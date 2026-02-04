@@ -1,0 +1,243 @@
+{
+  "name": "NodeJS-Starter-V1 with Claude Hooks",
+  "version": "2.0.0",
+  "description": "Production-ready monorepo with automated quality, security, and Australian compliance hooks",
+
+  "model": "claude-opus-4-5-20251101",
+  "maxTokens": 64000,
+
+  "permissions": {
+    "allow": [
+      "Read", "Write", "Edit", "Bash(npm *)", "Bash(npx *)", "Bash(pnpm *)",
+      "Bash(mkdir *)", "Bash(cat *)", "Bash(echo *)", "Bash(chmod *)",
+      "Bash(touch *)", "Bash(git *)", "Bash(supabase *)", "Bash(uv *)",
+      "Bash(python *)", "Bash(docker *)"
+    ],
+    "deny": [
+      "Bash(rm -rf /)",
+      "Bash(rm -rf /*)",
+      "Bash(sudo *)",
+      "Bash(> /etc/*)",
+      "Bash(dd *)"
+    ]
+  },
+
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/session-bootstrap.sh",
+            "timeout": 30,
+            "statusMessage": "🚀 Initializing NodeJS-Starter-V1 environment..."
+          }
+        ]
+      }
+    ],
+
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/security-validator.sh",
+            "timeout": 10,
+            "statusMessage": "🔒 Validating command safety..."
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/protected-files-guardian.sh",
+            "timeout": 5,
+            "statusMessage": "🛡️ Checking protected files..."
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__.*__write.*|mcp__memory__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/mcp-validator.sh",
+            "timeout": 5,
+            "statusMessage": "🔍 Validating MCP operation..."
+          }
+        ]
+      }
+    ],
+
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/quality-gate.sh",
+            "async": true,
+            "timeout": 180,
+            "statusMessage": "⚡ Running async quality checks..."
+          },
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/australian-compliance.sh",
+            "async": true,
+            "timeout": 60,
+            "statusMessage": "🇦🇺 Checking Australian compliance..."
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/post-command-logger.sh",
+            "async": true,
+            "timeout": 30,
+            "statusMessage": "📝 Logging command execution..."
+          }
+        ]
+      }
+    ],
+
+    "PostToolUseFailure": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/failure-analyzer.sh",
+            "timeout": 15,
+            "statusMessage": "🔍 Analyzing failure..."
+          }
+        ]
+      }
+    ],
+
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "agent",
+            "prompt": "You are a task completeness verifier for a NodeJS-Starter-V1 monorepo project. Review the session context and determine if the task is truly complete.\n\nCheck for:\n1. All requested files created/modified\n2. TypeScript types are correct (no 'any' types)\n3. Tests written and passing\n4. Documentation updated if needed\n5. Australian compliance (en-AU spelling, DD/MM/YYYY dates, AUD currency)\n6. No console.log or debug statements left\n7. Error handling implemented\n8. Proper exports from barrel files\n\nInput context: $ARGUMENTS\n\nRespond with JSON:\n{\"ok\": true} if complete, or\n{\"ok\": false, \"reason\": \"Specific issues found\"}",
+            "timeout": 60,
+            "statusMessage": "✅ Verifying task completeness..."
+          }
+        ]
+      }
+    ],
+
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "Review this user prompt for potential issues in a NodeJS-Starter-V1 monorepo: $ARGUMENTS\n\nCheck if the prompt:\n1. Requests destructive operations without safeguards\n2. Asks to skip tests or quality checks\n3. Violates security best practices\n4. Goes against project architecture patterns\n\nRespond with JSON: {\"ok\": true} to allow, or {\"ok\": false, \"reason\": \"Explanation\"} to block.",
+            "timeout": 15,
+            "statusMessage": "🤔 Reviewing prompt..."
+          }
+        ]
+      }
+    ],
+
+    "Notification": [
+      {
+        "matcher": "permission_prompt",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/notify-permission.sh",
+            "async": true,
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+
+    "SubagentStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/subagent-context.sh",
+            "timeout": 10,
+            "statusMessage": "🤖 Preparing subagent context..."
+          }
+        ]
+      }
+    ]
+  },
+
+  "commands": {
+    "bootstrap": {
+      "description": "Full foundation setup - run ONCE on new project",
+      "file": ".claude/commands/bootstrap.md"
+    },
+    "new-feature": {
+      "description": "Scaffold a complete feature with all required files",
+      "file": ".claude/commands/new-feature.md"
+    },
+    "verify": {
+      "description": "Verify foundation is intact",
+      "file": ".claude/commands/verify.md"
+    },
+    "audit": {
+      "description": "Full architecture audit",
+      "file": ".claude/commands/audit.md"
+    },
+    "fix-types": {
+      "description": "Regenerate database types from Supabase",
+      "run": "supabase gen types typescript --local > src/types/database.ts && npm run typecheck"
+    },
+    "hooks-status": {
+      "description": "Check Claude Code hooks status",
+      "run": "echo 'Claude Hooks Status' && echo '===================' && echo 'Settings: .claude/settings.json' && echo 'Scripts: .claude/hooks/' && echo 'Logs: .claude/logs/' && echo '' && echo 'Active hooks:' && cat .claude/settings.json | jq -r '.hooks | keys[]' 2>/dev/null || echo 'Run: cat .claude/settings.json | jq .hooks'"
+    }
+  },
+
+  "rules": {
+    "architecture": {
+      "layers": ["components", "hooks", "api", "services", "repositories", "database"],
+      "prohibited": [
+        "components/ cannot import from server/",
+        "app/api/ cannot import from repositories/ (must use services)",
+        "repositories/ cannot import from services/"
+      ]
+    },
+    "types": [
+      "Never use 'any' - find the real type or use 'unknown'",
+      "Never use type assertions (as Type) without runtime validation",
+      "Database types are GENERATED, never manually written",
+      "All functions must have explicit return types",
+      "Use type imports: import type { X } from ..."
+    ],
+    "patterns": {
+      "api-route": "try { validate → service → respond } catch { handleApiError }",
+      "service": "Business logic only, calls repository, throws AppError",
+      "repository": "Data access only, no business logic",
+      "component": "Must handle: loading, error, empty, success states"
+    }
+  },
+
+  "memory": {
+    "project": {
+      "type": "turborepo-monorepo",
+      "frontend": "nextjs-15-react-19",
+      "backend": "fastapi-langgraph",
+      "database": "supabase",
+      "validation": "zod-pydantic",
+      "location": "australia"
+    },
+    "architecture": "foundation-first",
+    "enforcement": "strict",
+    "compliance": "australian-en-au"
+  }
+}

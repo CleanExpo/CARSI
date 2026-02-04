@@ -1,0 +1,129 @@
+# =============================================================================
+# Docker Compose - Isolated Development Environment
+# =============================================================================
+# This configuration creates a fully isolated development environment.
+# External API calls are blocked by default.
+# =============================================================================
+
+version: '3.9'
+
+services:
+  # ---------------------------------------------------------------------------
+  # PostgreSQL Database
+  # ---------------------------------------------------------------------------
+  postgres:
+    image: pgvector/pgvector:pg15
+    container_name: starter-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: starter_user
+      POSTGRES_PASSWORD: local_dev_password
+      POSTGRES_DB: starter_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - isolated_dev
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U starter_user -d starter_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ---------------------------------------------------------------------------
+  # Redis Cache
+  # ---------------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: starter-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - isolated_dev
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ---------------------------------------------------------------------------
+  # Mailhog - Email Capture (catches all outgoing emails)
+  # ---------------------------------------------------------------------------
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: starter-mailhog
+    restart: unless-stopped
+    ports:
+      - "1025:1025"   # SMTP
+      - "8025:8025"   # Web UI
+    networks:
+      - isolated_dev
+
+  # ---------------------------------------------------------------------------
+  # MinIO - S3-Compatible Storage (local file storage)
+  # ---------------------------------------------------------------------------
+  minio:
+    image: minio/minio:latest
+    container_name: starter-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9000:9000"   # API
+      - "9001:9001"   # Console
+    volumes:
+      - minio_data:/data
+    networks:
+      - isolated_dev
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  # ---------------------------------------------------------------------------
+  # Mock API Server (intercepts external API calls in development)
+  # ---------------------------------------------------------------------------
+  mock-api:
+    build:
+      context: ./docker/mock-api
+      dockerfile: Dockerfile
+    container_name: starter-mock-api
+    restart: unless-stopped
+    ports:
+      - "8888:8888"
+    environment:
+      - MOCK_ELEVENLABS=true
+      - MOCK_STRIPE=true
+      - MOCK_TWILIO=true
+    networks:
+      - isolated_dev
+    profiles:
+      - mock  # Only starts with: docker compose --profile mock up
+
+# =============================================================================
+# Networks
+# =============================================================================
+networks:
+  isolated_dev:
+    driver: bridge
+    name: starter_isolated_network
+    # This network is isolated - containers can only talk to each other
+
+# =============================================================================
+# Volumes
+# =============================================================================
+volumes:
+  postgres_data:
+    name: starter_postgres_data
+  redis_data:
+    name: starter_redis_data
+  minio_data:
+    name: starter_minio_data
