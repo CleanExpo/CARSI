@@ -151,6 +151,10 @@ def route_task(self, task: Task) -> Agent:
     if self.is_verification_task(task):
         return self.get_agent('verification')
 
+    # Skill/tooling meta-tasks → Skill Manager
+    if self.is_skill_management_task(task):
+        return self.get_agent('skill-manager')
+
     # Fallback: Analyze and route
     return self.analyze_and_route(task)
 ```

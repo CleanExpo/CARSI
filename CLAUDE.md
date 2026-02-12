@@ -37,6 +37,12 @@ pnpm deps:clean             # Clean install dependencies
 .bin/bd.exe create "Title"  # Create new task
 .bin/bd.exe sync            # Sync to git
 
+# Skill Manager
+/skill-manager analyse      # Analyse skill gaps
+/skill-manager generate X   # Generate new skill
+/skill-manager browse       # Browse skill catalogue
+/skill-manager health X     # Validate skill quality
+
 # Claude Code Hooks
 claude /hooks               # View configured hooks
 claude --debug              # Debug hook execution
@@ -480,6 +486,7 @@ This project includes a skills system compatible with Vercel's Agent Skills form
 | `scientific-luxury`     | "design", "UI", "component"     | Design system enforcement                                      |
 | `react-best-practices`  | "React performance", "bundle"   | 57 Vercel React optimisation rules                             |
 | `web-design-guidelines` | "accessibility", "UX audit"     | 100+ accessibility & UX rules                                  |
+| `skill-manager`         | "skill gap", "generate skill"   | Analyse gaps, generate skills, validate health                 |
 
 ### Installation
 

@@ -23,6 +23,7 @@ Location: `.skills/custom/`
 | **genesis-orchestrator** | Phase-locked execution for Next.js full-stack builds                            | "build", "implement", "create feature", "plan architecture" |
 | **council-of-logic**     | Mathematical first principles validation (Turing, Von Neumann, Bezier, Shannon) | "optimise", "algorithm", "performance", "complexity"        |
 | **scientific-luxury**    | Design system enforcement for Scientific Luxury tier UI                         | "design", "UI", "component", "styling", "animation"         |
+| **skill-manager**        | Analyse skill gaps, generate new skills, browse catalogue, validate health      | "skill gap", "generate skill", "skill health", "missing skills" |
 
 ### Identified Gaps
 
@@ -32,15 +33,18 @@ Location: `.skills/custom/`
 
 **XAEM Gap Analysis**: The existing `scientific-luxury` skill enforces design constraints but does not generate themes. An XAEM-style skill would add a two-pass pipeline: (1) generate high-entropy visual themes (colour palettes, typography, spacing, animation curves), then (2) translate those themes into implementable code (CSS variables, Tailwind config, component styles). This complements `scientific-luxury` by handling the creative generation pass before constraint enforcement.
 
+**Note**: Use `/skill-manager analyse` to run automated gap analysis across all installed skills and detect missing capabilities.
+
 ## Skill Priority
 
 When multiple skills could apply, use this priority order:
 
 1. **council-of-logic** - Always validate code quality first
-2. **genesis-orchestrator** - For workflow and phase management
-3. **scientific-luxury** - For UI/design decisions
-4. **react-best-practices** - For React-specific optimisations
-5. **web-design-guidelines** - For accessibility and UX audits
+2. **skill-manager** - For skill lifecycle and gap analysis
+3. **genesis-orchestrator** - For workflow and phase management
+4. **scientific-luxury** - For UI/design decisions
+5. **react-best-practices** - For React-specific optimisations
+6. **web-design-guidelines** - For accessibility and UX audits
 
 ## Skill Activation
 
@@ -68,7 +72,7 @@ cp -r .skills/vercel-labs-agent-skills/skills/* ~/.claude/skills/
 
 ## Creating New Skills
 
-Follow the Vercel Skills format:
+Follow the Vercel Skills format. Use `/skill-manager generate {name}` to automate skill creation with built-in validation.
 
 ```
 .skills/custom/{skill-name}/
