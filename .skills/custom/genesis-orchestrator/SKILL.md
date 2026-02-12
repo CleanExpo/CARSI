@@ -22,6 +22,12 @@ Activate this skill when:
 - Needing to break complex work into verifiable sections
 - User says: "build", "implement", "create", "plan", "architecture"
 
+Do NOT activate when:
+
+- Reviewing or optimising existing code (use `council-of-logic` instead)
+- Styling or designing UI components (use `scientific-luxury` instead)
+- Running single-file bug fixes that do not require phased execution
+
 ## Core Directives
 
 ### Token Economy Protocol

@@ -22,6 +22,12 @@ Activate this skill when:
 - Reviewing designs for compliance
 - User mentions: "design", "UI", "component", "style", "animation"
 
+Do NOT activate when:
+
+- Writing backend-only logic, API routes, or database schemas
+- Optimising algorithms or data structures (use `council-of-logic` instead)
+- Configuring CI/CD, deployment, or infrastructure
+
 ## Core Principle
 
 **If it looks like a Bootstrap template, it's wrong.**
@@ -344,6 +350,18 @@ Before committing any new UI component, verify:
 - [ ] Avoids Lucide icons for status (uses breathing orbs)
 - [ ] Includes breathing/glow animations for active states
 - [ ] Uses Australian date/time formats
+
+## Response Format
+
+```
+[AGENT_ACTIVATED]: Scientific Luxury
+[PHASE]: {Audit | Implementation | Review}
+[STATUS]: {in_progress | complete}
+
+{design analysis or component guidance}
+
+[NEXT_ACTION]: {what to do next}
+```
 
 ---
 

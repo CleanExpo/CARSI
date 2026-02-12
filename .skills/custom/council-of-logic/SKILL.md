@@ -23,6 +23,12 @@ Activate this skill when:
 - Reducing data payload sizes
 - User mentions: "optimise", "performance", "complexity", "efficient"
 
+Do NOT activate when:
+
+- Writing documentation or README files (use Specialist D)
+- Implementing UI layouts without animations (use `scientific-luxury` instead)
+- Configuring environment variables or deployment settings
+
 ## The Council
 
 ### Alan Turing - Algorithmic Efficiency & Logic
@@ -226,6 +232,18 @@ transition: all 0.3s linear;
 ```css
 /* Physics-based - APPROVED */
 transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+```
+
+## Response Format
+
+```
+[AGENT_ACTIVATED]: Council of Logic
+[PHASE]: {Proof | Solve | Verify}
+[STATUS]: {in_progress | complete}
+
+{council analysis or verification results}
+
+[NEXT_ACTION]: {what to do next}
 ```
 
 ---
