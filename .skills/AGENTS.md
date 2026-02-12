@@ -27,6 +27,7 @@ Location: `.skills/custom/`
 | **error-taxonomy**       | Structured error codes, categories, and user-facing messages                    | "error handling", "error codes", "error messages", "error response" |
 | **data-validation**      | Zod and Pydantic validation patterns for input sanitisation                     | "validation", "Zod", "Pydantic", "schema", "sanitise", "input" |
 | **input-sanitisation**   | XSS, SQL injection, and command injection prevention patterns                   | "XSS", "injection", "sanitise", "security", "escape", "OWASP" |
+| **structured-logging**   | JSON-structured logging with correlation IDs and log levels                     | "logging", "logs", "observability", "tracing", "monitoring" |
 
 ### Identified Gaps
 
@@ -47,10 +48,11 @@ When multiple skills could apply, use this priority order:
 3. **error-taxonomy** - For structured error handling patterns
 4. **data-validation** - For input sanitisation and schema patterns
 5. **input-sanitisation** - For injection prevention and security
-6. **genesis-orchestrator** - For workflow and phase management
-7. **scientific-luxury** - For UI/design decisions
-8. **react-best-practices** - For React-specific optimisations
-9. **web-design-guidelines** - For accessibility and UX audits
+6. **structured-logging** - For observability and log patterns
+7. **genesis-orchestrator** - For workflow and phase management
+8. **scientific-luxury** - For UI/design decisions
+9. **react-best-practices** - For React-specific optimisations
+10. **web-design-guidelines** - For accessibility and UX audits
 
 ## Skill Activation
 
