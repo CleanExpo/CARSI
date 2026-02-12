@@ -28,6 +28,7 @@ Location: `.skills/custom/`
 | **data-validation**      | Zod and Pydantic validation patterns for input sanitisation                     | "validation", "Zod", "Pydantic", "schema", "sanitise", "input" |
 | **input-sanitisation**   | XSS, SQL injection, and command injection prevention patterns                   | "XSS", "injection", "sanitise", "security", "escape", "OWASP" |
 | **structured-logging**   | JSON-structured logging with correlation IDs and log levels                     | "logging", "logs", "observability", "tracing", "monitoring" |
+| **api-contract**         | Typed API contracts between FastAPI (Pydantic) and Next.js (Zod)               | "API contract", "endpoint", "response type", "OpenAPI", "schema" |
 
 ### Identified Gaps
 
@@ -49,10 +50,11 @@ When multiple skills could apply, use this priority order:
 4. **data-validation** - For input sanitisation and schema patterns
 5. **input-sanitisation** - For injection prevention and security
 6. **structured-logging** - For observability and log patterns
-7. **genesis-orchestrator** - For workflow and phase management
-8. **scientific-luxury** - For UI/design decisions
-9. **react-best-practices** - For React-specific optimisations
-10. **web-design-guidelines** - For accessibility and UX audits
+7. **api-contract** - For typed frontend/backend API contracts
+8. **genesis-orchestrator** - For workflow and phase management
+9. **scientific-luxury** - For UI/design decisions
+10. **react-best-practices** - For React-specific optimisations
+11. **web-design-guidelines** - For accessibility and UX audits
 
 ## Skill Activation
 
