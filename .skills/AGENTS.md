@@ -34,6 +34,7 @@ Location: `.skills/custom/`
 | **csv-processor**        | Streaming CSV parse and generate with Zod/Pydantic row validation              | "CSV", "import", "export", "spreadsheet", "download data", "upload file" |
 | **email-template**       | Responsive transactional emails with React Email and Scientific Luxury design  | "email", "template", "notification", "transactional", "welcome email" |
 | **metrics-collector**    | Database-backed metrics instrumentation with counters, gauges, and histograms  | "metrics", "KPI", "instrumentation", "analytics", "monitoring", "dashboard data" |
+| **dashboard-patterns**   | Real-time dashboard patterns with Status Command Centre, timeline layout, Supabase Realtime | "dashboard", "metrics display", "real-time", "monitoring UI", "command centre" |
 
 ### Identified Gaps
 
@@ -62,9 +63,10 @@ When multiple skills could apply, use this priority order:
 11. **csv-processor** - For CSV import, export, and streaming parse
 12. **email-template** - For transactional email design and delivery
 13. **genesis-orchestrator** - For workflow and phase management
-14. **scientific-luxury** - For UI/design decisions
-15. **react-best-practices** - For React-specific optimisations
-16. **web-design-guidelines** - For accessibility and UX audits
+14. **dashboard-patterns** - For real-time dashboard visualisation and layout
+15. **scientific-luxury** - For UI/design decisions
+16. **react-best-practices** - For React-specific optimisations
+17. **web-design-guidelines** - For accessibility and UX audits
 
 ## Skill Activation
 
