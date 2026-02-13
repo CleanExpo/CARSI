@@ -32,6 +32,7 @@ Location: `.skills/custom/`
 | **state-machine**        | Finite state machine patterns for complex flows and status enums               | "state machine", "status", "workflow state", "transitions", "FSM" |
 | **cron-scheduler**       | Scheduled task management with overlap protection and CRON_SECRET auth         | "cron", "schedule", "periodic", "interval", "timer", "background job" |
 | **csv-processor**        | Streaming CSV parse and generate with Zod/Pydantic row validation              | "CSV", "import", "export", "spreadsheet", "download data", "upload file" |
+| **email-template**       | Responsive transactional emails with React Email and Scientific Luxury design  | "email", "template", "notification", "transactional", "welcome email" |
 
 ### Identified Gaps
 
@@ -57,10 +58,11 @@ When multiple skills could apply, use this priority order:
 8. **state-machine** - For finite state machines and status transitions
 9. **cron-scheduler** - For scheduled tasks and periodic jobs
 10. **csv-processor** - For CSV import, export, and streaming parse
-11. **genesis-orchestrator** - For workflow and phase management
-12. **scientific-luxury** - For UI/design decisions
-13. **react-best-practices** - For React-specific optimisations
-14. **web-design-guidelines** - For accessibility and UX audits
+11. **email-template** - For transactional email design and delivery
+12. **genesis-orchestrator** - For workflow and phase management
+13. **scientific-luxury** - For UI/design decisions
+14. **react-best-practices** - For React-specific optimisations
+15. **web-design-guidelines** - For accessibility and UX audits
 
 ## Skill Activation
 
