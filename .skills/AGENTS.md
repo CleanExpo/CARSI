@@ -33,6 +33,7 @@ Location: `.skills/custom/`
 | **cron-scheduler**       | Scheduled task management with overlap protection and CRON_SECRET auth         | "cron", "schedule", "periodic", "interval", "timer", "background job" |
 | **csv-processor**        | Streaming CSV parse and generate with Zod/Pydantic row validation              | "CSV", "import", "export", "spreadsheet", "download data", "upload file" |
 | **email-template**       | Responsive transactional emails with React Email and Scientific Luxury design  | "email", "template", "notification", "transactional", "welcome email" |
+| **metrics-collector**    | Database-backed metrics instrumentation with counters, gauges, and histograms  | "metrics", "KPI", "instrumentation", "analytics", "monitoring", "dashboard data" |
 
 ### Identified Gaps
 
@@ -54,15 +55,16 @@ When multiple skills could apply, use this priority order:
 4. **data-validation** - For input sanitisation and schema patterns
 5. **input-sanitisation** - For injection prevention and security
 6. **structured-logging** - For observability and log patterns
-7. **api-contract** - For typed frontend/backend API contracts
-8. **state-machine** - For finite state machines and status transitions
-9. **cron-scheduler** - For scheduled tasks and periodic jobs
-10. **csv-processor** - For CSV import, export, and streaming parse
-11. **email-template** - For transactional email design and delivery
-12. **genesis-orchestrator** - For workflow and phase management
-13. **scientific-luxury** - For UI/design decisions
-14. **react-best-practices** - For React-specific optimisations
-15. **web-design-guidelines** - For accessibility and UX audits
+7. **metrics-collector** - For metrics instrumentation and analytics data
+8. **api-contract** - For typed frontend/backend API contracts
+9. **state-machine** - For finite state machines and status transitions
+10. **cron-scheduler** - For scheduled tasks and periodic jobs
+11. **csv-processor** - For CSV import, export, and streaming parse
+12. **email-template** - For transactional email design and delivery
+13. **genesis-orchestrator** - For workflow and phase management
+14. **scientific-luxury** - For UI/design decisions
+15. **react-best-practices** - For React-specific optimisations
+16. **web-design-guidelines** - For accessibility and UX audits
 
 ## Skill Activation
 
