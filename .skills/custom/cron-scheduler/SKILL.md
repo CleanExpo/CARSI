@@ -14,11 +14,15 @@ metadata:
 
 # Cron Scheduler - Scheduled Task Management
 
-Enforces consistent patterns for all scheduled tasks across the stack. Codifies the project's existing Vercel cron jobs and `ScheduledAuditRunner`, and adds overlap protection, idempotency, and timezone-aware scheduling.
+## Description
+
+Enforces consistent patterns for all scheduled tasks across the NodeJS-Starter-V1 stack. Codifies the project's existing Vercel cron jobs and ScheduledAuditRunner, covering cron expression conventions, CRON_SECRET authentication, overlap protection, idempotency, and timezone-aware scheduling for AEST/AEDT.
+
+---
 
 ## When to Apply
 
-Activate this skill when:
+### Positive Triggers
 
 - Creating new cron jobs or scheduled tasks
 - Adding Vercel cron entries to `vercel.json`
@@ -28,7 +32,7 @@ Activate this skill when:
 - Adding overlap protection to existing scheduled tasks
 - User mentions: "cron", "schedule", "periodic", "interval", "timer", "background job"
 
-Do NOT activate when:
+### Negative Triggers
 
 - Implementing real-time WebSocket or SSE connections
 - Designing state machine transitions (use `state-machine` instead)
@@ -495,5 +499,4 @@ Alert after 3+ consecutive failures. Track failure count per job in the database
 
 - **Timezone**: AEST (UTC+10) / AEDT (UTC+11) — store UTC, convert in display
 - **Spelling**: serialise, analyse, optimise, behaviour, colour, authorise
-- **Business Hours**: 9:00 AM – 5:00 PM AEST/AEDT (Mon–Fri)
 - **Date Format**: ISO 8601 in API; DD/MM/YYYY in UI display

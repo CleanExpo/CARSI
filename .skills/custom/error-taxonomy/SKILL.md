@@ -15,9 +15,13 @@ metadata:
 
 Unified error classification system ensuring every error in the stack has a code, category, severity, and user-facing message. Bridges the FastAPI `ErrorResponse` model with the Next.js `ApiClientError` class.
 
+## Description
+
+Provides a structured error code taxonomy following the `DOMAIN_CATEGORY_SPECIFIC` format. Maps every runtime error to an HTTP status code, severity level, and user-facing message, ensuring consistent error handling between the FastAPI backend and Next.js frontend.
+
 ## When to Apply
 
-Activate this skill when:
+### Positive Triggers
 
 - Creating or modifying API error responses
 - Adding new `HTTPException` raises in FastAPI routes
@@ -26,7 +30,7 @@ Activate this skill when:
 - Reviewing error consistency across backend and frontend
 - User mentions: "error handling", "error codes", "error messages", "error response"
 
-Do NOT activate when:
+### Negative Triggers
 
 - Implementing retry/resilience logic (use `retry-strategy` instead)
 - Designing React error boundary components (use `error-boundary` instead)
@@ -277,6 +281,23 @@ When adding a new error code:
 4. **Register** in the Error Code Registry table above
 5. **Map** a user-facing message in the frontend `ERROR_MESSAGES`
 6. **Use** the `ErrorResponse` model when raising `HTTPException`
+
+## Anti-Patterns
+
+| Pattern | Problem | Correct Approach |
+|---------|---------|------------------|
+| Unstructured error strings (`raise HTTPException(detail="bad input")`) | No machine-readable code, inconsistent frontend handling | Use `ErrorResponse` model with `error_code` field |
+| Inconsistent error codes (`AUTH_BAD_TOKEN` vs `AUTH_VALIDATION_INVALID_TOKEN`) | Breaks the `DOMAIN_CATEGORY_SPECIFIC` convention | Follow the three-part code format defined in this skill |
+| Missing user-facing messages | Frontend falls back to raw technical error text | Map every error code in the `ERROR_MESSAGES` record |
+| Error codes not matching domain prefix | Agent errors using `SYS_` prefix or vice versa | Choose domain from the Domains table before naming |
+
+## Checklist
+
+- [ ] Error codes follow `DOMAIN_CATEGORY_SPECIFIC` format
+- [ ] User-facing messages defined in frontend `ERROR_MESSAGES` map
+- [ ] HTTP status codes mapped correctly per severity table
+- [ ] Frontend `ApiClientError` handling matches backend `ErrorResponse` contract
+- [ ] New error codes registered in the Error Code Registry section
 
 ## Response Format
 

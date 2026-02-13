@@ -17,9 +17,15 @@ metadata:
 
 Standardised patterns for collecting, storing, and querying application metrics. Codifies the project's existing database-backed approach (Supabase + PostgreSQL) and defines conventions for metric naming, aggregation, and display. Designed for Vercel/serverless — no Prometheus scraping required.
 
+## Description
+
+Codifies database-backed metrics instrumentation for NodeJS-Starter-V1 using Supabase/PostgreSQL, covering standardised metric types (counters, gauges, histograms), naming conventions, time-series aggregation queries, and optional OpenTelemetry export for serverless-compatible observability.
+
+---
+
 ## When to Apply
 
-Activate this skill when:
+### Positive Triggers
 
 - Adding new metrics or KPIs to the application
 - Creating dashboard data sources or analytics endpoints
@@ -28,7 +34,7 @@ Activate this skill when:
 - Setting up alerting thresholds based on metric values
 - User mentions: "metrics", "KPI", "instrumentation", "analytics", "monitoring", "dashboard data"
 
-Do NOT activate when:
+### Negative Triggers
 
 - Adding log statements to code (use `structured-logging` instead)
 - Designing dashboard UI components (use `dashboard-patterns` when available)

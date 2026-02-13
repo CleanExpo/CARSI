@@ -16,9 +16,15 @@ metadata:
 
 Codifies the project's existing dashboard architecture: the Status Command Centre component library, backend analytics APIs, and the Scientific Luxury design rules that govern every data surface. Enforces timeline layout, spectral colours, physics-based animations, and Australian locale formatting.
 
+## Description
+
+Codifies real-time dashboard patterns for NodeJS-Starter-V1 including the Status Command Centre component library, timeline/orbital layouts, Supabase Realtime integration, spectral colour mapping, and Scientific Luxury design enforcement for all data visualisation surfaces.
+
+---
+
 ## When to Apply
 
-Activate this skill when:
+### Positive Triggers
 
 - Building new dashboard pages or metric displays
 - Adding real-time data visualisation components
@@ -28,7 +34,7 @@ Activate this skill when:
 - Reviewing dashboard layouts for Scientific Luxury compliance
 - User mentions: "dashboard", "metrics display", "real-time", "monitoring UI", "command centre"
 
-Do NOT activate when:
+### Negative Triggers
 
 - Collecting or storing metrics data (use `metrics-collector` instead)
 - Designing email templates (use `email-template` instead)

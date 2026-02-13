@@ -15,9 +15,13 @@ metadata:
 
 Validation patterns ensuring all data entering the system is validated at boundaries: user input via Zod (frontend), API requests via Pydantic (backend). No unvalidated data crosses a trust boundary.
 
+## Description
+
+Defines Zod and Pydantic validation patterns for all data entering the system at trust boundaries. Covers form validation, API request schemas, type-safe contracts, Australian-specific validators (ABN, phone, postcode), and schema composition strategies.
+
 ## When to Apply
 
-Activate this skill when:
+### Positive Triggers
 
 - Creating or modifying form inputs with user data
 - Defining API request/response schemas (Pydantic models)
@@ -26,7 +30,7 @@ Activate this skill when:
 - Building new API endpoints that accept POST/PUT/PATCH data
 - User mentions: "validation", "Zod", "Pydantic", "schema", "sanitise", "input"
 
-Do NOT activate when:
+### Negative Triggers
 
 - Implementing authentication logic (use auth patterns directly)
 - Designing error response formats (use `error-taxonomy` instead)
@@ -262,6 +266,24 @@ When adding a new feature, verify:
 - [ ] Every POST/PUT/PATCH endpoint has a Pydantic request model
 - [ ] Error messages are user-friendly, not technical
 - [ ] Australian formats validated where applicable (ABN, phone, postcode, date)
+- [ ] Schema field names match between frontend Zod and backend Pydantic
+
+## Anti-Patterns
+
+| Pattern | Problem | Correct Approach |
+|---------|---------|------------------|
+| Validation logic inside route handlers | Mixes concerns, hard to reuse or test | Define Zod/Pydantic schemas separately and reference them |
+| No error messages on validation failure | Users see raw Pydantic/Zod errors | Provide human-readable messages in en-AU on every field |
+| Type coercion without validation (`Number(input)`) | `NaN` and unexpected values slip through | Use Zod `.coerce.number()` or Pydantic `field_validator` |
+| Optional fields without defaults | Downstream code must null-check everywhere | Set sensible defaults via `Field(default=...)` or `.default()` |
+| Manually defining types instead of inferring | Types drift out of sync with schemas | Use `z.infer<typeof schema>` and Pydantic model exports |
+
+## Checklist
+
+- [ ] Zod schemas defined for all frontend form and API inputs
+- [ ] Pydantic models defined for all backend request bodies
+- [ ] Error messages written in en-AU (e.g., "Please enter a valid email address")
+- [ ] Validation occurs at system boundaries (frontend forms, API entry points)
 - [ ] Schema field names match between frontend Zod and backend Pydantic
 
 ## Response Format

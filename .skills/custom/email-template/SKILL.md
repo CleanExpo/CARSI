@@ -14,11 +14,15 @@ metadata:
 
 # Email Template - Responsive Transactional Emails
 
-Patterns for building, previewing, and sending transactional emails that match the Scientific Luxury design system. Uses React Email for component-based templates and Resend (or SMTP) for delivery.
+## Description
+
+Provides responsive transactional email template patterns for NodeJS-Starter-V1 using React Email and Resend. Covers Scientific Luxury dark-theme email design, template composition with shared components, preview tooling, and integration with the project's cron jobs and notification flows using Australian locale formatting.
+
+---
 
 ## When to Apply
 
-Activate this skill when:
+### Positive Triggers
 
 - Creating transactional email templates (welcome, password reset, alerts)
 - Building notification emails for cron job reports or agent alerts
@@ -27,7 +31,7 @@ Activate this skill when:
 - Adding email preview and testing tooling
 - User mentions: "email", "template", "notification", "transactional", "welcome email"
 
-Do NOT activate when:
+### Negative Triggers
 
 - Building in-app toast notifications (use UI component patterns)
 - Sending Slack or webhook notifications (use `webhook-handler` patterns)

@@ -12,9 +12,13 @@ metadata:
 
 Master orchestration protocol for autonomous Next.js full-stack development. Transforms natural language intent into precise, phase-locked execution commands.
 
+## Description
+
+Governs the full lifecycle of feature and project builds by enforcing phase-locked execution, token economy constraints, and sectional verification gates. Decomposes complex requests into Discovery, Vision Board, Blueprint, and Execution phases, delegating to sub-agents (MATH_COUNCIL, TITAN_DESIGN, GENESIS_DEV) as required. Ensures no phase advances without passing all quality checks.
+
 ## When to Apply
 
-Activate this skill when:
+### Positive Triggers
 
 - Starting a new feature implementation
 - Planning project architecture
@@ -22,7 +26,7 @@ Activate this skill when:
 - Needing to break complex work into verifiable sections
 - User says: "build", "implement", "create", "plan", "architecture"
 
-Do NOT activate when:
+### Negative Triggers
 
 - Reviewing or optimising existing code (use `council-of-logic` instead)
 - Styling or designing UI components (use `scientific-luxury` instead)
@@ -167,6 +171,25 @@ pnpm dev                   # Start development
 pnpm turbo run type-check lint  # Verify code quality
 pnpm turbo run test        # Run all tests
 ```
+
+## Anti-Patterns
+
+| Pattern | Problem | Correct Approach |
+| ------- | ------- | ---------------- |
+| Executing all phases in one pass | Context overflow, unverified output | Sectional execution with verification gates between each phase |
+| Skipping verification gates | Broken code propagates to later phases | Run type-check, lint, and test before advancing |
+| No spec before implementation | Scope creep, misaligned deliverables | Generate `phase-X-spec.md` in Blueprint phase before any code |
+| Ignoring Council of Logic checks | Sub-optimal algorithms and architecture | Activate MATH_COUNCIL for complexity and architecture review |
+| Committing multiple sections at once | Difficult rollback, unclear git history | Commit after each section with descriptive message |
+
+## Checklist
+
+- [ ] Phase spec generated and approved before execution begins
+- [ ] Verification gates (type-check, lint, test) passed at each phase boundary
+- [ ] Commit created after each execution section
+- [ ] Context checkpoint saved before approaching token limits
+- [ ] Sub-agents activated for their respective domains (not handled inline)
+- [ ] Australian localisation applied (en-AU spelling, DD/MM/YYYY dates)
 
 ---
 

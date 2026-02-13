@@ -16,9 +16,15 @@ metadata:
 
 Codifies the project's dual vector search systems (Memory Store for agent domain knowledge, RAG Pipeline for document retrieval), the multi-provider embedding abstraction, pgvector indexing, hybrid search scoring, and chunking strategies. All patterns are built on Supabase/PostgreSQL with pgvector.
 
+## Description
+
+Codifies pgvector embedding queries, similarity search, hybrid search, and multi-provider embedding generation for NodeJS-Starter-V1's Supabase/PostgreSQL stack, covering the Memory Store and RAG Pipeline vector infrastructure, indexing strategies, and chunking patterns.
+
+---
+
 ## When to Apply
 
-Activate this skill when:
+### Positive Triggers
 
 - Adding semantic search to new data types
 - Creating or modifying embedding generation logic
@@ -28,7 +34,7 @@ Activate this skill when:
 - Adding new embedding providers
 - User mentions: "vector", "embedding", "semantic search", "similarity", "RAG", "pgvector", "cosine"
 
-Do NOT activate when:
+### Negative Triggers
 
 - Building dashboard UI for search results (use `dashboard-patterns` instead)
 - Adding full-text keyword search only (use PostgreSQL `tsvector` directly)

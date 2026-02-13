@@ -15,9 +15,13 @@ metadata:
 
 Consistent, machine-readable logging across the full stack. The backend uses `structlog` with JSON output; the frontend uses a custom `Logger` class. This skill codifies conventions for both and adds correlation IDs, log context, and level guidelines.
 
+## Description
+
+Enforces JSON-structured logging with correlation IDs, consistent log levels, and contextual metadata across the FastAPI backend (structlog) and Next.js frontend (Logger class). Covers sensitive data redaction, request tracing, and observability best practices.
+
 ## When to Apply
 
-Activate this skill when:
+### Positive Triggers
 
 - Adding logging to new modules or API endpoints
 - Reviewing existing log statements for consistency
@@ -26,7 +30,7 @@ Activate this skill when:
 - Setting up log aggregation or monitoring pipelines
 - User mentions: "logging", "logs", "observability", "tracing", "monitoring", "debug"
 
-Do NOT activate when:
+### Negative Triggers
 
 - Implementing error response formats (use `error-taxonomy` instead)
 - Designing metrics/dashboards (use `metrics-collector` when available)
@@ -315,6 +319,25 @@ When adding or reviewing logging:
 - [ ] No secrets, tokens, or passwords in log output
 - [ ] Error logs include `error_code` from `error-taxonomy` where applicable
 - [ ] High-frequency operations use DEBUG level (not INFO)
+
+## Anti-Patterns
+
+| Pattern | Problem | Correct Approach |
+|---------|---------|------------------|
+| Unstructured `log.info(f"User {id} logged in")` strings | Not machine-parseable, breaks log aggregation | Use structured key-value pairs: `logger.info("User logged in", user_id=id)` |
+| Logging sensitive data (passwords, tokens, API keys) | Security breach via log exposure | Redact sensitive fields; never log credentials or session tokens |
+| No correlation IDs across requests | Cannot trace a request through backend and frontend | Use `CorrelationIdMiddleware` and propagate `X-Correlation-ID` header |
+| Inconsistent log levels (ERROR for warnings, INFO for debug) | Noisy alerts, missed critical errors | Follow the log level table: ERROR/WARNING/INFO/DEBUG |
+| Using `console.log` instead of the Logger class | No level filtering, no structured context, no timestamps | Import `logger` from `@/lib/logger` and use its methods |
+
+## Checklist
+
+- [ ] JSON-structured log output configured for production (structlog `JSONRenderer`)
+- [ ] Correlation IDs propagated via `X-Correlation-ID` header
+- [ ] Sensitive data redacted from all log output
+- [ ] Log levels consistently applied per the level guidelines table
+- [ ] All `console.log` calls replaced with `logger` methods in frontend code
+- [ ] Error logs include `error_code` from the error taxonomy
 
 ## Response Format
 

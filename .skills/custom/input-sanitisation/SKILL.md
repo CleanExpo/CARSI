@@ -15,9 +15,13 @@ metadata:
 
 Defence-in-depth patterns preventing injection attacks across the full stack. Complements `data-validation` (which checks shape/type) by ensuring data is safe for its destination context (HTML, SQL, shell, URL).
 
+## Description
+
+Covers XSS, SQL injection, command injection, URL redirect, and SSRF prevention patterns for the Next.js frontend and FastAPI backend. Enforces output encoding, parameterised queries, and safe subprocess handling aligned with OWASP Top 10 guidelines.
+
 ## When to Apply
 
-Activate this skill when:
+### Positive Triggers
 
 - Rendering user-generated content in HTML
 - Constructing database queries with user input
@@ -26,7 +30,7 @@ Activate this skill when:
 - Reviewing code for OWASP Top 10 vulnerabilities
 - User mentions: "XSS", "injection", "sanitise", "security", "escape", "OWASP"
 
-Do NOT activate when:
+### Negative Triggers
 
 - Validating data shape or type (use `data-validation` instead)
 - Classifying error responses (use `error-taxonomy` instead)
@@ -297,6 +301,25 @@ When reviewing code for injection risks:
 - [ ] No open redirects — all redirect targets validated against whitelist
 - [ ] No user-controlled URLs in server-side `fetch`/`requests` without SSRF check
 - [ ] CSP headers configured in Next.js
+
+## Anti-Patterns
+
+| Pattern | Problem | Correct Approach |
+|---------|---------|------------------|
+| String concatenation in SQL (`f"SELECT ... WHERE id = '{user_id}'"`) | SQL injection vulnerability | Use SQLAlchemy ORM or bound parameters with `text()` |
+| `innerHTML` or `dangerouslySetInnerHTML` for user content without sanitisation | XSS attack vector | Sanitise with DOMPurify before rendering |
+| No output encoding for context (HTML, URL, shell) | Injection in the destination context | Encode output appropriate to context: HTML-escape, URL-encode, `shlex.quote` |
+| Trusting client-side validation as the only defence | Attackers bypass the browser entirely | Always re-validate and sanitise on the server side |
+| `shell=True` with user-controlled arguments | Command injection vulnerability | Use list-form subprocess calls or `shlex.quote` |
+
+## Checklist
+
+- [ ] All SQL queries use parameterised queries (ORM or bound parameters)
+- [ ] XSS output encoding applied (DOMPurify for rich HTML, React auto-escaping elsewhere)
+- [ ] Command injection prevention verified (no `shell=True` with user input)
+- [ ] OWASP Top 10 input handling coverage reviewed
+- [ ] Redirect URLs validated against an allow-list
+- [ ] CSP headers configured in `next.config.ts`
 
 ## Response Format
 

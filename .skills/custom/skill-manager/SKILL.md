@@ -16,9 +16,13 @@ metadata:
 
 Meta-skill for analysing, generating, cataloguing, and validating the project's skill ecosystem. Operates as a peer to the Orchestrator in the agent hierarchy.
 
+## Description
+
+Manages the full lifecycle of agent skills including gap analysis, generation from templates or descriptions, catalogue browsing, and health validation. Ensures every skill in the project meets quality standards, uses Australian English, and is registered in the skill registry.
+
 ## When to Apply
 
-Activate this skill when:
+### Positive Triggers
 
 - Analysing which skills the project needs but lacks
 - Generating a new skill from a template or description
@@ -28,7 +32,7 @@ Activate this skill when:
 - Orchestrator requests gap analysis before a new phase
 - A new agent is added without corresponding skill coverage
 
-Do NOT activate when:
+### Negative Triggers
 
 - The task is about using an existing skill (route to that skill instead)
 - The task is pure code implementation (route to Specialist B)
@@ -177,10 +181,10 @@ Body sections (in order):
 
 ## When to Apply
 
-Activate this skill when:
+### Positive Triggers
 - {3+ positive triggers}
 
-Do NOT activate when:
+### Negative Triggers
 - {1+ negative triggers}
 
 ## Core Directives
@@ -260,6 +264,24 @@ Supports:
 Output the Health Report format defined in `references/health-check.md`.
 
 ---
+
+## Anti-Patterns
+
+| Pattern | Problem | Correct Approach |
+|---------|---------|------------------|
+| Generating skills without gap analysis | Produces redundant or low-priority skills | Run MODE 1 analysis before MODE 2 generation |
+| American English in generated skills | Fails health check locale validation | Always use en-AU: analyse, colour, optimise, behaviour |
+| Monolithic SKILL.md over 500 lines | Exceeds Shannon compression threshold | Split into SKILL.md + references/ directory |
+| Hardcoded absolute file paths | Breaks portability across environments | Use relative paths from project root |
+| Skipping health check after generation | Unvalidated skills enter the registry | Always run MODE 4 before registering a new skill |
+
+## Checklist
+
+- [ ] Gap analysis completed before generating new skills
+- [ ] Generated SKILL.md is under 500 lines
+- [ ] All en-AU spelling verified (analyse, catalogue, colour, optimise, behaviour)
+- [ ] Skill registered in `.skills/AGENTS.md`
+- [ ] Health check (MODE 4) passed with no critical findings
 
 ## Response Format
 

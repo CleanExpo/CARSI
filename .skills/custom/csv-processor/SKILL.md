@@ -14,11 +14,15 @@ metadata:
 
 # CSV Processor - Streaming CSV Parse & Generate
 
-Patterns for importing, exporting, and transforming CSV data across the stack. Enforces streaming (not load-all-into-memory), row-level validation, and Australian locale formatting.
+## Description
+
+Provides streaming CSV parse and generate patterns for NodeJS-Starter-V1, covering large file imports, exports, and transformations across Next.js frontend and FastAPI backend. Enforces row-by-row streaming, Zod and Pydantic row validation, and Australian locale formatting (DD/MM/YYYY dates, AUD currency).
+
+---
 
 ## When to Apply
 
-Activate this skill when:
+### Positive Triggers
 
 - Importing CSV files from user uploads
 - Exporting data to CSV for download (contractors, reports, agent runs)
@@ -27,7 +31,7 @@ Activate this skill when:
 - Transforming CSV data between formats
 - User mentions: "CSV", "import", "export", "spreadsheet", "download data", "upload file"
 
-Do NOT activate when:
+### Negative Triggers
 
 - Validating form inputs without file upload (use `data-validation` instead)
 - Generating PDF or HTML reports (use `report-generator` patterns)

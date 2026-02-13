@@ -16,9 +16,13 @@ metadata:
 
 Ensures every API endpoint has a typed contract: Pydantic models on the backend, Zod response schemas on the frontend, and documented error responses. Bridges the gap between `apps/backend/src/api/` and `apps/web/lib/api/`.
 
+## Description
+
+Enforces type-safe API contracts across the FastAPI backend and Next.js frontend. Every endpoint must declare a Pydantic `response_model`, have a matching Zod schema on the frontend, and document error responses via OpenAPI. Prevents schema drift, untyped responses, and manual type definitions by mandating a single source of truth through the Contract Triangle pattern.
+
 ## When to Apply
 
-Activate this skill when:
+### Positive Triggers
 
 - Creating or modifying API endpoints (FastAPI routes)
 - Adding frontend API calls (`apiClient.get/post/put/patch/delete`)
@@ -27,7 +31,7 @@ Activate this skill when:
 - Planning API versioning or deprecation
 - User mentions: "API contract", "endpoint", "response type", "OpenAPI", "schema"
 
-Do NOT activate when:
+### Negative Triggers
 
 - Validating user input forms (use `data-validation` instead)
 - Classifying error codes (use `error-taxonomy` instead)
@@ -384,6 +388,25 @@ rg "-> dict" apps/backend/src/api/routes/
 rg "apiClient\.(get|post|put|patch|delete)" apps/web/ | \
   rg -v "Schema\.parse"
 ```
+
+## Anti-Patterns
+
+| Pattern | Problem | Correct Approach |
+| ------- | ------- | ---------------- |
+| Untyped API responses (`-> dict`) | No compile-time or runtime validation, silent breakage | Declare `response_model` on every route with a Pydantic model |
+| Frontend/backend schema drift | Field mismatches cause runtime errors in production | Mirror Pydantic models with Zod schemas; validate with `.parse()` |
+| No response envelope pattern | Inconsistent list responses, missing pagination metadata | Use `PaginatedResponse` wrapper with `data` and `pagination` fields |
+| Manual type synchronisation | Types fall out of sync as endpoints evolve | Infer frontend types via `z.infer<typeof schema>`, never define manually |
+| Missing error response documentation | Consumers cannot handle failures gracefully | Document all error codes in `responses={}` dict using `ErrorResponse` model |
+
+## Checklist
+
+- [ ] Pydantic `response_model` defined on every route decorator
+- [ ] Zod client schemas match backend Pydantic models (field names, types, nullability)
+- [ ] API envelope pattern used for list endpoints (`data` + `pagination`)
+- [ ] OpenAPI spec generated with `summary`, `tags`, and `responses` on all routes
+- [ ] Error responses documented using `ErrorResponse` model
+- [ ] Frontend API calls parse responses through Zod schemas (`.parse()`)
 
 ## Response Format
 

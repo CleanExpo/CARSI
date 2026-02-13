@@ -12,9 +12,13 @@ metadata:
 
 Visual DNA for NodeJS-Starter-V1 Framework. Rejects generic SaaS aesthetics in favour of precision meets elegance.
 
+## Description
+
+Enforces the Scientific Luxury design tier across all React components and UI work. Mandates OLED black backgrounds, single-pixel borders, spectral colour mapping, physics-based Framer Motion animations, timeline/orbital layouts, and JetBrains Mono typography for data. Rejects Bootstrap card grids, Lucide icons for status, rounded corners, and linear transitions.
+
 ## When to Apply
 
-Activate this skill when:
+### Positive Triggers
 
 - Creating new React components
 - Styling UI elements
@@ -22,7 +26,7 @@ Activate this skill when:
 - Reviewing designs for compliance
 - User mentions: "design", "UI", "component", "style", "animation"
 
-Do NOT activate when:
+### Negative Triggers
 
 - Writing backend-only logic, API routes, or database schemas
 - Optimising algorithms or data structures (use `council-of-logic` instead)
@@ -334,6 +338,16 @@ new Date().toLocaleDateString('en-AU', {
   year: 'numeric',
 }); // "23/01/2026"
 ```
+
+## Anti-Patterns
+
+| Pattern | Problem | Correct Approach |
+| ------- | ------- | ---------------- |
+| Bootstrap/Tailwind card grids (`grid-cols-2`, `grid-cols-4`) | Generic SaaS aesthetic, "The Bento Trap" | Timeline nodes, data strips, or asymmetrical splits (40/60, 30/70) |
+| Lucide/FontAwesome icons for status indicators | Visual noise, lacks scientific precision | Breathing orbs with spectral colours and glow pulse animations |
+| White or light backgrounds | Violates OLED black foundation | Use `#050505` as primary background with `rgba(255,255,255,0.01)` elevation |
+| `rounded-lg` or `rounded-xl` corners | Soft, unprofessional appearance | Only `rounded-sm` (2px) permitted; `rounded-full` for orbs only |
+| Linear CSS transitions (`transition: all 0.3s linear`) | Mechanical, lifeless motion | Framer Motion with physics-based easing (`[0.19, 1, 0.22, 1]`) |
 
 ## Checklist for New Components
 

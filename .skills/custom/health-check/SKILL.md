@@ -16,9 +16,15 @@ metadata:
 
 Codifies the project's three-tier health probe architecture (shallow liveness, readiness, deep dependency checks), Docker container healthchecks, cron-based periodic monitoring, route discovery verification, and the comprehensive system health script. Patterns align with Kubernetes probe conventions even when running outside K8s.
 
+## Description
+
+Codifies liveness, readiness, and deep dependency health endpoints for NodeJS-Starter-V1's Next.js and FastAPI services, covering three-tier probe architecture, Docker healthchecks, cron-based monitoring, route discovery verification, and the system health script.
+
+---
+
 ## When to Apply
 
-Activate this skill when:
+### Positive Triggers
 
 - Adding new health check endpoints or probes
 - Integrating new dependencies that need health verification
@@ -28,7 +34,7 @@ Activate this skill when:
 - Adding service dependency checks to existing endpoints
 - User mentions: "health check", "liveness", "readiness", "probe", "heartbeat", "service health", "dependency check"
 
-Do NOT activate when:
+### Negative Triggers
 
 - Collecting application metrics (use `metrics-collector` instead)
 - Adding structured log statements (use `structured-logging` instead)

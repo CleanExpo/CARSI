@@ -12,9 +12,13 @@ metadata:
 
 Four legendary minds govern all technical decisions. Their principles are non-negotiable.
 
+## Description
+
+Validates all technical output against four mathematical first principles: Turing (algorithmic efficiency), Von Neumann (system architecture and game theory), Bezier (physics-based animation curves), and Shannon (information compression and token economy). Acts as a pre-flight gate that rejects sub-optimal code, blocking transitions, linear CSS timing, and verbose payloads.
+
 ## When to Apply
 
-Activate this skill when:
+### Positive Triggers
 
 - Writing or reviewing algorithms
 - Optimising performance
@@ -23,7 +27,7 @@ Activate this skill when:
 - Reducing data payload sizes
 - User mentions: "optimise", "performance", "complexity", "efficient"
 
-Do NOT activate when:
+### Negative Triggers
 
 - Writing documentation or README files (use Specialist D)
 - Implementing UI layouts without animations (use `scientific-luxury` instead)
@@ -245,6 +249,25 @@ transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1);
 
 [NEXT_ACTION]: {what to do next}
 ```
+
+## Anti-Patterns
+
+| Pattern | Problem | Correct Approach |
+| ------- | ------- | ---------------- |
+| O(n²) algorithms accepted without review | Exponential degradation at scale | Demand O(n) or O(log n); use Set/Map lookups instead of nested iterations |
+| Linear CSS transitions approved | Mechanical, lifeless UI that violates design principles | Apply physics-based cubic-bezier or spring easing curves |
+| Verbose prompts not compressed | Wasted tokens, poor signal-to-noise ratio | Apply Shannon compression — remove redundancy, dedupe, minimise |
+| Blocking operations in async code | Thread starvation, degraded responsiveness | Use async/parallel design patterns per Von Neumann principles |
+| Skipping the Proof step before coding | Unvalidated assumptions baked into implementation | State the mathematical model (complexity, architecture, easing, compression) first |
+
+## Checklist
+
+- [ ] Turing: Time complexity verified as O(n log n) or better
+- [ ] Von Neumann: Architecture checked for async execution and Nash equilibrium
+- [ ] Bezier: All animation curves use physics-based easing (no linear timing)
+- [ ] Shannon: Data payloads and prompts compressed to maximum signal density
+- [ ] Proof step completed before implementation began
+- [ ] Council Review checklist verified post-implementation
 
 ---
 

@@ -14,11 +14,15 @@ metadata:
 
 # State Machine - Finite State Machines for Complex Flows
 
-Enforces deterministic, minimal state machines for any multi-step flow. Codifies the project's existing patterns (TaskStatus, ExecutionStatus, NodeStatus) and provides a reusable framework for new state machines.
+## Description
+
+Enforces deterministic, minimal state machines for any multi-step flow in NodeJS-Starter-V1. Codifies the project's existing patterns (TaskStatus, ExecutionStatus, NodeStatus) and provides a reusable framework for defining states, transition maps, guard conditions, and side effects across Python and TypeScript.
+
+---
 
 ## When to Apply
 
-Activate this skill when:
+### Positive Triggers
 
 - Designing multi-step workflows with distinct status phases
 - Adding new `Enum` status fields to Pydantic models
@@ -27,7 +31,7 @@ Activate this skill when:
 - Adding retry, escalation, or verification loops
 - User mentions: "state machine", "status", "workflow state", "transitions", "FSM"
 
-Do NOT activate when:
+### Negative Triggers
 
 - Defining simple boolean flags (`is_active`, `is_published`)
 - Implementing form validation (use `data-validation` instead)
