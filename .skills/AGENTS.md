@@ -58,6 +58,11 @@ Location: `.skills/custom/`
 | **api-versioning**     | URL and header-based versioning with deprecation policies and sunset headers                  | "version", "v1", "v2", "deprecation", "sunset", "API version" |
 | **rbac-patterns**      | Role-based access control with permission hierarchies and row-level security                  | "RBAC", "role", "permission", "access control", "authorise", "guard" |
 | **status-page**        | Public status page with incident management, uptime tracking, and maintenance windows        | "status page", "incident", "uptime", "outage", "maintenance", "service status" |
+| **markdown-processor** | Parse, transform, and render Markdown with plugins and syntax highlighting                    | "Markdown", "MDX", "remark", "rehype", "render", "parse" |
+| **pdf-generator**      | Server-side PDF generation with React PDF and reportlab                                       | "PDF", "report", "invoice", "download", "export PDF", "A4" |
+| **content-moderation** | Content filtering, toxicity detection, and moderation queues                                   | "moderate", "filter", "toxicity", "safety", "content check", "PII" |
+| **i18n-patterns**      | Internationalisation with en-AU default, date/currency formatting, timezone handling          | "i18n", "locale", "translate", "date format", "currency", "timezone" |
+| **oauth-flow**         | OAuth 2.0 authorisation code flow with PKCE, provider config, and account linking             | "OAuth", "OIDC", "social login", "Google auth", "GitHub auth", "PKCE" |
 
 ### Identified Gaps
 
@@ -83,36 +88,41 @@ When multiple skills could apply, use this priority order:
 8. **data-validation** - For input sanitisation and schema patterns
 9. **input-sanitisation** - For injection prevention and security
 10. **rbac-patterns** - For role-based access control and permission hierarchies
-11. **secret-management** - For environment variable validation, redaction, and rotation
-12. **audit-trail** - For structured audit event logging and compliance
-13. **structured-logging** - For observability and log patterns
-14. **metrics-collector** - For metrics instrumentation and analytics data
-15. **tracing-patterns** - For distributed tracing and span context propagation
-16. **docker-patterns** - For multi-stage builds, layer caching, and Docker Compose
-17. **ci-cd-patterns** - For GitHub Actions workflows, caching, and security scanning
-18. **vector-search** - For pgvector embedding queries and similarity search
-19. **search-indexer** - For full-text search indexing with tsvector and GIN indexes
-20. **health-check** - For liveness, readiness, and dependency health probes
-21. **graceful-shutdown** - For signal handling, connection draining, and clean teardown
-22. **cache-strategy** - For caching patterns (lru_cache, Redis, Next.js fetch cache)
-23. **api-contract** - For typed frontend/backend API contracts
-24. **api-client** - For type-safe fetch wrappers with interceptors and retry
-25. **api-versioning** - For URL/header-based versioning with deprecation policies
-26. **webhook-handler** - For idempotent webhook processing with signature verification
-27. **state-machine** - For finite state machines and status transitions
-28. **queue-worker** - For Redis-backed background job processing
-29. **notification-system** - For multi-channel notification dispatch with preferences
-30. **cron-scheduler** - For scheduled tasks and periodic jobs
-31. **csv-processor** - For CSV import, export, and streaming parse
-32. **data-transform** - For ETL pipelines, typed mappers, and streaming transforms
-33. **email-template** - For transactional email design and delivery
-34. **changelog-generator** - For automated changelog and release notes from commits
-35. **genesis-orchestrator** - For workflow and phase management
-36. **dashboard-patterns** - For real-time dashboard visualisation and layout
-37. **status-page** - For public status page with incident management and uptime
-38. **scientific-luxury** - For UI/design decisions
-39. **react-best-practices** - For React-specific optimisations
-40. **web-design-guidelines** - For accessibility and UX audits
+11. **oauth-flow** - For OAuth 2.0/OIDC authorisation code flow with PKCE
+12. **secret-management** - For environment variable validation, redaction, and rotation
+13. **content-moderation** - For content filtering, toxicity detection, and safety checks
+14. **audit-trail** - For structured audit event logging and compliance
+15. **structured-logging** - For observability and log patterns
+16. **metrics-collector** - For metrics instrumentation and analytics data
+17. **tracing-patterns** - For distributed tracing and span context propagation
+18. **docker-patterns** - For multi-stage builds, layer caching, and Docker Compose
+19. **ci-cd-patterns** - For GitHub Actions workflows, caching, and security scanning
+20. **vector-search** - For pgvector embedding queries and similarity search
+21. **search-indexer** - For full-text search indexing with tsvector and GIN indexes
+22. **health-check** - For liveness, readiness, and dependency health probes
+23. **graceful-shutdown** - For signal handling, connection draining, and clean teardown
+24. **cache-strategy** - For caching patterns (lru_cache, Redis, Next.js fetch cache)
+25. **api-contract** - For typed frontend/backend API contracts
+26. **api-client** - For type-safe fetch wrappers with interceptors and retry
+27. **api-versioning** - For URL/header-based versioning with deprecation policies
+28. **webhook-handler** - For idempotent webhook processing with signature verification
+29. **state-machine** - For finite state machines and status transitions
+30. **queue-worker** - For Redis-backed background job processing
+31. **notification-system** - For multi-channel notification dispatch with preferences
+32. **cron-scheduler** - For scheduled tasks and periodic jobs
+33. **csv-processor** - For CSV import, export, and streaming parse
+34. **data-transform** - For ETL pipelines, typed mappers, and streaming transforms
+35. **markdown-processor** - For Markdown parsing, rendering, and MDX support
+36. **pdf-generator** - For server-side PDF generation with React PDF and reportlab
+37. **email-template** - For transactional email design and delivery
+38. **changelog-generator** - For automated changelog and release notes from commits
+39. **i18n-patterns** - For internationalisation with en-AU default locale
+40. **genesis-orchestrator** - For workflow and phase management
+41. **dashboard-patterns** - For real-time dashboard visualisation and layout
+42. **status-page** - For public status page with incident management and uptime
+43. **scientific-luxury** - For UI/design decisions
+44. **react-best-practices** - For React-specific optimisations
+45. **web-design-guidelines** - For accessibility and UX audits
 
 ## Skill Activation
 
