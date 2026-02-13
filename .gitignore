@@ -68,6 +68,7 @@ supabase/.temp
 *.tsbuildinfo
 .vercel
 .cache
+nul
 
 # Skills (external cloned repos)
 .skills/vercel-labs-agent-skills/
