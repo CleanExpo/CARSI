@@ -43,6 +43,7 @@ Location: `.skills/custom/`
 | **docker-patterns**      | Multi-stage builds, layer caching, security hardening, Docker Compose orchestration       | "Docker", "Dockerfile", "container", "image", "multi-stage", "docker-compose" |
 | **ci-cd-patterns**       | GitHub Actions workflow optimisation, caching strategies, security scanning pipelines     | "CI/CD", "GitHub Actions", "workflow", "pipeline", "deploy", "cache", "actions" |
 | **retry-strategy**       | Exponential backoff, circuit breaker, and retry policies for httpx and fetch clients       | "retry", "backoff", "circuit breaker", "timeout", "resilience", "transient error" |
+| **queue-worker**         | Redis-backed background job processing with arq (Python) and BullMQ (TypeScript)           | "queue", "worker", "background job", "Redis queue", "job processing", "BullMQ", "arq" |
 
 ### Identified Gaps
 
@@ -75,14 +76,15 @@ When multiple skills could apply, use this priority order:
 15. **cache-strategy** - For caching patterns (lru_cache, Redis, Next.js fetch cache)
 16. **api-contract** - For typed frontend/backend API contracts
 17. **state-machine** - For finite state machines and status transitions
-18. **cron-scheduler** - For scheduled tasks and periodic jobs
-19. **csv-processor** - For CSV import, export, and streaming parse
-20. **email-template** - For transactional email design and delivery
-21. **genesis-orchestrator** - For workflow and phase management
-22. **dashboard-patterns** - For real-time dashboard visualisation and layout
-23. **scientific-luxury** - For UI/design decisions
-24. **react-best-practices** - For React-specific optimisations
-25. **web-design-guidelines** - For accessibility and UX audits
+18. **queue-worker** - For Redis-backed background job processing
+19. **cron-scheduler** - For scheduled tasks and periodic jobs
+20. **csv-processor** - For CSV import, export, and streaming parse
+21. **email-template** - For transactional email design and delivery
+22. **genesis-orchestrator** - For workflow and phase management
+23. **dashboard-patterns** - For real-time dashboard visualisation and layout
+24. **scientific-luxury** - For UI/design decisions
+25. **react-best-practices** - For React-specific optimisations
+26. **web-design-guidelines** - For accessibility and UX audits
 
 ## Skill Activation
 
