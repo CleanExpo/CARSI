@@ -39,6 +39,7 @@ Location: `.skills/custom/`
 | **health-check**         | Liveness, readiness, and deep dependency health endpoints with Docker healthchecks | "health check", "liveness", "readiness", "probe", "heartbeat", "service health" |
 | **graceful-shutdown**    | Signal handling, connection draining, and clean resource teardown for backend and frontend | "shutdown", "SIGTERM", "drain", "cleanup", "teardown", "stop_grace_period" |
 | **cache-strategy**       | Caching patterns for Python (lru_cache, Redis) and Next.js (fetch cache, revalidation)    | "cache", "Redis", "TTL", "memoise", "revalidate", "lru_cache", "cache-aside" |
+| **tracing-patterns**     | Distributed tracing with span context propagation, W3C traceparent, agent span hierarchy  | "trace", "span", "traceparent", "distributed tracing", "correlation", "OpenTelemetry" |
 
 ### Identified Gaps
 
@@ -61,20 +62,21 @@ When multiple skills could apply, use this priority order:
 5. **input-sanitisation** - For injection prevention and security
 6. **structured-logging** - For observability and log patterns
 7. **metrics-collector** - For metrics instrumentation and analytics data
-8. **vector-search** - For pgvector embedding queries and similarity search
-9. **health-check** - For liveness, readiness, and dependency health probes
-10. **graceful-shutdown** - For signal handling, connection draining, and clean teardown
-11. **cache-strategy** - For caching patterns (lru_cache, Redis, Next.js fetch cache)
-12. **api-contract** - For typed frontend/backend API contracts
-13. **state-machine** - For finite state machines and status transitions
-14. **cron-scheduler** - For scheduled tasks and periodic jobs
-15. **csv-processor** - For CSV import, export, and streaming parse
-16. **email-template** - For transactional email design and delivery
-17. **genesis-orchestrator** - For workflow and phase management
-18. **dashboard-patterns** - For real-time dashboard visualisation and layout
-19. **scientific-luxury** - For UI/design decisions
-20. **react-best-practices** - For React-specific optimisations
-21. **web-design-guidelines** - For accessibility and UX audits
+8. **tracing-patterns** - For distributed tracing and span context propagation
+9. **vector-search** - For pgvector embedding queries and similarity search
+10. **health-check** - For liveness, readiness, and dependency health probes
+11. **graceful-shutdown** - For signal handling, connection draining, and clean teardown
+12. **cache-strategy** - For caching patterns (lru_cache, Redis, Next.js fetch cache)
+13. **api-contract** - For typed frontend/backend API contracts
+14. **state-machine** - For finite state machines and status transitions
+15. **cron-scheduler** - For scheduled tasks and periodic jobs
+16. **csv-processor** - For CSV import, export, and streaming parse
+17. **email-template** - For transactional email design and delivery
+18. **genesis-orchestrator** - For workflow and phase management
+19. **dashboard-patterns** - For real-time dashboard visualisation and layout
+20. **scientific-luxury** - For UI/design decisions
+21. **react-best-practices** - For React-specific optimisations
+22. **web-design-guidelines** - For accessibility and UX audits
 
 ## Skill Activation
 
