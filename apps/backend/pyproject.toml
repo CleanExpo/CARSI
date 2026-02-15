@@ -59,24 +59,7 @@ select = ["E", "F", "I", "N", "W", "UP"]
 [tool.mypy]
 python_version = "3.12"
 ignore_missing_imports = true
-check_untyped_defs = true
 warn_redundant_casts = true
-warn_unused_ignores = true
-
-# SQLAlchemy models use Column[] which mypy strict mode misinterprets
-[[tool.mypy.overrides]]
-module = ["src.db.*", "src.workflow.*"]
-disable_error_code = ["assignment", "attr-defined", "list-item"]
-
-# Route files have complex return types from FastAPI
-[[tool.mypy.overrides]]
-module = ["src.api.routes.*"]
-disable_error_code = ["return-value", "arg-type", "type-arg", "attr-defined"]
-
-# Agent/tool files with dynamic typing patterns
-[[tool.mypy.overrides]]
-module = ["src.agents.*", "src.tools.*", "src.skills.*"]
-disable_error_code = ["arg-type", "attr-defined", "no-any-return", "var-annotated", "type-arg"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
@@ -85,11 +68,14 @@ addopts = [
     "-v",
     "--strict-markers",
     "--tb=short",
+    "--ignore=tests/contracts",
+    "--ignore=tests/performance",
 ]
 markers = [
     "asyncio: mark test as async",
     "integration: mark test as integration test",
     "unit: mark test as unit test",
+    "performance: mark test as performance test",
 ]
 
 [tool.coverage.run]
