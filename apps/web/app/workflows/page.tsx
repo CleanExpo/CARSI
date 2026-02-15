@@ -29,7 +29,9 @@ export default function WorkflowsPage() {
         setWorkflows(data);
       }
     } catch (error) {
-      console.error("Failed to fetch workflows:", error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error("Failed to fetch workflows:", error);
+      }
     } finally {
       setLoading(false);
     }

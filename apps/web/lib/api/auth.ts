@@ -73,15 +73,14 @@ export const authApi = {
    * Logout (clear auth token)
    */
   async logout(): Promise<void> {
-    // Call backend logout then clear cookie via API route
+    // Call backend logout
     try {
       await apiClient.post('/api/auth/logout');
     } catch {
       // Ignore errors — proceed to clear cookie
     }
-    // Clear the httpOnly cookie by setting max-age=0 via a server action or
-    // redirect. For client-side, we navigate to trigger middleware cleanup.
-    document.cookie = 'auth_token=; path=/; max-age=0';
+    // Clear the httpOnly cookie via server-side API route
+    await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
   },
 
   /**

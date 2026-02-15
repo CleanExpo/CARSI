@@ -49,7 +49,9 @@ export default function WorkflowEditorPage() {
             setDescription(data.description || '');
           }
         } catch (error) {
-          console.error('Failed to fetch workflow:', error);
+          if (process.env.NODE_ENV === 'development') {
+            console.error('Failed to fetch workflow:', error);
+          }
         } finally {
           setLoading(false);
         }
@@ -126,7 +128,9 @@ export default function WorkflowEditorPage() {
         }
       }
     } catch (error) {
-      console.error('Failed to save workflow:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Failed to save workflow:', error);
+      }
     } finally {
       setIsSaving(false);
     }

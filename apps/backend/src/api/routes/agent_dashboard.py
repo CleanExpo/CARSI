@@ -10,9 +10,10 @@ Provides endpoints for the agent dashboard UI:
 from datetime import datetime, timedelta
 from typing import Any
 
-from fastapi import APIRouter, HTTPException, Query, status
+from fastapi import APIRouter, Query, Request
 from pydantic import BaseModel
 
+from src.api.error_handling import create_error_response
 from src.monitoring.agent_metrics import AgentHealthReport, AgentMetrics
 from src.utils import get_logger
 
@@ -71,7 +72,8 @@ class TaskHistoryItem(BaseModel):
 
 @router.get("/stats", response_model=AgentStatsResponse)
 async def get_agent_statistics(
-    time_range: int = Query(7, ge=1, le=90, description="Days of history to include")
+    request: Request,
+    time_range: int = Query(7, ge=1, le=90, description="Days of history to include"),
 ) -> AgentStatsResponse:
     """Get overall agent statistics.
 
@@ -122,15 +124,18 @@ async def get_agent_statistics(
 
     except Exception as e:
         logger.error(f"Failed to get agent statistics: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to retrieve agent statistics"
+        return create_error_response(
+            request=request,
+            exc=e,
+            public_message="Failed to retrieve agent statistics",
+            error_code="GET_AGENT_STATS_FAILED",
         )
 
 
 @router.get("/list", response_model=list[AgentListItem])
 async def list_agents(
-    agent_type: str | None = Query(None, description="Filter by agent type")
+    request: Request,
+    agent_type: str | None = Query(None, description="Filter by agent type"),
 ) -> list[AgentListItem]:
     """List all agents with their statistics.
 
@@ -182,14 +187,16 @@ async def list_agents(
 
     except Exception as e:
         logger.error(f"Failed to list agents: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to list agents"
+        return create_error_response(
+            request=request,
+            exc=e,
+            public_message="Failed to list agents",
+            error_code="LIST_AGENTS_FAILED",
         )
 
 
 @router.get("/{agent_id}/health", response_model=AgentHealthReport)
-async def get_agent_health(agent_id: str) -> AgentHealthReport:
+async def get_agent_health(request: Request, agent_id: str) -> AgentHealthReport:
     """Get health report for a specific agent.
 
     Args:
@@ -215,17 +222,20 @@ async def get_agent_health(agent_id: str) -> AgentHealthReport:
 
     except Exception as e:
         logger.error(f"Failed to get agent health: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to retrieve agent health"
+        return create_error_response(
+            request=request,
+            exc=e,
+            public_message="Failed to retrieve agent health",
+            error_code="GET_AGENT_HEALTH_FAILED",
         )
 
 
 @router.get("/tasks/recent", response_model=list[TaskHistoryItem])
 async def get_recent_tasks(
+    request: Request,
     limit: int = Query(20, ge=1, le=100, description="Max tasks to return"),
     agent_type: str | None = Query(None, description="Filter by agent type"),
-    status: str | None = Query(None, description="Filter by status")
+    status: str | None = Query(None, description="Filter by status"),
 ) -> list[TaskHistoryItem]:
     """Get recent task history.
 
@@ -294,15 +304,18 @@ async def get_recent_tasks(
 
     except Exception as e:
         logger.error(f"Failed to get recent tasks: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to retrieve task history"
+        return create_error_response(
+            request=request,
+            exc=e,
+            public_message="Failed to retrieve task history",
+            error_code="GET_RECENT_TASKS_FAILED",
         )
 
 
 @router.get("/performance/trends", response_model=dict[str, Any])
 async def get_performance_trends(
-    days: int = Query(7, ge=1, le=90, description="Days of data to analyze")
+    request: Request,
+    days: int = Query(7, ge=1, le=90, description="Days of data to analyze"),
 ) -> dict[str, Any]:
     """Get performance trends over time.
 
@@ -336,7 +349,9 @@ async def get_performance_trends(
 
     except Exception as e:
         logger.error(f"Failed to get performance trends: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to retrieve performance trends"
+        return create_error_response(
+            request=request,
+            exc=e,
+            public_message="Failed to retrieve performance trends",
+            error_code="GET_PERFORMANCE_TRENDS_FAILED",
         )

@@ -8,6 +8,7 @@ from fastapi import APIRouter, BackgroundTasks, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from src.agents.orchestrator import OrchestratorAgent
+from src.api.error_handling import create_error_response
 from src.state.events import AgentEventPublisher
 from src.state.supabase import SupabaseStateStore
 from src.utils import get_logger
@@ -206,7 +207,6 @@ async def trigger_agent_run(
 
     except Exception as e:
         logger.error("Failed to trigger agent run", error=str(e))
-        from src.api.error_handling import create_error_response
         return create_error_response(
             request=request,
             exc=e,
@@ -255,7 +255,6 @@ async def get_agent_run_status(request: Request, run_id: str) -> AgentRunStatusR
         raise
     except Exception as e:
         logger.error("Failed to get agent run status", run_id=run_id, error=str(e))
-        from src.api.error_handling import create_error_response
         return create_error_response(
             request=request,
             exc=e,
@@ -302,7 +301,6 @@ async def get_active_agent_runs(request: Request, user_id: str) -> list[AgentRun
 
     except Exception as e:
         logger.error("Failed to get active agent runs", user_id=user_id, error=str(e))
-        from src.api.error_handling import create_error_response
         return create_error_response(
             request=request,
             exc=e,

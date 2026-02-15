@@ -113,6 +113,7 @@ CREATE INDEX IF NOT EXISTS idx_contractors_user_id ON contractors(user_id);
 -- Indexes for availability
 CREATE INDEX IF NOT EXISTS idx_availability_contractor ON availability_slots(contractor_id);
 CREATE INDEX IF NOT EXISTS idx_availability_date ON availability_slots(date);
+CREATE INDEX IF NOT EXISTS idx_availability_contractor_date_status ON availability_slots(contractor_id, date, status);
 CREATE INDEX IF NOT EXISTS idx_availability_location ON availability_slots(suburb, state);
 CREATE INDEX IF NOT EXISTS idx_availability_status ON availability_slots(status);
 
@@ -135,6 +136,7 @@ CREATE TABLE IF NOT EXISTS documents (
 -- Indexes for vector similarity search
 CREATE INDEX IF NOT EXISTS idx_documents_embedding ON documents USING ivfflat (embedding vector_cosine_ops);
 CREATE INDEX IF NOT EXISTS idx_documents_user_id ON documents(user_id);
+CREATE INDEX IF NOT EXISTS idx_documents_user_created ON documents(user_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_documents_metadata ON documents USING GIN (metadata);
 
 -- Trigger for documents

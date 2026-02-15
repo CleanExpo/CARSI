@@ -8,11 +8,12 @@ Uses SQLAlchemy ORM for type-safe queries and async/await pattern.
 from datetime import datetime
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from pydantic import BaseModel, Field
 from sqlalchemy import and_, asc, desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.api.error_handling import create_error_response
 from src.auth.jwt import decode_access_token
 from src.config.database import get_async_db
 from src.db.models import Document, User
@@ -102,6 +103,7 @@ async def get_current_user_id(
     description="Get paginated list of documents with filtering and sorting",
 )
 async def list_documents(
+    request: Request,
     authorization: str | None = Query(None, description="Authorization header with JWT token"),
     # Filtering
     type: str | None = Query(None, description="Filter by document type"),
@@ -251,9 +253,11 @@ async def list_documents(
         raise
     except Exception as e:
         logger.error("Failed to list documents", error=str(e))
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to retrieve documents",
+        return create_error_response(
+            request=request,
+            exc=e,
+            public_message="Failed to retrieve documents",
+            error_code="LIST_DOCUMENTS_FAILED",
         )
 
 
@@ -268,6 +272,7 @@ async def list_documents(
     },
 )
 async def create_document(
+    request: Request,
     document: DocumentCreateRequest,
     authorization: str | None = Query(None, description="Authorization header with JWT token"),
     db: AsyncSession = Depends(get_async_db),
@@ -331,9 +336,11 @@ async def create_document(
     except Exception as e:
         logger.error("Failed to create document", error=str(e))
         await db.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to create document",
+        return create_error_response(
+            request=request,
+            exc=e,
+            public_message="Failed to create document",
+            error_code="CREATE_DOCUMENT_FAILED",
         )
 
 
@@ -347,6 +354,7 @@ async def create_document(
     },
 )
 async def get_document(
+    request: Request,
     document_id: str,
     authorization: str | None = Query(None, description="Authorization header with JWT token"),
     db: AsyncSession = Depends(get_async_db),
@@ -413,9 +421,11 @@ async def get_document(
         raise
     except Exception as e:
         logger.error("Failed to retrieve document", error=str(e))
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to retrieve document",
+        return create_error_response(
+            request=request,
+            exc=e,
+            public_message="Failed to retrieve document",
+            error_code="GET_DOCUMENT_FAILED",
         )
 
 
@@ -430,6 +440,7 @@ async def get_document(
     },
 )
 async def update_document(
+    request: Request,
     document_id: str,
     updates: DocumentUpdateRequest,
     authorization: str | None = Query(None, description="Authorization header with JWT token"),
@@ -509,9 +520,11 @@ async def update_document(
     except Exception as e:
         logger.error("Failed to update document", error=str(e))
         await db.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to update document",
+        return create_error_response(
+            request=request,
+            exc=e,
+            public_message="Failed to update document",
+            error_code="UPDATE_DOCUMENT_FAILED",
         )
 
 
@@ -526,6 +539,7 @@ async def update_document(
     },
 )
 async def delete_document(
+    request: Request,
     document_id: str,
     authorization: str | None = Query(None, description="Authorization header with JWT token"),
     db: AsyncSession = Depends(get_async_db),
@@ -583,7 +597,9 @@ async def delete_document(
     except Exception as e:
         logger.error("Failed to delete document", error=str(e))
         await db.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to delete document",
+        return create_error_response(
+            request=request,
+            exc=e,
+            public_message="Failed to delete document",
+            error_code="DELETE_DOCUMENT_FAILED",
         )

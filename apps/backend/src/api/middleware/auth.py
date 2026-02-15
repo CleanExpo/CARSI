@@ -7,6 +7,7 @@ from collections.abc import Callable
 from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 
+from src.auth.jwt import decode_access_token
 from src.config import get_settings
 from src.utils import get_logger
 
@@ -45,6 +46,25 @@ class AuthMiddleware(BaseHTTPMiddleware):
         ):
             request.state.auth_type = "api_key"
             return await call_next(request)
+
+        # Check for JWT in Authorization header
+        auth_header = request.headers.get("Authorization", "")
+        if auth_header.startswith("Bearer "):
+            token = auth_header[7:]
+            payload = decode_access_token(token)
+            if payload and payload.get("sub"):
+                request.state.user_email = payload["sub"]
+                request.state.auth_type = "jwt"
+                return await call_next(request)
+
+        # Check for JWT in httpOnly auth_token cookie
+        cookie_token = request.cookies.get("auth_token")
+        if cookie_token:
+            payload = decode_access_token(cookie_token)
+            if payload and payload.get("sub"):
+                request.state.user_email = payload["sub"]
+                request.state.auth_type = "jwt_cookie"
+                return await call_next(request)
 
         # Check for user ID header (set by frontend after auth)
         user_id = request.headers.get("X-User-Id")

@@ -10,9 +10,10 @@ Endpoints for managing agent task queue:
 from datetime import datetime
 from typing import Any
 
-from fastapi import APIRouter, HTTPException, Query, status
+from fastapi import APIRouter, HTTPException, Query, Request, status
 from pydantic import BaseModel, Field
 
+from src.api.error_handling import create_error_response
 from src.state.supabase import SupabaseStateStore
 from src.utils import get_logger
 
@@ -82,13 +83,15 @@ class TaskListResponse(BaseModel):
 
 @router.post("/", response_model=TaskResponse, status_code=status.HTTP_201_CREATED)
 async def create_task(
-    request: CreateTaskRequest,
-    user_id: str | None = None  # Would come from auth middleware
+    request: Request,
+    task_data: CreateTaskRequest,
+    user_id: str | None = None,  # Would come from auth middleware
 ) -> TaskResponse:
     """Submit a new task to the agentic layer.
 
     Args:
-        request: Task creation request
+        request: HTTP request
+        task_data: Task creation request
         user_id: Optional user ID from auth
 
     Returns:
@@ -102,10 +105,10 @@ async def create_task(
 
         # Create task in database
         result = store.client.table("agent_task_queue").insert({
-            "title": request.title,
-            "description": request.description,
-            "task_type": request.task_type,
-            "priority": request.priority,
+            "title": task_data.title,
+            "description": task_data.description,
+            "task_type": task_data.task_type,
+            "priority": task_data.priority,
             "status": "pending",
             "created_by": user_id
         }).execute()
@@ -116,48 +119,53 @@ async def create_task(
                 detail="Failed to create task"
             )
 
-        task_data = result.data[0]
+        row = result.data[0]
 
         logger.info(
             "Task created",
-            task_id=task_data["id"],
-            task_type=request.task_type,
-            priority=request.priority
+            task_id=row["id"],
+            task_type=task_data.task_type,
+            priority=task_data.priority
         )
 
         return TaskResponse(
-            id=str(task_data["id"]),
-            title=task_data["title"],
-            description=task_data["description"],
-            task_type=task_data["task_type"],
-            priority=task_data["priority"],
-            status=task_data["status"],
-            assigned_agent_id=task_data.get("assigned_agent_id"),
-            assigned_agent_type=task_data.get("assigned_agent_type"),
-            started_at=task_data.get("started_at"),
-            completed_at=task_data.get("completed_at"),
-            iterations=task_data.get("iterations", 0),
-            verification_status=task_data.get("verification_status"),
-            pr_url=task_data.get("pr_url"),
-            created_by=task_data.get("created_by"),
-            created_at=task_data["created_at"],
-            updated_at=task_data["updated_at"]
+            id=str(row["id"]),
+            title=row["title"],
+            description=row["description"],
+            task_type=row["task_type"],
+            priority=row["priority"],
+            status=row["status"],
+            assigned_agent_id=row.get("assigned_agent_id"),
+            assigned_agent_type=row.get("assigned_agent_type"),
+            started_at=row.get("started_at"),
+            completed_at=row.get("completed_at"),
+            iterations=row.get("iterations", 0),
+            verification_status=row.get("verification_status"),
+            pr_url=row.get("pr_url"),
+            created_by=row.get("created_by"),
+            created_at=row["created_at"],
+            updated_at=row["updated_at"]
         )
 
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Failed to create task: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to create task"
+        return create_error_response(
+            request=request,
+            exc=e,
+            public_message="Failed to create task",
+            error_code="CREATE_TASK_FAILED",
         )
 
 
 @router.get("/", response_model=TaskListResponse)
 async def list_tasks(
+    request: Request,
     status_filter: str | None = Query(None, description="Filter by status"),
     task_type: str | None = Query(None, description="Filter by task type"),
     page: int = Query(1, ge=1, description="Page number"),
-    page_size: int = Query(20, ge=1, le=100, description="Items per page")
+    page_size: int = Query(20, ge=1, le=100, description="Items per page"),
 ) -> TaskListResponse:
     """List tasks with pagination and filtering.
 
@@ -242,14 +250,16 @@ async def list_tasks(
 
     except Exception as e:
         logger.error(f"Failed to list tasks: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to list tasks"
+        return create_error_response(
+            request=request,
+            exc=e,
+            public_message="Failed to list tasks",
+            error_code="LIST_TASKS_FAILED",
         )
 
 
 @router.get("/{task_id}", response_model=TaskResponse)
-async def get_task(task_id: str) -> TaskResponse:
+async def get_task(request: Request, task_id: str) -> TaskResponse:
     """Get a specific task by ID.
 
     Args:
@@ -299,22 +309,26 @@ async def get_task(task_id: str) -> TaskResponse:
         raise
     except Exception as e:
         logger.error(f"Failed to get task: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to retrieve task"
+        return create_error_response(
+            request=request,
+            exc=e,
+            public_message="Failed to retrieve task",
+            error_code="GET_TASK_FAILED",
         )
 
 
 @router.patch("/{task_id}", response_model=TaskResponse)
 async def update_task(
+    request: Request,
     task_id: str,
-    request: UpdateTaskRequest
+    update_data: UpdateTaskRequest,
 ) -> TaskResponse:
     """Update a task.
 
     Args:
+        request: HTTP request
         task_id: Task UUID
-        request: Update request
+        update_data: Update request
 
     Returns:
         Updated task
@@ -325,27 +339,27 @@ async def update_task(
     try:
         store = SupabaseStateStore()
 
-        # Build update data
-        update_data = {}
-        if request.status:
-            update_data["status"] = request.status
-        if request.assigned_agent_id:
-            update_data["assigned_agent_id"] = request.assigned_agent_id
-        if request.assigned_agent_type:
-            update_data["assigned_agent_type"] = request.assigned_agent_type
-        if request.result:
-            update_data["result"] = request.result
-        if request.error_message:
-            update_data["error_message"] = request.error_message
+        # Build update fields
+        fields = {}
+        if update_data.status:
+            fields["status"] = update_data.status
+        if update_data.assigned_agent_id:
+            fields["assigned_agent_id"] = update_data.assigned_agent_id
+        if update_data.assigned_agent_type:
+            fields["assigned_agent_type"] = update_data.assigned_agent_type
+        if update_data.result:
+            fields["result"] = update_data.result
+        if update_data.error_message:
+            fields["error_message"] = update_data.error_message
 
         # Update status timestamps
-        if request.status == "in_progress" and "started_at" not in update_data:
-            update_data["started_at"] = datetime.now().isoformat()
-        elif request.status in ["completed", "failed", "cancelled"]:
-            update_data["completed_at"] = datetime.now().isoformat()
+        if update_data.status == "in_progress" and "started_at" not in fields:
+            fields["started_at"] = datetime.now().isoformat()
+        elif update_data.status in ["completed", "failed", "cancelled"]:
+            fields["completed_at"] = datetime.now().isoformat()
 
         result = store.client.table("agent_task_queue").update(
-            update_data
+            fields
         ).eq("id", task_id).execute()
 
         if not result.data:
@@ -359,7 +373,7 @@ async def update_task(
         logger.info(
             "Task updated",
             task_id=task_id,
-            updates=list(update_data.keys())
+            updates=list(fields.keys())
         )
 
         return TaskResponse(
@@ -385,14 +399,16 @@ async def update_task(
         raise
     except Exception as e:
         logger.error(f"Failed to update task: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to update task"
+        return create_error_response(
+            request=request,
+            exc=e,
+            public_message="Failed to update task",
+            error_code="UPDATE_TASK_FAILED",
         )
 
 
 @router.delete("/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def cancel_task(task_id: str) -> None:
+async def cancel_task(request: Request, task_id: str) -> None:
     """Cancel a pending task.
 
     Args:
@@ -435,14 +451,16 @@ async def cancel_task(task_id: str) -> None:
         raise
     except Exception as e:
         logger.error(f"Failed to cancel task: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to cancel task"
+        return create_error_response(
+            request=request,
+            exc=e,
+            public_message="Failed to cancel task",
+            error_code="CANCEL_TASK_FAILED",
         )
 
 
 @router.post("/{task_id}/execute", response_model=dict[str, Any])
-async def execute_task(task_id: str) -> dict[str, Any]:
+async def execute_task(request: Request, task_id: str) -> dict[str, Any]:
     """Execute a task using the orchestrator.
 
     Args:
@@ -503,14 +521,16 @@ async def execute_task(task_id: str) -> dict[str, Any]:
         raise
     except Exception as e:
         logger.error(f"Failed to execute task: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to execute task"
+        return create_error_response(
+            request=request,
+            exc=e,
+            public_message="Failed to execute task",
+            error_code="EXECUTE_TASK_FAILED",
         )
 
 
 @router.get("/stats/summary", response_model=dict[str, Any])
-async def get_queue_stats() -> dict[str, Any]:
+async def get_queue_stats(request: Request) -> dict[str, Any]:
     """Get queue statistics.
 
     Returns:
@@ -551,7 +571,9 @@ async def get_queue_stats() -> dict[str, Any]:
 
     except Exception as e:
         logger.error(f"Failed to get queue stats: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to retrieve queue statistics"
+        return create_error_response(
+            request=request,
+            exc=e,
+            public_message="Failed to retrieve queue statistics",
+            error_code="GET_QUEUE_STATS_FAILED",
         )

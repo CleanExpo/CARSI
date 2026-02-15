@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel
 
 from src.agents.orchestrator import OrchestratorAgent
+from src.api.error_handling import create_error_response
 from src.utils import get_logger
 
 router = APIRouter()
@@ -68,7 +69,6 @@ async def chat(
 
     except Exception as e:
         logger.error("Chat processing error", error=str(e))
-        from src.api.error_handling import create_error_response
         return create_error_response(
             request=request,
             exc=e,

@@ -1,8 +1,9 @@
 """Workflow API routes."""
 
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, Request, status
 
+from src.api.error_handling import create_error_response
 from src.utils import get_logger
 from src.workflow.models import (
     ExecutionStatus,
@@ -21,6 +22,7 @@ storage = WorkflowStorage()
 
 @router.post("/", response_model=WorkflowDefinition, status_code=status.HTTP_201_CREATED)
 async def create_workflow(
+    request: Request,
     workflow: WorkflowDefinition,
     user_id: str | None = None,
 ) -> WorkflowDefinition:
@@ -31,9 +33,11 @@ async def create_workflow(
 
     except Exception as e:
         logger.error("Failed to create workflow", error=str(e))
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to create workflow",
+        return create_error_response(
+            request=request,
+            exc=e,
+            public_message="Failed to create workflow",
+            error_code="CREATE_WORKFLOW_FAILED",
         )
 
 

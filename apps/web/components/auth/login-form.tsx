@@ -78,7 +78,7 @@ export function LoginForm() {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input placeholder="name@example.com" autoComplete="email" {...field} />
+                <Input placeholder="name@example.com" autoComplete="email" aria-describedby={error ? "login-error" : undefined} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -91,7 +91,7 @@ export function LoginForm() {
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input type="password" autoComplete="current-password" {...field} />
+                <Input type="password" autoComplete="current-password" aria-describedby={error ? "login-error" : undefined} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

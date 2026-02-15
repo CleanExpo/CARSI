@@ -35,7 +35,9 @@ export default function AnalyticsDashboardPage() {
         setMetrics(data);
       }
     } catch (error) {
-      console.error("Failed to fetch metrics:", error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error("Failed to fetch metrics:", error);
+      }
     } finally {
       setLoading(false);
     }

@@ -4,6 +4,7 @@ import time
 
 from fastapi import APIRouter, File, Form, HTTPException, Request, UploadFile
 
+from src.api.error_handling import create_error_response
 from src.rag.models import (
     PipelineConfig,
     SearchRequest,
@@ -82,7 +83,6 @@ async def upload_document(
 
     except Exception as e:
         logger.error("Document upload failed", error=str(e))
-        from src.api.error_handling import create_error_response
         return create_error_response(
             request=request,
             exc=e,
@@ -152,7 +152,6 @@ async def search_documents(request: Request, search_request: SearchRequest) -> S
         raise
     except Exception as e:
         logger.error("Search failed", error=str(e))
-        from src.api.error_handling import create_error_response
         return create_error_response(
             request=request,
             exc=e,

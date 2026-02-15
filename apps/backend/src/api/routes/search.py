@@ -5,11 +5,12 @@ Implements document search using PostgreSQL full-text search (tsvector).
 Uses SQLAlchemy ORM for type-safe queries and async/await pattern.
 """
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from pydantic import BaseModel, Field
 from sqlalchemy import func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.api.error_handling import create_error_response
 from src.auth.jwt import decode_access_token
 from src.config.database import get_async_db
 from src.db.models import Document, User
@@ -89,6 +90,7 @@ async def get_current_user_id(
     },
 )
 async def search_documents(
+    request: Request,
     search_request: SearchRequest,
     authorization: str | None = Query(None, description="Authorization header with JWT token"),
     db: AsyncSession = Depends(get_async_db),
@@ -222,7 +224,9 @@ async def search_documents(
         )
     except Exception as e:
         logger.error("Search failed", error=str(e))
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Search operation failed",
+        return create_error_response(
+            request=request,
+            exc=e,
+            public_message="Search operation failed",
+            error_code="SEARCH_FAILED",
         )
