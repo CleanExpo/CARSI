@@ -75,3 +75,6 @@ nul
 
 # Local binaries (Beads CLI)
 .bin/
+
+# NotebookLM generated artifacts
+.claude/notebooklm/repo-pack.txt
