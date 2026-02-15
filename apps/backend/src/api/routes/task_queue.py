@@ -149,7 +149,7 @@ async def create_task(
         logger.error(f"Failed to create task: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to create task: {str(e)}"
+            detail="Failed to create task"
         )
 
 

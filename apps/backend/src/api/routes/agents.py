@@ -4,7 +4,7 @@ This module provides HTTP endpoints for triggering and monitoring agent runs.
 Uses Supabase Realtime to push updates to the frontend in real-time.
 """
 
-from fastapi import APIRouter, HTTPException, BackgroundTasks
+from fastapi import APIRouter, HTTPException, BackgroundTasks, Request
 from pydantic import BaseModel, Field
 
 from src.agents.orchestrator import OrchestratorAgent
@@ -131,7 +131,8 @@ async def execute_agent_with_events(
 
 @router.post("/run", response_model=TriggerAgentResponse)
 async def trigger_agent_run(
-    request: TriggerAgentRequest,
+    request: Request,
+    trigger_request: TriggerAgentRequest,
     background_tasks: BackgroundTasks,
 ) -> TriggerAgentResponse:
     """Trigger a new agent run.
@@ -162,38 +163,38 @@ async def trigger_agent_run(
         publisher = AgentEventPublisher()
 
         # Create task
-        task_id = f"task_{hash(request.task_description) % 10000}"
+        task_id = f"task_{hash(trigger_request.task_description) % 10000}"
 
         await store.save_task(
             task_id=task_id,
             conversation_id=None,
-            description=request.task_description,
+            description=trigger_request.task_description,
             status="pending",
         )
 
         # Create agent run
         run_id = await publisher.start_run(
             task_id=task_id,
-            user_id=request.user_id,
+            user_id=trigger_request.user_id,
             agent_name="orchestrator",
-            metadata={"context": request.context or {}},
+            metadata={"context": trigger_request.context or {}},
         )
 
         # Execute agent in background
         background_tasks.add_task(
             execute_agent_with_events,
-            request.task_description,
+            trigger_request.task_description,
             run_id,
             task_id,
-            request.user_id,
-            request.context,
+            trigger_request.user_id,
+            trigger_request.context,
         )
 
         logger.info(
             "Triggered agent run",
             run_id=run_id,
             task_id=task_id,
-            description=request.task_description[:100],
+            description=trigger_request.task_description[:100],
         )
 
         return TriggerAgentResponse(
@@ -205,11 +206,17 @@ async def trigger_agent_run(
 
     except Exception as e:
         logger.error("Failed to trigger agent run", error=str(e))
-        raise HTTPException(status_code=500, detail=str(e))
+        from src.api.error_handling import create_error_response
+        return create_error_response(
+            request=request,
+            exc=e,
+            public_message="Failed to trigger agent run",
+            error_code="AGENT_TRIGGER_ERROR",
+        )
 
 
 @router.get("/run/{run_id}", response_model=AgentRunStatusResponse)
-async def get_agent_run_status(run_id: str) -> AgentRunStatusResponse:
+async def get_agent_run_status(request: Request, run_id: str) -> AgentRunStatusResponse:
     """Get current status of an agent run.
 
     Args:
@@ -248,11 +255,17 @@ async def get_agent_run_status(run_id: str) -> AgentRunStatusResponse:
         raise
     except Exception as e:
         logger.error("Failed to get agent run status", run_id=run_id, error=str(e))
-        raise HTTPException(status_code=500, detail=str(e))
+        from src.api.error_handling import create_error_response
+        return create_error_response(
+            request=request,
+            exc=e,
+            public_message="Failed to get agent run status",
+            error_code="AGENT_STATUS_ERROR",
+        )
 
 
 @router.get("/active", response_model=list[AgentRunStatusResponse])
-async def get_active_agent_runs(user_id: str) -> list[AgentRunStatusResponse]:
+async def get_active_agent_runs(request: Request, user_id: str) -> list[AgentRunStatusResponse]:
     """Get all active agent runs for a user.
 
     Args:
@@ -289,4 +302,10 @@ async def get_active_agent_runs(user_id: str) -> list[AgentRunStatusResponse]:
 
     except Exception as e:
         logger.error("Failed to get active agent runs", user_id=user_id, error=str(e))
-        raise HTTPException(status_code=500, detail=str(e))
+        from src.api.error_handling import create_error_response
+        return create_error_response(
+            request=request,
+            exc=e,
+            public_message="Failed to get active agent runs",
+            error_code="AGENT_LIST_ERROR",
+        )

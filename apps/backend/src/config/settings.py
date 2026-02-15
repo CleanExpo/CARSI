@@ -3,8 +3,16 @@
 from functools import lru_cache
 from typing import Literal
 
-from pydantic import Field
+from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+_UNSAFE_JWT_DEFAULTS = {
+    "your-secret-key-change-in-production",
+    "your-secret-key-change-in-production-use-long-random-string",
+    "changeme",
+    "secret",
+}
 
 
 class Settings(BaseSettings):
@@ -29,7 +37,7 @@ class Settings(BaseSettings):
 
     # Database (PostgreSQL)
     database_url: str = Field(
-        default="postgresql://starter_user:local_dev_password@localhost:5432/starter_db",
+        default="postgresql://starter_user:local_dev_password@localhost:5433/starter_db",
         description="PostgreSQL connection URL"
     )
 
@@ -40,11 +48,32 @@ class Settings(BaseSettings):
     )
     jwt_expire_minutes: int = Field(default=60, description="JWT token expiration in minutes")
 
+    # Webhook
+    webhook_secret: str = Field(
+        default="",
+        description="HMAC secret for verifying webhook signatures"
+    )
+
     # Legacy Supabase (deprecated - kept for migration compatibility)
     supabase_url: str = Field(default="", alias="NEXT_PUBLIC_SUPABASE_URL")
     supabase_anon_key: str = Field(default="", alias="NEXT_PUBLIC_SUPABASE_ANON_KEY")
     supabase_service_role_key: str = Field(default="")
     supabase_jwt_secret: str = Field(default="")
+
+    @model_validator(mode="after")
+    def _reject_unsafe_defaults_in_production(self) -> "Settings":
+        """Reject insecure default secrets when running in production."""
+        if self.environment == "production":
+            if self.jwt_secret_key in _UNSAFE_JWT_DEFAULTS:
+                raise ValueError(
+                    "JWT_SECRET_KEY must be changed from the default value "
+                    "before running in production."
+                )
+            if len(self.jwt_secret_key) < 32:
+                raise ValueError(
+                    "JWT_SECRET_KEY must be at least 32 characters in production."
+                )
+        return self
 
     # AI Provider Configuration
     ai_provider: str = Field(

@@ -217,7 +217,7 @@ async def get_agent_health(agent_id: str) -> AgentHealthReport:
         logger.error(f"Failed to get agent health: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to retrieve agent health: {str(e)}"
+            detail="Failed to retrieve agent health"
         )
 
 

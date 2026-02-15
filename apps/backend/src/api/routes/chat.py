@@ -68,7 +68,13 @@ async def chat(
 
     except Exception as e:
         logger.error("Chat processing error", error=str(e))
-        raise HTTPException(status_code=500, detail=str(e))
+        from src.api.error_handling import create_error_response
+        return create_error_response(
+            request=request,
+            exc=e,
+            public_message="Chat processing failed",
+            error_code="CHAT_ERROR",
+        )
 
 
 def _generate_response(result: dict[str, Any]) -> str:

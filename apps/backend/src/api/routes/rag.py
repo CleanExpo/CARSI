@@ -1,6 +1,6 @@
 """RAG pipeline API routes."""
 
-from fastapi import APIRouter, UploadFile, File, Form, HTTPException, status
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Request, status
 from typing import Optional
 import base64
 
@@ -44,6 +44,7 @@ async def get_store() -> RAGStore:
 
 @router.post("/upload")
 async def upload_document(
+    request: Request,
     file: UploadFile = File(...),
     project_id: str = Form(...),
     config: Optional[str] = Form(None),
@@ -82,11 +83,17 @@ async def upload_document(
 
     except Exception as e:
         logger.error("Document upload failed", error=str(e))
-        raise HTTPException(status_code=500, detail=str(e))
+        from src.api.error_handling import create_error_response
+        return create_error_response(
+            request=request,
+            exc=e,
+            public_message="Document upload failed",
+            error_code="UPLOAD_ERROR",
+        )
 
 
 @router.post("/search", response_model=SearchResponse)
-async def search_documents(request: SearchRequest) -> SearchResponse:
+async def search_documents(request: Request, search_request: SearchRequest) -> SearchResponse:
     """Search documents using vector, keyword, or hybrid search."""
     try:
         start_time = time.time()
@@ -94,21 +101,21 @@ async def search_documents(request: SearchRequest) -> SearchResponse:
         store = await get_store()
 
         # Execute search based on type
-        if request.search_type == SearchType.HYBRID:
+        if search_request.search_type == SearchType.HYBRID:
             results = await store.hybrid_search(
-                query=request.query,
-                project_id=request.project_id,
-                vector_weight=request.vector_weight,
-                keyword_weight=request.keyword_weight,
-                limit=request.limit,
-                threshold=request.min_score,
+                query=search_request.query,
+                project_id=search_request.project_id,
+                vector_weight=search_request.vector_weight,
+                keyword_weight=search_request.keyword_weight,
+                limit=search_request.limit,
+                threshold=search_request.min_score,
             )
-        elif request.search_type == SearchType.VECTOR:
+        elif search_request.search_type == SearchType.VECTOR:
             results = await store.vector_search(
-                query=request.query,
-                project_id=request.project_id,
-                limit=request.limit,
-                threshold=request.min_score,
+                query=search_request.query,
+                project_id=search_request.project_id,
+                limit=search_request.limit,
+                threshold=search_request.min_score,
             )
         else:
             raise HTTPException(
@@ -135,10 +142,10 @@ async def search_documents(request: SearchRequest) -> SearchResponse:
         ]
 
         return SearchResponse(
-            query=request.query,
+            query=search_request.query,
             results=search_results,
             total_count=len(search_results),
-            search_type=request.search_type,
+            search_type=search_request.search_type,
             execution_time_ms=execution_time,
         )
 
@@ -146,7 +153,13 @@ async def search_documents(request: SearchRequest) -> SearchResponse:
         raise
     except Exception as e:
         logger.error("Search failed", error=str(e))
-        raise HTTPException(status_code=500, detail=str(e))
+        from src.api.error_handling import create_error_response
+        return create_error_response(
+            request=request,
+            exc=e,
+            public_message="Search failed",
+            error_code="SEARCH_ERROR",
+        )
 
 
 @router.get("/sources/{source_id}")

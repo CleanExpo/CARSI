@@ -3,7 +3,7 @@
 Endpoints for generating Product Requirement Documents using AI agents.
 """
 
-from fastapi import APIRouter, HTTPException, BackgroundTasks
+from fastapi import APIRouter, HTTPException, BackgroundTasks, Request
 from pydantic import BaseModel, Field
 from typing import Any, Optional
 from pathlib import Path
@@ -61,8 +61,9 @@ class PRDStatusResponse(BaseModel):
 
 @router.post("/generate", response_model=GeneratePRDResponse)
 async def generate_prd(
-    request: GeneratePRDRequest,
-    background_tasks: BackgroundTasks
+    prd_request: GeneratePRDRequest,
+    background_tasks: BackgroundTasks,
+    request: Request = None,
 ) -> GeneratePRDResponse:
     """Generate comprehensive PRD from requirements.
 
@@ -108,7 +109,7 @@ async def generate_prd(
         # Start agent run tracking
         run_id = await publisher.start_run(
             task_id=prd_id,
-            user_id=request.user_id,
+            user_id=prd_request.user_id,
             agent_name="prd_orchestrator",
         )
 
@@ -116,7 +117,7 @@ async def generate_prd(
             "PRD generation request received",
             prd_id=prd_id,
             run_id=run_id,
-            requirements_length=len(request.requirements),
+            requirements_length=len(prd_request.requirements),
         )
 
         # Execute PRD generation in background
@@ -124,9 +125,9 @@ async def generate_prd(
             execute_prd_generation,
             prd_id=prd_id,
             run_id=run_id,
-            requirements=request.requirements,
-            context=request.context,
-            output_dir=request.output_dir,
+            requirements=prd_request.requirements,
+            context=prd_request.context,
+            output_dir=prd_request.output_dir,
             publisher=publisher,
         )
 
@@ -140,7 +141,13 @@ async def generate_prd(
 
     except Exception as e:
         logger.error("Failed to start PRD generation", error=str(e))
-        raise HTTPException(status_code=500, detail=str(e))
+        from src.api.error_handling import create_error_response
+        return create_error_response(
+            request=request,
+            exc=e,
+            public_message="Failed to start PRD generation",
+            error_code="PRD_GENERATION_ERROR",
+        )
 
 
 @router.get("/status/{run_id}", response_model=PRDStatusResponse)
@@ -183,7 +190,7 @@ async def get_prd_status(run_id: str) -> PRDStatusResponse:
         raise
     except Exception as e:
         logger.error("Failed to get PRD status", run_id=run_id, error=str(e))
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="Failed to get PRD status")
 
 
 @router.get("/result/{prd_id}")
@@ -230,7 +237,7 @@ async def get_prd_result(prd_id: str) -> dict[str, Any]:
         raise
     except Exception as e:
         logger.error("Failed to get PRD result", prd_id=prd_id, error=str(e))
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="Failed to get PRD result")
 
 
 @router.get("/documents/{prd_id}")
@@ -252,7 +259,7 @@ async def list_prd_documents(prd_id: str) -> dict[str, Any]:
 
     except Exception as e:
         logger.error("Failed to list PRD documents", prd_id=prd_id, error=str(e))
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="Failed to list PRD documents")
 
 
 # Background task function

@@ -46,14 +46,20 @@ export const authApi = {
    * Login with email and password
    */
   async login(credentials: LoginRequest): Promise<LoginResponse> {
-    const response = await apiClient.post<LoginResponse>('/api/auth/login', credentials);
+    // Login via Next.js API route which sets the httpOnly cookie server-side
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(credentials),
+      credentials: 'include',
+    });
 
-    // Store token in cookie
-    if (response.access_token) {
-      document.cookie = `auth_token=${response.access_token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`;
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: 'Login failed' }));
+      throw new Error(err.error || 'Login failed');
     }
 
-    return response;
+    return res.json();
   },
 
   /**
@@ -67,15 +73,15 @@ export const authApi = {
    * Logout (clear auth token)
    */
   async logout(): Promise<void> {
-    // Clear token cookie
-    document.cookie = 'auth_token=; path=/; max-age=0';
-
-    // Optionally call backend logout endpoint if it exists
+    // Call backend logout then clear cookie via API route
     try {
       await apiClient.post('/api/auth/logout');
     } catch {
-      // Ignore errors - token is already cleared
+      // Ignore errors — proceed to clear cookie
     }
+    // Clear the httpOnly cookie by setting max-age=0 via a server action or
+    // redirect. For client-side, we navigate to trigger middleware cleanup.
+    document.cookie = 'auth_token=; path=/; max-age=0';
   },
 
   /**

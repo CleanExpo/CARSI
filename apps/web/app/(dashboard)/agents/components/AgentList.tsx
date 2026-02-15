@@ -4,7 +4,15 @@
  * Displays list of active agents with their status and metrics.
  */
 
-async function fetchAgents() {
+interface Agent {
+  agent_id: string;
+  agent_type: string;
+  status: string;
+  task_count: number;
+  success_rate: number;
+}
+
+async function fetchAgents(): Promise<Agent[]> {
   try {
     const backendUrl = process.env.BACKEND_URL || 'http://localhost:8000'
     const res = await fetch(`${backendUrl}/api/agents/list`, {
@@ -17,8 +25,7 @@ async function fetchAgents() {
     }
 
     return res.json()
-  } catch (error) {
-    console.error('Failed to fetch agents:', error)
+  } catch {
     return []
   }
 }
@@ -28,13 +35,14 @@ export async function AgentList() {
 
   if (agents.length === 0) {
     return (
-      <div className="bg-white p-8 rounded-lg shadow text-center">
+      <div className="bg-white p-8 rounded-lg shadow text-center" role="status">
         <div className="text-gray-400 mb-2">
           <svg
             className="mx-auto h-12 w-12"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
+            aria-hidden="true"
           >
             <path
               strokeLinecap="round"
@@ -51,8 +59,8 @@ export async function AgentList() {
   }
 
   return (
-    <div className="space-y-3">
-      {agents.map((agent: any) => {
+    <div className="space-y-3" role="list" aria-label="Agent list">
+      {agents.map((agent: Agent) => {
         const statusColor =
           agent.status === 'active'
             ? 'bg-green-100 text-green-800'
@@ -69,6 +77,9 @@ export async function AgentList() {
           <div
             key={agent.agent_id}
             className="bg-white p-4 rounded-lg shadow hover:shadow-md transition"
+            role="listitem"
+            tabIndex={0}
+            aria-label={`Agent ${agent.agent_type}, status: ${agent.status}`}
           >
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center space-x-3">

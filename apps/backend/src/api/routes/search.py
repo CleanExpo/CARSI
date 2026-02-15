@@ -219,7 +219,7 @@ async def search_documents(
         logger.warning("Invalid search parameters", error=str(e))
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Invalid search parameters: {str(e)}",
+            detail="Invalid search parameters",
         )
     except Exception as e:
         logger.error("Search failed", error=str(e))

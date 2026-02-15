@@ -1,10 +1,12 @@
 """FastAPI application entry point."""
 
+import uuid
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 from src.config import get_settings
 from src.utils import setup_logging, get_logger
@@ -12,6 +14,8 @@ from src.utils import setup_logging, get_logger
 from .routes import agents, chat, health, webhooks, prd, workflows, rag, analytics, agent_dashboard, task_queue, contractors, search, documents, workflow_builder, discovery
 from .middleware.auth import AuthMiddleware
 from .middleware.rate_limit import RateLimitMiddleware
+from .middleware.security_headers import SecurityHeadersMiddleware
+from .middleware.request_id import RequestIdMiddleware
 
 settings = get_settings()
 logger = get_logger(__name__)
@@ -33,18 +37,42 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS middleware
+# CORS middleware — explicit methods and headers
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "X-User-Id", "X-Request-ID"],
 )
 
-# Custom middleware
+# Custom middleware (executed bottom-to-top: RequestId runs first)
+app.add_middleware(SecurityHeadersMiddleware)
 app.add_middleware(RateLimitMiddleware)
 app.add_middleware(AuthMiddleware)
+app.add_middleware(RequestIdMiddleware)
+
+
+# Global exception handler — safety net for unhandled errors
+@app.exception_handler(Exception)
+async def _global_exception_handler(request: Request, exc: Exception) -> JSONResponse:
+    request_id = getattr(request.state, "request_id", str(uuid.uuid4()))
+    logger.error(
+        "Unhandled exception",
+        request_id=request_id,
+        error=str(exc),
+        error_type=type(exc).__name__,
+        path=str(request.url.path),
+    )
+    return JSONResponse(
+        status_code=500,
+        content={
+            "error": "An internal error occurred",
+            "error_code": "INTERNAL_ERROR",
+            "request_id": request_id,
+        },
+    )
+
 
 # Include routers
 app.include_router(health.router, tags=["Health"])

@@ -2,16 +2,20 @@
 Database configuration and session management.
 
 Provides SQLAlchemy connection setup for local PostgreSQL.
+Includes slow-query detection via SQLAlchemy event listeners.
 """
 
+import time
 from typing import AsyncGenerator
 from contextlib import asynccontextmanager
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, event
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import Session, sessionmaker
 
 from .settings import get_settings
+
+_SLOW_QUERY_THRESHOLD_MS = 500
 
 
 def get_database_url(async_mode: bool = False) -> str:
@@ -28,7 +32,7 @@ def get_database_url(async_mode: bool = False) -> str:
     settings = get_settings()
 
     # Default to local PostgreSQL if not configured
-    db_url = settings.database_url or "postgresql://starter_user:local_dev_password@localhost:5432/starter_db"
+    db_url = settings.database_url or "postgresql://starter_user:local_dev_password@localhost:5433/starter_db"
 
     # Convert to async URL if needed
     if async_mode and not db_url.startswith("postgresql+asyncpg"):
@@ -73,6 +77,28 @@ AsyncSessionLocal = async_sessionmaker(
     autoflush=False,
     expire_on_commit=False,
 )
+
+
+# ---------------------------------------------------------------------------
+# Slow-query detection for the sync engine
+# ---------------------------------------------------------------------------
+
+@event.listens_for(sync_engine, "before_cursor_execute")
+def _before_cursor_execute(conn, cursor, statement, parameters, context, executemany):  # noqa: ANN001
+    conn.info.setdefault("query_start_time", []).append(time.perf_counter())
+
+
+@event.listens_for(sync_engine, "after_cursor_execute")
+def _after_cursor_execute(conn, cursor, statement, parameters, context, executemany):  # noqa: ANN001
+    from src.utils import get_logger
+    total_ms = (time.perf_counter() - conn.info["query_start_time"].pop()) * 1000
+    if total_ms > _SLOW_QUERY_THRESHOLD_MS:
+        logger = get_logger(__name__)
+        logger.warning(
+            "Slow query detected",
+            duration_ms=round(total_ms, 1),
+            statement=statement[:200],
+        )
 
 
 def get_sync_db() -> Session:

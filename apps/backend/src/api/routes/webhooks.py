@@ -1,14 +1,19 @@
 """Webhook routes for external integrations."""
 
+import hashlib
+import hmac
 from typing import Any
 
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel
 
+from src.config import get_settings
 from src.utils import get_logger
+from src.api.error_handling import create_error_response
 
 router = APIRouter()
 logger = get_logger(__name__)
+settings = get_settings()
 
 
 class WebhookPayload(BaseModel):
@@ -25,12 +30,39 @@ class WebhookResponse(BaseModel):
     event: str
 
 
+def _verify_webhook_signature(payload_body: bytes, signature: str | None) -> bool:
+    """Verify HMAC-SHA256 webhook signature.
+
+    Returns True if no webhook_secret is configured (allows unsigned
+    webhooks in development). In production, always configure WEBHOOK_SECRET.
+    """
+    if not settings.webhook_secret:
+        return True  # No secret configured — skip verification
+    if not signature:
+        return False
+
+    expected = hmac.new(
+        settings.webhook_secret.encode(),
+        payload_body,
+        hashlib.sha256,
+    ).hexdigest()
+
+    return hmac.compare_digest(f"sha256={expected}", signature)
+
+
 @router.post("/webhooks", response_model=WebhookResponse)
 async def handle_webhook(
     request: Request,
     payload: WebhookPayload,
 ) -> WebhookResponse:
     """Handle incoming webhooks."""
+    # Verify signature
+    raw_body = await request.body()
+    signature = request.headers.get("X-Webhook-Signature")
+
+    if not _verify_webhook_signature(raw_body, signature):
+        raise HTTPException(status_code=401, detail="Invalid webhook signature")
+
     try:
         logger.info("Received webhook", event=payload.event)
 
@@ -49,7 +81,12 @@ async def handle_webhook(
 
     except Exception as e:
         logger.error("Webhook processing error", error=str(e))
-        raise HTTPException(status_code=500, detail=str(e))
+        return create_error_response(
+            request=request,
+            exc=e,
+            public_message="Webhook processing failed",
+            error_code="WEBHOOK_ERROR",
+        )
 
 
 async def _handle_task_completed(data: dict[str, Any]) -> None:

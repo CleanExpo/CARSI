@@ -26,12 +26,10 @@ from src.models.contractor import (
     AustralianState,
     ErrorResponse,
 )
+from src.utils import get_logger
 from src.utils.supabase_client import supabase
 
-# DEBUG: Print to confirm this is the Supabase version
-print("=" * 60)
-print("LOADING CONTRACTORS ROUTE (SUPABASE VERSION)")
-print("=" * 60)
+logger = get_logger(__name__)
 
 router = APIRouter(
     prefix="/contractors",

@@ -190,8 +190,9 @@ export function useWorkflowExecution({
         `/api/workflows/${workflowId}/executions?limit=20`
       );
       setHistory(executions);
-    } catch {
-      // Non-critical failure
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Failed to load execution history';
+      setError(msg);
     }
   }, [workflowId]);
 

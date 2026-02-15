@@ -124,6 +124,10 @@ export function TaskSubmissionForm() {
           value={priority}
           onChange={(e) => setPriority(Number(e.target.value))}
           className="w-full"
+          aria-label={`Priority level: ${priority} out of 10`}
+          aria-valuemin={1}
+          aria-valuemax={10}
+          aria-valuenow={priority}
         />
         <div className="flex justify-between text-xs text-gray-500 mt-1">
           <span>Highest (1)</span>
@@ -146,14 +150,14 @@ export function TaskSubmissionForm() {
 
       {/* Success Message */}
       {success && (
-        <div className="p-3 bg-green-50 border border-green-200 rounded-md text-green-800 text-sm">
+        <div className="p-3 bg-green-50 border border-green-200 rounded-md text-green-800 text-sm" role="alert" aria-live="polite">
           Task submitted successfully! Agents will begin execution.
         </div>
       )}
 
       {/* Error Message */}
       {error && (
-        <div className="p-3 bg-red-50 border border-red-200 rounded-md text-red-800 text-sm">
+        <div className="p-3 bg-red-50 border border-red-200 rounded-md text-red-800 text-sm" role="alert" aria-live="assertive">
           {error}
         </div>
       )}

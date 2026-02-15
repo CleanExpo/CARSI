@@ -33,7 +33,7 @@ async def create_workflow(
         logger.error("Failed to create workflow", error=str(e))
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to create workflow: {str(e)}",
+            detail="Failed to create workflow",
         )
 
 

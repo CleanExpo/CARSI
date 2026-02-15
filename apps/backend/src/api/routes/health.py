@@ -4,6 +4,9 @@ from datetime import datetime
 
 from fastapi import APIRouter
 
+from src.utils import get_logger
+
+logger = get_logger(__name__)
 router = APIRouter()
 
 
@@ -18,10 +21,22 @@ async def health_check() -> dict[str, str]:
 
 
 @router.get("/ready")
-async def readiness_check() -> dict[str, str]:
-    """Readiness check endpoint."""
-    # Add checks for dependencies (database, external services, etc.)
+async def readiness_check() -> dict[str, str | bool]:
+    """Readiness check — verifies database connectivity."""
+    db_ok = False
+    try:
+        from src.config.database import async_engine
+        from sqlalchemy import text
+
+        async with async_engine.connect() as conn:
+            await conn.execute(text("SELECT 1"))
+            db_ok = True
+    except Exception as exc:
+        logger.warning("Readiness check failed: database unreachable", error=str(exc))
+
+    status = "ready" if db_ok else "not_ready"
     return {
-        "status": "ready",
+        "status": status,
         "timestamp": datetime.now().isoformat(),
+        "database": db_ok,
     }

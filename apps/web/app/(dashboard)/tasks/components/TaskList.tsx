@@ -4,7 +4,25 @@
  * Displays list of tasks in the queue with status and details.
  */
 
-async function fetchTasks(statusFilter?: string) {
+interface Task {
+  id: string;
+  title: string;
+  description: string;
+  status: string;
+  task_type: string;
+  priority: number;
+  assigned_agent_type?: string;
+  iterations?: number;
+  pr_url?: string;
+  created_at: string;
+}
+
+interface TaskListResponse {
+  tasks: Task[];
+  total: number;
+}
+
+async function fetchTasks(statusFilter?: string): Promise<TaskListResponse> {
   try {
     const backendUrl = process.env.BACKEND_URL || 'http://localhost:8000'
     const url = statusFilter
@@ -21,8 +39,7 @@ async function fetchTasks(statusFilter?: string) {
     }
 
     return res.json()
-  } catch (error) {
-    console.error('Failed to fetch tasks:', error)
+  } catch {
     return { tasks: [], total: 0 }
   }
 }
@@ -32,13 +49,14 @@ export async function TaskList() {
 
   if (tasks.length === 0) {
     return (
-      <div className="bg-white p-12 rounded-lg shadow text-center">
+      <div className="bg-white p-12 rounded-lg shadow text-center" role="status">
         <div className="text-gray-400 mb-3">
           <svg
             className="mx-auto h-16 w-16"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
+            aria-hidden="true"
           >
             <path
               strokeLinecap="round"
@@ -55,13 +73,13 @@ export async function TaskList() {
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3" role="list" aria-label="Task list">
       <div className="text-sm text-gray-600 mb-4">
         Showing {tasks.length} of {total} tasks
       </div>
 
-      {tasks.map((task: any) => {
-        const statusConfig = {
+      {tasks.map((task: Task) => {
+        const statusConfig: Record<string, { color: string; icon: string }> = {
           pending: { color: 'bg-yellow-100 text-yellow-800', icon: '[>]' },
           in_progress: { color: 'bg-blue-100 text-blue-800', icon: '[*]' },
           completed: { color: 'bg-green-100 text-green-800', icon: '[OK]' },
@@ -69,9 +87,9 @@ export async function TaskList() {
           cancelled: { color: 'bg-gray-100 text-gray-800', icon: '[-]' },
         }
 
-        const config = statusConfig[task.status as keyof typeof statusConfig] || statusConfig.pending
+        const config = statusConfig[task.status] || statusConfig.pending
 
-        const typeColors = {
+        const typeColors: Record<string, string> = {
           feature: 'bg-blue-50 text-blue-700',
           bug: 'bg-red-50 text-red-700',
           refactor: 'bg-purple-50 text-purple-700',
@@ -79,10 +97,16 @@ export async function TaskList() {
           test: 'bg-orange-50 text-orange-700',
         }
 
-        const typeColor = typeColors[task.task_type as keyof typeof typeColors] || 'bg-gray-50 text-gray-700'
+        const typeColor = typeColors[task.task_type] || 'bg-gray-50 text-gray-700'
 
         return (
-          <div key={task.id} className="bg-white p-5 rounded-lg shadow-md hover:shadow-lg transition">
+          <div
+            key={task.id}
+            className="bg-white p-5 rounded-lg shadow-md hover:shadow-lg transition"
+            role="listitem"
+            tabIndex={0}
+            aria-label={`Task: ${task.title}, status: ${task.status}`}
+          >
             {/* Header */}
             <div className="flex items-start justify-between mb-3">
               <div className="flex-1">
@@ -113,7 +137,7 @@ export async function TaskList() {
                     <span>{task.assigned_agent_type}</span>
                   </span>
                 )}
-                {task.iterations > 0 && (
+                {task.iterations && task.iterations > 0 && (
                   <span>{task.iterations} iterations</span>
                 )}
                 {task.pr_url && (

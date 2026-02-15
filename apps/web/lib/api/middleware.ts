@@ -68,7 +68,11 @@ export async function updateSession(request: NextRequest) {
   if (isProtectedPath && !user) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
-    url.searchParams.set("redirect", request.nextUrl.pathname);
+    // Validate redirect target is relative (prevent open redirect)
+    const redirectPath = request.nextUrl.pathname;
+    if (redirectPath.startsWith("/") && !redirectPath.startsWith("//")) {
+      url.searchParams.set("redirect", redirectPath);
+    }
     return NextResponse.redirect(url);
   }
 
@@ -81,7 +85,12 @@ export async function updateSession(request: NextRequest) {
   if (isAuthPath && user) {
     const url = request.nextUrl.clone();
     const redirect = request.nextUrl.searchParams.get("redirect");
-    url.pathname = redirect || "/dashboard";
+    // Validate redirect is a safe relative path (prevent open redirect)
+    const safePath =
+      redirect && redirect.startsWith("/") && !redirect.startsWith("//")
+        ? redirect
+        : "/dashboard";
+    url.pathname = safePath;
     url.searchParams.delete("redirect");
     return NextResponse.redirect(url);
   }
