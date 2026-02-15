@@ -12,7 +12,7 @@ export interface PRDGenerationRequest {
     timeline?: string;
     team_size?: number;
     existing_stack?: string;
-    [key: string]: any;
+    [key: string]: string | number | undefined;
   };
   output_dir?: string;
   user_id?: string;
@@ -27,11 +27,11 @@ export interface PRDGenerationResponse {
 }
 
 export interface PRDResult {
-  prd_analysis: any;
-  feature_decomposition: any;
-  technical_spec: any;
-  test_plan: any;
-  roadmap: any;
+  prd_analysis: Record<string, unknown>;
+  feature_decomposition: Record<string, unknown>;
+  technical_spec: Record<string, unknown>;
+  test_plan: Record<string, unknown>;
+  roadmap: Record<string, unknown>;
   documents_generated: string[];
   total_user_stories: number;
   total_api_endpoints: number;
