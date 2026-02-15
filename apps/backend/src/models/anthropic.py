@@ -14,13 +14,14 @@ Sources:
 - docs.anthropic.com/en/docs/build-with-claude/computer-use
 """
 
-from typing import Any, TypedDict, Literal, NotRequired
-from dataclasses import dataclass, field
+from dataclasses import dataclass
+from typing import Any, Literal, NotRequired, TypedDict
 
 from anthropic import AsyncAnthropic
 
 from src.config import get_settings
 from src.utils import get_logger
+
 from .base_provider import BaseLLMProvider
 
 settings = get_settings()

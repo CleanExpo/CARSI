@@ -24,16 +24,16 @@ https://www.anthropic.com/research/long-running-agents
 from __future__ import annotations
 
 import asyncio
-from datetime import datetime
+from collections.abc import Awaitable, Callable
 from pathlib import Path
-from typing import Any, Optional, Callable, Awaitable
+from typing import Any
 
 from pydantic import BaseModel, Field
 
-from .progress import ProgressTracker
-from .features import FeatureManager, Feature
+from .coding_agent import CodingAgent
+from .features import FeatureManager
 from .initializer import InitializerAgent, check_if_initialized
-from .coding_agent import CodingAgent, SessionRunner
+from .progress import ProgressTracker
 
 
 class HarnessConfig(BaseModel):
@@ -41,7 +41,7 @@ class HarnessConfig(BaseModel):
 
     project_path: str
     project_name: str
-    specification: Optional[str] = None
+    specification: str | None = None
 
     # Session settings
     max_sessions: int = 100  # Safety limit
@@ -66,11 +66,11 @@ class HarnessState(BaseModel):
 
     initialized: bool = False
     total_sessions: int = 0
-    current_session: Optional[str] = None
+    current_session: str | None = None
     features_complete: int = 0
     features_total: int = 0
     percent_complete: float = 0.0
-    last_activity: Optional[str] = None
+    last_activity: str | None = None
 
 
 class SessionResult(BaseModel):
@@ -81,7 +81,7 @@ class SessionResult(BaseModel):
     session_type: str  # "initializer" or "coding"
     features_completed: int = 0
     commits_made: list[str] = Field(default_factory=list)
-    error: Optional[str] = None
+    error: str | None = None
     should_continue: bool = True
     summary: str = ""
 
@@ -117,8 +117,8 @@ class LongRunningAgentHarness:
         self,
         project_path: str | Path,
         project_name: str,
-        specification: Optional[str] = None,
-        config: Optional[HarnessConfig] = None,
+        specification: str | None = None,
+        config: HarnessConfig | None = None,
     ) -> None:
         """Initialize the harness.
 
@@ -141,8 +141,8 @@ class LongRunningAgentHarness:
                 specification=specification,
             )
 
-        self._progress: Optional[ProgressTracker] = None
-        self._features: Optional[FeatureManager] = None
+        self._progress: ProgressTracker | None = None
+        self._features: FeatureManager | None = None
 
     def get_state(self) -> HarnessState:
         """Get current harness state."""
@@ -243,8 +243,8 @@ class LongRunningAgentHarness:
 
     async def run_until_complete(
         self,
-        max_sessions: Optional[int] = None,
-        on_session_complete: Optional[Callable[[SessionResult], Awaitable[bool]]] = None,
+        max_sessions: int | None = None,
+        on_session_complete: Callable[[SessionResult], Awaitable[bool]] | None = None,
     ) -> list[SessionResult]:
         """Run sessions until project is complete or max reached.
 

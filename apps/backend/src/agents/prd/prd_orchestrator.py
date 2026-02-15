@@ -13,21 +13,21 @@ Outputs comprehensive PRD documents ready for development.
 from __future__ import annotations
 
 import json
-from typing import Any, Optional
 from datetime import datetime
 from pathlib import Path
+from typing import Any
 
 from pydantic import BaseModel, Field
 
-from ..base_agent import BaseAgent
 from src.config import get_settings
 from src.utils import get_logger
 
-from .analysis_agent import PRDAnalysisAgent, PRDAnalysis
+from ..base_agent import BaseAgent
+from .analysis_agent import PRDAnalysis, PRDAnalysisAgent
 from .feature_decomposer import FeatureDecomposer, FeatureDecomposition
-from .tech_spec_generator import TechnicalSpecGenerator, TechnicalSpec
-from .test_generator import TestScenarioGenerator, TestPlan
-from .roadmap_planner import RoadmapPlanner, Roadmap
+from .roadmap_planner import Roadmap, RoadmapPlanner
+from .tech_spec_generator import TechnicalSpec, TechnicalSpecGenerator
+from .test_generator import TestPlan, TestScenarioGenerator
 
 settings = get_settings()
 logger = get_logger(__name__)
@@ -587,15 +587,36 @@ class PRDOrchestrator(BaseAgent):
 
 ## Unit Tests ({len(test_plan.unit_tests)} scenarios)
 
-{chr(10).join(f"### {test.id}: {test.title}\n**Given**: {test.given}\n**When**: {test.when}\n**Then**: {test.then}\n**Priority**: {test.priority}\n" for test in test_plan.unit_tests[:10])}
+{chr(10).join(
+    f"### {test.id}: {test.title}\n"
+    f"**Given**: {test.given}\n"
+    f"**When**: {test.when}\n"
+    f"**Then**: {test.then}\n"
+    f"**Priority**: {test.priority}\n"
+    for test in test_plan.unit_tests[:10]
+)}
 
 ## Integration Tests ({len(test_plan.integration_tests)} scenarios)
 
-{chr(10).join(f"### {test.id}: {test.title}\n**Given**: {test.given}\n**When**: {test.when}\n**Then**: {test.then}\n**Priority**: {test.priority}\n" for test in test_plan.integration_tests[:10])}
+{chr(10).join(
+    f"### {test.id}: {test.title}\n"
+    f"**Given**: {test.given}\n"
+    f"**When**: {test.when}\n"
+    f"**Then**: {test.then}\n"
+    f"**Priority**: {test.priority}\n"
+    for test in test_plan.integration_tests[:10]
+)}
 
 ## E2E Tests ({len(test_plan.e2e_tests)} scenarios)
 
-{chr(10).join(f"### {test.id}: {test.title}\n**Given**: {test.given}\n**When**: {test.when}\n**Then**: {test.then}\n**Priority**: {test.priority}\n" for test in test_plan.e2e_tests)}
+{chr(10).join(
+    f"### {test.id}: {test.title}\n"
+    f"**Given**: {test.given}\n"
+    f"**When**: {test.when}\n"
+    f"**Then**: {test.then}\n"
+    f"**Priority**: {test.priority}\n"
+    for test in test_plan.e2e_tests
+)}
 
 ## Security Tests
 
@@ -665,7 +686,13 @@ class PRDOrchestrator(BaseAgent):
 
 ## Risks
 
-{chr(10).join(f"### {r.id}: {r.title}\n**Probability**: {r.probability} | **Impact**: {r.impact}\n**Mitigation**: {r.mitigation}\n**Contingency**: {r.contingency}\n" for r in roadmap.risks)}
+{chr(10).join(
+    f"### {r.id}: {r.title}\n"
+    f"**Probability**: {r.probability} | **Impact**: {r.impact}\n"
+    f"**Mitigation**: {r.mitigation}\n"
+    f"**Contingency**: {r.contingency}\n"
+    for r in roadmap.risks
+)}
 
 ## Release Strategy
 

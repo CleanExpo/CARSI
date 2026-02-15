@@ -6,10 +6,10 @@ These are separate from Pydantic models (used for API validation).
 """
 
 import enum
-from datetime import datetime, timezone
-from typing import Optional
+from datetime import UTC, datetime
 from uuid import UUID, uuid4
 
+from pgvector.sqlalchemy import Vector
 from sqlalchemy import (
     Boolean,
     Column,
@@ -20,9 +20,9 @@ from sqlalchemy import (
     Text,
     Time,
 )
-from sqlalchemy.dialects.postgresql import JSONB, UUID as PGUUID
+from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.orm import DeclarativeBase, relationship
-from pgvector.sqlalchemy import Vector
 
 
 class Base(DeclarativeBase):
@@ -65,19 +65,19 @@ class User(Base):
     id: UUID = Column(PGUUID(as_uuid=True), primary_key=True, default=uuid4)
     email: str = Column(String(255), unique=True, nullable=False, index=True)
     password_hash: str = Column(String(255), nullable=False)
-    full_name: Optional[str] = Column(String(255), nullable=True)
+    full_name: str | None = Column(String(255), nullable=True)
     is_active: bool = Column(Boolean, default=True, nullable=False, index=True)
     is_admin: bool = Column(Boolean, default=False, nullable=False)
     created_at: datetime = Column(
-        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False
+        DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False
     )
     updated_at: datetime = Column(
         DateTime(timezone=True),
-        default=lambda: datetime.now(timezone.utc),
-        onupdate=lambda: datetime.now(timezone.utc),
+        default=lambda: datetime.now(UTC),
+        onupdate=lambda: datetime.now(UTC),
         nullable=False,
     )
-    last_login_at: Optional[datetime] = Column(DateTime(timezone=True), nullable=True)
+    last_login_at: datetime | None = Column(DateTime(timezone=True), nullable=True)
 
     # Relationships
     contractors = relationship("Contractor", back_populates="user")
@@ -97,21 +97,21 @@ class Contractor(Base):
     __tablename__ = "contractors"
 
     id: UUID = Column(PGUUID(as_uuid=True), primary_key=True, default=uuid4)
-    user_id: Optional[UUID] = Column(
+    user_id: UUID | None = Column(
         PGUUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), nullable=True
     )
     name: str = Column(String(100), nullable=False)
     mobile: str = Column(String(20), nullable=False, index=True)
-    abn: Optional[str] = Column(String(20), nullable=True, index=True)
-    email: Optional[str] = Column(String(255), nullable=True)
-    specialisation: Optional[str] = Column(String(100), nullable=True)
+    abn: str | None = Column(String(20), nullable=True, index=True)
+    email: str | None = Column(String(255), nullable=True)
+    specialisation: str | None = Column(String(100), nullable=True)
     created_at: datetime = Column(
-        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False
+        DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False
     )
     updated_at: datetime = Column(
         DateTime(timezone=True),
-        default=lambda: datetime.now(timezone.utc),
-        onupdate=lambda: datetime.now(timezone.utc),
+        default=lambda: datetime.now(UTC),
+        onupdate=lambda: datetime.now(UTC),
         nullable=False,
     )
 
@@ -151,20 +151,20 @@ class AvailabilitySlot(Base):
         default=AustralianState.QLD,
         index=True,
     )
-    postcode: Optional[str] = Column(String(10), nullable=True)
+    postcode: str | None = Column(String(10), nullable=True)
     status: AvailabilityStatus = Column(
         Enum(AvailabilityStatus, name="availability_status"),
         default=AvailabilityStatus.AVAILABLE,
         index=True,
     )
-    notes: Optional[str] = Column(Text, nullable=True)
+    notes: str | None = Column(Text, nullable=True)
     created_at: datetime = Column(
-        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False
+        DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False
     )
     updated_at: datetime = Column(
         DateTime(timezone=True),
-        default=lambda: datetime.now(timezone.utc),
-        onupdate=lambda: datetime.now(timezone.utc),
+        default=lambda: datetime.now(UTC),
+        onupdate=lambda: datetime.now(UTC),
         nullable=False,
     )
 
@@ -185,20 +185,21 @@ class Document(Base):
     __tablename__ = "documents"
 
     id: UUID = Column(PGUUID(as_uuid=True), primary_key=True, default=uuid4)
-    user_id: Optional[UUID] = Column(
+    user_id: UUID | None = Column(
         PGUUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=True
     )
     title: str = Column(String(255), nullable=False)
     content: str = Column(Text, nullable=False)
-    embedding: Optional[list[float]] = Column(Vector(1536), nullable=True)  # OpenAI/Anthropic dimension
-    doc_metadata: dict = Column("metadata", JSONB, default=dict, nullable=False)  # renamed from 'metadata' to avoid SQLAlchemy reserved name
+    embedding: list[float] | None = Column(Vector(1536), nullable=True)  # OpenAI/Anthropic dimension
+    # Renamed from 'metadata' to avoid SQLAlchemy reserved name
+    doc_metadata: dict = Column("metadata", JSONB, default=dict, nullable=False)
     created_at: datetime = Column(
-        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False
+        DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False
     )
     updated_at: datetime = Column(
         DateTime(timezone=True),
-        default=lambda: datetime.now(timezone.utc),
-        onupdate=lambda: datetime.now(timezone.utc),
+        default=lambda: datetime.now(UTC),
+        onupdate=lambda: datetime.now(UTC),
         nullable=False,
     )
 

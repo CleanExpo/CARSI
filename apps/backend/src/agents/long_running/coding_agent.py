@@ -16,13 +16,13 @@ from __future__ import annotations
 import subprocess
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional, Callable, Awaitable
+from typing import Any
 
 from pydantic import BaseModel, Field
 
 from ..base_agent import BaseAgent
+from .features import Feature, FeatureManager
 from .progress import ProgressTracker
-from .features import FeatureManager, Feature
 
 
 class SessionPhase(str):
@@ -54,7 +54,7 @@ class FeatureWorkResult(BaseModel):
     feature_id: str
     success: bool
     tests_passed: bool
-    commit_hash: Optional[str] = None
+    commit_hash: str | None = None
     notes: str = ""
     time_spent_seconds: int = 0
 
@@ -69,7 +69,7 @@ class CodingSessionResult(BaseModel):
     features_worked: list[FeatureWorkResult] = Field(default_factory=list)
     bugs_fixed: list[str] = Field(default_factory=list)
     commits_made: list[str] = Field(default_factory=list)
-    error: Optional[str] = None
+    error: str | None = None
     next_steps: list[str] = Field(default_factory=list)
     progress_summary: str = ""
 
@@ -112,10 +112,10 @@ class CodingAgent(BaseAgent):
                 "test",
             ],
         )
-        self._progress: Optional[ProgressTracker] = None
-        self._features: Optional[FeatureManager] = None
-        self._session_id: Optional[str] = None
-        self._start_time: Optional[datetime] = None
+        self._progress: ProgressTracker | None = None
+        self._features: FeatureManager | None = None
+        self._session_id: str | None = None
+        self._start_time: datetime | None = None
 
     async def execute(
         self,
@@ -492,7 +492,7 @@ class CodingAgent(BaseAgent):
         path: Path,
         feature: Feature,
         result: FeatureWorkResult,
-    ) -> Optional[str]:
+    ) -> str | None:
         """Commit the work done on a feature."""
         try:
             # Add all changes
@@ -568,14 +568,14 @@ class SessionRunner:
     def __init__(
         self,
         project_path: str | Path,
-        project_name: Optional[str] = None,
+        project_name: str | None = None,
     ) -> None:
         self.project_path = Path(project_path)
         self.project_name = project_name or self.project_path.name
 
     async def run(
         self,
-        specification: Optional[str] = None,
+        specification: str | None = None,
         **context: Any,
     ) -> dict[str, Any]:
         """Run a session - either init or coding.
@@ -587,7 +587,7 @@ class SessionRunner:
         Returns:
             Result from the agent
         """
-        from .initializer import check_if_initialized, InitializerAgent
+        from .initializer import InitializerAgent, check_if_initialized
 
         ctx = {
             "project_path": str(self.project_path),

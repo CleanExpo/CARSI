@@ -191,11 +191,11 @@ jobs:
           echo "# Security Scan Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "## Required Scans Completed:" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ NPM Audit (no token required)" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ Trivy Container Scan (no token required)" >> $GITHUB_STEP_SUMMARY
+          echo "- [PASS] NPM Audit (no token required)" >> $GITHUB_STEP_SUMMARY
+          echo "- [PASS] Trivy Container Scan (no token required)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "## Optional Scans:" >> $GITHUB_STEP_SUMMARY
-          echo "- ⚙️ Snyk Security Scans (requires SNYK_TOKEN secret)" >> $GITHUB_STEP_SUMMARY
+          echo "- [OPT] Snyk Security Scans (requires SNYK_TOKEN secret)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "All required security scans completed successfully." >> $GITHUB_STEP_SUMMARY
           echo "Please review the artifact reports for detailed findings." >> $GITHUB_STEP_SUMMARY

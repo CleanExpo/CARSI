@@ -6,9 +6,8 @@ Scientific Luxury Design System compliant with spectral colour mapping.
 """
 
 import enum
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from decimal import Decimal
-from typing import Optional
 from uuid import UUID, uuid4
 
 from sqlalchemy import (
@@ -23,7 +22,8 @@ from sqlalchemy import (
     Text,
     UniqueConstraint,
 )
-from sqlalchemy.dialects.postgresql import ARRAY, JSONB, UUID as PGUUID
+from sqlalchemy.dialects.postgresql import ARRAY, JSONB
+from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.orm import relationship
 
 from .models import Base
@@ -99,14 +99,14 @@ class Workflow(Base):
     __tablename__ = "workflows"
 
     id: UUID = Column(PGUUID(as_uuid=True), primary_key=True, default=uuid4)
-    user_id: Optional[UUID] = Column(
+    user_id: UUID | None = Column(
         PGUUID(as_uuid=True),
         ForeignKey("users.id", ondelete="CASCADE"),
         nullable=True,
         index=True,
     )
     name: str = Column(String(255), nullable=False)
-    description: Optional[str] = Column(Text, nullable=True)
+    description: str | None = Column(Text, nullable=True)
     version: str = Column(String(50), default="1.0.0", nullable=False)
     is_published: bool = Column(Boolean, default=False, nullable=False, index=True)
     is_template: bool = Column(Boolean, default=False, nullable=False)
@@ -116,16 +116,16 @@ class Workflow(Base):
     workflow_metadata: dict = Column("metadata", JSONB, default=dict, nullable=False)
     created_at: datetime = Column(
         DateTime(timezone=True),
-        default=lambda: datetime.now(timezone.utc),
+        default=lambda: datetime.now(UTC),
         nullable=False,
     )
     updated_at: datetime = Column(
         DateTime(timezone=True),
-        default=lambda: datetime.now(timezone.utc),
-        onupdate=lambda: datetime.now(timezone.utc),
+        default=lambda: datetime.now(UTC),
+        onupdate=lambda: datetime.now(UTC),
         nullable=False,
     )
-    published_at: Optional[datetime] = Column(DateTime(timezone=True), nullable=True)
+    published_at: datetime | None = Column(DateTime(timezone=True), nullable=True)
 
     # Relationships
     user = relationship("User", backref="workflows")
@@ -178,7 +178,7 @@ class WorkflowNode(Base):
         index=True,
     )
     label: str = Column(String(255), nullable=False)
-    description: Optional[str] = Column(Text, nullable=True)
+    description: str | None = Column(Text, nullable=True)
     position_x: Decimal = Column(Numeric(10, 2), default=0, nullable=False)
     position_y: Decimal = Column(Numeric(10, 2), default=0, nullable=False)
     config: dict = Column(JSONB, default=dict, nullable=False)
@@ -187,13 +187,13 @@ class WorkflowNode(Base):
     node_metadata: dict = Column("metadata", JSONB, default=dict, nullable=False)
     created_at: datetime = Column(
         DateTime(timezone=True),
-        default=lambda: datetime.now(timezone.utc),
+        default=lambda: datetime.now(UTC),
         nullable=False,
     )
     updated_at: datetime = Column(
         DateTime(timezone=True),
-        default=lambda: datetime.now(timezone.utc),
-        onupdate=lambda: datetime.now(timezone.utc),
+        default=lambda: datetime.now(UTC),
+        onupdate=lambda: datetime.now(UTC),
         nullable=False,
     )
 
@@ -254,18 +254,18 @@ class WorkflowEdge(Base):
         nullable=False,
         index=True,
     )
-    source_handle: Optional[str] = Column(String(100), nullable=True)
-    target_handle: Optional[str] = Column(String(100), nullable=True)
+    source_handle: str | None = Column(String(100), nullable=True)
+    target_handle: str | None = Column(String(100), nullable=True)
     type: WorkflowEdgeType = Column(
         Enum(WorkflowEdgeType, name="workflow_edge_type"),
         default=WorkflowEdgeType.DEFAULT,
         nullable=False,
     )
-    condition: Optional[str] = Column(Text, nullable=True)
+    condition: str | None = Column(Text, nullable=True)
     edge_metadata: dict = Column("metadata", JSONB, default=dict, nullable=False)
     created_at: datetime = Column(
         DateTime(timezone=True),
-        default=lambda: datetime.now(timezone.utc),
+        default=lambda: datetime.now(UTC),
         nullable=False,
     )
 
@@ -302,7 +302,7 @@ class WorkflowExecution(Base):
         nullable=False,
         index=True,
     )
-    user_id: Optional[UUID] = Column(
+    user_id: UUID | None = Column(
         PGUUID(as_uuid=True),
         ForeignKey("users.id", ondelete="SET NULL"),
         nullable=True,
@@ -314,20 +314,20 @@ class WorkflowExecution(Base):
         nullable=False,
         index=True,
     )
-    current_node_id: Optional[UUID] = Column(
+    current_node_id: UUID | None = Column(
         PGUUID(as_uuid=True),
         ForeignKey("workflow_nodes.id", ondelete="SET NULL"),
         nullable=True,
     )
     variables: dict = Column(JSONB, default=dict, nullable=False)
     input_data: dict = Column(JSONB, default=dict, nullable=False)
-    output_data: Optional[dict] = Column(JSONB, nullable=True)
-    error_message: Optional[str] = Column(Text, nullable=True)
-    started_at: Optional[datetime] = Column(DateTime(timezone=True), nullable=True)
-    completed_at: Optional[datetime] = Column(DateTime(timezone=True), nullable=True)
+    output_data: dict | None = Column(JSONB, nullable=True)
+    error_message: str | None = Column(Text, nullable=True)
+    started_at: datetime | None = Column(DateTime(timezone=True), nullable=True)
+    completed_at: datetime | None = Column(DateTime(timezone=True), nullable=True)
     created_at: datetime = Column(
         DateTime(timezone=True),
-        default=lambda: datetime.now(timezone.utc),
+        default=lambda: datetime.now(UTC),
         nullable=False,
         index=True,
     )
@@ -344,7 +344,7 @@ class WorkflowExecution(Base):
     )
 
     @property
-    def duration_ms(self) -> Optional[int]:
+    def duration_ms(self) -> int | None:
         """Calculate execution duration in milliseconds."""
         if self.completed_at and self.started_at:
             delta = self.completed_at - self.started_at
@@ -382,15 +382,15 @@ class WorkflowExecutionLog(Base):
         nullable=False,
         index=True,
     )
-    input_data: Optional[dict] = Column(JSONB, nullable=True)
-    output_data: Optional[dict] = Column(JSONB, nullable=True)
-    error_message: Optional[str] = Column(Text, nullable=True)
+    input_data: dict | None = Column(JSONB, nullable=True)
+    output_data: dict | None = Column(JSONB, nullable=True)
+    error_message: str | None = Column(Text, nullable=True)
     started_at: datetime = Column(DateTime(timezone=True), nullable=False)
-    completed_at: Optional[datetime] = Column(DateTime(timezone=True), nullable=True)
-    duration_ms: Optional[int] = Column(Integer, nullable=True)
+    completed_at: datetime | None = Column(DateTime(timezone=True), nullable=True)
+    duration_ms: int | None = Column(Integer, nullable=True)
     created_at: datetime = Column(
         DateTime(timezone=True),
-        default=lambda: datetime.now(timezone.utc),
+        default=lambda: datetime.now(UTC),
         nullable=False,
     )
 
@@ -430,15 +430,15 @@ class WorkflowCollaborator(Base):
     role: str = Column(String(50), default="editor", nullable=False)
     joined_at: datetime = Column(
         DateTime(timezone=True),
-        default=lambda: datetime.now(timezone.utc),
+        default=lambda: datetime.now(UTC),
         nullable=False,
     )
-    last_active_at: Optional[datetime] = Column(
+    last_active_at: datetime | None = Column(
         DateTime(timezone=True),
-        default=lambda: datetime.now(timezone.utc),
+        default=lambda: datetime.now(UTC),
         nullable=True,
     )
-    cursor_position: Optional[dict] = Column(JSONB, nullable=True)
+    cursor_position: dict | None = Column(JSONB, nullable=True)
 
     # Relationships
     workflow = relationship("Workflow", back_populates="collaborators")

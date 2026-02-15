@@ -5,15 +5,14 @@ Implements document search using PostgreSQL full-text search (tsvector).
 Uses SQLAlchemy ORM for type-safe queries and async/await pattern.
 """
 
-from typing import Optional, Annotated
-from pydantic import BaseModel, Field
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from sqlalchemy import select, and_, func, text
+from pydantic import BaseModel, Field
+from sqlalchemy import func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.auth.jwt import decode_access_token
 from src.config.database import get_async_db
 from src.db.models import Document, User
-from src.auth.jwt import extract_user_email, decode_access_token
 from src.utils import get_logger
 
 logger = get_logger(__name__)
@@ -26,7 +25,7 @@ class SearchResultItem(BaseModel):
 
     id: str
     title: str
-    type: Optional[str] = None
+    type: str | None = None
     snippet: str = Field(description="Content preview/highlight")
     relevance: float = Field(description="Relevance score 0-1")
 
@@ -45,14 +44,14 @@ class SearchRequest(BaseModel):
     """Search request parameters."""
 
     query: str = Field(min_length=1, description="Search query string")
-    type: Optional[str] = Field(None, description="Filter by document type")
+    type: str | None = Field(None, description="Filter by document type")
     limit: int = Field(default=20, ge=1, le=100, description="Results per page")
     offset: int = Field(default=0, ge=0, description="Pagination offset")
 
 
 async def get_current_user_id(
-    authorization: Optional[str] = None,
-) -> Optional[str]:
+    authorization: str | None = None,
+) -> str | None:
     """
     Extract user ID from JWT token in Authorization header.
 
@@ -91,7 +90,7 @@ async def get_current_user_id(
 )
 async def search_documents(
     search_request: SearchRequest,
-    authorization: Optional[str] = Query(None, description="Authorization header with JWT token"),
+    authorization: str | None = Query(None, description="Authorization header with JWT token"),
     db: AsyncSession = Depends(get_async_db),
 ) -> SearchResponse:
     """

@@ -10,15 +10,16 @@ This agent takes structured PRD analysis and decomposes it into:
 from __future__ import annotations
 
 import json
-from typing import Any, Optional
 from datetime import datetime
+from typing import Any
 
-from pydantic import BaseModel, Field
 from anthropic import AsyncAnthropic
+from pydantic import BaseModel, Field
 
-from ..base_agent import BaseAgent
 from src.config import get_settings
 from src.utils import get_logger
+
+from ..base_agent import BaseAgent
 from .analysis_agent import PRDAnalysis
 
 settings = get_settings()

@@ -6,7 +6,7 @@ Includes slow-query detection via SQLAlchemy event listeners.
 """
 
 import time
-from typing import AsyncGenerator
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
 from sqlalchemy import create_engine, event

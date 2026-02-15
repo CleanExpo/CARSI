@@ -1,13 +1,13 @@
 """Verification module - Independent verification of task completion."""
 
 from .independent_verifier import (
+    ClaimedOutput,
+    CompletionCriterion,
     IndependentVerifier,
-    VerificationRequest,
-    VerificationResult,
     VerificationEvidence,
     VerificationFailure,
-    CompletionCriterion,
-    ClaimedOutput,
+    VerificationRequest,
+    VerificationResult,
     VerificationType,
 )
 

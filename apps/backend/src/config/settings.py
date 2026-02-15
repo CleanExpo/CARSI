@@ -6,7 +6,6 @@ from typing import Literal
 from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-
 _UNSAFE_JWT_DEFAULTS = {
     "your-secret-key-change-in-production",
     "your-secret-key-change-in-production-use-long-random-string",

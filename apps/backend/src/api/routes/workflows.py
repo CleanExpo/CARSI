@@ -1,16 +1,16 @@
 """Workflow API routes."""
 
-from typing import Optional
+
 from fastapi import APIRouter, HTTPException, status
 
+from src.utils import get_logger
 from src.workflow.models import (
+    ExecutionStatus,
     WorkflowDefinition,
     WorkflowExecutionRequest,
     WorkflowExecutionResponse,
-    ExecutionStatus,
 )
 from src.workflow.storage import WorkflowStorage
-from src.utils import get_logger
 
 logger = get_logger(__name__)
 router = APIRouter(prefix="/workflows", tags=["workflows"])
@@ -22,7 +22,7 @@ storage = WorkflowStorage()
 @router.post("/", response_model=WorkflowDefinition, status_code=status.HTTP_201_CREATED)
 async def create_workflow(
     workflow: WorkflowDefinition,
-    user_id: Optional[str] = None,
+    user_id: str | None = None,
 ) -> WorkflowDefinition:
     """Create a new workflow definition."""
     try:
@@ -82,8 +82,8 @@ async def delete_workflow(workflow_id: str) -> None:
 
 @router.get("/", response_model=list[WorkflowDefinition])
 async def list_workflows(
-    user_id: Optional[str] = None,
-    is_published: Optional[bool] = None,
+    user_id: str | None = None,
+    is_published: bool | None = None,
     limit: int = 50,
     offset: int = 0,
 ) -> list[WorkflowDefinition]:

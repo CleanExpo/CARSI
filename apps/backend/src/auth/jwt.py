@@ -3,8 +3,7 @@ JWT Authentication Module
 Simple, self-contained JWT token generation and validation
 """
 
-from datetime import datetime, timedelta, timezone
-from typing import Optional
+from datetime import UTC, datetime, timedelta
 
 import jwt
 from passlib.context import CryptContext
@@ -38,7 +37,7 @@ def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
 
 
-def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
+def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
     """
     Create a JWT access token.
 
@@ -52,9 +51,9 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
     to_encode = data.copy()
 
     if expires_delta:
-        expire = datetime.now(timezone.utc) + expires_delta
+        expire = datetime.now(UTC) + expires_delta
     else:
-        expire = datetime.now(timezone.utc) + timedelta(minutes=_get_expire_minutes())
+        expire = datetime.now(UTC) + timedelta(minutes=_get_expire_minutes())
 
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, _get_secret_key(), algorithm=ALGORITHM)
@@ -62,7 +61,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
     return encoded_jwt
 
 
-def decode_access_token(token: str) -> Optional[dict]:
+def decode_access_token(token: str) -> dict | None:
     """
     Decode and validate a JWT token.
 
@@ -81,7 +80,7 @@ def decode_access_token(token: str) -> Optional[dict]:
         return None
 
 
-def extract_user_email(token: str) -> Optional[str]:
+def extract_user_email(token: str) -> str | None:
     """
     Extract user email from JWT token.
 

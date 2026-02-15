@@ -3,8 +3,9 @@
 from pathlib import Path
 from typing import Any
 
-from .parser import parse_skill_frontmatter
 from src.utils import get_logger
+
+from .parser import parse_skill_frontmatter
 
 logger = get_logger(__name__)
 

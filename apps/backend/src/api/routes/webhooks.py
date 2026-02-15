@@ -7,9 +7,9 @@ from typing import Any
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel
 
+from src.api.error_handling import create_error_response
 from src.config import get_settings
 from src.utils import get_logger
-from src.api.error_handling import create_error_response
 
 router = APIRouter()
 logger = get_logger(__name__)

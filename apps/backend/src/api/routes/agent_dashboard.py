@@ -11,9 +11,9 @@ from datetime import datetime, timedelta
 from typing import Any
 
 from fastapi import APIRouter, HTTPException, Query, status
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
-from src.monitoring.agent_metrics import AgentMetrics, AgentHealthReport
+from src.monitoring.agent_metrics import AgentHealthReport, AgentMetrics
 from src.utils import get_logger
 
 logger = get_logger(__name__)

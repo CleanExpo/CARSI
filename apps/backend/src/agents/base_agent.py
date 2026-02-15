@@ -8,16 +8,15 @@ The old verify_build(), verify_tests(), verify_functionality() methods
 now raise errors directing to use proper independent verification.
 """
 
+import uuid
 from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import Any
-import uuid
 
 from pydantic import BaseModel, Field
 
+from src.skills import SkillExecutor
 from src.utils import get_logger
-from src.skills import SkillLoader, SkillExecutor
-
 
 # ============================================================================
 # Verification Models (kept for backward compatibility, but deprecated)
@@ -556,7 +555,6 @@ class BaseAgent(ABC):
             Tuple of (result, success)
         """
         attempt = 0
-        last_error = None
         last_result = None
 
         self.logger.info(
@@ -623,7 +621,6 @@ class BaseAgent(ABC):
                         context["suggested_approach"] = suggestion
 
             except Exception as e:
-                last_error = e
                 self.logger.error(
                     "Iteration attempt failed with exception",
                     attempt=attempt,

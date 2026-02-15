@@ -6,11 +6,10 @@ agent sessions, enabling true long-running agent capabilities.
 
 from datetime import datetime
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 from uuid import uuid4
 
 from pydantic import BaseModel, Field
-
 
 # ============================================================================
 # Core Memory Models
@@ -33,25 +32,25 @@ class MemoryEntry(BaseModel):
     """
 
     id: str = Field(default_factory=lambda: f"mem_{uuid4().hex[:12]}")
-    user_id: Optional[str] = None
+    user_id: str | None = None
     domain: MemoryDomain
     category: str  # Sub-categorization within domain
     key: str  # Unique identifier within category
     value: dict[str, Any]  # Flexible JSON storage
-    embedding: Optional[list[float]] = None  # Vector for semantic search
+    embedding: list[float] | None = None  # Vector for semantic search
 
     # Relevance tracking
     relevance_score: float = Field(default=1.0, ge=0.0, le=1.0)
     access_count: int = 0
-    last_accessed_at: Optional[str] = None
+    last_accessed_at: str | None = None
 
     # Lifecycle
     created_at: str = Field(default_factory=lambda: datetime.now().isoformat())
     updated_at: str = Field(default_factory=lambda: datetime.now().isoformat())
-    expires_at: Optional[str] = None
+    expires_at: str | None = None
 
     # Metadata
-    source: Optional[str] = None  # Where this memory came from
+    source: str | None = None  # Where this memory came from
     tags: list[str] = Field(default_factory=list)
 
     model_config = {"use_enum_values": True}
@@ -60,17 +59,17 @@ class MemoryEntry(BaseModel):
 class MemoryQuery(BaseModel):
     """Query specification for memory retrieval."""
 
-    domain: Optional[MemoryDomain] = None
-    category: Optional[str] = None
-    key: Optional[str] = None
-    user_id: Optional[str] = None
+    domain: MemoryDomain | None = None
+    category: str | None = None
+    key: str | None = None
+    user_id: str | None = None
 
     # Semantic search
-    query_text: Optional[str] = None
+    query_text: str | None = None
     similarity_threshold: float = 0.7
 
     # Filters
-    tags: Optional[list[str]] = None
+    tags: list[str] | None = None
     min_relevance: float = 0.0
 
     # Pagination
@@ -131,7 +130,7 @@ class KnowledgeEntry(BaseModel):
     # Tracking
     created_at: str = Field(default_factory=lambda: datetime.now().isoformat())
     updated_at: str = Field(default_factory=lambda: datetime.now().isoformat())
-    created_by_session: Optional[str] = None
+    created_by_session: str | None = None
     confidence: float = Field(default=1.0, ge=0.0, le=1.0)
     usage_count: int = 0
 
@@ -180,7 +179,7 @@ class PreferenceEntry(BaseModel):
     """Complete user preferences store."""
 
     user_id: str
-    project_id: Optional[str] = None  # None = global preferences
+    project_id: str | None = None  # None = global preferences
 
     coding_style: CodingStyle = Field(default_factory=CodingStyle)
     communication: CommunicationPreferences = Field(
@@ -217,7 +216,7 @@ class TestFailurePattern(BaseModel):
 
     # Tracking
     occurrence_count: int = 0
-    last_occurred: Optional[str] = None
+    last_occurred: str | None = None
     resolved_count: int = 0
 
 
@@ -226,7 +225,7 @@ class TestResult(BaseModel):
 
     id: str = Field(default_factory=lambda: f"test_{uuid4().hex[:12]}")
     session_id: str
-    feature_id: Optional[str] = None
+    feature_id: str | None = None
 
     test_type: str  # "unit" | "integration" | "e2e"
     passed: bool
@@ -239,7 +238,7 @@ class TestResult(BaseModel):
     failures: list[dict[str, Any]] = Field(default_factory=list)
     # [{"test_name": str, "error": str, "file": str, "line": int}]
 
-    coverage: Optional[float] = None
+    coverage: float | None = None
     duration_seconds: float = 0
     timestamp: str = Field(default_factory=lambda: datetime.now().isoformat())
 
@@ -255,8 +254,8 @@ class TestingEntry(BaseModel):
     coverage_threshold: float = 80.0
 
     # E2E configuration
-    e2e_framework: Optional[str] = None  # "playwright" | "cypress"
-    e2e_command: Optional[str] = None
+    e2e_framework: str | None = None  # "playwright" | "cypress"
+    e2e_command: str | None = None
     e2e_base_url: str = "http://localhost:3000"
 
     # History
@@ -283,7 +282,7 @@ class Hypothesis(BaseModel):
     confidence: float = Field(default=0.5, ge=0.0, le=1.0)
     status: str = "untested"  # "untested" | "testing" | "confirmed" | "refuted"
     evidence: list[str] = Field(default_factory=list)
-    tested_at: Optional[str] = None
+    tested_at: str | None = None
 
 
 class InvestigationFinding(BaseModel):
@@ -292,7 +291,7 @@ class InvestigationFinding(BaseModel):
     id: str = Field(default_factory=lambda: f"find_{uuid4().hex[:8]}")
     description: str
     type: str  # "clue" | "dead_end" | "solution"
-    hypothesis_id: Optional[str] = None
+    hypothesis_id: str | None = None
     timestamp: str = Field(default_factory=lambda: datetime.now().isoformat())
 
 
@@ -301,12 +300,12 @@ class DebuggingSession(BaseModel):
 
     id: str = Field(default_factory=lambda: f"debug_{uuid4().hex[:12]}")
     session_id: str  # Links to ProgressTracker session
-    feature_id: Optional[str] = None
+    feature_id: str | None = None
 
     # Problem context
     initial_error: str
     error_type: str
-    stack_trace: Optional[str] = None
+    stack_trace: str | None = None
     affected_files: list[str] = Field(default_factory=list)
 
     # Investigation state
@@ -314,9 +313,9 @@ class DebuggingSession(BaseModel):
     findings: list[InvestigationFinding] = Field(default_factory=list)
     attempted_fixes: list[dict[str, Any]] = Field(default_factory=list)
 
-    current_hypothesis_id: Optional[str] = None
+    current_hypothesis_id: str | None = None
     status: str = "in_progress"  # "in_progress" | "resolved" | "blocked"
-    resolution: Optional[str] = None
+    resolution: str | None = None
 
     created_at: str = Field(default_factory=lambda: datetime.now().isoformat())
     updated_at: str = Field(default_factory=lambda: datetime.now().isoformat())

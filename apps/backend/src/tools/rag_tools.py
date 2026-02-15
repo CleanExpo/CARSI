@@ -2,13 +2,14 @@
 
 from typing import Any
 
-from .registry import (
-    ToolDefinition,
-    ToolConfig,
-    ToolExample,
-    ToolCategory,
-)
 from src.utils import get_logger
+
+from .registry import (
+    ToolCategory,
+    ToolConfig,
+    ToolDefinition,
+    ToolExample,
+)
 
 logger = get_logger(__name__)
 
@@ -46,7 +47,6 @@ async def search_knowledge_base(
         Search results with chunks
     """
     try:
-        from src.rag.models import SearchType
 
         store = await get_rag_store()
 

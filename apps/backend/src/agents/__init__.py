@@ -1,10 +1,10 @@
 """Agents module."""
 
-from .orchestrator import OrchestratorAgent
 from .base_agent import BaseAgent
+from .factory import AGENT_CONFIGS, create_agent, get_agent_capabilities, list_agent_types
+from .marketing_agents import BusinessConsistencyAgent, CopywritingAgent
+from .orchestrator import OrchestratorAgent
 from .registry import AgentRegistry
-from .marketing_agents import CopywritingAgent, BusinessConsistencyAgent
-from .factory import create_agent, list_agent_types, get_agent_capabilities, AGENT_CONFIGS
 
 __all__ = [
     "OrchestratorAgent",

@@ -25,8 +25,9 @@ async def readiness_check() -> dict[str, str | bool]:
     """Readiness check — verifies database connectivity."""
     db_ok = False
     try:
-        from src.config.database import async_engine
         from sqlalchemy import text
+
+        from src.config.database import async_engine
 
         async with async_engine.connect() as conn:
             await conn.execute(text("SELECT 1"))

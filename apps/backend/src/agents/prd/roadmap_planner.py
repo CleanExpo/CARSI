@@ -12,15 +12,16 @@ This agent generates:
 from __future__ import annotations
 
 import json
-from typing import Any, Optional
 from datetime import datetime
+from typing import Any
 
-from pydantic import BaseModel, Field
 from anthropic import AsyncAnthropic
+from pydantic import BaseModel, Field
 
-from ..base_agent import BaseAgent
 from src.config import get_settings
 from src.utils import get_logger
+
+from ..base_agent import BaseAgent
 from .analysis_agent import PRDAnalysis
 from .feature_decomposer import FeatureDecomposition
 from .tech_spec_generator import TechnicalSpec
@@ -394,7 +395,9 @@ Milestone Planning:
 **Total User Stories**: {len(feature_decomposition.user_stories)}
 **Epics**: {len(feature_decomposition.epics)}
 **Estimated Effort**: {feature_decomposition.total_effort_estimate}
-**Critical Path**: {', '.join(feature_decomposition.critical_path[:5])} ... ({len(feature_decomposition.critical_path)} stories)
+**Critical Path**: {
+    ', '.join(feature_decomposition.critical_path[:5])
+} ... ({len(feature_decomposition.critical_path)} stories)
 
 **Database Tables**: {len(tech_spec.database_schema)}
 **API Endpoints**: {len(tech_spec.api_endpoints)}
@@ -402,7 +405,10 @@ Milestone Planning:
 **Test Implementation Effort**: {test_plan.estimated_implementation_effort}
 
 **Epic Breakdown**:
-{chr(10).join(f"- {name} ({data['priority']}): {len(data['stories'])} stories" for name, data in list(epic_stories.items())[:10])}
+{chr(10).join(
+    f"- {name} ({data['priority']}): {len(data['stories'])} stories"
+    for name, data in list(epic_stories.items())[:10]
+)}
 {context_str}
 
 ## Instructions
@@ -447,7 +453,7 @@ Create a detailed roadmap in the following JSON format:
     }}
   ],
 
-  "dependency_graph_mermaid": "graph TD\\n  US001[User Registration] --> US002[User Login]\\n  US002 --> US003[Dashboard]",
+  "dependency_graph_mermaid": "graph TD\\n  US001[Registration] --> US002[Login]\\n  US002 --> US003[Dashboard]",
   "critical_path": ["US-001", "US-002", "US-003"],
 
   "team_composition": {{
@@ -492,7 +498,7 @@ Create a detailed roadmap in the following JSON format:
     "Bug escape rate (bugs in production)"
   ],
 
-  "executive_summary": "12-week project delivering MVP in 6 sprints (12 weeks), followed by 6 sprints of enhancements. Team of 2 developers working 2-week sprints. Critical path focuses on authentication → core features → launch."
+  "executive_summary": "12-week MVP in 6 sprints. 2 devs, 2-week sprints. Path: auth > core > launch."
 }}
 
 ## Requirements

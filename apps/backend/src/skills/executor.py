@@ -2,9 +2,10 @@
 
 from typing import Any
 
-from .loader import SkillLoader
-from .parser import extract_sections, extract_code_blocks
 from src.utils import get_logger
+
+from .loader import SkillLoader
+from .parser import extract_code_blocks, extract_sections
 
 logger = get_logger(__name__)
 

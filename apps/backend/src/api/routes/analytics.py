@@ -1,8 +1,9 @@
 """Analytics API routes for observability dashboard."""
 
 from datetime import datetime, timedelta
-from typing import Any, Optional
-from fastapi import APIRouter, Query, HTTPException
+from typing import Any
+
+from fastapi import APIRouter, HTTPException, Query
 
 from src.state.supabase import SupabaseStateStore
 from src.utils import get_logger
@@ -31,7 +32,7 @@ def get_time_range_start(time_range: str) -> str:
 @router.get("/metrics/overview")
 async def get_metrics_overview(
     time_range: str = Query("7d", regex="^(1h|24h|7d|30d|90d)$"),
-    agent_name: Optional[str] = None,
+    agent_name: str | None = None,
 ) -> dict[str, Any]:
     """
     Get high-level metrics overview.

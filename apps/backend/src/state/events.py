@@ -30,8 +30,9 @@ Usage:
 from typing import Any
 from uuid import uuid4
 
-from .supabase import SupabaseStateStore
 from src.utils import get_logger
+
+from .supabase import SupabaseStateStore
 
 logger = get_logger(__name__)
 

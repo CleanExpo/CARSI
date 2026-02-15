@@ -3,11 +3,10 @@
 Endpoints for generating Product Requirement Documents using AI agents.
 """
 
-from fastapi import APIRouter, HTTPException, BackgroundTasks, Request
+from typing import Any
+
+from fastapi import APIRouter, BackgroundTasks, HTTPException, Request
 from pydantic import BaseModel, Field
-from typing import Any, Optional
-from pathlib import Path
-import json
 
 from src.agents.prd import PRDOrchestrator
 from src.state.events import AgentEventPublisher
@@ -28,11 +27,11 @@ class GeneratePRDRequest(BaseModel):
         default_factory=dict,
         description="Additional context (target_users, timeline, team_size, etc.)"
     )
-    output_dir: Optional[str] = Field(
+    output_dir: str | None = Field(
         default=None,
         description="Directory to save PRD documents (optional)"
     )
-    user_id: Optional[str] = Field(
+    user_id: str | None = Field(
         default=None,
         description="User ID for tracking"
     )
@@ -280,13 +279,6 @@ async def execute_prd_generation(
         orchestrator = PRDOrchestrator()
 
         # Phase tracking
-        phases = [
-            ("Analyzing requirements", 20.0),
-            ("Decomposing features into user stories", 40.0),
-            ("Generating technical specification", 60.0),
-            ("Creating test plan", 80.0),
-            ("Planning implementation roadmap", 90.0),
-        ]
 
         # We can't easily hook into orchestrator phases, so we'll just update progress
         # In a production system, you'd modify orchestrator to emit progress events

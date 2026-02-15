@@ -6,11 +6,12 @@ we define their capabilities in a configuration dictionary and create instances
 using a factory function.
 """
 
-from typing import Any
 import uuid
+from typing import Any
+
+from src.utils import get_logger
 
 from .base_agent import BaseAgent
-from src.utils import get_logger
 
 logger = get_logger(__name__)
 

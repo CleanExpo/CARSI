@@ -2,16 +2,17 @@
 
 from typing import Any
 
+from src.utils import get_logger
+
 from .base_agent import (
-    BaseAgent,
     BackendAgent,
+    BaseAgent,
     DatabaseAgent,
     DevOpsAgent,
     FrontendAgent,
     GeneralAgent,
 )
-from .marketing_agents import CopywritingAgent, BusinessConsistencyAgent
-from src.utils import get_logger
+from .marketing_agents import BusinessConsistencyAgent, CopywritingAgent
 
 logger = get_logger(__name__)
 

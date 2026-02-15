@@ -12,11 +12,10 @@ less likely to inappropriately change or overwrite content.
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -67,8 +66,8 @@ class Feature(BaseModel):
     description: str
     steps: list[str] = Field(default_factory=list)
     passes: bool = False
-    last_tested: Optional[str] = None
-    tested_by_session: Optional[str] = None
+    last_tested: str | None = None
+    tested_by_session: str | None = None
     notes: str = ""
     blockers: list[str] = Field(default_factory=list)
     depends_on: list[str] = Field(default_factory=list)
@@ -123,7 +122,7 @@ class FeatureManager:
         """
         self.project_path = Path(project_path)
         self.feature_file = self.project_path / self.FEATURE_FILE
-        self._feature_list: Optional[FeatureList] = None
+        self._feature_list: FeatureList | None = None
 
     def initialize(
         self,
@@ -174,7 +173,7 @@ class FeatureManager:
         self._save()
         return self._feature_list
 
-    def load(self) -> Optional[FeatureList]:
+    def load(self) -> FeatureList | None:
         """Load existing feature list.
 
         Returns:
@@ -194,7 +193,7 @@ class FeatureManager:
         """Check if feature list exists."""
         return self.feature_file.exists()
 
-    def get_feature(self, feature_id: str) -> Optional[Feature]:
+    def get_feature(self, feature_id: str) -> Feature | None:
         """Get a specific feature by ID.
 
         Args:
@@ -216,8 +215,8 @@ class FeatureManager:
 
     def get_next_feature(
         self,
-        category: Optional[FeatureCategory] = None,
-    ) -> Optional[Feature]:
+        category: FeatureCategory | None = None,
+    ) -> Feature | None:
         """Get the next feature to work on.
 
         Prioritizes:
@@ -272,7 +271,7 @@ class FeatureManager:
 
     def get_failing_features(
         self,
-        limit: Optional[int] = None,
+        limit: int | None = None,
     ) -> list[Feature]:
         """Get all failing features.
 
@@ -307,7 +306,7 @@ class FeatureManager:
     def mark_passing(
         self,
         feature_id: str,
-        session_id: Optional[str] = None,
+        session_id: str | None = None,
         notes: str = "",
     ) -> bool:
         """Mark a feature as passing.
@@ -346,7 +345,7 @@ class FeatureManager:
     def mark_failing(
         self,
         feature_id: str,
-        session_id: Optional[str] = None,
+        session_id: str | None = None,
         notes: str = "",
     ) -> bool:
         """Mark a feature as failing (revert a previous pass).
@@ -652,7 +651,6 @@ def load_features_from_prd_json(json_path: Path | str) -> list[dict[str, Any]]:
         FileNotFoundError: If JSON file doesn't exist
         ValueError: If JSON is invalid
     """
-    import json
     from src.utils import get_logger
 
     logger = get_logger(__name__)

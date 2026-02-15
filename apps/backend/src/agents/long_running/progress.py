@@ -10,11 +10,8 @@ to agents working across multiple context windows.
 
 from __future__ import annotations
 
-import json
-from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional
 
 from pydantic import BaseModel, Field
 
@@ -24,7 +21,7 @@ class SessionProgress(BaseModel):
 
     session_id: str
     started_at: str
-    ended_at: Optional[str] = None
+    ended_at: str | None = None
     agent_type: str = "coding"  # "initializer" or "coding"
     features_worked_on: list[str] = Field(default_factory=list)
     features_completed: list[str] = Field(default_factory=list)
@@ -45,7 +42,7 @@ class ProgressFile(BaseModel):
     created_at: str
     last_updated: str
     total_sessions: int = 0
-    current_focus: Optional[str] = None
+    current_focus: str | None = None
     blockers: list[str] = Field(default_factory=list)
     sessions: list[SessionProgress] = Field(default_factory=list)
 
@@ -85,8 +82,8 @@ class ProgressTracker:
         """
         self.project_path = Path(project_path)
         self.progress_file = self.project_path / self.PROGRESS_FILE
-        self._current_session: Optional[SessionProgress] = None
-        self._progress: Optional[ProgressFile] = None
+        self._current_session: SessionProgress | None = None
+        self._progress: ProgressFile | None = None
 
     def initialize(self, project_name: str) -> ProgressFile:
         """Initialize a new progress file for a project.
@@ -107,7 +104,7 @@ class ProgressTracker:
         self._save()
         return self._progress
 
-    def load(self) -> Optional[ProgressFile]:
+    def load(self) -> ProgressFile | None:
         """Load existing progress file.
 
         Returns:
@@ -172,7 +169,7 @@ class ProgressTracker:
 
         return list(reversed(self._progress.sessions[-limit:]))
 
-    def get_current_focus(self) -> Optional[str]:
+    def get_current_focus(self) -> str | None:
         """Get what the previous session was focusing on."""
         if not self._progress:
             self.load()
@@ -275,7 +272,7 @@ class ProgressTracker:
     def end_session(
         self,
         notes: str = "",
-        next_steps: Optional[list[str]] = None,
+        next_steps: list[str] | None = None,
         status: str = "completed",
     ) -> None:
         """End the current session.

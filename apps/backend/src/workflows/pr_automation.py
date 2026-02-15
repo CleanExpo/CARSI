@@ -194,7 +194,7 @@ Co-Authored-By: Claude Agentic System <noreply@anthropic.com>
 """
 
             # Commit
-            result = subprocess.run(
+            subprocess.run(
                 ["git", "commit", "-m", full_message],
                 cwd=self.repo_path,
                 check=True,

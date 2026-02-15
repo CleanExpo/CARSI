@@ -2,12 +2,13 @@
 
 from typing import Literal
 
-from .base_provider import BaseLLMProvider
-from .anthropic import AnthropicClient
-from .google import GoogleClient
-from .openrouter import OpenRouterClient
-from .ollama_provider import OllamaProvider
 from src.config import get_settings
+
+from .anthropic import AnthropicClient
+from .base_provider import BaseLLMProvider
+from .google import GoogleClient
+from .ollama_provider import OllamaProvider
+from .openrouter import OpenRouterClient
 
 settings = get_settings()
 

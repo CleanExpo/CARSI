@@ -18,12 +18,13 @@ from __future__ import annotations
 import asyncio
 import json
 import uuid
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Callable, Dict, List, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from .registry import ToolRegistry, ToolDefinition
+    from .registry import ToolDefinition, ToolRegistry
 
 
 class ExecutionStatus(str, Enum):
@@ -42,13 +43,13 @@ class ToolCall:
 
     id: str
     name: str
-    input: Dict[str, Any]
+    input: dict[str, Any]
     caller_id: str  # ID of the code execution block
     status: ExecutionStatus = ExecutionStatus.PENDING
-    result: Optional[Any] = None
-    error: Optional[str] = None
+    result: Any | None = None
+    error: str | None = None
 
-    def to_api_format(self) -> Dict[str, Any]:
+    def to_api_format(self) -> dict[str, Any]:
         """Convert to Claude API format."""
         return {
             "type": "tool_use",
@@ -71,8 +72,8 @@ class ToolExecutionContext:
     """
 
     execution_id: str
-    pending_calls: List[ToolCall] = field(default_factory=list)
-    completed_calls: List[ToolCall] = field(default_factory=list)
+    pending_calls: list[ToolCall] = field(default_factory=list)
+    completed_calls: list[ToolCall] = field(default_factory=list)
     status: ExecutionStatus = ExecutionStatus.PENDING
     stdout: str = ""
     stderr: str = ""
@@ -80,7 +81,7 @@ class ToolExecutionContext:
     def add_tool_call(
         self,
         name: str,
-        input: Dict[str, Any],
+        input: dict[str, Any],
     ) -> ToolCall:
         """Register a tool call from executing code."""
         call = ToolCall(
@@ -92,7 +93,7 @@ class ToolExecutionContext:
         self.pending_calls.append(call)
         return call
 
-    def get_pending_calls(self) -> List[ToolCall]:
+    def get_pending_calls(self) -> list[ToolCall]:
         """Get all pending tool calls."""
         return [c for c in self.pending_calls if c.status == ExecutionStatus.PENDING]
 
@@ -100,7 +101,7 @@ class ToolExecutionContext:
         self,
         call_id: str,
         result: Any = None,
-        error: Optional[str] = None,
+        error: str | None = None,
     ) -> None:
         """Mark a tool call as complete."""
         for call in self.pending_calls:
@@ -115,7 +116,7 @@ class ToolExecutionContext:
                 self.pending_calls.remove(call)
                 break
 
-    def to_result_format(self) -> Dict[str, Any]:
+    def to_result_format(self) -> dict[str, Any]:
         """Convert to code execution result format."""
         return {
             "type": "code_execution_tool_result",
@@ -165,8 +166,8 @@ class ProgrammaticToolCaller:
             registry: Tool registry with tool definitions
         """
         self.registry = registry
-        self._contexts: Dict[str, ToolExecutionContext] = {}
-        self._tool_handlers: Dict[str, Callable] = {}
+        self._contexts: dict[str, ToolExecutionContext] = {}
+        self._tool_handlers: dict[str, Callable] = {}
 
     def create_context(self) -> ToolExecutionContext:
         """Create a new execution context."""
@@ -175,7 +176,7 @@ class ProgrammaticToolCaller:
         self._contexts[execution_id] = context
         return context
 
-    def get_context(self, execution_id: str) -> Optional[ToolExecutionContext]:
+    def get_context(self, execution_id: str) -> ToolExecutionContext | None:
         """Get an existing execution context."""
         return self._contexts.get(execution_id)
 
@@ -187,7 +188,7 @@ class ProgrammaticToolCaller:
         """Register a handler for a tool."""
         self._tool_handlers[tool_name] = handler
 
-    def get_programmatic_tools(self) -> List[ToolDefinition]:
+    def get_programmatic_tools(self) -> list[ToolDefinition]:
         """Get tools enabled for programmatic calling."""
         return [
             tool
@@ -257,6 +258,12 @@ class ProgrammaticToolCaller:
         # Clean function name (replace dots with underscores)
         func_name = tool.name.replace(".", "_").replace("-", "_")
 
+        kwargs_str = ", ".join(
+            f"{p.split(':')[0].strip()}={p.split(':')[0].strip()}"
+            for p in params
+            if ':' in p
+        )
+
         return f'''async def {func_name}({params_str}) -> Any:
     """
     {tool.description}
@@ -264,9 +271,9 @@ class ProgrammaticToolCaller:
     Args:
 {param_docs_str}
     """
-    return await _call_tool("{tool.name}", {", ".join(f"{p.split(':')[0].strip()}={p.split(':')[0].strip()}" for p in params if ':' in p)})'''
+    return await _call_tool("{tool.name}", {kwargs_str})'''
 
-    def _schema_to_python_type(self, schema: Dict[str, Any]) -> str:
+    def _schema_to_python_type(self, schema: dict[str, Any]) -> str:
         """Convert JSON Schema type to Python type hint."""
         type_map = {
             "string": "str",
@@ -282,7 +289,7 @@ class ProgrammaticToolCaller:
     async def execute_pending_calls(
         self,
         context: ToolExecutionContext,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Execute all pending tool calls in a context.
 
         Args:
@@ -346,7 +353,7 @@ class ProgrammaticToolCaller:
 
         return result
 
-    def get_code_execution_tool(self) -> Dict[str, Any]:
+    def get_code_execution_tool(self) -> dict[str, Any]:
         """Get the Code Execution tool definition."""
         return {
             "type": "code_execution_20250825",
@@ -355,8 +362,8 @@ class ProgrammaticToolCaller:
 
     def parse_tool_request(
         self,
-        request: Dict[str, Any],
-    ) -> Optional[ToolCall]:
+        request: dict[str, Any],
+    ) -> ToolCall | None:
         """Parse a tool request from Claude API response.
 
         Checks if this is a programmatic call (has caller field).
@@ -379,14 +386,14 @@ class ProgrammaticToolCaller:
         self,
         call: ToolCall,
         result: Any = None,
-        error: Optional[str] = None,
-    ) -> Dict[str, Any]:
+        error: str | None = None,
+    ) -> dict[str, Any]:
         """Format tool result for return to code execution.
 
         Note: This result goes to the code execution environment,
         NOT to Claude's context window.
         """
-        content: Dict[str, Any] = {}
+        content: dict[str, Any] = {}
 
         if error:
             content["error"] = error
@@ -403,7 +410,7 @@ class ProgrammaticToolCaller:
             "content": json.dumps(content),
         }
 
-    def get_context_savings(self) -> Dict[str, Any]:
+    def get_context_savings(self) -> dict[str, Any]:
         """Calculate context savings from programmatic calling.
 
         Returns statistics on tokens saved by keeping intermediate

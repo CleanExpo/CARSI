@@ -16,16 +16,16 @@ Integration Points:
 """
 
 from src.memory.models import (
+    DebuggingEntry,
+    # Domain-specific models
+    KnowledgeEntry,
+    MemoryDomain,
     # Base memory models
     MemoryEntry,
     MemoryQuery,
     MemoryResult,
-    MemoryDomain,
-    # Domain-specific models
-    KnowledgeEntry,
     PreferenceEntry,
     TestingEntry,
-    DebuggingEntry,
 )
 
 __all__ = [

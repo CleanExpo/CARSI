@@ -11,15 +11,16 @@ This agent generates:
 from __future__ import annotations
 
 import json
-from typing import Any, Optional
 from datetime import datetime
+from typing import Any
 
-from pydantic import BaseModel, Field
 from anthropic import AsyncAnthropic
+from pydantic import BaseModel, Field
 
-from ..base_agent import BaseAgent
 from src.config import get_settings
 from src.utils import get_logger
+
+from ..base_agent import BaseAgent
 from .analysis_agent import PRDAnalysis
 from .feature_decomposer import FeatureDecomposition
 from .tech_spec_generator import TechnicalSpec
@@ -459,7 +460,7 @@ Create a detailed test plan in the following JSON format:
     }}
   ],
 
-  "coverage_strategy": "Achieve 80%+ unit test coverage, 100% API endpoint coverage, E2E tests for all critical user flows",
+  "coverage_strategy": "80%+ unit coverage, 100% API coverage, E2E for critical flows",
   "critical_test_paths": ["UT-001", "IT-001", "E2E-001"],
 
   "test_fixtures": {{

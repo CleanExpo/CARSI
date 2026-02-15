@@ -11,9 +11,10 @@ This reduces context window usage by 85%+ when working with large tool libraries
 from __future__ import annotations
 
 import re
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Callable, Dict, List, Optional, Set
+from typing import Any
 
 
 class ToolCategory(str, Enum):
@@ -43,10 +44,10 @@ class ToolExample:
     """
 
     description: str
-    input: Dict[str, Any]
-    expected_behavior: Optional[str] = None
+    input: dict[str, Any]
+    expected_behavior: str | None = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to API-compatible format."""
         result = {"input": self.input}
         if self.expected_behavior:
@@ -65,7 +66,7 @@ class ToolConfig:
 
     # allowed_callers: List of callers that can invoke this tool
     # "code_execution_20250825" enables programmatic tool calling
-    allowed_callers: List[str] = field(default_factory=list)
+    allowed_callers: list[str] = field(default_factory=list)
 
     # parallel_safe: Tool can be called in parallel (idempotent)
     parallel_safe: bool = True
@@ -79,7 +80,7 @@ class ToolConfig:
     # cache_ttl_seconds: How long to cache results
     cache_ttl_seconds: int = 300
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to API-compatible format."""
         result = {}
         if self.defer_loading:
@@ -95,19 +96,19 @@ class ToolDefinition:
 
     name: str
     description: str
-    input_schema: Dict[str, Any]
-    handler: Optional[Callable] = None
+    input_schema: dict[str, Any]
+    handler: Callable | None = None
 
     # Advanced features
     config: ToolConfig = field(default_factory=ToolConfig)
-    examples: List[ToolExample] = field(default_factory=list)
-    categories: List[ToolCategory] = field(default_factory=list)
+    examples: list[ToolExample] = field(default_factory=list)
+    categories: list[ToolCategory] = field(default_factory=list)
 
     # Metadata for search
-    keywords: List[str] = field(default_factory=list)
-    aliases: List[str] = field(default_factory=list)
+    keywords: list[str] = field(default_factory=list)
+    aliases: list[str] = field(default_factory=list)
 
-    def to_api_format(self, include_deferred: bool = False) -> Optional[Dict[str, Any]]:
+    def to_api_format(self, include_deferred: bool = False) -> dict[str, Any] | None:
         """Convert to Claude API tool format.
 
         Args:
@@ -119,7 +120,7 @@ class ToolDefinition:
         if self.config.defer_loading and not include_deferred:
             return None
 
-        result: Dict[str, Any] = {
+        result: dict[str, Any] = {
             "name": self.name,
             "description": self.description,
             "input_schema": self.input_schema,
@@ -190,9 +191,9 @@ class ToolRegistry:
     """
 
     def __init__(self) -> None:
-        self._tools: Dict[str, ToolDefinition] = {}
-        self._loaded_tools: Set[str] = set()
-        self._usage_count: Dict[str, int] = {}
+        self._tools: dict[str, ToolDefinition] = {}
+        self._loaded_tools: set[str] = set()
+        self._usage_count: dict[str, int] = {}
 
     def register(self, tool: ToolDefinition) -> None:
         """Register a tool definition."""
@@ -200,16 +201,16 @@ class ToolRegistry:
         if not tool.config.defer_loading:
             self._loaded_tools.add(tool.name)
 
-    def register_many(self, tools: List[ToolDefinition]) -> None:
+    def register_many(self, tools: list[ToolDefinition]) -> None:
         """Register multiple tools."""
         for tool in tools:
             self.register(tool)
 
-    def get(self, name: str) -> Optional[ToolDefinition]:
+    def get(self, name: str) -> ToolDefinition | None:
         """Get a tool by name."""
         return self._tools.get(name)
 
-    def get_loaded_tools(self) -> List[ToolDefinition]:
+    def get_loaded_tools(self) -> list[ToolDefinition]:
         """Get all currently loaded (non-deferred) tools."""
         return [
             self._tools[name]
@@ -217,7 +218,7 @@ class ToolRegistry:
             if name in self._tools
         ]
 
-    def get_deferred_tools(self) -> List[ToolDefinition]:
+    def get_deferred_tools(self) -> list[ToolDefinition]:
         """Get all deferred tools."""
         return [
             tool
@@ -225,7 +226,7 @@ class ToolRegistry:
             if tool.config.defer_loading
         ]
 
-    def load_tool(self, name: str) -> Optional[ToolDefinition]:
+    def load_tool(self, name: str) -> ToolDefinition | None:
         """Load a deferred tool into active context."""
         tool = self._tools.get(name)
         if tool:
@@ -237,7 +238,7 @@ class ToolRegistry:
         """Remove a tool from active context."""
         self._loaded_tools.discard(name)
 
-    def search(self, query: str, limit: int = 5) -> List[ToolDefinition]:
+    def search(self, query: str, limit: int = 5) -> list[ToolDefinition]:
         """Search for tools matching a query.
 
         Args:
@@ -260,7 +261,7 @@ class ToolRegistry:
 
         return [tool for tool, _ in scored_tools[:limit]]
 
-    def search_by_category(self, category: ToolCategory) -> List[ToolDefinition]:
+    def search_by_category(self, category: ToolCategory) -> list[ToolDefinition]:
         """Get all tools in a category."""
         return [
             tool
@@ -268,7 +269,7 @@ class ToolRegistry:
             if category in tool.categories
         ]
 
-    def get_programmatic_tools(self) -> List[ToolDefinition]:
+    def get_programmatic_tools(self) -> list[ToolDefinition]:
         """Get tools that can be called from code execution."""
         return [
             tool
@@ -280,7 +281,7 @@ class ToolRegistry:
         """Record tool usage for optimization."""
         self._usage_count[name] = self._usage_count.get(name, 0) + 1
 
-    def get_usage_stats(self) -> Dict[str, int]:
+    def get_usage_stats(self) -> dict[str, int]:
         """Get tool usage statistics."""
         return dict(self._usage_count)
 
@@ -289,7 +290,7 @@ class ToolRegistry:
         include_search_tool: bool = True,
         include_code_execution: bool = True,
         include_deferred: bool = False,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Convert registry to Claude API tools array.
 
         Args:
@@ -300,7 +301,7 @@ class ToolRegistry:
         Returns:
             List of tool definitions for Claude API
         """
-        tools: List[Dict[str, Any]] = []
+        tools: list[dict[str, Any]] = []
 
         # Add Tool Search Tool for dynamic discovery
         if include_search_tool:
@@ -324,7 +325,7 @@ class ToolRegistry:
 
         return tools
 
-    def get_context_stats(self) -> Dict[str, Any]:
+    def get_context_stats(self) -> dict[str, Any]:
         """Get statistics about context usage.
 
         Returns:
@@ -354,7 +355,7 @@ class ToolRegistry:
 
 
 # Global registry instance
-_registry: Optional[ToolRegistry] = None
+_registry: ToolRegistry | None = None
 
 
 def get_registry() -> ToolRegistry:

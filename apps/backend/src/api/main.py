@@ -1,21 +1,37 @@
 """FastAPI application entry point."""
 
 import uuid
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from src.config import get_settings
-from src.utils import setup_logging, get_logger
+from src.utils import get_logger, setup_logging
 
-from .routes import agents, chat, health, webhooks, prd, workflows, rag, analytics, agent_dashboard, task_queue, contractors, search, documents, workflow_builder, discovery
 from .middleware.auth import AuthMiddleware
 from .middleware.rate_limit import RateLimitMiddleware
-from .middleware.security_headers import SecurityHeadersMiddleware
 from .middleware.request_id import RequestIdMiddleware
+from .middleware.security_headers import SecurityHeadersMiddleware
+from .routes import (
+    agent_dashboard,
+    agents,
+    analytics,
+    chat,
+    contractors,
+    discovery,
+    documents,
+    health,
+    prd,
+    rag,
+    search,
+    task_queue,
+    webhooks,
+    workflow_builder,
+    workflows,
+)
 
 settings = get_settings()
 logger = get_logger(__name__)

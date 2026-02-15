@@ -9,11 +9,11 @@ Features:
 - DD/MM/YYYY date formatting
 """
 
+import re
 from datetime import datetime, time
 from enum import Enum
-from typing import Optional
-from pydantic import BaseModel, Field, field_validator, ConfigDict
-import re
+
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class AvailabilityStatus(str, Enum):
@@ -113,7 +113,7 @@ class Location(BaseModel):
         description="Australian state or territory",
         examples=["QLD", "NSW", "VIC"]
     )
-    postcode: Optional[str] = Field(
+    postcode: str | None = Field(
         None,
         pattern=r"^\d{4}$",
         description="4-digit Australian postcode",
@@ -130,7 +130,7 @@ class AvailabilitySlot(BaseModel):
 
     model_config = ConfigDict(str_strip_whitespace=True)
 
-    id: Optional[str] = Field(None, description="Unique slot ID")
+    id: str | None = Field(None, description="Unique slot ID")
     date: datetime = Field(
         ...,
         description="Slot date (AEST timezone)",
@@ -154,7 +154,7 @@ class AvailabilitySlot(BaseModel):
         default=AvailabilityStatus.AVAILABLE,
         description="Slot availability status"
     )
-    notes: Optional[str] = Field(
+    notes: str | None = Field(
         None,
         max_length=500,
         description="Additional notes about the slot"
@@ -188,18 +188,18 @@ class ContractorBase(BaseModel):
         description="Australian mobile number (04XX XXX XXX)",
         examples=["0412 345 678", "0423 456 789"]
     )
-    abn: Optional[str] = Field(
+    abn: str | None = Field(
         None,
         description="Australian Business Number (XX XXX XXX XXX)",
         examples=["12 345 678 901", "23 456 789 012"]
     )
-    email: Optional[str] = Field(
+    email: str | None = Field(
         None,
         pattern=r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$",
         description="Email address",
         examples=["john@example.com.au"]
     )
-    specialisation: Optional[str] = Field(
+    specialisation: str | None = Field(
         None,
         max_length=200,
         description="Contractor specialisation",
@@ -214,7 +214,7 @@ class ContractorBase(BaseModel):
 
     @field_validator("abn")
     @classmethod
-    def validate_abn_format(cls, v: Optional[str]) -> Optional[str]:
+    def validate_abn_format(cls, v: str | None) -> str | None:
         """Validate and format Australian Business Number."""
         if v is None:
             return None
@@ -232,15 +232,15 @@ class ContractorUpdate(BaseModel):
 
     model_config = ConfigDict(str_strip_whitespace=True)
 
-    name: Optional[str] = Field(None, min_length=2, max_length=100)
-    mobile: Optional[str] = None
-    abn: Optional[str] = None
-    email: Optional[str] = None
-    specialisation: Optional[str] = Field(None, max_length=200)
+    name: str | None = Field(None, min_length=2, max_length=100)
+    mobile: str | None = None
+    abn: str | None = None
+    email: str | None = None
+    specialisation: str | None = Field(None, max_length=200)
 
     @field_validator("mobile")
     @classmethod
-    def validate_mobile_format(cls, v: Optional[str]) -> Optional[str]:
+    def validate_mobile_format(cls, v: str | None) -> str | None:
         """Validate and format Australian mobile number."""
         if v is None:
             return None
@@ -248,7 +248,7 @@ class ContractorUpdate(BaseModel):
 
     @field_validator("abn")
     @classmethod
-    def validate_abn_format(cls, v: Optional[str]) -> Optional[str]:
+    def validate_abn_format(cls, v: str | None) -> str | None:
         """Validate and format Australian Business Number."""
         if v is None:
             return None
@@ -326,7 +326,7 @@ class AvailabilitySlotCreate(BaseModel):
         default=AvailabilityStatus.AVAILABLE,
         description="Slot availability status"
     )
-    notes: Optional[str] = Field(None, max_length=500)
+    notes: str | None = Field(None, max_length=500)
 
     @field_validator("end_time")
     @classmethod
@@ -343,7 +343,7 @@ class ErrorResponse(BaseModel):
     """Standard error response."""
 
     detail: str = Field(..., description="Error message")
-    error_code: Optional[str] = Field(
+    error_code: str | None = Field(
         None,
         description="Machine-readable error code"
     )

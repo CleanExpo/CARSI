@@ -6,8 +6,7 @@ memory types, implementing semantic search via pgvector and efficient CRUD opera
 
 import json
 from datetime import datetime
-from typing import Any, Optional
-from uuid import UUID
+from typing import Any
 
 from src.memory.models import (
     MemoryDomain,
@@ -61,7 +60,7 @@ class MemoryStore:
         """Initialize the memory store."""
         self.supabase = SupabaseStateStore()
         self.client = self.supabase.client
-        self.embedding_provider: Optional[Any] = None  # Will be set in initialize()
+        self.embedding_provider: Any | None = None  # Will be set in initialize()
 
     async def initialize(self) -> None:
         """Initialize the store and dependencies."""
@@ -81,9 +80,9 @@ class MemoryStore:
         category: str,
         key: str,
         value: dict[str, Any],
-        user_id: Optional[str] = None,
-        source: Optional[str] = None,
-        tags: Optional[list[str]] = None,
+        user_id: str | None = None,
+        source: str | None = None,
+        tags: list[str] | None = None,
         generate_embedding: bool = True,
     ) -> MemoryEntry:
         """Create a new memory entry.
@@ -148,7 +147,7 @@ class MemoryStore:
         self,
         memory_id: str,
         increment_access: bool = True,
-    ) -> Optional[MemoryEntry]:
+    ) -> MemoryEntry | None:
         """Get a memory entry by ID.
 
         Args:
@@ -182,7 +181,7 @@ class MemoryStore:
         memory_id: str,
         updates: dict[str, Any],
         regenerate_embedding: bool = False,
-    ) -> Optional[MemoryEntry]:
+    ) -> MemoryEntry | None:
         """Update a memory entry.
 
         Args:
@@ -320,8 +319,8 @@ class MemoryStore:
     async def find_similar(
         self,
         query_text: str,
-        domain: Optional[MemoryDomain] = None,
-        user_id: Optional[str] = None,
+        domain: MemoryDomain | None = None,
+        user_id: str | None = None,
         similarity_threshold: float = 0.7,
         limit: int = 10,
     ) -> list[dict[str, Any]]:
@@ -489,7 +488,7 @@ class MemoryStore:
         self,
         session_id: str,
         task_outcomes: list[dict[str, Any]],
-        user_id: Optional[str] = None
+        user_id: str | None = None
     ) -> list[MemoryEntry]:
         """Capture learnings from a session of tasks.
 
@@ -550,8 +549,8 @@ class MemoryStore:
         self,
         pattern_type: str,
         pattern_data: dict[str, Any],
-        session_id: Optional[str] = None,
-        user_id: Optional[str] = None
+        session_id: str | None = None,
+        user_id: str | None = None
     ) -> MemoryEntry:
         """Store a successful pattern for future reuse.
 
@@ -583,8 +582,8 @@ class MemoryStore:
         self,
         failure_type: str,
         context: dict[str, Any],
-        session_id: Optional[str] = None,
-        user_id: Optional[str] = None
+        session_id: str | None = None,
+        user_id: str | None = None
     ) -> MemoryEntry:
         """Store a failure pattern to avoid repeating.
 
@@ -616,8 +615,8 @@ class MemoryStore:
     async def retrieve_relevant_context(
         self,
         task_description: str,
-        domain: Optional[MemoryDomain] = None,
-        user_id: Optional[str] = None,
+        domain: MemoryDomain | None = None,
+        user_id: str | None = None,
         limit: int = 5
     ) -> list[dict[str, Any]]:
         """Retrieve relevant past work for a new task.
@@ -651,8 +650,8 @@ class MemoryStore:
 
     async def get_failure_patterns(
         self,
-        failure_type: Optional[str] = None,
-        user_id: Optional[str] = None,
+        failure_type: str | None = None,
+        user_id: str | None = None,
         limit: int = 10
     ) -> list[MemoryEntry]:
         """Get known failure patterns to avoid.
@@ -685,8 +684,8 @@ class MemoryStore:
 
     async def get_successful_patterns(
         self,
-        pattern_type: Optional[str] = None,
-        user_id: Optional[str] = None,
+        pattern_type: str | None = None,
+        user_id: str | None = None,
         limit: int = 10
     ) -> list[MemoryEntry]:
         """Get successful patterns to reuse.

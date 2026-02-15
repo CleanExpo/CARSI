@@ -11,8 +11,6 @@ CRITICAL RULES:
 4. Return structured results with proof
 """
 
-import asyncio
-import hashlib
 import re
 import subprocess
 import time
@@ -313,7 +311,12 @@ class IndependentVerifier:
 
         if exists:
             stats = path.stat()
-            proof = f"File exists: {file_path}, Size: {stats.st_size} bytes, Modified: {datetime.fromtimestamp(stats.st_mtime).isoformat()}"
+            modified = datetime.fromtimestamp(stats.st_mtime).isoformat()
+            proof = (
+                f"File exists: {file_path}, "
+                f"Size: {stats.st_size} bytes, "
+                f"Modified: {modified}"
+            )
         else:
             proof = f"File NOT found: {file_path}"
 
@@ -748,7 +751,7 @@ class IndependentVerifier:
                 timestamp=datetime.now().isoformat(),
                 duration_ms=int((time.time() - start) * 1000),
             ),
-            "failure_reason": None if contains else f"Expected content not found",
+            "failure_reason": None if contains else "Expected content not found",
         }
 
     async def _verify_content_not_contains(
@@ -788,7 +791,7 @@ class IndependentVerifier:
                 timestamp=datetime.now().isoformat(),
                 duration_ms=int((time.time() - start) * 1000),
             ),
-            "failure_reason": f"Unwanted content found" if contains else None,
+            "failure_reason": "Unwanted content found" if contains else None,
         }
 
     async def _verify_build_passes(self, build_path: str) -> dict[str, Any]:
@@ -838,7 +841,7 @@ class IndependentVerifier:
         self, target: str, expected: str | None
     ) -> dict[str, Any]:
         """Verify functionality works as expected."""
-        start = time.time()
+        time.time()
 
         # This is a generic check - actual implementation depends on context
         # For now, just verify the target exists or responds

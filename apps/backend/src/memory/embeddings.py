@@ -6,9 +6,9 @@ or OpenAI API as a fallback. Embeddings enable semantic search across memory ent
 
 import os
 from abc import ABC, abstractmethod
-from typing import Optional
 
 import httpx
+
 from src.utils import get_logger
 
 logger = get_logger(__name__)

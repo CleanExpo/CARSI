@@ -7,14 +7,15 @@ Handles database connections with Australian context:
 - Type-safe queries with Pydantic models
 """
 
-from typing import Optional
-from supabase import create_client, Client
+
+from supabase import Client, create_client
+
 from src.config.settings import get_settings
 
 settings = get_settings()
 
 # Global client instance - lazy loaded
-_supabase_client: Optional[Client] = None
+_supabase_client: Client | None = None
 
 
 def get_supabase_client() -> Client:

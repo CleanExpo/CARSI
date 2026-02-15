@@ -6,11 +6,10 @@ Scientific Luxury Design System compliant.
 """
 
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 from uuid import UUID
 
-from pydantic import BaseModel, Field, ConfigDict
-
+from pydantic import BaseModel, ConfigDict, Field
 
 # =============================================================================
 # Node Position
@@ -34,7 +33,7 @@ class WorkflowNodeBase(BaseModel):
 
     type: str = Field(..., description="Node type (trigger, action, logic, agent, output)")
     label: str = Field(..., min_length=1, max_length=255, description="Node label")
-    description: Optional[str] = Field(None, description="Node description")
+    description: str | None = Field(None, description="Node description")
     position: NodePosition = Field(default_factory=NodePosition)
     config: dict[str, Any] = Field(default_factory=dict, description="Node configuration")
     inputs: dict[str, Any] = Field(default_factory=dict, description="Input mappings")
@@ -50,13 +49,13 @@ class WorkflowNodeCreate(WorkflowNodeBase):
 class WorkflowNodeUpdate(BaseModel):
     """Schema for updating a workflow node."""
 
-    type: Optional[str] = None
-    label: Optional[str] = Field(None, min_length=1, max_length=255)
-    description: Optional[str] = None
-    position: Optional[NodePosition] = None
-    config: Optional[dict[str, Any]] = None
-    inputs: Optional[dict[str, Any]] = None
-    outputs: Optional[dict[str, Any]] = None
+    type: str | None = None
+    label: str | None = Field(None, min_length=1, max_length=255)
+    description: str | None = None
+    position: NodePosition | None = None
+    config: dict[str, Any] | None = None
+    inputs: dict[str, Any] | None = None
+    outputs: dict[str, Any] | None = None
 
 
 class WorkflowNodeResponse(WorkflowNodeBase):
@@ -80,10 +79,10 @@ class WorkflowEdgeBase(BaseModel):
 
     source_node_id: UUID = Field(..., description="Source node ID")
     target_node_id: UUID = Field(..., description="Target node ID")
-    source_handle: Optional[str] = Field(None, description="Source handle identifier")
-    target_handle: Optional[str] = Field(None, description="Target handle identifier")
+    source_handle: str | None = Field(None, description="Source handle identifier")
+    target_handle: str | None = Field(None, description="Target handle identifier")
     type: str = Field(default="default", description="Edge type")
-    condition: Optional[str] = Field(None, description="Condition expression for conditional edges")
+    condition: str | None = Field(None, description="Condition expression for conditional edges")
 
 
 class WorkflowEdgeCreate(WorkflowEdgeBase):
@@ -111,7 +110,7 @@ class WorkflowBase(BaseModel):
     """Base schema for workflows."""
 
     name: str = Field(..., min_length=1, max_length=255, description="Workflow name")
-    description: Optional[str] = Field(None, description="Workflow description")
+    description: str | None = Field(None, description="Workflow description")
     tags: list[str] = Field(default_factory=list, description="Workflow tags")
     variables: dict[str, Any] = Field(default_factory=dict, description="Workflow variables")
 
@@ -126,11 +125,11 @@ class WorkflowCreate(WorkflowBase):
 class WorkflowUpdate(BaseModel):
     """Schema for updating a workflow."""
 
-    name: Optional[str] = Field(None, min_length=1, max_length=255)
-    description: Optional[str] = None
-    tags: Optional[list[str]] = None
-    variables: Optional[dict[str, Any]] = None
-    is_published: Optional[bool] = None
+    name: str | None = Field(None, min_length=1, max_length=255)
+    description: str | None = None
+    tags: list[str] | None = None
+    variables: dict[str, Any] | None = None
+    is_published: bool | None = None
 
 
 class WorkflowResponse(WorkflowBase):
@@ -139,13 +138,13 @@ class WorkflowResponse(WorkflowBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: UUID
-    user_id: Optional[UUID]
+    user_id: UUID | None
     version: str
     is_published: bool
     is_template: bool
     created_at: datetime
     updated_at: datetime
-    published_at: Optional[datetime]
+    published_at: datetime | None
 
 
 class WorkflowDetailResponse(WorkflowResponse):
@@ -184,16 +183,16 @@ class WorkflowExecutionResponse(BaseModel):
 
     id: UUID
     workflow_id: UUID
-    user_id: Optional[UUID]
+    user_id: UUID | None
     status: str
-    current_node_id: Optional[UUID]
+    current_node_id: UUID | None
     input_data: dict[str, Any]
-    output_data: Optional[dict[str, Any]]
-    error_message: Optional[str]
-    started_at: Optional[datetime]
-    completed_at: Optional[datetime]
+    output_data: dict[str, Any] | None
+    error_message: str | None
+    started_at: datetime | None
+    completed_at: datetime | None
     created_at: datetime
-    duration_ms: Optional[int]
+    duration_ms: int | None
 
 
 class ExecutionLogResponse(BaseModel):
@@ -205,12 +204,12 @@ class ExecutionLogResponse(BaseModel):
     execution_id: UUID
     node_id: UUID
     status: str
-    input_data: Optional[dict[str, Any]]
-    output_data: Optional[dict[str, Any]]
-    error_message: Optional[str]
+    input_data: dict[str, Any] | None
+    output_data: dict[str, Any] | None
+    error_message: str | None
     started_at: datetime
-    completed_at: Optional[datetime]
-    duration_ms: Optional[int]
+    completed_at: datetime | None
+    duration_ms: int | None
 
 
 class WorkflowExecutionDetailResponse(WorkflowExecutionResponse):
@@ -234,8 +233,8 @@ class CollaboratorResponse(BaseModel):
     user_id: UUID
     role: str
     joined_at: datetime
-    last_active_at: Optional[datetime]
-    cursor_position: Optional[dict[str, Any]]
+    last_active_at: datetime | None
+    cursor_position: dict[str, Any] | None
 
 
 class CollaboratorAddRequest(BaseModel):
@@ -255,4 +254,4 @@ class CanvasStateUpdate(BaseModel):
 
     nodes: list[dict[str, Any]] = Field(default_factory=list)
     edges: list[dict[str, Any]] = Field(default_factory=list)
-    viewport: Optional[dict[str, float]] = None
+    viewport: dict[str, float] | None = None

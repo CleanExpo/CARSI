@@ -1,8 +1,8 @@
 """RAG pipeline API routes."""
 
-from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Request, status
-from typing import Optional
-import base64
+import time
+
+from fastapi import APIRouter, File, Form, HTTPException, Request, UploadFile
 
 from src.rag.models import (
     PipelineConfig,
@@ -14,14 +14,13 @@ from src.rag.models import (
 from src.rag.pipeline import RAGPipeline
 from src.rag.storage import RAGStore
 from src.utils import get_logger
-import time
 
 logger = get_logger(__name__)
 router = APIRouter(prefix="/rag", tags=["RAG"])
 
 # Global instances (initialized on first use)
-_pipeline: Optional[RAGPipeline] = None
-_store: Optional[RAGStore] = None
+_pipeline: RAGPipeline | None = None
+_store: RAGStore | None = None
 
 
 async def get_pipeline() -> RAGPipeline:
@@ -47,8 +46,8 @@ async def upload_document(
     request: Request,
     file: UploadFile = File(...),
     project_id: str = Form(...),
-    config: Optional[str] = Form(None),
-    user_id: Optional[str] = Form(None),
+    config: str | None = Form(None),
+    user_id: str | None = Form(None),
 ) -> dict:
     """Upload and process a document."""
     try:

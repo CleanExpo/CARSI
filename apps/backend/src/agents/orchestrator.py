@@ -23,42 +23,43 @@ LONG-RUNNING AGENT HARNESS:
 - FeatureManager: Tracks feature completion with JSON file
 """
 
+from datetime import datetime
 from enum import Enum
 from typing import Any
-from datetime import datetime
 
 from pydantic import BaseModel, Field
 
-from .base_agent import BaseAgent, TaskOutput
-from .registry import AgentRegistry
-from src.verification import (
-    IndependentVerifier,
-    VerificationRequest,
-    VerificationResult as IndependentVerificationResult,
-    CompletionCriterion,
-    ClaimedOutput,
-    VerificationType,
-)
-from src.tools import (
-    ToolRegistry,
-    get_registry,
-    register_all_tools,
-)
-from src.tools.search import ToolSearcher
-from src.tools.programmatic import ProgrammaticToolCaller
 from src.agents.long_running import (
-    LongRunningAgentHarness,
     HarnessConfig,
+    LongRunningAgentHarness,
     SessionRunner,
     check_if_initialized,
 )
 from src.agents.subagent_manager import (
-    SubagentManager,
     SubagentConfig,
-    SubTask,
+    SubagentManager,
     SubagentResult,
+    SubTask,
 )
+from src.tools import (
+    ToolRegistry,
+)
+from src.tools.programmatic import ProgrammaticToolCaller
+from src.tools.search import ToolSearcher
 from src.utils import get_logger
+from src.verification import (
+    ClaimedOutput,
+    CompletionCriterion,
+    IndependentVerifier,
+    VerificationRequest,
+    VerificationType,
+)
+from src.verification import (
+    VerificationResult as IndependentVerificationResult,
+)
+
+from .base_agent import BaseAgent, TaskOutput
+from .registry import AgentRegistry
 
 logger = get_logger(__name__)
 

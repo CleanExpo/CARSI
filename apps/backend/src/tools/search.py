@@ -13,13 +13,13 @@ This implementation supports:
 
 from __future__ import annotations
 
-import re
 import math
+import re
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from .registry import ToolRegistry, ToolDefinition
+    from .registry import ToolDefinition, ToolRegistry
 
 
 @dataclass
@@ -29,10 +29,10 @@ class SearchResult:
     tool_name: str
     description: str
     score: float
-    categories: List[str]
-    keywords: List[str]
+    categories: list[str]
+    keywords: list[str]
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary format."""
         return {
             "name": self.tool_name,
@@ -76,15 +76,15 @@ class ToolSearcher:
         """
         self.registry = registry
         self.usage_weight = usage_weight
-        self._bm25_index: Optional[Dict[str, Dict[str, float]]] = None
+        self._bm25_index: dict[str, dict[str, float]] | None = None
 
     def search(
         self,
         query: str,
         limit: int = 5,
         strategy: str = "combined",
-        category: Optional[str] = None,
-    ) -> List[SearchResult]:
+        category: str | None = None,
+    ) -> list[SearchResult]:
         """Search for tools matching a query.
 
         Args:
@@ -109,10 +109,10 @@ class ToolSearcher:
         self,
         query: str,
         limit: int,
-        category: Optional[str] = None,
-    ) -> List[SearchResult]:
+        category: str | None = None,
+    ) -> list[SearchResult]:
         """Regex-based search for exact pattern matching."""
-        results: List[SearchResult] = []
+        results: list[SearchResult] = []
         pattern = re.compile(re.escape(query), re.IGNORECASE)
 
         for tool in self.registry._tools.values():
@@ -166,8 +166,8 @@ class ToolSearcher:
         self,
         query: str,
         limit: int,
-        category: Optional[str] = None,
-    ) -> List[SearchResult]:
+        category: str | None = None,
+    ) -> list[SearchResult]:
         """BM25-based search for natural language queries."""
         if self._bm25_index is None:
             self._build_bm25_index()
@@ -176,7 +176,7 @@ class ToolSearcher:
         if not query_terms:
             return []
 
-        results: List[SearchResult] = []
+        results: list[SearchResult] = []
         tools = list(self.registry._tools.values())
         avg_doc_len = sum(
             len(self._get_tool_text(t)) for t in tools
@@ -215,9 +215,9 @@ class ToolSearcher:
         self,
         category: str,
         limit: int,
-    ) -> List[SearchResult]:
+    ) -> list[SearchResult]:
         """Search by category."""
-        results: List[SearchResult] = []
+        results: list[SearchResult] = []
 
         for tool in self.registry._tools.values():
             if any(c.value == category.lower() for c in tool.categories):
@@ -242,15 +242,15 @@ class ToolSearcher:
         self,
         query: str,
         limit: int,
-        category: Optional[str] = None,
-    ) -> List[SearchResult]:
+        category: str | None = None,
+    ) -> list[SearchResult]:
         """Combined search using all strategies."""
         # Get results from both strategies
         regex_results = self._search_regex(query, limit * 2, category)
         bm25_results = self._search_bm25(query, limit * 2, category)
 
         # Combine scores
-        combined: Dict[str, SearchResult] = {}
+        combined: dict[str, SearchResult] = {}
 
         for result in regex_results:
             combined[result.tool_name] = result
@@ -273,7 +273,7 @@ class ToolSearcher:
         for tool in self.registry._tools.values():
             text = self._get_tool_text(tool)
             terms = self._tokenize(text)
-            term_freq: Dict[str, float] = {}
+            term_freq: dict[str, float] = {}
             for term in terms:
                 term_freq[term] = term_freq.get(term, 0) + 1
             self._bm25_index[tool.name] = term_freq
@@ -289,7 +289,7 @@ class ToolSearcher:
         ]
         return " ".join(parts)
 
-    def _tokenize(self, text: str) -> List[str]:
+    def _tokenize(self, text: str) -> list[str]:
         """Tokenize text for search."""
         # Simple tokenization - split on non-alphanumeric
         tokens = re.findall(r"\w+", text.lower())
@@ -299,7 +299,7 @@ class ToolSearcher:
     def _compute_bm25_score(
         self,
         tool: ToolDefinition,
-        query_terms: List[str],
+        query_terms: list[str],
         num_docs: int,
         avg_doc_len: float,
     ) -> float:
@@ -339,7 +339,7 @@ class ToolSearcher:
 
         return score
 
-    def get_search_tool_definition(self) -> Dict[str, Any]:
+    def get_search_tool_definition(self) -> dict[str, Any]:
         """Get the Tool Search Tool definition for Claude API.
 
         This is the tool that Claude uses to discover other tools.
@@ -353,7 +353,7 @@ class ToolSearcher:
         self,
         query: str,
         limit: int = 5,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Handle a tool search request from Claude.
 
         Args:

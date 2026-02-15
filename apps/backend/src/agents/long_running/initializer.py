@@ -18,13 +18,13 @@ from __future__ import annotations
 import subprocess
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
 
 from ..base_agent import BaseAgent
-from .progress import ProgressTracker, create_init_script
 from .features import FeatureManager, generate_features_from_spec, load_features_from_prd_json
+from .progress import ProgressTracker, create_init_script
 
 
 class InitializerConfig(BaseModel):
@@ -35,7 +35,7 @@ class InitializerConfig(BaseModel):
     specification: str
     init_commands: list[str] = Field(default_factory=list)
     create_git_repo: bool = True
-    dev_server_command: Optional[str] = None
+    dev_server_command: str | None = None
 
 
 class InitializerResult(BaseModel):
@@ -45,8 +45,8 @@ class InitializerResult(BaseModel):
     project_path: str
     files_created: list[str] = Field(default_factory=list)
     features_generated: int = 0
-    initial_commit: Optional[str] = None
-    error: Optional[str] = None
+    initial_commit: str | None = None
+    error: str | None = None
     next_steps: list[str] = Field(default_factory=list)
 
 
@@ -181,7 +181,7 @@ class InitializerAgent(BaseAgent):
             initial_commit = await self._init_git_repo(path, project_name)
 
         # 5. Start the first session
-        session = progress.start_session("initializer")
+        progress.start_session("initializer")
         progress.end_session(
             notes=f"Initialized project with {len(features)} features",
             next_steps=[
@@ -320,7 +320,7 @@ class InitializerAgent(BaseAgent):
 
         return commands
 
-    async def _init_git_repo(self, path: Path, project_name: str) -> Optional[str]:
+    async def _init_git_repo(self, path: Path, project_name: str) -> str | None:
         """Initialize git repository and make initial commit."""
         try:
             # Check if already a git repo
@@ -349,7 +349,7 @@ class InitializerAgent(BaseAgent):
             )
 
             # Make initial commit
-            result = subprocess.run(
+            subprocess.run(
                 [
                     "git", "commit", "-m",
                     f"Initial setup: {project_name}\n\n"

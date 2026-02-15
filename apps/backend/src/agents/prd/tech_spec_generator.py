@@ -12,15 +12,16 @@ This agent takes PRD analysis and feature decomposition and generates:
 from __future__ import annotations
 
 import json
-from typing import Any, Optional
 from datetime import datetime
+from typing import Any
 
-from pydantic import BaseModel, Field
 from anthropic import AsyncAnthropic
+from pydantic import BaseModel, Field
 
-from ..base_agent import BaseAgent
 from src.config import get_settings
 from src.utils import get_logger
+
+from ..base_agent import BaseAgent
 from .analysis_agent import PRDAnalysis
 from .feature_decomposer import FeatureDecomposition
 
@@ -429,8 +430,14 @@ Create a detailed technical specification in the following JSON format:
       "path": "/api/auth/register",
       "description": "Register new user account",
       "auth_required": false,
-      "request_body": {{"type": "object", "properties": {{"email": {{"type": "string"}}, "password": {{"type": "string"}}}}}},
-      "response": {{"type": "object", "properties": {{"user_id": {{"type": "string"}}, "token": {{"type": "string"}}}}}},
+      "request_body": {{
+        "type": "object",
+        "properties": {{"email": {{"type": "string"}}, "password": {{"type": "string"}}}}
+      }},
+      "response": {{
+        "type": "object",
+        "properties": {{"user_id": {{"type": "string"}}, "token": {{"type": "string"}}}}
+      }},
       "rate_limit": "5/minute",
       "related_user_story": "US-001"
     }}
@@ -491,7 +498,7 @@ Create a detailed technical specification in the following JSON format:
 
 ## Requirements
 
-1. **Database Schema**: Design ALL tables needed for the user stories. Include proper types, constraints, indexes, and relationships.
+1. **Database Schema**: Design ALL tables needed. Include types, constraints, indexes, and relationships.
 2. **API Endpoints**: Design ALL endpoints needed. Follow REST conventions.
 3. **Security**: Cover authentication, authorization, validation, and attack prevention.
 4. **Performance**: Set realistic targets and explain caching/scaling approach.

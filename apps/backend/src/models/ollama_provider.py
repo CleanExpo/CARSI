@@ -5,12 +5,12 @@ Local LLM provider using Ollama.
 Runs models locally without requiring API keys.
 """
 
-from typing import Any
 
 import httpx
 
 from src.config import get_settings
 from src.utils import get_logger
+
 from .base_provider import BaseLLMProvider
 
 settings = get_settings()

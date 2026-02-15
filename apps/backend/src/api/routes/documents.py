@@ -5,17 +5,17 @@ CRUD operations for documents with filtering, sorting, and pagination.
 Uses SQLAlchemy ORM for type-safe queries and async/await pattern.
 """
 
-from typing import Optional
 from datetime import datetime
-from pydantic import BaseModel, Field
-from fastapi import APIRouter, Depends, HTTPException, Query, status
-from sqlalchemy import select, and_, func, desc, asc
-from sqlalchemy.ext.asyncio import AsyncSession
 from uuid import UUID
 
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from pydantic import BaseModel, Field
+from sqlalchemy import and_, asc, desc, func, select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from src.auth.jwt import decode_access_token
 from src.config.database import get_async_db
 from src.db.models import Document, User
-from src.auth.jwt import decode_access_token
 from src.utils import get_logger
 
 logger = get_logger(__name__)
@@ -28,7 +28,7 @@ class DocumentItem(BaseModel):
 
     id: str
     title: str
-    content: Optional[str] = Field(None, description="Document content (preview only for lists)")
+    content: str | None = Field(None, description="Document content (preview only for lists)")
     metadata: dict = Field(default_factory=dict)
     created_at: datetime
     updated_at: datetime
@@ -61,14 +61,14 @@ class DocumentCreateRequest(BaseModel):
 class DocumentUpdateRequest(BaseModel):
     """Update document request."""
 
-    title: Optional[str] = Field(None, min_length=1, max_length=255)
-    content: Optional[str] = Field(None, min_length=1)
-    metadata: Optional[dict] = Field(None)
+    title: str | None = Field(None, min_length=1, max_length=255)
+    content: str | None = Field(None, min_length=1)
+    metadata: dict | None = Field(None)
 
 
 async def get_current_user_id(
-    authorization: Optional[str] = None,
-) -> Optional[str]:
+    authorization: str | None = None,
+) -> str | None:
     """
     Extract user ID from JWT token in Authorization header.
 
@@ -102,12 +102,12 @@ async def get_current_user_id(
     description="Get paginated list of documents with filtering and sorting",
 )
 async def list_documents(
-    authorization: Optional[str] = Query(None, description="Authorization header with JWT token"),
+    authorization: str | None = Query(None, description="Authorization header with JWT token"),
     # Filtering
-    type: Optional[str] = Query(None, description="Filter by document type"),
-    author_id: Optional[str] = Query(None, description="Filter by author (user_id)"),
-    created_after: Optional[datetime] = Query(None, description="Filter by creation date (>=)"),
-    created_before: Optional[datetime] = Query(None, description="Filter by creation date (<=)"),
+    type: str | None = Query(None, description="Filter by document type"),
+    author_id: str | None = Query(None, description="Filter by author (user_id)"),
+    created_after: datetime | None = Query(None, description="Filter by creation date (>=)"),
+    created_before: datetime | None = Query(None, description="Filter by creation date (<=)"),
     # Sorting
     sort_by: str = Query(
         "created",
@@ -269,7 +269,7 @@ async def list_documents(
 )
 async def create_document(
     document: DocumentCreateRequest,
-    authorization: Optional[str] = Query(None, description="Authorization header with JWT token"),
+    authorization: str | None = Query(None, description="Authorization header with JWT token"),
     db: AsyncSession = Depends(get_async_db),
 ) -> DocumentItem:
     """
@@ -348,7 +348,7 @@ async def create_document(
 )
 async def get_document(
     document_id: str,
-    authorization: Optional[str] = Query(None, description="Authorization header with JWT token"),
+    authorization: str | None = Query(None, description="Authorization header with JWT token"),
     db: AsyncSession = Depends(get_async_db),
 ) -> DocumentItem:
     """
@@ -432,7 +432,7 @@ async def get_document(
 async def update_document(
     document_id: str,
     updates: DocumentUpdateRequest,
-    authorization: Optional[str] = Query(None, description="Authorization header with JWT token"),
+    authorization: str | None = Query(None, description="Authorization header with JWT token"),
     db: AsyncSession = Depends(get_async_db),
 ) -> DocumentItem:
     """
@@ -527,7 +527,7 @@ async def update_document(
 )
 async def delete_document(
     document_id: str,
-    authorization: Optional[str] = Query(None, description="Authorization header with JWT token"),
+    authorization: str | None = Query(None, description="Authorization header with JWT token"),
     db: AsyncSession = Depends(get_async_db),
 ) -> None:
     """

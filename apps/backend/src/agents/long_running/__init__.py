@@ -37,27 +37,6 @@ Usage:
     results = await harness.run_until_complete(max_sessions=50)
 """
 
-from .progress import (
-    ProgressTracker,
-    SessionProgress,
-    ProgressFile,
-    create_init_script,
-)
-from .features import (
-    FeatureManager,
-    FeatureList,
-    Feature,
-    FeatureCategory,
-    FeaturePriority,
-    generate_features_from_spec,
-    load_features_from_prd_json,
-)
-from .initializer import (
-    InitializerAgent,
-    InitializerConfig,
-    InitializerResult,
-    check_if_initialized,
-)
 from .coding_agent import (
     CodingAgent,
     CodingConfig,
@@ -65,12 +44,33 @@ from .coding_agent import (
     FeatureWorkResult,
     SessionRunner,
 )
+from .features import (
+    Feature,
+    FeatureCategory,
+    FeatureList,
+    FeatureManager,
+    FeaturePriority,
+    generate_features_from_spec,
+    load_features_from_prd_json,
+)
 from .harness import (
-    LongRunningAgentHarness,
     HarnessConfig,
     HarnessState,
+    LongRunningAgentHarness,
     SessionResult,
     run_long_running_project,
+)
+from .initializer import (
+    InitializerAgent,
+    InitializerConfig,
+    InitializerResult,
+    check_if_initialized,
+)
+from .progress import (
+    ProgressFile,
+    ProgressTracker,
+    SessionProgress,
+    create_init_script,
 )
 
 __all__ = [

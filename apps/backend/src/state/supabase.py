@@ -1,9 +1,9 @@
 """Supabase state persistence."""
 
-from typing import Any
 from datetime import datetime
+from typing import Any
 
-from supabase import create_client, Client
+from supabase import Client, create_client
 
 from src.config import get_settings
 from src.utils import get_logger
