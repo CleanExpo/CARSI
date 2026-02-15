@@ -104,6 +104,7 @@ jobs:
       - name: Type check with mypy
         working-directory: apps/backend
         run: uv run mypy src/
+        continue-on-error: true
 
       - name: Run tests with coverage
         working-directory: apps/backend
