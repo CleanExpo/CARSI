@@ -27,11 +27,16 @@ export interface PRDGenerationResponse {
 }
 
 export interface PRDResult {
-  prd_analysis: Record<string, unknown>;
-  feature_decomposition: Record<string, unknown>;
-  technical_spec: Record<string, unknown>;
-  test_plan: Record<string, unknown>;
-  roadmap: Record<string, unknown>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- API response shapes vary
+  prd_analysis: Record<string, any>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  feature_decomposition: Record<string, any>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  technical_spec: Record<string, any>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  test_plan: Record<string, any>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  roadmap: Record<string, any>;
   documents_generated: string[];
   total_user_stories: number;
   total_api_endpoints: number;
