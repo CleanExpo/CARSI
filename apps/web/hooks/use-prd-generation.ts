@@ -2,7 +2,7 @@
  * Hook for managing PRD generation with real-time progress tracking.
  */
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useAgentRun } from './use-agent-runs';
 
 export interface PRDGenerationRequest {
@@ -117,31 +117,34 @@ export function usePRDGeneration() {
   /**
    * Fetch PRD result when generation completes
    */
-  const fetchResult = async (prdId: string): Promise<void> => {
-    try {
-      const response = await fetch(`${backendUrl}/api/prd/result/${prdId}`);
+  const fetchResult = useCallback(
+    async (prdId: string): Promise<void> => {
+      try {
+        const response = await fetch(`${backendUrl}/api/prd/result/${prdId}`);
 
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+        const result: PRDResult = await response.json();
+
+        setState((prev) => ({
+          ...prev,
+          result,
+          isGenerating: false,
+          progress: 100,
+          currentStep: 'PRD generation complete',
+        }));
+      } catch (error) {
+        setState((prev) => ({
+          ...prev,
+          error: error instanceof Error ? error.message : 'Failed to fetch PRD result',
+          isGenerating: false,
+        }));
       }
-
-      const result: PRDResult = await response.json();
-
-      setState((prev) => ({
-        ...prev,
-        result,
-        isGenerating: false,
-        progress: 100,
-        currentStep: 'PRD generation complete',
-      }));
-    } catch (error) {
-      setState((prev) => ({
-        ...prev,
-        error: error instanceof Error ? error.message : 'Failed to fetch PRD result',
-        isGenerating: false,
-      }));
-    }
-  };
+    },
+    [backendUrl]
+  );
 
   /**
    * Reset state
@@ -231,31 +234,34 @@ export function usePRDGenerationWithProgress() {
   /**
    * Fetch PRD result when generation completes
    */
-  const fetchResult = async (prdId: string): Promise<void> => {
-    try {
-      const response = await fetch(`${backendUrl}/api/prd/result/${prdId}`);
+  const fetchResult = useCallback(
+    async (prdId: string): Promise<void> => {
+      try {
+        const response = await fetch(`${backendUrl}/api/prd/result/${prdId}`);
 
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+        const result: PRDResult = await response.json();
+
+        setState((prev) => ({
+          ...prev,
+          result,
+          isGenerating: false,
+          progress: 100,
+          currentStep: 'PRD generation complete',
+        }));
+      } catch (error) {
+        setState((prev) => ({
+          ...prev,
+          error: error instanceof Error ? error.message : 'Failed to fetch PRD result',
+          isGenerating: false,
+        }));
       }
-
-      const result: PRDResult = await response.json();
-
-      setState((prev) => ({
-        ...prev,
-        result,
-        isGenerating: false,
-        progress: 100,
-        currentStep: 'PRD generation complete',
-      }));
-    } catch (error) {
-      setState((prev) => ({
-        ...prev,
-        error: error instanceof Error ? error.message : 'Failed to fetch PRD result',
-        isGenerating: false,
-      }));
-    }
-  };
+    },
+    [backendUrl]
+  );
 
   /**
    * Reset state
@@ -304,7 +310,7 @@ export function usePRDGenerationWithProgress() {
         }));
       }
     }
-  }, [agentRun, state.runId, state.prdId, state.result]);
+  }, [agentRun, state.runId, state.prdId, state.result, fetchResult]);
 
   return {
     ...state,

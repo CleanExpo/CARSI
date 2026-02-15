@@ -123,7 +123,8 @@ export function useCollaboration(config: UseCollaborationConfig): UseCollaborati
       setIsSynced(false);
       setCollaborators([]);
     };
-  }, [workflowId, userId, userName, enabled]); // Intentionally excluding initialNodes/Edges/callbacks
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- Intentionally excluding initialNodes/Edges/callbacks to avoid re-syncing
+  }, [workflowId, userId, userName, enabled]);
 
   // Update cursor position
   const updateCursor = useCallback((x: number, y: number) => {
