@@ -1,21 +1,14 @@
 """Tests for RAG search functionality."""
 
 import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock
 
-# RAG store requires Supabase credentials which were removed in the JWT migration.
-# Skip all tests that depend on SupabaseStateStore initialisation.
-try:
-    from src.state.supabase import SupabaseStateStore
-    _store = SupabaseStateStore()
-    _ = _store.client
-    HAS_SUPABASE = True
-except (ValueError, AttributeError):
-    HAS_SUPABASE = False
+# Supabase removed in JWT migration — all Supabase-dependent tests are skipped.
+HAS_SUPABASE = False
 
 requires_supabase = pytest.mark.skipif(
     not HAS_SUPABASE,
-    reason="Supabase credentials not configured (removed in JWT migration)",
+    reason="Persistent state store not configured (Supabase removed, PostgreSQL migration pending)",
 )
 
 
@@ -42,13 +35,9 @@ async def test_hybrid_search_call():
     store = RAGStore()
     await store.initialize()
 
-    # Mock embedding provider
     store.embedding_provider.get_embedding = AsyncMock(return_value=[0.1] * 1536)
-
-    # Mock Supabase client
     store.client.rpc = AsyncMock(return_value=MagicMock(data=[]))
 
-    # Call hybrid search
     results = await store.hybrid_search(
         query="test query",
         project_id="test-project",
@@ -57,10 +46,7 @@ async def test_hybrid_search_call():
         limit=10,
     )
 
-    # Verify embedding was generated
     assert store.embedding_provider.get_embedding.called
-
-    # Verify RPC was called with correct function
     assert store.client.rpc.called
     call_args = store.client.rpc.call_args
     assert call_args[0][0] == "hybrid_search"
@@ -75,10 +61,8 @@ async def test_vector_search_call():
     store = RAGStore()
     await store.initialize()
 
-    # Mock embedding provider
     store.embedding_provider.get_embedding = AsyncMock(return_value=[0.1] * 1536)
 
-    # Mock Supabase client table query
     mock_execute = MagicMock()
     mock_execute.data = []
 
@@ -91,14 +75,12 @@ async def test_vector_search_call():
 
     store.client.table = MagicMock(return_value=mock_builder)
 
-    # Call vector search
     results = await store.vector_search(
         query="test query",
         project_id="test-project",
         limit=5,
     )
 
-    # Verify results structure
     assert isinstance(results, list)
 
 
@@ -108,11 +90,6 @@ async def test_vector_search_call():
 async def test_search_knowledge_base_tool():
     """Test the search_knowledge_base tool (requires database)."""
     from src.tools.rag_tools import search_knowledge_base
-
-    # This test requires:
-    # 1. Supabase running
-    # 2. Documents uploaded
-    # 3. OpenAI API key for embeddings
 
     result = await search_knowledge_base(
         query="test",
@@ -124,7 +101,3 @@ async def test_search_knowledge_base_tool():
     assert "status" in result
     assert "results" in result
     assert isinstance(result["results"], list)
-
-
-# Run integration tests with:
-# pytest tests/rag/test_search.py -m integration -v

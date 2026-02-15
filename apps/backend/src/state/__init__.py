@@ -2,7 +2,21 @@
 
 from .events import AgentEventPublisher
 from .manager import StateManager
-from .supabase import SupabaseStateStore
+from .null_store import NullStateStore
 
-# Primary state manager (recommended for all new code)
-__all__ = ["AgentEventPublisher", "StateManager", "SupabaseStateStore"]
+# Backwards compatibility alias
+SupabaseStateStore = NullStateStore
+
+
+def get_state_store() -> NullStateStore:
+    """Factory function for the active state store."""
+    return NullStateStore()
+
+
+__all__ = [
+    "AgentEventPublisher",
+    "NullStateStore",
+    "StateManager",
+    "SupabaseStateStore",
+    "get_state_store",
+]

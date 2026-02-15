@@ -32,20 +32,20 @@ from uuid import uuid4
 
 from src.utils import get_logger
 
-from .supabase import SupabaseStateStore
+from .null_store import NullStateStore
 
 logger = get_logger(__name__)
 
 
 class AgentEventPublisher:
-    """Publishes agent execution events to Supabase Realtime.
+    """Publishes agent execution events via the state store.
 
-    This allows frontend to subscribe to agent status updates in real-time.
-    Now includes local caching for improved performance.
+    Uses NullStateStore as backend (Supabase removed).
+    Local caching provides in-memory state during the process lifetime.
     """
 
     def __init__(self) -> None:
-        self.store = SupabaseStateStore()
+        self.store = NullStateStore()
         self.local_cache: dict[str, dict[str, Any]] = {}
 
     async def start_run(

@@ -1,64 +1,37 @@
+"""Supabase client shim — safe null replacement.
+
+Supabase was removed in the JWT-only auth migration. This module
+preserves the import interface so that existing code like:
+
+    from src.utils.supabase_client import supabase
+
+does not crash at import time. Actual attribute access raises with
+a clear migration message.
 """
-Supabase Client for Backend
-
-Handles database connections with Australian context:
-- AEST timezone handling
-- Australian data validation (ABN, mobile, suburbs)
-- Type-safe queries with Pydantic models
-"""
 
 
-from supabase import Client, create_client
-
-from src.config.settings import get_settings
-
-settings = get_settings()
-
-# Global client instance - lazy loaded
-_supabase_client: Client | None = None
-
-
-def get_supabase_client() -> Client:
-    """
-    Create and return Supabase client.
-
-    Connects to Supabase PostgreSQL database with:
-    - Row Level Security (RLS) enabled
-    - Australian schema (contractors, availability_slots)
-    - AEST timezone configuration
-
-    Raises:
-        ValueError: If Supabase credentials are not configured
-    """
-    global _supabase_client
-
-    if _supabase_client is not None:
-        return _supabase_client
-
-    supabase_url = settings.supabase_url
-    supabase_key = settings.supabase_anon_key
-
-    if not supabase_url or not supabase_key:
-        raise ValueError(
-            "Supabase credentials not configured. "
-            "Set SUPABASE_URL and SUPABASE_ANON_KEY environment variables."
-        )
-
-    _supabase_client = create_client(supabase_url, supabase_key)
-    return _supabase_client
+def get_supabase_client():
+    """Raise with a clear migration message."""
+    raise ValueError(
+        "Supabase has been removed. "
+        "Contractor/analytics features require PostgreSQL migration."
+    )
 
 
 def is_supabase_configured() -> bool:
-    """Check if Supabase credentials are configured."""
-    return bool(settings.supabase_url and settings.supabase_anon_key)
+    """Always returns False — Supabase is no longer configured."""
+    return False
 
 
-# Lazy property for backwards compatibility - raises on access if not configured
-class _LazySupabaseClient:
-    """Lazy wrapper that raises only when accessed without credentials."""
+class _NullClient:
+    """Raises on any attribute access with a migration message."""
 
     def __getattr__(self, name: str):
-        return getattr(get_supabase_client(), name)
+        raise AttributeError(
+            f"Supabase client is not available (removed in JWT migration). "
+            f"Attempted to access '.{name}'. "
+            f"Migrate to PostgreSQL via SQLAlchemy."
+        )
 
 
-supabase: Client = _LazySupabaseClient()  # type: ignore
+supabase = _NullClient()
