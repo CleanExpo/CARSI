@@ -556,6 +556,7 @@ POSTHOG_API_KEY=xxx
 | [`docs/SPEC_GENERATION.md`](docs/SPEC_GENERATION.md)                  | Spec generation workflows          |
 | [`docs/new-project-checklist.md`](docs/new-project-checklist.md)      | 3-step setup checklist             |
 | [`.skills/AGENTS.md`](.skills/AGENTS.md)                              | Full 55-skill registry             |
+| [`docs/reference/VIBE_CODING_VS_SENIOR_ENGINEERS.md`](docs/reference/VIBE_CODING_VS_SENIOR_ENGINEERS.md) | AI vs human engineering analysis |
 
 ## Quick Reference
 
