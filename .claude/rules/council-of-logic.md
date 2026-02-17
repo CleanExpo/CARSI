@@ -188,6 +188,16 @@ class CouncilOfLogic:
         )
 ```
 
+### Integration with Execution Guardian
+
+The Council feeds into the Execution Guardian's risk scoring:
+
+- **Turing complexity** → confidence scoring (high complexity = lower confidence)
+- **Von Neumann architecture** → blast radius assessment (multi-service = higher blast radius)
+- **Shannon compression** → applies to Guardian's own output format (structured, minimal)
+
+**Boundary**: Council validates *code quality*; Execution Guardian validates *operation safety*.
+
 ---
 
 **Remember**: These are not guidelines. They are **mathematical laws**.

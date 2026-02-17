@@ -73,70 +73,74 @@ Location: `.skills/custom/`
 | **report-generator**  | Data aggregation, multi-format report output, scheduled reporting, and template-driven documents | "report", "generate report", "audit report", "export", "summary", "daily report" |
 | **slack-integration**  | Slack bot commands, webhook notifications, interactive messages, and team alerting              | "Slack", "webhook", "bot", "notification", "channel", "Block Kit" |
 | **xaem-theme-ui**  | Two-pass theme generation and code translation pipeline (colour palettes, glow, timing, tokens)   | "theme", "palette", "colour scheme", "design tokens", "generate theme" |
+| **execution-guardian** | Pre-execution governance with dynamic validation gates, risk/confidence scoring, and structured error format | "risk", "safe to proceed", "prerequisite", "validation gate", "confidence" |
+| **system-supervisor** | Architecture drift detection, silent failure scanning, hallucination prevention, and feature completeness audit | "drift", "dead code", "completeness", "audit", "integrity", "silent failure" |
 
 ### Identified Gaps
 
-No gaps identified. All 55 skills are installed. Use `/skill-manager analyse` to run automated gap analysis across all installed skills and detect missing capabilities.
+No gaps identified. All **57 skills** are installed. Use `/skill-manager analyse` to run automated gap analysis across all installed skills and detect missing capabilities.
 
 ## Skill Priority
 
 When multiple skills could apply, use this priority order:
 
 1. **council-of-logic** - Always validate code quality first
-2. **skill-manager** - For skill lifecycle and gap analysis
-3. **error-taxonomy** - For structured error handling patterns
-4. **error-boundary** - For React error boundaries, fallback UI, and error.tsx
-5. **retry-strategy** - For exponential backoff, circuit breaker, and retry policies
-6. **resilience-patterns** - For bulkhead isolation, timeout policies, and fallback chains
-7. **rate-limiter** - For token bucket, sliding window, and tiered rate limiting
-8. **data-validation** - For input sanitisation and schema patterns
-9. **input-sanitisation** - For injection prevention and security
-10. **rbac-patterns** - For role-based access control and permission hierarchies
-11. **oauth-flow** - For OAuth 2.0/OIDC authorisation code flow with PKCE
-12. **csrf-protection** - For CSRF prevention with double-submit cookies and origin checks
-13. **secret-management** - For environment variable validation, redaction, and rotation
-14. **content-moderation** - For content filtering, toxicity detection, and safety checks
-15. **audit-trail** - For structured audit event logging and compliance
-16. **structured-logging** - For observability and log patterns
-17. **metrics-collector** - For metrics instrumentation and analytics data
-18. **tracing-patterns** - For distributed tracing and span context propagation
-19. **docker-patterns** - For multi-stage builds, layer caching, and Docker Compose
-20. **ci-cd-patterns** - For GitHub Actions workflows, caching, and security scanning
-21. **infrastructure-as-code** - For Terraform/Pulumi cloud provisioning and environment parity
-22. **vector-search** - For pgvector embedding queries and similarity search
-23. **search-indexer** - For full-text search indexing with tsvector and GIN indexes
-24. **health-check** - For liveness, readiness, and dependency health probes
-25. **graceful-shutdown** - For signal handling, connection draining, and clean teardown
-26. **cache-strategy** - For caching patterns (lru_cache, Redis, Next.js fetch cache)
-27. **api-contract** - For typed frontend/backend API contracts
-28. **api-client** - For type-safe fetch wrappers with interceptors and retry
-29. **api-versioning** - For URL/header-based versioning with deprecation policies
-30. **graphql-patterns** - For GraphQL schema design, dataloader, and type-safe clients
-31. **webhook-handler** - For idempotent webhook processing with signature verification
-32. **state-machine** - For finite state machines and status transitions
-33. **saga-pattern** - For distributed transaction orchestration with compensation
-34. **pipeline-builder** - For composable data and task pipelines with typed stages
-35. **feature-flag** - For feature toggles with percentage rollout and targeting
-36. **workflow-engine** - For multi-step approval workflows with timeout and escalation
-37. **queue-worker** - For Redis-backed background job processing
-38. **notification-system** - For multi-channel notification dispatch with preferences
-39. **slack-integration** - For Slack bot commands, webhook notifications, and team alerting
-40. **cron-scheduler** - For scheduled tasks and periodic jobs
-41. **csv-processor** - For CSV import, export, and streaming parse
-42. **data-transform** - For ETL pipelines, typed mappers, and streaming transforms
-43. **report-generator** - For multi-format report output and scheduled reporting
-44. **markdown-processor** - For Markdown parsing, rendering, and MDX support
-45. **pdf-generator** - For server-side PDF generation with React PDF and reportlab
-46. **email-template** - For transactional email design and delivery
-47. **changelog-generator** - For automated changelog and release notes from commits
-48. **i18n-patterns** - For internationalisation with en-AU default locale
-49. **genesis-orchestrator** - For workflow and phase management
-50. **dashboard-patterns** - For real-time dashboard visualisation and layout
-51. **status-page** - For public status page with incident management and uptime
-52. **scientific-luxury** - For UI/design decisions
-53. **xaem-theme-ui** - For theme generation and design token translation
-54. **react-best-practices** - For React-specific optimisations
-55. **web-design-guidelines** - For accessibility and UX audits
+2. **execution-guardian** - Pre-execution governance, risk/confidence scoring, validation gates
+3. **system-supervisor** - Post-execution architecture drift, silent failures, completeness audit
+4. **skill-manager** - For skill lifecycle and gap analysis
+5. **error-taxonomy** - For structured error handling patterns
+6. **error-boundary** - For React error boundaries, fallback UI, and error.tsx
+7. **retry-strategy** - For exponential backoff, circuit breaker, and retry policies
+8. **resilience-patterns** - For bulkhead isolation, timeout policies, and fallback chains
+9. **rate-limiter** - For token bucket, sliding window, and tiered rate limiting
+10. **data-validation** - For input sanitisation and schema patterns
+11. **input-sanitisation** - For injection prevention and security
+12. **rbac-patterns** - For role-based access control and permission hierarchies
+13. **oauth-flow** - For OAuth 2.0/OIDC authorisation code flow with PKCE
+14. **csrf-protection** - For CSRF prevention with double-submit cookies and origin checks
+15. **secret-management** - For environment variable validation, redaction, and rotation
+16. **content-moderation** - For content filtering, toxicity detection, and safety checks
+17. **audit-trail** - For structured audit event logging and compliance
+18. **structured-logging** - For observability and log patterns
+19. **metrics-collector** - For metrics instrumentation and analytics data
+20. **tracing-patterns** - For distributed tracing and span context propagation
+21. **docker-patterns** - For multi-stage builds, layer caching, and Docker Compose
+22. **ci-cd-patterns** - For GitHub Actions workflows, caching, and security scanning
+23. **infrastructure-as-code** - For Terraform/Pulumi cloud provisioning and environment parity
+24. **vector-search** - For pgvector embedding queries and similarity search
+25. **search-indexer** - For full-text search indexing with tsvector and GIN indexes
+26. **health-check** - For liveness, readiness, and dependency health probes
+27. **graceful-shutdown** - For signal handling, connection draining, and clean teardown
+28. **cache-strategy** - For caching patterns (lru_cache, Redis, Next.js fetch cache)
+29. **api-contract** - For typed frontend/backend API contracts
+30. **api-client** - For type-safe fetch wrappers with interceptors and retry
+31. **api-versioning** - For URL/header-based versioning with deprecation policies
+32. **graphql-patterns** - For GraphQL schema design, dataloader, and type-safe clients
+33. **webhook-handler** - For idempotent webhook processing with signature verification
+34. **state-machine** - For finite state machines and status transitions
+35. **saga-pattern** - For distributed transaction orchestration with compensation
+36. **pipeline-builder** - For composable data and task pipelines with typed stages
+37. **feature-flag** - For feature toggles with percentage rollout and targeting
+38. **workflow-engine** - For multi-step approval workflows with timeout and escalation
+39. **queue-worker** - For Redis-backed background job processing
+40. **notification-system** - For multi-channel notification dispatch with preferences
+41. **slack-integration** - For Slack bot commands, webhook notifications, and team alerting
+42. **cron-scheduler** - For scheduled tasks and periodic jobs
+43. **csv-processor** - For CSV import, export, and streaming parse
+44. **data-transform** - For ETL pipelines, typed mappers, and streaming transforms
+45. **report-generator** - For multi-format report output and scheduled reporting
+46. **markdown-processor** - For Markdown parsing, rendering, and MDX support
+47. **pdf-generator** - For server-side PDF generation with React PDF and reportlab
+48. **email-template** - For transactional email design and delivery
+49. **changelog-generator** - For automated changelog and release notes from commits
+50. **i18n-patterns** - For internationalisation with en-AU default locale
+51. **genesis-orchestrator** - For workflow and phase management
+52. **dashboard-patterns** - For real-time dashboard visualisation and layout
+53. **status-page** - For public status page with incident management and uptime
+54. **scientific-luxury** - For UI/design decisions
+55. **xaem-theme-ui** - For theme generation and design token translation
+56. **react-best-practices** - For React-specific optimisations
+57. **web-design-guidelines** - For accessibility and UX audits
 
 ## Skill Activation
 
