@@ -19,7 +19,6 @@ from src.models.contractor import (
     ContractorList,
     ContractorUpdate,
     ErrorResponse,
-    Location,
 )
 from src.utils import get_logger
 
