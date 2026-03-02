@@ -48,7 +48,16 @@ if (Test-Path $progressPath) {
 # 5. Australian Locale Context
 $contextParts += "LOCALE: en-AU (DD/MM/YYYY, AUD, AEST/AEDT)"
 
-# 6. Check for pending type errors
+# 6. CONSTITUTION.md — inject immutable rules
+$constitutionPath = "$env:CLAUDE_PROJECT_DIR\.claude\memory\CONSTITUTION.md"
+if (Test-Path $constitutionPath) {
+    $constitution = Get-Content $constitutionPath -Raw -ErrorAction SilentlyContinue
+    if ($constitution) {
+        $contextParts += "CONSTITUTION: $($constitution.Substring(0, [Math]::Min(800, $constitution.Length)))"
+    }
+}
+
+# 7. Check for pending type errors
 $typeCheckResult = pnpm turbo run type-check --dry-run 2>&1
 if ($LASTEXITCODE -ne 0) {
     $contextParts += "WARNING: Type check may have errors"

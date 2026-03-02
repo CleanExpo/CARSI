@@ -147,6 +147,27 @@ Full system + banned elements: `docs/DESIGN_SYSTEM.md` | Skill: `.skills/custom/
 3. **Production Ready** — Real authentication, testing, CI/CD included.
 4. **Retrieval-First** — Query Context7/NotebookLM/Skills before loading docs into context.
 
+## Context Drift Prevention
+
+Context drift occurs when project rules are lost during automatic context compaction.
+This project has a 4-pillar defence built in:
+
+| Pillar | Mechanism | File |
+|--------|-----------|------|
+| Immutable rules | CONSTITUTION.md on disk | `.claude/memory/CONSTITUTION.md` |
+| Session injection | SessionStart hook | `session-start-context.ps1` |
+| Per-message compass | UserPromptSubmit hook | `user-prompt-compass.ps1` |
+| Pre-compaction save | PreCompact hook | `pre-compact-save.py` |
+
+If you notice drift (wrong patterns, ignored rules), run:
+
+```bash
+cat .claude/memory/CONSTITUTION.md   # Re-read immutable rules
+cat .claude/memory/current-state.md  # Check saved state
+```
+
+Full documentation: `.claude/rules/context-drift.md`
+
 ## Agents & Skills
 
 - **23 subagents**: `.claude/agents/*/agent.md`

@@ -324,6 +324,14 @@ def partition_context(self, subtask: SubTask) -> dict:
     }
 ```
 
+## Context Economy (Anti-Drift)
+
+- **Token budget**: Keep Orchestrator context under 80,000 tokens
+- **No large file reads**: Never read complete files in Orchestrator context — delegate to subagents
+- **State persistence**: Write key decisions to `.claude/memory/architectural-decisions.md`
+- **Subagent isolation**: All heavy implementation work dispatched to subagents (fresh context each time)
+- **Drift recovery**: If context feels wrong, re-read `.claude/memory/CONSTITUTION.md`
+
 ## Never
 
 - Allow agent to verify own work
