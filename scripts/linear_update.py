@@ -8,10 +8,26 @@ States: backlog | todo | in_progress | in_review | done
 """
 import sys
 import json
+import os
 import urllib.request
 import ssl
 
-API_KEY = "lin_api_REDACTED"
+def _load_api_key() -> str:
+    """Load the Linear API key from environment or .env.local file."""
+    key = os.environ.get("LINEAR_API_KEY")
+    if key:
+        return key
+    env_file = os.path.join(os.path.dirname(__file__), "..", ".env.local")
+    if os.path.exists(env_file):
+        with open(env_file) as f:
+            for line in f:
+                line = line.strip()
+                if line.startswith("LINEAR_API_KEY="):
+                    return line.split("=", 1)[1].strip().strip('"').strip("'")
+    print("ERROR: LINEAR_API_KEY not set. Add it to .env.local or export it as an environment variable.")
+    sys.exit(1)
+
+API_KEY = _load_api_key()
 
 STATE_MAP = {
     "backlog":     "fd635199-7bd7-442a-9df0-8c9afda1d646",
