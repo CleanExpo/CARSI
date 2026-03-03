@@ -23,8 +23,14 @@ _UUID_RE = re.compile(
 class AuthMiddleware(BaseHTTPMiddleware):
     """Middleware for JWT authentication."""
 
-    # Paths that don't require authentication
+    # Paths that don't require authentication (exact match, any method)
     PUBLIC_PATHS = {"/", "/health", "/ready", "/docs", "/openapi.json"}
+
+    # Path prefixes that don't require auth regardless of method (e.g. auth flows)
+    PUBLIC_PREFIXES = ("/api/lms/auth/",)
+
+    # Path prefixes that are public for GET requests only (e.g. course catalog)
+    PUBLIC_GET_PREFIXES = ("/api/lms/courses",)
 
     async def dispatch(
         self,
@@ -32,9 +38,21 @@ class AuthMiddleware(BaseHTTPMiddleware):
         call_next: Callable[[Request], Response],
     ) -> Response:
         """Process the request and validate authentication."""
-        # Skip auth for public paths
-        if request.url.path in self.PUBLIC_PATHS:
+        path = request.url.path
+
+        # Skip auth for exact public paths
+        if path in self.PUBLIC_PATHS:
             return await call_next(request)
+
+        # Skip auth for public path prefixes (any method — e.g. register/login)
+        if any(path.startswith(p) for p in self.PUBLIC_PREFIXES):
+            return await call_next(request)
+
+        # Skip auth for GET-only public path prefixes (e.g. course catalog)
+        if request.method == "GET" and any(path.startswith(p) for p in self.PUBLIC_GET_PREFIXES):
+            return await call_next(request)
+
+        # --- authenticated paths below ---
 
         # Check for API key authentication (timing-safe comparison)
         api_key = request.headers.get("Authorization", "").replace("Bearer ", "")

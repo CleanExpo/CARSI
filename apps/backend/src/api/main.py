@@ -25,6 +25,7 @@ from .routes import (
     documents,
     health,
     lms_auth,
+    lms_courses,
     prd,
     rag,
     search,
@@ -95,6 +96,7 @@ async def _global_exception_handler(request: Request, exc: Exception) -> JSONRes
 app.include_router(health.router, tags=["Health"])
 # CARSI LMS routes
 app.include_router(lms_auth.router)
+app.include_router(lms_courses.router)
 app.include_router(agents.router, prefix="/api", tags=["Agents"])
 app.include_router(chat.router, prefix="/api", tags=["Chat"])
 app.include_router(webhooks.router, prefix="/api", tags=["Webhooks"])
