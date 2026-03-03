@@ -107,6 +107,22 @@ class Settings(BaseSettings):
         description="Enable Google Drive integration (requires credentials)",
     )
 
+    # Redis & Celery
+    redis_url: str = Field(
+        default="redis://localhost:6379",
+        description="Redis connection URL (used for Celery broker and cache)",
+    )
+    celery_broker_url: str = Field(default="", description="Celery broker URL (defaults to redis_url/1)")
+    celery_result_backend: str = Field(default="", description="Celery result backend URL (defaults to redis_url/2)")
+
+    @property
+    def effective_celery_broker(self) -> str:
+        return self.celery_broker_url or self.redis_url.rstrip("/") + "/1"
+
+    @property
+    def effective_celery_backend(self) -> str:
+        return self.celery_result_backend or self.redis_url.rstrip("/") + "/2"
+
     # MCP Tools
     exa_api_key: str = Field(default="")
     ref_tools_api_key: str = Field(default="")
