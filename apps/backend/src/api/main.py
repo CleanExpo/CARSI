@@ -27,6 +27,7 @@ from .routes import (
     lms_auth,
     lms_courses,
     lms_drive,
+    lms_enrollments,
     prd,
     rag,
     search,
@@ -99,6 +100,7 @@ app.include_router(health.router, tags=["Health"])
 app.include_router(lms_auth.router)
 app.include_router(lms_courses.router)
 app.include_router(lms_drive.router)
+app.include_router(lms_enrollments.router)
 app.include_router(agents.router, prefix="/api", tags=["Agents"])
 app.include_router(chat.router, prefix="/api", tags=["Chat"])
 app.include_router(webhooks.router, prefix="/api", tags=["Webhooks"])
