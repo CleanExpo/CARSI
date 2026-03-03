@@ -5,5 +5,6 @@ from . import lms_courses  # noqa: F401
 from . import lms_drive  # noqa: F401
 from . import lms_enrollments  # noqa: F401
 from . import lms_lessons  # noqa: F401
+from . import lms_modules  # noqa: F401
 from . import lms_quiz  # noqa: F401
 from . import lms_progress  # noqa: F401
