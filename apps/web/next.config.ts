@@ -1,5 +1,24 @@
 import type { NextConfig } from 'next';
 
+const withPWA = require('next-pwa');
+
+const pwaConfig = withPWA({
+  dest: 'public',
+  disable: process.env.NODE_ENV === 'development',
+  register: true,
+  skipWaiting: true,
+  runtimeCaching: [
+    {
+      urlPattern: /\/courses\/.+\/lessons\/.+/,
+      handler: 'NetworkFirst',
+      options: {
+        cacheName: 'lesson-content',
+        expiration: { maxEntries: 20, maxAgeSeconds: 86400 },
+      },
+    },
+  ],
+});
+
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   transpilePackages: ['@shared'],
@@ -65,4 +84,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default pwaConfig(nextConfig);

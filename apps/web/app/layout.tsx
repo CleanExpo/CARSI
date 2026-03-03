@@ -7,8 +7,9 @@ import { ThemeProvider } from '@/components/ThemeProvider';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'AI Agent Orchestration',
-  description: 'Production-ready AI-powered application',
+  title: 'CARSI LMS',
+  description: 'IICRC CEC Training — Cleaning & Restoration',
+  manifest: '/manifest.json',
 };
 
 export default function RootLayout({
