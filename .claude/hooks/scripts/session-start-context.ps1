@@ -57,7 +57,33 @@ if (Test-Path $constitutionPath) {
     }
 }
 
-# 7. Check for pending type errors
+# 7. Minion Blueprint Keyword Scanning (deterministic — no LLM)
+# Scans Beads tasks for domain keywords, injects TOOLSHED and BLUEPRINT hints
+$beadsReadyPath = "$env:CLAUDE_PROJECT_DIR\.bin\bd.exe"
+if (Test-Path $beadsReadyPath) {
+    $taskText = (& $beadsReadyPath ready 2>&1 | Select-Object -First 10) -join " "
+    $taskText = $taskText.ToLower()
+
+    # Blueprint type detection
+    $blueprintType = "feature"  # default
+    if ($taskText -match "bug|fix|broken|error|failing|crash|regression") { $blueprintType = "bugfix" }
+    elseif ($taskText -match "migrate|upgrade|replace|move|switch|port") { $blueprintType = "migration" }
+    elseif ($taskText -match "refactor|clean|simplify|extract|rename|restructure") { $blueprintType = "refactor" }
+
+    # Toolshed detection
+    $toolshed = "general"  # default
+    if ($taskText -match "react|component|ui|tailwind|nextjs|page|layout") { $toolshed = "frontend" }
+    elseif ($taskText -match "api|fastapi|endpoint|route|python|pydantic") { $toolshed = "backend" }
+    elseif ($taskText -match "database|migration|sql|schema|postgres|alembic") { $toolshed = "database" }
+    elseif ($taskText -match "auth|jwt|login|security|rbac") { $toolshed = "security" }
+    elseif ($taskText -match "test|spec|playwright|vitest|pytest") { $toolshed = "test" }
+    elseif ($taskText -match "bug|fix|broken|error|crash") { $toolshed = "debug" }
+
+    $contextParts += "TOOLSHED:$toolshed"
+    $contextParts += "BLUEPRINT:$blueprintType"
+}
+
+# 8. Check for pending type errors
 $typeCheckResult = pnpm turbo run type-check --dry-run 2>&1
 if ($LASTEXITCODE -ne 0) {
     $contextParts += "WARNING: Type check may have errors"

@@ -15,13 +15,14 @@ hooks_triggered:
 
 # Orchestrator Agent
 
-*Preserves 605 lines of orchestration logic from ORCHESTRATOR_PRIMER.md with Unite-Group enhancements*
+_Preserves 605 lines of orchestration logic from ORCHESTRATOR_PRIMER.md with Unite-Group enhancements_
 
 ## Role & Responsibilities
 
 Master coordinator of all agent activities, enforces verification standards, and manages the entire software delivery lifecycle.
 
 ### Core Responsibilities
+
 1. **Task Routing**: Analyze incoming tasks and route to appropriate specialized agents
 2. **Multi-Agent Coordination**: Spawn, monitor, and coordinate subagents
 3. **Verification Enforcement**: NO agent verifies own work—route to IndependentVerifier
@@ -332,6 +333,58 @@ def partition_context(self, subtask: SubTask) -> dict:
 - **Subagent isolation**: All heavy implementation work dispatched to subagents (fresh context each time)
 - **Drift recovery**: If context feels wrong, re-read `.claude/memory/CONSTITUTION.md`
 
+## Minions Bounded Iteration Protocol
+
+When a task arrives via `/minion`, route it through the Blueprint DAG pipeline instead of the standard multi-turn orchestration:
+
+### Blueprint-Aware Routing
+
+```
+/minion invocation
+  → pre-hydration.ps1 (deterministic manifest)
+  → blueprint selection (.claude/blueprints/{type}.blueprint.md)
+  → toolshed load (.claude/data/toolsheds.json)
+  → specialist agent (context-scoped to manifest only)
+  → verification (deterministic: lint + type-check + test)
+  → git operations (deterministic)
+  → create-pr (deterministic)
+```
+
+### Iteration Counter Table
+
+Track in `.claude/data/minion-state.json` for every active minion session:
+
+| Counter                | Purpose                                  | Hard Cap |
+| ---------------------- | ---------------------------------------- | -------- |
+| `iterations.implement` | Feature/fix/migration/refactor passes    | 1        |
+| `iterations.fix_ci`    | CI/test failure remediation rounds       | 2        |
+| `iterations.fix_lint`  | Non-auto-fixable lint remediation rounds | 1        |
+| `iterations.total`     | All agentic iterations combined          | **3**    |
+
+When `total >= 3` → `BLUEPRINT_ESCALATION` → halt → human review required.
+
+### Auto-Fix Detection (No Iteration Cost)
+
+These are applied deterministically before any agentic node. They do NOT increment counters:
+
+| Pattern               | Auto-Fix                       |
+| --------------------- | ------------------------------ |
+| `Cannot find module`  | `pnpm install`                 |
+| `ModuleNotFoundError` | `uv sync`                      |
+| Auto-fixable ESLint   | `pnpm turbo run lint -- --fix` |
+| Auto-fixable ruff     | `uv run ruff check src/ --fix` |
+| Missing type stubs    | `pnpm add -D @types/{package}` |
+
+### Minion vs Interactive Routing
+
+| Signal                        | Route                                    |
+| ----------------------------- | ---------------------------------------- |
+| `/minion` prefix              | → Blueprint DAG (one-shot, no questions) |
+| No prefix                     | → Standard multi-turn orchestration      |
+| BLUEPRINT_ESCALATION received | → Surface to human, do not retry         |
+
+The minion pathway is **additive** — it does not replace multi-turn orchestration.
+
 ## Never
 
 - Allow agent to verify own work
@@ -339,3 +392,4 @@ def partition_context(self, subtask: SubTask) -> dict:
 - Publish content without Truth Finder verification
 - Use American defaults unless explicitly requested
 - Proceed without verification evidence
+- Merge a PR created by `/minion` (human review gate is mandatory)

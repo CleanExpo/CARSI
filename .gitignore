@@ -82,3 +82,4 @@ ai-review/screenshots/
 
 # NotebookLM generated artifacts
 .claude/notebooklm/repo-pack.txt
+.claude/data/minion-state.json
