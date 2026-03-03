@@ -1,13 +1,14 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
-import { Toaster } from "@/components/ui/toast";
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import './globals.css';
+import { Toaster } from '@/components/ui/toast';
+import { ThemeProvider } from '@/components/ThemeProvider';
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: "AI Agent Orchestration",
-  description: "Production-ready AI-powered application",
+  title: 'AI Agent Orchestration',
+  description: 'Production-ready AI-powered application',
 };
 
 export default function RootLayout({
@@ -18,8 +19,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        {children}
-        <Toaster />
+        <ThemeProvider initialTheme="light">
+          {children}
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );
