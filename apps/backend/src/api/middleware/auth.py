@@ -27,10 +27,10 @@ class AuthMiddleware(BaseHTTPMiddleware):
     PUBLIC_PATHS = {"/", "/health", "/ready", "/docs", "/openapi.json"}
 
     # Path prefixes that don't require auth regardless of method (e.g. auth flows)
-    PUBLIC_PREFIXES = ("/api/lms/auth/", "/api/lms/credentials/")
+    PUBLIC_PREFIXES = ("/api/lms/auth/", "/api/lms/credentials/", "/api/lms/webhooks/")
 
     # Path prefixes that are public for GET requests only (e.g. course catalog, pathways)
-    PUBLIC_GET_PREFIXES = ("/api/lms/courses", "/api/lms/pathways")
+    PUBLIC_GET_PREFIXES = ("/api/lms/courses", "/api/lms/pathways", "/api/lms/gamification/leaderboard")
 
     async def dispatch(
         self,
