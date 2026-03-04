@@ -1,6 +1,13 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, CheckCircle2 } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
+import {
+  AnimatedHero,
+  AnimatedStats,
+  AnimatedCard,
+  AnimatedSection,
+} from '@/components/landing/AnimatedHero';
+import { MobileNav } from '@/components/landing/MobileNav';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -65,6 +72,13 @@ const benefits = [
   'Self-paced online learning',
 ];
 
+const stats = [
+  { value: '261+', label: 'Professionals' },
+  { value: '91', label: 'Courses' },
+  { value: '7', label: 'Disciplines' },
+  { value: '4.9', label: 'Avg Rating' },
+];
+
 // ---------------------------------------------------------------------------
 // Sub-components
 // ---------------------------------------------------------------------------
@@ -77,7 +91,7 @@ function CourseCard({ course }: { course: Course }) {
   return (
     <Link
       href={`/courses/${course.slug}`}
-      className="group block overflow-hidden rounded-lg transition-transform duration-200 hover:-translate-y-1"
+      className="group block overflow-hidden rounded-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-blue-500/5"
       style={{
         background: 'rgba(255,255,255,0.03)',
         border: '1px solid rgba(255,255,255,0.08)',
@@ -89,7 +103,7 @@ function CourseCard({ course }: { course: Course }) {
             src={course.thumbnail_url}
             alt={course.title}
             fill
-            className="object-cover opacity-80 transition-opacity duration-200 group-hover:opacity-100"
+            className="object-cover opacity-80 transition-all duration-300 group-hover:scale-105 group-hover:opacity-100"
             sizes="(max-width: 768px) 100vw, 33vw"
           />
         )}
@@ -199,7 +213,7 @@ export default async function Home() {
               ))}
             </div>
 
-            <div className="flex items-center gap-4">
+            <div className="hidden items-center gap-4 md:flex">
               <Link
                 href="/login"
                 className="text-sm transition-colors duration-150 hover:text-white"
@@ -209,112 +223,24 @@ export default async function Home() {
               </Link>
               <Link
                 href="/subscribe"
-                className="rounded-md px-4 py-2 text-sm font-medium text-white transition-opacity duration-150 hover:opacity-90"
+                className="rounded-md px-4 py-2 text-sm font-medium text-white transition-all duration-200 hover:scale-[1.02]"
                 style={{ background: '#ed9d24' }}
               >
                 Start Free Trial
               </Link>
             </div>
+
+            {/* Mobile hamburger menu */}
+            <MobileNav />
           </div>
         </div>
       </nav>
 
-      {/* ── Hero ───────────────────────────────────────────────────────────── */}
-      <section className="relative px-6 pt-24 pb-20">
-        <div className="mx-auto max-w-6xl">
-          <div className="max-w-2xl">
-            <div
-              className="mb-6 inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs"
-              style={{
-                background: 'rgba(36,144,237,0.1)',
-                border: '1px solid rgba(36,144,237,0.2)',
-                color: '#2490ed',
-              }}
-            >
-              <span className="h-1.5 w-1.5 rounded-full" style={{ background: '#2490ed' }} />
-              IICRC CEC Approved
-            </div>
+      {/* ── Hero (Animated) ────────────────────────────────────────────────── */}
+      <AnimatedHero benefits={benefits} />
 
-            <h1
-              className="mb-6 text-4xl leading-tight font-bold tracking-tight sm:text-5xl"
-              style={{ color: 'rgba(255,255,255,0.95)' }}
-            >
-              Professional restoration
-              <br />
-              training for Australia
-            </h1>
-
-            <p
-              className="mb-8 max-w-lg text-lg leading-relaxed"
-              style={{ color: 'rgba(255,255,255,0.5)' }}
-            >
-              Earn IICRC Continuing Education Credits with self-paced online courses. Built for
-              cleaning and restoration professionals.
-            </p>
-
-            <div className="mb-10 flex flex-wrap gap-3">
-              <Link
-                href="/courses"
-                className="inline-flex items-center gap-2 rounded-md px-6 py-3 font-medium text-white transition-opacity duration-150 hover:opacity-90"
-                style={{ background: '#ed9d24' }}
-              >
-                Browse Courses <ArrowRight className="h-4 w-4" />
-              </Link>
-              <Link
-                href="/pathways"
-                className="inline-flex items-center gap-2 rounded-md px-6 py-3 font-medium transition-colors duration-150 hover:text-white"
-                style={{
-                  background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  color: 'rgba(255,255,255,0.7)',
-                }}
-              >
-                View Pathways
-              </Link>
-            </div>
-
-            {/* Simple benefit list — cleaner than animated cards */}
-            <ul className="space-y-2">
-              {benefits.map((benefit) => (
-                <li
-                  key={benefit}
-                  className="flex items-center gap-2 text-sm"
-                  style={{ color: 'rgba(255,255,255,0.5)' }}
-                >
-                  <CheckCircle2 className="h-4 w-4 flex-shrink-0" style={{ color: '#27ae60' }} />
-                  {benefit}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Stats (simple, no animation) ───────────────────────────────────── */}
-      <section className="px-6 py-12" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-        <div className="mx-auto max-w-6xl">
-          <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
-            {[
-              { value: '261+', label: 'Professionals' },
-              { value: '91', label: 'Courses' },
-              { value: '7', label: 'Disciplines' },
-              { value: '4.9', label: 'Avg Rating' },
-            ].map((stat) => (
-              <div key={stat.label} className="text-center">
-                <p className="text-3xl font-bold" style={{ color: '#2490ed' }}>
-                  {stat.value}
-                </p>
-                <p
-                  className="mt-1 text-xs tracking-wide uppercase"
-                  style={{ color: 'rgba(255,255,255,0.4)' }}
-                >
-                  {stat.label}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* ── Stats (Animated) ───────────────────────────────────────────────── */}
+      <AnimatedStats stats={stats} />
 
       {/* ── Disciplines (compact pills) ────────────────────────────────────── */}
       <section className="px-6 py-12" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
@@ -330,7 +256,7 @@ export default async function Home() {
               <Link
                 key={d.code}
                 href={`/courses?discipline=${d.code}`}
-                className="rounded-md px-3 py-1.5 text-xs transition-colors duration-150 hover:text-white"
+                className="rounded-md px-3 py-1.5 text-xs transition-all duration-200 hover:-translate-y-0.5 hover:text-white"
                 style={{
                   background: 'rgba(255,255,255,0.04)',
                   border: '1px solid rgba(255,255,255,0.08)',
@@ -347,59 +273,43 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* ── Featured Courses ───────────────────────────────────────────────── */}
-      <section className="px-6 py-16" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-        <div className="mx-auto max-w-6xl">
-          <div className="mb-8 flex items-end justify-between">
-            <div>
-              <p
-                className="mb-1 text-xs tracking-wide uppercase"
-                style={{ color: 'rgba(255,255,255,0.3)' }}
-              >
-                Featured
-              </p>
-              <h2 className="text-2xl font-bold" style={{ color: 'rgba(255,255,255,0.9)' }}>
-                Popular Courses
-              </h2>
-            </div>
-            <Link
-              href="/courses"
-              className="flex items-center gap-1 text-sm transition-colors duration-150 hover:text-white"
-              style={{ color: '#2490ed' }}
-            >
-              All courses <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
-
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {featuredCourses.length > 0
-              ? featuredCourses.map((course) => <CourseCard key={course.id} course={course} />)
-              : [1, 2, 3].map((i) => <SkeletonCard key={i} />)}
-          </div>
+      {/* ── Featured Courses (Animated) ────────────────────────────────────── */}
+      <AnimatedSection
+        label="Featured"
+        title="Popular Courses"
+        rightContent={
+          <Link
+            href="/courses"
+            className="flex items-center gap-1 text-sm transition-colors duration-150 hover:text-white"
+            style={{ color: '#2490ed' }}
+          >
+            All courses <ArrowRight className="h-4 w-4" />
+          </Link>
+        }
+      >
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {featuredCourses.length > 0
+            ? featuredCourses.map((course, i) => (
+                <AnimatedCard key={course.id} index={i}>
+                  <CourseCard course={course} />
+                </AnimatedCard>
+              ))
+            : [1, 2, 3].map((i) => (
+                <AnimatedCard key={i} index={i}>
+                  <SkeletonCard />
+                </AnimatedCard>
+              ))}
         </div>
-      </section>
+      </AnimatedSection>
 
-      {/* ── Industries (new section with all 8) ────────────────────────────── */}
-      <section className="px-6 py-16" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-        <div className="mx-auto max-w-6xl">
-          <div className="mb-8">
-            <p
-              className="mb-1 text-xs tracking-wide uppercase"
-              style={{ color: 'rgba(255,255,255,0.3)' }}
-            >
-              Industry Solutions
-            </p>
-            <h2 className="text-2xl font-bold" style={{ color: 'rgba(255,255,255,0.9)' }}>
-              Training for your sector
-            </h2>
-          </div>
-
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {industries.map((industry) => (
+      {/* ── Industries ─────────────────────────────────────────────────────── */}
+      <AnimatedSection label="Industry Solutions" title="Training for your sector">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {industries.map((industry, i) => (
+            <AnimatedCard key={industry.slug} index={i}>
               <Link
-                key={industry.slug}
                 href={`/industries/${industry.slug}`}
-                className="group rounded-lg px-4 py-3 transition-colors duration-150"
+                className="group flex items-center justify-between rounded-lg px-4 py-3 transition-all duration-200 hover:-translate-y-0.5"
                 style={{
                   background: 'rgba(255,255,255,0.03)',
                   border: '1px solid rgba(255,255,255,0.06)',
@@ -412,16 +322,16 @@ export default async function Home() {
                   {industry.label}
                 </span>
                 <ArrowRight
-                  className="ml-2 inline h-3 w-3 opacity-0 transition-opacity duration-150 group-hover:opacity-100"
+                  className="h-3 w-3 opacity-0 transition-all duration-200 group-hover:translate-x-0.5 group-hover:opacity-100"
                   style={{ color: '#2490ed' }}
                 />
               </Link>
-            ))}
-          </div>
+            </AnimatedCard>
+          ))}
         </div>
-      </section>
+      </AnimatedSection>
 
-      {/* ── CTA (single, simple) ───────────────────────────────────────────── */}
+      {/* ── CTA ────────────────────────────────────────────────────────────── */}
       <section className="px-6 py-20" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="mb-4 text-3xl font-bold" style={{ color: 'rgba(255,255,255,0.95)' }}>
@@ -432,15 +342,16 @@ export default async function Home() {
           </p>
           <Link
             href="/subscribe"
-            className="inline-flex items-center gap-2 rounded-md px-8 py-3 font-medium text-white transition-opacity duration-150 hover:opacity-90"
+            className="group inline-flex items-center gap-2 rounded-md px-8 py-3 font-medium text-white transition-all duration-200 hover:scale-[1.02]"
             style={{ background: '#ed9d24' }}
           >
-            Start Free Trial <ArrowRight className="h-4 w-4" />
+            Start Free Trial{' '}
+            <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />
           </Link>
         </div>
       </section>
 
-      {/* ── Footer (simplified) ────────────────────────────────────────────── */}
+      {/* ── Footer ─────────────────────────────────────────────────────────── */}
       <footer className="px-6 py-12" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
         <div className="mx-auto max-w-6xl">
           <div className="mb-8 grid gap-8 sm:grid-cols-4">
