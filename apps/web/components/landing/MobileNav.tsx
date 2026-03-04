@@ -185,12 +185,12 @@ export function MobileNav() {
                     Sign In
                   </Link>
                   <Link
-                    href="/subscribe"
+                    href="/courses"
                     onClick={() => setIsOpen(false)}
                     className="block rounded-md px-4 py-3 text-center text-base font-medium text-white transition-opacity duration-150 hover:opacity-90"
                     style={{ background: '#ed9d24' }}
                   >
-                    Start Free Trial
+                    Browse Courses
                   </Link>
                 </div>
               </nav>

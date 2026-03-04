@@ -38,14 +38,14 @@ const staggerContainer = {
 
 const trustBadges = [
   { icon: Award, label: 'IICRC Approved', color: '#2490ed' },
-  { icon: Shield, label: 'Industry Certified', color: '#27ae60' },
+  { icon: Shield, label: '24/7 Online Access', color: '#27ae60' },
   { icon: Star, label: '4.9★ Rating', color: '#ed9d24' },
 ];
 
 const partnerLogos = [
   { name: 'IICRC', abbr: 'IICRC' },
-  { name: 'RIA', abbr: 'RIA' },
-  { name: 'ACRA', abbr: 'ACRA' },
+  { name: 'ISSA', abbr: 'ISSA' },
+  { name: 'NRPG', abbr: 'NRPG' },
 ];
 
 // ---------------------------------------------------------------------------
@@ -150,9 +150,9 @@ export function AnimatedHero({ benefits }: AnimatedHeroProps) {
             className="mb-6 text-4xl leading-tight font-bold tracking-tight sm:text-5xl"
             style={{ color: 'rgba(255,255,255,0.95)' }}
           >
-            Professional restoration
+            Industry-leading training.
             <br />
-            training for Australia
+            <span style={{ color: '#2490ed' }}>Available 24/7.</span>
           </motion.h1>
 
           <motion.p
@@ -161,8 +161,8 @@ export function AnimatedHero({ benefits }: AnimatedHeroProps) {
             className="mb-8 max-w-lg text-lg leading-relaxed"
             style={{ color: 'rgba(255,255,255,0.5)' }}
           >
-            Earn IICRC Continuing Education Credits with self-paced online courses. Built for
-            cleaning and restoration professionals.
+            IICRC-approved CEC training for healthcare, hospitality, government, mining, commercial
+            cleaning, and restoration professionals. Self-paced. Online. Always on.
           </motion.p>
 
           <motion.div

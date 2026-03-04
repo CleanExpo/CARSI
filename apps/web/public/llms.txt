@@ -5,7 +5,9 @@
 
 ## What is CARSI?
 
-CARSI is Australia's leading online learning platform for cleaning and restoration professionals. We provide IICRC-aligned continuing education credits (CECs) across seven disciplines: Water Restoration (WRT), Carpet Restoration (CRT), Structural Drying (ASD), Microbial Remediation (AMRT), Fire & Smoke Restoration (FSRT), Odour Control (OCT), and Commercial Carpet Cleaning (CCT).
+CARSI is Australia's leading online training platform for industry professionals requiring IICRC credentials. We serve 12+ industries including healthcare, hospitality, government, mining, commercial cleaning, and restoration. Our platform provides IICRC-aligned continuing education credits (CECs) across seven disciplines: Water Restoration (WRT), Carpet Restoration (CRT), Structural Drying (ASD), Microbial Remediation (AMRT), Fire & Smoke Restoration (FSRT), Odour Control (OCT), and Commercial Carpet Cleaning (CCT).
+
+CARSI is one of the four core pillars of the National Restoration Professionals Group (NRPG) onboarding pathway.
 
 ## Key Facts
 
@@ -14,7 +16,7 @@ CARSI is Australia's leading online learning platform for cleaning and restorati
 - Certification body alignment: IICRC (Institute of Inspection Cleaning and Restoration Certification)
 - Course format: Self-paced online learning
 - Credential verification: Public credential pages at /credentials/{id}
-- Pricing: $795 AUD/year subscription with 7-day free trial
+- Pricing: Free courses available + premium courses from $20 AUD. Annual subscription $795 AUD/year for full access.
 
 ## IICRC Disciplines Explained
 

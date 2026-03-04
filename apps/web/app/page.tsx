@@ -55,28 +55,33 @@ const disciplines = [
 ];
 
 const industries = [
+  { slug: 'healthcare', label: 'Healthcare', highlight: true },
+  { slug: 'hospitality', label: 'Hotels & Resorts', highlight: true },
+  { slug: 'government-defence', label: 'Government & Defence', highlight: true },
+  { slug: 'commercial-cleaning', label: 'Commercial Cleaning', highlight: true },
   { slug: 'aged-care', label: 'Aged Care' },
-  { slug: 'childcare', label: 'Childcare' },
-  { slug: 'healthcare', label: 'Healthcare' },
-  { slug: 'construction', label: 'Construction' },
+  { slug: 'mining', label: 'Mining & Resources' },
+  { slug: 'education', label: 'Education' },
   { slug: 'property-management', label: 'Property Management' },
-  { slug: 'government-defence', label: 'Government & Defence' },
-  { slug: 'commercial-cleaning', label: 'Commercial Cleaning' },
-  { slug: 'mining', label: 'Mining' },
+  { slug: 'strata', label: 'Strata & Body Corporate' },
+  { slug: 'retail', label: 'Retail & Shopping Centres' },
+  { slug: 'childcare', label: 'Childcare' },
+  { slug: 'construction', label: 'Construction' },
 ];
 
 const benefits = [
+  '24/7 access — learn anytime, anywhere',
   'IICRC CEC-approved courses',
   'Automatic credit tracking',
   'Verifiable digital credentials',
-  'Self-paced online learning',
+  'No travel, no downtime, no waiting',
 ];
 
 const stats = [
-  { value: '261+', label: 'Professionals' },
+  { value: '24/7', label: 'Online Access' },
+  { value: '12+', label: 'Industries Served' },
   { value: '91', label: 'Courses' },
-  { value: '7', label: 'Disciplines' },
-  { value: '4.9', label: 'Avg Rating' },
+  { value: '7', label: 'IICRC Disciplines' },
 ];
 
 // ---------------------------------------------------------------------------
@@ -222,11 +227,11 @@ export default async function Home() {
                 Sign In
               </Link>
               <Link
-                href="/subscribe"
+                href="/courses"
                 className="rounded-md px-4 py-2 text-sm font-medium text-white transition-all duration-200 hover:scale-[1.02]"
                 style={{ background: '#ed9d24' }}
               >
-                Start Free Trial
+                Browse Courses
               </Link>
             </div>
 
@@ -303,7 +308,12 @@ export default async function Home() {
       </AnimatedSection>
 
       {/* ── Industries ─────────────────────────────────────────────────────── */}
-      <AnimatedSection label="Industry Solutions" title="Training for your sector">
+      <AnimatedSection label="Multi-Industry Training" title="Built for every sector">
+        <p className="mb-6 max-w-2xl text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
+          From hospitals to hotels, government facilities to commercial buildings — CARSI provides
+          industry-specific training pathways. Not just restoration. Every industry that needs IICRC
+          credentials.
+        </p>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {industries.map((industry, i) => (
             <AnimatedCard key={industry.slug} index={i}>
@@ -311,13 +321,17 @@ export default async function Home() {
                 href={`/industries/${industry.slug}`}
                 className="group flex items-center justify-between rounded-lg px-4 py-3 transition-all duration-200 hover:-translate-y-0.5"
                 style={{
-                  background: 'rgba(255,255,255,0.03)',
-                  border: '1px solid rgba(255,255,255,0.06)',
+                  background: industry.highlight
+                    ? 'rgba(36,144,237,0.08)'
+                    : 'rgba(255,255,255,0.03)',
+                  border: industry.highlight
+                    ? '1px solid rgba(36,144,237,0.2)'
+                    : '1px solid rgba(255,255,255,0.06)',
                 }}
               >
                 <span
                   className="text-sm font-medium transition-colors duration-150 group-hover:text-white"
-                  style={{ color: 'rgba(255,255,255,0.7)' }}
+                  style={{ color: industry.highlight ? '#2490ed' : 'rgba(255,255,255,0.7)' }}
                 >
                   {industry.label}
                 </span>
@@ -329,25 +343,144 @@ export default async function Home() {
             </AnimatedCard>
           ))}
         </div>
+        <div className="mt-6 text-center">
+          <Link
+            href="/industries"
+            className="text-sm font-medium transition-colors hover:text-white"
+            style={{ color: 'rgba(255,255,255,0.5)' }}
+          >
+            View all industries →
+          </Link>
+        </div>
       </AnimatedSection>
+
+      {/* ── Why Online ─────────────────────────────────────────────────────── */}
+      <AnimatedSection label="The Online Advantage" title="Why professionals choose CARSI">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {[
+            {
+              title: '24/7 Access',
+              desc: 'Learn at 2am or 2pm. Our platform never closes. Complete courses around your work schedule.',
+              color: '#2490ed',
+            },
+            {
+              title: 'No Travel Required',
+              desc: 'No flights, no hotels, no time away from work. Train your entire team without leaving the office.',
+              color: '#27ae60',
+            },
+            {
+              title: 'Instant Credentials',
+              desc: 'Complete a course, get your certificate. Verifiable digital credentials you can share immediately.',
+              color: '#ed9d24',
+            },
+          ].map((item, i) => (
+            <AnimatedCard key={item.title} index={i}>
+              <div
+                className="rounded-lg p-6"
+                style={{
+                  background: 'rgba(255,255,255,0.03)',
+                  border: '1px solid rgba(255,255,255,0.06)',
+                }}
+              >
+                <div className="mb-3 h-1 w-8 rounded-full" style={{ background: item.color }} />
+                <h3
+                  className="mb-2 text-base font-semibold"
+                  style={{ color: 'rgba(255,255,255,0.9)' }}
+                >
+                  {item.title}
+                </h3>
+                <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                  {item.desc}
+                </p>
+              </div>
+            </AnimatedCard>
+          ))}
+        </div>
+      </AnimatedSection>
+
+      {/* ── NRPG Partnership ─────────────────────────────────────────────────── */}
+      <section className="px-6 py-16" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+        <div className="mx-auto max-w-6xl">
+          <div
+            className="rounded-lg p-8 sm:p-10"
+            style={{
+              background:
+                'linear-gradient(135deg, rgba(36,144,237,0.08) 0%, rgba(237,157,36,0.08) 100%)',
+              border: '1px solid rgba(255,255,255,0.08)',
+            }}
+          >
+            <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p
+                  className="mb-2 text-xs tracking-wide uppercase"
+                  style={{ color: 'rgba(255,255,255,0.4)' }}
+                >
+                  National Partnership
+                </p>
+                <h3 className="mb-2 text-xl font-bold" style={{ color: 'rgba(255,255,255,0.95)' }}>
+                  NRPG Onboarding Partner
+                </h3>
+                <p className="max-w-md text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                  CARSI is one of the four core pillars of the National Restoration Professionals
+                  Group onboarding pathway. Industry-recognised training that meets NRPG standards.
+                </p>
+              </div>
+              <div className="flex items-center gap-4">
+                <div
+                  className="flex h-14 w-14 items-center justify-center rounded-lg text-lg font-bold"
+                  style={{
+                    background: 'rgba(255,255,255,0.06)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    color: '#2490ed',
+                  }}
+                >
+                  NRPG
+                </div>
+                <Link
+                  href="/pathways"
+                  className="text-sm font-medium transition-colors hover:text-white"
+                  style={{ color: '#2490ed' }}
+                >
+                  View Pathways →
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* ── CTA ────────────────────────────────────────────────────────────── */}
       <section className="px-6 py-20" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="mb-4 text-3xl font-bold" style={{ color: 'rgba(255,255,255,0.95)' }}>
-            Ready to get certified?
+            Start learning today
           </h2>
           <p className="mb-8 text-base" style={{ color: 'rgba(255,255,255,0.5)' }}>
-            $795 AUD/year. 7-day free trial. Cancel anytime.
+            Free courses available. Premium courses from just $20 AUD.
+            <br />
+            Or get full access to all 91 courses for $795 AUD/year.
           </p>
-          <Link
-            href="/subscribe"
-            className="group inline-flex items-center gap-2 rounded-md px-8 py-3 font-medium text-white transition-all duration-200 hover:scale-[1.02]"
-            style={{ background: '#ed9d24' }}
-          >
-            Start Free Trial{' '}
-            <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />
-          </Link>
+          <div className="flex flex-wrap justify-center gap-4">
+            <Link
+              href="/courses?filter=free"
+              className="group inline-flex items-center gap-2 rounded-md px-8 py-3 font-medium transition-all duration-200 hover:scale-[1.02] hover:text-white"
+              style={{
+                background: 'rgba(255,255,255,0.05)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                color: 'rgba(255,255,255,0.7)',
+              }}
+            >
+              Free Courses
+            </Link>
+            <Link
+              href="/courses"
+              className="group inline-flex items-center gap-2 rounded-md px-8 py-3 font-medium text-white transition-all duration-200 hover:scale-[1.02]"
+              style={{ background: '#ed9d24' }}
+            >
+              Browse All Courses{' '}
+              <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -368,7 +501,9 @@ export default async function Home() {
                 </span>
               </div>
               <p className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                Australia&apos;s restoration training platform.
+                Australia&apos;s industry training leader.
+                <br />
+                24/7 online. IICRC-approved.
               </p>
             </div>
 
