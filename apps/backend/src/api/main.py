@@ -38,6 +38,7 @@ from .routes import (
     lms_course_ideas,
     lms_rpl,
     lms_ai_builder,
+    lms_bundles,
     lms_payments,
     lms_modules,
     lms_pathways,
@@ -133,6 +134,7 @@ app.include_router(lms_rpl.router)
 app.include_router(lms_rpl.admin_router)
 app.include_router(lms_ai_builder.router)
 app.include_router(lms_payments.router)
+app.include_router(lms_bundles.router)
 app.include_router(agents.router, prefix="/api", tags=["Agents"])
 app.include_router(chat.router, prefix="/api", tags=["Chat"])
 app.include_router(webhooks.router, prefix="/api", tags=["Webhooks"])
