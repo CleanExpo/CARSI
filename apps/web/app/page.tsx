@@ -389,7 +389,6 @@ export default async function Home() {
                 fill
                 className="object-cover opacity-40"
                 sizes="(max-width: 1024px) 100vw, 50vw"
-                onError={() => {}}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
               <div className="absolute right-5 bottom-4 left-5">
