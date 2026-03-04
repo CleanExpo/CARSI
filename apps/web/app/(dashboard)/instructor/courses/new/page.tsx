@@ -1,12 +1,12 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { CourseBuilder } from '@/components/lms/CourseBuilder';
+import { CourseBuilder, CourseFormValues } from '@/components/lms/CourseBuilder';
 
 export default function NewCoursePage() {
   const router = useRouter();
 
-  async function handleSubmit(values: Record<string, unknown>) {
+  async function handleSubmit(values: CourseFormValues) {
     const userId = localStorage.getItem('carsi_user_id') ?? '';
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8000';
 

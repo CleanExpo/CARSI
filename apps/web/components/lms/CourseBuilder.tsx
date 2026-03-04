@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 
-interface CourseFormValues {
+export interface CourseFormValues {
   title?: string;
   slug?: string;
   description?: string;

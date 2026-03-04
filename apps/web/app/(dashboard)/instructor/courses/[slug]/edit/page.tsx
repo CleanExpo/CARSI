@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useParams } from 'next/navigation';
-import { CourseBuilder } from '@/components/lms/CourseBuilder';
+import { CourseBuilder, CourseFormValues } from '@/components/lms/CourseBuilder';
 import { ModuleEditor } from '@/components/lms/ModuleEditor';
 
 interface Module {
@@ -49,7 +49,7 @@ export default function EditCoursePage() {
     loadData();
   }, [loadData]);
 
-  async function handleCourseUpdate(values: Record<string, unknown>) {
+  async function handleCourseUpdate(values: CourseFormValues) {
     await fetch(`${backendUrl}/api/lms/courses/${params.slug}`, {
       method: 'PATCH',
       headers,
