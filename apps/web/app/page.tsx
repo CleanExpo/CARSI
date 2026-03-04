@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, Shield, Zap, Users } from 'lucide-react';
+import { ArrowRight, CheckCircle2 } from 'lucide-react';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -14,8 +14,6 @@ interface Course {
   price_aud: number | string;
   is_free?: boolean;
   discipline?: string | null;
-  category?: string | null;
-  lesson_count?: number | null;
   thumbnail_url?: string | null;
 }
 
@@ -38,153 +36,92 @@ async function getFeaturedCourses(): Promise<Course[]> {
 }
 
 // ---------------------------------------------------------------------------
-// Data constants
+// Constants
 // ---------------------------------------------------------------------------
 
 const disciplines = [
-  { code: 'WRT', label: 'Water Restoration', color: '#2490ed' },
-  { code: 'CRT', label: 'Carpet Restoration', color: '#26c4a0' },
-  { code: 'ASD', label: 'Applied Structural Drying', color: '#6c63ff' },
-  { code: 'OCT', label: 'Odour Control', color: '#9b59b6' },
-  { code: 'CCT', label: 'Commercial Carpet', color: '#17b8d4' },
-  { code: 'FSRT', label: 'Fire & Smoke', color: '#f05a35' },
-  { code: 'AMRT', label: 'Applied Microbial', color: '#27ae60' },
+  { code: 'WRT', label: 'Water Restoration' },
+  { code: 'CRT', label: 'Carpet Restoration' },
+  { code: 'ASD', label: 'Structural Drying' },
+  { code: 'AMRT', label: 'Microbial Remediation' },
+  { code: 'FSRT', label: 'Fire & Smoke' },
 ];
 
-const whyCarsi = [
-  {
-    Icon: Shield,
-    title: 'IICRC Aligned',
-    desc: 'Every course built around IICRC technical standards. Earn CECs that count toward your annual maintenance requirements.',
-    color: '#2490ed',
-    glow: 'rgba(36,144,237,0.15)',
-  },
-  {
-    Icon: Zap,
-    title: 'Automatic CEC Tracking',
-    desc: 'Per-discipline CEC ledger updated in real-time. Download your transcript for IICRC submission at any time.',
-    color: '#ed9d24',
-    glow: 'rgba(237,157,36,0.15)',
-  },
-  {
-    Icon: Users,
-    title: 'Industry Recognised',
-    desc: 'Trusted by restoration contractors and insurance assessors across Australia, referencing AS/NZS standards.',
-    color: '#26c4a0',
-    glow: 'rgba(38,196,160,0.15)',
-  },
+const industries = [
+  { slug: 'aged-care', label: 'Aged Care' },
+  { slug: 'childcare', label: 'Childcare' },
+  { slug: 'healthcare', label: 'Healthcare' },
+  { slug: 'construction', label: 'Construction' },
+  { slug: 'property-management', label: 'Property Management' },
+  { slug: 'government-defence', label: 'Government & Defence' },
+  { slug: 'commercial-cleaning', label: 'Commercial Cleaning' },
+  { slug: 'mining', label: 'Mining' },
 ];
 
-const stats = [
-  { value: '261+', label: 'Professionals' },
-  { value: '91', label: 'Courses' },
-  { value: '7', label: 'Disciplines' },
-  { value: '4.9★', label: 'Avg Rating' },
+const benefits = [
+  'IICRC CEC-approved courses',
+  'Automatic credit tracking',
+  'Verifiable digital credentials',
+  'Self-paced online learning',
 ];
-
-const disciplineGrads: Record<string, string> = {
-  WRT: 'from-blue-700 to-blue-900',
-  CRT: 'from-teal-600 to-teal-900',
-  ASD: 'from-indigo-700 to-indigo-900',
-  OCT: 'from-purple-700 to-purple-900',
-  CCT: 'from-cyan-600 to-cyan-900',
-  FSRT: 'from-orange-700 to-red-900',
-  AMRT: 'from-green-700 to-green-900',
-};
 
 // ---------------------------------------------------------------------------
 // Sub-components
 // ---------------------------------------------------------------------------
 
-function GlassStatCard({ value, label }: { value: string; label: string }) {
-  return (
-    <div
-      className="animate-float rounded-xl px-5 py-4 text-center"
-      style={{
-        background: 'rgba(255,255,255,0.05)',
-        backdropFilter: 'blur(20px) saturate(160%)',
-        WebkitBackdropFilter: 'blur(20px) saturate(160%)',
-        border: '1px solid rgba(255,255,255,0.1)',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)',
-      }}
-    >
-      <p className="text-gradient font-display text-2xl font-bold">{value}</p>
-      <p className="mt-0.5 text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
-        {label}
-      </p>
-    </div>
-  );
-}
-
-function FeaturedCourseCard({ course }: { course: Course }) {
+function CourseCard({ course }: { course: Course }) {
   const priceNum =
     typeof course.price_aud === 'string' ? parseFloat(course.price_aud) : course.price_aud;
   const isFree = course.is_free || priceNum === 0;
-  const discipline = course.discipline ?? null;
-  const grad = (discipline && disciplineGrads[discipline]) ?? 'from-blue-700 to-blue-900';
 
   return (
     <Link
       href={`/courses/${course.slug}`}
-      className="glass-card card-3d group flex flex-col overflow-hidden rounded-xl"
+      className="group block overflow-hidden rounded-lg transition-transform duration-200 hover:-translate-y-1"
+      style={{
+        background: 'rgba(255,255,255,0.03)',
+        border: '1px solid rgba(255,255,255,0.08)',
+      }}
     >
-      <div className={`relative h-36 bg-gradient-to-br ${grad} flex-shrink-0 overflow-hidden`}>
+      <div className="relative h-40 overflow-hidden bg-gradient-to-br from-slate-800 to-slate-900">
         {course.thumbnail_url && (
           <Image
             src={course.thumbnail_url}
             alt={course.title}
             fill
-            className="object-cover opacity-75 transition-opacity duration-300 group-hover:opacity-95"
+            className="object-cover opacity-80 transition-opacity duration-200 group-hover:opacity-100"
             sizes="(max-width: 768px) 100vw, 33vw"
           />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-        {discipline && (
+        {course.discipline && (
           <span
-            className="absolute top-2 left-2 rounded-md px-2 py-0.5 font-mono text-xs font-bold"
+            className="absolute top-3 left-3 rounded px-2 py-0.5 font-mono text-[10px] font-bold tracking-wide uppercase"
             style={{
-              color: disciplines.find((d) => d.code === discipline)?.color ?? '#2490ed',
-              background: 'rgba(0,0,0,0.65)',
-              border: `1px solid ${disciplines.find((d) => d.code === discipline)?.color ?? '#2490ed'}40`,
+              background: 'rgba(0,0,0,0.7)',
+              color: '#2490ed',
+              border: '1px solid rgba(36,144,237,0.3)',
             }}
           >
-            {discipline}
+            {course.discipline}
           </span>
         )}
       </div>
-      <div className="flex flex-1 flex-col p-4">
+      <div className="p-4">
         <h3
-          className="mb-2 line-clamp-2 text-sm font-semibold"
+          className="mb-2 line-clamp-2 text-sm leading-snug font-semibold"
           style={{ color: 'rgba(255,255,255,0.9)' }}
         >
           {course.title}
         </h3>
-        {course.short_description && (
-          <p className="mb-3 line-clamp-2 text-xs" style={{ color: 'rgba(255,255,255,0.45)' }}>
-            {course.short_description}
-          </p>
-        )}
-        <div className="mt-auto flex items-center justify-between">
-          <span
-            className="rounded-md px-2 py-0.5 text-xs font-semibold"
-            style={
-              isFree
-                ? {
-                    color: '#27ae60',
-                    background: 'rgba(39,174,96,0.15)',
-                    border: '1px solid rgba(39,174,96,0.3)',
-                  }
-                : {
-                    color: '#ed9d24',
-                    background: 'rgba(237,157,36,0.15)',
-                    border: '1px solid rgba(237,157,36,0.3)',
-                  }
-            }
-          >
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-medium" style={{ color: isFree ? '#27ae60' : '#ed9d24' }}>
             {isFree ? 'Free' : `$${priceNum.toFixed(0)} AUD`}
           </span>
-          <span className="text-xs" style={{ color: '#2490ed' }}>
-            View →
+          <span
+            className="text-xs opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+            style={{ color: '#2490ed' }}
+          >
+            View course →
           </span>
         </div>
       </div>
@@ -192,18 +129,16 @@ function FeaturedCourseCard({ course }: { course: Course }) {
   );
 }
 
-// Skeleton card for when backend unavailable
 function SkeletonCard() {
   return (
     <div
-      className="overflow-hidden rounded-xl"
-      style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
+      className="overflow-hidden rounded-lg"
+      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
     >
-      <div className="shimmer h-36" />
+      <div className="h-40 animate-pulse bg-slate-800/50" />
       <div className="space-y-2 p-4">
-        <div className="shimmer h-3.5 w-3/4 rounded" />
-        <div className="shimmer h-3 w-1/2 rounded" />
-        <div className="shimmer h-3 w-2/3 rounded" />
+        <div className="h-4 w-3/4 animate-pulse rounded bg-slate-700/30" />
+        <div className="h-3 w-1/2 animate-pulse rounded bg-slate-700/30" />
       </div>
     </div>
   );
@@ -217,88 +152,67 @@ export default async function Home() {
   const featuredCourses = await getFeaturedCourses();
 
   return (
-    <div className="relative min-h-screen" style={{ background: '#060a14' }}>
-      {/* ── Animated mesh background ───────────────────────────────────────── */}
-      <div className="mesh-bg" aria-hidden="true">
-        <div className="mesh-blob mesh-blob-1" />
-        <div className="mesh-blob mesh-blob-2" />
-        <div className="mesh-blob mesh-blob-3" />
-      </div>
+    <div className="min-h-screen" style={{ background: '#0a0f1a' }}>
+      {/* Single subtle gradient orb — much calmer than 3 animated blobs */}
+      <div
+        className="pointer-events-none fixed inset-0"
+        style={{
+          background:
+            'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(36,144,237,0.08) 0%, transparent 50%)',
+        }}
+        aria-hidden="true"
+      />
 
-      {/* ── Sticky glass nav ───────────────────────────────────────────────── */}
+      {/* ── Navigation ─────────────────────────────────────────────────────── */}
       <nav
         className="sticky top-0 z-50"
         style={{
-          background: 'rgba(6,10,20,0.8)',
-          backdropFilter: 'blur(20px) saturate(160%)',
-          WebkitBackdropFilter: 'blur(20px) saturate(160%)',
+          background: 'rgba(10,15,26,0.9)',
+          backdropFilter: 'blur(12px)',
           borderBottom: '1px solid rgba(255,255,255,0.06)',
         }}
       >
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex h-14 items-center justify-between">
-            {/* Logo */}
-            <Link href="/" className="group flex items-center gap-2.5">
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="flex h-16 items-center justify-between">
+            <Link href="/" className="flex items-center gap-2">
               <div
-                className="flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-200 group-hover:scale-105"
-                style={{
-                  background: 'linear-gradient(135deg, #2490ed 0%, #38a8ff 100%)',
-                  boxShadow: '0 0 16px rgba(36,144,237,0.4)',
-                }}
+                className="flex h-8 w-8 items-center justify-center rounded-md font-bold text-white"
+                style={{ background: '#2490ed' }}
               >
-                <span className="text-sm leading-none font-bold text-white">C</span>
+                C
               </div>
-              <span
-                className="font-display text-sm font-bold"
-                style={{ color: 'rgba(255,255,255,0.9)' }}
-              >
+              <span className="font-semibold" style={{ color: 'rgba(255,255,255,0.9)' }}>
                 CARSI
               </span>
             </Link>
 
-            {/* Links */}
-            <div
-              className="hidden items-center gap-6 text-sm md:flex"
-              style={{ color: 'rgba(255,255,255,0.5)' }}
-            >
-              {[
-                'Courses|/courses',
-                'Industries|/industries/mining',
-                'Pathways|/pathways',
-                'Pricing|/subscribe',
-                'About|/about',
-              ].map((item) => {
-                const [label, href] = item.split('|');
-                return (
-                  <Link
-                    key={href}
-                    href={href}
-                    className="transition-colors duration-150 hover:text-white"
-                  >
-                    {label}
-                  </Link>
-                );
-              })}
+            <div className="hidden items-center gap-8 md:flex">
+              {['Courses', 'Industries', 'Pathways', 'Pricing'].map((item) => (
+                <Link
+                  key={item}
+                  href={`/${item.toLowerCase()}`}
+                  className="text-sm transition-colors duration-150 hover:text-white"
+                  style={{ color: 'rgba(255,255,255,0.5)' }}
+                >
+                  {item}
+                </Link>
+              ))}
             </div>
 
-            {/* CTA */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-4">
               <Link
                 href="/login"
-                className="hidden px-3 py-1.5 text-sm transition-colors duration-150 sm:inline"
+                className="text-sm transition-colors duration-150 hover:text-white"
                 style={{ color: 'rgba(255,255,255,0.5)' }}
               >
                 Sign In
               </Link>
               <Link
                 href="/subscribe"
-                className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold text-white transition-all duration-200 hover:scale-[1.02]"
-                style={{
-                  background: 'linear-gradient(135deg, #ed9d24 0%, #d4891e 100%)',
-                  boxShadow: '0 0 20px rgba(237,157,36,0.3)',
-                }}
+                className="rounded-md px-4 py-2 text-sm font-medium text-white transition-opacity duration-150 hover:opacity-90"
+                style={{ background: '#ed9d24' }}
               >
-                Enrol Now
+                Start Free Trial
               </Link>
             </div>
           </div>
@@ -306,400 +220,299 @@ export default async function Home() {
       </nav>
 
       {/* ── Hero ───────────────────────────────────────────────────────────── */}
-      <section className="relative mx-auto max-w-7xl px-4 pt-20 pb-16 sm:px-6 lg:px-8">
-        <div className="grid items-center gap-16 lg:grid-cols-2">
-          {/* Left: text */}
-          <div className="animate-slide-up">
-            {/* IICRC pill */}
+      <section className="relative px-6 pt-24 pb-20">
+        <div className="mx-auto max-w-6xl">
+          <div className="max-w-2xl">
             <div
-              className="mb-8 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold"
+              className="mb-6 inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs"
               style={{
-                background: 'rgba(36,144,237,0.12)',
-                border: '1px solid rgba(36,144,237,0.3)',
+                background: 'rgba(36,144,237,0.1)',
+                border: '1px solid rgba(36,144,237,0.2)',
                 color: '#2490ed',
-                boxShadow: '0 0 12px rgba(36,144,237,0.1)',
               }}
             >
-              <span
-                className="animate-pulse-soft h-1.5 w-1.5 rounded-full"
-                style={{ background: '#2490ed' }}
-              />
-              IICRC CEC Approved Platform
+              <span className="h-1.5 w-1.5 rounded-full" style={{ background: '#2490ed' }} />
+              IICRC CEC Approved
             </div>
 
             <h1
-              className="font-display mb-6 text-5xl leading-[1.08] font-bold tracking-tight sm:text-6xl"
+              className="mb-6 text-4xl leading-tight font-bold tracking-tight sm:text-5xl"
               style={{ color: 'rgba(255,255,255,0.95)' }}
             >
-              Australia&apos;s Leading
+              Professional restoration
               <br />
-              Restoration Training
-              <br />
-              <span className="text-gradient">Platform</span>
+              training for Australia
             </h1>
 
             <p
-              className="mb-10 max-w-md text-lg leading-relaxed"
-              style={{ color: 'rgba(255,255,255,0.55)' }}
+              className="mb-8 max-w-lg text-lg leading-relaxed"
+              style={{ color: 'rgba(255,255,255,0.5)' }}
             >
-              IICRC-aligned CEC training for cleaning and restoration professionals. Earn recognised
-              credits and grow your career.
+              Earn IICRC Continuing Education Credits with self-paced online courses. Built for
+              cleaning and restoration professionals.
             </p>
 
-            <div className="flex flex-wrap gap-3">
+            <div className="mb-10 flex flex-wrap gap-3">
               <Link
                 href="/courses"
-                className="inline-flex items-center gap-2 rounded-lg px-6 py-3 text-sm font-semibold text-white transition-all duration-200 hover:scale-[1.03]"
-                style={{
-                  background: 'linear-gradient(135deg, #ed9d24 0%, #d4891e 100%)',
-                  boxShadow: '0 0 24px rgba(237,157,36,0.35)',
-                }}
+                className="inline-flex items-center gap-2 rounded-md px-6 py-3 font-medium text-white transition-opacity duration-150 hover:opacity-90"
+                style={{ background: '#ed9d24' }}
               >
                 Browse Courses <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
                 href="/pathways"
-                className="inline-flex items-center gap-2 rounded-lg px-6 py-3 text-sm font-semibold transition-all duration-200 hover:scale-[1.02]"
+                className="inline-flex items-center gap-2 rounded-md px-6 py-3 font-medium transition-colors duration-150 hover:text-white"
                 style={{
                   background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid rgba(255,255,255,0.12)',
-                  color: 'rgba(255,255,255,0.8)',
-                  backdropFilter: 'blur(12px)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  color: 'rgba(255,255,255,0.7)',
                 }}
               >
                 View Pathways
               </Link>
             </div>
-          </div>
 
-          {/* Right: floating glass stats grid */}
-          <div className="relative">
-            {/* Large glass card — centre piece */}
-            <div
-              className="relative mb-4 overflow-hidden rounded-2xl"
-              style={{
-                background: 'rgba(255,255,255,0.05)',
-                backdropFilter: 'blur(24px)',
-                WebkitBackdropFilter: 'blur(24px)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                boxShadow: '0 24px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1)',
-                height: '200px',
-              }}
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-900/30 to-indigo-900/20" />
-              <Image
-                src="https://carsi.com.au/wp-content/uploads/2024/01/water-damage-restoration-course.jpg"
-                alt="CARSI restoration training"
-                fill
-                className="object-cover opacity-40"
-                sizes="(max-width: 1024px) 100vw, 50vw"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-              <div className="absolute right-5 bottom-4 left-5">
-                <p
-                  className="mb-1 text-xs font-semibold tracking-widest uppercase"
-                  style={{ color: 'rgba(255,255,255,0.4)' }}
+            {/* Simple benefit list — cleaner than animated cards */}
+            <ul className="space-y-2">
+              {benefits.map((benefit) => (
+                <li
+                  key={benefit}
+                  className="flex items-center gap-2 text-sm"
+                  style={{ color: 'rgba(255,255,255,0.5)' }}
                 >
-                  IICRC-Aligned Training
-                </p>
-                <p
-                  className="font-display text-lg font-bold"
-                  style={{ color: 'rgba(255,255,255,0.95)' }}
-                >
-                  Restoration Professionals
-                </p>
-              </div>
-            </div>
-
-            {/* Stats row */}
-            <div className="grid grid-cols-4 gap-3">
-              {stats.map((s) => (
-                <GlassStatCard key={s.label} value={s.value} label={s.label} />
+                  <CheckCircle2 className="h-4 w-4 flex-shrink-0" style={{ color: '#27ae60' }} />
+                  {benefit}
+                </li>
               ))}
-            </div>
-
-            {/* Floating IICRC badge */}
-            <div
-              className="mt-4 flex items-center gap-3 rounded-xl px-4 py-3"
-              style={{
-                background: 'rgba(36,144,237,0.08)',
-                border: '1px solid rgba(36,144,237,0.2)',
-                boxShadow: '0 0 20px rgba(36,144,237,0.08)',
-              }}
-            >
-              <span className="text-2xl">🏷</span>
-              <div>
-                <p className="text-sm font-semibold" style={{ color: '#2490ed' }}>
-                  IICRC CEC Approved
-                </p>
-                <p className="text-xs" style={{ color: 'rgba(255,255,255,0.45)' }}>
-                  Earn Continuing Education Credits as you progress
-                </p>
-              </div>
-            </div>
+            </ul>
           </div>
         </div>
       </section>
 
-      {/* ── Discipline pills strip ─────────────────────────────────────────── */}
-      <section
-        className="relative py-6"
-        style={{
-          borderTop: '1px solid rgba(255,255,255,0.04)',
-          borderBottom: '1px solid rgba(255,255,255,0.04)',
-        }}
-      >
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-wrap justify-center gap-2">
-            {disciplines.map((d) => (
-              <Link
-                key={d.code}
-                href={`/courses?discipline=${d.code}`}
-                className="inline-flex items-center gap-2 rounded-lg px-3.5 py-1.5 text-xs font-medium transition-all duration-200 hover:scale-[1.03]"
-                style={{
-                  background: 'rgba(255,255,255,0.04)',
-                  border: `1px solid ${d.color}30`,
-                  color: 'rgba(255,255,255,0.65)',
-                }}
-              >
-                <span
-                  className="h-1.5 w-1.5 flex-shrink-0 rounded-full"
-                  style={{ backgroundColor: d.color, boxShadow: `0 0 5px ${d.color}` }}
-                />
-                <span className="font-mono text-[10px] font-bold" style={{ color: d.color }}>
-                  {d.code}
-                </span>
-                <span className="hidden sm:inline">{d.label}</span>
-              </Link>
+      {/* ── Stats (simple, no animation) ───────────────────────────────────── */}
+      <section className="px-6 py-12" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+        <div className="mx-auto max-w-6xl">
+          <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
+            {[
+              { value: '261+', label: 'Professionals' },
+              { value: '91', label: 'Courses' },
+              { value: '7', label: 'Disciplines' },
+              { value: '4.9', label: 'Avg Rating' },
+            ].map((stat) => (
+              <div key={stat.label} className="text-center">
+                <p className="text-3xl font-bold" style={{ color: '#2490ed' }}>
+                  {stat.value}
+                </p>
+                <p
+                  className="mt-1 text-xs tracking-wide uppercase"
+                  style={{ color: 'rgba(255,255,255,0.4)' }}
+                >
+                  {stat.label}
+                </p>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── Why CARSI ──────────────────────────────────────────────────────── */}
-      <section className="relative py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-12">
-            <p
-              className="mb-3 text-xs font-semibold tracking-widest uppercase"
-              style={{ color: 'rgba(255,255,255,0.3)' }}
-            >
-              Why Choose CARSI
-            </p>
-            <h2
-              className="font-display text-3xl font-bold"
-              style={{ color: 'rgba(255,255,255,0.92)' }}
-            >
-              Built for the <span className="text-gradient">restoration industry</span>
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
-            {whyCarsi.map((item) => (
-              <div key={item.title} className="glass-card card-3d rounded-xl p-6">
-                <div
-                  className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg"
-                  style={{ background: item.glow, border: `1px solid ${item.color}30` }}
-                >
-                  <item.Icon className="h-5 w-5" style={{ color: item.color }} />
-                </div>
-                <h3
-                  className="font-display mb-2 text-sm font-bold"
-                  style={{ color: 'rgba(255,255,255,0.9)' }}
-                >
-                  {item.title}
-                </h3>
-                <p className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>
-                  {item.desc}
-                </p>
-              </div>
+      {/* ── Disciplines (compact pills) ────────────────────────────────────── */}
+      <section className="px-6 py-12" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+        <div className="mx-auto max-w-6xl">
+          <p
+            className="mb-4 text-center text-xs tracking-wide uppercase"
+            style={{ color: 'rgba(255,255,255,0.3)' }}
+          >
+            IICRC Disciplines
+          </p>
+          <div className="flex flex-wrap justify-center gap-2">
+            {disciplines.map((d) => (
+              <Link
+                key={d.code}
+                href={`/courses?discipline=${d.code}`}
+                className="rounded-md px-3 py-1.5 text-xs transition-colors duration-150 hover:text-white"
+                style={{
+                  background: 'rgba(255,255,255,0.04)',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  color: 'rgba(255,255,255,0.6)',
+                }}
+              >
+                <span className="font-mono font-bold" style={{ color: '#2490ed' }}>
+                  {d.code}
+                </span>
+                <span className="ml-1.5 hidden sm:inline">{d.label}</span>
+              </Link>
             ))}
           </div>
         </div>
       </section>
 
       {/* ── Featured Courses ───────────────────────────────────────────────── */}
-      <section className="relative py-20" style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}>
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-10 flex items-end justify-between">
+      <section className="px-6 py-16" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+        <div className="mx-auto max-w-6xl">
+          <div className="mb-8 flex items-end justify-between">
             <div>
               <p
-                className="mb-2 text-xs font-semibold tracking-widest uppercase"
+                className="mb-1 text-xs tracking-wide uppercase"
                 style={{ color: 'rgba(255,255,255,0.3)' }}
               >
-                Featured Courses
+                Featured
               </p>
-              <h2
-                className="font-display text-3xl font-bold"
-                style={{ color: 'rgba(255,255,255,0.92)' }}
-              >
-                Start your journey
+              <h2 className="text-2xl font-bold" style={{ color: 'rgba(255,255,255,0.9)' }}>
+                Popular Courses
               </h2>
             </div>
             <Link
               href="/courses"
-              className="flex items-center gap-1.5 text-sm font-medium transition-colors duration-150"
+              className="flex items-center gap-1 text-sm transition-colors duration-150 hover:text-white"
               style={{ color: '#2490ed' }}
             >
               All courses <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {featuredCourses.length > 0
-              ? featuredCourses.map((course) => (
-                  <FeaturedCourseCard key={course.id} course={course} />
-                ))
+              ? featuredCourses.map((course) => <CourseCard key={course.id} course={course} />)
               : [1, 2, 3].map((i) => <SkeletonCard key={i} />)}
           </div>
         </div>
       </section>
 
-      {/* ── CTA Banner ─────────────────────────────────────────────────────── */}
-      <section className="relative py-20">
-        <div className="mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
-          <div
-            className="relative overflow-hidden rounded-2xl px-8 py-14"
-            style={{
-              background: 'rgba(255,255,255,0.04)',
-              backdropFilter: 'blur(24px)',
-              WebkitBackdropFilter: 'blur(24px)',
-              border: '1px solid rgba(36,144,237,0.2)',
-              boxShadow: '0 0 60px rgba(36,144,237,0.08), inset 0 1px 0 rgba(255,255,255,0.08)',
-            }}
-          >
-            {/* Glow orb */}
-            <div
-              className="pointer-events-none absolute top-1/2 left-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full"
-              style={{
-                background: 'radial-gradient(circle, rgba(36,144,237,0.12) 0%, transparent 70%)',
-                filter: 'blur(40px)',
-              }}
-            />
+      {/* ── Industries (new section with all 8) ────────────────────────────── */}
+      <section className="px-6 py-16" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+        <div className="mx-auto max-w-6xl">
+          <div className="mb-8">
             <p
-              className="relative z-10 mb-4 text-xs font-semibold tracking-widest uppercase"
+              className="mb-1 text-xs tracking-wide uppercase"
               style={{ color: 'rgba(255,255,255,0.3)' }}
             >
-              Get Started Today
+              Industry Solutions
             </p>
-            <h2
-              className="font-display relative z-10 mb-4 text-4xl font-bold"
-              style={{ color: 'rgba(255,255,255,0.95)' }}
-            >
-              Ready to earn your <span className="text-gradient">IICRC CECs?</span>
+            <h2 className="text-2xl font-bold" style={{ color: 'rgba(255,255,255,0.9)' }}>
+              Training for your sector
             </h2>
-            <p
-              className="relative z-10 mx-auto mb-8 max-w-lg text-base"
-              style={{ color: 'rgba(255,255,255,0.5)' }}
-            >
-              Join 261+ restoration professionals. $795 AUD/year — 7-day free trial.
-            </p>
-            <div className="relative z-10 flex justify-center gap-3">
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {industries.map((industry) => (
               <Link
-                href="/subscribe"
-                className="inline-flex items-center gap-2 rounded-lg px-8 py-3 font-semibold text-white transition-all duration-200 hover:scale-[1.03]"
+                key={industry.slug}
+                href={`/industries/${industry.slug}`}
+                className="group rounded-lg px-4 py-3 transition-colors duration-150"
                 style={{
-                  background: 'linear-gradient(135deg, #ed9d24 0%, #d4891e 100%)',
-                  boxShadow: '0 0 30px rgba(237,157,36,0.4)',
+                  background: 'rgba(255,255,255,0.03)',
+                  border: '1px solid rgba(255,255,255,0.06)',
                 }}
               >
-                Start Free Trial <ArrowRight className="h-4 w-4" />
+                <span
+                  className="text-sm font-medium transition-colors duration-150 group-hover:text-white"
+                  style={{ color: 'rgba(255,255,255,0.7)' }}
+                >
+                  {industry.label}
+                </span>
+                <ArrowRight
+                  className="ml-2 inline h-3 w-3 opacity-0 transition-opacity duration-150 group-hover:opacity-100"
+                  style={{ color: '#2490ed' }}
+                />
               </Link>
-              <Link
-                href="/courses"
-                className="inline-flex items-center gap-2 rounded-lg px-8 py-3 font-semibold transition-all duration-200"
-                style={{
-                  background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid rgba(255,255,255,0.12)',
-                  color: 'rgba(255,255,255,0.8)',
-                }}
-              >
-                Browse First
-              </Link>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* ── Footer ─────────────────────────────────────────────────────────── */}
-      <footer className="relative py-12" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-10 grid grid-cols-2 gap-8 sm:grid-cols-4">
-            <div className="col-span-2 sm:col-span-1">
-              <div className="mb-4 flex items-center gap-2">
+      {/* ── CTA (single, simple) ───────────────────────────────────────────── */}
+      <section className="px-6 py-20" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+        <div className="mx-auto max-w-2xl text-center">
+          <h2 className="mb-4 text-3xl font-bold" style={{ color: 'rgba(255,255,255,0.95)' }}>
+            Ready to get certified?
+          </h2>
+          <p className="mb-8 text-base" style={{ color: 'rgba(255,255,255,0.5)' }}>
+            $795 AUD/year. 7-day free trial. Cancel anytime.
+          </p>
+          <Link
+            href="/subscribe"
+            className="inline-flex items-center gap-2 rounded-md px-8 py-3 font-medium text-white transition-opacity duration-150 hover:opacity-90"
+            style={{ background: '#ed9d24' }}
+          >
+            Start Free Trial <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+      </section>
+
+      {/* ── Footer (simplified) ────────────────────────────────────────────── */}
+      <footer className="px-6 py-12" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+        <div className="mx-auto max-w-6xl">
+          <div className="mb-8 grid gap-8 sm:grid-cols-4">
+            <div>
+              <div className="mb-3 flex items-center gap-2">
                 <div
-                  className="flex h-7 w-7 items-center justify-center rounded-lg"
-                  style={{
-                    background: 'linear-gradient(135deg, #2490ed 0%, #38a8ff 100%)',
-                    boxShadow: '0 0 12px rgba(36,144,237,0.35)',
-                  }}
+                  className="flex h-6 w-6 items-center justify-center rounded text-xs font-bold text-white"
+                  style={{ background: '#2490ed' }}
                 >
-                  <span className="text-xs font-bold text-white">C</span>
+                  C
                 </div>
-                <span
-                  className="font-display text-sm font-bold"
-                  style={{ color: 'rgba(255,255,255,0.8)' }}
-                >
+                <span className="text-sm font-semibold" style={{ color: 'rgba(255,255,255,0.8)' }}>
                   CARSI
                 </span>
               </div>
-              <p
-                className="max-w-[160px] text-xs leading-relaxed"
-                style={{ color: 'rgba(255,255,255,0.35)' }}
-              >
-                Australia&apos;s dedicated restoration training platform.
+              <p className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                Australia&apos;s restoration training platform.
               </p>
             </div>
 
-            {[
-              {
-                heading: 'Disciplines',
-                links: disciplines.slice(0, 4).map((d) => ({
-                  label: `${d.code} — ${d.label}`,
-                  href: `/courses?discipline=${d.code}`,
-                })),
-              },
-              {
-                heading: 'Platform',
-                links: [
-                  { label: 'Pathways', href: '/pathways' },
-                  { label: 'Subscription', href: '/subscribe' },
-                  { label: 'Sign In', href: '/login' },
-                  { label: 'Credentials', href: '/student/credentials' },
-                ],
-              },
-              {
-                heading: 'Contact',
-                links: [{ label: 'info@carsi.com.au', href: 'mailto:info@carsi.com.au' }],
-              },
-            ].map((col) => (
-              <div key={col.heading}>
-                <p
-                  className="mb-3 text-[10px] font-semibold tracking-widest uppercase"
-                  style={{ color: 'rgba(255,255,255,0.3)' }}
-                >
-                  {col.heading}
-                </p>
-                <ul className="space-y-2">
-                  {col.links.map((l) => (
-                    <li key={l.label}>
-                      <Link
-                        href={l.href}
-                        className="text-xs transition-colors duration-150 hover:text-white"
-                        style={{ color: 'rgba(255,255,255,0.4)' }}
-                      >
-                        {l.label}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+            <div>
+              <p
+                className="mb-3 text-[10px] font-semibold tracking-wide uppercase"
+                style={{ color: 'rgba(255,255,255,0.3)' }}
+              >
+                Platform
+              </p>
+              <ul className="space-y-2 text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                {['Courses', 'Pathways', 'Pricing', 'About'].map((item) => (
+                  <li key={item}>
+                    <Link href={`/${item.toLowerCase()}`} className="hover:text-white">
+                      {item}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <p
+                className="mb-3 text-[10px] font-semibold tracking-wide uppercase"
+                style={{ color: 'rgba(255,255,255,0.3)' }}
+              >
+                Industries
+              </p>
+              <ul className="space-y-2 text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                {industries.slice(0, 4).map((industry) => (
+                  <li key={industry.slug}>
+                    <Link href={`/industries/${industry.slug}`} className="hover:text-white">
+                      {industry.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <p
+                className="mb-3 text-[10px] font-semibold tracking-wide uppercase"
+                style={{ color: 'rgba(255,255,255,0.3)' }}
+              >
+                Contact
+              </p>
+              <p className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                info@carsi.com.au
+              </p>
+            </div>
           </div>
 
           <div
             className="flex flex-col items-center justify-between gap-2 pt-6 sm:flex-row"
-            style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}
+            style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}
           >
             <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.25)' }}>
               © 2026 CARSI Pty Ltd. All rights reserved.
