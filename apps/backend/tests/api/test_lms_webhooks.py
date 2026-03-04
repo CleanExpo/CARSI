@@ -51,10 +51,13 @@ def test_webhook_handles_subscription_created():
 
 
 def test_webhook_returns_400_on_invalid_signature():
-    """An invalid Stripe signature returns 400."""
+    """An invalid Stripe signature returns 400 when WEBHOOK_SECRET is configured."""
     import stripe as real_stripe
 
-    with patch("src.api.routes.lms_webhooks.stripe") as mock_stripe:
+    with (
+        patch("src.api.routes.lms_webhooks.WEBHOOK_SECRET", "whsec_test_secret"),
+        patch("src.api.routes.lms_webhooks.stripe") as mock_stripe,
+    ):
         mock_stripe.error.SignatureVerificationError = (
             real_stripe.error.SignatureVerificationError
         )
