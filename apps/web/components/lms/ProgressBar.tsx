@@ -15,7 +15,7 @@ export function ProgressBar({ percentage, label }: ProgressBarProps) {
       <div className="bg-muted h-2 w-full overflow-hidden rounded-full">
         <div
           data-testid="progress-fill"
-          className="bg-brand-primary h-full rounded-full transition-all"
+          className="bg-brand-primary h-full rounded-full transition-all duration-500"
           style={{ width: `${clamped}%` }}
         />
       </div>

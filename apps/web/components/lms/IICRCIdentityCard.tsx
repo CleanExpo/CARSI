@@ -1,5 +1,7 @@
 'use client';
 
+import { AcronymTooltip } from '@/components/ui/AcronymTooltip';
+
 interface IICRCCertification {
   discipline: string;
   certified_at: string; // ISO date
@@ -33,15 +35,16 @@ export function IICRCIdentityCard({
     return (
       <div className="flex flex-col gap-3 rounded-sm border border-white/[0.06] bg-zinc-900/50 p-6">
         <p className="text-sm text-white/50">
-          No IICRC membership linked. Add your IICRC member number to track your CEC credits and
-          renewal status.
+          No <AcronymTooltip term="IICRC" /> membership linked. Add your{' '}
+          <AcronymTooltip term="IICRC" /> member number to track your <AcronymTooltip term="CEC" />{' '}
+          credits and renewal status.
         </p>
         {onEdit && (
           <button
             onClick={onEdit}
             className="text-left text-sm text-cyan-400 underline transition-colors hover:text-cyan-300"
           >
-            + Add IICRC member number
+            + Add <AcronymTooltip term="IICRC" /> member number
           </button>
         )}
       </div>
@@ -53,7 +56,9 @@ export function IICRCIdentityCard({
       {/* Header row */}
       <div className="flex items-start justify-between gap-4">
         <div className="flex flex-col gap-1">
-          <p className="font-mono text-xs tracking-widest text-white/40 uppercase">IICRC Member</p>
+          <p className="font-mono text-xs tracking-widest text-white/40 uppercase">
+            <AcronymTooltip term="IICRC" /> Member
+          </p>
           <p className="font-mono text-2xl font-bold text-white">{memberNumber}</p>
           {expiryDate && (
             <p className="text-xs text-white/40">
@@ -97,7 +102,7 @@ export function IICRCIdentityCard({
           onClick={onEdit}
           className="text-left text-xs text-white/30 underline transition-colors hover:text-white/50"
         >
-          Edit IICRC details
+          Edit <AcronymTooltip term="IICRC" /> details
         </button>
       )}
     </div>

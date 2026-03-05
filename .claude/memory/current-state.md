@@ -1,34 +1,24 @@
 # Current State
 
-> Updated: 05/03/2026 13:25 AEST
+> Updated by PreCompact hook. Session: 96911920
 
 ## Active Task
 
-Fly.io backend deployment — COMPLETE ✅
+Compaction triggered — context was saved at 05/03/2026 14:46 AEST.
+Re-read CONSTITUTION.md if rules feel unclear after compaction.
 
-## What Was Completed This Session
+## Recent Architectural Choices
 
-- Fly.io backend deployed: https://carsi-backend.fly.dev
-- /health → healthy, /ready → database:true, /docs → 200
-- All 6 Alembic migrations (001–006) applied to production DB
-- Three bugs fixed during live deploy:
-  1. Dockerfile: workers 4→1 (OOM on 512MB), CMD uv→.venv direct (permission fix)
-  2. Migration 005/004: sa.text() wrapper for server_default (JSONB quoting bug)
-  3. database.py: connect_args={"ssl": False} for asyncpg on flycast network
+See architectural-decisions.md for logged decisions.
 
 ## In-Progress Work
 
-Branch: feature/gamification-subscription-iicrc (3 commits ahead of origin)
-Not pushed yet — pending user decision on PR.
+Check recent git status: `git status` and `git log --oneline -5`
 
 ## Next Steps
 
-1. Add remaining Fly secrets: STRIPE_SECRET_KEY, ANTHROPIC_API_KEY
-2. Create Redis via Fly dashboard (update REDIS_URL secret)
-3. Configure custom domain api.carsi.com.au
-4. Update Vercel NEXT_PUBLIC_BACKEND_URL to https://api.carsi.com.au
-5. Push branch / create PR for the deploy fixes
+Re-read .claude/memory/CONSTITUTION.md to restore rule context.
 
 ## Last Updated
 
-05/03/2026 13:25 AEST (manual update)
+05/03/2026 14:46 AEST (PreCompact hook)

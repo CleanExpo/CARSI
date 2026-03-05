@@ -9,6 +9,10 @@ import {
 } from '@/components/landing/AnimatedHero';
 import { MobileNav } from '@/components/landing/MobileNav';
 import { FAQSchema } from '@/components/seo/JsonLd';
+import { IICRCDisciplineMap } from '@/components/lms/diagrams/IICRCDisciplineMap';
+import { StudentJourneyMap } from '@/components/lms/diagrams/StudentJourneyMap';
+import { CertificatePreview } from '@/components/lms/diagrams/CertificatePreview';
+import { AcronymTooltip } from '@/components/ui/AcronymTooltip';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -287,7 +291,7 @@ export default async function Home() {
             className="mb-4 text-center text-xs tracking-wide uppercase"
             style={{ color: 'rgba(255,255,255,0.3)' }}
           >
-            IICRC Disciplines
+            <AcronymTooltip term="IICRC" /> Disciplines
           </p>
           <div className="flex flex-wrap justify-center gap-2">
             {disciplines.map((d) => (
@@ -310,6 +314,17 @@ export default async function Home() {
           </div>
         </div>
       </section>
+
+      {/* ── IICRC Discipline Map ────────────────────────────────────────── */}
+      <AnimatedSection label="Certifications" title="IICRC Discipline Map">
+        <div className="mx-auto max-w-xl">
+          <p className="mb-6 text-center text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
+            Explore the seven IICRC disciplines. Hover over each node to see the full certification
+            name.
+          </p>
+          <IICRCDisciplineMap />
+        </div>
+      </AnimatedSection>
 
       {/* ── Featured Courses (Animated) ────────────────────────────────────── */}
       <AnimatedSection
@@ -344,8 +359,8 @@ export default async function Home() {
       <AnimatedSection label="Multi-Industry Training" title="Built for every sector">
         <p className="mb-6 max-w-2xl text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
           From hospitals to hotels, government facilities to commercial buildings — CARSI provides
-          industry-specific training pathways. Not just restoration. Every industry that needs IICRC
-          credentials.
+          industry-specific training pathways. Not just restoration. Every industry that needs{' '}
+          <AcronymTooltip term="IICRC" /> credentials.
         </p>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {industries.map((industry, i) => (
@@ -431,6 +446,16 @@ export default async function Home() {
         </div>
       </AnimatedSection>
 
+      {/* ── How It Works (Student Journey Map) ──────────────────────────── */}
+      <AnimatedSection label="How It Works" title="Your Learning Journey">
+        <div className="mx-auto max-w-3xl">
+          <p className="mb-6 text-center text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
+            From enrolment to credential — six steps to IICRC-recognised professional development.
+          </p>
+          <StudentJourneyMap />
+        </div>
+      </AnimatedSection>
+
       {/* ── Citable Passages (GEO-optimised) ─────────────────────────────── */}
       <AnimatedSection label="Industry Standards" title="What is IICRC Certification?">
         <div className="mx-auto max-w-3xl">
@@ -438,9 +463,10 @@ export default async function Home() {
             className="text-sm leading-relaxed sm:text-base sm:leading-relaxed"
             style={{ color: 'rgba(255,255,255,0.65)' }}
           >
-            The Institute of Inspection Cleaning and Restoration Certification (IICRC) is the global
-            standard-setting body for the cleaning and restoration industry. Established in 1972 in
-            the United States, the IICRC now operates across 25 countries and has certified over
+            The Institute of Inspection Cleaning and Restoration Certification (
+            <AcronymTooltip term="IICRC" />) is the global standard-setting body for the cleaning
+            and restoration industry. Established in 1972 in the United States, the{' '}
+            <AcronymTooltip term="IICRC" /> now operates across 25 countries and has certified over
             67,000 technicians worldwide{' '}
             <span className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
               (source:{' '}
@@ -455,12 +481,18 @@ export default async function Home() {
               )
             </span>
             . The organisation maintains standards across seven core disciplines including Water
-            Damage Restoration (WRT), Carpet Repair and Reinstallation (CRT), Applied Structural
-            Drying (ASD), Applied Microbial Remediation (AMRT), Odour Control (OCT), Carpet Cleaning
-            (CCT), and Fire and Smoke Restoration (FSRT). In Australia, IICRC certification is
-            recognised by major insurers such as IAG, Suncorp, and QBE as evidence of professional
-            competency. Technicians must earn Continuing Education Credits (CECs) every two years to
-            maintain their certified status{' '}
+            Damage Restoration (<AcronymTooltip term="WRT" />
+            ), Carpet Repair and Reinstallation (<AcronymTooltip term="CRT" />
+            ), Applied Structural Drying (<AcronymTooltip term="ASD" />
+            ), Applied Microbial Remediation (<AcronymTooltip term="AMRT" />
+            ), Odour Control (<AcronymTooltip term="OCT" />
+            ), Carpet Cleaning (<AcronymTooltip term="CCT" />
+            ), and Fire and Smoke Restoration (<AcronymTooltip term="FSRT" />
+            ). In Australia, <AcronymTooltip term="IICRC" /> certification is recognised by major
+            insurers such as IAG, Suncorp, and QBE as evidence of professional competency.
+            Technicians must earn Continuing Education Credits (
+            <AcronymTooltip term="CEC">CECs</AcronymTooltip>) every two years to maintain their
+            certified status{' '}
             <span className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
               (source:{' '}
               <a
@@ -473,9 +505,9 @@ export default async function Home() {
               </a>
               )
             </span>
-            . CARSI offers 40 IICRC CEC-approved online courses across all seven disciplines,
-            allowing Australian professionals to meet their renewal requirements without travelling
-            interstate.
+            . CARSI offers 40 <AcronymTooltip term="IICRC" /> <AcronymTooltip term="CEC" />
+            -approved online courses across all seven disciplines, allowing Australian professionals
+            to meet their renewal requirements without travelling interstate.
           </p>
           <p className="mt-4 text-xs italic" style={{ color: 'rgba(255,255,255,0.3)' }}>
             Last reviewed: March 2026
@@ -500,7 +532,8 @@ export default async function Home() {
             are generated instantly as verifiable digital credentials that can be shared with
             employers or added to a LinkedIn profile within minutes. With courses starting from $20
             AUD and a full all-access subscription at $795 AUD per year, CARSI provides the most
-            cost-effective path to IICRC certification maintenance in Australia.
+            cost-effective path to <AcronymTooltip term="IICRC" /> certification maintenance in
+            Australia.
           </p>
           <p className="mt-4 text-xs italic" style={{ color: 'rgba(255,255,255,0.3)' }}>
             Last reviewed: March 2026
@@ -532,13 +565,14 @@ export default async function Home() {
             </span>
             . The NRPG onboarding pathway requires new technicians to complete foundational training
             before entering the field. CARSI fulfils the education pillar of this pathway, providing
-            the IICRC CEC-approved coursework that new entrants must complete alongside practical
-            mentoring, equipment familiarisation, and workplace health and safety induction. This
-            partnership means CARSI-trained technicians are recognised across the NRPG network from
-            day one. For restoration companies, enrolling staff through CARSI ensures compliance
-            with NRPG workforce standards without disrupting operations. With over 91 courses
-            spanning all seven IICRC disciplines, CARSI provides the most comprehensive online
-            training library available to Australian restoration professionals.
+            the <AcronymTooltip term="IICRC" /> <AcronymTooltip term="CEC" />
+            -approved coursework that new entrants must complete alongside practical mentoring,
+            equipment familiarisation, and workplace health and safety induction. This partnership
+            means CARSI-trained technicians are recognised across the NRPG network from day one. For
+            restoration companies, enrolling staff through CARSI ensures compliance with NRPG
+            workforce standards without disrupting operations. With over 91 courses spanning all
+            seven <AcronymTooltip term="IICRC" /> disciplines, CARSI provides the most comprehensive
+            online training library available to Australian restoration professionals.
           </p>
           <p className="mt-4 text-xs italic" style={{ color: 'rgba(255,255,255,0.3)' }}>
             Last reviewed: March 2026
@@ -633,6 +667,17 @@ export default async function Home() {
         </div>
       </AnimatedSection>
 
+      {/* ── Certificate Preview ──────────────────────────────────────────── */}
+      <AnimatedSection label="Credentials" title="Verifiable Digital Certificates">
+        <div className="mx-auto max-w-xl">
+          <p className="mb-6 text-center text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
+            Every completed course earns you a verifiable digital certificate with a public URL you
+            can share with employers and clients.
+          </p>
+          <CertificatePreview />
+        </div>
+      </AnimatedSection>
+
       {/* ── CTA ────────────────────────────────────────────────────────────── */}
       <section className="px-6 py-20" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
         <div className="mx-auto max-w-2xl text-center">
@@ -687,7 +732,8 @@ export default async function Home() {
               <p className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.4)' }}>
                 Australia&apos;s industry training leader.
                 <br />
-                24/7 online. IICRC-approved.
+                24/7 online. <AcronymTooltip term="IICRC" />
+                -approved.
               </p>
             </div>
 
@@ -734,9 +780,45 @@ export default async function Home() {
               >
                 Contact
               </p>
-              <p className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                info@carsi.com.au
-              </p>
+              <ul className="space-y-2 text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                <li>PO Box 4309, Forest Lake QLD 4078</li>
+                <li>
+                  <a href="mailto:support@carsi.com.au" className="hover:text-white">
+                    support@carsi.com.au
+                  </a>
+                </li>
+                <li>
+                  <a href="tel:+61457123005" className="hover:text-white">
+                    0457 123 005
+                  </a>
+                </li>
+              </ul>
+              <div className="mt-4 flex items-center gap-3">
+                {[
+                  { label: 'Facebook', href: 'https://www.facebook.com/CARSIaus' },
+                  {
+                    label: 'YouTube',
+                    href: 'https://www.youtube.com/channel/UC3HpNvGJXivLGoPo4m7Qleg/featured',
+                  },
+                  { label: 'LinkedIn', href: 'https://www.linkedin.com/company/carsiaus' },
+                  {
+                    label: 'Podcast',
+                    href: 'https://open.spotify.com/show/4FVBn8Cfyx2jOx0m4MksuG',
+                  },
+                ].map((social) => (
+                  <a
+                    key={social.label}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[10px] transition-colors hover:text-white"
+                    style={{ color: 'rgba(255,255,255,0.35)' }}
+                    aria-label={social.label}
+                  >
+                    {social.label}
+                  </a>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -748,7 +830,8 @@ export default async function Home() {
               © 2026 CARSI Pty Ltd. All rights reserved.
             </p>
             <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.25)' }}>
-              IICRC-aligned continuing education — not an RTO
+              <AcronymTooltip term="IICRC" />
+              -aligned continuing education — not an <AcronymTooltip term="RTO" />
             </p>
           </div>
         </div>

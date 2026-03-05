@@ -1,5 +1,7 @@
 'use client';
 
+import { AcronymTooltip } from '@/components/ui/AcronymTooltip';
+
 interface CECProgressRingProps {
   cecEarned: number;
   cecRequired?: number; // default: 8 (IICRC standard 3-year cycle)
@@ -44,7 +46,9 @@ export function CECProgressRing({ cecEarned, cecRequired = 8, discipline }: CECP
         <div className="absolute flex flex-col items-center">
           <span className="font-mono text-xl leading-none font-bold text-white">{cecEarned}</span>
           <span className="text-xs leading-none text-white/40">/{cecRequired}</span>
-          <span className="mt-0.5 text-[10px] leading-none text-white/30">CECs</span>
+          <span className="mt-0.5 text-[10px] leading-none text-white/30">
+            <AcronymTooltip term="CEC">CECs</AcronymTooltip>
+          </span>
         </div>
       </div>
 
