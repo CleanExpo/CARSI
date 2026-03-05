@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { Sparkles, Shield, Award, Users } from 'lucide-react';
 import {
   IndustryPageLayout,
@@ -8,6 +9,19 @@ import {
   ContractorAddOns,
 } from '@/components/industries';
 import { FAQSchema } from '@/components/seo/JsonLd';
+
+export const metadata: Metadata = {
+  title: 'Commercial Cleaning IICRC Certification | CARSI',
+  description:
+    'IICRC certification for commercial cleaning contractors in Australia. CRT, CCT, and OCT courses for carpet restoration, odour control, and insurance panel eligibility.',
+  keywords: [
+    'commercial cleaning IICRC certification',
+    'cleaning contractor training Australia',
+    'CRT certification',
+    'CCT commercial carpet',
+    'OCT odour control training',
+  ],
+};
 
 // ---------------------------------------------------------------------------
 // Data Fetching

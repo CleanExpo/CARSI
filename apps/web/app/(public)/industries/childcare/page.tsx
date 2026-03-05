@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { Baby, Shield, Droplets } from 'lucide-react';
 import {
   IndustryPageLayout,
@@ -7,6 +8,18 @@ import {
   IndustryCTA,
   ContractorAddOns,
 } from '@/components/industries';
+
+export const metadata: Metadata = {
+  title: 'Childcare IICRC Training | CARSI',
+  description:
+    'IICRC certification for childcare centre maintenance. AMRT and CRT training supporting NQF compliance across Australian early learning centres.',
+  keywords: [
+    'childcare IICRC training',
+    'early learning centre cleaning',
+    'NQF compliance training',
+    'childcare mould remediation Australia',
+  ],
+};
 
 // ---------------------------------------------------------------------------
 // Data Fetching

@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { FileCheck, Shield, TrendingDown } from 'lucide-react';
 import {
   IndustryPageLayout,
@@ -7,6 +8,18 @@ import {
   IndustryCTA,
   ContractorAddOns,
 } from '@/components/industries';
+
+export const metadata: Metadata = {
+  title: 'Insurance Professional IICRC Training | CARSI',
+  description:
+    'IICRC training for loss adjusters and claims assessors. Scope restoration claims accurately with WRT, FSRT and AMRT certification.',
+  keywords: [
+    'insurance IICRC training',
+    'loss adjuster certification',
+    'claims assessor restoration training',
+    'insurance restoration Australia',
+  ],
+};
 
 // ---------------------------------------------------------------------------
 // Data Fetching

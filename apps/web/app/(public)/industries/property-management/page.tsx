@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { Building, Shield, Droplets, Scale } from 'lucide-react';
 import {
   IndustryPageLayout,
@@ -7,6 +8,18 @@ import {
   IndustryCTA,
   ContractorAddOns,
 } from '@/components/industries';
+
+export const metadata: Metadata = {
+  title: 'Property Management IICRC Training | CARSI',
+  description:
+    'IICRC restoration training for Australian property and strata managers. Mould, water damage and carpet credentials for RTA compliance.',
+  keywords: [
+    'property management IICRC training',
+    'strata manager restoration course',
+    'RTA mould compliance',
+    'property manager water damage Australia',
+  ],
+};
 
 // ---------------------------------------------------------------------------
 // Data Fetching

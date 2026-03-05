@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { Store, ShoppingCart, Wind } from 'lucide-react';
 import {
   IndustryPageLayout,
@@ -7,6 +8,18 @@ import {
   IndustryCTA,
   ContractorAddOns,
 } from '@/components/industries';
+
+export const metadata: Metadata = {
+  title: 'Retail & Shopping Centre IICRC Training | CARSI',
+  description:
+    'IICRC certification for shopping centre maintenance teams. Pre-qualify for major landlord panels with WRT, CRT and OCT credentials.',
+  keywords: [
+    'retail IICRC training',
+    'shopping centre restoration',
+    'retail property maintenance certification',
+    'shopping centre water damage Australia',
+  ],
+};
 
 // ---------------------------------------------------------------------------
 // Data Fetching

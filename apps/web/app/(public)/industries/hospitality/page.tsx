@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { Hotel, Droplets, Footprints, Waves } from 'lucide-react';
 import {
   IndustryPageLayout,
@@ -8,6 +9,19 @@ import {
   ContractorAddOns,
 } from '@/components/industries';
 import { FAQSchema } from '@/components/seo/JsonLd';
+
+export const metadata: Metadata = {
+  title: 'Hospitality IICRC Training | CARSI',
+  description:
+    'IICRC-certified training for Australian hotels and resorts. WRT, CRT, ASD and OCT courses for water damage, carpet care, structural drying and odour control.',
+  keywords: [
+    'hospitality IICRC training',
+    'hotel restoration training',
+    'hotel water damage',
+    'carpet repair certification',
+    'odour control training',
+  ],
+};
 
 // ---------------------------------------------------------------------------
 // Data Fetching

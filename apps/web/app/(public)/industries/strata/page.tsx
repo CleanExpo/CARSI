@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { Building2, ShieldCheck, Layers } from 'lucide-react';
 import {
   IndustryPageLayout,
@@ -7,6 +8,18 @@ import {
   IndustryCTA,
   ContractorAddOns,
 } from '@/components/industries';
+
+export const metadata: Metadata = {
+  title: 'Strata & Body Corporate IICRC Training | CARSI',
+  description:
+    'IICRC certification for strata managers and building managers. Protect common property with WRT, AMRT and ASD restoration credentials.',
+  keywords: [
+    'strata IICRC training',
+    'body corporate restoration',
+    'building manager certification',
+    'strata water damage Australia',
+  ],
+};
 
 // ---------------------------------------------------------------------------
 // Data Fetching

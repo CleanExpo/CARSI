@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { HeartPulse, Shield, Bug } from 'lucide-react';
 import {
   IndustryPageLayout,
@@ -8,6 +9,19 @@ import {
   ContractorAddOns,
 } from '@/components/industries';
 import { FAQSchema } from '@/components/seo/JsonLd';
+
+export const metadata: Metadata = {
+  title: 'Aged Care IICRC Training | CARSI',
+  description:
+    'NQF-compliant IICRC training for aged care facilities. CRT and AMRT courses for carpet restoration, mould remediation, and infection control.',
+  keywords: [
+    'aged care IICRC training',
+    'NQF compliance training',
+    'residential care cleaning certification',
+    'AMRT aged care',
+    'CRT aged care Australia',
+  ],
+};
 
 // ---------------------------------------------------------------------------
 // Data Fetching

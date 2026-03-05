@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { Stethoscope, Shield, Droplets, Flame } from 'lucide-react';
 import {
   IndustryPageLayout,
@@ -8,6 +9,19 @@ import {
   ContractorAddOns,
 } from '@/components/industries';
 import { FAQSchema } from '@/components/seo/JsonLd';
+
+export const metadata: Metadata = {
+  title: 'Healthcare IICRC Training | CARSI',
+  description:
+    'NSQHS-aligned IICRC training for Australian hospitals. AMRT, WRT, FSRT and ASD courses supporting Standard 3 compliance and JCI accreditation.',
+  keywords: [
+    'healthcare IICRC training',
+    'hospital restoration training',
+    'NSQHS Standard 3',
+    'AMRT certification',
+    'medical facility cleaning',
+  ],
+};
 
 // ---------------------------------------------------------------------------
 // Data Fetching

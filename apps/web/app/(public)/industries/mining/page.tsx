@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { Pickaxe, Shield, Droplets, Wind } from 'lucide-react';
 import {
   IndustryPageLayout,
@@ -7,6 +8,19 @@ import {
   IndustryCTA,
   ContractorAddOns,
 } from '@/components/industries';
+
+export const metadata: Metadata = {
+  title: 'Mining Site IICRC Restoration Training | CARSI',
+  description:
+    'WHS-compliant IICRC restoration training for Australian mining operations. WRT, AMRT, and ASD courses for water damage, mould, and structural drying on remote sites.',
+  keywords: [
+    'mining IICRC training Australia',
+    'WHS compliance restoration',
+    'WRT water damage mining',
+    'AMRT mould remediation mining',
+    'ASD structural drying',
+  ],
+};
 
 // ---------------------------------------------------------------------------
 // Data Fetching

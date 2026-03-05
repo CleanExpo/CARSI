@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { Building2, Shield, Flame } from 'lucide-react';
 import {
   IndustryPageLayout,
@@ -8,6 +9,19 @@ import {
   ContractorAddOns,
 } from '@/components/industries';
 import { FAQSchema } from '@/components/seo/JsonLd';
+
+export const metadata: Metadata = {
+  title: 'Government & Defence IICRC Training | CARSI',
+  description:
+    'WHS-compliant IICRC training for Australian councils, agencies and defence facilities. AMRT, WRT, ASD and FSRT courses for AusTender compliance.',
+  keywords: [
+    'government IICRC training',
+    'defence facility restoration',
+    'AusTender compliance',
+    'WHS mould training',
+    'heritage building restoration',
+  ],
+};
 
 // ---------------------------------------------------------------------------
 // Data Fetching

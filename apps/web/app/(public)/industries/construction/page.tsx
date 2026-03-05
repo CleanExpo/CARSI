@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { HardHat, Shield, Droplets } from 'lucide-react';
 import {
   IndustryPageLayout,
@@ -7,6 +8,18 @@ import {
   IndustryCTA,
   ContractorAddOns,
 } from '@/components/industries';
+
+export const metadata: Metadata = {
+  title: 'Construction IICRC Training | CARSI',
+  description:
+    'IICRC water damage and mould management training for Australian construction sites. WRT, ASD and AMRT courses supporting NCC compliance.',
+  keywords: [
+    'construction IICRC training',
+    'building site mould management',
+    'NCC compliance restoration',
+    'construction water damage Australia',
+  ],
+};
 
 // ---------------------------------------------------------------------------
 // Data Fetching

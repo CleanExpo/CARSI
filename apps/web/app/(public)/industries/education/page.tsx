@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { GraduationCap, ShieldCheck, Building, Users } from 'lucide-react';
 import {
   IndustryPageLayout,
@@ -7,6 +8,18 @@ import {
   IndustryCTA,
   ContractorAddOns,
 } from '@/components/industries';
+
+export const metadata: Metadata = {
+  title: 'Education Sector IICRC Training | CARSI',
+  description:
+    'IICRC certification for school and university maintenance teams. WRT, CRT, AMRT and ASD training for Australian education facilities.',
+  keywords: [
+    'education IICRC training',
+    'school restoration certification',
+    'university maintenance IICRC',
+    'education mould remediation Australia',
+  ],
+};
 
 // ---------------------------------------------------------------------------
 // Data Fetching
