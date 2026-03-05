@@ -109,7 +109,7 @@ export function CourseGrid({ courses, initialTab = 'All', loading = false }: Cou
               role="tab"
               aria-selected={isActive}
               onClick={() => setActiveTab(tab)}
-              className="relative px-4 py-3 text-sm font-medium whitespace-nowrap transition-all duration-200"
+              className="relative min-h-[44px] px-4 py-3 text-sm font-medium whitespace-nowrap transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
               style={isActive ? { color: accentColor } : { color: 'rgba(255,255,255,0.4)' }}
             >
               {tab}
@@ -138,7 +138,7 @@ export function CourseGrid({ courses, initialTab = 'All', loading = false }: Cou
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search courses..."
               aria-label="Search courses"
-              className="w-52 rounded-lg py-2 pr-4 pl-9 text-sm transition-all duration-200 focus:outline-none"
+              className="w-52 rounded-lg py-2 pr-4 pl-9 text-sm transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/50"
               style={{
                 background: 'rgba(255,255,255,0.05)',
                 border: '1px solid rgba(255,255,255,0.1)',
@@ -169,7 +169,7 @@ export function CourseGrid({ courses, initialTab = 'All', loading = false }: Cou
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value as SortKey)}
           aria-label="Sort courses by"
-          className="rounded-lg px-3 py-2 text-sm focus:outline-none"
+          className="rounded-lg px-3 py-2 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/50"
           style={{
             background: 'rgba(255,255,255,0.05)',
             border: '1px solid rgba(255,255,255,0.1)',

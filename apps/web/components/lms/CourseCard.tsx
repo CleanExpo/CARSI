@@ -215,7 +215,7 @@ export function CourseCard({ course }: CourseCardProps) {
           </div>
           <Link
             href={`/courses/${course.slug}`}
-            className="text-xs font-medium transition-all duration-150"
+            className="-m-2 flex min-h-[44px] min-w-[44px] items-center justify-center rounded-sm p-2 text-xs font-medium transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/50"
             style={{ color: ds.color }}
           >
             View →
