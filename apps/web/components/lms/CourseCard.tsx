@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -21,6 +22,53 @@ interface CourseCardProps {
     updated_at?: string | null;
     instructor?: { full_name: string } | null;
   };
+}
+
+/**
+ * Generates a fallback thumbnail path based on the course slug.
+ * Attempts to find a matching local image in /images/courses/
+ */
+function getFallbackThumbnail(slug: string, title: string): string | null {
+  // Common slug transformations
+  const candidates = [
+    slug,
+    slug.replace(/-/g, '-'),
+    title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, ''),
+  ];
+
+  // Known course image mappings (subset - common patterns)
+  const knownImages = new Set([
+    'intro-water-damage-restoration',
+    'intro-applied-structural-drying',
+    'intro-applied-microbial-remediation',
+    'mould-remediation-level-1',
+    'carpet-cleaning-basics',
+    'dehumidification',
+    'flood-restoration',
+    'fire-damage-assessment',
+    'biohazard-remediation',
+    'contents-restoration',
+    'emergency-response',
+    'insurance-documentation',
+    'healthcare-cleaning',
+    'commercial-kitchen-cleaning',
+    'hard-floor-cleaning',
+    'odour-control',
+    'smoke-damage',
+    'water-extraction',
+    'structural-drying',
+  ]);
+
+  for (const candidate of candidates) {
+    if (knownImages.has(candidate)) {
+      return `/images/courses/${candidate}.webp`;
+    }
+  }
+
+  return null;
 }
 
 const disciplineColors: Record<string, { color: string; glow: string; grad: string }> = {
@@ -51,6 +99,7 @@ function formatRelativeDate(dateStr: string | null | undefined): string {
 const smoothEase: [number, number, number, number] = [0.4, 0, 0.2, 1];
 
 export function CourseCard({ course }: CourseCardProps) {
+  const [imageError, setImageError] = useState(false);
   const priceNum =
     typeof course.price_aud === 'string' ? parseFloat(course.price_aud) : course.price_aud;
   const isFree = course.is_free || priceNum === 0;
@@ -64,6 +113,12 @@ export function CourseCard({ course }: CourseCardProps) {
 
   const ds = (discipline ? disciplineColors[discipline] : undefined) ?? defaultStyle;
 
+  // Determine thumbnail: API URL > local fallback > none (show gradient)
+  const thumbnailUrl =
+    !imageError && course.thumbnail_url
+      ? course.thumbnail_url
+      : getFallbackThumbnail(course.slug, course.title);
+
   return (
     <motion.div
       className="glass-card card-3d group flex flex-col overflow-hidden rounded-xl"
@@ -74,13 +129,14 @@ export function CourseCard({ course }: CourseCardProps) {
       <div
         className={`relative h-32 w-full bg-gradient-to-br ${ds.grad} flex-shrink-0 overflow-hidden`}
       >
-        {course.thumbnail_url && (
+        {thumbnailUrl && (
           <Image
-            src={course.thumbnail_url}
+            src={thumbnailUrl}
             alt={course.title}
             fill
             className="object-cover opacity-80 transition-opacity duration-300 group-hover:opacity-100"
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+            onError={() => setImageError(true)}
           />
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
