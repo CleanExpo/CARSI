@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 
 import { BundlePricingCard } from '@/components/lms/BundlePricingCard';
 import { CourseGrid } from '@/components/lms/CourseGrid';
+import { CECCalculator } from '@/components/tools/CECCalculator';
 
 export const metadata: Metadata = {
   title: 'IICRC-Approved Restoration Training Courses | CARSI',
@@ -51,7 +52,7 @@ export default async function CoursesPage({
   const [bundles, { items: courses, total }] = await Promise.all([getBundles(), getCourses()]);
 
   return (
-    <main className="relative min-h-screen" style={{ background: '#060a14' }}>
+    <main id="main-content" className="relative min-h-screen" style={{ background: '#060a14' }}>
       {/* Mesh background */}
       <div className="mesh-bg" aria-hidden="true">
         <div className="mesh-blob mesh-blob-1" />
@@ -158,6 +159,11 @@ export default async function CoursesPage({
               documented, portable, and recognised internationally across the restoration industry.
             </p>
           </section>
+        </div>
+
+        {/* CEC Calculator — interactive tool */}
+        <div className="mb-8">
+          <CECCalculator />
         </div>
 
         {/* Industry Bundles */}

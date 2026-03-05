@@ -76,7 +76,10 @@ export function LMSIconRail() {
       </Link>
 
       {/* Top nav */}
-      <nav className="flex w-full flex-col items-center gap-0.5 px-1.5">
+      <nav
+        aria-label="Main navigation"
+        className="flex w-full flex-col items-center gap-0.5 px-1.5"
+      >
         {topNav.map((item) => {
           if (item.adminOnly && !isAdmin) return null;
           if (item.instructorOnly && !isInstructor) return null;
@@ -88,6 +91,7 @@ export function LMSIconRail() {
               key={item.href}
               href={item.href}
               title={item.label}
+              aria-label={item.label}
               className="group relative flex h-10 w-10 items-center justify-center rounded-lg transition-all duration-200"
               style={
                 isActive
@@ -129,6 +133,7 @@ export function LMSIconRail() {
         <Link
           href="/dashboard/settings"
           title="Settings"
+          aria-label="Settings"
           className="flex h-10 w-10 items-center justify-center rounded-lg transition-all duration-200"
           style={{
             color: pathname.startsWith('/dashboard/settings')
@@ -143,6 +148,7 @@ export function LMSIconRail() {
         <button
           onClick={handleSignOut}
           title={`${user?.email ?? 'Account'} — click to sign out`}
+          aria-label="Sign out"
           className="mt-1 flex h-9 w-9 items-center justify-center rounded-lg text-xs font-bold text-white transition-all duration-200 hover:scale-105"
           style={{
             background: 'linear-gradient(135deg, #2490ed 0%, #1a7fd4 100%)',

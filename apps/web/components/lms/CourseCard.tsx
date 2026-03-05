@@ -1,3 +1,6 @@
+'use client';
+
+import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
 import { BookOpen, Clock } from 'lucide-react';
@@ -45,6 +48,8 @@ function formatRelativeDate(dateStr: string | null | undefined): string {
   return `${Math.floor(days / 30)}mo ago`;
 }
 
+const smoothEase: [number, number, number, number] = [0.4, 0, 0.2, 1];
+
 export function CourseCard({ course }: CourseCardProps) {
   const priceNum =
     typeof course.price_aud === 'string' ? parseFloat(course.price_aud) : course.price_aud;
@@ -60,7 +65,11 @@ export function CourseCard({ course }: CourseCardProps) {
   const ds = (discipline ? disciplineColors[discipline] : undefined) ?? defaultStyle;
 
   return (
-    <div className="glass-card card-3d group flex flex-col overflow-hidden rounded-xl">
+    <motion.div
+      className="glass-card card-3d group flex flex-col overflow-hidden rounded-xl"
+      whileHover={{ scale: 1.02, y: -4 }}
+      transition={{ duration: 0.25, ease: smoothEase }}
+    >
       {/* Image / gradient header */}
       <div
         className={`relative h-32 w-full bg-gradient-to-br ${ds.grad} flex-shrink-0 overflow-hidden`}
@@ -157,6 +166,6 @@ export function CourseCard({ course }: CourseCardProps) {
           </Link>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

@@ -1,8 +1,12 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import { motion } from 'framer-motion';
 import { Search, SlidersHorizontal } from 'lucide-react';
 import { CourseCard } from './CourseCard';
+import { CourseGridSkeleton } from './CourseCardSkeleton';
+
+const smoothEase: [number, number, number, number] = [0.4, 0, 0.2, 1];
 
 const DISCIPLINE_TABS = ['All', 'WRT', 'CRT', 'ASD', 'OCT', 'CCT', 'FSRT', 'AMRT', 'Free'] as const;
 type DisciplineTab = (typeof DISCIPLINE_TABS)[number];
@@ -36,6 +40,7 @@ interface Course {
 interface CourseGridProps {
   courses: Course[];
   initialTab?: string;
+  loading?: boolean;
 }
 
 type SortKey = 'title' | 'price' | 'updated';
@@ -65,7 +70,7 @@ function matchesDiscipline(course: Course, tab: DisciplineTab): boolean {
   return disc.toUpperCase().includes(tab);
 }
 
-export function CourseGrid({ courses, initialTab = 'All' }: CourseGridProps) {
+export function CourseGrid({ courses, initialTab = 'All', loading = false }: CourseGridProps) {
   const validInitial: DisciplineTab = (DISCIPLINE_TABS as readonly string[]).includes(initialTab)
     ? (initialTab as DisciplineTab)
     : 'All';
@@ -91,6 +96,8 @@ export function CourseGrid({ courses, initialTab = 'All' }: CourseGridProps) {
       {/* Discipline tab bar */}
       <div
         className="scrollbar-hide mb-5 flex overflow-x-auto"
+        role="tablist"
+        aria-label="Filter by discipline"
         style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}
       >
         {DISCIPLINE_TABS.map((tab) => {
@@ -99,6 +106,8 @@ export function CourseGrid({ courses, initialTab = 'All' }: CourseGridProps) {
           return (
             <button
               key={tab}
+              role="tab"
+              aria-selected={isActive}
               onClick={() => setActiveTab(tab)}
               className="relative px-4 py-3 text-sm font-medium whitespace-nowrap transition-all duration-200"
               style={isActive ? { color: accentColor } : { color: 'rgba(255,255,255,0.4)' }}
@@ -128,6 +137,7 @@ export function CourseGrid({ courses, initialTab = 'All' }: CourseGridProps) {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search courses..."
+              aria-label="Search courses"
               className="w-52 rounded-lg py-2 pr-4 pl-9 text-sm transition-all duration-200 focus:outline-none"
               style={{
                 background: 'rgba(255,255,255,0.05)',
@@ -158,6 +168,7 @@ export function CourseGrid({ courses, initialTab = 'All' }: CourseGridProps) {
         <select
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value as SortKey)}
+          aria-label="Sort courses by"
           className="rounded-lg px-3 py-2 text-sm focus:outline-none"
           style={{
             background: 'rgba(255,255,255,0.05)',
@@ -172,10 +183,19 @@ export function CourseGrid({ courses, initialTab = 'All' }: CourseGridProps) {
       </div>
 
       {/* Grid */}
-      {filtered.length > 0 ? (
+      {loading ? (
+        <CourseGridSkeleton />
+      ) : filtered.length > 0 ? (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {filtered.map((course) => (
-            <CourseCard key={course.id} course={course} />
+          {filtered.map((course, i) => (
+            <motion.div
+              key={course.id}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, ease: smoothEase, delay: i * 0.05 }}
+            >
+              <CourseCard course={course} />
+            </motion.div>
           ))}
         </div>
       ) : (

@@ -1,5 +1,6 @@
 import { LMSIconRail } from '@/components/layout/LMSIconRail';
 import { LMSContextPanel } from '@/components/layout/LMSContextPanel';
+import { PageTransition } from '@/components/layout/PageTransition';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -14,7 +15,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <LMSIconRail />
       <LMSContextPanel />
 
-      <main className="relative z-10 flex-1 overflow-auto">{children}</main>
+      <main id="main-content" className="relative z-10 flex-1 overflow-auto">
+        <PageTransition>{children}</PageTransition>
+      </main>
     </div>
   );
 }

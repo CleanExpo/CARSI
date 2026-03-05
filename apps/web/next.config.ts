@@ -52,6 +52,12 @@ const nextConfig: NextConfig = {
         hostname: 'drive.google.com',
         pathname: '/**',
       },
+      {
+        // Unsplash (design-system demo page)
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+        pathname: '/**',
+      },
     ],
   },
   async headers() {

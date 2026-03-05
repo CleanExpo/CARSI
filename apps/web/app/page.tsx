@@ -8,6 +8,7 @@ import {
   AnimatedSection,
 } from '@/components/landing/AnimatedHero';
 import { MobileNav } from '@/components/landing/MobileNav';
+import { FAQSchema } from '@/components/seo/JsonLd';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -82,6 +83,34 @@ const stats = [
   { value: '12+', label: 'Industries Served' },
   { value: '91', label: 'Courses' },
   { value: '7', label: 'IICRC Disciplines' },
+];
+
+const faqs = [
+  {
+    question: 'What is CARSI?',
+    answer:
+      'CARSI is an Australian online training platform offering IICRC CEC-approved courses for cleaning and restoration professionals. With over 91 courses across seven IICRC disciplines, CARSI enables technicians to maintain their certification entirely online.',
+  },
+  {
+    question: 'How do IICRC CECs work?',
+    answer:
+      'IICRC Continuing Education Credits (CECs) are required every two years to maintain certified technician status. Each CARSI course awards a specific number of CECs upon completion. Credits are tracked automatically in your student dashboard and can be reported to the IICRC for renewal.',
+  },
+  {
+    question: 'Is CARSI training recognised by insurers?',
+    answer:
+      'CARSI courses are IICRC CEC-approved, and IICRC certification is recognised by major Australian insurers including IAG, Suncorp, and QBE as evidence of professional competency. CARSI is also a core pillar of the NRPG onboarding pathway.',
+  },
+  {
+    question: 'Can I complete training at my own pace?',
+    answer:
+      'Yes. All CARSI courses are available 24/7 and fully self-paced. You can pause mid-lesson, resume between jobs, and fit study around shift work or on-call rosters. There are no deadlines or scheduled class times.',
+  },
+  {
+    question: 'What industries does CARSI serve?',
+    answer:
+      'CARSI serves over 12 industries including healthcare, hospitality, aged care, mining and resources, commercial cleaning, government and defence, education, property management, strata, retail, childcare, and construction.',
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -171,7 +200,10 @@ export default async function Home() {
   const featuredCourses = await getFeaturedCourses();
 
   return (
-    <div className="min-h-screen" style={{ background: '#0a0f1a' }}>
+    <div id="main-content" className="min-h-screen" style={{ background: '#0a0f1a' }}>
+      {/* FAQ structured data for GEO/AI search engines */}
+      <FAQSchema questions={faqs} />
+
       {/* Single subtle gradient orb — much calmer than 3 animated blobs */}
       <div
         className="pointer-events-none fixed inset-0"
@@ -184,6 +216,7 @@ export default async function Home() {
 
       {/* ── Navigation ─────────────────────────────────────────────────────── */}
       <nav
+        aria-label="Main navigation"
         className="sticky top-0 z-50"
         style={{
           background: 'rgba(10,15,26,0.9)',
@@ -408,15 +441,44 @@ export default async function Home() {
             The Institute of Inspection Cleaning and Restoration Certification (IICRC) is the global
             standard-setting body for the cleaning and restoration industry. Established in 1972 in
             the United States, the IICRC now operates across 25 countries and has certified over
-            67,000 technicians worldwide. The organisation maintains standards across seven core
-            disciplines including Water Damage Restoration (WRT), Carpet Repair and Reinstallation
-            (CRT), Applied Structural Drying (ASD), Applied Microbial Remediation (AMRT), Odour
-            Control (OCT), Carpet Cleaning (CCT), and Fire and Smoke Restoration (FSRT). In
-            Australia, IICRC certification is recognised by major insurers such as IAG, Suncorp, and
-            QBE as evidence of professional competency. Technicians must earn Continuing Education
-            Credits (CECs) every two years to maintain their certified status. CARSI offers 40 IICRC
-            CEC-approved online courses across all seven disciplines, allowing Australian
-            professionals to meet their renewal requirements without travelling interstate.
+            67,000 technicians worldwide{' '}
+            <span className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
+              (source:{' '}
+              <a
+                href="https://www.iicrc.org/page/About-the-IICRC"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline decoration-dotted hover:text-white"
+              >
+                IICRC.org
+              </a>
+              )
+            </span>
+            . The organisation maintains standards across seven core disciplines including Water
+            Damage Restoration (WRT), Carpet Repair and Reinstallation (CRT), Applied Structural
+            Drying (ASD), Applied Microbial Remediation (AMRT), Odour Control (OCT), Carpet Cleaning
+            (CCT), and Fire and Smoke Restoration (FSRT). In Australia, IICRC certification is
+            recognised by major insurers such as IAG, Suncorp, and QBE as evidence of professional
+            competency. Technicians must earn Continuing Education Credits (CECs) every two years to
+            maintain their certified status{' '}
+            <span className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
+              (source:{' '}
+              <a
+                href="https://www.iicrc.org/page/IICRCGlobalLocations"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline decoration-dotted hover:text-white"
+              >
+                IICRC Global
+              </a>
+              )
+            </span>
+            . CARSI offers 40 IICRC CEC-approved online courses across all seven disciplines,
+            allowing Australian professionals to meet their renewal requirements without travelling
+            interstate.
+          </p>
+          <p className="mt-4 text-xs italic" style={{ color: 'rgba(255,255,255,0.3)' }}>
+            Last reviewed: March 2026
           </p>
         </div>
       </AnimatedSection>
@@ -440,6 +502,9 @@ export default async function Home() {
             AUD and a full all-access subscription at $795 AUD per year, CARSI provides the most
             cost-effective path to IICRC certification maintenance in Australia.
           </p>
+          <p className="mt-4 text-xs italic" style={{ color: 'rgba(255,255,255,0.3)' }}>
+            Last reviewed: March 2026
+          </p>
         </div>
       </AnimatedSection>
 
@@ -452,16 +517,31 @@ export default async function Home() {
             CARSI is one of the four core pillars of the National Restoration Professionals Group
             (NRPG) onboarding pathway. The NRPG is Australia&apos;s peak body for the restoration
             and remediation industry, setting workforce standards that insurers, loss adjusters, and
-            building managers rely on when selecting qualified contractors. The NRPG onboarding
-            pathway requires new technicians to complete foundational training before entering the
-            field. CARSI fulfils the education pillar of this pathway, providing the IICRC
-            CEC-approved coursework that new entrants must complete alongside practical mentoring,
-            equipment familiarisation, and workplace health and safety induction. This partnership
-            means CARSI-trained technicians are recognised across the NRPG network from day one. For
-            restoration companies, enrolling staff through CARSI ensures compliance with NRPG
-            workforce standards without disrupting operations. With over 91 courses spanning all
-            seven IICRC disciplines, CARSI provides the most comprehensive online training library
-            available to Australian restoration professionals.
+            building managers rely on when selecting qualified contractors{' '}
+            <span className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
+              (source:{' '}
+              <a
+                href="https://www.nrpg.com.au"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline decoration-dotted hover:text-white"
+              >
+                NRPG.com.au
+              </a>
+              )
+            </span>
+            . The NRPG onboarding pathway requires new technicians to complete foundational training
+            before entering the field. CARSI fulfils the education pillar of this pathway, providing
+            the IICRC CEC-approved coursework that new entrants must complete alongside practical
+            mentoring, equipment familiarisation, and workplace health and safety induction. This
+            partnership means CARSI-trained technicians are recognised across the NRPG network from
+            day one. For restoration companies, enrolling staff through CARSI ensures compliance
+            with NRPG workforce standards without disrupting operations. With over 91 courses
+            spanning all seven IICRC disciplines, CARSI provides the most comprehensive online
+            training library available to Australian restoration professionals.
+          </p>
+          <p className="mt-4 text-xs italic" style={{ color: 'rgba(255,255,255,0.3)' }}>
+            Last reviewed: March 2026
           </p>
         </div>
       </AnimatedSection>
@@ -516,6 +596,42 @@ export default async function Home() {
           </div>
         </div>
       </section>
+
+      {/* ── FAQ (visible + schema) ─────────────────────────────────────────── */}
+      <AnimatedSection label="Common Questions" title="Frequently Asked Questions">
+        <div className="mx-auto max-w-3xl space-y-4">
+          {faqs.map((faq, i) => (
+            <AnimatedCard key={faq.question} index={i}>
+              <details
+                className="group rounded-lg"
+                style={{
+                  background: 'rgba(255,255,255,0.03)',
+                  border: '1px solid rgba(255,255,255,0.06)',
+                }}
+              >
+                <summary
+                  className="flex cursor-pointer items-center justify-between px-5 py-4 text-sm font-medium select-none"
+                  style={{ color: 'rgba(255,255,255,0.85)' }}
+                >
+                  {faq.question}
+                  <span
+                    className="ml-2 transition-transform duration-200 group-open:rotate-45"
+                    style={{ color: '#2490ed' }}
+                  >
+                    +
+                  </span>
+                </summary>
+                <div
+                  className="px-5 pb-4 text-sm leading-relaxed"
+                  style={{ color: 'rgba(255,255,255,0.55)' }}
+                >
+                  {faq.answer}
+                </div>
+              </details>
+            </AnimatedCard>
+          ))}
+        </div>
+      </AnimatedSection>
 
       {/* ── CTA ────────────────────────────────────────────────────────────── */}
       <section className="px-6 py-20" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>

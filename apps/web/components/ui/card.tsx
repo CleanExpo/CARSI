@@ -1,4 +1,5 @@
 import * as React from 'react';
+import Image from 'next/image';
 import { cva, type VariantProps } from 'class-variance-authority';
 
 import { cn } from '@/lib/utils';
@@ -111,29 +112,34 @@ CardFooter.displayName = 'CardFooter';
 /* ----------------------------------------
    Card Image Component
    ---------------------------------------- */
-interface CardImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
+interface CardImageProps {
+  src: string;
+  alt?: string;
   aspectRatio?: 'video' | 'square' | 'wide';
+  className?: string;
+  sizes?: string;
+  priority?: boolean;
 }
 
-const CardImage = React.forwardRef<HTMLImageElement, CardImageProps>(
-  ({ className, aspectRatio = 'video', alt = '', ...props }, ref) => (
+const CardImage = React.forwardRef<HTMLDivElement, CardImageProps>(
+  ({ className, aspectRatio = 'video', alt = '', src, sizes, priority, ...props }, ref) => (
     <div
+      ref={ref}
       className={cn(
         'relative overflow-hidden rounded-t-xl',
         aspectRatio === 'video' && 'aspect-video',
         aspectRatio === 'square' && 'aspect-square',
         aspectRatio === 'wide' && 'aspect-[21/9]'
       )}
+      {...props}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element -- Generic UI component supporting external URLs */}
-      <img
-        ref={ref}
+      <Image
+        src={src}
         alt={alt}
-        className={cn(
-          'duration-slow h-full w-full object-cover transition-transform hover:scale-105',
-          className
-        )}
-        {...props}
+        fill
+        sizes={sizes ?? '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'}
+        priority={priority}
+        className={cn('duration-slow object-cover transition-transform hover:scale-105', className)}
       />
     </div>
   )
