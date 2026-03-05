@@ -15,7 +15,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.api.deps_lms import get_current_lms_user
 from src.api.schemas.lms_progress import CourseProgressOut, LessonCompleteRequest, ProgressOut
 from src.config.database import get_async_db
-from src.db.lms_models import LMSEnrollment, LMSLesson, LMSModule, LMSProgress, LMSUser
+from src.db.lms_models import LMSCourse, LMSEnrollment, LMSLesson, LMSModule, LMSProgress, LMSUser
 
 router = APIRouter(tags=["lms-progress"])
 
@@ -122,6 +122,23 @@ async def mark_lesson_complete(
             "course_id": str(course_id),
             "completed_at": datetime.now(timezone.utc).isoformat(),
         }))
+
+        # Fire-and-forget: push to Synthex for marketing automation
+        from src.services.synthex_connector import notify_course_completed
+
+        # Fetch course details for Synthex
+        course_result = await db.execute(
+            select(LMSCourse).where(LMSCourse.id == course_id)
+        )
+        course = course_result.scalar_one_or_none()
+        if course:
+            asyncio.create_task(notify_course_completed(
+                student_id=current_user.id,
+                course_id=course_id,
+                course_title=course.title,
+                discipline=course.iicrc_discipline,
+                cec_hours_earned=float(course.cec_hours) if course.cec_hours else None,
+            ))
 
     return ProgressOut(
         lesson_id=progress.lesson_id,

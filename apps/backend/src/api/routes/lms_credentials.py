@@ -78,6 +78,20 @@ async def get_credential(
             "issued_at": issued_ts.isoformat() if issued_ts else None,
         }))
 
+        # Fire-and-forget: push to Synthex for marketing automation
+        from src.services.synthex_connector import notify_certification_awarded
+        from uuid import UUID
+
+        if student:
+            asyncio.create_task(notify_certification_awarded(
+                student_id=student.id,
+                credential_id=UUID(credential_id) if isinstance(credential_id, str) else credential_id,
+                credential_type="course_completion",
+                discipline=course.iicrc_discipline if course else None,
+                cec_hours=float(course.cec_hours) if course and course.cec_hours else None,
+                public_url=f"https://carsi.com.au/credentials/{credential_id}",
+            ))
+
     return CredentialOut(
         credential_id=credential_id,
         valid=is_valid,

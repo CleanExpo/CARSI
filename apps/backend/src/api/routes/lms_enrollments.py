@@ -72,6 +72,19 @@ async def enrol_in_course(
         "enrolled_at": enrollment.enrolled_at.isoformat() if enrollment.enrolled_at else None,
     }))
 
+    # Fire-and-forget: push to Synthex for marketing automation
+    from src.services.synthex_connector import notify_student_enrolled
+
+    asyncio.create_task(notify_student_enrolled(
+        student_id=current_user.id,
+        course_id=enrollment.course_id,
+        course_title=course.title,
+        discipline=course.iicrc_discipline,
+        cec_hours=float(course.cec_hours) if course.cec_hours else None,
+        price_aud=float(course.price_aud) if course.price_aud else None,
+        is_free=course.is_free or False,
+    ))
+
     return EnrollmentWithCourseOut(
         id=enrollment.id,
         student_id=enrollment.student_id,

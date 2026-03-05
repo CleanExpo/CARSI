@@ -51,6 +51,7 @@ from .routes import (
     webhooks,
     workflow_builder,
     workflows,
+    synthex_data,
 )
 
 settings = get_settings()
@@ -149,6 +150,7 @@ app.include_router(search.router, tags=["Search"])
 app.include_router(documents.router, tags=["Documents"])
 app.include_router(workflow_builder.router, prefix="/api", tags=["Workflow Builder"])
 app.include_router(discovery.router, prefix="/api", tags=["Discovery"])
+app.include_router(synthex_data.router, tags=["Synthex Integration"])
 
 
 @app.get("/")

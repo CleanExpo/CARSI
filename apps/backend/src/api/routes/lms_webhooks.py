@@ -148,6 +148,17 @@ async def _handle_subscription_created(db: AsyncSession, obj: dict) -> None:
     db.add(sub)
     await db.commit()
 
+    # Fire-and-forget: push to Synthex for marketing automation
+    import asyncio
+    from src.services.synthex_connector import notify_subscription_event, SynthexEvents
+
+    asyncio.create_task(notify_subscription_event(
+        student_id=student_id,
+        event_type=SynthexEvents.SUBSCRIPTION_CREATED,
+        plan="yearly",
+        amount_aud=795.0,
+    ))
+
 
 async def _handle_subscription_deleted(db: AsyncSession, obj: dict) -> None:
     result = await db.execute(
@@ -160,6 +171,16 @@ async def _handle_subscription_deleted(db: AsyncSession, obj: dict) -> None:
         sub.status = "cancelled"
         sub.cancelled_at = datetime.now(timezone.utc)
         await db.commit()
+
+        # Fire-and-forget: push to Synthex for marketing automation
+        import asyncio
+        from src.services.synthex_connector import notify_subscription_event, SynthexEvents
+
+        asyncio.create_task(notify_subscription_event(
+            student_id=sub.student_id,
+            event_type=SynthexEvents.SUBSCRIPTION_CANCELLED,
+            plan=sub.plan,
+        ))
 
 
 async def _handle_payment_succeeded(db: AsyncSession, obj: dict) -> None:
