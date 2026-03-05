@@ -751,6 +751,7 @@ export default async function Home() {
                   { label: 'Pricing', href: '/pricing' },
                   { label: 'About', href: '/about' },
                   { label: 'Testimonials', href: '/testimonials' },
+                  { label: 'Podcast', href: '/podcast' },
                   { label: 'Contact', href: '/contact' },
                 ].map((item) => (
                   <li key={item.label}>
