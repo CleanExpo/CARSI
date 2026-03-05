@@ -33,6 +33,7 @@ export function IICRCDisciplineMap() {
     <svg
       viewBox="0 0 500 400"
       className="mx-auto w-full max-w-lg"
+      style={{ overflow: 'visible' }}
       role="img"
       aria-label="IICRC Discipline Map showing 7 restoration disciplines"
     >
@@ -136,9 +137,9 @@ export function IICRCDisciplineMap() {
             {isActive && (
               <g>
                 <rect
-                  x={pos.x - disc.fullName.length * 3.6}
+                  x={pos.x - 90}
                   y={pos.y + NODE_R + 8}
-                  width={disc.fullName.length * 7.2}
+                  width={180}
                   height={22}
                   rx={4}
                   fill="rgba(6,10,20,0.92)"
