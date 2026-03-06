@@ -4,7 +4,7 @@
 
 ## Active Task
 
-Compaction triggered — context was saved at 06/03/2026 20:16 AEST.
+Compaction triggered — context was saved at 06/03/2026 23:05 AEST.
 Re-read CONSTITUTION.md if rules feel unclear after compaction.
 
 ## Recent Architectural Choices
@@ -21,4 +21,4 @@ Re-read .claude/memory/CONSTITUTION.md to restore rule context.
 
 ## Last Updated
 
-06/03/2026 20:16 AEST (PreCompact hook)
+06/03/2026 23:05 AEST (PreCompact hook)
