@@ -7,11 +7,6 @@ import { ErrorBanner } from '@/components/lms/ErrorBanner';
 
 const API = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8000';
 
-function formatDate(iso: string): string {
-  const d = new Date(iso);
-  return d.toLocaleDateString('en-AU', { day: '2-digit', month: 'short', year: 'numeric' });
-}
-
 function getUserId(): string {
   return typeof window !== 'undefined' ? (localStorage.getItem('carsi_user_id') ?? '') : '';
 }
@@ -76,7 +71,7 @@ function CredentialCard({ credential }: { credential: CredentialOut }) {
         </div>
         <div className="flex flex-col gap-0.5">
           <span className="font-mono text-xs tracking-widest text-white/40 uppercase">Issued</span>
-          <span className="font-mono text-sm text-white">{formatDate(credential.issued_date)}</span>
+          <span className="font-mono text-sm text-white">{credential.issued_date}</span>
         </div>
         {credential.cppp40421_unit_code && (
           <div className="flex flex-col gap-0.5">
