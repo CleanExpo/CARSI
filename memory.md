@@ -308,6 +308,54 @@ Evaluation tests must run during skill development and when upgrading to new Cla
 
 ---
 
+## Visual Excellence and Model Currency Protocol
+
+No customer-facing interface may ship in factory-default LLM UI mode. Visual quality is a **production requirement**, not a style preference.
+
+### Visual Excellence Standard
+
+**Required elements:**
+
+- Background: OLED Black `#050505`
+- Borders: `border-[0.5px] border-white/[0.06]` — never `border-2` or solid
+- Corners: `rounded-sm` only — `rounded-lg` and `rounded-xl` are banned
+- Typography: JetBrains Mono for data, Editorial New for hero names
+- Animations: Framer Motion only with physics-based easings
+- Colours: Spectral palette (Cyan `#00F5FF`, Emerald `#00FF88`, Amber `#FFB800`)
+- Layout: Timeline/orbital — NOT Bootstrap card grid
+
+**Banned factory-default signals:**
+`rounded-lg` | `rounded-xl` | linear CSS transitions | Bootstrap-blue buttons | Lucide icons as status | Lorem ipsum | generic gradient heroes | empty states without illustration
+
+**Visual evidence required before any customer-facing page ships:** browser screenshot with URL visible, both mobile (375px) and desktop (1440px).
+
+### Model Routing Defaults
+
+| Task Type                       | Approved Model              | Provider  |
+| ------------------------------- | --------------------------- | --------- |
+| Reasoning / Orchestration       | `claude-sonnet-4-6`         | Anthropic |
+| Fast generation / drafts        | `claude-haiku-4-5-20251001` | Anthropic |
+| High-capability complex         | `claude-opus-4-6`           | Anthropic |
+| Fast image generation / editing | Gemini 2.5 Flash Image      | Google    |
+| High-fidelity branding visuals  | Imagen 4                    | Google    |
+| Local inference (dev)           | `llama3.1:8b` via Ollama    | Local     |
+
+### Model Currency Checks
+
+- Run `pnpm ai:models:check` to verify configured models against approved defaults
+- Run on interval (monthly minimum) and before any heavy AI task
+- Report generated to `reports/model-currency-report.md`
+- Deprecated models must be replaced before AI tasks may proceed
+
+### Visual Audit
+
+- Run `pnpm ai:visual:audit` before any launch claim
+- Report generated to `reports/visual-audit-report.md`
+- Critical assets (logo, favicon, OG image) must all exist
+- `FAIL` status blocks launch — `CONDITIONAL_PASS` requires review
+
+---
+
 ## Development Principles
 
 1. **Truth over optimism** — Report accurate state, not reassuring state. Unknown = unknown, not assumed working.
@@ -328,15 +376,28 @@ Evaluation tests must run during skill development and when upgrading to new Cla
 
 ## Related Files
 
-| File                                        | Purpose                                                         |
-| ------------------------------------------- | --------------------------------------------------------------- |
-| `.claude/memory/CONSTITUTION.md`            | Immutable rules injected on every message (survives compaction) |
-| `.claude/memory/current-state.md`           | Session state snapshot                                          |
-| `.claude/memory/architectural-decisions.md` | Append-only decision log                                        |
-| `.claude/rules/context-drift.md`            | Compaction defence documentation                                |
-| `CLAUDE.md`                                 | Project-level routing and quick commands                        |
-| `memory.md`                                 | **This file** — full governance framework                       |
+| File                                                | Purpose                                                         |
+| --------------------------------------------------- | --------------------------------------------------------------- |
+| `.claude/memory/CONSTITUTION.md`                    | Immutable rules injected on every message (survives compaction) |
+| `.claude/memory/current-state.md`                   | Session state snapshot                                          |
+| `.claude/memory/architectural-decisions.md`         | Append-only decision log                                        |
+| `.claude/rules/context-drift.md`                    | Compaction defence documentation                                |
+| `CLAUDE.md`                                         | Project-level routing and quick commands                        |
+| `memory.md`                                         | **This file** — full governance framework                       |
+| `docs/agent-framework/SENIOR_PM_AGENT.md`           | PM Agent: DoD generation + founder translation                  |
+| `docs/agent-framework/SENIOR_ORCHESTRATOR_AGENT.md` | Orchestrator: delegation + evidence collection                  |
+| `docs/agent-framework/SENIOR_SPECIALIST_AGENTS.md`  | All 6 specialist agents with skill sets                         |
+| `docs/agent-framework/SUB_AGENT_PROTOCOL.md`        | Sub-agent output standards + example tasks                      |
+| `docs/agent-framework/RECOMMENDED_SKILL_MAP.md`     | 6–8 skills per agent role                                       |
+| `src/ai/model-registry/index.ts`                    | TypeScript model registry + approved defaults                   |
+| `src/ai/model-registry/providers/gemini.ts`         | Gemini routing and audit utilities                              |
+| `src/ai/version-checks/check-model-currency.ts`     | `pnpm ai:models:check` CLI script                               |
+| `src/ai/graphics/routing-policy.ts`                 | Visual task → model routing policy                              |
+| `src/ai/audits/visual-audit.ts`                     | `pnpm ai:visual:audit` CLI script                               |
+| `templates/governance-framework/`                   | Reusable scaffold for new projects                              |
+| `reports/model-currency-report.md`                  | Generated by `pnpm ai:models:check`                             |
+| `reports/visual-audit-report.md`                    | Generated by `pnpm ai:visual:audit`                             |
 
 ---
 
-_Last updated: 06/03/2026 | CARSI AI Development Governance Framework v1.0_
+_Last updated: 06/03/2026 | CARSI AI Development Governance Framework v2.0_

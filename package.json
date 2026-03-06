@@ -28,7 +28,11 @@
     "deps:check": "bash scripts/dependency-checks.sh",
     "deps:sync": "pnpm install && pnpm verify:deps",
     "deps:clean": "pnpm prune && pnpm install",
-    "prepare": "husky"
+    "prepare": "husky",
+    "ai:models:check": "npx ts-node src/ai/version-checks/check-model-currency.ts",
+    "ai:visual:audit": "npx ts-node src/ai/audits/visual-audit.ts",
+    "ai:finished:audit": "bash scripts/governance-check.sh && npx ts-node src/ai/audits/visual-audit.ts",
+    "ai:governance:check": "bash templates/governance-framework/governance-check.sh"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.3",
