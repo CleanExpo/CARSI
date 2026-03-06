@@ -61,6 +61,7 @@ interface NoteCardProps {
   onEditCancel: () => void;
   onDelete: (lessonId: string) => Promise<void>;
   saving: boolean;
+  deleting: string | null;
 }
 
 function NoteCard({
@@ -73,6 +74,7 @@ function NoteCard({
   onEditCancel,
   onDelete,
   saving,
+  deleting,
 }: NoteCardProps) {
   return (
     <div className="flex flex-col gap-3 rounded-sm border border-white/[0.06] bg-zinc-900/50 p-5">
@@ -146,9 +148,10 @@ function NoteCard({
             </button>
             <button
               onClick={() => onDelete(note.lesson_id)}
-              className="ml-auto rounded-sm border border-red-500/20 bg-red-500/5 px-3 py-1.5 font-mono text-xs text-red-400 transition-colors hover:border-red-500/40 hover:bg-red-500/10"
+              disabled={deleting === note.lesson_id}
+              className="ml-auto rounded-sm border border-red-500/20 bg-red-500/5 px-3 py-1.5 font-mono text-xs text-red-400 transition-colors hover:border-red-500/40 hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-40"
             >
-              Delete
+              {deleting === note.lesson_id ? 'Deleting…' : 'Delete'}
             </button>
           </>
         )}
@@ -186,6 +189,7 @@ export default function StudentNotesPage() {
   const [editingLessonId, setEditingLessonId] = useState<string | null>(null);
   const [editContent, setEditContent] = useState('');
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState<string | null>(null);
 
   const fetchNotes = useCallback(async () => {
     const headers = authHeaders();
@@ -221,6 +225,7 @@ export default function StudentNotesPage() {
   function handleEditCancel() {
     setEditingLessonId(null);
     setEditContent('');
+    setError(null);
   }
 
   async function handleEditSave(lessonId: string) {
@@ -247,26 +252,32 @@ export default function StudentNotesPage() {
     }
   }
 
-  async function handleDelete(lessonId: string) {
-    try {
-      const r = await fetch(`${API}/api/lms/notes/${lessonId}`, {
-        method: 'DELETE',
-        headers: authHeaders(),
-      });
-      if (r.ok || r.status === 204) {
-        setNotes((prev) => prev.filter((n) => n.lesson_id !== lessonId));
-        // Clear edit state if the deleted note was being edited
-        if (editingLessonId === lessonId) {
-          setEditingLessonId(null);
-          setEditContent('');
+  const handleDelete = useCallback(
+    async (lessonId: string) => {
+      setDeleting(lessonId);
+      try {
+        const r = await fetch(`${API}/api/lms/notes/${lessonId}`, {
+          method: 'DELETE',
+          headers: authHeaders(),
+        });
+        if (r.ok || r.status === 204) {
+          setNotes((prev) => prev.filter((n) => n.lesson_id !== lessonId));
+          // Clear edit state if the deleted note was being edited
+          if (editingLessonId === lessonId) {
+            setEditingLessonId(null);
+            setEditContent('');
+          }
+        } else {
+          setError('Failed to delete note. Please try again.');
         }
-      } else {
-        setError('Failed to delete note. Please try again.');
+      } catch {
+        setError('Network error deleting note.');
+      } finally {
+        setDeleting(null);
       }
-    } catch {
-      setError('Network error deleting note.');
-    }
-  }
+    },
+    [editingLessonId]
+  );
 
   const groups = groupByCourse(notes);
   const totalCourses = groups.length;
@@ -297,7 +308,7 @@ export default function StudentNotesPage() {
       {!loading && !error && notes.length === 0 && <EmptyState />}
 
       {/* Grouped notes */}
-      {!loading && notes.length > 0 && (
+      {!loading && !error && notes.length > 0 && (
         <div className="flex flex-col gap-8">
           {groups.map((group) => (
             <section key={group.course_slug} className="flex flex-col gap-4">
@@ -320,6 +331,7 @@ export default function StudentNotesPage() {
                     onEditCancel={handleEditCancel}
                     onDelete={handleDelete}
                     saving={saving}
+                    deleting={deleting}
                   />
                 ))}
               </div>
