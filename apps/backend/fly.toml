@@ -45,5 +45,7 @@ primary_region = "syd"
   memory_mb = 512
 
 # Deploy strategy: rolling (zero-downtime deploys)
+# Release command runs migrations before new version goes live
 [deploy]
   strategy = "rolling"
+  release_command = "/app/.venv/bin/alembic -c /app/alembic.ini upgrade head"
