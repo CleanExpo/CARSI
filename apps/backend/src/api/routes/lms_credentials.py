@@ -132,7 +132,6 @@ async def get_credential(
 
         # Fire-and-forget: push to Synthex for marketing automation
         from src.services.synthex_connector import notify_certification_awarded
-        from uuid import UUID
 
         if student:
             asyncio.create_task(notify_certification_awarded(

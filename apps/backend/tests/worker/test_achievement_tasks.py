@@ -75,7 +75,10 @@ class TestHandleLessonCompleted:
         mock_session.__enter__ = MagicMock(return_value=mock_session)
         mock_session.__exit__ = MagicMock(return_value=False)
 
-        with patch("src.worker.tasks.SyncSessionLocal", return_value=mock_session):
+        with (
+            patch("src.worker.tasks.SyncSessionLocal", return_value=mock_session),
+            patch("src.worker.tasks.award_xp"),  # prevent Redis connection attempt
+        ):
             result = handle_lesson_completed(
                 {
                     "student_id": str(STUDENT_ID),
