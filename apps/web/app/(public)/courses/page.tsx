@@ -21,9 +21,13 @@ interface SearchParams {
 async function getBundles() {
   const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8000';
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
     const res = await fetch(`${backendUrl}/api/lms/bundles`, {
       next: { revalidate: 60 },
+      signal: controller.signal,
     });
+    clearTimeout(timeoutId);
     if (!res.ok) return [];
     const data = await res.json();
     return data.items ?? data ?? [];
@@ -35,11 +39,16 @@ async function getBundles() {
 async function getCourses() {
   const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8000';
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
     const res = await fetch(`${backendUrl}/api/lms/courses`, {
       next: { revalidate: 60 },
+      signal: controller.signal,
     });
+    clearTimeout(timeoutId);
     if (!res.ok) return { items: [], total: 0 };
-    return res.json();
+    const data = await res.json();
+    return { items: data.items ?? [], total: data.total ?? 0 };
   } catch {
     return { items: [], total: 0 };
   }
