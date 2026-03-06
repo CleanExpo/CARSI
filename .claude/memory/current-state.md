@@ -1,24 +1,29 @@
 # Current State
 
-> Updated by PreCompact hook. Session: c4291f0b
+> Updated: 06/03/2026
 
 ## Active Task
 
-Compaction triggered — context was saved at 06/03/2026 15:50 AEST.
-Re-read CONSTITUTION.md if rules feel unclear after compaction.
+COMPLETE — Post-Install Full Audit + Linear Sync (06/03/2026)
 
-## Recent Architectural Choices
+## Completed This Session
 
-See architectural-decisions.md for logged decisions.
+- 8-phase audit executed → `reports/full-audit/` (all 8 reports written)
+- Production readiness assessed: 35–40%
+- 5 critical blockers identified: backend not deployed, no production DB, /student/credentials missing, course content not imported, Stripe in test mode
+- 35 Linear issues created: GP-230 to GP-264
+  - GP-230–247: pre-planned UI/infra/content issues
+  - GP-248–264: audit-specific issues (P0–P3)
+- All committed at: `6918f94 chore(audit): full system audit + Linear sync (06/03/2026)`
 
-## In-Progress Work
+## Next Steps (Sprint 1 — Make It Work)
 
-Check recent git status: `git status` and `git log --oneline -5`
-
-## Next Steps
-
-Re-read .claude/memory/CONSTITUTION.md to restore rule context.
+1. GP-248: Build `/student/credentials` page (P0 frontend gap — backend complete)
+2. Deploy backend to Fly.io (`fly deploy` from `apps/backend/`)
+3. Provision PostgreSQL, run `alembic upgrade head`
+4. Configure Google Drive OAuth for production
+5. GP-249: Build `/student/notes` page
 
 ## Last Updated
 
-06/03/2026 15:50 AEST (PreCompact hook)
+06/03/2026 (session end after audit + Linear sync)
