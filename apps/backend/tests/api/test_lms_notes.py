@@ -150,25 +150,44 @@ class TestUpsertNote:
     def test_creates_new_note(self):
         mock_db = make_mock_db()
         mock_student = make_mock_student()
+        lesson_id = str(LESSON_ID)
 
-        # No existing note on first lookup; return None on second lookup too (triggers 500)
+        # First execute call: lookup returns None (note doesn't exist yet)
         result_lookup = MagicMock()
         result_lookup.scalar_one_or_none.return_value = None
-        mock_db.execute = AsyncMock(return_value=result_lookup)
+
+        # Second execute call: re-fetch after commit returns a fully-formed note
+        mock_note = MagicMock(spec=LMSLessonNote)
+        mock_note.id = str(NOTE_ID)
+        mock_note.lesson_id = lesson_id
+        mock_note.content = "My new note"
+        mock_note.updated_at = datetime.now(timezone.utc)
+        mock_note.lesson = MagicMock()
+        mock_note.lesson.title = "Test Lesson"
+        mock_note.lesson.module = MagicMock()
+        mock_note.lesson.module.title = "Test Module"
+        mock_note.lesson.module.course = MagicMock()
+        mock_note.lesson.module.course.title = "Test Course"
+        mock_note.lesson.module.course.slug = "test-course"
+
+        result_refetch = MagicMock()
+        result_refetch.scalar_one_or_none.return_value = mock_note
+
+        mock_db.execute = AsyncMock(side_effect=[result_lookup, result_refetch])
 
         app.dependency_overrides[get_async_db] = _override_db(mock_db)
         app.dependency_overrides[get_current_lms_user] = _override_user(mock_student)
 
-        # The PUT will 500 because db.refresh returns a MagicMock without real fields.
-        # We ignore the response — only assert that add() was called (note was created).
-        try:
-            client.put(
-                f"/api/lms/notes/{LESSON_ID}",
-                headers={**AUTH_HEADERS, "Content-Type": "application/json"},
-                json={"content": "New note content"},
-            )
-        except Exception:
-            pass
+        response = client.put(
+            f"/api/lms/notes/{lesson_id}",
+            json={"content": "My new note"},
+            headers=AUTH_HEADERS,
+        )
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["lesson_title"] == "Test Lesson"
+        assert data["content"] == "My new note"
         mock_db.add.assert_called_once()
 
     def test_requires_authentication(self):

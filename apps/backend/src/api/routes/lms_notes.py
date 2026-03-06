@@ -9,7 +9,7 @@ DELETE /api/lms/notes/{lesson_id}     — delete note for a lesson
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -22,7 +22,7 @@ router = APIRouter(prefix="/api/lms/notes", tags=["lms-notes"])
 
 
 class NoteUpsert(BaseModel):
-    content: str
+    content: str = Field(max_length=50_000)
 
 
 class LessonNoteOut(BaseModel):
