@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { AlertCircle, RefreshCw } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
 import { XPLevelBadge } from '@/components/lms/XPLevelBadge';
+import { ErrorBanner } from '@/components/lms/ErrorBanner';
 import { StreakTracker } from '@/components/lms/StreakTracker';
 import { CECProgressRing } from '@/components/lms/CECProgressRing';
 import { IICRCIdentityCard } from '@/components/lms/IICRCIdentityCard';
@@ -64,24 +64,6 @@ interface ErrorState {
   enrollments: string | null;
 }
 
-function ErrorBanner({ message, onRetry }: { message: string; onRetry?: () => void }) {
-  return (
-    <div className="flex items-center gap-2 rounded-sm border border-red-900/50 bg-red-950/30 px-3 py-2 text-sm text-red-400">
-      <AlertCircle className="h-4 w-4 flex-shrink-0" />
-      <span>{message}</span>
-      {onRetry && (
-        <button
-          onClick={onRetry}
-          className="ml-auto flex items-center gap-1 rounded-sm bg-red-900/50 px-2 py-1 text-xs hover:bg-red-900/70"
-        >
-          <RefreshCw className="h-3 w-3" />
-          Retry
-        </button>
-      )}
-    </div>
-  );
-}
-
 export default function StudentDashboardPage() {
   const [level, setLevel] = useState<LevelData | null>(null);
   const [sub, setSub] = useState<SubData | null>(null);
@@ -100,7 +82,7 @@ export default function StudentDashboardPage() {
     profile: true,
   });
 
-  const fetchLevel = async () => {
+  const fetchLevel = useCallback(async () => {
     const headers = authHeaders();
     if (!headers['X-User-Id']) return;
     setLoading((l) => ({ ...l, level: true }));
@@ -117,9 +99,9 @@ export default function StudentDashboardPage() {
     } finally {
       setLoading((l) => ({ ...l, level: false }));
     }
-  };
+  }, []);
 
-  const fetchSub = async () => {
+  const fetchSub = useCallback(async () => {
     const headers = authHeaders();
     if (!headers['X-User-Id']) return;
     setLoading((l) => ({ ...l, sub: true }));
@@ -136,9 +118,9 @@ export default function StudentDashboardPage() {
     } finally {
       setLoading((l) => ({ ...l, sub: false }));
     }
-  };
+  }, []);
 
-  const fetchProfile = async () => {
+  const fetchProfile = useCallback(async () => {
     const headers = authHeaders();
     if (!headers['X-User-Id']) return;
     setLoading((l) => ({ ...l, profile: true }));
@@ -155,9 +137,9 @@ export default function StudentDashboardPage() {
     } finally {
       setLoading((l) => ({ ...l, profile: false }));
     }
-  };
+  }, []);
 
-  const fetchEnrollments = async () => {
+  const fetchEnrollments = useCallback(async () => {
     const headers = authHeaders();
     if (!headers['X-User-Id']) return;
     setEnrollmentsLoading(true);
@@ -174,7 +156,7 @@ export default function StudentDashboardPage() {
     } finally {
       setEnrollmentsLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     const headers = authHeaders();
@@ -184,7 +166,7 @@ export default function StudentDashboardPage() {
     fetchSub();
     fetchProfile();
     fetchEnrollments();
-  }, []);
+  }, [fetchLevel, fetchSub, fetchProfile, fetchEnrollments]);
 
   function handleManageSubscription() {
     const headers = authHeaders();

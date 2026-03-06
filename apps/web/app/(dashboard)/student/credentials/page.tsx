@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { AlertCircle, Award, RefreshCw } from 'lucide-react';
+import { Award } from 'lucide-react';
+import { ErrorBanner } from '@/components/lms/ErrorBanner';
 
 const API = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8000';
 
@@ -48,24 +49,6 @@ function disciplineColour(discipline: string | null): string {
   return DISCIPLINE_COLOURS[discipline as DisciplineKey] ?? DEFAULT_DISCIPLINE_COLOUR;
 }
 
-function ErrorBanner({ message, onRetry }: { message: string; onRetry?: () => void }) {
-  return (
-    <div className="flex items-center gap-2 rounded-sm border border-red-900/50 bg-red-950/30 px-3 py-2 text-sm text-red-400">
-      <AlertCircle className="h-4 w-4 flex-shrink-0" />
-      <span>{message}</span>
-      {onRetry && (
-        <button
-          onClick={onRetry}
-          className="ml-auto flex items-center gap-1 rounded-sm bg-red-900/50 px-2 py-1 text-xs hover:bg-red-900/70"
-        >
-          <RefreshCw className="h-3 w-3" />
-          Retry
-        </button>
-      )}
-    </div>
-  );
-}
-
 function CredentialCard({ credential }: { credential: CredentialOut }) {
   const pdfUrl = `${API}/api/lms/credentials/${credential.credential_id}/pdf`;
 
@@ -89,9 +72,7 @@ function CredentialCard({ credential }: { credential: CredentialOut }) {
           <span className="font-mono text-xs tracking-widest text-white/40 uppercase">
             CEC Hours
           </span>
-          <span className="font-mono text-sm text-white">
-            {credential.cec_hours.toFixed(1)} CEC Hours
-          </span>
+          <span className="font-mono text-sm text-white">{credential.cec_hours.toFixed(1)}</span>
         </div>
         <div className="flex flex-col gap-0.5">
           <span className="font-mono text-xs tracking-widest text-white/40 uppercase">Issued</span>
@@ -151,7 +132,7 @@ export default function StudentCredentialsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchCredentials = async () => {
+  const fetchCredentials = useCallback(async () => {
     const headers = authHeaders();
     if (!headers['X-User-Id']) {
       setLoading(false);
@@ -171,11 +152,11 @@ export default function StudentCredentialsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchCredentials();
-  }, []);
+  }, [fetchCredentials]);
 
   return (
     <main className="flex max-w-4xl flex-col gap-6 p-6">
