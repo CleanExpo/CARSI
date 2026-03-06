@@ -2,25 +2,22 @@
 CARSI Google Drive Service
 
 Wraps the Google Drive API v3 for course content management.
-Uses service account credentials stored in a JSON key file.
+Uses OAuth2 user credentials stored in PostgreSQL (admin one-time flow).
 
-In development without credentials (FEATURE_GOOGLE_DRIVE=false),
+In development without credentials (no token stored, or FEATURE_GOOGLE_DRIVE=false),
 the service operates in "disabled" mode and returns empty results
 rather than crashing — allowing the rest of the app to work normally.
 """
 
-import os
 from typing import Any
 
-from google.oauth2 import service_account
+from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 from src.utils import get_logger
 
 logger = get_logger(__name__)
-
-_SCOPES = ["https://www.googleapis.com/auth/drive.readonly"]
 
 _DRIVE_FILE_FIELDS = "id, name, mimeType, size, webViewLink, createdTime"
 _DRIVE_META_FIELDS = "id, name, mimeType, size, webViewLink, thumbnailLink"
@@ -30,29 +27,23 @@ class DriveService:
     """
     Thin wrapper around the Google Drive API.
 
-    Pass ``credentials_file=""`` or ``folder_id=""`` to activate disabled mode —
+    Pass ``credentials=None`` to activate disabled mode —
     all methods return empty/None without raising.
     """
 
-    def __init__(self, credentials_file: str, folder_id: str) -> None:
+    def __init__(self, credentials: Credentials | None, folder_id: str) -> None:
         self._folder_id = folder_id
         self._service: Any = None
 
-        if not credentials_file or not os.path.isfile(credentials_file):
-            logger.info(
-                "DriveService: no credentials file found — running in disabled mode",
-                credentials_file=credentials_file or "(empty)",
-            )
+        if credentials is None:
+            logger.info("DriveService: no credentials — running in disabled mode")
             self.is_disabled = True
             return
 
         try:
-            creds = service_account.Credentials.from_service_account_file(
-                credentials_file, scopes=_SCOPES
-            )
-            self._service = build("drive", "v3", credentials=creds, cache_discovery=False)
+            self._service = build("drive", "v3", credentials=credentials, cache_discovery=False)
             self.is_disabled = False
-            logger.info("DriveService: initialised with service account credentials")
+            logger.info("DriveService: initialised with OAuth2 credentials")
         except Exception as exc:
             logger.warning("DriveService: failed to initialise — disabled", error=str(exc))
             self.is_disabled = True

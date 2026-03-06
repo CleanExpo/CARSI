@@ -108,7 +108,7 @@ async def discover_drive_content(
     """
     from src.api.routes.lms_drive import _get_drive_service  # type: ignore[attr-defined]
 
-    drive = _get_drive_service()
+    drive = await _get_drive_service(db)
 
     job = LMSMigrationJob(
         job_type="discover",

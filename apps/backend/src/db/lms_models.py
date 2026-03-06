@@ -685,3 +685,24 @@ class LMSBundleCourse(Base):
     bundle_id = Column(PGUUID(as_uuid=True), ForeignKey("lms_bundles.id", ondelete="CASCADE"), primary_key=True)
     course_id = Column(PGUUID(as_uuid=True), ForeignKey("lms_courses.id", ondelete="CASCADE"), primary_key=True)
     display_order = Column(Integer, default=0)
+
+
+# ---------------------------------------------------------------------------
+# Google OAuth2 Tokens (Migration 007)
+# ---------------------------------------------------------------------------
+
+
+class LMSGoogleOAuthToken(Base):
+    """Stores the admin's Google OAuth2 refresh token for Drive access."""
+
+    __tablename__ = "lms_google_oauth_tokens"
+
+    id = Column(PGUUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    # nullable user_id — one platform-level token (admin's)
+    user_id = Column(PGUUID(as_uuid=True), ForeignKey("lms_users.id", ondelete="SET NULL"), nullable=True)
+    access_token = Column(Text, nullable=True)
+    refresh_token = Column(Text, nullable=False)
+    token_expiry = Column(DateTime(timezone=True), nullable=True)
+    scopes = Column(Text, nullable=False)
+    created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
+    updated_at = Column(DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow)

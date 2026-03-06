@@ -93,18 +93,20 @@ class Settings(BaseSettings):
     google_ai_api_key: str = Field(default="", description="Google AI API key (optional)")
     openrouter_api_key: str = Field(default="", description="OpenRouter API key (optional)")
 
-    # Google Drive Integration
+    # Google Drive Integration (OAuth2 user credentials)
+    google_client_id: str = Field(default="", description="Google OAuth2 Client ID")
+    google_client_secret: str = Field(default="", description="Google OAuth2 Client Secret")
+    google_drive_redirect_uri: str = Field(
+        default="http://localhost:8000/api/lms/drive/auth/callback",
+        description="OAuth2 redirect URI for Drive admin auth flow",
+    )
     google_drive_folder_id: str = Field(
         default="",
         description="Root Google Drive folder ID for CARSI course content",
     )
-    google_drive_credentials_file: str = Field(
-        default="",
-        description="Path to service account credentials JSON file",
-    )
     feature_google_drive: bool = Field(
         default=False,
-        description="Enable Google Drive integration (requires credentials)",
+        description="Enable Google Drive integration (requires OAuth2 token stored via /auth/connect)",
     )
 
     # Redis & Celery
