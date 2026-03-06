@@ -31,7 +31,15 @@ from .routes import (
     lms_enrollments,
     lms_admin,
     lms_lessons,
+    lms_gamification,
     lms_migration,
+    lms_subscription,
+    lms_webhooks,
+    lms_course_ideas,
+    lms_rpl,
+    lms_ai_builder,
+    lms_bundles,
+    lms_payments,
     lms_modules,
     lms_pathways,
     lms_progress,
@@ -43,6 +51,7 @@ from .routes import (
     webhooks,
     workflow_builder,
     workflows,
+    synthex_data,
 )
 
 settings = get_settings()
@@ -117,7 +126,16 @@ app.include_router(lms_modules.router)
 app.include_router(lms_progress.router)
 app.include_router(lms_quiz.router)
 app.include_router(lms_pathways.router)
+app.include_router(lms_gamification.router)
 app.include_router(lms_migration.router)
+app.include_router(lms_subscription.router)
+app.include_router(lms_webhooks.router)
+app.include_router(lms_course_ideas.router)
+app.include_router(lms_rpl.router)
+app.include_router(lms_rpl.admin_router)
+app.include_router(lms_ai_builder.router)
+app.include_router(lms_payments.router)
+app.include_router(lms_bundles.router)
 app.include_router(agents.router, prefix="/api", tags=["Agents"])
 app.include_router(chat.router, prefix="/api", tags=["Chat"])
 app.include_router(webhooks.router, prefix="/api", tags=["Webhooks"])
@@ -132,6 +150,7 @@ app.include_router(search.router, tags=["Search"])
 app.include_router(documents.router, tags=["Documents"])
 app.include_router(workflow_builder.router, prefix="/api", tags=["Workflow Builder"])
 app.include_router(discovery.router, prefix="/api", tags=["Discovery"])
+app.include_router(synthex_data.router, tags=["Synthex Integration"])
 
 
 @app.get("/")

@@ -18,69 +18,86 @@ Location: `.skills/vercel-labs-agent-skills/`
 
 Location: `.skills/custom/`
 
-| Skill                    | Description                                                                     | Trigger Phrases                                             |
-| ------------------------ | ------------------------------------------------------------------------------- | ----------------------------------------------------------- |
-| **genesis-orchestrator** | Phase-locked execution for Next.js full-stack builds                            | "build", "implement", "create feature", "plan architecture" |
-| **council-of-logic**     | Mathematical first principles validation (Turing, Von Neumann, Bezier, Shannon) | "optimise", "algorithm", "performance", "complexity"        |
-| **scientific-luxury**    | Design system enforcement for Scientific Luxury tier UI                         | "design", "UI", "component", "styling", "animation"         |
-| **skill-manager**        | Analyse skill gaps, generate new skills, browse catalogue, validate health      | "skill gap", "generate skill", "skill health", "missing skills" |
-| **error-taxonomy**       | Structured error codes, categories, and user-facing messages                    | "error handling", "error codes", "error messages", "error response" |
-| **data-validation**      | Zod and Pydantic validation patterns for input sanitisation                     | "validation", "Zod", "Pydantic", "schema", "sanitise", "input" |
-| **input-sanitisation**   | XSS, SQL injection, and command injection prevention patterns                   | "XSS", "injection", "sanitise", "security", "escape", "OWASP" |
-| **structured-logging**   | JSON-structured logging with correlation IDs and log levels                     | "logging", "logs", "observability", "tracing", "monitoring" |
-| **api-contract**         | Typed API contracts between FastAPI (Pydantic) and Next.js (Zod)               | "API contract", "endpoint", "response type", "OpenAPI", "schema" |
-| **state-machine**        | Finite state machine patterns for complex flows and status enums               | "state machine", "status", "workflow state", "transitions", "FSM" |
-| **cron-scheduler**       | Scheduled task management with overlap protection and CRON_SECRET auth         | "cron", "schedule", "periodic", "interval", "timer", "background job" |
-| **csv-processor**        | Streaming CSV parse and generate with Zod/Pydantic row validation              | "CSV", "import", "export", "spreadsheet", "download data", "upload file" |
-| **email-template**       | Responsive transactional emails with React Email and Scientific Luxury design  | "email", "template", "notification", "transactional", "welcome email" |
-| **metrics-collector**    | Database-backed metrics instrumentation with counters, gauges, and histograms  | "metrics", "KPI", "instrumentation", "analytics", "monitoring", "dashboard data" |
-| **dashboard-patterns**   | Real-time dashboard patterns with Status Command Centre, timeline layout, Supabase Realtime | "dashboard", "metrics display", "real-time", "monitoring UI", "command centre" |
-| **vector-search**        | pgvector embedding queries, similarity search, hybrid search, multi-provider embeddings | "vector", "embedding", "semantic search", "similarity", "RAG", "pgvector", "cosine" |
-| **health-check**         | Liveness, readiness, and deep dependency health endpoints with Docker healthchecks | "health check", "liveness", "readiness", "probe", "heartbeat", "service health" |
-| **graceful-shutdown**    | Signal handling, connection draining, and clean resource teardown for backend and frontend | "shutdown", "SIGTERM", "drain", "cleanup", "teardown", "stop_grace_period" |
-| **cache-strategy**       | Caching patterns for Python (lru_cache, Redis) and Next.js (fetch cache, revalidation)    | "cache", "Redis", "TTL", "memoise", "revalidate", "lru_cache", "cache-aside" |
-| **tracing-patterns**     | Distributed tracing with span context propagation, W3C traceparent, agent span hierarchy  | "trace", "span", "traceparent", "distributed tracing", "correlation", "OpenTelemetry" |
-| **docker-patterns**      | Multi-stage builds, layer caching, security hardening, Docker Compose orchestration       | "Docker", "Dockerfile", "container", "image", "multi-stage", "docker-compose" |
-| **ci-cd-patterns**       | GitHub Actions workflow optimisation, caching strategies, security scanning pipelines     | "CI/CD", "GitHub Actions", "workflow", "pipeline", "deploy", "cache", "actions" |
-| **retry-strategy**       | Exponential backoff, circuit breaker, and retry policies for httpx and fetch clients       | "retry", "backoff", "circuit breaker", "timeout", "resilience", "transient error" |
-| **queue-worker**         | Redis-backed background job processing with arq (Python) and BullMQ (TypeScript)           | "queue", "worker", "background job", "Redis queue", "job processing", "BullMQ", "arq" |
-| **changelog-generator**  | Automated changelog from Conventional Commits with semantic versioning and GitHub Releases  | "changelog", "release notes", "version bump", "conventional commits", "release" |
-| **audit-trail**          | Structured audit event logging for compliance, forensics, and activity tracking              | "audit trail", "audit log", "activity log", "compliance", "forensics", "who did what" |
-| **webhook-handler**      | Idempotent webhook processing with HMAC signature verification and delivery tracking        | "webhook", "callback", "signature", "HMAC", "idempotent", "event delivery" |
-| **rate-limiter**         | Token bucket, sliding window, and tiered rate limiting for FastAPI and Next.js               | "rate limit", "throttle", "429", "token bucket", "sliding window", "quota" |
-| **api-client**           | Type-safe fetch wrapper with interceptors, retry, and snake/camel case transforms           | "API client", "fetch", "interceptor", "httpx", "request", "response" |
-| **search-indexer**       | Full-text search indexing with tsvector, GIN indexes, and hybrid search                     | "search", "index", "tsvector", "full-text", "GIN", "autocomplete" |
-| **secret-management**    | Environment variable validation, secret redaction, rotation, and leak prevention            | "secret", "env", "API key", "rotation", "redact", "credential" |
-| **resilience-patterns**  | Bulkhead isolation, timeout policies, fallback chains, and hedged requests                   | "bulkhead", "timeout", "fallback", "resilience", "degrade", "hedging" |
-| **notification-system**  | Multi-channel notification dispatch with queue-backed delivery and user preferences         | "notification", "notify", "alert", "email", "in-app", "push" |
-| **error-boundary**     | React error boundary patterns with fallback UI, error.tsx, and Suspense composition          | "error boundary", "error.tsx", "fallback", "ErrorBoundary", "crash" |
-| **data-transform**     | ETL pipelines, typed data mappers, case conversion, and streaming transforms                 | "transform", "ETL", "mapper", "camelCase", "snake_case", "pipeline" |
-| **api-versioning**     | URL and header-based versioning with deprecation policies and sunset headers                  | "version", "v1", "v2", "deprecation", "sunset", "API version" |
-| **rbac-patterns**      | Role-based access control with permission hierarchies and row-level security                  | "RBAC", "role", "permission", "access control", "authorise", "guard" |
-| **status-page**        | Public status page with incident management, uptime tracking, and maintenance windows        | "status page", "incident", "uptime", "outage", "maintenance", "service status" |
-| **markdown-processor** | Parse, transform, and render Markdown with plugins and syntax highlighting                    | "Markdown", "MDX", "remark", "rehype", "render", "parse" |
-| **pdf-generator**      | Server-side PDF generation with React PDF and reportlab                                       | "PDF", "report", "invoice", "download", "export PDF", "A4" |
-| **content-moderation** | Content filtering, toxicity detection, and moderation queues                                   | "moderate", "filter", "toxicity", "safety", "content check", "PII" |
-| **i18n-patterns**      | Internationalisation with en-AU default, date/currency formatting, timezone handling          | "i18n", "locale", "translate", "date format", "currency", "timezone" |
-| **oauth-flow**         | OAuth 2.0 authorisation code flow with PKCE, provider config, and account linking             | "OAuth", "OIDC", "social login", "Google auth", "GitHub auth", "PKCE" |
-| **csrf-protection**    | CSRF prevention with double-submit cookies, SameSite, and origin validation                   | "CSRF", "forgery", "SameSite", "token", "cross-site", "form protection" |
-| **saga-pattern**       | Distributed transaction orchestration with compensation and rollback                           | "saga", "compensation", "rollback", "distributed transaction", "orchestration" |
-| **pipeline-builder**   | Composable data and task pipelines with typed stages and parallel execution                    | "pipeline", "compose", "stage", "ETL", "chain", "pipe" |
-| **feature-flag**       | Feature toggles with percentage rollout, targeting rules, and kill switches                    | "feature flag", "toggle", "rollout", "A/B test", "kill switch", "canary" |
-| **workflow-engine**    | Multi-step approval workflows with timeout, escalation, and visual execution                  | "workflow", "approval", "business process", "execution", "step", "automation" |
-| **graphql-patterns**   | Schema design, resolver patterns, dataloader optimisation, and type-safe client integration    | "GraphQL", "schema", "resolver", "dataloader", "Strawberry", "query" |
-| **infrastructure-as-code** | Terraform and Pulumi patterns for cloud provisioning, state management, and environment parity | "Terraform", "Pulumi", "IaC", "provision", "infrastructure", "cloud" |
-| **report-generator**  | Data aggregation, multi-format report output, scheduled reporting, and template-driven documents | "report", "generate report", "audit report", "export", "summary", "daily report" |
-| **slack-integration**  | Slack bot commands, webhook notifications, interactive messages, and team alerting              | "Slack", "webhook", "bot", "notification", "channel", "Block Kit" |
-| **xaem-theme-ui**  | Two-pass theme generation and code translation pipeline (colour palettes, glow, timing, tokens)   | "theme", "palette", "colour scheme", "design tokens", "generate theme" |
-| **execution-guardian** | Pre-execution governance with dynamic validation gates, risk/confidence scoring, and structured error format | "risk", "safe to proceed", "prerequisite", "validation gate", "confidence" |
-| **system-supervisor** | Architecture drift detection, silent failure scanning, hallucination prevention, and feature completeness audit | "drift", "dead code", "completeness", "audit", "integrity", "silent failure" |
-| **playwright-browser** | Playwright CLI and MCP tools for headless browser automation, E2E testing, screenshots, and web scraping | "playwright", "E2E", "browser test", "screenshot", "headless", "automation" |
-| **claude-browser** | Claude Chrome extension tools for personal browser automation in logged-in sessions | "chrome", "personal browser", "form fill", "logged in", "tab management" |
+| Skill                      | Description                                                                                                     | Trigger Phrases                                                                       |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| **genesis-orchestrator**   | Phase-locked execution for Next.js full-stack builds                                                            | "build", "implement", "create feature", "plan architecture"                           |
+| **council-of-logic**       | Mathematical first principles validation (Turing, Von Neumann, Bezier, Shannon)                                 | "optimise", "algorithm", "performance", "complexity"                                  |
+| **scientific-luxury**      | Design system enforcement for Scientific Luxury tier UI                                                         | "design", "UI", "component", "styling", "animation"                                   |
+| **skill-manager**          | Analyse skill gaps, generate new skills, browse catalogue, validate health                                      | "skill gap", "generate skill", "skill health", "missing skills"                       |
+| **error-taxonomy**         | Structured error codes, categories, and user-facing messages                                                    | "error handling", "error codes", "error messages", "error response"                   |
+| **data-validation**        | Zod and Pydantic validation patterns for input sanitisation                                                     | "validation", "Zod", "Pydantic", "schema", "sanitise", "input"                        |
+| **input-sanitisation**     | XSS, SQL injection, and command injection prevention patterns                                                   | "XSS", "injection", "sanitise", "security", "escape", "OWASP"                         |
+| **structured-logging**     | JSON-structured logging with correlation IDs and log levels                                                     | "logging", "logs", "observability", "tracing", "monitoring"                           |
+| **api-contract**           | Typed API contracts between FastAPI (Pydantic) and Next.js (Zod)                                                | "API contract", "endpoint", "response type", "OpenAPI", "schema"                      |
+| **state-machine**          | Finite state machine patterns for complex flows and status enums                                                | "state machine", "status", "workflow state", "transitions", "FSM"                     |
+| **cron-scheduler**         | Scheduled task management with overlap protection and CRON_SECRET auth                                          | "cron", "schedule", "periodic", "interval", "timer", "background job"                 |
+| **csv-processor**          | Streaming CSV parse and generate with Zod/Pydantic row validation                                               | "CSV", "import", "export", "spreadsheet", "download data", "upload file"              |
+| **email-template**         | Responsive transactional emails with React Email and Scientific Luxury design                                   | "email", "template", "notification", "transactional", "welcome email"                 |
+| **metrics-collector**      | Database-backed metrics instrumentation with counters, gauges, and histograms                                   | "metrics", "KPI", "instrumentation", "analytics", "monitoring", "dashboard data"      |
+| **dashboard-patterns**     | Real-time dashboard patterns with Status Command Centre, timeline layout, Supabase Realtime                     | "dashboard", "metrics display", "real-time", "monitoring UI", "command centre"        |
+| **vector-search**          | pgvector embedding queries, similarity search, hybrid search, multi-provider embeddings                         | "vector", "embedding", "semantic search", "similarity", "RAG", "pgvector", "cosine"   |
+| **health-check**           | Liveness, readiness, and deep dependency health endpoints with Docker healthchecks                              | "health check", "liveness", "readiness", "probe", "heartbeat", "service health"       |
+| **graceful-shutdown**      | Signal handling, connection draining, and clean resource teardown for backend and frontend                      | "shutdown", "SIGTERM", "drain", "cleanup", "teardown", "stop_grace_period"            |
+| **cache-strategy**         | Caching patterns for Python (lru_cache, Redis) and Next.js (fetch cache, revalidation)                          | "cache", "Redis", "TTL", "memoise", "revalidate", "lru_cache", "cache-aside"          |
+| **tracing-patterns**       | Distributed tracing with span context propagation, W3C traceparent, agent span hierarchy                        | "trace", "span", "traceparent", "distributed tracing", "correlation", "OpenTelemetry" |
+| **docker-patterns**        | Multi-stage builds, layer caching, security hardening, Docker Compose orchestration                             | "Docker", "Dockerfile", "container", "image", "multi-stage", "docker-compose"         |
+| **ci-cd-patterns**         | GitHub Actions workflow optimisation, caching strategies, security scanning pipelines                           | "CI/CD", "GitHub Actions", "workflow", "pipeline", "deploy", "cache", "actions"       |
+| **retry-strategy**         | Exponential backoff, circuit breaker, and retry policies for httpx and fetch clients                            | "retry", "backoff", "circuit breaker", "timeout", "resilience", "transient error"     |
+| **queue-worker**           | Redis-backed background job processing with arq (Python) and BullMQ (TypeScript)                                | "queue", "worker", "background job", "Redis queue", "job processing", "BullMQ", "arq" |
+| **changelog-generator**    | Automated changelog from Conventional Commits with semantic versioning and GitHub Releases                      | "changelog", "release notes", "version bump", "conventional commits", "release"       |
+| **audit-trail**            | Structured audit event logging for compliance, forensics, and activity tracking                                 | "audit trail", "audit log", "activity log", "compliance", "forensics", "who did what" |
+| **webhook-handler**        | Idempotent webhook processing with HMAC signature verification and delivery tracking                            | "webhook", "callback", "signature", "HMAC", "idempotent", "event delivery"            |
+| **rate-limiter**           | Token bucket, sliding window, and tiered rate limiting for FastAPI and Next.js                                  | "rate limit", "throttle", "429", "token bucket", "sliding window", "quota"            |
+| **api-client**             | Type-safe fetch wrapper with interceptors, retry, and snake/camel case transforms                               | "API client", "fetch", "interceptor", "httpx", "request", "response"                  |
+| **search-indexer**         | Full-text search indexing with tsvector, GIN indexes, and hybrid search                                         | "search", "index", "tsvector", "full-text", "GIN", "autocomplete"                     |
+| **secret-management**      | Environment variable validation, secret redaction, rotation, and leak prevention                                | "secret", "env", "API key", "rotation", "redact", "credential"                        |
+| **resilience-patterns**    | Bulkhead isolation, timeout policies, fallback chains, and hedged requests                                      | "bulkhead", "timeout", "fallback", "resilience", "degrade", "hedging"                 |
+| **notification-system**    | Multi-channel notification dispatch with queue-backed delivery and user preferences                             | "notification", "notify", "alert", "email", "in-app", "push"                          |
+| **error-boundary**         | React error boundary patterns with fallback UI, error.tsx, and Suspense composition                             | "error boundary", "error.tsx", "fallback", "ErrorBoundary", "crash"                   |
+| **data-transform**         | ETL pipelines, typed data mappers, case conversion, and streaming transforms                                    | "transform", "ETL", "mapper", "camelCase", "snake_case", "pipeline"                   |
+| **api-versioning**         | URL and header-based versioning with deprecation policies and sunset headers                                    | "version", "v1", "v2", "deprecation", "sunset", "API version"                         |
+| **rbac-patterns**          | Role-based access control with permission hierarchies and row-level security                                    | "RBAC", "role", "permission", "access control", "authorise", "guard"                  |
+| **status-page**            | Public status page with incident management, uptime tracking, and maintenance windows                           | "status page", "incident", "uptime", "outage", "maintenance", "service status"        |
+| **markdown-processor**     | Parse, transform, and render Markdown with plugins and syntax highlighting                                      | "Markdown", "MDX", "remark", "rehype", "render", "parse"                              |
+| **pdf-generator**          | Server-side PDF generation with React PDF and reportlab                                                         | "PDF", "report", "invoice", "download", "export PDF", "A4"                            |
+| **content-moderation**     | Content filtering, toxicity detection, and moderation queues                                                    | "moderate", "filter", "toxicity", "safety", "content check", "PII"                    |
+| **i18n-patterns**          | Internationalisation with en-AU default, date/currency formatting, timezone handling                            | "i18n", "locale", "translate", "date format", "currency", "timezone"                  |
+| **oauth-flow**             | OAuth 2.0 authorisation code flow with PKCE, provider config, and account linking                               | "OAuth", "OIDC", "social login", "Google auth", "GitHub auth", "PKCE"                 |
+| **csrf-protection**        | CSRF prevention with double-submit cookies, SameSite, and origin validation                                     | "CSRF", "forgery", "SameSite", "token", "cross-site", "form protection"               |
+| **saga-pattern**           | Distributed transaction orchestration with compensation and rollback                                            | "saga", "compensation", "rollback", "distributed transaction", "orchestration"        |
+| **pipeline-builder**       | Composable data and task pipelines with typed stages and parallel execution                                     | "pipeline", "compose", "stage", "ETL", "chain", "pipe"                                |
+| **feature-flag**           | Feature toggles with percentage rollout, targeting rules, and kill switches                                     | "feature flag", "toggle", "rollout", "A/B test", "kill switch", "canary"              |
+| **workflow-engine**        | Multi-step approval workflows with timeout, escalation, and visual execution                                    | "workflow", "approval", "business process", "execution", "step", "automation"         |
+| **graphql-patterns**       | Schema design, resolver patterns, dataloader optimisation, and type-safe client integration                     | "GraphQL", "schema", "resolver", "dataloader", "Strawberry", "query"                  |
+| **infrastructure-as-code** | Terraform and Pulumi patterns for cloud provisioning, state management, and environment parity                  | "Terraform", "Pulumi", "IaC", "provision", "infrastructure", "cloud"                  |
+| **report-generator**       | Data aggregation, multi-format report output, scheduled reporting, and template-driven documents                | "report", "generate report", "audit report", "export", "summary", "daily report"      |
+| **slack-integration**      | Slack bot commands, webhook notifications, interactive messages, and team alerting                              | "Slack", "webhook", "bot", "notification", "channel", "Block Kit"                     |
+| **xaem-theme-ui**          | Two-pass theme generation and code translation pipeline (colour palettes, glow, timing, tokens)                 | "theme", "palette", "colour scheme", "design tokens", "generate theme"                |
+| **execution-guardian**     | Pre-execution governance with dynamic validation gates, risk/confidence scoring, and structured error format    | "risk", "safe to proceed", "prerequisite", "validation gate", "confidence"            |
+| **system-supervisor**      | Architecture drift detection, silent failure scanning, hallucination prevention, and feature completeness audit | "drift", "dead code", "completeness", "audit", "integrity", "silent failure"          |
+| **playwright-browser**     | Playwright CLI and MCP tools for headless browser automation, E2E testing, screenshots, and web scraping        | "playwright", "E2E", "browser test", "screenshot", "headless", "automation"           |
+| **claude-browser**         | Claude Chrome extension tools for personal browser automation in logged-in sessions                             | "chrome", "personal browser", "form fill", "logged in", "tab management"              |
+
+### Governance Skills
+
+Location: `.skills/custom/` (installed 06/03/2026)
+
+> These 8 skills implement the AI Development Governance Framework (`memory.md`). Load before any complex task.
+
+| Skill                          | Description                                                                                                          | Trigger Phrases                                                                      |
+| ------------------------------ | -------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| **outcome-translator**         | Converts founder outcome language ("finished", "ready", "launch it") into gated engineering execution plans          | "finished", "ready", "launch it", "make it work", "production ready"                 |
+| **definition-of-done-builder** | Builds measurable, evidence-backed Definition of Done criteria for any task type                                     | "acceptance criteria", "when is this finished?", "define success", "done criteria"   |
+| **blueprint-first**            | Enforces ASCII blueprint generation and approval before any UI, architecture, or schema implementation               | "build a page", "create a layout", "new dashboard", "design the UI", "add a section" |
+| **finished-audit**             | Audits production systems against the Definition of Finished checklist across 8 domains                              | "is it finished?", "production ready?", "can we go live?", "run a finished audit"    |
+| **evidence-verifier**          | 4-tier evidence quality system — rejects narrative descriptions, requires Tier 1/2 artefacts for VERIFIED status     | "verified", "confirmed", "working", "passing", "check this evidence"                 |
+| **model-currency-checker**     | Checks configured AI models against approved defaults, detects deprecated/misrouted models                           | "check models", "model audit", "are models up to date?", "model currency"            |
+| **visual-excellence-enforcer** | Blocks factory-default LLM UI from shipping — enforces Scientific Luxury design system for all customer-facing pages | "review the UI", "visual audit", "design review", "does it look good?"               |
+| **delegation-planner**         | Maps tasks to the correct agent in the PM → Orchestrator → Specialist → Sub-Agent hierarchy                          | "delegate this", "who should handle this?", "assign this", "break this down"         |
 
 ### Identified Gaps
 
-No gaps identified. All **59 skills** are installed. Use `/skill-manager analyse` to run automated gap analysis across all installed skills and detect missing capabilities.
+No gaps identified. All **67 skills** are installed (59 original + 8 governance). Use `/skill-manager analyse` to run automated gap analysis across all installed skills and detect missing capabilities.
 
 ## Skill Priority
 

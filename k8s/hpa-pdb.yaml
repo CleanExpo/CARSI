@@ -1,0 +1,124 @@
+# GP-153 — HorizontalPodAutoscaler + PodDisruptionBudget
+#
+# Refined autoscaling targets and disruption budgets for web and backend.
+# These HPAs supersede the basic HPAs in web-deployment.yaml and backend-deployment.yaml.
+# After applying this file, remove the HPA sections from those files to avoid conflicts.
+#
+# Apply:
+#   kubectl apply -f k8s/hpa-pdb.yaml
+
+# --- Web HPA (min:2, max:6, CPU 70%) ---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: carsi-web-hpa
+  namespace: carsi-production
+  labels:
+    app: carsi-web
+    app.kubernetes.io/part-of: carsi-lms
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: carsi-web
+  minReplicas: 2
+  maxReplicas: 6
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 60
+      policies:
+        - type: Pods
+          value: 2
+          periodSeconds: 60
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 120
+---
+# --- Backend HPA (min:2, max:8, CPU 65%) ---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: carsi-backend-hpa
+  namespace: carsi-production
+  labels:
+    app: carsi-backend
+    app.kubernetes.io/part-of: carsi-lms
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: carsi-backend
+  minReplicas: 2
+  maxReplicas: 8
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 65
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 60
+      policies:
+        - type: Pods
+          value: 2
+          periodSeconds: 60
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 120
+---
+# --- Web PDB (minAvailable: 1) ---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: carsi-web-pdb
+  namespace: carsi-production
+  labels:
+    app: carsi-web
+    app.kubernetes.io/part-of: carsi-lms
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: carsi-web
+---
+# --- Backend PDB (minAvailable: 1) ---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: carsi-backend-pdb
+  namespace: carsi-production
+  labels:
+    app: carsi-backend
+    app.kubernetes.io/part-of: carsi-lms
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: carsi-backend

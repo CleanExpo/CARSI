@@ -1,0 +1,81 @@
+# GP-154 — cert-manager + Let's Encrypt TLS
+#
+# Prerequisites:
+#   Install cert-manager CRDs and controller before applying this file:
+#
+#   kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.14.0/cert-manager.yaml
+#
+#   Or via Helm (as documented in k8s/README.md):
+#
+#   helm repo add jetstack https://charts.jetstack.io
+#   helm repo update
+#   helm install cert-manager jetstack/cert-manager \
+#     --namespace cert-manager --create-namespace \
+#     --set crds.enabled=true
+#
+#   Wait for cert-manager pods to be ready:
+#   kubectl wait --for=condition=Ready pods -l app.kubernetes.io/instance=cert-manager -n cert-manager --timeout=120s
+#
+# Apply:
+#   kubectl apply -f k8s/cert-manager.yaml
+
+# --- Let's Encrypt Production ClusterIssuer ---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+  labels:
+    app.kubernetes.io/part-of: carsi-lms
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: admin@carsi.com.au
+    privateKeySecretRef:
+      name: letsencrypt-prod
+    solvers:
+      - http01:
+          ingress:
+            class: nginx
+---
+# --- Let's Encrypt Staging ClusterIssuer (for testing) ---
+# Use this issuer first to validate your setup without hitting rate limits.
+# Switch ingress annotation to "letsencrypt-staging" to test:
+#   cert-manager.io/cluster-issuer: letsencrypt-staging
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-staging
+  labels:
+    app.kubernetes.io/part-of: carsi-lms
+spec:
+  acme:
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    email: admin@carsi.com.au
+    privateKeySecretRef:
+      name: letsencrypt-staging
+    solvers:
+      - http01:
+          ingress:
+            class: nginx
+---
+# --- Certificate for carsi.com.au ---
+# cert-manager will automatically create and renew TLS certificates.
+# The resulting secret (carsi-tls) is referenced by k8s/ingress.yaml.
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: carsi-tls-cert
+  namespace: carsi-production
+  labels:
+    app.kubernetes.io/part-of: carsi-lms
+spec:
+  secretName: carsi-tls
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  dnsNames:
+    - carsi.com.au
+    - www.carsi.com.au
+    - api.carsi.com.au
+  duration: 2160h # 90 days
+  renewBefore: 720h # Renew 30 days before expiry

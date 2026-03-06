@@ -1,0 +1,310 @@
+# GP-156 — Prometheus + Grafana Monitoring Stack
+#
+# Prerequisites:
+#   Install kube-prometheus-stack via Helm (or Flux/ArgoCD HelmRelease below).
+#
+#   Manual Helm install:
+#     helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+#     helm repo update
+#     helm install kube-prometheus-stack prometheus-community/kube-prometheus-stack \
+#       --namespace carsi-monitoring --create-namespace \
+#       --values k8s/monitoring-values.yaml
+#
+# Apply CARSI-specific resources:
+#   kubectl apply -f k8s/monitoring.yaml
+
+# --- Monitoring Namespace ---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: carsi-monitoring
+  labels:
+    app.kubernetes.io/part-of: carsi-lms
+    environment: production
+---
+# --- HelmRelease (for Flux/ArgoCD) ---
+# Uncomment and apply if using GitOps. Otherwise use the manual Helm install above.
+#
+# apiVersion: helm.toolkit.fluxcd.io/v2beta2
+# kind: HelmRelease
+# metadata:
+#   name: kube-prometheus-stack
+#   namespace: carsi-monitoring
+# spec:
+#   interval: 1h
+#   chart:
+#     spec:
+#       chart: kube-prometheus-stack
+#       version: "58.x"
+#       sourceRef:
+#         kind: HelmRepository
+#         name: prometheus-community
+#         namespace: flux-system
+#   values:
+#     grafana:
+#       enabled: true
+#       adminPassword:
+#         existingSecret: grafana-admin
+#         secretKey: password
+#       ingress:
+#         enabled: true
+#         ingressClassName: nginx
+#         annotations:
+#           cert-manager.io/cluster-issuer: letsencrypt-prod
+#         hosts:
+#           - monitoring.carsi.com.au
+#         tls:
+#           - secretName: grafana-tls
+#             hosts:
+#               - monitoring.carsi.com.au
+#     prometheus:
+#       prometheusSpec:
+#         retention: 30d
+#         storageSpec:
+#           volumeClaimTemplate:
+#             spec:
+#               storageClassName: do-block-storage-retain
+#               accessModes: ["ReadWriteOnce"]
+#               resources:
+#                 requests:
+#                   storage: 50Gi
+#         serviceMonitorSelectorNilUsesHelmValues: false
+#         ruleSelector: {}
+#         ruleSelectorNilUsesHelmValues: false
+#     alertmanager:
+#       enabled: true
+#       alertmanagerSpec:
+#         retention: 120h
+---
+# --- Grafana Admin Secret ---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: grafana-admin
+  namespace: carsi-monitoring
+  labels:
+    app.kubernetes.io/part-of: carsi-lms
+type: Opaque
+stringData:
+  password: CHANGE_ME_GENERATE_WITH_openssl_rand_base64_24
+---
+# --- PrometheusRule: CARSI Application Alerts ---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: carsi-application-alerts
+  namespace: carsi-monitoring
+  labels:
+    app.kubernetes.io/part-of: carsi-lms
+    release: kube-prometheus-stack
+spec:
+  groups:
+    - name: carsi.api
+      rules:
+        # API response time > 2s for 5 minutes
+        - alert: CARSIHighResponseTime
+          expr: |
+            histogram_quantile(0.95,
+              sum(rate(http_request_duration_seconds_bucket{namespace="carsi-production"}[5m])) by (le)
+            ) > 2
+          for: 5m
+          labels:
+            severity: warning
+            team: carsi
+          annotations:
+            summary: 'API response time exceeds 2s (p95)'
+            description: '95th percentile response time is {{ $value | humanizeDuration }} over the last 5 minutes.'
+            runbook_url: 'https://docs.carsi.com.au/runbooks/high-response-time'
+
+        # Error rate > 5% for 5 minutes
+        - alert: CARSIHighErrorRate
+          expr: |
+            (
+              sum(rate(http_requests_total{namespace="carsi-production", status=~"5.."}[5m]))
+              /
+              sum(rate(http_requests_total{namespace="carsi-production"}[5m]))
+            ) * 100 > 5
+          for: 5m
+          labels:
+            severity: critical
+            team: carsi
+          annotations:
+            summary: 'API error rate exceeds 5%'
+            description: 'Error rate is {{ $value | printf "%.1f" }}% over the last 5 minutes.'
+            runbook_url: 'https://docs.carsi.com.au/runbooks/high-error-rate'
+
+    - name: carsi.pods
+      rules:
+        # Pod restart > 3 in 10 minutes
+        - alert: CARSIPodRestartLoop
+          expr: |
+            increase(kube_pod_container_status_restarts_total{namespace="carsi-production"}[10m]) > 3
+          for: 0m
+          labels:
+            severity: warning
+            team: carsi
+          annotations:
+            summary: 'Pod {{ $labels.pod }} restarting frequently'
+            description: 'Pod {{ $labels.pod }} in {{ $labels.namespace }} has restarted {{ $value | printf "%.0f" }} times in the last 10 minutes.'
+            runbook_url: 'https://docs.carsi.com.au/runbooks/pod-restart-loop'
+
+        # Pod not ready for 5 minutes
+        - alert: CARSIPodNotReady
+          expr: |
+            kube_pod_status_ready{namespace="carsi-production", condition="true"} == 0
+          for: 5m
+          labels:
+            severity: warning
+            team: carsi
+          annotations:
+            summary: 'Pod {{ $labels.pod }} not ready'
+            description: 'Pod {{ $labels.pod }} has been not-ready for more than 5 minutes.'
+---
+# --- ServiceMonitor: FastAPI Backend ---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: carsi-backend-monitor
+  namespace: carsi-monitoring
+  labels:
+    app: carsi-backend
+    app.kubernetes.io/part-of: carsi-lms
+    release: kube-prometheus-stack
+spec:
+  namespaceSelector:
+    matchNames:
+      - carsi-production
+  selector:
+    matchLabels:
+      app: carsi-backend
+  endpoints:
+    - port: '8000'
+      path: /metrics
+      interval: 30s
+      scrapeTimeout: 10s
+---
+# --- ConfigMap: Grafana Dashboard — FastAPI Metrics ---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: carsi-fastapi-dashboard
+  namespace: carsi-monitoring
+  labels:
+    app.kubernetes.io/part-of: carsi-lms
+    grafana_dashboard: 'true'
+data:
+  carsi-fastapi.json: |
+    {
+      "annotations": { "list": [] },
+      "editable": true,
+      "fiscalYearStartMonth": 0,
+      "graphTooltip": 1,
+      "id": null,
+      "links": [],
+      "panels": [
+        {
+          "title": "Request Rate (req/s)",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+          "targets": [
+            {
+              "expr": "sum(rate(http_requests_total{namespace=\"carsi-production\"}[5m])) by (method)",
+              "legendFormat": "{{ method }}"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": { "unit": "reqps" }
+          }
+        },
+        {
+          "title": "Response Time (p95)",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+          "targets": [
+            {
+              "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{namespace=\"carsi-production\"}[5m])) by (le))",
+              "legendFormat": "p95"
+            },
+            {
+              "expr": "histogram_quantile(0.50, sum(rate(http_request_duration_seconds_bucket{namespace=\"carsi-production\"}[5m])) by (le))",
+              "legendFormat": "p50"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": { "unit": "s" }
+          }
+        },
+        {
+          "title": "Error Rate (%)",
+          "type": "stat",
+          "gridPos": { "h": 4, "w": 6, "x": 0, "y": 8 },
+          "targets": [
+            {
+              "expr": "(sum(rate(http_requests_total{namespace=\"carsi-production\", status=~\"5..\"}[5m])) / sum(rate(http_requests_total{namespace=\"carsi-production\"}[5m]))) * 100",
+              "legendFormat": "Error %"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": { "unit": "percent", "thresholds": { "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 1 }, { "color": "red", "value": 5 }] } }
+          }
+        },
+        {
+          "title": "Active Pods",
+          "type": "stat",
+          "gridPos": { "h": 4, "w": 6, "x": 6, "y": 8 },
+          "targets": [
+            {
+              "expr": "count(kube_pod_status_ready{namespace=\"carsi-production\", condition=\"true\"}) by (deployment)",
+              "legendFormat": "{{ deployment }}"
+            }
+          ]
+        },
+        {
+          "title": "CPU Usage by Pod",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+          "targets": [
+            {
+              "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"carsi-production\", container!=\"\"}[5m])) by (pod)",
+              "legendFormat": "{{ pod }}"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": { "unit": "short" }
+          }
+        },
+        {
+          "title": "Memory Usage by Pod",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
+          "targets": [
+            {
+              "expr": "sum(container_memory_working_set_bytes{namespace=\"carsi-production\", container!=\"\"}) by (pod)",
+              "legendFormat": "{{ pod }}"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": { "unit": "bytes" }
+          }
+        },
+        {
+          "title": "Pod Restarts",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
+          "targets": [
+            {
+              "expr": "increase(kube_pod_container_status_restarts_total{namespace=\"carsi-production\"}[1h])",
+              "legendFormat": "{{ pod }}"
+            }
+          ]
+        }
+      ],
+      "schemaVersion": 39,
+      "tags": ["carsi", "fastapi", "production"],
+      "templating": { "list": [] },
+      "time": { "from": "now-6h", "to": "now" },
+      "timepicker": {},
+      "timezone": "Australia/Sydney",
+      "title": "CARSI LMS — FastAPI Metrics",
+      "uid": "carsi-fastapi-overview"
+    }

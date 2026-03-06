@@ -1,0 +1,49 @@
+# =============================================================================
+# CARSI LMS — Fly.io Application Configuration
+# App: carsi-backend
+# Region: syd (Sydney, Australia)
+# Machine: shared-cpu-1x 512MB RAM (~$3.83 AUD/month)
+# =============================================================================
+
+app = "carsi-backend"
+primary_region = "syd"
+
+# Build using the existing production Dockerfile
+[build]
+  dockerfile = "Dockerfile"
+
+# Static environment (non-secret) variables
+# Secrets (DATABASE_URL, JWT_SECRET_KEY, STRIPE_*, etc.) are set via:
+#   fly secrets set KEY=VALUE --app carsi-backend
+[env]
+  ENVIRONMENT = "production"
+  PORT = "8000"
+  AI_PROVIDER = "anthropic"
+
+# HTTP service configuration
+[http_service]
+  internal_port = 8000
+  force_https = true
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1
+
+  # Health check — maps to FastAPI /health endpoint
+  [[http_service.checks]]
+    grace_period = "15s"
+    interval = "30s"
+    method = "GET"
+    path = "/health"
+    protocol = "http"
+    timeout = "5s"
+
+# Machine size — shared-cpu-1x 512MB
+# Upgrade to shared-cpu-2x 1GB if memory pressure observed
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 512
+
+# Deploy strategy: rolling (zero-downtime deploys)
+[deploy]
+  strategy = "rolling"

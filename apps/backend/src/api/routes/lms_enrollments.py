@@ -5,6 +5,8 @@ POST   /api/lms/enrollments         — enrol in a course (any authenticated use
 GET    /api/lms/enrollments/me      — list my enrolments (current user)
 """
 
+import asyncio
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -60,6 +62,28 @@ async def enrol_in_course(
     await db.flush()
     await db.commit()
     await db.refresh(enrollment)
+
+    # Fire-and-forget: push enrolment event to Unite-Hub Nexus
+    from src.services.nexus_connector import push_event
+
+    asyncio.create_task(push_event("student.enrolled", {
+        "student_id": str(current_user.id),
+        "course_id": str(enrollment.course_id),
+        "enrolled_at": enrollment.enrolled_at.isoformat() if enrollment.enrolled_at else None,
+    }))
+
+    # Fire-and-forget: push to Synthex for marketing automation
+    from src.services.synthex_connector import notify_student_enrolled
+
+    asyncio.create_task(notify_student_enrolled(
+        student_id=current_user.id,
+        course_id=enrollment.course_id,
+        course_title=course.title,
+        discipline=course.iicrc_discipline,
+        cec_hours=float(course.cec_hours) if course.cec_hours else None,
+        price_aud=float(course.price_aud) if course.price_aud else None,
+        is_free=course.is_free or False,
+    ))
 
     return EnrollmentWithCourseOut(
         id=enrollment.id,

@@ -1,0 +1,41 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: carsi-staging-ingress
+  namespace: carsi-staging
+  labels:
+    app.kubernetes.io/part-of: carsi-lms
+    environment: staging
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/proxy-body-size: 50m
+    nginx.ingress.kubernetes.io/proxy-read-timeout: '60'
+    nginx.ingress.kubernetes.io/proxy-send-timeout: '60'
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - staging.carsi.com.au
+        - api-staging.carsi.com.au
+      secretName: carsi-staging-tls
+  rules:
+    - host: staging.carsi.com.au
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: carsi-web
+                port:
+                  number: 3000
+    - host: api-staging.carsi.com.au
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: carsi-backend
+                port:
+                  number: 8000

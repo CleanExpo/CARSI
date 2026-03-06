@@ -1,0 +1,1057 @@
+{
+  "$schema": "carsi-icp-v1",
+  "description": "CARSI Industry ICP Database — Decision makers, channels, pain points, and campaign triggers for SYNTHEX marketing automation",
+  "last_updated": "2026-03-05",
+  "industries": [
+    {
+      "id": "healthcare",
+      "name": "Healthcare",
+      "market_size_aud": "~$200B",
+      "iicrc_disciplines": ["AMRT", "WRT", "FSRT"],
+      "decision_makers": [
+        {
+          "role": "Facility Manager",
+          "title_variations": [
+            "Facilities Manager",
+            "Building Services Manager",
+            "Operations Manager"
+          ],
+          "seniority": "mid-senior",
+          "reports_to": "COO or Hospital Administrator",
+          "budget_authority": true,
+          "typical_age_range": "35-55"
+        },
+        {
+          "role": "Infection Control Practitioner",
+          "title_variations": ["ICP", "Infection Control Nurse", "IC Coordinator"],
+          "seniority": "specialist",
+          "reports_to": "Director of Nursing or Medical Director",
+          "budget_authority": false,
+          "influence_level": "high",
+          "typical_age_range": "30-50"
+        },
+        {
+          "role": "WHS/OHS Manager",
+          "title_variations": ["Safety Manager", "Risk Manager", "Compliance Manager"],
+          "seniority": "mid-senior",
+          "reports_to": "CEO or General Manager",
+          "budget_authority": true,
+          "typical_age_range": "35-55"
+        }
+      ],
+      "channels": {
+        "linkedin_groups": [
+          "Australian Healthcare Facilities Management",
+          "Infection Control Practitioners Network",
+          "Hospital Engineers Australia"
+        ],
+        "industry_associations": [
+          "Australasian College for Infection Prevention and Control (ACIPC)",
+          "Institute of Hospital Engineering Australia (IHEA)",
+          "Facility Management Association of Australia (FMA)"
+        ],
+        "publications": [
+          "Australian Health Review",
+          "Australasian Facilities Management",
+          "Hospital + Healthcare"
+        ],
+        "conferences": [
+          "IHEA National Conference",
+          "ACIPC International Conference",
+          "FMA Ideaction"
+        ],
+        "online_communities": [
+          "Healthcare Facilities Management Australia (Facebook)",
+          "Hospital Engineering LinkedIn"
+        ],
+        "search_behaviour": [
+          "mould remediation hospital",
+          "infection control training online",
+          "water damage healthcare facility",
+          "IICRC certification healthcare"
+        ]
+      },
+      "pain_points": [
+        {
+          "pain": "Regulatory compliance burden",
+          "description": "Constant audits from ACHS, state health departments. Need documented evidence of staff competency.",
+          "emotional_impact": "Anxiety about audit failures, personal liability",
+          "urgency": "high"
+        },
+        {
+          "pain": "Mould incidents causing ward closures",
+          "description": "Water damage leading to mould = closed wards = lost revenue + media risk",
+          "emotional_impact": "Fear of public embarrassment, patient safety concerns",
+          "urgency": "critical"
+        },
+        {
+          "pain": "Staff training logistics",
+          "description": "Can't send staff off-site for training. 24/7 operations mean no downtime.",
+          "emotional_impact": "Frustration with traditional training providers",
+          "urgency": "medium"
+        },
+        {
+          "pain": "Contractor competency verification",
+          "description": "Need to prove restoration contractors are qualified before engaging them",
+          "emotional_impact": "Risk aversion, fear of selecting wrong contractor",
+          "urgency": "high"
+        }
+      ],
+      "value_propositions": [
+        "24/7 online training — no staff downtime",
+        "IICRC credentials satisfy audit requirements",
+        "Documented competency for WHS due diligence defence",
+        "Train in-house staff to handle initial water damage response"
+      ],
+      "campaign_triggers": [
+        "Flu season (May-Sep) — mould awareness increases",
+        "Post-flood events — immediate training demand",
+        "Budget cycles — June/July new financial year",
+        "Accreditation renewal periods"
+      ],
+      "objections_and_responses": [
+        {
+          "objection": "We use external contractors for all restoration",
+          "response": "Understanding restoration standards helps you assess contractor quotes and avoid over-scoping"
+        },
+        {
+          "objection": "Our staff don't have time for training",
+          "response": "Self-paced online courses completed in 30-minute sessions. No travel, no downtime."
+        },
+        {
+          "objection": "Is IICRC recognised in Australia?",
+          "response": "IICRC is the global standard adopted by Australian insurers, government, and industry bodies"
+        }
+      ]
+    },
+    {
+      "id": "hospitality",
+      "name": "Hotels & Resorts",
+      "market_size_aud": "~$50B tourism",
+      "iicrc_disciplines": ["WRT", "CRT", "ASD", "OCT"],
+      "decision_makers": [
+        {
+          "role": "Hotel General Manager",
+          "title_variations": ["GM", "Resort Manager", "Property Manager"],
+          "seniority": "senior",
+          "reports_to": "Regional VP or Owner",
+          "budget_authority": true,
+          "typical_age_range": "40-60"
+        },
+        {
+          "role": "Chief Engineer",
+          "title_variations": ["Facilities Director", "Maintenance Manager", "Engineering Manager"],
+          "seniority": "mid-senior",
+          "reports_to": "General Manager",
+          "budget_authority": true,
+          "typical_age_range": "35-55"
+        },
+        {
+          "role": "Housekeeping Director",
+          "title_variations": [
+            "Executive Housekeeper",
+            "Director of Housekeeping",
+            "Rooms Division Manager"
+          ],
+          "seniority": "mid",
+          "reports_to": "General Manager or Rooms Division Director",
+          "budget_authority": false,
+          "influence_level": "high",
+          "typical_age_range": "30-50"
+        }
+      ],
+      "channels": {
+        "linkedin_groups": [
+          "Hotel Managers Australia",
+          "Accommodation Industry Australia",
+          "Hospitality Engineering"
+        ],
+        "industry_associations": [
+          "Accommodation Australia",
+          "Tourism Accommodation Australia (TAA)",
+          "Australian Hotels Association (AHA)"
+        ],
+        "publications": ["HM Magazine (Hospitality Magazine)", "Accom News", "Australian Hotelier"],
+        "conferences": [
+          "NoVacancy Hotel + Accommodation Expo",
+          "AHA National Conference",
+          "Accommodation Industry Conference"
+        ],
+        "online_communities": [
+          "Hotel GMs Australia (Facebook private group)",
+          "Hospitality Leaders Network"
+        ],
+        "search_behaviour": [
+          "carpet cleaning hotel training",
+          "water damage hotel room",
+          "odour removal hotel",
+          "flood response hospitality"
+        ]
+      },
+      "pain_points": [
+        {
+          "pain": "Room downtime = lost revenue",
+          "description": "Every night a room is out of service costs $200-$500+. Rapid restoration is critical.",
+          "emotional_impact": "Revenue pressure, owner/shareholder scrutiny",
+          "urgency": "critical"
+        },
+        {
+          "pain": "Guest complaints about odours",
+          "description": "Smoke, mould, or musty smells lead to refunds, bad reviews, reputation damage",
+          "emotional_impact": "Fear of TripAdvisor/Google reviews",
+          "urgency": "high"
+        },
+        {
+          "pain": "High-traffic carpet wear",
+          "description": "Lobbies, corridors, conference rooms need constant maintenance",
+          "emotional_impact": "Appearance anxiety, brand standards pressure",
+          "urgency": "medium"
+        },
+        {
+          "pain": "Pool/spa water damage",
+          "description": "Overflow and leak incidents in aquatic facilities",
+          "emotional_impact": "Safety liability concerns",
+          "urgency": "medium"
+        }
+      ],
+      "value_propositions": [
+        "Train maintenance staff to respond immediately — reduce room downtime",
+        "OCT certification solves persistent odour complaints",
+        "24/7 online training fits shift schedules",
+        "Differentiate from competitors with certified staff"
+      ],
+      "campaign_triggers": [
+        "Pre-peak season (Oct-Dec) — summer holiday prep",
+        "Post-storm events — flood damage",
+        "Renovation cycles — carpet replacement budgets",
+        "New hotel openings — staff onboarding"
+      ],
+      "objections_and_responses": [
+        {
+          "objection": "We outsource all cleaning and maintenance",
+          "response": "Understanding restoration standards helps you manage contractors effectively and respond faster to emergencies"
+        },
+        {
+          "objection": "Our brand has its own training program",
+          "response": "IICRC credentials complement brand training with industry-recognised certification"
+        }
+      ]
+    },
+    {
+      "id": "government",
+      "name": "Government & Defence",
+      "market_size_aud": "537 councils + federal/state agencies",
+      "iicrc_disciplines": ["AMRT", "WRT", "ASD", "FSRT"],
+      "decision_makers": [
+        {
+          "role": "Facilities/Asset Manager",
+          "title_variations": [
+            "Property Manager",
+            "Building Services Coordinator",
+            "Asset Coordinator"
+          ],
+          "seniority": "mid",
+          "reports_to": "Director of Operations or Council Manager",
+          "budget_authority": true,
+          "typical_age_range": "35-55"
+        },
+        {
+          "role": "Procurement Officer",
+          "title_variations": ["Contracts Manager", "Tender Coordinator", "Supply Chain Manager"],
+          "seniority": "mid",
+          "reports_to": "CFO or Director Corporate Services",
+          "budget_authority": false,
+          "influence_level": "critical",
+          "typical_age_range": "30-50"
+        },
+        {
+          "role": "WHS Advisor",
+          "title_variations": ["Safety Officer", "OHS Coordinator", "Risk & Safety Manager"],
+          "seniority": "mid",
+          "reports_to": "Director People & Culture or GM",
+          "budget_authority": false,
+          "influence_level": "high",
+          "typical_age_range": "30-55"
+        }
+      ],
+      "channels": {
+        "linkedin_groups": [
+          "Local Government Professionals Australia",
+          "Government Procurement Network",
+          "Public Sector WHS"
+        ],
+        "industry_associations": [
+          "Local Government Professionals Australia (LGPro)",
+          "Institute of Public Works Engineering Australasia (IPWEA)",
+          "Chartered Institute of Procurement & Supply (CIPS)"
+        ],
+        "publications": ["Government News", "The Mandarin", "Public Sector News"],
+        "conferences": [
+          "LGPro National Congress",
+          "IPWEA International Public Works Conference",
+          "Procurement Congress Australia"
+        ],
+        "online_communities": [
+          "GovTeams (internal government platform)",
+          "Local Government Professionals LinkedIn"
+        ],
+        "portals": ["AusTender", "NSW eTendering", "QTenders", "Tenders VIC"],
+        "search_behaviour": [
+          "AusTender restoration contractor",
+          "government building maintenance training",
+          "IICRC certification tender requirement",
+          "heritage building water damage"
+        ]
+      },
+      "pain_points": [
+        {
+          "pain": "Tender compliance requirements",
+          "description": "Procurement processes require documented contractor qualifications",
+          "emotional_impact": "Fear of audit findings, probity concerns",
+          "urgency": "high"
+        },
+        {
+          "pain": "Heritage building preservation",
+          "description": "Many government buildings are heritage-listed, requiring specialized restoration",
+          "emotional_impact": "Cultural responsibility, public scrutiny",
+          "urgency": "medium"
+        },
+        {
+          "pain": "WHS due diligence",
+          "description": "Government employers have strict WHS duties under Model WHS Act",
+          "emotional_impact": "Personal liability for officers",
+          "urgency": "high"
+        },
+        {
+          "pain": "Budget constraints",
+          "description": "Fixed budgets, need to justify training expenditure",
+          "emotional_impact": "Pressure to demonstrate ROI",
+          "urgency": "medium"
+        }
+      ],
+      "value_propositions": [
+        "IICRC credentials satisfy AusTender pre-qualification",
+        "Documented competency for WHS due diligence defence",
+        "Bulk licensing for council/department-wide training",
+        "Online training = no travel budget required"
+      ],
+      "campaign_triggers": [
+        "New financial year (July) — budget allocation",
+        "Election cycles — new councillors/ministers",
+        "Post-disaster events — flood, fire recovery",
+        "Tender release periods"
+      ],
+      "objections_and_responses": [
+        {
+          "objection": "We have internal training programs",
+          "response": "IICRC credentials provide external verification that satisfies audit requirements"
+        },
+        {
+          "objection": "Budget is locked for this financial year",
+          "response": "Our annual subscription model allows budget planning for next FY"
+        },
+        {
+          "objection": "Is this approved by our procurement panel?",
+          "response": "We can provide documentation for procurement review — IICRC is the global industry standard"
+        }
+      ]
+    },
+    {
+      "id": "commercial_cleaning",
+      "name": "Commercial Cleaning",
+      "market_size_aud": "~$15B",
+      "iicrc_disciplines": ["CCT", "CRT", "WRT", "AMRT", "OCT"],
+      "decision_makers": [
+        {
+          "role": "Cleaning Company Owner",
+          "title_variations": ["Director", "Principal", "Managing Director"],
+          "seniority": "owner",
+          "budget_authority": true,
+          "typical_age_range": "35-65"
+        },
+        {
+          "role": "Operations Manager",
+          "title_variations": ["Ops Manager", "Service Delivery Manager", "Contract Manager"],
+          "seniority": "mid-senior",
+          "reports_to": "Owner or General Manager",
+          "budget_authority": true,
+          "typical_age_range": "30-50"
+        },
+        {
+          "role": "Training Coordinator",
+          "title_variations": ["L&D Manager", "Quality Manager", "Compliance Officer"],
+          "seniority": "mid",
+          "reports_to": "Operations Manager",
+          "budget_authority": false,
+          "influence_level": "high",
+          "typical_age_range": "25-45"
+        }
+      ],
+      "channels": {
+        "linkedin_groups": [
+          "ISSA Australia & New Zealand",
+          "Commercial Cleaning Professionals",
+          "Cleaning Industry Network Australia"
+        ],
+        "industry_associations": [
+          "ISSA (International Sanitary Supply Association)",
+          "Building Service Contractors Association of Australia (BSCAA)",
+          "Cleaning Accountability Framework"
+        ],
+        "publications": ["Inclean Magazine", "FM Magazine", "Australasian Cleaning Review"],
+        "conferences": ["ISSA Cleaning & Hygiene Expo", "Total Facilities Live", "CleanNZ Expo"],
+        "online_communities": [
+          "Commercial Cleaners Australia (Facebook)",
+          "Cleaning Business Owners Network"
+        ],
+        "search_behaviour": [
+          "ISSA cleaning certification",
+          "add restoration services cleaning company",
+          "insurance work cleaning contractor",
+          "IICRC certification cleaning"
+        ]
+      },
+      "pain_points": [
+        {
+          "pain": "Commoditisation and price pressure",
+          "description": "Race to bottom on pricing. Need to differentiate or add services.",
+          "emotional_impact": "Margin anxiety, fear of losing contracts",
+          "urgency": "high"
+        },
+        {
+          "pain": "Winning insurance work",
+          "description": "Insurance restoration pays 30-50% higher margins but requires credentials",
+          "emotional_impact": "FOMO on higher-margin work",
+          "urgency": "high"
+        },
+        {
+          "pain": "Staff turnover and training",
+          "description": "High turnover industry, constant need to train new staff",
+          "emotional_impact": "Frustration with recruitment cycle",
+          "urgency": "medium"
+        },
+        {
+          "pain": "Tender pre-qualification",
+          "description": "Losing tenders due to lack of certifications",
+          "emotional_impact": "Missed opportunity frustration",
+          "urgency": "high"
+        }
+      ],
+      "value_propositions": [
+        "Add restoration services = 30-50% higher margins",
+        "Win insurance work with IICRC credentials",
+        "Differentiate from 'mop and bucket' competitors",
+        "Pre-qualify for government and corporate panels"
+      ],
+      "campaign_triggers": [
+        "ISSA Cleaning & Hygiene Expo",
+        "Contract renewal periods",
+        "Post-disaster events (flood, storm)",
+        "New business setup/expansion"
+      ],
+      "objections_and_responses": [
+        {
+          "objection": "We're just a cleaning company, not restoration",
+          "response": "That's exactly the opportunity — add restoration services without starting a new business"
+        },
+        {
+          "objection": "My staff don't have time for training",
+          "response": "30-minute self-paced modules. Staff can complete during breaks or slow periods."
+        },
+        {
+          "objection": "Is IICRC recognised by Australian insurers?",
+          "response": "Yes — IAG, Suncorp, QBE all recognise IICRC credentials for restoration contractors"
+        }
+      ]
+    },
+    {
+      "id": "insurance",
+      "name": "Insurance",
+      "market_size_aud": "$4.5B claims/year",
+      "iicrc_disciplines": ["WRT", "FSRT", "AMRT", "ASD"],
+      "decision_makers": [
+        {
+          "role": "Claims Manager",
+          "title_variations": ["Claims Team Leader", "Head of Claims", "Senior Claims Assessor"],
+          "seniority": "senior",
+          "reports_to": "General Manager Claims or COO",
+          "budget_authority": true,
+          "typical_age_range": "35-55"
+        },
+        {
+          "role": "Loss Adjuster",
+          "title_variations": ["Field Adjuster", "Senior Adjuster", "Technical Adjuster"],
+          "seniority": "specialist",
+          "reports_to": "Claims Manager or Principal",
+          "budget_authority": false,
+          "influence_level": "high",
+          "typical_age_range": "30-55"
+        },
+        {
+          "role": "Learning & Development Manager",
+          "title_variations": ["Training Manager", "People Development Manager", "L&D Coordinator"],
+          "seniority": "mid",
+          "reports_to": "HR Director or COO",
+          "budget_authority": true,
+          "typical_age_range": "30-50"
+        }
+      ],
+      "channels": {
+        "linkedin_groups": [
+          "Insurance Professionals Australia",
+          "Australian Loss Adjusters Network",
+          "Claims Management Network"
+        ],
+        "industry_associations": [
+          "Australian and New Zealand Institute of Insurance and Finance (ANZIIF)",
+          "Australasian Institute of Chartered Loss Adjusters (AICLA)",
+          "Insurance Council of Australia (ICA)"
+        ],
+        "publications": ["Insurance News", "Insurance Business Magazine", "ANZIIF Journal"],
+        "conferences": [
+          "ANZIIF Australian Insurance Industry Awards",
+          "Insurance Business Forum",
+          "AICLA National Conference"
+        ],
+        "online_communities": ["Insurance Professionals LinkedIn", "Loss Adjusters Network"],
+        "search_behaviour": [
+          "IICRC standards insurance claims",
+          "water damage assessment training",
+          "restoration scope of works training",
+          "mould remediation cost estimation"
+        ]
+      },
+      "pain_points": [
+        {
+          "pain": "Over-scoped restoration claims",
+          "description": "Contractors inflate restoration scope. Adjusters can't verify if work is necessary.",
+          "emotional_impact": "Suspicion, frustration with contractors",
+          "urgency": "high"
+        },
+        {
+          "pain": "Claims processing time",
+          "description": "Delayed claims due to lack of understanding of restoration process",
+          "emotional_impact": "Customer complaints, NPS pressure",
+          "urgency": "high"
+        },
+        {
+          "pain": "Fraudulent claims",
+          "description": "Can't distinguish legitimate restoration needs from inflated claims",
+          "emotional_impact": "Risk aversion, compliance concerns",
+          "urgency": "medium"
+        },
+        {
+          "pain": "Staff upskilling",
+          "description": "New adjusters lack restoration knowledge. Need efficient training.",
+          "emotional_impact": "Onboarding frustration",
+          "urgency": "medium"
+        }
+      ],
+      "value_propositions": [
+        "Understand IICRC standards to assess contractor scope",
+        "Faster claim resolution with restoration knowledge",
+        "Reduce over-scoped and fraudulent claims",
+        "CPD points for ANZIIF/AICLA members"
+      ],
+      "campaign_triggers": [
+        "Post-disaster events (major claims spike)",
+        "CPD renewal periods",
+        "New staff onboarding cycles",
+        "Claims process improvement initiatives"
+      ],
+      "objections_and_responses": [
+        {
+          "objection": "We don't do restoration, we just assess claims",
+          "response": "Exactly — understanding restoration helps you assess claims more accurately"
+        },
+        {
+          "objection": "Our staff are already ANZIIF qualified",
+          "response": "IICRC credentials complement ANZIIF with practical restoration knowledge"
+        },
+        {
+          "objection": "We use a panel of approved restorers",
+          "response": "Understanding their work helps you manage the panel and approve appropriate scope"
+        }
+      ]
+    },
+    {
+      "id": "aged_care",
+      "name": "Aged Care",
+      "market_size_aud": "~$30B",
+      "iicrc_disciplines": ["CRT", "AMRT", "WRT"],
+      "decision_makers": [
+        {
+          "role": "Facility Manager",
+          "title_variations": ["Residential Manager", "Home Manager", "Director of Care"],
+          "seniority": "senior",
+          "reports_to": "Regional Manager or CEO",
+          "budget_authority": true,
+          "typical_age_range": "40-60"
+        },
+        {
+          "role": "Maintenance Supervisor",
+          "title_variations": ["Facilities Coordinator", "Building Services Manager"],
+          "seniority": "mid",
+          "reports_to": "Facility Manager",
+          "budget_authority": false,
+          "influence_level": "high",
+          "typical_age_range": "35-55"
+        },
+        {
+          "role": "Quality & Compliance Manager",
+          "title_variations": ["Quality Coordinator", "Clinical Governance Manager"],
+          "seniority": "mid-senior",
+          "reports_to": "Facility Manager or Regional Quality Manager",
+          "budget_authority": false,
+          "influence_level": "critical",
+          "typical_age_range": "35-55"
+        }
+      ],
+      "channels": {
+        "linkedin_groups": [
+          "Aged Care Australia",
+          "LASA (Leading Age Services Australia)",
+          "Aged Care Quality Network"
+        ],
+        "industry_associations": [
+          "Aged & Community Care Providers Association (ACCPA)",
+          "Leading Age Services Australia (LASA)",
+          "Aged Care Quality and Safety Commission"
+        ],
+        "publications": ["Australian Ageing Agenda", "Aged Care Insite", "Community Care Review"],
+        "conferences": ["LASA National Congress", "ACCPA Conference", "Better Practice Conference"],
+        "search_behaviour": [
+          "aged care mould remediation",
+          "carpet cleaning aged care facility",
+          "infection control aged care training",
+          "aged care quality standards maintenance"
+        ]
+      },
+      "pain_points": [
+        {
+          "pain": "Royal Commission compliance",
+          "description": "Post-RC scrutiny on maintenance and infection control",
+          "emotional_impact": "Fear of sanctions, public shaming",
+          "urgency": "critical"
+        },
+        {
+          "pain": "Vulnerable resident safety",
+          "description": "Immunocompromised residents at higher mould/infection risk",
+          "emotional_impact": "Duty of care anxiety",
+          "urgency": "critical"
+        },
+        {
+          "pain": "Quality Standards audits",
+          "description": "Need documented evidence of maintenance competency",
+          "emotional_impact": "Audit anxiety",
+          "urgency": "high"
+        },
+        {
+          "pain": "Incontinence-related carpet damage",
+          "description": "Ongoing carpet maintenance challenges unique to aged care",
+          "emotional_impact": "Staff frustration, dignity concerns",
+          "urgency": "medium"
+        }
+      ],
+      "value_propositions": [
+        "Documented competency for Quality Standards audits",
+        "AMRT credentials for mould/infection control",
+        "Protect vulnerable residents with proper remediation",
+        "Online training = no staff shortages for training days"
+      ],
+      "campaign_triggers": [
+        "Quality Standards audit cycles",
+        "Post-water damage incidents",
+        "Budget cycles (July new FY)",
+        "Flu season preparation"
+      ]
+    },
+    {
+      "id": "education",
+      "name": "Education",
+      "market_size_aud": "9,500+ schools",
+      "iicrc_disciplines": ["AMRT", "WRT", "CRT", "ASD"],
+      "decision_makers": [
+        {
+          "role": "School Business Manager",
+          "title_variations": ["Bursar", "Finance Manager", "School Administrator"],
+          "seniority": "mid-senior",
+          "reports_to": "Principal",
+          "budget_authority": true,
+          "typical_age_range": "35-55"
+        },
+        {
+          "role": "Facilities Manager",
+          "title_variations": ["Grounds Manager", "Property Manager", "Building Supervisor"],
+          "seniority": "mid",
+          "reports_to": "Business Manager or Principal",
+          "budget_authority": true,
+          "typical_age_range": "35-60"
+        },
+        {
+          "role": "Regional Property Manager",
+          "title_variations": ["Asset Manager", "Facilities Director"],
+          "seniority": "senior",
+          "reports_to": "Director Infrastructure",
+          "budget_authority": true,
+          "typical_age_range": "40-55"
+        }
+      ],
+      "channels": {
+        "linkedin_groups": [
+          "School Business Managers Australia",
+          "Education Facilities Network",
+          "Independent Schools Australia"
+        ],
+        "industry_associations": [
+          "Association of School Business Administrators (ASBA)",
+          "Independent Schools Australia (ISA)",
+          "Australian Secondary Principals Association (ASPA)"
+        ],
+        "publications": ["Education Today", "School News", "Teacher Magazine"],
+        "conferences": ["ASBA National Conference", "EduTECH", "Independent Schools HR Conference"],
+        "search_behaviour": [
+          "school mould remediation training",
+          "classroom water damage response",
+          "school building maintenance certification"
+        ]
+      },
+      "pain_points": [
+        {
+          "pain": "Mould in classrooms",
+          "description": "Older buildings prone to mould. Parent complaints, media risk.",
+          "emotional_impact": "Reputation anxiety, duty of care concerns",
+          "urgency": "critical"
+        },
+        {
+          "pain": "School holidays = limited maintenance window",
+          "description": "Major work must happen in 6-week holiday periods",
+          "emotional_impact": "Time pressure, scheduling stress",
+          "urgency": "medium"
+        },
+        {
+          "pain": "Parent council scrutiny",
+          "description": "Parents demand proof of competency for contractors",
+          "emotional_impact": "Accountability pressure",
+          "urgency": "medium"
+        },
+        {
+          "pain": "Heritage building preservation",
+          "description": "Many private schools have heritage-listed buildings",
+          "emotional_impact": "Cultural responsibility",
+          "urgency": "medium"
+        }
+      ],
+      "value_propositions": [
+        "Documented competency for parent council confidence",
+        "Rapid mould response to minimize classroom closure",
+        "Holiday-period intensive training available",
+        "Protect student health with proper remediation"
+      ],
+      "campaign_triggers": [
+        "Pre-Term 1 (January) — summer maintenance",
+        "School holiday periods",
+        "Building audit cycles",
+        "Post-storm/flood events"
+      ]
+    },
+    {
+      "id": "strata",
+      "name": "Strata & Body Corporate",
+      "market_size_aud": "2.5M+ strata units",
+      "iicrc_disciplines": ["WRT", "CRT", "AMRT", "ASD"],
+      "decision_makers": [
+        {
+          "role": "Strata Manager",
+          "title_variations": ["Body Corporate Manager", "Owners Corporation Manager"],
+          "seniority": "mid",
+          "reports_to": "Principal or Director",
+          "budget_authority": false,
+          "influence_level": "critical",
+          "typical_age_range": "30-55"
+        },
+        {
+          "role": "Building Manager",
+          "title_variations": ["Caretaker", "Resident Manager", "Facilities Manager"],
+          "seniority": "mid",
+          "reports_to": "Strata Committee or Body Corporate",
+          "budget_authority": true,
+          "typical_age_range": "35-60"
+        },
+        {
+          "role": "Strata Committee Chair",
+          "title_variations": ["Committee Chairperson", "Owners Corporation Chair"],
+          "seniority": "volunteer",
+          "budget_authority": true,
+          "influence_level": "high",
+          "typical_age_range": "40-70"
+        }
+      ],
+      "channels": {
+        "linkedin_groups": [
+          "Strata Community Association (SCA)",
+          "Body Corporate Managers Network",
+          "Property Management Professionals"
+        ],
+        "industry_associations": [
+          "Strata Community Association (SCA)",
+          "Australian Resident Accommodation Managers Association (ARAMA)",
+          "Property Council of Australia"
+        ],
+        "publications": ["SCA National Magazine", "Strata Title Australia", "Property Australia"],
+        "conferences": [
+          "SCA National Convention",
+          "Strata Legislation Seminars",
+          "Property Council Congress"
+        ],
+        "search_behaviour": [
+          "strata water damage responsibility",
+          "body corporate mould remediation",
+          "building manager certification",
+          "basement flooding strata"
+        ]
+      },
+      "pain_points": [
+        {
+          "pain": "Common property liability",
+          "description": "Building managers personally liable under Strata Schemes Management Act",
+          "emotional_impact": "Personal risk anxiety",
+          "urgency": "critical"
+        },
+        {
+          "pain": "Basement and carpark flooding",
+          "description": "Subterranean areas prone to water ingress",
+          "emotional_impact": "Insurance claim concerns, resident complaints",
+          "urgency": "high"
+        },
+        {
+          "pain": "Defect rectification",
+          "description": "New buildings with water ingress defects needing remediation",
+          "emotional_impact": "Developer dispute stress",
+          "urgency": "high"
+        },
+        {
+          "pain": "Committee disputes",
+          "description": "Need independent credentials to justify contractor selection",
+          "emotional_impact": "Conflict avoidance, transparency pressure",
+          "urgency": "medium"
+        }
+      ],
+      "value_propositions": [
+        "IICRC credentials protect building managers from personal liability",
+        "Independent standard to justify contractor selection",
+        "Online training fits around building management duties",
+        "Document competency for insurance and legal purposes"
+      ],
+      "campaign_triggers": [
+        "AGM season (Oct-Dec)",
+        "Post-storm/flood events",
+        "Defect rectification cycles",
+        "Building audit periods"
+      ]
+    },
+    {
+      "id": "mining",
+      "name": "Mining & Resources",
+      "market_size_aud": "~$200B",
+      "iicrc_disciplines": ["WRT", "ASD", "AMRT"],
+      "decision_makers": [
+        {
+          "role": "Camp/Village Manager",
+          "title_variations": ["Accommodation Manager", "Village Services Manager"],
+          "seniority": "mid-senior",
+          "reports_to": "Site Manager or GM Operations",
+          "budget_authority": true,
+          "typical_age_range": "35-55"
+        },
+        {
+          "role": "HSE Manager",
+          "title_variations": ["Safety Manager", "HSEQ Manager", "Risk Manager"],
+          "seniority": "senior",
+          "reports_to": "Site Manager or GM",
+          "budget_authority": true,
+          "typical_age_range": "35-55"
+        },
+        {
+          "role": "Maintenance Superintendent",
+          "title_variations": ["Facilities Superintendent", "Maintenance Manager"],
+          "seniority": "mid-senior",
+          "reports_to": "Operations Manager",
+          "budget_authority": true,
+          "typical_age_range": "35-55"
+        }
+      ],
+      "channels": {
+        "linkedin_groups": [
+          "Mining People International",
+          "Australian Mining",
+          "FIFO Workers Network"
+        ],
+        "industry_associations": [
+          "Minerals Council of Australia (MCA)",
+          "Australasian Institute of Mining and Metallurgy (AusIMM)",
+          "Chamber of Minerals and Energy WA"
+        ],
+        "publications": ["Australian Mining", "Mining Monthly", "ResourcesLink"],
+        "conferences": ["AIMEX", "Diggers & Dealers", "Mining Indaba (international)"],
+        "search_behaviour": [
+          "mining camp maintenance training",
+          "FIFO accommodation mould",
+          "remote site water damage",
+          "mining village restoration"
+        ]
+      },
+      "pain_points": [
+        {
+          "pain": "Remote site response time",
+          "description": "Can't wait for contractors to fly in. Need on-site capability.",
+          "emotional_impact": "Isolation frustration, production pressure",
+          "urgency": "critical"
+        },
+        {
+          "pain": "Worker accommodation standards",
+          "description": "Mould, water damage in dongas/camps = worker complaints",
+          "emotional_impact": "Workforce retention concerns",
+          "urgency": "high"
+        },
+        {
+          "pain": "Cyclone/monsoon damage",
+          "description": "Northern sites face annual wet season damage",
+          "emotional_impact": "Seasonal planning stress",
+          "urgency": "seasonal"
+        },
+        {
+          "pain": "Compliance and audits",
+          "description": "Mining Act requirements for worker accommodation standards",
+          "emotional_impact": "Regulatory compliance pressure",
+          "urgency": "medium"
+        }
+      ],
+      "value_propositions": [
+        "Train on-site staff to respond immediately — no waiting for fly-in contractors",
+        "Online training = no travel to/from remote sites",
+        "Meet Mining Act accommodation standards",
+        "Reduce worker complaints and improve retention"
+      ],
+      "campaign_triggers": [
+        "Pre-wet season (Oct-Nov for northern sites)",
+        "Site establishment/expansion",
+        "Post-cyclone/flood events",
+        "Accommodation audit periods"
+      ]
+    },
+    {
+      "id": "retail",
+      "name": "Retail & Shopping Centres",
+      "market_size_aud": "$140B retail sector",
+      "iicrc_disciplines": ["WRT", "CRT", "OCT", "FSRT"],
+      "decision_makers": [
+        {
+          "role": "Centre Manager",
+          "title_variations": ["Shopping Centre Manager", "Retail Property Manager"],
+          "seniority": "senior",
+          "reports_to": "Regional Manager or Asset Director",
+          "budget_authority": true,
+          "typical_age_range": "35-55"
+        },
+        {
+          "role": "Facilities Manager",
+          "title_variations": ["Operations Manager", "Building Services Manager"],
+          "seniority": "mid",
+          "reports_to": "Centre Manager",
+          "budget_authority": true,
+          "typical_age_range": "30-50"
+        },
+        {
+          "role": "Procurement Manager",
+          "title_variations": ["Contracts Manager", "Vendor Manager"],
+          "seniority": "mid",
+          "reports_to": "Head of Operations or CFO",
+          "budget_authority": false,
+          "influence_level": "critical",
+          "typical_age_range": "30-50"
+        }
+      ],
+      "channels": {
+        "linkedin_groups": [
+          "Shopping Centre Council of Australia",
+          "Retail Property Network",
+          "Facilities Management Australia"
+        ],
+        "industry_associations": [
+          "Shopping Centre Council of Australia (SCCA)",
+          "Retail Council",
+          "Property Council of Australia"
+        ],
+        "publications": ["Shopping Centre News", "Inside Retail", "Property Australia"],
+        "conferences": ["RECon Asia Pacific", "ICSC Retail Summit", "Property Council Congress"],
+        "search_behaviour": [
+          "shopping centre restoration contractor",
+          "retail sprinkler damage response",
+          "food court odour control",
+          "IICRC certification landlord panel"
+        ]
+      },
+      "pain_points": [
+        {
+          "pain": "Tenant downtime = rent disputes",
+          "description": "Water damage closing tenant stores leads to rent abatement claims",
+          "emotional_impact": "Revenue anxiety, tenant relationship stress",
+          "urgency": "critical"
+        },
+        {
+          "pain": "Major landlord panel requirements",
+          "description": "Scentre, Vicinity, GPT require certified contractors",
+          "emotional_impact": "Competitive pressure",
+          "urgency": "high"
+        },
+        {
+          "pain": "Food court compliance",
+          "description": "Odour control, hygiene standards for food tenants",
+          "emotional_impact": "Health department scrutiny",
+          "urgency": "medium"
+        },
+        {
+          "pain": "Sprinkler false activation",
+          "description": "Common incident causing significant water damage",
+          "emotional_impact": "Insurance claim complexity",
+          "urgency": "medium"
+        }
+      ],
+      "value_propositions": [
+        "Pre-qualify for Scentre, Vicinity, GPT contractor panels",
+        "Rapid response minimizes tenant downtime",
+        "OCT certification for food court odour issues",
+        "Document competency for insurance claims"
+      ],
+      "campaign_triggers": [
+        "Contractor panel renewal periods",
+        "Post-incident (sprinkler, roof leak)",
+        "Centre refurbishment cycles",
+        "New centre openings"
+      ]
+    }
+  ],
+  "cross_industry_themes": {
+    "24_7_advantage": {
+      "message": "Train your team without travel. 24/7 online access fits any schedule.",
+      "industries": "all"
+    },
+    "whs_compliance": {
+      "message": "Documented competency for WHS due diligence defence under Model WHS Act",
+      "industries": ["healthcare", "aged_care", "government", "education", "mining"]
+    },
+    "insurance_panel": {
+      "message": "IICRC credentials recognised by IAG, Suncorp, QBE for restoration contractor panels",
+      "industries": ["commercial_cleaning", "restoration"]
+    },
+    "cleaning_plus": {
+      "message": "Add restoration services to your cleaning business — 30-50% higher margins",
+      "industries": ["commercial_cleaning"]
+    },
+    "nrpg_pathway": {
+      "message": "CARSI is one of the 4 core pillars of NRPG onboarding",
+      "industries": ["restoration"]
+    }
+  }
+}

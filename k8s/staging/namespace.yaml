@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: carsi-staging
+  labels:
+    app.kubernetes.io/part-of: carsi-lms
+    environment: staging

@@ -164,9 +164,15 @@ class TestLessonComplete:
         result_enrollment.scalar_one_or_none.return_value = mock_enrollment
         result_no_progress = MagicMock()
         result_no_progress.scalar_one_or_none.return_value = None
+        # Nexus connector completion check: total lessons + completed lessons
+        result_total = MagicMock()
+        result_total.scalar.return_value = 5
+        result_completed = MagicMock()
+        result_completed.scalar.return_value = 1
 
         mock_db.execute = AsyncMock(
-            side_effect=[result_lesson, result_enrollment, result_no_progress]
+            side_effect=[result_lesson, result_enrollment, result_no_progress,
+                         result_total, result_completed]
         )
         mock_db.refresh = AsyncMock(
             side_effect=lambda obj: _set_progress_fields(obj, mock_progress)

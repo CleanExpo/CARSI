@@ -138,3 +138,82 @@ async def get_metrics(
         total_courses=course_count,
         total_enrollments=enroll_count,
     )
+
+
+# ---------------------------------------------------------------------------
+# CEC Reports
+# ---------------------------------------------------------------------------
+
+
+class CECReportOut(BaseModel):
+    id: str
+    student_id: str
+    course_id: str
+    iicrc_member_number: str
+    email_to: str
+    status: str
+    sent_at: str | None
+    error_message: str | None
+    retry_count: int
+    created_at: str
+
+
+@router.get("/cec-reports", response_model=list[CECReportOut])
+async def list_cec_reports(
+    status_filter: str | None = None,
+    db: AsyncSession = Depends(get_async_db),
+    current_user: LMSUser = Depends(get_current_lms_user),
+) -> list[CECReportOut]:
+    """Admin: list all CEC report submissions. Filter by ?status_filter=pending|sent|failed."""
+    _require_admin(current_user)
+
+    from src.db.lms_models import LMSCECReport
+
+    query = select(LMSCECReport).order_by(LMSCECReport.created_at.desc())
+    if status_filter:
+        query = query.where(LMSCECReport.status == status_filter)
+
+    result = await db.execute(query)
+    reports = result.scalars().all()
+    return [
+        CECReportOut(
+            id=str(r.id),
+            student_id=str(r.student_id),
+            course_id=str(r.course_id),
+            iicrc_member_number=r.iicrc_member_number,
+            email_to=r.email_to,
+            status=r.status,
+            sent_at=r.sent_at.isoformat() if r.sent_at else None,
+            error_message=r.error_message,
+            retry_count=r.retry_count,
+            created_at=r.created_at.isoformat(),
+        )
+        for r in reports
+    ]
+
+
+@router.post("/cec-reports/{report_id}/retry")
+async def retry_cec_report(
+    report_id: str,
+    db: AsyncSession = Depends(get_async_db),
+    current_user: LMSUser = Depends(get_current_lms_user),
+) -> dict:
+    """Admin: manually retry a failed CEC report email."""
+    _require_admin(current_user)
+
+    from src.db.lms_models import LMSCECReport
+    from src.worker.tasks import send_iicrc_cec_report
+
+    result = await db.execute(
+        select(LMSCECReport).where(LMSCECReport.id == UUID(report_id))
+    )
+    report = result.scalar_one_or_none()
+    if not report:
+        raise HTTPException(status_code=404, detail="CEC report not found.")
+
+    report.status = "pending"
+    report.error_message = None
+    await db.commit()
+
+    send_iicrc_cec_report.delay({"report_id": report_id})
+    return {"queued": True}

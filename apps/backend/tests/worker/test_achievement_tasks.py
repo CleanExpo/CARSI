@@ -143,10 +143,9 @@ class TestHandleCourseCompleted:
 
         with (
             patch("src.worker.tasks.SyncSessionLocal", return_value=mock_session),
-            patch(
-                "src.worker.tasks.create_certificate",
-                return_value=mock_cert,
-            ),
+            patch("src.worker.tasks.create_certificate", return_value=mock_cert),
+            patch("src.worker.tasks.award_xp"),           # prevent Celery dispatch
+            patch("src.worker.tasks._maybe_send_cec_report"),  # tested separately
         ):
             result = handle_course_completed(
                 {"student_id": str(STUDENT_ID), "course_id": str(COURSE_ID)}

@@ -13,6 +13,7 @@ from sqlalchemy import (
     BigInteger,
     Boolean,
     Column,
+    Date,
     DateTime,
     ForeignKey,
     Integer,
@@ -60,6 +61,11 @@ class LMSUser(Base):
     is_active = Column(Boolean, default=True)
     is_verified = Column(Boolean, default=False)
     theme_preference = Column(String(10), default="light")
+    # IICRC Professional Identity (migration 003)
+    iicrc_member_number = Column(String(20), nullable=True)
+    iicrc_card_image_url = Column(Text, nullable=True)
+    iicrc_expiry_date = Column(Date, nullable=True)
+    iicrc_certifications = Column(JSONB, nullable=True, default=list)
     created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
     updated_at = Column(DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -70,6 +76,10 @@ class LMSUser(Base):
     cec_transactions = relationship("LMSCECTransaction", back_populates="student")
     certificates = relationship("LMSCertificate", back_populates="student")
     lesson_notes = relationship("LMSLessonNote", back_populates="student", cascade="all, delete-orphan")
+    xp_events = relationship("LMSXPEvent", back_populates="student", cascade="all, delete-orphan")
+    user_level = relationship("LMSUserLevel", back_populates="student", uselist=False, cascade="all, delete-orphan")
+    subscriptions = relationship("LMSSubscription", back_populates="student", cascade="all, delete-orphan")
+    cec_reports = relationship("LMSCECReport", back_populates="student", cascade="all, delete-orphan")
 
     @property
     def roles(self) -> list[str]:
@@ -460,3 +470,218 @@ class LMSMigrationJob(Base):
     error_log = Column(JSONB, default=list)
     created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
     updated_at = Column(DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+# ---------------------------------------------------------------------------
+# Gamification — XP Events (Migration 003)
+# ---------------------------------------------------------------------------
+
+
+class LMSXPEvent(Base):
+    __tablename__ = "lms_xp_events"
+
+    id = Column(PGUUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    student_id = Column(
+        PGUUID(as_uuid=True),
+        ForeignKey("lms_users.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    source_type = Column(String(50), nullable=False)
+    # lesson_completed | quiz_passed | quiz_perfect | course_completed | streak_bonus
+    source_id = Column(PGUUID(as_uuid=True), nullable=True)
+    xp_awarded = Column(Integer, nullable=False)
+    earned_at = Column(DateTime(timezone=True), default=datetime.utcnow)
+
+    student = relationship("LMSUser", back_populates="xp_events")
+
+
+# ---------------------------------------------------------------------------
+# Gamification — User Levels (Migration 003)
+# ---------------------------------------------------------------------------
+
+
+class LMSUserLevel(Base):
+    __tablename__ = "lms_user_levels"
+
+    student_id = Column(
+        PGUUID(as_uuid=True),
+        ForeignKey("lms_users.id", ondelete="CASCADE"),
+        primary_key=True,
+    )
+    total_xp = Column(Integer, nullable=False, default=0)
+    current_level = Column(Integer, nullable=False, default=1)
+    current_streak = Column(Integer, nullable=False, default=0)
+    longest_streak = Column(Integer, nullable=False, default=0)
+    last_active_date = Column(Date, nullable=True)
+
+    student = relationship("LMSUser", back_populates="user_level")
+
+
+# ---------------------------------------------------------------------------
+# Subscriptions — Stripe Recurring (Migration 003)
+# ---------------------------------------------------------------------------
+
+
+class LMSSubscription(Base):
+    __tablename__ = "lms_subscriptions"
+
+    id = Column(PGUUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    student_id = Column(
+        PGUUID(as_uuid=True),
+        ForeignKey("lms_users.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    stripe_subscription_id = Column(String(255), unique=True, nullable=False)
+    stripe_customer_id = Column(String(255), nullable=False)
+    status = Column(String(50), nullable=False, default="trialling")
+    # trialling | active | past_due | cancelled | unpaid
+    plan = Column(String(50), nullable=False, default="yearly")
+    current_period_start = Column(DateTime(timezone=True), nullable=True)
+    current_period_end = Column(DateTime(timezone=True), nullable=True)
+    trial_end = Column(DateTime(timezone=True), nullable=True)
+    cancelled_at = Column(DateTime(timezone=True), nullable=True)
+    created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
+
+    student = relationship("LMSUser", back_populates="subscriptions")
+
+
+# ---------------------------------------------------------------------------
+# IICRC CEC Reports — Email Audit Trail (Migration 003)
+# ---------------------------------------------------------------------------
+
+
+class LMSCECReport(Base):
+    __tablename__ = "lms_cec_reports"
+
+    id = Column(PGUUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    student_id = Column(
+        PGUUID(as_uuid=True),
+        ForeignKey("lms_users.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    course_id = Column(
+        PGUUID(as_uuid=True),
+        ForeignKey("lms_courses.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    iicrc_member_number = Column(String(20), nullable=False)
+    email_to = Column(String(255), nullable=False)
+    status = Column(String(20), nullable=False, default="pending")
+    # pending | sent | failed
+    sent_at = Column(DateTime(timezone=True), nullable=True)
+    error_message = Column(Text, nullable=True)
+    retry_count = Column(Integer, nullable=False, default=0)
+    created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
+
+    student = relationship("LMSUser", back_populates="cec_reports")
+    course = relationship("LMSCourse")
+
+
+# ---------------------------------------------------------------------------
+# Course Idea Catalog (Migration 004)
+# ---------------------------------------------------------------------------
+
+
+class LMSCourseIdea(Base):
+    __tablename__ = "lms_course_ideas"
+
+    id = Column(PGUUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    title = Column(String(500), nullable=False)
+    description = Column(Text, nullable=True)
+    iicrc_discipline = Column(String(10), nullable=True)
+    suggested_by_id = Column(
+        PGUUID(as_uuid=True),
+        ForeignKey("lms_users.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    vote_count = Column(Integer, nullable=False, default=0)
+    status = Column(String(50), nullable=False, default="idea")
+    # idea | in_development | published
+    ai_outline = Column(JSONB, nullable=True)
+    ai_outline_generated_at = Column(DateTime(timezone=True), nullable=True)
+    created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
+
+    suggested_by = relationship("LMSUser")
+    votes = relationship("LMSCourseIdeaVote", back_populates="idea", cascade="all, delete-orphan")
+
+
+class LMSCourseIdeaVote(Base):
+    __tablename__ = "lms_course_idea_votes"
+
+    idea_id = Column(
+        PGUUID(as_uuid=True),
+        ForeignKey("lms_course_ideas.id", ondelete="CASCADE"),
+        primary_key=True,
+    )
+    user_id = Column(
+        PGUUID(as_uuid=True),
+        ForeignKey("lms_users.id", ondelete="CASCADE"),
+        primary_key=True,
+    )
+    voted_at = Column(DateTime(timezone=True), default=datetime.utcnow)
+
+    idea = relationship("LMSCourseIdea", back_populates="votes")
+
+
+# ---------------------------------------------------------------------------
+# RPL Portfolio — Recognition of Prior Learning (Migration 005)
+# ---------------------------------------------------------------------------
+
+
+class LMSRPLPortfolio(Base):
+    __tablename__ = "lms_rpl_portfolios"
+
+    id = Column(PGUUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    student_id = Column(
+        PGUUID(as_uuid=True),
+        ForeignKey("lms_users.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    unit_code = Column(String(20), nullable=False)
+    unit_name = Column(String(255), nullable=False)
+    evidence_description = Column(Text, nullable=False)
+    evidence_urls = Column(JSONB, nullable=False, default=list)
+    status = Column(String(50), nullable=False, default="pending")
+    # pending | under_review | approved | rejected
+    reviewer_id = Column(
+        PGUUID(as_uuid=True),
+        ForeignKey("lms_users.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    reviewer_notes = Column(Text, nullable=True)
+    reviewed_at = Column(DateTime(timezone=True), nullable=True)
+    created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
+    updated_at = Column(DateTime(timezone=True), default=datetime.utcnow)
+
+    student = relationship("LMSUser", foreign_keys=[student_id])
+    reviewer = relationship("LMSUser", foreign_keys=[reviewer_id])
+
+
+# ---------------------------------------------------------------------------
+# Course Bundles (Migration 006)
+# ---------------------------------------------------------------------------
+
+
+class LMSBundle(Base):
+    __tablename__ = "lms_bundles"
+
+    id = Column(PGUUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    name = Column(String(200), nullable=False)
+    slug = Column(String(200), nullable=False, unique=True)
+    description = Column(Text, nullable=True)
+    price_aud = Column(Numeric(10, 2), nullable=False)
+    original_price_aud = Column(Numeric(10, 2), nullable=True)
+    is_active = Column(Boolean, default=True)
+    industry_tag = Column(String(100), nullable=True)
+    created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
+    updated_at = Column(DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    courses = relationship("LMSCourse", secondary="lms_bundle_courses", backref="bundles")
+
+
+class LMSBundleCourse(Base):
+    __tablename__ = "lms_bundle_courses"
+
+    bundle_id = Column(PGUUID(as_uuid=True), ForeignKey("lms_bundles.id", ondelete="CASCADE"), primary_key=True)
+    course_id = Column(PGUUID(as_uuid=True), ForeignKey("lms_courses.id", ondelete="CASCADE"), primary_key=True)
+    display_order = Column(Integer, default=0)

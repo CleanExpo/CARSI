@@ -1,0 +1,172 @@
+# GP-155 — Persistent Storage + Automated Backups
+#
+# DigitalOcean Block Storage for DOKS (SYD1 region).
+# Nightly PostgreSQL backup CronJob with 7-day retention.
+#
+# Apply:
+#   kubectl apply -f k8s/storage-backups.yaml
+
+# --- StorageClass: DigitalOcean Block Storage (Retain) ---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: do-block-storage-retain
+  labels:
+    app.kubernetes.io/part-of: carsi-lms
+provisioner: dobs.csi.digitalocean.com
+reclaimPolicy: Retain
+allowVolumeExpansion: true
+volumeBindingMode: WaitForFirstConsumer
+parameters:
+  fsType: ext4
+---
+# --- PVC: PostgreSQL Data (20Gi) ---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: carsi-postgres-data
+  namespace: carsi-production
+  labels:
+    app: carsi-postgres
+    app.kubernetes.io/part-of: carsi-lms
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: do-block-storage-retain
+  resources:
+    requests:
+      storage: 20Gi
+---
+# --- PVC: Redis Data (5Gi) ---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: carsi-redis-data
+  namespace: carsi-production
+  labels:
+    app: carsi-redis
+    app.kubernetes.io/part-of: carsi-lms
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: do-block-storage-retain
+  resources:
+    requests:
+      storage: 5Gi
+---
+# --- PVC: Backup Storage (10Gi) ---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: carsi-pg-backups
+  namespace: carsi-production
+  labels:
+    app: carsi-postgres
+    app.kubernetes.io/part-of: carsi-lms
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: do-block-storage-retain
+  resources:
+    requests:
+      storage: 10Gi
+---
+# --- ConfigMap: Backup Script ---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pg-backup-script
+  namespace: carsi-production
+  labels:
+    app: carsi-postgres
+    app.kubernetes.io/part-of: carsi-lms
+data:
+  backup.sh: |
+    #!/bin/sh
+    set -e
+
+    BACKUP_DIR="/backups"
+    TIMESTAMP=$(date +%Y%m%d)
+    BACKUP_FILE="${BACKUP_DIR}/carsi-${TIMESTAMP}.sql.gz"
+    RETENTION_DAYS=7
+
+    echo "[$(date)] Starting PostgreSQL backup..."
+
+    # Run pg_dump and compress
+    PGPASSWORD="${POSTGRES_PASSWORD}" pg_dump \
+      -h carsi-postgres \
+      -U carsi_user \
+      -d carsi_prod \
+      --no-owner \
+      --no-acl \
+      | gzip > "${BACKUP_FILE}"
+
+    BACKUP_SIZE=$(du -h "${BACKUP_FILE}" | cut -f1)
+    echo "[$(date)] Backup complete: ${BACKUP_FILE} (${BACKUP_SIZE})"
+
+    # Remove backups older than retention period
+    find "${BACKUP_DIR}" -name "carsi-*.sql.gz" -mtime +${RETENTION_DAYS} -delete
+    echo "[$(date)] Cleaned up backups older than ${RETENTION_DAYS} days"
+
+    # List remaining backups
+    echo "[$(date)] Current backups:"
+    ls -lh "${BACKUP_DIR}"/carsi-*.sql.gz 2>/dev/null || echo "  (none)"
+---
+# --- CronJob: Nightly PostgreSQL Backup (2:00 AM AEST = 16:00 UTC) ---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: pg-backup
+  namespace: carsi-production
+  labels:
+    app: carsi-postgres
+    app.kubernetes.io/part-of: carsi-lms
+spec:
+  schedule: '0 16 * * *' # 16:00 UTC = 02:00 AEST
+  timeZone: 'Australia/Sydney'
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      activeDeadlineSeconds: 600
+      template:
+        metadata:
+          labels:
+            app: carsi-pg-backup
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: pg-backup
+              image: postgres:15-alpine
+              command:
+                - /bin/sh
+                - /scripts/backup.sh
+              env:
+                - name: POSTGRES_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: carsi-secrets
+                      key: POSTGRES_PASSWORD
+              volumeMounts:
+                - name: backup-script
+                  mountPath: /scripts
+                  readOnly: true
+                - name: backup-storage
+                  mountPath: /backups
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 256Mi
+                limits:
+                  cpu: 500m
+                  memory: 512Mi
+          volumes:
+            - name: backup-script
+              configMap:
+                name: pg-backup-script
+                defaultMode: 0755
+            - name: backup-storage
+              persistentVolumeClaim:
+                claimName: carsi-pg-backups

@@ -123,6 +123,38 @@ class Settings(BaseSettings):
     def effective_celery_backend(self) -> str:
         return self.celery_result_backend or self.redis_url.rstrip("/") + "/2"
 
+    # Stripe Payments
+    stripe_secret_key: str = Field(default="", description="Stripe secret API key")
+    stripe_webhook_secret: str = Field(default="", description="Stripe webhook signing secret")
+    frontend_url: str = Field(
+        default="http://localhost:3009",
+        description="Frontend URL for Stripe redirects",
+    )
+
+    # Unite-Hub Nexus Integration
+    unite_hub_api_url: str = Field(
+        default="https://api.unite-hub.com/v1/events",
+        description="Unite-Hub Nexus API endpoint for event push",
+    )
+    unite_hub_api_key: str = Field(
+        default="",
+        description="API key for Unite-Hub Nexus (leave empty to disable)",
+    )
+
+    # Synthex Marketing Automation Integration
+    synthex_api_url: str = Field(
+        default="https://synthex.unite-group.com.au/api/webhooks/carsi",
+        description="Synthex API endpoint for marketing automation events",
+    )
+    synthex_api_key: str = Field(
+        default="",
+        description="API key for Synthex integration (leave empty to disable)",
+    )
+    synthex_data_sync_enabled: bool = Field(
+        default=True,
+        description="Enable Synthex data sync endpoints for full LMS visibility",
+    )
+
     # MCP Tools
     exa_api_key: str = Field(default="")
     ref_tools_api_key: str = Field(default="")

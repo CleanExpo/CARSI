@@ -1,0 +1,9 @@
+{
+  "scripts": {
+    "ai:models:check": "ts-node src/ai/version-checks/check-model-currency.ts",
+    "ai:visual:audit": "ts-node src/ai/audits/visual-audit.ts",
+    "ai:finished:audit": "node scripts/finished-audit.js",
+    "ai:governance:check": "bash scripts/governance-check.sh"
+  },
+  "_instructions": "Merge these scripts into your package.json scripts section"
+}

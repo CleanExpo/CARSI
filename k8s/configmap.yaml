@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: carsi-config
+  namespace: carsi-production
+  labels:
+    app.kubernetes.io/part-of: carsi-lms
+data:
+  NODE_ENV: production
+  LOG_LEVEL: info
+  NEXT_PUBLIC_BACKEND_URL: https://api.carsi.com.au
+  BACKEND_URL: http://carsi-backend:8000
+  REDIS_URL: redis://carsi-redis:6379/0
+  AI_PROVIDER: ollama
+  OLLAMA_BASE_URL: http://ollama:11434
+  OLLAMA_MODEL: llama3.1:8b

@@ -20,6 +20,7 @@ const pwaConfig = withPWA({
 });
 
 const nextConfig: NextConfig = {
+  output: 'standalone',
   reactStrictMode: true,
   transpilePackages: ['@shared'],
   turbopack: {},
@@ -28,7 +29,36 @@ const nextConfig: NextConfig = {
     // typedRoutes: true,
   },
   images: {
-    remotePatterns: [],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'carsi.com.au',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.carsi.com.au',
+        pathname: '/**',
+      },
+      {
+        // Google Drive thumbnails served via lh3.googleusercontent.com
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com',
+        pathname: '/**',
+      },
+      {
+        // Drive direct download thumbnails
+        protocol: 'https',
+        hostname: 'drive.google.com',
+        pathname: '/**',
+      },
+      {
+        // Unsplash (design-system demo page)
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+        pathname: '/**',
+      },
+    ],
   },
   async headers() {
     return [
