@@ -13,12 +13,21 @@ primary_region = "syd"
   dockerfile = "Dockerfile"
 
 # Static environment (non-secret) variables
-# Secrets (DATABASE_URL, JWT_SECRET_KEY, STRIPE_*, etc.) are set via:
+# Secrets (DATABASE_URL, JWT_SECRET_KEY, STRIPE_*, SMTP_PASS, etc.) are set via:
 #   fly secrets set KEY=VALUE --app carsi-backend
 [env]
   ENVIRONMENT = "production"
   PORT = "8000"
   AI_PROVIDER = "anthropic"
+
+  # Email configuration (SMTP_PASS is a secret — set via fly secrets)
+  SMTP_HOST = "smtp.resend.com"
+  SMTP_PORT = "465"
+  SMTP_USER = "resend"
+  SMTP_FROM = "noreply@carsi.com.au"
+  SMTP_FROM_NAME = "CARSI Learning"
+  SMTP_USE_SSL = "true"
+  SMTP_USE_TLS = "false"
 
 # HTTP service configuration
 [http_service]
