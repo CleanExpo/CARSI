@@ -21,6 +21,7 @@ from .routes import (
     analytics,
     articles,
     events,
+    jobs,
     chat,
     contractors,
     discovery,
@@ -157,6 +158,8 @@ app.include_router(synthex_data.router, tags=["Synthex Integration"])
 app.include_router(articles.router, tags=["Research Articles"])
 # CARSI Hub — Industry Calendar
 app.include_router(events.router, tags=["Industry Calendar"])
+# CARSI Hub — Job Board
+app.include_router(jobs.router, tags=["Job Board"])
 
 
 @app.get("/")
