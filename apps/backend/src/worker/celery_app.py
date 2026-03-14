@@ -10,7 +10,7 @@ celery_app = Celery(
     "carsi",
     broker=settings.effective_celery_broker,
     backend=settings.effective_celery_backend,
-    include=["src.worker.tasks"],
+    include=["src.worker.tasks", "src.worker.job_tasks"],
 )
 
 celery_app.conf.update(
@@ -19,4 +19,10 @@ celery_app.conf.update(
     accept_content=["json"],
     timezone="Australia/Sydney",
     enable_utc=True,
+    beat_schedule={
+        "expire-stale-job-listings-daily": {
+            "task": "expire_stale_job_listings",
+            "schedule": 86_400.0,  # every 24 hours
+        },
+    },
 )

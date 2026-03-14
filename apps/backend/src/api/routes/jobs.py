@@ -10,17 +10,46 @@ Admin endpoints: list all, approve/reject, delete.
 from datetime import UTC, datetime, timedelta
 from uuid import UUID
 
+import redis as redis_lib
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, EmailStr, Field, field_validator
 from sqlalchemy import asc, desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.config import get_settings
 from src.config.database import get_async_db
 from src.db.models import JobListing
 from src.utils import get_logger
 
+_settings = get_settings()
+
 logger = get_logger(__name__)
 router = APIRouter(prefix="/api/jobs", tags=["Job Board"])
+
+_RATE_LIMIT_TTL = 86_400  # 24 hours in seconds
+_RATE_LIMIT_PREFIX = "ratelimit:jobsubmit:"
+
+
+def _get_redis() -> redis_lib.Redis:
+    return redis_lib.from_url(_settings.redis_url, decode_responses=True)
+
+
+def _check_submission_rate_limit(email: str) -> None:
+    """Raise HTTP 429 if this email has submitted a job in the last 24 hours."""
+    try:
+        r = _get_redis()
+        key = f"{_RATE_LIMIT_PREFIX}{email.lower()}"
+        if r.exists(key):
+            raise HTTPException(
+                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                detail="You have already submitted a job listing in the last 24 hours. Please try again tomorrow.",
+            )
+        r.setex(key, _RATE_LIMIT_TTL, "1")
+    except HTTPException:
+        raise
+    except Exception as exc:
+        # Redis unavailable — fail open (log and continue)
+        logger.warning("Redis rate limit check failed, continuing without limit", error=str(exc))
 
 VALID_EMPLOYMENT_TYPES = {"FULL_TIME", "PART_TIME", "CONTRACTOR", "CASUAL", "INTERNSHIP"}
 VALID_STATES = {"QLD", "NSW", "VIC", "SA", "WA", "TAS", "NT", "ACT"}
@@ -249,6 +278,7 @@ async def submit_job(
 ) -> dict:
     """Public submission — creates listing with published=False, valid_through=now+30d."""
     body.validate_apply_method()
+    _check_submission_rate_limit(body.submitter_email)
 
     job = JobListing(
         title=body.title,
@@ -276,6 +306,19 @@ async def submit_job(
     await db.commit()
     await db.refresh(job)
     logger.info("Job submitted", job_id=str(job.id), company=job.company_name)
+
+    # Fire-and-forget confirmation email via Celery
+    try:
+        from src.worker.job_tasks import send_job_submission_confirmation
+        send_job_submission_confirmation.delay(
+            to_email=body.submitter_email,
+            submitter_name=body.submitter_name,
+            job_title=body.title,
+            company_name=body.company_name,
+        )
+    except Exception as exc:
+        logger.warning("Failed to enqueue confirmation email", job_id=str(job.id), error=str(exc))
+
     return {
         "id": str(job.id),
         "message": "Job submitted successfully. It will appear on the board after review (typically within 24 hours).",
