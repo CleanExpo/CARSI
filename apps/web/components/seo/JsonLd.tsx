@@ -14,16 +14,18 @@ export function OrganizationSchema({
   name = 'CARSI',
   url = 'https://carsi.com.au',
   logo = 'https://carsi.com.au/logo.png',
-  sameAs = ['https://nrpg.com.au', 'https://disasterrecovery.com.au'],
+  sameAs = ['https://www.linkedin.com/company/carsi'],
 }: OrganizationSchemaProps) {
   const schema = {
     '@context': 'https://schema.org',
-    '@type': 'EducationalOrganization',
+    '@type': 'Organization',
+    '@id': 'https://carsi.com.au/#organization',
     name,
+    alternateName: 'Centre for Australian Restoration and Standards Information',
     url,
     logo,
     description:
-      "Australia's leading industry body for disaster restoration education, research, and professional standards.",
+      "Australia's leading education and research hub for the disaster restoration industry.",
     address: {
       '@type': 'PostalAddress',
       addressCountry: 'AU',
@@ -33,12 +35,11 @@ export function OrganizationSchema({
       name: 'Australia',
     },
     knowsAbout: [
-      'Disaster recovery',
-      'Carpet restoration',
-      'Flood damage',
-      'Fire restoration',
-      'Insurance claims Australia',
-      'Restoration certifications',
+      'disaster recovery',
+      'restoration standards',
+      'insurance claims',
+      'building restoration',
+      'Australian restoration industry',
     ],
     sameAs,
     contactPoint: {
@@ -68,8 +69,10 @@ export function WebsiteSchema({
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
+    '@id': 'https://carsi.com.au/#website',
     name,
     url,
+    publisher: { '@id': 'https://carsi.com.au/#organization' },
     potentialAction: {
       '@type': 'SearchAction',
       target: {
@@ -117,14 +120,15 @@ export function CourseSchema({
     '@type': 'Course',
     name,
     description,
-    provider: {
-      '@type': 'EducationalOrganization',
-      name: provider,
-      url: 'https://carsi.com.au',
-    },
+    provider: { '@id': 'https://carsi.com.au/#organization' },
     url,
     inLanguage: 'en-AU',
     isAccessibleForFree: price === 0,
+    hasCourseInstance: {
+      '@type': 'CourseInstance',
+      courseMode: 'online',
+      inLanguage: 'en-AU',
+    },
   };
 
   if (price !== undefined && price > 0) {
@@ -471,21 +475,23 @@ export function ArticleSchema({
   const schema: Record<string, unknown> = {
     '@context': 'https://schema.org',
     '@type': 'Article',
+    '@id': `${url}#article`,
     headline,
     author: {
       '@type': 'Person',
       name: authorName,
-      memberOf: { '@type': 'Organization', name: 'CARSI' },
+      memberOf: { '@id': 'https://carsi.com.au/#organization' },
     },
-    publisher: {
-      '@type': 'Organization',
-      name: 'CARSI',
-      url: 'https://carsi.com.au',
-    },
+    publisher: { '@id': 'https://carsi.com.au/#organization' },
     datePublished,
     dateModified: dateModified ?? datePublished,
+    mainEntityOfPage: url,
     url,
     inLanguage: 'en-AU',
+    speakable: {
+      '@type': 'SpeakableSpecification',
+      cssSelector: ['.article-summary', 'h1 + p', '.faq-answer', '.key-takeaway'],
+    },
   };
 
   if (image) {
