@@ -14,7 +14,7 @@ export function OrganizationSchema({
   name = 'CARSI',
   url = 'https://carsi.com.au',
   logo = 'https://carsi.com.au/logo.png',
-  sameAs = [],
+  sameAs = ['https://nrpg.com.au', 'https://disasterrecovery.com.au'],
 }: OrganizationSchemaProps) {
   const schema = {
     '@context': 'https://schema.org',
@@ -23,7 +23,7 @@ export function OrganizationSchema({
     url,
     logo,
     description:
-      'IICRC-aligned continuing education platform for cleaning and restoration professionals in Australia.',
+      "Australia's leading industry body for disaster restoration education, research, and professional standards.",
     address: {
       '@type': 'PostalAddress',
       addressCountry: 'AU',
@@ -32,6 +32,14 @@ export function OrganizationSchema({
       '@type': 'Country',
       name: 'Australia',
     },
+    knowsAbout: [
+      'Disaster recovery',
+      'Carpet restoration',
+      'Flood damage',
+      'Fire restoration',
+      'Insurance claims Australia',
+      'Restoration certifications',
+    ],
     sameAs,
     contactPoint: {
       '@type': 'ContactPoint',
@@ -189,6 +197,61 @@ export function FAQSchema({ questions }: FAQSchemaProps) {
       },
     })),
   };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+    />
+  );
+}
+
+interface ArticleSchemaProps {
+  headline: string;
+  authorName: string;
+  datePublished: string;
+  dateModified?: string;
+  url: string;
+  image?: string;
+  description?: string;
+}
+
+export function ArticleSchema({
+  headline,
+  authorName,
+  datePublished,
+  dateModified,
+  url,
+  image,
+  description,
+}: ArticleSchemaProps) {
+  const schema: Record<string, unknown> = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline,
+    author: {
+      '@type': 'Person',
+      name: authorName,
+      memberOf: { '@type': 'Organization', name: 'CARSI' },
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'CARSI',
+      url: 'https://carsi.com.au',
+    },
+    datePublished,
+    dateModified: dateModified ?? datePublished,
+    url,
+    inLanguage: 'en-AU',
+  };
+
+  if (image) {
+    schema.image = image;
+  }
+
+  if (description) {
+    schema.description = description;
+  }
 
   return (
     <script
