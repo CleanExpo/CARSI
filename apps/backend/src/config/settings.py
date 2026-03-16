@@ -32,7 +32,10 @@ class Settings(BaseSettings):
 
     # API
     backend_api_key: str = Field(default="")
-    cors_origins: list[str] = Field(default=["http://localhost:3000"])
+    cors_origins: list[str] = Field(
+        default=["http://localhost:3000", "http://localhost:3009"],
+        description="Allowed CORS origins. Override in production via CORS_ORIGINS env var.",
+    )
 
     # Database (PostgreSQL)
     database_url: str = Field(
@@ -65,6 +68,21 @@ class Settings(BaseSettings):
             if len(self.jwt_secret_key) < 32:
                 raise ValueError(
                     "JWT_SECRET_KEY must be at least 32 characters in production."
+                )
+        return self
+
+    @model_validator(mode="after")
+    def _reject_missing_secrets_in_production(self) -> "Settings":
+        """Reject missing critical secrets when running in production."""
+        if self.environment == "production":
+            missing = []
+            if not self.stripe_secret_key:
+                missing.append("STRIPE_SECRET_KEY")
+            if not self.stripe_webhook_secret:
+                missing.append("STRIPE_WEBHOOK_SECRET")
+            if missing:
+                raise ValueError(
+                    f"Required secrets not set in production: {', '.join(missing)}"
                 )
         return self
 
@@ -128,6 +146,7 @@ class Settings(BaseSettings):
     # Stripe Payments
     stripe_secret_key: str = Field(default="", description="Stripe secret API key")
     stripe_webhook_secret: str = Field(default="", description="Stripe webhook signing secret")
+    stripe_yearly_price_id: str = Field(default="", description="Stripe yearly subscription price ID")
     frontend_url: str = Field(
         default="http://localhost:3009",
         description="Frontend URL for Stripe redirects",

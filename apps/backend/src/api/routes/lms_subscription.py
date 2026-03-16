@@ -6,6 +6,7 @@ GET  /api/lms/subscription/status    — current subscription status
 POST /api/lms/subscription/portal    — Stripe Billing Portal for self-service
 """
 
+import hashlib
 import os
 
 import stripe
@@ -16,10 +17,24 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.deps_lms import get_current_lms_user
 from src.config.database import get_async_db
+from src.config.settings import get_settings
 from src.db.lms_models import LMSSubscription, LMSUser
 
-stripe.api_key = os.getenv("STRIPE_SECRET_KEY", "")
-STRIPE_PRICE_ID = os.getenv("STRIPE_YEARLY_PRICE_ID", "price_placeholder")
+
+def _configure_stripe() -> None:
+    """Set the Stripe API key from settings at request time."""
+    stripe.api_key = get_settings().stripe_secret_key
+
+
+def _get_stripe_price_id() -> str:
+    s = get_settings()
+    price_id = s.stripe_yearly_price_id if s.stripe_yearly_price_id else os.getenv("STRIPE_YEARLY_PRICE_ID", "")
+    if not price_id:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Subscription not configured — contact support",
+        )
+    return price_id
 
 router = APIRouter(prefix="/api/lms/subscription", tags=["lms-subscription"])
 
@@ -52,6 +67,9 @@ async def create_checkout_session(
     current_user: LMSUser = Depends(get_current_lms_user),
 ) -> CheckoutResponse:
     """Create a Stripe Checkout Session. 7-day free trial, $795 AUD/year thereafter."""
+    _configure_stripe()
+    price_id = _get_stripe_price_id()
+
     existing = await db.execute(
         select(LMSSubscription).where(
             LMSSubscription.student_id == current_user.id,
@@ -64,15 +82,18 @@ async def create_checkout_session(
             detail="You already have an active subscription.",
         )
 
+    idempotency_key = hashlib.sha256(f"checkout_{current_user.id}".encode()).hexdigest()[:32]
+
     session = stripe.checkout.Session.create(
         mode="subscription",
         payment_method_types=["card"],
         customer_email=current_user.email,
-        line_items=[{"price": STRIPE_PRICE_ID, "quantity": 1}],
+        line_items=[{"price": price_id, "quantity": 1}],
         subscription_data={"trial_period_days": 7},
         success_url=data.success_url + "?session_id={CHECKOUT_SESSION_ID}",
         cancel_url=data.cancel_url,
         metadata={"student_id": str(current_user.id)},
+        idempotency_key=idempotency_key,
     )
     return CheckoutResponse(url=session.url)
 
@@ -109,6 +130,7 @@ async def create_billing_portal(
     current_user: LMSUser = Depends(get_current_lms_user),
 ) -> PortalResponse:
     """Create a Stripe Billing Portal session for subscription self-management."""
+    _configure_stripe()
     result = await db.execute(
         select(LMSSubscription)
         .where(LMSSubscription.student_id == current_user.id)

@@ -3,7 +3,7 @@ import { CertificatePreview } from '@/components/lms/diagrams/CertificatePreview
 import { notFound } from 'next/navigation';
 
 async function getCredential(credentialId: string) {
-  const apiUrl = process.env.API_URL ?? 'http://localhost:8000';
+  const apiUrl = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8000';
   const res = await fetch(`${apiUrl}/api/lms/credentials/${credentialId}`, {
     cache: 'no-store', // Always fresh — credentials can be revoked
   });
@@ -21,7 +21,7 @@ export default async function CredentialPage({
   const credential = await getCredential(credentialId);
   if (!credential) notFound();
 
-  const backendUrl = process.env.API_URL ?? 'http://localhost:8000';
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8000';
   const pdfUrl = `${backendUrl}/api/lms/credentials/${credentialId}/pdf`;
 
   return (

@@ -38,7 +38,17 @@ def test_checkout_returns_stripe_url():
     app.dependency_overrides[get_current_lms_user] = lambda: _make_mock_student()
     app.dependency_overrides[get_async_db] = lambda: mock_db
 
-    with patch("src.api.routes.lms_subscription.stripe") as mock_stripe:
+    with (
+        patch(
+            "src.api.routes.lms_subscription._configure_stripe",
+            return_value=None,
+        ),
+        patch(
+            "src.api.routes.lms_subscription._get_stripe_price_id",
+            return_value="price_test123",
+        ),
+        patch("src.api.routes.lms_subscription.stripe") as mock_stripe,
+    ):
         mock_stripe.checkout.Session.create.return_value = MagicMock(
             url="https://checkout.stripe.com/test"
         )
@@ -64,7 +74,17 @@ def test_checkout_returns_409_when_already_subscribed():
     app.dependency_overrides[get_current_lms_user] = lambda: _make_mock_student()
     app.dependency_overrides[get_async_db] = lambda: mock_db
 
-    with patch("src.api.routes.lms_subscription.stripe"):
+    with (
+        patch(
+            "src.api.routes.lms_subscription._configure_stripe",
+            return_value=None,
+        ),
+        patch(
+            "src.api.routes.lms_subscription._get_stripe_price_id",
+            return_value="price_test123",
+        ),
+        patch("src.api.routes.lms_subscription.stripe"),
+    ):
         resp = client.post(
             "/api/lms/subscription/checkout",
             json={"success_url": "http://x", "cancel_url": "http://x"},

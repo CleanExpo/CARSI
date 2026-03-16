@@ -14,6 +14,8 @@ from src.db.lms_models import LMSCourse, LMSEnrollment, LMSRole, LMSUser, LMSUse
 
 router = APIRouter(prefix="/api/lms/admin", tags=["lms-admin"])
 
+_VALID_ROLES = frozenset({"admin", "instructor", "student"})
+
 
 def _require_admin(user: LMSUser) -> None:
     roles = {ur.role.name for ur in user.user_roles}
@@ -79,6 +81,12 @@ async def update_user_role(
 ) -> AdminUserOut:
     """Set a user's primary role (replaces existing roles)."""
     _require_admin(current_user)
+
+    if body.role not in _VALID_ROLES:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid role '{body.role}'. Must be one of: {', '.join(sorted(_VALID_ROLES))}",
+        )
 
     result = await db.execute(
         select(LMSUser)

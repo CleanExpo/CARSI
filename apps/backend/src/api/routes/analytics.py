@@ -1,19 +1,19 @@
 """Analytics API routes for observability dashboard.
 
-Returns empty metrics until a persistent state store (PostgreSQL) is configured.
+Returns 503 until a persistent state store (PostgreSQL) is configured.
 Supabase was removed in the JWT-only auth migration.
 """
 
 from typing import Any
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, HTTPException, Query, status
 
 from src.utils import get_logger
 
 logger = get_logger(__name__)
 router = APIRouter(prefix="/analytics", tags=["Analytics"])
 
-_NOT_CONFIGURED_MSG = "Analytics requires persistent state store (not yet configured)"
+_NOT_CONFIGURED_DETAIL = "Analytics endpoint requires state store configuration"
 
 
 @router.get("/metrics/overview")
@@ -22,19 +22,10 @@ async def get_metrics_overview(
     agent_name: str | None = None,
 ) -> dict[str, Any]:
     """Get high-level metrics overview."""
-    return {
-        "total_runs": 0,
-        "completed_runs": 0,
-        "failed_runs": 0,
-        "active_runs": 0,
-        "success_rate": 0.0,
-        "avg_duration_seconds": 0.0,
-        "total_cost_usd": 0.0,
-        "total_input_tokens": 0,
-        "total_output_tokens": 0,
-        "time_range": time_range,
-        "message": _NOT_CONFIGURED_MSG,
-    }
+    raise HTTPException(
+        status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+        detail=_NOT_CONFIGURED_DETAIL,
+    )
 
 
 @router.get("/metrics/agents")
@@ -43,7 +34,10 @@ async def get_agent_metrics(
     group_by: str = Query("day", regex="^(hour|day|week)$"),
 ) -> list[dict[str, Any]]:
     """Get agent-specific performance metrics."""
-    return []
+    raise HTTPException(
+        status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+        detail=_NOT_CONFIGURED_DETAIL,
+    )
 
 
 @router.get("/metrics/costs")
@@ -51,23 +45,16 @@ async def get_cost_metrics(
     time_range: str = Query("30d"),
 ) -> dict[str, Any]:
     """Get cost and token usage metrics."""
-    return {
-        "total_cost_usd": 0.0,
-        "total_input_tokens": 0,
-        "total_output_tokens": 0,
-        "total_calls": 0,
-        "by_model": [],
-        "time_range": time_range,
-        "message": _NOT_CONFIGURED_MSG,
-    }
+    raise HTTPException(
+        status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+        detail=_NOT_CONFIGURED_DETAIL,
+    )
 
 
 @router.get("/runs/{run_id}/details")
 async def get_run_details(run_id: str) -> dict[str, Any]:
     """Get detailed information about a specific agent run."""
-    return {
-        "run": None,
-        "api_usage": [],
-        "tool_usage": [],
-        "message": _NOT_CONFIGURED_MSG,
-    }
+    raise HTTPException(
+        status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+        detail=_NOT_CONFIGURED_DETAIL,
+    )

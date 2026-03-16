@@ -37,7 +37,13 @@ def test_webhook_handles_subscription_created():
         },
     )
 
-    with patch("src.api.routes.lms_webhooks.stripe") as mock_stripe:
+    with (
+        patch(
+            "src.api.routes.lms_webhooks._get_webhook_secret",
+            return_value="whsec_test_secret",
+        ),
+        patch("src.api.routes.lms_webhooks.stripe") as mock_stripe,
+    ):
         mock_stripe.Webhook.construct_event.return_value = payload
         resp = client.post(
             "/api/lms/webhooks/stripe",
@@ -55,7 +61,10 @@ def test_webhook_returns_400_on_invalid_signature():
     import stripe as real_stripe
 
     with (
-        patch("src.api.routes.lms_webhooks.WEBHOOK_SECRET", "whsec_test_secret"),
+        patch(
+            "src.api.routes.lms_webhooks._get_webhook_secret",
+            return_value="whsec_test_secret",
+        ),
         patch("src.api.routes.lms_webhooks.stripe") as mock_stripe,
     ):
         mock_stripe.error.SignatureVerificationError = (
@@ -71,3 +80,18 @@ def test_webhook_returns_400_on_invalid_signature():
         )
 
     assert resp.status_code == 400
+
+
+def test_webhook_returns_500_when_secret_not_configured():
+    """Returns 500 when STRIPE_WEBHOOK_SECRET is not configured."""
+    with patch(
+        "src.api.routes.lms_webhooks._get_webhook_secret",
+        return_value="",
+    ):
+        resp = client.post(
+            "/api/lms/webhooks/stripe",
+            content=b"{}",
+            headers={"stripe-signature": "test_sig"},
+        )
+
+    assert resp.status_code == 500

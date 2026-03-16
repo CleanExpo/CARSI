@@ -13,21 +13,28 @@ IMPORTANT: This endpoint receives the RAW request body (bytes) for
 Stripe signature verification — do NOT use Pydantic body parsing here.
 """
 
-import os
 from datetime import datetime, timezone
 
 import stripe
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.config.database import get_async_db
+from src.config.settings import get_settings
 from src.db.lms_models import LMSEnrollment, LMSSubscription
+from src.utils import get_logger
 
-stripe.api_key = os.getenv("STRIPE_SECRET_KEY", "")
-WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET", "")
+logger = get_logger(__name__)
 
 router = APIRouter(prefix="/api/lms/webhooks", tags=["lms-webhooks"])
+
+# Keep module-level name for patching in tests — populated at request time via helper
+WEBHOOK_SECRET = ""
+
+
+def _get_webhook_secret() -> str:
+    return get_settings().stripe_webhook_secret
 
 
 def _ts_to_dt(ts: int | None) -> datetime | None:
@@ -48,19 +55,17 @@ async def stripe_webhook(
     payload = await request.body()
     sig_header = request.headers.get("stripe-signature", "")
 
-    if WEBHOOK_SECRET:
-        try:
-            event = stripe.Webhook.construct_event(payload, sig_header, WEBHOOK_SECRET)
-        except stripe.error.SignatureVerificationError:
-            raise HTTPException(status_code=400, detail="Invalid Stripe signature")
-    else:
-        # Dev mode: no signing secret configured — parse without verification.
-        # Set STRIPE_WEBHOOK_SECRET in .env.local to enable signature checks.
-        import json
-        try:
-            event = json.loads(payload)
-        except Exception:
-            raise HTTPException(status_code=400, detail="Invalid JSON payload")
+    webhook_secret = _get_webhook_secret()
+    if not webhook_secret:
+        logger.error("STRIPE_WEBHOOK_SECRET not configured — rejecting webhook")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Webhook endpoint not configured",
+        )
+    try:
+        event = stripe.Webhook.construct_event(payload, sig_header, webhook_secret)
+    except stripe.error.SignatureVerificationError:
+        raise HTTPException(status_code=400, detail="Invalid Stripe signature")
 
     event_type: str = event["type"]
     obj = event["data"]["object"]
@@ -96,24 +101,29 @@ async def _handle_checkout_completed(db: AsyncSession, obj: dict) -> None:
     except ValueError:
         return
 
-    # Idempotent — skip if already enrolled
-    existing = await db.execute(
-        select(LMSEnrollment).where(
-            LMSEnrollment.student_id == student_id,
-            LMSEnrollment.course_id == course_id,
+    try:
+        # Idempotent — skip if already enrolled
+        existing = await db.execute(
+            select(LMSEnrollment).where(
+                LMSEnrollment.student_id == student_id,
+                LMSEnrollment.course_id == course_id,
+            )
         )
-    )
-    if existing.scalar_one_or_none():
-        return
+        if existing.scalar_one_or_none():
+            return
 
-    enrollment = LMSEnrollment(
-        student_id=student_id,
-        course_id=course_id,
-        status="active",
-        payment_reference=obj.get("id", ""),
-    )
-    db.add(enrollment)
-    await db.commit()
+        enrollment = LMSEnrollment(
+            student_id=student_id,
+            course_id=course_id,
+            status="active",
+            payment_reference=obj.get("id", ""),
+        )
+        db.add(enrollment)
+        await db.commit()
+    except Exception as exc:
+        await db.rollback()
+        logger.error("Webhook handler failed", error=str(exc))
+        raise
 
 
 async def _handle_subscription_created(db: AsyncSession, obj: dict) -> None:
@@ -127,26 +137,31 @@ async def _handle_subscription_created(db: AsyncSession, obj: dict) -> None:
     except ValueError:
         return
 
-    existing = await db.execute(
-        select(LMSSubscription).where(
-            LMSSubscription.stripe_subscription_id == obj["id"]
+    try:
+        existing = await db.execute(
+            select(LMSSubscription).where(
+                LMSSubscription.stripe_subscription_id == obj["id"]
+            )
         )
-    )
-    if existing.scalar_one_or_none():
-        return  # idempotent
+        if existing.scalar_one_or_none():
+            return  # idempotent
 
-    sub = LMSSubscription(
-        student_id=student_id,
-        stripe_subscription_id=obj["id"],
-        stripe_customer_id=obj["customer"],
-        status=obj.get("status", "trialling"),
-        plan="yearly",
-        current_period_start=_ts_to_dt(obj.get("current_period_start")),
-        current_period_end=_ts_to_dt(obj.get("current_period_end")),
-        trial_end=_ts_to_dt(obj.get("trial_end")),
-    )
-    db.add(sub)
-    await db.commit()
+        sub = LMSSubscription(
+            student_id=student_id,
+            stripe_subscription_id=obj["id"],
+            stripe_customer_id=obj["customer"],
+            status=obj.get("status", "trialling"),
+            plan="yearly",
+            current_period_start=_ts_to_dt(obj.get("current_period_start")),
+            current_period_end=_ts_to_dt(obj.get("current_period_end")),
+            trial_end=_ts_to_dt(obj.get("trial_end")),
+        )
+        db.add(sub)
+        await db.commit()
+    except Exception as exc:
+        await db.rollback()
+        logger.error("Webhook handler failed", error=str(exc))
+        raise
 
     # Fire-and-forget: push to Synthex for marketing automation
     import asyncio
@@ -161,53 +176,68 @@ async def _handle_subscription_created(db: AsyncSession, obj: dict) -> None:
 
 
 async def _handle_subscription_deleted(db: AsyncSession, obj: dict) -> None:
-    result = await db.execute(
-        select(LMSSubscription).where(
-            LMSSubscription.stripe_subscription_id == obj["id"]
+    try:
+        result = await db.execute(
+            select(LMSSubscription).where(
+                LMSSubscription.stripe_subscription_id == obj["id"]
+            )
         )
-    )
-    sub = result.scalar_one_or_none()
-    if sub:
-        sub.status = "cancelled"
-        sub.cancelled_at = datetime.now(timezone.utc)
-        await db.commit()
+        sub = result.scalar_one_or_none()
+        if sub:
+            sub.status = "cancelled"
+            sub.cancelled_at = datetime.now(timezone.utc)
+            await db.commit()
 
-        # Fire-and-forget: push to Synthex for marketing automation
-        import asyncio
-        from src.services.synthex_connector import notify_subscription_event, SynthexEvents
+            # Fire-and-forget: push to Synthex for marketing automation
+            import asyncio
+            from src.services.synthex_connector import notify_subscription_event, SynthexEvents
 
-        asyncio.create_task(notify_subscription_event(
-            student_id=sub.student_id,
-            event_type=SynthexEvents.SUBSCRIPTION_CANCELLED,
-            plan=sub.plan,
-        ))
+            asyncio.create_task(notify_subscription_event(
+                student_id=sub.student_id,
+                event_type=SynthexEvents.SUBSCRIPTION_CANCELLED,
+                plan=sub.plan,
+            ))
+    except Exception as exc:
+        await db.rollback()
+        logger.error("Webhook handler failed", error=str(exc))
+        raise
 
 
 async def _handle_payment_succeeded(db: AsyncSession, obj: dict) -> None:
     sub_id = obj.get("subscription")
     if not sub_id:
         return
-    result = await db.execute(
-        select(LMSSubscription).where(
-            LMSSubscription.stripe_subscription_id == sub_id
+    try:
+        result = await db.execute(
+            select(LMSSubscription).where(
+                LMSSubscription.stripe_subscription_id == sub_id
+            )
         )
-    )
-    sub = result.scalar_one_or_none()
-    if sub:
-        sub.status = "active"
-        await db.commit()
+        sub = result.scalar_one_or_none()
+        if sub:
+            sub.status = "active"
+            await db.commit()
+    except Exception as exc:
+        await db.rollback()
+        logger.error("Webhook handler failed", error=str(exc))
+        raise
 
 
 async def _handle_payment_failed(db: AsyncSession, obj: dict) -> None:
     sub_id = obj.get("subscription")
     if not sub_id:
         return
-    result = await db.execute(
-        select(LMSSubscription).where(
-            LMSSubscription.stripe_subscription_id == sub_id
+    try:
+        result = await db.execute(
+            select(LMSSubscription).where(
+                LMSSubscription.stripe_subscription_id == sub_id
+            )
         )
-    )
-    sub = result.scalar_one_or_none()
-    if sub:
-        sub.status = "past_due"
-        await db.commit()
+        sub = result.scalar_one_or_none()
+        if sub:
+            sub.status = "past_due"
+            await db.commit()
+    except Exception as exc:
+        await db.rollback()
+        logger.error("Webhook handler failed", error=str(exc))
+        raise
