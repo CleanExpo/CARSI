@@ -55,13 +55,13 @@ def upgrade() -> None:
             "industry_categories",
             postgresql.JSONB(astext_type=sa.Text()),
             nullable=False,
-            server_default="'[]'",
+            server_default=sa.text("'[]'"),
         ),
         sa.Column(
             "tags",
             postgresql.JSONB(astext_type=sa.Text()),
             nullable=False,
-            server_default="'[]'",
+            server_default=sa.text("'[]'"),
         ),
         # Flags
         sa.Column("is_carsi_channel", sa.Boolean, nullable=False, server_default="false"),
