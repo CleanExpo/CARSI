@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: carsi-redis
+  namespace: carsi-staging
+  labels:
+    app: carsi-redis
+    app.kubernetes.io/part-of: carsi-lms
+    environment: staging
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: carsi-redis
+  template:
+    metadata:
+      labels:
+        app: carsi-redis
+        environment: staging
+    spec:
+      containers:
+        - name: redis
+          image: redis:7-alpine
+          ports:
+            - containerPort: 6379
+              protocol: TCP
+          command:
+            - redis-server
+            - --maxmemory
+            - 128mb
+            - --maxmemory-policy
+            - allkeys-lru
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 150m
+              memory: 128Mi
+          livenessProbe:
+            exec:
+              command:
+                - redis-cli
+                - ping
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          readinessProbe:
+            exec:
+              command:
+                - redis-cli
+                - ping
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: carsi-redis
+  namespace: carsi-staging
+  labels:
+    app: carsi-redis
+    app.kubernetes.io/part-of: carsi-lms
+spec:
+  type: ClusterIP
+  selector:
+    app: carsi-redis
+  ports:
+    - port: 6379
+      targetPort: 6379
+      protocol: TCP

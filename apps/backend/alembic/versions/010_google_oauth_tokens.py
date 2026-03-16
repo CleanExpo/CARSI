@@ -1,11 +1,11 @@
 """
-007 — Google OAuth Tokens
+010 — Google OAuth Tokens
 
 Stores admin OAuth2 refresh token for Google Drive access.
 Replaces service account key approach (blocked by org policy).
 
-Revision ID: 007
-Revises: 006
+Revision ID: 010
+Revises: 009
 Create Date: 2026-03-06
 """
 
@@ -13,8 +13,8 @@ from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
-revision = "007"
-down_revision = "006"
+revision = "010"
+down_revision = "009"
 branch_labels = None
 depends_on = None
 

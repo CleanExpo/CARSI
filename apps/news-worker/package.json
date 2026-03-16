@@ -1,0 +1,28 @@
+{
+  "name": "@carsi/news-worker",
+  "version": "0.1.0",
+  "description": "CARSI Hub — RSS news feed ingestion worker (UNI-81)",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "node --experimental-specifier-resolution=node dist/index.js",
+    "build": "tsc",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.24.0",
+    "bullmq": "^5.0.0",
+    "node-cron": "^3.0.3",
+    "rss-parser": "^3.13.0",
+    "pg": "^8.11.0",
+    "dotenv": "^16.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/node-cron": "^3.0.0",
+    "@types/pg": "^8.11.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.0.0"
+  }
+}

@@ -1,0 +1,100 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+  namespace: carsi-staging
+  labels:
+    app: carsi-postgres
+    app.kubernetes.io/part-of: carsi-lms
+    environment: staging
+spec:
+  serviceName: carsi-staging-postgres
+  replicas: 1
+  selector:
+    matchLabels:
+      app: carsi-postgres
+  template:
+    metadata:
+      labels:
+        app: carsi-postgres
+        environment: staging
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:15-alpine
+          ports:
+            - containerPort: 5432
+              protocol: TCP
+          env:
+            - name: POSTGRES_DB
+              value: carsi_staging
+            - name: POSTGRES_USER
+              value: carsi_user
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: carsi-staging-secrets
+                  key: POSTGRES_PASSWORD
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 1Gi
+          livenessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - carsi_user
+                - -d
+                - carsi_staging
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - carsi_user
+                - -d
+                - carsi_staging
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: standard
+        resources:
+          requests:
+            storage: 10Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: carsi-staging-postgres
+  namespace: carsi-staging
+  labels:
+    app: carsi-postgres
+    app.kubernetes.io/part-of: carsi-lms
+spec:
+  type: ClusterIP
+  selector:
+    app: carsi-postgres
+  ports:
+    - port: 5432
+      targetPort: 5432
+      protocol: TCP

@@ -1,8 +1,8 @@
 """
-008 — Performance Indexes
+011 — Performance Indexes
 
 Add composite indexes on hot query paths identified in audit.
-Revision ID: 008 / Revises: 007
+Revision ID: 011 / Revises: 010
 
 Corrections from model audit (lms_models.py):
 - lms_lesson_progress does not exist — actual table is lms_progress
@@ -12,8 +12,8 @@ Corrections from model audit (lms_models.py):
 """
 from alembic import op
 
-revision = "008"
-down_revision = "007"
+revision = "011"
+down_revision = "010"
 branch_labels = None
 depends_on = None
 

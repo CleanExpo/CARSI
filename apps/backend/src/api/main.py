@@ -19,6 +19,9 @@ from .routes import (
     agent_dashboard,
     agents,
     analytics,
+    articles,
+    events,
+    jobs,
     chat,
     contractors,
     discovery,
@@ -53,6 +56,9 @@ from .routes import (
     workflow_builder,
     workflows,
     synthex_data,
+    news,
+    podcasts,
+    youtube,
 )
 
 settings = get_settings()
@@ -153,6 +159,18 @@ app.include_router(documents.router, tags=["Documents"])
 app.include_router(workflow_builder.router, prefix="/api", tags=["Workflow Builder"])
 app.include_router(discovery.router, prefix="/api", tags=["Discovery"])
 app.include_router(synthex_data.router, tags=["Synthex Integration"])
+# CARSI Hub — Research Articles CMS
+app.include_router(articles.router, tags=["Research Articles"])
+# CARSI Hub — Industry Calendar
+app.include_router(events.router, tags=["Industry Calendar"])
+# CARSI Hub — Job Board
+app.include_router(jobs.router, tags=["Job Board"])
+# CARSI Hub — News Feed
+app.include_router(news.router, tags=["News Feed"])
+# CARSI Hub — Podcast Directory
+app.include_router(podcasts.router, tags=["Podcast Directory"])
+# CARSI Hub — YouTube Channel Directory
+app.include_router(youtube.router, tags=["YouTube Channel Directory"])
 
 
 @app.get("/")

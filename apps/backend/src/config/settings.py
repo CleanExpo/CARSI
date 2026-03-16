@@ -176,6 +176,12 @@ class Settings(BaseSettings):
         description="Enable Synthex data sync endpoints for full LMS visibility",
     )
 
+    # YouTube Data API (UNI-71 — YouTube Channel Directory)
+    youtube_api_key: str = Field(
+        default="",
+        description="YouTube Data API v3 key for channel stats sync (leave empty to disable sync)",
+    )
+
     # MCP Tools
     exa_api_key: str = Field(default="")
     ref_tools_api_key: str = Field(default="")

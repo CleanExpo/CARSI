@@ -196,6 +196,200 @@ VALUES ('1.0.0-init', 'Initial self-contained database setup')
 ON CONFLICT (version) DO NOTHING;
 
 -- =============================================================================
+-- SECTION N: CARSI Hub — Research Articles CMS
+-- =============================================================================
+
+-- Article publication status enum
+DO $$ BEGIN
+    CREATE TYPE article_status AS ENUM ('draft', 'published', 'archived');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+
+-- Research articles table
+-- Supports rich-text content, FAQ schema (FAQPage), SEO metadata, and NRPG author linkage.
+CREATE TABLE IF NOT EXISTS research_articles (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    slug VARCHAR(300) UNIQUE NOT NULL,
+    title VARCHAR(500) NOT NULL,
+    excerpt TEXT,
+    content TEXT NOT NULL,
+
+    category VARCHAR(100),
+    tags JSONB NOT NULL DEFAULT '[]',
+
+    seo_title VARCHAR(70),
+    seo_description VARCHAR(160),
+    canonical_url VARCHAR(500),
+    og_image_url VARCHAR(500),
+
+    -- FAQPage structured data: array of {"question": "...", "answer": "..."} objects
+    faq_items JSONB NOT NULL DEFAULT '[]',
+
+    -- NRPG author linkage (nullable until UNI-59 NRPG API integration)
+    author_nrpg_id VARCHAR(100),
+    author_name VARCHAR(255),
+    author_bio TEXT,
+
+    -- Related RestoreAssist features: array of {"feature": "...", "url": "..."} objects
+    related_restore_assist JSONB NOT NULL DEFAULT '[]',
+
+    status article_status NOT NULL DEFAULT 'draft',
+    published_at TIMESTAMPTZ,
+    view_count INTEGER NOT NULL DEFAULT 0,
+
+    created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+    updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+
+    CONSTRAINT slug_format CHECK (slug ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$')
+);
+
+CREATE INDEX IF NOT EXISTS idx_research_articles_slug ON research_articles(slug);
+CREATE INDEX IF NOT EXISTS idx_research_articles_status ON research_articles(status);
+CREATE INDEX IF NOT EXISTS idx_research_articles_category ON research_articles(category);
+CREATE INDEX IF NOT EXISTS idx_research_articles_published ON research_articles(published_at DESC) WHERE status = 'published';
+CREATE INDEX IF NOT EXISTS idx_research_articles_author_nrpg ON research_articles(author_nrpg_id) WHERE author_nrpg_id IS NOT NULL;
+
+CREATE TRIGGER research_articles_updated_at
+    BEFORE UPDATE ON research_articles
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+
+INSERT INTO schema_version (version, description)
+VALUES ('1.1.0-carsi-articles', 'CARSI Hub Research Articles CMS + FAQ Schema')
+ON CONFLICT (version) DO NOTHING;
+
+-- =============================================================================
+-- CARSI Hub Phase 1: Industry Calendar (UNI-68)
+-- =============================================================================
+
+CREATE TABLE IF NOT EXISTS industry_events (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    title VARCHAR(500) NOT NULL,
+    description TEXT,
+    event_type VARCHAR(50) NOT NULL DEFAULT 'conference',
+    industry_categories JSONB NOT NULL DEFAULT '[]',
+
+    -- Dates
+    start_date TIMESTAMPTZ NOT NULL,
+    end_date TIMESTAMPTZ,
+
+    -- Location
+    location_name VARCHAR(255),
+    location_address TEXT,
+    location_city VARCHAR(100),
+    location_state VARCHAR(10),
+    location_lat VARCHAR(20),
+    location_lng VARCHAR(20),
+    is_virtual BOOLEAN NOT NULL DEFAULT FALSE,
+
+    -- Organiser
+    organiser_name VARCHAR(255),
+    organiser_url VARCHAR(1000),
+    event_url VARCHAR(1000),
+
+    -- Schema.org event status
+    schema_event_status VARCHAR(50) NOT NULL DEFAULT 'EventScheduled',
+
+    -- Ticketing
+    ticket_url VARCHAR(1000),
+    is_free BOOLEAN NOT NULL DEFAULT FALSE,
+    price_range VARCHAR(100),
+
+    -- Media
+    image_url VARCHAR(1000),
+
+    -- Source
+    source VARCHAR(50) NOT NULL DEFAULT 'manual',
+    source_id VARCHAR(255),
+
+    -- Publication
+    published BOOLEAN NOT NULL DEFAULT FALSE,
+    featured BOOLEAN NOT NULL DEFAULT FALSE,
+
+    created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+    updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+
+    CONSTRAINT valid_event_type CHECK (event_type IN ('conference', 'training', 'webinar', 'workshop', 'networking', 'other')),
+    CONSTRAINT valid_event_dates CHECK (end_date IS NULL OR end_date >= start_date)
+);
+
+CREATE INDEX IF NOT EXISTS idx_industry_events_start_date ON industry_events(start_date ASC);
+CREATE INDEX IF NOT EXISTS idx_industry_events_published ON industry_events(published, start_date ASC) WHERE published = TRUE;
+CREATE INDEX IF NOT EXISTS idx_industry_events_type ON industry_events(event_type);
+CREATE INDEX IF NOT EXISTS idx_industry_events_categories ON industry_events USING GIN(industry_categories);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_industry_events_source_dedup ON industry_events(source, source_id) WHERE source_id IS NOT NULL;
+
+CREATE TRIGGER industry_events_updated_at
+    BEFORE UPDATE ON industry_events
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+
+-- =============================================================================
+-- CARSI Hub Phase 1: Job Board (UNI-67)
+-- =============================================================================
+
+CREATE TABLE IF NOT EXISTS job_listings (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    title VARCHAR(500) NOT NULL,
+    company_name VARCHAR(255) NOT NULL,
+    company_website VARCHAR(1000),
+    company_logo_url VARCHAR(1000),
+    description TEXT NOT NULL,
+    employment_type VARCHAR(50) NOT NULL DEFAULT 'FULL_TIME',
+    industry_categories JSONB NOT NULL DEFAULT '[]',
+
+    -- Location
+    location_city VARCHAR(100),
+    location_state VARCHAR(10),
+    location_postcode VARCHAR(10),
+    is_remote BOOLEAN NOT NULL DEFAULT FALSE,
+
+    -- Compensation
+    salary_min INTEGER,
+    salary_max INTEGER,
+
+    -- Application
+    apply_url VARCHAR(1000),
+    apply_email VARCHAR(255),
+
+    -- Submitter
+    submitter_name VARCHAR(255),
+    submitter_email VARCHAR(255),
+    submitter_phone VARCHAR(50),
+
+    -- Source
+    source VARCHAR(50) NOT NULL DEFAULT 'manual',
+    source_id VARCHAR(255),
+
+    -- 30-day auto-expiry
+    valid_through TIMESTAMPTZ NOT NULL,
+
+    -- Publication (manual approval required)
+    published BOOLEAN NOT NULL DEFAULT FALSE,
+    featured BOOLEAN NOT NULL DEFAULT FALSE,
+
+    created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+    updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+
+    CONSTRAINT valid_employment_type CHECK (employment_type IN ('FULL_TIME', 'PART_TIME', 'CONTRACTOR', 'CASUAL', 'INTERNSHIP')),
+    CONSTRAINT valid_apply_method CHECK (apply_url IS NOT NULL OR apply_email IS NOT NULL)
+);
+
+CREATE INDEX IF NOT EXISTS idx_job_listings_published ON job_listings(published, valid_through) WHERE published = TRUE;
+CREATE INDEX IF NOT EXISTS idx_job_listings_valid_through ON job_listings(valid_through);
+CREATE INDEX IF NOT EXISTS idx_job_listings_categories ON job_listings USING GIN(industry_categories);
+CREATE INDEX IF NOT EXISTS idx_job_listings_location ON job_listings(location_state, location_city);
+
+CREATE TRIGGER job_listings_updated_at
+    BEFORE UPDATE ON job_listings
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+
+INSERT INTO schema_version (version, description)
+VALUES ('1.2.0-carsi-calendar-jobs', 'CARSI Hub Phase 1: Industry Calendar + Job Board')
+ON CONFLICT (version) DO NOTHING;
+
+-- =============================================================================
 -- Initialization Complete
 -- =============================================================================
 
@@ -206,7 +400,7 @@ BEGIN
     RAISE NOTICE 'Database initialization complete!';
     RAISE NOTICE '=============================================================================';
     RAISE NOTICE 'Extensions: uuid-ossp, vector (pgvector)';
-    RAISE NOTICE 'Tables: users, contractors, availability_slots, documents, schema_version';
+    RAISE NOTICE 'Tables: users, contractors, availability_slots, documents, research_articles, schema_version';
     RAISE NOTICE 'Views: available_contractors';
     RAISE NOTICE 'Default admin: admin@local.dev / admin123 (CHANGE THIS!)';
     RAISE NOTICE '=============================================================================';
