@@ -27,6 +27,7 @@ from .routes import (
     discovery,
     documents,
     health,
+    hub_submissions,
     lms_auth,
     lms_courses,
     lms_credentials,
@@ -171,6 +172,8 @@ app.include_router(news.router, tags=["News Feed"])
 app.include_router(podcasts.router, tags=["Podcast Directory"])
 # CARSI Hub — YouTube Channel Directory
 app.include_router(youtube.router, tags=["YouTube Channel Directory"])
+# CARSI Hub — Submission Processing (admin review + Supabase webhook)
+app.include_router(hub_submissions.router, prefix="/api/hub", tags=["hub-submissions"])
 
 
 @app.get("/")

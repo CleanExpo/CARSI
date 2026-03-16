@@ -113,9 +113,9 @@ CREATE POLICY "Service role manages podcast shows"
 -- podcast_episodes — public read published, service role manages
 -- ============================================================
 
-CREATE POLICY "Public can read published podcast episodes"
+CREATE POLICY "Public can read podcast episodes"
     ON public.podcast_episodes FOR SELECT
-    USING (published = true);
+    USING (true);
 
 CREATE POLICY "Service role manages podcast episodes"
     ON public.podcast_episodes FOR ALL
