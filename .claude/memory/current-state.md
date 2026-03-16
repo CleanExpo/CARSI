@@ -1,24 +1,37 @@
 # Current State
 
-> Updated by PreCompact hook. Session: 1f64344e
+> Updated: 17/03/2026 AEST
 
 ## Active Task
 
-Compaction triggered — context was saved at 07/03/2026 00:19 AEST.
-Re-read CONSTITUTION.md if rules feel unclear after compaction.
+Staging branch merged into main. Ready to resume CARSI feature development.
 
-## Recent Architectural Choices
+## Completed This Session
 
-See architectural-decisions.md for logged decisions.
+- Committed local uncommitted changes (Stripe hardening, performance indexes, CI fixes)
+- Merged origin/staging (21 commits) into main
+- Resolved conflicts: podcast/page.tsx (took staging version), CLAUDE.md (kept main version)
+- Renumbered Alembic migrations: 007_google_oauth_tokens→010, 008_performance_indexes→011
+- Fixed lint errors: shared.ts→shared.tsx (JSX extension), unused provider param
+- Migration chain now: 001→002→003→004→005→006→007→008→009→010→011
 
-## In-Progress Work
+## New Features Available (from staging merge)
 
-Check recent git status: `git status` and `git log --oneline -5`
+- Podcast Directory (`/podcast`, `routes/podcasts.py`)
+- YouTube Channel Directory (`/youtube`, `routes/youtube.py`)
+- News Feed (`/news`, `routes/news.py`, `apps/news-worker/`)
+- Job Board (`/jobs`, `routes/jobs.py`)
+- Industry Calendar (`/calendar`, `routes/events.py`)
+- Research Articles CMS (`/research`, `routes/articles.py`)
+- Professional Directory stub (`/professional-directory`)
+- Centralised JSON-LD schema module (`apps/web/lib/schema/`)
+- Next.js API proxy routes (LMS checkout, Stripe webhook, credential verification)
 
 ## Next Steps
 
-Re-read .claude/memory/CONSTITUTION.md to restore rule context.
+1. Re-seed local database (carsi_dev is fresh — no seed data yet)
+2. Continue CARSI feature development (check Linear for next phase)
 
 ## Last Updated
 
-07/03/2026 00:19 AEST (PreCompact hook)
+17/03/2026 AEST (session end)
