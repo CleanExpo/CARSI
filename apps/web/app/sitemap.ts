@@ -29,6 +29,16 @@ const staticPages = [
   { path: '/industries/real-estate', priority: 0.7, changeFreq: 'monthly' as const },
   { path: '/industries/emergency-management', priority: 0.7, changeFreq: 'monthly' as const },
   { path: '/industries/caravan-parks', priority: 0.7, changeFreq: 'monthly' as const },
+  // Tier 2 industries
+  { path: '/industries/data-centres', priority: 0.6, changeFreq: 'monthly' as const },
+  { path: '/industries/education', priority: 0.6, changeFreq: 'monthly' as const },
+  { path: '/industries/food-processing', priority: 0.6, changeFreq: 'monthly' as const },
+  { path: '/industries/hospitality', priority: 0.6, changeFreq: 'monthly' as const },
+  { path: '/industries/insurance', priority: 0.6, changeFreq: 'monthly' as const },
+  { path: '/industries/museums-cultural', priority: 0.6, changeFreq: 'monthly' as const },
+  { path: '/industries/retail', priority: 0.6, changeFreq: 'monthly' as const },
+  { path: '/industries/strata', priority: 0.6, changeFreq: 'monthly' as const },
+  { path: '/industries/transport-logistics', priority: 0.6, changeFreq: 'monthly' as const },
 ];
 
 async function getCourses(): Promise<{ slug: string; updated_at?: string }[]> {

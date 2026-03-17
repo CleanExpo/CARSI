@@ -101,59 +101,145 @@ def _check_course_completion(db, enrollment: "LMSEnrollment") -> None:  # type: 
 
 
 # ---------------------------------------------------------------------------
-# Quiz Passed (stub — expanded in Phase 10)
+# Quiz Passed → Cert Chain
 # ---------------------------------------------------------------------------
 
 
 @celery_app.task(name="handle_quiz_passed")
 def handle_quiz_passed(data: dict) -> dict:
-    """Process a quiz-passed event (expanded in Phase 10)."""
+    """
+    Process a quiz-passed event.
+
+    Traverses quiz → lesson → module → course, verifies active enrollment,
+    guards against duplicate certs, awards XP, then triggers
+    handle_course_completed to issue the certificate and IICRC CEC report.
+    """
+    from sqlalchemy import select
+
+    from src.db.lms_models import LMSCertificate, LMSEnrollment, LMSLesson, LMSModule, LMSQuiz
+
+    student_id = uuid.UUID(data["student_id"])
+    quiz_id = uuid.UUID(data["quiz_id"])
+    score_pct = float(data.get("score_percentage", 100.0))
+
+    with SyncSessionLocal() as db:
+        quiz = db.execute(select(LMSQuiz).where(LMSQuiz.id == quiz_id)).scalar_one_or_none()
+        if not quiz:
+            return {"status": "quiz_not_found"}
+
+        lesson = db.execute(
+            select(LMSLesson).where(LMSLesson.id == quiz.lesson_id)
+        ).scalar_one_or_none()
+        if not lesson:
+            return {"status": "lesson_not_found"}
+
+        module = db.execute(
+            select(LMSModule).where(LMSModule.id == lesson.module_id)
+        ).scalar_one_or_none()
+        if not module:
+            return {"status": "module_not_found"}
+
+        course_id = module.course_id
+
+        enrollment = db.execute(
+            select(LMSEnrollment).where(
+                LMSEnrollment.student_id == student_id,
+                LMSEnrollment.course_id == course_id,
+                LMSEnrollment.status == "active",
+            )
+        ).scalar_one_or_none()
+        if not enrollment:
+            return {"status": "no_enrollment"}
+
+        # Idempotency — don't trigger cert chain if cert already issued
+        existing_cert = db.execute(
+            select(LMSCertificate).where(
+                LMSCertificate.student_id == student_id,
+                LMSCertificate.course_id == course_id,
+            )
+        ).scalar_one_or_none()
+        if existing_cert:
+            return {"status": "cert_already_exists", "credential_id": existing_cert.credential_id}
+
+    # Award XP: 50 for pass, extra 50 for perfect score
+    award_xp.delay(str(student_id), "quiz_passed", str(quiz_id), 50)
+    if score_pct >= 100.0:
+        award_xp.delay(str(student_id), "quiz_perfect", str(quiz_id), 50)
+
+    # Trigger full completion chain: cert + CEC report + email
+    handle_course_completed.delay({"student_id": str(student_id), "course_id": str(course_id)})
+
     return {"status": "ok"}
 
 
 # ---------------------------------------------------------------------------
-# Course Completed → Award CECs + Generate Certificate
+# Course Completed → Award CECs + Generate Certificate + Email Student
 # ---------------------------------------------------------------------------
 
 
 @celery_app.task(name="handle_course_completed")
 def handle_course_completed(data: dict) -> dict:
     """
-    Award IICRC CECs and generate a certificate when a course is completed.
+    Award IICRC CECs, generate a certificate, and email the student.
 
-    Creates LMSCECTransaction + LMSCertificate records.
-    Marks the enrollment as completed.
+    All DB writes are in a single transaction. Celery tasks fire after commit.
+    Idempotent — safe to call multiple times for the same student+course.
     """
+    from datetime import date
+
     from sqlalchemy import select
 
-    from src.db.lms_models import LMSCECTransaction, LMSCourse, LMSEnrollment
+    from src.db.lms_models import (
+        LMSCECReport,
+        LMSCECTransaction,
+        LMSCertificate,
+        LMSCourse,
+        LMSEnrollment,
+        LMSUser,
+    )
 
     student_id = uuid.UUID(data["student_id"])
     course_id = uuid.UUID(data["course_id"])
 
+    cec_report_payload: dict | None = None
+    credential_id: str = ""
+    course_title: str = ""
+
     with SyncSessionLocal() as db:
+        # Idempotency — don't issue duplicate certs
+        existing_cert = db.execute(
+            select(LMSCertificate).where(
+                LMSCertificate.student_id == student_id,
+                LMSCertificate.course_id == course_id,
+            )
+        ).scalar_one_or_none()
+        if existing_cert:
+            return {"status": "cert_already_exists", "credential_id": existing_cert.credential_id}
+
         course = db.execute(
             select(LMSCourse).where(LMSCourse.id == course_id)
         ).scalar_one_or_none()
-
         if not course:
             return {"status": "course_not_found"}
 
-        if not course.cec_hours:
-            return {"status": "no_cec_hours"}
+        course_title = course.title
 
-        # Award CECs
-        tx = LMSCECTransaction(
-            student_id=student_id,
-            course_id=course_id,
-            iicrc_discipline=course.iicrc_discipline,
-            cec_hours=course.cec_hours,
-        )
-        db.add(tx)
-        db.flush()
+        # Award CECs if course has them
+        cec_tx_id: uuid.UUID | None = None
+        if course.cec_hours and float(course.cec_hours) > 0:
+            tx = LMSCECTransaction(
+                student_id=student_id,
+                course_id=course_id,
+                iicrc_discipline=course.iicrc_discipline,
+                cec_hours=course.cec_hours,
+            )
+            db.add(tx)
+            db.flush()
+            cec_tx_id = tx.id
 
-        # Generate certificate record
-        cert = create_certificate(db, student_id, course, tx.id)
+        # Always generate a certificate regardless of CEC status
+        cert = create_certificate(db, student_id, course, cec_tx_id)
+        credential_id = cert.credential_id
 
         # Mark enrollment completed
         enrollment = db.execute(
@@ -162,92 +248,158 @@ def handle_course_completed(data: dict) -> dict:
                 LMSEnrollment.course_id == course_id,
             )
         ).scalar_one_or_none()
-
         if enrollment:
             enrollment.status = "completed"
             enrollment.completed_at = datetime.now(timezone.utc)
 
+        # Build CEC report if student has IICRC member number and course has CECs
+        if cec_tx_id and getattr(course, "iicrc_discipline", None):
+            user = db.execute(
+                select(LMSUser).where(LMSUser.id == student_id)
+            ).scalar_one_or_none()
+
+            if user and user.iicrc_member_number:
+                already_sent = db.execute(
+                    select(LMSCECReport).where(
+                        LMSCECReport.student_id == student_id,
+                        LMSCECReport.course_id == course_id,
+                        LMSCECReport.status == "sent",
+                    )
+                ).scalar_one_or_none()
+
+                if not already_sent:
+                    report = LMSCECReport(
+                        student_id=student_id,
+                        course_id=course_id,
+                        iicrc_member_number=user.iicrc_member_number,
+                        email_to="jenyferr@iicrcnet.org",
+                        status="pending",
+                    )
+                    db.add(report)
+                    db.flush()
+                    cec_report_payload = {
+                        "report_id": str(report.id),
+                        "student_id": str(student_id),
+                        "course_id": str(course_id),
+                        "student_name": user.full_name,
+                        "iicrc_member_number": user.iicrc_member_number,
+                        "student_email": user.email,
+                        "course_title": course.title,
+                        "iicrc_discipline": course.iicrc_discipline,
+                        "cec_hours": float(course.cec_hours),
+                        "completion_date": date.today().isoformat(),
+                        "certificate_id": credential_id,
+                    }
+
+        # Single commit — all records in one transaction
         db.commit()
 
-        # Award XP for course completion
-        award_xp.delay(str(student_id), "course_completed", str(course_id), 100)
+    # Post-commit: fire Celery tasks (DB transaction safely closed)
+    award_xp.delay(str(student_id), "course_completed", str(course_id), 100)
+    send_certificate_email.delay({
+        "student_id": str(student_id),
+        "credential_id": credential_id,
+        "course_title": course_title,
+    })
+    if cec_report_payload:
+        send_iicrc_cec_report.delay(cec_report_payload)
 
-        # Trigger IICRC CEC report if student has a member number
-        _maybe_send_cec_report(db, student_id, course_id, str(cert.credential_id))
-
-    return {"status": "ok", "credential_id": cert.credential_id}
+    return {"status": "ok", "credential_id": credential_id}
 
 
 # ---------------------------------------------------------------------------
-# Helper — IICRC CEC eligibility check + report trigger
+# Certificate Email
 # ---------------------------------------------------------------------------
 
 
-def _maybe_send_cec_report(
-    db,
-    student_id: uuid.UUID,
-    course_id: uuid.UUID,
-    certificate_id: str,
-) -> None:
-    """Create a CEC report row and trigger the email task if eligible."""
-    from datetime import date
+@celery_app.task(name="send_certificate_email", bind=True, max_retries=3, default_retry_delay=60)
+def send_certificate_email(self, data: dict) -> dict:
+    """
+    Email the student their certificate credential ID and public verification URL.
+
+    data keys: student_id, credential_id, course_title
+    """
+    import os
 
     from sqlalchemy import select
 
-    from src.db.lms_models import LMSCECReport, LMSCourse, LMSUser
+    from src.db.lms_models import LMSUser
+    from src.services.email_service import email_service
 
-    user = db.execute(
-        select(LMSUser).where(LMSUser.id == student_id)
-    ).scalar_one_or_none()
+    student_id = uuid.UUID(data["student_id"])
+    credential_id = data["credential_id"]
+    course_title = data["course_title"]
 
-    if not user or not user.iicrc_member_number:
-        return
+    with SyncSessionLocal() as db:
+        user = db.execute(
+            select(LMSUser).where(LMSUser.id == student_id)
+        ).scalar_one_or_none()
+        if not user:
+            return {"status": "user_not_found"}
+        student_name = user.full_name or user.email
+        student_email = user.email
 
-    course = db.execute(
-        select(LMSCourse).where(LMSCourse.id == course_id)
-    ).scalar_one_or_none()
+    frontend_url = os.getenv("NEXT_PUBLIC_FRONTEND_URL", "https://carsi.com.au")
+    cert_url = f"{frontend_url}/credentials/{credential_id}"
 
-    if not course or not getattr(course, "cec_hours", None) or course.cec_hours <= 0:
-        return
+    html_body = f"""
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;
+             background: #060a14; color: #fff; padding: 40px 40px 32px;">
+  <div style="margin-bottom: 32px;">
+    <span style="font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+                 color: rgba(255,255,255,0.35);">CARSI Learning</span>
+  </div>
 
-    if not getattr(course, "iicrc_discipline", None):
-        return
+  <h1 style="color: #2490ed; font-size: 26px; font-weight: 700; margin: 0 0 8px;">
+    Certificate Issued
+  </h1>
+  <p style="color: rgba(255,255,255,0.5); font-size: 14px; margin: 0 0 28px;">
+    Congratulations, {student_name}!
+  </p>
 
-    # Idempotency guard
-    existing = db.execute(
-        select(LMSCECReport).where(
-            LMSCECReport.student_id == student_id,
-            LMSCECReport.course_id == course_id,
-            LMSCECReport.status == "sent",
+  <p style="color: rgba(255,255,255,0.8); font-size: 15px; line-height: 1.6; margin: 0 0 24px;">
+    You have successfully completed
+    <strong style="color: #fff;">{course_title}</strong>.
+    Your certificate is ready to view and share.
+  </p>
+
+  <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+              border-radius: 6px; padding: 16px 20px; margin-bottom: 28px;">
+    <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em;
+              color: rgba(255,255,255,0.3);">Credential ID</p>
+    <p style="margin: 6px 0 0; font-family: monospace; font-size: 20px;
+              color: #2490ed; font-weight: 600;">{credential_id}</p>
+  </div>
+
+  <a href="{cert_url}"
+     style="display: inline-block; background: #2490ed; color: #fff;
+            padding: 14px 28px; text-decoration: none; border-radius: 4px;
+            font-weight: 600; font-size: 14px; margin-bottom: 32px;">
+    View Certificate →
+  </a>
+
+  <p style="color: rgba(255,255,255,0.35); font-size: 12px; margin: 0 0 4px;">
+    Share this verification link with employers:
+  </p>
+  <p style="color: rgba(255,255,255,0.25); font-size: 11px; margin: 0 0 28px;
+            word-break: break-all;">{cert_url}</p>
+
+  <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.08); margin: 0 0 20px;">
+  <p style="color: rgba(255,255,255,0.25); font-size: 11px; margin: 0;">
+    CARSI — Cleaning and Restoration Science Institute · carsi.com.au
+  </p>
+</div>
+"""
+
+    try:
+        email_service.send_email(
+            to=student_email,
+            subject=f"Your CARSI Certificate — {course_title}",
+            html_body=html_body,
         )
-    ).scalar_one_or_none()
-
-    if existing:
-        return
-
-    report = LMSCECReport(
-        student_id=student_id,
-        course_id=course_id,
-        iicrc_member_number=user.iicrc_member_number,
-        email_to="jenyferr@iicrcnet.org",
-        status="pending",
-    )
-    db.add(report)
-    db.flush()
-
-    send_iicrc_cec_report.delay({
-        "report_id": str(report.id),
-        "student_id": str(student_id),
-        "course_id": str(course_id),
-        "student_name": user.full_name,
-        "iicrc_member_number": user.iicrc_member_number,
-        "student_email": user.email,
-        "course_title": course.title,
-        "iicrc_discipline": course.iicrc_discipline,
-        "cec_hours": float(course.cec_hours),
-        "completion_date": date.today().isoformat(),
-        "certificate_id": certificate_id,
-    })
+        return {"status": "sent", "to": student_email}
+    except Exception as exc:
+        raise self.retry(exc=exc, countdown=60)
 
 
 # ---------------------------------------------------------------------------

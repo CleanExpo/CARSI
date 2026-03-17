@@ -24,7 +24,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
     """Middleware for JWT authentication."""
 
     # Paths that don't require authentication (exact match, any method)
-    PUBLIC_PATHS = {"/", "/health", "/ready", "/docs", "/openapi.json"}
+    PUBLIC_PATHS = {"/", "/health", "/ready", "/docs", "/openapi.json", "/api/contact"}
 
     # Path prefixes that don't require auth regardless of method (e.g. auth flows)
     PUBLIC_PREFIXES = ("/api/lms/auth/", "/api/lms/credentials/", "/api/lms/webhooks/")

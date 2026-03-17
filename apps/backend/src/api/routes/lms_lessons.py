@@ -11,7 +11,7 @@ from sqlalchemy.orm import joinedload
 from src.api.deps_lms import get_current_lms_user
 from src.api.schemas.lms_lessons import LessonOut
 from src.config.database import get_async_db
-from src.db.lms_models import LMSLesson, LMSModule, LMSUser
+from src.db.lms_models import LMSLesson, LMSModule, LMSSubscription, LMSUser
 
 router = APIRouter(prefix="/api/lms/lessons", tags=["lms-lessons"])
 modules_router = APIRouter(prefix="/api/lms/modules", tags=["lms-lessons"])
@@ -80,7 +80,7 @@ async def get_lesson(
     db: AsyncSession = Depends(get_async_db),
     current_user: LMSUser = Depends(get_current_lms_user),
 ) -> LessonOut:
-    """Return lesson detail for the lesson player."""
+    """Return lesson detail. Preview lessons are free; all others require an active subscription."""
     result = await db.execute(
         select(LMSLesson)
         .options(joinedload(LMSLesson.module))
@@ -89,6 +89,22 @@ async def get_lesson(
     lesson = result.scalar_one_or_none()
     if not lesson:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lesson not found")
+
+    # Subscription gate: admins and instructors always bypass
+    if not lesson.is_preview:
+        roles = {ur.role.name for ur in current_user.user_roles}
+        if not roles & {"admin", "instructor"}:
+            sub_result = await db.execute(
+                select(LMSSubscription).where(
+                    LMSSubscription.student_id == current_user.id,
+                    LMSSubscription.status.in_(["trialling", "active"]),
+                )
+            )
+            if not sub_result.scalar_one_or_none():
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="An active subscription is required to access course content.",
+                )
 
     return _to_out(lesson, lesson.module.course_id)
 

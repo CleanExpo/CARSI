@@ -110,35 +110,19 @@ class TestHandleCourseCompleted:
 
         assert result["status"] == "course_not_found"
 
-    def test_returns_no_cec_hours_when_course_has_none(self):
+    def test_creates_cert_even_when_course_has_no_cec(self):
+        """Courses without CEC hours still generate a certificate (no early exit)."""
         from src.worker.tasks import handle_course_completed
 
         mock_session = MagicMock()
         course_no_cec = _mock_course(has_cec=False)
-        mock_session.execute.return_value = MagicMock(
-            **{"scalar_one_or_none.return_value": course_no_cec}
-        )
-        mock_session.__enter__ = MagicMock(return_value=mock_session)
-        mock_session.__exit__ = MagicMock(return_value=False)
-
-        with patch("src.worker.tasks.SyncSessionLocal", return_value=mock_session):
-            result = handle_course_completed(
-                {"student_id": str(STUDENT_ID), "course_id": str(COURSE_ID)}
-            )
-
-        assert result["status"] == "no_cec_hours"
-
-    def test_awards_cec_and_creates_certificate(self):
-        from src.worker.tasks import handle_course_completed
-
-        mock_course = _mock_course()
         mock_enrollment = _mock_enrollment()
         mock_cert = MagicMock()
-        mock_cert.credential_id = "CARSI-WRT-2026-001"
+        mock_cert.credential_id = "CARSI-GEN-2026-001"
 
-        mock_session = MagicMock()
         mock_session.execute.side_effect = [
-            MagicMock(**{"scalar_one_or_none.return_value": mock_course}),     # course lookup
+            MagicMock(**{"scalar_one_or_none.return_value": None}),             # no existing cert
+            MagicMock(**{"scalar_one_or_none.return_value": course_no_cec}),   # course lookup
             MagicMock(**{"scalar_one_or_none.return_value": mock_enrollment}), # enrollment lookup
         ]
         mock_session.__enter__ = MagicMock(return_value=mock_session)
@@ -147,8 +131,43 @@ class TestHandleCourseCompleted:
         with (
             patch("src.worker.tasks.SyncSessionLocal", return_value=mock_session),
             patch("src.worker.tasks.create_certificate", return_value=mock_cert),
-            patch("src.worker.tasks.award_xp"),           # prevent Celery dispatch
-            patch("src.worker.tasks._maybe_send_cec_report"),  # tested separately
+            patch("src.worker.tasks.award_xp"),
+            patch("src.worker.tasks.send_certificate_email"),
+            patch("src.worker.tasks.send_iicrc_cec_report"),
+        ):
+            result = handle_course_completed(
+                {"student_id": str(STUDENT_ID), "course_id": str(COURSE_ID)}
+            )
+
+        assert result["status"] == "ok"
+        assert result["credential_id"] == "CARSI-GEN-2026-001"
+
+    def test_awards_cec_and_creates_certificate(self):
+        from src.worker.tasks import handle_course_completed
+
+        mock_course = _mock_course()
+        mock_enrollment = _mock_enrollment()
+        mock_cert = MagicMock()
+        mock_cert.credential_id = "CARSI-WRT-2026-001"
+        mock_user = MagicMock()
+        mock_user.iicrc_member_number = None  # no IICRC number → skip CEC report
+
+        mock_session = MagicMock()
+        mock_session.execute.side_effect = [
+            MagicMock(**{"scalar_one_or_none.return_value": None}),             # no existing cert (idempotency)
+            MagicMock(**{"scalar_one_or_none.return_value": mock_course}),     # course lookup
+            MagicMock(**{"scalar_one_or_none.return_value": mock_enrollment}), # enrollment lookup
+            MagicMock(**{"scalar_one_or_none.return_value": mock_user}),       # user lookup for CEC report
+        ]
+        mock_session.__enter__ = MagicMock(return_value=mock_session)
+        mock_session.__exit__ = MagicMock(return_value=False)
+
+        with (
+            patch("src.worker.tasks.SyncSessionLocal", return_value=mock_session),
+            patch("src.worker.tasks.create_certificate", return_value=mock_cert),
+            patch("src.worker.tasks.award_xp"),
+            patch("src.worker.tasks.send_certificate_email"),
+            patch("src.worker.tasks.send_iicrc_cec_report"),
         ):
             result = handle_course_completed(
                 {"student_id": str(STUDENT_ID), "course_id": str(COURSE_ID)}
@@ -156,7 +175,6 @@ class TestHandleCourseCompleted:
 
         assert result["status"] == "ok"
         assert result["credential_id"] == "CARSI-WRT-2026-001"
-        # Enrollment should be marked completed
         assert mock_enrollment.status == "completed"
 
 

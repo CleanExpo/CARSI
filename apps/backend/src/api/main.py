@@ -29,6 +29,7 @@ from .routes import (
     health,
     hub_submissions,
     lms_auth,
+    lms_contact,
     lms_courses,
     lms_credentials,
     lms_drive,
@@ -123,6 +124,7 @@ async def _global_exception_handler(request: Request, exc: Exception) -> JSONRes
 app.include_router(health.router, tags=["Health"])
 # CARSI LMS routes
 app.include_router(lms_auth.router)
+app.include_router(lms_contact.router)
 app.include_router(lms_courses.router)
 app.include_router(lms_drive.router)
 app.include_router(lms_enrollments.router)

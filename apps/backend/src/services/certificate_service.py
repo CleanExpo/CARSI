@@ -49,12 +49,13 @@ def create_certificate(
     db: Session,
     student_id: uuid.UUID,
     course: LMSCourse,
-    cec_transaction_id: uuid.UUID,
+    cec_transaction_id: uuid.UUID | None,
 ) -> LMSCertificate:
     """
     Create a certificate record for a completed course.
 
     Returns the persisted LMSCertificate. PDF generation is deferred.
+    cec_transaction_id is optional — courses without CECs still get a certificate.
     """
     credential_id = generate_credential_id(db, course.iicrc_discipline)
 
@@ -67,9 +68,10 @@ def create_certificate(
     db.add(cert)
     db.flush()  # get the cert.id
 
-    # Link the CEC transaction to this certificate
-    tx = db.get(LMSCECTransaction, cec_transaction_id)
-    if tx:
-        tx.certificate_id = cert.id
+    # Link the CEC transaction to this certificate (if present)
+    if cec_transaction_id:
+        tx = db.get(LMSCECTransaction, cec_transaction_id)
+        if tx:
+            tx.certificate_id = cert.id
 
     return cert

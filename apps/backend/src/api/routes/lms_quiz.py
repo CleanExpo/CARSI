@@ -118,6 +118,7 @@ async def submit_quiz(
             {
                 "student_id": str(current_user.id),
                 "quiz_id": str(quiz_id),
+                "score_percentage": score_pct,
             }
         )
 
