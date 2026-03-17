@@ -10,6 +10,9 @@ const staticPages = [
   { path: '/industries', priority: 0.8, changeFreq: 'monthly' as const },
   { path: '/subscribe', priority: 0.7, changeFreq: 'monthly' as const },
   { path: '/about', priority: 0.6, changeFreq: 'monthly' as const },
+  { path: '/contact', priority: 0.6, changeFreq: 'monthly' as const },
+  { path: '/testimonials', priority: 0.5, changeFreq: 'monthly' as const },
+  { path: '/pricing', priority: 0.7, changeFreq: 'monthly' as const },
   // Industry sub-pages
   { path: '/industries/aged-care', priority: 0.7, changeFreq: 'monthly' as const },
   { path: '/industries/childcare', priority: 0.7, changeFreq: 'monthly' as const },

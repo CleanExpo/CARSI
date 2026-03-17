@@ -14,38 +14,143 @@ export function OrganizationSchema({
   name = 'CARSI',
   url = 'https://carsi.com.au',
   logo = 'https://carsi.com.au/logo.png',
-  sameAs = ['https://www.linkedin.com/company/carsi'],
+  sameAs = [
+    'https://www.facebook.com/CARSIaus',
+    'https://www.linkedin.com/company/carsiaus',
+    'https://www.youtube.com/channel/UC3HpNvGJXivLGoPo4m7Qleg/featured',
+    'https://open.spotify.com/show/4FVBn8Cfyx2jOx0m4MksuG',
+  ],
 }: OrganizationSchemaProps) {
   const schema = {
     '@context': 'https://schema.org',
-    '@type': 'Organization',
+    // Service Area Business: EducationalOrganization (primary) + LocalBusiness (SAB signals)
+    '@type': ['EducationalOrganization', 'LocalBusiness'],
     '@id': 'https://carsi.com.au/#organization',
     name,
     alternateName: 'Centre for Australian Restoration and Standards Information',
     url,
     logo,
+    image: `${url}/og-image.png`,
     description:
-      "Australia's leading education and research hub for the disaster restoration industry.",
+      "Australia's leading online training platform for disaster restoration professionals. IICRC CEC-approved courses in water, fire, and carpet restoration delivered to students Australia-wide.",
+    telephone: '+61457123005',
+    email: 'support@carsi.com.au',
+    // SAB: postal address only — no street address exposed publicly
     address: {
       '@type': 'PostalAddress',
+      addressLocality: 'Forest Lake',
+      addressRegion: 'QLD',
       addressCountry: 'AU',
     },
-    areaServed: {
-      '@type': 'Country',
-      name: 'Australia',
-    },
+    // SAB: explicit state-by-state service area coverage
+    areaServed: [
+      {
+        '@type': 'AdministrativeArea',
+        name: 'New South Wales',
+        sameAs: 'https://en.wikipedia.org/wiki/New_South_Wales',
+      },
+      {
+        '@type': 'AdministrativeArea',
+        name: 'Victoria',
+        sameAs: 'https://en.wikipedia.org/wiki/Victoria_(Australia)',
+      },
+      {
+        '@type': 'AdministrativeArea',
+        name: 'Queensland',
+        sameAs: 'https://en.wikipedia.org/wiki/Queensland',
+      },
+      {
+        '@type': 'AdministrativeArea',
+        name: 'Western Australia',
+        sameAs: 'https://en.wikipedia.org/wiki/Western_Australia',
+      },
+      {
+        '@type': 'AdministrativeArea',
+        name: 'South Australia',
+        sameAs: 'https://en.wikipedia.org/wiki/South_Australia',
+      },
+      {
+        '@type': 'AdministrativeArea',
+        name: 'Tasmania',
+        sameAs: 'https://en.wikipedia.org/wiki/Tasmania',
+      },
+      {
+        '@type': 'AdministrativeArea',
+        name: 'Australian Capital Territory',
+        sameAs: 'https://en.wikipedia.org/wiki/Australian_Capital_Territory',
+      },
+      {
+        '@type': 'AdministrativeArea',
+        name: 'Northern Territory',
+        sameAs: 'https://en.wikipedia.org/wiki/Northern_Territory',
+      },
+    ],
+    serviceType: 'Online Restoration Industry Training',
     knowsAbout: [
+      'IICRC certifications',
+      'water restoration technician',
+      'fire and smoke restoration',
+      'carpet cleaning technician',
+      'applied structural drying',
       'disaster recovery',
       'restoration standards',
-      'insurance claims',
+      'insurance claims Australia',
       'building restoration',
-      'Australian restoration industry',
     ],
+    hasOfferCatalog: {
+      '@type': 'OfferCatalog',
+      name: 'IICRC CEC Training Programs',
+      itemListElement: [
+        {
+          '@type': 'Offer',
+          itemOffered: {
+            '@type': 'Course',
+            name: 'Water Restoration Technician (WRT)',
+            provider: { '@id': 'https://carsi.com.au/#organization' },
+          },
+        },
+        {
+          '@type': 'Offer',
+          itemOffered: {
+            '@type': 'Course',
+            name: 'Applied Structural Drying (ASD)',
+            provider: { '@id': 'https://carsi.com.au/#organization' },
+          },
+        },
+        {
+          '@type': 'Offer',
+          itemOffered: {
+            '@type': 'Course',
+            name: 'Fire and Smoke Restoration Technician (FSRT)',
+            provider: { '@id': 'https://carsi.com.au/#organization' },
+          },
+        },
+        {
+          '@type': 'Offer',
+          itemOffered: {
+            '@type': 'Course',
+            name: 'Carpet Cleaning Technician (CCT)',
+            provider: { '@id': 'https://carsi.com.au/#organization' },
+          },
+        },
+        {
+          '@type': 'Offer',
+          itemOffered: {
+            '@type': 'Course',
+            name: 'Odour Control Technician (OCT)',
+            provider: { '@id': 'https://carsi.com.au/#organization' },
+          },
+        },
+      ],
+    },
     sameAs,
     contactPoint: {
       '@type': 'ContactPoint',
-      email: 'info@carsi.com.au',
+      telephone: '+61457123005',
+      email: 'support@carsi.com.au',
       contactType: 'customer service',
+      areaServed: 'AU',
+      availableLanguage: 'en-AU',
     },
   };
 
