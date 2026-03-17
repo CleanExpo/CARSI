@@ -53,5 +53,5 @@ def test_send_cec_report_calls_email_service():
         )
         mock_svc.send_email.assert_called_once()
         call_kwargs = mock_svc.send_email.call_args[1]
-        assert call_kwargs["to"] == "cec@iicrc.org"
+        assert call_kwargs["to"] == "jenyferr@iicrcnet.org"
         assert "Jane Smith" in call_kwargs["subject"]

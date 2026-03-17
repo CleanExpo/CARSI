@@ -4,14 +4,14 @@ IICRC CEC Report Email Builder
 Sends a per-completion email to IICRC Las Vegas when a student has an IICRC
 member number and the course carries CEC hours.
 
-IICRC email: cec@iicrc.org (confirm with IICRC America before go-live)
+IICRC email: jenyferr@iicrcnet.org (confirmed by Phil, 17/03/2026)
 """
 
 from datetime import date
 
 from src.services.email_service import email_service
 
-IICRC_EMAIL = "cec@iicrc.org"
+IICRC_EMAIL = "jenyferr@iicrcnet.org"
 
 
 def build_cec_email_html(

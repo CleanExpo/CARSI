@@ -229,7 +229,7 @@ def _maybe_send_cec_report(
         student_id=student_id,
         course_id=course_id,
         iicrc_member_number=user.iicrc_member_number,
-        email_to="cec@iicrc.org",
+        email_to="jenyferr@iicrcnet.org",
         status="pending",
     )
     db.add(report)
@@ -350,7 +350,7 @@ def award_xp(
 )
 def send_iicrc_cec_report(self, data: dict) -> dict:
     """
-    Send a CEC completion report to IICRC Las Vegas (cec@iicrc.org).
+    Send a CEC completion report to IICRC (jenyferr@iicrcnet.org).
 
     data keys: report_id, student_name, iicrc_member_number, student_email,
                course_title, iicrc_discipline, cec_hours, completion_date (ISO),
