@@ -17,7 +17,7 @@ from sqlalchemy.orm import selectinload
 from src.api.deps_lms import get_current_lms_user, require_role
 from src.api.schemas.lms_courses import CourseCreate, CourseListOut, CourseOut, CourseUpdate
 from src.config.database import get_async_db
-from src.db.lms_models import LMSCourse, LMSEnrollment, LMSUser, LMSUserRole
+from src.db.lms_models import LMSCourse, LMSEnrollment, LMSSubscription, LMSUser, LMSUserRole
 
 router = APIRouter(prefix="/api/lms/courses", tags=["lms-courses"])
 
@@ -202,6 +202,20 @@ async def get_enrollment_status(
     enrollment = enrol_result.scalar_one_or_none()
 
     if not enrollment:
+        # Subscribers have access to all published courses without a per-course enrollment
+        sub_result = await db.execute(
+            select(LMSSubscription).where(
+                LMSSubscription.student_id == current_user.id,
+                LMSSubscription.status.in_(["trialling", "active"]),
+            )
+        )
+        if sub_result.scalar_one_or_none():
+            return {
+                "enrolled": True,
+                "status": "subscription",
+                "completion_percentage": 0.0,
+                "enrollment_id": None,
+            }
         return {
             "enrolled": False,
             "status": None,

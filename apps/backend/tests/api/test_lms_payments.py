@@ -122,8 +122,11 @@ class TestCourseCheckout:
         # Second execute: no existing enrolment
         result_no_enrol = MagicMock()
         result_no_enrol.scalar_one_or_none.return_value = None
+        # Third execute: no active subscription
+        result_no_sub = MagicMock()
+        result_no_sub.scalar_one_or_none.return_value = None
 
-        mock_db.execute = AsyncMock(side_effect=[result_course, result_no_enrol])
+        mock_db.execute = AsyncMock(side_effect=[result_course, result_no_enrol, result_no_sub])
 
         app.dependency_overrides[get_async_db] = _override_db(mock_db)
         app.dependency_overrides[get_current_lms_user] = _override_user(mock_student)
@@ -150,8 +153,11 @@ class TestCourseCheckout:
         # Second execute: no existing enrolment
         result_no_enrol = MagicMock()
         result_no_enrol.scalar_one_or_none.return_value = None
+        # Third execute: no active subscription
+        result_no_sub = MagicMock()
+        result_no_sub.scalar_one_or_none.return_value = None
 
-        mock_db.execute = AsyncMock(side_effect=[result_course, result_no_enrol])
+        mock_db.execute = AsyncMock(side_effect=[result_course, result_no_enrol, result_no_sub])
 
         # Mock Stripe response
         mock_session = MagicMock()

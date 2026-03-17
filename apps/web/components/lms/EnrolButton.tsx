@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 
 interface EnrolButtonProps {
@@ -9,22 +9,49 @@ interface EnrolButtonProps {
   isFree?: boolean;
 }
 
+type SubState = 'checking' | 'subscribed' | 'none';
+
 export function EnrolButton({ slug, priceAud = 0, isFree = false }: EnrolButtonProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [subState, setSubState] = useState<SubState>('checking');
+
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8000';
+
+  useEffect(() => {
+    const userId = typeof window !== 'undefined' ? localStorage.getItem('carsi_user_id') : null;
+    if (!userId) {
+      setSubState('none');
+      return;
+    }
+    fetch(`${backendUrl}/api/lms/subscription/status`, {
+      headers: { 'X-User-Id': userId },
+    })
+      .then((r) => r.json())
+      .then((data) => {
+        const active = data.has_subscription && ['active', 'trialling'].includes(data.status ?? '');
+        setSubState(active ? 'subscribed' : 'none');
+      })
+      .catch(() => setSubState('none'));
+  }, [backendUrl]);
 
   const isPaid = !isFree && priceAud > 0;
-  const label = isPaid ? `Enrol — $${priceAud.toFixed(2)} AUD` : 'Enrol Free';
+
+  function getLabel() {
+    if (loading) return 'Processing…';
+    if (subState === 'checking') return '…';
+    if (subState === 'subscribed') return 'Access Course — Included in Pro';
+    return isPaid ? `Enrol — $${priceAud.toFixed(0)} AUD` : 'Enrol Free';
+  }
 
   async function handleEnrol() {
     setLoading(true);
     setError(null);
 
-    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8000';
     const userId = typeof window !== 'undefined' ? localStorage.getItem('carsi_user_id') : null;
 
     if (!userId) {
-      setError('Please log in to enrol.');
+      setError('Please log in to access this course.');
       setLoading(false);
       return;
     }
@@ -71,8 +98,13 @@ export function EnrolButton({ slug, priceAud = 0, isFree = false }: EnrolButtonP
 
   return (
     <div>
-      <Button onClick={handleEnrol} disabled={loading} className="w-full" size="lg">
-        {loading ? 'Processing...' : label}
+      <Button
+        onClick={handleEnrol}
+        disabled={loading || subState === 'checking'}
+        className="w-full"
+        size="lg"
+      >
+        {getLabel()}
       </Button>
       {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
     </div>

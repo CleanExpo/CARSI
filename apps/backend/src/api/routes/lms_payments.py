@@ -14,7 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.deps_lms import get_current_lms_user
 from src.config.database import get_async_db
-from src.db.lms_models import LMSCourse, LMSEnrollment, LMSUser
+from src.db.lms_models import LMSCourse, LMSEnrollment, LMSSubscription, LMSUser
 
 stripe.api_key = os.getenv("STRIPE_SECRET_KEY", "")
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3009")
@@ -66,6 +66,25 @@ async def create_course_checkout(
             status_code=status.HTTP_409_CONFLICT,
             detail="You are already enrolled in this course",
         )
+
+    # Subscription check — active/trialling subscribers get access without paying
+    sub_result = await db.execute(
+        select(LMSSubscription).where(
+            LMSSubscription.student_id == current_user.id,
+            LMSSubscription.status.in_(["trialling", "active"]),
+        )
+    )
+    if sub_result.scalar_one_or_none():
+        enrollment = LMSEnrollment(
+            student_id=current_user.id,
+            course_id=course.id,
+            status="active",
+            payment_reference="subscription",
+        )
+        db.add(enrollment)
+        await db.flush()
+        await db.commit()
+        return CheckoutResponse(enrolled=True)
 
     # Free course — enrol directly
     price = float(course.price_aud or 0)

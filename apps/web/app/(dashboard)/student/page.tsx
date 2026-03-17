@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import Link from 'next/link';
 import { XPLevelBadge } from '@/components/lms/XPLevelBadge';
 import { ErrorBanner } from '@/components/lms/ErrorBanner';
 import { StreakTracker } from '@/components/lms/StreakTracker';
@@ -282,11 +283,44 @@ export default function StudentDashboardPage() {
 
       {/* --- Enrolled Courses --- */}
       <section className="flex flex-col gap-3">
-        <h2 className="font-mono text-xs tracking-widest text-white/40 uppercase">My Courses</h2>
+        <div className="flex items-center justify-between">
+          <h2 className="font-mono text-xs tracking-widest text-white/40 uppercase">My Courses</h2>
+          {sub?.has_subscription && ['active', 'trialling'].includes(sub.status ?? '') && (
+            <Link
+              href="/courses"
+              className="text-xs font-medium transition-colors hover:text-white"
+              style={{ color: '#2490ed' }}
+            >
+              Browse all courses →
+            </Link>
+          )}
+        </div>
         {errors.enrollments ? (
           <ErrorBanner message={errors.enrollments} onRetry={fetchEnrollments} />
         ) : enrollmentsLoading ? (
           <p className="text-sm text-white/30">Loading courses…</p>
+        ) : enrollments.length === 0 && sub?.has_subscription ? (
+          <div
+            className="rounded-sm p-6 text-center"
+            style={{
+              background: 'rgba(36,144,237,0.05)',
+              border: '1px solid rgba(36,144,237,0.15)',
+            }}
+          >
+            <p className="mb-1 text-sm font-medium text-white/80">
+              Your Pro subscription is active.
+            </p>
+            <p className="mb-4 text-xs text-white/45">
+              Click any course to start — your first access creates your enrolment automatically.
+            </p>
+            <Link
+              href="/courses"
+              className="inline-flex items-center rounded-sm px-4 py-2 text-sm font-medium text-white transition-all hover:scale-[1.02]"
+              style={{ background: '#2490ed' }}
+            >
+              Browse all courses
+            </Link>
+          </div>
         ) : (
           <EnrolledCourseList enrollments={enrollments} />
         )}
