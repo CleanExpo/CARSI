@@ -544,6 +544,7 @@ class LMSSubscription(Base):
     current_period_start = Column(DateTime(timezone=True), nullable=True)
     current_period_end = Column(DateTime(timezone=True), nullable=True)
     trial_end = Column(DateTime(timezone=True), nullable=True)
+    trial_ends_at = Column(DateTime(timezone=True), nullable=True)
     cancelled_at = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
 
@@ -787,3 +788,51 @@ class LMSStudentRiskScore(Base):
     computed_at = Column(DateTime(timezone=True), default=datetime.utcnow, nullable=False)
 
     student = relationship("LMSUser")
+
+
+# ---------------------------------------------------------------------------
+# UTM Capture (D3 — Marketing Automation)
+# ---------------------------------------------------------------------------
+
+
+class LMSUtmCapture(Base):
+    __tablename__ = "lms_utm_captures"
+
+    id = Column(PGUUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(
+        PGUUID(as_uuid=True),
+        ForeignKey("lms_users.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    utm_source = Column(String(100))
+    utm_medium = Column(String(100))
+    utm_campaign = Column(String(100))
+    utm_content = Column(String(100))
+    utm_term = Column(String(100))
+    captured_at = Column(DateTime(timezone=True), default=datetime.utcnow, nullable=False)
+    page_path = Column(String(500))
+
+    user = relationship("LMSUser")
+
+
+# ---------------------------------------------------------------------------
+# Audit Log — Compliance trail (Migration 021)
+# ---------------------------------------------------------------------------
+
+
+class LMSAuditLog(Base):
+    __tablename__ = "lms_audit_log"
+
+    id = Column(PGUUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    actor_id = Column(
+        PGUUID(as_uuid=True),
+        ForeignKey("lms_users.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    actor_email = Column(String(255))
+    action = Column(String(100), nullable=False)
+    resource_type = Column(String(100))
+    resource_id = Column(String(255))
+    details = Column(JSONB)
+    ip_address = Column(String(45))
+    created_at = Column(DateTime(timezone=True), default=datetime.utcnow, nullable=False)

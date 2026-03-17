@@ -9,6 +9,7 @@ import uuid
 from datetime import datetime, timezone
 
 from src.config.database import SyncSessionLocal
+from src.services.audit_service import audit_log_sync
 from src.services.certificate_service import create_certificate
 from src.worker.celery_app import celery_app
 
@@ -240,6 +241,16 @@ def handle_course_completed(data: dict) -> dict:
         # Always generate a certificate regardless of CEC status
         cert = create_certificate(db, student_id, course, cec_tx_id)
         credential_id = cert.credential_id
+
+        # Audit: certificate issued
+        audit_log_sync(
+            db,
+            "certificate.issued",
+            actor_id=student_id,
+            resource_type="LMSCertificate",
+            resource_id=credential_id,
+            details={"course_id": str(course_id), "course_title": course.title},
+        )
 
         # Mark enrollment completed
         enrollment = db.execute(
@@ -856,3 +867,56 @@ def compute_churn_scores() -> dict:
 
         db.commit()
         return {"computed": computed}
+
+
+# ---------------------------------------------------------------------------
+# Re-engagement Scanner (D3 — Marketing Automation)
+# ---------------------------------------------------------------------------
+
+
+@celery_app.task(name="scan_for_reengagement")
+def scan_for_reengagement() -> dict:
+    """
+    Scan for inactive students and dispatch re-engagement emails.
+
+    Targets students whose last active enrollment has had no progress in
+    exactly 14, 30, or 60 days.  Delegates the actual send to
+    ``send_reengagement_email`` so each nudge runs in its own task slot.
+    """
+    from sqlalchemy import text as sql_text
+
+    triggered = 0
+
+    with SyncSessionLocal() as db:
+        rows = db.execute(
+            sql_text("""
+                SELECT
+                    e.student_id,
+                    c.title  AS course_title,
+                    c.slug   AS course_slug,
+                    EXTRACT(
+                        DAY FROM NOW() - MAX(COALESCE(p.completed_at, e.enrolled_at))
+                    )::int AS days_inactive
+                FROM lms_enrollments e
+                JOIN lms_courses c ON c.id = e.course_id
+                LEFT JOIN lms_progress p ON p.enrollment_id = e.id
+                WHERE e.status = 'active'
+                GROUP BY e.student_id, e.id, c.title, c.slug
+                HAVING EXTRACT(
+                    DAY FROM NOW() - MAX(COALESCE(p.completed_at, e.enrolled_at))
+                )::int IN (14, 30, 60)
+            """)
+        ).fetchall()
+
+        for row in rows:
+            send_reengagement_email.delay(
+                {
+                    "student_id": str(row.student_id),
+                    "days_inactive": row.days_inactive,
+                    "course_title": row.course_title,
+                    "course_slug": row.course_slug,
+                }
+            )
+            triggered += 1
+
+    return {"triggered": triggered}

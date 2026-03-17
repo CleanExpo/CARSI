@@ -24,3 +24,5 @@ from . import lms_notifications  # noqa: F401
 from . import lms_search  # noqa: F401
 from . import lms_public_chat  # noqa: F401
 from . import lms_recommendations  # noqa: F401
+from . import lms_marketing  # noqa: F401
+from . import lms_hub_integration  # noqa: F401

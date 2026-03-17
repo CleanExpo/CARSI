@@ -34,7 +34,7 @@ export default function AdminDashboardPage() {
       {loading && <p className="text-muted-foreground">Loading metrics…</p>}
       {metrics && <AdminMetrics metrics={metrics} />}
 
-      <div className="flex gap-4">
+      <div className="flex flex-wrap gap-4">
         <Button asChild variant="outline">
           <Link href="/admin/users">Manage Users</Link>
         </Button>
@@ -43,6 +43,12 @@ export default function AdminDashboardPage() {
         </Button>
         <Button asChild variant="outline">
           <Link href="/admin/analytics">Analytics</Link>
+        </Button>
+        <Button asChild variant="outline">
+          <Link href="/admin/revenue">Revenue</Link>
+        </Button>
+        <Button asChild variant="outline">
+          <Link href="/admin/audit">Audit Log</Link>
         </Button>
       </div>
     </div>

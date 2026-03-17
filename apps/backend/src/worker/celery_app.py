@@ -13,6 +13,8 @@ celery_app = Celery(
     include=["src.worker.tasks", "src.worker.job_tasks"],
 )
 
+from celery.schedules import crontab  # noqa: E402
+
 celery_app.conf.update(
     task_serializer="json",
     result_serializer="json",
@@ -23,6 +25,14 @@ celery_app.conf.update(
         "expire-stale-job-listings-daily": {
             "task": "expire_stale_job_listings",
             "schedule": 86_400.0,  # every 24 hours
+        },
+        "daily-reengagement-scan": {
+            "task": "scan_for_reengagement",
+            "schedule": crontab(hour=9, minute=0),  # 9am AEST daily
+        },
+        "nightly-churn-scores": {
+            "task": "compute_churn_scores",
+            "schedule": crontab(hour=2, minute=0),  # 2am AEST nightly
         },
     },
 )

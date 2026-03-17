@@ -504,3 +504,175 @@ async def get_admin_analytics(
         cec_reports_sent=cec_sent,
         top_courses=top_courses,
     )
+
+
+# ---------------------------------------------------------------------------
+# Revenue Intelligence (Phase D1)
+# ---------------------------------------------------------------------------
+
+_YEARLY_PRICE_AUD = 795.0
+
+
+class RevenueByMonthOut(BaseModel):
+    month: str           # "YYYY-MM"
+    new_subs: int
+    revenue_aud: float
+
+
+class RevenueOut(BaseModel):
+    mrr_aud: float
+    arr_aud: float
+    total_subscribers: int
+    trialling: int
+    cancelled_this_month: int
+    trial_to_paid_rate: float
+    revenue_by_month: list[RevenueByMonthOut]
+
+
+@router.get("/revenue", response_model=RevenueOut)
+async def get_revenue(
+    db: AsyncSession = Depends(get_async_db),
+    current_user: LMSUser = Depends(get_current_lms_user),
+) -> RevenueOut:
+    """Revenue intelligence dashboard (admin only). Computed from local subscription data."""
+    _require_admin(current_user)
+
+    from datetime import datetime, timezone
+
+    from sqlalchemy import extract, func, select
+
+    from src.db.lms_models import LMSSubscription
+
+    now = datetime.now(timezone.utc)
+    month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+
+    # Active subscriber count
+    active_count = (
+        await db.execute(
+            select(func.count(LMSSubscription.id)).where(
+                LMSSubscription.status == "active"
+            )
+        )
+    ).scalar() or 0
+
+    # Trialling count
+    trialling_count = (
+        await db.execute(
+            select(func.count(LMSSubscription.id)).where(
+                LMSSubscription.status == "trialling"
+            )
+        )
+    ).scalar() or 0
+
+    # Cancelled this calendar month
+    cancelled_this_month = (
+        await db.execute(
+            select(func.count(LMSSubscription.id)).where(
+                LMSSubscription.cancelled_at >= month_start
+            )
+        )
+    ).scalar() or 0
+
+    # Trial-to-paid conversion rate
+    total_ever = (
+        await db.execute(select(func.count(LMSSubscription.id)))
+    ).scalar() or 0
+    trial_to_paid = round((active_count / total_ever * 100) if total_ever > 0 else 0.0, 1)
+
+    # Revenue by month — last 6 calendar months
+    six_months_ago = now.replace(day=1) - timedelta(days=31 * 5)
+    monthly_result = await db.execute(
+        select(
+            func.to_char(LMSSubscription.created_at, "YYYY-MM").label("month"),
+            func.count(LMSSubscription.id).label("new_subs"),
+        )
+        .where(
+            LMSSubscription.created_at >= six_months_ago,
+            LMSSubscription.status != "cancelled",
+        )
+        .group_by("month")
+        .order_by("month")
+    )
+    revenue_by_month = [
+        RevenueByMonthOut(
+            month=row.month,
+            new_subs=row.new_subs,
+            revenue_aud=round(row.new_subs * _YEARLY_PRICE_AUD, 2),
+        )
+        for row in monthly_result
+    ]
+
+    return RevenueOut(
+        mrr_aud=round(active_count * _YEARLY_PRICE_AUD / 12, 2),
+        arr_aud=round(active_count * _YEARLY_PRICE_AUD, 2),
+        total_subscribers=active_count,
+        trialling=trialling_count,
+        cancelled_this_month=cancelled_this_month,
+        trial_to_paid_rate=trial_to_paid,
+        revenue_by_month=revenue_by_month,
+    )
+
+
+# ---------------------------------------------------------------------------
+# Audit Log (Phase D2)
+# ---------------------------------------------------------------------------
+
+
+class AuditLogEntryOut(BaseModel):
+    id: str
+    actor_email: str | None
+    action: str
+    resource_type: str | None
+    resource_id: str | None
+    details: dict | None
+    ip_address: str | None
+    created_at: str
+
+
+class AuditLogPageOut(BaseModel):
+    items: list[AuditLogEntryOut]
+    total: int
+
+
+@router.get("/audit-log", response_model=AuditLogPageOut)
+async def get_audit_log(
+    action: str | None = None,
+    limit: int = 50,
+    offset: int = 0,
+    db: AsyncSession = Depends(get_async_db),
+    current_user: LMSUser = Depends(get_current_lms_user),
+) -> AuditLogPageOut:
+    """Paginated audit log with optional action filter (admin only)."""
+    _require_admin(current_user)
+
+    from sqlalchemy import func, select
+
+    from src.db.lms_models import LMSAuditLog
+
+    query = select(LMSAuditLog).order_by(LMSAuditLog.created_at.desc())
+    count_query = select(func.count(LMSAuditLog.id))
+
+    if action:
+        query = query.where(LMSAuditLog.action == action)
+        count_query = count_query.where(LMSAuditLog.action == action)
+
+    total = (await db.execute(count_query)).scalar() or 0
+    result = await db.execute(query.limit(limit).offset(offset))
+    rows = result.scalars().all()
+
+    return AuditLogPageOut(
+        items=[
+            AuditLogEntryOut(
+                id=str(r.id),
+                actor_email=r.actor_email,
+                action=r.action,
+                resource_type=r.resource_type,
+                resource_id=r.resource_id,
+                details=r.details,
+                ip_address=r.ip_address,
+                created_at=r.created_at.isoformat(),
+            )
+            for r in rows
+        ],
+        total=total,
+    )

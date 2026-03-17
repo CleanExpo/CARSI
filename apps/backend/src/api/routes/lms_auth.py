@@ -6,9 +6,10 @@ POST /api/lms/auth/login     — returns JWT access token
 GET  /api/lms/auth/me        — current user profile
 """
 
+import json
 from datetime import timedelta
 
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, Response, status
 from pydantic import BaseModel, EmailStr, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -19,6 +20,7 @@ from src.config.database import get_async_db
 from src.config.settings import get_settings
 from src.db.lms_models import LMSRole, LMSUser, LMSUserRole, LMSUserSession
 from src.api.deps_lms import get_current_lms_user
+from src.services.audit_service import audit_log
 
 router = APIRouter(prefix="/api/lms/auth", tags=["lms-auth"])
 
@@ -183,9 +185,19 @@ async def login(
 
     primary_role = user.roles[0] if user.roles else "student"
 
+    # Audit login event inline (same transaction as nothing else is being written)
+    ip = request.client.host if request.client else None
+    await audit_log(
+        db,
+        "user.login",
+        actor_id=user.id,
+        actor_email=user.email,
+        ip_address=ip,
+    )
+    await db.commit()
+
     # Record session start (best-effort, non-blocking)
     user_id_for_session = user.id
-    ip = request.client.host if request.client else None
     ua = request.headers.get("User-Agent")
 
     async def _record_session() -> None:
@@ -372,4 +384,120 @@ async def get_me(
         is_verified=current_user.is_verified,
         onboarding_completed=bool(current_user.onboarding_completed),
         recommended_pathway=current_user.recommended_pathway,
+    )
+
+
+@router.get("/me/export")
+async def export_my_data(
+    db: AsyncSession = Depends(get_async_db),
+    current_user: LMSUser = Depends(get_current_lms_user),
+) -> Response:
+    """GDPR data export — returns all personal data for the authenticated user as JSON.
+
+    Response header includes Content-Disposition for browser download.
+    """
+    from sqlalchemy import select
+
+    from src.db.lms_models import (
+        LMSCertificate,
+        LMSEnrollment,
+        LMSLessonNote,
+        LMSProgress,
+        LMSQuizAttempt,
+    )
+
+    user_id = current_user.id
+
+    enrollments_result = await db.execute(
+        select(LMSEnrollment).where(LMSEnrollment.student_id == user_id)
+    )
+    enrollments = [
+        {
+            "id": str(e.id),
+            "course_id": str(e.course_id),
+            "enrolled_at": e.enrolled_at.isoformat() if e.enrolled_at else None,
+            "completed_at": e.completed_at.isoformat() if e.completed_at else None,
+            "status": e.status,
+        }
+        for e in enrollments_result.scalars().all()
+    ]
+
+    certs_result = await db.execute(
+        select(LMSCertificate).where(LMSCertificate.student_id == user_id)
+    )
+    certificates = [
+        {
+            "id": str(c.id),
+            "credential_id": c.credential_id,
+            "course_id": str(c.course_id),
+            "issued_at": c.issued_at.isoformat() if c.issued_at else None,
+            "is_revoked": c.is_revoked,
+        }
+        for c in certs_result.scalars().all()
+    ]
+
+    attempts_result = await db.execute(
+        select(LMSQuizAttempt).where(LMSQuizAttempt.student_id == user_id)
+    )
+    quiz_attempts = [
+        {
+            "id": str(a.id),
+            "quiz_id": str(a.quiz_id),
+            "score_percentage": float(a.score_percentage) if a.score_percentage is not None else None,
+            "passed": a.passed,
+            "started_at": a.started_at.isoformat() if a.started_at else None,
+            "completed_at": a.completed_at.isoformat() if a.completed_at else None,
+        }
+        for a in attempts_result.scalars().all()
+    ]
+
+    notes_result = await db.execute(
+        select(LMSLessonNote).where(LMSLessonNote.student_id == user_id)
+    )
+    notes = [
+        {
+            "id": str(n.id),
+            "lesson_id": str(n.lesson_id),
+            "content": n.content,
+            "updated_at": n.updated_at.isoformat() if n.updated_at else None,
+        }
+        for n in notes_result.scalars().all()
+    ]
+
+    progress_result = await db.execute(
+        select(LMSProgress).where(LMSProgress.enrollment_id.in_(
+            [e["id"] for e in enrollments]
+        ))
+    )
+    progress = [
+        {
+            "id": str(p.id),
+            "enrollment_id": str(p.enrollment_id),
+            "lesson_id": str(p.lesson_id),
+            "completed_at": p.completed_at.isoformat() if p.completed_at else None,
+            "time_spent_seconds": p.time_spent_seconds,
+        }
+        for p in progress_result.scalars().all()
+    ]
+
+    payload = {
+        "user": {
+            "id": str(current_user.id),
+            "email": current_user.email,
+            "full_name": current_user.full_name,
+            "created_at": current_user.created_at.isoformat() if current_user.created_at else None,
+        },
+        "enrollments": enrollments,
+        "certificates": certificates,
+        "quiz_attempts": quiz_attempts,
+        "notes": notes,
+        "progress": progress,
+    }
+
+    content = json.dumps(payload, indent=2)
+    filename = f"carsi-data-export-{user_id}.json"
+    return Response(
+        content=content,
+        media_type="application/json",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
     )

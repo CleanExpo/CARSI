@@ -50,6 +50,8 @@ from .routes import (
     lms_public_chat,
     lms_recommendations,
     lms_search,
+    lms_marketing,
+    lms_hub_integration,
     lms_modules,
     lms_pathways,
     lms_progress,
@@ -156,6 +158,8 @@ app.include_router(lms_public_chat.router)
 app.include_router(lms_recommendations.router, tags=["LMS Recommendations"])
 app.include_router(lms_search.router)
 app.include_router(lms_bundles.router)
+app.include_router(lms_marketing.router)
+app.include_router(lms_hub_integration.router)
 app.include_router(agents.router, prefix="/api", tags=["Agents"])
 app.include_router(chat.router, prefix="/api", tags=["Chat"])
 app.include_router(webhooks.router, prefix="/api", tags=["Webhooks"])
