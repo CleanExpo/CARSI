@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { LessonPlayer } from '@/components/lms/LessonPlayer';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, ClipboardList } from 'lucide-react';
 import { apiClient } from '@/lib/api/client';
 
 interface Lesson {
@@ -17,6 +17,7 @@ interface Lesson {
   is_preview: boolean;
   order_index: number;
   course_id: string;
+  quiz_id: string | null;
 }
 
 export default function LessonPage() {
@@ -48,7 +49,34 @@ export default function LessonPage() {
 
       {loading && <p className="text-muted-foreground">Loading lesson…</p>}
       {error && <p className="text-destructive">{error}</p>}
-      {lesson && <LessonPlayer lesson={lesson} />}
+      {lesson && (
+        <>
+          <LessonPlayer lesson={lesson} />
+          {lesson.quiz_id && (
+            <div
+              className="mt-6 rounded-sm border p-4"
+              style={{ borderColor: 'rgba(36,144,237,0.25)', background: 'rgba(36,144,237,0.06)' }}
+            >
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <p className="text-sm font-semibold text-white">Assessment</p>
+                  <p className="mt-0.5 text-xs text-white/50">
+                    Test your knowledge for this lesson
+                  </p>
+                </div>
+                <Button
+                  onClick={() => router.push(`/courses/${params.slug}/quiz/${lesson.quiz_id}`)}
+                  className="shrink-0 gap-2 rounded-sm"
+                  style={{ background: '#2490ed', color: '#fff' }}
+                >
+                  <ClipboardList className="h-4 w-4" />
+                  Take Quiz
+                </Button>
+              </div>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }

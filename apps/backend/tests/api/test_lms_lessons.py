@@ -116,9 +116,13 @@ class TestGetLesson:
         mock_student = make_mock_student()
         mock_lesson = make_mock_lesson("text")
 
-        result = MagicMock()
-        result.scalar_one_or_none.return_value = mock_lesson
-        mock_db.execute = AsyncMock(return_value=result)
+        r_lesson = MagicMock()
+        r_lesson.scalar_one_or_none.return_value = mock_lesson
+        r_sub = MagicMock()
+        r_sub.scalar_one_or_none.return_value = MagicMock()  # truthy subscription
+        r_quiz = MagicMock()
+        r_quiz.scalar_one_or_none.return_value = None  # no quiz attached
+        mock_db.execute = AsyncMock(side_effect=[r_lesson, r_sub, r_quiz])
 
         app.dependency_overrides[get_async_db] = _override_db(mock_db)
         app.dependency_overrides[get_current_lms_user] = _override_user(mock_student)
@@ -134,6 +138,7 @@ class TestGetLesson:
         assert data["content_type"] == "text"
         assert data["content_body"] == "<p>Lesson content here.</p>"
         assert data["course_id"] == str(COURSE_ID)
+        assert data["quiz_id"] is None
 
     def test_returns_drive_file_lesson(self):
         mock_db = make_mock_db()
@@ -142,9 +147,13 @@ class TestGetLesson:
         mock_lesson.drive_file_id = "1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms"
         mock_lesson.content_body = None
 
-        result = MagicMock()
-        result.scalar_one_or_none.return_value = mock_lesson
-        mock_db.execute = AsyncMock(return_value=result)
+        r_lesson = MagicMock()
+        r_lesson.scalar_one_or_none.return_value = mock_lesson
+        r_sub = MagicMock()
+        r_sub.scalar_one_or_none.return_value = MagicMock()  # truthy subscription
+        r_quiz = MagicMock()
+        r_quiz.scalar_one_or_none.return_value = None
+        mock_db.execute = AsyncMock(side_effect=[r_lesson, r_sub, r_quiz])
 
         app.dependency_overrides[get_async_db] = _override_db(mock_db)
         app.dependency_overrides[get_current_lms_user] = _override_user(mock_student)
@@ -165,9 +174,11 @@ class TestGetLesson:
         mock_lesson.is_preview = True
         mock_lesson.duration_minutes = 30
 
-        result = MagicMock()
-        result.scalar_one_or_none.return_value = mock_lesson
-        mock_db.execute = AsyncMock(return_value=result)
+        r_lesson = MagicMock()
+        r_lesson.scalar_one_or_none.return_value = mock_lesson
+        r_quiz = MagicMock()
+        r_quiz.scalar_one_or_none.return_value = None  # preview lesson — no subscription check
+        mock_db.execute = AsyncMock(side_effect=[r_lesson, r_quiz])
 
         app.dependency_overrides[get_async_db] = _override_db(mock_db)
         app.dependency_overrides[get_current_lms_user] = _override_user(mock_student)

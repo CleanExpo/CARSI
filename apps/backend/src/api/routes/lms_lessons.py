@@ -11,7 +11,7 @@ from sqlalchemy.orm import joinedload
 from src.api.deps_lms import get_current_lms_user
 from src.api.schemas.lms_lessons import LessonOut
 from src.config.database import get_async_db
-from src.db.lms_models import LMSLesson, LMSLessonView, LMSModule, LMSSubscription, LMSUser
+from src.db.lms_models import LMSLesson, LMSLessonView, LMSModule, LMSQuiz, LMSSubscription, LMSUser
 
 router = APIRouter(prefix="/api/lms/lessons", tags=["lms-lessons"])
 modules_router = APIRouter(prefix="/api/lms/modules", tags=["lms-lessons"])
@@ -55,7 +55,7 @@ def _require_instructor_or_admin(user: LMSUser) -> None:
         )
 
 
-def _to_out(lesson: LMSLesson, course_id: UUID) -> LessonOut:
+def _to_out(lesson: LMSLesson, course_id: UUID, quiz_id: UUID | None = None) -> LessonOut:
     return LessonOut(
         id=lesson.id,
         title=lesson.title,
@@ -66,6 +66,7 @@ def _to_out(lesson: LMSLesson, course_id: UUID) -> LessonOut:
         is_preview=lesson.is_preview or False,
         order_index=lesson.order_index,
         course_id=course_id,
+        quiz_id=quiz_id,
     )
 
 
@@ -117,7 +118,13 @@ async def get_lesson(
     except Exception:
         await db.rollback()
 
-    return _to_out(lesson, lesson.module.course_id)
+    # Check if a quiz is attached to this lesson
+    quiz_result = await db.execute(
+        select(LMSQuiz.id).where(LMSQuiz.lesson_id == lesson.id).limit(1)
+    )
+    quiz_id = quiz_result.scalar_one_or_none()
+
+    return _to_out(lesson, lesson.module.course_id, quiz_id=quiz_id)
 
 
 # ---------------------------------------------------------------------------

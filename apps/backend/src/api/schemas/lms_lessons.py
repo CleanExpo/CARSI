@@ -15,5 +15,6 @@ class LessonOut(BaseModel):
     is_preview: bool
     order_index: int
     course_id: UUID
+    quiz_id: UUID | None = None
 
     model_config = {"from_attributes": True}
