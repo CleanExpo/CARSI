@@ -1,22 +1,20 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from 'next/server';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
+const COOKIE_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
 
 export async function POST(request: NextRequest) {
   try {
     const { email, password } = await request.json();
 
     if (!email || !password) {
-      return NextResponse.json(
-        { error: "Email and password are required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Email and password are required' }, { status: 400 });
     }
 
-    // Forward credentials to FastAPI backend
-    const backendResponse = await fetch(`${BACKEND_URL}/api/auth/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+    // Forward credentials to the LMS auth backend
+    const backendResponse = await fetch(`${BACKEND_URL}/api/lms/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
     });
 
@@ -24,30 +22,43 @@ export async function POST(request: NextRequest) {
 
     if (!backendResponse.ok) {
       return NextResponse.json(
-        { error: data.detail || "Invalid credentials" },
+        { error: data.detail || 'Invalid credentials' },
         { status: backendResponse.status }
       );
     }
 
-    // Set auth cookie server-side with secure flags
+    // Backend returns: { access_token, user_id, email, full_name, role }
     const response = NextResponse.json({
       success: true,
-      user: data.user,
+      user: {
+        id: data.user_id,
+        email: data.email,
+        full_name: data.full_name,
+        role: data.role,
+      },
     });
 
-    response.cookies.set("auth_token", data.access_token, {
+    const cookieOptions = {
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax' as const,
+      path: '/',
+      maxAge: COOKIE_MAX_AGE,
+    };
+
+    // httpOnly cookie — backend middleware validates this
+    response.cookies.set('auth_token', data.access_token, {
+      ...cookieOptions,
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
-      maxAge: 60 * 60 * 24 * 7, // 7 days
+    });
+
+    // Non-httpOnly cookie — frontend apiClient reads this to set Bearer header
+    response.cookies.set('carsi_token', data.access_token, {
+      ...cookieOptions,
+      httpOnly: false,
     });
 
     return response;
   } catch (_error) {
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

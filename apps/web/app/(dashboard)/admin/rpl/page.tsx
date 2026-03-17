@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-
-const API = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8000';
+import { apiClient } from '@/lib/api/client';
+import { useAuth } from '@/components/auth/auth-provider';
 
 interface RPLSubmission {
   id: string;
@@ -24,15 +24,6 @@ const STATUS_STYLES: Record<string, string> = {
   rejected: 'bg-red-950 text-red-400',
 };
 
-function getUserId(): string {
-  return typeof window !== 'undefined' ? (localStorage.getItem('carsi_user_id') ?? '') : '';
-}
-
-function authHeaders(): Record<string, string> {
-  const id = getUserId();
-  return { ...(id ? { 'X-User-Id': id } : {}), 'Content-Type': 'application/json' };
-}
-
 function _formatDate(iso: string | null): string {
   if (!iso) return '—';
   return new Date(iso).toLocaleDateString('en-AU', {
@@ -43,6 +34,7 @@ function _formatDate(iso: string | null): string {
 }
 
 export default function AdminRPLPage() {
+  const { user } = useAuth();
   const [submissions, setSubmissions] = useState<RPLSubmission[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('pending');
@@ -51,26 +43,24 @@ export default function AdminRPLPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!user) return;
     setLoading(true);
     const qs = statusFilter ? `?status=${statusFilter}` : '';
-    fetch(`${API}/api/lms/admin/rpl${qs}`, { headers: authHeaders() })
-      .then((r) => (r.ok ? r.json() : Promise.reject()))
+    apiClient
+      .get<RPLSubmission[]>(`/api/lms/admin/rpl${qs}`)
       .then(setSubmissions)
       .catch(() => setError('Could not load submissions.'))
       .finally(() => setLoading(false));
-  }, [statusFilter]);
+  }, [statusFilter, user]);
 
   async function handleReview(id: string, decision: 'approved' | 'rejected') {
     setReviewingId(id);
     setError(null);
     try {
-      const resp = await fetch(`${API}/api/lms/admin/rpl/${id}/review`, {
-        method: 'PATCH',
-        headers: authHeaders(),
-        body: JSON.stringify({ decision, notes: notes[id] ?? null }),
+      const updated = await apiClient.patch<RPLSubmission>(`/api/lms/admin/rpl/${id}/review`, {
+        decision,
+        notes: notes[id] ?? null,
       });
-      if (!resp.ok) throw new Error();
-      const updated: RPLSubmission = await resp.json();
       setSubmissions((prev) => prev.map((s) => (s.id === id ? updated : s)));
     } catch {
       setError('Could not save review decision.');

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { apiClient } from '@/lib/api/client';
 
 interface MigrationJob {
   id: string;
@@ -23,13 +24,6 @@ const STATUS_COLOURS: Record<string, string> = {
   failed: 'bg-red-500/10 text-red-400',
 };
 
-const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8000';
-
-function getUserId(): string {
-  if (typeof window === 'undefined') return '';
-  return localStorage.getItem('carsi_user_id') ?? '';
-}
-
 export default function MigrationPage() {
   const [jobs, setJobs] = useState<MigrationJob[]>([]);
   const [loading, setLoading] = useState(true);
@@ -38,13 +32,10 @@ export default function MigrationPage() {
 
   async function fetchJobs() {
     try {
-      const res = await fetch(`${BACKEND}/api/lms/admin/migration/jobs`, {
-        headers: { 'X-User-Id': getUserId() },
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setJobs(data.items ?? []);
-      }
+      const data = await apiClient.get<{ items: MigrationJob[] }>('/api/lms/admin/migration/jobs');
+      setJobs(data.items ?? []);
+    } catch {
+      // silently ignore
     } finally {
       setLoading(false);
     }
@@ -53,14 +44,8 @@ export default function MigrationPage() {
   async function startDiscovery() {
     setRunning(true);
     try {
-      const res = await fetch(`${BACKEND}/api/lms/admin/migration/discover`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-User-Id': getUserId() },
-        body: JSON.stringify({ dry_run: false }),
-      });
-      if (res.ok) {
-        await fetchJobs();
-      }
+      await apiClient.post('/api/lms/admin/migration/discover', { dry_run: false });
+      await fetchJobs();
     } finally {
       setRunning(false);
     }
@@ -69,14 +54,8 @@ export default function MigrationPage() {
   async function loadJob(jobId: string) {
     setRunning(true);
     try {
-      const res = await fetch(`${BACKEND}/api/lms/admin/migration/load`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-User-Id': getUserId() },
-        body: JSON.stringify({ job_id: jobId }),
-      });
-      if (res.ok) {
-        await fetchJobs();
-      }
+      await apiClient.post('/api/lms/admin/migration/load', { job_id: jobId });
+      await fetchJobs();
     } finally {
       setRunning(false);
     }

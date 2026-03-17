@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { LessonPlayer } from '@/components/lms/LessonPlayer';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
+import { apiClient } from '@/lib/api/client';
 
 interface Lesson {
   id: string;
@@ -26,18 +27,9 @@ export default function LessonPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const userId = localStorage.getItem('carsi_user_id') ?? '';
-    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8000';
-
-    fetch(`${backendUrl}/api/lms/lessons/${params.lessonId}`, {
-      headers: userId ? { 'X-User-Id': userId } : {},
-    })
-      .then((res) => {
-        if (res.status === 404) throw new Error('Lesson not found');
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.json();
-      })
-      .then((data: Lesson) => setLesson(data))
+    apiClient
+      .get<Lesson>(`/api/lms/lessons/${params.lessonId}`)
+      .then((data) => setLesson(data))
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }, [params.lessonId]);

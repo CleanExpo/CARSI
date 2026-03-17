@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { apiClient } from '@/lib/api/client';
 
 interface Pathway {
   id: string;
@@ -14,13 +15,6 @@ interface Pathway {
   estimated_hours?: string | null;
   is_published: boolean;
   order_index: number;
-}
-
-const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8000';
-
-function getUserId(): string {
-  if (typeof window === 'undefined') return '';
-  return localStorage.getItem('carsi_user_id') ?? '';
 }
 
 export default function AdminPathwaysPage() {
@@ -34,13 +28,10 @@ export default function AdminPathwaysPage() {
     // Admin endpoint returns all pathways (published and draft)
     // Fall back to public endpoint for now — extend later with an admin list
     try {
-      const res = await fetch(`${BACKEND}/api/lms/pathways`, {
-        headers: { 'X-User-Id': getUserId() },
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setPathways(data.items ?? []);
-      }
+      const data = await apiClient.get<{ items: Pathway[] }>('/api/lms/pathways');
+      setPathways(data.items ?? []);
+    } catch {
+      // silently ignore
     } finally {
       setLoading(false);
     }
@@ -49,32 +40,22 @@ export default function AdminPathwaysPage() {
   async function createPathway() {
     setSaving(true);
     try {
-      const res = await fetch(`${BACKEND}/api/lms/admin/pathways`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-User-Id': getUserId() },
-        body: JSON.stringify({
-          slug: form.slug,
-          title: form.title,
-          description: form.description || null,
-          iicrc_discipline: form.iicrc_discipline || null,
-        }),
+      await apiClient.post('/api/lms/admin/pathways', {
+        slug: form.slug,
+        title: form.title,
+        description: form.description || null,
+        iicrc_discipline: form.iicrc_discipline || null,
       });
-      if (res.ok) {
-        setShowForm(false);
-        setForm({ slug: '', title: '', iicrc_discipline: '', description: '' });
-        await fetchPathways();
-      }
+      setShowForm(false);
+      setForm({ slug: '', title: '', iicrc_discipline: '', description: '' });
+      await fetchPathways();
     } finally {
       setSaving(false);
     }
   }
 
   async function togglePublish(slug: string, current: boolean) {
-    await fetch(`${BACKEND}/api/lms/admin/pathways/${slug}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json', 'X-User-Id': getUserId() },
-      body: JSON.stringify({ is_published: !current }),
-    });
+    await apiClient.patch(`/api/lms/admin/pathways/${slug}`, { is_published: !current });
     await fetchPathways();
   }
 

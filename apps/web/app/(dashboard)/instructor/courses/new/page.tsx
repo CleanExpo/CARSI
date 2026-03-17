@@ -2,27 +2,14 @@
 
 import { useRouter } from 'next/navigation';
 import { CourseBuilder, CourseFormValues } from '@/components/lms/CourseBuilder';
+import { apiClient } from '@/lib/api/client';
 
 export default function NewCoursePage() {
   const router = useRouter();
 
   async function handleSubmit(values: CourseFormValues) {
-    const userId = localStorage.getItem('carsi_user_id') ?? '';
-    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8000';
-
-    const res = await fetch(`${backendUrl}/api/lms/courses`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(userId ? { 'X-User-Id': userId } : {}),
-      },
-      body: JSON.stringify(values),
-    });
-
-    if (res.ok) {
-      const course = await res.json();
-      router.push(`/instructor/courses/${course.slug}/edit`);
-    }
+    const course = await apiClient.post<{ slug: string }>('/api/lms/courses', values);
+    router.push(`/instructor/courses/${course.slug}/edit`);
   }
 
   return (

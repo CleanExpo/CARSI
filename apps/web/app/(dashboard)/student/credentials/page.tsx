@@ -4,17 +4,10 @@ import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Award } from 'lucide-react';
 import { ErrorBanner } from '@/components/lms/ErrorBanner';
+import { useAuth } from '@/components/auth/auth-provider';
+import { apiClient } from '@/lib/api/client';
 
 const API = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8000';
-
-function getUserId(): string {
-  return typeof window !== 'undefined' ? (localStorage.getItem('carsi_user_id') ?? '') : '';
-}
-
-function authHeaders(): Record<string, string> {
-  const id = getUserId();
-  return id ? { 'X-User-Id': id } : {};
-}
 
 interface CredentialOut {
   credential_id: string;
@@ -123,31 +116,27 @@ function EmptyState() {
 }
 
 export default function StudentCredentialsPage() {
+  const { user } = useAuth();
   const [credentials, setCredentials] = useState<CredentialOut[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchCredentials = useCallback(async () => {
-    const headers = authHeaders();
-    if (!headers['X-User-Id']) {
+    if (!user) {
       setLoading(false);
       return;
     }
     setLoading(true);
     setError(null);
     try {
-      const r = await fetch(`${API}/api/lms/credentials/me`, { headers });
-      if (r.ok) {
-        setCredentials(await r.json());
-      } else {
-        setError('Failed to load credentials. Please try again.');
-      }
+      const data = await apiClient.get<CredentialOut[]>('/api/lms/credentials/me');
+      setCredentials(data);
     } catch {
-      setError('Network error loading credentials.');
+      setError('Failed to load credentials. Please try again.');
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     fetchCredentials();

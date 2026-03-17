@@ -1,8 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-
-const API = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8000';
+import { apiClient } from '@/lib/api/client';
 
 interface CourseIdea {
   id: string;
@@ -16,17 +15,6 @@ interface CourseIdea {
 
 const DISCIPLINES = ['WRT', 'CRT', 'OCT', 'ASD', 'CCT'];
 
-function getUserId(): string {
-  return typeof window !== 'undefined' ? (localStorage.getItem('carsi_user_id') ?? '') : '';
-}
-
-function authHeaders(): Record<string, string> {
-  const id = getUserId();
-  return id
-    ? { 'X-User-Id': id, 'Content-Type': 'application/json' }
-    : { 'Content-Type': 'application/json' };
-}
-
 export default function InstructorIdeasPage() {
   const [ideas, setIdeas] = useState<CourseIdea[]>([]);
   const [loading, setLoading] = useState(true);
@@ -39,8 +27,8 @@ export default function InstructorIdeasPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch(`${API}/api/lms/ideas`)
-      .then((r) => (r.ok ? r.json() : Promise.reject()))
+    apiClient
+      .get<CourseIdea[]>('/api/lms/ideas')
       .then(setIdeas)
       .catch(() => setError('Could not load ideas.'))
       .finally(() => setLoading(false));
@@ -52,17 +40,11 @@ export default function InstructorIdeasPage() {
     setSubmitting(true);
     setError(null);
     try {
-      const resp = await fetch(`${API}/api/lms/ideas`, {
-        method: 'POST',
-        headers: authHeaders(),
-        body: JSON.stringify({
-          title: form.title,
-          description: form.description || null,
-          iicrc_discipline: form.iicrc_discipline || null,
-        }),
+      const newIdea = await apiClient.post<CourseIdea>('/api/lms/ideas', {
+        title: form.title,
+        description: form.description || null,
+        iicrc_discipline: form.iicrc_discipline || null,
       });
-      if (!resp.ok) throw new Error('Failed to submit');
-      const newIdea: CourseIdea = await resp.json();
       setIdeas((prev) => [newIdea, ...prev]);
       setForm({ title: '', description: '', iicrc_discipline: '' });
     } catch {
@@ -77,12 +59,9 @@ export default function InstructorIdeasPage() {
     setOutline(null);
     setError(null);
     try {
-      const resp = await fetch(`${API}/api/lms/ideas/${ideaId}/generate-outline`, {
-        method: 'POST',
-        headers: authHeaders(),
-      });
-      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-      const data = await resp.json();
+      const data = await apiClient.post<Record<string, unknown>>(
+        `/api/lms/ideas/${ideaId}/generate-outline`
+      );
       setOutline({ id: ideaId, data });
       // Update cached outline on idea
       setIdeas((prev) => prev.map((i) => (i.id === ideaId ? { ...i, ai_outline: data } : i)));

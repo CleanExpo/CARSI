@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-
-const API = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8000';
+import { apiClient } from '@/lib/api/client';
+import { useAuth } from '@/components/auth/auth-provider';
 
 interface CPPUnit {
   unit_code: string;
@@ -35,15 +35,6 @@ const STATUS_LABELS: Record<string, string> = {
   rejected: 'Rejected',
 };
 
-function getUserId(): string {
-  return typeof window !== 'undefined' ? (localStorage.getItem('carsi_user_id') ?? '') : '';
-}
-
-function authHeaders(extra?: Record<string, string>): Record<string, string> {
-  const id = getUserId();
-  return { ...(id ? { 'X-User-Id': id } : {}), 'Content-Type': 'application/json', ...extra };
-}
-
 function _formatDate(iso: string | null): string {
   if (!iso) return '—';
   return new Date(iso).toLocaleDateString('en-AU', {
@@ -54,6 +45,7 @@ function _formatDate(iso: string | null): string {
 }
 
 export default function RPLPortfolioPage() {
+  const { user } = useAuth();
   const [units, setUnits] = useState<CPPUnit[]>([]);
   const [submissions, setSubmissions] = useState<RPLSubmission[]>([]);
   const [loading, setLoading] = useState(true);
@@ -63,10 +55,12 @@ export default function RPLPortfolioPage() {
   const [form, setForm] = useState({ unit_code: '', unit_name: '', evidence_description: '' });
 
   useEffect(() => {
-    const headers = authHeaders();
+    if (!user) return;
     Promise.all([
-      fetch(`${API}/api/lms/rpl/units`).then((r) => (r.ok ? r.json() : [])),
-      fetch(`${API}/api/lms/rpl/portfolio/me`, { headers }).then((r) => (r.ok ? r.json() : [])),
+      apiClient.get<CPPUnit[]>('/api/lms/rpl/units').catch(() => [] as CPPUnit[]),
+      apiClient
+        .get<RPLSubmission[]>('/api/lms/rpl/portfolio/me')
+        .catch(() => [] as RPLSubmission[]),
     ])
       .then(([u, s]) => {
         setUnits(u);
@@ -74,7 +68,7 @@ export default function RPLPortfolioPage() {
       })
       .catch(() => setError('Could not load data.'))
       .finally(() => setLoading(false));
-  }, []);
+  }, [user]);
 
   function handleUnitSelect(e: React.ChangeEvent<HTMLSelectElement>) {
     const unit = units.find((u) => u.unit_code === e.target.value);
@@ -91,18 +85,12 @@ export default function RPLPortfolioPage() {
     setSubmitting(true);
     setError(null);
     try {
-      const resp = await fetch(`${API}/api/lms/rpl/portfolio`, {
-        method: 'POST',
-        headers: authHeaders(),
-        body: JSON.stringify({
-          unit_code: form.unit_code,
-          unit_name: form.unit_name,
-          evidence_description: form.evidence_description,
-          evidence_urls: [],
-        }),
+      const created = await apiClient.post<RPLSubmission>('/api/lms/rpl/portfolio', {
+        unit_code: form.unit_code,
+        unit_name: form.unit_name,
+        evidence_description: form.evidence_description,
+        evidence_urls: [],
       });
-      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-      const created: RPLSubmission = await resp.json();
       setSubmissions((prev) => [created, ...prev]);
       setForm({ unit_code: '', unit_name: '', evidence_description: '' });
     } catch {
@@ -115,13 +103,8 @@ export default function RPLPortfolioPage() {
   async function handleWithdraw(id: string) {
     setWithdrawingId(id);
     try {
-      const resp = await fetch(`${API}/api/lms/rpl/portfolio/${id}`, {
-        method: 'DELETE',
-        headers: authHeaders(),
-      });
-      if (resp.ok) {
-        setSubmissions((prev) => prev.filter((s) => s.id !== id));
-      }
+      await apiClient.delete(`/api/lms/rpl/portfolio/${id}`);
+      setSubmissions((prev) => prev.filter((s) => s.id !== id));
     } finally {
       setWithdrawingId(null);
     }

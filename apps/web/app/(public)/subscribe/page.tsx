@@ -3,8 +3,8 @@
 import { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-
-const API = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8000';
+import { useAuth } from '@/components/auth/auth-provider';
+import { apiClient } from '@/lib/api/client';
 
 const PLAN_DETAILS = {
   foundation: {
@@ -47,25 +47,8 @@ const PLAN_DETAILS = {
 
 type Plan = keyof typeof PLAN_DETAILS;
 
-async function startCheckout(userId: string, plan: Plan): Promise<string> {
-  const resp = await fetch(`${API}/api/lms/subscription/checkout`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-User-Id': userId,
-    },
-    body: JSON.stringify({
-      plan,
-      success_url: `${window.location.origin}/subscribe/success`,
-      cancel_url: `${window.location.origin}/subscribe?plan=${plan}`,
-    }),
-  });
-  if (!resp.ok) throw new Error('Failed to create checkout session');
-  const data = await resp.json();
-  return data.url;
-}
-
 export default function SubscribePage() {
+  const { user } = useAuth();
   const searchParams = useSearchParams();
   const rawPlan = searchParams.get('plan');
   const plan: Plan = rawPlan === 'foundation' ? 'foundation' : 'growth';
@@ -75,12 +58,19 @@ export default function SubscribePage() {
   const [error, setError] = useState<string | null>(null);
 
   async function handleSubscribe() {
+    if (!user) {
+      window.location.href = '/login?next=/subscribe';
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
-      const userId = localStorage.getItem('carsi_user_id') ?? '';
-      const url = await startCheckout(userId, plan);
-      window.location.href = url;
+      const data = await apiClient.post<{ url: string }>('/api/lms/subscription/checkout', {
+        plan,
+        success_url: `${window.location.origin}/subscribe/success`,
+        cancel_url: `${window.location.origin}/subscribe?plan=${plan}`,
+      });
+      window.location.href = data.url;
     } catch {
       setError('Could not start checkout. Please try again.');
     } finally {

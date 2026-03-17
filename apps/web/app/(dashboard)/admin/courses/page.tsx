@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { apiClient } from '@/lib/api/client';
+import { useAuth } from '@/components/auth/auth-provider';
 
 interface AdminCourse {
   id: string;
@@ -15,29 +17,22 @@ interface AdminCourse {
 }
 
 export default function AdminCoursesPage() {
+  const { user } = useAuth();
   const [courses, setCourses] = useState<AdminCourse[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const userId = typeof window !== 'undefined' ? (localStorage.getItem('carsi_user_id') ?? '') : '';
-  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8000';
-  const headers = {
-    'Content-Type': 'application/json',
-    ...(userId ? { 'X-User-Id': userId } : {}),
-  };
-
   useEffect(() => {
+    if (!user) return;
     // Fetch all courses (admin can see drafts via per_page=100)
-    fetch(`${backendUrl}/api/lms/courses?per_page=100`, { headers })
-      .then((res) => (res.ok ? res.json() : { items: [] }))
+    apiClient
+      .get<{ items: AdminCourse[] }>('/api/lms/courses?per_page=100')
       .then((data) => setCourses(data.items ?? []))
+      .catch(() => setCourses([]))
       .finally(() => setLoading(false));
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [user]);
 
   async function publishCourse(slug: string) {
-    await fetch(`${backendUrl}/api/lms/courses/${slug}/publish`, {
-      method: 'POST',
-      headers,
-    });
+    await apiClient.post(`/api/lms/courses/${slug}/publish`);
     setCourses((prev) => prev.map((c) => (c.slug === slug ? { ...c, status: 'published' } : c)));
   }
 

@@ -4,22 +4,13 @@ import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { FileText } from 'lucide-react';
 import { ErrorBanner } from '@/components/lms/ErrorBanner';
-
-const API = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8000';
+import { useAuth } from '@/components/auth/auth-provider';
+import { apiClient } from '@/lib/api/client';
 
 function formatDate(iso: string | null): string {
   if (!iso) return '';
   const d = new Date(iso);
   return d.toLocaleDateString('en-AU', { day: '2-digit', month: 'short', year: 'numeric' });
-}
-
-function getUserId(): string {
-  return typeof window !== 'undefined' ? (localStorage.getItem('carsi_user_id') ?? '') : '';
-}
-
-function authHeaders(): Record<string, string> {
-  const id = getUserId();
-  return id ? { 'X-User-Id': id } : {};
 }
 
 interface LessonNoteOut {
@@ -181,6 +172,7 @@ function EmptyState() {
 }
 
 export default function StudentNotesPage() {
+  const { user } = useAuth();
   const [notes, setNotes] = useState<LessonNoteOut[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -192,26 +184,21 @@ export default function StudentNotesPage() {
   const [deleting, setDeleting] = useState<string | null>(null);
 
   const fetchNotes = useCallback(async () => {
-    const headers = authHeaders();
-    if (!headers['X-User-Id']) {
+    if (!user) {
       setLoading(false);
       return;
     }
     setLoading(true);
     setError(null);
     try {
-      const r = await fetch(`${API}/api/lms/notes/me`, { headers });
-      if (r.ok) {
-        setNotes(await r.json());
-      } else {
-        setError('Failed to load notes. Please try again.');
-      }
+      const data = await apiClient.get<LessonNoteOut[]>('/api/lms/notes/me');
+      setNotes(data);
     } catch {
-      setError('Network error loading notes.');
+      setError('Failed to load notes. Please try again.');
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     fetchNotes();
@@ -231,22 +218,14 @@ export default function StudentNotesPage() {
   async function handleEditSave(lessonId: string) {
     setSaving(true);
     try {
-      const r = await fetch(`${API}/api/lms/notes/${lessonId}`, {
-        method: 'PUT',
-        headers: { ...authHeaders(), 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: editContent }),
+      const updated = await apiClient.put<LessonNoteOut>(`/api/lms/notes/${lessonId}`, {
+        content: editContent,
       });
-      if (r.ok) {
-        const updated: LessonNoteOut = await r.json();
-        setNotes((prev) => prev.map((n) => (n.lesson_id === lessonId ? updated : n)));
-        setEditingLessonId(null);
-        setEditContent('');
-      } else {
-        // Surface error inline without destroying the edit
-        setError('Failed to save note. Please try again.');
-      }
+      setNotes((prev) => prev.map((n) => (n.lesson_id === lessonId ? updated : n)));
+      setEditingLessonId(null);
+      setEditContent('');
     } catch {
-      setError('Network error saving note.');
+      setError('Failed to save note. Please try again.');
     } finally {
       setSaving(false);
     }
@@ -256,22 +235,14 @@ export default function StudentNotesPage() {
     async (lessonId: string) => {
       setDeleting(lessonId);
       try {
-        const r = await fetch(`${API}/api/lms/notes/${lessonId}`, {
-          method: 'DELETE',
-          headers: authHeaders(),
-        });
-        if (r.ok || r.status === 204) {
-          setNotes((prev) => prev.filter((n) => n.lesson_id !== lessonId));
-          // Clear edit state if the deleted note was being edited
-          if (editingLessonId === lessonId) {
-            setEditingLessonId(null);
-            setEditContent('');
-          }
-        } else {
-          setError('Failed to delete note. Please try again.');
+        await apiClient.delete(`/api/lms/notes/${lessonId}`);
+        setNotes((prev) => prev.filter((n) => n.lesson_id !== lessonId));
+        if (editingLessonId === lessonId) {
+          setEditingLessonId(null);
+          setEditContent('');
         }
       } catch {
-        setError('Network error deleting note.');
+        setError('Failed to delete note. Please try again.');
       } finally {
         setDeleting(null);
       }

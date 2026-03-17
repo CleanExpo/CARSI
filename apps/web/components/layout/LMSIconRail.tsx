@@ -35,8 +35,8 @@ export function LMSIconRail() {
   const router = useRouter();
   const { user, signOut } = useAuth();
 
-  const isAdmin = user?.is_admin ?? false;
-  const isInstructor = isAdmin;
+  const isAdmin = user?.roles?.includes('admin') ?? false;
+  const isInstructor = isAdmin || (user?.roles?.includes('instructor') ?? false);
 
   const initials = user?.full_name
     ? user.full_name

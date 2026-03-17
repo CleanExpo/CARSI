@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { AdminMetrics } from '@/components/lms/AdminMetrics';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { apiClient } from '@/lib/api/client';
 
 interface Metrics {
   total_users: number;
@@ -16,14 +17,10 @@ export default function AdminDashboardPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const userId = localStorage.getItem('carsi_user_id') ?? '';
-    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8000';
-
-    fetch(`${backendUrl}/api/lms/admin/metrics`, {
-      headers: userId ? { 'X-User-Id': userId } : {},
-    })
-      .then((res) => (res.ok ? res.json() : null))
+    apiClient
+      .get<Metrics>('/api/lms/admin/metrics')
       .then((data) => setMetrics(data))
+      .catch(() => null)
       .finally(() => setLoading(false));
   }, []);
 

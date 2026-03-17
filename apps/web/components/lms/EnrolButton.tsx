@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/components/auth/auth-provider';
+import { apiClient } from '@/lib/api/client';
 
 interface EnrolButtonProps {
   slug: string;
@@ -11,29 +13,35 @@ interface EnrolButtonProps {
 
 type SubState = 'checking' | 'subscribed' | 'none';
 
+interface SubStatusResponse {
+  has_subscription: boolean;
+  status: string | null;
+}
+
+interface CheckoutResponse {
+  enrolled?: boolean;
+  checkout_url?: string;
+}
+
 export function EnrolButton({ slug, priceAud = 0, isFree = false }: EnrolButtonProps) {
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [subState, setSubState] = useState<SubState>('checking');
 
-  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8000';
-
   useEffect(() => {
-    const userId = typeof window !== 'undefined' ? localStorage.getItem('carsi_user_id') : null;
-    if (!userId) {
+    if (!user) {
       setSubState('none');
       return;
     }
-    fetch(`${backendUrl}/api/lms/subscription/status`, {
-      headers: { 'X-User-Id': userId },
-    })
-      .then((r) => r.json())
+    apiClient
+      .get<SubStatusResponse>('/api/lms/subscription/status')
       .then((data) => {
         const active = data.has_subscription && ['active', 'trialling'].includes(data.status ?? '');
         setSubState(active ? 'subscribed' : 'none');
       })
       .catch(() => setSubState('none'));
-  }, [backendUrl]);
+  }, [user]);
 
   const isPaid = !isFree && priceAud > 0;
 
@@ -48,37 +56,14 @@ export function EnrolButton({ slug, priceAud = 0, isFree = false }: EnrolButtonP
     setLoading(true);
     setError(null);
 
-    const userId = typeof window !== 'undefined' ? localStorage.getItem('carsi_user_id') : null;
-
-    if (!userId) {
+    if (!user) {
       setError('Please log in to access this course.');
       setLoading(false);
       return;
     }
 
     try {
-      const res = await fetch(`${backendUrl}/api/lms/courses/${slug}/checkout`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-User-Id': userId,
-        },
-      });
-
-      if (res.status === 409) {
-        setError('You are already enrolled in this course.');
-        setLoading(false);
-        return;
-      }
-
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        setError(body.detail ?? 'Something went wrong. Please try again.');
-        setLoading(false);
-        return;
-      }
-
-      const data = await res.json();
+      const data = await apiClient.post<CheckoutResponse>(`/api/lms/courses/${slug}/checkout`);
 
       if (data.enrolled) {
         window.location.href = '/student';
@@ -89,8 +74,12 @@ export function EnrolButton({ slug, priceAud = 0, isFree = false }: EnrolButtonP
         window.location.href = data.checkout_url;
         return;
       }
-    } catch {
-      setError('Network error. Please try again.');
+    } catch (err) {
+      if (err instanceof Error && err.message.includes('409')) {
+        setError('You are already enrolled in this course.');
+      } else {
+        setError('Something went wrong. Please try again.');
+      }
     } finally {
       setLoading(false);
     }

@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -20,10 +21,11 @@ import { authApi } from '@/lib/api/auth';
 
 const formSchema = z
   .object({
+    fullName: z.string().min(2, 'Full name must be at least 2 characters'),
     email: z.string().email('Please enter a valid email address'),
-    password: z.string().min(6, 'Password must be at least 6 characters'),
+    password: z.string().min(8, 'Password must be at least 8 characters'),
     confirmPassword: z.string(),
-    fullName: z.string().optional(),
+    iicrcMemberNumber: z.string().optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
@@ -36,15 +38,15 @@ export function RegisterForm() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      fullName: '',
       email: '',
       password: '',
       confirmPassword: '',
-      fullName: '',
+      iicrcMemberNumber: '',
     },
   });
 
@@ -53,30 +55,22 @@ export function RegisterForm() {
     setError(null);
 
     try {
+      // Register the account
       await authApi.register({
         email: values.email,
         password: values.password,
         full_name: values.fullName,
+        iicrc_member_number: values.iicrcMemberNumber || undefined,
       });
-      setSuccess(true);
+
+      // Auto-login after registration
+      await authApi.login({ email: values.email, password: values.password });
+      router.push('/student');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Registration failed');
     } finally {
       setIsLoading(false);
     }
-  }
-
-  if (success) {
-    return (
-      <div className="space-y-2 text-center">
-        <p className="text-muted-foreground text-sm">
-          Account created successfully. You can now sign in.
-        </p>
-        <Button variant="outline" onClick={() => router.push('/login')}>
-          Go to sign in
-        </Button>
-      </div>
-    );
   }
 
   return (
@@ -130,6 +124,22 @@ export function RegisterForm() {
               <FormControl>
                 <Input type="password" {...field} />
               </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="iicrcMemberNumber"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>IICRC Member Number (optional)</FormLabel>
+              <FormControl>
+                <Input placeholder="e.g. IICRC-12345" {...field} />
+              </FormControl>
+              <FormDescription className="text-xs text-white/30">
+                Link your IICRC membership to track CECs and display your credentials.
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}

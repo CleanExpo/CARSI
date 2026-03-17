@@ -442,11 +442,15 @@ test.describe('6. Lesson player', () => {
     await mockCourseAPI(page);
     await mockStudentAPIs(page);
 
-    // Set a fake user ID in localStorage before navigating
-    await page.goto('/');
-    await page.evaluate(() => {
-      localStorage.setItem('carsi_user_id', '87159e2e-39ff-4cbc-acfd-2f85cff07bd0');
-    });
+    // Set a fake auth token cookie before navigating
+    await page.context().addCookies([
+      {
+        name: 'carsi_token',
+        value: 'test-jwt-token-james-wilson',
+        domain: 'localhost',
+        path: '/',
+      },
+    ]);
 
     await page.goto(`/courses/${MOCK_COURSES[0].slug}/lessons/${MOCK_LESSON.id}`);
     await page.waitForLoadState('networkidle');
@@ -494,10 +498,14 @@ test.describe('7. Quiz', () => {
     await mockCourseAPI(page);
     await mockStudentAPIs(page);
 
-    await page.goto('/');
-    await page.evaluate(() => {
-      localStorage.setItem('carsi_user_id', '87159e2e-39ff-4cbc-acfd-2f85cff07bd0');
-    });
+    await page.context().addCookies([
+      {
+        name: 'carsi_token',
+        value: 'test-jwt-token-james-wilson',
+        domain: 'localhost',
+        path: '/',
+      },
+    ]);
 
     // Navigate to a quiz page — the quiz is usually linked from a lesson
     // For testing, we directly mock the lesson page quiz section
@@ -533,11 +541,15 @@ test.describe('8. Student dashboard', () => {
     await mockStudentAPIs(page);
     await mockCourseAPI(page);
 
-    // Set user ID
-    await page.goto('/');
-    await page.evaluate(() => {
-      localStorage.setItem('carsi_user_id', '87159e2e-39ff-4cbc-acfd-2f85cff07bd0');
-    });
+    // Set auth token cookie
+    await page.context().addCookies([
+      {
+        name: 'carsi_token',
+        value: 'test-jwt-token-james-wilson',
+        domain: 'localhost',
+        path: '/',
+      },
+    ]);
 
     await page.goto('/student');
     await page.waitForLoadState('networkidle');

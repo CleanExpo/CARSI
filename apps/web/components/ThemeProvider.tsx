@@ -1,5 +1,6 @@
 'use client';
 import { createContext, useContext, useEffect, useState } from 'react';
+import { apiClient } from '@/lib/api/client';
 
 type Theme = 'light' | 'dark';
 
@@ -25,17 +26,7 @@ export function ThemeProvider({
     const next: Theme = theme === 'light' ? 'dark' : 'light';
     setTheme(next);
     // Persist to API (fire-and-forget — theme still toggles locally if this fails)
-    const userId =
-      typeof localStorage !== 'undefined' ? (localStorage.getItem('carsi_user_id') ?? '') : '';
-    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8000';
-    fetch(`${backendUrl}/api/lms/auth/me`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(userId ? { 'X-User-Id': userId } : {}),
-      },
-      body: JSON.stringify({ theme_preference: next }),
-    }).catch(() => {});
+    apiClient.patch('/api/lms/auth/me', { theme_preference: next }).catch(() => {});
   };
 
   return <ThemeContext.Provider value={{ theme, toggle }}>{children}</ThemeContext.Provider>;

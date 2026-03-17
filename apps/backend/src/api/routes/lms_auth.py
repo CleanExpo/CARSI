@@ -35,6 +35,7 @@ class RegisterRequest(BaseModel):
     password: str = Field(min_length=8)
     full_name: str = Field(min_length=2, max_length=255)
     role: str = Field(default="student")
+    iicrc_member_number: str | None = Field(default=None, max_length=50)
 
 
 class LoginRequest(BaseModel):
@@ -98,6 +99,7 @@ async def register(
         full_name=data.full_name,
         is_active=True,
         is_verified=False,
+        iicrc_member_number=data.iicrc_member_number,
     )
     db.add(user)
     await db.flush()  # get user.id before creating role assignment

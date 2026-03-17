@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-
-const API = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8000';
+import { apiClient } from '@/lib/api/client';
+import { useAuth } from '@/components/auth/auth-provider';
 
 interface CourseIdea {
   id: string;
@@ -30,34 +30,31 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 export default function CourseIdeasPage() {
+  const { user } = useAuth();
   const [ideas, setIdeas] = useState<CourseIdea[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [votingId, setVotingId] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch(`${API}/api/lms/ideas`)
-      .then((r) => (r.ok ? r.json() : Promise.reject(r.statusText)))
+    apiClient
+      .get<CourseIdea[]>('/api/lms/ideas')
       .then(setIdeas)
       .catch(() => setError('Could not load ideas.'))
       .finally(() => setLoading(false));
   }, []);
 
   async function handleVote(ideaId: string) {
-    const userId = localStorage.getItem('carsi_user_id') ?? '';
-    if (!userId) return;
+    if (!user) return;
 
     setVotingId(ideaId);
     try {
-      const resp = await fetch(`${API}/api/lms/ideas/${ideaId}/vote`, {
-        method: 'POST',
-        headers: { 'X-User-Id': userId },
-      });
-      if (!resp.ok) return;
-      const data = await resp.json();
+      const data = await apiClient.post<{ vote_count: number }>(`/api/lms/ideas/${ideaId}/vote`);
       setIdeas((prev) =>
         prev.map((idea) => (idea.id === ideaId ? { ...idea, vote_count: data.vote_count } : idea))
       );
+    } catch {
+      // silently ignore vote errors
     } finally {
       setVotingId(null);
     }

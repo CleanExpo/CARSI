@@ -9,17 +9,8 @@ import { CECProgressRing } from '@/components/lms/CECProgressRing';
 import { IICRCIdentityCard } from '@/components/lms/IICRCIdentityCard';
 import { SubscriptionStatus } from '@/components/lms/SubscriptionStatus';
 import { EnrolledCourseList } from '@/components/lms/EnrolledCourseList';
-
-const API = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8000';
-
-function getUserId(): string {
-  return typeof window !== 'undefined' ? (localStorage.getItem('carsi_user_id') ?? '') : '';
-}
-
-function authHeaders(): Record<string, string> {
-  const id = getUserId();
-  return id ? { 'X-User-Id': id } : {};
-}
+import { useAuth } from '@/components/auth/auth-provider';
+import { apiClient } from '@/lib/api/client';
 
 interface LevelData {
   total_xp: number;
@@ -66,6 +57,7 @@ interface ErrorState {
 }
 
 export default function StudentDashboardPage() {
+  const { user } = useAuth();
   const [level, setLevel] = useState<LevelData | null>(null);
   const [sub, setSub] = useState<SubData | null>(null);
   const [profile, setProfile] = useState<ProfileData | null>(null);
@@ -84,95 +76,72 @@ export default function StudentDashboardPage() {
   });
 
   const fetchLevel = useCallback(async () => {
-    const headers = authHeaders();
-    if (!headers['X-User-Id']) return;
+    if (!user) return;
     setLoading((l) => ({ ...l, level: true }));
     setErrors((e) => ({ ...e, level: null }));
     try {
-      const r = await fetch(`${API}/api/lms/gamification/me/level`, { headers });
-      if (r.ok) {
-        setLevel(await r.json());
-      } else {
-        setErrors((e) => ({ ...e, level: 'Failed to load progress data' }));
-      }
+      const data = await apiClient.get<LevelData>('/api/lms/gamification/me/level');
+      setLevel(data);
     } catch {
-      setErrors((e) => ({ ...e, level: 'Network error loading progress' }));
+      setErrors((e) => ({ ...e, level: 'Failed to load progress data' }));
     } finally {
       setLoading((l) => ({ ...l, level: false }));
     }
   }, []);
 
   const fetchSub = useCallback(async () => {
-    const headers = authHeaders();
-    if (!headers['X-User-Id']) return;
+    if (!user) return;
     setLoading((l) => ({ ...l, sub: true }));
     setErrors((e) => ({ ...e, sub: null }));
     try {
-      const r = await fetch(`${API}/api/lms/subscription/status`, { headers });
-      if (r.ok) {
-        setSub(await r.json());
-      } else {
-        setErrors((e) => ({ ...e, sub: 'Failed to load subscription status' }));
-      }
+      const data = await apiClient.get<SubData>('/api/lms/subscription/status');
+      setSub(data);
     } catch {
-      setErrors((e) => ({ ...e, sub: 'Network error loading subscription' }));
+      setErrors((e) => ({ ...e, sub: 'Failed to load subscription status' }));
     } finally {
       setLoading((l) => ({ ...l, sub: false }));
     }
-  }, []);
+  }, [user]);
 
   const fetchProfile = useCallback(async () => {
-    const headers = authHeaders();
-    if (!headers['X-User-Id']) return;
+    if (!user) return;
     setLoading((l) => ({ ...l, profile: true }));
     setErrors((e) => ({ ...e, profile: null }));
     try {
-      const r = await fetch(`${API}/api/lms/auth/me`, { headers });
-      if (r.ok) {
-        setProfile(await r.json());
-      } else {
-        setErrors((e) => ({ ...e, profile: 'Failed to load profile' }));
-      }
+      const data = await apiClient.get<ProfileData>('/api/lms/auth/me');
+      setProfile(data);
     } catch {
-      setErrors((e) => ({ ...e, profile: 'Network error loading profile' }));
+      setErrors((e) => ({ ...e, profile: 'Failed to load profile' }));
     } finally {
       setLoading((l) => ({ ...l, profile: false }));
     }
-  }, []);
+  }, [user]);
 
   const fetchEnrollments = useCallback(async () => {
-    const headers = authHeaders();
-    if (!headers['X-User-Id']) return;
+    if (!user) return;
     setEnrollmentsLoading(true);
     setErrors((e) => ({ ...e, enrollments: null }));
     try {
-      const r = await fetch(`${API}/api/lms/enrollments/me`, { headers });
-      if (r.ok) {
-        setEnrollments(await r.json());
-      } else {
-        setErrors((e) => ({ ...e, enrollments: 'Failed to load courses' }));
-      }
+      const data = await apiClient.get<Enrollment[]>('/api/lms/enrollments/me');
+      setEnrollments(data);
     } catch {
-      setErrors((e) => ({ ...e, enrollments: 'Network error loading courses' }));
+      setErrors((e) => ({ ...e, enrollments: 'Failed to load courses' }));
     } finally {
       setEnrollmentsLoading(false);
     }
-  }, []);
+  }, [user]);
 
   useEffect(() => {
-    const headers = authHeaders();
-    if (!headers['X-User-Id']) return;
-
+    if (!user) return;
     fetchLevel();
     fetchSub();
     fetchProfile();
     fetchEnrollments();
-  }, [fetchLevel, fetchSub, fetchProfile, fetchEnrollments]);
+  }, [user, fetchLevel, fetchSub, fetchProfile, fetchEnrollments]);
 
   function handleManageSubscription() {
-    const headers = authHeaders();
-    fetch(`${API}/api/lms/subscription/portal`, { method: 'POST', headers })
-      .then((r) => r.json())
+    apiClient
+      .post<{ url: string }>('/api/lms/subscription/portal')
       .then((data) => {
         if (data.url) window.location.href = data.url;
       })

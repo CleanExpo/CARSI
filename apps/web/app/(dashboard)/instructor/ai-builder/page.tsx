@@ -1,8 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-
-const API = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8000';
+import { apiClient } from '@/lib/api/client';
 
 const DISCIPLINES = ['WRT', 'ASD', 'AMRT', 'CCT', 'FSRT', 'CRT', 'OCT'] as const;
 
@@ -27,17 +26,6 @@ interface Module {
 
 interface AIBuilderResult {
   modules: Module[];
-}
-
-function getUserId(): string {
-  return typeof window !== 'undefined' ? (localStorage.getItem('carsi_user_id') ?? '') : '';
-}
-
-function authHeaders(): Record<string, string> {
-  const id = getUserId();
-  return id
-    ? { 'X-User-Id': id, 'Content-Type': 'application/json' }
-    : { 'Content-Type': 'application/json' };
 }
 
 export default function AIBuilderPage() {
@@ -71,23 +59,12 @@ export default function AIBuilderPage() {
     setResult(null);
 
     try {
-      const resp = await fetch(`${API}/api/lms/admin/ai-course-builder`, {
-        method: 'POST',
-        headers: authHeaders(),
-        body: JSON.stringify({
-          title,
-          iicrc_discipline: discipline,
-          standard_outline: standardOutline,
-          module_count: moduleCount,
-        }),
+      const data = await apiClient.post<AIBuilderResult>('/api/lms/admin/ai-course-builder', {
+        title,
+        iicrc_discipline: discipline,
+        standard_outline: standardOutline,
+        module_count: moduleCount,
       });
-
-      if (!resp.ok) {
-        const detail = await resp.json().catch(() => null);
-        throw new Error(detail?.detail ?? `HTTP ${resp.status}`);
-      }
-
-      const data: AIBuilderResult = await resp.json();
       setResult(data);
       // Expand all modules by default
       setExpandedModules(new Set(data.modules.map((_, i) => i)));

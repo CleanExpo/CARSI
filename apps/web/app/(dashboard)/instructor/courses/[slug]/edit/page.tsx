@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import { CourseBuilder, CourseFormValues } from '@/components/lms/CourseBuilder';
 import { ModuleEditor } from '@/components/lms/ModuleEditor';
+import { apiClient } from '@/lib/api/client';
 
 interface Module {
   id: string;
@@ -28,48 +29,36 @@ export default function EditCoursePage() {
   const [modules, setModules] = useState<Module[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const userId = typeof window !== 'undefined' ? (localStorage.getItem('carsi_user_id') ?? '') : '';
-  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8000';
-  const headers = {
-    'Content-Type': 'application/json',
-    ...(userId ? { 'X-User-Id': userId } : {}),
-  };
-
   const loadData = useCallback(async () => {
-    const [courseRes, modulesRes] = await Promise.all([
-      fetch(`${backendUrl}/api/lms/courses/${params.slug}`, { headers }),
-      fetch(`${backendUrl}/api/lms/courses/${params.slug}/modules`, { headers }),
+    const [courseData, modulesData] = await Promise.all([
+      apiClient.get<Course>(`/api/lms/courses/${params.slug}`).catch(() => null),
+      apiClient.get<Module[]>(`/api/lms/courses/${params.slug}/modules`).catch(() => []),
     ]);
-    if (courseRes.ok) setCourse(await courseRes.json());
-    if (modulesRes.ok) setModules(await modulesRes.json());
+    if (courseData) setCourse(courseData);
+    if (modulesData) setModules(modulesData);
     setLoading(false);
-  }, [params.slug]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [params.slug]);
 
   useEffect(() => {
     loadData();
   }, [loadData]);
 
   async function handleCourseUpdate(values: CourseFormValues) {
-    await fetch(`${backendUrl}/api/lms/courses/${params.slug}`, {
-      method: 'PATCH',
-      headers,
-      body: JSON.stringify(values),
-    });
+    await apiClient.patch(`/api/lms/courses/${params.slug}`, values);
   }
 
   async function handleAddModule() {
     const title = prompt('Module title:');
     if (!title) return;
-    await fetch(`${backendUrl}/api/lms/courses/${params.slug}/modules`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({ title, order_index: modules.length + 1 }),
+    await apiClient.post(`/api/lms/courses/${params.slug}/modules`, {
+      title,
+      order_index: modules.length + 1,
     });
     loadData();
   }
 
   async function handleDeleteModule(moduleId: string) {
-    await fetch(`${backendUrl}/api/lms/modules/${moduleId}`, { method: 'DELETE', headers });
+    await apiClient.delete(`/api/lms/modules/${moduleId}`);
     setModules((prev) => prev.filter((m) => m.id !== moduleId));
   }
 
@@ -77,10 +66,10 @@ export default function EditCoursePage() {
     const title = prompt('Lesson title:');
     if (!title) return;
     const nextOrder = (modules.find((m) => m.id === moduleId)?.lessons.length ?? 0) + 1;
-    await fetch(`${backendUrl}/api/lms/modules/${moduleId}/lessons`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({ title, order_index: nextOrder, content_type: 'text' }),
+    await apiClient.post(`/api/lms/modules/${moduleId}/lessons`, {
+      title,
+      order_index: nextOrder,
+      content_type: 'text',
     });
     loadData();
   }

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { apiClient } from '@/lib/api/client';
 
 interface AdminUser {
   id: string;
@@ -18,26 +19,16 @@ export default function AdminUsersPage() {
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const userId = typeof window !== 'undefined' ? (localStorage.getItem('carsi_user_id') ?? '') : '';
-  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8000';
-  const headers = {
-    'Content-Type': 'application/json',
-    ...(userId ? { 'X-User-Id': userId } : {}),
-  };
-
   useEffect(() => {
-    fetch(`${backendUrl}/api/lms/admin/users`, { headers })
-      .then((res) => (res.ok ? res.json() : []))
+    apiClient
+      .get<AdminUser[]>('/api/lms/admin/users')
       .then(setUsers)
+      .catch(() => [])
       .finally(() => setLoading(false));
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   async function assignRole(targetUserId: string, role: string) {
-    await fetch(`${backendUrl}/api/lms/admin/users/${targetUserId}/role`, {
-      method: 'PATCH',
-      headers,
-      body: JSON.stringify({ role }),
-    });
+    await apiClient.patch(`/api/lms/admin/users/${targetUserId}/role`, { role });
     setUsers((prev) => prev.map((u) => (u.id === targetUserId ? { ...u, roles: [role] } : u)));
   }
 

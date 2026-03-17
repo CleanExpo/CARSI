@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { apiClient } from '@/lib/api/client';
 
 interface Category {
   id: string;
@@ -11,13 +12,6 @@ interface Category {
   parent_id: string | null;
   order_index: number;
   created_at: string;
-}
-
-const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8000';
-
-function getUserId(): string {
-  if (typeof window === 'undefined') return '';
-  return localStorage.getItem('carsi_user_id') ?? '';
 }
 
 export default function TaxonomyPage() {
@@ -30,13 +24,8 @@ export default function TaxonomyPage() {
 
   async function fetchCategories() {
     try {
-      const res = await fetch(`${BACKEND}/api/lms/admin/categories`, {
-        headers: { 'X-User-Id': getUserId() },
-      });
-      if (res.ok) {
-        const data: Category[] = await res.json();
-        setCategories(data);
-      }
+      const data = await apiClient.get<Category[]>('/api/lms/admin/categories');
+      setCategories(data);
     } finally {
       setLoading(false);
     }
@@ -49,19 +38,13 @@ export default function TaxonomyPage() {
       const body: Record<string, unknown> = { slug: form.slug, name: form.name };
       if (form.parent_id) body.parent_id = form.parent_id;
 
-      const res = await fetch(`${BACKEND}/api/lms/admin/categories`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-User-Id': getUserId() },
-        body: JSON.stringify(body),
-      });
-      if (res.ok) {
-        setShowForm(false);
-        setForm({ slug: '', name: '', parent_id: '' });
-        await fetchCategories();
-      } else {
-        const data = await res.json();
-        setError(data.detail ?? 'Failed to create category');
-      }
+      await apiClient.post('/api/lms/admin/categories', body);
+      setShowForm(false);
+      setForm({ slug: '', name: '', parent_id: '' });
+      await fetchCategories();
+    } catch (err) {
+      const detail = err instanceof Error ? err.message : 'Failed to create category';
+      setError(detail);
     } finally {
       setSaving(false);
     }
@@ -69,10 +52,7 @@ export default function TaxonomyPage() {
 
   async function deleteCategory(slug: string) {
     if (!confirm(`Delete category "${slug}"? Courses using it will be uncategorised.`)) return;
-    await fetch(`${BACKEND}/api/lms/admin/categories/${slug}`, {
-      method: 'DELETE',
-      headers: { 'X-User-Id': getUserId() },
-    });
+    await apiClient.delete(`/api/lms/admin/categories/${slug}`);
     await fetchCategories();
   }
 

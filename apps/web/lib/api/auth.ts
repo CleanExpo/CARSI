@@ -2,6 +2,8 @@
  * Authentication API
  *
  * Handles login, logout, registration, and user management.
+ * Routes are proxied through Next.js API routes (same-origin) or go
+ * directly to the LMS backend at /api/lms/auth/*.
  */
 
 import { apiClient } from './client';
@@ -9,11 +11,12 @@ import { apiClient } from './client';
 export interface User {
   id: string;
   email: string;
-  full_name?: string;
+  full_name: string;
+  roles: string[];
+  theme_preference: string;
   is_active: boolean;
-  is_admin: boolean;
-  created_at: string;
-  last_login_at?: string;
+  is_verified: boolean;
+  iicrc_member_number?: string | null;
 }
 
 export interface LoginRequest {
@@ -22,20 +25,28 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
-  access_token: string;
-  token_type: string;
-  user: User;
+  success: boolean;
+  user: {
+    id: string;
+    email: string;
+    full_name: string;
+    role: string;
+  };
 }
 
 export interface RegisterRequest {
   email: string;
   password: string;
-  full_name?: string;
+  full_name: string;
+  iicrc_member_number?: string;
 }
 
 export interface RegisterResponse {
-  user: User;
-  message: string;
+  access_token: string;
+  user_id: string;
+  email: string;
+  full_name: string;
+  role: string;
 }
 
 /**
@@ -43,10 +54,10 @@ export interface RegisterResponse {
  */
 export const authApi = {
   /**
-   * Login with email and password
+   * Login with email and password.
+   * Routes through the Next.js proxy which sets httpOnly + readable cookies.
    */
   async login(credentials: LoginRequest): Promise<LoginResponse> {
-    // Login via Next.js API route which sets the httpOnly cookie server-side
     const res = await fetch('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -63,69 +74,48 @@ export const authApi = {
   },
 
   /**
-   * Register a new user
+   * Register a new student account.
+   * Calls the LMS backend directly — returns a token on success.
    */
   async register(data: RegisterRequest): Promise<RegisterResponse> {
-    return apiClient.post<RegisterResponse>('/api/auth/register', data);
+    return apiClient.post<RegisterResponse>('/api/lms/auth/register', {
+      email: data.email,
+      password: data.password,
+      full_name: data.full_name,
+      role: 'student',
+    });
   },
 
   /**
-   * Logout (clear auth token)
+   * Logout — clears both auth cookies via the Next.js route.
    */
   async logout(): Promise<void> {
-    // Call backend logout
-    try {
-      await apiClient.post('/api/auth/logout');
-    } catch {
-      // Ignore errors — proceed to clear cookie
-    }
-    // Clear the httpOnly cookie via server-side API route
     await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
   },
 
   /**
-   * Get current user
+   * Get the current authenticated user profile.
+   * Reads the JWT from the carsi_token cookie via apiClient.
    */
   async getCurrentUser(): Promise<User | null> {
     try {
-      return await apiClient.get<User>('/api/auth/me');
-    } catch (_error) {
-      // Not authenticated
+      return await apiClient.get<User>('/api/lms/auth/me');
+    } catch {
       return null;
     }
   },
 
   /**
-   * Update current user profile
+   * Update current user profile fields.
    */
   async updateProfile(data: Partial<User>): Promise<User> {
-    return apiClient.patch<User>('/api/auth/me', data);
+    return apiClient.patch<User>('/api/lms/auth/me', data);
   },
 
   /**
-   * Change password
-   */
-  async changePassword(currentPassword: string, newPassword: string): Promise<{ message: string }> {
-    return apiClient.post('/api/auth/change-password', {
-      current_password: currentPassword,
-      new_password: newPassword,
-    });
-  },
-
-  /**
-   * Request password reset
+   * Request a password reset email.
    */
   async requestPasswordReset(email: string): Promise<{ message: string }> {
-    return apiClient.post('/api/auth/forgot-password', { email });
-  },
-
-  /**
-   * Reset password with token
-   */
-  async resetPassword(token: string, newPassword: string): Promise<{ message: string }> {
-    return apiClient.post('/api/auth/reset-password', {
-      token,
-      new_password: newPassword,
-    });
+    return apiClient.post('/api/lms/auth/forgot-password', { email });
   },
 };
