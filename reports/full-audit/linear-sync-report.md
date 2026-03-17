@@ -9,7 +9,7 @@
 
 | Check                       | Status                                                                           |
 | --------------------------- | -------------------------------------------------------------------------------- |
-| Linear API Key in MEMORY.md | ✅ CONFIRMED — `lin_api_oviihkGfKH7PBmV2wSuVhpJH6EqOvzn6wntPJ2w8`                |
+| Linear API Key in MEMORY.md | ✅ CONFIRMED — stored in `.env.local` as `LINEAR_API_KEY`                        |
 | Linear update script        | ✅ CONFIRMED — `scripts/linear_update.py`                                        |
 | Linear create issues script | ⚠️ UNTRACKED — `scripts/linear-create-issues.py` (git status shows as untracked) |
 | Linear project              | ✅ CONFIRMED — Unite-Group / CARSI                                               |

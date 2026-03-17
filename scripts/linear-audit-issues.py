@@ -5,11 +5,12 @@ by the existing linear-create-issues.py script.
 Run: python scripts/linear-audit-issues.py
 """
 
+import os
 import ssl
 import json
 import urllib.request
 
-API_KEY = "lin_api_oviihkGfKH7PBmV2wSuVhpJH6EqOvzn6wntPJ2w8"
+API_KEY = os.environ["LINEAR_API_KEY"]
 TEAM_ID = "91b3cd04-86eb-422d-81e2-9aa37db2f2f5"
 API_URL = "https://api.linear.app/graphql"
 
