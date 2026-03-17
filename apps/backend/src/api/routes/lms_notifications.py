@@ -1,16 +1,16 @@
-"""LMS In-App Notifications — Phase B5."""
+"""LMS In-App Notifications — Phase B5 + D4 (PWA Push)."""
 
 from uuid import UUID
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from pydantic import BaseModel
-from sqlalchemy import select, update
+from sqlalchemy import delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.deps_lms import get_current_lms_user
 from src.config.database import get_async_db
-from src.db.lms_models import LMSNotification, LMSUser
+from src.db.lms_models import LMSNotification, LMSPushSubscription, LMSUser
 
 router = APIRouter(prefix="/api/lms/notifications", tags=["lms-notifications"])
 
@@ -91,3 +91,63 @@ async def mark_all_read(
     )
     await db.commit()
     return {"ok": True}
+
+
+# ---------------------------------------------------------------------------
+# PWA Push Subscriptions (Phase D4)
+# ---------------------------------------------------------------------------
+
+
+class PushSubscribeRequest(BaseModel):
+    endpoint: str
+    p256dh: str
+    auth: str
+
+
+@router.post("/me/push-subscribe", status_code=201)
+async def push_subscribe(
+    body: PushSubscribeRequest,
+    request: Request,
+    db: AsyncSession = Depends(get_async_db),
+    current_user: LMSUser = Depends(get_current_lms_user),
+) -> dict:
+    """Register a Web Push subscription for the current user."""
+    existing = await db.execute(
+        select(LMSPushSubscription).where(
+            LMSPushSubscription.student_id == current_user.id,
+            LMSPushSubscription.endpoint == body.endpoint,
+        )
+    )
+    sub = existing.scalar_one_or_none()
+    if sub:
+        sub.p256dh = body.p256dh
+        sub.auth = body.auth
+    else:
+        db.add(
+            LMSPushSubscription(
+                student_id=current_user.id,
+                endpoint=body.endpoint,
+                p256dh=body.p256dh,
+                auth=body.auth,
+                user_agent=request.headers.get("User-Agent"),
+            )
+        )
+    await db.commit()
+    return {"subscribed": True}
+
+
+@router.delete("/me/push-subscribe")
+async def push_unsubscribe(
+    endpoint: str,
+    db: AsyncSession = Depends(get_async_db),
+    current_user: LMSUser = Depends(get_current_lms_user),
+) -> dict:
+    """Remove a Web Push subscription."""
+    await db.execute(
+        delete(LMSPushSubscription).where(
+            LMSPushSubscription.student_id == current_user.id,
+            LMSPushSubscription.endpoint == endpoint,
+        )
+    )
+    await db.commit()
+    return {"unsubscribed": True}

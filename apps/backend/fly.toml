@@ -12,6 +12,14 @@ primary_region = "syd"
 [build]
   dockerfile = "Dockerfile"
 
+# Named process definitions
+# Each process maps to a named machine group in Fly.io
+# CELERY_BROKER_URL — set via: fly secrets set CELERY_BROKER_URL=redis://... --app carsi-backend
+[processes]
+  app    = "/app/.venv/bin/uvicorn src.api.main:app --host 0.0.0.0 --port 8000 --workers 2"
+  worker = "/app/.venv/bin/celery -A src.worker.celery_app worker --loglevel=info --concurrency=2 -Q celery"
+  beat   = "/app/.venv/bin/celery -A src.worker.celery_app beat --loglevel=info --scheduler celery.beat:PersistentScheduler"
+
 # Static environment (non-secret) variables
 # Secrets (DATABASE_URL, JWT_SECRET_KEY, STRIPE_*, SMTP_PASS, etc.) are set via:
 #   fly secrets set KEY=VALUE --app carsi-backend
@@ -29,8 +37,9 @@ primary_region = "syd"
   SMTP_USE_SSL = "true"
   SMTP_USE_TLS = "false"
 
-# HTTP service configuration
+# HTTP service configuration — bound to the "app" process only
 [http_service]
+  processes = ["app"]
   internal_port = 8000
   force_https = true
   auto_stop_machines = false
@@ -46,12 +55,25 @@ primary_region = "syd"
     protocol = "http"
     timeout = "5s"
 
-# Machine size — shared-cpu-1x 512MB
-# Upgrade to shared-cpu-2x 1GB if memory pressure observed
+# Machine sizes — per-process VM configuration
+# app:    512MB — uvicorn handles HTTP traffic
+# worker: 256MB — Celery task processing (concurrency=2)
+# beat:   256MB — lightweight scheduler only (no task execution)
+
 [[vm]]
-  cpu_kind = "shared"
-  cpus = 1
+  size = "shared-cpu-1x"
+  processes = ["app"]
   memory_mb = 512
+
+[[vm]]
+  size = "shared-cpu-1x"
+  processes = ["worker"]
+  memory_mb = 256
+
+[[vm]]
+  size = "shared-cpu-1x"
+  processes = ["beat"]
+  memory_mb = 256
 
 # Deploy strategy: rolling (zero-downtime deploys)
 # Release command runs migrations before new version goes live

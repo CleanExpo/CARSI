@@ -5,6 +5,7 @@ import { Toaster } from '@/components/ui/toast';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { AuthProvider } from '@/components/auth/auth-provider';
 import { OrganizationSchema, WebsiteSchema } from '@/components/seo';
+import { ServiceWorkerRegistration } from '@/components/lms/ServiceWorkerRegistration';
 
 const outfit = Outfit({
   subsets: ['latin'],
@@ -108,6 +109,7 @@ export default function RootLayout({
       <body className={`${outfit.variable} ${dmSans.variable} font-sans`} suppressHydrationWarning>
         <AuthProvider>
           <ThemeProvider initialTheme="dark">
+            <ServiceWorkerRegistration />
             <a
               href="#main-content"
               className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:rounded-md focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-black focus:shadow-lg"

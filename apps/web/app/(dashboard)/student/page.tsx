@@ -9,6 +9,7 @@ import { CECProgressRing } from '@/components/lms/CECProgressRing';
 import { IICRCIdentityCard } from '@/components/lms/IICRCIdentityCard';
 import { SubscriptionStatus } from '@/components/lms/SubscriptionStatus';
 import { EnrolledCourseList } from '@/components/lms/EnrolledCourseList';
+import { PushNotificationPrompt } from '@/components/lms/PushNotificationPrompt';
 import { RecommendationWidget } from '@/components/lms/RecommendationWidget';
 import { useAuth } from '@/components/auth/auth-provider';
 import { apiClient } from '@/lib/api/client';
@@ -157,6 +158,7 @@ export default function StudentDashboardPage() {
 
   return (
     <div className="flex max-w-4xl flex-col gap-8 p-6">
+      <PushNotificationPrompt />
       <h1 className="font-mono text-2xl font-bold text-white">
         {profile?.full_name ?? 'My Dashboard'}
       </h1>

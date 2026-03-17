@@ -5,6 +5,8 @@ Tasks run synchronously (outside the async FastAPI context) using the
 SyncSessionLocal session factory.
 """
 
+import json
+import os
 import uuid
 from datetime import datetime, timezone
 
@@ -920,3 +922,62 @@ def scan_for_reengagement() -> dict:
             triggered += 1
 
     return {"triggered": triggered}
+
+
+# ---------------------------------------------------------------------------
+# PWA Push Notifications (Phase D4)
+# ---------------------------------------------------------------------------
+
+
+@celery_app.task(name="send_push_notification")
+def send_push_notification(student_id: str, title: str, body: str, url: str = "/student") -> dict:
+    """
+    Send a Web Push notification to all registered devices for a student.
+    Uses pywebpush if VAPID keys are configured, otherwise no-ops gracefully.
+    """
+    from sqlalchemy import select
+
+    from src.db.lms_models import LMSPushSubscription
+
+    vapid_private_key = os.environ.get("VAPID_PRIVATE_KEY", "")
+    vapid_public_key = os.environ.get("VAPID_PUBLIC_KEY", "")  # noqa: F841 — reserved for future use
+    vapid_claims_email = os.environ.get("VAPID_CLAIMS_EMAIL", "admin@carsi.com.au")
+
+    if not vapid_private_key:
+        return {"status": "no_vapid_key"}
+
+    with SyncSessionLocal() as db:
+        result = db.execute(
+            select(LMSPushSubscription).where(
+                LMSPushSubscription.student_id == uuid.UUID(student_id)
+            )
+        )
+        subscriptions = result.scalars().all()
+
+    if not subscriptions:
+        return {"status": "no_subscriptions"}
+
+    payload = json.dumps({"title": title, "body": body, "url": url})
+    sent = 0
+
+    try:
+        from pywebpush import webpush, WebPushException  # noqa: F401
+    except ImportError:
+        return {"status": "pywebpush_not_installed"}
+
+    for sub in subscriptions:
+        try:
+            webpush(
+                subscription_info={
+                    "endpoint": sub.endpoint,
+                    "keys": {"p256dh": sub.p256dh, "auth": sub.auth},
+                },
+                data=payload,
+                vapid_private_key=vapid_private_key,
+                vapid_claims={"sub": f"mailto:{vapid_claims_email}"},
+            )
+            sent += 1
+        except Exception:  # noqa: BLE001
+            pass  # Stale subscription — skip silently
+
+    return {"status": "ok", "sent": sent}

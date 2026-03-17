@@ -836,3 +836,26 @@ class LMSAuditLog(Base):
     details = Column(JSONB)
     ip_address = Column(String(45))
     created_at = Column(DateTime(timezone=True), default=datetime.utcnow, nullable=False)
+
+
+# ---------------------------------------------------------------------------
+# PWA Push Subscriptions (Migration 022)
+# ---------------------------------------------------------------------------
+
+
+class LMSPushSubscription(Base):
+    __tablename__ = "lms_push_subscriptions"
+
+    id = Column(PGUUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    student_id = Column(
+        PGUUID(as_uuid=True),
+        ForeignKey("lms_users.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    endpoint = Column(Text, nullable=False)
+    p256dh = Column(Text, nullable=False)
+    auth = Column(Text, nullable=False)
+    user_agent = Column(String(500))
+    created_at = Column(DateTime(timezone=True), default=datetime.utcnow, nullable=False)
+
+    student = relationship("LMSUser")
