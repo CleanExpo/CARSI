@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { OrganizationSchema } from '@/components/seo/JsonLd';
 import {
+  Activity,
+  AlertTriangle,
   ArrowRight,
   Baby,
   Building,
@@ -9,6 +11,8 @@ import {
   FileCheck,
   GraduationCap,
   HardHat,
+  Heart,
+  Home,
   Hotel,
   Layers,
   Pickaxe,
@@ -16,6 +20,8 @@ import {
   Sparkles,
   Stethoscope,
   Store,
+  Tent,
+  Wrench,
 } from 'lucide-react';
 
 // ---------------------------------------------------------------------------
@@ -25,7 +31,7 @@ import {
 export const metadata: Metadata = {
   title: 'Industry Training Solutions | CARSI',
   description:
-    'IICRC-certified training for 12+ industries across Australia. Sector-specific restoration courses with verifiable credentials for healthcare, hospitality, mining, construction, and more.',
+    'IICRC-certified training for 19 industries across Australia. Sector-specific restoration courses with verifiable credentials for healthcare, hospitality, mining, plumbing, NDIS, real estate, and more.',
 };
 
 // ---------------------------------------------------------------------------
@@ -137,6 +143,54 @@ const industries = [
     color: '#673ab7',
     disciplines: ['WRT', 'CRT', 'ASD'],
   },
+  {
+    slug: 'plumbing-trades',
+    label: 'Plumbing & Trades',
+    description: 'Plumbers, trade contractors',
+    Icon: Wrench,
+    color: '#0097a7',
+    disciplines: ['WRT', 'ASD', 'AMRT'],
+  },
+  {
+    slug: 'ndis-disability',
+    label: 'NDIS & Disability Services',
+    description: 'SIL, SDA, disability providers',
+    Icon: Heart,
+    color: '#5c6bc0',
+    disciplines: ['AMRT', 'WRT', 'CRT'],
+  },
+  {
+    slug: 'gyms-fitness',
+    label: 'Gyms & Fitness Centres',
+    description: 'Gyms, pools, fitness facilities',
+    Icon: Activity,
+    color: '#43a047',
+    disciplines: ['AMRT', 'OCT', 'CRT'],
+  },
+  {
+    slug: 'real-estate',
+    label: 'Real Estate & Property Sales',
+    description: 'Real estate agents, conveyancers',
+    Icon: Home,
+    color: '#ff7043',
+    disciplines: ['WRT', 'ASD', 'AMRT'],
+  },
+  {
+    slug: 'emergency-management',
+    label: 'Emergency Management & SES',
+    description: 'SES, councils, emergency teams',
+    Icon: AlertTriangle,
+    color: '#ef5350',
+    disciplines: ['WRT', 'FSRT', 'ASD'],
+  },
+  {
+    slug: 'caravan-parks',
+    label: 'Caravan Parks & Holiday Stays',
+    description: 'Caravan parks, holiday accommodation',
+    Icon: Tent,
+    color: '#26a69a',
+    disciplines: ['AMRT', 'CRT', 'WRT'],
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -173,7 +227,7 @@ export default function IndustriesPage() {
             className="max-w-2xl text-lg leading-relaxed"
             style={{ color: 'rgba(255,255,255,0.5)' }}
           >
-            IICRC-certified training for 12+ industries across Australia. Each pathway includes
+            IICRC-certified training for 19 industries across Australia. Each pathway includes
             sector-specific courses, verifiable credentials, and continuing education credits.
           </p>
         </section>
