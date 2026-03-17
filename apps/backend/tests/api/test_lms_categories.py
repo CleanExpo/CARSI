@@ -337,8 +337,9 @@ class TestEnrollmentStatus:
         course = make_mock_course()
 
         calls = [
-            MagicMock(**{"scalar_one_or_none.return_value": course}),      # course lookup
-            MagicMock(**{"scalar_one_or_none.return_value": None}),         # no enrollment
+            MagicMock(**{"scalar_one_or_none.return_value": course}),  # course lookup
+            MagicMock(**{"scalar_one_or_none.return_value": None}),    # no enrollment
+            MagicMock(**{"scalar_one_or_none.return_value": None}),    # no active subscription
         ]
         mock_db.execute = AsyncMock(side_effect=calls)
 

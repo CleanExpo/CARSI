@@ -99,6 +99,7 @@ def _mock_course() -> MagicMock:
     course.duration_hours = None
     course.cppp40421_unit_code = None
     course.cppp40421_unit_name = None
+    course.tier = "foundation"
     course.instructor_id = INSTRUCTOR_ID
     course.created_at = datetime(2026, 1, 1)
     course.updated_at = datetime(2026, 3, 1)

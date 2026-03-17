@@ -25,6 +25,33 @@ from src.config.settings import get_settings
 from src.db.lms_models import LMSEnrollment, LMSSubscription
 from src.utils import get_logger
 
+# Monthly amount per plan in AUD (for Synthex reporting)
+_PLAN_AMOUNTS_AUD: dict[str, float] = {
+    "foundation": 44.0,
+    "growth": 99.0,
+    "yearly": 795.0,  # legacy annual plan
+}
+
+
+def _resolve_plan(metadata: dict, obj: dict) -> str:
+    """
+    Determine the plan name from subscription metadata.
+    Falls back to price ID comparison if metadata is absent (e.g. old webhooks).
+    """
+    plan = (metadata.get("plan") or "").lower()
+    if plan in ("foundation", "growth"):
+        return plan
+    # Attempt price-based detection for legacy or misconfigured webhooks
+    settings = get_settings()
+    items = (obj.get("items") or {}).get("data") or []
+    price_id = (items[0].get("price") or {}).get("id", "") if items else ""
+    if price_id and price_id == settings.stripe_foundation_price_id:
+        return "foundation"
+    if price_id and price_id == settings.stripe_growth_price_id:
+        return "growth"
+    # Default: treat unknown as growth (full access) — admin can correct via dashboard
+    return "growth"
+
 logger = get_logger(__name__)
 
 router = APIRouter(prefix="/api/lms/webhooks", tags=["lms-webhooks"])
@@ -74,6 +101,8 @@ async def stripe_webhook(
         await _handle_checkout_completed(db, obj)
     elif event_type == "customer.subscription.created":
         await _handle_subscription_created(db, obj)
+    elif event_type == "customer.subscription.updated":
+        await _handle_subscription_updated(db, obj)
     elif event_type == "customer.subscription.deleted":
         await _handle_subscription_deleted(db, obj)
     elif event_type == "invoice.payment_succeeded":
@@ -129,13 +158,16 @@ async def _handle_checkout_completed(db: AsyncSession, obj: dict) -> None:
 async def _handle_subscription_created(db: AsyncSession, obj: dict) -> None:
     from uuid import UUID
 
-    student_id_str = (obj.get("metadata") or {}).get("student_id")
+    metadata = obj.get("metadata") or {}
+    student_id_str = metadata.get("student_id")
     if not student_id_str:
         return
     try:
         student_id = UUID(student_id_str)
     except ValueError:
         return
+
+    plan = _resolve_plan(metadata, obj)
 
     try:
         existing = await db.execute(
@@ -151,7 +183,7 @@ async def _handle_subscription_created(db: AsyncSession, obj: dict) -> None:
             stripe_subscription_id=obj["id"],
             stripe_customer_id=obj["customer"],
             status=obj.get("status", "trialling"),
-            plan="yearly",
+            plan=plan,
             current_period_start=_ts_to_dt(obj.get("current_period_start")),
             current_period_end=_ts_to_dt(obj.get("current_period_end")),
             trial_end=_ts_to_dt(obj.get("trial_end")),
@@ -170,9 +202,36 @@ async def _handle_subscription_created(db: AsyncSession, obj: dict) -> None:
     asyncio.create_task(notify_subscription_event(
         student_id=student_id,
         event_type=SynthexEvents.SUBSCRIPTION_CREATED,
-        plan="yearly",
-        amount_aud=795.0,
+        plan=plan,
+        amount_aud=_PLAN_AMOUNTS_AUD.get(plan, 99.0),
     ))
+
+
+async def _handle_subscription_updated(db: AsyncSession, obj: dict) -> None:
+    """Handle customer.subscription.updated — sync plan and billing dates."""
+    try:
+        result = await db.execute(
+            select(LMSSubscription).where(
+                LMSSubscription.stripe_subscription_id == obj["id"]
+            )
+        )
+        sub = result.scalar_one_or_none()
+        if not sub:
+            return
+
+        metadata = obj.get("metadata") or {}
+        new_plan = _resolve_plan(metadata, obj)
+
+        sub.plan = new_plan
+        sub.status = obj.get("status", sub.status)
+        sub.current_period_start = _ts_to_dt(obj.get("current_period_start")) or sub.current_period_start
+        sub.current_period_end = _ts_to_dt(obj.get("current_period_end")) or sub.current_period_end
+        sub.trial_end = _ts_to_dt(obj.get("trial_end")) or sub.trial_end
+        await db.commit()
+    except Exception as exc:
+        await db.rollback()
+        logger.error("Webhook handler failed", error=str(exc))
+        raise
 
 
 async def _handle_subscription_deleted(db: AsyncSession, obj: dict) -> None:

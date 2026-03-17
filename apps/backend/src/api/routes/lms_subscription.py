@@ -103,9 +103,14 @@ async def create_checkout_session(
         payment_method_types=["card"],
         customer_email=current_user.email,
         line_items=[{"price": price_id, "quantity": 1}],
-        subscription_data={"trial_period_days": 7},
+        subscription_data={
+            "trial_period_days": 7,
+            # Metadata on the subscription object itself — read by customer.subscription.created
+            "metadata": {"student_id": str(current_user.id), "plan": plan},
+        },
         success_url=data.success_url + "?session_id={CHECKOUT_SESSION_ID}",
         cancel_url=data.cancel_url,
+        # Metadata on the checkout session — for checkout.session.completed
         metadata={"student_id": str(current_user.id), "plan": plan},
         idempotency_key=idempotency_key,
     )
