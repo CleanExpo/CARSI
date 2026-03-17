@@ -66,6 +66,9 @@ class LMSUser(Base):
     iicrc_card_image_url = Column(Text, nullable=True)
     iicrc_expiry_date = Column(Date, nullable=True)
     iicrc_certifications = Column(JSONB, nullable=True, default=list)
+    # Onboarding wizard (migration 019)
+    onboarding_completed = Column(Boolean, default=False, nullable=False)
+    recommended_pathway = Column(String(50), nullable=True)
     created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
     updated_at = Column(DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow)
 

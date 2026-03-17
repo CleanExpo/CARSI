@@ -19,6 +19,7 @@ from sqlalchemy.orm import selectinload
 
 from src.api.deps_lms import get_current_lms_user
 from src.config.database import get_async_db
+from src.config.settings import get_settings
 from src.db.lms_models import LMSCourse, LMSEnrollment, LMSUser
 from src.services.pdf_certificate import generate_certificate_pdf
 
@@ -48,6 +49,15 @@ class StudentCredentialOut(BaseModel):
     issued_date: str
     verification_url: str
     status: str
+
+
+class LinkedInDraftRequest(BaseModel):
+    years_experience: int | None = None
+
+
+class LinkedInDraftResponse(BaseModel):
+    draft: str
+    credential_id: str
 
 
 @router.get("/me", response_model=list[StudentCredentialOut])
@@ -156,6 +166,96 @@ async def get_credential(
         verification_url=f"https://carsi.com.au/credentials/{credential_id}",
         cppp40421_unit_code=course.cppp40421_unit_code if course else None,
     )
+
+
+@router.post("/{credential_id}/linkedin-draft", response_model=LinkedInDraftResponse)
+async def generate_linkedin_draft(
+    credential_id: str,
+    data: LinkedInDraftRequest,
+    db: AsyncSession = Depends(get_async_db),
+    current_user: LMSUser = Depends(get_current_lms_user),
+) -> LinkedInDraftResponse:
+    """Generate an AI-drafted LinkedIn post for a completed credential.
+
+    Falls back to a template string when no Anthropic API key is configured.
+    """
+    try:
+        uid = UUID(credential_id)
+    except ValueError:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Credential not found")
+
+    result = await db.execute(
+        select(LMSEnrollment)
+        .where(
+            LMSEnrollment.id == uid,
+            LMSEnrollment.student_id == current_user.id,
+        )
+        .options(
+            selectinload(LMSEnrollment.student),
+            selectinload(LMSEnrollment.course),
+        )
+    )
+    enrollment = result.scalar_one_or_none()
+    if not enrollment:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Credential not found")
+
+    course: LMSCourse = enrollment.course
+    student: LMSUser = enrollment.student
+    discipline = course.iicrc_discipline or "restoration" if course else "restoration"
+    course_title = course.title if course else "IICRC Certification"
+    cec_hours = float(course.cec_hours) if course and course.cec_hours else 0.0
+    experience_text = f"{data.years_experience} years" if data.years_experience else "several years"
+    student_name = student.full_name if student else current_user.full_name
+    verification_url = f"https://carsi.com.au/credentials/{credential_id}"
+
+    settings = get_settings()
+
+    if not settings.anthropic_api_key:
+        template = (
+            f"Excited to share that I've just earned my {discipline} certification through CARSI! "
+            f"After {experience_text} in the industry, formalising this knowledge feels great. "
+            f"You can verify my credential at {verification_url} "
+            f"#IICRC #{discipline} #PropertyRestoration"
+        )
+        return LinkedInDraftResponse(draft=template, credential_id=credential_id)
+
+    try:
+        import anthropic
+
+        client = anthropic.AsyncAnthropic(api_key=settings.anthropic_api_key)
+        prompt = (
+            f"Generate a professional LinkedIn post for an Australian trade professional "
+            f"who just earned an IICRC certification.\n\n"
+            f"Name: {student_name}\n"
+            f"Certification: {course_title} ({discipline} discipline)\n"
+            f"CEC Hours: {cec_hours}\n"
+            f"Years Experience: {experience_text}\n"
+            f"Credential ID: {credential_id}\n"
+            f"Verification URL: {verification_url}\n\n"
+            f"Requirements:\n"
+            f"- Under 200 words\n"
+            f"- Genuine and professional tone (not overly corporate)\n"
+            f"- Mention the specific discipline and what it covers\n"
+            f"- Include the credential verification URL\n"
+            f"- Use Australian English\n"
+            f"- End with 2-3 relevant hashtags\n\n"
+            f"Post only, no other text."
+        )
+        message = await client.messages.create(
+            model="claude-haiku-4-5-20251001",
+            max_tokens=400,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        draft_text = message.content[0].text if message.content else ""
+    except Exception:
+        draft_text = (
+            f"Excited to share that I've just earned my {discipline} certification through CARSI! "
+            f"After {experience_text} in the industry, formalising this knowledge feels great. "
+            f"You can verify my credential at {verification_url} "
+            f"#IICRC #{discipline} #PropertyRestoration"
+        )
+
+    return LinkedInDraftResponse(draft=draft_text, credential_id=credential_id)
 
 
 @router.get("/{credential_id}/pdf")

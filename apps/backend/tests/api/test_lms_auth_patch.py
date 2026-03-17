@@ -29,6 +29,8 @@ def make_mock_user(theme: str = "light") -> MagicMock:
     user.theme_preference = theme
     user.roles = ["student"]
     user.user_roles = []
+    user.onboarding_completed = False
+    user.recommended_pathway = None
     return user
 
 

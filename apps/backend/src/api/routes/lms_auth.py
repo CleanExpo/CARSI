@@ -60,6 +60,21 @@ class UserProfileResponse(BaseModel):
     theme_preference: str
     is_active: bool
     is_verified: bool
+    onboarding_completed: bool = False
+    recommended_pathway: str | None = None
+
+
+class OnboardingRequest(BaseModel):
+    industry: str
+    role: str
+    iicrc_experience: str
+    primary_goal: str
+
+
+class OnboardingResponse(BaseModel):
+    recommended_pathway: str
+    pathway_description: str
+    suggested_courses_url: str
 
 
 # ---------------------------------------------------------------------------
@@ -201,6 +216,116 @@ class UserUpdateRequest(BaseModel):
     theme_preference: str | None = None
 
 
+_PATHWAY_DESCRIPTIONS: dict[str, str] = {
+    "WRT": "Water Damage Restoration Technician — the industry entry point covering moisture assessment, drying science, and structural restoration.",
+    "ASD": "Applied Structural Drying — advanced drying techniques for complex commercial and residential losses.",
+    "CRT": "Commercial Drying Technician — large-scale commercial water damage restoration and project management.",
+    "OCT": "Odour Control Technician — identification and remediation of odour sources across all restoration disciplines.",
+    "CCT": "Commercial Carpet Technician — professional carpet cleaning, maintenance, and restoration.",
+    "HST": "Health and Safety Technician — infection control and safe work practices for healthcare environments.",
+    "general": "General Restoration — explore our full course catalogue to find the best fit for your goals.",
+}
+
+
+def _score_pathway(industry: str, role: str, iicrc_experience: str, primary_goal: str) -> str:
+    """Deterministic scoring function — returns the recommended IICRC discipline code."""
+    scores: dict[str, int] = {
+        "WRT": 0, "ASD": 0, "CRT": 0, "OCT": 0, "CCT": 0, "HST": 0,
+    }
+
+    # Industry signals
+    if industry == "restoration":
+        scores["WRT"] += 3
+        scores["ASD"] += 2
+        scores["CRT"] += 2
+    elif industry == "construction":
+        scores["WRT"] += 3
+        scores["ASD"] += 1
+    elif industry == "healthcare":
+        scores["HST"] += 10  # strong domain signal — overrides generic role/experience boosts
+        scores["WRT"] += 1
+    elif industry == "government":
+        scores["WRT"] += 3
+        scores["CRT"] += 2
+    else:
+        scores["WRT"] += 2
+
+    # Role signals
+    if role == "technician":
+        scores["WRT"] += 2
+        scores["ASD"] += 1
+    elif role == "supervisor":
+        scores["ASD"] += 2
+        scores["CRT"] += 2
+        scores["WRT"] += 1
+    elif role == "owner":
+        scores["CRT"] += 3
+        scores["ASD"] += 2
+    elif role == "new_to_industry":
+        scores["WRT"] += 4
+
+    # IICRC experience signals
+    if iicrc_experience == "none":
+        scores["WRT"] += 3
+    elif iicrc_experience == "some":
+        scores["ASD"] += 2
+        scores["WRT"] += 1
+    elif iicrc_experience == "certified":
+        scores["ASD"] += 1
+        scores["CRT"] += 2
+        scores["OCT"] += 2
+
+    # Goal signals
+    if primary_goal == "new_cert":
+        scores["WRT"] += 1
+    elif primary_goal == "cec_renewal":
+        scores["OCT"] += 2
+        scores["CCT"] += 1
+    elif primary_goal == "career_change":
+        scores["WRT"] += 3
+
+    winner = max(scores, key=lambda k: scores[k])
+    if scores[winner] == 0:
+        return "WRT"
+    return winner
+
+
+@router.post("/onboarding", response_model=OnboardingResponse)
+async def complete_onboarding(
+    data: OnboardingRequest,
+    db: AsyncSession = Depends(get_async_db),
+    current_user: LMSUser = Depends(get_current_lms_user),
+) -> OnboardingResponse:
+    """Run the AI onboarding wizard — maps user answers to a recommended IICRC pathway.
+
+    Returns 409 Conflict if the user has already completed onboarding.
+    """
+    if current_user.onboarding_completed:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Onboarding already completed",
+        )
+
+    pathway = _score_pathway(
+        industry=data.industry,
+        role=data.role,
+        iicrc_experience=data.iicrc_experience,
+        primary_goal=data.primary_goal,
+    )
+
+    current_user.onboarding_completed = True
+    current_user.recommended_pathway = pathway
+    await db.commit()
+    await db.refresh(current_user)
+
+    description = _PATHWAY_DESCRIPTIONS.get(pathway, _PATHWAY_DESCRIPTIONS["general"])
+    return OnboardingResponse(
+        recommended_pathway=pathway,
+        pathway_description=description,
+        suggested_courses_url=f"/pathways/{pathway.lower()}",
+    )
+
+
 @router.patch("/me", response_model=UserProfileResponse)
 async def update_me(
     data: UserUpdateRequest,
@@ -227,6 +352,8 @@ async def update_me(
         theme_preference=current_user.theme_preference,
         is_active=current_user.is_active,
         is_verified=current_user.is_verified,
+        onboarding_completed=bool(current_user.onboarding_completed),
+        recommended_pathway=current_user.recommended_pathway,
     )
 
 
@@ -243,4 +370,6 @@ async def get_me(
         theme_preference=current_user.theme_preference,
         is_active=current_user.is_active,
         is_verified=current_user.is_verified,
+        onboarding_completed=bool(current_user.onboarding_completed),
+        recommended_pathway=current_user.recommended_pathway,
     )

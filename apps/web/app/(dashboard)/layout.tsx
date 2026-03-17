@@ -1,6 +1,7 @@
 import { LMSIconRail } from '@/components/layout/LMSIconRail';
 import { LMSContextPanel } from '@/components/layout/LMSContextPanel';
 import { PageTransition } from '@/components/layout/PageTransition';
+import { OnboardingCheck } from '@/components/lms/OnboardingCheck';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -18,6 +19,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <main id="main-content" className="relative z-10 flex-1 overflow-auto">
         <PageTransition>{children}</PageTransition>
       </main>
+
+      {/* Onboarding wizard — shown once on first login */}
+      <OnboardingCheck />
     </div>
   );
 }
