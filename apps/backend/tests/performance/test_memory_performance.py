@@ -4,8 +4,13 @@ Tests performance characteristics and identifies bottlenecks.
 Run with: pytest tests/performance/test_memory_performance.py -v -m performance -s
 """
 
-import time
 import pytest
+
+pytestmark = pytest.mark.skip(
+    reason="Requires real database backend. CARSI uses NullStateStore — run with a live DB to enable."
+)
+
+import time
 from statistics import mean, median
 
 from src.memory.models import MemoryDomain

@@ -1,3 +1,6 @@
 
 # Use bd merge for beads JSONL files
 .beads/issues.jsonl merge=beads
+
+# Force LF line endings for markdown — prevents CRLF false positives on Windows (core.autocrlf)
+*.md text eol=lf

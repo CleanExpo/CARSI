@@ -22,6 +22,12 @@ How it works:
 """
 
 import pytest
+
+pytest.importorskip(
+    "pact",
+    reason="pact-python not installed. Run: uv add --dev pact-python",
+)
+
 import os
 from pathlib import Path
 from pact import Verifier
