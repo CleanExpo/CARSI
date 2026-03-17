@@ -41,6 +41,9 @@ export default function AdminDashboardPage() {
         <Button asChild variant="outline">
           <Link href="/admin/courses">Review Courses</Link>
         </Button>
+        <Button asChild variant="outline">
+          <Link href="/admin/analytics">Analytics</Link>
+        </Button>
       </div>
     </div>
   );

@@ -85,6 +85,18 @@ async def enrol_in_course(
         is_free=course.is_free or False,
     ))
 
+    # Day 0 welcome email — fire-and-forget (Redis may not be available in all envs)
+    try:
+        from src.worker.tasks import send_welcome_email
+
+        send_welcome_email.delay({
+            "student_id": str(current_user.id),
+            "course_title": course.title,
+            "course_slug": course.slug or "",
+        })
+    except Exception:
+        pass  # Non-fatal — enrollment still succeeds without email dispatch
+
     return EnrollmentWithCourseOut(
         id=enrollment.id,
         student_id=enrollment.student_id,

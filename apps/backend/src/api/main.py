@@ -35,6 +35,7 @@ from .routes import (
     lms_drive,
     lms_enrollments,
     lms_admin,
+    lms_notifications,
     lms_lessons,
     lms_gamification,
     lms_migration,
@@ -130,6 +131,7 @@ app.include_router(lms_drive.router)
 app.include_router(lms_enrollments.router)
 app.include_router(lms_credentials.router)
 app.include_router(lms_admin.router)
+app.include_router(lms_notifications.router)
 app.include_router(lms_lessons.router)
 app.include_router(lms_lessons.modules_router)
 app.include_router(lms_modules.router)

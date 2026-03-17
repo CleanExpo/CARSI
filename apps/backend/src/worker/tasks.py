@@ -291,6 +291,16 @@ def handle_course_completed(data: dict) -> dict:
                         "certificate_id": credential_id,
                     }
 
+        # In-app notification for cert issuance
+        _create_notification(
+            db,
+            student_id,
+            "cert_issued",
+            f"Certificate issued — {course_title}",
+            f"Your {course_title} certificate is ready to view and share.",
+            action_url=f"/student/credentials",
+        )
+
         # Single commit — all records in one transaction
         db.commit()
 
@@ -305,6 +315,33 @@ def handle_course_completed(data: dict) -> dict:
         send_iicrc_cec_report.delay(cec_report_payload)
 
     return {"status": "ok", "credential_id": credential_id}
+
+
+# ---------------------------------------------------------------------------
+# Notification Helper
+# ---------------------------------------------------------------------------
+
+
+def _create_notification(
+    db,
+    student_id: uuid.UUID,
+    type_: str,
+    title: str,
+    body: str,
+    action_url: str | None = None,
+) -> None:
+    """Create an in-app notification record (call inside an open SyncSessionLocal context)."""
+    from src.db.lms_models import LMSNotification
+
+    n = LMSNotification(
+        student_id=student_id,
+        type=type_,
+        title=title,
+        body=body,
+        action_url=action_url,
+    )
+    db.add(n)
+    # Caller is responsible for committing
 
 
 # ---------------------------------------------------------------------------
@@ -553,3 +590,139 @@ def send_iicrc_cec_report(self, data: dict) -> dict:
             # Exponential backoff: 5m → 30m → 2h
             countdown = [300, 1800, 7200][min(self.request.retries, 2)]
             raise self.retry(exc=exc, countdown=countdown)
+
+
+# ---------------------------------------------------------------------------
+# Welcome Email Sequence (B4)
+# ---------------------------------------------------------------------------
+
+
+@celery_app.task(name="send_welcome_email")
+def send_welcome_email(data: dict) -> dict:
+    """
+    Day 0 welcome — sent when student first enrols in a course.
+
+    data keys: student_id, course_title, course_slug
+    """
+    import os
+
+    from sqlalchemy import select
+
+    from src.db.lms_models import LMSUser
+    from src.services.email_service import email_service
+
+    student_id = uuid.UUID(data["student_id"])
+    course_title = data.get("course_title", "your course")
+    course_slug = data.get("course_slug", "")
+
+    with SyncSessionLocal() as db:
+        user = db.execute(select(LMSUser).where(LMSUser.id == student_id)).scalar_one_or_none()
+        if not user:
+            return {"status": "user_not_found"}
+        name = user.full_name or user.email
+        email = user.email
+
+    frontend_url = os.getenv("NEXT_PUBLIC_FRONTEND_URL", "https://carsi.com.au")
+    course_url = f"{frontend_url}/courses/{course_slug}" if course_slug else f"{frontend_url}/student"
+
+    html_body = f"""
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;
+             background: #060a14; color: #fff; padding: 40px 40px 32px;">
+  <span style="font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+               color: rgba(255,255,255,0.35);">Welcome to CARSI</span>
+  <h1 style="color: #2490ed; font-size: 24px; font-weight: 700; margin: 16px 0 8px;">
+    You're enrolled, {name}!
+  </h1>
+  <p style="color: rgba(255,255,255,0.7); font-size: 14px; line-height: 1.7; margin: 0 0 24px;">
+    You've just enrolled in <strong style="color: #fff;">{course_title}</strong>.
+    When you're ready, jump straight into your first lesson.
+  </p>
+  <a href="{course_url}" style="display: inline-block; background: #2490ed; color: #fff;
+     padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: 600;
+     font-size: 14px; margin-bottom: 28px;">Start Learning →</a>
+  <p style="color: rgba(255,255,255,0.4); font-size: 12px; margin: 0 0 4px;">
+    Questions? Reply to this email or visit <a href="{frontend_url}/contact"
+    style="color: #2490ed;">carsi.com.au/contact</a>
+  </p>
+  <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.08); margin: 24px 0 16px;">
+  <p style="color: rgba(255,255,255,0.2); font-size: 11px; margin: 0;">
+    CARSI — Cleaning and Restoration Science Institute · carsi.com.au
+  </p>
+</div>"""
+
+    try:
+        email_service.send_email(to=email, subject=f"Welcome to CARSI — {course_title}", html_body=html_body)
+        return {"status": "sent"}
+    except Exception:
+        return {"status": "error"}
+
+
+@celery_app.task(name="send_reengagement_email")
+def send_reengagement_email(data: dict) -> dict:
+    """
+    Re-engagement nudge for inactive students.
+
+    data keys: student_id, days_inactive (14 | 30 | 60), course_title, course_slug
+    """
+    import os
+
+    from sqlalchemy import select
+
+    from src.db.lms_models import LMSUser
+    from src.services.email_service import email_service
+
+    student_id = uuid.UUID(data["student_id"])
+    days = int(data.get("days_inactive", 14))
+    course_title = data.get("course_title", "your course")
+    course_slug = data.get("course_slug", "")
+
+    with SyncSessionLocal() as db:
+        user = db.execute(select(LMSUser).where(LMSUser.id == student_id)).scalar_one_or_none()
+        if not user:
+            return {"status": "user_not_found"}
+        name = user.full_name or user.email
+        email = user.email
+
+    frontend_url = os.getenv("NEXT_PUBLIC_FRONTEND_URL", "https://carsi.com.au")
+    course_url = f"{frontend_url}/courses/{course_slug}" if course_slug else f"{frontend_url}/student"
+
+    if days <= 14:
+        subject = f"Still working on {course_title}?"
+        message = "It looks like you haven't visited your course in a while. You're making great progress — don't lose momentum."
+    elif days <= 30:
+        subject = f"Your CARSI progress is waiting"
+        message = f"It's been {days} days since your last lesson. Your industry peers are upskilling daily — come back and keep your edge."
+    else:
+        subject = "We miss you at CARSI"
+        message = "It's been a while. Your course enrolment is still active and your progress is saved — pick up right where you left off."
+
+    html_body = f"""
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;
+             background: #060a14; color: #fff; padding: 40px 40px 32px;">
+  <h1 style="color: #ed9d24; font-size: 22px; font-weight: 700; margin: 0 0 16px;">
+    {subject}
+  </h1>
+  <p style="color: rgba(255,255,255,0.75); font-size: 14px; line-height: 1.7; margin: 0 0 8px;">
+    Hi {name},
+  </p>
+  <p style="color: rgba(255,255,255,0.75); font-size: 14px; line-height: 1.7; margin: 0 0 24px;">
+    {message}
+  </p>
+  <p style="color: rgba(255,255,255,0.6); font-size: 13px; margin: 0 0 24px;">
+    Course: <strong style="color: #fff;">{course_title}</strong>
+  </p>
+  <a href="{course_url}" style="display: inline-block; background: #ed9d24; color: #fff;
+     padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: 600;
+     font-size: 14px; margin-bottom: 28px;">Continue Learning →</a>
+  <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.08); margin: 24px 0 16px;">
+  <p style="color: rgba(255,255,255,0.2); font-size: 11px; margin: 0;">
+    CARSI — carsi.com.au · <a href="{frontend_url}/student" style="color: rgba(255,255,255,0.3);">
+    Manage notifications</a>
+  </p>
+</div>"""
+
+    try:
+        email_service.send_email(to=email, subject=subject, html_body=html_body)
+        return {"status": "sent"}
+    except Exception:
+        return {"status": "error"}

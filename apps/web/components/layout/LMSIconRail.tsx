@@ -12,6 +12,7 @@ import {
   Settings,
 } from 'lucide-react';
 import { useAuth } from '@/components/auth/auth-provider';
+import { NotificationBell } from '@/components/lms/NotificationBell';
 
 interface NavItem {
   icon: typeof LayoutDashboard;
@@ -130,6 +131,7 @@ export function LMSIconRail() {
 
       {/* Bottom nav */}
       <div className="flex w-full flex-col items-center gap-0.5 px-1.5">
+        <NotificationBell />
         <Link
           href="/dashboard/settings"
           title="Settings"

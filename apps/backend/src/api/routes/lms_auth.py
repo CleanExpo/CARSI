@@ -8,7 +8,7 @@ GET  /api/lms/auth/me        — current user profile
 
 from datetime import timedelta
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, status
 from pydantic import BaseModel, EmailStr, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -17,7 +17,7 @@ from sqlalchemy.orm import selectinload
 from src.auth.jwt import create_access_token, get_password_hash, verify_password
 from src.config.database import get_async_db
 from src.config.settings import get_settings
-from src.db.lms_models import LMSRole, LMSUser, LMSUserRole
+from src.db.lms_models import LMSRole, LMSUser, LMSUserRole, LMSUserSession
 from src.api.deps_lms import get_current_lms_user
 
 router = APIRouter(prefix="/api/lms/auth", tags=["lms-auth"])
@@ -135,6 +135,8 @@ async def register(
 @router.post("/login", response_model=TokenResponse)
 async def login(
     data: LoginRequest,
+    request: Request,
+    background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_async_db),
 ) -> TokenResponse:
     """Authenticate and return a JWT token."""
@@ -165,6 +167,26 @@ async def login(
     )
 
     primary_role = user.roles[0] if user.roles else "student"
+
+    # Record session start (best-effort, non-blocking)
+    user_id_for_session = user.id
+    ip = request.client.host if request.client else None
+    ua = request.headers.get("User-Agent")
+
+    async def _record_session() -> None:
+        from src.config.database import AsyncSessionLocal
+        async with AsyncSessionLocal() as session:
+            try:
+                session.add(LMSUserSession(
+                    student_id=user_id_for_session,
+                    ip_address=ip,
+                    user_agent=ua,
+                ))
+                await session.commit()
+            except Exception:
+                await session.rollback()
+
+    background_tasks.add_task(_record_session)
 
     return TokenResponse(
         access_token=token,

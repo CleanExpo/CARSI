@@ -11,7 +11,7 @@ from sqlalchemy.orm import joinedload
 from src.api.deps_lms import get_current_lms_user
 from src.api.schemas.lms_lessons import LessonOut
 from src.config.database import get_async_db
-from src.db.lms_models import LMSLesson, LMSModule, LMSSubscription, LMSUser
+from src.db.lms_models import LMSLesson, LMSLessonView, LMSModule, LMSSubscription, LMSUser
 
 router = APIRouter(prefix="/api/lms/lessons", tags=["lms-lessons"])
 modules_router = APIRouter(prefix="/api/lms/modules", tags=["lms-lessons"])
@@ -105,6 +105,17 @@ async def get_lesson(
                     status_code=status.HTTP_403_FORBIDDEN,
                     detail="An active subscription is required to access course content.",
                 )
+
+    # Record lesson view for analytics (best-effort — never blocks the response)
+    try:
+        db.add(LMSLessonView(
+            student_id=current_user.id,
+            lesson_id=lesson.id,
+            course_id=lesson.module.course_id,
+        ))
+        await db.commit()
+    except Exception:
+        await db.rollback()
 
     return _to_out(lesson, lesson.module.course_id)
 

@@ -707,3 +707,55 @@ class LMSGoogleOAuthToken(Base):
     scopes = Column(Text, nullable=False)
     created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
     updated_at = Column(DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+# ---------------------------------------------------------------------------
+# Session Tracking (Migration 014)
+# ---------------------------------------------------------------------------
+
+
+class LMSUserSession(Base):
+    __tablename__ = "lms_user_sessions"
+
+    id = Column(PGUUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    student_id = Column(PGUUID(as_uuid=True), ForeignKey("lms_users.id", ondelete="CASCADE"), nullable=False)
+    session_start = Column(DateTime(timezone=True), default=datetime.utcnow, nullable=False)
+    session_end = Column(DateTime(timezone=True))
+    ip_address = Column(String(45))
+    user_agent = Column(Text)
+
+    student = relationship("LMSUser")
+
+
+class LMSLessonView(Base):
+    __tablename__ = "lms_lesson_views"
+
+    id = Column(PGUUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    student_id = Column(PGUUID(as_uuid=True), ForeignKey("lms_users.id", ondelete="CASCADE"), nullable=False)
+    lesson_id = Column(PGUUID(as_uuid=True), ForeignKey("lms_lessons.id", ondelete="CASCADE"), nullable=False)
+    course_id = Column(PGUUID(as_uuid=True), ForeignKey("lms_courses.id", ondelete="CASCADE"), nullable=False)
+    viewed_at = Column(DateTime(timezone=True), default=datetime.utcnow, nullable=False)
+    duration_seconds = Column(Integer, default=0)
+
+    student = relationship("LMSUser")
+
+
+# ---------------------------------------------------------------------------
+# In-App Notifications (Migration 015)
+# ---------------------------------------------------------------------------
+
+
+class LMSNotification(Base):
+    __tablename__ = "lms_notifications"
+
+    id = Column(PGUUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    student_id = Column(PGUUID(as_uuid=True), ForeignKey("lms_users.id", ondelete="CASCADE"), nullable=False)
+    type = Column(String(50), nullable=False)
+    title = Column(String(255), nullable=False)
+    body = Column(Text, nullable=False)
+    action_url = Column(String(500))
+    is_read = Column(Boolean, nullable=False, default=False)
+    created_at = Column(DateTime(timezone=True), default=datetime.utcnow, nullable=False)
+    read_at = Column(DateTime(timezone=True))
+
+    student = relationship("LMSUser")
