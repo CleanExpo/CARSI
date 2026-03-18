@@ -11,9 +11,10 @@ Uses: admin user ecb3011b-04b8-462f-9a5f-2f2bedcf761f (admin@carsi.com.au)
 import json
 import sys
 import urllib.request
+import os
 import urllib.error
 
-BASE_URL = "http://localhost:8000"
+BASE_URL = os.environ.get("CARSI_API_URL", "http://localhost:8000")
 ADMIN_USER_ID = "ecb3011b-04b8-462f-9a5f-2f2bedcf761f"
 
 HEADERS = {
