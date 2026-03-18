@@ -68,7 +68,7 @@ Query knowledge sources before loading docs into context. See `.claude/rules/ret
 | ------------------------- | ------------------------------------------------- | ----------------------------------------- |
 | **NotebookLM**            | Architecture, debugging, security, onboarding     | `nlm notebook query <id>`                 |
 | **Context7 MCP**          | Library docs (Next.js, FastAPI, Playwright, etc.) | `resolve-library-id` → `get-library-docs` |
-| **Skills** (59 installed) | Pattern libraries                                 | `.skills/custom/*/SKILL.md`               |
+| **Skills** (67 installed) | Pattern libraries                                 | `.skills/custom/*/SKILL.md`               |
 | **Jina Reader**           | Web content extraction                            | `https://r.jina.ai/{url}`                 |
 
 NotebookLM config: `.claude/notebooklm/notebooks.json`
@@ -113,6 +113,18 @@ NEXT_PUBLIC_API_URL=http://localhost:8000
 ```
 
 Optional env vars: see `.env.example`
+
+## Production Deployment
+
+| Layer    | Platform      | URL / Notes                              |
+| -------- | ------------- | ---------------------------------------- |
+| Frontend | Vercel        | https://carsi-web.vercel.app             |
+| Backend  | DigitalOcean  | Docker container (migrating from Fly.io) |
+| Database | Supabase / DO | PostgreSQL 15 + pgvector                 |
+| Email    | Mailpit (dev) | localhost:8025                           |
+
+**Migration in progress**: Fly.io → DigitalOcean (Docker + managed Postgres)
+Fly.io config files in `fly.toml`, `Dockerfile` are being superseded by `docker-compose.prod.yml` + DO droplet.
 
 ## State Store
 
@@ -170,11 +182,25 @@ cat .claude/memory/current-state.md  # Check saved state
 
 Full documentation: `.claude/rules/context-drift.md`
 
+## Testing Discipline
+
+**Iron Law**: No production code without a failing test first. See `.skills/custom/tdd/SKILL.md`.
+
+| Layer    | Runner | Location              | Command                               |
+| -------- | ------ | --------------------- | ------------------------------------- |
+| Frontend | vitest | `apps/web/__tests__/` | `pnpm test --filter=web`              |
+| Backend  | pytest | `apps/backend/tests/` | `cd apps/backend && uv run pytest -v` |
+| All      | turbo  | Both                  | `pnpm turbo run test`                 |
+
+**Three mandatory skills**: `tdd` | `systematic-debugging` | `verification-before-completion`
+
+**Banned phrases** (run the command instead): "should work", "probably passes", "seems correct", "likely fixed"
+
 ## Agents & Skills
 
-- **23 subagents**: `.claude/agents/*/agent.md`
-- **59 skills**: `.skills/AGENTS.md` (full registry)
-- **10 commands**: `.claude/commands/*.md`
+- **31 subagents**: `.claude/agents/*/agent.md`
+- **67 skills**: `.skills/AGENTS.md` (full registry)
+- **14 commands**: `.claude/commands/*.md`
 - **Orchestrator**: `.claude/agents/orchestrator/agent.md`
 
 ## Documentation
