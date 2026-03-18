@@ -4,6 +4,8 @@ import { LearningPathwayCard } from '@/components/lms/LearningPathwayCard';
 import { StudentJourneyMap } from '@/components/lms/diagrams/StudentJourneyMap';
 import { AcronymTooltip } from '@/components/ui/AcronymTooltip';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'IICRC Learning Pathways — Which Restoration Certification Path Is Right for You? | CARSI',
   description:

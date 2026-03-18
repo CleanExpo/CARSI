@@ -11,6 +11,8 @@ import { AgentList } from './components/AgentList';
 import { TaskHistory } from './components/TaskHistory';
 import { PerformanceTrends } from './components/PerformanceTrends';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'Agent Dashboard | Agentic Layer',
   description: 'Monitor autonomous agent performance and metrics',

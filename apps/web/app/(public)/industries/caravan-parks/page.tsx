@@ -10,6 +10,8 @@ import {
 } from '@/components/industries';
 import { FAQSchema } from '@/components/seo/JsonLd';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'IICRC Mould & Restoration Training for Caravan Parks | CARSI Australia',
   description:

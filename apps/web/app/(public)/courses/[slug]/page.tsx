@@ -7,6 +7,8 @@ import { EnrolButton } from '@/components/lms/EnrolButton';
 import { CourseHubContext } from '@/components/lms/CourseHubContext';
 import { CourseSchema, BreadcrumbSchema } from '@/components/seo';
 
+export const dynamic = 'force-dynamic';
+
 interface CourseDetail {
   id: string;
   slug: string;

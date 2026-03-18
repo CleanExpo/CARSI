@@ -7,6 +7,8 @@ import { CECCalculator } from '@/components/tools/CECCalculator';
 import { AcronymTooltip } from '@/components/ui/AcronymTooltip';
 import { IICRCDisciplineMap } from '@/components/lms/diagrams/IICRCDisciplineMap';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'IICRC-Approved Restoration Training Courses | CARSI',
   description:

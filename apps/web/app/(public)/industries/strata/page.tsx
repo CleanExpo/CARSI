@@ -9,6 +9,8 @@ import {
   ContractorAddOns,
 } from '@/components/industries';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'Strata & Body Corporate IICRC Training | CARSI',
   description:

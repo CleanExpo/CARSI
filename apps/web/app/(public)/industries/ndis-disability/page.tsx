@@ -10,6 +10,8 @@ import {
 } from '@/components/industries';
 import { FAQSchema } from '@/components/seo/JsonLd';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'IICRC Training for NDIS & Disability Services | CARSI Australia',
   description:

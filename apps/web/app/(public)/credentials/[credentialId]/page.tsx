@@ -2,6 +2,8 @@ import { CredentialVerificationCard } from '@/components/lms/CredentialVerificat
 import { CertificatePreview } from '@/components/lms/diagrams/CertificatePreview';
 import { notFound } from 'next/navigation';
 
+export const dynamic = 'force-dynamic';
+
 async function getCredential(credentialId: string) {
   const apiUrl = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8000';
   const res = await fetch(`${apiUrl}/api/lms/credentials/${credentialId}`, {
