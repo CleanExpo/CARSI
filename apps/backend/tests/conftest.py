@@ -1,7 +1,12 @@
 """Pytest configuration and fixtures."""
 
+import os
+
 import pytest
 from httpx import AsyncClient, ASGITransport
+
+# Disable CSRF protection during tests — tests don't send CSRF cookies/headers
+os.environ.setdefault("TESTING", "true")
 
 from src.api.main import app
 from src.api.middleware.rate_limit import RateLimitMiddleware

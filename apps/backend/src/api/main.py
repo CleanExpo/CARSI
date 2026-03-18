@@ -12,6 +12,7 @@ from src.config import get_settings
 from src.utils import get_logger, setup_logging
 
 from .middleware.auth import AuthMiddleware
+from .middleware.csrf import CSRFMiddleware
 from .middleware.rate_limit import RateLimitMiddleware
 from .middleware.request_id import RequestIdMiddleware
 from .middleware.security_headers import SecurityHeadersMiddleware
@@ -100,6 +101,7 @@ app.add_middleware(
 
 # Custom middleware (executed bottom-to-top: RequestId runs first)
 app.add_middleware(SecurityHeadersMiddleware)
+app.add_middleware(CSRFMiddleware)
 app.add_middleware(RateLimitMiddleware)
 app.add_middleware(AuthMiddleware)
 app.add_middleware(RequestIdMiddleware)
