@@ -1,24 +1,35 @@
 # Current State
 
-> Updated by PreCompact hook. Session: d77a9846
+> Updated: 22/03/2026 13:15 AEST
 
 ## Active Task
 
-Compaction triggered — context was saved at 18/03/2026 16:00 AEST.
-Re-read CONSTITUTION.md if rules feel unclear after compaction.
+WordPress migration pipeline COMPLETE.
 
-## Recent Architectural Choices
+## Completed This Session
 
-See architectural-decisions.md for logged decisions.
+1. **WordPress Export** - 150 courses, 145 posts, 73 pages exported to `data/wordpress-export/`
+2. **Database Seeding** - 134 new courses imported (226 total, 217 published)
+3. **Security Fix** - Removed hardcoded WooCommerce API keys from wp-migrate.ts
+4. **Schema Fix** - Added missing `tier` column, stamped Alembic to 023
 
-## In-Progress Work
+## Key Commits
 
-Check recent git status: `git status` and `git log --oneline -5`
+- `22ba4a3` - feat(migration): WordPress course seed script + security fixes
+- `ba58418` - feat(migration): add WooCommerce API auth + run WordPress export
+- `a4a560a` - feat(migration): WordPress scraper + Supabase LMS schema with proper RLS
+
+## Stashed Work
+
+Image organization work stashed: "WIP: image organization work (sitemap, JsonLd, OptimizedImage)"
+Run `git stash pop` to resume.
 
 ## Next Steps
 
-Re-read .claude/memory/CONSTITUTION.md to restore rule context.
+1. Review imported courses in admin panel
+2. Add IICRC discipline and CEC hours to courses
+3. Consider rotating WooCommerce API keys (were briefly exposed)
 
 ## Last Updated
 
-18/03/2026 16:00 AEST (PreCompact hook)
+22/03/2026 13:15 AEST
