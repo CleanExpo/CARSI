@@ -10,7 +10,8 @@ const PROTECTED_PREFIXES = [
   '/instructor',
   '/admin',
   '/subscribe',
-  '/courses', // lessons + quizzes require enrolment — gate at middleware level
+  // '/courses' intentionally NOT protected — catalog must be public for SEO
+  // Individual lesson/quiz pages check enrolment via API calls
   '/dashboard', // hide starter template from unauthenticated users
   '/tasks',
   '/agents',
