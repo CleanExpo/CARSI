@@ -97,3 +97,5 @@ ai-review/screenshots/
 .claude/data/minion-state.json
 .worktrees/
 .env*.local
+# WordPress migration export (regenerate with: pnpm wp:migrate)
+data/wordpress-export/

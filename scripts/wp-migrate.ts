@@ -31,6 +31,12 @@ const WC_API_BASE = `${WP_BASE_URL}/wp-json/wc/v3`; // WooCommerce (requires aut
 const OUTPUT_DIR = path.join(__dirname, '..', 'data', 'wordpress-export');
 const SUPABASE_SEED_PATH = path.join(__dirname, '..', 'supabase', 'seed.sql');
 
+// WooCommerce API credentials
+const WC_CONSUMER_KEY =
+  process.env.WC_CONSUMER_KEY || 'ck_9a0cf170745390189aa90e26b6d6722336c25528';
+const WC_CONSUMER_SECRET =
+  process.env.WC_CONSUMER_SECRET || 'cs_00960ebae3375cb063d04415defc7ebfc371f58b';
+
 // Rate limiting — be respectful to the production site
 const DELAY_MS = 500;
 const PER_PAGE = 100;
@@ -333,29 +339,76 @@ async function fetchMedia(): Promise<WPMedia[]> {
   return fetchAllPages<WPMedia>(`${WP_API_BASE}/media`);
 }
 
-async function fetchProducts(): Promise<WPProduct[]> {
-  console.log('\n--- Fetching Products (WooCommerce) ---');
+async function fetchWooCommerceProducts(): Promise<WPProduct[]> {
+  console.log('\n--- Fetching Products (WooCommerce API) ---');
+  const results: WPProduct[] = [];
+  let page = 1;
+  let hasMore = true;
 
-  // Try public product endpoints first (custom post type)
-  // WooCommerce products might be exposed via REST
-  try {
-    // Try custom endpoint first (some themes expose this)
-    const products = await fetchAllPages<WPProduct>(`${WP_API_BASE}/product`, {});
-    if (products.length > 0) {
-      return products;
+  // Create Basic Auth header for WooCommerce
+  const authHeader =
+    'Basic ' + Buffer.from(`${WC_CONSUMER_KEY}:${WC_CONSUMER_SECRET}`).toString('base64');
+
+  while (hasMore) {
+    const url = `${WC_API_BASE}/products?per_page=${PER_PAGE}&page=${page}`;
+    console.log(`Fetching: ${url}`);
+
+    try {
+      const response = await fetch(url, {
+        headers: {
+          Accept: 'application/json',
+          'User-Agent': 'CARSI-Migration-Script/1.0',
+          Authorization: authHeader,
+        },
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          console.error('WooCommerce API authentication failed. Check your API keys.');
+          return results;
+        }
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const data = (await response.json()) as WPProduct[];
+      results.push(...data);
+      console.log(`  Fetched ${data.length} products (total: ${results.length})`);
+
+      // Check if there are more pages
+      const totalPages = parseInt(response.headers.get('X-WP-TotalPages') || '1');
+      hasMore = page < totalPages;
+      page++;
+
+      await delay(DELAY_MS);
+    } catch (error) {
+      console.error(`Error fetching ${url}:`, error);
+      hasMore = false;
     }
-  } catch {
-    console.log('No public product endpoint, trying courses...');
   }
 
-  // Try LearnDash courses if available
+  return results;
+}
+
+async function fetchProducts(): Promise<WPProduct[]> {
+  console.log('\n--- Fetching Products ---');
+
+  // Try WooCommerce API with authentication first
+  if (WC_CONSUMER_KEY && WC_CONSUMER_SECRET) {
+    console.log('Using WooCommerce API with authentication...');
+    const wcProducts = await fetchWooCommerceProducts();
+    if (wcProducts.length > 0) {
+      console.log(`Found ${wcProducts.length} WooCommerce products`);
+      return wcProducts;
+    }
+  }
+
+  // Fallback: Try LearnDash courses if WooCommerce fails
   try {
     const courses = await fetchAllPages<WPPost>(`${WP_API_BASE}/sfwd-courses`, {
       _embed: 'wp:featuredmedia',
     });
     if (courses.length > 0) {
       console.log(`Found ${courses.length} LearnDash courses`);
-      // Convert to product format
       return courses.map((course) => ({
         id: course.id,
         name: stripHTML(course.title.rendered),
@@ -387,14 +440,7 @@ async function fetchProducts(): Promise<WPProduct[]> {
     console.log('No LearnDash courses found');
   }
 
-  // Fallback: scrape product pages directly
-  console.log(
-    'WooCommerce REST API requires authentication for products.',
-    '\nTo fetch products, you need to:',
-    '\n  1. Add WooCommerce API keys to environment',
-    '\n  2. Or export products via WP Admin > WooCommerce > Products > Export'
-  );
-
+  console.log('No products found via any method.');
   return [];
 }
 
