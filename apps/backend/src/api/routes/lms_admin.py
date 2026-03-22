@@ -703,3 +703,80 @@ async def get_audit_log(
         ],
         total=total,
     )
+
+
+# ---------------------------------------------------------------------------
+# Bulk course seeding (for production data migration)
+# ---------------------------------------------------------------------------
+
+
+class BulkCourseIn(BaseModel):
+    slug: str
+    title: str
+    description: str | None = None
+    status: str = "published"
+    price_aud: float = 0.0
+    tier: str = "foundation"
+    iicrc_discipline: str | None = None
+    cec_hours: float | None = None
+    meta: dict | None = None
+
+
+class BulkSeedRequest(BaseModel):
+    courses: list[BulkCourseIn]
+
+
+class BulkSeedResult(BaseModel):
+    inserted: int
+    skipped: int
+    errors: list[str]
+
+
+@router.post("/seed-courses", response_model=BulkSeedResult)
+async def bulk_seed_courses(
+    data: BulkSeedRequest,
+    db: AsyncSession = Depends(get_async_db),
+    current_user: LMSUser = Depends(get_current_lms_user),
+) -> BulkSeedResult:
+    """
+    Bulk insert courses from migration data (admin only).
+
+    Idempotent — skips courses where slug already exists.
+    Used for production seeding of WordPress-exported courses.
+    """
+    _require_admin(current_user)
+
+    inserted = 0
+    skipped = 0
+    errors: list[str] = []
+
+    for course_data in data.courses:
+        # Check if slug already exists
+        existing = await db.execute(
+            select(LMSCourse).where(LMSCourse.slug == course_data.slug)
+        )
+        if existing.scalar_one_or_none():
+            skipped += 1
+            continue
+
+        try:
+            course = LMSCourse(
+                slug=course_data.slug,
+                title=course_data.title,
+                description=course_data.description,
+                instructor_id=current_user.id,
+                status=course_data.status,
+                price_aud=course_data.price_aud,
+                tier=course_data.tier,
+                iicrc_discipline=course_data.iicrc_discipline,
+                cec_hours=course_data.cec_hours,
+                meta=course_data.meta or {},
+            )
+            db.add(course)
+            inserted += 1
+        except Exception as exc:
+            errors.append(f"{course_data.slug}: {str(exc)}")
+
+    await db.commit()
+
+    return BulkSeedResult(inserted=inserted, skipped=skipped, errors=errors)
