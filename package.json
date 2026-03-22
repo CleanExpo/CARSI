@@ -34,11 +34,18 @@
     "ai:finished:audit": "bash scripts/governance-check.sh && npx ts-node src/ai/audits/visual-audit.ts",
     "ai:governance:check": "bash templates/governance-framework/governance-check.sh",
     "starter:audit": "bash scripts/starter-audit.sh",
-    "starter:adopt": "bash scripts/starter-adopt.sh"
+    "starter:adopt": "bash scripts/starter-adopt.sh",
+    "wp:migrate": "npx ts-node scripts/wp-migrate.ts",
+    "wp:migrate:dry-run": "npx ts-node scripts/wp-migrate.ts --dry-run",
+    "wp:redirects": "npx ts-node scripts/generate-redirects.ts",
+    "supabase:reset": "supabase db reset",
+    "supabase:push": "supabase db push",
+    "supabase:types": "supabase gen types typescript --local > apps/web/types/database.ts"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.3",
     "@types/node": "^22.10.0",
+    "ts-node": "^10.9.2",
     "husky": "^9.1.7",
     "lint-staged": "^15.2.10",
     "prettier": "^3.4.2",

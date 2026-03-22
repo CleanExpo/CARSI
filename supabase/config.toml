@@ -1,5 +1,5 @@
 # A string used to distinguish different Supabase projects on the same host.
-project_id = "claude-agent-orchestration"
+project_id = "carsi-lms"
 
 [api]
 enabled = true
@@ -57,7 +57,11 @@ enabled = false
 enabled = false
 
 [auth.external.google]
-enabled = false
+enabled = true
+client_id = "env(GOOGLE_CLIENT_ID)"
+secret = "env(GOOGLE_CLIENT_SECRET)"
+redirect_uri = "http://127.0.0.1:54321/auth/v1/callback"
+# Production: redirect_uri = "https://api.carsi.com.au/auth/v1/callback"
 
 [analytics]
 enabled = false
