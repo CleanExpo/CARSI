@@ -31,11 +31,9 @@ const WC_API_BASE = `${WP_BASE_URL}/wp-json/wc/v3`; // WooCommerce (requires aut
 const OUTPUT_DIR = path.join(__dirname, '..', 'data', 'wordpress-export');
 const SUPABASE_SEED_PATH = path.join(__dirname, '..', 'supabase', 'seed.sql');
 
-// WooCommerce API credentials
-const WC_CONSUMER_KEY =
-  process.env.WC_CONSUMER_KEY || 'ck_9a0cf170745390189aa90e26b6d6722336c25528';
-const WC_CONSUMER_SECRET =
-  process.env.WC_CONSUMER_SECRET || 'cs_00960ebae3375cb063d04415defc7ebfc371f58b';
+// WooCommerce API credentials (from environment)
+const WC_CONSUMER_KEY = process.env.WC_CONSUMER_KEY || '';
+const WC_CONSUMER_SECRET = process.env.WC_CONSUMER_SECRET || '';
 
 // Rate limiting — be respectful to the production site
 const DELAY_MS = 500;
