@@ -18,6 +18,11 @@ EXEMPT_PATHS = {
     "/openapi.json",
     "/redoc",
     "/api/lms/webhooks/stripe",  # Stripe uses HMAC signature verification instead
+    "/api/lms/auth/login",       # Credential-based — CSRF N/A for public auth endpoints
+    "/api/lms/auth/register",
+    "/api/lms/auth/logout",
+    "/api/lms/auth/forgot-password",
+    "/api/lms/auth/reset-password",
 }
 
 
