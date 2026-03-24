@@ -21,6 +21,7 @@ module.exports = [
       "**/dist/**",
       "**/build/**",
       "**/coverage/**",
+      "e2e/**",
     ],
   },
 
@@ -56,7 +57,6 @@ module.exports = [
       "src/**/*.test.{js,jsx,ts,tsx}",
       "src/**/*.spec.{js,jsx,ts,tsx}",
       "tests/**/*.{js,jsx,ts,tsx}",
-      "e2e/**/*.{js,jsx,ts,tsx}",
     ],
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
