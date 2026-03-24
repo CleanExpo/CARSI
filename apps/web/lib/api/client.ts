@@ -110,6 +110,16 @@ async function fetchApi<T>(
 
     clearTimeout(timeoutId);
 
+    // Handle 429 — surface a clear rate-limit error, do not retry
+    if (response.status === 429) {
+      const retryAfter = response.headers.get('Retry-After') ?? '60';
+      throw new ApiClientError(
+        `Too many requests. Please wait ${retryAfter} seconds before trying again.`,
+        429,
+        'RATE_LIMITED'
+      );
+    }
+
     // Handle 401 — attempt token refresh once
     if (response.status === 401 && !didRefresh) {
       const refreshed = await attemptTokenRefresh();

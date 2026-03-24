@@ -60,6 +60,19 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      { source: '/council-demo', destination: '/', permanent: true },
+      { source: '/council-demo/:path*', destination: '/', permanent: true },
+      { source: '/design-system', destination: '/', permanent: true },
+      { source: '/design-system/:path*', destination: '/', permanent: true },
+      { source: '/status-demo', destination: '/', permanent: true },
+      { source: '/status-demo/:path*', destination: '/', permanent: true },
+      { source: '/prd', destination: '/', permanent: true },
+      { source: '/prd/:path*', destination: '/', permanent: true },
+    ];
+  },
+
   async headers() {
     return [
       {

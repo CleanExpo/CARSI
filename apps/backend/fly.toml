@@ -27,7 +27,7 @@ primary_region = "syd"
   ENVIRONMENT = "production"
   PORT = "8000"
   AI_PROVIDER = "anthropic"
-  CORS_ORIGINS = '["https://carsi.com.au","https://www.carsi.com.au","https://carsi-web.vercel.app","https://carsi-backend.fly.dev"]'
+  CORS_ORIGINS = '["https://carsi.com.au","https://www.carsi.com.au","https://carsi-web.vercel.app","https://carsi-backend.fly.dev","https://api.carsi.com.au"]'
 
   # Email configuration (SMTP_PASS is a secret — set via fly secrets)
   SMTP_HOST = "smtp.resend.com"
@@ -46,6 +46,12 @@ primary_region = "syd"
   auto_stop_machines = false
   auto_start_machines = true
   min_machines_running = 1
+
+  # Custom domain — api.carsi.com.au → carsi-backend.fly.dev
+  # DNS: CNAME api.carsi.com.au → carsi-backend.fly.dev
+  # Then run: flyctl certs create api.carsi.com.au --app carsi-backend
+  [[http_service.custom_domains]]
+    hostname = "api.carsi.com.au"
 
   # Health check — maps to FastAPI /health endpoint
   [[http_service.checks]]
