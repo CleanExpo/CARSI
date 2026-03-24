@@ -20,7 +20,7 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"],
+      "@/*": ["./src/*"],
       "@shared/*": ["../../packages/shared/src/*"]
     }
   },
@@ -34,11 +34,10 @@
   "exclude": [
     "node_modules",
     "tests/**/*",
-    "src/app/demo/**/*",
     "src/components/JobCard.tsx",
-    "lib/image-generation/*",
-    "lib/image-generation/**/*",
-    "app/api/generate-image/*",
-    "hooks/use-image-generation.ts"
+    "src/lib/image-generation/*",
+    "src/lib/image-generation/**/*",
+    "src/app/api/generate-image/*",
+    "src/hooks/use-image-generation.ts"
   ]
 }

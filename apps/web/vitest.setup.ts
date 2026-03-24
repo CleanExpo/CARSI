@@ -27,5 +27,8 @@ vi.mock('next/navigation', () => ({
   useSearchParams: () => new URLSearchParams(),
 }));
 
-// Mock environment variables
-process.env.NEXT_PUBLIC_BACKEND_URL = 'http://localhost:8000';
+// Same-origin default for getBackendOrigin() in tests (no separate API)
+process.env.NEXT_PUBLIC_APP_URL = 'http://localhost:3000';
+delete process.env.NEXT_PUBLIC_BACKEND_URL;
+delete process.env.BACKEND_URL;
+delete process.env.NEXT_PUBLIC_API_URL;
