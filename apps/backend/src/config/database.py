@@ -64,7 +64,12 @@ SyncSessionLocal = sessionmaker(
 # ssl=False: Fly.io flycast network uses WireGuard for encryption; Postgres
 # doesn't expose TLS on the private address, so asyncpg must not attempt it.
 _db_url = get_database_url(async_mode=True)
-_connect_args: dict = {"ssl": False} if "flycast" in _db_url else {}
+if "flycast" in _db_url:
+    _connect_args: dict = {"ssl": False}
+elif "supabase.co" in _db_url:
+    _connect_args = {"ssl": "require"}
+else:
+    _connect_args = {}
 async_engine = create_async_engine(
     _db_url,
     echo=get_settings().debug,
