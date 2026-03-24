@@ -121,7 +121,7 @@ export const serverApiClient = {
 };
 
 /**
- * Create a server client (for compatibility with existing Supabase code)
+ * Create a server API client (legacy name preserved for callers)
  */
 export async function createClient() {
   return serverApiClient;

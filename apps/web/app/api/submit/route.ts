@@ -119,19 +119,16 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  /* 3. Resolve Supabase credentials */
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!supabaseUrl || !serviceRoleKey) {
-    console.error('[submit] Supabase credentials not configured');
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+  if (!apiUrl) {
+    console.error('[submit] NEXT_PUBLIC_API_URL is not configured');
     return NextResponse.json(
       { success: false, error: 'Service temporarily unavailable. Please try again later.' },
       { status: 503 }
     );
   }
 
-  /* 4. Build insert record */
+  /* 3. Build insert record */
   const record: HubSubmissionInsert = {
     submission_type: body.submission_type as SubmissionType,
     status: 'pending',
@@ -150,34 +147,38 @@ export async function POST(req: NextRequest) {
     user_agent: req.headers.get('user-agent'),
   };
 
-  /* 5. Insert via Supabase REST API */
+  /* 4. Forward to FastAPI hub intake */
   try {
-    const res = await fetch(`${supabaseUrl}/rest/v1/hub_submissions`, {
+    const res = await fetch(`${apiUrl.replace(/\/$/, '')}/api/hub/submissions/intake`, {
       method: 'POST',
       headers: {
-        apikey: serviceRoleKey,
-        Authorization: `Bearer ${serviceRoleKey}`,
         'Content-Type': 'application/json',
-        Prefer: 'return=representation',
+        Accept: 'application/json',
       },
       body: JSON.stringify(record),
     });
 
+    if (res.status === 503) {
+      const errJson = (await res.json().catch(() => ({}))) as { detail?: string };
+      console.error('[submit] Hub intake unavailable:', errJson.detail ?? res.statusText);
+      return NextResponse.json(
+        { success: false, error: 'Service temporarily unavailable. Please try again later.' },
+        { status: 503 }
+      );
+    }
+
     if (!res.ok) {
       const text = await res.text();
-      console.error(`[submit] Supabase insert failed (${res.status}): ${text}`);
+      console.error(`[submit] Hub intake failed (${res.status}): ${text}`);
       return NextResponse.json(
         { success: false, error: 'Failed to save submission. Please try again.' },
         { status: 502 }
       );
     }
 
-    const rows = (await res.json()) as { id: string }[];
-    const id = rows[0]?.id ?? null;
-
-    return NextResponse.json({ success: true, id }, { status: 200 });
+    return NextResponse.json({ success: true }, { status: 200 });
   } catch (err) {
-    console.error('[submit] Unexpected error during Supabase insert:', err);
+    console.error('[submit] Unexpected error during hub intake:', err);
     return NextResponse.json(
       { success: false, error: 'An unexpected error occurred. Please try again.' },
       { status: 500 }

@@ -1,10 +1,10 @@
 """
 CARSI Hub — Submission Processing Routes
 
-Admin-facing endpoints to list, view, and review incoming Hub content submissions.
-Webhook endpoint to acknowledge new submissions from Supabase INSERT events.
+Admin-facing endpoints for incoming Hub content submissions (storage not wired).
+Webhook endpoint for external triggers (e.g. database INSERT notifications).
 
-Tables (Supabase / Postgres):
+Tables (when backed by PostgreSQL):
   hub_submissions       — master intake queue
   submission_email_log  — audit trail of emails sent to submitters
 
@@ -13,14 +13,11 @@ The webhook endpoint is verified by X-Webhook-Secret header.
 """
 
 import asyncio
-import logging
-from datetime import UTC, datetime
 from enum import Enum
 from typing import Any, Optional
 
-import httpx
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request, status
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from src.api.deps_lms import get_current_lms_user
 from src.config.settings import get_settings
@@ -31,6 +28,11 @@ from src.utils import get_logger
 logger = get_logger(__name__)
 
 router = APIRouter(tags=["hub-submissions"])
+
+_HUB_STORAGE_UNAVAILABLE = (
+    "Hub submissions storage is not configured. "
+    "Wire hub_submissions to PostgreSQL (e.g. SQLAlchemy) to enable this feature."
+)
 
 
 # ---------------------------------------------------------------------------
@@ -82,51 +84,24 @@ class SubmissionListResponse(BaseModel):
     limit: int
 
 
-# ---------------------------------------------------------------------------
-# Supabase REST helpers
-# ---------------------------------------------------------------------------
+class HubSubmissionIntakeBody(BaseModel):
+    """Public form payload (mirrors frontend hub submission insert shape)."""
 
-
-def _supabase_headers() -> dict[str, str]:
-    """Return headers required for authenticated Supabase REST API calls."""
-    settings = get_settings()
-    return {
-        "apikey": settings.supabase_service_role_key,
-        "Authorization": f"Bearer {settings.supabase_service_role_key}",
-        "Content-Type": "application/json",
-        "Prefer": "return=representation",
-    }
-
-
-def _supabase_rest_url(path: str) -> str:
-    """Build a Supabase REST API URL from a table/path segment."""
-    settings = get_settings()
-    base = settings.supabase_url.rstrip("/")
-    return f"{base}/rest/v1/{path.lstrip('/')}"
-
-
-def _to_submission_out(row: dict[str, Any]) -> SubmissionOut:
-    return SubmissionOut(
-        id=row["id"],
-        submission_type=row["submission_type"],
-        status=row["status"],
-        submitter_name=row["submitter_name"],
-        submitter_email=row["submitter_email"],
-        submitter_phone=row.get("submitter_phone"),
-        submitter_company=row.get("submitter_company"),
-        submitter_role=row.get("submitter_role"),
-        submission_title=row["submission_title"],
-        submission_url=row.get("submission_url"),
-        submission_description=row.get("submission_description"),
-        submission_data=row.get("submission_data") or {},
-        reviewed_by=row.get("reviewed_by"),
-        reviewed_at=row.get("reviewed_at"),
-        review_notes=row.get("review_notes"),
-        rejection_reason=row.get("rejection_reason"),
-        needs_info_message=row.get("needs_info_message"),
-        created_at=row["created_at"],
-        updated_at=row["updated_at"],
-    )
+    submission_type: str
+    status: str = "pending"
+    submitter_name: str
+    submitter_email: str
+    submitter_phone: Optional[str] = None
+    submitter_company: Optional[str] = None
+    submitter_role: Optional[str] = None
+    submission_title: str
+    submission_url: Optional[str] = None
+    submission_description: Optional[str] = None
+    submission_data: dict[str, Any] = Field(default_factory=dict)
+    terms_accepted: bool = True
+    guidelines_accepted: bool = True
+    ip_address: Optional[str] = None
+    user_agent: Optional[str] = None
 
 
 def _require_admin(current_user: LMSUser) -> None:
@@ -137,6 +112,20 @@ def _require_admin(current_user: LMSUser) -> None:
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Admin access required",
         )
+
+
+# ---------------------------------------------------------------------------
+# Public intake (used by Next.js API route)
+# ---------------------------------------------------------------------------
+
+
+@router.post("/submissions/intake")
+async def public_submission_intake(_body: HubSubmissionIntakeBody) -> None:
+    """Accept a public Hub submission; persists when PostgreSQL storage is configured."""
+    raise HTTPException(
+        status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+        detail=_HUB_STORAGE_UNAVAILABLE,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -154,63 +143,9 @@ async def list_submissions(
 ) -> SubmissionListResponse:
     """Admin: list Hub submissions with optional filters. Ordered newest first."""
     _require_admin(current_user)
-
-    settings = get_settings()
-    if not settings.supabase_url or not settings.supabase_service_role_key:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Supabase not configured — set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY",
-        )
-
-    offset = (page - 1) * limit
-    params: dict[str, str] = {
-        "order": "created_at.desc",
-        "limit": str(limit),
-        "offset": str(offset),
-    }
-    if submission_status:
-        params["status"] = f"eq.{submission_status.value}"
-    if submission_type:
-        params["submission_type"] = f"eq.{submission_type}"
-
-    # Fetch matching rows + total count in parallel
-    count_params = dict(params)
-    count_params.pop("limit", None)
-    count_params.pop("offset", None)
-
-    headers = _supabase_headers()
-    url = _supabase_rest_url("hub_submissions")
-
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        data_resp, count_resp = await asyncio.gather(
-            client.get(url, params=params, headers=headers),
-            client.get(
-                url,
-                params=count_params,
-                headers={**headers, "Prefer": "count=exact"},
-            ),
-        )
-
-    if data_resp.status_code != 200:
-        logger.error("Supabase list_submissions failed", status=data_resp.status_code, body=data_resp.text)
-        raise HTTPException(status_code=502, detail="Failed to fetch submissions from Supabase")
-
-    rows: list[dict] = data_resp.json()
-
-    # Parse total from Content-Range header: "0-19/143"
-    total = len(rows)
-    content_range = count_resp.headers.get("content-range", "")
-    if "/" in content_range:
-        try:
-            total = int(content_range.split("/")[1])
-        except (ValueError, IndexError):
-            pass
-
-    return SubmissionListResponse(
-        data=[_to_submission_out(r) for r in rows],
-        total=total,
-        page=page,
-        limit=limit,
+    raise HTTPException(
+        status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+        detail=_HUB_STORAGE_UNAVAILABLE,
     )
 
 
@@ -226,27 +161,10 @@ async def get_submission(
 ) -> SubmissionOut:
     """Admin: retrieve a single Hub submission by ID."""
     _require_admin(current_user)
-
-    settings = get_settings()
-    if not settings.supabase_url or not settings.supabase_service_role_key:
-        raise HTTPException(status_code=503, detail="Supabase not configured")
-
-    url = _supabase_rest_url("hub_submissions")
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.get(
-            url,
-            params={"id": f"eq.{submission_id}", "limit": "1"},
-            headers=_supabase_headers(),
-        )
-
-    if resp.status_code != 200:
-        raise HTTPException(status_code=502, detail="Failed to fetch submission from Supabase")
-
-    rows = resp.json()
-    if not rows:
-        raise HTTPException(status_code=404, detail="Submission not found")
-
-    return _to_submission_out(rows[0])
+    raise HTTPException(
+        status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+        detail=_HUB_STORAGE_UNAVAILABLE,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -269,104 +187,14 @@ async def update_submission(
     - (Future) send a notification email to the submitter
     """
     _require_admin(current_user)
-
-    settings = get_settings()
-    if not settings.supabase_url or not settings.supabase_service_role_key:
-        raise HTTPException(status_code=503, detail="Supabase not configured")
-
-    headers = _supabase_headers()
-    url = _supabase_rest_url("hub_submissions")
-
-    # Fetch current row first (need submitter_email for email log)
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        fetch_resp = await client.get(
-            url,
-            params={"id": f"eq.{submission_id}", "limit": "1"},
-            headers=headers,
-        )
-
-    if fetch_resp.status_code != 200 or not fetch_resp.json():
-        raise HTTPException(status_code=404, detail="Submission not found")
-
-    existing = fetch_resp.json()[0]
-
-    # Build PATCH payload
-    now_iso = datetime.now(UTC).isoformat()
-    patch_data: dict[str, Any] = {
-        "status": body.status.value,
-        "reviewed_by": str(current_user.id),
-        "reviewed_at": now_iso,
-        "updated_at": now_iso,
-    }
-    if body.review_notes is not None:
-        patch_data["review_notes"] = body.review_notes
-    if body.rejection_reason is not None:
-        patch_data["rejection_reason"] = body.rejection_reason
-    if body.needs_info_message is not None:
-        patch_data["needs_info_message"] = body.needs_info_message
-
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        patch_resp = await client.patch(
-            url,
-            params={"id": f"eq.{submission_id}"},
-            headers=headers,
-            json=patch_data,
-        )
-
-    if patch_resp.status_code not in (200, 204):
-        logger.error(
-            "Supabase PATCH failed",
-            submission_id=submission_id,
-            status=patch_resp.status_code,
-            body=patch_resp.text,
-        )
-        raise HTTPException(status_code=502, detail="Failed to update submission")
-
-    # Log email record for status-change notifications
-    notify_statuses = {SubmissionStatus.approved, SubmissionStatus.rejected, SubmissionStatus.needs_info}
-    if body.status in notify_statuses:
-        email_type = body.status.value  # 'approved' | 'rejected' | 'needs_info'
-        await _log_submission_email(
-            submission_id=submission_id,
-            email_type=email_type,
-            recipient_email=existing["submitter_email"],
-        )
-        # Fire-and-forget status notification email
-        asyncio.create_task(
-            _send_status_notification_email(
-                submitter_name=existing["submitter_name"],
-                submitter_email=existing["submitter_email"],
-                submission_title=existing["submission_title"],
-                submission_type=existing["submission_type"],
-                new_status=body.status.value,
-                needs_info_message=body.needs_info_message,
-                rejection_reason=body.rejection_reason,
-            )
-        )
-
-    # Return updated row
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        updated_resp = await client.get(
-            url,
-            params={"id": f"eq.{submission_id}", "limit": "1"},
-            headers=headers,
-        )
-
-    updated_rows = updated_resp.json()
-    if not updated_rows:
-        raise HTTPException(status_code=502, detail="Could not retrieve updated submission")
-
-    logger.info(
-        "Submission updated",
-        submission_id=submission_id,
-        new_status=body.status.value,
-        reviewed_by=str(current_user.id),
+    raise HTTPException(
+        status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+        detail=_HUB_STORAGE_UNAVAILABLE,
     )
-    return _to_submission_out(updated_rows[0])
 
 
 # ---------------------------------------------------------------------------
-# Webhook: new submission created (Supabase INSERT trigger)
+# Webhook: new submission created (external INSERT trigger)
 # ---------------------------------------------------------------------------
 
 
@@ -376,7 +204,7 @@ async def new_submission_webhook(
     x_webhook_secret: Optional[str] = Header(default=None),
 ) -> dict[str, bool]:
     """
-    Supabase webhook called on INSERT to hub_submissions.
+    Webhook called when a new row is inserted into hub_submissions.
 
     Verifies X-Webhook-Secret header, parses the record, logs an
     acknowledgement email entry, and sends a confirmation to the submitter.
@@ -396,7 +224,7 @@ async def new_submission_webhook(
 
     payload: dict[str, Any] = await request.json()
 
-    # Supabase INSERT webhook shape: { type: "INSERT", record: {...}, ... }
+    # Typical webhook shape: { type: "INSERT", record: {...}, ... }
     record: dict[str, Any] = payload.get("record") or {}
 
     submission_id: str = record.get("id", "")
@@ -448,31 +276,13 @@ async def _log_submission_email(
     email_type: str,
     recipient_email: str,
 ) -> None:
-    """Insert a row into submission_email_log via Supabase REST API."""
-    settings = get_settings()
-    if not settings.supabase_url or not settings.supabase_service_role_key:
-        return  # Supabase not configured — skip silently
-
-    url = _supabase_rest_url("submission_email_log")
-    log_entry = {
-        "submission_id": submission_id,
-        "email_type": email_type,
-        "recipient_email": recipient_email,
-        "sent_at": datetime.now(UTC).isoformat(),
-        "delivery_status": "sent",
-    }
-
-    try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
-            resp = await client.post(url, headers=_supabase_headers(), json=log_entry)
-        if resp.status_code not in (200, 201):
-            logger.warning(
-                "submission_email_log insert failed",
-                status=resp.status_code,
-                body=resp.text,
-            )
-    except Exception as exc:
-        logger.error("submission_email_log insert error", error=str(exc))
+    """Record email dispatch when submission_email_log is backed by PostgreSQL."""
+    logger.debug(
+        "submission_email_log (not persisted — storage not configured)",
+        submission_id=submission_id,
+        email_type=email_type,
+        recipient_email=recipient_email,
+    )
 
 
 async def _send_acknowledgement_email(
@@ -507,71 +317,3 @@ async def _send_acknowledgement_email(
         logger.info("Acknowledgement email sent", to=submitter_email)
     except Exception as exc:
         logger.error("Failed to send acknowledgement email", to=submitter_email, error=str(exc))
-
-
-async def _send_status_notification_email(
-    *,
-    submitter_name: str,
-    submitter_email: str,
-    submission_title: str,
-    submission_type: str,
-    new_status: str,
-    needs_info_message: Optional[str] = None,
-    rejection_reason: Optional[str] = None,
-) -> None:
-    """Send a status update email when a submission is approved, rejected, or needs info."""
-    type_label = submission_type.replace("_", " ").title()
-
-    if new_status == "approved":
-        subject = f"CARSI Hub — Your {type_label} submission has been approved"
-        body_detail = "<p>Your submission has been approved and will be published to the CARSI Hub directory shortly.</p>"
-    elif new_status == "rejected":
-        reason_block = (
-            f"<p><strong>Reason:</strong> {rejection_reason}</p>" if rejection_reason else ""
-        )
-        subject = f"CARSI Hub — Your {type_label} submission was not approved"
-        body_detail = (
-            "<p>After review, we're unable to list your submission at this time.</p>"
-            + reason_block
-            + "<p>You're welcome to resubmit in the future once you've addressed the feedback above.</p>"
-        )
-    elif new_status == "needs_info":
-        info_block = (
-            f"<p><strong>Information needed:</strong> {needs_info_message}</p>"
-            if needs_info_message
-            else ""
-        )
-        subject = f"CARSI Hub — More information needed for your {type_label} submission"
-        body_detail = (
-            "<p>We'd like to list your submission but need a little more information first.</p>"
-            + info_block
-            + "<p>Please reply to this email with the requested details.</p>"
-        )
-    else:
-        return  # No email for other statuses
-
-    html_body = f"""
-    <p>Hi {submitter_name or 'there'},</p>
-    <p>This is an update regarding your CARSI Hub submission:
-    <strong>{submission_title}</strong>.</p>
-    {body_detail}
-    <p>Kind regards,<br>The CARSI Team</p>
-    """
-
-    try:
-        await asyncio.get_event_loop().run_in_executor(
-            None,
-            lambda: email_service.send_email(
-                to=submitter_email,
-                subject=subject,
-                html_body=html_body,
-            ),
-        )
-        logger.info("Status notification email sent", to=submitter_email, status=new_status)
-    except Exception as exc:
-        logger.error(
-            "Failed to send status notification email",
-            to=submitter_email,
-            status=new_status,
-            error=str(exc),
-        )

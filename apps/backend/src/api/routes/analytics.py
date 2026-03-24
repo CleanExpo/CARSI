@@ -1,7 +1,7 @@
 """Analytics API routes for observability dashboard.
 
 Returns 503 until a persistent state store (PostgreSQL) is configured.
-Supabase was removed in the JWT-only auth migration.
+Analytics persistence uses a null backend until PostgreSQL metrics tables are wired.
 """
 
 from typing import Any

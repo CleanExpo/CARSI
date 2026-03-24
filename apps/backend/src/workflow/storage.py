@@ -1,8 +1,8 @@
-"""Workflow storage layer using Supabase."""
+"""Workflow storage layer (null backend until PostgreSQL is wired)."""
 
 from datetime import datetime
 
-from src.state.supabase import SupabaseStateStore
+from src.state.null_store import NullStateStore
 from src.utils import get_logger
 
 from .models import (
@@ -18,7 +18,7 @@ class WorkflowStorage:
     """Storage layer for workflows and executions."""
 
     def __init__(self) -> None:
-        self.supabase = SupabaseStateStore()
+        self._store = NullStateStore()
 
     async def create_workflow(
         self,
@@ -44,7 +44,7 @@ class WorkflowStorage:
                 "created_by": workflow.created_by or user_id,
             }
 
-            _result = self.supabase.client.table("workflows").insert(data).execute()
+            _result = self._store.client.table("workflows").insert(data).execute()
 
             logger.info(
                 "Created workflow",
@@ -62,7 +62,7 @@ class WorkflowStorage:
         """Get workflow by ID."""
         try:
             result = (
-                self.supabase.client.table("workflows")
+                self._store.client.table("workflows")
                 .select("*")
                 .eq("id", workflow_id)
                 .single()
@@ -120,7 +120,7 @@ class WorkflowStorage:
             }
 
             result = (
-                self.supabase.client.table("workflows")
+                self._store.client.table("workflows")
                 .update(data)
                 .eq("id", workflow_id)
                 .execute()
@@ -139,7 +139,7 @@ class WorkflowStorage:
     async def delete_workflow(self, workflow_id: str) -> bool:
         """Delete a workflow."""
         try:
-            self.supabase.client.table("workflows").delete().eq(
+            self._store.client.table("workflows").delete().eq(
                 "id", workflow_id
             ).execute()
 
@@ -159,7 +159,7 @@ class WorkflowStorage:
     ) -> list[WorkflowDefinition]:
         """List workflows with optional filters."""
         try:
-            query = self.supabase.client.table("workflows").select("*")
+            query = self._store.client.table("workflows").select("*")
 
             if user_id:
                 query = query.eq("user_id", user_id)
@@ -220,7 +220,7 @@ class WorkflowStorage:
             }
 
             _result = (
-                self.supabase.client.table("workflow_executions").insert(data).execute()
+                self._store.client.table("workflow_executions").insert(data).execute()
             )
 
             logger.info(
@@ -256,7 +256,7 @@ class WorkflowStorage:
             if context.completed_at:
                 data["completed_at"] = context.completed_at
 
-            self.supabase.client.table("workflow_executions").update(data).eq(
+            self._store.client.table("workflow_executions").update(data).eq(
                 "id", execution_id
             ).execute()
 
@@ -277,7 +277,7 @@ class WorkflowStorage:
         """Get execution context by ID."""
         try:
             result = (
-                self.supabase.client.table("workflow_executions")
+                self._store.client.table("workflow_executions")
                 .select("*")
                 .eq("id", execution_id)
                 .single()

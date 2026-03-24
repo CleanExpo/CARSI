@@ -5,7 +5,7 @@ from typing import Any
 
 from src.memory.embeddings import get_embedding_provider
 from src.rag.models import DocumentChunk, DocumentSource, ProcessingStatus
-from src.state.supabase import SupabaseStateStore
+from src.state.null_store import NullStateStore
 from src.utils import get_logger
 
 logger = get_logger(__name__)
@@ -15,8 +15,8 @@ class RAGStore:
     """Storage layer for RAG pipeline."""
 
     def __init__(self) -> None:
-        self.supabase = SupabaseStateStore()
-        self.client = self.supabase.client
+        self._store = NullStateStore()
+        self.client = self._store.client
         self.embedding_provider = None
 
     async def initialize(self) -> None:
@@ -51,7 +51,7 @@ class RAGStore:
         if not result.data:
             raise Exception("Failed to create document source")
 
-        # Type assertion for Supabase result
+        # Type assertion for table client result
         result_data = result.data[0] if isinstance(result.data, list) else result.data
         return DocumentSource(**result_data)  # type: ignore[arg-type]
 

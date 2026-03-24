@@ -161,7 +161,7 @@ class TechnicalSpecGenerator(BaseAgent):
         result = await generator.execute(
             prd_analysis=analysis,
             feature_decomposition=decomposition,
-            context={"existing_stack": "Next.js + FastAPI + Supabase"}
+            context={"existing_stack": "Next.js + FastAPI + PostgreSQL"}
         )
 
         tech_spec = TechnicalSpec(**result["specification"])
@@ -447,26 +447,26 @@ Create a detailed technical specification in the following JSON format:
   "recommended_stack": {{
     "frontend": "Next.js 15 with React 19",
     "backend": "FastAPI with Python 3.11+",
-    "database": "PostgreSQL 15+ with Supabase",
+    "database": "PostgreSQL 15+ (SQLAlchemy + Alembic)",
     "cache": "Redis for session and query caching",
-    "storage": "Supabase Storage for file uploads",
-    "auth": "Supabase Auth with JWT tokens"
+    "storage": "S3-compatible object storage for file uploads",
+    "auth": "JWT auth (FastAPI + httpOnly cookies)"
   }},
   "existing_stack_integration": [
     "Use existing Next.js app in apps/web",
     "Extend FastAPI backend in apps/backend",
-    "Add new tables to existing Supabase database"
+    "Add new tables via Alembic migrations to existing PostgreSQL database"
   ],
 
   "security_considerations": [
-    "Use Supabase Row Level Security for multi-tenant data isolation",
+    "Use PostgreSQL Row Level Security (RLS) for multi-tenant data isolation where applicable",
     "Implement rate limiting on all public endpoints",
     "Validate all input using Pydantic models",
     "Use parameterized queries to prevent SQL injection",
     "Set secure headers (CSP, HSTS, X-Frame-Options)"
   ],
-  "authentication_approach": "JWT tokens issued by Supabase Auth, validated on each request",
-  "authorization_model": "Row Level Security (RLS) policies in Supabase for data access control",
+  "authentication_approach": "JWT tokens issued by FastAPI auth, validated on each request",
+  "authorization_model": "Row Level Security (RLS) and/or application-level checks for data access control",
 
   "scalability_approach": "Horizontal scaling of API servers, database read replicas, Redis cluster",
   "performance_targets": {{
@@ -483,11 +483,11 @@ Create a detailed technical specification in the following JSON format:
   ],
   "integration_points": [
     "Frontend calls backend API via fetch()",
-    "Backend queries Supabase via PostgREST client",
-    "Supabase Realtime pushes updates to frontend via WebSockets"
+    "Backend queries PostgreSQL via SQLAlchemy",
+    "Frontend receives updates via polling or WebSockets/SSE as needed"
   ],
 
-  "deployment_architecture": "Frontend on Vercel, Backend on Railway, Database on Supabase Cloud",
+  "deployment_architecture": "Frontend on Vercel, Backend on container host, Database on managed PostgreSQL",
   "infrastructure_requirements": [
     "2x API servers (auto-scaling)",
     "PostgreSQL instance with 4GB RAM minimum",
@@ -503,7 +503,7 @@ Create a detailed technical specification in the following JSON format:
 3. **Security**: Cover authentication, authorization, validation, and attack prevention.
 4. **Performance**: Set realistic targets and explain caching/scaling approach.
 5. **Architecture Diagram**: Use Mermaid syntax to show major components and data flow.
-6. **Integration**: Explain how this integrates with existing stack (Next.js + FastAPI + Supabase).
+6. **Integration**: Explain how this integrates with existing stack (Next.js + FastAPI + PostgreSQL).
 
 Be comprehensive and production-ready.
 Return ONLY the JSON, no additional text."""
@@ -543,7 +543,7 @@ Return ONLY the JSON, no additional text."""
             recommended_stack={
                 "frontend": "Next.js 15",
                 "backend": "FastAPI",
-                "database": "PostgreSQL via Supabase",
+                "database": "PostgreSQL (SQLAlchemy)",
             },
             existing_stack_integration=["Manual integration planning required"],
             security_considerations=["Security audit required"],

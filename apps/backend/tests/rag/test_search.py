@@ -3,16 +3,16 @@
 import pytest
 from unittest.mock import AsyncMock, MagicMock
 
-# Supabase removed in JWT migration — all Supabase-dependent tests are skipped.
-HAS_SUPABASE = False
+# Persistent vector/RAG store not configured — tests skipped until PostgreSQL/pgvector is wired.
+HAS_VECTOR_STORE = False
 
-requires_supabase = pytest.mark.skipif(
-    not HAS_SUPABASE,
-    reason="Persistent state store not configured (Supabase removed, PostgreSQL migration pending)",
+requires_vector_store = pytest.mark.skipif(
+    not HAS_VECTOR_STORE,
+    reason="Persistent state store not configured (PostgreSQL/pgvector migration pending)",
 )
 
 
-@requires_supabase
+@requires_vector_store
 @pytest.mark.asyncio
 async def test_rag_store_initialization():
     """Test RAG store can be initialized."""
@@ -21,12 +21,12 @@ async def test_rag_store_initialization():
     store = RAGStore()
     await store.initialize()
 
-    assert store.supabase is not None
+    assert store._store is not None
     assert store.client is not None
     assert store.embedding_provider is not None
 
 
-@requires_supabase
+@requires_vector_store
 @pytest.mark.asyncio
 async def test_hybrid_search_call():
     """Test hybrid search function call structure."""
@@ -52,7 +52,7 @@ async def test_hybrid_search_call():
     assert call_args[0][0] == "hybrid_search"
 
 
-@requires_supabase
+@requires_vector_store
 @pytest.mark.asyncio
 async def test_vector_search_call():
     """Test vector search function call."""

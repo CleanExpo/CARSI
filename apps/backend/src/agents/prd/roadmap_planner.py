@@ -433,7 +433,7 @@ Create a detailed roadmap in the following JSON format:
         "Code reviewed and merged",
         "Deployed to staging environment"
       ],
-      "risks": ["Supabase setup complexity"],
+      "risks": ["PostgreSQL migration complexity"],
       "team_capacity": "80% (ramp-up sprint)"
     }}
   ],

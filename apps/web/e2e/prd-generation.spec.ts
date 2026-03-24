@@ -57,7 +57,7 @@ test.describe("PRD Generation Flow", () => {
     await page.getByLabel(/Target Users/i).fill("Remote teams, project managers");
     await page.getByLabel(/Timeline/i).fill("3 months");
     await page.getByLabel(/Team Size/i).fill("2");
-    await page.getByLabel(/Existing Stack/i).fill("Next.js, FastAPI, Supabase");
+    await page.getByLabel(/Existing Stack/i).fill("Next.js, FastAPI, PostgreSQL");
 
     // Submit form
     const submitButton = page.getByRole("button", { name: /Generate PRD/i });

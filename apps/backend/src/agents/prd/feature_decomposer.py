@@ -315,7 +315,7 @@ Create epics and user stories following this JSON format:
       "epic": "EP-001",
       "dependencies": ["US-002"],
       "effort_estimate": "M",
-      "technical_notes": ["Use Supabase auth", "Needs rate limiting"]
+      "technical_notes": ["Use JWT auth", "Needs rate limiting"]
     }}
   ],
   "total_effort_estimate": "3-4 weeks with 2 developers",

@@ -125,7 +125,7 @@ export function PRDGeneratorForm({ onSubmit, isGenerating }: PRDGeneratorFormPro
               <Label htmlFor="existingStack">Existing Stack</Label>
               <Input
                 id="existingStack"
-                placeholder="e.g., Next.js, FastAPI, Supabase"
+                placeholder="e.g., Next.js, FastAPI, PostgreSQL"
                 value={existingStack}
                 onChange={(e) => setExistingStack(e.target.value)}
                 disabled={isGenerating}

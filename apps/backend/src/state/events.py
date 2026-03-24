@@ -1,7 +1,7 @@
 """Real-time event publisher for agent orchestration.
 
 This module provides a clean interface for agents to publish status updates
-that are automatically propagated to the frontend via Supabase Realtime.
+that can be consumed by the frontend (polling or app-specific channels).
 
 Usage:
     publisher = AgentEventPublisher()
@@ -40,7 +40,7 @@ logger = get_logger(__name__)
 class AgentEventPublisher:
     """Publishes agent execution events via the state store.
 
-    Uses NullStateStore as backend (Supabase removed).
+    Uses NullStateStore as backend until PostgreSQL agent run persistence is wired.
     Local caching provides in-memory state during the process lifetime.
     """
 

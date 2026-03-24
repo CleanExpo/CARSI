@@ -11,6 +11,7 @@ from pydantic import BaseModel, Field
 from src.agents.prd import PRDOrchestrator
 from src.api.error_handling import create_error_response
 from src.state.events import AgentEventPublisher
+from src.state.null_store import NullStateStore
 from src.utils import get_logger
 
 logger = get_logger(__name__)
@@ -163,9 +164,7 @@ async def get_prd_status(request: Request, run_id: str) -> PRDStatusResponse:
     - Error (if failed)
     """
     try:
-        from src.state.supabase import SupabaseStateStore
-
-        store = SupabaseStateStore()
+        store = NullStateStore()
         run = await store.get_agent_run(run_id)
 
         if not run:
@@ -207,9 +206,7 @@ async def get_prd_result(request: Request, prd_id: str) -> dict[str, Any]:
     try:
         # In production, you'd store PRD results in database
         # For now, we'll get it from agent run metadata
-        from src.state.supabase import SupabaseStateStore
-
-        store = SupabaseStateStore()
+        store = NullStateStore()
         runs = await store.get_task_agent_runs(prd_id)
 
         if not runs:
@@ -313,8 +310,7 @@ async def execute_prd_generation(
 
         if result["success"]:
             # Store result in metadata for retrieval
-            from src.state.supabase import SupabaseStateStore
-            store = SupabaseStateStore()
+            store = NullStateStore()
 
             await store.update_agent_run(
                 run_id=run_id,

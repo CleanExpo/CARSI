@@ -130,7 +130,7 @@ class SkillExecutor:
         trigger_keywords = {
             "frontend": ["frontend", "component", "ui", "react", "next"],
             "backend": ["backend", "api", "python", "agent"],
-            "database": ["database", "sql", "migration", "supabase"],
+            "database": ["database", "sql", "migration", "postgresql"],
             "devops": ["docker", "deploy", "ci", "cd"],
         }
 

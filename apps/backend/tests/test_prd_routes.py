@@ -128,7 +128,7 @@ class TestPRDGenerateEndpoint:
 class TestPRDStatusEndpoint:
     """Tests for GET /api/prd/status/{run_id} endpoint."""
 
-    @patch("src.state.supabase.SupabaseStateStore")
+    @patch("src.api.routes.prd.NullStateStore")
     def test_get_prd_status_success(self, mock_store_class):
         """Test successful status retrieval."""
         # Mock state store
@@ -152,7 +152,7 @@ class TestPRDStatusEndpoint:
         assert data["progress_percent"] == 50.0
         assert data["current_step"] == "Generating technical spec"
 
-    @patch("src.state.supabase.SupabaseStateStore")
+    @patch("src.api.routes.prd.NullStateStore")
     def test_get_prd_status_completed(self, mock_store_class, sample_prd_result):
         """Test status retrieval for completed PRD."""
         mock_store = AsyncMock()
@@ -175,7 +175,7 @@ class TestPRDStatusEndpoint:
         assert data["result"] is not None
         assert data["result"]["total_user_stories"] == 15
 
-    @patch("src.state.supabase.SupabaseStateStore")
+    @patch("src.api.routes.prd.NullStateStore")
     def test_get_prd_status_not_found(self, mock_store_class):
         """Test status retrieval for non-existent run."""
         mock_store = AsyncMock()
@@ -186,7 +186,7 @@ class TestPRDStatusEndpoint:
 
         assert response.status_code == 404
 
-    @patch("src.state.supabase.SupabaseStateStore")
+    @patch("src.api.routes.prd.NullStateStore")
     def test_get_prd_status_failed(self, mock_store_class):
         """Test status retrieval for failed PRD."""
         mock_store = AsyncMock()
@@ -212,7 +212,7 @@ class TestPRDStatusEndpoint:
 class TestPRDResultEndpoint:
     """Tests for GET /api/prd/result/{prd_id} endpoint."""
 
-    @patch("src.state.supabase.SupabaseStateStore")
+    @patch("src.api.routes.prd.NullStateStore")
     def test_get_prd_result_success(self, mock_store_class, sample_prd_result):
         """Test successful PRD result retrieval."""
         mock_store = AsyncMock()
@@ -234,7 +234,7 @@ class TestPRDResultEndpoint:
         assert data["total_sprints"] == 6
         assert data["estimated_duration_weeks"] == 12
 
-    @patch("src.state.supabase.SupabaseStateStore")
+    @patch("src.api.routes.prd.NullStateStore")
     def test_get_prd_result_not_found(self, mock_store_class):
         """Test PRD result retrieval for non-existent PRD."""
         mock_store = AsyncMock()
@@ -245,7 +245,7 @@ class TestPRDResultEndpoint:
 
         assert response.status_code == 404
 
-    @patch("src.state.supabase.SupabaseStateStore")
+    @patch("src.api.routes.prd.NullStateStore")
     def test_get_prd_result_not_completed(self, mock_store_class):
         """Test PRD result retrieval for incomplete PRD."""
         mock_store = AsyncMock()
@@ -265,7 +265,7 @@ class TestPRDResultEndpoint:
 class TestPRDDocumentsEndpoint:
     """Tests for GET /api/prd/documents/{prd_id} endpoint."""
 
-    @patch("src.state.supabase.SupabaseStateStore")
+    @patch("src.api.routes.prd.NullStateStore")
     def test_list_prd_documents_success(self, mock_store_class):
         """Test successful document listing."""
         mock_store = AsyncMock()
@@ -318,7 +318,7 @@ async def test_execute_prd_generation_background(sample_prd_request, sample_prd_
             "prd_result": sample_prd_result,
         }
 
-        with patch("src.state.supabase.SupabaseStateStore") as mock_store_class:
+        with patch("src.api.routes.prd.NullStateStore") as mock_store_class:
             mock_store = AsyncMock()
             mock_store_class.return_value = mock_store
 
@@ -357,7 +357,7 @@ async def test_execute_prd_generation_failure(sample_prd_request):
             "error": "Analysis failed",
         }
 
-        with patch("src.state.supabase.SupabaseStateStore") as mock_store_class:
+        with patch("src.api.routes.prd.NullStateStore") as mock_store_class:
             mock_store = AsyncMock()
             mock_store_class.return_value = mock_store
 

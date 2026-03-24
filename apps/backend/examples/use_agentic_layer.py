@@ -241,7 +241,7 @@ async def task_4_show_system_capabilities():
     print("\n[Agent Types Available]")
     print("  - Frontend Agent (Next.js, React, Tailwind)")
     print("  - Backend Agent (FastAPI, LangGraph, Python)")
-    print("  - Database Agent (PostgreSQL, Supabase)")
+    print("  - Database Agent (PostgreSQL)")
     print("  - Review Agent (Code quality analysis)")
     print("  - General Agent (Fallback for other tasks)")
 

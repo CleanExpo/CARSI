@@ -8,7 +8,7 @@ Tests Australian context validation:
 - AEST timezone handling
 - DD/MM/YYYY date formatting
 
-Note: CRUD tests require Supabase and are marked as integration tests.
+Note: CRUD tests require PostgreSQL-backed contractor storage (integration tests).
 """
 
 from datetime import datetime, time
@@ -27,7 +27,7 @@ except ImportError:
 
 requires_inmemory_db = pytest.mark.skipif(
     not HAS_INMEMORY_DB,
-    reason="Contractors route now uses Supabase, not in-memory DB"
+    reason="Contractors route requires PostgreSQL-backed storage, not in-memory DB"
 )
 from src.models.contractor import (
     AustralianState,

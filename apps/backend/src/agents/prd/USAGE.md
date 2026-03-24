@@ -122,7 +122,7 @@ generator = TechnicalSpecGenerator()
 result = await generator.execute(
     prd_analysis=prd_analysis,
     feature_decomposition=decomposition,
-    context={"existing_stack": "Next.js + FastAPI + Supabase"}
+    context={"existing_stack": "Next.js + FastAPI + PostgreSQL"}
 )
 
 tech_spec = result["specification"]
@@ -314,7 +314,7 @@ context = {
     "sprint_length": 2,  # weeks
 
     # Technology
-    "existing_stack": "Next.js + FastAPI + Supabase",
+    "existing_stack": "Next.js + FastAPI + PostgreSQL",
     "technology_constraints": "Must use PostgreSQL",
     "test_framework": "Vitest + Playwright",
 
@@ -506,7 +506,7 @@ After generating a PRD:
 2. **Validate with stakeholders** (show prd.md, roadmap.md)
 3. **Adjust if needed** (re-run with refined requirements)
 4. **Use feature_list.json** with InitializerAgent to start implementation
-5. **Track progress** in Supabase agent_runs table
+5. **Track progress** in agent_runs (PostgreSQL or in-memory publisher)
 
 ---
 

@@ -13,10 +13,10 @@ AUTH_HEADERS = {"X-User-Id": "00000000-0000-0000-0000-000000000001"}
 class TestTaskQueueAPI:
     """Tests for task queue endpoints."""
 
-    @patch('src.api.routes.task_queue.SupabaseStateStore')
+    @patch('src.api.routes.task_queue.NullStateStore')
     def test_create_task_success(self, mock_store_class):
         """Test creating a new task."""
-        # Mock Supabase client
+        # Mock state store client
         mock_client = MagicMock()
         mock_store = mock_store_class.return_value
         mock_store.client = mock_client
@@ -91,10 +91,10 @@ class TestTaskQueueAPI:
 
         assert response.status_code == 422  # Validation error
 
-    @patch('src.api.routes.task_queue.SupabaseStateStore')
+    @patch('src.api.routes.task_queue.NullStateStore')
     def test_list_tasks(self, mock_store_class):
         """Test listing tasks."""
-        # Mock Supabase client
+        # Mock state store client
         mock_client = MagicMock()
         mock_store = mock_store_class.return_value
         mock_store.client = mock_client
@@ -137,7 +137,7 @@ class TestTaskQueueAPI:
         assert isinstance(data["tasks"], list)
         assert len(data["tasks"]) == 1
 
-    @patch('src.api.routes.task_queue.SupabaseStateStore')
+    @patch('src.api.routes.task_queue.NullStateStore')
     def test_list_tasks_with_filters(self, mock_store_class):
         """Test listing tasks with status filter."""
         mock_client = MagicMock()
@@ -179,7 +179,7 @@ class TestTaskQueueAPI:
         for task in data["tasks"]:
             assert task["status"] == "pending"
 
-    @patch('src.api.routes.task_queue.SupabaseStateStore')
+    @patch('src.api.routes.task_queue.NullStateStore')
     def test_list_tasks_pagination(self, mock_store_class):
         """Test task list pagination."""
         mock_client = MagicMock()
@@ -203,7 +203,7 @@ class TestTaskQueueAPI:
         assert data["page"] == 1
         assert data["page_size"] == 5
 
-    @patch('src.api.routes.task_queue.SupabaseStateStore')
+    @patch('src.api.routes.task_queue.NullStateStore')
     def test_get_queue_stats(self, mock_store_class):
         """Test getting queue statistics."""
         mock_client = MagicMock()

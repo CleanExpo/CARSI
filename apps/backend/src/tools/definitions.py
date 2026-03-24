@@ -439,7 +439,7 @@ def register_database_tools(registry: ToolRegistry) -> None:
                 ),
             ],
             categories=[ToolCategory.DATABASE],
-            keywords=["database", "query", "select", "supabase", "sql"],
+            keywords=["database", "query", "select", "postgresql", "sql"],
             aliases=["db_query", "sql_query"],
         )
     )

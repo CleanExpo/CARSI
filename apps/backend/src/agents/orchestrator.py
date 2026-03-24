@@ -607,7 +607,7 @@ class OrchestratorAgent(BaseAgent):
                 "memory_domain": "backend"
             },
             "database": {
-                "relevant_paths": ["supabase/migrations/**/*.sql"],
+                "relevant_paths": ["apps/backend/alembic/versions/**/*.py"],
                 "skills": ["SUPABASE.md", "MIGRATIONS.md"],
                 "memory_domain": "database"
             },
@@ -982,7 +982,7 @@ class OrchestratorAgent(BaseAgent):
         keywords = {
             "frontend": ["frontend", "component", "ui", "page", "next", "react", "css", "tailwind"],
             "backend": ["backend", "api", "agent", "langgraph", "python", "fastapi"],
-            "database": ["database", "migration", "supabase", "sql", "query", "schema"],
+            "database": ["database", "migration", "postgresql", "sql", "query", "schema"],
             "devops": ["deploy", "docker", "ci", "cd", "devops", "infrastructure"],
         }
 

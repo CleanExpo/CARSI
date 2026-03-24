@@ -14,7 +14,7 @@ from src.memory.models import (
     MemoryQuery,
     MemoryResult,
 )
-from src.state.supabase import SupabaseStateStore
+from src.state.null_store import NullStateStore
 from src.utils import get_logger
 
 logger = get_logger(__name__)
@@ -58,8 +58,8 @@ class MemoryStore:
 
     def __init__(self) -> None:
         """Initialize the memory store."""
-        self.supabase = SupabaseStateStore()
-        self.client = self.supabase.client
+        self._store = NullStateStore()
+        self.client = self._store.client
         self.embedding_provider: Any | None = None  # Will be set in initialize()
 
     async def initialize(self) -> None:

@@ -151,7 +151,7 @@ CREATE INDEX idx_audit_outcome ON audit_log(outcome)
 --     FOR VALUES FROM ('2026-02-01') TO ('2026-03-01');
 ```
 
-**Project Reference**: `scripts/init-db.sql` — add this table after SECTION 6 (Utility Views). No existing audit tables in the schema. The `audit_evidence` table referenced in `apps/web/lib/audit/evidence-collector.ts` is a Supabase-only table for frontend evidence, not backend audit events.
+**Project Reference**: `scripts/init-db.sql` — add this table after SECTION 6 (Utility Views). No existing audit tables in the schema. The `audit_evidence` flow referenced in `apps/web/lib/audit/evidence-collector.ts` is for frontend evidence capture, not backend audit events.
 
 ### Index Rationale
 
@@ -228,7 +228,7 @@ from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from src.auth.jwt import extract_user_email
-from src.state.supabase import SupabaseStateStore
+from src.state.null_store import NullStateStore
 
 
 class AuditMiddleware(BaseHTTPMiddleware):
@@ -255,7 +255,7 @@ class AuditMiddleware(BaseHTTPMiddleware):
         duration_ms = (time.monotonic() - start_time) * 1000
 
         # Emit audit event
-        trail = AuditTrail(SupabaseStateStore())
+        trail = AuditTrail(NullStateStore())
         await trail.emit(AuditEvent(
             action=self._method_to_action(request.method),
             resource_type=self._extract_resource(request.url.path),
@@ -439,7 +439,7 @@ Create a `GET /api/audit/events` endpoint on `APIRouter(prefix="/api/audit", tag
 | `limit` | `int` (default 50, max 200) | Pagination |
 | `offset` | `int` (default 0) | Pagination offset |
 
-Chain Supabase `.eq()` / `.gte()` / `.lte()` filters, order by `timestamp DESC`, apply `.range(offset, offset + limit - 1)`, return `{"events": data, "count": len(data)}`.
+Chain PostgREST-style `.eq()` / `.gte()` / `.lte()` filters on your table client, order by `timestamp DESC`, apply `.range(offset, offset + limit - 1)`, return `{"events": data, "count": len(data)}`.
 
 **Rule**: The audit query endpoint must be restricted to admin users. Never expose audit logs to non-admin users — they may contain IP addresses, user agents, and other sensitive metadata.
 
@@ -484,7 +484,7 @@ When applying this skill, structure implementation as:
 ```markdown
 ### Audit Trail Implementation
 
-**Storage**: [PostgreSQL / Supabase]
+**Storage**: [PostgreSQL]
 **Event Model**: AuditEvent (Pydantic)
 **Capture Method**: [middleware / decorator / explicit]
 **Auth Events**: [login, logout, login_failed, permission_denied]

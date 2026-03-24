@@ -1,7 +1,7 @@
 """Contractor Availability API Routes.
 
 Australian-first API for managing contractor schedules.
-Currently returns 503 — Supabase was removed in the JWT migration.
+Currently returns 503 — persistent contractor storage is not wired to PostgreSQL yet.
 Requires PostgreSQL migration to restore functionality.
 """
 

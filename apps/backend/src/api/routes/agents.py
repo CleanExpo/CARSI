@@ -1,7 +1,7 @@
-"""Agent orchestration API endpoints with Realtime event bridge.
+"""Agent orchestration API endpoints.
 
-This module provides HTTP endpoints for triggering and monitoring agent runs.
-Uses Supabase Realtime to push updates to the frontend in real-time.
+HTTP endpoints for triggering and monitoring agent runs. Status is published
+via the in-process event publisher; wire PostgreSQL or SSE for production observability.
 """
 
 from fastapi import APIRouter, BackgroundTasks, HTTPException, Request
@@ -10,7 +10,7 @@ from pydantic import BaseModel, Field
 from src.agents.orchestrator import OrchestratorAgent
 from src.api.error_handling import create_error_response
 from src.state.events import AgentEventPublisher
-from src.state.supabase import SupabaseStateStore
+from src.state.null_store import NullStateStore
 from src.utils import get_logger
 
 logger = get_logger(__name__)
@@ -68,10 +68,9 @@ async def execute_agent_with_events(
     user_id: str | None,
     context: dict | None,
 ) -> None:
-    """Execute agent and publish status updates via Realtime.
+    """Execute agent and publish status updates via the event publisher.
 
-    This runs in the background and updates the agent_runs table
-    in real-time as the agent makes progress.
+    This runs in the background and updates run state as the agent makes progress.
 
     Args:
         task_description: Description of the task
@@ -139,8 +138,7 @@ async def trigger_agent_run(
     """Trigger a new agent run.
 
     This creates a task and agent run, then executes the orchestrator
-    in the background. The frontend can subscribe to real-time updates
-    via Supabase Realtime.
+    in the background. Poll run status or subscribe to app-specific realtime channels.
 
     Args:
         request: Trigger request with task description
@@ -160,7 +158,7 @@ async def trigger_agent_run(
         ```
     """
     try:
-        store = SupabaseStateStore()
+        store = NullStateStore()
         publisher = AgentEventPublisher()
 
         # Create task
@@ -202,7 +200,7 @@ async def trigger_agent_run(
             run_id=run_id,
             task_id=task_id,
             status="pending",
-            message="Agent run started successfully. Subscribe to real-time updates via Supabase.",
+            message="Agent run started successfully. Poll GET /api/agents/run/{run_id} for status.",
         )
 
     except Exception as e:

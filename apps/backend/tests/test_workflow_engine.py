@@ -138,5 +138,5 @@ async def test_conditional_node_evaluation():
 
 
 # NOTE: More comprehensive tests require database access
-# Run these tests after Docker/Supabase is started:
+# Run these tests after Docker/PostgreSQL is started:
 # pytest tests/test_workflow_engine.py -v

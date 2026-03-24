@@ -28,7 +28,7 @@ AGENT_CONFIGS = {
     },
     "database": {
         "name": "database",
-        "capabilities": ["database", "sql", "supabase", "migration", "query", "schema"],
+        "capabilities": ["database", "sql", "postgresql", "migration", "query", "schema"],
     },
     "devops": {
         "name": "devops",

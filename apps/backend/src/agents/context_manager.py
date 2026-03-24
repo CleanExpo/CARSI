@@ -159,8 +159,8 @@ class ContextManager:
             },
             "database": {
                 "file_patterns": ["*.sql"],
-                "paths": ["supabase/migrations/", "supabase/functions/"],
-                "skills": ["SUPABASE.md", "MIGRATIONS.md"],
+                "paths": ["apps/backend/alembic/versions/"],
+                "skills": ["migrations.skill.md"],
                 "memory_domain": "database"
             },
             "test": {
@@ -343,7 +343,7 @@ class ContextManager:
         skill_mapping = {
             "frontend": ["NEXTJS.md", "COMPONENTS.md", "TAILWIND.md"],
             "backend": ["FASTAPI.md", "LANGGRAPH.md", "AGENTS.md"],
-            "database": ["SUPABASE.md", "MIGRATIONS.md"],
+            "database": ["migrations.skill.md"],
             "test": ["TESTING.md"],
             "review": ["CODE_REVIEW.md"],
         }

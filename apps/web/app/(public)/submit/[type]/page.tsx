@@ -95,30 +95,9 @@ interface SubmissionGuideline {
   updated_at: string;
 }
 
-async function getGuidelines(type: string): Promise<SubmissionGuideline | null> {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  if (!supabaseUrl || !supabaseAnonKey) return null;
-
-  try {
-    const res = await fetch(
-      `${supabaseUrl}/rest/v1/submission_guidelines?submission_type=eq.${encodeURIComponent(type)}&limit=1`,
-      {
-        headers: {
-          apikey: supabaseAnonKey,
-          Authorization: `Bearer ${supabaseAnonKey}`,
-          Accept: 'application/json',
-        },
-        next: { revalidate: 3600 },
-      }
-    );
-    if (!res.ok) return null;
-    const rows = (await res.json()) as SubmissionGuideline[];
-    return rows[0] ?? null;
-  } catch {
-    return null;
-  }
+async function getGuidelines(_type: string): Promise<SubmissionGuideline | null> {
+  /* Guidelines can be loaded from a CMS or API when wired; default UI below is used when null. */
+  return null;
 }
 
 /* ─── Metadata ────────────────────────────────────────────────────────────── */
@@ -251,7 +230,7 @@ export default async function SubmitTypePage({ params }: { params: Promise<{ typ
             )}
           </section>
         ) : (
-          /* Fallback guidelines when Supabase row is absent */
+          /* Default guidelines when no CMS/API row is available */
           <section
             className="mb-10 rounded-sm border-[0.5px] border-white/[0.06] bg-white/[0.02] px-6 py-5"
             aria-label="Submission guidelines"

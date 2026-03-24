@@ -147,7 +147,7 @@ class TestAgentMemoryIntegration:
 
         knowledge_items = [
             ("oauth_implementation", {"description": "OAuth 2.0 with PKCE flow"}),
-            ("database_schema", {"description": "PostgreSQL with Supabase RLS"}),
+            ("database_schema", {"description": "PostgreSQL with RLS"}),
             ("frontend_framework", {"description": "Next.js 15 with React 19"}),
         ]
 

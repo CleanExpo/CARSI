@@ -3,7 +3,7 @@
 from decimal import Decimal
 from typing import Any
 
-from src.state.supabase import SupabaseStateStore
+from src.state.null_store import NullStateStore
 from src.utils import get_logger
 
 logger = get_logger(__name__)
@@ -44,7 +44,7 @@ class UsageTracker:
     """Track API usage and costs."""
 
     def __init__(self) -> None:
-        self.supabase = SupabaseStateStore()
+        self._store = NullStateStore()
 
     async def track_api_call(
         self,
@@ -77,7 +77,7 @@ class UsageTracker:
                 "metadata": metadata or {},
             }
 
-            self.supabase.client.table("api_usage").insert(data).execute()
+            self._store.client.table("api_usage").insert(data).execute()
 
             logger.debug(
                 "API usage tracked",

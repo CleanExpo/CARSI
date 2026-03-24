@@ -1,12 +1,12 @@
-"""Null state store — drop-in replacement for SupabaseStateStore.
+"""Null state store — no-op external state backend.
 
 Returns empty results for all operations, allowing the app to start
-and run without any external state backend. The null client chain
-absorbs arbitrary chained calls like:
+without a persistent state service. The null client chain absorbs
+arbitrary chained calls like:
 
     store.client.table("x").select("*").eq("id", "1").execute()
 
-This preserves the API contract for a future PostgreSQL migration.
+This preserves the API contract for a future PostgreSQL-backed implementation.
 """
 
 from datetime import datetime
@@ -45,7 +45,7 @@ class _NullQueryBuilder:
 
 
 class _NullTableClient:
-    """Mimics the Supabase client interface with table()/rpc() entry points."""
+    """PostgREST-style client surface with table()/rpc() entry points."""
 
     def table(self, name: str) -> _NullQueryBuilder:
         return _NullQueryBuilder()
@@ -55,7 +55,7 @@ class _NullTableClient:
 
 
 class NullStateStore:
-    """No-op state store implementing the SupabaseStateStore interface.
+    """No-op state store for development and graceful degradation.
 
     All read operations return empty results.
     All write operations silently succeed.

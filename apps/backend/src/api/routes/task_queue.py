@@ -14,7 +14,7 @@ from fastapi import APIRouter, HTTPException, Query, Request, status
 from pydantic import BaseModel, Field
 
 from src.api.error_handling import create_error_response
-from src.state.supabase import SupabaseStateStore
+from src.state.null_store import NullStateStore
 from src.utils import get_logger
 
 logger = get_logger(__name__)
@@ -101,7 +101,7 @@ async def create_task(
         HTTPException: If creation fails
     """
     try:
-        store = SupabaseStateStore()
+        store = NullStateStore()
 
         # Create task in database
         result = store.client.table("agent_task_queue").insert({
@@ -182,7 +182,7 @@ async def list_tasks(
         HTTPException: If listing fails
     """
     try:
-        store = SupabaseStateStore()
+        store = NullStateStore()
 
         # Build query
         query = store.client.table("agent_task_queue").select("*")
@@ -272,7 +272,7 @@ async def get_task(request: Request, task_id: str) -> TaskResponse:
         HTTPException: If task not found
     """
     try:
-        store = SupabaseStateStore()
+        store = NullStateStore()
 
         result = store.client.table("agent_task_queue").select("*").eq(
             "id", task_id
@@ -337,7 +337,7 @@ async def update_task(
         HTTPException: If task not found or update fails
     """
     try:
-        store = SupabaseStateStore()
+        store = NullStateStore()
 
         # Build update fields
         fields = {}
@@ -418,7 +418,7 @@ async def cancel_task(request: Request, task_id: str) -> None:
         HTTPException: If task not found or already completed
     """
     try:
-        store = SupabaseStateStore()
+        store = NullStateStore()
 
         # Check task exists and is cancellable
         task_result = store.client.table("agent_task_queue").select("status").eq(
@@ -473,7 +473,7 @@ async def execute_task(request: Request, task_id: str) -> dict[str, Any]:
         HTTPException: If task not found or execution fails
     """
     try:
-        store = SupabaseStateStore()
+        store = NullStateStore()
 
         # Get task
         task_result = store.client.table("agent_task_queue").select("*").eq(
@@ -540,7 +540,7 @@ async def get_queue_stats(request: Request) -> dict[str, Any]:
         HTTPException: If fetching fails
     """
     try:
-        store = SupabaseStateStore()
+        store = NullStateStore()
 
         result = store.client.table("agent_task_queue").select("status, task_type").execute()
 

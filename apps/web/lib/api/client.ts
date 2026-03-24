@@ -1,7 +1,7 @@
 /**
  * API Client for FastAPI Backend
  *
- * Replaces Supabase client with direct fetch calls to FastAPI.
+ * Direct fetch calls to the FastAPI backend.
  * Handles JWT authentication via cookies, request timeout,
  * and exponential backoff retry for transient failures.
  */

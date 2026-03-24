@@ -14,7 +14,7 @@ from typing import Any
 
 from pydantic import BaseModel
 
-from src.state.supabase import SupabaseStateStore
+from src.state.null_store import NullStateStore
 from src.utils import get_logger
 
 logger = get_logger(__name__)
@@ -58,7 +58,7 @@ class AgentMetrics:
 
     def __init__(self) -> None:
         """Initialize agent metrics."""
-        self.store = SupabaseStateStore()
+        self.store = NullStateStore()
         self.client = self.store.client
 
     async def track_task_execution(

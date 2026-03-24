@@ -292,7 +292,7 @@ class BaseAgent(ABC):
                 "api": ["backend/FASTAPI.md"],
                 "fastapi": ["backend/FASTAPI.md"],
                 "database": ["database/SUPABASE.md", "database/MIGRATIONS.md"],
-                "supabase": ["database/SUPABASE.md"],
+                "postgresql": ["database/migrations.skill.md"],
                 "devops": ["devops/DOCKER.md", "devops/DEPLOYMENT.md"],
             }
 
@@ -726,7 +726,7 @@ class DatabaseAgent(BaseAgent):
     def __init__(self) -> None:
         super().__init__(
             name="database",
-            capabilities=["database", "sql", "supabase", "migration", "query", "schema"],
+            capabilities=["database", "sql", "postgresql", "migration", "query", "schema"],
         )
 
     async def execute(

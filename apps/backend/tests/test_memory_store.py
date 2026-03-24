@@ -14,8 +14,8 @@ from src.memory.models import (
 
 
 @pytest.fixture
-def mock_supabase_client():
-    """Mock Supabase client."""
+def mock_table_client():
+    """Mock PostgREST-style table client."""
     client = MagicMock()
 
     # Mock table chain
@@ -37,10 +37,10 @@ def mock_embedding_provider():
 
 
 @pytest.fixture
-async def memory_store(mock_supabase_client, mock_embedding_provider):
+async def memory_store(mock_table_client, mock_embedding_provider):
     """Create a MemoryStore with mocked dependencies."""
-    with patch("src.memory.store.SupabaseStateStore") as mock_supabase:
-        mock_supabase.return_value.client = mock_supabase_client
+    with patch("src.memory.store.NullStateStore") as mock_store:
+        mock_store.return_value.client = mock_table_client
 
         store = MemoryStore()
         store.embedding_provider = mock_embedding_provider
@@ -52,7 +52,7 @@ class TestMemoryStoreCRUD:
     """Test CRUD operations."""
 
     @pytest.mark.asyncio
-    async def test_create_memory(self, memory_store, mock_supabase_client):
+    async def test_create_memory(self, memory_store, mock_table_client):
         """Test creating a new memory entry."""
         # Mock response
         mock_response = MagicMock()
@@ -74,7 +74,7 @@ class TestMemoryStoreCRUD:
             "expires_at": None,
         }]
 
-        mock_supabase_client.table.return_value.insert.return_value.execute.return_value = mock_response
+        mock_table_client.table.return_value.insert.return_value.execute.return_value = mock_response
 
         # Create memory
         entry = await memory_store.create(
@@ -93,7 +93,7 @@ class TestMemoryStoreCRUD:
         memory_store.embedding_provider.get_embedding.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_create_memory_without_embedding(self, memory_store, mock_supabase_client):
+    async def test_create_memory_without_embedding(self, memory_store, mock_table_client):
         """Test creating memory without generating embedding."""
         mock_response = MagicMock()
         mock_response.data = [{
@@ -114,7 +114,7 @@ class TestMemoryStoreCRUD:
             "expires_at": None,
         }]
 
-        mock_supabase_client.table.return_value.insert.return_value.execute.return_value = mock_response
+        mock_table_client.table.return_value.insert.return_value.execute.return_value = mock_response
 
         entry = await memory_store.create(
             domain=MemoryDomain.PREFERENCE,
@@ -128,7 +128,7 @@ class TestMemoryStoreCRUD:
         memory_store.embedding_provider.get_embedding.assert_not_called()
 
     @pytest.mark.asyncio
-    async def test_get_memory(self, memory_store, mock_supabase_client):
+    async def test_get_memory(self, memory_store, mock_table_client):
         """Test retrieving a memory entry."""
         memory_id = str(uuid4())
 
@@ -151,8 +151,8 @@ class TestMemoryStoreCRUD:
             "expires_at": None,
         }]
 
-        mock_supabase_client.table.return_value.select.return_value.eq.return_value.execute.return_value = mock_response
-        mock_supabase_client.rpc.return_value.execute.return_value = MagicMock()
+        mock_table_client.table.return_value.select.return_value.eq.return_value.execute.return_value = mock_response
+        mock_table_client.rpc.return_value.execute.return_value = MagicMock()
 
         entry = await memory_store.get(memory_id)
 
@@ -161,19 +161,19 @@ class TestMemoryStoreCRUD:
         assert entry.access_count == 6  # Incremented
 
     @pytest.mark.asyncio
-    async def test_get_memory_not_found(self, memory_store, mock_supabase_client):
+    async def test_get_memory_not_found(self, memory_store, mock_table_client):
         """Test retrieving a non-existent memory."""
         mock_response = MagicMock()
         mock_response.data = []
 
-        mock_supabase_client.table.return_value.select.return_value.eq.return_value.execute.return_value = mock_response
+        mock_table_client.table.return_value.select.return_value.eq.return_value.execute.return_value = mock_response
 
         entry = await memory_store.get(str(uuid4()))
 
         assert entry is None
 
     @pytest.mark.asyncio
-    async def test_update_memory(self, memory_store, mock_supabase_client):
+    async def test_update_memory(self, memory_store, mock_table_client):
         """Test updating a memory entry."""
         memory_id = str(uuid4())
 
@@ -196,7 +196,7 @@ class TestMemoryStoreCRUD:
             "expires_at": None,
         }]
 
-        mock_supabase_client.table.return_value.update.return_value.eq.return_value.execute.return_value = mock_response
+        mock_table_client.table.return_value.update.return_value.eq.return_value.execute.return_value = mock_response
 
         entry = await memory_store.update(
             memory_id,
@@ -208,26 +208,26 @@ class TestMemoryStoreCRUD:
         assert "authentication" in entry.tags
 
     @pytest.mark.asyncio
-    async def test_delete_memory(self, memory_store, mock_supabase_client):
+    async def test_delete_memory(self, memory_store, mock_table_client):
         """Test deleting a memory entry."""
         memory_id = str(uuid4())
 
         mock_response = MagicMock()
         mock_response.data = [{"id": memory_id}]
 
-        mock_supabase_client.table.return_value.delete.return_value.eq.return_value.execute.return_value = mock_response
+        mock_table_client.table.return_value.delete.return_value.eq.return_value.execute.return_value = mock_response
 
         success = await memory_store.delete(memory_id)
 
         assert success is True
 
     @pytest.mark.asyncio
-    async def test_delete_memory_not_found(self, memory_store, mock_supabase_client):
+    async def test_delete_memory_not_found(self, memory_store, mock_table_client):
         """Test deleting a non-existent memory."""
         mock_response = MagicMock()
         mock_response.data = []
 
-        mock_supabase_client.table.return_value.delete.return_value.eq.return_value.execute.return_value = mock_response
+        mock_table_client.table.return_value.delete.return_value.eq.return_value.execute.return_value = mock_response
 
         success = await memory_store.delete(str(uuid4()))
 
@@ -238,7 +238,7 @@ class TestMemoryStoreQuery:
     """Test query operations."""
 
     @pytest.mark.asyncio
-    async def test_query_by_domain(self, memory_store, mock_supabase_client):
+    async def test_query_by_domain(self, memory_store, mock_table_client):
         """Test querying memories by domain."""
         mock_response = MagicMock()
         mock_response.data = [
@@ -265,11 +265,11 @@ class TestMemoryStoreQuery:
         mock_count_response.count = 1
 
         # Mock the query chain
-        query_mock = mock_supabase_client.table.return_value.select.return_value
+        query_mock = mock_table_client.table.return_value.select.return_value
         query_mock.eq.return_value.order.return_value.range.return_value.execute.return_value = mock_response
 
         # Mock the count query
-        count_query_mock = mock_supabase_client.table.return_value.select.return_value
+        count_query_mock = mock_table_client.table.return_value.select.return_value
         count_query_mock.eq.return_value.execute.return_value = mock_count_response
 
         query = MemoryQuery(domain=MemoryDomain.KNOWLEDGE)
@@ -280,7 +280,7 @@ class TestMemoryStoreQuery:
         assert result.entries[0].domain == MemoryDomain.KNOWLEDGE
 
     @pytest.mark.asyncio
-    async def test_query_with_pagination(self, memory_store, mock_supabase_client):
+    async def test_query_with_pagination(self, memory_store, mock_table_client):
         """Test querying with pagination."""
         mock_response = MagicMock()
         mock_response.data = []
@@ -288,10 +288,10 @@ class TestMemoryStoreQuery:
         mock_count_response = MagicMock()
         mock_count_response.count = 100
 
-        query_mock = mock_supabase_client.table.return_value.select.return_value
+        query_mock = mock_table_client.table.return_value.select.return_value
         query_mock.order.return_value.range.return_value.execute.return_value = mock_response
 
-        count_query_mock = mock_supabase_client.table.return_value.select.return_value
+        count_query_mock = mock_table_client.table.return_value.select.return_value
         count_query_mock.execute.return_value = mock_count_response
 
         query = MemoryQuery(limit=20, offset=40)
@@ -302,7 +302,7 @@ class TestMemoryStoreQuery:
         query_mock.order.return_value.range.assert_called_once_with(40, 59)
 
     @pytest.mark.asyncio
-    async def test_query_with_filters(self, memory_store, mock_supabase_client):
+    async def test_query_with_filters(self, memory_store, mock_table_client):
         """Test querying with multiple filters."""
         mock_response = MagicMock()
         mock_response.data = []
@@ -310,10 +310,10 @@ class TestMemoryStoreQuery:
         mock_count_response = MagicMock()
         mock_count_response.count = 0
 
-        query_mock = mock_supabase_client.table.return_value.select.return_value
+        query_mock = mock_table_client.table.return_value.select.return_value
         query_mock.eq.return_value.eq.return_value.eq.return_value.order.return_value.range.return_value.execute.return_value = mock_response
 
-        count_query_mock = mock_supabase_client.table.return_value.select.return_value
+        count_query_mock = mock_table_client.table.return_value.select.return_value
         count_query_mock.eq.return_value.eq.return_value.eq.return_value.execute.return_value = mock_count_response
 
         user_id = str(uuid4())
@@ -331,7 +331,7 @@ class TestMemoryStoreVectorSearch:
     """Test vector similarity search."""
 
     @pytest.mark.asyncio
-    async def test_find_similar(self, memory_store, mock_supabase_client, mock_embedding_provider):
+    async def test_find_similar(self, memory_store, mock_table_client, mock_embedding_provider):
         """Test semantic similarity search."""
         mock_response = MagicMock()
         mock_response.data = [
@@ -353,7 +353,7 @@ class TestMemoryStoreVectorSearch:
             },
         ]
 
-        mock_supabase_client.rpc.return_value.execute.return_value = mock_response
+        mock_table_client.rpc.return_value.execute.return_value = mock_response
 
         results = await memory_store.find_similar(
             query_text="How does authentication work?",
@@ -369,14 +369,14 @@ class TestMemoryStoreVectorSearch:
         mock_embedding_provider.get_embedding.assert_called_once_with("How does authentication work?")
 
     @pytest.mark.asyncio
-    async def test_find_similar_with_user_filter(self, memory_store, mock_supabase_client, mock_embedding_provider):
+    async def test_find_similar_with_user_filter(self, memory_store, mock_table_client, mock_embedding_provider):
         """Test similarity search with user filter."""
         user_id = str(uuid4())
 
         mock_response = MagicMock()
         mock_response.data = []
 
-        mock_supabase_client.rpc.return_value.execute.return_value = mock_response
+        mock_table_client.rpc.return_value.execute.return_value = mock_response
 
         results = await memory_store.find_similar(
             query_text="coding style preferences",
@@ -384,7 +384,7 @@ class TestMemoryStoreVectorSearch:
         )
 
         # Verify RPC was called with user filter
-        call_args = mock_supabase_client.rpc.call_args
+        call_args = mock_table_client.rpc.call_args
         assert call_args[0][0] == "find_similar_memories"
         # Access the arguments dict from args[1]
         rpc_params = call_args[0][1] if len(call_args[0]) > 1 else call_args[1]
@@ -395,12 +395,12 @@ class TestMemoryStoreMaintenance:
     """Test maintenance operations."""
 
     @pytest.mark.asyncio
-    async def test_prune_stale(self, memory_store, mock_supabase_client):
+    async def test_prune_stale(self, memory_store, mock_table_client):
         """Test pruning stale memories."""
         mock_response = MagicMock()
         mock_response.data = 5  # 5 memories pruned
 
-        mock_supabase_client.rpc.return_value.execute.return_value = mock_response
+        mock_table_client.rpc.return_value.execute.return_value = mock_response
 
         deleted_count = await memory_store.prune_stale(
             min_relevance=0.3,
@@ -410,11 +410,11 @@ class TestMemoryStoreMaintenance:
         assert deleted_count == 5
 
         # Verify RPC was called
-        call_args = mock_supabase_client.rpc.call_args
+        call_args = mock_table_client.rpc.call_args
         assert call_args[0][0] == "prune_stale_memories"
 
     @pytest.mark.asyncio
-    async def test_update_relevance_positive(self, memory_store, mock_supabase_client):
+    async def test_update_relevance_positive(self, memory_store, mock_table_client):
         """Test updating relevance with positive feedback."""
         memory_id = str(uuid4())
 
@@ -458,16 +458,16 @@ class TestMemoryStoreMaintenance:
             "expires_at": None,
         }]
 
-        mock_supabase_client.table.return_value.select.return_value.eq.return_value.execute.return_value = get_response
-        mock_supabase_client.table.return_value.update.return_value.eq.return_value.execute.return_value = update_response
-        mock_supabase_client.rpc.return_value.execute.return_value = MagicMock()
+        mock_table_client.table.return_value.select.return_value.eq.return_value.execute.return_value = get_response
+        mock_table_client.table.return_value.update.return_value.eq.return_value.execute.return_value = update_response
+        mock_table_client.rpc.return_value.execute.return_value = MagicMock()
 
         success = await memory_store.update_relevance(memory_id, feedback=1.0)
 
         assert success is True
 
     @pytest.mark.asyncio
-    async def test_update_relevance_negative(self, memory_store, mock_supabase_client):
+    async def test_update_relevance_negative(self, memory_store, mock_table_client):
         """Test updating relevance with negative feedback."""
         memory_id = str(uuid4())
 
@@ -511,9 +511,9 @@ class TestMemoryStoreMaintenance:
             "expires_at": None,
         }]
 
-        mock_supabase_client.table.return_value.select.return_value.eq.return_value.execute.return_value = get_response
-        mock_supabase_client.table.return_value.update.return_value.eq.return_value.execute.return_value = update_response
-        mock_supabase_client.rpc.return_value.execute.return_value = MagicMock()
+        mock_table_client.table.return_value.select.return_value.eq.return_value.execute.return_value = get_response
+        mock_table_client.table.return_value.update.return_value.eq.return_value.execute.return_value = update_response
+        mock_table_client.rpc.return_value.execute.return_value = MagicMock()
 
         success = await memory_store.update_relevance(memory_id, feedback=-1.0)
 

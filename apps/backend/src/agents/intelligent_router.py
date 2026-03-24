@@ -124,7 +124,7 @@ class IntelligentRouter:
         categories_keywords = {
             "frontend": ["ui", "component", "page", "react", "nextjs", "tailwind"],
             "backend": ["api", "endpoint", "service", "fastapi", "agent"],
-            "database": ["migration", "schema", "query", "supabase", "sql"],
+            "database": ["migration", "schema", "query", "postgresql", "sql"],
             "testing": ["test", "coverage", "e2e"],
             "documentation": ["docs", "readme", "documentation"],
             "refactoring": ["refactor", "improve", "cleanup", "optimize"],

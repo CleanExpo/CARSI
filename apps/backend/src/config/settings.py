@@ -184,16 +184,6 @@ class Settings(BaseSettings):
         description="YouTube Data API v3 key for channel stats sync (leave empty to disable sync)",
     )
 
-    # Supabase (Hub submissions — tables managed by Supabase migrations)
-    supabase_url: str = Field(
-        default="",
-        description="Supabase project URL (e.g. https://xxx.supabase.co)",
-    )
-    supabase_service_role_key: str = Field(
-        default="",
-        description="Supabase service role key for server-side REST API access",
-    )
-
     # MCP Tools
     exa_api_key: str = Field(default="")
     ref_tools_api_key: str = Field(default="")

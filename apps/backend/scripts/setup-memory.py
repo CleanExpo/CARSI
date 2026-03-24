@@ -41,22 +41,15 @@ async def verify_setup() -> int:
     # 1. Check environment variables
     print("1. Checking environment variables...\n")
 
-    supabase_url = os.getenv("NEXT_PUBLIC_SUPABASE_URL")
-    supabase_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+    database_url = os.getenv("DATABASE_URL")
     openai_key = os.getenv("OPENAI_API_KEY")
     anthropic_key = os.getenv("ANTHROPIC_API_KEY")
 
-    if not supabase_url:
-        errors.append("NEXT_PUBLIC_SUPABASE_URL not set")
-        print_check("Supabase URL", False, "Environment variable not set")
+    if not database_url:
+        errors.append("DATABASE_URL not set")
+        print_check("DATABASE_URL", False, "Environment variable not set")
     else:
-        print_check("Supabase URL", True, f"{supabase_url}")
-
-    if not supabase_key:
-        errors.append("SUPABASE_SERVICE_ROLE_KEY not set")
-        print_check("Supabase service key", False, "Environment variable not set")
-    else:
-        print_check("Supabase service key", True, "Configured")
+        print_check("DATABASE_URL", True, "Configured")
 
     # Check embedding providers
     if openai_key:
@@ -74,23 +67,17 @@ async def verify_setup() -> int:
             "Using SimpleEmbeddingProvider (dev only)",
         )
 
-    # 2. Test database connection
-    print("\n2. Testing database connection...\n")
+    # 2. State store (null backend until PostgreSQL domain memory is wired)
+    print("\n2. Testing state store...\n")
     try:
-        from src.state.supabase import SupabaseStateStore
+        from src.state.null_store import NullStateStore
 
-        store = SupabaseStateStore()
-        client = store.client
-
-        # Try a simple query
-        result = client.table("domain_memories").select("id").limit(0).execute()
-        print_check("Database connection", True, "Successfully connected to Supabase")
-        print_check(
-            "domain_memories table", True, "Table exists and is accessible"
-        )
+        store = NullStateStore()
+        _ = store.client.table("domain_memories").select("id").limit(0).execute()
+        print_check("NullStateStore", True, "Client chain resolves (no external state backend)")
     except Exception as e:
-        errors.append(f"Database connection failed: {e}")
-        print_check("Database connection", False, str(e))
+        errors.append(f"State store check failed: {e}")
+        print_check("NullStateStore", False, str(e))
 
     # 3. Test memory store initialization
     print("\n3. Testing MemoryStore initialization...\n")
@@ -188,34 +175,30 @@ async def verify_setup() -> int:
         warnings.append(f"CRUD test failed: {e}")
         print_check("CRUD operations", False, str(e))
 
-    # 6. Test SupabaseStateStore memory methods
-    print("\n6. Testing SupabaseStateStore memory integration...\n")
+    # 6. NullStateStore memory API surface
+    print("\n6. Testing NullStateStore memory methods...\n")
     try:
-        from src.state.supabase import SupabaseStateStore
+        from src.state.null_store import NullStateStore
 
-        store = SupabaseStateStore()
-
-        # Test memory creation via SupabaseStateStore
+        store = NullStateStore()
         memory = await store.create_memory(
             domain="knowledge",
             category="setup_test",
-            key="supabase_integration_test",
-            value={"test": "supabase"},
+            key="null_store_integration_test",
+            value={"test": "memory"},
         )
         print_check(
-            "SupabaseStateStore.create_memory",
+            "NullStateStore.create_memory",
             True,
-            f"Created memory {memory.get('id', 'unknown')}",
+            f"Returned synthetic record {memory.get('id', 'unknown')}",
         )
-
-        # Clean up
-        if "id" in memory:
+        if memory and memory.get("id"):
             await store.delete_memory(memory["id"])
-            print_check("SupabaseStateStore.delete_memory", True, "Cleaned up test data")
+            print_check("NullStateStore.delete_memory", True, "Completed (no-op backend)")
 
     except Exception as e:
-        warnings.append(f"SupabaseStateStore integration test failed: {e}")
-        print_check("SupabaseStateStore integration", False, str(e))
+        warnings.append(f"NullStateStore memory test failed: {e}")
+        print_check("NullStateStore memory", False, str(e))
 
     # Summary
     print_header("📊 Verification Summary")
@@ -232,8 +215,8 @@ async def verify_setup() -> int:
                 print(f"   - {warning}")
 
         print("\n💡 Suggested fixes:")
-        print("   1. Ensure Supabase is running: supabase start")
-        print("   2. Apply migrations: supabase db reset")
+        print("   1. Ensure PostgreSQL is running (e.g. pnpm run docker:up)")
+        print("   2. Apply Alembic migrations: cd apps/backend && uv run alembic upgrade head")
         print("   3. Check .env file has required variables")
         print("   4. Re-run this script: uv run python scripts/setup-memory.py\n")
 

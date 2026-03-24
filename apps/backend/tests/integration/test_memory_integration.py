@@ -7,13 +7,13 @@ Run with: pytest tests/integration/test_memory_integration.py -v -m integration
 import pytest
 
 pytestmark = pytest.mark.skip(
-    reason="Requires real Supabase backend. CARSI uses NullStateStore — run with a live DB to enable."
+    reason="Requires persistent domain memory (PostgreSQL). NullStateStore is no-op — enable when wired."
 )
 from uuid import uuid4
 
 from src.memory.models import MemoryDomain, MemoryQuery
 from src.memory.store import MemoryStore
-from src.state.supabase import SupabaseStateStore
+from src.state.null_store import NullStateStore
 
 
 @pytest.mark.integration
@@ -318,115 +318,99 @@ class TestMemoryStoreIntegration:
 
 
 @pytest.mark.integration
-class TestSupabaseStateStoreMemoryIntegration:
-    """Test SupabaseStateStore memory methods with real database."""
+class TestNullStateStoreMemoryIntegration:
+    """Test NullStateStore memory methods (synthetic responses when module un-skipped)."""
 
     @pytest.fixture
-    def supabase_store(self):
-        """Create SupabaseStateStore."""
-        return SupabaseStateStore()
+    def state_store(self):
+        """Create NullStateStore."""
+        return NullStateStore()
 
     @pytest.mark.asyncio
-    async def test_create_memory_via_supabase_store(self, supabase_store):
-        """Test creating memory through SupabaseStateStore."""
-        memory = await supabase_store.create_memory(
+    async def test_create_memory_via_state_store(self, state_store):
+        """Test creating memory through NullStateStore."""
+        memory = await state_store.create_memory(
             domain="knowledge",
             category="integration_test",
-            key="supabase_create_test",
-            value={"test": "supabase integration"},
+            key="null_create_test",
+            value={"test": "integration"},
         )
 
         assert memory is not None
-        assert memory["key"] == "supabase_create_test"
+        assert memory["key"] == "null_create_test"
         assert memory["domain"] == "knowledge"
         assert "id" in memory
 
-        # Clean up
-        await supabase_store.delete_memory(memory["id"])
+        await state_store.delete_memory(memory["id"])
 
     @pytest.mark.asyncio
-    async def test_query_memories_via_supabase_store(self, supabase_store):
-        """Test querying memories through SupabaseStateStore."""
-        # Create test data
-        memory = await supabase_store.create_memory(
+    async def test_query_memories_via_state_store(self, state_store):
+        """Test querying memories through NullStateStore."""
+        memory = await state_store.create_memory(
             domain="testing",
             category="integration_test",
-            key="supabase_query_test",
+            key="null_query_test",
             value={"test": "query"},
         )
 
-        # Query
-        results = await supabase_store.query_memories(
+        results = await state_store.query_memories(
             domain="testing",
             category="integration_test",
             limit=10,
         )
 
-        assert len(results) > 0
-        assert any(r["key"] == "supabase_query_test" for r in results)
+        assert isinstance(results, list)
 
-        # Clean up
-        await supabase_store.delete_memory(memory["id"])
+        await state_store.delete_memory(memory["id"])
 
     @pytest.mark.asyncio
-    async def test_get_memory_via_supabase_store(self, supabase_store):
-        """Test retrieving memory through SupabaseStateStore."""
-        # Create
-        memory = await supabase_store.create_memory(
+    async def test_get_memory_via_state_store(self, state_store):
+        """Test retrieving memory through NullStateStore."""
+        memory = await state_store.create_memory(
             domain="knowledge",
             category="integration_test",
-            key="supabase_get_test",
+            key="null_get_test",
             value={"test": "get"},
         )
 
-        # Get
-        retrieved = await supabase_store.get_memory(memory["id"])
+        retrieved = await state_store.get_memory(memory["id"])
 
-        assert retrieved is not None
-        assert retrieved["id"] == memory["id"]
-        assert retrieved["key"] == "supabase_get_test"
+        assert retrieved is None
 
-        # Clean up
-        await supabase_store.delete_memory(memory["id"])
+        await state_store.delete_memory(memory["id"])
 
     @pytest.mark.asyncio
-    async def test_update_memory_via_supabase_store(self, supabase_store):
-        """Test updating memory through SupabaseStateStore."""
-        # Create
-        memory = await supabase_store.create_memory(
+    async def test_update_memory_via_state_store(self, state_store):
+        """Test updating memory through NullStateStore."""
+        memory = await state_store.create_memory(
             domain="knowledge",
             category="integration_test",
-            key="supabase_update_test",
+            key="null_update_test",
             value={"status": "initial"},
         )
 
-        # Update
-        updated = await supabase_store.update_memory(
+        updated = await state_store.update_memory(
             memory["id"],
             {"value": {"status": "updated"}},
         )
 
-        assert updated is not None
-        assert updated["value"] == {"status": "updated"}
+        assert updated is None
 
-        # Clean up
-        await supabase_store.delete_memory(memory["id"])
+        await state_store.delete_memory(memory["id"])
 
     @pytest.mark.asyncio
-    async def test_delete_memory_via_supabase_store(self, supabase_store):
-        """Test deleting memory through SupabaseStateStore."""
-        # Create
-        memory = await supabase_store.create_memory(
+    async def test_delete_memory_via_state_store(self, state_store):
+        """Test deleting memory through NullStateStore."""
+        memory = await state_store.create_memory(
             domain="knowledge",
             category="integration_test",
-            key="supabase_delete_test",
+            key="null_delete_test",
             value={"test": "delete"},
         )
 
-        # Delete
-        success = await supabase_store.delete_memory(memory["id"])
-        assert success is True
+        success = await state_store.delete_memory(memory["id"])
+        assert success is False
 
         # Verify deletion
-        retrieved = await supabase_store.get_memory(memory["id"])
+        retrieved = await state_store.get_memory(memory["id"])
         assert retrieved is None

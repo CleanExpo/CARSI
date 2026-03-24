@@ -37,7 +37,7 @@ def sample_context():
         "target_users": "Remote teams, project managers",
         "timeline": "3 months",
         "team_size": 2,
-        "existing_stack": "Next.js + FastAPI + Supabase",
+        "existing_stack": "Next.js + FastAPI + PostgreSQL",
     }
 
 

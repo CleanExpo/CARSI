@@ -189,7 +189,7 @@ app.include_router(news.router, tags=["News Feed"])
 app.include_router(podcasts.router, tags=["Podcast Directory"])
 # CARSI Hub — YouTube Channel Directory
 app.include_router(youtube.router, tags=["YouTube Channel Directory"])
-# CARSI Hub — Submission Processing (admin review + Supabase webhook)
+# CARSI Hub — Submission Processing (admin review + webhooks)
 app.include_router(hub_submissions.router, prefix="/api/hub", tags=["hub-submissions"])
 
 
