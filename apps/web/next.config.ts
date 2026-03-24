@@ -89,7 +89,7 @@ const nextConfig: NextConfig = {
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
               "img-src 'self' data: https: blob:",
-              `connect-src 'self' ${(process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000').trim()} https://api.stripe.com`,
+              `connect-src 'self' ${(process.env.NEXT_PUBLIC_BACKEND_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000').trim()} https://api.stripe.com`,
               'frame-src https://js.stripe.com https://hooks.stripe.com',
               "frame-ancestors 'none'",
             ].join('; '),
