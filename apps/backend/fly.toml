@@ -55,12 +55,12 @@ primary_region = "syd"
 
   # Health check — maps to FastAPI /health endpoint
   [[http_service.checks]]
-    grace_period = "15s"
+    grace_period = "30s"
     interval = "30s"
     method = "GET"
     path = "/health"
     protocol = "http"
-    timeout = "5s"
+    timeout = "10s"
 
 # Machine sizes — per-process VM configuration
 # app:    512MB — uvicorn handles HTTP traffic
