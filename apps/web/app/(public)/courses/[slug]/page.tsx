@@ -28,6 +28,26 @@ const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8000
 const siteUrl = process.env.NEXT_PUBLIC_FRONTEND_URL ?? 'https://carsi.com.au';
 
 async function getCourse(slug: string): Promise<CourseDetail | null> {
+  // Try Supabase first (has thumbnail_url populated)
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (supabaseUrl && supabaseKey) {
+    try {
+      const res = await fetch(
+        `${supabaseUrl}/rest/v1/lms_courses?slug=eq.${encodeURIComponent(slug)}&limit=1`,
+        {
+          next: { revalidate: 60 },
+          headers: { apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}` },
+        }
+      );
+      if (res.ok) {
+        const rows = await res.json();
+        if (Array.isArray(rows) && rows.length > 0) return rows[0];
+      }
+    } catch {
+      // fall through to backend
+    }
+  }
   try {
     const res = await fetch(`${backendUrl}/api/lms/courses/${slug}`, {
       next: { revalidate: 60 },

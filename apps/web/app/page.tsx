@@ -34,6 +34,40 @@ interface Course {
 // ---------------------------------------------------------------------------
 
 async function getFeaturedCourses(): Promise<{ courses: Course[]; total: number }> {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (supabaseUrl && supabaseKey) {
+    try {
+      const res = await fetch(
+        `${supabaseUrl}/rest/v1/lms_courses?select=id,slug,title,short_description,price_aud,is_free,discipline,thumbnail_url&limit=3&order=updated_at.desc`,
+        {
+          next: { revalidate: 300 },
+          headers: { apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}` },
+        }
+      );
+      if (res.ok) {
+        const items = await res.json();
+        // Get total count
+        const countRes = await fetch(
+          `${supabaseUrl}/rest/v1/lms_courses?select=count`,
+          {
+            next: { revalidate: 300 },
+            headers: {
+              apikey: supabaseKey,
+              Authorization: `Bearer ${supabaseKey}`,
+              Prefer: 'count=exact',
+            },
+          }
+        );
+        const total = countRes.ok
+          ? parseInt(countRes.headers.get('content-range')?.split('/')[1] ?? '0', 10)
+          : (Array.isArray(items) ? items.length : 0);
+        return { courses: Array.isArray(items) ? items : [], total };
+      }
+    } catch {
+      // fall through to backend
+    }
+  }
   const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8000';
   try {
     const res = await fetch(`${backendUrl}/api/lms/courses?limit=3`, {

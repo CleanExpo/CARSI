@@ -78,6 +78,11 @@ nul
 *.png
 *.jpg
 *.jpeg
+# Exceptions: public static assets must be committed
+!apps/web/public/**/*.png
+!apps/web/public/**/*.jpg
+!apps/web/public/**/*.jpeg
+!apps/web/public/**/*.webp
 login-section.md
 
 # Backend-level Claude hook shim (auto-generated to fix CWD drift)

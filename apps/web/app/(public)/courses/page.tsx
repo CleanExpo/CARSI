@@ -40,11 +40,38 @@ async function getBundles() {
 }
 
 async function getCourses() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (supabaseUrl && supabaseKey) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 8000);
+      const res = await fetch(
+        `${supabaseUrl}/rest/v1/lms_courses?select=id,slug,title,short_description,price_aud,is_free,level,category,discipline,lesson_count,thumbnail_url,updated_at&limit=200&order=title`,
+        {
+          next: { revalidate: 300 },
+          signal: controller.signal,
+          headers: {
+            apikey: supabaseKey,
+            Authorization: `Bearer ${supabaseKey}`,
+          },
+        }
+      );
+      clearTimeout(timeoutId);
+      if (res.ok) {
+        const items = await res.json();
+        return { items: Array.isArray(items) ? items : [], total: Array.isArray(items) ? items.length : 0 };
+      }
+    } catch {
+      // fall through to backend
+    }
+  }
+  // Fallback to backend
   const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8000';
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000);
-    const res = await fetch(`${backendUrl}/api/lms/courses`, {
+    const res = await fetch(`${backendUrl}/api/lms/courses?limit=200`, {
       next: { revalidate: 60 },
       signal: controller.signal,
     });
