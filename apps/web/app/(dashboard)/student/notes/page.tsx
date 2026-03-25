@@ -68,12 +68,12 @@ function NoteCard({
   deleting,
 }: NoteCardProps) {
   return (
-    <div className="flex flex-col gap-3 rounded-sm border border-white/[0.06] bg-zinc-900/50 p-5">
+    <div className="flex flex-col gap-3 rounded-md border border-border bg-zinc-900/50 p-5">
       {/* Lesson heading */}
       <div className="flex flex-col gap-0.5">
-        <h3 className="text-sm leading-snug font-semibold text-white">{note.lesson_title}</h3>
+        <h3 className="text-sm leading-snug font-semibold text-foreground">{note.lesson_title}</h3>
         {note.module_title && (
-          <p className="font-mono text-xs tracking-widest text-white/40 uppercase">
+          <p className="font-mono text-xs tracking-wider text-muted-foreground uppercase">
             {note.module_title}
           </p>
         )}
@@ -82,7 +82,7 @@ function NoteCard({
       {/* Note body */}
       {isEditing ? (
         <textarea
-          className="w-full resize-none rounded-sm border border-white/[0.06] bg-zinc-800 p-3 text-sm text-white focus:border-white/20 focus:outline-none"
+          className="w-full resize-none rounded-sm border border-border bg-input p-3 text-sm text-foreground focus:border-border/60 focus:outline-none"
           rows={5}
           value={editContent}
           onChange={(e) => onEditChange(e.target.value)}
@@ -90,24 +90,24 @@ function NoteCard({
           disabled={saving}
         />
       ) : (
-        <p className="text-sm whitespace-pre-wrap text-white/70">
-          {note.content ?? <span className="text-white/30 italic">No content yet.</span>}
+        <p className="text-sm whitespace-pre-wrap text-foreground/80">
+          {note.content ?? <span className="text-muted-foreground/50 italic">No content yet.</span>}
         </p>
       )}
 
       {/* Updated timestamp (read-only mode) */}
       {!isEditing && note.updated_at && (
-        <p className="font-mono text-xs text-white/30">
+        <p className="font-mono text-xs text-muted-foreground/50">
           Last updated {formatDate(note.updated_at)}
         </p>
       )}
 
       {/* Action row */}
-      <div className="flex flex-wrap items-center gap-3 border-t border-white/[0.06] pt-4">
+      <div className="flex flex-wrap items-center gap-3 border-t border-border pt-4">
         {/* Go to lesson — always visible */}
         <Link
           href={`/student/lessons/${note.lesson_id}`}
-          className="rounded-sm border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 font-mono text-xs text-white/70 transition-colors hover:border-white/20 hover:text-white"
+          className="rounded-md border border-border bg-secondary px-3 py-1.5 font-mono text-xs text-muted-foreground transition-colors hover:border-border/60 hover:text-foreground"
         >
           Go to lesson
         </Link>
@@ -124,7 +124,7 @@ function NoteCard({
             <button
               onClick={onEditCancel}
               disabled={saving}
-              className="rounded-sm border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 font-mono text-xs text-white/50 transition-colors hover:border-white/20 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+              className="rounded-md border border-border bg-secondary px-3 py-1.5 font-mono text-xs text-muted-foreground transition-colors hover:border-border/60 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
             >
               Cancel
             </button>
@@ -133,7 +133,7 @@ function NoteCard({
           <>
             <button
               onClick={() => onEditStart(note.lesson_id, note.content ?? '')}
-              className="rounded-sm border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 font-mono text-xs text-white/70 transition-colors hover:border-white/20 hover:text-white"
+              className="rounded-md border border-border bg-secondary px-3 py-1.5 font-mono text-xs text-muted-foreground transition-colors hover:border-border/60 hover:text-foreground"
             >
               Edit
             </button>
@@ -153,17 +153,17 @@ function NoteCard({
 
 function EmptyState() {
   return (
-    <div className="flex flex-col items-center gap-4 rounded-sm border border-white/[0.06] bg-zinc-900/50 px-6 py-12 text-center">
-      <FileText className="h-10 w-10 text-white/10" />
+    <div className="flex flex-col items-center gap-4 rounded-md border border-border bg-zinc-900/50 px-6 py-12 text-center">
+      <FileText className="h-10 w-10 text-muted-foreground/20" />
       <div className="flex flex-col gap-1">
-        <p className="text-sm font-medium text-white/40">No notes yet.</p>
-        <p className="text-sm text-white/30">
+        <p className="text-sm font-medium text-muted-foreground">No notes yet.</p>
+        <p className="text-sm text-muted-foreground/50">
           Open any lesson and jot notes as you learn. They&apos;ll all appear here.
         </p>
       </div>
       <Link
         href="/courses"
-        className="mt-2 rounded-sm border border-white/[0.08] bg-white/[0.03] px-4 py-2 font-mono text-xs text-white/60 transition-colors hover:border-white/20 hover:text-white"
+        className="mt-2 rounded-md border border-border bg-secondary px-4 py-2 font-mono text-xs text-muted-foreground transition-colors hover:border-border/60 hover:text-foreground"
       >
         Browse Courses
       </Link>
@@ -257,19 +257,19 @@ export default function StudentNotesPage() {
     <main className="flex max-w-4xl flex-col gap-6 p-6">
       {/* Page header */}
       <div className="flex flex-col gap-1">
-        <h1 className="font-mono text-2xl font-bold text-white">My Notes</h1>
-        <p className="text-sm text-white/40">Your private notes from each lesson.</p>
+        <h1 className="text-2xl font-bold text-foreground">My Notes</h1>
+        <p className="text-sm text-muted-foreground">Your private notes from each lesson.</p>
       </div>
 
       {/* Loading */}
-      {loading && <p className="text-sm text-white/30">Loading notes…</p>}
+      {loading && <p className="text-sm text-muted-foreground/50">Loading notes…</p>}
 
       {/* Error */}
       {error && <ErrorBanner message={error} onRetry={fetchNotes} />}
 
       {/* Note count summary */}
       {!loading && !error && notes.length > 0 && (
-        <p className="font-mono text-xs tracking-widest text-white/40 uppercase">
+        <p className="font-mono text-xs tracking-wider text-muted-foreground uppercase">
           {notes.length} {notes.length === 1 ? 'note' : 'notes'} across {totalCourses}{' '}
           {totalCourses === 1 ? 'course' : 'courses'}
         </p>
@@ -284,7 +284,7 @@ export default function StudentNotesPage() {
           {groups.map((group) => (
             <section key={group.course_slug} className="flex flex-col gap-4">
               {/* Course group header */}
-              <h2 className="font-mono text-xs tracking-widest text-white/40 uppercase">
+              <h2 className="font-mono text-xs tracking-wider text-muted-foreground uppercase">
                 {group.course_title}
               </h2>
 

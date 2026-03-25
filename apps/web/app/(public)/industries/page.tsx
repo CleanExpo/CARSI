@@ -236,7 +236,7 @@ export default function IndustriesPage() {
                   <industry.Icon className="h-5 w-5" style={{ color: industry.color }} />
                 </div>
 
-                <h2 className="mb-2 text-lg font-semibold text-foreground transition-colors duration-150 group-hover:text-white">
+                <h2 className="mb-2 text-lg font-semibold text-foreground transition-colors duration-150 group-hover:text-foreground">
                   {industry.label}
                   <ArrowRight
                     className="ml-2 inline h-4 w-4 text-primary opacity-0 transition-opacity duration-150 group-hover:opacity-100"
@@ -285,7 +285,7 @@ export default function IndustriesPage() {
               </Link>
               <Link
                 href="/pathways"
-                className="inline-flex items-center gap-2 rounded-lg border border-border bg-secondary px-6 py-2.5 text-sm font-medium text-muted-foreground transition-colors duration-150 hover:text-white"
+                className="inline-flex items-center gap-2 rounded-lg border border-border bg-secondary px-6 py-2.5 text-sm font-medium text-muted-foreground transition-colors duration-150 hover:text-foreground"
               >
                 View Pathways
               </Link>

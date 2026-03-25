@@ -67,19 +67,19 @@ export default function QuizExplanationModal({
     >
       {/* Modal panel */}
       <div
-        className="relative w-full max-w-lg rounded-sm border border-border bg-background"
+        className="relative w-full max-w-lg rounded-lg border border-border bg-card"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div
           className="flex items-center justify-between border-b border-border px-6 py-4"
         >
-          <h2 className="text-sm font-semibold tracking-widest text-white/70 uppercase">
+          <h2 className="text-sm font-semibold tracking-widest text-muted-foreground uppercase">
             Answer Explanation
           </h2>
           <button
             onClick={onClose}
-            className="text-white/40 transition-colors hover:text-white/80"
+            className="text-muted-foreground transition-colors hover:text-foreground/80"
             aria-label="Close explanation modal"
           >
             <svg
@@ -104,10 +104,10 @@ export default function QuizExplanationModal({
           {loading && (
             <div className="flex items-center justify-center py-8">
               <span
-                className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-white/20"
+                className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-border"
                 style={{ borderTopColor: 'hsl(var(--primary))' }}
               />
-              <span className="ml-3 text-sm text-white/40">Generating explanation…</span>
+              <span className="ml-3 text-sm text-muted-foreground">Generating explanation…</span>
             </div>
           )}
 
@@ -119,30 +119,30 @@ export default function QuizExplanationModal({
             <>
               {/* Correct answer callout */}
               <div
-                className="rounded-sm border border-primary/30 bg-primary/10 px-4 py-3"
+                className="rounded-lg border border-primary/30 bg-primary/10 px-4 py-3"
               >
                 <p
                   className="mb-1 text-xs font-semibold tracking-widest text-primary uppercase"
                 >
                   Correct Answer
                 </p>
-                <p className="text-sm font-medium text-white">{data.correct_answer}</p>
+                <p className="text-sm font-medium text-foreground">{data.correct_answer}</p>
               </div>
 
               {/* Explanation */}
               <div>
-                <p className="mb-1 text-xs font-semibold tracking-widest text-white/40 uppercase">
+                <p className="mb-1 text-xs font-semibold tracking-widest text-muted-foreground/50 uppercase">
                   Why this is correct
                 </p>
-                <p className="text-sm leading-relaxed text-white/80">{data.explanation}</p>
+                <p className="text-sm leading-relaxed text-foreground/80">{data.explanation}</p>
               </div>
 
               {/* Study tip */}
-              <div className="rounded-sm border-l-2 border-primary pl-3">
-                <p className="mb-0.5 text-xs font-semibold tracking-widest text-white/40 uppercase">
+              <div className="rounded-lg border-l-2 border-primary pl-3">
+                <p className="mb-0.5 text-xs font-semibold tracking-widest text-muted-foreground/50 uppercase">
                   Study Tip
                 </p>
-                <p className="text-sm text-white/60">{data.study_tip}</p>
+                <p className="text-sm text-muted-foreground">{data.study_tip}</p>
               </div>
             </>
           )}

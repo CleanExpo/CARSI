@@ -211,22 +211,6 @@ function getAudienceItems(course: CourseDetail): string[] {
 }
 
 /* ---------------------------------------------------------------------------
- * Inline style constants (Scientific Luxury glass panel system)
- * --------------------------------------------------------------------------- */
-
-const glassPanel = {
-  background: 'rgba(255,255,255,0.04)',
-  backdropFilter: 'blur(24px) saturate(160%)',
-  WebkitBackdropFilter: 'blur(24px) saturate(160%)',
-  border: '1px solid rgba(255,255,255,0.07)',
-} as const;
-
-const glassPanelSubtle = {
-  background: 'rgba(255,255,255,0.03)',
-  border: '1px solid rgba(255,255,255,0.06)',
-} as const;
-
-/* ---------------------------------------------------------------------------
  * Page Component
  * --------------------------------------------------------------------------- */
 
@@ -262,7 +246,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
       />
       <BreadcrumbSchema items={breadcrumbs} />
 
-      <main id="main-content" className="relative min-h-screen" style={{ background: '#060a14' }}>
+      <main id="main-content" className="relative min-h-screen bg-background">
         {/* ── Mesh background ── */}
         <div className="mesh-bg" aria-hidden="true">
           <div className="mesh-blob mesh-blob-1" />
@@ -271,31 +255,24 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
 
         {/* ── Hero Section ── */}
         <section className="relative z-10">
-          <div
-            style={{
-              background: 'linear-gradient(180deg, rgba(237,157,36,0.06) 0%, transparent 100%)',
-            }}
-          >
+          <div className="bg-gradient-to-b from-amber-500/6 to-transparent">
             <div className="mx-auto max-w-[1200px] px-4 pt-8 pb-12 sm:px-6 lg:px-8">
               {/* Breadcrumb nav */}
               <nav className="mb-8" aria-label="Breadcrumb">
-                <ol
-                  className="flex items-center gap-1.5 text-xs"
-                  style={{ color: 'rgba(255,255,255,0.35)' }}
-                >
+                <ol className="flex items-center gap-1.5 text-xs text-muted-foreground/50">
                   <li>
-                    <Link href="/" className="transition-colors hover:text-white/60">
+                    <Link href="/" className="transition-colors hover:text-muted-foreground">
                       Home
                     </Link>
                   </li>
                   <li aria-hidden="true">/</li>
                   <li>
-                    <Link href="/courses" className="transition-colors hover:text-white/60">
+                    <Link href="/courses" className="transition-colors hover:text-muted-foreground">
                       Courses
                     </Link>
                   </li>
                   <li aria-hidden="true">/</li>
-                  <li style={{ color: 'rgba(255,255,255,0.55)' }}>{course.title}</li>
+                  <li className="text-muted-foreground">{course.title}</li>
                 </ol>
               </nav>
 
@@ -305,78 +282,41 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                   {/* Badges */}
                   <div className="mb-5 flex flex-wrap items-center gap-2">
                     {course.iicrc_discipline && (
-                      <span
-                        className="rounded-sm px-2.5 py-1 text-xs font-semibold tracking-wide uppercase"
-                        style={{
-                          background: 'rgba(237,157,36,0.15)',
-                          color: '#ed9d24',
-                          border: '1px solid rgba(237,157,36,0.25)',
-                        }}
-                      >
+                      <span className="rounded-lg border border-amber-500/25 bg-amber-500/15 px-2.5 py-1 text-xs font-semibold tracking-wide uppercase text-amber-500">
                         IICRC {course.iicrc_discipline}
                       </span>
                     )}
                     {course.level && (
-                      <span
-                        className="rounded-sm px-2.5 py-1 text-xs font-medium"
-                        style={{
-                          background: 'rgba(255,255,255,0.06)',
-                          color: 'rgba(255,255,255,0.6)',
-                          border: '1px solid rgba(255,255,255,0.08)',
-                        }}
-                      >
+                      <span className="rounded-lg border border-border bg-card px-2.5 py-1 text-xs font-medium text-muted-foreground">
                         {course.level}
                       </span>
                     )}
                     {course.category && (
-                      <span
-                        className="rounded-sm px-2.5 py-1 text-xs font-medium"
-                        style={{
-                          background: 'rgba(255,255,255,0.06)',
-                          color: 'rgba(255,255,255,0.6)',
-                          border: '1px solid rgba(255,255,255,0.08)',
-                        }}
-                      >
+                      <span className="rounded-lg border border-border bg-card px-2.5 py-1 text-xs font-medium text-muted-foreground">
                         {course.category}
                       </span>
                     )}
                     {course.cec_hours && (
-                      <span
-                        className="rounded-sm px-2.5 py-1 text-xs font-medium"
-                        style={{
-                          background: 'rgba(0,245,255,0.08)',
-                          color: '#00F5FF',
-                          border: '1px solid rgba(0,245,255,0.15)',
-                        }}
-                      >
+                      <span className="rounded-lg border border-primary/15 bg-primary/8 px-2.5 py-1 text-xs font-medium text-primary">
                         {course.cec_hours} CECs
                       </span>
                     )}
                   </div>
 
                   {/* Title */}
-                  <h1
-                    className="mb-4 text-3xl leading-tight font-bold tracking-tight sm:text-4xl lg:text-5xl"
-                    style={{ color: 'rgba(255,255,255,0.95)' }}
-                  >
+                  <h1 className="mb-4 text-3xl leading-tight font-bold tracking-tight text-foreground/95 sm:text-4xl lg:text-5xl">
                     {course.title}
                   </h1>
 
                   {/* Discipline full name */}
                   {disciplineFull && (
-                    <p
-                      className="mb-4 text-sm font-medium tracking-wide uppercase"
-                      style={{ color: '#ed9d24' }}
-                    >
+                    <p className="mb-4 text-sm font-medium tracking-wide uppercase text-amber-500">
                       {disciplineFull}
                     </p>
                   )}
 
                   {/* Short description or description excerpt */}
-                  <p
-                    className="mb-6 max-w-2xl text-base leading-relaxed sm:text-lg"
-                    style={{ color: 'rgba(255,255,255,0.55)' }}
-                  >
+                  <p className="mb-6 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
                     {course.short_description ??
                       course.description?.slice(0, 280) ??
                       'Professional restoration training aligned with IICRC standards.'}
@@ -385,14 +325,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                   {/* Instructor */}
                   {course.instructor && (
                     <div className="flex items-center gap-3">
-                      <div
-                        className="flex h-10 w-10 items-center justify-center rounded-sm text-sm font-bold"
-                        style={{
-                          background: 'rgba(237,157,36,0.15)',
-                          color: '#ed9d24',
-                          border: '1px solid rgba(237,157,36,0.2)',
-                        }}
-                      >
+                      <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-amber-500/20 bg-amber-500/15 text-sm font-bold text-amber-500">
                         {course.instructor.full_name
                           .split(' ')
                           .map((n) => n[0])
@@ -400,13 +333,10 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                           .slice(0, 2)}
                       </div>
                       <div>
-                        <p
-                          className="text-sm font-medium"
-                          style={{ color: 'rgba(255,255,255,0.8)' }}
-                        >
+                        <p className="text-sm font-medium text-foreground/80">
                           {course.instructor.full_name}
                         </p>
-                        <p className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                        <p className="text-xs text-muted-foreground/50">
                           Course Instructor
                         </p>
                       </div>
@@ -414,34 +344,31 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                   )}
 
                   {/* Quick stats row — mobile only (desktop has sidebar) */}
-                  <div
-                    className="mt-8 grid grid-cols-3 gap-4 rounded-sm p-4 lg:hidden"
-                    style={glassPanelSubtle}
-                  >
+                  <div className="mt-8 grid grid-cols-3 gap-4 rounded-lg border border-border bg-card p-4 lg:hidden">
                     <div className="text-center">
-                      <p className="text-lg font-bold" style={{ color: '#ed9d24' }}>
+                      <p className="text-lg font-bold text-amber-500">
                         {price}
                       </p>
-                      <p className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                      <p className="text-xs text-muted-foreground/50">
                         {course.is_free || priceNum === 0 ? 'No cost' : 'AUD'}
                       </p>
                     </div>
                     {course.cec_hours && (
                       <div className="text-center">
-                        <p className="text-lg font-bold" style={{ color: '#00F5FF' }}>
+                        <p className="text-lg font-bold text-primary">
                           {course.cec_hours}
                         </p>
-                        <p className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                        <p className="text-xs text-muted-foreground/50">
                           CECs
                         </p>
                       </div>
                     )}
                     {course.duration_hours && (
                       <div className="text-center">
-                        <p className="text-lg font-bold" style={{ color: 'rgba(255,255,255,0.8)' }}>
+                        <p className="text-lg font-bold text-foreground/80">
                           {course.duration_hours}h
                         </p>
-                        <p className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                        <p className="text-xs text-muted-foreground/50">
                           Duration
                         </p>
                       </div>
@@ -459,10 +386,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                   <div className="sticky top-8">
                     {/* Thumbnail */}
                     {course.thumbnail_url && (
-                      <div
-                        className="mb-4 overflow-hidden rounded-sm"
-                        style={{ border: '1px solid rgba(255,255,255,0.07)' }}
-                      >
+                      <div className="mb-4 overflow-hidden rounded-lg border border-border">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={course.thumbnail_url}
@@ -473,25 +397,19 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                     )}
 
                     {/* Price card */}
-                    <div className="rounded-sm p-6" style={glassPanel}>
+                    <div className="rounded-lg border border-border bg-card p-6">
                       {/* Price */}
                       <div className="mb-1">
-                        <span
-                          className="text-3xl font-bold"
-                          style={{ color: 'rgba(255,255,255,0.95)' }}
-                        >
+                        <span className="text-3xl font-bold text-foreground/95">
                           {price}
                         </span>
                         {!course.is_free && priceNum > 0 && (
-                          <span
-                            className="ml-2 text-sm"
-                            style={{ color: 'rgba(255,255,255,0.35)' }}
-                          >
+                          <span className="ml-2 text-sm text-muted-foreground/50">
                             AUD
                           </span>
                         )}
                       </div>
-                      <p className="mb-6 text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                      <p className="mb-6 text-xs text-muted-foreground/50">
                         {course.is_free || priceNum === 0
                           ? 'Free access — no payment required'
                           : 'One-time payment — lifetime access'}
@@ -507,15 +425,11 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                       </div>
 
                       {/* Pro subscription note */}
-                      <p
-                        className="mb-6 text-center text-xs"
-                        style={{ color: 'rgba(255,255,255,0.3)' }}
-                      >
+                      <p className="mb-6 text-center text-xs text-muted-foreground/50">
                         or included with{' '}
                         <Link
                           href="/subscribe"
-                          className="underline transition-colors"
-                          style={{ color: '#00F5FF' }}
+                          className="text-primary underline transition-colors hover:text-primary/80"
                         >
                           CARSI Pro
                         </Link>{' '}
@@ -523,50 +437,47 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                       </p>
 
                       {/* Divider */}
-                      <div
-                        className="mb-5"
-                        style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}
-                      />
+                      <div className="mb-5 border-t border-border" />
 
                       {/* Course meta */}
                       <div className="space-y-3">
                         {course.duration_hours && (
                           <div className="flex items-center justify-between text-sm">
-                            <span style={{ color: 'rgba(255,255,255,0.4)' }}>Duration</span>
-                            <span style={{ color: 'rgba(255,255,255,0.8)' }}>
+                            <span className="text-muted-foreground">Duration</span>
+                            <span className="text-foreground/80">
                               {course.duration_hours} hours
                             </span>
                           </div>
                         )}
                         {course.cec_hours && (
                           <div className="flex items-center justify-between text-sm">
-                            <span style={{ color: 'rgba(255,255,255,0.4)' }}>CECs awarded</span>
-                            <span style={{ color: '#00F5FF' }}>{course.cec_hours} credits</span>
+                            <span className="text-muted-foreground">CECs awarded</span>
+                            <span className="text-primary">{course.cec_hours} credits</span>
                           </div>
                         )}
                         {course.level && (
                           <div className="flex items-center justify-between text-sm">
-                            <span style={{ color: 'rgba(255,255,255,0.4)' }}>Level</span>
-                            <span style={{ color: 'rgba(255,255,255,0.8)' }}>{course.level}</span>
+                            <span className="text-muted-foreground">Level</span>
+                            <span className="text-foreground/80">{course.level}</span>
                           </div>
                         )}
                         {course.iicrc_discipline && (
                           <div className="flex items-center justify-between text-sm">
-                            <span style={{ color: 'rgba(255,255,255,0.4)' }}>Discipline</span>
-                            <span style={{ color: '#ed9d24' }}>
+                            <span className="text-muted-foreground">Discipline</span>
+                            <span className="text-amber-500">
                               IICRC {course.iicrc_discipline}
                             </span>
                           </div>
                         )}
                         <div className="flex items-center justify-between text-sm">
-                          <span style={{ color: 'rgba(255,255,255,0.4)' }}>Format</span>
-                          <span style={{ color: 'rgba(255,255,255,0.8)' }}>
+                          <span className="text-muted-foreground">Format</span>
+                          <span className="text-foreground/80">
                             Online / Self-paced
                           </span>
                         </div>
                         <div className="flex items-center justify-between text-sm">
-                          <span style={{ color: 'rgba(255,255,255,0.4)' }}>Certificate</span>
-                          <span style={{ color: 'rgba(255,255,255,0.8)' }}>Digital credential</span>
+                          <span className="text-muted-foreground">Certificate</span>
+                          <span className="text-foreground/80">Digital credential</span>
                         </div>
                       </div>
                     </div>
@@ -593,17 +504,11 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
               {/* ── Full Description ── */}
               {course.description && (
                 <section>
-                  <h2
-                    className="mb-4 text-xl font-bold"
-                    style={{ color: 'rgba(255,255,255,0.92)' }}
-                  >
+                  <h2 className="mb-4 text-xl font-bold text-foreground/92">
                     About This Course
                   </h2>
-                  <div className="rounded-sm p-6" style={glassPanelSubtle}>
-                    <p
-                      className="text-sm leading-relaxed"
-                      style={{ color: 'rgba(255,255,255,0.55)' }}
-                    >
+                  <div className="rounded-lg border border-border bg-card p-6">
+                    <p className="text-sm leading-relaxed text-muted-foreground">
                       {course.description}
                     </p>
                   </div>
@@ -612,27 +517,20 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
 
               {/* ── What You'll Learn ── */}
               <section>
-                <h2 className="mb-4 text-xl font-bold" style={{ color: 'rgba(255,255,255,0.92)' }}>
+                <h2 className="mb-4 text-xl font-bold text-foreground/92">
                   What You&apos;ll Learn
                 </h2>
-                <div className="rounded-sm p-6" style={glassPanel}>
+                <div className="rounded-lg border border-border bg-card p-6">
                   <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     {learningOutcomes.map((outcome) => (
                       <li key={outcome} className="flex items-start gap-3">
                         <span
-                          className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-sm text-xs"
-                          style={{
-                            background: 'rgba(0,255,136,0.1)',
-                            color: '#00FF88',
-                          }}
+                          className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-lg bg-green-500/10 text-xs text-green-500"
                           aria-hidden="true"
                         >
                           &#10003;
                         </span>
-                        <span
-                          className="text-sm leading-relaxed"
-                          style={{ color: 'rgba(255,255,255,0.7)' }}
-                        >
+                        <span className="text-sm leading-relaxed text-muted-foreground">
                           {outcome}
                         </span>
                       </li>
@@ -643,13 +541,10 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
 
               {/* ── Course Details Grid ── */}
               <section>
-                <h2 className="mb-4 text-xl font-bold" style={{ color: 'rgba(255,255,255,0.92)' }}>
+                <h2 className="mb-4 text-xl font-bold text-foreground/92">
                   Course Details
                 </h2>
-                <div
-                  className="grid grid-cols-2 gap-px overflow-hidden rounded-sm sm:grid-cols-3"
-                  style={{ background: 'rgba(255,255,255,0.06)' }}
-                >
+                <div className="grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-border sm:grid-cols-3">
                   {[
                     {
                       label: 'Level',
@@ -686,18 +581,12 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                       accent: false,
                     },
                   ].map((item) => (
-                    <div key={item.label} className="p-5" style={{ background: '#060a14' }}>
-                      <p
-                        className="mb-1 text-xs font-medium tracking-wider uppercase"
-                        style={{ color: 'rgba(255,255,255,0.3)' }}
-                      >
+                    <div key={item.label} className="bg-card p-5">
+                      <p className="mb-1 text-xs font-medium tracking-wider uppercase text-muted-foreground/50">
                         {item.label}
                       </p>
                       <p
-                        className="text-sm font-semibold"
-                        style={{
-                          color: item.accent ? '#ed9d24' : 'rgba(255,255,255,0.8)',
-                        }}
+                        className={`text-sm font-semibold ${item.accent ? 'text-amber-500' : 'text-foreground/80'}`}
                       >
                         {item.value}
                       </p>
@@ -708,27 +597,20 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
 
               {/* ── Who This Course Is For ── */}
               <section>
-                <h2 className="mb-4 text-xl font-bold" style={{ color: 'rgba(255,255,255,0.92)' }}>
+                <h2 className="mb-4 text-xl font-bold text-foreground/92">
                   Who This Course Is For
                 </h2>
-                <div className="rounded-sm p-6" style={glassPanelSubtle}>
+                <div className="rounded-lg border border-border bg-card p-6">
                   <ul className="space-y-3">
                     {audienceItems.map((item) => (
                       <li key={item} className="flex items-start gap-3">
                         <span
-                          className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-sm text-xs"
-                          style={{
-                            background: 'rgba(237,157,36,0.1)',
-                            color: '#ed9d24',
-                          }}
+                          className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-lg bg-amber-500/10 text-xs text-amber-500"
                           aria-hidden="true"
                         >
                           &#8594;
                         </span>
-                        <span
-                          className="text-sm leading-relaxed"
-                          style={{ color: 'rgba(255,255,255,0.6)' }}
-                        >
+                        <span className="text-sm leading-relaxed text-muted-foreground">
                           {item}
                         </span>
                       </li>
@@ -739,55 +621,31 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
 
               {/* ── Credential & CEC Section ── */}
               <section>
-                <h2 className="mb-4 text-xl font-bold" style={{ color: 'rgba(255,255,255,0.92)' }}>
+                <h2 className="mb-4 text-xl font-bold text-foreground/92">
                   Credential &amp; CECs
                 </h2>
-                <div className="rounded-sm p-6" style={glassPanel}>
+                <div className="rounded-lg border border-border bg-card p-6">
                   <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <div>
-                      <div
-                        className="mb-3 flex h-10 w-10 items-center justify-center rounded-sm"
-                        style={{
-                          background: 'rgba(0,245,255,0.08)',
-                          border: '1px solid rgba(0,245,255,0.15)',
-                        }}
-                      >
-                        <span style={{ color: '#00F5FF', fontSize: '18px' }}>&#9733;</span>
+                      <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg border border-primary/15 bg-primary/8">
+                        <span className="text-lg text-primary">&#9733;</span>
                       </div>
-                      <h3
-                        className="mb-1 text-sm font-semibold"
-                        style={{ color: 'rgba(255,255,255,0.85)' }}
-                      >
+                      <h3 className="mb-1 text-sm font-semibold text-foreground/85">
                         Digital Credential
                       </h3>
-                      <p
-                        className="text-xs leading-relaxed"
-                        style={{ color: 'rgba(255,255,255,0.45)' }}
-                      >
+                      <p className="text-xs leading-relaxed text-muted-foreground">
                         Receive a verifiable digital credential with a unique public URL. Share
                         directly to LinkedIn or include in job applications.
                       </p>
                     </div>
                     <div>
-                      <div
-                        className="mb-3 flex h-10 w-10 items-center justify-center rounded-sm"
-                        style={{
-                          background: 'rgba(237,157,36,0.1)',
-                          border: '1px solid rgba(237,157,36,0.2)',
-                        }}
-                      >
-                        <span style={{ color: '#ed9d24', fontSize: '18px' }}>&#9670;</span>
+                      <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg border border-amber-500/20 bg-amber-500/10">
+                        <span className="text-lg text-amber-500">&#9670;</span>
                       </div>
-                      <h3
-                        className="mb-1 text-sm font-semibold"
-                        style={{ color: 'rgba(255,255,255,0.85)' }}
-                      >
+                      <h3 className="mb-1 text-sm font-semibold text-foreground/85">
                         IICRC CEC Tracking
                       </h3>
-                      <p
-                        className="text-xs leading-relaxed"
-                        style={{ color: 'rgba(255,255,255,0.45)' }}
-                      >
+                      <p className="text-xs leading-relaxed text-muted-foreground">
                         {course.cec_hours
                           ? `This course awards ${course.cec_hours} IICRC Continuing Education Credits. Credits are automatically recorded and exportable for IICRC submission.`
                           : 'Continuing Education Credits are tracked automatically in your CARSI dashboard and exportable for IICRC submission.'}
@@ -810,22 +668,12 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
 
         {/* ── Bottom CTA ── */}
         <section className="relative z-10">
-          <div
-            style={{
-              background: 'linear-gradient(180deg, transparent 0%, rgba(237,157,36,0.04) 100%)',
-            }}
-          >
+          <div className="bg-gradient-to-b from-transparent to-amber-500/4">
             <div className="mx-auto max-w-[800px] px-4 py-20 text-center sm:px-6">
-              <h2
-                className="mb-3 text-2xl font-bold sm:text-3xl"
-                style={{ color: 'rgba(255,255,255,0.92)' }}
-              >
+              <h2 className="mb-3 text-2xl font-bold text-foreground/92 sm:text-3xl">
                 Ready to advance your career?
               </h2>
-              <p
-                className="mx-auto mb-8 max-w-lg text-sm leading-relaxed"
-                style={{ color: 'rgba(255,255,255,0.45)' }}
-              >
+              <p className="mx-auto mb-8 max-w-lg text-sm leading-relaxed text-muted-foreground">
                 {course.cec_hours
                   ? `Earn ${course.cec_hours} IICRC CECs and receive a verifiable digital credential upon completion of ${course.title}.`
                   : `Complete ${course.title} and receive a verifiable digital credential for your professional portfolio.`}
@@ -835,7 +683,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                 <div className="w-full">
                   <EnrolButton slug={course.slug} priceAud={priceNum} isFree={course.is_free} />
                 </div>
-                <p className="text-xs" style={{ color: 'rgba(255,255,255,0.25)' }}>
+                <p className="text-xs text-muted-foreground/50">
                   {course.is_free || priceNum === 0
                     ? 'Free — no payment or credit card required'
                     : 'Secure checkout — or access all courses with CARSI Pro'}
@@ -845,8 +693,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
               <div className="mt-8">
                 <Link
                   href="/courses"
-                  className="text-sm underline transition-colors"
-                  style={{ color: 'rgba(255,255,255,0.35)' }}
+                  className="text-sm text-muted-foreground/50 underline transition-colors hover:text-muted-foreground"
                 >
                   Browse all courses
                 </Link>

@@ -124,18 +124,12 @@ export default function QuizPage() {
       {/* Header */}
       {quiz && (
         <div className="flex items-center gap-3">
-          <div
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-sm"
-            style={{
-              background: 'rgba(36,144,237,0.12)',
-              border: '1px solid rgba(36,144,237,0.25)',
-            }}
-          >
-            <ClipboardList className="h-5 w-5" style={{ color: '#2490ed' }} />
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-primary/25 bg-primary/10">
+            <ClipboardList className="h-5 w-5 text-primary" />
           </div>
           <div>
-            <h1 className="text-lg font-semibold text-white">{quiz.title}</h1>
-            <p className="text-xs text-white/40">
+            <h1 className="text-lg font-semibold text-foreground">{quiz.title}</h1>
+            <p className="text-xs text-muted-foreground">
               {quiz.questions.length} question{quiz.questions.length !== 1 ? 's' : ''} &nbsp;·&nbsp;
               Pass at {quiz.pass_percentage}% &nbsp;·&nbsp;
               {quiz.attempts_allowed} attempt{quiz.attempts_allowed !== 1 ? 's' : ''} allowed
@@ -154,10 +148,7 @@ export default function QuizPage() {
             exit={{ opacity: 0 }}
             className="flex items-center justify-center py-20"
           >
-            <span
-              className="inline-block h-8 w-8 animate-spin rounded-full border-2 border-white/10"
-              style={{ borderTopColor: '#2490ed' }}
-            />
+            <span className="inline-block h-8 w-8 animate-spin rounded-full border-2 border-muted border-t-primary" />
           </motion.div>
         )}
 
@@ -179,8 +170,7 @@ export default function QuizPage() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -12 }}
             transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
-            className="rounded-sm border p-6"
-            style={{ background: '#060a14', borderColor: 'rgba(255,255,255,0.06)' }}
+            className="rounded-lg border border-border bg-card p-6"
           >
             {submitError && (
               <p className="mb-4 rounded-sm border border-red-500/20 bg-red-500/8 px-3 py-2 text-xs text-red-400">
@@ -199,10 +189,9 @@ export default function QuizPage() {
             className="flex flex-col items-center justify-center gap-3 py-20"
           >
             <span
-              className="inline-block h-8 w-8 animate-spin rounded-full border-2 border-white/10"
-              style={{ borderTopColor: '#2490ed' }}
+              className="inline-block h-8 w-8 animate-spin rounded-full border-2 border-muted border-t-primary"
             />
-            <p className="text-sm text-white/40">Submitting…</p>
+            <p className="text-sm text-muted-foreground">Submitting…</p>
           </motion.div>
         )}
 
@@ -216,8 +205,7 @@ export default function QuizPage() {
           >
             {/* Score card */}
             <div
-              className="rounded-sm border p-6"
-              style={{ background: '#060a14', borderColor: 'rgba(255,255,255,0.06)' }}
+              className="rounded-lg border border-border bg-card p-6"
             >
               <QuizResult result={result} onRetry={handleRetry} />
             </div>

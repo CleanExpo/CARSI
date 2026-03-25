@@ -43,7 +43,7 @@ function CredentialCard({ credential }: { credential: CredentialOut }) {
   const issuedDate = new Date(credential.issued_date);
 
   return (
-    <div className="flex flex-col gap-4 rounded-sm border border-white/[0.06] bg-zinc-900/50 p-5">
+    <div className="flex flex-col gap-4 rounded-md border border-border bg-zinc-900/50 p-5">
       {/* Discipline badge + title */}
       <div className="flex flex-col gap-2">
         {credential.iicrc_discipline && (
@@ -53,25 +53,25 @@ function CredentialCard({ credential }: { credential: CredentialOut }) {
             {credential.iicrc_discipline}
           </span>
         )}
-        <h3 className="text-sm leading-snug font-semibold text-white">{credential.course_title}</h3>
+        <h3 className="text-sm leading-snug font-semibold text-foreground">{credential.course_title}</h3>
       </div>
 
       {/* Meta row */}
       <div className="flex flex-wrap gap-4">
         <div className="flex flex-col gap-0.5">
-          <span className="font-mono text-xs tracking-widest text-white/40 uppercase">
+          <span className="font-mono text-xs tracking-wider text-muted-foreground uppercase">
             CEC Hours
           </span>
-          <span className="font-mono text-sm text-white">{credential.cec_hours.toFixed(1)}</span>
+          <span className="font-mono text-sm text-foreground">{credential.cec_hours.toFixed(1)}</span>
         </div>
         <div className="flex flex-col gap-0.5">
-          <span className="font-mono text-xs tracking-widest text-white/40 uppercase">Issued</span>
-          <span className="font-mono text-sm text-white">{credential.issued_date}</span>
+          <span className="font-mono text-xs tracking-wider text-muted-foreground uppercase">Issued</span>
+          <span className="font-mono text-sm text-foreground">{credential.issued_date}</span>
         </div>
         {credential.cppp40421_unit_code && (
           <div className="flex flex-col gap-0.5">
-            <span className="font-mono text-xs tracking-widest text-white/40 uppercase">Unit</span>
-            <span className="font-mono text-sm text-white/60">
+            <span className="font-mono text-xs tracking-wider text-muted-foreground uppercase">Unit</span>
+            <span className="font-mono text-sm text-muted-foreground">
               {credential.cppp40421_unit_code}
             </span>
           </div>
@@ -89,10 +89,10 @@ function CredentialCard({ credential }: { credential: CredentialOut }) {
       />
 
       {/* Action links */}
-      <div className="flex gap-3 border-t border-white/[0.06] pt-4">
+      <div className="flex gap-3 border-t border-border pt-4">
         <Link
           href={`/credentials/${credential.credential_id}`}
-          className="flex-1 rounded-sm border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-center font-mono text-xs text-white/70 transition-colors hover:border-white/20 hover:text-white"
+          className="flex-1 rounded-md border border-border bg-secondary px-3 py-2 text-center font-mono text-xs text-muted-foreground transition-colors hover:border-border/60 hover:text-foreground"
         >
           View Certificate
         </Link>
@@ -111,15 +111,15 @@ function CredentialCard({ credential }: { credential: CredentialOut }) {
 
 function EmptyState() {
   return (
-    <div className="flex flex-col items-center gap-4 rounded-sm border border-white/[0.06] bg-zinc-900/50 px-6 py-12 text-center">
-      <Award className="h-10 w-10 text-white/10" />
+    <div className="flex flex-col items-center gap-4 rounded-md border border-border bg-zinc-900/50 px-6 py-12 text-center">
+      <Award className="h-10 w-10 text-muted-foreground/20" />
       <div className="flex flex-col gap-1">
-        <p className="text-sm font-medium text-white/40">No credentials yet.</p>
-        <p className="text-sm text-white/30">Complete a course to earn your first certificate.</p>
+        <p className="text-sm font-medium text-muted-foreground">No credentials yet.</p>
+        <p className="text-sm text-muted-foreground/50">Complete a course to earn your first certificate.</p>
       </div>
       <Link
         href="/courses"
-        className="mt-2 rounded-sm border border-white/[0.08] bg-white/[0.03] px-4 py-2 font-mono text-xs text-white/60 transition-colors hover:border-white/20 hover:text-white"
+        className="mt-2 rounded-md border border-border bg-secondary px-4 py-2 font-mono text-xs text-muted-foreground transition-colors hover:border-border/60 hover:text-foreground"
       >
         Browse Courses
       </Link>
@@ -158,21 +158,21 @@ export default function StudentCredentialsPage() {
     <main className="flex max-w-4xl flex-col gap-6 p-6">
       {/* Page header */}
       <div className="flex flex-col gap-1">
-        <h1 className="font-mono text-2xl font-bold text-white">My Credentials</h1>
-        <p className="text-sm text-white/40">
+        <h1 className="text-2xl font-bold text-foreground">My Credentials</h1>
+        <p className="text-sm text-muted-foreground">
           Your completed course certificates and IICRC continuing education credits.
         </p>
       </div>
 
       {/* Loading */}
-      {loading && <p className="text-sm text-white/30">Loading credentials…</p>}
+      {loading && <p className="text-sm text-muted-foreground/50">Loading credentials…</p>}
 
       {/* Error */}
       {!loading && error && <ErrorBanner message={error} onRetry={fetchCredentials} />}
 
       {/* Credential count */}
       {!loading && !error && (
-        <p className="font-mono text-xs tracking-widest text-white/40 uppercase">
+        <p className="font-mono text-xs tracking-wider text-muted-foreground uppercase">
           {credentials.length === 0
             ? 'No credentials earned'
             : `${credentials.length} credential${credentials.length === 1 ? '' : 's'} earned`}

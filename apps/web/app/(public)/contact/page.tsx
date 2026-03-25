@@ -67,7 +67,7 @@ export default function ContactPage() {
                   </p>
                   <a
                     href="tel:+61457123005"
-                    className="text-xs text-muted-foreground transition-colors hover:text-white"
+                    className="text-xs text-muted-foreground transition-colors hover:text-foreground"
                   >
                     0457 123 005
                   </a>
