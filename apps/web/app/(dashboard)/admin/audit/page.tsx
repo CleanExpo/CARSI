@@ -20,22 +20,23 @@ interface AuditLogPage {
   total: number;
 }
 
-const ACTION_COLOURS: Record<string, { bg: string; text: string }> = {
-  'certificate.issued': { bg: 'rgba(0,255,136,0.12)', text: '#00FF88' },
-  'user.login': { bg: 'rgba(36,144,237,0.12)', text: '#2490ed' },
-  'enrollment.created': { bg: 'rgba(0,245,255,0.12)', text: '#00F5FF' },
+const ACTION_COLOURS: Record<string, { className: string }> = {
+  'certificate.issued': { className: 'bg-green-500/10 text-green-500' },
+  'user.login': { className: 'bg-blue-500/10 text-blue-500' },
+  'enrollment.created': { className: 'bg-primary/10 text-primary' },
 };
 
 function ActionBadge({ action }: { action: string }) {
-  const style = ACTION_COLOURS[action] ?? {
-    bg: 'rgba(255,255,255,0.06)',
-    text: 'rgba(255,255,255,0.5)',
-  };
+  const style = ACTION_COLOURS[action];
+  if (style) {
+    return (
+      <span className={`inline-block rounded-lg px-2 py-0.5 text-xs ${style.className}`}>
+        {action}
+      </span>
+    );
+  }
   return (
-    <span
-      className="inline-block rounded-lg px-2 py-0.5 font-mono text-xs"
-      style={{ background: style.bg, color: style.text }}
-    >
+    <span className="inline-block rounded-lg bg-muted px-2 py-0.5 text-xs text-muted-foreground">
       {action}
     </span>
   );
@@ -80,18 +81,18 @@ export default function AuditLogPage() {
   }
 
   return (
-    <div className="min-h-screen space-y-6 bg-background p-6 text-white">
+    <div className="min-h-screen space-y-6 bg-background p-6 text-foreground">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-mono text-2xl font-bold tracking-tight">Audit Log</h1>
-          <p className="mt-1 font-mono text-sm text-white/40">
+          <h1 className="text-2xl font-bold tracking-tight">Audit Log</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
             {data ? `${data.total} total events` : 'Platform compliance trail'}
           </p>
         </div>
         <Link
           href="/admin"
-          className="rounded-lg border border-border bg-background px-3 py-2 font-mono text-xs text-primary"
+          className="rounded-lg border border-border bg-background px-3 py-2 text-xs text-primary"
         >
           ← Admin
         </Link>
@@ -99,13 +100,13 @@ export default function AuditLogPage() {
 
       {/* Filter */}
       <div className="flex items-center gap-3">
-        <label className="font-mono text-xs tracking-wider text-white/40 uppercase">
+        <label className="text-xs tracking-wider text-muted-foreground uppercase">
           Filter by action
         </label>
         <select
           value={actionFilter}
           onChange={(e) => handleActionChange(e.target.value)}
-          className="rounded-lg border border-border bg-background px-3 py-2 font-mono text-xs text-white"
+          className="rounded-lg border border-border bg-background px-3 py-2 text-xs text-foreground"
         >
           <option value="">All actions</option>
           {ACTION_OPTIONS.filter(Boolean).map((a) => (
@@ -117,21 +118,21 @@ export default function AuditLogPage() {
       </div>
 
       {loading && (
-        <p className="animate-pulse font-mono text-sm text-white/30">Loading audit log…</p>
+        <p className="animate-pulse text-sm text-muted-foreground/50">Loading audit log…</p>
       )}
-      {error && <p className="font-mono text-sm text-red-400">{error}</p>}
+      {error && <p className="text-sm text-red-400">{error}</p>}
 
       {data && !loading && (
         <>
           {/* Table */}
           <div className="overflow-hidden rounded-lg border border-border">
-            <table className="w-full font-mono text-xs">
+            <table className="w-full text-xs">
               <thead>
                 <tr className="border-b border-border bg-background">
                   {['Time', 'Actor', 'Action', 'Resource', 'IP'].map((h) => (
                     <th
                       key={h}
-                      className="px-4 py-3 text-left tracking-widest text-white/30 uppercase"
+                      className="px-4 py-3 text-left tracking-widest text-muted-foreground/50 uppercase"
                     >
                       {h}
                     </th>
@@ -141,7 +142,7 @@ export default function AuditLogPage() {
               <tbody>
                 {data.items.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-4 py-8 text-center text-white/20">
+                    <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground/50">
                       No audit events found.
                     </td>
                   </tr>
@@ -151,24 +152,24 @@ export default function AuditLogPage() {
                       key={entry.id}
                       className="border-b border-border/40"
                     >
-                      <td className="px-4 py-3 whitespace-nowrap text-white/40">
+                      <td className="px-4 py-3 whitespace-nowrap text-muted-foreground">
                         {new Date(entry.created_at).toLocaleString('en-AU', {
                           dateStyle: 'short',
                           timeStyle: 'medium',
                         })}
                       </td>
-                      <td className="max-w-[160px] truncate px-4 py-3 text-white/60">
+                      <td className="max-w-[160px] truncate px-4 py-3 text-muted-foreground">
                         {entry.actor_email ?? '—'}
                       </td>
                       <td className="px-4 py-3">
                         <ActionBadge action={entry.action} />
                       </td>
-                      <td className="px-4 py-3 text-white/40">
+                      <td className="px-4 py-3 text-muted-foreground">
                         {entry.resource_type ? (
                           <span>
-                            <span className="text-white/20">{entry.resource_type}</span>
+                            <span className="text-muted-foreground/50">{entry.resource_type}</span>
                             {entry.resource_id && (
-                              <span className="text-white/30">
+                              <span className="text-muted-foreground/50">
                                 {' '}
                                 #{entry.resource_id.slice(0, 8)}
                               </span>
@@ -178,7 +179,7 @@ export default function AuditLogPage() {
                           '—'
                         )}
                       </td>
-                      <td className="px-4 py-3 text-white/30">{entry.ip_address ?? '—'}</td>
+                      <td className="px-4 py-3 text-muted-foreground/50">{entry.ip_address ?? '—'}</td>
                     </tr>
                   ))
                 )}
@@ -189,21 +190,21 @@ export default function AuditLogPage() {
           {/* Pagination */}
           {totalPages > 1 && (
             <div className="flex items-center justify-between">
-              <p className="font-mono text-xs text-white/30">
+              <p className="text-xs text-muted-foreground/50">
                 Page {page + 1} of {totalPages} · {data.total} events
               </p>
               <div className="flex gap-2">
                 <button
                   onClick={() => setPage((p) => Math.max(0, p - 1))}
                   disabled={page === 0}
-                  className="rounded-lg border border-border bg-background px-3 py-2 font-mono text-xs text-primary disabled:opacity-30"
+                  className="rounded-lg border border-border bg-background px-3 py-2 text-xs text-primary disabled:opacity-30"
                 >
                   ← Previous
                 </button>
                 <button
                   onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
                   disabled={page >= totalPages - 1}
-                  className="rounded-lg border border-border bg-background px-3 py-2 font-mono text-xs text-primary disabled:opacity-30"
+                  className="rounded-lg border border-border bg-background px-3 py-2 text-xs text-primary disabled:opacity-30"
                 >
                   Next →
                 </button>

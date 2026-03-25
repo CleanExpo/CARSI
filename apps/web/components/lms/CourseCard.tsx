@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -167,19 +167,18 @@ function getFallbackThumbnail(slug: string, title: string): string | null {
   return null;
 }
 
-const disciplineColors: Record<string, { color: string; glow: string; grad: string }> = {
-  WRT: { color: '#2490ed', glow: 'rgba(36,144,237,0.3)', grad: 'from-blue-700 to-blue-900' },
-  CRT: { color: '#26c4a0', glow: 'rgba(38,196,160,0.3)', grad: 'from-teal-600 to-teal-900' },
-  ASD: { color: '#6c63ff', glow: 'rgba(108,99,255,0.3)', grad: 'from-indigo-700 to-indigo-900' },
-  OCT: { color: '#9b59b6', glow: 'rgba(155,89,182,0.3)', grad: 'from-purple-700 to-purple-900' },
-  CCT: { color: '#17b8d4', glow: 'rgba(23,184,212,0.3)', grad: 'from-cyan-600 to-cyan-900' },
-  FSRT: { color: '#f05a35', glow: 'rgba(240,90,53,0.3)', grad: 'from-orange-700 to-red-900' },
-  AMRT: { color: '#27ae60', glow: 'rgba(39,174,96,0.3)', grad: 'from-green-700 to-green-900' },
+const disciplineColors: Record<string, { color: string; grad: string }> = {
+  WRT: { color: '#2490ed', grad: 'from-blue-700 to-blue-900' },
+  CRT: { color: '#26c4a0', grad: 'from-teal-600 to-teal-900' },
+  ASD: { color: '#6c63ff', grad: 'from-indigo-700 to-indigo-900' },
+  OCT: { color: '#9b59b6', grad: 'from-purple-700 to-purple-900' },
+  CCT: { color: '#17b8d4', grad: 'from-cyan-600 to-cyan-900' },
+  FSRT: { color: '#f05a35', grad: 'from-orange-700 to-red-900' },
+  AMRT: { color: '#27ae60', grad: 'from-green-700 to-green-900' },
 };
 
 const defaultStyle = {
   color: '#2490ed',
-  glow: 'rgba(36,144,237,0.2)',
   grad: 'from-blue-800 to-slate-900',
 };
 
@@ -238,33 +237,16 @@ export function CourseCard({ course }: CourseCardProps) {
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
         {discipline && (
           <span
-            className="absolute top-2 left-2 rounded-md px-2 py-0.5 font-mono text-xs font-bold"
-            style={{
-              color: ds.color,
-              background: 'rgba(0,0,0,0.6)',
-              border: `1px solid ${ds.color}40`,
-              boxShadow: `0 0 8px ${ds.glow}`,
-            }}
+            className="absolute top-2 left-2 rounded-md bg-black/60 px-2 py-0.5 font-mono text-xs font-bold ring-1"
+            style={{ color: ds.color, '--tw-ring-color': `${ds.color}40` } as React.CSSProperties}
           >
             {discipline}
           </span>
         )}
         <span
-          className="absolute top-2 right-2 rounded-md px-2 py-0.5 text-xs font-semibold"
-          style={
-            isFree
-              ? {
-                  color: '#27ae60',
-                  background: 'rgba(0,0,0,0.6)',
-                  border: '1px solid rgba(39,174,96,0.4)',
-                }
-              : {
-                  color: '#ed9d24',
-                  background: 'rgba(0,0,0,0.6)',
-                  border: '1px solid rgba(237,157,36,0.4)',
-                  boxShadow: '0 0 8px rgba(237,157,36,0.2)',
-                }
-          }
+          className={`absolute top-2 right-2 rounded-md bg-black/60 px-2 py-0.5 text-xs font-semibold ring-1 ${
+            isFree ? 'text-green-500 ring-green-500/40' : 'text-carsi-orange ring-carsi-orange/40'
+          }`}
         >
           {price}
         </span>

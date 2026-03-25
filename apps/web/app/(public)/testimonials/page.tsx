@@ -65,7 +65,7 @@ const TESTIMONIALS: Testimonial[] = [
 
 export default function TestimonialsPage() {
   return (
-    <main className="min-h-screen" style={{ background: '#060a14' }}>
+    <main className="min-h-screen bg-background">
       {/* Mesh background */}
       <div className="mesh-bg" aria-hidden="true">
         <div className="mesh-blob mesh-blob-1" />
@@ -73,44 +73,29 @@ export default function TestimonialsPage() {
       </div>
 
       <div className="relative z-10 mx-auto max-w-5xl px-6 py-20">
-        <p
-          className="mb-2 text-xs tracking-wide uppercase"
-          style={{ color: 'rgba(255,255,255,0.3)' }}
-        >
+        <p className="mb-2 text-xs tracking-wide uppercase text-muted-foreground/50">
           Student Reviews
         </p>
-        <h1
-          className="mb-3 text-4xl font-bold tracking-tight"
-          style={{ color: 'rgba(255,255,255,0.95)' }}
-        >
+        <h1 className="mb-3 text-4xl font-bold tracking-tight text-foreground">
           What Our Students Say
         </h1>
-        <p
-          className="mb-12 max-w-2xl text-sm leading-relaxed"
-          style={{ color: 'rgba(255,255,255,0.5)' }}
-        >
+        <p className="mb-12 max-w-2xl text-sm leading-relaxed text-muted-foreground">
           Real reviews from cleaning and restoration professionals across Australia who have trained
           with CARSI and earned IICRC-recognised Continuing Education Credits.
         </p>
 
         {/* Aggregate stat row */}
-        <div
-          className="mb-10 flex flex-wrap gap-6 rounded-lg px-6 py-4"
-          style={{
-            background: 'rgba(36,144,237,0.05)',
-            border: '1px solid rgba(36,144,237,0.15)',
-          }}
-        >
+        <div className="mb-10 flex flex-wrap gap-6 rounded-lg border border-primary/15 bg-primary/5 px-6 py-4">
           {[
             { value: '5.0', label: 'Average Rating' },
             { value: `${TESTIMONIALS.length}`, label: 'Verified Reviews' },
             { value: '261+', label: 'Professionals Trained' },
           ].map((stat) => (
             <div key={stat.label} className="flex items-baseline gap-2">
-              <span className="text-2xl font-bold" style={{ color: '#2490ed' }}>
+              <span className="text-2xl font-bold text-primary">
                 {stat.value}
               </span>
-              <span className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
+              <span className="text-xs text-muted-foreground">
                 {stat.label}
               </span>
             </div>
@@ -129,11 +114,7 @@ export default function TestimonialsPage() {
           {TESTIMONIALS.map((t) => (
             <figure
               key={t.name}
-              className="flex flex-col rounded-lg p-5"
-              style={{
-                background: 'rgba(255,255,255,0.03)',
-                border: '1px solid rgba(255,255,255,0.08)',
-              }}
+              className="flex flex-col rounded-lg border border-border bg-card p-5"
             >
               {/* Stars */}
               <div className="mb-3 flex gap-0.5" aria-label="5 stars">
@@ -145,19 +126,16 @@ export default function TestimonialsPage() {
               </div>
 
               {/* Quote */}
-              <blockquote
-                className="mb-4 flex-1 text-xs leading-relaxed"
-                style={{ color: 'rgba(255,255,255,0.65)' }}
-              >
+              <blockquote className="mb-4 flex-1 text-xs leading-relaxed text-muted-foreground">
                 &ldquo;{t.quote}&rdquo;
               </blockquote>
 
               {/* Attribution */}
               <figcaption>
-                <p className="text-xs font-semibold" style={{ color: 'rgba(255,255,255,0.85)' }}>
+                <p className="text-xs font-semibold text-foreground/90">
                   {t.name}
                 </p>
-                <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                <p className="text-[11px] text-muted-foreground/50">
                   {t.company}
                 </p>
               </figcaption>
@@ -166,24 +144,17 @@ export default function TestimonialsPage() {
         </div>
 
         {/* Submit feedback CTA */}
-        <div
-          className="mt-12 rounded-lg p-6 text-center"
-          style={{
-            background: 'rgba(255,255,255,0.02)',
-            border: '1px solid rgba(255,255,255,0.06)',
-          }}
-        >
-          <h2 className="mb-2 text-base font-semibold" style={{ color: 'rgba(255,255,255,0.85)' }}>
+        <div className="mt-12 rounded-lg border border-border bg-card p-6 text-center">
+          <h2 className="mb-2 text-base font-semibold text-foreground/90">
             Share Your Experience
           </h2>
-          <p className="mb-4 text-xs" style={{ color: 'rgba(255,255,255,0.45)' }}>
+          <p className="mb-4 text-xs text-muted-foreground">
             Have you trained with CARSI? We&apos;d love to hear from you.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3">
             <a
               href="/contact"
-              className="rounded-sm px-5 py-2.5 text-xs font-semibold transition-opacity hover:opacity-90"
-              style={{ background: '#2490ed', color: '#fff' }}
+              className="rounded-lg bg-primary px-5 py-2.5 text-xs font-semibold text-primary-foreground transition-opacity hover:opacity-90"
             >
               Send Feedback
             </a>
@@ -191,12 +162,7 @@ export default function TestimonialsPage() {
               href="https://www.facebook.com/CARSIaus"
               target="_blank"
               rel="noopener noreferrer"
-              className="rounded-sm px-5 py-2.5 text-xs font-semibold transition-colors"
-              style={{
-                background: 'rgba(255,255,255,0.04)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                color: 'rgba(255,255,255,0.6)',
-              }}
+              className="rounded-lg border border-border bg-card px-5 py-2.5 text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground"
             >
               Review on Facebook
             </a>
@@ -204,12 +170,7 @@ export default function TestimonialsPage() {
               href="https://www.linkedin.com/company/carsiaus"
               target="_blank"
               rel="noopener noreferrer"
-              className="rounded-sm px-5 py-2.5 text-xs font-semibold transition-colors"
-              style={{
-                background: 'rgba(255,255,255,0.04)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                color: 'rgba(255,255,255,0.6)',
-              }}
+              className="rounded-lg border border-border bg-card px-5 py-2.5 text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground"
             >
               Review on LinkedIn
             </a>

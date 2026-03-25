@@ -20,7 +20,7 @@ const cardVariants = cva(
           'shadow-lg border-brand-primary/20 bg-gradient-to-br from-brand-primary-50/50 to-transparent dark:from-brand-primary-950/20',
         gradient:
           "relative overflow-hidden border-0 before:absolute before:inset-0 before:rounded-xl before:p-[1px] before:bg-gradient-brand before:-z-10 before:content-[''] shadow-md",
-        glass: 'glass border-white/20 dark:border-white/10 shadow-lg backdrop-blur-md',
+        glass: 'border-border/40 bg-card/80 shadow-lg backdrop-blur-sm',
         outline: 'border-2 shadow-none hover:border-brand-primary/50',
         ghost: 'border-transparent shadow-none hover:bg-muted/50',
       },

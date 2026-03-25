@@ -70,24 +70,17 @@ const SUBMISSION_TYPES: SubmissionType[] = [
 
 export default function SubmitIndexPage() {
   return (
-    <main className="min-h-screen bg-[#050505] px-4 py-16">
+    <main className="min-h-screen bg-background px-4 py-16">
       <div className="mx-auto max-w-5xl">
         {/* Header */}
         <div className="mb-12">
-          <div
-            className="mb-4 inline-flex items-center gap-2 rounded-sm px-3 py-1.5 text-xs font-semibold tracking-wider uppercase"
-            style={{
-              background: 'rgba(0,245,255,0.08)',
-              border: '0.5px solid rgba(0,245,255,0.2)',
-              color: '#00F5FF',
-            }}
-          >
+          <div className="mb-4 inline-flex items-center gap-2 rounded-lg border border-primary/20 bg-primary/8 px-3 py-1.5 text-xs font-semibold tracking-wider text-primary uppercase">
             CARSI Industry Hub
           </div>
-          <h1 className="mb-4 text-4xl font-bold tracking-tight text-white/90 md:text-5xl">
+          <h1 className="mb-4 text-4xl font-bold tracking-tight text-foreground/90 md:text-5xl">
             Submit to the Hub
           </h1>
-          <p className="max-w-2xl text-base leading-relaxed text-white/50">
+          <p className="max-w-2xl text-base leading-relaxed text-muted-foreground">
             Help us build Australia&apos;s most comprehensive resource directory for restoration,
             HVAC, and cleaning trade professionals. All submissions are reviewed before publication.
           </p>
@@ -99,15 +92,11 @@ export default function SubmitIndexPage() {
             <Link
               key={item.type}
               href={`/submit/${item.type}`}
-              className="group flex flex-col gap-4 rounded-sm border border-white/[0.06] bg-white/[0.02] p-6 transition-all duration-200 hover:border-[rgba(0,245,255,0.2)] hover:bg-white/[0.04]"
+              className="group flex flex-col gap-4 rounded-lg border border-border bg-card/20 p-6 transition-all duration-200 hover:border-primary/20 hover:bg-card/40"
             >
               {/* Icon */}
               <div
-                className="flex h-10 w-10 items-center justify-center rounded-sm text-xl"
-                style={{
-                  background: 'rgba(255,255,255,0.04)',
-                  border: '0.5px solid rgba(255,255,255,0.07)',
-                }}
+                className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-muted/10 text-xl"
                 aria-hidden="true"
               >
                 {item.icon}
@@ -115,18 +104,15 @@ export default function SubmitIndexPage() {
 
               {/* Content */}
               <div className="flex flex-1 flex-col gap-2">
-                <h2 className="text-base font-semibold text-white/85 transition-colors group-hover:text-white">
+                <h2 className="text-base font-semibold text-foreground/85 transition-colors group-hover:text-foreground">
                   {item.title}
                 </h2>
-                <p className="text-sm leading-relaxed text-white/45">{item.description}</p>
-                <p className="text-xs text-white/25">{item.detail}</p>
+                <p className="text-sm leading-relaxed text-muted-foreground">{item.description}</p>
+                <p className="text-xs text-muted-foreground/50">{item.detail}</p>
               </div>
 
               {/* CTA */}
-              <div
-                className="flex items-center gap-1.5 text-xs font-semibold tracking-wide transition-colors group-hover:text-[#00F5FF]"
-                style={{ color: 'rgba(0,245,255,0.6)' }}
-              >
+              <div className="flex items-center gap-1.5 text-xs font-semibold tracking-wide text-primary/60 transition-colors group-hover:text-primary">
                 Submit
                 <span
                   className="transition-transform group-hover:translate-x-0.5"
@@ -140,14 +126,14 @@ export default function SubmitIndexPage() {
         </div>
 
         {/* Footer note */}
-        <div className="mt-10 rounded-sm border-[0.5px] border-white/[0.06] bg-white/[0.02] px-6 py-4">
-          <p className="text-xs leading-relaxed text-white/35">
+        <div className="mt-10 rounded-lg border border-border bg-card/20 px-6 py-4">
+          <p className="text-xs leading-relaxed text-muted-foreground/50">
             All submissions are reviewed by the CARSI editorial team. We aim to respond within{' '}
-            <span className="text-white/55">5 business days</span>. Approved listings are published
+            <span className="text-muted-foreground">5 business days</span>. Approved listings are published
             free of charge. Commercial advertising enquiries should be directed to{' '}
             <a
               href="mailto:hello@carsi.com.au"
-              className="text-white/55 underline underline-offset-2 hover:text-white/75"
+              className="text-muted-foreground underline underline-offset-2 hover:text-foreground/75"
             >
               hello@carsi.com.au
             </a>

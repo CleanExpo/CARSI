@@ -54,31 +54,31 @@ export default function InstructorDashboardPage() {
   return (
     <main className="flex max-w-4xl flex-col gap-8 p-6">
       <div className="flex flex-col gap-1">
-        <h1 className="font-mono text-2xl font-bold text-white">Instructor Dashboard</h1>
-        <p className="text-sm text-white/40">Manage your courses and track student progress.</p>
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">Instructor Dashboard</h1>
+        <p className="text-sm text-muted-foreground">Manage your courses and track student progress.</p>
       </div>
 
       {/* Metrics summary */}
-      {loading && <p className="text-sm text-white/30">Loading metrics...</p>}
+      {loading && <p className="text-sm text-muted-foreground">Loading metrics...</p>}
       {metrics && (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <div className="rounded-sm border border-white/[0.06] bg-zinc-900/50 p-4">
-            <p className="font-mono text-xs tracking-widest text-white/40 uppercase">
+          <div className="rounded-lg border border-border bg-card p-4">
+            <p className="text-xs font-medium tracking-widest text-muted-foreground/60 uppercase">
               Published Courses
             </p>
-            <p className="mt-1 font-mono text-2xl text-white">{metrics.published_courses}</p>
+            <p className="mt-1 text-2xl font-bold text-foreground">{metrics.published_courses}</p>
           </div>
-          <div className="rounded-sm border border-white/[0.06] bg-zinc-900/50 p-4">
-            <p className="font-mono text-xs tracking-widest text-white/40 uppercase">
+          <div className="rounded-lg border border-border bg-card p-4">
+            <p className="text-xs font-medium tracking-widest text-muted-foreground/60 uppercase">
               Total Courses
             </p>
-            <p className="mt-1 font-mono text-2xl text-white">{metrics.total_courses}</p>
+            <p className="mt-1 text-2xl font-bold text-foreground">{metrics.total_courses}</p>
           </div>
-          <div className="rounded-sm border border-white/[0.06] bg-zinc-900/50 p-4">
-            <p className="font-mono text-xs tracking-widest text-white/40 uppercase">
+          <div className="rounded-lg border border-border bg-card p-4">
+            <p className="text-xs font-medium tracking-widest text-muted-foreground/60 uppercase">
               Total Enrolments
             </p>
-            <p className="mt-1 font-mono text-2xl text-white">{metrics.total_enrollments}</p>
+            <p className="mt-1 text-2xl font-bold text-foreground">{metrics.total_enrollments}</p>
           </div>
         </div>
       )}
@@ -89,18 +89,16 @@ export default function InstructorDashboardPage() {
           <Link
             key={item.href}
             href={item.href}
-            className="group flex items-start gap-4 rounded-sm border border-white/[0.06] bg-zinc-900/50 p-5 transition-colors hover:border-white/20 hover:bg-zinc-900/80"
+            className="group flex items-start gap-4 rounded-lg border border-border bg-card p-5 transition-colors hover:border-primary/30 hover:bg-card/80"
           >
-            <div
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-primary/20 bg-primary/10"
-            >
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-primary/20 bg-primary/10">
               <item.icon className="h-5 w-5 text-primary" />
             </div>
             <div className="flex flex-col gap-1">
-              <span className="text-sm font-semibold text-white group-hover:text-white/90">
+              <span className="text-sm font-semibold text-foreground">
                 {item.label}
               </span>
-              <span className="text-xs text-white/40">{item.description}</span>
+              <span className="text-xs text-muted-foreground">{item.description}</span>
             </div>
           </Link>
         ))}
@@ -108,10 +106,10 @@ export default function InstructorDashboardPage() {
 
       {/* Quick actions */}
       <div className="flex flex-wrap gap-3">
-        <Button asChild variant="outline" className="rounded-sm border-white/10 text-white/60">
+        <Button asChild variant="outline">
           <Link href="/instructor/courses/new">New Course</Link>
         </Button>
-        <Button asChild variant="outline" className="rounded-sm border-white/10 text-white/60">
+        <Button asChild variant="outline">
           <Link href="/instructor/analytics">View Analytics</Link>
         </Button>
       </div>

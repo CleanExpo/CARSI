@@ -17,7 +17,7 @@ export default function SubscribeSuccessPage() {
   }, []);
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-[#050505] px-4 py-16 text-white">
+    <main className="flex min-h-screen flex-col items-center justify-center bg-background px-4 py-16">
       {/* Success confetti effect */}
       {showConfetti && (
         <div className="pointer-events-none fixed inset-0 overflow-hidden">
@@ -56,10 +56,10 @@ export default function SubscribeSuccessPage() {
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-          className="flex h-24 w-24 items-center justify-center rounded-full border border-[#00FF88]/30 bg-[#00FF88]/10"
+          className="flex h-24 w-24 items-center justify-center rounded-full border border-green-500/30 bg-green-500/10"
         >
           <svg
-            className="h-12 w-12 text-[#00FF88]"
+            className="h-12 w-12 text-green-500"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -71,31 +71,31 @@ export default function SubscribeSuccessPage() {
 
         {/* Heading */}
         <div>
-          <h1 className="font-mono text-3xl font-bold text-white">Welcome to CARSI Pro!</h1>
-          <p className="mt-3 text-white/60">
+          <h1 className="text-3xl font-bold text-foreground">Welcome to CARSI Pro!</h1>
+          <p className="mt-3 text-muted-foreground">
             Your subscription is now active. You have full access to all CARSI courses and
             resources.
           </p>
         </div>
 
         {/* What's next */}
-        <div className="w-full rounded-sm border border-white/[0.06] bg-white/[0.02] p-6">
-          <h2 className="mb-4 font-mono text-sm font-semibold text-white/80">What&apos;s Next</h2>
-          <ul className="space-y-3 text-left text-sm text-white/60">
+        <div className="w-full rounded-lg border border-border bg-card p-6">
+          <h2 className="mb-4 text-sm font-semibold text-foreground/90">What&apos;s Next</h2>
+          <ul className="space-y-3 text-left text-sm text-muted-foreground">
             <li className="flex items-start gap-3">
-              <span className="mt-0.5 text-[#00F5FF]">1.</span>
+              <span className="mt-0.5 text-primary">1.</span>
               <span>Browse the full course catalogue — all IICRC courses are now unlocked</span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="mt-0.5 text-[#00F5FF]">2.</span>
+              <span className="mt-0.5 text-primary">2.</span>
               <span>Start earning CECs towards your IICRC certifications</span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="mt-0.5 text-[#00F5FF]">3.</span>
+              <span className="mt-0.5 text-primary">3.</span>
               <span>Track your progress on your Student Dashboard</span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="mt-0.5 text-[#00F5FF]">4.</span>
+              <span className="mt-0.5 text-primary">4.</span>
               <span>Compete on the XP leaderboard with other restoration professionals</span>
             </li>
           </ul>
@@ -105,24 +105,24 @@ export default function SubscribeSuccessPage() {
         <div className="flex w-full flex-col gap-3">
           <Link
             href="/courses"
-            className="w-full rounded-sm bg-[#00F5FF] py-3 font-mono text-sm font-semibold text-[#050505] transition-opacity hover:opacity-90"
+            className="w-full rounded-lg bg-primary py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
           >
             Browse Courses
           </Link>
           <Link
             href="/student"
-            className="w-full rounded-sm border border-white/[0.08] py-3 font-mono text-sm font-semibold text-white/80 transition-colors hover:border-white/20 hover:text-white"
+            className="w-full rounded-lg border border-border py-3 text-sm font-semibold text-foreground/90 transition-colors hover:border-border hover:text-foreground"
           >
             Go to Dashboard
           </Link>
         </div>
 
         {/* Receipt note */}
-        <p className="text-xs text-white/30">
+        <p className="text-xs text-muted-foreground/50">
           A receipt has been sent to your email. Your 7-day trial starts now.
           {sessionId && (
             <span className="mt-1 block">
-              Session: <code className="text-white/20">{sessionId.slice(0, 16)}...</code>
+              Session: <code className="text-muted-foreground/50">{sessionId.slice(0, 16)}...</code>
             </span>
           )}
         </p>

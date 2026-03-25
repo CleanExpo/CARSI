@@ -37,11 +37,11 @@ export function SubscriptionStatus({
   if (!status) {
     return (
       <div className="flex flex-col gap-2">
-        <p className="text-sm text-white/50">No active subscription.</p>
+        <p className="text-sm text-muted-foreground">No active subscription.</p>
         {onSubscribe && (
           <button
             onClick={onSubscribe}
-            className="rounded-sm bg-cyan-600 px-4 py-2 font-mono text-sm text-white transition-colors hover:bg-cyan-500"
+            className="rounded-lg bg-cyan-600 px-4 py-2 font-mono text-sm text-foreground transition-colors hover:bg-cyan-500"
           >
             Start 7-Day Free Trial — $795 AUD/year
           </button>
@@ -66,12 +66,12 @@ export function SubscriptionStatus({
         >
           {config.label}
         </span>
-        {dateLabel && <span className="text-xs text-white/40">{dateLabel}</span>}
+        {dateLabel && <span className="text-xs text-muted-foreground">{dateLabel}</span>}
       </div>
       {onManage && (
         <button
           onClick={onManage}
-          className="text-left text-xs text-white/40 underline transition-colors hover:text-white/60"
+          className="text-left text-xs text-muted-foreground underline transition-colors hover:text-foreground/90"
         >
           Manage subscription →
         </button>

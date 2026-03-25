@@ -47,7 +47,6 @@ export function CertificatePreview({
           className="relative rounded-sm bg-[#fefdf8] p-8 text-center"
           style={{
             border: `2px solid ${discColor}50`,
-            boxShadow: '0 4px 24px rgba(0,0,0,0.08)',
           }}
         >
           {/* Corner decorations */}
@@ -71,8 +70,7 @@ export function CertificatePreview({
           {/* CARSI Logo mark */}
           <div className="mx-auto mb-4 flex items-center justify-center gap-2">
             <div
-              className="flex h-10 w-10 items-center justify-center rounded-sm text-lg font-bold text-white"
-              style={{ backgroundColor: '#2490ed' }}
+              className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-lg font-bold text-primary-foreground"
             >
               C
             </div>

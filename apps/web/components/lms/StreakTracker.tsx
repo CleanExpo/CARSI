@@ -53,17 +53,17 @@ export function StreakTracker({ currentStreak, longestStreak }: StreakTrackerPro
           🔥
         </span>
         <div className="flex flex-col">
-          <span className="font-mono text-xl leading-none font-bold text-white">
+          <span className="font-mono text-xl leading-none font-bold text-foreground">
             {currentStreak}
           </span>
-          <span className="text-xs text-white/40">day streak</span>
+          <span className="text-xs text-muted-foreground">day streak</span>
         </div>
       </div>
 
       {longestStreak > 0 && (
-        <div className="flex flex-col border-l border-white/10 pl-4">
-          <span className="font-mono text-sm leading-none text-white/60">{longestStreak}</span>
-          <span className="text-xs text-white/30">best streak</span>
+        <div className="flex flex-col border-l border-border pl-4">
+          <span className="font-mono text-sm leading-none text-foreground/90">{longestStreak}</span>
+          <span className="text-xs text-muted-foreground/60">best streak</span>
         </div>
       )}
 

@@ -34,13 +34,13 @@ export default function InstructorAnalyticsPage() {
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Course Analytics</h1>
-        <p className="mt-1 text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>
+        <p className="mt-1 text-sm text-muted-foreground">
           Performance metrics for your courses
         </p>
       </div>
 
       {loading && (
-        <p style={{ color: 'rgba(255,255,255,0.4)' }} className="text-sm">
+        <p className="text-sm text-muted-foreground">
           Loading…
         </p>
       )}
@@ -55,19 +55,12 @@ export default function InstructorAnalyticsPage() {
             ].map(({ label, value }) => (
               <div
                 key={label}
-                className="rounded-sm p-5"
-                style={{
-                  background: 'rgba(255,255,255,0.03)',
-                  border: '1px solid rgba(255,255,255,0.08)',
-                }}
+                className="rounded-lg border border-border bg-card p-5"
               >
-                <p
-                  className="mb-1 text-[11px] tracking-widest uppercase"
-                  style={{ color: 'rgba(255,255,255,0.35)' }}
-                >
+                <p className="mb-1 text-[11px] tracking-widest text-muted-foreground uppercase">
                   {label}
                 </p>
-                <p className="text-3xl font-bold" style={{ color: 'rgba(255,255,255,0.92)' }}>
+                <p className="text-3xl font-bold text-foreground/90">
                   {value}
                 </p>
               </div>
@@ -75,17 +68,8 @@ export default function InstructorAnalyticsPage() {
           </div>
 
           {data.courses.length > 0 && (
-            <div
-              className="overflow-hidden rounded-sm"
-              style={{ border: '1px solid rgba(255,255,255,0.08)' }}
-            >
-              <div
-                className="grid grid-cols-4 px-5 py-3 text-[10px] font-semibold tracking-widest uppercase"
-                style={{
-                  color: 'rgba(255,255,255,0.3)',
-                  borderBottom: '1px solid rgba(255,255,255,0.08)',
-                }}
-              >
+            <div className="overflow-hidden rounded-lg border border-border">
+              <div className="grid grid-cols-4 border-b border-border px-5 py-3 text-[10px] font-semibold tracking-widest text-muted-foreground/50 uppercase">
                 <span className="col-span-2">Course</span>
                 <span>Enrolments</span>
                 <span>Completion</span>
@@ -93,21 +77,16 @@ export default function InstructorAnalyticsPage() {
               {data.courses.map((course, i) => (
                 <div
                   key={course.course_id}
-                  className="grid grid-cols-4 items-center px-5 py-3.5"
-                  style={{
-                    background: i % 2 === 0 ? 'rgba(255,255,255,0.015)' : 'transparent',
-                    borderBottom: '1px solid rgba(255,255,255,0.05)',
-                  }}
+                  className={`grid grid-cols-4 items-center border-b border-border px-5 py-3.5 ${i % 2 === 0 ? 'bg-muted/5' : ''}`}
                 >
-                  <span className="col-span-2 text-sm" style={{ color: 'rgba(255,255,255,0.8)' }}>
+                  <span className="col-span-2 text-sm text-foreground/80">
                     {course.title}
                   </span>
-                  <span className="text-sm" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                  <span className="text-sm text-muted-foreground">
                     {course.total_enrollments}
                   </span>
                   <span
-                    className="text-sm font-semibold"
-                    style={{ color: course.completion_rate_pct >= 60 ? '#00FF88' : '#ed9d24' }}
+                    className={`text-sm font-semibold ${course.completion_rate_pct >= 60 ? 'text-green-500' : 'text-carsi-orange'}`}
                   >
                     {course.completion_rate_pct}%
                   </span>

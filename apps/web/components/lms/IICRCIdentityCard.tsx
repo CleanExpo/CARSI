@@ -33,8 +33,8 @@ export function IICRCIdentityCard({
 }: IICRCIdentityCardProps) {
   if (!memberNumber) {
     return (
-      <div className="flex flex-col gap-3 rounded-sm border border-white/[0.06] bg-zinc-900/50 p-6">
-        <p className="text-sm text-white/50">
+      <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
+        <p className="text-sm text-muted-foreground">
           No <AcronymTooltip term="IICRC" /> membership linked. Add your{' '}
           <AcronymTooltip term="IICRC" /> member number to track your <AcronymTooltip term="CEC" />{' '}
           credits and renewal status.
@@ -52,17 +52,17 @@ export function IICRCIdentityCard({
   }
 
   return (
-    <div className="flex flex-col gap-5 rounded-sm border border-white/[0.06] bg-zinc-900/50 p-6">
+    <div className="flex flex-col gap-5 rounded-lg border border-border bg-card p-6">
       {/* Header row */}
       <div className="flex items-start justify-between gap-4">
         <div className="flex flex-col gap-1">
-          <p className="font-mono text-xs tracking-widest text-white/40 uppercase">
+          <p className="font-mono text-xs tracking-widest text-muted-foreground uppercase">
             <AcronymTooltip term="IICRC" /> Member
           </p>
-          <p className="font-mono text-2xl font-bold text-white">{memberNumber}</p>
+          <p className="font-mono text-2xl font-bold text-foreground">{memberNumber}</p>
           {expiryDate && (
-            <p className="text-xs text-white/40">
-              Renewal due: <span className="text-white/70">{_formatDate(expiryDate)}</span>
+            <p className="text-xs text-muted-foreground">
+              Renewal due: <span className="text-foreground/90">{_formatDate(expiryDate)}</span>
             </p>
           )}
         </div>
@@ -72,7 +72,7 @@ export function IICRCIdentityCard({
           <img
             src={cardImageUrl}
             alt="IICRC member card"
-            className="h-16 rounded-sm border border-white/[0.08] object-cover"
+            className="h-16 rounded-lg border border-border object-cover"
           />
         )}
       </div>
@@ -80,17 +80,17 @@ export function IICRCIdentityCard({
       {/* Certifications */}
       {certifications.length > 0 && (
         <div className="flex flex-col gap-2">
-          <p className="font-mono text-xs tracking-widest text-white/40 uppercase">
+          <p className="font-mono text-xs tracking-widest text-muted-foreground uppercase">
             Certifications
           </p>
           <div className="flex flex-wrap gap-2">
             {certifications.map((cert) => (
               <div
                 key={cert.discipline}
-                className="flex flex-col items-center rounded-sm border border-white/[0.06] bg-zinc-800 px-3 py-2"
+                className="flex flex-col items-center rounded-lg border border-border bg-muted px-3 py-2"
               >
                 <span className="font-mono text-sm font-bold text-cyan-400">{cert.discipline}</span>
-                <span className="text-xs text-white/30">{_formatDate(cert.certified_at)}</span>
+                <span className="text-xs text-muted-foreground/60">{_formatDate(cert.certified_at)}</span>
               </div>
             ))}
           </div>
@@ -100,7 +100,7 @@ export function IICRCIdentityCard({
       {onEdit && (
         <button
           onClick={onEdit}
-          className="text-left text-xs text-white/30 underline transition-colors hover:text-white/50"
+          className="text-left text-xs text-muted-foreground/60 underline transition-colors hover:text-muted-foreground"
         >
           Edit <AcronymTooltip term="IICRC" /> details
         </button>

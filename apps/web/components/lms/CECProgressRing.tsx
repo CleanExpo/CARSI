@@ -107,9 +107,9 @@ export function CECProgressRing({
           />
         </svg>
         <div className="absolute flex flex-col items-center">
-          <span className="font-mono text-xl leading-none font-bold text-white">{cecEarned}</span>
-          <span className="text-xs leading-none text-white/40">/{cecRequired}</span>
-          <span className="mt-0.5 text-[10px] leading-none text-white/30">
+          <span className="font-mono text-xl leading-none font-bold text-foreground">{cecEarned}</span>
+          <span className="text-xs leading-none text-muted-foreground">/{cecRequired}</span>
+          <span className="mt-0.5 text-[10px] leading-none text-muted-foreground/60">
             <AcronymTooltip term="CEC">CECs</AcronymTooltip>
           </span>
         </div>
@@ -117,7 +117,7 @@ export function CECProgressRing({
 
       <div className="flex flex-col items-center gap-0.5">
         {discipline && <span className="font-mono text-xs text-cyan-400">{discipline}</span>}
-        <span className="text-xs text-white/40">{percentage}% of 3-year cycle</span>
+        <span className="text-xs text-muted-foreground">{percentage}% of 3-year cycle</span>
         {normalised >= 1 && (
           <span className="font-mono text-xs text-emerald-400">Renewal requirement met</span>
         )}

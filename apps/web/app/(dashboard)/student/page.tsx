@@ -89,7 +89,7 @@ export default function StudentDashboardPage() {
     } finally {
       setLoading((l) => ({ ...l, level: false }));
     }
-  }, []);
+  }, [user]);
 
   const fetchSub = useCallback(async () => {
     if (!user) return;
@@ -159,7 +159,7 @@ export default function StudentDashboardPage() {
   return (
     <div className="flex max-w-4xl flex-col gap-8 p-6">
       <PushNotificationPrompt />
-      <h1 className="font-mono text-2xl font-bold text-white">
+      <h1 className="text-2xl font-bold tracking-tight text-foreground">
         {profile?.full_name ?? 'My Dashboard'}
       </h1>
 
@@ -167,13 +167,13 @@ export default function StudentDashboardPage() {
       <section className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {/* IICRC Identity Card */}
         <div className="flex flex-col gap-3">
-          <h2 className="font-mono text-xs tracking-widest text-white/40 uppercase">
+          <h2 className="text-xs font-medium tracking-widest text-muted-foreground/60 uppercase">
             IICRC Identity
           </h2>
           {errors.profile ? (
             <ErrorBanner message={errors.profile} onRetry={fetchProfile} />
           ) : loading.profile ? (
-            <p className="text-sm text-white/30">Loading profile…</p>
+            <p className="text-sm text-muted-foreground">Loading profile…</p>
           ) : (
             <IICRCIdentityCard
               memberNumber={profile?.iicrc_member_number}
@@ -202,7 +202,7 @@ export default function StudentDashboardPage() {
 
       {/* --- XP + Streak Row --- */}
       <section className="flex flex-col gap-3">
-        <h2 className="font-mono text-xs tracking-widest text-white/40 uppercase">
+        <h2 className="text-xs font-medium tracking-widest text-muted-foreground/60 uppercase">
           Progress &amp; Streak
         </h2>
         {errors.level ? (
@@ -210,7 +210,7 @@ export default function StudentDashboardPage() {
         ) : (
           <div className="flex flex-wrap items-center gap-6">
             {loading.level ? (
-              <p className="text-sm text-white/30">Loading…</p>
+              <p className="text-sm text-muted-foreground">Loading…</p>
             ) : level ? (
               <>
                 <XPLevelBadge
@@ -225,7 +225,7 @@ export default function StudentDashboardPage() {
                 />
               </>
             ) : (
-              <p className="text-sm text-white/30">No progress data available</p>
+              <p className="text-sm text-muted-foreground">No progress data available</p>
             )}
           </div>
         )}
@@ -233,11 +233,11 @@ export default function StudentDashboardPage() {
 
       {/* --- Subscription Status --- */}
       <section className="flex flex-col gap-3">
-        <h2 className="font-mono text-xs tracking-widest text-white/40 uppercase">Subscription</h2>
+        <h2 className="text-xs font-medium tracking-widest text-muted-foreground/60 uppercase">Subscription</h2>
         {errors.sub ? (
           <ErrorBanner message={errors.sub} onRetry={fetchSub} />
         ) : loading.sub ? (
-          <p className="text-sm text-white/30">Loading subscription…</p>
+          <p className="text-sm text-muted-foreground">Loading subscription…</p>
         ) : (
           <SubscriptionStatus
             status={
@@ -256,7 +256,7 @@ export default function StudentDashboardPage() {
       {/* --- Enrolled Courses --- */}
       <section className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
-          <h2 className="font-mono text-xs tracking-widest text-white/40 uppercase">My Courses</h2>
+          <h2 className="text-xs font-medium tracking-widest text-muted-foreground/60 uppercase">My Courses</h2>
           {sub?.has_subscription && ['active', 'trialling'].includes(sub.status ?? '') && (
             <Link
               href="/courses"
@@ -269,15 +269,15 @@ export default function StudentDashboardPage() {
         {errors.enrollments ? (
           <ErrorBanner message={errors.enrollments} onRetry={fetchEnrollments} />
         ) : enrollmentsLoading ? (
-          <p className="text-sm text-white/30">Loading courses…</p>
+          <p className="text-sm text-muted-foreground">Loading courses…</p>
         ) : enrollments.length === 0 && sub?.has_subscription ? (
           <div
             className="rounded-lg border border-primary/15 bg-primary/5 p-6 text-center"
           >
-            <p className="mb-1 text-sm font-medium text-white/80">
+            <p className="mb-1 text-sm font-medium text-foreground">
               Your Pro subscription is active.
             </p>
-            <p className="mb-4 text-xs text-white/45">
+            <p className="mb-4 text-xs text-muted-foreground">
               Click any course to start — your first access creates your enrolment automatically.
             </p>
             <Link
@@ -294,7 +294,7 @@ export default function StudentDashboardPage() {
 
       {/* --- What's Next For You --- */}
       <section className="flex flex-col gap-3">
-        <h2 className="font-mono text-xs tracking-widest text-white/40 uppercase">
+        <h2 className="text-xs font-medium tracking-widest text-muted-foreground/60 uppercase">
           What&apos;s Next For You
         </h2>
         <RecommendationWidget />

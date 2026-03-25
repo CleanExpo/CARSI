@@ -40,15 +40,15 @@ export function CourseHubContext({ slug }: CourseHubContextProps) {
 
   return (
     <aside
-      className="rounded-sm border border-white/[0.06] bg-[#060a14] p-5"
+      className="rounded-lg border border-border bg-card p-5"
       aria-label="Career opportunities for this discipline"
     >
-      <h3 className="mb-3 text-xs font-semibold tracking-widest text-white/40 uppercase">
+      <h3 className="mb-3 text-xs font-semibold tracking-widest text-muted-foreground uppercase">
         Career Opportunities
       </h3>
 
       {data.pathway_name && (
-        <p className="mb-3 text-sm font-medium text-white/80">{data.pathway_name}</p>
+        <p className="mb-3 text-sm font-medium text-foreground/90">{data.pathway_name}</p>
       )}
 
       <ul className="flex flex-wrap gap-2" aria-label="Related job keywords">
@@ -56,7 +56,7 @@ export function CourseHubContext({ slug }: CourseHubContextProps) {
           <li key={keyword}>
             <a
               href={`/hub/jobs?q=${encodeURIComponent(keyword)}`}
-              className="inline-block rounded-sm bg-[#2490ed]/10 px-2.5 py-1 text-xs font-medium text-[#2490ed] transition-colors hover:bg-[#2490ed]/20"
+              className="inline-block rounded-lg bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary transition-colors hover:bg-primary/20"
             >
               {keyword}
             </a>
@@ -65,9 +65,9 @@ export function CourseHubContext({ slug }: CourseHubContextProps) {
       </ul>
 
       {data.related_disciplines.length > 1 && (
-        <p className="mt-4 text-xs text-white/30">
+        <p className="mt-4 text-xs text-muted-foreground/60">
           Also relevant to:{' '}
-          <span className="text-white/50">
+          <span className="text-muted-foreground">
             {data.related_disciplines.filter((d) => d !== data.discipline).join(', ')}
           </span>
         </p>

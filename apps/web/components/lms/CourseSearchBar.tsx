@@ -168,14 +168,7 @@ export function CourseSearchBar({
                 <li key={result.id} role="option" aria-selected="false">
                   <button
                     type="button"
-                    className="flex w-full items-center justify-between gap-3 border-b border-border px-4 py-3 text-left transition-colors"
-                    onMouseEnter={(e) =>
-                      ((e.currentTarget as HTMLButtonElement).style.background =
-                        'rgba(255,255,255,0.04)')
-                    }
-                    onMouseLeave={(e) =>
-                      ((e.currentTarget as HTMLButtonElement).style.background = 'transparent')
-                    }
+                    className="flex w-full items-center justify-between gap-3 border-b border-border px-4 py-3 text-left transition-colors hover:bg-secondary"
                     onClick={() => handleSelect(result.slug)}
                   >
                     <span

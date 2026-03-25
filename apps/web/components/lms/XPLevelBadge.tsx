@@ -34,7 +34,7 @@ export function XPLevelBadge({
         <span className="text-xs opacity-60">{totalXp.toLocaleString()} XP</span>
       </div>
       {xpToNextLevel !== null && (
-        <p className="font-mono text-xs text-white/40">
+        <p className="font-mono text-xs text-muted-foreground">
           {xpToNextLevel.toLocaleString()} XP to next level
         </p>
       )}

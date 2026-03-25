@@ -136,7 +136,7 @@ export function RegisterForm() {
               <FormControl>
                 <Input placeholder="e.g. IICRC-12345" {...field} />
               </FormControl>
-              <FormDescription className="text-xs text-white/30">
+              <FormDescription className="text-xs text-muted-foreground/60">
                 Link your IICRC membership to track CECs and display your credentials.
               </FormDescription>
               <FormMessage />

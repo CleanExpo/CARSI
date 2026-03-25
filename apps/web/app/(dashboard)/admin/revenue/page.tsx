@@ -32,20 +32,20 @@ function MetricCard({
   label,
   value,
   sub,
-  accent = '#2490ed',
+  accentClass = 'text-primary',
 }: {
   label: string;
   value: string;
   sub?: string;
-  accent?: string;
+  accentClass?: string;
 }) {
   return (
-    <div className="flex flex-col gap-1 rounded-lg border border-border bg-background p-5">
-      <span className="font-mono text-xs tracking-widest text-white/40 uppercase">{label}</span>
-      <span className="font-mono text-3xl font-bold" style={{ color: accent }}>
+    <div className="flex flex-col gap-1 rounded-lg border border-border bg-card p-5">
+      <span className="text-xs tracking-widest text-muted-foreground uppercase">{label}</span>
+      <span className={`text-3xl font-bold ${accentClass}`}>
         {value}
       </span>
-      {sub && <span className="font-mono text-xs text-white/30">{sub}</span>}
+      {sub && <span className="text-xs text-muted-foreground/50">{sub}</span>}
     </div>
   );
 }
@@ -53,7 +53,7 @@ function MetricCard({
 function RevenueBarChart({ data }: { data: RevenueByMonth[] }) {
   if (data.length === 0) {
     return (
-      <p className="py-8 text-center font-mono text-sm text-white/30">No subscription data yet.</p>
+      <p className="py-8 text-center text-sm text-muted-foreground/50">No subscription data yet.</p>
     );
   }
 
@@ -65,7 +65,7 @@ function RevenueBarChart({ data }: { data: RevenueByMonth[] }) {
         const pct = (row.revenue_aud / maxRevenue) * 100;
         return (
           <div key={row.month} className="flex flex-1 flex-col items-center gap-2">
-            <span className="font-mono text-xs text-white/40">{formatAUD(row.revenue_aud)}</span>
+            <span className="text-xs text-muted-foreground">{formatAUD(row.revenue_aud)}</span>
             <div className="flex w-full flex-col justify-end" style={{ height: '96px' }}>
               <div
                 className="w-full rounded-lg bg-primary transition-all"
@@ -76,8 +76,8 @@ function RevenueBarChart({ data }: { data: RevenueByMonth[] }) {
                 }}
               />
             </div>
-            <span className="font-mono text-xs text-white/30">{row.month}</span>
-            <span className="font-mono text-xs text-white/20">{row.new_subs} new</span>
+            <span className="text-xs text-muted-foreground/50">{row.month}</span>
+            <span className="text-xs text-muted-foreground/50">{row.new_subs} new</span>
           </div>
         );
       })}
@@ -99,26 +99,26 @@ export default function RevenueDashboardPage() {
   }, []);
 
   return (
-    <div className="min-h-screen space-y-8 bg-background p-6 text-white">
+    <div className="min-h-screen space-y-8 bg-background p-6 text-foreground">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-mono text-2xl font-bold tracking-tight">Revenue Intelligence</h1>
-          <p className="mt-1 font-mono text-sm text-white/40">
+          <h1 className="text-2xl font-bold tracking-tight">Revenue Intelligence</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
             CARSI Pro · $795 AUD/year · computed from local subscription records
           </p>
         </div>
         <Link
           href="/admin"
-          className="rounded-lg border border-border bg-background px-3 py-2 font-mono text-xs text-primary"
+          className="rounded-lg border border-border bg-background px-3 py-2 text-xs text-primary"
         >
           ← Admin
         </Link>
       </div>
 
-      {loading && <p className="animate-pulse font-mono text-white/30">Loading revenue data…</p>}
+      {loading && <p className="animate-pulse text-muted-foreground/50">Loading revenue data…</p>}
 
-      {error && <p className="font-mono text-sm text-red-400">{error}</p>}
+      {error && <p className="text-sm text-red-400">{error}</p>}
 
       {data && (
         <>
@@ -128,25 +128,25 @@ export default function RevenueDashboardPage() {
               label="Monthly Recurring Revenue"
               value={formatAUD(data.mrr_aud)}
               sub="active subs / 12 × $795"
-              accent="#2490ed"
+              accentClass="text-primary"
             />
             <MetricCard
               label="Annual Recurring Revenue"
               value={formatAUD(data.arr_aud)}
               sub="active subs × $795"
-              accent="#2490ed"
+              accentClass="text-primary"
             />
             <MetricCard
               label="Active Subscribers"
               value={String(data.total_subscribers)}
               sub="status = active"
-              accent="#00FF88"
+              accentClass="text-green-500"
             />
             <MetricCard
               label="Trial Conversion Rate"
               value={`${data.trial_to_paid_rate}%`}
               sub="trials → active"
-              accent="#FFB800"
+              accentClass="text-amber-500"
             />
           </div>
 
@@ -156,19 +156,19 @@ export default function RevenueDashboardPage() {
               label="Trialling Now"
               value={String(data.trialling)}
               sub="7-day free trial in progress"
-              accent="#2490ed"
+              accentClass="text-primary"
             />
             <MetricCard
               label="Cancelled This Month"
               value={String(data.cancelled_this_month)}
               sub="cancelled_at in current month"
-              accent="#FF4444"
+              accentClass="text-red-500"
             />
           </div>
 
           {/* Bottom: Revenue by Month bar chart */}
-          <div className="rounded-lg border border-border bg-background p-6">
-            <h2 className="mb-6 font-mono text-sm tracking-widest text-white/40 uppercase">
+          <div className="rounded-lg border border-border bg-card p-6">
+            <h2 className="mb-6 text-sm tracking-widest text-muted-foreground uppercase">
               Revenue by Month — Last 6 Months
             </h2>
             <RevenueBarChart data={data.revenue_by_month} />
