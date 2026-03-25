@@ -217,9 +217,9 @@ export function CourseCard({ course }: CourseCardProps) {
 
   return (
     <motion.div
-      className="glass-card card-3d group flex flex-col overflow-hidden rounded-xl"
-      whileHover={{ scale: 1.02, y: -4 }}
-      transition={{ duration: 0.25, ease: smoothEase }}
+      className="group flex flex-col overflow-hidden rounded-lg border border-border bg-card transition-colors hover:bg-card/80"
+      whileHover={{ y: -2 }}
+      transition={{ duration: 0.2, ease: 'easeOut' }}
     >
       {/* Image / gradient header */}
       <div
@@ -273,28 +273,24 @@ export function CourseCard({ course }: CourseCardProps) {
       {/* Card body */}
       <div className="flex flex-1 flex-col p-3">
         <h3
-          className="mb-2 line-clamp-2 text-sm leading-snug font-semibold"
-          style={{ color: 'rgba(255,255,255,0.9)' }}
+          className="mb-2 line-clamp-2 text-sm leading-snug font-semibold text-foreground"
         >
           {course.title}
         </h3>
 
         {course.short_description && (
           <p
-            className="mb-2 line-clamp-2 text-xs leading-relaxed"
-            style={{ color: 'rgba(255,255,255,0.45)' }}
+            className="mb-2 line-clamp-2 text-xs leading-relaxed text-muted-foreground"
           >
             {course.short_description}
           </p>
         )}
 
         <div
-          className="mt-auto flex items-center justify-between pt-2"
-          style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}
+          className="mt-auto flex items-center justify-between border-t border-border pt-2"
         >
           <div
-            className="flex items-center gap-2 text-xs"
-            style={{ color: 'rgba(255,255,255,0.6)' }}
+            className="flex items-center gap-2 text-xs text-muted-foreground"
           >
             {course.lesson_count != null && (
               <span className="flex items-center gap-1">
