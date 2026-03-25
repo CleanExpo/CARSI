@@ -5,12 +5,10 @@ Revises: 023
 Create Date: 2026-03-25
 
 Adds columns: difficulty, estimated_duration_hours, category_id,
-learning_objectives, migration_source, tier
+learning_objectives, migration_source, tier — only if they don't already exist.
 """
 
 from alembic import op
-import sqlalchemy as sa
-from sqlalchemy.dialects.postgresql import UUID, JSONB
 
 revision = "024"
 down_revision = "023"
@@ -18,35 +16,26 @@ branch_labels = None
 depends_on = None
 
 
-def upgrade() -> None:
-    op.add_column("lms_courses", sa.Column("difficulty", sa.String(50), nullable=True))
-    op.add_column(
-        "lms_courses",
-        sa.Column("estimated_duration_hours", sa.Numeric(5, 1), nullable=True),
-    )
-    op.add_column(
-        "lms_courses",
-        sa.Column(
-            "category_id",
-            UUID(as_uuid=True),
-            sa.ForeignKey("lms_categories.id", ondelete="SET NULL"),
-            nullable=True,
-        ),
-    )
-    op.add_column(
-        "lms_courses",
-        sa.Column("learning_objectives", JSONB, nullable=True, server_default="[]"),
-    )
-    op.add_column(
-        "lms_courses",
-        sa.Column("migration_source", sa.String(50), nullable=True),
-    )
-    op.add_column(
-        "lms_courses",
-        sa.Column("tier", sa.String(50), nullable=False, server_default="foundation"),
-    )
+def _add_column_if_not_exists(table: str, column: str, col_type: str, extra: str = "") -> None:
+    """Add a column only if it doesn't already exist (PostgreSQL)."""
+    op.execute(f"""
+        DO $$ BEGIN
+            ALTER TABLE {table} ADD COLUMN {column} {col_type} {extra};
+        EXCEPTION WHEN duplicate_column THEN
+            NULL;
+        END $$;
+    """)
 
-    # Also publish all draft courses so the course listing works
+
+def upgrade() -> None:
+    _add_column_if_not_exists("lms_courses", "difficulty", "VARCHAR(50)")
+    _add_column_if_not_exists("lms_courses", "estimated_duration_hours", "NUMERIC(5,1)")
+    _add_column_if_not_exists("lms_courses", "category_id", "UUID REFERENCES lms_categories(id) ON DELETE SET NULL")
+    _add_column_if_not_exists("lms_courses", "learning_objectives", "JSONB", "DEFAULT '[]'")
+    _add_column_if_not_exists("lms_courses", "migration_source", "VARCHAR(50)")
+    _add_column_if_not_exists("lms_courses", "tier", "VARCHAR(50) NOT NULL", "DEFAULT 'foundation'")
+
+    # Publish all draft courses so the course listing works
     op.execute("UPDATE lms_courses SET status = 'published' WHERE status = 'draft'")
 
     # Fix admin role
