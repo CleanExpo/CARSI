@@ -16,15 +16,15 @@ export default function Error({ error, reset }: ErrorProps) {
 
   return (
     <div className="flex min-h-[400px] flex-col items-center justify-center p-8">
-      <h2 className="mb-4 text-xl font-semibold text-gray-900">
+      <h2 className="mb-4 text-xl font-semibold text-foreground">
         Something went wrong
       </h2>
-      <p className="mb-6 text-sm text-gray-600">
+      <p className="mb-6 text-sm text-muted-foreground">
         An unexpected error occurred. Please try again.
       </p>
       <button
         onClick={reset}
-        className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+        className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
       >
         Try again
       </button>
