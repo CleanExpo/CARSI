@@ -39,7 +39,7 @@ const FAQ_ITEMS = [
   {
     question: "What's the difference between Foundation and Growth?",
     answer:
-      'Foundation covers entry-level and practical CEC courses — PPE, moisture metering, carpet cleaning basics, Level 1 Mould Remediation, and more. Growth unlocks the full catalogue including advanced disciplines: Level 2 Mould, Admin, Social Media Marketing, Asthma & Allergy, NeoSan Labs, and all Introduction to courses valued at $500+.',
+      'Foundation covers entry-level and practical CEC courses — PPE, moisture metering, carpet cleaning basics, Level 1 Mould Remediation, and more. Growth unlocks every course on the platform — all 140+ courses and resources including advanced disciplines: Level 2 Mould, Admin, Social Media Marketing, Asthma & Allergy, NeoSan Labs, and all Introduction to courses valued at $500+.',
   },
   {
     question: 'Do CARSI courses count toward IICRC CECs?',

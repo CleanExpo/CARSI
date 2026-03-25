@@ -30,8 +30,8 @@ const FOUNDATION_EXTRAS = [
 ];
 
 const GROWTH_EXTRAS = [
+  'Access to ALL 140+ courses and resources',
   'Everything in Foundation',
-  'BONUS Policies & Procedures',
   'NeoSan Labs Product Course (valued at $99)',
   'Social Media Marketing (valued at $79)',
   'Admin Course (valued at $275)',
