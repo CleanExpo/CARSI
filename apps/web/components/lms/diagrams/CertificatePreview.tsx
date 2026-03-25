@@ -68,15 +68,13 @@ export function CertificatePreview({
           />
 
           {/* CARSI Logo mark */}
-          <div className="mx-auto mb-4 flex items-center justify-center gap-2">
-            <div
-              className="flex h-10 w-10 items-center justify-center rounded-sm bg-primary text-lg font-bold text-primary-foreground"
-            >
-              C
-            </div>
-            <span className="text-sm font-semibold tracking-[0.25em] text-[#1a1a1a] uppercase">
-              CARSI
-            </span>
+          <div className="mx-auto mb-4 flex items-center justify-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="https://carsi.com.au/wp-content/uploads/2021/02/CARSI-LOGO-best-compression-2.png"
+              alt="CARSI"
+              className="h-10 w-auto"
+            />
           </div>
 
           {/* Heading */}

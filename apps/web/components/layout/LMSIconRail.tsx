@@ -60,9 +60,14 @@ export function LMSIconRail() {
       <Link
         href="/"
         title="CARSI Home"
-        className="mb-3 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-sm bg-primary transition-transform hover:scale-105"
+        className="mb-3 flex h-9 w-9 flex-shrink-0 items-center justify-center transition-transform hover:scale-105"
       >
-        <span className="text-sm leading-none font-bold text-primary-foreground">C</span>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="https://carsi.com.au/wp-content/uploads/2021/02/CARSI-LOGO-best-compression-2.png"
+          alt="CARSI"
+          className="h-7 w-auto"
+        />
       </Link>
 
       {/* Top nav */}
