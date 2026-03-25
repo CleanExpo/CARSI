@@ -60,6 +60,18 @@ function sleep(ms: number): Promise<void> {
 }
 
 /**
+ * Only send users to /login after a hard 401 when they are inside the LMS app shell.
+ * Public marketing pages (courses, home, etc.) call the same API client for optional auth
+ * (e.g. getCurrentUser) — those must not redirect anonymous visitors.
+ */
+function shouldRedirect401ToLogin(): boolean {
+  if (typeof window === 'undefined') return false;
+  const p = window.location.pathname;
+  const appPrefixes = ['/student', '/dashboard', '/admin', '/instructor'];
+  return appPrefixes.some((prefix) => p === prefix || p.startsWith(`${prefix}/`));
+}
+
+/**
  * Attempt a single token refresh via the server-side route.
  * Returns true if the refresh succeeded and the caller should retry.
  */
@@ -117,8 +129,8 @@ async function fetchApi<T>(
       if (refreshed) {
         return fetchApi<T>(endpoint, options, retriesLeft, true);
       }
-      // Refresh failed — redirect to login
-      if (typeof window !== 'undefined') {
+      // Refresh failed — redirect only from protected LMS routes (not /courses, /, etc.)
+      if (typeof window !== 'undefined' && shouldRedirect401ToLogin()) {
         window.location.href = '/login';
       }
       throw new ApiClientError('Session expired', 401);
