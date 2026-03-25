@@ -9,11 +9,7 @@ export function IndustryPageLayout({ children }: IndustryPageLayoutProps) {
     <main className="min-h-screen bg-background">
       {/* Single subtle gradient — matches landing page */}
       <div
-        className="pointer-events-none fixed inset-0"
-        style={{
-          background:
-            'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(36,144,237,0.08) 0%, transparent 50%)',
-        }}
+        className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_0%,hsl(var(--primary)/0.08)_0%,transparent_50%)]"
         aria-hidden="true"
       />
 

@@ -61,8 +61,7 @@ export default function QuizExplanationModal({
   return (
     /* Backdrop */
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ backgroundColor: 'rgba(0,0,0,0.75)' }}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4"
       onClick={onClose}
     >
       {/* Modal panel */}
@@ -104,8 +103,7 @@ export default function QuizExplanationModal({
           {loading && (
             <div className="flex items-center justify-center py-8">
               <span
-                className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-border"
-                style={{ borderTopColor: 'hsl(var(--primary))' }}
+                className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-border border-t-primary"
               />
               <span className="ml-3 text-sm text-muted-foreground">Generating explanation…</span>
             </div>

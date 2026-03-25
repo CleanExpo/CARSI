@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export function Footer() {
   return (
-    <footer className="border-t border-border bg-[#050505] py-6">
+    <footer className="border-t border-border bg-background py-6">
       <div className="container flex flex-col items-center justify-between gap-4 md:flex-row">
         <p className="text-sm tracking-wide text-muted-foreground">
           CARSI — Restoration Training Platform

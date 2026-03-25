@@ -1,3 +1,4 @@
+import type React from 'react';
 import { CheckCircle2, ArrowRight, FileCheck, Briefcase } from 'lucide-react';
 import Link from 'next/link';
 
@@ -73,7 +74,7 @@ export function ContractorAddOns({ accentColor = '#2490ed' }: ContractorAddOnsPr
                 className="rounded-lg border border-border bg-secondary p-5"
               >
                 <div className="mb-3 flex items-center gap-2">
-                  <FileCheck className="h-4 w-4" style={{ color: accentColor }} />
+                  <FileCheck className="h-4 w-4" style={{ color: accentColor } as React.CSSProperties} />
                   <span className="text-sm font-semibold text-foreground">
                     {panel.name}
                   </span>
@@ -121,12 +122,8 @@ export function ContractorAddOns({ accentColor = '#2490ed' }: ContractorAddOnsPr
                     +
                   </span>
                   <span
-                    className="rounded px-2 py-0.5 font-mono text-xs font-bold"
-                    style={{
-                      background: `${accentColor}20`,
-                      color: accentColor,
-                      border: `1px solid ${accentColor}40`,
-                    }}
+                    className="rounded px-2 py-0.5 font-mono text-xs font-bold ring-1"
+                    style={{ color: accentColor, background: `${accentColor}20`, '--tw-ring-color': `${accentColor}40` } as React.CSSProperties}
                   >
                     {upgrade.addon}
                   </span>

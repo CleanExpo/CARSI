@@ -1,3 +1,4 @@
+import type React from 'react';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 
@@ -27,7 +28,7 @@ export function IndustryCTA({
           {subtitle}
         </p>
         <h2 className="mb-4 text-3xl font-bold text-foreground">
-          {title} <span style={{ color: accentColor }}>{price}</span>
+          {title} <span style={{ color: accentColor } as React.CSSProperties}>{price}</span>
         </h2>
         <p className="mb-8 text-base text-muted-foreground">
           {description}

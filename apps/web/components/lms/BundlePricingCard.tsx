@@ -23,29 +23,13 @@ interface BundleProps {
   };
 }
 
-const tagColors: Record<string, { bg: string; text: string; border: string }> = {
-  mining: {
-    bg: 'rgba(237,157,36,0.12)',
-    text: '#ed9d24',
-    border: 'rgba(237,157,36,0.3)',
-  },
-  'commercial-cleaning': {
-    bg: 'rgba(38,196,160,0.12)',
-    text: '#26c4a0',
-    border: 'rgba(38,196,160,0.3)',
-  },
-  'aged-care': {
-    bg: 'rgba(155,89,182,0.12)',
-    text: '#9b59b6',
-    border: 'rgba(155,89,182,0.3)',
-  },
+const tagClasses: Record<string, string> = {
+  mining: 'bg-amber-500/10 text-amber-400 border border-amber-500/30',
+  'commercial-cleaning': 'bg-teal-400/10 text-teal-400 border border-teal-400/30',
+  'aged-care': 'bg-purple-500/10 text-purple-400 border border-purple-500/30',
 };
 
-const defaultTagStyle = {
-  bg: 'rgba(36,144,237,0.12)',
-  text: '#2490ed',
-  border: 'rgba(36,144,237,0.3)',
-};
+const defaultTagClass = 'bg-blue-400/10 text-blue-400 border border-blue-400/30';
 
 const MAX_VISIBLE_COURSES = 4;
 
@@ -63,9 +47,9 @@ export function BundlePricingCard({ bundle }: BundleProps) {
       : bundle.savings_aud
     : null;
 
-  const tagStyle = bundle.industry_tag
-    ? (tagColors[bundle.industry_tag] ?? defaultTagStyle)
-    : defaultTagStyle;
+  const tagClass = bundle.industry_tag
+    ? (tagClasses[bundle.industry_tag] ?? defaultTagClass)
+    : defaultTagClass;
 
   const visibleCourses = bundle.courses.slice(0, MAX_VISIBLE_COURSES);
   const extraCount = bundle.courses.length - MAX_VISIBLE_COURSES;
@@ -79,12 +63,7 @@ export function BundlePricingCard({ bundle }: BundleProps) {
         {/* Industry tag badge */}
         {bundle.industry_tag && (
           <span
-            className="mb-3 inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium"
-            style={{
-              background: tagStyle.bg,
-              color: tagStyle.text,
-              border: `1px solid ${tagStyle.border}`,
-            }}
+            className={`mb-3 inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium ${tagClass}`}
           >
             <Tag className="h-3 w-3" />
             {bundle.industry_tag.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}
@@ -122,10 +101,7 @@ export function BundlePricingCard({ bundle }: BundleProps) {
             </li>
           ))}
           {extraCount > 0 && (
-            <li
-              className="text-xs font-medium text-muted-foreground/60"
-              style={{ paddingLeft: '1.25rem' }}
-            >
+            <li className="pl-5 text-xs font-medium text-muted-foreground/60">
               +{extraCount} more course{extraCount !== 1 ? 's' : ''}
             </li>
           )}
@@ -154,11 +130,7 @@ export function BundlePricingCard({ bundle }: BundleProps) {
 
         <Link
           href="/subscribe"
-          className="flex w-full items-center justify-center rounded-lg px-4 py-2.5 text-sm font-semibold transition-all duration-150"
-          style={{
-            background: 'linear-gradient(135deg, #ed9d24 0%, #d68820 100%)',
-            color: '#000',
-          }}
+          className="flex w-full items-center justify-center rounded-lg bg-carsi-orange px-4 py-2.5 text-sm font-semibold text-black transition-all duration-150 hover:opacity-90"
         >
           Enrol in Bundle &rarr;
         </Link>

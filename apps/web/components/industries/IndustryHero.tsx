@@ -1,3 +1,4 @@
+import type React from 'react';
 import { LucideIcon } from 'lucide-react';
 import { DisciplinePill } from './DisciplinePill';
 import { GlassStatCard } from './GlassStatCard';
@@ -39,12 +40,8 @@ export function IndustryHero({
       <div className="max-w-2xl">
         {/* Industry pill */}
         <div
-          className="mb-6 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold"
-          style={{
-            background: `${accentColor}15`,
-            border: `1px solid ${accentColor}30`,
-            color: accentColor,
-          }}
+          className="mb-6 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ring-1"
+          style={{ color: accentColor, background: `${accentColor}15`, '--tw-ring-color': `${accentColor}30` } as React.CSSProperties}
         >
           <Icon className="h-3.5 w-3.5" />
           {industryName}
