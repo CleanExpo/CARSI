@@ -46,12 +46,12 @@ const INDUSTRY_SEGMENTS = [
 ];
 
 const EVENT_TYPE_COLOURS: Record<string, string> = {
-  conference: 'bg-[rgba(36,144,237,0.15)] text-[#2490ed]',
-  training: 'bg-[rgba(52,211,153,0.15)] text-[#34d399]',
-  webinar: 'bg-[rgba(167,139,250,0.15)] text-[#a78bfa]',
-  workshop: 'bg-[rgba(251,191,36,0.15)] text-[#fbbf24]',
-  networking: 'bg-[rgba(248,113,113,0.15)] text-[#f87171]',
-  other: 'bg-white/[0.08] text-white/50',
+  conference: 'bg-primary/15 text-primary',
+  training: 'bg-emerald-400/15 text-emerald-400',
+  webinar: 'bg-violet-400/15 text-violet-400',
+  workshop: 'bg-amber-400/15 text-amber-400',
+  networking: 'bg-red-400/15 text-red-400',
+  other: 'bg-secondary text-muted-foreground',
 };
 
 interface EventSummary {
@@ -139,7 +139,7 @@ function EventCard({ event }: { event: EventSummary }) {
   return (
     <Link
       href={`/calendar/${event.id}`}
-      className="group flex flex-col gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5 transition-all duration-200 hover:border-[rgba(36,144,237,0.35)] hover:bg-white/[0.06] hover:shadow-[0_8px_40px_rgba(36,144,237,0.12)]"
+      className="group flex flex-col gap-3 rounded-sm border border-border bg-card p-5 transition-all duration-200 hover:border-primary/35 hover:bg-card/80 hover:shadow-[0_8px_40px_hsl(var(--primary)/0.12)]"
     >
       {/* Type + free badge */}
       <div className="flex flex-wrap items-center gap-2">
@@ -149,40 +149,40 @@ function EventCard({ event }: { event: EventSummary }) {
           {event.event_type}
         </span>
         {event.is_free && (
-          <span className="inline-flex items-center rounded-full bg-[rgba(52,211,153,0.12)] px-2.5 py-0.5 text-xs font-medium text-[#34d399]">
+          <span className="inline-flex items-center rounded-full bg-emerald-400/12 px-2.5 py-0.5 text-xs font-medium text-emerald-400">
             Free
           </span>
         )}
         {event.featured && (
-          <span className="inline-flex items-center rounded-full bg-[rgba(251,191,36,0.12)] px-2.5 py-0.5 text-xs font-medium text-[#fbbf24]">
+          <span className="inline-flex items-center rounded-full bg-amber-400/12 px-2.5 py-0.5 text-xs font-medium text-amber-400">
             Featured
           </span>
         )}
       </div>
 
-      <h3 className="text-base leading-snug font-semibold text-white/90 transition-colors group-hover:text-[#2490ed]">
+      <h3 className="text-base leading-snug font-semibold text-foreground transition-colors group-hover:text-primary">
         {event.title}
       </h3>
 
       {/* Date + location */}
-      <div className="flex flex-col gap-1 text-sm text-white/50">
+      <div className="flex flex-col gap-1 text-sm text-muted-foreground">
         <span>{formatEventDate(event.start_date, event.end_date)}</span>
         <span className="flex items-center gap-1.5">
           <span
-            className={`h-1.5 w-1.5 flex-shrink-0 rounded-full ${event.is_virtual ? 'bg-[#a78bfa]' : 'bg-[#2490ed]'}`}
+            className={`h-1.5 w-1.5 flex-shrink-0 rounded-full ${event.is_virtual ? 'bg-violet-400' : 'bg-primary'}`}
           />
           {locationStr}
         </span>
       </div>
 
-      {event.organiser_name && <p className="text-xs text-white/30">By {event.organiser_name}</p>}
+      {event.organiser_name && <p className="text-xs text-muted-foreground/50">By {event.organiser_name}</p>}
 
       {event.industry_categories.length > 0 && (
         <div className="mt-auto flex flex-wrap gap-1">
           {event.industry_categories.slice(0, 3).map((cat) => (
             <span
               key={cat}
-              className="rounded-md bg-white/[0.05] px-2 py-0.5 text-xs text-white/35"
+              className="rounded-sm bg-secondary px-2 py-0.5 text-xs text-muted-foreground/60"
             >
               {cat}
             </span>
@@ -196,14 +196,14 @@ function EventCard({ event }: { event: EventSummary }) {
 // Placeholder card — shown when no events exist yet
 function PlaceholderCard({ index }: { index: number }) {
   return (
-    <div className="flex flex-col gap-3 rounded-2xl border border-dashed border-white/[0.06] bg-white/[0.01] p-5">
-      <div className="h-5 w-20 animate-pulse rounded-full bg-white/[0.05]" />
-      <div className="h-5 w-4/5 animate-pulse rounded bg-white/[0.05]" />
+    <div className="flex flex-col gap-3 rounded-sm border border-dashed border-border bg-card/30 p-5">
+      <div className="h-5 w-20 animate-pulse rounded-full bg-muted/20" />
+      <div className="h-5 w-4/5 animate-pulse rounded bg-muted/20" />
       <div className="space-y-1.5">
-        <div className="h-4 w-1/2 animate-pulse rounded bg-white/[0.03]" />
-        <div className="h-4 w-2/3 animate-pulse rounded bg-white/[0.03]" />
+        <div className="h-4 w-1/2 animate-pulse rounded bg-muted/10" />
+        <div className="h-4 w-2/3 animate-pulse rounded bg-muted/10" />
       </div>
-      <p className="mt-auto text-xs text-white/20">Event slot {index} — calendar populating</p>
+      <p className="mt-auto text-xs text-muted-foreground/40">Event slot {index} — calendar populating</p>
     </div>
   );
 }
@@ -228,22 +228,22 @@ export default async function CalendarPage({
     <>
       <BreadcrumbSchema items={breadcrumbs} />
 
-      <main className="min-h-screen bg-[#050505] px-4 py-16">
+      <main className="min-h-screen bg-background px-4 py-16">
         <div className="mx-auto max-w-7xl">
           {/* Header */}
           <div className="mb-12">
-            <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-[rgba(36,144,237,0.1)] px-4 py-1.5 text-sm font-medium text-[#2490ed]">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#2490ed]" />
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary">
+              <span className="h-1.5 w-1.5 rounded-full bg-primary" />
               CARSI Industry Hub
             </div>
-            <h1 className="mb-4 text-4xl font-bold tracking-tight text-white md:text-5xl">
+            <h1 className="mb-4 text-4xl font-bold tracking-tight text-foreground md:text-5xl">
               Industry Calendar
             </h1>
-            <p className="max-w-2xl text-lg text-white/50">
+            <p className="max-w-2xl text-lg text-muted-foreground">
               National calendar of conferences, training, webinars, and workshops across the
               restoration, HVAC, flooring, and indoor environment industries.
             </p>
-            {total > 0 && <p className="mt-2 text-sm text-white/30">{total} upcoming events</p>}
+            {total > 0 && <p className="mt-2 text-sm text-muted-foreground/60">{total} upcoming events</p>}
           </div>
 
           {/* Filters row */}
@@ -252,8 +252,8 @@ export default async function CalendarPage({
               href="/calendar"
               className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
                 !type
-                  ? 'bg-[#2490ed] text-white'
-                  : 'border border-white/[0.08] text-white/50 hover:border-[rgba(36,144,237,0.35)] hover:text-white/80'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'border border-border text-muted-foreground hover:border-primary/35 hover:text-foreground'
               }`}
             >
               All Types
@@ -264,8 +264,8 @@ export default async function CalendarPage({
                 href={`/calendar?type=${et.value}${category ? `&category=${encodeURIComponent(category)}` : ''}`}
                 className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
                   type === et.value
-                    ? 'bg-[#2490ed] text-white'
-                    : 'border border-white/[0.08] text-white/50 hover:border-[rgba(36,144,237,0.35)] hover:text-white/80'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'border border-border text-muted-foreground hover:border-primary/35 hover:text-foreground'
                 }`}
               >
                 {et.label}
@@ -278,8 +278,8 @@ export default async function CalendarPage({
               href={type ? `/calendar?type=${type}` : '/calendar'}
               className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
                 !category
-                  ? 'bg-white/[0.1] text-white/70'
-                  : 'border border-white/[0.06] text-white/40 hover:text-white/70'
+                  ? 'bg-secondary text-foreground/70'
+                  : 'border border-border text-muted-foreground/60 hover:text-muted-foreground'
               }`}
             >
               All Segments
@@ -290,8 +290,8 @@ export default async function CalendarPage({
                 href={`/calendar?${type ? `type=${type}&` : ''}category=${encodeURIComponent(seg)}`}
                 className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
                   category === seg
-                    ? 'bg-white/[0.1] text-white/70'
-                    : 'border border-white/[0.06] text-white/40 hover:text-white/70'
+                    ? 'bg-secondary text-foreground/70'
+                    : 'border border-border text-muted-foreground/60 hover:text-muted-foreground'
                 }`}
               >
                 {seg}
@@ -300,16 +300,16 @@ export default async function CalendarPage({
           </div>
 
           {/* Submit event CTA */}
-          <div className="mb-10 flex items-center justify-between rounded-2xl border border-white/[0.06] bg-white/[0.02] px-6 py-4">
+          <div className="mb-10 flex items-center justify-between rounded-sm border border-border bg-card px-6 py-4">
             <div>
-              <p className="text-sm font-medium text-white/80">Have an industry event to list?</p>
-              <p className="text-xs text-white/40">
+              <p className="text-sm font-medium text-foreground/80">Have an industry event to list?</p>
+              <p className="text-xs text-muted-foreground">
                 Submit it for free — we review and publish within 24 hours.
               </p>
             </div>
             <Link
               href="/calendar/submit"
-              className="rounded-xl bg-[#2490ed] px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+              className="rounded-sm bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
             >
               Submit Event
             </Link>
@@ -317,8 +317,8 @@ export default async function CalendarPage({
 
           {/* Events grouped by month */}
           {grouped.length === 0 && placeholderCount === 0 ? (
-            <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-16 text-center">
-              <p className="text-white/40">
+            <div className="rounded-sm border border-border bg-card p-16 text-center">
+              <p className="text-muted-foreground">
                 {type || category
                   ? 'No upcoming events match your filters — try a different combination.'
                   : 'No upcoming events yet — check back soon or submit your event above.'}
@@ -328,7 +328,7 @@ export default async function CalendarPage({
             <div className="space-y-12">
               {grouped.map(([monthKey, monthEvents]) => (
                 <section key={monthKey}>
-                  <h2 className="mb-4 text-lg text-xs font-semibold tracking-widest text-white/60 uppercase">
+                  <h2 className="mb-4 text-xs font-semibold tracking-widest text-muted-foreground/60 uppercase">
                     {formatMonth(monthEvents[0].start_date)}
                   </h2>
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -340,7 +340,7 @@ export default async function CalendarPage({
               ))}
               {placeholderCount > 0 && (
                 <section>
-                  <h2 className="mb-4 text-xs font-semibold tracking-widest text-white/30 uppercase">
+                  <h2 className="mb-4 text-xs font-semibold tracking-widest text-muted-foreground/40 uppercase">
                     Upcoming
                   </h2>
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">

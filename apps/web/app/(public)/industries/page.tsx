@@ -1,3 +1,4 @@
+import type React from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { OrganizationSchema } from '@/components/seo/JsonLd';
@@ -224,19 +225,16 @@ export default function IndustriesPage() {
               <Link
                 key={industry.slug}
                 href={`/industries/${industry.slug}`}
-                className="group rounded-lg border border-border bg-card p-6 transition-all duration-200 hover:-translate-y-1"
+                className="group rounded-sm border border-border bg-card p-6 transition-all duration-200 hover:-translate-y-1"
               >
                 <div
-                  className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg"
-                  style={{
-                    background: `${industry.color}15`,
-                    border: `1px solid ${industry.color}30`,
-                  }}
+                  className="mb-4 flex h-10 w-10 items-center justify-center rounded-sm ring-1"
+                  style={{ background: `${industry.color}15`, '--tw-ring-color': `${industry.color}30` } as React.CSSProperties}
                 >
                   <industry.Icon className="h-5 w-5" style={{ color: industry.color }} />
                 </div>
 
-                <h2 className="mb-2 text-lg font-semibold text-foreground transition-colors duration-150 group-hover:text-white">
+                <h2 className="mb-2 text-lg font-semibold text-foreground transition-colors duration-150 group-hover:text-foreground">
                   {industry.label}
                   <ArrowRight
                     className="ml-2 inline h-4 w-4 text-primary opacity-0 transition-opacity duration-150 group-hover:opacity-100"
@@ -251,11 +249,7 @@ export default function IndustriesPage() {
                   {industry.disciplines.map((code) => (
                     <span
                       key={code}
-                      className="rounded px-2 py-0.5 font-mono text-[10px] font-bold text-primary"
-                      style={{
-                        background: 'rgba(36,144,237,0.1)',
-                        border: '1px solid rgba(36,144,237,0.2)',
-                      }}
+                      className="rounded bg-primary/10 px-2 py-0.5 font-mono text-[10px] font-bold text-primary ring-1 ring-primary/20"
                     >
                       {code}
                     </span>
@@ -278,14 +272,13 @@ export default function IndustriesPage() {
             <div className="flex justify-center gap-3">
               <Link
                 href="/courses"
-                className="inline-flex items-center gap-2 rounded-lg px-6 py-2.5 text-sm font-medium text-white transition-opacity duration-150 hover:opacity-90"
-                style={{ background: '#ed9d24' }}
+                className="inline-flex items-center gap-2 rounded-sm bg-carsi-orange px-6 py-2.5 text-sm font-medium text-white transition-opacity duration-150 hover:opacity-90"
               >
                 Browse All Courses
               </Link>
               <Link
                 href="/pathways"
-                className="inline-flex items-center gap-2 rounded-lg border border-border bg-secondary px-6 py-2.5 text-sm font-medium text-muted-foreground transition-colors duration-150 hover:text-white"
+                className="inline-flex items-center gap-2 rounded-sm border border-border bg-secondary px-6 py-2.5 text-sm font-medium text-muted-foreground transition-colors duration-150 hover:text-foreground"
               >
                 View Pathways
               </Link>

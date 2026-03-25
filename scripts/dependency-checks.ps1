@@ -275,7 +275,7 @@ function Test-WorkspaceConsistency {
     [CmdletBinding()]
     param()
 
-    $workspaces = @(".", "apps/web", "apps/backend", "packages/shared", "packages/config")
+    $workspaces = @(".", "packages/news-worker", "apps/backend", "packages/shared", "packages/config", "packages/schema")
     $depMatrix = @{}
 
     foreach ($ws in $workspaces) {

@@ -36,7 +36,7 @@ export function PushNotificationPrompt() {
 
   return (
     <div
-      className="mb-6 flex items-center justify-between gap-4 rounded-lg border border-primary/20 bg-primary/5 px-4 py-3"
+      className="mb-6 flex items-center justify-between gap-4 rounded-sm border border-primary/20 bg-primary/5 px-4 py-3"
       role="banner"
       aria-label="Push notification opt-in"
     >
@@ -50,7 +50,7 @@ export function PushNotificationPrompt() {
       <div className="flex shrink-0 items-center gap-3">
         <button
           onClick={handleEnable}
-          className="rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground transition-opacity hover:opacity-80"
+          className="rounded-sm bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground transition-opacity hover:opacity-80"
         >
           Enable Notifications
         </button>

@@ -216,7 +216,7 @@ export function CourseCard({ course }: CourseCardProps) {
 
   return (
     <motion.div
-      className="group flex flex-col overflow-hidden rounded-lg border border-border bg-card transition-colors hover:bg-card/80"
+      className="group flex flex-col overflow-hidden rounded-sm border border-border bg-card transition-colors hover:bg-card/80"
       whileHover={{ y: -2 }}
       transition={{ duration: 0.2, ease: 'easeOut' }}
     >
@@ -237,14 +237,14 @@ export function CourseCard({ course }: CourseCardProps) {
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
         {discipline && (
           <span
-            className="absolute top-2 left-2 rounded-md bg-black/60 px-2 py-0.5 font-mono text-xs font-bold ring-1"
+            className="absolute top-2 left-2 rounded-sm bg-black/60 px-2 py-0.5 font-mono text-xs font-bold ring-1"
             style={{ color: ds.color, '--tw-ring-color': `${ds.color}40` } as React.CSSProperties}
           >
             {discipline}
           </span>
         )}
         <span
-          className={`absolute top-2 right-2 rounded-md bg-black/60 px-2 py-0.5 text-xs font-semibold ring-1 ${
+          className={`absolute top-2 right-2 rounded-sm bg-black/60 px-2 py-0.5 text-xs font-semibold ring-1 ${
             isFree ? 'text-green-500 ring-green-500/40' : 'text-carsi-orange ring-carsi-orange/40'
           }`}
         >

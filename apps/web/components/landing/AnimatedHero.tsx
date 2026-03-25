@@ -26,7 +26,7 @@ const staggerContainer = {
 const trustBadges = [
   { icon: Award, label: 'IICRC Approved', className: 'text-primary' },
   { icon: Shield, label: '24/7 Online Access', className: 'text-green-500' },
-  { icon: Star, label: '4.9★ Rating', className: 'text-carsi-orange' },
+  { icon: Star, label: '140+ Courses', className: 'text-carsi-orange' },
 ];
 
 const partnerLogos = [
@@ -78,7 +78,7 @@ function TrustSignals() {
           <motion.div
             key={partner.name}
             variants={fadeIn}
-            className="flex h-7 items-center justify-center rounded-md border border-border bg-secondary px-2 text-[10px] font-bold tracking-wide text-muted-foreground"
+            className="flex h-7 items-center justify-center rounded-sm border border-border bg-secondary px-2 text-[10px] font-bold tracking-wide text-muted-foreground"
           >
             {partner.abbr}
           </motion.div>
@@ -130,14 +130,14 @@ export function AnimatedHero({ benefits }: AnimatedHeroProps) {
           >
             <Link
               href="/courses"
-              className="group inline-flex items-center gap-2 rounded-md bg-carsi-orange px-6 py-3 font-medium text-white transition-colors hover:bg-carsi-orange/90"
+              className="group inline-flex items-center gap-2 rounded-sm bg-carsi-orange px-6 py-3 font-medium text-white transition-colors hover:bg-carsi-orange/90"
             >
               Browse Courses{' '}
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
             <Link
               href="/pathways"
-              className="inline-flex items-center gap-2 rounded-md border border-border bg-secondary px-6 py-3 font-medium text-muted-foreground transition-colors hover:bg-secondary/80 hover:text-foreground"
+              className="inline-flex items-center gap-2 rounded-sm border border-border bg-secondary px-6 py-3 font-medium text-muted-foreground transition-colors hover:bg-secondary/80 hover:text-foreground"
             >
               View Pathways
             </Link>

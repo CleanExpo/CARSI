@@ -59,7 +59,7 @@ export function QuizPlayer({ quiz, onSubmit }: QuizPlayerProps) {
           {q.options.map((opt, idx) => (
             <label
               key={idx}
-              className="hover:bg-muted/50 flex cursor-pointer items-center gap-3 rounded-lg border p-3"
+              className="hover:bg-muted/50 flex cursor-pointer items-center gap-3 rounded-sm border p-3"
             >
               <input
                 type="radio"

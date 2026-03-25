@@ -36,7 +36,7 @@ export function ModuleEditor({
       )}
 
       {modules.map((mod) => (
-        <div key={mod.id} className="rounded-lg border p-4">
+        <div key={mod.id} className="rounded-sm border p-4">
           <div className="flex items-center justify-between">
             <h3 className="font-medium">{mod.title}</h3>
             <div className="flex gap-2">

@@ -57,7 +57,7 @@ export default function AdminCoursesPage() {
             {draft.map((course) => (
               <div
                 key={course.id}
-                className="flex items-center justify-between rounded-lg border p-4"
+                className="flex items-center justify-between rounded-sm border p-4"
               >
                 <div>
                   <p className="font-medium">{course.title}</p>

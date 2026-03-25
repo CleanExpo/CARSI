@@ -191,7 +191,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
           {/* Author bio */}
           {article.author_name && article.author_bio && (
-            <section className="mt-12 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6">
+            <section className="mt-12 rounded-sm border border-white/[0.06] bg-white/[0.02] p-6">
               <h2 className="mb-3 text-sm font-semibold tracking-wider text-white/40 uppercase">
                 About the Author
               </h2>
@@ -220,7 +220,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
                 {article.faq_items.map((faq, i) => (
                   <details
                     key={i}
-                    className="group rounded-xl border border-white/[0.06] bg-white/[0.02] open:border-[rgba(36,144,237,0.2)]"
+                    className="group rounded-sm border border-white/[0.06] bg-white/[0.02] open:border-[rgba(36,144,237,0.2)]"
                   >
                     <summary className="flex cursor-pointer items-center justify-between gap-4 px-6 py-4 text-base font-medium text-white/80 select-none hover:text-white">
                       {faq.question}
@@ -265,7 +265,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
               {article.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="rounded-md bg-white/[0.04] px-3 py-1 text-xs text-white/40"
+                  className="rounded-sm bg-white/[0.04] px-3 py-1 text-xs text-white/40"
                 >
                   #{tag}
                 </span>

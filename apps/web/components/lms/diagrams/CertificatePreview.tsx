@@ -68,15 +68,13 @@ export function CertificatePreview({
           />
 
           {/* CARSI Logo mark */}
-          <div className="mx-auto mb-4 flex items-center justify-center gap-2">
-            <div
-              className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-lg font-bold text-primary-foreground"
-            >
-              C
-            </div>
-            <span className="text-sm font-semibold tracking-[0.25em] text-[#1a1a1a] uppercase">
-              CARSI
-            </span>
+          <div className="mx-auto mb-4 flex items-center justify-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/brand/carsi-logo.webp"
+              alt="CARSI"
+              className="h-10 w-auto"
+            />
           </div>
 
           {/* Heading */}

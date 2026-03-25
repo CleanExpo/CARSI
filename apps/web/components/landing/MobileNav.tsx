@@ -37,7 +37,7 @@ export function MobileNav() {
     <div className="md:hidden">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative z-50 flex h-10 w-10 items-center justify-center rounded-md transition-colors hover:bg-secondary"
+        className="relative z-50 flex h-10 w-10 items-center justify-center rounded-sm transition-colors hover:bg-secondary"
         aria-label={isOpen ? 'Close menu' : 'Open menu'}
         aria-expanded={isOpen}
       >
@@ -83,7 +83,7 @@ export function MobileNav() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
-              className="fixed top-16 right-0 left-0 z-40 mx-4 overflow-hidden rounded-lg border border-border bg-popover shadow-xl"
+              className="fixed top-16 right-0 left-0 z-40 mx-4 overflow-hidden rounded-sm border border-border bg-popover shadow-xl"
             >
               <nav className="p-4">
                 <ul className="space-y-1">
@@ -92,7 +92,7 @@ export function MobileNav() {
                       <Link
                         href={item.href}
                         onClick={() => setIsOpen(false)}
-                        className="block rounded-md px-4 py-3 text-base font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                        className="block rounded-sm px-4 py-3 text-base font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
                       >
                         {item.label}
                       </Link>
@@ -104,14 +104,14 @@ export function MobileNav() {
                   <Link
                     href="/login"
                     onClick={() => setIsOpen(false)}
-                    className="block rounded-md border border-border bg-secondary px-4 py-3 text-center text-base font-medium text-foreground transition-colors hover:bg-secondary/80"
+                    className="block rounded-sm border border-border bg-secondary px-4 py-3 text-center text-base font-medium text-foreground transition-colors hover:bg-secondary/80"
                   >
                     Sign In
                   </Link>
                   <Link
                     href="/register"
                     onClick={() => setIsOpen(false)}
-                    className="block rounded-md bg-carsi-orange px-4 py-3 text-center text-base font-medium text-white transition-colors hover:bg-carsi-orange/90"
+                    className="block rounded-sm bg-carsi-orange px-4 py-3 text-center text-base font-medium text-white transition-colors hover:bg-carsi-orange/90"
                   >
                     Get Started Free
                   </Link>

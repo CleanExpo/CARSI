@@ -237,8 +237,8 @@ else {
     Write-Fail "Root package.json not found"
 }
 
-if ((Test-Path "apps/web") -and (Test-Path "apps/web/package.json")) {
-    Write-Pass "Frontend app exists (apps/web)"
+if ((Test-Path "app") -and (Test-Path "next.config.ts")) {
+    Write-Pass "Frontend app exists (root app/ + next.config.ts)"
 }
 else {
     Write-Fail "Frontend app not found"
@@ -316,13 +316,6 @@ else {
     Write-Fail "Root node_modules not found (run: pnpm install)"
 }
 
-if (Test-Path "apps/web/node_modules") {
-    Write-Pass "Frontend node_modules exists"
-}
-else {
-    Write-Fail "Frontend node_modules not found (run: pnpm install)"
-}
-
 if (Test-Path "apps/backend/.venv") {
     Write-Pass "Backend virtual environment exists"
 }
@@ -355,7 +348,7 @@ if (Test-Path "scripts/dependency-checks.ps1") {
     }
 
     # Check each workspace
-    $workspaces = @(".", "apps/web", "packages/shared", "packages/config")
+    $workspaces = @(".", "packages/news-worker", "packages/shared", "packages/config", "packages/schema")
     foreach ($workspace in $workspaces) {
         if (-not (Test-Path "$workspace/package.json")) {
             continue

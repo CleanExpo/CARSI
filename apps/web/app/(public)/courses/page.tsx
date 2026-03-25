@@ -12,7 +12,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'IICRC-Approved Restoration Training Courses | CARSI',
   description:
-    'What courses does CARSI offer? Browse 91+ IICRC CEC-approved restoration and cleaning courses across WRT, CRT, ASD, AMRT, FSRT, OCT and CCT disciplines. Earn continuing education credits online.',
+    'What courses does CARSI offer? Browse 140+ restoration and cleaning courses across WRT, CRT, ASD, AMRT, FSRT, OCT and CCT disciplines. Earn IICRC continuing education credits online.',
 };
 
 interface SearchParams {
@@ -40,11 +40,38 @@ async function getBundles() {
 }
 
 async function getCourses() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (supabaseUrl && supabaseKey) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 8000);
+      const res = await fetch(
+        `${supabaseUrl}/rest/v1/lms_courses?select=id,slug,title,short_description,price_aud,is_free,level,category,discipline,lesson_count,thumbnail_url,updated_at&limit=200&order=title`,
+        {
+          next: { revalidate: 300 },
+          signal: controller.signal,
+          headers: {
+            apikey: supabaseKey,
+            Authorization: `Bearer ${supabaseKey}`,
+          },
+        }
+      );
+      clearTimeout(timeoutId);
+      if (res.ok) {
+        const items = await res.json();
+        return { items: Array.isArray(items) ? items : [], total: Array.isArray(items) ? items.length : 0 };
+      }
+    } catch {
+      // fall through to backend
+    }
+  }
+  // Fallback to backend
   const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8000';
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000);
-    const res = await fetch(`${backendUrl}/api/lms/courses`, {
+    const res = await fetch(`${backendUrl}/api/lms/courses?limit=200`, {
       next: { revalidate: 60 },
       signal: controller.signal,
     });
@@ -87,7 +114,7 @@ export default async function CoursesPage({
 
         {/* ── Course Grid (primary content — above the fold) ── */}
         <section className="mb-10">
-          <div className="rounded-lg border border-border bg-card p-5">
+          <div className="rounded-sm border border-border bg-card p-5">
             <CourseGrid courses={courses} initialTab={discipline ?? 'All'} />
           </div>
         </section>
@@ -109,7 +136,7 @@ export default async function CoursesPage({
 
         {/* ── IICRC Discipline Map ── */}
         <section className="mb-10">
-          <div className="rounded-lg border border-border bg-card p-5">
+          <div className="rounded-sm border border-border bg-card p-5">
             <h2 className="font-display mb-3 text-center text-lg font-semibold text-foreground">
               IICRC Discipline Map
             </h2>
@@ -133,7 +160,7 @@ export default async function CoursesPage({
           </h2>
           <div className="space-y-3">
             {/* Q1 — What courses does CARSI offer? */}
-            <details className="group rounded-lg border border-border bg-card">
+            <details className="group rounded-sm border border-border bg-card">
               <summary className="flex cursor-pointer items-center justify-between px-5 py-4 text-sm font-semibold text-foreground select-none">
                 <span>What courses does CARSI offer?</span>
                 <svg
@@ -172,7 +199,7 @@ export default async function CoursesPage({
             </details>
 
             {/* Q2 — How do I choose the right discipline? */}
-            <details className="group rounded-lg border border-border bg-card">
+            <details className="group rounded-sm border border-border bg-card">
               <summary className="flex cursor-pointer items-center justify-between px-5 py-4 text-sm font-semibold text-foreground select-none">
                 <span>
                   How do I choose the right <AcronymTooltip term="IICRC" /> discipline?
@@ -210,7 +237,7 @@ export default async function CoursesPage({
             </details>
 
             {/* Q3 — What are CECs? */}
-            <details className="group rounded-lg border border-border bg-card">
+            <details className="group rounded-sm border border-border bg-card">
               <summary className="flex cursor-pointer items-center justify-between px-5 py-4 text-sm font-semibold text-foreground select-none">
                 <span>
                   What are <AcronymTooltip term="IICRC" /> Continuing Education Credits (

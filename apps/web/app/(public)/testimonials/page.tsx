@@ -85,7 +85,7 @@ export default function TestimonialsPage() {
         </p>
 
         {/* Aggregate stat row */}
-        <div className="mb-10 flex flex-wrap gap-6 rounded-lg border border-primary/15 bg-primary/5 px-6 py-4">
+        <div className="mb-10 flex flex-wrap gap-6 rounded-sm border border-primary/15 bg-primary/5 px-6 py-4">
           {[
             { value: '5.0', label: 'Average Rating' },
             { value: `${TESTIMONIALS.length}`, label: 'Verified Reviews' },
@@ -114,7 +114,7 @@ export default function TestimonialsPage() {
           {TESTIMONIALS.map((t) => (
             <figure
               key={t.name}
-              className="flex flex-col rounded-lg border border-border bg-card p-5"
+              className="flex flex-col rounded-sm border border-border bg-card p-5"
             >
               {/* Stars */}
               <div className="mb-3 flex gap-0.5" aria-label="5 stars">
@@ -144,7 +144,7 @@ export default function TestimonialsPage() {
         </div>
 
         {/* Submit feedback CTA */}
-        <div className="mt-12 rounded-lg border border-border bg-card p-6 text-center">
+        <div className="mt-12 rounded-sm border border-border bg-card p-6 text-center">
           <h2 className="mb-2 text-base font-semibold text-foreground/90">
             Share Your Experience
           </h2>
@@ -154,7 +154,7 @@ export default function TestimonialsPage() {
           <div className="flex flex-wrap items-center justify-center gap-3">
             <a
               href="/contact"
-              className="rounded-lg bg-primary px-5 py-2.5 text-xs font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+              className="rounded-sm bg-primary px-5 py-2.5 text-xs font-semibold text-primary-foreground transition-opacity hover:opacity-90"
             >
               Send Feedback
             </a>
@@ -162,7 +162,7 @@ export default function TestimonialsPage() {
               href="https://www.facebook.com/CARSIaus"
               target="_blank"
               rel="noopener noreferrer"
-              className="rounded-lg border border-border bg-card px-5 py-2.5 text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground"
+              className="rounded-sm border border-border bg-card px-5 py-2.5 text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground"
             >
               Review on Facebook
             </a>
@@ -170,7 +170,7 @@ export default function TestimonialsPage() {
               href="https://www.linkedin.com/company/carsiaus"
               target="_blank"
               rel="noopener noreferrer"
-              className="rounded-lg border border-border bg-card px-5 py-2.5 text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground"
+              className="rounded-sm border border-border bg-card px-5 py-2.5 text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground"
             >
               Review on LinkedIn
             </a>

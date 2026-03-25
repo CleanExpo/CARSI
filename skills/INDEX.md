@@ -23,7 +23,7 @@ Project knowledge and orchestration patterns.
 | Skill | Priority | Auto-load | Description |
 |-------|----------|-----------|-------------|
 | **orchestration.skill.md** | 1 | ✅ | Master coordinator routing, multi-agent patterns (Plan→Parallelize→Integrate), context partitioning |
-| **project-context.skill.md** | 2 | ❌ | NodeJS-Starter-V1 specific knowledge (Next.js 15, FastAPI, Supabase), 8 migrations, team conventions |
+| **project-context.skill.md** | 2 | ❌ | NodeJS-Starter-V1 specific knowledge (Next.js 15, FastAPI, PostgreSQL), 8 migrations, team conventions |
 
 ---
 
@@ -81,12 +81,11 @@ Next.js 15, React 19, 2025-2026 design system.
 
 ---
 
-### Database (2 skills)
-Supabase, PostgreSQL migrations, Australian compliance.
+### Database (1 skill)
+PostgreSQL migrations, Australian compliance.
 
 | Skill | Priority | Auto-load | Description |
 |-------|----------|-----------|-------------|
-| **supabase.skill.md** | 3 | ❌ | Supabase patterns (auth, queries, RLS, realtime, storage), Australian phone/ABN validation, Privacy Act 1988 compliance |
 | **migrations.skill.md** | 3 | ❌ | Database migration patterns, RLS policies, Australian fields (phone, state, postcode, ABN), audit logging |
 
 ---
@@ -145,14 +144,13 @@ Loaded when specific domains or technologies are involved.
 | **langgraph.skill.md** | Backend | LangGraph workflow patterns |
 | **fastapi.skill.md** | Backend | FastAPI patterns |
 | **nextjs.skill.md** | Frontend | Next.js 15 App Router |
-| **supabase.skill.md** | Database | Supabase patterns |
 | **migrations.skill.md** | Database | Database migrations |
 | **feature-development.skill.md** | Workflow | Feature development workflow |
 | **bug-fixing.skill.md** | Workflow | Bug fixing workflow |
 | **rank-monitoring.skill.md** | Search Dominance | Real-time ranking monitoring |
 | **tailwind.skill.md** | Design | Tailwind v4 patterns |
 
-**Total**: 10 skills
+**Total**: 9 skills
 
 ---
 
@@ -184,7 +182,7 @@ These 4 skills are **ALWAYS** loaded on every response:
 |-----------|--------------|
 | **Frontend** | nextjs.skill.md, components.skill.md, design-system.skill.md, tailwind.skill.md |
 | **Backend** | fastapi.skill.md, langgraph.skill.md, advanced-tool-use.skill.md |
-| **Database** | supabase.skill.md, migrations.skill.md |
+| **Database** | migrations.skill.md |
 | **SEO** | search-dominance.skill.md, blue-ocean.skill.md, geo-australian.skill.md, rank-monitoring.skill.md |
 | **Content** | truth-finder.skill.md |
 | **New Feature** | feature-development.skill.md, foundation-first.skill.md |
@@ -202,7 +200,7 @@ These 4 skills are **ALWAYS** loaded on every response:
 | **Spec Builder** | foundation-first.skill.md, project-context.skill.md, design-system.skill.md |
 | **Frontend Specialist** | nextjs.skill.md, components.skill.md, design-system.skill.md |
 | **Backend Specialist** | fastapi.skill.md, langgraph.skill.md, advanced-tool-use.skill.md |
-| **Database Specialist** | supabase.skill.md, migrations.skill.md |
+| **Database Specialist** | migrations.skill.md |
 | **Ralph Wiggum** | ralph-wiggum.skill.md, verification-first.skill.md, feature-development.skill.md |
 
 ---

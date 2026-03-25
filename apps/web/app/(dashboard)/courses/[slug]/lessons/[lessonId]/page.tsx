@@ -53,21 +53,17 @@ export default function LessonPage() {
         <>
           <LessonPlayer lesson={lesson} />
           {lesson.quiz_id && (
-            <div
-              className="mt-6 rounded-sm border p-4"
-              style={{ borderColor: 'rgba(36,144,237,0.25)', background: 'rgba(36,144,237,0.06)' }}
-            >
+            <div className="mt-6 rounded-sm border border-primary/25 bg-primary/6 p-4">
               <div className="flex items-center justify-between gap-4">
                 <div>
-                  <p className="text-sm font-semibold text-white">Assessment</p>
-                  <p className="mt-0.5 text-xs text-white/50">
+                  <p className="text-sm font-semibold text-foreground">Assessment</p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">
                     Test your knowledge for this lesson
                   </p>
                 </div>
                 <Button
                   onClick={() => router.push(`/courses/${params.slug}/quiz/${lesson.quiz_id}`)}
-                  className="shrink-0 gap-2 rounded-sm"
-                  style={{ background: '#2490ed', color: '#fff' }}
+                  className="shrink-0 gap-2"
                 >
                   <ClipboardList className="h-4 w-4" />
                   Take Quiz

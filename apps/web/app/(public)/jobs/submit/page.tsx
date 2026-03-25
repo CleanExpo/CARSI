@@ -153,13 +153,13 @@ export default function SubmitJobPage() {
           <div className="flex flex-wrap justify-center gap-3">
             <Link
               href="/jobs"
-              className="rounded-xl bg-[#2490ed] px-6 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+              className="rounded-sm bg-[#2490ed] px-6 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
             >
               Browse Jobs
             </Link>
             <Link
               href="/"
-              className="rounded-xl border border-white/[0.1] px-6 py-3 text-sm font-semibold text-white/50 transition-colors hover:text-white/80"
+              className="rounded-sm border border-white/[0.1] px-6 py-3 text-sm font-semibold text-white/50 transition-colors hover:text-white/80"
             >
               Back to Home
             </Link>
@@ -170,7 +170,7 @@ export default function SubmitJobPage() {
   }
 
   const inputClass =
-    'w-full rounded-xl border border-white/[0.1] bg-white/[0.04] px-4 py-3 text-sm text-white placeholder:text-white/25 focus:border-[rgba(36,144,237,0.5)] focus:outline-none focus:ring-1 focus:ring-[rgba(36,144,237,0.25)]';
+    'w-full rounded-sm border border-white/[0.1] bg-white/[0.04] px-4 py-3 text-sm text-white placeholder:text-white/25 focus:border-[rgba(36,144,237,0.5)] focus:outline-none focus:ring-1 focus:ring-[rgba(36,144,237,0.25)]';
   const labelClass = 'mb-1.5 block text-sm font-medium text-white/70';
 
   return (
@@ -430,7 +430,7 @@ export default function SubmitJobPage() {
 
           {/* Error */}
           {error && (
-            <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-400">
+            <div className="rounded-sm border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-400">
               {error}
             </div>
           )}
@@ -439,7 +439,7 @@ export default function SubmitJobPage() {
           <button
             type="submit"
             disabled={submitting}
-            className="w-full rounded-xl bg-[#2490ed] py-4 text-base font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+            className="w-full rounded-sm bg-[#2490ed] py-4 text-base font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {submitting ? 'Submitting...' : 'Submit Job Listing'}
           </button>

@@ -60,9 +60,14 @@ export function LMSIconRail() {
       <Link
         href="/"
         title="CARSI Home"
-        className="mb-3 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-primary transition-transform hover:scale-105"
+        className="mb-3 flex h-9 w-9 flex-shrink-0 items-center justify-center transition-transform hover:scale-105"
       >
-        <span className="text-sm leading-none font-bold text-primary-foreground">C</span>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/images/brand/carsi-logo.webp"
+          alt="CARSI"
+          className="h-7 w-auto"
+        />
       </Link>
 
       {/* Top nav */}
@@ -83,7 +88,7 @@ export function LMSIconRail() {
               title={item.label}
               aria-label={item.label}
               className={cn(
-                'group relative flex h-10 w-10 items-center justify-center rounded-lg border transition-colors',
+                'group relative flex h-10 w-10 items-center justify-center rounded-sm border transition-colors',
                 isActive
                   ? 'border-primary/30 bg-primary/15 text-primary'
                   : 'border-transparent text-muted-foreground hover:bg-sidebar-accent hover:text-foreground'
@@ -91,7 +96,7 @@ export function LMSIconRail() {
             >
               <item.icon className="h-4 w-4" />
               {/* Tooltip */}
-              <span className="pointer-events-none absolute left-full z-50 ml-2 rounded-md border border-border bg-popover px-2 py-1 text-xs font-medium text-popover-foreground whitespace-nowrap opacity-0 shadow-md transition-opacity group-hover:opacity-100">
+              <span className="pointer-events-none absolute left-full z-50 ml-2 rounded-sm border border-border bg-popover px-2 py-1 text-xs font-medium text-popover-foreground whitespace-nowrap opacity-0 shadow-md transition-opacity group-hover:opacity-100">
                 {item.label}
               </span>
             </Link>
@@ -109,7 +114,7 @@ export function LMSIconRail() {
           title="Settings"
           aria-label="Settings"
           className={cn(
-            'flex h-10 w-10 items-center justify-center rounded-lg border border-transparent transition-colors',
+            'flex h-10 w-10 items-center justify-center rounded-sm border border-transparent transition-colors',
             pathname.startsWith('/dashboard/settings')
               ? 'text-primary'
               : 'text-muted-foreground hover:bg-sidebar-accent hover:text-foreground'
@@ -122,7 +127,7 @@ export function LMSIconRail() {
           onClick={handleSignOut}
           title={`${user?.email ?? 'Account'} — click to sign out`}
           aria-label="Sign out"
-          className="mt-1 flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-xs font-bold text-primary-foreground transition-transform hover:scale-105"
+          className="mt-1 flex h-9 w-9 items-center justify-center rounded-sm bg-primary text-xs font-bold text-primary-foreground transition-transform hover:scale-105"
         >
           {initials}
         </button>

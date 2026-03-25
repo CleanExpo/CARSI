@@ -191,8 +191,7 @@ export function OnboardingWizard({ isOpen, onComplete }: OnboardingWizardProps) 
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: 'rgba(5, 5, 5, 0.85)' }}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4"
       role="dialog"
       aria-modal="true"
       aria-label="Onboarding wizard"
@@ -202,7 +201,7 @@ export function OnboardingWizard({ isOpen, onComplete }: OnboardingWizardProps) 
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.97 }}
         transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
-        className="relative w-full max-w-lg rounded-sm border border-white/[0.06] bg-background p-8"
+        className="relative w-full max-w-lg rounded-sm border border-border bg-background p-8"
       >
         {/* Step dots */}
         {!result && (
@@ -210,11 +209,7 @@ export function OnboardingWizard({ isOpen, onComplete }: OnboardingWizardProps) 
             {STEPS.map((_, i) => (
               <div
                 key={i}
-                className="h-2 rounded-sm transition-all duration-300"
-                style={{
-                  width: i === step ? '24px' : '8px',
-                  background: i <= step ? 'hsl(var(--primary))' : 'rgba(255,255,255,0.1)',
-                }}
+                className={`h-2 rounded-sm transition-all duration-300 ${i <= step ? 'bg-primary' : 'bg-white/10'} ${i === step ? 'w-6' : 'w-2'}`}
               />
             ))}
           </div>
@@ -234,11 +229,11 @@ export function OnboardingWizard({ isOpen, onComplete }: OnboardingWizardProps) 
               >
                 <GraduationCap className="h-8 w-8 text-primary" />
               </div>
-              <h2 className="mb-2 text-xl font-semibold text-white">We recommend starting with</h2>
+              <h2 className="mb-2 text-xl font-semibold text-foreground">We recommend starting with</h2>
               <p className="mb-3 text-lg font-bold text-primary">
                 {PATHWAY_LABELS[result.pathway] ?? result.pathway}
               </p>
-              <p className="mb-8 text-sm leading-relaxed text-white/60">{result.description}</p>
+              <p className="mb-8 text-sm leading-relaxed text-muted-foreground">{result.description}</p>
               <Button
                 onClick={handleComplete}
                 className="w-full gap-2 rounded-sm bg-primary text-white"
@@ -255,11 +250,8 @@ export function OnboardingWizard({ isOpen, onComplete }: OnboardingWizardProps) 
               animate={{ opacity: 1 }}
               className="flex flex-col items-center justify-center py-12"
             >
-              <div
-                className="mb-4 h-10 w-10 animate-spin rounded-full border-2 border-transparent"
-                style={{ borderTopColor: 'hsl(var(--primary))' }}
-              />
-              <p className="text-sm text-white/40">Analysing your answers…</p>
+              <div className="mb-4 h-10 w-10 animate-spin rounded-full border-2 border-transparent border-t-primary" />
+              <p className="text-sm text-muted-foreground">Analysing your answers…</p>
             </motion.div>
           ) : error ? (
             <motion.div
@@ -291,7 +283,7 @@ export function OnboardingWizard({ isOpen, onComplete }: OnboardingWizardProps) 
               exit="exit"
               transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
             >
-              <h2 className="mb-6 text-center text-xl font-semibold text-white">
+              <h2 className="mb-6 text-center text-xl font-semibold text-foreground">
                 {currentStep.question}
               </h2>
               <div className="grid gap-3">
@@ -299,11 +291,10 @@ export function OnboardingWizard({ isOpen, onComplete }: OnboardingWizardProps) 
                   <button
                     key={answer.value}
                     onClick={() => handleAnswer(answer.value)}
-                    className="flex items-center gap-4 rounded-sm border border-white/[0.06] p-4 text-left transition-all duration-150 hover:border-[#2490ed]/50 hover:bg-white/[0.03]"
-                    style={{ background: 'hsl(var(--secondary))' }}
+                    className="flex items-center gap-4 rounded-sm border border-border bg-secondary p-4 text-left transition-all duration-150 hover:border-primary/50 hover:bg-muted/30"
                   >
                     <span className="text-primary">{answer.icon}</span>
-                    <span className="text-sm font-medium text-white">{answer.label}</span>
+                    <span className="text-sm font-medium text-foreground">{answer.label}</span>
                   </button>
                 ))}
               </div>
@@ -314,7 +305,7 @@ export function OnboardingWizard({ isOpen, onComplete }: OnboardingWizardProps) 
                     setDirection(-1);
                     setStep((s) => s - 1);
                   }}
-                  className="mt-6 w-full text-center text-xs text-white/30 transition-colors hover:text-white/60"
+                  className="mt-6 w-full text-center text-xs text-muted-foreground/50 transition-colors hover:text-muted-foreground"
                 >
                   ← Back
                 </button>

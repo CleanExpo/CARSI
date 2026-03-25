@@ -29,7 +29,7 @@ const WP_BASE_URL = 'https://carsi.com.au';
 const WP_API_BASE = `${WP_BASE_URL}/wp-json/wp/v2`;
 const WC_API_BASE = `${WP_BASE_URL}/wp-json/wc/v3`; // WooCommerce (requires auth)
 const OUTPUT_DIR = path.join(__dirname, '..', 'data', 'wordpress-export');
-const SUPABASE_SEED_PATH = path.join(__dirname, '..', 'supabase', 'seed.sql');
+const WORDPRESS_SEED_SQL_PATH = path.join(__dirname, '..', 'data', 'wordpress-seed.sql');
 
 // WooCommerce API credentials (from environment)
 const WC_CONSUMER_KEY = process.env.WC_CONSUMER_KEY || '';
@@ -785,8 +785,8 @@ async function main() {
   // Generate SQL seed file
   if (generateSQL || true) {
     const seedSQL = generateSeedSQL(lmsCourses, categories);
-    fs.writeFileSync(SUPABASE_SEED_PATH, seedSQL);
-    console.log(`\nSaved: ${SUPABASE_SEED_PATH}`);
+    fs.writeFileSync(WORDPRESS_SEED_SQL_PATH, seedSQL);
+    console.log(`\nSaved: ${WORDPRESS_SEED_SQL_PATH}`);
   }
 
   console.log('\n='.repeat(60));
@@ -794,8 +794,8 @@ async function main() {
   console.log('='.repeat(60));
   console.log('\nNext steps:');
   console.log('1. Review exported JSON in data/wordpress-export/');
-  console.log('2. Review generated supabase/seed.sql');
-  console.log('3. Run: supabase db reset (applies migrations + seed)');
+  console.log('2. Review generated data/wordpress-seed.sql');
+  console.log('3. Apply seed SQL to PostgreSQL (psql or admin tool) as needed');
   console.log('4. Add redirects to Next.js config (next.config.ts)');
   console.log('');
 }

@@ -74,7 +74,7 @@ export default function SubmitIndexPage() {
       <div className="mx-auto max-w-5xl">
         {/* Header */}
         <div className="mb-12">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-lg border border-primary/20 bg-primary/8 px-3 py-1.5 text-xs font-semibold tracking-wider text-primary uppercase">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-sm border border-primary/20 bg-primary/8 px-3 py-1.5 text-xs font-semibold tracking-wider text-primary uppercase">
             CARSI Industry Hub
           </div>
           <h1 className="mb-4 text-4xl font-bold tracking-tight text-foreground/90 md:text-5xl">
@@ -92,11 +92,11 @@ export default function SubmitIndexPage() {
             <Link
               key={item.type}
               href={`/submit/${item.type}`}
-              className="group flex flex-col gap-4 rounded-lg border border-border bg-card/20 p-6 transition-all duration-200 hover:border-primary/20 hover:bg-card/40"
+              className="group flex flex-col gap-4 rounded-sm border border-border bg-card/20 p-6 transition-all duration-200 hover:border-primary/20 hover:bg-card/40"
             >
               {/* Icon */}
               <div
-                className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-muted/10 text-xl"
+                className="flex h-10 w-10 items-center justify-center rounded-sm border border-border bg-muted/10 text-xl"
                 aria-hidden="true"
               >
                 {item.icon}
@@ -126,7 +126,7 @@ export default function SubmitIndexPage() {
         </div>
 
         {/* Footer note */}
-        <div className="mt-10 rounded-lg border border-border bg-card/20 px-6 py-4">
+        <div className="mt-10 rounded-sm border border-border bg-card/20 px-6 py-4">
           <p className="text-xs leading-relaxed text-muted-foreground/50">
             All submissions are reviewed by the CARSI editorial team. We aim to respond within{' '}
             <span className="text-muted-foreground">5 business days</span>. Approved listings are published

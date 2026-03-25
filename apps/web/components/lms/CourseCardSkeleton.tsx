@@ -1,6 +1,6 @@
 export function CourseCardSkeleton() {
   return (
-    <div className="flex flex-col overflow-hidden rounded-lg border border-border bg-card">
+    <div className="flex flex-col overflow-hidden rounded-sm border border-border bg-card">
       {/* Header shimmer */}
       <div className="relative h-32 w-full flex-shrink-0 animate-pulse bg-muted" />
 

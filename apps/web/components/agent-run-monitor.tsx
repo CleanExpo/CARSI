@@ -162,7 +162,7 @@ export function AgentRunMonitor({ runId }: AgentRunMonitorProps) {
 
         {/* Error Message */}
         {run.error && (
-          <div className="rounded-md bg-destructive/10 p-3">
+          <div className="rounded-sm bg-destructive/10 p-3">
             <p className="text-sm font-medium text-destructive mb-1">Error</p>
             <p className="text-sm text-destructive/80">{run.error}</p>
           </div>
@@ -170,7 +170,7 @@ export function AgentRunMonitor({ runId }: AgentRunMonitorProps) {
 
         {/* Result */}
         {run.result && run.status === "completed" && (
-          <div className="rounded-md bg-primary/10 p-3">
+          <div className="rounded-sm bg-primary/10 p-3">
             <p className="text-sm font-medium mb-1">Result</p>
             <pre className="text-xs overflow-x-auto">
               {JSON.stringify(run.result, null, 2)}
@@ -199,7 +199,7 @@ export function AgentRunCard({ run }: { run: AgentRun }) {
   const isActive = ["in_progress", "verification_in_progress"].includes(run.status);
 
   return (
-    <div className="flex items-center justify-between p-3 border rounded-lg hover:bg-accent transition-colors">
+    <div className="flex items-center justify-between p-3 border rounded-sm hover:bg-accent transition-colors">
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1">
           <p className="text-sm font-medium truncate">{run.agent_name}</p>

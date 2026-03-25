@@ -11,9 +11,9 @@ default:
 dev:
     pnpm dev
 
-# Start frontend only
+# Start frontend only (Next.js at repo root)
 dev-web:
-    pnpm dev --filter=web
+    pnpm exec next dev
 
 # Start backend only
 dev-backend:
@@ -33,33 +33,33 @@ docker-reset:
 
 # ─── Quality ──────────────────────────────────────────────
 
-# Run all tests
+# Run E2E tests (Playwright)
 test:
-    pnpm turbo run test
+    pnpm test:e2e
 
 # Run backend tests (pytest)
 test-backend:
     cd apps/backend && uv run pytest
 
-# Run frontend tests (vitest)
+# Alias for E2E
 test-web:
-    pnpm test --filter=web
+    pnpm test:e2e
 
 # Run E2E tests (playwright)
 test-e2e:
-    pnpm --filter=web test:e2e
+    pnpm test:e2e
 
 # Run linter
 lint:
-    pnpm turbo run lint
+    pnpm lint
 
 # Run type checker
 type-check:
-    pnpm turbo run type-check
+    pnpm type-check
 
-# Run all quality checks (type-check + lint + test)
+# Run all quality checks (type-check + lint + e2e)
 verify:
-    pnpm turbo run type-check lint test
+    pnpm type-check && pnpm lint && pnpm test:e2e
 
 # Full health check
 health:
@@ -69,7 +69,7 @@ health:
 
 # Install Playwright browsers
 playwright-install:
-    cd apps/web && npx playwright install chromium
+    pnpm exec playwright install chromium
 
 # Run UI review stories (use /ui-review command in Claude Code)
 test-ui:

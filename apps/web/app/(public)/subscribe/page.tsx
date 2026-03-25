@@ -63,7 +63,7 @@ export default function SubscribePage() {
         </div>
 
         {/* Pricing card */}
-        <div className="flex flex-col gap-6 rounded-lg border border-primary/20 bg-primary/5 p-8">
+        <div className="flex flex-col gap-6 rounded-sm border border-primary/20 bg-primary/5 p-8">
           <div>
             <div className="flex items-baseline gap-2">
               <span className="text-5xl font-bold text-foreground">${yearlyPrice}</span>
@@ -87,7 +87,7 @@ export default function SubscribePage() {
             <button
               onClick={handleSubscribe}
               disabled={loading}
-              className="w-full rounded-lg bg-primary py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+              className="w-full rounded-sm bg-primary py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {loading ? 'Opening checkout…' : 'Start 7-Day Free Trial'}
             </button>
@@ -96,11 +96,11 @@ export default function SubscribePage() {
             </p>
           </div>
 
-          {error && <p className="rounded-lg bg-red-950 px-3 py-2 text-sm text-red-400">{error}</p>}
+          {error && <p className="rounded-sm bg-red-950 px-3 py-2 text-sm text-red-400">{error}</p>}
         </div>
 
         {/* Value proposition */}
-        <div className="rounded-lg border border-border bg-card p-4">
+        <div className="rounded-sm border border-border bg-card p-4">
           <p className="text-center text-sm text-muted-foreground">
             <span className="font-semibold text-foreground/90">Compare:</span> Individual IICRC courses
             cost $50–$150 each. With CARSI Pro, complete unlimited courses for one annual fee.

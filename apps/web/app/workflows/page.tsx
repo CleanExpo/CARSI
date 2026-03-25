@@ -106,7 +106,7 @@ export default function WorkflowsPage() {
                         {workflow.tags.map((tag) => (
                           <span
                             key={tag}
-                            className="px-2 py-1 bg-secondary text-secondary-foreground rounded-md text-xs"
+                            className="px-2 py-1 bg-secondary text-secondary-foreground rounded-sm text-xs"
                           >
                             {tag}
                           </span>

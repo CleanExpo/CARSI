@@ -38,7 +38,7 @@ export function PRDGenerationProgress({ progress, currentStep }: PRDGenerationPr
 
         {/* Current step */}
         {currentStep && (
-          <div className="flex items-start gap-3 p-4 bg-primary/5 rounded-lg border border-primary/10">
+          <div className="flex items-start gap-3 p-4 bg-primary/5 rounded-sm border border-primary/10">
             <Loader2 className="h-5 w-5 text-primary animate-spin shrink-0 mt-0.5" />
             <div>
               <p className="font-medium text-sm">Current Step</p>

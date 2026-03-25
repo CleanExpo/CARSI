@@ -28,7 +28,7 @@ function MetricCard({
   sub?: string;
 }) {
   return (
-    <div className="rounded-lg border border-border bg-card p-5">
+    <div className="rounded-sm border border-border bg-card p-5">
       <p className="mb-1 text-[11px] font-medium tracking-wide uppercase text-muted-foreground">
         {label}
       </p>
@@ -157,17 +157,14 @@ export default function AdminAnalyticsPage() {
           <h2 className="mb-4 text-xs font-semibold tracking-widest uppercase text-muted-foreground">
             Top Courses by Completion
           </h2>
-          <div className="overflow-hidden rounded-lg border border-border">
+          <div className="overflow-hidden rounded-sm border border-border">
             {data.top_courses.map((course, i) => (
               <div
                 key={i}
                 className={`flex items-center justify-between px-5 py-3 ${i % 2 === 0 ? 'bg-secondary' : ''} ${i < data.top_courses.length - 1 ? 'border-b border-border' : ''}`}
               >
                 <div className="flex items-center gap-3">
-                  <span
-                    className="font-mono text-xs text-muted-foreground"
-                    style={{ minWidth: '16px' }}
-                  >
+                  <span className="min-w-4 font-mono text-xs text-muted-foreground">
                     {i + 1}
                   </span>
                   <span className="text-sm text-foreground">

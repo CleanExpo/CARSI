@@ -49,7 +49,7 @@ export default async function SubmitSuccessPage({ params }: { params: Promise<{ 
       <div className="w-full max-w-lg text-center">
         {/* Icon */}
         <div
-          className="mx-auto mb-8 flex h-20 w-20 items-center justify-center rounded-lg border border-green-500/20 bg-green-500/6"
+          className="mx-auto mb-8 flex h-20 w-20 items-center justify-center rounded-sm border border-green-500/20 bg-green-500/6"
           aria-hidden="true"
         >
           <svg
@@ -86,7 +86,7 @@ export default async function SubmitSuccessPage({ params }: { params: Promise<{ 
         </p>
 
         {/* Info box */}
-        <div className="mb-10 rounded-lg border border-border bg-card/20 px-5 py-4 text-left">
+        <div className="mb-10 rounded-sm border border-border bg-card/20 px-5 py-4 text-left">
           <h2 className="mb-3 text-xs font-semibold tracking-wider text-muted-foreground/50 uppercase">
             What Happens Next
           </h2>
@@ -98,7 +98,7 @@ export default async function SubmitSuccessPage({ params }: { params: Promise<{ 
               'If we need more information, we will contact you directly.',
             ].map((step, i) => (
               <li key={i} className="flex items-start gap-3 text-xs text-muted-foreground">
-                <span className="mt-0.5 flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-lg border border-primary/15 bg-primary/8 text-[9px] font-bold text-primary">
+                <span className="mt-0.5 flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-sm border border-primary/15 bg-primary/8 text-[9px] font-bold text-primary">
                   {i + 1}
                 </span>
                 {step}
@@ -111,13 +111,13 @@ export default async function SubmitSuccessPage({ params }: { params: Promise<{ 
         <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           <Link
             href="/submit"
-            className="inline-flex items-center gap-2 rounded-lg border border-primary/25 bg-primary/10 px-5 py-2.5 text-sm font-semibold text-primary transition-colors"
+            className="inline-flex items-center gap-2 rounded-sm border border-primary/25 bg-primary/10 px-5 py-2.5 text-sm font-semibold text-primary transition-colors"
           >
             Submit Another
           </Link>
           <Link
             href="/"
-            className="inline-flex items-center gap-2 rounded-lg border border-border px-5 py-2.5 text-sm text-muted-foreground transition-colors hover:border-border/60 hover:text-foreground/75"
+            className="inline-flex items-center gap-2 rounded-sm border border-border px-5 py-2.5 text-sm text-muted-foreground transition-colors hover:border-border/60 hover:text-foreground/75"
           >
             Return to Home
           </Link>

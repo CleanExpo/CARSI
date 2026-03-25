@@ -55,7 +55,7 @@ Route all incoming tasks to the appropriate agent/skill and enforce verification
 
 ### Database Tasks
 - **Agent**: `.claude/agents/database-specialist/`
-- **Skills**: `database/supabase.skill.md`, `database/migrations.skill.md`
+- **Skills**: `database/migrations.skill.md`
 - **Verify**: Migration runs, queries return expected results, RLS policies tested
 
 ### SEO Tasks

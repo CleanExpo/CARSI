@@ -143,7 +143,7 @@ jobs:
       - name: Check for Debug Code
         run: |
           # Check for debug statements
-          if grep -r "console\.log" --include="*.ts" --include="*.tsx" apps/web/components apps/web/lib apps/web/app; then
+          if grep -r "console\.log" --include="*.ts" --include="*.tsx" src/components src/lib app; then
             echo "::warning::console.log statements found - should be removed"
           fi
 

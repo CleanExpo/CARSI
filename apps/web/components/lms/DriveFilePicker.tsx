@@ -25,7 +25,7 @@ export function DriveFilePicker({ files, onSelect, selectedId }: DriveFilePicker
               type="button"
               data-selected={isSelected ? true : undefined}
               onClick={() => onSelect(file.id)}
-              className={`w-full rounded-lg border px-4 py-2 text-left text-sm transition-colors ${
+              className={`w-full rounded-sm border px-4 py-2 text-left text-sm transition-colors ${
                 isSelected
                   ? 'border-brand-primary bg-brand-primary/10 font-medium'
                   : 'hover:bg-muted/50'

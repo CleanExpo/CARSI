@@ -170,7 +170,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
 
           {/* Event meta cards */}
           <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5">
+            <div className="rounded-sm border border-white/[0.08] bg-white/[0.03] p-5">
               <p className="mb-1 text-xs font-medium tracking-wider text-white/30 uppercase">
                 Date
               </p>
@@ -183,7 +183,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
               <p className="mt-1 text-sm text-white/40">{formatTime(event.start_date)}</p>
             </div>
 
-            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5">
+            <div className="rounded-sm border border-white/[0.08] bg-white/[0.03] p-5">
               <p className="mb-1 text-xs font-medium tracking-wider text-white/30 uppercase">
                 {event.is_virtual ? 'Format' : 'Location'}
               </p>
@@ -193,7 +193,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
               )}
             </div>
 
-            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5">
+            <div className="rounded-sm border border-white/[0.08] bg-white/[0.03] p-5">
               <p className="mb-1 text-xs font-medium tracking-wider text-white/30 uppercase">
                 Organiser
               </p>
@@ -213,7 +213,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
               )}
             </div>
 
-            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5">
+            <div className="rounded-sm border border-white/[0.08] bg-white/[0.03] p-5">
               <p className="mb-1 text-xs font-medium tracking-wider text-white/30 uppercase">
                 Cost
               </p>
@@ -243,7 +243,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
                 {event.industry_categories.map((cat) => (
                   <span
                     key={cat}
-                    className="rounded-md bg-white/[0.05] px-3 py-1 text-sm text-white/50"
+                    className="rounded-sm bg-white/[0.05] px-3 py-1 text-sm text-white/50"
                   >
                     {cat}
                   </span>
@@ -259,7 +259,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
                 href={event.event_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-xl bg-[#2490ed] px-6 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                className="rounded-sm bg-[#2490ed] px-6 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
               >
                 View Event Page ↗
               </a>
@@ -269,14 +269,14 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
                 href={event.ticket_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-xl border border-[rgba(36,144,237,0.4)] px-6 py-3 text-sm font-semibold text-[#2490ed] transition-colors hover:bg-[rgba(36,144,237,0.08)]"
+                className="rounded-sm border border-[rgba(36,144,237,0.4)] px-6 py-3 text-sm font-semibold text-[#2490ed] transition-colors hover:bg-[rgba(36,144,237,0.08)]"
               >
                 Register / Get Tickets ↗
               </a>
             )}
             <Link
               href="/calendar"
-              className="rounded-xl border border-white/[0.1] px-6 py-3 text-sm font-semibold text-white/50 transition-colors hover:text-white/80"
+              className="rounded-sm border border-white/[0.1] px-6 py-3 text-sm font-semibold text-white/50 transition-colors hover:text-white/80"
             >
               ← Back to Calendar
             </Link>

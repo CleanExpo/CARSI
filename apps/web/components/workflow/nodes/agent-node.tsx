@@ -13,7 +13,7 @@ function AgentNode({ data, selected }: NodeProps<AgentNodeData>) {
   return (
     <div
       className={`
-        px-4 py-3 rounded-lg border-2 shadow-md min-w-[180px]
+        px-4 py-3 rounded-sm border-2 shadow-md min-w-[180px]
         ${
           selected
             ? "border-primary bg-primary/10"

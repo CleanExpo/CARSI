@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { AcronymTooltip } from '@/components/ui/AcronymTooltip';
 
 const industries = [
@@ -14,11 +15,15 @@ export function PublicFooter() {
       <div className="mx-auto max-w-6xl">
         <div className="mb-8 grid gap-8 sm:grid-cols-4">
           <div>
-            <div className="mb-3 flex items-center gap-2">
-              <div className="flex h-6 w-6 items-center justify-center rounded-md bg-primary text-xs font-bold text-primary-foreground">
-                C
-              </div>
-              <span className="text-sm font-semibold text-foreground">CARSI</span>
+            <div className="mb-3">
+              <Image
+                src="/images/brand/carsi-logo.webp"
+                alt="CARSI"
+                width={80}
+                height={28}
+                className="h-5 w-auto opacity-70"
+                unoptimized
+              />
             </div>
             <p className="text-xs leading-relaxed text-muted-foreground">
               Australia&apos;s industry training leader.

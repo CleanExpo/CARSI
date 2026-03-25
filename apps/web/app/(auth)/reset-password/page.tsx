@@ -51,7 +51,7 @@ function ResetPasswordForm() {
   };
 
   return (
-    <div className="rounded-lg border border-border bg-card p-6 sm:p-8">
+    <div className="rounded-sm border border-border bg-card p-6 sm:p-8">
       <div className="mb-6 space-y-1.5">
         <h1 className="text-2xl font-bold text-foreground">
           Set new password
@@ -103,7 +103,7 @@ function ResetPasswordForm() {
           <button
             type="submit"
             disabled={isLoading || !token}
-            className="w-full rounded-lg py-3 text-sm font-semibold text-white transition-all duration-200 hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+            className="w-full rounded-sm py-3 text-sm font-semibold text-white transition-all duration-200 hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
             style={{ background: '#ed9d24' }}
           >
             {isLoading ? 'Updating…' : 'Update password'}

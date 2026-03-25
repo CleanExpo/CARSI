@@ -7,11 +7,11 @@ import {
   AnimatedCard,
   AnimatedSection,
 } from '@/components/landing/AnimatedHero';
-import { MobileNav } from '@/components/landing/MobileNav';
+import { PublicNavbar } from '@/components/landing/PublicNavbar';
+import { PublicFooter } from '@/components/landing/PublicFooter';
 import { FAQSchema } from '@/components/seo/JsonLd';
 import { IICRCDisciplineMap } from '@/components/lms/diagrams/IICRCDisciplineMap';
 import { StudentJourneyMap } from '@/components/lms/diagrams/StudentJourneyMap';
-import { CertificatePreview } from '@/components/lms/diagrams/CertificatePreview';
 import { AcronymTooltip } from '@/components/ui/AcronymTooltip';
 
 // ---------------------------------------------------------------------------
@@ -34,6 +34,40 @@ interface Course {
 // ---------------------------------------------------------------------------
 
 async function getFeaturedCourses(): Promise<{ courses: Course[]; total: number }> {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (supabaseUrl && supabaseKey) {
+    try {
+      const res = await fetch(
+        `${supabaseUrl}/rest/v1/lms_courses?select=id,slug,title,short_description,price_aud,is_free,discipline,thumbnail_url&limit=3&order=updated_at.desc`,
+        {
+          next: { revalidate: 300 },
+          headers: { apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}` },
+        }
+      );
+      if (res.ok) {
+        const items = await res.json();
+        // Get total count
+        const countRes = await fetch(
+          `${supabaseUrl}/rest/v1/lms_courses?select=count`,
+          {
+            next: { revalidate: 300 },
+            headers: {
+              apikey: supabaseKey,
+              Authorization: `Bearer ${supabaseKey}`,
+              Prefer: 'count=exact',
+            },
+          }
+        );
+        const total = countRes.ok
+          ? parseInt(countRes.headers.get('content-range')?.split('/')[1] ?? '0', 10)
+          : (Array.isArray(items) ? items.length : 0);
+        return { courses: Array.isArray(items) ? items : [], total };
+      }
+    } catch {
+      // fall through to backend
+    }
+  }
   const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8000';
   try {
     const res = await fetch(`${backendUrl}/api/lms/courses?limit=3`, {
@@ -64,14 +98,21 @@ const industries = [
   { slug: 'hospitality', label: 'Hotels & Resorts', highlight: true },
   { slug: 'government-defence', label: 'Government & Defence', highlight: true },
   { slug: 'commercial-cleaning', label: 'Commercial Cleaning', highlight: true },
-  { slug: 'aged-care', label: 'Aged Care' },
-  { slug: 'mining', label: 'Mining & Resources' },
-  { slug: 'education', label: 'Education' },
-  { slug: 'property-management', label: 'Property Management' },
-  { slug: 'strata', label: 'Strata & Body Corporate' },
-  { slug: 'retail', label: 'Retail & Shopping Centres' },
-  { slug: 'childcare', label: 'Childcare' },
-  { slug: 'construction', label: 'Construction' },
+  { slug: 'aged-care', label: 'Aged Care', highlight: false },
+  { slug: 'mining', label: 'Mining & Resources', highlight: false },
+  { slug: 'education', label: 'Education', highlight: false },
+  { slug: 'property-management', label: 'Property Management', highlight: false },
+  { slug: 'strata', label: 'Strata & Body Corporate', highlight: false },
+  { slug: 'retail', label: 'Retail & Shopping Centres', highlight: false },
+  { slug: 'childcare', label: 'Childcare', highlight: false },
+  { slug: 'construction', label: 'Construction', highlight: false },
+  { slug: 'insurance', label: 'Insurance', highlight: false },
+  { slug: 'plumbing-trades', label: 'Plumbing & Trades', highlight: false },
+  { slug: 'ndis-disability', label: 'NDIS & Disability Services', highlight: false },
+  { slug: 'gyms-fitness', label: 'Gyms & Fitness', highlight: false },
+  { slug: 'real-estate', label: 'Real Estate', highlight: false },
+  { slug: 'emergency-management', label: 'Emergency Management', highlight: false },
+  { slug: 'caravan-parks', label: 'Caravan Parks', highlight: false },
 ];
 
 const benefits = [
@@ -84,7 +125,7 @@ const benefits = [
 
 const BASE_STATS = [
   { value: '24/7', label: 'Online Access' },
-  { value: '12+', label: 'Industries Served' },
+  { value: '19', label: 'Industries Served' },
   { value: '7', label: 'IICRC Disciplines' },
 ];
 
@@ -92,7 +133,7 @@ const faqs = [
   {
     question: 'What is CARSI?',
     answer:
-      'CARSI is an Australian online training platform offering IICRC CEC-approved courses for cleaning and restoration professionals. With over 160 courses across seven IICRC disciplines, CARSI enables technicians to maintain their certification entirely online.',
+      'CARSI is an Australian online training platform offering IICRC CEC-approved courses for cleaning and restoration professionals. With over 140 courses and resources across seven IICRC disciplines, CARSI enables technicians to maintain their certification entirely online.',
   },
   {
     question: 'How do IICRC CECs work?',
@@ -112,7 +153,28 @@ const faqs = [
   {
     question: 'What industries does CARSI serve?',
     answer:
-      'CARSI serves over 12 industries including healthcare, hospitality, aged care, mining and resources, commercial cleaning, government and defence, education, property management, strata, retail, childcare, and construction.',
+      'CARSI serves 19 industries including healthcare, hospitality, aged care, mining and resources, commercial cleaning, government and defence, education, property management, strata, retail, childcare, construction, insurance, plumbing and trades, NDIS and disability services, gyms and fitness, real estate, emergency management, and caravan parks.',
+  },
+];
+
+const testimonials = [
+  {
+    name: 'Klark Brown',
+    company: 'Restoration Advisers',
+    quote:
+      "We've enrolled our entire team through CARSI. The IICRC discipline coverage is comprehensive, the course quality is consistently high, and the platform just works. It's our go-to for keeping technicians certified.",
+  },
+  {
+    name: 'Shannon Benz',
+    company: 'Mould Solutions Group',
+    quote:
+      "CARSI's mould remediation courses gave my team the IICRC-aligned knowledge we needed to tackle complex jobs with confidence. The CEC credit tracking is clear and the content is genuinely practical.",
+  },
+  {
+    name: 'Yasser Mohamed',
+    company: 'Black Gold Carpet Cleaning',
+    quote:
+      "Running my own carpet cleaning business means training has to fit around the job. CARSI's 24/7 online access let me complete my CRT preparation between callouts. Worth every dollar.",
   },
 ];
 
@@ -128,7 +190,7 @@ function CourseCard({ course }: { course: Course }) {
   return (
     <Link
       href={`/courses/${course.slug}`}
-      className="group block overflow-hidden rounded-lg border border-border bg-card transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-blue-500/5"
+      className="group block overflow-hidden rounded-sm border border-border bg-card transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-blue-500/5"
     >
       <div className="relative h-40 overflow-hidden bg-gradient-to-br from-slate-800 to-slate-900">
         {course.thumbnail_url && (
@@ -170,7 +232,7 @@ function CourseCard({ course }: { course: Course }) {
 function SkeletonCard() {
   return (
     <div
-      className="overflow-hidden rounded-lg border border-border bg-card"
+      className="overflow-hidden rounded-sm border border-border bg-card"
     >
       <div className="h-40 animate-pulse bg-muted/50" />
       <div className="space-y-2 p-4">
@@ -190,7 +252,7 @@ export default async function Home() {
 
   const stats = [
     ...BASE_STATS,
-    { value: courseTotal > 0 ? courseTotal.toString() : '160+', label: 'Courses' },
+    { value: courseTotal > 0 ? courseTotal.toString() : '140+', label: 'Courses' },
   ];
 
   return (
@@ -205,55 +267,7 @@ export default async function Home() {
       />
 
       {/* ── Navigation ─────────────────────────────────────────────────────── */}
-      <nav
-        aria-label="Main navigation"
-        className="sticky top-0 z-50 border-b border-border bg-background/85 backdrop-blur-sm"
-      >
-        <div className="mx-auto max-w-6xl px-6">
-          <div className="flex h-16 items-center justify-between">
-            <Link href="/" className="flex items-center gap-2">
-              <div
-                className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary font-bold text-primary-foreground"
-              >
-                C
-              </div>
-              <span className="font-semibold text-foreground">
-                CARSI
-              </span>
-            </Link>
-
-            <div className="hidden items-center gap-8 md:flex">
-              {['Courses', 'Industries', 'Pricing', 'About'].map((item) => (
-                <Link
-                  key={item}
-                  href={`/${item.toLowerCase()}`}
-                  className="text-sm text-muted-foreground transition-colors duration-150 hover:text-foreground"
-                >
-                  {item}
-                </Link>
-              ))}
-            </div>
-
-            <div className="hidden items-center gap-4 md:flex">
-              <Link
-                href="/login"
-                className="text-sm transition-colors duration-150 hover:text-foreground text-muted-foreground"
-              >
-                Sign In
-              </Link>
-              <Link
-                href="/register"
-                className="rounded-md bg-carsi-orange px-4 py-2 text-sm font-medium text-white transition-all duration-200 hover:scale-[1.02]"
-              >
-                Get Started Free
-              </Link>
-            </div>
-
-            {/* Mobile hamburger menu */}
-            <MobileNav />
-          </div>
-        </div>
-      </nav>
+      <PublicNavbar />
 
       {/* ── Hero (Animated) ────────────────────────────────────────────────── */}
       <AnimatedHero benefits={benefits} />
@@ -274,7 +288,7 @@ export default async function Home() {
               <Link
                 key={d.code}
                 href={`/courses?discipline=${d.code}`}
-                className="rounded-md px-3 py-1.5 text-xs border border-border bg-card/60 text-muted-foreground transition-all duration-200 hover:-translate-y-0.5 hover:text-foreground"
+                className="rounded-sm px-3 py-1.5 text-xs border border-border bg-card/60 text-muted-foreground transition-all duration-200 hover:-translate-y-0.5 hover:text-foreground"
               >
                 <span className="font-mono font-bold text-primary">
                   {d.code}
@@ -382,7 +396,7 @@ export default async function Home() {
             },
           ].map((item, i) => (
             <AnimatedCard key={item.title} index={i}>
-              <div className="rounded-lg border border-border bg-card p-6">
+              <div className="rounded-sm border border-border bg-card p-6">
                 <div className={`mb-3 h-1 w-8 rounded-full ${item.accentClass}`} />
                 <h3 className="mb-2 text-base font-semibold text-foreground">
                   {item.title}
@@ -454,9 +468,10 @@ export default async function Home() {
               </a>
               )
             </span>
-            . CARSI offers 40 <AcronymTooltip term="IICRC" /> <AcronymTooltip term="CEC" />
-            -approved online courses across all seven disciplines, allowing Australian professionals
-            to meet their renewal requirements without travelling interstate.
+            . CARSI offers over 60 <AcronymTooltip term="IICRC" />{' '}
+            <AcronymTooltip term="CEC" />-approved online courses across all seven disciplines,
+            allowing Australian professionals to meet their renewal requirements without travelling
+            interstate.
           </p>
           <p className="mt-4 text-xs italic text-muted-foreground">
             Last reviewed: March 2026
@@ -479,7 +494,7 @@ export default async function Home() {
             jobs, and fit study around shift work or on-call rosters. Upon completion, certificates
             are generated instantly as verifiable digital credentials that can be shared with
             employers or added to a LinkedIn profile within minutes. With courses starting from $20
-            AUD and a full all-access subscription at $795 AUD per year, CARSI provides the most
+            AUD and a Growth membership at $795 AUD per year (or Foundation from $495/year), CARSI provides the most
             cost-effective path to <AcronymTooltip term="IICRC" /> certification maintenance in
             Australia.
           </p>
@@ -517,8 +532,8 @@ export default async function Home() {
             equipment familiarisation, and workplace health and safety induction. This partnership
             means CARSI-trained technicians are recognised across the NRPG network from day one. For
             restoration companies, enrolling staff through CARSI ensures compliance with NRPG
-            workforce standards without disrupting operations. With over 160 courses spanning all
-            seven <AcronymTooltip term="IICRC" /> disciplines, CARSI provides the most comprehensive
+            workforce standards without disrupting operations. With over 140 courses and resources
+            spanning all seven <AcronymTooltip term="IICRC" /> disciplines, CARSI provides the most comprehensive
             online training library available to Australian restoration professionals.
           </p>
           <p className="mt-4 text-xs italic text-muted-foreground">
@@ -531,7 +546,7 @@ export default async function Home() {
       <section className="border-t border-border px-6 py-16">
         <div className="mx-auto max-w-6xl">
           <div
-            className="rounded-lg border border-border bg-card p-8 sm:p-10"
+            className="rounded-sm border border-border bg-card p-8 sm:p-10"
           >
             <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
               <div>
@@ -572,7 +587,7 @@ export default async function Home() {
           {faqs.map((faq, i) => (
             <AnimatedCard key={faq.question} index={i}>
               <details
-                className="group rounded-lg border border-border bg-card"
+                className="group rounded-sm border border-border bg-card"
               >
                 <summary
                   className="flex cursor-pointer items-center justify-between px-5 py-4 text-sm font-medium text-foreground select-none"
@@ -595,16 +610,82 @@ export default async function Home() {
         </div>
       </AnimatedSection>
 
-      {/* ── Certificate Preview ──────────────────────────────────────────── */}
-      <AnimatedSection label="Credentials" title="Verifiable Digital Certificates">
-        <div className="mx-auto max-w-xl">
-          <p className="mb-6 text-center text-sm text-muted-foreground">
-            Every completed course earns you a verifiable digital certificate with a public URL you
-            can share with employers and clients.
-          </p>
-          <CertificatePreview />
+      {/* ── Testimonials ──────────────────────────────────────────────────── */}
+      <AnimatedSection label="Student Reviews" title="What professionals say">
+        <div className="grid gap-6 sm:grid-cols-3">
+          {testimonials.map((t, i) => (
+            <AnimatedCard key={t.name} index={i}>
+              <div className="flex h-full flex-col rounded-sm border border-border bg-card p-6">
+                <p className="mb-4 flex-1 text-sm leading-relaxed text-muted-foreground">
+                  &ldquo;{t.quote}&rdquo;
+                </p>
+                <div className="border-t border-border pt-4">
+                  <p className="text-sm font-semibold text-foreground">{t.name}</p>
+                  <p className="text-xs text-muted-foreground">{t.company}</p>
+                </div>
+              </div>
+            </AnimatedCard>
+          ))}
+        </div>
+        <div className="mt-6 text-center">
+          <Link
+            href="/testimonials"
+            className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Read all reviews →
+          </Link>
         </div>
       </AnimatedSection>
+
+      {/* ── Pricing Teaser ────────────────────────────────────────────────── */}
+      <section className="border-t border-border px-6 py-16">
+        <div className="mx-auto max-w-6xl">
+          <div className="mb-8">
+            <p className="mb-1 text-xs uppercase tracking-wide text-muted-foreground/60">Membership</p>
+            <h2 className="text-2xl font-bold text-foreground">Simple, transparent pricing</h2>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-3">
+            {/* Free */}
+            <div className="rounded-sm border border-border bg-card p-6">
+              <p className="mb-1 text-sm font-semibold text-foreground">Free Library</p>
+              <p className="mb-3 text-3xl font-bold text-foreground">$0</p>
+              <p className="mb-4 text-xs text-muted-foreground">Australian government resources, SOPs, guides &amp; free webinar series. No card required.</p>
+              <Link href="/register" className="flex w-full items-center justify-center rounded-sm border border-border px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
+                Get Started Free
+              </Link>
+            </div>
+            {/* Foundation */}
+            <div className="rounded-sm border border-primary/20 bg-primary/5 p-6">
+              <p className="mb-1 text-sm font-semibold text-foreground">Foundation</p>
+              <div className="mb-1 flex items-baseline gap-1">
+                <span className="text-3xl font-bold text-foreground">$44</span>
+                <span className="text-sm text-muted-foreground">/ month</span>
+              </div>
+              <p className="mb-4 text-xs text-muted-foreground">Entry-level CEC courses — PPE, moisture metering, Level 1 Mould, Carpet Cleaning Basics &amp; more. 7-day free trial.</p>
+              <Link href="/subscribe?plan=foundation" className="flex w-full items-center justify-center rounded-sm bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90">
+                Start Free Trial
+              </Link>
+            </div>
+            {/* Growth */}
+            <div className="relative rounded-sm border border-primary/20 bg-primary/5 p-6">
+              <span className="absolute -top-3 left-5 rounded-sm bg-green-500 px-3 py-0.5 text-xs font-semibold uppercase tracking-wide text-black">Most Popular</span>
+              <p className="mb-1 text-sm font-semibold text-foreground">Growth</p>
+              <div className="mb-1 flex items-baseline gap-1">
+                <span className="text-3xl font-bold text-foreground">$99</span>
+                <span className="text-sm text-muted-foreground">/ month</span>
+              </div>
+              <p className="mb-4 text-xs text-muted-foreground">Unlock all 140+ courses — Level 2 Mould, Admin, Social Media, NeoSan Labs, IICRC CEC dashboard &amp; shareable credentials. 7-day free trial.</p>
+              <Link href="/subscribe?plan=growth" className="flex w-full items-center justify-center rounded-sm bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90">
+                Start Free Trial
+              </Link>
+            </div>
+          </div>
+          <p className="mt-4 text-center text-xs text-muted-foreground/50">
+            Annual plans available — Foundation $495/yr, Growth $795/yr.{' '}
+            <Link href="/pricing" className="underline hover:text-muted-foreground">See full pricing →</Link>
+          </p>
+        </div>
+      </section>
 
       {/* ── CTA ────────────────────────────────────────────────────────────── */}
       <section className="border-t border-border px-6 py-20">
@@ -615,7 +696,7 @@ export default async function Home() {
           <p className="mb-8 text-base text-muted-foreground">
             Free courses available. Premium courses from just $20 AUD.
             <br />
-            Or get full access to 160+ courses for $795 AUD/year.
+            Or get full access with Growth membership for $795 AUD/year.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
@@ -636,130 +717,7 @@ export default async function Home() {
       </section>
 
       {/* ── Footer ─────────────────────────────────────────────────────────── */}
-      <footer className="border-t border-border px-6 py-12">
-        <div className="mx-auto max-w-6xl">
-          <div className="mb-8 grid gap-8 sm:grid-cols-4">
-            <div>
-              <div className="mb-3 flex items-center gap-2">
-                <div
-                  className="flex h-6 w-6 items-center justify-center rounded-sm bg-primary text-xs font-bold text-white"
-                >
-                  C
-                </div>
-                <span className="text-sm font-semibold text-foreground/80">
-                  CARSI
-                </span>
-              </div>
-              <p className="text-xs leading-relaxed text-muted-foreground">
-                Australia&apos;s industry training leader.
-                <br />
-                24/7 online. <AcronymTooltip term="IICRC" />
-                -approved.
-              </p>
-            </div>
-
-            <div>
-              <p
-                className="mb-3 text-[10px] font-semibold tracking-wide uppercase text-muted-foreground"
-              >
-                Platform
-              </p>
-              <ul className="space-y-2 text-xs text-muted-foreground">
-                {[
-                  { label: 'Courses', href: '/courses' },
-                  { label: 'Pathways', href: '/pathways' },
-                  { label: 'Pricing', href: '/pricing' },
-                  { label: 'About', href: '/about' },
-                  { label: 'Testimonials', href: '/testimonials' },
-                  { label: 'Podcast', href: '/podcast' },
-                  { label: 'Contact', href: '/contact' },
-                ].map((item) => (
-                  <li key={item.label}>
-                    <Link href={item.href} className="hover:text-foreground">
-                      {item.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div>
-              <p
-                className="mb-3 text-[10px] font-semibold tracking-wide uppercase text-muted-foreground"
-              >
-                Industries
-              </p>
-              <ul className="space-y-2 text-xs text-muted-foreground">
-                {industries.slice(0, 4).map((industry) => (
-                  <li key={industry.slug}>
-                    <Link href={`/industries/${industry.slug}`} className="hover:text-foreground">
-                      {industry.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div>
-              <p
-                className="mb-3 text-[10px] font-semibold tracking-wide uppercase text-muted-foreground"
-              >
-                Contact
-              </p>
-              <ul className="space-y-2 text-xs text-muted-foreground">
-                <li>PO Box 4309, Forest Lake QLD 4078</li>
-                <li>
-                  <a href="mailto:support@carsi.com.au" className="hover:text-foreground">
-                    support@carsi.com.au
-                  </a>
-                </li>
-                <li>
-                  <a href="tel:+61457123005" className="hover:text-foreground">
-                    0457 123 005
-                  </a>
-                </li>
-              </ul>
-              <div className="mt-4 flex items-center gap-3">
-                {[
-                  { label: 'Facebook', href: 'https://www.facebook.com/CARSIaus' },
-                  {
-                    label: 'YouTube',
-                    href: 'https://www.youtube.com/channel/UC3HpNvGJXivLGoPo4m7Qleg/featured',
-                  },
-                  { label: 'LinkedIn', href: 'https://www.linkedin.com/company/carsiaus' },
-                  {
-                    label: 'Podcast',
-                    href: 'https://open.spotify.com/show/4FVBn8Cfyx2jOx0m4MksuG',
-                  },
-                ].map((social) => (
-                  <a
-                    key={social.label}
-                    href={social.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-[10px] text-muted-foreground transition-colors hover:text-foreground"
-                    aria-label={social.label}
-                  >
-                    {social.label}
-                  </a>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div
-            className="flex flex-col items-center justify-between gap-2 border-t border-border pt-6 sm:flex-row"
-          >
-            <p className="text-[11px] text-muted-foreground/50">
-              © 2026 CARSI Pty Ltd. All rights reserved.
-            </p>
-            <p className="text-[11px] text-muted-foreground/50">
-              <AcronymTooltip term="IICRC" />
-              -aligned continuing education — not an <AcronymTooltip term="RTO" />
-            </p>
-          </div>
-        </div>
-      </footer>
+      <PublicFooter />
     </div>
   );
 }

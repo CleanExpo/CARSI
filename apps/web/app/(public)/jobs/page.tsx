@@ -123,7 +123,7 @@ function JobCard({ job }: { job: JobSummary }) {
   return (
     <Link
       href={`/jobs/${job.id}`}
-      className="group flex flex-col gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5 transition-all duration-200 hover:border-[rgba(36,144,237,0.35)] hover:bg-white/[0.06] hover:shadow-[0_8px_40px_rgba(36,144,237,0.12)]"
+      className="group flex flex-col gap-3 rounded-sm border border-white/[0.08] bg-white/[0.03] p-5 transition-all duration-200 hover:border-[rgba(36,144,237,0.35)] hover:bg-white/[0.06] hover:shadow-[0_8px_40px_rgba(36,144,237,0.12)]"
     >
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
@@ -140,7 +140,7 @@ function JobCard({ job }: { job: JobSummary }) {
       </div>
 
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm text-white/50">
-        <span className="inline-flex items-center rounded-md bg-white/[0.06] px-2 py-0.5 text-xs">
+        <span className="inline-flex items-center rounded-sm bg-white/[0.06] px-2 py-0.5 text-xs">
           {EMPLOYMENT_TYPE_LABELS[job.employment_type] ?? job.employment_type}
         </span>
         <span className="flex items-center gap-1.5">
@@ -157,7 +157,7 @@ function JobCard({ job }: { job: JobSummary }) {
           {job.industry_categories.slice(0, 3).map((cat) => (
             <span
               key={cat}
-              className="rounded-md bg-white/[0.04] px-2 py-0.5 text-xs text-white/35"
+              className="rounded-sm bg-white/[0.04] px-2 py-0.5 text-xs text-white/35"
             >
               {cat}
             </span>
@@ -186,13 +186,13 @@ function JobCard({ job }: { job: JobSummary }) {
 
 function PlaceholderCard({ index }: { index: number }) {
   return (
-    <div className="flex flex-col gap-3 rounded-2xl border border-dashed border-white/[0.06] bg-white/[0.01] p-5">
+    <div className="flex flex-col gap-3 rounded-sm border border-dashed border-white/[0.06] bg-white/[0.01] p-5">
       <div className="space-y-1.5">
         <div className="h-5 w-3/4 animate-pulse rounded bg-white/[0.05]" />
         <div className="h-4 w-1/2 animate-pulse rounded bg-white/[0.03]" />
       </div>
       <div className="flex gap-2">
-        <div className="h-5 w-16 animate-pulse rounded-md bg-white/[0.04]" />
+        <div className="h-5 w-16 animate-pulse rounded-sm bg-white/[0.04]" />
         <div className="h-5 w-20 animate-pulse rounded bg-white/[0.03]" />
       </div>
       <p className="mt-auto text-xs text-white/20">Job slot {index} — positions incoming</p>
@@ -303,7 +303,7 @@ export default async function JobsPage({
           </div>
 
           {/* Post a job CTA */}
-          <div className="mb-10 flex items-center justify-between rounded-2xl border border-white/[0.06] bg-white/[0.02] px-6 py-4">
+          <div className="mb-10 flex items-center justify-between rounded-sm border border-white/[0.06] bg-white/[0.02] px-6 py-4">
             <div>
               <p className="text-sm font-medium text-white/80">Hiring in the industry?</p>
               <p className="text-xs text-white/40">
@@ -312,7 +312,7 @@ export default async function JobsPage({
             </div>
             <Link
               href="/jobs/submit"
-              className="rounded-xl bg-[#2490ed] px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+              className="rounded-sm bg-[#2490ed] px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
             >
               Post a Job
             </Link>
@@ -320,7 +320,7 @@ export default async function JobsPage({
 
           {/* Listings */}
           {jobs.length === 0 && placeholderCount === 0 ? (
-            <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-16 text-center">
+            <div className="rounded-sm border border-white/[0.06] bg-white/[0.02] p-16 text-center">
               <p className="text-white/40">
                 {category || state
                   ? 'No listings match your filters — try a different combination or post a job.'
@@ -344,7 +344,7 @@ export default async function JobsPage({
               {page > 1 && (
                 <Link
                   href={buildPageUrl(page - 1)}
-                  className="rounded-xl border border-white/[0.08] px-4 py-2 text-sm text-white/50 transition-colors hover:border-[rgba(36,144,237,0.35)] hover:text-white/80"
+                  className="rounded-sm border border-white/[0.08] px-4 py-2 text-sm text-white/50 transition-colors hover:border-[rgba(36,144,237,0.35)] hover:text-white/80"
                 >
                   ← Previous
                 </Link>
@@ -366,7 +366,7 @@ export default async function JobsPage({
                       <Link
                         key={p}
                         href={buildPageUrl(p as number)}
-                        className={`min-w-[36px] rounded-xl px-3 py-2 text-center text-sm transition-colors ${
+                        className={`min-w-[36px] rounded-sm px-3 py-2 text-center text-sm transition-colors ${
                           p === page
                             ? 'bg-[#2490ed] text-white'
                             : 'border border-white/[0.08] text-white/50 hover:border-[rgba(36,144,237,0.35)] hover:text-white/80'
@@ -380,7 +380,7 @@ export default async function JobsPage({
               {page < totalPages && (
                 <Link
                   href={buildPageUrl(page + 1)}
-                  className="rounded-xl border border-white/[0.08] px-4 py-2 text-sm text-white/50 transition-colors hover:border-[rgba(36,144,237,0.35)] hover:text-white/80"
+                  className="rounded-sm border border-white/[0.08] px-4 py-2 text-sm text-white/50 transition-colors hover:border-[rgba(36,144,237,0.35)] hover:text-white/80"
                 >
                   Next →
                 </Link>

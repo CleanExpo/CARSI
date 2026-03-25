@@ -110,7 +110,7 @@ export function LoginForm() {
         />
         {error && (
           <div
-            className="rounded-lg border border-destructive/30 bg-destructive/10 p-3"
+            className="rounded-sm border border-destructive/30 bg-destructive/10 p-3"
             role="alert"
             aria-live="assertive"
             id="login-error"
@@ -121,7 +121,7 @@ export function LoginForm() {
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full rounded-md bg-carsi-orange py-3 text-sm font-semibold text-white transition-colors hover:bg-carsi-orange/90 disabled:cursor-not-allowed disabled:opacity-50"
+          className="w-full rounded-sm bg-carsi-orange py-3 text-sm font-semibold text-white transition-colors hover:bg-carsi-orange/90 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isLoading ? 'Signing in...' : 'Sign in'}
         </button>

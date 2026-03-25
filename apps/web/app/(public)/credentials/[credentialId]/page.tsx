@@ -32,10 +32,7 @@ export default async function CredentialPage({
 
       {/* Certificate visual preview */}
       <section className="mt-10">
-        <h2
-          className="mb-4 text-center text-lg font-semibold"
-          style={{ color: 'rgba(255,255,255,0.85)' }}
-        >
+        <h2 className="mb-4 text-center text-lg font-semibold text-foreground/85">
           Certificate Preview
         </h2>
         <CertificatePreview

@@ -40,11 +40,11 @@ const featureCardVariants = cva('group relative overflow-hidden transition-all d
   variants: {
     variant: {
       default:
-        'bg-card hover:bg-muted/50 rounded-xl border p-6 hover:shadow-lg hover:-translate-y-1',
+        'bg-card hover:bg-muted/50 rounded-sm border p-6 hover:shadow-lg hover:-translate-y-1',
       cards:
-        'bg-gradient-to-br from-card to-muted/30 rounded-2xl border shadow-sm p-8 hover:shadow-xl hover:-translate-y-2',
-      bento: 'bg-card rounded-3xl border p-6 md:p-8 hover:border-brand-primary/30 hover:shadow-lg',
-      minimal: 'p-6 hover:bg-muted/30 rounded-lg',
+        'bg-gradient-to-br from-card to-muted/30 rounded-sm border shadow-sm p-8 hover:shadow-xl hover:-translate-y-2',
+      bento: 'bg-card rounded-sm border p-6 md:p-8 hover:border-brand-primary/30 hover:shadow-lg',
+      minimal: 'p-6 hover:bg-muted/30 rounded-sm',
       bordered:
         'border-l-4 border-l-brand-primary/50 hover:border-l-brand-primary bg-muted/20 rounded-r-lg p-6 hover:bg-muted/40',
     },
@@ -93,11 +93,11 @@ const FeatureIcon = React.forwardRef<
 >(({ className, variant = 'default', children, ...props }, ref) => {
   const iconStyles: Record<string, string> = {
     default:
-      'w-12 h-12 rounded-xl bg-brand-primary/10 text-brand-primary flex items-center justify-center mb-4 group-hover:bg-brand-primary group-hover:text-white transition-colors',
+      'w-12 h-12 rounded-sm bg-brand-primary/10 text-brand-primary flex items-center justify-center mb-4 group-hover:bg-brand-primary group-hover:text-white transition-colors',
     cards:
-      'w-14 h-14 rounded-2xl bg-gradient-brand text-white flex items-center justify-center mb-6 shadow-lg shadow-brand-primary/25',
+      'w-14 h-14 rounded-sm bg-gradient-brand text-white flex items-center justify-center mb-6 shadow-lg shadow-brand-primary/25',
     bento:
-      'w-10 h-10 rounded-lg bg-brand-primary/10 text-brand-primary flex items-center justify-center mb-4',
+      'w-10 h-10 rounded-sm bg-brand-primary/10 text-brand-primary flex items-center justify-center mb-4',
     minimal: 'w-10 h-10 text-brand-primary mb-4',
     bordered: 'w-10 h-10 text-brand-primary mb-4',
   };
@@ -144,7 +144,7 @@ const FeatureCard = React.forwardRef<
 
         {/* Image (for bento-style cards) */}
         {feature.image && variant === 'bento' && (
-          <div className="-mx-6 -mt-6 mb-6 overflow-hidden rounded-t-3xl md:-mx-8 md:-mt-8">
+          <div className="-mx-6 -mt-6 mb-6 overflow-hidden rounded-t-sm md:-mx-8 md:-mt-8">
             {feature.image}
           </div>
         )}

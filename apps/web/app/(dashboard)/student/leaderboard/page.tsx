@@ -40,22 +40,22 @@ export default function LeaderboardPage() {
   return (
     <main className="flex max-w-2xl flex-col gap-6 p-6">
       <div className="flex flex-col gap-1">
-        <h1 className="font-mono text-2xl font-bold text-white">Monthly Leaderboard</h1>
-        <p className="text-sm text-white/40">{monthLabel} — top 20 by XP earned</p>
+        <h1 className="text-2xl font-bold text-foreground">Monthly Leaderboard</h1>
+        <p className="text-sm text-muted-foreground">{monthLabel} — top 20 by XP earned</p>
       </div>
 
-      {loading && <p className="text-sm text-white/40">Loading…</p>}
+      {loading && <p className="text-sm text-muted-foreground">Loading…</p>}
 
       {error && <p className="text-sm text-red-400">{error}</p>}
 
       {!loading && !error && entries.length === 0 && (
-        <p className="text-sm text-white/40">
+        <p className="text-sm text-muted-foreground">
           No activity recorded yet this month. Complete a lesson to appear!
         </p>
       )}
 
       {entries.length > 0 && (
-        <div className="flex flex-col divide-y divide-white/[0.04]">
+        <div className="flex flex-col divide-y divide-border">
           {entries.map((entry) => {
             const isTop3 = entry.rank <= 3;
             const medals = ['', '🥇', '🥈', '🥉'];
@@ -64,15 +64,15 @@ export default function LeaderboardPage() {
               <div
                 key={entry.rank}
                 className={`flex items-center justify-between px-2 py-4 ${
-                  isTop3 ? 'rounded-sm bg-white/[0.02]' : ''
+                  isTop3 ? 'rounded-sm bg-secondary' : ''
                 }`}
               >
                 <div className="flex items-center gap-4">
-                  <span className="w-8 text-center font-mono text-white/40">
+                  <span className="w-8 text-center font-mono text-muted-foreground">
                     {isTop3 ? medals[entry.rank] : `#${entry.rank}`}
                   </span>
                   <div className="flex flex-col gap-0.5">
-                    <span className="font-mono text-sm text-white">{entry.display_name}</span>
+                    <span className="font-mono text-sm text-foreground">{entry.display_name}</span>
                     <span
                       className={`font-mono text-xs ${LEVEL_COLOURS[entry.current_level] ?? 'text-zinc-400'}`}
                     >
@@ -82,10 +82,10 @@ export default function LeaderboardPage() {
                 </div>
 
                 <div className="flex flex-col items-end gap-0.5">
-                  <span className="font-mono text-sm font-bold text-white">
+                  <span className="font-mono text-sm font-bold text-foreground">
                     {entry.total_xp.toLocaleString()}
                   </span>
-                  <span className="text-xs text-white/30">XP</span>
+                  <span className="text-xs text-muted-foreground/50">XP</span>
                 </div>
               </div>
             );

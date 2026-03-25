@@ -174,13 +174,13 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
 
           {/* Key details */}
           <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5">
+            <div className="rounded-sm border border-white/[0.08] bg-white/[0.03] p-5">
               <p className="mb-1 text-xs font-medium tracking-wider text-white/30 uppercase">
                 Location
               </p>
               <p className="text-base font-semibold text-white/90">{locationStr}</p>
             </div>
-            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5">
+            <div className="rounded-sm border border-white/[0.08] bg-white/[0.03] p-5">
               <p className="mb-1 text-xs font-medium tracking-wider text-white/30 uppercase">
                 Employment Type
               </p>
@@ -189,14 +189,14 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
               </p>
             </div>
             {salary && (
-              <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5">
+              <div className="rounded-sm border border-white/[0.08] bg-white/[0.03] p-5">
                 <p className="mb-1 text-xs font-medium tracking-wider text-white/30 uppercase">
                   Salary
                 </p>
                 <p className="text-base font-semibold text-[#34d399]">{salary}</p>
               </div>
             )}
-            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5">
+            <div className="rounded-sm border border-white/[0.08] bg-white/[0.03] p-5">
               <p className="mb-1 text-xs font-medium tracking-wider text-white/30 uppercase">
                 Listing Expires
               </p>
@@ -229,7 +229,7 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
                   <Link
                     key={cat}
                     href={`/jobs?category=${encodeURIComponent(cat)}`}
-                    className="rounded-md bg-white/[0.05] px-3 py-1 text-sm text-white/50 transition-colors hover:bg-white/[0.08] hover:text-white/80"
+                    className="rounded-sm bg-white/[0.05] px-3 py-1 text-sm text-white/50 transition-colors hover:bg-white/[0.08] hover:text-white/80"
                   >
                     {cat}
                   </Link>
@@ -245,7 +245,7 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
                 href={job.apply_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-xl bg-[#2490ed] px-6 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                className="rounded-sm bg-[#2490ed] px-6 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
               >
                 Apply Now ↗
               </a>
@@ -253,25 +253,25 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
             {job.apply_email && (
               <a
                 href={`mailto:${job.apply_email}?subject=Application: ${encodeURIComponent(job.title)}`}
-                className="rounded-xl border border-[rgba(36,144,237,0.4)] px-6 py-3 text-sm font-semibold text-[#2490ed] transition-colors hover:bg-[rgba(36,144,237,0.08)]"
+                className="rounded-sm border border-[rgba(36,144,237,0.4)] px-6 py-3 text-sm font-semibold text-[#2490ed] transition-colors hover:bg-[rgba(36,144,237,0.08)]"
               >
                 Apply via Email
               </a>
             )}
             <Link
               href="/jobs"
-              className="rounded-xl border border-white/[0.1] px-6 py-3 text-sm font-semibold text-white/50 transition-colors hover:text-white/80"
+              className="rounded-sm border border-white/[0.1] px-6 py-3 text-sm font-semibold text-white/50 transition-colors hover:text-white/80"
             >
               ← All Jobs
             </Link>
           </div>
 
           {/* Post a job nudge */}
-          <div className="mt-12 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 text-center">
+          <div className="mt-12 rounded-sm border border-white/[0.06] bg-white/[0.02] p-6 text-center">
             <p className="text-sm font-medium text-white/60">Hiring in the industry?</p>
             <Link
               href="/jobs/submit"
-              className="mt-2 inline-block rounded-xl bg-white/[0.06] px-4 py-2 text-sm font-semibold text-white/70 transition-colors hover:bg-white/[0.1]"
+              className="mt-2 inline-block rounded-sm bg-white/[0.06] px-4 py-2 text-sm font-semibold text-white/70 transition-colors hover:bg-white/[0.1]"
             >
               Post a Job for Free
             </Link>

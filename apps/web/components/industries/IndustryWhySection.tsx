@@ -1,3 +1,4 @@
+import type React from 'react';
 import { LucideIcon } from 'lucide-react';
 
 interface WhyCard {
@@ -36,14 +37,11 @@ export function IndustryWhySection({
           {cards.map((card) => (
             <div
               key={card.title}
-              className="rounded-lg border border-border bg-secondary p-6 transition-transform duration-200 hover:-translate-y-1"
+              className="rounded-sm border border-border bg-secondary p-6 transition-transform duration-200 hover:-translate-y-1"
             >
               <div
-                className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg"
-                style={{
-                  background: `${card.color}15`,
-                  border: `1px solid ${card.color}30`,
-                }}
+                className="mb-4 flex h-10 w-10 items-center justify-center rounded-sm ring-1"
+                style={{ background: `${card.color}15`, '--tw-ring-color': `${card.color}30` } as React.CSSProperties}
               >
                 <card.icon className="h-5 w-5" style={{ color: card.color }} />
               </div>

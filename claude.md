@@ -120,7 +120,7 @@ Optional env vars: see `.env.example`
 | -------- | ------------- | ---------------------------------------- |
 | Frontend | Vercel        | https://carsi-web.vercel.app             |
 | Backend  | DigitalOcean  | Docker container (migrating from Fly.io) |
-| Database | Supabase / DO | PostgreSQL 15 + pgvector                 |
+| Database | DigitalOcean / managed Postgres | PostgreSQL 15 + pgvector |
 | Email    | Mailpit (dev) | localhost:8025                           |
 
 **Migration in progress**: Fly.io → DigitalOcean (Docker + managed Postgres)
@@ -128,14 +128,12 @@ Fly.io config files in `fly.toml`, `Dockerfile` are being superseded by `docker-
 
 ## State Store
 
-Supabase removed. Backend uses **NullStateStore** for graceful degradation.
+Backend uses **NullStateStore** for graceful degradation until PostgreSQL-backed state is wired.
 
-| File                           | Purpose                                                 |
-| ------------------------------ | ------------------------------------------------------- |
-| `src/state/null_store.py`      | NullStateStore + `_NullTableClient` chain               |
-| `src/state/supabase.py`        | Re-export shim (`NullStateStore as SupabaseStateStore`) |
-| `src/state/__init__.py`        | `get_state_store()` factory                             |
-| `src/utils/supabase_client.py` | Safe `_NullClient` shim                                 |
+| File                      | Purpose                                   |
+| ------------------------- | ----------------------------------------- |
+| `src/state/null_store.py` | NullStateStore + `_NullTableClient` chain |
+| `src/state/__init__.py`   | `get_state_store()` factory               |
 
 Degraded: `/api/analytics/*` (empty), `/api/contractors/*` (503)
 

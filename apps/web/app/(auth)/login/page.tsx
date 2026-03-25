@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 export default function LoginPage() {
   return (
-    <div className="rounded-lg border border-border bg-card p-6 sm:p-8">
+    <div className="rounded-sm border border-border bg-card p-6 sm:p-8">
       <div className="mb-6 space-y-1.5">
         <h1 className="text-2xl font-bold text-foreground">
           Sign in

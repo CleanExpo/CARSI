@@ -12,7 +12,7 @@ function EndNode({ data, selected }: NodeProps<EndNodeData>) {
   return (
     <div
       className={`
-        px-4 py-3 rounded-lg border-2 shadow-md min-w-[150px]
+        px-4 py-3 rounded-sm border-2 shadow-md min-w-[150px]
         ${
           selected
             ? "border-primary bg-primary/10"

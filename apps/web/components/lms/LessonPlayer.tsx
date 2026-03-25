@@ -31,7 +31,7 @@ export function LessonPlayer({ lesson }: LessonPlayerProps) {
         </div>
       </div>
 
-      <div className="rounded-lg">{renderContent(lesson)}</div>
+      <div className="rounded-sm">{renderContent(lesson)}</div>
     </div>
   );
 }
@@ -40,7 +40,7 @@ function renderContent(lesson: Lesson) {
   switch (lesson.content_type) {
     case 'video':
       return (
-        <video controls className="w-full rounded-lg" src={lesson.content_body ?? undefined}>
+        <video controls className="w-full rounded-sm" src={lesson.content_body ?? undefined}>
           Your browser does not support video playback.
         </video>
       );
@@ -49,7 +49,7 @@ function renderContent(lesson: Lesson) {
       return (
         <iframe
           src={lesson.content_body ?? undefined}
-          className="h-[700px] w-full rounded-lg border"
+          className="h-[700px] w-full rounded-sm border"
           title="PDF viewer"
         />
       );

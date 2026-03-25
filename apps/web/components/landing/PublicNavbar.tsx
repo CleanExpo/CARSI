@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { MobileNav } from './MobileNav';
 
 export function PublicNavbar() {
@@ -10,10 +11,15 @@ export function PublicNavbar() {
       <div className="mx-auto max-w-6xl px-6">
         <div className="flex h-16 items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary font-bold text-primary-foreground">
-              C
-            </div>
-            <span className="font-semibold text-foreground">CARSI</span>
+            <Image
+              src="/images/brand/carsi-logo.webp"
+              alt="CARSI"
+              width={120}
+              height={40}
+              className="h-9 w-auto"
+              unoptimized
+              priority
+            />
           </Link>
 
           <div className="hidden items-center gap-8 md:flex">
@@ -37,7 +43,7 @@ export function PublicNavbar() {
             </Link>
             <Link
               href="/register"
-              className="rounded-md bg-carsi-orange px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-carsi-orange/90"
+              className="rounded-sm bg-carsi-orange px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-carsi-orange/90"
             >
               Get Started Free
             </Link>

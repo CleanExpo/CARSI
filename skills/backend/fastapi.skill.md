@@ -283,6 +283,6 @@ def test_invalid_phone_format():
 This skill works with:
 - `backend/langgraph.skill.md` - Agent workflows
 - `backend/advanced-tool-use.skill.md` - Tool patterns
-- `database/supabase.skill.md` - Database integration
+- `database/migrations.skill.md` - Database migrations (Alembic / PostgreSQL)
 
 See: `apps/backend/src/api/`, `verification/verification-first.skill.md`
