@@ -5,12 +5,6 @@ import Link from 'next/link';
 import { ArrowRight, CheckCircle2, Award, Shield, Star } from 'lucide-react';
 import { ReactNode } from 'react';
 
-// ---------------------------------------------------------------------------
-// Council-Approved Animation Config (Bezier principle)
-// ---------------------------------------------------------------------------
-
-const smoothEase: [number, number, number, number] = [0.4, 0, 0.2, 1]; // Council-approved smooth easing
-
 const fadeInUp = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0 },
@@ -25,21 +19,14 @@ const staggerContainer = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-      delayChildren: 0.1,
-    },
+    transition: { staggerChildren: 0.1, delayChildren: 0.1 },
   },
 };
 
-// ---------------------------------------------------------------------------
-// Trust Signals Data
-// ---------------------------------------------------------------------------
-
 const trustBadges = [
-  { icon: Award, label: 'IICRC Approved', color: '#2490ed' },
-  { icon: Shield, label: '24/7 Online Access', color: '#27ae60' },
-  { icon: Star, label: '4.9★ Rating', color: '#ed9d24' },
+  { icon: Award, label: 'IICRC Approved', className: 'text-primary' },
+  { icon: Shield, label: '24/7 Online Access', className: 'text-green-500' },
+  { icon: Star, label: '4.9★ Rating', className: 'text-carsi-orange' },
 ];
 
 const partnerLogos = [
@@ -48,26 +35,16 @@ const partnerLogos = [
   { name: 'NRPG', abbr: 'NRPG' },
 ];
 
-// ---------------------------------------------------------------------------
-// Sub-components
-// ---------------------------------------------------------------------------
-
 function AnimatedBadge() {
   return (
     <motion.div
       variants={fadeInUp}
-      className="mb-6 inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs"
-      style={{
-        background: 'rgba(36,144,237,0.1)',
-        border: '1px solid rgba(36,144,237,0.2)',
-        color: '#2490ed',
-      }}
+      className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs text-primary"
     >
       <motion.span
-        className="h-1.5 w-1.5 rounded-full"
-        style={{ background: '#2490ed' }}
+        className="h-1.5 w-1.5 rounded-full bg-primary"
         animate={{ scale: [1, 1.2, 1] }}
-        transition={{ duration: 2, repeat: Infinity, ease: smoothEase }}
+        transition={{ duration: 2, repeat: Infinity }}
       />
       IICRC CEC Approved
     </motion.div>
@@ -82,39 +59,26 @@ function TrustSignals() {
       animate="visible"
       className="mt-10 flex flex-wrap items-center gap-6"
     >
-      {/* Trust badges */}
       <div className="flex items-center gap-4">
         {trustBadges.map((badge) => (
           <motion.div key={badge.label} variants={fadeIn} className="flex items-center gap-1.5">
-            <badge.icon className="h-4 w-4" style={{ color: badge.color }} />
-            <span className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
-              {badge.label}
-            </span>
+            <badge.icon className={`h-4 w-4 ${badge.className}`} />
+            <span className="text-xs text-muted-foreground">{badge.label}</span>
           </motion.div>
         ))}
       </div>
 
-      {/* Separator */}
-      <div className="hidden h-4 w-px sm:block" style={{ background: 'rgba(255,255,255,0.1)' }} />
+      <div className="hidden h-4 w-px bg-border sm:block" />
 
-      {/* Partner logos */}
       <div className="flex items-center gap-3">
-        <span
-          className="text-[10px] tracking-wider uppercase"
-          style={{ color: 'rgba(255,255,255,0.25)' }}
-        >
+        <span className="text-[10px] uppercase tracking-wider text-muted-foreground/50">
           Aligned with
         </span>
         {partnerLogos.map((partner) => (
           <motion.div
             key={partner.name}
             variants={fadeIn}
-            className="flex h-7 items-center justify-center rounded-sm px-2 text-[10px] font-bold tracking-wide"
-            style={{
-              background: 'rgba(255,255,255,0.04)',
-              border: '1px solid rgba(255,255,255,0.08)',
-              color: 'rgba(255,255,255,0.4)',
-            }}
+            className="flex h-7 items-center justify-center rounded-md border border-border bg-secondary px-2 text-[10px] font-bold tracking-wide text-muted-foreground"
           >
             {partner.abbr}
           </motion.div>
@@ -123,10 +87,6 @@ function TrustSignals() {
     </motion.div>
   );
 }
-
-// ---------------------------------------------------------------------------
-// Main Component
-// ---------------------------------------------------------------------------
 
 interface AnimatedHeroProps {
   benefits: string[];
@@ -146,20 +106,18 @@ export function AnimatedHero({ benefits }: AnimatedHeroProps) {
 
           <motion.h1
             variants={fadeInUp}
-            transition={{ duration: 0.6, ease: smoothEase }}
-            className="mb-6 text-4xl leading-tight font-bold tracking-tight sm:text-5xl"
-            style={{ color: 'rgba(255,255,255,0.95)' }}
+            transition={{ duration: 0.6 }}
+            className="mb-6 text-4xl leading-tight font-bold tracking-tight text-foreground sm:text-5xl"
           >
             Industry-leading training.
             <br />
-            <span style={{ color: '#2490ed' }}>Available 24/7.</span>
+            <span className="text-primary">Available 24/7.</span>
           </motion.h1>
 
           <motion.p
             variants={fadeInUp}
-            transition={{ duration: 0.6, ease: smoothEase, delay: 0.1 }}
-            className="mb-8 max-w-lg text-lg leading-relaxed"
-            style={{ color: 'rgba(255,255,255,0.5)' }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="mb-8 max-w-lg text-lg leading-relaxed text-muted-foreground"
           >
             IICRC-approved CEC training for healthcare, hospitality, government, mining, commercial
             cleaning, and restoration professionals. Self-paced. Online. Always on.
@@ -167,31 +125,24 @@ export function AnimatedHero({ benefits }: AnimatedHeroProps) {
 
           <motion.div
             variants={fadeInUp}
-            transition={{ duration: 0.6, ease: smoothEase, delay: 0.2 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
             className="mb-10 flex flex-wrap gap-3"
           >
             <Link
               href="/courses"
-              className="group inline-flex items-center gap-2 rounded-sm px-6 py-3 font-medium text-white transition-all duration-200 hover:scale-[1.02]"
-              style={{ background: '#ed9d24' }}
+              className="group inline-flex items-center gap-2 rounded-md bg-carsi-orange px-6 py-3 font-medium text-white transition-colors hover:bg-carsi-orange/90"
             >
               Browse Courses{' '}
-              <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
             <Link
               href="/pathways"
-              className="inline-flex items-center gap-2 rounded-sm px-6 py-3 font-medium transition-all duration-200 hover:scale-[1.02] hover:text-white"
-              style={{
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                color: 'rgba(255,255,255,0.7)',
-              }}
+              className="inline-flex items-center gap-2 rounded-md border border-border bg-secondary px-6 py-3 font-medium text-muted-foreground transition-colors hover:bg-secondary/80 hover:text-foreground"
             >
               View Pathways
             </Link>
           </motion.div>
 
-          {/* Animated benefit list */}
           <motion.ul
             variants={staggerContainer}
             initial="hidden"
@@ -202,11 +153,10 @@ export function AnimatedHero({ benefits }: AnimatedHeroProps) {
               <motion.li
                 key={benefit}
                 variants={fadeInUp}
-                transition={{ duration: 0.4, ease: smoothEase, delay: 0.3 + i * 0.08 }}
-                className="flex items-center gap-2 text-sm"
-                style={{ color: 'rgba(255,255,255,0.5)' }}
+                transition={{ duration: 0.4, delay: 0.3 + i * 0.08 }}
+                className="flex items-center gap-2 text-sm text-muted-foreground"
               >
-                <CheckCircle2 className="h-4 w-4 flex-shrink-0" style={{ color: '#00FF88' }} />
+                <CheckCircle2 className="h-4 w-4 flex-shrink-0 text-green-500" />
                 {benefit}
               </motion.li>
             ))}
@@ -219,10 +169,6 @@ export function AnimatedHero({ benefits }: AnimatedHeroProps) {
   );
 }
 
-// ---------------------------------------------------------------------------
-// Animated Stats Section
-// ---------------------------------------------------------------------------
-
 interface Stat {
   value: string;
   label: string;
@@ -234,7 +180,7 @@ interface AnimatedStatsProps {
 
 export function AnimatedStats({ stats }: AnimatedStatsProps) {
   return (
-    <section className="px-6 py-12" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+    <section className="border-t border-border px-6 py-12">
       <div className="mx-auto max-w-6xl">
         <motion.div
           className="grid grid-cols-2 gap-8 sm:grid-cols-4"
@@ -247,16 +193,11 @@ export function AnimatedStats({ stats }: AnimatedStatsProps) {
             <motion.div
               key={stat.label}
               variants={fadeInUp}
-              transition={{ duration: 0.5, ease: smoothEase, delay: i * 0.1 }}
+              transition={{ duration: 0.5, delay: i * 0.1 }}
               className="text-center"
             >
-              <p className="text-3xl font-bold" style={{ color: '#2490ed' }}>
-                {stat.value}
-              </p>
-              <p
-                className="mt-1 text-xs tracking-wide uppercase"
-                style={{ color: 'rgba(255,255,255,0.4)' }}
-              >
+              <p className="text-3xl font-bold text-primary">{stat.value}</p>
+              <p className="mt-1 text-xs uppercase tracking-wide text-muted-foreground">
                 {stat.label}
               </p>
             </motion.div>
@@ -266,10 +207,6 @@ export function AnimatedStats({ stats }: AnimatedStatsProps) {
     </section>
   );
 }
-
-// ---------------------------------------------------------------------------
-// Animated Course Card Wrapper
-// ---------------------------------------------------------------------------
 
 interface AnimatedCardProps {
   children: ReactNode;
@@ -282,16 +219,12 @@ export function AnimatedCard({ children, index }: AnimatedCardProps) {
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-30px' }}
-      transition={{ duration: 0.5, ease: smoothEase, delay: index * 0.1 }}
+      transition={{ duration: 0.5, delay: index * 0.1 }}
     >
       {children}
     </motion.div>
   );
 }
-
-// ---------------------------------------------------------------------------
-// Animated Section Header
-// ---------------------------------------------------------------------------
 
 interface AnimatedSectionProps {
   label: string;
@@ -302,25 +235,20 @@ interface AnimatedSectionProps {
 
 export function AnimatedSection({ label, title, children, rightContent }: AnimatedSectionProps) {
   return (
-    <section className="px-6 py-16" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+    <section className="border-t border-border px-6 py-16">
       <div className="mx-auto max-w-6xl">
         <motion.div
           className="mb-8 flex items-end justify-between"
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.5, ease: smoothEase }}
+          transition={{ duration: 0.5 }}
         >
           <div>
-            <p
-              className="mb-1 text-xs tracking-wide uppercase"
-              style={{ color: 'rgba(255,255,255,0.3)' }}
-            >
+            <p className="mb-1 text-xs uppercase tracking-wide text-muted-foreground/60">
               {label}
             </p>
-            <h2 className="text-2xl font-bold" style={{ color: 'rgba(255,255,255,0.9)' }}>
-              {title}
-            </h2>
+            <h2 className="text-2xl font-bold text-foreground">{title}</h2>
           </div>
           {rightContent}
         </motion.div>
