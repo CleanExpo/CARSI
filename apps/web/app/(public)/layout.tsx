@@ -6,7 +6,7 @@ import { PublicFooter } from '@/components/landing/PublicFooter';
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-[#050505]">
+    <div className="min-h-screen bg-background">
       {/* Silent UTM attribution — no UI rendered */}
       <Suspense fallback={null}>
         <UtmCapture />
