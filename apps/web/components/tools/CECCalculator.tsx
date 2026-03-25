@@ -147,7 +147,7 @@ export function CECCalculator() {
           className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/15"
           aria-hidden="true"
         >
-          <Calculator className="h-5 w-5" className="text-primary" />
+          <Calculator className="h-5 w-5 text-primary" />
         </div>
         <div>
           <h2
@@ -248,8 +248,7 @@ export function CECCalculator() {
             <div className="space-y-3">
               <div className="flex items-start gap-2">
                 <Info
-                  className="mt-0.5 h-4 w-4 shrink-0"
-                  className="text-primary"
+                  className="mt-0.5 h-4 w-4 shrink-0 text-primary"
                   aria-hidden="true"
                 />
                 <p className="text-sm leading-relaxed">
@@ -275,14 +274,13 @@ export function CECCalculator() {
             /* Cycle complete */
             <div className="flex items-start gap-3">
               <div
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
-                className="bg-green-500/15"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-green-500/15"
                 aria-hidden="true"
               >
-                <Award className="h-5 w-5" className="text-green-500" />
+                <Award className="h-5 w-5 text-green-500" />
               </div>
               <div>
-                <p className="text-sm font-semibold" className="text-green-500">
+                <p className="text-sm font-semibold text-green-500">
                   Cycle Complete
                 </p>
                 <p className="mt-0.5 text-xs">
@@ -301,13 +299,12 @@ export function CECCalculator() {
                   <span className="text-xs font-medium">
                     {cecsEarned} of {result.required} CECs
                   </span>
-                  <span className="text-xs font-semibold" className="text-primary">
+                  <span className="text-xs font-semibold text-primary">
                     {result.progress}%
                   </span>
                 </div>
                 <div
-                  className="h-2 w-full overflow-hidden rounded-full"
-                  className="bg-secondary"
+                  className="h-2 w-full overflow-hidden rounded-full bg-secondary"
                   role="progressbar"
                   aria-valuenow={result.progress}
                   aria-valuemin={0}
@@ -327,10 +324,9 @@ export function CECCalculator() {
               {/* Stats row */}
               <div className="grid grid-cols-3 gap-3">
                 <div
-                  className="rounded-lg p-3 text-center"
-                  className="bg-primary/10"
+                  className="rounded-lg bg-primary/10 p-3 text-center"
                 >
-                  <p className="text-lg font-bold" className="text-primary">
+                  <p className="text-lg font-bold text-primary">
                     {result.remaining}
                   </p>
                   <p className="text-xs">
@@ -338,10 +334,9 @@ export function CECCalculator() {
                   </p>
                 </div>
                 <div
-                  className="rounded-lg p-3 text-center"
-                  className="bg-carsi-orange/10"
+                  className="rounded-lg bg-carsi-orange/10 p-3 text-center"
                 >
-                  <p className="text-lg font-bold" className="text-carsi-orange">
+                  <p className="text-lg font-bold text-carsi-orange">
                     {result.coursesNeeded}
                   </p>
                   <p className="text-xs">
@@ -349,8 +344,7 @@ export function CECCalculator() {
                   </p>
                 </div>
                 <div
-                  className="rounded-lg p-3 text-center"
-                  className="bg-secondary"
+                  className="rounded-lg bg-secondary p-3 text-center"
                 >
                   <div className="flex items-center justify-center gap-1">
                     <Clock
