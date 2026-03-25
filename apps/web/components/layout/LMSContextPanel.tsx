@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ChevronDown, ChevronRight } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 const disciplines = [
   { code: 'WRT', label: 'Water Restoration', color: '#2490ed' },
@@ -18,12 +19,7 @@ const disciplines = [
 const industries = [
   { slug: 'mining', label: 'Mining', icon: '\u26CF\uFE0F', color: '#f59e0b' },
   { slug: 'aged-care', label: 'Aged Care', icon: '\uD83C\uDFE5', color: '#10b981' },
-  {
-    slug: 'commercial-cleaning',
-    label: 'Commercial Cleaning',
-    icon: '\uD83E\uDDF9',
-    color: '#17b8d4',
-  },
+  { slug: 'commercial-cleaning', label: 'Commercial Cleaning', icon: '\uD83E\uDDF9', color: '#17b8d4' },
 ];
 
 function NavLink({
@@ -41,20 +37,12 @@ function NavLink({
   return (
     <Link
       href={href}
-      className="flex items-center rounded-lg px-3 py-2 text-sm transition-all duration-200"
-      style={
+      className={cn(
+        'flex items-center rounded-lg border px-3 py-2 text-sm transition-colors',
         isActive
-          ? {
-              background: 'rgba(36, 144, 237, 0.15)',
-              color: '#2490ed',
-              border: '1px solid rgba(36, 144, 237, 0.25)',
-              boxShadow: '0 0 12px rgba(36, 144, 237, 0.1)',
-            }
-          : {
-              color: 'rgba(255, 255, 255, 0.55)',
-              border: '1px solid transparent',
-            }
-      }
+          ? 'border-primary/25 bg-primary/10 text-primary'
+          : 'border-transparent text-muted-foreground hover:bg-sidebar-accent hover:text-foreground'
+      )}
     >
       {children}
     </Link>
@@ -76,8 +64,7 @@ function CollapsibleSection({
     <div className="mb-1">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="flex w-full items-center justify-between px-3 py-2 text-xs font-semibold tracking-widest uppercase transition-colors duration-150"
-        style={{ color: 'rgba(255, 255, 255, 0.3)' }}
+        className="flex w-full items-center justify-between px-3 py-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground/50 transition-colors hover:text-muted-foreground"
       >
         <span>{title}</span>
         {open ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
@@ -89,30 +76,16 @@ function CollapsibleSection({
 
 export function LMSContextPanel() {
   return (
-    <aside
-      className="scrollbar-glass relative z-10 flex min-h-screen w-[220px] flex-shrink-0 flex-col overflow-y-auto"
-      style={{
-        background: 'rgba(8, 12, 24, 0.75)',
-        backdropFilter: 'blur(24px) saturate(180%)',
-        WebkitBackdropFilter: 'blur(24px) saturate(180%)',
-        borderRight: '1px solid rgba(255, 255, 255, 0.06)',
-      }}
-    >
+    <aside className="scrollbar-thin relative z-10 flex min-h-screen w-[220px] flex-shrink-0 flex-col overflow-y-auto border-r border-border bg-sidebar">
       {/* Header */}
-      <div className="px-4 py-4" style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.05)' }}>
-        <p
-          className="text-[10px] font-semibold tracking-[0.2em] uppercase"
-          style={{ color: 'rgba(255, 255, 255, 0.3)' }}
-        >
+      <div className="border-b border-border px-4 py-4">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground/50">
           CARSI Learning
         </p>
       </div>
 
       {/* Main nav */}
-      <div
-        className="space-y-0.5 px-2 py-3"
-        style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.05)' }}
-      >
+      <div className="space-y-0.5 border-b border-border px-2 py-3">
         <NavLink href="/student">My Learning</NavLink>
         <NavLink href="/student/credentials">Certificates</NavLink>
         <NavLink href="/courses">All Courses</NavLink>
@@ -120,18 +93,17 @@ export function LMSContextPanel() {
       </div>
 
       {/* IICRC Disciplines */}
-      <div className="px-2 py-3" style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.05)' }}>
+      <div className="border-b border-border px-2 py-3">
         <CollapsibleSection title="IICRC Disciplines">
           {disciplines.map((d) => (
             <Link
               key={d.code}
               href={`/courses?discipline=${d.code}`}
-              className="flex items-center gap-2.5 rounded-lg px-3 py-2 transition-all duration-200"
-              style={{ border: '1px solid transparent', color: 'rgba(255, 255, 255, 0.5)' }}
+              className="flex items-center gap-2.5 rounded-lg border border-transparent px-3 py-2 text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-foreground"
             >
               <span
                 className="h-1.5 w-1.5 flex-shrink-0 rounded-full"
-                style={{ backgroundColor: d.color, boxShadow: `0 0 6px ${d.color}` }}
+                style={{ backgroundColor: d.color }}
               />
               <span
                 className="flex-shrink-0 font-mono text-[11px] font-bold"
@@ -146,7 +118,7 @@ export function LMSContextPanel() {
       </div>
 
       {/* Industries */}
-      <div className="px-2 py-3" style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.05)' }}>
+      <div className="border-b border-border px-2 py-3">
         <CollapsibleSection title="Industries" defaultOpen={false}>
           {industries.map((ind) => (
             <NavLink
@@ -156,7 +128,7 @@ export function LMSContextPanel() {
             >
               <span
                 className="mr-2.5 h-1.5 w-1.5 flex-shrink-0 rounded-full"
-                style={{ backgroundColor: ind.color, boxShadow: `0 0 6px ${ind.color}` }}
+                style={{ backgroundColor: ind.color }}
               />
               <span className="mr-2 text-sm">{ind.icon}</span>
               <span className="truncate text-xs leading-tight">{ind.label}</span>
