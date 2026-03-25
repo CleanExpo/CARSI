@@ -39,33 +39,18 @@ export function ContactForm() {
   }
 
   const fieldClass =
-    'w-full rounded-sm px-3 py-2.5 text-sm outline-none transition-colors placeholder:text-white/20 focus:border-[#2490ed]/60';
-  const fieldStyle = {
-    background: 'rgba(255,255,255,0.04)',
-    border: '1px solid rgba(255,255,255,0.1)',
-    color: 'rgba(255,255,255,0.85)',
-  };
-  const labelStyle = { color: 'rgba(255,255,255,0.5)' };
+    'w-full rounded-md border border-input bg-secondary px-3 py-2.5 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/40 focus:border-primary/60 focus:ring-1 focus:ring-primary/30';
 
   if (status === 'success') {
     return (
-      <div
-        className="flex min-h-[320px] flex-col items-center justify-center rounded-lg p-10 text-center"
-        style={{
-          background: 'rgba(36,144,237,0.05)',
-          border: '1px solid rgba(36,144,237,0.2)',
-        }}
-      >
-        <p className="mb-2 text-2xl font-bold" style={{ color: 'rgba(255,255,255,0.9)' }}>
-          Message sent ✓
-        </p>
-        <p className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
+      <div className="flex min-h-[320px] flex-col items-center justify-center rounded-lg border border-primary/20 bg-primary/5 p-10 text-center">
+        <p className="mb-2 text-2xl font-bold text-foreground">Message sent ✓</p>
+        <p className="text-sm text-muted-foreground">
           Thanks for reaching out. We&apos;ll be in touch within 1–2 business days.
         </p>
         <button
           onClick={() => setStatus('idle')}
-          className="mt-6 rounded-sm px-4 py-2 text-xs font-medium transition-colors"
-          style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.6)' }}
+          className="mt-6 rounded-md bg-secondary px-4 py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-secondary/80"
         >
           Send another message
         </button>
@@ -77,7 +62,7 @@ export function ContactForm() {
     <form onSubmit={handleSubmit} className="space-y-5">
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1.5">
-          <label htmlFor="firstName" className="block text-xs font-medium" style={labelStyle}>
+          <label htmlFor="firstName" className="block text-xs font-medium text-muted-foreground">
             First Name
           </label>
           <input
@@ -89,11 +74,10 @@ export function ContactForm() {
             onChange={handleChange}
             placeholder="Jane"
             className={fieldClass}
-            style={fieldStyle}
           />
         </div>
         <div className="space-y-1.5">
-          <label htmlFor="lastName" className="block text-xs font-medium" style={labelStyle}>
+          <label htmlFor="lastName" className="block text-xs font-medium text-muted-foreground">
             Last Name
           </label>
           <input
@@ -105,13 +89,12 @@ export function ContactForm() {
             onChange={handleChange}
             placeholder="Smith"
             className={fieldClass}
-            style={fieldStyle}
           />
         </div>
       </div>
 
       <div className="space-y-1.5">
-        <label htmlFor="email" className="block text-xs font-medium" style={labelStyle}>
+        <label htmlFor="email" className="block text-xs font-medium text-muted-foreground">
           Email Address
         </label>
         <input
@@ -123,12 +106,11 @@ export function ContactForm() {
           onChange={handleChange}
           placeholder="jane@example.com.au"
           className={fieldClass}
-          style={fieldStyle}
         />
       </div>
 
       <div className="space-y-1.5">
-        <label htmlFor="message" className="block text-xs font-medium" style={labelStyle}>
+        <label htmlFor="message" className="block text-xs font-medium text-muted-foreground">
           Message
         </label>
         <textarea
@@ -140,12 +122,12 @@ export function ContactForm() {
           onChange={handleChange}
           placeholder="Tell us how we can help — course questions, membership enquiries, or anything else..."
           className={fieldClass}
-          style={{ ...fieldStyle, resize: 'vertical' }}
+          style={{ resize: 'vertical' }}
         />
       </div>
 
       {status === 'error' && (
-        <p className="text-xs" style={{ color: '#ff6b6b' }}>
+        <p className="text-xs text-destructive">
           Something went wrong. Please try again or email us directly at support@carsi.com.au
         </p>
       )}
@@ -153,8 +135,7 @@ export function ContactForm() {
       <button
         type="submit"
         disabled={status === 'sending'}
-        className="rounded-sm px-6 py-3 text-sm font-semibold transition-opacity disabled:opacity-60"
-        style={{ background: '#2490ed', color: '#fff' }}
+        className="rounded-md bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60"
       >
         {status === 'sending' ? 'Sending…' : 'Send Message'}
       </button>
