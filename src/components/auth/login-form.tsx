@@ -61,7 +61,8 @@ export function LoginForm() {
       }
 
       // Server-side login succeeded, cookies are set — redirect to next or student dashboard
-      const next = searchParams.get('next') ?? '/student';
+      const next =
+        searchParams.get('next') ?? searchParams.get('redirect') ?? '/student';
       window.location.href = next;
     } catch (_err) {
       setError('Failed to connect to server');

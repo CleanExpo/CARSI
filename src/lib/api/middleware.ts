@@ -62,7 +62,7 @@ export async function updateSession(request: NextRequest) {
     url.pathname = '/login';
     const redirectPath = request.nextUrl.pathname;
     if (redirectPath.startsWith('/') && !redirectPath.startsWith('//')) {
-      url.searchParams.set('redirect', redirectPath);
+      url.searchParams.set('next', redirectPath);
     }
     return NextResponse.redirect(url);
   }
@@ -72,10 +72,12 @@ export async function updateSession(request: NextRequest) {
 
   if (isAuthPath && user) {
     const url = request.nextUrl.clone();
-    const redirect = request.nextUrl.searchParams.get('redirect');
+    const next =
+      request.nextUrl.searchParams.get('next') ?? request.nextUrl.searchParams.get('redirect');
     const safePath =
-      redirect && redirect.startsWith('/') && !redirect.startsWith('//') ? redirect : '/dashboard';
+      next && next.startsWith('/') && !next.startsWith('//') ? next : '/dashboard';
     url.pathname = safePath;
+    url.searchParams.delete('next');
     url.searchParams.delete('redirect');
     return NextResponse.redirect(url);
   }

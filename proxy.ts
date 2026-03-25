@@ -3,19 +3,27 @@ import { updateSession } from '@/lib/api/middleware';
 
 /**
  * CARSI LMS protected route prefixes.
- * Users without a valid carsi_token cookie are redirected to /login.
+ * Users without a session cookie (carsi_token or auth_token) are redirected to /login.
+ * Public marketing, course catalog, and /subscribe stay open; checkout flows send users to login in-app.
  */
 const PROTECTED_PREFIXES = [
   '/student',
   '/instructor',
   '/admin',
-  '/subscribe',
+  // '/subscribe' is public — login only when user starts Stripe checkout (see subscribe page)
   // '/courses' intentionally NOT protected — catalog must be public for SEO
   // Individual lesson/quiz pages check enrolment via API calls
   '/dashboard', // hide starter template from unauthenticated users
   '/tasks',
   '/agents',
 ];
+
+/** Either cookie counts — same JWT on login; avoids loops if one cookie is missing client-side */
+function hasSessionCookie(request: NextRequest): boolean {
+  return Boolean(
+    request.cookies.get('carsi_token')?.value || request.cookies.get('auth_token')?.value
+  );
+}
 
 function isProtected(pathname: string): boolean {
   return PROTECTED_PREFIXES.some(
@@ -28,8 +36,7 @@ export async function proxy(request: NextRequest) {
 
   // 1. CARSI LMS auth — redirect unauthenticated users to login
   if (isProtected(pathname)) {
-    const token = request.cookies.get('carsi_token');
-    if (!token?.value) {
+    if (!hasSessionCookie(request)) {
       const loginUrl = new URL('/login', request.url);
       loginUrl.searchParams.set('next', pathname);
       return NextResponse.redirect(loginUrl);
