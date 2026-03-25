@@ -1,0 +1,235 @@
+@import "tailwindcss";
+
+/* ============================================
+   CARSI LMS — Clean Dark Theme
+   Modern shadcn/ui + Tailwind CSS
+   ============================================ */
+
+@layer base {
+  :root {
+    /* ── CARSI Brand ─────────────────────────── */
+    --carsi-blue: 211 85% 54%;       /* #2490ed */
+    --carsi-orange: 36 87% 54%;      /* #ed9d24 */
+
+    /* ── Shadcn Tokens (dark theme) ──────────── */
+    --background: 0 0% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 5.5%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 5.5%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 211 85% 54%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 14.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 14.9%;
+    --muted-foreground: 0 0% 63.9%;
+    --accent: 36 87% 54%;
+    --accent-foreground: 0 0% 3.9%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 14.9%;
+    --input: 0 0% 14.9%;
+    --ring: 211 85% 54%;
+    --sidebar-background: 0 0% 5.5%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-primary: 211 85% 54%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 14.9%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 0 0% 14.9%;
+    --sidebar-ring: 211 85% 54%;
+
+    /* ── Radius (shadcn default) ──────────────── */
+    --radius: 0.625rem;
+
+    /* ── Semantic ─────────────────────────────── */
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 0%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 0%;
+    --error: 0 72% 51%;
+    --error-foreground: 0 0% 100%;
+    --info: 199 89% 48%;
+    --info-foreground: 0 0% 0%;
+
+    /* ── Charts ────────────────────────────────── */
+    --chart-1: 211 85% 54%;
+    --chart-2: 36 87% 54%;
+    --chart-3: 172 66% 50%;
+    --chart-4: 270 95% 75%;
+    --chart-5: 142 71% 45%;
+  }
+}
+
+/* ============================================
+   TAILWIND V4 THEME EXTENSION
+   ============================================ */
+
+@theme inline {
+  --color-carsi-blue: hsl(211 85% 54%);
+  --color-carsi-orange: hsl(36 87% 54%);
+  --color-success: hsl(var(--success));
+  --color-warning: hsl(var(--warning));
+  --color-error: hsl(var(--error));
+  --color-info: hsl(var(--info));
+
+  /* Animations */
+  --animate-fade-in: fade-in 200ms ease-out;
+  --animate-slide-up: slide-up 200ms ease-out;
+  --animate-slide-down: slide-down 200ms ease-out;
+  --animate-scale-in: scale-in 150ms ease-out;
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+}
+
+/* ============================================
+   KEYFRAMES
+   ============================================ */
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-down {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes accordion-down {
+  from { height: 0; }
+  to { height: var(--radix-accordion-content-height); }
+}
+
+@keyframes accordion-up {
+  from { height: var(--radix-accordion-content-height); }
+  to { height: 0; }
+}
+
+@keyframes shimmer {
+  from { background-position: -200% 0; }
+  to { background-position: 200% 0; }
+}
+
+/* ============================================
+   BASE STYLES
+   ============================================ */
+
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+
+  html {
+    scroll-behavior: smooth;
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  :focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px hsl(var(--ring));
+  }
+
+  ::selection {
+    background-color: hsl(var(--primary) / 0.2);
+    color: hsl(var(--foreground));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+@layer utilities {
+  /* ── Text gradients (brand) ────────────────── */
+  .text-gradient {
+    background: linear-gradient(135deg, #2490ed 0%, #38b8ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .text-gradient-warm {
+    background: linear-gradient(135deg, #ed9d24 0%, #f5c060 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* ── Brand gradients ───────────────────────── */
+  .bg-gradient-brand {
+    background: linear-gradient(135deg, #2490ed 0%, #1a7fd4 100%);
+  }
+
+  .bg-gradient-warm {
+    background: linear-gradient(135deg, #ed9d24 0%, #d4891e 100%);
+  }
+
+  /* ── Shimmer loading ───────────────────────── */
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      hsl(var(--muted)) 0%,
+      hsl(var(--muted) / 0.5) 50%,
+      hsl(var(--muted)) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2s linear infinite;
+  }
+
+  /* ── Scrollbar ─────────────────────────────── */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 4px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: hsl(var(--border));
+    border-radius: 2px;
+  }
+
+  /* ── Discipline colour coding ──────────────── */
+  .discipline-WRT   { --disc-color: #2490ed; }
+  .discipline-CRT   { --disc-color: #26c4a0; }
+  .discipline-ASD   { --disc-color: #6c63ff; }
+  .discipline-OCT   { --disc-color: #9b59b6; }
+  .discipline-CCT   { --disc-color: #17b8d4; }
+  .discipline-FSRT  { --disc-color: #f05a35; }
+  .discipline-AMRT  { --disc-color: #27ae60; }
+}

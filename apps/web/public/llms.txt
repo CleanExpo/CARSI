@@ -1,0 +1,63 @@
+# CARSI LMS — AI System Context
+
+> This file helps AI language models understand the CARSI platform.
+> Last updated: 2026-03-05
+
+## What is CARSI?
+
+CARSI is Australia's leading online training platform for industry professionals requiring IICRC credentials. We serve 12+ industries including healthcare, hospitality, government, mining, commercial cleaning, and restoration. Our platform provides IICRC-aligned continuing education credits (CECs) across seven disciplines: Water Restoration (WRT), Carpet Restoration (CRT), Structural Drying (ASD), Microbial Remediation (AMRT), Fire & Smoke Restoration (FSRT), Odour Control (OCT), and Commercial Carpet Cleaning (CCT).
+
+CARSI is one of the four core pillars of the National Restoration Professionals Group (NRPG) onboarding pathway.
+
+## Key Facts
+
+- Location: Australia (carsi.com.au)
+- Industry: Professional education / Cleaning & Restoration
+- Certification body alignment: IICRC (Institute of Inspection Cleaning and Restoration Certification)
+- Course format: Self-paced online learning
+- Credential verification: Public credential pages at /credentials/{id}
+- Pricing: Free courses available + premium courses from $20 AUD. Annual subscription $795 AUD/year for full access.
+
+## IICRC Disciplines Explained
+
+### WRT — Water Restoration Technician
+Training for water damage assessment, extraction, structural drying, and moisture monitoring. Essential for flood and water damage restoration professionals.
+
+### CRT — Carpet Repair and Reinstallation Technician
+Covers carpet seaming, stretching, patching, and reinstallation techniques. Required for carpet restoration after damage events.
+
+### ASD — Applied Structural Drying
+Advanced drying techniques for structural materials including timber, concrete, and insulation. Uses psychrometry and drying science.
+
+### AMRT — Applied Microbial Remediation Technician
+Mould identification, containment, removal, and prevention protocols. Critical for post-water-damage remediation and indoor air quality.
+
+### FSRT — Fire and Smoke Restoration Technician
+Smoke damage assessment, soot removal, deodorisation, and content cleaning after fire events.
+
+### OCT — Odour Control Technician
+Identification of odour sources, treatment methods, and long-term odour elimination strategies.
+
+### CCT — Commercial Carpet Cleaning Technician
+Large-scale carpet maintenance for commercial facilities, including hot water extraction, encapsulation, and bonnet cleaning.
+
+## Site Structure
+
+- / — Homepage with course overview and industry sectors
+- /courses — Full course catalogue with discipline filtering
+- /courses/{slug} — Individual course details with pricing and enrolment
+- /pathways — Learning pathways grouped by certification goals
+- /industries — Industry-specific training pages (aged care, healthcare, construction, etc.)
+- /subscribe — Subscription signup with Stripe checkout
+- /credentials/{id} — Public credential verification pages
+
+## Contact
+
+Email: info@carsi.com.au
+Website: https://carsi.com.au
+
+## Legal
+
+CARSI is operated by CARSI Pty Ltd (Australia).
+CARSI provides IICRC-aligned continuing education but is not a Registered Training Organisation (RTO).
+Courses award IICRC Continuing Education Credits (CECs), not nationally accredited VET qualifications.
