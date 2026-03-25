@@ -61,6 +61,26 @@ const nextConfig: NextConfig = {
     ],
   },
   async headers() {
+    const isDev = process.env.NODE_ENV === 'development';
+    // Next.js dev / webpack HMR / React Refresh use eval(); strict script-src breaks the app.
+    const scriptSrc = isDev
+      ? "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://js.stripe.com"
+      : "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://js.stripe.com";
+
+    const appOrigin = (
+      process.env.NEXT_PUBLIC_BACKEND_URL ||
+      process.env.NEXT_PUBLIC_APP_URL ||
+      'http://localhost:3000'
+    ).trim();
+    const connectParts = [
+      "'self'",
+      appOrigin,
+      'https://api.stripe.com',
+      ...(isDev
+        ? ['ws:', 'wss:', 'http://localhost:3000', 'http://localhost:3001', 'http://127.0.0.1:3000', 'http://127.0.0.1:3001']
+        : []),
+    ];
+
     return [
       {
         source: '/api/:path*',
@@ -85,11 +105,11 @@ const nextConfig: NextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://js.stripe.com",
+              scriptSrc,
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
               "img-src 'self' data: https: blob:",
-              `connect-src 'self' ${(process.env.NEXT_PUBLIC_BACKEND_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000').trim()} https://api.stripe.com`,
+              `connect-src ${connectParts.join(' ')}`,
               'frame-src https://js.stripe.com https://hooks.stripe.com',
               "frame-ancestors 'none'",
             ].join('; '),
