@@ -260,8 +260,7 @@ export default function StudentDashboardPage() {
           {sub?.has_subscription && ['active', 'trialling'].includes(sub.status ?? '') && (
             <Link
               href="/courses"
-              className="text-xs font-medium transition-colors hover:text-white"
-              style={{ color: '#2490ed' }}
+              className="text-xs font-medium text-primary transition-colors hover:text-white"
             >
               Browse all courses →
             </Link>
@@ -273,11 +272,7 @@ export default function StudentDashboardPage() {
           <p className="text-sm text-white/30">Loading courses…</p>
         ) : enrollments.length === 0 && sub?.has_subscription ? (
           <div
-            className="rounded-sm p-6 text-center"
-            style={{
-              background: 'rgba(36,144,237,0.05)',
-              border: '1px solid rgba(36,144,237,0.15)',
-            }}
+            className="rounded-lg border border-primary/15 bg-primary/5 p-6 text-center"
           >
             <p className="mb-1 text-sm font-medium text-white/80">
               Your Pro subscription is active.
@@ -287,8 +282,7 @@ export default function StudentDashboardPage() {
             </p>
             <Link
               href="/courses"
-              className="inline-flex items-center rounded-sm px-4 py-2 text-sm font-medium text-white transition-all hover:scale-[1.02]"
-              style={{ background: '#2490ed' }}
+              className="inline-flex items-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-all hover:scale-[1.02]"
             >
               Browse all courses
             </Link>

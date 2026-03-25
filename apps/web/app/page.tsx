@@ -129,11 +129,7 @@ function CourseCard({ course }: { course: Course }) {
   return (
     <Link
       href={`/courses/${course.slug}`}
-      className="group block overflow-hidden rounded-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-blue-500/5"
-      style={{
-        background: 'rgba(255,255,255,0.03)',
-        border: '1px solid rgba(255,255,255,0.08)',
-      }}
+      className="group block overflow-hidden rounded-lg border border-border bg-card transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-blue-500/5"
     >
       <div className="relative h-40 overflow-hidden bg-gradient-to-br from-slate-800 to-slate-900">
         {course.thumbnail_url && (
@@ -160,8 +156,7 @@ function CourseCard({ course }: { course: Course }) {
       </div>
       <div className="p-4">
         <h3
-          className="mb-2 line-clamp-2 text-sm leading-snug font-semibold"
-          style={{ color: 'rgba(255,255,255,0.9)' }}
+          className="mb-2 line-clamp-2 text-sm leading-snug font-semibold text-foreground"
         >
           {course.title}
         </h3>
@@ -171,7 +166,7 @@ function CourseCard({ course }: { course: Course }) {
           </span>
           <span
             className="text-xs opacity-0 transition-opacity duration-200 group-hover:opacity-100"
-            style={{ color: '#2490ed' }}
+            style={{ color: 'hsl(var(--primary))' }}
           >
             View course →
           </span>
@@ -184,8 +179,7 @@ function CourseCard({ course }: { course: Course }) {
 function SkeletonCard() {
   return (
     <div
-      className="overflow-hidden rounded-sm"
-      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
+      className="overflow-hidden rounded-lg border border-border bg-card"
     >
       <div className="h-40 animate-pulse bg-slate-800/50" />
       <div className="space-y-2 p-4">
@@ -204,7 +198,7 @@ export default async function Home() {
   const featuredCourses = await getFeaturedCourses();
 
   return (
-    <div id="main-content" className="min-h-screen bg-[#050505]">
+    <div id="main-content" className="min-h-screen bg-background">
       {/* FAQ structured data for GEO/AI search engines */}
       <FAQSchema questions={faqs} />
 
@@ -223,21 +217,20 @@ export default async function Home() {
         aria-label="Main navigation"
         className="sticky top-0 z-50"
         style={{
-          background: 'rgba(5,5,5,0.85)',
+          background: 'hsl(var(--background) / 0.85)',
           backdropFilter: 'blur(12px)',
-          borderBottom: '1px solid rgba(255,255,255,0.06)',
+          borderBottom: '1px solid hsl(var(--border))',
         }}
       >
         <div className="mx-auto max-w-6xl px-6">
           <div className="flex h-16 items-center justify-between">
             <Link href="/" className="flex items-center gap-2">
               <div
-                className="flex h-8 w-8 items-center justify-center rounded-sm font-bold text-white"
-                style={{ background: '#2490ed' }}
+                className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary font-bold text-primary-foreground"
               >
                 C
               </div>
-              <span className="font-semibold" style={{ color: 'rgba(255,255,255,0.9)' }}>
+              <span className="font-semibold text-foreground">
                 CARSI
               </span>
             </Link>
@@ -247,8 +240,7 @@ export default async function Home() {
                 <Link
                   key={item}
                   href={`/${item.toLowerCase()}`}
-                  className="text-sm transition-colors duration-150 hover:text-white"
-                  style={{ color: 'rgba(255,255,255,0.5)' }}
+                  className="text-sm text-muted-foreground transition-colors duration-150 hover:text-white"
                 >
                   {item}
                 </Link>
@@ -258,15 +250,13 @@ export default async function Home() {
             <div className="hidden items-center gap-4 md:flex">
               <Link
                 href="/login"
-                className="text-sm transition-colors duration-150 hover:text-white"
-                style={{ color: 'rgba(255,255,255,0.5)' }}
+                className="text-sm transition-colors duration-150 hover:text-white text-muted-foreground"
               >
                 Sign In
               </Link>
               <Link
                 href="/courses"
-                className="rounded-sm px-4 py-2 text-sm font-medium text-white transition-all duration-200 hover:scale-[1.02]"
-                style={{ background: '#ed9d24' }}
+                className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white transition-all duration-200 hover:scale-[1.02]"
               >
                 Browse Courses
               </Link>
@@ -285,11 +275,10 @@ export default async function Home() {
       <AnimatedStats stats={stats} />
 
       {/* ── Disciplines (compact pills) ────────────────────────────────────── */}
-      <section className="px-6 py-12" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+      <section className="border-t border-border px-6 py-12">
         <div className="mx-auto max-w-6xl">
           <p
-            className="mb-4 text-center text-xs tracking-wide uppercase"
-            style={{ color: 'rgba(255,255,255,0.3)' }}
+            className="mb-4 text-center text-xs tracking-wide uppercase text-muted-foreground"
           >
             <AcronymTooltip term="IICRC" /> Disciplines
           </p>
@@ -305,7 +294,7 @@ export default async function Home() {
                   color: 'rgba(255,255,255,0.6)',
                 }}
               >
-                <span className="font-mono font-bold" style={{ color: '#2490ed' }}>
+                <span className="font-mono font-bold" style={{ color: 'hsl(var(--primary))' }}>
                   {d.code}
                 </span>
                 <span className="ml-1.5 hidden sm:inline">{d.label}</span>
@@ -318,7 +307,7 @@ export default async function Home() {
       {/* ── IICRC Discipline Map ────────────────────────────────────────── */}
       <AnimatedSection label="Certifications" title="IICRC Discipline Map">
         <div className="mx-auto max-w-xl">
-          <p className="mb-6 text-center text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
+          <p className="mb-6 text-center text-sm text-muted-foreground">
             Explore the seven IICRC disciplines. Hover over each node to see the full certification
             name.
           </p>
@@ -334,7 +323,7 @@ export default async function Home() {
           <Link
             href="/courses"
             className="flex items-center gap-1 text-sm transition-colors duration-150 hover:text-white"
-            style={{ color: '#2490ed' }}
+            style={{ color: 'hsl(var(--primary))' }}
           >
             All courses <ArrowRight className="h-4 w-4" />
           </Link>
@@ -357,7 +346,7 @@ export default async function Home() {
 
       {/* ── Industries ─────────────────────────────────────────────────────── */}
       <AnimatedSection label="Multi-Industry Training" title="Built for every sector">
-        <p className="mb-6 max-w-2xl text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
+        <p className="mb-6 max-w-2xl text-sm text-muted-foreground">
           From hospitals to hotels, government facilities to commercial buildings — CARSI provides
           industry-specific training pathways. Not just restoration. Every industry that needs{' '}
           <AcronymTooltip term="IICRC" /> credentials.
@@ -385,7 +374,7 @@ export default async function Home() {
                 </span>
                 <ArrowRight
                   className="h-3 w-3 opacity-0 transition-all duration-200 group-hover:translate-x-0.5 group-hover:opacity-100"
-                  style={{ color: '#2490ed' }}
+                  style={{ color: 'hsl(var(--primary))' }}
                 />
               </Link>
             </AnimatedCard>
@@ -394,8 +383,7 @@ export default async function Home() {
         <div className="mt-6 text-center">
           <Link
             href="/industries"
-            className="text-sm font-medium transition-colors hover:text-white"
-            style={{ color: 'rgba(255,255,255,0.5)' }}
+            className="text-sm font-medium transition-colors hover:text-white text-muted-foreground"
           >
             View all industries →
           </Link>
@@ -424,20 +412,16 @@ export default async function Home() {
           ].map((item, i) => (
             <AnimatedCard key={item.title} index={i}>
               <div
-                className="rounded-sm p-6"
-                style={{
-                  background: 'rgba(255,255,255,0.03)',
-                  border: '1px solid rgba(255,255,255,0.06)',
-                }}
+                className="rounded-lg border border-border bg-card p-6"
               >
                 <div className="mb-3 h-1 w-8 rounded-full" style={{ background: item.color }} />
                 <h3
                   className="mb-2 text-base font-semibold"
-                  style={{ color: 'rgba(255,255,255,0.9)' }}
+                  style={{ color: 'hsl(var(--foreground))' }}
                 >
                   {item.title}
                 </h3>
-                <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                <p className="text-sm leading-relaxed text-muted-foreground">
                   {item.desc}
                 </p>
               </div>
@@ -449,7 +433,7 @@ export default async function Home() {
       {/* ── How It Works (Student Journey Map) ──────────────────────────── */}
       <AnimatedSection label="How It Works" title="Your Learning Journey">
         <div className="mx-auto max-w-3xl">
-          <p className="mb-6 text-center text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
+          <p className="mb-6 text-center text-sm text-muted-foreground">
             From enrolment to credential — six steps to IICRC-recognised professional development.
           </p>
           <StudentJourneyMap />
@@ -461,14 +445,14 @@ export default async function Home() {
         <div className="mx-auto max-w-3xl">
           <p
             className="text-sm leading-relaxed sm:text-base sm:leading-relaxed"
-            style={{ color: 'rgba(255,255,255,0.65)' }}
+            style={{ color: 'hsl(var(--muted-foreground))' }}
           >
             The Institute of Inspection Cleaning and Restoration Certification (
             <AcronymTooltip term="IICRC" />) is the global standard-setting body for the cleaning
             and restoration industry. Established in 1972 in the United States, the{' '}
             <AcronymTooltip term="IICRC" /> now operates across 25 countries and has certified over
             67,000 technicians worldwide{' '}
-            <span className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
+            <span className="text-xs" style={{ color: 'hsl(var(--muted-foreground))' }}>
               (source:{' '}
               <a
                 href="https://www.iicrc.org/page/About-the-IICRC"
@@ -493,7 +477,7 @@ export default async function Home() {
             Technicians must earn Continuing Education Credits (
             <AcronymTooltip term="CEC">CECs</AcronymTooltip>) every two years to maintain their
             certified status{' '}
-            <span className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
+            <span className="text-xs" style={{ color: 'hsl(var(--muted-foreground))' }}>
               (source:{' '}
               <a
                 href="https://www.iicrc.org/page/IICRCGlobalLocations"
@@ -509,7 +493,7 @@ export default async function Home() {
             -approved online courses across all seven disciplines, allowing Australian professionals
             to meet their renewal requirements without travelling interstate.
           </p>
-          <p className="mt-4 text-xs italic" style={{ color: 'rgba(255,255,255,0.3)' }}>
+          <p className="mt-4 text-xs italic text-muted-foreground">
             Last reviewed: March 2026
           </p>
         </div>
@@ -519,7 +503,7 @@ export default async function Home() {
         <div className="mx-auto max-w-3xl">
           <p
             className="text-sm leading-relaxed sm:text-base sm:leading-relaxed"
-            style={{ color: 'rgba(255,255,255,0.65)' }}
+            style={{ color: 'hsl(var(--muted-foreground))' }}
           >
             Traditional face-to-face restoration training in Australia requires travel,
             accommodation, and time away from active job sites. For technicians in regional areas —
@@ -535,7 +519,7 @@ export default async function Home() {
             cost-effective path to <AcronymTooltip term="IICRC" /> certification maintenance in
             Australia.
           </p>
-          <p className="mt-4 text-xs italic" style={{ color: 'rgba(255,255,255,0.3)' }}>
+          <p className="mt-4 text-xs italic text-muted-foreground">
             Last reviewed: March 2026
           </p>
         </div>
@@ -545,13 +529,13 @@ export default async function Home() {
         <div className="mx-auto max-w-3xl">
           <p
             className="text-sm leading-relaxed sm:text-base sm:leading-relaxed"
-            style={{ color: 'rgba(255,255,255,0.65)' }}
+            style={{ color: 'hsl(var(--muted-foreground))' }}
           >
             CARSI is one of the four core pillars of the National Restoration Professionals Group
             (NRPG) onboarding pathway. The NRPG is Australia&apos;s peak body for the restoration
             and remediation industry, setting workforce standards that insurers, loss adjusters, and
             building managers rely on when selecting qualified contractors{' '}
-            <span className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
+            <span className="text-xs" style={{ color: 'hsl(var(--muted-foreground))' }}>
               (source:{' '}
               <a
                 href="https://www.nrpg.com.au"
@@ -574,14 +558,14 @@ export default async function Home() {
             seven <AcronymTooltip term="IICRC" /> disciplines, CARSI provides the most comprehensive
             online training library available to Australian restoration professionals.
           </p>
-          <p className="mt-4 text-xs italic" style={{ color: 'rgba(255,255,255,0.3)' }}>
+          <p className="mt-4 text-xs italic text-muted-foreground">
             Last reviewed: March 2026
           </p>
         </div>
       </AnimatedSection>
 
       {/* ── NRPG Partnership ─────────────────────────────────────────────────── */}
-      <section className="px-6 py-16" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+      <section className="border-t border-border px-6 py-16">
         <div className="mx-auto max-w-6xl">
           <div
             className="rounded-sm p-8 sm:p-10"
@@ -595,14 +579,14 @@ export default async function Home() {
               <div>
                 <p
                   className="mb-2 text-xs tracking-wide uppercase"
-                  style={{ color: 'rgba(255,255,255,0.4)' }}
+                  style={{ color: 'hsl(var(--muted-foreground))' }}
                 >
                   National Partnership
                 </p>
-                <h3 className="mb-2 text-xl font-bold" style={{ color: 'rgba(255,255,255,0.95)' }}>
+                <h3 className="mb-2 text-xl font-bold" style={{ color: 'hsl(var(--foreground))' }}>
                   NRPG Onboarding Partner
                 </h3>
-                <p className="max-w-md text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                <p className="max-w-md text-sm text-muted-foreground">
                   CARSI is one of the four core pillars of the National Restoration Professionals
                   Group onboarding pathway. Industry-recognised training that meets NRPG standards.
                 </p>
@@ -621,7 +605,7 @@ export default async function Home() {
                 <Link
                   href="/pathways"
                   className="text-sm font-medium transition-colors hover:text-white"
-                  style={{ color: '#2490ed' }}
+                  style={{ color: 'hsl(var(--primary))' }}
                 >
                   View Pathways →
                 </Link>
@@ -637,27 +621,23 @@ export default async function Home() {
           {faqs.map((faq, i) => (
             <AnimatedCard key={faq.question} index={i}>
               <details
-                className="group rounded-sm"
-                style={{
-                  background: 'rgba(255,255,255,0.03)',
-                  border: '1px solid rgba(255,255,255,0.06)',
-                }}
+                className="group rounded-lg border border-border bg-card"
               >
                 <summary
                   className="flex cursor-pointer items-center justify-between px-5 py-4 text-sm font-medium select-none"
-                  style={{ color: 'rgba(255,255,255,0.85)' }}
+                  style={{ color: 'hsl(var(--foreground))' }}
                 >
                   {faq.question}
                   <span
                     className="ml-2 transition-transform duration-200 group-open:rotate-45"
-                    style={{ color: '#2490ed' }}
+                    style={{ color: 'hsl(var(--primary))' }}
                   >
                     +
                   </span>
                 </summary>
                 <div
                   className="px-5 pb-4 text-sm leading-relaxed"
-                  style={{ color: 'rgba(255,255,255,0.55)' }}
+                  style={{ color: 'hsl(var(--muted-foreground))' }}
                 >
                   {faq.answer}
                 </div>
@@ -670,7 +650,7 @@ export default async function Home() {
       {/* ── Certificate Preview ──────────────────────────────────────────── */}
       <AnimatedSection label="Credentials" title="Verifiable Digital Certificates">
         <div className="mx-auto max-w-xl">
-          <p className="mb-6 text-center text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
+          <p className="mb-6 text-center text-sm text-muted-foreground">
             Every completed course earns you a verifiable digital certificate with a public URL you
             can share with employers and clients.
           </p>
@@ -679,12 +659,12 @@ export default async function Home() {
       </AnimatedSection>
 
       {/* ── CTA ────────────────────────────────────────────────────────────── */}
-      <section className="px-6 py-20" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+      <section className="border-t border-border px-6 py-20">
         <div className="mx-auto max-w-2xl text-center">
-          <h2 className="mb-4 text-3xl font-bold" style={{ color: 'rgba(255,255,255,0.95)' }}>
+          <h2 className="mb-4 text-3xl font-bold" style={{ color: 'hsl(var(--foreground))' }}>
             Start learning today
           </h2>
-          <p className="mb-8 text-base" style={{ color: 'rgba(255,255,255,0.5)' }}>
+          <p className="mb-8 text-base text-muted-foreground">
             Free courses available. Premium courses from just $20 AUD.
             <br />
             Or get full access to all 91 courses for $795 AUD/year.
@@ -714,7 +694,7 @@ export default async function Home() {
       </section>
 
       {/* ── Footer ─────────────────────────────────────────────────────────── */}
-      <footer className="px-6 py-12" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+      <footer className="border-t border-border px-6 py-12">
         <div className="mx-auto max-w-6xl">
           <div className="mb-8 grid gap-8 sm:grid-cols-4">
             <div>
@@ -729,7 +709,7 @@ export default async function Home() {
                   CARSI
                 </span>
               </div>
-              <p className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.4)' }}>
+              <p className="text-xs leading-relaxed" style={{ color: 'hsl(var(--muted-foreground))' }}>
                 Australia&apos;s industry training leader.
                 <br />
                 24/7 online. <AcronymTooltip term="IICRC" />
@@ -739,12 +719,11 @@ export default async function Home() {
 
             <div>
               <p
-                className="mb-3 text-[10px] font-semibold tracking-wide uppercase"
-                style={{ color: 'rgba(255,255,255,0.3)' }}
+                className="mb-3 text-[10px] font-semibold tracking-wide uppercase text-muted-foreground"
               >
                 Platform
               </p>
-              <ul className="space-y-2 text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
+              <ul className="space-y-2 text-xs" style={{ color: 'hsl(var(--muted-foreground))' }}>
                 {[
                   { label: 'Courses', href: '/courses' },
                   { label: 'Pathways', href: '/pathways' },
@@ -765,12 +744,11 @@ export default async function Home() {
 
             <div>
               <p
-                className="mb-3 text-[10px] font-semibold tracking-wide uppercase"
-                style={{ color: 'rgba(255,255,255,0.3)' }}
+                className="mb-3 text-[10px] font-semibold tracking-wide uppercase text-muted-foreground"
               >
                 Industries
               </p>
-              <ul className="space-y-2 text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
+              <ul className="space-y-2 text-xs" style={{ color: 'hsl(var(--muted-foreground))' }}>
                 {industries.slice(0, 4).map((industry) => (
                   <li key={industry.slug}>
                     <Link href={`/industries/${industry.slug}`} className="hover:text-white">
@@ -783,12 +761,11 @@ export default async function Home() {
 
             <div>
               <p
-                className="mb-3 text-[10px] font-semibold tracking-wide uppercase"
-                style={{ color: 'rgba(255,255,255,0.3)' }}
+                className="mb-3 text-[10px] font-semibold tracking-wide uppercase text-muted-foreground"
               >
                 Contact
               </p>
-              <ul className="space-y-2 text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
+              <ul className="space-y-2 text-xs" style={{ color: 'hsl(var(--muted-foreground))' }}>
                 <li>PO Box 4309, Forest Lake QLD 4078</li>
                 <li>
                   <a href="mailto:support@carsi.com.au" className="hover:text-white">
@@ -820,7 +797,7 @@ export default async function Home() {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-[10px] transition-colors hover:text-white"
-                    style={{ color: 'rgba(255,255,255,0.35)' }}
+                    style={{ color: 'hsl(var(--muted-foreground))' }}
                     aria-label={social.label}
                   >
                     {social.label}
@@ -831,8 +808,7 @@ export default async function Home() {
           </div>
 
           <div
-            className="flex flex-col items-center justify-between gap-2 pt-6 sm:flex-row"
-            style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}
+            className="flex flex-col items-center justify-between gap-2 border-t border-border pt-6 sm:flex-row"
           >
             <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.25)' }}>
               © 2026 CARSI Pty Ltd. All rights reserved.

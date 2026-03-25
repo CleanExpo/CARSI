@@ -199,34 +199,19 @@ const industries = [
 
 export default function IndustriesPage() {
   return (
-    <main className="min-h-screen" style={{ background: '#060a14' }}>
+    <main className="min-h-screen bg-background">
       <OrganizationSchema />
-
-      {/* Mesh background */}
-      <div className="mesh-bg" aria-hidden="true">
-        <div className="mesh-blob mesh-blob-1" />
-        <div className="mesh-blob mesh-blob-2" />
-      </div>
 
       <div className="relative z-10">
         {/* Hero */}
         <section className="mx-auto max-w-6xl px-6 pt-20 pb-12">
-          <p
-            className="mb-2 text-xs tracking-wide uppercase"
-            style={{ color: 'rgba(255,255,255,0.3)' }}
-          >
+          <p className="mb-2 text-xs tracking-wide uppercase text-muted-foreground">
             Industry Solutions
           </p>
-          <h1
-            className="mb-4 text-4xl font-bold tracking-tight"
-            style={{ color: 'rgba(255,255,255,0.95)' }}
-          >
+          <h1 className="mb-4 text-4xl font-bold tracking-tight text-foreground">
             Industry Training Solutions
           </h1>
-          <p
-            className="max-w-2xl text-lg leading-relaxed"
-            style={{ color: 'rgba(255,255,255,0.5)' }}
-          >
+          <p className="max-w-2xl text-lg leading-relaxed text-muted-foreground">
             IICRC-certified training for 19 industries across Australia. Each pathway includes
             sector-specific courses, verifiable credentials, and continuing education credits.
           </p>
@@ -239,11 +224,7 @@ export default function IndustriesPage() {
               <Link
                 key={industry.slug}
                 href={`/industries/${industry.slug}`}
-                className="group rounded-lg p-6 transition-all duration-200 hover:-translate-y-1"
-                style={{
-                  background: 'rgba(255,255,255,0.03)',
-                  border: '1px solid rgba(255,255,255,0.08)',
-                }}
+                className="group rounded-lg border border-border bg-card p-6 transition-all duration-200 hover:-translate-y-1"
               >
                 <div
                   className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg"
@@ -255,21 +236,14 @@ export default function IndustriesPage() {
                   <industry.Icon className="h-5 w-5" style={{ color: industry.color }} />
                 </div>
 
-                <h2
-                  className="mb-2 text-lg font-semibold transition-colors duration-150 group-hover:text-white"
-                  style={{ color: 'rgba(255,255,255,0.9)' }}
-                >
+                <h2 className="mb-2 text-lg font-semibold text-foreground transition-colors duration-150 group-hover:text-white">
                   {industry.label}
                   <ArrowRight
-                    className="ml-2 inline h-4 w-4 opacity-0 transition-opacity duration-150 group-hover:opacity-100"
-                    style={{ color: '#2490ed' }}
+                    className="ml-2 inline h-4 w-4 text-primary opacity-0 transition-opacity duration-150 group-hover:opacity-100"
                   />
                 </h2>
 
-                <p
-                  className="mb-4 text-sm leading-relaxed"
-                  style={{ color: 'rgba(255,255,255,0.45)' }}
-                >
+                <p className="mb-4 text-sm leading-relaxed text-muted-foreground">
                   {industry.description}
                 </p>
 
@@ -277,10 +251,9 @@ export default function IndustriesPage() {
                   {industry.disciplines.map((code) => (
                     <span
                       key={code}
-                      className="rounded px-2 py-0.5 font-mono text-[10px] font-bold"
+                      className="rounded px-2 py-0.5 font-mono text-[10px] font-bold text-primary"
                       style={{
                         background: 'rgba(36,144,237,0.1)',
-                        color: '#2490ed',
                         border: '1px solid rgba(36,144,237,0.2)',
                       }}
                     >
@@ -294,30 +267,25 @@ export default function IndustriesPage() {
         </section>
 
         {/* CTA */}
-        <section className="px-6 py-16" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+        <section className="border-t border-border px-6 py-16">
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="mb-4 text-2xl font-bold" style={{ color: 'rgba(255,255,255,0.95)' }}>
+            <h2 className="mb-4 text-2xl font-bold text-foreground">
               Not sure which pathway?
             </h2>
-            <p className="mb-6 text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
+            <p className="mb-6 text-sm text-muted-foreground">
               Browse all courses by IICRC discipline or contact us for guidance.
             </p>
             <div className="flex justify-center gap-3">
               <Link
                 href="/courses"
-                className="inline-flex items-center gap-2 rounded-md px-6 py-2.5 text-sm font-medium text-white transition-opacity duration-150 hover:opacity-90"
+                className="inline-flex items-center gap-2 rounded-lg px-6 py-2.5 text-sm font-medium text-white transition-opacity duration-150 hover:opacity-90"
                 style={{ background: '#ed9d24' }}
               >
                 Browse All Courses
               </Link>
               <Link
                 href="/pathways"
-                className="inline-flex items-center gap-2 rounded-md px-6 py-2.5 text-sm font-medium transition-colors duration-150 hover:text-white"
-                style={{
-                  background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  color: 'rgba(255,255,255,0.7)',
-                }}
+                className="inline-flex items-center gap-2 rounded-lg border border-border bg-secondary px-6 py-2.5 text-sm font-medium text-muted-foreground transition-colors duration-150 hover:text-white"
               >
                 View Pathways
               </Link>

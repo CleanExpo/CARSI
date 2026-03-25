@@ -28,21 +28,15 @@ function MetricCard({
   sub?: string;
 }) {
   return (
-    <div
-      className="rounded-sm p-5"
-      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}
-    >
-      <p
-        className="mb-1 text-[11px] font-medium tracking-wide uppercase"
-        style={{ color: 'rgba(255,255,255,0.35)' }}
-      >
+    <div className="rounded-lg border border-border bg-card p-5">
+      <p className="mb-1 text-[11px] font-medium tracking-wide uppercase text-muted-foreground">
         {label}
       </p>
-      <p className="text-3xl font-bold tracking-tight" style={{ color: 'rgba(255,255,255,0.92)' }}>
+      <p className="text-3xl font-bold tracking-tight text-foreground">
         {value}
       </p>
       {sub && (
-        <p className="mt-1 text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
+        <p className="mt-1 text-xs text-muted-foreground">
           {sub}
         </p>
       )}
@@ -67,7 +61,7 @@ export default function AdminAnalyticsPage() {
       <div className="space-y-8">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Business Analytics</h1>
-          <p style={{ color: 'rgba(255,255,255,0.4)' }} className="mt-1 text-sm">
+          <p className="mt-1 text-sm text-muted-foreground">
             Loading metrics…
           </p>
         </div>
@@ -79,7 +73,7 @@ export default function AdminAnalyticsPage() {
     return (
       <div className="space-y-8">
         <h1 className="text-3xl font-bold tracking-tight">Business Analytics</h1>
-        <p style={{ color: '#ff6b6b' }} className="text-sm">
+        <p className="text-sm text-destructive">
           Failed to load analytics.
         </p>
       </div>
@@ -90,17 +84,14 @@ export default function AdminAnalyticsPage() {
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Business Analytics</h1>
-        <p className="mt-1 text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>
+        <p className="mt-1 text-sm text-muted-foreground">
           Real-time platform intelligence
         </p>
       </div>
 
       {/* Students */}
       <section>
-        <h2
-          className="mb-4 text-xs font-semibold tracking-widest uppercase"
-          style={{ color: 'rgba(255,255,255,0.3)' }}
-        >
+        <h2 className="mb-4 text-xs font-semibold tracking-widest uppercase text-muted-foreground">
           Students
         </h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -121,10 +112,7 @@ export default function AdminAnalyticsPage() {
 
       {/* Subscriptions */}
       <section>
-        <h2
-          className="mb-4 text-xs font-semibold tracking-widest uppercase"
-          style={{ color: 'rgba(255,255,255,0.3)' }}
-        >
+        <h2 className="mb-4 text-xs font-semibold tracking-widest uppercase text-muted-foreground">
           Subscriptions
         </h2>
         <div className="grid gap-4 sm:grid-cols-3">
@@ -148,10 +136,7 @@ export default function AdminAnalyticsPage() {
 
       {/* Certifications */}
       <section>
-        <h2
-          className="mb-4 text-xs font-semibold tracking-widest uppercase"
-          style={{ color: 'rgba(255,255,255,0.3)' }}
-        >
+        <h2 className="mb-4 text-xs font-semibold tracking-widest uppercase text-muted-foreground">
           Certifications
         </h2>
         <div className="grid gap-4 sm:grid-cols-2">
@@ -169,40 +154,27 @@ export default function AdminAnalyticsPage() {
       {/* Top Courses */}
       {data.top_courses.length > 0 && (
         <section>
-          <h2
-            className="mb-4 text-xs font-semibold tracking-widest uppercase"
-            style={{ color: 'rgba(255,255,255,0.3)' }}
-          >
+          <h2 className="mb-4 text-xs font-semibold tracking-widest uppercase text-muted-foreground">
             Top Courses by Completion
           </h2>
-          <div
-            className="overflow-hidden rounded-sm"
-            style={{ border: '1px solid rgba(255,255,255,0.08)' }}
-          >
+          <div className="overflow-hidden rounded-lg border border-border">
             {data.top_courses.map((course, i) => (
               <div
                 key={i}
-                className="flex items-center justify-between px-5 py-3"
-                style={{
-                  background: i % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent',
-                  borderBottom:
-                    i < data.top_courses.length - 1
-                      ? '1px solid rgba(255,255,255,0.05)'
-                      : undefined,
-                }}
+                className={`flex items-center justify-between px-5 py-3 ${i % 2 === 0 ? 'bg-secondary' : ''} ${i < data.top_courses.length - 1 ? 'border-b border-border' : ''}`}
               >
                 <div className="flex items-center gap-3">
                   <span
-                    className="font-mono text-xs"
-                    style={{ color: 'rgba(255,255,255,0.25)', minWidth: '16px' }}
+                    className="font-mono text-xs text-muted-foreground"
+                    style={{ minWidth: '16px' }}
                   >
                     {i + 1}
                   </span>
-                  <span className="text-sm" style={{ color: 'rgba(255,255,255,0.8)' }}>
+                  <span className="text-sm text-foreground">
                     {course.title}
                   </span>
                 </div>
-                <span className="text-sm font-semibold" style={{ color: '#2490ed' }}>
+                <span className="text-sm font-semibold text-primary">
                   {course.completions} completions
                 </span>
               </div>

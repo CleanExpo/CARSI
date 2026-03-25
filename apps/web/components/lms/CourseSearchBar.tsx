@@ -111,22 +111,16 @@ export function CourseSearchBar({
     <div ref={containerRef} className="relative w-full">
       {/* Input row */}
       <div
-        className="flex items-center gap-2 rounded-sm border px-3 py-2.5"
-        style={{
-          background: '#060a14',
-          borderColor: 'rgba(255,255,255,0.08)',
-        }}
+        className="flex items-center gap-2 rounded-sm border border-border bg-background px-3 py-2.5"
       >
         {loading ? (
           <Loader2
-            className="h-4 w-4 shrink-0 animate-spin"
-            style={{ color: 'rgba(255,255,255,0.35)' }}
+            className="h-4 w-4 shrink-0 animate-spin text-muted-foreground/60"
             aria-hidden="true"
           />
         ) : (
           <Search
-            className="h-4 w-4 shrink-0"
-            style={{ color: 'rgba(255,255,255,0.35)' }}
+            className="h-4 w-4 shrink-0 text-muted-foreground/60"
             aria-hidden="true"
           />
         )}
@@ -136,8 +130,7 @@ export function CourseSearchBar({
           value={query}
           onChange={handleChange}
           placeholder={placeholder}
-          className="flex-1 bg-transparent text-sm outline-none"
-          style={{ color: 'rgba(255,255,255,0.9)' }}
+          className="flex-1 bg-transparent text-sm text-foreground outline-none"
           aria-label="Search courses"
           autoComplete="off"
         />
@@ -146,8 +139,7 @@ export function CourseSearchBar({
           <button
             type="button"
             onClick={handleClear}
-            className="shrink-0 transition-opacity hover:opacity-80"
-            style={{ color: 'rgba(255,255,255,0.4)' }}
+            className="shrink-0 text-muted-foreground/60 transition-opacity hover:opacity-80"
             aria-label="Clear search"
           >
             <X className="h-4 w-4" />
@@ -158,18 +150,13 @@ export function CourseSearchBar({
       {/* Dropdown */}
       {open && query.length >= 2 && (
         <div
-          className="absolute top-full right-0 left-0 z-10 mt-1 overflow-hidden rounded-sm shadow-lg"
-          style={{
-            background: '#060a14',
-            border: '1px solid rgba(255,255,255,0.08)',
-          }}
+          className="absolute top-full right-0 left-0 z-10 mt-1 overflow-hidden rounded-sm border border-border bg-background shadow-lg"
           role="listbox"
           aria-label="Search results"
         >
           {results.length === 0 ? (
             <div
-              className="px-4 py-3 text-sm"
-              style={{ color: 'rgba(255,255,255,0.4)' }}
+              className="px-4 py-3 text-sm text-muted-foreground/60"
               role="option"
               aria-selected="false"
             >
@@ -181,8 +168,7 @@ export function CourseSearchBar({
                 <li key={result.id} role="option" aria-selected="false">
                   <button
                     type="button"
-                    className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition-colors"
-                    style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}
+                    className="flex w-full items-center justify-between gap-3 border-b border-border px-4 py-3 text-left transition-colors"
                     onMouseEnter={(e) =>
                       ((e.currentTarget as HTMLButtonElement).style.background =
                         'rgba(255,255,255,0.04)')
@@ -193,8 +179,7 @@ export function CourseSearchBar({
                     onClick={() => handleSelect(result.slug)}
                   >
                     <span
-                      className="flex-1 truncate text-sm"
-                      style={{ color: 'rgba(255,255,255,0.85)' }}
+                      className="flex-1 truncate text-sm text-foreground"
                     >
                       {result.title}
                     </span>
@@ -202,17 +187,13 @@ export function CourseSearchBar({
                     <div className="flex shrink-0 items-center gap-2">
                       {result.iicrc_discipline && (
                         <span
-                          className="rounded-sm px-2 py-0.5 text-xs font-medium"
-                          style={{
-                            background: 'rgba(36,144,237,0.15)',
-                            color: '#2490ed',
-                          }}
+                          className="rounded-sm bg-primary/15 px-2 py-0.5 text-xs font-medium text-primary"
                         >
                           {result.iicrc_discipline}
                         </span>
                       )}
                       {result.cec_hours && (
-                        <span className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                        <span className="text-xs text-muted-foreground/60">
                           {result.cec_hours} CECs
                         </span>
                       )}

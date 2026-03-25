@@ -104,7 +104,7 @@ export default function PricingPage() {
       <BreadcrumbSchema items={breadcrumbs} />
       <FAQSchema questions={FAQ_ITEMS} />
 
-      <main className="min-h-screen bg-[#050505] px-4 py-16 text-white">
+      <main className="min-h-screen bg-background px-4 py-16 text-white">
         <div className="mx-auto max-w-6xl">
           {/* ── Hero ───────────────────────────────────────── */}
           <section className="mb-16 text-center">
@@ -123,13 +123,7 @@ export default function PricingPage() {
             className="mb-16 grid grid-cols-1 gap-6 md:grid-cols-3"
           >
             {/* Free Library */}
-            <div
-              className="flex flex-col rounded-sm border p-6"
-              style={{
-                borderColor: 'rgba(255,255,255,0.08)',
-                background: 'rgba(255,255,255,0.02)',
-              }}
-            >
+            <div className="flex flex-col rounded-lg border border-border bg-card p-6">
               <div className="mb-6">
                 <h2 className="mb-1 font-mono text-lg font-bold text-white">Free Library</h2>
                 <div className="flex items-baseline gap-1">
@@ -150,7 +144,7 @@ export default function PricingPage() {
               <div className="mt-auto">
                 <Link
                   href="/register"
-                  className="flex w-full items-center justify-center rounded-sm border border-white/[0.12] px-4 py-2.5 text-sm font-medium text-white/70 transition-colors hover:border-white/25 hover:text-white"
+                  className="flex w-full items-center justify-center rounded-lg border border-white/[0.12] px-4 py-2.5 text-sm font-medium text-white/70 transition-colors hover:border-white/25 hover:text-white"
                 >
                   Create Free Account
                 </Link>
@@ -159,7 +153,7 @@ export default function PricingPage() {
 
             {/* Foundation */}
             <div
-              className="flex flex-col rounded-sm border p-6"
+              className="flex flex-col rounded-lg border p-6"
               style={{
                 borderColor: 'rgba(36,144,237,0.3)',
                 background: 'rgba(36,144,237,0.04)',
@@ -177,7 +171,7 @@ export default function PricingPage() {
               <ul className="mb-8 flex flex-col gap-2.5 text-sm text-white/70">
                 {FOUNDATION_EXTRAS.map((f) => (
                   <li key={f} className="flex items-start gap-2">
-                    <span className="mt-0.5 flex-shrink-0" style={{ color: '#2490ed' }}>
+                    <span className="mt-0.5 flex-shrink-0 text-primary">
                       ✓
                     </span>
                     {f}
@@ -188,7 +182,7 @@ export default function PricingPage() {
               <div className="mt-auto">
                 <Link
                   href="/subscribe?plan=foundation"
-                  className="flex w-full items-center justify-center rounded-sm px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                  className="flex w-full items-center justify-center rounded-lg px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
                   style={{ background: '#2490ed' }}
                 >
                   Start 7-Day Free Trial
@@ -201,7 +195,7 @@ export default function PricingPage() {
 
             {/* Growth — highlighted */}
             <div
-              className="relative flex flex-col rounded-sm border p-6"
+              className="relative flex flex-col rounded-lg border p-6"
               style={{
                 borderColor: 'rgba(0,245,255,0.3)',
                 background:
@@ -211,7 +205,7 @@ export default function PricingPage() {
               {/* Most Popular badge */}
               <div className="absolute -top-3 left-6">
                 <span
-                  className="rounded-sm px-3 py-1 text-xs font-semibold tracking-wide uppercase"
+                  className="rounded-lg px-3 py-1 text-xs font-semibold tracking-wide uppercase"
                   style={{ background: '#00FF88', color: '#050505' }}
                 >
                   Most Popular
@@ -239,7 +233,7 @@ export default function PricingPage() {
               <div className="mt-auto">
                 <Link
                   href="/subscribe?plan=growth"
-                  className="flex w-full items-center justify-center rounded-sm bg-[#00F5FF] px-4 py-2.5 text-sm font-semibold text-[#050505] transition-opacity hover:opacity-90"
+                  className="flex w-full items-center justify-center rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
                 >
                   Start 7-Day Free Trial
                 </Link>
@@ -253,7 +247,7 @@ export default function PricingPage() {
           {/* ── Per-Course CTA ─────────────────────────────── */}
           <section
             aria-label="Individual courses"
-            className="mb-16 flex flex-col items-start justify-between gap-4 rounded-sm border border-white/[0.06] bg-white/[0.02] p-6 sm:flex-row sm:items-center"
+            className="mb-16 flex flex-col items-start justify-between gap-4 rounded-lg border border-border bg-card p-6 sm:flex-row sm:items-center"
           >
             <div>
               <h2 className="mb-1 text-base font-semibold text-white/85">Or pay per course</h2>
@@ -263,7 +257,7 @@ export default function PricingPage() {
             </div>
             <Link
               href="/courses"
-              className="inline-flex flex-shrink-0 items-center rounded-sm border border-[rgba(0,245,255,0.25)] bg-[rgba(0,245,255,0.08)] px-5 py-2.5 text-sm font-semibold text-[#00F5FF] transition-colors hover:bg-[rgba(0,245,255,0.14)]"
+              className="inline-flex flex-shrink-0 items-center rounded-lg border border-primary/25 bg-primary/10 px-5 py-2.5 text-sm font-semibold text-primary transition-colors hover:bg-primary/20"
             >
               View All Courses
             </Link>
@@ -272,7 +266,7 @@ export default function PricingPage() {
           {/* ── FAQ ────────────────────────────────────────── */}
           <section aria-label="Frequently asked questions" className="mb-8">
             <h2 className="mb-6 text-2xl font-bold text-white">Frequently Asked Questions</h2>
-            <div className="flex flex-col divide-y divide-white/[0.06]">
+            <div className="flex flex-col divide-y divide-border">
               {FAQ_ITEMS.map((item) => (
                 <details key={item.question} className="group py-4">
                   <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-sm font-medium text-white/80 hover:text-white">
@@ -284,7 +278,7 @@ export default function PricingPage() {
                       +
                     </span>
                   </summary>
-                  <p className="mt-3 text-sm leading-relaxed text-white/45">{item.answer}</p>
+                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{item.answer}</p>
                 </details>
               ))}
             </div>

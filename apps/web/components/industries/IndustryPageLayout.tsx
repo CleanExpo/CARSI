@@ -6,7 +6,7 @@ interface IndustryPageLayoutProps {
 
 export function IndustryPageLayout({ children }: IndustryPageLayoutProps) {
   return (
-    <main className="min-h-screen" style={{ background: '#0a0f1a' }}>
+    <main className="min-h-screen bg-background">
       {/* Single subtle gradient — matches landing page */}
       <div
         className="pointer-events-none fixed inset-0"

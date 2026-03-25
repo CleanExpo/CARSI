@@ -66,23 +66,14 @@ export default async function CoursesPage({
   const [bundles, { items: courses, total }] = await Promise.all([getBundles(), getCourses()]);
 
   return (
-    <main id="main-content" className="relative min-h-screen" style={{ background: '#060a14' }}>
-      {/* Mesh background */}
-      <div className="mesh-bg" aria-hidden="true">
-        <div className="mesh-blob mesh-blob-1" />
-        <div className="mesh-blob mesh-blob-2" />
-      </div>
-
+    <main id="main-content" className="relative min-h-screen bg-background">
       <div className="relative z-10 mx-auto max-w-[1600px] px-4 py-8 sm:px-6 lg:px-8">
         {/* ── Hero header ── */}
         <header className="mb-6">
-          <h1
-            className="font-display text-3xl font-bold tracking-tight sm:text-4xl"
-            style={{ color: 'rgba(255,255,255,0.92)' }}
-          >
+          <h1 className="font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
             Restoration Training Courses
           </h1>
-          <p className="mt-2 text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>
+          <p className="mt-2 text-sm text-muted-foreground">
             {total} course{total !== 1 ? 's' : ''} across 7 <AcronymTooltip term="IICRC" />{' '}
             disciplines — earn <AcronymTooltip term="CEC">CECs</AcronymTooltip> online, at your own
             pace
@@ -96,15 +87,7 @@ export default async function CoursesPage({
 
         {/* ── Course Grid (primary content — above the fold) ── */}
         <section className="mb-10">
-          <div
-            className="rounded-sm p-5"
-            style={{
-              background: 'rgba(255,255,255,0.04)',
-              backdropFilter: 'blur(24px) saturate(160%)',
-              WebkitBackdropFilter: 'blur(24px) saturate(160%)',
-              border: '1px solid rgba(255,255,255,0.07)',
-            }}
-          >
+          <div className="rounded-lg border border-border bg-card p-5">
             <CourseGrid courses={courses} initialTab={discipline ?? 'All'} />
           </div>
         </section>
@@ -112,7 +95,7 @@ export default async function CoursesPage({
         {/* ── Industry Bundles ── */}
         {bundles.length > 0 && (
           <section className="mb-10">
-            <h2 className="mb-4 text-lg font-semibold" style={{ color: 'rgba(255,255,255,0.85)' }}>
+            <h2 className="mb-4 text-lg font-semibold text-foreground">
               Industry Bundles
             </h2>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -126,25 +109,11 @@ export default async function CoursesPage({
 
         {/* ── IICRC Discipline Map ── */}
         <section className="mb-10">
-          <div
-            className="rounded-sm p-5"
-            style={{
-              background: 'rgba(255,255,255,0.04)',
-              backdropFilter: 'blur(24px) saturate(160%)',
-              WebkitBackdropFilter: 'blur(24px) saturate(160%)',
-              border: '1px solid rgba(255,255,255,0.07)',
-            }}
-          >
-            <h2
-              className="font-display mb-3 text-center text-lg font-semibold"
-              style={{ color: 'rgba(255,255,255,0.88)' }}
-            >
+          <div className="rounded-lg border border-border bg-card p-5">
+            <h2 className="font-display mb-3 text-center text-lg font-semibold text-foreground">
               IICRC Discipline Map
             </h2>
-            <p
-              className="mx-auto mb-4 max-w-xl text-center text-xs"
-              style={{ color: 'rgba(255,255,255,0.4)' }}
-            >
+            <p className="mx-auto mb-4 max-w-xl text-center text-xs text-muted-foreground">
               Explore the seven IICRC disciplines. Hover over each node to learn more about the
               certification pathway.
             </p>
@@ -159,31 +128,16 @@ export default async function CoursesPage({
 
         {/* ── GEO Q&A Sections (SEO content — collapsed accordion) ── */}
         <section className="mb-8">
-          <h2
-            className="font-display mb-4 text-lg font-semibold"
-            style={{ color: 'rgba(255,255,255,0.88)' }}
-          >
+          <h2 className="font-display mb-4 text-lg font-semibold text-foreground">
             Frequently Asked Questions
           </h2>
           <div className="space-y-3">
             {/* Q1 — What courses does CARSI offer? */}
-            <details
-              className="group rounded-sm"
-              style={{
-                background: 'rgba(255,255,255,0.04)',
-                backdropFilter: 'blur(24px) saturate(160%)',
-                WebkitBackdropFilter: 'blur(24px) saturate(160%)',
-                border: '1px solid rgba(255,255,255,0.07)',
-              }}
-            >
-              <summary
-                className="flex cursor-pointer items-center justify-between px-5 py-4 text-sm font-semibold select-none"
-                style={{ color: 'rgba(255,255,255,0.88)' }}
-              >
+            <details className="group rounded-lg border border-border bg-card">
+              <summary className="flex cursor-pointer items-center justify-between px-5 py-4 text-sm font-semibold text-foreground select-none">
                 <span>What courses does CARSI offer?</span>
                 <svg
-                  className="h-4 w-4 shrink-0 transition-transform duration-200 group-open:rotate-180"
-                  style={{ color: 'rgba(255,255,255,0.4)' }}
+                  className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200 group-open:rotate-180"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -193,7 +147,7 @@ export default async function CoursesPage({
                 </svg>
               </summary>
               <div className="px-5 pb-5">
-                <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.55)' }}>
+                <p className="text-sm leading-relaxed text-muted-foreground">
                   CARSI provides <AcronymTooltip term="IICRC" />
                   -aligned continuing education across seven core disciplines: Water Restoration
                   Technology (<AcronymTooltip term="WRT" />
@@ -218,25 +172,13 @@ export default async function CoursesPage({
             </details>
 
             {/* Q2 — How do I choose the right discipline? */}
-            <details
-              className="group rounded-sm"
-              style={{
-                background: 'rgba(255,255,255,0.04)',
-                backdropFilter: 'blur(24px) saturate(160%)',
-                WebkitBackdropFilter: 'blur(24px) saturate(160%)',
-                border: '1px solid rgba(255,255,255,0.07)',
-              }}
-            >
-              <summary
-                className="flex cursor-pointer items-center justify-between px-5 py-4 text-sm font-semibold select-none"
-                style={{ color: 'rgba(255,255,255,0.88)' }}
-              >
+            <details className="group rounded-lg border border-border bg-card">
+              <summary className="flex cursor-pointer items-center justify-between px-5 py-4 text-sm font-semibold text-foreground select-none">
                 <span>
                   How do I choose the right <AcronymTooltip term="IICRC" /> discipline?
                 </span>
                 <svg
-                  className="h-4 w-4 shrink-0 transition-transform duration-200 group-open:rotate-180"
-                  style={{ color: 'rgba(255,255,255,0.4)' }}
+                  className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200 group-open:rotate-180"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -246,7 +188,7 @@ export default async function CoursesPage({
                 </svg>
               </summary>
               <div className="px-5 pb-5">
-                <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.55)' }}>
+                <p className="text-sm leading-relaxed text-muted-foreground">
                   Your discipline choice depends on your current role and career goals. Water
                   Restoration Technology (<AcronymTooltip term="WRT" />) is the most common starting
                   point, providing foundational knowledge applicable across all restoration work
@@ -268,26 +210,14 @@ export default async function CoursesPage({
             </details>
 
             {/* Q3 — What are CECs? */}
-            <details
-              className="group rounded-sm"
-              style={{
-                background: 'rgba(255,255,255,0.04)',
-                backdropFilter: 'blur(24px) saturate(160%)',
-                WebkitBackdropFilter: 'blur(24px) saturate(160%)',
-                border: '1px solid rgba(255,255,255,0.07)',
-              }}
-            >
-              <summary
-                className="flex cursor-pointer items-center justify-between px-5 py-4 text-sm font-semibold select-none"
-                style={{ color: 'rgba(255,255,255,0.88)' }}
-              >
+            <details className="group rounded-lg border border-border bg-card">
+              <summary className="flex cursor-pointer items-center justify-between px-5 py-4 text-sm font-semibold text-foreground select-none">
                 <span>
                   What are <AcronymTooltip term="IICRC" /> Continuing Education Credits (
                   <AcronymTooltip term="CEC">CECs</AcronymTooltip>)?
                 </span>
                 <svg
-                  className="h-4 w-4 shrink-0 transition-transform duration-200 group-open:rotate-180"
-                  style={{ color: 'rgba(255,255,255,0.4)' }}
+                  className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200 group-open:rotate-180"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -297,7 +227,7 @@ export default async function CoursesPage({
                 </svg>
               </summary>
               <div className="px-5 pb-5">
-                <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.55)' }}>
+                <p className="text-sm leading-relaxed text-muted-foreground">
                   <AcronymTooltip term="IICRC" /> Continuing Education Credits (
                   <AcronymTooltip term="CEC">CECs</AcronymTooltip>) are the industry standard for
                   tracking professional development in the cleaning and restoration sector.

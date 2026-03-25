@@ -127,16 +127,15 @@ export default function FloatingChat() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.92, y: 12 }}
             transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
-            className="flex w-[380px] flex-col overflow-hidden rounded-sm border border-white/[0.08] shadow-2xl"
-            style={{ height: 500, background: '#060a14' }}
+            className="flex w-[380px] flex-col overflow-hidden rounded-sm border border-white/[0.08] bg-background shadow-2xl"
+            style={{ height: 500 }}
           >
             {/* Header */}
             <div
-              className="flex items-center justify-between border-b border-white/[0.08] px-4 py-3"
-              style={{ background: '#060a14' }}
+              className="flex items-center justify-between border-b border-white/[0.08] bg-background px-4 py-3"
             >
               <div className="flex items-center gap-2">
-                <MessageCircle size={16} style={{ color: '#2490ed' }} aria-hidden />
+                <MessageCircle size={16} className="text-primary" aria-hidden />
                 <span className="text-sm font-semibold text-white/90">CARSI Assistant</span>
               </div>
               <button
@@ -159,7 +158,7 @@ export default function FloatingChat() {
                     className={`max-w-[85%] rounded-sm px-3 py-2 text-sm leading-relaxed ${
                       msg.role === 'user' ? 'text-white' : 'bg-white/[0.06] text-white/70'
                     }`}
-                    style={msg.role === 'user' ? { background: '#2490ed' } : undefined}
+                    style={msg.role === 'user' ? { background: 'hsl(var(--primary))' } : undefined}
                   >
                     {msg.text}
                   </div>
@@ -193,8 +192,7 @@ export default function FloatingChat() {
               <button
                 onClick={() => void sendMessage()}
                 disabled={!input.trim() || loading}
-                className="flex-shrink-0 rounded-sm p-2 transition-colors disabled:cursor-not-allowed disabled:opacity-40"
-                style={{ background: '#2490ed' }}
+                className="flex-shrink-0 rounded-sm bg-primary p-2 transition-colors disabled:cursor-not-allowed disabled:opacity-40"
                 aria-label="Send message"
               >
                 <Send size={16} className="text-white" />
@@ -209,8 +207,7 @@ export default function FloatingChat() {
         onClick={() => setOpen((v) => !v)}
         whileHover={{ scale: 1.06 }}
         whileTap={{ scale: 0.96 }}
-        className="flex items-center gap-2 rounded-sm px-4 py-3 text-sm font-semibold text-white shadow-lg transition-shadow hover:shadow-xl"
-        style={{ background: '#2490ed' }}
+        className="flex items-center gap-2 rounded-sm bg-primary px-4 py-3 text-sm font-semibold text-white shadow-lg transition-shadow hover:shadow-xl"
         aria-label={open ? 'Close chat' : 'Open CARSI assistant chat'}
       >
         <AnimatePresence mode="wait" initial={false}>

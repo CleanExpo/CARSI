@@ -67,17 +67,12 @@ export default function QuizExplanationModal({
     >
       {/* Modal panel */}
       <div
-        className="relative w-full max-w-lg rounded-sm border"
-        style={{
-          backgroundColor: '#060a14',
-          borderColor: 'rgba(255,255,255,0.08)',
-        }}
+        className="relative w-full max-w-lg rounded-sm border border-border bg-background"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div
-          className="flex items-center justify-between border-b px-6 py-4"
-          style={{ borderColor: 'rgba(255,255,255,0.06)' }}
+          className="flex items-center justify-between border-b border-border px-6 py-4"
         >
           <h2 className="text-sm font-semibold tracking-widest text-white/70 uppercase">
             Answer Explanation
@@ -110,7 +105,7 @@ export default function QuizExplanationModal({
             <div className="flex items-center justify-center py-8">
               <span
                 className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-white/20"
-                style={{ borderTopColor: '#2490ed' }}
+                style={{ borderTopColor: 'hsl(var(--primary))' }}
               />
               <span className="ml-3 text-sm text-white/40">Generating explanation…</span>
             </div>
@@ -124,15 +119,10 @@ export default function QuizExplanationModal({
             <>
               {/* Correct answer callout */}
               <div
-                className="rounded-sm border px-4 py-3"
-                style={{
-                  borderColor: 'rgba(36,144,237,0.3)',
-                  backgroundColor: 'rgba(36,144,237,0.08)',
-                }}
+                className="rounded-sm border border-primary/30 bg-primary/10 px-4 py-3"
               >
                 <p
-                  className="mb-1 text-xs font-semibold tracking-widest uppercase"
-                  style={{ color: '#2490ed' }}
+                  className="mb-1 text-xs font-semibold tracking-widest text-primary uppercase"
                 >
                   Correct Answer
                 </p>
@@ -148,7 +138,7 @@ export default function QuizExplanationModal({
               </div>
 
               {/* Study tip */}
-              <div className="rounded-sm border-l-2 pl-3" style={{ borderColor: '#2490ed' }}>
+              <div className="rounded-sm border-l-2 border-primary pl-3">
                 <p className="mb-0.5 text-xs font-semibold tracking-widest text-white/40 uppercase">
                   Study Tip
                 </p>
@@ -159,14 +149,10 @@ export default function QuizExplanationModal({
         </div>
 
         {/* Footer */}
-        <div className="border-t px-6 py-3" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+        <div className="border-t border-border px-6 py-3">
           <button
             onClick={onClose}
-            className="w-full rounded-sm py-2 text-sm font-medium transition-colors"
-            style={{
-              backgroundColor: 'rgba(255,255,255,0.05)',
-              color: 'rgba(255,255,255,0.6)',
-            }}
+            className="w-full rounded-sm bg-secondary py-2 text-sm font-medium text-muted-foreground transition-colors"
           >
             Close
           </button>

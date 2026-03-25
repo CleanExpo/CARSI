@@ -22,28 +22,22 @@ interface RecommendedCourse {
 function SkeletonCard() {
   return (
     <div
-      className="flex min-w-[260px] flex-col gap-3 rounded-sm p-4"
-      style={{ background: '#060a14', border: '0.5px solid rgba(255,255,255,0.06)' }}
+      className="flex min-w-[260px] flex-col gap-3 rounded-sm border border-border bg-background p-4"
     >
       <div
-        className="h-32 w-full animate-pulse rounded-sm"
-        style={{ background: 'rgba(255,255,255,0.05)' }}
+        className="h-32 w-full animate-pulse rounded-sm bg-secondary"
       />
       <div
-        className="h-3 w-20 animate-pulse rounded-sm"
-        style={{ background: 'rgba(36,144,237,0.2)' }}
+        className="h-3 w-20 animate-pulse rounded-sm bg-primary/20"
       />
       <div
-        className="h-4 w-3/4 animate-pulse rounded-sm"
-        style={{ background: 'rgba(255,255,255,0.08)' }}
+        className="h-4 w-3/4 animate-pulse rounded-sm bg-secondary"
       />
       <div
-        className="h-3 w-full animate-pulse rounded-sm"
-        style={{ background: 'rgba(255,255,255,0.05)' }}
+        className="h-3 w-full animate-pulse rounded-sm bg-secondary"
       />
       <div
-        className="h-3 w-2/3 animate-pulse rounded-sm"
-        style={{ background: 'rgba(255,255,255,0.05)' }}
+        className="h-3 w-2/3 animate-pulse rounded-sm bg-secondary"
       />
     </div>
   );
@@ -56,11 +50,7 @@ function SkeletonCard() {
 function RecommendationCard({ course }: { course: RecommendedCourse }) {
   return (
     <div
-      className="flex max-w-[300px] min-w-[260px] flex-shrink-0 flex-col gap-3 rounded-sm p-4 transition-all hover:scale-[1.01]"
-      style={{
-        background: '#060a14',
-        border: '0.5px solid rgba(255,255,255,0.06)',
-      }}
+      className="flex max-w-[300px] min-w-[260px] flex-shrink-0 flex-col gap-3 rounded-sm border border-border bg-background p-4 transition-all hover:scale-[1.01]"
     >
       {/* Thumbnail */}
       {course.thumbnail_url ? (
@@ -71,10 +61,9 @@ function RecommendationCard({ course }: { course: RecommendedCourse }) {
         />
       ) : (
         <div
-          className="flex h-32 w-full items-center justify-center rounded-sm"
-          style={{ background: 'rgba(36,144,237,0.06)' }}
+          className="flex h-32 w-full items-center justify-center rounded-sm bg-primary/5"
         >
-          <span className="font-mono text-xs" style={{ color: 'rgba(36,144,237,0.4)' }}>
+          <span className="font-mono text-xs text-primary/40">
             {course.iicrc_discipline ?? 'CARSI'}
           </span>
         </div>
@@ -84,14 +73,13 @@ function RecommendationCard({ course }: { course: RecommendedCourse }) {
       <div className="flex items-center gap-2">
         {course.iicrc_discipline && (
           <span
-            className="rounded-sm px-1.5 py-0.5 font-mono text-[10px] font-semibold tracking-wider uppercase"
-            style={{ background: 'rgba(36,144,237,0.15)', color: '#2490ed' }}
+            className="rounded-sm bg-primary/15 px-1.5 py-0.5 font-mono text-[10px] font-semibold tracking-wider text-primary uppercase"
           >
             {course.iicrc_discipline}
           </span>
         )}
         {course.cec_hours !== null && (
-          <span className="font-mono text-[10px]" style={{ color: 'rgba(255,255,255,0.35)' }}>
+          <span className="font-mono text-[10px] text-muted-foreground/60">
             {course.cec_hours} CEC hrs
           </span>
         )}
@@ -101,15 +89,14 @@ function RecommendationCard({ course }: { course: RecommendedCourse }) {
       <h3 className="line-clamp-2 text-sm leading-snug font-semibold text-white">{course.title}</h3>
 
       {/* Reason */}
-      <p className="line-clamp-1 text-xs italic" style={{ color: 'rgba(255,255,255,0.40)' }}>
+      <p className="line-clamp-1 text-xs italic text-muted-foreground/60">
         {course.reason}
       </p>
 
       {/* Enrol button */}
       <Link
         href={`/courses/${course.slug}`}
-        className="mt-auto inline-flex items-center justify-center rounded-sm px-3 py-1.5 text-xs font-medium text-white transition-all hover:brightness-110"
-        style={{ background: '#2490ed' }}
+        className="mt-auto inline-flex items-center justify-center rounded-sm bg-primary px-3 py-1.5 text-xs font-medium text-white transition-all hover:brightness-110"
       >
         Enrol now
       </Link>
@@ -147,11 +134,7 @@ export function RecommendationWidget() {
   if (!loading && courses.length === 0 && !error) {
     return (
       <div
-        className="rounded-sm p-6 text-center"
-        style={{
-          background: 'rgba(36,144,237,0.04)',
-          border: '0.5px solid rgba(36,144,237,0.12)',
-        }}
+        className="rounded-sm border border-primary/10 bg-primary/5 p-6 text-center"
       >
         <p className="text-sm text-white/50">
           Complete a course to unlock personalised recommendations.
@@ -163,7 +146,7 @@ export function RecommendationWidget() {
   return (
     <div className="flex flex-col gap-4">
       {error && (
-        <p className="text-xs" style={{ color: 'rgba(255,68,68,0.8)' }}>
+        <p className="text-xs text-destructive">
           {error}
         </p>
       )}

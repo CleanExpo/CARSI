@@ -40,13 +40,7 @@ function MetricCard({
   accent?: string;
 }) {
   return (
-    <div
-      className="flex flex-col gap-1 rounded-sm p-5"
-      style={{
-        background: '#060a14',
-        border: '0.5px solid rgba(255,255,255,0.06)',
-      }}
-    >
+    <div className="flex flex-col gap-1 rounded-lg border border-border bg-background p-5">
       <span className="font-mono text-xs tracking-widest text-white/40 uppercase">{label}</span>
       <span className="font-mono text-3xl font-bold" style={{ color: accent }}>
         {value}
@@ -74,10 +68,9 @@ function RevenueBarChart({ data }: { data: RevenueByMonth[] }) {
             <span className="font-mono text-xs text-white/40">{formatAUD(row.revenue_aud)}</span>
             <div className="flex w-full flex-col justify-end" style={{ height: '96px' }}>
               <div
-                className="w-full rounded-sm transition-all"
+                className="w-full rounded-lg bg-primary transition-all"
                 style={{
                   height: `${Math.max(pct, 3)}%`,
-                  background: '#2490ed',
                   opacity: 0.85,
                   minHeight: '4px',
                 }}
@@ -106,7 +99,7 @@ export default function RevenueDashboardPage() {
   }, []);
 
   return (
-    <div className="min-h-screen space-y-8 p-6" style={{ background: '#050505', color: '#ffffff' }}>
+    <div className="min-h-screen space-y-8 bg-background p-6 text-white">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -117,12 +110,7 @@ export default function RevenueDashboardPage() {
         </div>
         <Link
           href="/admin"
-          className="rounded-sm px-3 py-2 font-mono text-xs"
-          style={{
-            background: '#060a14',
-            border: '0.5px solid rgba(255,255,255,0.06)',
-            color: '#2490ed',
-          }}
+          className="rounded-lg border border-border bg-background px-3 py-2 font-mono text-xs text-primary"
         >
           ← Admin
         </Link>
@@ -179,13 +167,7 @@ export default function RevenueDashboardPage() {
           </div>
 
           {/* Bottom: Revenue by Month bar chart */}
-          <div
-            className="rounded-sm p-6"
-            style={{
-              background: '#060a14',
-              border: '0.5px solid rgba(255,255,255,0.06)',
-            }}
-          >
+          <div className="rounded-lg border border-border bg-background p-6">
             <h2 className="mb-6 font-mono text-sm tracking-widest text-white/40 uppercase">
               Revenue by Month — Last 6 Months
             </h2>

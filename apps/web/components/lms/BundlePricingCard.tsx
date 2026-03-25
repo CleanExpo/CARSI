@@ -72,13 +72,7 @@ export function BundlePricingCard({ bundle }: BundleProps) {
 
   return (
     <div
-      className="group flex flex-col overflow-hidden rounded-xl transition-all duration-200 hover:scale-[1.01]"
-      style={{
-        background: 'rgba(255,255,255,0.04)',
-        backdropFilter: 'blur(24px) saturate(160%)',
-        WebkitBackdropFilter: 'blur(24px) saturate(160%)',
-        border: '1px solid rgba(255,255,255,0.07)',
-      }}
+      className="group flex flex-col overflow-hidden rounded-xl border border-border bg-secondary transition-all duration-200 hover:scale-[1.01]"
     >
       {/* Header */}
       <div className="p-4 pb-3">
@@ -99,16 +93,14 @@ export function BundlePricingCard({ bundle }: BundleProps) {
 
         {/* Bundle name */}
         <h3
-          className="mb-1 text-base leading-snug font-semibold"
-          style={{ color: 'rgba(255,255,255,0.92)' }}
+          className="mb-1 text-base leading-snug font-semibold text-foreground"
         >
           {bundle.name}
         </h3>
 
         {bundle.description && (
           <p
-            className="line-clamp-2 text-xs leading-relaxed"
-            style={{ color: 'rgba(255,255,255,0.4)' }}
+            className="line-clamp-2 text-xs leading-relaxed text-muted-foreground/60"
           >
             {bundle.description}
           </p>
@@ -116,25 +108,23 @@ export function BundlePricingCard({ bundle }: BundleProps) {
       </div>
 
       {/* Course list */}
-      <div className="mx-4 border-t px-0 py-3" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+      <div className="mx-4 border-t border-border px-0 py-3">
         <ul className="flex flex-col gap-1.5">
           {visibleCourses.map((course) => (
             <li
               key={course.id}
-              className="flex items-center gap-2 text-xs"
-              style={{ color: 'rgba(255,255,255,0.55)' }}
+              className="flex items-center gap-2 text-xs text-muted-foreground"
             >
               <BookOpen
-                className="h-3 w-3 flex-shrink-0"
-                style={{ color: 'rgba(255,255,255,0.3)' }}
+                className="h-3 w-3 flex-shrink-0 text-muted-foreground/60"
               />
               <span className="truncate">{course.title}</span>
             </li>
           ))}
           {extraCount > 0 && (
             <li
-              className="text-xs font-medium"
-              style={{ color: 'rgba(255,255,255,0.3)', paddingLeft: '1.25rem' }}
+              className="text-xs font-medium text-muted-foreground/60"
+              style={{ paddingLeft: '1.25rem' }}
             >
               +{extraCount} more course{extraCount !== 1 ? 's' : ''}
             </li>
@@ -146,21 +136,16 @@ export function BundlePricingCard({ bundle }: BundleProps) {
       <div className="mt-auto p-4 pt-2">
         <div className="mb-3 flex items-baseline gap-2">
           {originalPrice != null && originalPrice > price && (
-            <span className="text-sm line-through" style={{ color: 'rgba(255,68,68,0.6)' }}>
+            <span className="text-sm text-destructive line-through">
               ${originalPrice.toFixed(0)}
             </span>
           )}
-          <span className="text-xl font-bold" style={{ color: '#ed9d24' }}>
+          <span className="text-xl font-bold text-carsi-orange">
             ${price.toFixed(0)} AUD
           </span>
           {savings != null && savings > 0 && (
             <span
-              className="rounded-md px-2 py-0.5 text-xs font-semibold"
-              style={{
-                color: '#27ae60',
-                background: 'rgba(39,174,96,0.12)',
-                border: '1px solid rgba(39,174,96,0.3)',
-              }}
+              className="rounded-md border border-green-500/30 bg-green-500/10 px-2 py-0.5 text-xs font-semibold text-green-500"
             >
               Save ${savings.toFixed(0)}
             </span>

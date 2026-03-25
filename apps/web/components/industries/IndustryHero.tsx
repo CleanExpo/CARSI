@@ -50,19 +50,13 @@ export function IndustryHero({
           {industryName}
         </div>
 
-        <h1
-          className="mb-6 text-4xl leading-tight font-bold tracking-tight sm:text-5xl"
-          style={{ color: 'rgba(255,255,255,0.95)' }}
-        >
+        <h1 className="mb-6 text-4xl leading-tight font-bold tracking-tight text-foreground sm:text-5xl">
           {headline}
           <br />
           <span style={{ color: accentColor }}>{headlineAccent}</span>
         </h1>
 
-        <p
-          className="mb-8 max-w-xl text-lg leading-relaxed"
-          style={{ color: 'rgba(255,255,255,0.5)' }}
-        >
+        <p className="mb-8 max-w-xl text-lg leading-relaxed text-muted-foreground">
           {description}
         </p>
 

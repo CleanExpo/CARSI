@@ -23,27 +23,18 @@ export function IndustryCourseSection({
   courses,
 }: IndustryCourseSectionProps) {
   return (
-    <section className="px-6 py-16" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+    <section className="border-t border-border px-6 py-16">
       <div className="mx-auto max-w-[1400px]">
         <div className="mb-8">
-          <p
-            className="mb-2 text-xs tracking-wide uppercase"
-            style={{ color: 'rgba(255,255,255,0.3)' }}
-          >
+          <p className="mb-2 text-xs tracking-wide uppercase text-muted-foreground/60">
             {industryName}-Relevant Courses
           </p>
-          <h2 className="text-2xl font-bold" style={{ color: 'rgba(255,255,255,0.9)' }}>
+          <h2 className="text-2xl font-bold text-foreground">
             {disciplineList} Training
           </h2>
         </div>
 
-        <div
-          className="rounded-xl p-5"
-          style={{
-            background: 'rgba(255,255,255,0.02)',
-            border: '1px solid rgba(255,255,255,0.06)',
-          }}
-        >
+        <div className="rounded-xl border border-border bg-secondary p-5">
           <CourseGrid courses={courses} initialTab="All" />
         </div>
       </div>

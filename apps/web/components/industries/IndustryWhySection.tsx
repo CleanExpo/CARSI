@@ -21,17 +21,14 @@ export function IndustryWhySection({
   cards,
 }: IndustryWhySectionProps) {
   return (
-    <section className="px-6 py-16" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+    <section className="border-t border-border px-6 py-16">
       <div className="mx-auto max-w-6xl">
         <div className="mb-10">
-          <p
-            className="mb-2 text-xs tracking-wide uppercase"
-            style={{ color: 'rgba(255,255,255,0.3)' }}
-          >
+          <p className="mb-2 text-xs tracking-wide uppercase text-muted-foreground/60">
             Why {industryName} Choose CARSI
           </p>
-          <h2 className="text-2xl font-bold" style={{ color: 'rgba(255,255,255,0.9)' }}>
-            {headline} <span style={{ color: '#2490ed' }}>{headlineAccent}</span>
+          <h2 className="text-2xl font-bold text-foreground">
+            {headline} <span className="text-primary">{headlineAccent}</span>
           </h2>
         </div>
 
@@ -39,12 +36,7 @@ export function IndustryWhySection({
           {cards.map((card) => (
             <div
               key={card.title}
-              className="rounded-lg p-6 transition-transform duration-200 hover:-translate-y-1"
-              style={{
-                background: 'rgba(255,255,255,0.03)',
-                border: '1px solid rgba(255,255,255,0.08)',
-                transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
-              }}
+              className="rounded-lg border border-border bg-secondary p-6 transition-transform duration-200 hover:-translate-y-1"
             >
               <div
                 className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg"
@@ -55,10 +47,10 @@ export function IndustryWhySection({
               >
                 <card.icon className="h-5 w-5" style={{ color: card.color }} />
               </div>
-              <h3 className="mb-2 text-sm font-bold" style={{ color: 'rgba(255,255,255,0.9)' }}>
+              <h3 className="mb-2 text-sm font-bold text-foreground">
                 {card.title}
               </h3>
-              <p className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>
+              <p className="text-xs leading-relaxed text-muted-foreground/60">
                 {card.description}
               </p>
             </div>

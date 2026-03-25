@@ -98,7 +98,7 @@ export function CourseGrid({ courses, initialTab = 'All', loading = false }: Cou
         className="scrollbar-hide mb-5 flex overflow-x-auto"
         role="tablist"
         aria-label="Filter by discipline"
-        style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}
+        style={{ borderBottom: '1px solid hsl(var(--border))' }}
       >
         {DISCIPLINE_TABS.map((tab) => {
           const isActive = activeTab === tab;
@@ -109,14 +109,14 @@ export function CourseGrid({ courses, initialTab = 'All', loading = false }: Cou
               role="tab"
               aria-selected={isActive}
               onClick={() => setActiveTab(tab)}
-              className="relative min-h-[44px] px-4 py-3 text-sm font-medium whitespace-nowrap transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
-              style={isActive ? { color: accentColor } : { color: 'rgba(255,255,255,0.4)' }}
+              className={`relative min-h-[44px] px-4 py-3 text-sm font-medium whitespace-nowrap transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black ${!isActive ? 'text-muted-foreground/60' : ''}`}
+              style={isActive ? { color: accentColor } : undefined}
             >
               {tab}
               {isActive && (
                 <span
                   className="absolute right-0 bottom-0 left-0 h-0.5 rounded-full"
-                  style={{ background: accentColor, boxShadow: `0 0 8px ${accentColor}` }}
+                  style={{ background: accentColor }}
                 />
               )}
             </button>
@@ -129,8 +129,7 @@ export function CourseGrid({ courses, initialTab = 'All', loading = false }: Cou
         <div className="flex items-center gap-3">
           <div className="relative">
             <Search
-              className="absolute top-1/2 left-3 h-3.5 w-3.5 -translate-y-1/2"
-              style={{ color: 'rgba(255,255,255,0.3)' }}
+              className="absolute top-1/2 left-3 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground/60"
             />
             <input
               type="text"
@@ -138,12 +137,7 @@ export function CourseGrid({ courses, initialTab = 'All', loading = false }: Cou
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search courses..."
               aria-label="Search courses"
-              className="w-52 rounded-lg py-2 pr-4 pl-9 text-sm transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/50"
-              style={{
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                color: 'rgba(255,255,255,0.8)',
-              }}
+              className="w-52 rounded-lg border border-border bg-secondary py-2 pr-4 pl-9 text-sm text-foreground transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/50"
               onFocus={(e) => {
                 e.currentTarget.style.borderColor = 'rgba(36,144,237,0.5)';
                 e.currentTarget.style.boxShadow = '0 0 0 3px rgba(36,144,237,0.1)';
@@ -155,8 +149,7 @@ export function CourseGrid({ courses, initialTab = 'All', loading = false }: Cou
             />
           </div>
           <div
-            className="flex items-center gap-1.5 text-sm"
-            style={{ color: 'rgba(255,255,255,0.6)' }}
+            className="flex items-center gap-1.5 text-sm text-muted-foreground"
           >
             <SlidersHorizontal className="h-3.5 w-3.5" />
             <span>
@@ -169,12 +162,7 @@ export function CourseGrid({ courses, initialTab = 'All', loading = false }: Cou
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value as SortKey)}
           aria-label="Sort courses by"
-          className="rounded-lg px-3 py-2 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/50"
-          style={{
-            background: 'rgba(255,255,255,0.05)',
-            border: '1px solid rgba(255,255,255,0.1)',
-            color: 'rgba(255,255,255,0.7)',
-          }}
+          className="rounded-lg border border-border bg-secondary px-3 py-2 text-sm text-muted-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/50"
         >
           <option value="updated">Recently Updated</option>
           <option value="price">Price</option>
@@ -200,7 +188,7 @@ export function CourseGrid({ courses, initialTab = 'All', loading = false }: Cou
         </div>
       ) : (
         <div className="py-20 text-center">
-          <p className="text-sm" style={{ color: 'rgba(255,255,255,0.6)' }}>
+          <p className="text-sm text-muted-foreground">
             No courses found{searchQuery ? ` for "${searchQuery}"` : ''}.
           </p>
         </div>

@@ -92,13 +92,9 @@ export default function InstructorDashboardPage() {
             className="group flex items-start gap-4 rounded-sm border border-white/[0.06] bg-zinc-900/50 p-5 transition-colors hover:border-white/20 hover:bg-zinc-900/80"
           >
             <div
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-sm"
-              style={{
-                background: 'rgba(36,144,237,0.1)',
-                border: '1px solid rgba(36,144,237,0.2)',
-              }}
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-primary/20 bg-primary/10"
             >
-              <item.icon className="h-5 w-5" style={{ color: '#2490ed' }} />
+              <item.icon className="h-5 w-5 text-primary" />
             </div>
             <div className="flex flex-col gap-1">
               <span className="text-sm font-semibold text-white group-hover:text-white/90">

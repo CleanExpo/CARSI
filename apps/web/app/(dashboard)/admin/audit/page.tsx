@@ -33,7 +33,7 @@ function ActionBadge({ action }: { action: string }) {
   };
   return (
     <span
-      className="inline-block rounded-sm px-2 py-0.5 font-mono text-xs"
+      className="inline-block rounded-lg px-2 py-0.5 font-mono text-xs"
       style={{ background: style.bg, color: style.text }}
     >
       {action}
@@ -80,7 +80,7 @@ export default function AuditLogPage() {
   }
 
   return (
-    <div className="min-h-screen space-y-6 p-6" style={{ background: '#050505', color: '#ffffff' }}>
+    <div className="min-h-screen space-y-6 bg-background p-6 text-white">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -91,12 +91,7 @@ export default function AuditLogPage() {
         </div>
         <Link
           href="/admin"
-          className="rounded-sm px-3 py-2 font-mono text-xs"
-          style={{
-            background: '#060a14',
-            border: '0.5px solid rgba(255,255,255,0.06)',
-            color: '#2490ed',
-          }}
+          className="rounded-lg border border-border bg-background px-3 py-2 font-mono text-xs text-primary"
         >
           ← Admin
         </Link>
@@ -110,12 +105,7 @@ export default function AuditLogPage() {
         <select
           value={actionFilter}
           onChange={(e) => handleActionChange(e.target.value)}
-          className="rounded-sm px-3 py-2 font-mono text-xs"
-          style={{
-            background: '#060a14',
-            border: '0.5px solid rgba(255,255,255,0.12)',
-            color: '#fff',
-          }}
+          className="rounded-lg border border-border bg-background px-3 py-2 font-mono text-xs text-white"
         >
           <option value="">All actions</option>
           {ACTION_OPTIONS.filter(Boolean).map((a) => (
@@ -134,18 +124,10 @@ export default function AuditLogPage() {
       {data && !loading && (
         <>
           {/* Table */}
-          <div
-            className="overflow-hidden rounded-sm"
-            style={{ border: '0.5px solid rgba(255,255,255,0.06)' }}
-          >
+          <div className="overflow-hidden rounded-lg border border-border">
             <table className="w-full font-mono text-xs">
               <thead>
-                <tr
-                  style={{
-                    background: '#060a14',
-                    borderBottom: '0.5px solid rgba(255,255,255,0.06)',
-                  }}
-                >
+                <tr className="border-b border-border bg-background">
                   {['Time', 'Actor', 'Action', 'Resource', 'IP'].map((h) => (
                     <th
                       key={h}
@@ -167,10 +149,7 @@ export default function AuditLogPage() {
                   data.items.map((entry) => (
                     <tr
                       key={entry.id}
-                      style={{
-                        borderBottom: '0.5px solid rgba(255,255,255,0.04)',
-                        background: 'transparent',
-                      }}
+                      className="border-b border-border/40"
                     >
                       <td className="px-4 py-3 whitespace-nowrap text-white/40">
                         {new Date(entry.created_at).toLocaleString('en-AU', {
@@ -217,24 +196,14 @@ export default function AuditLogPage() {
                 <button
                   onClick={() => setPage((p) => Math.max(0, p - 1))}
                   disabled={page === 0}
-                  className="rounded-sm px-3 py-2 font-mono text-xs disabled:opacity-30"
-                  style={{
-                    background: '#060a14',
-                    border: '0.5px solid rgba(255,255,255,0.06)',
-                    color: '#2490ed',
-                  }}
+                  className="rounded-lg border border-border bg-background px-3 py-2 font-mono text-xs text-primary disabled:opacity-30"
                 >
                   ← Previous
                 </button>
                 <button
                   onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
                   disabled={page >= totalPages - 1}
-                  className="rounded-sm px-3 py-2 font-mono text-xs disabled:opacity-30"
-                  style={{
-                    background: '#060a14',
-                    border: '0.5px solid rgba(255,255,255,0.06)',
-                    color: '#2490ed',
-                  }}
+                  className="rounded-lg border border-border bg-background px-3 py-2 font-mono text-xs text-primary disabled:opacity-30"
                 >
                   Next →
                 </button>

@@ -192,7 +192,7 @@ export function OnboardingWizard({ isOpen, onComplete }: OnboardingWizardProps) 
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: 'rgba(5, 5, 5, 0.85)', backdropFilter: 'blur(12px)' }}
+      style={{ background: 'rgba(5, 5, 5, 0.85)' }}
       role="dialog"
       aria-modal="true"
       aria-label="Onboarding wizard"
@@ -202,8 +202,7 @@ export function OnboardingWizard({ isOpen, onComplete }: OnboardingWizardProps) 
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.97 }}
         transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
-        className="relative w-full max-w-lg rounded-sm border border-white/[0.06] p-8"
-        style={{ background: '#060a14' }}
+        className="relative w-full max-w-lg rounded-sm border border-white/[0.06] bg-background p-8"
       >
         {/* Step dots */}
         {!result && (
@@ -214,7 +213,7 @@ export function OnboardingWizard({ isOpen, onComplete }: OnboardingWizardProps) 
                 className="h-2 rounded-sm transition-all duration-300"
                 style={{
                   width: i === step ? '24px' : '8px',
-                  background: i <= step ? '#2490ed' : 'rgba(255,255,255,0.1)',
+                  background: i <= step ? 'hsl(var(--primary))' : 'rgba(255,255,255,0.1)',
                 }}
               />
             ))}
@@ -231,23 +230,18 @@ export function OnboardingWizard({ isOpen, onComplete }: OnboardingWizardProps) 
               className="text-center"
             >
               <div
-                className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-sm"
-                style={{
-                  background: 'rgba(36,144,237,0.12)',
-                  border: '1px solid rgba(36,144,237,0.3)',
-                }}
+                className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-sm border border-primary/30 bg-primary/10"
               >
-                <GraduationCap className="h-8 w-8" style={{ color: '#2490ed' }} />
+                <GraduationCap className="h-8 w-8 text-primary" />
               </div>
               <h2 className="mb-2 text-xl font-semibold text-white">We recommend starting with</h2>
-              <p className="mb-3 text-lg font-bold" style={{ color: '#2490ed' }}>
+              <p className="mb-3 text-lg font-bold text-primary">
                 {PATHWAY_LABELS[result.pathway] ?? result.pathway}
               </p>
               <p className="mb-8 text-sm leading-relaxed text-white/60">{result.description}</p>
               <Button
                 onClick={handleComplete}
-                className="w-full gap-2 rounded-sm"
-                style={{ background: '#2490ed', color: '#fff' }}
+                className="w-full gap-2 rounded-sm bg-primary text-white"
                 asChild={false}
               >
                 Start Learning
@@ -263,7 +257,7 @@ export function OnboardingWizard({ isOpen, onComplete }: OnboardingWizardProps) 
             >
               <div
                 className="mb-4 h-10 w-10 animate-spin rounded-full border-2 border-transparent"
-                style={{ borderTopColor: '#2490ed' }}
+                style={{ borderTopColor: 'hsl(var(--primary))' }}
               />
               <p className="text-sm text-white/40">Analysing your answers…</p>
             </motion.div>
@@ -306,9 +300,9 @@ export function OnboardingWizard({ isOpen, onComplete }: OnboardingWizardProps) 
                     key={answer.value}
                     onClick={() => handleAnswer(answer.value)}
                     className="flex items-center gap-4 rounded-sm border border-white/[0.06] p-4 text-left transition-all duration-150 hover:border-[#2490ed]/50 hover:bg-white/[0.03]"
-                    style={{ background: 'rgba(255,255,255,0.02)' }}
+                    style={{ background: 'hsl(var(--secondary))' }}
                   >
-                    <span style={{ color: '#2490ed' }}>{answer.icon}</span>
+                    <span className="text-primary">{answer.icon}</span>
                     <span className="text-sm font-medium text-white">{answer.label}</span>
                   </button>
                 ))}

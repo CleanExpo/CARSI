@@ -93,18 +93,13 @@ export function NotificationBell() {
           setOpen((v) => !v);
           if (!open) fetchNotifications();
         }}
-        className="relative flex h-9 w-9 items-center justify-center rounded-sm transition-colors"
-        style={{
-          background: open ? 'rgba(255,255,255,0.08)' : 'transparent',
-          border: '1px solid rgba(255,255,255,0.08)',
-        }}
+        className={`relative flex h-9 w-9 items-center justify-center rounded-sm border border-border transition-colors ${open ? 'bg-secondary' : 'bg-transparent'}`}
         aria-label="Notifications"
       >
-        <Bell className="h-4 w-4" style={{ color: 'rgba(255,255,255,0.6)' }} />
+        <Bell className="h-4 w-4 text-muted-foreground" />
         {unread > 0 && (
           <span
-            className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full text-[9px] font-bold"
-            style={{ background: '#2490ed', color: '#fff' }}
+            className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-white"
           >
             {unread > 9 ? '9+' : unread}
           </span>
@@ -113,25 +108,19 @@ export function NotificationBell() {
 
       {open && (
         <div
-          className="absolute top-11 right-0 z-50 w-80 overflow-hidden rounded-sm shadow-2xl"
-          style={{
-            background: '#0d1626',
-            border: '1px solid rgba(255,255,255,0.12)',
-          }}
+          className="absolute top-11 right-0 z-50 w-80 overflow-hidden rounded-sm border border-border bg-card shadow-2xl"
         >
           {/* Header */}
           <div
-            className="flex items-center justify-between px-4 py-3"
-            style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}
+            className="flex items-center justify-between border-b border-border px-4 py-3"
           >
-            <span className="text-sm font-semibold" style={{ color: 'rgba(255,255,255,0.85)' }}>
+            <span className="text-sm font-semibold text-foreground">
               Notifications
             </span>
             {unread > 0 && (
               <button
                 onClick={markAllRead}
-                className="text-xs transition-colors"
-                style={{ color: '#2490ed' }}
+                className="text-xs text-primary transition-colors"
               >
                 Mark all read
               </button>
@@ -142,7 +131,7 @@ export function NotificationBell() {
           <div className="max-h-96 overflow-y-auto">
             {!data || data.notifications.length === 0 ? (
               <div className="px-4 py-8 text-center">
-                <p className="text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                <p className="text-sm text-muted-foreground/60">
                   No notifications yet
                 </p>
               </div>
@@ -150,11 +139,7 @@ export function NotificationBell() {
               data.notifications.map((n) => (
                 <div
                   key={n.id}
-                  className="cursor-pointer px-4 py-3 transition-colors"
-                  style={{
-                    background: n.is_read ? 'transparent' : 'rgba(36,144,237,0.06)',
-                    borderBottom: '1px solid rgba(255,255,255,0.05)',
-                  }}
+                  className={`cursor-pointer border-b border-border px-4 py-3 transition-colors ${n.is_read ? 'bg-transparent' : 'bg-primary/5'}`}
                   onClick={() => {
                     if (!n.is_read) markRead(n.id);
                     if (n.action_url) window.location.href = n.action_url;
@@ -163,24 +148,19 @@ export function NotificationBell() {
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0 flex-1">
                       <p
-                        className="truncate text-xs font-semibold"
-                        style={{
-                          color: n.is_read ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.9)',
-                        }}
+                        className={`truncate text-xs font-semibold ${n.is_read ? 'text-muted-foreground' : 'text-foreground'}`}
                       >
                         {n.title}
                       </p>
                       <p
-                        className="mt-0.5 line-clamp-2 text-xs"
-                        style={{ color: 'rgba(255,255,255,0.4)' }}
+                        className="mt-0.5 line-clamp-2 text-xs text-muted-foreground/60"
                       >
                         {n.body}
                       </p>
                     </div>
                     {!n.is_read && (
                       <div
-                        className="mt-1 h-2 w-2 shrink-0 rounded-full"
-                        style={{ background: '#2490ed' }}
+                        className="mt-1 h-2 w-2 shrink-0 rounded-full bg-primary"
                       />
                     )}
                   </div>

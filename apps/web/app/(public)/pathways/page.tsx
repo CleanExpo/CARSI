@@ -40,23 +40,14 @@ export default async function PathwaysPage() {
   const { items: pathways, total } = await getPathways();
 
   return (
-    <main id="main-content" className="relative min-h-screen" style={{ background: '#060a14' }}>
-      {/* Mesh background */}
-      <div className="mesh-bg" aria-hidden="true">
-        <div className="mesh-blob mesh-blob-1" />
-        <div className="mesh-blob mesh-blob-2" />
-      </div>
-
+    <main id="main-content" className="relative min-h-screen bg-background">
       <div className="relative z-10 mx-auto max-w-[1600px] px-4 py-8 sm:px-6 lg:px-8">
         {/* ── Hero header ── */}
         <header className="mb-6">
-          <h1
-            className="font-display text-3xl font-bold tracking-tight sm:text-4xl"
-            style={{ color: 'rgba(255,255,255,0.92)' }}
-          >
+          <h1 className="font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
             Certification Pathways
           </h1>
-          <p className="mt-2 text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>
+          <p className="mt-2 text-sm text-muted-foreground">
             Structured learning journeys towards <AcronymTooltip term="IICRC" /> certification.{' '}
             {total > 0 && `${total} pathway${total !== 1 ? 's' : ''} available.`}
           </p>
@@ -73,15 +64,7 @@ export default async function PathwaysPage() {
           </section>
         ) : (
           <section className="mb-10">
-            <div
-              className="mx-auto max-w-xl rounded-sm px-6 py-16 text-center"
-              style={{
-                background: 'rgba(255,255,255,0.04)',
-                backdropFilter: 'blur(24px) saturate(160%)',
-                WebkitBackdropFilter: 'blur(24px) saturate(160%)',
-                border: '1px solid rgba(255,255,255,0.07)',
-              }}
-            >
+            <div className="mx-auto max-w-xl rounded-lg border border-border bg-card px-6 py-16 text-center">
               {/* Graduation cap icon */}
               <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center">
                 <svg
@@ -112,17 +95,11 @@ export default async function PathwaysPage() {
                 </svg>
               </div>
 
-              <h2
-                className="font-display mb-3 text-xl font-semibold"
-                style={{ color: 'rgba(255,255,255,0.92)' }}
-              >
+              <h2 className="font-display mb-3 text-xl font-semibold text-foreground">
                 Pathways Coming Soon
               </h2>
 
-              <p
-                className="mx-auto mb-8 max-w-md text-sm leading-relaxed"
-                style={{ color: 'rgba(255,255,255,0.55)' }}
-              >
+              <p className="mx-auto mb-8 max-w-md text-sm leading-relaxed text-muted-foreground">
                 We&apos;re building structured learning pathways for each{' '}
                 <AcronymTooltip term="IICRC" /> discipline. In the meantime, browse our course
                 catalogue to start earning <AcronymTooltip term="CEC">CECs</AcronymTooltip>.
@@ -131,18 +108,14 @@ export default async function PathwaysPage() {
               <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
                 <Link
                   href="/courses"
-                  className="inline-flex items-center justify-center rounded-sm px-6 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                  className="inline-flex items-center justify-center rounded-lg px-6 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
                   style={{ background: '#ed9d24' }}
                 >
                   Browse Courses
                 </Link>
                 <Link
                   href="/pricing"
-                  className="inline-flex items-center justify-center rounded-sm px-6 py-2.5 text-sm font-semibold transition-opacity hover:opacity-80"
-                  style={{
-                    color: 'rgba(255,255,255,0.8)',
-                    border: '1px solid rgba(255,255,255,0.15)',
-                  }}
+                  className="inline-flex items-center justify-center rounded-lg border border-border px-6 py-2.5 text-sm font-semibold text-muted-foreground transition-opacity hover:opacity-80"
                 >
                   View Pricing
                 </Link>
@@ -153,25 +126,11 @@ export default async function PathwaysPage() {
 
         {/* ── Student Journey Map ── */}
         <section className="mb-10">
-          <div
-            className="rounded-sm p-5"
-            style={{
-              background: 'rgba(255,255,255,0.04)',
-              backdropFilter: 'blur(24px) saturate(160%)',
-              WebkitBackdropFilter: 'blur(24px) saturate(160%)',
-              border: '1px solid rgba(255,255,255,0.07)',
-            }}
-          >
-            <h2
-              className="font-display mb-3 text-center text-lg font-semibold"
-              style={{ color: 'rgba(255,255,255,0.88)' }}
-            >
+          <div className="rounded-lg border border-border bg-card p-5">
+            <h2 className="font-display mb-3 text-center text-lg font-semibold text-foreground">
               Your Learning Journey
             </h2>
-            <p
-              className="mx-auto mb-4 max-w-xl text-center text-xs"
-              style={{ color: 'rgba(255,255,255,0.4)' }}
-            >
+            <p className="mx-auto mb-4 max-w-xl text-center text-xs text-muted-foreground">
               From enrolment to credential — follow the structured path from first lesson to
               shareable digital certificate.
             </p>
@@ -181,31 +140,16 @@ export default async function PathwaysPage() {
 
         {/* ── GEO Q&A Sections (collapsed accordions — below primary content) ── */}
         <section className="mb-8">
-          <h2
-            className="font-display mb-4 text-lg font-semibold"
-            style={{ color: 'rgba(255,255,255,0.88)' }}
-          >
+          <h2 className="font-display mb-4 text-lg font-semibold text-foreground">
             Frequently Asked Questions
           </h2>
           <div className="space-y-3">
             {/* Q1 — What is a learning pathway? */}
-            <details
-              className="group rounded-sm"
-              style={{
-                background: 'rgba(255,255,255,0.04)',
-                backdropFilter: 'blur(24px) saturate(160%)',
-                WebkitBackdropFilter: 'blur(24px) saturate(160%)',
-                border: '1px solid rgba(255,255,255,0.07)',
-              }}
-            >
-              <summary
-                className="flex cursor-pointer items-center justify-between px-5 py-4 text-sm font-semibold select-none"
-                style={{ color: 'rgba(255,255,255,0.88)' }}
-              >
+            <details className="group rounded-lg border border-border bg-card">
+              <summary className="flex cursor-pointer items-center justify-between px-5 py-4 text-sm font-semibold text-foreground select-none">
                 <span>What is a learning pathway?</span>
                 <svg
-                  className="h-4 w-4 shrink-0 transition-transform duration-200 group-open:rotate-180"
-                  style={{ color: 'rgba(255,255,255,0.4)' }}
+                  className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200 group-open:rotate-180"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -215,7 +159,7 @@ export default async function PathwaysPage() {
                 </svg>
               </summary>
               <div className="px-5 pb-5">
-                <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.55)' }}>
+                <p className="text-sm leading-relaxed text-muted-foreground">
                   A learning pathway is a structured sequence of courses designed to build expertise
                   in a specific area of restoration or cleaning. Unlike individual courses, pathways
                   guide you through prerequisite knowledge, core competencies, and advanced
@@ -238,23 +182,11 @@ export default async function PathwaysPage() {
             </details>
 
             {/* Q2 — Which CARSI pathway is right for me? */}
-            <details
-              className="group rounded-sm"
-              style={{
-                background: 'rgba(255,255,255,0.04)',
-                backdropFilter: 'blur(24px) saturate(160%)',
-                WebkitBackdropFilter: 'blur(24px) saturate(160%)',
-                border: '1px solid rgba(255,255,255,0.07)',
-              }}
-            >
-              <summary
-                className="flex cursor-pointer items-center justify-between px-5 py-4 text-sm font-semibold select-none"
-                style={{ color: 'rgba(255,255,255,0.88)' }}
-              >
+            <details className="group rounded-lg border border-border bg-card">
+              <summary className="flex cursor-pointer items-center justify-between px-5 py-4 text-sm font-semibold text-foreground select-none">
                 <span>Which CARSI pathway is right for me?</span>
                 <svg
-                  className="h-4 w-4 shrink-0 transition-transform duration-200 group-open:rotate-180"
-                  style={{ color: 'rgba(255,255,255,0.4)' }}
+                  className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200 group-open:rotate-180"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -264,7 +196,7 @@ export default async function PathwaysPage() {
                 </svg>
               </summary>
               <div className="px-5 pb-5">
-                <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.55)' }}>
+                <p className="text-sm leading-relaxed text-muted-foreground">
                   Your ideal pathway depends on your current experience level and career objectives.
                   New technicians should start with the Water Restoration Fundamentals pathway,
                   which covers <AcronymTooltip term="IICRC" /> <AcronymTooltip term="WRT" />{' '}
@@ -286,23 +218,11 @@ export default async function PathwaysPage() {
             </details>
 
             {/* Q3 — How do pathways help with career progression? */}
-            <details
-              className="group rounded-sm"
-              style={{
-                background: 'rgba(255,255,255,0.04)',
-                backdropFilter: 'blur(24px) saturate(160%)',
-                WebkitBackdropFilter: 'blur(24px) saturate(160%)',
-                border: '1px solid rgba(255,255,255,0.07)',
-              }}
-            >
-              <summary
-                className="flex cursor-pointer items-center justify-between px-5 py-4 text-sm font-semibold select-none"
-                style={{ color: 'rgba(255,255,255,0.88)' }}
-              >
+            <details className="group rounded-lg border border-border bg-card">
+              <summary className="flex cursor-pointer items-center justify-between px-5 py-4 text-sm font-semibold text-foreground select-none">
                 <span>How do pathways help with career progression?</span>
                 <svg
-                  className="h-4 w-4 shrink-0 transition-transform duration-200 group-open:rotate-180"
-                  style={{ color: 'rgba(255,255,255,0.4)' }}
+                  className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200 group-open:rotate-180"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -312,7 +232,7 @@ export default async function PathwaysPage() {
                 </svg>
               </summary>
               <div className="px-5 pb-5">
-                <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.55)' }}>
+                <p className="text-sm leading-relaxed text-muted-foreground">
                   Structured pathways demonstrate systematic professional development to employers,
                   clients, and industry bodies. Completing a CARSI pathway shows you have mastered
                   not just isolated topics, but an integrated body of knowledge validated against{' '}
