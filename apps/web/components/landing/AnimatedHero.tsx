@@ -26,7 +26,7 @@ const staggerContainer = {
 const trustBadges = [
   { icon: Award, label: 'IICRC Approved', className: 'text-primary' },
   { icon: Shield, label: '24/7 Online Access', className: 'text-green-500' },
-  { icon: Star, label: '4.9★ Rating', className: 'text-carsi-orange' },
+  { icon: Star, label: '140+ Courses', className: 'text-carsi-orange' },
 ];
 
 const partnerLogos = [

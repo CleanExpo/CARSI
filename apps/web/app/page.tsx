@@ -11,7 +11,6 @@ import { MobileNav } from '@/components/landing/MobileNav';
 import { FAQSchema } from '@/components/seo/JsonLd';
 import { IICRCDisciplineMap } from '@/components/lms/diagrams/IICRCDisciplineMap';
 import { StudentJourneyMap } from '@/components/lms/diagrams/StudentJourneyMap';
-import { CertificatePreview } from '@/components/lms/diagrams/CertificatePreview';
 import { AcronymTooltip } from '@/components/ui/AcronymTooltip';
 
 // ---------------------------------------------------------------------------
@@ -64,14 +63,21 @@ const industries = [
   { slug: 'hospitality', label: 'Hotels & Resorts', highlight: true },
   { slug: 'government-defence', label: 'Government & Defence', highlight: true },
   { slug: 'commercial-cleaning', label: 'Commercial Cleaning', highlight: true },
-  { slug: 'aged-care', label: 'Aged Care' },
-  { slug: 'mining', label: 'Mining & Resources' },
-  { slug: 'education', label: 'Education' },
-  { slug: 'property-management', label: 'Property Management' },
-  { slug: 'strata', label: 'Strata & Body Corporate' },
-  { slug: 'retail', label: 'Retail & Shopping Centres' },
-  { slug: 'childcare', label: 'Childcare' },
-  { slug: 'construction', label: 'Construction' },
+  { slug: 'aged-care', label: 'Aged Care', highlight: false },
+  { slug: 'mining', label: 'Mining & Resources', highlight: false },
+  { slug: 'education', label: 'Education', highlight: false },
+  { slug: 'property-management', label: 'Property Management', highlight: false },
+  { slug: 'strata', label: 'Strata & Body Corporate', highlight: false },
+  { slug: 'retail', label: 'Retail & Shopping Centres', highlight: false },
+  { slug: 'childcare', label: 'Childcare', highlight: false },
+  { slug: 'construction', label: 'Construction', highlight: false },
+  { slug: 'insurance', label: 'Insurance', highlight: false },
+  { slug: 'plumbing-trades', label: 'Plumbing & Trades', highlight: false },
+  { slug: 'ndis-disability', label: 'NDIS & Disability Services', highlight: false },
+  { slug: 'gyms-fitness', label: 'Gyms & Fitness', highlight: false },
+  { slug: 'real-estate', label: 'Real Estate', highlight: false },
+  { slug: 'emergency-management', label: 'Emergency Management', highlight: false },
+  { slug: 'caravan-parks', label: 'Caravan Parks', highlight: false },
 ];
 
 const benefits = [
@@ -113,6 +119,27 @@ const faqs = [
     question: 'What industries does CARSI serve?',
     answer:
       'CARSI serves 19 industries including healthcare, hospitality, aged care, mining and resources, commercial cleaning, government and defence, education, property management, strata, retail, childcare, construction, insurance, plumbing and trades, NDIS and disability services, gyms and fitness, real estate, emergency management, and caravan parks.',
+  },
+];
+
+const testimonials = [
+  {
+    name: 'Klark Brown',
+    company: 'Restoration Advisers',
+    quote:
+      "We've enrolled our entire team through CARSI. The IICRC discipline coverage is comprehensive, the course quality is consistently high, and the platform just works. It's our go-to for keeping technicians certified.",
+  },
+  {
+    name: 'Shannon Benz',
+    company: 'Mould Solutions Group',
+    quote:
+      "CARSI's mould remediation courses gave my team the IICRC-aligned knowledge we needed to tackle complex jobs with confidence. The CEC credit tracking is clear and the content is genuinely practical.",
+  },
+  {
+    name: 'Yasser Mohamed',
+    company: 'Black Gold Carpet Cleaning',
+    quote:
+      "Running my own carpet cleaning business means training has to fit around the job. CARSI's 24/7 online access let me complete my CRT preparation between callouts. Worth every dollar.",
   },
 ];
 
@@ -596,16 +623,82 @@ export default async function Home() {
         </div>
       </AnimatedSection>
 
-      {/* ── Certificate Preview ──────────────────────────────────────────── */}
-      <AnimatedSection label="Credentials" title="Verifiable Digital Certificates">
-        <div className="mx-auto max-w-xl">
-          <p className="mb-6 text-center text-sm text-muted-foreground">
-            Every completed course earns you a verifiable digital certificate with a public URL you
-            can share with employers and clients.
-          </p>
-          <CertificatePreview />
+      {/* ── Testimonials ──────────────────────────────────────────────────── */}
+      <AnimatedSection label="Student Reviews" title="What professionals say">
+        <div className="grid gap-6 sm:grid-cols-3">
+          {testimonials.map((t, i) => (
+            <AnimatedCard key={t.name} index={i}>
+              <div className="flex h-full flex-col rounded-lg border border-border bg-card p-6">
+                <p className="mb-4 flex-1 text-sm leading-relaxed text-muted-foreground">
+                  &ldquo;{t.quote}&rdquo;
+                </p>
+                <div className="border-t border-border pt-4">
+                  <p className="text-sm font-semibold text-foreground">{t.name}</p>
+                  <p className="text-xs text-muted-foreground">{t.company}</p>
+                </div>
+              </div>
+            </AnimatedCard>
+          ))}
+        </div>
+        <div className="mt-6 text-center">
+          <Link
+            href="/testimonials"
+            className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Read all reviews →
+          </Link>
         </div>
       </AnimatedSection>
+
+      {/* ── Pricing Teaser ────────────────────────────────────────────────── */}
+      <section className="border-t border-border px-6 py-16">
+        <div className="mx-auto max-w-6xl">
+          <div className="mb-8">
+            <p className="mb-1 text-xs uppercase tracking-wide text-muted-foreground/60">Membership</p>
+            <h2 className="text-2xl font-bold text-foreground">Simple, transparent pricing</h2>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-3">
+            {/* Free */}
+            <div className="rounded-lg border border-border bg-card p-6">
+              <p className="mb-1 text-sm font-semibold text-foreground">Free Library</p>
+              <p className="mb-3 text-3xl font-bold text-foreground">$0</p>
+              <p className="mb-4 text-xs text-muted-foreground">Australian government resources, SOPs, guides &amp; free webinar series. No card required.</p>
+              <Link href="/register" className="flex w-full items-center justify-center rounded-lg border border-border px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
+                Get Started Free
+              </Link>
+            </div>
+            {/* Foundation */}
+            <div className="rounded-lg border border-primary/20 bg-primary/5 p-6">
+              <p className="mb-1 text-sm font-semibold text-foreground">Foundation</p>
+              <div className="mb-1 flex items-baseline gap-1">
+                <span className="text-3xl font-bold text-foreground">$44</span>
+                <span className="text-sm text-muted-foreground">/ month</span>
+              </div>
+              <p className="mb-4 text-xs text-muted-foreground">Entry-level CEC courses — PPE, moisture metering, Level 1 Mould, Carpet Cleaning Basics &amp; more. 7-day free trial.</p>
+              <Link href="/subscribe?plan=foundation" className="flex w-full items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90">
+                Start Free Trial
+              </Link>
+            </div>
+            {/* Growth */}
+            <div className="relative rounded-lg border border-primary/20 bg-primary/5 p-6">
+              <span className="absolute -top-3 left-5 rounded-lg bg-green-500 px-3 py-0.5 text-xs font-semibold uppercase tracking-wide text-black">Most Popular</span>
+              <p className="mb-1 text-sm font-semibold text-foreground">Growth</p>
+              <div className="mb-1 flex items-baseline gap-1">
+                <span className="text-3xl font-bold text-foreground">$99</span>
+                <span className="text-sm text-muted-foreground">/ month</span>
+              </div>
+              <p className="mb-4 text-xs text-muted-foreground">Unlock all 140+ courses — Level 2 Mould, Admin, Social Media, NeoSan Labs, IICRC CEC dashboard &amp; shareable credentials. 7-day free trial.</p>
+              <Link href="/subscribe?plan=growth" className="flex w-full items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90">
+                Start Free Trial
+              </Link>
+            </div>
+          </div>
+          <p className="mt-4 text-center text-xs text-muted-foreground/50">
+            Annual plans available — Foundation $495/yr, Growth $795/yr.{' '}
+            <Link href="/pricing" className="underline hover:text-muted-foreground">See full pricing →</Link>
+          </p>
+        </div>
+      </section>
 
       {/* ── CTA ────────────────────────────────────────────────────────────── */}
       <section className="border-t border-border px-6 py-20">
