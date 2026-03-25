@@ -187,7 +187,7 @@ export default function StudentDashboardPage() {
         {/* CEC Progress */}
         {profile?.iicrc_member_number && (
           <div className="flex flex-col items-center gap-3">
-            <h2 className="self-start font-mono text-xs tracking-widest text-white/40 uppercase">
+            <h2 className="self-start text-xs font-medium tracking-widest text-muted-foreground/60 uppercase">
               CEC Progress
             </h2>
             <CECProgressRing
@@ -260,7 +260,7 @@ export default function StudentDashboardPage() {
           {sub?.has_subscription && ['active', 'trialling'].includes(sub.status ?? '') && (
             <Link
               href="/courses"
-              className="text-xs font-medium text-primary transition-colors hover:text-white"
+              className="text-xs font-medium text-primary transition-colors hover:text-foreground"
             >
               Browse all courses →
             </Link>
