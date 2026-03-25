@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/components/auth/auth-provider';
 import { apiClient } from '@/lib/api/client';
@@ -24,6 +25,7 @@ interface CheckoutResponse {
 }
 
 export function EnrolButton({ slug, priceAud = 0, isFree = false }: EnrolButtonProps) {
+  const pathname = usePathname();
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -57,7 +59,8 @@ export function EnrolButton({ slug, priceAud = 0, isFree = false }: EnrolButtonP
     setError(null);
 
     if (!user) {
-      setError('Please log in to access this course.');
+      const returnTo = pathname && pathname.startsWith('/') ? pathname : `/courses/${slug}`;
+      window.location.href = `/login?next=${encodeURIComponent(returnTo)}`;
       setLoading(false);
       return;
     }
