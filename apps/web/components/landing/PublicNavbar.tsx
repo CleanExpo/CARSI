@@ -17,7 +17,7 @@ export function PublicNavbar() {
           </Link>
 
           <div className="hidden items-center gap-8 md:flex">
-            {['Courses', 'Industries', 'Pathways', 'Pricing'].map((item) => (
+            {['Courses', 'Industries', 'Pricing', 'About'].map((item) => (
               <Link
                 key={item}
                 href={`/${item.toLowerCase()}`}
@@ -36,10 +36,10 @@ export function PublicNavbar() {
               Sign In
             </Link>
             <Link
-              href="/courses"
+              href="/register"
               className="rounded-md bg-carsi-orange px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-carsi-orange/90"
             >
-              Browse Courses
+              Get Started Free
             </Link>
           </div>
 

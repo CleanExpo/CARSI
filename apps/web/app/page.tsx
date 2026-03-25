@@ -33,17 +33,17 @@ interface Course {
 // Data
 // ---------------------------------------------------------------------------
 
-async function getFeaturedCourses(): Promise<Course[]> {
+async function getFeaturedCourses(): Promise<{ courses: Course[]; total: number }> {
   const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8000';
   try {
     const res = await fetch(`${backendUrl}/api/lms/courses?limit=3`, {
       next: { revalidate: 300 },
     });
-    if (!res.ok) return [];
+    if (!res.ok) return { courses: [], total: 0 };
     const data = await res.json();
-    return data.items ?? [];
+    return { courses: data.items ?? [], total: data.total ?? 0 };
   } catch {
-    return [];
+    return { courses: [], total: 0 };
   }
 }
 
@@ -82,10 +82,9 @@ const benefits = [
   'No travel, no downtime, no waiting',
 ];
 
-const stats = [
+const BASE_STATS = [
   { value: '24/7', label: 'Online Access' },
   { value: '12+', label: 'Industries Served' },
-  { value: '91', label: 'Courses' },
   { value: '7', label: 'IICRC Disciplines' },
 ];
 
@@ -93,7 +92,7 @@ const faqs = [
   {
     question: 'What is CARSI?',
     answer:
-      'CARSI is an Australian online training platform offering IICRC CEC-approved courses for cleaning and restoration professionals. With over 91 courses across seven IICRC disciplines, CARSI enables technicians to maintain their certification entirely online.',
+      'CARSI is an Australian online training platform offering IICRC CEC-approved courses for cleaning and restoration professionals. With over 160 courses across seven IICRC disciplines, CARSI enables technicians to maintain their certification entirely online.',
   },
   {
     question: 'How do IICRC CECs work?',
@@ -187,7 +186,12 @@ function SkeletonCard() {
 // ---------------------------------------------------------------------------
 
 export default async function Home() {
-  const featuredCourses = await getFeaturedCourses();
+  const { courses: featuredCourses, total: courseTotal } = await getFeaturedCourses();
+
+  const stats = [
+    ...BASE_STATS,
+    { value: courseTotal > 0 ? courseTotal.toString() : '160+', label: 'Courses' },
+  ];
 
   return (
     <div id="main-content" className="min-h-screen bg-background">
@@ -219,7 +223,7 @@ export default async function Home() {
             </Link>
 
             <div className="hidden items-center gap-8 md:flex">
-              {['Courses', 'Industries', 'Pathways', 'Pricing'].map((item) => (
+              {['Courses', 'Industries', 'Pricing', 'About'].map((item) => (
                 <Link
                   key={item}
                   href={`/${item.toLowerCase()}`}
@@ -238,10 +242,10 @@ export default async function Home() {
                 Sign In
               </Link>
               <Link
-                href="/courses"
+                href="/register"
                 className="rounded-md bg-carsi-orange px-4 py-2 text-sm font-medium text-white transition-all duration-200 hover:scale-[1.02]"
               >
-                Browse Courses
+                Get Started Free
               </Link>
             </div>
 
@@ -513,7 +517,7 @@ export default async function Home() {
             equipment familiarisation, and workplace health and safety induction. This partnership
             means CARSI-trained technicians are recognised across the NRPG network from day one. For
             restoration companies, enrolling staff through CARSI ensures compliance with NRPG
-            workforce standards without disrupting operations. With over 91 courses spanning all
+            workforce standards without disrupting operations. With over 160 courses spanning all
             seven <AcronymTooltip term="IICRC" /> disciplines, CARSI provides the most comprehensive
             online training library available to Australian restoration professionals.
           </p>
@@ -571,20 +575,17 @@ export default async function Home() {
                 className="group rounded-lg border border-border bg-card"
               >
                 <summary
-                  className="flex cursor-pointer items-center justify-between px-5 py-4 text-sm font-medium select-none"
-                  style={{ color: 'hsl(var(--foreground))' }}
+                  className="flex cursor-pointer items-center justify-between px-5 py-4 text-sm font-medium text-foreground select-none"
                 >
                   {faq.question}
                   <span
-                    className="ml-2 transition-transform duration-200 group-open:rotate-45"
-                    style={{ color: 'hsl(var(--primary))' }}
+                    className="ml-2 text-primary transition-transform duration-200 group-open:rotate-45"
                   >
                     +
                   </span>
                 </summary>
                 <div
-                  className="px-5 pb-4 text-sm leading-relaxed"
-                  style={{ color: 'hsl(var(--muted-foreground))' }}
+                  className="px-5 pb-4 text-sm leading-relaxed text-muted-foreground"
                 >
                   {faq.answer}
                 </div>
@@ -614,7 +615,7 @@ export default async function Home() {
           <p className="mb-8 text-base text-muted-foreground">
             Free courses available. Premium courses from just $20 AUD.
             <br />
-            Or get full access to all 91 courses for $795 AUD/year.
+            Or get full access to 160+ courses for $795 AUD/year.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
@@ -641,16 +642,15 @@ export default async function Home() {
             <div>
               <div className="mb-3 flex items-center gap-2">
                 <div
-                  className="flex h-6 w-6 items-center justify-center rounded-sm text-xs font-bold text-white"
-                  style={{ background: '#2490ed' }}
+                  className="flex h-6 w-6 items-center justify-center rounded-sm bg-primary text-xs font-bold text-white"
                 >
                   C
                 </div>
-                <span className="text-sm font-semibold" style={{ color: 'rgba(255,255,255,0.8)' }}>
+                <span className="text-sm font-semibold text-foreground/80">
                   CARSI
                 </span>
               </div>
-              <p className="text-xs leading-relaxed" style={{ color: 'hsl(var(--muted-foreground))' }}>
+              <p className="text-xs leading-relaxed text-muted-foreground">
                 Australia&apos;s industry training leader.
                 <br />
                 24/7 online. <AcronymTooltip term="IICRC" />
@@ -664,7 +664,7 @@ export default async function Home() {
               >
                 Platform
               </p>
-              <ul className="space-y-2 text-xs" style={{ color: 'hsl(var(--muted-foreground))' }}>
+              <ul className="space-y-2 text-xs text-muted-foreground">
                 {[
                   { label: 'Courses', href: '/courses' },
                   { label: 'Pathways', href: '/pathways' },
@@ -675,7 +675,7 @@ export default async function Home() {
                   { label: 'Contact', href: '/contact' },
                 ].map((item) => (
                   <li key={item.label}>
-                    <Link href={item.href} className="hover:text-white">
+                    <Link href={item.href} className="hover:text-foreground">
                       {item.label}
                     </Link>
                   </li>
@@ -689,10 +689,10 @@ export default async function Home() {
               >
                 Industries
               </p>
-              <ul className="space-y-2 text-xs" style={{ color: 'hsl(var(--muted-foreground))' }}>
+              <ul className="space-y-2 text-xs text-muted-foreground">
                 {industries.slice(0, 4).map((industry) => (
                   <li key={industry.slug}>
-                    <Link href={`/industries/${industry.slug}`} className="hover:text-white">
+                    <Link href={`/industries/${industry.slug}`} className="hover:text-foreground">
                       {industry.label}
                     </Link>
                   </li>
@@ -706,15 +706,15 @@ export default async function Home() {
               >
                 Contact
               </p>
-              <ul className="space-y-2 text-xs" style={{ color: 'hsl(var(--muted-foreground))' }}>
+              <ul className="space-y-2 text-xs text-muted-foreground">
                 <li>PO Box 4309, Forest Lake QLD 4078</li>
                 <li>
-                  <a href="mailto:support@carsi.com.au" className="hover:text-white">
+                  <a href="mailto:support@carsi.com.au" className="hover:text-foreground">
                     support@carsi.com.au
                   </a>
                 </li>
                 <li>
-                  <a href="tel:+61457123005" className="hover:text-white">
+                  <a href="tel:+61457123005" className="hover:text-foreground">
                     0457 123 005
                   </a>
                 </li>
@@ -737,8 +737,7 @@ export default async function Home() {
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[10px] transition-colors hover:text-white"
-                    style={{ color: 'hsl(var(--muted-foreground))' }}
+                    className="text-[10px] text-muted-foreground transition-colors hover:text-foreground"
                     aria-label={social.label}
                   >
                     {social.label}
@@ -751,10 +750,10 @@ export default async function Home() {
           <div
             className="flex flex-col items-center justify-between gap-2 border-t border-border pt-6 sm:flex-row"
           >
-            <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.25)' }}>
+            <p className="text-[11px] text-muted-foreground/50">
               © 2026 CARSI Pty Ltd. All rights reserved.
             </p>
-            <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.25)' }}>
+            <p className="text-[11px] text-muted-foreground/50">
               <AcronymTooltip term="IICRC" />
               -aligned continuing education — not an <AcronymTooltip term="RTO" />
             </p>

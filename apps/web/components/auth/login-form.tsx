@@ -109,14 +109,14 @@ export function LoginForm() {
           )}
         />
         {error && (
-          <p
-            className="text-destructive text-sm"
+          <div
+            className="rounded-lg border border-destructive/30 bg-destructive/10 p-3"
             role="alert"
             aria-live="assertive"
             id="login-error"
           >
-            {error}
-          </p>
+            <p className="text-sm font-medium text-destructive">{error}</p>
+          </div>
         )}
         <button
           type="submit"

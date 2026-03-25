@@ -8,7 +8,6 @@ import { Menu, X } from 'lucide-react';
 const navItems = [
   { href: '/courses', label: 'Courses' },
   { href: '/industries', label: 'Industries' },
-  { href: '/pathways', label: 'Pathways' },
   { href: '/pricing', label: 'Pricing' },
   { href: '/about', label: 'About' },
 ];
@@ -110,11 +109,11 @@ export function MobileNav() {
                     Sign In
                   </Link>
                   <Link
-                    href="/courses"
+                    href="/register"
                     onClick={() => setIsOpen(false)}
                     className="block rounded-md bg-carsi-orange px-4 py-3 text-center text-base font-medium text-white transition-colors hover:bg-carsi-orange/90"
                   >
-                    Browse Courses
+                    Get Started Free
                   </Link>
                 </div>
               </nav>

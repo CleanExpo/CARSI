@@ -74,9 +74,9 @@ export default async function CoursesPage({
             Restoration Training Courses
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            {total} course{total !== 1 ? 's' : ''} across 7 <AcronymTooltip term="IICRC" />{' '}
-            disciplines — earn <AcronymTooltip term="CEC">CECs</AcronymTooltip> online, at your own
-            pace
+            {total > 0 ? `${total} courses` : 'IICRC-approved courses'} across 7{' '}
+            <AcronymTooltip term="IICRC" /> disciplines — earn{' '}
+            <AcronymTooltip term="CEC">CECs</AcronymTooltip> online, at your own pace
           </p>
         </header>
 

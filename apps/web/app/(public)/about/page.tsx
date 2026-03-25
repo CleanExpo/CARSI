@@ -5,7 +5,7 @@ import { ArrowRight } from 'lucide-react';
 export const metadata: Metadata = {
   title: 'About CARSI | Centre for Australian Restoration and Standards Information',
   description:
-    "CARSI is Australia's leading online training platform for cleaning and restoration professionals. 40+ IICRC CEC-approved courses across 7 disciplines. 50+ years of combined industry experience.",
+    "CARSI is Australia's leading online training platform for cleaning and restoration professionals. 160+ IICRC CEC-approved courses across 7 disciplines. 50+ years of combined industry experience.",
 };
 
 const disciplines = [
@@ -34,7 +34,7 @@ const credentials = [
 ];
 
 const stats = [
-  { value: '40+', label: 'IICRC CEC-approved courses' },
+  { value: '160+', label: 'IICRC CEC-approved courses' },
   { value: '7', label: 'IICRC disciplines covered' },
   { value: '12+', label: 'Industries served' },
 ];
@@ -87,7 +87,7 @@ export default function AboutPage() {
             in Perth, CARSI is there.
           </p>
           <p className="text-sm leading-relaxed text-muted-foreground">
-            With over 40 IICRC CEC-approved courses across seven disciplines, and a full-access
+            With over 160 IICRC CEC-approved courses across seven disciplines, and a full-access
             subscription at $795 AUD per year, we provide the most cost-effective path to IICRC
             certification maintenance in Australia.
           </p>
@@ -211,7 +211,7 @@ export default function AboutPage() {
             </Link>
             <Link
               href="/pricing"
-              className="inline-flex items-center rounded-lg border border-border bg-secondary px-5 py-2.5 text-sm font-medium text-muted-foreground transition-all duration-200 hover:text-white"
+              className="inline-flex items-center rounded-lg border border-border bg-secondary px-5 py-2.5 text-sm font-medium text-muted-foreground transition-all duration-200 hover:text-foreground"
             >
               View Pricing
             </Link>

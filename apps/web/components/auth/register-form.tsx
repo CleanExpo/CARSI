@@ -143,7 +143,26 @@ export function RegisterForm() {
             </FormItem>
           )}
         />
-        {error && <p className="text-destructive text-sm">{error}</p>}
+        {error && (
+          <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-4">
+            <p className="text-sm font-medium text-destructive">
+              {error.includes('timed out') || error.toLowerCase().includes('network')
+                ? 'Our servers are temporarily unavailable.'
+                : error}
+            </p>
+            {(error.includes('timed out') || error.toLowerCase().includes('network')) && (
+              <p className="mt-1 text-xs text-muted-foreground">
+                Please try again in a moment or email{' '}
+                <a
+                  href="mailto:support@carsi.com.au"
+                  className="underline hover:text-foreground"
+                >
+                  support@carsi.com.au
+                </a>
+              </p>
+            )}
+          </div>
+        )}
         <button
           type="submit"
           disabled={isLoading}

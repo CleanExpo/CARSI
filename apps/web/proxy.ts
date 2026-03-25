@@ -31,7 +31,7 @@ export async function proxy(request: NextRequest) {
     const token = request.cookies.get('carsi_token');
     if (!token?.value) {
       const loginUrl = new URL('/login', request.url);
-      loginUrl.searchParams.set('next', pathname);
+      loginUrl.searchParams.set('next', pathname + (request.nextUrl.search ?? ''));
       return NextResponse.redirect(loginUrl);
     }
   }

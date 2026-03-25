@@ -8,7 +8,7 @@
 
 const BACKEND_URL = (process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000').trim();
 
-const DEFAULT_TIMEOUT_MS = 30_000;
+const DEFAULT_TIMEOUT_MS = 8_000;
 const MAX_RETRIES = 3;
 const RETRY_BASE_MS = 500;
 
@@ -120,13 +120,20 @@ async function fetchApi<T>(
       );
     }
 
-    // Handle 401 — attempt token refresh once
+    // Handle 401 — attempt token refresh once, but ONLY if we sent a token.
+    // A 401 with no token simply means the user is not logged in — do not
+    // redirect public visitors to the login page.
     if (response.status === 401 && !didRefresh) {
+      if (!token) {
+        // No token was sent — unauthenticated user on a public endpoint.
+        // Throw silently so callers like getCurrentUser() can return null.
+        throw new ApiClientError('Not authenticated', 401);
+      }
       const refreshed = await attemptTokenRefresh();
       if (refreshed) {
         return fetchApi<T>(endpoint, options, retriesLeft, true);
       }
-      // Refresh failed — redirect to login
+      // Had a token but refresh failed — session has truly expired, redirect.
       if (typeof window !== 'undefined') {
         window.location.href = '/login';
       }

@@ -43,7 +43,7 @@ const FAQ_ITEMS = [
   {
     question: 'Do CARSI courses count toward IICRC CECs?',
     answer:
-      "CARSI's catalogue of approximately 40 courses carries IICRC CEC approval. Your membership includes a CEC tracking dashboard that logs every credit you earn, broken down by discipline (WRT, CRT, OCT, ASD, CCT and more).",
+      "CARSI's catalogue of 160+ courses carries IICRC CEC approval. Your membership includes a CEC tracking dashboard that logs every credit you earn, broken down by discipline (WRT, CRT, OCT, ASD, CCT and more).",
   },
   {
     question: 'What happens if my membership lapses?',
