@@ -1,0 +1,49 @@
+{
+  "generated": "2026-03-06",
+  "generator": "Gemini 2.5 Flash Image API",
+  "totalImages": 106,
+  "categories": {
+    "courses": {
+      "count": 74,
+      "path": "/images/courses/",
+      "format": "WebP",
+      "dimensions": "1200x675",
+      "description": "Course cover images for CARSI LMS"
+    },
+    "badges": {
+      "count": 14,
+      "path": "/images/badges/",
+      "format": "WebP",
+      "dimensions": "512x512",
+      "description": "Achievement and discipline badges for gamification"
+    },
+    "pathways": {
+      "count": 7,
+      "path": "/images/pathways/",
+      "format": "WebP",
+      "dimensions": "1200x675",
+      "description": "IICRC discipline learning pathway diagrams"
+    },
+    "og": {
+      "count": 11,
+      "path": "/images/og/",
+      "format": "WebP",
+      "dimensions": "1200x630",
+      "description": "Open Graph social sharing images"
+    }
+  },
+  "brandColours": {
+    "carsiBlue": "#2490ed",
+    "carsiOrange": "#ed9d24",
+    "successGreen": "#27ae60"
+  },
+  "disciplineColours": {
+    "WRT": "#2490ed",
+    "CRT": "#26c4a0",
+    "ASD": "#6c63ff",
+    "OCT": "#9b59b6",
+    "CCT": "#17b8d4",
+    "FSRT": "#f05a35",
+    "AMRT": "#27ae60"
+  }
+}
