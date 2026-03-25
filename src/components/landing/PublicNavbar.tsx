@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { MobileNav } from './MobileNav';
 
@@ -17,17 +18,16 @@ export function PublicNavbar() {
       }}
     >
       <div className="mx-auto max-w-6xl px-6">
-        <div className="flex h-16 items-center justify-between">
+        <div className="flex h-20 items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <div
-              className="flex h-8 w-8 items-center justify-center rounded-sm font-bold text-white"
-              style={{ background: '#2490ed' }}
-            >
-              C
-            </div>
-            <span className="font-semibold" style={{ color: 'rgba(255,255,255,0.9)' }}>
-              CARSI
-            </span>
+            <Image
+              src="/logo/logo.png"
+              alt="CARSI"
+              width={360}
+              height={72}
+              className="h-[72px] w-auto max-w-[min(360px,48vw)] object-contain object-left"
+              priority
+            />
           </Link>
 
           <div className="hidden items-center gap-8 md:flex">

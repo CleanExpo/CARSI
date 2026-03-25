@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { AcronymTooltip } from '@/components/ui/AcronymTooltip';
 
@@ -20,15 +21,13 @@ export function PublicFooter() {
         <div className="mb-8 grid gap-8 sm:grid-cols-4">
           <div>
             <div className="mb-3 flex items-center gap-2">
-              <div
-                className="flex h-6 w-6 items-center justify-center rounded-sm text-xs font-bold text-white"
-                style={{ background: '#2490ed' }}
-              >
-                C
-              </div>
-              <span className="text-sm font-semibold" style={{ color: 'rgba(255,255,255,0.8)' }}>
-                CARSI
-              </span>
+              <Image
+                src="/logo/logo.png"
+                alt="CARSI"
+                width={480}
+                height={96}
+                className="h-24 w-auto max-w-[min(480px,60vw)] object-contain object-left"
+              />
             </div>
             <p className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.4)' }}>
               Australia&apos;s industry training leader.
@@ -72,7 +71,7 @@ export function PublicFooter() {
               Industries
             </p>
             <ul className="space-y-2 text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
-              {industries.map((industry) => (
+              {industries.slice(0, 4).map((industry) => (
                 <li key={industry.slug}>
                   <Link href={`/industries/${industry.slug}`} className="hover:text-white">
                     {industry.label}
@@ -136,11 +135,11 @@ export function PublicFooter() {
           style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}
         >
           <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.25)' }}>
-            &copy; 2026 CARSI Pty Ltd. All rights reserved.
+            © 2026 CARSI Pty Ltd. All rights reserved.
           </p>
           <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.25)' }}>
             <AcronymTooltip term="IICRC" />
-            -aligned continuing education &mdash; not an <AcronymTooltip term="RTO" />
+            -aligned continuing education — not an <AcronymTooltip term="RTO" />
           </p>
         </div>
       </div>
