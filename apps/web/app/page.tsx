@@ -7,7 +7,7 @@ import {
   AnimatedCard,
   AnimatedSection,
 } from '@/components/landing/AnimatedHero';
-import { MobileNav } from '@/components/landing/MobileNav';
+import { PublicNavbar } from '@/components/landing/PublicNavbar';
 import { FAQSchema } from '@/components/seo/JsonLd';
 import { IICRCDisciplineMap } from '@/components/lms/diagrams/IICRCDisciplineMap';
 import { StudentJourneyMap } from '@/components/lms/diagrams/StudentJourneyMap';
@@ -232,55 +232,7 @@ export default async function Home() {
       />
 
       {/* ── Navigation ─────────────────────────────────────────────────────── */}
-      <nav
-        aria-label="Main navigation"
-        className="sticky top-0 z-50 border-b border-border bg-background/85 backdrop-blur-sm"
-      >
-        <div className="mx-auto max-w-6xl px-6">
-          <div className="flex h-16 items-center justify-between">
-            <Link href="/" className="flex items-center gap-2">
-              <div
-                className="flex h-8 w-8 items-center justify-center rounded-sm bg-primary font-bold text-primary-foreground"
-              >
-                C
-              </div>
-              <span className="font-semibold text-foreground">
-                CARSI
-              </span>
-            </Link>
-
-            <div className="hidden items-center gap-8 md:flex">
-              {['Courses', 'Industries', 'Pricing', 'About'].map((item) => (
-                <Link
-                  key={item}
-                  href={`/${item.toLowerCase()}`}
-                  className="text-sm text-muted-foreground transition-colors duration-150 hover:text-foreground"
-                >
-                  {item}
-                </Link>
-              ))}
-            </div>
-
-            <div className="hidden items-center gap-4 md:flex">
-              <Link
-                href="/login"
-                className="text-sm transition-colors duration-150 hover:text-foreground text-muted-foreground"
-              >
-                Sign In
-              </Link>
-              <Link
-                href="/register"
-                className="rounded-sm bg-carsi-orange px-4 py-2 text-sm font-medium text-white transition-all duration-200 hover:scale-[1.02]"
-              >
-                Get Started Free
-              </Link>
-            </div>
-
-            {/* Mobile hamburger menu */}
-            <MobileNav />
-          </div>
-        </div>
-      </nav>
+      <PublicNavbar />
 
       {/* ── Hero (Animated) ────────────────────────────────────────────────── */}
       <AnimatedHero benefits={benefits} />
