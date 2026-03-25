@@ -1,8 +1,8 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { ArrowRight, Award, CheckCircle2, Shield, Star } from 'lucide-react';
 import Link from 'next/link';
-import { ArrowRight, CheckCircle2, Award, Shield, Star } from 'lucide-react';
 import { ReactNode } from 'react';
 
 // ---------------------------------------------------------------------------
@@ -78,7 +78,7 @@ function TrustSignals() {
   return (
     <motion.div
       variants={staggerContainer}
-      initial="hidden"
+      initial="visible"
       animate="visible"
       className="mt-10 flex flex-wrap items-center gap-6"
     >
@@ -134,11 +134,11 @@ interface AnimatedHeroProps {
 
 export function AnimatedHero({ benefits }: AnimatedHeroProps) {
   return (
-    <section className="relative px-6 pt-24 pb-20">
+    <section className="relative z-10 px-6 pt-24 pb-20">
       <div className="mx-auto max-w-6xl">
         <motion.div
           className="max-w-2xl"
-          initial="hidden"
+          initial="visible"
           animate="visible"
           variants={staggerContainer}
         >
@@ -194,7 +194,7 @@ export function AnimatedHero({ benefits }: AnimatedHeroProps) {
           {/* Animated benefit list */}
           <motion.ul
             variants={staggerContainer}
-            initial="hidden"
+            initial="visible"
             animate="visible"
             className="space-y-2"
           >
@@ -238,7 +238,7 @@ export function AnimatedStats({ stats }: AnimatedStatsProps) {
       <div className="mx-auto max-w-6xl">
         <motion.div
           className="grid grid-cols-2 gap-8 sm:grid-cols-4"
-          initial="hidden"
+          initial="visible"
           whileInView="visible"
           viewport={{ once: true, margin: '-50px' }}
           variants={staggerContainer}
@@ -279,7 +279,7 @@ interface AnimatedCardProps {
 export function AnimatedCard({ children, index }: AnimatedCardProps) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 1, y: 0 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-30px' }}
       transition={{ duration: 0.5, ease: smoothEase, delay: index * 0.1 }}
@@ -306,7 +306,7 @@ export function AnimatedSection({ label, title, children, rightContent }: Animat
       <div className="mx-auto max-w-6xl">
         <motion.div
           className="mb-8 flex items-end justify-between"
-          initial={{ opacity: 0, y: 10 }}
+          initial={{ opacity: 1, y: 0 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, ease: smoothEase }}

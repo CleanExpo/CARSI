@@ -1,19 +1,19 @@
-import Link from 'next/link';
-import Image from 'next/image';
-import { ArrowRight } from 'lucide-react';
 import {
-  AnimatedHero,
-  AnimatedStats,
   AnimatedCard,
+  AnimatedHero,
   AnimatedSection,
+  AnimatedStats,
 } from '@/components/landing/AnimatedHero';
 import { MobileNav } from '@/components/landing/MobileNav';
-import { FAQSchema } from '@/components/seo/JsonLd';
+import { CertificatePreview } from '@/components/lms/diagrams/CertificatePreview';
 import { IICRCDisciplineMap } from '@/components/lms/diagrams/IICRCDisciplineMap';
 import { StudentJourneyMap } from '@/components/lms/diagrams/StudentJourneyMap';
-import { CertificatePreview } from '@/components/lms/diagrams/CertificatePreview';
+import { FAQSchema } from '@/components/seo/JsonLd';
 import { AcronymTooltip } from '@/components/ui/AcronymTooltip';
 import { getBackendOrigin } from '@/lib/env/public-url';
+import { ArrowRight } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -205,13 +205,13 @@ export default async function Home() {
   const featuredCourses = await getFeaturedCourses();
 
   return (
-    <div id="main-content" className="min-h-screen bg-[#050505]">
+    <div id="main-content" className="relative z-10 min-h-screen bg-[#050505]">
       {/* FAQ structured data for GEO/AI search engines */}
       <FAQSchema questions={faqs} />
 
       {/* Single subtle gradient orb — much calmer than 3 animated blobs */}
       <div
-        className="pointer-events-none fixed inset-0"
+        className="pointer-events-none fixed inset-0 z-0"
         style={{
           background:
             'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(36,144,237,0.07) 0%, transparent 55%)',
