@@ -1,12 +1,20 @@
 import Link from 'next/link';
+import Image from 'next/image';
 
 export function Footer() {
   return (
     <footer className="border-t border-border bg-background py-6">
       <div className="container flex flex-col items-center justify-between gap-4 md:flex-row">
-        <p className="text-sm tracking-wide text-muted-foreground">
-          CARSI — Restoration Training Platform
-        </p>
+        <Link href="/" className="flex items-center">
+          <Image
+            src="https://carsi.com.au/wp-content/uploads/2021/02/CARSI-LOGO-best-compression-2.png"
+            alt="CARSI"
+            width={100}
+            height={32}
+            className="h-7 w-auto opacity-70"
+            unoptimized
+          />
+        </Link>
         <nav className="flex gap-4 text-sm text-muted-foreground">
           <Link href="/terms" className="hover:text-foreground">
             Terms
