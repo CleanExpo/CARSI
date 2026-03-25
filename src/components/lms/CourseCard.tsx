@@ -191,8 +191,6 @@ function formatRelativeDate(dateStr: string | null | undefined): string {
   return `${Math.floor(days / 30)}mo ago`;
 }
 
-const smoothEase: [number, number, number, number] = [0.4, 0, 0.2, 1];
-
 export function CourseCard({ course }: CourseCardProps) {
   const [imageError, setImageError] = useState(false);
   const priceNum =
