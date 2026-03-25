@@ -283,7 +283,7 @@ else
 fi
 
 # Check file structure
-if [ -f "apps/backend/pyproject.toml" ] && [ -f "apps/web/package.json" ]; then
+if [ -f "apps/backend/pyproject.toml" ] && [ -f "package.json" ] && [ -d "app" ]; then
     print_success "Project structure is valid"
 else
     print_error "Project structure appears incomplete"

@@ -17,25 +17,20 @@ triggers:
 ## Migration Structure
 
 ```
-supabase/
-  migrations/
-    00000000000000_init.sql
-    00000000000001_auth_schema.sql
-    00000000000002_enable_pgvector.sql
-    00000000000003_state_tables.sql
-    00000000000004_australian_fields.sql
-    00000000000005_privacy_compliance.sql
-  seed.sql
-  config.toml
+apps/backend/alembic/
+  versions/
+    001_lms_core_schema.py
+    002_learning_pathways.py
+    ... (numbered Alembic revisions)
+  env.py
 ```
 
 ## Creating Migrations
 
 ```bash
-# Create a new migration
-supabase migration new create_users_table
-
-# This creates: supabase/migrations/[timestamp]_create_users_table.sql
+cd apps/backend
+uv run alembic revision --autogenerate -m "describe_change"
+uv run alembic upgrade head
 ```
 
 ## Migration Best Practices
@@ -327,23 +322,15 @@ $$;
 ## Running Migrations
 
 ```bash
-# Apply all pending migrations
-supabase db push
-
-# Reset database and apply all migrations (DESTRUCTIVE!)
-supabase db reset
-
-# Generate TypeScript types from schema
-supabase gen types typescript --local > types/supabase.ts
-
-# Create migration from diff
-supabase db diff --file migration_name
+cd apps/backend
+uv run alembic upgrade head
+uv run alembic downgrade -1   # rollback one revision (use with care)
 ```
 
 ## Seeding Data (Australian Context)
 
 ```sql
--- supabase/seed.sql
+-- scripts/seed.sql or one-off SQL against PostgreSQL
 
 -- Insert Australian states
 INSERT INTO states (code, name) VALUES
@@ -448,4 +435,4 @@ EXECUTE FUNCTION log_data_access();
 COMMIT;
 ```
 
-See: `supabase/migrations/`, `database/supabase.skill.md`
+See: `apps/backend/alembic/versions/`, this skill file.

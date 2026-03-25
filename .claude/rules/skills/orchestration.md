@@ -43,7 +43,7 @@ triggers: [react, component, ui, tailwind, nextjs]
 triggers: [api, agent, fastapi, langgraph]
 
 # Database tasks → database/*.md
-triggers: [migration, supabase, database, sql]
+triggers: [migration, postgresql, database, sql]
 ```
 
 ## Key Skills

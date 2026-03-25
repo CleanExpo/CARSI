@@ -134,7 +134,7 @@ A thin wrapper around the existing `AgentMetrics` pattern, extended with standar
 
 ```python
 from datetime import datetime, UTC
-from src.state.supabase import SupabaseStateStore
+from src.state.null_store import NullStateStore
 from src.utils import get_logger
 
 logger = get_logger(__name__)
@@ -144,7 +144,7 @@ class MetricsRegistry:
     """Centralised metrics collection and query interface."""
 
     def __init__(self) -> None:
-        self.store = SupabaseStateStore()
+        self.store = NullStateStore()
         self.client = self.store.client
 
     async def increment(self, metric: str, value: int = 1, labels: dict[str, str] | None = None) -> None:

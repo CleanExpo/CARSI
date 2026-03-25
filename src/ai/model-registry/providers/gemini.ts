@@ -6,7 +6,7 @@
  * @see src/ai/model-registry/index.ts for the full registry
  */
 
-import { type ModelConfig, type TaskType, APPROVED_MODELS, getApprovedModel } from '../index';
+import { type ModelConfig, APPROVED_MODELS } from '../index';
 
 export type GeminiModelId =
   | 'gemini-2.5-flash-image'

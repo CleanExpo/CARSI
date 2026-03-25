@@ -1,9 +1,0 @@
-node_modules
-.next
-.env*
-*.log
-.turbo
-coverage
-playwright-report
-test-results
-.vitest
