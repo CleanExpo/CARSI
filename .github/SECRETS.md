@@ -130,7 +130,7 @@ Uncomment in `.github/workflows/ci.yml`:
   uses: codecov/codecov-action@v4
   with:
     token: ${{ secrets.CODECOV_TOKEN }}
-    files: ./apps/web/coverage/lcov.info
+    files: ./coverage/lcov.info
     flags: frontend
 ```
 

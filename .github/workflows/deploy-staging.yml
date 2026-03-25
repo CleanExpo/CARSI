@@ -11,12 +11,11 @@ concurrency:
 
 env:
   REGISTRY: ghcr.io
-  WEB_IMAGE: ghcr.io/carsi-lms/web
   BACKEND_IMAGE: ghcr.io/carsi-lms/backend
 
 jobs:
   build-and-push:
-    name: Build & Push Docker Images (Staging)
+    name: Build & Push Backend Image (Staging)
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
@@ -45,24 +44,6 @@ jobs:
         run: |
           echo "sha=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
           echo "date=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_OUTPUT"
-
-      - name: Build & push web image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: apps/web/Dockerfile
-          push: true
-          tags: |
-            ${{ env.WEB_IMAGE }}:staging
-            ${{ env.WEB_IMAGE }}:staging-${{ steps.meta.outputs.sha }}
-          build-args: |
-            NEXT_PUBLIC_BACKEND_URL=https://api-staging.carsi.com.au
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          labels: |
-            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
-            org.opencontainers.image.revision=${{ github.sha }}
-            org.opencontainers.image.created=${{ steps.meta.outputs.date }}
 
       - name: Build & push backend image
         uses: docker/build-push-action@v6
@@ -108,28 +89,18 @@ jobs:
           kubectl apply -f k8s/staging/namespace.yaml
           kubectl apply -f k8s/staging/
 
-      - name: Set image tags
+      - name: Set backend image tag
         env:
           SHA: ${{ needs.build-and-push.outputs.image-tag }}
         run: |
-          kubectl set image deployment/carsi-web \
-            web=${{ env.WEB_IMAGE }}:staging-${SHA} \
-            -n carsi-staging
-
           kubectl set image deployment/carsi-backend \
             backend=${{ env.BACKEND_IMAGE }}:staging-${SHA} \
             -n carsi-staging
-
-      - name: Wait for web rollout
-        run: kubectl rollout status deployment/carsi-web -n carsi-staging --timeout=300s
 
       - name: Wait for backend rollout
         run: kubectl rollout status deployment/carsi-backend -n carsi-staging --timeout=300s
 
       - name: Verify deployment health
         run: |
-          echo "Checking web pods..."
-          kubectl get pods -n carsi-staging -l app=carsi-web -o wide
-          echo ""
           echo "Checking backend pods..."
           kubectl get pods -n carsi-staging -l app=carsi-backend -o wide

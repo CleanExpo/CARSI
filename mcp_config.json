@@ -1,11 +1,5 @@
 {
   "mcpServers": {
-    "supabase": {
-      "type": "http",
-      "url": "https://mcp.supabase.com/mcp?project_ref=pwwwhoaxxtkmowifpuwf",
-      "enabled": true,
-      "description": "Supabase MCP server for database operations"
-    },
     "filesystem": {
       "command": "npx",
       "args": [
@@ -78,8 +72,7 @@
   "security": {
     "allowed_paths": [
       "D:\\Node JS Starter V1",
-      "D:\\Node JS Starter V1\\apps",
-      "D:\\Node JS Starter V1\\supabase"
+      "D:\\Node JS Starter V1\\apps"
     ],
     "blocked_operations": ["rm -rf", "DROP DATABASE", "DELETE FROM"],
     "require_confirmation": ["write_file", "delete_file", "execute_command"]

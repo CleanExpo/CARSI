@@ -76,9 +76,7 @@ if [ "$DEPLOY_FRONTEND" = true ]; then
         exit 1
     fi
 
-    cd apps/web
     vercel --prod
-    cd ../..
 
     echo -e "${GREEN}✓ Frontend deployed${NC}"
 fi

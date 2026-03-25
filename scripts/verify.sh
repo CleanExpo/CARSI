@@ -184,8 +184,8 @@ else
     check_fail "Root package.json not found"
 fi
 
-if [ -d "apps/web" ] && [ -f "apps/web/package.json" ]; then
-    check_pass "Frontend app exists (apps/web)"
+if [ -d "app" ] && [ -f "next.config.ts" ]; then
+    check_pass "Frontend app exists (root app/ + next.config.ts)"
 else
     check_fail "Frontend app not found"
 fi
@@ -252,12 +252,6 @@ else
     check_fail "Root node_modules not found (run: pnpm install)"
 fi
 
-if [ -d "apps/web/node_modules" ]; then
-    check_pass "Frontend node_modules exists"
-else
-    check_fail "Frontend node_modules not found (run: pnpm install)"
-fi
-
 if [ -d "apps/backend/.venv" ]; then
     check_pass "Backend virtual environment exists"
 else
@@ -290,7 +284,7 @@ else
 fi
 
 # Check each workspace
-WORKSPACES=("." "apps/web" "packages/config")
+WORKSPACES=("." "packages/news-worker" "packages/shared" "packages/config" "packages/schema")
 for WORKSPACE in "${WORKSPACES[@]}"; do
     if [ ! -f "$WORKSPACE/package.json" ]; then
         continue

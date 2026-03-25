@@ -2,9 +2,14 @@ const path = require("path");
 const { FlatCompat } = require("@eslint/eslintrc");
 
 const compat = new FlatCompat({
-  baseDirectory: path.join(__dirname, "apps/web"),
-  resolvePluginsRelativeTo: path.join(__dirname, "apps/web"),
+  baseDirectory: __dirname,
+  resolvePluginsRelativeTo: __dirname,
 });
+
+const frontendGlobs = [
+  "app/**/*.{js,jsx,ts,tsx}",
+  "src/**/*.{js,jsx,ts,tsx}",
+];
 
 module.exports = [
   // Global ignores
@@ -16,20 +21,21 @@ module.exports = [
       "**/dist/**",
       "**/build/**",
       "**/coverage/**",
+      "e2e/**",
     ],
   },
 
-  // Base config for web app
+  // Base config for Next.js app (root)
   ...compat
     .extends("next/core-web-vitals", "plugin:@typescript-eslint/recommended")
     .map((config) => ({
       ...config,
-      files: ["apps/web/**/*.{js,jsx,ts,tsx}"],
+      files: frontendGlobs,
     })),
 
   // Production code overrides
   {
-    files: ["apps/web/**/*.{js,jsx,ts,tsx}"],
+    files: frontendGlobs,
     rules: {
       "@typescript-eslint/no-explicit-any": "error",
       "@typescript-eslint/no-unused-vars": [
@@ -47,11 +53,10 @@ module.exports = [
   // Test files - relaxed rules
   {
     files: [
-      "apps/web/**/__tests__/**/*.{js,jsx,ts,tsx}",
-      "apps/web/**/*.test.{js,jsx,ts,tsx}",
-      "apps/web/**/*.spec.{js,jsx,ts,tsx}",
-      "apps/web/**/tests/**/*.{js,jsx,ts,tsx}",
-      "apps/web/**/e2e/**/*.{js,jsx,ts,tsx}",
+      "src/**/__tests__/**/*.{js,jsx,ts,tsx}",
+      "src/**/*.test.{js,jsx,ts,tsx}",
+      "src/**/*.spec.{js,jsx,ts,tsx}",
+      "tests/**/*.{js,jsx,ts,tsx}",
     ],
     rules: {
       "@typescript-eslint/no-explicit-any": "off",

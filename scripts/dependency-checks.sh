@@ -124,7 +124,7 @@ try {
 
         // Report issues
         if (!installed) {
-            issues.push(`MISSING:${name}:${version}:not_installed`);
+            issues.push('MISSING:' + name + ':' + version + ':not_installed');
         } else if (installedVersion) {
             // Check for version mismatch
             // Remove common semver prefixes from declared version
@@ -133,7 +133,7 @@ try {
 
             // Only report mismatch if major version differs
             if (declaredClean !== '*' && declaredClean !== installedMajor && !version.includes(installedVersion)) {
-                issues.push(`MISMATCH:${name}:${version}:${installedVersion}`);
+                issues.push('MISMATCH:' + name + ':' + version + ':' + installedVersion);
             }
         }
     }
@@ -142,7 +142,7 @@ try {
     issues.forEach(issue => console.log(issue));
     process.exit(issues.length > 0 ? 1 : 0);
 } catch (error) {
-    console.error(`ERROR:${error.message}`);
+    console.error('ERROR:' + error.message);
     process.exit(1);
 }
 NODEJS_SCRIPT
@@ -172,18 +172,17 @@ check_orphaned_dependencies() {
     fi
 
     # Use Node.js to find orphans
-    local node_script=$(cat << 'NODEJS_SCRIPT'
-const fs = require('fs');
-const path = require('path');
+    local node_script=$(cat << 'ORPHANS_NODE_SCRIPT'
+const fs = require("fs");
+const path = require("path");
 const workspace = process.argv[1];
 
 try {
-    const pkgPath = path.join(workspace, 'package.json');
-    const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+    const pkgPath = path.join(workspace, "package.json");
+    const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf8"));
 
     const declared = {};
 
-    // Collect declared dependencies
     if (pkg.dependencies) {
         Object.assign(declared, pkg.dependencies);
     }
@@ -191,33 +190,30 @@ try {
         Object.assign(declared, pkg.devDependencies);
     }
 
-    const nodeModulesPath = path.join(workspace, 'node_modules');
+    const nodeModulesPath = path.join(workspace, "node_modules");
     const entries = fs.readdirSync(nodeModulesPath, { withFileTypes: true });
 
     const orphans = [];
 
     for (const entry of entries) {
-        // Skip @scoped directories initially
-        if (entry.name.startsWith('.') || entry.name === '.bin') {
+        if (entry.name.startsWith(".") || entry.name === ".bin") {
             continue;
         }
 
         if (entry.isDirectory()) {
-            // Check if it's a scoped package
-            if (entry.name.startsWith('@')) {
-                // For scoped packages like @babel/core, check subdirectories
+            if (entry.name.startsWith("@")) {
                 const scopePath = path.join(nodeModulesPath, entry.name);
                 const scopedEntries = fs.readdirSync(scopePath, { withFileTypes: true });
 
                 for (const scopedEntry of scopedEntries) {
-                    if (scopedEntry.isDirectory() && !scopedEntry.name.startsWith('.')) {
-                        const fullName = `${entry.name}/${scopedEntry.name}`;
+                    if (scopedEntry.isDirectory() && !scopedEntry.name.startsWith(".")) {
+                        const fullName = entry.name + "/" + scopedEntry.name;
                         if (!declared[fullName]) {
-                            const pkgJsonPath = path.join(scopePath, scopedEntry.name, 'package.json');
+                            const pkgJsonPath = path.join(scopePath, scopedEntry.name, "package.json");
                             if (fs.existsSync(pkgJsonPath)) {
                                 try {
-                                    const mod = JSON.parse(fs.readFileSync(pkgJsonPath, 'utf8'));
-                                    orphans.push(`ORPHANED:${fullName}:${mod.version || 'unknown'}`);
+                                    const mod = JSON.parse(fs.readFileSync(pkgJsonPath, "utf8"));
+                                    orphans.push("ORPHANED:" + fullName + ":" + (mod.version || "unknown"));
                                 } catch (e) {
                                     // Ignore parse errors
                                 }
@@ -226,13 +222,12 @@ try {
                     }
                 }
             } else {
-                // Regular package
                 if (!declared[entry.name]) {
-                    const pkgJsonPath = path.join(nodeModulesPath, entry.name, 'package.json');
+                    const pkgJsonPath = path.join(nodeModulesPath, entry.name, "package.json");
                     if (fs.existsSync(pkgJsonPath)) {
                         try {
-                            const mod = JSON.parse(fs.readFileSync(pkgJsonPath, 'utf8'));
-                            orphans.push(`ORPHANED:${entry.name}:${mod.version || 'unknown'}`);
+                            const mod = JSON.parse(fs.readFileSync(pkgJsonPath, "utf8"));
+                            orphans.push("ORPHANED:" + entry.name + ":" + (mod.version || "unknown"));
                         } catch (e) {
                             // Ignore parse errors
                         }
@@ -242,14 +237,13 @@ try {
         }
     }
 
-    // Output results
     orphans.forEach(orphan => console.log(orphan));
     process.exit(orphans.length > 0 ? 1 : 0);
 } catch (error) {
-    console.error(`ERROR:${error.message}`);
+    console.error("ERROR:" + error.message);
     process.exit(1);
 }
-NODEJS_SCRIPT
+ORPHANS_NODE_SCRIPT
 )
 
     # Run Node.js script
@@ -267,7 +261,7 @@ const fs = require('fs');
 const path = require('path');
 
 try {
-    const workspaces = ['.', 'apps/web', 'packages/config'];
+    const workspaces = ['.', 'packages/news-worker', 'packages/shared', 'packages/config', 'packages/schema'];
     const depMatrix = {};
 
     // Collect all dependencies from all workspaces
@@ -290,7 +284,7 @@ try {
             }
 
             for (const [name, version] of Object.entries(deps)) {
-                if (version.startsWith('workspace:')) {
+                if (version.startsWith("workspace:")) {
                     continue;
                 }
 
@@ -325,9 +319,9 @@ try {
     // Report conflicts
     if (conflicts.length > 0) {
         conflicts.forEach(conflict => {
-            console.log(`CONFLICT:${conflict.package}`);
+            console.log('CONFLICT:' + conflict.package);
             conflict.usages.forEach(usage => {
-                console.log(`  ${usage.workspace}:${usage.version}`);
+                console.log('  ' + usage.workspace + ':' + usage.version);
             });
         });
         process.exit(1);
@@ -335,7 +329,7 @@ try {
 
     process.exit(0);
 } catch (error) {
-    console.error(`ERROR:${error.message}`);
+    console.error('ERROR:' + error.message);
     process.exit(1);
 }
 NODEJS_SCRIPT
