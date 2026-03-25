@@ -43,7 +43,7 @@ export function PublicNavbar() {
             </Link>
             <Link
               href="/register"
-              className="rounded-md bg-carsi-orange px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-carsi-orange/90"
+              className="rounded-sm bg-carsi-orange px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-carsi-orange/90"
             >
               Get Started Free
             </Link>

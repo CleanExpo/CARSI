@@ -84,7 +84,7 @@ export function PricingCards() {
         className="mb-16 grid grid-cols-1 gap-6 md:grid-cols-3"
       >
         {/* Free Library */}
-        <div className="flex flex-col rounded-lg border border-border bg-card p-6">
+        <div className="flex flex-col rounded-sm border border-border bg-card p-6">
           <div className="mb-6">
             <h2 className="mb-1 text-lg font-bold text-foreground">Free Library</h2>
             <div className="flex items-baseline gap-1">
@@ -105,7 +105,7 @@ export function PricingCards() {
           <div className="mt-auto">
             <Link
               href="/register"
-              className="flex w-full items-center justify-center rounded-lg border border-border px-4 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:border-border hover:text-foreground"
+              className="flex w-full items-center justify-center rounded-sm border border-border px-4 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:border-border hover:text-foreground"
             >
               Create Free Account
             </Link>
@@ -113,7 +113,7 @@ export function PricingCards() {
         </div>
 
         {/* Foundation */}
-        <div className="flex flex-col rounded-lg border border-primary/20 bg-primary/5 p-6">
+        <div className="flex flex-col rounded-sm border border-primary/20 bg-primary/5 p-6">
           <div className="mb-6">
             <h2 className="mb-1 text-lg font-bold text-foreground">Foundation</h2>
             <div className="flex items-baseline gap-1">
@@ -145,7 +145,7 @@ export function PricingCards() {
           <div className="mt-auto">
             <Link
               href={`/subscribe?plan=foundation&billing=${yearly ? 'yearly' : 'monthly'}`}
-              className="flex w-full items-center justify-center rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+              className="flex w-full items-center justify-center rounded-sm bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
             >
               Start 7-Day Free Trial
             </Link>
@@ -156,10 +156,10 @@ export function PricingCards() {
         </div>
 
         {/* Growth — highlighted */}
-        <div className="relative flex flex-col rounded-lg border border-primary/20 bg-primary/5 p-6">
+        <div className="relative flex flex-col rounded-sm border border-primary/20 bg-primary/5 p-6">
           {/* Most Popular badge */}
           <div className="absolute -top-3 left-6">
-            <span className="rounded-lg bg-green-500 px-3 py-1 text-xs font-semibold tracking-wide uppercase text-black">
+            <span className="rounded-sm bg-green-500 px-3 py-1 text-xs font-semibold tracking-wide uppercase text-black">
               Most Popular
             </span>
           </div>
@@ -195,7 +195,7 @@ export function PricingCards() {
           <div className="mt-auto">
             <Link
               href={`/subscribe?plan=growth&billing=${yearly ? 'yearly' : 'monthly'}`}
-              className="flex w-full items-center justify-center rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+              className="flex w-full items-center justify-center rounded-sm bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
             >
               Start 7-Day Free Trial
             </Link>

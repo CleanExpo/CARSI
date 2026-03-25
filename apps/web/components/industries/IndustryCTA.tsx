@@ -36,13 +36,13 @@ export function IndustryCTA({
         <div className="flex justify-center gap-3">
           <Link
             href={ctaHref}
-            className="inline-flex items-center gap-2 rounded-md bg-carsi-orange px-8 py-3 font-medium text-white transition-all duration-200"
+            className="inline-flex items-center gap-2 rounded-sm bg-carsi-orange px-8 py-3 font-medium text-white transition-all duration-200"
           >
             {ctaText} <ArrowRight className="h-4 w-4" />
           </Link>
           <Link
             href="/courses"
-            className="inline-flex items-center gap-2 rounded-md border border-border bg-secondary px-8 py-3 font-medium text-muted-foreground transition-colors duration-200 hover:text-white"
+            className="inline-flex items-center gap-2 rounded-sm border border-border bg-secondary px-8 py-3 font-medium text-muted-foreground transition-colors duration-200 hover:text-white"
           >
             Browse All Courses
           </Link>

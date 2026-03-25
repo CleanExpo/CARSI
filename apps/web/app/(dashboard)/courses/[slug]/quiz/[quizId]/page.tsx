@@ -124,7 +124,7 @@ export default function QuizPage() {
       {/* Header */}
       {quiz && (
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-primary/25 bg-primary/10">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-sm border border-primary/25 bg-primary/10">
             <ClipboardList className="h-5 w-5 text-primary" />
           </div>
           <div>
@@ -170,7 +170,7 @@ export default function QuizPage() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -12 }}
             transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
-            className="rounded-lg border border-border bg-card p-6"
+            className="rounded-sm border border-border bg-card p-6"
           >
             {submitError && (
               <p className="mb-4 rounded-sm border border-red-500/20 bg-red-500/8 px-3 py-2 text-xs text-red-400">
@@ -205,7 +205,7 @@ export default function QuizPage() {
           >
             {/* Score card */}
             <div
-              className="rounded-lg border border-border bg-card p-6"
+              className="rounded-sm border border-border bg-card p-6"
             >
               <QuizResult result={result} onRetry={handleRetry} />
             </div>

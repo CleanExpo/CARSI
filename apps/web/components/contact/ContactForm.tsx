@@ -39,18 +39,18 @@ export function ContactForm() {
   }
 
   const fieldClass =
-    'w-full rounded-md border border-input bg-secondary px-3 py-2.5 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/40 focus:border-primary/60 focus:ring-1 focus:ring-primary/30';
+    'w-full rounded-sm border border-input bg-secondary px-3 py-2.5 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/40 focus:border-primary/60 focus:ring-1 focus:ring-primary/30';
 
   if (status === 'success') {
     return (
-      <div className="flex min-h-[320px] flex-col items-center justify-center rounded-lg border border-primary/20 bg-primary/5 p-10 text-center">
+      <div className="flex min-h-[320px] flex-col items-center justify-center rounded-sm border border-primary/20 bg-primary/5 p-10 text-center">
         <p className="mb-2 text-2xl font-bold text-foreground">Message sent ✓</p>
         <p className="text-sm text-muted-foreground">
           Thanks for reaching out. We&apos;ll be in touch within 1–2 business days.
         </p>
         <button
           onClick={() => setStatus('idle')}
-          className="mt-6 rounded-md bg-secondary px-4 py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-secondary/80"
+          className="mt-6 rounded-sm bg-secondary px-4 py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-secondary/80"
         >
           Send another message
         </button>
@@ -135,7 +135,7 @@ export function ContactForm() {
       <button
         type="submit"
         disabled={status === 'sending'}
-        className="rounded-md bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60"
+        className="rounded-sm bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60"
       >
         {status === 'sending' ? 'Sending…' : 'Send Message'}
       </button>

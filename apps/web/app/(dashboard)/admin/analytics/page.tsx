@@ -28,7 +28,7 @@ function MetricCard({
   sub?: string;
 }) {
   return (
-    <div className="rounded-lg border border-border bg-card p-5">
+    <div className="rounded-sm border border-border bg-card p-5">
       <p className="mb-1 text-[11px] font-medium tracking-wide uppercase text-muted-foreground">
         {label}
       </p>
@@ -157,7 +157,7 @@ export default function AdminAnalyticsPage() {
           <h2 className="mb-4 text-xs font-semibold tracking-widest uppercase text-muted-foreground">
             Top Courses by Completion
           </h2>
-          <div className="overflow-hidden rounded-lg border border-border">
+          <div className="overflow-hidden rounded-sm border border-border">
             {data.top_courses.map((course, i) => (
               <div
                 key={i}

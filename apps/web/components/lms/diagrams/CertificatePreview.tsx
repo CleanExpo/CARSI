@@ -70,7 +70,7 @@ export function CertificatePreview({
           {/* CARSI Logo mark */}
           <div className="mx-auto mb-4 flex items-center justify-center gap-2">
             <div
-              className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-lg font-bold text-primary-foreground"
+              className="flex h-10 w-10 items-center justify-center rounded-sm bg-primary text-lg font-bold text-primary-foreground"
             >
               C
             </div>

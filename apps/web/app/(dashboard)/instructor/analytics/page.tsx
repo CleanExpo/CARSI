@@ -55,7 +55,7 @@ export default function InstructorAnalyticsPage() {
             ].map(({ label, value }) => (
               <div
                 key={label}
-                className="rounded-lg border border-border bg-card p-5"
+                className="rounded-sm border border-border bg-card p-5"
               >
                 <p className="mb-1 text-[11px] tracking-widest text-muted-foreground uppercase">
                   {label}
@@ -68,7 +68,7 @@ export default function InstructorAnalyticsPage() {
           </div>
 
           {data.courses.length > 0 && (
-            <div className="overflow-hidden rounded-lg border border-border">
+            <div className="overflow-hidden rounded-sm border border-border">
               <div className="grid grid-cols-4 border-b border-border px-5 py-3 text-[10px] font-semibold tracking-widest text-muted-foreground/50 uppercase">
                 <span className="col-span-2">Course</span>
                 <span>Enrolments</span>

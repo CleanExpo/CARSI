@@ -141,10 +141,10 @@ export function CECCalculator() {
   }, [discipline, certLevel, cecsEarned]);
 
   return (
-    <section className="rounded-lg border border-border bg-card p-5 sm:p-6">
+    <section className="rounded-sm border border-border bg-card p-5 sm:p-6">
       <div className="mb-5 flex items-center gap-3">
         <div
-          className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/15"
+          className="flex h-10 w-10 items-center justify-center rounded-sm bg-primary/15"
           aria-hidden="true"
         >
           <Calculator className="h-5 w-5 text-primary" />
@@ -241,7 +241,7 @@ export function CECCalculator() {
       {/* Results */}
       {result && (
         <div
-          className="mt-5 rounded-lg border border-border bg-card p-4"
+          className="mt-5 rounded-sm border border-border bg-card p-4"
         >
           {certLevel === 'none' ? (
             /* New certification path */
@@ -324,7 +324,7 @@ export function CECCalculator() {
               {/* Stats row */}
               <div className="grid grid-cols-3 gap-3">
                 <div
-                  className="rounded-lg bg-primary/10 p-3 text-center"
+                  className="rounded-sm bg-primary/10 p-3 text-center"
                 >
                   <p className="text-lg font-bold text-primary">
                     {result.remaining}
@@ -334,7 +334,7 @@ export function CECCalculator() {
                   </p>
                 </div>
                 <div
-                  className="rounded-lg bg-carsi-orange/10 p-3 text-center"
+                  className="rounded-sm bg-carsi-orange/10 p-3 text-center"
                 >
                   <p className="text-lg font-bold text-carsi-orange">
                     {result.coursesNeeded}
@@ -344,7 +344,7 @@ export function CECCalculator() {
                   </p>
                 </div>
                 <div
-                  className="rounded-lg bg-secondary p-3 text-center"
+                  className="rounded-sm bg-secondary p-3 text-center"
                 >
                   <div className="flex items-center justify-center gap-1">
                     <Clock

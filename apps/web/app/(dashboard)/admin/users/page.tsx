@@ -42,7 +42,7 @@ export default function AdminUsersPage() {
       {loading && <p className="text-muted-foreground">Loading users…</p>}
 
       {!loading && (
-        <div className="overflow-x-auto rounded-lg border">
+        <div className="overflow-x-auto rounded-sm border">
           <table className="w-full text-sm">
             <thead className="bg-muted text-muted-foreground">
               <tr>

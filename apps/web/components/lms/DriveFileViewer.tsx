@@ -10,7 +10,7 @@ export function DriveFileViewer({ driveFileId, className }: DriveFileViewerProps
     <iframe
       src={src}
       allow="autoplay"
-      className={className ?? 'h-[600px] w-full rounded-lg border'}
+      className={className ?? 'h-[600px] w-full rounded-sm border'}
       title="Google Drive file viewer"
     />
   );

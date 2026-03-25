@@ -201,7 +201,7 @@ export function OnboardingWizard({ isOpen, onComplete }: OnboardingWizardProps) 
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.97 }}
         transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
-        className="relative w-full max-w-lg rounded-lg border border-border bg-background p-8"
+        className="relative w-full max-w-lg rounded-sm border border-border bg-background p-8"
       >
         {/* Step dots */}
         {!result && (
@@ -291,7 +291,7 @@ export function OnboardingWizard({ isOpen, onComplete }: OnboardingWizardProps) 
                   <button
                     key={answer.value}
                     onClick={() => handleAnswer(answer.value)}
-                    className="flex items-center gap-4 rounded-lg border border-border bg-secondary p-4 text-left transition-all duration-150 hover:border-primary/50 hover:bg-muted/30"
+                    className="flex items-center gap-4 rounded-sm border border-border bg-secondary p-4 text-left transition-all duration-150 hover:border-primary/50 hover:bg-muted/30"
                   >
                     <span className="text-primary">{answer.icon}</span>
                     <span className="text-sm font-medium text-foreground">{answer.label}</span>

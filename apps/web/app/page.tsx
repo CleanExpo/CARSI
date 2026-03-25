@@ -155,7 +155,7 @@ function CourseCard({ course }: { course: Course }) {
   return (
     <Link
       href={`/courses/${course.slug}`}
-      className="group block overflow-hidden rounded-lg border border-border bg-card transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-blue-500/5"
+      className="group block overflow-hidden rounded-sm border border-border bg-card transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-blue-500/5"
     >
       <div className="relative h-40 overflow-hidden bg-gradient-to-br from-slate-800 to-slate-900">
         {course.thumbnail_url && (
@@ -197,7 +197,7 @@ function CourseCard({ course }: { course: Course }) {
 function SkeletonCard() {
   return (
     <div
-      className="overflow-hidden rounded-lg border border-border bg-card"
+      className="overflow-hidden rounded-sm border border-border bg-card"
     >
       <div className="h-40 animate-pulse bg-muted/50" />
       <div className="space-y-2 p-4">
@@ -240,7 +240,7 @@ export default async function Home() {
           <div className="flex h-16 items-center justify-between">
             <Link href="/" className="flex items-center gap-2">
               <div
-                className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary font-bold text-primary-foreground"
+                className="flex h-8 w-8 items-center justify-center rounded-sm bg-primary font-bold text-primary-foreground"
               >
                 C
               </div>
@@ -270,7 +270,7 @@ export default async function Home() {
               </Link>
               <Link
                 href="/register"
-                className="rounded-md bg-carsi-orange px-4 py-2 text-sm font-medium text-white transition-all duration-200 hover:scale-[1.02]"
+                className="rounded-sm bg-carsi-orange px-4 py-2 text-sm font-medium text-white transition-all duration-200 hover:scale-[1.02]"
               >
                 Get Started Free
               </Link>
@@ -301,7 +301,7 @@ export default async function Home() {
               <Link
                 key={d.code}
                 href={`/courses?discipline=${d.code}`}
-                className="rounded-md px-3 py-1.5 text-xs border border-border bg-card/60 text-muted-foreground transition-all duration-200 hover:-translate-y-0.5 hover:text-foreground"
+                className="rounded-sm px-3 py-1.5 text-xs border border-border bg-card/60 text-muted-foreground transition-all duration-200 hover:-translate-y-0.5 hover:text-foreground"
               >
                 <span className="font-mono font-bold text-primary">
                   {d.code}
@@ -409,7 +409,7 @@ export default async function Home() {
             },
           ].map((item, i) => (
             <AnimatedCard key={item.title} index={i}>
-              <div className="rounded-lg border border-border bg-card p-6">
+              <div className="rounded-sm border border-border bg-card p-6">
                 <div className={`mb-3 h-1 w-8 rounded-full ${item.accentClass}`} />
                 <h3 className="mb-2 text-base font-semibold text-foreground">
                   {item.title}
@@ -559,7 +559,7 @@ export default async function Home() {
       <section className="border-t border-border px-6 py-16">
         <div className="mx-auto max-w-6xl">
           <div
-            className="rounded-lg border border-border bg-card p-8 sm:p-10"
+            className="rounded-sm border border-border bg-card p-8 sm:p-10"
           >
             <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
               <div>
@@ -600,7 +600,7 @@ export default async function Home() {
           {faqs.map((faq, i) => (
             <AnimatedCard key={faq.question} index={i}>
               <details
-                className="group rounded-lg border border-border bg-card"
+                className="group rounded-sm border border-border bg-card"
               >
                 <summary
                   className="flex cursor-pointer items-center justify-between px-5 py-4 text-sm font-medium text-foreground select-none"
@@ -628,7 +628,7 @@ export default async function Home() {
         <div className="grid gap-6 sm:grid-cols-3">
           {testimonials.map((t, i) => (
             <AnimatedCard key={t.name} index={i}>
-              <div className="flex h-full flex-col rounded-lg border border-border bg-card p-6">
+              <div className="flex h-full flex-col rounded-sm border border-border bg-card p-6">
                 <p className="mb-4 flex-1 text-sm leading-relaxed text-muted-foreground">
                   &ldquo;{t.quote}&rdquo;
                 </p>
@@ -659,36 +659,36 @@ export default async function Home() {
           </div>
           <div className="grid gap-4 sm:grid-cols-3">
             {/* Free */}
-            <div className="rounded-lg border border-border bg-card p-6">
+            <div className="rounded-sm border border-border bg-card p-6">
               <p className="mb-1 text-sm font-semibold text-foreground">Free Library</p>
               <p className="mb-3 text-3xl font-bold text-foreground">$0</p>
               <p className="mb-4 text-xs text-muted-foreground">Australian government resources, SOPs, guides &amp; free webinar series. No card required.</p>
-              <Link href="/register" className="flex w-full items-center justify-center rounded-lg border border-border px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
+              <Link href="/register" className="flex w-full items-center justify-center rounded-sm border border-border px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
                 Get Started Free
               </Link>
             </div>
             {/* Foundation */}
-            <div className="rounded-lg border border-primary/20 bg-primary/5 p-6">
+            <div className="rounded-sm border border-primary/20 bg-primary/5 p-6">
               <p className="mb-1 text-sm font-semibold text-foreground">Foundation</p>
               <div className="mb-1 flex items-baseline gap-1">
                 <span className="text-3xl font-bold text-foreground">$44</span>
                 <span className="text-sm text-muted-foreground">/ month</span>
               </div>
               <p className="mb-4 text-xs text-muted-foreground">Entry-level CEC courses — PPE, moisture metering, Level 1 Mould, Carpet Cleaning Basics &amp; more. 7-day free trial.</p>
-              <Link href="/subscribe?plan=foundation" className="flex w-full items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90">
+              <Link href="/subscribe?plan=foundation" className="flex w-full items-center justify-center rounded-sm bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90">
                 Start Free Trial
               </Link>
             </div>
             {/* Growth */}
-            <div className="relative rounded-lg border border-primary/20 bg-primary/5 p-6">
-              <span className="absolute -top-3 left-5 rounded-lg bg-green-500 px-3 py-0.5 text-xs font-semibold uppercase tracking-wide text-black">Most Popular</span>
+            <div className="relative rounded-sm border border-primary/20 bg-primary/5 p-6">
+              <span className="absolute -top-3 left-5 rounded-sm bg-green-500 px-3 py-0.5 text-xs font-semibold uppercase tracking-wide text-black">Most Popular</span>
               <p className="mb-1 text-sm font-semibold text-foreground">Growth</p>
               <div className="mb-1 flex items-baseline gap-1">
                 <span className="text-3xl font-bold text-foreground">$99</span>
                 <span className="text-sm text-muted-foreground">/ month</span>
               </div>
               <p className="mb-4 text-xs text-muted-foreground">Unlock all 140+ courses — Level 2 Mould, Admin, Social Media, NeoSan Labs, IICRC CEC dashboard &amp; shareable credentials. 7-day free trial.</p>
-              <Link href="/subscribe?plan=growth" className="flex w-full items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90">
+              <Link href="/subscribe?plan=growth" className="flex w-full items-center justify-center rounded-sm bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90">
                 Start Free Trial
               </Link>
             </div>

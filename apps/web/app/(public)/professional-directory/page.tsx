@@ -74,7 +74,7 @@ function ProfessionalCard({ pro }: { pro: Professional }) {
   });
 
   return (
-    <div className="relative rounded-lg border border-border bg-card/20 p-6 transition-colors hover:border-border/60 hover:bg-card/40">
+    <div className="relative rounded-sm border border-border bg-card/20 p-6 transition-colors hover:border-border/60 hover:bg-card/40">
       <SchemaMarkup schema={personSchema} />
       <SchemaMarkup schema={localBusinessSchema} />
 
@@ -106,7 +106,7 @@ function ProfessionalCard({ pro }: { pro: Professional }) {
             {pro.certifications.map((cert) => (
               <span
                 key={cert}
-                className="rounded-lg border border-border bg-muted/10 px-2 py-0.5 text-xs text-muted-foreground"
+                className="rounded-sm border border-border bg-muted/10 px-2 py-0.5 text-xs text-muted-foreground"
               >
                 {cert}
               </span>
@@ -125,7 +125,7 @@ function ProfessionalCard({ pro }: { pro: Professional }) {
             {pro.industries.map((ind) => (
               <span
                 key={ind}
-                className="rounded-lg border border-primary/15 bg-primary/5 px-2 py-0.5 text-xs text-primary/80"
+                className="rounded-sm border border-primary/15 bg-primary/5 px-2 py-0.5 text-xs text-primary/80"
               >
                 {ind}
               </span>
@@ -180,7 +180,7 @@ export default async function ProfessionalDirectoryPage() {
         </p>
 
         {/* Coming-soon banner */}
-        <div className="mb-10 flex items-start gap-3 rounded-lg border border-primary/20 bg-primary/5 px-5 py-4">
+        <div className="mb-10 flex items-start gap-3 rounded-sm border border-primary/20 bg-primary/5 px-5 py-4">
           <span className="mt-0.5 text-primary">ℹ</span>
           <div>
             <p className="text-sm font-medium text-foreground/80">

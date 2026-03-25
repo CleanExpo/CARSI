@@ -272,7 +272,7 @@ export default function StudentDashboardPage() {
           <p className="text-sm text-muted-foreground">Loading courses…</p>
         ) : enrollments.length === 0 && sub?.has_subscription ? (
           <div
-            className="rounded-lg border border-primary/15 bg-primary/5 p-6 text-center"
+            className="rounded-sm border border-primary/15 bg-primary/5 p-6 text-center"
           >
             <p className="mb-1 text-sm font-medium text-foreground">
               Your Pro subscription is active.
@@ -282,7 +282,7 @@ export default function StudentDashboardPage() {
             </p>
             <Link
               href="/courses"
-              className="inline-flex items-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-all hover:scale-[1.02]"
+              className="inline-flex items-center rounded-sm bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-all hover:scale-[1.02]"
             >
               Browse all courses
             </Link>

@@ -79,7 +79,7 @@ export default function SubscribeSuccessPage() {
         </div>
 
         {/* What's next */}
-        <div className="w-full rounded-lg border border-border bg-card p-6">
+        <div className="w-full rounded-sm border border-border bg-card p-6">
           <h2 className="mb-4 text-sm font-semibold text-foreground/90">What&apos;s Next</h2>
           <ul className="space-y-3 text-left text-sm text-muted-foreground">
             <li className="flex items-start gap-3">
@@ -105,13 +105,13 @@ export default function SubscribeSuccessPage() {
         <div className="flex w-full flex-col gap-3">
           <Link
             href="/courses"
-            className="w-full rounded-lg bg-primary py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+            className="w-full rounded-sm bg-primary py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
           >
             Browse Courses
           </Link>
           <Link
             href="/student"
-            className="w-full rounded-lg border border-border py-3 text-sm font-semibold text-foreground/90 transition-colors hover:border-border hover:text-foreground"
+            className="w-full rounded-sm border border-border py-3 text-sm font-semibold text-foreground/90 transition-colors hover:border-border hover:text-foreground"
           >
             Go to Dashboard
           </Link>

@@ -30,7 +30,7 @@ export function MessageList({ messages }: MessageListProps) {
           </Avatar>
           <div
             className={cn(
-              "rounded-lg px-4 py-2 max-w-[80%]",
+              "rounded-sm px-4 py-2 max-w-[80%]",
               message.role === "user"
                 ? "bg-primary text-primary-foreground"
                 : "bg-muted"

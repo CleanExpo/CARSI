@@ -102,7 +102,7 @@ export function CourseBuilder({ onSubmit, initialValues }: CourseBuilderProps) {
             id="level"
             value={values.level ?? 'beginner'}
             onChange={(e) => set('level', e.target.value)}
-            className="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
+            className="border-input bg-background w-full rounded-sm border px-3 py-2 text-sm"
           >
             <option value="beginner">Beginner</option>
             <option value="intermediate">Intermediate</option>

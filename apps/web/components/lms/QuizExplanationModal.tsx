@@ -66,7 +66,7 @@ export default function QuizExplanationModal({
     >
       {/* Modal panel */}
       <div
-        className="relative w-full max-w-lg rounded-lg border border-border bg-card"
+        className="relative w-full max-w-lg rounded-sm border border-border bg-card"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -117,7 +117,7 @@ export default function QuizExplanationModal({
             <>
               {/* Correct answer callout */}
               <div
-                className="rounded-lg border border-primary/30 bg-primary/10 px-4 py-3"
+                className="rounded-sm border border-primary/30 bg-primary/10 px-4 py-3"
               >
                 <p
                   className="mb-1 text-xs font-semibold tracking-widest text-primary uppercase"
@@ -136,7 +136,7 @@ export default function QuizExplanationModal({
               </div>
 
               {/* Study tip */}
-              <div className="rounded-lg border-l-2 border-primary pl-3">
+              <div className="rounded-sm border-l-2 border-primary pl-3">
                 <p className="mb-0.5 text-xs font-semibold tracking-widest text-muted-foreground/50 uppercase">
                   Study Tip
                 </p>

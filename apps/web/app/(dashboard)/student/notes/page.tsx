@@ -68,7 +68,7 @@ function NoteCard({
   deleting,
 }: NoteCardProps) {
   return (
-    <div className="flex flex-col gap-3 rounded-md border border-border bg-zinc-900/50 p-5">
+    <div className="flex flex-col gap-3 rounded-sm border border-border bg-zinc-900/50 p-5">
       {/* Lesson heading */}
       <div className="flex flex-col gap-0.5">
         <h3 className="text-sm leading-snug font-semibold text-foreground">{note.lesson_title}</h3>
@@ -107,7 +107,7 @@ function NoteCard({
         {/* Go to lesson — always visible */}
         <Link
           href={`/student/lessons/${note.lesson_id}`}
-          className="rounded-md border border-border bg-secondary px-3 py-1.5 font-mono text-xs text-muted-foreground transition-colors hover:border-border/60 hover:text-foreground"
+          className="rounded-sm border border-border bg-secondary px-3 py-1.5 font-mono text-xs text-muted-foreground transition-colors hover:border-border/60 hover:text-foreground"
         >
           Go to lesson
         </Link>
@@ -124,7 +124,7 @@ function NoteCard({
             <button
               onClick={onEditCancel}
               disabled={saving}
-              className="rounded-md border border-border bg-secondary px-3 py-1.5 font-mono text-xs text-muted-foreground transition-colors hover:border-border/60 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
+              className="rounded-sm border border-border bg-secondary px-3 py-1.5 font-mono text-xs text-muted-foreground transition-colors hover:border-border/60 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
             >
               Cancel
             </button>
@@ -133,7 +133,7 @@ function NoteCard({
           <>
             <button
               onClick={() => onEditStart(note.lesson_id, note.content ?? '')}
-              className="rounded-md border border-border bg-secondary px-3 py-1.5 font-mono text-xs text-muted-foreground transition-colors hover:border-border/60 hover:text-foreground"
+              className="rounded-sm border border-border bg-secondary px-3 py-1.5 font-mono text-xs text-muted-foreground transition-colors hover:border-border/60 hover:text-foreground"
             >
               Edit
             </button>
@@ -153,7 +153,7 @@ function NoteCard({
 
 function EmptyState() {
   return (
-    <div className="flex flex-col items-center gap-4 rounded-md border border-border bg-zinc-900/50 px-6 py-12 text-center">
+    <div className="flex flex-col items-center gap-4 rounded-sm border border-border bg-zinc-900/50 px-6 py-12 text-center">
       <FileText className="h-10 w-10 text-muted-foreground/20" />
       <div className="flex flex-col gap-1">
         <p className="text-sm font-medium text-muted-foreground">No notes yet.</p>
@@ -163,7 +163,7 @@ function EmptyState() {
       </div>
       <Link
         href="/courses"
-        className="mt-2 rounded-md border border-border bg-secondary px-4 py-2 font-mono text-xs text-muted-foreground transition-colors hover:border-border/60 hover:text-foreground"
+        className="mt-2 rounded-sm border border-border bg-secondary px-4 py-2 font-mono text-xs text-muted-foreground transition-colors hover:border-border/60 hover:text-foreground"
       >
         Browse Courses
       </Link>

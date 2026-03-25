@@ -225,10 +225,10 @@ export default function IndustriesPage() {
               <Link
                 key={industry.slug}
                 href={`/industries/${industry.slug}`}
-                className="group rounded-lg border border-border bg-card p-6 transition-all duration-200 hover:-translate-y-1"
+                className="group rounded-sm border border-border bg-card p-6 transition-all duration-200 hover:-translate-y-1"
               >
                 <div
-                  className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg ring-1"
+                  className="mb-4 flex h-10 w-10 items-center justify-center rounded-sm ring-1"
                   style={{ background: `${industry.color}15`, '--tw-ring-color': `${industry.color}30` } as React.CSSProperties}
                 >
                   <industry.Icon className="h-5 w-5" style={{ color: industry.color }} />
@@ -272,13 +272,13 @@ export default function IndustriesPage() {
             <div className="flex justify-center gap-3">
               <Link
                 href="/courses"
-                className="inline-flex items-center gap-2 rounded-lg bg-carsi-orange px-6 py-2.5 text-sm font-medium text-white transition-opacity duration-150 hover:opacity-90"
+                className="inline-flex items-center gap-2 rounded-sm bg-carsi-orange px-6 py-2.5 text-sm font-medium text-white transition-opacity duration-150 hover:opacity-90"
               >
                 Browse All Courses
               </Link>
               <Link
                 href="/pathways"
-                className="inline-flex items-center gap-2 rounded-lg border border-border bg-secondary px-6 py-2.5 text-sm font-medium text-muted-foreground transition-colors duration-150 hover:text-foreground"
+                className="inline-flex items-center gap-2 rounded-sm border border-border bg-secondary px-6 py-2.5 text-sm font-medium text-muted-foreground transition-colors duration-150 hover:text-foreground"
               >
                 View Pathways
               </Link>

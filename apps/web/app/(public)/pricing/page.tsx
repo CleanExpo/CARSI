@@ -83,7 +83,7 @@ export default function PricingPage() {
           {/* ── Per-Course CTA ─────────────────────────────── */}
           <section
             aria-label="Individual courses"
-            className="mb-16 flex flex-col items-start justify-between gap-4 rounded-lg border border-border bg-card p-6 sm:flex-row sm:items-center"
+            className="mb-16 flex flex-col items-start justify-between gap-4 rounded-sm border border-border bg-card p-6 sm:flex-row sm:items-center"
           >
             <div>
               <h2 className="mb-1 text-base font-semibold text-foreground/90">Or pay per course</h2>
@@ -93,7 +93,7 @@ export default function PricingPage() {
             </div>
             <Link
               href="/courses"
-              className="inline-flex flex-shrink-0 items-center rounded-lg border border-primary/25 bg-primary/10 px-5 py-2.5 text-sm font-semibold text-primary transition-colors hover:bg-primary/20"
+              className="inline-flex flex-shrink-0 items-center rounded-sm border border-primary/25 bg-primary/10 px-5 py-2.5 text-sm font-semibold text-primary transition-colors hover:bg-primary/20"
             >
               View All Courses
             </Link>

@@ -38,7 +38,7 @@ function NavLink({
     <Link
       href={href}
       className={cn(
-        'flex items-center rounded-lg border px-3 py-2 text-sm transition-colors',
+        'flex items-center rounded-sm border px-3 py-2 text-sm transition-colors',
         isActive
           ? 'border-primary/25 bg-primary/10 text-primary'
           : 'border-transparent text-muted-foreground hover:bg-sidebar-accent hover:text-foreground'
@@ -99,7 +99,7 @@ export function LMSContextPanel() {
             <Link
               key={d.code}
               href={`/courses?discipline=${d.code}`}
-              className="flex items-center gap-2.5 rounded-lg border border-transparent px-3 py-2 text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-foreground"
+              className="flex items-center gap-2.5 rounded-sm border border-transparent px-3 py-2 text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-foreground"
             >
               <span
                 className="h-1.5 w-1.5 flex-shrink-0 rounded-full"

@@ -53,7 +53,7 @@ export default function LessonPage() {
         <>
           <LessonPlayer lesson={lesson} />
           {lesson.quiz_id && (
-            <div className="mt-6 rounded-lg border border-primary/25 bg-primary/6 p-4">
+            <div className="mt-6 rounded-sm border border-primary/25 bg-primary/6 p-4">
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <p className="text-sm font-semibold text-foreground">Assessment</p>

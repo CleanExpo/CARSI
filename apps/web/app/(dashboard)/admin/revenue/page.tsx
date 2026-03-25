@@ -40,7 +40,7 @@ function MetricCard({
   accentClass?: string;
 }) {
   return (
-    <div className="flex flex-col gap-1 rounded-lg border border-border bg-card p-5">
+    <div className="flex flex-col gap-1 rounded-sm border border-border bg-card p-5">
       <span className="text-xs tracking-widest text-muted-foreground uppercase">{label}</span>
       <span className={`text-3xl font-bold ${accentClass}`}>
         {value}
@@ -68,7 +68,7 @@ function RevenueBarChart({ data }: { data: RevenueByMonth[] }) {
             <span className="text-xs text-muted-foreground">{formatAUD(row.revenue_aud)}</span>
             <div className="flex h-24 w-full flex-col justify-end">
               <div
-                className="w-full rounded-lg bg-primary/85 transition-all"
+                className="w-full rounded-sm bg-primary/85 transition-all"
                 style={{ height: `${Math.max(pct, 3)}%`, minHeight: '4px' }}
               />
             </div>
@@ -106,7 +106,7 @@ export default function RevenueDashboardPage() {
         </div>
         <Link
           href="/admin"
-          className="rounded-lg border border-border bg-background px-3 py-2 text-xs text-primary"
+          className="rounded-sm border border-border bg-background px-3 py-2 text-xs text-primary"
         >
           ← Admin
         </Link>
@@ -163,7 +163,7 @@ export default function RevenueDashboardPage() {
           </div>
 
           {/* Bottom: Revenue by Month bar chart */}
-          <div className="rounded-lg border border-border bg-card p-6">
+          <div className="rounded-sm border border-border bg-card p-6">
             <h2 className="mb-6 text-sm tracking-widest text-muted-foreground uppercase">
               Revenue by Month — Last 6 Months
             </h2>

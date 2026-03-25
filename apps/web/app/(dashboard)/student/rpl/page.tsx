@@ -127,7 +127,7 @@ export default function RPLPortfolioPage() {
       {!loading && (
         <form
           onSubmit={handleSubmit}
-          className="flex flex-col gap-4 rounded-md border border-border bg-zinc-900/50 p-6"
+          className="flex flex-col gap-4 rounded-sm border border-border bg-zinc-900/50 p-6"
         >
           <h2 className="font-mono text-xs tracking-wider text-muted-foreground uppercase">
             New Application
@@ -159,7 +159,7 @@ export default function RPLPortfolioPage() {
           <button
             type="submit"
             disabled={submitting}
-            className="self-start rounded-md bg-cyan-600 px-4 py-2 font-mono text-sm font-semibold text-white transition-colors hover:bg-cyan-500 disabled:opacity-50"
+            className="self-start rounded-sm bg-cyan-600 px-4 py-2 font-mono text-sm font-semibold text-white transition-colors hover:bg-cyan-500 disabled:opacity-50"
           >
             {submitting ? 'Submitting…' : 'Submit Application'}
           </button>
@@ -175,7 +175,7 @@ export default function RPLPortfolioPage() {
           {submissions.map((sub) => (
             <div
               key={sub.id}
-              className="flex flex-col gap-3 rounded-md border border-border bg-zinc-900/50 p-5"
+              className="flex flex-col gap-3 rounded-sm border border-border bg-zinc-900/50 p-5"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex flex-col gap-1">

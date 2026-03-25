@@ -148,7 +148,7 @@ function PlatformLinks({ show }: { show: PodcastShow }) {
 function CARSIPodcastHero({ show }: { show: PodcastShow }) {
   return (
     <div
-      className="mb-10 rounded-2xl p-6 sm:p-8"
+      className="mb-10 rounded-sm p-6 sm:p-8"
       style={{
         background: 'linear-gradient(135deg, rgba(36,144,237,0.12) 0%, rgba(36,144,237,0.04) 100%)',
         border: '1px solid rgba(36,144,237,0.25)',
@@ -156,7 +156,7 @@ function CARSIPodcastHero({ show }: { show: PodcastShow }) {
     >
       <div className="flex items-start gap-4">
         <div
-          className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-xl text-2xl sm:h-20 sm:w-20"
+          className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-sm text-2xl sm:h-20 sm:w-20"
           style={{ background: 'rgba(36,144,237,0.15)', border: '1px solid rgba(36,144,237,0.25)' }}
           aria-hidden="true"
         >
@@ -201,7 +201,7 @@ function PodcastCard({ show }: { show: PodcastShow }) {
   const latestDate = formatEpisodeDate(show.latest_episode_date);
 
   return (
-    <div className="group flex flex-col gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5 transition-all duration-200 hover:border-[rgba(36,144,237,0.25)] hover:bg-white/[0.05]">
+    <div className="group flex flex-col gap-3 rounded-sm border border-white/[0.08] bg-white/[0.03] p-5 transition-all duration-200 hover:border-[rgba(36,144,237,0.25)] hover:bg-white/[0.05]">
       {/* Header row */}
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
@@ -225,7 +225,7 @@ function PodcastCard({ show }: { show: PodcastShow }) {
         </div>
         {/* Podcast icon placeholder */}
         <div
-          className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg text-sm"
+          className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-sm text-sm"
           style={{
             background: 'rgba(255,255,255,0.04)',
             border: '1px solid rgba(255,255,255,0.07)',
@@ -253,7 +253,7 @@ function PodcastCard({ show }: { show: PodcastShow }) {
           {show.industry_categories.slice(0, 3).map((cat) => (
             <span
               key={cat}
-              className="rounded-md px-2 py-0.5 text-[10px] text-white/35"
+              className="rounded-sm px-2 py-0.5 text-[10px] text-white/35"
               style={{
                 background: 'rgba(255,255,255,0.04)',
                 border: '1px solid rgba(255,255,255,0.06)',
@@ -273,15 +273,15 @@ function PodcastCard({ show }: { show: PodcastShow }) {
 
 function PlaceholderCard() {
   return (
-    <div className="flex flex-col gap-3 rounded-2xl border border-dashed border-white/[0.05] bg-white/[0.01] p-5">
+    <div className="flex flex-col gap-3 rounded-sm border border-dashed border-white/[0.05] bg-white/[0.01] p-5">
       <div className="space-y-2">
         <div className="h-4 w-3/4 animate-pulse rounded bg-white/[0.05]" />
         <div className="h-3 w-1/2 animate-pulse rounded bg-white/[0.03]" />
       </div>
       <div className="h-8 w-full animate-pulse rounded bg-white/[0.03]" />
       <div className="flex gap-1">
-        <div className="h-5 w-16 animate-pulse rounded-md bg-white/[0.03]" />
-        <div className="h-5 w-16 animate-pulse rounded-md bg-white/[0.03]" />
+        <div className="h-5 w-16 animate-pulse rounded-sm bg-white/[0.03]" />
+        <div className="h-5 w-16 animate-pulse rounded-sm bg-white/[0.03]" />
       </div>
     </div>
   );
@@ -410,7 +410,7 @@ export default async function PodcastPage({
             )}
 
             {industryShows.length === 0 && placeholderCount === 0 ? (
-              <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-16 text-center">
+              <div className="rounded-sm border border-white/[0.06] bg-white/[0.02] p-16 text-center">
                 <p className="text-white/40">
                   {category || q
                     ? 'No podcasts match your filters. Try a different category or search term.'
@@ -430,7 +430,7 @@ export default async function PodcastPage({
           </section>
 
           {/* Submit a podcast CTA */}
-          <div className="mt-12 flex items-center justify-between rounded-2xl border border-white/[0.06] bg-white/[0.02] px-6 py-4">
+          <div className="mt-12 flex items-center justify-between rounded-sm border border-white/[0.06] bg-white/[0.02] px-6 py-4">
             <div>
               <p className="text-sm font-medium text-white/80">Know a podcast we should list?</p>
               <p className="text-xs text-white/40">
@@ -440,7 +440,7 @@ export default async function PodcastPage({
             </div>
             <Link
               href="/contact"
-              className="rounded-xl border border-[rgba(36,144,237,0.3)] bg-[rgba(36,144,237,0.15)] px-4 py-2 text-sm font-semibold text-[#2490ed] transition-colors hover:bg-[rgba(36,144,237,0.25)]"
+              className="rounded-sm border border-[rgba(36,144,237,0.3)] bg-[rgba(36,144,237,0.15)] px-4 py-2 text-sm font-semibold text-[#2490ed] transition-colors hover:bg-[rgba(36,144,237,0.25)]"
             >
               Submit Podcast
             </Link>

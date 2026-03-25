@@ -62,19 +62,19 @@ export default function InstructorDashboardPage() {
       {loading && <p className="text-sm text-muted-foreground">Loading metrics...</p>}
       {metrics && (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <div className="rounded-lg border border-border bg-card p-4">
+          <div className="rounded-sm border border-border bg-card p-4">
             <p className="text-xs font-medium tracking-widest text-muted-foreground/60 uppercase">
               Published Courses
             </p>
             <p className="mt-1 text-2xl font-bold text-foreground">{metrics.published_courses}</p>
           </div>
-          <div className="rounded-lg border border-border bg-card p-4">
+          <div className="rounded-sm border border-border bg-card p-4">
             <p className="text-xs font-medium tracking-widest text-muted-foreground/60 uppercase">
               Total Courses
             </p>
             <p className="mt-1 text-2xl font-bold text-foreground">{metrics.total_courses}</p>
           </div>
-          <div className="rounded-lg border border-border bg-card p-4">
+          <div className="rounded-sm border border-border bg-card p-4">
             <p className="text-xs font-medium tracking-widest text-muted-foreground/60 uppercase">
               Total Enrolments
             </p>
@@ -89,9 +89,9 @@ export default function InstructorDashboardPage() {
           <Link
             key={item.href}
             href={item.href}
-            className="group flex items-start gap-4 rounded-lg border border-border bg-card p-5 transition-colors hover:border-primary/30 hover:bg-card/80"
+            className="group flex items-start gap-4 rounded-sm border border-border bg-card p-5 transition-colors hover:border-primary/30 hover:bg-card/80"
           >
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-primary/20 bg-primary/10">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-sm border border-primary/20 bg-primary/10">
               <item.icon className="h-5 w-5 text-primary" />
             </div>
             <div className="flex flex-col gap-1">

@@ -34,7 +34,7 @@ export function IndustryCourseSection({
           </h2>
         </div>
 
-        <div className="rounded-xl border border-border bg-secondary p-5">
+        <div className="rounded-sm border border-border bg-secondary p-5">
           <CourseGrid courses={courses} initialTab="All" />
         </div>
       </div>

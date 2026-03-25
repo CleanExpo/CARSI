@@ -15,7 +15,7 @@ export function PublicFooter() {
         <div className="mb-8 grid gap-8 sm:grid-cols-4">
           <div>
             <div className="mb-3 flex items-center gap-2">
-              <div className="flex h-6 w-6 items-center justify-center rounded-md bg-primary text-xs font-bold text-primary-foreground">
+              <div className="flex h-6 w-6 items-center justify-center rounded-sm bg-primary text-xs font-bold text-primary-foreground">
                 C
               </div>
               <span className="text-sm font-semibold text-foreground">CARSI</span>

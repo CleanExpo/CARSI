@@ -22,7 +22,7 @@ interface RecommendedCourse {
 function SkeletonCard() {
   return (
     <div
-      className="flex min-w-[260px] flex-col gap-3 rounded-lg border border-border bg-card p-4"
+      className="flex min-w-[260px] flex-col gap-3 rounded-sm border border-border bg-card p-4"
     >
       <div
         className="h-32 w-full animate-pulse rounded-sm bg-secondary"
@@ -50,7 +50,7 @@ function SkeletonCard() {
 function RecommendationCard({ course }: { course: RecommendedCourse }) {
   return (
     <div
-      className="flex max-w-[300px] min-w-[260px] flex-shrink-0 flex-col gap-3 rounded-lg border border-border bg-card p-4 transition-all hover:scale-[1.01]"
+      className="flex max-w-[300px] min-w-[260px] flex-shrink-0 flex-col gap-3 rounded-sm border border-border bg-card p-4 transition-all hover:scale-[1.01]"
     >
       {/* Thumbnail */}
       {course.thumbnail_url ? (

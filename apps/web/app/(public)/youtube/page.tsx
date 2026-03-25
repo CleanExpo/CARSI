@@ -106,7 +106,7 @@ function ChannelCard({ channel }: { channel: YouTubeChannel }) {
       href={channel.channel_url}
       target="_blank"
       rel="noopener noreferrer"
-      className={`group flex flex-col gap-4 rounded-2xl border p-6 transition-all duration-200 hover:shadow-[0_8px_40px_rgba(36,144,237,0.12)] ${
+      className={`group flex flex-col gap-4 rounded-sm border p-6 transition-all duration-200 hover:shadow-[0_8px_40px_rgba(36,144,237,0.12)] ${
         isCarsi
           ? 'border-[rgba(36,144,237,0.4)] bg-[rgba(36,144,237,0.06)] hover:border-[rgba(36,144,237,0.6)]'
           : 'border-white/[0.08] bg-white/[0.03] hover:border-[rgba(36,144,237,0.35)] hover:bg-white/[0.06]'
@@ -172,7 +172,7 @@ function ChannelCard({ channel }: { channel: YouTubeChannel }) {
           {channel.industry_categories.slice(0, 4).map((cat) => (
             <span
               key={cat}
-              className="rounded-md bg-white/[0.05] px-2 py-0.5 text-xs text-white/40 capitalize"
+              className="rounded-sm bg-white/[0.05] px-2 py-0.5 text-xs text-white/40 capitalize"
             >
               {cat}
             </span>
@@ -182,7 +182,7 @@ function ChannelCard({ channel }: { channel: YouTubeChannel }) {
 
       {/* Latest upload */}
       {channel.latest_upload_title && (
-        <div className="rounded-lg bg-white/[0.03] px-3 py-2.5">
+        <div className="rounded-sm bg-white/[0.03] px-3 py-2.5">
           <p className="mb-1 text-xs text-white/25">Latest video</p>
           <p className="line-clamp-1 text-xs font-medium text-white/60">
             {channel.latest_upload_title}
@@ -212,7 +212,7 @@ function ChannelCard({ channel }: { channel: YouTubeChannel }) {
 
 function PlaceholderCard() {
   return (
-    <div className="flex flex-col gap-4 rounded-2xl border border-dashed border-white/[0.06] bg-white/[0.01] p-6">
+    <div className="flex flex-col gap-4 rounded-sm border border-dashed border-white/[0.06] bg-white/[0.01] p-6">
       <div className="flex items-start gap-4">
         <div className="h-14 w-14 flex-shrink-0 animate-pulse rounded-full bg-white/[0.05]" />
         <div className="flex-1 space-y-2">
@@ -343,7 +343,7 @@ export default async function YouTubePage({
 
           {/* Industry channels grid */}
           {channels.length === 0 && placeholderCount === 0 ? (
-            <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-16 text-center">
+            <div className="rounded-sm border border-white/[0.06] bg-white/[0.02] p-16 text-center">
               <p className="text-white/40">
                 {category
                   ? `No channels found in "${category}" — try a different category.`
@@ -373,7 +373,7 @@ export default async function YouTubePage({
           )}
 
           {/* CTA — suggest a channel */}
-          <div className="mt-16 rounded-2xl border border-white/[0.08] bg-white/[0.02] p-8 text-center">
+          <div className="mt-16 rounded-sm border border-white/[0.08] bg-white/[0.02] p-8 text-center">
             <h3 className="mb-2 text-lg font-semibold text-white/85">
               Know a channel we should add?
             </h3>

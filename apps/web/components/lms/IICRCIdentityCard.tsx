@@ -33,7 +33,7 @@ export function IICRCIdentityCard({
 }: IICRCIdentityCardProps) {
   if (!memberNumber) {
     return (
-      <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
+      <div className="flex flex-col gap-3 rounded-sm border border-border bg-card p-6">
         <p className="text-sm text-muted-foreground">
           No <AcronymTooltip term="IICRC" /> membership linked. Add your{' '}
           <AcronymTooltip term="IICRC" /> member number to track your <AcronymTooltip term="CEC" />{' '}
@@ -52,7 +52,7 @@ export function IICRCIdentityCard({
   }
 
   return (
-    <div className="flex flex-col gap-5 rounded-lg border border-border bg-card p-6">
+    <div className="flex flex-col gap-5 rounded-sm border border-border bg-card p-6">
       {/* Header row */}
       <div className="flex items-start justify-between gap-4">
         <div className="flex flex-col gap-1">
@@ -72,7 +72,7 @@ export function IICRCIdentityCard({
           <img
             src={cardImageUrl}
             alt="IICRC member card"
-            className="h-16 rounded-lg border border-border object-cover"
+            className="h-16 rounded-sm border border-border object-cover"
           />
         )}
       </div>
@@ -87,7 +87,7 @@ export function IICRCIdentityCard({
             {certifications.map((cert) => (
               <div
                 key={cert.discipline}
-                className="flex flex-col items-center rounded-lg border border-border bg-muted px-3 py-2"
+                className="flex flex-col items-center rounded-sm border border-border bg-muted px-3 py-2"
               >
                 <span className="font-mono text-sm font-bold text-cyan-400">{cert.discipline}</span>
                 <span className="text-xs text-muted-foreground/60">{_formatDate(cert.certified_at)}</span>

@@ -93,7 +93,7 @@ function ArticleCard({ article }: { article: ArticleSummary }) {
   return (
     <Link
       href={`/research/${article.slug}`}
-      className="group flex flex-col gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-6 transition-all duration-200 hover:border-[rgba(36,144,237,0.35)] hover:bg-white/[0.06] hover:shadow-[0_8px_40px_rgba(36,144,237,0.12)]"
+      className="group flex flex-col gap-3 rounded-sm border border-white/[0.08] bg-white/[0.03] p-6 transition-all duration-200 hover:border-[rgba(36,144,237,0.35)] hover:bg-white/[0.06] hover:shadow-[0_8px_40px_rgba(36,144,237,0.12)]"
     >
       {article.category && (
         <span className="inline-flex w-fit items-center rounded-full bg-[rgba(36,144,237,0.12)] px-3 py-1 text-xs font-medium text-[#2490ed]">
@@ -116,7 +116,7 @@ function ArticleCard({ article }: { article: ArticleSummary }) {
           {article.tags.slice(0, 4).map((tag) => (
             <span
               key={tag}
-              className="rounded-md bg-white/[0.05] px-2 py-0.5 text-xs text-white/40"
+              className="rounded-sm bg-white/[0.05] px-2 py-0.5 text-xs text-white/40"
             >
               #{tag}
             </span>
@@ -130,7 +130,7 @@ function ArticleCard({ article }: { article: ArticleSummary }) {
 // Placeholder card for empty slots (10 reserved for COO content hand-off)
 function PlaceholderCard({ index }: { index: number }) {
   return (
-    <div className="flex flex-col gap-3 rounded-2xl border border-dashed border-white/[0.06] bg-white/[0.01] p-6">
+    <div className="flex flex-col gap-3 rounded-sm border border-dashed border-white/[0.06] bg-white/[0.01] p-6">
       <div className="h-5 w-24 animate-pulse rounded bg-white/[0.05]" />
       <div className="h-6 w-3/4 animate-pulse rounded bg-white/[0.05]" />
       <div className="space-y-2">
@@ -210,7 +210,7 @@ export default async function ResearchPage({
 
           {/* Articles grid */}
           {articles.length === 0 && placeholderCount === 0 ? (
-            <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-16 text-center">
+            <div className="rounded-sm border border-white/[0.06] bg-white/[0.02] p-16 text-center">
               <p className="text-white/40">
                 {category
                   ? `No articles in "${category}" yet — check back soon.`

@@ -282,22 +282,22 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                   {/* Badges */}
                   <div className="mb-5 flex flex-wrap items-center gap-2">
                     {course.iicrc_discipline && (
-                      <span className="rounded-lg border border-amber-500/25 bg-amber-500/15 px-2.5 py-1 text-xs font-semibold tracking-wide uppercase text-amber-500">
+                      <span className="rounded-sm border border-amber-500/25 bg-amber-500/15 px-2.5 py-1 text-xs font-semibold tracking-wide uppercase text-amber-500">
                         IICRC {course.iicrc_discipline}
                       </span>
                     )}
                     {course.level && (
-                      <span className="rounded-lg border border-border bg-card px-2.5 py-1 text-xs font-medium text-muted-foreground">
+                      <span className="rounded-sm border border-border bg-card px-2.5 py-1 text-xs font-medium text-muted-foreground">
                         {course.level}
                       </span>
                     )}
                     {course.category && (
-                      <span className="rounded-lg border border-border bg-card px-2.5 py-1 text-xs font-medium text-muted-foreground">
+                      <span className="rounded-sm border border-border bg-card px-2.5 py-1 text-xs font-medium text-muted-foreground">
                         {course.category}
                       </span>
                     )}
                     {course.cec_hours && (
-                      <span className="rounded-lg border border-primary/15 bg-primary/8 px-2.5 py-1 text-xs font-medium text-primary">
+                      <span className="rounded-sm border border-primary/15 bg-primary/8 px-2.5 py-1 text-xs font-medium text-primary">
                         {course.cec_hours} CECs
                       </span>
                     )}
@@ -325,7 +325,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                   {/* Instructor */}
                   {course.instructor && (
                     <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-amber-500/20 bg-amber-500/15 text-sm font-bold text-amber-500">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-sm border border-amber-500/20 bg-amber-500/15 text-sm font-bold text-amber-500">
                         {course.instructor.full_name
                           .split(' ')
                           .map((n) => n[0])
@@ -344,7 +344,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                   )}
 
                   {/* Quick stats row — mobile only (desktop has sidebar) */}
-                  <div className="mt-8 grid grid-cols-3 gap-4 rounded-lg border border-border bg-card p-4 lg:hidden">
+                  <div className="mt-8 grid grid-cols-3 gap-4 rounded-sm border border-border bg-card p-4 lg:hidden">
                     <div className="text-center">
                       <p className="text-lg font-bold text-amber-500">
                         {price}
@@ -386,7 +386,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                   <div className="sticky top-8">
                     {/* Thumbnail */}
                     {course.thumbnail_url && (
-                      <div className="mb-4 overflow-hidden rounded-lg border border-border">
+                      <div className="mb-4 overflow-hidden rounded-sm border border-border">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={course.thumbnail_url}
@@ -397,7 +397,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                     )}
 
                     {/* Price card */}
-                    <div className="rounded-lg border border-border bg-card p-6">
+                    <div className="rounded-sm border border-border bg-card p-6">
                       {/* Price */}
                       <div className="mb-1">
                         <span className="text-3xl font-bold text-foreground/95">
@@ -507,7 +507,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                   <h2 className="mb-4 text-xl font-bold text-foreground/92">
                     About This Course
                   </h2>
-                  <div className="rounded-lg border border-border bg-card p-6">
+                  <div className="rounded-sm border border-border bg-card p-6">
                     <p className="text-sm leading-relaxed text-muted-foreground">
                       {course.description}
                     </p>
@@ -520,12 +520,12 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                 <h2 className="mb-4 text-xl font-bold text-foreground/92">
                   What You&apos;ll Learn
                 </h2>
-                <div className="rounded-lg border border-border bg-card p-6">
+                <div className="rounded-sm border border-border bg-card p-6">
                   <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     {learningOutcomes.map((outcome) => (
                       <li key={outcome} className="flex items-start gap-3">
                         <span
-                          className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-lg bg-green-500/10 text-xs text-green-500"
+                          className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-sm bg-green-500/10 text-xs text-green-500"
                           aria-hidden="true"
                         >
                           &#10003;
@@ -544,7 +544,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                 <h2 className="mb-4 text-xl font-bold text-foreground/92">
                   Course Details
                 </h2>
-                <div className="grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-border sm:grid-cols-3">
+                <div className="grid grid-cols-2 gap-px overflow-hidden rounded-sm border border-border sm:grid-cols-3">
                   {[
                     {
                       label: 'Level',
@@ -600,12 +600,12 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                 <h2 className="mb-4 text-xl font-bold text-foreground/92">
                   Who This Course Is For
                 </h2>
-                <div className="rounded-lg border border-border bg-card p-6">
+                <div className="rounded-sm border border-border bg-card p-6">
                   <ul className="space-y-3">
                     {audienceItems.map((item) => (
                       <li key={item} className="flex items-start gap-3">
                         <span
-                          className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-lg bg-amber-500/10 text-xs text-amber-500"
+                          className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-sm bg-amber-500/10 text-xs text-amber-500"
                           aria-hidden="true"
                         >
                           &#8594;
@@ -624,10 +624,10 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                 <h2 className="mb-4 text-xl font-bold text-foreground/92">
                   Credential &amp; CECs
                 </h2>
-                <div className="rounded-lg border border-border bg-card p-6">
+                <div className="rounded-sm border border-border bg-card p-6">
                   <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <div>
-                      <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg border border-primary/15 bg-primary/8">
+                      <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-sm border border-primary/15 bg-primary/8">
                         <span className="text-lg text-primary">&#9733;</span>
                       </div>
                       <h3 className="mb-1 text-sm font-semibold text-foreground/85">
@@ -639,7 +639,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                       </p>
                     </div>
                     <div>
-                      <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg border border-amber-500/20 bg-amber-500/10">
+                      <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-sm border border-amber-500/20 bg-amber-500/10">
                         <span className="text-lg text-amber-500">&#9670;</span>
                       </div>
                       <h3 className="mb-1 text-sm font-semibold text-foreground/85">

@@ -137,7 +137,7 @@ export function CourseGrid({ courses, initialTab = 'All', loading = false }: Cou
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search courses..."
               aria-label="Search courses"
-              className="w-52 rounded-lg border border-border bg-secondary py-2 pr-4 pl-9 text-sm text-foreground transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/50"
+              className="w-52 rounded-sm border border-border bg-secondary py-2 pr-4 pl-9 text-sm text-foreground transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/50"
               onFocus={(e) => {
                 e.currentTarget.style.borderColor = 'rgba(36,144,237,0.5)';
                 e.currentTarget.style.boxShadow = '0 0 0 3px rgba(36,144,237,0.1)';
@@ -162,7 +162,7 @@ export function CourseGrid({ courses, initialTab = 'All', loading = false }: Cou
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value as SortKey)}
           aria-label="Sort courses by"
-          className="rounded-lg border border-border bg-secondary px-3 py-2 text-sm text-muted-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/50"
+          className="rounded-sm border border-border bg-secondary px-3 py-2 text-sm text-muted-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/50"
         >
           <option value="updated">Recently Updated</option>
           <option value="price">Price</option>

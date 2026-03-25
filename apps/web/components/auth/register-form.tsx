@@ -144,7 +144,7 @@ export function RegisterForm() {
           )}
         />
         {error && (
-          <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-4">
+          <div className="rounded-sm border border-destructive/30 bg-destructive/10 p-4">
             <p className="text-sm font-medium text-destructive">
               {error.includes('timed out') || error.toLowerCase().includes('network')
                 ? 'Our servers are temporarily unavailable.'
@@ -166,7 +166,7 @@ export function RegisterForm() {
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full rounded-md bg-carsi-orange py-3 text-sm font-semibold text-white transition-colors hover:bg-carsi-orange/90 disabled:cursor-not-allowed disabled:opacity-50"
+          className="w-full rounded-sm bg-carsi-orange py-3 text-sm font-semibold text-white transition-colors hover:bg-carsi-orange/90 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isLoading ? 'Creating account...' : 'Create account'}
         </button>

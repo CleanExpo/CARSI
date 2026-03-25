@@ -32,12 +32,12 @@ const testimonialsVariants = cva('w-full py-16 md:py-24 lg:py-32', {
 const testimonialCardVariants = cva('relative h-full transition-all duration-normal', {
   variants: {
     variant: {
-      default: 'bg-card rounded-xl border p-6 hover:shadow-lg hover:-translate-y-1',
+      default: 'bg-card rounded-sm border p-6 hover:shadow-lg hover:-translate-y-1',
       cards:
-        'bg-gradient-to-br from-card to-muted/30 rounded-2xl border shadow-sm p-8 hover:shadow-xl',
+        'bg-gradient-to-br from-card to-muted/30 rounded-sm border shadow-sm p-8 hover:shadow-xl',
       minimal: 'p-6',
-      featured: 'bg-card rounded-2xl border-2 border-brand-primary/20 p-8 shadow-lg',
-      marquee: 'bg-card rounded-xl border p-6 shadow-sm w-[350px] shrink-0',
+      featured: 'bg-card rounded-sm border-2 border-brand-primary/20 p-8 shadow-lg',
+      marquee: 'bg-card rounded-sm border p-6 shadow-sm w-[350px] shrink-0',
     },
   },
   defaultVariants: {

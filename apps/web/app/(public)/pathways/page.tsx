@@ -64,7 +64,7 @@ export default async function PathwaysPage() {
           </section>
         ) : (
           <section className="mb-10">
-            <div className="mx-auto max-w-xl rounded-lg border border-border bg-card px-6 py-16 text-center">
+            <div className="mx-auto max-w-xl rounded-sm border border-border bg-card px-6 py-16 text-center">
               {/* Graduation cap icon */}
               <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center">
                 <svg
@@ -108,14 +108,14 @@ export default async function PathwaysPage() {
               <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
                 <Link
                   href="/courses"
-                  className="inline-flex items-center justify-center rounded-lg px-6 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                  className="inline-flex items-center justify-center rounded-sm px-6 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
                   style={{ background: '#ed9d24' }}
                 >
                   Browse Courses
                 </Link>
                 <Link
                   href="/pricing"
-                  className="inline-flex items-center justify-center rounded-lg border border-border px-6 py-2.5 text-sm font-semibold text-muted-foreground transition-opacity hover:opacity-80"
+                  className="inline-flex items-center justify-center rounded-sm border border-border px-6 py-2.5 text-sm font-semibold text-muted-foreground transition-opacity hover:opacity-80"
                 >
                   View Pricing
                 </Link>
@@ -126,7 +126,7 @@ export default async function PathwaysPage() {
 
         {/* ── Student Journey Map ── */}
         <section className="mb-10">
-          <div className="rounded-lg border border-border bg-card p-5">
+          <div className="rounded-sm border border-border bg-card p-5">
             <h2 className="font-display mb-3 text-center text-lg font-semibold text-foreground">
               Your Learning Journey
             </h2>
@@ -145,7 +145,7 @@ export default async function PathwaysPage() {
           </h2>
           <div className="space-y-3">
             {/* Q1 — What is a learning pathway? */}
-            <details className="group rounded-lg border border-border bg-card">
+            <details className="group rounded-sm border border-border bg-card">
               <summary className="flex cursor-pointer items-center justify-between px-5 py-4 text-sm font-semibold text-foreground select-none">
                 <span>What is a learning pathway?</span>
                 <svg
@@ -182,7 +182,7 @@ export default async function PathwaysPage() {
             </details>
 
             {/* Q2 — Which CARSI pathway is right for me? */}
-            <details className="group rounded-lg border border-border bg-card">
+            <details className="group rounded-sm border border-border bg-card">
               <summary className="flex cursor-pointer items-center justify-between px-5 py-4 text-sm font-semibold text-foreground select-none">
                 <span>Which CARSI pathway is right for me?</span>
                 <svg
@@ -218,7 +218,7 @@ export default async function PathwaysPage() {
             </details>
 
             {/* Q3 — How do pathways help with career progression? */}
-            <details className="group rounded-lg border border-border bg-card">
+            <details className="group rounded-sm border border-border bg-card">
               <summary className="flex cursor-pointer items-center justify-between px-5 py-4 text-sm font-semibold text-foreground select-none">
                 <span>How do pathways help with career progression?</span>
                 <svg

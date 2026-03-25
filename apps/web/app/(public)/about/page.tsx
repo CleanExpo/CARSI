@@ -95,7 +95,7 @@ export default function AboutPage() {
             {credentials.map((item) => (
               <div
                 key={item.title}
-                className="rounded-lg border border-border bg-card p-5"
+                className="rounded-sm border border-border bg-card p-5"
               >
                 <h3 className="mb-2 text-sm font-semibold text-foreground">
                   {item.title}
@@ -133,7 +133,7 @@ export default function AboutPage() {
             {stats.map((stat) => (
               <div
                 key={stat.label}
-                className="rounded-lg border border-border bg-card p-5 text-center"
+                className="rounded-sm border border-border bg-card p-5 text-center"
               >
                 <p className="text-3xl font-bold text-primary">
                   {stat.value}
@@ -163,7 +163,7 @@ export default function AboutPage() {
             {disciplines.map((d) => (
               <div
                 key={d.code}
-                className="flex items-center gap-3 rounded-lg border border-primary/15 bg-primary/[0.06] px-3 py-2"
+                className="flex items-center gap-3 rounded-sm border border-primary/15 bg-primary/[0.06] px-3 py-2"
               >
                 <span className="w-12 font-mono text-xs font-bold text-primary">
                   {d.code}
@@ -177,7 +177,7 @@ export default function AboutPage() {
         </section>
 
         {/* ── CTA ──────────────────────────────────────────────── */}
-        <section className="mb-16 rounded-lg border border-border bg-card p-8">
+        <section className="mb-16 rounded-sm border border-border bg-card p-8">
           <h2 className="mb-2 text-lg font-semibold text-foreground">
             Ready to advance your career?
           </h2>
@@ -187,13 +187,13 @@ export default function AboutPage() {
           <div className="flex flex-wrap gap-3">
             <Link
               href="/courses"
-              className="inline-flex items-center gap-2 rounded-lg bg-carsi-orange px-5 py-2.5 text-sm font-medium text-white transition-all duration-200 hover:scale-[1.02]"
+              className="inline-flex items-center gap-2 rounded-sm bg-carsi-orange px-5 py-2.5 text-sm font-medium text-white transition-all duration-200 hover:scale-[1.02]"
             >
               Browse Courses <ArrowRight className="h-4 w-4" />
             </Link>
             <Link
               href="/pricing"
-              className="inline-flex items-center rounded-lg border border-border bg-secondary px-5 py-2.5 text-sm font-medium text-muted-foreground transition-all duration-200 hover:text-foreground"
+              className="inline-flex items-center rounded-sm border border-border bg-secondary px-5 py-2.5 text-sm font-medium text-muted-foreground transition-all duration-200 hover:text-foreground"
             >
               View Pricing
             </Link>
@@ -202,7 +202,7 @@ export default function AboutPage() {
 
         {/* ── IICRC Disclaimer ─────────────────────────────────── */}
         <section
-          className="rounded-lg border border-border bg-card p-5"
+          className="rounded-sm border border-border bg-card p-5"
           aria-label="IICRC disclaimer"
         >
           <p className="text-xs leading-relaxed italic text-muted-foreground">

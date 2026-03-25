@@ -40,7 +40,7 @@ export function CourseHubContext({ slug }: CourseHubContextProps) {
 
   return (
     <aside
-      className="rounded-lg border border-border bg-card p-5"
+      className="rounded-sm border border-border bg-card p-5"
       aria-label="Career opportunities for this discipline"
     >
       <h3 className="mb-3 text-xs font-semibold tracking-widest text-muted-foreground uppercase">
@@ -56,7 +56,7 @@ export function CourseHubContext({ slug }: CourseHubContextProps) {
           <li key={keyword}>
             <a
               href={`/hub/jobs?q=${encodeURIComponent(keyword)}`}
-              className="inline-block rounded-lg bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary transition-colors hover:bg-primary/20"
+              className="inline-block rounded-sm bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary transition-colors hover:bg-primary/20"
             >
               {keyword}
             </a>

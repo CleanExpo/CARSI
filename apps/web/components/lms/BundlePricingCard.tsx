@@ -56,14 +56,14 @@ export function BundlePricingCard({ bundle }: BundleProps) {
 
   return (
     <div
-      className="group flex flex-col overflow-hidden rounded-lg border border-border bg-card transition-all duration-200 hover:scale-[1.01]"
+      className="group flex flex-col overflow-hidden rounded-sm border border-border bg-card transition-all duration-200 hover:scale-[1.01]"
     >
       {/* Header */}
       <div className="p-4 pb-3">
         {/* Industry tag badge */}
         {bundle.industry_tag && (
           <span
-            className={`mb-3 inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium ${tagClass}`}
+            className={`mb-3 inline-flex items-center gap-1.5 rounded-sm px-2.5 py-1 text-xs font-medium ${tagClass}`}
           >
             <Tag className="h-3 w-3" />
             {bundle.industry_tag.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}
@@ -121,7 +121,7 @@ export function BundlePricingCard({ bundle }: BundleProps) {
           </span>
           {savings != null && savings > 0 && (
             <span
-              className="rounded-lg border border-green-500/30 bg-green-500/10 px-2 py-0.5 text-xs font-semibold text-green-500"
+              className="rounded-sm border border-green-500/30 bg-green-500/10 px-2 py-0.5 text-xs font-semibold text-green-500"
             >
               Save ${savings.toFixed(0)}
             </span>
@@ -130,7 +130,7 @@ export function BundlePricingCard({ bundle }: BundleProps) {
 
         <Link
           href="/subscribe"
-          className="flex w-full items-center justify-center rounded-lg bg-carsi-orange px-4 py-2.5 text-sm font-semibold text-black transition-all duration-150 hover:opacity-90"
+          className="flex w-full items-center justify-center rounded-sm bg-carsi-orange px-4 py-2.5 text-sm font-semibold text-black transition-all duration-150 hover:opacity-90"
         >
           Enrol in Bundle &rarr;
         </Link>

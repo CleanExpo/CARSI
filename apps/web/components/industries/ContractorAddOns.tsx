@@ -71,7 +71,7 @@ export function ContractorAddOns({ accentColor = '#2490ed' }: ContractorAddOnsPr
             {governmentPanels.map((panel) => (
               <div
                 key={panel.name}
-                className="rounded-lg border border-border bg-secondary p-5"
+                className="rounded-sm border border-border bg-secondary p-5"
               >
                 <div className="mb-3 flex items-center gap-2">
                   <FileCheck className="h-4 w-4" style={{ color: accentColor } as React.CSSProperties} />
@@ -109,7 +109,7 @@ export function ContractorAddOns({ accentColor = '#2490ed' }: ContractorAddOnsPr
             {cleanerUpgrades.map((upgrade) => (
               <div
                 key={upgrade.base}
-                className="flex flex-col items-start gap-4 rounded-lg border border-border bg-secondary p-5 sm:flex-row sm:items-center"
+                className="flex flex-col items-start gap-4 rounded-sm border border-border bg-secondary p-5 sm:flex-row sm:items-center"
               >
                 <div className="flex items-center gap-3">
                   <Briefcase className="h-4 w-4 flex-shrink-0 text-muted-foreground/60" />
@@ -142,13 +142,13 @@ export function ContractorAddOns({ accentColor = '#2490ed' }: ContractorAddOnsPr
           <div className="mt-8 flex flex-wrap gap-4">
             <Link
               href="/courses"
-              className="inline-flex items-center gap-2 rounded-md bg-carsi-orange px-6 py-3 font-medium text-white transition-opacity duration-150 hover:opacity-90"
+              className="inline-flex items-center gap-2 rounded-sm bg-carsi-orange px-6 py-3 font-medium text-white transition-opacity duration-150 hover:opacity-90"
             >
               Browse Certification Courses <ArrowRight className="h-4 w-4" />
             </Link>
             <Link
               href="/pathways"
-              className="inline-flex items-center gap-2 rounded-md border border-border bg-secondary px-6 py-3 font-medium text-muted-foreground transition-colors duration-150 hover:text-white"
+              className="inline-flex items-center gap-2 rounded-sm border border-border bg-secondary px-6 py-3 font-medium text-muted-foreground transition-colors duration-150 hover:text-white"
             >
               View Learning Pathways
             </Link>

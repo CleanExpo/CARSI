@@ -30,13 +30,13 @@ function ActionBadge({ action }: { action: string }) {
   const style = ACTION_COLOURS[action];
   if (style) {
     return (
-      <span className={`inline-block rounded-lg px-2 py-0.5 text-xs ${style.className}`}>
+      <span className={`inline-block rounded-sm px-2 py-0.5 text-xs ${style.className}`}>
         {action}
       </span>
     );
   }
   return (
-    <span className="inline-block rounded-lg bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+    <span className="inline-block rounded-sm bg-muted px-2 py-0.5 text-xs text-muted-foreground">
       {action}
     </span>
   );
@@ -92,7 +92,7 @@ export default function AuditLogPage() {
         </div>
         <Link
           href="/admin"
-          className="rounded-lg border border-border bg-background px-3 py-2 text-xs text-primary"
+          className="rounded-sm border border-border bg-background px-3 py-2 text-xs text-primary"
         >
           ← Admin
         </Link>
@@ -106,7 +106,7 @@ export default function AuditLogPage() {
         <select
           value={actionFilter}
           onChange={(e) => handleActionChange(e.target.value)}
-          className="rounded-lg border border-border bg-background px-3 py-2 text-xs text-foreground"
+          className="rounded-sm border border-border bg-background px-3 py-2 text-xs text-foreground"
         >
           <option value="">All actions</option>
           {ACTION_OPTIONS.filter(Boolean).map((a) => (
@@ -125,7 +125,7 @@ export default function AuditLogPage() {
       {data && !loading && (
         <>
           {/* Table */}
-          <div className="overflow-hidden rounded-lg border border-border">
+          <div className="overflow-hidden rounded-sm border border-border">
             <table className="w-full text-xs">
               <thead>
                 <tr className="border-b border-border bg-background">
@@ -197,14 +197,14 @@ export default function AuditLogPage() {
                 <button
                   onClick={() => setPage((p) => Math.max(0, p - 1))}
                   disabled={page === 0}
-                  className="rounded-lg border border-border bg-background px-3 py-2 text-xs text-primary disabled:opacity-30"
+                  className="rounded-sm border border-border bg-background px-3 py-2 text-xs text-primary disabled:opacity-30"
                 >
                   ← Previous
                 </button>
                 <button
                   onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
                   disabled={page >= totalPages - 1}
-                  className="rounded-lg border border-border bg-background px-3 py-2 text-xs text-primary disabled:opacity-30"
+                  className="rounded-sm border border-border bg-background px-3 py-2 text-xs text-primary disabled:opacity-30"
                 >
                   Next →
                 </button>

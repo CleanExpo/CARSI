@@ -30,7 +30,7 @@ export default function ContactPage() {
           {/* Contact Details */}
           <div className="space-y-6">
             {/* Address card */}
-            <div className="space-y-4 rounded-lg border border-border bg-card p-5">
+            <div className="space-y-4 rounded-sm border border-border bg-card p-5">
               <h2 className="text-sm font-semibold text-foreground">
                 Our Details
               </h2>
@@ -76,7 +76,7 @@ export default function ContactPage() {
             </div>
 
             {/* Social card */}
-            <div className="rounded-lg border border-border bg-card p-5">
+            <div className="rounded-sm border border-border bg-card p-5">
               <h2 className="mb-4 text-sm font-semibold text-foreground">
                 Connect With Us
               </h2>
@@ -108,7 +108,7 @@ export default function ContactPage() {
                     href={s.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-between rounded-lg border border-border bg-secondary px-3 py-2 transition-colors"
+                    className="flex items-center justify-between rounded-sm border border-border bg-secondary px-3 py-2 transition-colors"
                   >
                     <span className="text-xs font-medium text-foreground">
                       {s.label}

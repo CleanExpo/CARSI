@@ -87,7 +87,7 @@ export default async function CoursesPage({
 
         {/* ── Course Grid (primary content — above the fold) ── */}
         <section className="mb-10">
-          <div className="rounded-lg border border-border bg-card p-5">
+          <div className="rounded-sm border border-border bg-card p-5">
             <CourseGrid courses={courses} initialTab={discipline ?? 'All'} />
           </div>
         </section>
@@ -109,7 +109,7 @@ export default async function CoursesPage({
 
         {/* ── IICRC Discipline Map ── */}
         <section className="mb-10">
-          <div className="rounded-lg border border-border bg-card p-5">
+          <div className="rounded-sm border border-border bg-card p-5">
             <h2 className="font-display mb-3 text-center text-lg font-semibold text-foreground">
               IICRC Discipline Map
             </h2>
@@ -133,7 +133,7 @@ export default async function CoursesPage({
           </h2>
           <div className="space-y-3">
             {/* Q1 — What courses does CARSI offer? */}
-            <details className="group rounded-lg border border-border bg-card">
+            <details className="group rounded-sm border border-border bg-card">
               <summary className="flex cursor-pointer items-center justify-between px-5 py-4 text-sm font-semibold text-foreground select-none">
                 <span>What courses does CARSI offer?</span>
                 <svg
@@ -172,7 +172,7 @@ export default async function CoursesPage({
             </details>
 
             {/* Q2 — How do I choose the right discipline? */}
-            <details className="group rounded-lg border border-border bg-card">
+            <details className="group rounded-sm border border-border bg-card">
               <summary className="flex cursor-pointer items-center justify-between px-5 py-4 text-sm font-semibold text-foreground select-none">
                 <span>
                   How do I choose the right <AcronymTooltip term="IICRC" /> discipline?
@@ -210,7 +210,7 @@ export default async function CoursesPage({
             </details>
 
             {/* Q3 — What are CECs? */}
-            <details className="group rounded-lg border border-border bg-card">
+            <details className="group rounded-sm border border-border bg-card">
               <summary className="flex cursor-pointer items-center justify-between px-5 py-4 text-sm font-semibold text-foreground select-none">
                 <span>
                   What are <AcronymTooltip term="IICRC" /> Continuing Education Credits (
