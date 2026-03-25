@@ -211,36 +211,24 @@ export default function QuizPage() {
             </div>
 
             {/* Per-question explanations */}
-            <div
-              className="rounded-sm border p-5"
-              style={{ background: '#060a14', borderColor: 'rgba(255,255,255,0.06)' }}
-            >
-              <p className="mb-4 flex items-center gap-2 text-xs font-semibold tracking-widest text-white/40 uppercase">
-                <Lightbulb className="h-3.5 w-3.5" style={{ color: '#2490ed' }} />
+            <div className="rounded-sm border border-border bg-card p-5">
+              <p className="mb-4 flex items-center gap-2 text-xs font-semibold tracking-widest text-muted-foreground/60 uppercase">
+                <Lightbulb className="h-3.5 w-3.5 text-primary" />
                 Answer Explanations
               </p>
               <div className="space-y-3">
                 {quiz.questions.map((q, idx) => (
                   <div
                     key={q.id}
-                    className="flex items-start justify-between gap-4 rounded-sm border px-4 py-3"
-                    style={{
-                      borderColor: 'rgba(255,255,255,0.05)',
-                      background: 'rgba(255,255,255,0.02)',
-                    }}
+                    className="flex items-start justify-between gap-4 rounded-sm border border-border bg-white/[0.02] px-4 py-3"
                   >
-                    <p className="text-sm leading-snug text-white/70">
-                      <span className="mr-1.5 text-white/30">{idx + 1}.</span>
+                    <p className="text-sm leading-snug text-foreground/70">
+                      <span className="mr-1.5 text-muted-foreground/40">{idx + 1}.</span>
                       {q.question_text}
                     </p>
                     <button
                       onClick={() => openExplanation(q.id)}
-                      className="shrink-0 rounded-sm px-3 py-1.5 text-xs font-medium transition-colors"
-                      style={{
-                        background: 'rgba(36,144,237,0.1)',
-                        color: '#2490ed',
-                        border: '1px solid rgba(36,144,237,0.2)',
-                      }}
+                      className="shrink-0 rounded-sm bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary ring-1 ring-primary/20 transition-colors hover:bg-primary/20"
                     >
                       Explain
                     </button>
@@ -254,7 +242,6 @@ export default function QuizPage() {
               <Button
                 onClick={() => router.push(`/courses/${params.slug}`)}
                 className="w-full gap-2 rounded-sm"
-                style={{ background: '#2490ed', color: '#fff' }}
               >
                 Continue Course
               </Button>

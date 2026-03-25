@@ -164,10 +164,7 @@ export default function AdminAnalyticsPage() {
                 className={`flex items-center justify-between px-5 py-3 ${i % 2 === 0 ? 'bg-secondary' : ''} ${i < data.top_courses.length - 1 ? 'border-b border-border' : ''}`}
               >
                 <div className="flex items-center gap-3">
-                  <span
-                    className="font-mono text-xs text-muted-foreground"
-                    style={{ minWidth: '16px' }}
-                  >
+                  <span className="min-w-4 font-mono text-xs text-muted-foreground">
                     {i + 1}
                   </span>
                   <span className="text-sm text-foreground">

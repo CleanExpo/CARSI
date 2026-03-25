@@ -36,7 +36,7 @@ export async function PerformanceTrends({ days = 7 }: PerformanceTrendsProps) {
   if (!trends || !trends.data_points) {
     return (
       <div className="bg-white p-8 rounded-lg shadow text-center">
-        <p className="text-gray-600">No trend data available</p>
+        <p className="text-muted-foreground">No trend data available</p>
       </div>
     )
   }
@@ -48,7 +48,7 @@ export async function PerformanceTrends({ days = 7 }: PerformanceTrendsProps) {
     <div className="bg-white p-6 rounded-lg shadow">
       <div className="mb-6">
         <h3 className="text-lg font-semibold mb-1">Last {days} Days</h3>
-        <p className="text-sm text-gray-600">Task completion and success rate trends</p>
+        <p className="text-sm text-muted-foreground">Task completion and success rate trends</p>
       </div>
 
       {/* Simple bar chart */}
@@ -64,19 +64,19 @@ export async function PerformanceTrends({ days = 7 }: PerformanceTrendsProps) {
 
           return (
             <div key={idx} className="flex items-center space-x-3">
-              <div className="text-xs text-gray-500 w-20">
+              <div className="text-xs text-muted-foreground/70 w-20">
                 {new Date(point.date).toLocaleDateString('en-US', {
                   month: 'short',
                   day: 'numeric',
                 })}
               </div>
               <div className="flex-1 relative">
-                <div className="w-full bg-gray-100 rounded h-8">
+                <div className="w-full rounded bg-secondary h-8">
                   <div
-                    className="bg-blue-500 rounded h-8 flex items-center justify-end pr-2"
+                    className="rounded bg-primary h-8 flex items-center justify-end pr-2"
                     style={{ width: `${barWidth}%` }}
                   >
-                    <span className="text-white text-xs font-medium">
+                    <span className="text-primary-foreground text-xs font-medium">
                       {point.tasks_completed}
                     </span>
                   </div>
@@ -93,7 +93,7 @@ export async function PerformanceTrends({ days = 7 }: PerformanceTrendsProps) {
       </div>
 
       {/* Legend */}
-      <div className="mt-6 pt-4 border-t flex items-center justify-between text-xs text-gray-500">
+      <div className="mt-6 pt-4 border-t flex items-center justify-between text-xs text-muted-foreground/70">
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-1">
             <div className="w-3 h-3 bg-blue-500 rounded" />

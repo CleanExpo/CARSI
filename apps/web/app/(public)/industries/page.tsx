@@ -1,3 +1,4 @@
+import type React from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { OrganizationSchema } from '@/components/seo/JsonLd';
@@ -227,11 +228,8 @@ export default function IndustriesPage() {
                 className="group rounded-lg border border-border bg-card p-6 transition-all duration-200 hover:-translate-y-1"
               >
                 <div
-                  className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg"
-                  style={{
-                    background: `${industry.color}15`,
-                    border: `1px solid ${industry.color}30`,
-                  }}
+                  className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg ring-1"
+                  style={{ background: `${industry.color}15`, '--tw-ring-color': `${industry.color}30` } as React.CSSProperties}
                 >
                   <industry.Icon className="h-5 w-5" style={{ color: industry.color }} />
                 </div>
@@ -251,11 +249,7 @@ export default function IndustriesPage() {
                   {industry.disciplines.map((code) => (
                     <span
                       key={code}
-                      className="rounded px-2 py-0.5 font-mono text-[10px] font-bold text-primary"
-                      style={{
-                        background: 'rgba(36,144,237,0.1)',
-                        border: '1px solid rgba(36,144,237,0.2)',
-                      }}
+                      className="rounded bg-primary/10 px-2 py-0.5 font-mono text-[10px] font-bold text-primary ring-1 ring-primary/20"
                     >
                       {code}
                     </span>
@@ -278,8 +272,7 @@ export default function IndustriesPage() {
             <div className="flex justify-center gap-3">
               <Link
                 href="/courses"
-                className="inline-flex items-center gap-2 rounded-lg px-6 py-2.5 text-sm font-medium text-white transition-opacity duration-150 hover:opacity-90"
-                style={{ background: '#ed9d24' }}
+                className="inline-flex items-center gap-2 rounded-lg bg-carsi-orange px-6 py-2.5 text-sm font-medium text-white transition-opacity duration-150 hover:opacity-90"
               >
                 Browse All Courses
               </Link>

@@ -44,11 +44,7 @@ export default function AboutPage() {
     <main className="min-h-screen bg-background">
       {/* Subtle gradient orb */}
       <div
-        className="pointer-events-none fixed inset-0"
-        style={{
-          background:
-            'radial-gradient(ellipse 60% 40% at 50% 0%, rgba(36,144,237,0.06) 0%, transparent 60%)',
-        }}
+        className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_0%,hsl(var(--primary)/0.06)_0%,transparent_60%)]"
         aria-hidden="true"
       />
 
@@ -167,16 +163,9 @@ export default function AboutPage() {
             {disciplines.map((d) => (
               <div
                 key={d.code}
-                className="flex items-center gap-3 rounded-lg px-3 py-2"
-                style={{
-                  background: 'rgba(36,144,237,0.06)',
-                  border: '1px solid rgba(36,144,237,0.15)',
-                }}
+                className="flex items-center gap-3 rounded-lg border border-primary/15 bg-primary/[0.06] px-3 py-2"
               >
-                <span
-                  className="font-mono text-xs font-bold text-primary"
-                  style={{ minWidth: '3rem' }}
-                >
+                <span className="w-12 font-mono text-xs font-bold text-primary">
                   {d.code}
                 </span>
                 <span className="text-xs text-muted-foreground">
@@ -188,13 +177,7 @@ export default function AboutPage() {
         </section>
 
         {/* ── CTA ──────────────────────────────────────────────── */}
-        <section
-          className="mb-16 rounded-lg border border-border p-8"
-          style={{
-            background:
-              'linear-gradient(135deg, rgba(36,144,237,0.08) 0%, rgba(237,157,36,0.08) 100%)',
-          }}
-        >
+        <section className="mb-16 rounded-lg border border-border bg-card p-8">
           <h2 className="mb-2 text-lg font-semibold text-foreground">
             Ready to advance your career?
           </h2>
@@ -204,8 +187,7 @@ export default function AboutPage() {
           <div className="flex flex-wrap gap-3">
             <Link
               href="/courses"
-              className="inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium text-white transition-all duration-200 hover:scale-[1.02]"
-              style={{ background: '#ed9d24' }}
+              className="inline-flex items-center gap-2 rounded-lg bg-carsi-orange px-5 py-2.5 text-sm font-medium text-white transition-all duration-200 hover:scale-[1.02]"
             >
               Browse Courses <ArrowRight className="h-4 w-4" />
             </Link>

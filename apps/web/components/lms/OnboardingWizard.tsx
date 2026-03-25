@@ -191,8 +191,7 @@ export function OnboardingWizard({ isOpen, onComplete }: OnboardingWizardProps) 
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: 'rgba(5, 5, 5, 0.85)' }}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4"
       role="dialog"
       aria-modal="true"
       aria-label="Onboarding wizard"
@@ -210,11 +209,7 @@ export function OnboardingWizard({ isOpen, onComplete }: OnboardingWizardProps) 
             {STEPS.map((_, i) => (
               <div
                 key={i}
-                className="h-2 rounded-sm transition-all duration-300"
-                style={{
-                  width: i === step ? '24px' : '8px',
-                  background: i <= step ? 'hsl(var(--primary))' : 'rgba(255,255,255,0.1)',
-                }}
+                className={`h-2 rounded-sm transition-all duration-300 ${i <= step ? 'bg-primary' : 'bg-white/10'} ${i === step ? 'w-6' : 'w-2'}`}
               />
             ))}
           </div>
@@ -255,10 +250,7 @@ export function OnboardingWizard({ isOpen, onComplete }: OnboardingWizardProps) 
               animate={{ opacity: 1 }}
               className="flex flex-col items-center justify-center py-12"
             >
-              <div
-                className="mb-4 h-10 w-10 animate-spin rounded-full border-2 border-transparent"
-                style={{ borderTopColor: 'hsl(var(--primary))' }}
-              />
+              <div className="mb-4 h-10 w-10 animate-spin rounded-full border-2 border-transparent border-t-primary" />
               <p className="text-sm text-muted-foreground">Analysing your answers…</p>
             </motion.div>
           ) : error ? (
@@ -299,8 +291,7 @@ export function OnboardingWizard({ isOpen, onComplete }: OnboardingWizardProps) 
                   <button
                     key={answer.value}
                     onClick={() => handleAnswer(answer.value)}
-                    className="flex items-center gap-4 rounded-lg border border-border p-4 text-left transition-all duration-150 hover:border-primary/50 hover:bg-muted/30"
-                    style={{ background: 'hsl(var(--secondary))' }}
+                    className="flex items-center gap-4 rounded-lg border border-border bg-secondary p-4 text-left transition-all duration-150 hover:border-primary/50 hover:bg-muted/30"
                   >
                     <span className="text-primary">{answer.icon}</span>
                     <span className="text-sm font-medium text-foreground">{answer.label}</span>

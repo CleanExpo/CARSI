@@ -152,7 +152,7 @@ export function RecommendationWidget() {
       )}
 
       {/* Horizontal scroll container */}
-      <div className="flex gap-4 overflow-x-auto pb-2" style={{ scrollbarWidth: 'thin' }}>
+      <div className="flex gap-4 overflow-x-auto pb-2 [scrollbar-width:thin]">
         {loading ? (
           <>
             <SkeletonCard />

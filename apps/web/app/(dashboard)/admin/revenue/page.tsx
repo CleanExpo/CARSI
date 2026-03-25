@@ -66,14 +66,10 @@ function RevenueBarChart({ data }: { data: RevenueByMonth[] }) {
         return (
           <div key={row.month} className="flex flex-1 flex-col items-center gap-2">
             <span className="text-xs text-muted-foreground">{formatAUD(row.revenue_aud)}</span>
-            <div className="flex w-full flex-col justify-end" style={{ height: '96px' }}>
+            <div className="flex h-24 w-full flex-col justify-end">
               <div
-                className="w-full rounded-lg bg-primary transition-all"
-                style={{
-                  height: `${Math.max(pct, 3)}%`,
-                  opacity: 0.85,
-                  minHeight: '4px',
-                }}
+                className="w-full rounded-lg bg-primary/85 transition-all"
+                style={{ height: `${Math.max(pct, 3)}%`, minHeight: '4px' }}
               />
             </div>
             <span className="text-xs text-muted-foreground/50">{row.month}</span>

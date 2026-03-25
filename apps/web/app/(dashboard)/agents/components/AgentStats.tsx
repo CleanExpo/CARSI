@@ -4,6 +4,14 @@
  * Displays key metrics about agent performance in card format.
  */
 
+const BORDER_COLOURS: Record<string, string> = {
+  blue: 'border-l-primary',
+  green: 'border-l-emerald-500',
+  purple: 'border-l-violet-500',
+  orange: 'border-l-amber-500',
+  yellow: 'border-l-yellow-500',
+};
+
 interface AgentStatsProps {
   stats: {
     total_agents: number
@@ -22,7 +30,6 @@ export function AgentStats({ stats }: AgentStatsProps) {
     {
       label: 'Active Agents',
       value: stats.active_agents,
-      total: stats.total_agents,
       suffix: ` / ${stats.total_agents}`,
       color: 'blue',
     },
@@ -47,33 +54,21 @@ export function AgentStats({ stats }: AgentStatsProps) {
   ]
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
       {cards.map((card) => (
         <div
           key={card.label}
-          className="bg-white p-6 rounded-lg shadow-md border-l-4"
-          style={{
-            borderLeftColor:
-              card.color === 'green'
-                ? '#10b981'
-                : card.color === 'blue'
-                  ? '#3b82f6'
-                  : card.color === 'purple'
-                    ? '#8b5cf6'
-                    : card.color === 'orange'
-                      ? '#f59e0b'
-                      : '#eab308',
-          }}
+          className={`rounded-lg border border-border bg-card p-6 shadow-sm border-l-4 ${BORDER_COLOURS[card.color] ?? 'border-l-border'}`}
         >
-          <div className="text-sm font-medium text-gray-600 mb-2">
+          <div className="mb-2 text-sm font-medium text-muted-foreground">
             {card.label}
           </div>
-          <div className="text-3xl font-bold text-gray-900">
+          <div className="text-3xl font-bold text-foreground">
             {card.value}
-            {card.suffix && <span className="text-lg text-gray-600">{card.suffix}</span>}
+            {card.suffix && <span className="text-lg text-muted-foreground">{card.suffix}</span>}
           </div>
           {card.subtitle && (
-            <div className="text-sm text-gray-500 mt-1">{card.subtitle}</div>
+            <div className="mt-1 text-sm text-muted-foreground/70">{card.subtitle}</div>
           )}
         </div>
       ))}
