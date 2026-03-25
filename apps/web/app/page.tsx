@@ -84,7 +84,7 @@ const benefits = [
 
 const BASE_STATS = [
   { value: '24/7', label: 'Online Access' },
-  { value: '12+', label: 'Industries Served' },
+  { value: '19', label: 'Industries Served' },
   { value: '7', label: 'IICRC Disciplines' },
 ];
 
@@ -92,7 +92,7 @@ const faqs = [
   {
     question: 'What is CARSI?',
     answer:
-      'CARSI is an Australian online training platform offering IICRC CEC-approved courses for cleaning and restoration professionals. With over 160 courses across seven IICRC disciplines, CARSI enables technicians to maintain their certification entirely online.',
+      'CARSI is an Australian online training platform offering IICRC CEC-approved courses for cleaning and restoration professionals. With over 140 courses and resources across seven IICRC disciplines, CARSI enables technicians to maintain their certification entirely online.',
   },
   {
     question: 'How do IICRC CECs work?',
@@ -112,7 +112,7 @@ const faqs = [
   {
     question: 'What industries does CARSI serve?',
     answer:
-      'CARSI serves over 12 industries including healthcare, hospitality, aged care, mining and resources, commercial cleaning, government and defence, education, property management, strata, retail, childcare, and construction.',
+      'CARSI serves 19 industries including healthcare, hospitality, aged care, mining and resources, commercial cleaning, government and defence, education, property management, strata, retail, childcare, construction, insurance, plumbing and trades, NDIS and disability services, gyms and fitness, real estate, emergency management, and caravan parks.',
   },
 ];
 
@@ -190,7 +190,7 @@ export default async function Home() {
 
   const stats = [
     ...BASE_STATS,
-    { value: courseTotal > 0 ? courseTotal.toString() : '160+', label: 'Courses' },
+    { value: courseTotal > 0 ? courseTotal.toString() : '140+', label: 'Courses' },
   ];
 
   return (
@@ -454,9 +454,10 @@ export default async function Home() {
               </a>
               )
             </span>
-            . CARSI offers 40 <AcronymTooltip term="IICRC" /> <AcronymTooltip term="CEC" />
-            -approved online courses across all seven disciplines, allowing Australian professionals
-            to meet their renewal requirements without travelling interstate.
+            . CARSI offers over 60 <AcronymTooltip term="IICRC" />{' '}
+            <AcronymTooltip term="CEC" />-approved online courses across all seven disciplines,
+            allowing Australian professionals to meet their renewal requirements without travelling
+            interstate.
           </p>
           <p className="mt-4 text-xs italic text-muted-foreground">
             Last reviewed: March 2026
@@ -479,7 +480,7 @@ export default async function Home() {
             jobs, and fit study around shift work or on-call rosters. Upon completion, certificates
             are generated instantly as verifiable digital credentials that can be shared with
             employers or added to a LinkedIn profile within minutes. With courses starting from $20
-            AUD and a full all-access subscription at $795 AUD per year, CARSI provides the most
+            AUD and a Growth membership at $795 AUD per year (or Foundation from $495/year), CARSI provides the most
             cost-effective path to <AcronymTooltip term="IICRC" /> certification maintenance in
             Australia.
           </p>
@@ -517,8 +518,8 @@ export default async function Home() {
             equipment familiarisation, and workplace health and safety induction. This partnership
             means CARSI-trained technicians are recognised across the NRPG network from day one. For
             restoration companies, enrolling staff through CARSI ensures compliance with NRPG
-            workforce standards without disrupting operations. With over 160 courses spanning all
-            seven <AcronymTooltip term="IICRC" /> disciplines, CARSI provides the most comprehensive
+            workforce standards without disrupting operations. With over 140 courses and resources
+            spanning all seven <AcronymTooltip term="IICRC" /> disciplines, CARSI provides the most comprehensive
             online training library available to Australian restoration professionals.
           </p>
           <p className="mt-4 text-xs italic text-muted-foreground">
@@ -615,7 +616,7 @@ export default async function Home() {
           <p className="mb-8 text-base text-muted-foreground">
             Free courses available. Premium courses from just $20 AUD.
             <br />
-            Or get full access to 160+ courses for $795 AUD/year.
+            Or get full access with Growth membership for $795 AUD/year.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
