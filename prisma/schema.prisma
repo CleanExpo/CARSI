@@ -1,0 +1,150 @@
+// LMS tables used by WordPress migration (`scripts/wp-migrate.ts` + SQL loaders). Run `pnpm prisma:pull` when your DB is up to sync with production.
+// When your Postgres is running, run `pnpm prisma:pull` (or `npx prisma db pull`) to replace this with an exact introspection of your database.
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model LmsRole {
+  id          Int    @id @default(autoincrement())
+  name        String @unique
+  description String?
+
+  userRoles LmsUserRole[]
+
+  @@map("lms_roles")
+}
+
+model LmsUser {
+  id                String   @id @db.Uuid
+  email             String   @unique
+  hashedPassword    String   @map("hashed_password")
+  fullName          String?  @map("full_name")
+  isActive          Boolean  @default(true) @map("is_active")
+  isVerified        Boolean  @default(false) @map("is_verified")
+  themePreference   String?  @map("theme_preference")
+  /// Present in some deployments (`scripts/seed_production.py`); omit in queries if unused.
+  role              String?
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  userRoles         LmsUserRole[]
+  enrollments       LmsEnrollment[] @relation("EnrollmentStudent")
+  coursesInstructing LmsCourse[]     @relation("CourseInstructor")
+
+  @@map("lms_users")
+}
+
+/// Junction table: `ON CONFLICT DO NOTHING` on (user_id, role_id) in loaders.
+model LmsUserRole {
+  userId String @map("user_id") @db.Uuid
+  roleId Int    @map("role_id")
+
+  user LmsUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role LmsRole @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+  @@map("lms_user_roles")
+}
+
+model LmsCourse {
+  id               String   @id @db.Uuid
+  slug             String   @unique
+  title            String
+  description      String?  @db.Text
+  shortDescription String?  @map("short_description") @db.Text
+  thumbnailUrl     String?  @map("thumbnail_url")
+  instructorId     String   @map("instructor_id") @db.Uuid
+  status           String
+  priceAud         Decimal  @map("price_aud") @db.Decimal(12, 2)
+  isFree           Boolean  @default(false) @map("is_free")
+  durationHours    Float?   @map("duration_hours")
+  level            String?
+  category         String?
+  tags             Json?
+  iicrcDiscipline  String?  @map("iicrc_discipline")
+  cecHours         Float?   @map("cec_hours")
+  meta             Json?
+  isPublished      Boolean? @map("is_published")
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  instructor  LmsUser         @relation("CourseInstructor", fields: [instructorId], references: [id])
+  modules     LmsModule[]
+  enrollments LmsEnrollment[]
+
+  @@map("lms_courses")
+}
+
+model LmsModule {
+  id         String   @id @db.Uuid
+  courseId   String   @map("course_id") @db.Uuid
+  title      String
+  orderIndex Int      @map("order_index")
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  course  LmsCourse  @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lessons LmsLesson[]
+
+  @@map("lms_modules")
+}
+
+model LmsLesson {
+  id          String   @id @db.Uuid
+  moduleId    String   @map("module_id") @db.Uuid
+  title       String
+  contentType String   @map("content_type")
+  contentBody String?  @map("content_body") @db.Text
+  orderIndex  Int      @map("order_index")
+  isPreview   Boolean  @default(false) @map("is_preview")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  module LmsModule @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  @@map("lms_lessons")
+}
+
+/// Unique enrollment per student/course: constraint `uq_lms_enrollment` in migration loaders.
+model LmsEnrollment {
+  id               String   @id @db.Uuid
+  studentId        String   @map("student_id") @db.Uuid
+  courseId         String   @map("course_id") @db.Uuid
+  status           String
+  paymentReference String?  @map("payment_reference")
+  enrolledAt       DateTime @default(now()) @map("enrolled_at") @db.Timestamptz(6)
+
+  student LmsUser   @relation("EnrollmentStudent", fields: [studentId], references: [id], onDelete: Cascade)
+  course  LmsCourse @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, courseId], map: "uq_lms_enrollment")
+  @@map("lms_enrollments")
+}
+
+model LmsCategory {
+  id          String  @id @db.Uuid
+  slug        String  @unique
+  name        String
+  description String? @db.Text
+  parentId    String? @map("parent_id") @db.Uuid
+  orderIndex  Int?    @map("order_index")
+
+  @@map("lms_categories")
+}
+
+model LmsLearningPathway {
+  id                  String   @id @db.Uuid
+  slug                String   @unique
+  title               String
+  description         String?  @db.Text
+  iicrcDiscipline     String?  @map("iicrc_discipline")
+  targetCertification String?  @map("target_certification") @db.Text
+  estimatedHours      Float?   @map("estimated_hours")
+  isPublished         Boolean  @default(false) @map("is_published")
+  orderIndex          Int      @default(0) @map("order_index")
+
+  @@map("lms_learning_pathways")
+}
