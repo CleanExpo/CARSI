@@ -71,7 +71,7 @@ export function CertificatePreview({
           <div className="mx-auto mb-4 flex items-center justify-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="https://carsi.com.au/wp-content/uploads/2021/02/CARSI-LOGO-best-compression-2.png"
+              src="/images/brand/carsi-logo.webp"
               alt="CARSI"
               className="h-10 w-auto"
             />

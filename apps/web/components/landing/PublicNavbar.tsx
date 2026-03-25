@@ -12,7 +12,7 @@ export function PublicNavbar() {
         <div className="flex h-16 items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
             <Image
-              src="https://carsi.com.au/wp-content/uploads/2021/02/CARSI-LOGO-best-compression-2.png"
+              src="/images/brand/carsi-logo.webp"
               alt="CARSI"
               width={120}
               height={40}

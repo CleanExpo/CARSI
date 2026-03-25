@@ -17,7 +17,7 @@ export function PublicFooter() {
           <div>
             <div className="mb-3">
               <Image
-                src="https://carsi.com.au/wp-content/uploads/2021/02/CARSI-LOGO-best-compression-2.png"
+                src="/images/brand/carsi-logo.webp"
                 alt="CARSI"
                 width={80}
                 height={28}
