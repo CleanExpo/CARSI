@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Outfit, DM_Sans } from 'next/font/google';
+import { Inter, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { Toaster } from '@/components/ui/toast';
 import { ThemeProvider } from '@/components/ThemeProvider';
@@ -7,15 +7,15 @@ import { AuthProvider } from '@/components/auth/auth-provider';
 import { OrganizationSchema, WebsiteSchema } from '@/components/seo';
 import { ServiceWorkerRegistration } from '@/components/lms/ServiceWorkerRegistration';
 
-const outfit = Outfit({
+const inter = Inter({
   subsets: ['latin'],
-  variable: '--font-display',
+  variable: '--font-sans',
   display: 'swap',
 });
 
-const dmSans = DM_Sans({
+const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
-  variable: '--font-sans',
+  variable: '--font-mono',
   display: 'swap',
 });
 
@@ -88,7 +88,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: '#ffffff' },
-    { media: '(prefers-color-scheme: dark)', color: '#0a0f1a' },
+    { media: '(prefers-color-scheme: dark)', color: '#09090b' },
   ],
   width: 'device-width',
   initialScale: 1,
@@ -106,7 +106,7 @@ export default function RootLayout({
         <OrganizationSchema />
         <WebsiteSchema />
       </head>
-      <body className={`${outfit.variable} ${dmSans.variable} font-sans`} suppressHydrationWarning>
+      <body className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased`} suppressHydrationWarning>
         <AuthProvider>
           <ThemeProvider initialTheme="dark">
             <ServiceWorkerRegistration />
