@@ -93,7 +93,7 @@ export function EnrolButton({ slug, priceAud = 0, isFree = false }: EnrolButtonP
       <Button
         onClick={handleEnrol}
         disabled={loading || subState === 'checking'}
-        className="w-full"
+        className="w-full rounded-sm border border-[#ed9d24]/70 bg-[#ed9d24] font-semibold text-[#111111] shadow-[0_10px_24px_rgba(237,157,36,0.32)] transition-all hover:bg-[#f2ad4e] hover:shadow-[0_14px_28px_rgba(237,157,36,0.4)]"
         size="lg"
       >
         {getLabel()}
