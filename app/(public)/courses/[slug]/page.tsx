@@ -2,9 +2,15 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import { EnrolButton } from '@/components/lms/EnrolButton';
+import { CourseThumbnail } from '@/components/lms/CourseThumbnail';
 import { CourseHubContext } from '@/components/lms/CourseHubContext';
 import { CourseSchema, BreadcrumbSchema } from '@/components/seo';
 import { getBackendOrigin } from '@/lib/env/public-url';
+import {
+  inferDisciplineFromWpExport,
+  loadWpExportCourses,
+  type WpExportCourse,
+} from '@/lib/wordpress-export-courses';
 
 export const dynamic = 'force-dynamic';
 
@@ -28,7 +34,44 @@ interface CourseDetail {
 const backendUrl = getBackendOrigin();
 const siteUrl = process.env.NEXT_PUBLIC_FRONTEND_URL ?? 'https://carsi.com.au';
 
+function resolveAssetUrl(url?: string | null): string | null {
+  if (!url) return null;
+  const trimmed = url.trim();
+  if (!trimmed) return null;
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) return trimmed;
+  if (trimmed.startsWith('/')) return `${backendUrl}${trimmed}`;
+  return `${backendUrl}/${trimmed}`;
+}
+
+function mapWpExportToCourseDetail(row: WpExportCourse): CourseDetail {
+  return {
+    id: String(row.wp_id),
+    slug: row.slug,
+    title: row.title,
+    description: row.description ?? null,
+    short_description: row.short_description ?? null,
+    price_aud: String(row.price_aud ?? 0),
+    is_free: row.is_free === true || Number(row.price_aud ?? 0) === 0,
+    level: row.level ?? null,
+    category: row.category ?? null,
+    iicrc_discipline: row.iicrc_discipline ?? inferDisciplineFromWpExport(row) ?? null,
+    cec_hours: null,
+    duration_hours: null,
+    thumbnail_url: resolveAssetUrl(row.thumbnail_url),
+    instructor: null,
+  };
+}
+
 async function getCourse(slug: string): Promise<CourseDetail | null> {
+  const targetSlug = decodeURIComponent(slug).trim().toLowerCase();
+
+  // Prefer local WordPress export when available so /courses/[slug] matches listing cards.
+  const exported = loadWpExportCourses();
+  if (exported && exported.length > 0) {
+    const match = exported.find((c) => (c.slug ?? '').trim().toLowerCase() === targetSlug);
+    if (match) return mapWpExportToCourseDetail(match);
+  }
+
   try {
     const res = await fetch(`${backendUrl}/api/lms/courses/${slug}`, {
       next: { revalidate: 60 },
@@ -58,6 +101,7 @@ export async function generateMetadata({
   }
 
   const priceNum = parseFloat(course.price_aud);
+  const thumbnailUrl = resolveAssetUrl(course.thumbnail_url);
   const priceText = course.is_free || priceNum === 0 ? 'Free' : `$${priceNum.toFixed(0)} AUD`;
   const disciplineText = course.iicrc_discipline ? `IICRC ${course.iicrc_discipline}` : '';
 
@@ -81,8 +125,8 @@ export async function generateMetadata({
       description,
       url: `${siteUrl}/courses/${slug}`,
       siteName: 'CARSI',
-      images: course.thumbnail_url
-        ? [{ url: course.thumbnail_url, width: 1200, height: 630, alt: course.title }]
+      images: thumbnailUrl
+        ? [{ url: thumbnailUrl, width: 1200, height: 630, alt: course.title }]
         : undefined,
       locale: 'en_AU',
       type: 'website',
@@ -91,7 +135,7 @@ export async function generateMetadata({
       card: 'summary_large_image',
       title: `${course.title} | CARSI`,
       description,
-      images: course.thumbnail_url ? [course.thumbnail_url] : undefined,
+      images: thumbnailUrl ? [thumbnailUrl] : undefined,
     },
     alternates: {
       canonical: `${siteUrl}/courses/${slug}`,
@@ -241,6 +285,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
   const price = course.is_free || priceNum === 0 ? 'Free' : `$${priceNum.toFixed(0)}`;
   const discipline = course.iicrc_discipline?.toUpperCase() ?? '';
   const disciplineFull = DISCIPLINE_LABELS[discipline] ?? '';
+  const thumbnailUrl = resolveAssetUrl(course.thumbnail_url);
   const learningOutcomes = getLearningOutcomes(course);
   const audienceItems = getAudienceItems(course);
 
@@ -459,19 +504,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                 <div className="hidden lg:block">
                   <div className="sticky top-8">
                     {/* Thumbnail */}
-                    {course.thumbnail_url && (
-                      <div
-                        className="mb-4 overflow-hidden rounded-sm"
-                        style={{ border: '1px solid rgba(255,255,255,0.07)' }}
-                      >
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={course.thumbnail_url}
-                          alt={course.title}
-                          className="aspect-video w-full object-cover"
-                        />
-                      </div>
-                    )}
+                    <CourseThumbnail src={thumbnailUrl} title={course.title} />
 
                     {/* Price card */}
                     <div className="rounded-sm p-6" style={glassPanel}>
@@ -621,7 +654,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                     {learningOutcomes.map((outcome) => (
                       <li key={outcome} className="flex items-start gap-3">
                         <span
-                          className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-sm text-xs"
+                          className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-sm text-xs"
                           style={{
                             background: 'rgba(0,255,136,0.1)',
                             color: '#00FF88',
@@ -717,7 +750,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                     {audienceItems.map((item) => (
                       <li key={item} className="flex items-start gap-3">
                         <span
-                          className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-sm text-xs"
+                          className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-sm text-xs"
                           style={{
                             background: 'rgba(237,157,36,0.1)',
                             color: '#ed9d24',
