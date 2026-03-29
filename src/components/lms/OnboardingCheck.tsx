@@ -42,9 +42,9 @@ export function OnboardingCheck() {
   return (
     <OnboardingWizard
       isOpen={showWizard}
-      onComplete={(pathway) => {
+      onComplete={(destination) => {
         setShowWizard(false);
-        router.push(`/pathways/${pathway.toLowerCase()}`);
+        router.push(destination);
       }}
     />
   );
