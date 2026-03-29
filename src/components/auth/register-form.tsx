@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
@@ -17,6 +17,8 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { authApi } from '@/lib/api/auth';
+import { apiClient, ApiClientError } from '@/lib/api/client';
+import { buildCourseCheckoutUrls } from '@/lib/checkout-urls';
 
 const formSchema = z
   .object({
@@ -35,6 +37,7 @@ type FormData = z.infer<typeof formSchema>;
 
 export function RegisterForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -54,7 +57,7 @@ export function RegisterForm() {
     setError(null);
 
     try {
-      // Register the account
+      // Register via same-origin API route (sets JWT cookies).
       await authApi.register({
         email: values.email,
         password: values.password,
@@ -62,9 +65,42 @@ export function RegisterForm() {
         iicrc_member_number: values.iicrcMemberNumber || undefined,
       });
 
-      // Auto-login after registration
-      await authApi.login({ email: values.email, password: values.password });
-      router.push('/student');
+      const next = searchParams.get('next') ?? searchParams.get('redirect') ?? '/student';
+      const safePath = next.startsWith('/') && !next.startsWith('//') ? next : '/student';
+
+      // If registration came from a specific course page, immediately start checkout.
+      const courseMatch = safePath.match(/^\/courses\/([^/?#]+)/);
+      if (courseMatch?.[1]) {
+        const slug = decodeURIComponent(courseMatch[1]);
+        try {
+          const { success_url, cancel_url } = buildCourseCheckoutUrls(window.location.origin, slug);
+          const checkout = await apiClient.post<{ enrolled?: boolean; checkout_url?: string }>(
+            '/api/lms/checkout',
+            { slug, success_url, cancel_url, customer_email: values.email }
+          );
+          if (checkout.checkout_url) {
+            window.location.href = checkout.checkout_url;
+            return;
+          }
+          if (checkout.enrolled) {
+            router.push(`/student?course=${encodeURIComponent(slug)}`);
+            return;
+          }
+        } catch (checkoutErr) {
+          if (checkoutErr instanceof ApiClientError && checkoutErr.status === 503) {
+            setError(
+              'Account created, but payments need STRIPE_SECRET_KEY (or a configured BACKEND_URL).'
+            );
+          } else if (checkoutErr instanceof ApiClientError && checkoutErr.status === 404) {
+            setError('Checkout service is not configured yet. Please contact support.');
+          } else {
+            setError('Account created, but checkout could not start. Please try Enrol again.');
+          }
+          return;
+        }
+      }
+
+      router.push(safePath);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Registration failed');
     } finally {
