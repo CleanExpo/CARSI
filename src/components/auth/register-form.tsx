@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
@@ -65,8 +65,8 @@ export function RegisterForm() {
         iicrc_member_number: values.iicrcMemberNumber || undefined,
       });
 
-      const next = searchParams.get('next') ?? searchParams.get('redirect') ?? '/student';
-      const safePath = next.startsWith('/') && !next.startsWith('//') ? next : '/student';
+      const next = searchParams.get('next') ?? searchParams.get('redirect') ?? '/dashboard';
+      const safePath = next.startsWith('/') && !next.startsWith('//') ? next : '/dashboard';
 
       // If registration came from a specific course page, immediately start checkout.
       const courseMatch = safePath.match(/^\/courses\/([^/?#]+)/);
