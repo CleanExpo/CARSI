@@ -24,6 +24,14 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   transpilePackages: ['@shared'],
   turbopack: {},
+  async rewrites() {
+    return {
+      beforeFiles: [
+        { source: '/dashboard/student', destination: '/student' },
+        { source: '/dashboard/student/:path*', destination: '/student/:path*' },
+      ],
+    };
+  },
   experimental: {
     // Typed routes disabled - requires full route type generation to be configured
     // typedRoutes: true,
