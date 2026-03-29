@@ -38,6 +38,12 @@ export default function SubscribePage() {
         success_url: `${window.location.origin}/subscribe/success`,
         cancel_url: `${window.location.origin}/subscribe`,
       });
+      if (!data.url?.trim()) {
+        setError(
+          'Subscription checkout needs the LMS backend. Set BACKEND_URL, or use a deployed environment with Stripe billing.'
+        );
+        return;
+      }
       window.location.href = data.url;
     } catch {
       setError('Could not start checkout. Please try again.');
