@@ -5,6 +5,9 @@ import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/components/auth/auth-provider';
 import { apiClient } from '@/lib/api/client';
+import { authApi } from '@/lib/api/auth';
+import { ApiClientError } from '@/lib/api/client';
+import { buildCourseCheckoutUrls } from '@/lib/checkout-urls';
 
 interface EnrolButtonProps {
   slug: string;
@@ -58,15 +61,24 @@ export function EnrolButton({ slug, priceAud = 0, isFree = false }: EnrolButtonP
     setLoading(true);
     setError(null);
 
-    if (!user) {
-      const returnTo = pathname && pathname.startsWith('/') ? pathname : `/courses/${slug}`;
-      window.location.href = `/login?next=${encodeURIComponent(returnTo)}`;
+    const returnTo = pathname && pathname.startsWith('/') ? pathname : `/courses/${slug}`;
+
+    // Re-check auth at click-time to avoid stale in-memory user state.
+    const currentUser = user ?? (await authApi.getCurrentUser());
+    if (!currentUser) {
+      window.location.href = `/register?next=${encodeURIComponent(returnTo)}`;
       setLoading(false);
       return;
     }
 
     try {
-      const data = await apiClient.post<CheckoutResponse>(`/api/lms/courses/${slug}/checkout`);
+      const { success_url, cancel_url } = buildCourseCheckoutUrls(window.location.origin, slug);
+      const data = await apiClient.post<CheckoutResponse>('/api/lms/checkout', {
+        slug,
+        success_url,
+        cancel_url,
+        ...(currentUser.email ? { customer_email: currentUser.email } : {}),
+      });
 
       if (data.enrolled) {
         window.location.href = '/student';
@@ -78,7 +90,9 @@ export function EnrolButton({ slug, priceAud = 0, isFree = false }: EnrolButtonP
         return;
       }
     } catch (err) {
-      if (err instanceof Error && err.message.includes('409')) {
+      if (err instanceof ApiClientError && err.status === 404) {
+        setError('Checkout service is not configured yet. Please contact support.');
+      } else if (err instanceof Error && err.message.includes('409')) {
         setError('You are already enrolled in this course.');
       } else {
         setError('Something went wrong. Please try again.');
