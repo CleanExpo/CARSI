@@ -21,7 +21,21 @@ import { apiClient } from '@/lib/api/client';
 
 interface OnboardingWizardProps {
   isOpen: boolean;
-  onComplete: (pathway: string) => void;
+  /** App path to open after onboarding (from API `suggested_courses_url` or derived slug). */
+  onComplete: (destination: string) => void;
+}
+
+/** Prefer server-provided URL; otherwise map certificate codes to `/pathways/:slug`. */
+function resolveOnboardingDestination(pathway: string, suggestedUrl?: string): string {
+  const raw = suggestedUrl?.trim();
+  if (raw) {
+    return raw.startsWith('/') ? raw : `/${raw}`;
+  }
+  const code = pathway.trim();
+  if (/^[A-Z]{2,5}$/.test(code)) {
+    return `/pathways/${code.toLowerCase()}`;
+  }
+  return '/pathways';
 }
 
 interface AnswerCard {
@@ -186,7 +200,7 @@ export function OnboardingWizard({ isOpen, onComplete }: OnboardingWizardProps) 
   };
 
   const handleComplete = () => {
-    if (result) onComplete(result.pathway);
+    if (result) onComplete(resolveOnboardingDestination(result.pathway, result.url));
   };
 
   return (
