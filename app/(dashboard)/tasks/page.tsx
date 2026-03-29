@@ -8,7 +8,7 @@ import { Suspense } from 'react';
 import { TaskSubmissionForm } from './components/TaskSubmissionForm';
 import { TaskList } from './components/TaskList';
 import { QueueStats } from './components/QueueStats';
-import { getBackendOrigin } from '@/lib/env/public-url';
+import { fetchTaskQueueStats } from '@/lib/server/task-queue-stats';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,39 +17,8 @@ export const metadata = {
   description: 'Submit and monitor tasks for autonomous execution',
 };
 
-async function fetchQueueStats() {
-  try {
-    const backendUrl = getBackendOrigin();
-    const res = await fetch(`${backendUrl}/api/tasks/stats/summary`, {
-      cache: 'no-store',
-      next: { revalidate: 0 },
-    });
-
-    if (!res.ok) {
-      return {
-        total_tasks: 0,
-        pending: 0,
-        in_progress: 0,
-        completed: 0,
-        failed: 0,
-      };
-    }
-
-    return res.json();
-  } catch (error) {
-    console.error('Failed to fetch queue stats:', error);
-    return {
-      total_tasks: 0,
-      pending: 0,
-      in_progress: 0,
-      completed: 0,
-      failed: 0,
-    };
-  }
-}
-
 export default async function TaskQueuePage() {
-  const stats = await fetchQueueStats();
+  const stats = await fetchTaskQueueStats();
 
   return (
     <div className="container mx-auto px-4 py-8">
