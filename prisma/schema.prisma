@@ -101,21 +101,41 @@ model LmsLesson {
   contentBody String?  @map("content_body") @db.Text
   orderIndex  Int      @map("order_index")
   isPreview   Boolean  @default(false) @map("is_preview")
+  resources   Json?
   createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
 
-  module LmsModule @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  module          LmsModule           @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  progressRecords LmsLessonProgress[]
 
   @@map("lms_lessons")
 }
 
+model LmsLessonProgress {
+  id             String    @id @default(uuid()) @db.Uuid
+  studentId      String    @map("student_id") @db.Uuid
+  lessonId       String    @map("lesson_id") @db.Uuid
+  completed      Boolean   @default(false)
+  completedAt    DateTime? @map("completed_at") @db.Timestamptz(6)
+  lastAccessedAt DateTime  @default(now()) @map("last_accessed_at") @db.Timestamptz(6)
+  updatedAt      DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  lesson LmsLesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, lessonId], map: "uq_lms_lesson_progress_student_lesson")
+  @@map("lms_lesson_progress")
+}
+
 /// Unique enrollment per student/course: constraint `uq_lms_enrollment` in migration loaders.
 model LmsEnrollment {
-  id               String   @id @db.Uuid
-  studentId        String   @map("student_id") @db.Uuid
-  courseId         String   @map("course_id") @db.Uuid
-  status           String
-  paymentReference String?  @map("payment_reference")
-  enrolledAt       DateTime @default(now()) @map("enrolled_at") @db.Timestamptz(6)
+  id                   String    @id @db.Uuid
+  studentId            String    @map("student_id") @db.Uuid
+  courseId             String    @map("course_id") @db.Uuid
+  status               String
+  paymentReference     String?   @map("payment_reference")
+  enrolledAt           DateTime  @default(now()) @map("enrolled_at") @db.Timestamptz(6)
+  lastAccessedLessonId String?   @map("last_accessed_lesson_id") @db.Uuid
+  completedAt          DateTime? @map("completed_at") @db.Timestamptz(6)
+  certificateIssuedAt  DateTime? @map("certificate_issued_at") @db.Timestamptz(6)
 
   student LmsUser   @relation("EnrollmentStudent", fields: [studentId], references: [id], onDelete: Cascade)
   course  LmsCourse @relation(fields: [courseId], references: [id], onDelete: Cascade)
