@@ -55,8 +55,15 @@ export async function updateSession(request: NextRequest) {
     }
   }
 
+  /** Public verification: same LMS shell as /dashboard without login. */
+  function isPublicCredentialVerifyPath(pathname: string): boolean {
+    return /^\/dashboard\/credentials\/[^/]+(\/?)$/.test(pathname);
+  }
+
   const protectedPaths = ['/dashboard', '/student', '/admin', '/instructor'];
-  const isProtectedPath = protectedPaths.some((path) => request.nextUrl.pathname.startsWith(path));
+  const isProtectedPath =
+    protectedPaths.some((path) => request.nextUrl.pathname.startsWith(path)) &&
+    !isPublicCredentialVerifyPath(request.nextUrl.pathname);
 
   if (isProtectedPath && !user) {
     const url = request.nextUrl.clone();
@@ -75,7 +82,8 @@ export async function updateSession(request: NextRequest) {
     const url = request.nextUrl.clone();
     const next =
       request.nextUrl.searchParams.get('next') ?? request.nextUrl.searchParams.get('redirect');
-    const safePath = next && next.startsWith('/') && !next.startsWith('//') ? next : '/student';
+    const safePath =
+      next && next.startsWith('/') && !next.startsWith('//') ? next : '/dashboard/student';
     url.pathname = safePath;
     url.searchParams.delete('next');
     url.searchParams.delete('redirect');
