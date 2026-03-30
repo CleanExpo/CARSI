@@ -1,31 +1,100 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import * as React from 'react';
 
-interface Toast {
-  id: string;
+import {
+  Toast as ToastRoot,
+  ToastClose,
+  ToastDescription,
+  ToastProvider as RadixToastProvider,
+  ToastTitle,
+  ToastViewport,
+} from '@/components/ui/toast';
+
+type ToastVariant = 'default' | 'destructive';
+
+export interface ToastInput {
   title: string;
   description?: string;
-  variant?: 'default' | 'destructive';
+  variant?: ToastVariant;
 }
 
-export function useToast() {
-  const [toasts, setToasts] = useState<Toast[]>([]);
+interface ToastItem extends ToastInput {
+  id: string;
+  variant: ToastVariant;
+}
 
-  const toast = useCallback(({ title, description, variant = 'default' }: Omit<Toast, 'id'>) => {
-    const id = Date.now().toString();
-    setToasts((prev) => [...prev, { id, title, description, variant }]);
+type ToastContextValue = {
+  toasts: ToastItem[];
+  toast: (input: ToastInput) => string;
+  dismiss: (id: string) => void;
+};
 
-    setTimeout(() => {
-      setToasts((prev) => prev.filter((t) => t.id !== id));
-    }, 5000);
+const ToastContext = React.createContext<ToastContextValue | null>(null);
 
-    return id;
-  }, []);
+export function AppToastProvider({ children }: { children: React.ReactNode }) {
+  const [toasts, setToasts] = React.useState<ToastItem[]>([]);
 
-  const dismiss = useCallback((id: string) => {
+  const dismiss = React.useCallback((id: string) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
-  return { toasts, toast, dismiss };
+  const toast = React.useCallback(
+    ({ title, description, variant = 'default' }: ToastInput) => {
+      const id = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+      setToasts((prev) => [...prev, { id, title, description, variant }]);
+
+      window.setTimeout(() => {
+        dismiss(id);
+      }, 4500);
+
+      return id;
+    },
+    [dismiss]
+  );
+
+  const ctx: ToastContextValue = React.useMemo(
+    () => ({ toasts, toast, dismiss }),
+    [toasts, toast, dismiss]
+  );
+
+  return React.createElement(
+    ToastContext.Provider,
+    { value: ctx },
+    children,
+    React.createElement(
+      RadixToastProvider,
+      null,
+      React.createElement(ToastViewport, null),
+      ...toasts.map((t) =>
+        React.createElement(
+          ToastRoot,
+          {
+            key: t.id,
+            variant: t.variant,
+            open: true,
+            onOpenChange: (open: boolean) => {
+              if (!open) dismiss(t.id);
+            },
+          },
+          React.createElement(
+            'div',
+            { className: 'flex flex-col gap-1' },
+            React.createElement(ToastTitle, null, t.title),
+            t.description ? React.createElement(ToastDescription, null, t.description) : null
+          ),
+          React.createElement(ToastClose, null)
+        )
+      )
+    )
+  );
 }
+
+export function useToast() {
+  const ctx = React.useContext(ToastContext);
+  if (!ctx) {
+    throw new Error('useToast must be used within <AppToastProvider>.');
+  }
+  return ctx;
+}
+
