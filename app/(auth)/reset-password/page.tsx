@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
+import { useToast } from '@/hooks/use-toast';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Input } from '@/components/ui/input';
+import { PasswordInput } from '@/components/ui/password-input';
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
 import { authApi } from '@/lib/api/auth';
@@ -10,6 +11,7 @@ import { authApi } from '@/lib/api/auth';
 function ResetPasswordForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { toast } = useToast();
   const token = searchParams.get('token') ?? '';
 
   const [password, setPassword] = useState('');
@@ -23,6 +25,10 @@ function ResetPasswordForm() {
     if (!token) {
       setIsError(true);
       setMessage('Invalid reset link. Please request a new one.');
+      toast({
+        title: 'Invalid reset link. Please request a new one.',
+        variant: 'destructive',
+      });
     }
   }, [token]);
 
@@ -40,11 +46,16 @@ function ResetPasswordForm() {
     try {
       const result = await authApi.confirmPasswordReset(token, password);
       setMessage(result.message);
+      toast({ title: result.message || 'Password updated successfully' });
       setDone(true);
       setTimeout(() => router.push('/login'), 3000);
     } catch (err) {
       setIsError(true);
       setMessage(err instanceof Error ? err.message : 'Reset failed. The link may have expired.');
+      toast({
+        title: err instanceof Error ? err.message : 'Reset failed. The link may have expired.',
+        variant: 'destructive',
+      });
     } finally {
       setIsLoading(false);
     }
@@ -79,9 +90,9 @@ function ResetPasswordForm() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="password">New password</Label>
-            <Input
+            <PasswordInput
               id="password"
-              type="password"
+              autoComplete="new-password"
               placeholder="At least 8 characters"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -92,9 +103,9 @@ function ResetPasswordForm() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="confirm">Confirm password</Label>
-            <Input
+            <PasswordInput
               id="confirm"
-              type="password"
+              autoComplete="new-password"
               placeholder="Repeat your new password"
               value={confirm}
               onChange={(e) => setConfirm(e.target.value)}
