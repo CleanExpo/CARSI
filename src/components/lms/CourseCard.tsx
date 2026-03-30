@@ -6,6 +6,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { BookOpen, Clock } from 'lucide-react';
 
+import { useCourseBrowseBase } from '@/components/lms/CourseBrowseContext';
+
 interface CourseCardProps {
   course: {
     id: string;
@@ -208,6 +210,7 @@ export function CourseCard({ course }: CourseCardProps) {
       : null);
 
   const ds = (discipline ? disciplineColors[discipline] : undefined) ?? defaultStyle;
+  const { courseLinkBase } = useCourseBrowseBase();
 
   // Determine thumbnail: API URL > local fallback > none (show gradient)
   const thumbnailUrl =
@@ -310,7 +313,7 @@ export function CourseCard({ course }: CourseCardProps) {
             )}
           </div>
           <Link
-            href={`/courses/${course.slug}`}
+            href={`${courseLinkBase}/${course.slug}`}
             className="-m-2 flex min-h-[44px] min-w-[44px] items-center justify-center rounded-sm p-2 text-xs font-medium transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/50"
             style={{ color: ds.color }}
           >
