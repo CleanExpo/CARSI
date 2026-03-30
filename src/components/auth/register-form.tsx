@@ -16,9 +16,11 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { PasswordInput } from '@/components/ui/password-input';
 import { authApi } from '@/lib/api/auth';
 import { apiClient, ApiClientError } from '@/lib/api/client';
 import { buildCourseCheckoutUrls } from '@/lib/checkout-urls';
+import { useToast } from '@/hooks/use-toast';
 
 const formSchema = z
   .object({
@@ -38,6 +40,7 @@ type FormData = z.infer<typeof formSchema>;
 export function RegisterForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -78,31 +81,58 @@ export function RegisterForm() {
             '/api/lms/checkout',
             { slug, success_url, cancel_url, customer_email: values.email }
           );
-          if (checkout.checkout_url) {
-            window.location.href = checkout.checkout_url;
+          const checkoutUrl = checkout.checkout_url;
+          if (checkoutUrl) {
+            toast({ title: 'Redirecting to checkout…' });
+            window.setTimeout(() => {
+              window.location.href = checkoutUrl;
+            }, 200);
             return;
           }
           if (checkout.enrolled) {
-            router.push(`/student?course=${encodeURIComponent(slug)}`);
+            toast({ title: 'You’re enrolled — welcome!' });
+            window.setTimeout(() => {
+              router.push(`/dashboard/student?course=${encodeURIComponent(slug)}`);
+            }, 200);
             return;
           }
         } catch (checkoutErr) {
           if (checkoutErr instanceof ApiClientError && checkoutErr.status === 503) {
             setError(
-              'Account created, but payments need STRIPE_SECRET_KEY (or a configured BACKEND_URL).'
+              'Account created, but payments need STRIPE_SECRET_KEY.'
             );
+            toast({
+              title:
+                'Account created, but payments need STRIPE_SECRET_KEY.',
+              variant: 'destructive',
+            });
           } else if (checkoutErr instanceof ApiClientError && checkoutErr.status === 404) {
             setError('Checkout service is not configured yet. Please contact support.');
+            toast({
+              title: 'Checkout service is not configured yet. Please contact support.',
+              variant: 'destructive',
+            });
           } else {
             setError('Account created, but checkout could not start. Please try Enrol again.');
+            toast({
+              title: 'Account created, but checkout could not start. Please try Enrol again.',
+              variant: 'destructive',
+            });
           }
           return;
         }
       }
 
-      router.push(safePath);
+      toast({ title: 'Account created successfully' });
+      window.setTimeout(() => {
+        router.push(safePath);
+      }, 200);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Registration failed');
+      toast({
+        title: err instanceof Error ? err.message : 'Registration failed',
+        variant: 'destructive',
+      });
     } finally {
       setIsLoading(false);
     }
@@ -144,7 +174,7 @@ export function RegisterForm() {
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input type="password" {...field} />
+                <PasswordInput autoComplete="new-password" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -157,7 +187,7 @@ export function RegisterForm() {
             <FormItem>
               <FormLabel>Confirm Password</FormLabel>
               <FormControl>
-                <Input type="password" {...field} />
+                <PasswordInput autoComplete="new-password" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
