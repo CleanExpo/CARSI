@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
+import { CoursesIndexLink } from '@/components/lms/CoursesIndexLink';
 import { EnrolButton } from '@/components/lms/EnrolButton';
 import { CourseThumbnail } from '@/components/lms/CourseThumbnail';
 import { CourseHubContext } from '@/components/lms/CourseHubContext';
@@ -336,9 +337,9 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                   </li>
                   <li aria-hidden="true">/</li>
                   <li>
-                    <Link href="/courses" className="transition-colors hover:text-white/60">
+                    <CoursesIndexLink className="transition-colors hover:text-white/60">
                       Courses
-                    </Link>
+                    </CoursesIndexLink>
                   </li>
                   <li aria-hidden="true">/</li>
                   <li style={{ color: 'rgba(255,255,255,0.55)' }}>{course.title}</li>
@@ -877,13 +878,12 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
               </div>
 
               <div className="mt-8">
-                <Link
-                  href="/courses"
+                <CoursesIndexLink
                   className="text-sm underline transition-colors"
                   style={{ color: 'rgba(255,255,255,0.35)' }}
                 >
                   Browse all courses
-                </Link>
+                </CoursesIndexLink>
               </div>
             </div>
           </div>
