@@ -1,9 +1,5 @@
 /**
- * Authentication API
- *
- * Handles login, logout, registration, and user management.
- * Routes are proxied through Next.js API routes (same-origin) or go
- * directly to the LMS backend at /api/lms/auth/*.
+ * Authentication API — login, logout, registration via this app’s `/api/auth/*` routes.
  */
 
 import { apiClient } from './client';
@@ -78,8 +74,7 @@ export const authApi = {
   },
 
   /**
-   * Register a new student account.
-   * Calls the LMS backend directly — returns a token on success.
+   * Register a new student account (Postgres via Prisma).
    */
   async register(data: RegisterRequest): Promise<RegisterResponse> {
     const res = await fetch('/api/auth/register', {
