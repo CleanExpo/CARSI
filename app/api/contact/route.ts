@@ -17,21 +17,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL?.trim();
-    if (backendUrl) {
-      try {
-        await fetch(`${backendUrl.replace(/\/$/, '')}/api/contact`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body),
-          signal: AbortSignal.timeout(5000),
-        });
-      } catch {
-        console.warn('[contact] Backend contact endpoint unavailable — queued locally');
-      }
-    }
+    // Persist or forward contact submissions here (e.g. email provider, CRM) when configured.
 
-    // Always return success to the user; backend failures are non-blocking
+    // Always return success to the user; failures are non-blocking
     return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });
