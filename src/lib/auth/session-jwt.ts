@@ -39,3 +39,23 @@ export async function verifySessionToken(token: string): Promise<SessionClaims |
     return null;
   }
 }
+
+export async function signPasswordResetToken(userId: string): Promise<string> {
+  return new SignJWT({ purpose: 'password_reset' })
+    .setProtectedHeader({ alg: 'HS256' })
+    .setSubject(userId)
+    .setIssuedAt()
+    .setExpirationTime('1h')
+    .sign(getSecret());
+}
+
+export async function verifyPasswordResetToken(token: string): Promise<string | null> {
+  try {
+    const { payload } = await jwtVerify(token, getSecret());
+    if (payload.purpose !== 'password_reset') return null;
+    const sub = typeof payload.sub === 'string' ? payload.sub : '';
+    return sub || null;
+  } catch {
+    return null;
+  }
+}
