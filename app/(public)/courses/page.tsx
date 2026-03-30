@@ -99,7 +99,7 @@ export default async function CoursesPage({
         aria-hidden="true"
       />
 
-      <div className="relative z-10 mx-auto max-w-6xl px-6 py-8 sm:py-10">
+      <div className="relative z-10 mx-auto px-6 py-8 sm:py-10">
         {/* ── Hero header ── */}
         <header className="mb-6">
           <h1
