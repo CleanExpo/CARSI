@@ -1,10 +1,15 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+import { getLmsSeedExportRows } from '@/lib/lms-seed-catalog';
+
 /** U+2028/U+2029 break JS string embedding in some bundlers; strip from user-facing text. */
 function sanitizeCourseText(s: string | null | undefined): string {
   if (s == null) return '';
-  return s.replace(/\u2028/g, ' ').replace(/\u2029/g, ' ').replace(/\r\n/g, '\n');
+  return s
+    .replace(/\u2028/g, ' ')
+    .replace(/\u2029/g, ' ')
+    .replace(/\r\n/g, '\n');
 }
 
 /** Path to `wp:migrate` output (gitignored in development). */
@@ -29,6 +34,8 @@ export interface WpExportCourse {
   wp_id: number;
   level?: string | null;
   category?: string | null;
+  /** When set (e.g. LMS seed), listing UIs can show module/lesson counts. */
+  lesson_count?: number | null;
   meta?: {
     wp_id?: number;
     wp_categories?: Array<{ id?: number; name?: string; slug?: string }>;
@@ -79,7 +86,8 @@ export function inferDisciplineFromWpExport(row: WpExportCourse): string | null 
   }
   const title = (row.title ?? '').toLowerCase();
   if (title.includes('water') || title.includes('flood')) return 'WRT';
-  if (title.includes('mould') || title.includes('mold') || title.includes('microbial')) return 'AMRT';
+  if (title.includes('mould') || title.includes('mold') || title.includes('microbial'))
+    return 'AMRT';
   if (title.includes('carpet clean')) return 'CCT';
   if (title.includes('odour') || title.includes('odor')) return 'OCT';
   if (title.includes('drying') || title.includes('structural')) return 'ASD';
@@ -109,14 +117,15 @@ export function mapWpExportToCourseListItem(row: WpExportCourse): CourseListItem
     id: String(row.wp_id),
     slug: row.slug,
     title: sanitizeCourseText(row.title) || row.slug,
-    short_description: row.short_description != null ? sanitizeCourseText(row.short_description) : null,
+    short_description:
+      row.short_description != null ? sanitizeCourseText(row.short_description) : null,
     price_aud: row.price_aud,
     is_free: row.is_free,
     discipline: inferDisciplineFromWpExport(row),
     thumbnail_url: row.thumbnail_url ?? null,
     level: row.level != null ? sanitizeCourseText(row.level) : null,
     category: row.category != null ? sanitizeCourseText(row.category) : null,
-    lesson_count: null,
+    lesson_count: row.lesson_count ?? null,
     updated_at: null,
     instructor: null,
   };
@@ -124,6 +133,9 @@ export function mapWpExportToCourseListItem(row: WpExportCourse): CourseListItem
 
 /** Returns parsed courses or `null` if the file is missing or invalid. */
 export function loadWpExportCourses(): WpExportCourse[] | null {
+  const seed = getLmsSeedExportRows();
+  if (seed.length > 0) return seed;
+
   try {
     if (!fs.existsSync(WP_EXPORT_COURSES_PATH)) return null;
     const raw = fs.readFileSync(WP_EXPORT_COURSES_PATH, 'utf-8');
