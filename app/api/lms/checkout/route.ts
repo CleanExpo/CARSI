@@ -2,19 +2,18 @@
  * POST /api/lms/checkout
  * Body: { slug, success_url?, cancel_url?, customer_email? }
  *
- * 1) Proxies to upstream LMS when BACKEND_URL / NEXT_PUBLIC_BACKEND_URL is set.
- * 2) Otherwise creates a Stripe Checkout Session locally (STRIPE_SECRET_KEY + WP export).
+ * Stripe Checkout via STRIPE_SECRET_KEY + local catalog (WordPress export); enrolment finalised in-app.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 
+import { verifySessionToken } from '@/lib/auth/session-jwt';
 import { buildCourseCheckoutUrls } from '@/lib/checkout-urls';
 import {
   createStripeCheckoutForCourse,
   findCourseInExport,
   resolveCheckoutEmail,
 } from '@/lib/server/local-course-checkout';
-import { getUpstreamBaseUrl } from '@/lib/server/upstream-api';
 
 export async function POST(request: NextRequest) {
   try {
@@ -42,7 +41,6 @@ export async function POST(request: NextRequest) {
         : defaults.cancel_url;
 
     const authHeader = request.headers.get('authorization') ?? '';
-    const cookieHeader = request.headers.get('cookie') ?? '';
     const authTokenCookie = request.cookies.get('auth_token')?.value;
 
     const customerEmail = await resolveCheckoutEmail({
@@ -51,36 +49,13 @@ export async function POST(request: NextRequest) {
       bodyEmail: body.customer_email,
     });
 
-    const upstream = getUpstreamBaseUrl();
-    if (upstream) {
-      try {
-        const backendRes = await fetch(
-          `${upstream.replace(/\/$/, '')}/api/lms/courses/${encodeURIComponent(slug)}/checkout`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              ...(authHeader ? { Authorization: authHeader } : {}),
-              ...(cookieHeader ? { Cookie: cookieHeader } : {}),
-            },
-            body: JSON.stringify({
-              success_url,
-              cancel_url,
-              ...(customerEmail ? { customer_email: customerEmail } : {}),
-            }),
-          }
-        );
-
-        const data = await backendRes.json().catch(() => ({}));
-        if (backendRes.ok) {
-          return NextResponse.json(data);
-        }
-      } catch {
-        // Fall through to local Stripe.
-      }
+    let studentId: string | undefined;
+    if (authTokenCookie) {
+      const c = await verifySessionToken(authTokenCookie);
+      if (c?.sub) studentId = c.sub;
     }
 
-    // --- Local Stripe + WordPress export (no upstream or upstream failed) ---
+    // --- Local Stripe + WordPress export ---
     if (!customerEmail) {
       return NextResponse.json(
         {
@@ -109,7 +84,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           detail:
-            'Payments not configured. Set STRIPE_SECRET_KEY, or set BACKEND_URL for LMS checkout.',
+            'Payments not configured. Set STRIPE_SECRET_KEY for LMS checkout.',
         },
         { status: 503 }
       );
@@ -122,6 +97,7 @@ export async function POST(request: NextRequest) {
         success_url,
         cancel_url,
         customer_email: customerEmail,
+        student_id: studentId,
       });
       return NextResponse.json({ checkout_url });
     } catch (err) {
