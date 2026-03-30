@@ -1,7 +1,6 @@
 import { getStripeClient } from '@/lib/api/stripe';
 import { loadWpExportCourses, type WpExportCourse } from '@/lib/wordpress-export-courses';
 import { verifySessionToken } from '@/lib/auth/session-jwt';
-import { getUpstreamBaseUrl } from '@/lib/server/upstream-api';
 
 export function findCourseInExport(slug: string): WpExportCourse | null {
   const rows = loadWpExportCourses();
@@ -29,21 +28,10 @@ export async function resolveCheckoutEmail(params: {
   const trimmed = bodyEmail?.trim();
   if (trimmed && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) return trimmed;
 
-  const upstream = getUpstreamBaseUrl();
-  const bearer = authorizationHeader?.startsWith('Bearer ') ? authorizationHeader : null;
-  if (upstream && bearer) {
-    try {
-      const r = await fetch(`${upstream.replace(/\/$/, '')}/api/lms/auth/me`, {
-        headers: { Authorization: bearer },
-        cache: 'no-store',
-      });
-      if (r.ok) {
-        const d = (await r.json()) as { email?: string };
-        if (typeof d.email === 'string' && d.email) return d.email;
-      }
-    } catch {
-      // ignore
-    }
+  const bearer = authorizationHeader?.startsWith('Bearer ') ? authorizationHeader.slice(7) : null;
+  if (bearer) {
+    const c = await verifySessionToken(bearer);
+    if (c?.email) return c.email;
   }
 
   return null;
@@ -55,8 +43,10 @@ export async function createStripeCheckoutForCourse(params: {
   success_url: string;
   cancel_url: string;
   customer_email: string;
+  /** When set, Stripe webhook can complete enrolment without relying on the client callback alone. */
+  student_id?: string;
 }): Promise<{ checkout_url: string }> {
-  const { slug, course, success_url, cancel_url, customer_email } = params;
+  const { slug, course, success_url, cancel_url, customer_email, student_id } = params;
 
   const priceNum = Number(course.price_aud);
   const unitAmount = Math.round(priceNum * 100);
@@ -74,6 +64,7 @@ export async function createStripeCheckoutForCourse(params: {
     metadata: {
       course_slug: slug,
       source: 'carsi-next-local-checkout',
+      ...(student_id ? { student_id } : {}),
     },
     line_items: [
       {
