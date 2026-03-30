@@ -580,10 +580,10 @@ test.describe('9. Credentials page', () => {
     await page.goto('/credentials/00000000-0000-0000-0000-000000000001');
     await page.waitForLoadState('networkidle');
 
-    // Page should load (not crash), even if 404
+    // Page should load (not crash), even if 404; legacy /credentials/… redirects to /dashboard/credentials/…
     const pageContent = page.locator('body');
     await expect(pageContent).toBeVisible();
-    expect(page.url()).toContain('/credentials/');
+    expect(page.url()).toContain('/dashboard/credentials/');
   });
 
   test('subscribe page loads', async ({ page }) => {
