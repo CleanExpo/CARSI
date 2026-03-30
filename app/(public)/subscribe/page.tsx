@@ -40,7 +40,7 @@ export default function SubscribePage() {
       });
       if (!data.url?.trim()) {
         setError(
-          'Subscription checkout needs the LMS backend. Set BACKEND_URL, or use a deployed environment with Stripe billing.'
+          'Subscription billing checkout is not available in this deployment. Stripe subscription routes are not wired yet.'
         );
         return;
       }
