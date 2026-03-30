@@ -17,31 +17,6 @@ export async function POST(request: NextRequest) {
     maxAge: COOKIE_MAX_AGE,
   };
 
-  const externalBackend =
-    process.env.NEXT_PUBLIC_BACKEND_URL?.trim() || process.env.BACKEND_URL?.trim();
-
-  if (externalBackend) {
-    try {
-      const backendResponse = await fetch(
-        `${externalBackend.replace(/\/$/, '')}/api/lms/auth/refresh`,
-        {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${currentToken}` },
-        }
-      );
-      const data = await backendResponse.json().catch(() => ({}));
-      if (backendResponse.ok && (data as { access_token?: string }).access_token) {
-        const nextToken = (data as { access_token: string }).access_token;
-        const response = NextResponse.json({ success: true });
-        response.cookies.set('auth_token', nextToken, { ...cookieOptions, httpOnly: true });
-        response.cookies.set('carsi_token', nextToken, { ...cookieOptions, httpOnly: false });
-        return response;
-      }
-    } catch {
-      // Fall through to local claim refresh attempt.
-    }
-  }
-
   const claims = await verifySessionToken(currentToken);
   if (!claims) {
     return NextResponse.json({ error: 'Session expired' }, { status: 401 });
@@ -59,4 +34,3 @@ export async function POST(request: NextRequest) {
   response.cookies.set('carsi_token', refreshed, { ...cookieOptions, httpOnly: false });
   return response;
 }
-
