@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+import { signPasswordResetToken } from '@/lib/auth/session-jwt';
+import { prisma } from '@/lib/prisma';
+
 export async function POST(request: NextRequest) {
   try {
     const { email } = await request.json();
@@ -7,36 +10,29 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Email is required' }, { status: 400 });
     }
 
-    const externalBackend =
-      process.env.NEXT_PUBLIC_BACKEND_URL?.trim() || process.env.BACKEND_URL?.trim();
-    if (!externalBackend) {
-      return NextResponse.json({
-        message: 'If that email exists, a password reset link has been sent.',
-      });
+    const normalized = email.trim().toLowerCase();
+    const generic = {
+      message: 'If that email exists, a password reset link has been sent.',
+    };
+
+    if (!process.env.DATABASE_URL?.trim()) {
+      return NextResponse.json(generic);
     }
 
-    const backendResponse = await fetch(
-      `${externalBackend.replace(/\/$/, '')}/api/lms/auth/forgot-password`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
+    const user = await prisma.lmsUser.findUnique({ where: { email: normalized } });
+    if (user) {
+      const token = await signPasswordResetToken(user.id);
+      const base =
+        process.env.NEXT_PUBLIC_APP_URL?.trim() ||
+        process.env.NEXT_PUBLIC_FRONTEND_URL?.trim() ||
+        request.nextUrl.origin;
+      const link = `${base.replace(/\/$/, '')}/reset-password?token=${encodeURIComponent(token)}`;
+      if (process.env.NODE_ENV === 'development') {
+        console.info('[forgot-password] dev reset link:', link);
       }
-    );
-    const data = await backendResponse.json().catch(() => ({}));
-
-    if (!backendResponse.ok) {
-      return NextResponse.json(
-        { error: (data as { detail?: string }).detail || 'Failed to send reset link' },
-        { status: backendResponse.status }
-      );
     }
 
-    return NextResponse.json({
-      message:
-        (data as { message?: string }).message ||
-        'If that email exists, a password reset link has been sent.',
-    });
+    return NextResponse.json(generic);
   } catch (error) {
     return NextResponse.json(
       {
@@ -47,4 +43,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-
