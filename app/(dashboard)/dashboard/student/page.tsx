@@ -1,18 +1,14 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
-import Link from 'next/link';
-import { XPLevelBadge } from '@/components/lms/XPLevelBadge';
-import { ErrorBanner } from '@/components/lms/ErrorBanner';
-import { StreakTracker } from '@/components/lms/StreakTracker';
-import { CECProgressRing } from '@/components/lms/CECProgressRing';
-import { IICRCIdentityCard } from '@/components/lms/IICRCIdentityCard';
-import { SubscriptionStatus } from '@/components/lms/SubscriptionStatus';
+import { useAuth } from '@/components/auth/auth-provider';
 import { EnrolledCourseList } from '@/components/lms/EnrolledCourseList';
+import { ErrorBanner } from '@/components/lms/ErrorBanner';
 import { PushNotificationPrompt } from '@/components/lms/PushNotificationPrompt';
 import { RecommendationWidget } from '@/components/lms/RecommendationWidget';
-import { useAuth } from '@/components/auth/auth-provider';
 import { apiClient } from '@/lib/api/client';
+import Link from 'next/link';
+import { ArrowRight, BookOpen, Sparkles } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
 
 interface LevelData {
   total_xp: number;
@@ -49,6 +45,11 @@ interface Enrollment {
   status: string;
   enrolled_at: string;
   completion_percentage: number;
+  thumbnail_url?: string | null;
+  last_lesson_id?: string | null;
+  last_lesson_title?: string | null;
+  all_lessons_complete?: boolean;
+  certificate_issued_at?: string | null;
 }
 
 interface ErrorState {
@@ -155,155 +156,166 @@ export default function StudentDashboardPage() {
   }
 
   const certifications = profile?.iicrc_certifications ?? [];
+  const displayName = profile?.full_name?.trim() || user?.email?.split('@')[0] || 'Learner';
 
   return (
-    <div className="flex max-w-4xl flex-col gap-8 p-6">
+    <div className="mx-auto w-full space-y-10 pb-16">
       <PushNotificationPrompt />
-      <h1 className="font-mono text-2xl font-bold text-white">
-        {profile?.full_name ?? 'My Dashboard'}
-      </h1>
 
-      {/* --- Professional Identity Row --- */}
-      <section className="grid grid-cols-1 gap-6 md:grid-cols-2">
-        {/* IICRC Identity Card */}
-        <div className="flex flex-col gap-3">
-          <h2 className="font-mono text-xs tracking-widest text-white/40 uppercase">
-            IICRC Identity
-          </h2>
-          {errors.profile ? (
-            <ErrorBanner message={errors.profile} onRetry={fetchProfile} />
-          ) : loading.profile ? (
-            <p className="text-sm text-white/30">Loading profile…</p>
-          ) : (
-            <IICRCIdentityCard
-              memberNumber={profile?.iicrc_member_number}
-              cardImageUrl={profile?.iicrc_card_image_url}
-              expiryDate={profile?.iicrc_expiry_date}
-              certifications={certifications}
-            />
-          )}
-        </div>
-
-        {/* CEC Progress */}
-        {profile?.iicrc_member_number && (
-          <div className="flex flex-col items-center gap-3">
-            <h2 className="self-start font-mono text-xs tracking-widest text-white/40 uppercase">
-              CEC Progress
-            </h2>
-            <CECProgressRing
-              cecEarned={0}
-              cecRequired={8}
-              discipline={certifications[0]?.discipline}
-              totalCecLifetime={level?.total_cec_lifetime}
-            />
+      {/* Hero */}
+      <header className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#2490ed]/18 via-white/[0.04] to-transparent px-6 py-8 shadow-[0_24px_80px_-40px_rgba(36,144,237,0.45)] sm:px-10 sm:py-10">
+        <div
+          className="pointer-events-none absolute -top-20 -right-20 h-56 w-56 rounded-full bg-[#2490ed]/25 blur-3xl"
+          aria-hidden
+        />
+        <div className="relative">
+          <p className="text-[11px] font-semibold tracking-[0.2em] text-white/40 uppercase">
+            My learning
+          </p>
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-balance text-white sm:text-4xl">
+            {displayName}
+          </h1>
+          <p className="mt-2 max-w-xl text-sm leading-relaxed text-white/55">
+            Your progress, credentials, and courses in one calm workspace — minimal, focused, and
+            built for serious training.
+          </p>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link
+              href="/dashboard/courses"
+              className="inline-flex items-center rounded-lg border border-white/15 bg-white/5 px-4 py-2 text-sm font-medium text-white/90 transition-colors hover:border-[#2490ed]/40 hover:bg-white/[0.08]"
+            >
+              Browse catalogue
+            </Link>
+            <Link
+              href="/dashboard/student/credentials"
+              className="inline-flex items-center rounded-lg border border-transparent px-4 py-2 text-sm font-medium text-[#7ec5ff] transition-colors hover:text-[#9ed4ff]"
+            >
+              Certificates →
+            </Link>
           </div>
-        )}
-      </section>
+        </div>
+      </header>
 
-      {/* --- XP + Streak Row --- */}
-      <section className="flex flex-col gap-3">
-        <h2 className="font-mono text-xs tracking-widest text-white/40 uppercase">
-          Progress &amp; Streak
-        </h2>
-        {errors.level ? (
-          <ErrorBanner message={errors.level} onRetry={fetchLevel} />
-        ) : (
-          <div className="flex flex-wrap items-center gap-6">
-            {loading.level ? (
-              <p className="text-sm text-white/30">Loading…</p>
-            ) : level ? (
-              <>
-                <XPLevelBadge
-                  totalXp={level.total_xp}
-                  currentLevel={level.current_level}
-                  levelTitle={level.level_title}
-                  xpToNextLevel={level.xp_to_next_level}
+      {/* My courses — primary workspace */}
+      <section className="relative overflow-hidden rounded-2xl border border-white/10 shadow-[0_0_0_1px_rgba(255,255,255,0.04)_inset]">
+        <div
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_90%_60%_at_50%_-30%,rgba(36,144,237,0.22),transparent_55%)]"
+          aria-hidden
+        />
+        <div className="pointer-events-none absolute -right-24 top-1/2 h-64 w-64 -translate-y-1/2 rounded-full bg-[#2490ed]/10 blur-3xl" aria-hidden />
+        <div className="relative px-5 py-8 sm:px-10 sm:py-10">
+          <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between">
+            <div className="flex min-w-0 gap-4 sm:gap-5">
+              <div
+                className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-[#2490ed]/35 bg-gradient-to-br from-[#2490ed]/25 to-[#2490ed]/5 text-[#9ed4ff] shadow-[0_8px_32px_-12px_rgba(36,144,237,0.5)]"
+                aria-hidden
+              >
+                <BookOpen className="h-7 w-7" strokeWidth={1.5} />
+              </div>
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-3">
+                  <h2 className="text-xl font-semibold tracking-tight text-white sm:text-2xl">
+                    My courses
+                  </h2>
+                  {!enrollmentsLoading && enrollments.length > 0 ? (
+                    <span className="rounded-full border border-white/10 bg-white/5 px-3 py-0.5 text-xs font-medium tabular-nums text-white/55">
+                      {enrollments.length} enrolled
+                    </span>
+                  ) : null}
+                </div>
+                <p className="mt-2 max-w-lg text-sm leading-relaxed text-white/45">
+                  Pick up where you left off, track progress, and grab certificates when you finish.
+                </p>
+              </div>
+            </div>
+            {sub?.has_subscription && ['active', 'trialling'].includes(sub.status ?? '') ? (
+              <Link
+                href="/dashboard/courses"
+                className="inline-flex shrink-0 items-center justify-center gap-2 self-start rounded-xl border border-white/12 bg-white/5 px-5 py-3 text-sm font-semibold text-white shadow-sm transition-all hover:border-[#2490ed]/45 hover:bg-[#2490ed]/12 hover:text-[#c8e9ff] lg:mt-1"
+              >
+                Browse catalogue
+                <ArrowRight className="h-4 w-4 opacity-80" aria-hidden />
+              </Link>
+            ) : null}
+          </div>
+
+          <div className="mt-10">
+            {errors.enrollments ? (
+              <ErrorBanner message={errors.enrollments} onRetry={fetchEnrollments} />
+            ) : enrollmentsLoading ? (
+              <div className="space-y-4" aria-busy="true" aria-label="Loading courses">
+                {[1, 2, 3].map((i) => (
+                  <div
+                    key={i}
+                    className="animate-pulse rounded-2xl border border-white/8 bg-white/5 p-5 sm:p-6"
+                  >
+                    <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
+                      <div className="h-28 rounded-xl bg-white/10 sm:h-24 sm:w-44" />
+                      <div className="min-w-0 flex-1 space-y-4">
+                        <div className="h-5 max-w-xs rounded-md bg-white/15" />
+                        <div className="h-3 max-w-lg rounded bg-white/8" />
+                        <div className="h-2 max-w-md rounded-full bg-white/10" />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : enrollments.length === 0 && sub?.has_subscription ? (
+              <div className="relative overflow-hidden rounded-2xl border border-[#2490ed]/25 bg-gradient-to-br from-[#2490ed]/15 via-white/5 to-transparent p-8 text-center sm:p-12">
+                <div
+                  className="pointer-events-none absolute -left-16 top-0 h-40 w-40 rounded-full bg-emerald-400/10 blur-3xl"
+                  aria-hidden
                 />
-                <StreakTracker
-                  currentStreak={level.current_streak}
-                  longestStreak={level.longest_streak}
-                />
-              </>
+                <div className="relative mx-auto max-w-md">
+                  <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-white/15 bg-white/10 text-amber-200/90 shadow-lg">
+                    <Sparkles className="h-7 w-7" aria-hidden />
+                  </div>
+                  <p className="text-lg font-semibold tracking-tight text-white">
+                    Subscription active — your catalogue is unlocked
+                  </p>
+                  <p className="mt-2 text-sm leading-relaxed text-white/50">
+                    Enrol by opening any course. Your first visit creates the enrolment automatically so
+                    progress saves here.
+                  </p>
+                  <Link
+                    href="/dashboard/courses"
+                    className="mt-8 inline-flex items-center justify-center gap-2 rounded-xl bg-[#2490ed] px-8 py-3.5 text-sm font-semibold text-white shadow-[0_12px_40px_-12px_rgba(36,144,237,0.65)] transition-transform hover:scale-[1.02] hover:bg-[#1f82d4]"
+                  >
+                    Explore courses
+                    <ArrowRight className="h-4 w-4" aria-hidden />
+                  </Link>
+                </div>
+              </div>
+            ) : enrollments.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-white/15 bg-white/5 px-6 py-14 text-center sm:px-10">
+                <p className="text-base font-medium text-white/80">No enrolments yet</p>
+                <p className="mx-auto mt-2 max-w-sm text-sm text-white/45">
+                  Browse the catalogue and start a course — it will show up here with progress and
+                  completion status.
+                </p>
+                <Link
+                  href="/dashboard/courses"
+                  className="mt-8 inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-white transition-colors hover:border-[#2490ed]/40 hover:bg-[#2490ed]/10"
+                >
+                  Browse catalogue
+                  <ArrowRight className="h-4 w-4" aria-hidden />
+                </Link>
+              </div>
             ) : (
-              <p className="text-sm text-white/30">No progress data available</p>
+              <EnrolledCourseList enrollments={enrollments} />
             )}
           </div>
-        )}
-      </section>
-
-      {/* --- Subscription Status --- */}
-      <section className="flex flex-col gap-3">
-        <h2 className="font-mono text-xs tracking-widest text-white/40 uppercase">Subscription</h2>
-        {errors.sub ? (
-          <ErrorBanner message={errors.sub} onRetry={fetchSub} />
-        ) : loading.sub ? (
-          <p className="text-sm text-white/30">Loading subscription…</p>
-        ) : (
-          <SubscriptionStatus
-            status={
-              sub?.has_subscription
-                ? (sub.status as 'trialling' | 'active' | 'past_due' | 'cancelled' | 'unpaid')
-                : null
-            }
-            trialEnd={sub?.trial_end}
-            periodEnd={sub?.current_period_end}
-            onManage={sub?.has_subscription ? handleManageSubscription : undefined}
-            onSubscribe={!sub?.has_subscription ? handleSubscribe : undefined}
-          />
-        )}
-      </section>
-
-      {/* --- Enrolled Courses --- */}
-      <section className="flex flex-col gap-3">
-        <div className="flex items-center justify-between">
-          <h2 className="font-mono text-xs tracking-widest text-white/40 uppercase">My Courses</h2>
-          {sub?.has_subscription && ['active', 'trialling'].includes(sub.status ?? '') && (
-            <Link
-              href="/courses"
-              className="text-xs font-medium transition-colors hover:text-white"
-              style={{ color: '#2490ed' }}
-            >
-              Browse all courses →
-            </Link>
-          )}
         </div>
-        {errors.enrollments ? (
-          <ErrorBanner message={errors.enrollments} onRetry={fetchEnrollments} />
-        ) : enrollmentsLoading ? (
-          <p className="text-sm text-white/30">Loading courses…</p>
-        ) : enrollments.length === 0 && sub?.has_subscription ? (
-          <div
-            className="rounded-sm p-6 text-center"
-            style={{
-              background: 'rgba(36,144,237,0.05)',
-              border: '1px solid rgba(36,144,237,0.15)',
-            }}
-          >
-            <p className="mb-1 text-sm font-medium text-white/80">
-              Your Pro subscription is active.
-            </p>
-            <p className="mb-4 text-xs text-white/45">
-              Click any course to start — your first access creates your enrolment automatically.
-            </p>
-            <Link
-              href="/courses"
-              className="inline-flex items-center rounded-sm px-4 py-2 text-sm font-medium text-white transition-all hover:scale-[1.02]"
-              style={{ background: '#2490ed' }}
-            >
-              Browse all courses
-            </Link>
-          </div>
-        ) : (
-          <EnrolledCourseList enrollments={enrollments} />
-        )}
       </section>
 
-      {/* --- What's Next For You --- */}
-      <section className="flex flex-col gap-3">
-        <h2 className="font-mono text-xs tracking-widest text-white/40 uppercase">
-          What&apos;s Next For You
+      {/* Recommendations */}
+      <section className="rounded-2xl border border-white/8 bg-white/[0.03] p-6 sm:p-8">
+        <h2 className="text-[11px] font-semibold tracking-[0.18em] text-white/35 uppercase">
+          What&apos;s next
         </h2>
-        <RecommendationWidget />
+        <div className="mt-2">
+          <RecommendationWidget />
+        </div>
       </section>
     </div>
   );
