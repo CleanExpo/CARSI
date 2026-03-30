@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 
+import { AuthNavLinks } from '@/components/landing/AuthNavLinks';
+
 // ---------------------------------------------------------------------------
 // Animation Config (Council-approved Bezier)
 // ---------------------------------------------------------------------------
@@ -167,32 +169,7 @@ export default function MobileNav() {
                   ))}
                 </ul>
 
-                {/* Auth buttons */}
-                <div
-                  className="mt-4 space-y-2 border-t pt-4"
-                  style={{ borderColor: 'rgba(255,255,255,0.08)' }}
-                >
-                  <Link
-                    href="/login"
-                    onClick={() => setIsOpen(false)}
-                    className="block rounded-md px-4 py-3 text-center text-base font-medium transition-colors duration-150"
-                    style={{
-                      color: 'rgba(255,255,255,0.7)',
-                      background: 'rgba(255,255,255,0.05)',
-                      border: '1px solid rgba(255,255,255,0.1)',
-                    }}
-                  >
-                    Sign In
-                  </Link>
-                  <Link
-                    href="/courses"
-                    onClick={() => setIsOpen(false)}
-                    className="block rounded-md px-4 py-3 text-center text-base font-medium text-white transition-opacity duration-150 hover:opacity-90"
-                    style={{ background: '#ed9d24' }}
-                  >
-                    Browse Courses
-                  </Link>
-                </div>
+                <AuthNavLinks variant="mobile" onNavigate={() => setIsOpen(false)} />
               </nav>
             </motion.div>
           </>
