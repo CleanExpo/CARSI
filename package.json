@@ -1,8 +1,9 @@
 {
-  "name": "claude-agent-orchestration-template",
+  "name": "CARSI",
   "version": "1.0.0",
   "description": "Production-ready monorepo for AI-powered applications with Next.js, LangGraph, and Claude",
-  "author": "Your Name",
+  "author": "Philip McGurk",
+  "contributors": ["Rana Muzamil (Technical Lead & Manager)"],
   "license": "MIT",
   "private": true,
   "engines": {
