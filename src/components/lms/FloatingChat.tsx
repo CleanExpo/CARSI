@@ -3,9 +3,6 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { MessageCircle, Send, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import { getBackendOrigin } from '@/lib/env/public-url';
-
-const BACKEND_URL = getBackendOrigin();
 
 const WELCOME_MESSAGE =
   "Hi! I'm the CARSI assistant. Ask me about courses, IICRC certifications, or pricing.";
@@ -68,7 +65,7 @@ export default function FloatingChat() {
     setLoading(true);
 
     try {
-      const res = await fetch(`${BACKEND_URL}/api/lms/public/chat`, {
+      const res = await fetch('/api/lms/public/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: text, conversation_id: conversationId }),

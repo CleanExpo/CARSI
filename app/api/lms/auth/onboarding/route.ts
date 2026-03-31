@@ -49,7 +49,8 @@ export async function POST(request: NextRequest) {
     recommended_pathway: 'Explore courses',
     pathway_description:
       'Browse the catalogue and start with a course that matches your discipline.',
-    suggested_courses_url: '/courses',
+    /** Post-wizard navigation — learner hub, not the public catalogue. */
+    suggested_courses_url: '/dashboard',
   });
   setOnboardingCompletedCookie(response, claims.sub);
   return response;

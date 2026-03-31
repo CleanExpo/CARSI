@@ -29,7 +29,12 @@ interface OnboardingWizardProps {
 function resolveOnboardingDestination(pathway: string, suggestedUrl?: string): string {
   const raw = suggestedUrl?.trim();
   if (raw) {
-    return raw.startsWith('/') ? raw : `/${raw}`;
+    const path = raw.startsWith('/') ? raw : `/${raw}`;
+    // Legacy API responses sent learners to the marketing catalogue; hub lives under /dashboard.
+    if (path === '/courses' || path.startsWith('/courses?')) {
+      return '/dashboard';
+    }
+    return path;
   }
   const code = pathway.trim();
   if (/^[A-Z]{2,5}$/.test(code)) {
