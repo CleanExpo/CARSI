@@ -80,6 +80,10 @@ nul
 *.png
 *.jpg
 *.jpeg
+# Ship raster assets under public/ (Docker/runtime); global *.png/*.jpg would otherwise omit them from git.
+!public/**/*.png
+!public/**/*.jpg
+!public/**/*.jpeg
 login-section.md
 
 # Backend-level Claude hook shim (auto-generated to fix CWD drift)
