@@ -50,7 +50,7 @@
 ### One-Command Setup
 
 ```bash
-git clone https://github.com/CleanExpo/NodeJS-Starter-V1.git && cd NodeJS-Starter-V1 && pnpm run setup && pnpm dev
+git clone https://github.com/CleanExpo/NodeJS-Starter-V1.git && cd NodeJS-Starter-V1 && npm install && npm run dev
 ```
 
 <sub>No API keys | No accounts | No configuration | Just works</sub>
@@ -136,7 +136,7 @@ sequenceDiagram
 | Docker  | Latest  | [docker.com](https://docker.com) |
 | Node.js | 20+     | [nodejs.org](https://nodejs.org) |
 | Python  | 3.12+   | [python.org](https://python.org) |
-| pnpm    | 9+      | `npm i -g pnpm`                  |
+| npm     | 9+      | Bundled with Node.js             |
 | Ollama  | Latest  | [ollama.com](https://ollama.com) |
 
 </details>
@@ -149,12 +149,11 @@ sequenceDiagram
 git clone https://github.com/CleanExpo/NodeJS-Starter-V1.git
 cd NodeJS-Starter-V1
 
-# 2. Run automated setup
-pnpm run setup              # macOS/Linux
-pnpm run setup:windows      # Windows
+# 2. Install dependencies
+npm install
 
 # 3. Start development
-pnpm dev
+npm run dev
 ```
 
 </details>
@@ -163,7 +162,7 @@ pnpm dev
 <summary><strong>Verify Installation</strong></summary>
 
 ```bash
-pnpm run verify
+npm run lint && npm run type-check
 ```
 
 | Service     | URL                    | Status  |
@@ -297,22 +296,17 @@ NodeJS-Starter-V1/
 <summary><strong>Common Commands</strong></summary>
 
 ```bash
-# Start all services
-pnpm dev
+# Start Next.js (webpack; avoids duplicate-React issues with PWA)
+npm run dev
 
-# Run tests
-pnpm turbo run test
+# Run tests (if defined)
+npm run --if-present test
 
 # Type check
-pnpm turbo run type-check
+npm run type-check
 
 # Lint
-pnpm turbo run lint
-
-# Docker management
-pnpm run docker:up          # Start services
-pnpm run docker:down        # Stop services
-pnpm run docker:reset       # Reset database
+npm run lint
 ```
 
 </details>
@@ -342,14 +336,11 @@ uv run ruff check src/
 <summary><strong>Frontend Commands</strong></summary>
 
 ```bash
-# Unit tests
-pnpm test --filter=web
-
 # E2E tests
-pnpm test:e2e --filter=web
+npm run test:e2e
 
 # Type check
-pnpm type-check --filter=web
+npm run type-check
 ```
 
 </details>
@@ -456,9 +447,9 @@ lsof -i :5432   # PostgreSQL
 <summary><strong>Dependency issues</strong></summary>
 
 ```bash
-rm -rf node_modules apps/*/node_modules
-pnpm store prune
-pnpm install
+rm -rf node_modules apps/*/node_modules .next
+npm cache clean --force
+npm install
 ```
 
 </details>
