@@ -1,21 +1,15 @@
+# Smaller build context; deps come from `npm ci` in Dockerfile
 node_modules
 .next
 .git
-.gitignore
-*.md
 .env
 .env.*
 !.env.example
-.turbo
 coverage
 playwright-report
 test-results
-.vercel
-.DS_Store
+*.log
+.turbo
+.cache
 ai-review
-.worktrees
-htmlcov
-.pytest_cache
-__pycache__
-.venv
-venv
+data/wordpress-export

@@ -14,6 +14,10 @@ RUN apt-get update -y && apt-get install -y openssl ca-certificates && rm -rf /v
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# App Platform passes BUILD_TIME / RUN_AND_BUILD_TIME envs as docker build-args (see project.yml).
+ARG DATABASE_URL
+ENV DATABASE_URL=${DATABASE_URL}
+
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 RUN npm run build

@@ -1,0 +1,25 @@
+# DigitalOcean App Platform spec (sync with: doctl apps update --spec project.yml)
+# - Forces Docker build (avoids unsupported buildpack runtime `typescript:default`).
+# - Set DATABASE_URL in the DO UI (or doctl) as an encrypted secret with scope RUN_AND_BUILD_TIME
+#   so `prisma migrate deploy` can reach Postgres during `docker build`.
+#
+# After editing, apply: doctl apps update <app-id> --spec project.yml
+# Or: App Platform → Settings → App Spec → Edit → paste this file.
+
+name: carsi
+region: syd
+services:
+  - name: web
+    github:
+      repo: CleanExpo/CARSI
+      branch: main
+      deploy_on_push: true
+    dockerfile_path: Dockerfile
+    http_port: 8080
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    envs:
+      - key: NODE_ENV
+        value: production
+        scope: RUN_TIME
+        type: GENERAL

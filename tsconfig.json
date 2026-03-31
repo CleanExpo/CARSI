@@ -32,7 +32,6 @@
   ],
   "exclude": [
     "node_modules",
-    "packages/news-worker/**/*",
     "src/__tests__/**/*",
     "tests/**/*",
     "src/components/JobCard.tsx",
