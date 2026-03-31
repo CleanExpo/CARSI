@@ -45,13 +45,11 @@ const pwaConfig = withPWA({
 const nextConfig: NextConfig = {
   output: 'standalone',
   reactStrictMode: true,
-  /** Production deploys: do not fail the build on TS/ESLint (fix issues in follow-up PRs). */
+  /** Production deploys: do not fail the build on TS (fix issues in follow-up PRs). */
   typescript: {
     ignoreBuildErrors: true,
   },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
+  // Next.js 16: do not set `eslint` here — it is not a valid next.config key; use `eslint.config` / `next lint`.
   transpilePackages: ['@shared'],
   /**
    * Force one React instance in the client bundle. Without this, pnpm + next-pwa/webpack can

@@ -20,6 +20,9 @@ __pycache__/
 .venv/
 venv/
 ENV/
+# macOS APFS is case-insensitive: `ENV/` matches `src/lib/env/` — un-ignore app source there.
+!src/lib/env/
+!src/lib/env/**
 .uv/
 *.egg-info/
 .eggs/
