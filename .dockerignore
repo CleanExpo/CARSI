@@ -1,15 +1,13 @@
-# Smaller build context; deps come from `npm ci` in Dockerfile
+# Faster, smaller Docker build context for DigitalOcean / CI
 node_modules
 .next
 .git
+.turbo
+coverage
+*.log
 .env
 .env.*
 !.env.example
-coverage
 playwright-report
 test-results
-*.log
-.turbo
-.cache
-ai-review
-data/wordpress-export
+.worktrees

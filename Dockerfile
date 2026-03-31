@@ -14,12 +14,17 @@ RUN apt-get update -y && apt-get install -y openssl ca-certificates && rm -rf /v
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# App Platform passes BUILD_TIME / RUN_AND_BUILD_TIME envs as docker build-args (see project.yml).
-ARG DATABASE_URL
-ENV DATABASE_URL=${DATABASE_URL}
-
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
+# App Platform passes RUN_AND_BUILD_TIME envs as `docker build --build-arg`.
+ARG DATABASE_URL
+ENV DATABASE_URL=${DATABASE_URL}
+ARG NEXT_PUBLIC_FRONTEND_URL
+ARG NEXT_PUBLIC_APP_URL
+ARG NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+ENV NEXT_PUBLIC_FRONTEND_URL=${NEXT_PUBLIC_FRONTEND_URL}
+ENV NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL}
+ENV NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}
 RUN npm run build
 
 FROM node:20-bookworm-slim AS runner

@@ -45,7 +45,7 @@ const pwaConfig = withPWA({
 const nextConfig: NextConfig = {
   output: 'standalone',
   reactStrictMode: true,
-  /** Deploy tolerance: fix TS/ESLint in follow-up PRs; do not block production builds. */
+  /** Production deploys: do not fail the build on TS/ESLint (fix issues in follow-up PRs). */
   typescript: {
     ignoreBuildErrors: true,
   },
