@@ -1,0 +1,72 @@
+name: carsi
+region: blr
+
+alerts:
+  - rule: DEPLOYMENT_FAILED
+  - rule: DOMAIN_FAILED
+
+services:
+  - name: carsi
+    github:
+      repo: CleanExpo/CARSI
+      branch: main
+      deploy_on_push: true
+
+    dockerfile_path: Dockerfile
+    http_port: 8080
+    source_dir: /
+    instance_count: 2
+    instance_size_slug: apps-s-1vcpu-1gb
+
+    health_check:
+      http_path: /api/health
+      initial_delay_seconds: 30
+      period_seconds: 10
+      timeout_seconds: 5
+      success_threshold: 1
+      failure_threshold: 3
+
+    envs:
+      - key: NODE_ENV
+        value: production
+        scope: RUN_TIME
+      - key: PORT
+        value: '8080'
+        scope: RUN_TIME
+
+      - key: DATABASE_URL
+        scope: RUN_AND_BUILD_TIME
+
+      - key: DATABASE_CA_CERT
+        scope: RUN_AND_BUILD_TIME
+
+      - key: JWT_SECRET
+        scope: RUN_TIME
+
+      - key: WC_CONSUMER_KEY
+        scope: RUN_AND_BUILD_TIME
+      - key: WC_CONSUMER_SECRET
+        scope: RUN_AND_BUILD_TIME
+
+      - key: STRIPE_SECRET_KEY
+        scope: RUN_AND_BUILD_TIME
+      - key: STRIPE_WEBHOOK_SECRET
+        scope: RUN_TIME
+
+      - key: NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+        scope: RUN_AND_BUILD_TIME
+
+      - key: ADMIN_EMAIL
+        scope: RUN_TIME
+      - key: ADMIN_PASSWORD
+        scope: RUN_TIME
+      - key: NEXT_PUBLIC_ADMIN_EMAIL
+        scope: RUN_AND_BUILD_TIME
+
+      - key: OPENAI_API_KEY
+        scope: RUN_TIME
+
+      - key: NEXT_PUBLIC_FRONTEND_URL
+        scope: RUN_AND_BUILD_TIME
+      - key: NEXT_PUBLIC_APP_URL
+        scope: RUN_AND_BUILD_TIME

@@ -1,31 +1,53 @@
-import { PrismaClient } from '@prisma/client';
-import fs from 'fs';
-import os from 'os';
-import path from 'path';
+import { randomUUID } from 'node:crypto';
+import { writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 
-const globalForPrisma = global as unknown as { prisma: PrismaClient };
+import { PrismaPg } from '@prisma/adapter-pg';
+import { PrismaClient } from '@/generated/prisma/client';
 
-function getDatabaseUrl(): string {
-  let url = process.env.DATABASE_URL!;
+const globalForPrisma = globalThis as unknown as { prisma: PrismaClient | undefined };
 
-  if (process.env.DATABASE_CA_CERT) {
-    const certPath = path.join(os.tmpdir(), 'do-ca.crt');
-    const certContent = Buffer.from(process.env.DATABASE_CA_CERT, 'base64').toString('utf-8');
-    fs.writeFileSync(certPath, certContent);
+let cachedCaPath: string | undefined;
 
-    const separator = url.includes('?') ? '&' : '?';
-    url = `${url}${separator}sslrootcert=${certPath}`;
+/**
+ * Appends sslrootcert for DigitalOcean managed Postgres when DATABASE_CA_CERT (base64 PEM) is set.
+ * Updates DATABASE_URL before PrismaPg reads it.
+ */
+function resolveDatabaseUrl(): string {
+  const base = process.env.DATABASE_URL;
+  if (!base) {
+    throw new Error('DATABASE_URL is not set');
   }
 
-  return url;
+  const b64 = process.env.DATABASE_CA_CERT?.trim();
+  if (!b64) {
+    return base;
+  }
+
+  if (!cachedCaPath) {
+    const certPath = join(tmpdir(), `carsi-pg-ca-${randomUUID()}.crt`);
+    const pem = Buffer.from(b64, 'base64').toString('utf8');
+    writeFileSync(certPath, pem, { mode: 0o600 });
+    cachedCaPath = certPath;
+  }
+
+  const sep = base.includes('?') ? '&' : '?';
+  return `${base}${sep}sslrootcert=${encodeURIComponent(cachedCaPath)}`;
 }
 
-export const prisma =
-  globalForPrisma.prisma ??
-  new PrismaClient({
-    datasources: {
-      db: { url: getDatabaseUrl() },
-    },
-  });
+process.env.DATABASE_URL = resolveDatabaseUrl();
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+function createClient() {
+  const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
+  return new PrismaClient({
+    adapter,
+    log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
+  });
+}
+
+export const prisma = globalForPrisma.prisma ?? createClient();
+
+if (process.env.NODE_ENV !== 'production') {
+  globalForPrisma.prisma = prisma;
+}
