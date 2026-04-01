@@ -1,5 +1,5 @@
 # DigitalOcean App Platform: set dockerfile_path to "Dockerfile" (no leading slash).
-# Prisma needs DATABASE_URL at install/build for generate + migrate.
+# Prisma needs DATABASE_URL at install/build for generate; migrate runs after `next build` in this stage.
 
 FROM node:22-bookworm-slim AS deps
 WORKDIR /app
