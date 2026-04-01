@@ -1,22 +1,31 @@
-import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "@/generated/prisma/client";
+import { PrismaClient } from '@prisma/client';
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
 
-const globalForPrisma = globalThis as unknown as { prisma: PrismaClient | undefined };
+const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
-function createClient() {
-  const url = process.env.DATABASE_URL;
-  if (!url) {
-    throw new Error("DATABASE_URL is not set");
+function getDatabaseUrl(): string {
+  let url = process.env.DATABASE_URL!;
+
+  if (process.env.DATABASE_CA_CERT) {
+    const certPath = path.join(os.tmpdir(), 'do-ca.crt');
+    const certContent = Buffer.from(process.env.DATABASE_CA_CERT, 'base64').toString('utf-8');
+    fs.writeFileSync(certPath, certContent);
+
+    const separator = url.includes('?') ? '&' : '?';
+    url = `${url}${separator}sslrootcert=${certPath}`;
   }
-  const adapter = new PrismaPg({ connectionString: url });
-  return new PrismaClient({
-    adapter,
-    log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
+
+  return url;
+}
+
+export const prisma =
+  globalForPrisma.prisma ??
+  new PrismaClient({
+    datasources: {
+      db: { url: getDatabaseUrl() },
+    },
   });
-}
 
-export const prisma = globalForPrisma.prisma ?? createClient();
-
-if (process.env.NODE_ENV !== "production") {
-  globalForPrisma.prisma = prisma;
-}
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
