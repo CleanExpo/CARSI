@@ -8,16 +8,21 @@ import { PrismaClient } from '@/generated/prisma/client';
 
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient | undefined };
 
+/** Same idea as `prisma.config.ts`: valid for client init when `DATABASE_URL` is not injected yet (e.g. `next build` on a host). */
+const PRISMA_CLIENT_PLACEHOLDER_URL =
+  'postgresql://prisma:prisma@127.0.0.1:5432/prisma_generate_only?schema=public';
+
 let cachedCaPath: string | undefined;
 
 /**
- * Appends sslrootcert for DigitalOcean managed Postgres when DATABASE_CA_CERT (base64 PEM) is set.
- * Updates DATABASE_URL before PrismaPg reads it.
+ * Connection string for PrismaPg. Does not mutate `process.env.DATABASE_URL`.
+ * When DATABASE_URL is unset (CI/build), uses a placeholder so the module can load; real
+ * requests must still have DATABASE_URL set for DB access.
  */
-function resolveDatabaseUrl(): string {
-  const base = process.env.DATABASE_URL;
+function getConnectionStringForAdapter(): string {
+  const base = process.env.DATABASE_URL?.trim();
   if (!base) {
-    throw new Error('DATABASE_URL is not set');
+    return PRISMA_CLIENT_PLACEHOLDER_URL;
   }
 
   const b64 = process.env.DATABASE_CA_CERT?.trim();
@@ -36,10 +41,8 @@ function resolveDatabaseUrl(): string {
   return `${base}${sep}sslrootcert=${encodeURIComponent(cachedCaPath)}`;
 }
 
-process.env.DATABASE_URL = resolveDatabaseUrl();
-
 function createClient() {
-  const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
+  const adapter = new PrismaPg({ connectionString: getConnectionStringForAdapter() });
   return new PrismaClient({
     adapter,
     log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
