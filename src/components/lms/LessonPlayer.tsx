@@ -1,9 +1,9 @@
-import type { ReactNode } from 'react';
-import DOMPurify from 'isomorphic-dompurify';
-import Link from 'next/link';
-import { Download } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
 import { DriveFileViewer } from '@/components/lms/DriveFileViewer';
+import { Badge } from '@/components/ui/badge';
+import DOMPurify from 'isomorphic-dompurify';
+import { Download } from 'lucide-react';
+import Link from 'next/link';
+import type { ReactNode } from 'react';
 
 interface Lesson {
   id: string;
