@@ -2,7 +2,7 @@ export function CourseCardSkeleton() {
   return (
     <div className="glass-card flex flex-col overflow-hidden rounded-xl">
       {/* Header shimmer */}
-      <div className="relative h-32 w-full flex-shrink-0 animate-pulse bg-white/[0.04]" />
+      <div className="relative aspect-video w-full shrink-0 animate-pulse bg-white/[0.04]" />
 
       {/* Body */}
       <div className="flex flex-1 flex-col p-3">
@@ -36,7 +36,7 @@ interface CourseGridSkeletonProps {
 
 export function CourseGridSkeleton({ count = 8 }: CourseGridSkeletonProps) {
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4">
       {Array.from({ length: count }, (_, i) => (
         <CourseCardSkeleton key={i} />
       ))}
