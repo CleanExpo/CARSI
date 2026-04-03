@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ArrowLeft, BookOpen, Users } from 'lucide-react';
+import { ArrowLeft, BookOpen, Percent, Users } from 'lucide-react';
 
 function NavButton({
   href,
@@ -43,6 +43,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const usersActive = pathname === '/admin';
   const coursesActive = pathname.startsWith('/admin/courses');
+  const discountsActive = pathname.startsWith('/admin/discounts');
 
   return (
     <div className="relative z-10 flex h-dvh min-h-0 w-full max-w-full overflow-hidden">
@@ -68,6 +69,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         <nav className="flex flex-1 flex-col gap-0.5 px-2 py-4">
           <NavButton href="/admin" label="Users" icon={Users} active={usersActive} />
           <NavButton href="/admin/courses" label="Courses" icon={BookOpen} active={coursesActive} />
+          <NavButton href="/admin/discounts" label="Discounts" icon={Percent} active={discountsActive} />
         </nav>
 
         <div className="mt-auto px-2 pb-6">
