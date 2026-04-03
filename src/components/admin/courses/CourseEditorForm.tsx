@@ -1,9 +1,9 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
+import { ChevronDown, ChevronUp, DollarSign, Loader2, Plus, Trash2, Upload } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ChevronDown, ChevronUp, DollarSign, Loader2, Plus, Trash2, Upload } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -26,6 +26,8 @@ type CourseDto = {
   title: string;
   description: string;
   thumbnailUrl: string;
+  introVideoUrl?: string;
+  introThumbnailUrl?: string;
   isFree: boolean;
   priceAud: number;
   published: boolean;
@@ -44,7 +46,8 @@ const panelClass = cn(
   'transition-[border-color,box-shadow] duration-300 hover:border-white/[0.12]'
 );
 
-const fieldClass = 'border-white/12 bg-black/35 text-white placeholder:text-white/35 focus-visible:ring-[#2490ed]/40';
+const fieldClass =
+  'border-white/12 bg-black/35 text-white placeholder:text-white/35 focus-visible:ring-[#2490ed]/40';
 
 function newModuleKey(): string {
   if (typeof globalThis !== 'undefined' && globalThis.crypto?.randomUUID) {
@@ -59,7 +62,9 @@ function emptyModule(): Mod {
 
 function SectionTitle({ children }: { children: ReactNode }) {
   return (
-    <h2 className="text-[11px] font-semibold tracking-[0.2em] text-white/45 uppercase">{children}</h2>
+    <h2 className="text-[11px] font-semibold tracking-[0.2em] text-white/45 uppercase">
+      {children}
+    </h2>
   );
 }
 
@@ -67,12 +72,15 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
   const router = useRouter();
   const { toast } = useToast();
   const fileRef = useRef<HTMLInputElement>(null);
+  const introThumbFileRef = useRef<HTMLInputElement>(null);
 
   const [loading, setLoading] = useState(!!courseId);
   const [saving, setSaving] = useState(false);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [thumbnailUrl, setThumbnailUrl] = useState('');
+  const [introVideoUrl, setIntroVideoUrl] = useState('');
+  const [introThumbnailUrl, setIntroThumbnailUrl] = useState('');
   const [slugReadOnly, setSlugReadOnly] = useState('');
   const [isFree, setIsFree] = useState(true);
   const [priceAud, setPriceAud] = useState('0');
@@ -92,6 +100,8 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
       setTitle(c.title);
       setDescription(c.description);
       setThumbnailUrl(c.thumbnailUrl);
+      setIntroVideoUrl(c.introVideoUrl ?? '');
+      setIntroThumbnailUrl(c.introThumbnailUrl ?? '');
       setIsFree(c.isFree);
       setPriceAud(String(Number(c.priceAud)));
       setPublished(c.published);
@@ -136,7 +146,11 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
     try {
       const fd = new FormData();
       fd.append('file', file);
-      const res = await fetch('/api/admin/upload', { method: 'POST', body: fd, credentials: 'include' });
+      const res = await fetch('/api/admin/upload', {
+        method: 'POST',
+        body: fd,
+        credentials: 'include',
+      });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
         throw new Error(typeof data.detail === 'string' ? data.detail : 'Upload failed');
@@ -144,6 +158,37 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
       if (typeof data.url === 'string') {
         setThumbnailUrl(data.url);
         toast({ title: 'Thumbnail uploaded' });
+      }
+    } catch (err) {
+      toast({
+        title: err instanceof Error ? err.message : 'Upload failed',
+        variant: 'destructive',
+      });
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  async function onUploadIntroThumbnailFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      const res = await fetch('/api/admin/upload', {
+        method: 'POST',
+        body: fd,
+        credentials: 'include',
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(typeof data.detail === 'string' ? data.detail : 'Upload failed');
+      }
+      if (typeof data.url === 'string') {
+        setIntroThumbnailUrl(data.url);
+        toast({ title: 'Intro thumbnail uploaded' });
       }
     } catch (err) {
       toast({
@@ -165,6 +210,8 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
         title: title.trim(),
         description: description.trim(),
         thumbnailUrl: thumbnailUrl.trim(),
+        introVideoUrl: introVideoUrl.trim() || undefined,
+        introThumbnailUrl: introThumbnailUrl.trim() || undefined,
         isFree,
         priceAud: resolvedPrice,
         published,
@@ -187,7 +234,10 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
         return;
       }
       if (!isFree && resolvedPrice <= 0) {
-        toast({ title: 'Set a price greater than zero, or mark the course as free', variant: 'destructive' });
+        toast({
+          title: 'Set a price greater than zero, or mark the course as free',
+          variant: 'destructive',
+        });
         setSaving(false);
         return;
       }
@@ -241,8 +291,8 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
               {courseId ? 'Edit course' : 'Create course'}
             </h1>
             <p className="max-w-2xl text-sm leading-relaxed text-white/50">
-              Full-width editor — set catalogue copy, pricing in AUD, thumbnail, and ordered modules. Paid courses require a
-              price; free courses ignore the price field on save.
+              Full-width editor — set catalogue copy, pricing in AUD, thumbnail, and ordered
+              modules. Paid courses require a price; free courses ignore the price field on save.
             </p>
             {slugReadOnly ? (
               <p className="font-mono text-xs text-white/40">
@@ -253,7 +303,7 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
           <div className="flex shrink-0 flex-wrap gap-3">
             <button
               type="submit"
-              disabled={saving}
+              disabled={saving || uploading}
               className="inline-flex min-w-[148px] items-center justify-center gap-2 rounded-xl bg-[#ed9d24] px-6 py-3 text-sm font-semibold text-white shadow-[0_8px_28px_-8px_rgba(237,157,36,0.55)] transition-[transform,box-shadow] duration-200 hover:shadow-[0_12px_32px_-8px_rgba(237,157,36,0.65)] disabled:opacity-50"
             >
               {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
@@ -305,8 +355,9 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
                 <div>
                   <SectionTitle>Pricing</SectionTitle>
                   <p className="mt-2 max-w-md text-xs leading-relaxed text-white/45">
-                    Price is always stored in Australian dollars. When &quot;Free course&quot; is on, the saved price is set to
-                    zero; you can still enter a draft price before switching to paid.
+                    Price is always stored in Australian dollars. When &quot;Free course&quot; is
+                    on, the saved price is set to zero; you can still enter a draft price before
+                    switching to paid.
                   </p>
                 </div>
                 <div className="flex items-center gap-2 rounded-full border border-white/10 bg-black/30 px-3 py-1.5">
@@ -338,7 +389,11 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
                     value={priceAud}
                     onChange={(e) => setPriceAud(e.target.value)}
                     disabled={isFree}
-                    className={cn('h-12 pl-8 text-base tabular-nums', fieldClass, isFree && 'cursor-not-allowed opacity-50')}
+                    className={cn(
+                      'h-12 pl-8 text-base tabular-nums',
+                      fieldClass,
+                      isFree && 'cursor-not-allowed opacity-50'
+                    )}
                     aria-describedby="price-hint"
                   />
                 </div>
@@ -387,9 +442,13 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
                   type="button"
                   disabled={uploading}
                   onClick={() => fileRef.current?.click()}
-                  className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/[0.04] px-4 py-2.5 text-xs font-semibold text-white/85 transition-colors hover:bg-white/[0.08] disabled:opacity-50"
+                  className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/4 px-4 py-2.5 text-xs font-semibold text-white/85 transition-colors hover:bg-white/8 disabled:opacity-50"
                 >
-                  {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                  {uploading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Upload className="h-4 w-4" />
+                  )}
                   Upload image
                 </button>
               </div>
@@ -404,7 +463,78 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
                     }}
                   />
                 ) : (
-                  <div className="flex aspect-video items-center justify-center text-xs text-white/35">Preview appears here</div>
+                  <div className="flex aspect-video items-center justify-center text-xs text-white/35">
+                    Preview appears here
+                  </div>
+                )}
+              </div>
+            </section>
+
+            <section className={cn(panelClass, 'space-y-4 p-5 sm:p-6')}>
+              <SectionTitle>Intro video</SectionTitle>
+              <div className="space-y-2">
+                <Label htmlFor="intro-video-url" className="text-white/65">
+                  Video URL
+                </Label>
+                <Input
+                  id="intro-video-url"
+                  value={introVideoUrl}
+                  onChange={(e) => setIntroVideoUrl(e.target.value)}
+                  className={cn('h-11 font-mono text-sm', fieldClass)}
+                  placeholder="YouTube, Vimeo, or direct .mp4"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="intro-thumb-url" className="text-white/65">
+                  Intro thumbnail URL
+                </Label>
+                <Input
+                  id="intro-thumb-url"
+                  value={introThumbnailUrl}
+                  onChange={(e) => setIntroThumbnailUrl(e.target.value)}
+                  className={cn('h-11 font-mono text-sm', fieldClass)}
+                  placeholder="https://… or /uploads/…"
+                />
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2">
+                <input
+                  ref={introThumbFileRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif"
+                  className="hidden"
+                  onChange={onUploadIntroThumbnailFile}
+                />
+                <button
+                  type="button"
+                  disabled={uploading}
+                  onClick={() => introThumbFileRef.current?.click()}
+                  className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/4 px-4 py-2.5 text-xs font-semibold text-white/85 transition-colors hover:bg-white/8 disabled:opacity-50"
+                >
+                  {uploading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Upload className="h-4 w-4" />
+                  )}
+                  Upload intro image
+                </button>
+              </div>
+
+              <div className="overflow-hidden rounded-xl border border-white/10 bg-black/40">
+                {introThumbnailUrl.trim() || thumbnailUrl.trim() ? (
+                  <img
+                    src={(introThumbnailUrl.trim() || thumbnailUrl.trim()).trim()}
+                    alt=""
+                    className="aspect-video w-full object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none';
+                    }}
+                  />
+                ) : (
+                  <div className="flex aspect-video items-center justify-center text-xs text-white/35">
+                    Preview appears here
+                  </div>
                 )}
               </div>
             </section>
@@ -426,9 +556,11 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
 
           <div className="space-y-5">
             {modules.map((mod, idx) => (
-              <div key={mod.key} className={cn(panelClass, 'space-y-4 border-white/[0.08] p-4 sm:p-5')}>
+              <div key={mod.key} className={cn(panelClass, 'space-y-4 border-white/8 p-4 sm:p-5')}>
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="text-xs font-bold tracking-wide text-white/50 uppercase">Module {idx + 1}</span>
+                  <span className="text-xs font-bold tracking-wide text-white/50 uppercase">
+                    Module {idx + 1}
+                  </span>
                   <div className="flex items-center gap-0.5">
                     <button
                       type="button"
@@ -464,7 +596,9 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
                   <Input
                     value={mod.title}
                     onChange={(e) =>
-                      setModules((m) => m.map((x, i) => (i === idx ? { ...x, title: e.target.value } : x)))
+                      setModules((m) =>
+                        m.map((x, i) => (i === idx ? { ...x, title: e.target.value } : x))
+                      )
                     }
                     required
                     className={cn('h-11', fieldClass)}
@@ -476,7 +610,9 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
                   <Textarea
                     value={mod.textContent}
                     onChange={(e) =>
-                      setModules((m) => m.map((x, i) => (i === idx ? { ...x, textContent: e.target.value } : x)))
+                      setModules((m) =>
+                        m.map((x, i) => (i === idx ? { ...x, textContent: e.target.value } : x))
+                      )
                     }
                     rows={5}
                     className={cn('font-mono text-sm', fieldClass)}
@@ -488,7 +624,9 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
                   <Input
                     value={mod.videoUrl}
                     onChange={(e) =>
-                      setModules((m) => m.map((x, i) => (i === idx ? { ...x, videoUrl: e.target.value } : x)))
+                      setModules((m) =>
+                        m.map((x, i) => (i === idx ? { ...x, videoUrl: e.target.value } : x))
+                      )
                     }
                     className={cn('h-11', fieldClass)}
                     placeholder="YouTube, Vimeo, or direct .mp4"
@@ -502,7 +640,7 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
         <div className="flex flex-wrap gap-3 border-t border-white/10 pt-8">
           <button
             type="submit"
-            disabled={saving}
+            disabled={saving || uploading}
             className="inline-flex min-w-[148px] items-center justify-center gap-2 rounded-xl bg-[#ed9d24] px-6 py-3 text-sm font-semibold text-white shadow-[0_8px_28px_-8px_rgba(237,157,36,0.55)] transition-[transform,box-shadow] duration-200 hover:shadow-[0_12px_32px_-8px_rgba(237,157,36,0.65)] disabled:opacity-50"
           >
             {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
