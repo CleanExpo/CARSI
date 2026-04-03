@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from 'react';
 
+import { bypassNextImageOptimizer, normalizePublicAssetUrl } from '@/lib/remote-image';
+
 interface CourseThumbnailProps {
   src?: string | null;
   title: string;
@@ -9,41 +11,42 @@ interface CourseThumbnailProps {
   compact?: boolean;
 }
 
-function fallbackSrc() {
-  return '/logo/logo1.png';
+function ThumbnailPlaceholder({ title, compact }: { title: string; compact?: boolean }) {
+  return (
+    <div
+      className={
+        compact
+          ? 'aspect-video overflow-hidden rounded-sm p-5'
+          : 'mb-4 aspect-video overflow-hidden rounded-sm p-5'
+      }
+      style={{
+        border: '1px solid rgba(255,255,255,0.07)',
+        background:
+          'linear-gradient(135deg, rgba(237,157,36,0.12) 0%, rgba(36,144,237,0.08) 100%)',
+      }}
+    >
+      <p className="text-xs font-semibold tracking-wide text-white/60 uppercase">Course preview</p>
+      <p className="mt-2 line-clamp-3 text-sm font-medium text-white/85">{title}</p>
+    </div>
+  );
 }
 
 export function CourseThumbnail({ src, title, compact }: CourseThumbnailProps) {
-  const [useFallbackAsset, setUseFallbackAsset] = useState(false);
   const [failed, setFailed] = useState(false);
 
   const resolvedSrc = useMemo(() => {
-    if (!src) return fallbackSrc();
-    const trimmed = src.trim();
-    if (!trimmed) return fallbackSrc();
-    if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
-      return `/api/image-proxy?url=${encodeURIComponent(trimmed)}`;
+    const normalized = normalizePublicAssetUrl(src);
+    if (!normalized) return null;
+    if (normalized.startsWith('http://') || normalized.startsWith('https://')) {
+      if (bypassNextImageOptimizer(normalized)) return normalized;
+      return `/api/image-proxy?url=${encodeURIComponent(normalized)}`;
     }
-    return trimmed;
+    return normalized.startsWith('/') ? normalized : `/${normalized}`;
   }, [src]);
 
-  if (failed) {
-    return (
-      <div
-        className="mb-4 aspect-video overflow-hidden rounded-sm p-5"
-        style={{
-          border: '1px solid rgba(255,255,255,0.07)',
-          background:
-            'linear-gradient(135deg, rgba(237,157,36,0.12) 0%, rgba(36,144,237,0.08) 100%)',
-        }}
-      >
-        <p className="text-xs font-semibold tracking-wide uppercase text-white/60">Course Preview</p>
-        <p className="mt-2 line-clamp-2 text-sm font-medium text-white/85">{title}</p>
-      </div>
-    );
+  if (failed || !resolvedSrc) {
+    return <ThumbnailPlaceholder title={title} compact={compact} />;
   }
-
-  const imageSrc = useFallbackAsset ? fallbackSrc() : resolvedSrc;
 
   return (
     <div
@@ -52,18 +55,13 @@ export function CourseThumbnail({ src, title, compact }: CourseThumbnailProps) {
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={imageSrc}
+        src={resolvedSrc}
         alt={title}
-        className="aspect-video w-full object-cover"
-        onError={() => {
-          if (!useFallbackAsset) {
-            setUseFallbackAsset(true);
-            return;
-          }
-          setFailed(true);
-        }}
+        className="aspect-video w-full object-contain object-center bg-black/30"
+        loading="eager"
+        decoding="async"
+        onError={() => setFailed(true)}
       />
     </div>
   );
 }
-
