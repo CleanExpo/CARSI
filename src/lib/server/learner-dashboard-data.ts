@@ -1,3 +1,4 @@
+import { normalizePublicAssetUrl } from '@/lib/remote-image';
 import { prisma } from '@/lib/prisma';
 
 /** Client / API shape for `EnrolledCourseList` and enrollments/me. */
@@ -110,7 +111,7 @@ function mapEnrollmentRow(
     status: allLessonsComplete ? 'completed' : e.status,
     enrolled_at: e.enrolledAt.toISOString(),
     completion_percentage: allLessonsComplete ? 100 : completionPercentage,
-    thumbnail_url: e.course.thumbnailUrl,
+    thumbnail_url: normalizePublicAssetUrl(e.course.thumbnailUrl),
     last_lesson_id: lastId,
     last_lesson_title: lastTitle,
     all_lessons_complete: allLessonsComplete,
