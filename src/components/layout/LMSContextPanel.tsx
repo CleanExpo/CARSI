@@ -1,7 +1,5 @@
 'use client';
 
-import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
 import {
   Award,
   BookOpen,
@@ -11,8 +9,9 @@ import {
   LogOut,
   Presentation,
   Route,
-  Shield,
 } from 'lucide-react';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 import { useAuth } from '@/components/auth/auth-provider';
@@ -41,7 +40,6 @@ const primaryNav: NavItem[] = [
   { href: '/dashboard/student/credentials', label: 'Certificates', icon: Award },
   { href: '/dashboard/pathways', label: 'Pathways', icon: Route },
   { href: '/dashboard/instructor', label: 'Instructor', icon: Presentation, instructorOnly: true },
-  { href: '/admin', label: 'Admin', icon: Shield, adminOnly: true },
 ];
 
 export function LMSContextPanel() {
@@ -76,9 +74,11 @@ export function LMSContextPanel() {
       </div>
 
       {/* Scrollable: menu + filters only; sidebar shell stays fixed */}
-      <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain px-2 py-4 [scrollbar-gutter:stable]">
+      <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain px-2 py-4 [scrollbar-gutter:stable]">
         <nav className="flex flex-col gap-0.5" aria-label="Section navigation">
-          <p className="mb-2 px-2 text-[10px] font-semibold tracking-wider text-white/30 uppercase">Menu</p>
+          <p className="mb-2 px-2 text-[10px] font-semibold tracking-wider text-white/30 uppercase">
+            Menu
+          </p>
           {primaryNav.map((item) => {
             if (item.adminOnly && !isAdmin) return null;
             if (item.instructorOnly && !isInstructor) return null;
@@ -125,14 +125,17 @@ export function LMSContextPanel() {
             />
           </button>
           {filtersOpen ? (
-            <div className="mt-2 max-h-40 space-y-1 overflow-y-auto pl-1 pr-1">
+            <div className="mt-2 max-h-40 space-y-1 overflow-y-auto pr-1 pl-1">
               {disciplines.map((d) => (
                 <Link
                   key={d.code}
                   href={`/dashboard/courses?discipline=${d.code}`}
                   className="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-white/55 transition hover:bg-white/4 hover:text-white/80"
                 >
-                  <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ backgroundColor: d.color }} />
+                  <span
+                    className="h-1.5 w-1.5 shrink-0 rounded-full"
+                    style={{ backgroundColor: d.color }}
+                  />
                   <span className="font-mono text-[10px] font-bold" style={{ color: d.color }}>
                     {d.code}
                   </span>
