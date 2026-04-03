@@ -45,6 +45,8 @@ function parseBody(body: unknown): AdminCourseWriteInput | null {
     title,
     description: typeof o.description === 'string' ? o.description : undefined,
     thumbnailUrl: typeof o.thumbnailUrl === 'string' ? o.thumbnailUrl : undefined,
+    introVideoUrl: typeof o.introVideoUrl === 'string' ? o.introVideoUrl : undefined,
+    introThumbnailUrl: typeof o.introThumbnailUrl === 'string' ? o.introThumbnailUrl : undefined,
     slug: typeof o.slug === 'string' ? o.slug : undefined,
     isFree: Boolean(o.isFree),
     priceAud: Number.isFinite(priceAud) ? priceAud : 0,
@@ -68,7 +70,14 @@ export async function GET(_request: NextRequest, ctx: Ctx) {
   if (!course) {
     return NextResponse.json({ detail: 'Not found' }, { status: 404 });
   }
-  return NextResponse.json({ course: courseToAdminDto(course) });
+  return NextResponse.json(
+    { course: courseToAdminDto(course) },
+    {
+      headers: {
+        'Cache-Control': 'no-store, max-age=0',
+      },
+    }
+  );
 }
 
 export async function PATCH(request: NextRequest, ctx: Ctx) {
