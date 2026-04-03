@@ -45,9 +45,9 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const coursesActive = pathname.startsWith('/admin/courses');
 
   return (
-    <div className="relative z-10 flex min-h-screen w-full">
+    <div className="relative z-10 flex h-dvh min-h-0 w-full max-w-full overflow-hidden">
       <aside
-        className="scrollbar-glass flex min-h-screen w-[240px] shrink-0 flex-col overflow-y-auto"
+        className="scrollbar-glass flex h-full w-[240px] shrink-0 flex-col overflow-hidden"
         style={{
           background: 'rgba(8, 12, 24, 0.88)',
           backdropFilter: 'blur(24px) saturate(180%)',
@@ -82,7 +82,10 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         </div>
       </aside>
 
-      <main id="main-content" className="relative min-h-screen flex-1 overflow-auto">
+      <main
+        id="main-content"
+        className="relative min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto"
+      >
         {children}
       </main>
     </div>
