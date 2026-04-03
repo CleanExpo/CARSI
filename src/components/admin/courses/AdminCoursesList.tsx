@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Loader2, Pencil, Plus, Trash2 } from 'lucide-react';
 
@@ -27,6 +28,7 @@ type Row = {
 };
 
 export function AdminCoursesList() {
+  const router = useRouter();
   const { toast } = useToast();
   const [rows, setRows] = useState<Row[] | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -36,7 +38,8 @@ export function AdminCoursesList() {
   const load = useCallback(async () => {
     setLoadError(null);
     try {
-      const res = await fetch('/api/admin/courses', { credentials: 'include' });
+        // Avoid any caching; courses can change immediately after create/update.
+        const res = await fetch('/api/admin/courses', { credentials: 'include', cache: 'no-store' });
       if (!res.ok) {
         const j = await res.json().catch(() => ({}));
         throw new Error(typeof j.detail === 'string' ? j.detail : 'Failed to load courses');
@@ -140,6 +143,16 @@ export function AdminCoursesList() {
               key={c.id}
               className="flex flex-col overflow-hidden rounded-xl border border-white/8"
               style={{ background: 'rgba(255,255,255,0.03)' }}
+              role="button"
+              tabIndex={0}
+              onClick={() => router.push(`/admin/courses/${c.id}`)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  router.push(`/admin/courses/${c.id}`);
+                }
+              }}
+              aria-label={`Edit course ${c.title}`}
             >
               <div className="relative aspect-video bg-black/40">
                 {c.thumbnailUrl ? (
@@ -166,7 +179,8 @@ export function AdminCoursesList() {
                 </p>
                 <div className="mt-4 flex flex-wrap gap-2">
                   <Link
-                    href={`/admin/courses/${c.id}/edit`}
+                    href={`/admin/courses/${c.id}`}
+                    onClick={(e) => e.stopPropagation()}
                     className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-white/12 px-3 py-2 text-xs font-medium text-white/85 transition-colors hover:bg-white/5"
                   >
                     <Pencil className="h-3.5 w-3.5" />
@@ -174,7 +188,10 @@ export function AdminCoursesList() {
                   </Link>
                   <button
                     type="button"
-                    onClick={() => setDeleteTarget(c)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setDeleteTarget(c);
+                    }}
                     className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-red-500/35 px-3 py-2 text-xs font-medium text-red-300 transition-colors hover:bg-red-500/10"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
