@@ -7,6 +7,7 @@ import { IICRCDisciplineMap } from '@/components/lms/diagrams/IICRCDisciplineMap
 import { CECCalculator } from '@/components/tools/CECCalculator';
 import { AcronymTooltip } from '@/components/ui/AcronymTooltip';
 import { getBackendOrigin } from '@/lib/env/public-url';
+import { getPublishedCourseListItemsFromDatabase } from '@/lib/server/public-courses-list';
 import { loadWpExportCourses, mapWpExportToCourseListItem } from '@/lib/wordpress-export-courses';
 
 export const dynamic = 'force-dynamic';
@@ -60,6 +61,17 @@ async function getCoursesFromBackend() {
 }
 
 async function getCourses() {
+  if (process.env.DATABASE_URL?.trim()) {
+    try {
+      const items = await getPublishedCourseListItemsFromDatabase();
+      if (items.length > 0) {
+        return { items, total: items.length };
+      }
+    } catch (e) {
+      console.error('[courses] Failed to load published courses from database', e);
+    }
+  }
+
   const exported = loadWpExportCourses();
   if (exported && exported.length > 0) {
     const items = exported.map(mapWpExportToCourseListItem);
