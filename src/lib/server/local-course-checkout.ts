@@ -45,11 +45,19 @@ export async function createStripeCheckoutForCourse(params: {
   customer_email: string;
   /** When set, Stripe webhook can complete enrolment without relying on the client callback alone. */
   student_id?: string;
+  /** Override line item amount in cents (e.g. after admin discount). */
+  unit_amount_cents?: number;
+  /** Optional Stripe metadata (e.g. discount_id). */
+  extra_metadata?: Record<string, string>;
 }): Promise<{ checkout_url: string }> {
-  const { slug, course, success_url, cancel_url, customer_email, student_id } = params;
+  const { slug, course, success_url, cancel_url, customer_email, student_id, unit_amount_cents, extra_metadata } =
+    params;
 
   const priceNum = Number(course.price_aud);
-  const unitAmount = Math.round(priceNum * 100);
+  const unitAmount =
+    unit_amount_cents != null && Number.isFinite(unit_amount_cents)
+      ? Math.round(unit_amount_cents)
+      : Math.round(priceNum * 100);
   if (!Number.isFinite(unitAmount) || unitAmount < 50) {
     throw new Error('INVALID_AMOUNT');
   }
@@ -65,6 +73,7 @@ export async function createStripeCheckoutForCourse(params: {
       course_slug: slug,
       source: 'carsi-next-local-checkout',
       ...(student_id ? { student_id } : {}),
+      ...(extra_metadata ?? {}),
     },
     line_items: [
       {
