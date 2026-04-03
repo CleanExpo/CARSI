@@ -21,6 +21,8 @@ export type AdminCourseWriteInput = {
   title: string;
   description?: string;
   thumbnailUrl?: string;
+  introVideoUrl?: string;
+  introThumbnailUrl?: string;
   slug?: string;
   isFree: boolean;
   priceAud: number;
@@ -84,6 +86,41 @@ function normalizeModules(modules: AdminModuleInput[]): AdminModuleInput[] {
       videoUrl: m.videoUrl?.trim() || undefined,
     }))
     .filter((m) => m.title.length > 0);
+}
+
+function normalizeOptionalString(raw?: string): string | undefined {
+  const t = raw?.trim();
+  return t ? t : undefined;
+}
+
+function readIntroVideoFromMeta(meta: unknown): { introVideoUrl?: string; introThumbnailUrl?: string } {
+  if (!meta || typeof meta !== 'object' || Array.isArray(meta)) return {};
+  const m = meta as Record<string, unknown>;
+  const introVideoUrl = typeof m.introVideoUrl === 'string' ? m.introVideoUrl : undefined;
+  const introThumbnailUrl = typeof m.introThumbnailUrl === 'string' ? m.introThumbnailUrl : undefined;
+  return { introVideoUrl, introThumbnailUrl };
+}
+
+function upsertIntroVideoInMeta(
+  existingMeta: unknown,
+  input: Pick<AdminCourseWriteInput, 'introVideoUrl' | 'introThumbnailUrl'>
+): Prisma.InputJsonValue | null {
+  const base =
+    existingMeta && typeof existingMeta === 'object' && !Array.isArray(existingMeta)
+      ? { ...(existingMeta as Record<string, unknown>) }
+      : {};
+
+  const introVideoUrl = normalizeOptionalString(input.introVideoUrl);
+  const introThumbnailUrl = normalizeOptionalString(input.introThumbnailUrl);
+
+  if (introVideoUrl) base.introVideoUrl = introVideoUrl;
+  else delete base.introVideoUrl;
+
+  if (introThumbnailUrl) base.introThumbnailUrl = introThumbnailUrl;
+  else delete base.introThumbnailUrl;
+
+  const keys = Object.keys(base);
+  return keys.length > 0 ? (base as Prisma.InputJsonValue) : null;
 }
 
 type LessonDesired = {
@@ -165,15 +202,19 @@ async function syncModuleLessons(
 }
 
 export function courseToAdminDto(course: CourseWithCurriculum) {
+  const { introVideoUrl, introThumbnailUrl } = readIntroVideoFromMeta(course.meta);
+  const status = (course.status ?? '').toLowerCase();
   return {
     id: course.id,
     slug: course.slug,
     title: course.title,
     description: course.description ?? '',
     thumbnailUrl: course.thumbnailUrl ?? '',
+    introVideoUrl,
+    introThumbnailUrl,
     isFree: course.isFree,
     priceAud: Number(course.priceAud),
-    published: course.isPublished === true || course.status === 'published',
+    published: course.isPublished === true || status === 'published',
     modules: course.modules.map((mod) => {
       const lessons = [...mod.lessons].sort((a, b) => a.orderIndex - b.orderIndex);
       const text = lessons.find((l) => l.contentType === 'text');
@@ -205,7 +246,7 @@ export async function adminListCourses() {
     moduleCount: c._count.modules,
     isFree: c.isFree,
     priceAud: Number(c.priceAud),
-    published: c.isPublished === true || c.status === 'published',
+    published: c.isPublished === true || String(c.status ?? '').toLowerCase() === 'published',
     updatedAt: c.updatedAt.toISOString(),
   }));
 }
@@ -239,6 +280,10 @@ export async function adminCreateCourse(input: AdminCourseWriteInput): Promise<C
         description: input.description?.trim() || null,
         shortDescription: null,
         thumbnailUrl: input.thumbnailUrl?.trim() || null,
+        meta: upsertIntroVideoInMeta(null, {
+          introVideoUrl: input.introVideoUrl,
+          introThumbnailUrl: input.introThumbnailUrl,
+        }),
         instructorId: DEFAULT_INSTRUCTOR_ID,
         status: published ? 'published' : 'draft',
         priceAud,
@@ -297,6 +342,10 @@ export async function adminUpdateCourse(
         title: input.title.trim(),
         description: input.description?.trim() || null,
         thumbnailUrl: input.thumbnailUrl?.trim() || null,
+        meta: upsertIntroVideoInMeta(existing.meta, {
+          introVideoUrl: input.introVideoUrl,
+          introThumbnailUrl: input.introThumbnailUrl,
+        }),
         status: published ? 'published' : 'draft',
         priceAud,
         isFree: Boolean(input.isFree),
