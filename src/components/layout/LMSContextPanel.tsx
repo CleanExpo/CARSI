@@ -7,7 +7,6 @@ import {
   GraduationCap,
   LayoutDashboard,
   LogOut,
-  Presentation,
   Route,
 } from 'lucide-react';
 import Link from 'next/link';
@@ -39,7 +38,6 @@ const primaryNav: NavItem[] = [
   { href: '/dashboard/student', label: 'My learning', icon: GraduationCap },
   { href: '/dashboard/student/credentials', label: 'Certificates', icon: Award },
   { href: '/dashboard/pathways', label: 'Pathways', icon: Route },
-  { href: '/dashboard/instructor', label: 'Instructor', icon: Presentation, instructorOnly: true },
 ];
 
 export function LMSContextPanel() {
