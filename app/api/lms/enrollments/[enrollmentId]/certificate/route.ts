@@ -54,10 +54,12 @@ export async function GET(request: NextRequest, ctx: Ctx) {
     }
 
     const studentName = row.student.fullName?.trim() || row.student.email;
+    const disc = row.course.iicrcDiscipline?.trim() || '—';
     const pdf = await buildCompletionCertificatePdf({
       studentName,
       courseTitle: row.course.title,
       completedDate: row.completedAt,
+      discipline: disc,
     });
 
     await markCertificateIssued(row.id);

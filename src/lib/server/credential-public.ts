@@ -77,16 +77,18 @@ export async function getPublicCredentialPdfBuffer(credentialId: string): Promis
     },
     include: {
       student: { select: { fullName: true, email: true } },
-      course: { select: { title: true, slug: true } },
+      course: { select: { title: true, slug: true, iicrcDiscipline: true } },
     },
   });
   if (!row) return { ok: false, reason: 'not_found' };
 
   const studentName = row.student.fullName?.trim() || row.student.email;
+  const disc = row.course.iicrcDiscipline?.trim() || '—';
   const pdf = await buildCompletionCertificatePdf({
     studentName,
     courseTitle: row.course.title,
     completedDate: row.completedAt!,
+    discipline: disc,
   });
 
   return {

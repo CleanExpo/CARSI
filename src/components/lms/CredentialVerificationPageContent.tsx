@@ -1,6 +1,3 @@
-import Link from 'next/link';
-
-import { CredentialVerificationCard } from '@/components/lms/CredentialVerificationCard';
 import { CertificatePreview } from '@/components/lms/diagrams/CertificatePreview';
 import type { PublicCredentialJson } from '@/lib/server/credential-public';
 
@@ -13,24 +10,7 @@ export function CredentialVerificationPageContent({ credential, credentialId }: 
   const pdfUrl = `/api/lms/credentials/${encodeURIComponent(credentialId)}?pdf=1`;
 
   return (
-    <div className="w-full max-w-4xl">
-      <div className="mb-8 flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-6">
-        <Link
-          href="/dashboard/student/credentials"
-          className="text-sm font-medium text-[#7ec5ff] transition-colors hover:text-[#9ed4ff]"
-        >
-          ← My credentials
-        </Link>
-        <Link
-          href="/dashboard"
-          className="text-sm text-white/50 transition-colors hover:text-white/80"
-        >
-          Dashboard home
-        </Link>
-      </div>
-
-      <CredentialVerificationCard credential={credential} />
-
+    <div className="w-full max-w-6xl">
       <section className="mt-10">
         <h2
           className="mb-4 text-center text-lg font-semibold"
