@@ -1,9 +1,11 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { Loader2, Pencil, Plus, Trash2 } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useCallback, useEffect, useState } from 'react';
+
+import { normalizeImageSrcForApp } from '@/lib/remote-image';
 
 import {
   Dialog,
@@ -27,6 +29,48 @@ type Row = {
   updatedAt: string;
 };
 
+/**
+ * Native <img> (not next/image): CDNs like Cloudinary often block or throttle when a browser
+ * Referer is sent from the admin origin; `referrerPolicy="no-referrer"` fixes intermittent
+ * broken thumbnails. Decorative alt — title is already in the card heading.
+ */
+function AdminCourseListThumb({
+  thumbnailUrl,
+  eager,
+}: {
+  thumbnailUrl: string | null;
+  eager?: boolean;
+}) {
+  const [failed, setFailed] = useState(false);
+  const src = normalizeImageSrcForApp(thumbnailUrl);
+
+  useEffect(() => {
+    setFailed(false);
+  }, [thumbnailUrl]);
+
+  if (!src || failed) {
+    return (
+      <div className="flex h-full min-h-[8.5rem] w-full items-center justify-center bg-black/50 text-xs text-white/35">
+        No thumbnail
+      </div>
+    );
+  }
+
+  return (
+    // eslint-disable-next-line @next/next/no-img-element -- intentional: reliable CDN loads + referrer control
+    <img
+      src={src}
+      alt=""
+      referrerPolicy="no-referrer"
+      loading={eager ? 'eager' : 'lazy'}
+      decoding="async"
+      fetchPriority={eager ? 'high' : 'auto'}
+      className="absolute inset-0 h-full w-full object-cover"
+      onError={() => setFailed(true)}
+    />
+  );
+}
+
 export function AdminCoursesList() {
   const router = useRouter();
   const { toast } = useToast();
@@ -38,8 +82,8 @@ export function AdminCoursesList() {
   const load = useCallback(async () => {
     setLoadError(null);
     try {
-        // Avoid any caching; courses can change immediately after create/update.
-        const res = await fetch('/api/admin/courses', { credentials: 'include', cache: 'no-store' });
+      // Avoid any caching; courses can change immediately after create/update.
+      const res = await fetch('/api/admin/courses', { credentials: 'include', cache: 'no-store' });
       if (!res.ok) {
         const j = await res.json().catch(() => ({}));
         throw new Error(typeof j.detail === 'string' ? j.detail : 'Failed to load courses');
@@ -124,8 +168,8 @@ export function AdminCoursesList() {
         >
           <p className="text-lg font-medium text-white/80">No courses yet</p>
           <p className="mt-2 max-w-md text-sm text-white/45">
-            Build your first course with modules, optional reading text, and optional video (YouTube,
-            Vimeo, or direct file URL).
+            Build your first course with modules, optional reading text, and optional video
+            (YouTube, Vimeo, or direct file URL).
           </p>
           <Link
             href="/admin/courses/new"
@@ -138,7 +182,7 @@ export function AdminCoursesList() {
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {rows.map((c) => (
+          {rows.map((c, index) => (
             <article
               key={c.id}
               className="flex flex-col overflow-hidden rounded-xl border border-white/8"
@@ -154,17 +198,11 @@ export function AdminCoursesList() {
               }}
               aria-label={`Edit course ${c.title}`}
             >
-              <div className="relative aspect-video bg-black/40">
-                {c.thumbnailUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={c.thumbnailUrl} alt="" className="h-full w-full object-cover" />
-                ) : (
-                  <div className="flex h-full items-center justify-center text-xs text-white/30">
-                    No thumbnail
-                  </div>
-                )}
+              <div className="relative aspect-video overflow-hidden bg-black/40">
+                <AdminCourseListThumb thumbnailUrl={c.thumbnailUrl} eager={index < 9} />
+
                 {!c.published && (
-                  <span className="absolute left-2 top-2 rounded bg-amber-500/90 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-black">
+                  <span className="absolute top-2 left-2 rounded bg-amber-500/90 px-2 py-0.5 text-[10px] font-bold tracking-wide text-black uppercase">
                     Draft
                   </span>
                 )}

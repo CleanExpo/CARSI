@@ -93,11 +93,15 @@ function normalizeOptionalString(raw?: string): string | undefined {
   return t ? t : undefined;
 }
 
-function readIntroVideoFromMeta(meta: unknown): { introVideoUrl?: string; introThumbnailUrl?: string } {
+function readIntroVideoFromMeta(meta: unknown): {
+  introVideoUrl?: string;
+  introThumbnailUrl?: string;
+} {
   if (!meta || typeof meta !== 'object' || Array.isArray(meta)) return {};
   const m = meta as Record<string, unknown>;
   const introVideoUrl = typeof m.introVideoUrl === 'string' ? m.introVideoUrl : undefined;
-  const introThumbnailUrl = typeof m.introThumbnailUrl === 'string' ? m.introThumbnailUrl : undefined;
+  const introThumbnailUrl =
+    typeof m.introThumbnailUrl === 'string' ? m.introThumbnailUrl : undefined;
   return { introVideoUrl, introThumbnailUrl };
 }
 
@@ -129,7 +133,11 @@ type LessonDesired = {
   title: string;
 };
 
-function buildDesiredLessons(moduleTitle: string, textContent?: string, videoUrl?: string): LessonDesired[] {
+function buildDesiredLessons(
+  moduleTitle: string,
+  textContent?: string,
+  videoUrl?: string
+): LessonDesired[] {
   const out: LessonDesired[] = [];
   if (textContent) {
     out.push({
@@ -258,7 +266,9 @@ export async function adminGetCourse(id: string): Promise<CourseWithCurriculum |
   });
 }
 
-export async function adminCreateCourse(input: AdminCourseWriteInput): Promise<CourseWithCurriculum> {
+export async function adminCreateCourse(
+  input: AdminCourseWriteInput
+): Promise<CourseWithCurriculum> {
   const modules = normalizeModules(input.modules);
   if (modules.length === 0) {
     throw new Error('MODULES_REQUIRED');

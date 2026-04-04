@@ -28,3 +28,14 @@ export function normalizePublicAssetUrl(url: string | null | undefined): string 
   if (t.startsWith('//')) return `https:${t}`;
   return t;
 }
+
+/**
+ * For `<img>` / `next/image` `src`: normalize then ensure app-relative paths use a leading `/`
+ * so they resolve from the site root (not from `/admin/courses/...`).
+ */
+export function normalizeImageSrcForApp(url: string | null | undefined): string | null {
+  const n = normalizePublicAssetUrl(url);
+  if (!n) return null;
+  if (n.startsWith('http://') || n.startsWith('https://')) return n;
+  return n.startsWith('/') ? n : `/${n}`;
+}

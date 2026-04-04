@@ -2,14 +2,15 @@
 
 import { motion } from 'framer-motion';
 import { BookOpen, Clock } from 'lucide-react';
-import Image from 'next/image';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { useCourseBrowseBase } from '@/components/lms/CourseBrowseContext';
-import { bypassNextImageOptimizer, normalizePublicAssetUrl } from '@/lib/remote-image';
+import { normalizeImageSrcForApp } from '@/lib/remote-image';
 
 interface CourseCardProps {
+  /** First visible cards: eager load + higher fetch priority (catalog / home grids). */
+  priorityImage?: boolean;
   course: {
     id: string;
     slug: string;
@@ -197,8 +198,8 @@ function formatRelativeDate(dateStr: string | null | undefined): string {
 
 const smoothEase: [number, number, number, number] = [0.4, 0, 0.2, 1];
 
-export function CourseCard({ course }: CourseCardProps) {
-  const [imageError, setImageError] = useState(false);
+export function CourseCard({ course, priorityImage }: CourseCardProps) {
+  const [tierIndex, setTierIndex] = useState(0);
   const priceNum =
     typeof course.price_aud === 'string' ? parseFloat(course.price_aud) : course.price_aud;
   const isFree = course.is_free || priceNum === 0;
@@ -213,10 +214,18 @@ export function CourseCard({ course }: CourseCardProps) {
   const ds = (discipline ? disciplineColors[discipline] : undefined) ?? defaultStyle;
   const { courseLinkBase } = useCourseBrowseBase();
 
-  // Determine thumbnail: API URL > local fallback > none (show gradient)
-  const storedThumb = normalizePublicAssetUrl(course.thumbnail_url);
-  const thumbnailUrl =
-    !imageError && storedThumb ? storedThumb : getFallbackThumbnail(course.slug, course.title);
+  const thumbTiers = useMemo(() => {
+    const primary = normalizeImageSrcForApp(course.thumbnail_url);
+    const fb = getFallbackThumbnail(course.slug, course.title);
+    const fallback = fb ? normalizeImageSrcForApp(fb) : null;
+    return [...new Set([primary, fallback].filter((s): s is string => Boolean(s)))];
+  }, [course.thumbnail_url, course.slug, course.title]);
+
+  useEffect(() => {
+    setTierIndex(0);
+  }, [course.id, course.thumbnail_url]);
+
+  const thumbSrc = thumbTiers[tierIndex] ?? null;
 
   return (
     <motion.div
@@ -228,17 +237,20 @@ export function CourseCard({ course }: CourseCardProps) {
       <div
         className={`relative aspect-video w-full shrink-0 overflow-hidden bg-gradient-to-br ${ds.grad}`}
       >
-        {thumbnailUrl && (
-          <Image
-            src={thumbnailUrl}
-            alt={course.title}
-            fill
-            unoptimized={bypassNextImageOptimizer(thumbnailUrl)}
-            className="object-cover opacity-90 transition-opacity duration-300 group-hover:opacity-100"
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            onError={() => setImageError(true)}
+        {thumbSrc ? (
+          // eslint-disable-next-line @next/next/no-img-element -- CDN thumbs: no-referrer + reliable loads (see admin list)
+          <img
+            key={thumbSrc}
+            src={thumbSrc}
+            alt=""
+            referrerPolicy="no-referrer"
+            loading={priorityImage ? 'eager' : 'lazy'}
+            decoding="async"
+            fetchPriority={priorityImage ? 'high' : 'auto'}
+            className="absolute inset-0 h-full w-full object-cover opacity-90 transition-opacity duration-300 group-hover:opacity-100"
+            onError={() => setTierIndex((i) => i + 1)}
           />
-        )}
+        ) : null}
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-black/20" />
         {discipline && (
           <span

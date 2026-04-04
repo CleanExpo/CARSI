@@ -210,7 +210,7 @@ export function CourseGrid({ courses, initialTab = 'All', loading = false }: Cou
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, ease: smoothEase, delay: i * 0.05 }}
             >
-              <CourseCard course={course} />
+              <CourseCard course={course} priorityImage={i < 9} />
             </motion.div>
           ))}
         </div>

@@ -61,43 +61,9 @@ const nextConfig: NextConfig = {
     // Typed routes disabled - requires full route type generation to be configured
     // typedRoutes: true,
   },
+  // Load image URLs in the browser (no /_next/image proxy). Avoids remotePatterns and CDN timeouts.
   images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'carsi.com.au',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'www.carsi.com.au',
-        pathname: '/**',
-      },
-      {
-        // Google Drive thumbnails served via lh3.googleusercontent.com
-        protocol: 'https',
-        hostname: 'lh3.googleusercontent.com',
-        pathname: '/**',
-      },
-      {
-        // Drive direct download thumbnails
-        protocol: 'https',
-        hostname: 'drive.google.com',
-        pathname: '/**',
-      },
-      {
-        // Unsplash (design-system demo page)
-        protocol: 'https',
-        hostname: 'images.unsplash.com',
-        pathname: '/**',
-      },
-      {
-        // Cloudinary (admin course thumbnails and other uploads)
-        protocol: 'https',
-        hostname: 'res.cloudinary.com',
-        pathname: '/**',
-      },
-    ],
+    unoptimized: true,
   },
   async headers() {
     const isDev = process.env.NODE_ENV === 'development';

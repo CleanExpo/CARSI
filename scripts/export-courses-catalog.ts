@@ -16,9 +16,9 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { prisma } from '../src/lib/prisma';
 import type { CoursesCatalogFile } from '../src/lib/seed/courses-catalog-types';
 import { COURSES_CATALOG_VERSION } from '../src/lib/seed/courses-catalog-types';
-import { prisma } from '../src/lib/prisma';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUT = join(__dirname, '..', 'data', 'seed', 'courses-catalog.json');

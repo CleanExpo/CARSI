@@ -313,7 +313,7 @@ export default async function Home() {
             {featuredCourses.length > 0
               ? featuredCourses.map((course, i) => (
                   <AnimatedCard key={course.id} index={i}>
-                    <CourseCard course={course} />
+                    <CourseCard course={course} priorityImage={i < 9} />
                   </AnimatedCard>
                 ))
               : [1, 2, 3].map((i) => (
