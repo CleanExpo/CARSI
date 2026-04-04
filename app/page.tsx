@@ -13,14 +13,8 @@ import { IICRCDisciplineMap } from '@/components/lms/diagrams/IICRCDisciplineMap
 import { StudentJourneyMap } from '@/components/lms/diagrams/StudentJourneyMap';
 import { FAQSchema } from '@/components/seo/JsonLd';
 import { AcronymTooltip } from '@/components/ui/AcronymTooltip';
-import { getBackendOrigin } from '@/lib/env/public-url';
 import { getPublishedCourseListItemsFromDatabase } from '@/lib/server/public-courses-list';
-import {
-  loadWpExportCourses,
-  mapWpExportToCourseListItem,
-  pickFeaturedFromExport,
-  type CourseListItem,
-} from '@/lib/wordpress-export-courses';
+import type { CourseListItem } from '@/lib/wordpress-export-courses';
 import {
   ArrowRight,
   Award,
@@ -44,41 +38,18 @@ type Course = CourseListItem;
 // Data
 // ---------------------------------------------------------------------------
 
-async function getFeaturedCoursesFromBackend(): Promise<Course[]> {
-  const backendUrl = getBackendOrigin();
-  try {
-    const res = await fetch(`${backendUrl}/api/lms/courses?limit=3`, {
-      next: { revalidate: 300 },
-    });
-    if (!res.ok) return [];
-    const data = await res.json();
-    return data.items ?? [];
-  } catch {
+/** Popular / featured strip: published rows from `lms_courses` only. */
+async function getFeaturedCourses(): Promise<Course[]> {
+  if (!process.env.DATABASE_URL?.trim()) {
     return [];
   }
-}
-
-/**
- * Popular / featured strip: same catalogue source as `/courses` — Postgres when configured,
- * then WordPress export, then legacy LMS API stub.
- */
-async function getFeaturedCourses(): Promise<Course[]> {
-  if (process.env.DATABASE_URL?.trim()) {
-    try {
-      const items = await getPublishedCourseListItemsFromDatabase();
-      if (items.length > 0) {
-        return items.slice(0, 3);
-      }
-    } catch (e) {
-      console.error('[home] Failed to load featured courses from database', e);
-    }
+  try {
+    const items = await getPublishedCourseListItemsFromDatabase();
+    return items.slice(0, 3);
+  } catch (e) {
+    console.error('[home] Failed to load featured courses from database', e);
+    return [];
   }
-
-  const data = loadWpExportCourses();
-  if (data && data.length > 0) {
-    return pickFeaturedFromExport(data, 3).map(mapWpExportToCourseListItem);
-  }
-  return getFeaturedCoursesFromBackend();
 }
 
 // ---------------------------------------------------------------------------
