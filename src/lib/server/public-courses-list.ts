@@ -9,6 +9,55 @@ const publishedWhere = {
   ],
 };
 
+const courseListInclude = {
+  instructor: { select: { fullName: true } },
+  modules: {
+    select: {
+      _count: { select: { lessons: true } },
+    },
+  },
+} as const;
+
+type CourseListRow = Awaited<
+  ReturnType<
+    typeof prisma.lmsCourse.findMany<{ where: typeof publishedWhere; include: typeof courseListInclude }>
+  >
+>[number];
+
+function mapCourseRowToListItem(c: CourseListRow): CourseListItem {
+  const lessonCount = c.modules.reduce((acc, m) => acc + m._count.lessons, 0);
+  return {
+    id: c.id,
+    slug: c.slug,
+    title: c.title,
+    short_description: c.shortDescription,
+    price_aud: Number(c.priceAud),
+    is_free: c.isFree,
+    discipline: c.iicrcDiscipline,
+    thumbnail_url: normalizePublicAssetUrl(c.thumbnailUrl),
+    level: c.level,
+    category: c.category,
+    lesson_count: lessonCount,
+    updated_at: c.updatedAt.toISOString(),
+    instructor: c.instructor?.fullName ? { full_name: c.instructor.fullName } : null,
+  };
+}
+
+/**
+ * Homepage “Popular Courses”: first `limit` published rows by catalogue insertion order.
+ */
+export async function getFeaturedCourseListItemsFromDatabase(
+  limit = 3
+): Promise<CourseListItem[]> {
+  const rows = await prisma.lmsCourse.findMany({
+    where: publishedWhere,
+    orderBy: { createdAt: 'asc' },
+    take: limit,
+    include: courseListInclude,
+  });
+  return rows.map(mapCourseRowToListItem);
+}
+
 /**
  * Published catalogue rows for `/courses` and other public listings.
  * Matches the `CourseListItem` shape used by `CourseGrid` / `CourseCard`.
@@ -17,34 +66,10 @@ export async function getPublishedCourseListItemsFromDatabase(): Promise<CourseL
   const rows = await prisma.lmsCourse.findMany({
     where: publishedWhere,
     orderBy: { updatedAt: 'desc' },
-    include: {
-      instructor: { select: { fullName: true } },
-      modules: {
-        select: {
-          _count: { select: { lessons: true } },
-        },
-      },
-    },
+    include: courseListInclude,
   });
 
-  return rows.map((c) => {
-    const lessonCount = c.modules.reduce((acc, m) => acc + m._count.lessons, 0);
-    return {
-      id: c.id,
-      slug: c.slug,
-      title: c.title,
-      short_description: c.shortDescription,
-      price_aud: Number(c.priceAud),
-      is_free: c.isFree,
-      discipline: c.iicrcDiscipline,
-      thumbnail_url: normalizePublicAssetUrl(c.thumbnailUrl),
-      level: c.level,
-      category: c.category,
-      lesson_count: lessonCount,
-      updated_at: c.updatedAt.toISOString(),
-      instructor: c.instructor?.fullName ? { full_name: c.instructor.fullName } : null,
-    };
-  });
+  return rows.map(mapCourseRowToListItem);
 }
 
 /**
