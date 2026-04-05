@@ -13,7 +13,7 @@
  *
  * Optional:
  *   WP_EXPORT_COURSES_PATH=... — Woo courses.json (default data/wordpress-export/courses.json)
- *   WXR_PATH=...  — defaults to data/wordpress-export/carsi.WordPress.2026-04-05.xml
+ *   WXR_PATH=... — .xml or .xml.gz; default uses carsi.WordPress.2026-04-05.xml.gz or .xml under data/wordpress-export/
  */
 import 'dotenv/config';
 
@@ -26,11 +26,11 @@ import { Prisma } from '../src/generated/prisma/client';
 import { prisma } from '../src/lib/prisma';
 import { isCoursesCatalogFile } from '../src/lib/seed/courses-catalog-types';
 import { readWpExportCoursesJsonOrThrow } from '../src/lib/seed/wp-export-courses-json';
+import { readWxrXmlOrThrow } from '../src/lib/seed/wp-export-wxr-xml';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const APP_ROOT = join(__dirname, '..');
 const CATALOG_PATH = join(APP_ROOT, 'data', 'seed', 'courses-catalog.json');
-const DEFAULT_WXR = join(APP_ROOT, 'data', 'wordpress-export', 'carsi.WordPress.2026-04-05.xml');
 
 const HREF_RE = /carsi\.com\.au\/courses\/([^/"']+)\//g;
 
@@ -272,7 +272,6 @@ async function main() {
     process.exit(1);
   }
 
-  const wxrPath = process.env.WXR_PATH?.trim() || DEFAULT_WXR;
   const catalogRaw = readFileSync(CATALOG_PATH, 'utf8');
   const catalog = JSON.parse(catalogRaw) as unknown;
   if (!isCoursesCatalogFile(catalog)) {
@@ -290,7 +289,7 @@ async function main() {
   );
   const wpImportSlugs = new Set(publishedRows.map((r) => r.slug));
 
-  const xml = readFileSync(wxrPath, 'utf8');
+  const { xml, path: wxrPath } = readWxrXmlOrThrow(APP_ROOT);
   const parsed = parseLessonsFromWxr(xml);
   console.log(`Parsed ${parsed.length} published sfwd-lessons from ${wxrPath}`);
 

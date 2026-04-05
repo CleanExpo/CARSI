@@ -107,6 +107,7 @@ ai-review/screenshots/
 # WordPress migration export (regenerate with: pnpm wp:migrate). courses.json is tracked for deploy seeds.
 data/wordpress-export/*
 !data/wordpress-export/courses.json
+!data/wordpress-export/carsi.WordPress.2026-04-05.xml.gz
 
 # Prisma 7 generated client (`npm run postinstall` / `prisma generate`)
 src/generated/prisma/
