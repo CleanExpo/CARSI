@@ -21,6 +21,8 @@
     "start:with-course-seed": "prisma migrate deploy && npm run db:seed-courses && next start",
     "db:export-courses": "npx tsx scripts/export-courses-catalog.ts",
     "db:seed-courses": "npx tsx scripts/seed-courses-catalog.ts",
+    "db:seed-wp-export": "npx tsx scripts/seed-wordpress-export-courses.ts",
+    "db:seed-wp-lessons": "npx tsx scripts/seed-wordpress-lessons-wxr.ts",
     "lint": "next lint",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate deploy",
