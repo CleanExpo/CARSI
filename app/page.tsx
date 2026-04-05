@@ -13,14 +13,8 @@ import { IICRCDisciplineMap } from '@/components/lms/diagrams/IICRCDisciplineMap
 import { StudentJourneyMap } from '@/components/lms/diagrams/StudentJourneyMap';
 import { FAQSchema } from '@/components/seo/JsonLd';
 import { AcronymTooltip } from '@/components/ui/AcronymTooltip';
-import { getBackendOrigin } from '@/lib/env/public-url';
-import { getFeaturedCourseListItemsFromDatabase } from '@/lib/server/public-courses-list';
-import {
-  loadWpExportCourses,
-  mapWpExportToCourseListItem,
-  pickFeaturedFromExport,
-  type CourseListItem,
-} from '@/lib/wordpress-export-courses';
+import { getPublishedCourseListItemsFromDatabase } from '@/lib/server/public-courses-list';
+import type { CourseListItem } from '@/lib/wordpress-export-courses';
 import {
   ArrowRight,
   Award,
@@ -44,44 +38,15 @@ type Course = CourseListItem;
 // Data
 // ---------------------------------------------------------------------------
 
-/**
- * Popular / featured strip: first 3 published courses from Postgres (by `created_at`),
- * then same fallbacks as `/courses` when the DB is empty or unavailable.
- */
+/** Homepage featured strip: three published rows from `lms_courses` only (no static/API fallback). */
 async function getFeaturedCourses(): Promise<Course[]> {
-  const limit = 3;
-
-  if (process.env.DATABASE_URL?.trim()) {
-    try {
-      const items = await getFeaturedCourseListItemsFromDatabase(limit);
-      if (items.length > 0) {
-        return items;
-      }
-    } catch (e) {
-      console.error('[home] Failed to load featured courses from database', e);
-    }
+  if (!process.env.DATABASE_URL?.trim()) {
+    return [];
   }
-
-  const exported = loadWpExportCourses();
-  if (exported && exported.length > 0) {
-    const picked = pickFeaturedFromExport(exported, limit);
-    return picked.map(mapWpExportToCourseListItem);
-  }
-
-  const backendUrl = getBackendOrigin();
   try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000);
-    const res = await fetch(`${backendUrl}/api/lms/courses?limit=${limit}`, {
-      next: { revalidate: 60 },
-      signal: controller.signal,
-    });
-    clearTimeout(timeoutId);
-    if (!res.ok) return [];
-    const data = (await res.json()) as { items?: CourseListItem[] };
-    const items = data.items ?? [];
-    return items.slice(0, limit);
-  } catch {
+    return await getPublishedCourseListItemsFromDatabase({ limit: 3 });
+  } catch (e) {
+    console.error('[home] Failed to load featured courses from database', e);
     return [];
   }
 }

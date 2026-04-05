@@ -148,7 +148,7 @@ export function loadWpExportCourses(): WpExportCourse[] | null {
   }
 }
 
-/** First `limit` courses, preferring published when enough exist (same rules as home featured strip). */
+/** First `limit` courses, preferring published when enough exist (for static/export-driven UIs). */
 export function pickFeaturedFromExport(courses: WpExportCourse[], limit: number): WpExportCourse[] {
   const published = courses.filter((c) => c.status === 'published');
   const pool = published.length >= limit ? published : courses;
