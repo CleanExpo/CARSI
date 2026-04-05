@@ -22,34 +22,23 @@ export async function getPublishedCourseListItemsFromDatabase(options?: {
     where: publishedWhere,
     orderBy: { updatedAt: 'desc' },
     ...(options?.limit != null ? { take: options.limit } : {}),
-    include: {
-      instructor: { select: { fullName: true } },
-      modules: {
-        select: {
-          _count: { select: { lessons: true } },
-        },
-      },
-    },
   });
 
-  return rows.map((c) => {
-    const lessonCount = c.modules.reduce((acc, m) => acc + m._count.lessons, 0);
-    return {
-      id: c.id,
-      slug: c.slug,
-      title: c.title,
-      short_description: c.shortDescription,
-      price_aud: Number(c.priceAud),
-      is_free: c.isFree,
-      discipline: c.iicrcDiscipline,
-      thumbnail_url: normalizePublicAssetUrl(c.thumbnailUrl),
-      level: c.level,
-      category: c.category,
-      lesson_count: lessonCount,
-      updated_at: c.updatedAt.toISOString(),
-      instructor: c.instructor?.fullName ? { full_name: c.instructor.fullName } : null,
-    };
-  });
+  return rows.map((c) => ({
+    id: c.id,
+    slug: c.slug,
+    title: c.title,
+    short_description: c.shortDescription,
+    price_aud: Number(c.priceAud),
+    is_free: c.isFree,
+    discipline: c.iicrcDiscipline,
+    thumbnail_url: normalizePublicAssetUrl(c.thumbnailUrl),
+    level: c.level,
+    category: c.category,
+    lesson_count: null,
+    updated_at: c.updatedAt.toISOString(),
+    instructor: null,
+  }));
 }
 
 /**
