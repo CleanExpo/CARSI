@@ -104,8 +104,9 @@ ai-review/screenshots/
 .claude/data/minion-state.json
 .worktrees/
 .env*.local
-# WordPress migration export (regenerate with: pnpm wp:migrate)
-data/wordpress-export/
+# WordPress migration export (regenerate with: pnpm wp:migrate). courses.json is tracked for deploy seeds.
+data/wordpress-export/*
+!data/wordpress-export/courses.json
 
 # Prisma 7 generated client (`npm run postinstall` / `prisma generate`)
 src/generated/prisma/

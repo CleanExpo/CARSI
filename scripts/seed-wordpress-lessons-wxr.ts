@@ -12,6 +12,7 @@
  *   DATABASE_URL="postgresql://..." npx tsx scripts/seed-wordpress-lessons-wxr.ts
  *
  * Optional:
+ *   WP_EXPORT_COURSES_PATH=... — Woo courses.json (default data/wordpress-export/courses.json)
  *   WXR_PATH=...  — defaults to data/wordpress-export/carsi.WordPress.2026-04-05.xml
  */
 import 'dotenv/config';
@@ -24,11 +25,12 @@ import { fileURLToPath } from 'node:url';
 import { Prisma } from '../src/generated/prisma/client';
 import { prisma } from '../src/lib/prisma';
 import { isCoursesCatalogFile } from '../src/lib/seed/courses-catalog-types';
+import { readWpExportCoursesJsonOrThrow } from '../src/lib/seed/wp-export-courses-json';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const WP_EXPORT_PATH = join(__dirname, '..', 'data', 'wordpress-export', 'courses.json');
-const CATALOG_PATH = join(__dirname, '..', 'data', 'seed', 'courses-catalog.json');
-const DEFAULT_WXR = join(__dirname, '..', 'data', 'wordpress-export', 'carsi.WordPress.2026-04-05.xml');
+const APP_ROOT = join(__dirname, '..');
+const CATALOG_PATH = join(APP_ROOT, 'data', 'seed', 'courses-catalog.json');
+const DEFAULT_WXR = join(APP_ROOT, 'data', 'wordpress-export', 'carsi.WordPress.2026-04-05.xml');
 
 const HREF_RE = /carsi\.com\.au\/courses\/([^/"']+)\//g;
 
@@ -62,10 +64,13 @@ function slugMatch(seedSlug: string, hrefSlug: string): boolean {
   return s === h || h.startsWith(s) || s.startsWith(h);
 }
 
-function buildSeedExclusionWpSlugs(seedSlugs: string[], seedTitles: Set<string>): Set<string> {
+function buildSeedExclusionWpSlugs(
+  seedSlugs: string[],
+  seedTitles: Set<string>,
+  wpExportJson: string
+): Set<string> {
   const exclude = new Set<string>();
-  const raw = readFileSync(WP_EXPORT_PATH, 'utf8');
-  const wp = JSON.parse(raw) as WpExportRow[];
+  const wp = JSON.parse(wpExportJson) as WpExportRow[];
 
   for (const c of wp) {
     if (seedTitles.has(normTitle(c.title))) {
@@ -276,9 +281,9 @@ async function main() {
 
   const seedSlugs = catalog.courses.map((c) => c.slug.trim().toLowerCase());
   const seedTitles = new Set(catalog.courses.map((c) => normTitle(c.title)));
-  const excludeSlugs = buildSeedExclusionWpSlugs(seedSlugs, seedTitles);
+  const wpRaw = readWpExportCoursesJsonOrThrow(APP_ROOT);
+  const excludeSlugs = buildSeedExclusionWpSlugs(seedSlugs, seedTitles, wpRaw);
 
-  const wpRaw = readFileSync(WP_EXPORT_PATH, 'utf8');
   const wpRows = JSON.parse(wpRaw) as WpExportRow[];
   const publishedRows = wpRows.filter(
     (c) => !excludeSlugs.has(c.slug) && (c.status ?? '').trim().toLowerCase() === 'published'
