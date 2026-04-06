@@ -23,6 +23,7 @@
     "db:seed-courses": "npx tsx scripts/seed-courses-catalog.ts",
     "db:seed-wp-export": "npx tsx scripts/seed-wordpress-export-courses.ts",
     "db:seed-wp-lessons": "npx tsx scripts/seed-wordpress-lessons-wxr.ts",
+    "db:set-wp-export-draft": "npx tsx scripts/set-wp-export-courses-draft.ts",
     "lint": "next lint",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate deploy",

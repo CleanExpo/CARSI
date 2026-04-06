@@ -25,21 +25,15 @@ import { fileURLToPath } from 'node:url';
 import { Prisma } from '../src/generated/prisma/client';
 import { prisma } from '../src/lib/prisma';
 import { isCoursesCatalogFile } from '../src/lib/seed/courses-catalog-types';
-import { readWpExportCoursesJsonOrThrow } from '../src/lib/seed/wp-export-courses-json';
+import {
+  getPublishedWpImportRows,
+  type WpExportCourseRow,
+} from '../src/lib/seed/wp-export-published-import-slugs';
 import { readWxrXmlOrThrow } from '../src/lib/seed/wp-export-wxr-xml';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const APP_ROOT = join(__dirname, '..');
 const CATALOG_PATH = join(APP_ROOT, 'data', 'seed', 'courses-catalog.json');
-
-const HREF_RE = /carsi\.com\.au\/courses\/([^/"']+)\//g;
-
-type WpExportRow = {
-  slug: string;
-  title: string;
-  description?: string;
-  status?: string;
-};
 
 type ParsedLesson = {
   wpPostId: number;
@@ -49,48 +43,6 @@ type ParsedLesson = {
   encodedContent: string;
   sfwdMeta: string;
 };
-
-function normTitle(t: string): string {
-  return t
-    .toLowerCase()
-    .replace(/[\u2019']/g, "'")
-    .replace(/\s+/g, ' ')
-    .trim();
-}
-
-function slugMatch(seedSlug: string, hrefSlug: string): boolean {
-  const s = seedSlug.toLowerCase();
-  const h = hrefSlug.toLowerCase();
-  return s === h || h.startsWith(s) || s.startsWith(h);
-}
-
-function buildSeedExclusionWpSlugs(
-  seedSlugs: string[],
-  seedTitles: Set<string>,
-  wpExportJson: string
-): Set<string> {
-  const exclude = new Set<string>();
-  const wp = JSON.parse(wpExportJson) as WpExportRow[];
-
-  for (const c of wp) {
-    if (seedTitles.has(normTitle(c.title))) {
-      exclude.add(c.slug);
-    }
-    const desc = c.description ?? '';
-    let m: RegExpExecArray | null;
-    const re = new RegExp(HREF_RE.source, 'g');
-    while ((m = re.exec(desc)) !== null) {
-      const h = m[1].toLowerCase();
-      for (const s of seedSlugs) {
-        if (slugMatch(s, h)) exclude.add(c.slug);
-      }
-    }
-  }
-
-  exclude.add('introduction-to-monitoring-air-quality-on-the-job-site');
-  exclude.add('introduction-to-monitoring-air-quality-job-site');
-  return exclude;
-}
 
 function phpSerializedStringAfterKey(serialized: string, key: string): string | null {
   const marker = `${key}";s:`;
@@ -138,7 +90,7 @@ function slugPairsMatch(wooSlug: string, ldPath: string): boolean {
   return false;
 }
 
-function wooCandidatesForLd(ldPath: string, publishedRows: WpExportRow[]): string[] {
+function wooCandidatesForLd(ldPath: string, publishedRows: WpExportCourseRow[]): string[] {
   const l = ldPath.toLowerCase();
   const set = new Set<string>();
   for (const row of publishedRows) {
@@ -279,14 +231,7 @@ async function main() {
   }
 
   const seedSlugs = catalog.courses.map((c) => c.slug.trim().toLowerCase());
-  const seedTitles = new Set(catalog.courses.map((c) => normTitle(c.title)));
-  const wpRaw = readWpExportCoursesJsonOrThrow(APP_ROOT);
-  const excludeSlugs = buildSeedExclusionWpSlugs(seedSlugs, seedTitles, wpRaw);
-
-  const wpRows = JSON.parse(wpRaw) as WpExportRow[];
-  const publishedRows = wpRows.filter(
-    (c) => !excludeSlugs.has(c.slug) && (c.status ?? '').trim().toLowerCase() === 'published'
-  );
+  const { rows: publishedRows } = getPublishedWpImportRows(APP_ROOT);
   const wpImportSlugs = new Set(publishedRows.map((r) => r.slug));
 
   const { xml, path: wxrPath } = readWxrXmlOrThrow(APP_ROOT);

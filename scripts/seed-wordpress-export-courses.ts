@@ -27,7 +27,10 @@ import { fileURLToPath } from 'node:url';
 import { Prisma } from '../src/generated/prisma/client';
 import { prisma } from '../src/lib/prisma';
 import { isCoursesCatalogFile } from '../src/lib/seed/courses-catalog-types';
-import { readWpExportCoursesJsonOrThrow } from '../src/lib/seed/wp-export-courses-json';
+import {
+  getPublishedWpImportRows,
+  type WpExportCourseRow,
+} from '../src/lib/seed/wp-export-published-import-slugs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const APP_ROOT = join(__dirname, '..');
@@ -35,74 +38,10 @@ const CATALOG_PATH = join(APP_ROOT, 'data', 'seed', 'courses-catalog.json');
 
 const SEED_PASSWORD_PLACEHOLDER = 'catalog:seed-from-json';
 
-const HREF_RE = /carsi\.com\.au\/courses\/([^/"']+)\//g;
-
-type WpExportRow = {
-  slug: string;
-  title: string;
-  description?: string;
-  short_description?: string;
-  thumbnail_url?: string | null;
-  status?: string;
-  price_aud?: number;
-  is_free?: boolean;
-  duration_hours?: number | null;
-  level?: string | null;
-  category?: string | null;
-  tags?: unknown;
-  iicrc_discipline?: string | null;
-  cec_hours?: number | null;
-  meta?: unknown;
-  wp_id?: number;
-};
-
 function jsonInput(v: unknown): Prisma.InputJsonValue | typeof Prisma.JsonNull | undefined {
   if (v === undefined) return undefined;
   if (v === null) return Prisma.JsonNull;
   return v as Prisma.InputJsonValue;
-}
-
-function normTitle(t: string): string {
-  return t
-    .toLowerCase()
-    .replace(/[\u2019']/g, "'")
-    .replace(/\s+/g, ' ')
-    .trim();
-}
-
-function slugMatch(seedSlug: string, hrefSlug: string): boolean {
-  const s = seedSlug.toLowerCase();
-  const h = hrefSlug.toLowerCase();
-  return s === h || h.startsWith(s) || s.startsWith(h);
-}
-
-function buildSeedExclusionWpSlugs(
-  seedSlugs: string[],
-  seedTitles: Set<string>,
-  wpExportJson: string
-): Set<string> {
-  const exclude = new Set<string>();
-  const wp = JSON.parse(wpExportJson) as WpExportRow[];
-
-  for (const c of wp) {
-    if (seedTitles.has(normTitle(c.title))) {
-      exclude.add(c.slug);
-    }
-    const desc = c.description ?? '';
-    let m: RegExpExecArray | null;
-    const re = new RegExp(HREF_RE.source, 'g');
-    while ((m = re.exec(desc)) !== null) {
-      const h = m[1].toLowerCase();
-      for (const s of seedSlugs) {
-        if (slugMatch(s, h)) exclude.add(c.slug);
-      }
-    }
-  }
-
-  // Product slug omits "on-the" in export; LMS/learn URL uses the longer path.
-  exclude.add('introduction-to-monitoring-air-quality-on-the-job-site');
-  exclude.add('introduction-to-monitoring-air-quality-job-site');
-  return exclude;
 }
 
 async function ensureInstructorsFromCatalog() {
@@ -132,7 +71,7 @@ async function ensureInstructorsFromCatalog() {
 }
 
 function wpRowToCourseData(
-  wp: WpExportRow,
+  wp: WpExportCourseRow,
   instructorId: string
 ): Omit<Prisma.LmsCourseCreateInput, 'slug' | 'id' | 'modules'> {
   const priceNum = Number(wp.price_aud ?? 0);
@@ -159,7 +98,7 @@ function wpRowToCourseData(
   };
 }
 
-async function upsertWpCourse(wp: WpExportRow, instructorId: string): Promise<'created' | 'updated'> {
+async function upsertWpCourse(wp: WpExportCourseRow, instructorId: string): Promise<'created' | 'updated'> {
   const data = wpRowToCourseData(wp, instructorId);
   const existing = await prisma.lmsCourse.findUnique({
     where: { slug: wp.slug },
@@ -205,17 +144,7 @@ async function main() {
     }
   }
 
-  const seedSlugs = catalog.courses.map((c) => c.slug.trim().toLowerCase());
-  const seedTitles = new Set(catalog.courses.map((c) => normTitle(c.title)));
-  const wpRaw = readWpExportCoursesJsonOrThrow(APP_ROOT);
-  const excludeSlugs = buildSeedExclusionWpSlugs(seedSlugs, seedTitles, wpRaw);
-
-  const wp = JSON.parse(wpRaw) as WpExportRow[];
-
-  const toImport = wp.filter(
-    (c) =>
-      !excludeSlugs.has(c.slug) && (c.status ?? '').trim().toLowerCase() === 'published'
-  );
+  const { rows: toImport, excludeSlugs } = getPublishedWpImportRows(APP_ROOT);
 
   let created = 0;
   let updated = 0;
