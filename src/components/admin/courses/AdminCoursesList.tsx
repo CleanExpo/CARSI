@@ -1,9 +1,9 @@
 'use client';
 
-import { Loader2, Pencil, Plus, Trash2 } from 'lucide-react';
+import { Loader2, Pencil, Plus, Search, Trash2, X } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { normalizeImageSrcForApp } from '@/lib/remote-image';
 
@@ -28,6 +28,32 @@ type Row = {
   published: boolean;
   updatedAt: string;
 };
+
+type StatusFilter = 'all' | 'draft' | 'published';
+type SortKey = 'updated' | 'title' | 'modules';
+
+function parseStatus(raw: string | null): StatusFilter {
+  if (raw === 'draft' || raw === 'published') return raw;
+  return 'all';
+}
+
+function parseSort(raw: string | null): SortKey {
+  if (raw === 'title' || raw === 'modules' || raw === 'updated') return raw;
+  return 'updated';
+}
+
+function buildCourseListParams(parts: {
+  status: StatusFilter;
+  q: string;
+  sort: SortKey;
+}) {
+  const p = new URLSearchParams();
+  if (parts.status !== 'all') p.set('status', parts.status);
+  const qt = parts.q.trim();
+  if (qt) p.set('q', qt);
+  if (parts.sort !== 'updated') p.set('sort', parts.sort);
+  return p;
+}
 
 /**
  * Native <img> (not next/image): CDNs like Cloudinary often block or throttle when a browser
@@ -73,32 +99,86 @@ function AdminCourseListThumb({
 
 export function AdminCoursesList() {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { toast } = useToast();
+
+  const status = parseStatus(searchParams.get('status'));
+  const qFromUrl = searchParams.get('q')?.trim() ?? '';
+  const sort = parseSort(searchParams.get('sort'));
+
+  const [queryDraft, setQueryDraft] = useState(qFromUrl);
+  useEffect(() => {
+    setQueryDraft(qFromUrl);
+  }, [qFromUrl]);
+
+  const apiUrl = useMemo(() => {
+    const p = buildCourseListParams({ status, q: qFromUrl, sort });
+    const qs = p.toString();
+    return qs ? `/api/admin/courses?${qs}` : '/api/admin/courses';
+  }, [status, qFromUrl, sort]);
+
   const [rows, setRows] = useState<Row[] | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Row | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const hasLoadedOnceRef = useRef(false);
 
   const load = useCallback(async () => {
     setLoadError(null);
+    if (hasLoadedOnceRef.current) setRefreshing(true);
     try {
-      // Avoid any caching; courses can change immediately after create/update.
-      const res = await fetch('/api/admin/courses', { credentials: 'include', cache: 'no-store' });
+      const res = await fetch(apiUrl, { credentials: 'include', cache: 'no-store' });
       if (!res.ok) {
         const j = await res.json().catch(() => ({}));
         throw new Error(typeof j.detail === 'string' ? j.detail : 'Failed to load courses');
       }
       const data = (await res.json()) as { courses: Row[] };
       setRows(data.courses);
+      hasLoadedOnceRef.current = true;
     } catch (e) {
       setLoadError(e instanceof Error ? e.message : 'Failed to load');
       setRows([]);
+      hasLoadedOnceRef.current = true;
+    } finally {
+      setRefreshing(false);
     }
-  }, []);
+  }, [apiUrl]);
 
   useEffect(() => {
     void load();
   }, [load]);
+
+  // Debounce typing → URL `q` (keeps shareable links and server-side search)
+  useEffect(() => {
+    const normalized = queryDraft.trim();
+    if (normalized === qFromUrl.trim()) return;
+    const t = window.setTimeout(() => {
+      const p = buildCourseListParams({ status, q: normalized, sort });
+      const qs = p.toString();
+      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+    }, 380);
+    return () => window.clearTimeout(t);
+  }, [queryDraft, qFromUrl, status, sort, pathname, router]);
+
+  function replaceWithParams(next: { status?: StatusFilter; q?: string; sort?: SortKey }) {
+    const p = buildCourseListParams({
+      status: next.status ?? status,
+      q: next.q !== undefined ? next.q : queryDraft,
+      sort: next.sort ?? sort,
+    });
+    const qs = p.toString();
+    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+  }
+
+  function clearFilters() {
+    setQueryDraft('');
+    router.replace(pathname, { scroll: false });
+  }
+
+  const hasActiveFilters =
+    status !== 'all' || Boolean(qFromUrl) || sort !== 'updated' || queryDraft.trim() !== qFromUrl;
 
   async function confirmDelete() {
     if (!deleteTarget) return;
@@ -142,6 +222,15 @@ export function AdminCoursesList() {
     );
   }
 
+  const emptyBecauseFilters = rows.length === 0 && hasActiveFilters;
+  const emptyNoCourses = rows.length === 0 && !hasActiveFilters;
+
+  const statusTabs: { id: StatusFilter; label: string }[] = [
+    { id: 'all', label: 'All' },
+    { id: 'published', label: 'Published' },
+    { id: 'draft', label: 'Draft' },
+  ];
+
   return (
     <div className="space-y-6 p-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -161,7 +250,102 @@ export function AdminCoursesList() {
         </Link>
       </div>
 
-      {rows.length === 0 ? (
+      <div
+        className="rounded-2xl border border-white/10 p-4 shadow-[0_8px_40px_rgba(0,0,0,0.25)]"
+        style={{ background: 'rgba(255,255,255,0.04)' }}
+      >
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="relative min-w-0 flex-1 lg:max-w-md">
+            <Search
+              className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-white/35"
+              aria-hidden
+            />
+            <input
+              type="search"
+              value={queryDraft}
+              onChange={(e) => setQueryDraft(e.target.value)}
+              placeholder="Search by title or slug…"
+              autoComplete="off"
+              className="w-full rounded-xl border border-white/12 bg-black/25 py-2.5 pr-3 pl-10 text-sm text-white/90 placeholder:text-white/30 outline-none ring-[#2490ed]/0 transition-[box-shadow,border-color] focus:border-[#2490ed]/50 focus:ring-2 focus:ring-[#2490ed]/25"
+              aria-label="Search courses"
+            />
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3">
+            <div
+              className="inline-flex rounded-xl border border-white/10 p-0.5"
+              style={{ background: 'rgba(0,0,0,0.2)' }}
+              role="tablist"
+              aria-label="Publication status"
+            >
+              {statusTabs.map((tab) => {
+                const active = status === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={active}
+                    onClick={() => replaceWithParams({ status: tab.id })}
+                    className={`rounded-[10px] px-3 py-1.5 text-xs font-semibold transition-colors ${
+                      active
+                        ? 'text-white shadow-sm'
+                        : 'text-white/45 hover:text-white/70'
+                    }`}
+                    style={
+                      active
+                        ? { background: '#2490ed' }
+                        : { background: 'transparent' }
+                    }
+                  >
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </div>
+
+            <label className="flex items-center gap-2 text-xs text-white/50">
+              <span className="whitespace-nowrap">Sort</span>
+              <select
+                value={sort}
+                onChange={(e) =>
+                  replaceWithParams({ sort: parseSort(e.target.value) })
+                }
+                className="rounded-xl border border-white/12 bg-black/30 py-2 pr-8 pl-3 text-xs font-medium text-white/90 outline-none focus:border-[#2490ed]/50 focus:ring-2 focus:ring-[#2490ed]/25"
+              >
+                <option value="updated">Last updated</option>
+                <option value="title">Title (A–Z)</option>
+                <option value="modules">Most modules</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-white/8 pt-3 text-xs text-white/40">
+          <p>
+            <span className="font-medium text-white/60">{rows.length}</span>
+            {rows.length === 1 ? ' course' : ' courses'}
+            {refreshing ? (
+              <span className="ml-2 inline-flex items-center gap-1 text-white/35">
+                <Loader2 className="h-3 w-3 animate-spin" />
+                Updating…
+              </span>
+            ) : null}
+          </p>
+          {hasActiveFilters ? (
+            <button
+              type="button"
+              onClick={() => clearFilters()}
+              className="inline-flex items-center gap-1 rounded-lg px-2 py-1 font-medium text-[#2490ed] transition-colors hover:bg-white/5 hover:text-white"
+            >
+              <X className="h-3.5 w-3.5" />
+              Clear filters
+            </button>
+          ) : null}
+        </div>
+      </div>
+
+      {emptyNoCourses ? (
         <div
           className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/15 py-20 text-center"
           style={{ background: 'rgba(255,255,255,0.02)' }}
@@ -179,6 +363,23 @@ export function AdminCoursesList() {
             <Plus className="h-4 w-4" />
             Add course
           </Link>
+        </div>
+      ) : emptyBecauseFilters ? (
+        <div
+          className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/15 py-16 text-center"
+          style={{ background: 'rgba(255,255,255,0.02)' }}
+        >
+          <p className="text-lg font-medium text-white/80">No matching courses</p>
+          <p className="mt-2 max-w-md text-sm text-white/45">
+            Try a different search, status, or sort — or clear filters to see everything.
+          </p>
+          <button
+            type="button"
+            onClick={() => clearFilters()}
+            className="mt-6 inline-flex items-center gap-2 rounded-lg border border-white/15 px-4 py-2.5 text-sm font-medium text-white/85 transition-colors hover:bg-white/5"
+          >
+            Clear filters
+          </button>
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
