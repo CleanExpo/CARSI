@@ -239,9 +239,62 @@ export function courseToAdminDto(course: CourseWithCurriculum) {
   };
 }
 
-export async function adminListCourses() {
+/** Matches list cards: published if `isPublished` or status is published (case-insensitive). */
+const publishedWhere: Prisma.LmsCourseWhereInput = {
+  OR: [
+    { isPublished: true },
+    { status: { equals: 'published', mode: 'insensitive' } },
+  ],
+};
+
+export type AdminListCoursesOptions = {
+  status?: 'all' | 'draft' | 'published';
+  /** Trimmed; title/slug contains, case-insensitive */
+  q?: string;
+  sort?: 'updated' | 'title' | 'modules';
+};
+
+function adminCoursesListWhere(options: AdminListCoursesOptions): Prisma.LmsCourseWhereInput {
+  const status = options.status ?? 'all';
+  const q = options.q?.trim();
+
+  const parts: Prisma.LmsCourseWhereInput[] = [];
+
+  if (status === 'published') {
+    parts.push(publishedWhere);
+  } else if (status === 'draft') {
+    parts.push({ NOT: publishedWhere });
+  }
+
+  if (q) {
+    parts.push({
+      OR: [
+        { title: { contains: q, mode: 'insensitive' } },
+        { slug: { contains: q, mode: 'insensitive' } },
+      ],
+    });
+  }
+
+  if (parts.length === 0) return {};
+  if (parts.length === 1) return parts[0]!;
+  return { AND: parts };
+}
+
+export async function adminListCourses(options: AdminListCoursesOptions = {}) {
+  const sort = options.sort ?? 'updated';
+
+  let orderBy: Prisma.LmsCourseOrderByWithRelationInput | Prisma.LmsCourseOrderByWithRelationInput[];
+  if (sort === 'title') {
+    orderBy = { title: 'asc' };
+  } else if (sort === 'modules') {
+    orderBy = { modules: { _count: 'desc' } };
+  } else {
+    orderBy = { updatedAt: 'desc' };
+  }
+
   const rows = await prisma.lmsCourse.findMany({
-    orderBy: { updatedAt: 'desc' },
+    where: adminCoursesListWhere(options),
+    orderBy,
     include: {
       _count: { select: { modules: true } },
     },

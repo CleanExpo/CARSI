@@ -8,7 +8,25 @@ import {
   type AdminCourseWriteInput,
 } from '@/lib/admin/admin-courses-service';
 
-export async function GET() {
+function parseListQuery(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const statusRaw = searchParams.get('status');
+  const status =
+    statusRaw === 'draft' || statusRaw === 'published' || statusRaw === 'all'
+      ? statusRaw
+      : 'all';
+
+  let q = searchParams.get('q')?.trim() ?? '';
+  if (q.length > 200) q = q.slice(0, 200);
+
+  const sortRaw = searchParams.get('sort');
+  const sort =
+    sortRaw === 'title' || sortRaw === 'modules' || sortRaw === 'updated' ? sortRaw : 'updated';
+
+  return { status, q: q || undefined, sort };
+}
+
+export async function GET(request: NextRequest) {
   const session = await getAdminSessionOrNull();
   if (!session) {
     return NextResponse.json({ detail: 'Unauthorized' }, { status: 401 });
@@ -19,7 +37,8 @@ export async function GET() {
   }
 
   try {
-    const courses = await adminListCourses();
+    const { status, q, sort } = parseListQuery(request);
+    const courses = await adminListCourses({ status, q, sort });
     return NextResponse.json(
       { courses },
       {
