@@ -109,6 +109,10 @@ export type CourseListItem = {
   level?: string | null;
   category?: string | null;
   lesson_count?: number | null;
+  /** LMS row status when loaded from Prisma (dashboard catalogue). */
+  catalog_status?: 'draft' | 'published' | string | null;
+  /** Number of modules (LMS curriculum); used for dashboard sorting. */
+  module_count?: number | null;
   updated_at?: string | null;
   instructor?: { full_name: string } | null;
 };
