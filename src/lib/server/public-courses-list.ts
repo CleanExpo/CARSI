@@ -9,6 +9,96 @@ const publishedWhere = {
   ],
 };
 
+const draftWhere = {
+  status: { equals: 'draft', mode: 'insensitive' as const },
+};
+
+export type DashboardCourseStatusFilter = 'all' | 'draft' | 'published';
+
+function mapDashboardCourseRow(c: {
+  id: string;
+  slug: string;
+  title: string;
+  shortDescription: string | null;
+  priceAud: { toString(): string };
+  isFree: boolean;
+  iicrcDiscipline: string | null;
+  thumbnailUrl: string | null;
+  level: string | null;
+  category: string | null;
+  status: string;
+  updatedAt: Date;
+  _count: { modules: number };
+}): CourseListItem {
+  const st = c.status.trim().toLowerCase();
+  return {
+    id: c.id,
+    slug: c.slug,
+    title: c.title,
+    short_description: c.shortDescription,
+    price_aud: Number(c.priceAud),
+    is_free: c.isFree,
+    discipline: c.iicrcDiscipline,
+    thumbnail_url: normalizePublicAssetUrl(c.thumbnailUrl),
+    level: c.level,
+    category: c.category,
+    lesson_count: null,
+    updated_at: c.updatedAt.toISOString(),
+    instructor: null,
+    catalog_status: st === 'draft' ? 'draft' : 'published',
+    module_count: c._count.modules,
+  };
+}
+
+/**
+ * Full LMS catalogue for `/dashboard/courses`: optional draft / published / all,
+ * with module counts. Draft-only lists are ordered by most modules first.
+ */
+export async function getDashboardCourseListItemsFromDatabase(options: {
+  status: DashboardCourseStatusFilter;
+}): Promise<CourseListItem[]> {
+  if (!process.env.DATABASE_URL?.trim()) {
+    return [];
+  }
+
+  const countInclude = {
+    _count: { select: { modules: true } },
+  } as const;
+
+  if (options.status === 'draft') {
+    const rows = await prisma.lmsCourse.findMany({
+      where: draftWhere,
+      orderBy: { modules: { _count: 'desc' } },
+      include: countInclude,
+    });
+    return rows.map(mapDashboardCourseRow);
+  }
+
+  if (options.status === 'published') {
+    const rows = await prisma.lmsCourse.findMany({
+      where: publishedWhere,
+      orderBy: { updatedAt: 'desc' },
+      include: countInclude,
+    });
+    return rows.map(mapDashboardCourseRow);
+  }
+
+  const [publishedRows, draftRows] = await Promise.all([
+    prisma.lmsCourse.findMany({
+      where: publishedWhere,
+      orderBy: { updatedAt: 'desc' },
+      include: countInclude,
+    }),
+    prisma.lmsCourse.findMany({
+      where: draftWhere,
+      orderBy: { modules: { _count: 'desc' } },
+      include: countInclude,
+    }),
+  ]);
+
+  return [...publishedRows.map(mapDashboardCourseRow), ...draftRows.map(mapDashboardCourseRow)];
+}
+
 /**
  * Published catalogue rows for `/courses` and other public listings.
  * Matches the `CourseListItem` shape used by `CourseGrid` / `CourseCard`.
