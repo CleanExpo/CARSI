@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { BookOpen, Clock } from 'lucide-react';
+import { BookOpen, Clock, Layers } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 
@@ -22,6 +22,8 @@ interface CourseCardProps {
     category?: string | null;
     discipline?: string | null;
     lesson_count?: number | null;
+    module_count?: number | null;
+    catalog_status?: string | null;
     thumbnail_url?: string | null;
     updated_at?: string | null;
     instructor?: { full_name: string } | null;
@@ -252,19 +254,33 @@ export function CourseCard({ course, priorityImage }: CourseCardProps) {
           />
         ) : null}
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-black/20" />
-        {discipline && (
-          <span
-            className="absolute top-2 left-2 rounded-md px-2 py-0.5 font-mono text-xs font-bold"
-            style={{
-              color: ds.color,
-              background: 'rgba(0,0,0,0.6)',
-              border: `1px solid ${ds.color}40`,
-              boxShadow: `0 0 8px ${ds.glow}`,
-            }}
-          >
-            {discipline}
-          </span>
-        )}
+        <div className="absolute top-2 left-2 flex flex-wrap gap-1">
+          {discipline && (
+            <span
+              className="rounded-md px-2 py-0.5 font-mono text-xs font-bold"
+              style={{
+                color: ds.color,
+                background: 'rgba(0,0,0,0.6)',
+                border: `1px solid ${ds.color}40`,
+                boxShadow: `0 0 8px ${ds.glow}`,
+              }}
+            >
+              {discipline}
+            </span>
+          )}
+          {course.catalog_status === 'draft' && (
+            <span
+              className="rounded-md px-2 py-0.5 text-xs font-semibold"
+              style={{
+                color: 'rgba(255,255,255,0.85)',
+                background: 'rgba(237,157,36,0.35)',
+                border: '1px solid rgba(237,157,36,0.55)',
+              }}
+            >
+              Draft
+            </span>
+          )}
+        </div>
         <span
           className="absolute top-2 right-2 rounded-md px-2 py-0.5 text-xs font-semibold"
           style={
@@ -312,6 +328,12 @@ export function CourseCard({ course, priorityImage }: CourseCardProps) {
             className="flex items-center gap-2 text-xs"
             style={{ color: 'rgba(255,255,255,0.6)' }}
           >
+            {course.module_count != null && (
+              <span className="flex items-center gap-1" title="Modules">
+                <Layers className="h-3 w-3" />
+                {course.module_count}
+              </span>
+            )}
             {course.lesson_count != null && (
               <span className="flex items-center gap-1">
                 <BookOpen className="h-3 w-3" />

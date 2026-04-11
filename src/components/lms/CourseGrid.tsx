@@ -32,6 +32,8 @@ interface Course {
   category?: string | null;
   discipline?: string | null;
   lesson_count?: number | null;
+  module_count?: number | null;
+  catalog_status?: string | null;
   thumbnail_url?: string | null;
   updated_at?: string | null;
   instructor?: { full_name: string } | null;
@@ -41,9 +43,13 @@ interface CourseGridProps {
   courses: Course[];
   initialTab?: string;
   loading?: boolean;
+  /** When true, adds “Most modules” sort (dashboard DB catalogue). */
+  showModulesSort?: boolean;
+  /** Default sort column (e.g. `modules` when viewing drafts). */
+  initialSortBy?: 'title' | 'price' | 'updated' | 'modules';
 }
 
-type SortKey = 'title' | 'price' | 'updated';
+type SortKey = 'title' | 'price' | 'updated' | 'modules';
 
 function priceNum(p: number | string): number {
   const n = typeof p === 'string' ? parseFloat(p) : p;
@@ -55,6 +61,11 @@ function sortCourses(courses: Course[], sortBy: SortKey): Course[] {
     if (sortBy === 'title') return a.title.localeCompare(b.title);
     if (sortBy === 'price') {
       return priceNum(a.price_aud) - priceNum(b.price_aud);
+    }
+    if (sortBy === 'modules') {
+      const ma = a.module_count ?? 0;
+      const mb = b.module_count ?? 0;
+      return mb - ma;
     }
     const da = a.updated_at ? new Date(a.updated_at).getTime() : 0;
     const db = b.updated_at ? new Date(b.updated_at).getTime() : 0;
@@ -73,15 +84,26 @@ function matchesDiscipline(course: Course, tab: DisciplineTab): boolean {
   return false;
 }
 
-export function CourseGrid({ courses, initialTab = 'All', loading = false }: CourseGridProps) {
+export function CourseGrid({
+  courses,
+  initialTab = 'All',
+  loading = false,
+  showModulesSort = false,
+  initialSortBy,
+}: CourseGridProps) {
   const validInitial: DisciplineTab = (DISCIPLINE_TABS as readonly string[]).includes(initialTab)
     ? (initialTab as DisciplineTab)
     : 'All';
 
   const [activeTab, setActiveTab] = useState<DisciplineTab>(validInitial);
   const [searchQuery, setSearchQuery] = useState('');
-  /** WordPress export has no `updated_at`; default to title so the grid is deterministic. */
-  const [sortBy, setSortBy] = useState<SortKey>('title');
+  const [sortBy, setSortBy] = useState<SortKey>(() => {
+    if (initialSortBy === 'modules') return showModulesSort ? 'modules' : 'updated';
+    if (initialSortBy === 'price') return 'price';
+    if (initialSortBy === 'updated') return 'updated';
+    if (initialSortBy === 'title') return 'title';
+    return 'title';
+  });
   const didFallbackTab = useRef(false);
 
   // URL ?discipline=WRT with sparse `discipline` fields used to yield zero rows; reset to All once.
@@ -193,6 +215,7 @@ export function CourseGrid({ courses, initialTab = 'All', loading = false }: Cou
           }}
         >
           <option value="updated">Recently Updated</option>
+          {showModulesSort ? <option value="modules">Most modules</option> : null}
           <option value="price">Price</option>
           <option value="title">Title A–Z</option>
         </select>
