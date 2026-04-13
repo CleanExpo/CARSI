@@ -312,32 +312,6 @@ export async function adminListCourses(options: AdminListCoursesOptions = {}) {
   }));
 }
 
-const BULK_STATUS_MAX_IDS = 200;
-
-/**
- * Sets `status` and `isPublished` for many courses (admin catalogue management).
- */
-export async function adminBulkSetCoursePublished(
-  ids: string[],
-  published: boolean
-): Promise<{ count: number }> {
-  const unique = [...new Set(ids.map((id) => id.trim()).filter(Boolean))];
-  if (unique.length === 0) return { count: 0 };
-  if (unique.length > BULK_STATUS_MAX_IDS) {
-    throw new Error('BULK_LIMIT');
-  }
-
-  const result = await prisma.lmsCourse.updateMany({
-    where: { id: { in: unique } },
-    data: {
-      status: published ? 'published' : 'draft',
-      isPublished: published,
-    },
-  });
-
-  return { count: result.count };
-}
-
 export async function adminGetCourse(id: string): Promise<CourseWithCurriculum | null> {
   return prisma.lmsCourse.findUnique({
     where: { id },
@@ -500,4 +474,31 @@ export async function adminDeleteCourse(id: string): Promise<void> {
     throw new Error('NOT_FOUND');
   }
   await prisma.lmsCourse.delete({ where: { id } });
+}
+
+export const ADMIN_BULK_PUBLICATION_MAX_IDS = 200;
+
+/**
+ * Set publication state for many courses (same rules as create/update: `status` + `isPublished`).
+ */
+export async function adminBulkSetCoursePublication(
+  ids: string[],
+  published: boolean
+): Promise<number> {
+  const unique = [...new Set(ids.map((id) => id.trim()).filter(Boolean))];
+  if (unique.length === 0) {
+    throw new Error('NO_IDS');
+  }
+  if (unique.length > ADMIN_BULK_PUBLICATION_MAX_IDS) {
+    throw new Error('TOO_MANY_IDS');
+  }
+
+  const result = await prisma.lmsCourse.updateMany({
+    where: { id: { in: unique } },
+    data: {
+      status: published ? 'published' : 'draft',
+      isPublished: published,
+    },
+  });
+  return result.count;
 }

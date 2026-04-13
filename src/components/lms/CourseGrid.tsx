@@ -1,12 +1,8 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Loader2, Search, SlidersHorizontal } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-
-import { useToast } from '@/hooks/use-toast';
-
+import { Search, SlidersHorizontal } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { CourseCard } from './CourseCard';
 import { CourseGridSkeleton } from './CourseCardSkeleton';
 
@@ -51,10 +47,6 @@ interface CourseGridProps {
   showModulesSort?: boolean;
   /** Default sort column (e.g. `modules` when viewing drafts). */
   initialSortBy?: 'title' | 'price' | 'updated' | 'modules';
-  /**
-   * When true (dashboard + admin session), show per-card checkboxes and bulk publish/draft actions.
-   */
-  enableCatalogManagement?: boolean;
 }
 
 type SortKey = 'title' | 'price' | 'updated' | 'modules';
@@ -98,18 +90,13 @@ export function CourseGrid({
   loading = false,
   showModulesSort = false,
   initialSortBy,
-  enableCatalogManagement = false,
 }: CourseGridProps) {
-  const router = useRouter();
-  const { toast } = useToast();
   const validInitial: DisciplineTab = (DISCIPLINE_TABS as readonly string[]).includes(initialTab)
     ? (initialTab as DisciplineTab)
     : 'All';
 
   const [activeTab, setActiveTab] = useState<DisciplineTab>(validInitial);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selected, setSelected] = useState<Record<string, boolean>>({});
-  const [bulkPending, setBulkPending] = useState(false);
   const [sortBy, setSortBy] = useState<SortKey>(() => {
     if (initialSortBy === 'modules') return showModulesSort ? 'modules' : 'updated';
     if (initialSortBy === 'price') return 'price';
@@ -141,77 +128,6 @@ export function CourseGrid({
     );
     return sortCourses(base, sortBy);
   }, [courses, activeTab, searchQuery, sortBy]);
-
-  const validIds = useMemo(() => new Set(courses.map((c) => c.id)), [courses]);
-
-  useEffect(() => {
-    setSelected((s) => {
-      const next: Record<string, boolean> = {};
-      for (const id of Object.keys(s)) {
-        if (s[id] && validIds.has(id)) next[id] = true;
-      }
-      return next;
-    });
-  }, [validIds]);
-
-  const selectedIds = useMemo(
-    () => Object.keys(selected).filter((id) => selected[id]),
-    [selected]
-  );
-  const selectedCount = selectedIds.length;
-
-  const toggleSelect = useCallback((id: string) => {
-    setSelected((s) => {
-      const next = { ...s };
-      if (next[id]) delete next[id];
-      else next[id] = true;
-      return next;
-    });
-  }, []);
-
-  const selectAllInView = useCallback(() => {
-    setSelected((s) => {
-      const next = { ...s };
-      for (const c of filtered) next[c.id] = true;
-      return next;
-    });
-  }, [filtered]);
-
-  const clearSelection = useCallback(() => setSelected({}), []);
-
-  const applyBulkStatus = useCallback(
-    async (published: boolean) => {
-      if (selectedIds.length === 0) return;
-      setBulkPending(true);
-      try {
-        const res = await fetch('/api/admin/courses/bulk-status', {
-          method: 'POST',
-          credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ids: selectedIds, published }),
-        });
-        const j = (await res.json().catch(() => ({}))) as { detail?: string; updated?: number };
-        if (!res.ok) {
-          throw new Error(typeof j.detail === 'string' ? j.detail : 'Update failed');
-        }
-        const n = typeof j.updated === 'number' ? j.updated : selectedIds.length;
-        toast({
-          title: published ? 'Published selected courses' : 'Moved selected courses to draft',
-          description: `Updated ${n} course${n === 1 ? '' : 's'}.`,
-        });
-        clearSelection();
-        router.refresh();
-      } catch (e) {
-        toast({
-          title: e instanceof Error ? e.message : 'Update failed',
-          variant: 'destructive',
-        });
-      } finally {
-        setBulkPending(false);
-      }
-    },
-    [selectedIds, toast, clearSelection, router]
-  );
 
   return (
     <div>
@@ -245,81 +161,6 @@ export function CourseGrid({
           );
         })}
       </div>
-
-      {enableCatalogManagement ? (
-        <div
-          className="mb-5 rounded-lg border p-4"
-          style={{
-            background: 'rgba(36,144,237,0.06)',
-            borderColor: 'rgba(36,144,237,0.22)',
-          }}
-        >
-          <p className="mb-3 text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.55)' }}>
-            Select one or more courses, then publish them or move them back to draft. Uses your
-            admin session (same as /admin).
-          </p>
-          <div className="flex flex-wrap items-center gap-2">
-            <button
-              type="button"
-              onClick={() => selectAllInView()}
-              disabled={filtered.length === 0 || bulkPending}
-              className="rounded-lg px-3 py-2 text-xs font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/50 disabled:opacity-40"
-              style={{
-                color: 'rgba(255,255,255,0.85)',
-                background: 'rgba(255,255,255,0.08)',
-                border: '1px solid rgba(255,255,255,0.12)',
-              }}
-            >
-              Select all in view ({filtered.length})
-            </button>
-            <button
-              type="button"
-              onClick={() => clearSelection()}
-              disabled={selectedCount === 0 || bulkPending}
-              className="rounded-lg px-3 py-2 text-xs font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/50 disabled:opacity-40"
-              style={{
-                color: 'rgba(255,255,255,0.75)',
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.1)',
-              }}
-            >
-              Clear selection
-            </button>
-            <span className="text-xs" style={{ color: 'rgba(255,255,255,0.45)' }}>
-              {selectedCount} selected
-            </span>
-            <span className="mx-1 h-4 w-px shrink-0 bg-white/15" aria-hidden />
-            <button
-              type="button"
-              onClick={() => void applyBulkStatus(true)}
-              disabled={selectedCount === 0 || bulkPending}
-              className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/50 disabled:opacity-40"
-              style={{
-                color: '#fff',
-                background: '#2490ed',
-                border: '1px solid rgba(36,144,237,0.5)',
-              }}
-            >
-              {bulkPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
-              Publish
-            </button>
-            <button
-              type="button"
-              onClick={() => void applyBulkStatus(false)}
-              disabled={selectedCount === 0 || bulkPending}
-              className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/50 disabled:opacity-40"
-              style={{
-                color: 'rgba(255,255,255,0.9)',
-                background: 'rgba(237,157,36,0.2)',
-                border: '1px solid rgba(237,157,36,0.45)',
-              }}
-            >
-              {bulkPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
-              Move to draft
-            </button>
-          </div>
-        </div>
-      ) : null}
 
       {/* Search + sort */}
       <div className="mb-6 flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
@@ -392,18 +233,7 @@ export function CourseGrid({
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, ease: smoothEase, delay: i * 0.05 }}
             >
-              <CourseCard
-                course={course}
-                priorityImage={i < 9}
-                selection={
-                  enableCatalogManagement
-                    ? {
-                        checked: Boolean(selected[course.id]),
-                        onToggle: () => toggleSelect(course.id),
-                      }
-                    : undefined
-                }
-              />
+              <CourseCard course={course} priorityImage={i < 9} />
             </motion.div>
           ))}
         </div>

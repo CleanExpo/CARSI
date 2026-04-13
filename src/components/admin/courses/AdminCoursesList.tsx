@@ -123,7 +123,13 @@ export function AdminCoursesList() {
   const [refreshing, setRefreshing] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Row | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [selected, setSelected] = useState<Set<string>>(() => new Set());
+  const [bulkSaving, setBulkSaving] = useState(false);
   const hasLoadedOnceRef = useRef(false);
+
+  useEffect(() => {
+    setSelected(new Set());
+  }, [status, qFromUrl, sort]);
 
   const load = useCallback(async () => {
     setLoadError(null);
@@ -179,6 +185,64 @@ export function AdminCoursesList() {
 
   const hasActiveFilters =
     status !== 'all' || Boolean(qFromUrl) || sort !== 'updated' || queryDraft.trim() !== qFromUrl;
+
+  const listRows = rows ?? [];
+  const allVisibleSelected =
+    listRows.length > 0 && listRows.every((r) => selected.has(r.id));
+
+  function toggleSelectAllVisible() {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      const ids = listRows.map((r) => r.id);
+      const allOn = ids.length > 0 && ids.every((id) => next.has(id));
+      if (allOn) {
+        ids.forEach((id) => next.delete(id));
+      } else {
+        ids.forEach((id) => next.add(id));
+      }
+      return next;
+    });
+  }
+
+  function toggleOne(id: string) {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  async function bulkSetPublished(published: boolean) {
+    if (selected.size === 0 || bulkSaving) return;
+    setBulkSaving(true);
+    try {
+      const res = await fetch('/api/admin/courses', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ courseIds: [...selected], published }),
+      });
+      const j = (await res.json().catch(() => ({}))) as { detail?: string; updated?: number };
+      if (!res.ok) {
+        throw new Error(typeof j.detail === 'string' ? j.detail : 'Update failed');
+      }
+      const n = typeof j.updated === 'number' ? j.updated : selected.size;
+      toast({
+        title: published ? 'Published' : 'Set to draft',
+        description: `Updated ${n} course${n === 1 ? '' : 's'}.`,
+      });
+      setSelected(new Set());
+      await load();
+    } catch (e) {
+      toast({
+        title: e instanceof Error ? e.message : 'Update failed',
+        variant: 'destructive',
+      });
+    } finally {
+      setBulkSaving(false);
+    }
+  }
 
   async function confirmDelete() {
     if (!deleteTarget) return;
@@ -332,18 +396,73 @@ export function AdminCoursesList() {
               </span>
             ) : null}
           </p>
-          {hasActiveFilters ? (
-            <button
-              type="button"
-              onClick={() => clearFilters()}
-              className="inline-flex items-center gap-1 rounded-lg px-2 py-1 font-medium text-[#2490ed] transition-colors hover:bg-white/5 hover:text-white"
-            >
-              <X className="h-3.5 w-3.5" />
-              Clear filters
-            </button>
-          ) : null}
+          <div className="flex flex-wrap items-center gap-2">
+            {rows.length > 0 ? (
+              <button
+                type="button"
+                onClick={() => toggleSelectAllVisible()}
+                className="rounded-lg px-2 py-1 font-medium text-white/55 transition-colors hover:bg-white/5 hover:text-white/85"
+              >
+                {allVisibleSelected ? 'Deselect all' : 'Select all'}
+              </button>
+            ) : null}
+            {hasActiveFilters ? (
+              <button
+                type="button"
+                onClick={() => clearFilters()}
+                className="inline-flex items-center gap-1 rounded-lg px-2 py-1 font-medium text-[#2490ed] transition-colors hover:bg-white/5 hover:text-white"
+              >
+                <X className="h-3.5 w-3.5" />
+                Clear filters
+              </button>
+            ) : null}
+          </div>
         </div>
       </div>
+
+      {selected.size > 0 ? (
+        <div
+          className="flex flex-col gap-3 rounded-2xl border border-[#2490ed]/35 px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
+          style={{ background: 'rgba(36,144,237,0.08)' }}
+          role="region"
+          aria-label="Bulk actions"
+        >
+          <p className="flex items-center gap-2 text-sm text-white/85">
+            {bulkSaving ? <Loader2 className="h-4 w-4 shrink-0 animate-spin text-white/60" /> : null}
+            <span>
+              <span className="font-semibold text-white">{selected.size}</span>
+              {selected.size === 1 ? ' course' : ' courses'} selected
+            </span>
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => setSelected(new Set())}
+              disabled={bulkSaving}
+              className="rounded-lg border border-white/15 bg-transparent px-3 py-2 text-xs font-medium text-white/75 transition-colors hover:bg-white/5 disabled:opacity-50"
+            >
+              Clear selection
+            </button>
+            <button
+              type="button"
+              onClick={() => void bulkSetPublished(true)}
+              disabled={bulkSaving}
+              className="inline-flex items-center justify-center rounded-lg px-3 py-2 text-xs font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+              style={{ background: '#2490ed' }}
+            >
+              Publish
+            </button>
+            <button
+              type="button"
+              onClick={() => void bulkSetPublished(false)}
+              disabled={bulkSaving}
+              className="inline-flex items-center justify-center rounded-lg border border-amber-500/45 bg-amber-500/15 px-3 py-2 text-xs font-semibold text-amber-100 transition-colors hover:bg-amber-500/25 disabled:opacity-50"
+            >
+              Set to draft
+            </button>
+          </div>
+        </div>
+      ) : null}
 
       {emptyNoCourses ? (
         <div
@@ -401,6 +520,21 @@ export function AdminCoursesList() {
             >
               <div className="relative aspect-video overflow-hidden bg-black/40">
                 <AdminCourseListThumb thumbnailUrl={c.thumbnailUrl} eager={index < 9} />
+
+                <label
+                  className="absolute top-2 right-2 z-20 flex cursor-pointer items-center gap-2 rounded-md border border-white/20 bg-black/55 px-2 py-1.5 text-[11px] font-medium text-white/90 backdrop-blur-sm transition-colors hover:bg-black/70"
+                  onClick={(e) => e.stopPropagation()}
+                  onKeyDown={(e) => e.stopPropagation()}
+                >
+                  <input
+                    type="checkbox"
+                    checked={selected.has(c.id)}
+                    onChange={() => toggleOne(c.id)}
+                    className="h-3.5 w-3.5 rounded border-white/30 bg-black/40 text-[#2490ed] focus:ring-[#2490ed]/50"
+                    aria-label={`Select ${c.title}`}
+                  />
+                  <span className="hidden sm:inline">Select</span>
+                </label>
 
                 {!c.published && (
                   <span className="absolute top-2 left-2 rounded bg-amber-500/90 px-2 py-0.5 text-[10px] font-bold tracking-wide text-black uppercase">

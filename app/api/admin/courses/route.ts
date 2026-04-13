@@ -2,16 +2,19 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { getAdminSessionOrNull } from '@/lib/admin/admin-session';
 import {
+  ADMIN_BULK_PUBLICATION_MAX_IDS,
+  adminBulkSetCoursePublication,
   adminCreateCourse,
   adminListCourses,
   courseToAdminDto,
   type AdminCourseWriteInput,
+  type AdminListCoursesOptions,
 } from '@/lib/admin/admin-courses-service';
 
 function parseListQuery(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const statusRaw = searchParams.get('status');
-  const status =
+  const status: NonNullable<AdminListCoursesOptions['status']> =
     statusRaw === 'draft' || statusRaw === 'published' || statusRaw === 'all'
       ? statusRaw
       : 'all';
@@ -20,7 +23,7 @@ function parseListQuery(request: NextRequest) {
   if (q.length > 200) q = q.slice(0, 200);
 
   const sortRaw = searchParams.get('sort');
-  const sort =
+  const sort: NonNullable<AdminListCoursesOptions['sort']> =
     sortRaw === 'title' || sortRaw === 'modules' || sortRaw === 'updated' ? sortRaw : 'updated';
 
   return { status, q: q || undefined, sort };
@@ -95,6 +98,63 @@ function parseBody(body: unknown): AdminCourseWriteInput | null {
     published: Boolean(o.published),
     modules,
   };
+}
+
+function parseBulkPublicationBody(body: unknown): { courseIds: string[]; published: boolean } | null {
+  if (!body || typeof body !== 'object') return null;
+  const o = body as Record<string, unknown>;
+  const raw = o.courseIds;
+  if (!Array.isArray(raw)) return null;
+  const courseIds = raw
+    .filter((x): x is string => typeof x === 'string' && x.trim().length > 0)
+    .map((x) => x.trim());
+  if (courseIds.length === 0) return null;
+  if (typeof o.published !== 'boolean') return null;
+  return { courseIds, published: o.published };
+}
+
+export async function PATCH(request: NextRequest) {
+  const session = await getAdminSessionOrNull();
+  if (!session) {
+    return NextResponse.json({ detail: 'Unauthorized' }, { status: 401 });
+  }
+
+  if (!process.env.DATABASE_URL?.trim()) {
+    return NextResponse.json({ detail: 'Database not configured' }, { status: 503 });
+  }
+
+  const body = parseBulkPublicationBody(await request.json().catch(() => null));
+  if (!body) {
+    return NextResponse.json(
+      { detail: 'Body must include courseIds (non-empty string array) and published (boolean)' },
+      { status: 400 }
+    );
+  }
+
+  try {
+    const updated = await adminBulkSetCoursePublication(body.courseIds, body.published);
+    return NextResponse.json(
+      { updated },
+      {
+        headers: {
+          'Cache-Control': 'no-store, max-age=0',
+        },
+      }
+    );
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    if (msg === 'NO_IDS') {
+      return NextResponse.json({ detail: 'No valid course ids' }, { status: 400 });
+    }
+    if (msg === 'TOO_MANY_IDS') {
+      return NextResponse.json(
+        { detail: `At most ${ADMIN_BULK_PUBLICATION_MAX_IDS} courses per request` },
+        { status: 400 }
+      );
+    }
+    console.error('[admin/courses PATCH]', e);
+    return NextResponse.json({ detail: 'Failed to update courses' }, { status: 500 });
+  }
 }
 
 export async function POST(request: NextRequest) {
