@@ -10,6 +10,12 @@ import {
   type CourseWithCurriculum,
 } from '@/lib/server/course-catalog-sync';
 
+/** Interactive tx default is 5s; remote Postgres + many modules/lessons exceeds that (P2028). */
+const ADMIN_COURSE_WRITE_TX_OPTIONS = {
+  maxWait: 15_000,
+  timeout: 120_000,
+} as const;
+
 export type AdminModuleInput = {
   id?: string;
   title: string;
@@ -334,43 +340,46 @@ export async function adminCreateCourse(
   const priceAud = new Prisma.Decimal(Number.isFinite(input.priceAud) ? input.priceAud : 0);
   const published = Boolean(input.published);
 
-  await prisma.$transaction(async (tx) => {
-    await tx.lmsCourse.create({
-      data: {
-        id: courseId,
-        slug,
-        title: input.title.trim(),
-        description: input.description?.trim() || null,
-        shortDescription: null,
-        thumbnailUrl: input.thumbnailUrl?.trim() || null,
-        meta: upsertIntroVideoInMeta(null, {
-          introVideoUrl: input.introVideoUrl,
-          introThumbnailUrl: input.introThumbnailUrl,
-        }),
-        instructorId: DEFAULT_INSTRUCTOR_ID,
-        status: published ? 'published' : 'draft',
-        priceAud,
-        isFree: Boolean(input.isFree),
-        level: null,
-        category: null,
-        isPublished: published,
-      },
-    });
-
-    for (let i = 0; i < modules.length; i += 1) {
-      const m = modules[i];
-      const moduleId = randomUUID();
-      await tx.lmsModule.create({
+  await prisma.$transaction(
+    async (tx) => {
+      await tx.lmsCourse.create({
         data: {
-          id: moduleId,
-          courseId,
-          title: m.title,
-          orderIndex: i,
+          id: courseId,
+          slug,
+          title: input.title.trim(),
+          description: input.description?.trim() || null,
+          shortDescription: null,
+          thumbnailUrl: input.thumbnailUrl?.trim() || null,
+          meta: upsertIntroVideoInMeta(null, {
+            introVideoUrl: input.introVideoUrl,
+            introThumbnailUrl: input.introThumbnailUrl,
+          }),
+          instructorId: DEFAULT_INSTRUCTOR_ID,
+          status: published ? 'published' : 'draft',
+          priceAud,
+          isFree: Boolean(input.isFree),
+          level: null,
+          category: null,
+          isPublished: published,
         },
       });
-      await syncModuleLessons(tx, moduleId, m.title, m.textContent, m.videoUrl, [], i === 0);
-    }
-  });
+
+      for (let i = 0; i < modules.length; i += 1) {
+        const m = modules[i];
+        const moduleId = randomUUID();
+        await tx.lmsModule.create({
+          data: {
+            id: moduleId,
+            courseId,
+            title: m.title,
+            orderIndex: i,
+          },
+        });
+        await syncModuleLessons(tx, moduleId, m.title, m.textContent, m.videoUrl, [], i === 0);
+      }
+    },
+    ADMIN_COURSE_WRITE_TX_OPTIONS
+  );
 
   return prisma.lmsCourse.findUniqueOrThrow({
     where: { id: courseId },
@@ -398,69 +407,72 @@ export async function adminUpdateCourse(
   const priceAud = new Prisma.Decimal(Number.isFinite(input.priceAud) ? input.priceAud : 0);
   const published = Boolean(input.published);
 
-  await prisma.$transaction(async (tx) => {
-    await tx.lmsCourse.update({
-      where: { id },
-      data: {
-        title: input.title.trim(),
-        description: input.description?.trim() || null,
-        thumbnailUrl: input.thumbnailUrl?.trim() || null,
-        meta: upsertIntroVideoInMeta(existing.meta, {
-          introVideoUrl: input.introVideoUrl,
-          introThumbnailUrl: input.introThumbnailUrl,
-        }),
-        status: published ? 'published' : 'draft',
-        priceAud,
-        isFree: Boolean(input.isFree),
-        isPublished: published,
-      },
-    });
+  await prisma.$transaction(
+    async (tx) => {
+      await tx.lmsCourse.update({
+        where: { id },
+        data: {
+          title: input.title.trim(),
+          description: input.description?.trim() || null,
+          thumbnailUrl: input.thumbnailUrl?.trim() || null,
+          meta: upsertIntroVideoInMeta(existing.meta, {
+            introVideoUrl: input.introVideoUrl,
+            introThumbnailUrl: input.introThumbnailUrl,
+          }),
+          status: published ? 'published' : 'draft',
+          priceAud,
+          isFree: Boolean(input.isFree),
+          isPublished: published,
+        },
+      });
 
-    const existingById = new Map(existing.modules.map((m) => [m.id, m]));
-    const keptIds = new Set<string>();
+      const existingById = new Map(existing.modules.map((m) => [m.id, m]));
+      const keptIds = new Set<string>();
 
-    for (let i = 0; i < modules.length; i += 1) {
-      const m = modules[i];
-      let moduleId: string;
-      const prev = m.id && existingById.get(m.id);
+      for (let i = 0; i < modules.length; i += 1) {
+        const m = modules[i];
+        let moduleId: string;
+        const prev = m.id && existingById.get(m.id);
 
-      if (prev) {
-        moduleId = prev.id;
-        keptIds.add(moduleId);
-        await tx.lmsModule.update({
-          where: { id: moduleId },
-          data: { title: m.title, orderIndex: i },
-        });
-        const lessons = await tx.lmsLesson.findMany({ where: { moduleId } });
-        await syncModuleLessons(
-          tx,
-          moduleId,
-          m.title,
-          m.textContent,
-          m.videoUrl,
-          lessons.map((l) => ({ id: l.id, orderIndex: l.orderIndex })),
-          i === 0
-        );
-      } else {
-        moduleId = randomUUID();
-        await tx.lmsModule.create({
-          data: {
-            id: moduleId,
-            courseId: id,
-            title: m.title,
-            orderIndex: i,
-          },
-        });
-        await syncModuleLessons(tx, moduleId, m.title, m.textContent, m.videoUrl, [], i === 0);
+        if (prev) {
+          moduleId = prev.id;
+          keptIds.add(moduleId);
+          await tx.lmsModule.update({
+            where: { id: moduleId },
+            data: { title: m.title, orderIndex: i },
+          });
+          const lessons = await tx.lmsLesson.findMany({ where: { moduleId } });
+          await syncModuleLessons(
+            tx,
+            moduleId,
+            m.title,
+            m.textContent,
+            m.videoUrl,
+            lessons.map((l) => ({ id: l.id, orderIndex: l.orderIndex })),
+            i === 0
+          );
+        } else {
+          moduleId = randomUUID();
+          await tx.lmsModule.create({
+            data: {
+              id: moduleId,
+              courseId: id,
+              title: m.title,
+              orderIndex: i,
+            },
+          });
+          await syncModuleLessons(tx, moduleId, m.title, m.textContent, m.videoUrl, [], i === 0);
+        }
       }
-    }
 
-    for (const mod of existing.modules) {
-      if (!keptIds.has(mod.id)) {
-        await tx.lmsModule.delete({ where: { id: mod.id } });
+      for (const mod of existing.modules) {
+        if (!keptIds.has(mod.id)) {
+          await tx.lmsModule.delete({ where: { id: mod.id } });
+        }
       }
-    }
-  });
+    },
+    ADMIN_COURSE_WRITE_TX_OPTIONS
+  );
 
   return prisma.lmsCourse.findUniqueOrThrow({
     where: { id },
