@@ -5,7 +5,8 @@ import type { SessionClaims } from '@/lib/auth/session-jwt';
 export const ADMIN_COOKIE_NAME = 'admin_session';
 
 const DEFAULT_ADMIN_EMAIL = 'mmlrana00@gmail.com';
-const DEFAULT_ADMIN_PASSWORD = 'Rana1199@';
+// DEFAULT_ADMIN_PASSWORD intentionally removed — ADMIN_PASSWORD must be set in env.
+// A missing env var returns '' (empty), causing all login attempts to fail safely.
 
 /**
  * Server-side: read from env on each call so `.env` changes apply without stale module cache.
@@ -20,7 +21,9 @@ export function getAdminEmail(): string {
 export function getAdminPassword(): string {
   const v = process.env.ADMIN_PASSWORD;
   if (typeof v === 'string' && v.trim()) return v.trim();
-  return DEFAULT_ADMIN_PASSWORD;
+  // No hardcoded fallback — return '' so login always fails when env var is unset.
+  // Set ADMIN_PASSWORD in your deployment environment (Railway / Vercel env vars).
+  return '';
 }
 
 /**
