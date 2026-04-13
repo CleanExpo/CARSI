@@ -11,6 +11,11 @@ import { normalizeImageSrcForApp } from '@/lib/remote-image';
 interface CourseCardProps {
   /** First visible cards: eager load + higher fetch priority (catalog / home grids). */
   priorityImage?: boolean;
+  /** When set (e.g. dashboard admin), shows a checkbox for bulk publish/draft actions. */
+  selection?: {
+    checked: boolean;
+    onToggle: () => void;
+  };
   course: {
     id: string;
     slug: string;
@@ -200,7 +205,7 @@ function formatRelativeDate(dateStr: string | null | undefined): string {
 
 const smoothEase: [number, number, number, number] = [0.4, 0, 0.2, 1];
 
-export function CourseCard({ course, priorityImage }: CourseCardProps) {
+export function CourseCard({ course, priorityImage, selection }: CourseCardProps) {
   const [tierIndex, setTierIndex] = useState(0);
   const priceNum =
     typeof course.price_aud === 'string' ? parseFloat(course.price_aud) : course.price_aud;
@@ -300,6 +305,25 @@ export function CourseCard({ course, priorityImage }: CourseCardProps) {
         >
           {price}
         </span>
+        {selection ? (
+          <label
+            className="absolute bottom-2 left-2 z-10 flex cursor-pointer items-center justify-center rounded-md p-1.5"
+            style={{
+              background: 'rgba(0,0,0,0.65)',
+              border: '1px solid rgba(255,255,255,0.22)',
+            }}
+            onClick={(e) => e.stopPropagation()}
+            onPointerDown={(e) => e.stopPropagation()}
+          >
+            <input
+              type="checkbox"
+              checked={selection.checked}
+              onChange={selection.onToggle}
+              aria-label={`Select ${course.title}`}
+              className="h-4 w-4 cursor-pointer rounded border-white/35 bg-black/40 text-[#2490ed] focus:ring-2 focus:ring-[#2490ed]/50"
+            />
+          </label>
+        ) : null}
       </div>
 
       {/* Card body */}

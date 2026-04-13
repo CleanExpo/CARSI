@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { CourseGrid } from '@/components/lms/CourseGrid';
 import { CourseSearchBar } from '@/components/lms/CourseSearchBar';
 import { AcronymTooltip } from '@/components/ui/AcronymTooltip';
+import { getAdminSessionOrNull } from '@/lib/admin/admin-session';
 import {
   type DashboardCourseStatusFilter,
   getDashboardCourseListItemsFromDatabase,
@@ -54,6 +55,7 @@ export default async function DashboardCoursesPage({
 
   const courses = await getDashboardCourseListItemsFromDatabase({ status });
   const total = courses.length;
+  const adminSession = await getAdminSessionOrNull();
 
   const filterBtn =
     'inline-flex min-h-[40px] items-center rounded-lg px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/50';
@@ -80,6 +82,12 @@ export default async function DashboardCoursesPage({
           <p className="mt-2 text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>
             {total} course{total !== 1 ? 's' : ''} — filter by catalogue status. Draft courses are
             ordered with the most modules first.
+            {adminSession ? (
+              <>
+                {' '}
+                As an admin, use the checkboxes below to publish or move courses to draft in bulk.
+              </>
+            ) : null}
           </p>
         </header>
 
@@ -143,6 +151,7 @@ export default async function DashboardCoursesPage({
                 initialTab={disciplineTab ?? 'All'}
                 showModulesSort
                 initialSortBy={status === 'draft' ? 'modules' : 'updated'}
+                enableCatalogManagement={!!adminSession}
               />
             )}
           </div>

@@ -312,6 +312,32 @@ export async function adminListCourses(options: AdminListCoursesOptions = {}) {
   }));
 }
 
+const BULK_STATUS_MAX_IDS = 200;
+
+/**
+ * Sets `status` and `isPublished` for many courses (admin catalogue management).
+ */
+export async function adminBulkSetCoursePublished(
+  ids: string[],
+  published: boolean
+): Promise<{ count: number }> {
+  const unique = [...new Set(ids.map((id) => id.trim()).filter(Boolean))];
+  if (unique.length === 0) return { count: 0 };
+  if (unique.length > BULK_STATUS_MAX_IDS) {
+    throw new Error('BULK_LIMIT');
+  }
+
+  const result = await prisma.lmsCourse.updateMany({
+    where: { id: { in: unique } },
+    data: {
+      status: published ? 'published' : 'draft',
+      isPublished: published,
+    },
+  });
+
+  return { count: result.count };
+}
+
 export async function adminGetCourse(id: string): Promise<CourseWithCurriculum | null> {
   return prisma.lmsCourse.findUnique({
     where: { id },
