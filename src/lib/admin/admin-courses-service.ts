@@ -514,3 +514,21 @@ export async function adminBulkSetCoursePublication(
   });
   return result.count;
 }
+
+/**
+ * Permanently delete many courses (cascade removes modules and lessons).
+ */
+export async function adminBulkDeleteCourses(ids: string[]): Promise<number> {
+  const unique = [...new Set(ids.map((id) => id.trim()).filter(Boolean))];
+  if (unique.length === 0) {
+    throw new Error('NO_IDS');
+  }
+  if (unique.length > ADMIN_BULK_PUBLICATION_MAX_IDS) {
+    throw new Error('TOO_MANY_IDS');
+  }
+
+  const result = await prisma.lmsCourse.deleteMany({
+    where: { id: { in: unique } },
+  });
+  return result.count;
+}

@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAdminSessionOrNull } from '@/lib/admin/admin-session';
 import {
   ADMIN_BULK_PUBLICATION_MAX_IDS,
+  adminBulkDeleteCourses,
   adminBulkSetCoursePublication,
   adminCreateCourse,
   adminListCourses,
@@ -100,7 +101,7 @@ function parseBody(body: unknown): AdminCourseWriteInput | null {
   };
 }
 
-function parseBulkPublicationBody(body: unknown): { courseIds: string[]; published: boolean } | null {
+function parseBulkCourseIds(body: unknown): string[] | null {
   if (!body || typeof body !== 'object') return null;
   const o = body as Record<string, unknown>;
   const raw = o.courseIds;
@@ -108,9 +109,60 @@ function parseBulkPublicationBody(body: unknown): { courseIds: string[]; publish
   const courseIds = raw
     .filter((x): x is string => typeof x === 'string' && x.trim().length > 0)
     .map((x) => x.trim());
-  if (courseIds.length === 0) return null;
+  return courseIds.length > 0 ? courseIds : null;
+}
+
+function parseBulkPublicationBody(body: unknown): { courseIds: string[]; published: boolean } | null {
+  if (!body || typeof body !== 'object') return null;
+  const o = body as Record<string, unknown>;
   if (typeof o.published !== 'boolean') return null;
+  const courseIds = parseBulkCourseIds(body);
+  if (!courseIds) return null;
   return { courseIds, published: o.published };
+}
+
+export async function DELETE(request: NextRequest) {
+  const session = await getAdminSessionOrNull();
+  if (!session) {
+    return NextResponse.json({ detail: 'Unauthorized' }, { status: 401 });
+  }
+
+  if (!process.env.DATABASE_URL?.trim()) {
+    return NextResponse.json({ detail: 'Database not configured' }, { status: 503 });
+  }
+
+  const courseIds = parseBulkCourseIds(await request.json().catch(() => null));
+  if (!courseIds) {
+    return NextResponse.json(
+      { detail: 'Body must include courseIds (non-empty string array)' },
+      { status: 400 }
+    );
+  }
+
+  try {
+    const deleted = await adminBulkDeleteCourses(courseIds);
+    return NextResponse.json(
+      { deleted },
+      {
+        headers: {
+          'Cache-Control': 'no-store, max-age=0',
+        },
+      }
+    );
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    if (msg === 'NO_IDS') {
+      return NextResponse.json({ detail: 'No valid course ids' }, { status: 400 });
+    }
+    if (msg === 'TOO_MANY_IDS') {
+      return NextResponse.json(
+        { detail: `At most ${ADMIN_BULK_PUBLICATION_MAX_IDS} courses per request` },
+        { status: 400 }
+      );
+    }
+    console.error('[admin/courses DELETE]', e);
+    return NextResponse.json({ detail: 'Failed to delete courses' }, { status: 500 });
+  }
 }
 
 export async function PATCH(request: NextRequest) {

@@ -125,7 +125,11 @@ export function AdminCoursesList() {
   const [deleting, setDeleting] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(() => new Set());
   const [bulkSaving, setBulkSaving] = useState(false);
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
+  const [bulkDeleting, setBulkDeleting] = useState(false);
   const hasLoadedOnceRef = useRef(false);
+
+  const bulkBusy = bulkSaving || bulkDeleting;
 
   useEffect(() => {
     setSelected(new Set());
@@ -214,7 +218,7 @@ export function AdminCoursesList() {
   }
 
   async function bulkSetPublished(published: boolean) {
-    if (selected.size === 0 || bulkSaving) return;
+    if (selected.size === 0 || bulkBusy) return;
     setBulkSaving(true);
     try {
       const res = await fetch('/api/admin/courses', {
@@ -241,6 +245,38 @@ export function AdminCoursesList() {
       });
     } finally {
       setBulkSaving(false);
+    }
+  }
+
+  async function confirmBulkDelete() {
+    if (selected.size === 0 || bulkDeleting) return;
+    setBulkDeleting(true);
+    try {
+      const res = await fetch('/api/admin/courses', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ courseIds: [...selected] }),
+      });
+      const j = (await res.json().catch(() => ({}))) as { detail?: string; deleted?: number };
+      if (!res.ok) {
+        throw new Error(typeof j.detail === 'string' ? j.detail : 'Delete failed');
+      }
+      const n = typeof j.deleted === 'number' ? j.deleted : selected.size;
+      toast({
+        title: 'Courses deleted',
+        description: `Removed ${n} course${n === 1 ? '' : 's'} from the database.`,
+      });
+      setBulkDeleteOpen(false);
+      setSelected(new Set());
+      await load();
+    } catch (e) {
+      toast({
+        title: e instanceof Error ? e.message : 'Delete failed',
+        variant: 'destructive',
+      });
+    } finally {
+      setBulkDeleting(false);
     }
   }
 
@@ -294,6 +330,8 @@ export function AdminCoursesList() {
     { id: 'published', label: 'Published' },
     { id: 'draft', label: 'Draft' },
   ];
+
+  const selectedRows = rows.filter((r) => selected.has(r.id));
 
   return (
     <div className="space-y-6 p-6">
@@ -428,7 +466,7 @@ export function AdminCoursesList() {
           aria-label="Bulk actions"
         >
           <p className="flex items-center gap-2 text-sm text-white/85">
-            {bulkSaving ? <Loader2 className="h-4 w-4 shrink-0 animate-spin text-white/60" /> : null}
+            {bulkBusy ? <Loader2 className="h-4 w-4 shrink-0 animate-spin text-white/60" /> : null}
             <span>
               <span className="font-semibold text-white">{selected.size}</span>
               {selected.size === 1 ? ' course' : ' courses'} selected
@@ -438,7 +476,7 @@ export function AdminCoursesList() {
             <button
               type="button"
               onClick={() => setSelected(new Set())}
-              disabled={bulkSaving}
+              disabled={bulkBusy}
               className="rounded-lg border border-white/15 bg-transparent px-3 py-2 text-xs font-medium text-white/75 transition-colors hover:bg-white/5 disabled:opacity-50"
             >
               Clear selection
@@ -446,7 +484,7 @@ export function AdminCoursesList() {
             <button
               type="button"
               onClick={() => void bulkSetPublished(true)}
-              disabled={bulkSaving}
+              disabled={bulkBusy}
               className="inline-flex items-center justify-center rounded-lg px-3 py-2 text-xs font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
               style={{ background: '#2490ed' }}
             >
@@ -455,10 +493,19 @@ export function AdminCoursesList() {
             <button
               type="button"
               onClick={() => void bulkSetPublished(false)}
-              disabled={bulkSaving}
+              disabled={bulkBusy}
               className="inline-flex items-center justify-center rounded-lg border border-amber-500/45 bg-amber-500/15 px-3 py-2 text-xs font-semibold text-amber-100 transition-colors hover:bg-amber-500/25 disabled:opacity-50"
             >
               Set to draft
+            </button>
+            <button
+              type="button"
+              onClick={() => setBulkDeleteOpen(true)}
+              disabled={bulkBusy}
+              className="inline-flex items-center justify-center rounded-lg border border-red-500/45 bg-red-500/15 px-3 py-2 text-xs font-semibold text-red-200 transition-colors hover:bg-red-500/25 disabled:opacity-50"
+            >
+              <Trash2 className="mr-1.5 h-3.5 w-3.5" />
+              Delete
             </button>
           </div>
         </div>
@@ -602,6 +649,49 @@ export function AdminCoursesList() {
               disabled={deleting}
             >
               {deleting ? 'Deleting…' : 'Delete'}
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={bulkDeleteOpen}
+        onOpenChange={(o) => !o && !bulkDeleting && setBulkDeleteOpen(false)}
+      >
+        <DialogContent className="border-white/10 bg-[#0c101c] text-white">
+          <DialogHeader>
+            <DialogTitle>Delete {selected.size} course{selected.size === 1 ? '' : 's'}?</DialogTitle>
+            <DialogDescription className="text-white/50">
+              This permanently removes the selected courses and all modules and lessons. Student
+              enrollments for these courses may be affected.
+            </DialogDescription>
+          </DialogHeader>
+          <ul className="max-h-40 list-inside list-disc overflow-y-auto text-sm text-white/65">
+            {selectedRows.slice(0, 12).map((r) => (
+              <li key={r.id}>{r.title}</li>
+            ))}
+            {selectedRows.length > 12 ? (
+              <li className="list-none text-white/45">
+                …and {selectedRows.length - 12} more
+              </li>
+            ) : null}
+          </ul>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <button
+              type="button"
+              className="rounded-lg border border-white/15 px-4 py-2 text-sm text-white/80"
+              onClick={() => setBulkDeleteOpen(false)}
+              disabled={bulkDeleting}
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-500 disabled:opacity-50"
+              onClick={() => void confirmBulkDelete()}
+              disabled={bulkDeleting}
+            >
+              {bulkDeleting ? 'Deleting…' : 'Delete all'}
             </button>
           </DialogFooter>
         </DialogContent>

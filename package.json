@@ -26,6 +26,7 @@
     "db:set-wp-export-draft": "npx tsx scripts/set-wp-export-courses-draft.ts",
     "db:export-draft-courses-wp": "npx tsx scripts/export-draft-courses-wp-dump.ts",
     "db:seed-air-quality-docx": "npx tsx scripts/seed-air-quality-docx.ts",
+    "db:seed-safety-ppe-docx": "npx tsx scripts/seed-safety-ppe-docx.ts",
     "lint": "next lint",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate deploy",

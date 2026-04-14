@@ -16,11 +16,8 @@ import { fileURLToPath } from 'node:url';
 
 import { adminCreateCourse } from '@/lib/admin/admin-courses-service';
 import { prisma } from '@/lib/prisma';
-import {
-  extractDocxParagraphs,
-  parseAirQualityCompendium,
-  paragraphsToLessonHtml,
-} from '@/lib/seed/air-quality-docx';
+import { parseAirQualityCompendium, paragraphsToLessonHtml } from '@/lib/seed/air-quality-docx';
+import { extractDocxParagraphs } from '@/lib/seed/docx-extract';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DOCX_PATH = join(__dirname, '..', 'data', 'air_quality_courses.docx');
