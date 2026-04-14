@@ -12,6 +12,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 
+import { CourseTextThumbnail } from '@/components/lms/CourseTextThumbnail';
+
 type Mod = {
   key: string;
   id?: string;
@@ -453,20 +455,23 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
                 </button>
               </div>
               <div className="overflow-hidden rounded-xl border border-white/10 bg-black/40">
-                {thumbnailUrl.trim() ? (
-                  <img
-                    src={thumbnailUrl.trim()}
-                    alt=""
-                    className="aspect-video w-full object-cover"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = 'none';
-                    }}
+                <div className="aspect-video">
+                  <CourseTextThumbnail
+                    variant="admin"
+                    title={title.trim() || 'Untitled course'}
+                    priceLabel={isFree ? 'Free' : `AUD ${Number.parseFloat(priceAud || '0').toFixed(0)}`}
+                    isFree={isFree}
+                    moduleCount={modules.length}
+                    draft={!published}
+                    shortDescription={
+                      description.trim()
+                        ? description.trim().replace(/\s+/g, ' ').slice(0, 240)
+                        : null
+                    }
+                    backdropImageSrc={thumbnailUrl.trim() || undefined}
+                    backdropImageLoading="eager"
                   />
-                ) : (
-                  <div className="flex aspect-video items-center justify-center text-xs text-white/35">
-                    Preview appears here
-                  </div>
-                )}
+                </div>
               </div>
             </section>
 
@@ -522,20 +527,25 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
               </div>
 
               <div className="overflow-hidden rounded-xl border border-white/10 bg-black/40">
-                {introThumbnailUrl.trim() || thumbnailUrl.trim() ? (
-                  <img
-                    src={(introThumbnailUrl.trim() || thumbnailUrl.trim()).trim()}
-                    alt=""
-                    className="aspect-video w-full object-cover"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = 'none';
-                    }}
+                <div className="aspect-video">
+                  <CourseTextThumbnail
+                    variant="admin"
+                    title={title.trim() || 'Untitled course'}
+                    priceLabel={isFree ? 'Free' : `AUD ${Number.parseFloat(priceAud || '0').toFixed(0)}`}
+                    isFree={isFree}
+                    moduleCount={modules.length}
+                    draft={!published}
+                    shortDescription={
+                      introThumbnailUrl.trim() || thumbnailUrl.trim()
+                        ? null
+                        : 'Intro video cover — upload an image or use the catalogue thumbnail.'
+                    }
+                    backdropImageSrc={
+                      (introThumbnailUrl.trim() || thumbnailUrl.trim()) || undefined
+                    }
+                    backdropImageLoading="eager"
                   />
-                ) : (
-                  <div className="flex aspect-video items-center justify-center text-xs text-white/35">
-                    Preview appears here
-                  </div>
-                )}
+                </div>
               </div>
             </section>
           </div>

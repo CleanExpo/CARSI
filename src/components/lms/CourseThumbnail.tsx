@@ -1,38 +1,52 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { bypassNextImageOptimizer, normalizePublicAssetUrl } from '@/lib/remote-image';
+
+import { CourseTextThumbnail } from '@/components/lms/CourseTextThumbnail';
 
 interface CourseThumbnailProps {
   src?: string | null;
   title: string;
   /** Omit bottom margin when nested in dense layouts (e.g. enrolment cards). */
   compact?: boolean;
+  category?: string | null;
+  discipline?: string | null;
+  priceLabel?: string | null;
+  isFree?: boolean;
+  moduleCount?: number | null;
+  lessonCount?: number | null;
+  level?: string | null;
+  cecHours?: string | null;
+  durationHours?: string | null;
+  shortDescription?: string | null;
+  instructorName?: string | null;
+  draft?: boolean;
 }
 
-function ThumbnailPlaceholder({ title, compact }: { title: string; compact?: boolean }) {
-  return (
-    <div
-      className={
-        compact
-          ? 'aspect-video overflow-hidden rounded-sm p-5'
-          : 'mb-4 aspect-video overflow-hidden rounded-sm p-5'
-      }
-      style={{
-        border: '1px solid rgba(255,255,255,0.07)',
-        background:
-          'linear-gradient(135deg, rgba(237,157,36,0.12) 0%, rgba(36,144,237,0.08) 100%)',
-      }}
-    >
-      <p className="text-xs font-semibold tracking-wide text-white/60 uppercase">Course preview</p>
-      <p className="mt-2 line-clamp-3 text-sm font-medium text-white/85">{title}</p>
-    </div>
-  );
-}
+export function CourseThumbnail({
+  src,
+  title,
+  compact,
+  category,
+  discipline,
+  priceLabel,
+  isFree,
+  moduleCount,
+  lessonCount,
+  level,
+  cecHours,
+  durationHours,
+  shortDescription,
+  instructorName,
+  draft,
+}: CourseThumbnailProps) {
+  const [backdropFailed, setBackdropFailed] = useState(false);
 
-export function CourseThumbnail({ src, title, compact }: CourseThumbnailProps) {
-  const [failed, setFailed] = useState(false);
+  useEffect(() => {
+    setBackdropFailed(false);
+  }, [src]);
 
   const resolvedSrc = useMemo(() => {
     const normalized = normalizePublicAssetUrl(src);
@@ -44,24 +58,36 @@ export function CourseThumbnail({ src, title, compact }: CourseThumbnailProps) {
     return normalized.startsWith('/') ? normalized : `/${normalized}`;
   }, [src]);
 
-  if (failed || !resolvedSrc) {
-    return <ThumbnailPlaceholder title={title} compact={compact} />;
-  }
+  const variant = compact ? 'card' : 'hero';
+  const wrapClass = compact ? 'overflow-hidden rounded-sm' : 'mb-4 overflow-hidden rounded-sm';
+
+  const backdrop =
+    resolvedSrc && !backdropFailed ? resolvedSrc : undefined;
 
   return (
-    <div
-      className={compact ? 'overflow-hidden rounded-sm' : 'mb-4 overflow-hidden rounded-sm'}
-      style={{ border: '1px solid rgba(255,255,255,0.07)' }}
-    >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={resolvedSrc}
-        alt={title}
-        className="aspect-video w-full object-contain object-center bg-black/30"
-        loading="eager"
-        decoding="async"
-        onError={() => setFailed(true)}
-      />
+    <div className={wrapClass} style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
+      <div className="aspect-video">
+        <CourseTextThumbnail
+          variant={variant}
+          title={title}
+          category={category}
+          discipline={discipline}
+          priceLabel={priceLabel}
+          isFree={isFree}
+          moduleCount={moduleCount}
+          lessonCount={lessonCount}
+          level={level}
+          cecHours={cecHours}
+          durationHours={durationHours}
+          shortDescription={shortDescription}
+          instructorName={instructorName}
+          draft={draft}
+          backdropImageSrc={backdrop}
+          backdropImageLoading="eager"
+          backdropImageFetchPriority={compact ? 'auto' : 'high'}
+          onBackdropImageError={() => setBackdropFailed(true)}
+        />
+      </div>
     </div>
   );
 }

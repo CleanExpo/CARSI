@@ -31,6 +31,7 @@ interface CourseDetail {
   cec_hours?: string | null;
   duration_hours?: string | null;
   thumbnail_url?: string | null;
+  module_count?: number | null;
   instructor?: { full_name: string } | null;
 }
 
@@ -60,6 +61,7 @@ function mapWpExportToCourseDetail(row: WpExportCourse): CourseDetail {
     cec_hours: null,
     duration_hours: null,
     thumbnail_url: resolveAssetUrl(row.thumbnail_url),
+    module_count: null,
     instructor: null,
   };
 }
@@ -518,7 +520,22 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                 <div className="hidden lg:block">
                   <div className="sticky top-8">
                     {/* Thumbnail */}
-                    <CourseThumbnail src={thumbnailUrl} title={course.title} />
+                    <CourseThumbnail
+                      src={thumbnailUrl}
+                      title={course.title}
+                      category={course.category}
+                      discipline={course.iicrc_discipline}
+                      priceLabel={
+                        course.is_free || priceNum === 0 ? 'Free' : `$${priceNum.toFixed(0)} AUD`
+                      }
+                      isFree={course.is_free || priceNum === 0}
+                      moduleCount={course.module_count ?? null}
+                      level={course.level}
+                      cecHours={course.cec_hours}
+                      durationHours={course.duration_hours}
+                      shortDescription={course.short_description}
+                      instructorName={course.instructor?.full_name ?? null}
+                    />
 
                     {/* Price card */}
                     <div className="rounded-sm p-6" style={glassPanel}>

@@ -7,6 +7,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { normalizeImageSrcForApp } from '@/lib/remote-image';
 
+import { CourseTextThumbnail } from '@/components/lms/CourseTextThumbnail';
+
 import {
   Dialog,
   DialogContent,
@@ -27,6 +29,11 @@ type Row = {
   priceAud: number;
   published: boolean;
   updatedAt: string;
+  category?: string | null;
+  level?: string | null;
+  iicrcDiscipline?: string | null;
+  cecHours?: string | null;
+  durationHours?: string | null;
 };
 
 type StatusFilter = 'all' | 'draft' | 'published';
@@ -63,9 +70,27 @@ function buildCourseListParams(parts: {
 function AdminCourseListThumb({
   thumbnailUrl,
   eager,
+  title,
+  moduleCount,
+  isFree,
+  priceAud,
+  category,
+  level,
+  iicrcDiscipline,
+  cecHours,
+  durationHours,
 }: {
   thumbnailUrl: string | null;
   eager?: boolean;
+  title: string;
+  moduleCount: number;
+  isFree: boolean;
+  priceAud: number;
+  category?: string | null;
+  level?: string | null;
+  iicrcDiscipline?: string | null;
+  cecHours?: string | null;
+  durationHours?: string | null;
 }) {
   const [failed, setFailed] = useState(false);
   const src = normalizeImageSrcForApp(thumbnailUrl);
@@ -74,25 +99,26 @@ function AdminCourseListThumb({
     setFailed(false);
   }, [thumbnailUrl]);
 
-  if (!src || failed) {
-    return (
-      <div className="flex h-full min-h-[8.5rem] w-full items-center justify-center bg-black/50 text-xs text-white/35">
-        No thumbnail
-      </div>
-    );
-  }
+  const backdrop = src && !failed ? src : undefined;
 
   return (
-    // eslint-disable-next-line @next/next/no-img-element -- intentional: reliable CDN loads + referrer control
-    <img
-      src={src}
-      alt=""
-      referrerPolicy="no-referrer"
-      loading={eager ? 'eager' : 'lazy'}
-      decoding="async"
-      fetchPriority={eager ? 'high' : 'auto'}
-      className="absolute inset-0 h-full w-full object-cover"
-      onError={() => setFailed(true)}
+    <CourseTextThumbnail
+      variant="admin"
+      className="absolute inset-0 min-h-[8.5rem]"
+      title={title}
+      category={category}
+      discipline={iicrcDiscipline}
+      priceLabel={isFree ? 'Free' : `AUD ${priceAud.toFixed(0)}`}
+      isFree={isFree}
+      moduleCount={moduleCount}
+      level={level}
+      cecHours={cecHours}
+      durationHours={durationHours}
+      backdropImageSrc={backdrop}
+      backdropImageLoading={eager ? 'eager' : 'lazy'}
+      backdropImageFetchPriority={eager ? 'high' : 'auto'}
+      backdropImageReferrerPolicy="no-referrer"
+      onBackdropImageError={() => setFailed(true)}
     />
   );
 }
@@ -566,7 +592,19 @@ export function AdminCoursesList() {
               aria-label={`Edit course ${c.title}`}
             >
               <div className="relative aspect-video overflow-hidden bg-black/40">
-                <AdminCourseListThumb thumbnailUrl={c.thumbnailUrl} eager={index < 9} />
+                <AdminCourseListThumb
+                  thumbnailUrl={c.thumbnailUrl}
+                  eager={index < 9}
+                  title={c.title}
+                  moduleCount={c.moduleCount}
+                  isFree={c.isFree}
+                  priceAud={c.priceAud}
+                  category={c.category}
+                  level={c.level}
+                  iicrcDiscipline={c.iicrcDiscipline}
+                  cecHours={c.cecHours}
+                  durationHours={c.durationHours}
+                />
 
                 <label
                   className="absolute top-2 right-2 z-20 flex cursor-pointer items-center gap-2 rounded-md border border-white/20 bg-black/55 px-2 py-1.5 text-[11px] font-medium text-white/90 backdrop-blur-sm transition-colors hover:bg-black/70"

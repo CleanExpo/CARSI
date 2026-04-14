@@ -315,6 +315,11 @@ export async function adminListCourses(options: AdminListCoursesOptions = {}) {
     priceAud: Number(c.priceAud),
     published: c.isPublished === true || String(c.status ?? '').toLowerCase() === 'published',
     updatedAt: c.updatedAt.toISOString(),
+    category: c.category,
+    level: c.level,
+    iicrcDiscipline: c.iicrcDiscipline,
+    cecHours: c.cecHours != null ? String(c.cecHours) : null,
+    durationHours: c.durationHours != null ? String(c.durationHours) : null,
   }));
 }
 

@@ -5,6 +5,7 @@ import { BookOpen, Clock, Layers } from 'lucide-react';
 import Link from 'next/link';
 
 import { useCourseBrowseBase } from '@/components/lms/CourseBrowseContext';
+import { CourseTextThumbnail } from '@/components/lms/CourseTextThumbnail';
 
 interface CourseCardProps {
   /** First visible cards: eager load + higher fetch priority (catalog / home grids). */
@@ -25,6 +26,8 @@ interface CourseCardProps {
     thumbnail_url?: string | null;
     updated_at?: string | null;
     instructor?: { full_name: string } | null;
+    cec_hours?: string | null;
+    duration_hours?: string | null;
   };
 }
 
@@ -70,7 +73,7 @@ export function CourseCard({ course, priorityImage }: CourseCardProps) {
   const ds = (discipline ? disciplineColors[discipline] : undefined) ?? defaultStyle;
   const { courseLinkBase } = useCourseBrowseBase();
 
-  const thumbSrc = course.thumbnail_url;
+  const thumbSrc = course.thumbnail_url ?? undefined;
 
   return (
     <motion.div
@@ -78,68 +81,27 @@ export function CourseCard({ course, priorityImage }: CourseCardProps) {
       whileHover={{ scale: 1.02, y: -4 }}
       transition={{ duration: 0.25, ease: smoothEase }}
     >
-      {/* Image / gradient header — taller 16:9 frame, object-contain so the full thumb fits */}
-      <div
-        className={`relative aspect-video w-full shrink-0 overflow-hidden bg-gradient-to-br ${ds.grad}`}
-      >
-        {thumbSrc ? (
-          // eslint-disable-next-line @next/next/no-img-element -- CDN / external URLs as stored on the course
-          <img
-            src={thumbSrc}
-            alt=""
-            loading={priorityImage ? 'eager' : 'lazy'}
-            decoding="async"
-            fetchPriority={priorityImage ? 'high' : 'auto'}
-            className="absolute inset-0 h-full w-full object-cover opacity-90 transition-opacity duration-300 group-hover:opacity-100"
-          />
-        ) : null}
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-black/20" />
-        <div className="absolute top-2 left-2 flex flex-wrap gap-1">
-          {discipline && (
-            <span
-              className="rounded-md px-2 py-0.5 font-mono text-xs font-bold"
-              style={{
-                color: ds.color,
-                background: 'rgba(0,0,0,0.6)',
-                border: `1px solid ${ds.color}40`,
-                boxShadow: `0 0 8px ${ds.glow}`,
-              }}
-            >
-              {discipline}
-            </span>
-          )}
-          {course.catalog_status === 'draft' && (
-            <span
-              className="rounded-md px-2 py-0.5 text-xs font-semibold"
-              style={{
-                color: 'rgba(255,255,255,0.85)',
-                background: 'rgba(237,157,36,0.35)',
-                border: '1px solid rgba(237,157,36,0.55)',
-              }}
-            >
-              Draft
-            </span>
-          )}
-        </div>
-        <span
-          className="absolute top-2 right-2 rounded-md px-2 py-0.5 text-xs font-semibold"
-          style={
-            isFree
-              ? {
-                  color: '#27ae60',
-                  background: 'rgba(0,0,0,0.6)',
-                  border: '1px solid rgba(39,174,96,0.4)',
-                }
-              : {
-                  color: '#ed9d24',
-                  background: 'rgba(0,0,0,0.6)',
-                  border: '1px solid rgba(237,157,36,0.4)',
-                  boxShadow: '0 0 8px rgba(237,157,36,0.2)',
-                }
-          }
-        >
-          {price}
-        </span>
+      {/* Textual thumbnail always; optional photo behind */}
+      <div className="relative aspect-video w-full shrink-0 overflow-hidden">
+        <CourseTextThumbnail
+          variant="card"
+          title={course.title}
+          category={course.category}
+          discipline={discipline}
+          priceLabel={price}
+          isFree={isFree}
+          moduleCount={course.module_count}
+          lessonCount={course.lesson_count}
+          level={course.level}
+          cecHours={course.cec_hours}
+          durationHours={course.duration_hours}
+          shortDescription={course.short_description}
+          instructorName={course.instructor?.full_name ?? null}
+          draft={course.catalog_status === 'draft'}
+          backdropImageSrc={thumbSrc}
+          backdropImageLoading={priorityImage ? 'eager' : 'lazy'}
+          backdropImageFetchPriority={priorityImage ? 'high' : 'auto'}
+        />
       </div>
 
       {/* Card body */}

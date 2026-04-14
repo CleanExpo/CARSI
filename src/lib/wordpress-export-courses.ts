@@ -115,6 +115,10 @@ export type CourseListItem = {
   module_count?: number | null;
   updated_at?: string | null;
   instructor?: { full_name: string } | null;
+  /** IICRC CEC hours when known (LMS or export). */
+  cec_hours?: string | null;
+  /** Estimated or published duration hours. */
+  duration_hours?: string | null;
 };
 
 export function mapWpExportToCourseListItem(row: WpExportCourse): CourseListItem {
@@ -133,6 +137,8 @@ export function mapWpExportToCourseListItem(row: WpExportCourse): CourseListItem
     lesson_count: row.lesson_count ?? null,
     updated_at: null,
     instructor: null,
+    cec_hours: null,
+    duration_hours: null,
   };
 }
 

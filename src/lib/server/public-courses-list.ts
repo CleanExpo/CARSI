@@ -28,6 +28,8 @@ function mapDashboardCourseRow(c: {
   category: string | null;
   status: string;
   updatedAt: Date;
+  cecHours: number | null;
+  durationHours: number | null;
   _count: { modules: number };
 }): CourseListItem {
   const st = c.status.trim().toLowerCase();
@@ -47,6 +49,8 @@ function mapDashboardCourseRow(c: {
     instructor: null,
     catalog_status: st === 'draft' ? 'draft' : 'published',
     module_count: c._count.modules,
+    cec_hours: c.cecHours != null ? String(c.cecHours) : null,
+    duration_hours: c.durationHours != null ? String(c.durationHours) : null,
   };
 }
 
@@ -112,6 +116,10 @@ export async function getPublishedCourseListItemsFromDatabase(options?: {
     where: publishedWhere,
     orderBy: { updatedAt: 'desc' },
     ...(options?.limit != null ? { take: options.limit } : {}),
+    include: {
+      _count: { select: { modules: true } },
+      instructor: { select: { fullName: true } },
+    },
   });
 
   return rows.map((c) => ({
@@ -126,8 +134,11 @@ export async function getPublishedCourseListItemsFromDatabase(options?: {
     level: c.level,
     category: c.category,
     lesson_count: null,
+    module_count: c._count.modules,
     updated_at: c.updatedAt.toISOString(),
-    instructor: null,
+    instructor: c.instructor?.fullName ? { full_name: c.instructor.fullName } : null,
+    cec_hours: c.cecHours != null ? String(c.cecHours) : null,
+    duration_hours: c.durationHours != null ? String(c.durationHours) : null,
   }));
 }
 
@@ -145,6 +156,7 @@ export async function getPublishedCourseDetailBySlugFromDatabase(slug: string) {
     },
     include: {
       instructor: { select: { fullName: true } },
+      _count: { select: { modules: true } },
     },
   });
 
@@ -165,6 +177,7 @@ export async function getPublishedCourseDetailBySlugFromDatabase(slug: string) {
     cec_hours: row.cecHours != null ? String(row.cecHours) : null,
     duration_hours: row.durationHours != null ? String(row.durationHours) : null,
     thumbnail_url: normalizePublicAssetUrl(row.thumbnailUrl),
+    module_count: row._count.modules,
     instructor: row.instructor?.fullName ? { full_name: row.instructor.fullName } : null,
   };
 }
