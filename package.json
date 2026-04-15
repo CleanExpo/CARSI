@@ -37,7 +37,8 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate deploy",
     "db:studio": "prisma studio",
-    "db:set-user-password": "npx tsx --tsconfig tsconfig.json scripts/ensure-lms-user-password.ts"
+    "db:set-user-password": "npx tsx --tsconfig tsconfig.json scripts/ensure-lms-user-password.ts",
+    "prepare": "husky"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.3",
@@ -53,6 +54,7 @@
     "concurrently": "^9.1.2",
     "eslint": "^9.17.0",
     "eslint-config-next": "16.1.1",
+    "husky": "^9.1.7",
     "lint-staged": "^15.2.10",
     "postcss": "^8.4.49",
     "prettier": "^3.4.2",
