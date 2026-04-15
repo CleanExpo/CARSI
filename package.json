@@ -33,7 +33,7 @@
     "db:seed-water-damage-txt": "npx tsx scripts/seed-water-damage-txt.ts",
     "db:seed-specialty-drying-txt": "npx tsx scripts/seed-specialty-drying-txt.ts",
     "type-check": "tsc --noEmit",
-    "lint": "next lint --dir .",
+    "lint": "next lint .",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate deploy",
     "db:studio": "prisma studio",
