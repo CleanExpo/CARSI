@@ -61,7 +61,7 @@ interface ErrorState {
 
 export default function StudentDashboardPage() {
   const { user } = useAuth();
-  const [level, setLevel] = useState<LevelData | null>(null);
+  const [_level, setLevel] = useState<LevelData | null>(null);
   const [sub, setSub] = useState<SubData | null>(null);
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
@@ -72,7 +72,7 @@ export default function StudentDashboardPage() {
     profile: null,
     enrollments: null,
   });
-  const [loading, setLoading] = useState({
+  const [_loading, setLoading] = useState({
     level: true,
     sub: true,
     profile: true,
@@ -142,7 +142,7 @@ export default function StudentDashboardPage() {
     fetchEnrollments();
   }, [user, fetchLevel, fetchSub, fetchProfile, fetchEnrollments]);
 
-  function handleManageSubscription() {
+  function _handleManageSubscription() {
     apiClient
       .post<{ url: string }>('/api/lms/subscription/portal')
       .then((data) => {
@@ -151,11 +151,11 @@ export default function StudentDashboardPage() {
       .catch(() => null);
   }
 
-  function handleSubscribe() {
+  function _handleSubscribe() {
     window.location.href = '/subscribe';
   }
 
-  const certifications = profile?.iicrc_certifications ?? [];
+  const _certifications = profile?.iicrc_certifications ?? [];
   const displayName = profile?.full_name?.trim() || user?.email?.split('@')[0] || 'Learner';
 
   return (

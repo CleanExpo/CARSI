@@ -523,7 +523,7 @@ test.describe('7. Quiz', () => {
     // The quiz question text or quiz title should appear
     const quizText = page.locator(`text=${MOCK_QUIZ.title}`);
     const questionText = page.locator('text=primary source of water damage');
-    const found =
+    const _found =
       (await quizText.isVisible({ timeout: 5_000 }).catch(() => false)) ||
       (await questionText.isVisible({ timeout: 3_000 }).catch(() => false));
 

@@ -218,7 +218,7 @@ function stripHTML(html: string): string {
     .trim();
 }
 
-function slugToTitle(slug: string): string {
+function _slugToTitle(slug: string): string {
   return slug
     .split('-')
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))

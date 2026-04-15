@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Course slug is required' }, { status: 400 });
     }
 
-    const normalized = slug.toLowerCase();
+    const _normalized = slug.toLowerCase();
     const origin = request.nextUrl.origin;
     const defaults = buildCourseCheckoutUrls(origin, slug);
     const success_url =

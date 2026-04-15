@@ -82,7 +82,7 @@ function uploadCourseThumbnailStreamOnce(
  */
 export async function uploadCourseThumbnailToCloudinary(
   buffer: Buffer,
-  mime: string
+  _mime: string
 ): Promise<{ url: string; publicId: string }> {
   const cfg = getConfig();
   if (!cfg) {

@@ -42,7 +42,7 @@ type CacheEntry = {
 
 let cache: CacheEntry | null = null;
 
-function toJsonSafeString(s: string) {
+function _toJsonSafeString(s: string) {
   return s.replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029');
 }
 

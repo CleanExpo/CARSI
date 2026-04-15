@@ -92,7 +92,7 @@ test.describe("PRD Generation Flow", () => {
     await expect(page.locator("text=/Technical Spec/i")).toBeVisible();
   });
 
-  test("should show success state after completion", async ({ page }) => {
+  test("should show success state after completion", async ({ page: _page }) => {
     // Note: This test requires mocking the backend or very long timeout
     // For real E2E, you'd mock the API responses
 

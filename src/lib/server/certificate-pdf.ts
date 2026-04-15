@@ -158,7 +158,7 @@ export async function buildCompletionCertificatePdf(params: {
   const helveticaBold = await doc.embedFont(StandardFonts.HelveticaBold);
 
   /** Full-bleed certificate: no default white margins — entire page is the dark panel. */
-  const cardLeft = 0;
+  const _cardLeft = 0;
   const cardBottom = 0;
   const cardRight = pageW;
   const cardTop = pageH;
