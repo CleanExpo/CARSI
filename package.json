@@ -35,6 +35,7 @@
     "db:seed-contents-specialty-drying-courses-txt": "npx tsx scripts/seed-contents-specialty-drying-courses-txt.ts",
     "db:seed-specialty-courses-resources-txt": "npx tsx scripts/seed-specialty-courses-resources-txt.ts",
     "db:seed-technology-inspection-tools-txt": "npx tsx scripts/seed-technology-inspection-tools-txt.ts",
+    "db:seed-odour-smoke-psychro-drying-docx": "npx tsx scripts/seed-odour-smoke-psychro-drying-docx.ts",
     "lint": "next lint",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate deploy",
