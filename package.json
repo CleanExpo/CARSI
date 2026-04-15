@@ -34,6 +34,7 @@
     "db:seed-specialty-drying-txt": "npx tsx scripts/seed-specialty-drying-txt.ts",
     "type-check": "tsc --noEmit",
     "lint": "eslint .",
+    "test:e2e": "playwright test e2e/",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate deploy",
     "db:studio": "prisma studio",
