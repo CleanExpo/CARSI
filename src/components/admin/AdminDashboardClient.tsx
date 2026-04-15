@@ -45,7 +45,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { ProgressBar } from '@/components/lms/ProgressBar';
 import { cn } from '@/lib/utils';
 
@@ -113,7 +120,7 @@ function AnalyticsPanel({
       )}
     >
       <div
-        className="pointer-events-none absolute -right-24 -top-28 h-64 w-64 rounded-full opacity-[0.35] blur-3xl transition-all duration-700 ease-out group-hover:opacity-[0.48]"
+        className="pointer-events-none absolute -top-28 -right-24 h-64 w-64 rounded-full opacity-[0.35] blur-3xl transition-all duration-700 ease-out group-hover:opacity-[0.48]"
         style={{ background: `radial-gradient(circle, ${accent}40 0%, transparent 68%)` }}
       />
       <div className="relative z-[1] flex min-h-0 flex-1 flex-col">
@@ -126,13 +133,15 @@ function AnalyticsPanel({
               <Icon className="h-5 w-5" strokeWidth={1.65} />
             </div>
             <div className="min-w-0 space-y-1">
-              <h3 className="text-[15px] font-semibold tracking-tight text-white/[0.94]">{title}</h3>
+              <h3 className="text-[15px] font-semibold tracking-tight text-white/[0.94]">
+                {title}
+              </h3>
               <p className="text-xs leading-relaxed text-white/48">{subtitle}</p>
             </div>
           </div>
           {headerRight ? <div className="shrink-0 pt-0.5">{headerRight}</div> : null}
         </div>
-        <div className="min-h-0 flex-1 px-3 pb-5 pt-3 sm:px-5 sm:pb-6">{children}</div>
+        <div className="min-h-0 flex-1 px-3 pt-3 pb-5 sm:px-5 sm:pb-6">{children}</div>
       </div>
     </div>
   );
@@ -174,8 +183,12 @@ function SectionHeading({ title, description }: { title: string; description?: s
   return (
     <div className="mb-5 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        <h2 className="text-[11px] font-semibold tracking-[0.22em] text-white/40 uppercase">{title}</h2>
-        {description ? <p className="mt-1 max-w-2xl text-sm leading-relaxed text-white/50">{description}</p> : null}
+        <h2 className="text-[11px] font-semibold tracking-[0.22em] text-white/40 uppercase">
+          {title}
+        </h2>
+        {description ? (
+          <p className="mt-1 max-w-2xl text-sm leading-relaxed text-white/50">{description}</p>
+        ) : null}
       </div>
     </div>
   );
@@ -209,8 +222,13 @@ function KpiCard({
       />
       <div className="flex items-start justify-between gap-3">
         <div className="space-y-3">
-          <p className="text-[11px] font-semibold tracking-[0.14em] text-white/42 uppercase">{label}</p>
-          <p className="text-3xl font-bold tracking-tight tabular-nums sm:text-[2rem]" style={{ color: accent }}>
+          <p className="text-[11px] font-semibold tracking-[0.14em] text-white/42 uppercase">
+            {label}
+          </p>
+          <p
+            className="text-3xl font-bold tracking-tight tabular-nums sm:text-[2rem]"
+            style={{ color: accent }}
+          >
             {display}
           </p>
         </div>
@@ -228,7 +246,9 @@ function KpiCard({
 export function AdminDashboardClient({ data }: { data: AdminDashboardClientData }) {
   const router = useRouter();
   const chartUid = useId().replace(/:/g, '');
-  const [selectedUserId, setSelectedUserId] = useState<string | null>(data.users[0]?.userId ?? null);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(
+    data.users[0]?.userId ?? null
+  );
   const [courseSlugToAdd, setCourseSlugToAdd] = useState<string>('');
   const [pendingGrant, setPendingGrant] = useState(false);
   const [pendingRevokeId, setPendingRevokeId] = useState<string | null>(null);
@@ -340,7 +360,9 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
           </h1>
           <p className="max-w-2xl text-sm leading-relaxed text-white/52 sm:text-[15px]">
             Monitor workbook engagement, completion, and catalog coverage. Seed catalog holds{' '}
-            <span className="font-semibold text-white/75">{data.catalogMeta.totalCoursesInCatalog}</span>{' '}
+            <span className="font-semibold text-white/75">
+              {data.catalogMeta.totalCoursesInCatalog}
+            </span>{' '}
             courses.
           </p>
         </div>
@@ -366,8 +388,18 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
         />
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <KpiCard label="Users" value={data.kpis.totalUsers} accent="#93c5fd" icon={Users} />
-          <KpiCard label="Active enrollments" value={data.kpis.activeLearners} accent="#22d3ee" icon={Activity} />
-          <KpiCard label="Completed" value={data.kpis.completedEnrollments} accent="#34d399" icon={CheckCircle2} />
+          <KpiCard
+            label="Active enrollments"
+            value={data.kpis.activeLearners}
+            accent="#22d3ee"
+            icon={Activity}
+          />
+          <KpiCard
+            label="Completed"
+            value={data.kpis.completedEnrollments}
+            accent="#34d399"
+            icon={CheckCircle2}
+          />
           <KpiCard
             label="Completion rate"
             value={`${data.kpis.completionRatePct}%`}
@@ -395,14 +427,18 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
               {data.charts.completionByCourseBar.length === 0 ? (
                 <AnalyticsChartEmpty message="No workbook enrollments yet — add learners and courses to see this chart." />
               ) : (
-                <div className="h-[min(320px,48vh)] w-full min-h-[240px]">
+                <div className="h-[min(320px,48vh)] min-h-[240px] w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart
                       data={data.charts.completionByCourseBar}
                       margin={{ top: 16, right: 10, left: -12, bottom: 4 }}
                       barCategoryGap="20%"
                     >
-                      <CartesianGrid strokeDasharray="5 8" vertical={false} stroke="rgba(255,255,255,0.055)" />
+                      <CartesianGrid
+                        strokeDasharray="5 8"
+                        vertical={false}
+                        stroke="rgba(255,255,255,0.055)"
+                      />
                       <XAxis
                         dataKey="courseTitle"
                         tick={{ fill: 'rgba(255,255,255,0.42)', fontSize: 10 }}
@@ -424,8 +460,10 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
                       />
                       <Tooltip
                         {...chartTooltipProps}
-                        formatter={(value: number | string) => [`${value}%`, 'Complete']}
-                        labelFormatter={(label) => (typeof label === 'string' ? label : String(label))}
+                        formatter={(value) => [`${value ?? ''}%`, 'Complete']}
+                        labelFormatter={(label) =>
+                          typeof label === 'string' ? label : String(label)
+                        }
                       />
                       <Bar
                         dataKey="completionPct"
@@ -452,7 +490,7 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
               icon={PieChartIcon}
               accent="#34d399"
               headerRight={
-                <span className="rounded-full border border-white/10 bg-white/[0.05] px-2.5 py-1 text-[11px] font-semibold tabular-nums text-white/55">
+                <span className="rounded-full border border-white/10 bg-white/[0.05] px-2.5 py-1 text-[11px] font-semibold text-white/55 tabular-nums">
                   {statusEnrollmentTotal} total
                 </span>
               }
@@ -482,12 +520,12 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
                       </Pie>
                       <Tooltip
                         {...chartTooltipProps}
-                        formatter={(value: number | string, name: string) => [value, name]}
+                        formatter={(value, name) => [value ?? '', name]}
                       />
                     </PieChart>
                   </ResponsiveContainer>
                   <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center">
-                    <span className="text-3xl font-bold tracking-tight tabular-nums text-white/[0.92]">
+                    <span className="text-3xl font-bold tracking-tight text-white/[0.92] tabular-nums">
                       {statusEnrollmentTotal}
                     </span>
                     <span className="mt-0.5 text-[10px] font-semibold tracking-[0.2em] text-white/38 uppercase">
@@ -498,7 +536,9 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
                 <ul className="flex min-w-0 flex-1 flex-col justify-center gap-3 lg:pl-2">
                   {data.charts.statusPie.map((row, idx) => {
                     const pct =
-                      statusEnrollmentTotal > 0 ? Math.round((row.value / statusEnrollmentTotal) * 100) : 0;
+                      statusEnrollmentTotal > 0
+                        ? Math.round((row.value / statusEnrollmentTotal) * 100)
+                        : 0;
                     const color = statusSliceColor(row.name, idx);
                     return (
                       <li
@@ -513,7 +553,9 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
                           <div className="text-sm font-medium text-white/88">{row.name}</div>
                           <div className="text-xs text-white/42">{pct}% of all enrollments</div>
                         </div>
-                        <span className="shrink-0 text-sm font-bold tabular-nums text-white/80">{row.value}</span>
+                        <span className="shrink-0 text-sm font-bold text-white/80 tabular-nums">
+                          {row.value}
+                        </span>
                       </li>
                     );
                   })}
@@ -532,14 +574,18 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
               {data.charts.catalogCategoryPie.length === 0 ? (
                 <AnalyticsChartEmpty message="No categories in the seed catalog." />
               ) : (
-                <div className="h-[min(340px,50vh)] w-full min-h-[260px]">
+                <div className="h-[min(340px,50vh)] min-h-[260px] w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart
                       layout="vertical"
                       data={data.charts.catalogCategoryPie}
                       margin={{ top: 8, right: 20, left: 8, bottom: 8 }}
                     >
-                      <CartesianGrid strokeDasharray="5 8" horizontal stroke="rgba(255,255,255,0.055)" />
+                      <CartesianGrid
+                        strokeDasharray="5 8"
+                        horizontal
+                        stroke="rgba(255,255,255,0.055)"
+                      />
                       <XAxis
                         type="number"
                         tick={{ fill: 'rgba(255,255,255,0.42)', fontSize: 11 }}
@@ -557,8 +603,10 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
                       />
                       <Tooltip
                         {...chartTooltipProps}
-                        formatter={(value: number | string) => [value, 'Courses']}
-                        labelFormatter={(label) => (typeof label === 'string' ? label : String(label))}
+                        formatter={(value) => [value ?? '', 'Courses']}
+                        labelFormatter={(label) =>
+                          typeof label === 'string' ? label : String(label)
+                        }
                       />
                       <Bar
                         dataKey="value"
@@ -589,14 +637,18 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
               {data.charts.enrollmentsPerCourse.length === 0 ? (
                 <AnalyticsChartEmpty message="No enrollment data to rank yet." />
               ) : (
-                <div className="h-[min(340px,48vh)] w-full min-h-[260px]">
+                <div className="h-[min(340px,48vh)] min-h-[260px] w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart
                       layout="vertical"
                       data={data.charts.enrollmentsPerCourse}
                       margin={{ top: 10, right: 18, left: 4, bottom: 8 }}
                     >
-                      <CartesianGrid strokeDasharray="5 8" horizontal stroke="rgba(255,255,255,0.055)" />
+                      <CartesianGrid
+                        strokeDasharray="5 8"
+                        horizontal
+                        stroke="rgba(255,255,255,0.055)"
+                      />
                       <XAxis
                         type="number"
                         tick={{ fill: 'rgba(255,255,255,0.42)', fontSize: 11 }}
@@ -613,7 +665,7 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
                       />
                       <Tooltip
                         {...chartTooltipProps}
-                        formatter={(value: number | string) => [value, 'Enrollments']}
+                        formatter={(value) => [value ?? '', 'Enrollments']}
                       />
                       <Bar
                         dataKey="enrollments"
@@ -637,9 +689,12 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
               icon={AreaChartIcon}
               accent="#22d3ee"
             >
-              <div className="h-[min(340px,48vh)] w-full min-h-[260px]">
+              <div className="h-[min(340px,48vh)] min-h-[260px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={data.charts.completionsLine} margin={{ top: 16, right: 12, left: -12, bottom: 8 }}>
+                  <AreaChart
+                    data={data.charts.completionsLine}
+                    margin={{ top: 16, right: 12, left: -12, bottom: 8 }}
+                  >
                     <defs>
                       <linearGradient id={`adminArea-${chartUid}`} x1="0" y1="0" x2="0" y2="1">
                         <stop offset="4%" stopColor="#22d3ee" stopOpacity={0.5} />
@@ -652,7 +707,9 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
                       tick={{ fill: 'rgba(255,255,255,0.42)', fontSize: 10 }}
                       tickLine={false}
                       axisLine={{ stroke: 'rgba(255,255,255,0.07)' }}
-                      tickFormatter={(v) => (typeof v === 'string' && v.length >= 10 ? v.slice(5, 10) : String(v))}
+                      tickFormatter={(v) =>
+                        typeof v === 'string' && v.length >= 10 ? v.slice(5, 10) : String(v)
+                      }
                     />
                     <YAxis
                       tick={{ fill: 'rgba(255,255,255,0.42)', fontSize: 11 }}
@@ -663,8 +720,10 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
                     />
                     <Tooltip
                       {...chartTooltipProps}
-                      formatter={(value: number | string) => [value, 'Completions']}
-                      labelFormatter={(label) => (typeof label === 'string' ? label : String(label))}
+                      formatter={(value) => [value ?? '', 'Completions']}
+                      labelFormatter={(label) =>
+                        typeof label === 'string' ? label : String(label)
+                      }
                     />
                     <Area
                       type="monotone"
@@ -694,7 +753,9 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
         <div className="grid gap-5 lg:grid-cols-12">
           <Card className={cn(glassCard, 'lg:col-span-3')}>
             <CardHeader className="border-b border-white/[0.06] pb-4">
-              <CardTitle className="text-base font-semibold text-white/88">Selected learner</CardTitle>
+              <CardTitle className="text-base font-semibold text-white/88">
+                Selected learner
+              </CardTitle>
               <CardDescription className="text-white/45">Overall workbook progress</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col items-center gap-5 pt-6">
@@ -723,7 +784,7 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
                     </ResponsiveContainer>
                     <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center">
                       <div
-                        className="text-3xl font-black tabular-nums tracking-tight"
+                        className="text-3xl font-black tracking-tight tabular-nums"
                         style={{ color: completionColor(selected.overallCompletionPct) }}
                       >
                         {selected.overallCompletionPct}%
@@ -734,12 +795,16 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
                     </div>
                   </div>
                   <div className="w-full space-y-1 text-center">
-                    <div className="text-sm font-semibold text-white/92">{selected.fullName ?? selected.email}</div>
+                    <div className="text-sm font-semibold text-white/92">
+                      {selected.fullName ?? selected.email}
+                    </div>
                     <div className="truncate text-xs text-white/48">{selected.email}</div>
                   </div>
                 </>
               ) : (
-                <p className="py-8 text-center text-sm text-white/45">Select a user from the directory</p>
+                <p className="py-8 text-center text-sm text-white/45">
+                  Select a user from the directory
+                </p>
               )}
             </CardContent>
           </Card>
@@ -780,7 +845,9 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
                             <div className="flex items-center gap-3">
                               <AvatarIcon user={u} />
                               <div className="min-w-0">
-                                <div className="truncate text-sm font-medium text-white/90">{u.fullName ?? u.email}</div>
+                                <div className="truncate text-sm font-medium text-white/90">
+                                  {u.fullName ?? u.email}
+                                </div>
                                 <div className="truncate text-xs text-white/42">{u.email}</div>
                               </div>
                             </div>
@@ -801,20 +868,26 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
           </Card>
 
           <Card className={cn(glassCard, 'lg:col-span-5')}>
-            <CardHeader className="border-b border-white/[0.06] space-y-4 pb-4">
+            <CardHeader className="space-y-4 border-b border-white/[0.06] pb-4">
               <div className="flex items-start gap-3">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[rgba(36,144,237,0.25)] bg-[rgba(36,144,237,0.1)]">
                   <BookOpen className="h-5 w-5 text-[#7ec5ff]" strokeWidth={1.75} />
                 </div>
                 <div className="min-w-0 flex-1 space-y-1">
-                  <CardTitle className="text-base font-semibold text-white/88">Workbook access</CardTitle>
-                  <CardDescription className="text-white/45">Grant seed-catalog courses for the selected learner</CardDescription>
+                  <CardTitle className="text-base font-semibold text-white/88">
+                    Workbook access
+                  </CardTitle>
+                  <CardDescription className="text-white/45">
+                    Grant seed-catalog courses for the selected learner
+                  </CardDescription>
                 </div>
               </div>
               {selected ? (
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
                   <div className="min-w-0 flex-1 space-y-1.5">
-                    <div className="text-[10px] font-semibold tracking-[0.16em] text-white/38 uppercase">Add course</div>
+                    <div className="text-[10px] font-semibold tracking-[0.16em] text-white/38 uppercase">
+                      Add course
+                    </div>
                     <Select
                       value={courseSlugToAdd}
                       onValueChange={setCourseSlugToAdd}
@@ -822,7 +895,11 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
                     >
                       <SelectTrigger className="h-11 rounded-xl border-white/[0.1] bg-white/[0.04] transition-colors hover:bg-white/[0.06]">
                         <SelectValue
-                          placeholder={grantableCourses.length ? 'Choose a course…' : 'All catalog courses assigned'}
+                          placeholder={
+                            grantableCourses.length
+                              ? 'Choose a course…'
+                              : 'All catalog courses assigned'
+                          }
                         />
                       </SelectTrigger>
                       <SelectContent>
@@ -845,7 +922,7 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
                 </div>
               ) : null}
             </CardHeader>
-            <CardContent className="max-h-[min(520px,55vh)] space-y-4 overflow-y-auto pr-1 pt-5">
+            <CardContent className="max-h-[min(520px,55vh)] space-y-4 overflow-y-auto pt-5 pr-1">
               {selected ? (
                 selected.enrollments.length > 0 ? (
                   selected.enrollments.map((e) => (
@@ -860,9 +937,12 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
                     >
                       <div className="flex flex-wrap items-start justify-between gap-3">
                         <div className="min-w-0 flex-1">
-                          <div className="truncate text-base font-semibold text-white/92">{e.courseTitle}</div>
+                          <div className="truncate text-base font-semibold text-white/92">
+                            {e.courseTitle}
+                          </div>
                           <div className="mt-1.5 text-xs leading-relaxed text-white/48">
-                            {e.completedLessons}/{e.totalLessons} lessons · {e.completedModules} modules complete
+                            {e.completedLessons}/{e.totalLessons} lessons · {e.completedModules}{' '}
+                            modules complete
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
@@ -918,7 +998,8 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
                     <div className="space-y-1 px-4">
                       <p className="text-sm font-medium text-white/70">No enrollments yet</p>
                       <p className="text-xs leading-relaxed text-white/45">
-                        Add a workbook from the catalog to start tracking this learner&apos;s progress.
+                        Add a workbook from the catalog to start tracking this learner&apos;s
+                        progress.
                       </p>
                     </div>
                   </div>

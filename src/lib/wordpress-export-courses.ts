@@ -37,10 +37,12 @@ export interface WpExportCourse {
   category?: string | null;
   /** When set (e.g. LMS seed), listing UIs can show module/lesson counts. */
   lesson_count?: number | null;
+  updated_at?: string | null;
   meta?: {
     wp_id?: number;
     wp_categories?: Array<{ id?: number; name?: string; slug?: string }>;
     wp_tags?: unknown[];
+    pricing?: string;
   };
 }
 
