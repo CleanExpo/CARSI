@@ -11,16 +11,19 @@ export async function POST(request: NextRequest) {
     }
 
     const normalized = email.trim().toLowerCase();
-    const generic = {
-      message: 'If that email exists, a password reset link has been sent.',
-    };
 
     if (!process.env.DATABASE_URL?.trim()) {
-      return NextResponse.json(generic);
+      return NextResponse.json(
+        { error: 'Password reset via email is not configured. Please contact support.' },
+        { status: 503 }
+      );
     }
 
     const user = await prisma.lmsUser.findUnique({ where: { email: normalized } });
     if (user) {
+      // Generate and log the reset token. No email transport is configured.
+      // TODO: Wire up an email provider (e.g. Resend, SendGrid, or nodemailer)
+      // and call it here with `link` before returning.
       const token = await signPasswordResetToken(user.id);
       const base =
         process.env.NEXT_PUBLIC_APP_URL?.trim() ||
@@ -32,7 +35,12 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    return NextResponse.json(generic);
+    // No email transport is configured — return an honest error instead of
+    // silently discarding the reset link and claiming success.
+    return NextResponse.json(
+      { error: 'Password reset via email is not configured. Please contact support.' },
+      { status: 503 }
+    );
   } catch (error) {
     return NextResponse.json(
       {

@@ -11,8 +11,9 @@ export async function POST(request: NextRequest) {
   }
 
   const cookieOptions = {
+    httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax' as const,
+    sameSite: 'strict' as const,
     path: '/',
     maxAge: COOKIE_MAX_AGE,
   };
@@ -30,7 +31,7 @@ export async function POST(request: NextRequest) {
   });
 
   const response = NextResponse.json({ success: true });
-  response.cookies.set('auth_token', refreshed, { ...cookieOptions, httpOnly: true });
-  response.cookies.set('carsi_token', refreshed, { ...cookieOptions, httpOnly: false });
+  response.cookies.set('auth_token', refreshed, cookieOptions);
+  response.cookies.set('carsi_token', refreshed, cookieOptions);
   return response;
 }

@@ -6,14 +6,15 @@ export async function POST() {
   const response = NextResponse.json({ success: true });
 
   const clearOptions = {
+    httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax' as const,
+    sameSite: 'strict' as const,
     path: '/',
     maxAge: 0,
   };
 
-  response.cookies.set('auth_token', '', { ...clearOptions, httpOnly: true });
-  response.cookies.set('carsi_token', '', { ...clearOptions, httpOnly: false });
+  response.cookies.set('auth_token', '', clearOptions);
+  response.cookies.set('carsi_token', '', clearOptions);
   response.cookies.set(ONBOARDING_COOKIE, '', { ...clearOptions, httpOnly: true });
 
   return response;
