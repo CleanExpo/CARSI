@@ -3,6 +3,11 @@ const MODULE_HEAD = /^MODULE (\d+):\s*(.*)$/i;
 const DASH_RULE = /^-{3,}\s*$/;
 const WHAT_YOU_LEARN = /^WHAT YOU WILL LEARN\b/i;
 const END_DOC = /^END OF WATER DAMAGE/i;
+const END_DOC_GENERIC = /^END OF DOCUMENT\b/i;
+
+function isEndDocLine(line: string): boolean {
+  return END_DOC.test(line) || END_DOC_GENERIC.test(line);
+}
 
 function slugify(title: string): string {
   const base = title
@@ -16,8 +21,8 @@ function slugify(title: string): string {
 
 function parsePriceLine(line: string): { priceAud: number; isFree: boolean } {
   const t = line.trim();
-  const free = /^Price:\s*Free\s*$/i.test(t);
-  if (free) return { priceAud: 0, isFree: true };
+  if (/^Price:\s*Free\s*$/i.test(t)) return { priceAud: 0, isFree: true };
+  if (/^Price:\s*FREE\b/i.test(t)) return { priceAud: 0, isFree: true };
   const m =
     t.match(/Price:\s*\$?\s*([0-9]+(?:\.[0-9]+)?)\s*AUD/i) ||
     t.match(/\$\s*([0-9]+(?:\.[0-9]+)?)\s*AUD/i);
@@ -39,7 +44,8 @@ export type WaterDamageParsedCourse = {
 };
 
 /**
- * Parse `water_damage_restoration_courses.txt` — `COURSE N OF M`, `COURSE OVERVIEW`, `MODULE K:` sections.
+ * Parse `water_damage_restoration_courses.txt` and `CONTENTS & SPECIALTY DRYING COURSES.txt` —
+ * `COURSE N OF M`, optional `Course Title:` or bare title line, `COURSE OVERVIEW`, `MODULE K:` sections.
  */
 export function parseWaterDamageRestorationTxt(text: string): WaterDamageParsedCourse[] {
   const lines = text.split(/\r?\n/);
@@ -70,6 +76,17 @@ export function parseWaterDamageRestorationTxt(text: string): WaterDamageParsedC
       }
       const dm = line.match(/^IICRC Discipline:\s*(.+)$/i);
       if (dm) iicrcDiscipline = dm[1]!.trim();
+      if (
+        !tm &&
+        line.trim() &&
+        !/^Price:\s*/i.test(line) &&
+        !/^Course Number:\s*/i.test(line) &&
+        !/^Total Modules:\s*/i.test(line) &&
+        !/^IICRC Discipline:\s*/i.test(line) &&
+        !/^Status:\s*/i.test(line)
+      ) {
+        if (!title) title = line.trim();
+      }
       i += 1;
     }
 
@@ -90,7 +107,7 @@ export function parseWaterDamageRestorationTxt(text: string): WaterDamageParsedC
       !COURSE_HEADER.test(lines[i]!)
     ) {
       const t = lines[i]!.trim();
-      if (t && !END_DOC.test(t)) overviewParagraphs.push(lines[i]!);
+      if (t && !isEndDocLine(t)) overviewParagraphs.push(lines[i]!);
       i += 1;
     }
 
@@ -101,7 +118,7 @@ export function parseWaterDamageRestorationTxt(text: string): WaterDamageParsedC
 
     while (i < lines.length) {
       if (COURSE_HEADER.test(lines[i]!)) break;
-      if (END_DOC.test(lines[i]!)) break;
+      if (isEndDocLine(lines[i]!)) break;
       if (/^={10,}.*END/i.test(lines[i]!)) break;
 
       if (/^={3,}\s*$/.test(lines[i]!.trim())) {
@@ -113,6 +130,8 @@ export function parseWaterDamageRestorationTxt(text: string): WaterDamageParsedC
       if (mm) {
         const modTitle = lines[i]!.trim();
         i += 1;
+        if (DASH_RULE.test(lines[i] ?? '')) i += 1;
+        while (i < lines.length && lines[i]!.trim() === '') i += 1;
         const bodyLines: string[] = [];
         while (
           i < lines.length &&
@@ -133,7 +152,7 @@ export function parseWaterDamageRestorationTxt(text: string): WaterDamageParsedC
         const rest = lines.slice(i);
         let end = rest.length;
         for (let j = 1; j < rest.length; j += 1) {
-          if (COURSE_HEADER.test(rest[j]!) || END_DOC.test(rest[j]!)) {
+          if (COURSE_HEADER.test(rest[j]!) || isEndDocLine(rest[j]!)) {
             end = j;
             break;
           }
