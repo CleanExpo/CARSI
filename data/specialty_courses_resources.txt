@@ -1,0 +1,932 @@
+================================================================================
+CARSI COURSE CONTENT — SPECIALTY COURSES AND RESOURCES
+================================================================================
+
+Contents:
+GLASS & SPECIALTY CLEANING
+  - Glass Cleaning Course (#77 CCW / #125 Standard) — $20 AUD — 5 Modules
+
+DUCT CLEANING
+  - Introduction to Residential Duct Cleaning (#102) — Free — 8 Modules
+
+AI & TECH RESOURCES
+  - Collaborative Development: Your Personal AI Assistant (#16) — $49 — Resource Overview
+  - Laser Measurer Assistance Video (#119) — Free — Resource Overview
+  - Comprehensive Chat GPT Cheat Sheet (#120) — Free — Resource Overview
+  - Technician Flow Chart (#121) — Free — Resource Overview
+  - CARSI ChatGPT eBook (#122) — $20 — Resource Overview
+
+MEMBERSHIPS & LARGE LOSS
+  - Large Loss Mastery Course (#123 / #124) — $1,980 — Course Overview
+  - Affiliate Membership (#138) — $220 — Membership Overview
+  - Foundation Membership (#139) — $44 — Membership Overview
+  - Growth Membership (#141) — $99 — Membership Overview
+  - Free Library (#143) — Free — Resource Overview
+
+MISC / INSURANCE
+  - Insurance Adjusters and Their Roles (#23) — Free — Resource Overview
+
+NOTE: Water Damage Litigation Support (#20) is documented in the Water Damage Restoration
+Courses module. Module content is not duplicated here.
+
+================================================================================
+
+
+================================================================================
+SECTION 1: GLASS & SPECIALTY CLEANING
+================================================================================
+
+COURSE TITLE: Glass Cleaning Course
+Course Numbers: #77 (CCW) / #125 (Standard)
+Price: $20 AUD
+Total Modules: 5
+Status: Published
+
+COURSE OVERVIEW
+
+Professional glass cleaning is a practical skill that restoration and cleaning technicians are frequently called on to perform following water damage events, construction works, renovation projects, and routine commercial cleaning contracts. Poorly executed glass cleaning produces streaks, smearing, and scratching — all of which are avoidable with correct technique, appropriate tools, and properly prepared cleaning solutions.
+
+This course covers the complete glass cleaning workflow: pre-job planning and preparation, the cleaning process itself, supplementary video guidance, bonus content on window track cleaning, and a knowledge assessment. Content is aligned with professional cleaning standards relevant to the Australian market.
+
+Topics covered: site assessment and equipment preparation, glass cleaning chemistry and technique, practical video demonstration reference, window track cleaning procedures, and a quiz to confirm knowledge retention.
+
+--------------------------------------------------------------------------------
+
+MODULE 1: Plan and Prepare
+
+Planning and preparation before picking up a squeegee determines the quality of the finished result. Experienced glass cleaners spend proportionally more time on preparation than on cleaning — because errors in preparation produce results that no amount of cleaning technique can fix.
+
+ASSESS THE GLASS BEFORE TOUCHING IT
+
+Walk the full extent of the glass to be cleaned before opening any equipment. Identify:
+- Type of glass: standard annealed, toughened, laminated, heritage / heritage-pattern, frosted, tinted, or coated (Low-E, solar control). Coated glass has specific chemical and abrasive restrictions — using the wrong product will strip the coating permanently.
+- Condition: scratches, chips, mineral deposits (calcium and silica scale from hard water or sprinkler overspray), paint overspray, adhesive residue, silicone contamination, or oxidised seals. Identify these before cleaning and document them with photographs — pre-existing damage noted before work begins cannot be attributed to your work.
+- Access requirements: working at height (ladder, elevated work platform), working over water features or garden beds (requires drop sheet management), or working in occupied buildings where overspray or water runoff must be controlled.
+- Frame material: aluminium, uPVC, timber, or powder-coated steel. Each has chemical compatibility requirements. Aggressive alkaline solutions can strip powder coating and stain aluminium frames if not rinsed promptly.
+
+EQUIPMENT CHECKLIST
+
+Confirm before arriving on site that you have:
+- Squeegee (correct channel width for the glass — a squeegee narrower than the glass panel requires multiple passes and leaves overlap marks)
+- Squeegee rubber in good condition (no nicks, cuts, or hardened sections — replace squeegee rubber every 4 to 8 hours of active use)
+- Scrubber / applicator sleeve (microfibre or lambswool — matched to the glass condition)
+- Bucket with appropriate solution (diluted professional glass cleaning concentrate or a low-residue alternative — avoid detergents that leave surfactant residue)
+- Scrim cloths or lint-free detailing cloths for edges and corners
+- Razor blade scraper in a safety holder (for paint, adhesive, or hard deposits — only on untreated, uncoated glass)
+- Extension pole matched to the window height
+- Drop sheet or barrier to protect frames and surfaces below
+
+SOLUTION PREPARATION
+
+Mix glass cleaning solution at the manufacturer's specified dilution. In hot Australian conditions, slightly increasing the concentration prevents the solution from flashing off (drying) before the squeegee pass is complete. Cold water increases working time in summer. Never use neat washing-up detergent — the surfactants leave a residue that attracts dirt and causes rapid re-soiling.
+
+Reference: Australian Window Association — Glass and Glazing Standards | Safe Work Australia — Working at Heights Code of Practice
+
+--------------------------------------------------------------------------------
+
+MODULE 2: Clean the Glass
+
+Correct glass cleaning technique eliminates streaks, prevents re-soiling, and protects the glass surface and frame. There is a specific sequence — follow it on every panel.
+
+STANDARD CLEANING SEQUENCE
+
+Step 1 — Pre-rinse. For exterior glass with significant dust or grit, rinse the surface with clean water before applying cleaning solution. Wiping a gritty glass surface with a scrubber without pre-rinsing embeds particles in the scrubber and scratches the glass.
+
+Step 2 — Apply solution. Saturate the scrubber / applicator sleeve with solution and apply to the full glass surface using overlapping horizontal strokes. Ensure complete coverage including edges and corners — dry edges cause streaks as the squeegee drags solvent residue from the wet centre across a dry border.
+
+Step 3 — Agitate. For normally soiled glass, the application stroke provides sufficient agitation. For glass with heavier soiling (construction dust, cooking grease, or insect residue), use circular scrubbing strokes before the squeegee pass.
+
+Step 4 — Squeegee. Start at the top corner of the panel and pull the squeegee across the top of the glass in one controlled stroke, angled slightly downward to direct water away from the frame at the leading edge. Wipe the squeegee rubber after each stroke with a scrim cloth to remove accumulated water and soil — a dirty rubber re-deposits contamination on the next stroke. Work downward in overlapping horizontal bands until the full panel is completed.
+
+Step 5 — Detail edges. Use a clean, dry scrim or lint-free cloth to wipe any remaining water from the frame perimeter, corners, and the bottom of the panel. This prevents water from running back onto the clean glass from the frame or sill.
+
+Step 6 — Inspect. Step back and inspect the panel from an angle at which any streaks or missed areas will be visible. Touch up as required before moving to the next panel.
+
+COMMON ERRORS AND HOW TO AVOID THEM
+
+Streaks running from top to bottom: squeegee rubber is nicked or dirty. Replace or clean the rubber.
+Streaks at the sides: insufficient solution applied to edges. Saturate edges fully before squeegeeing.
+Smearing across the full panel: solution is contaminated with old residue from the bucket. Change the water and solution after every 4 to 6 panels or when the water becomes visibly dirty.
+Mineral deposit marks remain after cleaning: standard cleaning solution does not remove calcium or silica scale. Use a proprietary scale remover or diluted acidic cleaner appropriate for the glass type (test in an inconspicuous area first).
+
+Reference: Australian Window Association | IICRC S100 (surface cleaning principles) | AS 1288 (Glass in Buildings)
+
+--------------------------------------------------------------------------------
+
+MODULE 3: Glass Cleaning Video
+
+PURPOSE OF THIS MODULE
+
+This module provides a video-based practical demonstration of the glass cleaning technique covered in Module 2. The video format allows learners to observe correct squeegee handling, solution application, detailing technique, and the inspection process in real time — elements that written instruction describes but cannot fully convey.
+
+HOW TO USE THIS MODULE
+
+Watch the full video before attempting the practical application covered in Module 2. Pay specific attention to:
+- Squeegee angle and pressure — observe how consistent angle control produces a clean cut through the solution without leaving a leading-edge streak
+- Rubber wiping technique — note the frequency and method of wiping the rubber between strokes
+- Edge detailing — observe the cloth folding technique that prevents the cloth from re-depositing water on the clean glass surface
+- Inspection — observe the angle and lighting conditions used to identify streaks or missed areas before moving to the next panel
+
+After completing Module 2 on an actual job, return to this video if any results are inconsistent with expectations. Visual reference is a faster troubleshooting tool than re-reading written instructions.
+
+ON-SITE APPLICATION
+
+This module is intended as a reference resource that technicians can access on a mobile device on site when learning or troubleshooting. Bookmark the video for quick access during early-career glass cleaning work. As technique becomes ingrained through practice, the written checklist in Module 1 (Plan and Prepare) is the on-site reference tool, with the video available for specific technique verification.
+
+Reference: Practical demonstration — applicable technique aligned with AS 1288 and Australian Window Association professional cleaning standards
+
+--------------------------------------------------------------------------------
+
+MODULE 4: BONUS — Window Tracks
+
+Window tracks are among the most neglected surfaces in residential and commercial cleaning — and among the most frequently complained about by clients who notice them after the glass has been cleaned. Leaving dirty tracks adjacent to clean glass produces an incomplete result and a dissatisfied client. Cleaning tracks correctly adds minutes to a job and significantly improves the client's perception of quality.
+
+WHY TRACKS ACCUMULATE HEAVY SOILING
+
+Window tracks collect: construction dust and concrete residue (in new builds and renovation sites), insect debris, mould growth in humid coastal climates, calcium scale from condensation and humidity, paint overspray from building works, and leaf litter and organic material in external tracks. The combination of fine particles, moisture, and organic matter in a confined channel creates soiling that resists standard spray-and-wipe cleaning.
+
+TRACK CLEANING PROCESS
+
+Step 1 — Dry removal first. Use a stiff, narrow brush or a dedicated track cleaning brush to loosen dry debris from the full length of the track before applying any liquid. Applying liquid to dry compacted debris turns it into a paste that is harder to remove and may stain the track surface.
+
+Step 2 — Vacuum. A crevice tool on a small vacuum removes the loosened dry material efficiently. This step is worth doing — skipping it means the debris gets pushed into the cleaning cloth and redeposited along the track.
+
+Step 3 — Apply cleaning solution. For standard soiling, diluted all-purpose cleaner applied with a small brush or spray is adequate. For calcium or mineral deposits, an acidic descaling solution (tested for compatibility with the track material — aluminium reacts with strong acids) provides faster results. For mould in tracks, a diluted disinfectant or mould-specific treatment is required.
+
+Step 4 — Agitate with a detail brush. A toothbrush-style detail brush or a dedicated track cleaning tool works the solution into corners and the full depth of the channel. Work along the full length of the track in short scrubbing strokes.
+
+Step 5 — Wipe out. Use a cloth folded to fit the track width — not a folded cloth pressed flat across the track opening — to draw soiling out of the channel. Work from one end of the track to the other in a single direction. Refold the cloth to a clean surface after each pass.
+
+Step 6 — Final inspection and wipe. Run a clean, damp cloth through the track to remove any residual cleaning product, then a dry cloth to remove moisture.
+
+ROLLERS AND MECHANISM CHECK
+
+While cleaning tracks, check that rollers (on sliding windows and doors) are moving freely and are not worn or damaged. Alert the client to any worn or seized rollers — this is a value-add observation that clients appreciate and that positions you as a thorough professional.
+
+Reference: Australian Window Association — Window maintenance guidelines
+
+--------------------------------------------------------------------------------
+
+MODULE 5: Glass Cleaning Quiz
+
+PURPOSE OF THIS MODULE
+
+The Glass Cleaning Quiz is the knowledge assessment for this course. It confirms that participants have understood and can apply the key principles covered across Modules 1 through 4 before independently performing glass cleaning work.
+
+HOW TO USE THIS MODULE
+
+Complete the quiz after finishing all preceding modules. The quiz is not a test of memory — it is a practical knowledge check. If you find a question difficult, return to the relevant module to review the content before attempting the quiz again.
+
+WHAT THE QUIZ COVERS
+
+The quiz assesses knowledge across four areas drawn directly from the course modules:
+
+Pre-job planning and assessment: identifying glass types and their specific requirements, pre-existing damage assessment and documentation, equipment selection and condition checking, and solution preparation.
+
+Cleaning technique: the correct sequence of steps for standard glass cleaning, squeegee technique and rubber maintenance, edge detailing, and the inspection process.
+
+Problem identification and resolution: recognising common errors (streaking, smearing, mineral deposit residue) and identifying their cause and correction.
+
+Window track cleaning: the dry-removal-first principle, cleaning sequence, product selection for different types of soiling, and roller and mechanism inspection.
+
+PASSING THE QUIZ
+
+Complete all questions in the quiz. Review any incorrect answers by returning to the relevant module section before proceeding to active field work. The quiz completion record is stored in your learner profile and may be referenced by supervisors or clients as confirmation of training.
+
+Reference: Glass Cleaning Course Modules 1 through 4 — all content areas assessed
+
+--------------------------------------------------------------------------------
+
+WHAT YOU WILL LEARN
+
+Participants who complete this course will be able to:
+- Conduct a pre-job assessment of glass type, condition, and access requirements before commencing cleaning
+- Select and prepare appropriate equipment and solutions for the specific glass and soiling conditions on each job
+- Execute the complete glass cleaning sequence to a professional standard with consistent, streak-free results
+- Identify and resolve common glass cleaning errors including streaking, smearing, and mineral deposit residue
+- Clean window tracks using the correct dry-first process and appropriate cleaning chemistry
+- Pass the knowledge assessment confirming practical understanding of all course content
+
+
+================================================================================
+SECTION 2: DUCT CLEANING
+================================================================================
+
+COURSE TITLE: Introduction to Residential Duct Cleaning
+Course Number: #102
+Price: Free
+Total Modules: 8
+Status: Draft
+
+COURSE OVERVIEW
+
+Residential duct cleaning is a growing service category within the Australian home services sector. Dirty ductwork degrades indoor air quality, reduces HVAC system efficiency, and — in the case of dryer duct systems — creates a genuine fire hazard. This course introduces the business context, technical knowledge, and equipment operation skills required to provide professional residential duct cleaning services.
+
+Topics covered: the commercial opportunity in residential duct cleaning, residential HVAC system architecture, the two primary cleaning methodologies (contact and negative pressure), the specific equipment systems used in each methodology, and the end-to-end cleaning process.
+
+This course is in Draft status. Content reflects the current module framework and is subject to review and supplementation with practical field photography and video resources prior to final publication.
+
+Standards applied: AIRAH (Australian Institute of Refrigeration, Air Conditioning and Heating) technical guidelines, AS/NZS 3823 (performance of air conditioners and heat pumps), Safe Work Australia Model WHS Regulations, state fire safety regulations applicable to dryer duct systems.
+
+--------------------------------------------------------------------------------
+
+MODULE 1: The Business of Residential Cleaning
+
+MARKET CONTEXT
+
+Residential duct cleaning in Australia operates in an underserved market. The majority of Australian homeowners with ducted HVAC systems have never had their ductwork professionally cleaned — many are unaware the service exists. Industry data consistently shows that duct cleaning businesses with professional presentation, clear service descriptions, and the ability to demonstrate before-and-after results grow quickly through referrals.
+
+The residential duct cleaning service sits alongside water damage restoration, carpet cleaning, and HVAC maintenance as a complementary service that restoration and cleaning businesses can add to their existing capabilities with targeted equipment investment.
+
+COMMERCIAL OPPORTUNITY
+
+Primary revenue streams in residential duct cleaning:
+- Standard duct system cleaning (supply and return air ducts, grilles, and register cleaning)
+- Dryer duct cleaning (fire safety service — independently marketed to homeowners, real estate agents, and property managers)
+- Sanitisation and antimicrobial treatment of duct systems (post-mould, post-renovation, or post-pest-infestation events)
+- Pre-occupancy duct cleaning for newly purchased or rental properties (increasingly requested by property managers)
+- Annual maintenance programmes (recurring revenue — subscription or reminder-based re-booking)
+
+PRICING STRUCTURE
+
+Residential duct cleaning is priced per system, per zone, or by component count (number of vents). Research local market rates before establishing pricing. Pricing variables include: number of vents, system type (ducted gas, ducted reverse cycle, evaporative), accessibility of the duct system (roof space, subfloor, or wall-mounted), and the extent of contamination.
+
+BUSINESS REQUIREMENTS
+
+Operating a residential duct cleaning business in Australia requires: appropriate insurance (public liability minimum $10 million, consider product liability cover for sanitisation services), a reliable late-model vehicle capable of carrying equipment, professional presentation and uniforms, a booking system capable of managing residential appointments, and an online presence with before-and-after photography.
+
+Reference: AIRAH | Australian Home Service Association | Safe Work Australia
+
+--------------------------------------------------------------------------------
+
+MODULE 2: Understanding Residential HVAC Systems
+
+SYSTEM TYPES
+
+Residential duct cleaning technicians encounter three primary HVAC system types:
+
+Ducted reverse cycle (refrigerant-based): the most common system in southern Australian states. A central air handling unit (typically in the roof space or ceiling cavity) distributes conditioned air through insulated flexible or rigid ductwork to supply registers throughout the home. Return air is drawn back to the unit through a central return air grille (usually a ceiling-mounted grille in a central hall or living area) or through return air ducts.
+
+Ducted gas heating with or without evaporative cooling: common in Victoria and South Australia. The gas furnace unit is typically in the roof space. Supply ducts are similar to reverse cycle systems. Evaporative coolers may be integrated or operate through separate ductwork.
+
+Evaporative cooling systems: common in dry inland Australian climates (Western Australia, South Australia, Victoria). A roof-mounted evaporative unit draws outside air through water-saturated pads and distributes cooled air through ductwork to ceiling registers. These systems operate with windows and doors slightly open to allow air flow through the home.
+
+SYSTEM COMPONENTS RELEVANT TO CLEANING
+
+Air handling unit (AHU): the central unit containing the fan, heat exchanger or evaporator coil, and filter. The AHU interior and coil require cleaning as part of a comprehensive duct cleaning service. Access panels on the unit allow inspection and cleaning of the fan blades and coil face.
+
+Supply ductwork: insulated flexible ducts (Flexduct) or rigid sheet metal ducts running from the AHU through the roof space to each register. Flexible duct is susceptible to kinking, collapse, and rodent damage — inspect for condition while cleaning.
+
+Return air system: the pathway through which room air is drawn back to the AHU. This may be a single large central grille and return air plenum, or a dedicated return air duct network.
+
+Registers and grilles: the visible supply and return air outlets in ceilings, walls, or floors. Registers accumulate dust, pet hair, and biological material on their face and in the first 300mm of the duct immediately behind them — often the most heavily contaminated location in the system.
+
+Dryer duct: a separate, dedicated duct from a clothes dryer to the exterior of the building. Not part of the HVAC system but a critical fire-safety cleaning service offered by duct cleaning businesses.
+
+Reference: AIRAH Technical Handbook | Manufacturer installation guides for common Australian residential HVAC brands
+
+--------------------------------------------------------------------------------
+
+MODULE 3: Contact Vs. Negative Pressure Duct Cleaning
+
+TWO PRIMARY APPROACHES
+
+Professional residential duct cleaning is performed using one of two methodologies: contact cleaning and negative pressure cleaning. Understanding the distinction between these methods allows you to select the right approach for each system and client situation.
+
+CONTACT CLEANING
+
+Contact cleaning uses mechanical tools — rotating brushes, compressed air whips, or air-driven agitation tools — to physically dislodge contamination from duct surfaces. The dislodged material is collected by the tool (if the tool has a debris collection function), vacuumed out through the register opening, or pushed toward a collection point within the duct system.
+
+Contact cleaning tools are inserted through the register openings or access points and directed through the ductwork. The technician has direct mechanical contact with the duct surface via the tool.
+
+When contact cleaning is appropriate:
+- Systems with moderate to heavy dust accumulation
+- Flexible ductwork (contact tools must be selected and operated carefully to avoid puncturing flexible duct liner)
+- Systems where access for a collection vacuum at the AHU end of the duct is limited
+- Smaller residential systems where the additional equipment of a full negative pressure setup is not warranted
+
+NEGATIVE PRESSURE CLEANING
+
+Negative pressure cleaning connects a high-powered vacuum collection unit to the duct system — typically at the AHU or a main trunk duct — and creates negative pressure (suction) throughout the system. Agitation tools (brushes, air whips, contact tools) are then used at each register to dislodge contamination, which the negative pressure airflow carries toward and into the vacuum collection unit.
+
+Negative pressure is more effective at capturing dislodged material before it re-settles and provides a higher standard of cleaning for systems with significant contamination.
+
+When negative pressure cleaning is appropriate:
+- Heavily contaminated systems
+- Systems where the AHU or trunk duct is accessible for vacuum connection
+- Post-mould remediation duct cleaning where containment of dislodged material is required
+- Commercial or premium residential services requiring a verifiable high-standard result
+
+COMPARISON SUMMARY
+
+Contact cleaning: lower equipment cost, faster setup, effective for standard residential maintenance cleaning, adequate for most residential jobs.
+
+Negative pressure cleaning: higher equipment investment, more complex setup, superior contamination capture, required for heavily contaminated systems and post-remediation work.
+
+Many duct cleaning businesses use both methods in combination — negative pressure vacuum for collection combined with contact agitation tools at each register.
+
+Reference: AIRAH | NADCA (National Air Duct Cleaners Association) standard ACR (Assessment, Cleaning and Restoration of HVAC Systems)
+
+--------------------------------------------------------------------------------
+
+MODULE 4: Negative Air Duct Cleaning Systems
+
+SYSTEM OVERVIEW
+
+A negative air duct cleaning system consists of a high-powered vacuum unit connected to the HVAC duct system to create sustained negative pressure throughout the duct network during the cleaning process. As agitation tools dislodge contamination from duct surfaces at each register, the negative pressure airflow carries the material toward the collection unit.
+
+EQUIPMENT COMPONENTS
+
+Collection vacuum unit: a truck-mounted or trailer-mounted high-powered vacuum (typically diesel or petrol-engine driven) with HEPA filtration to ensure that dislodged material is captured rather than exhausted back into the environment. The unit connects to the duct system via a flexible collection hose. Engine-driven units provide significantly higher airflow and suction than portable electric units and are the industry standard for negative pressure residential duct cleaning.
+
+Collection hose and system connection: a large-diameter (typically 200mm to 300mm) flexible hose connects the collection unit to the duct system. Connection is made at the AHU access panel, at the return air plenum, or through a purpose-drilled access hole in the main trunk duct. The connection must be airtight to maintain negative pressure throughout the system.
+
+Register sealing tools: foam plugs, magnetic covers, or adhesive covers are used to seal registers that are not actively being cleaned. Sealing registers concentrates the negative pressure in the duct section being agitated and prevents dislodged material from exiting through unsealed registers into the home.
+
+Agitation tools used in combination with negative pressure: contact brushes inserted through register openings, air whips (flexible hoses with nozzle ends that spin under compressed air pressure), and hand-held air guns for direct register cleaning.
+
+SETUP PROCEDURE
+
+1. Protect the work area with floor coverings at each register and at the AHU.
+2. Connect the collection hose to the duct system at the AHU or main trunk access point.
+3. Seal all supply and return registers with register covers — leave one register unsealed to maintain a controlled airflow path.
+4. Start the collection vacuum unit and confirm negative pressure is established (a visual indicator is that register covers are pulled flat against the register face by the suction).
+5. Begin agitation at the register furthest from the collection point, working systematically back toward the collection connection.
+6. Unseal each register only while agitating that register — reseal before moving to the next.
+
+Reference: NADCA ACR Standard | AIRAH | Equipment manufacturer operating manuals
+
+--------------------------------------------------------------------------------
+
+MODULE 5: The Dust Master Contact Cleaning System
+
+SYSTEM OVERVIEW
+
+The Dust Master is a contact duct cleaning system designed for the residential market. It uses a rotating brush mechanism to physically agitate and remove contamination from duct surfaces, with a built-in vacuum collection function that captures dislodged material at the point of agitation.
+
+EQUIPMENT COMPONENTS
+
+The Dust Master system includes: a portable electric drive unit, a range of flexible shaft extensions that allow the rotating brush to reach throughout duct runs from a single register access point, interchangeable brush heads in multiple sizes to match standard Australian residential duct diameters (typically 150mm to 250mm diameter flexible duct), and an integrated or companion vacuum for debris collection.
+
+SETUP AND OPERATION
+
+Setup: connect the drive unit to power, attach the appropriate brush head and shaft length for the duct diameter and estimated run length, and position the vacuum collection at the register opening before beginning rotation.
+
+Operation: insert the rotating brush into the register and advance it through the duct run using the flexible shaft. Apply light forward pressure — the rotating brush cleans on both the forward pass and the withdrawal. Advance and withdraw the brush in controlled strokes, allowing the brush to contact the full circumference of the duct interior. Do not force the brush through bends or restrictions — excessive force can collapse flexible duct or damage duct connections.
+
+Brush selection: use a brush diameter that matches the duct interior diameter — a brush that is too small will miss sections of the duct surface; a brush that is too large will struggle through bends and may cause duct damage. When the duct diameter is uncertain, start with a smaller brush and size up once the duct interior has been confirmed.
+
+APPLICATIONS
+
+The Dust Master contact system is well-suited to: standard residential flexible duct systems, dryer duct cleaning (using appropriate brush sizes), moderate soiling levels where full negative pressure setup is not required, and single-technician residential service operations.
+
+Limitation: the Dust Master captures material at the agitation point but does not prevent re-settling of finer particles dislodged further into the duct system. For heavily contaminated systems, combine with a downstream negative pressure collection unit for superior results.
+
+Reference: Dust Master equipment manufacturer documentation | AIRAH | Safe Work Australia
+
+--------------------------------------------------------------------------------
+
+MODULE 6: Vent Vac Dryer Duct Cleaning System
+
+SYSTEM OVERVIEW
+
+The Vent Vac system is specifically designed for residential dryer duct cleaning — the removal of lint accumulation from the duct connecting a residential clothes dryer to the building exterior. Dryer duct lint accumulation is the leading cause of residential dryer-related fires in Australia. A blocked or partially blocked dryer duct causes lint to build up, increases drying times (increasing energy consumption), stresses the dryer motor, and in the worst case creates conditions for a duct fire.
+
+WHY DRYER DUCT CLEANING IS A FIRE SAFETY SERVICE
+
+The Australian Building Codes Board and state fire authorities identify lint accumulation in dryer exhaust ducts as a fire hazard. Many home insurance policies require dryer ducts to be maintained in a clean condition — a policy detail that most homeowners are unaware of until a fire occurs and a claim is disputed. Positioning dryer duct cleaning as a fire safety and insurance compliance service (not just a cleaning service) is both accurate and commercially effective.
+
+SYSTEM COMPONENTS
+
+The Vent Vac system includes: a dedicated electric or compressed-air-driven brush rotation unit, flexible shaft sections that allow the system to navigate the bends common in residential dryer duct runs, dryer-specific brush heads sized for standard Australian dryer duct diameters (typically 100mm to 125mm), and a vacuum collection attachment for lint capture.
+
+OPERATION
+
+Step 1 — Disconnect the dryer from the duct at the dryer connection point (behind the dryer, typically a 100mm or 125mm flexible duct clamp connection).
+
+Step 2 — Insert the Vent Vac brush from the dryer connection end of the duct and advance toward the exterior termination point. Work in controlled strokes, advancing and withdrawing the brush to ensure full contact with the duct interior.
+
+Step 3 — At the exterior end, clean the exterior termination cap (louver or flap type) — this is frequently blocked by lint and insect nesting material.
+
+Step 4 — Vacuum the duct interior from both ends to remove dislodged lint.
+
+Step 5 — Reconnect the dryer and run a short cycle to confirm airflow is restored and the exterior flap is operating correctly.
+
+Step 6 — Photograph the lint collected and the clear duct at completion for the client's documentation.
+
+Indicator of blockage severity: if a strong hand over the exterior vent termination during dryer operation detects minimal airflow, the duct is significantly restricted and requires immediate cleaning. Most homeowners have never checked this.
+
+Reference: State fire authority guidelines on dryer duct safety | ABCB | Vent Vac manufacturer documentation
+
+--------------------------------------------------------------------------------
+
+MODULE 7: Cobra Power Brush Duct Cleaning System
+
+SYSTEM OVERVIEW
+
+The Cobra Power Brush system is a professional-grade contact cleaning system designed for both residential and light commercial duct cleaning. It uses a high-speed rotating brush driven by a portable electric or pneumatic drive unit, with a modular flexible shaft system that allows the brush to navigate through complex duct configurations including multiple bends and transitions.
+
+EQUIPMENT COMPONENTS
+
+Drive unit: a portable electric or pneumatic drive unit that rotates the flexible shaft and brush head. Electric versions are suitable for standard residential applications. Pneumatic versions require a compressor supply but offer higher torque for use in larger or more heavily contaminated systems.
+
+Flexible shaft and extensions: the Cobra system uses interlocking flexible shaft sections that can be assembled to reach the full length of most residential duct runs from a single access point. Sections are available in standard lengths and connect with a secure locking mechanism to prevent disassembly inside the duct.
+
+Brush heads: multiple brush head options are available including nylon bristle brushes for standard dust and lint removal, polypropylene stiff-bristle brushes for compacted contamination, and combination brush heads. Select the brush head and diameter matched to the duct material — flexible duct requires softer brush bristles than rigid sheet metal duct to avoid liner damage.
+
+OPERATION
+
+1. Assemble the shaft to the estimated duct run length before inserting — adding shaft sections once partially inserted is awkward and risks losing shaft sections in the duct.
+2. Insert the brush head and advance with the drive unit running. Let the brush do the work — forced advancement damages flexible duct.
+3. Use a withdrawal-and-advance technique at each section of ductwork to ensure complete contact cleaning of the duct wall.
+4. Position a vacuum collection at the register opening or at the AHU connection point to capture dislodged material.
+5. After completing each duct run, withdraw the full shaft, inspect the brush for material accumulation, and clean before advancing to the next register.
+
+APPLICATIONS
+
+The Cobra Power Brush system is suitable for: complete residential HVAC duct system cleaning, dryer duct cleaning (with appropriate brush sizes), roof space and subfloor duct runs with multiple bends, and post-renovation duct cleaning where construction dust has accumulated in the system.
+
+Reference: Cobra equipment manufacturer documentation | AIRAH | NADCA ACR Standard
+
+--------------------------------------------------------------------------------
+
+MODULE 8: The Residential Duct Cleaning Process
+
+COMPLETE WORKFLOW — JOB TO JOB
+
+This module brings together all preceding content into the complete residential duct cleaning process — from client arrival through to job completion and documentation.
+
+STEP 1 — ARRIVAL AND SITE SETUP
+
+Introduce yourself to the client and confirm the scope of work. Walk through the home to identify register locations, confirm system type and layout, and locate the AHU (typically in the roof space, ceiling cavity, or a dedicated plant cupboard). Lay protective floor covers at each register access point and at the AHU access. Confirm power availability and placement for equipment.
+
+STEP 2 — SYSTEM ASSESSMENT
+
+Before cleaning begins, assess the system condition. Inspect accessible duct sections for damage, disconnections, or significant moisture staining (indicating prior water intrusion). Photograph the AHU filter (record filter condition — a heavily loaded filter indicates long cleaning intervals and sets client expectations for the system's contamination level). Remove and set aside the filter for cleaning or disposal and replacement. Inspect the AHU interior (coil face and fan blades) and photograph.
+
+STEP 3 — EQUIPMENT CONNECTION AND SETUP
+
+Connect the collection vacuum at the AHU or main trunk access point (for negative pressure method), or prepare the contact cleaning equipment at the first register (for contact method). Seal all registers except the one being actively cleaned.
+
+STEP 4 — CLEANING — REGISTER BY REGISTER
+
+Work systematically through the home register by register. For each register:
+- Remove the register face / grille and clean with a brush or compressed air, then wash and dry
+- Insert the cleaning tool and clean the duct run from the register to the extent of the tool's reach
+- Vacuum at the register opening to capture dislodged material
+- Reinstall the clean register
+- Move to the next register and repeat
+
+Clean the return air system — remove, clean, and reinstall the return air grille, and clean the return air duct or plenum behind the grille.
+
+STEP 5 — AHU CLEANING
+
+Clean the AHU interior using appropriate brushes and a HEPA-filtered vacuum. Clean fan blades with a damp cloth. Clean the coil face using a soft brush — do not use pressure water or aggressive cleaning solutions on the coil without specific manufacturer guidance. Install a new or cleaned filter before closing the AHU.
+
+STEP 6 — SYSTEM RESTART AND CONFIRMATION
+
+Restore all equipment connections and register covers. Restart the HVAC system and confirm all registers are delivering airflow. Walk through the home with the client to confirm the system is operating normally.
+
+STEP 7 — DOCUMENTATION AND CLOSE-OUT
+
+Provide the client with a written completion record including: date of service, number of registers cleaned, pre-cleaning photographs, post-cleaning photographs, filter condition before and after, any observations about system condition (damaged duct sections, disconnected duct runs, coil contamination beyond the scope of standard cleaning), and recommended next service interval.
+
+Collect payment and provide a receipt. Request a review if the client is satisfied — duct cleaning businesses grow primarily through referral and review-driven discovery.
+
+Reference: AIRAH | NADCA ACR Standard | Safe Work Australia | State fire authority requirements for dryer duct services
+
+--------------------------------------------------------------------------------
+
+WHAT YOU WILL LEARN
+
+Participants who complete this course will be able to:
+- Identify the commercial opportunity in residential duct cleaning and structure a viable service offering
+- Assess residential HVAC system types and components relevant to the duct cleaning scope
+- Select the appropriate cleaning methodology (contact or negative pressure) based on system type and contamination level
+- Set up and operate a negative air duct cleaning system including vacuum connection and register sealing
+- Operate the Dust Master contact cleaning system for standard residential duct and dryer duct cleaning
+- Operate the Vent Vac system for professional dryer duct cleaning as a fire safety service
+- Operate the Cobra Power Brush system for residential duct cleaning across complex duct configurations
+- Execute the complete end-to-end residential duct cleaning process from site setup through client documentation
+
+
+================================================================================
+SECTION 3: AI & TECH RESOURCES
+================================================================================
+
+RESOURCE: Collaborative Development — Your Personal AI Assistant
+Resource Number: #16
+Price: $49 AUD
+Status: Published
+Modules: None
+
+RESOURCE OVERVIEW
+
+This resource provides restoration and cleaning business operators with practical guidance on using AI language model tools — specifically conversational AI assistants such as Claude (Anthropic) and ChatGPT (OpenAI) — as operational support tools in their daily business workflow.
+
+WHAT THIS RESOURCE PROVIDES
+
+This is not a course with assessed modules. It is a practical reference and development resource designed to help restoration business owners and managers integrate AI assistant tools into their operations. The $49 investment reflects the curated, industry-specific guidance included — as distinct from generic AI tutorials that have no connection to the restoration sector.
+
+The resource covers how to use AI assistants for:
+- Drafting client-facing documents — quotes, scope-of-work descriptions, completion reports, and client communication letters written in professional Australian English
+- Generating training content outlines for internal team training
+- Creating job SOPs and checklists tailored to the specific services your business delivers
+- Researching compliance requirements (WHS regulations, insurance reporting standards, IICRC standards) and summarising findings in plain language
+- Drafting marketing content — website copy, service descriptions, Google Business profile updates, and email campaigns
+- Building business document templates — job forms, induction checklists, risk assessment frameworks, and inspection report formats
+
+HOW RESTORATION PROFESSIONALS USE THIS IN PRACTICE
+
+A restoration business owner uses this resource to learn how to prompt an AI assistant effectively — the skill of asking questions in a way that produces useful, accurate, industry-relevant responses. The resource provides tested prompt frameworks relevant to the restoration sector.
+
+Practical examples:
+- A technician needs to write a water damage clearance report but is not confident in formal written English. They prompt the AI with the key facts from the job and receive a professional draft report that they review, verify for accuracy, and send.
+- A business owner wants to create an SOP for Category 3 water loss response. They use the AI to generate a structured draft, then review it against the IICRC S500 and their own operational requirements before finalising.
+- A sole trader needs to respond to a difficult client complaint in writing. They use the AI to draft a professional, de-escalating response that they review and personalise before sending.
+
+IMPORTANT OPERATIONAL NOTE
+
+AI assistants generate responses based on training data — they do not verify facts in real time and can produce errors, particularly on specific regulatory details, product specifications, and jurisdiction-specific compliance requirements. All AI-generated content must be reviewed by a competent person before use. This resource includes guidance on how to review and verify AI outputs for accuracy and appropriateness.
+
+Reference: Anthropic Claude documentation | OpenAI ChatGPT documentation | Safe Work Australia (for verifying AI-generated compliance content)
+
+--------------------------------------------------------------------------------
+
+RESOURCE: Laser Measurer Assistance Video
+Resource Number: #119
+Price: Free
+Status: Published
+Modules: None
+
+RESOURCE OVERVIEW
+
+This resource is a practical video tutorial on using a laser distance measurer (laser measuring device) on restoration and cleaning job sites. Laser measurers are standard field tools in water damage restoration, duct cleaning, estimating, and building inspection — enabling fast, accurate measurement of room dimensions, ceiling heights, and areas without a two-person tape measure operation.
+
+WHAT THIS RESOURCE PROVIDES
+
+A single instructional video demonstrating:
+- How to operate a laser measurer for single-distance, continuous, area, and volume measurement modes
+- How to use the device in an active restoration site (accounting for obstacles, wet floors, and lighting conditions)
+- How to record measurements directly into a moisture map or estimating platform
+
+HOW RESTORATION PROFESSIONALS USE THIS IN PRACTICE
+
+Technicians use laser measurers to capture room dimensions quickly during the initial assessment of a water damage job. Accurate room dimensions are required for:
+- Dehumidification sizing calculations (cubic metres of affected space)
+- Insurance estimate preparation in Xactimate or Symbility (room dimensions populate the sketch/floor plan)
+- Moisture map documentation (annotated floor plans with measurement-verified dimensions)
+- Equipment placement planning (knowing the exact area of each room determines air mover and dehumidifier quantities)
+
+A technician who can operate a laser measurer competently completes room measurement in 60 to 90 seconds per room, compared to 3 to 5 minutes with a tape measure. On a large water damage job with eight to ten affected rooms, this represents a significant time saving at the assessment stage.
+
+Practical tip: Most laser measurers have a memory function that stores the last 20 to 30 measurements. Use this to capture all room dimensions before entering them into your documentation — do not rely on handwritten notes for intermediate steps in a busy assessment.
+
+Reference: Laser measurer manufacturer instructions | IICRC S500 (assessment and documentation requirements)
+
+--------------------------------------------------------------------------------
+
+RESOURCE: Comprehensive Chat GPT Cheat Sheet
+Resource Number: #120
+Price: Free
+Status: Published
+Modules: None
+
+RESOURCE OVERVIEW
+
+This resource is a downloadable one-page or two-page reference sheet providing restoration and cleaning professionals with ready-to-use prompt frameworks for interacting with ChatGPT (and other AI language model tools) in their daily business operations.
+
+WHAT THIS RESOURCE PROVIDES
+
+A structured cheat sheet containing:
+- Pre-written prompt templates for the most common business writing tasks in the restoration sector (client letters, scope of works descriptions, completion reports, complaint responses, insurance correspondence)
+- Prompt engineering tips — how to frame questions to get more specific, more accurate, and more useful responses from AI tools
+- A quick-reference list of things AI tools do well in this industry (drafting, summarising, formatting) and things they do not do reliably (specific regulatory citations, product specifications, current pricing)
+- Example before-and-after prompts showing the difference between a vague prompt that produces a generic response and a specific prompt that produces a usable draft
+
+HOW RESTORATION PROFESSIONALS USE THIS IN PRACTICE
+
+Print the cheat sheet and keep it at a workstation or save it to a tablet used for business administration. When drafting a document or needing to communicate in writing, reference the cheat sheet to find the closest matching prompt template, adapt it with the specific details of the job, and use the AI-generated draft as a starting point.
+
+This resource is designed to be used alongside resource #16 (Collaborative Development: Your Personal AI Assistant) and the CARSI ChatGPT eBook (#122), which provide deeper guidance on the same topic.
+
+Reference: OpenAI ChatGPT documentation | Anthropic Claude documentation | CARSI AI resource series
+
+--------------------------------------------------------------------------------
+
+RESOURCE: Technician Flow Chart
+Resource Number: #121
+Price: Free
+Status: Published
+Modules: None
+
+RESOURCE OVERVIEW
+
+The Technician Flow Chart is a visual decision-support tool designed for use by restoration and cleaning technicians in the field. It maps the key decision points in a standard water damage response job and provides a clear, step-by-step pathway from initial site attendance through to job closeout.
+
+WHAT THIS RESOURCE PROVIDES
+
+A downloadable, printable flow chart that guides technicians through:
+- Site arrival decisions (safety assessment, water category classification, PPE selection)
+- Extraction decisions (equipment selection based on water depth and surface type)
+- Damage assessment decisions (in-place drying vs. material removal thresholds)
+- Equipment setup decisions (air mover and dehumidifier deployment based on affected area and wetness class)
+- Daily monitoring decisions (drying trajectory assessment, scope change triggers)
+- Closeout decisions (clearance testing requirements, documentation checklist)
+
+HOW RESTORATION PROFESSIONALS USE THIS IN PRACTICE
+
+The flow chart is designed for two audiences. For new technicians, it provides a guided framework during the first year of field work — a systematic reminder of the decision sequence on each job while they develop experience. Laminate a copy and keep it in the work vehicle.
+
+For experienced technicians, the flow chart is a training and quality assurance tool — use it during new employee inductions to walk new starters through the restoration workflow, and reference it during job debrief reviews to identify where a job deviated from standard procedure and why.
+
+The flow chart also functions as a quick-reference compliance tool — confirming that safety checks, PPE decisions, and documentation steps are not omitted under time pressure on a busy job.
+
+Reference: IICRC S500 — Water damage restoration workflow | Safe Work Australia WHS risk management | CARSI course content aligned with the flow chart decision points
+
+--------------------------------------------------------------------------------
+
+RESOURCE: CARSI ChatGPT eBook
+Resource Number: #122
+Price: $20 AUD
+Status: Published
+Modules: None
+
+RESOURCE OVERVIEW
+
+The CARSI ChatGPT eBook is a written reference guide specifically developed for cleaning and restoration business operators who want to integrate AI tools into their business operations beyond basic use. It provides structured, sector-specific guidance in an extended format — going deeper than the cheat sheet (#120) and providing worked examples directly relevant to the restoration industry.
+
+WHAT THIS RESOURCE PROVIDES
+
+The eBook covers:
+- A plain-language explanation of how AI language models work and why understanding this makes you a more effective user
+- Sector-specific use cases for AI tools in restoration and cleaning businesses: documentation, training content creation, marketing, compliance research, and client communication
+- Extended prompt examples with before-and-after comparisons showing the practical impact of well-constructed versus poorly constructed prompts
+- Guidance on using AI tools to assist with specific industry documents: water damage scope of works, JSEA / SWMS drafts, SDS registers, inspection reports, and client handover letters
+- A section on the limitations and risks of AI tools in a professional context — specifically, why AI-generated content must be reviewed for accuracy before use and what categories of content require human expertise to verify
+- A practical implementation guide: how to introduce AI tools into an existing business workflow without creating confusion or risk
+
+HOW RESTORATION PROFESSIONALS USE THIS IN PRACTICE
+
+The eBook is read once as a structured guide, then used as a reference resource when a specific use case arises. Business owners read it to develop a working understanding of how AI tools can improve their operational efficiency. They then share the cheat sheet (#120) with technicians and administrative staff as the daily-use tool, while retaining the eBook as the underlying reference.
+
+This resource is most effectively used in combination with the Collaborative Development AI Assistant course (#16), which provides the interactive, real-time practical component that the eBook supports with conceptual depth.
+
+Reference: Anthropic Claude documentation | OpenAI ChatGPT documentation | CARSI AI resource series | Australian Consumer Law (relevant to AI-assisted marketing content)
+
+
+================================================================================
+SECTION 4: MEMBERSHIPS & LARGE LOSS
+================================================================================
+
+COURSE: Large Loss Mastery Course
+Course Numbers: #123 (Split Payment) / #124 (Full Payment)
+Price: $1,980 AUD (Full) — Split Payment Option Available
+Status: Draft
+Modules: Not yet extracted
+
+COURSE OVERVIEW
+
+The Large Loss Mastery Course is the most advanced and most comprehensive offering in the CARSI catalogue. It is designed for restoration business owners, senior project managers, and experienced technicians who want to develop the capability to competitively tender for, efficiently manage, and profitably complete large-scale water damage restoration events — losses that are beyond the scope of standard residential response.
+
+WHAT THIS COURSE COVERS
+
+In the current Draft status, module content has not yet been finalised. The course framework is designed to provide mastery-level knowledge and skills across:
+- Classification and scoping of large loss events (commercial buildings, multi-tenancy properties, industrial sites, infrastructure)
+- Advanced project management for multi-trade, multi-week restoration programmes
+- Resource planning, equipment procurement, and subcontractor management at scale
+- Insurance engagement for large loss claims — working with loss adjusters, forensic engineers, and quantity surveyors
+- Business financial management specific to large loss work — cash flow, staged billing, retention management
+- Risk management and legal protection for high-value contracts
+- Case studies of actual large loss events in the Australian market — decision-making, challenges, and outcomes
+
+WHO THIS COURSE IS FOR
+
+This course is for restoration operators who already have foundational competence in water damage restoration (WRT-level knowledge or equivalent field experience) and are ready to develop the capability to pursue and successfully deliver losses in the $50,000 to $500,000+ range.
+
+The $1,980 price point reflects the commercial value of the capability delivered — a single large loss job managed successfully can return this investment many times over. The split payment option makes the course accessible without upfront capital commitment.
+
+WHEN THIS COURSE WILL BE AVAILABLE
+
+The Large Loss Mastery Course is currently in Draft status. Enrolled learners will be notified when module content is finalised and the course moves to published status. Contact CARSI directly for current progress updates and expected publication timeline.
+
+Reference: IICRC S500 | IICRC ASD | Safe Work Australia | Insurance Council of Australia large loss protocols
+
+--------------------------------------------------------------------------------
+
+MEMBERSHIP: Affiliate Membership
+Membership Number: #138
+Price: $220 AUD
+Status: Draft
+
+MEMBERSHIP OVERVIEW
+
+The CARSI Affiliate Membership is designed for businesses and individuals who want to align with the CARSI platform and professional community without the full engagement of a higher-tier membership. It provides a structured entry point into the CARSI ecosystem with a defined set of inclusions.
+
+WHAT AFFILIATE MEMBERSHIP PROVIDES
+
+As a Draft-status membership, the full inclusions are subject to finalisation. The Affiliate Membership tier is expected to provide:
+- Access to a defined subset of the CARSI course library at member pricing
+- Listing or recognition as a CARSI Affiliate in the CARSI professional directory (once this is activated)
+- Access to the CARSI community forums and discussion groups
+- Eligibility to upgrade to a higher membership tier (Foundation or Growth) with credit applied
+
+WHO AFFILIATE MEMBERSHIP IS DESIGNED FOR
+
+Individual technicians who want access to the CARSI training library at reduced cost, business owners exploring the CARSI platform before committing to a higher-tier membership, and businesses that supply or service the restoration industry (equipment suppliers, chemical manufacturers, insurance professionals) who want to engage with the CARSI community.
+
+HOW TO USE THIS MEMBERSHIP EFFECTIVELY
+
+Use the Affiliate Membership to access the CARSI course library and complete courses relevant to your current role. Review the course catalogue and identify the training most immediately applicable to your work. Use the community access to connect with other restoration professionals and to stay informed of industry developments, new course releases, and CARSI events.
+
+Contact CARSI for a full inclusions summary as the Affiliate Membership moves from Draft to Published status.
+
+Reference: CARSI membership terms and conditions | ACRA (Australian Carpet and Restoration Association) for industry association alignment context
+
+--------------------------------------------------------------------------------
+
+MEMBERSHIP: Foundation Membership
+Membership Number: #139
+Price: $44 AUD
+Status: Published
+
+MEMBERSHIP OVERVIEW
+
+The Foundation Membership is the entry-level active membership tier in the CARSI platform. At $44 AUD, it provides accessible structured access to the CARSI training and community resources for individual technicians and early-stage restoration businesses.
+
+WHAT FOUNDATION MEMBERSHIP PROVIDES
+
+The Foundation Membership is designed to give members structured access to the CARSI platform at a low-cost entry point. Inclusions at this tier are designed to support:
+- Access to the Free Library content (#143) and selected published free courses across the CARSI catalogue
+- Participation in the CARSI learner community
+- A platform profile that records course completions and can be shared with employers or clients as evidence of training
+- Eligibility to purchase individual courses at member pricing (applicable to paid courses in the catalogue)
+
+WHO FOUNDATION MEMBERSHIP IS DESIGNED FOR
+
+Technicians who are new to the restoration and cleaning industry and want a structured starting point for professional development. The $44 AUD annual cost is designed to be accessible to sole traders and entry-level workers.
+
+HOW TO USE THIS MEMBERSHIP EFFECTIVELY
+
+Step 1 — Complete the free courses available under the Foundation Membership starting with the courses most relevant to your current role (water damage, carpet cleaning, or infection control depending on your primary work type).
+
+Step 2 — Use the community resources to connect with other members and identify the training most valued by experienced operators in your area of practice.
+
+Step 3 — Review the paid course catalogue and identify 2 to 3 courses that would most directly improve your on-site capability or business outcomes. Purchase these at member pricing.
+
+Step 4 — When your training and business needs grow beyond the Foundation Membership inclusions, upgrade to the Growth Membership to access a broader course library and expanded platform benefits.
+
+Reference: CARSI platform terms and conditions
+
+--------------------------------------------------------------------------------
+
+MEMBERSHIP: Growth Membership
+Membership Number: #141
+Price: $99 AUD
+Status: Published
+
+MEMBERSHIP OVERVIEW
+
+The Growth Membership is the mid-tier active membership in the CARSI platform. At $99 AUD, it is designed for restoration and cleaning professionals who are actively developing their skills, building their business, and want comprehensive access to the CARSI training and community resources.
+
+WHAT GROWTH MEMBERSHIP PROVIDES
+
+Growth Membership provides expanded access to the CARSI platform relative to the Foundation tier, including:
+- Broader access to the CARSI course library including paid course inclusions or member-discounted access to a wider range of courses
+- Priority access to new course releases and beta content
+- Enhanced community participation including access to business development and marketing discussion groups
+- A more comprehensive learner profile that records certifications, course completions, and professional development history
+- Access to any Growth-tier exclusive resources, tools, or events as the CARSI platform develops
+
+WHO GROWTH MEMBERSHIP IS DESIGNED FOR
+
+Restoration and cleaning business owners who want to develop themselves and their team systematically. Experienced technicians who want access to the full breadth of CARSI's technical training content. Businesses building towards IICRC certification who want a structured training library to support their preparation.
+
+HOW TO USE THIS MEMBERSHIP EFFECTIVELY
+
+Map your business's current capability gaps against the CARSI course catalogue. Identify the 5 to 10 courses most likely to improve your team's technical competence or your business's compliance posture. Use the Growth Membership's broader course access to work through these courses systematically across a 12-month membership period.
+
+Use the community resources to engage with other Growth Membership holders on operational challenges, business development, and equipment and product questions. The peer learning component of community membership is often as valuable as the formal course content.
+
+Reference: CARSI platform terms and conditions | IICRC certification requirements (for members preparing for formal certification examination)
+
+--------------------------------------------------------------------------------
+
+RESOURCE: Free Library
+Resource Number: #143
+Price: Free
+Status: Published
+Modules: None
+
+RESOURCE OVERVIEW
+
+The CARSI Free Library is a curated collection of free resources, tools, and reference materials available to all registered CARSI users. It functions as the open-access entry point to the CARSI platform — a resource that delivers immediate value to new users and demonstrates the depth and quality of the broader CARSI course catalogue.
+
+WHAT THE FREE LIBRARY CONTAINS
+
+The Free Library aggregates the free content available across the CARSI platform, which may include:
+- Free published courses from the CARSI catalogue (those priced at $0 AUD in the course list)
+- Reference documents relevant to the restoration and cleaning industry
+- Templates and checklists for common restoration workflow documents
+- Links to relevant Australian regulatory resources (Safe Work Australia, IICRC, state WHS authorities)
+- Industry guidance documents
+
+HOW RESTORATION PROFESSIONALS USE THIS IN PRACTICE
+
+New users to the CARSI platform should begin with the Free Library to access immediately useful resources before committing to paid courses or a membership tier. Experienced users reference the Free Library for template documents, compliance references, and supplementary reading materials that support their paid course learning.
+
+Business owners can direct new employees to the Free Library as a first orientation to the CARSI platform and the professional standards of the restoration industry before enrolling them in specific paid courses.
+
+The Free Library also functions as a demonstration of CARSI's training quality for prospective members and course purchasers evaluating the platform.
+
+Reference: CARSI platform | Applicable Australian industry and regulatory references within the library collection
+
+
+================================================================================
+SECTION 5: MISC / INSURANCE
+================================================================================
+
+RESOURCE: Insurance Adjusters and Their Roles
+Resource Number: #23
+Price: Free
+Status: Published
+Modules: None
+
+RESOURCE OVERVIEW
+
+Insurance adjusters are the professional gatekeepers of the claim approval and payment process in Australian property insurance. For restoration contractors, understanding who adjusters are, what they do, how they are measured, and how to work with them effectively is a direct commercial capability — it determines how quickly your scopes get approved, how completely your invoices get paid, and whether you get referred back to the same insurer's panel jobs.
+
+WHAT THIS RESOURCE COVERS
+
+This resource provides a practical overview of the insurance adjuster's role, their professional context, and the specific expectations they have of restoration contractors. It is a professional development resource — not a formal course with assessed modules — but the knowledge it provides has direct, measurable commercial impact.
+
+WHO INSURANCE ADJUSTERS ARE
+
+Insurance adjusters (also called loss adjusters or claims assessors) are professionals engaged by insurers to investigate, assess, and quantify property damage claims. In Australia, adjusters operate under two primary models:
+
+Staff adjusters are employees of the insuring company. They handle claims directly on behalf of their employer-insurer. Their role includes attending sites, reviewing contractor scopes, approving or disputing claim costs, and managing the overall claim lifecycle.
+
+Independent loss adjusters are independent professionals engaged by insurers on a contract basis — particularly for larger, more complex, or higher-value claims. They are bound by professional standards and codes of conduct and are expected to assess claims objectively on behalf of the insurer. The Australian Institute of Loss Adjusters (AILA) is the professional body for independent adjusters in Australia.
+
+WHAT ADJUSTERS DO AND HOW THEY WORK
+
+An adjuster's primary function is to determine whether a claim is covered under the policy, and if so, to quantify the cost of the loss to a standard consistent with the policy's indemnity obligations. Their workflow on a water damage claim typically includes:
+- Reviewing the claim lodgement to confirm coverage in principle
+- Attending the site (for larger claims) or conducting a desktop review (for smaller claims) to assess damage extent
+- Reviewing the restoration contractor's scope of works and estimate for completeness, accuracy, and compliance with the applicable repair standard
+- Negotiating scope items where the insurer's position differs from the contractor's
+- Authorising payment of approved invoices
+
+HOW RESTORATION CONTRACTORS SHOULD WORK WITH ADJUSTERS
+
+The restoration contractor-adjuster relationship works most effectively when both parties communicate clearly, professionally, and promptly. Practical guidance:
+
+Respond to adjuster enquiries on the same business day. Adjusters manage multiple claims simultaneously and value contractors who are responsive. A contractor who is slow to respond to adjuster communications is quickly deprioritised for panel referrals.
+
+Submit complete, well-documented scopes on first lodgement. A scope that requires multiple revision cycles wastes the adjuster's time and delays your payment. The discipline covered in the CARSI Water Damage Estimating course directly supports this outcome.
+
+Document everything and make your documentation accessible to the adjuster promptly on request. Adjusters cannot approve what they cannot verify. Photographs, moisture readings, drying logs, and clearance reports that are organised and promptly available accelerate the claim settlement cycle.
+
+When disputing an adjuster's scope decision, provide factual evidence for your position — not advocacy. An adjuster who receives a well-evidenced explanation of why a scope item is required will reconsider. An adjuster who receives a general complaint without supporting evidence will not.
+
+Understand that adjusters have targets and KPIs. Claims cycle time is a metric that most adjusters are measured against. A restoration contractor who helps an adjuster close claims efficiently — through responsive communication, accurate first-submission scopes, and prompt clearance documentation — becomes a preferred partner, not just a panel participant.
+
+REGULATORY AND PROFESSIONAL CONTEXT
+
+Insurance adjusters in Australia operate under the Insurance Council of Australia's General Insurance Code of Practice, which sets standards for claims handling timeliness, communication, and dispute resolution. The Code gives policyholders specific rights including the right to request an internal review and, if unresolved, an external dispute resolution process through the Australian Financial Complaints Authority (AFCA).
+
+As a restoration contractor, understanding this framework helps you advise clients who are experiencing claim handling difficulties — a service that positions you as a knowledgeable professional rather than simply a trade contractor.
+
+Reference: Australian Institute of Loss Adjusters (AILA) | Insurance Council of Australia — General Insurance Code of Practice | Australian Financial Complaints Authority (AFCA) | IICRC S500 (for scope standards referenced by adjusters)
+
+
+================================================================================
+END OF DOCUMENT
+================================================================================
+
+SUMMARY OF ALL COURSES AND RESOURCES
+
+COURSES WITH MODULE CONTENT:
+- Glass Cleaning Course (#77 / #125) — $20 AUD — 5 Modules — Complete content provided
+- Introduction to Residential Duct Cleaning (#102) — Free — 8 Modules — Complete content provided
+
+RESOURCES WITHOUT MODULES — OVERVIEWS PROVIDED:
+- Collaborative Development: Your Personal AI Assistant (#16) — $49 AUD
+- Laser Measurer Assistance Video (#119) — Free
+- Comprehensive Chat GPT Cheat Sheet (#120) — Free
+- Technician Flow Chart (#121) — Free
+- CARSI ChatGPT eBook (#122) — $20 AUD
+- Large Loss Mastery Course (#123 / #124) — $1,980 AUD — Draft status
+- Affiliate Membership (#138) — $220 AUD — Draft status
+- Foundation Membership (#139) — $44 AUD
+- Growth Membership (#141) — $99 AUD
+- Free Library (#143) — Free
+- Insurance Adjusters and Their Roles (#23) — Free
+
+NOTE: Water Damage Litigation Support (#20) modules are documented in the
+Water Damage Restoration Courses module. That course content is not duplicated here.
+
+All content is written in Australian English and aligned with applicable
+IICRC standards, Safe Work Australia Model WHS Act and Regulations,
+and relevant Australian industry and regulatory requirements.
+================================================================================
