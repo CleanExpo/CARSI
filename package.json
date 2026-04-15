@@ -32,6 +32,7 @@
     "db:seed-microbial-docx": "npx tsx scripts/seed-microbial-docx.ts",
     "db:seed-water-damage-txt": "npx tsx scripts/seed-water-damage-txt.ts",
     "db:seed-specialty-drying-txt": "npx tsx scripts/seed-specialty-drying-txt.ts",
+    "db:seed-contents-specialty-drying-courses-txt": "npx tsx scripts/seed-contents-specialty-drying-courses-txt.ts",
     "lint": "next lint",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate deploy",
