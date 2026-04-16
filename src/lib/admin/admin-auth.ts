@@ -4,7 +4,6 @@ import type { SessionClaims } from '@/lib/auth/session-jwt';
 
 export const ADMIN_COOKIE_NAME = 'admin_session';
 
-const DEFAULT_ADMIN_EMAIL = 'mmlrana00@gmail.com';
 // DEFAULT_ADMIN_PASSWORD intentionally removed — ADMIN_PASSWORD must be set in env.
 // A missing env var returns '' (empty), causing all login attempts to fail safely.
 
@@ -15,7 +14,7 @@ const DEFAULT_ADMIN_EMAIL = 'mmlrana00@gmail.com';
 export function getAdminEmail(): string {
   const v = process.env.ADMIN_EMAIL;
   if (typeof v === 'string' && v.trim()) return v.trim();
-  return DEFAULT_ADMIN_EMAIL;
+  throw new Error('ADMIN_EMAIL environment variable is required');
 }
 
 export function getAdminPassword(): string {
@@ -57,13 +56,11 @@ export function isLmsClaimsAllowedAdminPanel(claims: SessionClaims): boolean {
 export const ADMIN_EMAIL =
   (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_ADMIN_EMAIL?.trim()) ||
   (typeof process !== 'undefined' && process.env.ADMIN_EMAIL?.trim()) ||
-  DEFAULT_ADMIN_EMAIL;
+  '';
 
-const ADMIN_JWT_SECRET =
-  process.env.ADMIN_JWT_SECRET ??
-  // Fall back to the app JWT secret so this works out-of-the-box in dev.
-  process.env.JWT_SECRET ??
-  'dev-admin-jwt-secret-change-me';
+const _ADMIN_JWT_SECRET = process.env.ADMIN_JWT_SECRET ?? process.env.JWT_SECRET;
+if (!_ADMIN_JWT_SECRET) throw new Error('ADMIN_JWT_SECRET environment variable is required');
+const ADMIN_JWT_SECRET = _ADMIN_JWT_SECRET;
 
 function getSecretKeyBytes(): Uint8Array {
   return new TextEncoder().encode(ADMIN_JWT_SECRET);
@@ -95,4 +92,3 @@ export async function verifyAdminSessionToken(token: string): Promise<AdminSessi
     return null;
   }
 }
-

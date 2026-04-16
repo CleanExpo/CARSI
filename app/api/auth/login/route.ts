@@ -2,11 +2,20 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { signSessionToken } from '@/lib/auth/session-jwt';
 import { authenticateWithPassword } from '@/lib/server/lms-auth';
+import { checkRateLimit } from '@/lib/server/rate-limit';
 
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
 
 export async function POST(request: NextRequest) {
   try {
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+    if (!checkRateLimit(`login:${ip}`, 5, 15 * 60 * 1000)) {
+      return NextResponse.json(
+        { error: 'Too many login attempts. Please try again later.' },
+        { status: 429 }
+      );
+    }
+
     const body = (await request.json()) as { email?: unknown; password?: unknown };
     const email = typeof body.email === 'string' ? body.email.trim() : '';
     const password = typeof body.password === 'string' ? body.password : '';
@@ -40,21 +49,15 @@ export async function POST(request: NextRequest) {
     });
 
     const cookieOptions = {
+      httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax' as const,
+      sameSite: 'strict' as const,
       path: '/',
       maxAge: COOKIE_MAX_AGE,
     };
 
-    response.cookies.set('auth_token', access_token, {
-      ...cookieOptions,
-      httpOnly: true,
-    });
-
-    response.cookies.set('carsi_token', access_token, {
-      ...cookieOptions,
-      httpOnly: false,
-    });
+    response.cookies.set('auth_token', access_token, cookieOptions);
+    response.cookies.set('carsi_token', access_token, cookieOptions);
 
     return response;
   } catch (error) {

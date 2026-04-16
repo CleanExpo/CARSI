@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { generateImage, generateIcon, getAPIStatus } from '@/lib/image-generation/gemini-client';
+import { generateImage, generateIcon } from '@/lib/image-generation/gemini-client';
 import { registerImageAsset, registerIconAsset } from '@/lib/image-generation/asset-manager';
+import { verifySessionToken } from '@/lib/auth/session-jwt';
 import type {
   ImageGenerationConfig,
   IconGenerationConfig,
@@ -9,10 +10,35 @@ import type {
 } from '@/lib/image-generation/types';
 
 /* ----------------------------------------
-   Rate Limiting (Simple in-memory)
+   Authentication helper
+   ---------------------------------------- */
+async function requireAuth(request: NextRequest): Promise<NextResponse | null> {
+  const auth = request.headers.get('authorization');
+  const bearer = auth?.startsWith('Bearer ') ? auth.slice(7) : null;
+  const cookieToken = request.cookies.get('auth_token')?.value;
+  const token = bearer || cookieToken;
+  if (!token) {
+    return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+  }
+  const claims = await verifySessionToken(token);
+  if (!claims) {
+    return NextResponse.json(
+      { success: false, error: 'Invalid or expired session' },
+      { status: 401 }
+    );
+  }
+  return null; // authenticated
+}
+
+/* ----------------------------------------
+   Rate Limiting (simple in-memory)
+   NOTE: This resets on serverless cold starts. For production, replace with
+   a persistent store such as Upstash Redis (@upstash/ratelimit). Limit is
+   intentionally low (3/min) to reduce blast radius until a durable limiter
+   is in place.
    ---------------------------------------- */
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
-const RATE_LIMIT = 10; // requests per minute
+const RATE_LIMIT = 3; // requests per window (kept low — in-memory resets on cold start)
 const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
 
 function checkRateLimit(ip: string): boolean {
@@ -33,12 +59,10 @@ function checkRateLimit(ip: string): boolean {
 }
 
 /* ----------------------------------------
-   GET - Check API Status
+   GET - Health check only (no config details leaked)
    ---------------------------------------- */
 export async function GET(): Promise<NextResponse> {
-  const status = getAPIStatus();
-
-  return NextResponse.json(status);
+  return NextResponse.json({ ok: true });
 }
 
 /* ----------------------------------------
@@ -46,8 +70,12 @@ export async function GET(): Promise<NextResponse> {
    ---------------------------------------- */
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
+    // Authentication — must have a valid session
+    const authError = await requireAuth(request);
+    if (authError) return authError;
+
     // Rate limiting
-    const ip = request.headers.get('x-forwarded-for') || 'unknown';
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
     if (!checkRateLimit(ip)) {
       return NextResponse.json(
         { success: false, error: 'Rate limit exceeded. Try again later.' },
@@ -55,10 +83,12 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       );
     }
 
-    // Check API status
-    const status = getAPIStatus();
-    if (!status.configured) {
-      return NextResponse.json({ success: false, error: status.message }, { status: 503 });
+    // Check API key is configured
+    if (!process.env.GEMINI_API_KEY?.trim()) {
+      return NextResponse.json(
+        { success: false, error: 'Image generation is not configured' },
+        { status: 503 }
+      );
     }
 
     // Parse request body
