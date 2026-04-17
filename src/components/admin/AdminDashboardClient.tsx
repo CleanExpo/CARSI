@@ -424,7 +424,7 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
                       />
                       <Tooltip
                         {...chartTooltipProps}
-                        formatter={(value: number | string) => [`${value}%`, 'Complete']}
+                        formatter={(value) => [`${value}%`, 'Complete'] as [string, string]}
                         labelFormatter={(label) => (typeof label === 'string' ? label : String(label))}
                       />
                       <Bar
