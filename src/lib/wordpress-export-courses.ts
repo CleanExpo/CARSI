@@ -37,6 +37,11 @@ export interface WpExportCourse {
   category?: string | null;
   /** When set (e.g. LMS seed), listing UIs can show module/lesson counts. */
   lesson_count?: number | null;
+  /**
+   * Last-modified timestamp (ISO 8601). Optional because most LMS-seed
+   * sources don't track it; sitemap.ts needs the union type to compile.
+   */
+  updated_at?: string;
   meta?: {
     wp_id?: number;
     wp_categories?: Array<{ id?: number; name?: string; slug?: string }>;
