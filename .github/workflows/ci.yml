@@ -84,8 +84,12 @@ jobs:
       - name: Lint (skipped — next lint deprecated in Next.js 16)
         run: echo "Skipped. Tracked in follow-up ticket — see PR description."
 
-      - name: Type check
-        run: npm run type-check
+      # package.json has no `type-check` script. Invoke tsc directly — same
+      # result, no package.json change needed. Follow-up: add
+      # "type-check": "tsc --noEmit" to package.json so local and CI share
+      # the same command.
+      - name: Type check (tsc --noEmit)
+        run: npx tsc --noEmit
 
   build:
     name: Build Check
