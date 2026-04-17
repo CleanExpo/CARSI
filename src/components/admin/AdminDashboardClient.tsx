@@ -482,7 +482,7 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
                       </Pie>
                       <Tooltip
                         {...chartTooltipProps}
-                        formatter={(value: number | string, name: string) => [value, name]}
+                        formatter={(value, name) => [value as string | number, String(name)] as [string | number, string]}
                       />
                     </PieChart>
                   </ResponsiveContainer>
@@ -557,7 +557,7 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
                       />
                       <Tooltip
                         {...chartTooltipProps}
-                        formatter={(value: number | string) => [value, 'Courses']}
+                        formatter={(value) => [value as string | number, 'Courses'] as [string | number, string]}
                         labelFormatter={(label) => (typeof label === 'string' ? label : String(label))}
                       />
                       <Bar
@@ -613,7 +613,7 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
                       />
                       <Tooltip
                         {...chartTooltipProps}
-                        formatter={(value: number | string) => [value, 'Enrollments']}
+                        formatter={(value) => [value as string | number, 'Enrollments'] as [string | number, string]}
                       />
                       <Bar
                         dataKey="enrollments"
@@ -663,7 +663,7 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
                     />
                     <Tooltip
                       {...chartTooltipProps}
-                      formatter={(value: number | string) => [value, 'Completions']}
+                      formatter={(value) => [value as string | number, 'Completions'] as [string | number, string]}
                       labelFormatter={(label) => (typeof label === 'string' ? label : String(label))}
                     />
                     <Area

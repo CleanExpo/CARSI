@@ -46,6 +46,8 @@ export interface WpExportCourse {
     wp_id?: number;
     wp_categories?: Array<{ id?: number; name?: string; slug?: string }>;
     wp_tags?: unknown[];
+    /** Free-form extension fields set by LMS seed builders (e.g. pricing model). */
+    [key: string]: unknown;
   };
 }
 
