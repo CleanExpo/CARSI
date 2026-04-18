@@ -115,6 +115,13 @@
     --surface-overlay: 222 47% 14%;
     --surface-glass: 222 47% 9% / 0.7;
 
+    /* ── Discipline tokens (water/fire/mould/microbial/biohazard) ── */
+    --discipline-water:     211 85% 54%;   /* WRT  — water-blue   */
+    --discipline-fire:       15 90% 58%;   /* FSRT — fire-orange  */
+    --discipline-mould:     245 80% 65%;   /* ASD  — mould-indigo */
+    --discipline-microbial: 142 71% 45%;   /* AMRT — micro-green  */
+    --discipline-biohazard:   0 84% 60%;   /* biohazard-red       */
+
     /* ── Gradients ──────────────────────────── */
     --gradient-brand: linear-gradient(135deg, #2490ed 0%, #38a8ff 100%);
     --gradient-brand-subtle: linear-gradient(135deg, rgba(36 144 237 / 0.15) 0%, rgba(56 168 255 / 0.08) 100%);
