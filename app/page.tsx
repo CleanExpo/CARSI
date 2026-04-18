@@ -8,6 +8,7 @@ import { PublicFooter } from '@/components/landing/PublicFooter';
 import { PublicNavbar } from '@/components/landing/PublicNavbar';
 import { CourseBrowseProvider } from '@/components/lms/CourseBrowseContext';
 import { CourseCard } from '@/components/lms/CourseCard';
+import FloatingChat from '@/components/lms/FloatingChat';
 import { CertificatePreview } from '@/components/lms/diagrams/CertificatePreview';
 import { IICRCDisciplineMap } from '@/components/lms/diagrams/IICRCDisciplineMap';
 import { StudentJourneyMap } from '@/components/lms/diagrams/StudentJourneyMap';
@@ -852,6 +853,8 @@ export default async function Home() {
 
       {/* ── Footer ─────────────────────────────────────────────────────────── */}
       <PublicFooter />
+
+      <FloatingChat />
     </div>
   );
 }
