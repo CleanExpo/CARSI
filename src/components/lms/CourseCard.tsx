@@ -41,6 +41,14 @@ const disciplineColors: Record<string, { color: string; glow: string; grad: stri
   AMRT: { color: '#27ae60', glow: 'rgba(39,174,96,0.3)', grad: 'from-green-700 to-green-900' },
 };
 
+/** Maps IICRC discipline codes to --discipline-{slug} CSS var tokens. */
+const DISCIPLINE_SLUG: Record<string, string> = {
+  WRT:  'water',
+  FSRT: 'fire',
+  ASD:  'mould',
+  AMRT: 'microbial',
+};
+
 const defaultStyle = {
   color: '#2490ed',
   glow: 'rgba(36,144,237,0.2)',
@@ -71,6 +79,10 @@ export function CourseCard({ course, priorityImage }: CourseCardProps) {
       : null);
 
   const ds = (discipline ? disciplineColors[discipline] : undefined) ?? defaultStyle;
+  const disciplineSlug = discipline ? DISCIPLINE_SLUG[discipline] : undefined;
+  const borderTopColor = disciplineSlug
+    ? `hsl(var(--discipline-${disciplineSlug}))`
+    : 'hsl(var(--primary))';
   const { courseLinkBase } = useCourseBrowseBase();
 
   const thumbSrc = course.thumbnail_url ?? undefined;
@@ -78,6 +90,7 @@ export function CourseCard({ course, priorityImage }: CourseCardProps) {
   return (
     <motion.div
       className="glass-card card-3d group flex flex-col overflow-hidden rounded-xl"
+      style={{ borderTop: `2px solid ${borderTopColor}` }}
       whileHover={{ scale: 1.02, y: -4 }}
       transition={{ duration: 0.25, ease: smoothEase }}
     >
@@ -131,13 +144,13 @@ export function CourseCard({ course, priorityImage }: CourseCardProps) {
             style={{ color: 'rgba(255,255,255,0.6)' }}
           >
             {course.module_count != null && (
-              <span className="flex items-center gap-1" title="Modules">
+              <span className="flex items-center gap-1 tabular-nums" title="Modules">
                 <Layers className="h-3 w-3" />
                 {course.module_count}
               </span>
             )}
             {course.lesson_count != null && (
-              <span className="flex items-center gap-1">
+              <span className="flex items-center gap-1 tabular-nums">
                 <BookOpen className="h-3 w-3" />
                 {course.lesson_count}
               </span>
