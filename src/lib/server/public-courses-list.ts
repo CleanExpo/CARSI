@@ -103,26 +103,31 @@ export async function getDashboardCourseListItemsFromDatabase(options: {
   return [...publishedRows.map(mapDashboardCourseRow), ...draftRows.map(mapDashboardCourseRow)];
 }
 
-/**
- * Published catalogue rows for `/courses` and other public listings.
- * Matches the `CourseListItem` shape used by `CourseGrid` / `CourseCard`.
- *
- * @param options.limit — when set, only fetch that many rows (e.g. homepage featured strip).
- */
-export async function getPublishedCourseListItemsFromDatabase(options?: {
-  limit?: number;
-}): Promise<CourseListItem[]> {
-  const rows = await prisma.lmsCourse.findMany({
-    where: publishedWhere,
-    orderBy: { updatedAt: 'desc' },
-    ...(options?.limit != null ? { take: options.limit } : {}),
-    include: {
-      _count: { select: { modules: true } },
-      instructor: { select: { fullName: true } },
-    },
-  });
+const publicListInclude = {
+  _count: { select: { modules: true } },
+  instructor: { select: { fullName: true } },
+} as const;
 
-  return rows.map((c) => ({
+type LmsCoursePublicListRow = {
+  id: string;
+  slug: string;
+  title: string;
+  shortDescription: string | null;
+  priceAud: { toString(): string };
+  isFree: boolean;
+  iicrcDiscipline: string | null;
+  thumbnailUrl: string | null;
+  level: string | null;
+  category: string | null;
+  cecHours: number | null;
+  durationHours: number | null;
+  updatedAt: Date;
+  instructor: { fullName: string | null } | null;
+  _count: { modules: number };
+};
+
+function mapLmsCourseToPublicListItem(c: LmsCoursePublicListRow): CourseListItem {
+  return {
     id: c.id,
     slug: c.slug,
     title: c.title,
@@ -139,7 +144,155 @@ export async function getPublishedCourseListItemsFromDatabase(options?: {
     instructor: c.instructor?.fullName ? { full_name: c.instructor.fullName } : null,
     cec_hours: c.cecHours != null ? String(c.cecHours) : null,
     duration_hours: c.durationHours != null ? String(c.durationHours) : null,
-  }));
+  };
+}
+
+/**
+ * Homepage “Popular Courses”: three pillars (microbial/mould, water, air quality), in that order.
+ * Optional `HOMEPAGE_FEATURED_COURSE_SLUGS` (comma-separated) overrides selection.
+ * Fills missing slots from newest published courses.
+ */
+export async function getHomepageFeaturedCourses(): Promise<CourseListItem[]> {
+  if (!process.env.DATABASE_URL?.trim()) {
+    return [];
+  }
+
+  const envSlugs = (process.env.HOMEPAGE_FEATURED_COURSE_SLUGS ?? '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+  if (envSlugs.length > 0) {
+    const out: CourseListItem[] = [];
+    for (const slug of envSlugs) {
+      if (out.length >= 3) break;
+      const row = await prisma.lmsCourse.findFirst({
+        where: {
+          ...publishedWhere,
+          slug: { equals: slug, mode: 'insensitive' },
+        },
+        include: publicListInclude,
+      });
+      if (row) out.push(mapLmsCourseToPublicListItem(row));
+    }
+    if (out.length >= 3) {
+      return out.slice(0, 3);
+    }
+    const pickedIds = new Set(out.map((c) => c.id));
+    const filler = await prisma.lmsCourse.findMany({
+      where: { ...publishedWhere, id: { notIn: [...pickedIds] } },
+      orderBy: { updatedAt: 'desc' },
+      take: 3 - out.length,
+      include: publicListInclude,
+    });
+    return [...out, ...filler.map(mapLmsCourseToPublicListItem)].slice(0, 3);
+  }
+
+  const moldWhere = {
+    AND: [
+      publishedWhere,
+      {
+        OR: [
+          { category: { contains: 'Microbial', mode: 'insensitive' as const } },
+          { category: { contains: 'Mould', mode: 'insensitive' as const } },
+          { category: { contains: 'Mold', mode: 'insensitive' as const } },
+          { iicrcDiscipline: { contains: 'AMRT', mode: 'insensitive' as const } },
+        ],
+      },
+    ],
+  };
+
+  const waterWhere = {
+    AND: [
+      publishedWhere,
+      {
+        OR: [
+          { category: { contains: 'Water Damage', mode: 'insensitive' as const } },
+          { iicrcDiscipline: { contains: 'WRT', mode: 'insensitive' as const } },
+        ],
+      },
+    ],
+  };
+
+  const airWhere = {
+    AND: [
+      publishedWhere,
+      {
+        OR: [
+          { category: { contains: 'Air Quality', mode: 'insensitive' as const } },
+          { title: { contains: 'Air Quality', mode: 'insensitive' as const } },
+        ],
+      },
+    ],
+  };
+
+  const [mold, water, air] = await Promise.all([
+    prisma.lmsCourse.findFirst({
+      where: moldWhere,
+      orderBy: { updatedAt: 'desc' },
+      include: publicListInclude,
+    }),
+    prisma.lmsCourse.findFirst({
+      where: waterWhere,
+      orderBy: { updatedAt: 'desc' },
+      include: publicListInclude,
+    }),
+    prisma.lmsCourse.findFirst({
+      where: airWhere,
+      orderBy: { updatedAt: 'desc' },
+      include: publicListInclude,
+    }),
+  ]);
+
+  const picked: LmsCoursePublicListRow[] = [];
+  const seen = new Set<string>();
+  for (const row of [mold, water, air]) {
+    if (row && !seen.has(row.id)) {
+      picked.push(row);
+      seen.add(row.id);
+    }
+  }
+
+  if (picked.length < 3) {
+    const more = await prisma.lmsCourse.findMany({
+      where: { ...publishedWhere, id: { notIn: [...seen] } },
+      orderBy: { updatedAt: 'desc' },
+      take: 3 - picked.length,
+      include: publicListInclude,
+    });
+    for (const row of more) {
+      if (!seen.has(row.id)) {
+        picked.push(row);
+        seen.add(row.id);
+      }
+      if (picked.length >= 3) break;
+    }
+  }
+
+  return picked.slice(0, 3).map(mapLmsCourseToPublicListItem);
+}
+
+/**
+ * Published catalogue rows for `/courses` and other public listings.
+ * Matches the `CourseListItem` shape used by `CourseGrid` / `CourseCard`.
+ *
+ * @param options.limit — when set, only fetch that many rows (e.g. homepage featured strip).
+ */
+export async function getPublishedCourseListItemsFromDatabase(options?: {
+  limit?: number;
+}): Promise<CourseListItem[]> {
+  if (!process.env.DATABASE_URL?.trim()) {
+    return [];
+  }
+
+  const rows = await prisma.lmsCourse.findMany({
+    where: publishedWhere,
+    orderBy: { updatedAt: 'desc' },
+    ...(options?.limit != null ? { take: options.limit } : {}),
+    include: publicListInclude,
+  });
+
+  return rows.map(mapLmsCourseToPublicListItem);
 }
 
 /**

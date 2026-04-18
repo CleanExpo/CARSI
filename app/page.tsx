@@ -13,7 +13,7 @@ import { IICRCDisciplineMap } from '@/components/lms/diagrams/IICRCDisciplineMap
 import { StudentJourneyMap } from '@/components/lms/diagrams/StudentJourneyMap';
 import { FAQSchema } from '@/components/seo/JsonLd';
 import { AcronymTooltip } from '@/components/ui/AcronymTooltip';
-import { getPublishedCourseListItemsFromDatabase } from '@/lib/server/public-courses-list';
+import { getHomepageFeaturedCourses } from '@/lib/server/public-courses-list';
 import type { CourseListItem } from '@/lib/wordpress-export-courses';
 import {
   ArrowRight,
@@ -28,6 +28,10 @@ import {
   Users,
 } from 'lucide-react';
 import Link from 'next/link';
+
+/** Always render homepage on the server so featured courses load from `DATABASE_URL` at request time (not a static build snapshot). */
+export const dynamic = 'force-dynamic';
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -38,13 +42,13 @@ type Course = CourseListItem;
 // Data
 // ---------------------------------------------------------------------------
 
-/** Homepage featured strip: three published rows from `lms_courses` only (no static/API fallback). */
+/**
+ * Homepage featured strip: mould/microbial, water, air — see `getHomepageFeaturedCourses`.
+ * `force-dynamic` avoids shipping a build-time empty snapshot when `DATABASE_URL` is only available at runtime.
+ */
 async function getFeaturedCourses(): Promise<Course[]> {
-  if (!process.env.DATABASE_URL?.trim()) {
-    return [];
-  }
   try {
-    return await getPublishedCourseListItemsFromDatabase({ limit: 3 });
+    return await getHomepageFeaturedCourses();
   } catch (e) {
     console.error('[home] Failed to load featured courses from database', e);
     return [];
