@@ -1,6 +1,7 @@
 import { LMSContextPanel } from '@/components/layout/LMSContextPanel';
 import { LMSIconRail } from '@/components/layout/LMSIconRail';
 import { PageTransition } from '@/components/layout/PageTransition';
+import FloatingChat from '@/components/lms/FloatingChat';
 import { OnboardingCheck } from '@/components/lms/OnboardingCheck';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -29,7 +30,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </main>
 
       <OnboardingCheck />
-      {/* <FloatingChat /> */}
+      <FloatingChat />
     </div>
   );
 }
