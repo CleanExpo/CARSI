@@ -4,6 +4,11 @@
 
 import { apiClient } from './client';
 
+export interface IicrcCertificationEntry {
+  discipline: string;
+  certified_at: string;
+}
+
 export interface User {
   id: string;
   email: string;
@@ -15,6 +20,9 @@ export interface User {
   /** When false/undefined, client may show first-run onboarding. */
   onboarding_completed?: boolean;
   iicrc_member_number?: string | null;
+  iicrc_expiry_date?: string | null;
+  iicrc_card_image_url?: string | null;
+  iicrc_certifications?: IicrcCertificationEntry[] | null;
 }
 
 export interface LoginRequest {

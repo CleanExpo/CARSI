@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import type { User } from '@/lib/api/auth';
+import { Prisma } from '@/generated/prisma/client';
+import type { IicrcCertificationEntry, User } from '@/lib/api/auth';
 import { hasCompletedOnboarding, setOnboardingCompletedCookie } from '@/lib/auth/onboarding-cookie';
 import { verifySessionToken } from '@/lib/auth/session-jwt';
+import { parseIicrcCertifications } from '@/lib/server/iicrc-profile-json';
 import { prisma } from '@/lib/prisma';
 
 async function requireClaims(request: NextRequest) {
@@ -27,12 +29,29 @@ export async function GET(request: NextRequest) {
   const { claims } = result;
 
   let theme_preference = 'dark';
+  let iicrc_member_number: string | null = null;
+  let iicrc_expiry_date: string | null = null;
+  let iicrc_card_image_url: string | null = null;
+  let iicrc_certifications: IicrcCertificationEntry[] | null = null;
+
   if (process.env.DATABASE_URL?.trim()) {
     const row = await prisma.lmsUser.findUnique({
       where: { id: claims.sub },
-      select: { themePreference: true },
+      select: {
+        themePreference: true,
+        iicrcMemberNumber: true,
+        iicrcExpiryDate: true,
+        iicrcCardImageUrl: true,
+        iicrcCertifications: true,
+      },
     });
     if (row?.themePreference) theme_preference = row.themePreference;
+    iicrc_member_number = row?.iicrcMemberNumber ?? null;
+    if (row?.iicrcExpiryDate) {
+      iicrc_expiry_date = row.iicrcExpiryDate.toISOString().slice(0, 10);
+    }
+    iicrc_card_image_url = row?.iicrcCardImageUrl ?? null;
+    iicrc_certifications = parseIicrcCertifications(row?.iicrcCertifications ?? null);
   }
 
   const user: User = {
@@ -44,6 +63,10 @@ export async function GET(request: NextRequest) {
     is_active: true,
     is_verified: true,
     onboarding_completed: hasCompletedOnboarding(request, claims.sub),
+    iicrc_member_number,
+    iicrc_expiry_date,
+    iicrc_card_image_url,
+    iicrc_certifications,
   };
   return NextResponse.json(user);
 }
@@ -56,29 +79,77 @@ export async function PATCH(request: NextRequest) {
   if ('error' in result) return result.error;
   const { claims } = result;
 
-  const patch = (await request.json().catch(() => ({}))) as Partial<User>;
+  const patch = (await request.json().catch(() => ({}))) as Partial<User> & {
+    iicrc_expiry_date?: string | null;
+  };
+
+  const update: Prisma.LmsUserUpdateInput = {};
+  if (typeof patch.theme_preference === 'string') {
+    update.themePreference = patch.theme_preference;
+  }
+  if (typeof patch.iicrc_member_number === 'string') {
+    update.iicrcMemberNumber = patch.iicrc_member_number;
+  }
+  if (patch.iicrc_member_number === null) {
+    update.iicrcMemberNumber = null;
+  }
+  if (typeof patch.iicrc_card_image_url === 'string') {
+    update.iicrcCardImageUrl = patch.iicrc_card_image_url;
+  }
+  if (patch.iicrc_card_image_url === null) {
+    update.iicrcCardImageUrl = null;
+  }
+  if (Array.isArray(patch.iicrc_certifications)) {
+    update.iicrcCertifications = patch.iicrc_certifications as Prisma.InputJsonValue;
+  }
+  if (patch.iicrc_certifications === null) {
+    update.iicrcCertifications = Prisma.JsonNull;
+  }
+  if (typeof patch.iicrc_expiry_date === 'string') {
+    const d = new Date(`${patch.iicrc_expiry_date}T12:00:00.000Z`);
+    if (!Number.isNaN(d.getTime())) {
+      update.iicrcExpiryDate = d;
+    }
+  }
+  if (patch.iicrc_expiry_date === null) {
+    update.iicrcExpiryDate = null;
+  }
+
+  if (process.env.DATABASE_URL?.trim() && Object.keys(update).length > 0) {
+    try {
+      await prisma.lmsUser.update({
+        where: { id: claims.sub },
+        data: update,
+      });
+    } catch {
+      /* user row may not exist */
+    }
+  }
+
   let theme_preference = 'dark';
+  let iicrc_member_number: string | null = null;
+  let iicrc_expiry_date: string | null = null;
+  let iicrc_card_image_url: string | null = null;
+  let iicrc_certifications: IicrcCertificationEntry[] | null = null;
 
   if (process.env.DATABASE_URL?.trim()) {
     const row = await prisma.lmsUser.findUnique({
       where: { id: claims.sub },
-      select: { themePreference: true },
+      select: {
+        themePreference: true,
+        iicrcMemberNumber: true,
+        iicrcExpiryDate: true,
+        iicrcCardImageUrl: true,
+        iicrcCertifications: true,
+      },
     });
     if (row?.themePreference) theme_preference = row.themePreference;
-  }
-
-  if (typeof patch.theme_preference === 'string') {
-    theme_preference = patch.theme_preference;
-    if (process.env.DATABASE_URL?.trim()) {
-      try {
-        await prisma.lmsUser.update({
-          where: { id: claims.sub },
-          data: { themePreference: patch.theme_preference },
-        });
-      } catch {
-        // User row may not exist yet; still return cookie-backed profile.
-      }
+    iicrc_member_number = row?.iicrcMemberNumber ?? null;
+    if (row?.iicrcExpiryDate) {
+      iicrc_expiry_date = row.iicrcExpiryDate.toISOString().slice(0, 10);
     }
+    iicrc_card_image_url = row?.iicrcCardImageUrl ?? null;
+    iicrc_certifications = parseIicrcCertifications(row?.iicrcCertifications ?? null);
   }
 
   const response = NextResponse.json({
@@ -93,6 +164,10 @@ export async function PATCH(request: NextRequest) {
       patch.onboarding_completed === true
         ? true
         : hasCompletedOnboarding(request, claims.sub),
+    iicrc_member_number,
+    iicrc_expiry_date,
+    iicrc_card_image_url,
+    iicrc_certifications,
   } satisfies User);
   if (patch.onboarding_completed === true) {
     setOnboardingCompletedCookie(response, claims.sub);
