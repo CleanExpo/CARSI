@@ -272,6 +272,17 @@ export default async function Home() {
       {/* ── Stats (Animated) ───────────────────────────────────────────────── */}
       <AnimatedStats stats={stats} />
 
+      <div className="border-t border-white/[0.06] px-6 py-4">
+        <div className="mx-auto max-w-6xl text-center">
+          <Link
+            href="/ccw-training"
+            className="text-xs text-white/35 transition-colors hover:text-[#2490ed] sm:text-sm"
+          >
+            2-Day Carpet Cleaning Workshop (CCW) — participant resources
+          </Link>
+        </div>
+      </div>
+
       {/* ── Disciplines (compact pills) ────────────────────────────────────── */}
       <section className="px-6 py-12" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
         <div className="mx-auto max-w-6xl">

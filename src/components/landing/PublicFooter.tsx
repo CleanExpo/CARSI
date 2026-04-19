@@ -47,6 +47,7 @@ export function PublicFooter() {
             <ul className="space-y-2 text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
               {[
                 { label: 'Courses', href: '/courses' },
+                { label: 'CCW Workshop', href: '/ccw-training' },
                 { label: 'Pathways', href: '/pathways' },
                 { label: 'Pricing', href: '/pricing' },
                 { label: 'About', href: '/about' },
