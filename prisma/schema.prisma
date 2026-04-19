@@ -33,6 +33,12 @@ model LmsUser {
   iicrcExpiryDate     DateTime? @map("iicrc_expiry_date") @db.Date
   iicrcCardImageUrl   String?   @map("iicrc_card_image_url") @db.Text
   iicrcCertifications Json?     @map("iicrc_certifications")
+  /// First-run dashboard onboarding (industry, disciplines, goals). Set when wizard completes.
+  onboardingCompletedAt DateTime? @map("onboarding_completed_at") @db.Timestamptz(6)
+  /// JSON: industry, role, iicrc_experience, disciplines_held[], primary_goal, etc.
+  onboarding            Json?
+  /// none | email | sms — preference for unfinished-lesson reminders (delivery not yet wired for sms).
+  resumeReminderOptIn   String?   @map("resume_reminder_opt_in")
   createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt         DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
