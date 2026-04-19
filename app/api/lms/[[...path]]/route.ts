@@ -54,10 +54,6 @@ function localStub(method: string, segments: string[]): NextResponse | null {
     });
   }
 
-  if (method === 'GET' && key === 'recommendations/next-course') {
-    return NextResponse.json([]);
-  }
-
   if (method === 'GET' && key === 'subscription/status') {
     return NextResponse.json({
       has_subscription: false,
