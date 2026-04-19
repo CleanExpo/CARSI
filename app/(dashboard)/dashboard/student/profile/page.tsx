@@ -3,7 +3,6 @@
 import { useAuth } from '@/components/auth/auth-provider';
 import { AcronymTooltip } from '@/components/ui/AcronymTooltip';
 import { Button } from '@/components/ui/button';
-import { useTheme } from '@/components/ThemeProvider';
 import type { User } from '@/lib/api/auth';
 import { apiClient } from '@/lib/api/client';
 import { useToast } from '@/hooks/use-toast';
@@ -14,9 +13,7 @@ import {
   ChevronRight,
   GraduationCap,
   LayoutDashboard,
-  Moon,
   Shield,
-  Sun,
   User as UserIcon,
 } from 'lucide-react';
 import Link from 'next/link';
@@ -26,7 +23,6 @@ const SECTIONS = [
   { id: 'overview', label: 'Overview' },
   { id: 'account', label: 'Account' },
   { id: 'iicrc', label: 'IICRC & renewal' },
-  { id: 'appearance', label: 'Appearance' },
 ] as const;
 
 function initialsFromUser(u: { full_name?: string; email?: string } | null): string {
@@ -44,7 +40,6 @@ function initialsFromUser(u: { full_name?: string; email?: string } | null): str
 
 export default function StudentProfilePage() {
   const { user: authUser, refreshUser } = useAuth();
-  const { theme, toggle: toggleTheme } = useTheme();
   const { toast } = useToast();
 
   const [loading, setLoading] = useState(true);
@@ -258,8 +253,8 @@ export default function StudentProfilePage() {
                 </Link>
               </div>
               <p className="mt-6 max-w-2xl text-sm leading-relaxed text-white/45">
-                Manage how you appear in CARSI, your <AcronymTooltip term="IICRC" /> renewal details,
-                and display preferences — similar to account hubs on platforms like Coursera or Udemy.
+                Manage how you appear in CARSI and your <AcronymTooltip term="IICRC" /> renewal
+                details — similar to account hubs on platforms like Coursera or Udemy.
               </p>
             </section>
 
@@ -409,51 +404,6 @@ export default function StudentProfilePage() {
                   {savingSection === 'iicrc' ? 'Saving…' : 'Save IICRC details'}
                 </Button>
               </form>
-            </section>
-
-            <section id="appearance" className="scroll-mt-24">
-              <div className="mb-4 flex items-center gap-2">
-                {theme === 'dark' ? (
-                  <Moon className="h-4 w-4 text-[#2490ed]" aria-hidden />
-                ) : (
-                  <Sun className="h-4 w-4 text-[#2490ed]" aria-hidden />
-                )}
-                <h2 className="text-lg font-semibold text-white">Appearance</h2>
-              </div>
-              <p className="mb-6 text-sm text-white/45">
-                Choose how CARSI looks on this device. Your preference is saved to your account.
-              </p>
-              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-white">Theme</p>
-                    <p className="mt-1 text-xs text-white/40">
-                      Currently: <span className="text-white/70 capitalize">{theme}</span>
-                    </p>
-                  </div>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => {
-                      void toggleTheme();
-                      toast({ title: `Theme: ${theme === 'dark' ? 'Light' : 'Dark'}` });
-                    }}
-                    className="rounded-xl border-white/15 bg-white/5 text-white hover:bg-white/10"
-                  >
-                    {theme === 'dark' ? (
-                      <>
-                        <Sun className="mr-2 h-4 w-4" />
-                        Use light mode
-                      </>
-                    ) : (
-                      <>
-                        <Moon className="mr-2 h-4 w-4" />
-                        Use dark mode
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </div>
             </section>
           </>
         )}
