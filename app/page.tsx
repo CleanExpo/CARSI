@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import {
   AnimatedCard,
   AnimatedHero,
@@ -14,6 +15,12 @@ import { IICRCDisciplineMap } from '@/components/lms/diagrams/IICRCDisciplineMap
 import { StudentJourneyMap } from '@/components/lms/diagrams/StudentJourneyMap';
 import { FAQSchema } from '@/components/seo/JsonLd';
 import { AcronymTooltip } from '@/components/ui/AcronymTooltip';
+import { disciplinePillsFromCodes } from '@/lib/iicrc-discipline-display';
+import {
+  catalogueMetaDescription,
+  formatCourseCountForCopy,
+  getPublicCatalogueFacts,
+} from '@/lib/server/public-catalogue-facts';
 import { getHomepageFeaturedCourses } from '@/lib/server/public-courses-list';
 import type { CourseListItem } from '@/lib/wordpress-export-courses';
 import {
@@ -32,6 +39,13 @@ import Link from 'next/link';
 
 /** Always render homepage on the server so featured courses load from `DATABASE_URL` at request time (not a static build snapshot). */
 export const dynamic = 'force-dynamic';
+
+export async function generateMetadata(): Promise<Metadata> {
+  const facts = await getPublicCatalogueFacts();
+  return {
+    description: catalogueMetaDescription(facts),
+  };
+}
 
 // ---------------------------------------------------------------------------
 // Types
@@ -60,14 +74,6 @@ async function getFeaturedCourses(): Promise<Course[]> {
 // Constants
 // ---------------------------------------------------------------------------
 
-const disciplines = [
-  { code: 'WRT', label: 'Water Restoration' },
-  { code: 'CRT', label: 'Carpet Restoration' },
-  { code: 'ASD', label: 'Structural Drying' },
-  { code: 'AMRT', label: 'Microbial Remediation' },
-  { code: 'FSRT', label: 'Fire & Smoke' },
-];
-
 const industries = [
   { slug: 'healthcare', label: 'Healthcare', highlight: true },
   { slug: 'hospitality', label: 'Hotels & Resorts', highlight: true },
@@ -89,13 +95,6 @@ const benefits = [
   'Automatic credit tracking',
   'Verifiable digital credentials',
   'No travel, no downtime, no waiting',
-];
-
-const stats = [
-  { value: '24/7', label: 'Online Access' },
-  { value: '12+', label: 'Industries Served' },
-  { value: '91', label: 'Courses' },
-  { value: '7', label: 'IICRC Disciplines' },
 ];
 
 const geoDisciplineCodes = [
@@ -131,11 +130,25 @@ const onlineHighlights = [
   },
 ] as const;
 
-const faqs = [
+function buildHomeFaqs(facts: {
+  publishedCourseCount: number;
+  disciplineCodes: string[];
+}) {
+  const n = facts.publishedCourseCount;
+  const d = facts.disciplineCodes.length;
+  const coursePhrase =
+    n > 0
+      ? `${n} published course${n === 1 ? '' : 's'}`
+      : 'IICRC CEC-approved courses';
+  const discPhrase =
+    d > 0
+      ? `${d} IICRC discipline${d === 1 ? '' : 's'}`
+      : 'the core IICRC disciplines';
+
+  return [
   {
     question: 'What is CARSI?',
-    answer:
-      'CARSI is an Australian online training platform offering IICRC CEC-approved courses for cleaning and restoration professionals. With over 91 courses across seven IICRC disciplines, CARSI enables technicians to maintain their certification entirely online.',
+    answer: `CARSI is an Australian online training platform offering IICRC CEC-approved courses for cleaning and restoration professionals. With ${coursePhrase} across ${discPhrase}, CARSI enables technicians to maintain their certification entirely online.`,
   },
   {
     question: 'How do IICRC CECs work?',
@@ -158,6 +171,7 @@ const faqs = [
       'CARSI serves over 12 industries including healthcare, hospitality, aged care, mining and resources, commercial cleaning, government and defence, education, property management, strata, retail, childcare, and construction.',
   },
 ];
+}
 
 // ---------------------------------------------------------------------------
 // Sub-components
@@ -201,7 +215,38 @@ function SourceLink({ href, label }: { href: string; label: string }) {
 // ---------------------------------------------------------------------------
 
 export default async function Home() {
-  const featuredCourses = await getFeaturedCourses();
+  const [featuredCourses, catalogueFacts] = await Promise.all([
+    getFeaturedCourses(),
+    getPublicCatalogueFacts(),
+  ]);
+  const faqs = buildHomeFaqs(catalogueFacts);
+  const stats = [
+    { value: '24/7', label: 'Online Access' },
+    { value: '12+', label: 'Industries Served' },
+    {
+      value:
+        catalogueFacts.publishedCourseCount > 0
+          ? formatCourseCountForCopy(catalogueFacts.publishedCourseCount)
+          : '—',
+      label: 'Courses',
+    },
+    {
+      value:
+        catalogueFacts.disciplineCodes.length > 0
+          ? formatCourseCountForCopy(catalogueFacts.disciplineCodes.length)
+          : '7',
+      label: 'IICRC Disciplines',
+    },
+  ];
+  const disciplinePills = disciplinePillsFromCodes(
+    catalogueFacts.disciplineCodes.length > 0
+      ? catalogueFacts.disciplineCodes
+      : ['WRT', 'CRT', 'ASD', 'AMRT', 'FSRT', 'OCT', 'CCT']
+  );
+  const disciplineCountLabel =
+    catalogueFacts.disciplineCodes.length > 0
+      ? catalogueFacts.disciplineCodes.length
+      : 7;
 
   return (
     <div id="main-content" className="relative z-10 min-h-screen bg-[#050505]">
@@ -237,7 +282,7 @@ export default async function Home() {
             <AcronymTooltip term="IICRC" /> Disciplines
           </p>
           <div className="flex flex-wrap justify-center gap-2">
-            {disciplines.map((d) => (
+            {disciplinePills.map((d) => (
               <Link
                 key={d.code}
                 href={`/courses?discipline=${d.code}`}
@@ -262,8 +307,8 @@ export default async function Home() {
       <AnimatedSection label="Certifications" title="IICRC Discipline Map">
         <div className="mx-auto max-w-xl">
           <p className="mb-6 text-center text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
-            Explore the seven IICRC disciplines. Hover over each node to see the full certification
-            name.
+            Explore the {disciplineCountLabel} IICRC disciplines. Hover over each node to see the
+            full certification name.
           </p>
           <IICRCDisciplineMap />
         </div>
@@ -492,8 +537,17 @@ export default async function Home() {
                     href="https://www.iicrc.org/page/IICRCGlobalLocations"
                     label="IICRC Global"
                   />
-                  . CARSI offers 40 <AcronymTooltip term="IICRC" /> <AcronymTooltip term="CEC" />
-                  -approved online courses across all seven disciplines, allowing Australian
+                  .{' '}
+                  {catalogueFacts.publishedCourseCount > 0 ? (
+                    <>
+                      CARSI offers {formatCourseCountForCopy(catalogueFacts.publishedCourseCount)}{' '}
+                    </>
+                  ) : (
+                    <>CARSI offers </>
+                  )}
+                  <AcronymTooltip term="IICRC" /> <AcronymTooltip term="CEC" />
+                  -approved online courses across {disciplineCountLabel}{' '}
+                  {disciplineCountLabel === 1 ? 'discipline' : 'disciplines'}, allowing Australian
                   professionals to meet renewal requirements without travelling interstate.
                 </p>
                 <div
@@ -687,9 +741,20 @@ export default async function Home() {
                   This partnership means CARSI-trained technicians are recognised across the NRPG
                   network from day one. For restoration companies, enrolling staff through CARSI
                   ensures compliance with NRPG workforce standards without disrupting operations.
-                  With over 91 courses spanning all seven <AcronymTooltip term="IICRC" />{' '}
-                  disciplines, CARSI provides the most comprehensive online training library
-                  available to Australian restoration professionals.
+                  {catalogueFacts.publishedCourseCount > 0 ? (
+                    <>
+                      With {formatCourseCountForCopy(catalogueFacts.publishedCourseCount)} courses
+                      spanning {disciplineCountLabel} <AcronymTooltip term="IICRC" /> disciplines,
+                      CARSI provides the most comprehensive online training library available to
+                      Australian restoration professionals.
+                    </>
+                  ) : (
+                    <>
+                      With courses spanning the core <AcronymTooltip term="IICRC" /> disciplines,
+                      CARSI provides the most comprehensive online training library available to
+                      Australian restoration professionals.
+                    </>
+                  )}
                 </p>
                 <div className="flex flex-wrap items-center gap-3 pt-1">
                   <Link
@@ -825,7 +890,15 @@ export default async function Home() {
           <p className="mb-8 text-base" style={{ color: 'rgba(255,255,255,0.5)' }}>
             Free courses available. Premium courses from just $20 AUD.
             <br />
-            Or get full access to all 91 courses for $795 AUD/year.
+            {catalogueFacts.publishedCourseCount > 0 ? (
+              <>
+                Or get full access to all{' '}
+                {formatCourseCountForCopy(catalogueFacts.publishedCourseCount)} courses for $795
+                AUD/year.
+              </>
+            ) : (
+              <>Or get full access to the full catalogue for $795 AUD/year.</>
+            )}
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
