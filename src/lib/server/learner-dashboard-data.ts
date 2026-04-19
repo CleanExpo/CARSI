@@ -30,7 +30,7 @@ export interface LearnerDashboardSummary {
   totalCatalogHours: number;
 }
 
-function normalizeStatus(raw: string): 'completed' | 'active' | 'other' {
+export function normalizeEnrollmentStatus(raw: string): 'completed' | 'active' | 'other' {
   const s = raw.toLowerCase().trim();
   if (s === 'completed' || s === 'complete') return 'completed';
   if (
@@ -95,7 +95,7 @@ function mapEnrollmentRow(
   const allLessonsComplete = total > 0 && completed >= total;
   const completionPercentage =
     total === 0
-      ? normalizeStatus(e.status) === 'completed'
+      ? normalizeEnrollmentStatus(e.status) === 'completed'
         ? 100
         : 0
       : Math.min(100, Math.round((completed / total) * 100));
@@ -177,11 +177,11 @@ export async function getLearnerDashboardSummary(
     for (let i = 0; i < rows.length; i += 1) {
       const r = rows[i];
       const dto = enrollments[i];
-      if (dto.all_lessons_complete || normalizeStatus(dto.status) === 'completed') {
+      if (dto.all_lessons_complete || normalizeEnrollmentStatus(dto.status) === 'completed') {
         completed += 1;
         const cec = toNumber(r.course.cecHours);
         if (cec !== null) cecHoursFromCompleted += cec;
-      } else if (normalizeStatus(dto.status) === 'active') {
+      } else if (normalizeEnrollmentStatus(dto.status) === 'active') {
         active += 1;
       }
       const dur = toNumber(r.course.durationHours);
