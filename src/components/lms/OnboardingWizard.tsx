@@ -15,6 +15,9 @@ import {
   RefreshCw,
   TrendingUp,
   ArrowRight,
+  Calendar,
+  Bell,
+  BellOff,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { apiClient } from '@/lib/api/client';
@@ -24,7 +27,7 @@ interface OnboardingWizardProps {
   onComplete: (destination: string) => void;
 }
 
-const POST_ONBOARDING_PATH = '/dashboard/student/profile';
+const POST_ONBOARDING_PATH = '/dashboard/student';
 
 interface AnswerCard {
   value: string;
@@ -32,14 +35,24 @@ interface AnswerCard {
   icon: React.ReactNode;
 }
 
-interface WizardStep {
-  question: string;
-  key: 'industry' | 'role' | 'iicrc_experience' | 'primary_goal';
-  answers: AnswerCard[];
-}
+type FlowItem =
+  | {
+      kind: 'single';
+      question: string;
+      key: 'industry' | 'role' | 'iicrc_experience' | 'primary_goal';
+      answers: AnswerCard[];
+    }
+  | {
+      kind: 'multi';
+      question: string;
+      key: 'disciplines_held';
+      options: { value: string; label: string }[];
+    }
+  | { kind: 'renewal'; question: string };
 
-const STEPS: WizardStep[] = [
+const FLOW: FlowItem[] = [
   {
+    kind: 'single',
     question: "What's your industry?",
     key: 'industry',
     answers: [
@@ -62,6 +75,7 @@ const STEPS: WizardStep[] = [
     ],
   },
   {
+    kind: 'single',
     question: "What's your role?",
     key: 'role',
     answers: [
@@ -80,6 +94,7 @@ const STEPS: WizardStep[] = [
     ],
   },
   {
+    kind: 'single',
     question: 'IICRC experience?',
     key: 'iicrc_experience',
     answers: [
@@ -97,6 +112,21 @@ const STEPS: WizardStep[] = [
     ],
   },
   {
+    kind: 'multi',
+    question: 'Which IICRC disciplines do you hold or plan to work in? Select all that apply.',
+    key: 'disciplines_held',
+    options: [
+      { value: 'WRT', label: 'WRT — Water' },
+      { value: 'CRT', label: 'CRT — Carpet' },
+      { value: 'ASD', label: 'ASD — Structural drying' },
+      { value: 'AMRT', label: 'AMRT — Microbial' },
+      { value: 'FSRT', label: 'FSRT — Fire & smoke' },
+      { value: 'OCT', label: 'OCT — Odour' },
+      { value: 'CCT', label: 'CCT — Carpet cleaning' },
+    ],
+  },
+  {
+    kind: 'single',
     question: "What's your main goal?",
     key: 'primary_goal',
     answers: [
@@ -113,16 +143,11 @@ const STEPS: WizardStep[] = [
       },
     ],
   },
+  {
+    kind: 'renewal',
+    question: 'Renewal & reminders (optional)',
+  },
 ];
-
-const PATHWAY_LABELS: Record<string, string> = {
-  WRT: 'Water Damage Restoration Technician (WRT)',
-  ASD: 'Applied Structural Drying (ASD)',
-  CRT: 'Commercial Drying Technician (CRT)',
-  OCT: 'Odour Control Technician (OCT)',
-  CCT: 'Commercial Carpet Technician (CCT)',
-  HST: 'Health and Safety Technician (HST)',
-};
 
 const slideVariants = {
   enter: (direction: number) => ({
@@ -139,44 +164,90 @@ const slideVariants = {
 export function OnboardingWizard({ isOpen, onComplete }: OnboardingWizardProps) {
   const [step, setStep] = useState(0);
   const [direction, setDirection] = useState(1);
-  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [answers, setAnswers] = useState<Record<string, string | string[]>>({});
+  const [disciplines, setDisciplines] = useState<Set<string>>(new Set());
+  const [renewalDate, setRenewalDate] = useState('');
+  const [resumeReminder, setResumeReminder] = useState<'none' | 'email' | 'sms'>('none');
   const [result, setResult] = useState<{
     pathway: string;
+    pathwayLabel: string;
     description: string;
+    suggestedUrl: string;
   } | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   if (!isOpen) return null;
 
-  const currentStep = STEPS[step];
-  const totalSteps = STEPS.length;
+  const current = FLOW[step];
+  const totalSteps = FLOW.length;
   const isLastStep = step === totalSteps - 1;
 
-  const handleAnswer = async (value: string) => {
-    const newAnswers = { ...answers, [currentStep.key]: value };
-    setAnswers(newAnswers);
+  function goNext() {
+    setDirection(1);
+    setStep((s) => Math.min(s + 1, totalSteps - 1));
+  }
 
-    if (isLastStep) {
-      await submitOnboarding(newAnswers);
-    } else {
-      setDirection(1);
-      setStep((s) => s + 1);
+  function goBack() {
+    setDirection(-1);
+    setStep((s) => Math.max(0, s - 1));
+  }
+
+  const handleSingleAnswer = (value: string) => {
+    const meta = FLOW[step];
+    if (meta.kind !== 'single') return;
+    const newAnswers = { ...answers, [meta.key]: value };
+    setAnswers(newAnswers);
+    if (!isLastStep) {
+      goNext();
     }
   };
 
-  const submitOnboarding = async (finalAnswers: Record<string, string>) => {
+  function toggleDiscipline(value: string) {
+    setDisciplines((prev) => {
+      const next = new Set(prev);
+      if (next.has(value)) next.delete(value);
+      else next.add(value);
+      return next;
+    });
+  }
+
+  function continueFromDisciplines() {
+    const codes = [...disciplines];
+    setAnswers((a) => ({ ...a, disciplines_held: codes }));
+    goNext();
+  }
+
+  const submitOnboarding = async () => {
     setLoading(true);
     setError(null);
+    const held =
+      Array.isArray(answers.disciplines_held) && answers.disciplines_held.length > 0
+        ? (answers.disciplines_held as string[])
+        : [...disciplines];
+
+    const payload: Record<string, unknown> = {
+      industry: answers.industry,
+      role: answers.role,
+      iicrc_experience: answers.iicrc_experience,
+      disciplines_held: held,
+      primary_goal: String(answers.primary_goal ?? ''),
+      renewal_date: renewalDate.trim() || null,
+      resume_reminder_opt_in: resumeReminder,
+    };
+
     try {
       const data = await apiClient.post<{
         recommended_pathway: string;
+        pathway_label?: string;
         pathway_description: string;
         suggested_courses_url: string;
-      }>('/api/lms/auth/onboarding', finalAnswers);
+      }>('/api/lms/auth/onboarding', payload);
       setResult({
         pathway: data.recommended_pathway,
+        pathwayLabel: data.pathway_label ?? data.recommended_pathway,
         description: data.pathway_description,
+        suggestedUrl: data.suggested_courses_url,
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong');
@@ -186,7 +257,7 @@ export function OnboardingWizard({ isOpen, onComplete }: OnboardingWizardProps) 
   };
 
   const handleComplete = () => {
-    onComplete(POST_ONBOARDING_PATH);
+    onComplete(result?.suggestedUrl ?? POST_ONBOARDING_PATH);
   };
 
   return (
@@ -205,10 +276,9 @@ export function OnboardingWizard({ isOpen, onComplete }: OnboardingWizardProps) 
         className="relative w-full max-w-lg rounded-sm border border-white/[0.06] p-8"
         style={{ background: '#060a14' }}
       >
-        {/* Step dots */}
         {!result && (
           <div className="mb-8 flex items-center justify-center gap-2">
-            {STEPS.map((_, i) => (
+            {FLOW.map((_, i) => (
               <div
                 key={i}
                 className="h-2 rounded-sm transition-all duration-300"
@@ -241,7 +311,7 @@ export function OnboardingWizard({ isOpen, onComplete }: OnboardingWizardProps) 
               </div>
               <h2 className="mb-2 text-xl font-semibold text-white">We recommend starting with</h2>
               <p className="mb-3 text-lg font-bold" style={{ color: '#2490ed' }}>
-                {PATHWAY_LABELS[result.pathway] ?? result.pathway}
+                {result.pathwayLabel}
               </p>
               <p className="mb-8 text-sm leading-relaxed text-white/60">{result.description}</p>
               <Button
@@ -250,7 +320,7 @@ export function OnboardingWizard({ isOpen, onComplete }: OnboardingWizardProps) 
                 style={{ background: '#2490ed', color: '#fff' }}
                 asChild={false}
               >
-                Start Learning
+                Go to your dashboard
                 <ArrowRight className="h-4 w-4" />
               </Button>
             </motion.div>
@@ -265,7 +335,7 @@ export function OnboardingWizard({ isOpen, onComplete }: OnboardingWizardProps) 
                 className="mb-4 h-10 w-10 animate-spin rounded-full border-2 border-transparent"
                 style={{ borderTopColor: '#2490ed' }}
               />
-              <p className="text-sm text-white/40">Analysing your answers…</p>
+              <p className="text-sm text-white/40">Saving your preferences…</p>
             </motion.div>
           ) : error ? (
             <motion.div
@@ -281,11 +351,145 @@ export function OnboardingWizard({ isOpen, onComplete }: OnboardingWizardProps) 
                   setError(null);
                   setStep(0);
                   setAnswers({});
+                  setDisciplines(new Set());
                 }}
                 className="rounded-sm"
               >
                 Try again
               </Button>
+            </motion.div>
+          ) : current.kind === 'renewal' ? (
+            <motion.div
+              key="renewal"
+              custom={direction}
+              variants={slideVariants}
+              initial="enter"
+              animate="centre"
+              exit="exit"
+              transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+            >
+              <h2 className="mb-2 text-center text-xl font-semibold text-white">{current.question}</h2>
+              <p className="mb-6 text-center text-xs text-white/40">
+                Used for your renewal cockpit. You can change this anytime in profile.
+              </p>
+              <label className="block text-xs font-medium text-white/50" htmlFor="renewal_date">
+                Certification / renewal date (optional)
+              </label>
+              <div className="mt-2 flex items-center gap-2">
+                <Calendar className="h-4 w-4 shrink-0 text-white/30" aria-hidden />
+                <input
+                  id="renewal_date"
+                  type="date"
+                  value={renewalDate}
+                  onChange={(e) => setRenewalDate(e.target.value)}
+                  className="w-full rounded-lg border border-white/10 bg-[#0a0f1a] px-3 py-2.5 text-sm text-white"
+                />
+              </div>
+              <p className="mt-6 text-xs font-medium text-white/50">Resume reminders (optional)</p>
+              <p className="mt-1 text-[11px] text-white/35">
+                We can nudge you about unfinished lessons. SMS may be enabled later — email is available
+                now where configured.
+              </p>
+              <div className="mt-3 grid gap-2">
+                <button
+                  type="button"
+                  onClick={() => setResumeReminder('none')}
+                  className={`flex items-center gap-3 rounded-sm border p-3 text-left text-sm transition ${
+                    resumeReminder === 'none'
+                      ? 'border-[#2490ed]/50 bg-[#2490ed]/10'
+                      : 'border-white/[0.06] bg-white/[0.02]'
+                  }`}
+                >
+                  <BellOff className="h-5 w-5 shrink-0 text-white/40" />
+                  <span className="text-white/85">No reminders</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setResumeReminder('email')}
+                  className={`flex items-center gap-3 rounded-sm border p-3 text-left text-sm transition ${
+                    resumeReminder === 'email'
+                      ? 'border-[#2490ed]/50 bg-[#2490ed]/10'
+                      : 'border-white/[0.06] bg-white/[0.02]'
+                  }`}
+                >
+                  <Bell className="h-5 w-5 shrink-0 text-[#2490ed]" />
+                  <span className="text-white/85">Email me about unfinished lessons (opt-in)</span>
+                </button>
+                <button
+                  type="button"
+                  disabled
+                  className="flex cursor-not-allowed items-center gap-3 rounded-sm border border-white/[0.04] p-3 text-left text-sm opacity-40"
+                >
+                  <Bell className="h-5 w-5 shrink-0" />
+                  <span className="text-white/50">SMS reminders — coming soon</span>
+                </button>
+              </div>
+              <Button
+                type="button"
+                onClick={() => void submitOnboarding()}
+                className="mt-8 w-full rounded-sm"
+                style={{ background: '#2490ed', color: '#fff' }}
+              >
+                Finish
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+              <button
+                type="button"
+                onClick={goBack}
+                className="mt-4 w-full text-center text-xs text-white/30 transition-colors hover:text-white/60"
+              >
+                ← Back
+              </button>
+            </motion.div>
+          ) : current.kind === 'multi' ? (
+            <motion.div
+              key="multi"
+              custom={direction}
+              variants={slideVariants}
+              initial="enter"
+              animate="centre"
+              exit="exit"
+              transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+            >
+              <h2 className="mb-6 text-center text-xl font-semibold text-white">{current.question}</h2>
+              <div className="grid gap-2">
+                {current.options.map((opt) => {
+                  const on = disciplines.has(opt.value);
+                  return (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => toggleDiscipline(opt.value)}
+                      className={`rounded-sm border px-4 py-3 text-left text-sm transition ${
+                        on
+                          ? 'border-[#2490ed]/50 bg-[#2490ed]/10 text-white'
+                          : 'border-white/[0.06] bg-white/[0.02] text-white/80'
+                      }`}
+                    >
+                      <span className="font-mono text-xs font-bold text-[#2490ed]">{opt.value}</span>
+                      <span className="ml-2">{opt.label.replace(/^[A-Z]{2,5}\s—\s/, '')}</span>
+                    </button>
+                  );
+                })}
+              </div>
+              <Button
+                type="button"
+                onClick={continueFromDisciplines}
+                className="mt-8 w-full rounded-sm"
+                style={{ background: '#2490ed', color: '#fff' }}
+              >
+                Continue
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+              {step > 0 ? (
+                <button
+                  type="button"
+                  onClick={goBack}
+                  className="mt-4 w-full text-center text-xs text-white/30 transition-colors hover:text-white/60"
+                >
+                  ← Back
+                </button>
+              ) : null}
             </motion.div>
           ) : (
             <motion.div
@@ -297,14 +501,13 @@ export function OnboardingWizard({ isOpen, onComplete }: OnboardingWizardProps) 
               exit="exit"
               transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
             >
-              <h2 className="mb-6 text-center text-xl font-semibold text-white">
-                {currentStep.question}
-              </h2>
+              <h2 className="mb-6 text-center text-xl font-semibold text-white">{current.question}</h2>
               <div className="grid gap-3">
-                {currentStep.answers.map((answer) => (
+                {current.answers.map((answer) => (
                   <button
                     key={answer.value}
-                    onClick={() => handleAnswer(answer.value)}
+                    type="button"
+                    onClick={() => handleSingleAnswer(answer.value)}
                     className="flex items-center gap-4 rounded-sm border border-white/[0.06] p-4 text-left transition-all duration-150 hover:border-[#2490ed]/50 hover:bg-white/[0.03]"
                     style={{ background: 'rgba(255,255,255,0.02)' }}
                   >
@@ -314,17 +517,15 @@ export function OnboardingWizard({ isOpen, onComplete }: OnboardingWizardProps) 
                 ))}
               </div>
 
-              {step > 0 && (
+              {step > 0 ? (
                 <button
-                  onClick={() => {
-                    setDirection(-1);
-                    setStep((s) => s - 1);
-                  }}
+                  type="button"
+                  onClick={goBack}
                   className="mt-6 w-full text-center text-xs text-white/30 transition-colors hover:text-white/60"
                 >
                   ← Back
                 </button>
-              )}
+              ) : null}
             </motion.div>
           )}
         </AnimatePresence>
