@@ -45,6 +45,17 @@ const pwaConfig = withPWA({
 const nextConfig: NextConfig = {
   output: 'standalone',
   reactStrictMode: true,
+  /**
+   * Ensure the CCW take-home files are copied into the standalone output on
+   * Vercel. The download API reads them from disk at runtime via
+   * `path.join(process.cwd(), 'content', 'ccw-take-home', ...)`. Without this
+   * tracing hint, @vercel/nft does not see the static binaries and they get
+   * pruned from the serverless bundle.
+   */
+  outputFileTracingIncludes: {
+    '/api/ccw-materials/download': ['./content/ccw-take-home/**/*'],
+    '/ccw-materials': ['./content/ccw-take-home/**/*'],
+  },
   /** Production deploys: do not fail the build on TS (fix issues in follow-up PRs). */
   typescript: {
     ignoreBuildErrors: true,
