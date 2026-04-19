@@ -8,13 +8,25 @@ on:
 
 env:
   NODE_VERSION: '22'
-  PYTHON_VERSION: '3.12'
+
+# This repo is a single-package Next.js 16 + Prisma app. The previous
+# workflow was inherited from a multi-service template (apps/backend/
+# Python, Playwright suites, type-check / test:e2e npm scripts) — none of
+# which exist in this repo, so every run failed. The current matrix only
+# runs what actually exists in package.json:
+#   - npm ci   (lockfile + deps)
+#   - npm run build  (= prisma generate && next build — does TS checking)
+#
+# Linting is intentionally skipped: Next.js 16 removed `next lint`, and the
+# repo doesn't yet have an ESLint flat config at the root. Re-enable a lint
+# job once ESLint is migrated. Same for E2E / accessibility tests — add
+# them when Playwright is actually configured for this app.
 
 jobs:
   dependency-verification:
     name: Dependency Verification
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -33,133 +45,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Verify dependencies
-        run: |
-          echo "Legacy scripts/verify.sh removed; skipping."
-          echo ok | tee verify-output.log
-
-      - name: Upload verification report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: dependency-verification-report
-          path: verify-output.log
-          retention-days: 30
-
-  backend-tests:
-    name: Backend Tests
-    needs: [dependency-verification]
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-
-    services:
-      postgres:
-        image: postgres:15-alpine
-        env:
-          POSTGRES_DB: starter_db
-          POSTGRES_USER: starter_user
-          POSTGRES_PASSWORD: local_dev_password
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup uv
-        uses: astral-sh/setup-uv@v4
-        with:
-          version: 'latest'
-
-      - name: Set up Python
-        run: uv python install ${{ env.PYTHON_VERSION }}
-
-      - name: Cache uv dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/uv
-            apps/backend/.venv
-          key: ${{ runner.os }}-uv-${{ hashFiles('apps/backend/pyproject.toml') }}
-          restore-keys: |
-            ${{ runner.os }}-uv-
-
-      - name: Install dependencies
-        working-directory: apps/backend
-        run: uv sync --extra dev
-
-      - name: Lint with ruff
-        working-directory: apps/backend
-        run: uv run ruff check src/
-
-      - name: Type check with mypy
-        working-directory: apps/backend
-        run: uv run mypy src/
-        continue-on-error: true
-
-      - name: Run tests with coverage
-        working-directory: apps/backend
-        run: uv run pytest --cov=src --cov-report=xml --cov-report=html --cov-report=term-missing -v
-        env:
-          DATABASE_URL: postgresql://starter_user:local_dev_password@localhost:5432/starter_db
-
-      - name: Check Alembic migrations are up-to-date
-        working-directory: apps/backend
-        run: uv run alembic check
-        env:
-          DATABASE_URL: postgresql://starter_user:local_dev_password@localhost:5432/starter_db
-
-      - name: Upload coverage report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: backend-coverage
-          path: |
-            apps/backend/coverage.xml
-            apps/backend/htmlcov/
-          retention-days: 30
-
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: backend-test-results
-          path: apps/backend/.pytest_cache/
-
-  frontend-tests:
-    name: Frontend Tests
-    needs: [dependency-verification]
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Lint
-        run: npm run lint
-
-      - name: Type check
-        run: npm run type-check
-
   build:
-    name: Build Check
+    name: Build
+    needs: [dependency-verification]
     runs-on: ubuntu-latest
-    timeout-minutes: 30
-    needs: [backend-tests, frontend-tests]
+    timeout-minutes: 20
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -173,156 +63,20 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build all packages
+      - name: Build
+        # `npm run build` = `prisma generate && next build`. next build
+        # runs TypeScript checking internally, so this is the canonical
+        # correctness gate for the app.
         run: npm run build
+        env:
+          # next build doesn't connect to the DB, but Prisma needs the env
+          # var present to satisfy datasource resolution.
+          DATABASE_URL: postgresql://placeholder:placeholder@localhost:5432/placeholder
 
       - name: Upload build artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: build-output
-          path: |
-            .next/
+          path: .next/
           retention-days: 7
-
-  e2e-tests:
-    name: E2E Tests
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    needs: [backend-tests, frontend-tests]
-
-    services:
-      postgres:
-        image: postgres:15-alpine
-        env:
-          POSTGRES_DB: starter_db
-          POSTGRES_USER: starter_user
-          POSTGRES_PASSWORD: local_dev_password
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Cache Playwright browsers
-        id: playwright-cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('package.json') }}
-          restore-keys: |
-            ${{ runner.os }}-playwright-
-
-      - name: Install Playwright browsers
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps chromium
-
-      - name: Install Playwright system dependencies
-        if: steps.playwright-cache.outputs.cache-hit == 'true'
-        run: npx playwright install-deps chromium
-
-      # RA-1164 — the ephemeral postgres service starts empty; E2E tests
-      # depend on migrated schema + seeded course catalog. Apply both
-      # before the Playwright run or every test hits an empty DB.
-      - name: Apply Prisma migrations
-        run: npm run prisma:migrate
-        env:
-          DATABASE_URL: postgresql://starter_user:local_dev_password@localhost:5432/starter_db
-
-      - name: Seed course catalog
-        run: npm run db:seed-courses
-        env:
-          DATABASE_URL: postgresql://starter_user:local_dev_password@localhost:5432/starter_db
-
-      - name: Run E2E tests
-        run: npm run test:e2e
-        env:
-          CI: true
-          DATABASE_URL: postgresql://starter_user:local_dev_password@localhost:5432/starter_db
-
-      - name: Upload Playwright report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-report
-          path: playwright-report/
-          retention-days: 30
-
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: e2e-test-results
-          path: test-results/
-
-  accessibility-tests:
-    name: Accessibility Tests
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    needs: [frontend-tests]
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Cache Playwright browsers
-        id: a11y-playwright-cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('package.json') }}
-          restore-keys: |
-            ${{ runner.os }}-playwright-
-
-      - name: Install Playwright browsers
-        if: steps.a11y-playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps chromium
-
-      - name: Install Playwright system dependencies
-        if: steps.a11y-playwright-cache.outputs.cache-hit == 'true'
-        run: npx playwright install-deps chromium
-
-      - name: Run accessibility tests
-        run: npx playwright test tests/accessibility/
-        continue-on-error: true
-        env:
-          CI: true
-
-      - name: Upload accessibility test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: accessibility-test-results
-          path: test-results/
-          retention-days: 30
-
-      - name: Upload Playwright report (accessibility)
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: accessibility-playwright-report
-          path: playwright-report/
-          retention-days: 30
