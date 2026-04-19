@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { cache } from 'react';
 
 import { BundlePricingCard } from '@/components/lms/BundlePricingCard';
 import { CourseGrid } from '@/components/lms/CourseGrid';
@@ -7,16 +8,23 @@ import { IICRCDisciplineMap } from '@/components/lms/diagrams/IICRCDisciplineMap
 import { CECCalculator } from '@/components/tools/CECCalculator';
 import { AcronymTooltip } from '@/components/ui/AcronymTooltip';
 import { getBackendOrigin } from '@/lib/env/public-url';
+import {
+  coursesIndexMetaDescription,
+  deriveCatalogueFactsFromCourseItems,
+} from '@/lib/server/public-catalogue-facts';
 import { getPublishedCourseListItemsFromDatabase } from '@/lib/server/public-courses-list';
 import { loadWpExportCourses, mapWpExportToCourseListItem } from '@/lib/wordpress-export-courses';
 
 export const dynamic = 'force-dynamic';
 
-export const metadata: Metadata = {
-  title: 'IICRC-Approved Restoration Training Courses | CARSI',
-  description:
-    'What courses does CARSI offer? Browse 91+ IICRC CEC-approved restoration and cleaning courses across WRT, CRT, ASD, AMRT, FSRT, OCT and CCT disciplines. Earn continuing education credits online.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { items } = await getCoursesCached();
+  const facts = deriveCatalogueFactsFromCourseItems(items);
+  return {
+    title: 'IICRC-Approved Restoration Training Courses | CARSI',
+    description: coursesIndexMetaDescription(facts),
+  };
+}
 
 interface SearchParams {
   category?: string;
@@ -80,6 +88,9 @@ async function getCourses() {
   return getCoursesFromBackend();
 }
 
+/** One catalogue fetch per request (shared by the page and `generateMetadata`). */
+const getCoursesCached = cache(getCourses);
+
 export default async function CoursesPage({
   searchParams,
 }: {
@@ -97,7 +108,11 @@ export default async function CoursesPage({
     typeof discipline === 'string' && discipline.trim() !== ''
       ? discipline.trim().toUpperCase()
       : undefined;
-  const [bundles, { items: courses, total }] = await Promise.all([getBundles(), getCourses()]);
+  const [bundles, { items: courses, total }] = await Promise.all([
+    getBundles(),
+    getCoursesCached(),
+  ]);
+  const catalogueFacts = deriveCatalogueFactsFromCourseItems(courses);
 
   return (
     <main id="main-content" className="relative z-10 min-h-screen bg-[#050505]">
@@ -243,7 +258,14 @@ export default async function CoursesPage({
                   ), and Commercial Carpet Cleaning Technology (<AcronymTooltip term="CCT" />
                   ). Each course awards <AcronymTooltip term="IICRC" /> Continuing Education Credits
                   (<AcronymTooltip term="CEC">CECs</AcronymTooltip>) upon completion, with automatic
-                  tracking and verifiable digital credentials. Our 91+ courses range from
+                  tracking and verifiable digital credentials.{' '}
+                  {catalogueFacts.publishedCourseCount > 0 ? (
+                    <>
+                      Our {catalogueFacts.publishedCourseCount} courses range from
+                    </>
+                  ) : (
+                    <>Our courses range from</>
+                  )}{' '}
                   introductory modules for new technicians through to advanced certification
                   preparation for experienced professionals. All courses are delivered online,
                   allowing Australian restoration technicians to study at their own pace from any
