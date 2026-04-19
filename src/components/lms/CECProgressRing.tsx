@@ -5,9 +5,11 @@ import { AcronymTooltip } from '@/components/ui/AcronymTooltip';
 
 interface CECProgressRingProps {
   cecEarned: number;
-  cecRequired?: number; // default: 8 (IICRC standard 3-year cycle)
+  cecRequired?: number;
   discipline?: string;
-  totalCecLifetime?: number; // Total CECs earned lifetime (for milestone badges)
+  totalCecLifetime?: number;
+  /** Shown under the ring as "{percentage}% {cycleLabel}" — default references the 3-year cycle. */
+  cycleLabel?: string;
 }
 
 type CECMilestone = 10 | 25 | 50 | 100;
@@ -42,6 +44,7 @@ export function CECProgressRing({
   cecRequired = 8,
   discipline,
   totalCecLifetime,
+  cycleLabel = 'of 3-year cycle',
 }: CECProgressRingProps) {
   const radius = 40;
   const stroke = 6;
@@ -117,7 +120,9 @@ export function CECProgressRing({
 
       <div className="flex flex-col items-center gap-0.5">
         {discipline && <span className="font-mono text-xs text-cyan-400">{discipline}</span>}
-        <span className="text-xs text-white/40">{percentage}% of 3-year cycle</span>
+        <span className="text-xs text-white/40">
+          {percentage}% {cycleLabel}
+        </span>
         {normalised >= 1 && (
           <span className="font-mono text-xs text-emerald-400">Renewal requirement met</span>
         )}

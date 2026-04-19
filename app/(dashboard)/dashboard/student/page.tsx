@@ -4,7 +4,7 @@ import { useAuth } from '@/components/auth/auth-provider';
 import { EnrolledCourseList } from '@/components/lms/EnrolledCourseList';
 import { ErrorBanner } from '@/components/lms/ErrorBanner';
 import { PushNotificationPrompt } from '@/components/lms/PushNotificationPrompt';
-import { RecommendationWidget } from '@/components/lms/RecommendationWidget';
+import { RenewalCockpit } from '@/components/lms/RenewalCockpit';
 import { apiClient } from '@/lib/api/client';
 import Link from 'next/link';
 import { ArrowRight, BookOpen, Sparkles } from 'lucide-react';
@@ -196,6 +196,8 @@ export default function StudentDashboardPage() {
         </div>
       </header>
 
+      <RenewalCockpit />
+
       {/* My courses — primary workspace */}
       <section className="relative overflow-hidden rounded-2xl border border-white/10 shadow-[0_0_0_1px_rgba(255,255,255,0.04)_inset]">
         <div
@@ -308,15 +310,6 @@ export default function StudentDashboardPage() {
         </div>
       </section>
 
-      {/* Recommendations */}
-      <section className="rounded-2xl border border-white/8 bg-white/[0.03] p-6 sm:p-8">
-        <h2 className="text-[11px] font-semibold tracking-[0.18em] text-white/35 uppercase">
-          What&apos;s next
-        </h2>
-        <div className="mt-2">
-          <RecommendationWidget />
-        </div>
-      </section>
     </div>
   );
 }
