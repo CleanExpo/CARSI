@@ -163,21 +163,6 @@ const faqs = [
 // Sub-components
 // ---------------------------------------------------------------------------
 
-function SkeletonCard() {
-  return (
-    <div
-      className="overflow-hidden rounded-sm"
-      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
-    >
-      <div className="h-40 animate-pulse bg-slate-800/50" />
-      <div className="space-y-2 p-4">
-        <div className="h-4 w-3/4 animate-pulse rounded bg-slate-700/30" />
-        <div className="h-3 w-1/2 animate-pulse rounded bg-slate-700/30" />
-      </div>
-    </div>
-  );
-}
-
 /** Inline GEO citation link — keeps sources visible without breaking reading flow. */
 function SourceLink({ href, label }: { href: string; label: string }) {
   return (
@@ -284,19 +269,47 @@ export default async function Home() {
         }
       >
         <CourseBrowseProvider courseLinkBase="/courses">
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {featuredCourses.length > 0
-              ? featuredCourses.map((course, i) => (
-                  <AnimatedCard key={course.id} index={i}>
-                    <CourseCard course={course} priorityImage={i < 9} />
-                  </AnimatedCard>
-                ))
-              : [1, 2, 3].map((i) => (
-                  <AnimatedCard key={i} index={i}>
-                    <SkeletonCard />
-                  </AnimatedCard>
-                ))}
-          </div>
+          {/* GP-344: skeleton cards were stuck forever in prod whenever
+              getFeaturedCourses() returned [] (missing DATABASE_URL or DB
+              error). Skeletons on a static-rendered page are never replaced,
+              so they permanently look broken. Replace the empty state with a
+              clean CTA to the /courses page. */}
+          {featuredCourses.length > 0 ? (
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {featuredCourses.map((course, i) => (
+                <AnimatedCard key={course.id} index={i}>
+                  <CourseCard course={course} priorityImage={i < 9} />
+                </AnimatedCard>
+              ))}
+            </div>
+          ) : (
+            <div
+              className="flex flex-col items-center gap-4 rounded-xl px-6 py-10 text-center"
+              style={{
+                background: 'rgba(255,255,255,0.02)',
+                border: '1px solid rgba(255,255,255,0.06)',
+              }}
+            >
+              <p className="text-base font-medium text-white/80">
+                Browse the full restoration-training catalog
+              </p>
+              <p className="text-sm text-white/50">
+                6+ <AcronymTooltip term="IICRC" /> <AcronymTooltip term="CEC" />
+                -approved courses across all seven disciplines. Self-paced,
+                online, and verifiable on completion.
+              </p>
+              <Link
+                href="/courses"
+                className="inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium transition-colors"
+                style={{
+                  background: '#f59e0b',
+                  color: '#0a0a0a',
+                }}
+              >
+                Browse all courses <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+          )}
         </CourseBrowseProvider>
       </AnimatedSection>
 

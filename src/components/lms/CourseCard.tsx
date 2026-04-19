@@ -116,24 +116,14 @@ export function CourseCard({ course, priorityImage }: CourseCardProps) {
         />
       </div>
 
-      {/* Card body */}
+      {/* Card body — GP-345: title + short_description were rendered TWICE
+          per card: once inside <CourseTextThumbnail> above (the
+          accent-styled "variant=card" thumbnail that carries the course name
+          + blurb as its design), and again here as a <h3> + <p> block. The
+          symptom in prod was every card showing each string twice
+          vertically. The thumbnail is the canonical text surface for cards;
+          this body block is now stats-only (modules/lessons/CECs + View CTA). */}
       <div className="flex flex-1 flex-col p-3">
-        <h3
-          className="mb-2 line-clamp-2 text-sm leading-snug font-semibold"
-          style={{ color: 'rgba(255,255,255,0.9)' }}
-        >
-          {course.title}
-        </h3>
-
-        {course.short_description && (
-          <p
-            className="mb-2 line-clamp-2 text-xs leading-relaxed"
-            style={{ color: 'rgba(255,255,255,0.45)' }}
-          >
-            {course.short_description}
-          </p>
-        )}
-
         <div
           className="mt-auto flex items-center justify-between pt-2"
           style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}
