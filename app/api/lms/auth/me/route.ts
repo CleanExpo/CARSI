@@ -28,6 +28,7 @@ export async function GET(request: NextRequest) {
   if ('error' in result) return result.error;
   const { claims } = result;
 
+  let displayName = claims.full_name;
   let theme_preference = 'dark';
   let iicrc_member_number: string | null = null;
   let iicrc_expiry_date: string | null = null;
@@ -38,6 +39,7 @@ export async function GET(request: NextRequest) {
     const row = await prisma.lmsUser.findUnique({
       where: { id: claims.sub },
       select: {
+        fullName: true,
         themePreference: true,
         iicrcMemberNumber: true,
         iicrcExpiryDate: true,
@@ -45,6 +47,7 @@ export async function GET(request: NextRequest) {
         iicrcCertifications: true,
       },
     });
+    if (row?.fullName?.trim()) displayName = row.fullName.trim();
     if (row?.themePreference) theme_preference = row.themePreference;
     iicrc_member_number = row?.iicrcMemberNumber ?? null;
     if (row?.iicrcExpiryDate) {
@@ -57,7 +60,7 @@ export async function GET(request: NextRequest) {
   const user: User = {
     id: claims.sub,
     email: claims.email,
-    full_name: claims.full_name,
+    full_name: displayName,
     roles: [claims.role],
     theme_preference,
     is_active: true,
@@ -86,6 +89,10 @@ export async function PATCH(request: NextRequest) {
   const update: Prisma.LmsUserUpdateInput = {};
   if (typeof patch.theme_preference === 'string') {
     update.themePreference = patch.theme_preference;
+  }
+  if (typeof patch.full_name === 'string') {
+    const t = patch.full_name.trim();
+    if (t.length > 0) update.fullName = t;
   }
   if (typeof patch.iicrc_member_number === 'string') {
     update.iicrcMemberNumber = patch.iicrc_member_number;
@@ -132,10 +139,13 @@ export async function PATCH(request: NextRequest) {
   let iicrc_card_image_url: string | null = null;
   let iicrc_certifications: IicrcCertificationEntry[] | null = null;
 
+  let patchDisplayName = claims.full_name;
+
   if (process.env.DATABASE_URL?.trim()) {
     const row = await prisma.lmsUser.findUnique({
       where: { id: claims.sub },
       select: {
+        fullName: true,
         themePreference: true,
         iicrcMemberNumber: true,
         iicrcExpiryDate: true,
@@ -143,6 +153,7 @@ export async function PATCH(request: NextRequest) {
         iicrcCertifications: true,
       },
     });
+    if (row?.fullName?.trim()) patchDisplayName = row.fullName.trim();
     if (row?.themePreference) theme_preference = row.themePreference;
     iicrc_member_number = row?.iicrcMemberNumber ?? null;
     if (row?.iicrcExpiryDate) {
@@ -155,7 +166,7 @@ export async function PATCH(request: NextRequest) {
   const response = NextResponse.json({
     id: claims.sub,
     email: claims.email,
-    full_name: claims.full_name,
+    full_name: patchDisplayName,
     roles: [claims.role],
     theme_preference,
     is_active: true,

@@ -8,6 +8,7 @@ import {
   LayoutDashboard,
   LogOut,
   Route,
+  User,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -36,6 +37,7 @@ const primaryNav: NavItem[] = [
   { href: '/dashboard', label: 'Overview', icon: LayoutDashboard },
   { href: '/dashboard/courses', label: 'Browse courses', icon: BookOpen },
   { href: '/dashboard/student', label: 'My learning', icon: GraduationCap },
+  { href: '/dashboard/student/profile', label: 'Profile', icon: User },
   { href: '/dashboard/student/credentials', label: 'Certificates', icon: Award },
   { href: '/dashboard/pathways', label: 'Pathways', icon: Route },
 ];

@@ -10,7 +10,16 @@ import {
   Search,
   Settings,
   Shield,
+  UserCircle,
 } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 
@@ -28,6 +37,7 @@ const topNav: NavItem[] = [
   { icon: LayoutDashboard, href: '/dashboard', label: 'Dashboard' },
   { icon: Search, href: '/dashboard/courses', label: 'Browse Courses' },
   { icon: BookOpen, href: '/dashboard/student', label: 'My Learning' },
+  { icon: UserCircle, href: '/dashboard/student/profile', label: 'Profile' },
   { icon: Award, href: '/dashboard/student/credentials', label: 'Credentials' },
   { icon: GraduationCap, href: '/dashboard/instructor', label: 'Instructor', instructorOnly: true },
   { icon: Shield, href: '/admin', label: 'Admin', adminOnly: true },
@@ -147,18 +157,53 @@ export function LMSIconRail() {
           <Settings className="h-4 w-4" />
         </Link>
 
-        <button
-          onClick={handleSignOut}
-          title={`${user?.email ?? 'Account'} — click to sign out`}
-          aria-label="Sign out"
-          className="mt-1 flex h-9 w-9 items-center justify-center rounded-lg text-xs font-bold text-white transition-all duration-200 hover:scale-105"
-          style={{
-            background: 'linear-gradient(135deg, #2490ed 0%, #1a7fd4 100%)',
-            boxShadow: '0 0 14px rgba(36, 144, 237, 0.35)',
-          }}
-        >
-          {initials}
-        </button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              type="button"
+              title="Account menu"
+              aria-label="Open account menu"
+              className="mt-1 flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg text-xs font-bold text-white transition-all duration-200 hover:scale-105 data-[state=open]:ring-2 data-[state=open]:ring-[#2490ed]/50"
+              style={{
+                background: 'linear-gradient(135deg, #2490ed 0%, #1a7fd4 100%)',
+                boxShadow: '0 0 14px rgba(36, 144, 237, 0.35)',
+              }}
+            >
+              {initials}
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            side="right"
+            align="end"
+            sideOffset={8}
+            className="min-w-[220px] border border-white/10 bg-[#0c1220] p-1 text-white shadow-xl"
+          >
+            <DropdownMenuLabel className="font-normal">
+              <span className="block truncate text-xs text-white/45">{user?.email}</span>
+              <span className="mt-0.5 block text-sm font-medium text-white/90">Account</span>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator className="bg-white/10" />
+            <DropdownMenuItem
+              className="cursor-pointer text-white/90 focus:bg-white/10 focus:text-white"
+              onClick={() => router.push('/dashboard/student/profile')}
+            >
+              Profile
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="cursor-pointer text-white/90 focus:bg-white/10 focus:text-white"
+              onClick={() => router.push('/dashboard/settings')}
+            >
+              Settings
+            </DropdownMenuItem>
+            <DropdownMenuSeparator className="bg-white/10" />
+            <DropdownMenuItem
+              className="cursor-pointer text-red-300 focus:bg-red-500/15 focus:text-red-200"
+              onClick={() => void handleSignOut()}
+            >
+              Sign out
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </aside>
   );
