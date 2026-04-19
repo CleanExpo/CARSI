@@ -29,7 +29,10 @@ export async function POST(request: NextRequest) {
     const result = await registerUserWithPassword({ email, password, fullName });
     if (!result.ok) {
       if (result.code === 'EMAIL_TAKEN') {
-        return NextResponse.json({ error: 'An account with this email already exists' }, { status: 409 });
+        return NextResponse.json(
+          { error: 'An account with this email already exists' },
+          { status: 409 }
+        );
       }
       return NextResponse.json({ error: 'Registration failed' }, { status: 500 });
     }
