@@ -29,6 +29,10 @@ model LmsUser {
   themePreference   String?  @map("theme_preference")
   /// Present in some deployments (`scripts/seed_production.py`); omit in queries if unused.
   role              String?
+  iicrcMemberNumber   String?   @map("iicrc_member_number")
+  iicrcExpiryDate     DateTime? @map("iicrc_expiry_date") @db.Date
+  iicrcCardImageUrl   String?   @map("iicrc_card_image_url") @db.Text
+  iicrcCertifications Json?     @map("iicrc_certifications")
   createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt         DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
