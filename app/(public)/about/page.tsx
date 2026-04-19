@@ -2,21 +2,31 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 
-export const metadata: Metadata = {
-  title: 'About CARSI | Centre for Australian Restoration and Standards Information',
-  description:
-    "CARSI is Australia's leading online training platform for cleaning and restoration professionals. 40+ IICRC CEC-approved courses across 7 disciplines. 50+ years of combined industry experience.",
-};
+import { disciplineRowsFromCodes } from '@/lib/iicrc-discipline-display';
+import {
+  formatCourseCountForCopy,
+  getPublicCatalogueFacts,
+} from '@/lib/server/public-catalogue-facts';
 
-const disciplines = [
-  { code: 'WRT', label: 'Water Restoration Technician' },
-  { code: 'CRT', label: 'Carpet Repair and Reinstallation Technician' },
-  { code: 'ASD', label: 'Applied Structural Drying' },
-  { code: 'AMRT', label: 'Applied Microbial Remediation Technician' },
-  { code: 'FSRT', label: 'Fire and Smoke Restoration Technician' },
-  { code: 'OCT', label: 'Odour Control Technician' },
-  { code: 'CCT', label: 'Commercial Carpet Cleaning Technician' },
-];
+export const dynamic = 'force-dynamic';
+
+export async function generateMetadata(): Promise<Metadata> {
+  const facts = await getPublicCatalogueFacts();
+  const n = facts.publishedCourseCount;
+  const d = facts.disciplineCodes.length;
+  const coursePhrase =
+    n > 0
+      ? `${formatCourseCountForCopy(n)} IICRC CEC-approved course${n === 1 ? '' : 's'}`
+      : 'IICRC CEC-approved courses';
+  const discPhrase =
+    d > 0
+      ? `${d} discipline${d === 1 ? '' : 's'}`
+      : 'multiple IICRC disciplines';
+  return {
+    title: 'About CARSI | Centre for Australian Restoration and Standards Information',
+    description: `CARSI is Australia's leading online training platform for cleaning and restoration professionals. ${coursePhrase} across ${discPhrase}. 50+ years of combined industry experience.`,
+  };
+}
 
 const credentials = [
   {
@@ -33,13 +43,27 @@ const credentials = [
   },
 ];
 
-const stats = [
-  { value: '40+', label: 'IICRC CEC-approved courses' },
-  { value: '7', label: 'IICRC disciplines covered' },
-  { value: '12+', label: 'Industries served' },
-];
+export default async function AboutPage() {
+  const facts = await getPublicCatalogueFacts();
+  const n = facts.publishedCourseCount;
+  const d = facts.disciplineCodes.length;
+  const disciplineRows =
+    d > 0
+      ? disciplineRowsFromCodes(facts.disciplineCodes)
+      : disciplineRowsFromCodes(['WRT', 'CRT', 'ASD', 'AMRT', 'FSRT', 'OCT', 'CCT']);
 
-export default function AboutPage() {
+  const stats = [
+    {
+      value: n > 0 ? formatCourseCountForCopy(n) : '—',
+      label: 'IICRC CEC-approved courses',
+    },
+    {
+      value: d > 0 ? formatCourseCountForCopy(d) : '7',
+      label: 'IICRC disciplines covered',
+    },
+    { value: '12+', label: 'Industries served' },
+  ];
+
   return (
     <main className="min-h-screen bg-[#050505]">
       {/* Subtle gradient orb */}
@@ -96,9 +120,20 @@ export default function AboutPage() {
             in Perth, CARSI is there.
           </p>
           <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.6)' }}>
-            With over 40 IICRC CEC-approved courses across seven disciplines, and a full-access
-            subscription at $795 AUD per year, we provide the most cost-effective path to IICRC
-            certification maintenance in Australia.
+            {n > 0 ? (
+              <>
+                With {formatCourseCountForCopy(n)} IICRC CEC-approved course{n === 1 ? '' : 's'}{' '}
+                across {d > 0 ? `${d} disciplines` : 'seven core disciplines'}, and a full-access
+                subscription at $795 AUD per year, we provide the most cost-effective path to IICRC
+                certification maintenance in Australia.
+              </>
+            ) : (
+              <>
+                With IICRC CEC-approved courses across seven core disciplines, and a full-access
+                subscription at $795 AUD per year, we provide the most cost-effective path to IICRC
+                certification maintenance in Australia.
+              </>
+            )}
           </p>
         </section>
 
@@ -177,16 +212,27 @@ export default function AboutPage() {
               IICRC Discipline Coverage
             </h2>
             <p className="mt-2 text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.55)' }}>
-              CARSI holds IICRC CEC approval across all seven core disciplines. Courses in each
-              discipline count toward the continuing education credits required to maintain your
-              certified technician status. Technicians must earn CECs every two years — CARSI makes
-              that straightforward.
+              {d > 0 ? (
+                <>
+                  Our published catalogue currently includes courses tagged across {d} IICRC
+                  discipline{d === 1 ? '' : 's'}. Courses in each area count toward the continuing
+                  education credits required to maintain your certified technician status.
+                  Technicians must earn CECs every two years — CARSI makes that straightforward.
+                </>
+              ) : (
+                <>
+                  CARSI holds IICRC CEC approval across all seven core disciplines. Courses in each
+                  discipline count toward the continuing education credits required to maintain your
+                  certified technician status. Technicians must earn CECs every two years — CARSI
+                  makes that straightforward.
+                </>
+              )}
             </p>
           </div>
           <div className="grid gap-2 sm:grid-cols-2">
-            {disciplines.map((d) => (
+            {disciplineRows.map((row) => (
               <div
-                key={d.code}
+                key={row.code}
                 className="flex items-center gap-3 rounded-sm px-3 py-2"
                 style={{
                   background: 'rgba(36,144,237,0.06)',
@@ -197,14 +243,20 @@ export default function AboutPage() {
                   className="font-mono text-xs font-bold"
                   style={{ color: '#2490ed', minWidth: '3rem' }}
                 >
-                  {d.code}
+                  {row.code}
                 </span>
                 <span className="text-xs" style={{ color: 'rgba(255,255,255,0.6)' }}>
-                  {d.label}
+                  {row.label}
                 </span>
               </div>
             ))}
           </div>
+          {d === 0 ? (
+            <p className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
+              The seven codes above reflect the full IICRC core set; published course tags will
+              appear here as your catalogue grows.
+            </p>
+          ) : null}
         </section>
 
         {/* ── CTA ──────────────────────────────────────────────── */}
