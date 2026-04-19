@@ -236,6 +236,19 @@ jobs:
         if: steps.playwright-cache.outputs.cache-hit == 'true'
         run: npx playwright install-deps chromium
 
+      # RA-1164 — the ephemeral postgres service starts empty; E2E tests
+      # depend on migrated schema + seeded course catalog. Apply both
+      # before the Playwright run or every test hits an empty DB.
+      - name: Apply Prisma migrations
+        run: npm run prisma:migrate
+        env:
+          DATABASE_URL: postgresql://starter_user:local_dev_password@localhost:5432/starter_db
+
+      - name: Seed course catalog
+        run: npm run db:seed-courses
+        env:
+          DATABASE_URL: postgresql://starter_user:local_dev_password@localhost:5432/starter_db
+
       - name: Run E2E tests
         run: npm run test:e2e
         env:
