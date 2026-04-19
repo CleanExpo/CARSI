@@ -35,6 +35,9 @@ export async function GET(request: NextRequest) {
   let iicrc_card_image_url: string | null = null;
   let iicrc_certifications: IicrcCertificationEntry[] | null = null;
 
+  let dbOnboardingDone = false;
+  let resume_reminder: 'none' | 'email' | 'sms' | null = null;
+
   if (process.env.DATABASE_URL?.trim()) {
     const row = await prisma.lmsUser.findUnique({
       where: { id: claims.sub },
@@ -45,6 +48,8 @@ export async function GET(request: NextRequest) {
         iicrcExpiryDate: true,
         iicrcCardImageUrl: true,
         iicrcCertifications: true,
+        onboardingCompletedAt: true,
+        resumeReminderOptIn: true,
       },
     });
     if (row?.fullName?.trim()) displayName = row.fullName.trim();
@@ -55,6 +60,9 @@ export async function GET(request: NextRequest) {
     }
     iicrc_card_image_url = row?.iicrcCardImageUrl ?? null;
     iicrc_certifications = parseIicrcCertifications(row?.iicrcCertifications ?? null);
+    dbOnboardingDone = row?.onboardingCompletedAt != null;
+    const v = row?.resumeReminderOptIn?.toLowerCase();
+    if (v === 'email' || v === 'sms' || v === 'none') resume_reminder = v;
   }
 
   const user: User = {
@@ -65,7 +73,8 @@ export async function GET(request: NextRequest) {
     theme_preference,
     is_active: true,
     is_verified: true,
-    onboarding_completed: hasCompletedOnboarding(request, claims.sub),
+    onboarding_completed: dbOnboardingDone || hasCompletedOnboarding(request, claims.sub),
+    resume_reminder_opt_in: resume_reminder,
     iicrc_member_number,
     iicrc_expiry_date,
     iicrc_card_image_url,
@@ -121,6 +130,12 @@ export async function PATCH(request: NextRequest) {
   if (patch.iicrc_expiry_date === null) {
     update.iicrcExpiryDate = null;
   }
+  if (typeof (patch as { resume_reminder_opt_in?: string }).resume_reminder_opt_in === 'string') {
+    const v = (patch as { resume_reminder_opt_in: string }).resume_reminder_opt_in.toLowerCase();
+    if (v === 'email' || v === 'sms' || v === 'none') {
+      update.resumeReminderOptIn = v;
+    }
+  }
 
   if (process.env.DATABASE_URL?.trim() && Object.keys(update).length > 0) {
     try {
@@ -141,6 +156,9 @@ export async function PATCH(request: NextRequest) {
 
   let patchDisplayName = claims.full_name;
 
+  let patchResumeReminder: 'none' | 'email' | 'sms' | null = null;
+  let patchOnboardingDone = false;
+
   if (process.env.DATABASE_URL?.trim()) {
     const row = await prisma.lmsUser.findUnique({
       where: { id: claims.sub },
@@ -151,6 +169,8 @@ export async function PATCH(request: NextRequest) {
         iicrcExpiryDate: true,
         iicrcCardImageUrl: true,
         iicrcCertifications: true,
+        onboardingCompletedAt: true,
+        resumeReminderOptIn: true,
       },
     });
     if (row?.fullName?.trim()) patchDisplayName = row.fullName.trim();
@@ -161,6 +181,9 @@ export async function PATCH(request: NextRequest) {
     }
     iicrc_card_image_url = row?.iicrcCardImageUrl ?? null;
     iicrc_certifications = parseIicrcCertifications(row?.iicrcCertifications ?? null);
+    patchOnboardingDone = row?.onboardingCompletedAt != null;
+    const rv = row?.resumeReminderOptIn?.toLowerCase();
+    if (rv === 'email' || rv === 'sms' || rv === 'none') patchResumeReminder = rv;
   }
 
   const response = NextResponse.json({
@@ -174,7 +197,8 @@ export async function PATCH(request: NextRequest) {
     onboarding_completed:
       patch.onboarding_completed === true
         ? true
-        : hasCompletedOnboarding(request, claims.sub),
+        : patchOnboardingDone || hasCompletedOnboarding(request, claims.sub),
+    resume_reminder_opt_in: patchResumeReminder,
     iicrc_member_number,
     iicrc_expiry_date,
     iicrc_card_image_url,

@@ -19,6 +19,8 @@ export interface User {
   is_verified: boolean;
   /** When false/undefined, client may show first-run onboarding. */
   onboarding_completed?: boolean;
+  /** Stored preference for unfinished-lesson reminders (delivery pipeline may be partial). */
+  resume_reminder_opt_in?: 'none' | 'email' | 'sms' | null;
   iicrc_member_number?: string | null;
   iicrc_expiry_date?: string | null;
   iicrc_card_image_url?: string | null;
