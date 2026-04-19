@@ -1,13 +1,19 @@
 'use client';
 
 import { useAuth } from '@/components/auth/auth-provider';
+import {
+  ContinueLearningBanner,
+  type ContinueLearningSnapshot,
+} from '@/components/lms/ContinueLearningBanner';
 import { EnrolledCourseList } from '@/components/lms/EnrolledCourseList';
 import { ErrorBanner } from '@/components/lms/ErrorBanner';
+import { PopularForYouStrip } from '@/components/lms/PopularForYouStrip';
 import { PushNotificationPrompt } from '@/components/lms/PushNotificationPrompt';
 import { RenewalCockpit } from '@/components/lms/RenewalCockpit';
 import { apiClient } from '@/lib/api/client';
 import Link from 'next/link';
 import { ArrowRight, BookOpen, Sparkles } from 'lucide-react';
+import type { RenewalCourseSuggestion } from '@/types/renewal';
 import { useCallback, useEffect, useState } from 'react';
 
 interface LevelData {
@@ -66,6 +72,8 @@ export default function StudentDashboardPage() {
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [enrollmentsLoading, setEnrollmentsLoading] = useState(true);
+  const [resume, setResume] = useState<ContinueLearningSnapshot | null>(null);
+  const [popular, setPopular] = useState<RenewalCourseSuggestion[]>([]);
   const [errors, setErrors] = useState<ErrorState>({
     level: null,
     sub: null,
@@ -134,13 +142,29 @@ export default function StudentDashboardPage() {
     }
   }, [user]);
 
+  const fetchResumeAndPopular = useCallback(async () => {
+    if (!user) return;
+    try {
+      const [resumeData, recData] = await Promise.all([
+        apiClient.get<ContinueLearningSnapshot | null>('/api/lms/learner/resume'),
+        apiClient.get<RenewalCourseSuggestion[]>('/api/lms/recommendations/next-course'),
+      ]);
+      setResume(resumeData && typeof resumeData === 'object' ? resumeData : null);
+      setPopular(Array.isArray(recData) ? recData : []);
+    } catch {
+      setResume(null);
+      setPopular([]);
+    }
+  }, [user]);
+
   useEffect(() => {
     if (!user) return;
     fetchLevel();
     fetchSub();
     fetchProfile();
     fetchEnrollments();
-  }, [user, fetchLevel, fetchSub, fetchProfile, fetchEnrollments]);
+    fetchResumeAndPopular();
+  }, [user, fetchLevel, fetchSub, fetchProfile, fetchEnrollments, fetchResumeAndPopular]);
 
   function handleManageSubscription() {
     apiClient
@@ -161,6 +185,8 @@ export default function StudentDashboardPage() {
   return (
     <div className="mx-auto w-full space-y-10 pb-16">
       <PushNotificationPrompt />
+
+      <ContinueLearningBanner snapshot={resume} />
 
       {/* Hero */}
       <header className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#2490ed]/18 via-white/[0.04] to-transparent px-6 py-8 shadow-[0_24px_80px_-40px_rgba(36,144,237,0.45)] sm:px-10 sm:py-10">
@@ -195,6 +221,8 @@ export default function StudentDashboardPage() {
           </div>
         </div>
       </header>
+
+      <PopularForYouStrip courses={popular} />
 
       <RenewalCockpit />
 
