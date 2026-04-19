@@ -47,6 +47,9 @@ const defaultStyle = {
   grad: 'from-blue-800 to-slate-900',
 };
 
+/** Slugs that have a matching --discipline-* CSS custom property. */
+const VALID_DISCIPLINE_SLUGS = new Set(['wrt', 'crt', 'asd', 'oct', 'cct', 'fsrt', 'amrt']);
+
 function formatRelativeDate(dateStr: string | null | undefined): string {
   if (!dateStr) return '';
   const days = Math.floor((Date.now() - new Date(dateStr).getTime()) / 86_400_000);
@@ -71,6 +74,14 @@ export function CourseCard({ course, priorityImage }: CourseCardProps) {
       : null);
 
   const ds = (discipline ? disciplineColors[discipline] : undefined) ?? defaultStyle;
+  // Only use the CSS-variable path when discipline is a known abbreviation slug
+  // (iicrcDiscipline is an unconstrained String? in Prisma; guard against stray
+  // full-name values like "Water Restoration Technology" producing invalid CSS).
+  const disciplineSlug = discipline?.toLowerCase();
+  const borderColor =
+    disciplineSlug && VALID_DISCIPLINE_SLUGS.has(disciplineSlug)
+      ? `hsl(var(--discipline-${disciplineSlug}))`
+      : ds.color;
   const { courseLinkBase } = useCourseBrowseBase();
 
   const thumbSrc = course.thumbnail_url ?? undefined;
@@ -78,6 +89,7 @@ export function CourseCard({ course, priorityImage }: CourseCardProps) {
   return (
     <motion.div
       className="glass-card card-3d group flex flex-col overflow-hidden rounded-xl"
+      style={{ borderColor, borderWidth: '2px' }}
       whileHover={{ scale: 1.02, y: -4 }}
       transition={{ duration: 0.25, ease: smoothEase }}
     >
@@ -131,13 +143,13 @@ export function CourseCard({ course, priorityImage }: CourseCardProps) {
             style={{ color: 'rgba(255,255,255,0.6)' }}
           >
             {course.module_count != null && (
-              <span className="flex items-center gap-1" title="Modules">
+              <span className="flex items-center gap-1 tabular-nums" title="Modules">
                 <Layers className="h-3 w-3" />
                 {course.module_count}
               </span>
             )}
             {course.lesson_count != null && (
-              <span className="flex items-center gap-1">
+              <span className="flex items-center gap-1 tabular-nums">
                 <BookOpen className="h-3 w-3" />
                 {course.lesson_count}
               </span>

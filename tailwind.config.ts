@@ -130,6 +130,17 @@ export default {
           recessed: 'hsl(var(--surface-recessed))',
           overlay: 'hsl(var(--surface-overlay))',
         },
+
+        // Discipline accent colours
+        discipline: {
+          wrt:  'hsl(var(--discipline-wrt))',
+          crt:  'hsl(var(--discipline-crt))',
+          asd:  'hsl(var(--discipline-asd))',
+          oct:  'hsl(var(--discipline-oct))',
+          cct:  'hsl(var(--discipline-cct))',
+          fsrt: 'hsl(var(--discipline-fsrt))',
+          amrt: 'hsl(var(--discipline-amrt))',
+        },
       },
 
       /* ----------------------------------------
