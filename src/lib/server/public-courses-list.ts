@@ -2,12 +2,15 @@ import { normalizePublicAssetUrl } from '@/lib/remote-image';
 import type { CourseListItem, WpExportCourse } from '@/lib/wordpress-export-courses';
 import { prisma } from '@/lib/prisma';
 
-const publishedWhere = {
+/** Same filter as the public `/courses` catalogue when loaded from Prisma. */
+export const lmsPublishedCourseWhere = {
   OR: [
     { isPublished: true },
     { status: { equals: 'published', mode: 'insensitive' as const } },
   ],
-};
+} as const;
+
+const publishedWhere = lmsPublishedCourseWhere;
 
 const draftWhere = {
   status: { equals: 'draft', mode: 'insensitive' as const },
