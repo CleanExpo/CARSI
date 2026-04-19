@@ -21,27 +21,10 @@ import { apiClient } from '@/lib/api/client';
 
 interface OnboardingWizardProps {
   isOpen: boolean;
-  /** App path to open after onboarding (from API `suggested_courses_url` or derived slug). */
   onComplete: (destination: string) => void;
 }
 
-/** Prefer server-provided URL; otherwise map certificate codes to `/pathways/:slug`. */
-function resolveOnboardingDestination(pathway: string, suggestedUrl?: string): string {
-  const raw = suggestedUrl?.trim();
-  if (raw) {
-    const path = raw.startsWith('/') ? raw : `/${raw}`;
-    // Legacy API responses sent learners to the marketing catalogue; hub lives under /dashboard.
-    if (path === '/courses' || path.startsWith('/courses?')) {
-      return '/dashboard';
-    }
-    return path;
-  }
-  const code = pathway.trim();
-  if (/^[A-Z]{2,5}$/.test(code)) {
-    return `/pathways/${code.toLowerCase()}`;
-  }
-  return '/pathways';
-}
+const POST_ONBOARDING_PATH = '/dashboard/student/profile';
 
 interface AnswerCard {
   value: string;
@@ -160,7 +143,6 @@ export function OnboardingWizard({ isOpen, onComplete }: OnboardingWizardProps) 
   const [result, setResult] = useState<{
     pathway: string;
     description: string;
-    url: string;
   } | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -195,7 +177,6 @@ export function OnboardingWizard({ isOpen, onComplete }: OnboardingWizardProps) 
       setResult({
         pathway: data.recommended_pathway,
         description: data.pathway_description,
-        url: data.suggested_courses_url,
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong');
@@ -205,7 +186,7 @@ export function OnboardingWizard({ isOpen, onComplete }: OnboardingWizardProps) 
   };
 
   const handleComplete = () => {
-    if (result) onComplete(resolveOnboardingDestination(result.pathway, result.url));
+    onComplete(POST_ONBOARDING_PATH);
   };
 
   return (
