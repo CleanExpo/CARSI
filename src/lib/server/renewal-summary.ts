@@ -119,8 +119,11 @@ export async function getRenewalSummaryForStudent(
       select: {
         iicrcMemberNumber: true,
         iicrcExpiryDate: true,
+        onboarding: true,
       },
     });
+
+    const preferDisciplines = extractOnboardingDisciplines(user?.onboarding);
 
     const rows = await prisma.lmsEnrollment.findMany({
       where: { studentId: userId },
@@ -250,6 +253,7 @@ export async function getRenewalSummaryForStudent(
       enrolledSlugs,
       completedSlugs,
       byDisciplineEarned: byDiscCycle,
+      preferDisciplines,
     });
 
     const cycleStartIso = cycle ? cycle.start.toISOString() : null;
@@ -278,11 +282,26 @@ export async function getRenewalSummaryForStudent(
   }
 }
 
+function extractOnboardingDisciplines(onboarding: unknown): string[] {
+  if (!onboarding || typeof onboarding !== 'object') return [];
+  const raw = (onboarding as Record<string, unknown>).disciplines_held;
+  if (!Array.isArray(raw)) return [];
+  const out: string[] = [];
+  for (const x of raw) {
+    const s = String(x).trim().toUpperCase();
+    if (/^[A-Z]{2,5}$/.test(s)) out.push(s);
+  }
+  return [...new Set(out)];
+}
+
 async function pickSuggestedCourses(args: {
   enrolledSlugs: Set<string>;
   completedSlugs: Set<string>;
   byDisciplineEarned: Record<string, number>;
+  /** From first-session onboarding — boosts matching catalogue rows for “Popular for you”. */
+  preferDisciplines?: string[];
 }): Promise<RenewalCourseSuggestion[]> {
+  const prefer = new Set((args.preferDisciplines ?? []).map((d) => d.trim().toUpperCase()).filter(Boolean));
   const exclude = new Set([...args.enrolledSlugs, ...args.completedSlugs]);
   const slugFilter = exclude.size > 0 ? { slug: { notIn: Array.from(exclude) } } : {};
 
@@ -311,13 +330,17 @@ async function pickSuggestedCourses(args: {
   const published = candidates.filter(isPublishedRow);
   if (published.length === 0) return [];
 
-  const scored = published.map((c) => {
-    const disc = c.iicrcDiscipline?.trim() || 'General';
-    const earned = args.byDisciplineEarned[disc] ?? 0;
-    const { hours: rh } = resolveCecHoursFromCourse(c);
-    const hours = rh > 0 ? rh : 0.25;
-    const gapWeight = 1 / (1 + earned);
-    const score = gapWeight * (hours + 0.5) * (disc === 'General' ? 0.85 : 1);
+    const scored = published.map((c) => {
+      const disc = c.iicrcDiscipline?.trim() || 'General';
+      const earned = args.byDisciplineEarned[disc] ?? 0;
+      const { hours: rh } = resolveCecHoursFromCourse(c);
+      const hours = rh > 0 ? rh : 0.25;
+      const gapWeight = 1 / (1 + earned);
+      const discUpper = disc.toUpperCase();
+      const onboardingBoost =
+        prefer.size > 0 && prefer.has(discUpper) ? 1.45 : prefer.size > 0 ? 0.92 : 1;
+      const score =
+        gapWeight * (hours + 0.5) * (disc === 'General' ? 0.85 : 1) * onboardingBoost;
     const reason =
       earned < 0.5
         ? `Adds ${disc} CEC hours — priority gap for your renewal mix.`

@@ -203,3 +203,111 @@ export async function getLearnerDashboardSummary(
     return null;
   }
 }
+
+/** Best “continue where you left off” target for the student dashboard hero. */
+export type ResumeSnapshot = {
+  course_slug: string;
+  course_title: string;
+  lesson_id: string;
+  lesson_title: string;
+  /** Deep link into LearnCourseShell (`?lesson=`). */
+  resume_href: string;
+  last_accessed_at: string;
+};
+
+export async function getResumeSnapshotForStudent(userId: string): Promise<ResumeSnapshot | null> {
+  if (!process.env.DATABASE_URL?.trim()) return null;
+
+  try {
+    const rows = await prisma.lmsEnrollment.findMany({
+      where: { studentId: userId },
+      include: {
+        course: {
+          select: {
+            title: true,
+            slug: true,
+            modules: {
+              orderBy: { orderIndex: 'asc' },
+              select: {
+                lessons: { orderBy: { orderIndex: 'asc' }, select: { id: true, title: true } },
+              },
+            },
+          },
+        },
+      },
+      orderBy: { enrolledAt: 'desc' },
+    });
+
+    const lessonMeta = new Map<string, { title: string; courseSlug: string; courseTitle: string }>();
+    const allLessonIds: string[] = [];
+    for (const e of rows) {
+      const slug = e.course.slug;
+      const title = e.course.title;
+      for (const m of e.course.modules) {
+        for (const l of m.lessons) {
+          allLessonIds.push(l.id);
+          lessonMeta.set(l.id, { title: l.title, courseSlug: slug, courseTitle: title });
+        }
+      }
+    }
+
+    if (allLessonIds.length === 0) return null;
+
+    const progressRows = await prisma.lmsLessonProgress.findMany({
+      where: { studentId: userId, lessonId: { in: allLessonIds } },
+      select: { lessonId: true, completed: true, lastAccessedAt: true },
+    });
+    const progressByLesson = new Map(progressRows.map((p) => [p.lessonId, p]));
+
+    type Best = { lessonId: string; at: Date };
+    let global: Best | null = null;
+
+    for (const e of rows) {
+      const lessonIds = e.course.modules.flatMap((m) => m.lessons.map((l) => l.id));
+      if (lessonIds.length === 0) continue;
+
+      let completed = 0;
+      for (const id of lessonIds) {
+        if (progressByLesson.get(id)?.completed === true) completed += 1;
+      }
+      const allDone = lessonIds.length > 0 && completed >= lessonIds.length;
+      if (allDone) continue;
+
+      let bestLocal: Best | null = null;
+      for (const id of lessonIds) {
+        const p = progressByLesson.get(id);
+        const at = p?.lastAccessedAt ?? null;
+        if (!at) continue;
+        if (!bestLocal || at > bestLocal.at) bestLocal = { lessonId: id, at };
+      }
+
+      if (!bestLocal && e.lastAccessedLessonId) {
+        const id = e.lastAccessedLessonId;
+        if (lessonIds.includes(id)) {
+          bestLocal = { lessonId: id, at: new Date(0) };
+        }
+      }
+
+      if (!bestLocal) continue;
+
+      if (!global || bestLocal.at > global.at) global = bestLocal;
+    }
+
+    if (!global) return null;
+
+    const meta = lessonMeta.get(global.lessonId);
+    if (!meta) return null;
+
+    return {
+      course_slug: meta.courseSlug,
+      course_title: meta.courseTitle,
+      lesson_id: global.lessonId,
+      lesson_title: meta.title,
+      resume_href: `/dashboard/learn/${encodeURIComponent(meta.courseSlug)}?lesson=${encodeURIComponent(global.lessonId)}`,
+      last_accessed_at: global.at.toISOString(),
+    };
+  } catch (err) {
+    console.error('[resume-snapshot]', err);
+    return null;
+  }
+}
