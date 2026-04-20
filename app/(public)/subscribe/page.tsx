@@ -16,7 +16,7 @@ const PRO_FEATURES = [
   'PDF certificates for every course',
   'IICRC CEC tracking dashboard',
   'Direct CEC reporting to IICRC',
-  'XP leaderboard & streak tracker',
+  'Monthly activity recognition (anonymous by default) & streak tracker',
   'Priority email support',
 ];
 
