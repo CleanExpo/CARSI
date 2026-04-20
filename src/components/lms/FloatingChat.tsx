@@ -2,7 +2,10 @@
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { Bot, MessageCircle, RotateCcw, Send, Sparkles, X } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { usePathname, useSearchParams } from 'next/navigation';
+import { useEffect, useMemo, useRef, useState } from 'react';
+
+import { deriveChatPageContext } from '@/lib/chat-page-context';
 
 const ASSISTANT_NAME =
   process.env.NEXT_PUBLIC_AI_ASSISTANT_NAME?.trim() || 'Claire';
@@ -66,6 +69,21 @@ function FormattedAssistantText({ text }: { text: string }) {
 }
 
 export default function FloatingChat() {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const searchKey = searchParams.toString();
+
+  const pageContext = useMemo(
+    () => deriveChatPageContext(pathname, searchParams),
+    [pathname, searchKey, searchParams]
+  );
+
+  const focusSubtitle = pageContext
+    ? pageContext.lesson_id
+      ? `Context: lesson in “${pageContext.course_slug}”`
+      : `Context: course “${pageContext.course_slug}”`
+    : null;
+
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     { id: 'welcome', role: 'assistant', text: WELCOME_MESSAGE },
@@ -122,6 +140,7 @@ export default function FloatingChat() {
           message: text,
           conversation_id: conversationId,
           history,
+          page_context: pageContext,
         }),
       });
 
@@ -210,6 +229,11 @@ export default function FloatingChat() {
                   <p className="truncate text-[11px] leading-tight text-white/45">
                     {ASSISTANT_TAGLINE}
                   </p>
+                  {focusSubtitle ? (
+                    <p className="mt-0.5 truncate text-[10px] text-[#7ec5ff]/85" title={focusSubtitle}>
+                      {focusSubtitle}
+                    </p>
+                  ) : null}
                 </div>
               </div>
               <div className="flex shrink-0 items-center gap-0.5">
