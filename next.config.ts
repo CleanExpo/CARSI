@@ -39,6 +39,38 @@ const pwaConfig = withPWA({
         expiration: { maxEntries: 20, maxAgeSeconds: 86400 },
       },
     },
+    /** Lesson detail API — NetworkFirst so techs can reopen last lessons offline after one online visit. */
+    {
+      urlPattern: /\/api\/lms\/lessons\//,
+      handler: 'NetworkFirst',
+      method: 'GET',
+      options: {
+        cacheName: 'lms-lesson-api',
+        networkTimeoutSeconds: 12,
+        expiration: { maxEntries: 48, maxAgeSeconds: 7 * 86400 },
+      },
+    },
+    /** Curriculum tree for /dashboard/learn/[slug]. */
+    {
+      urlPattern: /\/api\/lms\/courses\/[^/]+\/curriculum/,
+      handler: 'NetworkFirst',
+      method: 'GET',
+      options: {
+        cacheName: 'lms-curriculum-api',
+        networkTimeoutSeconds: 12,
+        expiration: { maxEntries: 24, maxAgeSeconds: 7 * 86400 },
+      },
+    },
+    /** Learn shell HTML (production PWA only — disabled in dev by next-pwa). */
+    {
+      urlPattern: /\/dashboard\/learn\//,
+      handler: 'NetworkFirst',
+      options: {
+        cacheName: 'learn-pages',
+        networkTimeoutSeconds: 8,
+        expiration: { maxEntries: 16, maxAgeSeconds: 86400 },
+      },
+    },
   ],
 });
 
