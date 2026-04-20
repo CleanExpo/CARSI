@@ -6,6 +6,7 @@ import Link from 'next/link';
 
 import { useCourseBrowseBase } from '@/components/lms/CourseBrowseContext';
 import { CourseTextThumbnail } from '@/components/lms/CourseTextThumbnail';
+import { disciplineToken } from '@/lib/discipline-tokens';
 
 interface CourseCardProps {
   /** First visible cards: eager load + higher fetch priority (catalog / home grids). */
@@ -31,21 +32,10 @@ interface CourseCardProps {
   };
 }
 
-const disciplineColors: Record<string, { color: string; glow: string; grad: string }> = {
-  WRT: { color: '#2490ed', glow: 'rgba(36,144,237,0.3)', grad: 'from-blue-700 to-blue-900' },
-  CRT: { color: '#26c4a0', glow: 'rgba(38,196,160,0.3)', grad: 'from-teal-600 to-teal-900' },
-  ASD: { color: '#6c63ff', glow: 'rgba(108,99,255,0.3)', grad: 'from-indigo-700 to-indigo-900' },
-  OCT: { color: '#9b59b6', glow: 'rgba(155,89,182,0.3)', grad: 'from-purple-700 to-purple-900' },
-  CCT: { color: '#17b8d4', glow: 'rgba(23,184,212,0.3)', grad: 'from-cyan-600 to-cyan-900' },
-  FSRT: { color: '#f05a35', glow: 'rgba(240,90,53,0.3)', grad: 'from-orange-700 to-red-900' },
-  AMRT: { color: '#27ae60', glow: 'rgba(39,174,96,0.3)', grad: 'from-green-700 to-green-900' },
-};
-
-const defaultStyle = {
-  color: '#2490ed',
-  glow: 'rgba(36,144,237,0.2)',
-  grad: 'from-blue-800 to-slate-900',
-};
+// GP-335 PR 1/4: accent now resolved via --discipline-* tokens.
+// The legacy glow/grad values (never currently rendered) are removed in this
+// migration; they'll come back as first-class tokens in PR 4/4 (border + glow).
+const DEFAULT_ACCENT_TOKEN = 'hsl(var(--discipline-water-500))';
 
 function formatRelativeDate(dateStr: string | null | undefined): string {
   if (!dateStr) return '';
@@ -70,7 +60,7 @@ export function CourseCard({ course, priorityImage }: CourseCardProps) {
       ? course.category.split(' ')[0]
       : null);
 
-  const ds = (discipline ? disciplineColors[discipline] : undefined) ?? defaultStyle;
+  const accentColor = disciplineToken(discipline) ?? DEFAULT_ACCENT_TOKEN;
   const { courseLinkBase } = useCourseBrowseBase();
 
   const thumbSrc = course.thumbnail_url ?? undefined;
@@ -152,7 +142,7 @@ export function CourseCard({ course, priorityImage }: CourseCardProps) {
           <Link
             href={`${courseLinkBase}/${course.slug}`}
             className="-m-2 flex min-h-[44px] min-w-[44px] items-center justify-center rounded-sm p-2 text-xs font-medium transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/50"
-            style={{ color: ds.color }}
+            style={{ color: accentColor }}
           >
             View →
           </Link>

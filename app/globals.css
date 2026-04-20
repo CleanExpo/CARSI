@@ -73,6 +73,119 @@
     --brand-secondary: 36 87% 54%;
     --brand-accent: 172 66% 50%;
 
+    /* ── Discipline tokens (GP-335 PR 1/4) ──
+       HSL triplets. Consume via `hsl(var(--discipline-<slug>-<shade>))`
+       or the Tailwind utility `bg-discipline-<slug>-<shade>`.
+       500 = canonical brand shade (matches legacy raw hex).
+       Do NOT remap to --primary — these are a separate semantic namespace. */
+    --discipline-water-50: 208 65% 97%;
+    --discipline-water-100: 208 65% 93%;
+    --discipline-water-200: 208 65% 85%;
+    --discipline-water-300: 208 85% 75%;
+    --discipline-water-400: 208 85% 65%;
+    --discipline-water-500: 208 85% 54%;
+    --discipline-water-600: 208 85% 45%;
+    --discipline-water-700: 208 85% 37%;
+    --discipline-water-800: 208 85% 29%;
+    --discipline-water-900: 208 70% 21%;
+    --discipline-water-950: 208 70% 15%;
+
+    --discipline-carpet-50: 166 48% 97%;
+    --discipline-carpet-100: 166 48% 93%;
+    --discipline-carpet-200: 166 48% 85%;
+    --discipline-carpet-300: 166 68% 75%;
+    --discipline-carpet-400: 166 68% 65%;
+    --discipline-carpet-500: 166 68% 46%;
+    --discipline-carpet-600: 166 68% 40%;
+    --discipline-carpet-700: 166 68% 32%;
+    --discipline-carpet-800: 166 68% 24%;
+    --discipline-carpet-900: 166 53% 18%;
+    --discipline-carpet-950: 166 53% 12%;
+
+    --discipline-drying-50: 243 80% 97%;
+    --discipline-drying-100: 243 80% 93%;
+    --discipline-drying-200: 243 80% 85%;
+    --discipline-drying-300: 243 100% 80%;
+    --discipline-drying-400: 243 100% 74%;
+    --discipline-drying-500: 243 100% 69%;
+    --discipline-drying-600: 243 90% 58%;
+    --discipline-drying-700: 243 80% 48%;
+    --discipline-drying-800: 243 75% 36%;
+    --discipline-drying-900: 243 65% 24%;
+    --discipline-drying-950: 243 60% 16%;
+
+    --discipline-odour-50: 283 40% 97%;
+    --discipline-odour-100: 283 40% 93%;
+    --discipline-odour-200: 283 40% 85%;
+    --discipline-odour-300: 283 39% 75%;
+    --discipline-odour-400: 283 39% 64%;
+    --discipline-odour-500: 283 39% 53%;
+    --discipline-odour-600: 283 39% 44%;
+    --discipline-odour-700: 283 39% 35%;
+    --discipline-odour-800: 283 39% 26%;
+    --discipline-odour-900: 283 40% 19%;
+    --discipline-odour-950: 283 40% 13%;
+
+    --discipline-commercial-50: 189 60% 97%;
+    --discipline-commercial-100: 189 60% 93%;
+    --discipline-commercial-200: 189 60% 85%;
+    --discipline-commercial-300: 189 80% 72%;
+    --discipline-commercial-400: 189 80% 58%;
+    --discipline-commercial-500: 189 80% 46%;
+    --discipline-commercial-600: 189 80% 38%;
+    --discipline-commercial-700: 189 80% 30%;
+    --discipline-commercial-800: 189 80% 22%;
+    --discipline-commercial-900: 189 65% 16%;
+    --discipline-commercial-950: 189 65% 11%;
+
+    --discipline-fire-50: 12 66% 97%;
+    --discipline-fire-100: 12 66% 93%;
+    --discipline-fire-200: 12 66% 85%;
+    --discipline-fire-300: 12 86% 75%;
+    --discipline-fire-400: 12 86% 65%;
+    --discipline-fire-500: 12 86% 57%;
+    --discipline-fire-600: 12 86% 47%;
+    --discipline-fire-700: 12 86% 37%;
+    --discipline-fire-800: 12 86% 28%;
+    --discipline-fire-900: 12 71% 20%;
+    --discipline-fire-950: 12 71% 14%;
+
+    --discipline-microbial-50: 145 43% 97%;
+    --discipline-microbial-100: 145 43% 93%;
+    --discipline-microbial-200: 145 43% 85%;
+    --discipline-microbial-300: 145 63% 72%;
+    --discipline-microbial-400: 145 63% 58%;
+    --discipline-microbial-500: 145 63% 42%;
+    --discipline-microbial-600: 145 63% 36%;
+    --discipline-microbial-700: 145 63% 28%;
+    --discipline-microbial-800: 145 63% 22%;
+    --discipline-microbial-900: 145 48% 16%;
+    --discipline-microbial-950: 145 48% 10%;
+
+    --discipline-mould-50: 100 40% 97%;
+    --discipline-mould-100: 100 40% 93%;
+    --discipline-mould-200: 100 40% 85%;
+    --discipline-mould-300: 100 50% 72%;
+    --discipline-mould-400: 100 50% 58%;
+    --discipline-mould-500: 100 50% 45%;
+    --discipline-mould-600: 100 50% 38%;
+    --discipline-mould-700: 100 50% 30%;
+    --discipline-mould-800: 100 50% 22%;
+    --discipline-mould-900: 100 40% 16%;
+    --discipline-mould-950: 100 40% 11%;
+
+    --discipline-biohazard-50: 350 55% 97%;
+    --discipline-biohazard-100: 350 55% 93%;
+    --discipline-biohazard-200: 350 55% 85%;
+    --discipline-biohazard-300: 350 75% 72%;
+    --discipline-biohazard-400: 350 75% 60%;
+    --discipline-biohazard-500: 350 75% 50%;
+    --discipline-biohazard-600: 350 75% 42%;
+    --discipline-biohazard-700: 350 75% 34%;
+    --discipline-biohazard-800: 350 75% 26%;
+    --discipline-biohazard-900: 350 60% 19%;
+    --discipline-biohazard-950: 350 60% 13%;
+
     /* ── Timing ─────────────────────────────── */
     --ease-spring: cubic-bezier(0.68, -0.55, 0.265, 1.55);
     --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);

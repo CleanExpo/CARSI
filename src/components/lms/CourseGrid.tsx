@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { Search, SlidersHorizontal } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { disciplineToken } from '@/lib/discipline-tokens';
 import { CourseCard } from './CourseCard';
 import { CourseGridSkeleton } from './CourseCardSkeleton';
 
@@ -11,15 +12,8 @@ const smoothEase: [number, number, number, number] = [0.4, 0, 0.2, 1];
 const DISCIPLINE_TABS = ['All', 'WRT', 'CRT', 'ASD', 'OCT', 'CCT', 'FSRT', 'AMRT', 'Free'] as const;
 type DisciplineTab = (typeof DISCIPLINE_TABS)[number];
 
-const tabColors: Record<string, string> = {
-  WRT: '#2490ed',
-  CRT: '#26c4a0',
-  ASD: '#6c63ff',
-  OCT: '#9b59b6',
-  CCT: '#17b8d4',
-  FSRT: '#f05a35',
-  AMRT: '#27ae60',
-};
+// GP-335 PR 1/4: tab accent resolved from --discipline-* tokens.
+const DEFAULT_TAB_ACCENT = 'hsl(var(--discipline-water-500))';
 
 interface Course {
   id: string;
@@ -140,7 +134,7 @@ export function CourseGrid({
       >
         {DISCIPLINE_TABS.map((tab) => {
           const isActive = activeTab === tab;
-          const accentColor = tabColors[tab] ?? '#2490ed';
+          const accentColor = disciplineToken(tab) ?? DEFAULT_TAB_ACCENT;
           return (
             <button
               key={tab}
