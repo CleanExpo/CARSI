@@ -19,7 +19,29 @@
     --glass-border-hover: rgba(36 144 237 / 0.35);
     --glass-border-active: rgba(36 144 237 / 0.6);
     --glass-blur: blur(24px) saturate(180%);
+    /* NOTE: --glass-blur-sm kept as `blur() saturate()` filter shorthand for
+       backward-compat with .glass-card / legacy consumers. The sm/md/lg ladder
+       below uses raw px values so individual axes can be remixed. */
     --glass-blur-sm: blur(12px) saturate(160%);
+
+    /* ── Glass ladder (GP-362 PR 2/4) ───────
+       Three-step ladder for tokenised glass surfaces. Calibrated from the
+       legacy .glass-sm / .glass / .glass-strong aesthetic — no visual drift.
+       Consume via .glass-sm / .glass-md / .glass-lg utilities. */
+    --glass-opacity-sm: 0.04;
+    --glass-blur-sm-px: 12px;
+    --glass-saturate-sm: 160%;
+    --glass-border-sm: 0.07;
+
+    --glass-opacity-md: 0.05;
+    --glass-blur-md-px: 24px;
+    --glass-saturate-md: 180%;
+    --glass-border-md: 0.09;
+
+    --glass-opacity-lg: 0.09;
+    --glass-blur-lg-px: 32px;
+    --glass-saturate-lg: 200%;
+    --glass-border-lg: 0.14;
 
     /* ── Glow accents ───────────────────────── */
     --glow-blue: 0 0 40px rgba(36 144 237 / 0.25);
@@ -452,18 +474,37 @@
     border: 1px solid var(--glass-border);
   }
 
+  /* GP-362 PR 2/4: tokenised glass ladder (.glass-sm / .glass-md / .glass-lg).
+     Backed by --glass-opacity-*, --glass-blur-*-px, --glass-saturate-*,
+     --glass-border-* CSS vars. Visual output matches the legacy
+     .glass-sm / .glass / .glass-strong palette — no regression. */
   .glass-sm {
-    background: rgba(255 255 255 / 0.04);
-    backdrop-filter: var(--glass-blur-sm);
-    -webkit-backdrop-filter: var(--glass-blur-sm);
-    border: 1px solid rgba(255 255 255 / 0.07);
+    background: rgba(255 255 255 / var(--glass-opacity-sm));
+    backdrop-filter: blur(var(--glass-blur-sm-px)) saturate(var(--glass-saturate-sm));
+    -webkit-backdrop-filter: blur(var(--glass-blur-sm-px)) saturate(var(--glass-saturate-sm));
+    border: 1px solid rgba(255 255 255 / var(--glass-border-sm));
   }
 
+  .glass-md {
+    background: rgba(255 255 255 / var(--glass-opacity-md));
+    backdrop-filter: blur(var(--glass-blur-md-px)) saturate(var(--glass-saturate-md));
+    -webkit-backdrop-filter: blur(var(--glass-blur-md-px)) saturate(var(--glass-saturate-md));
+    border: 1px solid rgba(255 255 255 / var(--glass-border-md));
+  }
+
+  .glass-lg {
+    background: rgba(255 255 255 / var(--glass-opacity-lg));
+    backdrop-filter: blur(var(--glass-blur-lg-px)) saturate(var(--glass-saturate-lg));
+    -webkit-backdrop-filter: blur(var(--glass-blur-lg-px)) saturate(var(--glass-saturate-lg));
+    border: 1px solid rgba(255 255 255 / var(--glass-border-lg));
+  }
+
+  /* Back-compat alias — .glass-strong was the pre-GP-362 name for .glass-lg */
   .glass-strong {
-    background: rgba(255 255 255 / 0.09);
-    backdrop-filter: blur(32px) saturate(200%);
-    -webkit-backdrop-filter: blur(32px) saturate(200%);
-    border: 1px solid rgba(255 255 255 / 0.14);
+    background: rgba(255 255 255 / var(--glass-opacity-lg));
+    backdrop-filter: blur(var(--glass-blur-lg-px)) saturate(var(--glass-saturate-lg));
+    -webkit-backdrop-filter: blur(var(--glass-blur-lg-px)) saturate(var(--glass-saturate-lg));
+    border: 1px solid rgba(255 255 255 / var(--glass-border-lg));
   }
 
   /* ── Glass card with interactive state ──── */
