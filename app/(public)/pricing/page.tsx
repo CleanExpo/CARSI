@@ -93,7 +93,7 @@ const GROWTH_EXTRAS = [
   'Asthma & Allergy Course (valued at $129)',
   'ALL Introduction To courses (value $500+)',
   'IICRC CEC tracking dashboard',
-  'XP leaderboard & streak tracker',
+  'Monthly activity recognition (anonymous by default) & streak tracker',
   'PDF certificate wallet',
   'Shareable credential profile',
 ];
