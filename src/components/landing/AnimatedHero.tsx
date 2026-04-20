@@ -1,17 +1,21 @@
 'use client';
 
 import { PUBLIC_SHELL_INNER_CLASS } from '@/components/landing/public-shell-width';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import {
   ArrowRight,
   Award,
   BookOpen,
   CheckCircle2,
+  CheckCircle,
+  Circle,
   Clock,
+  Headphones,
   Play,
   Search,
   Shield,
   Sparkles,
+  TrendingUp,
 } from 'lucide-react';
 import Link from 'next/link';
 import { ReactNode } from 'react';
@@ -49,30 +53,30 @@ const staggerContainer = {
 
 function HeroMeshBackdrop() {
   return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+    <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[28px]" aria-hidden>
       <div
-        className="absolute -top-1/2 left-1/2 h-[120%] w-[140%] -translate-x-1/2"
+        className="absolute -top-[45%] left-1/2 h-[130%] w-[155%] -translate-x-1/2"
         style={{
           background: `
-            radial-gradient(ellipse 45% 35% at 70% 20%, rgba(36, 144, 237, 0.22), transparent 55%),
-            radial-gradient(ellipse 40% 30% at 20% 60%, rgba(0, 212, 170, 0.08), transparent 50%),
-            radial-gradient(ellipse 35% 40% at 90% 75%, rgba(237, 157, 36, 0.06), transparent 45%)
+            radial-gradient(ellipse 50% 38% at 72% 18%, rgba(36, 144, 237, 0.28), transparent 58%),
+            radial-gradient(ellipse 42% 34% at 12% 55%, rgba(0, 212, 170, 0.1), transparent 52%),
+            radial-gradient(ellipse 38% 42% at 92% 78%, rgba(237, 157, 36, 0.09), transparent 48%)
           `,
         }}
       />
       <div
-        className="absolute inset-0 opacity-[0.35]"
+        className="absolute inset-0 opacity-[0.4]"
         style={{
-          backgroundImage: `linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)`,
-          backgroundSize: '48px 48px',
-          maskImage: 'radial-gradient(ellipse 70% 65% at 50% 45%, black 15%, transparent 70%)',
+          backgroundImage: `linear-gradient(rgba(255,255,255,0.045) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.045) 1px, transparent 1px)`,
+          backgroundSize: '44px 44px',
+          maskImage: 'radial-gradient(ellipse 78% 72% at 52% 42%, black 12%, transparent 72%)',
           WebkitMaskImage:
-            'radial-gradient(ellipse 70% 65% at 50% 45%, black 15%, transparent 70%)',
+            'radial-gradient(ellipse 78% 72% at 52% 42%, black 12%, transparent 72%)',
         }}
       />
       <div
-        className="absolute inset-0 opacity-[0.12]"
+        className="absolute inset-0 opacity-[0.11]"
         style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
         }}
@@ -98,112 +102,287 @@ function CatalogSearchCue() {
   );
 }
 
-function HeroLearningPreview() {
+function HeroPreviewConnector() {
   return (
-    <div className="relative mx-auto w-full max-w-[min(100%,520px)] lg:mr-0 lg:ml-auto">
-      <HeroMeshBackdrop />
+    <svg
+      className="pointer-events-none absolute top-[52%] left-[8%] z-[1] hidden h-32 w-24 text-[#2490ed]/25 lg:block"
+      viewBox="0 0 96 128"
+      fill="none"
+      aria-hidden
+    >
+      <path
+        d="M8 8 C 32 8, 40 48, 52 72 S 72 112, 88 120"
+        stroke="currentColor"
+        strokeWidth="1.25"
+        strokeLinecap="round"
+        vectorEffect="non-scaling-stroke"
+      />
+      <circle cx="8" cy="8" r="3" className="fill-[#2490ed]/40" />
+    </svg>
+  );
+}
 
-      {/* Back card — “pathway” */}
-      <motion.div
-        initial={{ opacity: 0, x: 40, rotate: -6 }}
-        animate={{ opacity: 1, x: 0, rotate: -6 }}
-        transition={{ duration: 0.7, ease: smoothEase, delay: 0.2 }}
-        className="absolute top-8 left-4 z-[1] w-[88%] rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/[0.07] to-white/[0.02] p-4 shadow-2xl backdrop-blur-sm"
-      >
-        <div className="mb-3 flex items-center justify-between gap-2">
-          <span className="text-[10px] font-semibold tracking-[0.15em] text-white/35 uppercase">
-            Your pathway
-          </span>
-          <span className="rounded-full bg-[#2490ed]/15 px-2 py-0.5 font-mono text-[10px] text-[#7ec5ff]">
-            IICRC CEC
-          </span>
-        </div>
-        <div className="space-y-2">
-          <div className="h-2 overflow-hidden rounded-full bg-white/[0.06]">
-            <div className="h-full w-[62%] rounded-full bg-gradient-to-r from-[#2490ed] to-[#38a8ff]" />
+function HeroLearningPreview() {
+  const reduceMotion = useReducedMotion();
+
+  return (
+    <div className="relative mx-auto w-full max-w-[min(100%,560px)] lg:mr-0 lg:ml-auto">
+      {/* Stage frame — anchors the whole column */}
+      <div className="relative overflow-visible rounded-[28px] border border-white/[0.09] bg-gradient-to-b from-white/[0.06] via-[#070b14]/40 to-[#04060c] p-4 shadow-[0_32px_100px_-40px_rgba(0,0,0,0.95),inset_0_1px_0_rgba(255,255,255,0.06)] sm:p-5">
+        <div className="pointer-events-none absolute inset-0 rounded-[28px] shadow-[inset_0_0_0_1px_rgba(36,144,237,0.12)]" />
+        <HeroMeshBackdrop />
+
+        {/* Eyebrow + live affordance */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: smoothEase }}
+          className="relative z-[2] mb-5 flex flex-col gap-3 sm:mb-6 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/25 bg-emerald-500/[0.08] px-3 py-1.5 text-[11px] font-semibold text-emerald-200/95">
+            <span className="relative flex h-2 w-2">
+              {!reduceMotion ? (
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400/50" />
+              ) : null}
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+            </span>
+            Your learning workspace
           </div>
-          <p className="text-xs text-white/45">Water damage restoration track</p>
-        </div>
-      </motion.div>
+          <p className="text-[11px] text-white/35 sm:text-right">
+            <span className="text-white/50">Resume-ready</span> · Est. 12 min to next milestone
+          </p>
+        </motion.div>
 
-      {/* Front card — “now playing” */}
-      <motion.div
-        initial={{ opacity: 0, y: 28 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.65, ease: smoothEase, delay: 0.35 }}
-        className="relative z-[2] mt-24 rounded-2xl border border-white/[0.12] bg-[#060a12]/95 p-1 shadow-[0_28px_80px_-32px_rgba(0,0,0,0.95),0_0_0_1px_rgba(255,255,255,0.05)_inset] backdrop-blur-xl"
-      >
-        <div className="overflow-hidden rounded-[14px]">
-          <div className="relative aspect-video bg-gradient-to-br from-[#1a2a42] via-[#0d1524] to-[#060a12]">
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_100%,rgba(36,144,237,0.25),transparent_55%)]" />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <motion.div
-                animate={{ scale: [1, 1.05, 1] }}
-                transition={{ duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}
-                className="flex h-16 w-16 items-center justify-center rounded-full border border-white/20 bg-white/10 shadow-lg backdrop-blur-md"
-              >
-                <Play className="ml-1 h-7 w-7 text-white" fill="currentColor" />
-              </motion.div>
+        <div className="relative z-[2] min-h-[320px] sm:min-h-[340px]">
+          <HeroPreviewConnector />
+
+          {/* Back card — pathway stack (bento accent) */}
+          <motion.div
+            initial={{ opacity: 0, x: 36, rotate: -5 }}
+            animate={{ opacity: 1, x: 0, rotate: -5 }}
+            transition={{ duration: 0.65, ease: smoothEase, delay: 0.15 }}
+            className="absolute top-0 right-0 z-[1] w-[min(100%,94%)] rounded-2xl border border-white/[0.1] bg-gradient-to-br from-white/[0.09] to-white/[0.02] p-4 shadow-[0_24px_60px_-28px_rgba(0,0,0,0.85)] backdrop-blur-md sm:w-[88%]"
+          >
+            <div className="mb-3 flex items-center justify-between gap-2">
+              <span className="text-[10px] font-semibold tracking-[0.18em] text-white/40 uppercase">
+                Pathway progress
+              </span>
+              <span className="inline-flex items-center gap-1 rounded-full bg-[#2490ed]/15 px-2 py-0.5 font-mono text-[10px] text-[#7ec5ff]">
+                <TrendingUp className="h-3 w-3" />
+                IICRC CEC
+              </span>
             </div>
-            <div className="absolute right-3 bottom-3 left-3">
-              <div className="mb-1.5 h-1 overflow-hidden rounded-full bg-black/40">
-                <motion.div
-                  className="h-full rounded-full bg-[#2490ed]"
-                  initial={{ width: '0%' }}
-                  animate={{ width: '38%' }}
-                  transition={{ duration: 1.2, ease: smoothEase, delay: 0.8 }}
+            <ul className="space-y-2.5">
+              <li className="flex items-start gap-2.5">
+                <CheckCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-400/90" />
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="truncate text-xs font-medium text-white/75">
+                      Water damage — fundamentals
+                    </span>
+                    <span className="shrink-0 text-[10px] tabular-nums text-white/35">Done</span>
+                  </div>
+                </div>
+              </li>
+              <li className="flex items-start gap-2.5">
+                <div className="mt-0.5 flex h-3.5 w-3.5 shrink-0 items-center justify-center">
+                  <div className="h-2 w-2 rounded-full bg-[#2490ed] shadow-[0_0_0_3px_rgba(36,144,237,0.25)]" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="truncate text-xs font-medium text-white/85">
+                      Psychrometry & drying
+                    </span>
+                    <span className="shrink-0 text-[10px] tabular-nums text-[#7ec5ff]">62%</span>
+                  </div>
+                  <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-white/[0.07]">
+                    <motion.div
+                      className="h-full rounded-full bg-gradient-to-r from-[#2490ed] to-[#38a8ff]"
+                      initial={{ width: reduceMotion ? '62%' : '0%' }}
+                      animate={{ width: '62%' }}
+                      transition={{ duration: reduceMotion ? 0 : 1.1, ease: smoothEase, delay: 0.5 }}
+                    />
+                  </div>
+                </div>
+              </li>
+              <li className="flex items-start gap-2.5 opacity-55">
+                <Circle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-white/25" />
+                <div className="min-w-0 flex-1">
+                  <span className="text-xs text-white/50">Odour control — unlocks next</span>
+                </div>
+              </li>
+            </ul>
+          </motion.div>
+
+          {/* Front card — lesson player */}
+          <motion.div
+            initial={{ opacity: 0, y: 32 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.65, ease: smoothEase, delay: 0.28 }}
+            whileHover={reduceMotion ? undefined : { scale: 1.008 }}
+            className="relative z-[2] mt-[5.5rem] rounded-2xl bg-gradient-to-br from-[#2490ed]/45 via-[#0a1628] to-[#ed9d24]/25 p-[3px] shadow-[0_36px_90px_-36px_rgba(0,0,0,0.95)] backdrop-blur-xl sm:mt-[6rem]"
+          >
+            <div className="overflow-hidden rounded-[13px] border border-white/[0.08] bg-[#060a12] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+              <div className="relative aspect-video bg-gradient-to-br from-[#1c2d48] via-[#0e1829] to-[#060a12]">
+                {/* Corner brackets */}
+                <div
+                  className="pointer-events-none absolute top-3 left-3 h-6 w-6 border-t border-l border-white/20"
+                  aria-hidden
                 />
+                <div
+                  className="pointer-events-none absolute top-3 right-3 h-6 w-6 border-t border-r border-white/20"
+                  aria-hidden
+                />
+                <div
+                  className="pointer-events-none absolute bottom-10 left-3 h-6 w-6 border-b border-l border-white/15"
+                  aria-hidden
+                />
+                <div
+                  className="pointer-events-none absolute right-3 bottom-10 h-6 w-6 border-b border-r border-white/15"
+                  aria-hidden
+                />
+
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_85%_65%_at_50%_100%,rgba(36,144,237,0.28),transparent_58%)]" />
+
+                {/* Mini “lesson timeline” */}
+                <div className="absolute top-3 right-3 left-3 flex gap-1">
+                  {[0.35, 0.55, 0.25, 0.7, 0.4].map((h, i) => (
+                    <div
+                      key={i}
+                      className="h-1 flex-1 overflow-hidden rounded-full bg-black/35"
+                      aria-hidden
+                    >
+                      <div
+                        className="h-full rounded-full bg-white/25"
+                        style={{ width: `${Math.round(h * 100)}%` }}
+                      />
+                    </div>
+                  ))}
+                </div>
+
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="relative flex h-[4.5rem] w-[4.5rem] items-center justify-center sm:h-[5rem] sm:w-[5rem]">
+                    <svg
+                      className="absolute inset-0 -rotate-90 text-[#2490ed]/85"
+                      viewBox="0 0 100 100"
+                      aria-hidden
+                    >
+                      <circle
+                        cx="50"
+                        cy="50"
+                        r="46"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="3"
+                        className="text-white/10"
+                      />
+                      <motion.circle
+                        cx="50"
+                        cy="50"
+                        r="46"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="3"
+                        strokeLinecap="round"
+                        strokeDasharray={289.03}
+                        initial={{ strokeDashoffset: 289.03 }}
+                        animate={{ strokeDashoffset: 289.03 * (1 - 0.38) }}
+                        transition={{ duration: reduceMotion ? 0 : 1.25, ease: smoothEase, delay: 0.65 }}
+                      />
+                    </svg>
+                    <motion.div
+                      animate={
+                        reduceMotion
+                          ? undefined
+                          : {
+                              scale: [1, 1.06, 1],
+                            }
+                      }
+                      transition={
+                        reduceMotion
+                          ? undefined
+                          : { duration: 3, repeat: Infinity, ease: 'easeInOut' }
+                      }
+                      className="relative flex h-14 w-14 items-center justify-center rounded-full border border-white/25 bg-white/[0.12] shadow-[0_12px_40px_-8px_rgba(0,0,0,0.6)] backdrop-blur-md sm:h-16 sm:w-16"
+                    >
+                      <Play className="ml-1 h-7 w-7 text-white" fill="currentColor" />
+                    </motion.div>
+                  </div>
+                </div>
+
+                <div className="absolute right-3 bottom-3 left-3">
+                  <div className="mb-1.5 h-1 overflow-hidden rounded-full bg-black/45">
+                    <motion.div
+                      className="h-full rounded-full bg-gradient-to-r from-[#2490ed] to-[#5eb3ff]"
+                      initial={{ width: '0%' }}
+                      animate={{ width: '38%' }}
+                      transition={{ duration: reduceMotion ? 0 : 1.15, ease: smoothEase, delay: 0.75 }}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between text-[10px] tabular-nums text-white/50">
+                    <span>12:04</span>
+                    <span>31:20</span>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center justify-between text-[10px] tabular-nums text-white/50">
-                <span>12:04</span>
-                <span>31:20</span>
+
+              <div className="border-t border-white/[0.07] bg-[#070b14]/95 px-4 py-3.5">
+                <div className="flex flex-wrap items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <p className="text-[10px] font-semibold tracking-[0.2em] text-[#2490ed]/90 uppercase">
+                      Now learning
+                    </p>
+                    <p className="mt-1 line-clamp-2 text-sm font-semibold leading-snug text-white">
+                      Psychrometry & drying science — module assessment prep
+                    </p>
+                  </div>
+                  <span className="shrink-0 rounded-lg border border-[#ed9d24]/25 bg-[#ed9d24]/10 px-2 py-1 text-[10px] font-semibold text-[#f0c06a]">
+                    In progress
+                  </span>
+                </div>
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <span className="inline-flex items-center gap-1 rounded-md border border-white/[0.08] bg-white/[0.04] px-2 py-0.5 text-[10px] text-white/55">
+                    <Clock className="h-3 w-3" />
+                    Self-paced
+                  </span>
+                  <span className="inline-flex items-center gap-1 rounded-md border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[10px] text-emerald-300/90">
+                    <Sparkles className="h-3 w-3" />
+                    CEC eligible
+                  </span>
+                  <span className="inline-flex items-center gap-1 rounded-md border border-white/[0.06] bg-white/[0.03] px-2 py-0.5 text-[10px] text-white/40">
+                    <Headphones className="h-3 w-3" />
+                    Audio + captions
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
-          <div className="border-t border-white/[0.06] bg-[#070b14]/90 px-4 py-3">
-            <p className="text-[10px] font-medium tracking-wider text-[#2490ed]/90 uppercase">
-              Now learning
-            </p>
-            <p className="mt-1 line-clamp-2 text-sm font-semibold leading-snug text-white/90">
-              Psychrometry & drying science — module assessment prep
-            </p>
-            <div className="mt-2 flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1 rounded-md border border-white/[0.08] bg-white/[0.04] px-2 py-0.5 text-[10px] text-white/55">
-                <Clock className="h-3 w-3" />
-                Self-paced
-              </span>
-              <span className="inline-flex items-center gap-1 rounded-md border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[10px] text-emerald-300/90">
-                <Sparkles className="h-3 w-3" />
-                CEC eligible
-              </span>
+          </motion.div>
+
+          {/* Floating metrics — intentional arc */}
+          <motion.div
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: smoothEase, delay: 0.55 }}
+            className="relative z-[3] mt-4 grid grid-cols-3 gap-2 sm:gap-3"
+          >
+            <div className="rounded-xl border border-white/10 bg-[#0a0f18]/90 px-2.5 py-2.5 text-center shadow-lg backdrop-blur-md sm:px-3 sm:py-3">
+              <p className="font-mono text-base font-bold tabular-nums text-white sm:text-lg">24/7</p>
+              <p className="text-[8px] tracking-wider text-white/40 uppercase sm:text-[9px]">Access</p>
             </div>
-          </div>
+            <div className="rounded-xl border border-[#2490ed]/20 bg-[#2490ed]/[0.07] px-2.5 py-2.5 text-center shadow-lg backdrop-blur-md sm:px-3 sm:py-3">
+              <p className="flex items-center justify-center gap-1 font-mono text-sm font-bold text-[#7ec5ff] sm:text-base">
+                <BookOpen className="h-3.5 w-3.5" />
+                CEC
+              </p>
+              <p className="text-[8px] tracking-wider text-white/45 uppercase sm:text-[9px]">Tracked</p>
+            </div>
+            <div className="rounded-xl border border-white/10 bg-[#0a0f18]/90 px-2.5 py-2.5 text-center shadow-lg backdrop-blur-md sm:px-3 sm:py-3">
+              <p className="text-xs font-bold text-white/90 sm:text-sm">NRPG</p>
+              <p className="text-[8px] tracking-wider text-white/40 uppercase sm:text-[9px]">Pathways</p>
+            </div>
+          </motion.div>
         </div>
-      </motion.div>
-
-      {/* Floating stat chips */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.92 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5, ease: smoothEase, delay: 0.65 }}
-        className="absolute -right-2 bottom-16 z-[3] hidden rounded-xl border border-white/10 bg-[#0a0f18]/95 px-3 py-2 shadow-xl backdrop-blur-md sm:block"
-      >
-        <p className="font-mono text-lg font-bold text-white tabular-nums">24/7</p>
-        <p className="text-[9px] tracking-wider text-white/40 uppercase">Access</p>
-      </motion.div>
-
-      <motion.div
-        initial={{ opacity: 0, scale: 0.92 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5, ease: smoothEase, delay: 0.75 }}
-        className="absolute -left-1 bottom-28 z-[3] hidden rounded-xl border border-white/10 bg-[#0a0f18]/95 px-3 py-2 shadow-xl backdrop-blur-md sm:block"
-      >
-        <p className="flex items-center gap-1 font-mono text-sm font-bold text-[#7ec5ff]">
-          <BookOpen className="h-3.5 w-3.5" />
-          CEC
-        </p>
-        <p className="text-[9px] tracking-wider text-white/40 uppercase">Tracked</p>
-      </motion.div>
+      </div>
     </div>
   );
 }
