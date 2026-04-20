@@ -10,6 +10,7 @@ import { LearnModuleOverview } from '@/components/lms/LearnModuleOverview';
 import { LessonPlayer } from '@/components/lms/LessonPlayer';
 import { Button } from '@/components/ui/button';
 import { apiClient, ApiClientError } from '@/lib/api/client';
+import { useOnlineStatus } from '@/hooks/use-online-status';
 
 interface CurriculumLesson {
   id: string;
@@ -54,9 +55,23 @@ interface LessonDetailResponse {
 
 type ViewMode = 'lesson' | 'module';
 
+const RELIABILITY_TIP_KEY = 'carsi_learn_reliability_tip_dismissed';
+
 export function LearnCourseShell({ slug }: { slug: string }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const online = useOnlineStatus();
+  const [reliabilityTipDismissed, setReliabilityTipDismissed] = useState(false);
+
+  useEffect(() => {
+    try {
+      if (typeof sessionStorage !== 'undefined' && sessionStorage.getItem(RELIABILITY_TIP_KEY) === '1') {
+        setReliabilityTipDismissed(true);
+      }
+    } catch {
+      /* private mode */
+    }
+  }, []);
   const lessonFromQuery = searchParams.get('lesson');
   const moduleFromQuery = searchParams.get('module');
 
@@ -298,6 +313,44 @@ export function LearnCourseShell({ slug }: { slug: string }) {
           courseTitle={curriculum.course.title}
           enrollmentId={curriculum.enrollment_id}
         />
+      ) : null}
+
+      {!online ? (
+        <div
+          className="rounded-xl border border-amber-500/35 bg-amber-500/10 px-4 py-3 text-sm text-amber-50/95"
+          role="status"
+        >
+          <span className="font-semibold text-amber-200">You&apos;re offline.</span>{' '}
+          <span className="text-amber-100/90">
+            Lessons you opened while online may load from your browser cache (PWA). Progress sync
+            needs a connection — reconnect when you can.
+          </span>
+        </div>
+      ) : null}
+
+      {online && !reliabilityTipDismissed ? (
+        <div className="flex items-start justify-between gap-3 rounded-xl border border-white/10 bg-white/4 px-4 py-3 text-xs leading-relaxed text-white/55">
+          <p>
+            <span className="font-medium text-white/70">Reliability tip · </span>
+            Open each lesson once while you have signal so your installed PWA can cache lesson API
+            responses and static assets — helpful for patchy field coverage. PDFs and videos cache when
+            your browser fetches them.
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              try {
+                sessionStorage.setItem(RELIABILITY_TIP_KEY, '1');
+              } catch {
+                /* ignore */
+              }
+              setReliabilityTipDismissed(true);
+            }}
+            className="shrink-0 rounded-md border border-white/15 px-2 py-1 text-[10px] font-medium text-white/50 uppercase tracking-wide hover:border-white/25 hover:text-white/75"
+          >
+            Dismiss
+          </button>
+        </div>
       ) : null}
 
       <div className="flex min-h-[calc(100vh-6rem)] w-full max-w-none flex-col gap-8 lg:flex-row lg:gap-10">
