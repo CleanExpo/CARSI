@@ -22,6 +22,7 @@ import { useCallback, useEffect, useState } from 'react';
 const SECTIONS = [
   { id: 'overview', label: 'Overview' },
   { id: 'account', label: 'Account' },
+  { id: 'recognition', label: 'Recognition' },
   { id: 'iicrc', label: 'IICRC & renewal' },
 ] as const;
 
@@ -50,6 +51,8 @@ export default function StudentProfilePage() {
   const [member, setMember] = useState('');
   const [expiry, setExpiry] = useState('');
   const [cardUrl, setCardUrl] = useState('');
+  const [leaderboardShow, setLeaderboardShow] = useState(false);
+  const [leaderboardName, setLeaderboardName] = useState('');
   const [profile, setProfile] = useState<User | null>(null);
 
   const load = useCallback(async () => {
@@ -63,6 +66,8 @@ export default function StudentProfilePage() {
       setMember(data.iicrc_member_number ?? '');
       setExpiry(data.iicrc_expiry_date ?? '');
       setCardUrl(data.iicrc_card_image_url ?? '');
+      setLeaderboardShow(data.leaderboard_show_display_name ?? false);
+      setLeaderboardName(data.leaderboard_display_name ?? '');
     } catch {
       setError('Could not load profile.');
     } finally {
@@ -97,6 +102,26 @@ export default function StudentProfilePage() {
       toast({ title: 'Account updated' });
     } catch {
       toast({ title: 'Could not save account', variant: 'destructive' });
+    } finally {
+      setSavingSection(null);
+    }
+  }
+
+  async function saveRecognition(e: React.FormEvent) {
+    e.preventDefault();
+    if (!authUser) return;
+    setSavingSection('recognition');
+    setError(null);
+    try {
+      const data = await apiClient.patch<User>('/api/lms/auth/me', {
+        leaderboard_show_display_name: leaderboardShow,
+        leaderboard_display_name: leaderboardName.trim() || null,
+      });
+      setProfile(data);
+      await refreshUser();
+      toast({ title: 'Recognition preferences saved' });
+    } catch {
+      toast({ title: 'Could not save recognition settings', variant: 'destructive' });
     } finally {
       setSavingSection(null);
     }
@@ -309,6 +334,68 @@ export default function StudentProfilePage() {
                   className="rounded-xl bg-[#2490ed] px-6 hover:bg-[#1f82d4]"
                 >
                   {savingSection === 'account' ? 'Saving…' : 'Save account'}
+                </Button>
+              </form>
+            </section>
+
+            <section id="recognition" className="scroll-mt-24">
+              <div className="mb-4 flex items-center gap-2">
+                <Award className="h-4 w-4 text-[#2490ed]" aria-hidden />
+                <h2 className="text-lg font-semibold text-white">Recognition</h2>
+              </div>
+              <p className="mb-6 text-sm text-white/45">
+                The monthly board highlights completion-based activity for the current calendar month
+                (Australia/Sydney). It is{' '}
+                <span className="text-white/70">anonymous by default</span> — only an optional label
+                you enter here can appear publicly. Your email and account name are never shown on
+                the board.
+              </p>
+              <form
+                onSubmit={saveRecognition}
+                className="space-y-5 rounded-2xl border border-white/10 bg-white/[0.03] p-6 sm:p-8"
+              >
+                <div className="flex items-start gap-3">
+                  <input
+                    id="lb_show"
+                    type="checkbox"
+                    checked={leaderboardShow}
+                    onChange={(ev) => setLeaderboardShow(ev.target.checked)}
+                    className="mt-1 h-4 w-4 rounded border-white/20 bg-[#0a0f1a] text-[#2490ed] focus:ring-[#2490ed]/40"
+                  />
+                  <div>
+                    <label htmlFor="lb_show" className="text-sm font-medium text-white/80">
+                      Show my chosen public label on the monthly recognition board
+                    </label>
+                    <p className="mt-1 text-xs text-white/35">
+                      If off, you appear as a neutral professional identifier (not your real name).
+                    </p>
+                  </div>
+                </div>
+                <div>
+                  <label htmlFor="lb_name" className="block text-xs font-medium text-white/50">
+                    Public label (optional, max 48 characters)
+                  </label>
+                  <input
+                    id="lb_name"
+                    type="text"
+                    value={leaderboardName}
+                    onChange={(ev) => setLeaderboardName(ev.target.value.slice(0, 48))}
+                    disabled={!leaderboardShow}
+                    placeholder="e.g. Alex K., WRT · QLD"
+                    className="mt-2 w-full max-w-md rounded-xl border border-white/10 bg-[#0a0f1a] px-4 py-3 text-sm text-white placeholder:text-white/30 focus:border-[#2490ed]/50 focus:outline-none disabled:cursor-not-allowed disabled:opacity-45"
+                    autoComplete="off"
+                  />
+                  <p className="mt-1.5 text-xs text-white/35">
+                    Do not use your email. This is only for the leaderboard — not certificates or
+                    verification.
+                  </p>
+                </div>
+                <Button
+                  type="submit"
+                  disabled={savingSection === 'recognition'}
+                  className="rounded-xl bg-[#2490ed] px-6 hover:bg-[#1f82d4]"
+                >
+                  {savingSection === 'recognition' ? 'Saving…' : 'Save recognition settings'}
                 </Button>
               </form>
             </section>
