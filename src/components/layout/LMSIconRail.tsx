@@ -5,8 +5,10 @@ import { NotificationBell } from '@/components/lms/NotificationBell';
 import {
   Award,
   BookOpen,
+  FileText,
   GraduationCap,
   LayoutDashboard,
+  ListOrdered,
   Search,
   Settings,
   Shield,
@@ -39,6 +41,8 @@ const topNav: NavItem[] = [
   { icon: BookOpen, href: '/dashboard/student', label: 'My Learning' },
   { icon: UserCircle, href: '/dashboard/student/profile', label: 'Profile' },
   { icon: Award, href: '/dashboard/student/credentials', label: 'Credentials' },
+  { icon: ListOrdered, href: '/dashboard/student/leaderboard', label: 'Recognition' },
+  { icon: FileText, href: '/dashboard/student/notes', label: 'Notes' },
   { icon: GraduationCap, href: '/dashboard/instructor', label: 'Instructor', instructorOnly: true },
   { icon: Shield, href: '/admin', label: 'Admin', adminOnly: true },
 ];
