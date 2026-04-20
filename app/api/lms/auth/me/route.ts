@@ -5,6 +5,7 @@ import type { IicrcCertificationEntry, User } from '@/lib/api/auth';
 import { hasCompletedOnboarding, setOnboardingCompletedCookie } from '@/lib/auth/onboarding-cookie';
 import { verifySessionToken } from '@/lib/auth/session-jwt';
 import { parseIicrcCertifications } from '@/lib/server/iicrc-profile-json';
+import { sanitizeLeaderboardDisplayName } from '@/lib/server/leaderboard-xp';
 import { prisma } from '@/lib/prisma';
 
 async function requireClaims(request: NextRequest) {
@@ -37,6 +38,8 @@ export async function GET(request: NextRequest) {
 
   let dbOnboardingDone = false;
   let resume_reminder: 'none' | 'email' | 'sms' | null = null;
+  let leaderboard_show_display_name = false;
+  let leaderboard_display_name: string | null = null;
 
   if (process.env.DATABASE_URL?.trim()) {
     const row = await prisma.lmsUser.findUnique({
@@ -50,6 +53,8 @@ export async function GET(request: NextRequest) {
         iicrcCertifications: true,
         onboardingCompletedAt: true,
         resumeReminderOptIn: true,
+        leaderboardShowDisplayName: true,
+        leaderboardDisplayName: true,
       },
     });
     if (row?.fullName?.trim()) displayName = row.fullName.trim();
@@ -63,6 +68,8 @@ export async function GET(request: NextRequest) {
     dbOnboardingDone = row?.onboardingCompletedAt != null;
     const v = row?.resumeReminderOptIn?.toLowerCase();
     if (v === 'email' || v === 'sms' || v === 'none') resume_reminder = v;
+    leaderboard_show_display_name = row?.leaderboardShowDisplayName ?? false;
+    leaderboard_display_name = row?.leaderboardDisplayName ?? null;
   }
 
   const user: User = {
@@ -79,6 +86,8 @@ export async function GET(request: NextRequest) {
     iicrc_expiry_date,
     iicrc_card_image_url,
     iicrc_certifications,
+    leaderboard_show_display_name,
+    leaderboard_display_name,
   };
   return NextResponse.json(user);
 }
@@ -136,6 +145,17 @@ export async function PATCH(request: NextRequest) {
       update.resumeReminderOptIn = v;
     }
   }
+  if (typeof patch.leaderboard_show_display_name === 'boolean') {
+    update.leaderboardShowDisplayName = patch.leaderboard_show_display_name;
+  }
+  if (patch.leaderboard_display_name !== undefined) {
+    if (patch.leaderboard_display_name === null) {
+      update.leaderboardDisplayName = null;
+    } else if (typeof patch.leaderboard_display_name === 'string') {
+      const cleaned = sanitizeLeaderboardDisplayName(patch.leaderboard_display_name);
+      update.leaderboardDisplayName = cleaned;
+    }
+  }
 
   if (process.env.DATABASE_URL?.trim() && Object.keys(update).length > 0) {
     try {
@@ -158,6 +178,8 @@ export async function PATCH(request: NextRequest) {
 
   let patchResumeReminder: 'none' | 'email' | 'sms' | null = null;
   let patchOnboardingDone = false;
+  let patchLeaderboardShow = false;
+  let patchLeaderboardName: string | null = null;
 
   if (process.env.DATABASE_URL?.trim()) {
     const row = await prisma.lmsUser.findUnique({
@@ -171,6 +193,8 @@ export async function PATCH(request: NextRequest) {
         iicrcCertifications: true,
         onboardingCompletedAt: true,
         resumeReminderOptIn: true,
+        leaderboardShowDisplayName: true,
+        leaderboardDisplayName: true,
       },
     });
     if (row?.fullName?.trim()) patchDisplayName = row.fullName.trim();
@@ -184,6 +208,8 @@ export async function PATCH(request: NextRequest) {
     patchOnboardingDone = row?.onboardingCompletedAt != null;
     const rv = row?.resumeReminderOptIn?.toLowerCase();
     if (rv === 'email' || rv === 'sms' || rv === 'none') patchResumeReminder = rv;
+    patchLeaderboardShow = row?.leaderboardShowDisplayName ?? false;
+    patchLeaderboardName = row?.leaderboardDisplayName ?? null;
   }
 
   const response = NextResponse.json({
@@ -203,6 +229,8 @@ export async function PATCH(request: NextRequest) {
     iicrc_expiry_date,
     iicrc_card_image_url,
     iicrc_certifications,
+    leaderboard_show_display_name: patchLeaderboardShow,
+    leaderboard_display_name: patchLeaderboardName,
   } satisfies User);
   if (patch.onboarding_completed === true) {
     setOnboardingCompletedCookie(response, claims.sub);
