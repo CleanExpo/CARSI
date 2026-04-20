@@ -2,15 +2,24 @@
 
 import { useState } from 'react';
 
+import { disciplineToken } from '@/lib/discipline-tokens';
+
+// GP-364: resolve discipline colours via token helper (was raw hex).
 const DISCIPLINES = [
-  { id: 'WRT', label: 'WRT', fullName: 'Water Damage Restoration', color: '#2490ed' },
-  { id: 'CRT', label: 'CRT', fullName: 'Carpet Repair & Reinstallation', color: '#26c4a0' },
-  { id: 'ASD', label: 'ASD', fullName: 'Applied Structural Drying', color: '#6c63ff' },
-  { id: 'OCT', label: 'OCT', fullName: 'Odour Control', color: '#9b59b6' },
-  { id: 'CCT', label: 'CCT', fullName: 'Commercial Carpet Maintenance', color: '#17b8d4' },
-  { id: 'FSRT', label: 'FSRT', fullName: 'Fire & Smoke Restoration', color: '#f05a35' },
-  { id: 'AMRT', label: 'AMRT', fullName: 'Applied Microbial Remediation', color: '#27ae60' },
-];
+  { id: 'WRT', label: 'WRT', fullName: 'Water Damage Restoration' },
+  { id: 'CRT', label: 'CRT', fullName: 'Carpet Repair & Reinstallation' },
+  { id: 'ASD', label: 'ASD', fullName: 'Applied Structural Drying' },
+  { id: 'OCT', label: 'OCT', fullName: 'Odour Control' },
+  { id: 'CCT', label: 'CCT', fullName: 'Commercial Carpet Maintenance' },
+  { id: 'FSRT', label: 'FSRT', fullName: 'Fire & Smoke Restoration' },
+  { id: 'AMRT', label: 'AMRT', fullName: 'Applied Microbial Remediation' },
+].map((d) => ({
+  ...d,
+  // `color-mix(... transparent)` lets us preserve the former alpha composites
+  // (e.g. the previous `${hex}22` fill) while consuming the shared HSL token.
+  color: disciplineToken(d.id) ?? 'hsl(var(--discipline-water-500))',
+  colorMuted: `color-mix(in srgb, ${disciplineToken(d.id) ?? 'hsl(var(--discipline-water-500))'} 13%, transparent)`,
+}));
 
 const CX = 250;
 const CY = 200;
@@ -113,7 +122,7 @@ export function IICRCDisciplineMap() {
               cx={pos.x}
               cy={pos.y}
               r={NODE_R}
-              fill={isActive ? disc.color : `${disc.color}22`}
+              fill={isActive ? disc.color : disc.colorMuted}
               stroke={disc.color}
               strokeWidth={isActive ? 2 : 1.5}
             />
@@ -164,7 +173,7 @@ export function IICRCDisciplineMap() {
 
       {/* Centre node */}
       <g filter="url(#centre-glow)">
-        <circle cx={CX} cy={CY} r={CENTRE_R} fill="#2490ed" opacity={0.9} />
+        <circle cx={CX} cy={CY} r={CENTRE_R} fill="hsl(var(--discipline-water-500))" opacity={0.9} />
         <circle
           cx={CX}
           cy={CY}

@@ -2,15 +2,10 @@
 
 import Image from 'next/image';
 
-const DISCIPLINE_COLORS: Record<string, string> = {
-  WRT: '#2490ed',
-  CRT: '#26c4a0',
-  ASD: '#6c63ff',
-  OCT: '#9b59b6',
-  CCT: '#17b8d4',
-  FSRT: '#f05a35',
-  AMRT: '#27ae60',
-};
+import { disciplineToken } from '@/lib/discipline-tokens';
+
+// GP-364: resolve certificate accent via shared discipline tokens.
+const DEFAULT_ACCENT = 'hsl(var(--discipline-water-500))';
 
 interface CertificatePreviewProps {
   studentName?: string;
@@ -29,7 +24,12 @@ export function CertificatePreview({
     year: 'numeric',
   }),
 }: CertificatePreviewProps) {
-  const discColor = DISCIPLINE_COLORS[discipline] ?? '#2490ed';
+  const discColor = disciplineToken(discipline) ?? DEFAULT_ACCENT;
+  const discColorSoft = `color-mix(in srgb, ${discColor} 21%, transparent)`;
+  const discColorFaint = `color-mix(in srgb, ${discColor} 7%, transparent)`;
+  const discColorMid = `color-mix(in srgb, ${discColor} 19%, transparent)`;
+  const discColorBorder = `color-mix(in srgb, ${discColor} 33%, transparent)`;
+  const discColorTag = `color-mix(in srgb, ${discColor} 38%, transparent)`;
 
   return (
     <div
@@ -41,14 +41,14 @@ export function CertificatePreview({
       <div
         className="rounded-sm p-1"
         style={{
-          background: `linear-gradient(135deg, ${discColor}35 0%, ${discColor}12 50%, ${discColor}30 100%)`,
+          background: `linear-gradient(135deg, ${discColorSoft} 0%, ${discColorFaint} 50%, ${discColorMid} 100%)`,
         }}
       >
         {/* Inner certificate card — dark surface */}
         <div
           className="relative rounded-sm bg-[#0a0e14] p-8 text-center"
           style={{
-            border: `2px solid ${discColor}55`,
+            border: `2px solid ${discColorTag}`,
             boxShadow: '0 8px 40px rgba(0,0,0,0.45)',
           }}
         >
@@ -127,7 +127,7 @@ export function CertificatePreview({
             <div
               className="rounded-sm border px-3 py-1 text-[10px] font-bold tracking-wider uppercase"
               style={{
-                borderColor: `${discColor}60`,
+                borderColor: discColorBorder,
                 color: discColor,
               }}
             >

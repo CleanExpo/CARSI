@@ -38,7 +38,8 @@ const staggerContainer = {
 
 const trustBadges = [
   { icon: Award, label: 'IICRC Approved', color: '#2490ed' },
-  { icon: Shield, label: '24/7 Online Access', color: '#27ae60' },
+  // GP-364: microbial discipline token (success/green).
+  { icon: Shield, label: '24/7 Online Access', color: 'hsl(var(--discipline-microbial-500))' },
   { icon: Star, label: '4.9★ Rating', color: '#ed9d24' },
 ];
 

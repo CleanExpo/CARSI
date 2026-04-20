@@ -16,14 +16,16 @@ import { useState } from 'react';
 
 import { useAuth } from '@/components/auth/auth-provider';
 import { getDashboardSectionLabel, isDashboardNavActive } from '@/lib/dashboard-nav-active';
+import { disciplineToken } from '@/lib/discipline-tokens';
 
+// GP-364: colours resolved from discipline tokens at render time.
 const disciplines = [
-  { code: 'WRT', label: 'Water', color: '#2490ed' },
-  { code: 'ASD', label: 'Structural drying', color: '#6c63ff' },
-  { code: 'AMRT', label: 'Microbial', color: '#27ae60' },
-  { code: 'FSRT', label: 'Fire & smoke', color: '#f05a35' },
-  { code: 'CCT', label: 'Commercial carpet', color: '#17b8d4' },
-];
+  { code: 'WRT', label: 'Water' },
+  { code: 'ASD', label: 'Structural drying' },
+  { code: 'AMRT', label: 'Microbial' },
+  { code: 'FSRT', label: 'Fire & smoke' },
+  { code: 'CCT', label: 'Commercial carpet' },
+] as const;
 
 type NavItem = {
   href: string;
@@ -126,22 +128,25 @@ export function LMSContextPanel() {
           </button>
           {filtersOpen ? (
             <div className="mt-2 max-h-40 space-y-1 overflow-y-auto pr-1 pl-1">
-              {disciplines.map((d) => (
-                <Link
-                  key={d.code}
-                  href={`/dashboard/courses?discipline=${d.code}`}
-                  className="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-white/55 transition hover:bg-white/4 hover:text-white/80"
-                >
-                  <span
-                    className="h-1.5 w-1.5 shrink-0 rounded-full"
-                    style={{ backgroundColor: d.color }}
-                  />
-                  <span className="font-mono text-[10px] font-bold" style={{ color: d.color }}>
-                    {d.code}
-                  </span>
-                  <span className="truncate">{d.label}</span>
-                </Link>
-              ))}
+              {disciplines.map((d) => {
+                const color = disciplineToken(d.code) ?? 'hsl(var(--discipline-water-500))';
+                return (
+                  <Link
+                    key={d.code}
+                    href={`/dashboard/courses?discipline=${d.code}`}
+                    className="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-white/55 transition hover:bg-white/4 hover:text-white/80"
+                  >
+                    <span
+                      className="h-1.5 w-1.5 shrink-0 rounded-full"
+                      style={{ backgroundColor: color }}
+                    />
+                    <span className="font-mono text-[10px] font-bold" style={{ color }}>
+                      {d.code}
+                    </span>
+                    <span className="truncate">{d.label}</span>
+                  </Link>
+                );
+              })}
             </div>
           ) : null}
         </div>

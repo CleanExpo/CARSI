@@ -156,7 +156,7 @@ export function ContractorAddOns({ accentColor = '#2490ed' }: ContractorAddOnsPr
                   style={{ color: 'rgba(255,255,255,0.2)' }}
                 />
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 flex-shrink-0" style={{ color: '#27ae60' }} />
+                  <CheckCircle2 className="h-4 w-4 flex-shrink-0" style={{ color: 'hsl(var(--discipline-microbial-500))' }} />
                   <span className="text-sm" style={{ color: 'rgba(255,255,255,0.6)' }}>
                     {upgrade.benefit}
                   </span>

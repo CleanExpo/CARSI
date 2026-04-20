@@ -1,12 +1,14 @@
 'use client';
 
+// GP-364: discipline-anchored step colours now resolve via shared tokens.
 const STEPS = [
-  { label: 'Enrol', icon: 'E', color: '#2490ed' },
-  { label: 'Learn', icon: 'L', color: '#26c4a0' },
-  { label: 'Quiz', icon: 'Q', color: '#6c63ff' },
+  { label: 'Enrol', icon: 'E', color: 'hsl(var(--discipline-water-500))' },
+  { label: 'Learn', icon: 'L', color: 'hsl(var(--discipline-carpet-500))' },
+  { label: 'Quiz', icon: 'Q', color: 'hsl(var(--discipline-drying-500))' },
+  // Earn-XP stays on the gold accent (non-discipline brand token).
   { label: 'Earn XP', icon: 'X', color: '#ed9d24' },
-  { label: 'Certificate', icon: 'C', color: '#27ae60' },
-  { label: 'Share', icon: 'S', color: '#17b8d4' },
+  { label: 'Certificate', icon: 'C', color: 'hsl(var(--discipline-microbial-500))' },
+  { label: 'Share', icon: 'S', color: 'hsl(var(--discipline-commercial-500))' },
 ];
 
 const STEP_Y = 65;
@@ -91,7 +93,11 @@ export function StudentJourneyMap({ activeStep = 0 }: { activeStep?: number }) {
         const x = getStepX(i, STEPS.length, 800);
         const isActive = i === activeStep;
         const isCompleted = i < activeStep;
-        const fill = isActive ? step.color : isCompleted ? `${step.color}88` : `${step.color}22`;
+        const fill = isActive
+          ? step.color
+          : isCompleted
+            ? `color-mix(in srgb, ${step.color} 53%, transparent)`
+            : `color-mix(in srgb, ${step.color} 13%, transparent)`;
         const strokeColor = isActive || isCompleted ? step.color : 'rgba(255,255,255,0.15)';
 
         return (
