@@ -143,8 +143,13 @@ jobs:
             echo "::warning::console.log statements found - should be removed"
           fi
 
-          if grep -r "print(" --include="*.py" apps/backend/src | grep -v "# debug"; then
-            echo "::warning::print() statements found - should use logger"
+          # CARSI has no Python backend (apps/backend/ does not exist) so the
+          # print() check from the template is a no-op. Preserve the scaffolding
+          # inside an if-block so nothing greps a non-existent directory.
+          if [ -d apps/backend/src ]; then
+            if grep -r "print(" --include="*.py" apps/backend/src | grep -v "# debug"; then
+              echo "::warning::print() statements found - should use logger"
+            fi
           fi
 
           echo "Debug code check complete"

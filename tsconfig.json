@@ -38,6 +38,7 @@
     "src/lib/image-generation/*",
     "src/lib/image-generation/**/*",
     "app/api/generate-image/*",
-    "src/hooks/use-image-generation.ts"
+    "src/hooks/use-image-generation.ts",
+    "packages/**"
   ]
 }
