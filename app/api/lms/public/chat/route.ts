@@ -4,6 +4,7 @@ import { randomUUID } from 'node:crypto';
 import {
   getAssistantCourseContextText,
   getAssistantDisplayName,
+  getAssistantPageFocusContext,
   getAssistantTagline,
 } from '@/lib/server/ai-assistant-context';
 
@@ -17,6 +18,8 @@ type RequestBody = {
   conversation_id?: string | null;
   /** Prior turns (excluding the current `message`); max ~12 each side enforced server-side */
   history?: ChatTurn[];
+  /** Optional: URL-derived focus so Claire can answer in course/lesson context (validated server-side). */
+  page_context?: { course_slug?: string; lesson_id?: string };
 };
 
 const MAX_MESSAGE_LEN = 2_000;
@@ -78,8 +81,32 @@ export async function POST(request: NextRequest) {
       'Course catalogue could not be loaded. Still help with general IICRC and LMS guidance, and suggest /courses.';
   }
 
+  let pageFocus: string | null = null;
+  const pc = body.page_context;
+  if (pc && typeof pc === 'object') {
+    const slug = typeof pc.course_slug === 'string' ? pc.course_slug : undefined;
+    const lid = typeof pc.lesson_id === 'string' ? pc.lesson_id : undefined;
+    if (slug?.trim() || lid?.trim()) {
+      try {
+        pageFocus = await getAssistantPageFocusContext(slug, lid);
+      } catch (e) {
+        console.error('[lms/public/chat] page focus failed:', e);
+      }
+    }
+  }
+
   const name = getAssistantDisplayName();
   const tagline = getAssistantTagline();
+
+  const focusSection = pageFocus
+    ? `
+--- BEGIN CURRENT PAGE FOCUS (this page only; server-sourced from the database) ---
+${pageFocus}
+--- END CURRENT PAGE FOCUS ---
+
+When CURRENT PAGE FOCUS is present, prioritise it for questions about "this course", "this lesson", or "here". If focus and catalogue disagree on CEC/discipline for the same slug, prefer the catalogue line for that slug and note the learner should confirm on the course page.
+`
+    : '';
 
   const systemContent = `You are ${name}, ${tagline} for CARSI (Centre for Applied Restoration and Specialist Industries / carsi.com.au).
 
@@ -87,8 +114,8 @@ Persona: professional, warm, concise, Australian English. You help visitors and 
 - Questions about published courses (titles, price in AUD, categories, IICRC disciplines, module counts, URLs like /courses/[slug])
 - How enrolment, modules, lessons, progress, and certificates work on the platform
 - High-level IICRC continuing education context (do not invent accreditation claims; defer to course pages)
-
-Ground truth for course facts is ONLY the following catalogue block. If something is not listed, say you do not have that detail and point to the course catalogue at /courses.
+${focusSection}
+Ground truth for catalogue-wide course facts is ONLY the following catalogue block. If something is not listed, say you do not have that detail and point to the course catalogue at /courses.
 
 --- BEGIN CATALOGUE ---
 ${courseContext}
