@@ -12,7 +12,7 @@ import { PushNotificationPrompt } from '@/components/lms/PushNotificationPrompt'
 import { RenewalCockpit } from '@/components/lms/RenewalCockpit';
 import { apiClient } from '@/lib/api/client';
 import Link from 'next/link';
-import { ArrowRight, BookOpen, Sparkles } from 'lucide-react';
+import { ArrowRight, Award, BookOpen, Flame, Sparkles, TrendingUp } from 'lucide-react';
 import type { RenewalCourseSuggestion } from '@/types/renewal';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -188,48 +188,135 @@ export default function StudentDashboardPage() {
 
       <ContinueLearningBanner snapshot={resume} />
 
-      {/* Hero */}
-      <header className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#2490ed]/18 via-white/[0.04] to-transparent px-6 py-8 shadow-[0_24px_80px_-40px_rgba(36,144,237,0.45)] sm:px-10 sm:py-10">
-        <div
-          className="pointer-events-none absolute -top-20 -right-20 h-56 w-56 rounded-full bg-[#2490ed]/25 blur-3xl"
-          aria-hidden
-        />
-        <div className="relative">
-          <p className="text-[11px] font-semibold tracking-[0.2em] text-white/40 uppercase">
-            My learning
-          </p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-balance text-white sm:text-4xl">
-            {displayName}
-          </h1>
-          <p className="mt-2 max-w-xl text-sm leading-relaxed text-white/55">
-            Your progress, credentials, and courses in one calm workspace — minimal, focused, and
-            built for serious training.
-          </p>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <Link
-              href="/dashboard/courses"
-              className="inline-flex items-center rounded-lg border border-white/15 bg-white/5 px-4 py-2 text-sm font-medium text-white/90 transition-colors hover:border-[#2490ed]/40 hover:bg-white/[0.08]"
-            >
-              Browse catalogue
-            </Link>
-            <Link
-              href="/dashboard/student/credentials"
-              className="inline-flex items-center rounded-lg border border-transparent px-4 py-2 text-sm font-medium text-[#7ec5ff] transition-colors hover:text-[#9ed4ff]"
-            >
-              Certificates →
-            </Link>
-            <Link
-              href="/dashboard/student/notes"
-              className="inline-flex items-center rounded-lg border border-transparent px-4 py-2 text-sm font-medium text-white/55 transition-colors hover:text-white/85"
-            >
-              My notes
-            </Link>
-            <Link
-              href="/dashboard/student/leaderboard"
-              className="inline-flex items-center rounded-lg border border-transparent px-4 py-2 text-sm font-medium text-white/55 transition-colors hover:text-white/85"
-            >
-              Monthly recognition
-            </Link>
+      {/* Hero — Udemy/Coursera-style workspace header */}
+      <header className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#060a12] shadow-[0_24px_80px_-40px_rgba(0,0,0,0.9)]">
+        <div className="pointer-events-none absolute inset-0" aria-hidden>
+          <div
+            className="absolute inset-0 opacity-90"
+            style={{
+              background: `
+                radial-gradient(ellipse 55% 45% at 85% 15%, rgba(36, 144, 237, 0.2), transparent 55%),
+                radial-gradient(ellipse 40% 35% at 10% 80%, rgba(0, 212, 170, 0.06), transparent 50%),
+                linear-gradient(180deg, rgba(36, 144, 237, 0.08) 0%, transparent 38%)
+              `,
+            }}
+          />
+          <div
+            className="absolute inset-0 opacity-[0.2]"
+            style={{
+              backgroundImage: `linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)`,
+              backgroundSize: '40px 40px',
+              maskImage: 'radial-gradient(ellipse 75% 70% at 50% 40%, black 20%, transparent 75%)',
+              WebkitMaskImage:
+                'radial-gradient(ellipse 75% 70% at 50% 40%, black 20%, transparent 75%)',
+            }}
+          />
+        </div>
+
+        <div className="relative px-6 py-8 sm:px-10 sm:py-10">
+          <div className="flex flex-col gap-10 lg:flex-row lg:items-stretch lg:justify-between lg:gap-12">
+            <div className="min-w-0 flex-1">
+              <p className="text-[11px] font-semibold tracking-[0.2em] text-[#2490ed]/80 uppercase">
+                My learning
+              </p>
+              <h1 className="mt-3 text-3xl font-bold tracking-tight text-balance text-white sm:text-4xl">
+                Welcome back,{' '}
+                <span className="bg-gradient-to-r from-white via-white to-[#7ec5ff] bg-clip-text text-transparent">
+                  {displayName}
+                </span>
+              </h1>
+              <p className="mt-3 max-w-xl text-sm leading-relaxed text-white/50 sm:text-base">
+                Pick up where you left off, track CECs, and move through courses the same way you
+                would on major learning platforms — built for shift work and on-site schedules.
+              </p>
+
+              <div className="mt-6 flex flex-wrap gap-2.5">
+                <Link
+                  href="/dashboard/courses"
+                  className="inline-flex items-center gap-2 rounded-xl bg-[#2490ed] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_8px_28px_-10px_rgba(36,144,237,0.65)] transition-all hover:bg-[#1f82d4] hover:shadow-[0_12px_32px_-10px_rgba(36,144,237,0.5)]"
+                >
+                  Browse catalogue
+                  <ArrowRight className="h-4 w-4 opacity-90" aria-hidden />
+                </Link>
+                <Link
+                  href="/dashboard/student/credentials"
+                  className="inline-flex items-center rounded-xl border border-white/12 bg-white/[0.04] px-5 py-2.5 text-sm font-medium text-white/85 backdrop-blur-sm transition-colors hover:border-white/20 hover:bg-white/[0.07]"
+                >
+                  Certificates
+                </Link>
+                <Link
+                  href="/dashboard/student/notes"
+                  className="inline-flex items-center rounded-xl border border-transparent px-4 py-2.5 text-sm font-medium text-white/50 transition-colors hover:text-white/85"
+                >
+                  Notes
+                </Link>
+                <Link
+                  href="/dashboard/student/leaderboard"
+                  className="inline-flex items-center rounded-xl border border-transparent px-4 py-2.5 text-sm font-medium text-white/50 transition-colors hover:text-white/85"
+                >
+                  Recognition
+                </Link>
+              </div>
+            </div>
+
+            {/* Stat tiles — Coursera-style progress snapshot */}
+            <div className="grid shrink-0 grid-cols-2 gap-3 sm:max-w-md lg:w-[340px] lg:max-w-none">
+              <div className="rounded-xl border border-white/[0.08] bg-white/[0.04] p-4 backdrop-blur-sm transition-colors hover:border-[#2490ed]/25">
+                <div className="flex items-center gap-2 text-[#2490ed]">
+                  <TrendingUp className="h-4 w-4" aria-hidden />
+                  <span className="text-[10px] font-semibold tracking-wider uppercase">
+                    Level
+                  </span>
+                </div>
+                <p className="mt-2 text-2xl font-bold tabular-nums text-white">
+                  {loading.level ? '—' : (level?.current_level ?? '—')}
+                </p>
+                <p className="mt-0.5 line-clamp-2 text-xs text-white/45">
+                  {loading.level ? 'Loading…' : (level?.level_title ?? 'Your progress')}
+                </p>
+              </div>
+              <div className="rounded-xl border border-white/[0.08] bg-white/[0.04] p-4 backdrop-blur-sm transition-colors hover:border-orange-500/25">
+                <div className="flex items-center gap-2 text-orange-300/90">
+                  <Flame className="h-4 w-4" aria-hidden />
+                  <span className="text-[10px] font-semibold tracking-wider uppercase">
+                    Streak
+                  </span>
+                </div>
+                <p className="mt-2 text-2xl font-bold tabular-nums text-white">
+                  {loading.level ? '—' : (level?.current_streak ?? 0)}
+                </p>
+                <p className="mt-0.5 text-xs text-white/45">Active days</p>
+              </div>
+              <div className="rounded-xl border border-white/[0.08] bg-white/[0.04] p-4 backdrop-blur-sm transition-colors hover:border-emerald-500/25">
+                <div className="flex items-center gap-2 text-emerald-300/90">
+                  <BookOpen className="h-4 w-4" aria-hidden />
+                  <span className="text-[10px] font-semibold tracking-wider uppercase">
+                    Courses
+                  </span>
+                </div>
+                <p className="mt-2 text-2xl font-bold tabular-nums text-white">
+                  {enrollmentsLoading ? '—' : enrollments.length}
+                </p>
+                <p className="mt-0.5 text-xs text-white/45">Enrolled</p>
+              </div>
+              <div className="rounded-xl border border-white/[0.08] bg-white/[0.04] p-4 backdrop-blur-sm transition-colors hover:border-violet-400/25">
+                <div className="flex items-center gap-2 text-violet-300/90">
+                  <Award className="h-4 w-4" aria-hidden />
+                  <span className="text-[10px] font-semibold tracking-wider uppercase">
+                    CECs
+                  </span>
+                </div>
+                <p className="mt-2 text-2xl font-bold tabular-nums text-white">
+                  {loading.level
+                    ? '—'
+                    : level?.total_cec_lifetime != null
+                      ? Number(level.total_cec_lifetime).toFixed(1)
+                      : '—'}
+                </p>
+                <p className="mt-0.5 text-xs text-white/45">Tracked (lifetime)</p>
+              </div>
+            </div>
           </div>
         </div>
       </header>
