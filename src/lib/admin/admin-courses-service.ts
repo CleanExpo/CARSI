@@ -355,10 +355,12 @@ export async function adminCreateCourse(
           description: input.description?.trim() || null,
           shortDescription: null,
           thumbnailUrl: input.thumbnailUrl?.trim() || null,
+          // Prisma JSON columns accept InputJsonValue — map our helper's
+          // null return to an empty object so the type narrows cleanly.
           meta: upsertIntroVideoInMeta(null, {
             introVideoUrl: input.introVideoUrl,
             introThumbnailUrl: input.introThumbnailUrl,
-          }),
+          }) ?? {},
           instructorId: DEFAULT_INSTRUCTOR_ID,
           status: published ? 'published' : 'draft',
           priceAud,
@@ -423,7 +425,7 @@ export async function adminUpdateCourse(
           meta: upsertIntroVideoInMeta(existing.meta, {
             introVideoUrl: input.introVideoUrl,
             introThumbnailUrl: input.introThumbnailUrl,
-          }),
+          }) ?? {},
           status: published ? 'published' : 'draft',
           priceAud,
           isFree: Boolean(input.isFree),

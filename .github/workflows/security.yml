@@ -51,41 +51,9 @@ jobs:
           path: snyk-report.json
           retention-days: 30
 
-  snyk-backend:
-    name: Snyk Backend Security Scan (Optional)
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    if: ${{ vars.SNYK_ENABLED == 'true' }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup uv
-        uses: astral-sh/setup-uv@v4
-        with:
-          version: "latest"
-
-      - name: Set up Python
-        run: uv python install ${{ env.PYTHON_VERSION }}
-
-      - name: Install dependencies
-        working-directory: apps/backend
-        run: uv sync
-
-      - name: Run Snyk to check Python dependencies
-        uses: snyk/actions/python@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          args: --severity-threshold=high --file=apps/backend/pyproject.toml
-
-      - name: Upload Snyk report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: snyk-backend-report
-          path: snyk-report.json
-          retention-days: 30
+  # NOTE: The `snyk-backend` job was removed on 2026-04-17.
+  # It targeted apps/backend/pyproject.toml but CARSI has no Python backend.
+  # Re-introduce alongside any future backend.
 
   dependency-review:
     name: Dependency Review

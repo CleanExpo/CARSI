@@ -21,6 +21,14 @@
     --glass-blur: blur(24px) saturate(180%);
     --glass-blur-sm: blur(12px) saturate(160%);
 
+    /* ── Glass size tokens ───────────────────── */
+    --glass-blur-radius-sm: 8px;
+    --glass-blur-radius-md: 16px;
+    --glass-blur-radius-lg: 28px;
+    --glass-surface-opacity-sm: 0.03;
+    --glass-surface-opacity-md: 0.06;
+    --glass-surface-opacity-lg: 0.09;
+
     /* ── Glow accents ───────────────────────── */
     --glow-blue: 0 0 40px rgba(36 144 237 / 0.25);
     --glow-blue-lg: 0 0 80px rgba(36 144 237 / 0.2);
@@ -114,6 +122,13 @@
     --surface-recessed: 223 47% 6%;
     --surface-overlay: 222 47% 14%;
     --surface-glass: 222 47% 9% / 0.7;
+
+    /* ── Discipline tokens (water/fire/mould/microbial/biohazard) ── */
+    --discipline-water:     211 85% 54%;   /* WRT  — water-blue   */
+    --discipline-fire:       15 90% 58%;   /* FSRT — fire-orange  */
+    --discipline-mould:     245 80% 65%;   /* ASD  — mould-indigo */
+    --discipline-microbial: 142 71% 45%;   /* AMRT — micro-green  */
+    --discipline-biohazard:   0 84% 60%;   /* biohazard-red       */
 
     /* ── Gradients ──────────────────────────── */
     --gradient-brand: linear-gradient(135deg, #2490ed 0%, #38a8ff 100%);
@@ -340,10 +355,24 @@
   }
 
   .glass-sm {
-    background: rgba(255 255 255 / 0.04);
-    backdrop-filter: var(--glass-blur-sm);
-    -webkit-backdrop-filter: var(--glass-blur-sm);
+    background: rgb(255 255 255 / var(--glass-surface-opacity-sm));
+    backdrop-filter: blur(var(--glass-blur-radius-sm)) saturate(140%);
+    -webkit-backdrop-filter: blur(var(--glass-blur-radius-sm)) saturate(140%);
     border: 1px solid rgba(255 255 255 / 0.07);
+  }
+
+  .glass-md {
+    background: rgb(255 255 255 / var(--glass-surface-opacity-md));
+    backdrop-filter: blur(var(--glass-blur-radius-md)) saturate(160%);
+    -webkit-backdrop-filter: blur(var(--glass-blur-radius-md)) saturate(160%);
+    border: 1px solid rgba(255 255 255 / 0.09);
+  }
+
+  .glass-lg {
+    background: rgb(255 255 255 / var(--glass-surface-opacity-lg));
+    backdrop-filter: blur(var(--glass-blur-radius-lg)) saturate(180%);
+    -webkit-backdrop-filter: blur(var(--glass-blur-radius-lg)) saturate(180%);
+    border: 1px solid rgba(255 255 255 / 0.12);
   }
 
   .glass-strong {

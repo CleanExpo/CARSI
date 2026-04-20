@@ -130,6 +130,15 @@ export default {
           recessed: 'hsl(var(--surface-recessed))',
           overlay: 'hsl(var(--surface-overlay))',
         },
+
+        // Discipline tokens
+        discipline: {
+          water:     'hsl(var(--discipline-water))',
+          fire:      'hsl(var(--discipline-fire))',
+          mould:     'hsl(var(--discipline-mould))',
+          microbial: 'hsl(var(--discipline-microbial))',
+          biohazard: 'hsl(var(--discipline-biohazard))',
+        },
       },
 
       /* ----------------------------------------
