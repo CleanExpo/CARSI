@@ -65,6 +65,11 @@ export default function PrivacyPage() {
               <li>Provide and maintain the Service</li>
               <li>Process payments and manage subscriptions</li>
               <li>Track and report IICRC Continuing Education Credits</li>
+              <li>
+                Show optional, aggregated monthly learning recognition on an in-app board (anonymous
+                by default; you may choose an optional public label in your profile — we never
+                display your email or account name there)
+              </li>
               <li>Send important notifications about your account and courses</li>
               <li>Respond to your enquiries and support requests</li>
               <li>Improve our Service based on usage patterns</li>
