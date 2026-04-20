@@ -39,6 +39,10 @@ model LmsUser {
   onboarding            Json?
   /// none | email | sms — preference for unfinished-lesson reminders (delivery not yet wired for sms).
   resumeReminderOptIn   String?   @map("resume_reminder_opt_in")
+  /// When true, `leaderboardDisplayName` may appear on the monthly leaderboard; otherwise an anonymous label is shown.
+  leaderboardShowDisplayName Boolean @default(false) @map("leaderboard_show_display_name")
+  /// Optional public label for the monthly leaderboard only (never auto-filled from legal name).
+  leaderboardDisplayName     String? @map("leaderboard_display_name") @db.VarChar(48)
   createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt         DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
