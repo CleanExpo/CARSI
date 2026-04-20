@@ -371,20 +371,40 @@ export default async function Home() {
       {/* ── IICRC Discipline Map ────────────────────────────────────────── */}
       <AnimatedSection
         label="Certifications"
-        title="IICRC discipline map"
-        className="bg-gradient-to-b from-[#2490ed]/[0.06] to-transparent"
+        title="IICRC discipline map & pathways"
+        className="bg-gradient-to-b from-[#2490ed]/[0.08] via-[#050505] to-transparent"
       >
-        <div className="relative mx-auto max-w-xl">
-          <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-[#2490ed]/15 to-transparent opacity-50 blur-2xl" aria-hidden />
-          <div className="relative rounded-2xl border border-white/10 bg-gradient-to-b from-[#0a1524]/95 to-[#050505]/90 p-6 shadow-[0_24px_80px_-40px_rgba(36,144,237,0.35)] sm:p-8">
-            <div
-              className="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-[#2490ed]/50 to-transparent sm:inset-x-8"
-              aria-hidden
-            />
-            <p className="mb-6 text-center text-sm leading-relaxed text-white/55">
-              Explore the {disciplineCountLabel} IICRC disciplines. Hover over each node to see the
-              full certification name.
+        <div className="grid gap-10 lg:grid-cols-12 lg:gap-14 lg:items-start">
+          <div className="space-y-6 lg:col-span-4">
+            <p className="text-base leading-relaxed text-white/60 md:text-lg">
+              Seven core pathways orbit <AcronymTooltip term="IICRC" /> standards — the same mental
+              model as browsing categories on major learning platforms, built for restoration and
+              cleaning credentials.
             </p>
+            <ul className="space-y-3 text-sm text-white/45">
+              <li className="flex gap-3">
+                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#2490ed]" aria-hidden />
+                <span>
+                  <strong className="text-white/70">Interactive hub</strong> — hover or tap any node
+                  to see the full certification name and jump into filtered courses.
+                </span>
+              </li>
+              <li className="flex gap-3">
+                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#00d4aa]" aria-hidden />
+                <span>
+                  <strong className="text-white/70">{disciplineCountLabel} disciplines</strong> in
+                  this view, aligned with CARSI&apos;s published catalogue.
+                </span>
+              </li>
+            </ul>
+            <Link
+              href="/courses"
+              className="inline-flex items-center gap-2 rounded-full border border-[#2490ed]/40 bg-[#2490ed]/10 px-5 py-2.5 text-sm font-semibold text-[#7ec5ff] transition-all hover:border-[#2490ed]/60 hover:bg-[#2490ed]/18"
+            >
+              Full course catalogue <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+          <div className="lg:col-span-8">
             <IICRCDisciplineMap />
           </div>
         </div>
