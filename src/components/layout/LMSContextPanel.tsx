@@ -4,8 +4,10 @@ import {
   Award,
   BookOpen,
   ChevronDown,
+  FileText,
   GraduationCap,
   LayoutDashboard,
+  ListOrdered,
   LogOut,
   Route,
   User,
@@ -39,6 +41,8 @@ const primaryNav: NavItem[] = [
   { href: '/dashboard/student', label: 'My learning', icon: GraduationCap },
   { href: '/dashboard/student/profile', label: 'Profile', icon: User },
   { href: '/dashboard/student/credentials', label: 'Certificates', icon: Award },
+  { href: '/dashboard/student/leaderboard', label: 'Recognition', icon: ListOrdered },
+  { href: '/dashboard/student/notes', label: 'Notes', icon: FileText },
   { href: '/dashboard/pathways', label: 'Pathways', icon: Route },
 ];
 
