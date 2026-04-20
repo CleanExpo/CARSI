@@ -23,9 +23,17 @@ export function isDashboardNavActive(pathname: string, href: string): boolean {
       p.startsWith('/dashboard/student/credentials') || /^\/dashboard\/credentials\//.test(p)
     );
   }
+  if (h === '/dashboard/student/leaderboard') {
+    return p.startsWith('/dashboard/student/leaderboard');
+  }
+  if (h === '/dashboard/student/notes') {
+    return p.startsWith('/dashboard/student/notes');
+  }
   if (h === '/dashboard/student') {
     if (p.startsWith('/dashboard/student/profile')) return false;
     if (p.startsWith('/dashboard/student/credentials')) return false;
+    if (p.startsWith('/dashboard/student/leaderboard')) return false;
+    if (p.startsWith('/dashboard/student/notes')) return false;
     if (/^\/dashboard\/credentials\//.test(p)) return false;
     if (p.startsWith('/dashboard/student')) return true;
     if (p.startsWith('/dashboard/learn')) return true;
@@ -45,6 +53,8 @@ export function getDashboardSectionLabel(pathname: string): string {
   if (p.startsWith('/dashboard/student/credentials') || p.startsWith('/dashboard/credentials/')) {
     return 'Certificates';
   }
+  if (p.startsWith('/dashboard/student/leaderboard')) return 'Recognition';
+  if (p.startsWith('/dashboard/student/notes')) return 'Notes';
   if (p.startsWith('/dashboard/student/profile')) return 'Profile';
   if (p.startsWith('/dashboard/student')) return 'My learning';
   if (p.startsWith('/dashboard/pathways')) return 'Pathways';
