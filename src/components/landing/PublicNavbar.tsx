@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import { AuthNavLinks } from '@/components/landing/AuthNavLinks';
+import { PUBLIC_SHELL_INNER_CLASS } from '@/components/landing/public-shell-width';
 
 import MobileNav from './MobileNav';
 
@@ -20,7 +21,7 @@ export function PublicNavbar() {
         borderBottom: '1px solid rgba(255,255,255,0.06)',
       }}
     >
-      <div className="mx-auto w-[94%] xl:w-[85%] 2xl:max-w-[1800px]">
+      <div className={PUBLIC_SHELL_INNER_CLASS}>
         <div className="flex h-20 items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
             <Image
