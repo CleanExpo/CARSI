@@ -30,14 +30,16 @@ const tagColors: Record<string, { bg: string; text: string; border: string }> = 
     border: 'rgba(237,157,36,0.3)',
   },
   'commercial-cleaning': {
-    bg: 'rgba(38,196,160,0.12)',
-    text: '#26c4a0',
-    border: 'rgba(38,196,160,0.3)',
+    // GP-364: carpet discipline token in place of raw hex.
+    bg: 'color-mix(in srgb, hsl(var(--discipline-carpet-500)) 12%, transparent)',
+    text: 'hsl(var(--discipline-carpet-500))',
+    border: 'color-mix(in srgb, hsl(var(--discipline-carpet-500)) 30%, transparent)',
   },
   'aged-care': {
-    bg: 'rgba(155,89,182,0.12)',
-    text: '#9b59b6',
-    border: 'rgba(155,89,182,0.3)',
+    // GP-364: odour discipline token in place of raw hex.
+    bg: 'color-mix(in srgb, hsl(var(--discipline-odour-500)) 12%, transparent)',
+    text: 'hsl(var(--discipline-odour-500))',
+    border: 'color-mix(in srgb, hsl(var(--discipline-odour-500)) 30%, transparent)',
   },
 };
 
@@ -157,9 +159,12 @@ export function BundlePricingCard({ bundle }: BundleProps) {
             <span
               className="rounded-md px-2 py-0.5 text-xs font-semibold"
               style={{
-                color: '#27ae60',
-                background: 'rgba(39,174,96,0.12)',
-                border: '1px solid rgba(39,174,96,0.3)',
+                // GP-364: success accent via microbial discipline token.
+                color: 'hsl(var(--discipline-microbial-500))',
+                background:
+                  'color-mix(in srgb, hsl(var(--discipline-microbial-500)) 12%, transparent)',
+                border:
+                  '1px solid color-mix(in srgb, hsl(var(--discipline-microbial-500)) 30%, transparent)',
               }}
             >
               Save ${savings.toFixed(0)}

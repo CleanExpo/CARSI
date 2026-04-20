@@ -67,10 +67,16 @@ export function CourseCard({ course, priorityImage }: CourseCardProps) {
 
   return (
     <motion.div
-      className="glass-card card-3d group flex flex-col overflow-hidden rounded-xl"
+      className="glass-card card-3d group relative flex flex-col overflow-hidden rounded-xl"
       whileHover={{ scale: 1.02, y: -4 }}
       transition={{ duration: 0.25, ease: smoothEase }}
     >
+      {/* GP-364: discipline accent stripe on card top (2px, no layout shift) */}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 z-10 h-[2px]"
+        style={{ background: accentColor }}
+      />
       {/* Textual thumbnail always; optional photo behind */}
       <div className="relative aspect-video w-full shrink-0 overflow-hidden">
         <CourseTextThumbnail
@@ -117,23 +123,23 @@ export function CourseCard({ course, priorityImage }: CourseCardProps) {
           style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}
         >
           <div
-            className="flex items-center gap-2 text-xs"
+            className="flex items-center gap-2 text-xs tabular-nums"
             style={{ color: 'rgba(255,255,255,0.6)' }}
           >
             {course.module_count != null && (
-              <span className="flex items-center gap-1" title="Modules">
+              <span className="flex items-center gap-1 tabular-nums" title="Modules">
                 <Layers className="h-3 w-3" />
                 {course.module_count}
               </span>
             )}
             {course.lesson_count != null && (
-              <span className="flex items-center gap-1">
+              <span className="flex items-center gap-1 tabular-nums">
                 <BookOpen className="h-3 w-3" />
                 {course.lesson_count}
               </span>
             )}
             {course.updated_at && (
-              <span className="flex items-center gap-1">
+              <span className="flex items-center gap-1 tabular-nums">
                 <Clock className="h-3 w-3" />
                 {formatRelativeDate(course.updated_at)}
               </span>

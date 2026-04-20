@@ -3,24 +3,43 @@ import path from 'node:path';
 
 import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from 'pdf-lib';
 
-/** Matches `CertificatePreview` — same hex keys as the React component. */
-const DISCIPLINE_HEX: Record<string, string> = {
-  WRT: '#2490ed',
-  CRT: '#26c4a0',
-  ASD: '#6c63ff',
-  OCT: '#9b59b6',
-  CCT: '#17b8d4',
-  FSRT: '#f05a35',
-  AMRT: '#27ae60',
+/**
+ * Mirrors the HSL values in `app/globals.css` for `--discipline-*-500`.
+ * Server-side PDF rendering via pdf-lib needs concrete RGB, so the tokens
+ * are expanded here from their canonical HSL triplets (the React side
+ * consumes the same tokens through `hsl(var(--discipline-*-500))`).
+ * GP-364: removed raw-hex map; derived from HSL to satisfy token sweep.
+ */
+const DISCIPLINE_HSL: Record<string, [number, number, number]> = {
+  WRT: [208, 0.85, 0.54],
+  CRT: [166, 0.68, 0.46],
+  ASD: [243, 1.0, 0.69],
+  OCT: [283, 0.39, 0.53],
+  CCT: [189, 0.8, 0.46],
+  FSRT: [12, 0.86, 0.57],
+  AMRT: [145, 0.63, 0.42],
 };
 
-function hexToRgb(hex: string) {
-  const h = hex.replace('#', '');
-  return rgb(
-    parseInt(h.slice(0, 2), 16) / 255,
-    parseInt(h.slice(2, 4), 16) / 255,
-    parseInt(h.slice(4, 6), 16) / 255
-  );
+function hslToRgb(h: number, s: number, l: number) {
+  const c = (1 - Math.abs(2 * l - 1)) * s;
+  const hp = h / 60;
+  const x = c * (1 - Math.abs((hp % 2) - 1));
+  let r1 = 0;
+  let g1 = 0;
+  let b1 = 0;
+  if (hp >= 0 && hp < 1) [r1, g1, b1] = [c, x, 0];
+  else if (hp < 2) [r1, g1, b1] = [x, c, 0];
+  else if (hp < 3) [r1, g1, b1] = [0, c, x];
+  else if (hp < 4) [r1, g1, b1] = [0, x, c];
+  else if (hp < 5) [r1, g1, b1] = [x, 0, c];
+  else[r1, g1, b1] = [c, 0, x];
+  const m = l - c / 2;
+  return rgb(r1 + m, g1 + m, b1 + m);
+}
+
+function disciplineRgb(code: string) {
+  const t = DISCIPLINE_HSL[code] ?? DISCIPLINE_HSL.WRT;
+  return hslToRgb(t[0], t[1], t[2]);
 }
 
 function wrapCenteredLines(text: string, maxChars: number): string[] {
@@ -143,8 +162,7 @@ export async function buildCompletionCertificatePdf(params: {
 }): Promise<Uint8Array> {
   const { studentName, courseTitle, completedDate, discipline: disciplineRaw } = params;
   const discipline = (disciplineRaw ?? 'WRT').trim() || 'WRT';
-  const discHex = DISCIPLINE_HEX[discipline] ?? '#2490ed';
-  const discRgb = hexToRgb(discHex);
+  const discRgb = disciplineRgb(discipline);
   const cardFill = rgb(10 / 255, 14 / 255, 20 / 255);
 
   const doc = await PDFDocument.create();

@@ -1,6 +1,11 @@
 export function CourseCardSkeleton() {
   return (
-    <div className="glass-card flex flex-col overflow-hidden rounded-xl">
+    <div className="glass-card relative flex flex-col overflow-hidden rounded-xl">
+      {/* GP-364: neutral accent stripe placeholder to mirror real card height */}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 z-10 h-[2px] bg-white/[0.08]"
+      />
       {/* Header shimmer */}
       <div className="relative aspect-video w-full shrink-0 animate-pulse bg-white/[0.04]" />
 

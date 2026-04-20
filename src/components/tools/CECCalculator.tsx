@@ -297,10 +297,10 @@ export function CECCalculator() {
                 style={{ background: 'rgba(39,174,96,0.15)' }}
                 aria-hidden="true"
               >
-                <Award className="h-5 w-5" style={{ color: '#27ae60' }} />
+                <Award className="h-5 w-5" style={{ color: 'hsl(var(--discipline-microbial-500))' }} />
               </div>
               <div>
-                <p className="text-sm font-semibold" style={{ color: '#27ae60' }}>
+                <p className="text-sm font-semibold" style={{ color: 'hsl(var(--discipline-microbial-500))' }}>
                   Cycle Complete
                 </p>
                 <p className="mt-0.5 text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
