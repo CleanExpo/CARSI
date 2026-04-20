@@ -7,6 +7,7 @@ import {
 } from '@/components/landing/AnimatedHero';
 import { PublicFooter } from '@/components/landing/PublicFooter';
 import { PublicNavbar } from '@/components/landing/PublicNavbar';
+import { PUBLIC_SHELL_INNER_CLASS } from '@/components/landing/public-shell-width';
 import { CourseBrowseProvider } from '@/components/lms/CourseBrowseContext';
 import { CourseCard } from '@/components/lms/CourseCard';
 import FloatingChatGate from '@/components/lms/FloatingChatGate';
@@ -26,15 +27,27 @@ import type { CourseListItem } from '@/lib/wordpress-export-courses';
 import {
   ArrowRight,
   Award,
+  Baby,
+  BadgeCheck,
   BookOpen,
+  Building2,
+  ChevronDown,
   Clock,
   DollarSign,
   ExternalLink,
+  Globe,
+  GraduationCap,
+  HardHat,
+  Heart,
+  Landmark,
   Laptop,
+  Layers,
   MapPin,
+  ShoppingBag,
   Sparkles,
   Users,
 } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 
 /** Always render homepage on the server so featured courses load from `DATABASE_URL` at request time (not a static build snapshot). */
@@ -106,6 +119,21 @@ const geoDisciplineCodes = [
   { code: 'CCT', label: 'Carpet Cleaning' },
   { code: 'FSRT', label: 'Fire & Smoke Restoration' },
 ] as const;
+
+const industryIconBySlug: Record<string, LucideIcon> = {
+  healthcare: Heart,
+  hospitality: Building2,
+  'government-defence': Landmark,
+  'commercial-cleaning': Sparkles,
+  'aged-care': Heart,
+  mining: HardHat,
+  education: GraduationCap,
+  'property-management': Building2,
+  strata: Layers,
+  retail: ShoppingBag,
+  childcare: Baby,
+  construction: HardHat,
+};
 
 const onlineHighlights = [
   {
@@ -272,42 +300,68 @@ export default async function Home() {
       {/* ── Stats (Animated) ───────────────────────────────────────────────── */}
       <AnimatedStats stats={stats} />
 
-      <div className="border-t border-white/[0.06] px-6 py-4">
-        <div className="mx-auto max-w-6xl text-center">
+      <div
+        className="border-t border-white/[0.08] bg-gradient-to-r from-[#2490ed]/12 via-[#0a1624]/80 to-[#ed9d24]/10 py-5"
+        style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}
+      >
+        <div className={PUBLIC_SHELL_INNER_CLASS}>
           <Link
             href="/ccw-training"
-            className="text-xs text-white/35 transition-colors hover:text-[#2490ed] sm:text-sm"
+            className="group flex flex-col items-center gap-3 sm:flex-row sm:justify-center md:justify-start"
           >
-            2-Day Carpet Cleaning Workshop (CCW) — participant resources
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-white/15 bg-white/10 shadow-[0_8px_32px_-12px_rgba(36,144,237,0.4)] transition-transform group-hover:scale-105">
+              <Award className="h-5 w-5 text-[#7ec5ff]" aria-hidden />
+            </span>
+            <div className="text-center sm:text-left">
+              <p className="text-[10px] font-semibold tracking-[0.18em] text-[#2490ed]/90 uppercase">
+                In-person workshop
+              </p>
+              <p className="text-sm font-medium text-white/90 transition-colors group-hover:text-white">
+                2-Day Carpet Cleaning Workshop (CCW) — participant resources
+              </p>
+              <p className="mt-0.5 text-xs text-white/40">Tap to view schedules &amp; materials</p>
+            </div>
+            <ArrowRight className="ml-auto hidden h-5 w-5 shrink-0 text-[#2490ed] opacity-60 transition-transform group-hover:translate-x-1 md:block" />
           </Link>
         </div>
       </div>
 
       {/* ── Disciplines (compact pills) ────────────────────────────────────── */}
-      <section className="px-6 py-12" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-        <div className="mx-auto max-w-6xl">
-          <p
-            className="mb-4 text-center text-xs tracking-wide uppercase"
-            style={{ color: 'rgba(255,255,255,0.3)' }}
-          >
-            <AcronymTooltip term="IICRC" /> Disciplines
-          </p>
-          <div className="flex flex-wrap justify-center gap-2">
+      <section
+        className="relative py-14 md:py-16"
+        style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}
+      >
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.15]"
+          aria-hidden
+          style={{
+            backgroundImage: `linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)`,
+            backgroundSize: '56px 56px',
+          }}
+        />
+        <div className={`relative ${PUBLIC_SHELL_INNER_CLASS}`}>
+          <div className="mb-8 text-center">
+            <p className="mb-2 inline-flex items-center rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[11px] font-semibold tracking-[0.14em] text-white/50 uppercase">
+              Explore by discipline
+            </p>
+            <h2 className="text-xl font-bold text-white md:text-2xl">
+              <AcronymTooltip term="IICRC" /> pathways
+            </h2>
+            <p className="mx-auto mt-2 max-w-lg text-sm text-white/45">
+              Jump straight into the credential track you need — same discovery pattern as global
+              learning platforms.
+            </p>
+          </div>
+          <div className="flex flex-wrap justify-center gap-2.5 md:gap-3">
             {disciplinePills.map((d) => (
               <Link
                 key={d.code}
                 href={`/courses?discipline=${d.code}`}
-                className="rounded-sm px-3 py-1.5 text-xs transition-all duration-200 hover:-translate-y-0.5 hover:text-white"
-                style={{
-                  background: 'rgba(255,255,255,0.04)',
-                  border: '1px solid rgba(255,255,255,0.08)',
-                  color: 'rgba(255,255,255,0.6)',
-                }}
+                className="group rounded-full border border-white/10 bg-gradient-to-b from-white/[0.08] to-white/[0.02] px-4 py-2 text-xs shadow-[0_8px_32px_-20px_rgba(0,0,0,0.9)] transition-all duration-200 hover:-translate-y-0.5 hover:border-[#2490ed]/40 hover:shadow-[0_12px_40px_-16px_rgba(36,144,237,0.35)]"
               >
-                <span className="font-mono font-bold" style={{ color: '#2490ed' }}>
-                  {d.code}
-                </span>
-                <span className="ml-1.5 hidden sm:inline">{d.label}</span>
+                <span className="font-mono font-bold text-[#2490ed]">{d.code}</span>
+                <span className="ml-2 hidden text-white/65 sm:inline">{d.label}</span>
               </Link>
             ))}
           </div>
@@ -315,32 +369,43 @@ export default async function Home() {
       </section>
 
       {/* ── IICRC Discipline Map ────────────────────────────────────────── */}
-      <AnimatedSection label="Certifications" title="IICRC Discipline Map">
-        <div className="mx-auto max-w-xl">
-          <p className="mb-6 text-center text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
-            Explore the {disciplineCountLabel} IICRC disciplines. Hover over each node to see the
-            full certification name.
-          </p>
-          <IICRCDisciplineMap />
+      <AnimatedSection
+        label="Certifications"
+        title="IICRC discipline map"
+        className="bg-gradient-to-b from-[#2490ed]/[0.06] to-transparent"
+      >
+        <div className="relative mx-auto max-w-xl">
+          <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-[#2490ed]/15 to-transparent opacity-50 blur-2xl" aria-hidden />
+          <div className="relative rounded-2xl border border-white/10 bg-gradient-to-b from-[#0a1524]/95 to-[#050505]/90 p-6 shadow-[0_24px_80px_-40px_rgba(36,144,237,0.35)] sm:p-8">
+            <div
+              className="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-[#2490ed]/50 to-transparent sm:inset-x-8"
+              aria-hidden
+            />
+            <p className="mb-6 text-center text-sm leading-relaxed text-white/55">
+              Explore the {disciplineCountLabel} IICRC disciplines. Hover over each node to see the
+              full certification name.
+            </p>
+            <IICRCDisciplineMap />
+          </div>
         </div>
       </AnimatedSection>
 
       {/* ── Featured Courses (Animated) ────────────────────────────────────── */}
       <AnimatedSection
         label="Featured"
-        title="Popular Courses"
+        title="Popular courses learners start with"
+        className="bg-white/[0.015]"
         rightContent={
           <Link
             href="/courses"
-            className="flex items-center gap-1 text-sm transition-colors duration-150 hover:text-white"
-            style={{ color: '#2490ed' }}
+            className="inline-flex items-center gap-2 rounded-full border border-[#2490ed]/35 bg-[#2490ed]/10 px-5 py-2.5 text-sm font-semibold text-[#7ec5ff] transition-all hover:border-[#2490ed]/50 hover:bg-[#2490ed]/18"
           >
-            All courses <ArrowRight className="h-4 w-4" />
+            View all courses <ArrowRight className="h-4 w-4" />
           </Link>
         }
       >
         <CourseBrowseProvider courseLinkBase="/courses">
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
             {featuredCourses.length > 0
               ? featuredCourses.map((course, i) => (
                   <AnimatedCard key={course.id} index={i}>
@@ -357,90 +422,101 @@ export default async function Home() {
       </AnimatedSection>
 
       {/* ── Industries ─────────────────────────────────────────────────────── */}
-      <AnimatedSection label="Multi-Industry Training" title="Built for every sector">
-        <p className="mb-6 max-w-2xl text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
+      <AnimatedSection
+        label="Multi-industry training"
+        title="Built for every sector you serve"
+        className="bg-gradient-to-b from-transparent via-white/[0.02] to-transparent"
+      >
+        <p className="mb-8 max-w-2xl text-sm leading-relaxed text-white/50 md:text-base">
           From hospitals to hotels, government facilities to commercial buildings — CARSI provides
           industry-specific training pathways. Not just restoration. Every industry that needs{' '}
           <AcronymTooltip term="IICRC" /> credentials.
         </p>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {industries.map((industry, i) => (
-            <AnimatedCard key={industry.slug} index={i}>
-              <Link
-                href={`/industries/${industry.slug}`}
-                className="group flex items-center justify-between rounded-sm px-4 py-3 transition-all duration-200 hover:-translate-y-0.5"
-                style={{
-                  background: industry.highlight
-                    ? 'rgba(36,144,237,0.08)'
-                    : 'rgba(255,255,255,0.03)',
-                  border: industry.highlight
-                    ? '1px solid rgba(36,144,237,0.2)'
-                    : '1px solid rgba(255,255,255,0.06)',
-                }}
-              >
-                <span
-                  className="text-sm font-medium transition-colors duration-150 group-hover:text-white"
-                  style={{ color: industry.highlight ? '#2490ed' : 'rgba(255,255,255,0.7)' }}
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {industries.map((industry, i) => {
+            const Icon = industryIconBySlug[industry.slug] ?? Building2;
+            return (
+              <AnimatedCard key={industry.slug} index={i}>
+                <Link
+                  href={`/industries/${industry.slug}`}
+                  className={`group flex items-center gap-3 rounded-2xl border p-4 transition-all duration-300 hover:-translate-y-1 ${
+                    industry.highlight
+                      ? 'border-[#2490ed]/35 bg-gradient-to-br from-[#2490ed]/15 to-[#0a1524]/90 shadow-[0_16px_48px_-28px_rgba(36,144,237,0.35)] hover:border-[#2490ed]/50'
+                      : 'border-white/10 bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.05]'
+                  }`}
                 >
-                  {industry.label}
-                </span>
-                <ArrowRight
-                  className="h-3 w-3 opacity-0 transition-all duration-200 group-hover:translate-x-0.5 group-hover:opacity-100"
-                  style={{ color: '#2490ed' }}
-                />
-              </Link>
-            </AnimatedCard>
-          ))}
+                  <span
+                    className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border ${
+                      industry.highlight
+                        ? 'border-[#2490ed]/30 bg-[#2490ed]/15 text-[#7ec5ff]'
+                        : 'border-white/10 bg-white/[0.05] text-white/55 group-hover:text-[#7ec5ff]'
+                    }`}
+                  >
+                    <Icon className="h-5 w-5" aria-hidden />
+                  </span>
+                  <span className="min-w-0 flex-1 text-sm font-semibold text-white/85 transition-colors group-hover:text-white">
+                    {industry.label}
+                  </span>
+                  <ArrowRight className="h-4 w-4 shrink-0 text-[#2490ed] opacity-0 transition-all group-hover:translate-x-0.5 group-hover:opacity-100" />
+                </Link>
+              </AnimatedCard>
+            );
+          })}
         </div>
-        <div className="mt-6 text-center">
+        <div className="mt-10 text-center">
           <Link
             href="/industries"
-            className="text-sm font-medium transition-colors hover:text-white"
-            style={{ color: 'rgba(255,255,255,0.5)' }}
+            className="inline-flex items-center gap-2 text-sm font-semibold text-[#7ec5ff] transition-colors hover:text-white"
           >
-            View all industries →
+            View all industries <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
       </AnimatedSection>
 
       {/* ── Why Online ─────────────────────────────────────────────────────── */}
-      <AnimatedSection label="The Online Advantage" title="Why professionals choose CARSI">
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {[
-            {
-              title: '24/7 Access',
-              desc: 'Learn at 2am or 2pm. Our platform never closes. Complete courses around your work schedule.',
-              color: '#2490ed',
-            },
-            {
-              title: 'No Travel Required',
-              desc: 'No flights, no hotels, no time away from work. Train your entire team without leaving the office.',
-              color: '#00FF88',
-            },
-            {
-              title: 'Instant Credentials',
-              desc: 'Complete a course, get your certificate. Verifiable digital credentials you can share immediately.',
-              color: '#ed9d24',
-            },
-          ].map((item, i) => (
+      <AnimatedSection
+        label="The online advantage"
+        title="Why crews choose flexible learning"
+        className="bg-white/[0.015]"
+      >
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
+          {(
+            [
+              {
+                title: '24/7 access',
+                desc: 'Learn at 2am or 2pm. Our platform never closes. Complete courses around your work schedule.',
+                color: '#2490ed',
+                Icon: Clock,
+              },
+              {
+                title: 'No travel required',
+                desc: 'No flights, no hotels, no time away from work. Train your entire team without leaving the office.',
+                color: '#00d4aa',
+                Icon: Globe,
+              },
+              {
+                title: 'Instant credentials',
+                desc: 'Complete a course, get your certificate. Verifiable digital credentials you can share immediately.',
+                color: '#ed9d24',
+                Icon: BadgeCheck,
+              },
+            ] as const
+          ).map((item, i) => (
             <AnimatedCard key={item.title} index={i}>
-              <div
-                className="rounded-sm p-6"
-                style={{
-                  background: 'rgba(255,255,255,0.03)',
-                  border: '1px solid rgba(255,255,255,0.06)',
-                }}
-              >
-                <div className="mb-3 h-1 w-8 rounded-full" style={{ background: item.color }} />
-                <h3
-                  className="mb-2 text-base font-semibold"
-                  style={{ color: 'rgba(255,255,255,0.9)' }}
+              <div className="group relative h-full overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.06] to-transparent p-6 shadow-[0_20px_60px_-40px_rgba(0,0,0,0.85)] transition-all duration-300 hover:border-white/18">
+                <div
+                  className="pointer-events-none absolute -right-8 -top-8 h-28 w-28 rounded-full opacity-30 blur-2xl transition-opacity group-hover:opacity-50"
+                  style={{ background: item.color }}
+                  aria-hidden
+                />
+                <div
+                  className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border-2 bg-[#050505]/60"
+                  style={{ borderColor: `${item.color}55` }}
                 >
-                  {item.title}
-                </h3>
-                <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                  {item.desc}
-                </p>
+                  <item.Icon className="h-7 w-7" style={{ color: item.color }} aria-hidden />
+                </div>
+                <h3 className="mb-2 text-lg font-bold text-white">{item.title}</h3>
+                <p className="text-sm leading-relaxed text-white/50">{item.desc}</p>
               </div>
             </AnimatedCard>
           ))}
@@ -448,35 +524,50 @@ export default async function Home() {
       </AnimatedSection>
 
       {/* ── How It Works (Student Journey Map) ──────────────────────────── */}
-      <AnimatedSection label="How It Works" title="Your Learning Journey">
-        <div className="mx-auto max-w-3xl">
-          <p className="mb-6 text-center text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
-            From enrolment to credential — six steps to IICRC-recognised professional development.
-          </p>
-          <StudentJourneyMap />
+      <AnimatedSection
+        label="How it works"
+        title="Your learning journey, step by step"
+        className="bg-gradient-to-b from-[#2490ed]/[0.05] to-transparent"
+      >
+        <div className="relative mx-auto max-w-3xl">
+          <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-[#2490ed]/20 to-transparent opacity-40 blur-3xl" aria-hidden />
+          <div className="relative rounded-2xl border border-white/10 bg-gradient-to-b from-[#0a1524]/95 to-[#050505] p-6 shadow-[0_28px_90px_-48px_rgba(36,144,237,0.45)] sm:p-10">
+            <div
+              className="absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-[#2490ed]/60 to-transparent"
+              aria-hidden
+            />
+            <p className="mb-8 text-center text-sm leading-relaxed text-white/55">
+              From enrolment to credential — six steps to IICRC-recognised professional development.
+            </p>
+            <StudentJourneyMap />
+          </div>
         </div>
       </AnimatedSection>
 
       {/* ── Citable passages (GEO) — editorial cards, scannable stats & sources ─ */}
-      <AnimatedSection label="Expert content" title="Standards, training & industry alignment">
-        <div className="mx-auto max-w-5xl space-y-8">
+      <AnimatedSection
+        label="Expert content"
+        title="Standards, training & industry alignment"
+        className="bg-white/[0.02]"
+      >
+        <div className="w-full space-y-10">
           {/* IICRC */}
           <article
-            className="overflow-hidden rounded-sm"
+            className="overflow-hidden rounded-2xl shadow-[0_24px_80px_-48px_rgba(36,144,237,0.35)]"
             style={{
               background:
-                'linear-gradient(165deg, rgba(36,144,237,0.06) 0%, rgba(255,255,255,0.02) 45%)',
-              border: '1px solid rgba(255,255,255,0.08)',
+                'linear-gradient(165deg, rgba(36,144,237,0.12) 0%, rgba(255,255,255,0.03) 50%, rgba(5,5,5,0.4) 100%)',
+              border: '1px solid rgba(255,255,255,0.12)',
             }}
           >
             <div className="grid gap-8 p-6 sm:p-8 lg:grid-cols-[minmax(0,220px)_1fr] lg:gap-12">
               <div className="space-y-4">
                 <div
-                  className="inline-flex items-center gap-2 rounded-sm px-2.5 py-1 text-[10px] font-semibold tracking-wide uppercase"
+                  className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[10px] font-semibold tracking-wide uppercase"
                   style={{
-                    background: 'rgba(36,144,237,0.12)',
-                    border: '1px solid rgba(36,144,237,0.25)',
-                    color: '#2490ed',
+                    background: 'rgba(36,144,237,0.18)',
+                    border: '1px solid rgba(36,144,237,0.35)',
+                    color: '#7ec5ff',
                   }}
                 >
                   <BookOpen className="h-3.5 w-3.5" aria-hidden />
@@ -496,10 +587,10 @@ export default async function Home() {
                   ].map((s) => (
                     <div
                       key={s.k}
-                      className="rounded-sm px-2 py-2.5 text-center"
+                      className="rounded-xl px-2 py-3 text-center transition-transform hover:scale-[1.02]"
                       style={{
-                        background: 'rgba(0,0,0,0.25)',
-                        border: '1px solid rgba(255,255,255,0.06)',
+                        background: 'rgba(0,0,0,0.35)',
+                        border: '1px solid rgba(36,144,237,0.15)',
                       }}
                     >
                       <p
@@ -593,10 +684,11 @@ export default async function Home() {
 
           {/* Online learning */}
           <article
-            className="rounded-sm p-6 sm:p-8"
+            className="rounded-2xl p-6 shadow-[0_20px_70px_-50px_rgba(237,157,36,0.25)] sm:p-8"
             style={{
-              background: 'rgba(255,255,255,0.02)',
-              border: '1px solid rgba(255,255,255,0.06)',
+              background:
+                'linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(10,15,24,0.95) 60%)',
+              border: '1px solid rgba(255,255,255,0.1)',
             }}
           >
             <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
@@ -616,11 +708,11 @@ export default async function Home() {
                 </h3>
               </div>
               <div
-                className="flex shrink-0 items-center gap-2 rounded-sm px-3 py-2 text-xs"
+                className="flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-xs shadow-[0_8px_24px_-12px_rgba(237,157,36,0.35)]"
                 style={{
-                  background: 'rgba(237,157,36,0.08)',
-                  border: '1px solid rgba(237,157,36,0.2)',
-                  color: 'rgba(255,255,255,0.75)',
+                  background: 'rgba(237,157,36,0.14)',
+                  border: '1px solid rgba(237,157,36,0.35)',
+                  color: 'rgba(255,255,255,0.85)',
                 }}
               >
                 <DollarSign className="h-4 w-4 shrink-0" style={{ color: '#ed9d24' }} aria-hidden />
@@ -634,14 +726,13 @@ export default async function Home() {
               {onlineHighlights.map(({ icon: Icon, title, text }) => (
                 <div
                   key={title}
-                  className="flex gap-3 rounded-sm p-3 transition-colors duration-200 hover:bg-white/3"
-                  style={{ border: '1px solid rgba(255,255,255,0.05)' }}
+                  className="flex gap-3 rounded-xl border border-white/8 bg-white/[0.03] p-3 transition-all duration-200 hover:border-[#2490ed]/25 hover:bg-[#2490ed]/[0.06]"
                 >
                   <div
-                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-sm"
+                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
                     style={{
-                      background: 'rgba(36,144,237,0.1)',
-                      border: '1px solid rgba(36,144,237,0.2)',
+                      background: 'rgba(36,144,237,0.15)',
+                      border: '1px solid rgba(36,144,237,0.3)',
                     }}
                   >
                     <Icon className="h-4 w-4" style={{ color: '#2490ed' }} aria-hidden />
@@ -688,11 +779,11 @@ export default async function Home() {
 
           {/* NRPG */}
           <article
-            className="relative overflow-hidden rounded-sm p-6 sm:p-8"
+            className="relative overflow-hidden rounded-2xl p-6 shadow-[0_28px_90px_-50px_rgba(36,144,237,0.4)] sm:p-8"
             style={{
               background:
-                'linear-gradient(125deg, rgba(36,144,237,0.1) 0%, rgba(5,5,5,0.9) 55%, rgba(237,157,36,0.06) 100%)',
-              border: '1px solid rgba(255,255,255,0.1)',
+                'linear-gradient(125deg, rgba(36,144,237,0.18) 0%, rgba(5,5,5,0.92) 45%, rgba(237,157,36,0.1) 100%)',
+              border: '1px solid rgba(255,255,255,0.14)',
             }}
           >
             <div
@@ -703,10 +794,10 @@ export default async function Home() {
             <div className="relative flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-10">
               <div className="flex shrink-0 items-start gap-4">
                 <div
-                  className="flex h-14 w-14 items-center justify-center rounded-sm text-lg font-bold"
+                  className="flex h-14 w-14 items-center justify-center rounded-2xl text-lg font-bold shadow-[0_12px_40px_-16px_rgba(36,144,237,0.5)]"
                   style={{
-                    background: 'rgba(255,255,255,0.06)',
-                    border: '1px solid rgba(255,255,255,0.12)',
+                    background: 'linear-gradient(135deg, rgba(36,144,237,0.25), rgba(255,255,255,0.06))',
+                    border: '1px solid rgba(255,255,255,0.2)',
                     color: '#2490ed',
                   }}
                 >
@@ -795,49 +886,62 @@ export default async function Home() {
       </AnimatedSection>
 
       {/* ── NRPG Partnership ─────────────────────────────────────────────────── */}
-      <section className="px-6 py-16" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-        <div className="mx-auto max-w-6xl">
+      <section
+        className="relative py-16 md:py-20"
+        style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}
+      >
+        <div
+          className="pointer-events-none absolute inset-0 opacity-30"
+          aria-hidden
+          style={{
+            background:
+              'radial-gradient(ellipse 60% 50% at 80% 50%, rgba(36,144,237,0.15), transparent 55%)',
+          }}
+        />
+        <div className={`relative ${PUBLIC_SHELL_INNER_CLASS}`}>
           <div
-            className="rounded-sm p-8 sm:p-10"
+            className="relative overflow-hidden rounded-3xl p-8 sm:p-10 md:p-12"
             style={{
               background:
-                'linear-gradient(135deg, rgba(36,144,237,0.08) 0%, rgba(237,157,36,0.08) 100%)',
-              border: '1px solid rgba(255,255,255,0.08)',
+                'linear-gradient(135deg, rgba(36,144,237,0.14) 0%, rgba(10,18,32,0.98) 42%, rgba(237,157,36,0.1) 100%)',
+              border: '1px solid rgba(255,255,255,0.12)',
+              boxShadow: '0 32px 100px -48px rgba(36,144,237,0.45)',
             }}
           >
-            <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <p
-                  className="mb-2 text-xs tracking-wide uppercase"
-                  style={{ color: 'rgba(255,255,255,0.4)' }}
-                >
-                  National Partnership
+            <div
+              className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full blur-3xl"
+              style={{ background: 'rgba(36,144,237,0.2)' }}
+              aria-hidden
+            />
+            <div className="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
+              <div className="max-w-xl">
+                <p className="mb-2 inline-flex items-center rounded-full border border-white/15 bg-white/5 px-3 py-1 text-[10px] font-semibold tracking-[0.15em] text-[#7ec5ff] uppercase">
+                  National partnership
                 </p>
-                <h3 className="mb-2 text-xl font-bold" style={{ color: 'rgba(255,255,255,0.95)' }}>
-                  NRPG Onboarding Partner
+                <h3 className="mb-3 text-2xl font-bold tracking-tight text-white md:text-3xl">
+                  NRPG onboarding partner
                 </h3>
-                <p className="max-w-md text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                <p className="text-sm leading-relaxed text-white/55 md:text-base">
                   CARSI is one of the four core pillars of the National Restoration Professionals
                   Group onboarding pathway. Industry-recognised training that meets NRPG standards.
                 </p>
               </div>
-              <div className="flex items-center gap-4">
+              <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-center">
                 <div
-                  className="flex h-14 w-14 items-center justify-center rounded-sm text-lg font-bold"
+                  className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl text-base font-bold tracking-tight shadow-[0_16px_48px_-20px_rgba(36,144,237,0.45)]"
                   style={{
-                    background: 'rgba(255,255,255,0.06)',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    color: '#2490ed',
+                    background: 'linear-gradient(145deg, rgba(255,255,255,0.12), rgba(36,144,237,0.2))',
+                    border: '1px solid rgba(255,255,255,0.2)',
+                    color: '#fff',
                   }}
                 >
                   NRPG
                 </div>
                 <Link
                   href="/pathways"
-                  className="text-sm font-medium transition-colors hover:text-white"
-                  style={{ color: '#2490ed' }}
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-[#ed9d24] px-8 py-3.5 text-sm font-bold text-[#1a1205] shadow-[0_12px_36px_-12px_rgba(237,157,36,0.55)] transition-transform hover:scale-[1.02]"
                 >
-                  View Pathways →
+                  View pathways <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
             </div>
@@ -846,33 +950,22 @@ export default async function Home() {
       </section>
 
       {/* ── FAQ (visible + schema) ─────────────────────────────────────────── */}
-      <AnimatedSection label="Common Questions" title="Frequently Asked Questions">
-        <div className="mx-auto max-w-6xl space-y-4">
+      <AnimatedSection
+        label="Common questions"
+        title="Frequently asked questions"
+        className="bg-gradient-to-b from-white/[0.02] to-transparent"
+      >
+        <div className="w-full space-y-3">
           {faqs.map((faq, i) => (
             <AnimatedCard key={faq.question} index={i}>
-              <details
-                className="group rounded-sm"
-                style={{
-                  background: 'rgba(255,255,255,0.03)',
-                  border: '1px solid rgba(255,255,255,0.06)',
-                }}
-              >
-                <summary
-                  className="flex cursor-pointer items-center justify-between px-5 py-4 text-sm font-medium select-none"
-                  style={{ color: 'rgba(255,255,255,0.85)' }}
-                >
+              <details className="group overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02] shadow-[0_12px_40px_-32px_rgba(0,0,0,0.9)] transition-colors open:border-[#2490ed]/30">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 text-sm font-semibold text-white/90 select-none sm:px-6 sm:py-5 sm:text-[15px]">
                   {faq.question}
-                  <span
-                    className="ml-2 transition-transform duration-200 group-open:rotate-45"
-                    style={{ color: '#2490ed' }}
-                  >
-                    +
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/5 transition-all group-open:border-[#2490ed]/35 group-open:bg-[#2490ed]/10">
+                    <ChevronDown className="h-4 w-4 text-[#2490ed] transition-transform duration-200 group-open:rotate-180" />
                   </span>
                 </summary>
-                <div
-                  className="px-5 pb-4 text-sm leading-relaxed"
-                  style={{ color: 'rgba(255,255,255,0.55)' }}
-                >
+                <div className="border-t border-white/8 px-5 py-4 text-sm leading-relaxed text-white/55 sm:px-6 sm:pb-5">
                   {faq.answer}
                 </div>
               </details>
@@ -882,7 +975,11 @@ export default async function Home() {
       </AnimatedSection>
 
       {/* ── Certificate Preview ──────────────────────────────────────────── */}
-      <AnimatedSection label="Credentials" title="Verifiable Digital Certificates">
+      <AnimatedSection
+        label="Credentials"
+        title="Verifiable Digital Certificates"
+        minimalHeader
+      >
         <div className="mx-auto max-w-xl">
           <p className="mb-6 text-center text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
             Every completed course earns you a verifiable digital certificate with a public URL you
@@ -893,44 +990,59 @@ export default async function Home() {
       </AnimatedSection>
 
       {/* ── CTA ────────────────────────────────────────────────────────────── */}
-      <section className="px-6 py-20" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="mb-4 text-3xl font-bold" style={{ color: 'rgba(255,255,255,0.95)' }}>
-            Start learning today
-          </h2>
-          <p className="mb-8 text-base" style={{ color: 'rgba(255,255,255,0.5)' }}>
-            Free courses available. Premium courses from just $20 AUD.
-            <br />
-            {catalogueFacts.publishedCourseCount > 0 ? (
-              <>
-                Or get full access to all{' '}
-                {formatCourseCountForCopy(catalogueFacts.publishedCourseCount)} courses for $795
-                AUD/year.
-              </>
-            ) : (
-              <>Or get full access to the full catalogue for $795 AUD/year.</>
-            )}
-          </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <Link
-              href="/courses?filter=free"
-              className="group inline-flex items-center gap-2 rounded-sm px-8 py-3 font-medium transition-all duration-200 hover:scale-[1.02] hover:text-white"
+      <section className="py-16 md:py-24" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+        <div className={PUBLIC_SHELL_INNER_CLASS}>
+          <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-[#2490ed]/25 via-[#0a1528] to-[#050505] px-6 py-14 shadow-[0_40px_120px_-50px_rgba(36,144,237,0.55)] sm:px-12 sm:py-16">
+            <div
+              className="pointer-events-none absolute inset-0 opacity-40"
+              aria-hidden
               style={{
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                color: 'rgba(255,255,255,0.7)',
+                backgroundImage: `linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+                  linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)`,
+                backgroundSize: '40px 40px',
               }}
-            >
-              Free Courses
-            </Link>
-            <Link
-              href="/courses"
-              className="group inline-flex items-center gap-2 rounded-sm px-8 py-3 font-medium text-white transition-all duration-200 hover:scale-[1.02]"
-              style={{ background: '#ed9d24' }}
-            >
-              Browse All Courses{' '}
-              <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />
-            </Link>
+            />
+            <div
+              className="pointer-events-none absolute -right-24 top-1/2 h-72 w-72 -translate-y-1/2 rounded-full blur-3xl"
+              style={{ background: 'rgba(237,157,36,0.12)' }}
+              aria-hidden
+            />
+            <div className="relative mx-auto max-w-2xl text-center">
+              <p className="mb-3 text-[11px] font-semibold tracking-[0.2em] text-[#7ec5ff] uppercase">
+                Get started
+              </p>
+              <h2 className="mb-4 text-3xl font-bold tracking-tight text-white md:text-4xl">
+                Start learning today
+              </h2>
+              <p className="mb-10 text-base leading-relaxed text-white/55">
+                Free courses available. Premium courses from just $20 AUD.
+                <br />
+                {catalogueFacts.publishedCourseCount > 0 ? (
+                  <>
+                    Or get full access to all{' '}
+                    {formatCourseCountForCopy(catalogueFacts.publishedCourseCount)} courses for $795
+                    AUD/year.
+                  </>
+                ) : (
+                  <>Or get full access to the full catalogue for $795 AUD/year.</>
+                )}
+              </p>
+              <div className="flex flex-wrap justify-center gap-4">
+                <Link
+                  href="/courses?filter=free"
+                  className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-8 py-3.5 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:border-white/35 hover:bg-white/15"
+                >
+                  Free courses
+                </Link>
+                <Link
+                  href="/courses"
+                  className="inline-flex items-center gap-2 rounded-full bg-[#ed9d24] px-8 py-3.5 text-sm font-bold text-[#1a1205] shadow-[0_12px_40px_-12px_rgba(237,157,36,0.55)] transition-transform hover:scale-[1.02]"
+                >
+                  Browse all courses{' '}
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       </section>
