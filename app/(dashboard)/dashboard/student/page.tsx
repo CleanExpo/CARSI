@@ -218,6 +218,18 @@ export default function StudentDashboardPage() {
             >
               Certificates →
             </Link>
+            <Link
+              href="/dashboard/student/notes"
+              className="inline-flex items-center rounded-lg border border-transparent px-4 py-2 text-sm font-medium text-white/55 transition-colors hover:text-white/85"
+            >
+              My notes
+            </Link>
+            <Link
+              href="/dashboard/student/leaderboard"
+              className="inline-flex items-center rounded-lg border border-transparent px-4 py-2 text-sm font-medium text-white/55 transition-colors hover:text-white/85"
+            >
+              Monthly recognition
+            </Link>
           </div>
         </div>
       </header>
