@@ -302,7 +302,8 @@ export function LearnCourseShell({ slug }: { slug: string }) {
 
       <div className="flex min-h-[calc(100vh-6rem)] w-full max-w-none flex-col gap-8 lg:flex-row lg:gap-10">
       <aside className="w-full shrink-0 lg:w-[min(100%,280px)]">
-        <div className="rounded-2xl border border-white/10 bg-white/3 p-4 backdrop-blur-sm lg:sticky lg:top-6">
+        {/* GP-362 PR 2/4: glass-sm tokenised utility (was inline bg-white/3 + border-white/10 + backdrop-blur-sm) */}
+        <div className="glass-sm rounded-2xl p-4 lg:sticky lg:top-6">
           <div className="mb-5 space-y-2 border-b border-white/8 pb-4">
             <Link
               href="/dashboard/student"
