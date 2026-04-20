@@ -35,7 +35,7 @@ interface CourseCardProps {
 // GP-335 PR 1/4: accent now resolved via --discipline-* tokens.
 // The legacy glow/grad values (never currently rendered) are removed in this
 // migration; they'll come back as first-class tokens in PR 4/4 (border + glow).
-const DEFAULT_ACCENT_TOKEN = 'hsl(var(--discipline-water-500))';
+const DEFAULT_ACCENT_TOKEN = 'hsl(var(--discipline-water-500))'; // pragma: allowlist secret
 
 function formatRelativeDate(dateStr: string | null | undefined): string {
   if (!dateStr) return '';
