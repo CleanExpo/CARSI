@@ -106,7 +106,7 @@ function NoteCard({
       <div className="flex flex-wrap items-center gap-3 border-t border-white/[0.06] pt-4">
         {/* Go to lesson — always visible */}
         <Link
-          href={`/student/lessons/${note.lesson_id}`}
+          href={`/dashboard/learn/${encodeURIComponent(note.course_slug)}?lesson=${encodeURIComponent(note.lesson_id)}`}
           className="rounded-sm border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 font-mono text-xs text-white/70 transition-colors hover:border-white/20 hover:text-white"
         >
           Go to lesson
@@ -162,10 +162,10 @@ function EmptyState() {
         </p>
       </div>
       <Link
-        href="/courses"
+        href="/dashboard/courses"
         className="mt-2 rounded-sm border border-white/[0.08] bg-white/[0.03] px-4 py-2 font-mono text-xs text-white/60 transition-colors hover:border-white/20 hover:text-white"
       >
-        Browse Courses
+        Browse courses
       </Link>
     </div>
   );
