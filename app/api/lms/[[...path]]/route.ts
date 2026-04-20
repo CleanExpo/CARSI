@@ -97,10 +97,6 @@ function localStub(method: string, segments: string[]): NextResponse | null {
     return NextResponse.json({ ok: true });
   }
 
-  if (method === 'GET' && key === 'gamification/leaderboard') {
-    return NextResponse.json({ items: [] });
-  }
-
   return null;
 }
 
