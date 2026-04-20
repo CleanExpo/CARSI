@@ -59,3 +59,29 @@ export async function verifyPasswordResetToken(token: string): Promise<string | 
     return null;
   }
 }
+
+const PROOF_PACK_SHARE_AUDIENCE = 'carsi-proof-pack-share';
+
+/** Time-limited link for employer-facing training / CEC summary (no session cookie required). */
+export async function signProofPackShareToken(userId: string): Promise<string> {
+  return new SignJWT({ purpose: 'proof_pack_share' })
+    .setProtectedHeader({ alg: 'HS256' })
+    .setSubject(userId)
+    .setAudience(PROOF_PACK_SHARE_AUDIENCE)
+    .setIssuedAt()
+    .setExpirationTime('30d')
+    .sign(getSecret());
+}
+
+export async function verifyProofPackShareToken(token: string): Promise<string | null> {
+  try {
+    const { payload } = await jwtVerify(token, getSecret(), {
+      audience: PROOF_PACK_SHARE_AUDIENCE,
+    });
+    if (payload.purpose !== 'proof_pack_share') return null;
+    const sub = typeof payload.sub === 'string' ? payload.sub : '';
+    return sub || null;
+  } catch {
+    return null;
+  }
+}
