@@ -1,3 +1,4 @@
+import { PUBLIC_SHELL_INNER_CLASS } from '@/components/landing/public-shell-width';
 import { AcronymTooltip } from '@/components/ui/AcronymTooltip';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -17,7 +18,7 @@ const industries = [
 export function PublicFooter() {
   return (
     <footer className="py-12" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-      <div className="mx-auto w-[94%] xl:w-[85%] 2xl:max-w-[1800px]">
+      <div className={PUBLIC_SHELL_INNER_CLASS}>
         <div className="mb-8 grid gap-8 sm:grid-cols-4">
           <div>
             <div className="mb-3 flex items-center gap-2">
