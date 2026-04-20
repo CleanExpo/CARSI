@@ -80,40 +80,49 @@ export default function SubscribeSuccessPage() {
 
         {/* What's next */}
         <div className="w-full rounded-sm border border-white/[0.06] bg-white/[0.02] p-6">
-          <h2 className="mb-4 font-mono text-sm font-semibold text-white/80">What&apos;s Next</h2>
-          <ul className="space-y-3 text-left text-sm text-white/60">
+          <h2 className="mb-4 font-mono text-sm font-semibold text-white/80">What&apos;s next</h2>
+          <ol className="list-none space-y-3 text-left text-sm text-white/60">
             <li className="flex items-start gap-3">
-              <span className="mt-0.5 text-[#00F5FF]">1.</span>
-              <span>Browse the full course catalogue — all IICRC courses are now unlocked</span>
+              <span className="mt-0.5 font-mono tabular-nums text-[#00F5FF]">1.</span>
+              <span>
+                Open the course catalogue and pick your first course — your subscription unlocks the
+                full library.
+              </span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="mt-0.5 text-[#00F5FF]">2.</span>
-              <span>Start earning CECs towards your IICRC certifications</span>
+              <span className="mt-0.5 font-mono tabular-nums text-[#00F5FF]">2.</span>
+              <span>Start a lesson and earn IICRC CECs toward renewal as you complete training.</span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="mt-0.5 text-[#00F5FF]">3.</span>
-              <span>Track your progress on your Student Dashboard</span>
+              <span className="mt-0.5 font-mono tabular-nums text-[#00F5FF]">3.</span>
+              <span>
+                Use My learning to resume where you left off, and My credentials when you finish a
+                course.
+              </span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="mt-0.5 text-[#00F5FF]">4.</span>
-              <span>Compete on the XP leaderboard with other restoration professionals</span>
+              <span className="mt-0.5 font-mono tabular-nums text-[#00F5FF]">4.</span>
+              <span>
+                Optional: appear on the monthly recognition board — anonymous by default; you can opt
+                in to a display name from your profile.
+              </span>
             </li>
-          </ul>
+          </ol>
         </div>
 
         {/* CTA buttons */}
         <div className="flex w-full flex-col gap-3">
           <Link
-            href="/courses"
+            href="/dashboard/courses"
             className="w-full rounded-sm bg-[#00F5FF] py-3 font-mono text-sm font-semibold text-[#050505] transition-opacity hover:opacity-90"
           >
-            Browse Courses
+            Browse courses
           </Link>
           <Link
-            href="/student"
+            href="/dashboard/student"
             className="w-full rounded-sm border border-white/[0.08] py-3 font-mono text-sm font-semibold text-white/80 transition-colors hover:border-white/20 hover:text-white"
           >
-            Go to Dashboard
+            Go to My learning
           </Link>
         </div>
 
