@@ -25,6 +25,10 @@ export interface User {
   iicrc_expiry_date?: string | null;
   iicrc_card_image_url?: string | null;
   iicrc_certifications?: IicrcCertificationEntry[] | null;
+  /** When true, `leaderboard_display_name` may appear on the public monthly leaderboard. */
+  leaderboard_show_display_name?: boolean;
+  /** Optional label for the leaderboard only (never your legal name unless you type it here). */
+  leaderboard_display_name?: string | null;
 }
 
 export interface LoginRequest {
