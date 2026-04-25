@@ -49,11 +49,7 @@ function parseSort(raw: string | null): SortKey {
   return 'updated';
 }
 
-function buildCourseListParams(parts: {
-  status: StatusFilter;
-  q: string;
-  sort: SortKey;
-}) {
+function buildCourseListParams(parts: { status: StatusFilter; q: string; sort: SortKey }) {
   const p = new URLSearchParams();
   if (parts.status !== 'all') p.set('status', parts.status);
   const qt = parts.q.trim();
@@ -217,8 +213,7 @@ export function AdminCoursesList() {
     status !== 'all' || Boolean(qFromUrl) || sort !== 'updated' || queryDraft.trim() !== qFromUrl;
 
   const listRows = rows ?? [];
-  const allVisibleSelected =
-    listRows.length > 0 && listRows.every((r) => selected.has(r.id));
+  const allVisibleSelected = listRows.length > 0 && listRows.every((r) => selected.has(r.id));
 
   function toggleSelectAllVisible() {
     setSelected((prev) => {
@@ -394,7 +389,7 @@ export function AdminCoursesList() {
               onChange={(e) => setQueryDraft(e.target.value)}
               placeholder="Search by title or slug…"
               autoComplete="off"
-              className="w-full rounded-xl border border-white/12 bg-black/25 py-2.5 pr-3 pl-10 text-sm text-white/90 placeholder:text-white/30 outline-none ring-[#2490ed]/0 transition-[box-shadow,border-color] focus:border-[#2490ed]/50 focus:ring-2 focus:ring-[#2490ed]/25"
+              className="w-full rounded-xl border border-white/12 bg-black/25 py-2.5 pr-3 pl-10 text-sm text-white/90 ring-[#2490ed]/0 transition-[box-shadow,border-color] outline-none placeholder:text-white/30 focus:border-[#2490ed]/50 focus:ring-2 focus:ring-[#2490ed]/25"
               aria-label="Search courses"
             />
           </div>
@@ -416,15 +411,9 @@ export function AdminCoursesList() {
                     aria-selected={active}
                     onClick={() => replaceWithParams({ status: tab.id })}
                     className={`rounded-[10px] px-3 py-1.5 text-xs font-semibold transition-colors ${
-                      active
-                        ? 'text-white shadow-sm'
-                        : 'text-white/45 hover:text-white/70'
+                      active ? 'text-white shadow-sm' : 'text-white/45 hover:text-white/70'
                     }`}
-                    style={
-                      active
-                        ? { background: '#2490ed' }
-                        : { background: 'transparent' }
-                    }
+                    style={active ? { background: '#2490ed' } : { background: 'transparent' }}
                   >
                     {tab.label}
                   </button>
@@ -436,9 +425,7 @@ export function AdminCoursesList() {
               <span className="whitespace-nowrap">Sort</span>
               <select
                 value={sort}
-                onChange={(e) =>
-                  replaceWithParams({ sort: parseSort(e.target.value) })
-                }
+                onChange={(e) => replaceWithParams({ sort: parseSort(e.target.value) })}
                 className="rounded-xl border border-white/12 bg-black/30 py-2 pr-8 pl-3 text-xs font-medium text-white/90 outline-none focus:border-[#2490ed]/50 focus:ring-2 focus:ring-[#2490ed]/25"
               >
                 <option value="updated">Last updated</option>
@@ -698,7 +685,9 @@ export function AdminCoursesList() {
       >
         <DialogContent className="border-white/10 bg-[#0c101c] text-white">
           <DialogHeader>
-            <DialogTitle>Delete {selected.size} course{selected.size === 1 ? '' : 's'}?</DialogTitle>
+            <DialogTitle>
+              Delete {selected.size} course{selected.size === 1 ? '' : 's'}?
+            </DialogTitle>
             <DialogDescription className="text-white/50">
               This permanently removes the selected courses and all modules and lessons. Student
               enrollments for these courses may be affected.
@@ -709,9 +698,7 @@ export function AdminCoursesList() {
               <li key={r.id}>{r.title}</li>
             ))}
             {selectedRows.length > 12 ? (
-              <li className="list-none text-white/45">
-                …and {selectedRows.length - 12} more
-              </li>
+              <li className="list-none text-white/45">…and {selectedRows.length - 12} more</li>
             ) : null}
           </ul>
           <DialogFooter className="gap-2 sm:gap-0">
