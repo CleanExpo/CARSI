@@ -1,11 +1,13 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { FileText } from 'lucide-react';
 import { ErrorBanner } from '@/components/lms/ErrorBanner';
+import { CourseFormattedBody } from '@/components/lms/CourseFormattedBody';
 import { useAuth } from '@/components/auth/auth-provider';
 import { apiClient } from '@/lib/api/client';
+import { applyNoteFormatting, type NoteFormatAction } from '@/lib/lms/note-formatting';
 
 function formatDate(iso: string | null): string {
   if (!iso) return '';
@@ -67,6 +69,20 @@ function NoteCard({
   saving,
   deleting,
 }: NoteCardProps) {
+  const editRef = useRef<HTMLTextAreaElement | null>(null);
+
+  function applyFormat(action: NoteFormatAction) {
+    const el = editRef.current;
+    const currentStart = el?.selectionStart ?? editContent.length;
+    const currentEnd = el?.selectionEnd ?? editContent.length;
+    const next = applyNoteFormatting(editContent, currentStart, currentEnd, action);
+    onEditChange(next.value);
+    requestAnimationFrame(() => {
+      editRef.current?.focus();
+      editRef.current?.setSelectionRange(next.selectionStart, next.selectionEnd);
+    });
+  }
+
   return (
     <div className="flex flex-col gap-3 rounded-sm border border-white/[0.06] bg-zinc-900/50 p-5">
       {/* Lesson heading */}
@@ -81,18 +97,45 @@ function NoteCard({
 
       {/* Note body */}
       {isEditing ? (
-        <textarea
-          className="w-full resize-none rounded-sm border border-white/[0.06] bg-zinc-800 p-3 text-sm text-white focus:border-white/20 focus:outline-none"
-          rows={5}
-          value={editContent}
-          onChange={(e) => onEditChange(e.target.value)}
-          aria-label={`Edit note for ${note.lesson_title}`}
-          disabled={saving}
-        />
+        <div className="space-y-2">
+          <div className="flex flex-wrap gap-1.5">
+            {(
+              [
+                ['heading', 'H'],
+                ['quote', 'Quote'],
+                ['bullet', 'List'],
+                ['bold', 'Bold'],
+                ['italic', 'Italic'],
+              ] as Array<[NoteFormatAction, string]>
+            ).map(([action, label]) => (
+              <button
+                key={action}
+                type="button"
+                onClick={() => applyFormat(action)}
+                className="rounded border border-white/12 bg-white/[0.03] px-2 py-1 text-[11px] text-white/65 transition-colors hover:border-white/25 hover:text-white"
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          <textarea
+            ref={editRef}
+            className="w-full resize-none rounded-sm border border-white/[0.06] bg-zinc-800 p-3 text-sm text-white focus:border-white/20 focus:outline-none"
+            rows={5}
+            value={editContent}
+            onChange={(e) => onEditChange(e.target.value)}
+            aria-label={`Edit note for ${note.lesson_title}`}
+            disabled={saving}
+          />
+        </div>
       ) : (
-        <p className="text-sm whitespace-pre-wrap text-white/70">
-          {note.content ?? <span className="text-white/30 italic">No content yet.</span>}
-        </p>
+        <div>
+          {note.content ? (
+            <CourseFormattedBody text={note.content} className="text-sm" />
+          ) : (
+            <p className="text-sm text-white/30 italic">No content yet.</p>
+          )}
+        </div>
       )}
 
       {/* Updated timestamp (read-only mode) */}

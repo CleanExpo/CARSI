@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Check, ChevronLeft, ChevronRight, Home, Layers, Loader2 } from 'lucide-react';
 
 import { CourseCompletionBanner } from '@/components/lms/CourseCompletionBanner';
@@ -11,6 +11,7 @@ import { LessonPlayer } from '@/components/lms/LessonPlayer';
 import { Button } from '@/components/ui/button';
 import { apiClient, ApiClientError } from '@/lib/api/client';
 import { useOnlineStatus } from '@/hooks/use-online-status';
+import { applyNoteFormatting, type NoteFormatAction } from '@/lib/lms/note-formatting';
 
 interface CurriculumLesson {
   id: string;
@@ -53,6 +54,12 @@ interface LessonDetailResponse {
   course: { id: string; slug: string; title: string };
 }
 
+interface LessonNoteOut {
+  id: string;
+  lesson_id: string;
+  content: string | null;
+}
+
 type ViewMode = 'lesson' | 'module';
 
 const RELIABILITY_TIP_KEY = 'carsi_learn_reliability_tip_dismissed';
@@ -87,6 +94,12 @@ export function LearnCourseShell({ slug }: { slug: string }) {
   const [loadingLesson, setLoadingLesson] = useState(false);
   const [lessonError, setLessonError] = useState<string | null>(null);
   const [savingComplete, setSavingComplete] = useState(false);
+  const [noteText, setNoteText] = useState('');
+  const [loadingNote, setLoadingNote] = useState(false);
+  const [savingNote, setSavingNote] = useState(false);
+  const [deletingNote, setDeletingNote] = useState(false);
+  const [noteStatus, setNoteStatus] = useState<string | null>(null);
+  const noteEditorRef = useRef<HTMLTextAreaElement | null>(null);
 
   const flatLessons = useMemo(() => {
     if (!curriculum) return [];
@@ -205,6 +218,26 @@ export function LearnCourseShell({ slug }: { slug: string }) {
     void loadLesson(activeLessonId);
   }, [view, activeLessonId, loadLesson]);
 
+  const loadLessonNote = useCallback(async (lessonId: string) => {
+    setLoadingNote(true);
+    setNoteStatus(null);
+    try {
+      const notes = await apiClient.get<LessonNoteOut[]>('/api/lms/notes/me');
+      const current = notes.find((n) => n.lesson_id === lessonId);
+      setNoteText(current?.content ?? '');
+    } catch {
+      setNoteText('');
+      setNoteStatus('Could not load note.');
+    } finally {
+      setLoadingNote(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (view !== 'lesson' || !activeLessonId) return;
+    void loadLessonNote(activeLessonId);
+  }, [view, activeLessonId, loadLessonNote]);
+
   function replaceLessonQuery(lessonId: string) {
     const params = new URLSearchParams(searchParams.toString());
     params.delete('module');
@@ -271,6 +304,53 @@ export function LearnCourseShell({ slug }: { slug: string }) {
     } finally {
       setSavingComplete(false);
     }
+  }
+
+  async function saveLessonNote() {
+    if (!activeLessonId || !lessonDetail) return;
+    setSavingNote(true);
+    setNoteStatus(null);
+    try {
+      await apiClient.put(`/api/lms/notes/${encodeURIComponent(activeLessonId)}`, {
+        content: noteText,
+        course_slug: lessonDetail.course.slug,
+        course_title: lessonDetail.course.title,
+        lesson_title: lessonDetail.lesson.title,
+        module_title: activeModule?.title ?? null,
+      });
+      setNoteStatus('Note saved.');
+    } catch {
+      setNoteStatus('Failed to save note.');
+    } finally {
+      setSavingNote(false);
+    }
+  }
+
+  async function deleteLessonNote() {
+    if (!activeLessonId) return;
+    setDeletingNote(true);
+    setNoteStatus(null);
+    try {
+      await apiClient.delete(`/api/lms/notes/${encodeURIComponent(activeLessonId)}`);
+      setNoteText('');
+      setNoteStatus('Note deleted.');
+    } catch {
+      setNoteStatus('Failed to delete note.');
+    } finally {
+      setDeletingNote(false);
+    }
+  }
+
+  function applyFormat(action: NoteFormatAction) {
+    const el = noteEditorRef.current;
+    const start = el?.selectionStart ?? noteText.length;
+    const end = el?.selectionEnd ?? noteText.length;
+    const next = applyNoteFormatting(noteText, start, end, action);
+    setNoteText(next.value);
+    requestAnimationFrame(() => {
+      noteEditorRef.current?.focus();
+      noteEditorRef.current?.setSelectionRange(next.selectionStart, next.selectionEnd);
+    });
   }
 
   const currentMeta = flatLessons.find((l) => l.id === activeLessonId);
@@ -467,38 +547,102 @@ export function LearnCourseShell({ slug }: { slug: string }) {
                   lesson={lessonDetail.lesson}
                   resources={lessonDetail.resources}
                   footer={
-                    <div className="mt-8 flex flex-col gap-4 border-t border-white/10 pt-6 sm:flex-row sm:items-center sm:justify-between">
-                      <div className="flex flex-wrap gap-2">
+                    <>
+                      <div className="mt-8 rounded-xl border border-white/10 bg-white/3 p-4 sm:p-5">
+                        <div className="mb-2 flex items-center justify-between gap-2">
+                          <h3 className="text-sm font-semibold text-white/85">My notes</h3>
+                          {loadingNote ? (
+                            <span className="text-xs text-white/45">Loading…</span>
+                          ) : null}
+                        </div>
+                        <div className="mb-2 flex flex-wrap gap-1.5">
+                          {(
+                            [
+                              ['heading', 'H'],
+                              ['quote', 'Quote'],
+                              ['bullet', 'List'],
+                              ['bold', 'Bold'],
+                              ['italic', 'Italic'],
+                            ] as Array<[NoteFormatAction, string]>
+                          ).map(([action, label]) => (
+                            <button
+                              key={action}
+                              type="button"
+                              onClick={() => applyFormat(action)}
+                              className="rounded border border-white/12 bg-white/4 px-2 py-1 text-[11px] text-white/70 hover:border-white/25 hover:text-white"
+                            >
+                              {label}
+                            </button>
+                          ))}
+                        </div>
+                        <textarea
+                          ref={noteEditorRef}
+                          value={noteText}
+                          onChange={(e) => setNoteText(e.target.value)}
+                          rows={5}
+                          placeholder="Write your lesson notes here…"
+                          className="w-full resize-y rounded-lg border border-white/12 bg-black/30 px-3 py-2 text-sm text-white placeholder:text-white/35 focus:border-[#2490ed]/45 focus:outline-none"
+                        />
+                        <div className="mt-3 flex flex-wrap items-center gap-2">
+                          <Button
+                            type="button"
+                            onClick={() => void saveLessonNote()}
+                            disabled={savingNote || deletingNote || loadingNote}
+                            className="h-8 rounded-md bg-[#2490ed] px-3 text-xs text-white hover:bg-[#1e7bc9] disabled:opacity-50"
+                          >
+                            {savingNote ? 'Saving…' : 'Save note'}
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => void deleteLessonNote()}
+                            disabled={savingNote || deletingNote || loadingNote || !noteText.trim()}
+                            className="h-8 border-white/20 px-3 text-xs text-white/80"
+                          >
+                            {deletingNote ? 'Deleting…' : 'Delete note'}
+                          </Button>
+                          <Link
+                            href="/dashboard/student/notes"
+                            className="ml-auto text-xs text-[#7ec5ff] hover:underline"
+                          >
+                            View all notes
+                          </Link>
+                        </div>
+                        {noteStatus ? <p className="mt-2 text-xs text-white/50">{noteStatus}</p> : null}
+                      </div>
+                      <div className="mt-8 flex flex-col gap-4 border-t border-white/10 pt-6 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="flex flex-wrap gap-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            disabled={!prevLesson}
+                            className="gap-1 border-white/20 text-white"
+                            onClick={() => prevLesson && selectLesson(prevLesson.id)}
+                          >
+                            <ChevronLeft className="h-4 w-4" />
+                            Previous
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            disabled={!nextLesson}
+                            className="gap-1 border-white/20 text-white"
+                            onClick={() => nextLesson && selectLesson(nextLesson.id)}
+                          >
+                            Next
+                            <ChevronRight className="h-4 w-4" />
+                          </Button>
+                        </div>
                         <Button
                           type="button"
-                          variant="outline"
-                          disabled={!prevLesson}
-                          className="gap-1 border-white/20 text-white"
-                          onClick={() => prevLesson && selectLesson(prevLesson.id)}
+                          disabled={savingComplete || currentMeta?.completed}
+                          className="rounded-md bg-emerald-600 text-white hover:bg-emerald-500 disabled:opacity-50"
+                          onClick={() => void toggleComplete(true)}
                         >
-                          <ChevronLeft className="h-4 w-4" />
-                          Previous
-                        </Button>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          disabled={!nextLesson}
-                          className="gap-1 border-white/20 text-white"
-                          onClick={() => nextLesson && selectLesson(nextLesson.id)}
-                        >
-                          Next
-                          <ChevronRight className="h-4 w-4" />
+                          {currentMeta?.completed ? 'Lesson completed' : 'Mark lesson complete'}
                         </Button>
                       </div>
-                      <Button
-                        type="button"
-                        disabled={savingComplete || currentMeta?.completed}
-                        className="rounded-md bg-emerald-600 text-white hover:bg-emerald-500 disabled:opacity-50"
-                        onClick={() => void toggleComplete(true)}
-                      >
-                        {currentMeta?.completed ? 'Lesson completed' : 'Mark lesson complete'}
-                      </Button>
-                    </div>
+                    </>
                   }
                 />
               </article>
