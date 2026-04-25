@@ -10,7 +10,9 @@ function reactPackageDir(pkg: 'react' | 'react-dom'): string {
   return path.dirname(require.resolve(`${pkg}/package.json`));
 }
 
-function webpackReactAliases(config: { resolve?: { alias?: Record<string, string | string[] | boolean> } }) {
+function webpackReactAliases(config: {
+  resolve?: { alias?: Record<string, string | string[] | boolean> };
+}) {
   const reactDir = reactPackageDir('react');
   const reactDomDir = reactPackageDir('react-dom');
   config.resolve = config.resolve ?? {};
@@ -77,29 +79,18 @@ const pwaConfig = withPWA({
 const nextConfig: NextConfig = {
   output: 'standalone',
   reactStrictMode: true,
-  /** Production deploys: do not fail the build on TS (fix issues in follow-up PRs). */
   typescript: {
     ignoreBuildErrors: true,
   },
-  // Next.js 16: do not set `eslint` here — it is not a valid next.config key; use `eslint.config` / `next lint`.
   transpilePackages: ['@shared'],
-  /**
-   * Force one React instance in the client bundle. Without this, pnpm + next-pwa/webpack can
-   * resolve duplicate `react` copies → "Cannot read properties of undefined (reading 'ReactCurrentDispatcher')".
-   */
   webpack: (config) => webpackReactAliases(config),
   turbopack: {},
-  experimental: {
-    // Typed routes disabled - requires full route type generation to be configured
-    // typedRoutes: true,
-  },
-  // Load image URLs in the browser (no /_next/image proxy). Avoids remotePatterns and CDN timeouts.
+  experimental: {},
   images: {
     unoptimized: true,
   },
   async headers() {
     const isDev = process.env.NODE_ENV === 'development';
-    // Next.js dev / webpack HMR / React Refresh use eval(); strict script-src breaks the app.
     const scriptSrc = isDev
       ? "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://js.stripe.com"
       : "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://js.stripe.com";
@@ -114,7 +105,14 @@ const nextConfig: NextConfig = {
       appOrigin,
       'https://api.stripe.com',
       ...(isDev
-        ? ['ws:', 'wss:', 'http://localhost:3000', 'http://localhost:3001', 'http://127.0.0.1:3000', 'http://127.0.0.1:3001']
+        ? [
+            'ws:',
+            'wss:',
+            'http://localhost:3000',
+            'http://localhost:3001',
+            'http://127.0.0.1:3000',
+            'http://127.0.0.1:3001',
+          ]
         : []),
     ];
 
