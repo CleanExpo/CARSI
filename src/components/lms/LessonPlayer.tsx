@@ -1,6 +1,6 @@
 import { DriveFileViewer } from '@/components/lms/DriveFileViewer';
+import { CourseFormattedBody } from '@/components/lms/CourseFormattedBody';
 import { Badge } from '@/components/ui/badge';
-import DOMPurify from 'isomorphic-dompurify';
 import { Download } from 'lucide-react';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
@@ -162,13 +162,7 @@ function renderContent(lesson: Lesson) {
 
     case 'text':
     default: {
-      const safe = DOMPurify.sanitize(lesson.content_body ?? '');
-      return (
-        <div
-          className="prose prose-invert prose-headings:text-white prose-p:text-white/85 max-w-none"
-          dangerouslySetInnerHTML={{ __html: safe }}
-        />
-      );
+      return <CourseFormattedBody text={lesson.content_body} />;
     }
   }
 }

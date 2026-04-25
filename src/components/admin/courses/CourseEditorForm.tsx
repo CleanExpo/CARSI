@@ -12,6 +12,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 
+import { CourseFormattedBody } from '@/components/lms/CourseFormattedBody';
 import { CourseTextThumbnail } from '@/components/lms/CourseTextThumbnail';
 
 type Mod = {
@@ -347,8 +348,21 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
                   onChange={(e) => setDescription(e.target.value)}
                   rows={5}
                   className={cn('min-h-[120px] resize-y', fieldClass)}
-                  placeholder="Summary shown on catalogue cards and SEO snippets"
+                  placeholder="Plain text: lines starting with ## are headings; lines starting with > are quotes. Legacy HTML still works."
                 />
+                <p className="text-xs leading-relaxed text-white/40">
+                  Optional: <code className="rounded bg-white/10 px-1 py-0.5 text-[10px]">## Section</code>{' '}
+                  and <code className="rounded bg-white/10 px-1 py-0.5 text-[10px]">&gt; Pull quote</code>
+                  . Blank line separates paragraphs.
+                </p>
+                {description.trim() ? (
+                  <div className="rounded-xl border border-white/10 bg-black/40 p-4">
+                    <p className="mb-2 text-[10px] font-semibold tracking-wider text-white/40 uppercase">
+                      Preview
+                    </p>
+                    <CourseFormattedBody text={description} />
+                  </div>
+                ) : null}
               </div>
             </section>
 

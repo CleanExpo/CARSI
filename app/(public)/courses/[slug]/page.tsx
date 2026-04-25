@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import { CoursesIndexLink } from '@/components/lms/CoursesIndexLink';
 import { EnrolButton } from '@/components/lms/EnrolButton';
+import { CourseFormattedBody } from '@/components/lms/CourseFormattedBody';
 import { CourseThumbnail } from '@/components/lms/CourseThumbnail';
 import { CourseHubContext } from '@/components/lms/CourseHubContext';
 import { CourseSchema, BreadcrumbSchema } from '@/components/seo';
@@ -665,12 +666,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                     About This Course
                   </h2>
                   <div className="rounded-sm p-6" style={glassPanelSubtle}>
-                    <p
-                      className="text-sm leading-relaxed"
-                      style={{ color: 'rgba(255,255,255,0.55)' }}
-                    >
-                      {course.description}
-                    </p>
+                    <CourseFormattedBody text={course.description} />
                   </div>
                 </section>
               )}
