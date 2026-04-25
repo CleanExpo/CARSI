@@ -7,6 +7,19 @@ import { NextRequest, NextResponse } from 'next/server';
 
 type Ctx = { params: Promise<{ path?: string[] }> };
 
+type StubLessonNote = {
+  id: string;
+  lesson_id: string;
+  lesson_title: string;
+  module_title: string | null;
+  course_title: string;
+  course_slug: string;
+  content: string | null;
+  updated_at: string | null;
+};
+
+const notesStore = new Map<string, StubLessonNote>();
+
 function inferDisciplineFromCourseSlug(slug: string): string {
   const s = slug.toLowerCase();
   if (/(odou?r|odor|deodor|smell|air-quality)/.test(s)) return 'OCT';
@@ -34,7 +47,11 @@ const HUB_KEYWORDS: Record<string, string[]> = {
   ASD: ['Structural drying technician', 'Water restoration'],
 };
 
-function localStub(method: string, segments: string[]): NextResponse | null {
+async function localStub(
+  method: string,
+  segments: string[],
+  request?: NextRequest
+): Promise<NextResponse | null> {
   const key = segments.join('/');
 
   if (
@@ -97,6 +114,62 @@ function localStub(method: string, segments: string[]): NextResponse | null {
     return NextResponse.json({ ok: true });
   }
 
+  if (method === 'GET' && key === 'notes/me') {
+    const notes = Array.from(notesStore.values()).sort((a, b) => {
+      const ta = a.updated_at ? new Date(a.updated_at).getTime() : 0;
+      const tb = b.updated_at ? new Date(b.updated_at).getTime() : 0;
+      return tb - ta;
+    });
+    return NextResponse.json(notes);
+  }
+
+  if (method === 'PUT' && segments[0] === 'notes' && segments[1]) {
+    const lessonId = segments[1];
+    let content = '';
+    let courseSlug = 'course';
+    let courseTitle = 'Course';
+    let lessonTitle = 'Lesson note';
+    let moduleTitle: string | null = null;
+    try {
+      const body = (await request?.json()) as
+        | {
+            content?: unknown;
+            course_slug?: unknown;
+            course_title?: unknown;
+            lesson_title?: unknown;
+            module_title?: unknown;
+          }
+        | undefined;
+      content = typeof body?.content === 'string' ? body.content : '';
+      courseSlug = typeof body?.course_slug === 'string' && body.course_slug.trim() ? body.course_slug : courseSlug;
+      courseTitle = typeof body?.course_title === 'string' && body.course_title.trim() ? body.course_title : courseTitle;
+      lessonTitle = typeof body?.lesson_title === 'string' && body.lesson_title.trim() ? body.lesson_title : lessonTitle;
+      moduleTitle = typeof body?.module_title === 'string' && body.module_title.trim() ? body.module_title : null;
+    } catch {
+      content = '';
+    }
+
+    const now = new Date().toISOString();
+    const existing = notesStore.get(lessonId);
+    const next: StubLessonNote = {
+      id: `stub-note-${lessonId}`,
+      lesson_id: lessonId,
+      lesson_title: lessonTitle || existing?.lesson_title || 'Lesson note',
+      module_title: moduleTitle ?? existing?.module_title ?? null,
+      course_title: courseTitle || existing?.course_title || 'Course',
+      course_slug: courseSlug || existing?.course_slug || 'course',
+      content,
+      updated_at: now,
+    };
+    notesStore.set(lessonId, next);
+    return NextResponse.json(next);
+  }
+
+  if (method === 'DELETE' && segments[0] === 'notes' && segments[1]) {
+    notesStore.delete(segments[1]);
+    return NextResponse.json({ ok: true });
+  }
+
   return null;
 }
 
@@ -107,31 +180,31 @@ function notConfiguredResponse(): NextResponse {
   );
 }
 
-async function handle(method: string, ctx: Ctx): Promise<NextResponse> {
+async function handle(method: string, ctx: Ctx, request?: NextRequest): Promise<NextResponse> {
   const { path = [] } = await ctx.params;
 
-  const stub = localStub(method, path);
+  const stub = await localStub(method, path, request);
   if (stub) return stub;
 
   return notConfiguredResponse();
 }
 
 export async function GET(_request: NextRequest, ctx: Ctx) {
-  return handle('GET', ctx);
+  return handle('GET', ctx, _request);
 }
 
-export async function POST(_request: NextRequest, ctx: Ctx) {
-  return handle('POST', ctx);
+export async function POST(request: NextRequest, ctx: Ctx) {
+  return handle('POST', ctx, request);
 }
 
-export async function PATCH(_request: NextRequest, ctx: Ctx) {
-  return handle('PATCH', ctx);
+export async function PATCH(request: NextRequest, ctx: Ctx) {
+  return handle('PATCH', ctx, request);
 }
 
-export async function PUT(_request: NextRequest, ctx: Ctx) {
-  return handle('PUT', ctx);
+export async function PUT(request: NextRequest, ctx: Ctx) {
+  return handle('PUT', ctx, request);
 }
 
-export async function DELETE(_request: NextRequest, ctx: Ctx) {
-  return handle('DELETE', ctx);
+export async function DELETE(request: NextRequest, ctx: Ctx) {
+  return handle('DELETE', ctx, request);
 }
