@@ -77,7 +77,7 @@ function HeroMeshBackdrop() {
       />
       <div
         className="absolute inset-0 opacity-[0.11]"
-        style={{
+      style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
         }}
       />
@@ -413,7 +413,7 @@ function TrustStrip() {
       <div className="flex items-center gap-3">
         <span className="text-[10px] tracking-[0.12em] text-white/30 uppercase">Aligned with</span>
         {['IICRC', 'NRPG'].map((abbr) => (
-          <span
+        <span
             key={abbr}
             className="rounded-lg border border-white/[0.08] bg-white/[0.04] px-2.5 py-1.5 text-[10px] font-bold tracking-wide text-white/45"
           >
@@ -440,12 +440,12 @@ export function AnimatedHero({ benefits }: AnimatedHeroProps) {
     <section className="relative z-10 overflow-hidden pt-20 pb-16 sm:pt-24 sm:pb-20 lg:pt-28 lg:pb-24">
       <div className={`relative ${PUBLIC_SHELL_INNER_CLASS}`}>
         <div className="grid items-center gap-14 lg:grid-cols-[minmax(0,1fr)_minmax(320px,520px)] lg:gap-12 xl:gap-16">
-          <motion.div
+        <motion.div
             className="min-w-0"
             initial="hidden"
-            animate="visible"
-            variants={staggerContainer}
-          >
+          animate="visible"
+          variants={staggerContainer}
+        >
             <motion.div variants={fadeInUp} transition={{ duration: 0.55, ease: smoothEase }}>
               <span className="inline-flex items-center gap-2 rounded-full border border-[#2490ed]/25 bg-[#2490ed]/10 px-3 py-1 text-xs font-medium text-[#7ec5ff]">
                 <span className="relative flex h-2 w-2">
@@ -456,68 +456,68 @@ export function AnimatedHero({ benefits }: AnimatedHeroProps) {
               </span>
             </motion.div>
 
-            <motion.h1
-              variants={fadeInUp}
-              transition={{ duration: 0.6, ease: smoothEase }}
+          <motion.h1
+            variants={fadeInUp}
+            transition={{ duration: 0.6, ease: smoothEase }}
               className="mt-6 text-4xl leading-[1.08] font-bold tracking-tight text-balance text-white sm:text-5xl lg:text-[3.25rem] lg:leading-[1.06]"
             >
               Learn like the pros.{' '}
               <span className="bg-gradient-to-r from-[#2490ed] via-[#5eb3ff] to-[#00d4aa] bg-clip-text text-transparent">
                 On your schedule.
               </span>
-            </motion.h1>
+          </motion.h1>
 
-            <motion.p
-              variants={fadeInUp}
+          <motion.p
+            variants={fadeInUp}
               transition={{ duration: 0.55, ease: smoothEase }}
               className="mt-5 max-w-xl text-base leading-relaxed text-white/55 sm:text-lg"
-            >
+          >
               Self-paced IICRC CEC training for restoration and commercial cleaning professionals —
               the same clarity you expect from global learning platforms, tuned for Australian
               technicians and NRPG pathways.
-            </motion.p>
+          </motion.p>
 
             <div className="mt-8 space-y-4">
               <CatalogSearchCue />
-              <motion.div
-                variants={fadeInUp}
+          <motion.div
+            variants={fadeInUp}
                 transition={{ duration: 0.55, ease: smoothEase }}
                 className="flex flex-wrap gap-3"
-              >
-                <Link
-                  href="/courses"
+          >
+            <Link
+              href="/courses"
                   className="group inline-flex items-center gap-2 rounded-xl bg-[#ed9d24] px-7 py-3.5 text-sm font-semibold text-[#1a1205] shadow-[0_12px_32px_-12px_rgba(237,157,36,0.55)] transition-all duration-200 hover:scale-[1.02] hover:shadow-[0_16px_40px_-12px_rgba(237,157,36,0.65)]"
-                >
+            >
                   Explore courses
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-                </Link>
-                <Link
-                  href="/pathways"
+            </Link>
+            <Link
+              href="/pathways"
                   className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/[0.04] px-7 py-3.5 text-sm font-semibold text-white/85 backdrop-blur-sm transition-all duration-200 hover:border-white/25 hover:bg-white/[0.07]"
                 >
                   View learning pathways
-                </Link>
-              </motion.div>
+            </Link>
+          </motion.div>
             </div>
 
-            <motion.ul
-              variants={staggerContainer}
+          <motion.ul
+            variants={staggerContainer}
               initial="hidden"
-              animate="visible"
+            animate="visible"
               className="mt-10 grid gap-3 sm:grid-cols-2"
-            >
+          >
               {topBenefits.map((benefit, i) => (
-                <motion.li
-                  key={benefit}
-                  variants={fadeInUp}
+              <motion.li
+                key={benefit}
+                variants={fadeInUp}
                   transition={{ duration: 0.45, ease: smoothEase, delay: 0.15 + i * 0.05 }}
                   className="flex items-start gap-2.5 text-sm text-white/50"
-                >
+              >
                   <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400/90" />
                   <span>{benefit}</span>
-                </motion.li>
-              ))}
-            </motion.ul>
+              </motion.li>
+            ))}
+          </motion.ul>
 
             <TrustStrip />
           </motion.div>
@@ -529,7 +529,7 @@ export function AnimatedHero({ benefits }: AnimatedHeroProps) {
             transition={{ duration: 0.7, ease: smoothEase, delay: 0.1 }}
           >
             <HeroLearningPreview />
-          </motion.div>
+        </motion.div>
         </div>
       </div>
     </section>
@@ -668,11 +668,11 @@ export function AnimatedSection({
             ) : (
               <>
                 <p className="mb-3 inline-flex items-center rounded-full border border-[#2490ed]/30 bg-[#2490ed]/10 px-3 py-1 text-[11px] font-semibold tracking-[0.14em] text-[#7ec5ff] uppercase">
-                  {label}
-                </p>
+              {label}
+            </p>
                 <h2 className="max-w-3xl text-2xl font-bold tracking-tight text-balance text-white md:text-3xl lg:text-[2.15rem] lg:leading-tight">
-                  {title}
-                </h2>
+              {title}
+            </h2>
                 <div
                   className="mt-4 h-1 w-16 rounded-full bg-gradient-to-r from-[#2490ed] via-[#5eb3ff] to-[#00d4aa]"
                   aria-hidden
