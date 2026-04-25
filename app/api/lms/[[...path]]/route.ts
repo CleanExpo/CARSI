@@ -126,10 +126,10 @@ async function localStub(
   if (method === 'PUT' && segments[0] === 'notes' && segments[1]) {
     const lessonId = segments[1];
     let content = '';
-    let courseSlug = 'course';
-    let courseTitle = 'Course';
-    let lessonTitle = 'Lesson note';
-    let moduleTitle: string | null = null;
+    let courseSlug: string | undefined;
+    let courseTitle: string | undefined;
+    let lessonTitle: string | undefined;
+    let moduleTitle: string | null | undefined;
     try {
       const body = (await request?.json()) as
         | {
@@ -141,10 +141,22 @@ async function localStub(
           }
         | undefined;
       content = typeof body?.content === 'string' ? body.content : '';
-      courseSlug = typeof body?.course_slug === 'string' && body.course_slug.trim() ? body.course_slug : courseSlug;
-      courseTitle = typeof body?.course_title === 'string' && body.course_title.trim() ? body.course_title : courseTitle;
-      lessonTitle = typeof body?.lesson_title === 'string' && body.lesson_title.trim() ? body.lesson_title : lessonTitle;
-      moduleTitle = typeof body?.module_title === 'string' && body.module_title.trim() ? body.module_title : null;
+      courseSlug =
+        typeof body?.course_slug === 'string' && body.course_slug.trim()
+          ? body.course_slug
+          : undefined;
+      courseTitle =
+        typeof body?.course_title === 'string' && body.course_title.trim()
+          ? body.course_title
+          : undefined;
+      lessonTitle =
+        typeof body?.lesson_title === 'string' && body.lesson_title.trim()
+          ? body.lesson_title
+          : undefined;
+      moduleTitle =
+        typeof body?.module_title === 'string' && body.module_title.trim()
+          ? body.module_title
+          : undefined;
     } catch {
       content = '';
     }
@@ -154,10 +166,10 @@ async function localStub(
     const next: StubLessonNote = {
       id: `stub-note-${lessonId}`,
       lesson_id: lessonId,
-      lesson_title: lessonTitle || existing?.lesson_title || 'Lesson note',
+      lesson_title: lessonTitle ?? existing?.lesson_title ?? 'Lesson note',
       module_title: moduleTitle ?? existing?.module_title ?? null,
-      course_title: courseTitle || existing?.course_title || 'Course',
-      course_slug: courseSlug || existing?.course_slug || 'course',
+      course_title: courseTitle ?? existing?.course_title ?? 'Course',
+      course_slug: courseSlug ?? existing?.course_slug ?? 'course',
       content,
       updated_at: now,
     };
