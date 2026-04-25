@@ -54,6 +54,13 @@ export async function GET(request: NextRequest) {
     });
   } catch (e) {
     console.error('[leaderboard]', e);
-    return NextResponse.json({ detail: 'Could not load leaderboard.' }, { status: 500 });
+    // Fail open for dashboard UX: show an empty board instead of a hard error.
+    return NextResponse.json({
+      period_label: leaderboardPeriodLabelNow(),
+      period_timezone: 'Australia/Sydney',
+      discipline,
+      items: [],
+      unavailable: true,
+    });
   }
 }
