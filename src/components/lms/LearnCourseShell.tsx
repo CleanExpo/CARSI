@@ -3,15 +3,21 @@
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Check, ChevronLeft, ChevronRight, Home, Layers, Loader2 } from 'lucide-react';
+import { Check, ChevronLeft, ChevronRight, Home, Layers, Loader2, Share2 } from 'lucide-react';
 
 import { CourseCompletionBanner } from '@/components/lms/CourseCompletionBanner';
 import { LearnModuleOverview } from '@/components/lms/LearnModuleOverview';
 import { LessonPlayer } from '@/components/lms/LessonPlayer';
+import { ProgressSharePrompt } from '@/components/lms/ProgressSharePrompt';
 import { Button } from '@/components/ui/button';
 import { apiClient, ApiClientError } from '@/lib/api/client';
 import { useOnlineStatus } from '@/hooks/use-online-status';
 import { applyNoteFormatting, type NoteFormatAction } from '@/lib/lms/note-formatting';
+import {
+  buildProgressShareDraft,
+  type ProgressShareDraft,
+  type ProgressShareType,
+} from '@/lib/lms/progress-share-post';
 
 interface CurriculumLesson {
   id: string;
@@ -100,6 +106,8 @@ export function LearnCourseShell({ slug }: { slug: string }) {
   const [deletingNote, setDeletingNote] = useState(false);
   const [noteStatus, setNoteStatus] = useState<string | null>(null);
   const noteEditorRef = useRef<HTMLTextAreaElement | null>(null);
+  const [shareDraft, setShareDraft] = useState<ProgressShareDraft | null>(null);
+  const shownShareKeysRef = useRef(new Set<string>());
 
   const flatLessons = useMemo(() => {
     if (!curriculum) return [];
@@ -289,9 +297,20 @@ export function LearnCourseShell({ slug }: { slug: string }) {
       await apiClient.patch(`/api/lms/lessons/${encodeURIComponent(activeLessonId)}/progress`, {
         completed,
       });
+      let nextShare: ProgressShareDraft | null = null;
+      let nextShareKey: string | null = null;
       setCurriculum((prev) => {
         if (!prev) return prev;
-        return {
+        const oldCourseComplete = prev.modules.every((m) => m.lessons.every((l) => l.completed));
+        const moduleIndexById = new Map(prev.modules.map((m, i) => [m.id, i + 1]));
+        const targetModule = prev.modules.find((m) => m.lessons.some((l) => l.id === activeLessonId));
+        const oldModuleComplete = targetModule
+          ? targetModule.lessons.every((l) => l.completed)
+          : false;
+        const wasLessonComplete =
+          targetModule?.lessons.some((l) => l.id === activeLessonId && l.completed) ?? false;
+
+        const next = {
           ...prev,
           modules: prev.modules.map((mod) => ({
             ...mod,
@@ -300,10 +319,92 @@ export function LearnCourseShell({ slug }: { slug: string }) {
             ),
           })),
         };
+        if (completed && !wasLessonComplete) {
+          const nextTargetModule =
+            next.modules.find((m) => m.lessons.some((l) => l.id === activeLessonId)) ?? null;
+          const newModuleComplete = nextTargetModule
+            ? nextTargetModule.lessons.every((l) => l.completed)
+            : false;
+          const newCourseComplete = next.modules.every((m) => m.lessons.every((l) => l.completed));
+
+          const completedLesson = nextTargetModule?.lessons.find((l) => l.id === activeLessonId);
+          const lessonTitleForShare = completedLesson?.title ?? '';
+
+          let shareType: ProgressShareType;
+          if (!oldCourseComplete && newCourseComplete) shareType = 'course';
+          else if (!oldModuleComplete && newModuleComplete) shareType = 'module';
+          else shareType = 'lesson';
+
+          const moduleNumber = nextTargetModule
+            ? moduleIndexById.get(nextTargetModule.id) ?? null
+            : null;
+          const key =
+            shareType === 'course'
+              ? `course:${next.course.slug}`
+              : shareType === 'module'
+                ? `module:${next.course.slug}:${nextTargetModule?.id ?? 'unknown'}`
+                : `lesson:${next.course.slug}:${activeLessonId}`;
+
+          if (!shownShareKeysRef.current.has(key)) {
+            if (shareType === 'course') {
+              nextShare = buildProgressShareDraft({
+                type: 'course',
+                courseTitle: next.course.title,
+              });
+            } else if (shareType === 'module') {
+              nextShare = buildProgressShareDraft({
+                type: 'module',
+                courseTitle: next.course.title,
+                moduleTitle: nextTargetModule?.title ?? null,
+                moduleNumber,
+              });
+            } else {
+              nextShare = buildProgressShareDraft({
+                type: 'lesson',
+                courseTitle: next.course.title,
+                lessonTitle: lessonTitleForShare,
+                moduleTitle: nextTargetModule?.title ?? null,
+                moduleNumber,
+              });
+            }
+            nextShareKey = key;
+          }
+        }
+        return next;
       });
+      if (nextShare) {
+        setShareDraft(nextShare);
+        if (nextShareKey) shownShareKeysRef.current.add(nextShareKey);
+      }
     } finally {
       setSavingComplete(false);
     }
+  }
+
+  function openCourseSharePrompt() {
+    if (!curriculum) return;
+    setShareDraft(
+      buildProgressShareDraft({
+        type: 'course',
+        courseTitle: curriculum.course.title,
+      })
+    );
+    shownShareKeysRef.current.add(`course:${curriculum.course.slug}`);
+  }
+
+  function openLessonSharePrompt() {
+    if (!curriculum || !activeLessonId || !lessonDetail) return;
+    const lessonTitle =
+      flatLessons.find((l) => l.id === activeLessonId)?.title ?? lessonDetail.lesson.title;
+    setShareDraft(
+      buildProgressShareDraft({
+        type: 'lesson',
+        courseTitle: curriculum.course.title,
+        lessonTitle,
+        moduleTitle: activeModule?.title ?? null,
+        moduleNumber: moduleIndex > 0 ? moduleIndex : null,
+      })
+    );
   }
 
   async function saveLessonNote() {
@@ -392,8 +493,10 @@ export function LearnCourseShell({ slug }: { slug: string }) {
         <CourseCompletionBanner
           courseTitle={curriculum.course.title}
           enrollmentId={curriculum.enrollment_id}
+          onShare={openCourseSharePrompt}
         />
       ) : null}
+      <ProgressSharePrompt draft={shareDraft} onClose={() => setShareDraft(null)} />
 
       {!online ? (
         <div
@@ -633,14 +736,27 @@ export function LearnCourseShell({ slug }: { slug: string }) {
                             <ChevronRight className="h-4 w-4" />
                           </Button>
                         </div>
-                        <Button
-                          type="button"
-                          disabled={savingComplete || currentMeta?.completed}
-                          className="rounded-md bg-emerald-600 text-white hover:bg-emerald-500 disabled:opacity-50"
-                          onClick={() => void toggleComplete(true)}
-                        >
-                          {currentMeta?.completed ? 'Lesson completed' : 'Mark lesson complete'}
-                        </Button>
+                        <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-3">
+                          {currentMeta?.completed ? (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              onClick={openLessonSharePrompt}
+                              className="gap-1.5 border-[#2490ed]/35 bg-[#2490ed]/10 text-[#7ec5ff] hover:bg-[#2490ed]/20"
+                            >
+                              <Share2 className="h-4 w-4" aria-hidden />
+                              Share progress
+                            </Button>
+                          ) : null}
+                          <Button
+                            type="button"
+                            disabled={savingComplete || currentMeta?.completed}
+                            className="rounded-md bg-emerald-600 text-white hover:bg-emerald-500 disabled:opacity-50"
+                            onClick={() => void toggleComplete(true)}
+                          >
+                            {currentMeta?.completed ? 'Lesson completed' : 'Mark lesson complete'}
+                          </Button>
+                        </div>
                       </div>
                     </>
                   }
