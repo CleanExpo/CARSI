@@ -20,7 +20,6 @@ function webpackReactAliases(config: {
     ...config.resolve.alias,
     react: reactDir,
     'react-dom': reactDomDir,
-    // Use resolved entry files so Next/RSC and the app share one React (fixes invalid hook / duplicate React).
     'react/jsx-runtime': require.resolve('react/jsx-runtime'),
     'react/jsx-dev-runtime': require.resolve('react/jsx-dev-runtime'),
   };
@@ -63,7 +62,6 @@ const pwaConfig = withPWA({
         expiration: { maxEntries: 24, maxAgeSeconds: 7 * 86400 },
       },
     },
-    /** Learn shell HTML (production PWA only — disabled in dev by next-pwa). */
     {
       urlPattern: /\/dashboard\/learn\//,
       handler: 'NetworkFirst',
@@ -79,29 +77,19 @@ const pwaConfig = withPWA({
 const nextConfig: NextConfig = {
   output: 'standalone',
   reactStrictMode: true,
-  /** Production deploys: do not fail the build on TS (fix issues in follow-up PRs). */
   typescript: {
     ignoreBuildErrors: true,
   },
-  // Next.js 16: do not set `eslint` here — it is not a valid next.config key; use `eslint.config` / `next lint`.
   transpilePackages: ['@shared'],
-  /**
-   * Force one React instance in the client bundle. Without this, pnpm + next-pwa/webpack can
-   * resolve duplicate `react` copies → "Cannot read properties of undefined (reading 'ReactCurrentDispatcher')".
-   */
   webpack: (config) => webpackReactAliases(config),
   turbopack: {},
   experimental: {
-    // Typed routes disabled - requires full route type generation to be configured
-    // typedRoutes: true,
   },
-  // Load image URLs in the browser (no /_next/image proxy). Avoids remotePatterns and CDN timeouts.
   images: {
     unoptimized: true,
   },
   async headers() {
     const isDev = process.env.NODE_ENV === 'development';
-    // Next.js dev / webpack HMR / React Refresh use eval(); strict script-src breaks the app.
     const scriptSrc = isDev
       ? "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://js.stripe.com"
       : "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://js.stripe.com";
