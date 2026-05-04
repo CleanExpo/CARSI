@@ -1,19 +1,20 @@
 'use client';
 
 import Link from 'next/link';
-import { Award, Download, PartyPopper, Sparkles } from 'lucide-react';
+import { Award, Download, PartyPopper, Share2, Sparkles } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 
 type Props = {
   courseTitle: string;
   enrollmentId: string;
+  onShare?: () => void;
 };
 
 /**
  * Shown when every lesson in the course curriculum is marked complete.
  */
-export function CourseCompletionBanner({ courseTitle, enrollmentId }: Props) {
+export function CourseCompletionBanner({ courseTitle, enrollmentId, onShare }: Props) {
   const pdfHref = `/api/lms/enrollments/${encodeURIComponent(enrollmentId)}/certificate`;
 
   return (
@@ -48,6 +49,17 @@ export function CourseCompletionBanner({ courseTitle, enrollmentId }: Props) {
           </p>
         </div>
         <div className="flex shrink-0 flex-col gap-2 sm:min-w-[200px]">
+          {onShare ? (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onShare}
+              className="w-full border-[#2490ed]/30 bg-[#2490ed]/10 text-[#7ec5ff] hover:bg-[#2490ed]/20 sm:w-auto"
+            >
+              <Share2 className="mr-2 h-4 w-4" aria-hidden />
+              Share progress
+            </Button>
+          ) : null}
           <Button
             asChild
             className="w-full rounded-lg bg-emerald-600 text-white hover:bg-emerald-500 sm:w-auto"
