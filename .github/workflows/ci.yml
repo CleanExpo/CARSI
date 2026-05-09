@@ -46,90 +46,11 @@ jobs:
           path: verify-output.log
           retention-days: 30
 
-  backend-tests:
-    name: Backend Tests
-    needs: [dependency-verification]
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-
-    services:
-      postgres:
-        image: postgres:15-alpine
-        env:
-          POSTGRES_DB: starter_db
-          POSTGRES_USER: starter_user
-          POSTGRES_PASSWORD: local_dev_password
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup uv
-        uses: astral-sh/setup-uv@v4
-        with:
-          version: 'latest'
-
-      - name: Set up Python
-        run: uv python install ${{ env.PYTHON_VERSION }}
-
-      - name: Cache uv dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/uv
-            apps/backend/.venv
-          key: ${{ runner.os }}-uv-${{ hashFiles('apps/backend/pyproject.toml') }}
-          restore-keys: |
-            ${{ runner.os }}-uv-
-
-      - name: Install dependencies
-        working-directory: apps/backend
-        run: uv sync --extra dev
-
-      - name: Lint with ruff
-        working-directory: apps/backend
-        run: uv run ruff check src/
-
-      - name: Type check with mypy
-        working-directory: apps/backend
-        run: uv run mypy src/
-        continue-on-error: true
-
-      - name: Run tests with coverage
-        working-directory: apps/backend
-        run: uv run pytest --cov=src --cov-report=xml --cov-report=html --cov-report=term-missing -v
-        env:
-          DATABASE_URL: postgresql://starter_user:local_dev_password@localhost:5432/starter_db
-
-      - name: Check Alembic migrations are up-to-date
-        working-directory: apps/backend
-        run: uv run alembic check
-        env:
-          DATABASE_URL: postgresql://starter_user:local_dev_password@localhost:5432/starter_db
-
-      - name: Upload coverage report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: backend-coverage
-          path: |
-            apps/backend/coverage.xml
-            apps/backend/htmlcov/
-          retention-days: 30
-
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: backend-test-results
-          path: apps/backend/.pytest_cache/
+  # backend-tests removed 2026-04-19 — CARSI has no apps/backend directory
+  # (checked with `ls apps/` → not a monorepo). The old job referenced a
+  # phantom path and failed every run, blocking e2e-tests + build via
+  # their `needs:` entries. If a Python backend is added later, restore
+  # this job with real paths.
 
   frontend-tests:
     name: Frontend Tests
@@ -159,7 +80,7 @@ jobs:
     name: Build Check
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    needs: [backend-tests, frontend-tests]
+    needs: [frontend-tests]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -189,7 +110,7 @@ jobs:
     name: E2E Tests
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    needs: [backend-tests, frontend-tests]
+    needs: [frontend-tests]
 
     services:
       postgres:
