@@ -211,3 +211,24 @@ model LmsLearningPathway {
 
   @@map("lms_learning_pathways")
 }
+
+/// RA-3027 — replaces the single ADMIN_EMAIL+ADMIN_PASSWORD env-var gate
+/// for the CARSI admin surface. Multiple admins, per-admin password hash
+/// (bcryptjs), per-admin role, audit-able lastLoginAt.
+///
+/// Migration semantics: backwards-compatible — the env-var login path
+/// remains active until at least one row exists in this table. See
+/// `docs/ADMIN_AUTH_MIGRATION.md` for rollout steps.
+model AdminUser {
+  id             String    @id @default(uuid()) @db.Uuid
+  email          String    @unique
+  passwordHash   String    @map("password_hash")
+  role           String    @default("admin")
+  isActive       Boolean   @default(true) @map("is_active")
+  lastLoginAt    DateTime? @map("last_login_at") @db.Timestamptz(6)
+  lastLoginIp    String?   @map("last_login_ip")
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@map("admin_users")
+}

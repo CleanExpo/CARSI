@@ -13,8 +13,24 @@ export async function GET(request: NextRequest) {
   }
 
   const q = request.nextUrl.searchParams.get('q')?.trim() ?? '';
-  if (q.length < 2) {
+  // RA-3027 — bumped from 2 to 3 chars. 2-char substrings return huge
+  // PII slices that resemble enumeration / scraping access patterns.
+  if (q.length < 3) {
     return NextResponse.json({ users: [] });
+  }
+  // RA-3027 — best-effort audit log of admin search queries. Structured
+  // JSON for downstream log aggregation. Failure here is non-fatal.
+  try {
+    console.log(
+      JSON.stringify({
+        ts: new Date().toISOString(),
+        kind: 'admin_search',
+        admin_email: session.email,
+        q_length: q.length,
+      }),
+    );
+  } catch {
+    // swallow — never block a search on audit-log failure
   }
 
   const term = q.toLowerCase();
