@@ -1,6 +1,14 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
+import { applyRateLimit, UNKNOWN_IP } from '@/lib/rate-limit';
+import { verifyTurnstile } from '@/lib/turnstile';
+
+/* ─── RA-3022 — rate-limit + Turnstile config ─────────────────────────────── */
+
+const LIMIT = 5;
+const WINDOW_MS = 60 * 60 * 1000; // 5/hour per IP
+
 /* ─── Types ───────────────────────────────────────────────────────────────── */
 
 const VALID_TYPES = [
@@ -27,6 +35,7 @@ interface SubmissionPayload {
   submission_description?: string;
   terms_accepted: boolean;
   guidelines_accepted: boolean;
+  cfTurnstileResponse?: string;
 }
 
 interface HubSubmissionInsert {
@@ -67,15 +76,50 @@ function getClientIp(req: NextRequest): string | null {
   );
 }
 
+function getClientIpForLimit(req: NextRequest): string {
+  return getClientIp(req) ?? UNKNOWN_IP;
+}
+
 /* ─── Route handler ───────────────────────────────────────────────────────── */
 
 export async function POST(req: NextRequest) {
+  /* RA-3022 — 1. Rate limit BEFORE parsing body so abusers cost less per request. */
+  const ip = getClientIpForLimit(req);
+  const rl = applyRateLimit(ip, LIMIT, WINDOW_MS);
+  if (!rl.ok) {
+    return NextResponse.json(
+      { success: false, error: 'Too many requests. Please try again later.' },
+      {
+        status: 429,
+        headers: {
+          'Retry-After': String(Math.ceil((rl.resetAt - Date.now()) / 1000)),
+        },
+      },
+    );
+  }
+
   /* 1. Parse body */
   let body: SubmissionPayload;
   try {
     body = (await req.json()) as SubmissionPayload;
   } catch {
     return NextResponse.json({ success: false, error: 'Invalid request body.' }, { status: 400 });
+  }
+
+  /* RA-3022 — Turnstile CAPTCHA — required for unauthenticated PII intake. */
+  const tsToken = body.cfTurnstileResponse ?? req.headers.get('cf-turnstile-response');
+  if (!tsToken) {
+    return NextResponse.json(
+      { success: false, error: 'CAPTCHA required.' },
+      { status: 400 },
+    );
+  }
+  const ts = await verifyTurnstile(tsToken, ip === UNKNOWN_IP ? null : ip);
+  if (!ts.success) {
+    return NextResponse.json(
+      { success: false, error: 'CAPTCHA verification failed.' },
+      { status: 401 },
+    );
   }
 
   /* 2. Validate required fields */
@@ -147,14 +191,20 @@ export async function POST(req: NextRequest) {
     user_agent: req.headers.get('user-agent'),
   };
 
-  /* 4. Forward to FastAPI hub intake */
+  /* 4. Forward to FastAPI hub intake — RA-3022 adds X-Internal-Auth so the
+        FastAPI side can reject anything that didn't go through this gate. */
+  const intakeSecret = process.env.HUB_INTAKE_SECRET;
+  const forwardHeaders: Record<string, string> = {
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+  };
+  if (intakeSecret?.trim()) {
+    forwardHeaders['X-Internal-Auth'] = intakeSecret;
+  }
   try {
     const res = await fetch(`${apiUrl.replace(/\/$/, '')}/api/hub/submissions/intake`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
+      headers: forwardHeaders,
       body: JSON.stringify(record),
     });
 
