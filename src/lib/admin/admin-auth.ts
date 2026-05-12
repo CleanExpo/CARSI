@@ -86,8 +86,23 @@ export async function verifyAdminSessionToken(token: string): Promise<AdminSessi
     if (sub !== 'admin') return null;
     const email = typeof payload.email === 'string' ? payload.email : '';
     if (!email) return null;
-    if (email.toLowerCase() !== getAdminEmail().toLowerCase()) return null;
-    return { email };
+    // RA-3027 — accept any email present in the `admin_users` table OR
+    // the legacy env-var email. The DB check is lazy-imported so this
+    // module stays usable in contexts that don't have Prisma loaded.
+    const emailLower = email.toLowerCase();
+    if (emailLower === getAdminEmail().toLowerCase()) return { email };
+    try {
+      const { prisma } = await import('@/lib/prisma');
+      const row = await prisma.adminUser.findUnique({
+        where: { email: emailLower },
+        select: { isActive: true },
+      });
+      if (row?.isActive) return { email };
+    } catch {
+      // DB unavailable — fall through to reject. Conservative on purpose
+      // since we don't want stolen tokens to validate during a DB outage.
+    }
+    return null;
   } catch {
     return null;
   }
