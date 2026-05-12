@@ -1,24 +1,12 @@
 // CARSI ESLint flat config — RA-3015.
 //
-// ESLint v9 dropped support for legacy `.eslintrc.*` files; the project
-// now needs a flat config. We use `FlatCompat` to bridge the Next.js
-// presets (which still ship as the legacy format) into the flat-config
-// world without rewriting them.
-//
-// Companion to the PR #110 fix that flipped the `lint` script from
-// `next lint` (broken in Next 16) to `eslint .`. With both changes,
-// `npm run lint` works in CI again.
+// `eslint-config-next` v16 already exports flat-config arrays from
+// `core-web-vitals` and `typescript`, so we import them directly
+// rather than going through `FlatCompat` (which hits a circular-JSON
+// bug in @eslint/eslintrc's config-validator on these configs).
 
-import { dirname } from "path";
-import { fileURLToPath } from "url";
-import { FlatCompat } from "@eslint/eslintrc";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-});
+import nextCoreWebVitals from "eslint-config-next/core-web-vitals";
+import nextTypescript from "eslint-config-next/typescript";
 
 export default [
   {
@@ -35,5 +23,6 @@ export default [
       "prisma/migrations/**",
     ],
   },
-  ...compat.extends("next/core-web-vitals", "next/typescript"),
+  ...nextCoreWebVitals,
+  ...nextTypescript,
 ];
