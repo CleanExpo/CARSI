@@ -1,8 +1,18 @@
+import { Prisma } from '@/generated/prisma/client';
+
 import { prisma } from '@/lib/prisma';
 
 /** XP aligned with internal CARSI gamification design (lesson / course completion). */
 export const XP_LESSON_COMPLETE = 10;
 export const XP_COURSE_COMPLETE = 100;
+
+/** Per-student XP in GROUP BY — COUNT * literal avoids PostgreSQL `sum(unknown)` (42725). */
+const SQL_LESSON_XP_TOTAL = Prisma.raw(
+  `(COUNT(*)::bigint * ${XP_LESSON_COMPLETE}::bigint)`
+);
+const SQL_COURSE_XP_TOTAL = Prisma.raw(
+  `(COUNT(*)::bigint * ${XP_COURSE_COMPLETE}::bigint)`
+);
 
 const LEVEL_TITLES = [
   'Apprentice',
@@ -93,7 +103,7 @@ export async function lessonXpGrouped(
 
   if (hasPeriod && discipline) {
     const rows = await prisma.$queryRaw<IdXpRow[]>`
-      SELECT lp.student_id::text AS student_id, SUM(${XP_LESSON_COMPLETE})::bigint AS xp
+      SELECT lp.student_id::text AS student_id, ${SQL_LESSON_XP_TOTAL} AS xp
       FROM lms_lesson_progress lp
       INNER JOIN lms_lessons l ON l.id = lp.lesson_id
       INNER JOIN lms_modules m ON m.id = l.module_id
@@ -107,7 +117,7 @@ export async function lessonXpGrouped(
     addRows(rows);
   } else if (hasPeriod) {
     const rows = await prisma.$queryRaw<IdXpRow[]>`
-      SELECT lp.student_id::text AS student_id, SUM(${XP_LESSON_COMPLETE})::bigint AS xp
+      SELECT lp.student_id::text AS student_id, ${SQL_LESSON_XP_TOTAL} AS xp
       FROM lms_lesson_progress lp
       INNER JOIN lms_lessons l ON l.id = lp.lesson_id
       INNER JOIN lms_modules m ON m.id = l.module_id
@@ -120,7 +130,7 @@ export async function lessonXpGrouped(
     addRows(rows);
   } else if (discipline) {
     const rows = await prisma.$queryRaw<IdXpRow[]>`
-      SELECT lp.student_id::text AS student_id, SUM(${XP_LESSON_COMPLETE})::bigint AS xp
+      SELECT lp.student_id::text AS student_id, ${SQL_LESSON_XP_TOTAL} AS xp
       FROM lms_lesson_progress lp
       INNER JOIN lms_lessons l ON l.id = lp.lesson_id
       INNER JOIN lms_modules m ON m.id = l.module_id
@@ -132,7 +142,7 @@ export async function lessonXpGrouped(
     addRows(rows);
   } else {
     const rows = await prisma.$queryRaw<IdXpRow[]>`
-      SELECT lp.student_id::text AS student_id, SUM(${XP_LESSON_COMPLETE})::bigint AS xp
+      SELECT lp.student_id::text AS student_id, ${SQL_LESSON_XP_TOTAL} AS xp
       FROM lms_lesson_progress lp
       INNER JOIN lms_lessons l ON l.id = lp.lesson_id
       INNER JOIN lms_modules m ON m.id = l.module_id
@@ -164,7 +174,7 @@ export async function courseXpGrouped(
 
   if (hasPeriod && discipline) {
     const rows = await prisma.$queryRaw<IdXpRow[]>`
-      SELECT e.student_id::text AS student_id, SUM(${XP_COURSE_COMPLETE})::bigint AS xp
+      SELECT e.student_id::text AS student_id, ${SQL_COURSE_XP_TOTAL} AS xp
       FROM lms_enrollments e
       INNER JOIN lms_courses c ON c.id = e.course_id
       WHERE e.completed_at IS NOT NULL
@@ -176,7 +186,7 @@ export async function courseXpGrouped(
     addRows(rows);
   } else if (hasPeriod) {
     const rows = await prisma.$queryRaw<IdXpRow[]>`
-      SELECT e.student_id::text AS student_id, SUM(${XP_COURSE_COMPLETE})::bigint AS xp
+      SELECT e.student_id::text AS student_id, ${SQL_COURSE_XP_TOTAL} AS xp
       FROM lms_enrollments e
       INNER JOIN lms_courses c ON c.id = e.course_id
       WHERE e.completed_at IS NOT NULL
@@ -187,7 +197,7 @@ export async function courseXpGrouped(
     addRows(rows);
   } else if (discipline) {
     const rows = await prisma.$queryRaw<IdXpRow[]>`
-      SELECT e.student_id::text AS student_id, SUM(${XP_COURSE_COMPLETE})::bigint AS xp
+      SELECT e.student_id::text AS student_id, ${SQL_COURSE_XP_TOTAL} AS xp
       FROM lms_enrollments e
       INNER JOIN lms_courses c ON c.id = e.course_id
       WHERE e.completed_at IS NOT NULL
@@ -197,7 +207,7 @@ export async function courseXpGrouped(
     addRows(rows);
   } else {
     const rows = await prisma.$queryRaw<IdXpRow[]>`
-      SELECT e.student_id::text AS student_id, SUM(${XP_COURSE_COMPLETE})::bigint AS xp
+      SELECT e.student_id::text AS student_id, ${SQL_COURSE_XP_TOTAL} AS xp
       FROM lms_enrollments e
       INNER JOIN lms_courses c ON c.id = e.course_id
       WHERE e.completed_at IS NOT NULL
