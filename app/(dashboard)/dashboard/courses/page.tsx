@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
+import { DashboardCatalogueHeader } from '@/components/layout/DashboardCatalogueHeader';
 import { CourseGrid } from '@/components/lms/CourseGrid';
 import { CourseSearchBar } from '@/components/lms/CourseSearchBar';
 import { AcronymTooltip } from '@/components/ui/AcronymTooltip';
@@ -70,6 +71,7 @@ export default async function DashboardCoursesPage({
       />
 
       <div className="relative z-10 mx-auto px-6 py-8 sm:py-10">
+        <DashboardCatalogueHeader />
         <header className="mb-6">
           <h1
             className="font-display text-3xl font-bold tracking-tight sm:text-4xl"
