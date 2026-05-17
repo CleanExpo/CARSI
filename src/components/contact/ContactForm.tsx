@@ -16,6 +16,7 @@ const INITIAL: FormState = { firstName: '', lastName: '', email: '', message: ''
 export function ContactForm() {
   const [form, setForm] = useState<FormState>(INITIAL);
   const [status, setStatus] = useState<Status>('idle');
+  const [reference, setReference] = useState<string | null>(null);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -30,7 +31,9 @@ export function ContactForm() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
       });
-      if (!res.ok) throw new Error('Failed');
+      const data = (await res.json().catch(() => ({}))) as { reference?: string; error?: string };
+      if (!res.ok) throw new Error(data.error ?? 'Failed');
+      setReference(data.reference ?? null);
       setStatus('success');
       setForm(INITIAL);
     } catch {
@@ -60,10 +63,16 @@ export function ContactForm() {
           Message sent ✓
         </p>
         <p className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
-          Thanks for reaching out. We&apos;ll be in touch within 1–2 business days.
+          {reference
+            ? `Reference ${reference}. We reply within one business day.`
+            : 'Thanks for reaching out. We reply within one business day.'}
         </p>
         <button
-          onClick={() => setStatus('idle')}
+          type="button"
+          onClick={() => {
+            setStatus('idle');
+            setReference(null);
+          }}
           className="mt-6 rounded-sm px-4 py-2 text-xs font-medium transition-colors"
           style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.6)' }}
         >
@@ -146,7 +155,7 @@ export function ContactForm() {
 
       {status === 'error' && (
         <p className="text-xs" style={{ color: '#ff6b6b' }}>
-          Something went wrong. Please try again or email us directly at support@carsi.com.au
+          Something went wrong. Please try again or email support@carsi.com.au
         </p>
       )}
 
