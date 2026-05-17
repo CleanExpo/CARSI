@@ -29,6 +29,11 @@ Disallow: /admin/
 Disallow: /api/
 Disallow: /student/
 Disallow: /instructor/
+Disallow: /workflows
+Disallow: /workflows/
+Disallow: /design-system
+Disallow: /prd
+Disallow: /agents
 
 # Sitemap
 Sitemap: https://carsi.com.au/sitemap.xml
