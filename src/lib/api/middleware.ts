@@ -6,6 +6,8 @@
 
 import { NextResponse, type NextRequest } from 'next/server';
 
+import { ADMIN_COOKIE_NAME } from '@/lib/admin/admin-auth';
+import { isValidAdminSessionCookie } from '@/lib/admin/admin-session-edge';
 import { verifySessionToken } from '@/lib/auth/session-jwt';
 
 interface User {
@@ -51,20 +53,33 @@ export async function updateSession(request: NextRequest) {
     }
   }
 
-  /** Public verification: same LMS shell as /dashboard without login. */
+  /** Public credential verify — no login required (Phase 1). */
   function isPublicCredentialVerifyPath(pathname: string): boolean {
-    return /^\/dashboard\/credentials\/[^/]+(\/?)$/.test(pathname);
+    return (
+      /^\/dashboard\/credentials\/[^/]+(\/?)$/.test(pathname) ||
+      /^\/verify\/credential\/[^/]+(\/?)$/.test(pathname)
+    );
   }
 
-  const protectedPaths = ['/dashboard', '/student', '/admin', '/instructor'];
-  const isProtectedPath =
-    protectedPaths.some((path) => request.nextUrl.pathname.startsWith(path)) &&
-    !isPublicCredentialVerifyPath(request.nextUrl.pathname);
+  const pathname = request.nextUrl.pathname;
+  const isAdminPath = pathname.startsWith('/admin');
 
-  if (isProtectedPath && !user) {
+  const adminSessionValid =
+    isAdminPath &&
+    (await isValidAdminSessionCookie(request.cookies.get(ADMIN_COOKIE_NAME)?.value));
+
+  const protectedPaths = ['/dashboard', '/student', '/instructor'];
+  const isProtectedPath =
+    protectedPaths.some((path) => pathname.startsWith(path)) ||
+    (isAdminPath && !adminSessionValid && !user);
+
+  if (isProtectedPath && !user && !isPublicCredentialVerifyPath(pathname)) {
+    if (isAdminPath) {
+      return response;
+    }
     const url = request.nextUrl.clone();
     url.pathname = '/login';
-    const redirectPath = request.nextUrl.pathname;
+    const redirectPath = pathname;
     if (redirectPath.startsWith('/') && !redirectPath.startsWith('//')) {
       url.searchParams.set('next', redirectPath);
     }
