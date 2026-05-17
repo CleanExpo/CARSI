@@ -47,15 +47,6 @@ export function isLmsClaimsAllowedAdminPanel(claims: SessionClaims): boolean {
   return getAdminPanelAllowedEmails().has(claims.email.trim().toLowerCase());
 }
 
-/**
- * Login form prefill (client + server). Non-`NEXT_PUBLIC_` env vars are not available in the
- * browser bundle, so we also support optional `NEXT_PUBLIC_ADMIN_EMAIL` for a matching hint.
- */
-export const ADMIN_EMAIL =
-  (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_ADMIN_EMAIL?.trim()) ||
-  (typeof process !== 'undefined' && process.env.ADMIN_EMAIL?.trim()) ||
-  DEFAULT_ADMIN_EMAIL;
-
 const ADMIN_JWT_SECRET =
   process.env.ADMIN_JWT_SECRET ??
   // Fall back to the app JWT secret so this works out-of-the-box in dev.
