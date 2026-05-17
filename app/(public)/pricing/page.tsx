@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { PricingTiers } from '@/components/pricing/PricingTiers';
 import { BreadcrumbSchema, FAQSchema } from '@/components/seo';
 
 export const metadata: Metadata = {
@@ -117,7 +118,9 @@ export default function PricingPage() {
             </p>
           </section>
 
-          {/* ── 3-Tier Grid ────────────────────────────────── */}
+          <PricingTiers />
+
+          {/* ── Legacy membership tiers (Free / Foundation / Growth) ── */}
           <section
             aria-label="Membership tiers"
             className="mb-16 grid grid-cols-1 gap-6 md:grid-cols-3"
