@@ -424,7 +424,7 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
                       />
                       <Tooltip
                         {...chartTooltipProps}
-                        formatter={(value: number | string) => [`${value}%`, 'Complete']}
+                        formatter={(value) => [`${value ?? 0}%`, 'Complete']}
                         labelFormatter={(label) => (typeof label === 'string' ? label : String(label))}
                       />
                       <Bar
@@ -482,7 +482,7 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
                       </Pie>
                       <Tooltip
                         {...chartTooltipProps}
-                        formatter={(value: number | string, name: string) => [value, name]}
+                        formatter={(value, name) => [value ?? 0, String(name ?? '')]}
                       />
                     </PieChart>
                   </ResponsiveContainer>
@@ -557,7 +557,7 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
                       />
                       <Tooltip
                         {...chartTooltipProps}
-                        formatter={(value: number | string) => [value, 'Courses']}
+                        formatter={(value) => [value ?? 0, 'Courses']}
                         labelFormatter={(label) => (typeof label === 'string' ? label : String(label))}
                       />
                       <Bar
@@ -613,7 +613,7 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
                       />
                       <Tooltip
                         {...chartTooltipProps}
-                        formatter={(value: number | string) => [value, 'Enrollments']}
+                        formatter={(value) => [value ?? 0, 'Enrollments']}
                       />
                       <Bar
                         dataKey="enrollments"
@@ -663,7 +663,7 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
                     />
                     <Tooltip
                       {...chartTooltipProps}
-                      formatter={(value: number | string) => [value, 'Completions']}
+                      formatter={(value) => [value ?? 0, 'Completions']}
                       labelFormatter={(label) => (typeof label === 'string' ? label : String(label))}
                     />
                     <Area
