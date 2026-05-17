@@ -11,7 +11,6 @@ import {
   LogOut,
   Route,
   User,
-  Users,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -45,7 +44,6 @@ const primaryNav: NavItem[] = [
   { href: '/dashboard/student/leaderboard', label: 'Recognition', icon: ListOrdered },
   { href: '/dashboard/student/notes', label: 'Notes', icon: FileText },
   { href: '/dashboard/pathways', label: 'Pathways', icon: Route },
-  { href: '/dashboard/team', label: 'Team', icon: Users },
 ];
 
 export function LMSContextPanel() {
