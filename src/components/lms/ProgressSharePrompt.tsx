@@ -19,9 +19,11 @@ export function ProgressSharePrompt({ draft, onClose }: ProgressSharePromptProps
 
   if (!isOpen || !draft) return null;
 
+  const copyText = draft.copyText;
+
   async function copyPost() {
     try {
-      await navigator.clipboard.writeText(draft.copyText);
+      await navigator.clipboard.writeText(copyText);
       setCopied(true);
       setTimeout(() => setCopied(false), 1600);
     } catch {
