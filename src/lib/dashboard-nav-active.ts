@@ -39,6 +39,7 @@ export function isDashboardNavActive(pathname: string, href: string): boolean {
     if (p.startsWith('/dashboard/learn')) return true;
     return false;
   }
+  if (h === '/dashboard/team') return p.startsWith('/dashboard/team');
   if (h === '/dashboard/instructor') return p.startsWith('/dashboard/instructor');
   if (h === '/admin') return p.startsWith('/admin');
   if (h === '/dashboard/settings') return p.startsWith('/dashboard/settings');
@@ -58,6 +59,7 @@ export function getDashboardSectionLabel(pathname: string): string {
   if (p.startsWith('/dashboard/student/profile')) return 'Profile';
   if (p.startsWith('/dashboard/student')) return 'My learning';
   if (p.startsWith('/dashboard/pathways')) return 'Pathways';
+  if (p.startsWith('/dashboard/team')) return 'Team';
   if (p.startsWith('/dashboard/instructor')) return 'Instructor';
   if (p.startsWith('/dashboard/settings')) return 'Settings';
   if (p.startsWith('/admin')) return 'Admin';
