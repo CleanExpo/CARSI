@@ -4,12 +4,11 @@ import {
   IndustryPageLayout,
   IndustryHero,
   IndustryWhySection,
-  IndustryCourseSection,
   IndustryCTA,
   ContractorAddOns,
 } from '@/components/industries';
+import { IndustryRecommendedCourses } from '@/components/industries/IndustryRecommendedCourses';
 import { FAQSchema } from '@/components/seo/JsonLd';
-import { getBackendOrigin } from '@/lib/env/public-url';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,41 +24,6 @@ export const metadata: Metadata = {
     'OCT odour control training',
   ],
 };
-
-// ---------------------------------------------------------------------------
-// Data Fetching
-// ---------------------------------------------------------------------------
-
-async function getIndustryCourses() {
-  const backendUrl = getBackendOrigin();
-  try {
-    const [crtRes, cctRes, octRes] = await Promise.all([
-      fetch(`${backendUrl}/api/lms/courses?discipline=CRT&limit=8`, { next: { revalidate: 60 } }),
-      fetch(`${backendUrl}/api/lms/courses?discipline=CCT&limit=8`, { next: { revalidate: 60 } }),
-      fetch(`${backendUrl}/api/lms/courses?discipline=OCT&limit=8`, { next: { revalidate: 60 } }),
-    ]);
-
-    const crtData = crtRes.ok ? await crtRes.json() : { items: [] };
-    const cctData = cctRes.ok ? await cctRes.json() : { items: [] };
-    const octData = octRes.ok ? await octRes.json() : { items: [] };
-
-    const seen = new Set<string>();
-    const combined = [];
-    for (const c of [
-      ...(crtData.items ?? []),
-      ...(cctData.items ?? []),
-      ...(octData.items ?? []),
-    ]) {
-      if (!seen.has(c.id)) {
-        seen.add(c.id);
-        combined.push(c);
-      }
-    }
-    return combined;
-  } catch {
-    return [];
-  }
-}
 
 // ---------------------------------------------------------------------------
 // Page Configuration
@@ -136,8 +100,6 @@ const whyCards = [
 // ---------------------------------------------------------------------------
 
 export default async function CommercialCleaningIndustryPage() {
-  const courses = await getIndustryCourses();
-
   return (
     <IndustryPageLayout>
       <FAQSchema questions={faqs} />
@@ -159,10 +121,10 @@ export default async function CommercialCleaningIndustryPage() {
         cards={whyCards}
       />
 
-      <IndustryCourseSection
+      <IndustryRecommendedCourses
         industryName="Commercial Cleaning"
         disciplineList="CRT, CCT & OCT"
-        courses={courses}
+        disciplines={['CRT', 'CCT', 'OCT']}
       />
 
       <ContractorAddOns accentColor={ACCENT_COLOR} />
