@@ -42,7 +42,7 @@ export async function getProofPackPayloadForStudent(
     iicrc_discipline: e.course.iicrcDiscipline,
     cec_hours: roundCec(Number(e.course.cecHours ?? 0)),
     issued_date: (e.certificateIssuedAt ?? e.completedAt)!.toISOString().slice(0, 10),
-    verification_url: `${base}/dashboard/credentials/${e.id}`,
+    verification_url: `${base}/verify/credential/${e.id}`,
   }));
 
   const byDisc = new Map<string, number>();
