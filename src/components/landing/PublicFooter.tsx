@@ -137,7 +137,10 @@ export function PublicFooter() {
           style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}
         >
           <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.25)' }}>
-            © 2026 CARSI Pty Ltd. All rights reserved.
+            © 2026 CARSI Pty Ltd. All rights reserved. ·{' '}
+            <Link href="/admin" className="hover:text-white/50">
+              Staff login
+            </Link>
           </p>
           <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.25)' }}>
             <AcronymTooltip term="IICRC" />
