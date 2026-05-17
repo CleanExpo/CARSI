@@ -1,6 +1,7 @@
 'use client';
 
 import { useAuth } from '@/components/auth/auth-provider';
+import { GuestEnrolForm } from '@/components/lms/GuestEnrolForm';
 import { Button } from '@/components/ui/button';
 import { authApi } from '@/lib/api/auth';
 import { apiClient, ApiClientError } from '@/lib/api/client';
@@ -33,6 +34,10 @@ interface CheckoutResponse {
   checkout_url?: string;
 }
 
+interface ConfirmResponse {
+  learn_url?: string;
+}
+
 export function EnrolButton({ slug, priceAud = 0, isFree = false }: EnrolButtonProps) {
   const pathname = usePathname();
   const { user } = useAuth();
@@ -40,12 +45,15 @@ export function EnrolButton({ slug, priceAud = 0, isFree = false }: EnrolButtonP
   const [error, setError] = useState<string | null>(null);
   const [subState, setSubState] = useState<SubState>('checking');
   const [pricing, setPricing] = useState<PricingApi | null>(null);
+  const [mode, setMode] = useState<'guest' | 'member'>('guest');
 
   useEffect(() => {
     if (!user) {
       setSubState('none');
+      setMode('guest');
       return;
     }
+    setMode('member');
     apiClient
       .get<SubStatusResponse>('/api/lms/subscription/status')
       .then((data) => {
@@ -77,7 +85,6 @@ export function EnrolButton({ slug, priceAud = 0, isFree = false }: EnrolButtonP
   const effectivePrice = pricing?.payableAud ?? priceAud;
   const effectiveFree = pricing != null ? Boolean(pricing.isFree) : isFree;
   const showDiscountHint = Boolean(pricing?.hasDiscount && !pricing.isFree);
-
   const isPaid = !effectiveFree && effectivePrice > 0;
 
   function getLabel() {
@@ -92,16 +99,15 @@ export function EnrolButton({ slug, priceAud = 0, isFree = false }: EnrolButtonP
     return isPaid ? `Enrol — $${effectivePrice.toFixed(0)} AUD` : 'Enrol Free';
   }
 
-  async function handleEnrol() {
+  async function handleMemberEnrol() {
     setLoading(true);
     setError(null);
 
     const returnTo = pathname && pathname.startsWith('/') ? pathname : `/courses/${slug}`;
 
-    // Re-check auth at click-time to avoid stale in-memory user state.
     const currentUser = user ?? (await authApi.getCurrentUser());
     if (!currentUser) {
-      window.location.href = `/register?next=${encodeURIComponent(returnTo)}`;
+      window.location.href = `/login?next=${encodeURIComponent(returnTo)}`;
       setLoading(false);
       return;
     }
@@ -117,14 +123,16 @@ export function EnrolButton({ slug, priceAud = 0, isFree = false }: EnrolButtonP
 
       if (data.enrolled) {
         try {
-          await apiClient.post('/api/lms/enrollments/confirm', { slug });
+          const confirmed = await apiClient.post<ConfirmResponse>('/api/lms/enrollments/confirm', {
+            slug,
+          });
+          window.location.href = confirmed.learn_url ?? '/dashboard/student';
         } catch (err) {
           const msg =
             err instanceof ApiClientError ? err.message : 'Could not complete free enrolment.';
           setError(msg);
           return;
         }
-        window.location.href = '/dashboard/student';
         return;
       }
 
@@ -145,10 +153,34 @@ export function EnrolButton({ slug, priceAud = 0, isFree = false }: EnrolButtonP
     }
   }
 
+  if (!user || mode === 'guest') {
+    return (
+      <div className="space-y-3">
+        {user ? (
+          <button
+            type="button"
+            onClick={() => setMode('member')}
+            className="text-xs text-[#2490ed] hover:underline"
+          >
+            Use my signed-in account instead
+          </button>
+        ) : null}
+        <GuestEnrolForm slug={slug} priceAud={effectivePrice} isFree={effectiveFree} />
+      </div>
+    );
+  }
+
   return (
     <div>
+      <button
+        type="button"
+        onClick={() => setMode('guest')}
+        className="mb-2 text-xs text-white/45 hover:text-[#2490ed]"
+      >
+        Quick enrol with a different email
+      </button>
       <Button
-        onClick={handleEnrol}
+        onClick={handleMemberEnrol}
         disabled={loading || subState === 'checking'}
         className="w-full rounded-sm border border-[#ed9d24]/70 bg-[#ed9d24] font-semibold text-[#111111] shadow-[0_10px_24px_rgba(237,157,36,0.32)] transition-all hover:bg-[#f2ad4e] hover:shadow-[0_14px_28px_rgba(237,157,36,0.4)]"
         size="lg"
