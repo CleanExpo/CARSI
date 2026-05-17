@@ -1,20 +1,18 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
+import { randomUUID } from 'node:crypto';
 
+import { sendEmail } from '@/lib/server/email';
 import { applyRateLimit, UNKNOWN_IP } from '@/lib/rate-limit';
-import { verifyTurnstile } from '@/lib/turnstile';
+import { prisma } from '@/lib/prisma';
 
 interface ContactPayload {
   firstName: string;
   lastName: string;
   email: string;
   message: string;
-  cfTurnstileResponse?: string;
 }
 
-// RA-3022 — rate limit + Cloudflare Turnstile on anonymous PII intake.
-// 5 submissions per hour per IP (defense-in-depth alongside Turnstile +
-// Cloudflare WAF). One hour = 3_600_000 ms.
 const LIMIT = 5;
 const WINDOW_MS = 60 * 60 * 1000;
 
@@ -28,7 +26,6 @@ function getClientIp(req: NextRequest): string {
 
 export async function POST(req: NextRequest) {
   try {
-    // 1. Rate limit BEFORE parsing body so abusers cost less per request.
     const ip = getClientIp(req);
     const rl = applyRateLimit(ip, LIMIT, WINDOW_MS);
     if (!rl.ok) {
@@ -45,30 +42,53 @@ export async function POST(req: NextRequest) {
 
     const body = (await req.json()) as ContactPayload;
 
-    // 2. Basic validation
     if (!body.firstName || !body.lastName || !body.email || !body.message) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    // 3. Turnstile CAPTCHA — required.
-    const tsToken =
-      body.cfTurnstileResponse ?? req.headers.get('cf-turnstile-response');
-    if (!tsToken) {
-      return NextResponse.json({ error: 'CAPTCHA required.' }, { status: 400 });
-    }
-    const ts = await verifyTurnstile(tsToken, ip === UNKNOWN_IP ? null : ip);
-    if (!ts.success) {
-      return NextResponse.json(
-        { error: 'CAPTCHA verification failed.' },
-        { status: 401 },
-      );
+    const email = body.email.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return NextResponse.json({ error: 'Invalid email' }, { status: 400 });
     }
 
-    // Persist or forward contact submissions here (e.g. email provider, CRM) when configured.
+    const submissionId = randomUUID();
+    const ticketRef = submissionId.slice(0, 8).toUpperCase();
 
-    // Always return success to the user; failures are non-blocking
-    return NextResponse.json({ ok: true });
-  } catch {
+    if (process.env.DATABASE_URL?.trim()) {
+      await prisma.contactSubmission.create({
+        data: {
+          id: submissionId,
+          firstName: body.firstName.trim(),
+          lastName: body.lastName.trim(),
+          email,
+          message: body.message.trim(),
+          status: 'new',
+          sourceIp: ip === UNKNOWN_IP ? null : ip,
+        },
+      });
+    }
+
+    const notifyTo =
+      process.env.CONTACT_NOTIFY_EMAIL?.trim() ||
+      process.env.ADMIN_EMAIL?.trim() ||
+      'support@carsi.com.au';
+
+    await sendEmail({
+      to: notifyTo,
+      replyTo: email,
+      subject: `[CARSI Contact #${ticketRef}] ${body.firstName} ${body.lastName}`,
+      html: `
+        <p><strong>Reference:</strong> ${ticketRef}</p>
+        <p><strong>From:</strong> ${body.firstName} ${body.lastName} &lt;${email}&gt;</p>
+        <p>${body.message.trim().replace(/\n/g, '<br>')}</p>
+        <p><em>View in admin: /admin/contacts</em></p>
+      `,
+      text: `Ref ${ticketRef}\nFrom: ${body.firstName} ${body.lastName} <${email}>\n\n${body.message.trim()}`,
+    });
+
+    return NextResponse.json({ ok: true, reference: ticketRef });
+  } catch (e) {
+    console.error('[contact]', e);
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }
