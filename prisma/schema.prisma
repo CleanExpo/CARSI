@@ -46,10 +46,13 @@ model LmsUser {
   createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt         DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  userRoles         LmsUserRole[]
-  enrollments       LmsEnrollment[] @relation("EnrollmentStudent")
+  userRoles          LmsUserRole[]
+  enrollments        LmsEnrollment[] @relation("EnrollmentStudent")
   coursesInstructing LmsCourse[]     @relation("CourseInstructor")
-  userDiscounts     UserDiscount[]
+  userDiscounts      UserDiscount[]
+  teamMemberships    LmsTeamMember[]
+  ownedTeams         LmsTeam[]       @relation("TeamOwner")
+  quizAttempts       LmsQuizAttempt[]
 
   @@map("lms_users")
 }
@@ -88,10 +91,12 @@ model LmsCourse {
   createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt        DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  instructor  LmsUser         @relation("CourseInstructor", fields: [instructorId], references: [id])
-  modules     LmsModule[]
-  enrollments LmsEnrollment[]
-  userDiscounts UserDiscount[]
+  instructor       LmsUser                  @relation("CourseInstructor", fields: [instructorId], references: [id])
+  modules          LmsModule[]
+  enrollments      LmsEnrollment[]
+  userDiscounts    UserDiscount[]
+  pathwayCourses   LmsLearningPathwayCourse[]
+  quizzes          LmsQuiz[]
 
   @@map("lms_courses")
 }
@@ -209,7 +214,118 @@ model LmsLearningPathway {
   isPublished         Boolean  @default(false) @map("is_published")
   orderIndex          Int      @default(0) @map("order_index")
 
+  courses LmsLearningPathwayCourse[]
+
   @@map("lms_learning_pathways")
+}
+
+model LmsLearningPathwayCourse {
+  pathwayId  String @map("pathway_id") @db.Uuid
+  courseId   String @map("course_id") @db.Uuid
+  orderIndex Int    @default(0) @map("order_index")
+
+  pathway LmsLearningPathway @relation(fields: [pathwayId], references: [id], onDelete: Cascade)
+  course  LmsCourse            @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@id([pathwayId, courseId])
+  @@map("lms_learning_pathway_courses")
+}
+
+/// Course quiz (Phase 2) — linked from lessons with content_type `quiz`.
+model LmsQuiz {
+  id               String   @id @default(uuid()) @db.Uuid
+  courseId         String   @map("course_id") @db.Uuid
+  title            String
+  passPercentage   Int      @default(70) @map("pass_percentage")
+  timeLimitMinutes Int?     @map("time_limit_minutes")
+  attemptsAllowed  Int      @default(3) @map("attempts_allowed")
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  course    LmsCourse         @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  questions LmsQuizQuestion[]
+  attempts  LmsQuizAttempt[]
+
+  @@index([courseId])
+  @@map("lms_quizzes")
+}
+
+model LmsQuizQuestion {
+  id            String @id @default(uuid()) @db.Uuid
+  quizId        String @map("quiz_id") @db.Uuid
+  questionText  String @map("question_text") @db.Text
+  options       Json
+  correctIndex  Int    @map("correct_index")
+  orderIndex    Int    @default(0) @map("order_index")
+  points        Int    @default(1)
+
+  quiz LmsQuiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
+
+  @@index([quizId])
+  @@map("lms_quiz_questions")
+}
+
+model LmsQuizAttempt {
+  id          String   @id @default(uuid()) @db.Uuid
+  quizId      String   @map("quiz_id") @db.Uuid
+  studentId   String   @map("student_id") @db.Uuid
+  scorePercent Int     @map("score_percent")
+  passed      Boolean
+  answers     Json
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  quiz    LmsQuiz  @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  student LmsUser  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([quizId, studentId])
+  @@map("lms_quiz_attempts")
+}
+
+/// B2B team (Phase 2) — seat-based bundles.
+model LmsTeam {
+  id           String   @id @default(uuid()) @db.Uuid
+  name         String
+  slug         String   @unique
+  ownerId      String   @map("owner_id") @db.Uuid
+  bundleTier   String   @map("bundle_tier") @db.VarChar(32)
+  seatLimit    Int      @default(5) @map("seat_limit")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  owner   LmsUser         @relation("TeamOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  members LmsTeamMember[]
+  invites LmsTeamInvite[]
+
+  @@map("lms_teams")
+}
+
+model LmsTeamMember {
+  teamId   String   @map("team_id") @db.Uuid
+  userId   String   @map("user_id") @db.Uuid
+  role     String   @default("member") @db.VarChar(16)
+  joinedAt DateTime @default(now()) @map("joined_at") @db.Timestamptz(6)
+
+  team LmsTeam @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user LmsUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([teamId, userId])
+  @@map("lms_team_members")
+}
+
+model LmsTeamInvite {
+  id        String    @id @default(uuid()) @db.Uuid
+  teamId    String    @map("team_id") @db.Uuid
+  email     String    @db.VarChar(320)
+  role      String    @default("member") @db.VarChar(16)
+  token     String    @unique
+  expiresAt DateTime  @map("expires_at") @db.Timestamptz(6)
+  acceptedAt DateTime? @map("accepted_at") @db.Timestamptz(6)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  team LmsTeam @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@index([teamId])
+  @@index([email])
+  @@map("lms_team_invites")
 }
 
 /// RA-3027 — replaces the single ADMIN_EMAIL+ADMIN_PASSWORD env-var gate
