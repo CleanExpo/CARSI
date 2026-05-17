@@ -2,7 +2,7 @@ import { jwtVerify, SignJWT } from 'jose';
 
 import type { SessionClaims } from '@/lib/auth/session-jwt';
 
-export const ADMIN_COOKIE_NAME = 'admin_session';
+export { ADMIN_COOKIE_NAME } from '@/lib/admin/admin-constants';
 
 const DEFAULT_ADMIN_EMAIL = 'mmlrana00@gmail.com';
 const DEFAULT_ADMIN_PASSWORD = 'Rana1199@';
