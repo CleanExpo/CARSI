@@ -28,6 +28,7 @@ type Row = {
   isFree: boolean;
   priceAud: number;
   published: boolean;
+  workflow_status?: 'draft' | 'in_review' | 'published';
   updatedAt: string;
   category?: string | null;
   level?: string | null;
@@ -36,11 +37,11 @@ type Row = {
   durationHours?: string | null;
 };
 
-type StatusFilter = 'all' | 'draft' | 'published';
+type StatusFilter = 'all' | 'draft' | 'in_review' | 'published';
 type SortKey = 'updated' | 'title' | 'modules';
 
 function parseStatus(raw: string | null): StatusFilter {
-  if (raw === 'draft' || raw === 'published') return raw;
+  if (raw === 'draft' || raw === 'published' || raw === 'in_review') return raw;
   return 'all';
 }
 
@@ -349,6 +350,7 @@ export function AdminCoursesList() {
   const statusTabs: { id: StatusFilter; label: string }[] = [
     { id: 'all', label: 'All' },
     { id: 'published', label: 'Published' },
+    { id: 'in_review', label: 'In review' },
     { id: 'draft', label: 'Draft' },
   ];
 
@@ -608,11 +610,15 @@ export function AdminCoursesList() {
                   <span className="hidden sm:inline">Select</span>
                 </label>
 
-                {!c.published && (
-                  <span className="absolute top-2 left-2 rounded bg-amber-500/90 px-2 py-0.5 text-[10px] font-bold tracking-wide text-black uppercase">
+                {c.workflow_status === 'in_review' ? (
+                  <span className="absolute top-2 left-2 rounded bg-amber-400/95 px-2 py-0.5 text-[10px] font-bold tracking-wide text-black uppercase">
+                    In review
+                  </span>
+                ) : !c.published ? (
+                  <span className="absolute top-2 left-2 rounded bg-white/20 px-2 py-0.5 text-[10px] font-bold tracking-wide text-white uppercase backdrop-blur-sm">
                     Draft
                   </span>
-                )}
+                ) : null}
               </div>
               <div className="flex flex-1 flex-col p-4">
                 <h2 className="line-clamp-2 text-sm font-semibold text-white/95">{c.title}</h2>
