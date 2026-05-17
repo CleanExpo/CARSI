@@ -79,6 +79,24 @@ export type RegisterPrismaResult =
   | { ok: true; claims: SessionClaims }
   | { ok: false; code: 'EMAIL_TAKEN' };
 
+async function ensureStudentRole(userId: string): Promise<void> {
+  const studentRole = await prisma.lmsRole.findUnique({ where: { name: 'student' } });
+  if (!studentRole) return;
+  try {
+    await prisma.lmsUserRole.create({
+      data: { userId, roleId: studentRole.id },
+    });
+  } catch {
+    // Role row race / duplicate — non-fatal
+  }
+}
+
+function isUniqueConstraintError(e: unknown): boolean {
+  return (
+    e !== null && typeof e === 'object' && 'code' in e && (e as { code?: string }).code === 'P2002'
+  );
+}
+
 export async function registerUserWithPassword(params: {
   email: string;
   password: string;
@@ -86,9 +104,41 @@ export async function registerUserWithPassword(params: {
 }): Promise<RegisterPrismaResult> {
   const email = params.email.trim().toLowerCase();
   const fullName = params.fullName.trim();
-  const id = randomUUID();
   const hashedPassword = await hashPassword(params.password);
 
+  const existing = await prisma.lmsUser.findUnique({ where: { email } });
+  if (existing) {
+    if (!existing.isActive) {
+      return { ok: false, code: 'EMAIL_TAKEN' };
+    }
+
+    // JWT-sync placeholder row — let the user finish signup with a real password.
+    if (isJwtProvisionedPasswordHash(existing.hashedPassword)) {
+      await prisma.lmsUser.update({
+        where: { id: existing.id },
+        data: {
+          hashedPassword,
+          fullName: fullName || existing.fullName,
+          role: 'student',
+        },
+      });
+      await ensureStudentRole(existing.id);
+      const claims = await sessionClaimsForUserId(existing.id);
+      if (!claims) return { ok: false, code: 'EMAIL_TAKEN' };
+      return { ok: true, claims };
+    }
+
+    // Same email + password as an existing account — treat as sign-in.
+    const passwordMatches = await verifyPassword(params.password, existing.hashedPassword);
+    if (passwordMatches) {
+      const claims = await sessionClaimsForUserId(existing.id);
+      if (claims) return { ok: true, claims };
+    }
+
+    return { ok: false, code: 'EMAIL_TAKEN' };
+  }
+
+  const id = randomUUID();
   try {
     await prisma.lmsUser.create({
       data: {
@@ -102,27 +152,13 @@ export async function registerUserWithPassword(params: {
       },
     });
   } catch (e: unknown) {
-    if (
-      e &&
-      typeof e === 'object' &&
-      'code' in e &&
-      (e as { code?: string }).code === 'P2002'
-    ) {
+    if (isUniqueConstraintError(e)) {
       return { ok: false, code: 'EMAIL_TAKEN' };
     }
     throw e;
   }
 
-  const studentRole = await prisma.lmsRole.findUnique({ where: { name: 'student' } });
-  if (studentRole) {
-    try {
-      await prisma.lmsUserRole.create({
-        data: { userId: id, roleId: studentRole.id },
-      });
-    } catch {
-      // Role row race / duplicate — non-fatal
-    }
-  }
+  await ensureStudentRole(id);
 
   return {
     ok: true,
