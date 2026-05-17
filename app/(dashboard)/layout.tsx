@@ -1,3 +1,4 @@
+import { SkipToMain } from '@/components/a11y/SkipToMain';
 import { LMSContextPanel } from '@/components/layout/LMSContextPanel';
 import { LMSIconRail } from '@/components/layout/LMSIconRail';
 import { PageTransition } from '@/components/layout/PageTransition';
@@ -10,6 +11,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       className="relative flex h-screen max-h-[100dvh] w-full max-w-[100vw] overflow-hidden"
       style={{ background: '#060a14' }}
     >
+      <SkipToMain />
       <div className="mesh-bg pointer-events-none" aria-hidden="true">
         <div className="mesh-blob mesh-blob-1" />
         <div className="mesh-blob mesh-blob-2" />
