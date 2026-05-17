@@ -2,9 +2,8 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 import { applyRateLimit, UNKNOWN_IP } from '@/lib/rate-limit';
-import { verifyTurnstile } from '@/lib/turnstile';
 
-/* ─── RA-3022 — rate-limit + Turnstile config ─────────────────────────────── */
+/* ─── Rate limit config ───────────────────────────────────────────────────── */
 
 const LIMIT = 5;
 const WINDOW_MS = 60 * 60 * 1000; // 5/hour per IP
@@ -35,7 +34,6 @@ interface SubmissionPayload {
   submission_description?: string;
   terms_accepted: boolean;
   guidelines_accepted: boolean;
-  cfTurnstileResponse?: string;
 }
 
 interface HubSubmissionInsert {
@@ -104,22 +102,6 @@ export async function POST(req: NextRequest) {
     body = (await req.json()) as SubmissionPayload;
   } catch {
     return NextResponse.json({ success: false, error: 'Invalid request body.' }, { status: 400 });
-  }
-
-  /* RA-3022 — Turnstile CAPTCHA — required for unauthenticated PII intake. */
-  const tsToken = body.cfTurnstileResponse ?? req.headers.get('cf-turnstile-response');
-  if (!tsToken) {
-    return NextResponse.json(
-      { success: false, error: 'CAPTCHA required.' },
-      { status: 400 },
-    );
-  }
-  const ts = await verifyTurnstile(tsToken, ip === UNKNOWN_IP ? null : ip);
-  if (!ts.success) {
-    return NextResponse.json(
-      { success: false, error: 'CAPTCHA verification failed.' },
-      { status: 401 },
-    );
   }
 
   /* 2. Validate required fields */
