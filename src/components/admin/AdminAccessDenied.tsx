@@ -7,12 +7,13 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-import { ADMIN_EMAIL } from '@/lib/admin/admin-auth';
-
 type LoginResponse = { ok?: boolean; detail?: string };
 
+const DEFAULT_ADMIN_EMAIL =
+  process.env.NEXT_PUBLIC_ADMIN_EMAIL?.trim() || 'mmlrana00@gmail.com';
+
 export function AdminAccessDenied() {
-  const [email, setEmail] = useState(ADMIN_EMAIL);
+  const [email, setEmail] = useState(DEFAULT_ADMIN_EMAIL);
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -89,4 +90,3 @@ export function AdminAccessDenied() {
     </div>
   );
 }
-
