@@ -55,7 +55,7 @@ export async function getPublicCredentialJson(
     cec_hours: Number(row.course.cecHours ?? 0),
     issued_date: issued.toISOString().slice(0, 10),
     issuing_organisation: 'CARSI Learning',
-    verification_url: `${origin.replace(/\/$/, '')}/dashboard/credentials/${row.id}`,
+    verification_url: `${origin.replace(/\/$/, '')}/verify/credential/${row.id}`,
     completed_at: issued.toISOString(),
     discipline: row.course.iicrcDiscipline ?? undefined,
   };
