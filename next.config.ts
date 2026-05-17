@@ -78,7 +78,7 @@ const nextConfig: NextConfig = {
   output: 'standalone',
   reactStrictMode: true,
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
   transpilePackages: ['@shared'],
   webpack: (config) => webpackReactAliases(config),
