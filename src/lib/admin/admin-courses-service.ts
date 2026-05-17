@@ -229,6 +229,7 @@ export function courseToAdminDto(course: CourseWithCurriculum) {
     isFree: course.isFree,
     priceAud: Number(course.priceAud),
     published: course.isPublished === true || status === 'published',
+    workflow_status: resolveCourseWorkflowStatus(course.status, course.isPublished),
     modules: course.modules.map((mod) => {
       const lessons = [...mod.lessons].sort((a, b) => a.orderIndex - b.orderIndex);
       const text = lessons.find((l) => l.contentType === 'text');
@@ -253,8 +254,20 @@ const publishedWhere: Prisma.LmsCourseWhereInput = {
   ],
 };
 
+export type CourseWorkflowStatus = 'draft' | 'in_review' | 'published';
+
+export function resolveCourseWorkflowStatus(
+  status: string | null | undefined,
+  isPublished: boolean | null | undefined
+): CourseWorkflowStatus {
+  const s = (status ?? '').toLowerCase();
+  if (s === 'in_review') return 'in_review';
+  if (isPublished === true || s === 'published') return 'published';
+  return 'draft';
+}
+
 export type AdminListCoursesOptions = {
-  status?: 'all' | 'draft' | 'published';
+  status?: 'all' | 'draft' | 'in_review' | 'published';
   /** Trimmed; title/slug contains, case-insensitive */
   q?: string;
   sort?: 'updated' | 'title' | 'modules';
@@ -269,7 +282,14 @@ function adminCoursesListWhere(options: AdminListCoursesOptions): Prisma.LmsCour
   if (status === 'published') {
     parts.push(publishedWhere);
   } else if (status === 'draft') {
-    parts.push({ NOT: publishedWhere });
+    parts.push({
+      AND: [
+        { NOT: publishedWhere },
+        { NOT: { status: { equals: 'in_review', mode: 'insensitive' } } },
+      ],
+    });
+  } else if (status === 'in_review') {
+    parts.push({ status: { equals: 'in_review', mode: 'insensitive' } });
   }
 
   if (q) {
@@ -314,6 +334,8 @@ export async function adminListCourses(options: AdminListCoursesOptions = {}) {
     isFree: c.isFree,
     priceAud: Number(c.priceAud),
     published: c.isPublished === true || String(c.status ?? '').toLowerCase() === 'published',
+    workflow_status: resolveCourseWorkflowStatus(c.status, c.isPublished),
+    status: c.status,
     updatedAt: c.updatedAt.toISOString(),
     category: c.category,
     level: c.level,
@@ -538,4 +560,32 @@ export async function adminBulkDeleteCourses(ids: string[]): Promise<number> {
     where: { id: { in: unique } },
   });
   return result.count;
+}
+
+export async function adminTransitionCourseWorkflow(
+  courseId: string,
+  action: 'save_draft' | 'submit_review' | 'publish'
+): Promise<CourseWorkflowStatus> {
+  let status: string;
+  let isPublished: boolean;
+  switch (action) {
+    case 'submit_review':
+      status = 'in_review';
+      isPublished = false;
+      break;
+    case 'publish':
+      status = 'published';
+      isPublished = true;
+      break;
+    default:
+      status = 'draft';
+      isPublished = false;
+  }
+
+  await prisma.lmsCourse.update({
+    where: { id: courseId },
+    data: { status, isPublished },
+  });
+
+  return resolveCourseWorkflowStatus(status, isPublished);
 }
