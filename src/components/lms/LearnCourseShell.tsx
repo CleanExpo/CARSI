@@ -5,9 +5,11 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Check, ChevronLeft, ChevronRight, Home, Layers, Loader2, Share2 } from 'lucide-react';
 
+import { CampusTopBar } from '@/components/layout/CampusTopBar';
 import { CourseCompletionBanner } from '@/components/lms/CourseCompletionBanner';
 import { LearnModuleOverview } from '@/components/lms/LearnModuleOverview';
 import { LessonPlayer } from '@/components/lms/LessonPlayer';
+import { QuizPlayer } from '@/components/lms/QuizPlayer';
 import { ProgressSharePrompt } from '@/components/lms/ProgressSharePrompt';
 import { Button } from '@/components/ui/button';
 import { apiClient, ApiClientError } from '@/lib/api/client';
@@ -18,6 +20,7 @@ import {
   type ProgressShareDraft,
   type ProgressShareType,
 } from '@/lib/lms/progress-share-post';
+import { extractQuizIdFromLesson } from '@/lib/lms/quiz-from-lesson';
 
 interface CurriculumLesson {
   id: string;
@@ -108,6 +111,26 @@ export function LearnCourseShell({ slug }: { slug: string }) {
   const noteEditorRef = useRef<HTMLTextAreaElement | null>(null);
   const [shareDraft, setShareDraft] = useState<ProgressShareDraft | null>(null);
   const shownShareKeysRef = useRef(new Set<string>());
+  const [quizData, setQuizData] = useState<{
+    id: string;
+    title: string;
+    pass_percentage: number;
+    time_limit_minutes: number | null;
+    attempts_allowed: number;
+    questions: Array<{
+      id: string;
+      question_text: string;
+      question_type: string;
+      options: { text: string }[];
+      order_index: number;
+      points: number;
+    }>;
+  } | null>(null);
+  const [quizResult, setQuizResult] = useState<{
+    score_percent: number;
+    passed: boolean;
+  } | null>(null);
+  const [loadingQuiz, setLoadingQuiz] = useState(false);
 
   const flatLessons = useMemo(() => {
     if (!curriculum) return [];
@@ -207,6 +230,8 @@ export function LearnCourseShell({ slug }: { slug: string }) {
         `/api/lms/lessons/${encodeURIComponent(lessonId)}`
       );
       setLessonDetail(data);
+      setQuizData(null);
+      setQuizResult(null);
     } catch (e) {
       const msg =
         e instanceof ApiClientError
@@ -225,6 +250,46 @@ export function LearnCourseShell({ slug }: { slug: string }) {
     if (view !== 'lesson' || !activeLessonId) return;
     void loadLesson(activeLessonId);
   }, [view, activeLessonId, loadLesson]);
+
+  useEffect(() => {
+    if (!lessonDetail) {
+      setQuizData(null);
+      return;
+    }
+    const quizId = extractQuizIdFromLesson(
+      lessonDetail.lesson.content_type,
+      lessonDetail.lesson.content_body,
+      lessonDetail.resources
+    );
+    if (!quizId) {
+      setQuizData(null);
+      return;
+    }
+    setLoadingQuiz(true);
+    apiClient
+      .get<NonNullable<typeof quizData>>(`/api/lms/quizzes/${encodeURIComponent(quizId)}`)
+      .then((data) => setQuizData(data))
+      .catch(() => setQuizData(null))
+      .finally(() => setLoadingQuiz(false));
+  }, [lessonDetail]);
+
+  const submitQuiz = useCallback(
+    async (answers: Record<string, number>) => {
+      if (!quizData) return;
+      try {
+        const res = await apiClient.post<{
+          score_percent: number;
+          passed: boolean;
+        }>(`/api/lms/quizzes/${encodeURIComponent(quizData.id)}/attempt`, { answers });
+        setQuizResult({ score_percent: res.score_percent, passed: res.passed });
+      } catch (e) {
+        const msg =
+          e instanceof ApiClientError ? e.message : 'Could not submit quiz';
+        setLessonError(msg);
+      }
+    },
+    [quizData]
+  );
 
   const loadLessonNote = useCallback(async (lessonId: string) => {
     setLoadingNote(true);
@@ -489,6 +554,13 @@ export function LearnCourseShell({ slug }: { slug: string }) {
 
   return (
     <div className="flex w-full min-w-0 max-w-none flex-col gap-6">
+      <CampusTopBar
+        section="Campus · Learn"
+        breadcrumbs={[
+          { label: 'My learning', href: '/dashboard/student' },
+          { label: curriculum?.course.title ?? 'Course' },
+        ]}
+      />
       {allLessonsComplete ? (
         <CourseCompletionBanner
           courseTitle={curriculum.course.title}
@@ -646,6 +718,29 @@ export function LearnCourseShell({ slug }: { slug: string }) {
               <p className="text-red-300/90">{lessonError}</p>
             ) : lessonDetail ? (
               <article className="rounded-2xl border border-white/8 bg-white/2 p-5 sm:p-8">
+                {loadingQuiz ? (
+                  <div className="mb-6 flex items-center gap-2 text-white/60">
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                    Loading assessment…
+                  </div>
+                ) : null}
+                {quizData ? (
+                  <>
+                    <QuizPlayer quiz={quizData} onSubmit={(a) => void submitQuiz(a)} />
+                    {quizResult ? (
+                      <p
+                        className={`mt-6 rounded-lg border px-4 py-3 text-sm ${
+                          quizResult.passed
+                            ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-100'
+                            : 'border-amber-500/40 bg-amber-500/10 text-amber-100'
+                        }`}
+                      >
+                        Score: {quizResult.score_percent}% —{' '}
+                        {quizResult.passed ? 'Passed' : 'Not passed yet'}
+                      </p>
+                    ) : null}
+                  </>
+                ) : (
                 <LessonPlayer
                   lesson={lessonDetail.lesson}
                   resources={lessonDetail.resources}
@@ -761,6 +856,7 @@ export function LearnCourseShell({ slug }: { slug: string }) {
                     </>
                   }
                 />
+                )}
               </article>
             ) : null}
           </>
