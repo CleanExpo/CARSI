@@ -4,12 +4,11 @@ import {
   IndustryPageLayout,
   IndustryHero,
   IndustryWhySection,
-  IndustryCourseSection,
   IndustryCTA,
   ContractorAddOns,
 } from '@/components/industries';
+import { IndustryRecommendedCourses } from '@/components/industries/IndustryRecommendedCourses';
 import { FAQSchema } from '@/components/seo/JsonLd';
-import { getBackendOrigin } from '@/lib/env/public-url';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,41 +24,6 @@ export const metadata: Metadata = {
     'holiday accommodation hygiene compliance',
   ],
 };
-
-// ---------------------------------------------------------------------------
-// Data Fetching
-// ---------------------------------------------------------------------------
-
-async function getIndustryCourses() {
-  const backendUrl = getBackendOrigin();
-  try {
-    const [amrtRes, crtRes, wrtRes] = await Promise.all([
-      fetch(`${backendUrl}/api/lms/courses?discipline=AMRT&limit=8`, { next: { revalidate: 60 } }),
-      fetch(`${backendUrl}/api/lms/courses?discipline=CRT&limit=8`, { next: { revalidate: 60 } }),
-      fetch(`${backendUrl}/api/lms/courses?discipline=WRT&limit=8`, { next: { revalidate: 60 } }),
-    ]);
-
-    const amrtData = amrtRes.ok ? await amrtRes.json() : { items: [] };
-    const crtData = crtRes.ok ? await crtRes.json() : { items: [] };
-    const wrtData = wrtRes.ok ? await wrtRes.json() : { items: [] };
-
-    const seen = new Set<string>();
-    const combined = [];
-    for (const c of [
-      ...(amrtData.items ?? []),
-      ...(crtData.items ?? []),
-      ...(wrtData.items ?? []),
-    ]) {
-      if (!seen.has(c.id)) {
-        seen.add(c.id);
-        combined.push(c);
-      }
-    }
-    return combined;
-  } catch {
-    return [];
-  }
-}
 
 // ---------------------------------------------------------------------------
 // Page Configuration
@@ -131,8 +95,6 @@ const whyCards = [
 // ---------------------------------------------------------------------------
 
 export default async function CaravanParksIndustryPage() {
-  const courses = await getIndustryCourses();
-
   return (
     <IndustryPageLayout>
       <FAQSchema questions={faqs} />
@@ -154,10 +116,10 @@ export default async function CaravanParksIndustryPage() {
         cards={whyCards}
       />
 
-      <IndustryCourseSection
+      <IndustryRecommendedCourses
         industryName="Caravan Parks & Holiday Accommodation"
         disciplineList="AMRT, CRT & WRT"
-        courses={courses}
+        disciplines={['AMRT', 'CRT', 'WRT']}
       />
 
       <ContractorAddOns accentColor={ACCENT_COLOR} />
