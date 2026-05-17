@@ -49,9 +49,19 @@ export async function createStripeCheckoutForCourse(params: {
   unit_amount_cents?: number;
   /** Optional Stripe metadata (e.g. discount_id). */
   extra_metadata?: Record<string, string>;
+  guest_checkout?: boolean;
 }): Promise<{ checkout_url: string }> {
-  const { slug, course, success_url, cancel_url, customer_email, student_id, unit_amount_cents, extra_metadata } =
-    params;
+  const {
+    slug,
+    course,
+    success_url,
+    cancel_url,
+    customer_email,
+    student_id,
+    unit_amount_cents,
+    extra_metadata,
+    guest_checkout,
+  } = params;
 
   const priceNum = Number(course.price_aud);
   const unitAmount =
@@ -73,6 +83,7 @@ export async function createStripeCheckoutForCourse(params: {
       course_slug: slug,
       source: 'carsi-next-local-checkout',
       ...(student_id ? { student_id } : {}),
+      ...(guest_checkout ? { guest_checkout: 'true' } : {}),
       ...(extra_metadata ?? {}),
     },
     line_items: [
