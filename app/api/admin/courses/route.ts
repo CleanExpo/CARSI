@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { getAdminSessionOrNull } from '@/lib/admin/admin-session';
 import {
   ADMIN_BULK_PUBLICATION_MAX_IDS,
   adminBulkDeleteCourses,
@@ -11,12 +10,16 @@ import {
   type AdminCourseWriteInput,
   type AdminListCoursesOptions,
 } from '@/lib/admin/admin-courses-service';
+import { getAdminSessionOrNull } from '@/lib/admin/admin-session';
 
 function parseListQuery(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const statusRaw = searchParams.get('status');
   const status: NonNullable<AdminListCoursesOptions['status']> =
-    statusRaw === 'draft' || statusRaw === 'published' || statusRaw === 'all'
+    statusRaw === 'draft' ||
+    statusRaw === 'published' ||
+    statusRaw === 'in_review' ||
+    statusRaw === 'all'
       ? statusRaw
       : 'all';
 
@@ -112,7 +115,9 @@ function parseBulkCourseIds(body: unknown): string[] | null {
   return courseIds.length > 0 ? courseIds : null;
 }
 
-function parseBulkPublicationBody(body: unknown): { courseIds: string[]; published: boolean } | null {
+function parseBulkPublicationBody(
+  body: unknown
+): { courseIds: string[]; published: boolean } | null {
   if (!body || typeof body !== 'object') return null;
   const o = body as Record<string, unknown>;
   if (typeof o.published !== 'boolean') return null;
