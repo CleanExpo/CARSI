@@ -8,7 +8,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import type Stripe from 'stripe';
 
 import { constructWebhookEvent } from '@/lib/api/stripe';
+import { sendEnrollmentWelcomeEmail } from '@/lib/server/enrollment-email';
 import { enrollStudentInCourse } from '@/lib/server/enrollment-service';
+import { ensureGuestUserFromStripeEmail } from '@/lib/server/guest-checkout';
 import { sessionClaimsForUserId } from '@/lib/server/lms-auth';
 import { prisma } from '@/lib/prisma';
 
@@ -59,6 +61,9 @@ export async function POST(request: NextRequest) {
     const user = await prisma.lmsUser.findUnique({ where: { email } });
     if (user) claims = await sessionClaimsForUserId(user.id);
   }
+  if (!claims && email && session.metadata?.guest_checkout === 'true') {
+    claims = await ensureGuestUserFromStripeEmail(email);
+  }
 
   if (!claims) {
     console.warn('[stripe webhook] checkout.session.completed: could not resolve learner', {
@@ -71,7 +76,18 @@ export async function POST(request: NextRequest) {
 
   try {
     const ref = typeof session.id === 'string' ? session.id : 'stripe_webhook';
-    await enrollStudentInCourse(claims, slug, ref);
+    const result = await enrollStudentInCourse(claims, slug, ref);
+    if (result !== 'already_enrolled') {
+      const origin =
+        process.env.NEXT_PUBLIC_APP_URL?.trim() ||
+        process.env.NEXT_PUBLIC_FRONTEND_URL?.trim() ||
+        'https://carsi.com.au';
+      void sendEnrollmentWelcomeEmail({
+        studentId: claims.sub,
+        courseSlug: slug,
+        origin,
+      }).catch((e) => console.error('[stripe webhook] email', e));
+    }
   } catch (e) {
     console.error('[stripe webhook] enrolment error:', e);
   }
