@@ -4,12 +4,11 @@ import {
   IndustryPageLayout,
   IndustryHero,
   IndustryWhySection,
-  IndustryCourseSection,
   IndustryCTA,
   ContractorAddOns,
 } from '@/components/industries';
+import { IndustryRecommendedCourses } from '@/components/industries/IndustryRecommendedCourses';
 import { FAQSchema } from '@/components/seo/JsonLd';
-import { getBackendOrigin } from '@/lib/env/public-url';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,35 +24,6 @@ export const metadata: Metadata = {
     'CRT aged care Australia',
   ],
 };
-
-// ---------------------------------------------------------------------------
-// Data Fetching
-// ---------------------------------------------------------------------------
-
-async function getIndustryCourses() {
-  const backendUrl = getBackendOrigin();
-  try {
-    const [crtRes, amrtRes] = await Promise.all([
-      fetch(`${backendUrl}/api/lms/courses?discipline=CRT&limit=8`, { next: { revalidate: 60 } }),
-      fetch(`${backendUrl}/api/lms/courses?discipline=AMRT&limit=8`, { next: { revalidate: 60 } }),
-    ]);
-
-    const crtData = crtRes.ok ? await crtRes.json() : { items: [] };
-    const amrtData = amrtRes.ok ? await amrtRes.json() : { items: [] };
-
-    const seen = new Set<string>();
-    const combined = [];
-    for (const c of [...(crtData.items ?? []), ...(amrtData.items ?? [])]) {
-      if (!seen.has(c.id)) {
-        seen.add(c.id);
-        combined.push(c);
-      }
-    }
-    return combined;
-  } catch {
-    return [];
-  }
-}
 
 // ---------------------------------------------------------------------------
 // Page Configuration
@@ -119,8 +89,6 @@ const whyCards = [
 // ---------------------------------------------------------------------------
 
 export default async function AgedCareIndustryPage() {
-  const courses = await getIndustryCourses();
-
   return (
     <IndustryPageLayout>
       <FAQSchema questions={faqs} />
@@ -142,10 +110,10 @@ export default async function AgedCareIndustryPage() {
         cards={whyCards}
       />
 
-      <IndustryCourseSection
-        industryName="Aged Care"
+      <IndustryRecommendedCourses
+        industryName="Aged Care Industry"
         disciplineList="CRT & AMRT"
-        courses={courses}
+        disciplines={['CRT', 'AMRT']}
       />
 
       <ContractorAddOns accentColor={ACCENT_COLOR} />
