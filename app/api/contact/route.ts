@@ -2,6 +2,7 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { randomUUID } from 'node:crypto';
 
+import { emitCrmEvent } from '@/lib/server/crm-sync';
 import { sendEmail } from '@/lib/server/email';
 import { applyRateLimit, UNKNOWN_IP } from '@/lib/rate-limit';
 import { prisma } from '@/lib/prisma';
@@ -72,6 +73,15 @@ export async function POST(req: NextRequest) {
       process.env.CONTACT_NOTIFY_EMAIL?.trim() ||
       process.env.ADMIN_EMAIL?.trim() ||
       'support@carsi.com.au';
+
+    void emitCrmEvent('contact.created', {
+      submission_id: submissionId,
+      email,
+      first_name: body.firstName.trim(),
+      last_name: body.lastName.trim(),
+      message: body.message.trim(),
+      ticket_ref: ticketRef,
+    });
 
     await sendEmail({
       to: notifyTo,
