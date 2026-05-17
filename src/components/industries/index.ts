@@ -4,5 +4,6 @@ export { IndustryCTA } from './IndustryCTA';
 export { IndustryHero } from './IndustryHero';
 export { IndustryWhySection } from './IndustryWhySection';
 export { IndustryCourseSection } from './IndustryCourseSection';
+export { IndustryRecommendedCourses } from './IndustryRecommendedCourses';
 export { IndustryPageLayout } from './IndustryPageLayout';
 export { ContractorAddOns } from './ContractorAddOns';
