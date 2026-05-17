@@ -7,6 +7,7 @@ import {
 } from '@/components/lms/ContinueLearningBanner';
 import { EnrolledCourseList } from '@/components/lms/EnrolledCourseList';
 import { ErrorBanner } from '@/components/lms/ErrorBanner';
+import { PathwayProgressCard } from '@/components/lms/PathwayProgressCard';
 import { PopularForYouStrip } from '@/components/lms/PopularForYouStrip';
 import { PushNotificationPrompt } from '@/components/lms/PushNotificationPrompt';
 import { RenewalCockpit } from '@/components/lms/RenewalCockpit';
@@ -187,6 +188,8 @@ export default function StudentDashboardPage() {
       <PushNotificationPrompt />
 
       <ContinueLearningBanner snapshot={resume} />
+
+      <PathwayProgressCard />
 
       {/* Hero — Udemy/Coursera-style workspace header */}
       <header className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#060a12] shadow-[0_24px_80px_-40px_rgba(0,0,0,0.9)]">
