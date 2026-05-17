@@ -1,14 +1,11 @@
-import { normalizePublicAssetUrl } from '@/lib/remote-image';
-import type { CourseListItem, WpExportCourse } from '@/lib/wordpress-export-courses';
 import type { Prisma } from '@/generated/prisma/client';
 import { prisma } from '@/lib/prisma';
+import { normalizePublicAssetUrl } from '@/lib/remote-image';
+import type { CourseListItem, WpExportCourse } from '@/lib/wordpress-export-courses';
 
 /** Same filter as the public `/courses` catalogue when loaded from Prisma. */
 export const lmsPublishedCourseWhere: Prisma.LmsCourseWhereInput = {
-  OR: [
-    { isPublished: true },
-    { status: { equals: 'published', mode: 'insensitive' } },
-  ],
+  OR: [{ isPublished: true }, { status: { equals: 'published', mode: 'insensitive' } }],
 };
 
 const publishedWhere = lmsPublishedCourseWhere;
@@ -343,7 +340,9 @@ export async function getPublishedCourseDetailBySlugFromDatabase(slug: string) {
  * Stripe/checkout line item metadata: same published course as the catalogue when using Prisma.
  * Shaped like a WP export row so `createStripeCheckoutForCourse` can stay unchanged.
  */
-export async function getPublishedCourseAsWpExportForCheckout(slug: string): Promise<WpExportCourse | null> {
+export async function getPublishedCourseAsWpExportForCheckout(
+  slug: string
+): Promise<WpExportCourse | null> {
   if (!process.env.DATABASE_URL?.trim()) return null;
   const target = decodeURIComponent(slug).trim();
   if (!target) return null;
