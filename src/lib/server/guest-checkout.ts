@@ -61,16 +61,29 @@ export async function ensureGuestUserFromStripeEmail(
 
   const id = randomUUID();
   const hashedPassword = await hashPassword(generateProvisionalPassword());
-  await prisma.lmsUser.create({
-    data: {
-      id,
-      email: normalized,
-      hashedPassword,
-      fullName: fullName?.trim() || normalized.split('@')[0],
-      isActive: true,
-      isVerified: false,
-    },
-  });
+  try {
+    await prisma.lmsUser.create({
+      data: {
+        id,
+        email: normalized,
+        hashedPassword,
+        fullName: fullName?.trim() || normalized.split('@')[0],
+        isActive: true,
+        isVerified: false,
+      },
+    });
+  } catch (e: unknown) {
+    if (
+      e &&
+      typeof e === 'object' &&
+      'code' in e &&
+      (e as { code?: string }).code === 'P2002'
+    ) {
+      const again = await prisma.lmsUser.findUnique({ where: { email: normalized } });
+      if (again) return sessionClaimsForUserId(again.id);
+    }
+    throw e;
+  }
 
   return sessionClaimsForUserId(id);
 }
