@@ -1,14 +1,13 @@
 import type { Metadata } from 'next';
 import { Building2, ShieldCheck, Layers } from 'lucide-react';
-import { getBackendOrigin } from '@/lib/env/public-url';
 import {
   IndustryPageLayout,
   IndustryHero,
   IndustryWhySection,
-  IndustryCourseSection,
   IndustryCTA,
   ContractorAddOns,
 } from '@/components/industries';
+import { IndustryRecommendedCourses } from '@/components/industries/IndustryRecommendedCourses';
 
 export const dynamic = 'force-dynamic';
 
@@ -23,44 +22,6 @@ export const metadata: Metadata = {
     'strata water damage Australia',
   ],
 };
-
-// ---------------------------------------------------------------------------
-// Data Fetching
-// ---------------------------------------------------------------------------
-
-async function getIndustryCourses() {
-  const backendUrl = getBackendOrigin();
-  try {
-    const [wrtRes, crtRes, amrtRes, asdRes] = await Promise.all([
-      fetch(`${backendUrl}/api/lms/courses?discipline=WRT&limit=8`, { next: { revalidate: 60 } }),
-      fetch(`${backendUrl}/api/lms/courses?discipline=CRT&limit=8`, { next: { revalidate: 60 } }),
-      fetch(`${backendUrl}/api/lms/courses?discipline=AMRT&limit=8`, { next: { revalidate: 60 } }),
-      fetch(`${backendUrl}/api/lms/courses?discipline=ASD&limit=8`, { next: { revalidate: 60 } }),
-    ]);
-
-    const wrtData = wrtRes.ok ? await wrtRes.json() : { items: [] };
-    const crtData = crtRes.ok ? await crtRes.json() : { items: [] };
-    const amrtData = amrtRes.ok ? await amrtRes.json() : { items: [] };
-    const asdData = asdRes.ok ? await asdRes.json() : { items: [] };
-
-    const seen = new Set<string>();
-    const combined = [];
-    for (const c of [
-      ...(wrtData.items ?? []),
-      ...(crtData.items ?? []),
-      ...(amrtData.items ?? []),
-      ...(asdData.items ?? []),
-    ]) {
-      if (!seen.has(c.id)) {
-        seen.add(c.id);
-        combined.push(c);
-      }
-    }
-    return combined;
-  } catch {
-    return [];
-  }
-}
 
 // ---------------------------------------------------------------------------
 // Page Configuration
@@ -110,8 +71,6 @@ const whyCards = [
 // ---------------------------------------------------------------------------
 
 export default async function StrataIndustryPage() {
-  const courses = await getIndustryCourses();
-
   return (
     <IndustryPageLayout>
       <IndustryHero
@@ -132,10 +91,10 @@ export default async function StrataIndustryPage() {
         cards={whyCards}
       />
 
-      <IndustryCourseSection
-        industryName="Strata"
+      <IndustryRecommendedCourses
+        industryName="Strata & Body Corporate"
         disciplineList="WRT, CRT, AMRT & ASD"
-        courses={courses}
+        disciplines={['WRT', 'CRT', 'AMRT', 'ASD']}
       />
 
       <ContractorAddOns accentColor={ACCENT_COLOR} />
