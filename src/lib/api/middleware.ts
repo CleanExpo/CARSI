@@ -8,6 +8,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 
 import { ADMIN_COOKIE_NAME } from '@/lib/admin/admin-auth';
 import { isValidAdminSessionCookie } from '@/lib/admin/admin-session-edge';
+import { internalToolsEnabled, isInternalToolPath } from '@/lib/internal-tools';
 import { verifySessionToken } from '@/lib/auth/session-jwt';
 
 interface User {
@@ -62,6 +63,14 @@ export async function updateSession(request: NextRequest) {
   }
 
   const pathname = request.nextUrl.pathname;
+
+  if (isInternalToolPath(pathname) && !internalToolsEnabled()) {
+    const url = request.nextUrl.clone();
+    url.pathname = '/';
+    url.search = '';
+    return NextResponse.redirect(url);
+  }
+
   const isAdminPath = pathname.startsWith('/admin');
 
   const adminSessionValid =
