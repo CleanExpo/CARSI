@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { getStripeClient } from '@/lib/api/stripe';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
+import { sendEnrollmentWelcomeEmail } from '@/lib/server/enrollment-email';
 import { enrollStudentInCourse } from '@/lib/server/enrollment-service';
+import { getFirstLessonLearnPath } from '@/lib/server/first-lesson';
 import { findCourseInExport } from '@/lib/server/local-course-checkout';
 import { computeDiscountedAud, findActiveUserDiscount } from '@/lib/server/user-discounts';
 import { getOrCreateCourseBySlug } from '@/lib/server/course-catalog-sync';
@@ -104,13 +106,22 @@ export async function POST(request: NextRequest) {
 
   try {
     const result = await enrollStudentInCourse(claims, slug, paymentReference);
+    const learnUrl = (await getFirstLessonLearnPath(slug)) ?? '/dashboard/student';
     if (result === 'already_enrolled') {
-      return NextResponse.json({ ok: true, already_enrolled: true });
+      return NextResponse.json({ ok: true, already_enrolled: true, learn_url: learnUrl });
     }
+
+    void sendEnrollmentWelcomeEmail({
+      studentId: claims.sub,
+      courseSlug: slug,
+      origin: request.nextUrl.origin,
+    }).catch((e) => console.error('[enrollments/confirm] email', e));
+
     return NextResponse.json({
       ok: true,
       enrollment_id: result.enrollmentId,
       course_id: result.courseId,
+      learn_url: learnUrl,
     });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
