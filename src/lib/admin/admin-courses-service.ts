@@ -355,10 +355,11 @@ export async function adminCreateCourse(
           description: input.description?.trim() || null,
           shortDescription: null,
           thumbnailUrl: input.thumbnailUrl?.trim() || null,
-          meta: upsertIntroVideoInMeta(null, {
-            introVideoUrl: input.introVideoUrl,
-            introThumbnailUrl: input.introThumbnailUrl,
-          }),
+          meta:
+            upsertIntroVideoInMeta(null, {
+              introVideoUrl: input.introVideoUrl,
+              introThumbnailUrl: input.introThumbnailUrl,
+            }) ?? undefined,
           instructorId: DEFAULT_INSTRUCTOR_ID,
           status: published ? 'published' : 'draft',
           priceAud,
@@ -420,10 +421,11 @@ export async function adminUpdateCourse(
           title: input.title.trim(),
           description: input.description?.trim() || null,
           thumbnailUrl: input.thumbnailUrl?.trim() || null,
-          meta: upsertIntroVideoInMeta(existing.meta, {
-            introVideoUrl: input.introVideoUrl,
-            introThumbnailUrl: input.introThumbnailUrl,
-          }),
+          meta:
+            upsertIntroVideoInMeta(existing.meta, {
+              introVideoUrl: input.introVideoUrl,
+              introThumbnailUrl: input.introThumbnailUrl,
+            }) ?? undefined,
           status: published ? 'published' : 'draft',
           priceAud,
           isFree: Boolean(input.isFree),
