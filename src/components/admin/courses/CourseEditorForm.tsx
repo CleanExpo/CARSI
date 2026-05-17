@@ -34,6 +34,7 @@ type CourseDto = {
   isFree: boolean;
   priceAud: number;
   published: boolean;
+  workflow_status?: 'draft' | 'in_review' | 'published';
   modules: {
     id: string;
     title: string;
@@ -88,6 +89,10 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
   const [isFree, setIsFree] = useState(true);
   const [priceAud, setPriceAud] = useState('0');
   const [published, setPublished] = useState(false);
+  const [workflowStatus, setWorkflowStatus] = useState<'draft' | 'in_review' | 'published'>(
+    'draft'
+  );
+  const [workflowBusy, setWorkflowBusy] = useState(false);
   const [modules, setModules] = useState<Mod[]>([emptyModule()]);
   const [uploading, setUploading] = useState(false);
 
@@ -108,6 +113,7 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
       setIsFree(c.isFree);
       setPriceAud(String(Number(c.priceAud)));
       setPublished(c.published);
+      setWorkflowStatus(c.workflow_status ?? (c.published ? 'published' : 'draft'));
       setModules(
         c.modules.length > 0
           ? c.modules.map((m) => ({
@@ -130,6 +136,35 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
   useEffect(() => {
     void load();
   }, [load]);
+
+  async function runWorkflow(action: 'save_draft' | 'submit_review' | 'publish') {
+    if (!courseId) return;
+    setWorkflowBusy(true);
+    try {
+      const res = await fetch(`/api/admin/courses/${courseId}/workflow`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action }),
+      });
+      if (!res.ok) throw new Error('Workflow failed');
+      const data = (await res.json()) as { course: CourseDto };
+      setWorkflowStatus(data.course.workflow_status ?? 'draft');
+      setPublished(data.course.published);
+      toast({
+        title:
+          action === 'publish'
+            ? 'Course published'
+            : action === 'submit_review'
+              ? 'Submitted for review'
+              : 'Saved as draft',
+      });
+    } catch {
+      toast({ title: 'Workflow update failed', variant: 'destructive' });
+    } finally {
+      setWorkflowBusy(false);
+    }
+  }
 
   function moveModule(i: number, dir: -1 | 1) {
     const j = i + dir;
@@ -420,13 +455,48 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
                 </p>
               </div>
 
-              <div className="flex flex-wrap items-center gap-3 border-t border-white/10 pt-5">
-                <div className="flex items-center gap-2">
-                  <Switch id="pub" checked={published} onCheckedChange={setPublished} />
-                  <Label htmlFor="pub" className="cursor-pointer text-sm text-white/75">
-                    Published (visible in catalogue when live)
-                  </Label>
-                </div>
+              <div className="space-y-4 border-t border-white/10 pt-5">
+                {courseId ? (
+                  <>
+                    <p className="text-xs text-white/45">
+                      Content workflow — status:{' '}
+                      <span className="font-semibold text-white/80">{workflowStatus}</span>
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        disabled={workflowBusy}
+                        onClick={() => void runWorkflow('save_draft')}
+                        className="rounded-lg border border-white/15 px-3 py-1.5 text-xs font-medium text-white/75 hover:bg-white/5 disabled:opacity-50"
+                      >
+                        Save draft
+                      </button>
+                      <button
+                        type="button"
+                        disabled={workflowBusy}
+                        onClick={() => void runWorkflow('submit_review')}
+                        className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-1.5 text-xs font-medium text-amber-100 hover:bg-amber-500/15 disabled:opacity-50"
+                      >
+                        Submit for review
+                      </button>
+                      <button
+                        type="button"
+                        disabled={workflowBusy}
+                        onClick={() => void runWorkflow('publish')}
+                        className="rounded-lg bg-[#2490ed] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#1f82d4] disabled:opacity-50"
+                      >
+                        Publish
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <Switch id="pub" checked={published} onCheckedChange={setPublished} />
+                    <Label htmlFor="pub" className="cursor-pointer text-sm text-white/75">
+                      Published on create
+                    </Label>
+                  </div>
+                )}
               </div>
             </section>
           </div>
