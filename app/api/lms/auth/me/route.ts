@@ -125,7 +125,7 @@ export async function PATCH(request: NextRequest) {
     update.iicrcCardImageUrl = null;
   }
   if (Array.isArray(patch.iicrc_certifications)) {
-    update.iicrcCertifications = patch.iicrc_certifications as Prisma.InputJsonValue;
+    update.iicrcCertifications = patch.iicrc_certifications as unknown as Prisma.InputJsonValue;
   }
   if (patch.iicrc_certifications === null) {
     update.iicrcCertifications = Prisma.JsonNull;
