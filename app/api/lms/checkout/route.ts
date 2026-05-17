@@ -22,6 +22,7 @@ import {
   STRIPE_MIN_UNIT_AMOUNT_CENTS,
 } from '@/lib/server/user-discounts';
 import { getOrCreateCourseBySlug } from '@/lib/server/course-catalog-sync';
+import { getFirstLessonLearnPath } from '@/lib/server/first-lesson';
 import { getPublishedCourseAsWpExportForCheckout } from '@/lib/server/public-courses-list';
 
 export async function POST(request: NextRequest) {
@@ -31,6 +32,8 @@ export async function POST(request: NextRequest) {
       success_url?: string;
       cancel_url?: string;
       customer_email?: string;
+      guest_checkout?: boolean;
+      full_name?: string;
     };
 
     const slug = typeof body.slug === 'string' ? body.slug.trim() : '';
@@ -40,7 +43,8 @@ export async function POST(request: NextRequest) {
 
     const normalized = slug.toLowerCase();
     const origin = request.nextUrl.origin;
-    const defaults = buildCourseCheckoutUrls(origin, slug);
+    const learnNext = await getFirstLessonLearnPath(normalized);
+    const defaults = buildCourseCheckoutUrls(origin, slug, learnNext);
     const success_url =
       typeof body.success_url === 'string' && body.success_url.startsWith('http')
         ? body.success_url
@@ -65,13 +69,15 @@ export async function POST(request: NextRequest) {
       if (c?.sub) studentId = c.sub;
     }
 
+    const guestCheckout = body.guest_checkout === true;
+
     if (!customerEmail) {
       return NextResponse.json(
         {
           detail:
-            'Sign in required, or pass customer_email after registration. Try the Enrol button again.',
+            'Sign in required, or provide your email for quick checkout.',
         },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -133,6 +139,7 @@ export async function POST(request: NextRequest) {
             student_id: studentId,
             unit_amount_cents: cents,
             extra_metadata: { discount_id: disc.id },
+            guest_checkout: guestCheckout && !studentId,
           });
           return NextResponse.json({ checkout_url });
         } catch (err) {
@@ -172,6 +179,7 @@ export async function POST(request: NextRequest) {
         customer_email: customerEmail,
         student_id: studentId,
         unit_amount_cents,
+        guest_checkout: guestCheckout && !studentId,
       });
       return NextResponse.json({ checkout_url });
     } catch (err) {
