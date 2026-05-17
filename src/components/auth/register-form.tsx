@@ -127,9 +127,14 @@ export function RegisterForm() {
         window.location.href = safePath;
       }, 200);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Registration failed');
+      const message = err instanceof Error ? err.message : 'Registration failed';
+      const duplicateEmail = message.toLowerCase().includes('already exists');
+      const displayMessage = duplicateEmail
+        ? 'An account with this email already exists. Sign in or use Forgot password.'
+        : message;
+      setError(displayMessage);
       toast({
-        title: err instanceof Error ? err.message : 'Registration failed',
+        title: displayMessage,
         variant: 'destructive',
       });
     } finally {
@@ -208,7 +213,23 @@ export function RegisterForm() {
             </FormItem>
           )}
         />
-        {error && <p className="text-destructive text-sm">{error}</p>}
+        {error && (
+          <p className="text-destructive text-sm">
+            {error}
+            {error.includes('already exists') && (
+              <>
+                {' '}
+                <a href="/login" className="underline underline-offset-2">
+                  Sign in
+                </a>
+                {' · '}
+                <a href="/forgot-password" className="underline underline-offset-2">
+                  Forgot password
+                </a>
+              </>
+            )}
+          </p>
+        )}
         <button
           type="submit"
           disabled={isLoading}
