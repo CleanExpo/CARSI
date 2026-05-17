@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { getStripeClient } from '@/lib/api/stripe';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
+import { notifyCrmEnrollmentCreated } from '@/lib/server/crm-enrollment-notify';
 import { sendEnrollmentWelcomeEmail } from '@/lib/server/enrollment-email';
 import { enrollStudentInCourse } from '@/lib/server/enrollment-service';
 import { getFirstLessonLearnPath } from '@/lib/server/first-lesson';
@@ -116,6 +117,12 @@ export async function POST(request: NextRequest) {
       courseSlug: slug,
       origin: request.nextUrl.origin,
     }).catch((e) => console.error('[enrollments/confirm] email', e));
+
+    notifyCrmEnrollmentCreated({
+      enrollmentId: result.enrollmentId,
+      studentId: claims.sub,
+      courseId: result.courseId,
+    });
 
     return NextResponse.json({
       ok: true,
