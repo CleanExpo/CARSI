@@ -352,6 +352,21 @@ model ContactSubmission {
   @@map("contact_submissions")
 }
 
+/// Outbound CRM/webhook events (Phase 3) — contact, enrollment, etc.
+model CrmEventLog {
+  id             String   @id @default(uuid()) @db.Uuid
+  eventType      String   @map("event_type") @db.VarChar(64)
+  payload        Json
+  status         String   @default("pending") @db.VarChar(32)
+  responseStatus Int?     @map("response_status")
+  responseBody   String?  @map("response_body") @db.Text
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@index([eventType, createdAt(sort: Desc)])
+  @@index([status])
+  @@map("crm_event_logs")
+}
+
 model AdminUser {
   id             String    @id @default(uuid()) @db.Uuid
   email          String    @unique
