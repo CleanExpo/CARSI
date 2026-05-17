@@ -1,6 +1,9 @@
 'use client';
 
 import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { apiClient } from '@/lib/api/client';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -9,13 +12,21 @@ function isSafeInternalPath(path: string): boolean {
   return path.startsWith('/') && !path.startsWith('//') && !path.includes('://');
 }
 
+type Phase = 'confirming' | 'guest_setup' | 'done' | 'error';
+
 export function PaymentSuccessClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const params = useParams();
   const slug = typeof params.slug === 'string' ? params.slug : '';
-  const [countdown, setCountdown] = useState(3);
+
+  const [phase, setPhase] = useState<Phase>('confirming');
   const [confirmError, setConfirmError] = useState<string | null>(null);
+  const [sessionEmail, setSessionEmail] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [password, setPassword] = useState('');
+  const [learnUrl, setLearnUrl] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const nextRaw = searchParams.get('next') ?? '/dashboard/student';
   const nextPath = isSafeInternalPath(nextRaw) ? nextRaw : '/dashboard/student';
@@ -23,59 +34,160 @@ export function PaymentSuccessClient() {
 
   useEffect(() => {
     let cancelled = false;
-    let timer: ReturnType<typeof setInterval> | undefined;
 
     (async () => {
-      if (sessionId) {
-        try {
-          await apiClient.post('/api/lms/enrollments/confirm', { session_id: sessionId });
-        } catch {
-          if (!cancelled) {
-            setConfirmError('We could not verify enrolment automatically. Check My Learning or contact support.');
-          }
-        }
-      } else if (slug) {
-        try {
-          await apiClient.post('/api/lms/enrollments/confirm', { slug });
-        } catch {
-          if (!cancelled) {
-            setConfirmError('We could not verify enrolment automatically. Check My Learning or contact support.');
-          }
-        }
+      if (!sessionId && !slug) {
+        setPhase('error');
+        setConfirmError('Missing payment session.');
+        return;
       }
 
-      if (cancelled) return;
-
-      timer = setInterval(() => {
-        setCountdown((prev) => {
-          if (prev <= 1) {
-            if (timer) clearInterval(timer);
-            router.push(nextPath);
-            return 0;
-          }
-          return prev - 1;
+      try {
+        const data = await apiClient.post<{ learn_url?: string }>('/api/lms/enrollments/confirm', {
+          ...(sessionId ? { session_id: sessionId } : { slug }),
         });
-      }, 1000);
+        if (!cancelled) {
+          setLearnUrl(data.learn_url ?? nextPath);
+          setPhase('done');
+          router.push(data.learn_url ?? nextPath);
+        }
+        return;
+      } catch {
+        // Not logged in — guest checkout completion
+      }
+
+      if (!sessionId) {
+        if (!cancelled) {
+          setPhase('error');
+          setConfirmError('Sign in or complete account setup below.');
+        }
+        return;
+      }
+
+      try {
+        const info = await fetch(
+          `/api/lms/checkout/session?session_id=${encodeURIComponent(sessionId)}`,
+        ).then((r) => r.json() as Promise<{ email?: string; guest_checkout?: boolean }>);
+        if (!cancelled && info.email) {
+          setSessionEmail(info.email);
+          const stored = sessionStorage.getItem('carsi_guest_checkout');
+          if (stored) {
+            try {
+              const parsed = JSON.parse(stored) as { fullName?: string };
+              if (parsed.fullName) setFullName(parsed.fullName);
+            } catch {
+              /* ignore */
+            }
+          }
+          setPhase('guest_setup');
+          return;
+        }
+      } catch {
+        /* fall through */
+      }
+
+      if (!cancelled) {
+        setPhase('error');
+        setConfirmError('We could not verify enrolment. Contact support@carsi.com.au');
+      }
     })();
 
     return () => {
       cancelled = true;
-      if (timer) clearInterval(timer);
     };
   }, [router, nextPath, sessionId, slug]);
+
+  async function handleGuestComplete(e: React.FormEvent) {
+    e.preventDefault();
+    if (!sessionId) return;
+    setSubmitting(true);
+    setConfirmError(null);
+    try {
+      const res = await fetch('/api/lms/enrollments/guest-complete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          session_id: sessionId,
+          password,
+          full_name: fullName,
+        }),
+      });
+      const data = (await res.json().catch(() => ({}))) as {
+        learn_url?: string;
+        detail?: string;
+      };
+      if (!res.ok) {
+        setConfirmError(data.detail ?? 'Could not finish setup');
+        return;
+      }
+      sessionStorage.removeItem('carsi_guest_checkout');
+      window.location.href = data.learn_url ?? nextPath;
+    } catch {
+      setConfirmError('Something went wrong. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  if (phase === 'guest_setup') {
+    return (
+      <main className="flex min-h-[60vh] items-center justify-center px-4">
+        <Card className="w-full max-w-md border-[0.5px] border-white/6 bg-[#050505]">
+          <CardContent className="space-y-4 p-8">
+            <h1 className="text-2xl font-bold text-white">Payment successful</h1>
+            <p className="text-sm text-white/60">
+              Create your password for <strong className="text-white/80">{sessionEmail}</strong> to
+              access your course.
+            </p>
+            <form onSubmit={handleGuestComplete} className="space-y-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="ps-full-name">Full name</Label>
+                <Input
+                  id="ps-full-name"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  required
+                  className="border-white/15 bg-white/5 text-white"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="ps-password">Password</Label>
+                <Input
+                  id="ps-password"
+                  type="password"
+                  minLength={8}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="border-white/15 bg-white/5 text-white"
+                />
+              </div>
+              {confirmError ? <p className="text-sm text-amber-200/90">{confirmError}</p> : null}
+              <Button type="submit" disabled={submitting} className="w-full bg-[#2490ed]">
+                {submitting ? 'Setting up…' : 'Start lesson 1'}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </main>
+    );
+  }
 
   return (
     <main className="flex min-h-[60vh] items-center justify-center px-4">
       <Card className="w-full max-w-md border-[0.5px] border-white/6 bg-[#050505]">
         <CardContent className="p-8 text-center">
           <div className="mb-4 text-4xl">&#10003;</div>
-          <h1 className="mb-2 text-2xl font-bold text-white">Payment Successful</h1>
+          <h1 className="mb-2 text-2xl font-bold text-white">
+            {phase === 'confirming' ? 'Confirming enrolment…' : 'Payment successful'}
+          </h1>
           <p className="mb-2 text-white/60">
-            You are now enrolled. Redirecting in {countdown}…
+            {phase === 'done' && learnUrl
+              ? 'Taking you to your first lesson…'
+              : phase === 'confirming'
+                ? 'Please wait a moment.'
+                : confirmError ?? 'Redirecting…'}
           </p>
-          {confirmError ? (
-            <p className="text-sm text-amber-200/90">{confirmError}</p>
-          ) : null}
         </CardContent>
       </Card>
     </main>
