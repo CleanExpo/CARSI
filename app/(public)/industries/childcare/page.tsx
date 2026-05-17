@@ -1,14 +1,13 @@
 import type { Metadata } from 'next';
 import { Baby, Shield, Droplets } from 'lucide-react';
-import { getBackendOrigin } from '@/lib/env/public-url';
 import {
   IndustryPageLayout,
   IndustryHero,
   IndustryWhySection,
-  IndustryCourseSection,
   IndustryCTA,
   ContractorAddOns,
 } from '@/components/industries';
+import { IndustryRecommendedCourses } from '@/components/industries/IndustryRecommendedCourses';
 
 export const dynamic = 'force-dynamic';
 
@@ -23,41 +22,6 @@ export const metadata: Metadata = {
     'childcare mould remediation Australia',
   ],
 };
-
-// ---------------------------------------------------------------------------
-// Data Fetching
-// ---------------------------------------------------------------------------
-
-async function getIndustryCourses() {
-  const backendUrl = getBackendOrigin();
-  try {
-    const [crtRes, amrtRes, wrtRes] = await Promise.all([
-      fetch(`${backendUrl}/api/lms/courses?discipline=CRT&limit=8`, { next: { revalidate: 60 } }),
-      fetch(`${backendUrl}/api/lms/courses?discipline=AMRT&limit=8`, { next: { revalidate: 60 } }),
-      fetch(`${backendUrl}/api/lms/courses?discipline=WRT&limit=8`, { next: { revalidate: 60 } }),
-    ]);
-
-    const crtData = crtRes.ok ? await crtRes.json() : { items: [] };
-    const amrtData = amrtRes.ok ? await amrtRes.json() : { items: [] };
-    const wrtData = wrtRes.ok ? await wrtRes.json() : { items: [] };
-
-    const seen = new Set<string>();
-    const combined = [];
-    for (const c of [
-      ...(crtData.items ?? []),
-      ...(amrtData.items ?? []),
-      ...(wrtData.items ?? []),
-    ]) {
-      if (!seen.has(c.id)) {
-        seen.add(c.id);
-        combined.push(c);
-      }
-    }
-    return combined;
-  } catch {
-    return [];
-  }
-}
 
 // ---------------------------------------------------------------------------
 // Page Configuration
@@ -106,8 +70,6 @@ const whyCards = [
 // ---------------------------------------------------------------------------
 
 export default async function ChildcareIndustryPage() {
-  const courses = await getIndustryCourses();
-
   return (
     <IndustryPageLayout>
       <IndustryHero
@@ -128,10 +90,10 @@ export default async function ChildcareIndustryPage() {
         cards={whyCards}
       />
 
-      <IndustryCourseSection
-        industryName="Childcare"
+      <IndustryRecommendedCourses
+        industryName="Childcare Industry"
         disciplineList="AMRT, CRT & WRT"
-        courses={courses}
+        disciplines={['CRT', 'AMRT', 'WRT']}
       />
 
       <ContractorAddOns accentColor={ACCENT_COLOR} />
