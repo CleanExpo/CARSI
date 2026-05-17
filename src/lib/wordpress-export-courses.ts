@@ -41,6 +41,7 @@ export interface WpExportCourse {
     wp_id?: number;
     wp_categories?: Array<{ id?: number; name?: string; slug?: string }>;
     wp_tags?: unknown[];
+    pricing?: string;
   };
 }
 
