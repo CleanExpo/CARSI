@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { signSessionToken } from '@/lib/auth/session-jwt';
+import { notifyCrmEnrollmentCreated } from '@/lib/server/crm-enrollment-notify';
 import { sendEnrollmentWelcomeEmail } from '@/lib/server/enrollment-email';
 import { enrollStudentInCourse } from '@/lib/server/enrollment-service';
 import { findOrCreateGuestUser } from '@/lib/server/guest-checkout';
@@ -71,6 +72,11 @@ export async function POST(request: NextRequest) {
         courseSlug: slug,
         origin: request.nextUrl.origin,
       }).catch((e) => console.error('[guest-free] email', e));
+      notifyCrmEnrollmentCreated({
+        enrollmentId: result.enrollmentId,
+        studentId: claims.sub,
+        courseId: result.courseId,
+      });
     }
 
     const accessToken = await signSessionToken(claims);
