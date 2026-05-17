@@ -6,7 +6,7 @@
 
 import { NextResponse, type NextRequest } from 'next/server';
 
-import { ADMIN_COOKIE_NAME } from '@/lib/admin/admin-auth';
+import { ADMIN_COOKIE_NAME } from '@/lib/admin/admin-constants';
 import { isValidAdminSessionCookie } from '@/lib/admin/admin-session-edge';
 import { internalToolsEnabled, isInternalToolPath } from '@/lib/internal-tools';
 import { verifySessionToken } from '@/lib/auth/session-jwt';
