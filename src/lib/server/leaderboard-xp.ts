@@ -75,7 +75,7 @@ async function queryMonthBoundsSydney(): Promise<MonthBounds | null> {
 
 type IdXpRow = { student_id: string; xp: bigint | number };
 
-async function lessonXpGrouped(
+export async function lessonXpGrouped(
   start: Date | null,
   end: Date | null,
   discipline: string | null
@@ -146,7 +146,7 @@ async function lessonXpGrouped(
   return map;
 }
 
-async function courseXpGrouped(
+export async function courseXpGrouped(
   start: Date | null,
   end: Date | null,
   discipline: string | null
@@ -209,7 +209,7 @@ async function courseXpGrouped(
   return map;
 }
 
-function mergeXpMaps(a: Map<string, number>, b: Map<string, number>): Map<string, number> {
+export function mergeXpMaps(a: Map<string, number>, b: Map<string, number>): Map<string, number> {
   const out = new Map(a);
   for (const [k, v] of b) {
     out.set(k, (out.get(k) ?? 0) + v);
