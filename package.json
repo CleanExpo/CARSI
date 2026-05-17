@@ -37,6 +37,8 @@
     "db:seed-technology-inspection-tools-txt": "npx tsx scripts/seed-technology-inspection-tools-txt.ts",
     "db:seed-odour-smoke-psychro-drying-docx": "npx tsx scripts/seed-odour-smoke-psychro-drying-docx.ts",
     "lint": "eslint .",
+    "type-check": "tsc --noEmit",
+    "db:seed-phase2": "npx tsx scripts/seed-phase2-pathways-quizzes.ts",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate deploy",
     "db:studio": "prisma studio",
