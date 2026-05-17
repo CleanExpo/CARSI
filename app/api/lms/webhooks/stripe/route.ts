@@ -8,6 +8,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import type Stripe from 'stripe';
 
 import { constructWebhookEvent } from '@/lib/api/stripe';
+import { notifyCrmEnrollmentCreated } from '@/lib/server/crm-enrollment-notify';
 import { sendEnrollmentWelcomeEmail } from '@/lib/server/enrollment-email';
 import { enrollStudentInCourse } from '@/lib/server/enrollment-service';
 import { ensureGuestUserFromStripeEmail } from '@/lib/server/guest-checkout';
@@ -87,6 +88,11 @@ export async function POST(request: NextRequest) {
         courseSlug: slug,
         origin,
       }).catch((e) => console.error('[stripe webhook] email', e));
+      notifyCrmEnrollmentCreated({
+        enrollmentId: result.enrollmentId,
+        studentId: claims.sub,
+        courseId: result.courseId,
+      });
     }
   } catch (e) {
     console.error('[stripe webhook] enrolment error:', e);
