@@ -1,6 +1,6 @@
 'use client';
 
-import { BookOpen, LogOut, Mail, Percent, Users } from 'lucide-react';
+import { BarChart3, BookOpen, LogOut, Mail, Percent, Users } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 
@@ -49,6 +49,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const coursesActive = pathname.startsWith('/admin/courses');
   const discountsActive = pathname.startsWith('/admin/discounts');
   const contactsActive = pathname.startsWith('/admin/contacts');
+  const analyticsActive = pathname.startsWith('/admin/analytics');
 
   async function handleSignOut() {
     await signOut();
@@ -86,6 +87,12 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             active={discountsActive}
           />
           <NavButton href="/admin/contacts" label="Contacts" icon={Mail} active={contactsActive} />
+          <NavButton
+            href="/admin/analytics"
+            label="Analytics"
+            icon={BarChart3}
+            active={analyticsActive}
+          />
         </nav>
 
         <div className="mt-auto border-t border-white/6 px-2 py-3 pb-6">
