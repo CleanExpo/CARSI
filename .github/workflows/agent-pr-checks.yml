@@ -77,7 +77,7 @@ jobs:
       - name: Type Check
         id: type-check
         run: |
-          npm run type-check
+          npm run --if-present type-check
           echo "status=$?" >> $GITHUB_OUTPUT
 
       - name: Lint

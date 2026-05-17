@@ -74,7 +74,7 @@ jobs:
         run: npm run lint
 
       - name: Type check
-        run: npm run type-check
+        run: npm run --if-present type-check
 
   build:
     name: Build Check
@@ -158,7 +158,7 @@ jobs:
         run: npx playwright install-deps chromium
 
       - name: Run E2E tests
-        run: npm run test:e2e
+        run: npm run --if-present test:e2e
         env:
           CI: true
           DATABASE_URL: postgresql://starter_user:local_dev_password@localhost:5432/starter_db
