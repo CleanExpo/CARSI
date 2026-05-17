@@ -1,10 +1,10 @@
-import { NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { getLearnerLevelPayload } from '@/lib/server/learner-xp';
 
 /** GET /api/lms/gamification/me/level — real XP from lesson/course progress (Phase 1). */
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   const claims = await getSessionClaimsFromRequest(request);
   if (!claims) {
     return NextResponse.json({ detail: 'Unauthorized' }, { status: 401 });
