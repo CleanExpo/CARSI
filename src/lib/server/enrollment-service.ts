@@ -154,14 +154,32 @@ export async function getEnrollmentForCertificate(
 ): Promise<{
   id: string;
   student: { email: string; fullName: string | null };
-  course: { title: string; slug: string; iicrcDiscipline: string | null };
+  course: {
+    title: string;
+    slug: string;
+    iicrcDiscipline: string | null;
+    cecHours: unknown;
+    durationHours: unknown;
+    level: string | null;
+  };
   completedAt: Date;
+  certificateIssuedAt: Date | null;
 } | null> {
   const row = await prisma.lmsEnrollment.findFirst({
     where: { id: enrollmentId, studentId: studentSub },
     include: {
       student: { select: { email: true, fullName: true } },
-      course: { select: { title: true, slug: true, id: true, iicrcDiscipline: true } },
+      course: {
+        select: {
+          title: true,
+          slug: true,
+          id: true,
+          iicrcDiscipline: true,
+          cecHours: true,
+          durationHours: true,
+          level: true,
+        },
+      },
     },
   });
   if (!row) return null;
@@ -172,7 +190,16 @@ export async function getEnrollmentForCertificate(
     where: { id: enrollmentId, studentId: studentSub },
     include: {
       student: { select: { email: true, fullName: true } },
-      course: { select: { title: true, slug: true, iicrcDiscipline: true } },
+      course: {
+        select: {
+          title: true,
+          slug: true,
+          iicrcDiscipline: true,
+          cecHours: true,
+          durationHours: true,
+          level: true,
+        },
+      },
     },
   });
   if (!refreshed || refreshed.status !== 'completed' || !refreshed.completedAt) {
@@ -184,6 +211,7 @@ export async function getEnrollmentForCertificate(
     student: refreshed.student,
     course: refreshed.course,
     completedAt: refreshed.completedAt,
+    certificateIssuedAt: refreshed.certificateIssuedAt,
   };
 }
 
