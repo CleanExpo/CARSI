@@ -47,6 +47,7 @@ export async function POST(request: NextRequest) {
       to: claims.email,
       fullName: claims.full_name,
       dashboardUrl: `${origin}/dashboard/student`,
+      appOrigin: origin,
     }).catch((e) => console.error('[register] welcome email', e));
 
     const response = NextResponse.json({

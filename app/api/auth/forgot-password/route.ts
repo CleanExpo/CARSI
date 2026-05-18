@@ -39,15 +39,20 @@ export async function POST(request: NextRequest) {
       to: normalized,
       resetLink: link,
       fullName: user.fullName,
+      appOrigin: base,
     });
 
     if (!emailResult.sent) {
       if (process.env.NODE_ENV === 'development' || !isEmailConfigured()) {
-        console.info('[forgot-password] email not sent (%s). Dev reset link:', emailResult.reason, link);
+        console.info('[forgot-password] dev reset link:', link);
         return NextResponse.json({ message: SENT_MESSAGE });
       }
       console.error('[forgot-password] failed to send reset email:', emailResult.reason, '→', normalized);
       return NextResponse.json({ error: SEND_FAILED_MESSAGE }, { status: 502 });
+    }
+
+    if (emailResult.reason === 'dev_console') {
+      console.info('[forgot-password] reset link (dev console):', link);
     }
 
     return NextResponse.json({ message: SENT_MESSAGE });
