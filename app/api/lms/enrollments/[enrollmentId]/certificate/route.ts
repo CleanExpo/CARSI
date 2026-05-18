@@ -2,7 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { getUpstreamBaseUrl } from '@/lib/server/upstream-api';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
-import { buildCompletionCertificatePdf } from '@/lib/server/certificate-pdf';
+import {
+  buildCompletionCertificatePdf,
+  completionCertificateDataFromEnrollment,
+} from '@/lib/server/certificate-pdf';
 import { getEnrollmentForCertificate, markCertificateIssued } from '@/lib/server/enrollment-service';
 
 type Ctx = { params: Promise<{ enrollmentId: string }> };
@@ -53,14 +56,12 @@ export async function GET(request: NextRequest, ctx: Ctx) {
       );
     }
 
-    const studentName = row.student.fullName?.trim() || row.student.email;
-    const disc = row.course.iicrcDiscipline?.trim() || '—';
-    const pdf = await buildCompletionCertificatePdf({
-      studentName,
-      courseTitle: row.course.title,
-      completedDate: row.completedAt,
-      discipline: disc,
-    });
+    const origin =
+      process.env.NEXT_PUBLIC_APP_URL?.trim() ||
+      new URL(request.url).origin;
+    const pdf = await buildCompletionCertificatePdf(
+      completionCertificateDataFromEnrollment(row, origin)
+    );
 
     await markCertificateIssued(row.id);
 

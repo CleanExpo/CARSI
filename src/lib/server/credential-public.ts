@@ -1,6 +1,9 @@
 import { prisma } from '@/lib/prisma';
 
-import { buildCompletionCertificatePdf } from '@/lib/server/certificate-pdf';
+import {
+  buildCompletionCertificatePdf,
+  completionCertificateDataFromEnrollment,
+} from '@/lib/server/certificate-pdf';
 
 /** Public verification JSON (matches CredentialVerificationCard + certificate preview). */
 export type PublicCredentialJson = {
@@ -77,19 +80,36 @@ export async function getPublicCredentialPdfBuffer(credentialId: string): Promis
     },
     include: {
       student: { select: { fullName: true, email: true } },
-      course: { select: { title: true, slug: true, iicrcDiscipline: true } },
+      course: {
+        select: {
+          title: true,
+          slug: true,
+          iicrcDiscipline: true,
+          cecHours: true,
+          durationHours: true,
+          level: true,
+        },
+      },
     },
   });
   if (!row) return { ok: false, reason: 'not_found' };
 
-  const studentName = row.student.fullName?.trim() || row.student.email;
-  const disc = row.course.iicrcDiscipline?.trim() || '—';
-  const pdf = await buildCompletionCertificatePdf({
-    studentName,
-    courseTitle: row.course.title,
-    completedDate: row.completedAt!,
-    discipline: disc,
-  });
+  const origin =
+    process.env.NEXT_PUBLIC_APP_URL?.trim() ||
+    process.env.NEXT_PUBLIC_SITE_URL?.trim() ||
+    'https://carsi.com.au';
+  const pdf = await buildCompletionCertificatePdf(
+    completionCertificateDataFromEnrollment(
+      {
+        id: row.id,
+        completedAt: row.completedAt!,
+        certificateIssuedAt: row.certificateIssuedAt,
+        student: row.student,
+        course: row.course,
+      },
+      origin
+    )
+  );
 
   return {
     ok: true,
