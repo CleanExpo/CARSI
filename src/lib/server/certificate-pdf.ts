@@ -28,10 +28,8 @@ export type CompletionCertificateData = {
   issuedDate?: Date;
   discipline?: string;
   cecHours?: number | null;
-  durationHours?: number | null;
   courseLevel?: string | null;
   credentialId?: string;
-  verificationUrl?: string;
 };
 
 function hexToRgb(hex: string) {
@@ -157,71 +155,158 @@ function drawCornerBracket(
   page.drawLine({ start: vertical[corner][0], end: vertical[corner][1], thickness, color });
 }
 
-type DetailRow = { label: string; value: string };
+type ProgrammeMetric = { label: string; value: string };
 
-function drawDetailsPanel(
+function drawProgrammeRecordPanel(
   page: PDFPage,
   opts: {
     x: number;
     yTop: number;
     width: number;
-    rows: DetailRow[];
-    labelFont: PDFFont;
-    valueFont: PDFFont;
+    discCode: string;
     discRgb: ReturnType<typeof rgb>;
     fill: ReturnType<typeof rgb>;
+    disciplineName: string;
+    metrics: ProgrammeMetric[];
+    credentialRef: string;
+    helvetica: PDFFont;
+    helveticaBold: PDFFont;
   }
 ): number {
-  const { x, width, rows, labelFont, valueFont, discRgb, fill } = opts;
-  const labelColW = width * 0.38;
-  const padX = 14;
-  const padY = 12;
-  const rowH = 18;
-  const panelH = padY * 2 + rows.length * rowH;
+  const { x, width, discCode, discRgb, fill, disciplineName, metrics, credentialRef } = opts;
+  const headerH = 22;
+  const subHeaderH = 16;
+  const cellH = 34;
+  const footerH = 20;
+  const metricCount = Math.max(1, opts.metrics.length);
+  const gridRows = 1;
+  const panelH = headerH + subHeaderH + cellH * gridRows + footerH;
+  const yBottom = opts.yTop - panelH;
 
   page.drawRectangle({
     x,
-    y: opts.yTop - panelH,
+    y: yBottom,
     width,
     height: panelH,
     color: fill,
     borderColor: discRgb,
     borderWidth: 1,
-    borderOpacity: 0.35,
+    borderOpacity: 0.4,
+  });
+  page.drawRectangle({
+    x,
+    y: opts.yTop - headerH,
+    width,
+    height: headerH,
+    color: discRgb,
+    opacity: 0.18,
+    borderWidth: 0,
   });
 
-  const labelColor = rgb(0.52, 0.54, 0.58);
-  const valueColor = rgb(0.9, 0.91, 0.94);
-  let rowY = opts.yTop - padY - 11;
+  const padX = 14;
+  page.drawText('PROGRAMME RECORD', {
+    x: x + padX,
+    y: opts.yTop - headerH + 9,
+    size: 7,
+    font: opts.helveticaBold,
+    color: rgb(0.72, 0.74, 0.78),
+  });
 
-  for (const row of rows) {
-    page.drawText(row.label.toUpperCase(), {
-      x: x + padX,
-      y: rowY,
-      size: 7,
-      font: labelFont,
-      color: labelColor,
+  const badgeText = discCode;
+  const badgeSize = 8;
+  const badgePadX = 8;
+  const badgeW = opts.helveticaBold.widthOfTextAtSize(badgeText, badgeSize) + badgePadX * 2;
+  const badgeH = 14;
+  const badgeX = x + width - padX - badgeW;
+  const badgeY = opts.yTop - headerH + 6;
+  page.drawRectangle({
+    x: badgeX,
+    y: badgeY,
+    width: badgeW,
+    height: badgeH,
+    color: discRgb,
+  });
+  page.drawText(badgeText, {
+    x: badgeX + badgePadX,
+    y: badgeY + 3,
+    size: badgeSize,
+    font: opts.helveticaBold,
+    color: rgb(1, 1, 1),
+  });
+
+  const subY = opts.yTop - headerH - subHeaderH;
+  page.drawText(disciplineName, {
+    x: x + padX,
+    y: subY + 5,
+    size: 8,
+    font: opts.helvetica,
+    color: rgb(0.78, 0.8, 0.84),
+  });
+
+  const gridTop = subY;
+  const colW = width / metricCount;
+  const labelColor = rgb(0.5, 0.52, 0.56);
+  const valueColor = rgb(0.92, 0.93, 0.96);
+  const cellY = gridTop - cellH;
+
+  for (let i = 1; i < metricCount; i++) {
+    const dividerX = x + colW * i;
+    page.drawLine({
+      start: { x: dividerX, y: cellY },
+      end: { x: dividerX, y: gridTop },
+      thickness: 0.5,
+      color: discRgb,
+      opacity: 0.22,
     });
-    const valueLines = wrapLines(row.value, 42);
-    const valueText = valueLines[0] ?? '';
-    page.drawText(valueText, {
-      x: x + labelColW,
-      y: rowY,
-      size: 9,
-      font: valueFont,
-      color: valueColor,
-    });
-    rowY -= rowH;
   }
 
-  return opts.yTop - panelH;
+  metrics.forEach((m, i) => {
+    const cellX = x + colW * i;
+    const cellPad = i === 0 ? padX : 10;
+    page.drawText(m.label.toUpperCase(), {
+      x: cellX + cellPad,
+      y: cellY + cellH - 20,
+      size: 6.5,
+      font: opts.helveticaBold,
+      color: labelColor,
+    });
+    const maxChars = Math.floor((colW - cellPad * 2) / 5);
+    const valLines = wrapLines(m.value, Math.max(14, maxChars));
+    const valueSize = valLines[0]!.length > 22 ? 8 : 9;
+    page.drawText(valLines[0] ?? m.value, {
+      x: cellX + cellPad,
+      y: cellY + cellH - 32,
+      size: valueSize,
+      font: opts.helveticaBold,
+      color: valueColor,
+    });
+    if (valLines[1]) {
+      page.drawText(valLines[1], {
+        x: cellX + cellPad,
+        y: cellY + 6,
+        size: 7.5,
+        font: opts.helvetica,
+        color: rgb(0.75, 0.77, 0.8),
+      });
+    }
+  });
+
+  page.drawText(`Credential  ${credentialRef}`, {
+    x: x + padX,
+    y: yBottom + 7,
+    size: 7,
+    font: opts.helvetica,
+    color: rgb(0.55, 0.57, 0.62),
+  });
+
+  return yBottom;
 }
 
 function drawVerificationSeal(
   page: PDFPage,
   cx: number,
   cy: number,
-  radius: number,
+  outerR: number,
   discRgb: ReturnType<typeof rgb>,
   helveticaBold: PDFFont,
   helvetica: PDFFont
@@ -229,15 +314,28 @@ function drawVerificationSeal(
   page.drawCircle({
     x: cx,
     y: cy,
-    size: radius * 2,
+    size: outerR * 2,
     borderColor: discRgb,
     borderWidth: 1.5,
-    borderOpacity: 0.55,
+    borderOpacity: 0.65,
     color: rgb(0.04, 0.06, 0.1),
-    opacity: 0.9,
+    opacity: 0.98,
   });
-  drawCenteredText(page, 'CARSI', cx, cy + 6, 9, helveticaBold, discRgb);
-  drawCenteredText(page, 'VERIFIED', cx, cy - 8, 6, helvetica, rgb(0.55, 0.58, 0.62));
+  page.drawCircle({
+    x: cx,
+    y: cy,
+    size: (outerR - 4) * 2,
+    borderColor: discRgb,
+    borderWidth: 0.5,
+    borderOpacity: 0.35,
+    color: discRgb,
+    opacity: 0.1,
+  });
+
+  drawCenteredText(page, 'CARSI', cx, cy + 8, 10, helveticaBold, discRgb);
+  drawCenteredText(page, 'VERIFIED', cx, cy - 3, 6, helveticaBold, rgb(0.85, 0.87, 0.9));
+  drawCenteredText(page, 'COMPLETION', cx, cy - 12, 5, helvetica, rgb(0.55, 0.58, 0.62));
+  drawCenteredText(page, 'IICRC CEC', cx, cy - 21, 5, helveticaBold, discRgb);
 }
 
 export async function buildCompletionCertificatePdf(
@@ -250,10 +348,8 @@ export async function buildCompletionCertificatePdf(
     issuedDate,
     discipline: disciplineRaw,
     cecHours,
-    durationHours,
     courseLevel,
     credentialId,
-    verificationUrl,
   } = params;
 
   const discCode = disciplineCode(disciplineRaw);
@@ -266,7 +362,6 @@ export async function buildCompletionCertificatePdf(
   const page = doc.addPage([PAGE_W, PAGE_H]);
   const xMid = PAGE_W / 2;
   const contentLeft = MARGIN;
-  const contentRight = PAGE_W - MARGIN;
 
   const timesBold = await doc.embedFont(StandardFonts.TimesRomanBold);
   const timesItalic = await doc.embedFont(StandardFonts.TimesRomanItalic);
@@ -399,39 +494,29 @@ export async function buildCompletionCertificatePdf(
   const cecStr =
     cecHours != null && cecHours > 0
       ? `${Number(cecHours) % 1 === 0 ? cecHours : cecHours.toFixed(1)} IICRC CEC hour${cecHours === 1 ? '' : 's'}`
-      : 'As listed in course accreditation record';
-  const durationStr =
-    durationHours != null && durationHours > 0
-      ? `${durationHours % 1 === 0 ? durationHours : durationHours.toFixed(1)} hours · Online LMS`
-      : 'Online · CARSI Learning Platform';
+      : 'Per course listing';
   const levelStr = courseLevel?.trim() ? courseLevel.trim() : 'Professional development';
 
-  const detailRows: DetailRow[] = [
-    { label: 'Programme', value: courseTitle },
-    { label: 'Date of completion', value: completedStr },
-    { label: 'Credential reference', value: credRef },
-    {
-      label: 'IICRC discipline',
-      value: `${discCode} — ${disciplineLabel(discCode)}`,
-    },
-    { label: 'Continuing education', value: cecStr },
-    { label: 'Delivery & duration', value: `${durationStr} · ${levelStr}` },
-    { label: 'Issuing organisation', value: 'CARSI Learning · IICRC-aligned curriculum' },
-  ];
-
-  y = drawDetailsPanel(page, {
+  y = drawProgrammeRecordPanel(page, {
     x: contentLeft,
     yTop: y,
     width: CONTENT_W,
-    rows: detailRows,
-    labelFont: helveticaBold,
-    valueFont: helvetica,
+    discCode,
     discRgb,
     fill: panelFill,
+    disciplineName: disciplineLabel(discCode),
+    metrics: [
+      { label: 'Completed', value: completedStr },
+      { label: 'CEC credits', value: cecStr },
+      { label: 'Programme level', value: levelStr },
+    ],
+    credentialRef: credRef,
+    helvetica,
+    helveticaBold,
   });
   y -= 14;
 
-  const noticeH = 28;
+  const noticeH = 24;
   page.drawRectangle({
     x: contentLeft,
     y: y - noticeH,
@@ -456,12 +541,12 @@ export async function buildCompletionCertificatePdf(
   const colW = CONTENT_W / 3;
   const col1Center = contentLeft + colW / 2;
   const col2Center = contentLeft + colW + colW / 2;
-  const col3Center = contentRight - colW / 2;
+  const col3Center = PAGE_W - MARGIN - colW / 2;
 
   drawCenteredText(page, 'Date issued', col1Center, footerTop, 7, helveticaBold, rgb(0.5, 0.52, 0.56));
   drawCenteredText(page, issuedStr, col1Center, footerTop - 14, 9, helvetica, rgb(0.78, 0.8, 0.84));
 
-  drawVerificationSeal(page, col2Center, footerTop - 22, 26, discRgb, helveticaBold, helvetica);
+  drawVerificationSeal(page, col2Center, footerTop - 24, 22, discRgb, helveticaBold, helvetica);
 
   drawCenteredText(page, 'Authorised signatory', col3Center, footerTop, 7, helveticaBold, rgb(0.5, 0.52, 0.56));
   drawCenteredText(page, 'Philip McGurk', col3Center, footerTop - 20, 16, timesItalic, rgb(0.88, 0.89, 0.92));
@@ -475,21 +560,7 @@ export async function buildCompletionCertificatePdf(
   });
   drawCenteredText(page, 'Training Director', col3Center, footerTop - 50, 7, helvetica, rgb(0.5, 0.52, 0.56));
 
-  y = footerTop - 72;
-
-  if (verificationUrl?.trim()) {
-    const verifyLabel = 'Verify this credential:';
-    const url = verificationUrl.trim();
-    drawCenteredText(page, verifyLabel, xMid, y, 7, helveticaBold, rgb(0.48, 0.5, 0.54));
-    y -= 11;
-    const urlLines = wrapLines(url, 72);
-    for (const line of urlLines.slice(0, 2)) {
-      drawCenteredText(page, line, xMid, y, 7.5, helvetica, discRgb);
-      y -= 10;
-    }
-  }
-
-  const footerTag = 'carsi.com.au · Restoration industry education';
+  const footerTag = 'CARSI Learning · carsi.com.au · IICRC-aligned restoration education';
   drawCenteredText(page, footerTag, xMid, MARGIN - 4, 6.5, helvetica, rgb(0.42, 0.44, 0.48));
 
   return doc.save();
@@ -506,23 +577,17 @@ export function completionCertificateDataFromEnrollment(
       title: string;
       iicrcDiscipline: string | null;
       cecHours?: unknown;
-      durationHours?: unknown;
       level?: string | null;
     };
   },
   verificationOrigin?: string
 ): CompletionCertificateData {
-  const origin = verificationOrigin?.replace(/\/$/, '') ?? '';
+  void verificationOrigin;
   const studentName = row.student.fullName?.trim() || row.student.email;
   const cec =
     row.course.cecHours != null && row.course.cecHours !== ''
       ? Number(row.course.cecHours)
       : null;
-  const duration =
-    row.course.durationHours != null && row.course.durationHours !== ''
-      ? Number(row.course.durationHours)
-      : null;
-
   return {
     studentName,
     courseTitle: row.course.title,
@@ -530,9 +595,7 @@ export function completionCertificateDataFromEnrollment(
     issuedDate: row.certificateIssuedAt ?? row.completedAt,
     discipline: row.course.iicrcDiscipline?.trim() || undefined,
     cecHours: Number.isFinite(cec) ? cec : null,
-    durationHours: Number.isFinite(duration) ? duration : null,
     courseLevel: row.course.level,
     credentialId: row.id,
-    verificationUrl: origin ? `${origin}/verify/credential/${row.id}` : undefined,
   };
 }
