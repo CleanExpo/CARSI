@@ -24,7 +24,6 @@ export function CredentialVerificationPageContent({ credential, credentialId }: 
           discipline={credential.discipline ?? credential.iicrc_discipline ?? undefined}
           credentialId={credentialId}
           cecHours={credential.cec_hours}
-          verificationUrl={credential.verification_url}
           completedDate={
             credential.completed_at
               ? new Date(credential.completed_at).toLocaleDateString('en-AU', {
