@@ -12,20 +12,26 @@ export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [isError, setIsError] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setMessage('');
+    setIsError(false);
 
     try {
       const result = await authApi.requestPasswordReset(email);
-      setMessage(result.message || 'Check your email for a password reset link.');
-      toast({ title: result.message || 'Check your email for a password reset link.' });
+      const successText = result.message || 'A password reset link has been sent to your email.';
+      setMessage(successText);
+      setIsError(false);
+      toast({ title: successText });
     } catch (err) {
-      setMessage(err instanceof Error ? err.message : 'Failed to send reset link');
+      const errorText = err instanceof Error ? err.message : 'Failed to send reset link';
+      setMessage(errorText);
+      setIsError(true);
       toast({
-        title: err instanceof Error ? err.message : 'Failed to send reset link',
+        title: errorText,
         variant: 'destructive',
       });
     } finally {
@@ -68,8 +74,19 @@ export default function ForgotPasswordPage() {
           />
         </div>
         {message && (
-          <p className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
+          <p
+            className="text-sm"
+            style={{ color: isError ? 'hsl(var(--destructive))' : 'rgba(255,255,255,0.7)' }}
+          >
             {message}
+            {isError && message.includes('No account found') && (
+              <>
+                {' '}
+                <Link href="/register" className="underline underline-offset-2">
+                  Create an account
+                </Link>
+              </>
+            )}
           </p>
         )}
         <button
