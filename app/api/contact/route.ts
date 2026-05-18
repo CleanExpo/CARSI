@@ -3,7 +3,8 @@ import { NextResponse } from 'next/server';
 import { randomUUID } from 'node:crypto';
 
 import { emitCrmEvent } from '@/lib/server/crm-sync';
-import { sendEmail } from '@/lib/server/email';
+import { getAppOrigin } from '@/lib/server/app-url';
+import { sendContactNotificationEmail } from '@/lib/server/transactional-email';
 import { applyRateLimit, UNKNOWN_IP } from '@/lib/rate-limit';
 import { prisma } from '@/lib/prisma';
 
@@ -83,17 +84,14 @@ export async function POST(req: NextRequest) {
       ticket_ref: ticketRef,
     });
 
-    const emailResult = await sendEmail({
-      to: notifyTo,
-      replyTo: email,
-      subject: `[CARSI Contact #${ticketRef}] ${body.firstName} ${body.lastName}`,
-      html: `
-        <p><strong>Reference:</strong> ${ticketRef}</p>
-        <p><strong>From:</strong> ${body.firstName} ${body.lastName} &lt;${email}&gt;</p>
-        <p>${body.message.trim().replace(/\n/g, '<br>')}</p>
-        <p><em>View in admin: /admin/contacts</em></p>
-      `,
-      text: `Ref ${ticketRef}\nFrom: ${body.firstName} ${body.lastName} <${email}>\n\n${body.message.trim()}`,
+    const emailResult = await sendContactNotificationEmail({
+      appOrigin: getAppOrigin(req),
+      ticketRef,
+      firstName: body.firstName.trim(),
+      lastName: body.lastName.trim(),
+      email,
+      message: body.message.trim(),
+      notifyTo,
     });
 
     if (!emailResult.sent) {
