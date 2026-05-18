@@ -494,3 +494,45 @@ export async function buildCompletionCertificatePdf(
 
   return doc.save();
 }
+
+/** Map enrollment + course row to PDF builder input (shared by download + public verify). */
+export function completionCertificateDataFromEnrollment(
+  row: {
+    id: string;
+    completedAt: Date;
+    certificateIssuedAt?: Date | null;
+    student: { fullName: string | null; email: string };
+    course: {
+      title: string;
+      iicrcDiscipline: string | null;
+      cecHours?: unknown;
+      durationHours?: unknown;
+      level?: string | null;
+    };
+  },
+  verificationOrigin?: string
+): CompletionCertificateData {
+  const origin = verificationOrigin?.replace(/\/$/, '') ?? '';
+  const studentName = row.student.fullName?.trim() || row.student.email;
+  const cec =
+    row.course.cecHours != null && row.course.cecHours !== ''
+      ? Number(row.course.cecHours)
+      : null;
+  const duration =
+    row.course.durationHours != null && row.course.durationHours !== ''
+      ? Number(row.course.durationHours)
+      : null;
+
+  return {
+    studentName,
+    courseTitle: row.course.title,
+    completedDate: row.completedAt,
+    issuedDate: row.certificateIssuedAt ?? row.completedAt,
+    discipline: row.course.iicrcDiscipline?.trim() || undefined,
+    cecHours: Number.isFinite(cec) ? cec : null,
+    durationHours: Number.isFinite(duration) ? duration : null,
+    courseLevel: row.course.level,
+    credentialId: row.id,
+    verificationUrl: origin ? `${origin}/verify/credential/${row.id}` : undefined,
+  };
+}
