@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
       void sendEnrollmentWelcomeEmail({
         studentId: claims.sub,
         courseSlug: slug,
-        origin,
+        appOrigin: origin,
       }).catch((e) => console.error('[stripe webhook] email', e));
       notifyCrmEnrollmentCreated({
         enrollmentId: result.enrollmentId,
