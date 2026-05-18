@@ -22,9 +22,21 @@ export function CredentialVerificationPageContent({ credential, credentialId }: 
           studentName={credential.student_name ?? undefined}
           courseName={credential.course_title ?? undefined}
           discipline={credential.discipline ?? credential.iicrc_discipline ?? undefined}
+          credentialId={credentialId}
+          cecHours={credential.cec_hours}
+          verificationUrl={credential.verification_url}
           completedDate={
             credential.completed_at
               ? new Date(credential.completed_at).toLocaleDateString('en-AU', {
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric',
+                })
+              : undefined
+          }
+          issuedDate={
+            credential.issued_date
+              ? new Date(credential.issued_date).toLocaleDateString('en-AU', {
                   day: 'numeric',
                   month: 'long',
                   year: 'numeric',
