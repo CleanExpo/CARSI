@@ -267,3 +267,64 @@ export function renderRegistrationWelcomeEmail(params: {
     `Hi ${params.name},\n\nWelcome to CARSI Learning.\n\nDashboard: ${params.dashboardUrl}`
   );
 }
+
+export function renderEnrollmentWelcomeEmail(params: {
+  appOrigin: string;
+  name: string;
+  courseTitle: string;
+  startUrl: string;
+  dashboardUrl: string;
+}): RenderedEmail {
+  return render(
+    {
+      appOrigin: params.appOrigin,
+      preheader: `You're enrolled in ${params.courseTitle}`,
+      eyebrow: 'Enrolment confirmed',
+      title: 'Your course is ready',
+      greeting: `Hi ${params.name},`,
+      paragraphs: [
+        'Your enrolment is confirmed. You now have full access to course materials, lessons, and progress tracking.',
+      ],
+      details: [
+        { label: 'Course', value: params.courseTitle },
+        { label: 'Access', value: 'Immediate — start anytime' },
+      ],
+      cta: { label: 'Start lesson 1', href: params.startUrl },
+      noteHtml: `Or open ${brandLink(params.dashboardUrl, 'My Learning')} to see all your courses.`,
+    },
+    `Hi ${params.name},\n\nYou're enrolled in ${params.courseTitle}.\n\nStart: ${params.startUrl}\n\nMy Learning: ${params.dashboardUrl}`
+  );
+}
+
+export function renderContactNotificationEmail(params: {
+  appOrigin: string;
+  ticketRef: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  message: string;
+  adminContactsUrl: string;
+}): RenderedEmail {
+  const fullName = `${params.firstName} ${params.lastName}`.trim();
+  return render(
+    {
+      appOrigin: params.appOrigin,
+      preheader: `New contact form — #${params.ticketRef}`,
+      eyebrow: 'Contact form',
+      title: `New message · #${params.ticketRef}`,
+      paragraphs: [
+        'A visitor submitted the CARSI contact form. Details are below.',
+        'Reply directly to this email to respond to the sender (reply-to is set to their address).',
+      ],
+      details: [
+        { label: 'Reference', value: params.ticketRef },
+        { label: 'Name', value: fullName },
+        { label: 'Email', value: params.email },
+      ],
+      messageHtml: formatPlainMessageAsHtml(params.message),
+      cta: { label: 'Open in admin', href: params.adminContactsUrl },
+      noteHtml: `Submitted via ${brandLink(`${params.appOrigin}/contact`, 'carsi.com.au/contact')}.`,
+    },
+    `Contact #${params.ticketRef}\nFrom: ${fullName} <${params.email}>\n\n${params.message}\n\nAdmin: ${params.adminContactsUrl}`
+  );
+}
