@@ -1,5 +1,6 @@
 /**
- * Transactional email via Resend (https://resend.com).
+ * Low-level email delivery via Resend (https://resend.com).
+ * Prefer @/lib/server/transactional-email for branded CARSI templates.
  * Local dev: set EMAIL_DEV_CONSOLE=true or emails log to the terminal when Resend is unreachable.
  */
 
