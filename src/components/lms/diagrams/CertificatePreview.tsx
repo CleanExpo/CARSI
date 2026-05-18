@@ -23,9 +23,7 @@ export interface CertificatePreviewProps {
   issuedDate?: string;
   credentialId?: string;
   cecHours?: number | null;
-  durationHours?: number | null;
   courseLevel?: string | null;
-  verificationUrl?: string;
 }
 
 function disciplineCode(raw?: string): string {
@@ -46,36 +44,22 @@ export function CertificatePreview({
   issuedDate,
   credentialId,
   cecHours = 4,
-  durationHours = 6,
   courseLevel = 'Professional development',
-  verificationUrl = 'https://carsi.com.au/verify/credential/example',
 }: CertificatePreviewProps) {
   const discCode = disciplineCode(discipline);
   const discColor = DISCIPLINE_COLORS[discCode] ?? '#2490ed';
   const discLabel = IICRC_DISCIPLINE_LONG[discCode] ?? discipline;
   const issued = issuedDate ?? completedDate;
   const credentialRef = credentialId ? formatCredentialRef(credentialId) : 'CARSI-EXAMPLE000';
-  const cecLabel =
+  const cecValue =
     cecHours != null && cecHours > 0
-      ? `${cecHours % 1 === 0 ? cecHours : cecHours.toFixed(1)} IICRC CEC hour${cecHours === 1 ? '' : 's'}`
-      : 'As listed in course accreditation record';
-  const durationLabel =
-    durationHours != null && durationHours > 0
-      ? `${durationHours % 1 === 0 ? durationHours : durationHours.toFixed(1)} hours · Online LMS`
-      : 'Online · CARSI Learning Platform';
-
-  const details: { label: string; value: string }[] = [
-    { label: 'Programme', value: courseName },
-    { label: 'Date of completion', value: completedDate },
-    { label: 'Credential reference', value: credentialRef },
-    { label: 'IICRC discipline', value: `${discCode} — ${discLabel}` },
-    { label: 'Continuing education', value: cecLabel },
-    {
-      label: 'Delivery & duration',
-      value: `${durationLabel} · ${courseLevel ?? 'Professional development'}`,
-    },
-    { label: 'Issuing organisation', value: 'CARSI Learning · IICRC-aligned curriculum' },
-  ];
+      ? `${cecHours % 1 === 0 ? cecHours : cecHours.toFixed(1)} CEC hours`
+      : 'Per course listing';
+  const metrics = [
+    { label: 'Completed', value: completedDate },
+    { label: 'CEC credits', value: cecValue },
+    { label: 'Programme level', value: courseLevel ?? 'Professional development' },
+  ] as const;
 
   return (
     <div
@@ -163,22 +147,44 @@ export function CertificatePreview({
           </p>
 
           <div
-            className="mx-auto mb-5 max-w-lg rounded-sm border text-left text-sm"
+            className="mx-auto mb-5 max-w-lg overflow-hidden rounded-sm border text-left"
             style={{ borderColor: `${discColor}55`, backgroundColor: 'rgba(14,18,26,0.95)' }}
           >
-            <dl className="divide-y divide-white/[0.06]">
-              {details.map((row) => (
+            <div
+              className="flex items-center justify-between gap-3 px-4 py-2.5 sm:px-5"
+              style={{ backgroundColor: `${discColor}2e` }}
+            >
+              <span className="text-[10px] font-bold tracking-[0.14em] text-white/55 uppercase">
+                Programme record
+              </span>
+              <span
+                className="shrink-0 rounded-sm px-2.5 py-1 text-[10px] font-bold tracking-wider text-white"
+                style={{ backgroundColor: discColor }}
+              >
+                {discCode}
+              </span>
+            </div>
+            <p className="border-b border-white/6 px-4 py-2 text-left text-xs text-white/75 sm:px-5">
+              {discLabel}
+            </p>
+            <div className="grid grid-cols-3 divide-x divide-white/6">
+              {metrics.map((m) => (
                 <div
-                  key={row.label}
-                  className="grid grid-cols-[38%_1fr] gap-3 px-4 py-2.5 sm:px-5"
+                  key={m.label}
+                  className="px-3 py-3 sm:px-4"
                 >
-                  <dt className="text-[10px] font-semibold tracking-wide text-white/40 uppercase">
-                    {row.label}
-                  </dt>
-                  <dd className="text-xs leading-snug text-white/88">{row.value}</dd>
+                  <p className="text-[9px] font-semibold tracking-wide text-white/40 uppercase">
+                    {m.label}
+                  </p>
+                  <p className="mt-1 text-xs font-semibold leading-snug text-white/92 sm:text-sm">
+                    {m.value}
+                  </p>
                 </div>
               ))}
-            </dl>
+            </div>
+            <p className="border-t border-white/6 px-4 py-2.5 font-mono text-[10px] text-white/45 sm:px-5">
+              Credential {credentialRef}
+            </p>
           </div>
 
           <p
@@ -189,7 +195,7 @@ export function CertificatePreview({
             applicable. Maintain this certificate with your renewal records.
           </p>
 
-          <div className="mx-auto grid max-w-lg grid-cols-3 gap-4 border-t border-white/[0.08] pt-6 text-center">
+          <div className="mx-auto grid max-w-lg grid-cols-3 items-end gap-4 border-t border-white/8 pt-6 text-center">
             <div>
               <p className="text-[10px] font-semibold tracking-wide text-white/40 uppercase">
                 Date issued
@@ -198,14 +204,34 @@ export function CertificatePreview({
             </div>
             <div className="flex flex-col items-center justify-center">
               <div
-                className="flex h-[52px] w-[52px] items-center justify-center rounded-full border-2 text-center"
-                style={{ borderColor: `${discColor}88` }}
+                className="relative flex h-[62px] w-[62px] items-center justify-center rounded-full border-2 bg-[#0a0e14]"
+                style={{ borderColor: `${discColor}99` }}
               >
-                <span className="block text-[9px] font-bold tracking-wider" style={{ color: discColor }}>
-                  CARSI
-                  <br />
-                  <span className="text-[7px] font-normal text-white/45">VERIFIED</span>
-                </span>
+                <div
+                  className="absolute inset-[5px] rounded-full border"
+                  style={{ borderColor: `${discColor}44` }}
+                  aria-hidden
+                />
+                <div className="relative text-center leading-tight">
+                  <span
+                    className="block text-[10px] font-extrabold tracking-[0.16em]"
+                    style={{ color: discColor }}
+                  >
+                    CARSI
+                  </span>
+                  <span className="block text-[7px] font-bold tracking-[0.18em] text-white/80">
+                    VERIFIED
+                  </span>
+                  <span className="block text-[6px] tracking-[0.12em] text-white/45 uppercase">
+                    Completion
+                  </span>
+                  <span
+                    className="mt-0.5 block text-[6px] font-bold tracking-wider uppercase"
+                    style={{ color: discColor }}
+                  >
+                    IICRC CEC
+                  </span>
+                </div>
               </div>
             </div>
             <div>
@@ -223,17 +249,9 @@ export function CertificatePreview({
             </div>
           </div>
 
-          {verificationUrl ? (
-            <p className="mt-6 text-[10px] text-white/45">
-              <span className="font-semibold text-white/55">Verify this credential:</span>
-              <br />
-              <span className="break-all" style={{ color: discColor }}>
-                {verificationUrl}
-              </span>
-            </p>
-          ) : null}
-
-          <p className="mt-4 text-[10px] text-white/30">carsi.com.au · Restoration industry education</p>
+          <p className="mt-5 text-[10px] text-white/30">
+            CARSI Learning · carsi.com.au · IICRC-aligned restoration education
+          </p>
         </div>
       </div>
     </div>
