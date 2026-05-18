@@ -83,7 +83,7 @@ export async function POST(req: NextRequest) {
       ticket_ref: ticketRef,
     });
 
-    await sendEmail({
+    const emailResult = await sendEmail({
       to: notifyTo,
       replyTo: email,
       subject: `[CARSI Contact #${ticketRef}] ${body.firstName} ${body.lastName}`,
@@ -95,6 +95,10 @@ export async function POST(req: NextRequest) {
       `,
       text: `Ref ${ticketRef}\nFrom: ${body.firstName} ${body.lastName} <${email}>\n\n${body.message.trim()}`,
     });
+
+    if (!emailResult.sent) {
+      console.warn('[contact] notification email not sent:', emailResult.reason, '→', notifyTo);
+    }
 
     return NextResponse.json({ ok: true, reference: ticketRef });
   } catch (e) {
