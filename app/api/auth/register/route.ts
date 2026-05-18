@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { signSessionToken } from '@/lib/auth/session-jwt';
+import { sendRegistrationWelcomeEmail } from '@/lib/server/auth-email';
+import { getAppOrigin } from '@/lib/server/app-url';
 import { registerUserWithPassword } from '@/lib/server/lms-auth';
 
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
@@ -39,6 +41,13 @@ export async function POST(request: NextRequest) {
 
     const { claims } = result;
     const accessToken = await signSessionToken(claims);
+
+    const origin = getAppOrigin(request);
+    void sendRegistrationWelcomeEmail({
+      to: claims.email,
+      fullName: claims.full_name,
+      dashboardUrl: `${origin}/dashboard/student`,
+    }).catch((e) => console.error('[register] welcome email', e));
 
     const response = NextResponse.json({
       success: true,
