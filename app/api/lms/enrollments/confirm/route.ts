@@ -115,7 +115,7 @@ export async function POST(request: NextRequest) {
     void sendEnrollmentWelcomeEmail({
       studentId: claims.sub,
       courseSlug: slug,
-      origin: request.nextUrl.origin,
+      appOrigin: request.nextUrl.origin,
     }).catch((e) => console.error('[enrollments/confirm] email', e));
 
     notifyCrmEnrollmentCreated({
