@@ -8,6 +8,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import type Stripe from 'stripe';
 
 import { constructWebhookEvent } from '@/lib/api/stripe';
+import { getAppOrigin } from '@/lib/server/app-url';
 import { notifyCrmEnrollmentCreated } from '@/lib/server/crm-enrollment-notify';
 import { sendEnrollmentWelcomeEmail } from '@/lib/server/enrollment-email';
 import { enrollStudentInCourse } from '@/lib/server/enrollment-service';
@@ -79,10 +80,7 @@ export async function POST(request: NextRequest) {
     const ref = typeof session.id === 'string' ? session.id : 'stripe_webhook';
     const result = await enrollStudentInCourse(claims, slug, ref);
     if (result !== 'already_enrolled') {
-      const origin =
-        process.env.NEXT_PUBLIC_APP_URL?.trim() ||
-        process.env.NEXT_PUBLIC_FRONTEND_URL?.trim() ||
-        'https://carsi.com.au';
+      const origin = getAppOrigin();
       void sendEnrollmentWelcomeEmail({
         studentId: claims.sub,
         courseSlug: slug,
