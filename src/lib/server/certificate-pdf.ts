@@ -3,7 +3,9 @@ import path from 'node:path';
 
 import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from 'pdf-lib';
 
-/** Matches `CertificatePreview` — same hex keys as the React component. */
+import { formatCredentialRef } from '@/lib/credential-format';
+import { IICRC_DISCIPLINE_LONG } from '@/lib/iicrc-discipline-display';
+
 const DISCIPLINE_HEX: Record<string, string> = {
   WRT: '#2490ed',
   CRT: '#26c4a0',
@@ -12,6 +14,24 @@ const DISCIPLINE_HEX: Record<string, string> = {
   CCT: '#17b8d4',
   FSRT: '#f05a35',
   AMRT: '#27ae60',
+};
+
+const PAGE_W = 595;
+const PAGE_H = 842;
+const MARGIN = 44;
+const CONTENT_W = PAGE_W - MARGIN * 2;
+
+export type CompletionCertificateData = {
+  studentName: string;
+  courseTitle: string;
+  completedDate: Date;
+  issuedDate?: Date;
+  discipline?: string;
+  cecHours?: number | null;
+  durationHours?: number | null;
+  courseLevel?: string | null;
+  credentialId?: string;
+  verificationUrl?: string;
 };
 
 function hexToRgb(hex: string) {
@@ -23,7 +43,7 @@ function hexToRgb(hex: string) {
   );
 }
 
-function wrapCenteredLines(text: string, maxChars: number): string[] {
+function wrapLines(text: string, maxChars: number): string[] {
   const words = text.split(/\s+/).filter(Boolean);
   if (words.length === 0) return [''];
   const lines: string[] = [];
@@ -39,6 +59,25 @@ function wrapCenteredLines(text: string, maxChars: number): string[] {
   }
   if (current) lines.push(current);
   return lines;
+}
+
+function formatAuDate(d: Date): string {
+  return d.toLocaleDateString('en-AU', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+}
+
+function disciplineCode(raw?: string): string {
+  const c = raw?.trim().toUpperCase();
+  if (!c || c === '—' || c === '-') return 'GEN';
+  return c;
+}
+
+function disciplineLabel(code: string): string {
+  if (code === 'GEN') return 'General restoration training';
+  return IICRC_DISCIPLINE_LONG[code] ?? code;
 }
 
 async function loadLogoPng(): Promise<Uint8Array | null> {
@@ -69,7 +108,6 @@ function drawCenteredText(
   });
 }
 
-/** L-shaped corner (2 lines), same inset/arm as Tailwind `h-6 w-6` corners in preview (~18pt). */
 function drawCornerBracket(
   page: PDFPage,
   cx: number,
@@ -79,77 +117,156 @@ function drawCornerBracket(
   color: ReturnType<typeof rgb>,
   corner: 'tl' | 'tr' | 'bl' | 'br'
 ) {
-  if (corner === 'tl') {
-    page.drawLine({
-      start: { x: cx, y: cy },
-      end: { x: cx + arm, y: cy },
-      thickness,
-      color,
-    });
-    page.drawLine({
-      start: { x: cx, y: cy },
-      end: { x: cx, y: cy - arm },
-      thickness,
-      color,
-    });
-  } else if (corner === 'tr') {
-    page.drawLine({
-      start: { x: cx, y: cy },
-      end: { x: cx - arm, y: cy },
-      thickness,
-      color,
-    });
-    page.drawLine({
-      start: { x: cx, y: cy },
-      end: { x: cx, y: cy - arm },
-      thickness,
-      color,
-    });
-  } else if (corner === 'bl') {
-    page.drawLine({
-      start: { x: cx, y: cy },
-      end: { x: cx + arm, y: cy },
-      thickness,
-      color,
-    });
-    page.drawLine({
-      start: { x: cx, y: cy },
-      end: { x: cx, y: cy + arm },
-      thickness,
-      color,
-    });
-  } else {
-    page.drawLine({
-      start: { x: cx, y: cy },
-      end: { x: cx - arm, y: cy },
-      thickness,
-      color,
-    });
-    page.drawLine({
-      start: { x: cx, y: cy },
-      end: { x: cx, y: cy + arm },
-      thickness,
-      color,
-    });
-  }
+  const segments: Record<typeof corner, [{ x: number; y: number }, { x: number; y: number }]> = {
+    tl: [
+      { x: cx, y: cy },
+      { x: cx + arm, y: cy },
+    ],
+    tr: [
+      { x: cx, y: cy },
+      { x: cx - arm, y: cy },
+    ],
+    bl: [
+      { x: cx, y: cy },
+      { x: cx + arm, y: cy },
+    ],
+    br: [
+      { x: cx, y: cy },
+      { x: cx - arm, y: cy },
+    ],
+  };
+  const vertical: Record<typeof corner, [{ x: number; y: number }, { x: number; y: number }]> = {
+    tl: [
+      { x: cx, y: cy },
+      { x: cx, y: cy - arm },
+    ],
+    tr: [
+      { x: cx, y: cy },
+      { x: cx, y: cy - arm },
+    ],
+    bl: [
+      { x: cx, y: cy },
+      { x: cx, y: cy + arm },
+    ],
+    br: [
+      { x: cx, y: cy },
+      { x: cx, y: cy + arm },
+    ],
+  };
+  page.drawLine({ start: segments[corner][0], end: segments[corner][1], thickness, color });
+  page.drawLine({ start: vertical[corner][0], end: vertical[corner][1], thickness, color });
 }
 
-export async function buildCompletionCertificatePdf(params: {
-  studentName: string;
-  courseTitle: string;
-  completedDate: Date;
-  /** IICRC discipline code shown on badge (same as `CertificatePreview`). */
-  discipline?: string;
-}): Promise<Uint8Array> {
-  const { studentName, courseTitle, completedDate, discipline: disciplineRaw } = params;
-  const discipline = (disciplineRaw ?? 'WRT').trim() || 'WRT';
-  const discHex = DISCIPLINE_HEX[discipline] ?? '#2490ed';
+type DetailRow = { label: string; value: string };
+
+function drawDetailsPanel(
+  page: PDFPage,
+  opts: {
+    x: number;
+    yTop: number;
+    width: number;
+    rows: DetailRow[];
+    labelFont: PDFFont;
+    valueFont: PDFFont;
+    discRgb: ReturnType<typeof rgb>;
+    fill: ReturnType<typeof rgb>;
+  }
+): number {
+  const { x, width, rows, labelFont, valueFont, discRgb, fill } = opts;
+  const labelColW = width * 0.38;
+  const padX = 14;
+  const padY = 12;
+  const rowH = 18;
+  const panelH = padY * 2 + rows.length * rowH;
+
+  page.drawRectangle({
+    x,
+    y: opts.yTop - panelH,
+    width,
+    height: panelH,
+    color: fill,
+    borderColor: discRgb,
+    borderWidth: 1,
+    borderOpacity: 0.35,
+  });
+
+  const labelColor = rgb(0.52, 0.54, 0.58);
+  const valueColor = rgb(0.9, 0.91, 0.94);
+  let rowY = opts.yTop - padY - 11;
+
+  for (const row of rows) {
+    page.drawText(row.label.toUpperCase(), {
+      x: x + padX,
+      y: rowY,
+      size: 7,
+      font: labelFont,
+      color: labelColor,
+    });
+    const valueLines = wrapLines(row.value, 42);
+    const valueText = valueLines[0] ?? '';
+    page.drawText(valueText, {
+      x: x + labelColW,
+      y: rowY,
+      size: 9,
+      font: valueFont,
+      color: valueColor,
+    });
+    rowY -= rowH;
+  }
+
+  return opts.yTop - panelH;
+}
+
+function drawVerificationSeal(
+  page: PDFPage,
+  cx: number,
+  cy: number,
+  radius: number,
+  discRgb: ReturnType<typeof rgb>,
+  helveticaBold: PDFFont,
+  helvetica: PDFFont
+) {
+  page.drawCircle({
+    x: cx,
+    y: cy,
+    size: radius * 2,
+    borderColor: discRgb,
+    borderWidth: 1.5,
+    borderOpacity: 0.55,
+    color: rgb(0.04, 0.06, 0.1),
+    opacity: 0.9,
+  });
+  drawCenteredText(page, 'CARSI', cx, cy + 6, 9, helveticaBold, discRgb);
+  drawCenteredText(page, 'VERIFIED', cx, cy - 8, 6, helvetica, rgb(0.55, 0.58, 0.62));
+}
+
+export async function buildCompletionCertificatePdf(
+  params: CompletionCertificateData
+): Promise<Uint8Array> {
+  const {
+    studentName,
+    courseTitle,
+    completedDate,
+    issuedDate,
+    discipline: disciplineRaw,
+    cecHours,
+    durationHours,
+    courseLevel,
+    credentialId,
+    verificationUrl,
+  } = params;
+
+  const discCode = disciplineCode(disciplineRaw);
+  const discHex = DISCIPLINE_HEX[discCode] ?? '#2490ed';
   const discRgb = hexToRgb(discHex);
   const cardFill = rgb(10 / 255, 14 / 255, 20 / 255);
+  const panelFill = rgb(14 / 255, 18 / 255, 26 / 255);
 
   const doc = await PDFDocument.create();
-  const page = doc.addPage([595, 842]);
-  const { width: pageW, height: pageH } = page.getSize();
+  const page = doc.addPage([PAGE_W, PAGE_H]);
+  const xMid = PAGE_W / 2;
+  const contentLeft = MARGIN;
+  const contentRight = PAGE_W - MARGIN;
 
   const timesBold = await doc.embedFont(StandardFonts.TimesRomanBold);
   const timesItalic = await doc.embedFont(StandardFonts.TimesRomanItalic);
@@ -157,230 +274,223 @@ export async function buildCompletionCertificatePdf(params: {
   const helvetica = await doc.embedFont(StandardFonts.Helvetica);
   const helveticaBold = await doc.embedFont(StandardFonts.HelveticaBold);
 
-  /** Full-bleed certificate: no default white margins — entire page is the dark panel. */
-  const cardLeft = 0;
-  const cardBottom = 0;
-  const cardRight = pageW;
-  const cardTop = pageH;
-  const xMid = pageW / 2;
-
-  const frameInset = 6;
-
-  // Base: full page #0a0e14 (covers PDF white canvas edge-to-edge)
+  page.drawRectangle({ x: 0, y: 0, width: PAGE_W, height: PAGE_H, color: cardFill });
   page.drawRectangle({
     x: 0,
     y: 0,
-    width: pageW,
-    height: pageH,
-    color: cardFill,
-    borderWidth: 0,
-  });
-
-  // Subtle discipline wash over full bleed (matches React outer gradient wrapper)
-  page.drawRectangle({
-    x: 0,
-    y: 0,
-    width: pageW,
-    height: pageH,
+    width: PAGE_W,
+    height: PAGE_H,
     color: discRgb,
-    opacity: 0.1,
-    borderWidth: 0,
+    opacity: 0.08,
   });
 
-  // Frame stroke only — no inner fill, so the page stays one continuous dark field
-  const b = frameInset;
-  const frameBorder = 2;
-  const borderCol = discRgb;
-  const borderOp = 0.4;
-  page.drawLine({
-    start: { x: b, y: b },
-    end: { x: pageW - b, y: b },
-    thickness: frameBorder,
-    color: borderCol,
-    opacity: borderOp,
+  const frameInset = 10;
+  const borderOp = 0.45;
+  page.drawRectangle({
+    x: frameInset,
+    y: frameInset,
+    width: PAGE_W - frameInset * 2,
+    height: PAGE_H - frameInset * 2,
+    borderColor: discRgb,
+    borderWidth: 1.5,
+    borderOpacity: borderOp,
+    color: cardFill,
+    opacity: 0,
   });
-  page.drawLine({
-    start: { x: b, y: pageH - b },
-    end: { x: pageW - b, y: pageH - b },
-    thickness: frameBorder,
-    color: borderCol,
-    opacity: borderOp,
-  });
-  page.drawLine({
-    start: { x: b, y: b },
-    end: { x: b, y: pageH - b },
-    thickness: frameBorder,
-    color: borderCol,
-    opacity: borderOp,
-  });
-  page.drawLine({
-    start: { x: pageW - b, y: b },
-    end: { x: pageW - b, y: pageH - b },
-    thickness: frameBorder,
-    color: borderCol,
-    opacity: borderOp,
+  page.drawRectangle({
+    x: frameInset + 6,
+    y: frameInset + 6,
+    width: PAGE_W - (frameInset + 6) * 2,
+    height: PAGE_H - (frameInset + 6) * 2,
+    borderColor: discRgb,
+    borderWidth: 0.5,
+    borderOpacity: 0.22,
+    color: cardFill,
+    opacity: 0,
   });
 
-  const arm = 18;
-  const cornerInset = frameInset + 14;
-  const t = 2;
-  drawCornerBracket(page, cornerInset, cardTop - cornerInset, arm, t, discRgb, 'tl');
-  drawCornerBracket(page, cardRight - cornerInset, cardTop - cornerInset, arm, t, discRgb, 'tr');
-  drawCornerBracket(page, cornerInset, cardBottom + cornerInset, arm, t, discRgb, 'bl');
-  drawCornerBracket(page, cardRight - cornerInset, cardBottom + cornerInset, arm, t, discRgb, 'br');
+  const arm = 16;
+  const cornerInset = frameInset + 18;
+  const t = 1.5;
+  drawCornerBracket(page, cornerInset, PAGE_H - cornerInset, arm, t, discRgb, 'tl');
+  drawCornerBracket(page, PAGE_W - cornerInset, PAGE_H - cornerInset, arm, t, discRgb, 'tr');
+  drawCornerBracket(page, cornerInset, cornerInset, arm, t, discRgb, 'bl');
+  drawCornerBracket(page, PAGE_W - cornerInset, cornerInset, arm, t, discRgb, 'br');
 
-  const topPad = 36;
-  let y = cardTop - topPad;
+  let y = PAGE_H - MARGIN - 8;
 
   const logoBytes = await loadLogoPng();
   if (logoBytes) {
     const pngImage = await doc.embedPng(logoBytes);
-    const maxW = 240;
+    const maxW = 168;
     const scale = maxW / pngImage.width;
     const imgW = maxW;
     const imgH = pngImage.height * scale;
-    const logoX = xMid - imgW / 2;
-    const logoY = y - imgH;
     page.drawImage(pngImage, {
-      x: logoX,
-      y: logoY,
+      x: xMid - imgW / 2,
+      y: y - imgH,
       width: imgW,
       height: imgH,
     });
-    y = logoY - 20;
-  } else {
-    y -= 8;
+    y -= imgH + 6;
   }
 
-  const titleText = 'Certificate of Completion';
-  const titleSize = 22;
-  drawCenteredText(page, titleText, xMid, y, titleSize, timesRoman, rgb(0.95, 0.95, 0.97));
-  y -= titleSize + 6;
+  drawCenteredText(
+    page,
+    'Centre for Applied Restoration Science & Industry',
+    xMid,
+    y,
+    7,
+    helvetica,
+    rgb(0.5, 0.52, 0.56)
+  );
+  y -= 22;
 
-  const ruleW = 96;
-  page.drawLine({
-    start: { x: xMid - ruleW / 2, y: y },
-    end: { x: xMid + ruleW / 2, y: y },
-    thickness: 1,
-    color: discRgb,
-  });
-  y -= 28;
-
-  const labelSmall = 9;
-  const muted = rgb(0.65, 0.65, 0.68);
-  drawCenteredText(page, 'THIS CERTIFIES THAT', xMid, y, labelSmall, helvetica, muted);
-  y -= 16;
-
-  const nameSize = 18;
-  drawCenteredText(page, studentName, xMid, y, nameSize, timesItalic, rgb(126 / 255, 197 / 255, 1));
-  y -= nameSize + 14;
-
-  drawCenteredText(page, 'HAS SUCCESSFULLY COMPLETED', xMid, y, labelSmall, helvetica, muted);
-  y -= 16;
-
-  const courseLines = wrapCenteredLines(courseTitle, 78);
-  const courseSize = 14;
-  for (const line of courseLines) {
-    drawCenteredText(page, line, xMid, y, courseSize, timesBold, rgb(0.9, 0.9, 0.93));
-    y -= courseSize + 6;
-  }
+  drawCenteredText(page, 'Certificate of Completion', xMid, y, 24, timesRoman, rgb(0.96, 0.96, 0.98));
+  y -= 14;
+  drawCenteredText(
+    page,
+    'Official record of achievement',
+    xMid,
+    y,
+    9,
+    helvetica,
+    rgb(0.58, 0.6, 0.64)
+  );
   y -= 10;
 
-  // Discipline badge + label
-  const badgePadX = 10;
-  const badgePadY = 4;
-  const badgeText = discipline.toUpperCase();
-  const badgeFontSize = 9;
-  const badgeW = helveticaBold.widthOfTextAtSize(badgeText, badgeFontSize) + badgePadX * 2;
-  const badgeH = badgeFontSize + badgePadY * 2;
-  const disciplineWord = 'Discipline';
-  const discLabelW = helvetica.widthOfTextAtSize(disciplineWord, 9);
-  const gap = 10;
-  const rowW = badgeW + gap + discLabelW;
-  let badgeLeft = xMid - rowW / 2;
-  page.drawRectangle({
-    x: badgeLeft,
-    y: y - badgeH + 2,
-    width: badgeW,
-    height: badgeH,
-    color: discRgb,
-  });
-  page.drawText(badgeText, {
-    x: badgeLeft + badgePadX,
-    y: y - badgeH + badgePadY + 1,
-    size: badgeFontSize,
-    font: helveticaBold,
-    color: rgb(1, 1, 1),
-  });
-  page.drawText(disciplineWord, {
-    x: badgeLeft + badgeW + gap,
-    y: y - badgeH + badgePadY + 1,
-    size: 9,
-    font: helvetica,
-    color: rgb(0.55, 0.55, 0.58),
-  });
-  y -= badgeH + 18;
-
-  const dateStr = completedDate.toLocaleDateString('en-AU', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  });
-  const stampText = 'IICRC CEC Approved';
-  const stampSize = 8;
-  const dateW = helvetica.widthOfTextAtSize(dateStr, 9);
-  const stampW = helveticaBold.widthOfTextAtSize(stampText, stampSize) + 16;
-  const stampH = stampSize + 8;
-  const rowGap = 28;
-  const dateStampW = dateW + rowGap + stampW;
-  const rowLeft = xMid - dateStampW / 2;
-  const rowCenterY = y - 10;
-  const dateBaseline = rowCenterY - 2;
-  page.drawText(dateStr, {
-    x: rowLeft,
-    y: dateBaseline,
-    size: 9,
-    font: helvetica,
-    color: rgb(0.55, 0.55, 0.58),
-  });
-  const stampX = rowLeft + dateW + rowGap;
-  const stampBoxBottom = rowCenterY - stampH / 2;
-  page.drawRectangle({
-    x: stampX,
-    y: stampBoxBottom,
-    width: stampW,
-    height: stampH,
-    color: cardFill,
-    borderColor: discRgb,
-    borderWidth: 1,
-    borderOpacity: 0.38,
-  });
-  const stampTw = helveticaBold.widthOfTextAtSize(stampText, stampSize);
-  page.drawText(stampText, {
-    x: stampX + (stampW - stampTw) / 2,
-    y: stampBoxBottom + 5,
-    size: stampSize,
-    font: helveticaBold,
-    color: discRgb,
-  });
-  y = stampBoxBottom - 20;
-
-  // Signature block (Training Director) — script approximated with Times-Italic
-  const sigName = 'Philip McGurk';
-  const sigSize = 20;
-  drawCenteredText(page, sigName, xMid, y, sigSize, timesItalic, rgb(0.88, 0.88, 0.9));
-  y -= sigSize + 6;
-
-  const sigRuleW = 200;
+  const ruleW = 120;
   page.drawLine({
-    start: { x: xMid - sigRuleW / 2, y: y },
-    end: { x: xMid + sigRuleW / 2, y: y },
-    thickness: 0.5,
-    color: rgb(0.75, 0.75, 0.78),
-    opacity: 0.35,
+    start: { x: xMid - ruleW / 2, y },
+    end: { x: xMid + ruleW / 2, y },
+    thickness: 1.2,
+    color: discRgb,
+  });
+  y -= 26;
+
+  drawCenteredText(page, 'THIS IS TO CERTIFY THAT', xMid, y, 8, helveticaBold, rgb(0.58, 0.6, 0.64));
+  y -= 22;
+
+  const nameSize = 20;
+  drawCenteredText(page, studentName, xMid, y, nameSize, timesItalic, rgb(126 / 255, 197 / 255, 1));
+  y -= nameSize + 12;
+
+  const bodyMuted = rgb(0.62, 0.64, 0.68);
+  const bodyLines = [
+    'has demonstrated the required competency and',
+    'successfully completed the accredited programme',
+  ];
+  for (const line of bodyLines) {
+    drawCenteredText(page, line, xMid, y, 9, helvetica, bodyMuted);
+    y -= 12;
+  }
+  y -= 6;
+
+  const courseLines = wrapLines(courseTitle, 52);
+  for (const line of courseLines) {
+    drawCenteredText(page, line, xMid, y, 15, timesBold, rgb(0.93, 0.94, 0.96));
+    y -= 17;
+  }
+  y -= 8;
+
+  const completedStr = formatAuDate(completedDate);
+  const issuedStr = formatAuDate(issuedDate ?? completedDate);
+  const credRef = credentialId ? formatCredentialRef(credentialId) : '—';
+  const cecStr =
+    cecHours != null && cecHours > 0
+      ? `${Number(cecHours) % 1 === 0 ? cecHours : cecHours.toFixed(1)} IICRC CEC hour${cecHours === 1 ? '' : 's'}`
+      : 'As listed in course accreditation record';
+  const durationStr =
+    durationHours != null && durationHours > 0
+      ? `${durationHours % 1 === 0 ? durationHours : durationHours.toFixed(1)} hours · Online LMS`
+      : 'Online · CARSI Learning Platform';
+  const levelStr = courseLevel?.trim() ? courseLevel.trim() : 'Professional development';
+
+  const detailRows: DetailRow[] = [
+    { label: 'Programme', value: courseTitle },
+    { label: 'Date of completion', value: completedStr },
+    { label: 'Credential reference', value: credRef },
+    {
+      label: 'IICRC discipline',
+      value: `${discCode} — ${disciplineLabel(discCode)}`,
+    },
+    { label: 'Continuing education', value: cecStr },
+    { label: 'Delivery & duration', value: `${durationStr} · ${levelStr}` },
+    { label: 'Issuing organisation', value: 'CARSI Learning · IICRC-aligned curriculum' },
+  ];
+
+  y = drawDetailsPanel(page, {
+    x: contentLeft,
+    yTop: y,
+    width: CONTENT_W,
+    rows: detailRows,
+    labelFont: helveticaBold,
+    valueFont: helvetica,
+    discRgb,
+    fill: panelFill,
   });
   y -= 14;
-  drawCenteredText(page, 'TRAINING DIRECTOR', xMid, y, 8, helvetica, rgb(0.55, 0.55, 0.58));
+
+  const noticeH = 28;
+  page.drawRectangle({
+    x: contentLeft,
+    y: y - noticeH,
+    width: CONTENT_W,
+    height: noticeH,
+    color: discRgb,
+    opacity: 0.14,
+    borderWidth: 0,
+  });
+  const notice =
+    'This programme is designed for IICRC Continuing Education Credits (CECs) where applicable. ' +
+    'Maintain this certificate with your renewal records.';
+  const noticeLines = wrapLines(notice, 88);
+  let noticeY = y - 10;
+  for (const line of noticeLines.slice(0, 2)) {
+    drawCenteredText(page, line, xMid, noticeY, 7.5, helvetica, rgb(0.72, 0.74, 0.78));
+    noticeY -= 10;
+  }
+  y -= noticeH + 18;
+
+  const footerTop = y;
+  const colW = CONTENT_W / 3;
+  const col1Center = contentLeft + colW / 2;
+  const col2Center = contentLeft + colW + colW / 2;
+  const col3Center = contentRight - colW / 2;
+
+  drawCenteredText(page, 'Date issued', col1Center, footerTop, 7, helveticaBold, rgb(0.5, 0.52, 0.56));
+  drawCenteredText(page, issuedStr, col1Center, footerTop - 14, 9, helvetica, rgb(0.78, 0.8, 0.84));
+
+  drawVerificationSeal(page, col2Center, footerTop - 22, 26, discRgb, helveticaBold, helvetica);
+
+  drawCenteredText(page, 'Authorised signatory', col3Center, footerTop, 7, helveticaBold, rgb(0.5, 0.52, 0.56));
+  drawCenteredText(page, 'Philip McGurk', col3Center, footerTop - 20, 16, timesItalic, rgb(0.88, 0.89, 0.92));
+  const sigLineW = 110;
+  page.drawLine({
+    start: { x: col3Center - sigLineW / 2, y: footerTop - 38 },
+    end: { x: col3Center + sigLineW / 2, y: footerTop - 38 },
+    thickness: 0.5,
+    color: rgb(0.55, 0.57, 0.6),
+    opacity: 0.5,
+  });
+  drawCenteredText(page, 'Training Director', col3Center, footerTop - 50, 7, helvetica, rgb(0.5, 0.52, 0.56));
+
+  y = footerTop - 72;
+
+  if (verificationUrl?.trim()) {
+    const verifyLabel = 'Verify this credential:';
+    const url = verificationUrl.trim();
+    drawCenteredText(page, verifyLabel, xMid, y, 7, helveticaBold, rgb(0.48, 0.5, 0.54));
+    y -= 11;
+    const urlLines = wrapLines(url, 72);
+    for (const line of urlLines.slice(0, 2)) {
+      drawCenteredText(page, line, xMid, y, 7.5, helvetica, discRgb);
+      y -= 10;
+    }
+  }
+
+  const footerTag = 'carsi.com.au · Restoration industry education';
+  drawCenteredText(page, footerTag, xMid, MARGIN - 4, 6.5, helvetica, rgb(0.42, 0.44, 0.48));
 
   return doc.save();
 }
