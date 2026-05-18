@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
       void sendEnrollmentWelcomeEmail({
         studentId: claims.sub,
         courseSlug: slug,
-        origin: request.nextUrl.origin,
+        appOrigin: request.nextUrl.origin,
       }).catch((e) => console.error('[guest-free] email', e));
       notifyCrmEnrollmentCreated({
         enrollmentId: result.enrollmentId,
