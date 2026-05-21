@@ -1,3 +1,5 @@
+import { sanitizeLearnerContent } from '@/lib/seed/sanitize-learner-content';
+
 const COURSE_TITLE = /^COURSE TITLE:\s*(.+)$/i;
 const RESOURCE = /^RESOURCE:\s*(.+)$/i;
 const COURSE_SHORT = /^COURSE:\s*(.+)$/i;
@@ -352,5 +354,14 @@ export function parseSpecialtyCoursesResourcesTxt(text: string): SpecialtyResour
     i += 1;
   }
 
-  return courses;
+  return courses.map((c) => ({
+    ...c,
+    overviewParagraphs: c.overviewParagraphs
+      .map((p) => sanitizeLearnerContent(p) ?? '')
+      .filter(Boolean),
+    modules: c.modules.map((m) => ({
+      ...m,
+      bodyText: sanitizeLearnerContent(m.bodyText) ?? '',
+    })),
+  }));
 }
