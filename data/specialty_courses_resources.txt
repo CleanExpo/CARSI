@@ -522,7 +522,7 @@ Modules: None
 
 RESOURCE OVERVIEW
 
-This resource provides restoration and cleaning business operators with practical guidance on using AI language model tools — specifically conversational AI assistants such as Claude (Anthropic) and ChatGPT (OpenAI) — as operational support tools in their daily business workflow.
+This resource provides restoration and cleaning business operators with practical guidance on using AI language model tools — specifically conversational AI assistants — as operational support tools in their daily business workflow.
 
 WHAT THIS RESOURCE PROVIDES
 
@@ -549,7 +549,7 @@ IMPORTANT OPERATIONAL NOTE
 
 AI assistants generate responses based on training data — they do not verify facts in real time and can produce errors, particularly on specific regulatory details, product specifications, and jurisdiction-specific compliance requirements. All AI-generated content must be reviewed by a competent person before use. This resource includes guidance on how to review and verify AI outputs for accuracy and appropriateness.
 
-Reference: Anthropic Claude documentation | OpenAI ChatGPT documentation | Safe Work Australia (for verifying AI-generated compliance content)
+Reference: Safe Work Australia (for verifying AI-generated compliance content) | CARSI AI resource series
 
 --------------------------------------------------------------------------------
 
@@ -594,7 +594,7 @@ Modules: None
 
 RESOURCE OVERVIEW
 
-This resource is a downloadable one-page or two-page reference sheet providing restoration and cleaning professionals with ready-to-use prompt frameworks for interacting with ChatGPT (and other AI language model tools) in their daily business operations.
+This resource is a downloadable one-page or two-page reference sheet providing restoration and cleaning professionals with ready-to-use prompt frameworks for interacting with conversational AI language model tools in their daily business operations.
 
 WHAT THIS RESOURCE PROVIDES
 
@@ -610,7 +610,7 @@ Print the cheat sheet and keep it at a workstation or save it to a tablet used f
 
 This resource is designed to be used alongside resource #16 (Collaborative Development: Your Personal AI Assistant) and the CARSI ChatGPT eBook (#122), which provide deeper guidance on the same topic.
 
-Reference: OpenAI ChatGPT documentation | Anthropic Claude documentation | CARSI AI resource series
+Reference: CARSI AI resource series
 
 --------------------------------------------------------------------------------
 
@@ -672,7 +672,7 @@ The eBook is read once as a structured guide, then used as a reference resource 
 
 This resource is most effectively used in combination with the Collaborative Development AI Assistant course (#16), which provides the interactive, real-time practical component that the eBook supports with conceptual depth.
 
-Reference: Anthropic Claude documentation | OpenAI ChatGPT documentation | CARSI AI resource series | Australian Consumer Law (relevant to AI-assisted marketing content)
+Reference: CARSI AI resource series | Australian Consumer Law (relevant to AI-assisted marketing content)
 
 
 ================================================================================
