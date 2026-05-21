@@ -818,12 +818,12 @@ Role: Cleaning and Restoration Business Operator
 
 COURSE OVERVIEW
 
-This course is the interactive companion to the CARSI AI reference resources. It introduces cleaning and restoration business operators to AI language tools — specifically ChatGPT and Claude — and guides them through using these tools for the specific documentation, marketing, compliance, and communication tasks that consume time in a restoration or cleaning business. The course is structured around doing, not reading — participants work with AI tools in real time to produce outputs relevant to their own business. No prior technology experience is required.
+This course is the interactive companion to the CARSI AI reference resources. It introduces cleaning and restoration business operators to AI language tools — specifically conversational AI assistants — and guides them through using these tools for the specific documentation, marketing, compliance, and communication tasks that consume time in a restoration or cleaning business. The course is structured around doing, not reading — participants work with AI tools in real time to produce outputs relevant to their own business. No prior technology experience is required.
 
 
 WHAT THIS COURSE COVERS
 
-AI language tools — ChatGPT, Claude, Gemini — are accessible, free-to-use technology that can produce professional written outputs in seconds when given a specific, contextual instruction. The challenge is not accessing the technology — it is knowing how to instruct it effectively and how to apply it to the right tasks.
+AI language tools — leading conversational AI assistants — are accessible, free-to-use technology that can produce professional written outputs in seconds when given a specific, contextual instruction. The challenge is not accessing the technology — it is knowing how to instruct it effectively and how to apply it to the right tasks.
 
 This course builds practical AI competency across the tasks most relevant to restoration and cleaning operators: drafting water damage inspection reports and scope of works documents, producing JSEA and SWMS first drafts, creating SOP documentation, writing client communication letters and emails, generating social media and marketing content, and producing staff training materials.
 
