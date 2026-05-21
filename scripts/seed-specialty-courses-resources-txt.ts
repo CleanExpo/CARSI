@@ -68,6 +68,7 @@ async function main() {
 
     const description =
       c.overviewParagraphs.length > 0 ? c.overviewParagraphs.join('\n\n') : null;
+    const shortDescription = c.overviewParagraphs[0]?.slice(0, 480) ?? null;
 
     const price = Number.isFinite(c.priceAud) ? c.priceAud : 0;
 
@@ -80,7 +81,7 @@ async function main() {
             slug: c.slug,
             title: c.title,
             description,
-            shortDescription: c.overviewParagraphs[0]?.slice(0, 480) ?? null,
+            shortDescription,
             thumbnailUrl: null,
             instructorId: DEFAULT_INSTRUCTOR_ID,
             status: 'published',
