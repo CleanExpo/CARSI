@@ -46,7 +46,8 @@
     "db:set-user-password": "npx tsx --tsconfig tsconfig.json scripts/ensure-lms-user-password.ts",
     "db:list-low-module-courses": "npx tsx scripts/list-courses-under-module-count.ts",
     "db:analyze-module-mismatch": "npx tsx scripts/analyze-module-title-mismatch.ts",
-    "db:sync-specialty-modules": "npx tsx scripts/sync-specialty-modules-from-collection-txt.ts"
+    "db:sync-specialty-modules": "npx tsx scripts/sync-specialty-modules-from-collection-txt.ts",
+    "db:seed-specialty-collection-txt": "npx tsx scripts/seed-carsi-specialty-courses-collection-txt.ts"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.3",
