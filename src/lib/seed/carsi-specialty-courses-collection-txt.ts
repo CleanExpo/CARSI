@@ -1,5 +1,7 @@
 import { randomUUID } from 'node:crypto';
 
+import { sanitizeLearnerContent } from '@/lib/seed/sanitize-learner-content';
+
 export type SpecialtyParsedModule = { title: string; bodyText: string };
 
 export type SpecialtyParsedCourse = {
@@ -139,5 +141,14 @@ export function parseSpecialtyCoursesCollectionTxt(raw: string): SpecialtyParsed
       });
     }
   }
-  return courses;
+  return courses.map((c) => ({
+    ...c,
+    overviewParagraphs: c.overviewParagraphs
+      .map((p) => sanitizeLearnerContent(p) ?? '')
+      .filter(Boolean),
+    modules: c.modules.map((m) => ({
+      ...m,
+      bodyText: sanitizeLearnerContent(m.bodyText) ?? '',
+    })),
+  }));
 }
