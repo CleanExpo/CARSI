@@ -44,7 +44,8 @@
     "prisma:migrate": "prisma migrate deploy",
     "db:studio": "prisma studio",
     "db:set-user-password": "npx tsx --tsconfig tsconfig.json scripts/ensure-lms-user-password.ts",
-    "db:list-low-module-courses": "npx tsx scripts/list-courses-under-module-count.ts"
+    "db:list-low-module-courses": "npx tsx scripts/list-courses-under-module-count.ts",
+    "db:analyze-module-mismatch": "npx tsx scripts/analyze-module-title-mismatch.ts"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.3",
