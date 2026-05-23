@@ -689,13 +689,13 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
       <section>
         <SectionHeading
           title="Learner management"
-          description="Select a learner, review progress, and grant or revoke workbook access."
+          description="Select a learner, review progress, and grant or revoke course access."
         />
         <div className="grid gap-5 lg:grid-cols-12">
           <Card className={cn(glassCard, 'lg:col-span-3')}>
             <CardHeader className="border-b border-white/[0.06] pb-4">
               <CardTitle className="text-base font-semibold text-white/88">Selected learner</CardTitle>
-              <CardDescription className="text-white/45">Overall workbook progress</CardDescription>
+              <CardDescription className="text-white/45">Overall course progress</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col items-center gap-5 pt-6">
               {selected ? (
@@ -801,14 +801,16 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
           </Card>
 
           <Card className={cn(glassCard, 'lg:col-span-5')}>
-            <CardHeader className="border-b border-white/[0.06] space-y-4 pb-4">
+            <CardHeader className="overflow-visible border-b border-white/[0.06] space-y-4 pb-4">
               <div className="flex items-start gap-3">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[rgba(36,144,237,0.25)] bg-[rgba(36,144,237,0.1)]">
                   <BookOpen className="h-5 w-5 text-[#7ec5ff]" strokeWidth={1.75} />
                 </div>
                 <div className="min-w-0 flex-1 space-y-1">
-                  <CardTitle className="text-base font-semibold text-white/88">Workbook access</CardTitle>
-                  <CardDescription className="text-white/45">Grant seed-catalog courses for the selected learner</CardDescription>
+                  <CardTitle className="text-base font-semibold text-white/88">Course enrollments</CardTitle>
+                  <CardDescription className="text-white/45">
+                    Assign catalog courses and track module progress for the selected learner
+                  </CardDescription>
                 </div>
               </div>
               {selected ? (
@@ -825,10 +827,23 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
                           placeholder={grantableCourses.length ? 'Choose a course…' : 'All catalog courses assigned'}
                         />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent
+                        className="z-[200] border-white/10 bg-[rgba(10,14,26,0.98)] text-white shadow-xl"
+                        position="popper"
+                        sideOffset={6}
+                      >
                         {grantableCourses.map((c) => (
-                          <SelectItem key={c.slug} value={c.slug}>
-                            {c.title} ({c.moduleCount} modules)
+                          <SelectItem
+                            key={c.slug}
+                            value={c.slug}
+                            className="items-start py-2.5 pr-9 pl-3 text-left leading-snug whitespace-normal focus:bg-white/10 focus:text-white"
+                          >
+                            <span className="block">
+                              {c.title}
+                              <span className="mt-0.5 block text-xs font-normal text-white/50">
+                                {c.moduleCount} modules
+                              </span>
+                            </span>
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -845,7 +860,7 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
                 </div>
               ) : null}
             </CardHeader>
-            <CardContent className="max-h-[min(520px,55vh)] space-y-4 overflow-y-auto pr-1 pt-5">
+            <CardContent className="max-h-[min(520px,55vh)] space-y-5 overflow-y-auto pr-1 pt-5">
               {selected ? (
                 selected.enrollments.length > 0 ? (
                   selected.enrollments.map((e) => (
@@ -918,7 +933,7 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
                     <div className="space-y-1 px-4">
                       <p className="text-sm font-medium text-white/70">No enrollments yet</p>
                       <p className="text-xs leading-relaxed text-white/45">
-                        Add a workbook from the catalog to start tracking this learner&apos;s progress.
+                        Add a course from the catalog to start tracking this learner&apos;s progress.
                       </p>
                     </div>
                   </div>
