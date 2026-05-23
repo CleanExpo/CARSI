@@ -1,37 +1,21 @@
-import type { AdminCatalogCourse } from '@/lib/admin/load-admin-catalog';
-import { buildAdminCatalogFromSeed } from '@/lib/lms-seed-catalog';
 import { prisma } from '@/lib/prisma';
 
-export type AdminCourseModuleProgress = {
-  moduleNo: number;
-  title: string;
-  lessonTitle: string;
-  completed: boolean;
-};
+import {
+  fetchCatalogEnrollmentsForUsers,
+  fetchCompletedLessonCounts,
+  fetchLastActiveByUserId,
+  getAdminCatalogContext,
+  mapUserToAdminProgress,
+  normalizeEnrollmentStatus,
+  type AdminCatalogCourseOption,
+  type AdminUserProgress,
+} from '@/lib/admin/admin-user-progress';
 
-export type AdminCourseProgressForUser = {
-  enrollmentId: string;
-  courseSlug: string;
-  courseTitle: string;
-  totalLessons: number;
-  completedLessons: number;
-  completionPct: number;
-  completedModules: number;
-  remainingLessons: number;
-  modules: AdminCourseModuleProgress[];
-};
-
-export type AdminUserProgress = {
-  userId: string;
-  email: string;
-  fullName: string | null;
-  role: string | null;
-  isActive: boolean;
-  createdAt: string;
-  lastActiveAt: string | null;
-  overallCompletionPct: number;
-  enrollments: AdminCourseProgressForUser[];
-};
+export type {
+  AdminCourseModuleProgress,
+  AdminCourseProgressForUser,
+  AdminUserProgress,
+} from '@/lib/admin/admin-user-progress';
 
 export type AdminDashboardClientData = {
   generatedAt: string;
@@ -53,48 +37,16 @@ export type AdminDashboardClientData = {
     totalCoursesInCatalog: number;
     excelPath: string;
   };
-  /** Workbook-only courses for grant-access picker */
-  catalogCourses: { slug: string; title: string; moduleCount: number }[];
+  catalogCourses: AdminCatalogCourseOption[];
   users: AdminUserProgress[];
 };
 
-function normalizeStatus(status: string): 'completed' | 'active' | 'other' {
-  const s = (status ?? '').toLowerCase().trim();
-  if (s === 'completed' || s === 'complete') return 'completed';
-  if (['active', 'enrolled', 'in_progress', 'in progress', 'started'].includes(s)) return 'active';
-  return 'other';
-}
-
-function clamp(n: number, min: number, max: number) {
-  return Math.max(min, Math.min(max, n));
-}
-
-function completionPct(completed: number, total: number) {
-  if (total <= 0) return completed > 0 ? 100 : 0;
-  return Math.round((clamp(completed, 0, total) / total) * 100);
-}
-
-function buildModuleProgress(course: AdminCatalogCourse, completedModulesCount: number) {
-  const totalModules = course.modules.length;
-  const completed = clamp(completedModulesCount, 0, totalModules);
-  return course.modules
-    .slice()
-    .sort((a, b) => a.moduleNo - b.moduleNo)
-    .map((m, idx) => ({
-      moduleNo: m.moduleNo,
-      title: m.title,
-      lessonTitle: m.lessons[0]?.title ?? m.title,
-      completed: idx < completed,
-    }));
-}
-
 export async function getAdminDashboardData(): Promise<AdminDashboardClientData> {
-  const catalog = buildAdminCatalogFromSeed();
-  const catalogCourses = catalog.courses;
-  const catalogBySlug = new Map(catalogCourses.map((c) => [c.slug, c]));
-  const catalogSlugs = Array.from(catalogBySlug.keys());
+  const ctx = getAdminCatalogContext();
+  const catalogCourses = ctx.catalogCourses;
+  const catalogBySlug = ctx.catalogBySlug;
+  const catalogSlugs = ctx.catalogSlugs;
 
-  // --- Users ---
   const users = await prisma.lmsUser.findMany({
     select: {
       id: true,
@@ -102,28 +54,19 @@ export async function getAdminDashboardData(): Promise<AdminDashboardClientData>
       fullName: true,
       role: true,
       isActive: true,
+      isVerified: true,
+      iicrcMemberNumber: true,
+      iicrcExpiryDate: true,
       createdAt: true,
+      updatedAt: true,
     },
   });
 
   const userIds = users.map((u) => u.id);
-
-  // --- Enrollments (only for courses in catalog) ---
-  const enrollments = await prisma.lmsEnrollment.findMany({
-    where: { course: { slug: { in: catalogSlugs } } },
-    select: {
-      id: true,
-      studentId: true,
-      courseId: true,
-      status: true,
-      enrolledAt: true,
-      completedAt: true,
-      lastAccessedLessonId: true,
-      course: { select: { id: true, slug: true, title: true } },
-    },
-  });
-
+  const enrollments = await fetchCatalogEnrollmentsForUsers(userIds, catalogSlugs);
   const courseIds = Array.from(new Set(enrollments.map((e) => e.courseId)));
+  const completedLessonCounts = await fetchCompletedLessonCounts(userIds, courseIds);
+  const lastActiveByUserId = await fetchLastActiveByUserId(userIds);
 
   const userEnrollmentsByUserId = new Map<string, typeof enrollments>();
   for (const e of enrollments) {
@@ -132,73 +75,28 @@ export async function getAdminDashboardData(): Promise<AdminDashboardClientData>
     userEnrollmentsByUserId.set(e.studentId, arr);
   }
 
-  // --- Completed lesson counts grouped by (studentId, courseId) ---
-  const completedLessonCounts = new Map<string, number>();
-  if (userIds.length > 0 && courseIds.length > 0) {
-    const completedRows = await prisma.lmsLessonProgress.findMany({
-      where: {
-        studentId: { in: userIds },
-        completed: true,
-        lesson: { module: { courseId: { in: courseIds } } },
-      },
-      select: {
-        studentId: true,
-        lesson: {
-          select: {
-            module: { select: { courseId: true } },
-          },
-        },
-      },
-    });
-
-    for (const row of completedRows) {
-      const courseId = row.lesson?.module?.courseId;
-      if (!courseId) continue;
-      const key = `${row.studentId}-${courseId}`;
-      completedLessonCounts.set(key, (completedLessonCounts.get(key) ?? 0) + 1);
-    }
-  }
-
-  // --- Last activity per user ---
-  const lastActiveRows =
-    userIds.length > 0
-      ? await prisma.lmsLessonProgress.groupBy({
-          by: ['studentId'],
-          where: { studentId: { in: userIds } },
-          _max: { lastAccessedAt: true },
-        })
-      : [];
-
-  const lastActiveByUserId = new Map<string, Date | null>();
-  for (const r of lastActiveRows) {
-    lastActiveByUserId.set(r.studentId, r._max.lastAccessedAt ?? null);
-  }
-
-  // --- KPIs ---
   const totalUsers = users.length;
   const totalEnrollments = enrollments.length;
-  const completedEnrollments = enrollments.filter((e) => normalizeStatus(e.status) === 'completed').length;
-  const activeLearners = enrollments.filter((e) => normalizeStatus(e.status) === 'active').length;
+  const completedEnrollments = enrollments.filter(
+    (e) => normalizeEnrollmentStatus(e.status) === 'completed',
+  ).length;
+  const activeLearners = enrollments.filter(
+    (e) => normalizeEnrollmentStatus(e.status) === 'active',
+  ).length;
 
   const completionRatePct =
     totalEnrollments > 0 ? Math.round((completedEnrollments / totalEnrollments) * 100) : 0;
 
-  // --- Charts data ---
   const statusPie = [
     { name: 'Active', value: activeLearners },
     { name: 'Completed', value: completedEnrollments },
   ];
 
-  const enrollmentsByCourseId = new Map<string, { total: number; completed: number; slug: string; title: string }>();
+  const enrollmentsByCourseId = new Map<string, { total: number; completed: number; title: string }>();
   for (const e of enrollments) {
-    const n = enrollmentsByCourseId.get(e.courseId) ?? {
-      total: 0,
-      completed: 0,
-      slug: e.course.slug,
-      title: e.course.title,
-    };
+    const n = enrollmentsByCourseId.get(e.courseId) ?? { total: 0, completed: 0, title: e.course.title };
     n.total += 1;
-    if (normalizeStatus(e.status) === 'completed') n.completed += 1;
+    if (normalizeEnrollmentStatus(e.status) === 'completed') n.completed += 1;
     enrollmentsByCourseId.set(e.courseId, n);
   }
 
@@ -215,14 +113,12 @@ export async function getAdminDashboardData(): Promise<AdminDashboardClientData>
   for (let i = daysBack; i >= 0; i -= 1) {
     const d = new Date(today);
     d.setDate(d.getDate() - i);
-    const key = d.toISOString().slice(0, 10);
-    dayKeys.push(key);
+    dayKeys.push(d.toISOString().slice(0, 10));
   }
   const completionsByDay = new Map<string, number>();
   for (const k of dayKeys) completionsByDay.set(k, 0);
   for (const e of enrollments) {
-    const st = normalizeStatus(e.status);
-    if (st !== 'completed' || !e.completedAt) continue;
+    if (normalizeEnrollmentStatus(e.status) !== 'completed' || !e.completedAt) continue;
     const key = e.completedAt.toISOString().slice(0, 10);
     if (completionsByDay.has(key)) {
       completionsByDay.set(key, (completionsByDay.get(key) ?? 0) + 1);
@@ -248,7 +144,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardClientData>
     }));
 
   const categoryCounts = new Map<string, number>();
-  for (const c of catalogCourses) {
+  for (const c of catalogBySlug.values()) {
     if (c.categories.length === 0) {
       categoryCounts.set('Uncategorized', (categoryCounts.get('Uncategorized') ?? 0) + 1);
     } else {
@@ -266,67 +162,15 @@ export async function getAdminDashboardData(): Promise<AdminDashboardClientData>
           .sort((a, b) => b.value - a.value)
           .slice(0, 12);
 
-  // --- Per-user course progress ---
-  const usersWithProgress: AdminUserProgress[] = users.map((u) => {
-    const userEnrollments = userEnrollmentsByUserId.get(u.id) ?? [];
-
-    const totalLessonsSum = userEnrollments.reduce((acc, e) => {
-      const courseSlug = e.course.slug;
-      const course = catalogBySlug.get(courseSlug);
-      const totalLessons = course?.moduleCount ?? 0;
-      return acc + totalLessons;
-    }, 0);
-
-    const completedLessonsSum = userEnrollments.reduce((acc, e) => {
-      const courseId = e.courseId;
-      const key = `${u.id}-${courseId}`;
-      const completed = completedLessonCounts.get(key) ?? 0;
-      const courseSlug = e.course.slug;
-      const course = catalogBySlug.get(courseSlug);
-      const totalLessons = course?.moduleCount ?? 0;
-      return acc + clamp(completed, 0, totalLessons);
-    }, 0);
-
-    const overallCompletionPct = completionPct(completedLessonsSum, totalLessonsSum);
-
-    const enrollmentsProgress: AdminCourseProgressForUser[] = userEnrollments.map((e) => {
-      const courseSlug = e.course.slug;
-      const course = catalogBySlug.get(courseSlug);
-      const totalLessons = course?.moduleCount ?? 0;
-
-      const key = `${u.id}-${e.courseId}`;
-      const completedRaw = completedLessonCounts.get(key) ?? 0;
-      const completedLessons = clamp(completedRaw, 0, totalLessons);
-
-      const completedModules = completedLessons; // module ~= lesson in this catalog
-      const remainingLessons = Math.max(0, totalLessons - completedModules);
-      const pct = totalLessons > 0 ? Math.round((completedModules / totalLessons) * 100) : 0;
-
-      return {
-        enrollmentId: e.id,
-        courseSlug,
-        courseTitle: e.course.title,
-        totalLessons,
-        completedLessons,
-        completionPct: pct,
-        completedModules,
-        remainingLessons,
-        modules: course ? buildModuleProgress(course, completedModules) : [],
-      };
-    });
-
-    return {
-      userId: u.id,
-      email: u.email,
-      fullName: u.fullName ?? null,
-      role: (u as any).role ?? null,
-      isActive: u.isActive,
-      createdAt: u.createdAt.toISOString(),
-      lastActiveAt: lastActiveByUserId.get(u.id)?.toISOString() ?? null,
-      overallCompletionPct,
-      enrollments: enrollmentsProgress.sort((a, b) => b.completionPct - a.completionPct),
-    };
-  });
+  const usersWithProgress: AdminUserProgress[] = users.map((u) =>
+    mapUserToAdminProgress(
+      u,
+      userEnrollmentsByUserId.get(u.id) ?? [],
+      catalogBySlug,
+      completedLessonCounts,
+      lastActiveByUserId.get(u.id) ?? null,
+    ),
+  );
 
   return {
     generatedAt: new Date().toISOString(),
@@ -344,14 +188,8 @@ export async function getAdminDashboardData(): Promise<AdminDashboardClientData>
       enrollmentsPerCourse,
       catalogCategoryPie,
     },
-    catalogMeta: {
-      totalCoursesInCatalog: catalogCourses.length,
-      excelPath: catalog.excelPath,
-    },
-    catalogCourses: catalogCourses
-      .map((c) => ({ slug: c.slug, title: c.title, moduleCount: c.moduleCount }))
-      .sort((a, b) => a.title.localeCompare(b.title)),
+    catalogMeta: ctx.catalogMeta,
+    catalogCourses,
     users: usersWithProgress,
   };
 }
-
