@@ -45,7 +45,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const { user, signOut } = useAuth();
-  const usersActive = pathname === '/admin';
+  const usersActive = pathname === '/admin' || pathname.startsWith('/admin/users');
   const coursesActive = pathname.startsWith('/admin/courses');
   const discountsActive = pathname.startsWith('/admin/discounts');
   const contactsActive = pathname.startsWith('/admin/contacts');
