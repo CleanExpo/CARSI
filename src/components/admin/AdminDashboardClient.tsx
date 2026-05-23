@@ -1,7 +1,7 @@
 'use client';
 
-import { useId, useMemo, useState, type ReactNode } from 'react';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { useId, useMemo, type ReactNode } from 'react';
 import {
   Area,
   AreaChart,
@@ -21,32 +21,24 @@ import {
   Activity,
   AreaChart as AreaChartIcon,
   BarChart3,
-  BookOpen,
   CheckCircle2,
+  ChevronRight,
   LayoutDashboard,
   LineChart as LineChartIcon,
-  Loader2,
   PieChart as PieChartIcon,
-  Sparkles,
-  Trash2,
   TrendingUp,
-  UserRound,
   Users,
 } from 'lucide-react';
 
-import type { AdminDashboardClientData, AdminUserProgress } from '@/lib/admin/admin-dashboard-data';
+import type { AdminDashboardClientData } from '@/lib/admin/admin-dashboard-data';
 
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+  adminGlassCard,
+  completionColor,
+  LearnerAvatar,
+} from '@/components/admin/admin-learner-ui';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { ProgressBar } from '@/components/lms/ProgressBar';
 import { cn } from '@/lib/utils';
 
 const CHART_COLS = ['#2490ed', '#22d3ee', '#34d399', '#fb923c', '#a78bfa', '#f472b6'];
@@ -147,29 +139,6 @@ function AnalyticsChartEmpty({ message }: { message: string }) {
   );
 }
 
-function completionColor(completionPct: number) {
-  if (completionPct >= 90) return '#34d399';
-  if (completionPct >= 40) return '#2490ed';
-  return '#fb923c';
-}
-
-function AvatarIcon({ user }: { user: AdminUserProgress }) {
-  const label = (user.fullName ?? user.email).split(' ').filter(Boolean)[0]?.slice(0, 1) ?? 'A';
-  return (
-    <div
-      aria-hidden
-      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-sm font-bold tracking-tight shadow-inner transition-transform duration-200 group-hover:scale-[1.03]"
-      style={{
-        background: 'linear-gradient(145deg, rgba(36,144,237,0.22) 0%, rgba(36,144,237,0.06) 100%)',
-        border: '1px solid rgba(36,144,237,0.28)',
-        color: '#93c5fd',
-      }}
-    >
-      {label.toUpperCase()}
-    </div>
-  );
-}
-
 function SectionHeading({ title, description }: { title: string; description?: string }) {
   return (
     <div className="mb-5 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
@@ -226,36 +195,7 @@ function KpiCard({
 }
 
 export function AdminDashboardClient({ data }: { data: AdminDashboardClientData }) {
-  const router = useRouter();
   const chartUid = useId().replace(/:/g, '');
-  const [selectedUserId, setSelectedUserId] = useState<string | null>(data.users[0]?.userId ?? null);
-  const [courseSlugToAdd, setCourseSlugToAdd] = useState<string>('');
-  const [pendingGrant, setPendingGrant] = useState(false);
-  const [pendingRevokeId, setPendingRevokeId] = useState<string | null>(null);
-  const [actionError, setActionError] = useState<string | null>(null);
-
-  const selected = useMemo(
-    () => data.users.find((u) => u.userId === selectedUserId) ?? null,
-    [data.users, selectedUserId]
-  );
-
-  const enrolledSlugs = useMemo(
-    () => new Set(selected?.enrollments.map((e) => e.courseSlug) ?? []),
-    [selected]
-  );
-
-  const grantableCourses = useMemo(
-    () => data.catalogCourses.filter((c) => !enrolledSlugs.has(c.slug)),
-    [data.catalogCourses, enrolledSlugs]
-  );
-
-  const gaugeData = useMemo(() => {
-    const pct = selected?.overallCompletionPct ?? 0;
-    return [
-      { name: 'done', value: pct },
-      { name: 'rest', value: Math.max(0, 100 - pct) },
-    ];
-  }, [selected]);
 
   const generatedLabel = useMemo(() => {
     try {
@@ -271,51 +211,6 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
   const statusEnrollmentTotal = useMemo(
     () => data.charts.statusPie.reduce((acc, row) => acc + row.value, 0),
     [data.charts.statusPie]
-  );
-
-  async function grantCourse() {
-    setActionError(null);
-    if (!selectedUserId || !courseSlugToAdd) return;
-    setPendingGrant(true);
-    try {
-      const res = await fetch('/api/admin/enrollments', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ studentId: selectedUserId, courseSlug: courseSlugToAdd }),
-      });
-      const payload = (await res.json().catch(() => ({}))) as { detail?: string };
-      if (!res.ok) {
-        setActionError(payload.detail ?? 'Could not add course');
-        return;
-      }
-      setCourseSlugToAdd('');
-      router.refresh();
-    } finally {
-      setPendingGrant(false);
-    }
-  }
-
-  async function revokeEnrollment(enrollmentId: string) {
-    setActionError(null);
-    setPendingRevokeId(enrollmentId);
-    try {
-      const res = await fetch(`/api/admin/enrollments/${enrollmentId}`, { method: 'DELETE' });
-      const payload = (await res.json().catch(() => ({}))) as { detail?: string };
-      if (!res.ok) {
-        setActionError(payload.detail ?? 'Could not remove course');
-        return;
-      }
-      router.refresh();
-    } finally {
-      setPendingRevokeId(null);
-    }
-  }
-
-  const glassCard = cn(
-    'rounded-2xl border border-white/[0.07] bg-white/[0.025]',
-    'shadow-[0_1px_0_rgba(255,255,255,0.04)_inset]',
-    'transition-[border-color,box-shadow,background-color] duration-300 ease-out',
-    'hover:border-white/[0.1] hover:bg-white/[0.03]'
   );
 
   return (
@@ -348,16 +243,6 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
           <p className="text-xs text-white/38">Figures refreshed · {generatedLabel}</p>
         ) : null}
       </header>
-
-      {actionError ? (
-        <div
-          className="mb-8 flex items-start gap-3 rounded-xl border border-red-400/25 bg-red-500/[0.09] px-4 py-3 text-sm text-red-100/95 shadow-[0_0_0_1px_rgba(248,113,113,0.08)_inset]"
-          role="status"
-        >
-          <span className="mt-0.5 inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-red-400" />
-          {actionError}
-        </div>
-      ) : null}
 
       <section className="mb-14">
         <SectionHeading
@@ -688,265 +573,83 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
 
       <section>
         <SectionHeading
-          title="Learner management"
-          description="Select a learner, review progress, and grant or revoke course access."
+          title="Learner directory"
+          description="Open a learner profile for full progress, enrollments, modules, and course access."
         />
-        <div className="grid gap-5 lg:grid-cols-12">
-          <Card className={cn(glassCard, 'lg:col-span-3')}>
-            <CardHeader className="border-b border-white/[0.06] pb-4">
-              <CardTitle className="text-base font-semibold text-white/88">Selected learner</CardTitle>
-              <CardDescription className="text-white/45">Overall course progress</CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-col items-center gap-5 pt-6">
-              {selected ? (
-                <>
-                  <div className="relative h-[168px] w-[168px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie
-                          data={gaugeData}
-                          dataKey="value"
-                          cx="50%"
-                          cy="50%"
-                          innerRadius="62%"
-                          outerRadius="86%"
-                          startAngle={90}
-                          endAngle={-270}
-                          stroke="none"
-                          animationDuration={700}
+        <Card className={adminGlassCard}>
+          <CardHeader className="border-b border-white/[0.06] pb-4">
+            <CardTitle className="text-base font-semibold text-white/88">All learners</CardTitle>
+            <CardDescription className="text-white/45">
+              {data.users.length.toLocaleString()} registered · click a row for the full profile
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="p-0 pt-2">
+            <div className="overflow-auto rounded-xl border border-white/[0.06] bg-black/20">
+              <Table>
+                <TableHeader>
+                  <TableRow className="border-white/[0.06] hover:bg-transparent">
+                    <TableHead className="sticky top-0 z-[1] bg-[rgba(8,12,22,0.97)] py-3 text-[11px] font-semibold tracking-wide text-white/45 uppercase backdrop-blur-sm">
+                      Learner
+                    </TableHead>
+                    <TableHead className="sticky top-0 z-[1] hidden bg-[rgba(8,12,22,0.97)] py-3 text-[11px] font-semibold tracking-wide text-white/45 uppercase backdrop-blur-sm sm:table-cell">
+                      Enrollments
+                    </TableHead>
+                    <TableHead className="sticky top-0 z-[1] bg-[rgba(8,12,22,0.97)] py-3 text-right text-[11px] font-semibold tracking-wide text-white/45 uppercase backdrop-blur-sm">
+                      Progress
+                    </TableHead>
+                    <TableHead className="sticky top-0 z-[1] w-12 bg-[rgba(8,12,22,0.97)] py-3 backdrop-blur-sm" />
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {data.users.map((u) => (
+                    <TableRow
+                      key={u.userId}
+                      className="group border-white/[0.04] transition-colors hover:bg-white/[0.04]"
+                    >
+                      <TableCell className="py-3">
+                        <Link
+                          href={`/admin/users/${u.userId}`}
+                          className="flex items-center gap-3 outline-none focus-visible:ring-2 focus-visible:ring-[#2490ed]/50"
                         >
-                          <Cell fill="#2490ed" />
-                          <Cell fill="rgba(255,255,255,0.07)" />
-                        </Pie>
-                        <Tooltip {...chartTooltipProps} />
-                      </PieChart>
-                    </ResponsiveContainer>
-                    <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center">
-                      <div
-                        className="text-3xl font-black tabular-nums tracking-tight"
-                        style={{ color: completionColor(selected.overallCompletionPct) }}
-                      >
-                        {selected.overallCompletionPct}%
-                      </div>
-                      <div className="mt-0.5 text-[10px] font-semibold tracking-[0.2em] text-white/38 uppercase">
-                        overall
-                      </div>
-                    </div>
-                  </div>
-                  <div className="w-full space-y-1 text-center">
-                    <div className="text-sm font-semibold text-white/92">{selected.fullName ?? selected.email}</div>
-                    <div className="truncate text-xs text-white/48">{selected.email}</div>
-                  </div>
-                </>
-              ) : (
-                <p className="py-8 text-center text-sm text-white/45">Select a user from the directory</p>
-              )}
-            </CardContent>
-          </Card>
-
-          <Card className={cn(glassCard, 'lg:col-span-4')}>
-            <CardHeader className="border-b border-white/[0.06] pb-4">
-              <CardTitle className="text-base font-semibold text-white/88">Directory</CardTitle>
-              <CardDescription className="text-white/45">Click a row to inspect</CardDescription>
-            </CardHeader>
-            <CardContent className="p-0 pt-2">
-              <div className="max-h-[min(520px,55vh)] overflow-auto rounded-xl border border-white/[0.06] bg-black/20">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="border-white/[0.06] hover:bg-transparent">
-                      <TableHead className="sticky top-0 z-[1] bg-[rgba(8,12,22,0.97)] py-3 text-[11px] font-semibold tracking-wide text-white/45 uppercase backdrop-blur-sm">
-                        User
-                      </TableHead>
-                      <TableHead className="sticky top-0 z-[1] bg-[rgba(8,12,22,0.97)] py-3 text-right text-[11px] font-semibold tracking-wide text-white/45 uppercase backdrop-blur-sm">
-                        Progress
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {data.users.map((u) => {
-                      const active = selectedUserId === u.userId;
-                      return (
-                        <TableRow
-                          key={u.userId}
-                          onClick={() => setSelectedUserId(u.userId)}
-                          className={cn(
-                            'group cursor-pointer border-white/[0.04] transition-colors duration-200',
-                            active
-                              ? 'bg-[rgba(36,144,237,0.12)] ring-1 ring-[rgba(36,144,237,0.35)] ring-inset'
-                              : 'hover:bg-white/[0.04]'
-                          )}
-                        >
-                          <TableCell className="py-3">
-                            <div className="flex items-center gap-3">
-                              <AvatarIcon user={u} />
-                              <div className="min-w-0">
-                                <div className="truncate text-sm font-medium text-white/90">{u.fullName ?? u.email}</div>
-                                <div className="truncate text-xs text-white/42">{u.email}</div>
-                              </div>
+                          <LearnerAvatar user={u} />
+                          <div className="min-w-0">
+                            <div className="truncate text-sm font-medium text-white/90 group-hover:text-white">
+                              {u.fullName ?? u.email}
                             </div>
-                          </TableCell>
-                          <TableCell
-                            className="py-3 text-right text-sm font-bold tabular-nums"
-                            style={{ color: completionColor(u.overallCompletionPct) }}
-                          >
-                            {u.overallCompletionPct}%
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className={cn(glassCard, 'lg:col-span-5')}>
-            <CardHeader className="overflow-visible border-b border-white/[0.06] space-y-4 pb-4">
-              <div className="flex items-start gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[rgba(36,144,237,0.25)] bg-[rgba(36,144,237,0.1)]">
-                  <BookOpen className="h-5 w-5 text-[#7ec5ff]" strokeWidth={1.75} />
-                </div>
-                <div className="min-w-0 flex-1 space-y-1">
-                  <CardTitle className="text-base font-semibold text-white/88">Course enrollments</CardTitle>
-                  <CardDescription className="text-white/45">
-                    Assign catalog courses and track module progress for the selected learner
-                  </CardDescription>
-                </div>
-              </div>
-              {selected ? (
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
-                  <div className="min-w-0 flex-1 space-y-1.5">
-                    <div className="text-[10px] font-semibold tracking-[0.16em] text-white/38 uppercase">Add course</div>
-                    <Select
-                      value={courseSlugToAdd}
-                      onValueChange={setCourseSlugToAdd}
-                      disabled={grantableCourses.length === 0 || !selected}
-                    >
-                      <SelectTrigger className="h-11 rounded-xl border-white/[0.1] bg-white/[0.04] transition-colors hover:bg-white/[0.06]">
-                        <SelectValue
-                          placeholder={grantableCourses.length ? 'Choose a course…' : 'All catalog courses assigned'}
-                        />
-                      </SelectTrigger>
-                      <SelectContent
-                        className="z-[200] border-white/10 bg-[rgba(10,14,26,0.98)] text-white shadow-xl"
-                        position="popper"
-                        sideOffset={6}
-                      >
-                        {grantableCourses.map((c) => (
-                          <SelectItem
-                            key={c.slug}
-                            value={c.slug}
-                            className="items-start py-2.5 pr-9 pl-3 text-left leading-snug whitespace-normal focus:bg-white/10 focus:text-white"
-                          >
-                            <span className="block">
-                              {c.title}
-                              <span className="mt-0.5 block text-xs font-normal text-white/50">
-                                {c.moduleCount} modules
-                              </span>
-                            </span>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <Button
-                    type="button"
-                    className="h-11 shrink-0 rounded-xl px-6 font-semibold shadow-[0_0_20px_-4px_rgba(36,144,237,0.55)] transition-[transform,box-shadow] duration-200 hover:shadow-[0_0_28px_-4px_rgba(36,144,237,0.65)] active:scale-[0.98]"
-                    disabled={!courseSlugToAdd || pendingGrant || !selected}
-                    onClick={() => void grantCourse()}
-                  >
-                    {pendingGrant ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Add access'}
-                  </Button>
-                </div>
-              ) : null}
-            </CardHeader>
-            <CardContent className="max-h-[min(520px,55vh)] space-y-5 overflow-y-auto pr-1 pt-5">
-              {selected ? (
-                selected.enrollments.length > 0 ? (
-                  selected.enrollments.map((e) => (
-                    <div
-                      key={e.enrollmentId}
-                      className={cn(
-                        'rounded-xl border border-white/[0.08] bg-white/[0.02] p-4 sm:p-5',
-                        'shadow-[0_1px_0_rgba(255,255,255,0.03)_inset]',
-                        'transition-[border-color,background-color,box-shadow] duration-300',
-                        'hover:border-white/[0.12] hover:bg-white/[0.035] hover:shadow-[0_12px_40px_-28px_rgba(0,0,0,0.75)]'
-                      )}
-                    >
-                      <div className="flex flex-wrap items-start justify-between gap-3">
-                        <div className="min-w-0 flex-1">
-                          <div className="truncate text-base font-semibold text-white/92">{e.courseTitle}</div>
-                          <div className="mt-1.5 text-xs leading-relaxed text-white/48">
-                            {e.completedLessons}/{e.totalLessons} lessons · {e.completedModules} modules complete
+                            <div className="truncate text-xs text-white/42">{u.email}</div>
                           </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div
-                            className="text-sm font-bold tabular-nums"
-                            style={{ color: completionColor(e.completionPct) }}
-                          >
-                            {e.completionPct}%
-                          </div>
-                          <Button
-                            type="button"
-                            size="icon"
-                            variant="destructive"
-                            className="h-9 w-9 shrink-0 rounded-lg opacity-90 transition-opacity hover:opacity-100"
-                            disabled={pendingRevokeId === e.enrollmentId}
-                            onClick={() => void revokeEnrollment(e.enrollmentId)}
-                            title="Remove access"
-                          >
-                            {pendingRevokeId === e.enrollmentId ? (
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                              <Trash2 className="h-4 w-4" />
-                            )}
-                          </Button>
-                        </div>
-                      </div>
-                      <div className="mt-4">
-                        <ProgressBar percentage={e.completionPct} label="Completion" />
-                      </div>
-                      <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                        {e.modules.map((m) => (
-                          <div
-                            key={m.moduleNo}
-                            className={cn(
-                              'rounded-lg border px-3 py-2.5 text-xs transition-colors duration-200',
-                              m.completed
-                                ? 'border-emerald-400/22 bg-emerald-400/[0.07] text-white/88'
-                                : 'border-white/[0.08] bg-white/[0.02] text-white/80'
-                            )}
-                          >
-                            <div className="font-medium">{m.title}</div>
-                            <div className="mt-0.5 text-white/42">Module {m.moduleNo}</div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-white/[0.12] bg-white/[0.02] py-14 text-center">
-                    <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-white/[0.08] bg-white/[0.04]">
-                      <UserRound className="h-7 w-7 text-white/35" strokeWidth={1.5} />
-                    </div>
-                    <div className="space-y-1 px-4">
-                      <p className="text-sm font-medium text-white/70">No enrollments yet</p>
-                      <p className="text-xs leading-relaxed text-white/45">
-                        Add a course from the catalog to start tracking this learner&apos;s progress.
-                      </p>
-                    </div>
-                  </div>
-                )
-              ) : (
-                <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-white/[0.1] py-14 text-center text-sm text-white/45">
-                  <Sparkles className="h-8 w-8 text-white/25" strokeWidth={1.25} />
-                  Select a learner from the directory to manage courses.
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+                        </Link>
+                      </TableCell>
+                      <TableCell className="hidden py-3 text-sm text-white/55 sm:table-cell">
+                        <Link href={`/admin/users/${u.userId}`} className="block tabular-nums">
+                          {u.enrollments.length}
+                        </Link>
+                      </TableCell>
+                      <TableCell className="py-3 text-right">
+                        <Link
+                          href={`/admin/users/${u.userId}`}
+                          className="text-sm font-bold tabular-nums"
+                          style={{ color: completionColor(u.overallCompletionPct) }}
+                        >
+                          {u.overallCompletionPct}%
+                        </Link>
+                      </TableCell>
+                      <TableCell className="py-3 text-right">
+                        <Link
+                          href={`/admin/users/${u.userId}`}
+                          className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-transparent text-white/35 transition-colors group-hover:border-white/10 group-hover:bg-white/[0.06] group-hover:text-[#7ec5ff]"
+                          aria-label={`View ${u.fullName ?? u.email}`}
+                        >
+                          <ChevronRight className="h-4 w-4" />
+                        </Link>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
       </section>
     </div>
   );
