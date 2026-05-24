@@ -1,7 +1,7 @@
 {
   "name": "CARSI",
   "version": "1.0.0",
-  "description": "CARSI — learning platform for courses, enrollments, and progress. Next.js, Prisma, PostgreSQL, and Stripe.",
+  "description": "CARSI \u2014 learning platform for courses, enrollments, and progress. Next.js, Prisma, PostgreSQL, and Stripe.",
   "author": "Philip McGurk",
   "contributors": [
     "Rana Muzamil (Technical Lead & Manager)"
@@ -132,5 +132,6 @@
     "yjs": "^13.6.29",
     "zod": "^3.24.1",
     "zustand": "^5.0.10"
-  }
+  },
+  "packageManager": "npm@10.9.0"
 }

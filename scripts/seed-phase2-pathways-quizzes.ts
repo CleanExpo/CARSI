@@ -79,14 +79,14 @@ async function main() {
       });
     }
 
-    const module = await prisma.lmsModule.findFirst({
+    const firstModule = await prisma.lmsModule.findFirst({
       where: { courseId: firstCourseId },
       orderBy: { orderIndex: 'asc' },
     });
-    if (!module) continue;
+    if (!firstModule) continue;
 
     const maxOrder = await prisma.lmsLesson.aggregate({
-      where: { moduleId: module.id },
+      where: { firstModuleId: firstModule.id },
       _max: { orderIndex: true },
     });
     const nextOrder = (maxOrder._max.orderIndex ?? 0) + 1;
@@ -94,7 +94,7 @@ async function main() {
     await prisma.lmsLesson.create({
       data: {
         id: crypto.randomUUID(),
-        moduleId: module.id,
+        firstModuleId: firstModule.id,
         title: 'Knowledge check',
         contentType: 'quiz',
         contentBody: quiz.id,
