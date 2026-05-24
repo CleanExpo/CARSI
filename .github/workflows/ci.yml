@@ -112,20 +112,25 @@ jobs:
     timeout-minutes: 30
     needs: [frontend-tests]
 
+    # Postgres service + DATABASE_URL aligned to CARSI's schema (not the
+    # starter_db leftover from the NodeJS Starter V1 template). Without
+    # prisma migrate the webServer would query an empty schema and fail.
     services:
       postgres:
-        image: postgres:15-alpine
+        image: postgres:16
         env:
-          POSTGRES_DB: starter_db
-          POSTGRES_USER: starter_user
-          POSTGRES_PASSWORD: local_dev_password
-        ports:
-          - 5432:5432
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: root
+          POSTGRES_DB: carsi
+        ports: ['5432:5432']
         options: >-
-          --health-cmd pg_isready
+          --health-cmd "pg_isready -U root"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://root:root@localhost:5432/carsi
 
     steps:
       - name: Checkout code
@@ -139,6 +144,9 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Apply Prisma migrations to test DB
+        run: npx prisma migrate deploy
 
       - name: Cache Playwright browsers
         id: playwright-cache
@@ -161,7 +169,9 @@ jobs:
         run: npm run test:e2e
         env:
           CI: true
-          DATABASE_URL: postgresql://starter_user:local_dev_password@localhost:5432/starter_db
+          # DATABASE_URL inherited from job-level env (postgresql://root:root@localhost:5432/carsi).
+          # The previous step-level starter_db override caused P1000 auth failure
+          # because the postgres service uses root:root, not starter_user.
 
       - name: Upload Playwright report
         if: always()
@@ -183,6 +193,27 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     needs: [frontend-tests]
+
+    # Postgres service: Playwright's webServer (Next dev) needs a reachable DB.
+    # Without this DATABASE_URL fell through to the production DigitalOcean URL
+    # which is unreachable from GitHub runners (P1001 ECONNREFUSED).
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: root
+          POSTGRES_DB: carsi
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U root"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://root:root@localhost:5432/carsi
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -195,6 +226,9 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Apply Prisma migrations to test DB
+        run: npx prisma migrate deploy
 
       - name: Cache Playwright browsers
         id: a11y-playwright-cache
