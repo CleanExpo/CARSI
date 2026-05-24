@@ -183,6 +183,27 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     needs: [frontend-tests]
+
+    # Postgres service: Playwright's webServer (Next dev) needs a reachable DB.
+    # Without this DATABASE_URL fell through to the production DigitalOcean URL
+    # which is unreachable from GitHub runners (P1001 ECONNREFUSED).
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: root
+          POSTGRES_DB: carsi
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U root"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://root:root@localhost:5432/carsi
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -195,6 +216,9 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Apply Prisma migrations to test DB
+        run: npx prisma migrate deploy
 
       - name: Cache Playwright browsers
         id: a11y-playwright-cache
