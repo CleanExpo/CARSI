@@ -86,15 +86,15 @@ async function main() {
     if (!firstModule) continue;
 
     const maxOrder = await prisma.lmsLesson.aggregate({
-      where: { firstModuleId: firstModule.id },
+      where: { moduleId: firstModule.id },
       _max: { orderIndex: true },
     });
-    const nextOrder = (maxOrder._max.orderIndex ?? 0) + 1;
+    const nextOrder = (maxOrder._max?.orderIndex ?? 0) + 1;
 
     await prisma.lmsLesson.create({
       data: {
         id: crypto.randomUUID(),
-        firstModuleId: firstModule.id,
+        moduleId: firstModule.id,
         title: 'Knowledge check',
         contentType: 'quiz',
         contentBody: quiz.id,
