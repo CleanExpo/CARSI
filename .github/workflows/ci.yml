@@ -169,7 +169,9 @@ jobs:
         run: npm run test:e2e
         env:
           CI: true
-          DATABASE_URL: postgresql://starter_user:local_dev_password@localhost:5432/starter_db
+          # DATABASE_URL inherited from job-level env (postgresql://root:root@localhost:5432/carsi).
+          # The previous step-level starter_db override caused P1000 auth failure
+          # because the postgres service uses root:root, not starter_user.
 
       - name: Upload Playwright report
         if: always()
