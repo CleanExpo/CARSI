@@ -1,8 +1,19 @@
 name: Deploy
 
+# This workflow is currently dormant. It targets a Python backend in
+# `apps/backend/` (uv + pytest + Fly.io), but no such directory exists in
+# this repo — CARSI is a Next.js app deployed via Vercel (see vercel.json).
+# Every push-to-main run failed on the first step (`working-directory:
+# apps/backend` → "No such file or directory"), turning the main-branch run
+# red 100% of the time while providing zero signal. Gated to
+# workflow_dispatch-only until either:
+#   1. an `apps/backend/` Python service is actually added, OR
+#   2. this workflow is deleted in favour of CARSI's Vercel-only deploy path.
+#
+# ci.yml already documents the same removal pattern (see comment at the top
+# of its backend-tests section, dated 2026-04-19).
 on:
-  push:
-    branches: [main]
+  workflow_dispatch:
 
 concurrency:
   group: deploy-${{ github.ref }}
