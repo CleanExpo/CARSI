@@ -71,12 +71,17 @@ export function IICRCDisciplineMap() {
           }}
         />
 
+        <div
+          className="relative z-[1] mx-auto w-full max-w-[min(100%,520px)]"
+          style={{ aspectRatio: `${VB_W} / ${VB_H}` }}
+          role="group"
+          aria-label="Interactive map of seven IICRC certification disciplines around a central IICRC hub"
+        >
         <svg
           viewBox={`0 0 ${VB_W} ${VB_H}`}
-          className="relative z-[1] mx-auto w-full max-w-[min(100%,520px)]"
+          className="absolute inset-0 w-full h-full"
           style={{ overflow: 'visible' }}
-          role="img"
-          aria-label="Interactive map of seven IICRC certification disciplines around a central IICRC hub"
+          aria-hidden="true"
         >
           <defs>
             <filter id="iicrc-node-shadow" x="-40%" y="-40%" width="180%" height="180%">
@@ -152,24 +157,11 @@ export function IICRCDisciplineMap() {
             return (
               <g
                 key={disc.id}
-                role="button"
-                tabIndex={0}
                 transform={`translate(${tx}, ${ty}) scale(${scale})`}
                 style={{
-                  cursor: 'pointer',
                   transition: 'transform 260ms cubic-bezier(0.34, 1.56, 0.64, 1)',
+                  pointerEvents: 'none',
                 }}
-                onMouseEnter={() => setHover(disc.id)}
-                onMouseLeave={() => setHover(null)}
-                onClick={() => toggleLock(disc.id)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    toggleLock(disc.id);
-                  }
-                }}
-                aria-label={`${disc.label}: ${disc.fullName}`}
-                aria-pressed={locked === disc.id}
               >
                 {isActive && (
                   <circle
@@ -246,6 +238,38 @@ export function IICRCDisciplineMap() {
             </text>
           </g>
         </svg>
+
+        {/* Real <button> overlays — invisible, positioned over each SVG node.
+            Handles all keyboard + pointer interaction so the SVG itself stays
+            aria-hidden + decorative. Avoids axe-core nested-interactive. */}
+        {DISCIPLINES.map((disc, i) => {
+          const { x, y } = getNodePosition(i, DISCIPLINES.length);
+          const leftPct = ((CX + x) / VB_W) * 100;
+          const topPct = ((CY + y) / VB_H) * 100;
+          const sizePct = ((NODE_R * 2) / VB_W) * 100;
+          return (
+            <button
+              key={`btn-${disc.id}`}
+              type="button"
+              aria-label={`${disc.label}: ${disc.fullName}`}
+              aria-pressed={locked === disc.id}
+              onMouseEnter={() => setHover(disc.id)}
+              onMouseLeave={() => setHover(null)}
+              onFocus={() => setHover(disc.id)}
+              onBlur={() => setHover(null)}
+              onClick={() => toggleLock(disc.id)}
+              className="absolute cursor-pointer rounded-full border-0 bg-transparent p-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#060a12]"
+              style={{
+                left: `${leftPct}%`,
+                top: `${topPct}%`,
+                width: `${sizePct}%`,
+                aspectRatio: '1',
+                transform: 'translate(-50%, -50%)',
+              }}
+            />
+          );
+        })}
+        </div>
 
         <p className="relative z-[1] px-4 pb-4 text-center text-[11px] text-white/35">
           Hover on desktop or tap a node on mobile — tap again to clear.
