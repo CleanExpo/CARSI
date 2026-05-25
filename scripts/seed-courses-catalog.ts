@@ -25,6 +25,7 @@ import { prisma } from '../src/lib/prisma';
 type PrismaTx = Parameters<Parameters<typeof prisma.$transaction>[0]>[0];
 import type { CatalogCourse, CoursesCatalogFile } from '../src/lib/seed/courses-catalog-types';
 import { COURSES_CATALOG_VERSION, isCoursesCatalogFile } from '../src/lib/seed/courses-catalog-types';
+import { resolveCatalogCecHours } from '../src/lib/seed/cec-hours';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const CATALOG_PATH = join(__dirname, '..', 'data', 'seed', 'courses-catalog.json');
@@ -79,6 +80,7 @@ async function deleteCourseCurriculum(tx: PrismaTx, courseId: string) {
 
 async function seedCourse(c: CatalogCourse, instructorOverride: string | undefined) {
   const instructorId = instructorOverride?.trim() || c.instructorId;
+  const cecHours = c.cecHours ?? resolveCatalogCecHours(c);
 
   await prisma.$transaction(async (tx) => {
     const existing = await tx.lmsCourse.findUnique({
@@ -109,7 +111,7 @@ async function seedCourse(c: CatalogCourse, instructorOverride: string | undefin
         category: c.category,
         tags: jsonInput(c.tags),
         iicrcDiscipline: c.iicrcDiscipline,
-        cecHours: c.cecHours,
+        cecHours,
         meta: jsonInput(c.meta),
         isPublished: c.isPublished,
         modules: {
@@ -145,7 +147,7 @@ async function seedCourse(c: CatalogCourse, instructorOverride: string | undefin
         category: c.category,
         tags: jsonInput(c.tags),
         iicrcDiscipline: c.iicrcDiscipline,
-        cecHours: c.cecHours,
+        cecHours,
         meta: jsonInput(c.meta),
         isPublished: c.isPublished,
       },
