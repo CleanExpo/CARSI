@@ -31,16 +31,10 @@ import {
   LearnerAvatar,
   StatusBadge,
 } from '@/components/admin/admin-learner-ui';
+import { AdminCourseMultiPicker } from '@/components/admin/AdminCourseMultiPicker';
 import { ProgressBar } from '@/components/lms/ProgressBar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 
 const chartTooltipProps = {
@@ -56,23 +50,47 @@ const chartTooltipProps = {
 function CourseEnrollmentCard({
   enrollment,
   pendingRevoke,
+  pendingComplete,
+  selectable,
+  selected,
+  onToggleSelect,
   onRevoke,
+  onMarkComplete,
 }: {
   enrollment: AdminCourseProgressForUser;
   pendingRevoke: boolean;
+  pendingComplete: boolean;
+  selectable: boolean;
+  selected: boolean;
+  onToggleSelect: () => void;
   onRevoke: (id: string) => void;
+  onMarkComplete: (id: string) => void;
 }) {
   const statusLabel = enrollment.status.replace(/_/g, ' ');
+  const isComplete = enrollment.completionPct >= 100;
   return (
     <article
       className={cn(
         adminGlassCard,
         'overflow-hidden p-0',
-        enrollment.completionPct >= 100 && 'border-emerald-400/20',
+        isComplete && 'border-emerald-400/20',
+        selected && 'ring-1 ring-[#2490ed]/45',
       )}
     >
       <div className="border-b border-white/[0.06] px-5 py-4 sm:px-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
+          {selectable ? (
+            <label className="flex cursor-pointer items-start gap-3 pt-1">
+              <input
+                type="checkbox"
+                checked={selected}
+                disabled={pendingComplete}
+                onChange={onToggleSelect}
+                className="mt-1 h-4 w-4 shrink-0 rounded border-white/20 bg-white/5 accent-[#2490ed]"
+                aria-label={`Select ${enrollment.courseTitle}`}
+              />
+            </label>
+          ) : null}
           <div className="min-w-0 flex-1 space-y-2">
             <div className="flex flex-wrap items-center gap-2">
               <StatusBadge label={statusLabel} tone={enrollmentStatusTone(enrollment.status)} />
@@ -104,19 +122,38 @@ function CourseEnrollmentCard({
               </div>
             </dl>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center justify-end gap-2">
             <div
               className="text-2xl font-black tabular-nums"
               style={{ color: completionColor(enrollment.completionPct) }}
             >
               {enrollment.completionPct}%
             </div>
+            {!isComplete ? (
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                className="h-9 rounded-lg border-white/10 bg-white/[0.06] text-white/85 hover:bg-white/10"
+                disabled={pendingComplete || pendingRevoke}
+                onClick={() => onMarkComplete(enrollment.enrollmentId)}
+              >
+                {pendingComplete ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <>
+                    <CheckCircle2 className="mr-1.5 h-3.5 w-3.5" />
+                    Mark complete
+                  </>
+                )}
+              </Button>
+            ) : null}
             <Button
               type="button"
               size="icon"
               variant="destructive"
               className="h-10 w-10 shrink-0 rounded-xl"
-              disabled={pendingRevoke}
+              disabled={pendingRevoke || pendingComplete}
               onClick={() => onRevoke(enrollment.enrollmentId)}
               title="Remove enrollment"
             >
@@ -173,14 +210,21 @@ export function AdminUserDetailClient({
   catalogCourses: AdminCatalogCourseOption[];
 }) {
   const router = useRouter();
-  const [courseSlugToAdd, setCourseSlugToAdd] = useState('');
+  const [selectedCourseSlugs, setSelectedCourseSlugs] = useState<Set<string>>(() => new Set());
   const [pendingGrant, setPendingGrant] = useState(false);
   const [pendingRevokeId, setPendingRevokeId] = useState<string | null>(null);
+  const [pendingCompleteIds, setPendingCompleteIds] = useState<Set<string>>(() => new Set());
+  const [selectedEnrollmentIds, setSelectedEnrollmentIds] = useState<Set<string>>(() => new Set());
   const [actionError, setActionError] = useState<string | null>(null);
 
+  const incompleteEnrollments = useMemo(
+    () => user.enrollments.filter((e) => e.completionPct < 100),
+    [user.enrollments],
+  );
+
   const enrolledSlugs = useMemo(() => new Set(user.enrollments.map((e) => e.courseSlug)), [user.enrollments]);
-  const grantableCourses = useMemo(
-    () => catalogCourses.filter((c) => !enrolledSlugs.has(c.slug)),
+  const grantableCount = useMemo(
+    () => catalogCourses.filter((c) => !enrolledSlugs.has(c.slug)).length,
     [catalogCourses, enrolledSlugs],
   );
 
@@ -198,22 +242,27 @@ export function AdminUserDetailClient({
 
   const displayName = user.fullName?.trim() || user.email.split('@')[0] || 'Learner';
 
-  async function grantCourse() {
+  async function grantSelectedCourses() {
     setActionError(null);
-    if (!courseSlugToAdd) return;
+    const slugs = [...selectedCourseSlugs].filter((s) => !enrolledSlugs.has(s));
+    if (slugs.length === 0) return;
     setPendingGrant(true);
     try {
       const res = await fetch('/api/admin/enrollments', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ studentId: user.userId, courseSlug: courseSlugToAdd }),
+        body: JSON.stringify({ studentId: user.userId, courseSlugs: slugs }),
       });
-      const payload = (await res.json().catch(() => ({}))) as { detail?: string };
+      const payload = (await res.json().catch(() => ({}))) as {
+        detail?: string;
+        created?: number;
+        alreadyEnrolled?: number;
+      };
       if (!res.ok) {
-        setActionError(payload.detail ?? 'Could not add course');
+        setActionError(payload.detail ?? 'Could not grant course access');
         return;
       }
-      setCourseSlugToAdd('');
+      setSelectedCourseSlugs(new Set());
       router.refresh();
     } finally {
       setPendingGrant(false);
@@ -230,11 +279,58 @@ export function AdminUserDetailClient({
         setActionError(payload.detail ?? 'Could not remove course');
         return;
       }
+      setSelectedEnrollmentIds((prev) => {
+        const next = new Set(prev);
+        next.delete(enrollmentId);
+        return next;
+      });
       router.refresh();
     } finally {
       setPendingRevokeId(null);
     }
   }
+
+  function toggleEnrollmentSelection(enrollmentId: string) {
+    setSelectedEnrollmentIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(enrollmentId)) next.delete(enrollmentId);
+      else next.add(enrollmentId);
+      return next;
+    });
+  }
+
+  function selectAllIncomplete() {
+    setSelectedEnrollmentIds(new Set(incompleteEnrollments.map((e) => e.enrollmentId)));
+  }
+
+  function clearSelection() {
+    setSelectedEnrollmentIds(new Set());
+  }
+
+  async function markEnrollmentsComplete(enrollmentIds: string[]) {
+    if (enrollmentIds.length === 0) return;
+    setActionError(null);
+    setPendingCompleteIds(new Set(enrollmentIds));
+    try {
+      const res = await fetch('/api/admin/enrollments/complete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ studentId: user.userId, enrollmentIds }),
+      });
+      const payload = (await res.json().catch(() => ({}))) as { detail?: string };
+      if (!res.ok) {
+        setActionError(payload.detail ?? 'Could not mark courses complete');
+        return;
+      }
+      setSelectedEnrollmentIds(new Set());
+      router.refresh();
+    } finally {
+      setPendingCompleteIds(new Set());
+    }
+  }
+
+  const bulkCompletePending = pendingCompleteIds.size > 0;
+  const selectedCount = selectedEnrollmentIds.size;
 
   return (
     <div className="relative px-5 py-8 pb-24 sm:px-8 sm:py-10">
@@ -409,69 +505,113 @@ export function AdminUserDetailClient({
                 <div>
                   <CardTitle className="text-base text-white/88">Course enrollments</CardTitle>
                   <CardDescription className="text-white/45">
-                    Assign catalog courses, review progress, and remove access
+                    Assign courses, mark completions for CEC support, or remove access
                   </CardDescription>
                 </div>
               </div>
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
-                <div className="min-w-0 flex-1 space-y-1.5">
+              <div className="space-y-3">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div className="text-[10px] font-semibold tracking-[0.16em] text-white/38 uppercase">
-                    Add course
+                    Add courses
                   </div>
-                  <Select
-                    value={courseSlugToAdd}
-                    onValueChange={setCourseSlugToAdd}
-                    disabled={grantableCourses.length === 0}
+                  <Button
+                    type="button"
+                    className="h-10 shrink-0 rounded-xl px-5 font-semibold sm:self-start"
+                    disabled={selectedCourseSlugs.size === 0 || pendingGrant || grantableCount === 0}
+                    onClick={() => void grantSelectedCourses()}
                   >
-                    <SelectTrigger className="h-11 rounded-xl border-white/10 bg-white/[0.04]">
-                      <SelectValue
-                        placeholder={
-                          grantableCourses.length ? 'Choose a course…' : 'All catalog courses assigned'
-                        }
-                      />
-                    </SelectTrigger>
-                    <SelectContent
-                      className="z-[200] border-white/10 bg-[rgba(10,14,26,0.98)] text-white shadow-xl"
-                      position="popper"
-                      sideOffset={6}
-                    >
-                      {grantableCourses.map((c) => (
-                        <SelectItem
-                          key={c.slug}
-                          value={c.slug}
-                          className="items-start py-2.5 pr-9 pl-3 whitespace-normal focus:bg-white/10"
-                        >
-                          <span className="block leading-snug">
-                            {c.title}
-                            <span className="mt-0.5 block text-xs text-white/50">{c.moduleCount} modules</span>
-                          </span>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    {pendingGrant ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      `Grant access${selectedCourseSlugs.size > 0 ? ` (${selectedCourseSlugs.size})` : ''}`
+                    )}
+                  </Button>
                 </div>
-                <Button
-                  type="button"
-                  className="h-11 shrink-0 rounded-xl px-6 font-semibold"
-                  disabled={!courseSlugToAdd || pendingGrant}
-                  onClick={() => void grantCourse()}
-                >
-                  {pendingGrant ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Grant access'}
-                </Button>
+                <AdminCourseMultiPicker
+                  courses={catalogCourses}
+                  enrolledSlugs={enrolledSlugs}
+                  selectedSlugs={selectedCourseSlugs}
+                  onSelectionChange={setSelectedCourseSlugs}
+                  disabled={pendingGrant || grantableCount === 0}
+                />
               </div>
             </CardHeader>
           </Card>
 
           {user.enrollments.length > 0 ? (
             <div className="space-y-5">
-              {user.enrollments.map((e) => (
-                <CourseEnrollmentCard
-                  key={e.enrollmentId}
-                  enrollment={e}
-                  pendingRevoke={pendingRevokeId === e.enrollmentId}
-                  onRevoke={(id) => void revokeEnrollment(id)}
-                />
-              ))}
+              {incompleteEnrollments.length > 0 ? (
+                <div
+                  className={cn(
+                    adminGlassCard,
+                    'flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between',
+                  )}
+                >
+                  <p className="text-sm text-white/55">
+                    {incompleteEnrollments.length} course
+                    {incompleteEnrollments.length === 1 ? '' : 's'} not fully complete
+                    {selectedCount > 0 ? (
+                      <span className="text-white/80"> · {selectedCount} selected</span>
+                    ) : null}
+                  </p>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="h-9 text-white/60 hover:text-white"
+                      disabled={bulkCompletePending}
+                      onClick={selectAllIncomplete}
+                    >
+                      Select all incomplete
+                    </Button>
+                    {selectedCount > 0 ? (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-9 text-white/60 hover:text-white"
+                        disabled={bulkCompletePending}
+                        onClick={clearSelection}
+                      >
+                        Clear
+                      </Button>
+                    ) : null}
+                    <Button
+                      type="button"
+                      size="sm"
+                      className="h-9 rounded-lg bg-[#2490ed] px-4 font-semibold hover:bg-[#1a7fd4]"
+                      disabled={selectedCount === 0 || bulkCompletePending}
+                      onClick={() => void markEnrollmentsComplete([...selectedEnrollmentIds])}
+                    >
+                      {bulkCompletePending ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <>
+                          <CheckCircle2 className="mr-1.5 h-4 w-4" />
+                          Mark {selectedCount > 0 ? selectedCount : ''} complete
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              ) : null}
+              {user.enrollments.map((e) => {
+                const isIncomplete = e.completionPct < 100;
+                return (
+                  <CourseEnrollmentCard
+                    key={e.enrollmentId}
+                    enrollment={e}
+                    selectable={isIncomplete}
+                    selected={selectedEnrollmentIds.has(e.enrollmentId)}
+                    pendingRevoke={pendingRevokeId === e.enrollmentId}
+                    pendingComplete={pendingCompleteIds.has(e.enrollmentId)}
+                    onToggleSelect={() => toggleEnrollmentSelection(e.enrollmentId)}
+                    onRevoke={(id) => void revokeEnrollment(id)}
+                    onMarkComplete={(id) => void markEnrollmentsComplete([id])}
+                  />
+                );
+              })}
             </div>
           ) : (
             <div
