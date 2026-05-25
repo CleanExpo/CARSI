@@ -83,7 +83,15 @@ export function ContactForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    /* WebMCP annotations expose this form to in-browser AI agents per the
+       GEO standard (Pi-CEO skills/geo-optimization/SKILL.md §5). */
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-5"
+      // @ts-expect-error WebMCP attributes are W3C-draft and not yet in React's type defs
+      toolname="submit_contact_enquiry"
+      tooldescription="Submit a contact enquiry to CARSI (Australia's leading IICRC continuing-education platform). Routes to support@carsi.com.au for human follow-up. Use for course questions, membership enquiries, certification queries, or general support."
+    >
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1.5">
           <label htmlFor="firstName" className="block text-xs font-medium" style={labelStyle}>
@@ -99,6 +107,8 @@ export function ContactForm() {
             placeholder="Jane"
             className={fieldClass}
             style={fieldStyle}
+            // @ts-expect-error WebMCP attribute — W3C draft, not yet in React types
+            toolparamdescription="Enquirer's first name"
           />
         </div>
         <div className="space-y-1.5">
@@ -115,6 +125,8 @@ export function ContactForm() {
             placeholder="Smith"
             className={fieldClass}
             style={fieldStyle}
+            // @ts-expect-error WebMCP attribute — W3C draft, not yet in React types
+            toolparamdescription="Enquirer's last name (family name)"
           />
         </div>
       </div>
@@ -133,6 +145,8 @@ export function ContactForm() {
           placeholder="jane@example.com.au"
           className={fieldClass}
           style={fieldStyle}
+          // @ts-expect-error WebMCP attribute — W3C draft, not yet in React types
+          toolparamdescription="Valid email address where the CARSI team should reply"
         />
       </div>
 
@@ -145,11 +159,14 @@ export function ContactForm() {
           name="message"
           required
           rows={6}
+          maxLength={3000}
           value={form.message}
           onChange={handleChange}
           placeholder="Tell us how we can help — course questions, membership enquiries, or anything else..."
           className={fieldClass}
           style={{ ...fieldStyle, resize: 'vertical' }}
+          // @ts-expect-error WebMCP attribute — W3C draft, not yet in React types
+          toolparamdescription="Free-text enquiry (max 3000 chars). Mention which IICRC discipline (WRT, CRT, ASD, AMRT, FSRT, OCT, CCT) if applicable, and whether the enquiry is for individual or group/corporate enrolment."
         />
       </div>
 
