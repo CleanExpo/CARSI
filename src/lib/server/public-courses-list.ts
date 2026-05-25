@@ -1,4 +1,5 @@
 import type { Prisma } from '@/generated/prisma/client';
+import { resolveCecHoursLabelForSlug } from '@/lib/cec-display';
 import { prisma } from '@/lib/prisma';
 import { normalizePublicAssetUrl } from '@/lib/remote-image';
 import type { CourseListItem, WpExportCourse } from '@/lib/wordpress-export-courses';
@@ -50,7 +51,7 @@ function mapDashboardCourseRow(c: {
     instructor: null,
     catalog_status: st === 'draft' ? 'draft' : 'published',
     module_count: c._count.modules,
-    cec_hours: c.cecHours != null ? String(c.cecHours) : null,
+    cec_hours: resolveCecHoursLabelForSlug(c.slug, c.cecHours),
     duration_hours: c.durationHours != null ? String(c.durationHours) : null,
   };
 }
@@ -328,7 +329,7 @@ export async function getPublishedCourseDetailBySlugFromDatabase(slug: string) {
     level: row.level ?? null,
     category: row.category ?? null,
     iicrc_discipline: row.iicrcDiscipline ?? null,
-    cec_hours: row.cecHours != null ? String(row.cecHours) : null,
+    cec_hours: resolveCecHoursLabelForSlug(row.slug, row.cecHours),
     duration_hours: row.durationHours != null ? String(row.durationHours) : null,
     thumbnail_url: normalizePublicAssetUrl(row.thumbnailUrl),
     module_count: row._count.modules,
