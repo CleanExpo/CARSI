@@ -9,6 +9,8 @@ import { CourseHubContext } from '@/components/lms/CourseHubContext';
 import { CourseSchema, BreadcrumbSchema } from '@/components/seo';
 import { getBackendOrigin, getPublicSiteUrl } from '@/lib/env/public-url';
 import { normalizePublicAssetUrl } from '@/lib/remote-image';
+import { resolveCecHoursLabelForSlug } from '@/lib/cec-display';
+import { resolveCecHours } from '@/lib/seed/cec-hours';
 import { getPublishedCourseDetailBySlugFromDatabase } from '@/lib/server/public-courses-list';
 import {
   inferDisciplineFromWpExport,
@@ -48,6 +50,13 @@ function resolveAssetUrl(url?: string | null): string | null {
 }
 
 function mapWpExportToCourseDetail(row: WpExportCourse): CourseDetail {
+  const cec = resolveCecHours({
+    cec_hours: row.cec_hours,
+    short_description: row.short_description,
+    description: row.description,
+    meta: row.meta,
+  });
+
   return {
     id: String(row.wp_id),
     slug: row.slug,
@@ -59,12 +68,17 @@ function mapWpExportToCourseDetail(row: WpExportCourse): CourseDetail {
     level: row.level ?? null,
     category: row.category ?? null,
     iicrc_discipline: row.iicrc_discipline ?? inferDisciplineFromWpExport(row) ?? null,
-    cec_hours: null,
+    cec_hours: resolveCecHoursLabelForSlug(row.slug, cec),
     duration_hours: null,
     thumbnail_url: resolveAssetUrl(row.thumbnail_url),
     module_count: null,
     instructor: null,
   };
+}
+
+function withCourseCecFallback(course: CourseDetail): CourseDetail {
+  const cec_hours = resolveCecHoursLabelForSlug(course.slug, course.cec_hours);
+  return cec_hours ? { ...course, cec_hours } : course;
 }
 
 async function getCourse(slug: string): Promise<CourseDetail | null> {
@@ -73,7 +87,7 @@ async function getCourse(slug: string): Promise<CourseDetail | null> {
   if (process.env.DATABASE_URL?.trim()) {
     try {
       const fromDb = await getPublishedCourseDetailBySlugFromDatabase(slug);
-      if (fromDb) return fromDb;
+      if (fromDb) return withCourseCecFallback(fromDb);
     } catch (e) {
       console.error('[courses/[slug]] Failed to load course from database', e);
     }
@@ -83,7 +97,7 @@ async function getCourse(slug: string): Promise<CourseDetail | null> {
   const exported = loadWpExportCourses();
   if (exported && exported.length > 0) {
     const match = exported.find((c) => (c.slug ?? '').trim().toLowerCase() === targetSlug);
-    if (match) return mapWpExportToCourseDetail(match);
+    if (match) return withCourseCecFallback(mapWpExportToCourseDetail(match));
   }
 
   const base = backendUrl.replace(/\/$/, '');
@@ -95,7 +109,8 @@ async function getCourse(slug: string): Promise<CourseDetail | null> {
     });
     if (res.status === 404) return null;
     if (!res.ok) return null;
-    return res.json();
+    const data = (await res.json()) as CourseDetail;
+    return withCourseCecFallback(data);
   } catch {
     return null;
   }
