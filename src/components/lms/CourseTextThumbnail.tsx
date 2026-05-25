@@ -324,6 +324,18 @@ export function CourseTextThumbnail({
               IICRC {code}
             </span>
           )}
+          {cecHours && variant === 'card' ? (
+            <span
+              className="rounded px-1.5 py-0.5 text-[9px] font-bold tabular-nums"
+              style={{
+                color: '#7ee8ff',
+                background: 'rgba(0,245,255,0.18)',
+                border: '1px solid rgba(0,245,255,0.35)',
+              }}
+            >
+              {cecHours} CEC{cecHours === '1' ? '' : 's'}
+            </span>
+          ) : null}
           {showCategory && (
             <span
               className="line-clamp-1 max-w-full rounded px-1.5 py-0.5 text-[9px] font-medium text-white/80"
