@@ -7,9 +7,11 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
 import { ADMIN_COOKIE_NAME } from '@/lib/admin/admin-constants';
+import { getPostLoginRedirectPath, isLmsClaimsAllowedAdminPanel } from '@/lib/admin/admin-auth';
 import { isValidAdminSessionCookie } from '@/lib/admin/admin-session-edge';
-import { internalToolsEnabled, isInternalToolPath } from '@/lib/internal-tools';
+import type { SessionClaims } from '@/lib/auth/session-jwt';
 import { verifySessionToken } from '@/lib/auth/session-jwt';
+import { internalToolsEnabled, isInternalToolPath } from '@/lib/internal-tools';
 
 interface User {
   id: string;
@@ -77,6 +79,21 @@ export async function updateSession(request: NextRequest) {
     isAdminPath &&
     (await isValidAdminSessionCookie(request.cookies.get(ADMIN_COOKIE_NAME)?.value));
 
+  if (isAdminPath && user && !adminSessionValid) {
+    const claims: SessionClaims = {
+      sub: user.id,
+      email: user.email,
+      full_name: 'User',
+      role: user.roles?.[0] ?? 'student',
+    };
+    if (!isLmsClaimsAllowedAdminPanel(claims)) {
+      const url = request.nextUrl.clone();
+      url.pathname = '/dashboard/student';
+      url.search = '';
+      return NextResponse.redirect(url);
+    }
+  }
+
   const protectedPaths = ['/dashboard', '/student', '/instructor'];
   const isProtectedPath =
     protectedPaths.some((path) => pathname.startsWith(path)) ||
@@ -100,11 +117,15 @@ export async function updateSession(request: NextRequest) {
 
   if (isAuthPath && user) {
     const url = request.nextUrl.clone();
+    const claims: SessionClaims = {
+      sub: user.id,
+      email: user.email,
+      full_name: 'User',
+      role: user.roles?.[0] ?? 'student',
+    };
     const next =
       request.nextUrl.searchParams.get('next') ?? request.nextUrl.searchParams.get('redirect');
-    const safePath =
-      next && next.startsWith('/') && !next.startsWith('//') ? next : '/dashboard/student';
-    url.pathname = safePath;
+    url.pathname = getPostLoginRedirectPath(claims, next);
     url.searchParams.delete('next');
     url.searchParams.delete('redirect');
     return NextResponse.redirect(url);
