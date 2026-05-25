@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { isCoursesCatalogFile } from './courses-catalog-types';
+import { enrichCourseWithCecHours } from './cec-hours';
 import { readWpExportCoursesJsonOrThrow } from './wp-export-courses-json';
 
 const HREF_RE = /carsi\.com\.au\/courses\/([^/"']+)\//g;
@@ -87,10 +88,12 @@ export function getPublishedWpImportRows(appRoot: string): {
   const excludeSlugs = buildSeedExclusionWpSlugs(seedSlugs, seedTitles, wpRaw);
 
   const wp = JSON.parse(wpRaw) as WpExportCourseRow[];
-  const rows = wp.filter(
-    (c) =>
-      !excludeSlugs.has(c.slug) && (c.status ?? '').trim().toLowerCase() === 'published'
-  );
+  const rows = wp
+    .filter(
+      (c) =>
+        !excludeSlugs.has(c.slug) && (c.status ?? '').trim().toLowerCase() === 'published'
+    )
+    .map((c) => enrichCourseWithCecHours(c));
 
   return { rows, excludeSlugs };
 }
