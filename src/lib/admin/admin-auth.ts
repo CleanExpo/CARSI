@@ -47,6 +47,29 @@ export function isLmsClaimsAllowedAdminPanel(claims: SessionClaims): boolean {
   return getAdminPanelAllowedEmails().has(claims.email.trim().toLowerCase());
 }
 
+/** Default landing after sign-in: admin panel for allowlisted emails, student overview otherwise. */
+export function getDefaultAppPathForClaims(claims: SessionClaims): '/admin' | '/dashboard/student' {
+  return isLmsClaimsAllowedAdminPanel(claims) ? '/admin' : '/dashboard/student';
+}
+
+/**
+ * Honors `next` when safe; blocks `/admin` for users not on `ADMIN_PANEL_EMAILS` / admin role.
+ */
+export function getPostLoginRedirectPath(
+  claims: SessionClaims,
+  requestedNext?: string | null
+): string {
+  const defaultPath = getDefaultAppPathForClaims(claims);
+  const next = requestedNext?.trim();
+  if (!next || !next.startsWith('/') || next.startsWith('//')) {
+    return defaultPath;
+  }
+  if (next.startsWith('/admin') && !isLmsClaimsAllowedAdminPanel(claims)) {
+    return '/dashboard/student';
+  }
+  return next;
+}
+
 const ADMIN_JWT_SECRET =
   process.env.ADMIN_JWT_SECRET ??
   // Fall back to the app JWT secret so this works out-of-the-box in dev.
