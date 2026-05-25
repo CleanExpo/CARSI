@@ -17,8 +17,7 @@ export const BRAND = {
   text: 'rgba(255, 255, 255, 0.95)',
   textMuted: 'rgba(255, 255, 255, 0.45)',
   textDim: 'rgba(255, 255, 255, 0.35)',
-  font:
-    "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+  font: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
 } as const;
 
 export function escapeHtml(s: string): string {
@@ -129,7 +128,6 @@ export function buildCarsiEmailHtml(options: CarsiEmailContent): string {
         </td>
       </tr>`
     : '';
-
 
   const ctaBlock = options.cta
     ? `
