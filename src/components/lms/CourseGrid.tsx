@@ -37,6 +37,8 @@ interface Course {
   thumbnail_url?: string | null;
   updated_at?: string | null;
   instructor?: { full_name: string } | null;
+  cec_hours?: string | null;
+  duration_hours?: string | null;
 }
 
 interface CourseGridProps {
