@@ -86,6 +86,9 @@ export function LoginForm() {
     form.setValue('password', parsed.data.password, { shouldDirty: true });
 
     try {
+      const nextParam =
+        searchParams.get('next') ?? searchParams.get('redirect') ?? undefined;
+
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
@@ -94,10 +97,14 @@ export function LoginForm() {
         body: JSON.stringify({
           email: parsed.data.email,
           password: parsed.data.password,
+          next: nextParam,
         }),
       });
 
-      const data = await response.json();
+      const data = (await response.json()) as {
+        error?: string;
+        redirect_to?: string;
+      };
 
       if (!response.ok) {
         setError(data.error || 'Login failed');
@@ -106,13 +113,14 @@ export function LoginForm() {
         return;
       }
 
-      // Server-side login succeeded, cookies are set — redirect to next or student dashboard
-      const next =
-        searchParams.get('next') ?? searchParams.get('redirect') ?? '/dashboard/student';
+      const destination =
+        typeof data.redirect_to === 'string' && data.redirect_to.startsWith('/')
+          ? data.redirect_to
+          : '/dashboard/student';
+
       toast({ title: 'Signed in successfully' });
-      // Allow the toast to render before navigation.
       window.setTimeout(() => {
-        window.location.href = next;
+        window.location.href = destination;
       }, 250);
     } catch (_err) {
       setError('Failed to connect to server');
