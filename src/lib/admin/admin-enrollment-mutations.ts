@@ -1,8 +1,22 @@
 import { randomUUID } from 'node:crypto';
 
-import { getAllSeedSlugs, isSeedSlug } from '@/lib/lms-seed-catalog';
+import { getAllSeedSlugs } from '@/lib/lms-seed-catalog';
+import { getOrCreateLmsCourseFromWorkbookCatalog } from '@/lib/admin/admin-course-materialize';
 import { prisma } from '@/lib/prisma';
 import { getOrCreateCourseBySlug } from '@/lib/server/course-catalog-sync';
+import { forceCompleteEnrollment } from '@/lib/server/enrollment-service';
+
+async function resolveCourseForAdminGrant(slug: string) {
+  try {
+    return await getOrCreateLmsCourseFromWorkbookCatalog(slug);
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    if (msg === 'WORKBOOK_COURSE_NOT_FOUND') {
+      return getOrCreateCourseBySlug(slug);
+    }
+    throw e;
+  }
+}
 
 /**
  * Create an enrollment for a learner for a course in the LMS seed catalog (five pilot courses).
@@ -10,14 +24,12 @@ import { getOrCreateCourseBySlug } from '@/lib/server/course-catalog-sync';
  */
 export async function adminGrantEnrollment(params: { studentId: string; courseSlug: string }) {
   const courseSlug = params.courseSlug.trim().toLowerCase();
-  if (!isSeedSlug(courseSlug)) {
-    throw new Error('COURSE_NOT_IN_WORKBOOK');
-  }
+  if (!courseSlug) throw new Error('INVALID_COURSE_SLUG');
 
   const student = await prisma.lmsUser.findUnique({ where: { id: params.studentId } });
   if (!student) throw new Error('USER_NOT_FOUND');
 
-  const course = await getOrCreateCourseBySlug(courseSlug);
+  const course = await resolveCourseForAdminGrant(courseSlug);
 
   const existing = await prisma.lmsEnrollment.findUnique({
     where: { studentId_courseId: { studentId: params.studentId, courseId: course.id } },
@@ -35,6 +47,31 @@ export async function adminGrantEnrollment(params: { studentId: string; courseSl
   });
 
   return { kind: 'created' as const, enrollmentId: enrollment.id };
+}
+
+export async function adminGrantEnrollments(params: {
+  studentId: string;
+  courseSlugs: string[];
+}): Promise<{
+  created: number;
+  alreadyEnrolled: number;
+  enrollmentIds: string[];
+}> {
+  const unique = [...new Set(params.courseSlugs.map((s) => s.trim().toLowerCase()).filter(Boolean))];
+  if (unique.length === 0) throw new Error('NO_COURSES');
+
+  let created = 0;
+  let alreadyEnrolled = 0;
+  const enrollmentIds: string[] = [];
+
+  for (const courseSlug of unique) {
+    const result = await adminGrantEnrollment({ studentId: params.studentId, courseSlug });
+    enrollmentIds.push(result.enrollmentId);
+    if (result.kind === 'already_enrolled') alreadyEnrolled += 1;
+    else created += 1;
+  }
+
+  return { created, alreadyEnrolled, enrollmentIds };
 }
 
 /**
@@ -71,4 +108,24 @@ export async function adminRevokeEnrollment(enrollmentId: string) {
     }),
     prisma.lmsEnrollment.delete({ where: { id: en.id } }),
   ]);
+}
+
+/** Mark one or more enrollments fully complete (all lessons + enrollment status). */
+export async function adminMarkEnrollmentsComplete(params: {
+  studentId: string;
+  enrollmentIds: string[];
+}): Promise<{ updated: number; results: { enrollmentId: string; lessonsMarked: number }[] }> {
+  const student = await prisma.lmsUser.findUnique({ where: { id: params.studentId } });
+  if (!student) throw new Error('USER_NOT_FOUND');
+
+  const uniqueIds = [...new Set(params.enrollmentIds.map((id) => id.trim()).filter(Boolean))];
+  if (uniqueIds.length === 0) throw new Error('NO_ENROLLMENTS');
+
+  const results: { enrollmentId: string; lessonsMarked: number }[] = [];
+  for (const enrollmentId of uniqueIds) {
+    const r = await forceCompleteEnrollment(enrollmentId, params.studentId);
+    results.push({ enrollmentId, lessonsMarked: r.lessonsMarked });
+  }
+
+  return { updated: results.length, results };
 }
