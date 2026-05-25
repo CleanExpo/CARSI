@@ -50,6 +50,56 @@ async function lessonTotalsForCourse(courseId: string): Promise<{ ids: string[];
   return { ids, total: ids.length };
 }
 
+/** Admin/support: mark every lesson in an enrollment complete and sync enrollment status. */
+export async function forceCompleteEnrollment(
+  enrollmentId: string,
+  studentId: string,
+): Promise<{ lessonsMarked: number }> {
+  const en = await prisma.lmsEnrollment.findFirst({
+    where: { id: enrollmentId, studentId },
+    select: { id: true, studentId: true, courseId: true },
+  });
+  if (!en) throw new Error('ENROLLMENT_NOT_FOUND');
+
+  const { ids, total } = await lessonTotalsForCourse(en.courseId);
+  const now = new Date();
+
+  if (total === 0) {
+    await prisma.lmsEnrollment.update({
+      where: { id: en.id },
+      data: { status: 'completed', completedAt: now },
+    });
+    return { lessonsMarked: 0 };
+  }
+
+  await prisma.$transaction([
+    ...ids.map((lessonId) =>
+      prisma.lmsLessonProgress.upsert({
+        where: { studentId_lessonId: { studentId: en.studentId, lessonId } },
+        create: {
+          studentId: en.studentId,
+          lessonId,
+          completed: true,
+          completedAt: now,
+          lastAccessedAt: now,
+        },
+        update: {
+          completed: true,
+          completedAt: now,
+          lastAccessedAt: now,
+        },
+      }),
+    ),
+    prisma.lmsEnrollment.update({
+      where: { id: en.id },
+      data: { lastAccessedLessonId: ids[ids.length - 1]! },
+    }),
+  ]);
+
+  await syncEnrollmentCompletion(en.id, en.studentId, en.courseId);
+  return { lessonsMarked: total };
+}
+
 export async function syncEnrollmentCompletion(
   enrollmentId: string,
   studentId: string,
