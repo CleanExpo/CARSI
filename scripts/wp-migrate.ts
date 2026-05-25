@@ -23,6 +23,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
+import { resolveCecHours } from '../src/lib/seed/cec-hours';
+
 // ============================================================================
 // Configuration
 // ============================================================================
@@ -255,19 +257,6 @@ function detectIICRCDiscipline(categories: string[], title: string): string | nu
   return null;
 }
 
-function extractCECHours(metaData: Array<{ key: string; value: unknown }>): number | null {
-  // Look for CEC-related meta fields
-  const cecKeys = ['cec_hours', '_cec_hours', 'iicrc_cec', 'continuing_education_credits'];
-
-  for (const meta of metaData) {
-    if (cecKeys.includes(meta.key.toLowerCase())) {
-      const val = parseFloat(String(meta.value));
-      if (!isNaN(val)) return val;
-    }
-  }
-
-  return null;
-}
 
 // ============================================================================
 // WordPress API Fetchers
@@ -552,7 +541,12 @@ function transformToLMSCourses(products: WPProduct[], categories: WPCategory[]):
       tags: tagNames,
       iicrc_discipline:
         product.course_data?.iicrc_discipline || detectIICRCDiscipline(categoryNames, product.name),
-      cec_hours: product.course_data?.cec_hours || extractCECHours(product.meta_data) || null,
+      cec_hours: resolveCecHours({
+        cec_hours: product.course_data?.cec_hours ?? null,
+        short_description: stripHTML(product.short_description),
+        description: product.description,
+        meta: product.meta_data,
+      }),
       cppp40421_unit_code: null,
       cppp40421_unit_name: null,
       meta: {
