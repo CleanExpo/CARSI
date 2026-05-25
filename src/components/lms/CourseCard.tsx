@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { BookOpen, Clock, Layers } from 'lucide-react';
+import { Award, BookOpen, Clock, Layers } from 'lucide-react';
 import Link from 'next/link';
 
 import { useCourseBrowseBase } from '@/components/lms/CourseBrowseContext';
@@ -113,6 +113,20 @@ export function CourseCard({ course, priorityImage }: CourseCardProps) {
           {course.title}
         </h3>
 
+        {course.cec_hours ? (
+          <p
+            className="mb-2 inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-semibold"
+            style={{
+              color: '#7ee8ff',
+              background: 'rgba(0,245,255,0.1)',
+              border: '1px solid rgba(0,245,255,0.22)',
+            }}
+          >
+            <Award className="h-3 w-3 shrink-0" aria-hidden />
+            {course.cec_hours} IICRC CEC{course.cec_hours === '1' ? '' : 's'}
+          </p>
+        ) : null}
+
         {course.short_description && (
           <p
             className="mb-2 line-clamp-2 text-xs leading-relaxed"
@@ -142,6 +156,12 @@ export function CourseCard({ course, priorityImage }: CourseCardProps) {
                 {course.lesson_count}
               </span>
             )}
+            {course.cec_hours ? (
+              <span className="flex items-center gap-1" title="IICRC continuing education credits">
+                <Award className="h-3 w-3" style={{ color: '#7ee8ff' }} />
+                {course.cec_hours}
+              </span>
+            ) : null}
             {course.updated_at && (
               <span className="flex items-center gap-1">
                 <Clock className="h-3 w-3" />
