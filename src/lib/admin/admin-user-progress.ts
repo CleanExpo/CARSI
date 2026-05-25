@@ -1,4 +1,5 @@
 import type { AdminCatalogCourse } from '@/lib/admin/load-admin-catalog';
+import { loadAdminCatalogFromXlsx } from '@/lib/admin/load-admin-catalog';
 import { buildAdminCatalogFromSeed } from '@/lib/lms-seed-catalog';
 import { prisma } from '@/lib/prisma';
 
@@ -291,7 +292,13 @@ export async function getAdminUserDetail(userId: string): Promise<{
   roleNames: string[];
   catalogCourses: AdminCatalogCourseOption[];
 } | null> {
-  const ctx = getAdminCatalogContext();
+  const workbook = await loadAdminCatalogFromXlsx();
+  const catalogBySlug = new Map(workbook.courses.map((c) => [c.slug, c]));
+  const catalogSlugs = workbook.courses.map((c) => c.slug);
+  const catalogCourses = workbook.courses
+    .map((c) => ({ slug: c.slug, title: c.title, moduleCount: c.moduleCount }))
+    .sort((a, b) => a.title.localeCompare(b.title));
+
   const user = await prisma.lmsUser.findUnique({
     where: { id: userId },
     select: {
@@ -301,7 +308,7 @@ export async function getAdminUserDetail(userId: string): Promise<{
   });
   if (!user) return null;
 
-  const enrollments = await fetchCatalogEnrollmentsForUsers([userId], ctx.catalogSlugs);
+  const enrollments = await fetchCatalogEnrollmentsForUsers([userId], catalogSlugs);
   const courseIds = Array.from(new Set(enrollments.map((e) => e.courseId)));
   const completedLessonCounts = await fetchCompletedLessonCounts([userId], courseIds);
   const lastActiveMap = await fetchLastActiveByUserId([userId]);
@@ -310,7 +317,7 @@ export async function getAdminUserDetail(userId: string): Promise<{
   const progress = mapUserToAdminProgress(
     user,
     enrollments,
-    ctx.catalogBySlug,
+    catalogBySlug,
     completedLessonCounts,
     lastActiveMap.get(userId) ?? null,
   );
@@ -318,6 +325,6 @@ export async function getAdminUserDetail(userId: string): Promise<{
   return {
     user: progress,
     roleNames,
-    catalogCourses: ctx.catalogCourses,
+    catalogCourses,
   };
 }
