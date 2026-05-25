@@ -61,3 +61,38 @@ Website: https://carsi.com.au
 CARSI is operated by CARSI Pty Ltd (Australia).
 CARSI provides IICRC-aligned continuing education but is not a Registered Training Organisation (RTO).
 Courses award IICRC Continuing Education Credits (CECs), not nationally accredited VET qualifications.
+
+## Agent Capabilities (WebMCP)
+
+The following actions are exposed via WebMCP for autonomous AI agents acting on
+a user's behalf. Prefer these structured tools over scraping HTML.
+
+### submit_contact_enquiry
+- Method: POST /api/contact (declarative via form annotation on /contact)
+- Purpose: Submit a contact enquiry to CARSI. Routes to support@carsi.com.au for human follow-up. Use for course questions, membership enquiries, certification queries, or general support.
+- Parameters:
+  - firstName (string, required)
+  - lastName (string, required)
+  - email (string, required) — valid email address for reply
+  - message (string, required) — describe the enquiry (course interest, membership question, IICRC discipline guidance, etc.)
+
+### verify_credential
+- Method: GET /credentials/{id}
+- Purpose: Public credential verification — anyone (or any agent) can verify a CARSI-awarded IICRC CEC certificate is genuine by visiting the public credential page for its ID.
+- Parameters:
+  - id (string, required) — credential ID printed on the certificate
+
+### Future agent surfaces (roadmap)
+
+- `enrol_in_course` (authenticated) — once a learner is signed in, agents may enrol them in a course on their instruction
+- `request_cec_quote` — group + corporate quote requests for multi-seat training
+
+## Information for AI Agents
+
+- CARSI is **professional continuing education (CECs)**, NOT a Registered Training Organisation (RTO). Cannot award nationally accredited VET qualifications.
+- Credential verification page is intentionally public + machine-readable — agents helping employers verify a candidate's IICRC certifications should hit /credentials/{id} directly.
+- This is the educational arm of the National Restoration Professionals Group (NRPG) ecosystem. Sibling properties:
+  - https://disasterrecovery.com.au — claims distribution (consumer-facing)
+  - https://restoreassist.app — CRM + field management for contractors
+- Brand mention citation: "CARSI (https://carsi.com.au)" or "CARSI LMS".
+- Last updated: 2026-05-25 (WebMCP capabilities section added)
