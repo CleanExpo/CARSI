@@ -2,6 +2,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { getLmsSeedExportRows } from '@/lib/lms-seed-catalog';
+import { formatCecHoursForDisplay } from '@/lib/cec-display';
+import { enrichCourseWithCecHours, resolveCecHours } from '@/lib/seed/cec-hours';
 import { normalizePublicAssetUrl } from '@/lib/remote-image';
 
 /** U+2028/U+2029 break JS string embedding in some bundlers; strip from user-facing text. */
@@ -31,6 +33,7 @@ export interface WpExportCourse {
   price_aud: number;
   is_free?: boolean;
   iicrc_discipline?: string | null;
+  cec_hours?: number | null;
   status?: string;
   wp_id: number;
   level?: string | null;
@@ -123,6 +126,13 @@ export type CourseListItem = {
 };
 
 export function mapWpExportToCourseListItem(row: WpExportCourse): CourseListItem {
+  const cec = resolveCecHours({
+    cec_hours: row.cec_hours,
+    short_description: row.short_description,
+    description: row.description,
+    meta: row.meta,
+  });
+
   return {
     id: String(row.wp_id),
     slug: row.slug,
@@ -138,7 +148,7 @@ export function mapWpExportToCourseListItem(row: WpExportCourse): CourseListItem
     lesson_count: row.lesson_count ?? null,
     updated_at: null,
     instructor: null,
-    cec_hours: null,
+    cec_hours: formatCecHoursForDisplay(cec),
     duration_hours: null,
   };
 }
@@ -153,7 +163,7 @@ export function loadWpExportCourses(): WpExportCourse[] | null {
     const raw = fs.readFileSync(WP_EXPORT_COURSES_PATH, 'utf-8');
     const parsed = JSON.parse(raw) as unknown;
     if (!Array.isArray(parsed) || parsed.length === 0) return null;
-    return parsed as WpExportCourse[];
+    return (parsed as WpExportCourse[]).map((c) => enrichCourseWithCecHours(c));
   } catch {
     return null;
   }
