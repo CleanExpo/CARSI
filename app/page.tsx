@@ -1,4 +1,3 @@
-import type { Metadata } from 'next';
 import {
   AnimatedCard,
   AnimatedHero,
@@ -24,6 +23,7 @@ import {
 } from '@/lib/server/public-catalogue-facts';
 import { getHomepageFeaturedCourses } from '@/lib/server/public-courses-list';
 import type { CourseListItem } from '@/lib/wordpress-export-courses';
+import type { LucideIcon } from 'lucide-react';
 import {
   ArrowRight,
   Award,
@@ -47,7 +47,7 @@ import {
   Sparkles,
   Users,
 } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
+import type { Metadata } from 'next';
 import Link from 'next/link';
 
 /** Always render homepage on the server so featured courses load from `DATABASE_URL` at request time (not a static build snapshot). */
@@ -158,47 +158,40 @@ const onlineHighlights = [
   },
 ] as const;
 
-function buildHomeFaqs(facts: {
-  publishedCourseCount: number;
-  disciplineCodes: string[];
-}) {
+function buildHomeFaqs(facts: { publishedCourseCount: number; disciplineCodes: string[] }) {
   const n = facts.publishedCourseCount;
   const d = facts.disciplineCodes.length;
   const coursePhrase =
-    n > 0
-      ? `${n} published course${n === 1 ? '' : 's'}`
-      : 'IICRC CEC-approved courses';
+    n > 0 ? `${n} published course${n === 1 ? '' : 's'}` : 'IICRC CEC-approved courses';
   const discPhrase =
-    d > 0
-      ? `${d} IICRC discipline${d === 1 ? '' : 's'}`
-      : 'the core IICRC disciplines';
+    d > 0 ? `${d} IICRC discipline${d === 1 ? '' : 's'}` : 'the core IICRC disciplines';
 
   return [
-  {
-    question: 'What is CARSI?',
-    answer: `CARSI is an Australian online training platform offering IICRC CEC-approved courses for cleaning and restoration professionals. With ${coursePhrase} across ${discPhrase}, CARSI enables technicians to maintain their certification entirely online.`,
-  },
-  {
-    question: 'How do IICRC CECs work?',
-    answer:
-      'IICRC Continuing Education Credits (CECs) are required every two years to maintain certified technician status. Each CARSI course awards a specific number of CECs upon completion. Credits are tracked automatically in your student dashboard and can be reported to the IICRC for renewal.',
-  },
-  {
-    question: 'Is CARSI training recognised by insurers?',
-    answer:
-      'CARSI courses are IICRC CEC-approved, and IICRC certification is recognised by major Australian insurers including IAG, Suncorp, and QBE as evidence of professional competency. CARSI is also a core pillar of the NRPG onboarding pathway.',
-  },
-  {
-    question: 'Can I complete training at my own pace?',
-    answer:
-      'Yes. All CARSI courses are available 24/7 and fully self-paced. You can pause mid-lesson, resume between jobs, and fit study around shift work or on-call rosters. There are no deadlines or scheduled class times.',
-  },
-  {
-    question: 'What industries does CARSI serve?',
-    answer:
-      'CARSI serves over 12 industries including healthcare, hospitality, aged care, mining and resources, commercial cleaning, government and defence, education, property management, strata, retail, childcare, and construction.',
-  },
-];
+    {
+      question: 'What is CARSI?',
+      answer: `CARSI is an Australian online training platform offering IICRC CEC-approved courses for cleaning and restoration professionals. With ${coursePhrase} across ${discPhrase}, CARSI enables technicians to maintain their certification entirely online.`,
+    },
+    {
+      question: 'How do IICRC CECs work?',
+      answer:
+        'IICRC Continuing Education Credits (CECs) are required every two years to maintain certified technician status. Each CARSI course awards a specific number of CECs upon completion. Credits are tracked automatically in your student dashboard and can be reported to the IICRC for renewal.',
+    },
+    {
+      question: 'Is CARSI training recognised by insurers?',
+      answer:
+        'CARSI courses are IICRC CEC-approved, and IICRC certification is recognised by major Australian insurers including IAG, Suncorp, and QBE as evidence of professional competency. CARSI is also a core pillar of the NRPG onboarding pathway.',
+    },
+    {
+      question: 'Can I complete training at my own pace?',
+      answer:
+        'Yes. All CARSI courses are available 24/7 and fully self-paced. You can pause mid-lesson, resume between jobs, and fit study around shift work or on-call rosters. There are no deadlines or scheduled class times.',
+    },
+    {
+      question: 'What industries does CARSI serve?',
+      answer:
+        'CARSI serves over 12 industries including healthcare, hospitality, aged care, mining and resources, commercial cleaning, government and defence, education, property management, strata, retail, childcare, and construction.',
+    },
+  ];
 }
 
 // ---------------------------------------------------------------------------
@@ -272,9 +265,7 @@ export default async function Home() {
       : ['WRT', 'CRT', 'ASD', 'AMRT', 'FSRT', 'OCT', 'CCT']
   );
   const disciplineCountLabel =
-    catalogueFacts.disciplineCodes.length > 0
-      ? catalogueFacts.disciplineCodes.length
-      : 7;
+    catalogueFacts.disciplineCodes.length > 0 ? catalogueFacts.disciplineCodes.length : 7;
 
   return (
     <div id="main-content" className="relative z-10 min-h-screen bg-[#050505]">
@@ -374,7 +365,7 @@ export default async function Home() {
         title="IICRC discipline map & pathways"
         className="bg-gradient-to-b from-[#2490ed]/[0.08] via-[#050505] to-transparent"
       >
-        <div className="grid gap-10 lg:grid-cols-12 lg:gap-14 lg:items-start">
+        <div className="grid gap-10 lg:grid-cols-12 lg:items-start lg:gap-14">
           <div className="space-y-6 lg:col-span-4">
             <p className="text-base leading-relaxed text-white/60 md:text-lg">
               Seven core pathways orbit <AcronymTooltip term="IICRC" /> standards — the same mental
@@ -383,14 +374,20 @@ export default async function Home() {
             </p>
             <ul className="space-y-3 text-sm text-white/45">
               <li className="flex gap-3">
-                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#2490ed]" aria-hidden />
+                <span
+                  className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#2490ed]"
+                  aria-hidden
+                />
                 <span>
                   <strong className="text-white/70">Interactive hub</strong> — hover or tap any node
                   to see the full certification name and jump into filtered courses.
                 </span>
               </li>
               <li className="flex gap-3">
-                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#00d4aa]" aria-hidden />
+                <span
+                  className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#00d4aa]"
+                  aria-hidden
+                />
                 <span>
                   <strong className="text-white/70">{disciplineCountLabel} disciplines</strong> in
                   this view, aligned with CARSI&apos;s published catalogue.
@@ -525,7 +522,7 @@ export default async function Home() {
             <AnimatedCard key={item.title} index={i}>
               <div className="group relative h-full overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.06] to-transparent p-6 shadow-[0_20px_60px_-40px_rgba(0,0,0,0.85)] transition-all duration-300 hover:border-white/18">
                 <div
-                  className="pointer-events-none absolute -right-8 -top-8 h-28 w-28 rounded-full opacity-30 blur-2xl transition-opacity group-hover:opacity-50"
+                  className="pointer-events-none absolute -top-8 -right-8 h-28 w-28 rounded-full opacity-30 blur-2xl transition-opacity group-hover:opacity-50"
                   style={{ background: item.color }}
                   aria-hidden
                 />
@@ -550,7 +547,10 @@ export default async function Home() {
         className="bg-gradient-to-b from-[#2490ed]/[0.05] to-transparent"
       >
         <div className="relative mx-auto max-w-3xl">
-          <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-[#2490ed]/20 to-transparent opacity-40 blur-3xl" aria-hidden />
+          <div
+            className="absolute inset-0 rounded-2xl bg-gradient-to-b from-[#2490ed]/20 to-transparent opacity-40 blur-3xl"
+            aria-hidden
+          />
           <div className="relative rounded-2xl border border-white/10 bg-gradient-to-b from-[#0a1524]/95 to-[#050505] p-6 shadow-[0_28px_90px_-48px_rgba(36,144,237,0.45)] sm:p-10">
             <div
               className="absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-[#2490ed]/60 to-transparent"
@@ -662,7 +662,8 @@ export default async function Home() {
                   .{' '}
                   {catalogueFacts.publishedCourseCount > 0 ? (
                     <>
-                      CARSI offers {formatCourseCountForCopy(catalogueFacts.publishedCourseCount)}{' '}
+                      CARSI offers{' '}
+                      {formatCourseCountForCopy(catalogueFacts.publishedCourseCount)}{' '}
                     </>
                   ) : (
                     <>CARSI offers </>
@@ -816,7 +817,8 @@ export default async function Home() {
                 <div
                   className="flex h-14 w-14 items-center justify-center rounded-2xl text-lg font-bold shadow-[0_12px_40px_-16px_rgba(36,144,237,0.5)]"
                   style={{
-                    background: 'linear-gradient(135deg, rgba(36,144,237,0.25), rgba(255,255,255,0.06))',
+                    background:
+                      'linear-gradient(135deg, rgba(36,144,237,0.25), rgba(255,255,255,0.06))',
                     border: '1px solid rgba(255,255,255,0.2)',
                     color: '#2490ed',
                   }}
@@ -929,7 +931,7 @@ export default async function Home() {
             }}
           >
             <div
-              className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full blur-3xl"
+              className="pointer-events-none absolute -top-20 -right-20 h-64 w-64 rounded-full blur-3xl"
               style={{ background: 'rgba(36,144,237,0.2)' }}
               aria-hidden
             />
@@ -950,7 +952,8 @@ export default async function Home() {
                 <div
                   className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl text-base font-bold tracking-tight shadow-[0_16px_48px_-20px_rgba(36,144,237,0.45)]"
                   style={{
-                    background: 'linear-gradient(145deg, rgba(255,255,255,0.12), rgba(36,144,237,0.2))',
+                    background:
+                      'linear-gradient(145deg, rgba(255,255,255,0.12), rgba(36,144,237,0.2))',
                     border: '1px solid rgba(255,255,255,0.2)',
                     color: '#fff',
                   }}
@@ -995,11 +998,7 @@ export default async function Home() {
       </AnimatedSection>
 
       {/* ── Certificate Preview ──────────────────────────────────────────── */}
-      <AnimatedSection
-        label="Credentials"
-        title="Verifiable Digital Certificates"
-        minimalHeader
-      >
+      <AnimatedSection label="Credentials" title="Verifiable Digital Certificates" minimalHeader>
         <div className="mx-auto max-w-xl">
           <p className="mb-6 text-center text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
             Every completed course earns you a verifiable digital certificate with a public URL you
@@ -1023,7 +1022,7 @@ export default async function Home() {
               }}
             />
             <div
-              className="pointer-events-none absolute -right-24 top-1/2 h-72 w-72 -translate-y-1/2 rounded-full blur-3xl"
+              className="pointer-events-none absolute top-1/2 -right-24 h-72 w-72 -translate-y-1/2 rounded-full blur-3xl"
               style={{ background: 'rgba(237,157,36,0.12)' }}
               aria-hidden
             />
@@ -1058,8 +1057,7 @@ export default async function Home() {
                   href="/courses"
                   className="inline-flex items-center gap-2 rounded-full bg-[#ed9d24] px-8 py-3.5 text-sm font-bold text-[#1a1205] shadow-[0_12px_40px_-12px_rgba(237,157,36,0.55)] transition-transform hover:scale-[1.02]"
                 >
-                  Browse all courses{' '}
-                  <ArrowRight className="h-4 w-4" />
+                  Browse all courses <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
             </div>
