@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+import { getPostLoginRedirectPath } from '@/lib/admin/admin-auth';
 import { signSessionToken } from '@/lib/auth/session-jwt';
 import { authenticateWithPassword } from '@/lib/server/lms-auth';
 
@@ -7,9 +8,17 @@ const COOKIE_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
 
 export async function POST(request: NextRequest) {
   try {
-    const body = (await request.json()) as { email?: unknown; password?: unknown };
+    const body = (await request.json()) as {
+      email?: unknown;
+      password?: unknown;
+      next?: unknown;
+      redirect?: unknown;
+    };
     const email = typeof body.email === 'string' ? body.email.trim() : '';
     const password = typeof body.password === 'string' ? body.password : '';
+    const requestedNext =
+      (typeof body.next === 'string' ? body.next : null) ??
+      (typeof body.redirect === 'string' ? body.redirect : null);
 
     if (!email || !password) {
       return NextResponse.json({ error: 'Email and password are required' }, { status: 400 });
@@ -31,6 +40,7 @@ export async function POST(request: NextRequest) {
 
     const response = NextResponse.json({
       success: true,
+      redirect_to: getPostLoginRedirectPath(claims, requestedNext),
       user: {
         id: claims.sub,
         email: claims.email,
