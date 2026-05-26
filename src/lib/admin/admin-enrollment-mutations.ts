@@ -121,6 +121,14 @@ export async function adminMarkEnrollmentsComplete(params: {
   const uniqueIds = [...new Set(params.enrollmentIds.map((id) => id.trim()).filter(Boolean))];
   if (uniqueIds.length === 0) throw new Error('NO_ENROLLMENTS');
 
+  const owned = await prisma.lmsEnrollment.findMany({
+    where: { id: { in: uniqueIds }, studentId: params.studentId },
+    select: { id: true },
+  });
+  if (owned.length !== uniqueIds.length) {
+    throw new Error('ENROLLMENT_NOT_FOUND');
+  }
+
   const results: { enrollmentId: string; lessonsMarked: number }[] = [];
   for (const enrollmentId of uniqueIds) {
     const r = await forceCompleteEnrollment(enrollmentId, params.studentId);

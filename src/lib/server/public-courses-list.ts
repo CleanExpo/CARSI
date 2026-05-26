@@ -144,7 +144,7 @@ function mapLmsCourseToPublicListItem(c: LmsCoursePublicListRow): CourseListItem
     module_count: c._count.modules,
     updated_at: c.updatedAt.toISOString(),
     instructor: c.instructor?.fullName ? { full_name: c.instructor.fullName } : null,
-    cec_hours: c.cecHours != null ? String(c.cecHours) : null,
+    cec_hours: resolveCecHoursLabelForSlug(c.slug, c.cecHours),
     duration_hours: c.durationHours != null ? String(c.durationHours) : null,
   };
 }

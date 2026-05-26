@@ -607,8 +607,14 @@ export function AdminUserDetailClient({
                     pendingRevoke={pendingRevokeId === e.enrollmentId}
                     pendingComplete={pendingCompleteIds.has(e.enrollmentId)}
                     onToggleSelect={() => toggleEnrollmentSelection(e.enrollmentId)}
-                    onRevoke={(id) => void revokeEnrollment(id)}
-                    onMarkComplete={(id) => void markEnrollmentsComplete([id])}
+                    onRevoke={
+                      bulkCompletePending ? () => {} : (id) => void revokeEnrollment(id)
+                    }
+                    onMarkComplete={
+                      bulkCompletePending
+                        ? () => {}
+                        : (id) => void markEnrollmentsComplete([id])
+                    }
                   />
                 );
               })}

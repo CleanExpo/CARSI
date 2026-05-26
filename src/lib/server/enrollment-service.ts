@@ -65,10 +65,7 @@ export async function forceCompleteEnrollment(
   const now = new Date();
 
   if (total === 0) {
-    await prisma.lmsEnrollment.update({
-      where: { id: en.id },
-      data: { status: 'completed', completedAt: now },
-    });
+    await syncEnrollmentCompletion(en.id, en.studentId, en.courseId);
     return { lessonsMarked: 0 };
   }
 

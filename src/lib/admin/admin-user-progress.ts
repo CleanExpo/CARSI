@@ -292,10 +292,17 @@ export async function getAdminUserDetail(userId: string): Promise<{
   roleNames: string[];
   catalogCourses: AdminCatalogCourseOption[];
 } | null> {
-  const workbook = await loadAdminCatalogFromXlsx();
-  const catalogBySlug = new Map(workbook.courses.map((c) => [c.slug, c]));
-  const catalogSlugs = workbook.courses.map((c) => c.slug);
-  const catalogCourses = workbook.courses
+  let workbookCourses: AdminCatalogCourse[];
+  try {
+    const workbook = await loadAdminCatalogFromXlsx();
+    workbookCourses = workbook.courses;
+  } catch (err) {
+    console.error('[admin] workbook catalog load failed, using seed fallback', err);
+    workbookCourses = buildAdminCatalogFromSeed().courses;
+  }
+  const catalogBySlug = new Map(workbookCourses.map((c) => [c.slug, c]));
+  const catalogSlugs = workbookCourses.map((c) => c.slug);
+  const catalogCourses = workbookCourses
     .map((c) => ({ slug: c.slug, title: c.title, moduleCount: c.moduleCount }))
     .sort((a, b) => a.title.localeCompare(b.title));
 

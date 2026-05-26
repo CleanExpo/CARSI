@@ -7,7 +7,10 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
 import { ADMIN_COOKIE_NAME } from '@/lib/admin/admin-constants';
-import { getPostLoginRedirectPath, isLmsClaimsAllowedAdminPanel } from '@/lib/admin/admin-auth';
+import {
+  getPostLoginRedirectPath,
+  isLmsClaimsAllowedAdminPanel,
+} from '@/lib/admin/admin-panel-access';
 import { isValidAdminSessionCookie } from '@/lib/admin/admin-session-edge';
 import type { SessionClaims } from '@/lib/auth/session-jwt';
 import { verifySessionToken } from '@/lib/auth/session-jwt';

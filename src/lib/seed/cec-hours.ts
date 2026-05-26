@@ -57,11 +57,11 @@ export function extractCecHoursFromMeta(meta: unknown): number | null {
 
   if (typeof meta === 'object') {
     const record = meta as Record<string, unknown>;
-    for (const key of CEC_META_KEYS) {
-      if (key in record) {
-        const hours = parsePositiveHours(record[key]);
-        if (hours != null) return hours;
-      }
+    for (const [rawKey, rawValue] of Object.entries(record)) {
+      const key = rawKey.toLowerCase();
+      if (!CEC_META_KEYS.includes(key as (typeof CEC_META_KEYS)[number])) continue;
+      const hours = parsePositiveHours(rawValue);
+      if (hours != null) return hours;
     }
   }
 

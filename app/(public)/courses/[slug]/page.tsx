@@ -77,8 +77,10 @@ function mapWpExportToCourseDetail(row: WpExportCourse): CourseDetail {
 }
 
 function withCourseCecFallback(course: CourseDetail): CourseDetail {
-  const cec_hours = resolveCecHoursLabelForSlug(course.slug, course.cec_hours);
-  return cec_hours ? { ...course, cec_hours } : course;
+  return {
+    ...course,
+    cec_hours: resolveCecHoursLabelForSlug(course.slug, course.cec_hours),
+  };
 }
 
 async function getCourse(slug: string): Promise<CourseDetail | null> {

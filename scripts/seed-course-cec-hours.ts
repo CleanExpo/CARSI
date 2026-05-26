@@ -30,13 +30,17 @@ const APP_ROOT = join(__dirname, '..');
 const dryRun = process.argv.includes('--dry-run');
 const overwrite = process.argv.includes('--overwrite');
 
+function normalizeSlug(slug: string): string {
+  return slug.trim().toLowerCase();
+}
+
 function buildCecBySlug(): Map<string, number> {
   const map = new Map<string, number>();
 
   const wpRaw = readWpExportCoursesJsonOrThrow(APP_ROOT);
   const allWp = JSON.parse(wpRaw) as WpExportCourseRow[];
   for (const row of allWp.map((c) => enrichCourseWithCecHours(c))) {
-    if (row.cec_hours != null) map.set(row.slug, row.cec_hours);
+    if (row.cec_hours != null) map.set(normalizeSlug(row.slug), row.cec_hours);
   }
 
   const catalogPath = join(APP_ROOT, 'data', 'seed', 'courses-catalog.json');
@@ -44,13 +48,13 @@ function buildCecBySlug(): Map<string, number> {
   if (isCoursesCatalogFile(catalog)) {
     for (const c of catalog.courses) {
       const hours = resolveCatalogCecHours(c);
-      if (hours != null) map.set(c.slug, hours);
+      if (hours != null) map.set(normalizeSlug(c.slug), hours);
     }
   }
 
   const { rows } = getPublishedWpImportRows(APP_ROOT);
   for (const row of rows.map((c) => enrichCourseWithCecHours(c))) {
-    if (row.cec_hours != null) map.set(row.slug, row.cec_hours);
+    if (row.cec_hours != null) map.set(normalizeSlug(row.slug), row.cec_hours);
   }
 
   return map;
@@ -69,7 +73,7 @@ async function main() {
   let missing = 0;
 
   for (const course of courses) {
-    const hours = cecBySlug.get(course.slug);
+    const hours = cecBySlug.get(normalizeSlug(course.slug));
     if (hours == null) {
       missing++;
       continue;
