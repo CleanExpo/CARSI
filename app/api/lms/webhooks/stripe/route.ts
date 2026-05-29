@@ -11,10 +11,10 @@ import { constructWebhookEvent } from '@/lib/api/stripe';
 import { getAppOrigin } from '@/lib/server/app-url';
 import { notifyCrmEnrollmentCreated } from '@/lib/server/crm-enrollment-notify';
 import { sendEnrollmentWelcomeEmail } from '@/lib/server/enrollment-email';
-import { enrollStudentInCourse } from '@/lib/server/enrollment-service';
 import { ensureGuestUserFromStripeEmail } from '@/lib/server/guest-checkout';
 import { sessionClaimsForUserId } from '@/lib/server/lms-auth';
 import { prisma } from '@/lib/prisma';
+import { fulfillCourseCheckoutForUser } from '@/lib/server/team-course-purchase';
 
 export async function POST(request: NextRequest) {
   const rawBody = await request.text();
@@ -76,24 +76,40 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ received: true });
   }
 
+  const purchaseMode = session.metadata?.purchase_mode === 'team' ? 'team' : 'self';
+  const teamSeatRaw = session.metadata?.team_seat_count;
+  const teamSeatCount = teamSeatRaw ? Number.parseInt(teamSeatRaw, 10) : undefined;
+
   try {
     const ref = typeof session.id === 'string' ? session.id : 'stripe_webhook';
-    const result = await enrollStudentInCourse(claims, slug, ref);
-    if (result !== 'already_enrolled') {
-      const origin = getAppOrigin();
+    const origin = getAppOrigin();
+    const fulfilled = await fulfillCourseCheckoutForUser({
+      claims,
+      courseSlug: slug,
+      paymentReference: ref,
+      purchaseMode,
+      teamSeatCount: Number.isFinite(teamSeatCount) ? teamSeatCount : undefined,
+    });
+
+    if (!fulfilled.alreadyEnrolled && fulfilled.enrollmentId && fulfilled.courseId) {
       void sendEnrollmentWelcomeEmail({
         studentId: claims.sub,
         courseSlug: slug,
         appOrigin: origin,
       }).catch((e) => console.error('[stripe webhook] email', e));
       notifyCrmEnrollmentCreated({
-        enrollmentId: result.enrollmentId,
+        enrollmentId: fulfilled.enrollmentId,
         studentId: claims.sub,
-        courseId: result.courseId,
+        courseId: fulfilled.courseId,
       });
     }
   } catch (e) {
-    console.error('[stripe webhook] enrolment error:', e);
+    const msg = e instanceof Error ? e.message : String(e);
+    if (msg === 'ALREADY_ON_TEAM') {
+      console.warn('[stripe webhook] team purchase blocked: user on another team');
+    } else {
+      console.error('[stripe webhook] enrolment error:', e);
+    }
   }
 
   return NextResponse.json({ received: true });
