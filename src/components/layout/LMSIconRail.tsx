@@ -13,6 +13,7 @@ import {
   Settings,
   Shield,
   UserCircle,
+  Users,
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -43,6 +44,7 @@ const topNav: NavItem[] = [
   { icon: Award, href: '/dashboard/student/credentials', label: 'Credentials' },
   { icon: ListOrdered, href: '/dashboard/student/leaderboard', label: 'Recognition' },
   { icon: FileText, href: '/dashboard/student/notes', label: 'Notes' },
+  { icon: Users, href: '/dashboard/team', label: 'Team' },
   { icon: GraduationCap, href: '/dashboard/instructor', label: 'Instructor', instructorOnly: true },
   { icon: Shield, href: '/admin', label: 'Admin', adminOnly: true },
 ];
