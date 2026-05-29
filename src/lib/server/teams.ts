@@ -56,24 +56,47 @@ export async function countTeamSeatsUsed(teamId: string): Promise<number> {
   return prisma.lmsTeamMember.count({ where: { teamId } });
 }
 
+const teamInclude = {
+  members: {
+    include: {
+      user: { select: { id: true, email: true, fullName: true } },
+    },
+  },
+  invites: {
+    where: { acceptedAt: null, expiresAt: { gt: new Date() } },
+    orderBy: { createdAt: 'desc' as const },
+  },
+};
+
 export async function getTeamForUser(userId: string) {
   const membership = await prisma.lmsTeamMember.findFirst({
     where: { userId },
     include: {
       team: {
-        include: {
-          members: {
-            include: {
-              user: { select: { id: true, email: true, fullName: true } },
-            },
-          },
-          invites: {
-            where: { acceptedAt: null, expiresAt: { gt: new Date() } },
-            orderBy: { createdAt: 'desc' },
-          },
-        },
+        include: teamInclude,
       },
     },
   });
   return membership?.team ?? null;
+}
+
+/** Membership row missing after checkout — attach owner to their course-purchase team. */
+export async function repairAndGetTeamForUser(userId: string) {
+  const direct = await getTeamForUser(userId);
+  if (direct) return direct;
+
+  const ownedCourseTeam = await prisma.lmsTeam.findFirst({
+    where: { ownerId: userId, bundleTier: 'course_purchase' },
+  });
+  if (!ownedCourseTeam) return null;
+
+  await prisma.lmsTeamMember.upsert({
+    where: {
+      teamId_userId: { teamId: ownedCourseTeam.id, userId },
+    },
+    create: { teamId: ownedCourseTeam.id, userId, role: 'owner' },
+    update: { role: 'owner' },
+  });
+
+  return getTeamForUser(userId);
 }
