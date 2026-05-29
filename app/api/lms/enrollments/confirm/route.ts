@@ -4,8 +4,7 @@ import { getStripeClient } from '@/lib/api/stripe';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { notifyCrmEnrollmentCreated } from '@/lib/server/crm-enrollment-notify';
 import { sendEnrollmentWelcomeEmail } from '@/lib/server/enrollment-email';
-import { enrollStudentInCourse } from '@/lib/server/enrollment-service';
-import { getFirstLessonLearnPath } from '@/lib/server/first-lesson';
+import { fulfillCourseCheckoutForUser } from '@/lib/server/team-course-purchase';
 import { findCourseInExport } from '@/lib/server/local-course-checkout';
 import { computeDiscountedAud, findActiveUserDiscount } from '@/lib/server/user-discounts';
 import { getOrCreateCourseBySlug } from '@/lib/server/course-catalog-sync';
@@ -33,6 +32,8 @@ export async function POST(request: NextRequest) {
   const sessionId = typeof json.session_id === 'string' ? json.session_id.trim() : '';
 
   let paymentReference: string;
+  let purchaseMode: 'self' | 'team' = 'self';
+  let teamSeatCount: number | undefined;
 
   if (sessionId) {
     if (!process.env.STRIPE_SECRET_KEY?.trim()) {
@@ -49,6 +50,12 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ detail: 'Missing course on session' }, { status: 400 });
       }
       slug = metaSlug;
+      purchaseMode = session.metadata?.purchase_mode === 'team' ? 'team' : 'self';
+      const seatsMeta = session.metadata?.team_seat_count;
+      if (seatsMeta) {
+        const n = Number.parseInt(seatsMeta, 10);
+        if (Number.isFinite(n)) teamSeatCount = n;
+      }
       const email = session.customer_email ?? session.customer_details?.email;
       if (
         email &&
@@ -106,34 +113,44 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const result = await enrollStudentInCourse(claims, slug, paymentReference);
-    const learnUrl = (await getFirstLessonLearnPath(slug)) ?? '/dashboard/student';
-    if (result === 'already_enrolled') {
-      return NextResponse.json({ ok: true, already_enrolled: true, learn_url: learnUrl });
-    }
-
-    void sendEnrollmentWelcomeEmail({
-      studentId: claims.sub,
+    const fulfilled = await fulfillCourseCheckoutForUser({
+      claims,
       courseSlug: slug,
-      appOrigin: request.nextUrl.origin,
-    }).catch((e) => console.error('[enrollments/confirm] email', e));
-
-    notifyCrmEnrollmentCreated({
-      enrollmentId: result.enrollmentId,
-      studentId: claims.sub,
-      courseId: result.courseId,
+      paymentReference,
+      purchaseMode,
+      teamSeatCount,
     });
+
+    if (!fulfilled.alreadyEnrolled && fulfilled.enrollmentId && fulfilled.courseId) {
+      void sendEnrollmentWelcomeEmail({
+        studentId: claims.sub,
+        courseSlug: slug,
+        appOrigin: request.nextUrl.origin,
+      }).catch((e) => console.error('[enrollments/confirm] email', e));
+
+      notifyCrmEnrollmentCreated({
+        enrollmentId: fulfilled.enrollmentId,
+        studentId: claims.sub,
+        courseId: fulfilled.courseId,
+      });
+    }
 
     return NextResponse.json({
       ok: true,
-      enrollment_id: result.enrollmentId,
-      course_id: result.courseId,
-      learn_url: learnUrl,
+      already_enrolled: fulfilled.alreadyEnrolled,
+      learn_url: fulfilled.redirectPath,
+      team_purchase: fulfilled.kind === 'team',
     });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     if (msg === 'COURSE_NOT_FOUND') {
       return NextResponse.json({ detail: 'Course not found' }, { status: 404 });
+    }
+    if (msg === 'ALREADY_ON_TEAM') {
+      return NextResponse.json(
+        { detail: 'You already belong to another team. Contact support to move your purchase.' },
+        { status: 409 },
+      );
     }
     console.error('[enrollments/confirm]', e);
     return NextResponse.json({ detail: 'Enrolment failed' }, { status: 500 });
