@@ -1,5 +1,5 @@
-import { normalizePublicAssetUrl } from '@/lib/remote-image';
 import { prisma } from '@/lib/prisma';
+import { normalizePublicAssetUrl } from '@/lib/remote-image';
 
 /** Client / API shape for `EnrolledCourseList` and enrollments/me. */
 export interface EnrollmentDto {
@@ -101,7 +101,7 @@ function mapEnrollmentRow(
       : Math.min(100, Math.round((completed / total) * 100));
 
   const lastId = e.lastAccessedLessonId;
-  const lastTitle = lastId ? lessonTitleById.get(lastId) ?? null : null;
+  const lastTitle = lastId ? (lessonTitleById.get(lastId) ?? null) : null;
 
   return {
     id: e.id,
@@ -238,7 +238,10 @@ export async function getResumeSnapshotForStudent(userId: string): Promise<Resum
       orderBy: { enrolledAt: 'desc' },
     });
 
-    const lessonMeta = new Map<string, { title: string; courseSlug: string; courseTitle: string }>();
+    const lessonMeta = new Map<
+      string,
+      { title: string; courseSlug: string; courseTitle: string }
+    >();
     const allLessonIds: string[] = [];
     for (const e of rows) {
       const slug = e.course.slug;
