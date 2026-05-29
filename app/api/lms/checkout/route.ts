@@ -11,6 +11,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifySessionToken } from '@/lib/auth/session-jwt';
 import { buildCourseCheckoutUrls } from '@/lib/checkout-urls';
 import {
+  parsePurchaseMode,
+  parseTeamSeatCount,
+  validateTeamSeatCount,
+} from '@/lib/checkout-purchase-mode';
+import {
   createStripeCheckoutForCourse,
   findCourseInExport,
   resolveCheckoutEmail,
@@ -34,6 +39,8 @@ export async function POST(request: NextRequest) {
       customer_email?: string;
       guest_checkout?: boolean;
       full_name?: string;
+      purchase_mode?: string;
+      team_seat_count?: number;
     };
 
     const slug = typeof body.slug === 'string' ? body.slug.trim() : '';
@@ -42,9 +49,14 @@ export async function POST(request: NextRequest) {
     }
 
     const normalized = slug.toLowerCase();
+    const purchaseMode = parsePurchaseMode(body.purchase_mode);
+    const teamSeatCount = parseTeamSeatCount(body.team_seat_count);
+
     const origin = request.nextUrl.origin;
     const learnNext = await getFirstLessonLearnPath(normalized);
-    const defaults = buildCourseCheckoutUrls(origin, slug, learnNext);
+    const defaults = buildCourseCheckoutUrls(origin, slug, learnNext, {
+      teamSeats: purchaseMode === 'team' ? teamSeatCount ?? undefined : undefined,
+    });
     const success_url =
       typeof body.success_url === 'string' && body.success_url.startsWith('http')
         ? body.success_url
@@ -70,6 +82,17 @@ export async function POST(request: NextRequest) {
     }
 
     const guestCheckout = body.guest_checkout === true;
+    const checkoutQuantity = purchaseMode === 'team' && teamSeatCount ? teamSeatCount : 1;
+
+    if (purchaseMode === 'team') {
+      if (!teamSeatCount) {
+        return NextResponse.json({ detail: 'team_seat_count is required for team purchases' }, { status: 400 });
+      }
+      const seatErr = validateTeamSeatCount(teamSeatCount);
+      if (seatErr) {
+        return NextResponse.json({ detail: seatErr }, { status: 400 });
+      }
+    }
 
     if (!customerEmail) {
       return NextResponse.json(
@@ -140,6 +163,9 @@ export async function POST(request: NextRequest) {
             unit_amount_cents: cents,
             extra_metadata: { discount_id: disc.id },
             guest_checkout: guestCheckout && !studentId,
+            quantity: checkoutQuantity,
+            purchase_mode: purchaseMode,
+            team_seat_count: teamSeatCount ?? undefined,
           });
           return NextResponse.json({ checkout_url });
         } catch (err) {
@@ -180,6 +206,9 @@ export async function POST(request: NextRequest) {
         student_id: studentId,
         unit_amount_cents,
         guest_checkout: guestCheckout && !studentId,
+        quantity: checkoutQuantity,
+        purchase_mode: purchaseMode,
+        team_seat_count: teamSeatCount ?? undefined,
       });
       return NextResponse.json({ checkout_url });
     } catch (err) {
