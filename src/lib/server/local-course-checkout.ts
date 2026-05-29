@@ -50,6 +50,10 @@ export async function createStripeCheckoutForCourse(params: {
   /** Optional Stripe metadata (e.g. discount_id). */
   extra_metadata?: Record<string, string>;
   guest_checkout?: boolean;
+  /** Seats for team purchase (line item quantity). */
+  quantity?: number;
+  purchase_mode?: 'self' | 'team';
+  team_seat_count?: number;
 }): Promise<{ checkout_url: string }> {
   const {
     slug,
@@ -61,6 +65,9 @@ export async function createStripeCheckoutForCourse(params: {
     unit_amount_cents,
     extra_metadata,
     guest_checkout,
+    quantity = 1,
+    purchase_mode = 'self',
+    team_seat_count,
   } = params;
 
   const priceNum = Number(course.price_aud);
@@ -72,7 +79,15 @@ export async function createStripeCheckoutForCourse(params: {
     throw new Error('INVALID_AMOUNT');
   }
 
+  const seatQty = Math.max(1, Math.min(100, Math.floor(quantity)));
+  const isTeam = purchase_mode === 'team' && seatQty > 1;
+  const teamSeats = isTeam ? (team_seat_count ?? seatQty) : undefined;
+
   const stripe = getStripeClient();
+
+  const productName = isTeam
+    ? `${course.title || slug} — team (${seatQty} seats)`
+    : course.title || slug;
 
   const session = await stripe.checkout.sessions.create({
     mode: 'payment',
@@ -82,19 +97,23 @@ export async function createStripeCheckoutForCourse(params: {
     metadata: {
       course_slug: slug,
       source: 'carsi-next-local-checkout',
+      purchase_mode: isTeam ? 'team' : 'self',
+      ...(teamSeats != null ? { team_seat_count: String(teamSeats) } : {}),
       ...(student_id ? { student_id } : {}),
       ...(guest_checkout ? { guest_checkout: 'true' } : {}),
       ...(extra_metadata ?? {}),
     },
     line_items: [
       {
-        quantity: 1,
+        quantity: seatQty,
         price_data: {
           currency: 'aud',
           unit_amount: unitAmount,
           product_data: {
-            name: course.title || slug,
-            description: course.short_description?.slice(0, 500) || undefined,
+            name: productName,
+            description: isTeam
+              ? `${seatQty} learner seats for this course`
+              : course.short_description?.slice(0, 500) || undefined,
           },
         },
       },
