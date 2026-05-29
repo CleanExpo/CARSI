@@ -4,9 +4,10 @@ import { signSessionToken } from '@/lib/auth/session-jwt';
 import { getStripeClient } from '@/lib/api/stripe';
 import { notifyCrmEnrollmentCreated } from '@/lib/server/crm-enrollment-notify';
 import { sendEnrollmentWelcomeEmail } from '@/lib/server/enrollment-email';
-import { enrollStudentInCourse } from '@/lib/server/enrollment-service';
 import { findOrCreateGuestUser } from '@/lib/server/guest-checkout';
-import { getFirstLessonLearnPath } from '@/lib/server/first-lesson';
+import { getTeamForUser } from '@/lib/server/teams';
+import { fulfillCourseCheckoutForUser } from '@/lib/server/team-course-purchase';
+import { prisma } from '@/lib/prisma';
 
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
 
@@ -23,6 +24,7 @@ export async function POST(request: NextRequest) {
     session_id?: string;
     password?: string;
     full_name?: string;
+    team_name?: string;
   };
 
   const sessionId = body.session_id?.trim();
@@ -66,12 +68,32 @@ export async function POST(request: NextRequest) {
       password,
     });
 
-    const result = await enrollStudentInCourse(claims, slug, sessionId);
-    const alreadyEnrolled = result === 'already_enrolled';
-    const origin = request.nextUrl.origin;
-    const learnPath = (await getFirstLessonLearnPath(slug)) ?? '/dashboard/student';
+    const purchaseMode = session.metadata?.purchase_mode === 'team' ? 'team' : 'self';
+    const seatsMeta = session.metadata?.team_seat_count;
+    const teamSeatCount = seatsMeta ? Number.parseInt(seatsMeta, 10) : undefined;
 
-    if (!alreadyEnrolled) {
+    const fulfilled = await fulfillCourseCheckoutForUser({
+      claims,
+      courseSlug: slug,
+      paymentReference: sessionId,
+      purchaseMode,
+      teamSeatCount: Number.isFinite(teamSeatCount) ? teamSeatCount : undefined,
+    });
+
+    const teamName = typeof body.team_name === 'string' ? body.team_name.trim() : '';
+    if (purchaseMode === 'team' && teamName.length >= 2) {
+      const ownedTeam = await getTeamForUser(claims.sub);
+      if (ownedTeam && ownedTeam.ownerId === claims.sub) {
+        await prisma.lmsTeam.update({
+          where: { id: ownedTeam.id },
+          data: { name: teamName.slice(0, 80) },
+        });
+      }
+    }
+
+    const origin = request.nextUrl.origin;
+
+    if (!fulfilled.alreadyEnrolled && fulfilled.enrollmentId && fulfilled.courseId) {
       void sendEnrollmentWelcomeEmail({
         studentId: claims.sub,
         courseSlug: slug,
@@ -79,17 +101,21 @@ export async function POST(request: NextRequest) {
       }).catch((e) => console.error('[guest-complete] email', e));
 
       notifyCrmEnrollmentCreated({
-        enrollmentId: result.enrollmentId,
+        enrollmentId: fulfilled.enrollmentId,
         studentId: claims.sub,
-        courseId: result.courseId,
+        courseId: fulfilled.courseId,
       });
     }
 
     const accessToken = await signSessionToken(claims);
     const response = NextResponse.json({
       ok: true,
-      learn_url: learnPath,
-      already_enrolled: alreadyEnrolled,
+      learn_url:
+        fulfilled.kind === 'team'
+          ? `/dashboard/team?from_purchase=1&course=${encodeURIComponent(slug)}${Number.isFinite(teamSeatCount) ? `&seats=${teamSeatCount}` : ''}`
+          : fulfilled.redirectPath,
+      team_purchase: fulfilled.kind === 'team',
+      already_enrolled: fulfilled.alreadyEnrolled,
     });
 
     const cookieOptions = {
@@ -103,6 +129,13 @@ export async function POST(request: NextRequest) {
 
     return response;
   } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    if (msg === 'ALREADY_ON_TEAM') {
+      return NextResponse.json(
+        { detail: 'You already belong to another team. Contact support@carsi.com.au' },
+        { status: 409 },
+      );
+    }
     console.error('[guest-complete]', e);
     return NextResponse.json({ detail: 'Could not complete enrolment' }, { status: 500 });
   }
