@@ -9,6 +9,7 @@ import {
   renderEnrollmentWelcomeEmail,
   renderPasswordResetEmail,
   renderRegistrationWelcomeEmail,
+  renderTeamMemberAddedEmail,
 } from '@/lib/server/email-templates';
 import { sendEmail, isEmailConfigured, type SendEmailResult } from '@/lib/server/email';
 import { getFirstLessonLearnPath } from '@/lib/server/first-lesson';
@@ -94,6 +95,42 @@ export async function sendEnrollmentWelcomeEmail(params: {
   return sendEmail({
     to: user.email,
     subject: `You're enrolled — ${course.title}`,
+    html,
+    text,
+  });
+}
+
+export async function sendTeamMemberAddedEmail(params: {
+  to: string;
+  memberName: string;
+  inviterName: string;
+  teamName: string;
+  courseTitles: string[];
+  appOrigin: string;
+  temporaryPassword: string;
+}): Promise<SendEmailResult> {
+  const base = params.appOrigin.replace(/\/$/, '');
+  const loginUrl = `${base}/login`;
+  const name = params.memberName.trim() || params.to.split('@')[0];
+  const subjectCourse =
+    params.courseTitles.length === 1
+      ? params.courseTitles[0]!
+      : `${params.courseTitles.length} CARSI courses`;
+
+  const { html, text } = renderTeamMemberAddedEmail({
+    appOrigin: base,
+    memberName: name,
+    inviterName: params.inviterName,
+    teamName: params.teamName,
+    courseTitles: params.courseTitles,
+    loginUrl,
+    memberEmail: params.to,
+    temporaryPassword: params.temporaryPassword,
+  });
+
+  return sendEmail({
+    to: params.to,
+    subject: `${params.inviterName} gave you access to ${subjectCourse}`,
     html,
     text,
   });
