@@ -16,7 +16,7 @@
   "scripts": {
     "postinstall": "prisma generate",
     "build": "prisma generate && next build",
-    "dev": "next dev",
+    "dev": "prisma generate && prisma migrate deploy && next dev",
     "start": "prisma migrate deploy && next start",
     "start:with-course-seed": "prisma migrate deploy && npm run db:seed-courses && next start",
     "db:export-courses": "npx tsx scripts/export-courses-catalog.ts",
