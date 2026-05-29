@@ -364,6 +364,7 @@ export function LearnCourseShell({ slug }: { slug: string }) {
       });
       let nextShare: ProgressShareDraft | null = null;
       let nextShareKey: string | null = null;
+      let certificateEnrollmentId: string | null = null;
       setCurriculum((prev) => {
         if (!prev) return prev;
         const oldCourseComplete = prev.modules.every((m) => m.lessons.every((l) => l.completed));
@@ -392,52 +393,51 @@ export function LearnCourseShell({ slug }: { slug: string }) {
             : false;
           const newCourseComplete = next.modules.every((m) => m.lessons.every((l) => l.completed));
 
-          const completedLesson = nextTargetModule?.lessons.find((l) => l.id === activeLessonId);
-          const lessonTitleForShare = completedLesson?.title ?? '';
+          if (!oldCourseComplete && newCourseComplete) {
+            certificateEnrollmentId = prev.enrollment_id;
+          } else {
+            const completedLesson = nextTargetModule?.lessons.find((l) => l.id === activeLessonId);
+            const lessonTitleForShare = completedLesson?.title ?? '';
 
-          let shareType: ProgressShareType;
-          if (!oldCourseComplete && newCourseComplete) shareType = 'course';
-          else if (!oldModuleComplete && newModuleComplete) shareType = 'module';
-          else shareType = 'lesson';
+            const shareType: ProgressShareType =
+              !oldModuleComplete && newModuleComplete ? 'module' : 'lesson';
 
-          const moduleNumber = nextTargetModule
-            ? moduleIndexById.get(nextTargetModule.id) ?? null
-            : null;
-          const key =
-            shareType === 'course'
-              ? `course:${next.course.slug}`
-              : shareType === 'module'
+            const moduleNumber = nextTargetModule
+              ? moduleIndexById.get(nextTargetModule.id) ?? null
+              : null;
+            const key =
+              shareType === 'module'
                 ? `module:${next.course.slug}:${nextTargetModule?.id ?? 'unknown'}`
                 : `lesson:${next.course.slug}:${activeLessonId}`;
 
-          if (!shownShareKeysRef.current.has(key)) {
-            if (shareType === 'course') {
-              nextShare = buildProgressShareDraft({
-                type: 'course',
-                courseTitle: next.course.title,
-              });
-            } else if (shareType === 'module') {
-              nextShare = buildProgressShareDraft({
-                type: 'module',
-                courseTitle: next.course.title,
-                moduleTitle: nextTargetModule?.title ?? null,
-                moduleNumber,
-              });
-            } else {
-              nextShare = buildProgressShareDraft({
-                type: 'lesson',
-                courseTitle: next.course.title,
-                lessonTitle: lessonTitleForShare,
-                moduleTitle: nextTargetModule?.title ?? null,
-                moduleNumber,
-              });
+            if (!shownShareKeysRef.current.has(key)) {
+              if (shareType === 'module') {
+                nextShare = buildProgressShareDraft({
+                  type: 'module',
+                  courseTitle: next.course.title,
+                  moduleTitle: nextTargetModule?.title ?? null,
+                  moduleNumber,
+                });
+              } else {
+                nextShare = buildProgressShareDraft({
+                  type: 'lesson',
+                  courseTitle: next.course.title,
+                  lessonTitle: lessonTitleForShare,
+                  moduleTitle: nextTargetModule?.title ?? null,
+                  moduleNumber,
+                });
+              }
+              nextShareKey = key;
             }
-            nextShareKey = key;
           }
         }
         return next;
       });
-      if (nextShare) {
+      if (certificateEnrollmentId) {
+        router.push(
+          `/dashboard/credentials/${encodeURIComponent(certificateEnrollmentId)}?completed=1&course=${encodeURIComponent(slug)}`,
+        );
+      } else if (nextShare) {
         setShareDraft(nextShare);
         if (nextShareKey) shownShareKeysRef.current.add(nextShareKey);
       }
@@ -565,6 +565,7 @@ export function LearnCourseShell({ slug }: { slug: string }) {
         <CourseCompletionBanner
           courseTitle={curriculum.course.title}
           enrollmentId={curriculum.enrollment_id}
+          courseSlug={curriculum.course.slug}
           onShare={openCourseSharePrompt}
         />
       ) : null}
