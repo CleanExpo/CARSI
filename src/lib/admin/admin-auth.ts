@@ -11,12 +11,9 @@ export {
 
 import { getAdminEmail } from '@/lib/admin/admin-panel-access';
 
-const DEFAULT_ADMIN_PASSWORD = 'Rana1199@';
-
 export function getAdminPassword(): string {
   const v = process.env.ADMIN_PASSWORD;
-  if (typeof v === 'string' && v.trim()) return v.trim();
-  return DEFAULT_ADMIN_PASSWORD;
+  return typeof v === 'string' ? v.trim() : '';
 }
 
 const ADMIN_JWT_SECRET =
@@ -49,7 +46,8 @@ export async function verifyAdminSessionToken(token: string): Promise<AdminSessi
     const email = typeof payload.email === 'string' ? payload.email : '';
     if (!email) return null;
     const emailLower = email.toLowerCase();
-    if (emailLower === getAdminEmail().toLowerCase()) return { email };
+    const bootstrapEmail = getAdminEmail().toLowerCase();
+    if (bootstrapEmail && emailLower === bootstrapEmail) return { email };
     try {
       const { prisma } = await import('@/lib/prisma');
       const row = await prisma.adminUser.findUnique({

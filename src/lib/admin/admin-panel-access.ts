@@ -1,12 +1,9 @@
 import type { SessionClaims } from '@/lib/auth/session-jwt';
 
-const DEFAULT_ADMIN_EMAIL = 'mmlrana00@gmail.com';
-
 /** Server-side admin bootstrap email from env (no Prisma — safe for Edge middleware). */
 export function getAdminEmail(): string {
   const v = process.env.ADMIN_EMAIL;
-  if (typeof v === 'string' && v.trim()) return v.trim();
-  return DEFAULT_ADMIN_EMAIL;
+  return typeof v === 'string' ? v.trim() : '';
 }
 
 /**
@@ -15,7 +12,8 @@ export function getAdminEmail(): string {
  */
 export function getAdminPanelAllowedEmails(): Set<string> {
   const out = new Set<string>();
-  out.add(getAdminEmail().toLowerCase());
+  const bootstrap = getAdminEmail().toLowerCase();
+  if (bootstrap) out.add(bootstrap);
   const raw = process.env.ADMIN_PANEL_EMAILS;
   if (typeof raw === 'string' && raw.trim()) {
     for (const part of raw.split(',')) {

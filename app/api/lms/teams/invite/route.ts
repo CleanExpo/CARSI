@@ -114,6 +114,12 @@ export async function POST(request: NextRequest) {
         { status: 403 },
       );
     }
+    if (msg === 'NOT_TEAM_PURCHASE_COURSE') {
+      return NextResponse.json(
+        { detail: 'Only team-purchased courses can be assigned on a course team plan' },
+        { status: 403 },
+      );
+    }
     if (msg === 'ALREADY_MEMBER') {
       return NextResponse.json({ detail: 'This person is already on your team' }, { status: 409 });
     }

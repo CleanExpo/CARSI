@@ -7,17 +7,38 @@ import { serializeTeamForClient } from '@/lib/server/team-api-serialize';
 import { fulfillCourseCheckoutForUser } from '@/lib/server/team-course-purchase';
 import { repairAndGetTeamForUser } from '@/lib/server/teams';
 
-async function findStripeCheckoutSessionForUser(userId: string): Promise<string | null> {
-  const enrollment = await prisma.lmsEnrollment.findFirst({
+async function findTeamStripeCheckoutSessionForUser(userId: string): Promise<string | null> {
+  const enrollments = await prisma.lmsEnrollment.findMany({
     where: {
       studentId: userId,
       paymentReference: { startsWith: 'cs_' },
     },
     orderBy: { enrolledAt: 'desc' },
     select: { paymentReference: true },
+    take: 15,
   });
-  const ref = enrollment?.paymentReference?.trim();
-  return ref && ref.startsWith('cs_') ? ref : null;
+
+  if (!process.env.STRIPE_SECRET_KEY?.trim()) {
+    return null;
+  }
+
+  const stripe = getStripeClient();
+  for (const row of enrollments) {
+    const ref = row.paymentReference?.trim();
+    if (!ref?.startsWith('cs_')) continue;
+    try {
+      const session = await stripe.checkout.sessions.retrieve(ref);
+      if (
+        session.payment_status === 'paid' &&
+        session.metadata?.purchase_mode === 'team'
+      ) {
+        return ref;
+      }
+    } catch {
+      continue;
+    }
+  }
+  return null;
 }
 
 /**
@@ -49,7 +70,7 @@ export async function POST(request: NextRequest) {
     let existing = await repairAndGetTeamForUser(claims.sub);
 
     if (!sessionId) {
-      sessionId = (await findStripeCheckoutSessionForUser(claims.sub)) ?? '';
+      sessionId = (await findTeamStripeCheckoutSessionForUser(claims.sub)) ?? '';
     }
 
     if (sessionId && process.env.STRIPE_SECRET_KEY?.trim()) {

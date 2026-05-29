@@ -67,20 +67,31 @@ export async function addCourseTeamMemberByEmail(params: {
     team.courseSlug?.trim().toLowerCase() ?? (await readTeamCourseSlug(team.id));
   if (legacySlug) teamPurchaseSlugs.add(legacySlug);
 
+  const isCoursePurchaseTeam =
+    team.bundleTier === 'course_purchase' && teamPurchaseSlugs.size > 0;
   const teamCourseSlugs = slugs.filter((s) => teamPurchaseSlugs.has(s));
-  if (teamCourseSlugs.length > 0) {
-    try {
-      await assertCourseSeatsAvailable(team.id, teamCourseSlugs);
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : String(e);
-      if (msg === 'COURSE_SEATS_FULL') throw new Error('COURSE_SEATS_FULL');
-      if (msg === 'NO_SEATS_FOR_COURSE') throw new Error('NO_SEATS_FOR_COURSE');
-      throw e;
+
+  if (isCoursePurchaseTeam) {
+    const notInPool = slugs.filter((s) => !teamPurchaseSlugs.has(s));
+    if (notInPool.length > 0) {
+      throw new Error('NOT_TEAM_PURCHASE_COURSE');
+    }
+    if (teamCourseSlugs.length > 0) {
+      try {
+        await assertCourseSeatsAvailable(team.id, teamCourseSlugs);
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
+        if (msg === 'COURSE_SEATS_FULL') throw new Error('COURSE_SEATS_FULL');
+        if (msg === 'NO_SEATS_FOR_COURSE') throw new Error('NO_SEATS_FOR_COURSE');
+        throw e;
+      }
     }
   }
 
+  const enrollSlugs = isCoursePurchaseTeam ? teamCourseSlugs : slugs;
+
   const courseTitles = ownerEnrollments
-    .filter((e) => slugs.includes(e.course.slug.trim().toLowerCase()))
+    .filter((e) => enrollSlugs.includes(e.course.slug.trim().toLowerCase()))
     .map((e) => e.course.title);
 
   const existingOnTeam = team.members.find((m) => m.user.email.toLowerCase() === email);
@@ -120,7 +131,7 @@ export async function addCourseTeamMemberByEmail(params: {
     throw new Error('USER_INACTIVE');
   }
 
-  for (const slug of slugs) {
+  for (const slug of enrollSlugs) {
     try {
       await enrollStudentInCourse(memberClaims, slug, `team:${team.id}`);
     } catch (e) {
