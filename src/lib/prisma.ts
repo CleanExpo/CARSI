@@ -49,8 +49,23 @@ function createClient() {
   });
 }
 
-export const prisma = globalForPrisma.prisma ?? createClient();
-
-if (process.env.NODE_ENV !== 'production') {
-  globalForPrisma.prisma = prisma;
+function clientHasTeamCoursePurchases(client: PrismaClient): boolean {
+  return Boolean(
+    (client as PrismaClient & { lmsTeamCoursePurchase?: { findMany?: unknown } })
+      .lmsTeamCoursePurchase?.findMany,
+  );
 }
+
+/** Dev HMR can keep a Prisma client generated before new models exist — refresh when stale. */
+function getPrismaClient(): PrismaClient {
+  let client = globalForPrisma.prisma ?? createClient();
+  if (!clientHasTeamCoursePurchases(client)) {
+    client = createClient();
+  }
+  if (process.env.NODE_ENV !== 'production') {
+    globalForPrisma.prisma = client;
+  }
+  return client;
+}
+
+export const prisma = getPrismaClient();
