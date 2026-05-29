@@ -52,7 +52,7 @@ export function buildCarsiWordmarkHtml(appOrigin: string): string {
     </p>`;
 }
 
-export type CarsiEmailDetail = { label: string; value: string };
+export type CarsiEmailDetail = { label: string; value: string; valueHtml?: string };
 
 export type CarsiEmailContent = {
   appOrigin: string;
@@ -107,7 +107,7 @@ export function buildCarsiEmailHtml(options: CarsiEmailContent): string {
                 ${escapeHtml(d.label)}
               </td>
               <td style="padding: 12px 14px; font-family: ${BRAND.font}; font-size: 14px; line-height: 1.5; color: ${BRAND.text}; vertical-align: top; border-bottom: 1px solid ${BRAND.cardBorder};">
-                ${escapeHtml(d.value)}
+                ${d.valueHtml ?? escapeHtml(d.value)}
               </td>
             </tr>`
               )
@@ -308,11 +308,16 @@ export function renderTeamMemberAddedEmail(params: {
     params.courseTitles.length === 1
       ? params.courseTitles[0]!
       : params.courseTitles.map((t) => `• ${t}`).join('\n');
+  const courseListHtml =
+    params.courseTitles.length === 1
+      ? escapeHtml(params.courseTitles[0]!)
+      : params.courseTitles.map((t) => `• ${escapeHtml(t)}`).join('<br>');
 
   const details: CarsiEmailDetail[] = [
     {
       label: params.courseTitles.length === 1 ? 'Course' : 'Courses',
       value: courseList,
+      valueHtml: courseListHtml,
     },
     { label: 'Team', value: params.teamName },
     { label: 'Added by', value: params.inviterName },
