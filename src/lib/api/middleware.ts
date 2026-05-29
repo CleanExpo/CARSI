@@ -42,10 +42,26 @@ async function verifyToken(token: string): Promise<User | null> {
 /**
  * Update session and handle authentication
  */
+/** Legacy WordPress / marketing paths → dashboard student area. */
+function legacyStudentRedirect(pathname: string): string | null {
+  if (pathname === '/student') return '/dashboard/student';
+  if (pathname.startsWith('/student/')) {
+    return `/dashboard${pathname}`;
+  }
+  return null;
+}
+
 export async function updateSession(request: NextRequest) {
-  const response = NextResponse.next({
-    request,
-  });
+  const pathname = request.nextUrl.pathname;
+
+  const studentRedirect = legacyStudentRedirect(pathname);
+  if (studentRedirect) {
+    const url = request.nextUrl.clone();
+    url.pathname = studentRedirect;
+    return NextResponse.redirect(url, 308);
+  }
+
+  const response = NextResponse.next();
 
   const token = request.cookies.get('auth_token')?.value;
 
@@ -66,8 +82,6 @@ export async function updateSession(request: NextRequest) {
       /^\/verify\/credential\/[^/]+(\/?)$/.test(pathname)
     );
   }
-
-  const pathname = request.nextUrl.pathname;
 
   if (isInternalToolPath(pathname) && !internalToolsEnabled()) {
     const url = request.nextUrl.clone();
