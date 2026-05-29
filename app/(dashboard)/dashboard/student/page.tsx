@@ -12,9 +12,9 @@ import { PopularForYouStrip } from '@/components/lms/PopularForYouStrip';
 import { PushNotificationPrompt } from '@/components/lms/PushNotificationPrompt';
 import { RenewalCockpit } from '@/components/lms/RenewalCockpit';
 import { apiClient } from '@/lib/api/client';
-import Link from 'next/link';
-import { ArrowRight, Award, BookOpen, Flame, Sparkles, TrendingUp } from 'lucide-react';
 import type { RenewalCourseSuggestion } from '@/types/renewal';
+import { ArrowRight, Award, BookOpen, Flame, Sparkles, TrendingUp } from 'lucide-react';
+import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 
 interface LevelData {
@@ -268,11 +268,9 @@ export default function StudentDashboardPage() {
               <div className="rounded-xl border border-white/[0.08] bg-white/[0.04] p-4 backdrop-blur-sm transition-colors hover:border-[#2490ed]/25">
                 <div className="flex items-center gap-2 text-[#2490ed]">
                   <TrendingUp className="h-4 w-4" aria-hidden />
-                  <span className="text-[10px] font-semibold tracking-wider uppercase">
-                    Level
-                  </span>
+                  <span className="text-[10px] font-semibold tracking-wider uppercase">Level</span>
                 </div>
-                <p className="mt-2 text-2xl font-bold tabular-nums text-white">
+                <p className="mt-2 text-2xl font-bold text-white tabular-nums">
                   {loading.level ? '—' : (level?.current_level ?? '—')}
                 </p>
                 <p className="mt-0.5 line-clamp-2 text-xs text-white/45">
@@ -282,11 +280,9 @@ export default function StudentDashboardPage() {
               <div className="rounded-xl border border-white/[0.08] bg-white/[0.04] p-4 backdrop-blur-sm transition-colors hover:border-orange-500/25">
                 <div className="flex items-center gap-2 text-orange-300/90">
                   <Flame className="h-4 w-4" aria-hidden />
-                  <span className="text-[10px] font-semibold tracking-wider uppercase">
-                    Streak
-                  </span>
+                  <span className="text-[10px] font-semibold tracking-wider uppercase">Streak</span>
                 </div>
-                <p className="mt-2 text-2xl font-bold tabular-nums text-white">
+                <p className="mt-2 text-2xl font-bold text-white tabular-nums">
                   {loading.level ? '—' : (level?.current_streak ?? 0)}
                 </p>
                 <p className="mt-0.5 text-xs text-white/45">Active days</p>
@@ -298,7 +294,7 @@ export default function StudentDashboardPage() {
                     Courses
                   </span>
                 </div>
-                <p className="mt-2 text-2xl font-bold tabular-nums text-white">
+                <p className="mt-2 text-2xl font-bold text-white tabular-nums">
                   {enrollmentsLoading ? '—' : enrollments.length}
                 </p>
                 <p className="mt-0.5 text-xs text-white/45">Enrolled</p>
@@ -306,11 +302,9 @@ export default function StudentDashboardPage() {
               <div className="rounded-xl border border-white/[0.08] bg-white/[0.04] p-4 backdrop-blur-sm transition-colors hover:border-violet-400/25">
                 <div className="flex items-center gap-2 text-violet-300/90">
                   <Award className="h-4 w-4" aria-hidden />
-                  <span className="text-[10px] font-semibold tracking-wider uppercase">
-                    CECs
-                  </span>
+                  <span className="text-[10px] font-semibold tracking-wider uppercase">CECs</span>
                 </div>
-                <p className="mt-2 text-2xl font-bold tabular-nums text-white">
+                <p className="mt-2 text-2xl font-bold text-white tabular-nums">
                   {loading.level
                     ? '—'
                     : level?.total_cec_lifetime != null
@@ -334,7 +328,10 @@ export default function StudentDashboardPage() {
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_90%_60%_at_50%_-30%,rgba(36,144,237,0.22),transparent_55%)]"
           aria-hidden
         />
-        <div className="pointer-events-none absolute -right-24 top-1/2 h-64 w-64 -translate-y-1/2 rounded-full bg-[#2490ed]/10 blur-3xl" aria-hidden />
+        <div
+          className="pointer-events-none absolute top-1/2 -right-24 h-64 w-64 -translate-y-1/2 rounded-full bg-[#2490ed]/10 blur-3xl"
+          aria-hidden
+        />
         <div className="relative px-5 py-8 sm:px-10 sm:py-10">
           <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between">
             <div className="flex min-w-0 gap-4 sm:gap-5">
@@ -350,7 +347,7 @@ export default function StudentDashboardPage() {
                     My courses
                   </h2>
                   {!enrollmentsLoading && enrollments.length > 0 ? (
-                    <span className="rounded-full border border-white/10 bg-white/5 px-3 py-0.5 text-xs font-medium tabular-nums text-white/55">
+                    <span className="rounded-full border border-white/10 bg-white/5 px-3 py-0.5 text-xs font-medium text-white/55 tabular-nums">
                       {enrollments.length} enrolled
                     </span>
                   ) : null}
@@ -395,7 +392,7 @@ export default function StudentDashboardPage() {
             ) : enrollments.length === 0 && sub?.has_subscription ? (
               <div className="relative overflow-hidden rounded-2xl border border-[#2490ed]/25 bg-gradient-to-br from-[#2490ed]/15 via-white/5 to-transparent p-8 text-center sm:p-12">
                 <div
-                  className="pointer-events-none absolute -left-16 top-0 h-40 w-40 rounded-full bg-emerald-400/10 blur-3xl"
+                  className="pointer-events-none absolute top-0 -left-16 h-40 w-40 rounded-full bg-emerald-400/10 blur-3xl"
                   aria-hidden
                 />
                 <div className="relative mx-auto max-w-md">
@@ -406,8 +403,8 @@ export default function StudentDashboardPage() {
                     Subscription active — your catalogue is unlocked
                   </p>
                   <p className="mt-2 text-sm leading-relaxed text-white/50">
-                    Enrol by opening any course. Your first visit creates the enrolment automatically so
-                    progress saves here.
+                    Enrol by opening any course. Your first visit creates the enrolment
+                    automatically so progress saves here.
                   </p>
                   <Link
                     href="/dashboard/courses"
@@ -439,7 +436,6 @@ export default function StudentDashboardPage() {
           </div>
         </div>
       </section>
-
     </div>
   );
 }
