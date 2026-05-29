@@ -77,6 +77,12 @@ const pwaConfig = withPWA({
 const nextConfig: NextConfig = {
   output: 'standalone',
   reactStrictMode: true,
+  async redirects() {
+    return [
+      { source: '/student', destination: '/dashboard/student', permanent: true },
+      { source: '/student/:path*', destination: '/dashboard/student/:path*', permanent: true },
+    ];
+  },
   typescript: {
     ignoreBuildErrors: false,
   },
