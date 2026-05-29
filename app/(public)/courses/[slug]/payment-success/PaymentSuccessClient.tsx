@@ -28,11 +28,28 @@ export function PaymentSuccessClient() {
   const [learnUrl, setLearnUrl] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const nextRaw = searchParams.get('next') ?? '/dashboard/student';
-  const nextPath = isSafeInternalPath(nextRaw) ? nextRaw : '/dashboard/student';
+  const isTeamPurchase = searchParams.get('purchase') === 'team';
+  const teamSeatsParam = searchParams.get('seats');
+  const teamCourseParam = searchParams.get('course') ?? slug;
   const sessionId = searchParams.get('session_id');
 
+  const teamNextPath =
+    sessionId && teamSeatsParam
+      ? `/dashboard/team?session_id=${encodeURIComponent(sessionId)}&from_purchase=1&course=${encodeURIComponent(teamCourseParam)}&seats=${encodeURIComponent(teamSeatsParam)}`
+      : null;
+
+  const nextRaw = searchParams.get('next') ?? teamNextPath ?? '/dashboard/student';
+  const nextPath = isSafeInternalPath(nextRaw) ? nextRaw : '/dashboard/student';
+
   useEffect(() => {
+    if (isTeamPurchase && teamNextPath) {
+      router.replace(teamNextPath);
+    }
+  }, [isTeamPurchase, teamNextPath, router]);
+
+  useEffect(() => {
+    if (isTeamPurchase) return;
+
     let cancelled = false;
 
     (async () => {
@@ -47,9 +64,10 @@ export function PaymentSuccessClient() {
           ...(sessionId ? { session_id: sessionId } : { slug }),
         });
         if (!cancelled) {
-          setLearnUrl(data.learn_url ?? nextPath);
+          const dest = data.learn_url ?? nextPath;
+          setLearnUrl(dest);
           setPhase('done');
-          router.push(data.learn_url ?? nextPath);
+          router.push(dest);
         }
         return;
       } catch {
@@ -67,7 +85,13 @@ export function PaymentSuccessClient() {
       try {
         const info = await fetch(
           `/api/lms/checkout/session?session_id=${encodeURIComponent(sessionId)}`,
-        ).then((r) => r.json() as Promise<{ email?: string; guest_checkout?: boolean }>);
+        ).then(
+          (r) =>
+            r.json() as Promise<{
+              email?: string;
+              guest_checkout?: boolean;
+            }>,
+        );
         if (!cancelled && info.email) {
           setSessionEmail(info.email);
           const stored = sessionStorage.getItem('carsi_guest_checkout');
@@ -95,7 +119,7 @@ export function PaymentSuccessClient() {
     return () => {
       cancelled = true;
     };
-  }, [router, nextPath, sessionId, slug]);
+  }, [router, nextPath, sessionId, slug, isTeamPurchase]);
 
   async function handleGuestComplete(e: React.FormEvent) {
     e.preventDefault();
@@ -129,6 +153,18 @@ export function PaymentSuccessClient() {
     }
   }
 
+  if (isTeamPurchase) {
+    return (
+      <main className="flex min-h-[60vh] items-center justify-center px-4">
+        <Card className="w-full max-w-md border-[0.5px] border-white/6 bg-[#050505]">
+          <CardContent className="p-8 text-center">
+            <p className="text-white/60">Taking you to your team dashboard…</p>
+          </CardContent>
+        </Card>
+      </main>
+    );
+  }
+
   if (phase === 'guest_setup') {
     return (
       <main className="flex min-h-[60vh] items-center justify-center px-4">
@@ -136,8 +172,8 @@ export function PaymentSuccessClient() {
           <CardContent className="space-y-4 p-8">
             <h1 className="text-2xl font-bold text-white">Payment successful</h1>
             <p className="text-sm text-white/60">
-              Create your password for <strong className="text-white/80">{sessionEmail}</strong> to
-              access your course.
+              Create your password for{' '}
+              <strong className="text-white/80">{sessionEmail}</strong> to access your course.
             </p>
             <form onSubmit={handleGuestComplete} className="space-y-3">
               <div className="space-y-1.5">
