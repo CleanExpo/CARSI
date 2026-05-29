@@ -90,11 +90,11 @@ export async function addCourseTeamMemberByEmail(params: {
 
   let user = await prisma.lmsUser.findUnique({ where: { email } });
   let accountCreated = false;
-
-  const memberPassword = generateMemberTempPassword();
-  const hashedPassword = await hashPassword(memberPassword);
+  let memberPassword: string | null = null;
 
   if (!user) {
+    memberPassword = generateMemberTempPassword();
+    const hashedPassword = await hashPassword(memberPassword);
     const id = randomUUID();
     user = await prisma.lmsUser.create({
       data: {
@@ -107,11 +107,6 @@ export async function addCourseTeamMemberByEmail(params: {
       },
     });
     accountCreated = true;
-  } else {
-    await prisma.lmsUser.update({
-      where: { id: user.id },
-      data: { hashedPassword },
-    });
   }
 
   await prisma.lmsTeamMember.upsert({
@@ -145,7 +140,7 @@ export async function addCourseTeamMemberByEmail(params: {
     teamName: team.name,
     courseTitles,
     appOrigin: params.appOrigin,
-    temporaryPassword: memberPassword,
+    ...(memberPassword ? { temporaryPassword: memberPassword } : {}),
   }).catch((e) => console.error('[team-member-provision] email', e));
 
   return { email, account_created: accountCreated, courses: courseTitles };

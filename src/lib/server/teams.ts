@@ -56,24 +56,26 @@ export async function countTeamSeatsUsed(teamId: string): Promise<number> {
   return prisma.lmsTeamMember.count({ where: { teamId } });
 }
 
-const teamInclude = {
-  members: {
-    include: {
-      user: { select: { id: true, email: true, fullName: true } },
+function teamInclude() {
+  return {
+    members: {
+      include: {
+        user: { select: { id: true, email: true, fullName: true } },
+      },
     },
-  },
-  invites: {
-    where: { acceptedAt: null, expiresAt: { gt: new Date() } },
-    orderBy: { createdAt: 'desc' as const },
-  },
-};
+    invites: {
+      where: { acceptedAt: null, expiresAt: { gt: new Date() } },
+      orderBy: { createdAt: 'desc' as const },
+    },
+  };
+}
 
 export async function getTeamForUser(userId: string) {
   const membership = await prisma.lmsTeamMember.findFirst({
     where: { userId },
     include: {
       team: {
-        include: teamInclude,
+        include: teamInclude(),
       },
     },
   });

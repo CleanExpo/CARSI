@@ -41,7 +41,9 @@ export async function POST(request: NextRequest) {
     body = {};
   }
 
-  let sessionId = typeof body.session_id === 'string' ? body.session_id.trim() : '';
+  const explicitSessionId =
+    typeof body.session_id === 'string' && body.session_id.trim().length > 0;
+  let sessionId = explicitSessionId ? body.session_id!.trim() : '';
 
   try {
     let existing = await repairAndGetTeamForUser(claims.sub);
@@ -59,40 +61,42 @@ export async function POST(request: NextRequest) {
 
       const purchaseMode = session.metadata?.purchase_mode === 'team' ? 'team' : 'self';
       if (purchaseMode !== 'team') {
-        return NextResponse.json({ detail: 'Not a team purchase session' }, { status: 400 });
-      }
+        if (explicitSessionId) {
+          return NextResponse.json({ detail: 'Not a team purchase session' }, { status: 400 });
+        }
+      } else {
+        const email = (
+          session.customer_email ??
+          session.customer_details?.email ??
+          ''
+        )
+          .trim()
+          .toLowerCase();
+        if (email && claims.email && email !== claims.email.toLowerCase()) {
+          return NextResponse.json(
+            {
+              detail:
+                'This payment was made with a different email. Sign in with that email or contact support.',
+            },
+            { status: 403 },
+          );
+        }
 
-      const email = (
-        session.customer_email ??
-        session.customer_details?.email ??
-        ''
-      )
-        .trim()
-        .toLowerCase();
-      if (email && claims.email && email !== claims.email.toLowerCase()) {
-        return NextResponse.json(
-          {
-            detail:
-              'This payment was made with a different email. Sign in with that email or contact support.',
-          },
-          { status: 403 },
-        );
-      }
+        const slug = session.metadata?.course_slug?.trim().toLowerCase();
+        const seatsMeta = session.metadata?.team_seat_count;
+        const teamSeatCount = seatsMeta ? Number.parseInt(seatsMeta, 10) : undefined;
+        if (!slug || !teamSeatCount || teamSeatCount < 2) {
+          return NextResponse.json({ detail: 'Invalid team checkout session' }, { status: 400 });
+        }
 
-      const slug = session.metadata?.course_slug?.trim().toLowerCase();
-      const seatsMeta = session.metadata?.team_seat_count;
-      const teamSeatCount = seatsMeta ? Number.parseInt(seatsMeta, 10) : undefined;
-      if (!slug || !teamSeatCount || teamSeatCount < 2) {
-        return NextResponse.json({ detail: 'Invalid team checkout session' }, { status: 400 });
+        await fulfillCourseCheckoutForUser({
+          claims,
+          courseSlug: slug,
+          paymentReference: sessionId,
+          purchaseMode: 'team',
+          teamSeatCount,
+        });
       }
-
-      await fulfillCourseCheckoutForUser({
-        claims,
-        courseSlug: slug,
-        paymentReference: sessionId,
-        purchaseMode: 'team',
-        teamSeatCount,
-      });
     }
 
     existing = await repairAndGetTeamForUser(claims.sub);

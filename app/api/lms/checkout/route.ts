@@ -131,7 +131,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    if (studentId && dbCourse) {
+    if (studentId && dbCourse && purchaseMode !== 'team') {
       const disc = await findActiveUserDiscount(studentId, dbCourse.id);
       if (disc) {
         const finalAud = computeDiscountedAud(listAud, disc);
@@ -182,7 +182,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    if (isFreeCatalog) {
+    if (isFreeCatalog && purchaseMode !== 'team') {
       return NextResponse.json({ enrolled: true });
     }
 

@@ -16,11 +16,15 @@ export async function writeTeamCourseSlug(teamId: string, courseSlug: string): P
 }
 
 export async function readTeamCourseSlug(teamId: string): Promise<string | null> {
-  const team = await prisma.lmsTeam.findUnique({
-    where: { id: teamId },
-    select: { courseSlug: true },
-  });
-  if (team?.courseSlug?.trim()) return team.courseSlug.trim().toLowerCase();
+  try {
+    const team = await prisma.lmsTeam.findUnique({
+      where: { id: teamId },
+      select: { courseSlug: true },
+    });
+    if (team?.courseSlug?.trim()) return team.courseSlug.trim().toLowerCase();
+  } catch {
+    // Stale Prisma client may lack courseSlug; fall back to raw SQL below.
+  }
 
   const rows = await prisma.$queryRaw<{ course_slug: string | null }[]>`
     SELECT course_slug FROM lms_teams WHERE id = ${teamId}::uuid

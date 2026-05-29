@@ -76,10 +76,15 @@ export async function getTeamCoursePurchases(teamId: string): Promise<TeamCourse
     courses.map((c) => [c.slug.trim().toLowerCase(), c.title]),
   );
 
+  const seatsUsedBySlug = new Map<string, number>();
   const rows: TeamCoursePurchaseRow[] = [];
   for (const p of purchases) {
     const slug = p.courseSlug.trim().toLowerCase();
-    const seatsUsed = await countSeatsUsedForTeamCourse(teamId, slug);
+    let seatsUsed = seatsUsedBySlug.get(slug);
+    if (seatsUsed === undefined) {
+      seatsUsed = await countSeatsUsedForTeamCourse(teamId, slug);
+      seatsUsedBySlug.set(slug, seatsUsed);
+    }
     rows.push({
       id: p.id,
       course_slug: slug,

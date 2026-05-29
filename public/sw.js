@@ -5,7 +5,11 @@ const CACHE_NAME = 'carsi-v2';
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) =>
-      cache.addAll(['/', '/courses', '/dashboard/student']),
+      Promise.all(
+        ['/', '/courses', '/dashboard/student'].map((url) =>
+          cache.add(url).catch((e) => console.warn('[sw] precache skip', url, e)),
+        ),
+      ),
     ),
   );
   self.skipWaiting();

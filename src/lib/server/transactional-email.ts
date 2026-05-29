@@ -107,7 +107,7 @@ export async function sendTeamMemberAddedEmail(params: {
   teamName: string;
   courseTitles: string[];
   appOrigin: string;
-  temporaryPassword: string;
+  temporaryPassword?: string;
 }): Promise<SendEmailResult> {
   const base = params.appOrigin.replace(/\/$/, '');
   const loginUrl = `${base}/login`;
@@ -115,7 +115,9 @@ export async function sendTeamMemberAddedEmail(params: {
   const subjectCourse =
     params.courseTitles.length === 1
       ? params.courseTitles[0]!
-      : `${params.courseTitles.length} CARSI courses`;
+      : params.courseTitles.length > 1
+        ? `${params.courseTitles.length} CARSI courses`
+        : 'your CARSI courses';
 
   const { html, text } = renderTeamMemberAddedEmail({
     appOrigin: base,

@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useCallback, useEffect, useState } from 'react';
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 
@@ -110,11 +110,13 @@ function TeamDashboardPage() {
   const [setupLoading, setSetupLoading] = useState(false);
 
   const needsCheckoutSetup = Boolean(sessionId && !user);
+  const hasSyncedRef = useRef(false);
+  const initialSessionIdRef = useRef(sessionId);
 
-  const syncTeam = useCallback(async () => {
+  const syncTeam = useCallback(async (activateSessionId?: string) => {
     const data = await apiClient.post<{ team: TeamPayload | null; detail?: string }>(
       '/api/lms/teams/activate-purchase',
-      sessionId ? { session_id: sessionId } : {},
+      activateSessionId ? { session_id: activateSessionId } : {},
     );
     if (data.team) {
       setTeam(data.team);
@@ -129,7 +131,7 @@ function TeamDashboardPage() {
       return me.team;
     }
     return null;
-  }, [sessionId]);
+  }, []);
 
   useEffect(() => {
     if (!sessionId || user) return;
@@ -150,21 +152,25 @@ function TeamDashboardPage() {
       setLoading(false);
       return;
     }
+    if (hasSyncedRef.current) return;
 
     let cancelled = false;
+    const activateSessionId = initialSessionIdRef.current ?? undefined;
+
     (async () => {
       setLoading(true);
       setError(null);
       try {
-        await syncTeam();
+        await syncTeam(activateSessionId);
       } catch (err) {
         if (!cancelled) {
           setError(err instanceof ApiClientError ? err.message : 'Failed to load team');
         }
       } finally {
         if (!cancelled) {
+          hasSyncedRef.current = true;
           setLoading(false);
-          if (sessionId) {
+          if (activateSessionId) {
             const params = new URLSearchParams(searchParams.toString());
             params.delete('session_id');
             const qs = params.toString();
@@ -177,7 +183,7 @@ function TeamDashboardPage() {
     return () => {
       cancelled = true;
     };
-  }, [user, sessionId, syncTeam, router, searchParams]);
+  }, [user, syncTeam, router, searchParams]);
 
   async function handleCheckoutSetup(e: React.FormEvent) {
     e.preventDefault();

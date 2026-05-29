@@ -153,7 +153,7 @@ export function PaymentSuccessClient() {
     }
   }
 
-  if (isTeamPurchase) {
+  if (isTeamPurchase && teamNextPath) {
     return (
       <main className="flex min-h-[60vh] items-center justify-center px-4">
         <Card className="w-full max-w-md border-[0.5px] border-white/6 bg-[#050505]">

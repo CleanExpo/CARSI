@@ -71,7 +71,11 @@ export async function POST(request: NextRequest) {
       }),
     ]);
 
-    await enrollTeamMemberInPurchasedCourse(claims.sub, invite.teamId);
+    try {
+      await enrollTeamMemberInPurchasedCourse(claims.sub, invite.teamId);
+    } catch (enrollErr) {
+      console.error('[teams/invite/accept] enrol', enrollErr);
+    }
 
     return NextResponse.json({
       team_id: invite.teamId,

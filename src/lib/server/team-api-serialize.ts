@@ -40,9 +40,11 @@ export async function serializeTeamForClient(team: TeamRecord, claimsSub: string
     };
   }
 
-  const seatsUsed = await countTeamSeatsUsed(team.id);
-  const coursePurchases = await getTeamCoursePurchases(team.id);
-  const courseSeatPools = await getTeamCourseSeatPools(team.id);
+  const [seatsUsed, coursePurchases, courseSeatPools] = await Promise.all([
+    countTeamSeatsUsed(team.id),
+    getTeamCoursePurchases(team.id),
+    getTeamCourseSeatPools(team.id),
+  ]);
 
   return {
     id: team.id,
