@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 
 import { prisma } from '@/lib/prisma';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
+import { enrollTeamMemberInPurchasedCourse } from '@/lib/server/team-course-purchase';
 import { countTeamSeatsUsed } from '@/lib/server/teams';
 
 /** POST /api/lms/teams/invite/accept — accept invite token. */
@@ -47,13 +48,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const existingMember = await prisma.lmsTeamMember.findFirst({
-      where: { userId: claims.sub },
-    });
-    if (existingMember && existingMember.teamId !== invite.teamId) {
-      return NextResponse.json({ detail: 'You already belong to another team' }, { status: 409 });
-    }
-
     const seatsUsed = await countTeamSeatsUsed(invite.teamId);
     if (seatsUsed >= invite.team.seatLimit) {
       return NextResponse.json({ detail: 'Team is full' }, { status: 409 });
@@ -76,6 +70,8 @@ export async function POST(request: NextRequest) {
         data: { acceptedAt: new Date() },
       }),
     ]);
+
+    await enrollTeamMemberInPurchasedCourse(claims.sub, invite.teamId);
 
     return NextResponse.json({
       team_id: invite.teamId,
