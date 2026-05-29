@@ -1,11 +1,17 @@
 'use client';
 
 import { useAuth } from '@/components/auth/auth-provider';
+import { CoursePurchaseOptions } from '@/components/lms/CoursePurchaseOptions';
 import { GuestEnrolForm } from '@/components/lms/GuestEnrolForm';
 import { Button } from '@/components/ui/button';
 import { authApi } from '@/lib/api/auth';
 import { apiClient, ApiClientError } from '@/lib/api/client';
 import { buildCourseCheckoutUrls } from '@/lib/checkout-urls';
+import {
+  MIN_TEAM_SEATS,
+  type CoursePurchaseMode,
+  validateTeamSeatCount,
+} from '@/lib/checkout-purchase-mode';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -36,6 +42,7 @@ interface CheckoutResponse {
 
 interface ConfirmResponse {
   learn_url?: string;
+  team_purchase?: boolean;
 }
 
 export function EnrolButton({ slug, priceAud = 0, isFree = false }: EnrolButtonProps) {
@@ -46,6 +53,8 @@ export function EnrolButton({ slug, priceAud = 0, isFree = false }: EnrolButtonP
   const [subState, setSubState] = useState<SubState>('checking');
   const [pricing, setPricing] = useState<PricingApi | null>(null);
   const [mode, setMode] = useState<'guest' | 'member'>('guest');
+  const [purchaseMode, setPurchaseMode] = useState<CoursePurchaseMode>('self');
+  const [teamSeats, setTeamSeats] = useState(MIN_TEAM_SEATS);
 
   useEffect(() => {
     if (!user) {
@@ -96,6 +105,10 @@ export function EnrolButton({ slug, priceAud = 0, isFree = false }: EnrolButtonP
         ? `Enrol — $${effectivePrice.toFixed(0)} AUD (was $${pricing.listPriceAud.toFixed(0)})`
         : 'Enrol Free';
     }
+    if (purchaseMode === 'team' && isPaid) {
+      const total = effectivePrice * teamSeats;
+      return `Enrol team — $${total.toFixed(0)} AUD (${teamSeats} seats)`;
+    }
     return isPaid ? `Enrol — $${effectivePrice.toFixed(0)} AUD` : 'Enrol Free';
   }
 
@@ -112,12 +125,28 @@ export function EnrolButton({ slug, priceAud = 0, isFree = false }: EnrolButtonP
       return;
     }
 
+    if (purchaseMode === 'team' && isPaid) {
+      const seatErr = validateTeamSeatCount(teamSeats);
+      if (seatErr) {
+        setError(seatErr);
+        setLoading(false);
+        return;
+      }
+    }
+
     try {
-      const { success_url, cancel_url } = buildCourseCheckoutUrls(window.location.origin, slug);
+      const { success_url, cancel_url } = buildCourseCheckoutUrls(
+        window.location.origin,
+        slug,
+        undefined,
+        purchaseMode === 'team' ? { teamSeats } : undefined,
+      );
       const data = await apiClient.post<CheckoutResponse>('/api/lms/checkout', {
         slug,
         success_url,
         cancel_url,
+        purchase_mode: purchaseMode,
+        ...(purchaseMode === 'team' ? { team_seat_count: teamSeats } : {}),
         ...(currentUser.email ? { customer_email: currentUser.email } : {}),
       });
 
@@ -165,7 +194,12 @@ export function EnrolButton({ slug, priceAud = 0, isFree = false }: EnrolButtonP
             Use my signed-in account instead
           </button>
         ) : null}
-        <GuestEnrolForm slug={slug} priceAud={effectivePrice} isFree={effectiveFree} />
+        <GuestEnrolForm
+          slug={slug}
+          priceAud={effectivePrice}
+          isFree={effectiveFree}
+          showTeamOption={isPaid}
+        />
       </div>
     );
   }
@@ -179,6 +213,18 @@ export function EnrolButton({ slug, priceAud = 0, isFree = false }: EnrolButtonP
       >
         Quick enrol with a different email
       </button>
+      {isPaid ? (
+        <div className="mb-3">
+          <CoursePurchaseOptions
+            mode={purchaseMode}
+            onModeChange={setPurchaseMode}
+            teamSeats={teamSeats}
+            onTeamSeatsChange={setTeamSeats}
+            unitPriceAud={effectivePrice}
+            disabled={loading}
+          />
+        </div>
+      ) : null}
       <Button
         onClick={handleMemberEnrol}
         disabled={loading || subState === 'checking'}
