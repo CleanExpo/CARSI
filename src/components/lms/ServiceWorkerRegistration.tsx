@@ -3,9 +3,12 @@ import { useEffect } from 'react';
 
 export function ServiceWorkerRegistration() {
   useEffect(() => {
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(() => {}); // Silent fail — SW is enhancement only
-    }
+    if (process.env.NODE_ENV !== 'production') return;
+    if (!('serviceWorker' in navigator)) return;
+
+    navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(() => {
+      /* SW is optional */
+    });
   }, []);
   return null;
 }
