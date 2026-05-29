@@ -26,6 +26,10 @@ export async function GET(request: NextRequest) {
       email: email.trim().toLowerCase(),
       course_slug: slug,
       guest_checkout: session.metadata?.guest_checkout === 'true',
+      purchase_mode: session.metadata?.purchase_mode === 'team' ? 'team' : 'self',
+      team_seat_count: session.metadata?.team_seat_count
+        ? Number.parseInt(session.metadata.team_seat_count, 10)
+        : undefined,
     });
   } catch {
     return NextResponse.json({ detail: 'Invalid session' }, { status: 400 });
