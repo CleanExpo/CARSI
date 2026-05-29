@@ -8,17 +8,28 @@ export const dynamic = 'force-dynamic';
 
 export default async function DashboardCredentialPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ credentialId: string }>;
+  searchParams: Promise<{ completed?: string; course?: string }>;
 }) {
   const { credentialId } = await params;
+  const query = await searchParams;
   const origin = await getServerOrigin();
   const credential = await getPublicCredentialJson(credentialId, origin);
   if (!credential) notFound();
 
+  const courseSlug =
+    typeof query.course === 'string' && query.course.trim() ? query.course.trim() : null;
+
   return (
-    <main className="mx-auto w-full max-w-4xl">
-      <CredentialVerificationPageContent credential={credential} credentialId={credentialId} />
+    <main className="mx-auto w-full max-w-4xl px-4 pb-12">
+      <CredentialVerificationPageContent
+        credential={credential}
+        credentialId={credentialId}
+        justCompleted={query.completed === '1'}
+        courseSlug={courseSlug}
+      />
     </main>
   );
 }
