@@ -294,6 +294,65 @@ export function renderEnrollmentWelcomeEmail(params: {
   );
 }
 
+export function renderTeamMemberAddedEmail(params: {
+  appOrigin: string;
+  memberName: string;
+  inviterName: string;
+  teamName: string;
+  courseTitles: string[];
+  loginUrl: string;
+  memberEmail: string;
+  temporaryPassword?: string;
+}): RenderedEmail {
+  const courseList =
+    params.courseTitles.length === 1
+      ? params.courseTitles[0]!
+      : params.courseTitles.map((t) => `• ${t}`).join('\n');
+
+  const details: CarsiEmailDetail[] = [
+    {
+      label: params.courseTitles.length === 1 ? 'Course' : 'Courses',
+      value: courseList,
+    },
+    { label: 'Team', value: params.teamName },
+    { label: 'Added by', value: params.inviterName },
+    { label: 'Sign-in email', value: params.memberEmail },
+  ];
+  if (params.temporaryPassword) {
+    details.push({ label: 'Your password', value: params.temporaryPassword });
+  }
+
+  const coursePhrase =
+    params.courseTitles.length === 1
+      ? params.courseTitles[0]!
+      : `these ${params.courseTitles.length} courses`;
+
+  const paragraphs = [
+    `${params.inviterName} gave you access to ${coursePhrase} on CARSI.`,
+    'Use your sign-in details below — your password is only for you. Change it after your first login if you like.',
+  ];
+
+  const subjectCourse =
+    params.courseTitles.length === 1
+      ? params.courseTitles[0]!
+      : `${params.courseTitles.length} courses`;
+
+  return render(
+    {
+      appOrigin: params.appOrigin,
+      preheader: `${params.inviterName} added you to ${subjectCourse}`,
+      eyebrow: 'Course access',
+      title: 'Your course access is ready',
+      greeting: `Hi ${params.memberName},`,
+      paragraphs,
+      details,
+      cta: { label: 'Sign in & start learning', href: params.loginUrl },
+      noteHtml: `Sign in, then open ${brandLink(`${params.appOrigin}/dashboard/student`, 'My Learning')} — only the course(s) listed above are on your account.`,
+    },
+    `Hi ${params.memberName},\n\n${params.inviterName} gave you access on CARSI (${params.teamName}):\n\n${params.courseTitles.map((t) => `- ${t}`).join('\n')}\n\nSign-in email: ${params.memberEmail}\nYour password: ${params.temporaryPassword ?? '(ask your team owner)'}\n\nSign in: ${params.loginUrl}`,
+  );
+}
+
 export function renderContactNotificationEmail(params: {
   appOrigin: string;
   ticketRef: string;
