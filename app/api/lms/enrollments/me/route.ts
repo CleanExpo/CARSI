@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { verifySessionToken } from '@/lib/auth/session-jwt';
 import { getEnrollmentsForStudent } from '@/lib/server/learner-dashboard-data';
+import { nextResponseFromFetch } from '@/lib/server/proxy-fetch-response';
 import { getUpstreamBaseUrl } from '@/lib/server/upstream-api';
 
 /**
@@ -26,12 +27,7 @@ export async function GET(request: NextRequest) {
       headers: { authorization: auth, cookie: request.headers.get('cookie') ?? '' },
       cache: 'no-store',
     });
-    const contentType = res.headers.get('content-type') || 'application/json';
-    const buf = await res.arrayBuffer();
-    return new NextResponse(buf, {
-      status: res.status,
-      headers: { 'content-type': contentType },
-    });
+    return nextResponseFromFetch(res);
   }
 
   if (!process.env.DATABASE_URL?.trim()) {
