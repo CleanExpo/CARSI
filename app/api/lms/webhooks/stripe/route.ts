@@ -14,7 +14,18 @@ import { sendEnrollmentWelcomeEmail } from '@/lib/server/enrollment-email';
 import { ensureGuestUserFromStripeEmail } from '@/lib/server/guest-checkout';
 import { sessionClaimsForUserId } from '@/lib/server/lms-auth';
 import { prisma } from '@/lib/prisma';
+import {
+  claimStripeWebhookEvent,
+  markStripeWebhookEventProcessed,
+  releaseStripeWebhookEventClaim,
+} from '@/lib/server/stripe-webhook-idempotency';
 import { fulfillCourseCheckoutForUser } from '@/lib/server/team-course-purchase';
+
+type StripeWebhookEventDelegate = {
+  create(args: { data: { id: string; type: string } }): Promise<unknown>;
+  update(args: { where: { id: string }; data: { processedAt: Date } }): Promise<unknown>;
+  delete(args: { where: { id: string } }): Promise<unknown>;
+};
 
 export async function POST(request: NextRequest) {
   const rawBody = await request.text();
@@ -35,52 +46,67 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
   }
 
-  if (event.type !== 'checkout.session.completed') {
-    return NextResponse.json({ received: true });
-  }
-
-  const session = event.data.object as Stripe.Checkout.Session;
-
-  if (session.payment_status && session.payment_status !== 'paid') {
-    return NextResponse.json({ received: true });
-  }
-
-  const slug = session.metadata?.course_slug?.trim().toLowerCase();
-  if (!slug) {
-    return NextResponse.json({ received: true });
-  }
-
   if (!process.env.DATABASE_URL?.trim()) {
     return NextResponse.json({ error: 'Database not configured' }, { status: 503 });
   }
 
-  const studentIdMeta = session.metadata?.student_id?.trim();
-  const email =
-    (session.customer_email ?? session.customer_details?.email)?.trim().toLowerCase() ?? '';
-
-  let claims = studentIdMeta ? await sessionClaimsForUserId(studentIdMeta) : null;
-  if (!claims && email) {
-    const user = await prisma.lmsUser.findUnique({ where: { email } });
-    if (user) claims = await sessionClaimsForUserId(user.id);
-  }
-  if (!claims && email && session.metadata?.guest_checkout === 'true') {
-    claims = await ensureGuestUserFromStripeEmail(email);
-  }
-
-  if (!claims) {
-    console.warn('[stripe webhook] checkout.session.completed: could not resolve learner', {
-      slug,
-      hasStudentMeta: Boolean(studentIdMeta),
-      hasEmail: Boolean(email),
+  const stripeWebhookEvents = (prisma as unknown as { stripeWebhookEvent: StripeWebhookEventDelegate })
+    .stripeWebhookEvent;
+  const claim = await claimStripeWebhookEvent(stripeWebhookEvents, event);
+  if (!claim.claimed) {
+    console.warn('[stripe webhook] duplicate event, skipped', {
+      id: event.id,
+      type: event.type,
     });
-    return NextResponse.json({ received: true });
+    return NextResponse.json({ received: true, status: 'duplicate' });
   }
 
-  const purchaseMode = session.metadata?.purchase_mode === 'team' ? 'team' : 'self';
-  const teamSeatRaw = session.metadata?.team_seat_count;
-  const teamSeatCount = teamSeatRaw ? Number.parseInt(teamSeatRaw, 10) : undefined;
+  const acknowledge = async () => {
+    await markStripeWebhookEventProcessed(stripeWebhookEvents, event.id);
+    return NextResponse.json({ received: true });
+  };
 
   try {
+    if (event.type !== 'checkout.session.completed') {
+      return acknowledge();
+    }
+
+    const session = event.data.object as Stripe.Checkout.Session;
+
+    if (session.payment_status && session.payment_status !== 'paid') {
+      return acknowledge();
+    }
+
+    const slug = session.metadata?.course_slug?.trim().toLowerCase();
+    if (!slug) {
+      return acknowledge();
+    }
+
+    const studentIdMeta = session.metadata?.student_id?.trim();
+    const email =
+      (session.customer_email ?? session.customer_details?.email)?.trim().toLowerCase() ?? '';
+
+    let claims = studentIdMeta ? await sessionClaimsForUserId(studentIdMeta) : null;
+    if (!claims && email) {
+      const user = await prisma.lmsUser.findUnique({ where: { email } });
+      if (user) claims = await sessionClaimsForUserId(user.id);
+    }
+    if (!claims && email && session.metadata?.guest_checkout === 'true') {
+      claims = await ensureGuestUserFromStripeEmail(email);
+    }
+
+    if (!claims) {
+      console.warn('[stripe webhook] checkout.session.completed: could not resolve learner', {
+        slug,
+        hasStudentMeta: Boolean(studentIdMeta),
+        hasEmail: Boolean(email),
+      });
+      return acknowledge();
+    }
+
+    const purchaseMode = session.metadata?.purchase_mode === 'team' ? 'team' : 'self';
+    const teamSeatRaw = session.metadata?.team_seat_count;
+    const teamSeatCount = teamSeatRaw ? Number.parseInt(teamSeatRaw, 10) : undefined;
     const ref = typeof session.id === 'string' ? session.id : 'stripe_webhook';
     const origin = getAppOrigin();
     const fulfilled = await fulfillCourseCheckoutForUser({
@@ -109,8 +135,10 @@ export async function POST(request: NextRequest) {
       console.warn('[stripe webhook] team purchase blocked: user on another team');
     } else {
       console.error('[stripe webhook] enrolment error:', e);
+      await releaseStripeWebhookEventClaim(stripeWebhookEvents, event.id);
+      return NextResponse.json({ error: 'Stripe webhook processing failed' }, { status: 500 });
     }
   }
 
-  return NextResponse.json({ received: true });
+  return acknowledge();
 }
