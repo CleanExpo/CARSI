@@ -8,13 +8,22 @@ import { Button } from '@/components/ui/button';
 type Props = {
   courseTitle: string;
   enrollmentId: string;
+  courseSlug?: string;
   onShare?: () => void;
 };
 
 /**
  * Shown when every lesson in the course curriculum is marked complete.
  */
-export function CourseCompletionBanner({ courseTitle, enrollmentId, onShare }: Props) {
+export function CourseCompletionBanner({
+  courseTitle,
+  enrollmentId,
+  courseSlug,
+  onShare,
+}: Props) {
+  const certViewHref = `/dashboard/credentials/${encodeURIComponent(enrollmentId)}${
+    courseSlug ? `?course=${encodeURIComponent(courseSlug)}` : ''
+  }`;
   const pdfHref = `/api/lms/enrollments/${encodeURIComponent(enrollmentId)}/certificate`;
 
   return (
@@ -60,13 +69,20 @@ export function CourseCompletionBanner({ courseTitle, enrollmentId, onShare }: P
               Share progress
             </Button>
           ) : null}
+          <Button asChild className="w-full rounded-lg bg-emerald-600 text-white hover:bg-emerald-500 sm:w-auto">
+            <Link href={certViewHref}>
+              <Award className="mr-2 h-4 w-4" aria-hidden />
+              View certificate
+            </Link>
+          </Button>
           <Button
             asChild
-            className="w-full rounded-lg bg-emerald-600 text-white hover:bg-emerald-500 sm:w-auto"
+            variant="outline"
+            className="w-full border-white/20 bg-white/5 text-white hover:bg-white/10 sm:w-auto"
           >
             <a href={pdfHref} target="_blank" rel="noopener noreferrer">
               <Download className="mr-2 h-4 w-4" aria-hidden />
-              Download certificate (PDF)
+              Download PDF
             </a>
           </Button>
           <Button
