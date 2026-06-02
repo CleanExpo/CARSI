@@ -22,7 +22,11 @@ async function resolveCourseForAdminGrant(slug: string) {
  * Create an enrollment for a learner for a course in the LMS seed catalog (five pilot courses).
  * Materialises the course in the DB (8 modules + lessons) when missing.
  */
-export async function adminGrantEnrollment(params: { studentId: string; courseSlug: string }) {
+export async function adminGrantEnrollment(params: {
+  studentId: string;
+  courseSlug: string;
+  paymentReference?: string;
+}) {
   const courseSlug = params.courseSlug.trim().toLowerCase();
   if (!courseSlug) throw new Error('INVALID_COURSE_SLUG');
 
@@ -42,7 +46,7 @@ export async function adminGrantEnrollment(params: { studentId: string; courseSl
       studentId: params.studentId,
       courseId: course.id,
       status: 'active',
-      paymentReference: 'admin:seed-catalog',
+      paymentReference: params.paymentReference ?? 'admin:seed-catalog',
     },
   });
 
@@ -52,6 +56,7 @@ export async function adminGrantEnrollment(params: { studentId: string; courseSl
 export async function adminGrantEnrollments(params: {
   studentId: string;
   courseSlugs: string[];
+  paymentReference?: string;
 }): Promise<{
   created: number;
   alreadyEnrolled: number;
@@ -65,7 +70,11 @@ export async function adminGrantEnrollments(params: {
   const enrollmentIds: string[] = [];
 
   for (const courseSlug of unique) {
-    const result = await adminGrantEnrollment({ studentId: params.studentId, courseSlug });
+    const result = await adminGrantEnrollment({
+      studentId: params.studentId,
+      courseSlug,
+      paymentReference: params.paymentReference,
+    });
     enrollmentIds.push(result.enrollmentId);
     if (result.kind === 'already_enrolled') alreadyEnrolled += 1;
     else created += 1;

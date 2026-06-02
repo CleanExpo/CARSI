@@ -358,6 +358,50 @@ export function renderTeamMemberAddedEmail(params: {
   );
 }
 
+export function renderYearlyMembershipEmail(params: {
+  appOrigin: string;
+  memberName: string;
+  memberEmail: string;
+  temporaryPassword: string;
+  priceLabel: string;
+  courseCount: number;
+  durationLabel: string;
+  loginUrl: string;
+  dashboardUrl: string;
+}): RenderedEmail {
+  const courseAccessLine =
+    params.courseCount === 1
+      ? '1 published course'
+      : `all ${params.courseCount} published courses`;
+
+  const details: CarsiEmailDetail[] = [
+    { label: 'Membership', value: 'Yearly Membership' },
+    { label: 'Price', value: params.priceLabel },
+    { label: 'Access', value: courseAccessLine },
+    { label: 'Duration', value: params.durationLabel },
+    { label: 'Sign-in email', value: params.memberEmail },
+    { label: 'Your password', value: params.temporaryPassword },
+  ];
+
+  return render(
+    {
+      appOrigin: params.appOrigin,
+      preheader: 'Your CARSI Yearly Membership is active',
+      eyebrow: 'Yearly Membership',
+      title: 'Full library access is ready',
+      greeting: `Hi ${params.memberName},`,
+      paragraphs: [
+        'Your CARSI Yearly Membership is now active. You can sign in and start any published course in the catalogue.',
+        'Use the sign-in details below. We recommend changing your password after your first login.',
+      ],
+      details,
+      cta: { label: 'Sign in to CARSI', href: params.loginUrl },
+      noteHtml: `Open ${brandLink(params.dashboardUrl, 'My Learning')} after sign-in to see your courses and track progress.`,
+    },
+    `Hi ${params.memberName},\n\nYour CARSI Yearly Membership is active.\n\nMembership: Yearly Membership\nPrice: ${params.priceLabel}\nAccess: ${courseAccessLine}\nDuration: ${params.durationLabel}\n\nSign-in email: ${params.memberEmail}\nPassword: ${params.temporaryPassword}\n\nSign in: ${params.loginUrl}\nDashboard: ${params.dashboardUrl}`,
+  );
+}
+
 export function renderContactNotificationEmail(params: {
   appOrigin: string;
   ticketRef: string;

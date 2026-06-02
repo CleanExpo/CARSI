@@ -1,6 +1,6 @@
 'use client';
 
-import { BarChart3, BookOpen, LogOut, Mail, Percent, Users } from 'lucide-react';
+import { BadgeCheck, BarChart3, BookOpen, LogOut, Mail, Percent, Users } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 
@@ -50,6 +50,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const discountsActive = pathname.startsWith('/admin/discounts');
   const contactsActive = pathname.startsWith('/admin/contacts');
   const analyticsActive = pathname.startsWith('/admin/analytics');
+  const yearlyMembershipActive = pathname.startsWith('/admin/yearly-membership');
 
   async function handleSignOut() {
     await signOut();
@@ -85,6 +86,12 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             label="Discounts"
             icon={Percent}
             active={discountsActive}
+          />
+          <NavButton
+            href="/admin/yearly-membership"
+            label="Yearly Membership"
+            icon={BadgeCheck}
+            active={yearlyMembershipActive}
           />
           <NavButton href="/admin/contacts" label="Contacts" icon={Mail} active={contactsActive} />
           <NavButton

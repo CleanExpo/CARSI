@@ -10,6 +10,7 @@ import {
   renderPasswordResetEmail,
   renderRegistrationWelcomeEmail,
   renderTeamMemberAddedEmail,
+  renderYearlyMembershipEmail,
 } from '@/lib/server/email-templates';
 import { sendEmail, isEmailConfigured, type SendEmailResult } from '@/lib/server/email';
 import { getFirstLessonLearnPath } from '@/lib/server/first-lesson';
@@ -133,6 +134,41 @@ export async function sendTeamMemberAddedEmail(params: {
   return sendEmail({
     to: params.to,
     subject: `${params.inviterName} gave you access to ${subjectCourse}`,
+    html,
+    text,
+  });
+}
+
+export async function sendYearlyMembershipEmail(params: {
+  to: string;
+  memberName: string;
+  memberEmail: string;
+  temporaryPassword: string;
+  priceLabel: string;
+  courseCount: number;
+  durationLabel: string;
+  appOrigin: string;
+}): Promise<SendEmailResult> {
+  const base = params.appOrigin.replace(/\/$/, '');
+  const loginUrl = `${base}/login`;
+  const dashboardUrl = `${base}/dashboard/student`;
+  const name = params.memberName.trim() || params.to.split('@')[0];
+
+  const { html, text } = renderYearlyMembershipEmail({
+    appOrigin: base,
+    memberName: name,
+    memberEmail: params.memberEmail,
+    temporaryPassword: params.temporaryPassword,
+    priceLabel: params.priceLabel,
+    courseCount: params.courseCount,
+    durationLabel: params.durationLabel,
+    loginUrl,
+    dashboardUrl,
+  });
+
+  return sendEmail({
+    to: params.to,
+    subject: 'Your CARSI Yearly Membership — sign-in details',
     html,
     text,
   });
