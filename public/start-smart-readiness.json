@@ -1,0 +1,72 @@
+{
+  "name": "CARSI Start Smart Professional Readiness Loop",
+  "url": "https://carsi.com.au/start-carpet-cleaning-business",
+  "updated": "2026-06-17",
+  "purpose": "Help people researching carpet cleaning as a business, add-on service, equipment purchase, or acquisition connect professional equipment, service model, chemicals, and training before taking consequential action.",
+  "standing_rule": "The operator may research, prepare, and practise, but should not buy major equipment, advertise a service, select chemicals for customer work, or take paid work until the matching service, equipment, chemical, and training gates are clear.",
+  "pillars": [
+    {
+      "name": "Professional Equipment",
+      "route": "https://carsi.com.au/start-carpet-cleaning-business/equipment-before-you-buy",
+      "role": "Equipment supports the chosen service and chemical method. It should not be selected by price, power, or supplier bundle alone."
+    },
+    {
+      "name": "Service",
+      "route": "https://carsi.com.au/start-carpet-cleaning-business/service-models",
+      "role": "The service model defines the customer promise, job boundaries, equipment capacity, chemical range, quoting method, documentation, and escalation rules."
+    },
+    {
+      "name": "Chemicals",
+      "route": "https://carsi.com.au/start-carpet-cleaning-business/chemistry-for-beginners",
+      "role": "Chemical decisions follow fibre, soil, stain history, pH, dwell time, agitation, rinse, safety, and customer sensitivity."
+    },
+    {
+      "name": "Training",
+      "route": "https://carsi.com.au/courses?discipline=CCT",
+      "role": "Training is the judgement layer that connects equipment, service, and chemicals into safe, explainable professional decisions."
+    }
+  ],
+  "routes": [
+    {
+      "url": "https://carsi.com.au/start-carpet-cleaning-business/no-experience",
+      "audience": "First-time operators",
+      "readiness_focus": "Build knowledge, practice, a narrow service promise, and equipment questions before paid customer work."
+    },
+    {
+      "url": "https://carsi.com.au/start-carpet-cleaning-business/cleaners-adding-carpet-cleaning",
+      "audience": "Existing cleaners adding carpet cleaning",
+      "readiness_focus": "Turn an add-on service into a defined workflow with suitable equipment, carpet-specific chemicals, and lead-operator training."
+    },
+    {
+      "url": "https://carsi.com.au/start-carpet-cleaning-business/buying-a-cleaning-business",
+      "audience": "Business buyers and acquisition researchers",
+      "readiness_focus": "Use equipment, service, chemical, and training evidence as operational due diligence before valuation or handover."
+    },
+    {
+      "url": "https://carsi.com.au/start-carpet-cleaning-business/equipment-before-you-buy",
+      "audience": "People comparing carpet cleaning machines and startup packages",
+      "readiness_focus": "Choose equipment only after the first job types, service model, chemical method, access, drying, maintenance, and training needs are understood."
+    },
+    {
+      "url": "https://carsi.com.au/start-carpet-cleaning-business/chemistry-for-beginners",
+      "audience": "Beginners and teams needing safer chemical decisions",
+      "readiness_focus": "Connect product choice to fibre, soil, stain history, pH, dwell, agitation, rinse, safety, equipment, and customer promises."
+    },
+    {
+      "url": "https://carsi.com.au/start-carpet-cleaning-business/quoting-and-pricing",
+      "audience": "New operators pricing carpet cleaning work",
+      "readiness_focus": "Quote from service scope, equipment time, chemical risk, setup, access, aftercare, training, and margin rather than room count alone."
+    },
+    {
+      "url": "https://carsi.com.au/start-carpet-cleaning-business/certification-and-trust",
+      "audience": "Learners, customers, employers, and buyers checking trust signals",
+      "readiness_focus": "Present training, CECs, IICRC alignment, credentials, chemical safety, and service limits honestly without overstating legal status."
+    },
+    {
+      "url": "https://carsi.com.au/start-carpet-cleaning-business/service-models",
+      "audience": "Operators choosing residential, commercial, upholstery, odour, rug, or restoration-adjacent niches",
+      "readiness_focus": "Choose a service niche first, then align equipment, chemicals, quoting, training, and escalation before expanding."
+    }
+  ],
+  "not_advice": "CARSI Start Smart is educational guidance, not legal, insurance, finance, RTO, or local compliance advice."
+}

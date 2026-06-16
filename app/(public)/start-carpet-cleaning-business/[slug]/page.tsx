@@ -1,10 +1,11 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
-import { ArticleSchema } from '@/components/seo';
+import { ArticleSchema, ItemListSchema } from '@/components/seo';
 import { StartSmartDetail } from '@/components/marketing/StartSmartContent';
 import { getPublicSiteUrl } from '@/lib/env/public-url';
 import {
+  getStartSmartOperatingConnections,
   getStartSmartPage,
   startSmartBasePath,
   startSmartPages,
@@ -50,6 +51,7 @@ export default async function StartSmartSubPillarPage({ params }: PageProps) {
   if (!page) notFound();
 
   const canonical = `${siteUrl}${startSmartBasePath}/${page.slug}`;
+  const operatingConnections = getStartSmartOperatingConnections(page.slug);
 
   return (
     <>
@@ -59,6 +61,15 @@ export default async function StartSmartSubPillarPage({ params }: PageProps) {
         url={canonical}
         articleSection="Carpet Cleaning Business Training"
         keywords={page.keywords}
+      />
+      <ItemListSchema
+        name={`${page.title} equipment-service-chemicals-training map`}
+        description="CARSI Start Smart decision gates connecting professional equipment, service model, carpet cleaning chemicals and training."
+        items={operatingConnections.map((connection) => ({
+          name: connection.pillar,
+          description: `${connection.impact} ${connection.decision} ${connection.evidence}`,
+          url: `${canonical}#equipment-service-chemicals-training`,
+        }))}
       />
       <StartSmartDetail page={page} siteUrl={siteUrl} />
     </>

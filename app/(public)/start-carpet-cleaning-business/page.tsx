@@ -7,6 +7,7 @@ import {
   startSmartBasePath,
   startSmartHubKeywords,
   startSmartPages,
+  startSmartReadinessLoop,
 } from '@/lib/marketing/start-smart';
 
 const siteUrl = getPublicSiteUrl();
@@ -47,6 +48,15 @@ export default function StartCarpetCleaningBusinessPage() {
           name: page.title,
           description: page.description,
           url: `${siteUrl}${startSmartBasePath}/${page.slug}`,
+        }))}
+      />
+      <ItemListSchema
+        name="CARSI Start Smart Professional Readiness Loop"
+        description="The four connected readiness pillars a carpet cleaning operator should align before buying gear, advertising services, selecting products or taking paid work."
+        items={startSmartReadinessLoop.map((pillar) => ({
+          name: pillar.label,
+          description: `${pillar.summary} ${pillar.connection} ${pillar.proofQuestion}`,
+          url: `${siteUrl}${pillar.href}`,
         }))}
       />
       <StartSmartHub siteUrl={siteUrl} />
