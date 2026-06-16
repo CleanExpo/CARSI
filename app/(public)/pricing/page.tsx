@@ -118,6 +118,31 @@ export default function PricingPage() {
             </p>
           </section>
 
+          <section
+            aria-label="Carpet cleaning startup pathway"
+            className="mb-10 grid gap-5 rounded-sm border border-[#ed9d24]/20 bg-[#ed9d24]/[0.055] p-6 md:grid-cols-[1fr_auto] md:items-center"
+          >
+            <div>
+              <p className="mb-2 text-[11px] font-semibold tracking-[0.18em] text-[#ed9d24] uppercase">
+                Not sure what to buy or learn first?
+              </p>
+              <h2 className="text-xl font-semibold text-white">
+                Use the Start Smart pathway before choosing equipment, courses or a service model.
+              </h2>
+              <p className="mt-3 max-w-3xl text-sm leading-6 text-white/55">
+                If you are starting carpet cleaning with no experience, adding it to an existing
+                cleaning business, or buying a cleaning company, CARSI&apos;s Start Smart pages explain
+                the knowledge, quoting, chemistry and trust gaps to check before spending money.
+              </p>
+            </div>
+            <Link
+              href="/start-carpet-cleaning-business"
+              className="inline-flex items-center justify-center rounded-sm border border-[#ed9d24]/35 bg-[#ed9d24]/10 px-5 py-3 text-sm font-semibold text-[#ffcf7a] transition-colors hover:bg-[#ed9d24]/16"
+            >
+              Start Smart
+            </Link>
+          </section>
+
           <PricingTiers />
 
           {/* ── Legacy membership tiers (Free / Foundation / Growth) ── */}
