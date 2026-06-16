@@ -4,6 +4,11 @@ export type StartSmartSource = {
   note: string;
 };
 
+export type StartSmartFaq = {
+  question: string;
+  answer: string;
+};
+
 export type StartSmartPage = {
   slug: string;
   title: string;
@@ -23,7 +28,7 @@ export type StartSmartPage = {
     href: string;
     label: string;
   };
-  faqs: { question: string; answer: string }[];
+  faqs: StartSmartFaq[];
   sources: StartSmartSource[];
   keywords: string[];
 };
@@ -35,6 +40,13 @@ export type StartSmartReadinessPillar = {
   connection: string;
   proofQuestion: string;
   href: string;
+};
+
+export type StartSmartOperatingConnection = {
+  pillar: StartSmartReadinessPillar['label'];
+  impact: string;
+  decision: string;
+  evidence: string;
 };
 
 export const startSmartBasePath = '/start-carpet-cleaning-business';
@@ -92,6 +104,217 @@ export const startSmartReadinessRules = [
   'Do not choose chemicals without fibre, soil, stain, safety and equipment context.',
   'Do not treat training as optional; it is the link that makes equipment, service and chemicals professional.',
 ];
+
+export const startSmartOperatingConnectionsBySlug: Record<string, StartSmartOperatingConnection[]> = {
+  'no-experience': [
+    {
+      pillar: 'Professional Equipment',
+      impact: 'First-time operators should choose starter equipment only after they know their first job types and access limits.',
+      decision: 'Delay major purchases until the learner can explain method, drying, maintenance and which jobs the machine should not be used on.',
+      evidence: 'A written job profile, supplier questions and a practice record before paid customer work.',
+    },
+    {
+      pillar: 'Service',
+      impact: 'The first service promise should be narrow, low-risk and easy to explain before the operator expands.',
+      decision: 'Define inclusions, exclusions, aftercare and escalation before publishing prices.',
+      evidence: 'A simple service menu with clear boundaries for stains, odour, rugs, upholstery and restoration-adjacent work.',
+    },
+    {
+      pillar: 'Chemicals',
+      impact: 'Beginners need product logic before product volume, because the wrong chemical can damage fibres or trust.',
+      decision: 'Select chemicals only after fibre, soil, stain history, pH, dwell, agitation and rinse have been considered.',
+      evidence: 'A basic product decision tree and notes from practice on sample materials.',
+    },
+    {
+      pillar: 'Training',
+      impact: 'Training is the control layer that turns interest into safer judgement.',
+      decision: 'Complete structured learning before taking paid jobs that involve customer property, difficult stains or unclear risks.',
+      evidence: 'CARSI course progress, practice notes and a list of situations that require help from a senior technician.',
+    },
+  ],
+  'cleaners-adding-carpet-cleaning': [
+    {
+      pillar: 'Professional Equipment',
+      impact: 'Existing cleaners should not assume general cleaning tools translate to carpet results.',
+      decision: 'Choose equipment that matches the add-on service, staff transport, commercial access and drying expectations.',
+      evidence: 'A pilot equipment list matched to residential, bond or commercial maintenance work.',
+    },
+    {
+      pillar: 'Service',
+      impact: 'Carpet cleaning should be sold as a defined add-on, not a vague extra on a general cleaning invoice.',
+      decision: 'Create a pilot offer with intake questions, exclusions and referral rules before rolling it to every customer.',
+      evidence: 'A documented add-on workflow that staff can follow without improvising.',
+    },
+    {
+      pillar: 'Chemicals',
+      impact: 'Carpet chemistry is different from hard-surface cleaning and needs its own product logic.',
+      decision: 'Train staff on fibre, spotting, residue, rinse and safety before they use chemicals in customer homes or facilities.',
+      evidence: 'Product notes, SDS awareness and before-after job records from supervised work.',
+    },
+    {
+      pillar: 'Training',
+      impact: 'Training lets an existing cleaning team add revenue without weakening trust.',
+      decision: 'Nominate a lead operator first, then scale the service after method and quality checks are stable.',
+      evidence: 'Lead operator completion records, team checklist adoption and callback tracking.',
+    },
+  ],
+  'buying-a-cleaning-business': [
+    {
+      pillar: 'Professional Equipment',
+      impact: 'Equipment value only matters if it suits the revenue being purchased and is maintained well enough to keep earning.',
+      decision: 'Audit condition, service history, consumables and fit for the claimed service mix before valuation.',
+      evidence: 'A due diligence equipment register with maintenance notes and replacement risk.',
+    },
+    {
+      pillar: 'Service',
+      impact: 'A buyer needs to know whether revenue comes from repeatable services or from seller-dependent know-how.',
+      decision: 'Map every service line to staff capability, margin, contracts, complaint history and handover risk.',
+      evidence: 'A service capability matrix tied to revenue, staff names or roles, and customer expectations.',
+    },
+    {
+      pillar: 'Chemicals',
+      impact: 'Chemical practices can reveal hidden quality, safety or documentation risk in an acquisition.',
+      decision: 'Review product range, SDS access, dilution habits, stain promises and how technicians document method choice.',
+      evidence: 'Chemical inventory, SDS folder, job notes and callback evidence.',
+    },
+    {
+      pillar: 'Training',
+      impact: 'Training records show whether the business has transferable capability after the seller leaves.',
+      decision: 'Treat missing training evidence as an operational risk and build a 90-day upskill plan into the acquisition.',
+      evidence: 'Certificates, CARSI/IICRC records, staff interviews and post-acquisition training milestones.',
+    },
+  ],
+  'equipment-before-you-buy': [
+    {
+      pillar: 'Professional Equipment',
+      impact: 'This page is the equipment gate: the machine has to fit the service, not the other way around.',
+      decision: 'Buy only after target jobs, access, power, water, transport, drying and maintenance are understood.',
+      evidence: 'A written equipment brief comparing must-have tools, later upgrades and jobs to avoid.',
+    },
+    {
+      pillar: 'Service',
+      impact: 'The service model decides whether a portable, truckmount, spotter, agitation tool or encapsulation setup makes sense.',
+      decision: 'Define the first three services before speaking to suppliers or accepting bundle recommendations.',
+      evidence: 'A service-to-method map for residential, commercial, upholstery, odour or restoration-adjacent work.',
+    },
+    {
+      pillar: 'Chemicals',
+      impact: 'Equipment performance depends on compatible chemistry, dwell, agitation, extraction and rinse.',
+      decision: 'Check chemical compatibility and residue controls before choosing the machine and accessories.',
+      evidence: 'Supplier questions covering chemical range, training needs and method limits.',
+    },
+    {
+      pillar: 'Training',
+      impact: 'Training helps the buyer understand what sales brochures leave out.',
+      decision: 'Use CARSI learning to separate genuine operating needs from marketing claims.',
+      evidence: 'Course notes that explain method choice, maintenance, risk and customer communication.',
+    },
+  ],
+  'chemistry-for-beginners': [
+    {
+      pillar: 'Professional Equipment',
+      impact: 'Chemistry changes how equipment is used, rinsed and maintained.',
+      decision: 'Choose tools and processes that support the products, fibres and rinse standards required by the job.',
+      evidence: 'Method notes linking product, dilution, dwell, agitation, rinse and drying.',
+    },
+    {
+      pillar: 'Service',
+      impact: 'The service promise must match what chemistry can safely achieve.',
+      decision: 'Qualify stain, odour and restoration promises before the customer hears a guarantee.',
+      evidence: 'Customer intake and limitation wording for common stains, fibres and sensitivities.',
+    },
+    {
+      pillar: 'Chemicals',
+      impact: 'This page is the chemical decision gate: product choice follows inspection, not habit.',
+      decision: 'Assess fibre, soil, stain history, pH, dwell, agitation, rinse, safety and sensitivity before applying product.',
+      evidence: 'A chemical decision tree, SDS access and documented product choices.',
+    },
+    {
+      pillar: 'Training',
+      impact: 'Training keeps chemical selection from becoming trial and error on customer property.',
+      decision: 'Practise and learn the logic before using stronger products or promising difficult outcomes.',
+      evidence: 'CARSI learning records and supervised practice on sample materials.',
+    },
+  ],
+  'quoting-and-pricing': [
+    {
+      pillar: 'Professional Equipment',
+      impact: 'Pricing must recover the real cost of equipment ownership, transport, setup, consumables and maintenance.',
+      decision: 'Include equipment time and limitations in the quote instead of pricing only by room count.',
+      evidence: 'A quote checklist that includes setup, pack-down, drying and access constraints.',
+    },
+    {
+      pillar: 'Service',
+      impact: 'The quote is the written version of the service promise.',
+      decision: 'Separate base service, add-ons, exclusions and escalation before the customer approves work.',
+      evidence: 'Quote templates with inclusions, exclusions, aftercare and limitation language.',
+    },
+    {
+      pillar: 'Chemicals',
+      impact: 'Chemical complexity changes cost, risk and customer expectations.',
+      decision: 'Price spotting, odour, residue, sensitivity and special product requirements separately when needed.',
+      evidence: 'Job notes showing product choice, dilution, dwell and extra risk factors.',
+    },
+    {
+      pillar: 'Training',
+      impact: 'Training supports confident explanations that justify professional pricing.',
+      decision: 'Use technical understanding to compete on trust and process, not only cheap prices.',
+      evidence: 'Credentials, clear inspection language and tracked margins from early jobs.',
+    },
+  ],
+  'certification-and-trust': [
+    {
+      pillar: 'Professional Equipment',
+      impact: 'Customers trust equipment more when the operator can explain why it is suitable.',
+      decision: 'Avoid using machine ownership as a substitute for competence.',
+      evidence: 'Visible training records and plain-English method explanations.',
+    },
+    {
+      pillar: 'Service',
+      impact: 'Trust is earned when the service promise is honest about limits, credentials and local requirements.',
+      decision: 'Present CARSI, CECs and IICRC-aligned learning accurately without overstating legal status.',
+      evidence: 'Website, quote and credential wording that avoids licence or RTO confusion.',
+    },
+    {
+      pillar: 'Chemicals',
+      impact: 'Chemical safety and limitation language is a trust signal, especially for homes, facilities and sensitive occupants.',
+      decision: 'Explain product choices and safety controls without making unsupported stain or health claims.',
+      evidence: 'SDS awareness, customer notes and documented limitations.',
+    },
+    {
+      pillar: 'Training',
+      impact: 'This page is the trust gate: education must be visible, accurate and applied.',
+      decision: 'Keep certificates, continuing education and credential records available for customers, employers and buyers.',
+      evidence: 'CARSI records, IICRC CEC references and public credential verification where applicable.',
+    },
+  ],
+  'service-models': [
+    {
+      pillar: 'Professional Equipment',
+      impact: 'Each service model needs a different equipment profile.',
+      decision: 'Match tools to residential, commercial, upholstery, rug, odour or restoration-adjacent work before expanding.',
+      evidence: 'A service-to-equipment matrix with must-have tools and deferred upgrades.',
+    },
+    {
+      pillar: 'Service',
+      impact: 'This page is the service gate: the niche defines the promise and risk.',
+      decision: 'Choose one primary model and one add-on before trying to sell every service at once.',
+      evidence: 'A 90-day service menu with boundaries, aftercare and referral rules.',
+    },
+    {
+      pillar: 'Chemicals',
+      impact: 'Different service models change chemical range, safety controls and documentation.',
+      decision: 'Select products for the chosen niche instead of carrying a broad range with unclear use cases.',
+      evidence: 'Product notes linked to each service model and job type.',
+    },
+    {
+      pillar: 'Training',
+      impact: 'Training decides when a service model is ready to sell and when it needs escalation.',
+      decision: 'Close knowledge gaps before adding rugs, upholstery, odour, commercial maintenance or restoration-adjacent work.',
+      evidence: 'A staged learning plan tied to each service expansion.',
+    },
+  ],
+};
 
 export const startSmartSources = {
   iicrcCct: {
@@ -627,6 +850,32 @@ export const startSmartPages: StartSmartPage[] = [
 
 export function getStartSmartPage(slug: string) {
   return startSmartPages.find((page) => page.slug === slug);
+}
+
+export function getStartSmartOperatingConnections(slug: string): StartSmartOperatingConnection[] {
+  return (
+    startSmartOperatingConnectionsBySlug[slug] ??
+    startSmartReadinessLoop.map((pillar) => ({
+      pillar: pillar.label,
+      impact: pillar.connection,
+      decision: pillar.summary,
+      evidence: pillar.proofQuestion,
+    }))
+  );
+}
+
+export function getStartSmartPageFaqs(page: StartSmartPage): StartSmartFaq[] {
+  const readinessAnswer = getStartSmartOperatingConnections(page.slug)
+    .map(({ pillar, impact }) => `${pillar}: ${impact}`)
+    .join(' ');
+
+  return [
+    ...page.faqs,
+    {
+      question: `How does ${page.shortTitle.toLowerCase()} connect equipment, service, chemicals and training?`,
+      answer: readinessAnswer,
+    },
+  ];
 }
 
 export const startSmartHubFaqs = [

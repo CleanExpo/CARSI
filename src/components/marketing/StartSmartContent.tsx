@@ -23,11 +23,14 @@ import {
 
 import { BreadcrumbSchema, FAQSchema, OrganizationSchema } from '@/components/seo';
 import {
+  getStartSmartOperatingConnections,
+  getStartSmartPageFaqs,
   startSmartBasePath,
   startSmartHubFaqs,
   startSmartPages,
   startSmartReadinessLoop,
   startSmartReadinessRules,
+  type StartSmartOperatingConnection,
   type StartSmartPage,
   type StartSmartReadinessPillar,
   type StartSmartSource,
@@ -173,6 +176,65 @@ function ProfessionalReadinessLoop({ compact = false }: { compact?: boolean }) {
           ))}
         </div>
       ) : null}
+    </section>
+  );
+}
+
+function OperatingConnectionCard({ connection }: { connection: StartSmartOperatingConnection }) {
+  const Icon = readinessIconByLabel[connection.pillar as keyof typeof readinessIconByLabel] ?? Compass;
+
+  return (
+    <div className="rounded-sm p-5" style={panelStyle}>
+      <div className="flex items-start gap-3">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-sm bg-[#2490ed]/15 text-[#5bd7ff]">
+          <Icon className="h-4 w-4" aria-hidden="true" />
+        </div>
+        <div>
+          <p className="text-xs font-semibold tracking-wide text-[#ed9d24] uppercase">
+            {connection.pillar}
+          </p>
+          <p className="mt-2 text-sm leading-6" style={{ color: soft }}>
+            {connection.impact}
+          </p>
+        </div>
+      </div>
+      <div className="mt-4 grid gap-3 border-t border-white/[0.07] pt-4">
+        <div>
+          <p className="text-xs font-semibold tracking-wide text-[#5bd7ff] uppercase">
+            Decision gate
+          </p>
+          <p className="mt-1 text-sm leading-6" style={{ color: muted }}>
+            {connection.decision}
+          </p>
+        </div>
+        <div>
+          <p className="text-xs font-semibold tracking-wide text-[#5bd7ff] uppercase">
+            Evidence to keep
+          </p>
+          <p className="mt-1 text-sm leading-6" style={{ color: muted }}>
+            {connection.evidence}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function StartSmartOperatingMap({ page }: { page: StartSmartPage }) {
+  const connections = getStartSmartOperatingConnections(page.slug);
+
+  return (
+    <section id="equipment-service-chemicals-training" className="py-8">
+      <SectionHeader
+        eyebrow="Operating system map"
+        title="How this topic connects equipment, service, chemicals and training"
+        body="This is the practical bridge between learning and action. Each topic should change a buying decision, a service promise, a chemical choice or a training gate before the operator moves forward."
+      />
+      <div className="grid gap-4 md:grid-cols-2">
+        {connections.map((connection) => (
+          <OperatingConnectionCard key={connection.pillar} connection={connection} />
+        ))}
+      </div>
     </section>
   );
 }
@@ -391,12 +453,13 @@ export function StartSmartDetail({ page, siteUrl }: { page: StartSmartPage; site
     { name: page.shortTitle, url: canonical },
   ];
   const relatedPages = startSmartPages.filter((item) => item.slug !== page.slug).slice(0, 4);
+  const pageFaqs = getStartSmartPageFaqs(page);
 
   return (
     <main className="relative min-h-screen py-10 sm:py-14">
       <OrganizationSchema />
       <BreadcrumbSchema items={breadcrumbs} />
-      <FAQSchema questions={page.faqs} />
+      <FAQSchema questions={pageFaqs} />
 
       <div
         className="pointer-events-none fixed inset-0 z-0"
@@ -490,6 +553,8 @@ export function StartSmartDetail({ page, siteUrl }: { page: StartSmartPage; site
           </div>
         </section>
 
+        <StartSmartOperatingMap page={page} />
+
         <ProfessionalReadinessLoop compact />
 
         <section className="py-8">
@@ -535,7 +600,7 @@ export function StartSmartDetail({ page, siteUrl }: { page: StartSmartPage; site
               Questions this page answers
             </h2>
             <div className="mt-5 space-y-3">
-              {page.faqs.map((faq) => (
+              {pageFaqs.map((faq) => (
                 <details key={faq.question} className="rounded-sm bg-white/[0.03] p-4">
                   <summary className="cursor-pointer text-sm font-semibold" style={{ color: strong }}>
                     {faq.question}
