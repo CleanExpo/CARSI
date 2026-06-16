@@ -9,6 +9,7 @@ import {
   ClipboardCheck,
   Compass,
   ExternalLink,
+  FlaskConical,
   GraduationCap,
   HelpCircle,
   Lightbulb,
@@ -17,6 +18,7 @@ import {
   Sparkles,
   Target,
   Users,
+  Wrench,
 } from 'lucide-react';
 
 import { BreadcrumbSchema, FAQSchema, OrganizationSchema } from '@/components/seo';
@@ -24,7 +26,10 @@ import {
   startSmartBasePath,
   startSmartHubFaqs,
   startSmartPages,
+  startSmartReadinessLoop,
+  startSmartReadinessRules,
   type StartSmartPage,
+  type StartSmartReadinessPillar,
   type StartSmartSource,
 } from '@/lib/marketing/start-smart';
 
@@ -100,6 +105,75 @@ function Pill({ children }: { children: string }) {
     >
       {children}
     </span>
+  );
+}
+
+const readinessIconByLabel = {
+  'Professional Equipment': Wrench,
+  Service: Target,
+  Chemicals: FlaskConical,
+  Training: GraduationCap,
+} as const;
+
+function ReadinessPillarCard({ pillar }: { pillar: StartSmartReadinessPillar }) {
+  const Icon = readinessIconByLabel[pillar.label as keyof typeof readinessIconByLabel] ?? Compass;
+
+  return (
+    <Link
+      href={pillar.href}
+      className="group rounded-sm p-5 transition hover:-translate-y-0.5 hover:border-[#5bd7ff]/40"
+      style={panelStyle}
+    >
+      <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-sm bg-[#2490ed]/15 text-[#5bd7ff]">
+        <Icon className="h-5 w-5" aria-hidden="true" />
+      </div>
+      <p className="text-xs font-semibold tracking-wide text-[#ed9d24] uppercase">
+        {pillar.label}
+      </p>
+      <p className="mt-3 text-sm leading-6" style={{ color: muted }}>
+        {pillar.summary}
+      </p>
+      <p className="mt-4 text-sm leading-6" style={{ color: soft }}>
+        {pillar.connection}
+      </p>
+      <p className="mt-4 border-t border-white/[0.07] pt-4 text-xs leading-5" style={{ color: muted }}>
+        Proof question: {pillar.proofQuestion}
+      </p>
+      <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[#5bd7ff]">
+        Connect this piece <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
+      </span>
+    </Link>
+  );
+}
+
+function ProfessionalReadinessLoop({ compact = false }: { compact?: boolean }) {
+  return (
+    <section className="py-8">
+      <SectionHeader
+        eyebrow="Professional readiness loop"
+        title="Equipment, service, chemicals and training must work as one system"
+        body="A professional carpet cleaning offer is not built by buying a machine first. The service promise, equipment capability, chemical method and operator training all have to match before the customer is asked to trust the result."
+      />
+
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {startSmartReadinessLoop.map((pillar) => (
+          <ReadinessPillarCard key={pillar.label} pillar={pillar} />
+        ))}
+      </div>
+
+      {!compact ? (
+        <div className="mt-5 grid gap-3 md:grid-cols-2">
+          {startSmartReadinessRules.map((rule) => (
+            <div key={rule} className="flex gap-3 rounded-sm p-4" style={panelStyle}>
+              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#5bd7ff]" aria-hidden="true" />
+              <p className="text-sm leading-6" style={{ color: soft }}>
+                {rule}
+              </p>
+            </div>
+          ))}
+        </div>
+      ) : null}
+    </section>
   );
 }
 
@@ -221,6 +295,8 @@ export function StartSmartHub({ siteUrl }: { siteUrl: string }) {
             ))}
           </div>
         </section>
+
+        <ProfessionalReadinessLoop />
 
         <section className="grid gap-5 py-8 lg:grid-cols-3">
           {[
@@ -413,6 +489,8 @@ export function StartSmartDetail({ page, siteUrl }: { page: StartSmartPage; site
             </div>
           </div>
         </section>
+
+        <ProfessionalReadinessLoop compact />
 
         <section className="py-8">
           <SectionHeader

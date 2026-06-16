@@ -28,7 +28,70 @@ export type StartSmartPage = {
   keywords: string[];
 };
 
+export type StartSmartReadinessPillar = {
+  label: string;
+  shortLabel: string;
+  summary: string;
+  connection: string;
+  proofQuestion: string;
+  href: string;
+};
+
 export const startSmartBasePath = '/start-carpet-cleaning-business';
+
+export const startSmartReadinessLoop: StartSmartReadinessPillar[] = [
+  {
+    label: 'Professional Equipment',
+    shortLabel: 'Equipment',
+    summary:
+      'Machines, tools and accessories should be chosen from the work you intend to sell, not from horsepower, price or a supplier bundle alone.',
+    connection:
+      'Equipment follows the service model, must support the chemistry and only performs well when a trained operator understands method, access, drying and maintenance.',
+    proofQuestion:
+      'Can you explain which jobs this equipment is for, which jobs it is not for and what chemicals or training it depends on?',
+    href: `${startSmartBasePath}/equipment-before-you-buy`,
+  },
+  {
+    label: 'Service',
+    shortLabel: 'Service',
+    summary:
+      'The service model is the promise you make to the customer: residential rooms, commercial maintenance, upholstery, rugs, odour, spotting or restoration-adjacent work.',
+    connection:
+      'Service defines the equipment capacity, chemical range, quoting method, documentation and training depth required before you advertise the offer.',
+    proofQuestion:
+      'Can you describe the exact service, inclusions, exclusions, risks, aftercare and escalation point before quoting it?',
+    href: `${startSmartBasePath}/service-models`,
+  },
+  {
+    label: 'Chemicals',
+    shortLabel: 'Chemicals',
+    summary:
+      'Chemical choice is not a shopping list. It is a decision based on fibre, soil, stain history, pH, dwell time, agitation, rinse, safety and customer sensitivity.',
+    connection:
+      'Chemicals bridge the service promise and the equipment method, while training keeps product choice from becoming guesswork.',
+    proofQuestion:
+      'Can you justify the product, dilution, dwell time, rinse and safety controls for the fibre and soil in front of you?',
+    href: `${startSmartBasePath}/chemistry-for-beginners`,
+  },
+  {
+    label: 'Training',
+    shortLabel: 'Training',
+    summary:
+      'Training is the decision layer that turns gear, products and a service menu into professional judgement customers can trust.',
+    connection:
+      'Training connects the other three: it tells you what to buy, what to sell, what to apply and when to stop or escalate.',
+    proofQuestion:
+      'Can a customer, employer or buyer see evidence that the operator understands the method, risk and limits behind the service?',
+    href: '/courses?discipline=CCT',
+  },
+];
+
+export const startSmartReadinessRules = [
+  'Do not buy equipment until the first service model and target job types are clear.',
+  'Do not sell a service until the chemistry, method, limits and aftercare can be explained.',
+  'Do not choose chemicals without fibre, soil, stain, safety and equipment context.',
+  'Do not treat training as optional; it is the link that makes equipment, service and chemicals professional.',
+];
 
 export const startSmartSources = {
   iicrcCct: {
@@ -583,6 +646,11 @@ export const startSmartHubFaqs = [
       'No. CARSI helps build technical and business understanding. Practical supervision, local compliance checks and real-world practice are still important before paid work.',
   },
   {
+    question: 'How do professional equipment, service, chemicals and training connect?',
+    answer:
+      'They should be treated as one operating system. The service model defines the work, equipment supports the method, chemicals solve the fibre and soil problem, and training connects the decisions so the operator can work safely, quote honestly and know when to escalate.',
+  },
+  {
     question: 'Can learners use CARSI from outside Australia?',
     answer:
       'Yes. CARSI is online and useful globally as a trusted education resource, but learners should always check local legal, insurance and certification requirements in their own market.',
@@ -598,4 +666,7 @@ export const startSmartHubKeywords = [
   'carpet cleaning equipment for beginners',
   'carpet cleaning chemistry',
   'carpet cleaning certification',
+  'professional carpet cleaning equipment',
+  'carpet cleaning chemicals training',
+  'carpet cleaning service model',
 ];
