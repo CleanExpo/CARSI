@@ -35,14 +35,20 @@ export function PublicNavbar() {
           </Link>
 
           <div className="hidden items-center gap-8 md:flex">
-            {['Courses', 'Industries', 'Pathways', 'Pricing'].map((item) => (
+            {[
+              { label: 'Courses', href: '/courses' },
+              { label: 'Start Smart', href: '/start-carpet-cleaning-business' },
+              { label: 'Industries', href: '/industries' },
+              { label: 'Pathways', href: '/pathways' },
+              { label: 'Pricing', href: '/pricing' },
+            ].map((item) => (
               <Link
-                key={item}
-                href={`/${item.toLowerCase()}`}
+                key={item.href}
+                href={item.href}
                 className="text-sm transition-colors duration-150 hover:text-white"
                 style={{ color: 'rgba(255,255,255,0.5)' }}
               >
-                {item}
+                {item.label}
               </Link>
             ))}
           </div>

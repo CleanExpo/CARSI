@@ -32,8 +32,14 @@ export type AdminCatalog = {
 };
 
 /** Repo workbook: override with CARSI_COURSES_XLSX_PATH for deploys that store it elsewhere. */
-const DEFAULT_XLSX_PATH = path.join('data', 'carsi_courses.xlsx');
-const XLSX_PATH = process.env.CARSI_COURSES_XLSX_PATH ?? DEFAULT_XLSX_PATH;
+const DEFAULT_XLSX_PATH = path.join(process.cwd(), 'data', 'carsi_courses.xlsx');
+
+function resolveWorkbookPath() {
+  const configuredPath = process.env.CARSI_COURSES_XLSX_PATH;
+  if (!configuredPath) return DEFAULT_XLSX_PATH;
+  if (path.isAbsolute(configuredPath)) return configuredPath;
+  return path.join(/*turbopackIgnore: true*/ process.cwd(), configuredPath);
+}
 
 type CacheEntry = {
   mtimeMs: number;
@@ -47,8 +53,7 @@ function toJsonSafeString(s: string) {
 }
 
 export async function loadAdminCatalogFromXlsx(): Promise<AdminCatalog> {
-  const resolved = path.resolve(process.cwd(), XLSX_PATH);
-  const excelPath = fs.existsSync(XLSX_PATH) ? XLSX_PATH : resolved;
+  const excelPath = resolveWorkbookPath();
   const stat = fs.statSync(excelPath);
 
   if (cache && cache.mtimeMs === stat.mtimeMs) return cache.data;
@@ -311,4 +316,3 @@ with zipfile.ZipFile(XLSX_PATH) as z:
   cache = { mtimeMs: stat.mtimeMs, data };
   return data;
 }
-

@@ -5,6 +5,7 @@ export {
   BreadcrumbSchema,
   FAQSchema,
   ArticleSchema,
+  ItemListSchema,
   EventSchema,
   JobPostingSchema,
   NewsArticleSchema,

@@ -1,5 +1,6 @@
 import { MetadataRoute } from 'next';
 import { getBackendOrigin, getPublicSiteUrl } from '@/lib/env/public-url';
+import { startSmartBasePath, startSmartPages } from '@/lib/marketing/start-smart';
 import { loadWpExportCourses } from '@/lib/wordpress-export-courses';
 
 export const dynamic = 'force-dynamic';
@@ -17,6 +18,12 @@ const staticPages = [
   { path: '/contact', priority: 0.6, changeFreq: 'monthly' as const },
   { path: '/testimonials', priority: 0.5, changeFreq: 'monthly' as const },
   { path: '/pricing', priority: 0.7, changeFreq: 'monthly' as const },
+  { path: startSmartBasePath, priority: 0.85, changeFreq: 'weekly' as const },
+  ...startSmartPages.map((page) => ({
+    path: `${startSmartBasePath}/${page.slug}`,
+    priority: 0.78,
+    changeFreq: 'weekly' as const,
+  })),
   // Industry sub-pages
   { path: '/industries/aged-care', priority: 0.7, changeFreq: 'monthly' as const },
   { path: '/industries/childcare', priority: 0.7, changeFreq: 'monthly' as const },
