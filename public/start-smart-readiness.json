@@ -4,6 +4,32 @@
   "updated": "2026-06-17",
   "purpose": "Help people researching carpet cleaning as a business, add-on service, equipment purchase, or acquisition connect professional equipment, service model, chemicals, and training before taking consequential action.",
   "standing_rule": "The operator may research, prepare, and practise, but should not buy major equipment, advertise a service, select chemicals for customer work, or take paid work until the matching service, equipment, chemical, and training gates are clear.",
+  "conversion_paths": [
+    {
+      "name": "CARSI CCT course pathway",
+      "route": "https://carsi.com.au/courses?discipline=CCT&utm_source=start-smart&utm_medium=organic&utm_campaign=carsi_cct_conversion",
+      "intent": "course-enquiry",
+      "use_when": "The visitor is ready to start structured carpet cleaning learning."
+    },
+    {
+      "name": "CCW hands-on carpet cleaning workshop",
+      "route": "https://carsi.com.au/contact?source=start-smart&topic=CCW+hands-on+carpet+cleaning+workshop&intent=ccw-workshop",
+      "intent": "ccw-workshop",
+      "use_when": "The visitor needs practical equipment, service, chemical, or operator decision support connected to CCW training."
+    },
+    {
+      "name": "Equipment and service readiness",
+      "route": "https://carsi.com.au/contact?source=start-smart&topic=Equipment+and+service+readiness&intent=equipment-service-guidance",
+      "intent": "equipment-service-guidance",
+      "use_when": "The visitor is comparing machines, chemicals, or service models before spending money."
+    },
+    {
+      "name": "Team training or business buyer due diligence",
+      "route": "https://carsi.com.au/contact?source=start-smart&topic=Team+training+or+business+buyer+due+diligence&intent=team-or-buyer",
+      "intent": "team-or-buyer",
+      "use_when": "The visitor represents a cleaning business, team, employer, or acquisition/buyer scenario."
+    }
+  ],
   "pillars": [
     {
       "name": "Professional Equipment",

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 
-import { ContactForm } from '@/components/contact/ContactForm';
+import { ContactForm, type ContactLeadContext } from '@/components/contact/ContactForm';
 
 export const metadata: Metadata = {
   title: 'Contact CARSI | Cleaning and Restoration Science Institute',
@@ -8,7 +8,44 @@ export const metadata: Metadata = {
     'Get in touch with CARSI. Contact our team for course enquiries, membership support, or general questions about IICRC-aligned training for cleaning and restoration professionals.',
 };
 
-export default function ContactPage() {
+type ContactPageProps = {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+function firstParam(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+function cleanParam(value: string | undefined, maxLength = 120) {
+  return value?.replace(/[<>]/g, '').trim().slice(0, maxLength) || undefined;
+}
+
+function buildLeadContext(params: Awaited<ContactPageProps['searchParams']>): ContactLeadContext | undefined {
+  const source = cleanParam(firstParam(params.source), 48);
+  const topic = cleanParam(firstParam(params.topic), 160);
+  const pathway = cleanParam(firstParam(params.pathway), 80);
+  const intent = cleanParam(firstParam(params.intent), 80);
+
+  if (!source && !topic && !pathway && !intent) {
+    return undefined;
+  }
+
+  const pathwayText = pathway ? ` from the ${pathway.replaceAll('-', ' ')} Start Smart pathway` : '';
+  const topicText = topic ? ` about ${topic}` : '';
+
+  return {
+    source,
+    topic,
+    pathway,
+    intent,
+    pageUrl: pathway ? `/start-carpet-cleaning-business/${pathway}` : '/start-carpet-cleaning-business',
+    initialMessage: `Hi CARSI, I would like help${topicText}${pathwayText}.`,
+  };
+}
+
+export default async function ContactPage({ searchParams }: ContactPageProps) {
+  const leadContext = buildLeadContext(await searchParams);
+
   return (
     <main className="min-h-screen" style={{ background: '#060a14' }}>
       {/* Mesh background */}
@@ -37,10 +74,35 @@ export default function ContactPage() {
 
         <div className="grid gap-10 lg:grid-cols-[1fr_340px]">
           {/* Contact Form */}
-          <ContactForm />
+          <ContactForm leadContext={leadContext} />
 
-          {/* Contact Details */}
-          <div className="space-y-6">
+            {/* Contact Details */}
+            <div className="space-y-6">
+            {leadContext ? (
+              <div
+                className="space-y-3 rounded-lg p-5"
+                style={{
+                  background: 'rgba(36,144,237,0.06)',
+                  border: '1px solid rgba(36,144,237,0.18)',
+                }}
+              >
+                <p
+                  className="text-[10px] font-semibold tracking-wide uppercase"
+                  style={{ color: '#7ec5ff' }}
+                >
+                  Start Smart enquiry
+                </p>
+                <h2 className="text-sm font-semibold" style={{ color: 'rgba(255,255,255,0.85)' }}>
+                  Routed to the right conversation
+                </h2>
+                <p className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.56)' }}>
+                  This enquiry includes the Start Smart source, topic and pathway so CARSI can see
+                  whether you need course guidance, CCW practical support, equipment direction,
+                  service modelling or team/buyer training.
+                </p>
+              </div>
+            ) : null}
+
             {/* Address card */}
             <div
               className="space-y-4 rounded-lg p-5"
