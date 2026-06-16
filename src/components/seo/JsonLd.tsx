@@ -315,6 +315,35 @@ export function FAQSchema({ questions }: FAQSchemaProps) {
   );
 }
 
+interface ItemListSchemaProps {
+  name: string;
+  description?: string;
+  items: { name: string; url: string; description?: string }[];
+}
+
+export function ItemListSchema({ name, description, items }: ItemListSchemaProps) {
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name,
+    description,
+    itemListElement: items.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: item.name,
+      url: item.url,
+      description: item.description,
+    })),
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+    />
+  );
+}
+
 interface EventSchemaProps {
   name: string;
   description?: string;
@@ -560,22 +589,26 @@ export function NewsArticleSchema({
 
 interface ArticleSchemaProps {
   headline: string;
-  authorName: string;
-  datePublished: string;
+  authorName?: string;
+  datePublished?: string;
   dateModified?: string;
   url: string;
   image?: string;
   description?: string;
+  keywords?: string[];
+  articleSection?: string;
 }
 
 export function ArticleSchema({
   headline,
-  authorName,
-  datePublished,
+  authorName = 'CARSI',
+  datePublished = '2026-06-16',
   dateModified,
   url,
   image,
   description,
+  keywords,
+  articleSection,
 }: ArticleSchemaProps) {
   const schema: Record<string, unknown> = {
     '@context': 'https://schema.org',
@@ -605,6 +638,14 @@ export function ArticleSchema({
 
   if (description) {
     schema.description = description;
+  }
+
+  if (keywords && keywords.length > 0) {
+    schema.keywords = keywords.join(', ');
+  }
+
+  if (articleSection) {
+    schema.articleSection = articleSection;
   }
 
   return (

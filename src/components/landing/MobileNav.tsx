@@ -41,6 +41,7 @@ const itemVariants = {
 
 const navItems = [
   { href: '/courses', label: 'Courses' },
+  { href: '/start-carpet-cleaning-business', label: 'Start Smart' },
   { href: '/industries', label: 'Industries' },
   { href: '/pathways', label: 'Pathways' },
   { href: '/pricing', label: 'Pricing' },
