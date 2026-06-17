@@ -1,139 +1,83 @@
 ---
 name: project-context
 category: context
-version: 1.0.0
-description: NodeJS-Starter-V1 specific knowledge
+version: 2.0.0
+description: CARSI project-specific knowledge
 priority: 2
 ---
 
-# Project Context Skill
+# CARSI Project Context Skill
 
-Project-specific knowledge for NodeJS-Starter-V1.
+Use this skill when working inside `/Users/phillmcgurk/CARSI`.
 
-## Technology Stack
+## Product Identity
 
-### Frontend
-- **Framework**: Next.js 15 (App Router)
-- **UI Library**: React 19
-- **Styling**: Tailwind v4
-- **Components**: shadcn/ui
-- **Icons**: AI-generated custom (NO Lucide)
+- Canonical name: CARSI
+- Alias: Online Training LMS
+- Purpose: Online training and CEC learning platform for Australian cleaning and restoration professionals
+- GitHub: `CleanExpo/CARSI`
 
-### Backend
-- **Framework**: FastAPI (Python 3.12)
-- **Agents**: LangGraph
-- **Validation**: Pydantic
-- **Async**: asyncio
+The portfolio registry remains the SSOT for identity: `../Unite-Hub/.portfolio/PORTFOLIO.yaml`.
 
-### Database
-- **Platform**: Supabase
-- **Database**: PostgreSQL
-- **Vectors**: pgvector
-- **Auth**: Row Level Security (RLS)
+## Current Stack
 
-### Tooling
-- **Monorepo**: Turborepo + pnpm workspaces
-- **Package Manager**: pnpm 9+
-- **Node**: 20+
-- **Python**: 3.12+
+| Layer           | Current CARSI stack                                 |
+| --------------- | --------------------------------------------------- |
+| App             | Next.js 16 App Router                               |
+| Runtime UI      | React 19                                            |
+| Language        | TypeScript                                          |
+| Styling         | Tailwind CSS v4 plus local design tokens/components |
+| Database        | PostgreSQL                                          |
+| ORM             | Prisma 7                                            |
+| Payments        | Stripe                                              |
+| Email           | Resend/server email helpers                         |
+| AI assistant    | OpenAI-backed public/learner assistant              |
+| Image AI        | Optional Google/Gemini image-generation path        |
+| Deployment docs | DigitalOcean and production runbooks                |
 
-## Architecture Patterns
+Do not assume the old NodeJS-Starter-V1 FastAPI/LangGraph/Supabase backend exists in this repo. If a doc references `apps/backend`, verify before using it.
 
-### Monorepo Structure
-```
-apps/
-  web/          # Next.js frontend
-  backend/      # FastAPI backend
-packages/
-  shared/       # Shared types
-  config/       # Shared configs
-```
+## Important Runtime Areas
 
-### Layer Separation
-```
-Frontend: Components → Hooks → API Routes → Services
-Backend:  API → Agents → Tools → Graphs → State
-Database: Tables → RLS → Functions → Triggers
-```
+| Area                         | Paths                                                       |
+| ---------------------------- | ----------------------------------------------------------- |
+| Public pages                 | `app/(public)/`                                             |
+| Admin                        | `app/(admin)/`, `src/lib/admin/`                            |
+| Learner/dashboard            | `app/(dashboard)/`, `app/dashboard/`, `src/components/lms/` |
+| API routes                   | `app/api/`                                                  |
+| Server logic                 | `src/lib/server/`                                           |
+| Prisma schema/migrations     | `prisma/`                                                   |
+| AI model policy              | `src/ai/`                                                   |
+| Verification/audit utilities | `src/lib/agents/`, `src/lib/audit/`                         |
+| Course seed/import scripts   | `scripts/`, `data/`                                         |
+| Docs                         | `docs/`                                                     |
 
-**Rule**: No cross-layer imports
+## Stack Discipline
 
-### Verification-First
-- Prove It Works
-- Honest Failure Reporting
-- No Assumptions
-- Root Cause First
-- One Fix at a Time
+- Prefer Next.js route handlers and server modules before adding a separate backend service.
+- Keep Prisma as the database access layer unless a file already uses a different established path.
+- Use Zod/types for external input and model output.
+- Keep auth, payments, enrolments, certificates, discounts, and admin permissions deterministic.
+- Avoid copying template docs or patterns forward unless the paths exist.
+- Update docs when removing stale architecture assumptions.
 
-## Key Systems
+## AI Discipline
 
-### Agent Orchestration
-- Master orchestrator coordinates subagents
-- Independent verification (no self-attestation)
-- Context partitioning for token efficiency
+- LLMs may assist with learner guidance, content drafting, admin summaries, visual generation, and audits.
+- LLMs must not decide critical state transitions.
+- Ground learner-facing AI in CARSI course/page data.
+- Treat model IDs as volatile; check official provider docs before changing defaults.
+- Prefer structured outputs/tool schemas whenever output affects app behaviour.
+- Record evidence for AI changes: route response, test, screenshot, generated artefact, or audit result.
 
-### Tool Registry
-- Advanced tool search
-- Programmatic calling
-- Dependency resolution
-
-### Long-Running Agents
-- Multi-session via progress files
-- State persistence
-- Resume capability
-
-### Memory System
-- Vector-based (pgvector)
-- Persistent knowledge
-- Domain-specific memory
-
-## Australian Context
-
-- **Language**: en-AU (always)
-- **Currency**: AUD
-- **Locations**: Brisbane (primary), Sydney, Melbourne
-- **Regulations**: Privacy Act 1988, WCAG 2.1 AA
-
-## Design System
-
-- **Aesthetic**: 2025-2026 modern (Bento, glassmorphism)
-- **NO Lucide icons**: AI-generated custom only
-- **Primary Color**: #0D9488 (teal)
-- **Shadows**: Soft colored (never pure black)
-
-## Commands
+## Verification Commands
 
 ```bash
-# Development
-pnpm dev                          # All services
-pnpm dev --filter=web             # Frontend only
-
-# Database
-supabase start && supabase db push
-
-# Quality
-pnpm turbo run type-check lint test
-
-# Pre-PR
-pnpm turbo run type-check lint test && echo "✅ Ready"
+npm run type-check
+npm run lint
+npm run build
+npm run test:e2e
+npm run test:a11y
 ```
 
-## Migrations
-
-8 total migrations in `supabase/migrations/`:
-1. init - UUID, triggers
-2. auth_schema - profiles, RLS
-3. enable_pgvector - vectors
-4. state_tables - conversations, tasks
-5. audit_evidence - verification
-6. copywriting_consistency - business data
-7. agent_runs_realtime - real-time status
-8. domain_memory - persistent memory
-
-## Never
-
-- Use American spelling
-- Use Lucide icons
-- Skip verification
-- Cross layer boundaries
-- Self-verify own work
+Use the smallest relevant check first. For broad stack changes, run type-check, lint, and build.

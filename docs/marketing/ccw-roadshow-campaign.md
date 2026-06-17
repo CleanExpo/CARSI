@@ -1,6 +1,6 @@
 # CARSI x CCW Business Growth Days Campaign
 
-Last updated: 17 June 2026
+Last updated: 18 June 2026
 
 ## Campaign Snapshot
 
@@ -10,11 +10,11 @@ CARSI and Carpet Cleaners Warehouse are running two-day Business Growth Days pos
 - Sydney: 30-31 July 2026, 8.30am-4.30pm both days
 - Melbourne venue: Carpet Cleaners Warehouse, Unit 1/5 Gatwick Road, Bayswater North VIC 3153
 - Sydney venue: Carpet Cleaners Warehouse, 2/8 Tollis Place, Seven Hills NSW 2147
-- Price: $175 per person or $500 for five seats
+- Entry: Free for CCW past and current customers
 - CARSI website: `https://www.carsi.com.au`
 - CCW website: `https://www.ccwarehouse.com.au`
-- Booking URL: `https://www.carsi.com.au/events/ccw-roadshow`
-- Primary CTA: Limited places available. Reserve your seat through CARSI.
+- Registration URL: `https://www.carsi.com.au/events/ccw-roadshow`
+- Primary CTA: Claim your free past/current CCW customer entry token through CARSI.
 
 ## Core Positioning
 
@@ -30,7 +30,7 @@ Message hierarchy:
 2. Credibility line: `Spend two days with Phil McGurk`.
 3. Event name: `CARSI x CCW Business Growth Days`.
 4. Outcome proof: better-fit jobs, profit decisions, fewer mistakes, profitable service planning, quoting confidence and stronger systems.
-5. Urgency: limited places, small group format, register early.
+5. Urgency: free past/current CCW customer entry, limited places, small group format, register early.
 
 ## Toby Review Inputs Integrated
 
@@ -115,20 +115,20 @@ Who it is for:
 
 What they achieve:
 
-> Book your seat and leave with strategies to pursue better-fit jobs, quote with confidence, avoid costly mistakes, add profitable services and build a stronger business.
+> Claim your free past/current CCW customer entry token and leave with strategies to pursue better-fit jobs, quote with confidence, avoid costly mistakes, add profitable services and build a stronger business.
 
 ### Urgency Message
 
-Why book now:
+Why register now:
 
-> Places are limited, the format is practical, and the $500 team pack gives five people the same operating language before the next busy season.
+> Places are limited, the format is practical, and CCW past/current customers can claim free entry for themselves or up to five team members before the room fills.
 
 ## Audience Segments
 
 - Existing carpet cleaners wanting sharper technical confidence and better service offers.
 - Domestic, bond and commercial cleaners adding carpet cleaning or hard-floor services.
 - Owners comparing equipment, chemicals and training before investing more money.
-- Teams wanting a low-cost way to bring up to five staff into a shared operating language.
+- Teams wanting a free past/current CCW customer entry path to bring up to five staff into a shared operating language.
 - Business buyers checking whether a cleaning or carpet cleaning business has real capability behind the numbers.
 - New operators who discovered carpet cleaning as a business idea and need credible guidance before taking paid work.
 
@@ -137,9 +137,9 @@ Why book now:
 1. Awareness: CARSI and CCW posts introduce the Melbourne and Sydney dates.
 2. Education: posts explain the connection between service, equipment, chemicals and training.
 3. Proof: short clips, practical topic posts, Toby/CCW credibility and CARSI learning pathway links.
-4. Offer: $175 per person or $500 for five seats, with books essential.
-5. Checkout: `/events/ccw-roadshow` sends attendees to Stripe Checkout.
-6. Follow-up: Stripe booking data gives attendee name, email, phone, business, city, ticket package and seat count.
+4. Offer: free for CCW past and current customers, with free entry token required for check-in.
+5. Registration: `/events/ccw-roadshow` generates a `CCW-FREE-{CITY}-{CODE}` token.
+6. Follow-up: registration data gives attendee name, email, phone, business, city, customer status, entry option and seat count.
 
 ## Publishing Calendar
 
@@ -155,14 +155,14 @@ Why book now:
 - 2 posts per week from CARSI: training, chemistry, service and business growth angles.
 - 2 posts per week from CCW: equipment, chemicals, workshop support and venue reminders.
 - 1 group/community post per week: practical question-led post, then link in comments if group rules prefer it.
-- Short video/reel prompts: "The mistake new operators make before buying equipment", "Why stain removal is a customer trust moment", "How the $500 team pack helps get everyone speaking the same language".
+- Short video/reel prompts: "The mistake new operators make before buying equipment", "Why stain removal is a customer trust moment", "How free CCW team entry helps everyone speak the same language".
 
 ### Conversion Push: 6-19 July
 
 - 3 posts per week from CARSI and CCW.
 - Weekly email reminder.
 - Retarget warm leads from Start Smart and CCT course enquiries if consent allows.
-- DM/respond to comments with the booking link.
+- DM/respond to comments with the registration link.
 
 ### Final Push
 
@@ -190,9 +190,9 @@ Melbourne: 22-23 July 2026 at CCW Bayswater North
 Sydney: 30-31 July 2026 at CCW Seven Hills
 Time: 8.30am-4.30pm both days
 
-$175 per person or $500 for five seats. Limited places available.
+Free for CCW past and current customers. Claim your free entry token through CARSI. Limited places available.
 
-Book through CARSI: https://www.carsi.com.au/events/ccw-roadshow
+Claim your token through CARSI: https://www.carsi.com.au/events/ccw-roadshow
 
 ### CCW Launch Post
 
@@ -210,14 +210,15 @@ What will you leave with? Clearer service direction, the course outline, practic
 
 Bring yourself or bring the team:
 
-- $175 per person
-- $500 for five seats
+- Free for CCW past and current customers
+- Free entry token generated through CARSI
+- Team option available for up to five seats
 - 8.30am-4.30pm both days
 
 Melbourne: 22-23 July, Unit 1/5 Gatwick Road, Bayswater North
 Sydney: 30-31 July, 2/8 Tollis Place, Seven Hills
 
-Small group format. Limited places available. Book here: https://www.carsi.com.au/events/ccw-roadshow
+Small group format. Limited places available. Claim your free token here: https://www.carsi.com.au/events/ccw-roadshow
 
 ### Australian Carpet Cleaner Group Post
 
@@ -234,9 +235,9 @@ What you achieve: practical strategies to pursue better-fit jobs, quote with con
 Melbourne: 22-23 July at CCW Bayswater North
 Sydney: 30-31 July at CCW Seven Hills
 
-It is $175 per person or $500 for five seats. Places are limited.
+It is free for CCW past and current customers. Register through CARSI to claim a free entry token. Places are limited.
 
-Booking link: https://www.carsi.com.au/events/ccw-roadshow
+Registration link: https://www.carsi.com.au/events/ccw-roadshow
 
 ## Email Sequence
 
@@ -252,9 +253,9 @@ Spend two practical days with Phil McGurk inside Carpet Cleaners Warehouse and c
 
 Melbourne runs 22-23 July. Sydney runs 30-31 July. Both days run 8.30am-4.30pm.
 
-Seats are $175 per person or $500 for five. Limited places available.
+CCW past and current customers can attend free by claiming a free entry token through CARSI. Limited places available.
 
-Book here: https://www.carsi.com.au/events/ccw-roadshow
+Claim your token here: https://www.carsi.com.au/events/ccw-roadshow
 
 ### Email 2: Who Should Attend
 
@@ -266,7 +267,7 @@ This is for carpet cleaners, cleaners adding carpet or tile work, rug and stain 
 
 If you are comparing equipment, choosing products, building service offers, training staff or trying to quote with more confidence, this room is built for you.
 
-Choose Melbourne or Sydney and reserve your seat: https://www.carsi.com.au/events/ccw-roadshow
+Choose Melbourne or Sydney and claim your free entry token: https://www.carsi.com.au/events/ccw-roadshow
 
 ### Email 3: What You Will Achieve
 
@@ -278,32 +279,32 @@ The CARSI x CCW Business Growth Days are built around practical outcomes.
 
 You should leave with practical strategies to pursue better-fit jobs, quote with confidence, avoid costly mistakes, add profitable services, build better systems, and connect the course outline and chemical details back to real customer work.
 
-Book here: https://www.carsi.com.au/events/ccw-roadshow
+Claim your token here: https://www.carsi.com.au/events/ccw-roadshow
 
-### Email 4: Team Pack
+### Email 4: Team Entry
 
-Subject: Bring five people for $500
+Subject: Bring the team with free CCW entry
 
 Body:
 
-If your team needs a shared language around carpet cleaning, rug cleaning, stain removal, tile cleaning and business growth, the team pack is the best value.
+If your team needs a shared language around carpet cleaning, rug cleaning, stain removal, tile cleaning and business growth, the free CCW team entry option is the best value.
 
-Five seats are $500.
+Past and current CCW customers can claim free entry for up to five seats.
 
 Melbourne: 22-23 July
 Sydney: 30-31 July
 
-Book here: https://www.carsi.com.au/events/ccw-roadshow
+Claim your team token here: https://www.carsi.com.au/events/ccw-roadshow
 
 ## Creative Brief
 
 - Format: 1080x1080 square, 1080x1920 story/reel cover, LinkedIn 1200x627.
-- Visual priority: Why, Who, What they achieve, plus CARSI x CCW, city, dates, price, booking URL.
+- Visual priority: Why, Who, What they achieve, plus CARSI x CCW, city, dates, free past/current CCW customer entry, token CTA.
 - Avoid: overclaiming certification outcomes, "guaranteed income", or implying RTO/national qualification status.
 - Suggested headline: "Grow Your Cleaning Business"
 - Suggested subhead: "Spend two days with Phil McGurk inside Carpet Cleaners Warehouse."
-- Badge: "$175 each or $500 for 5"
-- Urgency badge: "Limited places available"
+- Badge: "Past/current CCW customers free"
+- Urgency badge: "Claim your free entry token"
 - Proof slot: "Insert approved attendee quote here" only after a real quote is supplied.
 
 ## Creative Variants
@@ -314,7 +315,7 @@ Headline: Grow your cleaning business.
 
 Body: Spend two practical days with Phil McGurk connecting training, equipment, chemicals, services, quoting and follow-up before spending more money or taking on harder jobs.
 
-CTA: Book your seat.
+CTA: Claim your free token.
 
 ### Variant 2: Who
 
@@ -330,13 +331,13 @@ Headline: Walk away with strategies you can use immediately.
 
 Body: Pursue better-fit jobs, quote with confidence, avoid costly mistakes, add profitable services and build a stronger business, with the course outline and chemical details included.
 
-CTA: Reserve your seat.
+CTA: Claim your token.
 
 ## Counter Conversation Script
 
 Use this when a walk-in customer sees the counter card or flyer:
 
-> We are running CARSI x CCW Business Growth Days here in July. It is for carpet cleaners and cleaners adding carpet, rug, stain or tile work. The point is to connect training, equipment, chemicals and business growth so you can make better decisions before spending more money or taking on harder jobs. Attendees also receive the course outline and practical chemical details as part of the course material. You can scan the QR code to book. It is $175 each or $500 for five seats.
+> We are running CARSI x CCW Business Growth Days here in July. It is for carpet cleaners and cleaners adding carpet, rug, stain or tile work. The point is to connect training, equipment, chemicals and business growth so you can make better decisions before spending more money or taking on harder jobs. Attendees also receive the course outline and practical chemical details as part of the course material. CCW past and current customers can attend free. Scan the QR code to claim a free entry token for check-in.
 
 ## Tracking
 
@@ -349,12 +350,12 @@ Use UTM links by channel:
 
 Primary KPI:
 
-- Paid Stripe bookings by city and package.
+- Free entry token registrations by city and entry option.
 
 Secondary KPIs:
 
 - Landing page visits.
-- Checkout starts.
+- Token claims.
 - Group comments and DMs.
 - Course clicks from the success page.
 - Start Smart traffic lift during campaign period.

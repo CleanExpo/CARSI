@@ -37,6 +37,7 @@ This repo contains the full CARSI web application: public marketing pages, the l
 - **SEO-ready public site**: metadata, sitemap, and robots.
 - **Admin analytics**: see users, enrolments, and completion trends.
 - **Payments included**: Stripe-backed checkout for paid training.
+- **AI where it helps**: learner guidance, content operations, image support, and audits stay grounded in CARSI data.
 
 ---
 
@@ -49,6 +50,8 @@ This repo contains the full CARSI web application: public marketing pages, the l
 - Admin dashboard for users and learning analytics
 - Stripe checkout + webhooks
 - WordPress import pipeline (keeps course data in sync)
+- Floating course assistant with provider-gated configuration
+- Verification/audit utilities for route, journey, and UX evidence
 
 ---
 
@@ -64,11 +67,32 @@ This repo contains the full CARSI web application: public marketing pages, the l
 
 ## Tech Stack
 
-- **Frontend**: Next.js App Router, React, TypeScript, Tailwind
+- **Frontend**: Next.js 16 App Router, React 19, TypeScript, Tailwind
 - **Database**: PostgreSQL
-- **ORM**: Prisma
+- **ORM**: Prisma 7
 - **Payments**: Stripe
+- **AI**: focused provider integrations for assistant, image generation, and verification workflows
 - **Deployment**: Docker + DigitalOcean App Platform (`app.yaml`, `Dockerfile`)
+
+---
+
+## AI & Stack Hardening
+
+CARSI treats LLMs as bounded assistants, not as the product's source of truth. Auth, payments, enrolments, certificates, discounts, admin permissions, and IICRC-related reporting remain deterministic application logic.
+
+Current AI posture:
+
+- Public/learner assistant: `app/api/lms/public/chat/route.ts`
+- Assistant context: `src/lib/server/ai-assistant-context.ts`
+- Model policy: `src/ai/model-registry/`
+- Image generation policy/client code: `src/lib/image-generation/`, `src/ai/graphics/`
+- Evidence-first verification: `src/lib/agents/independent-verifier.ts`, `src/lib/audit/`
+
+Docs:
+
+- [LLM Capabilities and Stack Hardening](docs/LLM_CAPABILITIES_AND_STACK_HARDENING.md)
+- [AI Provider Guide](docs/AI_PROVIDERS.md)
+- [Agentic Operating Model](docs/AGENTIC_LAYER_IMPLEMENTATION.md)
 
 ---
 
@@ -110,6 +134,8 @@ See `app.yaml` for DigitalOcean scopes. Common variables:
 - `ADMIN_EMAIL` / `ADMIN_PASSWORD`: admin bootstrap credentials
 - `NEXT_PUBLIC_ADMIN_EMAIL`: admin identifier used by the app
 - `OPENAI_API_KEY`: optional AI features
+- `OPENAI_CHAT_MODEL`: optional public/learner assistant model override
+- `GOOGLE_AI_API_KEY`: optional Gemini/image-generation features
 - `WC_CONSUMER_KEY` / `WC_CONSUMER_SECRET`: WordPress/WooCommerce integration keys
 
 ---
@@ -172,12 +198,3 @@ npm run db:studio
 ## License
 
 MIT
-
-<div align="center">
-
-<!-- HERO BANNER -->
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/CleanExpo/NodeJS-Starter-V1/main/.github/assets/banner-dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/CleanExpo/NodeJS-Starter-V1/main/.github/assets/banner-light.svg">
-  <img alt="NodeJS-Starter-V1 Banner" src="https://raw.githubusercontent.com/CleanExpo/NodeJS-Starter-V1/main/.github/assets/banner-dark.svg" width="100%">
-</picture>

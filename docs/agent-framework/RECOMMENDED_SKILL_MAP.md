@@ -21,31 +21,31 @@ Each Senior Agent maintains 6–8 maximum active skills. Skills are loaded only 
 
 ## Senior Orchestrator Agent (8 skills)
 
-| #   | Skill                    | Purpose                                                   |
-| --- | ------------------------ | --------------------------------------------------------- |
-| 1   | `delegation-planner`     | Route tasks to correct specialists and sub-agents         |
-| 2   | `evidence-verifier`      | Validate all returned artefacts before marking gates done |
-| 3   | `finished-audit`         | Verify production readiness at each phase boundary        |
-| 4   | `outcome-translator`     | Re-interpret goals when scope changes                     |
-| 5   | `model-currency-checker` | Verify AI models are current before heavy AI tasks        |
-| 6   | `agents-protocol`        | Enforce communication and delegation protocol             |
-| 7   | `structured-logging`     | Capture orchestration decisions as structured logs        |
-| 8   | `retrieval-first`        | Query NotebookLM/Context7/Skills before loading docs      |
+| #   | Skill                    | Purpose                                                               |
+| --- | ------------------------ | --------------------------------------------------------------------- |
+| 1   | `delegation-planner`     | Route tasks to correct specialists and sub-agents                     |
+| 2   | `evidence-verifier`      | Validate all returned artefacts before marking gates done             |
+| 3   | `finished-audit`         | Verify production readiness at each phase boundary                    |
+| 4   | `outcome-translator`     | Re-interpret goals when scope changes                                 |
+| 5   | `model-currency-checker` | Verify AI models are current before heavy AI tasks                    |
+| 6   | `agents-protocol`        | Enforce communication and delegation protocol                         |
+| 7   | `structured-logging`     | Capture orchestration decisions as structured logs                    |
+| 8   | `retrieval-first`        | Query focused repo/docs/provider sources before loading broad context |
 
 ---
 
 ## Senior Engineering Agent (8 skills)
 
-| #   | Skill                 | Purpose                                         |
-| --- | --------------------- | ----------------------------------------------- |
-| 1   | `api-contract`        | Typed contracts between FastAPI and Next.js     |
-| 2   | `data-validation`     | Zod/Pydantic input validation patterns          |
-| 3   | `input-sanitisation`  | XSS, SQLi, injection prevention                 |
-| 4   | `structured-logging`  | JSON logging with correlation IDs               |
-| 5   | `error-taxonomy`      | Structured error codes and user-facing messages |
-| 6   | `state-machine`       | FSM patterns for status transitions             |
-| 7   | `resilience-patterns` | Retry, circuit breaker, graceful degradation    |
-| 8   | `evidence-verifier`   | Verify test + API output before claiming done   |
+| #   | Skill                 | Purpose                                                        |
+| --- | --------------------- | -------------------------------------------------------------- |
+| 1   | `api-contract`        | Typed contracts between Next.js routes, server modules, and UI |
+| 2   | `data-validation`     | Zod/Prisma-safe input and model-output validation patterns     |
+| 3   | `input-sanitisation`  | XSS, SQLi, injection prevention                                |
+| 4   | `structured-logging`  | JSON logging with correlation IDs                              |
+| 5   | `error-taxonomy`      | Structured error codes and user-facing messages                |
+| 6   | `state-machine`       | FSM patterns for status transitions                            |
+| 7   | `resilience-patterns` | Retry, circuit breaker, graceful degradation                   |
+| 8   | `evidence-verifier`   | Verify test + API output before claiming done                  |
 
 ---
 
@@ -81,14 +81,14 @@ Each Senior Agent maintains 6–8 maximum active skills. Skills are loaded only 
 
 ## Senior Research Agent (6 skills)
 
-| #   | Skill                | Purpose                                       |
-| --- | -------------------- | --------------------------------------------- |
-| 1   | `truth-finder`       | 4-tier source verification                    |
-| 2   | `knowledge-curator`  | NotebookLM knowledge base management          |
-| 3   | `retrieval-first`    | External source query before inline reasoning |
-| 4   | `delegation-planner` | Route research tasks correctly                |
-| 5   | `structured-logging` | Document findings with source citations       |
-| 6   | `evidence-verifier`  | Verify sources before citing                  |
+| #   | Skill                | Purpose                                           |
+| --- | -------------------- | ------------------------------------------------- |
+| 1   | `truth-finder`       | 4-tier source verification                        |
+| 2   | `knowledge-curator`  | NotebookLM knowledge base management              |
+| 3   | `retrieval-first`    | Focused source query before broad context loading |
+| 4   | `delegation-planner` | Route research tasks correctly                    |
+| 5   | `structured-logging` | Document findings with source citations           |
+| 6   | `evidence-verifier`  | Verify sources before citing                      |
 
 ---
 

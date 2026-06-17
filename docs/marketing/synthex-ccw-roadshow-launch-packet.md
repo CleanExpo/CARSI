@@ -1,7 +1,7 @@
 # SYNTHEX Campaign Launch Packet: CARSI x CCW Business Growth Days
 
-Last updated: 17 June 2026
-Launch status: visual proof approved by Phill on 17 June 2026. Organic publishing may proceed through Synthex. CCW client-list email and paid ads remain separately gated.
+Last updated: 18 June 2026
+Launch status: free-entry offer update applied. Organic publishing may proceed through Synthex after final approval. CCW client-list email and paid ads remain separately gated.
 
 ## Campaign Brief
 
@@ -9,7 +9,7 @@ Campaign name: CARSI x CCW Business Growth Days
 Dominant campaign headline: Grow Your Cleaning Business
 Credibility hook: Spend two days with Phil McGurk inside Carpet Cleaners Warehouse.
 
-Primary booking URL:
+Primary registration URL:
 
 - `https://www.carsi.com.au/events/ccw-roadshow`
 
@@ -25,9 +25,9 @@ Events:
 
 Offer:
 
-- $175 per person
-- $500 for five seats
-- Limited places available; small group format; register early
+- Free for CCW past and current customers
+- Free entry token generated through the CARSI Roadshow registration form
+- Individual and team entry options; small group format; register early
 
 Included material:
 
@@ -46,11 +46,11 @@ Toby review inputs now integrated:
 
 ## Launch Gate
 
-Launch gate passed on 17 June 2026:
+Launch gate updated on 18 June 2026:
 
 - `https://www.carsi.com.au/events/ccw-roadshow` returned HTTP 200.
-- `https://www.carsi.com.au/api/events/ccw-roadshow/checkout` returned HTTP 200 when starting a booking.
-- The checkout response returned a `checkout.stripe.com` URL with a live `cs_live_` Stripe Checkout session.
+- `https://www.carsi.com.au/api/events/ccw-roadshow/checkout` returned HTTP 200 when claiming free entry.
+- The registration response returns a `CCW-FREE-{CITY}-{CODE}` token and a confirmation URL.
 - Organic CARSI, CCW and group-safe campaign activity may start through Synthex. CCW client-list email and paid ads still need separate approval/checks.
 
 ## Campaign Spine
@@ -107,9 +107,9 @@ Message:
 > Melbourne: 22-23 July at CCW Bayswater North
 > Sydney: 30-31 July at CCW Seven Hills
 >
-> $175 per person or $500 for five seats. Limited places available.
+> Free for CCW past and current customers. Register through CARSI to claim a free entry token for check-in.
 >
-> Book through CARSI: [UTM booking link]
+> Claim your free entry token through CARSI: [UTM registration link]
 
 ### Phase 2: Education Posts
 
@@ -133,7 +133,7 @@ Timing: 6 July to 19 July 2026.
 
 Angles:
 
-- Team pack value: five people for $500.
+- Team entry value: CCW customers can claim free entry for up to five people.
 - City-specific reminders.
 - Course material included.
 - Limited places available.
@@ -148,7 +148,7 @@ Timing:
 
 Message:
 
-> Final reminder: CARSI x CCW Business Growth Days are nearly here. If you want to spend two practical days with Phil McGurk and leave with clearer strategies for services, equipment, chemicals, quoting, customer conversations and business growth, book now.
+> Final reminder: CARSI x CCW Business Growth Days are nearly here. If you want to spend two practical days with Phil McGurk and leave with clearer strategies for services, equipment, chemicals, quoting, customer conversations and business growth, claim your free past/current CCW customer entry token now.
 
 ## Daily Social Prompts
 
@@ -160,8 +160,8 @@ Message:
 6. What you achieve: pursue better-fit jobs, quote with confidence and avoid costly mistakes.
 7. Melbourne reminder: 22-23 July at CCW Bayswater North.
 8. Sydney reminder: 30-31 July at CCW Seven Hills.
-9. Team pack: five seats for $500.
-10. Last call: limited places available.
+9. Team entry: free past/current CCW customer entry for up to five people.
+10. Last call: claim your free entry token before the room fills.
 
 ## Synthex Tasking
 

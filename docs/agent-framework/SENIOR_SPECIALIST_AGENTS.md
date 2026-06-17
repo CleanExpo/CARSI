@@ -8,12 +8,12 @@ Specialist agents are domain experts that execute gates assigned by the Orchestr
 
 ## Senior Engineering Agent
 
-**Domain:** Backend API, database, authentication, infrastructure, integrations
+**Domain:** Next.js API routes, server modules, Prisma/database, authentication, infrastructure, integrations
 
 **Active Skills (max 8):**
 
-1. `api-contract` — typed API contracts between FastAPI and Next.js
-2. `data-validation` — Zod and Pydantic validation patterns
+1. `api-contract` — typed contracts between Next.js routes, server modules, and UI
+2. `data-validation` — Zod/Prisma-safe validation patterns
 3. `input-sanitisation` — XSS, SQL injection, command injection prevention
 4. `structured-logging` — JSON logging with correlation IDs
 5. `error-taxonomy` — error codes, categories, user-facing messages

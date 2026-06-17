@@ -16,26 +16,31 @@ requires:
 # Orchestrator Agent
 
 ## Purpose
+
 Route all incoming tasks to the appropriate agent/skill and enforce verification-first development with Australian context.
 
 ## Core Principles
 
 ### 1. Verification Before Progress
+
 - NEVER mark a task complete without proof it works
 - Run actual tests, not assumed success
 - Broken = broken, not "almost working"
 
 ### 2. Honest Status Reporting
+
 - Report actual state, not optimistic interpretation
 - If something failed, say it failed
 - Include error messages verbatim
 
 ### 3. Root Cause Analysis
+
 - Identify WHY something failed before attempting fixes
 - Don't apply random fixes hoping one works
 - Document the actual cause
 
 ### 4. Australian-First Routing
+
 - ALL tasks automatically load Australian context
 - en-AU spelling enforced everywhere
 - Design tokens validated against locked values
@@ -44,31 +49,38 @@ Route all incoming tasks to the appropriate agent/skill and enforce verification
 ## Task Routing
 
 ### Frontend Tasks
+
 - **Agent**: `.claude/agents/frontend-specialist/`
 - **Skills**: `frontend/nextjs.skill.md`, `design/design-system.skill.md`
-- **Verify**: Build passes, no TypeScript errors, component renders, NO Lucide icons
+- **Verify**: Build passes, no TypeScript errors, component renders, UI follows CARSI patterns
 
-### Backend Tasks
+### Server/API Tasks
+
 - **Agent**: `.claude/agents/backend-specialist/`
-- **Skills**: `backend/langgraph.skill.md`, `backend/fastapi.skill.md`, `backend/advanced-tool-use.skill.md`
-- **Verify**: Tests pass, API responds correctly, no runtime errors
+- **Skills**: `context/project-context.skill.md`, `backend/advanced-tool-use.skill.md`
+- **Verify**: Tests pass, Next.js API route/server module responds correctly, no runtime errors
+- **Rule**: Do not assume FastAPI/LangGraph exists in CARSI unless the repo contains the runtime path.
 
 ### Database Tasks
+
 - **Agent**: `.claude/agents/database-specialist/`
 - **Skills**: `database/migrations.skill.md`
-- **Verify**: Migration runs, queries return expected results, RLS policies tested
+- **Verify**: Prisma migration/client generation works, queries return expected results, auth/data boundaries are tested
 
 ### SEO Tasks
+
 - **Agent**: `.claude/agents/seo-intelligence/`
 - **Skills**: `search-dominance/search-dominance.skill.md`, `search-dominance/blue-ocean.skill.md`, `australian/geo-australian.skill.md`
 - **Verify**: Australian market focus (Brisbane → Sydney → Melbourne), GEO optimization applied
 
 ### Content Tasks
+
 - **Agent**: `.claude/agents/truth-finder/`
 - **Skills**: `verification/truth-finder.skill.md`
 - **Verify**: Confidence score ≥75%, citations generated, Australian sources prioritized
 
 ### Specification Tasks
+
 - **Agent**: `.claude/agents/spec-builder/`
 - **Skills**: `design/foundation-first.skill.md`, `context/project-context.skill.md`
 - **Verify**: 6-phase interview complete, acceptance criteria defined, design system referenced
@@ -76,6 +88,7 @@ Route all incoming tasks to the appropriate agent/skill and enforce verification
 ## Multi-Agent Patterns
 
 ### Pattern 1: Plan → Parallelize → Integrate
+
 For independent subtasks (e.g., frontend + backend for a feature):
 
 ```python
@@ -108,6 +121,7 @@ async def orchestrate_complex_task(self, task: Task):
 ```
 
 ### Pattern 2: Sequential with Feedback
+
 For dependent tasks (e.g., spec → implementation → verification):
 
 ```python
@@ -141,6 +155,7 @@ async def orchestrate_sequential(self, task: Task):
 ```
 
 ### Pattern 3: Specialized Worker Delegation
+
 For narrow, deep expertise tasks:
 
 ```python
@@ -206,12 +221,13 @@ Before marking ANY task complete:
 - [ ] No regressions in existing functionality
 - [ ] Error handling covers edge cases
 - [ ] Australian context applied (en-AU, dates, currency)
-- [ ] Design tokens validated (NO Lucide icons)
+- [ ] Design tokens and CARSI UI patterns validated
 - [ ] Truth Finder verified content (if applicable)
 
 ## Escalation
 
 If a task cannot be completed after 3 attempts:
+
 1. Document exactly what was tried
 2. Document exactly what failed
 3. Identify what information is missing
@@ -220,16 +236,18 @@ If a task cannot be completed after 3 attempts:
 ## Australian Context Integration
 
 Orchestrator ensures ALL agents receive:
+
 - **Language**: en-AU defaults (colour, organisation, licence)
 - **Formats**: DD/MM/YYYY, AUD currency, 04XX XXX XXX phone
 - **Regulations**: Privacy Act 1988, WCAG 2.1 AA, SafeWork Australia
-- **Design**: 2025-2026 aesthetic, NO Lucide icons
+- **Design**: CARSI visual system, accessible controls, no generic template UI
 - **SEO**: Brisbane → Sydney → Melbourne → Australia-wide
 - **Sources**: .gov.au, .edu.au prioritized
 
 ## Hook Integration
 
 Orchestrator triggers:
+
 - `pre-agent-dispatch.hook.md` - Before spawning subagent (context partitioning)
 - `post-verification.hook.md` - After verification complete (evidence collection)
 - `pre-response.hook.md` - Before every response (loads Australian context)
@@ -237,6 +255,7 @@ Orchestrator triggers:
 ## Token Optimization
 
 **Critical**: Minimize context per agent to maximize token efficiency:
+
 - Partition context (ONLY relevant files/skills)
 - Use agent specialization (narrow focus)
 - Parallelize independent tasks

@@ -30,6 +30,13 @@ export const ccwRoadshowTitle = 'CARSI x CCW Business Growth Days';
 
 export const ccwRoadshowHeroHeadline = 'Grow Your Cleaning Business';
 
+export const ccwRoadshowFreeEntryOffer = {
+  headline: 'Free for CCW past and current customers',
+  detail:
+    'All past and current Carpet Cleaners Warehouse customers can attend at no cost. Register to claim a free entry token for check-in at the CCW location.',
+  tokenPrefix: 'CCW-FREE',
+};
+
 export const ccwRoadshowPresenter = {
   name: 'Phil McGurk',
   role: 'CARSI founder and cleaning and restoration educator',
@@ -93,19 +100,21 @@ export const ccwRoadshowEvents: CcwRoadshowEvent[] = [
 export const ccwRoadshowTicketPackages: CcwRoadshowTicketPackage[] = [
   {
     id: 'single',
-    label: 'Single attendee',
-    shortLabel: '$175 per person',
-    unitAmountCents: 17500,
+    label: 'Free CCW customer entry',
+    shortLabel: 'Free entry',
+    unitAmountCents: 0,
     attendeeCount: 1,
-    description: 'One seat for the selected two-day CARSI x CCW Business Growth Days event.',
+    description:
+      'One free seat for a past or current CCW customer at the selected two-day CARSI x CCW Business Growth Days event.',
   },
   {
     id: 'team-five',
-    label: 'Team pack',
-    shortLabel: '$500 for 5',
-    unitAmountCents: 50000,
+    label: 'Free CCW team entry',
+    shortLabel: 'Free for 5',
+    unitAmountCents: 0,
     attendeeCount: 5,
-    description: 'Five seats for the selected two-day CARSI x CCW Business Growth Days event.',
+    description:
+      'Five free seats for a past or current CCW customer team at the selected two-day CARSI x CCW Business Growth Days event.',
   },
 ];
 
@@ -161,6 +170,8 @@ export function getCcwRoadshowTicketPackage(id: string | null | undefined) {
 }
 
 export function formatAudFromCents(cents: number) {
+  if (cents <= 0) return 'Free';
+
   return new Intl.NumberFormat('en-AU', {
     style: 'currency',
     currency: 'AUD',

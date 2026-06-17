@@ -5,6 +5,7 @@ import { ArrowRight, Loader2 } from 'lucide-react';
 
 import type { CcwRoadshowEvent } from '@/lib/marketing/ccw-roadshow';
 import {
+  ccwRoadshowFreeEntryOffer,
   ccwRoadshowTicketPackages,
   formatAudFromCents,
   type CcwRoadshowTicketPackage,
@@ -21,6 +22,7 @@ import {
 type BookingFormState = {
   eventSlug: string;
   packageId: CcwRoadshowTicketPackage['id'];
+  ccwCustomerStatus: 'current' | 'past' | 'not_sure';
   fullName: string;
   businessName: string;
   email: string;
@@ -33,6 +35,7 @@ export function CcwRoadshowBooking({ events }: { events: CcwRoadshowEvent[] }) {
   const [form, setForm] = useState<BookingFormState>({
     eventSlug: events[0]?.slug ?? '',
     packageId: 'single',
+    ccwCustomerStatus: 'current',
     fullName: '',
     businessName: '',
     email: '',
@@ -88,29 +91,32 @@ export function CcwRoadshowBooking({ events }: { events: CcwRoadshowEvent[] }) {
       });
       const payload = (await response.json().catch(() => ({}))) as {
         checkout_url?: string;
+        booking_url?: string;
         detail?: string;
         error?: string;
       };
+      const destination = payload.booking_url || payload.checkout_url;
 
-      if (!response.ok || !payload.checkout_url) {
-        throw new Error(payload.detail || payload.error || 'Could not start checkout.');
+      if (!response.ok || !destination) {
+        throw new Error(payload.detail || payload.error || 'Could not reserve your free entry.');
       }
 
-      window.location.href = payload.checkout_url;
+      window.location.href = destination;
     } catch (error) {
       setStatus('error');
-      setMessage(error instanceof Error ? error.message : 'Could not start checkout.');
+      setMessage(error instanceof Error ? error.message : 'Could not reserve your free entry.');
     }
   }
 
   return (
     <div className={`p-5 sm:p-6 ${marketingStatCard}`}>
       <div className="mb-5">
-        <p className={marketingEyebrowPill}>Bookings Essential</p>
-        <h2 className="mt-4 text-xl font-bold tracking-tight text-white">Reserve your seat</h2>
+        <p className={marketingEyebrowPill}>Limited places</p>
+        <h2 className="mt-4 text-xl font-bold tracking-tight text-white">
+          Claim your free entry token
+        </h2>
         <p className={`mt-2 ${marketingBodySm}`}>
-          {selectedEvent.city} - {selectedEvent.dates}. Stripe Checkout will collect payment and
-          send confirmation to the email entered here.
+          {selectedEvent.city} - {selectedEvent.dates}. {ccwRoadshowFreeEntryOffer.detail}
         </p>
       </div>
 
@@ -158,6 +164,24 @@ export function CcwRoadshowBooking({ events }: { events: CcwRoadshowEvent[] }) {
             })}
           </div>
         </div>
+
+        <label className="block">
+          <span className={labelClass}>CCW customer status</span>
+          <select
+            value={form.ccwCustomerStatus}
+            onChange={(event) =>
+              updateField(
+                'ccwCustomerStatus',
+                event.target.value as BookingFormState['ccwCustomerStatus'],
+              )
+            }
+            className={marketingInput}
+          >
+            <option value="current">Current CCW customer</option>
+            <option value="past">Past CCW customer</option>
+            <option value="not_sure">Not sure / CCW team can confirm</option>
+          </select>
+        </label>
 
         <div className="grid gap-3 sm:grid-cols-2">
           <label className="block">
@@ -229,7 +253,7 @@ export function CcwRoadshowBooking({ events }: { events: CcwRoadshowEvent[] }) {
           ) : (
             <ArrowRight className="h-4 w-4" aria-hidden />
           )}
-          Pay {formatAudFromCents(selectedPackage.unitAmountCents)} and book
+          Claim {formatAudFromCents(selectedPackage.unitAmountCents).toLowerCase()} entry token
         </button>
       </div>
     </div>
