@@ -198,6 +198,11 @@ def draw_footer(c: canvas.Canvas, page_w: float, y: float) -> None:
     c.drawRightString(page_w - 36, y, "Book at carsi.com.au/events/ccw-roadshow")
 
 
+def draw_price_pills(c: canvas.Canvas, x: float, y: float, gap: float = 12) -> None:
+    pill(c, x, y, "$175 each", GREEN, text=INK)
+    pill(c, x + 90 + gap, y, "$500 for 5", GOLD, text=INK)
+
+
 def flyer(c: canvas.Canvas, event: OfficeEvent) -> None:
     page_w, page_h = A4
     margin = 36
@@ -280,7 +285,7 @@ def flyer(c: canvas.Canvas, event: OfficeEvent) -> None:
 
     c.setFillColor(colors.white)
     c.setStrokeColor(LINE)
-    c.roundRect(right_x, content_top - 292, page_w - right_x - margin, 292, 12, fill=1, stroke=1)
+    c.roundRect(right_x, content_top - 320, page_w - right_x - margin, 320, 12, fill=1, stroke=1)
     c.setFillColor(BLUE)
     c.roundRect(right_x, content_top - 52, page_w - right_x - margin, 52, 12, fill=1, stroke=0)
     c.setFillColor(colors.white)
@@ -318,23 +323,6 @@ def flyer(c: canvas.Canvas, event: OfficeEvent) -> None:
     c.setFont("Helvetica-Bold", 12)
     c.drawString(right_x + 18, info_y - 15, "$175 per person")
     c.drawString(right_x + 18, info_y - 31, "$500 for 5 seats")
-
-    c.setFillColor(PAPER)
-    c.roundRect(right_x, content_top - 346, page_w - right_x - margin, 42, 10, fill=1, stroke=0)
-    draw_wrapped(
-        c,
-        "Scan the QR code or ask the CCW team to help you book.",
-        right_x + 14,
-        content_top - 320,
-        page_w - right_x - margin - 28,
-        "Helvetica-Bold",
-        9.5,
-        12,
-        INK,
-    )
-
-    pill(c, right_x, content_top - 386, "$175 each", GREEN, text=INK)
-    pill(c, right_x + 95, content_top - 386, "$500 for 5", GOLD, text=INK)
 
     draw_footer(c, page_w, 34)
     c.showPage()
@@ -384,9 +372,17 @@ def counter_card(c: canvas.Canvas, event: OfficeEvent) -> None:
     c.setFillColor(INK)
     c.setFont("Helvetica-Bold", 20)
     c.drawCentredString(page_w / 2, card_y - 88, "$500 for 5 seats")
-    c.setFillColor(MUTED)
-    c.setFont("Helvetica", 8.5)
-    c.drawCentredString(page_w / 2, card_y - 112, f"{event.venue} - {event.address}")
+    draw_centered_wrapped(
+        c,
+        f"{event.venue} - {event.address}",
+        margin + 20,
+        card_y - 112,
+        page_w - margin * 2 - 40,
+        "Helvetica",
+        8.5,
+        10,
+        MUTED,
+    )
 
     qr_size = 118
     qr_x = page_w / 2 - qr_size / 2
@@ -413,14 +409,26 @@ def write_pdf(filename: str, pagesize: tuple[float, float], draw_func, event: Of
 
 
 def write_print_pack(paths: Iterable[Path]) -> Path:
-    from pypdf import PdfWriter, PdfReader
+    from pypdf import PageObject, PdfReader, PdfWriter, Transformation
 
     pack = OUT / "ccw-roadshow-office-print-pack.pdf"
     writer = PdfWriter()
+    a4_w, a4_h = A4
     for path in paths:
         reader = PdfReader(str(path))
         for page in reader.pages:
-            writer.add_page(page)
+            width = float(page.mediabox.width)
+            height = float(page.mediabox.height)
+            if abs(width - a4_w) < 1 and abs(height - a4_h) < 1:
+                writer.add_page(page)
+                continue
+
+            sheet = PageObject.create_blank_page(width=a4_w, height=a4_h)
+            scale = min((a4_w - 72) / width, (a4_h - 72) / height)
+            tx = (a4_w - width * scale) / 2
+            ty = (a4_h - height * scale) / 2
+            sheet.merge_transformed_page(page, Transformation().scale(scale).translate(tx, ty))
+            writer.add_page(sheet)
     with pack.open("wb") as fh:
         writer.write(fh)
     return pack
