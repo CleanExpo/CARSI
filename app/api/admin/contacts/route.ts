@@ -3,6 +3,50 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAdminSessionOrNull } from '@/lib/admin/admin-session';
 import { prisma } from '@/lib/prisma';
 
+type LeadContext = {
+  source?: string;
+  topic?: string;
+  pathway?: string;
+  intent?: string;
+  page_url?: string;
+};
+
+const LEAD_PREFIXES = {
+  'Lead source': 'source',
+  'Lead topic': 'topic',
+  'Start Smart pathway': 'pathway',
+  'Lead intent': 'intent',
+  'Source page': 'page_url',
+} as const;
+
+function parseLeadContext(message: string): { leadContext: LeadContext; cleanMessage: string } {
+  const [maybeHeader, ...rest] = message.split(/\n\s*\n/);
+  const leadContext: LeadContext = {};
+  const lines = maybeHeader?.split('\n') ?? [];
+  let matched = 0;
+
+  for (const line of lines) {
+    const [rawKey, ...valueParts] = line.split(':');
+    const key = rawKey?.trim() as keyof typeof LEAD_PREFIXES;
+    const field = LEAD_PREFIXES[key];
+    const value = valueParts.join(':').trim();
+
+    if (field && value) {
+      leadContext[field] = value;
+      matched += 1;
+    }
+  }
+
+  if (!matched) {
+    return { leadContext, cleanMessage: message };
+  }
+
+  return {
+    leadContext,
+    cleanMessage: rest.join('\n\n').trim() || message,
+  };
+}
+
 /** GET /api/admin/contacts — list contact submissions (newest first). */
 export async function GET(request: NextRequest) {
   const session = await getAdminSessionOrNull();
@@ -15,25 +59,35 @@ export async function GET(request: NextRequest) {
   }
 
   const status = request.nextUrl.searchParams.get('status')?.trim();
+  const leadIntent = request.nextUrl.searchParams.get('lead_intent')?.trim();
   const limit = Math.min(Number(request.nextUrl.searchParams.get('limit') ?? 50), 100);
 
   const items = await prisma.contactSubmission.findMany({
-    where: status ? { status } : undefined,
+    where: {
+      ...(status ? { status } : {}),
+      ...(leadIntent ? { message: { contains: `Lead intent: ${leadIntent}` } } : {}),
+    },
     orderBy: { createdAt: 'desc' },
     take: limit,
   });
 
   return NextResponse.json({
-    items: items.map((r) => ({
-      id: r.id,
-      first_name: r.firstName,
-      last_name: r.lastName,
-      email: r.email,
-      message: r.message,
-      status: r.status,
-      source_ip: r.sourceIp,
-      created_at: r.createdAt.toISOString(),
-    })),
+    items: items.map((r) => {
+      const parsed = parseLeadContext(r.message);
+
+      return {
+        id: r.id,
+        first_name: r.firstName,
+        last_name: r.lastName,
+        email: r.email,
+        message: parsed.cleanMessage,
+        raw_message: r.message,
+        lead_context: parsed.leadContext,
+        status: r.status,
+        source_ip: r.sourceIp,
+        created_at: r.createdAt.toISOString(),
+      };
+    }),
   });
 }
 
