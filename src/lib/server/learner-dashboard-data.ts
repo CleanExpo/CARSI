@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { normalizePublicAssetUrl } from '@/lib/remote-image';
+import { getCecSubmissionsByEnrollmentIds } from '@/lib/server/iicrc-cec-submission';
 
 /** Client / API shape for `EnrolledCourseList` and enrollments/me. */
 export interface EnrollmentDto {
@@ -15,6 +16,8 @@ export interface EnrollmentDto {
   last_lesson_title?: string | null;
   all_lessons_complete?: boolean;
   certificate_issued_at?: string | null;
+  cec_submission_status?: string | null;
+  cec_submitted_at?: string | null;
 }
 
 export interface LearnerDashboardSummary {
@@ -75,7 +78,8 @@ function mapEnrollmentRow(
       modules: { lessons: { id: string; title: string }[] }[];
     };
   },
-  progressByLesson: Map<string, { completed: boolean }>
+  progressByLesson: Map<string, { completed: boolean }>,
+  cecSubmission?: { status: string; sent_at: string | null } | null,
 ): EnrollmentDto {
   const lessonIds: string[] = [];
   const lessonTitleById = new Map<string, string>();
@@ -116,6 +120,8 @@ function mapEnrollmentRow(
     last_lesson_title: lastTitle,
     all_lessons_complete: allLessonsComplete,
     certificate_issued_at: e.certificateIssuedAt?.toISOString() ?? null,
+    cec_submission_status: cecSubmission?.status ?? null,
+    cec_submitted_at: cecSubmission?.sent_at ?? null,
   };
 }
 
@@ -167,7 +173,16 @@ export async function getLearnerDashboardSummary(
 
     const progressByLesson = new Map(progressRows.map((p) => [p.lessonId, p]));
 
-    const enrollments = rows.map((r) => mapEnrollmentRow(r, progressByLesson));
+    let cecByEnrollment = new Map<string, { status: string; sent_at: string | null }>();
+    try {
+      cecByEnrollment = await getCecSubmissionsByEnrollmentIds(rows.map((r) => r.id));
+    } catch (err) {
+      console.warn('[learner-dashboard-data] CEC submissions unavailable', err);
+    }
+
+    const enrollments = rows.map((r) =>
+      mapEnrollmentRow(r, progressByLesson, cecByEnrollment.get(r.id) ?? null),
+    );
 
     let active = 0;
     let completed = 0;
