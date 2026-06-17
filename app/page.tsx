@@ -4,7 +4,6 @@ import {
   AnimatedSection,
   AnimatedStats,
 } from '@/components/landing/AnimatedHero';
-import { HomeSpotlightFeatures } from '@/components/landing/HomeSpotlightFeatures';
 import { PublicFooter } from '@/components/landing/PublicFooter';
 import { PublicNavbar } from '@/components/landing/PublicNavbar';
 import { PUBLIC_SHELL_INNER_CLASS } from '@/components/landing/public-shell-width';
@@ -288,9 +287,6 @@ export default async function Home() {
 
       {/* ── Hero (Animated) ────────────────────────────────────────────────── */}
       <AnimatedHero benefits={benefits} />
-
-      {/* ── Section 2: Start Smart + CCW roadshow ──────────────────────────── */}
-      <HomeSpotlightFeatures />
 
       {/* ── Stats (Animated) ───────────────────────────────────────────────── */}
       <AnimatedStats stats={stats} />
