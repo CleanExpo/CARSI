@@ -75,15 +75,15 @@ export function CcwRoadshowBooking({ events }: { events: CcwRoadshowEvent[] }) {
   }
 
   return (
-    <div className="rounded-2xl border border-[rgba(36,144,237,0.24)] bg-white/[0.04] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.28)]">
+    <div className="rounded-2xl border border-[#c8d7e8] bg-white p-5 shadow-[0_24px_80px_rgba(15,23,42,0.12)]">
       <div className="mb-5">
         <p className="text-xs font-semibold tracking-[0.18em] text-[#34d399] uppercase">
-          Bookings Essential
+          Limited Places
         </p>
-        <h2 className="mt-2 text-2xl font-semibold tracking-tight text-white">
+        <h2 className="mt-2 text-2xl font-semibold tracking-tight text-[#0b0f14]">
           Reserve your seat
         </h2>
-        <p className="mt-2 text-sm leading-relaxed text-white/58">
+        <p className="mt-2 text-sm leading-relaxed text-[#465466]">
           {selectedEvent.city} - {selectedEvent.dates}. Stripe Checkout will collect payment and
           send confirmation to the email entered here.
         </p>
@@ -91,11 +91,11 @@ export function CcwRoadshowBooking({ events }: { events: CcwRoadshowEvent[] }) {
 
       <div className="space-y-4">
         <label className="block">
-          <span className="mb-1.5 block text-sm font-medium text-white/75">Event</span>
+          <span className="mb-1.5 block text-sm font-medium text-[#243244]">Event</span>
           <select
             value={form.eventSlug}
             onChange={(event) => updateField('eventSlug', event.target.value)}
-            className="h-11 w-full rounded-lg border border-white/10 bg-[#080808] px-3 text-sm text-white outline-none transition-colors focus:border-[#2490ed]"
+            className="h-11 w-full rounded-lg border border-[#c8d7e8] bg-white px-3 text-sm text-[#0b0f14] outline-none transition-colors focus:border-[#2490ed]"
           >
             {events.map((event) => (
               <option key={event.slug} value={event.slug}>
@@ -106,7 +106,7 @@ export function CcwRoadshowBooking({ events }: { events: CcwRoadshowEvent[] }) {
         </label>
 
         <div>
-          <span className="mb-2 block text-sm font-medium text-white/75">Ticket</span>
+          <span className="mb-2 block text-sm font-medium text-[#243244]">Ticket</span>
           <div className="grid gap-2 sm:grid-cols-2">
             {ccwRoadshowTicketPackages.map((pkg) => {
               const active = form.packageId === pkg.id;
@@ -117,15 +117,15 @@ export function CcwRoadshowBooking({ events }: { events: CcwRoadshowEvent[] }) {
                   onClick={() => updateField('packageId', pkg.id)}
                   className={`min-h-24 rounded-lg border p-3 text-left transition-colors ${
                     active
-                      ? 'border-[#2490ed] bg-[rgba(36,144,237,0.14)]'
-                      : 'border-white/10 bg-white/[0.03] hover:border-white/22'
+                      ? 'border-[#2490ed] bg-[#eaf5ff]'
+                      : 'border-[#d8e0ea] bg-[#f8fafc] hover:border-[#9eb7d2]'
                   }`}
                 >
-                  <span className="block text-sm font-semibold text-white">{pkg.label}</span>
+                  <span className="block text-sm font-semibold text-[#0b0f14]">{pkg.label}</span>
                   <span className="mt-1 block text-lg font-semibold text-[#34d399]">
                     {formatAudFromCents(pkg.unitAmountCents)}
                   </span>
-                  <span className="mt-1 block text-xs text-white/50">
+                  <span className="mt-1 block text-xs text-[#5b6878]">
                     {pkg.attendeeCount} {pkg.attendeeCount === 1 ? 'seat' : 'seats'}
                   </span>
                 </button>
@@ -136,22 +136,22 @@ export function CcwRoadshowBooking({ events }: { events: CcwRoadshowEvent[] }) {
 
         <div className="grid gap-3 sm:grid-cols-2">
           <label className="block">
-            <span className="mb-1.5 block text-sm font-medium text-white/75">Name</span>
+            <span className="mb-1.5 block text-sm font-medium text-[#243244]">Name</span>
             <input
               value={form.fullName}
               onChange={(event) => updateField('fullName', event.target.value)}
               autoComplete="name"
-              className="h-11 w-full rounded-lg border border-white/10 bg-[#080808] px-3 text-sm text-white outline-none transition-colors placeholder:text-white/24 focus:border-[#2490ed]"
+              className="h-11 w-full rounded-lg border border-[#c8d7e8] bg-white px-3 text-sm text-[#0b0f14] outline-none transition-colors placeholder:text-[#8b97a7] focus:border-[#2490ed]"
               placeholder="Full name"
             />
           </label>
           <label className="block">
-            <span className="mb-1.5 block text-sm font-medium text-white/75">Business</span>
+            <span className="mb-1.5 block text-sm font-medium text-[#243244]">Business</span>
             <input
               value={form.businessName}
               onChange={(event) => updateField('businessName', event.target.value)}
               autoComplete="organization"
-              className="h-11 w-full rounded-lg border border-white/10 bg-[#080808] px-3 text-sm text-white outline-none transition-colors placeholder:text-white/24 focus:border-[#2490ed]"
+              className="h-11 w-full rounded-lg border border-[#c8d7e8] bg-white px-3 text-sm text-[#0b0f14] outline-none transition-colors placeholder:text-[#8b97a7] focus:border-[#2490ed]"
               placeholder="Business name"
             />
           </label>
@@ -159,24 +159,24 @@ export function CcwRoadshowBooking({ events }: { events: CcwRoadshowEvent[] }) {
 
         <div className="grid gap-3 sm:grid-cols-2">
           <label className="block">
-            <span className="mb-1.5 block text-sm font-medium text-white/75">Email</span>
+            <span className="mb-1.5 block text-sm font-medium text-[#243244]">Email</span>
             <input
               value={form.email}
               onChange={(event) => updateField('email', event.target.value)}
               autoComplete="email"
               inputMode="email"
-              className="h-11 w-full rounded-lg border border-white/10 bg-[#080808] px-3 text-sm text-white outline-none transition-colors placeholder:text-white/24 focus:border-[#2490ed]"
+              className="h-11 w-full rounded-lg border border-[#c8d7e8] bg-white px-3 text-sm text-[#0b0f14] outline-none transition-colors placeholder:text-[#8b97a7] focus:border-[#2490ed]"
               placeholder="name@example.com"
             />
           </label>
           <label className="block">
-            <span className="mb-1.5 block text-sm font-medium text-white/75">Phone</span>
+            <span className="mb-1.5 block text-sm font-medium text-[#243244]">Phone</span>
             <input
               value={form.phone}
               onChange={(event) => updateField('phone', event.target.value)}
               autoComplete="tel"
               inputMode="tel"
-              className="h-11 w-full rounded-lg border border-white/10 bg-[#080808] px-3 text-sm text-white outline-none transition-colors placeholder:text-white/24 focus:border-[#2490ed]"
+              className="h-11 w-full rounded-lg border border-[#c8d7e8] bg-white px-3 text-sm text-[#0b0f14] outline-none transition-colors placeholder:text-[#8b97a7] focus:border-[#2490ed]"
               placeholder="Mobile number"
             />
           </label>

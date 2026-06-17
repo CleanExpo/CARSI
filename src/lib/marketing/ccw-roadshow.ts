@@ -28,12 +28,29 @@ export const ccwRoadshowPath = '/events/ccw-roadshow';
 
 export const ccwRoadshowTitle = 'CARSI x CCW Business Growth Days';
 
+export const ccwRoadshowHeroHeadline = 'Grow Your Cleaning Business';
+
+export const ccwRoadshowPresenter = {
+  name: 'Phil McGurk',
+  role: 'CARSI founder and cleaning and restoration educator',
+  value:
+    'Spend two practical days learning directly from Phil McGurk and the CCW team, with the conversation tied back to real equipment, chemicals, service decisions and customer outcomes.',
+};
+
 export const ccwRoadshowTopics = [
-  'Carpet cleaning',
-  'Rug cleaning',
-  'Stain removal',
-  'Tile cleaning',
-  'Business growth',
+  'Better-fit jobs',
+  'Quote with confidence',
+  'Improve profit decisions',
+  'Avoid costly mistakes',
+  'Add profitable services',
+  'Build a stronger business',
+];
+
+export const ccwRoadshowFacilityAdvantages = [
+  'See equipment and chemical options inside working Carpet Cleaners Warehouse locations.',
+  'Compare practical solutions side-by-side before spending more money.',
+  'Ask real-world questions that connect training directly to customer jobs.',
+  'Link the course material to service offers, quoting, safety and follow-up.',
 ];
 
 export const ccwRoadshowEvents: CcwRoadshowEvent[] = [
@@ -52,7 +69,7 @@ export const ccwRoadshowEvents: CcwRoadshowEvent[] = [
     suburbStatePostcode: 'Bayswater North VIC 3153',
     state: 'VIC',
     description:
-      'Two practical days connecting training, equipment, service design, chemistry, sales confidence and business growth for carpet, rug, stain and tile cleaning operators.',
+      'Two practical days with Phil McGurk and the CCW team, connecting training, equipment, service design, chemistry, quoting confidence and business growth for carpet, rug, stain and tile cleaning operators.',
   },
   {
     slug: 'sydney',
@@ -69,7 +86,7 @@ export const ccwRoadshowEvents: CcwRoadshowEvent[] = [
     suburbStatePostcode: 'Seven Hills NSW 2147',
     state: 'NSW',
     description:
-      'Two practical days connecting training, equipment, service design, chemistry, sales confidence and business growth for carpet, rug, stain and tile cleaning operators.',
+      'Two practical days with Phil McGurk and the CCW team, connecting training, equipment, service design, chemistry, quoting confidence and business growth for carpet, rug, stain and tile cleaning operators.',
   },
 ];
 
@@ -102,9 +119,9 @@ export const ccwRoadshowAudienceSegments = [
 export const ccwRoadshowCampaignPillars = {
   why: {
     eyebrow: 'Why attend',
-    title: 'Because growth needs more than another machine or product',
+    title: 'Because this is business improvement, not just a product day',
     body:
-      'Most cleaning businesses do not stall because owners lack effort. They stall because training, equipment, chemicals, service offers, pricing and customer follow-up are treated as separate decisions. These two days help operators connect the decisions before more money, time or reputation is put at risk.',
+      'Most cleaning businesses do not stall because owners lack effort. They stall because training, equipment, chemicals, service offers, pricing and customer follow-up are treated as separate decisions. These two days help operators connect those decisions before more money, time or reputation is put at risk.',
     points: [
       'Turn scattered supplier, product and course information into a practical business direction.',
       'Understand how service promises, equipment choices and chemical decisions affect customer outcomes.',
@@ -120,15 +137,15 @@ export const ccwRoadshowCampaignPillars = {
   },
   achieve: {
     eyebrow: 'What you will achieve',
-    title: 'Leave with clearer services, safer decisions and a stronger growth plan',
+    title: 'Leave with strategies you can use immediately',
     body:
       'The outcome is not just inspiration. Attendees receive the course outline and chemical decision details as part of the course material, then leave with practical next steps they can use in the business: what to learn, what to buy, what to sell, what to charge, what to document and when to ask for help.',
     points: [
-      'A clearer map of carpet, rug, stain and tile cleaning service opportunities.',
-      'A stronger link between equipment, chemicals, method, safety and customer expectations.',
-      'Course outline material and practical chemical details to support safer product and method decisions.',
-      'Better confidence to quote, explain value, capture leads and follow up after the job.',
-      'A practical training and team-development path through CARSI and hands-on CCW support.',
+      'Win better-fit jobs by knowing which services, methods and customer promises fit your capability.',
+      'Quote with more confidence and explain value without overpromising.',
+      'Avoid costly mistakes with equipment, chemicals, method selection and process decisions.',
+      'Add profitable services with a clearer path for carpet, rug, stain and tile work.',
+      'Build a stronger business through better systems, team language, lead capture and follow-up.',
     ],
   },
 } as const;

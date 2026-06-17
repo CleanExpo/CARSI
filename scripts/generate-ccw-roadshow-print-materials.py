@@ -163,12 +163,12 @@ def draw_qr(c: canvas.Canvas, url: str, x: float, y: float, size: float) -> None
 
 def draw_topic_grid(c: canvas.Canvas, x: float, y: float, width: float) -> float:
     topics = [
-        "Carpet cleaning",
-        "Rug cleaning",
-        "Stain removal",
-        "Tile cleaning",
-        "Equipment + chemicals",
-        "Business growth",
+        "Win better-fit jobs",
+        "Quote with confidence",
+        "Avoid costly mistakes",
+        "Add profitable services",
+        "Improve profit decisions",
+        "Build a stronger business",
     ]
     col_gap = 10
     box_w = (width - col_gap) / 2
@@ -195,7 +195,7 @@ def draw_footer(c: canvas.Canvas, page_w: float, y: float) -> None:
     c.setFont("Helvetica", 7.5)
     c.setFillColor(MUTED)
     c.drawString(36, y, "CARSI is professional continuing education and is not an RTO.")
-    c.drawRightString(page_w - 36, y, "Book at carsi.com.au/events/ccw-roadshow")
+    c.drawRightString(page_w - 36, y, "Limited places - book at carsi.com.au/events/ccw-roadshow")
 
 
 def draw_price_pills(c: canvas.Canvas, x: float, y: float, gap: float = 12) -> None:
@@ -210,8 +210,10 @@ def flyer(c: canvas.Canvas, event: OfficeEvent) -> None:
     c.setFillColor(PAPER)
     c.rect(0, 0, page_w, page_h, fill=1, stroke=0)
 
-    c.setFillColor(INK)
-    c.rect(0, page_h - 255, page_w, 255, fill=1, stroke=0)
+    c.setFillColor(colors.white)
+    c.roundRect(margin / 2, page_h - 255, page_w - margin, 230, 14, fill=1, stroke=0)
+    c.setStrokeColor(LINE)
+    c.roundRect(margin / 2, page_h - 255, page_w - margin, 230, 14, fill=0, stroke=1)
     c.setFillColor(BLUE)
     c.rect(0, page_h - 255, 9, 255, fill=1, stroke=0)
     c.setFillColor(GREEN)
@@ -221,29 +223,32 @@ def flyer(c: canvas.Canvas, event: OfficeEvent) -> None:
     c.setFillColor(GREEN)
     c.setFont("Helvetica-Bold", 12)
     c.drawString(margin + 72, page_h - 60, "CARSI x Carpet Cleaners Warehouse")
-    c.setFillColor(colors.white)
-    c.setFont("Helvetica-Bold", 35)
+    c.setFillColor(GOLD)
+    c.setFont("Helvetica-Bold", 11)
+    c.drawString(margin + 72, page_h - 78, "Spend two days with Phil McGurk")
+    c.setFillColor(INK)
+    c.setFont("Helvetica-Bold", 33)
     y = page_h - 135
     y = draw_wrapped(
         c,
-        "Business Growth Days",
+        "Grow Your Cleaning Business",
         margin,
         y,
         page_w - margin * 2 - 130,
         "Helvetica-Bold",
-        35,
-        39,
-        colors.white,
+        33,
+        37,
+        INK,
     )
     c.setFont("Helvetica-Bold", 19)
-    c.setFillColor(GOLD)
+    c.setFillColor(BLUE)
     c.drawString(margin, y - 8, f"{event.city} - {event.dates}")
     c.setFont("Helvetica", 12)
-    c.setFillColor(colors.Color(1, 1, 1, alpha=0.72))
+    c.setFillColor(MUTED)
     c.drawString(margin, y - 32, "8.30am-4.30pm both days")
 
     draw_qr(c, booking_url(event), page_w - margin - 105, page_h - 145, 95)
-    c.setFillColor(colors.white)
+    c.setFillColor(INK)
     c.setFont("Helvetica-Bold", 9)
     c.drawCentredString(page_w - margin - 57, page_h - 164, "SCAN TO BOOK")
 
@@ -253,10 +258,10 @@ def flyer(c: canvas.Canvas, event: OfficeEvent) -> None:
 
     c.setFillColor(INK)
     c.setFont("Helvetica-Bold", 18)
-    c.drawString(margin, content_top, "For walk-in customers ready to grow")
+    c.drawString(margin, content_top, "Business improvement, not just a chemical day")
     draw_wrapped(
         c,
-        "A practical two-day event for carpet cleaners, cleaners adding carpet or tile services, rug and stain removal operators, and teams wanting clearer business growth direction.",
+        "A practical two-day event inside Carpet Cleaners Warehouse for cleaners who want better-fit jobs, stronger quoting confidence and smarter equipment, chemical and service decisions.",
         margin,
         content_top - 28,
         left_w,
@@ -270,11 +275,11 @@ def flyer(c: canvas.Canvas, event: OfficeEvent) -> None:
 
     c.setFillColor(INK)
     c.setFont("Helvetica-Bold", 14)
-    c.drawString(margin, grid_bottom - 10, "What customers will leave with")
+    c.drawString(margin, grid_bottom - 10, "Walk away ready to")
     bullets = [
-        "A clearer link between training, equipment, chemicals and service offers.",
-        "Better questions to ask before buying gear or adding a new service.",
-        "Practical confidence around quoting, customer expectations and follow-up.",
+        "Connect training, equipment, chemicals and service offers.",
+        "Ask better questions before buying gear or adding services.",
+        "Explain value with more confidence in customer conversations.",
     ]
     by = grid_bottom - 34
     for bullet in bullets:
@@ -289,8 +294,8 @@ def flyer(c: canvas.Canvas, event: OfficeEvent) -> None:
     c.setFillColor(BLUE)
     c.roundRect(right_x, content_top - 52, page_w - right_x - margin, 52, 12, fill=1, stroke=0)
     c.setFillColor(colors.white)
-    c.setFont("Helvetica-Bold", 17)
-    c.drawString(right_x + 18, content_top - 32, "Books are essential")
+    c.setFont("Helvetica-Bold", 14)
+    c.drawString(right_x + 18, content_top - 32, "Limited places available")
 
     info_y = content_top - 78
     details = [
@@ -332,7 +337,7 @@ def counter_card(c: canvas.Canvas, event: OfficeEvent) -> None:
     page_w, page_h = A5
     margin = 28
 
-    c.setFillColor(INK)
+    c.setFillColor(PAPER)
     c.rect(0, 0, page_w, page_h, fill=1, stroke=0)
     c.setFillColor(BLUE)
     c.rect(0, 0, 12, page_h, fill=1, stroke=0)
@@ -343,29 +348,30 @@ def counter_card(c: canvas.Canvas, event: OfficeEvent) -> None:
     c.setFillColor(GREEN)
     c.setFont("Helvetica-Bold", 10)
     c.drawString(margin + 60, page_h - 48, "CARSI x CCW")
-    c.setFillColor(colors.Color(1, 1, 1, alpha=0.6))
+    c.setFillColor(MUTED)
     c.setFont("Helvetica", 8)
-    c.drawString(margin + 60, page_h - 62, "Business Growth Days")
+    c.drawString(margin + 60, page_h - 62, "Spend two days with Phil McGurk")
 
     y = page_h - 118
-    c.setFillColor(colors.white)
+    c.setFillColor(INK)
     c.setFont("Helvetica-Bold", 31)
-    y = draw_centered_wrapped(c, "Grow Your Cleaning Business", margin, y, page_w - margin * 2, "Helvetica-Bold", 31, 34, colors.white)
-    c.setFillColor(GOLD)
+    y = draw_centered_wrapped(c, "Grow Your Cleaning Business", margin, y, page_w - margin * 2, "Helvetica-Bold", 31, 34, INK)
+    c.setFillColor(BLUE)
     c.setFont("Helvetica-Bold", 17)
     c.drawCentredString(page_w / 2, y - 4, f"{event.city} - {event.dates}")
 
-    c.setFillColor(colors.Color(1, 1, 1, alpha=0.72))
+    c.setFillColor(MUTED)
     c.setFont("Helvetica", 11)
-    c.drawCentredString(page_w / 2, y - 28, "Carpet cleaning | Rugs | Stains | Tile | Growth")
+    c.drawCentredString(page_w / 2, y - 28, "Better-fit jobs | Quote with confidence")
     c.drawCentredString(page_w / 2, y - 45, "8.30am-4.30pm both days")
 
     card_y = y - 76
     c.setFillColor(colors.white)
-    c.roundRect(margin, card_y - 130, page_w - margin * 2, 130, 14, fill=1, stroke=0)
+    c.setStrokeColor(LINE)
+    c.roundRect(margin, card_y - 130, page_w - margin * 2, 130, 14, fill=1, stroke=1)
     c.setFillColor(INK)
     c.setFont("Helvetica-Bold", 16)
-    c.drawCentredString(page_w / 2, card_y - 28, "Books are essential")
+    c.drawCentredString(page_w / 2, card_y - 28, "Limited places available")
     c.setFillColor(BLUE)
     c.setFont("Helvetica-Bold", 20)
     c.drawCentredString(page_w / 2, card_y - 60, "$175 per person")
@@ -388,11 +394,11 @@ def counter_card(c: canvas.Canvas, event: OfficeEvent) -> None:
     qr_x = page_w / 2 - qr_size / 2
     qr_y = 70
     draw_qr(c, booking_url(event), qr_x, qr_y, qr_size)
-    c.setFillColor(colors.white)
+    c.setFillColor(INK)
     c.setFont("Helvetica-Bold", 12)
     c.drawCentredString(page_w / 2, qr_y - 26, "SCAN TO BOOK")
     c.setFont("Helvetica", 8.5)
-    c.setFillColor(colors.Color(1, 1, 1, alpha=0.6))
+    c.setFillColor(MUTED)
     c.drawCentredString(page_w / 2, 26, "carsi.com.au/events/ccw-roadshow")
 
     c.showPage()

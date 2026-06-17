@@ -4,7 +4,7 @@ Last updated: 17 June 2026
 
 ## Campaign Snapshot
 
-CARSI and Carpet Cleaners Warehouse are running two-day Business Growth Days for carpet cleaning, rug cleaning, stain removal, tile cleaning and practical business growth.
+CARSI and Carpet Cleaners Warehouse are running two-day Business Growth Days positioned around a simple outcome-led promise: grow your cleaning business by making better service, equipment, chemical, quoting and customer decisions.
 
 - Melbourne: 22-23 July 2026, 8.30am-4.30pm both days
 - Sydney: 30-31 July 2026, 8.30am-4.30pm both days
@@ -14,15 +14,34 @@ CARSI and Carpet Cleaners Warehouse are running two-day Business Growth Days for
 - CARSI website: `https://www.carsi.com.au`
 - CCW website: `https://www.ccwarehouse.com.au`
 - Booking URL: `https://www.carsi.com.au/events/ccw-roadshow`
-- Primary CTA: Books are essential. Reserve your seat through CARSI.
+- Primary CTA: Limited places available. Reserve your seat through CARSI.
 
 ## Core Positioning
 
-This is not a generic seminar. It is a hands-on business growth checkpoint for people who need to connect what they learn, what they buy, what they sell and how they explain value to customers.
+This is not a generic seminar or a simple chemical information day. It is a hands-on business improvement opportunity for people who need to connect what they learn, what they buy, what they sell and how they explain value to customers.
 
 Core message:
 
-> Learn the practical links between carpet cleaning, rug cleaning, stain removal, tile cleaning, equipment, chemistry, service confidence and business growth - then leave with clearer next steps for your own business.
+> Spend two days with Phil McGurk inside Carpet Cleaners Warehouse and leave with clearer strategies to pursue better-fit jobs, quote with confidence, avoid costly mistakes, add profitable services and build a stronger cleaning business.
+
+Message hierarchy:
+
+1. Dominant headline: `Grow Your Cleaning Business`.
+2. Credibility line: `Spend two days with Phil McGurk`.
+3. Event name: `CARSI x CCW Business Growth Days`.
+4. Outcome proof: better-fit jobs, profit decisions, fewer mistakes, profitable service planning, quoting confidence and stronger systems.
+5. Urgency: limited places, small group format, register early.
+
+## Toby Review Inputs Integrated
+
+Toby's 17 June review notes reposition the campaign away from a subject list and toward a clearer registration argument:
+
+- Whyte-style competitor events communicate quickly because they answer "why attend?" in seconds. CARSI x CCW must do the same.
+- The stronger offer is not "a chemical day"; it is business growth, better decision making and practical industry experience.
+- Phil McGurk's name should be visible because his reputation is a major drawcard for cleaners.
+- The CCW facility setting matters: attendees can see equipment, compare options, ask practical questions and connect training to real-world applications.
+- Replace passive "Books are essential" as the main urgency line with stronger action cues such as "Limited places available", "Small group format" and "Register early".
+- Add approved social proof where available. Do not invent testimonials; use a placeholder only until a real attendee quote is approved.
 
 ## Campaign Spine: Why, Who, What They Achieve
 
@@ -84,7 +103,7 @@ Marketing angle:
 
 Why this exists:
 
-> Cleaning businesses grow when training, equipment, chemicals and service offers work together. CARSI and CCW are bringing that conversation into one room in Melbourne and Sydney this July.
+> Cleaning businesses grow when training, equipment, chemicals and service offers work together. CARSI and CCW are bringing that conversation into one room in Melbourne and Sydney this July with Phil McGurk leading practical business-improvement sessions inside CCW facilities.
 
 ### Interest Message
 
@@ -96,13 +115,13 @@ Who it is for:
 
 What they achieve:
 
-> Book your seat and leave with a clearer service map, course outline material, practical chemical details, stronger quoting confidence and next steps for growth.
+> Book your seat and leave with strategies to pursue better-fit jobs, quote with confidence, avoid costly mistakes, add profitable services and build a stronger business.
 
 ### Urgency Message
 
 Why book now:
 
-> Seats are limited, books are essential, and the $500 team pack gives five people the same practical language before the next busy season.
+> Places are limited, the format is practical, and the $500 team pack gives five people the same operating language before the next busy season.
 
 ## Audience Segments
 
@@ -155,33 +174,39 @@ Why book now:
 
 ### CARSI Launch Post
 
-CARSI x Carpet Cleaners Warehouse Business Growth Days are coming to Melbourne and Sydney.
+Grow your cleaning business.
+
+CARSI x Carpet Cleaners Warehouse Business Growth Days are coming to Melbourne and Sydney, with two practical days led by Phil McGurk inside CCW facilities.
 
 Why? Because growth needs more than another machine or product. Training, equipment, chemicals, service offers, quoting and follow-up all need to work together.
 
 Who is it for? Carpet cleaners, cleaners adding carpet or tile work, rug and stain removal operators, team leaders and people thinking seriously about entering the industry.
 
-What will you achieve? A clearer service map, the course outline, practical chemical details, stronger quoting confidence and next steps for business growth.
+What will you achieve? Practical strategies to pursue better-fit jobs, make clearer profit decisions, avoid costly mistakes, add profitable services, quote with confidence and build a stronger business.
+
+This is business improvement, not just a topic day. You will be inside Carpet Cleaners Warehouse, where you can see, compare and discuss equipment, chemicals and real-world service decisions.
 
 Melbourne: 22-23 July 2026 at CCW Bayswater North
 Sydney: 30-31 July 2026 at CCW Seven Hills
 Time: 8.30am-4.30pm both days
 
-$175 per person or $500 for five seats. Books are essential.
+$175 per person or $500 for five seats. Limited places available.
 
 Book through CARSI: https://www.carsi.com.au/events/ccw-roadshow
 
 ### CCW Launch Post
 
+Grow your cleaning business with CARSI and CCW.
+
 We are hosting CARSI x CCW Business Growth Days at our Melbourne and Sydney locations this July.
 
-These are practical two-day sessions for operators who want stronger carpet cleaning, rug cleaning, stain removal, tile cleaning and business growth confidence.
+These are practical two-day sessions with Phil McGurk for operators who want stronger carpet cleaning, rug cleaning, stain removal, tile cleaning and business growth confidence.
 
 Why come? To connect training, equipment, chemicals and service decisions before you spend more money or take on harder work.
 
 Who should come? Owner-operators, cleaners adding services, growing teams and people comparing machines, products and training pathways.
 
-What will you leave with? Clearer service direction, the course outline, practical chemical details, better questions to ask before buying, stronger customer conversations and next steps for growth.
+What will you leave with? Clearer service direction, the course outline, practical chemical details, better questions to ask before buying, stronger customer conversations, better quoting confidence and next steps for growth.
 
 Bring yourself or bring the team:
 
@@ -192,24 +217,24 @@ Bring yourself or bring the team:
 Melbourne: 22-23 July, Unit 1/5 Gatwick Road, Bayswater North
 Sydney: 30-31 July, 2/8 Tollis Place, Seven Hills
 
-Books are essential. Book here: https://www.carsi.com.au/events/ccw-roadshow
+Small group format. Limited places available. Book here: https://www.carsi.com.au/events/ccw-roadshow
 
 ### Australian Carpet Cleaner Group Post
 
-For anyone in Melbourne or Sydney looking to sharpen carpet cleaning, rug cleaning, stain removal, tile cleaning and business growth skills, CARSI and CCW are running two-day Business Growth Days in July.
+For anyone in Melbourne or Sydney who wants to grow a cleaning business, CARSI and CCW are running two-day Business Growth Days in July.
 
-The focus is practical: how training, equipment, chemistry and service decisions connect before you sell the work or spend more money.
+The focus is practical: spend two days with Phil McGurk inside Carpet Cleaners Warehouse and connect training, equipment, chemistry and service decisions before you sell the work or spend more money.
 
 Why: to get clearer before adding services, buying equipment or quoting more complex jobs.
 
 Who: carpet cleaners, cleaners adding carpet or tile, team leaders, new starters and business buyers.
 
-What you achieve: a practical map for services, method, chemicals, customer expectations, quoting confidence and growth next steps, supported by the course outline and chemical details.
+What you achieve: practical strategies to pursue better-fit jobs, quote with confidence, avoid costly mistakes, add profitable services and build better systems, supported by the course outline and chemical details.
 
 Melbourne: 22-23 July at CCW Bayswater North
 Sydney: 30-31 July at CCW Seven Hills
 
-It is $175 per person or $500 for five seats. Books are essential.
+It is $175 per person or $500 for five seats. Places are limited.
 
 Booking link: https://www.carsi.com.au/events/ccw-roadshow
 
@@ -217,17 +242,17 @@ Booking link: https://www.carsi.com.au/events/ccw-roadshow
 
 ### Email 1: Why Attend
 
-Subject: Why these Business Growth Days matter
+Subject: Spend two days with Phil McGurk
 
 Body:
 
 CARSI and Carpet Cleaners Warehouse are bringing two-day Business Growth Days to Melbourne and Sydney this July because cleaning businesses need more than isolated tips, products or machine advice.
 
-Training, equipment, chemicals, service offers, quoting and customer follow-up all need to connect. These two days are designed to help operators make better decisions before buying more gear, adding more services or taking on harder jobs.
+Spend two practical days with Phil McGurk inside Carpet Cleaners Warehouse and connect training, equipment, chemicals, service offers, quoting and customer follow-up before buying more gear, adding more services or taking on harder jobs.
 
 Melbourne runs 22-23 July. Sydney runs 30-31 July. Both days run 8.30am-4.30pm.
 
-Seats are $175 per person or $500 for five. Books are essential.
+Seats are $175 per person or $500 for five. Limited places available.
 
 Book here: https://www.carsi.com.au/events/ccw-roadshow
 
@@ -251,7 +276,7 @@ Body:
 
 The CARSI x CCW Business Growth Days are built around practical outcomes.
 
-You should leave with a clearer map of carpet, rug, stain and tile cleaning opportunities, the course outline, practical chemical details, stronger customer expectation language, and practical next steps for learning, quoting, lead capture and follow-up.
+You should leave with practical strategies to pursue better-fit jobs, quote with confidence, avoid costly mistakes, add profitable services, build better systems, and connect the course outline and chemical details back to real customer work.
 
 Book here: https://www.carsi.com.au/events/ccw-roadshow
 
@@ -275,17 +300,19 @@ Book here: https://www.carsi.com.au/events/ccw-roadshow
 - Format: 1080x1080 square, 1080x1920 story/reel cover, LinkedIn 1200x627.
 - Visual priority: Why, Who, What they achieve, plus CARSI x CCW, city, dates, price, booking URL.
 - Avoid: overclaiming certification outcomes, "guaranteed income", or implying RTO/national qualification status.
-- Suggested headline: "Why grow alone when the decisions connect?"
-- Suggested subhead: "For carpet, rug, stain and tile operators ready for clearer services, safer decisions and stronger growth."
+- Suggested headline: "Grow Your Cleaning Business"
+- Suggested subhead: "Spend two days with Phil McGurk inside Carpet Cleaners Warehouse."
 - Badge: "$175 each or $500 for 5"
+- Urgency badge: "Limited places available"
+- Proof slot: "Insert approved attendee quote here" only after a real quote is supplied.
 
 ## Creative Variants
 
 ### Variant 1: Why
 
-Headline: Growth needs more than another machine.
+Headline: Grow your cleaning business.
 
-Body: Connect training, equipment, chemicals, services, quoting and follow-up before spending more money or taking on harder jobs.
+Body: Spend two practical days with Phil McGurk connecting training, equipment, chemicals, services, quoting and follow-up before spending more money or taking on harder jobs.
 
 CTA: Book your seat.
 
@@ -299,9 +326,9 @@ CTA: Choose Melbourne or Sydney.
 
 ### Variant 3: What
 
-Headline: Leave with a clearer growth plan.
+Headline: Walk away with strategies you can use immediately.
 
-Body: Build a practical map for services, method, equipment, chemicals, quoting, lead capture and follow-up, with the course outline and chemical details included.
+Body: Pursue better-fit jobs, quote with confidence, avoid costly mistakes, add profitable services and build a stronger business, with the course outline and chemical details included.
 
 CTA: Reserve your seat.
 
