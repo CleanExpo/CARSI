@@ -33,7 +33,6 @@ import {
   Building2,
   ChevronDown,
   Clock,
-  Compass,
   DollarSign,
   ExternalLink,
   Globe,
@@ -291,53 +290,6 @@ export default async function Home() {
 
       {/* ── Stats (Animated) ───────────────────────────────────────────────── */}
       <AnimatedStats stats={stats} />
-
-      <div
-        className="border-t border-white/[0.08] bg-gradient-to-r from-[#2490ed]/12 via-[#0a1624]/80 to-[#ed9d24]/10 py-5"
-        style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}
-      >
-        <div className={`${PUBLIC_SHELL_INNER_CLASS} grid gap-3 lg:grid-cols-2`}>
-          <Link
-            href="/ccw-training"
-            className="group flex flex-col items-center gap-3 rounded-2xl border border-white/0 p-2 transition-colors hover:border-white/10 sm:flex-row sm:justify-center md:justify-start"
-          >
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-white/15 bg-white/10 shadow-[0_8px_32px_-12px_rgba(36,144,237,0.4)] transition-transform group-hover:scale-105">
-              <Award className="h-5 w-5 text-[#7ec5ff]" aria-hidden />
-            </span>
-            <div className="text-center sm:text-left">
-              <p className="text-[10px] font-semibold tracking-[0.18em] text-[#2490ed]/90 uppercase">
-                In-person workshop
-              </p>
-              <p className="text-sm font-medium text-white/90 transition-colors group-hover:text-white">
-                2-Day Carpet Cleaning Workshop (CCW) — participant resources
-              </p>
-              <p className="mt-0.5 text-xs text-white/40">Tap to view schedules &amp; materials</p>
-            </div>
-            <ArrowRight className="ml-auto hidden h-5 w-5 shrink-0 text-[#2490ed] opacity-60 transition-transform group-hover:translate-x-1 md:block" />
-          </Link>
-
-          <Link
-            href="/start-carpet-cleaning-business"
-            className="group flex flex-col items-center gap-3 rounded-2xl border border-white/0 p-2 transition-colors hover:border-white/10 sm:flex-row sm:justify-center md:justify-start"
-          >
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-white/15 bg-white/10 shadow-[0_8px_32px_-12px_rgba(237,157,36,0.35)] transition-transform group-hover:scale-105">
-              <Compass className="h-5 w-5 text-[#ed9d24]" aria-hidden />
-            </span>
-            <div className="text-center sm:text-left">
-              <p className="text-[10px] font-semibold tracking-[0.18em] text-[#ed9d24]/90 uppercase">
-                Start Smart pathway
-              </p>
-              <p className="text-sm font-medium text-white/90 transition-colors group-hover:text-white">
-                Starting or adding carpet cleaning? Learn before buying gear
-              </p>
-              <p className="mt-0.5 text-xs text-white/40">
-                Startup, equipment, quoting and trust guidance
-              </p>
-            </div>
-            <ArrowRight className="ml-auto hidden h-5 w-5 shrink-0 text-[#ed9d24] opacity-60 transition-transform group-hover:translate-x-1 md:block" />
-          </Link>
-        </div>
-      </div>
 
       {/* ── Disciplines (compact pills) ────────────────────────────────────── */}
       <section

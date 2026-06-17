@@ -1,6 +1,7 @@
 'use client';
 
 import { PUBLIC_SHELL_INNER_CLASS } from '@/components/landing/public-shell-width';
+import { HeroPathwaysStrip } from '@/components/landing/HeroPathwaysStrip';
 import { motion, useReducedMotion } from 'framer-motion';
 import {
   ArrowRight,
@@ -531,6 +532,16 @@ export function AnimatedHero({ benefits }: AnimatedHeroProps) {
             <HeroLearningPreview />
         </motion.div>
         </div>
+
+        <motion.div
+          variants={fadeInUp}
+          initial="hidden"
+          animate="visible"
+          transition={{ duration: 0.55, ease: smoothEase, delay: 0.2 }}
+          className="mt-10 border-t border-white/8 pt-8 lg:mt-12 lg:pt-9"
+        >
+          <HeroPathwaysStrip />
+        </motion.div>
       </div>
     </section>
   );

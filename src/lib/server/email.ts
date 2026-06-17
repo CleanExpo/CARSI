@@ -4,16 +4,26 @@
  * Local dev: set EMAIL_DEV_CONSOLE=true or emails log to the terminal when Resend is unreachable.
  */
 
+export type EmailAttachment = {
+  filename: string;
+  /** Raw bytes or base64 string for Resend API. */
+  content: Buffer | Uint8Array | string;
+};
+
 export type SendEmailParams = {
   to: string | string[];
   subject: string;
   html: string;
   text?: string;
   replyTo?: string;
+  cc?: string | string[];
+  bcc?: string | string[];
+  attachments?: EmailAttachment[];
 };
 
 export type SendEmailResult = {
   sent: boolean;
+  messageId?: string;
   reason?: 'not_configured' | 'send_failed' | 'resend_error' | 'dev_console';
 };
 
@@ -102,6 +112,21 @@ export async function sendEmail(params: SendEmailParams): Promise<SendEmailResul
   };
   if (params.text) payload.text = params.text;
   if (params.replyTo) payload.reply_to = params.replyTo;
+  if (params.cc) {
+    payload.cc = Array.isArray(params.cc) ? params.cc : [params.cc];
+  }
+  if (params.bcc) {
+    payload.bcc = Array.isArray(params.bcc) ? params.bcc : [params.bcc];
+  }
+  if (params.attachments?.length) {
+    payload.attachments = params.attachments.map((a) => ({
+      filename: a.filename,
+      content:
+        typeof a.content === 'string'
+          ? a.content
+          : Buffer.from(a.content).toString('base64'),
+    }));
+  }
 
   try {
     const res = await fetch('https://api.resend.com/emails', {
@@ -128,6 +153,7 @@ export async function sendEmail(params: SendEmailParams): Promise<SendEmailResul
       const parsed = JSON.parse(bodyText) as { id?: string };
       if (parsed.id) {
         console.info('[email] sent', params.subject, '→', to.join(', '), 'id=', parsed.id);
+        return { sent: true, messageId: parsed.id };
       }
     } catch {
       console.info('[email] sent', params.subject, '→', to.join(', '));

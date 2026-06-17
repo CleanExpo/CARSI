@@ -105,8 +105,11 @@ export async function syncEnrollmentCompletion(
   const { ids, total } = await lessonTotalsForCourse(courseId);
   const prior = await prisma.lmsEnrollment.findUnique({
     where: { id: enrollmentId },
-    select: { completedAt: true },
+    select: { completedAt: true, status: true },
   });
+
+  const wasAlreadyCompleted =
+    prior?.status === 'completed' || prior?.completedAt != null;
 
   if (total === 0) {
     await prisma.lmsEnrollment.update({
@@ -129,6 +132,15 @@ export async function syncEnrollmentCompletion(
       completedAt: allDone ? (prior?.completedAt ?? new Date()) : null,
     },
   });
+
+  if (allDone && !wasAlreadyCompleted) {
+    const { processIicrcCecSubmissionForEnrollment } = await import(
+      '@/lib/server/iicrc-cec-submission'
+    );
+    void processIicrcCecSubmissionForEnrollment(enrollmentId).catch((e) =>
+      console.error('[enrollment] IICRC CEC auto-submit', enrollmentId, e),
+    );
+  }
 }
 
 export async function touchLessonProgress(params: {

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Award, PlayCircle } from 'lucide-react';
+import { Award, CheckCircle2, PlayCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -22,6 +22,8 @@ export interface EnrollmentListItem {
   last_lesson_title?: string | null;
   all_lessons_complete?: boolean;
   certificate_issued_at?: string | null;
+  cec_submission_status?: string | null;
+  cec_submitted_at?: string | null;
 }
 
 interface EnrolledCourseListProps {
@@ -48,6 +50,13 @@ export function EnrolledCourseList({ enrollments }: EnrolledCourseListProps) {
             ? `${learnBase}?lesson=${encodeURIComponent(enr.last_lesson_id)}`
             : learnBase;
         const done = enr.all_lessons_complete === true || enr.status === 'completed';
+        const cecSubmitted = enr.cec_submission_status === 'sent';
+        const cecSubmittedAt = enr.cec_submitted_at
+          ? new Date(enr.cec_submitted_at).toLocaleString(undefined, {
+              dateStyle: 'medium',
+              timeStyle: 'short',
+            })
+          : null;
 
         return (
           <li key={enr.id}>
@@ -84,10 +93,21 @@ export function EnrolledCourseList({ enrollments }: EnrolledCourseListProps) {
                           In progress
                         </Badge>
                       )}
+                      {cecSubmitted ? (
+                        <Badge className="gap-1 border-sky-500/35 bg-sky-500/10 text-sky-200">
+                          <CheckCircle2 className="h-3 w-3" aria-hidden />
+                          CEC submitted
+                        </Badge>
+                      ) : null}
                     </div>
                     {enr.last_lesson_title && !done ? (
                       <p className="text-xs text-white/45">
                         Last: <span className="text-white/70">{enr.last_lesson_title}</span>
+                      </p>
+                    ) : null}
+                    {cecSubmitted && cecSubmittedAt ? (
+                      <p className="text-xs text-sky-200/70">
+                        IICRC submission sent {cecSubmittedAt}
                       </p>
                     ) : null}
                     <div className="max-w-md text-white/80">

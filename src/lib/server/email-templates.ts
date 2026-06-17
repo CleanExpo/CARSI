@@ -402,6 +402,61 @@ export function renderYearlyMembershipEmail(params: {
   );
 }
 
+export function renderCcwRoadshowBookingConfirmationEmail(params: {
+  appOrigin: string;
+  attendeeName: string;
+  eventCity: string;
+  eventDates: string;
+  dateRangeLabel: string;
+  timeLabel: string;
+  venueName: string;
+  venueAddress: string;
+  ticketLabel: string;
+  seatCount: number;
+  amountLabel: string;
+  businessName?: string;
+  phone?: string;
+  eventPageUrl: string;
+}): RenderedEmail {
+  const name = params.attendeeName.trim() || 'there';
+  const details: CarsiEmailDetail[] = [
+    { label: 'Event', value: `${params.eventCity} — ${params.eventDates}` },
+    { label: 'When', value: `${params.dateRangeLabel}. ${params.timeLabel}` },
+    {
+      label: 'Venue',
+      value: params.venueName,
+      valueHtml: `${escapeHtml(params.venueName)}<br>${escapeHtml(params.venueAddress)}`,
+    },
+    { label: 'Ticket', value: `${params.ticketLabel} (${params.seatCount} ${params.seatCount === 1 ? 'seat' : 'seats'})` },
+    { label: 'Paid', value: params.amountLabel },
+  ];
+
+  if (params.businessName) {
+    details.push({ label: 'Business', value: params.businessName });
+  }
+  if (params.phone) {
+    details.push({ label: 'Phone', value: params.phone });
+  }
+
+  return render(
+    {
+      appOrigin: params.appOrigin,
+      preheader: `You're booked for ${params.eventCity} — ${params.eventDates}`,
+      eyebrow: 'Booking confirmed',
+      title: 'Your CARSI x CCW seat is reserved',
+      greeting: `Hi ${name},`,
+      paragraphs: [
+        'Thank you — your payment was received through Stripe and your seat is confirmed.',
+        'Please save this email. Arrive from 8.30am on day one. Course outline and practical chemical details are included as part of the course material on the day.',
+      ],
+      details,
+      cta: { label: 'View event details', href: params.eventPageUrl },
+      noteHtml: `Questions? Reply to this email or visit ${brandLink(params.eventPageUrl, 'the event page')}.`,
+    },
+    `Hi ${name},\n\nYour booking for CARSI x CCW Business Growth Days is confirmed.\n\nEvent: ${params.eventCity} — ${params.eventDates}\nWhen: ${params.dateRangeLabel}. ${params.timeLabel}\nVenue: ${params.venueName}, ${params.venueAddress}\nTicket: ${params.ticketLabel} (${params.seatCount} seats)\nPaid: ${params.amountLabel}\n\nEvent page: ${params.eventPageUrl}`,
+  );
+}
+
 export function renderContactNotificationEmail(params: {
   appOrigin: string;
   ticketRef: string;

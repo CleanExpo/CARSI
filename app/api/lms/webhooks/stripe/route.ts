@@ -8,6 +8,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import type Stripe from 'stripe';
 
 import { constructWebhookEvent } from '@/lib/api/stripe';
+import { processCcwRoadshowBookingConfirmation } from '@/lib/server/ccw-roadshow-booking-email';
 import { getAppOrigin } from '@/lib/server/app-url';
 import { notifyCrmEnrollmentCreated } from '@/lib/server/crm-enrollment-notify';
 import { sendEnrollmentWelcomeEmail } from '@/lib/server/enrollment-email';
@@ -42,6 +43,17 @@ export async function POST(request: NextRequest) {
   const session = event.data.object as Stripe.Checkout.Session;
 
   if (session.payment_status && session.payment_status !== 'paid') {
+    return NextResponse.json({ received: true });
+  }
+
+  if (session.metadata?.source === 'carsi-ccw-roadshow') {
+    try {
+      await processCcwRoadshowBookingConfirmation(session, {
+        appOrigin: getAppOrigin(),
+      });
+    } catch {
+      // Errors logged in sendCcwRoadshowBookingConfirmationEmail
+    }
     return NextResponse.json({ received: true });
   }
 

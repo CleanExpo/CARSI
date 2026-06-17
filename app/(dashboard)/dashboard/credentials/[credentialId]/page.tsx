@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 
 import { CredentialVerificationPageContent } from '@/components/lms/CredentialVerificationPageContent';
 import { getPublicCredentialJson } from '@/lib/server/credential-public';
+import { getCecSubmissionSummaryForEnrollment } from '@/lib/server/iicrc-cec-submission';
 import { getServerOrigin } from '@/lib/server/request-origin';
 
 export const dynamic = 'force-dynamic';
@@ -22,6 +23,8 @@ export default async function DashboardCredentialPage({
   const courseSlug =
     typeof query.course === 'string' && query.course.trim() ? query.course.trim() : null;
 
+  const cecSubmission = await getCecSubmissionSummaryForEnrollment(credentialId);
+
   return (
     <main className="mx-auto w-full max-w-4xl px-4 pb-12">
       <CredentialVerificationPageContent
@@ -29,6 +32,8 @@ export default async function DashboardCredentialPage({
         credentialId={credentialId}
         justCompleted={query.completed === '1'}
         courseSlug={courseSlug}
+        cecSubmissionStatus={cecSubmission?.status ?? null}
+        cecSubmittedAt={cecSubmission?.sent_at ?? null}
       />
     </main>
   );
