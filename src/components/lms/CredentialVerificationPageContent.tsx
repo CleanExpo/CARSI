@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Award, Download, PartyPopper } from 'lucide-react';
+import { Award, CheckCircle2, Download, PartyPopper } from 'lucide-react';
 
 import { CertificatePreview } from '@/components/lms/diagrams/CertificatePreview';
 import type { PublicCredentialJson } from '@/lib/server/credential-public';
@@ -10,6 +10,8 @@ type Props = {
   /** Set when redirected immediately after finishing the course. */
   justCompleted?: boolean;
   courseSlug?: string | null;
+  cecSubmissionStatus?: string | null;
+  cecSubmittedAt?: string | null;
 };
 
 export function CredentialVerificationPageContent({
@@ -17,8 +19,17 @@ export function CredentialVerificationPageContent({
   credentialId,
   justCompleted = false,
   courseSlug,
+  cecSubmissionStatus = null,
+  cecSubmittedAt = null,
 }: Props) {
   const pdfUrl = `/api/lms/credentials/${encodeURIComponent(credentialId)}?pdf=1`;
+  const cecSubmitted = cecSubmissionStatus === 'sent';
+  const cecSubmittedLabel = cecSubmittedAt
+    ? new Date(cecSubmittedAt).toLocaleString(undefined, {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+      })
+    : null;
 
   return (
     <div className="w-full max-w-6xl">
@@ -35,6 +46,23 @@ export function CredentialVerificationPageContent({
             You finished <span className="font-medium text-white/90">{credential.course_title}</span>.
             View your certificate below or download the PDF.
           </p>
+        </div>
+      ) : null}
+
+      {cecSubmitted ? (
+        <div
+          className="mt-6 flex items-start gap-3 rounded-2xl border border-sky-500/25 bg-sky-500/10 px-5 py-4"
+          role="status"
+        >
+          <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-sky-300" aria-hidden />
+          <div>
+            <p className="font-medium text-sky-100">CEC submitted to IICRC</p>
+            <p className="mt-1 text-sm text-sky-100/75">
+              Your certificate was emailed to IICRC Renewals
+              {cecSubmittedLabel ? ` on ${cecSubmittedLabel}` : ''}. Keep this page as your
+              verification record.
+            </p>
+          </div>
         </div>
       ) : null}
 
