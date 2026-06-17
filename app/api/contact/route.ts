@@ -13,6 +13,13 @@ interface ContactPayload {
   lastName: string;
   email: string;
   message: string;
+  leadContext?: {
+    source?: string;
+    topic?: string;
+    pathway?: string;
+    intent?: string;
+    pageUrl?: string;
+  };
 }
 
 const LIMIT = 5;
@@ -24,6 +31,36 @@ function getClientIp(req: NextRequest): string {
     req.headers.get('x-real-ip') ??
     UNKNOWN_IP
   );
+}
+
+function cleanText(value: unknown, maxLength: number) {
+  return typeof value === 'string'
+    ? value.replace(/[<>]/g, '').trim().slice(0, maxLength) || undefined
+    : undefined;
+}
+
+function buildLeadContextBlock(body: ContactPayload) {
+  const source = cleanText(body.leadContext?.source, 48);
+  const topic = cleanText(body.leadContext?.topic, 160);
+  const pathway = cleanText(body.leadContext?.pathway, 80);
+  const intent = cleanText(body.leadContext?.intent, 80);
+  const pageUrl = cleanText(body.leadContext?.pageUrl, 240);
+  const lines = [
+    source ? `Lead source: ${source}` : null,
+    topic ? `Lead topic: ${topic}` : null,
+    pathway ? `Start Smart pathway: ${pathway}` : null,
+    intent ? `Lead intent: ${intent}` : null,
+    pageUrl ? `Source page: ${pageUrl}` : null,
+  ].filter((line): line is string => Boolean(line));
+
+  return {
+    block: lines.length ? lines.join('\n') : '',
+    source,
+    topic,
+    pathway,
+    intent,
+    pageUrl,
+  };
 }
 
 export async function POST(req: NextRequest) {
@@ -55,6 +92,9 @@ export async function POST(req: NextRequest) {
 
     const submissionId = randomUUID();
     const ticketRef = submissionId.slice(0, 8).toUpperCase();
+    const message = body.message.trim();
+    const leadContext = buildLeadContextBlock(body);
+    const enrichedMessage = [leadContext.block, message].filter(Boolean).join('\n\n');
 
     if (process.env.DATABASE_URL?.trim()) {
       await prisma.contactSubmission.create({
@@ -63,7 +103,7 @@ export async function POST(req: NextRequest) {
           firstName: body.firstName.trim(),
           lastName: body.lastName.trim(),
           email,
-          message: body.message.trim(),
+          message: enrichedMessage,
           status: 'new',
           sourceIp: ip === UNKNOWN_IP ? null : ip,
         },
@@ -80,8 +120,13 @@ export async function POST(req: NextRequest) {
       email,
       first_name: body.firstName.trim(),
       last_name: body.lastName.trim(),
-      message: body.message.trim(),
+      message: enrichedMessage,
       ticket_ref: ticketRef,
+      lead_source: leadContext.source,
+      lead_topic: leadContext.topic,
+      lead_pathway: leadContext.pathway,
+      lead_intent: leadContext.intent,
+      lead_page_url: leadContext.pageUrl,
     });
 
     const emailResult = await sendContactNotificationEmail({
@@ -90,7 +135,7 @@ export async function POST(req: NextRequest) {
       firstName: body.firstName.trim(),
       lastName: body.lastName.trim(),
       email,
-      message: body.message.trim(),
+      message: enrichedMessage,
       notifyTo,
     });
 

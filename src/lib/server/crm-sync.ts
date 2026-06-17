@@ -15,6 +15,11 @@ export interface CrmContactPayload {
   last_name: string;
   message: string;
   ticket_ref: string;
+  lead_source?: string;
+  lead_topic?: string;
+  lead_pathway?: string;
+  lead_intent?: string;
+  lead_page_url?: string;
 }
 
 export interface CrmEnrollmentPayload {

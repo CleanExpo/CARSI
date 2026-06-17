@@ -49,6 +49,16 @@ export type StartSmartOperatingConnection = {
   evidence: string;
 };
 
+export type StartSmartLeadPath = {
+  id: string;
+  title: string;
+  body: string;
+  href: string;
+  label: string;
+  topic: string;
+  intent: string;
+};
+
 export const startSmartBasePath = '/start-carpet-cleaning-business';
 
 export const startSmartReadinessLoop: StartSmartReadinessPillar[] = [
@@ -104,6 +114,87 @@ export const startSmartReadinessRules = [
   'Do not choose chemicals without fibre, soil, stain, safety and equipment context.',
   'Do not treat training as optional; it is the link that makes equipment, service and chemicals professional.',
 ];
+
+export function buildStartSmartContactHref({
+  topic,
+  pathway,
+  intent,
+}: {
+  topic: string;
+  pathway?: string;
+  intent: string;
+}) {
+  const params = new URLSearchParams({
+    source: 'start-smart',
+    topic,
+    intent,
+  });
+
+  if (pathway) {
+    params.set('pathway', pathway);
+  }
+
+  return `/contact?${params.toString()}`;
+}
+
+export const startSmartLeadPaths: StartSmartLeadPath[] = [
+  {
+    id: 'courses',
+    title: 'Choose the right CARSI learning path',
+    body: 'For people ready to learn carpet cleaning fundamentals, chemistry, quoting or trust-building before taking paid work.',
+    href: '/courses?discipline=CCT&utm_source=start-smart&utm_medium=organic&utm_campaign=carsi_cct_conversion',
+    label: 'Explore CCT courses',
+    topic: 'CARSI CCT course pathway',
+    intent: 'course-enquiry',
+  },
+  {
+    id: 'ccw-workshop',
+    title: 'Ask about CCW hands-on workshop support',
+    body: 'For learners who need practical equipment, service, chemical and operator decision support connected to CCW training.',
+    href: buildStartSmartContactHref({
+      topic: 'CCW hands-on carpet cleaning workshop',
+      intent: 'ccw-workshop',
+    }),
+    label: 'Ask about CCW workshop',
+    topic: 'CCW hands-on carpet cleaning workshop',
+    intent: 'ccw-workshop',
+  },
+  {
+    id: 'equipment-service',
+    title: 'Check equipment and service direction',
+    body: 'For people comparing machines, chemicals or service models who need a safer decision path before spending money.',
+    href: buildStartSmartContactHref({
+      topic: 'Equipment and service readiness',
+      intent: 'equipment-service-guidance',
+    }),
+    label: 'Request readiness guidance',
+    topic: 'Equipment and service readiness',
+    intent: 'equipment-service-guidance',
+  },
+  {
+    id: 'team-buyer',
+    title: 'Plan team training or buyer due diligence',
+    body: 'For cleaning businesses, employers or buyers who need a training baseline across staff, services and operating risk.',
+    href: buildStartSmartContactHref({
+      topic: 'Team training or business buyer due diligence',
+      intent: 'team-or-buyer',
+    }),
+    label: 'Talk to CARSI',
+    topic: 'Team training or business buyer due diligence',
+    intent: 'team-or-buyer',
+  },
+];
+
+export const startSmartLeadPathIdsBySlug: Record<string, string[]> = {
+  'no-experience': ['courses', 'ccw-workshop', 'equipment-service'],
+  'cleaners-adding-carpet-cleaning': ['team-buyer', 'courses', 'equipment-service'],
+  'buying-a-cleaning-business': ['team-buyer', 'equipment-service', 'courses'],
+  'equipment-before-you-buy': ['equipment-service', 'ccw-workshop', 'courses'],
+  'chemistry-for-beginners': ['courses', 'ccw-workshop', 'equipment-service'],
+  'quoting-and-pricing': ['courses', 'team-buyer', 'equipment-service'],
+  'certification-and-trust': ['courses', 'team-buyer', 'ccw-workshop'],
+  'service-models': ['equipment-service', 'team-buyer', 'courses'],
+};
 
 export const startSmartOperatingConnectionsBySlug: Record<string, StartSmartOperatingConnection[]> = {
   'no-experience': [
@@ -876,6 +967,19 @@ export function getStartSmartPageFaqs(page: StartSmartPage): StartSmartFaq[] {
       answer: readinessAnswer,
     },
   ];
+}
+
+export function getStartSmartLeadPathsForPage(slug: string): StartSmartLeadPath[] {
+  const ids = startSmartLeadPathIdsBySlug[slug] ?? ['courses', 'equipment-service', 'ccw-workshop'];
+  return ids
+    .map((id) => startSmartLeadPaths.find((path) => path.id === id))
+    .filter((path): path is StartSmartLeadPath => Boolean(path))
+    .map((path) => ({
+      ...path,
+      href: path.href.startsWith('/contact')
+        ? `${path.href}&pathway=${encodeURIComponent(slug)}`
+        : path.href,
+    }));
 }
 
 export const startSmartHubFaqs = [

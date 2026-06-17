@@ -9,14 +9,37 @@ interface FormState {
   message: string;
 }
 
+export interface ContactLeadContext {
+  source?: string;
+  topic?: string;
+  pathway?: string;
+  intent?: string;
+  pageUrl?: string;
+  initialMessage?: string;
+}
+
 type Status = 'idle' | 'sending' | 'success' | 'error';
 
 const INITIAL: FormState = { firstName: '', lastName: '', email: '', message: '' };
 
-export function ContactForm() {
-  const [form, setForm] = useState<FormState>(INITIAL);
+function formatContextLabel(value?: string) {
+  return value
+    ?.replaceAll('-', ' ')
+    .replace(/\b\w/g, (char) => char.toUpperCase())
+    .trim();
+}
+
+export function ContactForm({ leadContext }: { leadContext?: ContactLeadContext }) {
+  const initialForm = {
+    ...INITIAL,
+    message: leadContext?.initialMessage ?? '',
+  };
+  const [form, setForm] = useState<FormState>(initialForm);
   const [status, setStatus] = useState<Status>('idle');
   const [reference, setReference] = useState<string | null>(null);
+  const hasLeadContext = Boolean(
+    leadContext?.source || leadContext?.topic || leadContext?.pathway || leadContext?.intent,
+  );
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -29,13 +52,13 @@ export function ContactForm() {
       const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, leadContext }),
       });
       const data = (await res.json().catch(() => ({}))) as { reference?: string; error?: string };
       if (!res.ok) throw new Error(data.error ?? 'Failed');
       setReference(data.reference ?? null);
       setStatus('success');
-      setForm(INITIAL);
+      setForm(initialForm);
     } catch {
       setStatus('error');
     }
@@ -72,6 +95,7 @@ export function ContactForm() {
           onClick={() => {
             setStatus('idle');
             setReference(null);
+            setForm(initialForm);
           }}
           className="mt-6 rounded-sm px-4 py-2 text-xs font-medium transition-colors"
           style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.6)' }}
@@ -92,6 +116,39 @@ export function ContactForm() {
       toolname="submit_contact_enquiry"
       tooldescription="Submit a contact enquiry to CARSI (Australia's leading IICRC continuing-education platform). Routes to support@carsi.com.au for human follow-up. Use for course questions, membership enquiries, certification queries, or general support."
     >
+      {hasLeadContext ? (
+        <div
+          className="rounded-sm p-4"
+          style={{
+            background: 'rgba(36,144,237,0.08)',
+            border: '1px solid rgba(36,144,237,0.22)',
+          }}
+        >
+          <p className="text-xs font-semibold tracking-wide uppercase" style={{ color: '#7ec5ff' }}>
+            Lead context attached
+          </p>
+          <div className="mt-3 grid gap-2 sm:grid-cols-2">
+            {[
+              ['Source', formatContextLabel(leadContext?.source)],
+              ['Topic', leadContext?.topic],
+              ['Pathway', formatContextLabel(leadContext?.pathway)],
+              ['Intent', formatContextLabel(leadContext?.intent)],
+            ]
+              .filter(([, value]) => Boolean(value))
+              .map(([label, value]) => (
+                <div key={label} className="rounded-sm bg-white/[0.04] px-3 py-2">
+                  <p className="text-[10px] font-semibold tracking-wide uppercase" style={{ color: 'rgba(255,255,255,0.36)' }}>
+                    {label}
+                  </p>
+                  <p className="mt-1 text-xs leading-5" style={{ color: 'rgba(255,255,255,0.72)' }}>
+                    {value}
+                  </p>
+                </div>
+              ))}
+          </div>
+        </div>
+      ) : null}
+
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1.5">
           <label htmlFor="firstName" className="block text-xs font-medium" style={labelStyle}>

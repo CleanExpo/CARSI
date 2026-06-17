@@ -24,12 +24,15 @@ import {
 import { BreadcrumbSchema, FAQSchema, OrganizationSchema } from '@/components/seo';
 import {
   getStartSmartOperatingConnections,
+  getStartSmartLeadPathsForPage,
   getStartSmartPageFaqs,
+  startSmartLeadPaths,
   startSmartBasePath,
   startSmartHubFaqs,
   startSmartPages,
   startSmartReadinessLoop,
   startSmartReadinessRules,
+  type StartSmartLeadPath,
   type StartSmartOperatingConnection,
   type StartSmartPage,
   type StartSmartReadinessPillar,
@@ -239,6 +242,56 @@ function StartSmartOperatingMap({ page }: { page: StartSmartPage }) {
   );
 }
 
+function LeadPathCard({ path }: { path: StartSmartLeadPath }) {
+  const isContact = path.href.startsWith('/contact');
+  const Icon = isContact ? Users : GraduationCap;
+
+  return (
+    <Link
+      href={path.href}
+      className="group rounded-sm p-5 transition hover:-translate-y-0.5 hover:border-[#5bd7ff]/40"
+      style={panelStyle}
+    >
+      <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-sm bg-[#2490ed]/15 text-[#5bd7ff]">
+        <Icon className="h-5 w-5" aria-hidden="true" />
+      </div>
+      <p className="text-xs font-semibold tracking-wide text-[#ed9d24] uppercase">
+        {path.intent.replaceAll('-', ' ')}
+      </p>
+      <h3 className="mt-2 text-base font-semibold" style={{ color: strong }}>
+        {path.title}
+      </h3>
+      <p className="mt-3 text-sm leading-6" style={{ color: muted }}>
+        {path.body}
+      </p>
+      <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[#5bd7ff]">
+        {path.label} <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
+      </span>
+    </Link>
+  );
+}
+
+function StartSmartLeadPaths({
+  title = 'Turn the research into the right next action',
+  body = 'When a visitor is ready, route them into the right CARSI path: self-paced learning, CCW-linked practical support, equipment/service readiness, or team and buyer guidance.',
+  paths,
+}: {
+  title?: string;
+  body?: string;
+  paths: StartSmartLeadPath[];
+}) {
+  return (
+    <section id="start-smart-lead-paths" className="py-8">
+      <SectionHeader eyebrow="Conversion paths" title={title} body={body} />
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {paths.map((path) => (
+          <LeadPathCard key={path.id} path={path} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export function StartSmartHub({ siteUrl }: { siteUrl: string }) {
   const canonical = `${siteUrl}${startSmartBasePath}`;
   const breadcrumbs = [
@@ -360,6 +413,8 @@ export function StartSmartHub({ siteUrl }: { siteUrl: string }) {
 
         <ProfessionalReadinessLoop />
 
+        <StartSmartLeadPaths paths={startSmartLeadPaths} />
+
         <section className="grid gap-5 py-8 lg:grid-cols-3">
           {[
             {
@@ -454,6 +509,7 @@ export function StartSmartDetail({ page, siteUrl }: { page: StartSmartPage; site
   ];
   const relatedPages = startSmartPages.filter((item) => item.slug !== page.slug).slice(0, 4);
   const pageFaqs = getStartSmartPageFaqs(page);
+  const leadPaths = getStartSmartLeadPathsForPage(page.slug);
 
   return (
     <main className="relative min-h-screen py-10 sm:py-14">
@@ -576,6 +632,12 @@ export function StartSmartDetail({ page, siteUrl }: { page: StartSmartPage; site
             ))}
           </div>
         </section>
+
+        <StartSmartLeadPaths
+          title="Choose the next step for this pathway"
+          body="This page should lead to a useful action: learn the technical baseline, ask about CCW practical support, check equipment and service readiness, or plan team/buyer training."
+          paths={leadPaths}
+        />
 
         <section className="grid gap-5 py-8 lg:grid-cols-[0.8fr_1.2fr]">
           <div className="rounded-sm p-6" style={panelStyle}>
