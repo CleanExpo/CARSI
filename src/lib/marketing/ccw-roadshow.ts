@@ -122,10 +122,11 @@ export const ccwRoadshowCampaignPillars = {
     eyebrow: 'What you will achieve',
     title: 'Leave with clearer services, safer decisions and a stronger growth plan',
     body:
-      'The outcome is not just inspiration. Attendees should leave with practical next steps they can use in the business: what to learn, what to buy, what to sell, what to charge, what to document and when to ask for help.',
+      'The outcome is not just inspiration. Attendees receive the course outline and chemical decision details as part of the course material, then leave with practical next steps they can use in the business: what to learn, what to buy, what to sell, what to charge, what to document and when to ask for help.',
     points: [
       'A clearer map of carpet, rug, stain and tile cleaning service opportunities.',
       'A stronger link between equipment, chemicals, method, safety and customer expectations.',
+      'Course outline material and practical chemical details to support safer product and method decisions.',
       'Better confidence to quote, explain value, capture leads and follow up after the job.',
       'A practical training and team-development path through CARSI and hands-on CCW support.',
     ],

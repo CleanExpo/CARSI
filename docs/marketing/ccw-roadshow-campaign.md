@@ -60,12 +60,13 @@ Marketing angle:
 
 ### What Will They Achieve?
 
-The outcome is not motivation for its own sake. Attendees should walk away with practical clarity they can use in the business.
+The outcome is not motivation for its own sake. Attendees receive the course outline and practical chemical details as part of the course material, then walk away with practical clarity they can use in the business.
 
 They should achieve:
 
 - A clearer map of carpet, rug, stain and tile cleaning service opportunities.
 - Better understanding of how equipment, chemicals, method, safety and training fit together.
+- Course outline material and chemical decision details they can refer back to after the event.
 - More confidence to quote, explain value, set expectations and avoid overpromising.
 - Better lead capture and follow-up thinking for online sales, phone orders, service bookings and repeat work.
 - A practical next-step plan for CARSI learning and hands-on CCW support.
@@ -93,7 +94,7 @@ Who it is for:
 
 What they achieve:
 
-> Book your seat and leave with a clearer service map, better equipment and chemical decision logic, stronger quoting confidence and practical next steps for growth.
+> Book your seat and leave with a clearer service map, course outline material, practical chemical details, stronger quoting confidence and next steps for growth.
 
 ### Urgency Message
 
@@ -158,7 +159,7 @@ Why? Because growth needs more than another machine or product. Training, equipm
 
 Who is it for? Carpet cleaners, cleaners adding carpet or tile work, rug and stain removal operators, team leaders and people thinking seriously about entering the industry.
 
-What will you achieve? A clearer service map, better equipment and chemical decision logic, stronger quoting confidence and practical next steps for business growth.
+What will you achieve? A clearer service map, the course outline, practical chemical details, stronger quoting confidence and next steps for business growth.
 
 Melbourne: 22-23 July 2026 at CCW Bayswater North
 Sydney: 30-31 July 2026 at CCW Seven Hills
@@ -178,7 +179,7 @@ Why come? To connect training, equipment, chemicals and service decisions before
 
 Who should come? Owner-operators, cleaners adding services, growing teams and people comparing machines, products and training pathways.
 
-What will you leave with? Clearer service direction, better questions to ask before buying, stronger customer conversations and practical next steps for growth.
+What will you leave with? Clearer service direction, the course outline, practical chemical details, better questions to ask before buying, stronger customer conversations and next steps for growth.
 
 Bring yourself or bring the team:
 
@@ -201,7 +202,7 @@ Why: to get clearer before adding services, buying equipment or quoting more com
 
 Who: carpet cleaners, cleaners adding carpet or tile, team leaders, new starters and business buyers.
 
-What you achieve: a practical map for services, method, chemicals, customer expectations, quoting confidence and growth next steps.
+What you achieve: a practical map for services, method, chemicals, customer expectations, quoting confidence and growth next steps, supported by the course outline and chemical details.
 
 Melbourne: 22-23 July at CCW Bayswater North
 Sydney: 30-31 July at CCW Seven Hills
@@ -248,7 +249,7 @@ Body:
 
 The CARSI x CCW Business Growth Days are built around practical outcomes.
 
-You should leave with a clearer map of carpet, rug, stain and tile cleaning opportunities, better equipment and chemical decision logic, stronger customer expectation language, and practical next steps for learning, quoting, lead capture and follow-up.
+You should leave with a clearer map of carpet, rug, stain and tile cleaning opportunities, the course outline, practical chemical details, stronger customer expectation language, and practical next steps for learning, quoting, lead capture and follow-up.
 
 Book here: https://carsi.com.au/events/ccw-roadshow
 
@@ -298,7 +299,7 @@ CTA: Choose Melbourne or Sydney.
 
 Headline: Leave with a clearer growth plan.
 
-Body: Build a practical map for services, method, equipment, chemicals, quoting, lead capture and follow-up.
+Body: Build a practical map for services, method, equipment, chemicals, quoting, lead capture and follow-up, with the course outline and chemical details included.
 
 CTA: Reserve your seat.
 
@@ -306,7 +307,7 @@ CTA: Reserve your seat.
 
 Use this when a walk-in customer sees the counter card or flyer:
 
-> We are running CARSI x CCW Business Growth Days here in July. It is for carpet cleaners and cleaners adding carpet, rug, stain or tile work. The point is to connect training, equipment, chemicals and business growth so you can make better decisions before spending more money or taking on harder jobs. You can scan the QR code to book. It is $175 each or $500 for five seats.
+> We are running CARSI x CCW Business Growth Days here in July. It is for carpet cleaners and cleaners adding carpet, rug, stain or tile work. The point is to connect training, equipment, chemicals and business growth so you can make better decisions before spending more money or taking on harder jobs. Attendees also receive the course outline and practical chemical details as part of the course material. You can scan the QR code to book. It is $175 each or $500 for five seats.
 
 ## Tracking
 

@@ -150,8 +150,10 @@ export default function CcwRoadshowPage() {
                 </div>
                 <div className="rounded-lg border border-white/10 bg-white/[0.04] p-4">
                   <Sparkles className="mb-3 h-5 w-5 text-[#fbbf24]" aria-hidden />
-                  <p className="text-sm font-semibold text-white">Business growth focus</p>
-                  <p className="mt-1 text-sm text-white/52">Training, service and sales readiness</p>
+                  <p className="text-sm font-semibold text-white">Course material included</p>
+                  <p className="mt-1 text-sm text-white/52">
+                    Course outline and practical chemical details
+                  </p>
                 </div>
               </div>
 
