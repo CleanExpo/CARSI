@@ -1,7 +1,7 @@
 {
   "name": "CARSI Start Smart Professional Readiness Loop",
   "url": "https://carsi.com.au/start-carpet-cleaning-business",
-  "updated": "2026-06-17",
+  "updated": "2026-06-18",
   "purpose": "Help people researching carpet cleaning as a business, add-on service, equipment purchase, or acquisition connect professional equipment, service model, chemicals, and training before taking consequential action.",
   "standing_rule": "The operator may research, prepare, and practise, but should not buy major equipment, advertise a service, select chemicals for customer work, or take paid work until the matching service, equipment, chemical, and training gates are clear.",
   "conversion_paths": [
@@ -13,7 +13,7 @@
     },
     {
       "name": "CCW hands-on carpet cleaning workshop",
-      "route": "https://carsi.com.au/contact?source=start-smart&topic=CCW+hands-on+carpet+cleaning+workshop&intent=ccw-workshop",
+      "route": "https://carsi.com.au/ccw-training?utm_source=start-smart&utm_medium=organic&utm_campaign=ccw_hands_on_workshop",
       "intent": "ccw-workshop",
       "use_when": "The visitor needs practical equipment, service, chemical, or operator decision support connected to CCW training."
     },
@@ -28,6 +28,23 @@
       "route": "https://carsi.com.au/contact?source=start-smart&topic=Team+training+or+business+buyer+due+diligence&intent=team-or-buyer",
       "intent": "team-or-buyer",
       "use_when": "The visitor represents a cleaning business, team, employer, or acquisition/buyer scenario."
+    }
+  ],
+  "verified_ccw_surfaces": [
+    {
+      "name": "CCW Online storefront",
+      "url": "https://ccwonline.com.au/",
+      "use_when": "A learner needs to research professional carpet cleaning equipment, chemicals, parts, accessories, or supplier support after the CARSI training/readiness gate is clear."
+    },
+    {
+      "name": "CCW Online agent instructions",
+      "url": "https://ccwonline.com.au/agents.md",
+      "use_when": "An AI assistant or search system needs the official agent-readable description of the CCW Shopify storefront, catalog discovery, cart and checkout rules."
+    },
+    {
+      "name": "CCW Online sitemap",
+      "url": "https://ccwonline.com.au/sitemap.xml",
+      "use_when": "Search engines and answer engines need live product, collection, page, blog and agentic discovery URLs for CCW."
     }
   ],
   "pillars": [
