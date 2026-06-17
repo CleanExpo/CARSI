@@ -1,7 +1,7 @@
 # SYNTHEX Campaign Launch Packet: CARSI x CCW Business Growth Days
 
 Last updated: 17 June 2026
-Launch status: staged, not public-live until checkout gate passes
+Launch status: live organic launch-ready. Paid ads remain blocked unless separately approved.
 
 ## Campaign Brief
 
@@ -35,17 +35,12 @@ Included material:
 
 ## Launch Gate
 
-Do not publish paid or high-volume organic posts until both checks pass:
+Launch gate passed on 17 June 2026:
 
-- `https://www.carsi.com.au/events/ccw-roadshow` returns HTTP 200.
-- Submitting the booking form returns a Stripe Checkout URL.
-
-Current verification on 17 June 2026:
-
-- `https://www.carsi.com.au/events/ccw-roadshow` returned HTTP 404 from the current custom-domain origin.
-- `https://carsi-web.vercel.app/events/ccw-roadshow` returned HTTP 200.
-- `https://carsi-web.vercel.app/api/events/ccw-roadshow/checkout` returned HTTP 500.
-- Vercel logs showed Stripe failing because the `STRIPE_SECRET_KEY` value contains an invalid character in the Authorization header. The app now normalizes copied key whitespace, but production still needs redeployment and a fresh checkout verification.
+- `https://www.carsi.com.au/events/ccw-roadshow` returned HTTP 200.
+- `https://www.carsi.com.au/api/events/ccw-roadshow/checkout` returned HTTP 200 when starting a booking.
+- The checkout response returned a `checkout.stripe.com` URL with a live `cs_live_` Stripe Checkout session.
+- Organic CARSI, CCW, email and group-safe campaign activity may start. Paid ads still need separate approval.
 
 ## Campaign Spine
 
@@ -72,7 +67,7 @@ They leave with a clearer service map, course outline material, practical chemic
 
 ## UTM Links
 
-Use these once the launch gate passes:
+Use these for campaign publishing:
 
 - CARSI social: `https://www.carsi.com.au/events/ccw-roadshow?utm_source=carsi_social&utm_medium=organic&utm_campaign=ccw_roadshow_2026`
 - CCW social: `https://www.carsi.com.au/events/ccw-roadshow?utm_source=ccw_social&utm_medium=organic&utm_campaign=ccw_roadshow_2026`
@@ -83,7 +78,7 @@ Use these once the launch gate passes:
 
 ### Phase 1: Launch Announcement
 
-Timing: after checkout gate passes.
+Timing: start now.
 
 Channels:
 
@@ -163,4 +158,4 @@ Generate and schedule:
 - 2 city-specific final-reminder posts for Melbourne.
 - 2 city-specific final-reminder posts for Sydney.
 
-Do not publish automatically until the launch gate passes.
+Organic publishing can start now. Keep paid ads blocked until separately approved.
