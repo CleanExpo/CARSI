@@ -7,7 +7,7 @@ import { CcwRoadshowBooking } from '@/components/marketing/CcwRoadshowBooking';
 import { BreadcrumbSchema, EventSchema, FAQSchema, ItemListSchema } from '@/components/seo';
 import { getPublicSiteUrl } from '@/lib/env/public-url';
 import {
-  ccwRoadshowAudienceSegments,
+  ccwRoadshowCampaignPillars,
   ccwRoadshowEvents,
   ccwRoadshowPath,
   ccwRoadshowTicketPackages,
@@ -222,25 +222,43 @@ export default function CcwRoadshowPage() {
         </section>
 
         <section className="border-y border-white/8 bg-white/[0.025] px-4 py-12">
-          <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.75fr_1fr]">
-            <div>
+          <div className="mx-auto max-w-7xl">
+            <div className="mb-7 max-w-3xl">
               <p className="text-xs font-semibold tracking-[0.18em] text-[#34d399] uppercase">
-                Why This Matters
+                Why, Who, What
               </p>
               <h2 className="mt-2 text-3xl font-semibold tracking-tight text-white">
-                Connect training to the work operators sell every week
+                A growth day built around practical decisions
               </h2>
               <p className="mt-4 text-sm leading-relaxed text-white/55">
-                The campaign should pull beginners, existing cleaners, growing teams and business
-                buyers into one practical conversation: what to learn, what to buy, what to sell,
-                what to charge and when to ask for expert support.
+                The campaign pulls beginners, existing cleaners, growing teams and business buyers
+                into one useful conversation: why the day matters, who should be in the room and
+                what they should be able to do after it.
               </p>
             </div>
-            <div className="grid gap-3 sm:grid-cols-2">
-              {ccwRoadshowAudienceSegments.map((segment) => (
-                <div key={segment} className="rounded-lg border border-white/10 bg-[#050505] p-4">
-                  <p className="text-sm leading-relaxed text-white/68">{segment}</p>
-                </div>
+
+            <div className="grid gap-4 lg:grid-cols-3">
+              {Object.values(ccwRoadshowCampaignPillars).map((pillar) => (
+                <article
+                  key={pillar.eyebrow}
+                  className="rounded-lg border border-white/10 bg-[#050505] p-5"
+                >
+                  <p className="text-xs font-semibold tracking-[0.18em] text-[#2490ed] uppercase">
+                    {pillar.eyebrow}
+                  </p>
+                  <h3 className="mt-3 text-xl font-semibold leading-tight text-white">
+                    {pillar.title}
+                  </h3>
+                  <p className="mt-3 text-sm leading-relaxed text-white/55">{pillar.body}</p>
+                  <div className="mt-5 space-y-3">
+                    {pillar.points.map((point) => (
+                      <div key={point} className="flex gap-3">
+                        <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#34d399]" />
+                        <p className="text-sm leading-relaxed text-white/65">{point}</p>
+                      </div>
+                    ))}
+                  </div>
+                </article>
               ))}
             </div>
           </div>
@@ -253,17 +271,10 @@ export default function CcwRoadshowPage() {
                 Daily Focus
               </p>
               <h2 className="mt-2 text-3xl font-semibold tracking-tight text-white">
-                Built around practical decisions
+                Built around outcomes you can use in the business
               </h2>
               <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                {[
-                  'Carpet and rug cleaning method choices',
-                  'Stain removal decision-making and customer expectation setting',
-                  'Tile cleaning service opportunities and quoting confidence',
-                  'Equipment, chemicals and training as one operating system',
-                  'Lead capture, follow-up and repeat customer growth',
-                  'CARSI/CCW pathways for ongoing learning and practical support',
-                ].map((item) => (
+                {ccwRoadshowCampaignPillars.achieve.points.map((item) => (
                   <div key={item} className="rounded-lg border border-white/10 bg-white/[0.03] p-4">
                     <p className="text-sm leading-relaxed text-white/62">{item}</p>
                   </div>

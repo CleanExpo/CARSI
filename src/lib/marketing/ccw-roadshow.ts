@@ -99,6 +99,39 @@ export const ccwRoadshowAudienceSegments = [
   'Business buyers or managers wanting a practical growth and risk-readiness checkpoint',
 ];
 
+export const ccwRoadshowCampaignPillars = {
+  why: {
+    eyebrow: 'Why attend',
+    title: 'Because growth needs more than another machine or product',
+    body:
+      'Most cleaning businesses do not stall because owners lack effort. They stall because training, equipment, chemicals, service offers, pricing and customer follow-up are treated as separate decisions. These two days help operators connect the decisions before more money, time or reputation is put at risk.',
+    points: [
+      'Turn scattered supplier, product and course information into a practical business direction.',
+      'Understand how service promises, equipment choices and chemical decisions affect customer outcomes.',
+      'Use training as the decision layer before quoting harder jobs, adding services or scaling a team.',
+    ],
+  },
+  who: {
+    eyebrow: 'Who it is for',
+    title: 'For cleaners, operators and teams ready to make better decisions',
+    body:
+      'The campaign should speak to people who are already close to action: starting up, adding a service, buying equipment, training staff, or trying to lift the value of the work they already sell.',
+    points: ccwRoadshowAudienceSegments,
+  },
+  achieve: {
+    eyebrow: 'What you will achieve',
+    title: 'Leave with clearer services, safer decisions and a stronger growth plan',
+    body:
+      'The outcome is not just inspiration. Attendees should leave with practical next steps they can use in the business: what to learn, what to buy, what to sell, what to charge, what to document and when to ask for help.',
+    points: [
+      'A clearer map of carpet, rug, stain and tile cleaning service opportunities.',
+      'A stronger link between equipment, chemicals, method, safety and customer expectations.',
+      'Better confidence to quote, explain value, capture leads and follow up after the job.',
+      'A practical training and team-development path through CARSI and hands-on CCW support.',
+    ],
+  },
+} as const;
+
 export function getCcwRoadshowEvent(slug: string | null | undefined) {
   const normalized = slug?.trim().toLowerCase();
   return ccwRoadshowEvents.find((event) => event.slug === normalized) ?? null;

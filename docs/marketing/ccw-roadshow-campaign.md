@@ -22,6 +22,85 @@ Core message:
 
 > Learn the practical links between carpet cleaning, rug cleaning, stain removal, tile cleaning, equipment, chemistry, service confidence and business growth - then leave with clearer next steps for your own business.
 
+## Campaign Spine: Why, Who, What They Achieve
+
+Use this as the core structure for social posts, counter conversations, emails, reels and follow-up messages. Every piece should answer one of these three questions clearly.
+
+### Why?
+
+Most cleaning businesses do not stall because owners lack effort. They stall because training, equipment, chemicals, service offers, pricing and customer follow-up are treated as separate decisions.
+
+The reason to attend:
+
+- To connect the practical decisions before buying more gear, adding more services or taking on harder jobs.
+- To understand how service promises, equipment choices and chemical decisions affect the outcome the customer sees.
+- To use training as the decision layer before quoting, selling, scaling or sending staff into customer work.
+- To turn scattered supplier, product and course information into one practical business direction.
+
+Marketing angle:
+
+> You do not need more noise. You need a clearer operating map for what to learn, what to buy, what to sell and how to explain value to customers.
+
+### Who?
+
+The campaign should speak to people already close to action. They are researching, buying, adding services, training staff or trying to lift the value of work they already sell.
+
+Best-fit audience:
+
+- Existing carpet cleaners who want sharper technical confidence and stronger service offers.
+- Domestic, bond and commercial cleaners adding carpet cleaning, rug cleaning, stain removal or tile cleaning.
+- Owner-operators comparing machines, chemicals and methods before spending more money.
+- Teams that need a shared language across training, service standards, products and customer communication.
+- Business buyers or managers checking whether a cleaning business has real capability behind the numbers.
+- New operators who found carpet cleaning as a business idea and want credible guidance before taking paid work.
+
+Marketing angle:
+
+> If you clean, quote, sell, manage or want to start carpet, rug, stain or tile cleaning work, this room is built for you.
+
+### What Will They Achieve?
+
+The outcome is not motivation for its own sake. Attendees should walk away with practical clarity they can use in the business.
+
+They should achieve:
+
+- A clearer map of carpet, rug, stain and tile cleaning service opportunities.
+- Better understanding of how equipment, chemicals, method, safety and training fit together.
+- More confidence to quote, explain value, set expectations and avoid overpromising.
+- Better lead capture and follow-up thinking for online sales, phone orders, service bookings and repeat work.
+- A practical next-step plan for CARSI learning and hands-on CCW support.
+- A stronger way to decide what to buy, what to sell, what to document and when to ask for help.
+
+Marketing angle:
+
+> Leave with clearer services, safer decisions and a growth plan you can actually use on Monday.
+
+## Campaign Messages By Funnel Stage
+
+### Awareness Message
+
+Why this exists:
+
+> Cleaning businesses grow when training, equipment, chemicals and service offers work together. CARSI and CCW are bringing that conversation into one room in Melbourne and Sydney this July.
+
+### Interest Message
+
+Who it is for:
+
+> For carpet cleaners, cleaners adding carpet or tile work, rug and stain removal operators, team leaders and new starters who want to make better business decisions before spending more money or taking on harder work.
+
+### Conversion Message
+
+What they achieve:
+
+> Book your seat and leave with a clearer service map, better equipment and chemical decision logic, stronger quoting confidence and practical next steps for growth.
+
+### Urgency Message
+
+Why book now:
+
+> Seats are limited, books are essential, and the $500 team pack gives five people the same practical language before the next busy season.
+
 ## Audience Segments
 
 - Existing carpet cleaners wanting sharper technical confidence and better service offers.
@@ -75,7 +154,11 @@ Core message:
 
 CARSI x Carpet Cleaners Warehouse Business Growth Days are coming to Melbourne and Sydney.
 
-If you clean carpets, rugs, stains or tiles - or you are thinking about adding those services - these two-day sessions are built to connect the practical pieces: training, equipment, chemicals, service confidence, quoting and growth.
+Why? Because growth needs more than another machine or product. Training, equipment, chemicals, service offers, quoting and follow-up all need to work together.
+
+Who is it for? Carpet cleaners, cleaners adding carpet or tile work, rug and stain removal operators, team leaders and people thinking seriously about entering the industry.
+
+What will you achieve? A clearer service map, better equipment and chemical decision logic, stronger quoting confidence and practical next steps for business growth.
 
 Melbourne: 22-23 July 2026 at CCW Bayswater North
 Sydney: 30-31 July 2026 at CCW Seven Hills
@@ -90,6 +173,12 @@ Book through CARSI: https://carsi.com.au/events/ccw-roadshow
 We are hosting CARSI x CCW Business Growth Days at our Melbourne and Sydney locations this July.
 
 These are practical two-day sessions for operators who want stronger carpet cleaning, rug cleaning, stain removal, tile cleaning and business growth confidence.
+
+Why come? To connect training, equipment, chemicals and service decisions before you spend more money or take on harder work.
+
+Who should come? Owner-operators, cleaners adding services, growing teams and people comparing machines, products and training pathways.
+
+What will you leave with? Clearer service direction, better questions to ask before buying, stronger customer conversations and practical next steps for growth.
 
 Bring yourself or bring the team:
 
@@ -108,6 +197,12 @@ For anyone in Melbourne or Sydney looking to sharpen carpet cleaning, rug cleani
 
 The focus is practical: how training, equipment, chemistry and service decisions connect before you sell the work or spend more money.
 
+Why: to get clearer before adding services, buying equipment or quoting more complex jobs.
+
+Who: carpet cleaners, cleaners adding carpet or tile, team leaders, new starters and business buyers.
+
+What you achieve: a practical map for services, method, chemicals, customer expectations, quoting confidence and growth next steps.
+
 Melbourne: 22-23 July at CCW Bayswater North
 Sydney: 30-31 July at CCW Seven Hills
 
@@ -117,15 +212,15 @@ Booking link: https://carsi.com.au/events/ccw-roadshow
 
 ## Email Sequence
 
-### Email 1: Launch
+### Email 1: Why Attend
 
-Subject: Melbourne and Sydney Business Growth Days are open
+Subject: Why these Business Growth Days matter
 
 Body:
 
-CARSI and Carpet Cleaners Warehouse are bringing two-day Business Growth Days to Melbourne and Sydney this July.
+CARSI and Carpet Cleaners Warehouse are bringing two-day Business Growth Days to Melbourne and Sydney this July because cleaning businesses need more than isolated tips, products or machine advice.
 
-These sessions are for carpet cleaners, cleaners adding carpet or tile work, rug and stain removal operators, and business owners who want practical growth support.
+Training, equipment, chemicals, service offers, quoting and customer follow-up all need to connect. These two days are designed to help operators make better decisions before buying more gear, adding more services or taking on harder jobs.
 
 Melbourne runs 22-23 July. Sydney runs 30-31 July. Both days run 8.30am-4.30pm.
 
@@ -133,19 +228,31 @@ Seats are $175 per person or $500 for five. Books are essential.
 
 Book here: https://carsi.com.au/events/ccw-roadshow
 
-### Email 2: Practical Value
+### Email 2: Who Should Attend
 
-Subject: Training, equipment, chemicals and growth in one room
+Subject: Is this Business Growth Day for you?
 
 Body:
 
-Good carpet cleaning businesses do not grow from one thing alone. Training, equipment, chemicals, service design and customer trust all need to work together.
+This is for carpet cleaners, cleaners adding carpet or tile work, rug and stain removal operators, team leaders, new starters and business buyers who want clearer business direction.
 
-That is the focus of the CARSI x CCW Business Growth Days.
+If you are comparing equipment, choosing products, building service offers, training staff or trying to quote with more confidence, this room is built for you.
 
 Choose Melbourne or Sydney and reserve your seat: https://carsi.com.au/events/ccw-roadshow
 
-### Email 3: Team Pack
+### Email 3: What You Will Achieve
+
+Subject: What you will leave with
+
+Body:
+
+The CARSI x CCW Business Growth Days are built around practical outcomes.
+
+You should leave with a clearer map of carpet, rug, stain and tile cleaning opportunities, better equipment and chemical decision logic, stronger customer expectation language, and practical next steps for learning, quoting, lead capture and follow-up.
+
+Book here: https://carsi.com.au/events/ccw-roadshow
+
+### Email 4: Team Pack
 
 Subject: Bring five people for $500
 
@@ -163,11 +270,43 @@ Book here: https://carsi.com.au/events/ccw-roadshow
 ## Creative Brief
 
 - Format: 1080x1080 square, 1080x1920 story/reel cover, LinkedIn 1200x627.
-- Visual priority: CARSI x CCW, city, dates, price, booking URL.
+- Visual priority: Why, Who, What they achieve, plus CARSI x CCW, city, dates, price, booking URL.
 - Avoid: overclaiming certification outcomes, "guaranteed income", or implying RTO/national qualification status.
-- Suggested headline: "Business Growth Days: Carpet, Rug, Stain, Tile"
-- Suggested subhead: "Melbourne 22-23 July | Sydney 30-31 July"
+- Suggested headline: "Why grow alone when the decisions connect?"
+- Suggested subhead: "For carpet, rug, stain and tile operators ready for clearer services, safer decisions and stronger growth."
 - Badge: "$175 each or $500 for 5"
+
+## Creative Variants
+
+### Variant 1: Why
+
+Headline: Growth needs more than another machine.
+
+Body: Connect training, equipment, chemicals, services, quoting and follow-up before spending more money or taking on harder jobs.
+
+CTA: Book your seat.
+
+### Variant 2: Who
+
+Headline: Built for cleaners ready to grow.
+
+Body: For carpet cleaners, cleaners adding carpet or tile, rug and stain removal operators, teams, new starters and business buyers.
+
+CTA: Choose Melbourne or Sydney.
+
+### Variant 3: What
+
+Headline: Leave with a clearer growth plan.
+
+Body: Build a practical map for services, method, equipment, chemicals, quoting, lead capture and follow-up.
+
+CTA: Reserve your seat.
+
+## Counter Conversation Script
+
+Use this when a walk-in customer sees the counter card or flyer:
+
+> We are running CARSI x CCW Business Growth Days here in July. It is for carpet cleaners and cleaners adding carpet, rug, stain or tile work. The point is to connect training, equipment, chemicals and business growth so you can make better decisions before spending more money or taking on harder jobs. You can scan the QR code to book. It is $175 each or $500 for five seats.
 
 ## Tracking
 
