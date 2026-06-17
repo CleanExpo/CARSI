@@ -19,8 +19,15 @@ import Stripe from 'stripe';
 
 let _stripe: Stripe | null = null;
 
+export function normalizeStripeSecretKey(rawKey: string): string {
+  return rawKey
+    .trim()
+    .replace(/^['"`]+|['"`]+$/g, '')
+    .replace(/\s+/g, '');
+}
+
 function getSecretKey(): string {
-  const key = process.env.STRIPE_SECRET_KEY || '';
+  const key = normalizeStripeSecretKey(process.env.STRIPE_SECRET_KEY || '');
 
   if (!key || key === 'sk_test_xxx' || key === 'your-stripe-secret-key') {
     throw new Error('Stripe secret key not configured. Set STRIPE_SECRET_KEY in .env');
