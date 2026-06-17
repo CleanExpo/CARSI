@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { CheckCircle2 } from 'lucide-react';
 
 import { getCheckoutSession } from '@/lib/api/stripe';
+import { processCcwRoadshowBookingConfirmation } from '@/lib/server/ccw-roadshow-booking-email';
 import { ccwRoadshowPath, ccwRoadshowTitle } from '@/lib/marketing/ccw-roadshow';
 
 export const metadata: Metadata = {
@@ -38,12 +39,26 @@ async function getBookingSummary(sessionId: string | undefined): Promise<StripeB
   }
 }
 
+async function sendBookingConfirmationIfNeeded(sessionId: string | undefined) {
+  if (!sessionId || !process.env.STRIPE_SECRET_KEY?.trim()) {
+    return;
+  }
+
+  try {
+    const session = await getCheckoutSession(sessionId);
+    await processCcwRoadshowBookingConfirmation(session);
+  } catch {
+    // Errors logged in sendCcwRoadshowBookingConfirmationEmail
+  }
+}
+
 export default async function CcwRoadshowSuccessPage({
   searchParams,
 }: {
   searchParams: Promise<{ session_id?: string }>;
 }) {
   const { session_id: sessionId } = await searchParams;
+  await sendBookingConfirmationIfNeeded(sessionId);
   const booking = await getBookingSummary(sessionId);
 
   return (
