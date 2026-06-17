@@ -99,7 +99,7 @@ export default function CcwRoadshowPage() {
           locationCity={event.suburb}
           locationState={event.state}
           organiserName="CARSI and Carpet Cleaners Warehouse"
-          organiserUrl="https://carsi.com.au"
+          organiserUrl="https://www.carsi.com.au"
           ticketUrl={canonical}
           isFree={false}
           image={`${siteUrl}/og-image.png`}

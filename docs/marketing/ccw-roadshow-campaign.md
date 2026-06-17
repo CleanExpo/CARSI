@@ -11,7 +11,9 @@ CARSI and Carpet Cleaners Warehouse are running two-day Business Growth Days for
 - Melbourne venue: Carpet Cleaners Warehouse, Unit 1/5 Gatwick Road, Bayswater North VIC 3153
 - Sydney venue: Carpet Cleaners Warehouse, 2/8 Tollis Place, Seven Hills NSW 2147
 - Price: $175 per person or $500 for five seats
-- Booking URL: `/events/ccw-roadshow`
+- CARSI website: `https://www.carsi.com.au`
+- CCW website: `https://www.ccwarehouse.com.au`
+- Booking URL: `https://www.carsi.com.au/events/ccw-roadshow`
 - Primary CTA: Books are essential. Reserve your seat through CARSI.
 
 ## Core Positioning
@@ -167,7 +169,7 @@ Time: 8.30am-4.30pm both days
 
 $175 per person or $500 for five seats. Books are essential.
 
-Book through CARSI: https://carsi.com.au/events/ccw-roadshow
+Book through CARSI: https://www.carsi.com.au/events/ccw-roadshow
 
 ### CCW Launch Post
 
@@ -190,7 +192,7 @@ Bring yourself or bring the team:
 Melbourne: 22-23 July, Unit 1/5 Gatwick Road, Bayswater North
 Sydney: 30-31 July, 2/8 Tollis Place, Seven Hills
 
-Books are essential. Book here: https://carsi.com.au/events/ccw-roadshow
+Books are essential. Book here: https://www.carsi.com.au/events/ccw-roadshow
 
 ### Australian Carpet Cleaner Group Post
 
@@ -209,7 +211,7 @@ Sydney: 30-31 July at CCW Seven Hills
 
 It is $175 per person or $500 for five seats. Books are essential.
 
-Booking link: https://carsi.com.au/events/ccw-roadshow
+Booking link: https://www.carsi.com.au/events/ccw-roadshow
 
 ## Email Sequence
 
@@ -227,7 +229,7 @@ Melbourne runs 22-23 July. Sydney runs 30-31 July. Both days run 8.30am-4.30pm.
 
 Seats are $175 per person or $500 for five. Books are essential.
 
-Book here: https://carsi.com.au/events/ccw-roadshow
+Book here: https://www.carsi.com.au/events/ccw-roadshow
 
 ### Email 2: Who Should Attend
 
@@ -239,7 +241,7 @@ This is for carpet cleaners, cleaners adding carpet or tile work, rug and stain 
 
 If you are comparing equipment, choosing products, building service offers, training staff or trying to quote with more confidence, this room is built for you.
 
-Choose Melbourne or Sydney and reserve your seat: https://carsi.com.au/events/ccw-roadshow
+Choose Melbourne or Sydney and reserve your seat: https://www.carsi.com.au/events/ccw-roadshow
 
 ### Email 3: What You Will Achieve
 
@@ -251,7 +253,7 @@ The CARSI x CCW Business Growth Days are built around practical outcomes.
 
 You should leave with a clearer map of carpet, rug, stain and tile cleaning opportunities, the course outline, practical chemical details, stronger customer expectation language, and practical next steps for learning, quoting, lead capture and follow-up.
 
-Book here: https://carsi.com.au/events/ccw-roadshow
+Book here: https://www.carsi.com.au/events/ccw-roadshow
 
 ### Email 4: Team Pack
 
@@ -266,7 +268,7 @@ Five seats are $500.
 Melbourne: 22-23 July
 Sydney: 30-31 July
 
-Book here: https://carsi.com.au/events/ccw-roadshow
+Book here: https://www.carsi.com.au/events/ccw-roadshow
 
 ## Creative Brief
 
@@ -334,7 +336,7 @@ Secondary KPIs:
 
 After deployment, submit:
 
-- `https://carsi.com.au/events/ccw-roadshow`
-- `https://carsi.com.au/sitemap.xml`
+- `https://www.carsi.com.au/events/ccw-roadshow`
+- `https://www.carsi.com.au/sitemap.xml`
 
-Confirm the page is indexable, the canonical is `https://carsi.com.au/events/ccw-roadshow`, and the page appears in the sitemap.
+Confirm the page is indexable, the canonical is `https://www.carsi.com.au/events/ccw-roadshow`, and the page appears in the sitemap.
