@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { cache } from 'react';
 
 import { BundlePricingCard } from '@/components/lms/BundlePricingCard';
 import { CourseGrid } from '@/components/lms/CourseGrid';
-import { CourseSearchBar } from '@/components/lms/CourseSearchBar';
 import { IICRCDisciplineMap } from '@/components/lms/diagrams/IICRCDisciplineMap';
 import { CECCalculator } from '@/components/tools/CECCalculator';
 import { AcronymTooltip } from '@/components/ui/AcronymTooltip';
@@ -135,27 +135,34 @@ export default async function CoursesPage({
           >
             Restoration Training Courses
           </h1>
-          <p className="mt-2 text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>
+          <p className="mt-2 text-sm" style={{ color: 'rgba(255,255,255,0.58)' }}>
             {total} course{total !== 1 ? 's' : ''} across 7 <AcronymTooltip term="IICRC" />{' '}
             disciplines — earn <AcronymTooltip term="CEC">CECs</AcronymTooltip> online, at your own
             pace
           </p>
+          <div className="mt-4 rounded-lg border border-[#2490ed]/25 bg-[#2490ed]/10 px-4 py-3">
+            <p className="text-sm leading-relaxed text-white/72">
+              Not sure where to start?{' '}
+              <Link
+                href="/pathways"
+                className="font-semibold text-[#8fd0ff] underline decoration-[#8fd0ff]/40 underline-offset-4 transition-colors hover:text-white"
+              >
+                Use the guided pathway advisor
+              </Link>{' '}
+              to choose by trade goal, CEC need, team rollout, or facility risk.
+            </p>
+          </div>
         </header>
-
-        {/* ── AI Search Bar — immediately below header ── */}
-        <div className="relative mx-auto mb-8 max-w-2xl">
-          <CourseSearchBar />
-        </div>
 
         {/* ── Course Grid (primary content — above the fold) ── */}
         <section className="mb-10">
           <div
-            className="rounded-sm p-5"
+            className="rounded-sm p-4 sm:p-5"
             style={{
-              background: 'rgba(255,255,255,0.04)',
+              background: 'rgba(255,255,255,0.055)',
               backdropFilter: 'blur(24px) saturate(160%)',
               WebkitBackdropFilter: 'blur(24px) saturate(160%)',
-              border: '1px solid rgba(255,255,255,0.07)',
+              border: '1px solid rgba(255,255,255,0.1)',
             }}
           >
             <CourseGrid courses={courses} initialTab={disciplineTab ?? 'All'} />
@@ -260,9 +267,7 @@ export default async function CoursesPage({
                   (<AcronymTooltip term="CEC">CECs</AcronymTooltip>) upon completion, with automatic
                   tracking and verifiable digital credentials.{' '}
                   {catalogueFacts.publishedCourseCount > 0 ? (
-                    <>
-                      Our {catalogueFacts.publishedCourseCount} courses range from
-                    </>
+                    <>Our {catalogueFacts.publishedCourseCount} courses range from</>
                   ) : (
                     <>Our courses range from</>
                   )}{' '}

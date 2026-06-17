@@ -100,7 +100,10 @@ function hashHue(title: string): number {
   return h % 360;
 }
 
-function inferDisciplineCode(category: string | null | undefined, discipline: string | null | undefined) {
+function inferDisciplineCode(
+  category: string | null | undefined,
+  discipline: string | null | undefined
+) {
   const d = discipline?.trim().toUpperCase();
   if (d && DISCIPLINE_ACCENTS[d]) return d;
   const cat = category?.trim() ?? '';
@@ -202,12 +205,12 @@ export function CourseTextThumbnail({
         ? 'text-sm font-semibold leading-snug text-white'
         : 'text-sm font-bold leading-snug text-white';
 
-  const descLines = variant === 'hero' ? 3 : variant === 'admin' ? 2 : 2;
-  const showDesc = Boolean(shortDescription?.trim());
+  const descLines = variant === 'hero' ? 3 : 2;
+  const showDesc = variant !== 'card' && Boolean(shortDescription?.trim());
 
   const logoH = variant === 'hero' ? 32 : variant === 'admin' ? 28 : 26;
   const showModuleCallout =
-    moduleCount != null && (moduleCount > 0 || variant === 'admin');
+    variant !== 'card' && moduleCount != null && (moduleCount > 0 || variant === 'admin');
 
   return (
     <div
@@ -254,7 +257,7 @@ export function CourseTextThumbnail({
       ) : (
         <>
           <div
-            className="pointer-events-none absolute -right-8 -top-12 h-40 w-40 rounded-full blur-3xl"
+            className="pointer-events-none absolute -top-12 -right-8 h-40 w-40 rounded-full blur-3xl"
             style={{ background: accent.glow }}
             aria-hidden
           />
@@ -313,7 +316,7 @@ export function CourseTextThumbnail({
         <div className="mb-1.5 flex flex-wrap items-center gap-1">
           {code && (
             <span
-              className="rounded px-1.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-wide"
+              className="rounded px-1.5 py-0.5 font-mono text-[9px] font-bold tracking-wide uppercase"
               style={{
                 color: accent.fg,
                 background: 'rgba(0,0,0,0.45)',
@@ -354,7 +357,7 @@ export function CourseTextThumbnail({
           )}
         </div>
 
-        <h3 className={cn(titleClass, variant === 'card' ? 'line-clamp-2' : 'line-clamp-3')}>{title}</h3>
+        {variant === 'card' ? null : <h3 className={cn(titleClass, 'line-clamp-3')}>{title}</h3>}
 
         {showModuleCallout ? (
           <div
@@ -388,7 +391,7 @@ export function CourseTextThumbnail({
           </p>
         ) : null}
 
-        <div className="mt-auto flex flex-wrap gap-x-2.5 gap-y-1 border-t border-white/10 pt-2 text-[9px] text-white/50">
+        <div className="mt-auto flex flex-wrap gap-x-2.5 gap-y-1 border-t border-white/10 pt-2 text-[9px] text-white/58">
           {level ? (
             <span className="inline-flex items-center gap-1">
               <GraduationCap className="h-3 w-3 shrink-0 text-white/35" />

@@ -41,11 +41,13 @@ const itemVariants = {
 
 const navItems = [
   { href: '/courses', label: 'Courses' },
+  { href: '/pathways', label: 'Pathways' },
   { href: '/start-carpet-cleaning-business', label: 'Start Smart' },
   { href: '/industries', label: 'Industries' },
-  { href: '/pathways', label: 'Pathways' },
   { href: '/pricing', label: 'Pricing' },
+  { href: '/authority', label: 'Authority' },
   { href: '/about', label: 'About' },
+  { href: '/contact', label: 'Contact' },
 ];
 
 // ---------------------------------------------------------------------------
@@ -75,7 +77,7 @@ export default function MobileNav() {
   }, [isOpen]);
 
   return (
-    <div className="md:hidden">
+    <div className="lg:hidden">
       {/* Hamburger button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
@@ -122,7 +124,7 @@ export default function MobileNav() {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
               className="fixed inset-0 z-40"
-              style={{ background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(4px)' }}
+              style={{ background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(4px)' }}
               onClick={() => setIsOpen(false)}
             />
 
@@ -132,10 +134,10 @@ export default function MobileNav() {
               initial="closed"
               animate="open"
               exit="closed"
-              className="fixed top-16 right-0 left-0 z-40 mx-4 overflow-hidden rounded-lg"
+              className="fixed top-14 right-0 left-0 z-40 mx-3 overflow-hidden rounded-lg"
               style={{
-                background: 'rgba(10,15,26,0.98)',
-                border: '1px solid rgba(255,255,255,0.08)',
+                background: 'rgba(12,18,30,0.98)',
+                border: '1px solid rgba(255,255,255,0.14)',
                 boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)',
               }}
             >
@@ -154,7 +156,7 @@ export default function MobileNav() {
                         onClick={() => setIsOpen(false)}
                         className="block rounded-md px-4 py-3 text-base font-medium transition-colors duration-150 hover:text-white"
                         style={{
-                          color: 'rgba(255,255,255,0.7)',
+                          color: 'rgba(255,255,255,0.82)',
                           background: 'transparent',
                         }}
                         onMouseEnter={(e) => {

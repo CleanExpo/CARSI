@@ -12,6 +12,7 @@ const VALID_TYPES = [
   'event',
   'job',
   'article',
+  'case_study',
   'news_source',
 ] as const;
 
@@ -69,10 +70,18 @@ const TYPE_CONFIG: Record<SubmissionType, TypeConfig> = {
   },
   article: {
     label: 'Article',
-    icon: '📄',
+    icon: 'DOC',
     urlLabel: 'Article URL',
     urlPlaceholder: 'https://...',
     tagline: 'Submit a technical article, case study, or opinion piece for the Hub.',
+  },
+  case_study: {
+    label: 'Field Case Study',
+    icon: 'LOG',
+    urlLabel: 'Case study, file, or source URL',
+    urlPlaceholder: 'https://...',
+    tagline:
+      'Submit an anonymised field note, job observation, method summary, or evidence-backed case study for CARSI review.',
   },
   news_source: {
     label: 'News Source',

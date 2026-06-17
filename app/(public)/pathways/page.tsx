@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 
+import { PathwayAdvisor } from '@/components/lms/PathwayAdvisor';
 import { LearningPathwayCard } from '@/components/lms/LearningPathwayCard';
 import { StudentJourneyMap } from '@/components/lms/diagrams/StudentJourneyMap';
 import { AcronymTooltip } from '@/components/ui/AcronymTooltip';
@@ -57,11 +58,19 @@ export default async function PathwaysPage() {
           >
             Certification Pathways
           </h1>
-          <p className="mt-2 text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>
-            Structured learning journeys towards <AcronymTooltip term="IICRC" /> certification.{' '}
+          <p
+            className="mt-2 max-w-2xl text-sm leading-relaxed"
+            style={{ color: 'rgba(255,255,255,0.62)' }}
+          >
+            Structured learning journeys towards <AcronymTooltip term="IICRC" /> certification, team
+            readiness, CEC renewal and practical trade confidence.{' '}
             {total > 0 && `${total} pathway${total !== 1 ? 's' : ''} available.`}
           </p>
         </header>
+
+        <div className="mb-10">
+          <PathwayAdvisor />
+        </div>
 
         {/* ── Pathway content or empty state ── */}
         {pathways.length > 0 ? (
@@ -113,20 +122,17 @@ export default async function PathwaysPage() {
                 </svg>
               </div>
 
-              <h2
-                className="font-display mb-3 text-xl font-semibold"
-                style={{ color: 'rgba(255,255,255,0.92)' }}
-              >
-                Pathways Coming Soon
+              <h2 className="font-display mb-3 text-xl font-semibold text-white">
+                Database pathways are being linked
               </h2>
 
               <p
                 className="mx-auto mb-8 max-w-md text-sm leading-relaxed"
-                style={{ color: 'rgba(255,255,255,0.55)' }}
+                style={{ color: 'rgba(255,255,255,0.62)' }}
               >
-                We&apos;re building structured learning pathways for each{' '}
-                <AcronymTooltip term="IICRC" /> discipline. In the meantime, browse our course
-                catalogue to start earning <AcronymTooltip term="CEC">CECs</AcronymTooltip>.
+                The guided advisor above is live now. Saved pathway cards will appear here as
+                courses are linked to each <AcronymTooltip term="IICRC" /> discipline and team
+                training journey.
               </p>
 
               <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">

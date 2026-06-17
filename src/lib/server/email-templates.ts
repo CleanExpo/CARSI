@@ -282,15 +282,17 @@ export function renderEnrollmentWelcomeEmail(params: {
       greeting: `Hi ${params.name},`,
       paragraphs: [
         'Your enrolment is confirmed. You now have full access to course materials, lessons, and progress tracking.',
+        'The fastest path is simple: start the first lesson, return until the course is complete, generate your certificate, then choose the next course while the knowledge is fresh.',
       ],
       details: [
         { label: 'Course', value: params.courseTitle },
         { label: 'Access', value: 'Immediate — start anytime' },
+        { label: 'Next action', value: 'Complete lesson 1 today so your progress loop starts' },
       ],
       cta: { label: 'Start lesson 1', href: params.startUrl },
-      noteHtml: `Or open ${brandLink(params.dashboardUrl, 'My Learning')} to see all your courses.`,
+      noteHtml: `Or open ${brandLink(params.dashboardUrl, 'My Learning')} to resume, track CEC progress, download certificates, and find the next recommended course.`,
     },
-    `Hi ${params.name},\n\nYou're enrolled in ${params.courseTitle}.\n\nStart: ${params.startUrl}\n\nMy Learning: ${params.dashboardUrl}`
+    `Hi ${params.name},\n\nYou're enrolled in ${params.courseTitle}.\n\nNext action: complete lesson 1 today so your progress loop starts.\n\nStart: ${params.startUrl}\n\nMy Learning: ${params.dashboardUrl}`
   );
 }
 
@@ -354,7 +356,7 @@ export function renderTeamMemberAddedEmail(params: {
       cta: { label: 'Sign in & start learning', href: params.loginUrl },
       noteHtml: `Sign in, then open ${brandLink(`${params.appOrigin}/dashboard/student`, 'My Learning')} — only the course(s) listed above are on your account.`,
     },
-    `Hi ${params.memberName},\n\n${params.inviterName} gave you access on CARSI (${params.teamName}):\n\n${params.courseTitles.map((t) => `- ${t}`).join('\n')}\n\nSign-in email: ${params.memberEmail}\nYour password: ${params.temporaryPassword ?? '(ask your team owner)'}\n\nSign in: ${params.loginUrl}`,
+    `Hi ${params.memberName},\n\n${params.inviterName} gave you access on CARSI (${params.teamName}):\n\n${params.courseTitles.map((t) => `- ${t}`).join('\n')}\n\nSign-in email: ${params.memberEmail}\nYour password: ${params.temporaryPassword ?? '(ask your team owner)'}\n\nSign in: ${params.loginUrl}`
   );
 }
 
@@ -370,9 +372,7 @@ export function renderYearlyMembershipEmail(params: {
   dashboardUrl: string;
 }): RenderedEmail {
   const courseAccessLine =
-    params.courseCount === 1
-      ? '1 published course'
-      : `all ${params.courseCount} published courses`;
+    params.courseCount === 1 ? '1 published course' : `all ${params.courseCount} published courses`;
 
   const details: CarsiEmailDetail[] = [
     { label: 'Membership', value: 'Yearly Membership' },
@@ -398,7 +398,7 @@ export function renderYearlyMembershipEmail(params: {
       cta: { label: 'Sign in to CARSI', href: params.loginUrl },
       noteHtml: `Open ${brandLink(params.dashboardUrl, 'My Learning')} after sign-in to see your courses and track progress.`,
     },
-    `Hi ${params.memberName},\n\nYour CARSI Yearly Membership is active.\n\nMembership: Yearly Membership\nPrice: ${params.priceLabel}\nAccess: ${courseAccessLine}\nDuration: ${params.durationLabel}\n\nSign-in email: ${params.memberEmail}\nPassword: ${params.temporaryPassword}\n\nSign in: ${params.loginUrl}\nDashboard: ${params.dashboardUrl}`,
+    `Hi ${params.memberName},\n\nYour CARSI Yearly Membership is active.\n\nMembership: Yearly Membership\nPrice: ${params.priceLabel}\nAccess: ${courseAccessLine}\nDuration: ${params.durationLabel}\n\nSign-in email: ${params.memberEmail}\nPassword: ${params.temporaryPassword}\n\nSign in: ${params.loginUrl}\nDashboard: ${params.dashboardUrl}`
   );
 }
 
@@ -427,7 +427,10 @@ export function renderCcwRoadshowBookingConfirmationEmail(params: {
       value: params.venueName,
       valueHtml: `${escapeHtml(params.venueName)}<br>${escapeHtml(params.venueAddress)}`,
     },
-    { label: 'Ticket', value: `${params.ticketLabel} (${params.seatCount} ${params.seatCount === 1 ? 'seat' : 'seats'})` },
+    {
+      label: 'Ticket',
+      value: `${params.ticketLabel} (${params.seatCount} ${params.seatCount === 1 ? 'seat' : 'seats'})`,
+    },
     { label: 'Paid', value: params.amountLabel },
   ];
 
@@ -453,7 +456,7 @@ export function renderCcwRoadshowBookingConfirmationEmail(params: {
       cta: { label: 'View event details', href: params.eventPageUrl },
       noteHtml: `Questions? Reply to this email or visit ${brandLink(params.eventPageUrl, 'the event page')}.`,
     },
-    `Hi ${name},\n\nYour booking for CARSI x CCW Business Growth Days is confirmed.\n\nEvent: ${params.eventCity} — ${params.eventDates}\nWhen: ${params.dateRangeLabel}. ${params.timeLabel}\nVenue: ${params.venueName}, ${params.venueAddress}\nTicket: ${params.ticketLabel} (${params.seatCount} seats)\nPaid: ${params.amountLabel}\n\nEvent page: ${params.eventPageUrl}`,
+    `Hi ${name},\n\nYour booking for CARSI x CCW Business Growth Days is confirmed.\n\nEvent: ${params.eventCity} — ${params.eventDates}\nWhen: ${params.dateRangeLabel}. ${params.timeLabel}\nVenue: ${params.venueName}, ${params.venueAddress}\nTicket: ${params.ticketLabel} (${params.seatCount} seats)\nPaid: ${params.amountLabel}\n\nEvent page: ${params.eventPageUrl}`
   );
 }
 

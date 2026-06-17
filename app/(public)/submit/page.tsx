@@ -54,10 +54,17 @@ const SUBMISSION_TYPES: SubmissionType[] = [
   },
   {
     type: 'article',
-    icon: '📄',
+    icon: 'DOC',
     title: 'Article',
     description: 'Submit a technical article, case study, or industry opinion piece.',
     detail: 'Original content from practitioners, researchers, and vendors.',
+  },
+  {
+    type: 'case_study',
+    icon: 'LOG',
+    title: 'Field Case Study',
+    description: 'Submit an anonymised job note or field observation for CARSI review.',
+    detail: 'Methods, limits, outcomes, lessons, sources, and no customer-identifying details.',
   },
   {
     type: 'news_source',

@@ -77,8 +77,8 @@ export function CourseCard({ course, priorityImage }: CourseCardProps) {
 
   return (
     <motion.div
-      className="glass-card card-3d group flex flex-col overflow-hidden rounded-xl"
-      whileHover={{ scale: 1.02, y: -4 }}
+      className="glass-card card-3d group flex flex-col overflow-hidden rounded-lg"
+      whileHover={{ scale: 1.01, y: -3 }}
       transition={{ duration: 0.25, ease: smoothEase }}
     >
       {/* Textual thumbnail always; optional photo behind */}
@@ -105,10 +105,10 @@ export function CourseCard({ course, priorityImage }: CourseCardProps) {
       </div>
 
       {/* Card body */}
-      <div className="flex flex-1 flex-col p-3">
+      <div className="flex flex-1 flex-col p-4">
         <h3
-          className="mb-2 line-clamp-2 text-sm leading-snug font-semibold"
-          style={{ color: 'rgba(255,255,255,0.9)' }}
+          className="mb-2 line-clamp-2 text-base leading-snug font-semibold"
+          style={{ color: 'rgba(255,255,255,0.94)' }}
         >
           {course.title}
         </h3>
@@ -130,7 +130,7 @@ export function CourseCard({ course, priorityImage }: CourseCardProps) {
         {course.short_description && (
           <p
             className="mb-2 line-clamp-2 text-xs leading-relaxed"
-            style={{ color: 'rgba(255,255,255,0.45)' }}
+            style={{ color: 'rgba(255,255,255,0.66)' }}
           >
             {course.short_description}
           </p>
@@ -171,10 +171,10 @@ export function CourseCard({ course, priorityImage }: CourseCardProps) {
           </div>
           <Link
             href={`${courseLinkBase}/${course.slug}`}
-            className="-m-2 flex min-h-[44px] min-w-[44px] items-center justify-center rounded-sm p-2 text-xs font-medium transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/50"
+            className="-m-2 flex min-h-[44px] min-w-[64px] items-center justify-center rounded-sm p-2 text-xs font-semibold transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/50"
             style={{ color: ds.color }}
           >
-            View →
+            View course
           </Link>
         </div>
       </div>

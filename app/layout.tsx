@@ -3,6 +3,7 @@ import { Outfit, DM_Sans } from 'next/font/google';
 import './globals.css';
 import { AppToastProvider } from '@/hooks/use-toast';
 import { ThemeProvider } from '@/components/ThemeProvider';
+import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics';
 import { AuthProvider } from '@/components/auth/auth-provider';
 import { OrganizationSchema, WebsiteSchema } from '@/components/seo';
 import { ServiceWorkerRegistration } from '@/components/lms/ServiceWorkerRegistration';
@@ -120,6 +121,7 @@ export default function RootLayout({
             <AppToastProvider>{children}</AppToastProvider>
           </ThemeProvider>
         </AuthProvider>
+        <GoogleAnalytics />
       </body>
     </html>
   );

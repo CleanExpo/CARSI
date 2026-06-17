@@ -17,6 +17,7 @@ const VALID_TYPES = [
   'event',
   'job',
   'article',
+  'case_study',
   'news_source',
 ] as const;
 

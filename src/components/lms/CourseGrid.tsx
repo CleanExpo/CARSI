@@ -165,9 +165,9 @@ export function CourseGrid({
       </div>
 
       {/* Search + sort */}
-      <div className="mb-6 flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
-        <div className="flex items-center gap-3">
-          <div className="relative">
+      <div className="mb-6 flex flex-col items-stretch justify-between gap-3 sm:flex-row sm:items-center">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <div className="relative w-full sm:w-auto">
             <Search
               className="absolute top-1/2 left-3 h-3.5 w-3.5 -translate-y-1/2"
               style={{ color: 'rgba(255,255,255,0.3)' }}
@@ -178,7 +178,7 @@ export function CourseGrid({
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search courses..."
               aria-label="Search courses"
-              className="w-52 rounded-lg py-2 pr-4 pl-9 text-sm transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/50"
+              className="w-full rounded-lg py-2 pr-4 pl-9 text-sm transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/50 sm:w-56"
               style={{
                 background: 'rgba(255,255,255,0.05)',
                 border: '1px solid rgba(255,255,255,0.1)',
@@ -195,7 +195,7 @@ export function CourseGrid({
             />
           </div>
           <div
-            className="flex items-center gap-1.5 text-sm"
+            className="flex items-center gap-1.5 text-sm whitespace-nowrap"
             style={{ color: 'rgba(255,255,255,0.6)' }}
           >
             <SlidersHorizontal className="h-3.5 w-3.5" />
@@ -209,7 +209,7 @@ export function CourseGrid({
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value as SortKey)}
           aria-label="Sort courses by"
-          className="rounded-lg px-3 py-2 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/50"
+          className="w-full rounded-lg px-3 py-2 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/50 sm:w-auto"
           style={{
             background: 'rgba(255,255,255,0.05)',
             border: '1px solid rgba(255,255,255,0.1)',

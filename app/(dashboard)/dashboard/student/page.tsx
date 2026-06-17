@@ -7,6 +7,7 @@ import {
 } from '@/components/lms/ContinueLearningBanner';
 import { EnrolledCourseList } from '@/components/lms/EnrolledCourseList';
 import { ErrorBanner } from '@/components/lms/ErrorBanner';
+import { LearningMomentumLoop } from '@/components/lms/LearningMomentumLoop';
 import { PathwayProgressCard } from '@/components/lms/PathwayProgressCard';
 import { PopularForYouStrip } from '@/components/lms/PopularForYouStrip';
 import { PushNotificationPrompt } from '@/components/lms/PushNotificationPrompt';
@@ -99,7 +100,7 @@ export default function StudentDashboardPage() {
     } finally {
       setLoading((l) => ({ ...l, level: false }));
     }
-  }, []);
+  }, [user]);
 
   const fetchSub = useCallback(async () => {
     if (!user) return;
@@ -167,20 +168,6 @@ export default function StudentDashboardPage() {
     fetchResumeAndPopular();
   }, [user, fetchLevel, fetchSub, fetchProfile, fetchEnrollments, fetchResumeAndPopular]);
 
-  function handleManageSubscription() {
-    apiClient
-      .post<{ url: string }>('/api/lms/subscription/portal')
-      .then((data) => {
-        if (data.url) window.location.href = data.url;
-      })
-      .catch(() => null);
-  }
-
-  function handleSubscribe() {
-    window.location.href = '/subscribe';
-  }
-
-  const certifications = profile?.iicrc_certifications ?? [];
   const displayName = profile?.full_name?.trim() || user?.email?.split('@')[0] || 'Learner';
 
   return (
@@ -188,6 +175,13 @@ export default function StudentDashboardPage() {
       <PushNotificationPrompt />
 
       <ContinueLearningBanner snapshot={resume} />
+
+      <LearningMomentumLoop
+        resume={resume}
+        enrollments={enrollments}
+        recommendationsCount={popular.length}
+        loading={enrollmentsLoading}
+      />
 
       <PathwayProgressCard />
 

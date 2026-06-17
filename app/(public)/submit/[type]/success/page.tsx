@@ -9,6 +9,7 @@ const VALID_TYPES = [
   'event',
   'job',
   'article',
+  'case_study',
   'news_source',
 ] as const;
 
@@ -25,6 +26,7 @@ const TYPE_LABELS: Record<SubmissionType, string> = {
   event: 'Industry Event',
   job: 'Job Listing',
   article: 'Article',
+  case_study: 'Field Case Study',
   news_source: 'News Source',
 };
 

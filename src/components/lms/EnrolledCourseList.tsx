@@ -31,11 +31,11 @@ interface EnrolledCourseListProps {
 }
 
 export function EnrolledCourseList({ enrollments }: EnrolledCourseListProps) {
+  const router = useRouter();
+
   if (enrollments.length === 0) {
     return null;
   }
-
-  const router = useRouter();
 
   function certificateHref(enrollmentId: string) {
     return `/api/lms/enrollments/${enrollmentId}/certificate`;
@@ -136,7 +136,9 @@ export function EnrolledCourseList({ enrollments }: EnrolledCourseListProps) {
                             onClick={(e) => e.stopPropagation()}
                           >
                             <Award className="h-4 w-4" />
-                            {enr.certificate_issued_at ? 'Download certificate' : 'Generate certificate'}
+                            {enr.certificate_issued_at
+                              ? 'Download certificate'
+                              : 'Generate certificate'}
                           </a>
                         </Button>
                       ) : null}

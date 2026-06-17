@@ -52,3 +52,19 @@ https://carsi.com.au/sitemap.xml
 - Google indexing is a request, not a guarantee.
 - The pages should be deployed before Search Console submission.
 - If Search Console is not accessible from Codex, complete the final live click/API submission from a logged-in Google owner account.
+
+## Bing / IndexNow automation
+
+CARSI now has a production-safe IndexNow path:
+
+1. Set `INDEXNOW_KEY` in the production environment.
+2. Confirm `https://carsi.com.au/indexnow-key.txt` returns the key as plain text.
+3. Run:
+
+```bash
+npm run seo:submit-indexnow -- --send
+```
+
+The script submits the core CARSI public pages, Start Smart URLs from `public/start-smart-urls.txt`, AI citation assets, `llms.txt`, and contribution pages. Use `--url /new-path` for urgent one-off URLs after publishing new pages.
+
+Google does not provide a general-purpose instant-indexing API for normal webpages. The correct production loop is: deploy the pages, keep `https://carsi.com.au/sitemap.xml` referenced in `robots.txt`, submit or refresh the sitemap in Google Search Console, then use URL Inspection for the highest-value pages that need manual crawl nudging.

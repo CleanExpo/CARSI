@@ -7,11 +7,9 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { deriveChatPageContext } from '@/lib/chat-page-context';
 
-const ASSISTANT_NAME =
-  process.env.NEXT_PUBLIC_AI_ASSISTANT_NAME?.trim() || 'Claire';
+const ASSISTANT_NAME = process.env.NEXT_PUBLIC_AI_ASSISTANT_NAME?.trim() || 'Claire';
 const ASSISTANT_TAGLINE =
-  process.env.NEXT_PUBLIC_AI_ASSISTANT_TAGLINE?.trim() ||
-  'Your CARSI professional learning guide';
+  process.env.NEXT_PUBLIC_AI_ASSISTANT_TAGLINE?.trim() || 'Your CARSI professional learning guide';
 
 const WELCOME_MESSAGE = `Hi — I'm ${ASSISTANT_NAME}, ${ASSISTANT_TAGLINE}. Ask me about CARSI courses, IICRC disciplines, enrolment, or your dashboard.`;
 
@@ -191,7 +189,7 @@ export default function FloatingChat() {
   }
 
   return (
-    <div className="fixed right-6 bottom-6 z-50 flex flex-col items-end gap-3">
+    <div className="fixed right-3 bottom-3 z-50 flex flex-col items-end gap-3 sm:right-6 sm:bottom-6">
       <AnimatePresence>
         {open && (
           <motion.div
@@ -200,8 +198,8 @@ export default function FloatingChat() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.92, y: 12 }}
             transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
-            className="flex w-[min(100vw-2rem,400px)] flex-col overflow-hidden rounded-sm border border-white/[0.08] shadow-2xl"
-            style={{ height: 520, background: '#060a14' }}
+            className="flex w-[min(100vw-1.5rem,400px)] flex-col overflow-hidden rounded-sm border border-white/[0.08] shadow-2xl"
+            style={{ height: 'min(520px, calc(100vh - 6.5rem))', background: '#060a14' }}
           >
             {/* Header */}
             <div
@@ -214,7 +212,10 @@ export default function FloatingChat() {
               <div className="flex min-w-0 items-center gap-3">
                 <div
                   className="flex h-10 w-10 shrink-0 items-center justify-center rounded-sm"
-                  style={{ background: 'rgba(36,144,237,0.2)', border: '1px solid rgba(36,144,237,0.35)' }}
+                  style={{
+                    background: 'rgba(36,144,237,0.2)',
+                    border: '1px solid rgba(36,144,237,0.35)',
+                  }}
                   aria-hidden
                 >
                   <Bot className="h-5 w-5 text-[#2490ed]" strokeWidth={1.75} />
@@ -230,7 +231,10 @@ export default function FloatingChat() {
                     {ASSISTANT_TAGLINE}
                   </p>
                   {focusSubtitle ? (
-                    <p className="mt-0.5 truncate text-[10px] text-[#7ec5ff]/85" title={focusSubtitle}>
+                    <p
+                      className="mt-0.5 truncate text-[10px] text-[#7ec5ff]/85"
+                      title={focusSubtitle}
+                    >
                       {focusSubtitle}
                     </p>
                   ) : null}
@@ -260,7 +264,7 @@ export default function FloatingChat() {
             {/* Suggested prompts */}
             {messages.length <= 1 && (
               <div className="shrink-0 space-y-1.5 border-b border-white/[0.06] px-3 py-2.5">
-                <p className="text-[10px] font-medium uppercase tracking-wide text-white/35">
+                <p className="text-[10px] font-medium tracking-wide text-white/35 uppercase">
                   Try asking
                 </p>
                 <div className="flex flex-wrap gap-1.5">
@@ -352,7 +356,7 @@ export default function FloatingChat() {
         onClick={() => setOpen((v) => !v)}
         whileHover={{ scale: 1.06 }}
         whileTap={{ scale: 0.96 }}
-        className="flex items-center gap-2 rounded-sm px-4 py-3 text-sm font-semibold text-white shadow-lg transition-shadow hover:shadow-xl"
+        className="flex min-h-12 min-w-12 items-center justify-center gap-2 rounded-sm px-3 py-3 text-sm font-semibold text-white shadow-lg transition-shadow hover:shadow-xl sm:min-w-0 sm:px-4"
         style={{ background: '#2490ed' }}
         aria-label={open ? 'Close chat' : `Open ${ASSISTANT_NAME}`}
       >
@@ -379,7 +383,7 @@ export default function FloatingChat() {
             </motion.span>
           )}
         </AnimatePresence>
-        {!open && <span>Ask {ASSISTANT_NAME}</span>}
+        {!open && <span className="hidden sm:inline">Ask {ASSISTANT_NAME}</span>}
       </motion.button>
     </div>
   );
