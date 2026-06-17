@@ -53,6 +53,7 @@ model LmsUser {
   teamMemberships    LmsTeamMember[]
   ownedTeams         LmsTeam[]       @relation("TeamOwner")
   quizAttempts       LmsQuizAttempt[]
+  iicrcCecSubmissions LmsIicrcCecSubmission[]
 
   @@map("lms_users")
 }
@@ -97,6 +98,7 @@ model LmsCourse {
   userDiscounts    UserDiscount[]
   pathwayCourses   LmsLearningPathwayCourse[]
   quizzes          LmsQuiz[]
+  iicrcCecSubmissions LmsIicrcCecSubmission[]
 
   @@map("lms_courses")
 }
@@ -187,9 +189,40 @@ model LmsEnrollment {
 
   student LmsUser   @relation("EnrollmentStudent", fields: [studentId], references: [id], onDelete: Cascade)
   course  LmsCourse @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  iicrcCecSubmission LmsIicrcCecSubmission?
 
   @@unique([studentId, courseId], map: "uq_lms_enrollment")
   @@map("lms_enrollments")
+}
+
+/// Auto-submitted IICRC CEC certificate emails (renewals@iicrcnet.org) on course completion.
+model LmsIicrcCecSubmission {
+  id                String    @id @default(uuid()) @db.Uuid
+  enrollmentId      String    @unique @map("enrollment_id") @db.Uuid
+  studentId         String    @map("student_id") @db.Uuid
+  courseId          String    @map("course_id") @db.Uuid
+  recipientEmail    String    @map("recipient_email") @db.VarChar(320)
+  technicianEmail   String    @map("technician_email") @db.VarChar(320)
+  status            String    @default("pending") @db.VarChar(16)
+  cecHours          Float?    @map("cec_hours")
+  iicrcDiscipline   String?   @map("iicrc_discipline") @db.VarChar(16)
+  iicrcMemberNumber String?   @map("iicrc_member_number") @db.VarChar(32)
+  emailSubject      String?   @map("email_subject") @db.Text
+  emailTextBody     String?   @map("email_text_body") @db.Text
+  providerMessageId String?   @map("provider_message_id") @db.VarChar(128)
+  failureReason     String?   @map("failure_reason") @db.Text
+  sentAt            DateTime? @map("sent_at") @db.Timestamptz(6)
+  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  enrollment LmsEnrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  student    LmsUser       @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  course     LmsCourse     @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@index([studentId])
+  @@index([status])
+  @@index([sentAt])
+  @@map("lms_iicrc_cec_submissions")
 }
 
 model LmsCategory {
