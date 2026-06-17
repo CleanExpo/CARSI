@@ -3,8 +3,11 @@
  * Uses branded templates from email-templates.ts and delivery from email.ts.
  */
 
+import { prisma } from '@/lib/prisma';
 import { getAppOrigin } from '@/lib/server/app-url';
+import { isEmailConfigured, sendEmail, type SendEmailResult } from '@/lib/server/email';
 import {
+  renderCcwRoadshowBookingConfirmationEmail,
   renderContactNotificationEmail,
   renderEnrollmentWelcomeEmail,
   renderPasswordResetEmail,
@@ -12,9 +15,7 @@ import {
   renderTeamMemberAddedEmail,
   renderYearlyMembershipEmail,
 } from '@/lib/server/email-templates';
-import { sendEmail, isEmailConfigured, type SendEmailResult } from '@/lib/server/email';
 import { getFirstLessonLearnPath } from '@/lib/server/first-lesson';
-import { prisma } from '@/lib/prisma';
 
 export { isEmailConfigured };
 export type { SendEmailResult };
@@ -174,6 +175,73 @@ export async function sendYearlyMembershipEmail(params: {
   });
 }
 
+export async function sendCcwRoadshowBookingConfirmationEmail(params: {
+  to: string;
+  attendeeName: string;
+  eventCity: string;
+  eventDates: string;
+  dateRangeLabel: string;
+  timeLabel: string;
+  venueName: string;
+  venueAddress: string;
+  ticketLabel: string;
+  seatCount: number;
+  amountLabel: string;
+  businessName?: string;
+  phone?: string;
+  appOrigin: string;
+}): Promise<SendEmailResult> {
+  const base = params.appOrigin.replace(/\/$/, '');
+  const eventPageUrl = `${base}/events/ccw-roadshow`;
+
+  const { html, text } = renderCcwRoadshowBookingConfirmationEmail({
+    appOrigin: base,
+    attendeeName: params.attendeeName,
+    eventCity: params.eventCity,
+    eventDates: params.eventDates,
+    dateRangeLabel: params.dateRangeLabel,
+    timeLabel: params.timeLabel,
+    venueName: params.venueName,
+    venueAddress: params.venueAddress,
+    ticketLabel: params.ticketLabel,
+    seatCount: params.seatCount,
+    amountLabel: params.amountLabel,
+    businessName: params.businessName,
+    phone: params.phone,
+    eventPageUrl,
+  });
+
+  try {
+    const result = await sendEmail({
+      to: params.to,
+      subject: `Booking confirmed — CARSI x CCW ${params.eventCity}`,
+      html,
+      text,
+    });
+
+    if (!result.sent) {
+      console.error('[ccw-roadshow-email] confirmation email not sent', {
+        to: params.to,
+        eventCity: params.eventCity,
+        reason: result.reason,
+        messageId: result.messageId,
+      });
+    }
+
+    return result;
+  } catch (error) {
+    console.error('[ccw-roadshow-email] confirmation email error', {
+      to: params.to,
+      eventCity: params.eventCity,
+      error:
+        error instanceof Error
+          ? { message: error.message, name: error.name, stack: error.stack }
+          : error,
+    });
+    throw error;
+  }
+}
+
 export async function sendContactNotificationEmail(params: {
   appOrigin: string;
   ticketRef: string;
@@ -204,7 +272,9 @@ export async function sendContactNotificationEmail(params: {
 }
 
 /** Resolve app origin when only a request or explicit origin string is available. */
-export function resolveAppOrigin(originOrRequest?: { nextUrl?: { origin: string } } | string | null): string {
+export function resolveAppOrigin(
+  originOrRequest?: { nextUrl?: { origin: string } } | string | null
+): string {
   if (typeof originOrRequest === 'string' && originOrRequest.trim()) {
     return originOrRequest.replace(/\/$/, '');
   }
