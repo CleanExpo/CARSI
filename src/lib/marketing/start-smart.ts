@@ -151,11 +151,8 @@ export const startSmartLeadPaths: StartSmartLeadPath[] = [
     id: 'ccw-workshop',
     title: 'Ask about CCW hands-on workshop support',
     body: 'For learners who need practical equipment, service, chemical and operator decision support connected to CCW training.',
-    href: buildStartSmartContactHref({
-      topic: 'CCW hands-on carpet cleaning workshop',
-      intent: 'ccw-workshop',
-    }),
-    label: 'Ask about CCW workshop',
+    href: '/ccw-training?utm_source=start-smart&utm_medium=organic&utm_campaign=ccw_hands_on_workshop',
+    label: 'View CCW workshop',
     topic: 'CCW hands-on carpet cleaning workshop',
     intent: 'ccw-workshop',
   },
@@ -428,6 +425,11 @@ export const startSmartSources = {
     url: 'https://www.servicemonster.com/blog/is-carpet-cleaning-profitable',
     note: 'Summarises startup costs, equipment, pricing, repeat customers and add-on service strategy.',
   },
+  ccwOnline: {
+    label: 'Carpet Cleaners Warehouse online store',
+    url: 'https://ccwonline.com.au/',
+    note: 'Verified CCW Shopify storefront for professional carpet cleaning equipment, chemicals, parts, supplier information and agent-readable product discovery.',
+  },
   aspireBuying: {
     label: 'Aspire: buying a cleaning business',
     url: 'https://www.youraspire.com/blog/how-to-buy-cleaning-business',
@@ -495,7 +497,12 @@ export const startSmartPages: StartSmartPage[] = [
           'No. CARSI is positioned as professional education. The goal is to help you understand the work before you risk money, reputation or customer property.',
       },
     ],
-    sources: [startSmartSources.iicrcCct, startSmartSources.bizCoverStartup, startSmartSources.issaTraining],
+    sources: [
+      startSmartSources.iicrcCct,
+      startSmartSources.bizCoverStartup,
+      startSmartSources.issaTraining,
+      startSmartSources.ccwOnline,
+    ],
     keywords: [
       'start carpet cleaning business no experience',
       'carpet cleaning business training',
@@ -557,7 +564,12 @@ export const startSmartPages: StartSmartPage[] = [
           'Start with fibre identification, soiling, cleaning chemistry, method selection, safety, drying and customer communication.',
       },
     ],
-    sources: [startSmartSources.iicrcCct, startSmartSources.issaTraining, startSmartSources.serviceMonsterProfit],
+    sources: [
+      startSmartSources.iicrcCct,
+      startSmartSources.issaTraining,
+      startSmartSources.serviceMonsterProfit,
+      startSmartSources.ccwOnline,
+    ],
     keywords: [
       'add carpet cleaning to cleaning business',
       'cleaners adding carpet cleaning',
@@ -681,7 +693,12 @@ export const startSmartPages: StartSmartPage[] = [
           'Yes. Training gives you the vocabulary and method knowledge to ask better supplier questions and avoid buying based only on price or marketing claims.',
       },
     ],
-    sources: [startSmartSources.bizCoverStartup, startSmartSources.issaTraining, startSmartSources.serviceMonsterProfit],
+    sources: [
+      startSmartSources.bizCoverStartup,
+      startSmartSources.issaTraining,
+      startSmartSources.serviceMonsterProfit,
+      startSmartSources.ccwOnline,
+    ],
     keywords: [
       'carpet cleaning equipment for beginners',
       'best carpet cleaning machine startup',
@@ -743,7 +760,7 @@ export const startSmartPages: StartSmartPage[] = [
           'No. Job conditions vary. Fibre, soil, stain history, odour, customer sensitivity and method all influence product selection.',
       },
     ],
-    sources: [startSmartSources.iicrcCct, startSmartSources.issaTraining],
+    sources: [startSmartSources.iicrcCct, startSmartSources.issaTraining, startSmartSources.ccwOnline],
     keywords: [
       'carpet cleaning chemistry for beginners',
       'carpet cleaning pH training',
