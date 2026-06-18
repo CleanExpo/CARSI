@@ -6,6 +6,9 @@ export const metadata: Metadata = {
   description: 'Privacy Policy for CARSI Learning Management System',
 };
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default function PrivacyPage() {
   return (
     <main className="min-h-screen bg-[#050505] px-4 py-16 text-white">

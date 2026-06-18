@@ -123,6 +123,15 @@ const nextConfig: NextConfig = {
 
     return [
       {
+        source: '/privacy',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'no-store, no-cache, must-revalidate, proxy-revalidate',
+          },
+        ],
+      },
+      {
         source: '/api/:path*',
         headers: [
           { key: 'Access-Control-Allow-Credentials', value: 'true' },
