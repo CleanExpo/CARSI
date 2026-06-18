@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Privacy Policy | CARSI',
@@ -176,7 +177,16 @@ export default function PrivacyPage() {
                 Office of the Australian Information Commissioner (OAIC).
               </li>
             </ul>
-            <p>To exercise these rights, contact us at privacy@carsi.com.au.</p>
+            <p>
+              To exercise these rights, contact us through the{' '}
+              <Link
+                href="/contact"
+                className="text-[#2490ed] underline underline-offset-2 hover:text-white"
+              >
+                CARSI contact page
+              </Link>
+              .
+            </p>
           </section>
 
           <section>
@@ -221,7 +231,13 @@ export default function PrivacyPage() {
             <address className="mt-2 not-italic">
               <strong className="text-white">CARSI Pty Ltd</strong>
               <br />
-              Email: privacy@carsi.com.au
+              Privacy Officer:{' '}
+              <Link
+                href="/contact"
+                className="text-[#2490ed] underline underline-offset-2 hover:text-white"
+              >
+                CARSI contact page
+              </Link>
               <br />
               Phone: 1300 434 287
               <br />
