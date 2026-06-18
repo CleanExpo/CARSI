@@ -88,6 +88,11 @@ function validateCourseStructuredData(schema, pageUrl, source, failures) {
       }
     }
 
+    if (Object.prototype.hasOwnProperty.call(node, 'serviceType')) {
+      const label = typeof node.name === 'string' ? ` "${node.name}"` : '';
+      failures.push(`${pageUrl} ${source}${label} uses invalid JSON-LD property serviceType`);
+    }
+
     if (Array.isArray(node)) {
       for (const item of node) stack.push(item);
     } else {

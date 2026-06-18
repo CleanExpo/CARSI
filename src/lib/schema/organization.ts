@@ -89,7 +89,6 @@ export function buildOrganizationSchema(input: OrganizationSchemaInput = {}): Sc
         sameAs: 'https://en.wikipedia.org/wiki/Northern_Territory',
       },
     ],
-    serviceType: 'Online Restoration Industry Training',
     knowsAbout: [
       'IICRC certifications',
       'water restoration technician',
