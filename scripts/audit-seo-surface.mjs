@@ -10,11 +10,13 @@ const crawlSeeds = [
 ].map((path) => `${baseUrl}${path}`);
 
 async function fetchText(url) {
+  const signal = AbortSignal.timeout(10_000);
   const res = await fetch(url, {
     headers: {
       'user-agent': 'CARSI SEO surface audit/1.0',
     },
     redirect: 'follow',
+    signal,
   });
   const text = await res.text();
   return { url, finalUrl: res.url, status: res.status, text };
