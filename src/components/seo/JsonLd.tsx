@@ -318,7 +318,6 @@ export function ItemListSchema({
       return {
         '@type': 'ListItem',
         position: index + 1,
-        url: item.url,
         item:
           itemType === 'Course'
             ? {

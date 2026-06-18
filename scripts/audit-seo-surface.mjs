@@ -105,6 +105,15 @@ function validateCourseStructuredData(schema, pageUrl, source, failures) {
       failures.push(`${pageUrl} ${source}${label} uses invalid JSON-LD property serviceType`);
     }
 
+    if (
+      schemaTypes(node).includes('ListItem') &&
+      Object.prototype.hasOwnProperty.call(node, 'item') &&
+      Object.prototype.hasOwnProperty.call(node, 'url')
+    ) {
+      const label = typeof node.name === 'string' ? ` "${node.name}"` : '';
+      failures.push(`${pageUrl} ${source}${label} ListItem uses mutually exclusive item and url`);
+    }
+
     if (Array.isArray(node)) {
       for (const item of node) stack.push(item);
     } else {
