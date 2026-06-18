@@ -96,6 +96,13 @@ async function getCourses() {
 /** One catalogue fetch per request (shared by the page and `generateMetadata`). */
 const getCoursesCached = cache(getCourses);
 
+function courseSchemaPrice(course: CourseListItem): number | undefined {
+  if (course.is_free) return 0;
+  const price = Number(course.price_aud);
+  if (!Number.isFinite(price) || price < 0) return undefined;
+  return price;
+}
+
 export default async function CoursesPage({
   searchParams,
 }: {
@@ -119,11 +126,18 @@ export default async function CoursesPage({
   ]);
   const catalogueFacts = deriveCatalogueFactsFromCourseItems(courses);
   const siteUrl = getPublicSiteUrl();
-  const courseListItems = (courses as CourseListItem[]).map((course) => ({
-    name: course.title,
-    url: `${siteUrl}/courses/${course.slug}`,
-    description: course.short_description ?? `${course.title} online restoration training course.`,
-  }));
+  const courseListItems = (courses as CourseListItem[]).map((course) => {
+    const price = courseSchemaPrice(course);
+
+    return {
+      name: course.title,
+      url: `${siteUrl}/courses/${course.slug}`,
+      description: course.short_description ?? `${course.title} online restoration training course.`,
+      price,
+      duration: course.duration_hours,
+      isFree: course.is_free === true || price === 0,
+    };
+  });
 
   return (
     <main id="main-content" className="relative z-10 min-h-screen bg-[#050505]">

@@ -159,6 +159,35 @@ interface CourseSchemaProps {
   teaches?: string[];
 }
 
+function normalizeCoursePrice(price: number | undefined): number | undefined {
+  if (typeof price !== 'number' || !Number.isFinite(price) || price < 0) return undefined;
+  return Number(price.toFixed(2));
+}
+
+function courseOffer(url: string, price: number | undefined) {
+  const normalizedPrice = normalizeCoursePrice(price);
+  if (normalizedPrice === undefined) return undefined;
+
+  return {
+    '@type': 'Offer',
+    url,
+    price: normalizedPrice,
+    priceCurrency: 'AUD',
+    availability: 'https://schema.org/InStock',
+    category: normalizedPrice === 0 ? 'Free' : 'Paid',
+  };
+}
+
+function selfPacedCourseInstance(name: string, url: string, duration?: string | null) {
+  return {
+    '@type': 'CourseInstance',
+    name: `${name} online self-paced course`,
+    courseMode: 'online',
+    url,
+    ...(duration ? { courseWorkload: `PT${duration}H` } : {}),
+  };
+}
+
 export function CourseSchema({
   name,
   description,
@@ -181,7 +210,11 @@ export function CourseSchema({
     },
     url,
     inLanguage: 'en-AU',
+    hasCourseInstance: selfPacedCourseInstance(name, url, duration),
   };
+
+  const offer = courseOffer(url, price);
+  if (offer) schema.offers = offer;
 
   if (price === 0) schema.isAccessibleForFree = true;
 
@@ -258,7 +291,14 @@ export function FAQSchema({ questions }: FAQSchemaProps) {
 interface ItemListSchemaProps {
   name: string;
   description?: string;
-  items: { name: string; url: string; description?: string }[];
+  items: {
+    name: string;
+    url: string;
+    description?: string;
+    price?: number;
+    duration?: string | null;
+    isFree?: boolean;
+  }[];
   itemType?: 'Thing' | 'Course';
 }
 
@@ -273,31 +313,38 @@ export function ItemListSchema({
     '@type': 'ItemList',
     name,
     description,
-    itemListElement: items.map((item, index) => ({
-      '@type': 'ListItem',
-      position: index + 1,
-      url: item.url,
-      item:
-        itemType === 'Course'
-          ? {
-              '@type': 'Course',
-              name: item.name,
-              description: item.description ?? item.name,
-              url: item.url,
-              provider: {
-                '@type': 'EducationalOrganization',
-                '@id': 'https://carsi.com.au/#organization',
-                name: 'CARSI',
-                url: 'https://carsi.com.au',
+    itemListElement: items.map((item, index) => {
+      const offer = courseOffer(item.url, item.price);
+
+      return {
+        '@type': 'ListItem',
+        position: index + 1,
+        url: item.url,
+        item:
+          itemType === 'Course'
+            ? {
+                '@type': 'Course',
+                name: item.name,
+                description: item.description ?? item.name,
+                url: item.url,
+                ...(item.isFree !== undefined ? { isAccessibleForFree: item.isFree } : {}),
+                ...(offer ? { offers: offer } : {}),
+                hasCourseInstance: selfPacedCourseInstance(item.name, item.url, item.duration),
+                provider: {
+                  '@type': 'EducationalOrganization',
+                  '@id': 'https://carsi.com.au/#organization',
+                  name: 'CARSI',
+                  url: 'https://carsi.com.au',
+                },
+              }
+            : {
+                '@type': 'Thing',
+                name: item.name,
+                url: item.url,
+                ...(item.description ? { description: item.description } : {}),
               },
-            }
-          : {
-              '@type': 'Thing',
-              name: item.name,
-              url: item.url,
-              ...(item.description ? { description: item.description } : {}),
-            },
-    })),
+      };
+    }),
   };
 
   return (

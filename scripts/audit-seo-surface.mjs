@@ -52,9 +52,46 @@ function validateJsonLd(html, pageUrl, failures) {
   ];
   for (const [index, script] of scripts.entries()) {
     try {
-      JSON.parse(script[1]);
+      const schema = JSON.parse(script[1]);
+      validateCourseStructuredData(schema, pageUrl, `JSON-LD script #${index + 1}`, failures);
     } catch (error) {
       failures.push(`${pageUrl} has invalid JSON-LD script #${index + 1}: ${error.message}`);
+    }
+  }
+}
+
+function schemaTypes(node) {
+  const type = node?.['@type'];
+  return Array.isArray(type) ? type : type ? [type] : [];
+}
+
+function isBlank(value) {
+  return typeof value !== 'string' || value.trim() === '';
+}
+
+function validateCourseStructuredData(schema, pageUrl, source, failures) {
+  const stack = [schema];
+  while (stack.length > 0) {
+    const node = stack.pop();
+    if (!node || typeof node !== 'object') continue;
+
+    if (schemaTypes(node).includes('Course')) {
+      const label = typeof node.name === 'string' ? node.name : 'unnamed Course';
+      if (isBlank(node.description)) {
+        failures.push(`${pageUrl} ${source} Course "${label}" is missing description`);
+      }
+      if (!node.offers) {
+        failures.push(`${pageUrl} ${source} Course "${label}" is missing offers`);
+      }
+      if (!node.hasCourseInstance) {
+        failures.push(`${pageUrl} ${source} Course "${label}" is missing hasCourseInstance`);
+      }
+    }
+
+    if (Array.isArray(node)) {
+      for (const item of node) stack.push(item);
+    } else {
+      for (const value of Object.values(node)) stack.push(value);
     }
   }
 }
