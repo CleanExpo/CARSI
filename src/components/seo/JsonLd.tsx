@@ -183,7 +183,7 @@ function selfPacedCourseInstance(name: string, url: string, duration?: string | 
     name: `${name} online self-paced course`,
     courseMode: 'online',
     url,
-    ...(duration ? { courseWorkload: `PT${duration}H` } : {}),
+    courseWorkload: duration ? `PT${duration}H` : 'Self-paced online course; workload varies by learner',
   };
 }
 

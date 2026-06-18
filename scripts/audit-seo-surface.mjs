@@ -69,6 +69,14 @@ function isBlank(value) {
   return typeof value !== 'string' || value.trim() === '';
 }
 
+function hasCourseInstanceWorkload(courseInstance) {
+  const instances = Array.isArray(courseInstance) ? courseInstance : [courseInstance];
+  return instances.some((instance) => {
+    if (!instance || typeof instance !== 'object') return false;
+    return !isBlank(instance.courseWorkload) || Boolean(instance.courseSchedule);
+  });
+}
+
 function validateCourseStructuredData(schema, pageUrl, source, failures) {
   const stack = [schema];
   while (stack.length > 0) {
@@ -85,6 +93,10 @@ function validateCourseStructuredData(schema, pageUrl, source, failures) {
       }
       if (!node.hasCourseInstance) {
         failures.push(`${pageUrl} ${source} Course "${label}" is missing hasCourseInstance`);
+      } else if (!hasCourseInstanceWorkload(node.hasCourseInstance)) {
+        failures.push(
+          `${pageUrl} ${source} Course "${label}" has CourseInstance without courseWorkload or courseSchedule`,
+        );
       }
     }
 
