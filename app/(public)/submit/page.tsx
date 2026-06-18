@@ -152,12 +152,12 @@ export default function SubmitIndexPage() {
             All submissions are reviewed by the CARSI editorial team. We aim to respond within{' '}
             <span className="text-white/55">5 business days</span>. Approved listings are published
             free of charge. Commercial advertising enquiries should be directed to{' '}
-            <a
-              href="mailto:hello@carsi.com.au"
+            <Link
+              href="/contact"
               className="text-white/55 underline underline-offset-2 hover:text-white/75"
             >
-              hello@carsi.com.au
-            </a>
+              contact CARSI
+            </Link>
             .
           </p>
         </div>

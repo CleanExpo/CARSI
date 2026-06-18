@@ -21,13 +21,21 @@ export const IICRC_DISCIPLINE_LONG: Record<string, string> = {
 };
 
 const DEFAULT_ORDER = ['WRT', 'CRT', 'ASD', 'AMRT', 'FSRT', 'OCT', 'CCT'] as const;
+const KNOWN_CODES = new Set<string>(DEFAULT_ORDER);
+
+export function normalizeDisciplineCodes(codes: string[]): string[] {
+  return codes.flatMap((raw) => {
+    const matches = raw.toUpperCase().match(/\b(WRT|CRT|ASD|AMRT|FSRT|OCT|CCT)\b/g);
+    return matches ?? [];
+  });
+}
 
 /** Order discipline codes for display (known IICRC order first, then remainder sorted). */
 export function orderDisciplineCodes(codes: string[]): string[] {
-  const set = new Set(codes.map((c) => c.toUpperCase()));
+  const set = new Set(normalizeDisciplineCodes(codes).map((c) => c.toUpperCase()));
   const primary = DEFAULT_ORDER.filter((c) => set.has(c));
   const rest = [...set]
-    .filter((c) => !DEFAULT_ORDER.includes(c as (typeof DEFAULT_ORDER)[number]))
+    .filter((c) => !KNOWN_CODES.has(c))
     .sort();
   return [...primary, ...rest];
 }

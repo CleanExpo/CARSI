@@ -145,12 +145,12 @@ export default async function SubmitSuccessPage({ params }: { params: Promise<{ 
         {/* Contact note */}
         <p className="mt-10 text-xs text-white/25">
           Questions?{' '}
-          <a
-            href="mailto:hello@carsi.com.au"
+          <Link
+            href="/contact"
             className="text-white/40 underline underline-offset-2 hover:text-white/60"
           >
-            hello@carsi.com.au
-          </a>
+            Contact CARSI
+          </Link>
         </p>
       </div>
     </main>

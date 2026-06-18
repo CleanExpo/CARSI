@@ -5,15 +5,20 @@ import { cache } from 'react';
 import { BundlePricingCard } from '@/components/lms/BundlePricingCard';
 import { CourseGrid } from '@/components/lms/CourseGrid';
 import { IICRCDisciplineMap } from '@/components/lms/diagrams/IICRCDisciplineMap';
+import { ItemListSchema } from '@/components/seo';
 import { CECCalculator } from '@/components/tools/CECCalculator';
 import { AcronymTooltip } from '@/components/ui/AcronymTooltip';
-import { getBackendOrigin } from '@/lib/env/public-url';
+import { getBackendOrigin, getPublicSiteUrl } from '@/lib/env/public-url';
 import {
   coursesIndexMetaDescription,
   deriveCatalogueFactsFromCourseItems,
 } from '@/lib/server/public-catalogue-facts';
 import { getPublishedCourseListItemsFromDatabase } from '@/lib/server/public-courses-list';
-import { loadWpExportCourses, mapWpExportToCourseListItem } from '@/lib/wordpress-export-courses';
+import {
+  loadWpExportCourses,
+  mapWpExportToCourseListItem,
+  type CourseListItem,
+} from '@/lib/wordpress-export-courses';
 
 export const dynamic = 'force-dynamic';
 
@@ -113,9 +118,22 @@ export default async function CoursesPage({
     getCoursesCached(),
   ]);
   const catalogueFacts = deriveCatalogueFactsFromCourseItems(courses);
+  const siteUrl = getPublicSiteUrl();
+  const courseListItems = (courses as CourseListItem[]).map((course) => ({
+    name: course.title,
+    url: `${siteUrl}/courses/${course.slug}`,
+    description: course.short_description ?? `${course.title} online restoration training course.`,
+  }));
 
   return (
     <main id="main-content" className="relative z-10 min-h-screen bg-[#050505]">
+      <ItemListSchema
+        name="CARSI restoration training courses"
+        description={coursesIndexMetaDescription(catalogueFacts)}
+        items={courseListItems}
+        itemType="Course"
+      />
+
       {/* Match home: single top radial accent */}
       <div
         className="pointer-events-none fixed inset-0 z-0"

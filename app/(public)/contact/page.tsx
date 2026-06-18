@@ -139,13 +139,9 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
                   >
                     Email
                   </p>
-                  <a
-                    href="mailto:support@carsi.com.au"
-                    className="text-xs transition-colors"
-                    style={{ color: '#2490ed' }}
-                  >
-                    support@carsi.com.au
-                  </a>
+                  <p className="text-xs" style={{ color: '#2490ed' }}>
+                    Use the form and CARSI support will reply by email.
+                  </p>
                 </div>
 
                 <div>

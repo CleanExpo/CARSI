@@ -43,7 +43,7 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: 'CARSI', url: siteUrl }],
   creator: 'CARSI',
-  publisher: 'CARSI Pty Ltd',
+  publisher: 'CARSI',
   manifest: '/manifest.json',
   robots: {
     index: true,

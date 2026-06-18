@@ -29,8 +29,7 @@ export function buildOrganizationSchema(input: OrganizationSchemaInput = {}): Sc
 
   return {
     '@context': 'https://schema.org',
-    // Service Area Business: EducationalOrganization (primary) + LocalBusiness (SAB signals)
-    '@type': ['EducationalOrganization', 'LocalBusiness'],
+    '@type': 'EducationalOrganization',
     '@id': `${url}/#organization`,
     name,
     alternateName: 'Centre for Australian Restoration and Standards Information',

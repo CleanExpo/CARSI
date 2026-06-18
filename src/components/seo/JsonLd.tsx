@@ -23,8 +23,7 @@ export function OrganizationSchema({
 }: OrganizationSchemaProps) {
   const schema = {
     '@context': 'https://schema.org',
-    // Service Area Business: EducationalOrganization (primary) + LocalBusiness (SAB signals)
-    '@type': ['EducationalOrganization', 'LocalBusiness'],
+    '@type': 'EducationalOrganization',
     '@id': 'https://carsi.com.au/#organization',
     name,
     alternateName: 'Centre for Australian Restoration and Standards Information',
@@ -97,52 +96,6 @@ export function OrganizationSchema({
       'insurance claims Australia',
       'building restoration',
     ],
-    hasOfferCatalog: {
-      '@type': 'OfferCatalog',
-      name: 'IICRC CEC Training Programs',
-      itemListElement: [
-        {
-          '@type': 'Offer',
-          itemOffered: {
-            '@type': 'Course',
-            name: 'Water Restoration Technician (WRT)',
-            provider: { '@id': 'https://carsi.com.au/#organization' },
-          },
-        },
-        {
-          '@type': 'Offer',
-          itemOffered: {
-            '@type': 'Course',
-            name: 'Applied Structural Drying (ASD)',
-            provider: { '@id': 'https://carsi.com.au/#organization' },
-          },
-        },
-        {
-          '@type': 'Offer',
-          itemOffered: {
-            '@type': 'Course',
-            name: 'Fire and Smoke Restoration Technician (FSRT)',
-            provider: { '@id': 'https://carsi.com.au/#organization' },
-          },
-        },
-        {
-          '@type': 'Offer',
-          itemOffered: {
-            '@type': 'Course',
-            name: 'Carpet Cleaning Technician (CCT)',
-            provider: { '@id': 'https://carsi.com.au/#organization' },
-          },
-        },
-        {
-          '@type': 'Offer',
-          itemOffered: {
-            '@type': 'Course',
-            name: 'Odour Control Technician (OCT)',
-            provider: { '@id': 'https://carsi.com.au/#organization' },
-          },
-        },
-      ],
-    },
     sameAs,
     contactPoint: {
       '@type': 'ContactPoint',
@@ -199,23 +152,18 @@ export function WebsiteSchema({
 interface CourseSchemaProps {
   name: string;
   description: string;
-  provider?: string;
   url: string;
   price?: number;
-  priceCurrency?: string;
   duration?: string;
   educationalLevel?: string;
   teaches?: string[];
-  hasCourseInstance?: boolean;
 }
 
 export function CourseSchema({
   name,
   description,
-  provider: _provider = 'CARSI',
   url,
   price,
-  priceCurrency = 'AUD',
   duration,
   educationalLevel,
   teaches,
@@ -225,25 +173,17 @@ export function CourseSchema({
     '@type': 'Course',
     name,
     description,
-    provider: { '@id': 'https://carsi.com.au/#organization' },
+    provider: {
+      '@type': 'EducationalOrganization',
+      '@id': 'https://carsi.com.au/#organization',
+      name: 'CARSI',
+      url: 'https://carsi.com.au',
+    },
     url,
     inLanguage: 'en-AU',
-    isAccessibleForFree: price === 0,
-    hasCourseInstance: {
-      '@type': 'CourseInstance',
-      courseMode: 'online',
-      inLanguage: 'en-AU',
-    },
   };
 
-  if (price !== undefined && price > 0) {
-    schema.offers = {
-      '@type': 'Offer',
-      price,
-      priceCurrency,
-      availability: 'https://schema.org/InStock',
-    };
-  }
+  if (price === 0) schema.isAccessibleForFree = true;
 
   if (duration) {
     schema.timeRequired = `PT${duration}H`;
@@ -319,9 +259,15 @@ interface ItemListSchemaProps {
   name: string;
   description?: string;
   items: { name: string; url: string; description?: string }[];
+  itemType?: 'Thing' | 'Course';
 }
 
-export function ItemListSchema({ name, description, items }: ItemListSchemaProps) {
+export function ItemListSchema({
+  name,
+  description,
+  items,
+  itemType = 'Thing',
+}: ItemListSchemaProps) {
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
@@ -330,9 +276,27 @@ export function ItemListSchema({ name, description, items }: ItemListSchemaProps
     itemListElement: items.map((item, index) => ({
       '@type': 'ListItem',
       position: index + 1,
-      name: item.name,
       url: item.url,
-      description: item.description,
+      item:
+        itemType === 'Course'
+          ? {
+              '@type': 'Course',
+              name: item.name,
+              description: item.description ?? item.name,
+              url: item.url,
+              provider: {
+                '@type': 'EducationalOrganization',
+                '@id': 'https://carsi.com.au/#organization',
+                name: 'CARSI',
+                url: 'https://carsi.com.au',
+              },
+            }
+          : {
+              '@type': 'Thing',
+              name: item.name,
+              url: item.url,
+              ...(item.description ? { description: item.description } : {}),
+            },
     })),
   };
 

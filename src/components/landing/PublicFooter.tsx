@@ -94,8 +94,8 @@ export function PublicFooter() {
             <ul className="space-y-2 text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
               <li>PO Box 4309, Forest Lake QLD 4078</li>
               <li>
-                <a href="mailto:support@carsi.com.au" className="hover:text-white">
-                  support@carsi.com.au
+                <a href="/contact" className="hover:text-white">
+                  Contact CARSI support
                 </a>
               </li>
               <li>

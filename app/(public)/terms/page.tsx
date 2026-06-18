@@ -147,7 +147,7 @@ export default function TermsPage() {
             <address className="mt-2 not-italic">
               <strong className="text-white">CARSI Pty Ltd</strong>
               <br />
-              Email: support@carsi.com.au
+              Support: use the CARSI contact page
               <br />
               Phone: 1300 434 287
             </address>

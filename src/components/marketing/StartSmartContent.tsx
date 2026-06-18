@@ -22,7 +22,7 @@ import {
 } from 'lucide-react';
 
 import { MarketingSectionHeader } from '@/components/marketing/MarketingSectionHeader';
-import { BreadcrumbSchema, FAQSchema, OrganizationSchema } from '@/components/seo';
+import { BreadcrumbSchema, FAQSchema } from '@/components/seo';
 import {
   marketingBtnPrimary,
   marketingBtnSecondary,
@@ -268,7 +268,6 @@ export function StartSmartHub({ siteUrl }: { siteUrl: string }) {
 
   return (
     <main className="relative min-h-screen py-10 sm:py-14">
-      <OrganizationSchema />
       <BreadcrumbSchema items={breadcrumbs} />
       <FAQSchema questions={startSmartHubFaqs} />
 
@@ -465,7 +464,6 @@ export function StartSmartDetail({ page, siteUrl }: { page: StartSmartPage; site
 
   return (
     <main className="relative min-h-screen py-10 sm:py-14">
-      <OrganizationSchema />
       <BreadcrumbSchema items={breadcrumbs} />
       <FAQSchema questions={pageFaqs} />
 

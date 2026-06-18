@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { OrganizationSchema } from '@/components/seo/JsonLd';
 import {
   Activity,
   AlertTriangle,
@@ -200,8 +199,6 @@ const industries = [
 export default function IndustriesPage() {
   return (
     <main className="min-h-screen" style={{ background: '#060a14' }}>
-      <OrganizationSchema />
-
       {/* Mesh background */}
       <div className="mesh-bg" aria-hidden="true">
         <div className="mesh-blob mesh-blob-1" />

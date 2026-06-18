@@ -210,8 +210,8 @@ export default async function ProfessionalDirectoryPage() {
         <p className="mt-12 text-center text-xs text-white/25">
           All professionals listed are NRPG members. Membership verification is updated
           periodically. Contact{' '}
-          <a href="mailto:info@carsi.com.au" className="underline hover:text-white/50">
-            info@carsi.com.au
+          <a href="/contact" className="underline hover:text-white/50">
+            contact CARSI
           </a>{' '}
           to report any inaccuracies.
         </p>
