@@ -13,11 +13,11 @@ import { FAQSchema } from '@/components/seo/JsonLd';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Hospitality IICRC Training | CARSI',
+  title: 'Hospitality IICRC CEC Training | CARSI',
   description:
     'IICRC-certified training for Australian hotels and resorts. WRT, CRT, ASD and OCT courses for water damage, carpet care, structural drying and odour control.',
   keywords: [
-    'hospitality IICRC training',
+    'hospitality IICRC CEC training',
     'hotel restoration training',
     'hotel water damage',
     'carpet repair certification',
@@ -61,9 +61,9 @@ const faqs = [
       'IICRC OCT (Odour Control) certification trains hotel staff in source identification, thermal fogging, ozone treatment, and hydroxyl generation for smoke, pet, and biological odours. Proper odour remediation prevents negative guest reviews and avoids taking rooms offline unnecessarily.',
   },
   {
-    question: 'Can hospitality teams complete IICRC training online?',
+    question: 'Can hospitality teams complete IICRC CEC training online?',
     answer:
-      'Yes. CARSI delivers all IICRC CEC-approved courses online and self-paced, ideal for hotel teams working rotating rosters. Staff can complete modules between shifts. Courses issue verifiable digital credentials and count toward IICRC Continuing Education Credits.',
+      'Yes. CARSI offers IICRC CEC accredited courses online and self-paced, ideal for hotel teams working rotating rosters. Staff can complete modules between shifts. Courses issue verifiable digital credentials and count toward IICRC Continuing Education Credits.',
   },
   {
     question: 'What is structural drying training for hotel pool and spa areas?',

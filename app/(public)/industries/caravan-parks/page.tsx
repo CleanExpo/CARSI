@@ -13,9 +13,9 @@ import { FAQSchema } from '@/components/seo/JsonLd';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'IICRC Mould & Restoration Training for Caravan Parks | CARSI Australia',
+  title: 'IICRC CEC Mould & Restoration Training for Caravan Parks | CARSI Australia',
   description:
-    'Protect guests and comply with state Fair Trading obligations. IICRC AMRT, CRT, and WRT training for Australian caravan parks and holiday accommodation. Online, CEC approved.',
+    'Protect guests and comply with state Fair Trading obligations. IICRC AMRT, CRT, and WRT training for Australian caravan parks and holiday accommodation. Online, CEC accredited.',
   keywords: [
     'caravan park mould training Australia',
     'holiday park IICRC certification',
@@ -40,7 +40,7 @@ const disciplines = [
 const stats = [
   { value: '2,800+', label: 'Caravan Parks (AUS)' },
   { value: '$8.6B', label: 'Industry Revenue' },
-  { value: 'IICRC', label: 'CEC Approved' },
+  { value: 'IICRC', label: 'CEC Accredited' },
 ];
 
 const faqs = [
@@ -55,7 +55,7 @@ const faqs = [
       'Caravan parks and holiday parks face water damage from cyclone and storm events in tropical regions, flooding in low-lying coastal and riverside parks, roof failures in ageing cabin stock, and plumbing failures in shared amenities blocks. IICRC WRT (Water Damage Restoration Technician) training equips park maintenance staff to respond immediately after these events — extracting water, placing drying equipment, and documenting damage for insurance claims — reducing the period of lost revenue from uninhabitable sites.',
   },
   {
-    question: 'How does IICRC training protect caravan park guests and operators?',
+    question: 'How does IICRC CEC training protect caravan park guests and operators?',
     answer:
       'Caravan park operators owe guests a duty of care under Australian Consumer Law and state-specific tourism accommodation legislation. Providing accommodation with hidden mould or water damage exposes operators to Fair Trading complaints, negative TripAdvisor reviews, and potential personal injury claims if guests suffer health impacts. IICRC AMRT certification demonstrates that maintenance staff are competent to identify and remediate mould — providing a defensible record that standards-based inspections and remediation were performed, which is increasingly expected by park accreditation bodies.',
   },

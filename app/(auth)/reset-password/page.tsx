@@ -30,7 +30,7 @@ function ResetPasswordForm() {
         variant: 'destructive',
       });
     }
-  }, [token]);
+  }, [toast, token]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,26 +63,23 @@ function ResetPasswordForm() {
 
   return (
     <div
-      className="rounded-sm p-6 sm:p-8"
+      className="rounded-xl bg-white p-6 shadow-xl shadow-slate-200/70 ring-1 ring-slate-200 sm:p-8"
       style={{
-        background: 'rgba(255,255,255,0.04)',
-        backdropFilter: 'blur(24px) saturate(160%)',
-        WebkitBackdropFilter: 'blur(24px) saturate(160%)',
-        border: '1px solid rgba(255,255,255,0.07)',
+        border: '1px solid rgba(15,23,42,0.05)',
       }}
     >
       <div className="mb-6 space-y-1.5">
-        <h1 className="text-2xl font-bold" style={{ color: 'rgba(255,255,255,0.95)' }}>
+        <h1 className="text-2xl font-bold text-slate-950">
           Set new password
         </h1>
-        <p className="text-sm" style={{ color: 'rgba(255,255,255,0.45)' }}>
+        <p className="text-sm text-slate-600">
           Choose a strong password for your CARSI account
         </p>
       </div>
 
       {done ? (
         <div className="space-y-4">
-          <p className="text-sm" style={{ color: '#00FF88' }}>
+          <p className="text-sm font-medium text-emerald-700">
             {message} Redirecting to sign in…
           </p>
         </div>
@@ -115,15 +112,15 @@ function ResetPasswordForm() {
             />
           </div>
           {message && (
-            <p className="text-sm" style={{ color: isError ? '#FF4444' : 'rgba(255,255,255,0.5)' }}>
+            <p className="text-sm" style={{ color: isError ? 'hsl(var(--destructive))' : '#334155' }}>
               {message}
             </p>
           )}
           <button
             type="submit"
             disabled={isLoading || !token}
-            className="w-full rounded-sm py-3 text-sm font-semibold text-white transition-all duration-200 hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
-            style={{ background: '#ed9d24' }}
+            className="min-h-12 w-full rounded-lg py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50"
+            style={{ background: '#9a4a00' }}
           >
             {isLoading ? 'Updating…' : 'Update password'}
           </button>
@@ -133,8 +130,7 @@ function ResetPasswordForm() {
       <div className="mt-5 text-center text-sm">
         <Link
           href="/login"
-          className="font-medium underline decoration-white/20 underline-offset-4 transition-colors duration-150 hover:text-white hover:decoration-white/50"
-          style={{ color: '#00F5FF' }}
+          className="font-semibold text-[#146fc2] underline decoration-[#146fc2]/25 underline-offset-4 transition-colors duration-150 hover:text-[#0f5fa8]"
         >
           Back to sign in
         </Link>

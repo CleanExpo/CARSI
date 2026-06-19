@@ -60,12 +60,12 @@ export default async function DashboardCoursesPage({
     'inline-flex min-h-[40px] items-center rounded-lg px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/50';
 
   return (
-    <main id="main-content" className="relative z-10 min-h-screen bg-[#050505]">
+    <main id="main-content" className="relative z-10 min-h-screen bg-[#f6f8fb] text-slate-900">
       <div
         className="pointer-events-none fixed inset-0 z-0"
         style={{
           background:
-            'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(36,144,237,0.07) 0%, transparent 55%)',
+            'radial-gradient(ellipse 80% 42% at 50% 0%, rgba(36,144,237,0.12) 0%, transparent 58%)',
         }}
         aria-hidden="true"
       />
@@ -73,13 +73,10 @@ export default async function DashboardCoursesPage({
       <div className="relative z-10 mx-auto px-6 py-8 sm:py-10">
         <DashboardCatalogueHeader />
         <header className="mb-6">
-          <h1
-            className="font-display text-3xl font-bold tracking-tight sm:text-4xl"
-            style={{ color: 'rgba(255,255,255,0.92)' }}
-          >
+          <h1 className="font-display text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">
             Courses
           </h1>
-          <p className="mt-2 text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>
+          <p className="mt-2 text-sm text-slate-600">
             {total} course{total !== 1 ? 's' : ''} — filter by catalogue status. Draft courses are
             ordered with the most modules first.
           </p>
@@ -107,14 +104,14 @@ export default async function DashboardCoursesPage({
                 style={
                   active
                     ? {
-                        color: '#7ec5ff',
-                        background: 'rgba(36,144,237,0.15)',
-                        border: '1px solid rgba(36,144,237,0.45)',
+                        color: '#146fc2',
+                        background: '#eef7ff',
+                        border: '1px solid #b8dbfb',
                       }
                     : {
-                        color: 'rgba(255,255,255,0.55)',
-                        background: 'rgba(255,255,255,0.05)',
-                        border: '1px solid rgba(255,255,255,0.1)',
+                        color: '#475569',
+                        background: '#ffffff',
+                        border: '1px solid rgba(15,23,42,0.12)',
                       }
                 }
               >
@@ -126,17 +123,14 @@ export default async function DashboardCoursesPage({
 
         <section className="mb-10">
           <div
-            className="rounded-sm p-5"
+            className="rounded-xl bg-white p-5 shadow-sm ring-1 ring-slate-200"
             style={{
-              background: 'rgba(255,255,255,0.04)',
-              backdropFilter: 'blur(24px) saturate(160%)',
-              WebkitBackdropFilter: 'blur(24px) saturate(160%)',
-              border: '1px solid rgba(255,255,255,0.07)',
+              border: '1px solid rgba(15,23,42,0.04)',
             }}
           >
             {courses.length === 0 ? (
-              <p className="py-12 text-center text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                No courses in this view. Connect <code className="text-white/70">DATABASE_URL</code>{' '}
+              <p className="py-12 text-center text-sm text-slate-600">
+                No courses in this view. Connect <code className="text-slate-800">DATABASE_URL</code>{' '}
                 or choose another filter.
               </p>
             ) : (
@@ -150,9 +144,9 @@ export default async function DashboardCoursesPage({
           </div>
         </section>
 
-        <p className="text-center text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
+        <p className="text-center text-xs text-slate-500">
           Public catalogue:{' '}
-          <Link href="/courses" className="text-[#7ec5ff] underline-offset-2 hover:underline">
+          <Link href="/courses" className="text-[#146fc2] underline-offset-2 hover:underline">
             /courses
           </Link>
           . Disciplines follow <AcronymTooltip term="IICRC" /> groupings.

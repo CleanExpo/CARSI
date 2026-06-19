@@ -13,11 +13,11 @@ import { FAQSchema } from '@/components/seo/JsonLd';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'IICRC Training for Emergency Management & SES | CARSI Australia',
+  title: 'IICRC CEC Training for Emergency Management & SES | CARSI Australia',
   description:
-    'Train SES volunteers and council emergency teams before disaster strikes. IICRC WRT, FSRT, ASD, and AMRT certification for flood and fire response. Online, CEC approved.',
+    'Train SES volunteers and council emergency teams before disaster strikes. IICRC WRT, FSRT, ASD, and AMRT certification for flood and fire response. Online, CEC accredited.',
   keywords: [
-    'SES IICRC training Australia',
+    'SES IICRC CEC training Australia',
     'emergency management restoration training',
     'WRT flood response training',
     'FSRT fire damage certification',
@@ -41,12 +41,12 @@ const disciplines = [
 const stats = [
   { value: '40,000+', label: 'SES Volunteers (AUS)' },
   { value: '2,000+', label: 'Call-Outs Per Major Flood' },
-  { value: 'IICRC', label: 'CEC Approved' },
+  { value: 'IICRC', label: 'CEC Accredited' },
 ];
 
 const faqs = [
   {
-    question: 'What IICRC training is relevant for SES volunteers and emergency responders?',
+    question: 'What IICRC CEC training is relevant for SES volunteers and emergency responders?',
     answer:
       'State Emergency Service (SES) volunteers performing damage assessment and initial response after flooding benefit significantly from IICRC WRT (Water Damage Restoration Technician) training. WRT covers moisture behaviour in building materials, structural damage assessment, and documentation — enabling volunteers to triage flood-affected properties more accurately, advise homeowners on immediate protective actions, and produce assessment records that support insurance claims. FSRT (Fire & Smoke Restoration) certification is similarly valuable for volunteers supporting post-bushfire triage.',
   },
@@ -56,9 +56,9 @@ const faqs = [
       'IICRC WRT training equips emergency responders to move beyond surface-level water removal to understand the moisture migration patterns within wall cavities, subfloors, and roof spaces that determine long-term structural damage and mould risk. WRT-trained volunteers can advise homeowners on which materials require immediate removal to prevent mould, which can be dried in place, and what documentation is needed for insurance claims — transforming the immediate flood response from a basic clean-up into a structured damage mitigation process.',
   },
   {
-    question: 'Can council emergency management teams complete IICRC training?',
+    question: 'Can council emergency management teams complete IICRC CEC training?',
     answer:
-      'Yes. Council emergency management coordinators, building surveyors, and flood response teams benefit from IICRC awareness-level training in WRT and ASD. Online, self-paced delivery means staff can complete training between deployments without disrupting rostering. Councils that invest in IICRC training for emergency response staff report improved property triage accuracy, stronger documentation for DRFA (Disaster Recovery Funding Arrangements) claims, and better community outcomes in the weeks following a major weather event.',
+      'Yes. Council emergency management coordinators, building surveyors, and flood response teams benefit from IICRC awareness-level training in WRT and ASD. Online, self-paced delivery means staff can complete training between deployments without disrupting rostering. Councils that invest in IICRC CEC training for emergency response staff report improved property triage accuracy, stronger documentation for DRFA (Disaster Recovery Funding Arrangements) claims, and better community outcomes in the weeks following a major weather event.',
   },
   {
     question:

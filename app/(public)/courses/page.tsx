@@ -26,7 +26,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const { items } = await getCoursesCached();
   const facts = deriveCatalogueFactsFromCourseItems(items);
   return {
-    title: 'IICRC-Approved Restoration Training Courses | CARSI',
+    title: 'IICRC CEC Accredited Restoration Courses | CARSI',
     description: coursesIndexMetaDescription(facts),
   };
 }
@@ -103,6 +103,16 @@ function courseSchemaPrice(course: CourseListItem): number | undefined {
   return price;
 }
 
+function dedupeCoursesBySlug(items: CourseListItem[]): CourseListItem[] {
+  const seen = new Set<string>();
+  return items.filter((course) => {
+    const key = course.slug?.trim() || course.id;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 export default async function CoursesPage({
   searchParams,
 }: {
@@ -120,13 +130,15 @@ export default async function CoursesPage({
     typeof discipline === 'string' && discipline.trim() !== ''
       ? discipline.trim().toUpperCase()
       : undefined;
-  const [bundles, { items: courses, total }] = await Promise.all([
+  const [bundles, { items: courses }] = await Promise.all([
     getBundles(),
     getCoursesCached(),
   ]);
-  const catalogueFacts = deriveCatalogueFactsFromCourseItems(courses);
+  const displayCourses = dedupeCoursesBySlug(courses);
+  const displayTotal = displayCourses.length;
+  const catalogueFacts = deriveCatalogueFactsFromCourseItems(displayCourses);
   const siteUrl = getPublicSiteUrl();
-  const courseListItems = (courses as CourseListItem[]).map((course) => {
+  const courseListItems = displayCourses.map((course) => {
     const price = courseSchemaPrice(course);
 
     return {
@@ -140,7 +152,7 @@ export default async function CoursesPage({
   });
 
   return (
-    <main id="main-content" className="relative z-10 min-h-screen bg-[#050505]">
+    <main id="main-content" className="relative z-10 min-h-screen bg-[#f6f8fb] text-slate-900">
       <ItemListSchema
         name="CARSI restoration training courses"
         description={coursesIndexMetaDescription(catalogueFacts)}
@@ -148,12 +160,11 @@ export default async function CoursesPage({
         itemType="Course"
       />
 
-      {/* Match home: single top radial accent */}
       <div
         className="pointer-events-none fixed inset-0 z-0"
         style={{
           background:
-            'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(36,144,237,0.07) 0%, transparent 55%)',
+            'radial-gradient(ellipse 80% 42% at 50% 0%, rgba(36,144,237,0.12) 0%, transparent 58%)',
         }}
         aria-hidden="true"
       />
@@ -161,23 +172,20 @@ export default async function CoursesPage({
       <div className="relative z-10 mx-auto px-6 py-8 sm:py-10">
         {/* ── Hero header ── */}
         <header className="mb-6">
-          <h1
-            className="font-display text-3xl font-bold tracking-tight sm:text-4xl"
-            style={{ color: 'rgba(255,255,255,0.92)' }}
-          >
+          <h1 className="font-display text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">
             Restoration Training Courses
           </h1>
-          <p className="mt-2 text-sm" style={{ color: 'rgba(255,255,255,0.58)' }}>
-            {total} course{total !== 1 ? 's' : ''} across 7 <AcronymTooltip term="IICRC" />{' '}
-            disciplines — earn <AcronymTooltip term="CEC">CECs</AcronymTooltip> online, at your own
-            pace
+          <p className="mt-2 text-sm text-slate-600">
+            {displayTotal} beginner, intermediate, and advanced course
+            {displayTotal !== 1 ? 's' : ''} across 7 <AcronymTooltip term="IICRC" /> disciplines —
+            track <AcronymTooltip term="CEC">CECs</AcronymTooltip> online, at your own pace
           </p>
-          <div className="mt-4 rounded-lg border border-[#2490ed]/25 bg-[#2490ed]/10 px-4 py-3">
-            <p className="text-sm leading-relaxed text-white/72">
+          <div className="mt-4 rounded-lg border border-[#b8dbfb] bg-white px-4 py-3 shadow-sm">
+            <p className="text-sm leading-relaxed text-slate-700">
               Not sure where to start?{' '}
               <Link
                 href="/pathways"
-                className="font-semibold text-[#8fd0ff] underline decoration-[#8fd0ff]/40 underline-offset-4 transition-colors hover:text-white"
+                className="font-semibold text-[#146fc2] underline decoration-[#146fc2]/30 underline-offset-4 transition-colors hover:text-[#0f5fa8]"
               >
                 Use the guided pathway advisor
               </Link>{' '}
@@ -189,22 +197,19 @@ export default async function CoursesPage({
         {/* ── Course Grid (primary content — above the fold) ── */}
         <section className="mb-10">
           <div
-            className="rounded-sm p-4 sm:p-5"
+            className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200 sm:p-5"
             style={{
-              background: 'rgba(255,255,255,0.055)',
-              backdropFilter: 'blur(24px) saturate(160%)',
-              WebkitBackdropFilter: 'blur(24px) saturate(160%)',
-              border: '1px solid rgba(255,255,255,0.1)',
+              border: '1px solid rgba(15,23,42,0.04)',
             }}
           >
-            <CourseGrid courses={courses} initialTab={disciplineTab ?? 'All'} />
+            <CourseGrid courses={displayCourses} initialTab={disciplineTab ?? 'All'} />
           </div>
         </section>
 
         {/* ── Industry Bundles ── */}
         {bundles.length > 0 && (
           <section className="mb-10">
-            <h2 className="mb-4 text-lg font-semibold" style={{ color: 'rgba(255,255,255,0.85)' }}>
+            <h2 className="mb-4 text-lg font-semibold text-slate-950">
               Industry Bundles
             </h2>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -219,26 +224,21 @@ export default async function CoursesPage({
         {/* ── IICRC Discipline Map ── */}
         <section className="mb-10">
           <div
-            className="rounded-sm p-5"
+            className="rounded-xl bg-white p-5 shadow-sm ring-1 ring-slate-200"
             style={{
-              background: 'rgba(255,255,255,0.04)',
-              backdropFilter: 'blur(24px) saturate(160%)',
-              WebkitBackdropFilter: 'blur(24px) saturate(160%)',
-              border: '1px solid rgba(255,255,255,0.07)',
+              border: '1px solid rgba(15,23,42,0.04)',
             }}
           >
             <h2
-              className="font-display mb-3 text-center text-lg font-semibold"
-              style={{ color: 'rgba(255,255,255,0.88)' }}
+              className="font-display mb-3 text-center text-lg font-semibold text-slate-950"
             >
               IICRC Discipline Map
             </h2>
             <p
-              className="mx-auto mb-4 max-w-xl text-center text-xs"
-              style={{ color: 'rgba(255,255,255,0.4)' }}
+              className="mx-auto mb-4 max-w-xl text-center text-xs text-slate-600"
             >
               Explore the seven IICRC disciplines. Hover over each node to learn more about the
-              certification pathway.
+              CEC pathway.
             </p>
             <IICRCDisciplineMap />
           </div>
@@ -251,31 +251,24 @@ export default async function CoursesPage({
 
         {/* ── GEO Q&A Sections (SEO content — collapsed accordion) ── */}
         <section className="mb-8">
-          <h2
-            className="font-display mb-4 text-lg font-semibold"
-            style={{ color: 'rgba(255,255,255,0.88)' }}
-          >
+          <h2 className="font-display mb-4 text-lg font-semibold text-slate-950">
             Frequently Asked Questions
           </h2>
           <div className="space-y-3">
             {/* Q1 — What courses does CARSI offer? */}
             <details
-              className="group rounded-sm"
+              className="group rounded-lg border border-slate-200 bg-white shadow-sm"
               style={{
-                background: 'rgba(255,255,255,0.04)',
-                backdropFilter: 'blur(24px) saturate(160%)',
-                WebkitBackdropFilter: 'blur(24px) saturate(160%)',
-                border: '1px solid rgba(255,255,255,0.07)',
+                border: '1px solid rgba(15,23,42,0.1)',
               }}
             >
               <summary
-                className="flex cursor-pointer items-center justify-between px-5 py-4 text-sm font-semibold select-none"
-                style={{ color: 'rgba(255,255,255,0.88)' }}
+                className="flex cursor-pointer items-center justify-between px-5 py-4 text-sm font-semibold text-slate-900 select-none"
               >
                 <span>What courses does CARSI offer?</span>
                 <svg
                   className="h-4 w-4 shrink-0 transition-transform duration-200 group-open:rotate-180"
-                  style={{ color: 'rgba(255,255,255,0.4)' }}
+                  style={{ color: '#64748b' }}
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -285,9 +278,9 @@ export default async function CoursesPage({
                 </svg>
               </summary>
               <div className="px-5 pb-5">
-                <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.55)' }}>
-                  CARSI provides <AcronymTooltip term="IICRC" />
-                  -aligned continuing education across seven core disciplines: Water Restoration
+                <p className="text-sm leading-relaxed text-slate-600">
+                  CARSI offers <AcronymTooltip term="IICRC" /> <AcronymTooltip term="CEC" />{' '}
+                  accredited courses across seven core disciplines: Water Restoration
                   Technology (<AcronymTooltip term="WRT" />
                   ), Carpet Repair and Reinstallation Technology (<AcronymTooltip term="CRT" />
                   ), Applied Structural Drying (<AcronymTooltip term="ASD" />
@@ -295,45 +288,40 @@ export default async function CoursesPage({
                   ), Fire and Smoke Restoration Technology (<AcronymTooltip term="FSRT" />
                   ), Odour Control Technology (<AcronymTooltip term="OCT" />
                   ), and Commercial Carpet Cleaning Technology (<AcronymTooltip term="CCT" />
-                  ). Each course awards <AcronymTooltip term="IICRC" /> Continuing Education Credits
-                  (<AcronymTooltip term="CEC">CECs</AcronymTooltip>) upon completion, with automatic
-                  tracking and verifiable digital credentials.{' '}
+                  ). Eligible courses carry <AcronymTooltip term="IICRC" /> Continuing Education
+                  Credits (<AcronymTooltip term="CEC">CECs</AcronymTooltip>) upon completion, with
+                  automatic tracking and verifiable digital credentials.{' '}
                   {catalogueFacts.publishedCourseCount > 0 ? (
                     <>Our {catalogueFacts.publishedCourseCount} courses range from</>
                   ) : (
                     <>Our courses range from</>
                   )}{' '}
-                  introductory modules for new technicians through to advanced certification
-                  preparation for experienced professionals. All courses are delivered online,
-                  allowing Australian restoration technicians to study at their own pace from any
-                  location. Course content is reviewed and approved by the{' '}
-                  <AcronymTooltip term="IICRC" /> board in the United States before{' '}
-                  <AcronymTooltip term="CEC">CECs</AcronymTooltip> are assigned, ensuring every
-                  credit meets international standards.
+                  beginner modules for people just starting, through intermediate refreshers and
+                  advanced practice modules for experienced professionals. Courses are delivered
+                  online, allowing Australian restoration technicians to study at their own pace
+                  from any location. Eligible courses show their <AcronymTooltip term="CEC" /> value
+                  so learners can track continuing education progress without implying{' '}
+                  <AcronymTooltip term="IICRC" /> delivery status.
                 </p>
               </div>
             </details>
 
             {/* Q2 — How do I choose the right discipline? */}
             <details
-              className="group rounded-sm"
+              className="group rounded-lg border border-slate-200 bg-white shadow-sm"
               style={{
-                background: 'rgba(255,255,255,0.04)',
-                backdropFilter: 'blur(24px) saturate(160%)',
-                WebkitBackdropFilter: 'blur(24px) saturate(160%)',
-                border: '1px solid rgba(255,255,255,0.07)',
+                border: '1px solid rgba(15,23,42,0.1)',
               }}
             >
               <summary
-                className="flex cursor-pointer items-center justify-between px-5 py-4 text-sm font-semibold select-none"
-                style={{ color: 'rgba(255,255,255,0.88)' }}
+                className="flex cursor-pointer items-center justify-between px-5 py-4 text-sm font-semibold text-slate-900 select-none"
               >
                 <span>
                   How do I choose the right <AcronymTooltip term="IICRC" /> discipline?
                 </span>
                 <svg
                   className="h-4 w-4 shrink-0 transition-transform duration-200 group-open:rotate-180"
-                  style={{ color: 'rgba(255,255,255,0.4)' }}
+                  style={{ color: '#64748b' }}
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -343,7 +331,7 @@ export default async function CoursesPage({
                 </svg>
               </summary>
               <div className="px-5 pb-5">
-                <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.55)' }}>
+                <p className="text-sm leading-relaxed text-slate-600">
                   Your discipline choice depends on your current role and career goals. Water
                   Restoration Technology (<AcronymTooltip term="WRT" />) is the most common starting
                   point, providing foundational knowledge applicable across all restoration work
@@ -366,17 +354,13 @@ export default async function CoursesPage({
 
             {/* Q3 — What are CECs? */}
             <details
-              className="group rounded-sm"
+              className="group rounded-lg border border-slate-200 bg-white shadow-sm"
               style={{
-                background: 'rgba(255,255,255,0.04)',
-                backdropFilter: 'blur(24px) saturate(160%)',
-                WebkitBackdropFilter: 'blur(24px) saturate(160%)',
-                border: '1px solid rgba(255,255,255,0.07)',
+                border: '1px solid rgba(15,23,42,0.1)',
               }}
             >
               <summary
-                className="flex cursor-pointer items-center justify-between px-5 py-4 text-sm font-semibold select-none"
-                style={{ color: 'rgba(255,255,255,0.88)' }}
+                className="flex cursor-pointer items-center justify-between px-5 py-4 text-sm font-semibold text-slate-900 select-none"
               >
                 <span>
                   What are <AcronymTooltip term="IICRC" /> Continuing Education Credits (
@@ -384,7 +368,7 @@ export default async function CoursesPage({
                 </span>
                 <svg
                   className="h-4 w-4 shrink-0 transition-transform duration-200 group-open:rotate-180"
-                  style={{ color: 'rgba(255,255,255,0.4)' }}
+                  style={{ color: '#64748b' }}
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -394,17 +378,16 @@ export default async function CoursesPage({
                 </svg>
               </summary>
               <div className="px-5 pb-5">
-                <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.55)' }}>
+                <p className="text-sm leading-relaxed text-slate-600">
                   <AcronymTooltip term="IICRC" /> Continuing Education Credits (
                   <AcronymTooltip term="CEC">CECs</AcronymTooltip>) are the industry standard for
                   tracking professional development in the cleaning and restoration sector.
-                  Certified technicians must earn a minimum number of{' '}
+                  IICRC members and certified technicians continue their education through{' '}
                   <AcronymTooltip term="CEC">CECs</AcronymTooltip> within each certification cycle
                   to maintain their credentials with the Institute of Inspection, Cleaning and
-                  Restoration Certification. CARSI courses are individually submitted to the{' '}
-                  <AcronymTooltip term="IICRC" /> board for approval, and each approved course is
-                  assigned a specific <AcronymTooltip term="CEC" /> value based on its content depth
-                  and duration. Upon completing a course, your{' '}
+                  Restoration Certification. Eligible CARSI courses carry a specific{' '}
+                  <AcronymTooltip term="CEC" /> value based on course scope and duration. Upon
+                  completing a course, your{' '}
                   <AcronymTooltip term="CEC">CECs</AcronymTooltip> are automatically recorded in
                   your CARSI student dashboard and can be exported for submission to the{' '}
                   <AcronymTooltip term="IICRC" />. CARSI also provides verifiable digital

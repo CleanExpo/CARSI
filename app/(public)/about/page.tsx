@@ -16,8 +16,8 @@ export async function generateMetadata(): Promise<Metadata> {
   const d = facts.disciplineCodes.length;
   const coursePhrase =
     n > 0
-      ? `${formatCourseCountForCopy(n)} IICRC CEC-approved course${n === 1 ? '' : 's'}`
-      : 'IICRC CEC-approved courses';
+      ? `${formatCourseCountForCopy(n)} IICRC CEC accredited course${n === 1 ? '' : 's'}`
+      : 'IICRC CEC accredited courses';
   const discPhrase =
     d > 0
       ? `${d} discipline${d === 1 ? '' : 's'}`
@@ -55,7 +55,7 @@ export default async function AboutPage() {
   const stats = [
     {
       value: n > 0 ? formatCourseCountForCopy(n) : '—',
-      label: 'IICRC CEC-approved courses',
+      label: 'IICRC CEC accredited courses',
     },
     {
       value: d > 0 ? formatCourseCountForCopy(d) : '7',
@@ -97,8 +97,9 @@ export default async function AboutPage() {
           >
             CARSI — the Centre for Australian Restoration and Standards Information — is
             Australia&apos;s leading online training platform for cleaning and restoration
-            professionals. We deliver IICRC CEC-approved courses that allow technicians to maintain
-            their certification without leaving the job site.
+            professionals. We offer beginner, intermediate, and advanced IICRC CEC accredited
+            courses for people starting out, updating their knowledge, or maintaining continuing
+            education without leaving the job site.
           </p>
         </div>
 
@@ -109,9 +110,9 @@ export default async function AboutPage() {
           </h2>
           <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.6)' }}>
             The cleaning and restoration industry is demanding. Technicians work long hours, often
-            interstate, responding to water damage, fire, and mould events. Finding time to complete
-            the continuing education required to maintain IICRC certification has historically meant
-            flights, hotels, and days away from active jobs. CARSI changes that.
+            interstate, responding to water damage, fire, and mould events. For IICRC members and
+            certified technicians, continuing education through CECs has historically meant flights,
+            hotels, and days away from active jobs. CARSI changes that.
           </p>
           <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.6)' }}>
             We believe professional development should fit around your work — not the other way
@@ -122,16 +123,16 @@ export default async function AboutPage() {
           <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.6)' }}>
             {n > 0 ? (
               <>
-                With {formatCourseCountForCopy(n)} IICRC CEC-approved course{n === 1 ? '' : 's'}{' '}
+                With {formatCourseCountForCopy(n)} IICRC CEC accredited course{n === 1 ? '' : 's'}{' '}
                 across {d > 0 ? `${d} disciplines` : 'seven core disciplines'}, and a full-access
-                subscription at $795 AUD per year, we provide the most cost-effective path to IICRC
-                certification maintenance in Australia.
+                subscription at $795 AUD per year, we provide a practical path for IICRC members and
+                certified technicians to keep continuing education moving in Australia.
               </>
             ) : (
               <>
-                With IICRC CEC-approved courses across seven core disciplines, and a full-access
-                subscription at $795 AUD per year, we provide the most cost-effective path to IICRC
-                certification maintenance in Australia.
+                With IICRC CEC accredited courses across seven core disciplines, and a full-access
+                subscription at $795 AUD per year, we provide a practical path for IICRC members and
+                certified technicians to keep continuing education moving in Australia.
               </>
             )}
           </p>
@@ -216,15 +217,16 @@ export default async function AboutPage() {
                 <>
                   Our published catalogue currently includes courses tagged across {d} IICRC
                   discipline{d === 1 ? '' : 's'}. Courses in each area count toward the continuing
-                  education credits required to maintain your certified technician status.
-                  Technicians must earn CECs every two years — CARSI makes that straightforward.
+                  education credits used to maintain your certified technician status. IICRC members
+                  and certified technicians continue their education through CECs — CARSI makes that
+                  straightforward.
                 </>
               ) : (
                 <>
-                  CARSI holds IICRC CEC approval across all seven core disciplines. Courses in each
-                  discipline count toward the continuing education credits required to maintain your
-                  certified technician status. Technicians must earn CECs every two years — CARSI
-                  makes that straightforward.
+                  CARSI offers IICRC CEC accredited courses across all seven core disciplines.
+                  Courses in each discipline count toward the continuing education credits used to
+                  maintain your certified technician status. IICRC members and certified technicians
+                  continue their education through CECs — CARSI makes that straightforward.
                 </>
               )}
             </p>
@@ -308,11 +310,11 @@ export default async function AboutPage() {
           <p className="text-xs leading-relaxed italic" style={{ color: 'rgba(255,255,255,0.35)' }}>
             The IICRC does not endorse any educational provider, product, offering, or service. The
             Institute expressly disclaims responsibility, endorsement or warranty for third-party
-            publications, products, certifications, or instruction. The approved status does not
-            award IICRC Certification, only qualified continuing education hours.
+            publications, products, certifications, or instruction. CEC accreditation does not
+            award IICRC Certification; it only qualifies continuing education hours where applicable.
           </p>
           <p className="mt-3 text-xs font-medium" style={{ color: 'rgba(255,255,255,0.5)' }}>
-            All CARSI courses carry IICRC CEC approval.
+            CARSI courses are IICRC CEC accredited where stated.
           </p>
         </section>
       </div>

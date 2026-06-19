@@ -8,8 +8,7 @@ for (const path of CRITICAL_PATHS) {
     await page.goto(path, { waitUntil: 'networkidle' });
 
     const results = await new AxeBuilder({ page })
-      .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
-      .disableRules(['color-contrast'])
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])
       .analyze();
 
     const blocking = results.violations.filter((v) =>

@@ -12,11 +12,11 @@ import { IndustryRecommendedCourses } from '@/components/industries/IndustryReco
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Childcare IICRC Training | CARSI',
+  title: 'Childcare IICRC CEC Training | CARSI',
   description:
-    'IICRC certification for childcare centre maintenance. AMRT and CRT training supporting NQF compliance across Australian early learning centres.',
+    'IICRC CEC training for childcare centre maintenance. AMRT and CRT training supporting NQF compliance across Australian early learning centres.',
   keywords: [
-    'childcare IICRC training',
+    'childcare IICRC CEC training',
     'early learning centre cleaning',
     'NQF compliance training',
     'childcare mould remediation Australia',
@@ -38,7 +38,7 @@ const disciplines = [
 const stats = [
   { value: '16,000+', label: 'Approved Centres' },
   { value: 'NQF', label: 'Quality Framework' },
-  { value: 'IICRC', label: 'CEC Approved' },
+  { value: 'IICRC', label: 'CEC Accredited' },
 ];
 
 const whyCards = [
@@ -46,7 +46,7 @@ const whyCards = [
     icon: Shield,
     title: 'NQF Quality Area 2',
     description:
-      'IICRC training directly supports Health & Safety requirements under the National Quality Standard. Aim for "Exceeding" at your next ACECQA assessment.',
+      'IICRC CEC training directly supports Health & Safety requirements under the National Quality Standard. Aim for "Exceeding" at your next ACECQA assessment.',
     color: '#e91e63',
   },
   {

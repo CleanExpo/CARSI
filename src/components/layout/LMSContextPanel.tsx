@@ -65,24 +65,22 @@ export function LMSContextPanel() {
 
   return (
     <aside
-      className="scrollbar-glass z-10 hidden h-screen max-h-screen w-[min(100%,240px)] shrink-0 flex-col overflow-hidden overscroll-none border-r border-white/6 md:flex md:flex-col"
+      className="z-10 hidden h-screen max-h-screen w-[min(100%,260px)] shrink-0 flex-col overflow-hidden overscroll-none border-r border-slate-200 bg-white md:flex md:flex-col"
       style={{
-        background: 'rgba(8, 12, 24, 0.82)',
-        backdropFilter: 'blur(20px) saturate(160%)',
-        WebkitBackdropFilter: 'blur(20px) saturate(160%)',
+        boxShadow: '1px 0 0 rgba(15,23,42,0.04)',
       }}
     >
       {/* Fixed header — does not scroll */}
-      <div className="shrink-0 border-b border-white/6 px-4 py-5">
-        <p className="text-[10px] font-semibold tracking-[0.2em] text-white/35 uppercase">CARSI</p>
-        <p className="mt-1.5 text-[15px] font-semibold tracking-tight text-white/95">{section}</p>
-        <p className="mt-1 text-xs leading-snug text-white/40">Learning workspace</p>
+      <div className="shrink-0 border-b border-slate-200 px-4 py-5">
+        <p className="text-[10px] font-semibold tracking-[0.2em] text-[#146fc2] uppercase">CARSI</p>
+        <p className="mt-1.5 text-[15px] font-semibold tracking-tight text-slate-950">{section}</p>
+        <p className="mt-1 text-xs leading-snug text-slate-500">Learning workspace</p>
       </div>
 
       {/* Scrollable: menu + filters only; sidebar shell stays fixed */}
       <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain px-2 py-4 [scrollbar-gutter:stable]">
         <nav className="flex flex-col gap-0.5" aria-label="Section navigation">
-          <p className="mb-2 px-2 text-[10px] font-semibold tracking-wider text-white/30 uppercase">
+          <p className="mb-2 px-2 text-[10px] font-semibold tracking-wider text-slate-500 uppercase">
             Menu
           </p>
           {primaryNav.map((item) => {
@@ -98,12 +96,12 @@ export function LMSContextPanel() {
                 style={
                   active
                     ? {
-                        background: 'rgba(36, 144, 237, 0.14)',
-                        color: '#7ec5ff',
-                        border: '1px solid rgba(36, 144, 237, 0.22)',
+                        background: '#eef7ff',
+                        color: '#146fc2',
+                        border: '1px solid #b8dbfb',
                       }
                     : {
-                        color: 'rgba(255, 255, 255, 0.62)',
+                        color: '#475569',
                         border: '1px solid transparent',
                       }
                 }
@@ -118,11 +116,11 @@ export function LMSContextPanel() {
           })}
         </nav>
 
-        <div className="mt-6 border-t border-white/6 pt-4">
+        <div className="mt-6 border-t border-slate-200 pt-4">
           <button
             type="button"
             onClick={() => setFiltersOpen((v) => !v)}
-            className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-[10px] font-semibold tracking-wider text-white/35 uppercase transition hover:bg-white/4"
+            className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-[10px] font-semibold tracking-wider text-slate-500 uppercase transition hover:bg-slate-100"
           >
             <span>Filter by discipline</span>
             <ChevronDown
@@ -136,7 +134,7 @@ export function LMSContextPanel() {
                 <Link
                   key={d.code}
                   href={`/dashboard/courses?discipline=${d.code}`}
-                  className="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-white/55 transition hover:bg-white/4 hover:text-white/80"
+                  className="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-slate-600 transition hover:bg-slate-100 hover:text-slate-950"
                 >
                   <span
                     className="h-1.5 w-1.5 shrink-0 rounded-full"
@@ -154,11 +152,11 @@ export function LMSContextPanel() {
       </div>
 
       {/* Fixed footer — sign out always visible */}
-      <div className="shrink-0 border-t border-white/6 px-2 py-3">
+      <div className="shrink-0 border-t border-slate-200 px-2 py-3">
         <button
           type="button"
           onClick={() => void handleSignOut()}
-          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-white/70 transition-colors hover:bg-white/6 hover:text-white"
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-950"
           title={user?.email ? `Sign out (${user.email})` : 'Sign out'}
         >
           <LogOut className="h-4 w-4 shrink-0 opacity-90" aria-hidden />

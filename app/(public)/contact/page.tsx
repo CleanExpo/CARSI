@@ -5,7 +5,7 @@ import { ContactForm, type ContactLeadContext } from '@/components/contact/Conta
 export const metadata: Metadata = {
   title: 'Contact CARSI | Cleaning and Restoration Science Institute',
   description:
-    'Get in touch with CARSI. Contact our team for course enquiries, membership support, or general questions about IICRC-aligned training for cleaning and restoration professionals.',
+    'Get in touch with CARSI for course enquiries, membership support, or questions about IICRC CEC accredited courses.',
 };
 
 type ContactPageProps = {
@@ -47,83 +47,46 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
   const leadContext = buildLeadContext(await searchParams);
 
   return (
-    <main className="min-h-screen" style={{ background: '#060a14' }}>
-      {/* Mesh background */}
-      <div className="mesh-bg" aria-hidden="true">
-        <div className="mesh-blob mesh-blob-1" />
-        <div className="mesh-blob mesh-blob-2" />
-      </div>
-
-      <div className="relative z-10 mx-auto max-w-4xl px-6 py-20">
-        <p
-          className="mb-2 text-xs tracking-wide uppercase"
-          style={{ color: 'rgba(255,255,255,0.3)' }}
-        >
-          Get in Touch
+    <main id="main-content" className="min-h-screen bg-[#f6f8fb] text-slate-900">
+      <div className="mx-auto max-w-5xl px-6 py-14">
+        <p className="mb-2 text-xs font-semibold tracking-wide text-[#146fc2] uppercase">
+          Get in touch
         </p>
-        <h1
-          className="mb-2 text-4xl font-bold tracking-tight"
-          style={{ color: 'rgba(255,255,255,0.95)' }}
-        >
-          Contact Us
+        <h1 className="mb-3 text-4xl font-bold tracking-tight text-slate-950">
+          Contact CARSI
         </h1>
-        <p className="mb-12 text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)' }}>
-          Have a question about our courses, membership, or IICRC training? We&apos;d love to hear
-          from you.
+        <p className="mb-10 max-w-2xl text-sm leading-relaxed text-slate-600">
+          Have a question about courses, membership, IICRC CECs, or team training? Send the details
+          and CARSI support will route it to the right conversation.
         </p>
 
-        <div className="grid gap-10 lg:grid-cols-[1fr_340px]">
-          {/* Contact Form */}
-          <ContactForm leadContext={leadContext} />
+        <div className="grid gap-8 lg:grid-cols-[1fr_340px]">
+          <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+            <ContactForm leadContext={leadContext} />
+          </section>
 
-            {/* Contact Details */}
-            <div className="space-y-6">
+          <aside className="space-y-5">
             {leadContext ? (
-              <div
-                className="space-y-3 rounded-lg p-5"
-                style={{
-                  background: 'rgba(36,144,237,0.06)',
-                  border: '1px solid rgba(36,144,237,0.18)',
-                }}
-              >
-                <p
-                  className="text-[10px] font-semibold tracking-wide uppercase"
-                  style={{ color: '#7ec5ff' }}
-                >
+              <div className="rounded-xl border border-[#b8dbfb] bg-[#eef7ff] p-5">
+                <p className="text-[10px] font-semibold tracking-wide text-[#146fc2] uppercase">
                   Start Smart enquiry
                 </p>
-                <h2 className="text-sm font-semibold" style={{ color: 'rgba(255,255,255,0.85)' }}>
+                <h2 className="mt-2 text-sm font-semibold text-slate-950">
                   Routed to the right conversation
                 </h2>
-                <p className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.56)' }}>
-                  This enquiry includes the Start Smart source, topic and pathway so CARSI can see
-                  whether you need course guidance, CCW practical support, equipment direction,
-                  service modelling or team/buyer training.
+                <p className="mt-2 text-xs leading-relaxed text-slate-600">
+                  This enquiry includes the source, topic and pathway so CARSI can quickly see what
+                  guidance you need.
                 </p>
               </div>
             ) : null}
 
-            {/* Address card */}
-            <div
-              className="space-y-4 rounded-lg p-5"
-              style={{
-                background: 'rgba(255,255,255,0.03)',
-                border: '1px solid rgba(255,255,255,0.08)',
-              }}
-            >
-              <h2 className="text-sm font-semibold" style={{ color: 'rgba(255,255,255,0.85)' }}>
-                Our Details
-              </h2>
-
-              <div className="space-y-3">
+            <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+              <h2 className="text-sm font-semibold text-slate-950">Our details</h2>
+              <div className="mt-4 space-y-4 text-xs leading-relaxed text-slate-600">
                 <div>
-                  <p
-                    className="mb-1 text-[10px] font-semibold tracking-wide uppercase"
-                    style={{ color: 'rgba(255,255,255,0.3)' }}
-                  >
-                    Address
-                  </p>
-                  <p className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                  <p className="mb-1 font-semibold tracking-wide text-slate-700 uppercase">Address</p>
+                  <p>
                     PO Box 4309
                     <br />
                     Forest Lake QLD 4078
@@ -131,104 +94,41 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
                     Australia
                   </p>
                 </div>
-
                 <div>
-                  <p
-                    className="mb-1 text-[10px] font-semibold tracking-wide uppercase"
-                    style={{ color: 'rgba(255,255,255,0.3)' }}
-                  >
-                    Email
-                  </p>
-                  <p className="text-xs" style={{ color: '#2490ed' }}>
-                    Use the form and CARSI support will reply by email.
-                  </p>
+                  <p className="mb-1 font-semibold tracking-wide text-slate-700 uppercase">Email</p>
+                  <p>Use the form and CARSI support will reply by email.</p>
                 </div>
-
                 <div>
-                  <p
-                    className="mb-1 text-[10px] font-semibold tracking-wide uppercase"
-                    style={{ color: 'rgba(255,255,255,0.3)' }}
-                  >
-                    Phone
-                  </p>
-                  <a
-                    href="tel:+61457123005"
-                    className="text-xs transition-colors hover:text-white"
-                    style={{ color: 'rgba(255,255,255,0.6)' }}
-                  >
+                  <p className="mb-1 font-semibold tracking-wide text-slate-700 uppercase">Phone</p>
+                  <a href="tel:+61457123005" className="font-semibold text-[#146fc2] hover:text-[#0f5fa8]">
                     0457 123 005
                   </a>
                 </div>
               </div>
             </div>
 
-            {/* Social card */}
-            <div
-              className="rounded-lg p-5"
-              style={{
-                background: 'rgba(255,255,255,0.03)',
-                border: '1px solid rgba(255,255,255,0.08)',
-              }}
-            >
-              <h2
-                className="mb-4 text-sm font-semibold"
-                style={{ color: 'rgba(255,255,255,0.85)' }}
-              >
-                Connect With Us
-              </h2>
-              <div className="space-y-3">
+            <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+              <h2 className="text-sm font-semibold text-slate-950">Connect with us</h2>
+              <div className="mt-4 grid gap-2">
                 {[
-                  {
-                    label: 'Facebook',
-                    href: 'https://www.facebook.com/CARSIaus',
-                    desc: '@CARSIaus',
-                  },
-                  {
-                    label: 'YouTube',
-                    href: 'https://www.youtube.com/channel/UC3HpNvGJXivLGoPo4m7Qleg/featured',
-                    desc: 'CARSI Channel',
-                  },
-                  {
-                    label: 'LinkedIn',
-                    href: 'https://www.linkedin.com/company/carsiaus',
-                    desc: 'CARSI Australia',
-                  },
-                  {
-                    label: 'Podcast',
-                    href: 'https://open.spotify.com/show/4FVBn8Cfyx2jOx0m4MksuG',
-                    desc: 'The Science of Property Restoration',
-                  },
-                ].map((s) => (
+                  { label: 'Facebook', href: 'https://www.facebook.com/CARSIaus' },
+                  { label: 'YouTube', href: 'https://www.youtube.com/channel/UC3HpNvGJXivLGoPo4m7Qleg/featured' },
+                  { label: 'LinkedIn', href: 'https://www.linkedin.com/company/carsiaus' },
+                  { label: 'Podcast', href: 'https://open.spotify.com/show/4FVBn8Cfyx2jOx0m4MksuG' },
+                ].map((social) => (
                   <a
-                    key={s.label}
-                    href={s.href}
+                    key={social.label}
+                    href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-between rounded-sm px-3 py-2 transition-colors"
-                    style={{
-                      background: 'rgba(255,255,255,0.02)',
-                      border: '1px solid rgba(255,255,255,0.06)',
-                    }}
+                    className="rounded-lg border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:border-[#2490ed]/35 hover:text-[#146fc2]"
                   >
-                    <span
-                      className="text-xs font-medium"
-                      style={{ color: 'rgba(255,255,255,0.7)' }}
-                    >
-                      {s.label}
-                    </span>
-                    <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.3)' }}>
-                      {s.desc}
-                    </span>
+                    {social.label}
                   </a>
                 ))}
               </div>
             </div>
-
-            {/* Response time note */}
-            <p className="text-[11px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.3)' }}>
-              We aim to respond to all enquiries within 1–2 business days (AEST).
-            </p>
-          </div>
+          </aside>
         </div>
       </div>
     </main>

@@ -13,11 +13,11 @@ import { FAQSchema } from '@/components/seo/JsonLd';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'IICRC Training for Plumbers & Trades | CARSI Australia',
+  title: 'IICRC CEC Training for Plumbers & Trades | CARSI Australia',
   description:
-    'Turn water damage call-outs into drying contracts. IICRC WRT and ASD certification for Australian plumbers and trade contractors — online, self-paced, CEC approved.',
+    'Turn water damage call-outs into drying contracts. IICRC WRT and ASD certification for Australian plumbers and trade contractors — online, self-paced, CEC accredited.',
   keywords: [
-    'IICRC training plumbers Australia',
+    'IICRC CEC training plumbers Australia',
     'WRT certification plumbing',
     'water damage restoration plumber',
     'ASD structural drying trade',
@@ -40,7 +40,7 @@ const disciplines = [
 const stats = [
   { value: '85,000+', label: 'Licensed Plumbers (AUS)' },
   { value: 'WHS', label: 'Act Compliant' },
-  { value: 'IICRC', label: 'CEC Approved' },
+  { value: 'IICRC', label: 'CEC Accredited' },
 ];
 
 const faqs = [
@@ -55,14 +55,14 @@ const faqs = [
       'WRT (Water Damage Restoration Technician) is the IICRC foundation course covering moisture behaviour in building materials, psychrometrics, drying equipment placement, and documentation requirements. For a plumbing contractor, WRT training means you can identify hidden moisture damage behind walls, set up drying equipment, and submit a compliant drying report to the insurer — turning a standard repair call-out into a multi-day drying contract that significantly increases per-job revenue.',
   },
   {
-    question: 'How does IICRC training increase plumbing revenue per call-out?',
+    question: 'How does IICRC CEC training increase plumbing revenue per call-out?',
     answer:
       'Most plumbing call-outs involving burst pipes, flexi-hose failures, or roof leaks leave wet structural materials behind. Without restoration certification, plumbers fix the source and leave — the customer engages a separate remediation contractor. IICRC-certified plumbers can perform the full scope: fix the source, extract water, place drying equipment, and document the process. Average Australian water damage restoration jobs range from $2,500 to $15,000, representing significant additional revenue per call-out.',
   },
   {
-    question: 'Can I complete IICRC training online while running a plumbing business?',
+    question: 'Can I complete IICRC CEC training online while running a plumbing business?',
     answer:
-      'Yes. CARSI delivers all IICRC CEC-approved courses online and fully self-paced. There are no fixed class times — modules are completed between jobs, in the evening, or on weekends. Most WRT courses take 8–12 hours of study, which plumbers typically spread over two weeks. On completion, you receive a verifiable digital credential and IICRC Continuing Education Credits (CECs) towards your professional standing.',
+      'Yes. CARSI offers IICRC CEC accredited courses online and fully self-paced. There are no fixed class times — modules are completed between jobs, in the evening, or on weekends. Most WRT courses take 8–12 hours of study, which plumbers typically spread over two weeks. On completion, you receive a verifiable digital credential and IICRC Continuing Education Credits (CECs) towards your professional standing.',
   },
 ];
 
@@ -128,7 +128,7 @@ export default async function PlumbingTradesIndustryPage() {
         subtitle="Plumbing & Trades Training"
         title="Trades Restoration Bundle"
         price="$245"
-        description="WRT + ASD training for licensed plumbers and trade contractors. Complete online between jobs. IICRC CEC approved."
+        description="WRT + ASD training for licensed plumbers and trade contractors. Complete online between jobs. IICRC CEC accredited."
         ctaText="Add Restoration to Your Business"
         accentColor={ACCENT_COLOR}
       />

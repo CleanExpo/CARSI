@@ -12,11 +12,11 @@ import { IndustryRecommendedCourses } from '@/components/industries/IndustryReco
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Property Management IICRC Training | CARSI',
+  title: 'Property Management IICRC CEC Training | CARSI',
   description:
     'IICRC restoration training for Australian property and strata managers. Mould, water damage and carpet credentials for RTA compliance.',
   keywords: [
-    'property management IICRC training',
+    'property management IICRC CEC training',
     'strata manager restoration course',
     'RTA mould compliance',
     'property manager water damage Australia',
@@ -39,7 +39,7 @@ const disciplines = [
 const stats = [
   { value: '12,000+', label: 'Property Agencies' },
   { value: 'RTA', label: 'Compliance' },
-  { value: 'IICRC', label: 'CEC Approved' },
+  { value: 'IICRC', label: 'CEC Accredited' },
 ];
 
 const whyCards = [

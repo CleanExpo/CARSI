@@ -337,7 +337,7 @@ export default function FloatingChat() {
                   onClick={() => void sendMessage()}
                   disabled={!input.trim() || loading}
                   className="flex h-10 w-10 shrink-0 items-center justify-center rounded-sm transition-opacity disabled:cursor-not-allowed disabled:opacity-40"
-                  style={{ background: '#2490ed' }}
+                  style={{ background: '#0f5fa8' }}
                   aria-label="Send message"
                 >
                   <Send size={18} className="text-white" />
@@ -357,7 +357,7 @@ export default function FloatingChat() {
         whileHover={{ scale: 1.06 }}
         whileTap={{ scale: 0.96 }}
         className="flex min-h-12 min-w-12 items-center justify-center gap-2 rounded-sm px-3 py-3 text-sm font-semibold text-white shadow-lg transition-shadow hover:shadow-xl sm:min-w-0 sm:px-4"
-        style={{ background: '#2490ed' }}
+        style={{ background: '#0f5fa8' }}
         aria-label={open ? 'Close chat' : `Open ${ASSISTANT_NAME}`}
       >
         <AnimatePresence mode="wait" initial={false}>

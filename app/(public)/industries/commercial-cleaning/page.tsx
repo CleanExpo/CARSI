@@ -13,11 +13,11 @@ import { FAQSchema } from '@/components/seo/JsonLd';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Commercial Cleaning IICRC Certification | CARSI',
+  title: 'Commercial Cleaning IICRC CEC Training | CARSI',
   description:
-    'IICRC certification for commercial cleaning contractors in Australia. CRT, CCT, and OCT courses for carpet restoration, odour control, and insurance panel eligibility.',
+    'IICRC CEC accredited courses for commercial cleaning contractors in Australia. CRT, CCT, and OCT topics for carpet restoration, odour control, and insurance panel readiness.',
   keywords: [
-    'commercial cleaning IICRC certification',
+    'commercial cleaning IICRC CEC training',
     'cleaning contractor training Australia',
     'CRT certification',
     'CCT commercial carpet',
@@ -60,9 +60,9 @@ const faqs = [
       'IICRC and ISSA (International Sanitary Supply Association) are complementary industry bodies. IICRC provides technician-level certifications in specific restoration disciplines, while ISSA focuses on cleaning management standards. Australian cleaning companies often hold credentials from both organisations to demonstrate comprehensive capability in tenders.',
   },
   {
-    question: 'What is the cost of IICRC certification for cleaning staff in Australia?',
+    question: 'What is the cost of IICRC CEC training for cleaning staff in Australia?',
     answer:
-      'CARSI offers IICRC CEC-approved training from $795 AUD per year per seat, which includes access to all courses, verifiable digital credentials, and CEC tracking. Bulk team pricing is available for cleaning companies training multiple technicians. All courses are online and self-paced, eliminating travel and downtime costs.',
+      'CARSI offers IICRC CEC accredited courses from $795 AUD per year per seat, which includes access to courses, verifiable CARSI digital credentials, and CEC tracking. Bulk team pricing is available for cleaning companies training multiple technicians. Courses are online and self-paced, eliminating travel and downtime costs.',
   },
   {
     question: 'How do cleaning contractors track IICRC CEC credits for their team?',
@@ -74,9 +74,9 @@ const faqs = [
 const whyCards = [
   {
     icon: Award,
-    title: 'IICRC Certification',
+    title: 'IICRC CEC Training',
     description:
-      'Earn recognised IICRC certifications that differentiate your cleaning business. Stand out in tender submissions and client proposals.',
+      'Build IICRC CEC records and CARSI credentials that differentiate your cleaning business. Stand out in tender submissions and client proposals.',
     color: '#2490ed',
   },
   {
@@ -108,8 +108,8 @@ export default async function CommercialCleaningIndustryPage() {
         industryName="Commercial Cleaning"
         accentColor={ACCENT_COLOR}
         headline="Commercial Cleaning"
-        headlineAccent="Professional Certification"
-        description="IICRC certification training for commercial cleaning contractors. Earn recognised credentials in carpet restoration, commercial carpet care, and odour control."
+        headlineAccent="Professional CEC Training"
+        description="IICRC CEC accredited courses for commercial cleaning contractors. Build CARSI credentials in carpet restoration, commercial carpet care, and odour control."
         disciplines={disciplines}
         stats={stats}
       />

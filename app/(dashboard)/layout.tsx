@@ -1,6 +1,5 @@
 import { SkipToMain } from '@/components/a11y/SkipToMain';
 import { LMSContextPanel } from '@/components/layout/LMSContextPanel';
-import { LMSIconRail } from '@/components/layout/LMSIconRail';
 import { PageTransition } from '@/components/layout/PageTransition';
 import FloatingChatGate from '@/components/lms/FloatingChatGate';
 import { OnboardingCheck } from '@/components/lms/OnboardingCheck';
@@ -9,16 +8,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <div
       className="relative flex h-screen max-h-[100dvh] w-full max-w-[100vw] overflow-hidden"
-      style={{ background: '#060a14' }}
+      style={{ background: '#f6f8fb' }}
     >
       <SkipToMain />
-      <div className="mesh-bg pointer-events-none" aria-hidden="true">
-        <div className="mesh-blob mesh-blob-1" />
-        <div className="mesh-blob mesh-blob-2" />
-        <div className="mesh-blob mesh-blob-3" />
-      </div>
-
-      <LMSIconRail />
       <LMSContextPanel />
 
       {/* Only this region scrolls; sidebars stay fixed to the viewport */}

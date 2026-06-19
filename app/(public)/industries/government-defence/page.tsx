@@ -13,11 +13,11 @@ import { FAQSchema } from '@/components/seo/JsonLd';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Government & Defence IICRC Training | CARSI',
+  title: 'Government & Defence IICRC CEC Training | CARSI',
   description:
-    'WHS-compliant IICRC training for Australian councils, agencies and defence facilities. AMRT, WRT, ASD and FSRT courses for AusTender compliance.',
+    'WHS-compliant IICRC CEC training for Australian councils, agencies and defence facilities. AMRT, WRT, ASD and FSRT courses for AusTender compliance.',
   keywords: [
-    'government IICRC training',
+    'government IICRC CEC training',
     'defence facility restoration',
     'AusTender compliance',
     'WHS mould training',
@@ -41,7 +41,7 @@ const disciplines = [
 const stats = [
   { value: '537', label: 'Local Councils' },
   { value: 'WHS', label: 'Act Compliance' },
-  { value: 'IICRC', label: 'CEC Approved' },
+  { value: 'IICRC', label: 'CEC Accredited' },
 ];
 
 const faqs = [
@@ -61,9 +61,9 @@ const faqs = [
       'Heritage-listed buildings require specialised structural drying techniques that avoid damaging original materials. IICRC ASD (Applied Structural Drying) certification trains government maintenance teams in low-impact drying methods, moisture monitoring, and documentation protocols that satisfy both heritage conservation requirements and WHS compliance.',
   },
   {
-    question: 'Can government facility staff complete IICRC training online?',
+    question: 'Can government facility staff complete IICRC CEC training online?',
     answer:
-      'Yes. CARSI delivers IICRC CEC-approved courses online and self-paced, suitable for council and agency staff across metropolitan and regional Australia. Courses issue verifiable digital credentials that satisfy audit and procurement compliance requirements. Bulk seat licensing is available for departments and councils.',
+      'Yes. CARSI offers IICRC CEC accredited courses online and self-paced, suitable for council and agency staff across metropolitan and regional Australia. Courses issue verifiable digital credentials that satisfy audit and procurement compliance requirements. Bulk seat licensing is available for departments and councils.',
   },
 ];
 
@@ -72,7 +72,7 @@ const whyCards = [
     icon: Shield,
     title: 'WHS Due Diligence',
     description:
-      'Government employers have strict WHS duties. IICRC training demonstrates due diligence for mould and water hazard identification.',
+      'Government employers have strict WHS duties. IICRC CEC training demonstrates due diligence for mould and water hazard identification.',
     color: '#2196f3',
   },
   {

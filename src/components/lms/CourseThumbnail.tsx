@@ -59,13 +59,13 @@ export function CourseThumbnail({
   }, [src]);
 
   const variant = compact ? 'card' : 'hero';
-  const wrapClass = compact ? 'overflow-hidden rounded-sm' : 'mb-4 overflow-hidden rounded-sm';
+  const wrapClass = compact ? 'overflow-hidden rounded-lg' : 'mb-4 overflow-hidden rounded-lg';
 
   const backdrop =
     resolvedSrc && !backdropFailed ? resolvedSrc : undefined;
 
   return (
-    <div className={wrapClass} style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
+    <div className={wrapClass} style={{ border: '1px solid rgba(15,23,42,0.1)' }}>
       <div className="aspect-video">
         <CourseTextThumbnail
           variant={variant}

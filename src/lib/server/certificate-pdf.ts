@@ -560,7 +560,7 @@ export async function buildCompletionCertificatePdf(
   });
   drawCenteredText(page, 'Training Director', col3Center, footerTop - 50, 7, helvetica, rgb(0.5, 0.52, 0.56));
 
-  const footerTag = 'CARSI Learning · carsi.com.au · IICRC-aligned restoration education';
+  const footerTag = 'CARSI Learning · carsi.com.au · IICRC CEC accredited restoration courses';
   drawCenteredText(page, footerTag, xMid, MARGIN - 4, 6.5, helvetica, rgb(0.42, 0.44, 0.48));
 
   return doc.save();

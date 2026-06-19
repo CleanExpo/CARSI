@@ -122,7 +122,7 @@ export function LoginForm() {
       window.setTimeout(() => {
         window.location.href = destination;
       }, 250);
-    } catch (_err) {
+    } catch {
       setError('Failed to connect to server');
       toast({ title: 'Failed to connect to server', variant: 'destructive' });
       setIsLoading(false);
@@ -188,8 +188,8 @@ export function LoginForm() {
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full rounded-sm py-3 text-sm font-semibold text-white transition-all duration-200 hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
-          style={{ background: '#ed9d24' }}
+          className="min-h-12 w-full rounded-lg py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50"
+          style={{ background: '#9a4a00' }}
         >
           {isLoading ? 'Signing in...' : 'Sign in'}
         </button>

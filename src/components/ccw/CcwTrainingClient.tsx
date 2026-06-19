@@ -72,7 +72,7 @@ const trainerMeta = [
   },
   {
     term: 'CARSI',
-    text: 'IICRC-approved CEC provider, 90+ courses across 7 disciplines',
+    text: 'IICRC CEC accredited courses across 7 disciplines',
   },
   {
     term: 'Focus',

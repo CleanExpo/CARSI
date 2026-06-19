@@ -13,9 +13,9 @@ import { FAQSchema } from '@/components/seo/JsonLd';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'IICRC Mould & Odour Training for Gyms & Fitness Centres | CARSI',
+  title: 'IICRC CEC Mould & Odour Training for Gyms & Fitness Centres | CARSI',
   description:
-    'Protect your members and your reputation. IICRC AMRT, OCT, and CRT training for Australian gyms, pools, and fitness facilities. Online, self-paced, CEC approved.',
+    'Protect your members and your reputation. IICRC AMRT, OCT, and CRT training for Australian gyms, pools, and fitness facilities. Online, self-paced, CEC accredited.',
   keywords: [
     'gym mould training Australia',
     'fitness centre IICRC certification',
@@ -40,7 +40,7 @@ const disciplines = [
 const stats = [
   { value: '6,000+', label: 'Fitness Facilities (AUS)' },
   { value: '5M+', label: 'Active Members' },
-  { value: 'IICRC', label: 'CEC Approved' },
+  { value: 'IICRC', label: 'CEC Accredited' },
 ];
 
 const faqs = [
@@ -55,9 +55,9 @@ const faqs = [
       'The primary mould drivers in Australian gyms are inadequate ventilation in wet areas, condensation on cold surfaces in air-conditioned spaces, water ingress around pool surrounds and wet decks, and porous materials (grout, carpet, ceiling tiles) that retain moisture. IICRC AMRT training covers moisture mapping, relative humidity monitoring, and containment procedures that allow maintenance staff to identify and address these conditions systematically before mould becomes visible — preventing the costly remediation and member complaints that follow.',
   },
   {
-    question: 'How does IICRC training reduce liability for gym operators?',
+    question: 'How does IICRC CEC training reduce liability for gym operators?',
     answer:
-      "Gym operators have a duty of care to members under Australian Consumer Law and WHS legislation. Documented IICRC training demonstrates that maintenance staff were competent to identify and respond to mould and moisture hazards. In the event of a member health complaint or personal injury claim linked to indoor air quality, evidence of IICRC-certified staff and documented inspection protocols significantly strengthens the operator's defence and can reduce insurance premiums for premises liability coverage.",
+      "Gym operators have a duty of care to members under Australian Consumer Law and WHS legislation. Documented IICRC CEC training demonstrates that maintenance staff were competent to identify and respond to mould and moisture hazards. In the event of a member health complaint or personal injury claim linked to indoor air quality, evidence of IICRC-certified staff and documented inspection protocols significantly strengthens the operator's defence and can reduce insurance premiums for premises liability coverage.",
   },
   {
     question: 'What is OCT certification and how does it help fitness facilities?',
@@ -85,7 +85,7 @@ const whyCards = [
     icon: Users,
     title: 'Member Retention & Reputation',
     description:
-      'Mould complaints and Google reviews mentioning cleanliness are the leading non-price drivers of gym cancellations. Documented IICRC training protects your reputation and your renewal rate.',
+      'Mould complaints and Google reviews mentioning cleanliness are the leading non-price drivers of gym cancellations. Documented IICRC CEC training protects your reputation and your renewal rate.',
     color: '#2490ed',
   },
 ];

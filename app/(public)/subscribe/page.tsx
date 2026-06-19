@@ -6,7 +6,7 @@ import { useAuth } from '@/components/auth/auth-provider';
 import { apiClient } from '@/lib/api/client';
 
 const PRO_FEATURES = [
-  'All 111+ IICRC-approved courses',
+  'All 111+ IICRC CEC accredited courses',
   'Unlimited CEC credits',
   'Water Restoration Technician (WRT) courses',
   'Carpet Cleaning Technician (CCT) courses',

@@ -13,11 +13,11 @@ import { FAQSchema } from '@/components/seo/JsonLd';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'IICRC Training for Real Estate & Property Sales | CARSI Australia',
+  title: 'IICRC CEC Training for Real Estate & Property Sales | CARSI Australia',
   description:
-    'Vendor disclosure compliance and pre-sale remediation. IICRC WRT, ASD, and AMRT certification for real estate agents, property managers, and conveyancers. Online, CEC approved.',
+    'Vendor disclosure compliance and pre-sale remediation. IICRC WRT, ASD, and AMRT certification for real estate agents, property managers, and conveyancers. Online, CEC accredited.',
   keywords: [
-    'real estate IICRC training Australia',
+    'real estate IICRC CEC training Australia',
     'water damage disclosure property',
     'mould training real estate agent',
     'WRT property sales certification',
@@ -40,7 +40,7 @@ const disciplines = [
 const stats = [
   { value: '1.1M+', label: 'Annual Transactions (AUS)' },
   { value: 'ACL', label: 'Disclosure Required' },
-  { value: 'IICRC', label: 'CEC Approved' },
+  { value: 'IICRC', label: 'CEC Accredited' },
 ];
 
 const faqs = [
@@ -72,7 +72,7 @@ const whyCards = [
     icon: FileCheck,
     title: 'Vendor Disclosure Compliance',
     description:
-      'Water damage and mould are material defects requiring disclosure under Australian Consumer Law. IICRC training equips agents to identify, document, and disclose these defects accurately — minimising post-settlement liability.',
+      'Water damage and mould are material defects requiring disclosure under Australian Consumer Law. IICRC CEC training equips agents to identify, document, and disclose these defects accurately — minimising post-settlement liability.',
     color: '#ff7043',
   },
   {

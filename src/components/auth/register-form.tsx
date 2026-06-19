@@ -206,7 +206,7 @@ export function RegisterForm() {
               <FormControl>
                 <Input placeholder="e.g. IICRC-12345" {...field} />
               </FormControl>
-              <FormDescription className="text-xs text-white/30">
+              <FormDescription className="text-xs text-slate-500">
                 Link your IICRC membership to track CECs and display your credentials.
               </FormDescription>
               <FormMessage />
@@ -233,8 +233,8 @@ export function RegisterForm() {
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full rounded-sm py-3 text-sm font-semibold text-white transition-all duration-200 hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
-          style={{ background: '#ed9d24' }}
+          className="min-h-12 w-full rounded-lg py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50"
+          style={{ background: '#9a4a00' }}
         >
           {isLoading ? 'Creating account...' : 'Create account'}
         </button>

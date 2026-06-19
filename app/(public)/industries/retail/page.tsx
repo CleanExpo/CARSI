@@ -12,11 +12,11 @@ import { IndustryRecommendedCourses } from '@/components/industries/IndustryReco
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Retail & Shopping Centre IICRC Training | CARSI',
+  title: 'Retail & Shopping Centre IICRC CEC Training | CARSI',
   description:
-    'IICRC certification for shopping centre maintenance teams. Pre-qualify for major landlord panels with WRT, CRT and OCT credentials.',
+    'IICRC CEC training for shopping centre maintenance teams. Pre-qualify for major landlord panels with WRT, CRT and OCT credentials.',
   keywords: [
-    'retail IICRC training',
+    'retail IICRC CEC training',
     'shopping centre restoration',
     'retail property maintenance certification',
     'shopping centre water damage Australia',

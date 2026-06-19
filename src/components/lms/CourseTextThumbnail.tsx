@@ -14,53 +14,53 @@ const DISCIPLINE_ACCENTS: Record<
   { fg: string; glow: string; from: string; via: string; to: string }
 > = {
   WRT: {
-    fg: '#5cb3f5',
-    glow: 'rgba(36,144,237,0.45)',
-    from: '#0f2744',
-    via: '#132a4a',
-    to: '#060d18',
+    fg: '#146fc2',
+    glow: 'rgba(36,144,237,0.22)',
+    from: '#eef7ff',
+    via: '#dceeff',
+    to: '#ffffff',
   },
   CRT: {
-    fg: '#4ee0c3',
-    glow: 'rgba(38,196,160,0.4)',
-    from: '#0f2e28',
-    via: '#123d34',
-    to: '#060f0d',
+    fg: '#047f6f',
+    glow: 'rgba(38,196,160,0.2)',
+    from: '#ecfdf7',
+    via: '#d7fbef',
+    to: '#ffffff',
   },
   ASD: {
-    fg: '#a29bfa',
-    glow: 'rgba(108,99,255,0.4)',
-    from: '#1a1740',
-    via: '#221e4a',
-    to: '#0a0818',
+    fg: '#4f46e5',
+    glow: 'rgba(108,99,255,0.18)',
+    from: '#f0f1ff',
+    via: '#e3e5ff',
+    to: '#ffffff',
   },
   OCT: {
-    fg: '#c792ea',
-    glow: 'rgba(155,89,182,0.35)',
-    from: '#2a1535',
-    via: '#321a40',
-    to: '#0f0814',
+    fg: '#7e3ba0',
+    glow: 'rgba(155,89,182,0.18)',
+    from: '#fbf0ff',
+    via: '#f1ddfb',
+    to: '#ffffff',
   },
   CCT: {
-    fg: '#5ee7f9',
-    glow: 'rgba(23,184,212,0.35)',
-    from: '#0a2a32',
-    via: '#0d3540',
-    to: '#050e12',
+    fg: '#0f7890',
+    glow: 'rgba(23,184,212,0.18)',
+    from: '#ecfbff',
+    via: '#d9f6fb',
+    to: '#ffffff',
   },
   FSRT: {
-    fg: '#ff8f73',
-    glow: 'rgba(240,90,53,0.35)',
-    from: '#351a12',
-    via: '#402018',
-    to: '#120a08',
+    fg: '#c2410c',
+    glow: 'rgba(240,90,53,0.18)',
+    from: '#fff4ed',
+    via: '#ffe3d2',
+    to: '#ffffff',
   },
   AMRT: {
-    fg: '#5ee9a0',
-    glow: 'rgba(39,174,96,0.35)',
-    from: '#0f2a1c',
-    via: '#123824',
-    to: '#060d09',
+    fg: '#15803d',
+    glow: 'rgba(39,174,96,0.18)',
+    from: '#f0fdf4',
+    via: '#dcfce7',
+    to: '#ffffff',
   },
 };
 
@@ -72,25 +72,25 @@ const CATEGORY_ACCENTS: { test: (c: string) => boolean; key: string }[] = [
 
 const EXTRA_ACCENTS: Record<string, (typeof DISCIPLINE_ACCENTS)['WRT']> = {
   safety: {
-    fg: '#f0b429',
-    glow: 'rgba(240,180,41,0.35)',
-    from: '#2a2210',
-    via: '#352a12',
-    to: '#0f0c06',
+    fg: '#a16207',
+    glow: 'rgba(240,180,41,0.18)',
+    from: '#fff8e6',
+    via: '#fff1c2',
+    to: '#ffffff',
   },
   whs: {
-    fg: '#7dd3fc',
-    glow: 'rgba(125,211,252,0.3)',
-    from: '#0f2433',
-    via: '#122d42',
-    to: '#060c12',
+    fg: '#0369a1',
+    glow: 'rgba(125,211,252,0.18)',
+    from: '#eff9ff',
+    via: '#dff3ff',
+    to: '#ffffff',
   },
   mkt: {
-    fg: '#f472b6',
-    glow: 'rgba(244,114,182,0.3)',
-    from: '#2a1528',
-    via: '#381830',
-    to: '#100810',
+    fg: '#be185d',
+    glow: 'rgba(244,114,182,0.18)',
+    from: '#fff1f7',
+    via: '#ffe1ee',
+    to: '#ffffff',
   },
 };
 
@@ -134,11 +134,11 @@ export function getCourseTextAccent(
 
   const hue = hashHue(title);
   return {
-    fg: `hsl(${hue} 72% 68%)`,
-    glow: `hsla(${hue}, 70%, 50%, 0.28)`,
-    from: `hsl(${hue} 35% 14%)`,
-    via: `hsl(${(hue + 12) % 360} 32% 11%)`,
-    to: '#06080f',
+    fg: `hsl(${hue} 64% 34%)`,
+    glow: `hsla(${hue}, 70%, 50%, 0.16)`,
+    from: `hsl(${hue} 80% 96%)`,
+    via: `hsl(${(hue + 12) % 360} 78% 92%)`,
+    to: '#ffffff',
   };
 }
 
@@ -200,10 +200,12 @@ export function CourseTextThumbnail({
 
   const titleClass =
     variant === 'hero'
-      ? 'font-display text-xl font-bold leading-snug tracking-tight text-white sm:text-2xl'
+      ? `font-display text-xl font-bold leading-snug tracking-tight sm:text-2xl ${
+          hasBackdrop ? 'text-white' : 'text-slate-950'
+        }`
       : variant === 'admin'
-        ? 'text-sm font-semibold leading-snug text-white'
-        : 'text-sm font-bold leading-snug text-white';
+        ? `text-sm font-semibold leading-snug ${hasBackdrop ? 'text-white' : 'text-slate-950'}`
+        : `text-sm font-bold leading-snug ${hasBackdrop ? 'text-white' : 'text-slate-950'}`;
 
   const descLines = variant === 'hero' ? 3 : 2;
   const showDesc = variant !== 'card' && Boolean(shortDescription?.trim());
@@ -225,7 +227,7 @@ export function CourseTextThumbnail({
           ? { background: '#0a0c10' }
           : {
               background: `linear-gradient(145deg, ${accent.from} 0%, ${accent.via} 48%, ${accent.to} 100%)`,
-              boxShadow: `inset 0 1px 0 rgba(255,255,255,0.06), 0 0 40px -12px ${accent.glow}`,
+              boxShadow: `inset 0 1px 0 rgba(255,255,255,0.9), 0 18px 40px -28px ${accent.glow}`,
             }
       }
     >
@@ -243,7 +245,7 @@ export function CourseTextThumbnail({
             onError={onBackdropImageError}
           />
           <div
-            className="pointer-events-none absolute inset-0 z-0 bg-linear-to-b from-black/72 via-black/48 to-black/78"
+            className="pointer-events-none absolute inset-0 z-0 bg-linear-to-b from-black/58 via-black/28 to-black/68"
             aria-hidden
           />
           <div
@@ -319,9 +321,9 @@ export function CourseTextThumbnail({
               className="rounded px-1.5 py-0.5 font-mono text-[9px] font-bold tracking-wide uppercase"
               style={{
                 color: accent.fg,
-                background: 'rgba(0,0,0,0.45)',
+                background: hasBackdrop ? 'rgba(0,0,0,0.45)' : 'rgba(255,255,255,0.82)',
                 border: `1px solid ${accent.fg}55`,
-                boxShadow: `0 0 12px ${accent.glow}`,
+                boxShadow: `0 8px 18px -14px ${accent.glow}`,
               }}
             >
               IICRC {code}
@@ -331,9 +333,9 @@ export function CourseTextThumbnail({
             <span
               className="rounded px-1.5 py-0.5 text-[9px] font-bold tabular-nums"
               style={{
-                color: '#7ee8ff',
-                background: 'rgba(0,245,255,0.18)',
-                border: '1px solid rgba(0,245,255,0.35)',
+                color: '#146fc2',
+                background: hasBackdrop ? 'rgba(255,255,255,0.16)' : '#eef7ff',
+                border: '1px solid rgba(36,144,237,0.28)',
               }}
             >
               {cecHours} CEC{cecHours === '1' ? '' : 's'}
@@ -341,10 +343,14 @@ export function CourseTextThumbnail({
           ) : null}
           {showCategory && (
             <span
-              className="line-clamp-1 max-w-full rounded px-1.5 py-0.5 text-[9px] font-medium text-white/80"
+              className={`line-clamp-1 max-w-full rounded px-1.5 py-0.5 text-[9px] font-medium ${
+                hasBackdrop ? 'text-white/85' : 'text-slate-700'
+              }`}
               style={{
-                background: 'rgba(0,0,0,0.35)',
-                border: '1px solid rgba(255,255,255,0.12)',
+                background: hasBackdrop ? 'rgba(0,0,0,0.35)' : 'rgba(255,255,255,0.72)',
+                border: hasBackdrop
+                  ? '1px solid rgba(255,255,255,0.12)'
+                  : '1px solid rgba(15,23,42,0.1)',
               }}
             >
               {category}
@@ -361,15 +367,28 @@ export function CourseTextThumbnail({
 
         {showModuleCallout ? (
           <div
-            className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 rounded-md border border-white/10 px-2 py-1.5"
-            style={{ background: 'rgba(0,0,0,0.28)' }}
+            className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 rounded-md px-2 py-1.5"
+            style={{
+              background: hasBackdrop ? 'rgba(0,0,0,0.28)' : 'rgba(255,255,255,0.74)',
+              border: hasBackdrop
+                ? '1px solid rgba(255,255,255,0.1)'
+                : '1px solid rgba(15,23,42,0.1)',
+            }}
           >
-            <span className="inline-flex items-center gap-1 text-[11px] font-bold text-white tabular-nums">
+            <span
+              className={`inline-flex items-center gap-1 text-[11px] font-bold tabular-nums ${
+                hasBackdrop ? 'text-white' : 'text-slate-900'
+              }`}
+            >
               <Layers className="h-3.5 w-3.5" style={{ color: accent.fg }} />
               {moduleCount} module{moduleCount === 1 ? '' : 's'}
             </span>
             {lessonCount != null && lessonCount > 0 ? (
-              <span className="inline-flex items-center gap-1 text-[10px] font-medium text-white/65">
+              <span
+                className={`inline-flex items-center gap-1 text-[10px] font-medium ${
+                  hasBackdrop ? 'text-white/70' : 'text-slate-600'
+                }`}
+              >
                 <BookOpen className="h-3 w-3 opacity-70" />
                 {lessonCount} lesson{lessonCount === 1 ? '' : 's'}
               </span>
@@ -379,7 +398,9 @@ export function CourseTextThumbnail({
 
         {showDesc ? (
           <p
-            className="mt-2 text-[11px] leading-relaxed text-white/55"
+            className={`mt-2 text-[11px] leading-relaxed ${
+              hasBackdrop ? 'text-white/70' : 'text-slate-600'
+            }`}
             style={{
               display: '-webkit-box',
               WebkitLineClamp: descLines,
@@ -391,38 +412,42 @@ export function CourseTextThumbnail({
           </p>
         ) : null}
 
-        <div className="mt-auto flex flex-wrap gap-x-2.5 gap-y-1 border-t border-white/10 pt-2 text-[9px] text-white/58">
+        <div
+          className={`mt-auto flex flex-wrap gap-x-2.5 gap-y-1 border-t pt-2 text-[9px] ${
+            hasBackdrop ? 'border-white/10 text-white/70' : 'border-slate-200 text-slate-600'
+          }`}
+        >
           {level ? (
             <span className="inline-flex items-center gap-1">
-              <GraduationCap className="h-3 w-3 shrink-0 text-white/35" />
+              <GraduationCap className={`h-3 w-3 shrink-0 ${hasBackdrop ? 'text-white/45' : 'text-slate-400'}`} />
               {level}
             </span>
           ) : null}
           {cecHours ? (
-            <span className="text-cyan-300/85">
+            <span className={hasBackdrop ? 'text-cyan-200' : 'text-[#146fc2]'}>
               {cecHours} IICRC CEC{cecHours === '1' ? '' : 's'}
             </span>
           ) : null}
           {durationHours ? (
             <span className="inline-flex items-center gap-1">
-              <Clock className="h-3 w-3 shrink-0 text-white/35" />
+              <Clock className={`h-3 w-3 shrink-0 ${hasBackdrop ? 'text-white/45' : 'text-slate-400'}`} />
               {durationHours}h
             </span>
           ) : null}
           {instructorName ? (
             <span className="inline-flex min-w-0 items-center gap-1">
-              <User className="h-3 w-3 shrink-0 text-white/35" />
+              <User className={`h-3 w-3 shrink-0 ${hasBackdrop ? 'text-white/45' : 'text-slate-400'}`} />
               <span className="truncate">{instructorName}</span>
             </span>
           ) : null}
         </div>
 
         {variant === 'card' ? (
-          <p className="mt-1.5 truncate text-[7px] tracking-wide text-white/30 uppercase">
+          <p className={`mt-1.5 truncate text-[7px] tracking-wide uppercase ${hasBackdrop ? 'text-white/45' : 'text-slate-500'}`}>
             CARSI · Restoration training · Australia
           </p>
         ) : (
-          <div className="mt-2 flex items-center gap-2 border-t border-white/5 pt-2">
+          <div className={`mt-2 flex items-center gap-2 border-t pt-2 ${hasBackdrop ? 'border-white/5' : 'border-slate-200'}`}>
             <div className="relative h-5 w-14 shrink-0 opacity-80">
               <Image
                 src={CARSI_COURSE_LOGO_SRC}
@@ -433,7 +458,7 @@ export function CourseTextThumbnail({
                 aria-hidden
               />
             </div>
-            <p className="text-[8px] leading-tight tracking-wide text-white/35 uppercase">
+            <p className={`text-[8px] leading-tight tracking-wide uppercase ${hasBackdrop ? 'text-white/45' : 'text-slate-500'}`}>
               Restoration &amp; cleaning training · Australia
             </p>
           </div>

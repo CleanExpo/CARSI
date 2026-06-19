@@ -1,20 +1,20 @@
 /**
- * Design Tokens - Scientific Luxury Tier
+ * Design Tokens - CARSI Campus
  * Centralised constants for the design system
  *
  * @see docs/DESIGN_SYSTEM.md for full documentation
  */
 
 // =============================================================================
-// SPECTRAL COLOURS
+// CAMPUS COLOURS
 // =============================================================================
 
 export const SPECTRAL = {
-  cyan: '#00F5FF',
-  emerald: '#00FF88',
-  amber: '#FFB800',
-  red: '#FF4444',
-  magenta: '#FF00FF',
+  cyan: '#146FC2',
+  emerald: '#15803D',
+  amber: '#D97706',
+  red: '#DC2626',
+  magenta: '#A21CAF',
   grey: '#6B7280',
 } as const;
 
@@ -25,14 +25,14 @@ export type SpectralColour = keyof typeof SPECTRAL;
 // =============================================================================
 
 export const BACKGROUNDS = {
-  /** True OLED black */
-  primary: '#050505',
+  /** App background */
+  primary: '#F6F8FB',
   /** Elevated surface */
-  elevated: 'rgba(255, 255, 255, 0.01)',
+  elevated: '#FFFFFF',
   /** Hover state */
-  hover: 'rgba(255, 255, 255, 0.02)',
+  hover: '#EEF7FF',
   /** Active/pressed state */
-  active: 'rgba(255, 255, 255, 0.03)',
+  active: '#DCEEFF',
 } as const;
 
 // =============================================================================
@@ -40,12 +40,12 @@ export const BACKGROUNDS = {
 // =============================================================================
 
 export const TEXT = {
-  primary: 'rgba(255, 255, 255, 0.9)',
-  secondary: 'rgba(255, 255, 255, 0.7)',
-  tertiary: 'rgba(255, 255, 255, 0.5)',
-  muted: 'rgba(255, 255, 255, 0.4)',
-  subtle: 'rgba(255, 255, 255, 0.3)',
-  ghost: 'rgba(255, 255, 255, 0.2)',
+  primary: '#0F172A',
+  secondary: '#334155',
+  tertiary: '#475569',
+  muted: '#64748B',
+  subtle: '#94A3B8',
+  ghost: '#CBD5E1',
 } as const;
 
 // =============================================================================
@@ -53,9 +53,9 @@ export const TEXT = {
 // =============================================================================
 
 export const BORDERS = {
-  visible: 'rgba(255, 255, 255, 0.1)',
-  subtle: 'rgba(255, 255, 255, 0.06)',
-  ghost: 'rgba(255, 255, 255, 0.03)',
+  visible: 'rgba(15, 23, 42, 0.14)',
+  subtle: 'rgba(15, 23, 42, 0.1)',
+  ghost: 'rgba(15, 23, 42, 0.06)',
 } as const;
 
 // =============================================================================

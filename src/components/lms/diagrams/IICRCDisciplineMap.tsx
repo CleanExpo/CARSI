@@ -4,13 +4,13 @@ import Link from 'next/link';
 import { useCallback, useMemo, useState } from 'react';
 
 const DISCIPLINES = [
-  { id: 'WRT', label: 'WRT', fullName: 'Water Damage Restoration', color: '#2490ed', blurb: 'Drying, psychrometry & flood response.' },
-  { id: 'CRT', label: 'CRT', fullName: 'Carpet Repair & Reinstallation', color: '#26c4a0', blurb: 'Repair, re-stretch & installation standards.' },
-  { id: 'ASD', label: 'ASD', fullName: 'Applied Structural Drying', color: '#6c63ff', blurb: 'Building drying & moisture control.' },
-  { id: 'OCT', label: 'OCT', fullName: 'Odour Control', color: '#9b59b6', blurb: 'Deodorisation & indoor air quality.' },
-  { id: 'CCT', label: 'CCT', fullName: 'Commercial Carpet Maintenance', color: '#17b8d4', blurb: 'Commercial carpet care & maintenance.' },
-  { id: 'FSRT', label: 'FSRT', fullName: 'Fire & Smoke Restoration', color: '#f05a35', blurb: 'Fire, smoke & soot remediation.' },
-  { id: 'AMRT', label: 'AMRT', fullName: 'Applied Microbial Remediation', color: '#27ae60', blurb: 'Mould & microbial remediation.' },
+  { id: 'WRT', label: 'WRT', fullName: 'Water Damage Restoration', color: '#0f5fa8', blurb: 'Drying, psychrometry & flood response.' },
+  { id: 'CRT', label: 'CRT', fullName: 'Carpet Repair & Reinstallation', color: '#047857', blurb: 'Repair, re-stretch & installation standards.' },
+  { id: 'ASD', label: 'ASD', fullName: 'Applied Structural Drying', color: '#5145cd', blurb: 'Building drying & moisture control.' },
+  { id: 'OCT', label: 'OCT', fullName: 'Odour Control', color: '#7e22ce', blurb: 'Deodorisation & indoor air quality.' },
+  { id: 'CCT', label: 'CCT', fullName: 'Commercial Carpet Maintenance', color: '#0e7490', blurb: 'Commercial carpet care & maintenance.' },
+  { id: 'FSRT', label: 'FSRT', fullName: 'Fire & Smoke Restoration', color: '#b94723', blurb: 'Fire, smoke & soot remediation.' },
+  { id: 'AMRT', label: 'AMRT', fullName: 'Applied Microbial Remediation', color: '#15803d', blurb: 'Mould & microbial remediation.' },
 ] as const;
 
 const VB_W = 560;
@@ -49,15 +49,15 @@ export function IICRCDisciplineMap() {
 
   return (
     <div className="flex flex-col gap-6 lg:gap-8">
-      <div className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-[#060a12] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+      <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
         <div
           className="pointer-events-none absolute inset-0 opacity-90"
           aria-hidden
           style={{
             background: `
-              radial-gradient(ellipse 70% 55% at 50% 42%, rgba(36, 144, 237, 0.14), transparent 62%),
-              radial-gradient(ellipse 50% 40% at 80% 20%, rgba(108, 99, 255, 0.08), transparent 50%),
-              radial-gradient(ellipse 45% 35% at 15% 75%, rgba(38, 196, 160, 0.06), transparent 50%)
+              radial-gradient(ellipse 70% 55% at 50% 42%, rgba(15, 95, 168, 0.12), transparent 62%),
+              radial-gradient(ellipse 50% 40% at 80% 20%, rgba(81, 69, 205, 0.08), transparent 50%),
+              radial-gradient(ellipse 45% 35% at 15% 75%, rgba(4, 120, 87, 0.06), transparent 50%)
             `,
           }}
         />
@@ -65,8 +65,8 @@ export function IICRCDisciplineMap() {
           className="pointer-events-none absolute inset-0 opacity-[0.12]"
           aria-hidden
           style={{
-            backgroundImage: `linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)`,
+            backgroundImage: `linear-gradient(rgba(15,23,42,0.045) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(15,23,42,0.045) 1px, transparent 1px)`,
             backgroundSize: '32px 32px',
           }}
         />
@@ -75,7 +75,7 @@ export function IICRCDisciplineMap() {
           className="relative z-[1] mx-auto w-full max-w-[min(100%,520px)]"
           style={{ aspectRatio: `${VB_W} / ${VB_H}` }}
           role="group"
-          aria-label="Interactive map of seven IICRC certification disciplines around a central IICRC hub"
+          aria-label="Interactive map of seven IICRC CEC disciplines around a central IICRC hub"
         >
         <svg
           viewBox={`0 0 ${VB_W} ${VB_H}`}
@@ -95,12 +95,12 @@ export function IICRCDisciplineMap() {
               </feMerge>
             </filter>
             <linearGradient id="iicrc-centre-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#38a8ff" />
-              <stop offset="100%" stopColor="#1a6bb8" />
+              <stop offset="0%" stopColor="#0f5fa8" />
+              <stop offset="100%" stopColor="#0b4e88" />
             </linearGradient>
             <radialGradient id="orbit-fade" cx="50%" cy="50%" r="50%">
-              <stop offset="70%" stopColor="rgba(255,255,255,0.07)" />
-              <stop offset="100%" stopColor="rgba(255,255,255,0)" />
+              <stop offset="70%" stopColor="rgba(15,23,42,0.08)" />
+              <stop offset="100%" stopColor="rgba(15,23,42,0)" />
             </radialGradient>
           </defs>
 
@@ -110,7 +110,7 @@ export function IICRCDisciplineMap() {
             cy={CY}
             r={RADIUS}
             fill="none"
-            stroke="rgba(255,255,255,0.06)"
+            stroke="rgba(15,23,42,0.12)"
             strokeWidth={1}
             strokeDasharray="6 10"
           />
@@ -135,7 +135,7 @@ export function IICRCDisciplineMap() {
                 y1={CY}
                 x2={CX + x}
                 y2={CY + y}
-                stroke={isActive ? disc.color : 'rgba(255,255,255,0.1)'}
+                stroke={isActive ? disc.color : 'rgba(15,23,42,0.16)'}
                 strokeWidth={isActive ? 2.2 : 1}
                 strokeDasharray={isActive ? '0' : '5 6'}
                 opacity={isActive ? 1 : 0.85}
@@ -175,7 +175,7 @@ export function IICRCDisciplineMap() {
                 )}
                 <circle
                   r={NODE_R}
-                  fill={isActive ? disc.color : 'rgba(8,12,20,0.92)'}
+                  fill={isActive ? disc.color : '#ffffff'}
                   stroke={disc.color}
                   strokeWidth={isActive ? 2.2 : 1.4}
                   filter="url(#iicrc-node-shadow)"
@@ -183,7 +183,7 @@ export function IICRCDisciplineMap() {
                   style={{ transition: 'fill 220ms ease, stroke-width 220ms ease' }}
                 />
                 {isActive && (
-                  <circle r={NODE_R - 6} fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth={0.75} />
+                  <circle r={NODE_R - 6} fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth={0.75} />
                 )}
                 <text
                   y={1}
@@ -203,16 +203,9 @@ export function IICRCDisciplineMap() {
 
           {/* Centre hub */}
           <g filter="url(#iicrc-node-shadow)">
-            <circle cx={CX} cy={CY} r={CENTRE_R + 6} fill="none" stroke="rgba(36,144,237,0.25)" strokeWidth={1} strokeDasharray="4 6" />
+            <circle cx={CX} cy={CY} r={CENTRE_R + 6} fill="none" stroke="rgba(15,95,168,0.25)" strokeWidth={1} strokeDasharray="4 6" />
             <circle cx={CX} cy={CY} r={CENTRE_R} fill="url(#iicrc-centre-grad)" opacity={0.98} />
-            <circle
-              cx={CX}
-              cy={CY}
-              r={CENTRE_R}
-              fill="none"
-              stroke="rgba(255,255,255,0.22)"
-              strokeWidth={1.25}
-            />
+            <circle cx={CX} cy={CY} r={CENTRE_R} fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth={1.25} />
             <text
               x={CX}
               y={CY - 7}
@@ -258,7 +251,7 @@ export function IICRCDisciplineMap() {
               onFocus={() => setHover(disc.id)}
               onBlur={() => setHover(null)}
               onClick={() => toggleLock(disc.id)}
-              className="absolute cursor-pointer rounded-full border-0 bg-transparent p-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#060a12]"
+              className="absolute cursor-pointer rounded-full border-0 bg-transparent p-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0f5fa8] focus-visible:ring-offset-2 focus-visible:ring-offset-white"
               style={{
                 left: `${leftPct}%`,
                 top: `${topPct}%`,
@@ -271,7 +264,7 @@ export function IICRCDisciplineMap() {
         })}
         </div>
 
-        <p className="relative z-[1] px-4 pb-4 text-center text-[11px] text-white/35">
+        <p className="relative z-[1] px-4 pb-4 text-center text-[11px] text-slate-600">
           Hover on desktop or tap a node on mobile — tap again to clear.
         </p>
       </div>
@@ -280,8 +273,8 @@ export function IICRCDisciplineMap() {
       <div
         className={`rounded-2xl border px-5 py-5 transition-all duration-300 sm:px-6 sm:py-6 ${
           active
-            ? 'border-white/15 bg-gradient-to-br from-white/[0.08] to-white/[0.02] shadow-[0_20px_60px_-40px_rgba(36,144,237,0.35)]'
-            : 'border-white/[0.06] bg-white/[0.02]'
+            ? 'border-slate-200 bg-white shadow-sm'
+            : 'border-slate-200 bg-white'
         }`}
         style={active ? { borderColor: `${active.color}44` } : undefined}
       >
@@ -290,31 +283,31 @@ export function IICRCDisciplineMap() {
             <div className="min-w-0">
               <div className="mb-2 flex flex-wrap items-center gap-2">
                 <span
-                  className="rounded-md px-2 py-0.5 font-mono text-xs font-bold text-white"
-                  style={{ backgroundColor: `${active.color}33`, color: active.color }}
+                  className="rounded-md px-2 py-0.5 font-mono text-xs font-bold"
+                  style={{ backgroundColor: `${active.color}18`, color: active.color }}
                 >
                   {active.label}
                 </span>
-                <span className="text-[10px] font-semibold tracking-wider text-white/35 uppercase">
-                  Certification track
+                <span className="text-[10px] font-semibold tracking-wider text-slate-600 uppercase">
+                  CEC track
                 </span>
               </div>
-              <h3 className="text-lg font-semibold leading-snug text-white sm:text-xl">{active.fullName}</h3>
-              <p className="mt-2 max-w-prose text-sm leading-relaxed text-white/50">{active.blurb}</p>
+              <h3 className="text-lg leading-snug font-semibold text-slate-950 sm:text-xl">{active.fullName}</h3>
+              <p className="mt-2 max-w-prose text-sm leading-relaxed text-slate-600">{active.blurb}</p>
             </div>
             <Link
               href={`/courses?discipline=${active.id}`}
-              className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold text-[#050505] transition-transform hover:scale-[1.02]"
-              style={{ backgroundColor: active.color, boxShadow: `0 10px 40px -12px ${active.color}88` }}
+              className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold text-white transition-transform hover:scale-[1.02]"
+              style={{ backgroundColor: '#0f5fa8', boxShadow: '0 10px 34px -16px rgba(15,95,168,0.5)' }}
             >
               Browse {active.label} courses
             </Link>
           </div>
         ) : (
           <div className="flex flex-col items-center gap-2 py-2 text-center sm:py-4">
-            <p className="text-sm font-medium text-white/55">Select a discipline on the map</p>
-            <p className="max-w-md text-xs leading-relaxed text-white/35">
-              Each node is an IICRC pathway. We&apos;ll show the full certification name and a quick
+            <p className="text-sm font-medium text-slate-700">Select a discipline on the map</p>
+            <p className="max-w-md text-xs leading-relaxed text-slate-600">
+              Each node is an IICRC CEC pathway. We&apos;ll show the full discipline name and a quick
               link into the matching catalogue filter.
             </p>
           </div>
@@ -330,12 +323,12 @@ export function IICRCDisciplineMap() {
             onClick={() => setLocked((prev) => (prev === d.id ? null : d.id))}
             className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[11px] font-medium transition-all ${
               activeId === d.id
-                ? 'border-white/20 bg-white/10 text-white'
-                : 'border-white/8 bg-white/[0.03] text-white/45 hover:border-white/15 hover:text-white/70'
+                ? 'border-slate-300 bg-slate-100 text-slate-950'
+                : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:text-slate-950'
             }`}
           >
             <span className="h-2 w-2 rounded-full" style={{ backgroundColor: d.color }} aria-hidden />
-            <span className="font-mono font-bold" style={{ color: d.color }}>
+            <span className="font-mono font-bold text-slate-900">
               {d.label}
             </span>
           </button>

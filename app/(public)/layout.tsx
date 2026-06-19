@@ -6,7 +6,7 @@ import { Suspense, type ReactNode } from 'react';
 
 export default function PublicLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-screen bg-[#050505]">
+    <div className="min-h-screen bg-[#f6f8fb] text-slate-900">
       {/* Silent UTM attribution — no UI rendered */}
       <Suspense fallback={null}>
         <UtmCapture />

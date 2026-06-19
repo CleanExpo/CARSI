@@ -13,11 +13,11 @@ import { FAQSchema } from '@/components/seo/JsonLd';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Transport & Logistics IICRC Training | CARSI',
+  title: 'Transport & Logistics IICRC CEC Training | CARSI',
   description:
     'IICRC restoration training for Australian transport and logistics operations. WRT, CRT and OCT courses for vehicle interiors, warehouses, and loading dock maintenance.',
   keywords: [
-    'transport IICRC training Australia',
+    'transport IICRC CEC training Australia',
     'logistics warehouse restoration',
     'WRT water damage warehouse',
     'CRT carpet cleaning vehicle interiors',
@@ -40,12 +40,12 @@ const disciplines = [
 const stats = [
   { value: '50,000+', label: 'Transport Operators' },
   { value: 'Chain of', label: 'Responsibility' },
-  { value: 'IICRC', label: 'CEC Approved' },
+  { value: 'IICRC', label: 'CEC Accredited' },
 ];
 
 const faqs = [
   {
-    question: 'What IICRC training do Australian transport companies need?',
+    question: 'What IICRC CEC training do Australian transport companies need?',
     answer:
       'Australian transport and logistics operators benefit from WRT (Water Damage Restoration) for warehouse flooding and roof leak response, CRT (Carpet & Upholstery Cleaning) for vehicle interior maintenance across fleets, and OCT (Odour Control) for managing contamination odours in enclosed cargo areas and passenger vehicles. These certifications support Chain of Responsibility compliance and fleet asset protection.',
   },
@@ -62,7 +62,7 @@ const faqs = [
   {
     question: 'Can transport and logistics staff train online around shift schedules?',
     answer:
-      'Yes. CARSI delivers all IICRC CEC-approved courses online and self-paced. Drivers and warehouse staff can complete modules during downtime, between shifts, or during scheduled stand-down periods. All courses issue verifiable digital credentials on completion.',
+      'Yes. CARSI offers IICRC CEC accredited courses online and self-paced. Drivers and warehouse staff can complete modules during downtime, between shifts, or during scheduled stand-down periods. All courses issue verifiable digital credentials on completion.',
   },
 ];
 
@@ -71,7 +71,7 @@ const whyCards = [
     icon: Shield,
     title: 'Asset Protection',
     description:
-      'Warehoused goods, fleet vehicles, and loading infrastructure represent significant capital. IICRC training ensures rapid, standards-based response to water damage and contamination events.',
+      'Warehoused goods, fleet vehicles, and loading infrastructure represent significant capital. IICRC CEC training ensures rapid, standards-based response to water damage and contamination events.',
     color: '#1565C0',
   },
   {

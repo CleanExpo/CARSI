@@ -10,9 +10,9 @@ import { getBackendOrigin } from '@/lib/env/public-url';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'IICRC Learning Pathways — Which Restoration Certification Path Is Right for You? | CARSI',
+  title: 'IICRC CEC Learning Pathways — Which Restoration Course Path Is Right for You? | CARSI',
   description:
-    'Explore structured IICRC certification pathways for water restoration, mould remediation, carpet cleaning and more. Find the right learning path for your career stage and earn CECs in the correct order.',
+    'Explore structured IICRC CEC pathways for water restoration, mould remediation, carpet cleaning and more. Find the right learning path for your career stage and earn CECs in the correct order.',
 };
 
 interface Pathway {
@@ -56,14 +56,14 @@ export default async function PathwaysPage() {
             className="font-display text-3xl font-bold tracking-tight sm:text-4xl"
             style={{ color: 'rgba(255,255,255,0.92)' }}
           >
-            Certification Pathways
+            CEC Pathways
           </h1>
           <p
             className="mt-2 max-w-2xl text-sm leading-relaxed"
             style={{ color: 'rgba(255,255,255,0.62)' }}
           >
-            Structured learning journeys towards <AcronymTooltip term="IICRC" /> certification, team
-            readiness, CEC renewal and practical trade confidence.{' '}
+            Structured learning journeys for <AcronymTooltip term="IICRC" /> CEC renewal, team
+            readiness and practical trade confidence.{' '}
             {total > 0 && `${total} pathway${total !== 1 ? 's' : ''} available.`}
           </p>
         </header>

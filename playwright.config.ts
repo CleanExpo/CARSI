@@ -3,7 +3,9 @@ import { defineConfig, devices } from '@playwright/test';
 const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? 'http://localhost:3000';
 
 export default defineConfig({
-  testDir: './tests',
+  testDir: '.',
+  testMatch: ['tests/**/*.spec.ts', 'e2e/**/*.spec.ts'],
+  testIgnore: ['**/.next/**', '**/node_modules/**'],
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
@@ -15,16 +17,27 @@ export default defineConfig({
   },
   projects: [
     {
-      name: 'chromium',
+      name: 'desktop-chromium',
       use: { ...devices['Desktop Chrome'] },
     },
+    {
+      name: 'tablet-chromium',
+      use: {
+        ...devices['iPad (gen 7)'],
+      },
+    },
+    {
+      name: 'mobile-chromium',
+      use: {
+        ...devices['Pixel 5'],
+        viewport: { width: 390, height: 844 },
+      },
+    },
   ],
-  webServer: process.env.CI
-    ? {
-        command: 'npm run build && npm run start',
-        url: baseURL,
-        reuseExistingServer: false,
-        timeout: 180_000,
-      }
-    : undefined,
+  webServer: {
+    command: process.env.CI ? 'npm run build && npm run start' : 'npm run dev',
+    url: baseURL,
+    reuseExistingServer: !process.env.CI,
+    timeout: 180_000,
+  },
 });

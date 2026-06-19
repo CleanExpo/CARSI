@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 /* ============================================
-   GLASS DESIGN SYSTEM — ABYSSAL VISION
-   Deep space glassmorphic theme for CARSI LMS
+   CARSI CAMPUS DESIGN SYSTEM
+   Light-first professional LMS theme
    ============================================ */
 
 @layer base {
@@ -11,54 +11,54 @@
     --carsi-blue: 36 144 237;      /* #2490ed */
     --carsi-orange: 237 157 36;    /* #ed9d24 */
 
-    /* ── Glass surfaces ─────────────────────── */
-    --glass-bg: rgba(255 255 255 / 0.05);
-    --glass-bg-hover: rgba(255 255 255 / 0.08);
-    --glass-bg-active: rgba(255 255 255 / 0.11);
-    --glass-border: rgba(255 255 255 / 0.09);
+    /* ── Campus surfaces ───────────────────── */
+    --glass-bg: rgba(255 255 255 / 0.86);
+    --glass-bg-hover: rgba(255 255 255 / 0.96);
+    --glass-bg-active: rgba(235 245 255 / 0.95);
+    --glass-border: rgba(15 23 42 / 0.1);
     --glass-border-hover: rgba(36 144 237 / 0.35);
     --glass-border-active: rgba(36 144 237 / 0.6);
-    --glass-blur: blur(24px) saturate(180%);
-    --glass-blur-sm: blur(12px) saturate(160%);
+    --glass-blur: blur(18px) saturate(140%);
+    --glass-blur-sm: blur(8px) saturate(130%);
 
     /* ── Glow accents ───────────────────────── */
-    --glow-blue: 0 0 40px rgba(36 144 237 / 0.25);
-    --glow-blue-lg: 0 0 80px rgba(36 144 237 / 0.2);
-    --glow-orange: 0 0 40px rgba(237 157 36 / 0.3);
-    --glow-card-hover: 0 8px 40px rgba(36 144 237 / 0.15), 0 2px 8px rgba(0 0 0 / 0.5);
+    --glow-blue: 0 12px 36px rgba(36 144 237 / 0.16);
+    --glow-blue-lg: 0 20px 60px rgba(36 144 237 / 0.16);
+    --glow-orange: 0 14px 36px rgba(237 157 36 / 0.22);
+    --glow-card-hover: 0 18px 50px rgba(15 23 42 / 0.1), 0 8px 24px rgba(36 144 237 / 0.12);
 
-    /* ── Deep space background ──────────────── */
-    --bg-deep: #060a14;
-    --bg-surface: rgba(12 18 36 / 0.8);
-    --bg-elevated: rgba(18 28 56 / 0.6);
+    /* ── Campus background ─────────────────── */
+    --bg-deep: #f6f8fb;
+    --bg-surface: #ffffff;
+    --bg-elevated: #eef5fc;
 
     /* ── Text ───────────────────────────────── */
-    --text-primary: rgba(255 255 255 / 0.92);
-    --text-secondary: rgba(255 255 255 / 0.6);
-    --text-muted: rgba(255 255 255 / 0.35);
-    --text-accent: #2490ed;
-    --text-orange: #ed9d24;
+    --text-primary: #0f172a;
+    --text-secondary: #334155;
+    --text-muted: #64748b;
+    --text-accent: #146fc2;
+    --text-orange: #b65f00;
 
-    /* ── Shadcn tokens (dark glass) ─────────── */
-    --background: 222 47% 4%;
-    --foreground: 210 40% 95%;
-    --card: 222 47% 7%;
-    --card-foreground: 210 40% 95%;
-    --popover: 222 47% 7%;
-    --popover-foreground: 210 40% 95%;
-    --primary: 211 85% 54%;
-    --primary-foreground: 222 47% 4%;
-    --secondary: 217 33% 14%;
-    --secondary-foreground: 210 40% 95%;
-    --muted: 217 33% 12%;
-    --muted-foreground: 215 20% 55%;
+    /* ── Shadcn tokens (light campus) ───────── */
+    --background: 210 40% 98%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 207 83% 42%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 40% 94%;
+    --secondary-foreground: 222 47% 16%;
+    --muted: 210 40% 94%;
+    --muted-foreground: 215 16% 38%;
     --accent: 36 87% 54%;
-    --accent-foreground: 222 47% 4%;
+    --accent-foreground: 24 84% 10%;
     --destructive: 0 72% 51%;
-    --destructive-foreground: 210 40% 95%;
-    --border: 217 33% 14%;
-    --input: 217 33% 14%;
-    --ring: 211 85% 54%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 214 32% 88%;
+    --input: 214 32% 88%;
+    --ring: 207 83% 42%;
 
     /* ── Radius ─────────────────────────────── */
     --radius: 0.75rem;
@@ -83,10 +83,10 @@
     --duration-slow: 500ms;
 
     /* ── Shadows ───────────────────────────── */
-    --shadow-sm: 0 1px 3px rgba(0 0 0 / 0.4);
-    --shadow-md: 0 4px 12px rgba(0 0 0 / 0.5);
-    --shadow-lg: 0 10px 30px rgba(0 0 0 / 0.5);
-    --shadow-xl: 0 20px 50px rgba(0 0 0 / 0.6);
+    --shadow-sm: 0 1px 2px rgba(15 23 42 / 0.06);
+    --shadow-md: 0 8px 24px rgba(15 23 42 / 0.08);
+    --shadow-lg: 0 16px 42px rgba(15 23 42 / 0.1);
+    --shadow-xl: 0 28px 72px rgba(15 23 42 / 0.14);
     --shadow-glow: var(--glow-blue);
     --shadow-glow-accent: var(--glow-orange);
 
@@ -110,10 +110,10 @@
     --info: 199 89% 48%;
     --info-foreground: 0 0% 0%;
     --info-muted: 199 89% 15%;
-    --surface-elevated: 222 47% 11%;
-    --surface-recessed: 223 47% 6%;
-    --surface-overlay: 222 47% 14%;
-    --surface-glass: 222 47% 9% / 0.7;
+    --surface-elevated: 0 0% 100%;
+    --surface-recessed: 210 40% 96%;
+    --surface-overlay: 209 58% 97%;
+    --surface-glass: 0 0% 100% / 0.86;
 
     /* ── Gradients ──────────────────────────── */
     --gradient-brand: linear-gradient(135deg, #2490ed 0%, #38a8ff 100%);
@@ -121,11 +121,34 @@
     --gradient-glass: linear-gradient(135deg, rgba(255 255 255 / 0.08) 0%, rgba(255 255 255 / 0.03) 100%);
   }
 
-  /* Keep dark class in sync (we're permanently dark) */
   .dark {
-    --brand-primary: 211 85% 54%;
-    --brand-secondary: 36 87% 54%;
-    --brand-accent: 172 66% 50%;
+    --glass-bg: rgba(255 255 255 / 0.05);
+    --glass-bg-hover: rgba(255 255 255 / 0.08);
+    --glass-bg-active: rgba(255 255 255 / 0.11);
+    --glass-border: rgba(255 255 255 / 0.09);
+    --bg-deep: #060a14;
+    --bg-surface: rgba(12 18 36 / 0.8);
+    --bg-elevated: rgba(18 28 56 / 0.6);
+    --text-primary: rgba(255 255 255 / 0.92);
+    --text-secondary: rgba(255 255 255 / 0.68);
+    --text-muted: rgba(255 255 255 / 0.46);
+    --background: 222 47% 4%;
+    --foreground: 210 40% 95%;
+    --card: 222 47% 7%;
+    --card-foreground: 210 40% 95%;
+    --popover: 222 47% 7%;
+    --popover-foreground: 210 40% 95%;
+    --primary: 211 85% 54%;
+    --primary-foreground: 222 47% 4%;
+    --secondary: 217 33% 14%;
+    --secondary-foreground: 210 40% 95%;
+    --muted: 217 33% 12%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 36 87% 54%;
+    --accent-foreground: 222 47% 4%;
+    --border: 217 33% 14%;
+    --input: 217 33% 14%;
+    --ring: 211 85% 54%;
   }
 }
 
@@ -290,7 +313,7 @@
 
   html {
     scroll-behavior: smooth;
-    color-scheme: dark;
+    color-scheme: light;
   }
 
   body {
@@ -299,21 +322,20 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     font-feature-settings: "rlig" 1, "calt" 1;
-    /* Always dark — glassmorphism requires dark background */
     background-image:
-      radial-gradient(ellipse 80% 50% at 20% 10%, rgba(36 144 237 / 0.12) 0%, transparent 60%),
-      radial-gradient(ellipse 60% 40% at 80% 90%, rgba(237 157 36 / 0.08) 0%, transparent 60%);
+      radial-gradient(ellipse 80% 42% at 20% 0%, rgba(36 144 237 / 0.12) 0%, transparent 62%),
+      radial-gradient(ellipse 54% 36% at 85% 10%, rgba(237 157 36 / 0.1) 0%, transparent 58%);
     min-height: 100vh;
   }
 
   :focus-visible {
     outline: none;
-    box-shadow: 0 0 0 2px rgba(36 144 237 / 0.8);
+    box-shadow: 0 0 0 3px rgba(36 144 237 / 0.42);
   }
 
   ::selection {
-    background-color: rgba(36 144 237 / 0.25);
-    color: var(--text-primary);
+    background-color: rgba(36 144 237 / 0.18);
+    color: #0f172a;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -340,17 +362,17 @@
   }
 
   .glass-sm {
-    background: rgba(255 255 255 / 0.04);
+    background: rgba(255 255 255 / 0.78);
     backdrop-filter: var(--glass-blur-sm);
     -webkit-backdrop-filter: var(--glass-blur-sm);
-    border: 1px solid rgba(255 255 255 / 0.07);
+    border: 1px solid rgba(15 23 42 / 0.08);
   }
 
   .glass-strong {
-    background: rgba(255 255 255 / 0.09);
-    backdrop-filter: blur(32px) saturate(200%);
-    -webkit-backdrop-filter: blur(32px) saturate(200%);
-    border: 1px solid rgba(255 255 255 / 0.14);
+    background: rgba(255 255 255 / 0.94);
+    backdrop-filter: blur(18px) saturate(150%);
+    -webkit-backdrop-filter: blur(18px) saturate(150%);
+    border: 1px solid rgba(15 23 42 / 0.1);
   }
 
   /* ── Glass card with interactive state ──── */
@@ -359,7 +381,7 @@
     backdrop-filter: var(--glass-blur-sm);
     -webkit-backdrop-filter: var(--glass-blur-sm);
     border: 1px solid var(--glass-border);
-    box-shadow: 0 8px 32px rgba(0 0 0 / 0.45), inset 0 1px 0 rgba(255 255 255 / 0.08);
+    box-shadow: 0 14px 38px rgba(15 23 42 / 0.08), inset 0 1px 0 rgba(255 255 255 / 0.8);
     transition:
       background var(--duration-normal) var(--ease-smooth),
       border-color var(--duration-normal) var(--ease-smooth),
@@ -370,8 +392,8 @@
   .glass-card:hover {
     background: var(--glass-bg-hover);
     border-color: var(--glass-border-hover);
-    box-shadow: var(--glow-card-hover), inset 0 1px 0 rgba(255 255 255 / 0.12);
-    transform: translateY(-3px);
+    box-shadow: var(--glow-card-hover), inset 0 1px 0 rgba(255 255 255 / 0.9);
+    transform: translateY(-2px);
   }
 
   /* ── 3D perspective tilt on hover ────────── */

@@ -101,7 +101,7 @@ export default async function Image() {
           lineHeight: 1.4,
         }}
       >
-        IICRC-approved CEC training for restoration professionals across Australia.
+        IICRC CEC accredited courses for restoration professionals across Australia.
       </p>
 
       {/* Stats row */}

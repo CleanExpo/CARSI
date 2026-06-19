@@ -12,11 +12,11 @@ import { IndustryRecommendedCourses } from '@/components/industries/IndustryReco
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Mining Site IICRC Restoration Training | CARSI',
+  title: 'Mining Site IICRC CEC Restoration Training | CARSI',
   description:
     'WHS-compliant IICRC restoration training for Australian mining operations. WRT, AMRT, and ASD courses for water damage, mould, and structural drying on remote sites.',
   keywords: [
-    'mining IICRC training Australia',
+    'mining IICRC CEC training Australia',
     'WHS compliance restoration',
     'WRT water damage mining',
     'AMRT mould remediation mining',
@@ -39,7 +39,7 @@ const disciplines = [
 const stats = [
   { value: '400+', label: 'Mining Operations' },
   { value: 'WHS', label: 'Act Compliance' },
-  { value: 'IICRC', label: 'CEC Approved' },
+  { value: 'IICRC', label: 'CEC Accredited' },
 ];
 
 const whyCards = [
@@ -47,7 +47,7 @@ const whyCards = [
     icon: Shield,
     title: 'WHS Compliance',
     description:
-      'Mining operations have strict WHS obligations. IICRC training demonstrates due diligence for water damage and mould hazard identification on site.',
+      'Mining operations have strict WHS obligations. IICRC CEC training demonstrates due diligence for water damage and mould hazard identification on site.',
     color: '#ed9d24',
   },
   {

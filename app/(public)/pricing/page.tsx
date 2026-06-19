@@ -1,12 +1,13 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+
 import { PricingTiers } from '@/components/pricing/PricingTiers';
 import { BreadcrumbSchema, FAQSchema } from '@/components/seo';
 
 export const metadata: Metadata = {
   title: 'Pricing | CARSI — Restoration Training Online',
   description:
-    'CARSI membership from $44/month — access IICRC CEC-approved restoration courses, track your credits, and earn verified certificates. Free Library available to all.',
+    'CARSI membership from $44/month — access IICRC CEC accredited restoration courses, track your credits, and earn verified CARSI certificates. Free Library available to all.',
   keywords: [
     'CARSI pricing',
     'restoration training membership',
@@ -44,7 +45,7 @@ const FAQ_ITEMS = [
   {
     question: 'Do CARSI courses count toward IICRC CECs?',
     answer:
-      "CARSI's catalogue of approximately 40 courses carries IICRC CEC approval. Your membership includes a CEC tracking dashboard that logs every credit you earn, broken down by discipline (WRT, CRT, OCT, ASD, CCT and more).",
+      "CARSI's catalogue includes IICRC CEC accredited courses where stated. Your membership includes a CEC tracking dashboard that logs completed credits, broken down by discipline (WRT, CRT, OCT, ASD, CCT and more).",
   },
   {
     question: 'What happens if my membership lapses?',
@@ -105,226 +106,128 @@ export default function PricingPage() {
       <BreadcrumbSchema items={breadcrumbs} />
       <FAQSchema questions={FAQ_ITEMS} />
 
-      <main className="min-h-screen bg-[#050505] px-4 py-16 text-white">
+      <main id="main-content" className="min-h-screen bg-[#f6f8fb] px-4 py-14 text-slate-900">
         <div className="mx-auto max-w-6xl">
-          {/* ── Hero ───────────────────────────────────────── */}
-          <section className="mb-16 text-center">
-            <h1 className="mb-4 text-4xl font-bold tracking-tight text-white md:text-5xl">
+          <section className="mb-12 text-center">
+            <p className="mb-3 inline-flex rounded-full border border-[#b8dbfb] bg-white px-3 py-1 text-xs font-semibold text-[#146fc2]">
+              Transparent CARSI access
+            </p>
+            <h1 className="text-4xl font-bold tracking-tight text-slate-950 md:text-5xl">
               Membership &amp; Pricing
             </h1>
-            <p className="mx-auto max-w-2xl text-lg leading-relaxed text-white/50">
-              For the cleaning and restoration industry. Start free — upgrade when you&apos;re
-              ready.
+            <p className="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-slate-600">
+              Start with the right access level for your learning goal, then upgrade when your team
+              or CEC needs grow.
             </p>
           </section>
 
           <section
-            aria-label="Carpet cleaning startup pathway"
-            className="mb-10 grid gap-5 rounded-sm border border-[#ed9d24]/20 bg-[#ed9d24]/[0.055] p-6 md:grid-cols-[1fr_auto] md:items-center"
+            aria-label="Course guidance"
+            className="mb-10 grid gap-5 rounded-xl border border-[#f2cf8f] bg-[#fff8ed] p-6 shadow-sm md:grid-cols-[1fr_auto] md:items-center"
           >
             <div>
-              <p className="mb-2 text-[11px] font-semibold tracking-[0.18em] text-[#ed9d24] uppercase">
+              <p className="mb-2 text-[11px] font-semibold tracking-[0.18em] text-[#7a3500] uppercase">
                 Not sure what to buy or learn first?
               </p>
-              <h2 className="text-xl font-semibold text-white">
-                Use the Start Smart pathway before choosing equipment, courses or a service model.
+              <h2 className="text-xl font-semibold text-slate-950">
+                Use the pathway guide before choosing courses or a service model.
               </h2>
-              <p className="mt-3 max-w-3xl text-sm leading-6 text-white/55">
-                If you are starting carpet cleaning with no experience, adding it to an existing
-                cleaning business, or buying a cleaning company, CARSI&apos;s Start Smart pages explain
-                the knowledge, quoting, chemistry and trust gaps to check before spending money.
+              <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
+                CARSI can help you choose by trade goal, CEC need, team rollout, or facility risk.
               </p>
             </div>
             <Link
-              href="/start-carpet-cleaning-business"
-              className="inline-flex items-center justify-center rounded-sm border border-[#ed9d24]/35 bg-[#ed9d24]/10 px-5 py-3 text-sm font-semibold text-[#ffcf7a] transition-colors hover:bg-[#ed9d24]/16"
+              href="/pathways"
+              className="inline-flex min-h-11 items-center justify-center rounded-lg bg-[#9a4a00] px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#7a3500]"
             >
-              Start Smart
+              Find my pathway
             </Link>
           </section>
 
           <PricingTiers />
 
-          {/* ── Legacy membership tiers (Free / Foundation / Growth) ── */}
           <section
             aria-label="Membership tiers"
             className="mb-16 grid grid-cols-1 gap-6 md:grid-cols-3"
           >
-            {/* Free Library */}
-            <div
-              className="flex flex-col rounded-sm border p-6"
-              style={{
-                borderColor: 'rgba(255,255,255,0.08)',
-                background: 'rgba(255,255,255,0.02)',
-              }}
-            >
-              <div className="mb-6">
-                <h2 className="mb-1 font-mono text-lg font-bold text-white">Free Library</h2>
-                <div className="flex items-baseline gap-1">
-                  <span className="font-mono text-3xl font-bold text-white">FREE</span>
-                </div>
-                <p className="mt-1 text-xs text-white/30">No card required</p>
-              </div>
-
-              <ul className="mb-8 flex flex-col gap-2.5 text-sm text-white/60">
-                {FREE_FEATURES.map((f) => (
-                  <li key={f} className="flex items-start gap-2">
-                    <span className="mt-0.5 flex-shrink-0 text-white/30">✓</span>
-                    {f}
-                  </li>
-                ))}
-              </ul>
-
-              <div className="mt-auto">
-                <Link
-                  href="/register"
-                  className="flex w-full items-center justify-center rounded-sm border border-white/[0.12] px-4 py-2.5 text-sm font-medium text-white/70 transition-colors hover:border-white/25 hover:text-white"
-                >
-                  Create Free Account
-                </Link>
-              </div>
-            </div>
-
-            {/* Foundation */}
-            <div
-              className="flex flex-col rounded-sm border p-6"
-              style={{
-                borderColor: 'rgba(36,144,237,0.3)',
-                background: 'rgba(36,144,237,0.04)',
-              }}
-            >
-              <div className="mb-6">
-                <h2 className="mb-1 font-mono text-lg font-bold text-white">Foundation</h2>
-                <div className="flex items-baseline gap-1">
-                  <span className="font-mono text-3xl font-bold text-white">$44</span>
-                  <span className="font-mono text-sm text-white/40">AUD / month</span>
-                </div>
-                <p className="mt-1 text-xs text-white/30">GST included · Cancel anytime</p>
-              </div>
-
-              <ul className="mb-8 flex flex-col gap-2.5 text-sm text-white/70">
-                {FOUNDATION_EXTRAS.map((f) => (
-                  <li key={f} className="flex items-start gap-2">
-                    <span className="mt-0.5 flex-shrink-0" style={{ color: '#2490ed' }}>
-                      ✓
-                    </span>
-                    {f}
-                  </li>
-                ))}
-              </ul>
-
-              <div className="mt-auto">
-                <Link
-                  href="/subscribe?plan=foundation"
-                  className="flex w-full items-center justify-center rounded-sm px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-                  style={{ background: '#2490ed' }}
-                >
-                  Start 7-Day Free Trial
-                </Link>
-                <p className="mt-2 text-center text-xs text-white/25">
-                  Card required. No charge for 7 days.
-                </p>
-              </div>
-            </div>
-
-            {/* Growth — highlighted */}
-            <div
-              className="relative flex flex-col rounded-sm border p-6"
-              style={{
-                borderColor: 'rgba(0,245,255,0.3)',
-                background:
-                  'linear-gradient(135deg, rgba(0,245,255,0.06) 0%, rgba(0,245,255,0.02) 100%)',
-              }}
-            >
-              {/* Most Popular badge */}
-              <div className="absolute -top-3 left-6">
-                <span
-                  className="rounded-sm px-3 py-1 text-xs font-semibold tracking-wide uppercase"
-                  style={{ background: '#00FF88', color: '#050505' }}
-                >
-                  Most Popular
-                </span>
-              </div>
-
-              <div className="mb-6">
-                <h2 className="mb-1 font-mono text-lg font-bold text-white">Growth</h2>
-                <div className="flex items-baseline gap-1">
-                  <span className="font-mono text-3xl font-bold text-white">$99</span>
-                  <span className="font-mono text-sm text-white/40">AUD / month</span>
-                </div>
-                <p className="mt-1 text-xs text-white/30">GST included · Cancel anytime</p>
-              </div>
-
-              <ul className="mb-8 flex flex-col gap-2.5 text-sm text-white/70">
-                {GROWTH_EXTRAS.map((f) => (
-                  <li key={f} className="flex items-start gap-2">
-                    <span className="mt-0.5 flex-shrink-0 text-[#00FF88]">✓</span>
-                    {f}
-                  </li>
-                ))}
-              </ul>
-
-              <div className="mt-auto">
-                <Link
-                  href="/subscribe?plan=growth"
-                  className="flex w-full items-center justify-center rounded-sm bg-[#00F5FF] px-4 py-2.5 text-sm font-semibold text-[#050505] transition-opacity hover:opacity-90"
-                >
-                  Start 7-Day Free Trial
-                </Link>
-                <p className="mt-2 text-center text-xs text-white/25">
-                  Card required. No charge for 7 days.
-                </p>
-              </div>
-            </div>
+            <MembershipCard
+              title="Free Library"
+              price="FREE"
+              priceSuffix="No card required"
+              features={FREE_FEATURES}
+              cta="Create Free Account"
+              href="/register"
+              tone="neutral"
+            />
+            <MembershipCard
+              title="Foundation"
+              price="$44"
+              priceSuffix="AUD / month"
+              helper="GST included · Cancel anytime"
+              features={FOUNDATION_EXTRAS}
+              cta="Start 7-Day Free Trial"
+              href="/subscribe?plan=foundation"
+              note="Card required. No charge for 7 days."
+              tone="blue"
+            />
+            <MembershipCard
+              title="Growth"
+              price="$99"
+              priceSuffix="AUD / month"
+              helper="GST included · Cancel anytime"
+              features={GROWTH_EXTRAS}
+              cta="Start 7-Day Free Trial"
+              href="/subscribe?plan=growth"
+              note="Card required. No charge for 7 days."
+              badge="Most Popular"
+              tone="green"
+            />
           </section>
 
-          {/* ── Per-Course CTA ─────────────────────────────── */}
           <section
             aria-label="Individual courses"
-            className="mb-16 flex flex-col items-start justify-between gap-4 rounded-sm border border-white/[0.06] bg-white/[0.02] p-6 sm:flex-row sm:items-center"
+            className="mb-16 flex flex-col items-start justify-between gap-4 rounded-lg border border-slate-200 bg-white p-6 shadow-sm sm:flex-row sm:items-center"
           >
             <div>
-              <h2 className="mb-1 text-base font-semibold text-white/85">Or pay per course</h2>
-              <p className="text-sm text-white/40">
+              <h2 className="mb-1 text-base font-semibold text-slate-950">Or pay per course</h2>
+              <p className="text-sm text-slate-600">
                 Not ready to subscribe? Enrol in individual courses at your own pace.
               </p>
             </div>
             <Link
               href="/courses"
-              className="inline-flex flex-shrink-0 items-center rounded-sm border border-[rgba(0,245,255,0.25)] bg-[rgba(0,245,255,0.08)] px-5 py-2.5 text-sm font-semibold text-[#00F5FF] transition-colors hover:bg-[rgba(0,245,255,0.14)]"
+              className="inline-flex min-h-11 shrink-0 items-center rounded-lg border border-[#b8dbfb] bg-[#eef7ff] px-5 py-2.5 text-sm font-semibold text-[#146fc2] transition-colors hover:bg-[#dceeff]"
             >
               View All Courses
             </Link>
           </section>
 
-          {/* ── FAQ ────────────────────────────────────────── */}
           <section aria-label="Frequently asked questions" className="mb-8">
-            <h2 className="mb-6 text-2xl font-bold text-white">Frequently Asked Questions</h2>
-            <div className="flex flex-col divide-y divide-white/[0.06]">
+            <h2 className="mb-6 text-2xl font-bold text-slate-950">Frequently Asked Questions</h2>
+            <div className="flex flex-col divide-y divide-slate-200 rounded-lg border border-slate-200 bg-white px-5 shadow-sm">
               {FAQ_ITEMS.map((item) => (
                 <details key={item.question} className="group py-4">
-                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-sm font-medium text-white/80 hover:text-white">
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-sm font-medium text-slate-800 hover:text-slate-950">
                     {item.question}
                     <span
-                      className="flex-shrink-0 text-white/30 transition-transform duration-200 group-open:rotate-45"
+                      className="shrink-0 text-slate-400 transition-transform duration-200 group-open:rotate-45"
                       aria-hidden="true"
                     >
                       +
                     </span>
                   </summary>
-                  <p className="mt-3 text-sm leading-relaxed text-white/45">{item.answer}</p>
+                  <p className="mt-3 text-sm leading-relaxed text-slate-600">{item.answer}</p>
                 </details>
               ))}
             </div>
           </section>
 
-          {/* ── Footer note ────────────────────────────────── */}
-          <p className="text-center text-xs text-white/20">
+          <p className="text-center text-xs text-slate-600">
             Prices in AUD. GST included. Billed monthly. Managed via Stripe — secure payment
             processing.
             <br />
             Questions?{' '}
-            <Link href="/contact" className="underline hover:text-white/50">
+            <Link href="/contact" className="font-medium text-[#146fc2] underline">
               Contact the CARSI team
             </Link>
             .
@@ -332,5 +235,90 @@ export default function PricingPage() {
         </div>
       </main>
     </>
+  );
+}
+
+function MembershipCard({
+  title,
+  price,
+  priceSuffix,
+  helper,
+  features,
+  cta,
+  href,
+  note,
+  badge,
+  tone,
+}: {
+  title: string;
+  price: string;
+  priceSuffix: string;
+  helper?: string;
+  features: string[];
+  cta: string;
+  href: string;
+  note?: string;
+  badge?: string;
+  tone: 'neutral' | 'blue' | 'green';
+}) {
+  const isBlue = tone === 'blue';
+  const isGreen = tone === 'green';
+
+  return (
+    <div
+      className="relative flex flex-col rounded-lg border bg-white p-6 shadow-sm"
+      style={{
+        borderColor: isBlue ? '#b8dbfb' : isGreen ? '#9fdab8' : 'rgba(15,23,42,0.1)',
+        background: isBlue ? '#f4faff' : isGreen ? '#f1fbf5' : '#ffffff',
+      }}
+    >
+      {badge ? (
+        <div className="absolute -top-3 left-6">
+          <span className="rounded-md bg-[#1b7f48] px-3 py-1 text-xs font-semibold tracking-wide text-white uppercase">
+            {badge}
+          </span>
+        </div>
+      ) : null}
+
+      <div className="mb-6">
+        <h2 className="mb-1 text-lg font-bold text-slate-950">{title}</h2>
+        <div className="flex items-baseline gap-1">
+          <span className="text-3xl font-bold text-slate-950">{price}</span>
+          {price !== 'FREE' ? (
+            <span className="text-sm text-slate-500">{priceSuffix}</span>
+          ) : null}
+        </div>
+        <p className="mt-1 text-xs text-slate-500">{helper ?? priceSuffix}</p>
+      </div>
+
+      <ul className="mb-8 flex flex-col gap-2.5 text-sm text-slate-600">
+        {features.map((feature) => (
+          <li key={feature} className="flex items-start gap-2">
+            <span
+              className="mt-0.5 shrink-0 font-semibold"
+              style={{ color: isGreen ? '#1b7f48' : isBlue ? '#146fc2' : '#64748b' }}
+            >
+              ✓
+            </span>
+            {feature}
+          </li>
+        ))}
+      </ul>
+
+      <div className="mt-auto">
+        <Link
+          href={href}
+          className="flex min-h-11 w-full items-center justify-center rounded-lg px-4 py-2.5 text-sm font-semibold transition-opacity hover:opacity-90"
+          style={{
+            background: isGreen ? '#1b7f48' : isBlue ? '#0f5fa8' : 'transparent',
+            color: isGreen || isBlue ? '#ffffff' : '#146fc2',
+            border: isGreen || isBlue ? 'none' : '1px solid rgba(15,95,168,0.35)',
+          }}
+        >
+          {cta}
+        </Link>
+        {note ? <p className="mt-2 text-center text-xs text-slate-500">{note}</p> : null}
+      </div>
+    </div>
   );
 }

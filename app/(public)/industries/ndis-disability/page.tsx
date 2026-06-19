@@ -13,11 +13,11 @@ import { FAQSchema } from '@/components/seo/JsonLd';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'IICRC Training for NDIS & Disability Services | CARSI Australia',
+  title: 'IICRC CEC Training for NDIS & Disability Services | CARSI Australia',
   description:
-    'Meet NDIS Practice Standards with IICRC mould and water damage certification. AMRT, WRT, and CRT training for disability support providers. Online, CEC approved.',
+    'Meet NDIS Practice Standards with IICRC mould and water damage certification. AMRT, WRT, and CRT training for disability support providers. Online, CEC accredited.',
   keywords: [
-    'NDIS IICRC training',
+    'NDIS IICRC CEC training',
     'disability services mould training Australia',
     'AMRT NDIS provider',
     'NDIS Practice Standards infection control',
@@ -40,12 +40,12 @@ const disciplines = [
 const stats = [
   { value: '600,000+', label: 'NDIS Participants (AUS)' },
   { value: 'NDIS', label: 'Practice Standards' },
-  { value: 'IICRC', label: 'CEC Approved' },
+  { value: 'IICRC', label: 'CEC Accredited' },
 ];
 
 const faqs = [
   {
-    question: 'What IICRC training do NDIS service providers need?',
+    question: 'What IICRC CEC training do NDIS service providers need?',
     answer:
       'NDIS providers supporting participants in supported independent living (SIL) or specialist disability accommodation (SDA) have a duty of care to maintain safe, hygienic environments. IICRC AMRT (Applied Microbial Remediation Technician) training covers mould identification, containment, and remediation — skills directly relevant to Module 3 of the NDIS Practice Standards (Supports Provision Environment). WRT training supports water damage response in participant homes and shared accommodation facilities.',
   },
@@ -78,7 +78,7 @@ const whyCards = [
     icon: Shield,
     title: 'Duty of Care Protection',
     description:
-      'NDIS participants are often immunocompromised. Documented IICRC training demonstrates due diligence, reducing organisational liability under the NDIS Act and WHS legislation.',
+      'NDIS participants are often immunocompromised. Documented IICRC CEC training demonstrates due diligence, reducing organisational liability under the NDIS Act and WHS legislation.',
     color: '#4a5aa8',
   },
   {

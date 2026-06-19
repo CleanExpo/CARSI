@@ -36,11 +36,11 @@ This document summarizes **what was built on the current local `main`** (recent 
 
 - Expanded **`/dashboard/student/profile`** (overview, account, IICRC & renewal).
 - **`/dashboard/settings`** hub (simplified to profile link after later refactor).
-- **`LMSIconRail` / `LMSContextPanel`:** Profile entry, avatar menu, active states.
+- **`LMSContextPanel`:** Profile entry, avatar menu, active states.
 - **`refreshUser`** after saves; **`/api/auth/me`** and **`/api/lms/auth/me`** aligned with DB fields where applicable.
 - Onboarding wizard completion redirect adjusted toward profile flow in `057a25d`.
 
-**Key files:** `app/(dashboard)/dashboard/student/profile/page.tsx`, `app/(dashboard)/dashboard/settings/page.tsx`, `src/components/layout/LMSIconRail.tsx`, `src/components/layout/LMSContextPanel.tsx`, `src/lib/dashboard-nav-active.ts`, `src/components/auth/auth-provider.tsx`, `app/api/lms/auth/me/route.ts`, `app/api/auth/me/route.ts`
+**Key files:** `app/(dashboard)/dashboard/student/profile/page.tsx`, `app/(dashboard)/dashboard/settings/page.tsx`, `src/components/layout/LMSContextPanel.tsx`, `src/lib/dashboard-nav-active.ts`, `src/components/auth/auth-provider.tsx`, `app/api/lms/auth/me/route.ts`, `app/api/auth/me/route.ts`
 
 ---
 

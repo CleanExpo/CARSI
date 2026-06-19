@@ -13,11 +13,11 @@ import { FAQSchema } from '@/components/seo/JsonLd';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Healthcare IICRC Training | CARSI',
+  title: 'Healthcare IICRC CEC Training | CARSI',
   description:
-    'NSQHS-aligned IICRC training for Australian hospitals. AMRT, WRT, FSRT and ASD courses supporting Standard 3 compliance and JCI accreditation.',
+    'NSQHS-aligned IICRC CEC training for Australian hospitals. AMRT, WRT, FSRT and ASD courses supporting Standard 3 compliance and JCI accreditation.',
   keywords: [
-    'healthcare IICRC training',
+    'healthcare IICRC CEC training',
     'hospital restoration training',
     'NSQHS Standard 3',
     'AMRT certification',
@@ -41,7 +41,7 @@ const disciplines = [
 const stats = [
   { value: '2,050+', label: 'Hospitals' },
   { value: 'NSQHS', label: 'Standard 3' },
-  { value: 'IICRC', label: 'CEC Approved' },
+  { value: 'IICRC', label: 'CEC Accredited' },
 ];
 
 const faqs = [
@@ -51,14 +51,14 @@ const faqs = [
       'Australian healthcare facilities typically require AMRT (Applied Microbial Remediation) for mould and infection control, WRT (Water Damage Restoration) for pipe bursts and flooding in clinical areas, and FSRT (Fire & Smoke Restoration) for emergency response. These certifications support NSQHS Standard 3 compliance and JCI accreditation audits.',
   },
   {
-    question: 'How does IICRC training support NSQHS Standard 3 compliance?',
+    question: 'How does IICRC CEC training support NSQHS Standard 3 compliance?',
     answer:
       'NSQHS Standard 3 (Preventing and Controlling Infections) requires healthcare facilities to demonstrate staff competency in infection prevention. IICRC AMRT certification provides verifiable evidence that environmental services teams are trained in mould identification, remediation protocols, and contamination prevention — all directly relevant to Standard 3 audit requirements.',
   },
   {
-    question: 'Can hospital maintenance staff complete IICRC training online?',
+    question: 'Can hospital maintenance staff complete IICRC CEC training online?',
     answer:
-      'Yes. CARSI delivers IICRC CEC-approved courses online and self-paced, designed to fit around 24/7 hospital shift patterns. Staff can complete modules between shifts without leaving the facility. All courses count toward IICRC Continuing Education Credits (CECs) and issue verifiable digital credentials on completion.',
+      'Yes. CARSI offers IICRC CEC accredited courses online and self-paced, designed to fit around 24/7 hospital shift patterns. Staff can complete modules between shifts without leaving the facility. Eligible courses count toward IICRC Continuing Education Credits (CECs) and issue verifiable digital credentials on completion.',
   },
   {
     question: 'What is mould remediation training for healthcare facilities?',

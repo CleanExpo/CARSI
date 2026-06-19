@@ -65,27 +65,26 @@ export function ContactForm({ leadContext }: { leadContext?: ContactLeadContext 
   }
 
   const fieldClass =
-    'w-full rounded-sm px-3 py-2.5 text-sm outline-none transition-colors placeholder:text-white/20 focus:border-[#2490ed]/60';
+    'w-full rounded-lg px-3 py-2.5 text-sm text-slate-900 outline-none transition-colors placeholder:text-slate-400 focus:border-[#2490ed]/60 focus:ring-2 focus:ring-[#2490ed]/15';
   const fieldStyle = {
-    background: 'rgba(255,255,255,0.04)',
-    border: '1px solid rgba(255,255,255,0.1)',
-    color: 'rgba(255,255,255,0.85)',
+    background: '#ffffff',
+    border: '1px solid rgba(15,23,42,0.14)',
+    color: '#0f172a',
   };
-  const labelStyle = { color: 'rgba(255,255,255,0.5)' };
+  const labelStyle = { color: '#334155' };
 
   if (status === 'success') {
     return (
       <div
-        className="flex min-h-[320px] flex-col items-center justify-center rounded-lg p-10 text-center"
+        className="flex min-h-[320px] flex-col items-center justify-center rounded-lg bg-white p-10 text-center shadow-sm"
         style={{
-          background: 'rgba(36,144,237,0.05)',
           border: '1px solid rgba(36,144,237,0.2)',
         }}
       >
-        <p className="mb-2 text-2xl font-bold" style={{ color: 'rgba(255,255,255,0.9)' }}>
-          Message sent ✓
+        <p className="mb-2 text-2xl font-bold text-slate-950">
+          Message sent
         </p>
-        <p className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
+        <p className="text-sm text-slate-600">
           {reference
             ? `Reference ${reference}. We reply within one business day.`
             : 'Thanks for reaching out. We reply within one business day.'}
@@ -97,8 +96,7 @@ export function ContactForm({ leadContext }: { leadContext?: ContactLeadContext 
             setReference(null);
             setForm(initialForm);
           }}
-          className="mt-6 rounded-sm px-4 py-2 text-xs font-medium transition-colors"
-          style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.6)' }}
+          className="mt-6 rounded-lg border border-slate-300 bg-white px-4 py-2 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-50"
         >
           Send another message
         </button>
@@ -118,13 +116,13 @@ export function ContactForm({ leadContext }: { leadContext?: ContactLeadContext 
     >
       {hasLeadContext ? (
         <div
-          className="rounded-sm p-4"
+          className="rounded-lg p-4"
           style={{
-            background: 'rgba(36,144,237,0.08)',
+            background: '#eef7ff',
             border: '1px solid rgba(36,144,237,0.22)',
           }}
         >
-          <p className="text-xs font-semibold tracking-wide uppercase" style={{ color: '#7ec5ff' }}>
+          <p className="text-xs font-semibold tracking-wide text-[#146fc2] uppercase">
             Lead context attached
           </p>
           <div className="mt-3 grid gap-2 sm:grid-cols-2">
@@ -136,11 +134,11 @@ export function ContactForm({ leadContext }: { leadContext?: ContactLeadContext 
             ]
               .filter(([, value]) => Boolean(value))
               .map(([label, value]) => (
-                <div key={label} className="rounded-sm bg-white/[0.04] px-3 py-2">
-                  <p className="text-[10px] font-semibold tracking-wide uppercase" style={{ color: 'rgba(255,255,255,0.36)' }}>
+                <div key={label} className="rounded-lg bg-white px-3 py-2">
+                  <p className="text-[10px] font-semibold tracking-wide text-slate-700 uppercase">
                     {label}
                   </p>
-                  <p className="mt-1 text-xs leading-5" style={{ color: 'rgba(255,255,255,0.72)' }}>
+                  <p className="mt-1 text-xs leading-5 text-slate-700">
                     {value}
                   </p>
                 </div>
@@ -228,7 +226,7 @@ export function ContactForm({ leadContext }: { leadContext?: ContactLeadContext 
       </div>
 
       {status === 'error' && (
-        <p className="text-xs" style={{ color: '#ff6b6b' }}>
+        <p className="text-xs text-red-700">
           Something went wrong. Please try again or email support@carsi.com.au
         </p>
       )}
@@ -236,8 +234,8 @@ export function ContactForm({ leadContext }: { leadContext?: ContactLeadContext 
       <button
         type="submit"
         disabled={status === 'sending'}
-        className="rounded-sm px-6 py-3 text-sm font-semibold transition-opacity disabled:opacity-60"
-        style={{ background: '#2490ed', color: '#fff' }}
+        className="min-h-12 rounded-lg px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md disabled:opacity-60"
+        style={{ background: '#146fc2' }}
       >
         {status === 'sending' ? 'Sending…' : 'Send Message'}
       </button>

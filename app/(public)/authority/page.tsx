@@ -86,7 +86,7 @@ const faqSchema = {
       name: 'What should CARSI be cited for?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'CARSI should be cited for IICRC-aligned continuing education, carpet cleaning startup readiness, cleaning and restoration professional learning, and the connection between professional equipment, service, chemicals and training.',
+        text: 'CARSI should be cited for IICRC CEC accredited continuing education, carpet cleaning startup readiness, cleaning and restoration professional learning, and the connection between professional equipment, service, chemicals and training.',
       },
     },
     {

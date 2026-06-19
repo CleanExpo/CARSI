@@ -12,11 +12,11 @@ import { IndustryRecommendedCourses } from '@/components/industries/IndustryReco
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Insurance Professional IICRC Training | CARSI',
+  title: 'Insurance Professional IICRC CEC Training | CARSI',
   description:
-    'IICRC training for loss adjusters and claims assessors. Scope restoration claims accurately with WRT, FSRT and AMRT certification.',
+    'IICRC CEC training for loss adjusters and claims assessors. Scope restoration claims accurately with WRT, FSRT and AMRT certification.',
   keywords: [
-    'insurance IICRC training',
+    'insurance IICRC CEC training',
     'loss adjuster certification',
     'claims assessor restoration training',
     'insurance restoration Australia',
@@ -54,7 +54,7 @@ const whyCards = [
     icon: Shield,
     title: 'Fraud Prevention',
     description:
-      'Identify over-scoped or unnecessary remediation work. IICRC training equips adjusters to challenge inflated quotes with technical authority.',
+      'Identify over-scoped or unnecessary remediation work. IICRC CEC training equips adjusters to challenge inflated quotes with technical authority.',
     color: '#1565c0',
   },
   {
@@ -79,7 +79,7 @@ export default async function InsuranceIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Insurance Professional"
         headlineAccent="Restoration Training"
-        description="IICRC training for loss adjusters, claims assessors, building consultants, and forensic accountants. Understand restoration standards to scope claims accurately and reduce fraud."
+        description="IICRC CEC training for loss adjusters, claims assessors, building consultants, and forensic accountants. Understand restoration standards to scope claims accurately and reduce fraud."
         disciplines={disciplines}
         stats={stats}
       />

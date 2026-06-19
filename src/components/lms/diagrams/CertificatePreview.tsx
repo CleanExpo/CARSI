@@ -250,7 +250,7 @@ export function CertificatePreview({
           </div>
 
           <p className="mt-5 text-[10px] text-white/30">
-            CARSI Learning · carsi.com.au · IICRC-aligned restoration education
+            CARSI Learning · carsi.com.au · IICRC CEC accredited restoration courses
           </p>
         </div>
       </div>

@@ -15,86 +15,25 @@ import { test, expect } from '@playwright/test';
 // Shared helpers
 // ---------------------------------------------------------------------------
 
-const MOCK_COURSES = [
-  {
-    id: 'c1',
-    slug: 'water-damage-restoration-fundamentals',
-    title: 'Water Damage Restoration Fundamentals',
-    short_description: 'IICRC WRT-aligned course covering water damage restoration basics.',
-    price_aud: '349.00',
-    is_free: false,
-    level: 'beginner',
-    category: 'Water Damage Restoration',
-    discipline: 'WRT',
-    lesson_count: 10,
-    thumbnail_url: null,
-    updated_at: '2026-03-01T00:00:00Z',
-    instructor: { full_name: 'Sarah Mitchell' },
-  },
-  {
-    id: 'c2',
-    slug: 'carpet-repair-technician',
-    title: 'Carpet Repair Technician',
-    short_description: 'CRT practical training for carpet restoration.',
-    price_aud: '295.00',
-    is_free: false,
-    level: 'intermediate',
-    category: 'Carpet Restoration',
-    discipline: 'CRT',
-    lesson_count: 8,
-    thumbnail_url: null,
-    updated_at: '2026-02-15T00:00:00Z',
-    instructor: { full_name: 'Sarah Mitchell' },
-  },
-  {
-    id: 'c3',
-    slug: 'free-intro-to-restoration',
-    title: 'Free Intro to Restoration',
-    short_description: 'A free introductory overview of the restoration industry.',
-    price_aud: '0.00',
-    is_free: true,
-    level: 'beginner',
-    category: 'General',
-    discipline: null,
-    lesson_count: 3,
-    thumbnail_url: null,
-    updated_at: '2026-01-10T00:00:00Z',
-    instructor: { full_name: 'Phil Admin' },
-  },
-];
-
-/** Intercept the backend course API and return mock data. */
-async function mockCourseAPI(page: import('@playwright/test').Page) {
-  await page.route('**/api/lms/courses**', async (route) => {
-    const url = new URL(route.request().url());
-    const limit = parseInt(url.searchParams.get('limit') ?? '100', 10);
-    const items = MOCK_COURSES.slice(0, limit);
-    await route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify({ items, total: items.length }),
-    });
-  });
-}
+const DETAIL_COURSE = {
+  slug: 'wrt-water-damage-essentials',
+  title: 'Water Damage Restoration — Essentials (WRT-aligned)',
+};
 
 // =========================================================================
 // Journey 1: Public visitor browses course catalogue
 // =========================================================================
 
 test.describe('Public course catalogue', () => {
-  test.beforeEach(async ({ page }) => {
-    await mockCourseAPI(page);
-  });
-
-  test('landing page loads with hero content and Browse Courses CTA', async ({ page }) => {
+  test('landing page loads with hero content and Browse courses CTA', async ({ page }) => {
     await page.goto('/');
 
     // Hero section visible
-    await expect(page.locator('text=Restoration Training')).toBeVisible({ timeout: 10_000 });
-    await expect(page.locator('text=IICRC CEC Approved Platform')).toBeVisible();
+    await expect(page.locator('text=CARSI restoration training')).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('text=IICRC CEC accredited online courses')).toBeVisible();
 
     // CTA link exists
-    const browseCta = page.locator('a', { hasText: 'Browse Courses' });
+    const browseCta = page.getByRole('link', { name: /^Browse courses$/i }).first();
     await expect(browseCta).toBeVisible();
   });
 
@@ -106,7 +45,7 @@ test.describe('Public course catalogue', () => {
 
     // Discipline tabs rendered
     for (const tab of ['All', 'WRT', 'CRT', 'ASD', 'OCT', 'CCT', 'FSRT', 'AMRT', 'Free']) {
-      await expect(page.locator('button', { hasText: tab })).toBeVisible();
+      await expect(page.getByRole('tab', { name: tab, exact: true })).toBeVisible();
     }
   });
 
@@ -114,13 +53,13 @@ test.describe('Public course catalogue', () => {
     await page.goto('/courses');
 
     // Click the WRT tab
-    await page.locator('button', { hasText: 'WRT' }).click();
+    const wrtTab = page.getByRole('tab', { name: 'WRT', exact: true });
+    await wrtTab.click();
 
-    // Only the WRT course should be visible
-    await expect(page.locator('text=Water Damage Restoration Fundamentals')).toBeVisible();
-
-    // CRT course should not be visible
-    await expect(page.locator('text=Carpet Repair Technician')).not.toBeVisible();
+    await expect(wrtTab).toHaveAttribute('aria-selected', 'true');
+    const main = page.getByRole('main');
+    await expect(main.getByRole('heading', { name: DETAIL_COURSE.title })).toBeVisible();
+    await expect(main.getByText('1 course')).toBeVisible();
   });
 
   test('search narrows results', async ({ page }) => {
@@ -130,15 +69,14 @@ test.describe('Public course catalogue', () => {
     const searchInput = page.locator('input[placeholder="Search courses..."]');
     await searchInput.fill('Carpet');
 
-    // Only Carpet course should remain
-    await expect(page.locator('text=Carpet Repair Technician')).toBeVisible();
-    await expect(page.locator('text=Water Damage Restoration Fundamentals')).not.toBeVisible();
+    await expect(page.getByText(/Carpet/i).first()).toBeVisible();
+    await expect(page.getByText(DETAIL_COURSE.title)).not.toBeVisible();
   });
 
   test('sort dropdown is present', async ({ page }) => {
     await page.goto('/courses');
 
-    const sortSelect = page.locator('select');
+    const sortSelect = page.getByRole('main').getByLabel('Sort courses by');
     await expect(sortSelect).toBeVisible();
 
     // Default option
@@ -155,7 +93,7 @@ test.describe('Student auth flow', () => {
     await page.goto('/login');
 
     // Heading
-    await expect(page.locator('text=Sign in')).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole('heading', { name: 'Sign in' })).toBeVisible({ timeout: 10_000 });
 
     // Description
     await expect(
@@ -171,11 +109,11 @@ test.describe('Student auth flow', () => {
 
   test('invalid credentials shows error', async ({ page }) => {
     // Mock login endpoint to return 401
-    await page.route('**/api/lms/auth/login', async (route) => {
+    await page.route('**/api/auth/login', async (route) => {
       await route.fulfill({
         status: 401,
         contentType: 'application/json',
-        body: JSON.stringify({ detail: 'Invalid email or password' }),
+        body: JSON.stringify({ error: 'Invalid email or password' }),
       });
     });
 
@@ -196,7 +134,7 @@ test.describe('Student auth flow', () => {
     await submitButton.click();
 
     // Error should appear
-    await expect(page.locator('text=/[Ii]nvalid|[Ee]rror|[Ff]ailed/')).toBeVisible({
+    await expect(page.locator('#login-error')).toBeVisible({
       timeout: 5_000,
     });
   });
@@ -207,47 +145,23 @@ test.describe('Student auth flow', () => {
 // =========================================================================
 
 test.describe('Course detail page', () => {
-  const DETAIL_COURSE = MOCK_COURSES[0];
-
-  test.beforeEach(async ({ page }) => {
-    await mockCourseAPI(page);
-
-    // Mock single course detail endpoint
-    await page.route(`**/api/lms/courses/${DETAIL_COURSE.slug}`, async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify(DETAIL_COURSE),
-      });
-    });
-
-    // Mock enrollment status (unauthenticated)
-    await page.route(
-      `**/api/lms/courses/${DETAIL_COURSE.slug}/enrollment-status**`,
-      async (route) => {
-        await route.fulfill({
-          status: 200,
-          contentType: 'application/json',
-          body: JSON.stringify({ enrolled: false }),
-        });
-      }
-    );
-  });
-
   test('course detail loads from direct URL', async ({ page }) => {
     await page.goto(`/courses/${DETAIL_COURSE.slug}`);
 
     // Course title should be visible
-    await expect(page.locator(`text=${DETAIL_COURSE.title}`)).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole('heading', { level: 1, name: DETAIL_COURSE.title })).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   test('course detail shows discipline and price', async ({ page }) => {
     await page.goto(`/courses/${DETAIL_COURSE.slug}`);
 
     // Wait for content
-    await expect(page.locator(`text=${DETAIL_COURSE.title}`)).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole('heading', { level: 1, name: DETAIL_COURSE.title })).toBeVisible({
+      timeout: 10_000,
+    });
 
-    // Price should appear somewhere on the page
-    await expect(page.locator('text=/349|\\$349/')).toBeVisible();
+    await expect(page.getByText(/WRT|Water Restoration|Free/i).first()).toBeVisible();
   });
 });

@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     template: '%s | CARSI',
   },
   description:
-    'IICRC-aligned CEC training for cleaning and restoration professionals in Australia. Earn recognised credits, track your progress, get certified.',
+    'IICRC CEC accredited courses for cleaning and restoration professionals in Australia. Earn continuing education credits, track your progress, and receive CARSI completion certificates.',
   keywords: [
     'restoration training',
     'IICRC CECs',
@@ -63,7 +63,7 @@ export const metadata: Metadata = {
     siteName: 'CARSI',
     title: 'CARSI | Restoration Training — IICRC CEC Platform',
     description:
-      'IICRC-aligned CEC training for cleaning and restoration professionals in Australia. Earn recognised credits, track your progress.',
+      'IICRC CEC accredited courses for cleaning and restoration professionals in Australia. Earn continuing education credits and track your progress.',
     images: [
       {
         url: `${siteUrl}/og-image.png`,
@@ -77,7 +77,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'CARSI | Restoration Training — IICRC CEC Platform',
     description:
-      'IICRC-aligned CEC training for cleaning and restoration professionals in Australia.',
+      'IICRC CEC accredited courses for cleaning and restoration professionals in Australia.',
     images: [`${siteUrl}/og-image.png`],
     creator: '@carsi_au',
   },
@@ -90,7 +90,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: '#ffffff' },
-    { media: '(prefers-color-scheme: dark)', color: '#0a0f1a' },
+    { media: '(prefers-color-scheme: dark)', color: '#f6f8fb' },
   ],
   width: 'device-width',
   initialScale: 1,
@@ -103,14 +103,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en-AU" className="dark" suppressHydrationWarning>
+    <html lang="en-AU" suppressHydrationWarning>
       <head>
         <OrganizationSchema />
         <WebsiteSchema />
       </head>
       <body className={`${outfit.variable} ${dmSans.variable} font-sans`} suppressHydrationWarning>
         <AuthProvider>
-          <ThemeProvider initialTheme="dark">
+          <ThemeProvider initialTheme="light">
             <ServiceWorkerRegistration />
             <a
               href="#main-content"

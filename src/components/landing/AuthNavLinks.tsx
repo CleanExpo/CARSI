@@ -18,7 +18,7 @@ export function AuthNavLinks({
 
   if (loading) {
     if (variant === 'desktop') {
-      return <span className="text-sm" style={{ color: 'rgba(255, 255, 255, 0.25)' }} aria-hidden>…</span>;
+      return <span className="text-sm text-slate-400" aria-hidden>...</span>;
     }
     return null;
   }
@@ -30,8 +30,7 @@ export function AuthNavLinks({
         <div className="flex items-center gap-4">
           <Link
             href="/dashboard"
-            className="max-w-[200px] truncate text-sm transition-colors duration-150 hover:text-white"
-            style={{ color: 'rgba(255, 255, 255, 0.75)' }}
+            className="max-w-[200px] truncate rounded-md px-2 py-2 text-sm font-medium text-slate-700 transition-colors duration-150 hover:bg-slate-100 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-[#2490ed]/40 focus-visible:outline-none"
             title={label}
           >
             {label}
@@ -39,8 +38,7 @@ export function AuthNavLinks({
           <button
             type="button"
             onClick={() => void signOut()}
-            className="text-sm transition-colors duration-150 hover:text-white"
-            style={{ color: 'rgba(255, 255, 255, 0.45)' }}
+            className="rounded-md px-2 py-2 text-sm font-medium text-slate-500 transition-colors duration-150 hover:bg-slate-100 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-[#2490ed]/40 focus-visible:outline-none"
           >
             Sign out
           </button>
@@ -51,22 +49,20 @@ export function AuthNavLinks({
     return (
       <div
         className="mt-4 space-y-2 border-t pt-4"
-        style={{ borderColor: 'rgba(255, 255, 255, 0.08)' }}
+        style={{ borderColor: 'rgba(15, 23, 42, 0.1)' }}
       >
         <div
-          className="rounded-md px-4 py-2 text-center text-sm"
-          style={{ color: 'rgba(255, 255, 255, 0.85)' }}
+          className="rounded-md px-4 py-2 text-center text-sm font-medium text-slate-700"
         >
           {label}
         </div>
         <Link
           href="/dashboard"
           onClick={() => onNavigate?.()}
-          className="block rounded-md px-4 py-3 text-center text-base font-medium transition-colors duration-150"
+          className="block min-h-11 rounded-md px-4 py-3 text-center text-base font-semibold text-white transition-colors duration-150"
           style={{
-            color: 'rgba(255, 255, 255, 0.85)',
-            background: 'rgba(36, 144, 237, 0.15)',
-            border: '1px solid rgba(36, 144, 237, 0.25)',
+            background: '#146fc2',
+            border: '1px solid rgba(20, 111, 194, 0.35)',
           }}
         >
           Dashboard
@@ -77,11 +73,10 @@ export function AuthNavLinks({
             void signOut();
             onNavigate?.();
           }}
-          className="w-full rounded-md px-4 py-3 text-center text-base font-medium transition-colors duration-150"
+          className="w-full min-h-11 rounded-md px-4 py-3 text-center text-base font-semibold text-slate-700 transition-colors duration-150 hover:bg-slate-100"
           style={{
-            color: 'rgba(255, 255, 255, 0.7)',
-            background: 'rgba(255, 255, 255, 0.05)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
+            background: '#f8fafc',
+            border: '1px solid rgba(15, 23, 42, 0.12)',
           }}
         >
           Sign out
@@ -96,16 +91,15 @@ export function AuthNavLinks({
         <Link
           href="/login"
           onClick={() => onNavigate?.()}
-          className="text-sm transition-colors duration-150 hover:text-white"
-          style={{ color: 'rgba(255, 255, 255, 0.5)' }}
+          className="rounded-md px-2 py-2 text-sm font-medium text-slate-600 transition-colors duration-150 hover:bg-slate-100 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-[#2490ed]/40 focus-visible:outline-none"
         >
           Sign In
         </Link>
         <Link
           href="/courses"
           onClick={() => onNavigate?.()}
-          className="rounded-sm px-4 py-2 text-sm font-medium text-white transition-all duration-200 hover:scale-[1.02]"
-          style={{ background: '#ed9d24' }}
+          className="rounded-md px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md focus-visible:ring-2 focus-visible:ring-[#ed9d24]/45 focus-visible:outline-none"
+          style={{ background: '#9a4a00' }}
         >
           Browse Courses
         </Link>
@@ -116,16 +110,15 @@ export function AuthNavLinks({
   return (
     <div
       className="mt-4 space-y-2 border-t pt-4"
-      style={{ borderColor: 'rgba(255, 255, 255, 0.08)' }}
+      style={{ borderColor: 'rgba(15, 23, 42, 0.1)' }}
     >
       <Link
         href="/login"
         onClick={() => onNavigate?.()}
-        className="block rounded-md px-4 py-3 text-center text-base font-medium transition-colors duration-150"
+        className="block min-h-11 rounded-md px-4 py-3 text-center text-base font-semibold text-slate-700 transition-colors duration-150 hover:bg-slate-100"
         style={{
-          color: 'rgba(255, 255, 255, 0.7)',
-          background: 'rgba(255, 255, 255, 0.05)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
+          background: '#f8fafc',
+          border: '1px solid rgba(15, 23, 42, 0.12)',
         }}
       >
         Sign In
@@ -133,8 +126,8 @@ export function AuthNavLinks({
       <Link
         href="/courses"
         onClick={() => onNavigate?.()}
-        className="block rounded-md px-4 py-3 text-center text-base font-medium text-white transition-opacity duration-150 hover:opacity-90"
-        style={{ background: '#ed9d24' }}
+        className="block min-h-11 rounded-md px-4 py-3 text-center text-base font-semibold text-white transition-opacity duration-150 hover:opacity-90"
+        style={{ background: '#9a4a00' }}
       >
         Browse Courses
       </Link>

@@ -9,7 +9,11 @@ import FloatingChat from '@/components/lms/FloatingChat';
 export default function FloatingChatGate() {
   const pathname = usePathname();
 
-  if (pathname === '/events/ccw-roadshow') {
+  if (
+    pathname === '/events/ccw-roadshow' ||
+    pathname === '/courses' ||
+    pathname.startsWith('/dashboard/courses')
+  ) {
     return null;
   }
 

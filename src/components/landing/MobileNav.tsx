@@ -42,11 +42,7 @@ const itemVariants = {
 const navItems = [
   { href: '/courses', label: 'Courses' },
   { href: '/pathways', label: 'Pathways' },
-  { href: '/start-carpet-cleaning-business', label: 'Start Smart' },
-  { href: '/industries', label: 'Industries' },
   { href: '/pricing', label: 'Pricing' },
-  { href: '/authority', label: 'Authority' },
-  { href: '/about', label: 'About' },
   { href: '/contact', label: 'Contact' },
 ];
 
@@ -81,9 +77,9 @@ export default function MobileNav() {
       {/* Hamburger button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative z-50 flex h-10 w-10 items-center justify-center rounded-md transition-colors duration-150"
+        className="relative z-50 flex h-11 w-11 items-center justify-center rounded-md text-slate-700 transition-colors duration-150 hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-[#2490ed]/40 focus-visible:outline-none"
         style={{
-          background: isOpen ? 'rgba(255,255,255,0.1)' : 'transparent',
+          background: isOpen ? 'rgba(36,144,237,0.1)' : 'transparent',
         }}
         aria-label={isOpen ? 'Close menu' : 'Open menu'}
         aria-expanded={isOpen}
@@ -97,7 +93,7 @@ export default function MobileNav() {
               exit={{ rotate: 90, opacity: 0 }}
               transition={{ duration: 0.2 }}
             >
-              <X className="h-5 w-5" style={{ color: 'rgba(255,255,255,0.9)' }} />
+              <X className="h-5 w-5" />
             </motion.div>
           ) : (
             <motion.div
@@ -107,7 +103,7 @@ export default function MobileNav() {
               exit={{ rotate: -90, opacity: 0 }}
               transition={{ duration: 0.2 }}
             >
-              <Menu className="h-5 w-5" style={{ color: 'rgba(255,255,255,0.7)' }} />
+              <Menu className="h-5 w-5" />
             </motion.div>
           )}
         </AnimatePresence>
@@ -124,7 +120,7 @@ export default function MobileNav() {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
               className="fixed inset-0 z-40"
-              style={{ background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(4px)' }}
+              style={{ background: 'rgba(15,23,42,0.34)', backdropFilter: 'blur(4px)' }}
               onClick={() => setIsOpen(false)}
             />
 
@@ -134,11 +130,11 @@ export default function MobileNav() {
               initial="closed"
               animate="open"
               exit="closed"
-              className="fixed top-14 right-0 left-0 z-40 mx-3 overflow-hidden rounded-lg"
+              className="fixed top-[76px] right-0 left-0 z-40 mx-3 overflow-hidden rounded-xl"
               style={{
-                background: 'rgba(12,18,30,0.98)',
-                border: '1px solid rgba(255,255,255,0.14)',
-                boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)',
+                background: 'rgba(255,255,255,0.98)',
+                border: '1px solid rgba(15,23,42,0.12)',
+                boxShadow: '0 25px 50px -18px rgba(15,23,42,0.28)',
               }}
             >
               <nav className="p-4">
@@ -154,17 +150,7 @@ export default function MobileNav() {
                       <Link
                         href={item.href}
                         onClick={() => setIsOpen(false)}
-                        className="block rounded-md px-4 py-3 text-base font-medium transition-colors duration-150 hover:text-white"
-                        style={{
-                          color: 'rgba(255,255,255,0.82)',
-                          background: 'transparent',
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.background = 'transparent';
-                        }}
+                        className="block min-h-11 rounded-md px-4 py-3 text-base font-semibold text-slate-800 transition-colors duration-150 hover:bg-slate-100 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-[#2490ed]/40 focus-visible:outline-none"
                       >
                         {item.label}
                       </Link>

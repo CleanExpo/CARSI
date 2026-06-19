@@ -13,11 +13,11 @@ import { FAQSchema } from '@/components/seo/JsonLd';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Aged Care IICRC Training | CARSI',
+  title: 'Aged Care IICRC CEC Training | CARSI',
   description:
-    'NQF-compliant IICRC training for aged care facilities. CRT and AMRT courses for carpet restoration, mould remediation, and infection control.',
+    'NQF-compliant IICRC CEC training for aged care facilities. CRT and AMRT courses for carpet restoration, mould remediation, and infection control.',
   keywords: [
-    'aged care IICRC training',
+    'aged care IICRC CEC training',
     'NQF compliance training',
     'residential care cleaning certification',
     'AMRT aged care',
@@ -39,7 +39,7 @@ const disciplines = [
 const stats = [
   { value: '15,000+', label: 'Aged Care Facilities' },
   { value: 'NQF', label: 'Compliance Requirement' },
-  { value: 'IICRC', label: 'CEC Approved' },
+  { value: 'IICRC', label: 'CEC Accredited' },
 ];
 
 const faqs = [
@@ -49,14 +49,14 @@ const faqs = [
       'Australian aged care facilities typically require CRT (Carpet Restoration) for high-traffic flooring maintenance and AMRT (Applied Microbial Remediation) for mould and infection control. These certifications support National Quality Framework compliance and demonstrate competency to aged care auditors.',
   },
   {
-    question: 'How does IICRC training support Aged Care Quality Standards?',
+    question: 'How does IICRC CEC training support Aged Care Quality Standards?',
     answer:
       'The Aged Care Quality Standards require facilities to demonstrate safe, clean environments for residents. IICRC AMRT certification provides verifiable evidence that cleaning teams are trained in mould identification, remediation protocols, and infection prevention — directly relevant to Standard 3 (Personal Care and Clinical Care) compliance.',
   },
   {
-    question: 'Can aged care staff complete IICRC training around shift work?',
+    question: 'Can aged care staff complete IICRC CEC training around shift work?',
     answer:
-      'Yes. CARSI delivers IICRC CEC-approved courses online and self-paced, designed to fit around 24/7 aged care operations. Staff can complete modules between shifts without leaving the facility. All courses issue verifiable digital credentials on completion.',
+      'Yes. CARSI offers IICRC CEC accredited courses online and self-paced, designed to fit around 24/7 aged care operations. Staff can complete modules between shifts without leaving the facility. All courses issue verifiable digital credentials on completion.',
   },
 ];
 
@@ -65,7 +65,7 @@ const whyCards = [
     icon: Shield,
     title: 'NQF Compliance',
     description:
-      'Meet National Quality Framework infection control requirements with IICRC-aligned training for cleaning and maintenance teams.',
+      'Meet National Quality Framework infection control requirements with IICRC CEC accredited courses for cleaning and maintenance teams.',
     color: '#27ae60',
   },
   {

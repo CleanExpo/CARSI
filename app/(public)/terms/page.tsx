@@ -30,7 +30,7 @@ export default function TermsPage() {
             </h2>
             <p>
               CARSI provides online education and training courses primarily for the restoration and
-              cleaning industry. Our courses include IICRC-approved Continuing Education Credit
+              cleaning industry. Our courses include IICRC CEC accredited Continuing Education Credit
               (CEC) courses and general professional development content.
             </p>
             <p>

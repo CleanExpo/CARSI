@@ -10,9 +10,12 @@ const smoothEase: [number, number, number, number] = [0.4, 0, 0.2, 1];
 
 const DISCIPLINE_TABS = ['All', 'WRT', 'CRT', 'ASD', 'OCT', 'CCT', 'FSRT', 'AMRT', 'Free'] as const;
 type DisciplineTab = (typeof DISCIPLINE_TABS)[number];
+type PriceFilter = 'all' | 'free' | 'paid';
+type CecFilter = 'all' | 'has-cec';
+type DurationFilter = 'all' | 'short' | 'medium' | 'long';
 
 const tabColors: Record<string, string> = {
-  WRT: '#2490ed',
+  WRT: '#0f5fa8',
   CRT: '#26c4a0',
   ASD: '#6c63ff',
   OCT: '#9b59b6',
@@ -86,6 +89,26 @@ function matchesDiscipline(course: Course, tab: DisciplineTab): boolean {
   return false;
 }
 
+function normalizedLevel(course: Course): string {
+  return course.level?.trim().toLowerCase() || 'all levels';
+}
+
+function courseDurationHours(course: Course): number | null {
+  const raw = course.duration_hours;
+  if (!raw) return null;
+  const n = Number.parseFloat(String(raw));
+  return Number.isFinite(n) ? n : null;
+}
+
+function matchesDuration(course: Course, filter: DurationFilter): boolean {
+  if (filter === 'all') return true;
+  const hours = courseDurationHours(course);
+  if (hours == null) return false;
+  if (filter === 'short') return hours <= 1;
+  if (filter === 'medium') return hours > 1 && hours <= 3;
+  return hours > 3;
+}
+
 export function CourseGrid({
   courses,
   initialTab = 'All',
@@ -99,12 +122,16 @@ export function CourseGrid({
 
   const [activeTab, setActiveTab] = useState<DisciplineTab>(validInitial);
   const [searchQuery, setSearchQuery] = useState('');
+  const [levelFilter, setLevelFilter] = useState('all');
+  const [priceFilter, setPriceFilter] = useState<PriceFilter>('all');
+  const [cecFilter, setCecFilter] = useState<CecFilter>('all');
+  const [durationFilter, setDurationFilter] = useState<DurationFilter>('all');
   const [sortBy, setSortBy] = useState<SortKey>(() => {
     if (initialSortBy === 'modules') return showModulesSort ? 'modules' : 'updated';
     if (initialSortBy === 'price') return 'price';
     if (initialSortBy === 'updated') return 'updated';
     if (initialSortBy === 'title') return 'title';
-    return 'title';
+    return 'updated';
   });
   const didFallbackTab = useRef(false);
 
@@ -119,44 +146,70 @@ export function CourseGrid({
     }
   }, [courses, loading, validInitial]);
 
+  const levelOptions = useMemo(() => {
+    const levels = new Set<string>();
+    for (const course of courses) {
+      const level = normalizedLevel(course);
+      if (level !== 'all levels') levels.add(level);
+    }
+    return [...levels].sort((a, b) => a.localeCompare(b));
+  }, [courses]);
+
   const filtered = useMemo(() => {
     const q = searchQuery.toLowerCase();
     const base = courses.filter(
-      (c) =>
-        matchesDiscipline(c, activeTab) &&
+      (c) => {
+        const p = priceNum(c.price_aud);
+        const priceMatches =
+          priceFilter === 'all' ||
+          (priceFilter === 'free' ? c.is_free === true || p === 0 : p > 0);
+        const levelMatches = levelFilter === 'all' || normalizedLevel(c) === levelFilter;
+        const cecMatches = cecFilter === 'all' || Boolean(c.cec_hours?.trim());
+
+        return (
+          matchesDiscipline(c, activeTab) &&
+          priceMatches &&
+          levelMatches &&
+          cecMatches &&
+          matchesDuration(c, durationFilter) &&
         (q === '' ||
           c.title.toLowerCase().includes(q) ||
           (c.short_description ?? '').toLowerCase().includes(q))
+        );
+      }
     );
     return sortCourses(base, sortBy);
-  }, [courses, activeTab, searchQuery, sortBy]);
+  }, [courses, activeTab, searchQuery, sortBy, levelFilter, priceFilter, cecFilter, durationFilter]);
 
   return (
     <div>
       {/* Discipline tab bar */}
       <div
-        className="scrollbar-hide mb-5 flex overflow-x-auto"
+        className="scrollbar-hide mb-5 flex gap-2 overflow-x-auto rounded-lg border border-slate-200 bg-white p-1"
         role="tablist"
         aria-label="Filter by discipline"
-        style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}
       >
         {DISCIPLINE_TABS.map((tab) => {
           const isActive = activeTab === tab;
-          const accentColor = tabColors[tab] ?? '#2490ed';
+          const accentColor = tabColors[tab] ?? '#0f5fa8';
           return (
             <button
               key={tab}
               role="tab"
               aria-selected={isActive}
               onClick={() => setActiveTab(tab)}
-              className="relative min-h-[44px] px-4 py-3 text-sm font-medium whitespace-nowrap transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
-              style={isActive ? { color: accentColor } : { color: 'rgba(255,255,255,0.4)' }}
+              className="relative min-h-[44px] rounded-md px-4 py-2.5 text-sm font-semibold whitespace-nowrap transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2490ed]/40"
+              style={
+                isActive
+                  ? { color: accentColor, background: 'rgba(15,95,168,0.08)' }
+                  : { color: '#475569' }
+              }
             >
               {tab}
               {isActive && (
                 <span
                   className="absolute right-0 bottom-0 left-0 h-0.5 rounded-full"
-                  style={{ background: accentColor, boxShadow: `0 0 8px ${accentColor}` }}
+                  style={{ background: accentColor }}
                 />
               )}
             </button>
@@ -165,12 +218,12 @@ export function CourseGrid({
       </div>
 
       {/* Search + sort */}
-      <div className="mb-6 flex flex-col items-stretch justify-between gap-3 sm:flex-row sm:items-center">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          <div className="relative w-full sm:w-auto">
+      <div className="mb-6 grid gap-3 lg:grid-cols-[minmax(220px,1fr)_auto] lg:items-end">
+        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-[minmax(220px,1.3fr)_repeat(4,minmax(130px,0.8fr))]">
+          <div className="relative">
             <Search
               className="absolute top-1/2 left-3 h-3.5 w-3.5 -translate-y-1/2"
-              style={{ color: 'rgba(255,255,255,0.3)' }}
+              style={{ color: '#64748b' }}
             />
             <input
               type="text"
@@ -178,49 +231,78 @@ export function CourseGrid({
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search courses..."
               aria-label="Search courses"
-              className="w-full rounded-lg py-2 pr-4 pl-9 text-sm transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/50 sm:w-56"
-              style={{
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                color: 'rgba(255,255,255,0.8)',
-              }}
-              onFocus={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(36,144,237,0.5)';
-                e.currentTarget.style.boxShadow = '0 0 0 3px rgba(36,144,237,0.1)';
-              }}
-              onBlur={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
-                e.currentTarget.style.boxShadow = 'none';
-              }}
+              className="h-11 w-full rounded-lg border border-slate-300 bg-white py-2 pr-4 pl-9 text-sm text-slate-900 shadow-sm transition focus:border-[#2490ed] focus:ring-2 focus:ring-[#2490ed]/20 focus:outline-none"
             />
           </div>
-          <div
-            className="flex items-center gap-1.5 text-sm whitespace-nowrap"
-            style={{ color: 'rgba(255,255,255,0.6)' }}
+
+          <select
+            value={levelFilter}
+            onChange={(e) => setLevelFilter(e.target.value)}
+            aria-label="Filter by level"
+            className="h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-800 shadow-sm focus:border-[#2490ed] focus:ring-2 focus:ring-[#2490ed]/20 focus:outline-none"
           >
+            <option value="all">All levels</option>
+            {levelOptions.map((level) => (
+              <option key={level} value={level}>
+                {level[0]?.toUpperCase()}
+                {level.slice(1)}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={priceFilter}
+            onChange={(e) => setPriceFilter(e.target.value as PriceFilter)}
+            aria-label="Filter by price"
+            className="h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-800 shadow-sm focus:border-[#2490ed] focus:ring-2 focus:ring-[#2490ed]/20 focus:outline-none"
+          >
+            <option value="all">All pricing</option>
+            <option value="free">Free</option>
+            <option value="paid">Paid</option>
+          </select>
+
+          <select
+            value={cecFilter}
+            onChange={(e) => setCecFilter(e.target.value as CecFilter)}
+            aria-label="Filter by CEC availability"
+            className="h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-800 shadow-sm focus:border-[#2490ed] focus:ring-2 focus:ring-[#2490ed]/20 focus:outline-none"
+          >
+            <option value="all">All CECs</option>
+            <option value="has-cec">CEC eligible</option>
+          </select>
+
+          <select
+            value={durationFilter}
+            onChange={(e) => setDurationFilter(e.target.value as DurationFilter)}
+            aria-label="Filter by duration"
+            className="h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-800 shadow-sm focus:border-[#2490ed] focus:ring-2 focus:ring-[#2490ed]/20 focus:outline-none"
+          >
+            <option value="all">Any duration</option>
+            <option value="short">1h or less</option>
+            <option value="medium">1-3h</option>
+            <option value="long">3h+</option>
+          </select>
+        </div>
+
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center lg:justify-end">
+          <div className="flex items-center gap-1.5 text-sm font-medium whitespace-nowrap text-slate-600">
             <SlidersHorizontal className="h-3.5 w-3.5" />
             <span>
               {filtered.length} course{filtered.length !== 1 ? 's' : ''}
             </span>
           </div>
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as SortKey)}
+            aria-label="Sort courses by"
+            className="h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-800 shadow-sm focus:border-[#2490ed] focus:ring-2 focus:ring-[#2490ed]/20 focus:outline-none sm:w-auto"
+          >
+            <option value="updated">Recently updated</option>
+            {showModulesSort ? <option value="modules">Most modules</option> : null}
+            <option value="price">Price low-high</option>
+            <option value="title">Title A-Z</option>
+          </select>
         </div>
-
-        <select
-          value={sortBy}
-          onChange={(e) => setSortBy(e.target.value as SortKey)}
-          aria-label="Sort courses by"
-          className="w-full rounded-lg px-3 py-2 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/50 sm:w-auto"
-          style={{
-            background: 'rgba(255,255,255,0.05)',
-            border: '1px solid rgba(255,255,255,0.1)',
-            color: 'rgba(255,255,255,0.7)',
-          }}
-        >
-          <option value="updated">Recently Updated</option>
-          {showModulesSort ? <option value="modules">Most modules</option> : null}
-          <option value="price">Price</option>
-          <option value="title">Title A–Z</option>
-        </select>
       </div>
 
       {/* Grid */}
@@ -241,7 +323,7 @@ export function CourseGrid({
         </div>
       ) : (
         <div className="py-20 text-center">
-          <p className="text-sm" style={{ color: 'rgba(255,255,255,0.6)' }}>
+          <p className="text-sm text-slate-600">
             No courses found{searchQuery ? ` for "${searchQuery}"` : ''}.
           </p>
         </div>

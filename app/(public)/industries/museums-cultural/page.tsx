@@ -13,11 +13,11 @@ import { FAQSchema } from '@/components/seo/JsonLd';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Museums & Cultural Institutions IICRC Training | CARSI',
+  title: 'Museums & Cultural Institutions IICRC CEC Training | CARSI',
   description:
     'Heritage preservation and artifact protection training for Australian museums, galleries, and cultural institutions. AMRT, WRT and ASD courses for climate-controlled environments.',
   keywords: [
-    'museum IICRC training Australia',
+    'museum IICRC CEC training Australia',
     'heritage preservation restoration',
     'artifact protection water damage',
     'AMRT mould remediation museum',
@@ -40,24 +40,24 @@ const disciplines = [
 const stats = [
   { value: '1,200+', label: 'Museums & Galleries' },
   { value: 'ISO', label: '11799 Aligned' },
-  { value: 'IICRC', label: 'CEC Approved' },
+  { value: 'IICRC', label: 'CEC Accredited' },
 ];
 
 const faqs = [
   {
-    question: 'What IICRC training do Australian museums need for heritage preservation?',
+    question: 'What IICRC CEC training do Australian museums need for heritage preservation?',
     answer:
       'Australian museums and cultural institutions benefit most from AMRT (Applied Microbial Remediation) for mould prevention in collection storage, WRT (Water Damage Restoration) for emergency response to leaks or flooding near artefacts, and ASD (Applied Structural Drying) for controlling moisture in climate-sensitive exhibition spaces. These certifications support ISO 11799 and AICCM guidelines for collection care.',
   },
   {
-    question: 'How does mould affect museum collections and how does IICRC training help?',
+    question: 'How does mould affect museum collections and how does IICRC CEC training help?',
     answer:
       'Mould poses a critical threat to paper, textile, and organic artefacts in museum storage. IICRC AMRT training teaches staff to identify microbial growth early, implement containment protocols, and remediate without damaging collection items. For Australian institutions in humid coastal climates, this training is essential for preventive conservation programs.',
   },
   {
-    question: 'Can gallery and museum staff complete IICRC training online?',
+    question: 'Can gallery and museum staff complete IICRC CEC training online?',
     answer:
-      'Yes. CARSI delivers all IICRC CEC-approved courses online and self-paced, ideal for museum staff who need to maintain building operations during opening hours. Courses can be completed around exhibition schedules and issue verifiable digital credentials on completion.',
+      'Yes. CARSI offers IICRC CEC accredited courses online and self-paced, ideal for museum staff who need to maintain building operations during opening hours. Courses can be completed around exhibition schedules and issue verifiable digital credentials on completion.',
   },
   {
     question: 'What is the emergency response protocol for water damage in a museum?',
@@ -71,7 +71,7 @@ const whyCards = [
     icon: Shield,
     title: 'Heritage Preservation',
     description:
-      'Protect irreplaceable artefacts and collection items. IICRC training equips staff with standards-based response protocols aligned to AICCM conservation guidelines.',
+      'Protect irreplaceable artefacts and collection items. IICRC CEC training equips staff with standards-based response protocols aligned to AICCM conservation guidelines.',
     color: '#8B6914',
   },
   {

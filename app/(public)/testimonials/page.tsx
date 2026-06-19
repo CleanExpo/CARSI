@@ -17,7 +17,7 @@ const TESTIMONIALS: Testimonial[] = [
     name: 'Shannon Benz',
     company: 'Mould Solutions Group',
     quote:
-      "CARSI's mould remediation courses gave my team the IICRC-aligned knowledge we needed to tackle complex jobs with confidence. The CEC credit tracking is clear and the content is genuinely practical — not just theory.",
+      "CARSI's mould remediation courses gave my team the IICRC CEC knowledge we needed to tackle complex jobs with confidence. The CEC credit tracking is clear and the content is genuinely practical — not just theory.",
   },
   {
     name: 'Yasser Mohamed',
@@ -41,7 +41,7 @@ const TESTIMONIALS: Testimonial[] = [
     name: 'Kayla McGowan',
     company: 'Restoration and Remediation Magazine',
     quote:
-      "As someone who covers the restoration industry professionally, I've seen many training providers. CARSI stands out for the depth of their IICRC-aligned content and their genuine commitment to raising industry standards.",
+      "As someone who covers the restoration industry professionally, I've seen many training providers. CARSI stands out for the depth of their IICRC CEC course content and their genuine commitment to raising industry standards.",
   },
   {
     name: 'Lisa Lavender',

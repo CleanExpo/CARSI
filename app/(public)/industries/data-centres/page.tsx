@@ -13,11 +13,11 @@ import { FAQSchema } from '@/components/seo/JsonLd';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Data Centre IICRC Training | CARSI',
+  title: 'Data Centre IICRC CEC Training | CARSI',
   description:
     'IICRC restoration training for Australian data centres. WRT, ASD and FSRT courses for water damage prevention, climate control recovery, and fire suppression system response.',
   keywords: [
-    'data centre IICRC training Australia',
+    'data centre IICRC CEC training Australia',
     'water damage prevention data centre',
     'WRT restoration data centre',
     'ASD structural drying server room',
@@ -40,7 +40,7 @@ const disciplines = [
 const stats = [
   { value: '300+', label: 'Data Centres' },
   { value: 'Uptime', label: 'Institute Tier III+' },
-  { value: 'IICRC', label: 'CEC Approved' },
+  { value: 'IICRC', label: 'CEC Accredited' },
 ];
 
 const faqs = [
@@ -60,9 +60,9 @@ const faqs = [
       'After clean agent or water mist suppression activation, residue and moisture must be professionally removed to prevent corrosion and equipment failure. IICRC FSRT training covers post-suppression assessment, residue cleanup, and air quality restoration. Combined with ASD for moisture management, this ensures rapid return to operational status.',
   },
   {
-    question: 'Can data centre operations staff complete IICRC training without downtime?',
+    question: 'Can data centre operations staff complete IICRC CEC training without downtime?',
     answer:
-      'Yes. CARSI delivers all IICRC CEC-approved courses online and self-paced. NOC and facility staff can complete modules during scheduled maintenance windows or between shifts. All courses issue verifiable digital credentials on completion.',
+      'Yes. CARSI offers IICRC CEC accredited courses online and self-paced. NOC and facility staff can complete modules during scheduled maintenance windows or between shifts. All courses issue verifiable digital credentials on completion.',
   },
 ];
 
@@ -71,7 +71,7 @@ const whyCards = [
     icon: Shield,
     title: 'Uptime Protection',
     description:
-      'Every minute of downtime costs thousands. IICRC training ensures your facility team can respond to water and fire events within minutes, protecting SLA commitments and Uptime Institute tier compliance.',
+      'Every minute of downtime costs thousands. IICRC CEC training ensures your facility team can respond to water and fire events within minutes, protecting SLA commitments and Uptime Institute tier compliance.',
     color: '#6A1B9A',
   },
   {

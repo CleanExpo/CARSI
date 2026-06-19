@@ -142,28 +142,21 @@ export function CECCalculator() {
 
   return (
     <section
-      className="rounded-xl p-5 sm:p-6"
-      style={{
-        background: 'rgba(255,255,255,0.03)',
-        border: '1px solid rgba(255,255,255,0.06)',
-      }}
+      className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6"
     >
       <div className="mb-5 flex items-center gap-3">
         <div
           className="flex h-10 w-10 items-center justify-center rounded-lg"
-          style={{ background: 'rgba(36,144,237,0.15)' }}
+          style={{ background: '#eef7ff' }}
           aria-hidden="true"
         >
           <Calculator className="h-5 w-5" style={{ color: '#2490ed' }} />
         </div>
         <div>
-          <h2
-            className="font-display text-lg font-semibold"
-            style={{ color: 'rgba(255,255,255,0.88)' }}
-          >
+          <h2 className="font-display text-lg font-semibold text-slate-950">
             Calculate Your CEC Needs
           </h2>
-          <p className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
+          <p className="text-xs text-slate-600">
             Find out how many Continuing Education Credits you need
           </p>
         </div>
@@ -174,8 +167,7 @@ export function CECCalculator() {
         <div className="space-y-2">
           <Label
             htmlFor="cec-discipline"
-            className="flex items-center gap-1.5 text-xs font-medium"
-            style={{ color: 'rgba(255,255,255,0.6)' }}
+            className="flex items-center gap-1.5 text-xs font-medium text-slate-700"
           >
             <GraduationCap className="h-3.5 w-3.5" aria-hidden="true" />
             Target Discipline
@@ -183,16 +175,15 @@ export function CECCalculator() {
           <Select value={discipline} onValueChange={(val) => setDiscipline(val as Discipline)}>
             <SelectTrigger
               id="cec-discipline"
-              className="h-10 border-white/10 bg-white/[0.04] text-sm"
-              style={{ color: 'rgba(255,255,255,0.85)' }}
+              className="h-10 border-slate-300 bg-white text-sm text-slate-900"
             >
               <SelectValue placeholder="Select discipline" />
             </SelectTrigger>
-            <SelectContent className="border-white/10 bg-[#0c1224]">
+            <SelectContent className="border-slate-200 bg-white text-slate-900">
               {DISCIPLINES.map((d) => (
                 <SelectItem key={d.code} value={d.code} className="text-sm">
                   <span className="font-medium">{d.code}</span>
-                  <span className="ml-1.5" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                  <span className="ml-1.5 text-slate-600">
                     — {d.name}
                   </span>
                 </SelectItem>
@@ -205,8 +196,7 @@ export function CECCalculator() {
         <div className="space-y-2">
           <Label
             htmlFor="cec-level"
-            className="flex items-center gap-1.5 text-xs font-medium"
-            style={{ color: 'rgba(255,255,255,0.6)' }}
+            className="flex items-center gap-1.5 text-xs font-medium text-slate-700"
           >
             <Award className="h-3.5 w-3.5" aria-hidden="true" />
             Current Certification
@@ -214,12 +204,11 @@ export function CECCalculator() {
           <Select value={certLevel} onValueChange={(val) => setCertLevel(val as CertLevel)}>
             <SelectTrigger
               id="cec-level"
-              className="h-10 border-white/10 bg-white/[0.04] text-sm"
-              style={{ color: 'rgba(255,255,255,0.85)' }}
+              className="h-10 border-slate-300 bg-white text-sm text-slate-900"
             >
               <SelectValue placeholder="Select level" />
             </SelectTrigger>
-            <SelectContent className="border-white/10 bg-[#0c1224]">
+            <SelectContent className="border-slate-200 bg-white text-slate-900">
               {CERT_LEVELS.map((l) => (
                 <SelectItem key={l.value} value={l.value} className="text-sm">
                   {l.label}
@@ -233,8 +222,7 @@ export function CECCalculator() {
         <div className="space-y-2">
           <Label
             htmlFor="cec-earned"
-            className="flex items-center gap-1.5 text-xs font-medium"
-            style={{ color: 'rgba(255,255,255,0.6)' }}
+            className="flex items-center gap-1.5 text-xs font-medium text-slate-700"
           >
             <BookOpen className="h-3.5 w-3.5" aria-hidden="true" />
             CECs Earned This Cycle
@@ -246,8 +234,7 @@ export function CECCalculator() {
             max={99}
             value={cecsEarned}
             onChange={(e) => setCecsEarned(Math.max(0, parseInt(e.target.value) || 0))}
-            className="h-10 border-white/10 bg-white/[0.04] text-sm"
-            style={{ color: 'rgba(255,255,255,0.85)' }}
+            className="h-10 border-slate-300 bg-white text-sm text-slate-900"
           />
         </div>
       </div>
@@ -257,8 +244,8 @@ export function CECCalculator() {
         <div
           className="mt-5 rounded-lg p-4"
           style={{
-            background: 'rgba(255,255,255,0.02)',
-            border: '1px solid rgba(255,255,255,0.05)',
+            background: '#f8fafc',
+            border: '1px solid rgba(15,23,42,0.08)',
           }}
         >
           {certLevel === 'none' ? (
@@ -270,16 +257,16 @@ export function CECCalculator() {
                   style={{ color: '#2490ed' }}
                   aria-hidden="true"
                 />
-                <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.7)' }}>
+                <p className="text-sm leading-relaxed text-slate-700">
                   To earn your{' '}
-                  <strong style={{ color: '#2490ed' }}>{result.discipline.code}</strong>{' '}
+                  <strong style={{ color: '#0f5fa8' }}>{result.discipline.code}</strong>{' '}
                   certification, start with the foundational courses below. Once certified, you will
                   need <strong style={{ color: '#ed9d24' }}>14 CECs</strong> every 3 years as a
                   Technician, or <strong style={{ color: '#ed9d24' }}>21 CECs</strong> as a Master
                   Technician.
                 </p>
               </div>
-              <Button asChild variant="glow" size="sm">
+              <Button asChild variant="glow" size="sm" className="bg-[#0f5fa8] text-white hover:bg-[#0b4e88]">
                 <Link
                   href={`/courses?discipline=${result.discipline.code}`}
                   aria-label={`Browse ${result.discipline.code} courses — ${result.discipline.name}`}
@@ -303,7 +290,7 @@ export function CECCalculator() {
                 <p className="text-sm font-semibold" style={{ color: '#27ae60' }}>
                   Cycle Complete
                 </p>
-                <p className="mt-0.5 text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                <p className="mt-0.5 text-xs text-slate-600">
                   You have met the {result.required} CEC requirement for your{' '}
                   {result.discipline.code} {certLevel === 'master' ? 'Master ' : ''}Technician
                   certification this cycle. Keep learning to stay ahead.
@@ -316,16 +303,16 @@ export function CECCalculator() {
               {/* Progress bar */}
               <div>
                 <div className="mb-1.5 flex items-center justify-between">
-                  <span className="text-xs font-medium" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                  <span className="text-xs font-medium text-slate-700">
                     {cecsEarned} of {result.required} CECs
                   </span>
-                  <span className="text-xs font-semibold" style={{ color: '#2490ed' }}>
+                  <span className="text-xs font-semibold" style={{ color: '#0f5fa8' }}>
                     {result.progress}%
                   </span>
                 </div>
                 <div
                   className="h-2 w-full overflow-hidden rounded-full"
-                  style={{ background: 'rgba(255,255,255,0.06)' }}
+                  style={{ background: '#dbe7f3' }}
                   role="progressbar"
                   aria-valuenow={result.progress}
                   aria-valuemin={0}
@@ -336,8 +323,8 @@ export function CECCalculator() {
                     className="h-full rounded-full transition-all duration-500"
                     style={{
                       width: `${result.progress}%`,
-                      background: 'linear-gradient(90deg, #2490ed, #38b8ff)',
-                      boxShadow: '0 0 12px rgba(36,144,237,0.4)',
+                      background: 'linear-gradient(90deg, #0f5fa8, #38b8ff)',
+                      boxShadow: '0 0 12px rgba(15,95,168,0.25)',
                     }}
                   />
                 </div>
@@ -347,12 +334,12 @@ export function CECCalculator() {
               <div className="grid grid-cols-3 gap-3">
                 <div
                   className="rounded-lg p-3 text-center"
-                  style={{ background: 'rgba(36,144,237,0.08)' }}
+                  style={{ background: '#eef7ff' }}
                 >
-                  <p className="text-lg font-bold" style={{ color: '#2490ed' }}>
+                  <p className="text-lg font-bold" style={{ color: '#0f5fa8' }}>
                     {result.remaining}
                   </p>
-                  <p className="text-xs" style={{ color: 'rgba(255,255,255,0.45)' }}>
+                  <p className="text-xs text-slate-600">
                     CECs needed
                   </p>
                 </div>
@@ -363,31 +350,31 @@ export function CECCalculator() {
                   <p className="text-lg font-bold" style={{ color: '#ed9d24' }}>
                     {result.coursesNeeded}
                   </p>
-                  <p className="text-xs" style={{ color: 'rgba(255,255,255,0.45)' }}>
+                  <p className="text-xs text-slate-600">
                     courses approx.
                   </p>
                 </div>
                 <div
                   className="rounded-lg p-3 text-center"
-                  style={{ background: 'rgba(255,255,255,0.04)' }}
+                  style={{ background: '#f1f5f9' }}
                 >
                   <div className="flex items-center justify-center gap-1">
                     <Clock
                       className="h-3.5 w-3.5"
-                      style={{ color: 'rgba(255,255,255,0.5)' }}
+                      style={{ color: '#64748b' }}
                       aria-hidden="true"
                     />
-                    <p className="text-lg font-bold" style={{ color: 'rgba(255,255,255,0.85)' }}>
+                    <p className="text-lg font-bold text-slate-900">
                       {result.estimatedHours}h
                     </p>
                   </div>
-                  <p className="text-xs" style={{ color: 'rgba(255,255,255,0.45)' }}>
+                  <p className="text-xs text-slate-600">
                     est. study time
                   </p>
                 </div>
               </div>
 
-              <Button asChild variant="glow" size="sm">
+              <Button asChild variant="glow" size="sm" className="bg-[#0f5fa8] text-white hover:bg-[#0b4e88]">
                 <Link
                   href={`/courses?discipline=${result.discipline.code}`}
                   aria-label={`Browse ${result.discipline.code} courses to earn ${result.remaining} more CECs`}

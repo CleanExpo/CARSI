@@ -12,11 +12,11 @@ import { IndustryRecommendedCourses } from '@/components/industries/IndustryReco
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Education Sector IICRC Training | CARSI',
+  title: 'Education Sector IICRC CEC Training | CARSI',
   description:
-    'IICRC certification for school and university maintenance teams. WRT, CRT, AMRT and ASD training for Australian education facilities.',
+    'IICRC CEC training for school and university maintenance teams. WRT, CRT, AMRT and ASD training for Australian education facilities.',
   keywords: [
-    'education IICRC training',
+    'education IICRC CEC training',
     'school restoration certification',
     'university maintenance IICRC',
     'education mould remediation Australia',
@@ -39,7 +39,7 @@ const disciplines = [
 const stats = [
   { value: '9,500+', label: 'Schools' },
   { value: 'WHS', label: 'Compliance' },
-  { value: 'IICRC', label: 'CEC Approved' },
+  { value: 'IICRC', label: 'CEC Accredited' },
 ];
 
 const whyCards = [
@@ -47,7 +47,7 @@ const whyCards = [
     icon: ShieldCheck,
     title: 'Duty of Care',
     description:
-      'Schools must demonstrate competency in mould identification and remediation. IICRC training provides documented evidence of due diligence for student and staff safety.',
+      'Schools must demonstrate competency in mould identification and remediation. IICRC CEC training provides documented evidence of due diligence for student and staff safety.',
     color: '#2196f3',
   },
   {

@@ -77,6 +77,7 @@ const pwaConfig = withPWA({
 const nextConfig: NextConfig = {
   output: 'standalone',
   reactStrictMode: true,
+  devIndicators: false,
   async redirects() {
     return [
       { source: '/student', destination: '/dashboard/student', permanent: true },
