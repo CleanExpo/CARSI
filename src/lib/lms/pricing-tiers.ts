@@ -37,11 +37,11 @@ export const INDIVIDUAL_TIERS: IndividualTier[] = [
   },
   {
     id: 'pro_annual',
-    name: 'Pro (annual)',
+    name: 'Yearly membership',
     priceLabel: '$795 / year',
     priceCents: 79500,
-    description: 'Unlimited access to the published library for one learner.',
-    cta: 'Subscribe',
+    description: '100% access to all published CARSI courses for one learner for 12 months.',
+    cta: 'Choose yearly',
     href: '/subscribe',
   },
 ];

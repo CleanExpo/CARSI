@@ -29,8 +29,11 @@ test.describe('Public course catalogue', () => {
     await page.goto('/');
 
     // Hero section visible
-    await expect(page.locator('text=CARSI restoration training')).toBeVisible({ timeout: 10_000 });
-    await expect(page.locator('text=IICRC CEC accredited online courses')).toBeVisible();
+    const pageContent = page.locator('#main-content');
+    await expect(pageContent).toContainText('CARSI restoration training', {
+      timeout: 10_000,
+    });
+    await expect(pageContent).toContainText('IICRC CEC accredited online courses');
 
     // CTA link exists
     const browseCta = page.getByRole('link', { name: /^Browse courses$/i }).first();

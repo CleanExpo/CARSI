@@ -182,14 +182,21 @@ export default async function CoursesPage({
           </p>
           <div className="mt-4 rounded-lg border border-[#b8dbfb] bg-white px-4 py-3 shadow-sm">
             <p className="text-sm leading-relaxed text-slate-700">
-              Not sure where to start?{' '}
+              Not sure where to start, or comparing several courses?{' '}
               <Link
                 href="/pathways"
                 className="font-semibold text-[#146fc2] underline decoration-[#146fc2]/30 underline-offset-4 transition-colors hover:text-[#0f5fa8]"
               >
                 Use the guided pathway advisor
               </Link>{' '}
-              to choose by trade goal, CEC need, team rollout, or facility risk.
+              to choose by trade goal, CEC need, team rollout, or facility risk.{' '}
+              <Link
+                href="/pricing"
+                className="font-semibold text-[#146fc2] underline decoration-[#146fc2]/30 underline-offset-4 transition-colors hover:text-[#0f5fa8]"
+              >
+                Membership gives 100% access to all published courses
+              </Link>
+              .
             </p>
           </div>
         </header>

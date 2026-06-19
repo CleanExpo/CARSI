@@ -1,13 +1,50 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/components/auth/auth-provider';
 import { apiClient } from '@/lib/api/client';
 
+type SubscribePlanId = 'foundation' | 'growth' | 'pro';
+
+const PLAN_OPTIONS: Record<
+  SubscribePlanId,
+  {
+    name: string;
+    price: number;
+    suffix: string;
+    helper: string;
+    checkoutPlan: string;
+  }
+> = {
+  foundation: {
+    name: 'Monthly membership',
+    price: 44,
+    suffix: 'AUD / month',
+    helper: 'Flexible monthly access · GST included · cancel anytime',
+    checkoutPlan: 'foundation',
+  },
+  growth: {
+    name: 'Growth monthly membership',
+    price: 99,
+    suffix: 'AUD / month',
+    helper: 'Monthly access with extra recognition tools · GST included',
+    checkoutPlan: 'growth',
+  },
+  pro: {
+    name: 'Yearly membership',
+    price: 795,
+    suffix: 'AUD / year',
+    helper: 'That is about $66/month · GST included',
+    checkoutPlan: 'pro',
+  },
+};
+
 const PRO_FEATURES = [
-  'All 111+ IICRC CEC accredited courses',
-  'Unlimited CEC credits',
+  '100% access to all published CARSI courses',
+  'Beginner, intermediate, and advanced levels',
+  'IICRC CEC accredited courses where stated',
+  'CEC tracking for completed eligible courses',
   'Water Restoration Technician (WRT) courses',
   'Carpet Cleaning Technician (CCT) courses',
   'Odour Control Technician (OCT) courses',
@@ -15,15 +52,24 @@ const PRO_FEATURES = [
   'Carpet Repair & Reinstallation (CRT) courses',
   'PDF certificates for every course',
   'IICRC CEC tracking dashboard',
-  'Direct CEC reporting to IICRC',
   'Monthly activity recognition (anonymous by default) & streak tracker',
   'Priority email support',
 ];
 
 export default function SubscribePage() {
   const { user } = useAuth();
+  const [selectedPlanId, setSelectedPlanId] = useState<SubscribePlanId>('pro');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const selectedPlan = PLAN_OPTIONS[selectedPlanId];
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const plan = params.get('plan');
+    if (plan === 'foundation' || plan === 'growth') {
+      setSelectedPlanId(plan);
+    }
+  }, []);
 
   async function handleSubscribe() {
     if (!user) {
@@ -34,7 +80,7 @@ export default function SubscribePage() {
     setError(null);
     try {
       const data = await apiClient.post<{ url: string }>('/api/lms/subscription/checkout', {
-        plan: 'pro',
+        plan: selectedPlan.checkoutPlan,
         success_url: `${window.location.origin}/subscribe/success`,
         cancel_url: `${window.location.origin}/subscribe`,
       });
@@ -52,38 +98,38 @@ export default function SubscribePage() {
     }
   }
 
-  // Calculate monthly equivalent
-  const yearlyPrice = 795;
-  const monthlyEquivalent = Math.round(yearlyPrice / 12);
-
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-[#050505] px-4 py-16 text-white">
+    <main className="flex min-h-screen flex-col items-center justify-center bg-[#f6f8fb] px-4 py-16 text-slate-900">
       <div className="flex w-full max-w-lg flex-col gap-8">
         {/* Header */}
         <div className="text-center">
-          <span className="inline-block rounded-full border border-[#00F5FF]/30 bg-[#00F5FF]/10 px-3 py-1 text-xs font-medium text-[#00F5FF]">
+          <span className="inline-block rounded-full border border-[#b8dbfb] bg-white px-3 py-1 text-xs font-semibold text-[#146fc2] shadow-sm">
             7-day free trial
           </span>
-          <h1 className="mt-4 font-mono text-3xl font-bold text-white">CARSI Pro</h1>
-          <p className="mt-2 text-white/60">Full access to all IICRC courses and CEC credits</p>
+          <h1 className="mt-4 text-3xl font-bold text-slate-950">{selectedPlan.name}</h1>
+          <p className="mt-2 text-slate-600">
+            Monthly or yearly membership unlocks 100% access to all published courses.
+          </p>
         </div>
 
         {/* Pricing card */}
-        <div className="flex flex-col gap-6 rounded-sm border border-[#00F5FF]/20 bg-[#00F5FF]/5 p-8">
+        <div className="flex flex-col gap-6 rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
           <div>
             <div className="flex items-baseline gap-2">
-              <span className="font-mono text-5xl font-bold text-white">${yearlyPrice}</span>
-              <span className="font-mono text-white/40">AUD / year</span>
+              <span className="text-5xl font-bold text-slate-950">${selectedPlan.price}</span>
+              <span className="text-slate-500">{selectedPlan.suffix}</span>
             </div>
-            <p className="mt-2 text-sm text-white/50">
-              That&apos;s just ${monthlyEquivalent}/month · GST included
+            <p className="mt-2 text-sm text-slate-600">{selectedPlan.helper}</p>
+            <p className="mt-3 rounded-lg border border-[#f2cf8f] bg-[#fff8ed] px-3 py-2 text-sm font-medium text-[#7a3500]">
+              Membership is best for clients planning multiple courses, refreshing knowledge across
+              levels, or maintaining CECs over time.
             </p>
           </div>
 
-          <ul className="flex flex-col gap-3 text-sm text-white/70">
+          <ul className="flex flex-col gap-3 text-sm text-slate-700">
             {PRO_FEATURES.map((feature) => (
               <li key={feature} className="flex items-start gap-2">
-                <span className="mt-0.5 flex-shrink-0 text-[#00F5FF]">✓</span>
+                <span className="mt-0.5 flex-shrink-0 text-[#146fc2]">✓</span>
                 {feature}
               </li>
             ))}
@@ -93,34 +139,35 @@ export default function SubscribePage() {
             <button
               onClick={handleSubscribe}
               disabled={loading}
-              className="w-full rounded-sm bg-[#00F5FF] py-3 font-mono text-sm font-semibold text-[#050505] transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+              className="w-full rounded-lg bg-[#0f5fa8] py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {loading ? 'Opening checkout…' : 'Start 7-Day Free Trial'}
             </button>
-            <p className="text-center text-xs text-white/30">
+            <p className="text-center text-xs text-slate-500">
               Card required. No charge for 7 days. Cancel anytime.
             </p>
           </div>
 
-          {error && <p className="rounded-sm bg-red-950 px-3 py-2 text-sm text-red-400">{error}</p>}
+          {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
         </div>
 
         {/* Value proposition */}
-        <div className="rounded-sm border border-white/[0.06] bg-white/[0.02] p-4">
-          <p className="text-center text-sm text-white/50">
-            <span className="font-semibold text-white/70">Compare:</span> Individual IICRC courses
-            cost $50–$150 each. With CARSI Pro, complete unlimited courses for one annual fee.
+        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+          <p className="text-center text-sm text-slate-600">
+            <span className="font-semibold text-slate-900">Compare:</span> Individual courses are
+            useful for one-off needs. Membership is designed for clients who want multiple courses
+            and full catalogue flexibility.
           </p>
         </div>
 
         {/* Legal links */}
-        <p className="text-center text-xs leading-relaxed text-white/20">
+        <p className="text-center text-xs leading-relaxed text-slate-500">
           By subscribing, you agree to our{' '}
-          <Link href="/terms" className="underline hover:text-white/40">
+          <Link href="/terms" className="font-medium text-[#146fc2] underline">
             Terms of Service
           </Link>{' '}
           and{' '}
-          <Link href="/privacy" className="underline hover:text-white/40">
+          <Link href="/privacy" className="font-medium text-[#146fc2] underline">
             Privacy Policy
           </Link>
           .

@@ -7,7 +7,7 @@ import { BreadcrumbSchema, FAQSchema } from '@/components/seo';
 export const metadata: Metadata = {
   title: 'Pricing | CARSI — Restoration Training Online',
   description:
-    'CARSI membership from $44/month — access IICRC CEC accredited restoration courses, track your credits, and earn verified CARSI certificates. Free Library available to all.',
+    'CARSI membership from $44/month — monthly or yearly subscriptions unlock 100% access to all published courses, CEC tracking, and verified CARSI certificates. Free Library available to all.',
   keywords: [
     'CARSI pricing',
     'restoration training membership',
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Pricing | CARSI — Restoration Training Online',
     description:
-      'Free Library, Foundation $44/mo, Growth $99/mo. Every plan includes a 7-day free trial.',
+      'Free Library, monthly membership from $44/mo, and yearly membership at $795/yr. Paid memberships include 100% course access.',
     type: 'website',
     url: 'https://carsi.com.au/pricing',
   },
@@ -30,7 +30,7 @@ const FAQ_ITEMS = [
   {
     question: 'How does the 7-day free trial work?',
     answer:
-      'Your trial begins the moment you sign up. You have full access to every course in your chosen plan for 7 days at no cost. Your card is only charged on day 8 if you choose to continue. Cancel any time before then with no questions asked.',
+      'Your trial begins the moment you sign up for a paid membership. Monthly and yearly memberships include 100% access to all published courses during the trial. Your card is only charged on day 8 if you choose to continue. Cancel any time before then with no questions asked.',
   },
   {
     question: 'Can I cancel my membership at any time?',
@@ -38,9 +38,9 @@ const FAQ_ITEMS = [
       'Yes — cancel any time from your student dashboard. Your access continues until the end of the current billing period. No lock-in contracts, no cancellation fees.',
   },
   {
-    question: "What's the difference between Foundation and Growth?",
+    question: "What's the difference between monthly and yearly membership?",
     answer:
-      'Foundation covers entry-level and practical CEC courses — PPE, moisture metering, carpet cleaning basics, Level 1 Mould Remediation, and more. Growth unlocks the full catalogue including advanced disciplines: Level 2 Mould, Admin, Social Media Marketing, Asthma & Allergy, NeoSan Labs, and all Introduction to courses valued at $500+.',
+      'Both paid membership paths unlock 100% access to all published CARSI courses while the membership is active. Monthly membership is flexible and cancel-anytime; yearly membership is the full-year option for learners planning multiple courses or ongoing CEC maintenance.',
   },
   {
     question: 'Do CARSI courses count toward IICRC CECs?',
@@ -74,6 +74,10 @@ const FREE_FEATURES = [
 
 const FOUNDATION_EXTRAS = [
   'Everything in Free Library',
+  '100% access to all published CARSI courses',
+  'Beginner, intermediate, and advanced course levels',
+  'IICRC CEC tracking dashboard',
+  'PDF certificate wallet',
   'Policies & Procedures',
   'Donning & Doffing PPE (valued at $39)',
   'Microbe Clean Basic Understanding (valued at $99)',
@@ -86,7 +90,8 @@ const FOUNDATION_EXTRAS = [
 ];
 
 const GROWTH_EXTRAS = [
-  'Everything in Foundation',
+  'Everything in monthly membership',
+  '100% access to all published CARSI courses',
   'BONUS Policies & Procedures',
   'NeoSan Labs Product Course (valued at $99)',
   'Social Media Marketing (valued at $79)',
@@ -94,9 +99,7 @@ const GROWTH_EXTRAS = [
   'Level 2 Mould Remediation (valued at $99)',
   'Asthma & Allergy Course (valued at $129)',
   'ALL Introduction To courses (value $500+)',
-  'IICRC CEC tracking dashboard',
   'Monthly activity recognition (anonymous by default) & streak tracker',
-  'PDF certificate wallet',
   'Shareable credential profile',
 ];
 
@@ -116,8 +119,8 @@ export default function PricingPage() {
               Membership &amp; Pricing
             </h1>
             <p className="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-slate-600">
-              Start with the right access level for your learning goal, then upgrade when your team
-              or CEC needs grow.
+              Buy one course when that is all you need, or choose monthly/yearly membership for 100%
+              access to all published courses while your membership is active.
             </p>
           </section>
 
@@ -130,10 +133,11 @@ export default function PricingPage() {
                 Not sure what to buy or learn first?
               </p>
               <h2 className="text-xl font-semibold text-slate-950">
-                Use the pathway guide before choosing courses or a service model.
+                Buying more than one course? Compare it with membership first.
               </h2>
               <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
-                CARSI can help you choose by trade goal, CEC need, team rollout, or facility risk.
+                Membership is built for learners maintaining CECs, refreshing knowledge across
+                multiple disciplines, or planning beginner through advanced study over time.
               </p>
             </div>
             <Link
@@ -163,7 +167,7 @@ export default function PricingPage() {
               title="Foundation"
               price="$44"
               priceSuffix="AUD / month"
-              helper="GST included · Cancel anytime"
+              helper="100% course access · GST included · Cancel anytime"
               features={FOUNDATION_EXTRAS}
               cta="Start 7-Day Free Trial"
               href="/subscribe?plan=foundation"
@@ -174,7 +178,7 @@ export default function PricingPage() {
               title="Growth"
               price="$99"
               priceSuffix="AUD / month"
-              helper="GST included · Cancel anytime"
+              helper="100% course access · GST included · Cancel anytime"
               features={GROWTH_EXTRAS}
               cta="Start 7-Day Free Trial"
               href="/subscribe?plan=growth"
@@ -191,7 +195,8 @@ export default function PricingPage() {
             <div>
               <h2 className="mb-1 text-base font-semibold text-slate-950">Or pay per course</h2>
               <p className="text-sm text-slate-600">
-                Not ready to subscribe? Enrol in individual courses at your own pace.
+                If you only need one specific course, individual enrolment is still available.
+                Planning several courses? Membership gives full access.
               </p>
             </div>
             <Link
@@ -223,8 +228,8 @@ export default function PricingPage() {
           </section>
 
           <p className="text-center text-xs text-slate-600">
-            Prices in AUD. GST included. Billed monthly. Managed via Stripe — secure payment
-            processing.
+            Prices in AUD. GST included. Billed monthly or yearly depending on the option selected.
+            Managed via Stripe — secure payment processing.
             <br />
             Questions?{' '}
             <Link href="/contact" className="font-medium text-[#146fc2] underline">
@@ -282,6 +287,11 @@ function MembershipCard({
 
       <div className="mb-6">
         <h2 className="mb-1 text-lg font-bold text-slate-950">{title}</h2>
+        {tone !== 'neutral' ? (
+          <p className="mb-3 inline-flex rounded-md border border-[#b8dbfb] bg-white px-2 py-1 text-[11px] font-semibold text-[#146fc2]">
+            Includes 100% course access
+          </p>
+        ) : null}
         <div className="flex items-baseline gap-1">
           <span className="text-3xl font-bold text-slate-950">{price}</span>
           {price !== 'FREE' ? (
