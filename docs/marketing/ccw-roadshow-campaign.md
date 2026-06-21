@@ -22,12 +22,12 @@ This is not a generic seminar or a simple chemical information day. It is a hand
 
 Core message:
 
-> Spend two days with Phil McGurk inside Carpet Cleaners Warehouse and leave with clearer strategies to pursue better-fit jobs, quote with confidence, avoid costly mistakes, add profitable services and build a stronger cleaning business.
+> Spend two days with Phill McGurk inside Carpet Cleaners Warehouse and leave with clearer strategies to pursue better-fit jobs, quote with confidence, avoid costly mistakes, add profitable services and build a stronger cleaning business.
 
 Message hierarchy:
 
 1. Dominant headline: `Grow Your Cleaning Business`.
-2. Credibility line: `Spend two days with Phil McGurk`.
+2. Credibility line: `Spend two days with Phill McGurk`.
 3. Event name: `CARSI x CCW Business Growth Days`.
 4. Outcome proof: better-fit jobs, profit decisions, fewer mistakes, profitable service planning, quoting confidence and stronger systems.
 5. Urgency: free past/current CCW customer entry, limited places, small group format, register early.
@@ -38,7 +38,7 @@ Toby's 17 June review notes reposition the campaign away from a subject list and
 
 - Whyte-style competitor events communicate quickly because they answer "why attend?" in seconds. CARSI x CCW must do the same.
 - The stronger offer is not "a chemical day"; it is business growth, better decision making and practical industry experience.
-- Phil McGurk's name should be visible because his reputation is a major drawcard for cleaners.
+- Phill McGurk's name should be visible because his reputation is a major drawcard for cleaners.
 - The CCW facility setting matters: attendees can see equipment, compare options, ask practical questions and connect training to real-world applications.
 - Replace passive "Books are essential" as the main urgency line with stronger action cues such as "Limited places available", "Small group format" and "Register early".
 - Add approved social proof where available. Do not invent testimonials; use a placeholder only until a real attendee quote is approved.
@@ -103,7 +103,7 @@ Marketing angle:
 
 Why this exists:
 
-> Cleaning businesses grow when training, equipment, chemicals and service offers work together. CARSI and CCW are bringing that conversation into one room in Melbourne and Sydney this July with Phil McGurk leading practical business-improvement sessions inside CCW facilities.
+> Cleaning businesses grow when training, equipment, chemicals and service offers work together. CARSI and CCW are bringing that conversation into one room in Melbourne and Sydney this July with Phill McGurk leading practical business-improvement sessions inside CCW facilities.
 
 ### Interest Message
 
@@ -176,7 +176,7 @@ Why register now:
 
 Grow your cleaning business.
 
-CARSI x Carpet Cleaners Warehouse Business Growth Days are coming to Melbourne and Sydney, with two practical days led by Phil McGurk inside CCW facilities.
+CARSI x Carpet Cleaners Warehouse Business Growth Days are coming to Melbourne and Sydney, with two practical days led by Phill McGurk inside CCW facilities.
 
 Why? Because growth needs more than another machine or product. Training, equipment, chemicals, service offers, quoting and follow-up all need to work together.
 
@@ -200,7 +200,7 @@ Grow your cleaning business with CARSI and CCW.
 
 We are hosting CARSI x CCW Business Growth Days at our Melbourne and Sydney locations this July.
 
-These are practical two-day sessions with Phil McGurk for operators who want stronger carpet cleaning, rug cleaning, stain removal, tile cleaning and business growth confidence.
+These are practical two-day sessions with Phill McGurk for operators who want stronger carpet cleaning, rug cleaning, stain removal, tile cleaning and business growth confidence.
 
 Why come? To connect training, equipment, chemicals and service decisions before you spend more money or take on harder work.
 
@@ -224,7 +224,7 @@ Small group format. Limited places available. Claim your free token here: https:
 
 For anyone in Melbourne or Sydney who wants to grow a cleaning business, CARSI and CCW are running two-day Business Growth Days in July.
 
-The focus is practical: spend two days with Phil McGurk inside Carpet Cleaners Warehouse and connect training, equipment, chemistry and service decisions before you sell the work or spend more money.
+The focus is practical: spend two days with Phill McGurk inside Carpet Cleaners Warehouse and connect training, equipment, chemistry and service decisions before you sell the work or spend more money.
 
 Why: to get clearer before adding services, buying equipment or quoting more complex jobs.
 
@@ -243,13 +243,13 @@ Registration link: https://www.carsi.com.au/events/ccw-roadshow
 
 ### Email 1: Why Attend
 
-Subject: Spend two days with Phil McGurk
+Subject: Spend two days with Phill McGurk
 
 Body:
 
 CARSI and Carpet Cleaners Warehouse are bringing two-day Business Growth Days to Melbourne and Sydney this July because cleaning businesses need more than isolated tips, products or machine advice.
 
-Spend two practical days with Phil McGurk inside Carpet Cleaners Warehouse and connect training, equipment, chemicals, service offers, quoting and customer follow-up before buying more gear, adding more services or taking on harder jobs.
+Spend two practical days with Phill McGurk inside Carpet Cleaners Warehouse and connect training, equipment, chemicals, service offers, quoting and customer follow-up before buying more gear, adding more services or taking on harder jobs.
 
 Melbourne runs 22-23 July. Sydney runs 30-31 July. Both days run 8.30am-4.30pm.
 
@@ -302,7 +302,7 @@ Claim your team token here: https://www.carsi.com.au/events/ccw-roadshow
 - Visual priority: Why, Who, What they achieve, plus CARSI x CCW, city, dates, free past/current CCW customer entry, token CTA.
 - Avoid: overclaiming certification outcomes, "guaranteed income", or implying RTO/national qualification status.
 - Suggested headline: "Grow Your Cleaning Business"
-- Suggested subhead: "Spend two days with Phil McGurk inside Carpet Cleaners Warehouse."
+- Suggested subhead: "Spend two days with Phill McGurk inside Carpet Cleaners Warehouse."
 - Badge: "Past/current CCW customers free"
 - Urgency badge: "Claim your free entry token"
 - Proof slot: "Insert approved attendee quote here" only after a real quote is supplied.
@@ -313,7 +313,7 @@ Claim your team token here: https://www.carsi.com.au/events/ccw-roadshow
 
 Headline: Grow your cleaning business.
 
-Body: Spend two practical days with Phil McGurk connecting training, equipment, chemicals, services, quoting and follow-up before spending more money or taking on harder jobs.
+Body: Spend two practical days with Phill McGurk connecting training, equipment, chemicals, services, quoting and follow-up before spending more money or taking on harder jobs.
 
 CTA: Claim your free token.
 

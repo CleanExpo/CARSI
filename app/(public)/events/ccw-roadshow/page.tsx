@@ -10,7 +10,7 @@ import {
   marketingBody,
   marketingBodySm,
   marketingBtnSecondary,
-  marketingEyebrowEmerald,
+  marketingEyebrowAmber,
   marketingEyebrowPill,
   marketingHeading,
   marketingPageGlow,
@@ -40,7 +40,7 @@ const canonical = `${siteUrl}${ccwRoadshowPath}`;
 export const metadata: Metadata = {
   title: 'Grow Your Cleaning Business | CARSI x CCW Roadshow 2026',
   description:
-    'Free for CCW past and current customers. Spend two practical days with Phil McGurk at CCW Melbourne or Sydney and claim a free entry token when you register.',
+    'Free for CCW past and current customers. Spend two practical days with Phill McGurk at CCW Melbourne or Sydney and claim a free entry token when you register.',
   alternates: { canonical },
   keywords: [
     'carpet cleaning training Melbourne',
@@ -54,7 +54,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Grow Your Cleaning Business with CARSI x CCW',
     description:
-      'Two practical business-growth days with Phil McGurk inside CCW Melbourne and Sydney locations.',
+      'Two practical business-growth days with Phill McGurk inside CCW Melbourne and Sydney locations.',
     url: canonical,
     type: 'website',
     images: ['/og-image.png'],
@@ -125,7 +125,11 @@ export default function CcwRoadshowPage() {
         />
       ))}
 
-      <main className="relative min-h-screen pb-16 pt-6 text-white sm:pb-20 sm:pt-8">
+      <main
+        id="main-content"
+        className="relative min-h-screen pb-16 pt-6 text-white sm:pb-20 sm:pt-8"
+        style={{ background: '#060a14' }}
+      >
         <div className={marketingPageGlow} aria-hidden="true" />
 
         {/* Hero */}
@@ -133,22 +137,22 @@ export default function CcwRoadshowPage() {
           <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(300px,420px)] lg:items-start lg:gap-12">
             <div className="min-w-0">
               <span
-                className={`inline-flex items-center gap-2 rounded-full border border-[#34d399]/25 bg-[#34d399]/10 px-3 py-1 text-xs font-medium text-[#34d399]`}
+                className={`inline-flex items-center gap-2 rounded-full border border-[#ed9d24]/25 bg-[#ed9d24]/10 px-3 py-1 text-xs font-medium text-[#ed9d24]`}
               >
                 <span className="relative flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#34d399] opacity-40" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-[#34d399]" />
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#ed9d24] opacity-40" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-[#ed9d24]" />
                 </span>
                 Melbourne + Sydney · July 2026
               </span>
 
-              <p className={`mt-5 ${marketingEyebrowEmerald}`}>
+              <p className={`mt-5 ${marketingEyebrowAmber}`}>
                 CARSI and Carpet Cleaners Warehouse
               </p>
 
               <h1 className={`mt-3 ${marketingHeading}`}>{ccwRoadshowHeroHeadline}</h1>
 
-              <p className="mt-3 text-lg font-semibold text-[#34d399]">
+              <p className="mt-3 text-lg font-semibold text-[#ed9d24]">
                 Spend two days with {ccwRoadshowPresenter.name}
               </p>
 
@@ -165,7 +169,7 @@ export default function CcwRoadshowPage() {
                   <p className={`mt-1 ${marketingBodySm}`}>Melbourne 22-23, Sydney 30-31</p>
                 </div>
                 <div className={marketingStatCard}>
-                  <Users className="mb-3 h-4 w-4 text-[#34d399]/80" aria-hidden />
+                  <Users className="mb-3 h-4 w-4 text-[#ed9d24]/80" aria-hidden />
                   <p className="text-sm font-semibold text-white/90">Free CCW entry</p>
                   <p className={`mt-1 ${marketingBodySm}`}>Past/current customers claim a token</p>
                 </div>
@@ -251,7 +255,7 @@ export default function CcwRoadshowPage() {
           <MarketingSectionHeader
             eyebrow="Why, Who, What"
             title="Business improvement, not just a chemical day"
-            body="The value is not only the topic list. The value is spending two days with Phil, CARSI and the CCW team connecting services, equipment, chemicals and real customer decisions into a plan you can use."
+            body="The value is not only the topic list. The value is spending two days with Phill, CARSI and the CCW team connecting services, equipment, chemicals and real customer decisions into a plan you can use."
           />
 
           <div className="grid gap-4 lg:grid-cols-3">
@@ -266,7 +270,7 @@ export default function CcwRoadshowPage() {
                   {pillar.points.map((point) => (
                     <div key={point} className="flex gap-3">
                       <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#2490ed]" />
-                      <p className={`${marketingBodySm} text-white/50`}>{point}</p>
+                      <p className={marketingBodySm}>{point}</p>
                     </div>
                   ))}
                 </div>

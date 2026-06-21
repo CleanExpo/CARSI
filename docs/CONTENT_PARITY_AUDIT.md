@@ -99,7 +99,7 @@ Admin Sole Trader ($275), AGI Essentials, Asthma and Allergy ($129), Carpet Clea
 | Partner images       | 2 partner images                                                                       | None                                           | GAP       |
 | Next.js pricing      | N/A                                                                                    | $795 AUD/year single tier with Stripe checkout | DIFFERENT |
 
-**Critical gap:** WordPress has 3 membership tiers (Free, $44/mo, $99/mo). Next.js has a single $795/year subscription. The tiered pricing structure is missing. This may be intentional (business model change), but should be confirmed with Phil.
+**Critical gap:** WordPress has 3 membership tiers (Free, $44/mo, $99/mo). Next.js has a single $795/year subscription. The tiered pricing structure is missing. This may be intentional (business model change), but should be confirmed with Phill.
 
 ### 5. Contact Page
 

@@ -40,10 +40,10 @@ export const ccwRoadshowFreeEntryOffer = {
 };
 
 export const ccwRoadshowPresenter = {
-  name: 'Phil McGurk',
+  name: 'Phill McGurk',
   role: 'CARSI founder and cleaning and restoration educator',
   value:
-    'Spend two practical days learning directly from Phil McGurk and the CCW team, with the conversation tied back to real equipment, chemicals, service decisions and customer outcomes.',
+    'Spend two practical days learning directly from Phill McGurk and the CCW team, with the conversation tied back to real equipment, chemicals, service decisions and customer outcomes.',
 };
 
 export const ccwRoadshowTopics = [
@@ -78,7 +78,7 @@ export const ccwRoadshowEvents: CcwRoadshowEvent[] = [
     suburbStatePostcode: 'Bayswater North VIC 3153',
     state: 'VIC',
     description:
-      'Two practical days with Phil McGurk and the CCW team, connecting training, equipment, service design, chemistry, quoting confidence and business growth for carpet, rug, stain and tile cleaning operators.',
+      'Two practical days with Phill McGurk and the CCW team, connecting training, equipment, service design, chemistry, quoting confidence and business growth for carpet, rug, stain and tile cleaning operators.',
     capacity: 10,
     calendarEventId: '1d1uqjm6an36n1kgc6s4s3ln7s',
   },
@@ -97,7 +97,7 @@ export const ccwRoadshowEvents: CcwRoadshowEvent[] = [
     suburbStatePostcode: 'Seven Hills NSW 2147',
     state: 'NSW',
     description:
-      'Two practical days with Phil McGurk and the CCW team, connecting training, equipment, service design, chemistry, quoting confidence and business growth for carpet, rug, stain and tile cleaning operators.',
+      'Two practical days with Phill McGurk and the CCW team, connecting training, equipment, service design, chemistry, quoting confidence and business growth for carpet, rug, stain and tile cleaning operators.',
     capacity: 12,
     calendarEventId: 'h6qm8t3muuv44ht9gqann5dhuk',
   },

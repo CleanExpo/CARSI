@@ -7,7 +7,7 @@ Launch status: free-entry offer update applied. Organic publishing may proceed t
 
 Campaign name: CARSI x CCW Business Growth Days
 Dominant campaign headline: Grow Your Cleaning Business
-Credibility hook: Spend two days with Phil McGurk inside Carpet Cleaners Warehouse.
+Credibility hook: Spend two days with Phill McGurk inside Carpet Cleaners Warehouse.
 
 Primary registration URL:
 
@@ -38,7 +38,7 @@ Included material:
 Toby review inputs now integrated:
 
 - Lead with outcomes, not subject areas.
-- Make Phil McGurk visible as a major reason to attend.
+- Make Phill McGurk visible as a major reason to attend.
 - Position the event as business improvement, not only a chemical or product day.
 - Explain why being inside CCW facilities matters: see, compare, ask and connect training to real-world decisions.
 - Use stronger urgency language than "Books are essential".
@@ -102,7 +102,7 @@ Message:
 
 > Grow your cleaning business.
 >
-> CARSI x Carpet Cleaners Warehouse Business Growth Days are coming to Melbourne and Sydney this July. Spend two practical days with Phil McGurk inside CCW facilities, connecting carpet cleaning, rug cleaning, stain removal, tile cleaning, equipment, chemicals, course material, quoting confidence and business growth.
+> CARSI x Carpet Cleaners Warehouse Business Growth Days are coming to Melbourne and Sydney this July. Spend two practical days with Phill McGurk inside CCW facilities, connecting carpet cleaning, rug cleaning, stain removal, tile cleaning, equipment, chemicals, course material, quoting confidence and business growth.
 >
 > Melbourne: 22-23 July at CCW Bayswater North
 > Sydney: 30-31 July at CCW Seven Hills
@@ -118,7 +118,7 @@ Timing: 22 June to 5 July 2026.
 Angles:
 
 - Why training should come before buying more equipment.
-- Spend two days with Phil McGurk.
+- Spend two days with Phill McGurk.
 - Why this is a business improvement event, not just a chemical day.
 - Why CCW facilities make the learning more practical: see it, compare it, ask questions.
 - How chemical decisions shape customer outcomes.
@@ -148,12 +148,12 @@ Timing:
 
 Message:
 
-> Final reminder: CARSI x CCW Business Growth Days are nearly here. If you want to spend two practical days with Phil McGurk and leave with clearer strategies for services, equipment, chemicals, quoting, customer conversations and business growth, claim your free past/current CCW customer entry token now.
+> Final reminder: CARSI x CCW Business Growth Days are nearly here. If you want to spend two practical days with Phill McGurk and leave with clearer strategies for services, equipment, chemicals, quoting, customer conversations and business growth, claim your free past/current CCW customer entry token now.
 
 ## Daily Social Prompts
 
 1. Why this exists: growth happens when training, equipment, chemicals and service promises connect.
-2. Phil hook: spend two days learning directly from Phil McGurk.
+2. Phill hook: spend two days learning directly from Phill McGurk.
 3. CCW facility advantage: see equipment, compare options and ask practical questions.
 4. Who should attend: cleaners adding services, existing carpet cleaners, teams and new operators.
 5. What you receive: course outline and practical chemical details.
