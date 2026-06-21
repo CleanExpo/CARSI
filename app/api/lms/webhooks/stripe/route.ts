@@ -17,6 +17,7 @@ import { sessionClaimsForUserId } from '@/lib/server/lms-auth';
 import { prisma } from '@/lib/prisma';
 import { fulfillCourseCheckoutForUser } from '@/lib/server/team-course-purchase';
 import { shouldRetryWebhookFulfillment } from '@/lib/server/stripe-webhook-policy';
+import { resolveStripePaymentReference } from '@/lib/server/stripe-payment-reference';
 
 export async function POST(request: NextRequest) {
   const rawBody = await request.text();
@@ -93,8 +94,15 @@ export async function POST(request: NextRequest) {
   const teamSeatRaw = session.metadata?.team_seat_count;
   const teamSeatCount = teamSeatRaw ? Number.parseInt(teamSeatRaw, 10) : undefined;
 
+  const ref = resolveStripePaymentReference(session.id);
+  if (!ref) {
+    console.error(
+      '[stripe webhook] checkout.session.completed missing a session id — skipping fulfillment to avoid non-idempotent provisioning',
+    );
+    return NextResponse.json({ received: true });
+  }
+
   try {
-    const ref = typeof session.id === 'string' ? session.id : 'stripe_webhook';
     const origin = getAppOrigin();
     const fulfilled = await fulfillCourseCheckoutForUser({
       claims,

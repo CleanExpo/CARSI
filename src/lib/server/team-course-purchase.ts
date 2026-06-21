@@ -55,6 +55,10 @@ async function insertTeamCoursePurchaseTx(
       where: { paymentReference: ref },
     });
     if (existing) return false;
+  } else {
+    console.warn(
+      '[team-purchase] provisioning a team seat block without a payment reference — duplicate deliveries cannot be de-duplicated for this row',
+    );
   }
 
   await tx.lmsTeamCoursePurchase.create({
