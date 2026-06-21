@@ -431,3 +431,37 @@ model AdminUser {
 
   @@map("admin_users")
 }
+
+model CcwRoadshowRegistration {
+  id                String   @id @default(uuid()) @db.Uuid
+  eventSlug         String   @map("event_slug") @db.VarChar(32)
+  freeEntryToken    String   @unique @map("free_entry_token")
+  companyName       String?  @map("company_name")
+  contactEmail      String   @map("contact_email")
+  contactPhone      String?  @map("contact_phone")
+  ccwCustomerStatus String?  @map("ccw_customer_status") @db.VarChar(40)
+  seatCount         Int      @map("seat_count")
+  status            String   @default("confirmed") @db.VarChar(20)
+  calendarSynced    Boolean  @default(false) @map("calendar_synced")
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  attendees CcwRoadshowAttendee[]
+
+  @@index([eventSlug, status])
+  @@index([eventSlug, createdAt(sort: Asc)])
+  @@map("ccw_roadshow_registrations")
+}
+
+model CcwRoadshowAttendee {
+  id              String   @id @default(uuid()) @db.Uuid
+  registrationId  String   @map("registration_id") @db.Uuid
+  fullName        String   @map("full_name")
+  yearsExperience String   @map("years_experience") @db.VarChar(16)
+  goals           String   @db.Text
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  registration CcwRoadshowRegistration @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+
+  @@index([registrationId])
+  @@map("ccw_roadshow_attendees")
+}
