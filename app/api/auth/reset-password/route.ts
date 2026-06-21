@@ -44,12 +44,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ message: 'Password updated successfully.' });
   } catch (error) {
-    return NextResponse.json(
-      {
-        error: 'Reset service unavailable',
-        detail: error instanceof Error ? error.message : 'Unknown error',
-      },
-      { status: 502 }
-    );
+    console.error('[reset-password] failed:', error instanceof Error ? error.message : String(error));
+    return NextResponse.json({ error: 'Reset service unavailable' }, { status: 502 });
   }
 }

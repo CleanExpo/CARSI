@@ -95,12 +95,7 @@ export async function POST(request: NextRequest) {
 
     return response;
   } catch (error) {
-    return NextResponse.json(
-      {
-        error: 'Registration service unavailable',
-        detail: error instanceof Error ? error.message : 'Unknown error',
-      },
-      { status: 502 }
-    );
+    console.error('[auth/register] failed:', error instanceof Error ? error.message : String(error));
+    return NextResponse.json({ error: 'Registration service unavailable' }, { status: 502 });
   }
 }

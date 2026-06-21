@@ -89,12 +89,6 @@ export async function POST(request: NextRequest) {
     console.error('[auth/login] failed:', {
       error: error instanceof Error ? error.message : String(error),
     });
-    return NextResponse.json(
-      {
-        error: 'Login service unavailable',
-        detail: error instanceof Error ? error.message : 'Unknown error',
-      },
-      { status: 502 }
-    );
+    return NextResponse.json({ error: 'Login service unavailable' }, { status: 502 });
   }
 }

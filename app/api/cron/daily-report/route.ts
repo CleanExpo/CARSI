@@ -58,9 +58,6 @@ export async function GET(request: Request) {
     });
   } catch (error) {
     logger.error('Daily report cron error', error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Daily report failed' }, { status: 500 });
   }
 }

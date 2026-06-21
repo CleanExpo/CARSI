@@ -60,12 +60,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: SENT_MESSAGE });
   } catch (error) {
     console.error('[forgot-password]', error);
-    return NextResponse.json(
-      {
-        error: 'Password reset service unavailable',
-        detail: error instanceof Error ? error.message : 'Unknown error',
-      },
-      { status: 502 }
-    );
+    return NextResponse.json({ error: 'Password reset service unavailable' }, { status: 502 });
   }
 }
