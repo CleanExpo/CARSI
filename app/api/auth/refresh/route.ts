@@ -31,6 +31,6 @@ export async function POST(request: NextRequest) {
 
   const response = NextResponse.json({ success: true });
   response.cookies.set('auth_token', refreshed, { ...cookieOptions, httpOnly: true });
-  response.cookies.set('carsi_token', refreshed, { ...cookieOptions, httpOnly: false });
+  response.cookies.set('carsi_token', refreshed, { ...cookieOptions, httpOnly: true });
   return response;
 }

@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
 
     response.cookies.set('carsi_token', access_token, {
       ...cookieOptions,
-      httpOnly: false,
+      httpOnly: true,
     });
 
     return response;

@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
       maxAge: COOKIE_MAX_AGE,
     };
     response.cookies.set('auth_token', accessToken, { ...cookieOptions, httpOnly: true });
-    response.cookies.set('carsi_token', accessToken, { ...cookieOptions, httpOnly: false });
+    response.cookies.set('carsi_token', accessToken, { ...cookieOptions, httpOnly: true });
 
     return response;
   } catch (error) {
