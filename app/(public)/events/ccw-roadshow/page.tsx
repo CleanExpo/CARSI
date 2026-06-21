@@ -125,7 +125,11 @@ export default function CcwRoadshowPage() {
         />
       ))}
 
-      <main className="relative min-h-screen pb-16 pt-6 text-white sm:pb-20 sm:pt-8">
+      <main
+        id="main-content"
+        className="relative min-h-screen pb-16 pt-6 text-white sm:pb-20 sm:pt-8"
+        style={{ background: '#060a14' }}
+      >
         <div className={marketingPageGlow} aria-hidden="true" />
 
         {/* Hero */}
@@ -266,7 +270,7 @@ export default function CcwRoadshowPage() {
                   {pillar.points.map((point) => (
                     <div key={point} className="flex gap-3">
                       <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#2490ed]" />
-                      <p className={`${marketingBodySm} text-white/50`}>{point}</p>
+                      <p className={marketingBodySm}>{point}</p>
                     </div>
                   ))}
                 </div>

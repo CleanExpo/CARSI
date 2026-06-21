@@ -32,7 +32,7 @@ type BookingFormState = {
   attendees: AttendeeForm[];
 };
 
-const labelClass = 'mb-1.5 block text-xs font-medium tracking-wide text-white/45 uppercase';
+const labelClass = 'mb-1.5 block text-xs font-medium tracking-wide text-white/70 uppercase';
 
 function emptyAttendee(): AttendeeForm {
   return { fullName: '', yearsExperience: '', goals: '' };

@@ -35,9 +35,9 @@ export const marketingInput =
 export const marketingPageGlow =
   'pointer-events-none fixed inset-0 z-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_0%,rgba(36,144,237,0.07),transparent_55%)]';
 
-export const marketingBody = 'text-base leading-relaxed text-white/55 sm:text-lg';
+export const marketingBody = 'text-base leading-relaxed text-white/75 sm:text-lg';
 
-export const marketingBodySm = 'text-sm leading-relaxed text-white/45';
+export const marketingBodySm = 'text-sm leading-relaxed text-white/65';
 
 export const marketingHeading =
   'text-4xl leading-[1.08] font-bold tracking-tight text-balance text-white sm:text-5xl lg:text-[3.25rem] lg:leading-[1.06]';
@@ -49,4 +49,4 @@ export const marketingStatCard =
   'rounded-2xl border border-white/[0.08] bg-gradient-to-b from-white/[0.07] to-white/[0.02] px-4 py-5 shadow-[0_16px_48px_-28px_rgba(0,0,0,0.8)]';
 
 export const marketingTopicPill =
-  'rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs text-white/55';
+  'rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs text-white/75';
