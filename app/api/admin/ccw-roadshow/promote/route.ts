@@ -7,6 +7,7 @@ import {
   setRegistrationCalendarSynced,
 } from '@/lib/server/ccw-roadshow-registry';
 import { addRegistrationToCalendar } from '@/lib/server/ccw-roadshow-calendar';
+import { sendCcwRoadshowRegistrationEmail } from '@/lib/server/transactional-email';
 import { prisma } from '@/lib/prisma';
 
 export async function POST(request: NextRequest) {
@@ -30,6 +31,7 @@ export async function POST(request: NextRequest) {
     try {
       const registration = await prisma.ccwRoadshowRegistration.findUnique({
         where: { id: body.registrationId },
+        include: { attendees: { take: 1, orderBy: { createdAt: 'asc' } } },
       });
       if (registration) {
         const synced = await addRegistrationToCalendar({
@@ -39,9 +41,27 @@ export async function POST(request: NextRequest) {
         if (synced) {
           await setRegistrationCalendarSynced(body.registrationId);
         }
+
+        try {
+          await sendCcwRoadshowRegistrationEmail({
+            to: registration.contactEmail,
+            kind: 'promoted',
+            attendeeName: registration.attendees[0]?.fullName ?? 'there',
+            eventCity: event.city,
+            dateRangeLabel: event.dateRangeLabel,
+            timeLabel: event.timeLabel,
+            venueName: event.venueName,
+            venueAddress: `${event.streetAddress}, ${event.suburbStatePostcode}`,
+            seatCount: registration.seatCount,
+            freeEntryToken: registration.freeEntryToken,
+            appOrigin: request.nextUrl.origin,
+          });
+        } catch (emailErr) {
+          console.error('[ccw-roadshow-promote] promotion email failed (non-fatal):', emailErr);
+        }
       }
-    } catch (calErr) {
-      console.error('[ccw-roadshow-promote] calendar sync failed (non-fatal):', calErr);
+    } catch (sideEffectErr) {
+      console.error('[ccw-roadshow-promote] post-promotion side effects failed (non-fatal):', sideEffectErr);
     }
 
     return NextResponse.json(result);

@@ -15,6 +15,7 @@ import {
   type AttendeeInput,
 } from '@/lib/server/ccw-roadshow-registry';
 import { addRegistrationToCalendar } from '@/lib/server/ccw-roadshow-calendar';
+import { sendCcwRoadshowRegistrationEmail } from '@/lib/server/transactional-email';
 
 type AttendeeBody = { fullName?: string; yearsExperience?: string; goals?: string };
 type RoadshowCheckoutBody = {
@@ -147,6 +148,24 @@ export async function POST(request: NextRequest) {
       currency: 'AUD',
       registration_url: bookingUrl,
     });
+
+    try {
+      await sendCcwRoadshowRegistrationEmail({
+        to: contactEmail,
+        kind: result.status === 'confirmed' ? 'confirmed' : 'waitlisted',
+        attendeeName: attendees[0]?.fullName ?? 'there',
+        eventCity: event.city,
+        dateRangeLabel: event.dateRangeLabel,
+        timeLabel: event.timeLabel,
+        venueName: event.venueName,
+        venueAddress: `${event.streetAddress}, ${event.suburbStatePostcode}`,
+        seatCount: result.seatCount,
+        freeEntryToken,
+        appOrigin: origin,
+      });
+    } catch (emailErr) {
+      console.error('[ccw-roadshow] registration email failed (non-fatal):', emailErr);
+    }
 
     return NextResponse.json({
       booking_url: bookingUrl,
