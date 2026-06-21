@@ -13,7 +13,8 @@ const OPTIONAL_ENV_VARS = {
 function validateEnv(): void {
   if (process.env.NODE_ENV === 'production' && !process.env.JWT_SECRET) {
     console.warn(
-      '[config] JWT_SECRET is not set — using embedded dev default. Set JWT_SECRET in production.'
+      '[config] JWT_SECRET is not set. Token signing/verification will fail in production until it is set ' +
+        '(see src/lib/auth/jwt-secret.ts).'
     );
   }
 }
