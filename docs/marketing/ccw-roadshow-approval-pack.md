@@ -36,7 +36,7 @@ Generators:
 
 - Phill approved the original visual proof set in chat on 17 June 2026; 18 June free-entry copy has now been applied to the proof set.
 - CCW confirms venue details, addresses, free-entry eligibility, seat capacity, brand use and facility wording.
-- Phil approves name prominence, role line and any image/bio before a headshot or expanded presenter copy is used.
+- Phill approves name prominence, role line and any image/bio before a headshot or expanded presenter copy is used.
 - CARSI confirms course outline, chemical-detail wording, free-entry token terms and non-RTO boundary.
 - CCW confirms email-list consent basis, suppression list, unsubscribe URL, sender profile and audience segments.
 - Synthex confirms final UTM links, publish dates/times, platform owners and rollback owner.
@@ -51,7 +51,7 @@ Generators:
 
 ## Known Open Inputs
 
-- Approved Phil headshot and short bio.
+- Approved Phill headshot and short bio.
 - CCW facility photos for Melbourne and Sydney.
 - Confirmed seat capacity for each location.
 - Final unsubscribe URL and sender postal/address footer for the CCW client-list email.

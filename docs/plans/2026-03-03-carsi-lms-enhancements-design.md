@@ -2,7 +2,7 @@
 
 **Date:** 2026-03-03
 **Status:** Approved
-**Author:** Brainstorming session with Phil
+**Author:** Brainstorming session with Phill
 
 ---
 
@@ -50,7 +50,7 @@ CARSI is the only LMS in Australia that:
 - **OCT** — Odour Control Technician
 - **ASD** — Applied Structural Drying
 - **CCT** — Commercial Carpet Maintenance Technician
-- _(Additional disciplines to be confirmed with Phil)_
+- _(Additional disciplines to be confirmed with Phill)_
 
 **IICRC CECs** are Continuing Education Credits required to maintain IICRC certification. CARSI courses are CEC-accredited — meaning completing a CARSI course earns CECs toward IICRC recertification.
 

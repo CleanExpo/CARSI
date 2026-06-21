@@ -40,7 +40,7 @@ const canonical = `${siteUrl}${ccwRoadshowPath}`;
 export const metadata: Metadata = {
   title: 'Grow Your Cleaning Business | CARSI x CCW Roadshow 2026',
   description:
-    'Free for CCW past and current customers. Spend two practical days with Phil McGurk at CCW Melbourne or Sydney and claim a free entry token when you register.',
+    'Free for CCW past and current customers. Spend two practical days with Phill McGurk at CCW Melbourne or Sydney and claim a free entry token when you register.',
   alternates: { canonical },
   keywords: [
     'carpet cleaning training Melbourne',
@@ -54,7 +54,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Grow Your Cleaning Business with CARSI x CCW',
     description:
-      'Two practical business-growth days with Phil McGurk inside CCW Melbourne and Sydney locations.',
+      'Two practical business-growth days with Phill McGurk inside CCW Melbourne and Sydney locations.',
     url: canonical,
     type: 'website',
     images: ['/og-image.png'],
@@ -255,7 +255,7 @@ export default function CcwRoadshowPage() {
           <MarketingSectionHeader
             eyebrow="Why, Who, What"
             title="Business improvement, not just a chemical day"
-            body="The value is not only the topic list. The value is spending two days with Phil, CARSI and the CCW team connecting services, equipment, chemicals and real customer decisions into a plan you can use."
+            body="The value is not only the topic list. The value is spending two days with Phill, CARSI and the CCW team connecting services, equipment, chemicals and real customer decisions into a plan you can use."
           />
 
           <div className="grid gap-4 lg:grid-cols-3">

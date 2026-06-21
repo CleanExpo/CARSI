@@ -146,7 +146,7 @@ Implement and validate these in order:
 3. `Course` and `CourseInstance`/course list data for core CARSI courses.
 4. `Event` data for Melbourne and Sydney Roadshow pages, including free entry for eligible CCW customers where represented on-page.
 5. `FAQPage` or visible Q&A content on Start Smart and Roadshow pages.
-6. `ProfilePage`/`Person` for Toby, Phil, trainers, and recognised experts once bios are approved.
+6. `ProfilePage`/`Person` for Toby, Phill, trainers, and recognised experts once bios are approved.
 7. `Article`/`NewsArticle` for evidence library updates and Roadshow recap articles.
 8. `VideoObject` for any training clips, Roadshow previews, and YouTube embeds.
 

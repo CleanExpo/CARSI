@@ -23,13 +23,13 @@ All emails need the live unsubscribe link, sender address, CCW/CARSI approval an
 
 Subject: Grow your cleaning business this July
 
-Preheader: Two practical days with Phil McGurk inside CCW Melbourne or Sydney.
+Preheader: Two practical days with Phill McGurk inside CCW Melbourne or Sydney.
 
 Body:
 
 CARSI and Carpet Cleaners Warehouse are bringing Business Growth Days to Melbourne and Sydney this July.
 
-Spend two practical days with Phil McGurk inside CCW and connect training, equipment, chemicals, service offers, quoting and customer follow-up before you spend more money or take on harder work.
+Spend two practical days with Phill McGurk inside CCW and connect training, equipment, chemicals, service offers, quoting and customer follow-up before you spend more money or take on harder work.
 
 Melbourne: 22-23 July at CCW Bayswater North.
 Sydney: 30-31 July at CCW Seven Hills.
@@ -91,7 +91,7 @@ CTA: Claim your free entry token before final seats close.
 2. Why: Training, equipment, chemicals, quoting and follow-up should work together before a business spends more money.
 3. Who: Built for carpet cleaners, cleaners adding services, rug and stain operators, tile cleaners, teams and new entrants.
 4. What: Leave with clearer strategies to pursue better-fit jobs, quote with confidence and avoid costly mistakes.
-5. Phil: Spend two days with Phil McGurk and the CCW team inside working CCW facilities.
+5. Phill: Spend two days with Phill McGurk and the CCW team inside working CCW facilities.
 6. Facility: This is not a hotel-room talk; attendees can see equipment, compare options and ask practical questions.
 7. Team entry: CCW past and current customers can claim free entry for up to five people and give the team one shared operating language.
 8. Course material: Course outline and practical chemical details are included.
@@ -101,7 +101,7 @@ CTA: Claim your free entry token before final seats close.
 ## CCW Social Posts
 
 1. We are hosting CARSI x CCW Business Growth Days at our Melbourne and Sydney locations.
-2. Spend two practical days with Phil McGurk inside Carpet Cleaners Warehouse.
+2. Spend two practical days with Phill McGurk inside Carpet Cleaners Warehouse.
 3. Connect equipment, chemicals, training and customer decisions before buying or quoting.
 4. Better questions before buying equipment can prevent expensive wrong turns.
 5. Practical chemical details and the course outline are included as part of the material.

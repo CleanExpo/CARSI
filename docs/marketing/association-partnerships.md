@@ -135,7 +135,7 @@ Establish CARSI as a recognised training partner across 7+ Australian industry a
 
 Dear [Name],
 
-I'm Phil from CARSI (carsi.com.au), an Australian-owned online training platform delivering IICRC CEC-approved courses in restoration, mould remediation and water damage management.
+I'm Phill from CARSI (carsi.com.au), an Australian-owned online training platform delivering IICRC CEC-approved courses in restoration, mould remediation and water damage management.
 
 We'd like to explore a training partnership with [Association Name] — offering your members discounted access to 40+ IICRC-approved courses, all available online and self-paced.
 
@@ -144,7 +144,7 @@ There's no cost to the association. Members receive a discount code and verifiab
 Would you be open to a 15-minute call to discuss?
 
 Kind regards,
-Phil
+Phill
 CARSI — Restoration Courses & Training Online
 carsi.com.au | training@carsi.com.au
 
@@ -178,7 +178,7 @@ This arrangement has worked well with other industry bodies and we'd welcome the
 Would you be available for a brief call next week?
 
 Kind regards,
-Phil
+Phill
 CARSI — Restoration Courses & Training Online
 carsi.com.au | training@carsi.com.au
 
@@ -192,7 +192,7 @@ carsi.com.au | training@carsi.com.au
 
 Dear [Name],
 
-I'm Phil from CARSI (carsi.com.au) — an Australian-owned online training platform specialising in IICRC CEC-approved courses for restoration, cleaning and building maintenance professionals.
+I'm Phill from CARSI (carsi.com.au) — an Australian-owned online training platform specialising in IICRC CEC-approved courses for restoration, cleaning and building maintenance professionals.
 
 I'm reaching out because I believe [Association Name] members could significantly benefit from access to our training catalogue, and I'd like to explore a formal partnership.
 
@@ -224,7 +224,7 @@ If the partnership delivers value, we're open to upgrading to **Preferred Traini
 I've attached a one-page partnership overview. Would you be open to a 15-minute introductory call? I'm happy to work around your availability.
 
 Kind regards,
-Phil
+Phill
 CARSI — Restoration Courses & Training Online
 carsi.com.au | training@carsi.com.au
 
@@ -269,7 +269,7 @@ CARSI (carsi.com.au) is an Australian-owned online training platform delivering 
 - Digital-first: verifiable credentials, LinkedIn sharing, employer audit trail
 
 **Next Step**
-15-minute introductory call with Phil → pilot with 3 member organisations → formal endorsement.
+15-minute introductory call with Phill → pilot with 3 member organisations → formal endorsement.
 
 Contact: training@carsi.com.au | carsi.com.au
 
