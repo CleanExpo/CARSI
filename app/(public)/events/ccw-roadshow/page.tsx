@@ -10,7 +10,7 @@ import {
   marketingBody,
   marketingBodySm,
   marketingBtnSecondary,
-  marketingEyebrowEmerald,
+  marketingEyebrowAmber,
   marketingEyebrowPill,
   marketingHeading,
   marketingPageGlow,
@@ -137,22 +137,22 @@ export default function CcwRoadshowPage() {
           <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(300px,420px)] lg:items-start lg:gap-12">
             <div className="min-w-0">
               <span
-                className={`inline-flex items-center gap-2 rounded-full border border-[#34d399]/25 bg-[#34d399]/10 px-3 py-1 text-xs font-medium text-[#34d399]`}
+                className={`inline-flex items-center gap-2 rounded-full border border-[#ed9d24]/25 bg-[#ed9d24]/10 px-3 py-1 text-xs font-medium text-[#ed9d24]`}
               >
                 <span className="relative flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#34d399] opacity-40" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-[#34d399]" />
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#ed9d24] opacity-40" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-[#ed9d24]" />
                 </span>
                 Melbourne + Sydney · July 2026
               </span>
 
-              <p className={`mt-5 ${marketingEyebrowEmerald}`}>
+              <p className={`mt-5 ${marketingEyebrowAmber}`}>
                 CARSI and Carpet Cleaners Warehouse
               </p>
 
               <h1 className={`mt-3 ${marketingHeading}`}>{ccwRoadshowHeroHeadline}</h1>
 
-              <p className="mt-3 text-lg font-semibold text-[#34d399]">
+              <p className="mt-3 text-lg font-semibold text-[#ed9d24]">
                 Spend two days with {ccwRoadshowPresenter.name}
               </p>
 
@@ -169,7 +169,7 @@ export default function CcwRoadshowPage() {
                   <p className={`mt-1 ${marketingBodySm}`}>Melbourne 22-23, Sydney 30-31</p>
                 </div>
                 <div className={marketingStatCard}>
-                  <Users className="mb-3 h-4 w-4 text-[#34d399]/80" aria-hidden />
+                  <Users className="mb-3 h-4 w-4 text-[#ed9d24]/80" aria-hidden />
                   <p className="text-sm font-semibold text-white/90">Free CCW entry</p>
                   <p className={`mt-1 ${marketingBodySm}`}>Past/current customers claim a token</p>
                 </div>
