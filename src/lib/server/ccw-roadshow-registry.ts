@@ -195,3 +195,8 @@ export async function setRegistrationCalendarSynced(registrationId: string): Pro
     data: { calendarSynced: true },
   });
 }
+
+/** Remove a registration (and its attendees, via cascade). Frees its seats. */
+export async function deleteRoadshowRegistration(registrationId: string): Promise<void> {
+  await prisma.ccwRoadshowRegistration.delete({ where: { id: registrationId } });
+}
