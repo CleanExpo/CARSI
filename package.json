@@ -47,6 +47,7 @@
     "db:seed-phase2": "npx tsx scripts/seed-phase2-pathways-quizzes.ts",
     "test:a11y": "playwright test tests/accessibility",
     "test:e2e": "playwright test",
+    "test:unit": "vitest run",
     "video:brand:plan": "npx tsx scripts/automate-brand-videos.ts --plan",
     "video:brand:submit": "npx tsx scripts/automate-brand-videos.ts --submit",
     "video:brand:poll": "npx tsx scripts/automate-brand-videos.ts --poll",
@@ -83,7 +84,8 @@
     "prisma": "7.6.0",
     "tailwindcss": "^4.1.18",
     "ts-node": "^10.9.2",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "vitest": "^3.2.4"
   },
   "overrides": {
     "react": "19.2.4",
