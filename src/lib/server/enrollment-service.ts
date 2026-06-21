@@ -4,6 +4,7 @@ import type { SessionClaims } from '@/lib/auth/session-jwt';
 import { prisma } from '@/lib/prisma';
 import { getOrCreateCourseBySlug } from '@/lib/server/course-catalog-sync';
 import { ensureLmsUserFromClaims } from '@/lib/server/lms-user-sync';
+import { isUniqueConstraintError } from '@/lib/server/db-errors';
 
 export type EnrollResult =
   | 'already_enrolled'
@@ -24,17 +25,27 @@ export async function enrollStudentInCourse(
   });
   if (existing) return 'already_enrolled';
 
-  const enrollment = await prisma.lmsEnrollment.create({
-    data: {
-      id: randomUUID(),
-      studentId: claims.sub,
-      courseId: course.id,
-      status: 'active',
-      paymentReference,
-    },
-  });
+  try {
+    const enrollment = await prisma.lmsEnrollment.create({
+      data: {
+        id: randomUUID(),
+        studentId: claims.sub,
+        courseId: course.id,
+        status: 'active',
+        paymentReference,
+      },
+    });
 
-  return { enrollmentId: enrollment.id, courseId: course.id };
+    return { enrollmentId: enrollment.id, courseId: course.id };
+  } catch (error) {
+    // Concurrent enrolment (Stripe webhook + success-page confirm racing) hits
+    // the @@unique([studentId, courseId]) constraint. Treat as already enrolled
+    // instead of surfacing a 500 to a paying customer.
+    if (isUniqueConstraintError(error)) {
+      return 'already_enrolled';
+    }
+    throw error;
+  }
 }
 
 async function lessonTotalsForCourse(courseId: string): Promise<{ ids: string[]; total: number }> {
