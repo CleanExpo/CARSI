@@ -13,7 +13,7 @@ export async function POST() {
   };
 
   response.cookies.set('auth_token', '', { ...clearOptions, httpOnly: true });
-  response.cookies.set('carsi_token', '', { ...clearOptions, httpOnly: false });
+  response.cookies.set('carsi_token', '', { ...clearOptions, httpOnly: true });
   response.cookies.set(ONBOARDING_COOKIE, '', { ...clearOptions, httpOnly: true });
 
   return response;

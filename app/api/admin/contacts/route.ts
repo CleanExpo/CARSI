@@ -62,33 +62,38 @@ export async function GET(request: NextRequest) {
   const leadIntent = request.nextUrl.searchParams.get('lead_intent')?.trim();
   const limit = Math.min(Number(request.nextUrl.searchParams.get('limit') ?? 50), 100);
 
-  const items = await prisma.contactSubmission.findMany({
-    where: {
-      ...(status ? { status } : {}),
-      ...(leadIntent ? { message: { contains: `Lead intent: ${leadIntent}` } } : {}),
-    },
-    orderBy: { createdAt: 'desc' },
-    take: limit,
-  });
+  try {
+    const items = await prisma.contactSubmission.findMany({
+      where: {
+        ...(status ? { status } : {}),
+        ...(leadIntent ? { message: { contains: `Lead intent: ${leadIntent}` } } : {}),
+      },
+      orderBy: { createdAt: 'desc' },
+      take: limit,
+    });
 
-  return NextResponse.json({
-    items: items.map((r) => {
-      const parsed = parseLeadContext(r.message);
+    return NextResponse.json({
+      items: items.map((r) => {
+        const parsed = parseLeadContext(r.message);
 
-      return {
-        id: r.id,
-        first_name: r.firstName,
-        last_name: r.lastName,
-        email: r.email,
-        message: parsed.cleanMessage,
-        raw_message: r.message,
-        lead_context: parsed.leadContext,
-        status: r.status,
-        source_ip: r.sourceIp,
-        created_at: r.createdAt.toISOString(),
-      };
-    }),
-  });
+        return {
+          id: r.id,
+          first_name: r.firstName,
+          last_name: r.lastName,
+          email: r.email,
+          message: parsed.cleanMessage,
+          raw_message: r.message,
+          lead_context: parsed.leadContext,
+          status: r.status,
+          source_ip: r.sourceIp,
+          created_at: r.createdAt.toISOString(),
+        };
+      }),
+    });
+  } catch (error) {
+    console.error('[admin/contacts] list failed:', error);
+    return NextResponse.json({ detail: 'Failed to load contacts.' }, { status: 500 });
+  }
 }
 
 /** PATCH /api/admin/contacts — update status. Body: { id, status } */
@@ -110,10 +115,19 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ detail: 'Invalid status' }, { status: 400 });
   }
 
-  await prisma.contactSubmission.update({
-    where: { id },
-    data: { status },
-  });
+  if (!process.env.DATABASE_URL?.trim()) {
+    return NextResponse.json({ detail: 'Database not configured' }, { status: 503 });
+  }
 
-  return NextResponse.json({ ok: true });
+  try {
+    await prisma.contactSubmission.update({
+      where: { id },
+      data: { status },
+    });
+
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    console.error('[admin/contacts] update failed:', error);
+    return NextResponse.json({ detail: 'Failed to update contact.' }, { status: 500 });
+  }
 }

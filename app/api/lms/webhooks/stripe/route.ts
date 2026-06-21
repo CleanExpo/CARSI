@@ -16,6 +16,7 @@ import { ensureGuestUserFromStripeEmail } from '@/lib/server/guest-checkout';
 import { sessionClaimsForUserId } from '@/lib/server/lms-auth';
 import { prisma } from '@/lib/prisma';
 import { fulfillCourseCheckoutForUser } from '@/lib/server/team-course-purchase';
+import { shouldRetryWebhookFulfillment } from '@/lib/server/stripe-webhook-policy';
 
 export async function POST(request: NextRequest) {
   const rawBody = await request.text();
@@ -117,11 +118,14 @@ export async function POST(request: NextRequest) {
     }
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
-    if (msg === 'ALREADY_ON_TEAM') {
-      console.warn('[stripe webhook] team purchase blocked: user on another team');
-    } else {
-      console.error('[stripe webhook] enrolment error:', e);
+    if (shouldRetryWebhookFulfillment(msg)) {
+      // Transient/unexpected failure — return 5xx so Stripe retries instead of
+      // silently dropping a paid enrolment.
+      console.error('[stripe webhook] enrolment error (returning 500 so Stripe retries):', e);
+      return NextResponse.json({ error: 'Enrolment failed; Stripe will retry.' }, { status: 500 });
     }
+    // Terminal business condition — acknowledge so Stripe does not retry.
+    console.warn('[stripe webhook] team purchase blocked: user on another team');
   }
 
   return NextResponse.json({ received: true });

@@ -68,3 +68,15 @@ export function applyRateLimit(
 // every "no-IP" caller into the same bucket so they can't bypass the
 // limit by spoofing missing headers.
 export const UNKNOWN_IP = "__unknown__";
+
+/**
+ * Resolve the client IP from proxy headers. Takes the first `x-forwarded-for`
+ * hop, then `x-real-ip`, then the UNKNOWN_IP sentinel. Empty/blank values fall
+ * through so a caller can't dodge the limit with a blank header.
+ */
+export function clientIpFrom(
+  forwardedFor: string | null | undefined,
+  realIp: string | null | undefined,
+): string {
+  return forwardedFor?.split(',')[0]?.trim() || realIp?.trim() || UNKNOWN_IP;
+}

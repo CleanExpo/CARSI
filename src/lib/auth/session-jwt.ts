@@ -1,10 +1,6 @@
 import { SignJWT, jwtVerify } from 'jose';
 
-function getSecret(): Uint8Array {
-  return new TextEncoder().encode(
-    process.env.JWT_SECRET || 'development-only-change-jwt-secret-in-production'
-  );
-}
+import { getSessionSecretBytes } from '@/lib/auth/jwt-secret';
 
 export interface SessionClaims {
   sub: string;
@@ -23,12 +19,12 @@ export async function signSessionToken(claims: SessionClaims): Promise<string> {
     .setSubject(claims.sub)
     .setIssuedAt()
     .setExpirationTime('7d')
-    .sign(getSecret());
+    .sign(getSessionSecretBytes());
 }
 
 export async function verifySessionToken(token: string): Promise<SessionClaims | null> {
   try {
-    const { payload } = await jwtVerify(token, getSecret());
+    const { payload } = await jwtVerify(token, getSessionSecretBytes());
     const sub = typeof payload.sub === 'string' ? payload.sub : '';
     const email = typeof payload.email === 'string' ? payload.email : '';
     const full_name = typeof payload.full_name === 'string' ? payload.full_name : 'User';
@@ -46,12 +42,12 @@ export async function signPasswordResetToken(userId: string): Promise<string> {
     .setSubject(userId)
     .setIssuedAt()
     .setExpirationTime('1h')
-    .sign(getSecret());
+    .sign(getSessionSecretBytes());
 }
 
 export async function verifyPasswordResetToken(token: string): Promise<string | null> {
   try {
-    const { payload } = await jwtVerify(token, getSecret());
+    const { payload } = await jwtVerify(token, getSessionSecretBytes());
     if (payload.purpose !== 'password_reset') return null;
     const sub = typeof payload.sub === 'string' ? payload.sub : '';
     return sub || null;
@@ -70,12 +66,12 @@ export async function signProofPackShareToken(userId: string): Promise<string> {
     .setAudience(PROOF_PACK_SHARE_AUDIENCE)
     .setIssuedAt()
     .setExpirationTime('30d')
-    .sign(getSecret());
+    .sign(getSessionSecretBytes());
 }
 
 export async function verifyProofPackShareToken(token: string): Promise<string | null> {
   try {
-    const { payload } = await jwtVerify(token, getSecret(), {
+    const { payload } = await jwtVerify(token, getSessionSecretBytes(), {
       audience: PROOF_PACK_SHARE_AUDIENCE,
     });
     if (payload.purpose !== 'proof_pack_share') return null;
