@@ -91,10 +91,10 @@ export async function processCcwRoadshowBookingConfirmation(
     appOrigin,
   });
 
-  const confirmedDelivered =
-    result.sent && result.reason !== 'dev_console' && result.reason !== 'not_configured';
-
-  if (confirmedDelivered) {
+  // Mark the session so a page refresh doesn't resend. Any successful send —
+  // including dev-console / not-configured fallbacks — counts as handled; only a
+  // genuine send failure (sent === false) is left unflagged so it can retry.
+  if (result.sent) {
     try {
       const stripe = getStripeClient();
       await stripe.checkout.sessions.update(sessionId, {
