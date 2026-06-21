@@ -15,6 +15,7 @@ import {
   type AttendeeInput,
 } from '@/lib/server/ccw-roadshow-registry';
 import { addRegistrationToCalendar } from '@/lib/server/ccw-roadshow-calendar';
+import { isMissingTableError } from '@/lib/server/db-errors';
 import { sendCcwRoadshowRegistrationEmail } from '@/lib/server/transactional-email';
 
 type AttendeeBody = { fullName?: string; yearsExperience?: string; goals?: string };
@@ -95,22 +96,43 @@ export async function POST(request: NextRequest) {
 
     const freeEntryToken = generateFreeEntryToken(event.slug);
 
-    const result = await createRoadshowRegistration({
-      event,
-      companyName,
-      contactEmail,
-      contactPhone,
-      ccwCustomerStatus,
-      attendees,
-      freeEntryToken,
-    });
+    let result;
+    try {
+      result = await createRoadshowRegistration({
+        event,
+        companyName,
+        contactEmail,
+        contactPhone,
+        ccwCustomerStatus,
+        attendees,
+        freeEntryToken,
+      });
+    } catch (error) {
+      if (isMissingTableError(error)) {
+        // Registry tables not migrated yet — degrade gracefully: still issue a
+        // token (and fire CRM + email below) so registration works, just
+        // without persistence/caps. Full caps/waitlist resume once
+        // `prisma migrate deploy` has run.
+        console.warn(
+          '[ccw-roadshow] registry tables missing — issued a token without persistence/caps. Run prisma migrate deploy.',
+        );
+        result = {
+          registrationId: '',
+          status: 'confirmed' as const,
+          seatCount: attendees.length,
+          remaining: event.capacity,
+        };
+      } else {
+        throw error;
+      }
+    }
 
     if (result.status === 'confirmed') {
       const synced = await addRegistrationToCalendar({
         calendarEventId: event.calendarEventId,
         attendeeEmail: contactEmail,
       });
-      if (synced) {
+      if (synced && result.registrationId) {
         await setRegistrationCalendarSynced(result.registrationId);
       }
     }
