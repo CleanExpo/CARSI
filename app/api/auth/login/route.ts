@@ -3,11 +3,29 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPostLoginRedirectPath } from '@/lib/admin/admin-auth';
 import { signSessionToken } from '@/lib/auth/session-jwt';
 import { authenticateWithPassword } from '@/lib/server/lms-auth';
+import { applyRateLimit, clientIpFrom } from '@/lib/rate-limit';
 
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
+const AUTH_LIMIT = 10;
+const AUTH_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
 
 export async function POST(request: NextRequest) {
   try {
+    const ip = clientIpFrom(
+      request.headers.get('x-forwarded-for'),
+      request.headers.get('x-real-ip'),
+    );
+    const rl = applyRateLimit(`auth-login:${ip}`, AUTH_LIMIT, AUTH_WINDOW_MS);
+    if (!rl.ok) {
+      return NextResponse.json(
+        { error: 'Too many attempts. Please try again later.' },
+        {
+          status: 429,
+          headers: { 'Retry-After': String(Math.ceil((rl.resetAt - Date.now()) / 1000)) },
+        },
+      );
+    }
+
     const body = (await request.json()) as {
       email?: unknown;
       password?: unknown;
