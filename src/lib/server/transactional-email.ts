@@ -16,6 +16,10 @@ import {
   renderYearlyMembershipEmail,
 } from '@/lib/server/email-templates';
 import { getFirstLessonLearnPath } from '@/lib/server/first-lesson';
+import {
+  buildRegistrationEmail,
+  type RoadshowEmailKind,
+} from '@/lib/server/ccw-roadshow-registration-email';
 
 export { isEmailConfigured };
 export type { SendEmailResult };
@@ -240,6 +244,41 @@ export async function sendCcwRoadshowBookingConfirmationEmail(params: {
     });
     throw error;
   }
+}
+
+/**
+ * Free roadshow registration email (confirmed / waitlisted / promoted).
+ * Carries the free-entry token; the template never tells a waitlisted attendee
+ * to show a token at check-in.
+ */
+export async function sendCcwRoadshowRegistrationEmail(params: {
+  to: string;
+  kind: RoadshowEmailKind;
+  attendeeName: string;
+  eventCity: string;
+  dateRangeLabel: string;
+  timeLabel: string;
+  venueName: string;
+  venueAddress: string;
+  seatCount: number;
+  freeEntryToken: string;
+  appOrigin: string;
+}): Promise<SendEmailResult> {
+  const base = params.appOrigin.replace(/\/$/, '');
+  const { subject, html, text } = buildRegistrationEmail({
+    kind: params.kind,
+    attendeeName: params.attendeeName,
+    eventCity: params.eventCity,
+    dateRangeLabel: params.dateRangeLabel,
+    timeLabel: params.timeLabel,
+    venueName: params.venueName,
+    venueAddress: params.venueAddress,
+    seatCount: params.seatCount,
+    freeEntryToken: params.freeEntryToken,
+    eventPageUrl: `${base}/events/ccw-roadshow`,
+  });
+
+  return sendEmail({ to: params.to, subject, html, text });
 }
 
 export async function sendContactNotificationEmail(params: {

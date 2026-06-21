@@ -13,6 +13,8 @@ export type CcwRoadshowEvent = {
   suburbStatePostcode: string;
   state: 'VIC' | 'NSW';
   description: string;
+  capacity: number;
+  calendarEventId: string;
 };
 
 export type CcwRoadshowTicketPackage = {
@@ -77,6 +79,8 @@ export const ccwRoadshowEvents: CcwRoadshowEvent[] = [
     state: 'VIC',
     description:
       'Two practical days with Phil McGurk and the CCW team, connecting training, equipment, service design, chemistry, quoting confidence and business growth for carpet, rug, stain and tile cleaning operators.',
+    capacity: 10,
+    calendarEventId: '1d1uqjm6an36n1kgc6s4s3ln7s',
   },
   {
     slug: 'sydney',
@@ -94,6 +98,8 @@ export const ccwRoadshowEvents: CcwRoadshowEvent[] = [
     state: 'NSW',
     description:
       'Two practical days with Phil McGurk and the CCW team, connecting training, equipment, service design, chemistry, quoting confidence and business growth for carpet, rug, stain and tile cleaning operators.',
+    capacity: 12,
+    calendarEventId: 'h6qm8t3muuv44ht9gqann5dhuk',
   },
 ];
 
@@ -177,4 +183,39 @@ export function formatAudFromCents(cents: number) {
     currency: 'AUD',
     maximumFractionDigits: 0,
   }).format(cents / 100);
+}
+
+export type RegistrationStatus = 'confirmed' | 'waitlisted';
+
+export const ccwRoadshowExperienceBands: { value: string; label: string }[] = [
+  { value: '0-1', label: '0–1 years' },
+  { value: '2-5', label: '2–5 years' },
+  { value: '6-10', label: '6–10 years' },
+  { value: '11+', label: '11+ years' },
+];
+
+export function isValidExperienceBand(value: string): boolean {
+  return ccwRoadshowExperienceBands.some((band) => band.value === value);
+}
+
+export function decideRegistrationStatus(input: {
+  confirmedSeats: number;
+  requestedSeats: number;
+  capacity: number;
+}): { status: RegistrationStatus } {
+  const fits = input.confirmedSeats + input.requestedSeats <= input.capacity;
+  return { status: fits ? 'confirmed' : 'waitlisted' };
+}
+
+export function computeAvailability(input: {
+  capacity: number;
+  confirmedSeats: number;
+}): { capacity: number; confirmed: number; remaining: number; isFull: boolean } {
+  const remaining = Math.max(0, input.capacity - input.confirmedSeats);
+  return {
+    capacity: input.capacity,
+    confirmed: input.confirmedSeats,
+    remaining,
+    isFull: input.confirmedSeats >= input.capacity,
+  };
 }

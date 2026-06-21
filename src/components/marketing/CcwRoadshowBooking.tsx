@@ -1,13 +1,13 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { ArrowRight, Loader2 } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { ArrowRight, Loader2, Plus, X } from 'lucide-react';
 
 import type { CcwRoadshowEvent } from '@/lib/marketing/ccw-roadshow';
 import {
+  ccwRoadshowExperienceBands,
   ccwRoadshowFreeEntryOffer,
   ccwRoadshowTicketPackages,
-  formatAudFromCents,
   type CcwRoadshowTicketPackage,
 } from '@/lib/marketing/ccw-roadshow';
 import {
@@ -19,30 +19,38 @@ import {
   marketingStatCard,
 } from '@/lib/marketing/marketing-ui';
 
+type AttendeeForm = { fullName: string; yearsExperience: string; goals: string };
+type Availability = { capacity: number; confirmed: number; remaining: number; isFull: boolean };
+
 type BookingFormState = {
   eventSlug: string;
   packageId: CcwRoadshowTicketPackage['id'];
   ccwCustomerStatus: 'current' | 'past' | 'not_sure';
-  fullName: string;
-  businessName: string;
-  email: string;
-  phone: string;
+  companyName: string;
+  contactEmail: string;
+  contactPhone: string;
+  attendees: AttendeeForm[];
 };
 
 const labelClass = 'mb-1.5 block text-xs font-medium tracking-wide text-white/45 uppercase';
+
+function emptyAttendee(): AttendeeForm {
+  return { fullName: '', yearsExperience: '', goals: '' };
+}
 
 export function CcwRoadshowBooking({ events }: { events: CcwRoadshowEvent[] }) {
   const [form, setForm] = useState<BookingFormState>({
     eventSlug: events[0]?.slug ?? '',
     packageId: 'single',
     ccwCustomerStatus: 'current',
-    fullName: '',
-    businessName: '',
-    email: '',
-    phone: '',
+    companyName: '',
+    contactEmail: '',
+    contactPhone: '',
+    attendees: [emptyAttendee()],
   });
   const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle');
   const [message, setMessage] = useState('');
+  const [availability, setAvailability] = useState<Availability | null>(null);
 
   const selectedEvent = useMemo(
     () => events.find((event) => event.slug === form.eventSlug) ?? events[0],
@@ -52,12 +60,59 @@ export function CcwRoadshowBooking({ events }: { events: CcwRoadshowEvent[] }) {
     ccwRoadshowTicketPackages.find((pkg) => pkg.id === form.packageId) ??
     ccwRoadshowTicketPackages[0];
 
+  useEffect(() => {
+    let active = true;
+    if (!form.eventSlug) return;
+    fetch(`/api/events/ccw-roadshow/availability?event=${form.eventSlug}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (active && data) setAvailability(data as Availability);
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, [form.eventSlug]);
+
   if (!selectedEvent || !selectedPackage) {
     return null;
   }
 
+  const maxSeats = selectedPackage.attendeeCount;
+  const isFull = availability?.isFull ?? false;
+
   function updateField<K extends keyof BookingFormState>(key: K, value: BookingFormState[K]) {
     setForm((current) => ({ ...current, [key]: value }));
+  }
+
+  function selectPackage(pkg: CcwRoadshowTicketPackage) {
+    setForm((current) => {
+      const attendees = current.attendees.slice(0, pkg.attendeeCount);
+      return { ...current, packageId: pkg.id, attendees: attendees.length ? attendees : [emptyAttendee()] };
+    });
+  }
+
+  function updateAttendee(index: number, key: keyof AttendeeForm, value: string) {
+    setForm((current) => {
+      const attendees = current.attendees.map((a, i) => (i === index ? { ...a, [key]: value } : a));
+      return { ...current, attendees };
+    });
+  }
+
+  function addAttendee() {
+    setForm((current) =>
+      current.attendees.length >= maxSeats
+        ? current
+        : { ...current, attendees: [...current.attendees, emptyAttendee()] },
+    );
+  }
+
+  function removeAttendee(index: number) {
+    setForm((current) =>
+      current.attendees.length <= 1
+        ? current
+        : { ...current, attendees: current.attendees.filter((_, i) => i !== index) },
+    );
   }
 
   function isValidEmail(value: string) {
@@ -65,43 +120,61 @@ export function CcwRoadshowBooking({ events }: { events: CcwRoadshowEvent[] }) {
   }
 
   async function submitBooking() {
+    if (status === 'loading') return; // guard against double-click before disabled state renders
     setStatus('loading');
     setMessage('');
 
-    const fullName = form.fullName.trim();
-    const email = form.email.trim();
-
-    if (!fullName) {
+    const contactEmail = form.contactEmail.trim();
+    if (!contactEmail || !isValidEmail(contactEmail)) {
       setStatus('error');
-      setMessage('Name is required.');
+      setMessage('A valid contact email is required.');
       return;
     }
-
-    if (!email || !isValidEmail(email)) {
-      setStatus('error');
-      setMessage('A valid email is required.');
-      return;
+    for (const attendee of form.attendees) {
+      if (!attendee.fullName.trim()) {
+        setStatus('error');
+        setMessage('Every attendee needs a name.');
+        return;
+      }
+      if (!attendee.yearsExperience) {
+        setStatus('error');
+        setMessage('Select years of experience for every attendee.');
+        return;
+      }
+      if (!attendee.goals.trim()) {
+        setStatus('error');
+        setMessage('Tell us what each attendee wants to achieve.');
+        return;
+      }
     }
 
     try {
       const response = await fetch('/api/events/ccw-roadshow/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, fullName, email }),
+        body: JSON.stringify({
+          eventSlug: form.eventSlug,
+          packageId: form.packageId,
+          ccwCustomerStatus: form.ccwCustomerStatus,
+          companyName: form.companyName.trim(),
+          contactEmail,
+          contactPhone: form.contactPhone.trim(),
+          attendees: form.attendees.map((a) => ({
+            fullName: a.fullName.trim(),
+            yearsExperience: a.yearsExperience,
+            goals: a.goals.trim(),
+          })),
+        }),
       });
       const payload = (await response.json().catch(() => ({}))) as {
-        checkout_url?: string;
         booking_url?: string;
         detail?: string;
         error?: string;
       };
-      const destination = payload.booking_url || payload.checkout_url;
-
-      if (!response.ok || !destination) {
+      if (!response.ok || !payload.booking_url) {
         throw new Error(payload.detail || payload.error || 'Could not reserve your free entry.');
       }
-
-      window.location.href = destination;
+      window.location.href = payload.booking_url;
     } catch (error) {
       setStatus('error');
       setMessage(error instanceof Error ? error.message : 'Could not reserve your free entry.');
@@ -111,13 +184,20 @@ export function CcwRoadshowBooking({ events }: { events: CcwRoadshowEvent[] }) {
   return (
     <div className={`p-5 sm:p-6 ${marketingStatCard}`}>
       <div className="mb-5">
-        <p className={marketingEyebrowPill}>Limited places</p>
+        <p className={marketingEyebrowPill}>{isFull ? 'Waitlist open' : 'Limited places'}</p>
         <h2 className="mt-4 text-xl font-bold tracking-tight text-white">
-          Claim your free entry token
+          {isFull ? 'Join the waitlist' : 'Claim your free entry token'}
         </h2>
         <p className={`mt-2 ${marketingBodySm}`}>
           {selectedEvent.city} - {selectedEvent.dates}. {ccwRoadshowFreeEntryOffer.detail}
         </p>
+        {availability && (
+          <p className={`mt-2 ${marketingBodySm}`}>
+            {availability.remaining > 0
+              ? `${availability.remaining} of ${availability.capacity} seats left.`
+              : 'This city is full — new registrations join the waitlist.'}
+          </p>
+        )}
       </div>
 
       <div className="space-y-4">
@@ -137,7 +217,7 @@ export function CcwRoadshowBooking({ events }: { events: CcwRoadshowEvent[] }) {
         </label>
 
         <div>
-          <span className={labelClass}>Ticket</span>
+          <span className={labelClass}>Registration type</span>
           <div className="grid gap-2 sm:grid-cols-2">
             {ccwRoadshowTicketPackages.map((pkg) => {
               const active = form.packageId === pkg.id;
@@ -145,7 +225,7 @@ export function CcwRoadshowBooking({ events }: { events: CcwRoadshowEvent[] }) {
                 <button
                   key={pkg.id}
                   type="button"
-                  onClick={() => updateField('packageId', pkg.id)}
+                  onClick={() => selectPackage(pkg)}
                   className={`min-h-[5.5rem] rounded-xl border p-3 text-left transition-all ${
                     active
                       ? 'border-[#2490ed]/50 bg-[#2490ed]/12 shadow-[0_8px_24px_-12px_rgba(36,144,237,0.35)]'
@@ -153,11 +233,9 @@ export function CcwRoadshowBooking({ events }: { events: CcwRoadshowEvent[] }) {
                   }`}
                 >
                   <span className="block text-sm font-semibold text-white/90">{pkg.label}</span>
-                  <span className="mt-1 block text-lg font-bold text-white">
-                    {formatAudFromCents(pkg.unitAmountCents)}
-                  </span>
+                  <span className="mt-1 block text-lg font-bold text-white">Free</span>
                   <span className={`mt-1 block ${marketingBodySm}`}>
-                    {pkg.attendeeCount} {pkg.attendeeCount === 1 ? 'seat' : 'seats'}
+                    Up to {pkg.attendeeCount} {pkg.attendeeCount === 1 ? 'person' : 'people'}
                   </span>
                 </button>
               );
@@ -170,10 +248,7 @@ export function CcwRoadshowBooking({ events }: { events: CcwRoadshowEvent[] }) {
           <select
             value={form.ccwCustomerStatus}
             onChange={(event) =>
-              updateField(
-                'ccwCustomerStatus',
-                event.target.value as BookingFormState['ccwCustomerStatus'],
-              )
+              updateField('ccwCustomerStatus', event.target.value as BookingFormState['ccwCustomerStatus'])
             }
             className={marketingInput}
           >
@@ -185,36 +260,21 @@ export function CcwRoadshowBooking({ events }: { events: CcwRoadshowEvent[] }) {
 
         <div className="grid gap-3 sm:grid-cols-2">
           <label className="block">
-            <span className={labelClass}>Name</span>
-            <input
-              type="text"
-              value={form.fullName}
-              onChange={(event) => updateField('fullName', event.target.value)}
-              autoComplete="name"
-              required
-              className={marketingInput}
-              placeholder="Full name"
-            />
-          </label>
-          <label className="block">
             <span className={labelClass}>Business</span>
             <input
-              value={form.businessName}
-              onChange={(event) => updateField('businessName', event.target.value)}
+              value={form.companyName}
+              onChange={(event) => updateField('companyName', event.target.value)}
               autoComplete="organization"
               className={marketingInput}
               placeholder="Business name"
             />
           </label>
-        </div>
-
-        <div className="grid gap-3 sm:grid-cols-2">
           <label className="block">
-            <span className={labelClass}>Email</span>
+            <span className={labelClass}>Contact email</span>
             <input
               type="email"
-              value={form.email}
-              onChange={(event) => updateField('email', event.target.value)}
+              value={form.contactEmail}
+              onChange={(event) => updateField('contactEmail', event.target.value)}
               autoComplete="email"
               inputMode="email"
               required
@@ -222,18 +282,80 @@ export function CcwRoadshowBooking({ events }: { events: CcwRoadshowEvent[] }) {
               placeholder="name@example.com"
             />
           </label>
-          <label className="block">
-            <span className={labelClass}>Phone</span>
-            <input
-              type="tel"
-              value={form.phone}
-              onChange={(event) => updateField('phone', event.target.value)}
-              autoComplete="tel"
-              inputMode="tel"
-              className={marketingInput}
-              placeholder="Mobile number"
-            />
-          </label>
+        </div>
+
+        <label className="block">
+          <span className={labelClass}>Contact phone</span>
+          <input
+            type="tel"
+            value={form.contactPhone}
+            onChange={(event) => updateField('contactPhone', event.target.value)}
+            autoComplete="tel"
+            inputMode="tel"
+            className={marketingInput}
+            placeholder="Mobile number"
+          />
+        </label>
+
+        <div className="space-y-3">
+          <span className={labelClass}>Attendees</span>
+          {form.attendees.map((attendee, index) => (
+            <div key={index} className={`rounded-xl border p-3 ${marketingPanel}`}>
+              <div className="mb-2 flex items-center justify-between">
+                <span className="text-sm font-semibold text-white/80">Attendee {index + 1}</span>
+                {form.attendees.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => removeAttendee(index)}
+                    className="text-white/50 hover:text-white"
+                    aria-label={`Remove attendee ${index + 1}`}
+                  >
+                    <X className="h-4 w-4" aria-hidden />
+                  </button>
+                )}
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <input
+                  value={attendee.fullName}
+                  onChange={(e) => updateAttendee(index, 'fullName', e.target.value)}
+                  className={marketingInput}
+                  placeholder="Full name"
+                  required
+                />
+                <select
+                  value={attendee.yearsExperience}
+                  onChange={(e) => updateAttendee(index, 'yearsExperience', e.target.value)}
+                  className={marketingInput}
+                  required
+                >
+                  <option value="">Years experience…</option>
+                  {ccwRoadshowExperienceBands.map((band) => (
+                    <option key={band.value} value={band.value}>
+                      {band.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <textarea
+                value={attendee.goals}
+                onChange={(e) => updateAttendee(index, 'goals', e.target.value)}
+                className={`mt-3 min-h-[4.5rem] ${marketingInput}`}
+                placeholder="What do they want to achieve from the 2 days?"
+                required
+              />
+            </div>
+          ))}
+
+          {form.attendees.length < maxSeats && (
+            <button
+              type="button"
+              onClick={addAttendee}
+              className={`flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-white/20 py-2 text-sm text-white/70 hover:border-white/40 hover:text-white`}
+            >
+              <Plus className="h-4 w-4" aria-hidden />
+              Add attendee ({form.attendees.length}/{maxSeats})
+            </button>
+          )}
         </div>
 
         {message && (
@@ -253,7 +375,7 @@ export function CcwRoadshowBooking({ events }: { events: CcwRoadshowEvent[] }) {
           ) : (
             <ArrowRight className="h-4 w-4" aria-hidden />
           )}
-          Claim {formatAudFromCents(selectedPackage.unitAmountCents).toLowerCase()} entry token
+          {isFull ? 'Join waitlist' : 'Claim free entry token'}
         </button>
       </div>
     </div>

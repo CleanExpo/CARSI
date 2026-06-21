@@ -1,10 +1,11 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, Clock } from 'lucide-react';
 
 import { getCheckoutSession } from '@/lib/api/stripe';
 import { processCcwRoadshowBookingConfirmation } from '@/lib/server/ccw-roadshow-booking-email';
 import { ccwRoadshowPath, ccwRoadshowTitle } from '@/lib/marketing/ccw-roadshow';
+import { getRoadshowSuccessView } from '@/lib/marketing/ccw-roadshow-success';
 
 export const metadata: Metadata = {
   title: 'Roadshow Free Entry Confirmed | CARSI',
@@ -61,6 +62,7 @@ export default async function CcwRoadshowSuccessPage({
     city?: string;
     dates?: string;
     seats?: string;
+    status?: string;
   }>;
 }) {
   const {
@@ -69,42 +71,59 @@ export default async function CcwRoadshowSuccessPage({
     city: freeCity,
     dates: freeDates,
     seats: freeSeats,
+    status: registrationStatus,
   } = await searchParams;
   await sendBookingConfirmationIfNeeded(sessionId);
   const booking = await getBookingSummary(sessionId);
   const hasFreeEntry = Boolean(freeEntryToken);
+  const view = getRoadshowSuccessView({
+    status: registrationStatus,
+    hasToken: hasFreeEntry,
+    eventTitle: ccwRoadshowTitle,
+  });
+  const isWaitlisted = view.variant === 'waitlisted';
 
   return (
     <main className="min-h-screen bg-[#050505] px-4 py-16 text-white">
       <div className="mx-auto max-w-2xl">
         <div className="rounded-2xl border border-[rgba(52,211,153,0.25)] bg-white/[0.04] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.28)]">
-          <CheckCircle2 className="h-12 w-12 text-[#34d399]" aria-hidden />
-          <p className="mt-5 text-xs font-semibold tracking-[0.18em] text-[#34d399] uppercase">
-            {hasFreeEntry ? 'Free Entry Confirmed' : 'Booking Confirmed'}
+          {isWaitlisted ? (
+            <Clock className="h-12 w-12 text-[#fbbf24]" aria-hidden />
+          ) : (
+            <CheckCircle2 className="h-12 w-12 text-[#34d399]" aria-hidden />
+          )}
+          <p
+            className={`mt-5 text-xs font-semibold tracking-[0.18em] uppercase ${
+              isWaitlisted ? 'text-[#fbbf24]' : 'text-[#34d399]'
+            }`}
+          >
+            {view.eyebrow}
           </p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white">
-            {hasFreeEntry
-              ? `Your free entry token for ${ccwRoadshowTitle} is ready`
-              : `You are booked for ${ccwRoadshowTitle}`}
-          </h1>
-          <p className="mt-3 text-sm leading-relaxed text-white/58">
-            {hasFreeEntry
-              ? 'No payment is required for CCW past and current customers. Save this token and show it at check-in when you arrive at the CCW location.'
-              : 'Payment has been sent through Stripe. Keep an eye on the booking email for your receipt and event details.'}
-          </p>
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white">{view.heading}</h1>
+          <p className="mt-3 text-sm leading-relaxed text-white/58">{view.body}</p>
 
-          {hasFreeEntry && (
-            <div className="mt-6 rounded-xl border border-[#34d399]/35 bg-[#34d399]/10 p-5">
-              <p className="text-xs font-semibold tracking-[0.18em] text-[#34d399] uppercase">
-                Free Entry Token
+          {view.showTokenBlock && (
+            <div
+              className={`mt-6 rounded-xl border p-5 ${
+                view.tokenIsValidForEntry
+                  ? 'border-[#34d399]/35 bg-[#34d399]/10'
+                  : 'border-[#fbbf24]/35 bg-[#fbbf24]/10'
+              }`}
+            >
+              <p
+                className={`text-xs font-semibold tracking-[0.18em] uppercase ${
+                  view.tokenIsValidForEntry ? 'text-[#34d399]' : 'text-[#fbbf24]'
+                }`}
+              >
+                {view.tokenLabel}
               </p>
               <p className="mt-3 break-all font-mono text-2xl font-semibold tracking-wide text-white">
                 {freeEntryToken}
               </p>
               <p className="mt-3 text-sm leading-relaxed text-white/58">
-                This token covers {freeSeats ?? '1'} {freeSeats === '1' ? 'seat' : 'seats'}
-                {freeCity ? ` for ${freeCity}` : ''}
-                {freeDates ? `, ${freeDates}` : ''}.
+                {view.tokenIsValidForEntry
+                  ? `This token covers ${freeSeats ?? '1'} ${freeSeats === '1' ? 'seat' : 'seats'}${freeCity ? ` for ${freeCity}` : ''}${freeDates ? `, ${freeDates}` : ''}.`
+                  : `We'll email you if a seat opens up${freeCity ? ` for ${freeCity}` : ''}${freeDates ? `, ${freeDates}` : ''}. Please don't rely on this reference for entry until we confirm.`}
               </p>
             </div>
           )}

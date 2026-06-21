@@ -1,6 +1,16 @@
 'use client';
 
-import { BadgeCheck, BarChart3, BookOpen, LogOut, Mail, Percent, Send, Users } from 'lucide-react';
+import {
+  BadgeCheck,
+  BarChart3,
+  BookOpen,
+  CalendarDays,
+  LogOut,
+  Mail,
+  Percent,
+  Send,
+  Users,
+} from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 
@@ -52,6 +62,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const analyticsActive = pathname.startsWith('/admin/analytics');
   const yearlyMembershipActive = pathname.startsWith('/admin/yearly-membership');
   const iicrcCecActive = pathname.startsWith('/admin/iicrc-cec');
+  const ccwRoadshowActive = pathname.startsWith('/admin/ccw-roadshow');
 
   async function handleSignOut() {
     await signOut();
@@ -101,6 +112,12 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             active={iicrcCecActive}
           />
           <NavButton href="/admin/contacts" label="Contacts" icon={Mail} active={contactsActive} />
+          <NavButton
+            href="/admin/ccw-roadshow"
+            label="CCW Roadshow"
+            icon={CalendarDays}
+            active={ccwRoadshowActive}
+          />
           <NavButton
             href="/admin/analytics"
             label="Analytics"
