@@ -27,17 +27,21 @@ export async function POST(request: NextRequest) {
   try {
     const result = await promoteRegistration(body.registrationId, event);
 
-    const registration = await prisma.ccwRoadshowRegistration.findUnique({
-      where: { id: body.registrationId },
-    });
-    if (registration) {
-      const synced = await addRegistrationToCalendar({
-        calendarEventId: event.calendarEventId,
-        attendeeEmail: registration.contactEmail,
+    try {
+      const registration = await prisma.ccwRoadshowRegistration.findUnique({
+        where: { id: body.registrationId },
       });
-      if (synced) {
-        await setRegistrationCalendarSynced(body.registrationId);
+      if (registration) {
+        const synced = await addRegistrationToCalendar({
+          calendarEventId: event.calendarEventId,
+          attendeeEmail: registration.contactEmail,
+        });
+        if (synced) {
+          await setRegistrationCalendarSynced(body.registrationId);
+        }
       }
+    } catch (calErr) {
+      console.error('[ccw-roadshow-promote] calendar sync failed (non-fatal):', calErr);
     }
 
     return NextResponse.json(result);
