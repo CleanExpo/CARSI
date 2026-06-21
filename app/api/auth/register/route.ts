@@ -5,6 +5,7 @@ import { sendRegistrationWelcomeEmail } from '@/lib/server/auth-email';
 import { getAppOrigin } from '@/lib/server/app-url';
 import { registerUserWithPassword } from '@/lib/server/lms-auth';
 import { applyRateLimit, clientIpFrom } from '@/lib/rate-limit';
+import { validateNewPassword } from '@/lib/auth/password-policy';
 
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
 const AUTH_LIMIT = 10;
@@ -37,6 +38,11 @@ export async function POST(request: NextRequest) {
         { error: 'Email, password, and full name are required' },
         { status: 400 }
       );
+    }
+
+    const passwordError = validateNewPassword(password);
+    if (passwordError) {
+      return NextResponse.json({ error: passwordError }, { status: 400 });
     }
 
     if (!process.env.DATABASE_URL?.trim()) {

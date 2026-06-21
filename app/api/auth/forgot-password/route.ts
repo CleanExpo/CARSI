@@ -5,10 +5,9 @@ import { sendPasswordResetEmail, isEmailConfigured } from '@/lib/server/auth-ema
 import { getAppOrigin } from '@/lib/server/app-url';
 import { prisma } from '@/lib/prisma';
 
-const NOT_FOUND_MESSAGE = 'No account found with this email address.';
-const SENT_MESSAGE = 'A password reset link has been sent to your email.';
-const SEND_FAILED_MESSAGE =
-  'We could not send the reset email. Please try again in a few minutes.';
+// Neutral message returned whether or not the account exists, so the endpoint
+// cannot be used to enumerate registered email addresses.
+const SENT_MESSAGE = 'If an account exists for that email, a password reset link has been sent.';
 
 export async function POST(request: NextRequest) {
   try {
@@ -27,32 +26,35 @@ export async function POST(request: NextRequest) {
     }
 
     const user = await prisma.lmsUser.findUnique({ where: { email: normalized } });
-    if (!user?.isActive) {
-      return NextResponse.json({ error: NOT_FOUND_MESSAGE }, { status: 404 });
-    }
 
-    const token = await signPasswordResetToken(user.id);
-    const base = getAppOrigin(request);
-    const link = `${base}/reset-password?token=${encodeURIComponent(token)}`;
+    // Only do work for a real, active account — but always return the same
+    // neutral response below so existence is never revealed.
+    if (user?.isActive) {
+      const token = await signPasswordResetToken(user.id);
+      const base = getAppOrigin(request);
+      const link = `${base}/reset-password?token=${encodeURIComponent(token)}`;
 
-    const emailResult = await sendPasswordResetEmail({
-      to: normalized,
-      resetLink: link,
-      fullName: user.fullName,
-      appOrigin: base,
-    });
+      const emailResult = await sendPasswordResetEmail({
+        to: normalized,
+        resetLink: link,
+        fullName: user.fullName,
+        appOrigin: base,
+      });
 
-    if (!emailResult.sent) {
-      if (process.env.NODE_ENV === 'development' || !isEmailConfigured()) {
-        console.info('[forgot-password] dev reset link:', link);
-        return NextResponse.json({ message: SENT_MESSAGE });
+      if (!emailResult.sent) {
+        if (process.env.NODE_ENV === 'development' || !isEmailConfigured()) {
+          console.info('[forgot-password] dev reset link:', link);
+        } else {
+          console.error(
+            '[forgot-password] failed to send reset email:',
+            emailResult.reason,
+            '→',
+            normalized
+          );
+        }
+      } else if (emailResult.reason === 'dev_console') {
+        console.info('[forgot-password] reset link (dev console):', link);
       }
-      console.error('[forgot-password] failed to send reset email:', emailResult.reason, '→', normalized);
-      return NextResponse.json({ error: SEND_FAILED_MESSAGE }, { status: 502 });
-    }
-
-    if (emailResult.reason === 'dev_console') {
-      console.info('[forgot-password] reset link (dev console):', link);
     }
 
     return NextResponse.json({ message: SENT_MESSAGE });
