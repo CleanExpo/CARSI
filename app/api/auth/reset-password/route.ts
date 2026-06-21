@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { verifyPasswordResetToken } from '@/lib/auth/session-jwt';
+import { validateNewPassword } from '@/lib/auth/password-policy';
 import { hashPassword } from '@/lib/server/lms-auth';
 import { prisma } from '@/lib/prisma';
 
@@ -17,11 +18,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (newPassword.length < 6) {
-      return NextResponse.json(
-        { error: 'Password must be at least 6 characters' },
-        { status: 400 }
-      );
+    const passwordError = validateNewPassword(newPassword);
+    if (passwordError) {
+      return NextResponse.json({ error: passwordError }, { status: 400 });
     }
 
     if (!process.env.DATABASE_URL?.trim()) {
@@ -45,12 +44,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ message: 'Password updated successfully.' });
   } catch (error) {
-    return NextResponse.json(
-      {
-        error: 'Reset service unavailable',
-        detail: error instanceof Error ? error.message : 'Unknown error',
-      },
-      { status: 502 }
-    );
+    console.error('[reset-password] failed:', error instanceof Error ? error.message : String(error));
+    return NextResponse.json({ error: 'Reset service unavailable' }, { status: 502 });
   }
 }

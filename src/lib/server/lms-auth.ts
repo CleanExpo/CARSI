@@ -128,13 +128,9 @@ export async function registerUserWithPassword(params: {
       return { ok: true, claims };
     }
 
-    // Same email + password as an existing account — treat as sign-in.
-    const passwordMatches = await verifyPassword(params.password, existing.hashedPassword);
-    if (passwordMatches) {
-      const claims = await sessionClaimsForUserId(existing.id);
-      if (claims) return { ok: true, claims };
-    }
-
+    // Existing real-password account. Always report EMAIL_TAKEN regardless of
+    // the supplied password — never confirm whether it matches, so register
+    // cannot be used as an unauthenticated password-checking oracle.
     return { ok: false, code: 'EMAIL_TAKEN' };
   }
 

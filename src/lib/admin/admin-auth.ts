@@ -1,5 +1,7 @@
 import { jwtVerify, SignJWT } from 'jose';
 
+import { getAdminSecretBytes } from '@/lib/auth/jwt-secret';
+
 export { ADMIN_COOKIE_NAME } from '@/lib/admin/admin-constants';
 export {
   getAdminEmail,
@@ -16,15 +18,6 @@ export function getAdminPassword(): string {
   return typeof v === 'string' ? v.trim() : '';
 }
 
-const ADMIN_JWT_SECRET =
-  process.env.ADMIN_JWT_SECRET ??
-  process.env.JWT_SECRET ??
-  'dev-admin-jwt-secret-change-me';
-
-function getSecretKeyBytes(): Uint8Array {
-  return new TextEncoder().encode(ADMIN_JWT_SECRET);
-}
-
 export type AdminSessionClaims = {
   email: string;
 };
@@ -35,12 +28,12 @@ export async function createAdminSessionToken(email: string): Promise<string> {
     .setSubject('admin')
     .setIssuedAt()
     .setExpirationTime('1d')
-    .sign(getSecretKeyBytes());
+    .sign(getAdminSecretBytes());
 }
 
 export async function verifyAdminSessionToken(token: string): Promise<AdminSessionClaims | null> {
   try {
-    const { payload } = await jwtVerify(token, getSecretKeyBytes());
+    const { payload } = await jwtVerify(token, getAdminSecretBytes());
     const sub = typeof payload.sub === 'string' ? payload.sub : '';
     if (sub !== 'admin') return null;
     const email = typeof payload.email === 'string' ? payload.email : '';
