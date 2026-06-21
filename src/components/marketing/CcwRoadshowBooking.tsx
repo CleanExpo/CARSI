@@ -120,6 +120,7 @@ export function CcwRoadshowBooking({ events }: { events: CcwRoadshowEvent[] }) {
   }
 
   async function submitBooking() {
+    if (status === 'loading') return; // guard against double-click before disabled state renders
     setStatus('loading');
     setMessage('');
 
