@@ -9,7 +9,7 @@ interface IndustryPageLayoutProps {
   children: ReactNode;
 }
 
-/** Dark industry surface aligned with homepage chrome and marketing pages. */
+/** Theme-aware industry surface aligned with homepage and marketing pages. */
 export function IndustryPageLayout({ children }: IndustryPageLayoutProps) {
   return (
     <MarketingPageShell innerClassName={marketingPageInnerWideClass}>{children}</MarketingPageShell>
