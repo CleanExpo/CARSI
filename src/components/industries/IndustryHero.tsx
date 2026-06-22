@@ -1,6 +1,8 @@
-import { LucideIcon } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+
 import { DisciplinePill } from './DisciplinePill';
 import { GlassStatCard } from './GlassStatCard';
+import { marketingBody, marketingHeading } from '@/lib/marketing/marketing-ui';
 
 interface Discipline {
   code: string;
@@ -35,49 +37,43 @@ export function IndustryHero({
   stats,
 }: IndustryHeroProps) {
   return (
-    <section className="mx-auto max-w-6xl px-6 pt-20 pb-16">
-      <div className="max-w-2xl">
-        {/* Industry pill */}
+    <section className="pb-12 pt-2 sm:pb-14">
+      <div className="max-w-3xl">
         <div
-          className="mb-6 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold"
+          className="mb-6 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-[11px] font-semibold tracking-[0.14em] uppercase"
           style={{
             background: `${accentColor}15`,
-            border: `1px solid ${accentColor}30`,
+            borderColor: `${accentColor}35`,
             color: accentColor,
           }}
         >
-          <Icon className="h-3.5 w-3.5" />
+          <Icon className="h-4 w-4" aria-hidden />
           {industryName}
         </div>
 
-        <h1
-          className="mb-6 text-4xl leading-tight font-bold tracking-tight sm:text-5xl"
-          style={{ color: 'rgba(255,255,255,0.95)' }}
-        >
+        <h1 className={`max-w-4xl ${marketingHeading}`}>
           {headline}
           <br />
           <span style={{ color: accentColor }}>{headlineAccent}</span>
         </h1>
 
-        <p
-          className="mb-8 max-w-xl text-lg leading-relaxed"
-          style={{ color: 'rgba(255,255,255,0.5)' }}
-        >
-          {description}
-        </p>
+        <p className={`mt-5 max-w-2xl ${marketingBody}`}>{description}</p>
 
-        {/* Discipline pills */}
-        <div className="mb-10 flex flex-wrap gap-2">
+        <div className="mt-8 flex flex-wrap gap-2">
           {disciplines.map((d) => (
             <DisciplinePill key={d.code} code={d.code} label={d.label} color={d.color} />
           ))}
         </div>
       </div>
 
-      {/* Stats row */}
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+      <div className="mt-10 grid grid-cols-1 gap-3 sm:grid-cols-3">
         {stats.map((stat) => (
-          <GlassStatCard key={stat.label} value={stat.value} label={stat.label} />
+          <GlassStatCard
+            key={stat.label}
+            value={stat.value}
+            label={stat.label}
+            accentColor={accentColor}
+          />
         ))}
       </div>
     </section>
