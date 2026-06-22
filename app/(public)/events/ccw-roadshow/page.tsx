@@ -3,7 +3,11 @@ import Link from 'next/link';
 import { ArrowRight, CalendarDays, MapPin, Sparkles, Users } from 'lucide-react';
 
 import { CcwRoadshowBooking } from '@/components/marketing/CcwRoadshowBooking';
+import { MarketingGrowthLinks } from '@/components/marketing/MarketingGrowthLinks';
 import { MarketingSectionHeader } from '@/components/marketing/MarketingSectionHeader';
+import {
+  MarketingPageShell,
+} from '@/components/marketing/MarketingPageShell';
 import { BreadcrumbSchema, EventSchema, FAQSchema, ItemListSchema } from '@/components/seo';
 import { getPublicSiteUrl } from '@/lib/env/public-url';
 import {
@@ -13,7 +17,6 @@ import {
   marketingEyebrowAmber,
   marketingEyebrowPill,
   marketingHeading,
-  marketingPageGlow,
   marketingPanel,
   marketingPanelHover,
   marketingSection,
@@ -125,14 +128,7 @@ export default function CcwRoadshowPage() {
         />
       ))}
 
-      <main
-        id="main-content"
-        className="relative min-h-screen pb-16 pt-6 text-white sm:pb-20 sm:pt-8"
-        style={{ background: '#060a14' }}
-      >
-        <div className={marketingPageGlow} aria-hidden="true" />
-
-        <div className="relative z-10 mx-auto w-full max-w-6xl px-5 sm:px-8 lg:px-10">
+      <MarketingPageShell id="main-content">
 
         {/* Hero */}
         <section className="relative z-10 pb-12 sm:pb-14">
@@ -345,8 +341,9 @@ export default function CcwRoadshowPage() {
             </div>
           </div>
         </section>
-        </div>
-      </main>
+
+        <MarketingGrowthLinks currentHref={ccwRoadshowPath} />
+      </MarketingPageShell>
     </>
   );
 }
