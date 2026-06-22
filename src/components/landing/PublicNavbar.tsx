@@ -8,23 +8,13 @@ import {
   PUBLIC_CHROME_NAV_CLASS,
   PUBLIC_SHELL_INNER_CLASS,
 } from '@/components/landing/public-shell-width';
-
-import { startSmartBasePath } from '@/lib/marketing/start-smart';
+import { PUBLIC_PRIMARY_NAV } from '@/lib/navigation/public-nav';
 
 import MobileNav from './MobileNav';
 
-const primaryNavItems = [
-  { label: 'Courses', href: '/courses' },
-  { label: 'Pathways', href: '/pathways' },
-  { label: 'Start Smart', href: startSmartBasePath },
-  { label: 'Events', href: '/events/ccw-roadshow' },
-  { label: 'Pricing', href: '/pricing' },
-  { label: 'Contact', href: '/contact' },
-];
-
 /**
- * Shared public navigation bar — identical to the homepage nav.
- * Used in the (public) layout so every public page gets consistent navigation.
+ * Shared public navigation bar — identical on every public page and the homepage.
+ * Only high-value product links; secondary routes are in the footer.
  */
 export function PublicNavbar() {
   return (
@@ -34,13 +24,13 @@ export function PublicNavbar() {
         aria-hidden
       />
       <div className={`relative ${PUBLIC_SHELL_INNER_CLASS}`}>
-        <div className="flex h-[72px] items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
+        <div className="flex h-[72px] items-center justify-between gap-4">
+          <Link href="/" className="flex shrink-0 items-center gap-2">
             <PublicLogo variant="nav" />
           </Link>
 
-          <div className="hidden items-center gap-8 lg:flex">
-            {primaryNavItems.map((item) => (
+          <div className="hidden items-center gap-7 lg:flex">
+            {PUBLIC_PRIMARY_NAV.map((item) => (
               <Link key={item.href} href={item.href} className={PUBLIC_CHROME_LINK_CLASS}>
                 {item.label}
               </Link>
