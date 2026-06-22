@@ -1,3 +1,4 @@
+import { PUBLIC_SHELL_INNER_CLASS } from '@/components/landing/public-shell-width';
 import { PublicFooter } from '@/components/landing/PublicFooter';
 import { PublicNavbar } from '@/components/landing/PublicNavbar';
 import FloatingChatGate from '@/components/lms/FloatingChatGate';
@@ -12,7 +13,7 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
         <UtmCapture />
       </Suspense>
       <PublicNavbar />
-      <div className="mx-auto w-[94%] xl:w-[85%] 2xl:max-w-[1800px]">{children}</div>
+      <div className={PUBLIC_SHELL_INNER_CLASS}>{children}</div>
       <PublicFooter />
       <FloatingChatGate />
     </div>
