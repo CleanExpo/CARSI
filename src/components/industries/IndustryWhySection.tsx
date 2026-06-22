@@ -2,6 +2,7 @@ import type { LucideIcon } from 'lucide-react';
 
 import {
   marketingBodySm,
+  marketingEyebrowPill,
   marketingIconWrap,
   marketingPanel,
   marketingPanelHover,
@@ -33,18 +34,19 @@ export function IndustryWhySection({
 }: IndustryWhySectionProps) {
   return (
     <section className={marketingSection}>
-      <div className="mb-8 max-w-3xl md:mb-10">
-        <p className="mb-3 inline-flex items-center rounded-full border border-[#2490ed]/30 bg-[#2490ed]/10 px-3 py-1 text-[11px] font-semibold tracking-[0.14em] text-[#7ec5ff] uppercase">
-          Why {industryName} choose CARSI
-        </p>
+      <div className="mb-8 max-w-4xl md:mb-10">
+        <p className={`mb-3 ${marketingEyebrowPill}`}>Why {industryName} choose CARSI</p>
         <h2 className={marketingSectionTitle}>
           {headline}{' '}
           <span style={{ color: accentColor }}>{headlineAccent}</span>
         </h2>
-        <div className="mt-4 h-1 w-16 rounded-full bg-gradient-to-r from-[#2490ed] via-[#5eb3ff] to-[#00d4aa]" aria-hidden />
+        <div
+          className="mt-4 h-1 w-16 rounded-full bg-gradient-to-r from-[#2490ed] via-[#5eb3ff] to-[#00d4aa]"
+          aria-hidden
+        />
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         {cards.map((card) => (
           <div key={card.title} className={`p-6 ${marketingPanel} ${marketingPanelHover}`}>
             <div
@@ -57,7 +59,7 @@ export function IndustryWhySection({
             >
               <card.icon className="h-5 w-5" aria-hidden />
             </div>
-            <h3 className="text-base font-semibold text-white/90">{card.title}</h3>
+            <h3 className="text-base font-semibold text-slate-900 dark:text-white/90">{card.title}</h3>
             <p className={`mt-3 ${marketingBodySm}`}>{card.description}</p>
           </div>
         ))}
