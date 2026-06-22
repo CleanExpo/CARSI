@@ -29,7 +29,7 @@ export function MarketingSectionHeader({
       {pill ? (
         <p className={`mb-3 ${eyebrowClassName}`}>{eyebrow}</p>
       ) : (
-        <p className="mb-2 text-[11px] font-semibold tracking-[0.2em] text-[#2490ed]/80 uppercase">
+        <p className="mb-2 text-[11px] font-semibold tracking-[0.2em] text-[#146fc2]/90 uppercase dark:text-[#2490ed]/80">
           {eyebrow}
         </p>
       )}
