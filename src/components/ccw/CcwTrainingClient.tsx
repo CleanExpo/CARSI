@@ -1,17 +1,15 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
 import { MarketingGrowthLinks } from '@/components/marketing/MarketingGrowthLinks';
 import {
   MarketingPageShell,
   marketingPageInnerNarrowClass,
 } from '@/components/marketing/MarketingPageShell';
-import { marketingHeading, marketingInput, marketingPanel } from '@/lib/marketing/marketing-ui';
-import { ccwWorkshopPath } from '@/lib/marketing/marketing-growth-links';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { CCW_COURSE_ZIP_HREF, CCW_COURSE_ZIP_PATH } from '@/lib/ccw/course-zip';
+import { ccwWorkshopPath } from '@/lib/marketing/marketing-growth-links';
+import { marketingHeading, marketingInput, marketingPanel } from '@/lib/marketing/marketing-ui';
 import {
   ArrowRight,
   BookOpen,
@@ -26,6 +24,8 @@ import {
   ShieldCheck,
   Target,
 } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
+import { useCallback, useEffect, useState } from 'react';
 
 const SESSION_KEY = 'carsi_ccw_training_unlocked';
 
@@ -75,7 +75,7 @@ const included = [
 const trainerMeta = [
   {
     term: 'Anchored',
-    text: 'ANSI/IICRC S100 · S300 · S220 · S500 · S520 (Phill\'s Drive library)',
+    text: "ANSI/IICRC S100 · S300 · S220 · S500 · S520 (Phill's Drive library)",
   },
   {
     term: 'CARSI',
@@ -112,7 +112,7 @@ const faq = [
 
 function AgendaLine({ text }: { text: string }) {
   return (
-    <li className="border-b border-slate-200/80 dark:border-white/6 py-3 text-sm leading-relaxed text-slate-600 dark:text-white/55 last:border-0">
+    <li className="border-b border-slate-200/80 py-3 text-sm leading-relaxed text-slate-600 last:border-0 dark:border-white/6 dark:text-white/55">
       {text}
     </li>
   );
@@ -142,318 +142,352 @@ export function CcwTrainingClient() {
     const section = searchParams.get('section');
     if (section === 'materials' && unlocked) {
       requestAnimationFrame(() => {
-        document.getElementById('materials')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        document
+          .getElementById('materials')
+          ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
     }
   }, [searchParams, unlocked]);
 
-  const onUnlock = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setPending(true);
-    try {
-      const res = await fetch('/api/ccw-training/verify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password }),
-      });
-      const data = (await res.json()) as { ok?: boolean; error?: string };
-      if (!res.ok || !data.ok) {
-        setError(data.error ?? 'Incorrect password.');
-        return;
-      }
+  const onUnlock = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      setError(null);
+      setPending(true);
       try {
-        sessionStorage.setItem(SESSION_KEY, '1');
+        const res = await fetch('/api/ccw-training/verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password }),
+        });
+        const data = (await res.json()) as { ok?: boolean; error?: string };
+        if (!res.ok || !data.ok) {
+          setError(data.error ?? 'Incorrect password.');
+          return;
+        }
+        try {
+          sessionStorage.setItem(SESSION_KEY, '1');
+        } catch {
+          /* ignore */
+        }
+        setUnlocked(true);
+        setPassword('');
       } catch {
-        /* ignore */
+        setError('Something went wrong. Try again.');
+      } finally {
+        setPending(false);
       }
-      setUnlocked(true);
-      setPassword('');
-    } catch {
-      setError('Something went wrong. Try again.');
-    } finally {
-      setPending(false);
-    }
-  }, [password]);
+    },
+    [password]
+  );
 
   return (
     <MarketingPageShell innerClassName={marketingPageInnerNarrowClass}>
-        {/* Hero */}
-        <header className="text-center">
-          <p className="mb-4 text-[10px] font-semibold tracking-[0.22em] text-slate-500 dark:text-white/40 uppercase">
-            CARSI · 2 DAYS · HANDS-ON
-          </p>
-          <h1 className={`text-balance ${marketingHeading}`}>
-            The Carpet Cleaning Workshop
-          </h1>
-          <div
-            className="mx-auto mt-6 h-px w-16 bg-linear-to-r from-transparent via-[#2490ed]/80 to-transparent"
-            aria-hidden
-          />
-          <p className="mx-auto mt-6 max-w-3xl text-sm leading-relaxed tracking-wide text-slate-500 dark:text-white/45 md:text-[15px]">
-            {PILLAR_LINE}
-          </p>
-          <p className="mx-auto mt-4 max-w-2xl text-xs font-medium text-[#7ec5ff]/90 md:text-sm">
-            {ANCHORED_HERO}
-          </p>
-          <p className="mx-auto mt-8 max-w-2xl text-pretty text-base leading-relaxed text-slate-600 dark:text-white/50 md:text-lg">
-            This page is for enrolled participants to access the workshop resource pack after your session.
-          </p>
-        </header>
+      {/* Hero */}
+      <header className="text-center">
+        <p className="mb-4 text-[10px] font-semibold tracking-[0.22em] text-slate-500 uppercase dark:text-white/40">
+          CARSI · 2 DAYS · HANDS-ON
+        </p>
+        <h1 className={`text-balance ${marketingHeading}`}>The Carpet Cleaning Workshop</h1>
+        <div
+          className="mx-auto mt-6 h-px w-16 bg-linear-to-r from-transparent via-[#2490ed]/80 to-transparent"
+          aria-hidden
+        />
+        <p className="mx-auto mt-6 max-w-3xl text-sm leading-relaxed tracking-wide text-slate-500 md:text-[15px] dark:text-white/45">
+          {PILLAR_LINE}
+        </p>
+        <p className="mx-auto mt-4 max-w-2xl text-xs font-medium text-[#7ec5ff]/90 md:text-sm">
+          {ANCHORED_HERO}
+        </p>
+        <p className="mx-auto mt-8 max-w-2xl text-base leading-relaxed text-pretty text-slate-600 md:text-lg dark:text-white/50">
+          This page is for enrolled participants to access the workshop resource pack after your
+          session.
+        </p>
+      </header>
 
-        {/* Your trainer */}
-        <section className="mt-20 md:mt-24" aria-labelledby="ccw-trainer-heading">
-          <div className="mb-8 border-b border-white/8 pb-6">
-            <p className="text-[10px] font-semibold tracking-[0.22em] text-slate-400 dark:text-white/35 uppercase">
-              Your trainer
-            </p>
-            <h2 id="ccw-trainer-heading" className="mt-1 text-xl font-semibold tracking-tight text-slate-900 dark:text-white md:text-2xl">
-              Phill McGurk — CARSI
-            </h2>
-            <p className="mx-auto mt-4 max-w-3xl text-pretty text-sm leading-relaxed text-slate-600 dark:text-white/50 md:text-base">
-              The two days you are about to do are built from a library of real IICRC standards and distilled
-              into a CARSI original curriculum you can take home.
-            </p>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {trainerMeta.map(({ term, text }) => (
-              <div key={term} className={`rounded-2xl p-5 md:p-6 ${marketingPanel}`}>
-                <p className="text-[10px] font-semibold tracking-[0.18em] text-[#7ec5ff]/80 uppercase">
-                  {term}
-                </p>
-                <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-white/60">{text}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Agenda */}
-        <section className="mt-20 md:mt-24" aria-labelledby="ccw-agenda-heading">
-          <div className="mb-8 flex flex-col gap-2 border-b border-white/8 pb-6 md:flex-row md:items-end md:justify-between">
-            <div>
-              <p className="text-[10px] font-semibold tracking-[0.22em] text-slate-400 dark:text-white/35 uppercase">Agenda</p>
-              <h2 id="ccw-agenda-heading" className="mt-1 text-xl font-semibold tracking-tight text-slate-900 dark:text-white md:text-2xl">
-                Two Days — Five Deliverables
-              </h2>
-            </div>
-          </div>
-          <div className="grid gap-6 lg:grid-cols-2 lg:gap-8">
-            <div className={`flex flex-col rounded-2xl p-6 md:p-8 ${marketingPanel}`}>
-              <div className="mb-4 flex items-center gap-2 border-b border-white/8 pb-4">
-                <GraduationCap className="h-5 w-5 text-[#7ec5ff]" aria-hidden />
-                <span className="text-sm font-semibold text-slate-900 dark:text-white/90">Day 1</span>
-              </div>
-              <p className="mb-4 text-xs font-medium tracking-wide text-slate-500 dark:text-white/45 uppercase">
-                Carpet &amp; Stain Fundamentals
+      {/* Your trainer */}
+      <section className="mt-20 md:mt-24" aria-labelledby="ccw-trainer-heading">
+        <div className="mb-8 border-b border-white/8 pb-6">
+          <p className="text-[10px] font-semibold tracking-[0.22em] text-slate-400 uppercase dark:text-white/35">
+            Your trainer
+          </p>
+          <h2
+            id="ccw-trainer-heading"
+            className="mt-1 text-xl font-semibold tracking-tight text-slate-900 md:text-2xl dark:text-white"
+          >
+            Phill McGurk — CARSI
+          </h2>
+          <p className="mx-auto mt-4 max-w-3xl text-sm leading-relaxed text-pretty text-slate-600 md:text-base dark:text-white/50">
+            The two days you are about to do are built from a library of real IICRC standards and
+            distilled into a CARSI original curriculum you can take home.
+          </p>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          {trainerMeta.map(({ term, text }) => (
+            <div key={term} className={`rounded-2xl p-5 md:p-6 ${marketingPanel}`}>
+              <p className="text-[10px] font-semibold tracking-[0.18em] text-[#7ec5ff]/80 uppercase">
+                {term}
               </p>
-              <ul className="list-none space-y-0">
-                {agendaDay1.map((line) => (
-                  <AgendaLine key={line} text={line} />
-                ))}
-              </ul>
-            </div>
-            <div className={`flex flex-col rounded-2xl p-6 md:p-8 ${marketingPanel}`}>
-              <div className="mb-4 flex items-center gap-2 border-b border-white/8 pb-4">
-                <GraduationCap className="h-5 w-5 text-[#7ec5ff]" aria-hidden />
-                <span className="text-sm font-semibold text-slate-900 dark:text-white/90">Day 2</span>
-              </div>
-              <p className="mb-4 text-xs font-medium tracking-wide text-slate-500 dark:text-white/45 uppercase">
-                Upholstery · Hard Floors · Business · Maintenance
+              <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-white/60">
+                {text}
               </p>
-              <ul className="list-none space-y-0">
-                {agendaDay2.map((line) => (
-                  <AgendaLine key={line} text={line} />
-                ))}
-              </ul>
             </div>
-          </div>
-        </section>
+          ))}
+        </div>
+      </section>
 
-        {/* What's included */}
-        <section className="mt-20 md:mt-24" aria-labelledby="ccw-included-heading">
-          <div className="mb-8">
-            <p className="text-[10px] font-semibold tracking-[0.22em] text-slate-400 dark:text-white/35 uppercase">
-              Deliverables
+      {/* Agenda */}
+      <section className="mt-20 md:mt-24" aria-labelledby="ccw-agenda-heading">
+        <div className="mb-8 flex flex-col gap-2 border-b border-white/8 pb-6 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="text-[10px] font-semibold tracking-[0.22em] text-slate-400 uppercase dark:text-white/35">
+              Agenda
             </p>
-            <h2 id="ccw-included-heading" className="mt-1 text-xl font-semibold tracking-tight text-slate-900 dark:text-white md:text-2xl">
-              What&apos;s included
+            <h2
+              id="ccw-agenda-heading"
+              className="mt-1 text-xl font-semibold tracking-tight text-slate-900 md:text-2xl dark:text-white"
+            >
+              Two Days — Five Deliverables
             </h2>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {included.map(({ icon: Icon, title, body }) => (
-              <div
-                key={title}
-                className="glass-card rounded-2xl p-6 transition-none hover:translate-y-0"
-              >
-                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl border border-white/8 bg-white/4">
-                  <Icon className="h-5 w-5 text-[#7ec5ff]" aria-hidden />
+        </div>
+        <div className="grid gap-6 lg:grid-cols-2 lg:gap-8">
+          <div className={`flex flex-col rounded-2xl p-6 md:p-8 ${marketingPanel}`}>
+            <div className="mb-4 flex items-center gap-2 border-b border-white/8 pb-4">
+              <GraduationCap className="h-5 w-5 text-[#7ec5ff]" aria-hidden />
+              <span className="text-sm font-semibold text-slate-900 dark:text-white/90">Day 1</span>
+            </div>
+            <p className="mb-4 text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-white/45">
+              Carpet &amp; Stain Fundamentals
+            </p>
+            <ul className="list-none space-y-0">
+              {agendaDay1.map((line) => (
+                <AgendaLine key={line} text={line} />
+              ))}
+            </ul>
+          </div>
+          <div className={`flex flex-col rounded-2xl p-6 md:p-8 ${marketingPanel}`}>
+            <div className="mb-4 flex items-center gap-2 border-b border-white/8 pb-4">
+              <GraduationCap className="h-5 w-5 text-[#7ec5ff]" aria-hidden />
+              <span className="text-sm font-semibold text-slate-900 dark:text-white/90">Day 2</span>
+            </div>
+            <p className="mb-4 text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-white/45">
+              Upholstery · Hard Floors · Business · Maintenance
+            </p>
+            <ul className="list-none space-y-0">
+              {agendaDay2.map((line) => (
+                <AgendaLine key={line} text={line} />
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* What's included */}
+      <section className="mt-20 md:mt-24" aria-labelledby="ccw-included-heading">
+        <div className="mb-8">
+          <p className="text-[10px] font-semibold tracking-[0.22em] text-slate-400 uppercase dark:text-white/35">
+            Deliverables
+          </p>
+          <h2
+            id="ccw-included-heading"
+            className="mt-1 text-xl font-semibold tracking-tight text-slate-900 md:text-2xl dark:text-white"
+          >
+            What&apos;s included
+          </h2>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {included.map(({ icon: Icon, title, body }) => (
+            <div
+              key={title}
+              className="glass-card rounded-2xl p-6 transition-none hover:translate-y-0"
+            >
+              <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl border border-white/8 bg-white/4">
+                <Icon className="h-5 w-5 text-[#7ec5ff]" aria-hidden />
+              </div>
+              <h3 className="text-sm font-semibold text-slate-900 dark:text-white/95">{title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-slate-500 dark:text-white/45">
+                {body}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Materials gate */}
+      <section className="mt-20 md:mt-28" aria-labelledby="ccw-access-heading">
+        <div className="mb-8 text-center md:mb-10">
+          <p className="text-[10px] font-semibold tracking-[0.22em] text-slate-400 uppercase dark:text-white/35">
+            Participants
+          </p>
+          <h2
+            id="ccw-access-heading"
+            className="mt-1 text-xl font-semibold tracking-tight text-slate-900 md:text-2xl dark:text-white"
+          >
+            Workshop materials
+          </h2>
+          <p className="mx-auto mt-2 max-w-md text-sm text-slate-500 dark:text-white/40">
+            Unlock below to download the take-home pack for your cohort.
+          </p>
+        </div>
+
+        <div className="mx-auto w-full max-w-xl">
+          {!unlocked ? (
+            <div className="glass-strong rounded-2xl p-8 shadow-[0_24px_80px_rgba(0,0,0,0.45)] md:p-10">
+              {!gateOpen ? (
+                <div className="text-center">
+                  <p className="text-sm leading-relaxed text-slate-600 dark:text-white/50">
+                    Use the password shared with you for this cohort to open the download.
+                  </p>
+                  <Button
+                    type="button"
+                    size="lg"
+                    className="mt-8 w-full rounded-xl bg-[#2490ed] text-[15px] font-semibold text-white shadow-lg shadow-[#2490ed]/20 hover:bg-[#1f82d4] sm:w-auto sm:min-w-[220px]"
+                    onClick={() => setGateOpen(true)}
+                  >
+                    Access Course
+                    <ArrowRight className="ml-2 h-4 w-4" aria-hidden />
+                  </Button>
                 </div>
-                <h3 className="text-sm font-semibold text-slate-900 dark:text-white/95">{title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-slate-500 dark:text-white/45">{body}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Materials gate */}
-        <section className="mt-20 md:mt-28" aria-labelledby="ccw-access-heading">
-          <div className="mb-8 text-center md:mb-10">
-            <p className="text-[10px] font-semibold tracking-[0.22em] text-slate-400 dark:text-white/35 uppercase">
-              Participants
-            </p>
-            <h2 id="ccw-access-heading" className="mt-1 text-xl font-semibold tracking-tight text-slate-900 dark:text-white md:text-2xl">
-              Workshop materials
-            </h2>
-            <p className="mx-auto mt-2 max-w-md text-sm text-slate-500 dark:text-white/40">
-              Unlock below to download the take-home pack for your cohort.
-            </p>
-          </div>
-
-          <div className="mx-auto w-full max-w-xl">
-            {!unlocked ? (
-              <div className="glass-strong rounded-2xl p-8 shadow-[0_24px_80px_rgba(0,0,0,0.45)] md:p-10">
-                {!gateOpen ? (
+              ) : (
+                <form onSubmit={onUnlock} className="space-y-6">
                   <div className="text-center">
-                    <p className="text-sm leading-relaxed text-slate-600 dark:text-white/50">
-                      Use the password shared with you for this cohort to open the download.
+                    <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl border border-[#2490ed]/30 bg-[#2490ed]/10 text-[#7ec5ff]">
+                      <Lock className="h-6 w-6" aria-hidden />
+                    </div>
+                    <p className="text-sm font-medium text-slate-900 dark:text-white/90">
+                      Enter access password
                     </p>
+                    <p className="mt-1 text-xs text-slate-500 dark:text-white/40">
+                      Case-sensitive.
+                    </p>
+                  </div>
+                  <div className="relative">
+                    <Input
+                      id="ccw-training-password"
+                      name="password"
+                      type={showPw ? 'text' : 'password'}
+                      autoComplete="off"
+                      autoFocus
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Password"
+                      className={`h-12 pr-12 ${marketingInput}`}
+                      aria-invalid={error ? true : undefined}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPw(!showPw)}
+                      className="absolute top-1/2 right-2 -translate-y-1/2 rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700 dark:text-white/40 dark:hover:bg-white/5 dark:hover:text-white/75"
+                      aria-label={showPw ? 'Hide password' : 'Show password'}
+                    >
+                      {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
+                  {error ? (
+                    <p className="text-center text-sm text-red-400/90" role="alert">
+                      {error}
+                    </p>
+                  ) : null}
+                  <div className="flex flex-col gap-2 sm:flex-row sm:justify-between">
                     <Button
                       type="button"
-                      size="lg"
-                      className="mt-8 w-full rounded-xl bg-[#2490ed] text-[15px] font-semibold text-white shadow-lg shadow-[#2490ed]/20 hover:bg-[#1f82d4] sm:w-auto sm:min-w-[220px]"
-                      onClick={() => setGateOpen(true)}
+                      variant="ghost"
+                      className="text-slate-500 hover:text-slate-800 dark:text-white/45 dark:hover:text-white/75"
+                      onClick={() => {
+                        setGateOpen(false);
+                        setError(null);
+                        setPassword('');
+                      }}
                     >
-                      Access Course
-                      <ArrowRight className="ml-2 h-4 w-4" aria-hidden />
+                      Back
+                    </Button>
+                    <Button
+                      type="submit"
+                      disabled={pending || !password.trim()}
+                      className="rounded-xl bg-[#2490ed] hover:bg-[#1f82d4]"
+                    >
+                      {pending ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Verifying…
+                        </>
+                      ) : (
+                        'Unlock'
+                      )}
                     </Button>
                   </div>
-                ) : (
-                  <form onSubmit={onUnlock} className="space-y-6">
-                    <div className="text-center">
-                      <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl border border-[#2490ed]/30 bg-[#2490ed]/10 text-[#7ec5ff]">
-                        <Lock className="h-6 w-6" aria-hidden />
-                      </div>
-                      <p className="text-sm font-medium text-slate-900 dark:text-white/90">Enter access password</p>
-                      <p className="mt-1 text-xs text-slate-500 dark:text-white/40">Case-sensitive.</p>
-                    </div>
-                    <div className="relative">
-                      <Input
-                        id="ccw-training-password"
-                        name="password"
-                        type={showPw ? 'text' : 'password'}
-                        autoComplete="off"
-                        autoFocus
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder="Password"
-                        className={`h-12 pr-12 ${marketingInput}`}
-                        aria-invalid={error ? true : undefined}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPw(!showPw)}
-                        className="absolute top-1/2 right-2 -translate-y-1/2 rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700 dark:text-white/40 dark:hover:bg-white/5 dark:hover:text-white/75"
-                        aria-label={showPw ? 'Hide password' : 'Show password'}
-                      >
-                        {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </button>
-                    </div>
-                    {error ? (
-                      <p className="text-center text-sm text-red-400/90" role="alert">
-                        {error}
-                      </p>
-                    ) : null}
-                    <div className="flex flex-col gap-2 sm:flex-row sm:justify-between">
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        className="text-slate-500 hover:text-slate-800 dark:text-white/45 dark:hover:text-white/75"
-                        onClick={() => {
-                          setGateOpen(false);
-                          setError(null);
-                          setPassword('');
-                        }}
-                      >
-                        Back
-                      </Button>
-                      <Button
-                        type="submit"
-                        disabled={pending || !password.trim()}
-                        className="rounded-xl bg-[#2490ed] hover:bg-[#1f82d4]"
-                      >
-                        {pending ? (
-                          <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Verifying…
-                          </>
-                        ) : (
-                          'Unlock'
-                        )}
-                      </Button>
-                    </div>
-                  </form>
-                )}
-              </div>
-            ) : (
-              <section
-                id="materials"
-                className="scroll-mt-28 rounded-2xl border border-emerald-500/25 bg-emerald-50 p-8 shadow-sm dark:bg-linear-to-b dark:from-emerald-500/8 dark:to-white/2 dark:shadow-[0_24px_80px_rgba(0,0,0,0.35)] md:p-10"
-              >
-                <div className="mb-6 flex items-start gap-3">
-                  <CheckCircle2 className="mt-0.5 h-6 w-6 shrink-0 text-emerald-400/90" aria-hidden />
-                  <div>
-                    <h3 className="text-lg font-semibold text-slate-900 dark:text-white">You&apos;re in</h3>
-                    <p className="mt-1 text-sm leading-relaxed text-slate-600 dark:text-white/50">
-                      Download the workshop pack. This session remembers unlock in your browser; use the
-                      password again if you return in a new session.
-                    </p>
-                  </div>
+                </form>
+              )}
+            </div>
+          ) : (
+            <section
+              id="materials"
+              className="scroll-mt-28 rounded-2xl border border-emerald-500/25 bg-emerald-50 p-8 shadow-sm md:p-10 dark:bg-linear-to-b dark:from-emerald-500/8 dark:to-white/2 dark:shadow-[0_24px_80px_rgba(0,0,0,0.35)]"
+            >
+              <div className="mb-6 flex items-start gap-3">
+                <CheckCircle2 className="mt-0.5 h-6 w-6 shrink-0 text-emerald-400/90" aria-hidden />
+                <div>
+                  <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
+                    You&apos;re in
+                  </h3>
+                  <p className="mt-1 text-sm leading-relaxed text-slate-600 dark:text-white/50">
+                    Download the workshop pack. This session remembers unlock in your browser; use
+                    the password again if you return in a new session.
+                  </p>
                 </div>
-                <a
-                  href={CCW_COURSE_ZIP_HREF}
-                  download
-                  className="inline-flex w-full items-center justify-center gap-3 rounded-xl border border-white/10 bg-[#2490ed] px-6 py-4 text-sm font-semibold text-white transition hover:bg-[#1f82d4] sm:w-auto"
-                >
-                  <Download className="h-5 w-5 shrink-0" aria-hidden />
-                  Download workshop pack (ZIP)
-                </a>
-                <p className="mt-4 font-mono text-[11px] text-slate-400 break-all dark:text-white/30">
-                  {CCW_COURSE_ZIP_PATH.replace(/^\//, '')}
-                </p>
-              </section>
-            )}
-          </div>
-        </section>
-
-        {/* FAQ */}
-        <section className="mx-auto mt-20 max-w-3xl md:mt-24" aria-labelledby="ccw-faq-heading">
-          <div className="mb-8 text-center">
-            <p className="text-[10px] font-semibold tracking-[0.22em] text-slate-400 dark:text-white/35 uppercase">
-              Help
-            </p>
-            <h2 id="ccw-faq-heading" className="mt-1 text-xl font-semibold tracking-tight text-slate-900 dark:text-white md:text-2xl">
-              Frequently asked questions
-            </h2>
-          </div>
-          <div className="space-y-2">
-            {faq.map((item) => (
-              <details
-                key={item.q}
-                className={`group rounded-xl px-5 py-1 transition-colors open:bg-slate-100 dark:open:bg-white/3 ${marketingPanel}`}
+              </div>
+              <a
+                href={CCW_COURSE_ZIP_HREF}
+                download
+                className="inline-flex w-full items-center justify-center gap-3 rounded-xl border border-white/10 bg-[#2490ed] px-6 py-4 text-sm font-semibold text-white transition hover:bg-[#1f82d4] sm:w-auto"
               >
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-4 text-left text-sm font-medium text-slate-800 dark:text-white/85 [&::-webkit-details-marker]:hidden">
-                  {item.q}
-                  <ChevronDown className="h-4 w-4 shrink-0 text-slate-400 dark:text-white/35 transition-transform group-open:rotate-180" aria-hidden />
-                </summary>
-                <p className="border-t border-slate-200/80 dark:border-white/6 pb-4 pt-0 text-sm leading-relaxed text-slate-500 dark:text-white/45">
-                  {item.a}
-                </p>
-              </details>
-            ))}
-          </div>
-        </section>
+                <Download className="h-5 w-5 shrink-0" aria-hidden />
+                Download workshop pack (ZIP)
+              </a>
+              <p className="mt-4 font-mono text-[11px] break-all text-slate-400 dark:text-white/30">
+                {CCW_COURSE_ZIP_PATH.replace(/^\//, '')}
+              </p>
+            </section>
+          )}
+        </div>
+      </section>
 
-        <MarketingGrowthLinks currentHref={ccwWorkshopPath} />
+      {/* FAQ */}
+      <section className="mx-auto mt-20 max-w-3xl md:mt-24" aria-labelledby="ccw-faq-heading">
+        <div className="mb-8 text-center">
+          <p className="text-[10px] font-semibold tracking-[0.22em] text-slate-400 uppercase dark:text-white/35">
+            Help
+          </p>
+          <h2
+            id="ccw-faq-heading"
+            className="mt-1 text-xl font-semibold tracking-tight text-slate-900 md:text-2xl dark:text-white"
+          >
+            Frequently asked questions
+          </h2>
+        </div>
+        <div className="space-y-2">
+          {faq.map((item) => (
+            <details
+              key={item.q}
+              className={`group rounded-xl px-5 py-1 transition-colors open:bg-slate-100 dark:open:bg-white/3 ${marketingPanel}`}
+            >
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-4 text-left text-sm font-medium text-slate-800 dark:text-white/85 [&::-webkit-details-marker]:hidden">
+                {item.q}
+                <ChevronDown
+                  className="h-4 w-4 shrink-0 text-slate-400 transition-transform group-open:rotate-180 dark:text-white/35"
+                  aria-hidden
+                />
+              </summary>
+              <p className="border-t border-slate-200/80 pt-0 pb-4 text-sm leading-relaxed text-slate-500 dark:border-white/6 dark:text-white/45">
+                {item.a}
+              </p>
+            </details>
+          ))}
+        </div>
+      </section>
+
+      <MarketingGrowthLinks currentHref={ccwWorkshopPath} />
     </MarketingPageShell>
   );
 }
