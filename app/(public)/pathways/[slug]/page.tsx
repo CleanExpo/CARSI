@@ -1,7 +1,16 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+
+import { MarketingPageShell } from '@/components/marketing/MarketingPageShell';
 import { Badge } from '@/components/ui/badge';
 import { getBackendOrigin } from '@/lib/env/public-url';
+import {
+  marketingBodySm,
+  marketingHeading,
+  marketingPanel,
+  marketingTextMuted,
+  marketingTextStrong,
+} from '@/lib/marketing/marketing-ui';
 
 export const dynamic = 'force-dynamic';
 
@@ -52,10 +61,10 @@ export default async function PathwayDetailPage({ params }: { params: Promise<{ 
   }, 0);
 
   return (
-    <main className="container mx-auto px-4 py-12">
+    <MarketingPageShell>
       <Link
         href="/pathways"
-        className="text-muted-foreground hover:text-foreground mb-6 inline-flex items-center text-sm"
+        className={`mb-6 inline-flex items-center text-sm transition-colors hover:text-[#146fc2] dark:hover:text-[#7ec5ff] ${marketingTextMuted}`}
       >
         ← All pathways
       </Link>
@@ -69,15 +78,13 @@ export default async function PathwayDetailPage({ params }: { params: Promise<{ 
         )}
       </div>
 
-      <h1 className="mb-3 text-4xl font-bold">{pathway.title}</h1>
+      <h1 className={`mb-3 ${marketingHeading}`}>{pathway.title}</h1>
 
       {pathway.description && (
-        <p className="text-muted-foreground mb-6 max-w-2xl text-base leading-relaxed">
-          {pathway.description}
-        </p>
+        <p className={`mb-6 max-w-2xl ${marketingBodySm}`}>{pathway.description}</p>
       )}
 
-      <div className="text-muted-foreground mb-8 flex gap-6 text-sm">
+      <div className={`mb-8 flex gap-6 text-sm ${marketingTextMuted}`}>
         {pathway.courses.length > 0 && (
           <span>
             {pathway.courses.length} course{pathway.courses.length !== 1 ? 's' : ''}
@@ -90,20 +97,24 @@ export default async function PathwayDetailPage({ params }: { params: Promise<{ 
       {pathway.courses.length > 0 ? (
         <ol className="space-y-3">
           {pathway.courses.map((pc, i) => (
-            <li key={pc.course_id} className="flex items-start gap-4">
-              <span className="bg-muted text-muted-foreground flex h-7 w-7 shrink-0 items-center justify-center rounded-sm font-mono text-xs font-semibold">
+            <li key={pc.course_id} className={`flex items-start gap-4 p-4 ${marketingPanel}`}>
+              <span
+                className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-sm font-mono text-xs font-semibold ${marketingTextMuted} border border-slate-200 bg-slate-50 dark:border-white/10 dark:bg-white/[0.04]`}
+              >
                 {i + 1}
               </span>
               <div className="flex-1">
                 {pc.course_slug ? (
                   <Link
                     href={`/courses/${pc.course_slug}`}
-                    className="hover:text-foreground font-medium underline-offset-4 hover:underline"
+                    className={`font-medium underline-offset-4 hover:underline ${marketingTextStrong}`}
                   >
                     {pc.course_title ?? pc.course_slug}
                   </Link>
                 ) : (
-                  <span className="font-medium">{pc.course_title ?? pc.course_id}</span>
+                  <span className={`font-medium ${marketingTextStrong}`}>
+                    {pc.course_title ?? pc.course_id}
+                  </span>
                 )}
                 <div className="mt-1 flex gap-2">
                   {pc.iicrc_discipline && (
@@ -112,10 +123,10 @@ export default async function PathwayDetailPage({ params }: { params: Promise<{ 
                     </Badge>
                   )}
                   {pc.cec_hours && (
-                    <span className="text-muted-foreground text-xs">{pc.cec_hours} CECs</span>
+                    <span className={`text-xs ${marketingTextMuted}`}>{pc.cec_hours} CECs</span>
                   )}
                   {!pc.is_required && (
-                    <span className="text-muted-foreground text-xs italic">optional</span>
+                    <span className={`text-xs italic ${marketingTextMuted}`}>optional</span>
                   )}
                 </div>
               </div>
@@ -123,8 +134,8 @@ export default async function PathwayDetailPage({ params }: { params: Promise<{ 
           ))}
         </ol>
       ) : (
-        <p className="text-muted-foreground">No courses added to this pathway yet.</p>
+        <p className={marketingTextMuted}>No courses added to this pathway yet.</p>
       )}
-    </main>
+    </MarketingPageShell>
   );
 }
