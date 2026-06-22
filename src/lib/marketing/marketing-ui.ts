@@ -68,3 +68,53 @@ export const marketingTextMuted = 'text-slate-600 dark:text-white/55';
 export const marketingTextSubtle = 'text-slate-500 dark:text-white/45';
 
 export const marketingDivider = 'border-slate-200/80 dark:border-white/[0.08]';
+
+/** Industry Hub listing pages (news, jobs, calendar, etc.) */
+export const marketingHubCard = `${marketingPanel} ${marketingPanelHover}`;
+
+export const marketingFilterPillActive =
+  'rounded-full bg-[#2490ed] px-4 py-1.5 text-sm font-semibold text-white shadow-sm';
+
+export const marketingFilterPillInactive =
+  `${marketingTopicPill} px-4 py-1.5 transition hover:border-[#2490ed]/35`;
+
+export const marketingFilterPillMutedActive =
+  'rounded-full border border-slate-300/90 bg-slate-100 px-4 py-1.5 text-sm font-semibold text-slate-800 dark:border-white/15 dark:bg-white/10 dark:text-white/80';
+
+export const marketingFilterPillMutedInactive =
+  `${marketingTopicPill} px-4 py-1.5 transition hover:border-[#2490ed]/30`;
+
+export const marketingEmptyState =
+  'rounded-xl border border-dashed border-slate-300/90 bg-slate-50/50 p-12 text-center dark:border-white/10 dark:bg-white/[0.02]';
+
+export const marketingHubCtaBanner =
+  `${marketingPanel} flex flex-col gap-4 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6`;
+
+export const marketingHubPlaceholder =
+  'flex flex-col gap-3 rounded-xl border border-dashed border-slate-300/90 bg-slate-50/50 p-5 dark:border-white/10 dark:bg-white/[0.02]';
+
+export const marketingHubSectionLabel =
+  'text-[11px] font-semibold tracking-[0.18em] text-slate-500 uppercase dark:text-white/40';
+
+export const marketingBackLink =
+  'inline-flex items-center gap-2 text-sm text-slate-500 transition-colors hover:text-slate-800 dark:text-white/45 dark:hover:text-white/75';
+
+export const marketingMetaCard = `${marketingPanel} p-5`;
+
+export const marketingMetaLabel =
+  'mb-1 text-[10px] font-semibold tracking-[0.16em] text-slate-500 uppercase dark:text-white/35';
+
+export const marketingLink =
+  'font-medium text-[#146fc2] underline underline-offset-2 transition hover:text-[#2490ed] dark:text-[#7ec5ff] dark:hover:text-white';
+
+export const marketingLegalArticle = `${marketingPanel} mx-auto max-w-3xl p-6 sm:p-8 md:p-10`;
+
+export const marketingLegalProse =
+  'space-y-8 text-sm leading-relaxed text-slate-600 dark:text-white/70';
+
+export const marketingLegalH2 = 'text-lg font-semibold text-slate-900 dark:text-white';
+
+export const marketingLegalH3 = 'mt-4 text-base font-medium text-slate-800 dark:text-white/90';
+
+export const marketingArticleProse =
+  'prose prose-slate max-w-none prose-headings:font-semibold prose-headings:text-slate-900 prose-p:text-slate-600 prose-p:leading-relaxed prose-a:text-[#146fc2] prose-a:no-underline hover:prose-a:underline prose-strong:text-slate-900 prose-code:rounded prose-code:bg-slate-100 prose-code:px-1.5 prose-code:py-0.5 prose-code:text-sm prose-blockquote:border-l-[#2490ed] prose-blockquote:text-slate-600 prose-hr:border-slate-200 dark:prose-invert dark:prose-headings:text-white dark:prose-p:text-white/70 dark:prose-strong:text-white/90 dark:prose-code:bg-white/[0.06] dark:prose-blockquote:text-white/50 dark:prose-hr:border-white/[0.06]';
