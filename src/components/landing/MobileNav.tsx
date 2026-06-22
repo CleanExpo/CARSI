@@ -78,9 +78,9 @@ export default function MobileNav() {
       {/* Hamburger button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative z-50 flex h-11 w-11 items-center justify-center rounded-md text-slate-700 transition-colors duration-150 hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-[#2490ed]/40 focus-visible:outline-none"
+        className="relative z-50 flex h-11 w-11 items-center justify-center rounded-md text-white/82 transition-colors duration-150 hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-[#2490ed]/45 focus-visible:outline-none"
         style={{
-          background: isOpen ? 'rgba(36,144,237,0.1)' : 'transparent',
+          background: isOpen ? 'rgba(255,255,255,0.12)' : 'transparent',
         }}
         aria-label={isOpen ? 'Close menu' : 'Open menu'}
         aria-expanded={isOpen}
