@@ -2,12 +2,22 @@ import type { Metadata } from 'next';
 import { Suspense } from 'react';
 
 import { CcwTrainingClient } from '@/components/ccw/CcwTrainingClient';
+import { getPublicSiteUrl } from '@/lib/env/public-url';
+
+const siteUrl = getPublicSiteUrl();
 
 export const metadata: Metadata = {
   title: 'The Carpet Cleaning Workshop | CARSI',
   description:
     'CARSI · 2 days · hands-on — fibre, chemistry, methods, upholstery, hard floors, business, maintenance. Anchored in ANSI/IICRC S100 · S300 · S220. Participant resources (password).',
-  robots: { index: false, follow: false },
+  alternates: { canonical: `${siteUrl}/ccw-training` },
+  openGraph: {
+    title: 'The Carpet Cleaning Workshop | CARSI',
+    description:
+      'Hands-on CARSI carpet cleaning workshop — fibre, chemistry, upholstery, hard floors and business modules. Cohort resource pack for enrolled participants.',
+    type: 'website',
+    url: `${siteUrl}/ccw-training`,
+  },
 };
 
 function CcwTrainingFallback() {
