@@ -1,19 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
 import { AuthNavLinks } from '@/components/landing/AuthNavLinks';
 import { PublicThemeToggle } from '@/components/landing/PublicThemeToggle';
-import { authorityPath } from '@/lib/marketing/authority';
-import { startSmartBasePath } from '@/lib/marketing/start-smart';
-import { ccwWorkshopPath } from '@/lib/marketing/marketing-growth-links';
-
-// ---------------------------------------------------------------------------
-// Animation Config (Council-approved Bezier)
-// ---------------------------------------------------------------------------
+import { PUBLIC_PRIMARY_NAV } from '@/lib/navigation/public-nav';
 
 const smoothEase: [number, number, number, number] = [0.4, 0, 0.2, 1];
 
@@ -39,33 +33,9 @@ const itemVariants = {
   }),
 };
 
-// ---------------------------------------------------------------------------
-// Data
-// ---------------------------------------------------------------------------
-
-const navItems = [
-  { href: '/courses', label: 'Courses' },
-  { href: '/pathways', label: 'Pathways' },
-  { href: startSmartBasePath, label: 'Start Smart' },
-  { href: '/events/ccw-roadshow', label: 'Events' },
-  { href: '/pricing', label: 'Pricing' },
-  { href: '/contact', label: 'Contact' },
-];
-
-const growthNavItems = [
-  { href: '/events/ccw-roadshow', label: 'CCW Roadshow' },
-  { href: ccwWorkshopPath, label: 'CCW Workshop' },
-  { href: authorityPath, label: 'Authority Hub' },
-];
-
-// ---------------------------------------------------------------------------
-// Component
-// ---------------------------------------------------------------------------
-
 export default function MobileNav() {
   const [isOpen, setIsOpen] = useState(false);
 
-  // Close menu on route change or escape key
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setIsOpen(false);
@@ -86,7 +56,6 @@ export default function MobileNav() {
 
   return (
     <div className="lg:hidden">
-      {/* Hamburger button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="relative z-50 flex h-11 w-11 items-center justify-center rounded-md text-white/82 transition-colors duration-150 hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-[#2490ed]/45 focus-visible:outline-none"
@@ -121,11 +90,9 @@ export default function MobileNav() {
         </AnimatePresence>
       </button>
 
-      {/* Mobile menu overlay */}
       <AnimatePresence>
         {isOpen && (
           <>
-            {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -136,7 +103,6 @@ export default function MobileNav() {
               onClick={() => setIsOpen(false)}
             />
 
-            {/* Menu panel */}
             <motion.div
               variants={menuVariants}
               initial="closed"
@@ -149,41 +115,19 @@ export default function MobileNav() {
                 boxShadow: '0 25px 50px -18px rgba(15,23,42,0.28)',
               }}
             >
-              <nav className="p-4">
+              <nav className="p-4" aria-label="Mobile navigation">
                 <div className="mb-4 flex items-center justify-between px-4">
                   <span className="text-xs font-semibold tracking-wide text-slate-500 uppercase">
                     Appearance
                   </span>
                   <PublicThemeToggle variant="light" />
                 </div>
+
                 <ul className="space-y-1">
-                  {navItems.map((item, i) => (
+                  {PUBLIC_PRIMARY_NAV.map((item, i) => (
                     <motion.li
                       key={item.href}
                       custom={i}
-                      variants={itemVariants}
-                      initial="closed"
-                      animate="open"
-                    >
-                      <Link
-                        href={item.href}
-                        onClick={() => setIsOpen(false)}
-                        className="block min-h-11 rounded-md px-4 py-3 text-base font-semibold text-slate-800 transition-colors duration-150 hover:bg-slate-100 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-[#2490ed]/40 focus-visible:outline-none"
-                      >
-                        {item.label}
-                      </Link>
-                    </motion.li>
-                  ))}
-                </ul>
-
-                <p className="mt-4 mb-2 px-4 text-[10px] font-semibold tracking-wide text-slate-500 uppercase">
-                  Growth pathways
-                </p>
-                <ul className="space-y-1">
-                  {growthNavItems.map((item, i) => (
-                    <motion.li
-                      key={item.href}
-                      custom={navItems.length + i}
                       variants={itemVariants}
                       initial="closed"
                       animate="open"
