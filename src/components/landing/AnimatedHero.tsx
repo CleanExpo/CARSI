@@ -93,10 +93,7 @@ export function AnimatedHero({ benefits: _benefits }: AnimatedHeroProps) {
               </Link>
             </motion.div>
 
-            <motion.ul
-              variants={staggerContainer}
-              className="mt-8 flex flex-wrap gap-x-5 gap-y-2"
-            >
+            <motion.ul variants={staggerContainer} className="mt-8 flex flex-wrap gap-x-5 gap-y-2">
               {trustPoints.map((point) => (
                 <motion.li
                   key={point}
