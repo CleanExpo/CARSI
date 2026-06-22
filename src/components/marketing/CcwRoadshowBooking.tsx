@@ -15,8 +15,10 @@ import {
   marketingBtnPrimary,
   marketingEyebrowPill,
   marketingInput,
+  marketingLabel,
   marketingPanel,
   marketingStatCard,
+  marketingTextStrong,
 } from '@/lib/marketing/marketing-ui';
 
 type AttendeeForm = { fullName: string; yearsExperience: string; goals: string };
@@ -32,7 +34,7 @@ type BookingFormState = {
   attendees: AttendeeForm[];
 };
 
-const labelClass = 'mb-1.5 block text-xs font-medium tracking-wide text-white/70 uppercase';
+const labelClass = marketingLabel;
 
 function emptyAttendee(): AttendeeForm {
   return { fullName: '', yearsExperience: '', goals: '' };
@@ -185,7 +187,7 @@ export function CcwRoadshowBooking({ events }: { events: CcwRoadshowEvent[] }) {
     <div className={`p-5 sm:p-6 ${marketingStatCard}`}>
       <div className="mb-5">
         <p className={marketingEyebrowPill}>{isFull ? 'Waitlist open' : 'Limited places'}</p>
-        <h2 className="mt-4 text-xl font-bold tracking-tight text-white">
+        <h2 className={`mt-4 text-xl font-bold tracking-tight ${marketingTextStrong}`}>
           {isFull ? 'Join the waitlist' : 'Claim your free entry token'}
         </h2>
         <p className={`mt-2 ${marketingBodySm}`}>
@@ -232,8 +234,8 @@ export function CcwRoadshowBooking({ events }: { events: CcwRoadshowEvent[] }) {
                       : `${marketingPanel} hover:border-white/20`
                   }`}
                 >
-                  <span className="block text-sm font-semibold text-white/90">{pkg.label}</span>
-                  <span className="mt-1 block text-lg font-bold text-white">Free</span>
+                  <span className={`block text-sm font-semibold ${marketingTextStrong}`}>{pkg.label}</span>
+                  <span className={`mt-1 block text-lg font-bold ${marketingTextStrong}`}>Free</span>
                   <span className={`mt-1 block ${marketingBodySm}`}>
                     Up to {pkg.attendeeCount} {pkg.attendeeCount === 1 ? 'person' : 'people'}
                   </span>
@@ -302,12 +304,12 @@ export function CcwRoadshowBooking({ events }: { events: CcwRoadshowEvent[] }) {
           {form.attendees.map((attendee, index) => (
             <div key={index} className={`rounded-xl border p-3 ${marketingPanel}`}>
               <div className="mb-2 flex items-center justify-between">
-                <span className="text-sm font-semibold text-white/80">Attendee {index + 1}</span>
+                <span className={`text-sm font-semibold text-slate-700 dark:text-white/80`}>Attendee {index + 1}</span>
                 {form.attendees.length > 1 && (
                   <button
                     type="button"
                     onClick={() => removeAttendee(index)}
-                    className="text-white/50 hover:text-white"
+                    className="text-slate-400 hover:text-slate-700 dark:text-white/50 dark:hover:text-white"
                     aria-label={`Remove attendee ${index + 1}`}
                   >
                     <X className="h-4 w-4" aria-hidden />
@@ -350,7 +352,7 @@ export function CcwRoadshowBooking({ events }: { events: CcwRoadshowEvent[] }) {
             <button
               type="button"
               onClick={addAttendee}
-              className={`flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-white/20 py-2 text-sm text-white/70 hover:border-white/40 hover:text-white`}
+              className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-slate-300 py-2 text-sm text-slate-600 hover:border-slate-400 hover:text-slate-900 dark:border-white/20 dark:text-white/70 dark:hover:border-white/40 dark:hover:text-white"
             >
               <Plus className="h-4 w-4" aria-hidden />
               Add attendee ({form.attendees.length}/{maxSeats})
