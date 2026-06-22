@@ -10,10 +10,14 @@ import {
 import {
   marketingBtnPrimary,
   marketingBtnSecondary,
+  marketingBodySm,
+  marketingEyebrowPill,
   marketingIconWrap,
   marketingPanel,
   marketingSection,
   marketingSectionTitle,
+  marketingTextMuted,
+  marketingTextStrong,
 } from '@/lib/marketing/marketing-ui';
 
 interface ContractorAddOnsProps {
@@ -27,16 +31,17 @@ export function ContractorAddOns({ accentColor = '#2490ed', variant = 'default' 
   return (
     <>
       <section className={marketingSection}>
-        <div className="mb-8 max-w-3xl">
-          <p className="mb-3 inline-flex items-center rounded-full border border-[#2490ed]/30 bg-[#2490ed]/10 px-3 py-1 text-[11px] font-semibold tracking-[0.14em] text-[#7ec5ff] uppercase">
-            {content.eyebrow}
-          </p>
+        <div className="mb-8 max-w-4xl">
+          <p className={`mb-3 ${marketingEyebrowPill}`}>{content.eyebrow}</p>
           <h2 className={marketingSectionTitle}>
             {content.title}{' '}
             <span style={{ color: accentColor }}>{content.titleAccent}</span>
           </h2>
-          <p className="mt-4 max-w-2xl text-sm leading-relaxed text-white/65">{content.body}</p>
-          <div className="mt-4 h-1 w-16 rounded-full bg-gradient-to-r from-[#2490ed] via-[#5eb3ff] to-[#00d4aa]" aria-hidden />
+          <p className={`mt-4 max-w-3xl ${marketingBodySm}`}>{content.body}</p>
+          <div
+            className="mt-4 h-1 w-16 rounded-full bg-gradient-to-r from-[#2490ed] via-[#5eb3ff] to-[#00d4aa]"
+            aria-hidden
+          />
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -45,8 +50,8 @@ export function ContractorAddOns({ accentColor = '#2490ed', variant = 'default' 
               <div className={`mb-3 ${marketingIconWrap}`} style={{ color: accentColor }}>
                 <CheckCircle2 className="h-4 w-4" aria-hidden />
               </div>
-              <p className="text-sm font-semibold text-white/90">{panel.name}</p>
-              <p className="mt-2 text-xs leading-relaxed text-white/55">{panel.requirement}</p>
+              <p className={`text-sm font-semibold ${marketingTextStrong}`}>{panel.name}</p>
+              <p className={`mt-2 text-xs leading-relaxed ${marketingTextMuted}`}>{panel.requirement}</p>
             </div>
           ))}
         </div>
@@ -67,11 +72,11 @@ export function ContractorAddOns({ accentColor = '#2490ed', variant = 'default' 
                 className={`flex flex-col items-start gap-4 p-5 sm:flex-row sm:items-center ${marketingPanel}`}
               >
                 <div className="flex items-center gap-3">
-                  <Briefcase className="h-4 w-4 shrink-0 text-white/45" aria-hidden />
-                  <span className="text-sm font-medium text-white/75">{upgrade.base}</span>
+                  <Briefcase className="h-4 w-4 shrink-0 text-slate-400 dark:text-white/45" aria-hidden />
+                  <span className={`text-sm font-medium ${marketingTextStrong}`}>{upgrade.base}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-white/35">+</span>
+                  <span className="text-xs text-slate-400 dark:text-white/35">+</span>
                   <span
                     className="rounded-full border px-2.5 py-0.5 font-mono text-xs font-bold"
                     style={{
@@ -83,10 +88,10 @@ export function ContractorAddOns({ accentColor = '#2490ed', variant = 'default' 
                     {upgrade.addon}
                   </span>
                 </div>
-                <ArrowRight className="hidden h-4 w-4 text-white/25 sm:block" aria-hidden />
+                <ArrowRight className="hidden h-4 w-4 text-slate-300 dark:text-white/25 sm:block" aria-hidden />
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 shrink-0 text-[#34d399]" aria-hidden />
-                  <span className="text-sm text-white/62">{upgrade.benefit}</span>
+                  <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600 dark:text-[#34d399]" aria-hidden />
+                  <span className={`text-sm ${marketingTextMuted}`}>{upgrade.benefit}</span>
                 </div>
               </div>
             ))}
