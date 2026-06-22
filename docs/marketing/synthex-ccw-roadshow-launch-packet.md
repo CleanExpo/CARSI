@@ -1,7 +1,28 @@
 # SYNTHEX Campaign Launch Packet: CARSI x CCW Business Growth Days
 
-Last updated: 18 June 2026
-Launch status: free-entry offer update applied. Organic publishing may proceed through Synthex after final approval. CCW client-list email and paid ads remain separately gated.
+Last updated: 22 June 2026
+Launch status: **GO — registration is live.** The event page and free-entry registration are live in production (`/events/ccw-roadshow` + checkout return 200 with a `CCW-FREE-{CITY}-{CODE}` token). Organic publishing may proceed.
+
+## This run — routing, scope & guardrails (22 June 2026)
+
+**Routing:** Campaign enters via **Unite-Group (CRM)**. Unite-Group then owns and controls the process loop through the **Unite-Group Kanban**, delegating publishing to **Synthex**. This packet is the brief Unite-Group/Synthex executes.
+
+**Channels for this run:** **CARSI Facebook + CCW Facebook + email campaign** only. (LinkedIn, Instagram, reels/stories and FB-group posts are prepared below and can be switched on later, but are out of scope for this run.)
+
+**Guardrails:**
+- **NOT for IICRC CEC credits.** These two days are practical business-growth training only. Do **not** state or imply that attendance earns CEC credits / continuing education points anywhere in any post or email. "Course outline" and "practical chemical details" refer to take-home material, not accreditation.
+- Free for CCW past and current customers; register via CARSI for a free entry token.
+- No invented testimonials/social proof — approved quotes only.
+
+**Registration method (put in every post + email):**
+- Public page: `https://www.carsi.com.au/events/ccw-roadshow`
+- How it works: choose Melbourne or Sydney → register → receive a free `CCW-FREE-…` entry token to show at check-in.
+
+**Add-to-calendar links (for emails + posts):**
+- Melbourne (22–23 Jul): `https://calendar.google.com/calendar/render?action=TEMPLATE&text=CARSI%20x%20CCW%20Business%20Growth%20Days%20-%20Melbourne&dates=20260722/20260724&location=Carpet%20Cleaners%20Warehouse%2C%20Unit%201%2F5%20Gatwick%20Road%2C%20Bayswater%20North%20VIC%203153&details=Two%20practical%20days%20with%20Phill%20McGurk.%20Register%3A%20https%3A%2F%2Fwww.carsi.com.au%2Fevents%2Fccw-roadshow`
+- Sydney (30–31 Jul): `https://calendar.google.com/calendar/render?action=TEMPLATE&text=CARSI%20x%20CCW%20Business%20Growth%20Days%20-%20Sydney&dates=20260730/20260801&location=Carpet%20Cleaners%20Warehouse%2C%202%2F8%20Tollis%20Place%2C%20Seven%20Hills%20NSW%202147&details=Two%20practical%20days%20with%20Phill%20McGurk.%20Register%3A%20https%3A%2F%2Fwww.carsi.com.au%2Fevents%2Fccw-roadshow`
+
+**Timing:** Launch immediately (22 June), then run the phased sequence below through to the Melbourne (20–21 Jul) and Sydney (27–29 Jul) final-reminder windows.
 
 ## Campaign Brief
 
