@@ -1,11 +1,23 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import { ChevronDown, GraduationCap } from 'lucide-react';
 
 import { PathwayAdvisor } from '@/components/lms/PathwayAdvisor';
 import { LearningPathwayCard } from '@/components/lms/LearningPathwayCard';
 import { StudentJourneyMap } from '@/components/lms/diagrams/StudentJourneyMap';
+import { MarketingPageShell } from '@/components/marketing/MarketingPageShell';
 import { AcronymTooltip } from '@/components/ui/AcronymTooltip';
 import { getBackendOrigin } from '@/lib/env/public-url';
+import {
+  marketingBodySm,
+  marketingBtnPrimary,
+  marketingBtnSecondary,
+  marketingHeading,
+  marketingPanel,
+  marketingTextMuted,
+  marketingTextStrong,
+  marketingTextSubtle,
+} from '@/lib/marketing/marketing-ui';
 
 export const dynamic = 'force-dynamic';
 
@@ -38,307 +50,161 @@ async function getPathways(): Promise<{ items: Pathway[]; total: number }> {
   }
 }
 
+const faqItems = [
+  {
+    question: 'What is a learning pathway?',
+    answer: (
+      <>
+        A learning pathway is a structured sequence of courses designed to build expertise in a
+        specific area of restoration or cleaning. Unlike individual courses, pathways guide you
+        through prerequisite knowledge, core competencies, and advanced techniques in a logical
+        progression. CARSI&apos;s pathways align with <AcronymTooltip term="IICRC" /> certification
+        requirements, ensuring you earn the right Continuing Education Credits (
+        <AcronymTooltip term="CEC">CECs</AcronymTooltip>) in the right order to achieve your
+        professional goals. Each pathway maps directly to an <AcronymTooltip term="IICRC" /> discipline
+        such as Water Restoration (<AcronymTooltip term="WRT" />
+        ), Applied Microbial Remediation (<AcronymTooltip term="AMRT" />
+        ), or Carpet Cleaning (<AcronymTooltip term="CCT" />
+        ), so every course you complete contributes meaningfully towards certification or
+        recertification. Pathways also eliminate guesswork — instead of choosing from dozens of
+        individual courses, you follow a curated sequence that builds knowledge progressively, from
+        foundational science through to advanced field techniques and industry best practice.
+      </>
+    ),
+  },
+  {
+    question: 'Which CARSI pathway is right for me?',
+    answer: (
+      <>
+        Your ideal pathway depends on your current experience level and career objectives. New
+        technicians should start with the Water Restoration Fundamentals pathway, which covers{' '}
+        <AcronymTooltip term="IICRC" /> <AcronymTooltip term="WRT" /> certification preparation and
+        provides the foundation for all other disciplines. Experienced professionals looking to
+        expand their service offering should consider a multi-discipline pathway that combines{' '}
+        <AcronymTooltip term="WRT" />, <AcronymTooltip term="AMRT" />, and{' '}
+        <AcronymTooltip term="ASD" /> for comprehensive restoration capability. If you already hold{' '}
+        <AcronymTooltip term="IICRC" /> certifications and need to maintain them, CARSI&apos;s{' '}
+        <AcronymTooltip term="CEC" />
+        -approved courses let you accumulate credits within a structured pathway rather than through
+        ad-hoc training. Specialist contractors in carpet care, commercial cleaning, or aged-care
+        facility maintenance will find dedicated pathways tailored to those sectors. Browse the
+        pathways below, check the estimated hours and target certification for each, and choose the
+        one that matches where you are now and where you want your career to go.
+      </>
+    ),
+  },
+  {
+    question: 'How do pathways help with career progression?',
+    answer: (
+      <>
+        Structured pathways demonstrate systematic professional development to employers, clients,
+        and industry bodies. Completing a CARSI pathway shows you have mastered not just isolated
+        topics, but an integrated body of knowledge validated against{' '}
+        <AcronymTooltip term="IICRC" /> standards. Many insurance panels and government tenders in
+        Australia now require evidence of ongoing professional development, and a completed pathway
+        provides exactly that documentation. Pathways also make it straightforward to track your{' '}
+        <AcronymTooltip term="CEC" /> accumulation towards certification renewal — you can see at a
+        glance how many credits you have earned and how many remain. For business owners, enrolling
+        your team in pathways ensures consistent training standards across all technicians, reducing
+        callbacks and improving customer satisfaction. Whether you are an independent operator
+        building credibility or a company training a workforce, pathways turn professional
+        development from a compliance burden into a competitive advantage.
+      </>
+    ),
+  },
+];
+
 export default async function PathwaysPage() {
   const { items: pathways, total } = await getPathways();
 
   return (
-    <main id="main-content" className="relative min-h-screen" style={{ background: '#060a14' }}>
-      {/* Mesh background */}
-      <div className="mesh-bg" aria-hidden="true">
-        <div className="mesh-blob mesh-blob-1" />
-        <div className="mesh-blob mesh-blob-2" />
+    <MarketingPageShell id="main-content">
+      <header className="mb-6">
+        <h1 className={marketingHeading}>CEC Pathways</h1>
+        <p className={`mt-2 max-w-2xl ${marketingBodySm}`}>
+          Structured learning journeys for <AcronymTooltip term="IICRC" /> CEC renewal, team readiness
+          and practical trade confidence.{' '}
+          {total > 0 && `${total} pathway${total !== 1 ? 's' : ''} available.`}
+        </p>
+      </header>
+
+      <div className="mb-10">
+        <PathwayAdvisor />
       </div>
 
-      <div className="relative z-10 mx-auto max-w-[1600px] px-4 py-8 sm:px-6 lg:px-8">
-        {/* ── Hero header ── */}
-        <header className="mb-6">
-          <h1
-            className="font-display text-3xl font-bold tracking-tight sm:text-4xl"
-            style={{ color: 'rgba(255,255,255,0.92)' }}
-          >
-            CEC Pathways
-          </h1>
-          <p
-            className="mt-2 max-w-2xl text-sm leading-relaxed"
-            style={{ color: 'rgba(255,255,255,0.62)' }}
-          >
-            Structured learning journeys for <AcronymTooltip term="IICRC" /> CEC renewal, team
-            readiness and practical trade confidence.{' '}
-            {total > 0 && `${total} pathway${total !== 1 ? 's' : ''} available.`}
-          </p>
-        </header>
-
-        <div className="mb-10">
-          <PathwayAdvisor />
-        </div>
-
-        {/* ── Pathway content or empty state ── */}
-        {pathways.length > 0 ? (
-          <section className="mb-10">
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {pathways.map((p) => (
-                <LearningPathwayCard key={p.id} pathway={p} />
-              ))}
-            </div>
-          </section>
-        ) : (
-          <section className="mb-10">
-            <div
-              className="mx-auto max-w-xl rounded-sm px-6 py-16 text-center"
-              style={{
-                background: 'rgba(255,255,255,0.04)',
-                backdropFilter: 'blur(24px) saturate(160%)',
-                WebkitBackdropFilter: 'blur(24px) saturate(160%)',
-                border: '1px solid rgba(255,255,255,0.07)',
-              }}
-            >
-              {/* Graduation cap icon */}
-              <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center">
-                <svg
-                  width="56"
-                  height="56"
-                  viewBox="0 0 56 56"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M28 8L4 20L28 32L52 20L28 8Z"
-                    stroke="#ed9d24"
-                    strokeWidth="2"
-                    strokeLinejoin="round"
-                    fill="rgba(237,157,36,0.1)"
-                  />
-                  <path
-                    d="M14 26V38C14 38 20 44 28 44C36 44 42 38 42 38V26"
-                    stroke="#ed9d24"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    fill="none"
-                  />
-                  <path d="M48 20V36" stroke="#ed9d24" strokeWidth="2" strokeLinecap="round" />
-                  <circle cx="48" cy="38" r="2" fill="#ed9d24" />
-                </svg>
-              </div>
-
-              <h2 className="font-display mb-3 text-xl font-semibold text-white">
-                Database pathways are being linked
-              </h2>
-
-              <p
-                className="mx-auto mb-8 max-w-md text-sm leading-relaxed"
-                style={{ color: 'rgba(255,255,255,0.62)' }}
-              >
-                The guided advisor above is live now. Saved pathway cards will appear here as
-                courses are linked to each <AcronymTooltip term="IICRC" /> discipline and team
-                training journey.
-              </p>
-
-              <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
-                <Link
-                  href="/courses"
-                  className="inline-flex items-center justify-center rounded-sm px-6 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-                  style={{ background: '#ed9d24' }}
-                >
-                  Browse Courses
-                </Link>
-                <Link
-                  href="/pricing"
-                  className="inline-flex items-center justify-center rounded-sm px-6 py-2.5 text-sm font-semibold transition-opacity hover:opacity-80"
-                  style={{
-                    color: 'rgba(255,255,255,0.8)',
-                    border: '1px solid rgba(255,255,255,0.15)',
-                  }}
-                >
-                  View Pricing
-                </Link>
-              </div>
-            </div>
-          </section>
-        )}
-
-        {/* ── Student Journey Map ── */}
+      {pathways.length > 0 ? (
         <section className="mb-10">
-          <div
-            className="rounded-sm p-5"
-            style={{
-              background: 'rgba(255,255,255,0.04)',
-              backdropFilter: 'blur(24px) saturate(160%)',
-              WebkitBackdropFilter: 'blur(24px) saturate(160%)',
-              border: '1px solid rgba(255,255,255,0.07)',
-            }}
-          >
-            <h2
-              className="font-display mb-3 text-center text-lg font-semibold"
-              style={{ color: 'rgba(255,255,255,0.88)' }}
-            >
-              Your Learning Journey
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {pathways.map((p) => (
+              <LearningPathwayCard key={p.id} pathway={p} />
+            ))}
+          </div>
+        </section>
+      ) : (
+        <section className="mb-10">
+          <div className={`mx-auto max-w-xl px-6 py-16 text-center ${marketingPanel}`}>
+            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl border border-[#ed9d24]/30 bg-[#ed9d24]/10">
+              <GraduationCap className="h-9 w-9 text-[#ed9d24]" aria-hidden />
+            </div>
+
+            <h2 className={`font-display mb-3 text-xl font-semibold ${marketingTextStrong}`}>
+              Database pathways are being linked
             </h2>
-            <p
-              className="mx-auto mb-4 max-w-xl text-center text-xs"
-              style={{ color: 'rgba(255,255,255,0.4)' }}
-            >
-              From enrolment to credential — follow the structured path from first lesson to
-              shareable digital certificate.
+
+            <p className={`mx-auto mb-8 max-w-md ${marketingBodySm}`}>
+              The guided advisor above is live now. Saved pathway cards will appear here as courses
+              are linked to each <AcronymTooltip term="IICRC" /> discipline and team training
+              journey.
             </p>
-            <StudentJourneyMap />
+
+            <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <Link href="/courses" className={marketingBtnPrimary}>
+                Browse Courses
+              </Link>
+              <Link href="/pricing" className={marketingBtnSecondary}>
+                View Pricing
+              </Link>
+            </div>
           </div>
         </section>
+      )}
 
-        {/* ── GEO Q&A Sections (collapsed accordions — below primary content) ── */}
-        <section className="mb-8">
-          <h2
-            className="font-display mb-4 text-lg font-semibold"
-            style={{ color: 'rgba(255,255,255,0.88)' }}
-          >
-            Frequently Asked Questions
+      <section className="mb-10">
+        <div className={`p-5 sm:p-6 ${marketingPanel}`}>
+          <h2 className={`font-display mb-3 text-center text-lg font-semibold ${marketingTextStrong}`}>
+            Your Learning Journey
           </h2>
-          <div className="space-y-3">
-            {/* Q1 — What is a learning pathway? */}
-            <details
-              className="group rounded-sm"
-              style={{
-                background: 'rgba(255,255,255,0.04)',
-                backdropFilter: 'blur(24px) saturate(160%)',
-                WebkitBackdropFilter: 'blur(24px) saturate(160%)',
-                border: '1px solid rgba(255,255,255,0.07)',
-              }}
-            >
-              <summary
-                className="flex cursor-pointer items-center justify-between px-5 py-4 text-sm font-semibold select-none"
-                style={{ color: 'rgba(255,255,255,0.88)' }}
-              >
-                <span>What is a learning pathway?</span>
-                <svg
-                  className="h-4 w-4 shrink-0 transition-transform duration-200 group-open:rotate-180"
-                  style={{ color: 'rgba(255,255,255,0.4)' }}
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                </svg>
-              </summary>
-              <div className="px-5 pb-5">
-                <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.55)' }}>
-                  A learning pathway is a structured sequence of courses designed to build expertise
-                  in a specific area of restoration or cleaning. Unlike individual courses, pathways
-                  guide you through prerequisite knowledge, core competencies, and advanced
-                  techniques in a logical progression. CARSI&apos;s pathways align with{' '}
-                  <AcronymTooltip term="IICRC" /> certification requirements, ensuring you earn the
-                  right Continuing Education Credits (
-                  <AcronymTooltip term="CEC">CECs</AcronymTooltip>) in the right order to achieve
-                  your professional goals. Each pathway maps directly to an{' '}
-                  <AcronymTooltip term="IICRC" /> discipline such as Water Restoration (
-                  <AcronymTooltip term="WRT" />
-                  ), Applied Microbial Remediation (<AcronymTooltip term="AMRT" />
-                  ), or Carpet Cleaning (<AcronymTooltip term="CCT" />
-                  ), so every course you complete contributes meaningfully towards certification or
-                  recertification. Pathways also eliminate guesswork — instead of choosing from
-                  dozens of individual courses, you follow a curated sequence that builds knowledge
-                  progressively, from foundational science through to advanced field techniques and
-                  industry best practice.
-                </p>
-              </div>
-            </details>
+          <p className={`mx-auto mb-4 max-w-xl text-center text-xs ${marketingTextSubtle}`}>
+            From enrolment to credential — follow the structured path from first lesson to shareable
+            digital certificate.
+          </p>
+          <StudentJourneyMap />
+        </div>
+      </section>
 
-            {/* Q2 — Which CARSI pathway is right for me? */}
-            <details
-              className="group rounded-sm"
-              style={{
-                background: 'rgba(255,255,255,0.04)',
-                backdropFilter: 'blur(24px) saturate(160%)',
-                WebkitBackdropFilter: 'blur(24px) saturate(160%)',
-                border: '1px solid rgba(255,255,255,0.07)',
-              }}
-            >
+      <section className="mb-8">
+        <h2 className={`font-display mb-4 text-lg font-semibold ${marketingTextStrong}`}>
+          Frequently Asked Questions
+        </h2>
+        <div className="space-y-3">
+          {faqItems.map((item) => (
+            <details key={item.question} className={`group ${marketingPanel}`}>
               <summary
-                className="flex cursor-pointer items-center justify-between px-5 py-4 text-sm font-semibold select-none"
-                style={{ color: 'rgba(255,255,255,0.88)' }}
+                className={`flex cursor-pointer list-none items-center justify-between px-5 py-4 text-sm font-semibold select-none [&::-webkit-details-marker]:hidden ${marketingTextStrong}`}
               >
-                <span>Which CARSI pathway is right for me?</span>
-                <svg
-                  className="h-4 w-4 shrink-0 transition-transform duration-200 group-open:rotate-180"
-                  style={{ color: 'rgba(255,255,255,0.4)' }}
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                </svg>
+                <span>{item.question}</span>
+                <ChevronDown
+                  className={`h-4 w-4 shrink-0 transition-transform duration-200 group-open:rotate-180 ${marketingTextSubtle}`}
+                  aria-hidden
+                />
               </summary>
               <div className="px-5 pb-5">
-                <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.55)' }}>
-                  Your ideal pathway depends on your current experience level and career objectives.
-                  New technicians should start with the Water Restoration Fundamentals pathway,
-                  which covers <AcronymTooltip term="IICRC" /> <AcronymTooltip term="WRT" />{' '}
-                  certification preparation and provides the foundation for all other disciplines.
-                  Experienced professionals looking to expand their service offering should consider
-                  a multi-discipline pathway that combines <AcronymTooltip term="WRT" />,{' '}
-                  <AcronymTooltip term="AMRT" />, and <AcronymTooltip term="ASD" /> for
-                  comprehensive restoration capability. If you already hold{' '}
-                  <AcronymTooltip term="IICRC" /> certifications and need to maintain them,
-                  CARSI&apos;s <AcronymTooltip term="CEC" />
-                  -approved courses let you accumulate credits within a structured pathway rather
-                  than through ad-hoc training. Specialist contractors in carpet care, commercial
-                  cleaning, or aged-care facility maintenance will find dedicated pathways tailored
-                  to those sectors. Browse the pathways below, check the estimated hours and target
-                  certification for each, and choose the one that matches where you are now and
-                  where you want your career to go.
-                </p>
+                <p className={`text-sm leading-relaxed ${marketingTextMuted}`}>{item.answer}</p>
               </div>
             </details>
-
-            {/* Q3 — How do pathways help with career progression? */}
-            <details
-              className="group rounded-sm"
-              style={{
-                background: 'rgba(255,255,255,0.04)',
-                backdropFilter: 'blur(24px) saturate(160%)',
-                WebkitBackdropFilter: 'blur(24px) saturate(160%)',
-                border: '1px solid rgba(255,255,255,0.07)',
-              }}
-            >
-              <summary
-                className="flex cursor-pointer items-center justify-between px-5 py-4 text-sm font-semibold select-none"
-                style={{ color: 'rgba(255,255,255,0.88)' }}
-              >
-                <span>How do pathways help with career progression?</span>
-                <svg
-                  className="h-4 w-4 shrink-0 transition-transform duration-200 group-open:rotate-180"
-                  style={{ color: 'rgba(255,255,255,0.4)' }}
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                </svg>
-              </summary>
-              <div className="px-5 pb-5">
-                <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.55)' }}>
-                  Structured pathways demonstrate systematic professional development to employers,
-                  clients, and industry bodies. Completing a CARSI pathway shows you have mastered
-                  not just isolated topics, but an integrated body of knowledge validated against{' '}
-                  <AcronymTooltip term="IICRC" /> standards. Many insurance panels and government
-                  tenders in Australia now require evidence of ongoing professional development, and
-                  a completed pathway provides exactly that documentation. Pathways also make it
-                  straightforward to track your <AcronymTooltip term="CEC" /> accumulation towards
-                  certification renewal — you can see at a glance how many credits you have earned
-                  and how many remain. For business owners, enrolling your team in pathways ensures
-                  consistent training standards across all technicians, reducing callbacks and
-                  improving customer satisfaction. Whether you are an independent operator building
-                  credibility or a company training a workforce, pathways turn professional
-                  development from a compliance burden into a competitive advantage.
-                </p>
-              </div>
-            </details>
-          </div>
-        </section>
-      </div>
-    </main>
+          ))}
+        </div>
+      </section>
+    </MarketingPageShell>
   );
 }
