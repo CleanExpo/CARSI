@@ -2,9 +2,8 @@ import {
   AnimatedCard,
   AnimatedHero,
   AnimatedSection,
-  AnimatedStats,
 } from '@/components/landing/AnimatedHero';
-import { HomePathwaysSpotlight } from '@/components/landing/HomePathwaysSpotlight';
+import { HomeGrowthSection } from '@/components/landing/HomeGrowthSection';
 import { PublicFooter } from '@/components/landing/PublicFooter';
 import { PublicNavbar } from '@/components/landing/PublicNavbar';
 import { PUBLIC_SHELL_INNER_CLASS } from '@/components/landing/public-shell-width';
@@ -15,7 +14,6 @@ import { IICRCDisciplineMap } from '@/components/lms/diagrams/IICRCDisciplineMap
 import { StudentJourneyMap } from '@/components/lms/diagrams/StudentJourneyMap';
 import { FAQSchema } from '@/components/seo/JsonLd';
 import { AcronymTooltip } from '@/components/ui/AcronymTooltip';
-import { disciplinePillsFromCodes } from '@/lib/iicrc-discipline-display';
 import { ccwRoadshowPath } from '@/lib/marketing/ccw-roadshow';
 import {
   catalogueMetaDescription,
@@ -34,7 +32,6 @@ import {
   Clock,
   Compass,
   ShieldCheck,
-  Sparkles,
   Ticket,
 } from 'lucide-react';
 import type { Metadata } from 'next';
@@ -82,37 +79,6 @@ const industries = [
   { slug: 'construction', label: 'Construction' },
 ];
 
-const discoverLinks = [
-  {
-    href: '/pathways',
-    label: 'Learning pathways',
-    title: 'Structured IICRC CEC paths',
-    detail: 'Follow curated course sequences by discipline and career stage.',
-    icon: Compass,
-  },
-  {
-    href: '/authority',
-    label: 'Authority hub',
-    title: 'Standards & expert content',
-    detail: 'Research, resources and industry alignment for restoration teams.',
-    icon: BookOpen,
-  },
-  {
-    href: ccwRoadshowPath,
-    label: 'Business Growth Days',
-    title: 'CARSI × CCW roadshow',
-    detail: 'Melbourne and Sydney — book seats or read the full program.',
-    icon: Ticket,
-  },
-  {
-    href: '/pricing',
-    label: 'Membership',
-    title: 'Plans & per-course options',
-    detail: 'Free library, monthly membership, or pay per course when you need one.',
-    icon: Sparkles,
-  },
-] as const;
-
 function buildHomeFaqs(facts: { publishedCourseCount: number; disciplineCodes: string[] }) {
   const n = facts.publishedCourseCount;
   const d = facts.disciplineCodes.length;
@@ -151,11 +117,11 @@ function buildHomeFaqs(facts: { publishedCourseCount: number; disciplineCodes: s
 
 function HomeSkeletonCard() {
   return (
-    <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
-      <div className="h-40 animate-pulse bg-slate-100" />
+    <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/[0.04]">
+      <div className="h-40 animate-pulse bg-slate-100 dark:bg-white/[0.06]" />
       <div className="space-y-3 p-4">
-        <div className="h-4 w-3/4 animate-pulse rounded bg-slate-100" />
-        <div className="h-3 w-1/2 animate-pulse rounded bg-slate-100" />
+        <div className="h-4 w-3/4 animate-pulse rounded bg-slate-100 dark:bg-white/[0.06]" />
+        <div className="h-3 w-1/2 animate-pulse rounded bg-slate-100 dark:bg-white/[0.06]" />
       </div>
     </div>
   );
@@ -167,11 +133,6 @@ export default async function Home() {
     getPublicCatalogueFacts(),
   ]);
   const faqs = buildHomeFaqs(catalogueFacts);
-  const disciplinePills = disciplinePillsFromCodes(
-    catalogueFacts.disciplineCodes.length > 0
-      ? catalogueFacts.disciplineCodes
-      : ['WRT', 'CRT', 'ASD', 'AMRT', 'FSRT', 'OCT', 'CCT']
-  );
   const disciplineCountLabel =
     catalogueFacts.disciplineCodes.length > 0 ? catalogueFacts.disciplineCodes.length : 7;
   const stats = [
@@ -194,40 +155,14 @@ export default async function Home() {
   ];
 
   return (
-    <div id="main-content" className="min-h-screen bg-[#f6f8fb] text-slate-900">
+    <div
+      id="main-content"
+      className="min-h-screen bg-[#f6f8fb] text-slate-900 dark:bg-[#050505] dark:text-white"
+    >
       <FAQSchema questions={faqs} />
       <PublicNavbar />
       <AnimatedHero benefits={benefits} />
-      <HomePathwaysSpotlight />
-      <AnimatedStats stats={stats} />
-
-      <section className="border-b border-slate-200 bg-[#f6f8fb] py-12">
-        <div className={PUBLIC_SHELL_INNER_CLASS}>
-          <div className="mb-6 text-center">
-            <p className="mb-2 inline-flex rounded-full border border-[#b8dbfb] bg-white px-3 py-1 text-[11px] font-semibold tracking-[0.14em] text-[#146fc2] uppercase">
-              Explore by discipline
-            </p>
-            <h2 className="text-xl font-bold text-slate-950 md:text-2xl">
-              <AcronymTooltip term="IICRC" /> course tracks
-            </h2>
-            <p className="mx-auto mt-2 max-w-lg text-sm text-slate-600">
-              Jump into the credential area you need — filter the catalogue by discipline code.
-            </p>
-          </div>
-          <div className="flex flex-wrap justify-center gap-2.5">
-            {disciplinePills.map((d) => (
-              <Link
-                key={d.code}
-                href={`/courses?discipline=${d.code}`}
-                className="rounded-full border border-slate-200 bg-white px-4 py-2 text-xs shadow-sm transition hover:-translate-y-0.5 hover:border-[#2490ed]/40 hover:shadow-md"
-              >
-                <span className="font-mono font-bold text-[#146fc2]">{d.code}</span>
-                <span className="ml-2 hidden text-slate-600 sm:inline">{d.label}</span>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
+      <HomeGrowthSection stats={stats} />
 
       <AnimatedSection
         label="Featured courses"
@@ -261,26 +196,26 @@ export default async function Home() {
       <AnimatedSection
         label="Certifications"
         title="IICRC discipline map and pathways"
-        className="bg-white"
+        className="bg-white dark:bg-[#0a0a0a]"
       >
         <div className="grid gap-10 lg:grid-cols-12 lg:items-start lg:gap-14">
           <div className="space-y-5 lg:col-span-4">
-            <p className="text-sm leading-relaxed text-slate-600 md:text-base">
+            <p className="text-sm leading-relaxed text-slate-600 md:text-base dark:text-white/65">
               Seven core pathways orbit <AcronymTooltip term="IICRC" /> standards — hover or tap any
               node to see the full certification name and jump into filtered courses.
             </p>
-            <ul className="space-y-3 text-sm text-slate-600">
+            <ul className="space-y-3 text-sm text-slate-600 dark:text-white/60">
               <li className="flex gap-3">
                 <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#146fc2]" aria-hidden />
                 <span>
-                  <strong className="text-slate-900">Interactive hub</strong> — explore disciplines
+                  <strong className="text-slate-900 dark:text-white">Interactive hub</strong> — explore disciplines
                   visually, then open matching courses.
                 </span>
               </li>
               <li className="flex gap-3">
                 <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-600" aria-hidden />
                 <span>
-                  <strong className="text-slate-900">{disciplineCountLabel} disciplines</strong>{' '}
+                  <strong className="text-slate-900 dark:text-white">{disciplineCountLabel} disciplines</strong>{' '}
                   in this view, aligned with CARSI&apos;s published catalogue.
                 </span>
               </li>
@@ -306,17 +241,17 @@ export default async function Home() {
         </div>
       </AnimatedSection>
 
-      <section className="bg-white py-14">
+      <section className="border-t border-slate-200/80 bg-white py-14 dark:border-white/10 dark:bg-[#0a0a0a]">
         <div className={PUBLIC_SHELL_INNER_CLASS}>
           <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
             <div>
               <p className="inline-flex rounded-full border border-[#b8dbfb] bg-[#eef7ff] px-3 py-1 text-[11px] font-semibold tracking-[0.14em] text-[#146fc2] uppercase">
                 How it works
               </p>
-              <h2 className="mt-4 text-2xl font-bold tracking-tight text-slate-950 md:text-3xl">
+              <h2 className="mt-4 text-2xl font-bold tracking-tight text-slate-950 md:text-3xl dark:text-white">
                 A clearer path from enrolment to certificate.
               </h2>
-              <p className="mt-3 text-sm leading-relaxed text-slate-600">
+              <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-white/65">
                 CARSI is structured around practical outcomes: find the right course, complete
                 self-paced lessons, track CECs, and share verifiable credentials when your work
                 requires proof.
@@ -351,10 +286,10 @@ export default async function Home() {
                   text: 'Use certificates and verification pages for employers, clients, or renewal.',
                 },
               ].map((item) => (
-                <div key={item.title} className="rounded-lg border border-slate-200 bg-[#f8fbff] p-5">
+                <div key={item.title} className="rounded-lg border border-slate-200 bg-[#f8fbff] p-5 dark:border-white/10 dark:bg-white/[0.04]">
                   <item.icon className="h-5 w-5 text-[#146fc2]" aria-hidden />
-                  <h3 className="mt-3 font-semibold text-slate-950">{item.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-slate-600">{item.text}</p>
+                  <h3 className="mt-3 font-semibold text-slate-950 dark:text-white">{item.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-white/60">{item.text}</p>
                 </div>
               ))}
             </div>
@@ -385,8 +320,8 @@ export default async function Home() {
                 href={`/industries/${industry.slug}`}
                 className={`group flex min-h-20 items-center gap-3 rounded-lg border p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${
                   industry.highlight
-                    ? 'border-[#2490ed]/35 bg-[#eef7ff] hover:border-[#2490ed]/50'
-                    : 'border-slate-200 bg-white hover:border-[#2490ed]/45'
+                    ? 'border-[#2490ed]/35 bg-[#eef7ff] hover:border-[#2490ed]/50 dark:border-[#2490ed]/30 dark:bg-[#2490ed]/10'
+                    : 'border-slate-200 bg-white hover:border-[#2490ed]/45 dark:border-white/10 dark:bg-white/[0.04]'
                 }`}
               >
                 <span
@@ -419,30 +354,7 @@ export default async function Home() {
         </div>
       </AnimatedSection>
 
-      <AnimatedSection label="Discover CARSI" title="Where to go next" className="bg-white">
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {discoverLinks.map((item, i) => (
-            <AnimatedCard key={item.href} index={i}>
-              <Link
-                href={item.href}
-                className="group flex h-full flex-col rounded-lg border border-slate-200 bg-[#f8fbff] p-5 transition hover:-translate-y-0.5 hover:border-[#2490ed]/40 hover:shadow-md"
-              >
-                <item.icon className="h-5 w-5 text-[#146fc2]" aria-hidden />
-                <p className="mt-3 text-[10px] font-semibold tracking-[0.14em] text-[#146fc2] uppercase">
-                  {item.label}
-                </p>
-                <h3 className="mt-2 font-semibold text-slate-950">{item.title}</h3>
-                <p className="mt-2 flex-1 text-sm leading-relaxed text-slate-600">{item.detail}</p>
-                <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-[#146fc2] group-hover:text-[#0f5fa8]">
-                  Learn more <ArrowRight className="h-3.5 w-3.5" aria-hidden />
-                </span>
-              </Link>
-            </AnimatedCard>
-          ))}
-        </div>
-      </AnimatedSection>
-
-      <section className="bg-[#0f172a] py-14 text-white">
+      <section className="bg-[#0f172a] py-14 text-white dark:bg-[#020617]">
         <div className={`${PUBLIC_SHELL_INNER_CLASS} grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center`}>
           <div>
             <p className="inline-flex items-center gap-2 text-sm font-semibold text-[#8fd0ff]">
