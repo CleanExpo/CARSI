@@ -22,6 +22,7 @@ export async function IndustryRecommendedCourses({
       industryName={industryName}
       disciplineList={disciplineList}
       courses={courses}
+      initialTab={disciplines[0]}
     />
   );
 }
