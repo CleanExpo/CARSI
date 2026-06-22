@@ -1,33 +1,32 @@
 import type { Metadata } from 'next';
 import { Hotel, Droplets, Footprints, Waves } from 'lucide-react';
 import {
-  IndustryPageLayout,
-  IndustryHero,
-  IndustryWhySection,
-  IndustryCTA,
   ContractorAddOns,
+  IndustryCTA,
+  IndustryCrossLinks,
+  IndustryFAQSection,
+  IndustryHero,
+  IndustryPageLayout,
+  IndustryRecommendedCourses,
+  IndustryWhySection,
 } from '@/components/industries';
-import { IndustryRecommendedCourses } from '@/components/industries/IndustryRecommendedCourses';
 import { FAQSchema } from '@/components/seo/JsonLd';
+import { buildIndustryMetadata } from '@/lib/marketing/industry-metadata';
 
 export const dynamic = 'force-dynamic';
 
-export const metadata: Metadata = {
-  title: 'Hospitality IICRC CEC Training | CARSI',
-  description:
-    'IICRC-certified training for Australian hotels and resorts. WRT, CRT, ASD and OCT courses for water damage, carpet care, structural drying and odour control.',
-  keywords: [
+export const metadata: Metadata = buildIndustryMetadata(
+  'hospitality',
+  'Hospitality IICRC CEC Training | CARSI',
+  'IICRC-certified training for Australian hotels and resorts. WRT, CRT, ASD and OCT courses for water damage, carpet care, structural drying and odour control.',
+  [
     'hospitality IICRC CEC training',
     'hotel restoration training',
     'hotel water damage',
     'carpet repair certification',
     'odour control training',
-  ],
-};
-
-// ---------------------------------------------------------------------------
-// Page Configuration
-// ---------------------------------------------------------------------------
+  ]
+);
 
 const ACCENT_COLOR = '#ed9d24';
 
@@ -96,10 +95,6 @@ const whyCards = [
   },
 ];
 
-// ---------------------------------------------------------------------------
-// Page Component
-// ---------------------------------------------------------------------------
-
 export default async function HospitalityIndustryPage() {
   return (
     <IndustryPageLayout>
@@ -116,9 +111,10 @@ export default async function HospitalityIndustryPage() {
       />
 
       <IndustryWhySection
-        industryName="Hospitality Teams"
+        industryName="hospitality teams"
         headline="Built for"
         headlineAccent="guest-first operations"
+        accentColor={ACCENT_COLOR}
         cards={whyCards}
       />
 
@@ -128,16 +124,21 @@ export default async function HospitalityIndustryPage() {
         disciplines={['WRT', 'CRT', 'ASD', 'OCT']}
       />
 
-      <ContractorAddOns accentColor={ACCENT_COLOR} />
+      <ContractorAddOns accentColor={ACCENT_COLOR} variant="hospitality" />
+
+      <IndustryFAQSection industryName="Hotels & Resorts" faqs={faqs} />
 
       <IndustryCTA
-        subtitle="Hospitality Training Bundle"
+        subtitle="Hospitality training bundle"
         title="Hotel Maintenance Bundle"
         price="$295"
         description="WRT + CRT + OCT training for hotel maintenance teams. Bulk licensing available for hotel chains and resort groups."
-        ctaText="Request Bundle Pricing"
+        ctaText="Request bundle pricing"
+        ctaHref="/contact"
         accentColor={ACCENT_COLOR}
       />
+
+      <IndustryCrossLinks currentSlug="hospitality" />
     </IndustryPageLayout>
   );
 }
