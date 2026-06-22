@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { ArrowRight, Award, BookOpen, Clock, Layers } from 'lucide-react';
+import { ArrowRight, BookOpen, Clock, Layers } from 'lucide-react';
 import Link from 'next/link';
 
 import { useCourseBrowseBase } from '@/components/lms/CourseBrowseContext';
@@ -54,11 +54,7 @@ const cardShellClass =
 const featuredShellClass =
   'group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_8px_32px_-20px_rgba(15,23,42,0.12)] transition-all duration-200 hover:-translate-y-1 hover:border-[#2490ed]/25 hover:shadow-[0_24px_56px_-24px_rgba(36,144,237,0.2)] dark:border-white/10 dark:bg-[#0a0f18] dark:shadow-[0_16px_48px_-28px_rgba(0,0,0,0.45)] dark:hover:border-[#2490ed]/30 dark:hover:shadow-[0_28px_64px_-28px_rgba(36,144,237,0.18)]';
 
-export function CourseCard({
-  course,
-  priorityImage,
-  variant = 'catalog',
-}: CourseCardProps) {
+export function CourseCard({ course, priorityImage, variant = 'catalog' }: CourseCardProps) {
   const priceNum =
     typeof course.price_aud === 'string' ? parseFloat(course.price_aud) : course.price_aud;
   const isFree = course.is_free || priceNum === 0;
@@ -89,6 +85,12 @@ export function CourseCard({
           discipline={discipline}
           priceLabel={price}
           isFree={isFree}
+          level={course.level}
+          cecHours={course.cec_hours}
+          moduleCount={course.module_count}
+          lessonCount={course.lesson_count}
+          durationHours={course.duration_hours}
+          shortDescription={course.short_description}
           draft={course.catalog_status === 'draft'}
           backdropImageSrc={thumbSrc}
           backdropImageLoading={priorityImage ? 'eager' : 'lazy'}
@@ -97,37 +99,15 @@ export function CourseCard({
       </Link>
 
       <div className={`flex flex-1 flex-col ${isFeatured ? 'gap-3 p-5' : 'gap-2.5 p-4'}`}>
-        <div className="space-y-2">
-          <div className="flex flex-wrap items-center gap-1.5">
-            {course.level ? (
-              <span className="rounded-md border border-slate-200/90 bg-slate-50 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-slate-600 uppercase dark:border-white/10 dark:bg-white/[0.04] dark:text-white/55">
-                {formatLevel(course.level)}
-              </span>
-            ) : null}
-            {course.cec_hours ? (
-              <span className="inline-flex items-center gap-1 rounded-md border border-[#b8dbfb] bg-[#eef7ff] px-2 py-0.5 text-[10px] font-semibold text-[#0f5fa8] dark:border-[#2490ed]/30 dark:bg-[#2490ed]/10 dark:text-[#8fd0ff]">
-                <Award className="h-3 w-3 shrink-0" aria-hidden />
-                {course.cec_hours} CEC{course.cec_hours === '1' ? '' : 's'}
-              </span>
-            ) : null}
-          </div>
-
-          <h3
-            className={`line-clamp-2 font-semibold leading-snug text-slate-950 dark:text-white ${
-              isFeatured ? 'text-[1.05rem]' : 'text-[0.95rem]'
-            }`}
-          >
-            <Link href={href} className="transition-colors hover:text-[#146fc2] dark:hover:text-[#8fd0ff]">
-              {course.title}
-            </Link>
-          </h3>
-
-          {course.short_description ? (
-            <p className="line-clamp-2 text-sm leading-relaxed text-slate-600 dark:text-white/58">
-              {course.short_description}
-            </p>
-          ) : null}
-        </div>
+        <h3
+          className={`line-clamp-2 font-semibold leading-snug text-slate-950 dark:text-white ${
+            isFeatured ? 'text-[1.05rem]' : 'text-[0.95rem]'
+          }`}
+        >
+          <Link href={href} className="transition-colors hover:text-[#146fc2] dark:hover:text-[#8fd0ff]">
+            {course.title}
+          </Link>
+        </h3>
 
         <div
           className={`mt-auto flex items-center justify-between gap-3 border-t pt-3 ${
@@ -162,8 +142,8 @@ export function CourseCard({
             aria-label={`View course: ${course.title}`}
             className={
               isFeatured
-                ? 'inline-flex shrink-0 items-center gap-1 rounded-lg bg-[#146fc2] px-3 py-2 text-xs font-semibold text-white transition hover:bg-[#0f5fa8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2490ed]/40'
-                : 'inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-[#146fc2] transition hover:text-[#0f5fa8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2490ed]/40 dark:text-[#8fd0ff] dark:hover:text-white'
+                ? 'inline-flex shrink-0 items-center gap-1 rounded-lg bg-[#146fc2] px-3 py-2 text-xs font-semibold text-white transition hover:bg-[#0f5fa8] focus-visible:ring-2 focus-visible:ring-[#2490ed]/40 focus-visible:outline-none'
+                : 'inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-[#146fc2] transition hover:text-[#0f5fa8] focus-visible:ring-2 focus-visible:ring-[#2490ed]/40 focus-visible:outline-none dark:text-[#8fd0ff] dark:hover:text-white'
             }
           >
             View

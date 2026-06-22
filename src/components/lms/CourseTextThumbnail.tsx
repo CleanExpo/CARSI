@@ -3,6 +3,7 @@
 import { BookOpen, Clock, GraduationCap, Layers, User } from 'lucide-react';
 import type { ImgHTMLAttributes } from 'react';
 
+import { IICRC_DISCIPLINE_SHORT } from '@/lib/iicrc-discipline-display';
 import { cn } from '@/lib/utils';
 
 const DISCIPLINE_ACCENTS: Record<
@@ -161,6 +162,10 @@ export type CourseTextThumbnailProps = {
   onBackdropImageError?: () => void;
 };
 
+function formatLevelLabel(level: string): string {
+  return level.charAt(0).toUpperCase() + level.slice(1).toLowerCase();
+}
+
 function PriceBadge({
   priceLabel,
   isFree,
@@ -229,6 +234,12 @@ export function CourseTextThumbnail({
   const showDesc = !isCard && Boolean(shortDescription?.trim());
   const showModuleCallout =
     !isCard && moduleCount != null && (moduleCount > 0 || variant === 'admin');
+  const disciplineLabel = code ? (IICRC_DISCIPLINE_SHORT[code] ?? code) : null;
+  const hasCardStats =
+    isCard &&
+    ((moduleCount != null && moduleCount > 0) ||
+      (lessonCount != null && lessonCount > 0) ||
+      Boolean(durationHours));
 
   return (
     <div
@@ -288,6 +299,15 @@ export function CourseTextThumbnail({
             }}
             aria-hidden
           />
+          {isCard && code ? (
+            <div
+              className="pointer-events-none absolute -right-1 bottom-0 z-0 select-none font-mono text-[4.5rem] font-black leading-none tracking-tighter opacity-[0.07]"
+              style={{ color: accent.fg }}
+              aria-hidden
+            >
+              {code}
+            </div>
+          ) : null}
         </>
       )}
 
@@ -355,7 +375,107 @@ export function CourseTextThumbnail({
 
             <h3 className={cn(titleClass, 'line-clamp-3')}>{title}</h3>
           </>
-        ) : null}
+        ) : (
+          <div className="flex min-h-0 flex-1 flex-col">
+            {disciplineLabel ? (
+              <p
+                className={cn(
+                  'text-[11px] font-semibold tracking-wide uppercase',
+                  hasBackdrop ? 'text-white/85' : ''
+                )}
+                style={hasBackdrop ? undefined : { color: accent.fg }}
+              >
+                {disciplineLabel}
+              </p>
+            ) : showCategory && category ? (
+              <p
+                className={cn(
+                  'line-clamp-1 text-[11px] font-semibold tracking-wide uppercase',
+                  hasBackdrop ? 'text-white/85' : 'text-slate-600'
+                )}
+              >
+                {category}
+              </p>
+            ) : null}
+
+            <div className="mt-1.5 flex flex-wrap items-center gap-1">
+              {level ? (
+                <span
+                  className={cn(
+                    'rounded-md px-1.5 py-0.5 text-[9px] font-semibold tracking-wide uppercase',
+                    hasBackdrop
+                      ? 'border border-white/15 bg-black/35 text-white/90'
+                      : 'border border-slate-200/90 bg-white/85 text-slate-700'
+                  )}
+                >
+                  {formatLevelLabel(level)}
+                </span>
+              ) : null}
+              {cecHours ? (
+                <span
+                  className={cn(
+                    'rounded-md px-1.5 py-0.5 text-[9px] font-semibold tabular-nums',
+                    hasBackdrop
+                      ? 'border border-cyan-300/25 bg-black/35 text-cyan-100'
+                      : 'border border-[#2490ed]/25 bg-[#eef7ff] text-[#146fc2]'
+                  )}
+                >
+                  {cecHours} CEC{cecHours === '1' ? '' : 's'}
+                </span>
+              ) : null}
+            </div>
+
+            {shortDescription?.trim() ? (
+              <p
+                className={cn(
+                  'mt-2 line-clamp-3 text-[11px] leading-relaxed',
+                  hasBackdrop ? 'text-white/80' : 'text-slate-700'
+                )}
+              >
+                {shortDescription}
+              </p>
+            ) : (
+              <h3
+                className={cn(
+                  'mt-2 line-clamp-3 text-sm font-bold leading-snug',
+                  hasBackdrop ? 'text-white' : 'text-slate-950'
+                )}
+              >
+                {title}
+              </h3>
+            )}
+
+            {hasCardStats ? (
+              <div
+                className={cn(
+                  'mt-auto flex flex-wrap items-center gap-x-2.5 gap-y-1 border-t pt-2 text-[10px] font-medium',
+                  hasBackdrop
+                    ? 'border-white/12 text-white/75'
+                    : 'border-slate-200/90 text-slate-600'
+                )}
+              >
+                {moduleCount != null && moduleCount > 0 ? (
+                  <span className="inline-flex items-center gap-1">
+                    <Layers className="h-3 w-3 shrink-0 opacity-75" style={{ color: accent.fg }} />
+                    {moduleCount} mod{moduleCount === 1 ? '' : 's'}
+                  </span>
+                ) : null}
+                {lessonCount != null && lessonCount > 0 ? (
+                  <span className="inline-flex items-center gap-1">
+                    <BookOpen className="h-3 w-3 shrink-0 opacity-75" />
+                    {lessonCount} lesson{lessonCount === 1 ? '' : 's'}
+                  </span>
+                ) : null}
+                {durationHours ? (
+                  <span className="inline-flex items-center gap-1">
+                    <Clock className="h-3 w-3 shrink-0 opacity-75" />
+                    {durationHours}h
+                  </span>
+                ) : null}
+              </div>
+            ) : null}
+          </div>
+        )}
 
         {showModuleCallout ? (
           <div
@@ -416,7 +536,10 @@ export function CourseTextThumbnail({
             {level ? (
               <span className="inline-flex items-center gap-1">
                 <GraduationCap
-                  className={cn('h-3 w-3 shrink-0', hasBackdrop ? 'text-white/45' : 'text-slate-400')}
+                  className={cn(
+                    'h-3 w-3 shrink-0',
+                    hasBackdrop ? 'text-white/45' : 'text-slate-400'
+                  )}
                 />
                 {level}
               </span>
@@ -429,7 +552,10 @@ export function CourseTextThumbnail({
             {durationHours ? (
               <span className="inline-flex items-center gap-1">
                 <Clock
-                  className={cn('h-3 w-3 shrink-0', hasBackdrop ? 'text-white/45' : 'text-slate-400')}
+                  className={cn(
+                    'h-3 w-3 shrink-0',
+                    hasBackdrop ? 'text-white/45' : 'text-slate-400'
+                  )}
                 />
                 {durationHours}h
               </span>
@@ -437,7 +563,10 @@ export function CourseTextThumbnail({
             {instructorName ? (
               <span className="inline-flex min-w-0 items-center gap-1">
                 <User
-                  className={cn('h-3 w-3 shrink-0', hasBackdrop ? 'text-white/45' : 'text-slate-400')}
+                  className={cn(
+                    'h-3 w-3 shrink-0',
+                    hasBackdrop ? 'text-white/45' : 'text-slate-400'
+                  )}
                 />
                 <span className="truncate">{instructorName}</span>
               </span>
