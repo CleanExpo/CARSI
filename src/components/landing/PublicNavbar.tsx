@@ -2,6 +2,7 @@ import Link from 'next/link';
 
 import { AuthNavLinks } from '@/components/landing/AuthNavLinks';
 import { PublicLogo } from '@/components/landing/PublicLogo';
+import { PublicThemeToggle } from '@/components/landing/PublicThemeToggle';
 import {
   PUBLIC_CHROME_LINK_CLASS,
   PUBLIC_CHROME_NAV_CLASS,
@@ -46,7 +47,8 @@ export function PublicNavbar() {
             ))}
           </div>
 
-          <div className="hidden items-center gap-4 lg:flex">
+          <div className="hidden items-center gap-3 lg:flex">
+            <PublicThemeToggle />
             <AuthNavLinks variant="desktop" tone="chrome" />
           </div>
 
