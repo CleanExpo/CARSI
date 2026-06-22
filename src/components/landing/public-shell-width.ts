@@ -1,8 +1,7 @@
 /**
  * Inner width for public marketing chrome — must match {@link PublicNavbar} and {@link PublicFooter}.
  */
-export const PUBLIC_SHELL_INNER_CLASS =
-  'mx-auto w-[94%] xl:w-[85%] 2xl:max-w-[1800px]';
+export const PUBLIC_SHELL_INNER_CLASS = 'mx-auto w-[94%] xl:w-[85%] 2xl:max-w-[1800px]';
 
 /** Full-width page body — used for marketing & industry pages (no max-width cap). */
 export const PUBLIC_PAGE_FULL_CLASS = 'w-full';
@@ -24,4 +23,3 @@ export const PUBLIC_CHROME_HEADING_CLASS =
 
 export const PUBLIC_CHROME_AUTH_BAND_CLASS =
   'relative overflow-hidden rounded-2xl border border-white/[0.08] bg-gradient-to-b from-[#152238] via-[#0f172a] to-[#0d1524] px-6 py-10 shadow-[0_20px_50px_-28px_rgba(15,23,42,0.65)]';
-
