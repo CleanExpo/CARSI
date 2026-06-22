@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 
 import { AuthNavLinks } from '@/components/landing/AuthNavLinks';
+import { PublicThemeToggle } from '@/components/landing/PublicThemeToggle';
 import { authorityPath } from '@/lib/marketing/authority';
 import { startSmartBasePath } from '@/lib/marketing/start-smart';
 import { ccwWorkshopPath } from '@/lib/marketing/marketing-growth-links';
@@ -149,6 +150,12 @@ export default function MobileNav() {
               }}
             >
               <nav className="p-4">
+                <div className="mb-4 flex items-center justify-between px-4">
+                  <span className="text-xs font-semibold tracking-wide text-slate-500 uppercase">
+                    Appearance
+                  </span>
+                  <PublicThemeToggle variant="light" />
+                </div>
                 <ul className="space-y-1">
                   {navItems.map((item, i) => (
                     <motion.li
