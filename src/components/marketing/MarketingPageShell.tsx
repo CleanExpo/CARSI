@@ -30,7 +30,7 @@ export function MarketingPageShell({
   return (
     <main
       id={id}
-      className={`relative min-h-screen w-full pb-16 pt-6 sm:pb-20 sm:pt-8 ${marketingPageBg} ${className}`}
+      className={`relative min-h-screen w-full pt-6 pb-16 sm:pt-8 sm:pb-20 ${marketingPageBg} ${className}`}
     >
       <div className={marketingPageGlow} aria-hidden />
       <div className={innerClassName}>{children}</div>
