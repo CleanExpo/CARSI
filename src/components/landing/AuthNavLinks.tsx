@@ -115,7 +115,7 @@ export function AuthNavLinks({
           className="rounded-md px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md focus-visible:ring-2 focus-visible:ring-[#ed9d24]/45 focus-visible:outline-none"
           style={{ background: '#9a4a00' }}
         >
-          Browse Courses
+          Get started
         </Link>
       </>
     );
@@ -143,7 +143,7 @@ export function AuthNavLinks({
         className="block min-h-11 rounded-md px-4 py-3 text-center text-base font-semibold text-white transition-opacity duration-150 hover:opacity-90"
         style={{ background: '#9a4a00' }}
       >
-        Browse Courses
+        Get started
       </Link>
     </div>
   );
