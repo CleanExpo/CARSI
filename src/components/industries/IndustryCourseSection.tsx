@@ -40,7 +40,7 @@ export function IndustryCourseSection({
       />
 
       <div className={`p-4 sm:p-5 ${marketingPanel}`}>
-        <CourseGrid courses={courses} initialTab={defaultTab} surface="dark" />
+        <CourseGrid courses={courses} initialTab={defaultTab} surface="auto" />
       </div>
     </section>
   );
