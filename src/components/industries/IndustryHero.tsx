@@ -1,8 +1,8 @@
 import type { LucideIcon } from 'lucide-react';
 
+import { marketingBody, marketingHeading } from '@/lib/marketing/marketing-ui';
 import { DisciplinePill } from './DisciplinePill';
 import { GlassStatCard } from './GlassStatCard';
-import { marketingBody, marketingHeading } from '@/lib/marketing/marketing-ui';
 
 interface Discipline {
   code: string;
@@ -37,7 +37,7 @@ export function IndustryHero({
   stats,
 }: IndustryHeroProps) {
   return (
-    <section className="pb-12 pt-2 sm:pb-14">
+    <section className="pt-2 pb-12 sm:pb-14">
       <div className="max-w-4xl">
         <div
           className="mb-6 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-[11px] font-semibold tracking-[0.14em] uppercase"
