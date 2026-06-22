@@ -16,7 +16,7 @@ interface HomeFeaturedCoursesSectionProps {
 function FeaturedCourseSkeleton() {
   return (
     <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm dark:border-white/10 dark:bg-[#0a0f18]">
-      <div className="aspect-video animate-pulse bg-gradient-to-br from-slate-100 to-slate-50 dark:from-white/[0.06] dark:to-white/[0.02]" />
+      <div className="aspect-[16/10] animate-pulse bg-gradient-to-br from-slate-100 to-slate-50 dark:from-white/[0.06] dark:to-white/[0.02]" />
       <div className="space-y-3 p-5">
         <div className="h-4 w-4/5 animate-pulse rounded bg-slate-100 dark:bg-white/[0.06]" />
         <div className="h-3 w-1/3 animate-pulse rounded bg-slate-100 dark:bg-white/[0.06]" />
@@ -76,7 +76,6 @@ export function HomeFeaturedCoursesSection({
                       course={course}
                       priorityImage={i < 6}
                       variant="featured"
-                      showBrand={false}
                     />
                   </AnimatedCard>
                 ))
