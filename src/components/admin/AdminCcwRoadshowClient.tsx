@@ -65,6 +65,23 @@ export function AdminCcwRoadshowClient() {
     await load();
   }
 
+  async function remove(row: RegistryRow) {
+    if (!window.confirm(`Delete this registration (${row.contactEmail})? This frees its seats.`)) {
+      return;
+    }
+    const res = await fetch('/api/admin/ccw-roadshow', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ registrationId: row.registrationId }),
+    });
+    if (!res.ok) {
+      const payload = (await res.json().catch(() => ({}))) as { detail?: string };
+      setError(payload.detail || 'Failed to delete');
+      return;
+    }
+    await load();
+  }
+
   if (loading) return <div className="p-6">Loading registry…</div>;
 
   return (
@@ -129,15 +146,24 @@ export function AdminCcwRoadshowClient() {
                 </td>
                 <td className="p-2 font-mono text-xs">{row.freeEntryToken}</td>
                 <td className="p-2">
-                  {row.status === 'waitlisted' && (
+                  <div className="flex gap-2">
+                    {row.status === 'waitlisted' && (
+                      <button
+                        type="button"
+                        onClick={() => promote(row)}
+                        className="rounded-lg border px-2 py-1 text-xs font-medium"
+                      >
+                        Promote
+                      </button>
+                    )}
                     <button
                       type="button"
-                      onClick={() => promote(row)}
-                      className="rounded-lg border px-2 py-1 text-xs font-medium"
+                      onClick={() => remove(row)}
+                      className="rounded-lg border border-red-300 px-2 py-1 text-xs font-medium text-red-700"
                     >
-                      Promote
+                      Delete
                     </button>
-                  )}
+                  </div>
                 </td>
               </tr>
             ))}
