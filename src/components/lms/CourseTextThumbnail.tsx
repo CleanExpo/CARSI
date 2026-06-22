@@ -1,13 +1,9 @@
 'use client';
 
 import { BookOpen, Clock, GraduationCap, Layers, User } from 'lucide-react';
-import Image from 'next/image';
 import type { ImgHTMLAttributes } from 'react';
 
 import { cn } from '@/lib/utils';
-
-/** Primary CARSI mark for textual course art (public/). */
-export const CARSI_COURSE_LOGO_SRC = '/logo/logo1.png';
 
 const DISCIPLINE_ACCENTS: Record<
   string,
@@ -146,7 +142,6 @@ export type CourseTextThumbnailProps = {
   title: string;
   category?: string | null;
   discipline?: string | null;
-  /** e.g. "Free" or "$99 AUD" */
   priceLabel?: string | null;
   isFree?: boolean;
   moduleCount?: number | null;
@@ -157,21 +152,41 @@ export type CourseTextThumbnailProps = {
   shortDescription?: string | null;
   instructorName?: string | null;
   draft?: boolean;
-  /** Card grid, course hero sidebar, or admin list */
   variant?: 'card' | 'hero' | 'admin';
-  /** Show CARSI logo and brand line on thumbnails (off for homepage featured grid). */
-  showBrand?: boolean;
   className?: string;
-  /**
-   * Optional catalogue photo behind the text (gradient scrim keeps copy readable).
-   * When set, the textual layout is always shown on top.
-   */
   backdropImageSrc?: string | null;
   backdropImageLoading?: ImgHTMLAttributes<HTMLImageElement>['loading'];
   backdropImageFetchPriority?: ImgHTMLAttributes<HTMLImageElement>['fetchPriority'];
   backdropImageReferrerPolicy?: ImgHTMLAttributes<HTMLImageElement>['referrerPolicy'];
   onBackdropImageError?: () => void;
 };
+
+function PriceBadge({
+  priceLabel,
+  isFree,
+  hasBackdrop,
+}: {
+  priceLabel: string;
+  isFree?: boolean;
+  hasBackdrop: boolean;
+}) {
+  return (
+    <span
+      className={cn(
+        'shrink-0 rounded-md px-2 py-0.5 text-[11px] font-semibold tabular-nums',
+        isFree
+          ? hasBackdrop
+            ? 'border border-emerald-400/35 bg-black/50 text-emerald-300'
+            : 'border border-emerald-500/30 bg-emerald-50 text-emerald-700'
+          : hasBackdrop
+            ? 'border border-amber-300/35 bg-black/50 text-amber-200'
+            : 'border border-amber-500/25 bg-amber-50 text-amber-800'
+      )}
+    >
+      {priceLabel}
+    </span>
+  );
+}
 
 export function CourseTextThumbnail({
   title,
@@ -188,7 +203,6 @@ export function CourseTextThumbnail({
   instructorName,
   draft,
   variant = 'card',
-  showBrand = true,
   className,
   backdropImageSrc,
   backdropImageLoading = 'lazy',
@@ -200,6 +214,7 @@ export function CourseTextThumbnail({
   const code = inferDisciplineCode(category, discipline);
   const showCategory = shouldShowCategoryLabel(category, code);
   const hasBackdrop = Boolean(backdropImageSrc?.trim());
+  const isCard = variant === 'card';
 
   const titleClass =
     variant === 'hero'
@@ -211,18 +226,15 @@ export function CourseTextThumbnail({
         : `text-sm font-bold leading-snug ${hasBackdrop ? 'text-white' : 'text-slate-950'}`;
 
   const descLines = variant === 'hero' ? 3 : 2;
-  const showDesc = variant !== 'card' && Boolean(shortDescription?.trim());
-
-  const logoH = variant === 'hero' ? 32 : variant === 'admin' ? 28 : 26;
+  const showDesc = !isCard && Boolean(shortDescription?.trim());
   const showModuleCallout =
-    variant !== 'card' && moduleCount != null && (moduleCount > 0 || variant === 'admin');
-  const showBrandRow = showBrand || Boolean(priceLabel);
+    !isCard && moduleCount != null && (moduleCount > 0 || variant === 'admin');
 
   return (
     <div
       className={cn(
         'relative flex h-full min-h-0 w-full flex-col overflow-hidden',
-        variant === 'hero' ? 'p-4 sm:p-5' : variant === 'admin' ? 'p-3.5' : 'p-3',
+        variant === 'hero' ? 'p-4 sm:p-5' : variant === 'admin' ? 'p-3.5' : 'p-3.5',
         hasBackdrop && 'shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)]',
         className
       )}
@@ -230,7 +242,7 @@ export function CourseTextThumbnail({
         hasBackdrop
           ? { background: '#0a0c10' }
           : {
-              background: `linear-gradient(145deg, ${accent.from} 0%, ${accent.via} 48%, ${accent.to} 100%)`,
+              background: `linear-gradient(145deg, ${accent.from} 0%, ${accent.via} 52%, ${accent.to} 100%)`,
               boxShadow: `inset 0 1px 0 rgba(255,255,255,0.9), 0 18px 40px -28px ${accent.glow}`,
             }
       }
@@ -268,9 +280,10 @@ export function CourseTextThumbnail({
             aria-hidden
           />
           <div
-            className="pointer-events-none absolute inset-0 opacity-[0.06]"
+            className="pointer-events-none absolute inset-0 opacity-[0.05]"
             style={{
-              backgroundImage: `linear-gradient(105deg, transparent 0%, rgba(255,255,255,0.35) 45%, transparent 90%)`,
+              backgroundImage:
+                'linear-gradient(105deg, transparent 0%, rgba(255,255,255,0.35) 45%, transparent 90%)',
               backgroundSize: '18px 100%',
             }}
             aria-hidden
@@ -284,127 +297,90 @@ export function CourseTextThumbnail({
           hasBackdrop && '[text-shadow:0_1px_2px_rgba(0,0,0,0.85)]'
         )}
       >
-        {/* Brand + price */}
-        {showBrandRow ? (
-          <div
-            className={cn(
-              'mb-2 flex items-start gap-2',
-              showBrand ? 'justify-between' : 'justify-end'
-            )}
-          >
-            {showBrand ? (
-              <div className="relative min-w-0 shrink pt-0.5" style={{ height: logoH }}>
-                <Image
-                  src={CARSI_COURSE_LOGO_SRC}
-                  alt="CARSI"
-                  width={140}
-                  height={48}
-                  className="h-full w-auto max-w-[min(100%,9.5rem)] object-contain object-left drop-shadow-[0_2px_12px_rgba(0,0,0,0.45)]"
-                />
-              </div>
-            ) : null}
-            {priceLabel ? (
+        <div className="mb-2 flex items-start justify-between gap-2">
+          <div className="flex min-w-0 flex-wrap items-center gap-1">
+            {code ? (
               <span
-                className="shrink-0 rounded-md px-2 py-0.5 text-[11px] font-bold tabular-nums"
-                style={
-                  isFree
-                    ? {
-                        color: '#5ee9a0',
-                        background: hasBackdrop ? 'rgba(0,0,0,0.5)' : 'rgba(16,185,129,0.12)',
-                        border: hasBackdrop
-                          ? '1px solid rgba(94,233,160,0.35)'
-                          : '1px solid rgba(16,185,129,0.35)',
-                      }
-                    : {
-                        color: hasBackdrop ? '#f5c15c' : '#9a4a00',
-                        background: hasBackdrop ? 'rgba(0,0,0,0.5)' : 'rgba(237,157,36,0.12)',
-                        border: hasBackdrop
-                          ? '1px solid rgba(245,193,92,0.35)'
-                          : '1px solid rgba(237,157,36,0.35)',
-                        boxShadow: hasBackdrop ? '0 0 14px rgba(237,157,36,0.15)' : undefined,
-                      }
-                }
+                className="rounded-md px-1.5 py-0.5 font-mono text-[10px] font-bold tracking-wide uppercase"
+                style={{
+                  color: accent.fg,
+                  background: hasBackdrop ? 'rgba(0,0,0,0.45)' : 'rgba(255,255,255,0.88)',
+                  border: `1px solid ${accent.fg}44`,
+                }}
               >
-                {priceLabel}
+                {code}
+              </span>
+            ) : null}
+            {draft ? (
+              <span className="rounded-md bg-amber-500/90 px-1.5 py-0.5 text-[9px] font-bold tracking-wide text-black uppercase">
+                Draft
               </span>
             ) : null}
           </div>
-        ) : null}
-
-        {/* Discipline / category / draft */}
-        <div className="mb-1.5 flex flex-wrap items-center gap-1">
-          {code && (
-            <span
-              className="rounded px-1.5 py-0.5 font-mono text-[9px] font-bold tracking-wide uppercase"
-              style={{
-                color: accent.fg,
-                background: hasBackdrop ? 'rgba(0,0,0,0.45)' : 'rgba(255,255,255,0.82)',
-                border: `1px solid ${accent.fg}55`,
-                boxShadow: `0 8px 18px -14px ${accent.glow}`,
-              }}
-            >
-              IICRC {code}
-            </span>
-          )}
-          {cecHours && variant === 'card' ? (
-            <span
-              className="rounded px-1.5 py-0.5 text-[9px] font-bold tabular-nums"
-              style={{
-                color: '#146fc2',
-                background: hasBackdrop ? 'rgba(255,255,255,0.16)' : '#eef7ff',
-                border: '1px solid rgba(36,144,237,0.28)',
-              }}
-            >
-              {cecHours} CEC{cecHours === '1' ? '' : 's'}
-            </span>
+          {priceLabel ? (
+            <PriceBadge priceLabel={priceLabel} isFree={isFree} hasBackdrop={hasBackdrop} />
           ) : null}
-          {showCategory && (
-            <span
-              className={`line-clamp-1 max-w-full rounded px-1.5 py-0.5 text-[9px] font-medium ${
-                hasBackdrop ? 'text-white/85' : 'text-slate-700'
-              }`}
-              style={{
-                background: hasBackdrop ? 'rgba(0,0,0,0.35)' : 'rgba(255,255,255,0.72)',
-                border: hasBackdrop
-                  ? '1px solid rgba(255,255,255,0.12)'
-                  : '1px solid rgba(15,23,42,0.1)',
-              }}
-            >
-              {category}
-            </span>
-          )}
-          {draft && (
-            <span className="rounded bg-amber-500/90 px-1.5 py-0.5 text-[9px] font-bold tracking-wide text-black uppercase">
-              Draft
-            </span>
-          )}
         </div>
 
-        {variant === 'card' ? null : <h3 className={cn(titleClass, 'line-clamp-3')}>{title}</h3>}
+        {!isCard ? (
+          <>
+            {(showCategory || cecHours) && (
+              <div className="mb-1.5 flex flex-wrap items-center gap-1">
+                {cecHours ? (
+                  <span
+                    className={cn(
+                      'rounded-md px-1.5 py-0.5 text-[9px] font-semibold tabular-nums',
+                      hasBackdrop
+                        ? 'border border-white/15 bg-white/10 text-cyan-100'
+                        : 'border border-[#2490ed]/25 bg-[#eef7ff] text-[#146fc2]'
+                    )}
+                  >
+                    {cecHours} CEC{cecHours === '1' ? '' : 's'}
+                  </span>
+                ) : null}
+                {showCategory ? (
+                  <span
+                    className={cn(
+                      'line-clamp-1 max-w-full rounded-md px-1.5 py-0.5 text-[9px] font-medium',
+                      hasBackdrop
+                        ? 'border border-white/12 bg-black/35 text-white/85'
+                        : 'border border-slate-200/90 bg-white/80 text-slate-700'
+                    )}
+                  >
+                    {category}
+                  </span>
+                ) : null}
+              </div>
+            )}
+
+            <h3 className={cn(titleClass, 'line-clamp-3')}>{title}</h3>
+          </>
+        ) : null}
 
         {showModuleCallout ? (
           <div
-            className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 rounded-md px-2 py-1.5"
-            style={{
-              background: hasBackdrop ? 'rgba(0,0,0,0.28)' : 'rgba(255,255,255,0.74)',
-              border: hasBackdrop
-                ? '1px solid rgba(255,255,255,0.1)'
-                : '1px solid rgba(15,23,42,0.1)',
-            }}
+            className={cn(
+              'mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 rounded-md px-2 py-1.5',
+              hasBackdrop
+                ? 'border border-white/10 bg-black/28'
+                : 'border border-slate-200/90 bg-white/75'
+            )}
           >
             <span
-              className={`inline-flex items-center gap-1 text-[11px] font-bold tabular-nums ${
+              className={cn(
+                'inline-flex items-center gap-1 text-[11px] font-bold tabular-nums',
                 hasBackdrop ? 'text-white' : 'text-slate-900'
-              }`}
+              )}
             >
               <Layers className="h-3.5 w-3.5" style={{ color: accent.fg }} />
               {moduleCount} module{moduleCount === 1 ? '' : 's'}
             </span>
             {lessonCount != null && lessonCount > 0 ? (
               <span
-                className={`inline-flex items-center gap-1 text-[10px] font-medium ${
+                className={cn(
+                  'inline-flex items-center gap-1 text-[10px] font-medium',
                   hasBackdrop ? 'text-white/70' : 'text-slate-600'
-                }`}
+                )}
               >
                 <BookOpen className="h-3 w-3 opacity-70" />
                 {lessonCount} lesson{lessonCount === 1 ? '' : 's'}
@@ -415,9 +391,10 @@ export function CourseTextThumbnail({
 
         {showDesc ? (
           <p
-            className={`mt-2 text-[11px] leading-relaxed ${
+            className={cn(
+              'mt-2 text-[11px] leading-relaxed',
               hasBackdrop ? 'text-white/70' : 'text-slate-600'
-            }`}
+            )}
             style={{
               display: '-webkit-box',
               WebkitLineClamp: descLines,
@@ -429,67 +406,42 @@ export function CourseTextThumbnail({
           </p>
         ) : null}
 
-        <div
-          className={`mt-auto flex flex-wrap gap-x-2.5 gap-y-1 border-t pt-2 text-[9px] ${
-            hasBackdrop ? 'border-white/10 text-white/70' : 'border-slate-200 text-slate-600'
-          }`}
-        >
-          {level ? (
-            <span className="inline-flex items-center gap-1">
-              <GraduationCap
-                className={`h-3 w-3 shrink-0 ${hasBackdrop ? 'text-white/45' : 'text-slate-400'}`}
-              />
-              {level}
-            </span>
-          ) : null}
-          {cecHours ? (
-            <span className={hasBackdrop ? 'text-cyan-200' : 'text-[#146fc2]'}>
-              {cecHours} IICRC CEC{cecHours === '1' ? '' : 's'}
-            </span>
-          ) : null}
-          {durationHours ? (
-            <span className="inline-flex items-center gap-1">
-              <Clock
-                className={`h-3 w-3 shrink-0 ${hasBackdrop ? 'text-white/45' : 'text-slate-400'}`}
-              />
-              {durationHours}h
-            </span>
-          ) : null}
-          {instructorName ? (
-            <span className="inline-flex min-w-0 items-center gap-1">
-              <User
-                className={`h-3 w-3 shrink-0 ${hasBackdrop ? 'text-white/45' : 'text-slate-400'}`}
-              />
-              <span className="truncate">{instructorName}</span>
-            </span>
-          ) : null}
-        </div>
-
-        {variant === 'card' && showBrand ? (
-          <p
-            className={`mt-1.5 truncate text-[7px] tracking-wide uppercase ${hasBackdrop ? 'text-white/45' : 'text-slate-500'}`}
-          >
-            CARSI · Restoration training · Australia
-          </p>
-        ) : variant !== 'card' && showBrand ? (
+        {!isCard ? (
           <div
-            className={`mt-2 flex items-center gap-2 border-t pt-2 ${hasBackdrop ? 'border-white/5' : 'border-slate-200'}`}
+            className={cn(
+              'mt-auto flex flex-wrap gap-x-2.5 gap-y-1 border-t pt-2 text-[9px]',
+              hasBackdrop ? 'border-white/10 text-white/70' : 'border-slate-200 text-slate-600'
+            )}
           >
-            <div className="relative h-5 w-14 shrink-0 opacity-80">
-              <Image
-                src={CARSI_COURSE_LOGO_SRC}
-                alt=""
-                width={112}
-                height={40}
-                className="h-5 w-auto object-contain object-left"
-                aria-hidden
-              />
-            </div>
-            <p
-              className={`text-[8px] leading-tight tracking-wide uppercase ${hasBackdrop ? 'text-white/45' : 'text-slate-500'}`}
-            >
-              Restoration &amp; cleaning training · Australia
-            </p>
+            {level ? (
+              <span className="inline-flex items-center gap-1">
+                <GraduationCap
+                  className={cn('h-3 w-3 shrink-0', hasBackdrop ? 'text-white/45' : 'text-slate-400')}
+                />
+                {level}
+              </span>
+            ) : null}
+            {cecHours ? (
+              <span className={hasBackdrop ? 'text-cyan-200' : 'text-[#146fc2]'}>
+                {cecHours} IICRC CEC{cecHours === '1' ? '' : 's'}
+              </span>
+            ) : null}
+            {durationHours ? (
+              <span className="inline-flex items-center gap-1">
+                <Clock
+                  className={cn('h-3 w-3 shrink-0', hasBackdrop ? 'text-white/45' : 'text-slate-400')}
+                />
+                {durationHours}h
+              </span>
+            ) : null}
+            {instructorName ? (
+              <span className="inline-flex min-w-0 items-center gap-1">
+                <User
+                  className={cn('h-3 w-3 shrink-0', hasBackdrop ? 'text-white/45' : 'text-slate-400')}
+                />
+                <span className="truncate">{instructorName}</span>
+              </span>
+            ) : null}
           </div>
         ) : null}
       </div>
