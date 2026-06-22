@@ -132,7 +132,7 @@ const faqSchema = {
 function TextLink({ href, children }: { href: string; children: ReactNode }) {
   const isExternal = href.startsWith('http');
   const className =
-    'inline-flex items-center gap-1 font-semibold text-[#7ec5ff] underline-offset-4 hover:underline';
+    'inline-flex items-center gap-1 font-semibold text-[#146fc2] underline-offset-4 hover:underline dark:text-[#7ec5ff]';
 
   if (isExternal) {
     return (
@@ -191,10 +191,10 @@ export default function AuthorityPage() {
                 ['AI discovery', 'Sitemap, robots, llms.txt and clean structured data'],
               ].map(([label, value]) => (
                 <div key={label} className={`p-5 ${marketingPanel}`}>
-                  <p className="text-xs font-semibold tracking-[0.16em] text-white/36 uppercase">
+                  <p className="text-xs font-semibold tracking-[0.16em] text-slate-400 dark:text-white/36 uppercase">
                     {label}
                   </p>
-                  <p className="mt-3 text-sm leading-6 text-white/70">{value}</p>
+                  <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-white/70">{value}</p>
                 </div>
               ))}
             </div>
@@ -214,9 +214,9 @@ export default function AuthorityPage() {
                 <div className={`mb-4 ${marketingIconWrap}`}>
                   <BookOpenCheck className="h-5 w-5" />
                 </div>
-                <h3 className="text-lg font-semibold text-white/90">{topic.title}</h3>
-                <p className="mt-3 text-sm leading-6 text-white/54">{topic.question}</p>
-                <p className="mt-4 border-l-2 border-[#ed9d24]/70 pl-4 text-sm leading-6 text-white/72">
+                <h3 className="text-lg font-semibold text-slate-900 dark:text-white/90">{topic.title}</h3>
+                <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-white/55">{topic.question}</p>
+                <p className="mt-4 border-l-2 border-[#ed9d24]/70 pl-4 text-sm leading-6 text-slate-700 dark:text-white/72">
                   {topic.proof}
                 </p>
                 <div className="mt-5 flex flex-wrap gap-2">
@@ -246,8 +246,8 @@ export default function AuthorityPage() {
                 className={`group p-5 ${marketingPanel} ${marketingPanelHover}`}
               >
                 <Library className="h-5 w-5 text-[#7ec5ff]" />
-                <h3 className="mt-4 text-base font-semibold text-white/90">{asset.title}</h3>
-                <p className="mt-3 text-sm leading-6 text-white/56">{asset.summary}</p>
+                <h3 className="mt-4 text-base font-semibold text-slate-900 dark:text-white/90">{asset.title}</h3>
+                <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-white/56">{asset.summary}</p>
                 <p className="mt-4 text-xs font-semibold tracking-[0.14em] text-[#ed9d24]/80 uppercase">
                   {asset.audience}
                 </p>
@@ -271,22 +271,22 @@ export default function AuthorityPage() {
                     <Users className="h-5 w-5" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-white/90">{channel.title}</h3>
-                    <p className="mt-2 text-sm leading-6 text-white/56">{channel.purpose}</p>
+                    <h3 className="text-lg font-semibold text-slate-900 dark:text-white/90">{channel.title}</h3>
+                    <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-white/56">{channel.purpose}</p>
                   </div>
                 </div>
                 <dl className="mt-5 grid gap-3 text-sm sm:grid-cols-2">
                   <div>
-                    <dt className="text-xs font-semibold tracking-[0.14em] text-white/32 uppercase">
+                    <dt className="text-xs font-semibold tracking-[0.14em] text-slate-400 dark:text-white/32 uppercase">
                       Cadence
                     </dt>
-                    <dd className="mt-2 leading-6 text-white/68">{channel.cadence}</dd>
+                    <dd className="mt-2 leading-6 text-slate-600 dark:text-white/68">{channel.cadence}</dd>
                   </div>
                   <div>
-                    <dt className="text-xs font-semibold tracking-[0.14em] text-white/32 uppercase">
+                    <dt className="text-xs font-semibold tracking-[0.14em] text-slate-400 dark:text-white/32 uppercase">
                       Contribution
                     </dt>
-                    <dd className="mt-2 leading-6 text-white/68">{channel.contribution}</dd>
+                    <dd className="mt-2 leading-6 text-slate-600 dark:text-white/68">{channel.contribution}</dd>
                   </div>
                 </dl>
               </article>
@@ -305,9 +305,9 @@ export default function AuthorityPage() {
             {citationTargets.map((target) => (
               <article key={target.title} className={`p-5 ${marketingPanel}`}>
                 <Network className="h-5 w-5 text-[#7ec5ff]" />
-                <h3 className="mt-4 text-base font-semibold text-white/90">{target.title}</h3>
-                <p className="mt-3 text-sm leading-6 text-white/54">{target.fit}</p>
-                <p className="mt-4 text-sm leading-6 text-white/72">{target.action}</p>
+                <h3 className="mt-4 text-base font-semibold text-slate-900 dark:text-white/90">{target.title}</h3>
+                <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-white/55">{target.fit}</p>
+                <p className="mt-4 text-sm leading-6 text-slate-700 dark:text-white/72">{target.action}</p>
               </article>
             ))}
           </div>
@@ -325,7 +325,7 @@ export default function AuthorityPage() {
               <div className="mt-6 rounded-xl border border-[#ed9d24]/20 bg-[#ed9d24]/[0.06] p-5">
                 <div className="flex items-start gap-3">
                   <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-[#ed9d24]" />
-                  <p className="text-sm leading-6 text-white/70">
+                  <p className="text-sm leading-6 text-slate-600 dark:text-white/70">
                     Measurement rule: a prompt is not won until the answer mentions CARSI or links
                     to a CARSI page as a useful source, and the cited page accurately supports the
                     claim.
@@ -339,7 +339,7 @@ export default function AuthorityPage() {
                 <div key={query} className={`p-4 ${marketingPanel}`}>
                   <div className="flex items-start gap-3">
                     <MessageSquareText className="mt-0.5 h-5 w-5 shrink-0 text-[#7ec5ff]" />
-                    <p className="text-sm leading-6 text-white/72">{query}</p>
+                    <p className="text-sm leading-6 text-slate-700 dark:text-white/72">{query}</p>
                   </div>
                 </div>
               ))}
@@ -369,8 +369,8 @@ export default function AuthorityPage() {
                     className={`p-4 transition hover:border-[#2490ed]/35 ${marketingPanel}`}
                   >
                     <Globe2 className="h-4 w-4 text-[#7ec5ff]" />
-                    <p className="mt-3 text-sm font-semibold text-white/86">{source.label}</p>
-                    <p className="mt-2 text-xs leading-5 text-white/50">{source.note}</p>
+                    <p className="mt-3 text-sm font-semibold text-slate-800 dark:text-white/86">{source.label}</p>
+                    <p className="mt-2 text-xs leading-5 text-slate-500 dark:text-white/50">{source.note}</p>
                   </a>
                 ))}
               </div>
@@ -384,15 +384,15 @@ export default function AuthorityPage() {
               <div className={`mb-4 ${marketingIconWrap}`}>
                 <Handshake className="h-5 w-5" />
               </div>
-              <h2 className="text-2xl font-semibold text-white">
+              <h2 className="text-2xl font-semibold text-slate-900 dark:text-white">
                 Help CARSI become the reference point for the industry.
               </h2>
-              <p className="mt-3 max-w-3xl text-sm leading-7 text-white/66">
+              <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600 dark:text-white/66">
                 Submit useful sources, field observations, case studies, events, profiles or
                 podcast/video channels. The strongest contributions will become research notes,
                 community resources and future course improvements.
               </p>
-              <p className="mt-4 text-sm leading-7 text-white/54">
+              <p className="mt-4 text-sm leading-7 text-slate-600 dark:text-white/55">
                 Start with <TextLink href="/submit">the submission hub</TextLink>, or use the
                 CARSI citation pack at <TextLink href="/carsi-ai-citation-pack.md">this markdown
                 reference</TextLink>.
