@@ -49,7 +49,7 @@ export function IICRCDisciplineMap() {
 
   return (
     <div className="flex flex-col gap-6 lg:gap-8">
-      <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-white/10 dark:bg-[#0a1018]">
         <div
           className="pointer-events-none absolute inset-0 opacity-90"
           aria-hidden
