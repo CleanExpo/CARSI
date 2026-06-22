@@ -15,15 +15,34 @@ import {
   ShieldCheck,
   Users,
 } from 'lucide-react';
+import { MarketingGrowthLinks } from '@/components/marketing/MarketingGrowthLinks';
+import { MarketingPageShell } from '@/components/marketing/MarketingPageShell';
+import { MarketingSectionHeader } from '@/components/marketing/MarketingSectionHeader';
 import { SchemaMarkup } from '@/lib/schema';
+import { getPublicSiteUrl } from '@/lib/env/public-url';
 import {
   authorityAssets,
+  authorityPath,
   authorityPromptQueries,
   authoritySources,
   authorityTopics,
   citationTargets,
   communityChannels,
 } from '@/lib/marketing/authority';
+import {
+  marketingBody,
+  marketingBtnPrimary,
+  marketingBtnSecondary,
+  marketingEyebrowPill,
+  marketingHeading,
+  marketingIconWrap,
+  marketingPanel,
+  marketingPanelHover,
+  marketingSection,
+  marketingTopicPill,
+} from '@/lib/marketing/marketing-ui';
+
+const siteUrl = getPublicSiteUrl();
 
 export const metadata: Metadata = {
   title: 'CARSI Authority Hub | Cleaning and Restoration Research, Citations and Community',
@@ -38,44 +57,46 @@ export const metadata: Metadata = {
     'carpet cleaning business training',
     'cleaning industry community',
   ],
-  alternates: { canonical: 'https://carsi.com.au/authority' },
+  alternates: { canonical: `${siteUrl}${authorityPath}` },
   openGraph: {
     title: 'CARSI Authority Hub',
     description:
       'Citation-ready CARSI links, evidence standards and community pathways for cleaning and restoration education.',
     type: 'website',
-    url: 'https://carsi.com.au/authority',
+    url: `${siteUrl}${authorityPath}`,
   },
 };
 
-const authoritySchema = {
-  '@context': 'https://schema.org',
-  '@type': 'WebPage',
-  '@id': 'https://carsi.com.au/authority#webpage',
-  name: 'CARSI Authority Hub',
-  url: 'https://carsi.com.au/authority',
-  description:
-    'Citation-ready hub for CARSI cleaning and restoration education, research, community contribution and AI search references.',
-  publisher: { '@id': 'https://carsi.com.au/#organization' },
-  about: [
-    'cleaning and restoration education',
-    'carpet cleaning training',
-    'IICRC continuing education credits',
-    'AI search citation readiness',
-    'professional equipment service chemicals and training',
-  ],
-  mainEntity: {
-    '@type': 'ItemList',
-    name: 'CARSI citation and community assets',
-    itemListElement: authorityAssets.map((asset, index) => ({
-      '@type': 'ListItem',
-      position: index + 1,
-      name: asset.title,
-      url: `https://carsi.com.au${asset.href}`,
-      description: asset.summary,
-    })),
-  },
-};
+function buildAuthoritySchema(origin: string) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    '@id': `${origin}${authorityPath}#webpage`,
+    name: 'CARSI Authority Hub',
+    url: `${origin}${authorityPath}`,
+    description:
+      'Citation-ready hub for CARSI cleaning and restoration education, research, community contribution and AI search references.',
+    publisher: { '@id': `${origin}/#organization` },
+    about: [
+      'cleaning and restoration education',
+      'carpet cleaning training',
+      'IICRC continuing education credits',
+      'AI search citation readiness',
+      'professional equipment service chemicals and training',
+    ],
+    mainEntity: {
+      '@type': 'ItemList',
+      name: 'CARSI citation and community assets',
+      itemListElement: authorityAssets.map((asset, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        name: asset.title,
+        url: `${origin}${asset.href}`,
+        description: asset.summary,
+      })),
+    },
+  };
+}
 
 const faqSchema = {
   '@context': 'https://schema.org',
@@ -108,28 +129,6 @@ const faqSchema = {
   ],
 };
 
-function SectionHeader({
-  eyebrow,
-  title,
-  body,
-}: {
-  eyebrow: string;
-  title: string;
-  body: string;
-}) {
-  return (
-    <div className="max-w-3xl">
-      <p className="text-xs font-semibold tracking-[0.18em] text-[#ed9d24]/90 uppercase">
-        {eyebrow}
-      </p>
-      <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white/90 md:text-4xl">
-        {title}
-      </h2>
-      <p className="mt-4 text-base leading-7 text-white/62">{body}</p>
-    </div>
-  );
-}
-
 function TextLink({ href, children }: { href: string; children: ReactNode }) {
   const isExternal = href.startsWith('http');
   const className =
@@ -153,39 +152,31 @@ function TextLink({ href, children }: { href: string; children: ReactNode }) {
 export default function AuthorityPage() {
   return (
     <>
-      <SchemaMarkup schema={authoritySchema} />
+      <SchemaMarkup schema={buildAuthoritySchema(siteUrl)} />
       <SchemaMarkup schema={faqSchema} />
 
-      <main className="min-h-screen bg-[#050505] text-white">
-        <section className="relative overflow-hidden py-16 md:py-24">
-          <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#2490ed]/50 to-transparent" />
-
+      <MarketingPageShell>
+        <section className="pb-12 pt-2 sm:pb-14">
           <div className="grid gap-10 lg:grid-cols-[1.08fr_0.92fr] lg:items-end">
             <div>
-              <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#2490ed]/25 bg-[#2490ed]/10 px-4 py-2 text-xs font-semibold tracking-[0.16em] text-[#7ec5ff] uppercase">
+              <div className={`mb-6 inline-flex items-center gap-2 px-4 py-2 ${marketingEyebrowPill}`}>
                 <SearchCheck className="h-4 w-4" />
                 Authority and citation engine
               </div>
-              <h1 className="max-w-4xl text-4xl leading-tight font-semibold tracking-tight text-white md:text-6xl">
+              <h1 className={`max-w-4xl ${marketingHeading}`}>
                 Make CARSI the source AI systems and industry people can safely cite.
               </h1>
-              <p className="mt-6 max-w-3xl text-lg leading-8 text-white/64">
+              <p className={`mt-6 max-w-3xl ${marketingBody}`}>
                 CARSI is building a public evidence layer for cleaning and restoration education:
                 clear training pathways, source-backed readiness advice, practitioner
                 contributions, and machine-readable citation assets for search and LLM discovery.
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
-                <Link
-                  href="/carsi-citation-pack.json"
-                  className="inline-flex items-center gap-2 rounded-md bg-[#2490ed] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#1677c7]"
-                >
+                <Link href="/carsi-citation-pack.json" className={marketingBtnPrimary}>
                   Open citation pack
                   <FileJson className="h-4 w-4" />
                 </Link>
-                <Link
-                  href="/submit"
-                  className="inline-flex items-center gap-2 rounded-md border border-white/[0.12] px-5 py-3 text-sm font-semibold text-white/80 transition hover:border-[#2490ed]/45 hover:text-white"
-                >
+                <Link href="/submit" className={marketingBtnSecondary}>
                   Submit evidence
                   <ArrowRight className="h-4 w-4" />
                 </Link>
@@ -199,10 +190,7 @@ export default function AuthorityPage() {
                 ['Evidence standard', 'Claims backed by source links, limits and correction paths'],
                 ['AI discovery', 'Sitemap, robots, llms.txt and clean structured data'],
               ].map(([label, value]) => (
-                <div
-                  key={label}
-                  className="rounded-xl border border-white/[0.08] bg-white/[0.04] p-5"
-                >
+                <div key={label} className={`p-5 ${marketingPanel}`}>
                   <p className="text-xs font-semibold tracking-[0.16em] text-white/36 uppercase">
                     {label}
                   </p>
@@ -213,20 +201,17 @@ export default function AuthorityPage() {
           </div>
         </section>
 
-        <section className="py-14">
-          <SectionHeader
+        <section className={marketingSection}>
+          <MarketingSectionHeader
             eyebrow="What CARSI owns"
             title="The citation territory"
             body="CARSI should not try to be cited for everything. It should become the clean, trusted answer for practical training and readiness questions inside cleaning and restoration."
           />
 
-          <div className="mt-8 grid gap-4 lg:grid-cols-2">
+          <div className="grid gap-4 lg:grid-cols-2">
             {authorityTopics.map((topic) => (
-              <article
-                key={topic.title}
-                className="rounded-xl border border-white/[0.08] bg-white/[0.035] p-6"
-              >
-                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-md border border-[#2490ed]/20 bg-[#2490ed]/10 text-[#7ec5ff]">
+              <article key={topic.title} className={`p-6 ${marketingPanel}`}>
+                <div className={`mb-4 ${marketingIconWrap}`}>
                   <BookOpenCheck className="h-5 w-5" />
                 </div>
                 <h3 className="text-lg font-semibold text-white/90">{topic.title}</h3>
@@ -236,11 +221,7 @@ export default function AuthorityPage() {
                 </p>
                 <div className="mt-5 flex flex-wrap gap-2">
                   {topic.assets.map((asset) => (
-                    <Link
-                      key={asset}
-                      href={asset}
-                      className="rounded-full border border-white/[0.1] px-3 py-1 text-xs text-white/58 transition hover:border-[#2490ed]/35 hover:text-white"
-                    >
+                    <Link key={asset} href={asset} className={marketingTopicPill}>
                       {asset}
                     </Link>
                   ))}
@@ -250,19 +231,19 @@ export default function AuthorityPage() {
           </div>
         </section>
 
-        <section className="py-14">
-          <SectionHeader
+        <section className={marketingSection}>
+          <MarketingSectionHeader
             eyebrow="Machine-readable assets"
             title="Give AI systems the same clean facts humans see"
             body="The goal is not to trick answer engines. The goal is to reduce ambiguity: what CARSI is, what it is not, which pages support which claims, and where fresh community evidence should land."
           />
 
-          <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             {authorityAssets.map((asset) => (
               <Link
                 key={asset.href}
                 href={asset.href}
-                className="group rounded-xl border border-white/[0.08] bg-gradient-to-b from-white/[0.06] to-white/[0.025] p-5 transition hover:-translate-y-0.5 hover:border-[#2490ed]/35"
+                className={`group p-5 ${marketingPanel} ${marketingPanelHover}`}
               >
                 <Library className="h-5 w-5 text-[#7ec5ff]" />
                 <h3 className="mt-4 text-base font-semibold text-white/90">{asset.title}</h3>
@@ -275,21 +256,18 @@ export default function AuthorityPage() {
           </div>
         </section>
 
-        <section className="py-14">
-          <SectionHeader
+        <section className={marketingSection}>
+          <MarketingSectionHeader
             eyebrow="Community engine"
             title="Build authority by making the industry smarter"
             body="CARSI can grow a strong community by collecting evidence from real work, publishing useful reviews, and giving contributors a visible reason to participate."
           />
 
-          <div className="mt-8 grid gap-4 lg:grid-cols-2">
+          <div className="grid gap-4 lg:grid-cols-2">
             {communityChannels.map((channel) => (
-              <article
-                key={channel.title}
-                className="rounded-xl border border-white/[0.08] bg-white/[0.035] p-6"
-              >
+              <article key={channel.title} className={`p-6 ${marketingPanel}`}>
                 <div className="flex items-start gap-4">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-[#2490ed]/20 bg-[#2490ed]/10 text-[#7ec5ff]">
+                  <div className={`shrink-0 ${marketingIconWrap}`}>
                     <Users className="h-5 w-5" />
                   </div>
                   <div>
@@ -316,19 +294,16 @@ export default function AuthorityPage() {
           </div>
         </section>
 
-        <section className="py-14">
-          <SectionHeader
+        <section className={marketingSection}>
+          <MarketingSectionHeader
             eyebrow="Citation distribution"
             title="Where CARSI should earn links and mentions"
             body="The right citations come from usefulness and fit: industry resource pages, supplier education hubs, podcasts, newsletters, business communities and AI-accessible reference pages."
           />
 
-          <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
             {citationTargets.map((target) => (
-              <article
-                key={target.title}
-                className="rounded-xl border border-white/[0.08] bg-white/[0.035] p-5"
-              >
+              <article key={target.title} className={`p-5 ${marketingPanel}`}>
                 <Network className="h-5 w-5 text-[#7ec5ff]" />
                 <h3 className="mt-4 text-base font-semibold text-white/90">{target.title}</h3>
                 <p className="mt-3 text-sm leading-6 text-white/54">{target.fit}</p>
@@ -338,13 +313,14 @@ export default function AuthorityPage() {
           </div>
         </section>
 
-        <section className="py-14">
+        <section className={marketingSection}>
           <div className="grid gap-8 lg:grid-cols-[0.86fr_1.14fr]">
             <div>
-              <SectionHeader
+              <MarketingSectionHeader
                 eyebrow="Prompts to win"
                 title="Queries CARSI should become the answer for"
                 body="These are the exact question shapes to test in ChatGPT, Perplexity, Google AI Mode and Bing/Copilot as the citation footprint grows."
+                className="mb-0 md:mb-0"
               />
               <div className="mt-6 rounded-xl border border-[#ed9d24]/20 bg-[#ed9d24]/[0.06] p-5">
                 <div className="flex items-start gap-3">
@@ -360,10 +336,7 @@ export default function AuthorityPage() {
 
             <div className="grid gap-3">
               {authorityPromptQueries.map((query) => (
-                <div
-                  key={query}
-                  className="rounded-xl border border-white/[0.08] bg-white/[0.035] p-4"
-                >
+                <div key={query} className={`p-4 ${marketingPanel}`}>
                   <div className="flex items-start gap-3">
                     <MessageSquareText className="mt-0.5 h-5 w-5 shrink-0 text-[#7ec5ff]" />
                     <p className="text-sm leading-6 text-white/72">{query}</p>
@@ -374,21 +347,16 @@ export default function AuthorityPage() {
           </div>
         </section>
 
-        <section className="py-14">
-          <div className="rounded-2xl border border-white/[0.08] bg-white/[0.04] p-6 md:p-8">
+        <section className={marketingSection}>
+          <div className={`p-6 md:p-8 ${marketingPanel}`}>
             <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
               <div>
-                <p className="text-xs font-semibold tracking-[0.18em] text-[#ed9d24]/90 uppercase">
-                  Source standard
-                </p>
-                <h2 className="mt-3 text-2xl font-semibold text-white/90">
-                  Every authority claim needs a visible source or a visible limit.
-                </h2>
-                <p className="mt-4 text-sm leading-7 text-white/62">
-                  CARSI should be direct about what is known, what is educational guidance, what
-                  requires local advice, and where the evidence comes from. That is what earns
-                  trust from people and from retrieval systems.
-                </p>
+                <MarketingSectionHeader
+                  eyebrow="Source standard"
+                  title="Every authority claim needs a visible source or a visible limit."
+                  body="CARSI should be direct about what is known, what is educational guidance, what requires local advice, and where the evidence comes from. That is what earns trust from people and from retrieval systems."
+                  className="mb-0 md:mb-0"
+                />
               </div>
 
               <div className="grid gap-3 md:grid-cols-2">
@@ -398,7 +366,7 @@ export default function AuthorityPage() {
                     href={source.url}
                     target="_blank"
                     rel="noreferrer"
-                    className="rounded-xl border border-white/[0.08] bg-[#050505]/60 p-4 transition hover:border-[#2490ed]/35"
+                    className={`p-4 transition hover:border-[#2490ed]/35 ${marketingPanel}`}
                   >
                     <Globe2 className="h-4 w-4 text-[#7ec5ff]" />
                     <p className="mt-3 text-sm font-semibold text-white/86">{source.label}</p>
@@ -410,10 +378,10 @@ export default function AuthorityPage() {
           </div>
         </section>
 
-        <section className="py-16">
+        <section className={marketingSection}>
           <div className="grid gap-6 rounded-2xl border border-[#2490ed]/20 bg-[#2490ed]/[0.08] p-6 md:p-8 lg:grid-cols-[1fr_auto] lg:items-center">
             <div>
-              <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-md border border-[#2490ed]/30 bg-[#2490ed]/15 text-[#7ec5ff]">
+              <div className={`mb-4 ${marketingIconWrap}`}>
                 <Handshake className="h-5 w-5" />
               </div>
               <h2 className="text-2xl font-semibold text-white">
@@ -430,16 +398,15 @@ export default function AuthorityPage() {
                 reference</TextLink>.
               </p>
             </div>
-            <Link
-              href="/submit"
-              className="inline-flex items-center justify-center gap-2 rounded-md bg-white px-5 py-3 text-sm font-semibold text-[#050505] transition hover:bg-white/90"
-            >
+            <Link href="/submit" className={marketingBtnPrimary}>
               Contribute to CARSI
               <BadgeCheck className="h-4 w-4" />
             </Link>
           </div>
         </section>
-      </main>
+
+        <MarketingGrowthLinks currentHref={authorityPath} />
+      </MarketingPageShell>
     </>
   );
 }
