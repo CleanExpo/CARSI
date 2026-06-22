@@ -2,7 +2,24 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { BreadcrumbSchema, EventSchema } from '@/components/seo';
+import {
+  MarketingPageShell,
+  marketingPageInnerNarrowClass,
+} from '@/components/marketing/MarketingPageShell';
 import { getBackendOrigin } from '@/lib/env/public-url';
+import {
+  marketingArticleProse,
+  marketingBackLink,
+  marketingBtnPrimary,
+  marketingBtnSecondary,
+  marketingHubSectionLabel,
+  marketingLink,
+  marketingMetaCard,
+  marketingMetaLabel,
+  marketingTextMuted,
+  marketingTextStrong,
+  marketingTopicPill,
+} from '@/lib/marketing/marketing-ui';
 
 const BACKEND_URL = getBackendOrigin();
 
@@ -149,141 +166,117 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
         eventType={event.event_type}
       />
 
-      <main className="min-h-screen bg-[#050505] px-4 py-16">
-        <div className="mx-auto max-w-3xl">
-          {/* Back link */}
-          <Link
-            href="/calendar"
-            className="mb-8 inline-flex items-center gap-2 text-sm text-white/40 transition-colors hover:text-white/70"
-          >
-            ← Back to Calendar
-          </Link>
+      <MarketingPageShell
+        id="main-content"
+        innerClassName={`${marketingPageInnerNarrowClass} mx-auto max-w-3xl`}
+      >
+        <Link href="/calendar" className={`mb-8 ${marketingBackLink}`}>
+          ← Back to Calendar
+        </Link>
 
-          {/* Type badge + title */}
-          <div className="mb-6">
-            <span className="mb-3 inline-flex items-center rounded-full bg-[rgba(36,144,237,0.12)] px-3 py-1 text-xs font-medium text-[#2490ed] capitalize">
-              {event.event_type}
-            </span>
-            <h1 className="mt-3 text-3xl leading-tight font-bold text-white md:text-4xl">
-              {event.title}
-            </h1>
+        <div className="mb-6">
+          <span className="mb-3 inline-flex items-center rounded-full bg-[#eef7ff] px-3 py-1 text-xs font-medium text-[#146fc2] capitalize dark:bg-[rgba(36,144,237,0.12)] dark:text-[#2490ed]">
+            {event.event_type}
+          </span>
+          <h1 className={`mt-3 text-3xl leading-tight font-bold md:text-4xl ${marketingTextStrong}`}>
+            {event.title}
+          </h1>
+        </div>
+
+        <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className={marketingMetaCard}>
+            <p className={marketingMetaLabel}>Date</p>
+            <p className={`text-base font-semibold ${marketingTextStrong}`}>
+              {formatDate(event.start_date)}
+            </p>
+            {event.end_date && event.end_date !== event.start_date && (
+              <p className={`text-sm ${marketingTextMuted}`}>to {formatDate(event.end_date)}</p>
+            )}
+            <p className={`mt-1 text-sm ${marketingTextMuted}`}>{formatTime(event.start_date)}</p>
           </div>
 
-          {/* Event meta cards */}
-          <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5">
-              <p className="mb-1 text-xs font-medium tracking-wider text-white/30 uppercase">
-                Date
-              </p>
-              <p className="text-base font-semibold text-white/90">
-                {formatDate(event.start_date)}
-              </p>
-              {event.end_date && event.end_date !== event.start_date && (
-                <p className="text-sm text-white/50">to {formatDate(event.end_date)}</p>
-              )}
-              <p className="mt-1 text-sm text-white/40">{formatTime(event.start_date)}</p>
-            </div>
-
-            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5">
-              <p className="mb-1 text-xs font-medium tracking-wider text-white/30 uppercase">
-                {event.is_virtual ? 'Format' : 'Location'}
-              </p>
-              <p className="text-base font-semibold text-white/90">{locationStr}</p>
-              {event.location_address && !event.is_virtual && (
-                <p className="mt-1 text-sm text-white/40">{event.location_address}</p>
-              )}
-            </div>
-
-            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5">
-              <p className="mb-1 text-xs font-medium tracking-wider text-white/30 uppercase">
-                Organiser
-              </p>
-              {event.organiser_url ? (
-                <a
-                  href={event.organiser_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-base font-semibold text-[#2490ed] hover:underline"
-                >
-                  {event.organiser_name ?? 'View Organiser'}
-                </a>
-              ) : (
-                <p className="text-base font-semibold text-white/90">
-                  {event.organiser_name ?? '—'}
-                </p>
-              )}
-            </div>
-
-            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5">
-              <p className="mb-1 text-xs font-medium tracking-wider text-white/30 uppercase">
-                Cost
-              </p>
-              <p className="text-base font-semibold text-white/90">
-                {event.is_free ? 'Free' : (event.price_range ?? 'See event page')}
-              </p>
-            </div>
+          <div className={marketingMetaCard}>
+            <p className={marketingMetaLabel}>{event.is_virtual ? 'Format' : 'Location'}</p>
+            <p className={`text-base font-semibold ${marketingTextStrong}`}>{locationStr}</p>
+            {event.location_address && !event.is_virtual && (
+              <p className={`mt-1 text-sm ${marketingTextMuted}`}>{event.location_address}</p>
+            )}
           </div>
 
-          {/* Description */}
-          {event.description && (
-            <section className="mb-8">
-              <h2 className="mb-3 text-lg font-semibold text-white/80">About This Event</h2>
-              <div className="prose prose-invert max-w-none text-white/60">
-                <p className="leading-relaxed whitespace-pre-line">{event.description}</p>
-              </div>
-            </section>
-          )}
-
-          {/* Industry categories */}
-          {event.industry_categories.length > 0 && (
-            <section className="mb-8">
-              <h2 className="mb-3 text-sm font-semibold tracking-wider text-white/30 uppercase">
-                Industry Segments
-              </h2>
-              <div className="flex flex-wrap gap-2">
-                {event.industry_categories.map((cat) => (
-                  <span
-                    key={cat}
-                    className="rounded-md bg-white/[0.05] px-3 py-1 text-sm text-white/50"
-                  >
-                    {cat}
-                  </span>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* CTAs */}
-          <div className="flex flex-wrap gap-3">
-            {event.event_url && (
+          <div className={marketingMetaCard}>
+            <p className={marketingMetaLabel}>Organiser</p>
+            {event.organiser_url ? (
               <a
-                href={event.event_url}
+                href={event.organiser_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-xl bg-[#2490ed] px-6 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                className={`text-base font-semibold ${marketingLink}`}
               >
-                View Event Page ↗
+                {event.organiser_name ?? 'View Organiser'}
               </a>
+            ) : (
+              <p className={`text-base font-semibold ${marketingTextStrong}`}>
+                {event.organiser_name ?? '—'}
+              </p>
             )}
-            {event.ticket_url && !event.is_free && (
-              <a
-                href={event.ticket_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rounded-xl border border-[rgba(36,144,237,0.4)] px-6 py-3 text-sm font-semibold text-[#2490ed] transition-colors hover:bg-[rgba(36,144,237,0.08)]"
-              >
-                Register / Get Tickets ↗
-              </a>
-            )}
-            <Link
-              href="/calendar"
-              className="rounded-xl border border-white/[0.1] px-6 py-3 text-sm font-semibold text-white/50 transition-colors hover:text-white/80"
-            >
-              ← Back to Calendar
-            </Link>
+          </div>
+
+          <div className={marketingMetaCard}>
+            <p className={marketingMetaLabel}>Cost</p>
+            <p className={`text-base font-semibold ${marketingTextStrong}`}>
+              {event.is_free ? 'Free' : (event.price_range ?? 'See event page')}
+            </p>
           </div>
         </div>
-      </main>
+
+        {event.description && (
+          <section className="mb-8">
+            <h2 className={`mb-3 text-lg font-semibold ${marketingTextStrong}`}>About This Event</h2>
+            <div className={marketingArticleProse}>
+              <p className="leading-relaxed whitespace-pre-line">{event.description}</p>
+            </div>
+          </section>
+        )}
+
+        {event.industry_categories.length > 0 && (
+          <section className="mb-8">
+            <h2 className={marketingHubSectionLabel}>Industry Segments</h2>
+            <div className="flex flex-wrap gap-2">
+              {event.industry_categories.map((cat) => (
+                <span key={cat} className={`px-3 py-1 text-sm ${marketingTopicPill}`}>
+                  {cat}
+                </span>
+              ))}
+            </div>
+          </section>
+        )}
+
+        <div className="flex flex-wrap gap-3">
+          {event.event_url && (
+            <a
+              href={event.event_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={marketingBtnPrimary}
+            >
+              View Event Page ↗
+            </a>
+          )}
+          {event.ticket_url && !event.is_free && (
+            <a
+              href={event.ticket_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={marketingBtnSecondary}
+            >
+              Register / Get Tickets ↗
+            </a>
+          )}
+          <Link href="/calendar" className={marketingBtnSecondary}>
+            ← Back to Calendar
+          </Link>
+        </div>
+      </MarketingPageShell>
     </>
   );
 }
