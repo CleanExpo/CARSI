@@ -1,33 +1,32 @@
 import type { Metadata } from 'next';
 import { Sparkles, Shield, Award, Users } from 'lucide-react';
 import {
-  IndustryPageLayout,
-  IndustryHero,
-  IndustryWhySection,
-  IndustryCTA,
   ContractorAddOns,
+  IndustryCTA,
+  IndustryCrossLinks,
+  IndustryFAQSection,
+  IndustryHero,
+  IndustryPageLayout,
+  IndustryRecommendedCourses,
+  IndustryWhySection,
 } from '@/components/industries';
-import { IndustryRecommendedCourses } from '@/components/industries/IndustryRecommendedCourses';
 import { FAQSchema } from '@/components/seo/JsonLd';
+import { buildIndustryMetadata } from '@/lib/marketing/industry-metadata';
 
 export const dynamic = 'force-dynamic';
 
-export const metadata: Metadata = {
-  title: 'Commercial Cleaning IICRC CEC Training | CARSI',
-  description:
-    'IICRC CEC accredited courses for commercial cleaning contractors in Australia. CRT, CCT, and OCT topics for carpet restoration, odour control, and insurance panel readiness.',
-  keywords: [
+export const metadata: Metadata = buildIndustryMetadata(
+  'commercial-cleaning',
+  'Commercial Cleaning IICRC CEC Training | CARSI',
+  'IICRC CEC accredited courses for commercial cleaning contractors in Australia. CRT, CCT, and OCT topics for carpet restoration, odour control, and insurance panel readiness.',
+  [
     'commercial cleaning IICRC CEC training',
     'cleaning contractor training Australia',
     'CRT certification',
     'CCT commercial carpet',
     'OCT odour control training',
-  ],
-};
-
-// ---------------------------------------------------------------------------
-// Page Configuration
-// ---------------------------------------------------------------------------
+  ]
+);
 
 const ACCENT_COLOR = '#2490ed';
 
@@ -95,10 +94,6 @@ const whyCards = [
   },
 ];
 
-// ---------------------------------------------------------------------------
-// Page Component
-// ---------------------------------------------------------------------------
-
 export default async function CommercialCleaningIndustryPage() {
   return (
     <IndustryPageLayout>
@@ -115,9 +110,10 @@ export default async function CommercialCleaningIndustryPage() {
       />
 
       <IndustryWhySection
-        industryName="Cleaning Contractors"
+        industryName="cleaning contractors"
         headline="Built for"
         headlineAccent="professional growth"
+        accentColor={ACCENT_COLOR}
         cards={whyCards}
       />
 
@@ -127,16 +123,22 @@ export default async function CommercialCleaningIndustryPage() {
         disciplines={['CRT', 'CCT', 'OCT']}
       />
 
-      <ContractorAddOns accentColor={ACCENT_COLOR} />
+      <ContractorAddOns accentColor={ACCENT_COLOR} variant="commercial-cleaning" />
+
+      <IndustryFAQSection industryName="Commercial Cleaning" faqs={faqs} />
 
       <IndustryCTA
-        subtitle="Cleaning Professional Training"
+        subtitle="Cleaning professional training"
         title="Pro Cleaning Bundle"
         price="$195"
         description="CRT Carpet Restoration + CCT Commercial Carpet + OCT Odour Control. Perfect for cleaning contractors seeking IICRC credentials."
-        ctaText="Get Certified"
+        ctaText="View pricing"
+        ctaHref="/pricing"
+        secondaryHref="/courses"
         accentColor={ACCENT_COLOR}
       />
+
+      <IndustryCrossLinks currentSlug="commercial-cleaning" />
     </IndustryPageLayout>
   );
 }
