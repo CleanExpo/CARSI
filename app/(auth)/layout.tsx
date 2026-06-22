@@ -1,5 +1,7 @@
-import Image from 'next/image';
 import Link from 'next/link';
+
+import { PublicLogo } from '@/components/landing/PublicLogo';
+import { PUBLIC_CHROME_AUTH_BAND_CLASS } from '@/components/landing/public-shell-width';
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -17,24 +19,22 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       />
 
       <div className="relative z-10 w-full max-w-md py-12">
-        {/* Logo + Wordmark */}
-        <div className="mb-8 flex flex-col items-center gap-3">
-          <Link href="/" className="flex items-center justify-center">
-            <Image
-              src="/logo/logo1.png"
-              alt="CARSI"
-              width={440}
-              height={88}
-              className="h-auto w-auto max-h-24 max-w-[min(380px,92vw)] object-contain"
-              priority
-            />
-          </Link>
-          <Link
-            href="/"
-            className="text-xs font-medium text-slate-500 transition-colors duration-150 hover:text-slate-950"
-          >
-            &larr; Back to home
-          </Link>
+        <div className={`mb-8 ${PUBLIC_CHROME_AUTH_BAND_CLASS}`}>
+          <div
+            className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_90%_80%_at_50%_0%,rgba(36,144,237,0.16),transparent_68%)]"
+            aria-hidden
+          />
+          <div className="relative flex flex-col items-center gap-3">
+            <Link href="/" className="flex items-center justify-center">
+              <PublicLogo variant="auth" />
+            </Link>
+            <Link
+              href="/"
+              className="text-xs font-medium text-white/58 transition-colors duration-150 hover:text-white"
+            >
+              &larr; Back to home
+            </Link>
+          </div>
         </div>
 
         {children}
