@@ -26,12 +26,13 @@ const modules: ModuleItem[] = [
 export function HeroTrainingInfographic() {
   const reduceMotion = useReducedMotion();
 
+  const floatEase: [number, number, number, number] = [0.4, 0, 0.2, 1];
   const float = (delay = 0) =>
     reduceMotion
       ? {}
       : {
           y: [0, -6, 0],
-          transition: { duration: 5 + delay, repeat: Infinity, ease: 'easeInOut', delay },
+          transition: { duration: 5 + delay, repeat: Infinity, ease: floatEase, delay },
         };
 
   return (
