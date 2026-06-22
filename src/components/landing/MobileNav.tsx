@@ -6,6 +6,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 
 import { AuthNavLinks } from '@/components/landing/AuthNavLinks';
+import { authorityPath } from '@/lib/marketing/authority';
+import { startSmartBasePath } from '@/lib/marketing/start-smart';
+import { ccwWorkshopPath } from '@/lib/marketing/marketing-growth-links';
 
 // ---------------------------------------------------------------------------
 // Animation Config (Council-approved Bezier)
@@ -42,9 +45,16 @@ const itemVariants = {
 const navItems = [
   { href: '/courses', label: 'Courses' },
   { href: '/pathways', label: 'Pathways' },
+  { href: startSmartBasePath, label: 'Start Smart' },
   { href: '/events/ccw-roadshow', label: 'Events' },
   { href: '/pricing', label: 'Pricing' },
   { href: '/contact', label: 'Contact' },
+];
+
+const growthNavItems = [
+  { href: '/events/ccw-roadshow', label: 'CCW Roadshow' },
+  { href: ccwWorkshopPath, label: 'CCW Workshop' },
+  { href: authorityPath, label: 'Authority Hub' },
 ];
 
 // ---------------------------------------------------------------------------
@@ -144,6 +154,29 @@ export default function MobileNav() {
                     <motion.li
                       key={item.href}
                       custom={i}
+                      variants={itemVariants}
+                      initial="closed"
+                      animate="open"
+                    >
+                      <Link
+                        href={item.href}
+                        onClick={() => setIsOpen(false)}
+                        className="block min-h-11 rounded-md px-4 py-3 text-base font-semibold text-slate-800 transition-colors duration-150 hover:bg-slate-100 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-[#2490ed]/40 focus-visible:outline-none"
+                      >
+                        {item.label}
+                      </Link>
+                    </motion.li>
+                  ))}
+                </ul>
+
+                <p className="mt-4 mb-2 px-4 text-[10px] font-semibold tracking-wide text-slate-500 uppercase">
+                  Growth pathways
+                </p>
+                <ul className="space-y-1">
+                  {growthNavItems.map((item, i) => (
+                    <motion.li
+                      key={item.href}
+                      custom={navItems.length + i}
                       variants={itemVariants}
                       initial="closed"
                       animate="open"
