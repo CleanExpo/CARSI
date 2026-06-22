@@ -3,13 +3,13 @@ import {
   AnimatedHero,
   AnimatedSection,
 } from '@/components/landing/AnimatedHero';
+import { HomeCertificationsSection } from '@/components/landing/HomeCertificationsSection';
 import { HomeFeaturedCoursesSection } from '@/components/landing/HomeFeaturedCoursesSection';
 import { HomeGrowthSection } from '@/components/landing/HomeGrowthSection';
 import { PublicFooter } from '@/components/landing/PublicFooter';
 import { PublicNavbar } from '@/components/landing/PublicNavbar';
 import { PUBLIC_SHELL_INNER_CLASS } from '@/components/landing/public-shell-width';
 import FloatingChatGate from '@/components/lms/FloatingChatGate';
-import { IICRCDisciplineMap } from '@/components/lms/diagrams/IICRCDisciplineMap';
 import { StudentJourneyMap } from '@/components/lms/diagrams/StudentJourneyMap';
 import { FAQSchema } from '@/components/seo/JsonLd';
 import { AcronymTooltip } from '@/components/ui/AcronymTooltip';
@@ -160,53 +160,7 @@ export default async function Home() {
         }
       />
 
-      <AnimatedSection
-        label="Certifications"
-        title="IICRC discipline map and pathways"
-        className="bg-white dark:bg-[#0a0a0a]"
-      >
-        <div className="grid gap-10 lg:grid-cols-12 lg:items-start lg:gap-14">
-          <div className="space-y-5 lg:col-span-4">
-            <p className="text-sm leading-relaxed text-slate-600 md:text-base dark:text-white/65">
-              Seven core pathways orbit <AcronymTooltip term="IICRC" /> standards — hover or tap any
-              node to see the full certification name and jump into filtered courses.
-            </p>
-            <ul className="space-y-3 text-sm text-slate-600 dark:text-white/60">
-              <li className="flex gap-3">
-                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#146fc2]" aria-hidden />
-                <span>
-                  <strong className="text-slate-900 dark:text-white">Interactive hub</strong> — explore disciplines
-                  visually, then open matching courses.
-                </span>
-              </li>
-              <li className="flex gap-3">
-                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-600" aria-hidden />
-                <span>
-                  <strong className="text-slate-900 dark:text-white">{disciplineCountLabel} disciplines</strong>{' '}
-                  in this view, aligned with CARSI&apos;s published catalogue.
-                </span>
-              </li>
-            </ul>
-            <div className="flex flex-wrap gap-3">
-              <Link
-                href="/courses"
-                className="inline-flex items-center gap-2 rounded-lg bg-[#146fc2] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#0f5fa8]"
-              >
-                Full course catalogue <ArrowRight className="h-4 w-4" aria-hidden />
-              </Link>
-              <Link
-                href="/pathways"
-                className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-800 transition hover:border-[#2490ed] hover:text-[#146fc2]"
-              >
-                View pathways
-              </Link>
-            </div>
-          </div>
-          <div className="lg:col-span-8">
-            <IICRCDisciplineMap />
-          </div>
-        </div>
-      </AnimatedSection>
+      <HomeCertificationsSection disciplineCountLabel={disciplineCountLabel} />
 
       <section className="border-t border-slate-200/80 bg-white py-14 dark:border-white/10 dark:bg-[#0a0a0a]">
         <div className={PUBLIC_SHELL_INNER_CLASS}>
