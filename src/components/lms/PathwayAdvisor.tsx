@@ -9,10 +9,19 @@ import {
   pathwayAdvisorOptions,
   type PathwayAdvisorOption,
 } from '@/lib/customer-journey-loop';
+import {
+  marketingBodySm,
+  marketingEyebrow,
+  marketingEyebrowAmber,
+  marketingPanel,
+  marketingTextMuted,
+  marketingTextStrong,
+  marketingTextSubtle,
+} from '@/lib/marketing/marketing-ui';
 
 function DisciplinePill({ code }: { code: string }) {
   return (
-    <span className="rounded border border-[#2490ed]/30 bg-[#2490ed]/10 px-2 py-1 font-mono text-[11px] font-bold text-[#8fd0ff]">
+    <span className="rounded border border-[#2490ed]/30 bg-[#eef7ff] px-2 py-1 font-mono text-[11px] font-bold text-[#146fc2] dark:bg-[#2490ed]/10 dark:text-[#8fd0ff]">
       {code}
     </span>
   );
@@ -33,27 +42,28 @@ function AdvisorOptionButton({
     <button
       type="button"
       onClick={onSelect}
-      className="flex min-h-16 w-full items-center gap-3 rounded-lg border px-3 py-3 text-left transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2490ed]/70"
-      style={{
-        background: active ? 'rgba(36,144,237,0.16)' : 'rgba(255,255,255,0.045)',
-        borderColor: active ? 'rgba(36,144,237,0.55)' : 'rgba(255,255,255,0.1)',
-      }}
+      className={`flex min-h-16 w-full items-center gap-3 rounded-lg border px-3 py-3 text-left transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2490ed]/70 ${
+        active
+          ? 'border-[#2490ed]/55 bg-[#eef7ff] dark:bg-[#2490ed]/16'
+          : 'border-slate-200 bg-slate-50 hover:border-slate-300 dark:border-white/10 dark:bg-white/[0.045] dark:hover:border-white/15'
+      }`}
       aria-pressed={active}
     >
       <span
-        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border"
-        style={{
-          borderColor: active ? 'rgba(36,144,237,0.6)' : 'rgba(255,255,255,0.12)',
-          background: active ? 'rgba(36,144,237,0.18)' : 'rgba(255,255,255,0.04)',
-          color: active ? '#8fd0ff' : 'rgba(255,255,255,0.62)',
-        }}
+        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-md border ${
+          active
+            ? 'border-[#2490ed]/60 bg-[#2490ed]/15 text-[#146fc2] dark:bg-[#2490ed]/18 dark:text-[#8fd0ff]'
+            : 'border-slate-200 bg-white text-slate-500 dark:border-white/12 dark:bg-white/[0.04] dark:text-white/62'
+        }`}
         aria-hidden
       >
         <Icon className="h-5 w-5" />
       </span>
       <span className="min-w-0">
-        <span className="block text-sm font-semibold text-white">{option.label}</span>
-        <span className="mt-0.5 block text-xs leading-snug text-white/54">{option.eyebrow}</span>
+        <span className={`block text-sm font-semibold ${marketingTextStrong}`}>{option.label}</span>
+        <span className={`mt-0.5 block text-xs leading-snug ${marketingTextMuted}`}>
+          {option.eyebrow}
+        </span>
       </span>
     </button>
   );
@@ -65,12 +75,12 @@ export function JourneyLoopStrip() {
       {customerJourneyLoopStages.map((stage) => {
         const Icon = stage.icon;
         return (
-          <li key={stage.id} className="rounded-lg border border-white/10 bg-white/[0.04] p-3">
+          <li key={stage.id} className={`p-3 ${marketingPanel}`}>
             <div className="flex items-center gap-2">
-              <Icon className="h-4 w-4 shrink-0 text-[#7ec5ff]" aria-hidden />
-              <p className="text-sm font-semibold text-white">{stage.title}</p>
+              <Icon className="h-4 w-4 shrink-0 text-[#146fc2] dark:text-[#7ec5ff]" aria-hidden />
+              <p className={`text-sm font-semibold ${marketingTextStrong}`}>{stage.title}</p>
             </div>
-            <p className="mt-2 text-xs leading-relaxed text-white/54">{stage.description}</p>
+            <p className={`mt-2 text-xs leading-relaxed ${marketingTextMuted}`}>{stage.description}</p>
           </li>
         );
       })}
@@ -93,29 +103,26 @@ export function PathwayAdvisor() {
 
   return (
     <section
-      className="relative overflow-hidden rounded-lg border border-white/10 bg-[#090f1a] p-4 shadow-[0_24px_80px_-50px_rgba(0,0,0,0.95)] sm:p-6 lg:p-7"
+      className="relative overflow-hidden rounded-xl border border-slate-200/90 bg-white p-4 shadow-[0_24px_80px_-50px_rgba(15,23,42,0.15)] sm:p-6 lg:p-7 dark:border-white/10 dark:bg-[#090f1a] dark:shadow-[0_24px_80px_-50px_rgba(0,0,0,0.95)]"
       aria-labelledby="pathway-advisor-heading"
     >
       <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_55%_at_75%_0%,rgba(36,144,237,0.18),transparent_58%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_55%_at_75%_0%,rgba(36,144,237,0.12),transparent_58%)] dark:bg-[radial-gradient(ellipse_70%_55%_at_75%_0%,rgba(36,144,237,0.18),transparent_58%)]"
         aria-hidden
       />
       <div className="relative">
         <div className="grid gap-6 lg:grid-cols-[340px_minmax(0,1fr)]">
           <div>
-            <p className="text-[11px] font-semibold tracking-[0.18em] text-[#7ec5ff] uppercase">
-              Find your path
-            </p>
+            <p className={marketingEyebrow}>Find your path</p>
             <h2
               id="pathway-advisor-heading"
-              className="mt-2 text-2xl leading-tight font-bold tracking-tight text-white sm:text-3xl"
+              className={`mt-2 text-2xl leading-tight font-bold tracking-tight sm:text-3xl ${marketingTextStrong}`}
             >
               Choose the next best CARSI move
             </h2>
-            <p className="mt-3 text-sm leading-relaxed text-white/62">
+            <p className={`mt-3 ${marketingBodySm}`}>
               Start with the situation, not the catalogue. CARSI should always guide a learner from
-              goal to course, then back into progress, credential proof, and the next
-              recommendation.
+              goal to course, then back into progress, credential proof, and the next recommendation.
             </p>
 
             <div className="mt-5 grid gap-2">
@@ -130,17 +137,15 @@ export function PathwayAdvisor() {
             </div>
           </div>
 
-          <div className="rounded-lg border border-white/10 bg-black/20 p-4 sm:p-5 lg:p-6">
+          <div className={`p-4 sm:p-5 lg:p-6 ${marketingPanel}`}>
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div className="flex min-w-0 gap-3">
-                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md border border-[#2490ed]/40 bg-[#2490ed]/14 text-[#8fd0ff]">
+                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md border border-[#2490ed]/40 bg-[#eef7ff] text-[#146fc2] dark:bg-[#2490ed]/14 dark:text-[#8fd0ff]">
                   <SelectedIcon className="h-6 w-6" aria-hidden />
                 </span>
                 <div className="min-w-0">
-                  <p className="text-[11px] font-semibold tracking-[0.16em] text-[#ed9d24] uppercase">
-                    {selected.eyebrow}
-                  </p>
-                  <h3 className="mt-1 text-xl font-semibold tracking-tight text-white">
+                  <p className={marketingEyebrowAmber}>{selected.eyebrow}</p>
+                  <h3 className={`mt-1 text-xl font-semibold tracking-tight ${marketingTextStrong}`}>
                     {selected.title}
                   </h3>
                 </div>
@@ -152,30 +157,28 @@ export function PathwayAdvisor() {
               </div>
             </div>
 
-            <p className="mt-5 max-w-3xl text-sm leading-relaxed text-white/68">
-              {selected.summary}
-            </p>
+            <p className={`mt-5 max-w-3xl ${marketingBodySm}`}>{selected.summary}</p>
 
             <div className="mt-6 grid gap-4 lg:grid-cols-2">
-              <div className="rounded-lg border border-white/10 bg-white/[0.04] p-4">
-                <p className="text-sm font-semibold text-white">Best for</p>
+              <div className={`p-4 ${marketingPanel}`}>
+                <p className={`text-sm font-semibold ${marketingTextStrong}`}>Best for</p>
                 <ul className="mt-3 space-y-2">
                   {selected.bestFor.map((item) => (
-                    <li key={item} className="flex items-start gap-2 text-sm text-white/62">
-                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-300" />
+                    <li key={item} className={`flex items-start gap-2 text-sm ${marketingTextMuted}`}>
+                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-300" />
                       <span>{item}</span>
                     </li>
                   ))}
                 </ul>
               </div>
-              <div className="rounded-lg border border-white/10 bg-white/[0.04] p-4">
-                <p className="text-sm font-semibold text-white">Loop enforcement</p>
-                <p className="mt-3 text-sm leading-relaxed text-white/62">
-                  <span className="font-medium text-white/86">First action:</span>{' '}
+              <div className={`p-4 ${marketingPanel}`}>
+                <p className={`text-sm font-semibold ${marketingTextStrong}`}>Loop enforcement</p>
+                <p className={`mt-3 text-sm leading-relaxed ${marketingTextMuted}`}>
+                  <span className={`font-medium ${marketingTextStrong}`}>First action:</span>{' '}
                   {selected.firstAction}
                 </p>
-                <p className="mt-3 text-sm leading-relaxed text-white/62">
-                  <span className="font-medium text-white/86">Retention cue:</span>{' '}
+                <p className={`mt-3 text-sm leading-relaxed ${marketingTextMuted}`}>
+                  <span className={`font-medium ${marketingTextStrong}`}>Retention cue:</span>{' '}
                   {selected.retentionCue}
                 </p>
               </div>
@@ -191,7 +194,7 @@ export function PathwayAdvisor() {
               </Link>
               <Link
                 href={selected.secondaryHref}
-                className="inline-flex items-center justify-center rounded-lg border border-white/15 bg-white/[0.04] px-5 py-3 text-sm font-semibold text-white/86 transition-colors hover:border-white/25 hover:bg-white/[0.08]"
+                className="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-slate-50 px-5 py-3 text-sm font-semibold text-slate-800 transition-colors hover:border-slate-400 hover:bg-slate-100 dark:border-white/15 dark:bg-white/[0.04] dark:text-white/86 dark:hover:border-white/25 dark:hover:bg-white/[0.08]"
               >
                 {selected.secondaryLabel}
               </Link>
@@ -199,8 +202,8 @@ export function PathwayAdvisor() {
           </div>
         </div>
 
-        <div className="mt-6 border-t border-white/10 pt-6">
-          <p className="mb-3 text-[11px] font-semibold tracking-[0.18em] text-white/42 uppercase">
+        <div className="mt-6 border-t border-slate-200/80 pt-6 dark:border-white/10">
+          <p className={`mb-3 text-[11px] font-semibold tracking-[0.18em] uppercase ${marketingTextSubtle}`}>
             CARSI retention loop
           </p>
           <JourneyLoopStrip />
