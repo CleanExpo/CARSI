@@ -2,6 +2,16 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { CheckCircle2, Clock } from 'lucide-react';
 
+import { MarketingPageShell } from '@/components/marketing/MarketingPageShell';
+import {
+  marketingBtnPrimary,
+  marketingBtnSecondary,
+  marketingPanel,
+  marketingTextMuted,
+  marketingTextStrong,
+  marketingTextSubtle,
+} from '@/lib/marketing/marketing-ui';
+
 import { getCheckoutSession } from '@/lib/api/stripe';
 import { processCcwRoadshowBookingConfirmation } from '@/lib/server/ccw-roadshow-booking-email';
 import { ccwRoadshowPath, ccwRoadshowTitle } from '@/lib/marketing/ccw-roadshow';
@@ -84,9 +94,9 @@ export default async function CcwRoadshowSuccessPage({
   const isWaitlisted = view.variant === 'waitlisted';
 
   return (
-    <main className="min-h-screen bg-[#050505] px-4 py-16 text-white">
-      <div className="mx-auto max-w-2xl">
-        <div className="rounded-2xl border border-[rgba(52,211,153,0.25)] bg-white/[0.04] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.28)]">
+    <MarketingPageShell className="flex items-center py-16 sm:py-20">
+      <div className="mx-auto w-full max-w-2xl">
+        <div className={`p-6 sm:p-8 ${marketingPanel}`}>
           {isWaitlisted ? (
             <Clock className="h-12 w-12 text-[#fbbf24]" aria-hidden />
           ) : (
@@ -99,8 +109,8 @@ export default async function CcwRoadshowSuccessPage({
           >
             {view.eyebrow}
           </p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white">{view.heading}</h1>
-          <p className="mt-3 text-sm leading-relaxed text-white/58">{view.body}</p>
+          <h1 className={`mt-2 text-3xl font-semibold tracking-tight ${marketingTextStrong}`}>{view.heading}</h1>
+          <p className={`mt-3 text-sm leading-relaxed ${marketingTextMuted}`}>{view.body}</p>
 
           {view.showTokenBlock && (
             <div
@@ -117,10 +127,10 @@ export default async function CcwRoadshowSuccessPage({
               >
                 {view.tokenLabel}
               </p>
-              <p className="mt-3 break-all font-mono text-2xl font-semibold tracking-wide text-white">
+              <p className={`mt-3 break-all font-mono text-2xl font-semibold tracking-wide ${marketingTextStrong}`}>
                 {freeEntryToken}
               </p>
-              <p className="mt-3 text-sm leading-relaxed text-white/58">
+              <p className={`mt-3 text-sm leading-relaxed ${marketingTextMuted}`}>
                 {view.tokenIsValidForEntry
                   ? `This token covers ${freeSeats ?? '1'} ${freeSeats === '1' ? 'seat' : 'seats'}${freeCity ? ` for ${freeCity}` : ''}${freeDates ? `, ${freeDates}` : ''}.`
                   : `We'll email you if a seat opens up${freeCity ? ` for ${freeCity}` : ''}${freeDates ? `, ${freeDates}` : ''}. Please don't rely on this reference for entry until we confirm.`}
@@ -129,17 +139,17 @@ export default async function CcwRoadshowSuccessPage({
           )}
 
           {booking && (
-            <div className="mt-6 grid gap-3 rounded-lg border border-white/10 bg-[#050505] p-4 text-sm">
+            <div className={`mt-6 grid gap-3 rounded-lg border p-4 text-sm ${marketingPanel}`}>
               {booking.attendeeName && (
                 <div className="flex justify-between gap-4">
-                  <span className="text-white/45">Name</span>
-                  <span className="text-right font-medium text-white">{booking.attendeeName}</span>
+                  <span className={marketingTextSubtle}>Name</span>
+                  <span className={`text-right font-medium ${marketingTextStrong}`}>{booking.attendeeName}</span>
                 </div>
               )}
               {booking.city && (
                 <div className="flex justify-between gap-4">
-                  <span className="text-white/45">Event</span>
-                  <span className="text-right font-medium text-white">
+                  <span className={marketingTextSubtle}>Event</span>
+                  <span className={`text-right font-medium ${marketingTextStrong}`}>
                     {booking.city}
                     {booking.dates ? `, ${booking.dates}` : ''}
                   </span>
@@ -147,35 +157,29 @@ export default async function CcwRoadshowSuccessPage({
               )}
               {booking.attendeeCount && (
                 <div className="flex justify-between gap-4">
-                  <span className="text-white/45">Seats</span>
-                  <span className="text-right font-medium text-white">{booking.attendeeCount}</span>
+                  <span className={marketingTextSubtle}>Seats</span>
+                  <span className={`text-right font-medium ${marketingTextStrong}`}>{booking.attendeeCount}</span>
                 </div>
               )}
               {booking.email && (
                 <div className="flex justify-between gap-4">
-                  <span className="text-white/45">Email</span>
-                  <span className="text-right font-medium text-white">{booking.email}</span>
+                  <span className={marketingTextSubtle}>Email</span>
+                  <span className={`text-right font-medium ${marketingTextStrong}`}>{booking.email}</span>
                 </div>
               )}
             </div>
           )}
 
           <div className="mt-6 flex flex-wrap gap-3">
-            <Link
-              href={ccwRoadshowPath}
-              className="rounded-lg bg-[#2490ed] px-5 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-            >
+            <Link href={ccwRoadshowPath} className={marketingBtnPrimary}>
               Back to event page
             </Link>
-            <Link
-              href="/courses?discipline=CCT"
-              className="rounded-lg border border-white/12 px-5 py-3 text-sm font-semibold text-white/65 transition-colors hover:text-white"
-            >
+            <Link href="/courses?discipline=CCT" className={marketingBtnSecondary}>
               Explore CARSI CCT courses
             </Link>
           </div>
         </div>
       </div>
-    </main>
+    </MarketingPageShell>
   );
 }
