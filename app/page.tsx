@@ -1,8 +1,4 @@
-import {
-  AnimatedCard,
-  AnimatedHero,
-  AnimatedSection,
-} from '@/components/landing/AnimatedHero';
+import { AnimatedCard, AnimatedHero, AnimatedSection } from '@/components/landing/AnimatedHero';
 import { HomeCertificationsSection } from '@/components/landing/HomeCertificationsSection';
 import { HomeFeaturedCoursesSection } from '@/components/landing/HomeFeaturedCoursesSection';
 import { HomeGrowthSection } from '@/components/landing/HomeGrowthSection';
@@ -207,10 +203,17 @@ export default async function Home() {
                   text: 'Use certificates and verification pages for employers, clients, or renewal.',
                 },
               ].map((item) => (
-                <div key={item.title} className="rounded-lg border border-slate-200 bg-[#f8fbff] p-5 dark:border-white/10 dark:bg-white/[0.04]">
+                <div
+                  key={item.title}
+                  className="rounded-lg border border-slate-200 bg-[#f8fbff] p-5 dark:border-white/10 dark:bg-white/[0.04]"
+                >
                   <item.icon className="h-5 w-5 text-[#146fc2]" aria-hidden />
-                  <h3 className="mt-3 font-semibold text-slate-950 dark:text-white">{item.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-white/60">{item.text}</p>
+                  <h3 className="mt-3 font-semibold text-slate-950 dark:text-white">
+                    {item.title}
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-white/60">
+                    {item.text}
+                  </p>
                 </div>
               ))}
             </div>
@@ -225,10 +228,7 @@ export default async function Home() {
         </div>
       </section>
 
-      <AnimatedSection
-        label="Multi-industry training"
-        title="Built for every sector you serve"
-      >
+      <AnimatedSection label="Multi-industry training" title="Built for every sector you serve">
         <p className="mb-8 max-w-2xl text-sm leading-relaxed text-slate-600 md:text-base">
           From hospitals to hotels, government facilities to commercial buildings — CARSI provides
           industry-specific training pathways for every sector that needs{' '}
@@ -247,9 +247,7 @@ export default async function Home() {
               >
                 <span
                   className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${
-                    industry.highlight
-                      ? 'bg-white text-[#146fc2]'
-                      : 'bg-[#eef7ff] text-[#146fc2]'
+                    industry.highlight ? 'bg-white text-[#146fc2]' : 'bg-[#eef7ff] text-[#146fc2]'
                   }`}
                 >
                   <Building2 className="h-5 w-5" aria-hidden />
@@ -276,7 +274,9 @@ export default async function Home() {
       </AnimatedSection>
 
       <section className="bg-[#0f172a] py-14 text-white dark:bg-[#020617]">
-        <div className={`${PUBLIC_SHELL_INNER_CLASS} grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center`}>
+        <div
+          className={`${PUBLIC_SHELL_INNER_CLASS} grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center`}
+        >
           <div>
             <p className="inline-flex items-center gap-2 text-sm font-semibold text-[#8fd0ff]">
               <ShieldCheck className="h-4 w-4" aria-hidden />
