@@ -3,6 +3,8 @@
 import { motion } from 'framer-motion';
 import { Search, SlidersHorizontal } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
+
+import { useTheme } from '@/components/ThemeProvider';
 import { CourseCard } from './CourseCard';
 import { CourseGridSkeleton } from './CourseCardSkeleton';
 
@@ -52,8 +54,8 @@ interface CourseGridProps {
   showModulesSort?: boolean;
   /** Default sort column (e.g. `modules` when viewing drafts). */
   initialSortBy?: 'title' | 'price' | 'updated' | 'modules';
-  /** Light (default) for catalogue pages; dark for industry marketing surfaces. */
-  surface?: 'light' | 'dark';
+  /** Light, dark, or follow global theme (default). */
+  surface?: 'light' | 'dark' | 'auto';
 }
 
 type SortKey = 'title' | 'price' | 'updated' | 'modules';
@@ -117,9 +119,10 @@ export function CourseGrid({
   loading = false,
   showModulesSort = false,
   initialSortBy,
-  surface = 'light',
+  surface = 'auto',
 }: CourseGridProps) {
-  const isDark = surface === 'dark';
+  const { theme } = useTheme();
+  const isDark = surface === 'auto' ? theme === 'dark' : surface === 'dark';
   const controlClass = isDark
     ? 'h-11 rounded-xl border border-white/10 bg-[#080c14]/80 px-3 text-sm text-white outline-none focus:border-[#2490ed]/50 focus:ring-1 focus:ring-[#2490ed]/25'
     : 'h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-800 shadow-sm focus:border-[#2490ed] focus:ring-2 focus:ring-[#2490ed]/20 focus:outline-none';
