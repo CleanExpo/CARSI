@@ -5,6 +5,7 @@ import {
   marketingBtnPrimary,
   marketingBtnSecondary,
   marketingBodySm,
+  marketingEyebrow,
   marketingSection,
   marketingSectionTitle,
 } from '@/lib/marketing/marketing-ui';
@@ -35,9 +36,7 @@ export function IndustryCTA({
   return (
     <section className={marketingSection}>
       <div className="mx-auto max-w-2xl text-center">
-        <p className="mb-3 text-[11px] font-semibold tracking-[0.18em] text-[#7ec5ff] uppercase">
-          {subtitle}
-        </p>
+        <p className={`mb-3 ${marketingEyebrow}`}>{subtitle}</p>
         <h2 className={marketingSectionTitle}>
           {title} <span style={{ color: accentColor }}>{price}</span>
         </h2>
