@@ -1,4 +1,13 @@
-import { LucideIcon } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+
+import {
+  marketingBodySm,
+  marketingIconWrap,
+  marketingPanel,
+  marketingPanelHover,
+  marketingSection,
+  marketingSectionTitle,
+} from '@/lib/marketing/marketing-ui';
 
 interface WhyCard {
   icon: LucideIcon;
@@ -11,6 +20,7 @@ interface IndustryWhySectionProps {
   industryName: string;
   headline: string;
   headlineAccent: string;
+  accentColor?: string;
   cards: WhyCard[];
 }
 
@@ -18,52 +28,39 @@ export function IndustryWhySection({
   industryName,
   headline,
   headlineAccent,
+  accentColor = '#2490ed',
   cards,
 }: IndustryWhySectionProps) {
   return (
-    <section className="px-6 py-16" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-      <div className="mx-auto max-w-6xl">
-        <div className="mb-10">
-          <p
-            className="mb-2 text-xs tracking-wide uppercase"
-            style={{ color: 'rgba(255,255,255,0.3)' }}
-          >
-            Why {industryName} Choose CARSI
-          </p>
-          <h2 className="text-2xl font-bold" style={{ color: 'rgba(255,255,255,0.9)' }}>
-            {headline} <span style={{ color: '#2490ed' }}>{headlineAccent}</span>
-          </h2>
-        </div>
+    <section className={marketingSection}>
+      <div className="mb-8 max-w-3xl md:mb-10">
+        <p className="mb-3 inline-flex items-center rounded-full border border-[#2490ed]/30 bg-[#2490ed]/10 px-3 py-1 text-[11px] font-semibold tracking-[0.14em] text-[#7ec5ff] uppercase">
+          Why {industryName} choose CARSI
+        </p>
+        <h2 className={marketingSectionTitle}>
+          {headline}{' '}
+          <span style={{ color: accentColor }}>{headlineAccent}</span>
+        </h2>
+        <div className="mt-4 h-1 w-16 rounded-full bg-gradient-to-r from-[#2490ed] via-[#5eb3ff] to-[#00d4aa]" aria-hidden />
+      </div>
 
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
-          {cards.map((card) => (
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        {cards.map((card) => (
+          <div key={card.title} className={`p-6 ${marketingPanel} ${marketingPanelHover}`}>
             <div
-              key={card.title}
-              className="rounded-lg p-6 transition-transform duration-200 hover:-translate-y-1"
+              className={`mb-4 ${marketingIconWrap}`}
               style={{
-                background: 'rgba(255,255,255,0.03)',
-                border: '1px solid rgba(255,255,255,0.08)',
-                transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
+                borderColor: `${card.color}35`,
+                background: `${card.color}12`,
+                color: card.color,
               }}
             >
-              <div
-                className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg"
-                style={{
-                  background: `${card.color}15`,
-                  border: `1px solid ${card.color}30`,
-                }}
-              >
-                <card.icon className="h-5 w-5" style={{ color: card.color }} />
-              </div>
-              <h3 className="mb-2 text-sm font-bold" style={{ color: 'rgba(255,255,255,0.9)' }}>
-                {card.title}
-              </h3>
-              <p className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>
-                {card.description}
-              </p>
+              <card.icon className="h-5 w-5" aria-hidden />
             </div>
-          ))}
-        </div>
+            <h3 className="text-base font-semibold text-white/90">{card.title}</h3>
+            <p className={`mt-3 ${marketingBodySm}`}>{card.description}</p>
+          </div>
+        ))}
       </div>
     </section>
   );
