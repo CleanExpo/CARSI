@@ -419,7 +419,9 @@ export function CourseTextThumbnail({
         >
           {level ? (
             <span className="inline-flex items-center gap-1">
-              <GraduationCap className={`h-3 w-3 shrink-0 ${hasBackdrop ? 'text-white/45' : 'text-slate-400'}`} />
+              <GraduationCap
+                className={`h-3 w-3 shrink-0 ${hasBackdrop ? 'text-white/45' : 'text-slate-400'}`}
+              />
               {level}
             </span>
           ) : null}
@@ -430,24 +432,32 @@ export function CourseTextThumbnail({
           ) : null}
           {durationHours ? (
             <span className="inline-flex items-center gap-1">
-              <Clock className={`h-3 w-3 shrink-0 ${hasBackdrop ? 'text-white/45' : 'text-slate-400'}`} />
+              <Clock
+                className={`h-3 w-3 shrink-0 ${hasBackdrop ? 'text-white/45' : 'text-slate-400'}`}
+              />
               {durationHours}h
             </span>
           ) : null}
           {instructorName ? (
             <span className="inline-flex min-w-0 items-center gap-1">
-              <User className={`h-3 w-3 shrink-0 ${hasBackdrop ? 'text-white/45' : 'text-slate-400'}`} />
+              <User
+                className={`h-3 w-3 shrink-0 ${hasBackdrop ? 'text-white/45' : 'text-slate-400'}`}
+              />
               <span className="truncate">{instructorName}</span>
             </span>
           ) : null}
         </div>
 
         {variant === 'card' ? (
-          <p className={`mt-1.5 truncate text-[7px] tracking-wide uppercase ${hasBackdrop ? 'text-white/45' : 'text-slate-500'}`}>
+          <p
+            className={`mt-1.5 truncate text-[7px] tracking-wide uppercase ${hasBackdrop ? 'text-white/45' : 'text-slate-500'}`}
+          >
             CARSI · Restoration training · Australia
           </p>
         ) : (
-          <div className={`mt-2 flex items-center gap-2 border-t pt-2 ${hasBackdrop ? 'border-white/5' : 'border-slate-200'}`}>
+          <div
+            className={`mt-2 flex items-center gap-2 border-t pt-2 ${hasBackdrop ? 'border-white/5' : 'border-slate-200'}`}
+          >
             <div className="relative h-5 w-14 shrink-0 opacity-80">
               <Image
                 src={CARSI_COURSE_LOGO_SRC}
@@ -458,7 +468,9 @@ export function CourseTextThumbnail({
                 aria-hidden
               />
             </div>
-            <p className={`text-[8px] leading-tight tracking-wide uppercase ${hasBackdrop ? 'text-white/45' : 'text-slate-500'}`}>
+            <p
+              className={`text-[8px] leading-tight tracking-wide uppercase ${hasBackdrop ? 'text-white/45' : 'text-slate-500'}`}
+            >
               Restoration &amp; cleaning training · Australia
             </p>
           </div>
