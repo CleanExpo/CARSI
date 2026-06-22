@@ -52,6 +52,8 @@ interface CourseGridProps {
   showModulesSort?: boolean;
   /** Default sort column (e.g. `modules` when viewing drafts). */
   initialSortBy?: 'title' | 'price' | 'updated' | 'modules';
+  /** Light (default) for catalogue pages; dark for industry marketing surfaces. */
+  surface?: 'light' | 'dark';
 }
 
 type SortKey = 'title' | 'price' | 'updated' | 'modules';
@@ -115,7 +117,12 @@ export function CourseGrid({
   loading = false,
   showModulesSort = false,
   initialSortBy,
+  surface = 'light',
 }: CourseGridProps) {
+  const isDark = surface === 'dark';
+  const controlClass = isDark
+    ? 'h-11 rounded-xl border border-white/10 bg-[#080c14]/80 px-3 text-sm text-white outline-none focus:border-[#2490ed]/50 focus:ring-1 focus:ring-[#2490ed]/25'
+    : 'h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-800 shadow-sm focus:border-[#2490ed] focus:ring-2 focus:ring-[#2490ed]/20 focus:outline-none';
   const validInitial: DisciplineTab = (DISCIPLINE_TABS as readonly string[]).includes(initialTab)
     ? (initialTab as DisciplineTab)
     : 'All';
@@ -185,7 +192,11 @@ export function CourseGrid({
     <div>
       {/* Discipline tab bar */}
       <div
-        className="scrollbar-hide mb-5 flex gap-2 overflow-x-auto rounded-lg border border-slate-200 bg-white p-1"
+        className={
+          isDark
+            ? 'scrollbar-hide mb-5 flex gap-2 overflow-x-auto rounded-xl border border-white/10 bg-white/[0.04] p-1'
+            : 'scrollbar-hide mb-5 flex gap-2 overflow-x-auto rounded-lg border border-slate-200 bg-white p-1'
+        }
         role="tablist"
         aria-label="Filter by discipline"
       >
@@ -201,8 +212,8 @@ export function CourseGrid({
               className="relative min-h-[44px] rounded-md px-4 py-2.5 text-sm font-semibold whitespace-nowrap transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2490ed]/40"
               style={
                 isActive
-                  ? { color: accentColor, background: 'rgba(15,95,168,0.08)' }
-                  : { color: '#475569' }
+                  ? { color: accentColor, background: `${accentColor}18` }
+                  : { color: isDark ? 'rgba(255,255,255,0.55)' : '#475569' }
               }
             >
               {tab}
@@ -223,7 +234,7 @@ export function CourseGrid({
           <div className="relative">
             <Search
               className="absolute top-1/2 left-3 h-3.5 w-3.5 -translate-y-1/2"
-              style={{ color: '#64748b' }}
+              style={{ color: isDark ? 'rgba(255,255,255,0.35)' : '#64748b' }}
             />
             <input
               type="text"
@@ -231,7 +242,11 @@ export function CourseGrid({
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search courses..."
               aria-label="Search courses"
-              className="h-11 w-full rounded-lg border border-slate-300 bg-white py-2 pr-4 pl-9 text-sm text-slate-900 shadow-sm transition focus:border-[#2490ed] focus:ring-2 focus:ring-[#2490ed]/20 focus:outline-none"
+              className={
+                isDark
+                  ? 'h-11 w-full rounded-xl border border-white/10 bg-[#080c14]/80 py-2 pr-4 pl-9 text-sm text-white outline-none transition placeholder:text-white/30 focus:border-[#2490ed]/50 focus:ring-1 focus:ring-[#2490ed]/25'
+                  : 'h-11 w-full rounded-lg border border-slate-300 bg-white py-2 pr-4 pl-9 text-sm text-slate-900 shadow-sm transition focus:border-[#2490ed] focus:ring-2 focus:ring-[#2490ed]/20 focus:outline-none'
+              }
             />
           </div>
 
@@ -239,7 +254,7 @@ export function CourseGrid({
             value={levelFilter}
             onChange={(e) => setLevelFilter(e.target.value)}
             aria-label="Filter by level"
-            className="h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-800 shadow-sm focus:border-[#2490ed] focus:ring-2 focus:ring-[#2490ed]/20 focus:outline-none"
+            className={controlClass}
           >
             <option value="all">All levels</option>
             {levelOptions.map((level) => (
@@ -254,7 +269,7 @@ export function CourseGrid({
             value={priceFilter}
             onChange={(e) => setPriceFilter(e.target.value as PriceFilter)}
             aria-label="Filter by price"
-            className="h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-800 shadow-sm focus:border-[#2490ed] focus:ring-2 focus:ring-[#2490ed]/20 focus:outline-none"
+            className={controlClass}
           >
             <option value="all">All pricing</option>
             <option value="free">Free</option>
@@ -265,7 +280,7 @@ export function CourseGrid({
             value={cecFilter}
             onChange={(e) => setCecFilter(e.target.value as CecFilter)}
             aria-label="Filter by CEC availability"
-            className="h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-800 shadow-sm focus:border-[#2490ed] focus:ring-2 focus:ring-[#2490ed]/20 focus:outline-none"
+            className={controlClass}
           >
             <option value="all">All CECs</option>
             <option value="has-cec">CEC eligible</option>
@@ -275,7 +290,7 @@ export function CourseGrid({
             value={durationFilter}
             onChange={(e) => setDurationFilter(e.target.value as DurationFilter)}
             aria-label="Filter by duration"
-            className="h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-800 shadow-sm focus:border-[#2490ed] focus:ring-2 focus:ring-[#2490ed]/20 focus:outline-none"
+            className={controlClass}
           >
             <option value="all">Any duration</option>
             <option value="short">1h or less</option>
@@ -285,7 +300,11 @@ export function CourseGrid({
         </div>
 
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center lg:justify-end">
-          <div className="flex items-center gap-1.5 text-sm font-medium whitespace-nowrap text-slate-600">
+          <div
+            className={`flex items-center gap-1.5 text-sm font-medium whitespace-nowrap ${
+              isDark ? 'text-white/55' : 'text-slate-600'
+            }`}
+          >
             <SlidersHorizontal className="h-3.5 w-3.5" />
             <span>
               {filtered.length} course{filtered.length !== 1 ? 's' : ''}
@@ -295,7 +314,11 @@ export function CourseGrid({
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as SortKey)}
             aria-label="Sort courses by"
-            className="h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-800 shadow-sm focus:border-[#2490ed] focus:ring-2 focus:ring-[#2490ed]/20 focus:outline-none sm:w-auto"
+            className={`h-11 w-full px-3 text-sm outline-none sm:w-auto ${
+              isDark
+                ? 'rounded-xl border border-white/10 bg-[#080c14]/80 text-white focus:border-[#2490ed]/50 focus:ring-1 focus:ring-[#2490ed]/25'
+                : 'rounded-lg border border-slate-300 bg-white text-slate-800 shadow-sm focus:border-[#2490ed] focus:ring-2 focus:ring-[#2490ed]/20'
+            }`}
           >
             <option value="updated">Recently updated</option>
             {showModulesSort ? <option value="modules">Most modules</option> : null}
@@ -323,7 +346,7 @@ export function CourseGrid({
         </div>
       ) : (
         <div className="py-20 text-center">
-          <p className="text-sm text-slate-600">
+          <p className={`text-sm ${isDark ? 'text-white/55' : 'text-slate-600'}`}>
             No courses found{searchQuery ? ` for "${searchQuery}"` : ''}.
           </p>
         </div>
