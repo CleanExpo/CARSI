@@ -8,9 +8,12 @@ type Variant = 'desktop' | 'mobile';
 
 export function AuthNavLinks({
   variant,
+  tone = 'light',
   onNavigate,
 }: {
   variant: Variant;
+  /** Nav chrome bar uses light text on a dark surface. */
+  tone?: 'light' | 'chrome';
   /** Close mobile menu after navigation */
   onNavigate?: () => void;
 }) {
@@ -18,10 +21,29 @@ export function AuthNavLinks({
 
   if (loading) {
     if (variant === 'desktop') {
-      return <span className="text-sm text-slate-400" aria-hidden>...</span>;
+      return (
+        <span
+          className={`text-sm ${tone === 'chrome' ? 'text-white/40' : 'text-slate-400'}`}
+          aria-hidden
+        >
+          ...
+        </span>
+      );
     }
     return null;
   }
+
+  const chromeLink =
+    'rounded-md px-2 py-2 text-sm font-medium text-white/75 transition-colors duration-150 hover:bg-white/[0.08] hover:text-white focus-visible:ring-2 focus-visible:ring-[#2490ed]/45 focus-visible:outline-none';
+  const lightLink =
+    'rounded-md px-2 py-2 text-sm font-medium text-slate-600 transition-colors duration-150 hover:bg-slate-100 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-[#2490ed]/40 focus-visible:outline-none';
+  const chromeMuted =
+    'rounded-md px-2 py-2 text-sm font-medium text-white/55 transition-colors duration-150 hover:bg-white/[0.08] hover:text-white focus-visible:ring-2 focus-visible:ring-[#2490ed]/45 focus-visible:outline-none';
+  const lightMuted =
+    'rounded-md px-2 py-2 text-sm font-medium text-slate-500 transition-colors duration-150 hover:bg-slate-100 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-[#2490ed]/40 focus-visible:outline-none';
+  const dashboardLink = tone === 'chrome' ? chromeLink : lightLink;
+  const signOutLink = tone === 'chrome' ? chromeMuted : lightMuted;
+  const signInLink = tone === 'chrome' ? chromeLink : lightLink;
 
   if (user) {
     const label = user.full_name?.trim() || user.email;
@@ -30,16 +52,12 @@ export function AuthNavLinks({
         <div className="flex items-center gap-4">
           <Link
             href="/dashboard"
-            className="max-w-[200px] truncate rounded-md px-2 py-2 text-sm font-medium text-slate-700 transition-colors duration-150 hover:bg-slate-100 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-[#2490ed]/40 focus-visible:outline-none"
+            className={`max-w-[200px] truncate ${dashboardLink}`}
             title={label}
           >
             {label}
           </Link>
-          <button
-            type="button"
-            onClick={() => void signOut()}
-            className="rounded-md px-2 py-2 text-sm font-medium text-slate-500 transition-colors duration-150 hover:bg-slate-100 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-[#2490ed]/40 focus-visible:outline-none"
-          >
+          <button type="button" onClick={() => void signOut()} className={signOutLink}>
             Sign out
           </button>
         </div>
@@ -88,11 +106,7 @@ export function AuthNavLinks({
   if (variant === 'desktop') {
     return (
       <>
-        <Link
-          href="/login"
-          onClick={() => onNavigate?.()}
-          className="rounded-md px-2 py-2 text-sm font-medium text-slate-600 transition-colors duration-150 hover:bg-slate-100 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-[#2490ed]/40 focus-visible:outline-none"
-        >
+        <Link href="/login" onClick={() => onNavigate?.()} className={signInLink}>
           Sign In
         </Link>
         <Link
