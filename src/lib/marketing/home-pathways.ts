@@ -1,11 +1,8 @@
 import type { LucideIcon } from 'lucide-react';
 import { Compass, Sparkles, Ticket } from 'lucide-react';
 
-import { ccwRoadshowPath, formatAudFromCents, ccwRoadshowTicketPackages } from '@/lib/marketing/ccw-roadshow';
+import { ccwRoadshowPath } from '@/lib/marketing/ccw-roadshow';
 import { startSmartBasePath } from '@/lib/marketing/start-smart';
-
-const singlePrice = formatAudFromCents(ccwRoadshowTicketPackages[0].unitAmountCents);
-const teamPrice = formatAudFromCents(ccwRoadshowTicketPackages[1].unitAmountCents);
 
 export type HomePathwayItem = {
   href: string;
@@ -33,7 +30,7 @@ export const homePathwayItems: HomePathwayItem[] = [
     href: `${ccwRoadshowPath}#booking`,
     label: 'Book Growth Days',
     title: 'Melbourne 22–23 Jul · Sydney 30–31 Jul',
-    detail: `${singlePrice} per seat · ${teamPrice} for 5 · Stripe checkout`,
+    detail: 'Free entry for CCW customers · register for your check-in token',
     cta: 'Book your seat',
     icon: Ticket,
     accentClass: 'text-emerald-700',
