@@ -10,6 +10,8 @@ import { CourseTextThumbnail } from '@/components/lms/CourseTextThumbnail';
 interface CourseCardProps {
   /** First visible cards: eager load + higher fetch priority (catalog / home grids). */
   priorityImage?: boolean;
+  /** Homepage featured grid: cleaner thumbnails without CARSI logo. */
+  showBrand?: boolean;
   course: {
     id: string;
     slug: string;
@@ -42,7 +44,7 @@ function formatRelativeDate(dateStr: string | null | undefined): string {
 
 const smoothEase: [number, number, number, number] = [0.4, 0, 0.2, 1];
 
-export function CourseCard({ course, priorityImage }: CourseCardProps) {
+export function CourseCard({ course, priorityImage, showBrand = true }: CourseCardProps) {
   const priceNum =
     typeof course.price_aud === 'string' ? parseFloat(course.price_aud) : course.price_aud;
   const isFree = course.is_free || priceNum === 0;
@@ -68,6 +70,7 @@ export function CourseCard({ course, priorityImage }: CourseCardProps) {
       <div className="relative aspect-video w-full shrink-0 overflow-hidden">
         <CourseTextThumbnail
           variant="card"
+          showBrand={showBrand}
           title={course.title}
           category={course.category}
           discipline={discipline}
