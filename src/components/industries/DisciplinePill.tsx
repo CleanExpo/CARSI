@@ -7,11 +7,11 @@ interface DisciplinePillProps {
 export function DisciplinePill({ code, label, color }: DisciplinePillProps) {
   return (
     <span
-      className="inline-flex items-center gap-1.5 rounded px-2.5 py-1 font-mono text-xs font-bold"
+      className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 font-mono text-xs font-bold"
       style={{
         color,
         background: `${color}15`,
-        border: `1px solid ${color}40`,
+        borderColor: `${color}40`,
       }}
     >
       <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: color }} />
