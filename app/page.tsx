@@ -4,13 +4,19 @@ import {
   AnimatedSection,
   AnimatedStats,
 } from '@/components/landing/AnimatedHero';
+import { HomePathwaysSpotlight } from '@/components/landing/HomePathwaysSpotlight';
 import { PublicFooter } from '@/components/landing/PublicFooter';
 import { PublicNavbar } from '@/components/landing/PublicNavbar';
 import { PUBLIC_SHELL_INNER_CLASS } from '@/components/landing/public-shell-width';
 import { CourseBrowseProvider } from '@/components/lms/CourseBrowseContext';
 import { CourseCard } from '@/components/lms/CourseCard';
 import FloatingChatGate from '@/components/lms/FloatingChatGate';
+import { IICRCDisciplineMap } from '@/components/lms/diagrams/IICRCDisciplineMap';
+import { StudentJourneyMap } from '@/components/lms/diagrams/StudentJourneyMap';
 import { FAQSchema } from '@/components/seo/JsonLd';
+import { AcronymTooltip } from '@/components/ui/AcronymTooltip';
+import { disciplinePillsFromCodes } from '@/lib/iicrc-discipline-display';
+import { ccwRoadshowPath } from '@/lib/marketing/ccw-roadshow';
 import {
   catalogueMetaDescription,
   formatCourseCountForCopy,
@@ -26,7 +32,10 @@ import {
   Building2,
   CheckCircle2,
   Clock,
+  Compass,
   ShieldCheck,
+  Sparkles,
+  Ticket,
 } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
@@ -59,15 +68,50 @@ const benefits = [
 ];
 
 const industries = [
-  { slug: 'healthcare', label: 'Healthcare' },
-  { slug: 'hospitality', label: 'Hotels & Resorts' },
-  { slug: 'government-defence', label: 'Government & Defence' },
-  { slug: 'commercial-cleaning', label: 'Commercial Cleaning' },
+  { slug: 'healthcare', label: 'Healthcare', highlight: true },
+  { slug: 'hospitality', label: 'Hotels & Resorts', highlight: true },
+  { slug: 'government-defence', label: 'Government & Defence', highlight: true },
+  { slug: 'commercial-cleaning', label: 'Commercial Cleaning', highlight: true },
   { slug: 'aged-care', label: 'Aged Care' },
   { slug: 'mining', label: 'Mining & Resources' },
   { slug: 'education', label: 'Education' },
   { slug: 'property-management', label: 'Property Management' },
+  { slug: 'strata', label: 'Strata & Body Corporate' },
+  { slug: 'retail', label: 'Retail & Shopping Centres' },
+  { slug: 'childcare', label: 'Childcare' },
+  { slug: 'construction', label: 'Construction' },
 ];
+
+const discoverLinks = [
+  {
+    href: '/pathways',
+    label: 'Learning pathways',
+    title: 'Structured IICRC CEC paths',
+    detail: 'Follow curated course sequences by discipline and career stage.',
+    icon: Compass,
+  },
+  {
+    href: '/authority',
+    label: 'Authority hub',
+    title: 'Standards & expert content',
+    detail: 'Research, resources and industry alignment for restoration teams.',
+    icon: BookOpen,
+  },
+  {
+    href: ccwRoadshowPath,
+    label: 'Business Growth Days',
+    title: 'CARSI × CCW roadshow',
+    detail: 'Melbourne and Sydney — book seats or read the full program.',
+    icon: Ticket,
+  },
+  {
+    href: '/pricing',
+    label: 'Membership',
+    title: 'Plans & per-course options',
+    detail: 'Free library, monthly membership, or pay per course when you need one.',
+    icon: Sparkles,
+  },
+] as const;
 
 function buildHomeFaqs(facts: { publishedCourseCount: number; disciplineCodes: string[] }) {
   const n = facts.publishedCourseCount;
@@ -92,6 +136,16 @@ function buildHomeFaqs(facts: { publishedCourseCount: number; disciplineCodes: s
       answer:
         'IICRC members and certified technicians continue their education through CECs. Each eligible CARSI course carries a specific Continuing Education Credit value, with certificates and progress available in the learner dashboard.',
     },
+    {
+      question: 'What industries does CARSI serve?',
+      answer:
+        'CARSI serves healthcare, hospitality, aged care, mining, commercial cleaning, government and defence, education, property management, strata, retail, childcare, construction, and more — with sector-specific training pathways.',
+    },
+    {
+      question: 'Does CARSI run in-person events?',
+      answer:
+        'Yes. CARSI partners with Carpet Cleaners Warehouse on Business Growth Days in Melbourne and Sydney, and offers the 2-Day CCW Carpet Cleaning Workshop. Online courses remain available 24/7 between events.',
+    },
   ];
 }
 
@@ -113,6 +167,13 @@ export default async function Home() {
     getPublicCatalogueFacts(),
   ]);
   const faqs = buildHomeFaqs(catalogueFacts);
+  const disciplinePills = disciplinePillsFromCodes(
+    catalogueFacts.disciplineCodes.length > 0
+      ? catalogueFacts.disciplineCodes
+      : ['WRT', 'CRT', 'ASD', 'AMRT', 'FSRT', 'OCT', 'CCT']
+  );
+  const disciplineCountLabel =
+    catalogueFacts.disciplineCodes.length > 0 ? catalogueFacts.disciplineCodes.length : 7;
   const stats = [
     { value: '24/7', label: 'Online Access' },
     { value: '12+', label: 'Industries Served' },
@@ -137,7 +198,36 @@ export default async function Home() {
       <FAQSchema questions={faqs} />
       <PublicNavbar />
       <AnimatedHero benefits={benefits} />
+      <HomePathwaysSpotlight />
       <AnimatedStats stats={stats} />
+
+      <section className="border-b border-slate-200 bg-[#f6f8fb] py-12">
+        <div className={PUBLIC_SHELL_INNER_CLASS}>
+          <div className="mb-6 text-center">
+            <p className="mb-2 inline-flex rounded-full border border-[#b8dbfb] bg-white px-3 py-1 text-[11px] font-semibold tracking-[0.14em] text-[#146fc2] uppercase">
+              Explore by discipline
+            </p>
+            <h2 className="text-xl font-bold text-slate-950 md:text-2xl">
+              <AcronymTooltip term="IICRC" /> course tracks
+            </h2>
+            <p className="mx-auto mt-2 max-w-lg text-sm text-slate-600">
+              Jump into the credential area you need — filter the catalogue by discipline code.
+            </p>
+          </div>
+          <div className="flex flex-wrap justify-center gap-2.5">
+            {disciplinePills.map((d) => (
+              <Link
+                key={d.code}
+                href={`/courses?discipline=${d.code}`}
+                className="rounded-full border border-slate-200 bg-white px-4 py-2 text-xs shadow-sm transition hover:-translate-y-0.5 hover:border-[#2490ed]/40 hover:shadow-md"
+              >
+                <span className="font-mono font-bold text-[#146fc2]">{d.code}</span>
+                <span className="ml-2 hidden text-slate-600 sm:inline">{d.label}</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
 
       <AnimatedSection
         label="Featured courses"
@@ -168,6 +258,54 @@ export default async function Home() {
         </CourseBrowseProvider>
       </AnimatedSection>
 
+      <AnimatedSection
+        label="Certifications"
+        title="IICRC discipline map and pathways"
+        className="bg-white"
+      >
+        <div className="grid gap-10 lg:grid-cols-12 lg:items-start lg:gap-14">
+          <div className="space-y-5 lg:col-span-4">
+            <p className="text-sm leading-relaxed text-slate-600 md:text-base">
+              Seven core pathways orbit <AcronymTooltip term="IICRC" /> standards — hover or tap any
+              node to see the full certification name and jump into filtered courses.
+            </p>
+            <ul className="space-y-3 text-sm text-slate-600">
+              <li className="flex gap-3">
+                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#146fc2]" aria-hidden />
+                <span>
+                  <strong className="text-slate-900">Interactive hub</strong> — explore disciplines
+                  visually, then open matching courses.
+                </span>
+              </li>
+              <li className="flex gap-3">
+                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-600" aria-hidden />
+                <span>
+                  <strong className="text-slate-900">{disciplineCountLabel} disciplines</strong>{' '}
+                  in this view, aligned with CARSI&apos;s published catalogue.
+                </span>
+              </li>
+            </ul>
+            <div className="flex flex-wrap gap-3">
+              <Link
+                href="/courses"
+                className="inline-flex items-center gap-2 rounded-lg bg-[#146fc2] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#0f5fa8]"
+              >
+                Full course catalogue <ArrowRight className="h-4 w-4" aria-hidden />
+              </Link>
+              <Link
+                href="/pathways"
+                className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-800 transition hover:border-[#2490ed] hover:text-[#146fc2]"
+              >
+                View pathways
+              </Link>
+            </div>
+          </div>
+          <div className="lg:col-span-8">
+            <IICRCDisciplineMap />
+          </div>
+        </div>
+      </AnimatedSection>
+
       <section className="bg-white py-14">
         <div className={PUBLIC_SHELL_INNER_CLASS}>
           <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
@@ -183,6 +321,12 @@ export default async function Home() {
                 self-paced lessons, track CECs, and share verifiable credentials when your work
                 requires proof.
               </p>
+              <Link
+                href="/pathways"
+                className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[#146fc2] hover:text-[#0f5fa8]"
+              >
+                Browse structured pathways <ArrowRight className="h-4 w-4" aria-hidden />
+              </Link>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               {[
@@ -215,49 +359,127 @@ export default async function Home() {
               ))}
             </div>
           </div>
+
+          <div className="mt-10 rounded-xl border border-slate-200 bg-[#0f172a] p-6 sm:p-8">
+            <p className="mb-6 text-center text-sm leading-relaxed text-slate-300">
+              From enrolment to credential — six steps to IICRC-recognised professional development.
+            </p>
+            <StudentJourneyMap />
+          </div>
         </div>
       </section>
 
-      <AnimatedSection label="Industry pathways" title="Training for the facilities and sectors you serve">
+      <AnimatedSection
+        label="Multi-industry training"
+        title="Built for every sector you serve"
+      >
+        <p className="mb-8 max-w-2xl text-sm leading-relaxed text-slate-600 md:text-base">
+          From hospitals to hotels, government facilities to commercial buildings — CARSI provides
+          industry-specific training pathways for every sector that needs{' '}
+          <AcronymTooltip term="IICRC" /> credentials.
+        </p>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {industries.map((industry) => (
-            <Link
-              key={industry.slug}
-              href={`/industries/${industry.slug}`}
-              className="group flex min-h-20 items-center gap-3 rounded-lg border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-[#2490ed]/45 hover:shadow-md"
-            >
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#eef7ff] text-[#146fc2]">
-                <Building2 className="h-5 w-5" aria-hidden />
-              </span>
-              <span className="font-semibold text-slate-800 group-hover:text-[#146fc2]">
-                {industry.label}
-              </span>
-            </Link>
+          {industries.map((industry, i) => (
+            <AnimatedCard key={industry.slug} index={i}>
+              <Link
+                href={`/industries/${industry.slug}`}
+                className={`group flex min-h-20 items-center gap-3 rounded-lg border p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${
+                  industry.highlight
+                    ? 'border-[#2490ed]/35 bg-[#eef7ff] hover:border-[#2490ed]/50'
+                    : 'border-slate-200 bg-white hover:border-[#2490ed]/45'
+                }`}
+              >
+                <span
+                  className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${
+                    industry.highlight
+                      ? 'bg-white text-[#146fc2]'
+                      : 'bg-[#eef7ff] text-[#146fc2]'
+                  }`}
+                >
+                  <Building2 className="h-5 w-5" aria-hidden />
+                </span>
+                <span
+                  className={`font-semibold transition-colors group-hover:text-[#146fc2] ${
+                    industry.highlight ? 'text-slate-900' : 'text-slate-800'
+                  }`}
+                >
+                  {industry.label}
+                </span>
+              </Link>
+            </AnimatedCard>
+          ))}
+        </div>
+        <div className="mt-8 text-center">
+          <Link
+            href="/industries"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-[#146fc2] hover:text-[#0f5fa8]"
+          >
+            View all industries <ArrowRight className="h-4 w-4" aria-hidden />
+          </Link>
+        </div>
+      </AnimatedSection>
+
+      <AnimatedSection label="Discover CARSI" title="Where to go next" className="bg-white">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {discoverLinks.map((item, i) => (
+            <AnimatedCard key={item.href} index={i}>
+              <Link
+                href={item.href}
+                className="group flex h-full flex-col rounded-lg border border-slate-200 bg-[#f8fbff] p-5 transition hover:-translate-y-0.5 hover:border-[#2490ed]/40 hover:shadow-md"
+              >
+                <item.icon className="h-5 w-5 text-[#146fc2]" aria-hidden />
+                <p className="mt-3 text-[10px] font-semibold tracking-[0.14em] text-[#146fc2] uppercase">
+                  {item.label}
+                </p>
+                <h3 className="mt-2 font-semibold text-slate-950">{item.title}</h3>
+                <p className="mt-2 flex-1 text-sm leading-relaxed text-slate-600">{item.detail}</p>
+                <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-[#146fc2] group-hover:text-[#0f5fa8]">
+                  Learn more <ArrowRight className="h-3.5 w-3.5" aria-hidden />
+                </span>
+              </Link>
+            </AnimatedCard>
           ))}
         </div>
       </AnimatedSection>
 
       <section className="bg-[#0f172a] py-14 text-white">
-        <div className={`${PUBLIC_SHELL_INNER_CLASS} grid gap-6 md:grid-cols-[1fr_auto] md:items-center`}>
+        <div className={`${PUBLIC_SHELL_INNER_CLASS} grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center`}>
           <div>
             <p className="inline-flex items-center gap-2 text-sm font-semibold text-[#8fd0ff]">
               <ShieldCheck className="h-4 w-4" aria-hidden />
               Built for practical professional development
             </p>
             <h2 className="mt-3 text-2xl font-bold tracking-tight md:text-3xl">
-              Ready to find the right CARSI course?
+              Ready to start — online, in person, or both?
             </h2>
             <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-300">
-              Start with the catalogue, compare courses clearly, and enrol when the path is right.
+              Browse the catalogue for self-paced CEC courses, follow a structured pathway, or book
+              CARSI × CCW Business Growth Days when you are ready to grow in person.
             </p>
           </div>
-          <Link
-            href="/courses"
-            className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-[#ed9d24] px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-[#f2b14f]"
-          >
-            Browse the catalogue
-            <CheckCircle2 className="h-4 w-4" aria-hidden />
-          </Link>
+          <div className="flex flex-col gap-3 sm:flex-row lg:flex-col">
+            <Link
+              href="/courses"
+              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-[#ed9d24] px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-[#f2b14f]"
+            >
+              Browse the catalogue
+              <CheckCircle2 className="h-4 w-4" aria-hidden />
+            </Link>
+            <Link
+              href={`${ccwRoadshowPath}#booking`}
+              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg border border-white/20 bg-white/5 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
+            >
+              Book Growth Days
+              <Ticket className="h-4 w-4" aria-hidden />
+            </Link>
+            <Link
+              href="/pathways"
+              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg border border-white/20 bg-white/5 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
+            >
+              Find my pathway
+              <Compass className="h-4 w-4" aria-hidden />
+            </Link>
+          </div>
         </div>
       </section>
 
