@@ -1,11 +1,12 @@
 'use client';
 
-import { ArrowRight, Award } from 'lucide-react';
+import { ArrowRight, Award, BookOpen, Building2, Clock, type LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 
 import { GrowthPathInfographic } from '@/components/landing/GrowthPathInfographic';
 import { PUBLIC_SHELL_INNER_CLASS } from '@/components/landing/public-shell-width';
 import { ccwWorkshopHref, homePathwayItems } from '@/lib/marketing/home-pathways';
+import { cn } from '@/lib/utils';
 
 interface Stat {
   value: string;
@@ -14,6 +15,52 @@ interface Stat {
 
 interface HomeGrowthSectionProps {
   stats: Stat[];
+}
+
+const STAT_PRESENTATION: Record<
+  string,
+  { icon: LucideIcon; detail: string; badge: string; accent: string; glow: string }
+> = {
+  'Online Access': {
+    icon: Clock,
+    detail: 'Study around the roster',
+    badge: 'Always on',
+    accent: 'text-[#146fc2] dark:text-[#8fd0ff]',
+    glow: 'from-[#2490ed]/12 to-transparent dark:from-[#2490ed]/20',
+  },
+  'Industries Served': {
+    icon: Building2,
+    detail: 'Sector-specific pathways',
+    badge: 'Multi-sector',
+    accent: 'text-emerald-600 dark:text-emerald-400',
+    glow: 'from-emerald-500/12 to-transparent dark:from-emerald-500/18',
+  },
+  Courses: {
+    icon: BookOpen,
+    detail: 'Published in the catalogue',
+    badge: 'Catalogue',
+    accent: 'text-[#146fc2] dark:text-[#8fd0ff]',
+    glow: 'from-[#2490ed]/10 to-transparent dark:from-[#2490ed]/16',
+  },
+  'IICRC Disciplines': {
+    icon: Award,
+    detail: 'CEC-aligned course tracks',
+    badge: 'IICRC CEC',
+    accent: 'text-[#9a4a00] dark:text-[#f2b14f]',
+    glow: 'from-[#ed9d24]/14 to-transparent dark:from-[#ed9d24]/20',
+  },
+};
+
+function getStatPresentation(label: string) {
+  return (
+    STAT_PRESENTATION[label] ?? {
+      icon: Award,
+      detail: 'CARSI platform',
+      badge: 'CARSI',
+      accent: 'text-[#146fc2] dark:text-[#8fd0ff]',
+      glow: 'from-[#2490ed]/10 to-transparent',
+    }
+  );
 }
 
 /**
@@ -27,19 +74,70 @@ export function HomeGrowthSection({ stats }: HomeGrowthSectionProps) {
       className="relative border-b border-slate-200/80 bg-white dark:border-white/10 dark:bg-[#0a0a0a]"
     >
       {/* Stats strip */}
-      <div className="border-b border-slate-200/80 bg-[#f6f8fb]/80 dark:border-white/10 dark:bg-[#050505]/80">
-        <div className={PUBLIC_SHELL_INNER_CLASS}>
-          <div className="grid grid-cols-2 divide-slate-200/80 sm:grid-cols-4 sm:divide-x dark:divide-white/10">
-            {stats.map((stat) => (
-              <div key={stat.label} className="px-4 py-8 text-center sm:py-9">
-                <p className="text-3xl font-bold tracking-tight text-[#146fc2] tabular-nums sm:text-4xl dark:text-[#8fd0ff]">
-                  {stat.value}
-                </p>
-                <p className="mt-1.5 text-[11px] font-semibold tracking-[0.14em] text-slate-500 uppercase dark:text-white/45">
-                  {stat.label}
-                </p>
-              </div>
-            ))}
+      <div className="relative overflow-hidden border-b border-slate-200/80 bg-[#f6f8fb] dark:border-white/10 dark:bg-[#050505]">
+        <div
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(36,144,237,0.1),transparent_55%)] dark:bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(36,144,237,0.14),transparent_55%)]"
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.35] dark:opacity-20"
+          style={{
+            backgroundImage:
+              'linear-gradient(rgba(15,23,42,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(15,23,42,0.035) 1px, transparent 1px)',
+            backgroundSize: '40px 40px',
+          }}
+          aria-hidden
+        />
+
+        <div className={`relative ${PUBLIC_SHELL_INNER_CLASS} py-8 md:py-10`}>
+          <p className="mb-5 text-center text-[11px] font-semibold tracking-[0.2em] text-slate-500 uppercase dark:text-white/40">
+            Platform at a glance
+          </p>
+
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
+            {stats.map((stat) => {
+              const meta = getStatPresentation(stat.label);
+              const Icon = meta.icon;
+
+              return (
+                <div
+                  key={stat.label}
+                  className="group relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white/90 p-4 shadow-[0_16px_40px_-32px_rgba(15,23,42,0.28)] backdrop-blur-sm transition hover:-translate-y-0.5 hover:border-[#2490ed]/25 hover:shadow-[0_22px_48px_-28px_rgba(36,144,237,0.22)] sm:p-5 dark:border-white/10 dark:bg-white/[0.04] dark:shadow-[0_20px_44px_-32px_rgba(0,0,0,0.55)] dark:hover:border-[#2490ed]/30"
+                >
+                  <div
+                    className={cn(
+                      'pointer-events-none absolute inset-x-0 top-0 h-16 bg-gradient-to-b opacity-80',
+                      meta.glow
+                    )}
+                    aria-hidden
+                  />
+
+                  <div className="relative flex items-start justify-between gap-3">
+                    <span
+                      className={cn(
+                        'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200/80 bg-white shadow-sm dark:border-white/10 dark:bg-white/[0.06]',
+                        meta.accent
+                      )}
+                    >
+                      <Icon className="h-4 w-4" aria-hidden />
+                    </span>
+                    <span className="rounded-full border border-slate-200/80 bg-slate-50 px-2 py-0.5 text-[9px] font-semibold tracking-wide text-slate-600 uppercase dark:border-white/10 dark:bg-white/[0.06] dark:text-white/50">
+                      {meta.badge}
+                    </span>
+                  </div>
+
+                  <p className="relative mt-4 text-3xl font-bold tracking-tight text-slate-950 tabular-nums sm:text-[2rem] dark:text-white">
+                    {stat.value}
+                  </p>
+                  <p className="relative mt-1 text-[11px] font-semibold tracking-[0.14em] text-slate-600 uppercase dark:text-white/55">
+                    {stat.label}
+                  </p>
+                  <p className="relative mt-1 text-[11px] leading-snug text-slate-500 dark:text-white/40">
+                    {meta.detail}
+                  </p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
