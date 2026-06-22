@@ -163,17 +163,17 @@ export default function CcwRoadshowPage() {
               <div className="mt-8 grid gap-3 sm:grid-cols-3">
                 <div className={marketingStatCard}>
                   <CalendarDays className="mb-3 h-4 w-4 text-[#2490ed]/80" aria-hidden />
-                  <p className="text-sm font-semibold text-white/90">July 2026</p>
+                  <p className="text-sm font-semibold text-slate-900 dark:text-white/90">July 2026</p>
                   <p className={`mt-1 ${marketingBodySm}`}>Melbourne 22-23, Sydney 30-31</p>
                 </div>
                 <div className={marketingStatCard}>
                   <Users className="mb-3 h-4 w-4 text-[#ed9d24]/80" aria-hidden />
-                  <p className="text-sm font-semibold text-white/90">Free CCW entry</p>
+                  <p className="text-sm font-semibold text-slate-900 dark:text-white/90">Free CCW entry</p>
                   <p className={`mt-1 ${marketingBodySm}`}>Past/current customers claim a token</p>
                 </div>
                 <div className={marketingStatCard}>
                   <Sparkles className="mb-3 h-4 w-4 text-[#2490ed]/80" aria-hidden />
-                  <p className="text-sm font-semibold text-white/90">Limited seats</p>
+                  <p className="text-sm font-semibold text-slate-900 dark:text-white/90">Limited seats</p>
                   <p className={`mt-1 ${marketingBodySm}`}>Small group format. Register early.</p>
                 </div>
               </div>
@@ -221,7 +221,7 @@ export default function CcwRoadshowPage() {
                     <p className="text-xs font-semibold tracking-[0.14em] text-[#7ec5ff] uppercase">
                       {event.city}
                     </p>
-                    <h3 className="mt-2 text-xl font-bold tracking-tight text-white sm:text-2xl">
+                    <h3 className="mt-2 text-xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-2xl">
                       {event.dates}
                     </h3>
                     <p className={`mt-2 ${marketingBodySm}`}>{event.timeLabel}</p>
@@ -234,7 +234,7 @@ export default function CcwRoadshowPage() {
                 <div className="mt-5 flex gap-3 border-t border-white/[0.06] pt-5">
                   <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#2490ed]/70" aria-hidden />
                   <div>
-                    <p className="text-sm font-semibold text-white/85">{event.venueName}</p>
+                    <p className="text-sm font-semibold text-slate-800 dark:text-white/85">{event.venueName}</p>
                     <p className={`mt-1 ${marketingBodySm}`}>
                       {event.streetAddress}, {event.suburbStatePostcode}
                     </p>
@@ -262,7 +262,7 @@ export default function CcwRoadshowPage() {
                 <p className="text-[10px] font-semibold tracking-[0.14em] text-[#2490ed]/80 uppercase">
                   {pillar.eyebrow}
                 </p>
-                <h3 className="mt-3 text-lg font-bold leading-snug text-white">{pillar.title}</h3>
+                <h3 className="mt-3 text-lg font-bold leading-snug text-slate-900 dark:text-white">{pillar.title}</h3>
                 <p className={`mt-3 ${marketingBodySm}`}>{pillar.body}</p>
                 <div className="mt-5 space-y-3">
                   {pillar.points.map((point) => (
@@ -297,15 +297,15 @@ export default function CcwRoadshowPage() {
 
             <div className={`p-5 ${marketingStatCard}`}>
               <p className={marketingEyebrowPill}>Free CCW customer entry</p>
-              <h2 className="mt-4 text-2xl font-bold tracking-tight text-white">
+              <h2 className="mt-4 text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
                 {ccwRoadshowFreeEntryOffer.headline}
               </h2>
               <p className={`mt-3 ${marketingBodySm}`}>{ccwRoadshowFreeEntryOffer.detail}</p>
               <div className="mt-5 space-y-3">
                 {ccwRoadshowTicketPackages.map((pkg) => (
                   <div key={pkg.id} className={`p-4 ${marketingPanel}`}>
-                    <p className="text-sm font-semibold text-white/90">{pkg.label}</p>
-                    <p className="mt-1 text-2xl font-bold tracking-tight text-white">
+                    <p className="text-sm font-semibold text-slate-900 dark:text-white/90">{pkg.label}</p>
+                    <p className="mt-1 text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
                       {formatAudFromCents(pkg.unitAmountCents)}
                     </p>
                     <p className={`mt-1 ${marketingBodySm}`}>{pkg.description}</p>
