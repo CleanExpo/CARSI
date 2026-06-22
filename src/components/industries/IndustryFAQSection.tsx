@@ -1,5 +1,5 @@
 import { MarketingSectionHeader } from '@/components/marketing/MarketingSectionHeader';
-import { marketingPanel, marketingSection } from '@/lib/marketing/marketing-ui';
+import { marketingPanel, marketingSection, marketingTextMuted, marketingTextStrong } from '@/lib/marketing/marketing-ui';
 
 export type IndustryFaq = {
   question: string;
@@ -24,10 +24,10 @@ export function IndustryFAQSection({ industryName, faqs }: IndustryFAQSectionPro
       <div className="grid gap-3 md:grid-cols-2">
         {faqs.map((faq) => (
           <details key={faq.question} className={`p-4 ${marketingPanel}`}>
-            <summary className="cursor-pointer text-sm font-semibold text-white/90">
+            <summary className={`cursor-pointer text-sm font-semibold ${marketingTextStrong}`}>
               {faq.question}
             </summary>
-            <p className="mt-3 text-sm leading-6 text-white/55">{faq.answer}</p>
+            <p className={`mt-3 text-sm leading-6 ${marketingTextMuted}`}>{faq.answer}</p>
           </details>
         ))}
       </div>
