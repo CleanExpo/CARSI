@@ -1,8 +1,33 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
+import {
+  ArrowRight,
+  Award,
+  BadgeCheck,
+  Globe2,
+  Shield,
+  Sparkles,
+} from 'lucide-react';
 
+import { AboutMissionPillars } from '@/components/marketing/about/AboutMissionPillars';
+import { MarketingPageShell } from '@/components/marketing/MarketingPageShell';
+import { MarketingSectionHeader } from '@/components/marketing/MarketingSectionHeader';
+import { GlassStatCard } from '@/components/industries/GlassStatCard';
+import { StudentJourneyMap } from '@/components/lms/diagrams/StudentJourneyMap';
+import { AcronymTooltip } from '@/components/ui/AcronymTooltip';
 import { disciplineRowsFromCodes } from '@/lib/iicrc-discipline-display';
+import {
+  marketingBody,
+  marketingBodySm,
+  marketingBtnPrimary,
+  marketingBtnSecondary,
+  marketingEyebrowPill,
+  marketingHeading,
+  marketingIconWrap,
+  marketingPanel,
+  marketingTextMuted,
+  marketingTextStrong,
+} from '@/lib/marketing/marketing-ui';
 import {
   formatCourseCountForCopy,
   getPublicCatalogueFacts,
@@ -19,9 +44,7 @@ export async function generateMetadata(): Promise<Metadata> {
       ? `${formatCourseCountForCopy(n)} IICRC CEC accredited course${n === 1 ? '' : 's'}`
       : 'IICRC CEC accredited courses';
   const discPhrase =
-    d > 0
-      ? `${d} discipline${d === 1 ? '' : 's'}`
-      : 'multiple IICRC disciplines';
+    d > 0 ? `${d} discipline${d === 1 ? '' : 's'}` : 'multiple IICRC disciplines';
   return {
     title: 'About CARSI | Centre for Australian Restoration and Standards Information',
     description: `CARSI is Australia's leading online training platform for cleaning and restoration professionals. ${coursePhrase} across ${discPhrase}. 50+ years of combined industry experience.`,
@@ -30,14 +53,17 @@ export async function generateMetadata(): Promise<Metadata> {
 
 const credentials = [
   {
+    icon: Shield,
     title: "Australia's Only CFO & CBFRS",
     desc: 'Certified Flooring Organisation and Certified Building Flood Recovery Specialist — the only holder of both credentials in Australia.',
   },
   {
+    icon: Award,
     title: '50+ Years Combined Experience',
-    desc: 'Our founders and instructors bring decades of hands-on experience across cleaning, water damage, and building restoration.',
+    desc: 'Founders and instructors bring decades of hands-on experience across cleaning, water damage, and building restoration.',
   },
   {
+    icon: Globe2,
     title: 'Raise the Bar',
     desc: 'We exist to lift industry standards through education. Every course is designed by practitioners, for practitioners.',
   },
@@ -55,269 +81,194 @@ export default async function AboutPage() {
   const stats = [
     {
       value: n > 0 ? formatCourseCountForCopy(n) : '—',
-      label: 'IICRC CEC accredited courses',
+      label: 'CEC courses',
+      accent: '#2490ed',
     },
     {
       value: d > 0 ? formatCourseCountForCopy(d) : '7',
-      label: 'IICRC disciplines covered',
+      label: 'IICRC disciplines',
+      accent: '#26c4a0',
     },
-    { value: '12+', label: 'Industries served' },
+    { value: '12+', label: 'Industries served', accent: '#ed9d24' },
   ];
 
   return (
-    <main className="min-h-screen bg-[#050505]">
-      {/* Subtle gradient orb */}
-      <div
-        className="pointer-events-none fixed inset-0"
-        style={{
-          background:
-            'radial-gradient(ellipse 60% 40% at 50% 0%, rgba(36,144,237,0.06) 0%, transparent 60%)',
-        }}
-        aria-hidden="true"
-      />
+    <MarketingPageShell id="main-content">
+      <header className="pb-10 sm:pb-14">
+        <p className={`mb-4 inline-flex items-center gap-2 ${marketingEyebrowPill}`}>
+          <Sparkles className="h-3.5 w-3.5" aria-hidden />
+          About CARSI
+        </p>
+        <h1 className={`max-w-4xl ${marketingHeading}`}>
+          Raising the bar for restoration professionals.
+        </h1>
+        <p className={`mt-5 max-w-3xl ${marketingBody}`}>
+          CARSI — the Centre for Australian Restoration and Standards Information — is
+          Australia&apos;s leading online training platform for cleaning and restoration
+          professionals. We offer beginner, intermediate, and advanced{' '}
+          <AcronymTooltip term="IICRC" /> <AcronymTooltip term="CEC" /> accredited courses for
+          people starting out, updating their knowledge, or maintaining continuing education without
+          leaving the job site.
+        </p>
+      </header>
 
-      <div className="relative z-10 mx-auto max-w-4xl px-6 py-20">
-        {/* ── Hero ─────────────────────────────────────────────── */}
-        <div className="mb-16">
-          <p
-            className="mb-3 text-xs tracking-wide uppercase"
-            style={{ color: 'rgba(255,255,255,0.3)' }}
-          >
-            About Us
-          </p>
-          <h1
-            className="mb-4 text-4xl font-bold tracking-tight"
-            style={{ color: 'rgba(255,255,255,0.95)' }}
-          >
-            Raising the bar for restoration professionals.
-          </h1>
-          <p
-            className="max-w-2xl text-base leading-relaxed"
-            style={{ color: 'rgba(255,255,255,0.55)' }}
-          >
-            CARSI — the Centre for Australian Restoration and Standards Information — is
-            Australia&apos;s leading online training platform for cleaning and restoration
-            professionals. We offer beginner, intermediate, and advanced IICRC CEC accredited
-            courses for people starting out, updating their knowledge, or maintaining continuing
-            education without leaving the job site.
-          </p>
-        </div>
-
-        {/* ── Mission ──────────────────────────────────────────── */}
-        <section className="mb-16 space-y-5" aria-label="Our mission">
-          <h2 className="text-xl font-semibold" style={{ color: 'rgba(255,255,255,0.9)' }}>
-            Growth. Support. Development.
-          </h2>
-          <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.6)' }}>
+      <section className="mb-14 sm:mb-16">
+        <MarketingSectionHeader
+          eyebrow="Our mission"
+          title="Growth. Support. Development."
+          body="Professional development should fit around your work — not the other way around."
+          pill={false}
+        />
+        <AboutMissionPillars />
+        <div className={`mt-8 space-y-4 ${marketingBodySm}`}>
+          <p>
             The cleaning and restoration industry is demanding. Technicians work long hours, often
-            interstate, responding to water damage, fire, and mould events. For IICRC members and
-            certified technicians, continuing education through CECs has historically meant flights,
-            hotels, and days away from active jobs. CARSI changes that.
+            interstate, responding to water damage, fire, and mould events. For IICRC members,
+            continuing education through CECs has historically meant flights, hotels, and days away
+            from active jobs. CARSI changes that.
           </p>
-          <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.6)' }}>
-            We believe professional development should fit around your work — not the other way
-            around. Our platform is available 24 hours a day, 7 days a week, accessible from any
-            device. Whether you&apos;re between jobs in regional Queensland or studying at midnight
-            in Perth, CARSI is there.
-          </p>
-          <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.6)' }}>
+          <p>
+            Our platform is available 24/7 from any device — whether you&apos;re between jobs in
+            regional Queensland or studying at midnight in Perth.
             {n > 0 ? (
               <>
-                With {formatCourseCountForCopy(n)} IICRC CEC accredited course{n === 1 ? '' : 's'}{' '}
-                across {d > 0 ? `${d} disciplines` : 'seven core disciplines'}, and a full-access
-                subscription at $795 AUD per year, we provide a practical path for IICRC members and
-                certified technicians to keep continuing education moving in Australia.
+                {' '}
+                With {formatCourseCountForCopy(n)} accredited course{n === 1 ? '' : 's'} across{' '}
+                {d > 0 ? `${d} disciplines` : 'seven core disciplines'}, plus full-access
+                subscription options, we keep continuing education moving in Australia.
               </>
-            ) : (
-              <>
-                With IICRC CEC accredited courses across seven core disciplines, and a full-access
-                subscription at $795 AUD per year, we provide a practical path for IICRC members and
-                certified technicians to keep continuing education moving in Australia.
-              </>
-            )}
+            ) : null}
           </p>
-        </section>
+        </div>
+      </section>
 
-        {/* ── Credentials grid ─────────────────────────────────── */}
-        <section className="mb-16" aria-label="Our credentials">
-          <div className="grid gap-4 sm:grid-cols-3">
-            {credentials.map((item) => (
-              <div
-                key={item.title}
-                className="rounded-sm p-5"
-                style={{
-                  background: 'rgba(255,255,255,0.03)',
-                  border: '1px solid rgba(255,255,255,0.08)',
-                }}
-              >
-                <h3
-                  className="mb-2 text-sm font-semibold"
-                  style={{ color: 'rgba(255,255,255,0.85)' }}
-                >
-                  {item.title}
-                </h3>
-                <p className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                  {item.desc}
-                </p>
+      <section className="mb-14 sm:mb-16" aria-label="Platform at a glance">
+        <div className="grid gap-3 sm:grid-cols-3">
+          {stats.map((stat) => (
+            <GlassStatCard key={stat.label} value={stat.value} label={stat.label} accentColor={stat.accent} />
+          ))}
+        </div>
+      </section>
+
+      <section className="mb-14 sm:mb-16" aria-label="Our credentials">
+        <MarketingSectionHeader
+          eyebrow="Credentials"
+          title="Built on real industry authority"
+          body="Practitioner-led training backed by credentials that matter in the Australian market."
+        />
+        <div className="grid gap-4 md:grid-cols-3">
+          {credentials.map((item) => {
+            const Icon = item.icon;
+            return (
+              <div key={item.title} className={`p-5 ${marketingPanel}`}>
+                <div className={marketingIconWrap}>
+                  <Icon className="h-5 w-5" aria-hidden />
+                </div>
+                <h3 className={`mt-4 text-base font-semibold ${marketingTextStrong}`}>{item.title}</h3>
+                <p className={`mt-2 text-sm leading-relaxed ${marketingTextMuted}`}>{item.desc}</p>
               </div>
-            ))}
-          </div>
-        </section>
+            );
+          })}
+        </div>
+      </section>
 
-        {/* ── The CARSI Difference ─────────────────────────────── */}
-        <section className="mb-16 space-y-6" aria-label="Why CARSI">
-          <div>
-            <h2 className="text-xl font-semibold" style={{ color: 'rgba(255,255,255,0.9)' }}>
-              Why CARSI?
-            </h2>
-            <p className="mt-3 text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.6)' }}>
-              Traditional restoration training in Australia requires travel. A two-day face-to-face
-              course in a capital city can cost over $2,000 in flights and accommodation alone — on
-              top of course fees and lost billing days. CARSI&apos;s online platform eliminates
-              these costs entirely. Courses are self-paced, certificates are instant, and your CEC
-              progress is tracked automatically in your student dashboard.
-            </p>
-            <p className="mt-3 text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.6)' }}>
-              CARSI is also a core pillar of the National Restoration Professionals Group (NRPG)
-              onboarding pathway, ensuring trained technicians are recognised across the NRPG
-              network from day one. Our training is recognised by major Australian insurers
-              including IAG, Suncorp, and QBE as evidence of professional competency.
-            </p>
-          </div>
+      <section className="mb-14 sm:mb-16" aria-label="Learning journey">
+        <div className={`p-5 sm:p-6 ${marketingPanel}`}>
+          <MarketingSectionHeader
+            eyebrow="How it works"
+            title="From enrolment to credential"
+            body="A structured path from first lesson to shareable digital certificate."
+            className="mb-6"
+          />
+          <StudentJourneyMap />
+        </div>
+      </section>
 
-          <div className="grid gap-3 sm:grid-cols-3">
-            {stats.map((stat) => (
-              <div
-                key={stat.label}
-                className="rounded-sm p-5 text-center"
-                style={{
-                  background: 'rgba(255,255,255,0.02)',
-                  border: '1px solid rgba(255,255,255,0.06)',
-                }}
-              >
-                <p className="text-3xl font-bold" style={{ color: '#2490ed' }}>
-                  {stat.value}
-                </p>
-                <p className="mt-1 text-xs" style={{ color: 'rgba(255,255,255,0.45)' }}>
-                  {stat.label}
-                </p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* ── IICRC Disciplines ─────────────────────────────────── */}
-        <section className="mb-16 space-y-5" aria-label="IICRC disciplines">
-          <div>
-            <h2 className="text-xl font-semibold" style={{ color: 'rgba(255,255,255,0.9)' }}>
-              IICRC Discipline Coverage
-            </h2>
-            <p className="mt-2 text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.55)' }}>
-              {d > 0 ? (
-                <>
-                  Our published catalogue currently includes courses tagged across {d} IICRC
-                  discipline{d === 1 ? '' : 's'}. Courses in each area count toward the continuing
-                  education credits used to maintain your certified technician status. IICRC members
-                  and certified technicians continue their education through CECs — CARSI makes that
-                  straightforward.
-                </>
-              ) : (
-                <>
-                  CARSI offers IICRC CEC accredited courses across all seven core disciplines.
-                  Courses in each discipline count toward the continuing education credits used to
-                  maintain your certified technician status. IICRC members and certified technicians
-                  continue their education through CECs — CARSI makes that straightforward.
-                </>
-              )}
+      <section className="mb-14 sm:mb-16" aria-label="Why CARSI">
+        <MarketingSectionHeader
+          eyebrow="The CARSI difference"
+          title="Why technicians choose us"
+          body="Online, self-paced, and designed for people who cannot pause the job site for classroom training."
+        />
+        <div className={`grid gap-4 lg:grid-cols-2 ${marketingBodySm}`}>
+          <div className={`p-5 ${marketingPanel}`}>
+            <BadgeCheck className="mb-3 h-5 w-5 text-[#146fc2] dark:text-[#8fd0ff]" aria-hidden />
+            <p>
+              Traditional restoration training in Australia often requires travel. A two-day
+              face-to-face course in a capital city can cost over $2,000 in flights and accommodation
+              alone — on top of course fees and lost billing days. CARSI eliminates those costs.
+              Courses are self-paced, certificates are instant, and CEC progress is tracked in your
+              dashboard.
             </p>
           </div>
-          <div className="grid gap-2 sm:grid-cols-2">
-            {disciplineRows.map((row) => (
-              <div
-                key={row.code}
-                className="flex items-center gap-3 rounded-sm px-3 py-2"
-                style={{
-                  background: 'rgba(36,144,237,0.06)',
-                  border: '1px solid rgba(36,144,237,0.15)',
-                }}
-              >
-                <span
-                  className="font-mono text-xs font-bold"
-                  style={{ color: '#2490ed', minWidth: '3rem' }}
-                >
-                  {row.code}
-                </span>
-                <span className="text-xs" style={{ color: 'rgba(255,255,255,0.6)' }}>
-                  {row.label}
-                </span>
-              </div>
-            ))}
-          </div>
-          {d === 0 ? (
-            <p className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
-              The seven codes above reflect the full IICRC core set; published course tags will
-              appear here as your catalogue grows.
+          <div className={`p-5 ${marketingPanel}`}>
+            <Shield className="mb-3 h-5 w-5 text-emerald-600 dark:text-emerald-400" aria-hidden />
+            <p>
+              CARSI is a core pillar of the National Restoration Professionals Group (NRPG)
+              onboarding pathway. Our training is recognised by major Australian insurers including
+              IAG, Suncorp, and QBE as evidence of professional competency.
             </p>
-          ) : null}
-        </section>
+          </div>
+        </div>
+      </section>
 
-        {/* ── CTA ──────────────────────────────────────────────── */}
-        <section
-          className="mb-16 rounded-sm p-8"
-          style={{
-            background:
-              'linear-gradient(135deg, rgba(36,144,237,0.08) 0%, rgba(237,157,36,0.08) 100%)',
-            border: '1px solid rgba(255,255,255,0.08)',
-          }}
-        >
-          <h2 className="mb-2 text-lg font-semibold" style={{ color: 'rgba(255,255,255,0.95)' }}>
-            Ready to advance your career?
-          </h2>
-          <p className="mb-6 text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
-            Browse our full course catalogue or start with a 7-day free trial of Pro access.
-          </p>
-          <div className="flex flex-wrap gap-3">
-            <Link
-              href="/courses"
-              className="inline-flex items-center gap-2 rounded-sm px-5 py-2.5 text-sm font-medium text-white transition-all duration-200 hover:scale-[1.02]"
-              style={{ background: '#ed9d24' }}
+      <section className="mb-14 sm:mb-16" aria-label="IICRC disciplines">
+        <MarketingSectionHeader
+          eyebrow="Discipline coverage"
+          title="IICRC-aligned course catalogue"
+          body={
+            d > 0
+              ? `Published courses tagged across ${d} IICRC discipline${d === 1 ? '' : 's'} — each counting toward continuing education credits.`
+              : 'CEC accredited courses across all seven core IICRC disciplines.'
+          }
+        />
+        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          {disciplineRows.map((row) => (
+            <div
+              key={row.code}
+              className="flex items-center gap-3 rounded-xl border border-[#2490ed]/20 bg-[#eef7ff]/80 px-3 py-2.5 dark:border-[#2490ed]/25 dark:bg-[#2490ed]/10"
             >
-              Browse Courses <ArrowRight className="h-4 w-4" />
-            </Link>
-            <Link
-              href="/pricing"
-              className="inline-flex items-center rounded-sm px-5 py-2.5 text-sm font-medium transition-all duration-200 hover:text-white"
-              style={{
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                color: 'rgba(255,255,255,0.7)',
-              }}
-            >
-              View Pricing
-            </Link>
-          </div>
-        </section>
+              <span className="min-w-[3rem] font-mono text-xs font-bold text-[#146fc2] dark:text-[#8fd0ff]">
+                {row.code}
+              </span>
+              <span className={`text-sm ${marketingTextMuted}`}>{row.label}</span>
+            </div>
+          ))}
+        </div>
+      </section>
 
-        {/* ── IICRC Disclaimer ─────────────────────────────────── */}
-        <section
-          className="rounded-sm p-5"
-          style={{
-            background: 'rgba(255,255,255,0.02)',
-            border: '1px solid rgba(255,255,255,0.06)',
-          }}
-          aria-label="IICRC disclaimer"
-        >
-          <p className="text-xs leading-relaxed italic" style={{ color: 'rgba(255,255,255,0.35)' }}>
-            The IICRC does not endorse any educational provider, product, offering, or service. The
-            Institute expressly disclaims responsibility, endorsement or warranty for third-party
-            publications, products, certifications, or instruction. CEC accreditation does not
-            award IICRC Certification; it only qualifies continuing education hours where applicable.
-          </p>
-          <p className="mt-3 text-xs font-medium" style={{ color: 'rgba(255,255,255,0.5)' }}>
-            CARSI courses are IICRC CEC accredited where stated.
-          </p>
-        </section>
-      </div>
-    </main>
+      <section
+        className="mb-10 rounded-2xl border border-[#2490ed]/20 bg-gradient-to-br from-[#eef7ff] via-white to-[#f8fbff] p-6 sm:p-8 dark:border-[#2490ed]/25 dark:from-[#2490ed]/10 dark:via-[#0a0f18] dark:to-[#060a14]"
+        aria-label="Get started"
+      >
+        <h2 className={`text-xl font-bold sm:text-2xl ${marketingTextStrong}`}>
+          Ready to advance your career?
+        </h2>
+        <p className={`mt-2 max-w-xl ${marketingBodySm}`}>
+          Browse the full course catalogue or explore subscription options for unlimited access.
+        </p>
+        <div className="mt-6 flex flex-wrap gap-3">
+          <Link href="/courses" className={marketingBtnPrimary}>
+            Browse courses
+            <ArrowRight className="h-4 w-4" aria-hidden />
+          </Link>
+          <Link href="/pricing" className={marketingBtnSecondary}>
+            View pricing
+          </Link>
+        </div>
+      </section>
+
+      <section className={`p-5 ${marketingPanel}`} aria-label="IICRC disclaimer">
+        <p className={`text-xs leading-relaxed italic ${marketingTextMuted}`}>
+          The IICRC does not endorse any educational provider, product, offering, or service. The
+          Institute expressly disclaims responsibility, endorsement or warranty for third-party
+          publications, products, certifications, or instruction. CEC accreditation does not award
+          IICRC Certification; it only qualifies continuing education hours where applicable.
+        </p>
+        <p className={`mt-3 text-xs font-medium ${marketingTextStrong}`}>
+          CARSI courses are IICRC CEC accredited where stated.
+        </p>
+      </section>
+    </MarketingPageShell>
   );
 }
