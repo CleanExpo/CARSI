@@ -107,6 +107,11 @@ export default function RootLayout({
       <head>
         <OrganizationSchema />
         <WebsiteSchema />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('carsi-theme');if(t==='dark')document.documentElement.classList.add('dark');}catch(e){}})();`,
+          }}
+        />
       </head>
       <body className={`${outfit.variable} ${dmSans.variable} font-sans`} suppressHydrationWarning>
         <AuthProvider>
