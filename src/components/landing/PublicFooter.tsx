@@ -1,6 +1,11 @@
-import { PUBLIC_SHELL_INNER_CLASS } from '@/components/landing/public-shell-width';
+import {
+  PUBLIC_CHROME_BODY_CLASS,
+  PUBLIC_CHROME_FOOTER_CLASS,
+  PUBLIC_CHROME_HEADING_CLASS,
+  PUBLIC_SHELL_INNER_CLASS,
+} from '@/components/landing/public-shell-width';
+import { PublicLogo } from '@/components/landing/PublicLogo';
 import { AcronymTooltip } from '@/components/ui/AcronymTooltip';
-import Image from 'next/image';
 import Link from 'next/link';
 
 /**
@@ -15,22 +20,22 @@ const industries = [
   { slug: 'commercial-cleaning', label: 'Commercial Cleaning' },
 ];
 
+const footerLinkClass = `inline-flex min-h-6 items-center ${PUBLIC_CHROME_BODY_CLASS} transition-colors hover:text-white`;
+
 export function PublicFooter() {
   return (
-    <footer className="bg-white py-12" style={{ borderTop: '1px solid rgba(15,23,42,0.1)' }}>
-      <div className={PUBLIC_SHELL_INNER_CLASS}>
+    <footer className={`relative py-12 ${PUBLIC_CHROME_FOOTER_CLASS}`}>
+      <div
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_55%_at_100%_100%,rgba(36,144,237,0.1),transparent_62%)]"
+        aria-hidden
+      />
+      <div className={`relative ${PUBLIC_SHELL_INNER_CLASS}`}>
         <div className="mb-8 grid gap-8 sm:grid-cols-2 lg:grid-cols-[1.25fr_1fr_1fr_1fr]">
           <div>
             <div className="mb-3 flex items-center gap-2">
-              <Image
-                src="/logo/logo1.png"
-                alt="CARSI"
-                width={480}
-                height={96}
-                className="h-auto w-auto max-h-20 max-w-[min(360px,60vw)] object-contain object-left"
-              />
+              <PublicLogo variant="footer" />
             </div>
-            <p className="text-xs leading-relaxed text-slate-600">
+            <p className={`text-xs leading-relaxed ${PUBLIC_CHROME_BODY_CLASS}`}>
               Australia&apos;s industry training leader.
               <br />
               24/7 online. <AcronymTooltip term="IICRC" />
@@ -39,13 +44,8 @@ export function PublicFooter() {
           </div>
 
           <div>
-            <p
-              className="mb-3 text-[10px] font-semibold tracking-wide uppercase"
-              style={{ color: '#64748b' }}
-            >
-              Platform
-            </p>
-            <ul className="space-y-2 text-xs text-slate-600">
+            <p className={`mb-3 ${PUBLIC_CHROME_HEADING_CLASS}`}>Platform</p>
+            <ul className={`space-y-2 text-xs ${PUBLIC_CHROME_BODY_CLASS}`}>
               {[
                 { label: 'Courses', href: '/courses' },
                 { label: 'Pathways', href: '/pathways' },
@@ -59,7 +59,7 @@ export function PublicFooter() {
                 { label: 'Podcast', href: '/podcast' },
               ].map((item) => (
                 <li key={item.label}>
-                  <Link href={item.href} className="inline-flex min-h-6 items-center hover:text-slate-950">
+                  <Link href={item.href} className={footerLinkClass}>
                     {item.label}
                   </Link>
                 </li>
@@ -68,19 +68,11 @@ export function PublicFooter() {
           </div>
 
           <div>
-            <p
-              className="mb-3 text-[10px] font-semibold tracking-wide uppercase"
-              style={{ color: '#64748b' }}
-            >
-              Industries
-            </p>
-            <ul className="space-y-2 text-xs text-slate-600">
+            <p className={`mb-3 ${PUBLIC_CHROME_HEADING_CLASS}`}>Industries</p>
+            <ul className={`space-y-2 text-xs ${PUBLIC_CHROME_BODY_CLASS}`}>
               {industries.slice(0, 4).map((industry) => (
                 <li key={industry.slug}>
-                  <Link
-                    href={`/industries/${industry.slug}`}
-                    className="inline-flex min-h-6 items-center hover:text-slate-950"
-                  >
+                  <Link href={`/industries/${industry.slug}`} className={footerLinkClass}>
                     {industry.label}
                   </Link>
                 </li>
@@ -89,24 +81,16 @@ export function PublicFooter() {
           </div>
 
           <div>
-            <p
-              className="mb-3 text-[10px] font-semibold tracking-wide uppercase"
-              style={{ color: '#64748b' }}
-            >
-              Contact
-            </p>
-            <ul className="space-y-2 text-xs text-slate-600">
+            <p className={`mb-3 ${PUBLIC_CHROME_HEADING_CLASS}`}>Contact</p>
+            <ul className={`space-y-2 text-xs ${PUBLIC_CHROME_BODY_CLASS}`}>
               <li>PO Box 4309, Forest Lake QLD 4078</li>
               <li>
-                <a href="/contact" className="inline-flex min-h-6 items-center hover:text-slate-950">
+                <a href="/contact" className={footerLinkClass}>
                   Contact CARSI support
                 </a>
               </li>
               <li>
-                <a
-                  href="tel:+61457123005"
-                  className="inline-flex min-h-6 items-center hover:text-slate-950"
-                >
+                <a href="tel:+61457123005" className={footerLinkClass}>
                   0457 123 005
                 </a>
               </li>
@@ -129,7 +113,7 @@ export function PublicFooter() {
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex min-h-6 items-center text-[10px] text-slate-600 transition-colors hover:text-slate-950"
+                  className={`inline-flex min-h-6 items-center text-[10px] ${PUBLIC_CHROME_BODY_CLASS} transition-colors hover:text-white`}
                   aria-label={social.label}
                 >
                   {social.label}
@@ -139,17 +123,14 @@ export function PublicFooter() {
           </div>
         </div>
 
-        <div
-          className="flex flex-col items-center justify-between gap-2 pt-6 sm:flex-row"
-          style={{ borderTop: '1px solid rgba(15,23,42,0.1)' }}
-        >
-          <p className="text-[11px] text-slate-500">
+        <div className="flex flex-col items-center justify-between gap-2 border-t border-white/[0.08] pt-6 sm:flex-row">
+          <p className={`text-[11px] ${PUBLIC_CHROME_BODY_CLASS}`}>
             © 2026 CARSI Pty Ltd. All rights reserved. ·{' '}
-            <Link href="/admin" className="inline-flex min-h-6 items-center hover:text-slate-950">
+            <Link href="/admin" className="transition-colors hover:text-white">
               Staff login
             </Link>
           </p>
-          <p className="text-[11px] text-slate-500">
+          <p className={`text-[11px] ${PUBLIC_CHROME_BODY_CLASS}`}>
             <AcronymTooltip term="IICRC" />
             <span> CEC continuing education — not an </span>
             <AcronymTooltip term="RTO" />
