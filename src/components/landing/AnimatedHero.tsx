@@ -2,13 +2,7 @@
 
 import { PUBLIC_SHELL_INNER_CLASS } from '@/components/landing/public-shell-width';
 import { motion, useReducedMotion } from 'framer-motion';
-import {
-  ArrowRight,
-  Award,
-  BookOpen,
-  CheckCircle2,
-  Search,
-} from 'lucide-react';
+import { ArrowRight, Award, BookOpen, CheckCircle2, Search } from 'lucide-react';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 
@@ -59,7 +53,10 @@ function LearningPreview() {
           <div className="absolute inset-x-4 top-4 flex gap-1">
             {[52, 38, 66, 30, 72].map((w) => (
               <span key={w} className="h-1 flex-1 overflow-hidden rounded-full bg-white/20">
-                <span className="block h-full rounded-full bg-[#6ebcff]" style={{ width: `${w}%` }} />
+                <span
+                  className="block h-full rounded-full bg-[#6ebcff]"
+                  style={{ width: `${w}%` }}
+                />
               </span>
             ))}
           </div>
@@ -94,9 +91,14 @@ function LearningPreview() {
             ['CEC', 'Tracked'],
             ['100%', 'Online'],
           ].map(([value, label]) => (
-            <div key={label} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-center">
+            <div
+              key={label}
+              className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-center"
+            >
               <p className="font-semibold text-slate-950">{value}</p>
-              <p className="text-[10px] font-medium tracking-wider text-slate-500 uppercase">{label}</p>
+              <p className="text-[10px] font-medium tracking-wider text-slate-500 uppercase">
+                {label}
+              </p>
             </div>
           ))}
         </div>
@@ -166,7 +168,11 @@ export function AnimatedHero({ benefits }: AnimatedHeroProps) {
 
             <motion.ul variants={staggerContainer} className="mt-8 grid gap-3 sm:grid-cols-2">
               {topBenefits.map((benefit) => (
-                <motion.li key={benefit} variants={fadeInUp} className="flex items-start gap-2.5 text-sm text-slate-700">
+                <motion.li
+                  key={benefit}
+                  variants={fadeInUp}
+                  className="flex items-start gap-2.5 text-sm text-slate-700"
+                >
                   <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" aria-hidden />
                   <span>{benefit}</span>
                 </motion.li>
@@ -203,9 +209,16 @@ export function AnimatedStats({ stats }: AnimatedStatsProps) {
       <div className={PUBLIC_SHELL_INNER_CLASS}>
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           {stats.map((stat) => (
-            <div key={stat.label} className="rounded-lg border border-slate-200 bg-[#f8fbff] px-4 py-5 text-center">
-              <p className="text-2xl font-bold text-[#146fc2] tabular-nums sm:text-3xl">{stat.value}</p>
-              <p className="mt-1 text-xs font-semibold tracking-wider text-slate-500 uppercase">{stat.label}</p>
+            <div
+              key={stat.label}
+              className="rounded-lg border border-slate-200 bg-[#f8fbff] px-4 py-5 text-center"
+            >
+              <p className="text-2xl font-bold text-[#146fc2] tabular-nums sm:text-3xl">
+                {stat.value}
+              </p>
+              <p className="mt-1 text-xs font-semibold tracking-wider text-slate-500 uppercase">
+                {stat.label}
+              </p>
             </div>
           ))}
         </div>
@@ -250,7 +263,9 @@ export function AnimatedSection({
   minimalHeader = false,
 }: AnimatedSectionProps) {
   return (
-    <section className={`relative border-t border-slate-200 bg-[#f6f8fb] py-14 md:py-20 ${className}`}>
+    <section
+      className={`relative border-t border-slate-200 bg-[#f6f8fb] py-14 md:py-20 ${className}`}
+    >
       <div className={PUBLIC_SHELL_INNER_CLASS}>
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
