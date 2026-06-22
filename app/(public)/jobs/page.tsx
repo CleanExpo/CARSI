@@ -1,7 +1,26 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { BreadcrumbSchema } from '@/components/seo';
+import { MarketingPageShell, marketingPageInnerClass } from '@/components/marketing/MarketingPageShell';
+import {
+  HubCategoryPills,
+  HubCtaBanner,
+  HubEmptyState,
+  HubPageHeader,
+  HubPlaceholderCard,
+  HubSecondaryPills,
+} from '@/components/marketing/hub/HubUi';
 import { getBackendOrigin } from '@/lib/env/public-url';
+import {
+  marketingBtnSecondary,
+  marketingFilterPillActive,
+  marketingFilterPillInactive,
+  marketingHubCard,
+  marketingTextStrong,
+  marketingTextMuted,
+  marketingTextSubtle,
+  marketingTopicPill,
+} from '@/lib/marketing/marketing-ui';
 
 export const metadata: Metadata = {
   title: 'Jobs | CARSI Industry Hub',
@@ -124,42 +143,41 @@ function JobCard({ job }: { job: JobSummary }) {
   return (
     <Link
       href={`/jobs/${job.id}`}
-      className="group flex flex-col gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5 transition-all duration-200 hover:border-[rgba(36,144,237,0.35)] hover:bg-white/[0.06] hover:shadow-[0_8px_40px_rgba(36,144,237,0.12)]"
+      className={`group flex flex-col gap-3 p-5 ${marketingHubCard}`}
     >
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
-          <h3 className="truncate text-base leading-snug font-semibold text-white/90 transition-colors group-hover:text-[#2490ed]">
+          <h3
+            className={`truncate text-base leading-snug font-semibold transition-colors group-hover:text-[#2490ed] ${marketingTextStrong}`}
+          >
             {job.title}
           </h3>
-          <p className="mt-0.5 truncate text-sm text-white/50">{job.company_name}</p>
+          <p className={`mt-0.5 truncate text-sm ${marketingTextMuted}`}>{job.company_name}</p>
         </div>
         {job.featured && (
-          <span className="inline-flex flex-shrink-0 items-center rounded-full bg-[rgba(251,191,36,0.12)] px-2 py-0.5 text-xs font-medium text-[#fbbf24]">
+          <span className="inline-flex flex-shrink-0 items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700 dark:bg-[rgba(251,191,36,0.12)] dark:text-[#fbbf24]">
             Featured
           </span>
         )}
       </div>
 
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm text-white/50">
-        <span className="inline-flex items-center rounded-md bg-white/[0.06] px-2 py-0.5 text-xs">
+      <div className={`flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm ${marketingTextMuted}`}>
+        <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs ${marketingTopicPill}`}>
           {EMPLOYMENT_TYPE_LABELS[job.employment_type] ?? job.employment_type}
         </span>
         <span className="flex items-center gap-1.5">
           <span
-            className={`h-1.5 w-1.5 flex-shrink-0 rounded-full ${job.is_remote ? 'bg-[#34d399]' : 'bg-white/30'}`}
+            className={`h-1.5 w-1.5 flex-shrink-0 rounded-full ${job.is_remote ? 'bg-emerald-500' : 'bg-slate-400 dark:bg-white/30'}`}
           />
           {locationStr}
         </span>
-        {salary && <span className="font-medium text-[#34d399]">{salary}</span>}
+        {salary && <span className="font-medium text-emerald-700 dark:text-[#34d399]">{salary}</span>}
       </div>
 
       {job.industry_categories.length > 0 && (
         <div className="flex flex-wrap gap-1">
           {job.industry_categories.slice(0, 3).map((cat) => (
-            <span
-              key={cat}
-              className="rounded-md bg-white/[0.04] px-2 py-0.5 text-xs text-white/35"
-            >
+            <span key={cat} className={`rounded-md px-2 py-0.5 text-xs ${marketingTopicPill}`}>
               {cat}
             </span>
           ))}
@@ -167,37 +185,21 @@ function JobCard({ job }: { job: JobSummary }) {
       )}
 
       <div className="mt-auto flex items-center justify-between gap-2">
-        <p className="text-xs text-white/25">{timeAgo(job.created_at)}</p>
+        <p className={`text-xs ${marketingTextSubtle}`}>{timeAgo(job.created_at)}</p>
         <div className="flex items-center gap-2">
           {job.source !== 'manual' && (
-            <span className="text-xs text-white/20 capitalize">via {job.source}</span>
+            <span className={`text-xs capitalize ${marketingTextSubtle}`}>via {job.source}</span>
           )}
           {job.apply_url ? (
-            <span className="text-xs font-medium text-[#2490ed]/60 transition-colors group-hover:text-[#2490ed]">
+            <span className="text-xs font-medium text-[#146fc2] transition-colors group-hover:text-[#2490ed] dark:text-[#7ec5ff]">
               Apply ↗
             </span>
           ) : (
-            <span className="text-xs text-white/20">View →</span>
+            <span className={`text-xs ${marketingTextSubtle}`}>View →</span>
           )}
         </div>
       </div>
     </Link>
-  );
-}
-
-function PlaceholderCard({ index }: { index: number }) {
-  return (
-    <div className="flex flex-col gap-3 rounded-2xl border border-dashed border-white/[0.06] bg-white/[0.01] p-5">
-      <div className="space-y-1.5">
-        <div className="h-5 w-3/4 animate-pulse rounded bg-white/[0.05]" />
-        <div className="h-4 w-1/2 animate-pulse rounded bg-white/[0.03]" />
-      </div>
-      <div className="flex gap-2">
-        <div className="h-5 w-16 animate-pulse rounded-md bg-white/[0.04]" />
-        <div className="h-5 w-20 animate-pulse rounded bg-white/[0.03]" />
-      </div>
-      <p className="mt-auto text-xs text-white/20">Job slot {index} — positions incoming</p>
-    </div>
   );
 }
 
@@ -231,165 +233,115 @@ export default async function JobsPage({
     <>
       <BreadcrumbSchema items={breadcrumbs} />
 
-      <main className="min-h-screen bg-[#050505] px-4 py-16">
-        <div className="mx-auto max-w-7xl">
-          {/* Header */}
-          <div className="mb-12">
-            <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-[rgba(36,144,237,0.1)] px-4 py-1.5 text-sm font-medium text-[#2490ed]">
+      <MarketingPageShell
+        id="main-content"
+        innerClassName={`${marketingPageInnerClass} mx-auto max-w-7xl`}
+      >
+        <HubPageHeader
+          eyebrow={
+            <>
               <span className="h-1.5 w-1.5 rounded-full bg-[#2490ed]" />
               CARSI Industry Hub
-            </div>
-            <h1 className="mb-4 text-4xl font-bold tracking-tight text-white md:text-5xl">
-              Industry Jobs
-            </h1>
-            <p className="max-w-2xl text-lg text-white/50">
-              Jobs across the Australian restoration, HVAC, flooring, and indoor environment
-              industries. Posted directly by employers — no recruitment fees.
-            </p>
-            {total > 0 && <p className="mt-2 text-sm text-white/30">{total} active listings</p>}
-          </div>
+            </>
+          }
+          title="Industry Jobs"
+          description="Jobs across the Australian restoration, HVAC, flooring, and indoor environment industries. Posted directly by employers — no recruitment fees."
+          meta={total > 0 ? <span>{total} active listings</span> : undefined}
+        />
 
-          {/* Category filter */}
-          <div className="mb-4 flex flex-wrap gap-2">
-            <Link
-              href={state ? `/jobs?state=${state}` : '/jobs'}
-              className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
-                !category
-                  ? 'bg-[#2490ed] text-white'
-                  : 'border border-white/[0.08] text-white/50 hover:border-[rgba(36,144,237,0.35)] hover:text-white/80'
-              }`}
-            >
-              All Categories
-            </Link>
-            {CATEGORIES.map((cat) => (
-              <Link
-                key={cat}
-                href={`/jobs?category=${encodeURIComponent(cat)}${state ? `&state=${state}` : ''}`}
-                className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
-                  category === cat
-                    ? 'bg-[#2490ed] text-white'
-                    : 'border border-white/[0.08] text-white/50 hover:border-[rgba(36,144,237,0.35)] hover:text-white/80'
-                }`}
-              >
-                {cat}
-              </Link>
-            ))}
-          </div>
-
-          {/* State filter */}
-          <div className="mb-10 flex flex-wrap gap-2">
-            <Link
-              href={category ? `/jobs?category=${encodeURIComponent(category)}` : '/jobs'}
-              className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
-                !state
-                  ? 'bg-white/[0.1] text-white/70'
-                  : 'border border-white/[0.06] text-white/40 hover:text-white/70'
-              }`}
-            >
-              All States
-            </Link>
-            {AU_STATES.map((st) => (
-              <Link
-                key={st}
-                href={`/jobs?${category ? `category=${encodeURIComponent(category)}&` : ''}state=${st}`}
-                className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
-                  state === st
-                    ? 'bg-white/[0.1] text-white/70'
-                    : 'border border-white/[0.06] text-white/40 hover:text-white/70'
-                }`}
-              >
-                {st}
-              </Link>
-            ))}
-          </div>
-
-          {/* Post a job CTA */}
-          <div className="mb-10 flex items-center justify-between rounded-2xl border border-white/[0.06] bg-white/[0.02] px-6 py-4">
-            <div>
-              <p className="text-sm font-medium text-white/80">Hiring in the industry?</p>
-              <p className="text-xs text-white/40">
-                Post a job for free — reviewed and live within 24 hours. 30-day listing.
-              </p>
-            </div>
-            <Link
-              href="/jobs/submit"
-              className="rounded-xl bg-[#2490ed] px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-            >
-              Post a Job
-            </Link>
-          </div>
-
-          {/* Listings */}
-          {jobs.length === 0 && placeholderCount === 0 ? (
-            <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-16 text-center">
-              <p className="text-white/40">
-                {category || state
-                  ? 'No listings match your filters — try a different combination or post a job.'
-                  : 'No listings yet — be the first to post a job above.'}
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {jobs.map((job) => (
-                <JobCard key={job.id} job={job} />
-              ))}
-              {Array.from({ length: placeholderCount }, (_, i) => (
-                <PlaceholderCard key={`placeholder-${i}`} index={jobs.length + i + 1} />
-              ))}
-            </div>
-          )}
-
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <nav className="mt-10 flex items-center justify-center gap-2" aria-label="Pagination">
-              {page > 1 && (
-                <Link
-                  href={buildPageUrl(page - 1)}
-                  className="rounded-xl border border-white/[0.08] px-4 py-2 text-sm text-white/50 transition-colors hover:border-[rgba(36,144,237,0.35)] hover:text-white/80"
-                >
-                  ← Previous
-                </Link>
-              )}
-              <div className="flex items-center gap-1">
-                {Array.from({ length: totalPages }, (_, i) => i + 1)
-                  .filter((p) => p === 1 || p === totalPages || Math.abs(p - page) <= 2)
-                  .reduce<(number | 'ellipsis')[]>((acc, p, idx, arr) => {
-                    if (idx > 0 && p - (arr[idx - 1] as number) > 1) acc.push('ellipsis');
-                    acc.push(p);
-                    return acc;
-                  }, [])
-                  .map((p, idx) =>
-                    p === 'ellipsis' ? (
-                      <span key={`ellipsis-${idx}`} className="px-2 text-white/25">
-                        …
-                      </span>
-                    ) : (
-                      <Link
-                        key={p}
-                        href={buildPageUrl(p as number)}
-                        className={`min-w-[36px] rounded-xl px-3 py-2 text-center text-sm transition-colors ${
-                          p === page
-                            ? 'bg-[#2490ed] text-white'
-                            : 'border border-white/[0.08] text-white/50 hover:border-[rgba(36,144,237,0.35)] hover:text-white/80'
-                        }`}
-                      >
-                        {p}
-                      </Link>
-                    )
-                  )}
-              </div>
-              {page < totalPages && (
-                <Link
-                  href={buildPageUrl(page + 1)}
-                  className="rounded-xl border border-white/[0.08] px-4 py-2 text-sm text-white/50 transition-colors hover:border-[rgba(36,144,237,0.35)] hover:text-white/80"
-                >
-                  Next →
-                </Link>
-              )}
-            </nav>
-          )}
+        <div className="mb-4">
+          <HubCategoryPills
+            basePath="/jobs"
+            categories={CATEGORIES}
+            activeCategory={category}
+            queryParams={{ state }}
+            allLabel="All Categories"
+          />
         </div>
-      </main>
+
+        <div className="mb-10">
+          <HubSecondaryPills
+            items={AU_STATES.map((st) => ({ value: st, label: st }))}
+            activeValue={state}
+            allLabel="All States"
+            buildHref={(value) => {
+              const params = new URLSearchParams();
+              if (category) params.set('category', category);
+              if (value) params.set('state', value);
+              const qs = params.toString();
+              return qs ? `/jobs?${qs}` : '/jobs';
+            }}
+          />
+        </div>
+
+        <HubCtaBanner
+          title="Hiring in the industry?"
+          description="Post a job for free — reviewed and live within 24 hours. 30-day listing."
+          href="/jobs/submit"
+          ctaLabel="Post a Job"
+        />
+
+        {jobs.length === 0 && placeholderCount === 0 ? (
+          <HubEmptyState>
+            {category || state
+              ? 'No listings match your filters — try a different combination or post a job.'
+              : 'No listings yet — be the first to post a job above.'}
+          </HubEmptyState>
+        ) : (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {jobs.map((job) => (
+              <JobCard key={job.id} job={job} />
+            ))}
+            {Array.from({ length: placeholderCount }, (_, i) => (
+              <HubPlaceholderCard
+                key={`placeholder-${i}`}
+                message={`Job slot ${jobs.length + i + 1} — positions incoming`}
+              />
+            ))}
+          </div>
+        )}
+
+        {totalPages > 1 && (
+          <nav className="mt-10 flex items-center justify-center gap-2" aria-label="Pagination">
+            {page > 1 && (
+              <Link href={buildPageUrl(page - 1)} className={marketingBtnSecondary}>
+                ← Previous
+              </Link>
+            )}
+            <div className="flex items-center gap-1">
+              {Array.from({ length: totalPages }, (_, i) => i + 1)
+                .filter((p) => p === 1 || p === totalPages || Math.abs(p - page) <= 2)
+                .reduce<(number | 'ellipsis')[]>((acc, p, idx, arr) => {
+                  if (idx > 0 && p - (arr[idx - 1] as number) > 1) acc.push('ellipsis');
+                  acc.push(p);
+                  return acc;
+                }, [])
+                .map((p, idx) =>
+                  p === 'ellipsis' ? (
+                    <span key={`ellipsis-${idx}`} className={`px-2 ${marketingTextSubtle}`}>
+                      …
+                    </span>
+                  ) : (
+                    <Link
+                      key={p}
+                      href={buildPageUrl(p as number)}
+                      className={`min-w-[36px] rounded-xl px-3 py-2 text-center text-sm transition-colors ${
+                        p === page ? marketingFilterPillActive : marketingFilterPillInactive
+                      }`}
+                    >
+                      {p}
+                    </Link>
+                  )
+                )}
+            </div>
+            {page < totalPages && (
+              <Link href={buildPageUrl(page + 1)} className={marketingBtnSecondary}>
+                Next →
+              </Link>
+            )}
+          </nav>
+        )}
+      </MarketingPageShell>
     </>
   );
 }

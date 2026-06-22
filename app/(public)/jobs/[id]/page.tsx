@@ -2,7 +2,25 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { BreadcrumbSchema, JobPostingSchema } from '@/components/seo';
+import {
+  MarketingPageShell,
+  marketingPageInnerNarrowClass,
+} from '@/components/marketing/MarketingPageShell';
+import { HubSuggestBanner } from '@/components/marketing/hub/HubUi';
 import { getBackendOrigin } from '@/lib/env/public-url';
+import {
+  marketingBackLink,
+  marketingBtnPrimary,
+  marketingBtnSecondary,
+  marketingHubSectionLabel,
+  marketingLink,
+  marketingMetaCard,
+  marketingMetaLabel,
+  marketingTextMuted,
+  marketingTextStrong,
+  marketingTextSubtle,
+  marketingTopicPill,
+} from '@/lib/marketing/marketing-ui';
 
 const BACKEND_URL = getBackendOrigin();
 
@@ -127,158 +145,135 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
         applyUrl={job.apply_url ?? undefined}
       />
 
-      <main className="min-h-screen bg-[#050505] px-4 py-16">
-        <div className="mx-auto max-w-3xl">
-          {/* Back link */}
-          <Link
-            href="/jobs"
-            className="mb-8 inline-flex items-center gap-2 text-sm text-white/40 transition-colors hover:text-white/70"
-          >
-            ← Back to Jobs
-          </Link>
+      <MarketingPageShell
+        id="main-content"
+        innerClassName={`${marketingPageInnerNarrowClass} mx-auto max-w-3xl`}
+      >
+        <Link href="/jobs" className={`mb-8 ${marketingBackLink}`}>
+          ← Back to Jobs
+        </Link>
 
-          {/* Title + company */}
-          <div className="mb-6">
-            <div className="mb-2 flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center rounded-full bg-[rgba(36,144,237,0.12)] px-3 py-1 text-xs font-medium text-[#2490ed]">
-                {EMPLOYMENT_TYPE_LABELS[job.employment_type] ?? job.employment_type}
+        <div className="mb-6">
+          <div className="mb-2 flex flex-wrap items-center gap-2">
+            <span className="inline-flex items-center rounded-full bg-[#eef7ff] px-3 py-1 text-xs font-medium text-[#146fc2] dark:bg-[rgba(36,144,237,0.12)] dark:text-[#2490ed]">
+              {EMPLOYMENT_TYPE_LABELS[job.employment_type] ?? job.employment_type}
+            </span>
+            {job.is_remote && (
+              <span className="inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700 dark:bg-[rgba(52,211,153,0.12)] dark:text-[#34d399]">
+                Remote
               </span>
-              {job.is_remote && (
-                <span className="inline-flex items-center rounded-full bg-[rgba(52,211,153,0.12)] px-3 py-1 text-xs font-medium text-[#34d399]">
-                  Remote
-                </span>
-              )}
-              {job.featured && (
-                <span className="inline-flex items-center rounded-full bg-[rgba(251,191,36,0.12)] px-3 py-1 text-xs font-medium text-[#fbbf24]">
-                  Featured
-                </span>
-              )}
-            </div>
-            <h1 className="text-3xl leading-tight font-bold text-white md:text-4xl">{job.title}</h1>
-            <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-lg text-white/60">
-              {job.company_website ? (
-                <a
-                  href={job.company_website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-medium text-[#2490ed] hover:underline"
-                >
-                  {job.company_name}
-                </a>
-              ) : (
-                <span className="font-medium">{job.company_name}</span>
-              )}
-              <span className="text-white/25">·</span>
-              <span className="text-base">{locationStr}</span>
-            </div>
-          </div>
-
-          {/* Key details */}
-          <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5">
-              <p className="mb-1 text-xs font-medium tracking-wider text-white/30 uppercase">
-                Location
-              </p>
-              <p className="text-base font-semibold text-white/90">{locationStr}</p>
-            </div>
-            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5">
-              <p className="mb-1 text-xs font-medium tracking-wider text-white/30 uppercase">
-                Employment Type
-              </p>
-              <p className="text-base font-semibold text-white/90">
-                {EMPLOYMENT_TYPE_LABELS[job.employment_type] ?? job.employment_type}
-              </p>
-            </div>
-            {salary && (
-              <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5">
-                <p className="mb-1 text-xs font-medium tracking-wider text-white/30 uppercase">
-                  Salary
-                </p>
-                <p className="text-base font-semibold text-[#34d399]">{salary}</p>
-              </div>
             )}
-            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5">
-              <p className="mb-1 text-xs font-medium tracking-wider text-white/30 uppercase">
-                Listing Expires
-              </p>
-              <p className="text-base font-semibold text-white/90">
-                {new Date(job.valid_through).toLocaleDateString('en-AU', {
-                  day: 'numeric',
-                  month: 'long',
-                  year: 'numeric',
-                })}
-              </p>
-            </div>
+            {job.featured && (
+              <span className="inline-flex items-center rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-700 dark:bg-[rgba(251,191,36,0.12)] dark:text-[#fbbf24]">
+                Featured
+              </span>
+            )}
           </div>
-
-          {/* Description */}
-          <section className="mb-8">
-            <h2 className="mb-3 text-lg font-semibold text-white/80">About the Role</h2>
-            <div className="leading-relaxed whitespace-pre-line text-white/60">
-              {job.description}
-            </div>
-          </section>
-
-          {/* Industry categories */}
-          {job.industry_categories.length > 0 && (
-            <section className="mb-8">
-              <h2 className="mb-3 text-sm font-semibold tracking-wider text-white/30 uppercase">
-                Industry
-              </h2>
-              <div className="flex flex-wrap gap-2">
-                {job.industry_categories.map((cat) => (
-                  <Link
-                    key={cat}
-                    href={`/jobs?category=${encodeURIComponent(cat)}`}
-                    className="rounded-md bg-white/[0.05] px-3 py-1 text-sm text-white/50 transition-colors hover:bg-white/[0.08] hover:text-white/80"
-                  >
-                    {cat}
-                  </Link>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* Apply CTAs */}
-          <div className="flex flex-wrap gap-3">
-            {job.apply_url && (
+          <h1 className={`text-3xl leading-tight font-bold md:text-4xl ${marketingTextStrong}`}>
+            {job.title}
+          </h1>
+          <div className={`mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-lg ${marketingTextMuted}`}>
+            {job.company_website ? (
               <a
-                href={job.apply_url}
+                href={job.company_website}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-xl bg-[#2490ed] px-6 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                className={`font-medium ${marketingLink}`}
               >
-                Apply Now ↗
+                {job.company_name}
               </a>
+            ) : (
+              <span className="font-medium">{job.company_name}</span>
             )}
-            {job.apply_email && (
-              <a
-                href={`mailto:${job.apply_email}?subject=Application: ${encodeURIComponent(job.title)}`}
-                className="rounded-xl border border-[rgba(36,144,237,0.4)] px-6 py-3 text-sm font-semibold text-[#2490ed] transition-colors hover:bg-[rgba(36,144,237,0.08)]"
-              >
-                Apply via Email
-              </a>
-            )}
-            <Link
-              href="/jobs"
-              className="rounded-xl border border-white/[0.1] px-6 py-3 text-sm font-semibold text-white/50 transition-colors hover:text-white/80"
-            >
-              ← All Jobs
-            </Link>
-          </div>
-
-          {/* Post a job nudge */}
-          <div className="mt-12 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 text-center">
-            <p className="text-sm font-medium text-white/60">Hiring in the industry?</p>
-            <Link
-              href="/jobs/submit"
-              className="mt-2 inline-block rounded-xl bg-white/[0.06] px-4 py-2 text-sm font-semibold text-white/70 transition-colors hover:bg-white/[0.1]"
-            >
-              Post a Job for Free
-            </Link>
+            <span className={marketingTextSubtle}>·</span>
+            <span className="text-base">{locationStr}</span>
           </div>
         </div>
-      </main>
+
+        <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className={marketingMetaCard}>
+            <p className={marketingMetaLabel}>Location</p>
+            <p className={`text-base font-semibold ${marketingTextStrong}`}>{locationStr}</p>
+          </div>
+          <div className={marketingMetaCard}>
+            <p className={marketingMetaLabel}>Employment Type</p>
+            <p className={`text-base font-semibold ${marketingTextStrong}`}>
+              {EMPLOYMENT_TYPE_LABELS[job.employment_type] ?? job.employment_type}
+            </p>
+          </div>
+          {salary && (
+            <div className={marketingMetaCard}>
+              <p className={marketingMetaLabel}>Salary</p>
+              <p className="text-base font-semibold text-emerald-700 dark:text-[#34d399]">{salary}</p>
+            </div>
+          )}
+          <div className={marketingMetaCard}>
+            <p className={marketingMetaLabel}>Listing Expires</p>
+            <p className={`text-base font-semibold ${marketingTextStrong}`}>
+              {new Date(job.valid_through).toLocaleDateString('en-AU', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+              })}
+            </p>
+          </div>
+        </div>
+
+        <section className="mb-8">
+          <h2 className={`mb-3 text-lg font-semibold ${marketingTextStrong}`}>About the Role</h2>
+          <div className={`leading-relaxed whitespace-pre-line ${marketingTextMuted}`}>
+            {job.description}
+          </div>
+        </section>
+
+        {job.industry_categories.length > 0 && (
+          <section className="mb-8">
+            <h2 className={marketingHubSectionLabel}>Industry</h2>
+            <div className="flex flex-wrap gap-2">
+              {job.industry_categories.map((cat) => (
+                <Link
+                  key={cat}
+                  href={`/jobs?category=${encodeURIComponent(cat)}`}
+                  className={`px-3 py-1 text-sm transition-colors hover:border-[#2490ed]/35 ${marketingTopicPill}`}
+                >
+                  {cat}
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
+        <div className="flex flex-wrap gap-3">
+          {job.apply_url && (
+            <a
+              href={job.apply_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={marketingBtnPrimary}
+            >
+              Apply Now ↗
+            </a>
+          )}
+          {job.apply_email && (
+            <a
+              href={`mailto:${job.apply_email}?subject=Application: ${encodeURIComponent(job.title)}`}
+              className={marketingBtnSecondary}
+            >
+              Apply via Email
+            </a>
+          )}
+          <Link href="/jobs" className={marketingBtnSecondary}>
+            ← All Jobs
+          </Link>
+        </div>
+
+        <HubSuggestBanner
+          title="Hiring in the industry?"
+          description="Post a job listing for free — reviewed and published within 24 hours."
+          href="/jobs/submit"
+          ctaLabel="Post a Job for Free"
+        />
+      </MarketingPageShell>
     </>
   );
 }
