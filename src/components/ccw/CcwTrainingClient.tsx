@@ -2,6 +2,12 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { MarketingGrowthLinks } from '@/components/marketing/MarketingGrowthLinks';
+import {
+  MarketingPageShell,
+  marketingPageInnerNarrowClass,
+} from '@/components/marketing/MarketingPageShell';
+import { ccwWorkshopPath } from '@/lib/marketing/marketing-growth-links';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { CCW_COURSE_ZIP_HREF, CCW_COURSE_ZIP_PATH } from '@/lib/ccw/course-zip';
@@ -170,13 +176,7 @@ export function CcwTrainingClient() {
   }, [password]);
 
   return (
-    <main className="relative pb-28 pt-12 md:pt-16">
-      <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-[min(420px,55vh)] bg-[radial-gradient(ellipse_70%_60%_at_50%_-10%,rgba(36,144,237,0.14),transparent_65%)]"
-        aria-hidden
-      />
-
-      <div className="relative mx-auto max-w-5xl px-4 sm:px-6">
+    <MarketingPageShell innerClassName={marketingPageInnerNarrowClass}>
         {/* Hero */}
         <header className="text-center">
           <p className="mb-4 text-[10px] font-semibold tracking-[0.22em] text-white/40 uppercase">
@@ -451,7 +451,8 @@ export function CcwTrainingClient() {
             ))}
           </div>
         </section>
-      </div>
-    </main>
+
+        <MarketingGrowthLinks currentHref={ccwWorkshopPath} />
+    </MarketingPageShell>
   );
 }
