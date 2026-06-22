@@ -132,6 +132,8 @@ export default function CcwRoadshowPage() {
       >
         <div className={marketingPageGlow} aria-hidden="true" />
 
+        <div className="relative z-10 mx-auto w-full max-w-6xl px-5 sm:px-8 lg:px-10">
+
         {/* Hero */}
         <section className="relative z-10 pb-12 sm:pb-14">
           <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(300px,420px)] lg:items-start lg:gap-12">
@@ -343,6 +345,7 @@ export default function CcwRoadshowPage() {
             </div>
           </div>
         </section>
+        </div>
       </main>
     </>
   );
