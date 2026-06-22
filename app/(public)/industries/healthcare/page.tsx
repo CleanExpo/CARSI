@@ -1,33 +1,32 @@
 import type { Metadata } from 'next';
 import { Stethoscope, Shield, Droplets, Flame } from 'lucide-react';
 import {
-  IndustryPageLayout,
-  IndustryHero,
-  IndustryWhySection,
-  IndustryCTA,
   ContractorAddOns,
+  IndustryCTA,
+  IndustryCrossLinks,
+  IndustryFAQSection,
+  IndustryHero,
+  IndustryPageLayout,
+  IndustryRecommendedCourses,
+  IndustryWhySection,
 } from '@/components/industries';
-import { IndustryRecommendedCourses } from '@/components/industries/IndustryRecommendedCourses';
 import { FAQSchema } from '@/components/seo/JsonLd';
+import { buildIndustryMetadata } from '@/lib/marketing/industry-metadata';
 
 export const dynamic = 'force-dynamic';
 
-export const metadata: Metadata = {
-  title: 'Healthcare IICRC CEC Training | CARSI',
-  description:
-    'NSQHS-aligned IICRC CEC training for Australian hospitals. AMRT, WRT, FSRT and ASD courses supporting Standard 3 compliance and JCI accreditation.',
-  keywords: [
+export const metadata: Metadata = buildIndustryMetadata(
+  'healthcare',
+  'Healthcare IICRC CEC Training | CARSI',
+  'NSQHS-aligned IICRC CEC training for Australian hospitals. AMRT, WRT, FSRT and ASD courses supporting Standard 3 compliance and JCI accreditation.',
+  [
     'healthcare IICRC CEC training',
     'hospital restoration training',
     'NSQHS Standard 3',
     'AMRT certification',
     'medical facility cleaning',
-  ],
-};
-
-// ---------------------------------------------------------------------------
-// Page Configuration
-// ---------------------------------------------------------------------------
+  ]
+);
 
 const ACCENT_COLOR = '#009688';
 
@@ -91,10 +90,6 @@ const whyCards = [
   },
 ];
 
-// ---------------------------------------------------------------------------
-// Page Component
-// ---------------------------------------------------------------------------
-
 export default async function HealthcareIndustryPage() {
   return (
     <IndustryPageLayout>
@@ -111,9 +106,10 @@ export default async function HealthcareIndustryPage() {
       />
 
       <IndustryWhySection
-        industryName="Healthcare Facilities"
+        industryName="healthcare facilities"
         headline="Built for"
         headlineAccent="patient safety"
+        accentColor={ACCENT_COLOR}
         cards={whyCards}
       />
 
@@ -123,16 +119,21 @@ export default async function HealthcareIndustryPage() {
         disciplines={['AMRT', 'WRT', 'FSRT', 'ASD']}
       />
 
-      <ContractorAddOns accentColor={ACCENT_COLOR} />
+      <ContractorAddOns accentColor={ACCENT_COLOR} variant="healthcare" />
+
+      <IndustryFAQSection industryName="Healthcare" faqs={faqs} />
 
       <IndustryCTA
-        subtitle="Healthcare Facility Training"
+        subtitle="Healthcare facility training"
         title="Healthcare Bundle"
         price="$295"
         description="WRT + AMRT + FSRT training + Healthcare-Specific Mould Risk Assessment bonus module. Online, self-paced — fits around 24/7 hospital shift patterns."
-        ctaText="Train Your Team"
+        ctaText="Train your team"
+        ctaHref="/contact"
         accentColor={ACCENT_COLOR}
       />
+
+      <IndustryCrossLinks currentSlug="healthcare" />
     </IndustryPageLayout>
   );
 }
