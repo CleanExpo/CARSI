@@ -21,7 +21,12 @@ import {
   Wrench,
 } from 'lucide-react';
 
+import { MarketingGrowthLinks } from '@/components/marketing/MarketingGrowthLinks';
 import { MarketingSectionHeader } from '@/components/marketing/MarketingSectionHeader';
+import {
+  MarketingPageShell,
+  marketingPageInnerWideClass,
+} from '@/components/marketing/MarketingPageShell';
 import { BreadcrumbSchema, FAQSchema } from '@/components/seo';
 import {
   marketingBtnPrimary,
@@ -29,7 +34,6 @@ import {
   marketingEyebrow,
   marketingEyebrowAmber,
   marketingIconWrap,
-  marketingPageGlow,
   marketingPanel,
   marketingPanelHover,
   marketingSection,
@@ -267,13 +271,10 @@ export function StartSmartHub({ siteUrl }: { siteUrl: string }) {
   ];
 
   return (
-    <main className="relative min-h-screen py-10 sm:py-14">
+    <MarketingPageShell innerClassName={marketingPageInnerWideClass}>
       <BreadcrumbSchema items={breadcrumbs} />
       <FAQSchema questions={startSmartHubFaqs} />
 
-      <div className={marketingPageGlow} aria-hidden="true" />
-
-      <div className="relative z-10 mx-auto max-w-7xl">
         <section className="grid gap-8 pb-10 pt-2 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
           <div>
             <div className="mb-5 flex flex-wrap gap-2">
@@ -446,8 +447,9 @@ export function StartSmartHub({ siteUrl }: { siteUrl: string }) {
             ]}
           />
         </section>
-      </div>
-    </main>
+
+        <MarketingGrowthLinks currentHref={startSmartBasePath} />
+    </MarketingPageShell>
   );
 }
 
@@ -463,13 +465,11 @@ export function StartSmartDetail({ page, siteUrl }: { page: StartSmartPage; site
   const leadPaths = getStartSmartLeadPathsForPage(page.slug);
 
   return (
-    <main className="relative min-h-screen py-10 sm:py-14">
+    <MarketingPageShell innerClassName={marketingPageInnerWideClass}>
       <BreadcrumbSchema items={breadcrumbs} />
       <FAQSchema questions={pageFaqs} />
 
-      <div className={marketingPageGlow} aria-hidden="true" />
-
-      <article className="relative z-10 mx-auto max-w-7xl">
+      <article>
         <header className="grid gap-8 pb-10 pt-2 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
           <div>
             <Link
@@ -648,8 +648,10 @@ export function StartSmartDetail({ page, siteUrl }: { page: StartSmartPage; site
             ))}
           </div>
         </section>
+
+        <MarketingGrowthLinks currentHref={startSmartBasePath} />
       </article>
-    </main>
+    </MarketingPageShell>
   );
 }
 
