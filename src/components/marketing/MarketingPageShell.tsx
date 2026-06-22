@@ -1,15 +1,14 @@
 import type { ReactNode } from 'react';
 
-import { marketingPageGlow } from '@/lib/marketing/marketing-ui';
+import { marketingPageBg, marketingPageGlow } from '@/lib/marketing/marketing-ui';
 
+/** Full-width inner padding — no max-width cap (spacious SaaS layout). */
 export const marketingPageInnerClass =
-  'relative z-10 mx-auto w-full max-w-6xl px-5 sm:px-8 lg:px-10';
+  'relative z-10 w-full px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16';
 
-export const marketingPageInnerWideClass =
-  'relative z-10 mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-10';
+export const marketingPageInnerWideClass = marketingPageInnerClass;
 
-export const marketingPageInnerNarrowClass =
-  'relative z-10 mx-auto w-full max-w-5xl px-4 sm:px-6';
+export const marketingPageInnerNarrowClass = marketingPageInnerClass;
 
 interface MarketingPageShellProps {
   children: ReactNode;
@@ -19,8 +18,8 @@ interface MarketingPageShellProps {
 }
 
 /**
- * Dark marketing surface shared by roadshow, Start Smart, workshop, and authority pages.
- * Pairs with the light public layout + dark chrome nav/footer (same pattern as homepage body).
+ * Theme-aware marketing surface for growth, authority, and industry pages.
+ * Respects global light/dark via `.dark` on `<html>`.
  */
 export function MarketingPageShell({
   children,
@@ -31,8 +30,7 @@ export function MarketingPageShell({
   return (
     <main
       id={id}
-      className={`relative min-h-screen pb-16 pt-6 text-white sm:pb-20 sm:pt-8 ${className}`}
-      style={{ background: '#060a14' }}
+      className={`relative min-h-screen w-full pb-16 pt-6 sm:pb-20 sm:pt-8 ${marketingPageBg} ${className}`}
     >
       <div className={marketingPageGlow} aria-hidden />
       <div className={innerClassName}>{children}</div>
