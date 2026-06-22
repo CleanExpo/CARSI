@@ -159,6 +159,8 @@ export type CourseTextThumbnailProps = {
   draft?: boolean;
   /** Card grid, course hero sidebar, or admin list */
   variant?: 'card' | 'hero' | 'admin';
+  /** Show CARSI logo and brand line on thumbnails (off for homepage featured grid). */
+  showBrand?: boolean;
   className?: string;
   /**
    * Optional catalogue photo behind the text (gradient scrim keeps copy readable).
@@ -186,6 +188,7 @@ export function CourseTextThumbnail({
   instructorName,
   draft,
   variant = 'card',
+  showBrand = true,
   className,
   backdropImageSrc,
   backdropImageLoading = 'lazy',
@@ -213,6 +216,7 @@ export function CourseTextThumbnail({
   const logoH = variant === 'hero' ? 32 : variant === 'admin' ? 28 : 26;
   const showModuleCallout =
     variant !== 'card' && moduleCount != null && (moduleCount > 0 || variant === 'admin');
+  const showBrandRow = showBrand || Boolean(priceLabel);
 
   return (
     <div
@@ -281,38 +285,51 @@ export function CourseTextThumbnail({
         )}
       >
         {/* Brand + price */}
-        <div className="mb-2 flex items-start justify-between gap-2">
-          <div className="relative min-w-0 shrink pt-0.5" style={{ height: logoH }}>
-            <Image
-              src={CARSI_COURSE_LOGO_SRC}
-              alt="CARSI"
-              width={140}
-              height={48}
-              className="h-full w-auto max-w-[min(100%,9.5rem)] object-contain object-left drop-shadow-[0_2px_12px_rgba(0,0,0,0.45)]"
-            />
+        {showBrandRow ? (
+          <div
+            className={cn(
+              'mb-2 flex items-start gap-2',
+              showBrand ? 'justify-between' : 'justify-end'
+            )}
+          >
+            {showBrand ? (
+              <div className="relative min-w-0 shrink pt-0.5" style={{ height: logoH }}>
+                <Image
+                  src={CARSI_COURSE_LOGO_SRC}
+                  alt="CARSI"
+                  width={140}
+                  height={48}
+                  className="h-full w-auto max-w-[min(100%,9.5rem)] object-contain object-left drop-shadow-[0_2px_12px_rgba(0,0,0,0.45)]"
+                />
+              </div>
+            ) : null}
+            {priceLabel ? (
+              <span
+                className="shrink-0 rounded-md px-2 py-0.5 text-[11px] font-bold tabular-nums"
+                style={
+                  isFree
+                    ? {
+                        color: '#5ee9a0',
+                        background: hasBackdrop ? 'rgba(0,0,0,0.5)' : 'rgba(16,185,129,0.12)',
+                        border: hasBackdrop
+                          ? '1px solid rgba(94,233,160,0.35)'
+                          : '1px solid rgba(16,185,129,0.35)',
+                      }
+                    : {
+                        color: hasBackdrop ? '#f5c15c' : '#9a4a00',
+                        background: hasBackdrop ? 'rgba(0,0,0,0.5)' : 'rgba(237,157,36,0.12)',
+                        border: hasBackdrop
+                          ? '1px solid rgba(245,193,92,0.35)'
+                          : '1px solid rgba(237,157,36,0.35)',
+                        boxShadow: hasBackdrop ? '0 0 14px rgba(237,157,36,0.15)' : undefined,
+                      }
+                }
+              >
+                {priceLabel}
+              </span>
+            ) : null}
           </div>
-          {priceLabel ? (
-            <span
-              className="shrink-0 rounded-md px-2 py-0.5 text-[11px] font-bold tabular-nums"
-              style={
-                isFree
-                  ? {
-                      color: '#5ee9a0',
-                      background: 'rgba(0,0,0,0.5)',
-                      border: '1px solid rgba(94,233,160,0.35)',
-                    }
-                  : {
-                      color: '#f5c15c',
-                      background: 'rgba(0,0,0,0.5)',
-                      border: '1px solid rgba(245,193,92,0.35)',
-                      boxShadow: '0 0 14px rgba(237,157,36,0.15)',
-                    }
-              }
-            >
-              {priceLabel}
-            </span>
-          ) : null}
-        </div>
+        ) : null}
 
         {/* Discipline / category / draft */}
         <div className="mb-1.5 flex flex-wrap items-center gap-1">
@@ -448,13 +465,13 @@ export function CourseTextThumbnail({
           ) : null}
         </div>
 
-        {variant === 'card' ? (
+        {variant === 'card' && showBrand ? (
           <p
             className={`mt-1.5 truncate text-[7px] tracking-wide uppercase ${hasBackdrop ? 'text-white/45' : 'text-slate-500'}`}
           >
             CARSI · Restoration training · Australia
           </p>
-        ) : (
+        ) : variant !== 'card' && showBrand ? (
           <div
             className={`mt-2 flex items-center gap-2 border-t pt-2 ${hasBackdrop ? 'border-white/5' : 'border-slate-200'}`}
           >
@@ -474,7 +491,7 @@ export function CourseTextThumbnail({
               Restoration &amp; cleaning training · Australia
             </p>
           </div>
-        )}
+        ) : null}
       </div>
     </div>
   );
