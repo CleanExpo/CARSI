@@ -1,5 +1,7 @@
 'use client';
 
+import { useTheme } from '@/components/ThemeProvider';
+
 const STEPS = [
   { label: 'Enrol', icon: 'E', color: '#2490ed' },
   { label: 'Learn', icon: 'L', color: '#26c4a0' },
@@ -19,6 +21,17 @@ function getStepX(index: number, total: number, width: number) {
 }
 
 export function StudentJourneyMap({ activeStep = 0 }: { activeStep?: number }) {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+
+  const inactiveStroke = isDark ? 'rgba(255,255,255,0.15)' : 'rgba(15,23,42,0.15)';
+  const arrowStroke = isDark ? 'rgba(255,255,255,0.25)' : 'rgba(15,23,42,0.25)';
+  const inactiveIconFill = isDark ? 'rgba(255,255,255,0.4)' : 'rgba(15,23,42,0.45)';
+  const completedIconFill = isDark ? 'rgba(255,255,255,0.85)' : 'rgba(15,23,42,0.75)';
+  const activeLabelFill = isDark ? 'rgba(255,255,255,0.92)' : 'rgba(15,23,42,0.9)';
+  const inactiveLabelFill = isDark ? 'rgba(255,255,255,0.45)' : 'rgba(15,23,42,0.5)';
+  const stepNumberFill = isDark ? 'rgba(255,255,255,0.2)' : 'rgba(15,23,42,0.25)';
+
   return (
     <svg
       viewBox="0 0 800 160"
@@ -43,12 +56,7 @@ export function StudentJourneyMap({ activeStep = 0 }: { activeStep?: number }) {
           markerHeight={8}
           orient="auto-start-reverse"
         >
-          <path
-            d="M 0 1 L 8 5 L 0 9"
-            fill="none"
-            stroke="rgba(255,255,255,0.25)"
-            strokeWidth={1.5}
-          />
+          <path d="M 0 1 L 8 5 L 0 9" fill="none" stroke={arrowStroke} strokeWidth={1.5} />
         </marker>
         <marker
           id="arrow-active"
@@ -63,7 +71,6 @@ export function StudentJourneyMap({ activeStep = 0 }: { activeStep?: number }) {
         </marker>
       </defs>
 
-      {/* Connector lines with arrows */}
       {STEPS.map((_, i) => {
         if (i === STEPS.length - 1) return null;
         const x1 = getStepX(i, STEPS.length, 800) + CIRCLE_R + 6;
@@ -76,7 +83,7 @@ export function StudentJourneyMap({ activeStep = 0 }: { activeStep?: number }) {
             y1={STEP_Y}
             x2={x2}
             y2={STEP_Y}
-            stroke={isCompleted ? '#2490ed' : 'rgba(255,255,255,0.15)'}
+            stroke={isCompleted ? '#2490ed' : inactiveStroke}
             strokeWidth={isCompleted ? 2 : 1.5}
             markerEnd={isCompleted ? 'url(#arrow-active)' : 'url(#arrow)'}
             style={{
@@ -86,17 +93,15 @@ export function StudentJourneyMap({ activeStep = 0 }: { activeStep?: number }) {
         );
       })}
 
-      {/* Steps */}
       {STEPS.map((step, i) => {
         const x = getStepX(i, STEPS.length, 800);
         const isActive = i === activeStep;
         const isCompleted = i < activeStep;
         const fill = isActive ? step.color : isCompleted ? `${step.color}88` : `${step.color}22`;
-        const strokeColor = isActive || isCompleted ? step.color : 'rgba(255,255,255,0.15)';
+        const strokeColor = isActive || isCompleted ? step.color : inactiveStroke;
 
         return (
           <g key={step.label}>
-            {/* Glow ring for active */}
             {isActive && (
               <circle
                 cx={x}
@@ -110,7 +115,6 @@ export function StudentJourneyMap({ activeStep = 0 }: { activeStep?: number }) {
               />
             )}
 
-            {/* Circle */}
             <circle
               cx={x}
               cy={STEP_Y}
@@ -124,18 +128,13 @@ export function StudentJourneyMap({ activeStep = 0 }: { activeStep?: number }) {
               }}
             />
 
-            {/* Icon letter */}
             <text
               x={x}
               y={STEP_Y + 1}
               textAnchor="middle"
               dominantBaseline="central"
               fill={
-                isActive
-                  ? '#ffffff'
-                  : isCompleted
-                    ? 'rgba(255,255,255,0.85)'
-                    : 'rgba(255,255,255,0.4)'
+                isActive ? '#ffffff' : isCompleted ? completedIconFill : inactiveIconFill
               }
               fontSize={14}
               fontWeight={700}
@@ -144,12 +143,11 @@ export function StudentJourneyMap({ activeStep = 0 }: { activeStep?: number }) {
               {step.icon}
             </text>
 
-            {/* Step label */}
             <text
               x={x}
               y={STEP_Y + CIRCLE_R + 18}
               textAnchor="middle"
-              fill={isActive ? 'rgba(255,255,255,0.92)' : 'rgba(255,255,255,0.45)'}
+              fill={isActive ? activeLabelFill : inactiveLabelFill}
               fontSize={12}
               fontWeight={isActive ? 600 : 400}
               fontFamily="system-ui, sans-serif"
@@ -160,12 +158,11 @@ export function StudentJourneyMap({ activeStep = 0 }: { activeStep?: number }) {
               {step.label}
             </text>
 
-            {/* Step number */}
             <text
               x={x}
               y={STEP_Y - CIRCLE_R - 10}
               textAnchor="middle"
-              fill={isActive ? step.color : 'rgba(255,255,255,0.2)'}
+              fill={isActive ? step.color : stepNumberFill}
               fontSize={10}
               fontFamily="system-ui, sans-serif"
             >
