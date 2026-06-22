@@ -38,7 +38,7 @@ export function IndustryHero({
 }: IndustryHeroProps) {
   return (
     <section className="pb-12 pt-2 sm:pb-14">
-      <div className="max-w-3xl">
+      <div className="max-w-4xl">
         <div
           className="mb-6 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-[11px] font-semibold tracking-[0.14em] uppercase"
           style={{
@@ -51,13 +51,13 @@ export function IndustryHero({
           {industryName}
         </div>
 
-        <h1 className={`max-w-4xl ${marketingHeading}`}>
+        <h1 className={`max-w-5xl ${marketingHeading}`}>
           {headline}
           <br />
           <span style={{ color: accentColor }}>{headlineAccent}</span>
         </h1>
 
-        <p className={`mt-5 max-w-2xl ${marketingBody}`}>{description}</p>
+        <p className={`mt-5 max-w-3xl ${marketingBody}`}>{description}</p>
 
         <div className="mt-8 flex flex-wrap gap-2">
           {disciplines.map((d) => (
@@ -66,7 +66,7 @@ export function IndustryHero({
         </div>
       </div>
 
-      <div className="mt-10 grid grid-cols-1 gap-3 sm:grid-cols-3">
+      <div className="mt-10 grid grid-cols-1 gap-3 sm:grid-cols-3 lg:grid-cols-3">
         {stats.map((stat) => (
           <GlassStatCard
             key={stat.label}
