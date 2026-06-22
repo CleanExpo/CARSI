@@ -3,12 +3,11 @@ import {
   AnimatedHero,
   AnimatedSection,
 } from '@/components/landing/AnimatedHero';
+import { HomeFeaturedCoursesSection } from '@/components/landing/HomeFeaturedCoursesSection';
 import { HomeGrowthSection } from '@/components/landing/HomeGrowthSection';
 import { PublicFooter } from '@/components/landing/PublicFooter';
 import { PublicNavbar } from '@/components/landing/PublicNavbar';
 import { PUBLIC_SHELL_INNER_CLASS } from '@/components/landing/public-shell-width';
-import { CourseBrowseProvider } from '@/components/lms/CourseBrowseContext';
-import { CourseCard } from '@/components/lms/CourseCard';
 import FloatingChatGate from '@/components/lms/FloatingChatGate';
 import { IICRCDisciplineMap } from '@/components/lms/diagrams/IICRCDisciplineMap';
 import { StudentJourneyMap } from '@/components/lms/diagrams/StudentJourneyMap';
@@ -115,18 +114,6 @@ function buildHomeFaqs(facts: { publishedCourseCount: number; disciplineCodes: s
   ];
 }
 
-function HomeSkeletonCard() {
-  return (
-    <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/[0.04]">
-      <div className="h-40 animate-pulse bg-slate-100 dark:bg-white/[0.06]" />
-      <div className="space-y-3 p-4">
-        <div className="h-4 w-3/4 animate-pulse rounded bg-slate-100 dark:bg-white/[0.06]" />
-        <div className="h-3 w-1/2 animate-pulse rounded bg-slate-100 dark:bg-white/[0.06]" />
-      </div>
-    </div>
-  );
-}
-
 export default async function Home() {
   const [featuredCourses, catalogueFacts] = await Promise.all([
     getFeaturedCourses(),
@@ -164,34 +151,14 @@ export default async function Home() {
       <AnimatedHero benefits={benefits} />
       <HomeGrowthSection stats={stats} />
 
-      <AnimatedSection
-        label="Featured courses"
-        title="Popular courses learners start with"
-        rightContent={
-          <Link
-            href="/courses"
-            className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-[#146fc2] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#0f5fa8]"
-          >
-            View all courses <ArrowRight className="h-4 w-4" aria-hidden />
-          </Link>
+      <HomeFeaturedCoursesSection
+        courses={featuredCourses}
+        courseCountLabel={
+          catalogueFacts.publishedCourseCount > 0
+            ? formatCourseCountForCopy(catalogueFacts.publishedCourseCount)
+            : undefined
         }
-      >
-        <CourseBrowseProvider courseLinkBase="/courses">
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {featuredCourses.length > 0
-              ? featuredCourses.map((course, i) => (
-                  <AnimatedCard key={course.id} index={i}>
-                    <CourseCard course={course} priorityImage={i < 6} />
-                  </AnimatedCard>
-                ))
-              : [1, 2, 3].map((i) => (
-                  <AnimatedCard key={i} index={i}>
-                    <HomeSkeletonCard />
-                  </AnimatedCard>
-                ))}
-          </div>
-        </CourseBrowseProvider>
-      </AnimatedSection>
+      />
 
       <AnimatedSection
         label="Certifications"
