@@ -1,33 +1,32 @@
 import type { Metadata } from 'next';
 import { Building2, Shield, Flame } from 'lucide-react';
 import {
-  IndustryPageLayout,
-  IndustryHero,
-  IndustryWhySection,
-  IndustryCTA,
   ContractorAddOns,
+  IndustryCTA,
+  IndustryCrossLinks,
+  IndustryFAQSection,
+  IndustryHero,
+  IndustryPageLayout,
+  IndustryRecommendedCourses,
+  IndustryWhySection,
 } from '@/components/industries';
-import { IndustryRecommendedCourses } from '@/components/industries/IndustryRecommendedCourses';
 import { FAQSchema } from '@/components/seo/JsonLd';
+import { buildIndustryMetadata } from '@/lib/marketing/industry-metadata';
 
 export const dynamic = 'force-dynamic';
 
-export const metadata: Metadata = {
-  title: 'Government & Defence IICRC CEC Training | CARSI',
-  description:
-    'WHS-compliant IICRC CEC training for Australian councils, agencies and defence facilities. AMRT, WRT, ASD and FSRT courses for AusTender compliance.',
-  keywords: [
+export const metadata: Metadata = buildIndustryMetadata(
+  'government-defence',
+  'Government & Defence IICRC CEC Training | CARSI',
+  'WHS-compliant IICRC CEC training for Australian councils, agencies and defence facilities. AMRT, WRT, ASD and FSRT courses for AusTender compliance.',
+  [
     'government IICRC CEC training',
     'defence facility restoration',
     'AusTender compliance',
     'WHS mould training',
     'heritage building restoration',
-  ],
-};
-
-// ---------------------------------------------------------------------------
-// Page Configuration
-// ---------------------------------------------------------------------------
+  ]
+);
 
 const ACCENT_COLOR = '#2196f3';
 
@@ -91,10 +90,6 @@ const whyCards = [
   },
 ];
 
-// ---------------------------------------------------------------------------
-// Page Component
-// ---------------------------------------------------------------------------
-
 export default async function GovernmentDefenceIndustryPage() {
   return (
     <IndustryPageLayout>
@@ -111,9 +106,10 @@ export default async function GovernmentDefenceIndustryPage() {
       />
 
       <IndustryWhySection
-        industryName="Government Agencies"
+        industryName="government agencies"
         headline="Built for"
         headlineAccent="public accountability"
+        accentColor={ACCENT_COLOR}
         cards={whyCards}
       />
 
@@ -123,16 +119,21 @@ export default async function GovernmentDefenceIndustryPage() {
         disciplines={['AMRT', 'WRT', 'ASD', 'FSRT']}
       />
 
-      <ContractorAddOns accentColor={ACCENT_COLOR} />
+      <ContractorAddOns accentColor={ACCENT_COLOR} variant="government-defence" />
+
+      <IndustryFAQSection industryName="Government & Defence" faqs={faqs} />
 
       <IndustryCTA
-        subtitle="Government Facility Training"
+        subtitle="Government facility training"
         title="Facility Restoration Bundle"
         price="$295"
         description="WRT + AMRT + ASD training for government facility teams. Bulk 10+ seat licensing available for councils and departments."
-        ctaText="Request Bulk Pricing"
+        ctaText="Request bulk pricing"
+        ctaHref="/contact"
         accentColor={ACCENT_COLOR}
       />
+
+      <IndustryCrossLinks currentSlug="government-defence" />
     </IndustryPageLayout>
   );
 }
