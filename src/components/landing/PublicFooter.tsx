@@ -48,9 +48,11 @@ export function PublicFooter() {
             <ul className="space-y-2 text-xs text-slate-600">
               {[
                 { label: 'Courses', href: '/courses' },
-                { label: 'CCW Workshop', href: '/ccw-training' },
-                { label: 'Authority Hub', href: '/authority' },
                 { label: 'Pathways', href: '/pathways' },
+                { label: 'CCW Roadshow', href: '/events/ccw-roadshow' },
+                { label: 'CCW Workshop', href: '/ccw-training' },
+                { label: 'Start Smart', href: '/start-carpet-cleaning-business' },
+                { label: 'Authority Hub', href: '/authority' },
                 { label: 'Pricing', href: '/pricing' },
                 { label: 'About', href: '/about' },
                 { label: 'Testimonials', href: '/testimonials' },

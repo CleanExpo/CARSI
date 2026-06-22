@@ -9,6 +9,7 @@ import MobileNav from './MobileNav';
 const primaryNavItems = [
   { label: 'Courses', href: '/courses' },
   { label: 'Pathways', href: '/pathways' },
+  { label: 'Events', href: '/events/ccw-roadshow' },
   { label: 'Pricing', href: '/pricing' },
   { label: 'Contact', href: '/contact' },
 ];

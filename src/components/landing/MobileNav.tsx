@@ -42,6 +42,7 @@ const itemVariants = {
 const navItems = [
   { href: '/courses', label: 'Courses' },
   { href: '/pathways', label: 'Pathways' },
+  { href: '/events/ccw-roadshow', label: 'Events' },
   { href: '/pricing', label: 'Pricing' },
   { href: '/contact', label: 'Contact' },
 ];
