@@ -8,11 +8,14 @@ import {
   PUBLIC_SHELL_INNER_CLASS,
 } from '@/components/landing/public-shell-width';
 
+import { startSmartBasePath } from '@/lib/marketing/start-smart';
+
 import MobileNav from './MobileNav';
 
 const primaryNavItems = [
   { label: 'Courses', href: '/courses' },
   { label: 'Pathways', href: '/pathways' },
+  { label: 'Start Smart', href: startSmartBasePath },
   { label: 'Events', href: '/events/ccw-roadshow' },
   { label: 'Pricing', href: '/pricing' },
   { label: 'Contact', href: '/contact' },
