@@ -48,6 +48,9 @@ export async function getAdminDashboardData(): Promise<AdminDashboardClientData>
   const catalogSlugs = ctx.catalogSlugs;
 
   const users = await prisma.lmsUser.findMany({
+    // Defensive cap so the admin dashboard can't load an unbounded user set
+    // into memory. Generous for current scale; switch to pagination if exceeded.
+    take: 2000,
     select: {
       id: true,
       email: true,
