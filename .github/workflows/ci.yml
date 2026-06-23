@@ -148,6 +148,12 @@ jobs:
       - name: Apply Prisma migrations to test DB
         run: npx prisma migrate deploy
 
+      # Seed the course catalogue so the data-dependent journeys in
+      # e2e/carsi-journeys.spec.ts (course list, WRT filter, "Carpet" search,
+      # course detail by slug) run against real data instead of an empty DB.
+      - name: Seed course catalogue for E2E
+        run: npm run db:seed-courses
+
       - name: Cache Playwright browsers
         id: playwright-cache
         uses: actions/cache@v4
