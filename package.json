@@ -44,6 +44,7 @@
     "db:seed-odour-smoke-psychro-drying-docx": "npx tsx scripts/seed-odour-smoke-psychro-drying-docx.ts",
     "lint": "eslint .",
     "type-check": "tsc --noEmit",
+    "test:stripe-webhook": "node scripts/test-stripe-webhook-idempotency.mjs",
     "db:seed-phase2": "npx tsx scripts/seed-phase2-pathways-quizzes.ts",
     "test:a11y": "playwright test tests/accessibility",
     "test:e2e": "playwright test",
