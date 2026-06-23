@@ -71,7 +71,7 @@ export function HomeGrowthSection({ stats }: HomeGrowthSectionProps) {
   return (
     <section
       aria-labelledby="home-growth-heading"
-      className="relative border-b border-slate-200/80 bg-white dark:border-white/10 dark:bg-[#0a0a0a]"
+      className="relative overflow-hidden border-b border-slate-200/80 bg-white dark:border-white/10 dark:bg-[#0a0a0a]"
     >
       {/* Stats strip */}
       <div className="relative overflow-hidden border-b border-slate-200/80 bg-[#f6f8fb] dark:border-white/10 dark:bg-[#050505]">
