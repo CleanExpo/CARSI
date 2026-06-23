@@ -7,7 +7,8 @@ import {
   getAssistantPageFocusContext,
   getAssistantTagline,
 } from '@/lib/server/ai-assistant-context';
-import { applyRateLimit, clientIpFrom } from '@/lib/rate-limit';
+import { clientIpFrom } from '@/lib/rate-limit';
+import { applyRateLimitDistributed } from '@/lib/rate-limit-distributed';
 
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
 const MODEL = process.env.OPENAI_CHAT_MODEL?.trim() || 'gpt-4o-mini';
@@ -61,7 +62,7 @@ export async function POST(request: NextRequest) {
     request.headers.get('x-forwarded-for'),
     request.headers.get('x-real-ip')
   );
-  const rl = applyRateLimit(`public-chat:${ip}`, CHAT_RATE_LIMIT, CHAT_RATE_WINDOW_MS);
+  const rl = await applyRateLimitDistributed(`public-chat:${ip}`, CHAT_RATE_LIMIT, CHAT_RATE_WINDOW_MS);
   if (!rl.ok) {
     return NextResponse.json(
       { detail: 'Too many requests. Please wait a moment and try again.' },
