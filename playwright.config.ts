@@ -24,6 +24,9 @@ export default defineConfig({
       name: 'tablet-chromium',
       use: {
         ...devices['iPad (gen 7)'],
+        // devices['iPad (gen 7)'] defaults to WebKit; force Chromium so this
+        // project matches its name and the browser CI installs (chromium only).
+        browserName: 'chromium',
       },
     },
     {
