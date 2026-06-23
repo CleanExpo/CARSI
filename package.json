@@ -47,7 +47,7 @@
     "test:stripe-webhook": "node scripts/test-stripe-webhook-idempotency.mjs",
     "db:seed-phase2": "npx tsx scripts/seed-phase2-pathways-quizzes.ts",
     "test:a11y": "playwright test tests/accessibility",
-    "test:e2e": "playwright test",
+    "test:e2e": "playwright test e2e",
     "test:unit": "vitest run",
     "video:brand:plan": "npx tsx scripts/automate-brand-videos.ts --plan",
     "video:brand:submit": "npx tsx scripts/automate-brand-videos.ts --submit",
