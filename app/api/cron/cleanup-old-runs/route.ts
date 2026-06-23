@@ -55,7 +55,7 @@ export async function GET(request: Request) {
   } catch (error) {
     logger.error('Cleanup cron error', error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'Cleanup failed' },
       { status: 500 }
     );
   }
