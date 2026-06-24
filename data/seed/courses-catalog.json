@@ -2449,6 +2449,44 @@
           ]
         }
       ]
+    },
+    {
+      "id": "b7c1d9e4-5a2f-4c83-9e61-2d4f8a1b3c7e",
+      "slug": "wrt-water-damage-essentials",
+      "title": "Water Damage Restoration — Essentials (WRT-aligned)",
+      "description": "A concise, WRT-aligned introduction to water damage restoration fundamentals: categories of water, classes of loss, safety, and the core drying workflow.",
+      "shortDescription": "WRT-aligned essentials of water damage restoration.",
+      "thumbnailUrl": null,
+      "instructorId": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+      "status": "published",
+      "priceAud": "0",
+      "isFree": true,
+      "durationHours": 2,
+      "level": "Beginner",
+      "category": null,
+      "tags": null,
+      "iicrcDiscipline": "WRT",
+      "cecHours": null,
+      "meta": null,
+      "isPublished": true,
+      "modules": [
+        {
+          "id": "c2e3f4a5-6b7c-4d8e-9f01-23a4b5c6d7e8",
+          "title": "Water Damage Fundamentals",
+          "orderIndex": 0,
+          "lessons": [
+            {
+              "id": "d3f4a5b6-7c8d-4e9f-a012-34b5c6d7e8f9",
+              "title": "Categories and Classes of Water Damage — Reading",
+              "contentType": "text",
+              "contentBody": "<p>Water damage restoration begins with correctly classifying the loss. Water is grouped into three categories by contamination level and the affected materials into classes by the rate of evaporation required. Understanding these distinctions guides safe handling, drying strategy, and documentation throughout the job.</p>",
+              "orderIndex": 0,
+              "isPreview": true,
+              "resources": null
+            }
+          ]
+        }
+      ]
     }
   ]
 }

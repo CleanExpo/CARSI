@@ -52,12 +52,7 @@ test.describe('Public course catalogue', () => {
     }
   });
 
-  // Skipped: the seeded course catalogue (data/seed/courses-catalog.json) has no
-  // discipline-coded courses — every course is `discipline: null` — so clicking the
-  // WRT tab always yields zero matches and this assertion (a specific WRT course +
-  // "1 course") can never pass against real data. Re-enable once the seed includes
-  // discipline-tagged courses, or rewrite to assert the empty-state.
-  test.skip('discipline filter works — clicking WRT shows only WRT courses', async ({ page }) => {
+  test('discipline filter works — clicking WRT shows only WRT courses', async ({ page }) => {
     await page.goto('/courses');
 
     // Click the WRT tab

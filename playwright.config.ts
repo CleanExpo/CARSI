@@ -4,6 +4,9 @@ const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? 'http://localhost:3000';
 
 export default defineConfig({
   testDir: '.',
+  // `auth.setup.ts` is matched by the dedicated `setup` project below (not by the
+  // `*.spec.ts` glob), so it runs once to mint a real session before the
+  // authenticated journeys.
   testMatch: ['tests/**/*.spec.ts', 'e2e/**/*.spec.ts'],
   testIgnore: ['**/.next/**', '**/node_modules/**'],
   fullyParallel: true,
@@ -17,8 +20,20 @@ export default defineConfig({
   },
   projects: [
     {
+      // Real-login setup: signs in the seeded E2E student and saves storageState
+      // to playwright/.auth/student.json. Authenticated specs opt in with
+      // `test.use({ storageState })`; unauthenticated specs are unaffected.
+      name: 'setup',
+      testMatch: /e2e\/auth\.setup\.ts$/,
+    },
+    {
       name: 'desktop-chromium',
       use: { ...devices['Desktop Chrome'] },
+      // Run `setup` first so the saved session exists when the authenticated
+      // journeys (which apply it via test.use storageState) run. The default
+      // project storageState stays empty, so unauthenticated journeys (homepage,
+      // login form, course catalogue) still run as a guest.
+      dependencies: ['setup'],
     },
     {
       name: 'tablet-chromium',
