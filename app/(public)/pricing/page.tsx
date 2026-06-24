@@ -28,11 +28,6 @@ export const metadata: Metadata = {
 
 const FAQ_ITEMS = [
   {
-    question: 'How does the 7-day free trial work?',
-    answer:
-      'Memberships (and the 7-day free trial) are launching soon. When they go live, your trial will begin the moment you sign up for a paid membership, with 100% access to all published courses during the trial — your card only charged on day 8 if you choose to continue, cancel any time before then. For now, you can enrol in any course individually.',
-  },
-  {
     question: 'Can I cancel my membership at any time?',
     answer:
       'Yes — cancel any time from your student dashboard. Your access continues until the end of the current billing period. No lock-in contracts, no cancellation fees.',
