@@ -30,7 +30,7 @@ const FAQ_ITEMS = [
   {
     question: 'How does the 7-day free trial work?',
     answer:
-      'Your trial begins the moment you sign up for a paid membership. Monthly and yearly memberships include 100% access to all published courses during the trial. Your card is only charged on day 8 if you choose to continue. Cancel any time before then with no questions asked.',
+      'Memberships (and the 7-day free trial) are launching soon. When they go live, your trial will begin the moment you sign up for a paid membership, with 100% access to all published courses during the trial — your card only charged on day 8 if you choose to continue, cancel any time before then. For now, you can enrol in any course individually.',
   },
   {
     question: 'Can I cancel my membership at any time?',
@@ -119,8 +119,8 @@ export default function PricingPage() {
               Membership &amp; Pricing
             </h1>
             <p className="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-slate-600">
-              Buy one course when that is all you need, or choose monthly/yearly membership for 100%
-              access to all published courses while your membership is active.
+              Buy any course individually today. Monthly and yearly membership — 100% access to
+              all published courses — is launching soon.
             </p>
           </section>
 
@@ -169,9 +169,10 @@ export default function PricingPage() {
               priceSuffix="AUD / month"
               helper="100% course access · GST included · Cancel anytime"
               features={FOUNDATION_EXTRAS}
-              cta="Start 7-Day Free Trial"
-              href="/subscribe?plan=foundation"
-              note="Card required. No charge for 7 days."
+              cta="Browse courses"
+              href="/courses"
+              note="Memberships launching soon — enrol per course in the meantime."
+              badge="Launching soon"
               tone="blue"
             />
             <MembershipCard
@@ -180,10 +181,10 @@ export default function PricingPage() {
               priceSuffix="AUD / month"
               helper="100% course access · GST included · Cancel anytime"
               features={GROWTH_EXTRAS}
-              cta="Start 7-Day Free Trial"
-              href="/subscribe?plan=growth"
-              note="Card required. No charge for 7 days."
-              badge="Most Popular"
+              cta="Browse courses"
+              href="/courses"
+              note="Memberships launching soon — enrol per course in the meantime."
+              badge="Launching soon"
               tone="green"
             />
           </section>
