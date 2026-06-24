@@ -6,6 +6,37 @@ import { test, expect } from "@playwright/test";
 
 test.describe("PRD Generation Flow", () => {
   test.beforeEach(async ({ page }) => {
+    // Mock the PRD backend (CI has no AI generation service). These defaults let the
+    // submit-driven tests enter and stay in the "generating" state. Tests that need
+    // other behaviour (error handling, full workflow) register their own routes
+    // afterwards, which take priority in Playwright.
+    await page.route("**/api/prd/generate", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          prd_id: "prd_test",
+          task_id: "prd_test",
+          run_id: "run_test",
+          status: "pending",
+          message: "PRD generation started",
+        }),
+      });
+    });
+    await page.route("**/api/prd/status/**", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          prd_id: "prd_test",
+          status: "running",
+          progress_percent: 30,
+          current_step: "Analyzing requirements",
+          result: null,
+        }),
+      });
+    });
+
     // Navigate to PRD generator page
     await page.goto("/prd/generate");
   });
@@ -86,10 +117,12 @@ test.describe("PRD Generation Flow", () => {
     await expect(page.locator("text=/Decomposing features/i")).toBeVisible();
     await expect(page.locator("text=/Generating technical specification/i")).toBeVisible();
 
-    // Check "What's Being Generated" section
-    await expect(page.locator("text=/PRD Document/i")).toBeVisible();
-    await expect(page.locator("text=/User Stories/i")).toBeVisible();
-    await expect(page.locator("text=/Technical Spec/i")).toBeVisible();
+    // Check "What's Being Generated" section. Target the section headings — these
+    // phrases also appear in the phase list and descriptions, so a bare text= locator
+    // matches multiple elements (strict-mode violation).
+    await expect(page.getByRole("heading", { name: "PRD Document" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "User Stories" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Technical Spec" })).toBeVisible();
   });
 
   test("should show success state after completion", async ({ page }) => {
@@ -125,21 +158,24 @@ test.describe("PRD Generation Flow", () => {
     );
     await page.getByRole("button", { name: /Generate PRD/i }).click();
 
-    // Wait for generation state
-    await expect(page.locator("text=/Generating/i")).toBeVisible({ timeout: 5000 });
+    // Wait for generation state. Target the heading — "Generating" also appears in
+    // the subtitle and phase list (strict-mode violation with a bare text= locator).
+    await expect(page.getByRole("heading", { name: "Generating Your PRD" })).toBeVisible({
+      timeout: 5000,
+    });
 
-    // All inputs should be disabled (checking for disabled attribute)
-    const textarea = page.getByLabel(/Project Description/i);
-    await expect(textarea).toBeDisabled();
+    // During generation the page swaps the form out for the progress view, so the
+    // inputs are no longer present/editable.
+    await expect(page.getByLabel(/Project Description/i)).toHaveCount(0);
   });
 
   test("should show How It Works section", async ({ page }) => {
-    await expect(page.locator("text=/How It Works/i")).toBeVisible();
+    await expect(page.getByText("How It Works", { exact: true })).toBeVisible({ timeout: 10_000 });
 
-    // Check steps are displayed
-    await expect(page.locator("text=/Describe Your Project/i")).toBeVisible();
-    await expect(page.locator("text=/AI Analysis/i")).toBeVisible();
-    await expect(page.locator("text=/Ready to Build/i")).toBeVisible();
+    // Check steps are displayed (each is an <h4> heading)
+    await expect(page.getByRole("heading", { name: "Describe Your Project" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "AI Analysis" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Ready to Build" })).toBeVisible();
   });
 });
 
