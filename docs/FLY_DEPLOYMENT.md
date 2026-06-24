@@ -212,6 +212,20 @@ Both connectors use fire-and-forget HTTP calls already configured in:
 Once `SYNTHEX_API_KEY` and `UNITE_HUB_API_KEY` secrets are set,
 those connections activate automatically on events (enrolments, completions, subscriptions).
 
+### Demo-video marketing assets
+
+SYNTHEX campaigns can use real-product demo screencasts + narrated avatar videos as creative.
+Producing them is an **authoring-time** task (not part of the running app), so these secrets
+belong wherever the videos are generated — a maintainer machine or a dedicated job, not
+necessarily the Fly app:
+
+- `HEYGEN_API_KEY` (+ optional `HEYGEN_AVATAR_ID`, `HEYGEN_VOICE_ID`) — avatar generation.
+- `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` — video hosting
+  (folder `carsi/demo-videos`).
+
+Runbook: `docs/marketing/demo-video-production.md`. Asset/campaign usage:
+`docs/marketing/synthex-campaign-context.md` → "Video Assets".
+
 ---
 
 ## Troubleshooting
