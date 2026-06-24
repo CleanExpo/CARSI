@@ -43,7 +43,7 @@ export function SubscriptionStatus({
             onClick={onSubscribe}
             className="rounded-sm bg-cyan-600 px-4 py-2 font-mono text-sm text-white transition-colors hover:bg-cyan-500"
           >
-            Start 7-Day Free Trial — $795 AUD/year
+            Start Membership — $795 AUD/year
           </button>
         )}
       </div>

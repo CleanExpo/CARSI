@@ -104,7 +104,7 @@ export default function SubscribePage() {
         {/* Header */}
         <div className="text-center">
           <span className="inline-block rounded-full border border-[#b8dbfb] bg-white px-3 py-1 text-xs font-semibold text-[#146fc2] shadow-sm">
-            7-day free trial
+            Membership
           </span>
           <h1 className="mt-4 text-3xl font-bold text-slate-950">{selectedPlan.name}</h1>
           <p className="mt-2 text-slate-600">
@@ -141,10 +141,10 @@ export default function SubscribePage() {
               disabled={loading}
               className="w-full rounded-lg bg-[#0f5fa8] py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {loading ? 'Opening checkout…' : 'Start 7-Day Free Trial'}
+              {loading ? 'Opening checkout…' : 'Start Membership'}
             </button>
             <p className="text-center text-xs text-slate-500">
-              Card required. No charge for 7 days. Cancel anytime.
+              Card required. Cancel anytime.
             </p>
           </div>
 
