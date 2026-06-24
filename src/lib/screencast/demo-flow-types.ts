@@ -77,6 +77,10 @@ function isNonEmptyString(x: unknown): x is string {
   return typeof x === 'string' && x.trim().length > 0;
 }
 
+function isFiniteNumber(x: unknown): x is number {
+  return typeof x === 'number' && Number.isFinite(x);
+}
+
 const STEP_ACTIONS = ['goto', 'click', 'fill', 'scroll', 'wait', 'highlight'] as const;
 
 /** Narrow a value to a structurally-valid `DemoStep`. */
@@ -93,9 +97,9 @@ export function isDemoStep(value: unknown): value is DemoStep {
     case 'fill':
       return isNonEmptyString(step.selector) && typeof step.value === 'string';
     case 'scroll':
-      return step.to === 'bottom' || step.to === 'top' || typeof step.to === 'number';
+      return step.to === 'bottom' || step.to === 'top' || isFiniteNumber(step.to);
     case 'wait':
-      return typeof step.ms === 'number' && step.ms >= 0;
+      return isFiniteNumber(step.ms) && step.ms >= 0;
     default:
       return false;
   }
@@ -115,11 +119,15 @@ function isDemoFlow(value: unknown): value is DemoFlow {
     (flow.brandVideoScriptId === null || isNonEmptyString(flow.brandVideoScriptId)) &&
     (flow.auth === 'student' || flow.auth === 'guest') &&
     !!viewport &&
-    typeof viewport.width === 'number' &&
-    typeof viewport.height === 'number' &&
+    isFiniteNumber(viewport.width) &&
+    viewport.width > 0 &&
+    isFiniteNumber(viewport.height) &&
+    viewport.height > 0 &&
     !!pip &&
     (pip.corner === 'br' || pip.corner === 'bl' || pip.corner === 'tr' || pip.corner === 'tl') &&
-    typeof pip.widthPct === 'number' &&
+    isFiniteNumber(pip.widthPct) &&
+    pip.widthPct > 0 &&
+    pip.widthPct <= 100 &&
     Array.isArray(flow.steps) &&
     flow.steps.every(isDemoStep) &&
     (flow.lessonId === undefined || isNonEmptyString(flow.lessonId))

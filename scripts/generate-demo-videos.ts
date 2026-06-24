@@ -61,8 +61,8 @@ const BRAND_CAPTION_DIR = join(ROOT, 'output', 'brand-video', 'captions');
 const STORAGE_STATE_PATH = join(ROOT, 'playwright', '.auth', 'student.json');
 
 const BASE_URL = process.env.DEMO_RECORD_BASE_URL ?? 'http://localhost:3000';
-const HARD_CAP = Number(process.env.DEMO_VIDEO_MAX ?? 12);
-const PIP_MARGIN = Number(process.env.DEMO_PIP_MARGIN ?? 24);
+const HARD_CAP = parsePositiveInt(process.env.DEMO_VIDEO_MAX, 'DEMO_VIDEO_MAX', 12);
+const PIP_MARGIN = parsePositiveInt(process.env.DEMO_PIP_MARGIN, 'DEMO_PIP_MARGIN', 24);
 
 // Seeded demo account (scripts/seed-e2e-user.ts) — same credentials as e2e/auth.setup.ts.
 const STUDENT = {
@@ -96,6 +96,16 @@ function argValue(name: string): string | undefined {
 
 function hasFlag(name: string): boolean {
   return process.argv.includes(`--${name}`);
+}
+
+/** Parse a positive integer from a CLI/env value, or throw so bad input fails fast. */
+function parsePositiveInt(raw: string | undefined, label: string, fallback: number): number {
+  if (raw === undefined || raw.trim() === '') return fallback;
+  const n = Number(raw);
+  if (!Number.isInteger(n) || n < 1) {
+    throw new Error(`Invalid ${label}: "${raw}". Expected a positive integer.`);
+  }
+  return n;
 }
 
 function getCommand(): Command {
@@ -145,7 +155,7 @@ function selectedFlows(): DemoFlow[] {
     flows = flows.filter((f) => ids.has(f.id));
     if (flows.length === 0) throw new Error(`No flow matched --id=${id}`);
   }
-  const limit = Number(argValue('limit') ?? HARD_CAP);
+  const limit = parsePositiveInt(argValue('limit'), '--limit', HARD_CAP);
   return flows.slice(0, Math.min(limit, HARD_CAP));
 }
 
@@ -491,6 +501,7 @@ async function main() {
     browser = await chromium.launch();
   }
 
+  let hadFailures = false;
   try {
     for (const flow of flows) {
       try {
@@ -529,6 +540,7 @@ async function main() {
           }
         }
       } catch (err) {
+        hadFailures = true;
         const failure = err instanceof Error ? err.message : String(err);
         console.error(`✗ ${flow.id}: ${failure}`);
         if (!dryRun) {
@@ -536,6 +548,8 @@ async function main() {
         }
       }
     }
+    // Surface per-flow failures as a non-zero exit so automation/shells notice.
+    if (hadFailures) process.exitCode = 1;
   } finally {
     if (browser) await browser.close();
   }
