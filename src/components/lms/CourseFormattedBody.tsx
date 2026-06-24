@@ -1,7 +1,11 @@
 import DOMPurify from 'isomorphic-dompurify';
 
 import { cn } from '@/lib/utils';
-import { looksLikeHtmlFragment, parseCourseBody } from '@/lib/lms/format-course-body';
+import {
+  looksLikeHtmlFragment,
+  parseCourseBody,
+  stripLegacyPurchaseCta,
+} from '@/lib/lms/format-course-body';
 
 export interface CourseFormattedBodyProps {
   /** Raw course description (plain conventions or legacy HTML). */
@@ -12,7 +16,7 @@ export interface CourseFormattedBodyProps {
 const blockGap = 'space-y-4';
 
 export function CourseFormattedBody({ text, className }: CourseFormattedBodyProps) {
-  const raw = text?.trim() ?? '';
+  const raw = stripLegacyPurchaseCta(text?.trim() ?? '');
   if (!raw) return null;
 
   if (looksLikeHtmlFragment(raw)) {
