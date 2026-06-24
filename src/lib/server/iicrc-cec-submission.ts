@@ -446,6 +446,50 @@ export async function processIicrcCecSubmissionForEnrollment(
   }
 }
 
+export async function retryIicrcCecSubmission(
+  submissionId: string,
+  options?: ProcessIicrcCecSubmissionOptions,
+): Promise<{
+  status: IicrcCecSubmissionStatus;
+}> {
+  const row = await prisma.lmsIicrcCecSubmission.findUnique({
+    where: { id: submissionId },
+    select: { enrollmentId: true, status: true, initiatedByAdminEmail: true },
+  });
+  if (!row) throw new Error('SUBMISSION_NOT_FOUND');
+  if (row.status === 'sent') return { status: 'sent' };
+
+  await prisma.lmsIicrcCecSubmission.update({
+    where: { id: submissionId },
+    data: { status: 'pending', failureReason: null, sentAt: null, providerMessageId: null },
+  });
+
+  const result = await processIicrcCecSubmissionForEnrollment(row.enrollmentId, {
+    initiatedByAdminEmail: options?.initiatedByAdminEmail ?? row.initiatedByAdminEmail,
+  });
+  return { status: result.status };
+}
+
+export async function getCecSubmissionSummaryForEnrollment(
+  enrollmentId: string,
+): Promise<{
+  status: IicrcCecSubmissionStatus | null;
+  sent_at: string | null;
+  recipient_email: string | null;
+} | null> {
+  if (!process.env.DATABASE_URL?.trim()) return null;
+  const row = await prisma.lmsIicrcCecSubmission.findUnique({
+    where: { enrollmentId },
+    select: { status: true, sentAt: true, recipientEmail: true },
+  });
+  if (!row) return null;
+  return {
+    status: row.status as IicrcCecSubmissionStatus,
+    sent_at: row.sentAt?.toISOString() ?? null,
+    recipient_email: row.recipientEmail,
+  };
+}
+
 export async function listIicrcCecSubmissionsForAdmin(options?: {
   limit?: number;
 }): Promise<IicrcCecSubmissionRow[]> {
@@ -459,6 +503,19 @@ export async function listIicrcCecSubmissionsForAdmin(options?: {
     },
   });
 
+  const submissionIds = rows.map((r) => r.id);
+  const countBySubmission = new Map<string, number>();
+  if (submissionIds.length > 0) {
+    const countRows = await prisma.lmsIicrcCecCommunication.groupBy({
+      by: ['submissionId'],
+      where: { submissionId: { in: submissionIds } },
+      _count: { _all: true },
+    });
+    for (const c of countRows) {
+      countBySubmission.set(c.submissionId, c._count._all);
+    }
+  }
+
   return rows.map((r) => ({
     id: r.id,
     enrollment_id: r.enrollmentId,
@@ -468,6 +525,9 @@ export async function listIicrcCecSubmissionsForAdmin(options?: {
     course_title: r.course.title,
     course_slug: r.course.slug,
     status: r.status as IicrcCecSubmissionStatus,
+    renewal_status: r.renewalStatus,
+    initiated_by_admin_email: r.initiatedByAdminEmail,
+    communication_count: countBySubmission.get(r.id) ?? 0,
     cec_hours: r.cecHours,
     iicrc_discipline: r.iicrcDiscipline,
     iicrc_member_number: r.iicrcMemberNumber,
