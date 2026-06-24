@@ -8,6 +8,21 @@ export type CourseBodyBlock =
   | { type: 'quote'; text: string }
   | { type: 'ul'; items: string[] };
 
+/**
+ * Strip the legacy WooCommerce/WordPress "Already Purchased This Course?" → "Access Here"
+ * block that leads many imported course descriptions and links the highest-intent visitors
+ * OFF-site (issue #126). Applied at the render path so a re-import can't reintroduce the leak.
+ */
+export function stripLegacyPurchaseCta(raw: string): string {
+  if (!raw) return raw;
+  return raw
+    .replace(
+      /<h3>\s*Already Purchased This Course\?\s*<\/h3>\s*<p>[\s\S]*?Access Here[\s\S]*?<\/p>\s*/i,
+      ''
+    )
+    .replace(/^\s+/, '');
+}
+
 function splitLongParagraph(text: string): string[] {
   const compact = text.replace(/\s+/g, ' ').trim();
   if (!compact) return [];
