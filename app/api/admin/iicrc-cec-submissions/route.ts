@@ -3,6 +3,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { getAdminSessionOrNull } from '@/lib/admin/admin-session';
 import {
   listIicrcCecSubmissionsForAdmin,
+  manualSendIicrcCecForEnrollment,
   retryIicrcCecSubmission,
 } from '@/lib/server/iicrc-cec-submission';
 import { listRenewalSubmissionsForStudent } from '@/lib/server/iicrc-renewal-communication';
@@ -32,16 +33,57 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ detail: 'Unauthorized' }, { status: 401 });
   }
 
-  let body: { submissionId?: string };
+  let body: { submissionId?: string; enrollmentId?: string; studentId?: string };
   try {
     body = await request.json();
   } catch {
     return NextResponse.json({ detail: 'Invalid JSON' }, { status: 400 });
   }
 
+  const enrollmentId = typeof body.enrollmentId === 'string' ? body.enrollmentId.trim() : '';
+  const studentId = typeof body.studentId === 'string' ? body.studentId.trim() : '';
+
+  if (enrollmentId && studentId) {
+    try {
+      const result = await manualSendIicrcCecForEnrollment({
+        enrollmentId,
+        studentId,
+        initiatedByAdminEmail: session.email,
+      });
+      return NextResponse.json({
+        ok: true,
+        status: result.status,
+        submissionId: result.submissionId ?? null,
+        alreadySent: result.alreadySent ?? false,
+      });
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      if (msg === 'ENROLLMENT_NOT_FOUND') {
+        return NextResponse.json({ detail: 'Enrollment not found for this learner' }, { status: 404 });
+      }
+      if (msg === 'IICRC_MEMBER_NUMBER_REQUIRED') {
+        return NextResponse.json(
+          { detail: 'Learner must have an IICRC member number on file before sending renewal email' },
+          { status: 400 },
+        );
+      }
+      if (msg === 'ENROLLMENT_NOT_COMPLETED') {
+        return NextResponse.json({ detail: 'Course must be marked complete before sending to IICRC' }, { status: 400 });
+      }
+      if (msg === 'COURSE_NOT_CEC_ELIGIBLE') {
+        return NextResponse.json({ detail: 'This course is not eligible for IICRC CEC submission' }, { status: 400 });
+      }
+      console.error('[admin/iicrc-cec-submissions] manual send', e);
+      return NextResponse.json({ detail: 'Failed to send IICRC renewal email' }, { status: 500 });
+    }
+  }
+
   const submissionId = typeof body.submissionId === 'string' ? body.submissionId.trim() : '';
   if (!submissionId) {
-    return NextResponse.json({ detail: 'submissionId is required' }, { status: 400 });
+    return NextResponse.json(
+      { detail: 'submissionId or enrollmentId + studentId are required' },
+      { status: 400 },
+    );
   }
 
   try {

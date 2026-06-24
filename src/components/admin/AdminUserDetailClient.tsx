@@ -48,27 +48,46 @@ const chartTooltipProps = {
   itemStyle: { color: 'rgba(255, 255, 255, 0.95)', fontSize: 13 },
 } as const;
 
+function isCecEligibleEnrollment(enrollment: AdminCourseProgressForUser): boolean {
+  return (
+    (enrollment.cecHours != null && enrollment.cecHours > 0) ||
+    Boolean(enrollment.discipline?.trim())
+  );
+}
+
 function CourseEnrollmentCard({
   enrollment,
   pendingRevoke,
   pendingComplete,
+  pendingSendIicrc,
+  hasIicrcMemberNumber,
   selectable,
   selected,
   onToggleSelect,
   onRevoke,
   onMarkComplete,
+  onSendIicrc,
 }: {
   enrollment: AdminCourseProgressForUser;
   pendingRevoke: boolean;
   pendingComplete: boolean;
+  pendingSendIicrc: boolean;
+  hasIicrcMemberNumber: boolean;
   selectable: boolean;
   selected: boolean;
   onToggleSelect: () => void;
   onRevoke: (id: string) => void;
   onMarkComplete: (id: string) => void;
+  onSendIicrc: (id: string) => void;
 }) {
   const statusLabel = enrollment.status.replace(/_/g, ' ');
   const isComplete = enrollment.completionPct >= 100;
+  const cecEligible = isCecEligibleEnrollment(enrollment);
+  const renewalAlreadySent =
+    enrollment.renewalStatus === 'sent' ||
+    enrollment.renewalStatus === 'approved' ||
+    enrollment.renewalStatus === 'completed';
+  const canSendIicrc = isComplete && cecEligible && hasIicrcMemberNumber && !renewalAlreadySent;
   return (
     <article
       className={cn(
@@ -165,9 +184,7 @@ function CourseEnrollmentCard({
         <div className="mt-4">
           <ProgressBar percentage={enrollment.completionPct} label="Course completion" />
         </div>
-        {isComplete &&
-        enrollment.renewalSubmissionId &&
-        (enrollment.cecHours != null && enrollment.cecHours > 0 || enrollment.discipline) ? (
+        {isComplete && cecEligible ? (
           <div className="mt-4 rounded-xl border border-[#2490ed]/20 bg-[#2490ed]/[0.06] px-4 py-3">
             <p className="text-[10px] font-semibold tracking-[0.18em] text-[#7ec5ff]/80 uppercase">
               IICRC renewal
@@ -188,7 +205,9 @@ function CourseEnrollmentCard({
                           : 'muted'
                   }
                 />
-              ) : null}
+              ) : (
+                <StatusBadge label="Not sent" tone="muted" />
+              )}
               {enrollment.renewalSentAt ? (
                 <span className="text-xs text-white/45">
                   Sent {formatAdminDateTime(enrollment.renewalSentAt)}
@@ -201,13 +220,38 @@ function CourseEnrollmentCard({
                 </span>
               ) : null}
             </div>
-            <Link
-              href={`/admin/iicrc-cec/${enrollment.renewalSubmissionId}`}
-              className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-[#7ec5ff] hover:underline"
-            >
-              <Mail className="h-3 w-3" />
-              View communication log
-            </Link>
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              {canSendIicrc ? (
+                <Button
+                  type="button"
+                  size="sm"
+                  className="h-8 rounded-lg bg-[#2490ed] px-3 text-xs font-semibold hover:bg-[#1a7fd4]"
+                  disabled={pendingSendIicrc || pendingComplete || pendingRevoke}
+                  onClick={() => onSendIicrc(enrollment.enrollmentId)}
+                >
+                  {pendingSendIicrc ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <>
+                      <Mail className="mr-1.5 h-3.5 w-3.5" />
+                      Send IICRC email
+                    </>
+                  )}
+                </Button>
+              ) : null}
+              {!hasIicrcMemberNumber && isComplete ? (
+                <span className="text-xs text-amber-200/70">IICRC member number required</span>
+              ) : null}
+              {enrollment.renewalSubmissionId ? (
+                <Link
+                  href={`/admin/iicrc-cec/${enrollment.renewalSubmissionId}`}
+                  className="inline-flex items-center gap-1 text-xs font-medium text-[#7ec5ff] hover:underline"
+                >
+                  <Mail className="h-3 w-3" />
+                  View communication log
+                </Link>
+              ) : null}
+            </div>
           </div>
         ) : null}
       </div>
@@ -261,7 +305,9 @@ export function AdminUserDetailClient({
   const [pendingRevokeId, setPendingRevokeId] = useState<string | null>(null);
   const [pendingCompleteIds, setPendingCompleteIds] = useState<Set<string>>(() => new Set());
   const [selectedEnrollmentIds, setSelectedEnrollmentIds] = useState<Set<string>>(() => new Set());
+  const [pendingSendIicrcIds, setPendingSendIicrcIds] = useState<Set<string>>(() => new Set());
   const [actionError, setActionError] = useState<string | null>(null);
+  const [actionSuccess, setActionSuccess] = useState<string | null>(null);
 
   const incompleteEnrollments = useMemo(
     () => user.enrollments.filter((e) => e.completionPct < 100),
@@ -286,7 +332,12 @@ export function AdminUserDetailClient({
     [user.overallCompletionPct],
   );
 
-  const displayName = user.fullName?.trim() || user.email.split('@')[0] || 'Learner';
+  const cecEligibleCompleted = useMemo(
+    () => user.enrollments.filter((e) => e.completionPct >= 100 && isCecEligibleEnrollment(e)),
+    [user.enrollments],
+  );
+
+  const hasIicrcMemberNumber = Boolean(user.iicrcMemberNumber?.trim());
 
   async function grantSelectedCourses() {
     setActionError(null);
@@ -375,6 +426,42 @@ export function AdminUserDetailClient({
     }
   }
 
+  async function sendIicrcRenewalEmail(enrollmentId: string) {
+    setActionError(null);
+    setActionSuccess(null);
+    setPendingSendIicrcIds(new Set([enrollmentId]));
+    try {
+      const res = await fetch('/api/admin/iicrc-cec-submissions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ enrollmentId, studentId: user.userId }),
+      });
+      const payload = (await res.json().catch(() => ({}))) as {
+        detail?: string;
+        status?: string;
+        alreadySent?: boolean;
+      };
+      if (!res.ok) {
+        setActionError(payload.detail ?? 'Could not send IICRC renewal email');
+        return;
+      }
+      if (payload.alreadySent) {
+        setActionSuccess('IICRC renewal email was already sent for this course.');
+      } else if (payload.status === 'sent') {
+        setActionSuccess('IICRC renewal email sent successfully.');
+      } else if (payload.status === 'failed') {
+        setActionError('IICRC email delivery failed — check the communication log for details.');
+      } else if (payload.status === 'skipped') {
+        setActionError('IICRC submission was skipped — verify course CEC eligibility and settings.');
+      }
+      router.refresh();
+    } finally {
+      setPendingSendIicrcIds(new Set());
+    }
+  }
+
+  const displayName = user.fullName?.trim() || user.email.split('@')[0] || 'Learner';
+
   const bulkCompletePending = pendingCompleteIds.size > 0;
   const selectedCount = selectedEnrollmentIds.size;
   const enrollDisabled =
@@ -402,6 +489,15 @@ export function AdminUserDetailClient({
         <ArrowLeft className="h-4 w-4" />
         Back to learner directory
       </Link>
+
+      {actionSuccess ? (
+        <div
+          className="mb-6 rounded-xl border border-emerald-400/25 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100"
+          role="status"
+        >
+          {actionSuccess}
+        </div>
+      ) : null}
 
       {actionError ? (
         <div
@@ -542,6 +638,57 @@ export function AdminUserDetailClient({
                 No IICRC member number on file. Add it from the learner profile when they update credentials.
               </p>
             ) : null}
+
+            {cecEligibleCompleted.length > 0 ? (
+              <div className="rounded-xl border border-[#2490ed]/20 bg-[#2490ed]/[0.05] p-4">
+                <div className="flex items-center gap-2">
+                  <Mail className="h-4 w-4 text-[#7ec5ff]" />
+                  <p className="text-sm font-semibold text-white/88">Manual IICRC renewal</p>
+                </div>
+                <p className="mt-1 text-xs text-white/45">
+                  Send certificate of completion to IICRC using member number{' '}
+                  <span className="font-medium text-white/70">{user.iicrcMemberNumber}</span>
+                </p>
+                <ul className="mt-3 space-y-2">
+                  {cecEligibleCompleted.map((e) => {
+                    const alreadySent =
+                      e.renewalStatus === 'sent' ||
+                      e.renewalStatus === 'approved' ||
+                      e.renewalStatus === 'completed';
+                    return (
+                      <li
+                        key={e.enrollmentId}
+                        className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-white/[0.06] bg-black/20 px-3 py-2"
+                      >
+                        <div className="min-w-0">
+                          <p className="truncate text-xs font-medium text-white/80">{e.courseTitle}</p>
+                          {e.cecHours != null && e.cecHours > 0 ? (
+                            <p className="text-[10px] text-white/40">{e.cecHours} CEC hours</p>
+                          ) : null}
+                        </div>
+                        {alreadySent ? (
+                          <StatusBadge label="Sent" tone="success" />
+                        ) : hasIicrcMemberNumber ? (
+                          <Button
+                            type="button"
+                            size="sm"
+                            className="h-7 rounded-lg bg-[#2490ed] px-2.5 text-[11px] font-semibold hover:bg-[#1a7fd4]"
+                            disabled={pendingSendIicrcIds.has(e.enrollmentId)}
+                            onClick={() => void sendIicrcRenewalEmail(e.enrollmentId)}
+                          >
+                            {pendingSendIicrcIds.has(e.enrollmentId) ? (
+                              <Loader2 className="h-3 w-3 animate-spin" />
+                            ) : (
+                              'Send email'
+                            )}
+                          </Button>
+                        ) : null}
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            ) : null}
           </CardContent>
         </Card>
 
@@ -673,6 +820,8 @@ export function AdminUserDetailClient({
                   <CourseEnrollmentCard
                     key={e.enrollmentId}
                     enrollment={e}
+                    hasIicrcMemberNumber={hasIicrcMemberNumber}
+                    pendingSendIicrc={pendingSendIicrcIds.has(e.enrollmentId)}
                     selectable={isIncomplete}
                     selected={selectedEnrollmentIds.has(e.enrollmentId)}
                     pendingRevoke={pendingRevokeId === e.enrollmentId}
@@ -686,6 +835,7 @@ export function AdminUserDetailClient({
                         ? () => {}
                         : (id) => void markEnrollmentsComplete([id])
                     }
+                    onSendIicrc={(id) => void sendIicrcRenewalEmail(id)}
                   />
                 );
               })}

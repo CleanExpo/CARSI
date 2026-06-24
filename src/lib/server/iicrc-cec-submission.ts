@@ -26,6 +26,8 @@ export type IicrcCecSubmissionStatus = 'pending' | 'sent' | 'failed' | 'skipped'
 
 export type ProcessIicrcCecSubmissionOptions = {
   initiatedByAdminEmail?: string | null;
+  /** Admin-initiated send bypasses IICRC_CEC_AUTO_SUBMIT=false. */
+  forceSend?: boolean;
 };
 
 function emailFromAddress(): string {
@@ -127,6 +129,7 @@ export async function processIicrcCecSubmissionForEnrollment(
   options?: ProcessIicrcCecSubmissionOptions,
 ): Promise<{ status: IicrcCecSubmissionStatus; submissionId?: string }> {
   const initiatedByAdminEmail = options?.initiatedByAdminEmail?.trim() || null;
+  const forceSend = options?.forceSend === true;
   if (!process.env.DATABASE_URL?.trim()) {
     return { status: 'skipped' };
   }
@@ -167,7 +170,7 @@ export async function processIicrcCecSubmissionForEnrollment(
     return { status: 'skipped' };
   }
 
-  if (!isIicrcCecAutoSubmitEnabled()) {
+  if (!forceSend && !isIicrcCecAutoSubmitEnabled()) {
     const submission = existing
       ? await prisma.lmsIicrcCecSubmission.update({
           where: { id: existing.id },
@@ -466,8 +469,71 @@ export async function retryIicrcCecSubmission(
 
   const result = await processIicrcCecSubmissionForEnrollment(row.enrollmentId, {
     initiatedByAdminEmail: options?.initiatedByAdminEmail ?? row.initiatedByAdminEmail,
+    forceSend: true,
   });
   return { status: result.status };
+}
+
+export type ManualIicrcSendResult = {
+  status: IicrcCecSubmissionStatus;
+  submissionId?: string;
+  alreadySent?: boolean;
+};
+
+/** Admin-triggered IICRC renewal email for a completed, CEC-eligible enrollment. */
+export async function manualSendIicrcCecForEnrollment(params: {
+  enrollmentId: string;
+  studentId: string;
+  initiatedByAdminEmail?: string | null;
+}): Promise<ManualIicrcSendResult> {
+  const enrollmentId = params.enrollmentId.trim();
+  const studentId = params.studentId.trim();
+  if (!enrollmentId || !studentId) throw new Error('INVALID_PARAMS');
+
+  const enrollment = await loadEnrollmentForSubmission(enrollmentId);
+  if (!enrollment || enrollment.studentId !== studentId) {
+    throw new Error('ENROLLMENT_NOT_FOUND');
+  }
+
+  if (!enrollment.student.iicrcMemberNumber?.trim()) {
+    throw new Error('IICRC_MEMBER_NUMBER_REQUIRED');
+  }
+
+  if (enrollment.status !== 'completed' || !enrollment.completedAt) {
+    throw new Error('ENROLLMENT_NOT_COMPLETED');
+  }
+
+  if (!courseEligibleForIicrcCecSubmission(enrollment.course)) {
+    throw new Error('COURSE_NOT_CEC_ELIGIBLE');
+  }
+
+  const existing = await prisma.lmsIicrcCecSubmission.findUnique({
+    where: { enrollmentId },
+    select: { id: true, status: true },
+  });
+  if (existing?.status === 'sent') {
+    return { status: 'sent', submissionId: existing.id, alreadySent: true };
+  }
+
+  if (existing) {
+    await prisma.lmsIicrcCecSubmission.update({
+      where: { id: existing.id },
+      data: {
+        status: 'pending',
+        renewalStatus: 'pending',
+        failureReason: null,
+        sentAt: null,
+        providerMessageId: null,
+        iicrcMemberNumber: enrollment.student.iicrcMemberNumber,
+      },
+    });
+  }
+
+  const result = await processIicrcCecSubmissionForEnrollment(enrollmentId, {
+    initiatedByAdminEmail: params.initiatedByAdminEmail,
+    forceSend: true,
+  });
+  return { status: result.status, submissionId: result.submissionId };
 }
 
 export async function getCecSubmissionSummaryForEnrollment(
