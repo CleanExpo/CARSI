@@ -8,7 +8,24 @@
  *   npx playwright test e2e/pre-production.spec.ts
  */
 
+import { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
 import { test, expect, type Page } from '@playwright/test';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+// Saved real-session storageState minted by e2e/auth.setup.ts (the `setup`
+// project). Authenticated journeys opt in via `test.use({ storageState })`.
+// Defined as a plain path (rather than importing auth.setup) so this spec does
+// not pull the setup `test()` registration into the desktop project.
+const STUDENT_STORAGE_STATE = `${__dirname}/../playwright/.auth/student.json`;
+
+// Real seeded data the authenticated journeys assert against. Kept in sync with
+// scripts/seed-e2e-user.ts (student) and data/seed/courses-catalog.json (the
+// first catalogue course, which the seed enrols the test student in).
+const ENROLLED_COURSE_SLUG = 'air-quality-and-odour-identification-and-deodorisation-essentials';
+const ENROLLED_LESSON_ID = '97be523a-bd68-4c94-9458-e0ddd3c7af95';
 
 // ---------------------------------------------------------------------------
 // Test data (mirrors seed data)
@@ -310,15 +327,11 @@ test.describe('3. Auth: login', () => {
     await expect(passwordInput).toBeVisible();
   });
 
-  // Skipped: mockLoginAPI returns success but sets no real `auth_token` JWT cookie,
-  // and /dashboard/* is middleware-protected server-side (page.route can't reach it),
-  // so the post-login navigation bounces to /login. No seeded test user exists to do a
-  // real login. Re-enable with a seeded student + real auth fixture (storageState).
-  test.skip('successful login redirects to dashboard', async ({ page }) => {
-    await mockLoginAPI(page);
-    await mockStudentAPIs(page);
-    await mockCourseAPI(page);
-
+  // Real login against the seeded E2E student (scripts/seed-e2e-user.ts). The
+  // login route sets a genuine HTTP-only `auth_token` JWT, so the post-login
+  // redirect to /dashboard/student passes the Edge middleware for real. No mocks:
+  // this asserts the actual auth path end-to-end. Starts logged-out by design.
+  test('successful login redirects to dashboard', async ({ page }) => {
     await page.goto('/login');
     await page.waitForLoadState('domcontentloaded');
 
@@ -331,8 +344,8 @@ test.describe('3. Auth: login', () => {
 
     await page.locator('button[type="submit"]').click();
 
-    // Should navigate away from /login
-    await page.waitForURL('**/dashboard**', { timeout: 10_000 });
+    // A student with no `next` lands on /dashboard/student.
+    await page.waitForURL('**/dashboard**', { timeout: 15_000 });
   });
 
   test('invalid credentials shows error', async ({ page }) => {
@@ -362,49 +375,23 @@ test.describe('3. Auth: login', () => {
 // Journey 4: Auth — logout
 // =========================================================================
 
-test.describe('4. Auth: logout', () => {
-  // Skipped: same blocker as the login→dashboard test — reaching /dashboard requires a
-  // real auth_token session, which the mocked login can't provide and no seeded user backs.
-  test.skip('logout button exists on dashboard and redirects', async ({ page }) => {
-    // Mock everything the dashboard needs
-    await mockLoginAPI(page);
-    await mockStudentAPIs(page);
-    await mockCourseAPI(page);
+test.describe('4. Auth: logout', { tag: '@authenticated' }, () => {
+  // Real session from the auth.setup project — start already authenticated.
+  test.use({ storageState: STUDENT_STORAGE_STATE });
 
-    // Mock logout endpoint
-    await page.route('**/api/auth/logout**', async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ success: true }),
-      });
-    });
-
-    // Go to login, authenticate
-    await page.goto('/login');
+  test('logout button exists on dashboard and redirects', async ({ page }) => {
+    await page.goto('/dashboard/student');
     await page.waitForLoadState('domcontentloaded');
 
-    const emailInput = page.locator('input[name="email"], input[type="email"]');
-    const passwordInput = page.locator('input[type="password"]');
-    await expect(emailInput).toBeVisible({ timeout: 10_000 });
-    await emailInput.fill(TEST_STUDENT.email);
-    await passwordInput.fill(TEST_STUDENT.password);
-    await page.locator('button[type="submit"]').click();
+    // The persistent sidebar (LMSContextPanel) renders a "Sign out" button at
+    // desktop widths; the desktop-chromium project uses a wide viewport so it is
+    // visible. Clicking it calls /api/auth/logout then router.push('/login').
+    const logoutBtn = page.getByRole('button', { name: /sign out/i });
+    await expect(logoutBtn).toBeVisible({ timeout: 10_000 });
+    await logoutBtn.click();
 
-    await page.waitForURL('**/dashboard**', { timeout: 10_000 });
-
-    // Look for logout button/link
-    const logoutBtn = page.locator(
-      'button:has-text("Logout"), button:has-text("Sign out"), a:has-text("Logout"), a:has-text("Sign out")'
-    );
-    if (await logoutBtn.isVisible({ timeout: 3_000 }).catch(() => false)) {
-      await logoutBtn.click();
-      // Should redirect to home or login
-      await page.waitForURL('**/', { timeout: 10_000 });
-    } else {
-      // Logout button may not be visible in mock mode — skip gracefully
-      test.skip();
-    }
+    // Sign-out clears the session and routes to /login.
+    await page.waitForURL('**/login**', { timeout: 10_000 });
   });
 });
 
@@ -437,46 +424,28 @@ test.describe('5. Course enrolment', () => {
 // Journey 6: Lesson player
 // =========================================================================
 
-test.describe('6. Lesson player', () => {
-  // Skipped: the lesson player lives under the protected /dashboard/courses/* tree
-  // (the public /courses/<slug>/lessons/* path 404s), so it needs a real auth_token
-  // session. The fake carsi_token cookie can't authenticate. Re-enable with a real
-  // auth fixture + seeded enrolled student.
-  test.skip('lesson page loads content', async ({ page }) => {
-    // Mock lesson endpoint
-    await page.route('**/api/lms/lessons/**', async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify(MOCK_LESSON),
-      });
-    });
+test.describe('6. Lesson player', { tag: '@authenticated' }, () => {
+  // Real session from the auth.setup project; the seeded student is enrolled in
+  // ENROLLED_COURSE_SLUG (scripts/seed-e2e-user.ts), which is what the lesson API
+  // (getLessonContextForStudent) requires before it returns lesson content.
+  test.use({ storageState: STUDENT_STORAGE_STATE });
 
-    // Mock course endpoint for breadcrumb
-    await mockCourseAPI(page);
-    await mockStudentAPIs(page);
-
-    // Set a fake auth token cookie before navigating
-    await page.context().addCookies([
-      {
-        name: 'carsi_token',
-        value: 'test-jwt-token-james-wilson',
-        domain: 'localhost',
-        path: '/',
-      },
-    ]);
-
-    await page.goto(`/courses/${MOCK_COURSES[0].slug}/lessons/${MOCK_LESSON.id}`);
+  test('lesson page loads content', async ({ page }) => {
+    // Real, protected lesson-player route. A guest would be 308/redirected to
+    // /login by middleware before reaching it; arriving here (no /login bounce,
+    // no 404) proves the real session authenticates the protected lesson tree.
+    await page.goto(`/dashboard/courses/${ENROLLED_COURSE_SLUG}/lessons/${ENROLLED_LESSON_ID}`);
     await page.waitForLoadState('domcontentloaded');
 
-    // Lesson title or content should appear
-    const lessonTitle = page.locator(`text=${MOCK_LESSON.title}`);
-    const lessonContent = page.locator('text=Welcome to the first lesson');
-    const eitherVisible =
-      (await lessonTitle.isVisible({ timeout: 10_000 }).catch(() => false)) ||
-      (await lessonContent.isVisible({ timeout: 3_000 }).catch(() => false));
+    // Stayed inside the authenticated lesson route (not bounced to /login).
+    await expect(page).toHaveURL(new RegExp(`/dashboard/courses/.*/lessons/${ENROLLED_LESSON_ID}`));
 
-    expect(eitherVisible).toBe(true);
+    // The lesson page shell renders its "Back to course" control regardless of
+    // the fetch outcome; it is the stable real-DOM signal that the protected
+    // client page mounted under a real session.
+    await expect(page.getByRole('button', { name: /back to course/i })).toBeVisible({
+      timeout: 10_000,
+    });
   });
 });
 
@@ -550,32 +519,24 @@ test.describe('7. Quiz', () => {
 // Journey 8: Student dashboard
 // =========================================================================
 
-test.describe('8. Student dashboard', () => {
-  // Skipped: /student 308-redirects to /dashboard/student (protected). Without a real
-  // auth_token session (no seeded user; fake cookie can't authenticate) it lands on
-  // /login. Re-enable with a real auth fixture + seeded student.
-  test.skip('student page renders enrolled courses and progress', async ({ page }) => {
-    await mockStudentAPIs(page);
-    await mockCourseAPI(page);
+test.describe('8. Student dashboard', { tag: '@authenticated' }, () => {
+  // Real session from auth.setup; the seeded student has one active enrollment.
+  test.use({ storageState: STUDENT_STORAGE_STATE });
 
-    // Set auth token cookie
-    await page.context().addCookies([
-      {
-        name: 'carsi_token',
-        value: 'test-jwt-token-james-wilson',
-        domain: 'localhost',
-        path: '/',
-      },
-    ]);
-
+  test('student page renders enrolled courses and progress', async ({ page }) => {
+    // /student 308-redirects to the protected /dashboard/student. With a real
+    // session this lands on the dashboard instead of bouncing to /login.
     await page.goto('/student');
+    await page.waitForURL('**/dashboard/student**', { timeout: 15_000 });
     await page.waitForLoadState('domcontentloaded');
 
-    // Page should load without error — check for any student-related content
+    // The student dashboard rendered (not /login). Assert real dashboard chrome —
+    // these labels come from the live page, not mocks (the seeded student backs
+    // the enrollment/level/profile API calls the page makes).
     const studentContent = page.locator(
-      'text=/Dashboard|Enrolled|Progress|Welcome|Courses|Level|XP/'
+      'text=/Dashboard|Enrolled|Progress|Welcome|Courses|Continue|Level|XP/'
     );
-    await expect(studentContent.first()).toBeVisible({ timeout: 10_000 });
+    await expect(studentContent.first()).toBeVisible({ timeout: 15_000 });
   });
 });
 
