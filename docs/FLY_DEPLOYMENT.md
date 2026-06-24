@@ -1,5 +1,11 @@
 # CARSI LMS — Fly.io Backend Deployment
 
+> ⚠️ **LEGACY / NOT IN USE.** CARSI deploys on **DigitalOcean App Platform** (see
+> [`docs/DIGITALOCEAN_DEPLOYMENT.md`](./DIGITALOCEAN_DEPLOYMENT.md) and the root `app.yaml`).
+> This Fly.io guide is retained for history only — its app name (`carsi-backend`) and secret
+> list (`ANTHROPIC_API_KEY`, `REDIS_URL`, `JWT_SECRET_KEY`) do **not** match the live
+> deployment. Do not follow it for production.
+
 > Region: `syd` (Sydney) | Machine: `shared-cpu-1x` 512MB | ~$7 AUD/month
 
 ---
