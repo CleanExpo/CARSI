@@ -8,6 +8,9 @@ import { adminGlassCard, formatAdminDateTime } from '@/components/admin/admin-le
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
+import type { RenewalStatus } from '@/types/iicrc-renewal';
+import { renewalStatusLabel } from '@/types/iicrc-renewal';
+
 type SubmissionRow = {
   id: string;
   enrollment_id: string;
@@ -17,6 +20,9 @@ type SubmissionRow = {
   course_title: string;
   course_slug: string;
   status: string;
+  renewal_status: RenewalStatus;
+  initiated_by_admin_email: string | null;
+  communication_count: number;
   cec_hours: number | null;
   iicrc_discipline: string | null;
   iicrc_member_number: string | null;
@@ -26,6 +32,23 @@ type SubmissionRow = {
   provider_message_id: string | null;
   created_at: string;
 };
+
+function renewalStatusClass(status: RenewalStatus): string {
+  switch (status) {
+    case 'sent':
+      return 'border-emerald-500/35 bg-emerald-500/10 text-emerald-200';
+    case 'awaiting_response':
+      return 'border-amber-500/35 bg-amber-500/10 text-amber-200';
+    case 'approved':
+    case 'completed':
+      return 'border-sky-500/35 bg-sky-500/10 text-sky-200';
+    case 'rejected':
+    case 'failed':
+      return 'border-red-500/35 bg-red-500/10 text-red-200';
+    default:
+      return 'border-white/15 bg-white/5 text-white/55';
+  }
+}
 
 function statusClass(status: string): string {
   switch (status) {
@@ -109,7 +132,7 @@ export function AdminIicrcCecSubmissionsClient() {
             <h1 className="text-2xl font-bold tracking-tight text-white">IICRC CEC submissions</h1>
             <p className="mt-1 max-w-2xl text-sm text-white/45">
               Automatic Certificate of Completion emails sent to IICRC Renewals when technicians
-              finish CEC-eligible courses. Each row is the mail receipt logged by CARSI.
+              finish CEC-eligible courses. Open a row to view the full communication audit trail.
             </p>
           </div>
         </div>
@@ -149,7 +172,9 @@ export function AdminIicrcCecSubmissionsClient() {
                 <th className="px-4 py-3 font-medium">Technician</th>
                 <th className="px-4 py-3 font-medium">Course</th>
                 <th className="px-4 py-3 font-medium">CEC</th>
-                <th className="px-4 py-3 font-medium">Status</th>
+                <th className="px-4 py-3 font-medium">Email</th>
+                <th className="px-4 py-3 font-medium">Renewal</th>
+                <th className="px-4 py-3 font-medium">Messages</th>
                 <th className="px-4 py-3 font-medium">Sent</th>
                 <th className="px-4 py-3 font-medium">Actions</th>
               </tr>
@@ -184,6 +209,20 @@ export function AdminIicrcCecSubmissionsClient() {
                       <p className="mt-1 max-w-[220px] text-xs text-red-200/80">{row.failure_reason}</p>
                     ) : null}
                   </td>
+                  <td className="px-4 py-3 align-top">
+                    <span
+                      className={cn(
+                        'inline-flex rounded-full border px-2.5 py-0.5 text-xs font-medium',
+                        renewalStatusClass(row.renewal_status),
+                      )}
+                    >
+                      {renewalStatusLabel(row.renewal_status)}
+                    </span>
+                    {row.initiated_by_admin_email ? (
+                      <p className="mt-1 text-xs text-white/35">By {row.initiated_by_admin_email}</p>
+                    ) : null}
+                  </td>
+                  <td className="px-4 py-3 align-top text-white/55">{row.communication_count}</td>
                   <td className="px-4 py-3 align-top text-white/55">
                     {row.sent_at ? formatAdminDateTime(row.sent_at) : '—'}
                     {row.provider_message_id ? (
@@ -194,6 +233,12 @@ export function AdminIicrcCecSubmissionsClient() {
                   </td>
                   <td className="px-4 py-3 align-top">
                     <div className="flex flex-col gap-2">
+                      <Link
+                        href={`/admin/iicrc-cec/${row.id}`}
+                        className="text-xs font-medium text-[#7ec5ff] hover:underline"
+                      >
+                        Communication log
+                      </Link>
                       {row.status === 'failed' || row.status === 'pending' ? (
                         <Button
                           type="button"
