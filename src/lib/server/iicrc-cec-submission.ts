@@ -10,6 +10,7 @@ import {
   courseEligibleForIicrcCecSubmission,
   getIicrcCecSubmissionEmail,
   isIicrcCecAutoSubmitEnabled,
+  resolveEffectiveCecHours,
 } from '@/lib/server/iicrc-cec-config';
 import {
   buildIicrcCecSubmissionHtml,
@@ -21,6 +22,7 @@ import {
 } from '@/lib/server/iicrc-cec-email';
 
 import { logRenewalCommunication } from '@/lib/server/iicrc-renewal-communication';
+import { syncEnrollmentCompletion } from '@/lib/server/enrollment-service';
 
 export type IicrcCecSubmissionStatus = 'pending' | 'sent' | 'failed' | 'skipped';
 
@@ -106,7 +108,10 @@ function emailContentFromEnrollment(
 ): IicrcCecSubmissionEmailContent {
   const origin = appOrigin();
   const studentName = row.student.fullName?.trim() || row.student.email;
-  const cecHours = Number(row.course.cecHours ?? 0);
+  const cecHours = resolveEffectiveCecHours({
+    slug: row.course.slug,
+    cecHours: row.course.cecHours,
+  }) ?? 0;
   return {
     studentName,
     studentEmail: row.student.email,
@@ -118,6 +123,13 @@ function emailContentFromEnrollment(
     credentialId: row.id,
     verificationUrl: `${origin}/verify/credential/${row.id}`,
   };
+}
+
+function resolvedCecHoursForCourse(course: {
+  slug: string;
+  cecHours: unknown;
+}): number | null {
+  return resolveEffectiveCecHours({ slug: course.slug, cecHours: course.cecHours });
 }
 
 /**
@@ -147,7 +159,13 @@ export async function processIicrcCecSubmissionForEnrollment(
     return { status: 'skipped' };
   }
 
-  if (!courseEligibleForIicrcCecSubmission(enrollment.course)) {
+  if (
+    !courseEligibleForIicrcCecSubmission({
+      slug: enrollment.course.slug,
+      cecHours: resolvedCecHoursForCourse(enrollment.course),
+      iicrcDiscipline: enrollment.course.iicrcDiscipline,
+    })
+  ) {
     if (!existing) {
       await prisma.lmsIicrcCecSubmission.create({
         data: {
@@ -161,7 +179,7 @@ export async function processIicrcCecSubmissionForEnrollment(
           renewalStatus: 'skipped',
           initiatedByAdminEmail,
           failureReason: 'course_not_cec_eligible',
-          cecHours: enrollment.course.cecHours,
+          cecHours: resolvedCecHoursForCourse(enrollment.course),
           iicrcDiscipline: enrollment.course.iicrcDiscipline,
           iicrcMemberNumber: enrollment.student.iicrcMemberNumber,
         },
@@ -193,7 +211,7 @@ export async function processIicrcCecSubmissionForEnrollment(
             renewalStatus: 'skipped',
             initiatedByAdminEmail,
             failureReason: 'auto_submit_disabled',
-            cecHours: enrollment.course.cecHours,
+            cecHours: resolvedCecHoursForCourse(enrollment.course),
             iicrcDiscipline: enrollment.course.iicrcDiscipline,
             iicrcMemberNumber: enrollment.student.iicrcMemberNumber,
           },
@@ -235,7 +253,7 @@ export async function processIicrcCecSubmissionForEnrollment(
             recipientEmail: recipient,
             technicianEmail: enrollment.student.email,
             initiatedByAdminEmail,
-            cecHours: enrollment.course.cecHours,
+            cecHours: resolvedCecHoursForCourse(enrollment.course),
             iicrcDiscipline: enrollment.course.iicrcDiscipline,
             iicrcMemberNumber: enrollment.student.iicrcMemberNumber,
             emailSubject: subject,
@@ -258,7 +276,7 @@ export async function processIicrcCecSubmissionForEnrollment(
             status: 'pending',
             renewalStatus: 'pending',
             initiatedByAdminEmail,
-            cecHours: enrollment.course.cecHours,
+            cecHours: resolvedCecHoursForCourse(enrollment.course),
             iicrcDiscipline: enrollment.course.iicrcDiscipline,
             iicrcMemberNumber: enrollment.student.iicrcMemberNumber,
             emailSubject: subject,
@@ -284,7 +302,7 @@ export async function processIicrcCecSubmissionForEnrollment(
           course: {
             title: enrollment.course.title,
             iicrcDiscipline: enrollment.course.iicrcDiscipline,
-            cecHours: enrollment.course.cecHours,
+            cecHours: resolvedCecHoursForCourse(enrollment.course),
             level: enrollment.course.level,
           },
         },
@@ -478,7 +496,64 @@ export type ManualIicrcSendResult = {
   status: IicrcCecSubmissionStatus;
   submissionId?: string;
   alreadySent?: boolean;
+  failureReason?: string | null;
+  detail?: string;
 };
+
+async function ensureEnrollmentReadyForIicrcManual(
+  enrollmentId: string,
+  studentId: string,
+  courseId: string,
+  initiatedByAdminEmail?: string | null,
+): Promise<void> {
+  await syncEnrollmentCompletion(enrollmentId, studentId, courseId, {
+    initiatedByAdminEmail,
+    skipIicrcAutoSubmit: true,
+  });
+
+  const row = await prisma.lmsEnrollment.findUnique({
+    where: { id: enrollmentId },
+    select: { status: true, completedAt: true },
+  });
+
+  if (row?.status === 'completed' && row.completedAt) return;
+
+  await prisma.lmsEnrollment.update({
+    where: { id: enrollmentId },
+    data: {
+      status: 'completed',
+      completedAt: row?.completedAt ?? new Date(),
+    },
+  });
+}
+
+async function loadSubmissionFailureReason(submissionId: string | undefined): Promise<string | null> {
+  if (!submissionId) return null;
+  const row = await prisma.lmsIicrcCecSubmission.findUnique({
+    where: { id: submissionId },
+    select: { failureReason: true },
+  });
+  return row?.failureReason ?? null;
+}
+
+export function iicrcSubmissionFailureMessage(reason: string | null | undefined): string {
+  switch (reason) {
+    case 'not_configured':
+      return 'Email is not configured on the server. Set RESEND_API_KEY and EMAIL_FROM.';
+    case 'send_failed':
+      return 'Email delivery failed. Check server logs and network access to api.resend.com.';
+    case 'resend_error':
+      return 'Resend rejected the email. Verify your API key and verified sending domain.';
+    case 'course_not_cec_eligible':
+      return 'This course is not eligible for IICRC CEC submission.';
+    case 'auto_submit_disabled':
+      return 'IICRC auto-submit is disabled and manual send did not complete.';
+    case 'submission_skipped':
+      return 'IICRC submission was skipped. Ensure the course is complete and CEC-eligible.';
+    default:
+      return reason?.trim() || 'IICRC renewal email could not be sent.';
+  }
+}
 
 /** Admin-triggered IICRC renewal email for a completed, CEC-eligible enrollment. */
 export async function manualSendIicrcCecForEnrollment(params: {
@@ -490,7 +565,7 @@ export async function manualSendIicrcCecForEnrollment(params: {
   const studentId = params.studentId.trim();
   if (!enrollmentId || !studentId) throw new Error('INVALID_PARAMS');
 
-  const enrollment = await loadEnrollmentForSubmission(enrollmentId);
+  let enrollment = await loadEnrollmentForSubmission(enrollmentId);
   if (!enrollment || enrollment.studentId !== studentId) {
     throw new Error('ENROLLMENT_NOT_FOUND');
   }
@@ -499,11 +574,25 @@ export async function manualSendIicrcCecForEnrollment(params: {
     throw new Error('IICRC_MEMBER_NUMBER_REQUIRED');
   }
 
-  if (enrollment.status !== 'completed' || !enrollment.completedAt) {
+  await ensureEnrollmentReadyForIicrcManual(
+    enrollmentId,
+    studentId,
+    enrollment.courseId,
+    params.initiatedByAdminEmail,
+  );
+
+  enrollment = await loadEnrollmentForSubmission(enrollmentId);
+  if (!enrollment || enrollment.status !== 'completed' || !enrollment.completedAt) {
     throw new Error('ENROLLMENT_NOT_COMPLETED');
   }
 
-  if (!courseEligibleForIicrcCecSubmission(enrollment.course)) {
+  if (
+    !courseEligibleForIicrcCecSubmission({
+      slug: enrollment.course.slug,
+      cecHours: resolvedCecHoursForCourse(enrollment.course),
+      iicrcDiscipline: enrollment.course.iicrcDiscipline,
+    })
+  ) {
     throw new Error('COURSE_NOT_CEC_ELIGIBLE');
   }
 
@@ -533,7 +622,21 @@ export async function manualSendIicrcCecForEnrollment(params: {
     initiatedByAdminEmail: params.initiatedByAdminEmail,
     forceSend: true,
   });
-  return { status: result.status, submissionId: result.submissionId };
+
+  const failureReason = await loadSubmissionFailureReason(result.submissionId);
+  const detail =
+    result.status === 'failed' || result.status === 'skipped'
+      ? iicrcSubmissionFailureMessage(
+          failureReason ?? (result.status === 'skipped' ? 'submission_skipped' : 'send_failed'),
+        )
+      : undefined;
+
+  return {
+    status: result.status,
+    submissionId: result.submissionId,
+    failureReason,
+    detail,
+  };
 }
 
 export async function getCecSubmissionSummaryForEnrollment(

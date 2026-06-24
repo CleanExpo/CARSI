@@ -113,7 +113,7 @@ export async function syncEnrollmentCompletion(
   enrollmentId: string,
   studentId: string,
   courseId: string,
-  options?: { initiatedByAdminEmail?: string | null },
+  options?: { initiatedByAdminEmail?: string | null; skipIicrcAutoSubmit?: boolean },
 ): Promise<void> {
   const { ids, total } = await lessonTotalsForCourse(courseId);
   const prior = await prisma.lmsEnrollment.findUnique({
@@ -146,7 +146,7 @@ export async function syncEnrollmentCompletion(
     },
   });
 
-  if (allDone && !wasAlreadyCompleted) {
+  if (allDone && !wasAlreadyCompleted && !options?.skipIicrcAutoSubmit) {
     const { processIicrcCecSubmissionForEnrollment } = await import(
       '@/lib/server/iicrc-cec-submission'
     );

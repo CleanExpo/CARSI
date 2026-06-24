@@ -50,6 +50,21 @@ export async function POST(request: NextRequest) {
         studentId,
         initiatedByAdminEmail: session.email,
       });
+
+      if (result.status === 'failed' || result.status === 'skipped') {
+        const statusCode = result.failureReason === 'not_configured' ? 503 : 502;
+        return NextResponse.json(
+          {
+            ok: false,
+            status: result.status,
+            submissionId: result.submissionId ?? null,
+            failureReason: result.failureReason ?? null,
+            detail: result.detail ?? 'IICRC renewal email could not be sent.',
+          },
+          { status: statusCode },
+        );
+      }
+
       return NextResponse.json({
         ok: true,
         status: result.status,

@@ -440,6 +440,7 @@ export function AdminUserDetailClient({
         detail?: string;
         status?: string;
         alreadySent?: boolean;
+        failureReason?: string;
       };
       if (!res.ok) {
         setActionError(payload.detail ?? 'Could not send IICRC renewal email');
@@ -450,9 +451,12 @@ export function AdminUserDetailClient({
       } else if (payload.status === 'sent') {
         setActionSuccess('IICRC renewal email sent successfully.');
       } else if (payload.status === 'failed') {
-        setActionError('IICRC email delivery failed — check the communication log for details.');
+        setActionError(payload.detail ?? 'IICRC email delivery failed — check the communication log.');
       } else if (payload.status === 'skipped') {
-        setActionError('IICRC submission was skipped — verify course CEC eligibility and settings.');
+        setActionError(
+          payload.detail ??
+            'IICRC submission was skipped — verify course CEC eligibility, RESEND_API_KEY, and completion status.',
+        );
       }
       router.refresh();
     } finally {
