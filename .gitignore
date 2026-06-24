@@ -99,6 +99,9 @@ apps/backend/.claude/
 ai-review/results/
 ai-review/screenshots/
 
+# Demo screencast pipeline (generated recordings, composites, results manifest)
+output/demo-screencast/
+
 # NotebookLM generated artifacts
 .claude/notebooklm/repo-pack.txt
 .claude/data/minion-state.json
