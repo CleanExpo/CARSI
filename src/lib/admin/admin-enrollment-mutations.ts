@@ -123,6 +123,7 @@ export async function adminRevokeEnrollment(enrollmentId: string) {
 export async function adminMarkEnrollmentsComplete(params: {
   studentId: string;
   enrollmentIds: string[];
+  initiatedByAdminEmail?: string | null;
 }): Promise<{ updated: number; results: { enrollmentId: string; lessonsMarked: number }[] }> {
   const student = await prisma.lmsUser.findUnique({ where: { id: params.studentId } });
   if (!student) throw new Error('USER_NOT_FOUND');
@@ -140,7 +141,9 @@ export async function adminMarkEnrollmentsComplete(params: {
 
   const results: { enrollmentId: string; lessonsMarked: number }[] = [];
   for (const enrollmentId of uniqueIds) {
-    const r = await forceCompleteEnrollment(enrollmentId, params.studentId);
+    const r = await forceCompleteEnrollment(enrollmentId, params.studentId, {
+      initiatedByAdminEmail: params.initiatedByAdminEmail,
+    });
     results.push({ enrollmentId, lessonsMarked: r.lessonsMarked });
   }
 
