@@ -2,6 +2,7 @@ import type { AdminCatalogCourse } from '@/lib/admin/load-admin-catalog';
 import { loadAdminCatalogFromXlsx } from '@/lib/admin/load-admin-catalog';
 import { buildAdminCatalogFromSeed } from '@/lib/lms-seed-catalog';
 import { prisma } from '@/lib/prisma';
+import { getRenewalSummaryByEnrollmentIds } from '@/lib/server/iicrc-renewal-communication';
 
 export type AdminCourseModuleProgress = {
   moduleNo: number;
@@ -26,6 +27,10 @@ export type AdminCourseProgressForUser = {
   completedModules: number;
   remainingLessons: number;
   modules: AdminCourseModuleProgress[];
+  renewalSubmissionId: string | null;
+  renewalStatus: string | null;
+  renewalCommunicationCount: number;
+  renewalSentAt: string | null;
 };
 
 export type AdminUserProgress = {
@@ -134,6 +139,16 @@ export function mapUserToAdminProgress(
   catalogBySlug: Map<string, AdminCatalogCourse>,
   completedLessonCounts: Map<string, number>,
   lastActiveAt: Date | null,
+  renewalByEnrollment?: Map<
+    string,
+    {
+      submission_id: string;
+      status: string;
+      renewal_status: string;
+      sent_at: string | null;
+      communication_count: number;
+    }
+  >,
 ): AdminUserProgress {
   const totalLessonsSum = userEnrollments.reduce((acc, e) => {
     const course = catalogBySlug.get(e.course.slug);
@@ -161,6 +176,8 @@ export function mapUserToAdminProgress(
     const remainingLessons = Math.max(0, totalLessons - completedModules);
     const pct = totalLessons > 0 ? Math.round((completedModules / totalLessons) * 100) : 0;
 
+    const renewal = renewalByEnrollment?.get(e.id);
+
     return {
       enrollmentId: e.id,
       courseSlug,
@@ -177,6 +194,10 @@ export function mapUserToAdminProgress(
       completedModules,
       remainingLessons,
       modules: course ? buildModuleProgress(course, completedModules) : [],
+      renewalSubmissionId: renewal?.submission_id ?? null,
+      renewalStatus: renewal?.renewal_status ?? null,
+      renewalCommunicationCount: renewal?.communication_count ?? 0,
+      renewalSentAt: renewal?.sent_at ?? null,
     };
   });
 
@@ -317,8 +338,10 @@ export async function getAdminUserDetail(userId: string): Promise<{
 
   const enrollments = await fetchCatalogEnrollmentsForUsers([userId], catalogSlugs);
   const courseIds = Array.from(new Set(enrollments.map((e) => e.courseId)));
+  const enrollmentIds = enrollments.map((e) => e.id);
   const completedLessonCounts = await fetchCompletedLessonCounts([userId], courseIds);
   const lastActiveMap = await fetchLastActiveByUserId([userId]);
+  const renewalByEnrollment = await getRenewalSummaryByEnrollmentIds(enrollmentIds);
   const roleNames = user.userRoles.map((ur) => ur.role.name);
 
   const progress = mapUserToAdminProgress(
@@ -327,6 +350,7 @@ export async function getAdminUserDetail(userId: string): Promise<{
     catalogBySlug,
     completedLessonCounts,
     lastActiveMap.get(userId) ?? null,
+    renewalByEnrollment,
   );
 
   return {
