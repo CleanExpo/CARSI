@@ -302,10 +302,12 @@ test.describe("PRD Viewer", () => {
   test("should navigate between tabs", async ({ page }) => {
     await page.goto(`/prd/${PRD_ID}`);
 
-    // User Stories tab -> epic card renders. Assert on the seeded epic name, which is
-    // unique to this tab's content (the word "Epics" never appears in the markup).
+    // User Stories tab -> epic card renders. Assert on the seeded epic name. Use the
+    // heading role (the epic name is an <h3>) so the match is unambiguous: a plain
+    // getByText("Collaboration") also matches the epic's description paragraph
+    // ("Real-time collaboration features"), tripping Playwright strict mode.
     await page.getByRole("tab", { name: "User Stories" }).click();
-    await expect(page.getByText("Collaboration")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Collaboration" })).toBeVisible();
 
     // Tech tab -> "Architecture Overview" card title.
     await page.getByRole("tab", { name: /Tech/i }).click();
