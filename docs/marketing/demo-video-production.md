@@ -62,7 +62,10 @@ npm run video:demo:upload   -- --id=<flow> [--persist]    # Cloudinary (+ option
 
 Useful flags: `--dry-run` (print resolved steps + the FFmpeg command, no browser/spend),
 `--id=<flow>` / `--limit=N` to scope, `--force` to re-record, `--yes` for non-interactive
-upload confirmation.
+upload confirmation, `DEMO_CURSOR=0` to disable the synthetic cursor.
+
+Composite audio flags (see "Artlist audio" below): `--voiceover=<file>`, `--music=<file>`,
+`--music-gain=<0..1>`.
 
 ## Current flows (`src/lib/screencast/demo-flows.ts`)
 
@@ -71,6 +74,35 @@ upload confirmation.
 | `lesson-player-walkthrough` | `lesson-walkthrough` | `learner-day-three-nudge` |
 | `welcome-public-tour` | `marketing-reel` | `carsi-public-introduction` |
 | `dashboard-broll` | `brand-broll` | _none (silent)_ |
+| `pathways-tour` | `marketing-reel` | `pathways-advisor-intro` |
+| `course-catalogue-discipline-tour` | `brand-broll` | _none (silent)_ |
+
+## Artlist audio (licensed music bed / voiceover)
+
+For ad creative you can mux in **Artlist** assets (royalty-free music + AI voiceover). A
+**Pro/Max** Artlist license covers **paid ads** on Facebook/Instagram/LinkedIn; the basic
+Social license does not. Keep the per-asset Artlist license certificate on file.
+
+No API is required — download the files from the Artlist web app and pass them at composite
+time:
+
+```bash
+# Keep the HeyGen avatar visual, but use an Artlist voiceover + music bed for audio:
+npm run video:demo:composite -- --id=welcome-public-tour \
+  --voiceover=assets/artlist/reel-vo.mp3 --music=assets/artlist/bed.mp3 --music-gain=0.18
+
+# Fully Artlist audio with NO avatar (use a silent b-roll flow):
+npm run video:demo:composite -- --id=course-catalogue-discipline-tour \
+  --voiceover=assets/artlist/reel-vo.mp3 --music=assets/artlist/bed.mp3
+```
+
+Behaviour:
+
+- `--voiceover` **overrides** the avatar's own audio as the narration track.
+- `--music` is **looped** and mixed underneath at `--music-gain` (default `0.18`).
+- The video (screencast) length governs the final cut (`-shortest`); the music bed loops to
+  cover it, so the bed can be shorter than the video.
+- With no audio flags, behaviour is unchanged (avatar audio for paired flows, silent for b-roll).
 
 ## Authoring a new flow
 

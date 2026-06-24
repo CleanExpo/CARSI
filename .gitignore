@@ -102,6 +102,9 @@ ai-review/screenshots/
 # Demo screencast pipeline (generated recordings, composites, results manifest)
 output/demo-screencast/
 
+# Licensed third-party media downloaded for video production (e.g. Artlist) — never commit
+assets/artlist/
+
 # NotebookLM generated artifacts
 .claude/notebooklm/repo-pack.txt
 .claude/data/minion-state.json

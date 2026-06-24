@@ -400,55 +400,109 @@ function overlayExpr(corner: DemoFlow['pip']['corner'], margin: number): string 
   }
 }
 
+/**
+ * External audio supplied at composite time (e.g. an Artlist music bed / AI voiceover).
+ * - voiceover overrides the avatar's own audio as the narration track.
+ * - music is looped and mixed underneath at `musicGain` (0–1).
+ */
+type AudioOpts = { music: string | null; voiceover: string | null; musicGain: number };
+
+function audioOptsFromFlags(): AudioOpts {
+  const raw = argValue('music-gain');
+  let musicGain = 0.18;
+  if (raw !== undefined && raw.trim() !== '') {
+    const n = Number(raw);
+    if (!Number.isFinite(n) || n < 0 || n > 1) {
+      throw new Error(`Invalid --music-gain: "${raw}". Expected a number between 0 and 1.`);
+    }
+    musicGain = n;
+  }
+  return {
+    music: argValue('music') ?? null,
+    voiceover: argValue('voiceover') ?? null,
+    musicGain,
+  };
+}
+
 function buildFfmpegArgs(
   flow: DemoFlow,
   rawPath: string,
   avatarPath: string | null,
   captionPath: string | null,
-  outPath: string
+  outPath: string,
+  audio: AudioOpts
 ): string[] {
   const vw = flow.viewport.width;
   const vh = flow.viewport.height;
-
-  // Silent b-roll: just normalise the webm to a clean H.264 MP4.
-  if (!avatarPath) {
-    return [
-      '-y',
-      '-i', rawPath,
-      '-vf', `scale=${vw}:${vh},setsar=1,format=yuv420p`,
-      '-c:v', 'libx264',
-      '-preset', 'medium',
-      '-an',
-      outPath,
-    ];
-  }
-
-  const pipW = Math.round((vw * flow.pip.widthPct) / 100 / 2) * 2; // even width for yuv420p
-  const overlay = overlayExpr(flow.pip.corner, PIP_MARGIN);
-  const filter =
-    `[0:v]scale=${vw}:${vh},setsar=1[bg];` +
-    `[1:v]scale=${pipW}:-2[pip];` +
-    `[bg][pip]overlay=${overlay}:format=auto,format=yuv420p[v]`;
-
-  const args = ['-y', '-i', rawPath, '-i', avatarPath];
   const hasCaptions = !!captionPath;
-  if (hasCaptions) args.push('-i', captionPath);
 
-  args.push(
-    '-filter_complex', filter,
-    '-map', '[v]',
-    '-map', '1:a', // voiceover comes from the avatar
-  );
-  if (hasCaptions) {
-    args.push('-map', '2:0', '-c:s', 'mov_text');
+  // Track input indices as -i entries are appended.
+  const inputs: string[] = ['-i', rawPath];
+  let idx = 0;
+  const rawIdx = idx++;
+  let avatarIdx = -1;
+  if (avatarPath) {
+    inputs.push('-i', avatarPath);
+    avatarIdx = idx++;
   }
-  args.push(
-    '-c:v', 'libx264',
-    '-preset', 'medium',
-    '-c:a', 'aac',
-    '-shortest', // end when the avatar narration ends
-    outPath,
-  );
+  let captionIdx = -1;
+  if (hasCaptions) {
+    inputs.push('-i', captionPath as string);
+    captionIdx = idx++;
+  }
+  let voiceIdx = -1;
+  if (audio.voiceover) {
+    inputs.push('-i', audio.voiceover);
+    voiceIdx = idx++;
+  }
+  let musicIdx = -1;
+  if (audio.music) {
+    inputs.push('-stream_loop', '-1', '-i', audio.music); // loop the bed to cover the video
+    musicIdx = idx++;
+  }
+
+  // ---- Video graph ----
+  const filters: string[] = [];
+  if (avatarIdx >= 0) {
+    const pipW = Math.round((vw * flow.pip.widthPct) / 100 / 2) * 2; // even width for yuv420p
+    const overlay = overlayExpr(flow.pip.corner, PIP_MARGIN);
+    filters.push(
+      `[${rawIdx}:v]scale=${vw}:${vh},setsar=1[bg]`,
+      `[${avatarIdx}:v]scale=${pipW}:-2[pip]`,
+      `[bg][pip]overlay=${overlay}:format=auto,format=yuv420p[v]`
+    );
+  } else {
+    filters.push(`[${rawIdx}:v]scale=${vw}:${vh},setsar=1,format=yuv420p[v]`);
+  }
+
+  // ---- Audio graph ----
+  // An explicit voiceover overrides the avatar's own audio; otherwise use the avatar's.
+  const primary = voiceIdx >= 0 ? `${voiceIdx}:a` : avatarIdx >= 0 ? `${avatarIdx}:a` : null;
+  let aLabel: string | null = null;
+  if (primary && musicIdx >= 0) {
+    filters.push(
+      `[${primary}]volume=1.0[pa]`,
+      `[${musicIdx}:a]volume=${audio.musicGain}[ma]`,
+      `[pa][ma]amix=inputs=2:duration=longest:normalize=0[aout]`
+    );
+    aLabel = '[aout]';
+  } else if (primary) {
+    aLabel = primary; // direct map, no mixing needed
+  } else if (musicIdx >= 0) {
+    filters.push(`[${musicIdx}:a]volume=1.0[aout]`);
+    aLabel = '[aout]';
+  }
+
+  const args = ['-y', ...inputs, '-filter_complex', filters.join(';'), '-map', '[v]'];
+  if (aLabel) args.push('-map', aLabel);
+  if (hasCaptions) args.push('-map', `${captionIdx}:0`, '-c:s', 'mov_text');
+  args.push('-c:v', 'libx264', '-preset', 'medium');
+  if (aLabel) {
+    args.push('-c:a', 'aac', '-shortest'); // end at the shortest finite stream (video governs)
+  } else {
+    args.push('-an');
+  }
+  args.push(outPath);
   return args;
 }
 
@@ -471,10 +525,11 @@ async function compositeFlow(flow: DemoFlow): Promise<string> {
   const captionPathRaw = captionPathFor(flow);
   const captionPath = captionPathRaw && (await exists(captionPathRaw)) ? captionPathRaw : null;
   const finalPath = join(FINAL_DIR, `${flow.id}.mp4`);
+  const audio = audioOptsFromFlags();
 
   // A dry-run previews the command without requiring any inputs to exist yet.
   if (hasFlag('dry-run')) {
-    const args = buildFfmpegArgs(flow, rawPath, avatarPath, captionPath, finalPath);
+    const args = buildFfmpegArgs(flow, rawPath, avatarPath, captionPath, finalPath, audio);
     console.log(`  [dry-run] ${resolveFfmpegBin()} ${args.join(' ')}`);
     return finalPath;
   }
@@ -487,8 +542,14 @@ async function compositeFlow(flow: DemoFlow): Promise<string> {
       `Avatar video missing for "${flow.id}" (${avatarPath}). Run \`npm run video:brand:generate -- --ids=${flow.brandVideoScriptId}\` first.`
     );
   }
+  if (audio.voiceover && !(await exists(audio.voiceover))) {
+    throw new Error(`--voiceover file not found: ${audio.voiceover}`);
+  }
+  if (audio.music && !(await exists(audio.music))) {
+    throw new Error(`--music file not found: ${audio.music}`);
+  }
   await mkdir(FINAL_DIR, { recursive: true });
-  const args = buildFfmpegArgs(flow, rawPath, avatarPath, captionPath, finalPath);
+  const args = buildFfmpegArgs(flow, rawPath, avatarPath, captionPath, finalPath, audio);
   await runFfmpeg(args);
   return finalPath;
 }
