@@ -1,5 +1,13 @@
 // CARSI LMS Service Worker — PWA + Push Notifications
-const CACHE_NAME = 'carsi-v2';
+const CACHE_NAME = 'carsi-v3';
+
+function shouldBypassFetch(url) {
+  return (
+    url.pathname.startsWith('/admin') ||
+    url.pathname.startsWith('/api') ||
+    url.pathname.startsWith('/_next')
+  );
+}
 
 // Install — cache critical shell assets (valid routes only)
 self.addEventListener('install', (event) => {
@@ -27,16 +35,30 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Fetch — do not intercept document navigations (avoids broken HTML streams in dev)
+// Fetch — do not intercept admin/API/RSC or document navigations
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
   if (event.request.mode === 'navigate') return;
 
   const url = new URL(event.request.url);
   if (url.origin !== self.location.origin) return;
+  if (shouldBypassFetch(url)) return;
 
   event.respondWith(
-    fetch(event.request).catch(() => caches.match(event.request)),
+    (async () => {
+      try {
+        return await fetch(event.request);
+      } catch (err) {
+        const cached = await caches.match(event.request);
+        if (cached) return cached;
+        console.warn('[sw] network error, no cache', event.request.url, err);
+        return new Response('Offline', {
+          status: 503,
+          statusText: 'Service Unavailable',
+          headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+        });
+      }
+    })(),
   );
 });
 
