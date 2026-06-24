@@ -224,6 +224,8 @@ model LmsIicrcCecSubmission {
   enrollment     LmsEnrollment                 @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
   student        LmsUser                       @relation(fields: [studentId], references: [id], onDelete: Cascade)
   course         LmsCourse                     @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  communications LmsIicrcCecCommunication[]
+  notes          LmsIicrcCecSubmissionNote[]
 
   @@index([studentId])
   @@index([status])
