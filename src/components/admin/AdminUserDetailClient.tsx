@@ -17,7 +17,7 @@ import {
   Trash2,
   UserRound,
 } from 'lucide-react';
-import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
+import { Cell, Pie, PieChart, Tooltip } from 'recharts';
 
 import type { AdminCatalogCourseOption, AdminUserProgress } from '@/lib/admin/admin-user-progress';
 import type { AdminCourseProgressForUser } from '@/lib/admin/admin-user-progress';
@@ -35,7 +35,7 @@ import { renewalStatusLabel, type RenewalStatus } from '@/types/iicrc-renewal';
 import { AdminCourseMultiPicker } from '@/components/admin/AdminCourseMultiPicker';
 import { ProgressBar } from '@/components/lms/ProgressBar';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 
 const chartTooltipProps = {
@@ -377,6 +377,12 @@ export function AdminUserDetailClient({
 
   const bulkCompletePending = pendingCompleteIds.size > 0;
   const selectedCount = selectedEnrollmentIds.size;
+  const enrollDisabled =
+    selectedCourseSlugs.size === 0 || pendingGrant || grantableCount === 0;
+  const enrollButtonLabel =
+    selectedCourseSlugs.size > 0
+      ? `Enroll in ${selectedCourseSlugs.size} course${selectedCourseSlugs.size === 1 ? '' : 's'}`
+      : 'Enroll learner';
 
   return (
     <div className="relative px-5 py-8 pb-24 sm:px-8 sm:py-10">
@@ -441,25 +447,23 @@ export function AdminUserDetailClient({
               </div>
             </div>
             <div className="relative mx-auto h-[140px] w-[140px] shrink-0 lg:mx-0">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={gaugeData}
-                    dataKey="value"
-                    cx="50%"
-                    cy="50%"
-                    innerRadius="58%"
-                    outerRadius="82%"
-                    startAngle={90}
-                    endAngle={-270}
-                    stroke="none"
-                  >
-                    <Cell fill="#2490ed" />
-                    <Cell fill="rgba(255,255,255,0.07)" />
-                  </Pie>
-                  <Tooltip {...chartTooltipProps} />
-                </PieChart>
-              </ResponsiveContainer>
+              <PieChart width={140} height={140}>
+                <Pie
+                  data={gaugeData}
+                  dataKey="value"
+                  cx={70}
+                  cy={70}
+                  innerRadius={40}
+                  outerRadius={57}
+                  startAngle={90}
+                  endAngle={-270}
+                  stroke="none"
+                >
+                  <Cell fill="#2490ed" />
+                  <Cell fill="rgba(255,255,255,0.07)" />
+                </Pie>
+                <Tooltip {...chartTooltipProps} />
+              </PieChart>
               <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
                 <span
                   className="text-3xl font-black tabular-nums"
@@ -556,22 +560,8 @@ export function AdminUserDetailClient({
                 </div>
               </div>
               <div className="space-y-3">
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="text-[10px] font-semibold tracking-[0.16em] text-white/38 uppercase">
-                    Add courses
-                  </div>
-                  <Button
-                    type="button"
-                    className="h-10 shrink-0 rounded-xl px-5 font-semibold sm:self-start"
-                    disabled={selectedCourseSlugs.size === 0 || pendingGrant || grantableCount === 0}
-                    onClick={() => void grantSelectedCourses()}
-                  >
-                    {pendingGrant ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      `Grant access${selectedCourseSlugs.size > 0 ? ` (${selectedCourseSlugs.size})` : ''}`
-                    )}
-                  </Button>
+                <div className="text-[10px] font-semibold tracking-[0.16em] text-white/38 uppercase">
+                  Add courses
                 </div>
                 <AdminCourseMultiPicker
                   courses={catalogCourses}
@@ -579,9 +569,44 @@ export function AdminUserDetailClient({
                   selectedSlugs={selectedCourseSlugs}
                   onSelectionChange={setSelectedCourseSlugs}
                   disabled={pendingGrant || grantableCount === 0}
+                  onEnroll={() => void grantSelectedCourses()}
+                  enrollPending={pendingGrant}
+                  enrollDisabled={enrollDisabled}
                 />
+                {grantableCount === 0 ? (
+                  <p className="rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white/45">
+                    This learner is already enrolled in every course in the catalog.
+                  </p>
+                ) : null}
               </div>
             </CardHeader>
+            <CardFooter className="flex flex-col gap-3 border-t border-white/[0.06] bg-black/20 px-6 py-4">
+              <p className="text-sm text-white/50">
+                {selectedCourseSlugs.size > 0 ? (
+                  <>
+                    <span className="font-medium text-white/85">
+                      {selectedCourseSlugs.size} course
+                      {selectedCourseSlugs.size === 1 ? '' : 's'} ready to assign
+                    </span>
+                    {' · '}Confirm enrollment below
+                  </>
+                ) : (
+                  'Select one or more courses, then confirm enrollment'
+                )}
+              </p>
+              <Button
+                type="button"
+                className="h-12 w-full rounded-xl bg-[#2490ed] px-6 text-base font-semibold text-white shadow-lg shadow-[#2490ed]/25 hover:bg-[#1a7fd4] disabled:opacity-40"
+                disabled={enrollDisabled}
+                onClick={() => void grantSelectedCourses()}
+              >
+                {pendingGrant ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  enrollButtonLabel
+                )}
+              </Button>
+            </CardFooter>
           </Card>
 
           {user.enrollments.length > 0 ? (
@@ -669,15 +694,39 @@ export function AdminUserDetailClient({
             <div
               className={cn(
                 adminGlassCard,
-                'flex flex-col items-center justify-center gap-3 py-16 text-center',
+                'flex flex-col items-center justify-center gap-4 py-16 text-center',
               )}
             >
               <Calendar className="h-10 w-10 text-white/25" strokeWidth={1.25} />
               <p className="text-sm font-medium text-white/70">No course enrollments yet</p>
-              <p className="max-w-sm text-xs text-white/45">
-                Grant a course from the catalog above to start tracking this learner&apos;s modules and
-                completion.
-              </p>
+              {selectedCourseSlugs.size > 0 ? (
+                <>
+                  <p className="max-w-sm text-xs text-white/45">
+                    {selectedCourseSlugs.size} course
+                    {selectedCourseSlugs.size === 1 ? '' : 's'} selected — use the blue{' '}
+                    <span className="font-medium text-white/65">Enroll</span> button in the panel
+                    above to grant access.
+                  </p>
+                  <Button
+                    type="button"
+                    className="h-11 rounded-xl bg-[#2490ed] px-8 font-semibold text-white hover:bg-[#1a7fd4] disabled:opacity-40"
+                    disabled={enrollDisabled}
+                    onClick={() => void grantSelectedCourses()}
+                  >
+                    {pendingGrant ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      enrollButtonLabel
+                    )}
+                  </Button>
+                </>
+              ) : (
+                <p className="max-w-sm text-xs text-white/45">
+                  Select courses in the panel above, then click{' '}
+                  <span className="font-medium text-white/65">Enroll learner</span> to grant access
+                  and start tracking modules and completion.
+                </p>
+              )}
             </div>
           )}
         </div>

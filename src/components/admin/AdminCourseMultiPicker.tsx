@@ -1,9 +1,10 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { Search, X } from 'lucide-react';
+import { Loader2, Search, X } from 'lucide-react';
 
 import type { AdminCatalogCourseOption } from '@/lib/admin/admin-user-progress';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 
@@ -13,12 +14,18 @@ export function AdminCourseMultiPicker({
   selectedSlugs,
   onSelectionChange,
   disabled,
+  onEnroll,
+  enrollPending,
+  enrollDisabled,
 }: {
   courses: AdminCatalogCourseOption[];
   enrolledSlugs: Set<string>;
   selectedSlugs: Set<string>;
   onSelectionChange: (slugs: Set<string>) => void;
   disabled?: boolean;
+  onEnroll?: () => void;
+  enrollPending?: boolean;
+  enrollDisabled?: boolean;
 }) {
   const [query, setQuery] = useState('');
 
@@ -78,19 +85,35 @@ export function AdminCourseMultiPicker({
       </div>
 
       {selectedCourses.length > 0 ? (
-        <div className="flex flex-wrap gap-2">
-          {selectedCourses.map((c) => (
-            <button
-              key={c.slug}
+        <div className="space-y-3">
+          <div className="flex flex-wrap gap-2">
+            {selectedCourses.map((c) => (
+              <button
+                key={c.slug}
+                type="button"
+                disabled={disabled}
+                onClick={() => toggle(c.slug)}
+                className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-[#2490ed]/35 bg-[#2490ed]/15 px-2.5 py-1 text-left text-xs font-medium text-[#93c5fd] transition-colors hover:bg-[#2490ed]/25 disabled:opacity-50"
+              >
+                <span className="truncate">{c.title}</span>
+                <X className="h-3 w-3 shrink-0 opacity-70" aria-hidden />
+              </button>
+            ))}
+          </div>
+          {onEnroll ? (
+            <Button
               type="button"
-              disabled={disabled}
-              onClick={() => toggle(c.slug)}
-              className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-[#2490ed]/35 bg-[#2490ed]/15 px-2.5 py-1 text-left text-xs font-medium text-[#93c5fd] transition-colors hover:bg-[#2490ed]/25 disabled:opacity-50"
+              className="h-11 w-full rounded-xl bg-[#2490ed] px-6 font-semibold text-white shadow-lg shadow-[#2490ed]/20 hover:bg-[#1a7fd4]"
+              disabled={enrollDisabled || enrollPending || disabled}
+              onClick={onEnroll}
             >
-              <span className="truncate">{c.title}</span>
-              <X className="h-3 w-3 shrink-0 opacity-70" aria-hidden />
-            </button>
-          ))}
+              {enrollPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                `Enroll in ${selectedSlugs.size} course${selectedSlugs.size === 1 ? '' : 's'}`
+              )}
+            </Button>
+          ) : null}
         </div>
       ) : null}
 
