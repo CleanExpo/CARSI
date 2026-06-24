@@ -1,10 +1,10 @@
 import { prisma } from '@/lib/prisma';
 
+import { loadAdminCatalogSource } from '@/lib/admin/admin-catalog-source';
 import {
-  fetchCatalogEnrollmentsForUsers,
+  fetchEnrollmentsForUsers,
   fetchCompletedLessonCounts,
   fetchLastActiveByUserId,
-  getAdminCatalogContext,
   mapUserToAdminProgress,
   normalizeEnrollmentStatus,
   type AdminCatalogCourseOption,
@@ -36,16 +36,16 @@ export type AdminDashboardClientData = {
   catalogMeta: {
     totalCoursesInCatalog: number;
     excelPath: string;
+    catalogSource: 'database' | 'workbook' | 'seed';
   };
   catalogCourses: AdminCatalogCourseOption[];
   users: AdminUserProgress[];
 };
 
 export async function getAdminDashboardData(): Promise<AdminDashboardClientData> {
-  const ctx = getAdminCatalogContext();
-  const catalogCourses = ctx.catalogCourses;
-  const catalogBySlug = ctx.catalogBySlug;
-  const catalogSlugs = ctx.catalogSlugs;
+  const catalog = await loadAdminCatalogSource();
+  const catalogCourses = catalog.catalogCourses;
+  const catalogBySlug = catalog.catalogBySlug;
 
   const users = await prisma.lmsUser.findMany({
     select: {
@@ -60,10 +60,11 @@ export async function getAdminDashboardData(): Promise<AdminDashboardClientData>
       createdAt: true,
       updatedAt: true,
     },
+    orderBy: [{ createdAt: 'desc' }],
   });
 
   const userIds = users.map((u) => u.id);
-  const enrollments = await fetchCatalogEnrollmentsForUsers(userIds, catalogSlugs);
+  const enrollments = await fetchEnrollmentsForUsers(userIds);
   const courseIds = Array.from(new Set(enrollments.map((e) => e.courseId)));
   const completedLessonCounts = await fetchCompletedLessonCounts(userIds, courseIds);
   const lastActiveByUserId = await fetchLastActiveByUserId(userIds);
@@ -162,15 +163,22 @@ export async function getAdminDashboardData(): Promise<AdminDashboardClientData>
           .sort((a, b) => b.value - a.value)
           .slice(0, 12);
 
-  const usersWithProgress: AdminUserProgress[] = users.map((u) =>
-    mapUserToAdminProgress(
-      u,
-      userEnrollmentsByUserId.get(u.id) ?? [],
-      catalogBySlug,
-      completedLessonCounts,
-      lastActiveByUserId.get(u.id) ?? null,
-    ),
-  );
+  const usersWithProgress: AdminUserProgress[] = users
+    .map((u) =>
+      mapUserToAdminProgress(
+        u,
+        userEnrollmentsByUserId.get(u.id) ?? [],
+        catalogBySlug,
+        completedLessonCounts,
+        lastActiveByUserId.get(u.id) ?? null,
+      ),
+    )
+    .sort((a, b) => {
+      const aTime = a.lastActiveAt ? new Date(a.lastActiveAt).getTime() : 0;
+      const bTime = b.lastActiveAt ? new Date(b.lastActiveAt).getTime() : 0;
+      if (bTime !== aTime) return bTime - aTime;
+      return (a.fullName ?? a.email).localeCompare(b.fullName ?? b.email);
+    });
 
   return {
     generatedAt: new Date().toISOString(),
@@ -188,7 +196,11 @@ export async function getAdminDashboardData(): Promise<AdminDashboardClientData>
       enrollmentsPerCourse,
       catalogCategoryPie,
     },
-    catalogMeta: ctx.catalogMeta,
+    catalogMeta: {
+      totalCoursesInCatalog: catalog.courses.length,
+      excelPath: catalog.source === 'database' ? 'LMS database' : 'Workbook / seed',
+      catalogSource: catalog.source,
+    },
     catalogCourses,
     users: usersWithProgress,
   };
