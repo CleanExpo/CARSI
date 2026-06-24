@@ -179,12 +179,7 @@ test.describe("PRD Generation Flow", () => {
   });
 });
 
-// Re-skipped: in CI the viewer (/prd/<id>) never rendered the mocked PRD — all four
-// tests failed with no tabs/buttons present. The page.route mock of /api/prd/result/<id>
-// isn't taking effect (the data path is not interceptable from the browser as assumed,
-// or the id is rejected server-side), so the viewer stays on its loading/empty state.
-// Needs a real generated PRD fixture (or a server-side mock) — tracked as follow-up.
-test.describe.skip("PRD Viewer", () => {
+test.describe("PRD Viewer", () => {
   // The viewer page (app/prd/[id]/page.tsx) is a client component. Its usePRDResult
   // hook (src/hooks/use-prd-generation.ts) fetches GET /api/prd/result/<id> from the
   // browser (getBackendOrigin() returns "", so the request is same-origin/relative).

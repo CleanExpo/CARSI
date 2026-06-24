@@ -52,21 +52,30 @@ test.describe('Public course catalogue', () => {
     }
   });
 
-  // Re-skipped: a WRT-coded course was added to the seed (wrt-water-damage-essentials),
-  // but the CI catalogue still doesn't surface it under the WRT tab (the seeded course
-  // doesn't reach the rendered list — likely the public catalogue's data source/publish
-  // filter). Tracked as follow-up; the seed course is in place for when it's resolved.
-  test.skip('discipline filter works — clicking WRT shows only WRT courses', async ({ page }) => {
+  test('discipline filter works — clicking WRT shows only WRT courses', async ({ page }) => {
     await page.goto('/courses');
 
-    // Click the WRT tab
+    const main = page.getByRole('main');
+
+    // Default ("All") view lists every published course, including a non-WRT one
+    // (the air-quality essentials course). Assert it is present before filtering so
+    // the post-filter "hidden" check below is meaningful.
+    const nonWrtHeading = main
+      .getByRole('heading', { name: /Air Quality and Odour/i })
+      .first();
+    await expect(nonWrtHeading).toBeVisible({ timeout: 10_000 });
+
+    // Click the WRT tab.
     const wrtTab = page.getByRole('tab', { name: 'WRT', exact: true });
     await wrtTab.click();
-
     await expect(wrtTab).toHaveAttribute('aria-selected', 'true');
-    const main = page.getByRole('main');
+
+    // Only the single WRT-coded course remains: its heading is shown and the
+    // non-WRT course is filtered out — i.e. the WRT tab shows only WRT courses.
+    // (Asserting the filtered set directly rather than the "N course(s)" toolbar
+    // text, which renders outside the <main> landmark.)
     await expect(main.getByRole('heading', { name: DETAIL_COURSE.title })).toBeVisible();
-    await expect(main.getByText('1 course')).toBeVisible();
+    await expect(nonWrtHeading).toBeHidden();
   });
 
   test('search narrows results', async ({ page }) => {
