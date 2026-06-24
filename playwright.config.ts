@@ -27,13 +27,27 @@ export default defineConfig({
       testMatch: /e2e\/auth\.setup\.ts$/,
     },
     {
+      // Guest desktop journeys + the accessibility specs. Excludes @authenticated
+      // tests (they run in desktop-authenticated), so this project needs no session
+      // — crucially the accessibility job runs these specs WITHOUT triggering the
+      // real-login `setup` project (which has no JWT_SECRET/seeded user there).
       name: 'desktop-chromium',
       use: { ...devices['Desktop Chrome'] },
-      // Run `setup` first so the saved session exists when the authenticated
-      // journeys (which apply it via test.use storageState) run. The default
-      // project storageState stays empty, so unauthenticated journeys (homepage,
-      // login form, course catalogue) still run as a guest.
+      grepInvert: /@authenticated/,
+    },
+    {
+      // Authenticated desktop journeys: depend on `setup` to mint a real session and
+      // run with its storageState. Scoped to e2e specs + @authenticated-tagged tests,
+      // so this project never matches the accessibility specs (and never runs in the
+      // accessibility job).
+      name: 'desktop-authenticated',
+      testMatch: ['e2e/**/*.spec.ts'],
+      grep: /@authenticated/,
       dependencies: ['setup'],
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: 'playwright/.auth/student.json',
+      },
     },
     {
       name: 'tablet-chromium',

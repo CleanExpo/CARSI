@@ -375,7 +375,7 @@ test.describe('3. Auth: login', () => {
 // Journey 4: Auth — logout
 // =========================================================================
 
-test.describe('4. Auth: logout', () => {
+test.describe('4. Auth: logout', { tag: '@authenticated' }, () => {
   // Real session from the auth.setup project — start already authenticated.
   test.use({ storageState: STUDENT_STORAGE_STATE });
 
@@ -424,7 +424,7 @@ test.describe('5. Course enrolment', () => {
 // Journey 6: Lesson player
 // =========================================================================
 
-test.describe('6. Lesson player', () => {
+test.describe('6. Lesson player', { tag: '@authenticated' }, () => {
   // Real session from the auth.setup project; the seeded student is enrolled in
   // ENROLLED_COURSE_SLUG (scripts/seed-e2e-user.ts), which is what the lesson API
   // (getLessonContextForStudent) requires before it returns lesson content.
@@ -519,7 +519,7 @@ test.describe('7. Quiz', () => {
 // Journey 8: Student dashboard
 // =========================================================================
 
-test.describe('8. Student dashboard', () => {
+test.describe('8. Student dashboard', { tag: '@authenticated' }, () => {
   // Real session from auth.setup; the seeded student has one active enrollment.
   test.use({ storageState: STUDENT_STORAGE_STATE });
 
