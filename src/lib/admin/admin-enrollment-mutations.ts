@@ -3,16 +3,40 @@ import { randomUUID } from 'node:crypto';
 import { getAllSeedSlugs } from '@/lib/lms-seed-catalog';
 import { getOrCreateLmsCourseFromWorkbookCatalog } from '@/lib/admin/admin-course-materialize';
 import { prisma } from '@/lib/prisma';
-import { getOrCreateCourseBySlug } from '@/lib/server/course-catalog-sync';
+import {
+  courseWithCurriculum,
+  getOrCreateCourseBySlug,
+  type CourseWithCurriculum,
+} from '@/lib/server/course-catalog-sync';
 import { forceCompleteEnrollment } from '@/lib/server/enrollment-service';
 
-async function resolveCourseForAdminGrant(slug: string) {
+function isWorkbookInfrastructureError(message: string): boolean {
+  const m = message.toLowerCase();
+  return (
+    m.includes('enoent') ||
+    m.includes('python') ||
+    m.includes('spawn') ||
+    m.includes('expected sheets not found') ||
+    m.includes('carsi_courses.xlsx')
+  );
+}
+
+async function resolveCourseForAdminGrant(slug: string): Promise<CourseWithCurriculum> {
+  const normalized = slug.trim().toLowerCase();
+  if (!normalized) throw new Error('INVALID_COURSE_SLUG');
+
+  const existing = await prisma.lmsCourse.findUnique({
+    where: { slug: normalized },
+    include: courseWithCurriculum,
+  });
+  if (existing) return existing;
+
   try {
-    return await getOrCreateLmsCourseFromWorkbookCatalog(slug);
+    return await getOrCreateLmsCourseFromWorkbookCatalog(normalized);
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
-    if (msg === 'WORKBOOK_COURSE_NOT_FOUND') {
-      return getOrCreateCourseBySlug(slug);
+    if (msg === 'WORKBOOK_COURSE_NOT_FOUND' || isWorkbookInfrastructureError(msg)) {
+      return getOrCreateCourseBySlug(normalized);
     }
     throw e;
   }

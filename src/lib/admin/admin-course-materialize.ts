@@ -11,6 +11,12 @@ import {
   type CourseWithCurriculum,
 } from '@/lib/server/course-catalog-sync';
 
+/** Remote Postgres + large workbook imports exceed Prisma's 5s interactive tx default. */
+const ADMIN_MATERIALIZE_TX_OPTIONS = {
+  maxWait: 15_000,
+  timeout: 120_000,
+} as const;
+
 function escapeHtml(s: string) {
   return s
     .replace(/&/g, '&amp;')
@@ -92,7 +98,7 @@ export async function getOrCreateLmsCourseFromWorkbookCatalog(slug: string): Pro
         },
       });
     }
-  });
+  }, ADMIN_MATERIALIZE_TX_OPTIONS);
 
   return prisma.lmsCourse.findUniqueOrThrow({
     where: { id: courseId },
