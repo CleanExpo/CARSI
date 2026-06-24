@@ -175,6 +175,10 @@ jobs:
         run: npm run test:e2e
         env:
           CI: true
+          # /prd, /workflows, /design-system, /agents are internal-tool routes that
+          # middleware 302-redirects to "/" unless this is set. The PRD-generation
+          # E2E journeys exercise /prd, so enable internal tools for the test run.
+          INTERNAL_TOOLS_ENABLED: 'true'
           # DATABASE_URL inherited from job-level env (postgresql://root:root@localhost:5432/carsi).
           # The previous step-level starter_db override caused P1000 auth failure
           # because the postgres service uses root:root, not starter_user.
