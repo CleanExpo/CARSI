@@ -31,6 +31,7 @@ import {
   LearnerAvatar,
   StatusBadge,
 } from '@/components/admin/admin-learner-ui';
+import { renewalStatusLabel, type RenewalStatus } from '@/types/iicrc-renewal';
 import { AdminCourseMultiPicker } from '@/components/admin/AdminCourseMultiPicker';
 import { ProgressBar } from '@/components/lms/ProgressBar';
 import { Button } from '@/components/ui/button';
@@ -164,6 +165,51 @@ function CourseEnrollmentCard({
         <div className="mt-4">
           <ProgressBar percentage={enrollment.completionPct} label="Course completion" />
         </div>
+        {isComplete &&
+        enrollment.renewalSubmissionId &&
+        (enrollment.cecHours != null && enrollment.cecHours > 0 || enrollment.discipline) ? (
+          <div className="mt-4 rounded-xl border border-[#2490ed]/20 bg-[#2490ed]/[0.06] px-4 py-3">
+            <p className="text-[10px] font-semibold tracking-[0.18em] text-[#7ec5ff]/80 uppercase">
+              IICRC renewal
+            </p>
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              {enrollment.renewalStatus ? (
+                <StatusBadge
+                  label={renewalStatusLabel(enrollment.renewalStatus as RenewalStatus)}
+                  tone={
+                    enrollment.renewalStatus === 'approved' ||
+                    enrollment.renewalStatus === 'completed' ||
+                    enrollment.renewalStatus === 'sent'
+                      ? 'success'
+                      : enrollment.renewalStatus === 'awaiting_response'
+                        ? 'warning'
+                        : enrollment.renewalStatus === 'failed' || enrollment.renewalStatus === 'rejected'
+                          ? 'warning'
+                          : 'muted'
+                  }
+                />
+              ) : null}
+              {enrollment.renewalSentAt ? (
+                <span className="text-xs text-white/45">
+                  Sent {formatAdminDateTime(enrollment.renewalSentAt)}
+                </span>
+              ) : null}
+              {enrollment.renewalCommunicationCount > 0 ? (
+                <span className="text-xs text-white/40">
+                  {enrollment.renewalCommunicationCount} message
+                  {enrollment.renewalCommunicationCount === 1 ? '' : 's'}
+                </span>
+              ) : null}
+            </div>
+            <Link
+              href={`/admin/iicrc-cec/${enrollment.renewalSubmissionId}`}
+              className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-[#7ec5ff] hover:underline"
+            >
+              <Mail className="h-3 w-3" />
+              View communication log
+            </Link>
+          </div>
+        ) : null}
       </div>
       <div className="bg-black/15 px-5 py-4 sm:px-6">
         <p className="mb-3 text-[10px] font-semibold tracking-[0.18em] text-white/38 uppercase">Modules</p>
