@@ -261,12 +261,15 @@ async function applyStep(page: Page, step: DemoStep): Promise<void> {
     case 'wait':
       await page.waitForTimeout(step.ms);
       break;
-    case 'highlight':
-      // Pulse a spotlight on the target, and glide the synthetic cursor to it.
+    case 'highlight': {
+      // Bring the target into view via an awaited scroll so layout settles BEFORE we measure
+      // its box (an in-page smooth scrollIntoView would not have settled yet).
+      const target = page.locator(step.selector).first();
+      await target.scrollIntoViewIfNeeded().catch(() => {});
+      // Pulse a spotlight on the target.
       await page.evaluate((sel) => {
         const el = document.querySelector(sel) as HTMLElement | null;
         if (!el) return;
-        el.scrollIntoView({ block: 'center', behavior: 'smooth' });
         const prev = el.style.boxShadow;
         el.style.transition = 'box-shadow .3s ease';
         el.style.boxShadow = '0 0 0 4px rgba(20,111,194,.9), 0 0 24px rgba(20,111,194,.6)';
@@ -274,16 +277,14 @@ async function applyStep(page: Page, step: DemoStep): Promise<void> {
           el.style.boxShadow = prev;
         }, 1400);
       }, step.selector);
+      // Glide the synthetic cursor to the now-settled target position.
       if (CURSOR_ENABLED) {
-        const box = await page
-          .locator(step.selector)
-          .first()
-          .boundingBox()
-          .catch(() => null);
+        const box = await target.boundingBox().catch(() => null);
         if (box) await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2, { steps: 12 });
       }
       await page.waitForTimeout(1500);
       break;
+    }
   }
 }
 
