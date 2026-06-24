@@ -4,6 +4,7 @@ import { Readable } from 'node:stream';
 import { v2 as cloudinary } from 'cloudinary';
 
 const DEFAULT_FOLDER = 'carsi/admin-courses';
+const CERTIFICATE_FOLDER = 'carsi/certificates';
 
 /** Cloudinary Node SDK defaults to 60s; large/slow uploads hit 499 TimeoutError. */
 const UPLOAD_TIMEOUT_MS = 180_000;
@@ -37,9 +38,16 @@ function isLikelyUploadTimeout(err: unknown): boolean {
   );
 }
 
-function uploadCourseThumbnailStreamOnce(
+function uploadBufferStreamOnce(
   buffer: Buffer,
-  cfg: NonNullable<ReturnType<typeof getConfig>>
+  cfg: NonNullable<ReturnType<typeof getConfig>>,
+  options: {
+    folder: string;
+    publicId: string;
+    resourceType: 'image' | 'raw';
+    format?: string;
+    overwrite?: boolean;
+  }
 ): Promise<{ url: string; publicId: string }> {
   cloudinary.config({
     cloud_name: cfg.cloud_name,
@@ -48,15 +56,14 @@ function uploadCourseThumbnailStreamOnce(
     secure: true,
   });
 
-  const publicId = randomUUID();
-
   return new Promise((resolve, reject) => {
     const upload = cloudinary.uploader.upload_stream(
       {
-        folder: DEFAULT_FOLDER,
-        public_id: publicId,
-        resource_type: 'image',
-        overwrite: false,
+        folder: options.folder,
+        public_id: options.publicId,
+        resource_type: options.resourceType,
+        format: options.format,
+        overwrite: options.overwrite ?? false,
         invalidate: true,
         timeout: UPLOAD_TIMEOUT_MS,
       },
@@ -67,12 +74,57 @@ function uploadCourseThumbnailStreamOnce(
         }
         resolve({
           url: result.secure_url,
-          publicId: result.public_id ?? `${DEFAULT_FOLDER}/${publicId}`,
+          publicId: result.public_id ?? `${options.folder}/${options.publicId}`,
         });
       }
     );
 
     Readable.from(buffer).pipe(upload);
+  });
+}
+
+async function uploadWithRetries(
+  buffer: Buffer,
+  options: {
+    folder: string;
+    publicId: string;
+    resourceType: 'image' | 'raw';
+    format?: string;
+    overwrite?: boolean;
+  }
+): Promise<{ url: string; publicId: string }> {
+  const cfg = getConfig();
+  if (!cfg) {
+    throw new Error(
+      'Cloudinary is not configured (set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET)'
+    );
+  }
+
+  let lastErr: unknown;
+  for (let attempt = 1; attempt <= UPLOAD_MAX_ATTEMPTS; attempt += 1) {
+    try {
+      return await uploadBufferStreamOnce(buffer, cfg, options);
+    } catch (e) {
+      lastErr = e;
+      if (attempt < UPLOAD_MAX_ATTEMPTS && isLikelyUploadTimeout(e)) {
+        await new Promise((r) => setTimeout(r, 1000 * attempt));
+        continue;
+      }
+      throw e;
+    }
+  }
+  throw lastErr instanceof Error ? lastErr : new Error(String(lastErr));
+}
+
+function uploadCourseThumbnailStreamOnce(
+  buffer: Buffer,
+  cfg: NonNullable<ReturnType<typeof getConfig>>
+): Promise<{ url: string; publicId: string }> {
+  return uploadBufferStreamOnce(buffer, cfg, {
+    folder: DEFAULT_FOLDER,
+    publicId: randomUUID(),
+    resourceType: 'image',
+    overwrite: false,
   });
 }
 
@@ -103,4 +155,22 @@ export async function uploadCourseThumbnailToCloudinary(
     }
   }
   throw lastErr instanceof Error ? lastErr : new Error(String(lastErr));
+}
+
+/**
+ * Upload a completion certificate PDF to Cloudinary (`resource_type: raw`).
+ * Returns a public HTTPS URL suitable for linking in IICRC renewal emails.
+ */
+export async function uploadCertificatePdfToCloudinary(
+  buffer: Buffer,
+  enrollmentId: string
+): Promise<{ url: string; publicId: string }> {
+  const safeId = enrollmentId.replace(/[^a-zA-Z0-9_-]/g, '');
+  return uploadWithRetries(buffer, {
+    folder: CERTIFICATE_FOLDER,
+    publicId: safeId || randomUUID(),
+    resourceType: 'raw',
+    format: 'pdf',
+    overwrite: true,
+  });
 }

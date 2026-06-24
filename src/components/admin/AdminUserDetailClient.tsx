@@ -443,7 +443,7 @@ export function AdminUserDetailClient({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        signal: AbortSignal.timeout(55_000),
+        signal: AbortSignal.timeout(15_000),
         body: JSON.stringify({
           enrollmentId,
           studentId: user.userId,
@@ -457,6 +457,14 @@ export function AdminUserDetailClient({
         alreadySent?: boolean;
         failureReason?: string;
       };
+      if (res.status === 202 || payload.status === 'processing') {
+        setActionSuccess(
+          payload.detail ??
+            'IICRC renewal email is being sent. Refresh in a moment or check Admin → IICRC CEC.',
+        );
+        router.refresh();
+        return;
+      }
       if (!res.ok) {
         if (res.status === 504) {
           setActionError(

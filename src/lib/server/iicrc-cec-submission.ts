@@ -7,6 +7,10 @@ import {
 } from '@/lib/server/certificate-pdf';
 import { sendEmail } from '@/lib/server/email';
 import {
+  isCloudinaryConfigured,
+  uploadCertificatePdfToCloudinary,
+} from '@/lib/server/cloudinary-upload';
+import {
   courseEligibleForIicrcCecSubmission,
   getIicrcCecSubmissionEmail,
   isIicrcCecAutoSubmitEnabled,
@@ -38,9 +42,7 @@ export type ProcessIicrcCecSubmissionOptions = {
 };
 
 function emailFromAddress(): string {
-  return (
-    process.env.EMAIL_FROM?.trim() || 'CARSI Learning <noreply@carsi.com.au>'
-  );
+  return process.env.EMAIL_FROM?.trim() || 'CARSI Learning <noreply@carsi.com.au>';
 }
 
 export type IicrcCecSubmissionRow = {
@@ -110,7 +112,7 @@ async function loadEnrollmentForSubmission(enrollmentId: string) {
 function emailContentFromEnrollment(
   row: LoadedEnrollment,
   completedAt: Date,
-  cecHoursOverride?: number | null,
+  cecHoursOverride?: number | null
 ): IicrcCecSubmissionEmailContent {
   const origin = appOrigin();
   const studentName = row.student.fullName?.trim() || row.student.email;
@@ -133,16 +135,17 @@ function resolvedCecHoursForCourse(
     slug: string;
     cecHours: unknown;
   },
-  override?: number | null,
+  override?: number | null
 ): number | null {
-  const direct = typeof override === 'number' && Number.isFinite(override) && override > 0 ? override : null;
+  const direct =
+    typeof override === 'number' && Number.isFinite(override) && override > 0 ? override : null;
   if (direct != null) return direct;
   return resolveEffectiveCecHours({ slug: course.slug, cecHours: course.cecHours });
 }
 
 function courseCtxForSubmission(
   enrollment: LoadedEnrollment,
-  options?: ProcessIicrcCecSubmissionOptions,
+  options?: ProcessIicrcCecSubmissionOptions
 ) {
   return {
     slug: enrollment.course.slug,
@@ -153,7 +156,7 @@ function courseCtxForSubmission(
 
 async function applySubmissionOverrides(
   enrollment: LoadedEnrollment,
-  options?: ProcessIicrcCecSubmissionOptions,
+  options?: ProcessIicrcCecSubmissionOptions
 ): Promise<LoadedEnrollment> {
   const member = options?.iicrcMemberNumber?.trim();
   let row = enrollment;
@@ -186,7 +189,7 @@ async function applySubmissionOverrides(
  */
 export async function processIicrcCecSubmissionForEnrollment(
   enrollmentId: string,
-  options?: ProcessIicrcCecSubmissionOptions,
+  options?: ProcessIicrcCecSubmissionOptions
 ): Promise<{ status: IicrcCecSubmissionStatus; submissionId?: string }> {
   const initiatedByAdminEmail = options?.initiatedByAdminEmail?.trim() || null;
   const forceSend = options?.forceSend === true;
@@ -286,11 +289,9 @@ export async function processIicrcCecSubmissionForEnrollment(
   }
 
   const recipient = getIicrcCecSubmissionEmail();
-  const content = emailContentFromEnrollment(enrollment, completedAt, options?.cecHoursOverride);
-  const subject = buildIicrcCecSubmissionSubject(content);
-  const textBody = buildIicrcCecSubmissionText(content);
-  const htmlBody = buildIicrcCecSubmissionHtml(content);
   const ccList = [enrollment.student.email];
+  const baseContent = emailContentFromEnrollment(enrollment, completedAt, options?.cecHoursOverride);
+  const subject = buildIicrcCecSubmissionSubject(baseContent);
 
   const submission =
     existing != null
@@ -306,8 +307,8 @@ export async function processIicrcCecSubmissionForEnrollment(
             iicrcDiscipline: enrollment.course.iicrcDiscipline,
             iicrcMemberNumber: enrollment.student.iicrcMemberNumber,
             emailSubject: subject,
-            emailTextBody: textBody,
-            emailHtmlBody: htmlBody,
+            emailTextBody: null,
+            emailHtmlBody: null,
             ccEmails: JSON.stringify(ccList),
             failureReason: null,
             sentAt: null,
@@ -329,13 +330,13 @@ export async function processIicrcCecSubmissionForEnrollment(
             iicrcDiscipline: enrollment.course.iicrcDiscipline,
             iicrcMemberNumber: enrollment.student.iicrcMemberNumber,
             emailSubject: subject,
-            emailTextBody: textBody,
-            emailHtmlBody: htmlBody,
             ccEmails: JSON.stringify(ccList),
           },
         });
 
   const pdfFilename = `carsi-certificate-${enrollment.course.slug}.pdf`;
+  let textBody: string | undefined;
+  let htmlBody: string | undefined;
 
   try {
     const pdf = await buildCompletionCertificatePdf(
@@ -355,9 +356,30 @@ export async function processIicrcCecSubmissionForEnrollment(
             level: enrollment.course.level,
           },
         },
-        appOrigin(),
-      ),
+        appOrigin()
+      )
     );
+
+    if (!isCloudinaryConfigured()) {
+      throw new Error('CLOUDINARY_NOT_CONFIGURED');
+    }
+
+    const { url: certificateDownloadUrl } = await uploadCertificatePdfToCloudinary(
+      Buffer.from(pdf),
+      enrollment.id
+    );
+
+    const content: IicrcCecSubmissionEmailContent = {
+      ...baseContent,
+      certificateDownloadUrl,
+    };
+    textBody = buildIicrcCecSubmissionText(content);
+    htmlBody = buildIicrcCecSubmissionHtml(content);
+
+    await prisma.lmsIicrcCecSubmission.update({
+      where: { id: submission.id },
+      data: { emailTextBody: textBody, emailHtmlBody: htmlBody },
+    });
 
     await prisma.lmsEnrollment.update({
       where: { id: enrollment.id },
@@ -372,7 +394,6 @@ export async function processIicrcCecSubmissionForEnrollment(
       html: htmlBody,
       text: textBody,
       replyTo: enrollment.student.email,
-      attachments: [{ filename: pdfFilename, content: pdf }],
     });
 
     if (!iicrcResult.sent) {
@@ -518,7 +539,7 @@ export async function processIicrcCecSubmissionForEnrollment(
 
 export async function retryIicrcCecSubmission(
   submissionId: string,
-  options?: ProcessIicrcCecSubmissionOptions,
+  options?: ProcessIicrcCecSubmissionOptions
 ): Promise<{
   status: IicrcCecSubmissionStatus;
 }> {
@@ -566,7 +587,9 @@ async function ensureEnrollmentReadyForIicrcManual(enrollmentId: string): Promis
   });
 }
 
-async function loadSubmissionFailureReason(submissionId: string | undefined): Promise<string | null> {
+async function loadSubmissionFailureReason(
+  submissionId: string | undefined
+): Promise<string | null> {
   if (!submissionId) return null;
   const row = await prisma.lmsIicrcCecSubmission.findUnique({
     where: { id: submissionId },
@@ -587,6 +610,9 @@ export function iicrcSubmissionFailureMessage(reason: string | null | undefined)
       return 'This course is not eligible for IICRC CEC submission.';
     case 'auto_submit_disabled':
       return 'IICRC auto-submit is disabled and manual send did not complete.';
+    case 'CLOUDINARY_NOT_CONFIGURED':
+    case 'cloudinary_not_configured':
+      return 'Certificate upload is not configured. Set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET on the server.';
     case 'submission_skipped':
       return 'IICRC submission was skipped. Ensure the course is complete and CEC-eligible.';
     default:
@@ -634,7 +660,9 @@ export async function manualSendIicrcCecForEnrollment(params: {
     cecHoursOverride,
   });
 
-  if (!courseEligibleForIicrcCecSubmission(courseCtxForSubmission(enrollment, { cecHoursOverride }))) {
+  if (
+    !courseEligibleForIicrcCecSubmission(courseCtxForSubmission(enrollment, { cecHoursOverride }))
+  ) {
     throw new Error('COURSE_NOT_CEC_ELIGIBLE');
   }
 
@@ -671,7 +699,7 @@ export async function manualSendIicrcCecForEnrollment(params: {
   const detail =
     result.status === 'failed' || result.status === 'skipped'
       ? iicrcSubmissionFailureMessage(
-          failureReason ?? (result.status === 'skipped' ? 'submission_skipped' : 'send_failed'),
+          failureReason ?? (result.status === 'skipped' ? 'submission_skipped' : 'send_failed')
         )
       : undefined;
 
@@ -683,9 +711,7 @@ export async function manualSendIicrcCecForEnrollment(params: {
   };
 }
 
-export async function getCecSubmissionSummaryForEnrollment(
-  enrollmentId: string,
-): Promise<{
+export async function getCecSubmissionSummaryForEnrollment(enrollmentId: string): Promise<{
   status: IicrcCecSubmissionStatus | null;
   sent_at: string | null;
   recipient_email: string | null;
@@ -753,7 +779,7 @@ export async function listIicrcCecSubmissionsForAdmin(options?: {
 }
 
 export async function getCecSubmissionsByEnrollmentIds(
-  enrollmentIds: string[],
+  enrollmentIds: string[]
 ): Promise<Map<string, { status: string; sent_at: string | null }>> {
   const out = new Map<string, { status: string; sent_at: string | null }>();
   if (enrollmentIds.length === 0) return out;

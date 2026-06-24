@@ -105,6 +105,11 @@ export function AdminIicrcCecSubmissionsClient() {
         body: JSON.stringify({ submissionId }),
       });
       const data = await res.json().catch(() => ({}));
+      if (res.status === 202) {
+        setError(null);
+        await load();
+        return;
+      }
       if (!res.ok) {
         setError(typeof data.detail === 'string' ? data.detail : 'Retry failed');
         return;

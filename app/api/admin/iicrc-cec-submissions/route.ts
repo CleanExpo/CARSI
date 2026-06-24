@@ -1,15 +1,12 @@
 import { type NextRequest, NextResponse } from 'next/server';
 
 import { getAdminSessionOrNull } from '@/lib/admin/admin-session';
+import { getAppOrigin } from '@/lib/server/app-url';
 import {
   listIicrcCecSubmissionsForAdmin,
-  manualSendIicrcCecForEnrollment,
-  retryIicrcCecSubmission,
 } from '@/lib/server/iicrc-cec-submission';
 import { listRenewalSubmissionsForStudent } from '@/lib/server/iicrc-renewal-communication';
 
-/** PDF generation + Resend can exceed the default 10s serverless limit. */
-export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
@@ -37,6 +34,34 @@ function readManualSendFields(body: ManualSendBody) {
     '';
   const cecHours = parseOptionalPositiveNumber(body.cecHours ?? body.cec_hours);
   return { enrollmentId, studentId, iicrcMemberNumber, cecHours };
+}
+
+function triggerIicrcBackgroundProcess(
+  request: NextRequest,
+  payload: Record<string, unknown>,
+): { ok: true } | { ok: false; detail: string } {
+  const secret = process.env.CRON_SECRET?.trim();
+  if (!secret) {
+    return {
+      ok: false,
+      detail:
+        'Background processing is not configured (CRON_SECRET). Set it on the server so IICRC sends can complete without timing out.',
+    };
+  }
+
+  const origin = getAppOrigin(request);
+  const url = `${origin}/api/admin/iicrc-cec-submissions/process`;
+
+  void fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${secret}`,
+    },
+    body: JSON.stringify(payload),
+  }).catch((e) => console.error('[admin/iicrc-cec-submissions] background trigger failed', e));
+
+  return { ok: true };
 }
 
 export async function GET(request: NextRequest) {
@@ -84,65 +109,29 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    try {
-      const result = await manualSendIicrcCecForEnrollment({
-        enrollmentId,
-        studentId,
-        iicrcMemberNumber,
-        cecHours,
-        initiatedByAdminEmail: session.email,
-      });
+    const triggered = triggerIicrcBackgroundProcess(request, {
+      enrollmentId,
+      studentId,
+      iicrcMemberNumber,
+      cecHours,
+      initiatedByAdminEmail: session.email,
+    });
 
-      if (result.status === 'failed' || result.status === 'skipped') {
-        const statusCode = result.failureReason === 'not_configured' ? 503 : 502;
-        return NextResponse.json(
-          {
-            ok: false,
-            status: result.status,
-            submissionId: result.submissionId ?? null,
-            failureReason: result.failureReason ?? null,
-            detail: result.detail ?? 'IICRC renewal email could not be sent.',
-            iicrcMemberNumber,
-            cecHours,
-          },
-          { status: statusCode },
-        );
-      }
-
-      return NextResponse.json({
-        ok: true,
-        status: result.status,
-        submissionId: result.submissionId ?? null,
-        alreadySent: result.alreadySent ?? false,
-        iicrcMemberNumber,
-        cecHours,
-      });
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : String(e);
-      if (msg === 'ENROLLMENT_NOT_FOUND') {
-        return NextResponse.json({ detail: 'Enrollment not found for this learner' }, { status: 404 });
-      }
-      if (msg === 'IICRC_MEMBER_NUMBER_REQUIRED') {
-        return NextResponse.json(
-          { detail: 'Learner must have an IICRC member number before sending renewal email' },
-          { status: 400 },
-        );
-      }
-      if (msg === 'ENROLLMENT_NOT_COMPLETED') {
-        return NextResponse.json({ detail: 'Course must be marked complete before sending to IICRC' }, { status: 400 });
-      }
-      if (msg === 'COURSE_NOT_CEC_ELIGIBLE') {
-        return NextResponse.json({ detail: 'This course is not eligible for IICRC CEC submission' }, { status: 400 });
-      }
-      console.error('[admin/iicrc-cec-submissions] manual send', e);
-      return NextResponse.json(
-        {
-          detail:
-            'Failed to send IICRC renewal email. If this timed out, retry from the communication log.',
-        },
-        { status: 500 },
-      );
+    if (!triggered.ok) {
+      return NextResponse.json({ detail: triggered.detail }, { status: 503 });
     }
+
+    return NextResponse.json(
+      {
+        ok: true,
+        status: 'processing',
+        detail:
+          'IICRC renewal email is being sent in the background. Refresh this page in a moment, or check Admin → IICRC CEC for the communication log.',
+        iicrcMemberNumber,
+        cecHours,
+      },
+      { status: 202 },
+    );
   }
 
   const submissionId = typeof body.submissionId === 'string' ? body.submissionId.trim() : '';
@@ -156,17 +145,21 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  try {
-    const result = await retryIicrcCecSubmission(submissionId, {
-      initiatedByAdminEmail: session.email,
-    });
-    return NextResponse.json({ ok: true, status: result.status });
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e);
-    if (msg === 'SUBMISSION_NOT_FOUND') {
-      return NextResponse.json({ detail: 'Submission not found' }, { status: 404 });
-    }
-    console.error('[admin/iicrc-cec-submissions]', e);
-    return NextResponse.json({ detail: 'Retry failed' }, { status: 500 });
+  const triggered = triggerIicrcBackgroundProcess(request, {
+    submissionId,
+    initiatedByAdminEmail: session.email,
+  });
+
+  if (!triggered.ok) {
+    return NextResponse.json({ detail: triggered.detail }, { status: 503 });
   }
+
+  return NextResponse.json(
+    {
+      ok: true,
+      status: 'processing',
+      detail: 'IICRC retry is running in the background. Check the communication log shortly.',
+    },
+    { status: 202 },
+  );
 }
