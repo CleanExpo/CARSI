@@ -179,12 +179,7 @@ test.describe("PRD Generation Flow", () => {
   });
 });
 
-// Re-skipped: in CI the viewer (/prd/<id>) never rendered the mocked PRD — all four
-// tests failed with no tabs/buttons present. The page.route mock of /api/prd/result/<id>
-// isn't taking effect (the data path is not interceptable from the browser as assumed,
-// or the id is rejected server-side), so the viewer stays on its loading/empty state.
-// Needs a real generated PRD fixture (or a server-side mock) — tracked as follow-up.
-test.describe.skip("PRD Viewer", () => {
+test.describe("PRD Viewer", () => {
   // The viewer page (app/prd/[id]/page.tsx) is a client component. Its usePRDResult
   // hook (src/hooks/use-prd-generation.ts) fetches GET /api/prd/result/<id> from the
   // browser (getBackendOrigin() returns "", so the request is same-origin/relative).
@@ -307,10 +302,12 @@ test.describe.skip("PRD Viewer", () => {
   test("should navigate between tabs", async ({ page }) => {
     await page.goto(`/prd/${PRD_ID}`);
 
-    // User Stories tab -> epic card renders. Assert on the seeded epic name, which is
-    // unique to this tab's content (the word "Epics" never appears in the markup).
+    // User Stories tab -> epic card renders. Assert on the seeded epic name. Use the
+    // heading role (the epic name is an <h3>) so the match is unambiguous: a plain
+    // getByText("Collaboration") also matches the epic's description paragraph
+    // ("Real-time collaboration features"), tripping Playwright strict mode.
     await page.getByRole("tab", { name: "User Stories" }).click();
-    await expect(page.getByText("Collaboration")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Collaboration" })).toBeVisible();
 
     // Tech tab -> "Architecture Overview" card title.
     await page.getByRole("tab", { name: /Tech/i }).click();
