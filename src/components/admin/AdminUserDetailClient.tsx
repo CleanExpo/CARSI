@@ -429,12 +429,27 @@ export function AdminUserDetailClient({
   async function sendIicrcRenewalEmail(enrollmentId: string) {
     setActionError(null);
     setActionSuccess(null);
+
+    const enrollment = user.enrollments.find((e) => e.enrollmentId === enrollmentId);
+    const iicrcMemberNumber = user.iicrcMemberNumber?.trim();
+    if (!iicrcMemberNumber) {
+      setActionError('Add an IICRC member number to this learner profile before sending renewal email.');
+      return;
+    }
+
     setPendingSendIicrcIds(new Set([enrollmentId]));
     try {
       const res = await fetch('/api/admin/iicrc-cec-submissions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ enrollmentId, studentId: user.userId }),
+        credentials: 'include',
+        signal: AbortSignal.timeout(55_000),
+        body: JSON.stringify({
+          enrollmentId,
+          studentId: user.userId,
+          iicrcMemberNumber,
+          cecHours: enrollment?.cecHours ?? null,
+        }),
       });
       const payload = (await res.json().catch(() => ({}))) as {
         detail?: string;
@@ -443,6 +458,12 @@ export function AdminUserDetailClient({
         failureReason?: string;
       };
       if (!res.ok) {
+        if (res.status === 504) {
+          setActionError(
+            'Request timed out while sending to IICRC. Check Admin → IICRC CEC for whether the email was logged.',
+          );
+          return;
+        }
         setActionError(payload.detail ?? 'Could not send IICRC renewal email');
         return;
       }
