@@ -6,6 +6,37 @@ import { test, expect } from "@playwright/test";
 
 test.describe("PRD Generation Flow", () => {
   test.beforeEach(async ({ page }) => {
+    // Mock the PRD backend (CI has no AI generation service). These defaults let the
+    // submit-driven tests enter and stay in the "generating" state. Tests that need
+    // other behaviour (error handling, full workflow) register their own routes
+    // afterwards, which take priority in Playwright.
+    await page.route("**/api/prd/generate", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          prd_id: "prd_test",
+          task_id: "prd_test",
+          run_id: "run_test",
+          status: "pending",
+          message: "PRD generation started",
+        }),
+      });
+    });
+    await page.route("**/api/prd/status/**", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          prd_id: "prd_test",
+          status: "running",
+          progress_percent: 30,
+          current_step: "Analyzing requirements",
+          result: null,
+        }),
+      });
+    });
+
     // Navigate to PRD generator page
     await page.goto("/prd/generate");
   });
@@ -128,18 +159,18 @@ test.describe("PRD Generation Flow", () => {
     // Wait for generation state
     await expect(page.locator("text=/Generating/i")).toBeVisible({ timeout: 5000 });
 
-    // All inputs should be disabled (checking for disabled attribute)
-    const textarea = page.getByLabel(/Project Description/i);
-    await expect(textarea).toBeDisabled();
+    // During generation the page swaps the form out for the progress view, so the
+    // inputs are no longer present/editable.
+    await expect(page.getByLabel(/Project Description/i)).toHaveCount(0);
   });
 
   test("should show How It Works section", async ({ page }) => {
-    await expect(page.locator("text=/How It Works/i")).toBeVisible();
+    await expect(page.getByText("How It Works", { exact: true })).toBeVisible({ timeout: 10_000 });
 
-    // Check steps are displayed
-    await expect(page.locator("text=/Describe Your Project/i")).toBeVisible();
-    await expect(page.locator("text=/AI Analysis/i")).toBeVisible();
-    await expect(page.locator("text=/Ready to Build/i")).toBeVisible();
+    // Check steps are displayed (each is an <h4> heading)
+    await expect(page.getByRole("heading", { name: "Describe Your Project" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "AI Analysis" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Ready to Build" })).toBeVisible();
   });
 });
 
