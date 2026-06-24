@@ -5,14 +5,21 @@ import {
   listIicrcCecSubmissionsForAdmin,
   retryIicrcCecSubmission,
 } from '@/lib/server/iicrc-cec-submission';
+import { listRenewalSubmissionsForStudent } from '@/lib/server/iicrc-renewal-communication';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   const session = await getAdminSessionOrNull();
   if (!session) {
     return NextResponse.json({ detail: 'Unauthorized' }, { status: 401 });
   }
   if (!process.env.DATABASE_URL?.trim()) {
     return NextResponse.json({ detail: 'Database not configured' }, { status: 503 });
+  }
+
+  const studentId = request.nextUrl.searchParams.get('studentId')?.trim() ?? '';
+  if (studentId) {
+    const submissions = await listRenewalSubmissionsForStudent(studentId);
+    return NextResponse.json({ submissions });
   }
 
   const submissions = await listIicrcCecSubmissionsForAdmin({ limit: 200 });
@@ -38,7 +45,9 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const result = await retryIicrcCecSubmission(submissionId);
+    const result = await retryIicrcCecSubmission(submissionId, {
+      initiatedByAdminEmail: session.email,
+    });
     return NextResponse.json({ ok: true, status: result.status });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
