@@ -118,6 +118,22 @@ export const brandVideoScripts: BrandVideoScript[] = [
     script:
       'Your team training works best when progress is visible. Check who has started, who is stalled, and which certificates are ready. If one person has completed the baseline, the next step is to assign the same course to the rest of the team so everyone shares the same operating language on site.',
   },
+  {
+    id: 'pathways-advisor-intro',
+    title: 'Find Your Learning Pathway',
+    audience: 'public',
+    format: 'lesson-intro',
+    durationSeconds: 35,
+    placement: 'Pathways page intro and pathway-advisor onboarding',
+    goal: 'Help visitors choose a structured CARSI pathway instead of guessing which course to start.',
+    visualDirection:
+      'Assistant beside a clean pathway map: discipline tracks, ordered courses, and CEC progress markers. Calm, structured, professional.',
+    voiceDirection: 'Clear and guiding. Reduce overwhelm; make the next step feel obvious.',
+    ctaLabel: 'Find my path',
+    ctaHref: '/pathways',
+    script:
+      "If you are not sure which course to start with, begin with a pathway. CARSI pathways group courses into a sensible order for each restoration and cleaning discipline, so you build knowledge in the right sequence and keep your continuing education on track. Pick the pathway that matches your work, and CARSI will guide you from your first lesson through to a verifiable certificate, one clear step at a time.",
+  },
 ];
 
 export function getBrandVideoScript(id: string) {

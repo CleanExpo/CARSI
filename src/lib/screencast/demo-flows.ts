@@ -107,5 +107,52 @@ export const demoFlowsFile: DemoFlowsFile = {
         { action: 'wait', ms: 2000 },
       ],
     },
+    {
+      // Narrated walkthrough of the public Pathways page (static IICRC content — renders for
+      // anyone, no login). Paired with the pathways-advisor narration (~35s).
+      id: 'pathways-tour',
+      title: 'Find your learning pathway',
+      purpose: 'marketing-reel',
+      brandVideoScriptId: 'pathways-advisor-intro',
+      auth: 'guest',
+      viewport: VIEWPORT_16x9,
+      pip: { corner: 'br', widthPct: 26 },
+      steps: [
+        { action: 'goto', path: '/pathways' },
+        { action: 'wait', ms: 5000 },
+        { action: 'scroll', to: 700 },
+        { action: 'wait', ms: 5000 },
+        { action: 'scroll', to: 'bottom' },
+        { action: 'wait', ms: 5000 },
+        { action: 'scroll', to: 'top' },
+        { action: 'highlight', selector: 'a[href="/courses"]', label: 'Browse courses CTA' },
+        { action: 'wait', ms: 6000 },
+      ],
+    },
+    {
+      // Silent b-roll of the public catalogue + discipline filtering. Footage to cut into the
+      // brand/marketing videos. Tab buttons + card links are the selectors the e2e suite asserts.
+      id: 'course-catalogue-discipline-tour',
+      title: 'Course catalogue — discipline filtering (b-roll)',
+      purpose: 'brand-broll',
+      brandVideoScriptId: null,
+      auth: 'guest',
+      viewport: VIEWPORT_16x9,
+      pip: { corner: 'br', widthPct: 26 },
+      steps: [
+        { action: 'goto', path: '/courses' },
+        { action: 'wait', ms: 3000 },
+        { action: 'highlight', selector: 'a[href*="/courses/"]', label: 'A course card' },
+        { action: 'wait', ms: 1500 },
+        { action: 'click', selector: 'button:has-text("WRT")', label: 'Filter: Water (WRT)' },
+        { action: 'wait', ms: 2500 },
+        { action: 'click', selector: 'button:has-text("AMRT")', label: 'Filter: Mould (AMRT)' },
+        { action: 'wait', ms: 2500 },
+        { action: 'click', selector: 'button:has-text("All")', label: 'Back to all courses' },
+        { action: 'wait', ms: 2000 },
+        { action: 'scroll', to: 'bottom' },
+        { action: 'wait', ms: 2000 },
+      ],
+    },
   ],
 };

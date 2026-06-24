@@ -63,6 +63,9 @@ const STORAGE_STATE_PATH = join(ROOT, 'playwright', '.auth', 'student.json');
 const BASE_URL = process.env.DEMO_RECORD_BASE_URL ?? 'http://localhost:3000';
 const HARD_CAP = parsePositiveInt(process.env.DEMO_VIDEO_MAX, 'DEMO_VIDEO_MAX', 12);
 const PIP_MARGIN = parsePositiveInt(process.env.DEMO_PIP_MARGIN, 'DEMO_PIP_MARGIN', 24);
+// Playwright recordings don't render a mouse pointer; inject a synthetic one so the
+// viewer can follow clicks. Disable with DEMO_CURSOR=0.
+const CURSOR_ENABLED = process.env.DEMO_CURSOR !== '0';
 
 // Seeded demo account (scripts/seed-e2e-user.ts) — same credentials as e2e/auth.setup.ts.
 const STUDENT = {
@@ -259,7 +262,7 @@ async function applyStep(page: Page, step: DemoStep): Promise<void> {
       await page.waitForTimeout(step.ms);
       break;
     case 'highlight':
-      // Playwright recordings show no cursor; pulse a spotlight so the eye has a target.
+      // Pulse a spotlight on the target, and glide the synthetic cursor to it.
       await page.evaluate((sel) => {
         const el = document.querySelector(sel) as HTMLElement | null;
         if (!el) return;
@@ -271,8 +274,72 @@ async function applyStep(page: Page, step: DemoStep): Promise<void> {
           el.style.boxShadow = prev;
         }, 1400);
       }, step.selector);
+      if (CURSOR_ENABLED) {
+        const box = await page
+          .locator(step.selector)
+          .first()
+          .boundingBox()
+          .catch(() => null);
+        if (box) await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2, { steps: 12 });
+      }
       await page.waitForTimeout(1500);
       break;
+  }
+}
+
+/**
+ * Browser-side script that draws a synthetic mouse pointer following real mouse events,
+ * since Playwright's video recorder never renders the OS cursor. Runs before page scripts on
+ * every navigation (added via context.addInitScript).
+ */
+function cursorInitScript(): void {
+  const ID = '__demo_cursor__';
+  function ensureCursor() {
+    if (document.getElementById(ID)) return;
+    const c = document.createElement('div');
+    c.id = ID;
+    Object.assign(c.style, {
+      position: 'fixed',
+      top: '0',
+      left: '0',
+      width: '22px',
+      height: '22px',
+      marginLeft: '-11px',
+      marginTop: '-11px',
+      borderRadius: '50%',
+      background: 'rgba(20,111,194,0.35)',
+      border: '2px solid rgba(20,111,194,0.9)',
+      boxShadow: '0 0 8px rgba(20,111,194,0.6)',
+      pointerEvents: 'none',
+      zIndex: '2147483647',
+      transition: 'transform .05s linear, background .2s, opacity .2s',
+      transform: 'translate(-100px,-100px)',
+      opacity: '0',
+    } as Partial<CSSStyleDeclaration>);
+    document.documentElement.appendChild(c);
+    window.addEventListener(
+      'mousemove',
+      (e) => {
+        c.style.opacity = '1';
+        c.style.transform = `translate(${(e as MouseEvent).clientX}px, ${(e as MouseEvent).clientY}px)`;
+      },
+      true
+    );
+    window.addEventListener(
+      'mousedown',
+      () => {
+        c.style.background = 'rgba(20,111,194,0.65)';
+        setTimeout(() => {
+          c.style.background = 'rgba(20,111,194,0.35)';
+        }, 200);
+      },
+      true
+    );
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', ensureCursor);
+  } else {
+    ensureCursor();
   }
 }
 
@@ -287,6 +354,7 @@ async function recordFlow(browser: Browser, flow: DemoFlow): Promise<string> {
     storageState,
     recordVideo: { dir: RAW_DIR, size: flow.viewport },
   });
+  if (CURSOR_ENABLED) await context.addInitScript(cursorInitScript);
   const page = await context.newPage();
 
   try {
