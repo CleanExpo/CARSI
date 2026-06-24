@@ -35,7 +35,7 @@
     /* ── Text ───────────────────────────────── */
     --text-primary: #0f172a;
     --text-secondary: #334155;
-    --text-muted: #64748b;
+    --text-muted: #617187;
     --text-accent: #146fc2;
     --text-orange: #b65f00;
 
@@ -98,17 +98,23 @@
     --chart-5: 142 71% 45%;
 
     /* ── Surface / Semantic ────────────────── */
-    --success: 142 71% 45%;
-    --success-foreground: 0 0% 0%;
+    /* Semantic colours double as text (text-success etc.) AND solid fills
+       (bg-success + *-foreground). On the light campus surfaces the bright
+       variants failed WCAG AA as text (success 2.3:1, warning 2.1:1, info
+       2.9:1), so the light values are darkened to clear 4.5:1 on white and the
+       foregrounds flip to white for solid fills. The bright variants are
+       restored in `.dark` below, where they read correctly on dark surfaces. */
+    --success: 142 71% 30%;
+    --success-foreground: 0 0% 100%;
     --success-muted: 142 76% 15%;
-    --warning: 38 92% 50%;
-    --warning-foreground: 0 0% 0%;
+    --warning: 38 92% 32%;
+    --warning-foreground: 0 0% 100%;
     --warning-muted: 38 92% 15%;
     --error: 0 72% 51%;
     --error-foreground: 0 0% 100%;
     --error-muted: 0 72% 15%;
-    --info: 199 89% 48%;
-    --info-foreground: 0 0% 0%;
+    --info: 199 89% 36%;
+    --info-foreground: 0 0% 100%;
     --info-muted: 199 89% 15%;
     --surface-elevated: 0 0% 100%;
     --surface-recessed: 210 40% 96%;
@@ -149,6 +155,14 @@
     --border: 217 33% 14%;
     --input: 217 33% 14%;
     --ring: 211 85% 54%;
+    /* Restore the bright semantic variants for dark surfaces (the light
+       darkening above would otherwise be too dark to read on near-black). */
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 0%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 0%;
+    --info: 199 89% 48%;
+    --info-foreground: 0 0% 0%;
   }
 }
 
