@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-06-24T03:09:09.513Z",
+  "generatedAt": "2026-06-25T10:23:45.097Z",
   "briefs": [
     {
       "slug": "air-quality-and-odour-identification-and-deodorisation-essentials",
@@ -379,6 +379,25 @@
       "composition": "keep the upper-left third calm, darker and uncluttered so a white course title can be overlaid; place the main subject toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that does not bury the subject",
       "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage, no UI, no readable displays, no human faces",
       "authorNote": "WRT-aligned fundamentals; classic restoration motifs (moisture meter, air movers) read instantly as water-damage training."
+    },
+    {
+      "slug": "commercial-floor-care-schools-childcare",
+      "title": "Commercial Floor Care for Schools & Childcare Contracts",
+      "discipline": null,
+      "concept": "A freshly cleaned, bright, empty Australian school/childcare interior — gleaming sealed vinyl floor and clean carpet — with professional commercial floor-care equipment, conveying safe, low-disruption service. No people.",
+      "motifs": [
+        "a glossy freshly sealed vinyl floor catching soft daylight",
+        "clean carpet with fresh, even vacuum/extraction lines",
+        "a professional floor scrubber or carpet extractor at rest",
+        "a yellow wet-floor caution sign in an empty bright corridor",
+        "tidy childcare/classroom space, sunlit, spotless, unoccupied"
+      ],
+      "palette": "fresh aqua-teal and clean blues with bright, airy neutrals and warm timber accents",
+      "mood": "calm, professional, safe and trustworthy; child-aware commercial cleaning; Australian training",
+      "style": "photoreal",
+      "composition": "keep the upper-left third calm, darker and uncluttered for a white course title overlay; place the equipment/clean-floor subject toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that keeps the subject readable",
+      "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage text, no UI, no readable displays, no human faces, no children, no people",
+      "authorNote": "Commercial floor care (carpet, tile, vinyl strip & seal, pressure washing) for schools/childcare — no IICRC discipline (keep null, no CEC overclaim). Imagery must be child-safe: empty, spotless facility + equipment, absolutely no children or faces."
     }
   ]
 }
