@@ -2487,6 +2487,311 @@
           ]
         }
       ]
+    },
+    {
+      "id": "505daa3e-72ac-4be2-a79b-114d3c9d9378",
+      "slug": "commercial-floor-care-schools-childcare",
+      "title": "Commercial Floor Care for Schools & Childcare Contracts",
+      "description": "Schools and childcare centres are among the most demanding floor-care environments in Australia: the work is done around children, under tight occupancy and term-break windows, and against real compliance expectations. This course takes an experienced cleaner or small cleaning-business owner from technique to a contract-ready service across the four jobs that win this work — carpet cleaning, tile and grout, vinyl stripping and sealing, and pressure washing.\n\nEach service area is paired with the Australian regulatory frame that a school or childcare contract assumes you already understand: your WHS duties and Safety Data Sheet (SDS) obligations, child-safe and low-tox product selection, verifying slip resistance after sealing (AS 4663), keeping pressure-wash run-off out of stormwater, and the scheduling and documentation a contract expects. Product and chemical choices are grounded in a real Australian catalogue with current SDS, so what you learn maps to what you actually buy and use.\n\nThis is professional development and contract-readiness training. It supports your judgement — it does not replace Safety Data Sheets, manufacturer technical data, Australian Standards, or your own qualified assessment of each site.",
+      "shortDescription": "Carpet, tile & grout, vinyl strip & seal and pressure washing for Australian school and childcare contracts — technique plus WHS/SDS, child-safety, slip resistance and run-off compliance.",
+      "thumbnailUrl": null,
+      "instructorId": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+      "status": "draft",
+      "priceAud": "0",
+      "isFree": true,
+      "durationHours": 6,
+      "level": "Intermediate",
+      "category": "Commercial Cleaning",
+      "tags": [
+        "commercial cleaning",
+        "floor care",
+        "carpet cleaning",
+        "tile and grout",
+        "strip and seal",
+        "pressure washing",
+        "schools",
+        "childcare",
+        "WHS",
+        "SDS"
+      ],
+      "iicrcDiscipline": null,
+      "cecHours": null,
+      "meta": {
+        "sourceResearch": "data/courses/commercial-floor-care-schools-childcare/research.md",
+        "audience": "Australian commercial cleaning operators/technicians and small business owners servicing schools & childcare",
+        "positioning": "Professional development / contract-readiness — not IICRC CEC accredited",
+        "buildStage": "skeleton"
+      },
+      "isPublished": false,
+      "modules": [
+        {
+          "id": "93f7627d-a791-4159-9e63-8e0618271369",
+          "title": "Foundations: WHS, SDS & Child-Safe Selection",
+          "orderIndex": 0,
+          "lessons": [
+            {
+              "id": "cd16901b-e4d5-42e0-8af7-c770baa7af1e",
+              "title": "Welcome: winning and keeping school & childcare floor-care work",
+              "contentType": "text",
+              "contentBody": null,
+              "orderIndex": 0,
+              "isPreview": true,
+              "resources": []
+            },
+            {
+              "id": "d31c3d56-0baa-473a-ab44-7d2f7a35c8c9",
+              "title": "Your WHS duties: current SDS, the chemicals register & labelling",
+              "contentType": "text",
+              "contentBody": null,
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": []
+            },
+            {
+              "id": "70f5d9a2-f2c4-4d64-b63e-1551dd87432c",
+              "title": "How to read a Safety Data Sheet (and build your register)",
+              "contentType": "text",
+              "contentBody": null,
+              "orderIndex": 2,
+              "isPreview": false,
+              "resources": []
+            },
+            {
+              "id": "282a5ec8-3f4f-4898-b2b1-3989e16e331a",
+              "title": "Choosing child-safe, low-tox products and ventilating occupied rooms",
+              "contentType": "text",
+              "contentBody": null,
+              "orderIndex": 3,
+              "isPreview": false,
+              "resources": []
+            },
+            {
+              "id": "7f322ec9-1cdd-48a6-a09d-afc01f96bb2c",
+              "title": "Knowledge check: foundations",
+              "contentType": "text",
+              "contentBody": null,
+              "orderIndex": 4,
+              "isPreview": false,
+              "resources": []
+            }
+          ]
+        },
+        {
+          "id": "b4c991c7-c45e-4f7d-b1ea-51da25e75048",
+          "title": "Carpet Cleaning for Occupied Facilities",
+          "orderIndex": 1,
+          "lessons": [
+            {
+              "id": "6a254468-8fbb-4fd4-8ceb-7d0a66cf3520",
+              "title": "Carpet, fibre and soil: an S100-aligned overview",
+              "contentType": "text",
+              "contentBody": null,
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": []
+            },
+            {
+              "id": "4c3a5bbe-514d-4610-8298-507ba3e08359",
+              "title": "Hot water extraction vs encapsulation: the dry-time trade-off",
+              "contentType": "text",
+              "contentBody": null,
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": []
+            },
+            {
+              "id": "49d932f7-4fd5-4769-87a3-61e75b8358de",
+              "title": "Pre-spray, spotting and protection with the CCW/Actichem range",
+              "contentType": "text",
+              "contentBody": null,
+              "orderIndex": 2,
+              "isPreview": false,
+              "resources": []
+            },
+            {
+              "id": "b8803682-d133-4ed5-a9e2-39879204f17c",
+              "title": "Low-disruption method and equipment for classrooms and care rooms",
+              "contentType": "text",
+              "contentBody": null,
+              "orderIndex": 3,
+              "isPreview": false,
+              "resources": []
+            },
+            {
+              "id": "6ee175db-3457-4d1d-8340-9dba9fa6a0f1",
+              "title": "Knowledge check: carpet cleaning",
+              "contentType": "text",
+              "contentBody": null,
+              "orderIndex": 4,
+              "isPreview": false,
+              "resources": []
+            }
+          ]
+        },
+        {
+          "id": "be3f81f2-d52e-49af-bd50-6a6df04995f9",
+          "title": "Tile & Grout Cleaning",
+          "orderIndex": 2,
+          "lessons": [
+            {
+              "id": "30fbdab5-3ae3-44d9-ade5-e23fddc27a53",
+              "title": "Hard-floor and grout soil: tools, brushes and chemistry",
+              "contentType": "text",
+              "contentBody": null,
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": []
+            },
+            {
+              "id": "85b202ca-5898-4d27-8a4c-5aa67a6ef862",
+              "title": "Method, dwell and rinse — and slip resistance after cleaning (AS 4663)",
+              "contentType": "text",
+              "contentBody": null,
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": []
+            },
+            {
+              "id": "8105a80c-e938-45c7-808e-282356956552",
+              "title": "Knowledge check: tile & grout",
+              "contentType": "text",
+              "contentBody": null,
+              "orderIndex": 2,
+              "isPreview": false,
+              "resources": []
+            }
+          ]
+        },
+        {
+          "id": "689d5761-cf76-44a8-b30b-89dde8427f2f",
+          "title": "Vinyl Strip & Seal — the high-risk job",
+          "orderIndex": 3,
+          "lessons": [
+            {
+              "id": "c3df9e7f-caa8-469c-a3fe-fe08df2683b0",
+              "title": "The strip-and-seal process, end to end",
+              "contentType": "text",
+              "contentBody": null,
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": []
+            },
+            {
+              "id": "aa7459b0-0597-4268-8b89-de14dddb941c",
+              "title": "Caustic stripper safety: PPE, ventilation, isolation and signage",
+              "contentType": "text",
+              "contentBody": null,
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": []
+            },
+            {
+              "id": "61343220-4f0a-44d6-8885-8fde6e217f16",
+              "title": "Sealing and finishing — cure & re-entry come from the SDS/TDS, not guesswork",
+              "contentType": "text",
+              "contentBody": null,
+              "orderIndex": 2,
+              "isPreview": false,
+              "resources": []
+            },
+            {
+              "id": "a2838add-3c1c-4ff7-87a0-f8b7386a3636",
+              "title": "Verifying slip resistance to a target class (AS 4663)",
+              "contentType": "text",
+              "contentBody": null,
+              "orderIndex": 3,
+              "isPreview": false,
+              "resources": []
+            },
+            {
+              "id": "f4589b37-5163-4486-8601-83bbf1c11d98",
+              "title": "Knowledge check: strip & seal",
+              "contentType": "text",
+              "contentBody": null,
+              "orderIndex": 4,
+              "isPreview": false,
+              "resources": []
+            }
+          ]
+        },
+        {
+          "id": "cc47043e-106f-469f-a3b9-46e09df37c8a",
+          "title": "Pressure Washing & Run-off Control",
+          "orderIndex": 4,
+          "lessons": [
+            {
+              "id": "4c5341f6-97dd-4121-a013-9dafaf7fe564",
+              "title": "Pressure-washing technique, surfaces and pressures",
+              "contentType": "text",
+              "contentBody": null,
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": []
+            },
+            {
+              "id": "bde458a3-c8cc-4d66-a4c2-39a3b4003d85",
+              "title": "“The drain is just for rain”: capturing run-off and trade-waste to sewer",
+              "contentType": "text",
+              "contentBody": null,
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": []
+            },
+            {
+              "id": "522fa48c-529a-4b4d-b84a-44a220ae6647",
+              "title": "Knowledge check: pressure washing",
+              "contentType": "text",
+              "contentBody": null,
+              "orderIndex": 2,
+              "isPreview": false,
+              "resources": []
+            }
+          ]
+        },
+        {
+          "id": "e25bb8f7-7417-4d17-ac18-a0245ec722de",
+          "title": "Winning & Servicing the Contract",
+          "orderIndex": 5,
+          "lessons": [
+            {
+              "id": "e6b4c7e3-42aa-4ab6-8f5c-818e11a66fe3",
+              "title": "Scheduling around occupancy, term breaks and deep-clean windows",
+              "contentType": "text",
+              "contentBody": null,
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": []
+            },
+            {
+              "id": "4a21ae04-6706-4ee3-a613-6bbdcd27c45a",
+              "title": "Compliance & documentation: SDS register, WWC checks, NQS QA2 and school cleaning standards",
+              "contentType": "text",
+              "contentBody": null,
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": []
+            },
+            {
+              "id": "adedee36-8676-4ebe-9289-53e39988fbe5",
+              "title": "Capstone: build your child-safe floor-care service offer",
+              "contentType": "text",
+              "contentBody": null,
+              "orderIndex": 2,
+              "isPreview": false,
+              "resources": []
+            },
+            {
+              "id": "4cda9cdb-3bee-4dab-b458-0800220c7a46",
+              "title": "Knowledge check: the contract",
+              "contentType": "text",
+              "contentBody": null,
+              "orderIndex": 3,
+              "isPreview": false,
+              "resources": []
+            }
+          ]
+        }
+      ]
     }
   ]
 }
