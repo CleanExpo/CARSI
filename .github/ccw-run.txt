@@ -1,2 +1,2 @@
 Touch this file (change the nonce) and push to run the CCW scrape.
-run-nonce: manual-001-2026-06-25T0935Z
+run-nonce: sds-fix-002-2026-06-25T0945Z

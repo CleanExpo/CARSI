@@ -137,6 +137,19 @@ function deriveSdsLabel(url: string): string {
   }
 }
 
+/** Extract every PDF link from an HTML blob as SDS-record candidates. */
+function extractPdfLinksFromHtml(html: string, base: string): CcwSdsRecord[] {
+  const out: CcwSdsRecord[] = [];
+  const seen = new Set<string>();
+  for (const m of html.matchAll(/href=["']([^"']+\.pdf[^"']*)["']/gi)) {
+    const abs = absoluteUrl(m[1], base);
+    if (!abs || seen.has(abs)) continue;
+    seen.add(abs);
+    out.push({ documentUrl: abs, label: deriveSdsLabel(abs), issuedAt: null, hazards: [], extractedText: null });
+  }
+  return out;
+}
+
 function extractHazards(sdsText: string): string[] {
   const hazards = new Set<string>();
   for (const m of sdsText.matchAll(/\bH\d{3}\b[^\n]*/g)) hazards.add(m[0].trim().slice(0, 200));
@@ -173,21 +186,39 @@ async function fetchSdsLibrary(baseUrl: string, sdsPageInput: string | null): Pr
   }
 
   const sds = new Map<string, CcwSdsRecord>();
-  const seenPages = new Set<string>();
-  for (const page of pages) {
-    const key = page.split('#')[0];
-    if (seenPages.has(key)) continue;
-    seenPages.add(key);
+  const visited = new Set<string>();
+  const queue = [...new Set(pages.map((p) => p.split('#')[0]))];
+  const MAX_FETCHES = 80;
+  let fetches = 0;
+
+  while (queue.length && fetches < MAX_FETCHES) {
+    const page = queue.shift() as string;
+    if (visited.has(page)) continue;
+    visited.add(page);
+    fetches++;
     let html: string;
     try {
-      html = await httpGetText(key);
+      html = await httpGetText(page);
     } catch {
       continue;
     }
-    for (const m of html.matchAll(/href="([^"]+\.pdf[^"]*)"/gi)) {
-      const abs = absoluteUrl(m[1], key);
-      if (!abs || sds.has(abs)) continue;
-      sds.set(abs, { documentUrl: abs, label: deriveSdsLabel(abs), issuedAt: null, hazards: [], extractedText: null });
+    for (const rec of extractPdfLinksFromHtml(html, page)) {
+      if (!sds.has(rec.documentUrl)) sds.set(rec.documentUrl, rec);
+    }
+    // Follow same-origin SDS/blog article links one+ level deep (bounded by MAX_FETCHES).
+    for (const m of html.matchAll(/href="([^"]+)"/gi)) {
+      const abs = absoluteUrl(m[1], page);
+      if (!abs) continue;
+      let u: URL;
+      try {
+        u = new URL(abs);
+      } catch {
+        continue;
+      }
+      if (u.origin !== origin) continue;
+      if (!/\/blogs\/|safety[-_]?data|(^|[/-])sds([/-]|$)/i.test(u.pathname)) continue;
+      const norm = abs.split('#')[0];
+      if (!visited.has(norm) && !queue.includes(norm)) queue.push(norm);
     }
   }
   return [...sds.values()];
@@ -214,7 +245,12 @@ function matchSdsToProduct(product: CcwProduct, library: CcwSdsRecord[]): CcwSds
 }
 
 function shopifyToProduct(p: ShopifyProduct, origin: string, scrapedAt: string): CcwProduct {
-  const description = htmlToText(p.body_html ?? '').slice(0, 600);
+  const body = p.body_html ?? '';
+  const description = htmlToText(body).slice(0, 600);
+  // SDS sheets are often linked directly in the product description. Prefer
+  // SDS-named PDFs; if none are named that way, fall back to any PDF in the body.
+  const pdfs = extractPdfLinksFromHtml(body, origin);
+  const named = pdfs.filter((s) => /sds|safety[-_ ]?data/i.test(`${s.documentUrl} ${s.label ?? ''}`));
   return {
     slug: p.handle || slugify(p.title),
     name: p.title,
@@ -225,7 +261,7 @@ function shopifyToProduct(p: ShopifyProduct, origin: string, scrapedAt: string):
     imageUrl: p.images?.[0]?.src ?? null,
     price: p.variants?.[0]?.price ?? null,
     tags: Array.isArray(p.tags) ? p.tags : [],
-    sds: [],
+    sds: named.length ? named : pdfs,
     scrapedAt,
   };
 }
@@ -389,21 +425,35 @@ async function main() {
     const shopifyProducts = await fetchShopifyProducts(args.url, { max: args.max });
     console.log(`Fetched ${shopifyProducts.length} products from products.json.`);
     products = shopifyProducts.map((p) => shopifyToProduct(p, origin, scrapedAt));
+    const fromDescriptions = products.reduce((n, p) => n + (p.sds.length ? 1 : 0), 0);
+    console.log(`${fromDescriptions}/${products.length} products had an SDS linked in their description.`);
 
-    sdsLibrary = await fetchSdsLibrary(args.url, args.sdsPage);
-    console.log(`Found ${sdsLibrary.length} SDS documents on the Safety Data Sheets page.`);
+    // Also read the site's Safety Data Sheets page(s) and attach any matches.
+    const sdsPageLib = await fetchSdsLibrary(args.url, args.sdsPage);
+    console.log(`Found ${sdsPageLib.length} SDS documents on the Safety Data Sheets page(s).`);
+    for (const product of products) {
+      const have = new Set(product.sds.map((s) => s.documentUrl));
+      for (const m of matchSdsToProduct(product, sdsPageLib)) {
+        if (!have.has(m.documentUrl)) {
+          product.sds.push(m);
+          have.add(m.documentUrl);
+        }
+      }
+    }
+
+    // File-level library = every distinct SDS discovered, matched or not.
+    const libMap = new Map<string, CcwSdsRecord>();
+    for (const s of sdsPageLib) libMap.set(s.documentUrl, s);
+    for (const p of products) for (const s of p.sds) if (!libMap.has(s.documentUrl)) libMap.set(s.documentUrl, s);
+    sdsLibrary = [...libMap.values()];
 
     if (args.fetchSds && sdsLibrary.length) {
       if (!apiKey) console.warn('JINA_API_KEY not set — SDS text extraction will use Jina anonymously.');
       await enrichSds(sdsLibrary, apiKey);
     }
 
-    let matched = 0;
-    for (const product of products) {
-      product.sds = matchSdsToProduct(product, sdsLibrary);
-      if (product.sds.length) matched++;
-    }
-    console.log(`Matched SDS to ${matched}/${products.length} products.`);
+    const matched = products.filter((p) => p.sds.length).length;
+    console.log(`SDS: ${sdsLibrary.length} in library; ${matched}/${products.length} products have >=1 SDS.`);
   } else {
     engine = 'jina';
     if (!apiKey) console.warn('JINA_API_KEY not set — using Jina anonymously (lower rate limit).');
