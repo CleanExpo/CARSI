@@ -3,6 +3,8 @@ import { randomUUID } from 'node:crypto';
 import { Prisma } from '@/generated/prisma/client';
 
 import { prisma } from '@/lib/prisma';
+import { isCecExcludedSlug } from '@/lib/seed/cec-professional-assignments';
+import { resolveLmsCourseCecHours } from '@/lib/server/course-cec-hours';
 import {
   courseWithCurriculum,
   DEFAULT_INSTRUCTOR_ID,
@@ -33,8 +35,75 @@ export type AdminCourseWriteInput = {
   isFree: boolean;
   priceAud: number;
   published: boolean;
+  cecHours?: number | null;
+  durationHours?: number | null;
+  iicrcDiscipline?: string | null;
+  level?: string | null;
   modules: AdminModuleInput[];
 };
+
+function parseOptionalHours(raw: unknown): number | null | undefined {
+  if (raw === null) return null;
+  if (raw === undefined || raw === '') return undefined;
+  const n = typeof raw === 'number' ? raw : parseFloat(String(raw));
+  if (!Number.isFinite(n) || n < 0) return undefined;
+  return n;
+}
+
+function parseOptionalTrimmedString(raw: unknown): string | null | undefined {
+  if (raw === null) return null;
+  if (typeof raw !== 'string') return undefined;
+  const t = raw.trim();
+  return t ? t : null;
+}
+
+export function parseAdminCourseWriteBody(body: unknown): AdminCourseWriteInput | null {
+  if (!body || typeof body !== 'object') return null;
+  const o = body as Record<string, unknown>;
+  const title = typeof o.title === 'string' ? o.title.trim() : '';
+  if (!title) return null;
+
+  const modulesRaw = Array.isArray(o.modules) ? o.modules : [];
+  const modules = modulesRaw
+    .map((row) => {
+      if (!row || typeof row !== 'object') return null;
+      const m = row as Record<string, unknown>;
+      const modTitle = typeof m.title === 'string' ? m.title.trim() : '';
+      if (!modTitle) return null;
+      return {
+        id: typeof m.id === 'string' && m.id.trim() ? m.id.trim() : undefined,
+        title: modTitle,
+        textContent: typeof m.textContent === 'string' ? m.textContent : undefined,
+        videoUrl: typeof m.videoUrl === 'string' ? m.videoUrl : undefined,
+      };
+    })
+    .filter(Boolean) as AdminCourseWriteInput['modules'];
+
+  const priceRaw = o.priceAud;
+  const priceAud =
+    typeof priceRaw === 'number' && Number.isFinite(priceRaw)
+      ? priceRaw
+      : typeof priceRaw === 'string'
+        ? Number.parseFloat(priceRaw)
+        : 0;
+
+  return {
+    title,
+    description: typeof o.description === 'string' ? o.description : undefined,
+    thumbnailUrl: typeof o.thumbnailUrl === 'string' ? o.thumbnailUrl : undefined,
+    introVideoUrl: typeof o.introVideoUrl === 'string' ? o.introVideoUrl : undefined,
+    introThumbnailUrl: typeof o.introThumbnailUrl === 'string' ? o.introThumbnailUrl : undefined,
+    slug: typeof o.slug === 'string' ? o.slug : undefined,
+    isFree: Boolean(o.isFree),
+    priceAud: Number.isFinite(priceAud) ? priceAud : 0,
+    published: Boolean(o.published),
+    cecHours: parseOptionalHours(o.cecHours),
+    durationHours: parseOptionalHours(o.durationHours),
+    iicrcDiscipline: parseOptionalTrimmedString(o.iicrcDiscipline),
+    level: parseOptionalTrimmedString(o.level),
+    modules,
+  };
+}
 
 function escapeHtml(s: string) {
   return s
@@ -218,6 +287,15 @@ async function syncModuleLessons(
 export function courseToAdminDto(course: CourseWithCurriculum) {
   const { introVideoUrl, introThumbnailUrl } = readIntroVideoFromMeta(course.meta);
   const status = (course.status ?? '').toLowerCase();
+  const resolved = resolveLmsCourseCecHours({
+    slug: course.slug,
+    cecHours: course.cecHours != null ? Number(course.cecHours) : null,
+    shortDescription: course.shortDescription,
+    description: course.description,
+    meta: course.meta,
+    durationHours: course.durationHours != null ? Number(course.durationHours) : null,
+    iicrcDiscipline: course.iicrcDiscipline,
+  });
   return {
     id: course.id,
     slug: course.slug,
@@ -230,6 +308,13 @@ export function courseToAdminDto(course: CourseWithCurriculum) {
     priceAud: Number(course.priceAud),
     published: course.isPublished === true || status === 'published',
     workflow_status: resolveCourseWorkflowStatus(course.status, course.isPublished),
+    cecHours: course.cecHours != null ? String(course.cecHours) : null,
+    durationHours: course.durationHours != null ? String(course.durationHours) : null,
+    iicrcDiscipline: course.iicrcDiscipline,
+    level: course.level,
+    resolvedCecHours: resolved != null ? String(resolved) : null,
+    cecMissing: !isCecExcludedSlug(course.slug) && resolved == null,
+    cecExcluded: isCecExcludedSlug(course.slug),
     modules: course.modules.map((mod) => {
       const lessons = [...mod.lessons].sort((a, b) => a.orderIndex - b.orderIndex);
       const text = lessons.find((l) => l.contentType === 'text');
@@ -271,6 +356,8 @@ export type AdminListCoursesOptions = {
   /** Trimmed; title/slug contains, case-insensitive */
   q?: string;
   sort?: 'updated' | 'title' | 'modules';
+  /** When `missing`, only courses without resolvable CEC (excludes memberships/downloads). */
+  cec?: 'all' | 'missing';
 };
 
 function adminCoursesListWhere(options: AdminListCoursesOptions): Prisma.LmsCourseWhereInput {
@@ -325,24 +412,44 @@ export async function adminListCourses(options: AdminListCoursesOptions = {}) {
       _count: { select: { modules: true } },
     },
   });
-  return rows.map((c) => ({
-    id: c.id,
-    slug: c.slug,
-    title: c.title,
-    thumbnailUrl: c.thumbnailUrl,
-    moduleCount: c._count.modules,
-    isFree: c.isFree,
-    priceAud: Number(c.priceAud),
-    published: c.isPublished === true || String(c.status ?? '').toLowerCase() === 'published',
-    workflow_status: resolveCourseWorkflowStatus(c.status, c.isPublished),
-    status: c.status,
-    updatedAt: c.updatedAt.toISOString(),
-    category: c.category,
-    level: c.level,
-    iicrcDiscipline: c.iicrcDiscipline,
-    cecHours: c.cecHours != null ? String(c.cecHours) : null,
-    durationHours: c.durationHours != null ? String(c.durationHours) : null,
-  }));
+
+  const mapped = rows.map((c) => {
+    const resolved = resolveLmsCourseCecHours({
+      slug: c.slug,
+      cecHours: c.cecHours != null ? Number(c.cecHours) : null,
+      shortDescription: c.shortDescription,
+      description: c.description,
+      meta: c.meta,
+      durationHours: c.durationHours != null ? Number(c.durationHours) : null,
+      iicrcDiscipline: c.iicrcDiscipline,
+    });
+    return {
+      id: c.id,
+      slug: c.slug,
+      title: c.title,
+      thumbnailUrl: c.thumbnailUrl,
+      moduleCount: c._count.modules,
+      isFree: c.isFree,
+      priceAud: Number(c.priceAud),
+      published: c.isPublished === true || String(c.status ?? '').toLowerCase() === 'published',
+      workflow_status: resolveCourseWorkflowStatus(c.status, c.isPublished),
+      status: c.status,
+      updatedAt: c.updatedAt.toISOString(),
+      category: c.category,
+      level: c.level,
+      iicrcDiscipline: c.iicrcDiscipline,
+      cecHours: c.cecHours != null ? String(c.cecHours) : null,
+      durationHours: c.durationHours != null ? String(c.durationHours) : null,
+      resolvedCecHours: resolved != null ? String(resolved) : null,
+      cecMissing: !isCecExcludedSlug(c.slug) && resolved == null,
+      cecExcluded: isCecExcludedSlug(c.slug),
+    };
+  });
+
+  if (options.cec === 'missing') {
+    return mapped.filter((c) => c.cecMissing);
+  }
+  return mapped;
 }
 
 export async function adminGetCourse(id: string): Promise<CourseWithCurriculum | null> {
@@ -386,8 +493,11 @@ export async function adminCreateCourse(
           status: published ? 'published' : 'draft',
           priceAud,
           isFree: Boolean(input.isFree),
-          level: null,
+          level: input.level?.trim() || null,
           category: null,
+          cecHours: input.cecHours ?? null,
+          durationHours: input.durationHours ?? null,
+          iicrcDiscipline: input.iicrcDiscipline?.trim() || null,
           isPublished: published,
         },
       });
@@ -452,6 +562,12 @@ export async function adminUpdateCourse(
           priceAud,
           isFree: Boolean(input.isFree),
           isPublished: published,
+          ...(input.cecHours !== undefined ? { cecHours: input.cecHours } : {}),
+          ...(input.durationHours !== undefined ? { durationHours: input.durationHours } : {}),
+          ...(input.iicrcDiscipline !== undefined
+            ? { iicrcDiscipline: input.iicrcDiscipline?.trim() || null }
+            : {}),
+          ...(input.level !== undefined ? { level: input.level?.trim() || null } : {}),
         },
       });
 
