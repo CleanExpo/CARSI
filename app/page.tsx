@@ -16,7 +16,7 @@ import {
   getPublicCatalogueFacts,
 } from '@/lib/server/public-catalogue-facts';
 import { getHomepageFeaturedCourses } from '@/lib/server/public-courses-list';
-import type { CourseListItem } from '@/lib/wordpress-export-courses';
+import type { CourseListItem } from '@/lib/course-list-item';
 import {
   ArrowRight,
   Award,
