@@ -1,4 +1,5 @@
 import { SkipToMain } from '@/components/a11y/SkipToMain';
+import { DashboardLightTheme } from '@/components/dashboard/DashboardLightTheme';
 import { LMSContextPanel } from '@/components/layout/LMSContextPanel';
 import { PageTransition } from '@/components/layout/PageTransition';
 import FloatingChatGate from '@/components/lms/FloatingChatGate';
@@ -10,13 +11,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       className="relative flex h-screen max-h-[100dvh] w-full max-w-[100vw] overflow-hidden"
       style={{ background: '#f6f8fb' }}
     >
+      <DashboardLightTheme />
       <SkipToMain />
       <LMSContextPanel />
 
       {/* Only this region scrolls; sidebars stay fixed to the viewport */}
       <main
         id="main-content"
-        className="relative z-10 flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-auto overscroll-y-contain"
+        className="dashboard-light relative z-10 flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-auto overscroll-y-contain text-slate-900"
       >
         <div className="flex min-h-0 w-full max-w-none min-w-0 flex-1 flex-col px-4 py-6 sm:px-6 sm:py-8 lg:px-10 lg:py-10">
           <PageTransition>{children}</PageTransition>
