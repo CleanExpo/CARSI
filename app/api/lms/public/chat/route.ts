@@ -7,9 +7,16 @@ import {
   getAssistantPageFocusContext,
   getAssistantTagline,
 } from '@/lib/server/ai-assistant-context';
+import { clientIpFrom } from '@/lib/rate-limit';
+import { applyRateLimitDistributed } from '@/lib/rate-limit-distributed';
 
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
 const MODEL = process.env.OPENAI_CHAT_MODEL?.trim() || 'gpt-4o-mini';
+
+// Public (unauthenticated) endpoint that spends on OpenAI — cap per IP so a
+// bot can't drive unbounded model cost. Best-effort (in-process) limiter.
+const CHAT_RATE_LIMIT = 12;
+const CHAT_RATE_WINDOW_MS = 60_000;
 
 type ChatTurn = { role: 'user' | 'assistant'; content: string };
 
@@ -47,6 +54,22 @@ export async function POST(request: NextRequest) {
           'Chat assistant is not configured. Ask your administrator to set OPENAI_API_KEY in the environment.',
       },
       { status: 503 }
+    );
+  }
+
+  // Rate-limit before spending on the model. Keyed per client IP.
+  const ip = clientIpFrom(
+    request.headers.get('x-forwarded-for'),
+    request.headers.get('x-real-ip')
+  );
+  const rl = await applyRateLimitDistributed(`public-chat:${ip}`, CHAT_RATE_LIMIT, CHAT_RATE_WINDOW_MS);
+  if (!rl.ok) {
+    return NextResponse.json(
+      { detail: 'Too many requests. Please wait a moment and try again.' },
+      {
+        status: 429,
+        headers: { 'Retry-After': String(Math.max(1, Math.ceil((rl.resetAt - Date.now()) / 1000))) },
+      }
     );
   }
 

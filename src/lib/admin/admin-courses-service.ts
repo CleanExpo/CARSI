@@ -406,6 +406,9 @@ export async function adminListCourses(options: AdminListCoursesOptions = {}) {
   }
 
   const rows = await prisma.lmsCourse.findMany({
+    // Defensive cap on the admin course list. Far above current catalogue size;
+    // move to pagination if the catalogue ever approaches this.
+    take: 1000,
     where: adminCoursesListWhere(options),
     orderBy,
     include: {

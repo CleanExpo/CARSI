@@ -122,7 +122,7 @@ export default async function AgedCareIndustryPage() {
         subtitle="Aged Care Training"
         title="Certify Your Staff"
         price="Today"
-        description="$795 AUD/year per seat. 7-day free trial. Bulk team pricing available."
+        description="$795 AUD/year per seat. Bulk team pricing available."
         ctaText="Certify Your Staff Today"
         accentColor={ACCENT_COLOR}
       />
