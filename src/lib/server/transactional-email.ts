@@ -12,6 +12,7 @@ import {
   renderEnrollmentWelcomeEmail,
   renderPasswordResetEmail,
   renderRegistrationWelcomeEmail,
+  renderAdminPasswordResetEmail,
   renderTeamMemberAddedEmail,
   renderYearlyMembershipEmail,
 } from '@/lib/server/email-templates';
@@ -174,6 +175,33 @@ export async function sendYearlyMembershipEmail(params: {
   return sendEmail({
     to: params.to,
     subject: 'Your CARSI Yearly Membership — sign-in details',
+    html,
+    text,
+  });
+}
+
+export async function sendAdminPasswordResetEmail(params: {
+  to: string;
+  memberName: string | null;
+  memberEmail: string;
+  temporaryPassword: string;
+  appOrigin: string;
+}): Promise<SendEmailResult> {
+  const base = params.appOrigin.replace(/\/$/, '');
+  const loginUrl = `${base}/login`;
+  const name = params.memberName?.trim() || params.to.split('@')[0] || 'Learner';
+
+  const { html, text } = renderAdminPasswordResetEmail({
+    appOrigin: base,
+    memberName: name,
+    memberEmail: params.memberEmail,
+    temporaryPassword: params.temporaryPassword,
+    loginUrl,
+  });
+
+  return sendEmail({
+    to: params.to,
+    subject: 'Your CARSI Learning password was reset',
     html,
     text,
   });
