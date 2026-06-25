@@ -17,7 +17,6 @@ export function PushNotificationPrompt() {
     const dismissed = typeof window !== 'undefined' && localStorage.getItem(DISMISSED_KEY);
     if (dismissed) return;
 
-    // Show after 3 seconds — non-intrusive delay
     const timer = setTimeout(() => setVisible(true), 3000);
     return () => clearTimeout(timer);
   }, [isSupported, permission]);
@@ -36,17 +35,13 @@ export function PushNotificationPrompt() {
 
   return (
     <div
-      className="mb-6 flex items-center justify-between gap-4 rounded-sm px-4 py-3"
-      style={{
-        background: 'rgba(36,144,237,0.06)',
-        border: '1px solid rgba(36,144,237,0.18)',
-      }}
+      className="mb-6 flex items-center justify-between gap-4 rounded-xl border border-[#2490ed]/20 bg-[#eef7ff] px-4 py-3"
       role="banner"
       aria-label="Push notification opt-in"
     >
       <div className="flex min-w-0 flex-col gap-0.5">
-        <p className="truncate text-sm font-medium text-white">Stay on top of your learning</p>
-        <p className="text-xs text-white/50">
+        <p className="truncate text-sm font-medium text-slate-900">Stay on top of your learning</p>
+        <p className="text-xs text-slate-600">
           Get notified about your learning streaks and new courses.
         </p>
       </div>
@@ -54,14 +49,13 @@ export function PushNotificationPrompt() {
       <div className="flex shrink-0 items-center gap-3">
         <button
           onClick={handleEnable}
-          className="rounded-sm px-3 py-1.5 text-xs font-semibold transition-opacity hover:opacity-80"
-          style={{ background: '#2490ed', color: '#fff' }}
+          className="rounded-lg bg-[#2490ed] px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-[#1a7fd4]"
         >
           Enable Notifications
         </button>
         <button
           onClick={handleDismiss}
-          className="text-xs text-white/40 transition-colors hover:text-white/70"
+          className="text-xs text-slate-500 transition-colors hover:text-slate-800"
         >
           Maybe later
         </button>
