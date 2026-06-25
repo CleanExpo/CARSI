@@ -3,6 +3,7 @@ import path from 'node:path';
 
 import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from 'pdf-lib';
 
+import { formatCecHoursForCertificate } from '@/lib/cec-display';
 import { formatCredentialRef } from '@/lib/credential-format';
 import { IICRC_DISCIPLINE_LONG } from '@/lib/iicrc-discipline-display';
 import { resolveLmsCourseCecHours, type LmsCourseCecSource } from '@/lib/server/course-cec-hours';
@@ -415,26 +416,24 @@ export async function buildCompletionCertificatePdf(
   const completedStr = formatAuDate(completedDate);
   const issuedStr = formatAuDate(issuedDate ?? completedDate);
   const credRef = credentialId ? formatCredentialRef(credentialId) : '—';
-  const cecStr =
-    cecHours != null && cecHours > 0
-      ? `${Number(cecHours) % 1 === 0 ? cecHours : cecHours.toFixed(1)} IICRC CEC hour${cecHours === 1 ? '' : 's'}`
-      : 'Per course listing';
+  const cecStr = formatCecHoursForCertificate(cecHours);
   const levelStr = courseLevel?.trim() ? courseLevel.trim() : 'Professional development';
   const discName = disciplineLabel(discCode);
 
   const bandTop = Math.max(y, FOOTER_ROW_Y + 118);
+  const bandItems = [
+    { label: 'Discipline', value: discName },
+    { label: 'Completed', value: completedStr },
+    ...(cecStr ? [{ label: 'CEC credits', value: cecStr }] : []),
+    { label: 'Programme level', value: levelStr },
+  ];
   drawProgrammeDetailsBand(page, {
     yTop: bandTop,
     xMid,
     margin: MARGIN,
     contentW: CONTENT_W,
     discRgb,
-    items: [
-      { label: 'Discipline', value: discName },
-      { label: 'Completed', value: completedStr },
-      { label: 'CEC credits', value: cecStr },
-      { label: 'Programme level', value: levelStr },
-    ],
+    items: bandItems,
     credentialRef: credRef,
     notice:
       'Designed for IICRC Continuing Education Credits (CECs) where applicable. Retain this certificate with your renewal records.',
