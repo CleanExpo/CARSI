@@ -46,18 +46,8 @@ RUN addgroup --system --gid 1001 nodejs \
 COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-# Prisma CLI + migrations for entrypoint `migrate deploy` at runtime
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.bin/prisma ./node_modules/.bin/prisma
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/prisma ./node_modules/prisma
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
-COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
-COPY --from=builder --chown=nextjs:nodejs /app/prisma.config.ts ./prisma.config.ts
-COPY --chown=nextjs:nodejs scripts/docker-entrypoint.sh ./scripts/docker-entrypoint.sh
-COPY --chown=nextjs:nodejs scripts/start-server.sh ./scripts/start-server.sh
-RUN chmod +x ./scripts/docker-entrypoint.sh ./scripts/start-server.sh
 
 USER nextjs
 EXPOSE 8080
 
-ENTRYPOINT ["/app/scripts/docker-entrypoint.sh"]
-CMD ["/app/scripts/docker-entrypoint.sh"]
+CMD ["node", "server.js"]

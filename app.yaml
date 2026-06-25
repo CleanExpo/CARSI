@@ -13,8 +13,6 @@ services:
       deploy_on_push: true
 
     dockerfile_path: Dockerfile
-    # Docker: /app/scripts/docker-entrypoint.sh — Buildpack: npm start (uses scripts/start-server.sh)
-    run_command: npm start
     http_port: 8080
     source_dir: /
     instance_count: 2
@@ -41,10 +39,6 @@ services:
 
       - key: DATABASE_CA_CERT
         scope: RUN_AND_BUILD_TIME
-
-      - key: PRISMA_MIGRATE_ON_START
-        value: 'false'
-        scope: RUN_TIME
 
       - key: JWT_SECRET
         scope: RUN_TIME
