@@ -15,6 +15,9 @@ export const CEC_META_KEYS = [
 /** Common phrasing in CARSI Woo short descriptions. */
 const CEC_TEXT_PATTERNS: RegExp[] = [
   /Continuing Education Credit\s*\(CEC\)\s*:\s*(\d+(?:\.\d+)?)\s*Hours?/i,
+  /Continuing Education Credit\s*:\s*(\d+(?:\.\d+)?)\s*Hours?/i,
+  /approved for IICRC Continuing Education Credit\s*\(CEC\)\s*:\s*(\d+(?:\.\d+)?)\s*Hours?/i,
+  /CEC\s+Credits?\s*[\n:]\s*(\d+(?:\.\d+)?)\s*Hours?/i,
   /\(CEC\)\s*:\s*(\d+(?:\.\d+)?)\s*Hours?/i,
   /\(CEC\)\s*:\s*(\d+(?:\.\d+)?)\b/i,
   /\bCEC\s*:\s*(\d+(?:\.\d+)?)\s*Hours?/i,
@@ -24,7 +27,9 @@ const CEC_TEXT_PATTERNS: RegExp[] = [
 /** Course duration lines in Woo short descriptions (e.g. "Approx 4Hours"). */
 const DURATION_TEXT_PATTERNS: RegExp[] = [
   /(?:Course\s+Duration|Duration)\s*:?\s*\n?\s*Approx(?:imately)?\s*(\d+(?:\.\d+)?)\s*Hours?/i,
+  /(?:Course\s+Duration|Duration)\s*:?\s*\n?\s*(\d+(?:\.\d+)?)\s*to\s*(\d+(?:\.\d+)?)\s*Hours?/i,
   /Approx(?:imately)?\s*(\d+(?:\.\d+)?)\s*Hours?/i,
+  /Approx(?:imately)?\s*(\d+(?:\.\d+)?)\s*Minutes?/i,
   /Approximately\s+(\d+(?:\.\d+)?)\s*Minutes?/i,
 ];
 
@@ -52,6 +57,12 @@ export function extractDurationHoursFromText(text: string | null | undefined): n
   for (const pattern of DURATION_TEXT_PATTERNS) {
     const match = pattern.exec(text);
     if (!match?.[1]) continue;
+    if (match[2] != null) {
+      const low = parsePositiveHours(match[1]);
+      const high = parsePositiveHours(match[2]);
+      if (low != null && high != null) return Math.max(low, high);
+      continue;
+    }
     const value = parsePositiveHours(match[1]);
     if (value == null) continue;
     if (/minutes?/i.test(match[0])) return value / 60;
@@ -119,11 +130,6 @@ export type CecResolvable = {
   iicrc_discipline?: string | null;
 };
 
-function hasIicrcDiscipline(discipline: string | null | undefined): boolean {
-  const value = discipline?.trim();
-  return Boolean(value && value !== '—' && value !== '-');
-}
-
 /** Best available CEC hours for a WP-export or catalog-shaped row. */
 export function resolveCecHours(row: CecResolvable): number | null {
   const explicit = parsePositiveHours(row.cec_hours);
@@ -135,8 +141,6 @@ export function resolveCecHours(row: CecResolvable): number | null {
   const text = [row.short_description, row.description].filter(Boolean).join('\n');
   const fromText = extractCecHoursFromText(text);
   if (fromText != null) return fromText;
-
-  if (!hasIicrcDiscipline(row.iicrc_discipline)) return null;
 
   const duration = resolveDurationHours({
     duration_hours: row.duration_hours,
