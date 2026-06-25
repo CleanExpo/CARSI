@@ -1,7 +1,8 @@
-import Link from 'next/link';
 import { ArrowRight, Award, BookOpenCheck, CheckCircle2, Route } from 'lucide-react';
+import Link from 'next/link';
 
 import { customerJourneyLoopStages } from '@/lib/customer-journey-loop';
+import { dash } from '@/lib/dashboard-light-ui';
 
 import type { ContinueLearningSnapshot } from './ContinueLearningBanner';
 
@@ -113,24 +114,21 @@ export function LearningMomentumLoop(props: LearningMomentumLoopProps) {
         : 'next';
 
   return (
-    <section
-      className="rounded-2xl border border-white/10 bg-white/[0.035] p-5 sm:p-6"
-      aria-label="Learning momentum loop"
-    >
+    <section className={`${dash.card} p-5 sm:p-6`} aria-label="Learning momentum loop">
       <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
         <div className="flex min-w-0 gap-4">
           <div
-            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-[#2490ed]/35 bg-[#2490ed]/12 text-[#8fd0ff]"
+            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-[#2490ed]/25 bg-[#eef7ff] text-[#146fc2]"
             aria-hidden
           >
             <Icon className="h-6 w-6" />
           </div>
           <div className="min-w-0">
-            <p className="text-[11px] font-semibold tracking-[0.18em] text-[#7ec5ff] uppercase">
+            <p className="text-[11px] font-semibold tracking-[0.18em] text-[#146fc2] uppercase">
               {action.eyebrow}
             </p>
-            <h2 className="mt-1 text-lg font-semibold tracking-tight text-white">{action.title}</h2>
-            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-white/58">{action.body}</p>
+            <h2 className={`mt-1 text-lg font-semibold tracking-tight ${dash.h2}`}>{action.title}</h2>
+            <p className={`mt-2 max-w-2xl text-sm leading-relaxed ${dash.muted}`}>{action.body}</p>
           </div>
         </div>
 
@@ -151,19 +149,21 @@ export function LearningMomentumLoop(props: LearningMomentumLoopProps) {
           return (
             <li
               key={stage.id}
-              className="rounded-lg border px-3 py-2.5"
-              style={{
-                background: active ? 'rgba(36,144,237,0.12)' : 'rgba(255,255,255,0.025)',
-                borderColor: active ? 'rgba(36,144,237,0.38)' : 'rgba(255,255,255,0.08)',
-              }}
+              className={`rounded-lg border px-3 py-2.5 ${
+                active
+                  ? 'border-[#2490ed]/30 bg-[#eef7ff]'
+                  : 'border-slate-200 bg-slate-50'
+              }`}
             >
               <div className="flex items-center gap-2">
                 <StageIcon
-                  className={active ? 'h-3.5 w-3.5 text-[#7ec5ff]' : 'h-3.5 w-3.5 text-white/34'}
+                  className={active ? 'h-3.5 w-3.5 text-[#146fc2]' : 'h-3.5 w-3.5 text-slate-400'}
                   aria-hidden
                 />
                 <span
-                  className={active ? 'text-xs font-semibold text-white' : 'text-xs text-white/48'}
+                  className={
+                    active ? 'text-xs font-semibold text-slate-900' : 'text-xs text-slate-500'
+                  }
                 >
                   {stage.title}
                 </span>
