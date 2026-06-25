@@ -52,6 +52,8 @@
     "test:a11y": "playwright test tests/accessibility",
     "test:e2e": "playwright test e2e",
     "test:unit": "vitest run",
+    "voice:plan": "npx tsx scripts/generate-course-voiceover.ts --plan",
+    "voice:generate": "npx tsx scripts/generate-course-voiceover.ts --generate",
     "video:brand:plan": "npx tsx scripts/automate-brand-videos.ts --plan",
     "video:brand:submit": "npx tsx scripts/automate-brand-videos.ts --submit",
     "video:brand:poll": "npx tsx scripts/automate-brand-videos.ts --poll",
