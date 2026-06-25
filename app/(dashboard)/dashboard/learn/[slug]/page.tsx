@@ -13,7 +13,7 @@ export default async function LearnCoursePage({
     <div className="w-full min-w-0">
       <Suspense
         fallback={
-          <div className="flex min-h-[40vh] items-center justify-center text-white/55">
+          <div className="flex min-h-[40vh] items-center justify-center text-slate-500">
             Loading…
           </div>
         }
