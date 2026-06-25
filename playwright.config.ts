@@ -24,6 +24,11 @@ export default defineConfig({
       name: 'tablet-chromium',
       use: {
         ...devices['iPad (gen 7)'],
+        // iPad device profiles default to the WebKit engine. Force Chromium so
+        // the whole suite runs on one engine (matching every project's
+        // "-chromium" name) without requiring the WebKit browser to be
+        // installed in CI — that missing binary was failing the a11y job.
+        defaultBrowserType: 'chromium',
       },
     },
     {

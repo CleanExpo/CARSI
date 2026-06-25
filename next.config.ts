@@ -1,10 +1,17 @@
 import { createRequire } from 'node:module';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import type { NextConfig } from 'next';
 
 const require = createRequire(import.meta.url);
 const withPWA = require('next-pwa');
+
+// Pin the workspace root to this project. Without this, Next infers the root
+// from the nearest lockfile and can wrongly select a parent directory (e.g. a
+// stray ~/package-lock.json), which breaks module resolution such as
+// `tailwindcss` during `next dev`.
+const projectRoot = path.dirname(fileURLToPath(import.meta.url));
 
 function reactPackageDir(pkg: 'react' | 'react-dom'): string {
   return path.dirname(require.resolve(`${pkg}/package.json`));
@@ -89,7 +96,7 @@ const nextConfig: NextConfig = {
   },
   transpilePackages: ['@shared'],
   webpack: (config) => webpackReactAliases(config),
-  turbopack: {},
+  turbopack: { root: projectRoot },
   experimental: {
   },
   images: {
