@@ -6,6 +6,7 @@ import { Award, FileText, Link2, Loader2 } from 'lucide-react';
 import { ErrorBanner } from '@/components/lms/ErrorBanner';
 import { LinkedInShareButton } from '@/components/lms/LinkedInShareButton';
 import { useAuth } from '@/components/auth/auth-provider';
+import { formatCecHoursForDisplay } from '@/lib/cec-display';
 import { apiClient } from '@/lib/api/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -23,18 +24,24 @@ interface CredentialOut {
 type DisciplineKey = 'WRT' | 'CRT' | 'OCT' | 'ASD' | 'CCT';
 
 const DISCIPLINE_COLOURS: Record<DisciplineKey, string> = {
-  WRT: 'text-cyan-400 bg-cyan-400/10 border border-cyan-400/20',
-  CRT: 'text-emerald-400 bg-emerald-400/10 border border-emerald-400/20',
-  OCT: 'text-amber-400 bg-amber-400/10 border border-amber-400/20',
-  ASD: 'text-blue-400 bg-blue-400/10 border border-blue-400/20',
-  CCT: 'text-fuchsia-400 bg-fuchsia-400/10 border border-fuchsia-400/20',
+  WRT: 'text-cyan-700 bg-cyan-50 border border-cyan-200',
+  CRT: 'text-emerald-700 bg-emerald-50 border border-emerald-200',
+  OCT: 'text-amber-700 bg-amber-50 border border-amber-200',
+  ASD: 'text-blue-700 bg-blue-50 border border-blue-200',
+  CCT: 'text-fuchsia-700 bg-fuchsia-50 border border-fuchsia-200',
 };
 
-const DEFAULT_DISCIPLINE_COLOUR = 'text-zinc-400 bg-zinc-400/10 border border-zinc-400/20';
+const DEFAULT_DISCIPLINE_COLOUR = 'text-slate-600 bg-slate-50 border border-slate-200';
 
 function disciplineColour(discipline: string | null): string {
   if (!discipline) return DEFAULT_DISCIPLINE_COLOUR;
   return DISCIPLINE_COLOURS[discipline as DisciplineKey] ?? DEFAULT_DISCIPLINE_COLOUR;
+}
+
+function formatCecHours(hours: number): string {
+  const label = formatCecHoursForDisplay(hours);
+  if (!label) return '—';
+  return `${label} IICRC CEC hour${label === '1' ? '' : 's'}`;
 }
 
 function CredentialCard({ credential }: { credential: CredentialOut }) {
@@ -42,7 +49,7 @@ function CredentialCard({ credential }: { credential: CredentialOut }) {
   const issuedDate = new Date(credential.issued_date);
 
   return (
-    <div className="flex flex-col gap-4 rounded-sm border border-white/[0.06] bg-zinc-900/50 p-5">
+    <div className="flex flex-col gap-4 rounded-sm border border-slate-200 bg-white border border-slate-200 p-5">
       {/* Discipline badge + title */}
       <div className="flex flex-col gap-2">
         {credential.iicrc_discipline && (
@@ -52,25 +59,25 @@ function CredentialCard({ credential }: { credential: CredentialOut }) {
             {credential.iicrc_discipline}
           </span>
         )}
-        <h3 className="text-sm leading-snug font-semibold text-white">{credential.course_title}</h3>
+        <h3 className="text-sm leading-snug font-semibold text-slate-900">{credential.course_title}</h3>
       </div>
 
       {/* Meta row */}
       <div className="flex flex-wrap gap-4">
         <div className="flex flex-col gap-0.5">
-          <span className="font-mono text-xs tracking-widest text-white/40 uppercase">
-            CEC Hours
+          <span className="font-mono text-xs tracking-widest text-slate-500 uppercase">
+            IICRC CEC hours
           </span>
-          <span className="font-mono text-sm text-white">{credential.cec_hours.toFixed(1)}</span>
+          <span className="font-mono text-sm text-slate-900">{formatCecHours(credential.cec_hours)}</span>
         </div>
         <div className="flex flex-col gap-0.5">
-          <span className="font-mono text-xs tracking-widest text-white/40 uppercase">Issued</span>
-          <span className="font-mono text-sm text-white">{credential.issued_date}</span>
+          <span className="font-mono text-xs tracking-widest text-slate-500 uppercase">Issued</span>
+          <span className="font-mono text-sm text-slate-900">{credential.issued_date}</span>
         </div>
         {credential.cppp40421_unit_code && (
           <div className="flex flex-col gap-0.5">
-            <span className="font-mono text-xs tracking-widest text-white/40 uppercase">Unit</span>
-            <span className="font-mono text-sm text-white/60">
+            <span className="font-mono text-xs tracking-widest text-slate-500 uppercase">Unit</span>
+            <span className="font-mono text-sm text-slate-600">
               {credential.cppp40421_unit_code}
             </span>
           </div>
@@ -88,10 +95,10 @@ function CredentialCard({ credential }: { credential: CredentialOut }) {
       />
 
       {/* Action links */}
-      <div className="flex gap-3 border-t border-white/[0.06] pt-4">
+      <div className="flex gap-3 border-t border-slate-200 pt-4">
         <Link
           href={`/dashboard/credentials/${credential.credential_id}`}
-          className="flex-1 rounded-sm border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-center font-mono text-xs text-white/70 transition-colors hover:border-white/20 hover:text-white"
+          className="flex-1 rounded-sm border border-slate-200 bg-slate-50 px-3 py-2 text-center font-mono text-xs text-slate-700 transition-colors hover:border-slate-300 hover:text-slate-900"
         >
           View Certificate
         </Link>
@@ -99,7 +106,7 @@ function CredentialCard({ credential }: { credential: CredentialOut }) {
           href={pdfUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex-1 rounded-sm border border-cyan-400/20 bg-cyan-400/5 px-3 py-2 text-center font-mono text-xs text-cyan-400 transition-colors hover:border-cyan-400/40 hover:bg-cyan-400/10"
+          className="flex-1 rounded-sm border border-cyan-200 bg-cyan-50 px-3 py-2 text-center font-mono text-xs text-cyan-700 transition-colors hover:border-cyan-300 hover:bg-cyan-100"
         >
           Download PDF
         </a>
@@ -138,12 +145,12 @@ function ProofPackCard() {
     <div className="rounded-sm border border-[#2490ed]/25 bg-[#2490ed]/[0.06] p-5">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex gap-3">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-sm border border-white/10 bg-white/5 text-[#7ec5ff]">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-sm border border-slate-200 bg-white text-[#146fc2]">
             <FileText className="h-5 w-5" aria-hidden />
           </div>
           <div>
-            <h2 className="font-mono text-sm font-semibold text-white">Employer proof pack</h2>
-            <p className="mt-1 max-w-xl text-xs leading-relaxed text-white/45">
+            <h2 className="font-mono text-sm font-semibold text-slate-900">Employer proof pack</h2>
+            <p className="mt-1 max-w-xl text-xs leading-relaxed text-slate-500">
               One PDF or share link: completed courses, dates, IICRC CEC totals by discipline, and
               credential IDs with verification URLs — for HR or insurer evidence.
             </p>
@@ -154,7 +161,7 @@ function ProofPackCard() {
             href="/api/lms/credentials/proof-pack/pdf"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 rounded-sm border border-cyan-400/30 bg-cyan-400/10 px-4 py-2.5 font-mono text-xs font-medium text-cyan-300 transition-colors hover:border-cyan-400/50 hover:bg-cyan-400/15"
+            className="inline-flex items-center justify-center gap-2 rounded-sm border border-cyan-200 bg-cyan-50 px-4 py-2.5 font-mono text-xs font-medium text-cyan-700 transition-colors hover:border-cyan-300 hover:bg-cyan-100"
           >
             Download PDF
           </a>
@@ -162,7 +169,7 @@ function ProofPackCard() {
             type="button"
             onClick={copyShareLink}
             disabled={minting}
-            className="inline-flex items-center justify-center gap-2 rounded-sm border border-white/10 bg-white/[0.04] px-4 py-2.5 font-mono text-xs font-medium text-white/80 transition-colors hover:border-white/20 hover:bg-white/[0.07] disabled:opacity-50"
+            className="inline-flex items-center justify-center gap-2 rounded-sm border border-slate-200 bg-white px-4 py-2.5 font-mono text-xs font-medium text-slate-800 transition-colors hover:border-slate-300 hover:bg-slate-50 disabled:opacity-50"
           >
             {minting ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />
@@ -179,15 +186,15 @@ function ProofPackCard() {
 
 function EmptyState() {
   return (
-    <div className="flex flex-col items-center gap-4 rounded-sm border border-white/[0.06] bg-zinc-900/50 px-6 py-12 text-center">
-      <Award className="h-10 w-10 text-white/10" />
+    <div className="flex flex-col items-center gap-4 rounded-sm border border-slate-200 bg-white border border-slate-200 px-6 py-12 text-center">
+      <Award className="h-10 w-10 text-slate-200" />
       <div className="flex flex-col gap-1">
-        <p className="text-sm font-medium text-white/40">No credentials yet.</p>
-        <p className="text-sm text-white/30">Complete a course to earn your first certificate.</p>
+        <p className="text-sm font-medium text-slate-500">No credentials yet.</p>
+        <p className="text-sm text-slate-400">Complete a course to earn your first certificate.</p>
       </div>
       <Link
         href="/dashboard/courses"
-        className="mt-2 rounded-sm border border-white/[0.08] bg-white/[0.03] px-4 py-2 font-mono text-xs text-white/60 transition-colors hover:border-white/20 hover:text-white"
+        className="mt-2 rounded-sm border border-slate-200 bg-slate-50 px-4 py-2 font-mono text-xs text-slate-600 transition-colors hover:border-slate-300 hover:text-slate-900"
       >
         Browse courses
       </Link>
@@ -226,8 +233,8 @@ export default function StudentCredentialsPage() {
     <main className="flex max-w-4xl flex-col gap-6 p-6">
       {/* Page header */}
       <div className="flex flex-col gap-1">
-        <h1 className="font-mono text-2xl font-bold text-white">My Credentials</h1>
-        <p className="text-sm text-white/40">
+        <h1 className="font-mono text-2xl font-bold text-slate-900">My Credentials</h1>
+        <p className="text-sm text-slate-500">
           Your completed course certificates and IICRC continuing education credits.
         </p>
       </div>
@@ -235,14 +242,14 @@ export default function StudentCredentialsPage() {
       {user && <ProofPackCard />}
 
       {/* Loading */}
-      {loading && <p className="text-sm text-white/30">Loading credentials…</p>}
+      {loading && <p className="text-sm text-slate-400">Loading credentials…</p>}
 
       {/* Error */}
       {!loading && error && <ErrorBanner message={error} onRetry={fetchCredentials} />}
 
       {/* Credential count */}
       {!loading && !error && (
-        <p className="font-mono text-xs tracking-widest text-white/40 uppercase">
+        <p className="font-mono text-xs tracking-widest text-slate-500 uppercase">
           {credentials.length === 0
             ? 'No credentials earned'
             : `${credentials.length} credential${credentials.length === 1 ? '' : 's'} earned`}
