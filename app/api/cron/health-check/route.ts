@@ -58,7 +58,7 @@ export async function GET(request: Request) {
     return NextResponse.json(
       {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: 'Health check failed',
       },
       { status: 500 }
     );

@@ -157,6 +157,24 @@ fly redis status carsi-redis
 | `SYNTHEX_API_KEY`        | Synthex marketing webhook | Not set |
 | `UNITE_HUB_API_KEY`      | Unite-Hub integration     | Not set |
 
+**Demo-video production secrets (SYNTHEX marketing assets — authoring tool only, not used at runtime):**
+
+These power the demo-screencast / brand-avatar video pipeline (`npm run video:demo:*` /
+`video:brand:*`). They are only needed where the videos are produced (a maintainer machine or
+a dedicated job), not by the running app. See `docs/marketing/demo-video-production.md`.
+
+| Secret                   | Description                                      | Status  |
+| ------------------------ | ------------------------------------------------ | ------- |
+| `HEYGEN_API_KEY`         | HeyGen avatar video generation                   | Not set |
+| `HEYGEN_AVATAR_ID`       | HeyGen avatar id (avatar mode)                   | Not set |
+| `HEYGEN_VOICE_ID`        | HeyGen voice id (avatar mode)                    | Not set |
+| `CLOUDINARY_CLOUD_NAME`  | Cloudinary account for video/thumbnail uploads   | Not set |
+| `CLOUDINARY_API_KEY`     | Cloudinary API key                               | Not set |
+| `CLOUDINARY_API_SECRET`  | Cloudinary API secret                            | Not set |
+
+Optional overrides (have safe defaults, see `.env.example`): `DEMO_RECORD_BASE_URL`,
+`DEMO_VIDEO_MAX`, `DEMO_PIP_MARGIN`, `FFMPEG_PATH`, `DEMO_STUDENT_EMAIL`, `DEMO_STUDENT_PASSWORD`.
+
 **Setting a secret:**
 
 ```bash
