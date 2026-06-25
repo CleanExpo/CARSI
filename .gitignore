@@ -102,6 +102,9 @@ ai-review/screenshots/
 # Demo screencast pipeline (generated recordings, composites, results manifest)
 output/demo-screencast/
 
+# Course voiceover pipeline — resumable run state (briefs themselves are committed)
+data/voice/course-voice-results.json
+
 # Licensed third-party media downloaded for video production (e.g. Artlist) — never commit
 assets/artlist/
 

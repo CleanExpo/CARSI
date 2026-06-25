@@ -5,6 +5,7 @@ import { v2 as cloudinary } from 'cloudinary';
 
 const DEFAULT_FOLDER = 'carsi/admin-courses';
 const DEFAULT_VIDEO_FOLDER = 'carsi/demo-videos';
+const DEFAULT_AUDIO_FOLDER = 'carsi/course-audio';
 const CERTIFICATE_FOLDER = 'carsi/certificates';
 
 /** Cloudinary Node SDK defaults to 60s; large/slow uploads hit 499 TimeoutError. */
@@ -228,6 +229,18 @@ export async function uploadVideoToCloudinary(
     }
   }
   throw lastErr instanceof Error ? lastErr : new Error(String(lastErr));
+}
+
+/**
+ * Upload a lesson narration MP3 to Cloudinary. Returns an HTTPS URL suitable for storing in a
+ * lesson's `resources` JSON. Cloudinary stores audio under the `video` resource type, so this
+ * reuses the same streaming/retry path as the demo-video uploader, only with the audio folder.
+ */
+export async function uploadCourseAudioToCloudinary(
+  buffer: Buffer,
+  folder: string = DEFAULT_AUDIO_FOLDER
+): Promise<{ url: string; publicId: string }> {
+  return uploadVideoToCloudinary(buffer, folder);
 }
 
 /**
