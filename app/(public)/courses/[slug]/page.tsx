@@ -690,11 +690,15 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                         : 'General',
                       accent: true,
                     },
-                    {
-                      label: 'CEC Hours',
-                      value: course.cec_hours ? `${course.cec_hours} credits` : 'N/A',
-                      accent: false,
-                    },
+                    ...(course.cec_hours
+                      ? [
+                          {
+                            label: 'CEC Hours',
+                            value: `${course.cec_hours} credits`,
+                            accent: false,
+                          },
+                        ]
+                      : []),
                     {
                       label: 'Duration',
                       value: course.duration_hours
