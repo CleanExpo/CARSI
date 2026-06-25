@@ -601,11 +601,12 @@ async function loadSubmissionFailureReason(
 export function iicrcSubmissionFailureMessage(reason: string | null | undefined): string {
   switch (reason) {
     case 'not_configured':
-      return 'Email is not configured on the server. Set RESEND_API_KEY and EMAIL_FROM.';
+      return 'Email is not configured on the server. Set MAILTRAP_API_KEY and EMAIL_FROM.';
     case 'send_failed':
-      return 'Email delivery failed. Check server logs and network access to api.resend.com.';
+      return 'Email delivery failed. Check server logs and network access to send.api.mailtrap.io.';
+    case 'provider_error':
     case 'resend_error':
-      return 'Resend rejected the email. Verify your API key and verified sending domain.';
+      return 'Mailtrap rejected the email. Verify your API token and verified sending domain.';
     case 'course_not_cec_eligible':
       return 'This course is not eligible for IICRC CEC submission.';
     case 'auto_submit_disabled':
