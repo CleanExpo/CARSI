@@ -1,0 +1,203 @@
+name: Generate course media & seed
+
+# Manual "Run workflow" button (Actions tab → Generate course media & seed → Run workflow).
+#
+# Runs the cost-bearing authoring scripts on GitHub's runners, which have the API
+# credentials (pulled from Vercel) that a local shell may lack:
+#   - db:thumbnails:generate  → OpenAI gpt-image-1 background → Cloudinary → writes
+#     thumbnailUrl into data/seed/courses-catalog.json
+#   - voice:generate          → ElevenLabs TTS → Cloudinary → writes the audio URL
+#     into each lesson's resources in the same catalogue
+# Both default to --persist=seed (catalogue JSON only, NO database needed — Prisma is
+# lazy-loaded) and are idempotent (skip slugs/lessons already 'done' in their results
+# manifest). The job commits the updated catalogue + manifests and opens a PR.
+#
+# The optional `seed` job imports the catalogue into Postgres (db:seed-courses). It is
+# OFF by default and only runs when seed_after=true AND mode=generate, against the
+# DATABASE_URL pulled from Vercel production.
+#
+# Secrets are sourced from Vercel (project carsi-web) via `vercel env pull`, so the only
+# GitHub secret required is VERCEL_TOKEN. The non-secret org/project IDs are inlined below.
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "plan = scaffold briefs · dry-run = print prompts, no spend · generate = real run (spends money)"
+        type: choice
+        options: [dry-run, plan, generate]
+        default: dry-run
+      media:
+        description: "Which media to produce"
+        type: choice
+        options: [both, thumbnails, voice]
+        default: both
+      slug:
+        description: "Restrict to one course slug (blank = all)"
+        required: false
+        default: ""
+      limit:
+        description: "Cap how many items to generate this run (blank = script HARD_CAP: 25 thumbs / 50 voice)"
+        required: false
+        default: ""
+      seed_after:
+        description: "After a successful generate, import the catalogue into Postgres (db:seed-courses)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+env:
+  # Non-secret — from .vercel/repo.json (project carsi-web, team unite-group).
+  VERCEL_ORG_ID: team_KMZACI5rIltoCRhAtGCXlxUf
+  VERCEL_PROJECT_ID: prj_hIQAdXiHQGGec6nNKEGzn7SyMh9p
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Pull secrets from Vercel (production)
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          if [ -z "$VERCEL_TOKEN" ]; then
+            echo "::error::VERCEL_TOKEN repo secret is not set. Add it at Settings → Secrets and variables → Actions."
+            exit 1
+          fi
+          # Pull the production env into .env (gitignored); the scripts auto-load it via dotenv.
+          npx --yes vercel@latest env pull .env --yes --environment=production --token="$VERCEL_TOKEN"
+          echo "Pulled $(grep -c '=' .env) environment variables."
+
+      - name: Normalise + validate credentials
+        run: |
+          set -e
+          # Fix the known Vercel key typo: scripts read ELEVENLABS_VOICE_ID, Vercel stores
+          # the value under ELEVENLABS_VIOCE_ID. Alias it without exposing the value.
+          if ! grep -q '^ELEVENLABS_VOICE_ID=' .env && grep -q '^ELEVENLABS_VIOCE_ID=' .env; then
+            sed -n 's/^ELEVENLABS_VIOCE_ID=/ELEVENLABS_VOICE_ID=/p' .env >> .env
+            echo "Aliased ELEVENLABS_VIOCE_ID → ELEVENLABS_VOICE_ID."
+          fi
+
+          MISSING=""
+          need() { grep -q "^$1=" .env || MISSING="$MISSING $1"; }
+
+          # Cloudinary is required for any upload (thumbnails AND voice).
+          need CLOUDINARY_CLOUD_NAME
+          need CLOUDINARY_API_KEY
+          need CLOUDINARY_API_SECRET
+
+          case "${{ inputs.media }}" in
+            thumbnails) need OPENAI_API_KEY ;;
+            voice)      need ELEVENLABS_API_KEY; need ELEVENLABS_VOICE_ID ;;
+            both)       need OPENAI_API_KEY; need ELEVENLABS_API_KEY; need ELEVENLABS_VOICE_ID ;;
+          esac
+          if [ "${{ inputs.seed_after }}" = "true" ]; then need DATABASE_URL; fi
+
+          if [ -n "$MISSING" ]; then
+            echo "::error::Missing required env in Vercel production:$MISSING"
+            echo "::error::Add them in Vercel → carsi-web → Settings → Environment Variables."
+            echo "::error::Note: CLOUDINARY_CLOUD_NAME is the cloud your API key/secret belong to — the catalogue's active cloud is 'dsppmoo9z' (legacy: 'dmaulkthb'). Set it to match your key."
+            exit 1
+          fi
+          echo "All required credentials present for media='${{ inputs.media }}', mode='${{ inputs.mode }}'."
+
+      - name: Build script arguments
+        id: args
+        run: |
+          case "${{ inputs.mode }}" in
+            plan)     PHASE="--plan" ;;
+            dry-run)  PHASE="--generate --dry-run" ;;
+            generate) PHASE="--generate --yes --persist=seed" ;;
+          esac
+          EXTRA=""
+          [ -n "${{ inputs.slug }}" ]  && EXTRA="$EXTRA --slug=${{ inputs.slug }}"
+          [ -n "${{ inputs.limit }}" ] && EXTRA="$EXTRA --limit=${{ inputs.limit }}"
+          echo "phase=$PHASE" >> "$GITHUB_OUTPUT"
+          echo "extra=$EXTRA" >> "$GITHUB_OUTPUT"
+
+      - name: Generate thumbnails
+        if: ${{ inputs.media == 'thumbnails' || inputs.media == 'both' }}
+        run: npx tsx scripts/generate-course-thumbnails.ts ${{ steps.args.outputs.phase }} ${{ steps.args.outputs.extra }}
+
+      - name: Generate voiceovers
+        if: ${{ inputs.media == 'voice' || inputs.media == 'both' }}
+        run: npx tsx scripts/generate-course-voiceover.ts ${{ steps.args.outputs.phase }} ${{ steps.args.outputs.extra }}
+
+      - name: Upload generated artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: course-media-${{ github.run_id }}
+          path: |
+            data/seed/courses-catalog.json
+            data/thumbnails/course-thumbnail-results.json
+            data/voice/course-voice-results.json
+          if-no-files-found: warn
+
+      - name: Open a PR with the generated media URLs
+        if: ${{ inputs.mode == 'generate' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if git diff --quiet -- data/seed/courses-catalog.json data/thumbnails data/voice; then
+            echo "No catalogue changes — every requested item was already generated (idempotent skip)."
+            echo "### No changes ✅" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          BRANCH="course-media/run-${{ github.run_id }}-${{ github.run_attempt }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          git add data/seed/courses-catalog.json data/thumbnails data/voice
+          git commit -m "media(courses): generate ${{ inputs.media }} URLs (run ${{ github.run_id }})"
+          git push -u origin "$BRANCH"
+          COMPARE_URL="${{ github.server_url }}/${{ github.repository }}/pull/new/${BRANCH}"
+          if gh pr create --base main --head "$BRANCH" \
+            --title "Course media: ${{ inputs.media }} (run ${{ github.run_id }})" \
+            --body "Automated ${{ inputs.media }} generation. Cloudinary URLs written into \`data/seed/courses-catalog.json\`. Review and merge; run the seed step (or db:seed-courses) to import into Postgres." \
+            --draft; then
+            echo "Opened a draft PR for branch $BRANCH."
+          else
+            echo "::warning::Could not auto-open a PR (enable Settings → Actions → General → 'Allow GitHub Actions to create and approve pull requests')."
+            echo "Open it here: $COMPARE_URL"
+          fi
+          {
+            echo "### Course media generated ✅"
+            echo "Branch \`$BRANCH\` — review the catalogue diff and merge."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  seed:
+    needs: generate
+    if: ${{ inputs.seed_after == true && inputs.mode == 'generate' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Pull secrets from Vercel (production)
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: npx --yes vercel@latest env pull .env --yes --environment=production --token="$VERCEL_TOKEN"
+      - name: Seed courses into Postgres
+        run: |
+          echo "Seeding production catalogue into Postgres (db:seed-courses)…"
+          npm run db:seed-courses
+          echo "### Catalogue seeded into Postgres ✅" >> "$GITHUB_STEP_SUMMARY"
