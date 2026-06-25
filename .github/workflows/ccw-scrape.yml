@@ -1,0 +1,91 @@
+name: Scrape CCW products
+
+# Manual "Run workflow" button (Actions tab → Scrape CCW products → Run workflow).
+# Runs the Jina-based scraper on GitHub's runners — which have open outbound
+# internet — then opens a PR with the populated data/seed/ccw-products.json.
+on:
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: "Catalogue/index URL to scrape"
+        required: true
+        default: "https://ccwonline.com.au/"
+      max:
+        description: "Max number of product pages to fetch"
+        required: false
+        default: "50"
+      fetch_sds:
+        description: "Also download SDS documents and extract text + hazards (slower)"
+        type: boolean
+        default: true
+      product_match:
+        description: "Optional regex a link URL must match to be treated as a product page"
+        required: false
+        default: ""
+      sds_match:
+        description: "Optional regex for SDS document links (blank = sds/safety-data/.pdf)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run CCW scrape (Jina engine)
+        env:
+          JINA_API_KEY: ${{ secrets.JINA_API_KEY }}
+          BASE_URL: ${{ inputs.base_url }}
+          MAX: ${{ inputs.max }}
+          FETCH_SDS: ${{ inputs.fetch_sds }}
+          PRODUCT_MATCH: ${{ inputs.product_match }}
+          SDS_MATCH: ${{ inputs.sds_match }}
+        run: |
+          ARGS=(--url "$BASE_URL" --max "$MAX")
+          if [ "$FETCH_SDS" = "true" ]; then ARGS+=(--fetch-sds); fi
+          if [ -n "$PRODUCT_MATCH" ]; then ARGS+=(--product-match "$PRODUCT_MATCH"); fi
+          if [ -n "$SDS_MATCH" ]; then ARGS+=(--sds-match "$SDS_MATCH"); fi
+          npx tsx scripts/scrape-ccw-products.ts "${ARGS[@]}"
+
+      - name: Upload results as downloadable artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ccw-products
+          path: data/seed/ccw-products.json
+          if-no-files-found: warn
+
+      - name: Open a PR with the scraped data
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE_URL: ${{ inputs.base_url }}
+        run: |
+          if git diff --quiet -- data/seed/ccw-products.json; then
+            echo "No changes to data/seed/ccw-products.json — nothing to commit."
+            exit 0
+          fi
+          BRANCH="ccw-scrape/results-${{ github.run_id }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          git add data/seed/ccw-products.json
+          git commit -m "data(ccw): scraped products + SDS from ${BASE_URL}"
+          git push -u origin "$BRANCH"
+          gh pr create --base main --head "$BRANCH" \
+            --title "CCW scrape results" \
+            --body "Automated CCW product + SDS scrape from ${BASE_URL}. Review the data file and merge if it looks right." \
+            --draft \
+            || echo "Could not open PR automatically (branch '$BRANCH' was still pushed — open a PR from it manually, or download the artifact above)."
