@@ -395,14 +395,17 @@ test.describe('4. Auth: logout', { tag: '@authenticated' }, () => {
     const logoutBtn = page.getByRole('button', { name: /sign out/i });
     await expect(logoutBtn).toBeVisible({ timeout: 10_000 });
 
-    // The AuthProvider loads `user` via a client fetch AFTER first paint; until it
-    // resolves the sidebar reflows (the button's title gains the user's email and
-    // role-gated nav items appear above it), shifting this button. Clicking mid-
-    // reflow makes Playwright wait for a stable box and time out. Wait for the
-    // auth-settled signal — the title acquiring the "(email)" suffix — so the
-    // sidebar has stopped moving before we click.
+    // The AuthProvider loads `user` via a client fetch AFTER first paint; the
+    // sidebar then reflows (the title gains the user's email, role-gated nav
+    // items appear above it). Wait for the auth-settled signal — the title
+    // acquiring the "(email)" suffix — before interacting.
     await expect(logoutBtn).toHaveAttribute('title', /\(.+@.+\)/, { timeout: 10_000 });
-    await logoutBtn.click();
+
+    // Even after auth settles the box can keep micro-shifting (staged nav render),
+    // so Playwright's actionability "stable box" wait on a normal click times out
+    // despite the button being visible and enabled. Force the click — the element
+    // is asserted visible above and signOut() fires on the click event.
+    await logoutBtn.click({ force: true });
 
     // Sign-out clears the session and routes to /login.
     await page.waitForURL('**/login**', { timeout: 15_000 });

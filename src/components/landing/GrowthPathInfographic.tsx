@@ -38,7 +38,7 @@ export function GrowthPathInfographic({ className = '' }: { className?: string }
     >
       {/* Ambient depth */}
       <div
-        className="pointer-events-none absolute -inset-5 rounded-[1.75rem] bg-[radial-gradient(ellipse_at_20%_15%,rgba(36,144,237,0.2),transparent_55%),radial-gradient(ellipse_at_85%_75%,rgba(237,157,36,0.14),transparent_50%)] blur-2xl dark:opacity-90"
+        className="pointer-events-none absolute inset-x-0 -inset-y-5 rounded-[1.75rem] bg-[radial-gradient(ellipse_at_20%_15%,rgba(36,144,237,0.2),transparent_55%),radial-gradient(ellipse_at_85%_75%,rgba(237,157,36,0.14),transparent_50%)] blur-2xl dark:opacity-90"
         aria-hidden
       />
 
