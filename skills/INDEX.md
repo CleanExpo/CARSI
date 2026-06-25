@@ -1,6 +1,6 @@
 # Skills Index
 
-**Total Skills**: 36+
+**Total Skills**: 37+
 **Last Updated**: CARSI LLM and stack hardening refresh, 18/06/2026
 
 ---
@@ -29,7 +29,7 @@ Project knowledge and orchestration patterns.
 
 ---
 
-### Design (3 skills)
+### Design (4 skills)
 
 CARSI visual system, accessible LMS interfaces, purposeful assets, locked design tokens.
 
@@ -38,6 +38,17 @@ CARSI visual system, accessible LMS interfaces, purposeful assets, locked design
 | **design-system.skill.md**    | 1        | ✅        | Locked design tokens, CARSI LMS patterns, accessible controls, no generic template UI                    |
 | **foundation-first.skill.md** | 2        | ❌        | 7-layer foundation (psychology → personas → journeys → emotions → acceptance criteria), 8 missing states |
 | **tailwind.skill.md**         | 3        | ❌        | Tailwind v4 patterns, utility-first CSS, responsive design                                               |
+| **course-thumbnails.skill.md**| 4        | ❌        | Generate on-brand, text-free course thumbnail backgrounds via OpenAI gpt-image-1 → Cloudinary → catalogue |
+
+---
+
+### Content (1 skill)
+
+Media production from the real product — demo-account screen recordings composited with narration.
+
+| Skill                          | Priority | Auto-load | Description                                                                                              |
+| ------------------------------ | -------- | --------- | -------------------------------------------------------------------------------------------------------- |
+| **demo-screencasts.skill.md**  | 5        | ❌        | Record the seeded demo account with Playwright, composite a HeyGen avatar as a PiP overlay via FFmpeg → Cloudinary → lessons |
 
 ---
 

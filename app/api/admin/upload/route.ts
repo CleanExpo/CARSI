@@ -18,6 +18,41 @@ function extForMime(mime: string): string {
   return 'bin';
 }
 
+/**
+ * Detect the real image type from the file's leading "magic" bytes, so a
+ * renamed/spoofed `file.type` cannot smuggle a non-image past the allowlist.
+ * Returns the detected MIME, or null if the content is not a supported image.
+ */
+function sniffImageMime(buf: Buffer): string | null {
+  if (buf.length >= 3 && buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff) {
+    return 'image/jpeg';
+  }
+  if (
+    buf.length >= 8 &&
+    buf[0] === 0x89 &&
+    buf[1] === 0x50 &&
+    buf[2] === 0x4e &&
+    buf[3] === 0x47 &&
+    buf[4] === 0x0d &&
+    buf[5] === 0x0a &&
+    buf[6] === 0x1a &&
+    buf[7] === 0x0a
+  ) {
+    return 'image/png';
+  }
+  if (buf.length >= 6 && buf.subarray(0, 6).toString('latin1').match(/^GIF8[79]a$/)) {
+    return 'image/gif';
+  }
+  if (
+    buf.length >= 12 &&
+    buf.subarray(0, 4).toString('latin1') === 'RIFF' &&
+    buf.subarray(8, 12).toString('latin1') === 'WEBP'
+  ) {
+    return 'image/webp';
+  }
+  return null;
+}
+
 export async function POST(request: NextRequest) {
   const session = await getAdminSessionOrNull();
   if (!session) {
@@ -40,12 +75,22 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ detail: 'File too large (max 5MB)' }, { status: 400 });
   }
 
-  const mime = file.type || 'application/octet-stream';
-  if (!ALLOWED.has(mime)) {
+  const declaredMime = file.type || 'application/octet-stream';
+  if (!ALLOWED.has(declaredMime)) {
     return NextResponse.json({ detail: 'Only JPEG, PNG, WebP, or GIF images allowed' }, { status: 400 });
   }
 
   const buf = Buffer.from(await file.arrayBuffer());
+
+  // Don't trust the client-declared MIME: verify the real format from the
+  // file's magic bytes before persisting or forwarding it anywhere.
+  const mime = sniffImageMime(buf);
+  if (!mime || !ALLOWED.has(mime)) {
+    return NextResponse.json(
+      { detail: 'File content is not a valid JPEG, PNG, WebP, or GIF image' },
+      { status: 400 }
+    );
+  }
 
   if (isCloudinaryConfigured()) {
     try {
@@ -53,10 +98,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ url, storage: 'cloudinary' as const });
     } catch (e) {
       console.error('[admin/upload] Cloudinary failed:', e);
-      return NextResponse.json(
-        { detail: e instanceof Error ? e.message : 'Cloudinary upload failed' },
-        { status: 502 }
-      );
+      return NextResponse.json({ detail: 'Cloudinary upload failed' }, { status: 502 });
     }
   }
 

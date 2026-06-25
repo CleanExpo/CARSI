@@ -1,0 +1,384 @@
+{
+  "version": 1,
+  "generatedAt": "2026-06-24T03:09:09.513Z",
+  "briefs": [
+    {
+      "slug": "air-quality-and-odour-identification-and-deodorisation-essentials",
+      "title": "Air Quality and Odour: Identification and Deodorisation Essentials",
+      "discipline": "OCT",
+      "concept": "An odour-control specialist identifying and neutralising lingering indoor odours after a restoration job.",
+      "motifs": [
+        "a fine airborne haze catching soft light in a clean room",
+        "an air-quality meter on a small tripod with a blank glowing display",
+        "subtle vapour and scent-diffusion swirls in the air",
+        "a freshly restored bright interior"
+      ],
+      "palette": "soft purples and fresh, airy lilac with clean neutrals",
+      "mood": "calm, professional, trustworthy; competence and care; Australian restoration-industry training",
+      "style": "photoreal",
+      "composition": "keep the upper-left third calm, darker and uncluttered so a white course title can be overlaid; place the main subject toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that does not bury the subject",
+      "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage, no UI, no readable displays, no human faces",
+      "authorNote": "Course is odour identification + deodorisation (VOCs, ventilation) — OCT discipline; motifs evoke invisible airborne odour made visible without being literal."
+    },
+    {
+      "slug": "documenting-and-reporting-air-quality-improvements",
+      "title": "Documenting and Reporting Air Quality Improvements",
+      "discipline": null,
+      "concept": "Monitoring and documenting job-site air quality with instruments and clean professional records.",
+      "motifs": [
+        "a handheld particle counter with a softly glowing blank screen",
+        "an air-sampling pump on a tidy site table",
+        "a clipboard and tablet beside the instruments",
+        "an orderly restoration job site in soft light"
+      ],
+      "palette": "clean cool cyan and soft teal with fresh white daylight",
+      "mood": "calm, professional, trustworthy; competence and care; Australian restoration-industry training",
+      "style": "photoreal",
+      "composition": "keep the upper-left third calm, darker and uncluttered so a white course title can be overlaid; place the main subject toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that does not bury the subject",
+      "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage, no UI, no readable displays, no human faces",
+      "authorNote": "Subject is monitoring + documenting/reporting IAQ; motifs centre on measurement instruments and clean record-keeping. No readable numbers per negative prompt."
+    },
+    {
+      "slug": "dust-and-particulates-in-indoor-air-control-and-cleaning-strategies",
+      "title": "Dust and Particulates in Indoor Air: Control and Cleaning Strategies",
+      "discipline": null,
+      "concept": "Controlling fine dust and airborne particulates indoors through filtration and cleaning.",
+      "motifs": [
+        "a shaft of light revealing fine dust particles floating in still air",
+        "a HEPA air scrubber drawing in dusty air",
+        "fine particulate settling on a clean surface",
+        "a crisp contrast between a dusty and a freshly cleaned zone"
+      ],
+      "palette": "clean cool cyan and soft teal with fresh white daylight",
+      "mood": "calm, professional, trustworthy; competence and care; Australian restoration-industry training",
+      "style": "photoreal",
+      "composition": "keep the upper-left third calm, darker and uncluttered so a white course title can be overlaid; place the main subject toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that does not bury the subject",
+      "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage, no UI, no readable displays, no human faces",
+      "authorNote": "Particulates + filtration + cleaning strategies; the light-beam dust motif makes invisible particulates visible — the core idea of the course."
+    },
+    {
+      "slug": "hvac-systems-and-indoor-air-quality-what-every-technician-should-know",
+      "title": "HVAC Systems and Indoor Air Quality: What Every Technician Should Know",
+      "discipline": null,
+      "concept": "How HVAC airflow, filtration and ventilation shape indoor air quality.",
+      "motifs": [
+        "clean ductwork and an air-handling unit",
+        "a fresh pleated HVAC filter close up",
+        "soft airflow streams moving through a ceiling vent",
+        "a tidy building mechanical room"
+      ],
+      "palette": "cool steel blues and clean cyan with neutral greys",
+      "mood": "calm, professional, trustworthy; competence and care; Australian restoration-industry training",
+      "style": "photoreal",
+      "composition": "keep the upper-left third calm, darker and uncluttered so a white course title can be overlaid; place the main subject toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that does not bury the subject",
+      "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage, no UI, no readable displays, no human faces",
+      "authorNote": "HVAC + IAQ for technicians; ducting/filter/air-handler motifs are the literal subject matter."
+    },
+    {
+      "slug": "introduction-to-air-quality-fundamentals",
+      "title": "Introduction to Air Quality Fundamentals",
+      "discipline": null,
+      "concept": "The fundamentals of indoor air quality in restoration and cleaning work.",
+      "motifs": [
+        "a light-filled clean interior with a sense of fresh moving air",
+        "a compact IAQ monitor on a sill",
+        "gentle airflow visualised as soft translucent streams",
+        "a ventilation grille with clean air passing through"
+      ],
+      "palette": "fresh cyan and clean white with a hint of green",
+      "mood": "calm, professional, trustworthy; competence and care; Australian restoration-industry training",
+      "style": "photoreal",
+      "composition": "keep the upper-left third calm, darker and uncluttered so a white course title can be overlaid; place the main subject toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that does not bury the subject",
+      "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage, no UI, no readable displays, no human faces",
+      "authorNote": "Foundational IAQ course; calm, fresh, beginner-friendly tone — the \"clean air\" idea over any single device."
+    },
+    {
+      "slug": "introduction-to-creating-a-clean-air-environment-best-practices-for-final-cleara",
+      "title": "Introduction to Creating a Clean Air Environment: Best Practices for Final Clearance and Handover",
+      "discipline": null,
+      "concept": "Final clearance and handover that confirms a clean, healthy air environment.",
+      "motifs": [
+        "a pristine handed-over room filled with soft daylight",
+        "an air clearance sampling cassette on a tripod",
+        "a sealed clean zone with crisp surfaces",
+        "a blank handover checklist on a clipboard"
+      ],
+      "palette": "clean white and soft green with fresh light",
+      "mood": "calm, professional, trustworthy; competence and care; Australian restoration-industry training",
+      "style": "photoreal",
+      "composition": "keep the upper-left third calm, darker and uncluttered so a white course title can be overlaid; place the main subject toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that does not bury the subject",
+      "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage, no UI, no readable displays, no human faces",
+      "authorNote": "Final clearance + handover; the spotless, sign-off-ready room conveys the benefit (verified clean air, client confidence)."
+    },
+    {
+      "slug": "introduction-to-drying-educational-and-institutional-sites",
+      "title": "Introduction to Drying Educational and Institutional Sites",
+      "discipline": "ASD",
+      "concept": "Structural drying strategies for schools and institutional buildings.",
+      "motifs": [
+        "a school corridor or classroom with drying equipment in place",
+        "a row of air movers along a wet floor",
+        "a dehumidifier working in an institutional space",
+        "clean institutional architecture and lockers"
+      ],
+      "palette": "calm indigo and structural blue-violet with warm equipment accents",
+      "mood": "calm, professional, trustworthy; competence and care; Australian restoration-industry training",
+      "style": "photoreal",
+      "composition": "keep the upper-left third calm, darker and uncluttered so a white course title can be overlaid; place the main subject toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that does not bury the subject",
+      "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage, no UI, no readable displays, no human faces",
+      "authorNote": "Applied structural drying in education/institutional settings — ASD; site-specific architecture grounds it."
+    },
+    {
+      "slug": "introduction-to-drying-health-care-facilities",
+      "title": "Introduction to Drying Health Care Facilities",
+      "discipline": "ASD",
+      "concept": "Structural drying in healthcare facilities under strict infection-control constraints.",
+      "motifs": [
+        "a hospital corridor with clean containment sheeting",
+        "air movers and a dehumidifier on a clinical floor",
+        "a negative-air containment zip-wall",
+        "bright sterile clinical surfaces"
+      ],
+      "palette": "calm indigo and clinical teal with clean white",
+      "mood": "calm, professional, trustworthy; competence and care; Australian restoration-industry training",
+      "style": "photoreal",
+      "composition": "keep the upper-left third calm, darker and uncluttered so a white course title can be overlaid; place the main subject toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that does not bury the subject",
+      "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage, no UI, no readable displays, no human faces",
+      "authorNote": "Drying healthcare facilities (infection control, critical operations) — ASD with a clinical, controlled tone."
+    },
+    {
+      "slug": "introduction-to-drying-hospitality-and-lodging-sites",
+      "title": "Introduction to Drying Hospitality and Lodging Sites",
+      "discipline": "ASD",
+      "concept": "Drying hotel and lodging spaces while minimising disruption and revenue loss.",
+      "motifs": [
+        "an elegant hotel room with drying equipment discreetly placed",
+        "air movers tucked beneath furniture",
+        "a refined corridor of guest rooms",
+        "a warm, welcoming lobby"
+      ],
+      "palette": "calm indigo with warm hospitality gold accents",
+      "mood": "calm, professional, trustworthy; competence and care; Australian restoration-industry training",
+      "style": "photoreal",
+      "composition": "keep the upper-left third calm, darker and uncluttered so a white course title can be overlaid; place the main subject toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that does not bury the subject",
+      "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage, no UI, no readable displays, no human faces",
+      "authorNote": "Drying hospitality/lodging (business impact, guest experience) — ASD; the refined setting conveys minimal-disruption restoration."
+    },
+    {
+      "slug": "introduction-to-drying-industrial-and-manufacturing-sites",
+      "title": "Introduction to Drying Industrial and Manufacturing Sites",
+      "discipline": "ASD",
+      "concept": "Drying complex materials and maintaining production in industrial and manufacturing sites.",
+      "motifs": [
+        "a factory floor with large industrial air movers",
+        "heavy-duty dehumidifiers and drying ducting",
+        "exposed steel structure and machinery",
+        "an expansive manufacturing space"
+      ],
+      "palette": "calm indigo with industrial steel grey and amber hazard accents",
+      "mood": "calm, professional, trustworthy; competence and care; Australian restoration-industry training",
+      "style": "photoreal",
+      "composition": "keep the upper-left third calm, darker and uncluttered so a white course title can be overlaid; place the main subject toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that does not bury the subject",
+      "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage, no UI, no readable displays, no human faces",
+      "authorNote": "Industrial/manufacturing drying (production, hazard comms) — ASD at scale; heavy equipment and steel convey the context."
+    },
+    {
+      "slug": "introduction-to-drying-transportation-and-vehicles",
+      "title": "Introduction to Drying Transportation and Vehicles",
+      "discipline": "ASD",
+      "concept": "Drying and restoring flood-affected vehicles and transport assets.",
+      "motifs": [
+        "a flood-affected car interior being dried out",
+        "air movers aimed into an open vehicle",
+        "a vehicle on a clean drying bay",
+        "drying mats and airflow around a transport asset"
+      ],
+      "palette": "calm indigo with cool automotive steel and water-blue accents",
+      "mood": "calm, professional, trustworthy; competence and care; Australian restoration-industry training",
+      "style": "photoreal",
+      "composition": "keep the upper-left third calm, darker and uncluttered so a white course title can be overlaid; place the main subject toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that does not bury the subject",
+      "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage, no UI, no readable displays, no human faces",
+      "authorNote": "Specialised drying for transportation/vehicles — ASD; the vehicle interior under airflow is the distinctive subject."
+    },
+    {
+      "slug": "introduction-to-iaq-and-mould-understanding-airborne-spread-and-containment",
+      "title": "Introduction to IAQ and Mould: Understanding Airborne Spread and Containment",
+      "discipline": "AMRT",
+      "concept": "Preventing airborne mould spread through containment and indoor-air-quality control.",
+      "motifs": [
+        "a containment zip-wall under gentle negative pressure",
+        "an air scrubber ducted to the outside",
+        "fine airborne spores drifting in a light beam (abstract)",
+        "taped poly-sheeting barriers"
+      ],
+      "palette": "clean clinical greens with neutral greys",
+      "mood": "calm, professional, trustworthy; competence and care; Australian restoration-industry training",
+      "style": "photoreal",
+      "composition": "keep the upper-left third calm, darker and uncluttered so a white course title can be overlaid; place the main subject toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that does not bury the subject",
+      "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage, no UI, no readable displays, no human faces",
+      "authorNote": "IAQ + mould airborne spread/containment — AMRT; containment + air scrubbing motifs are the literal remediation method."
+    },
+    {
+      "slug": "introduction-to-improving-indoor-air-quality-after-water-damage",
+      "title": "Introduction to Improving Indoor Air Quality After Water Damage",
+      "discipline": "WRT",
+      "concept": "Restoring healthy indoor air quality in the aftermath of water damage.",
+      "motifs": [
+        "a water-affected room mid-restoration",
+        "air movers and an air scrubber clearing the space",
+        "fresh clean air returning to a bright room",
+        "a moisture meter against a drying wall"
+      ],
+      "palette": "cool corporate blues and clean water tones",
+      "mood": "calm, professional, trustworthy; competence and care; Australian restoration-industry training",
+      "style": "photoreal",
+      "composition": "keep the upper-left third calm, darker and uncluttered so a white course title can be overlaid; place the main subject toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that does not bury the subject",
+      "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage, no UI, no readable displays, no human faces",
+      "authorNote": "IAQ after water damage — bridges WRT + air quality; the drying-then-clean-air arc conveys the benefit."
+    },
+    {
+      "slug": "introduction-to-infrared-thermography-for-drying",
+      "title": "Introduction to Infrared Thermography for Drying",
+      "discipline": null,
+      "concept": "Using infrared thermography to find hidden moisture and verify drying progress.",
+      "motifs": [
+        "a thermal false-colour view of a wall with a cool moisture plume",
+        "a handheld thermal imager held toward a ceiling",
+        "a heat-map gradient revealing a damp area",
+        "a drying wall seen in thermal contrast"
+      ],
+      "palette": "thermal false-colour from deep blue to ember orange against neutral grey",
+      "mood": "calm, professional, trustworthy; competence and care; Australian restoration-industry training",
+      "style": "photoreal",
+      "composition": "keep the upper-left third calm, darker and uncluttered so a white course title can be overlaid; place the main subject toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that does not bury the subject",
+      "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage, no UI, no readable displays, no human faces",
+      "authorNote": "IR thermography for moisture detection; the false-colour heat map IS the subject and reads instantly as thermography."
+    },
+    {
+      "slug": "introduction-to-recovery-of-submerged-items-and-contents",
+      "title": "Introduction to Recovery of Submerged Items and Contents",
+      "discipline": null,
+      "concept": "Evaluating and recovering water-submerged contents and valued personal items.",
+      "motifs": [
+        "water-affected personal contents sorted carefully on a clean table",
+        "gentle gloved cleaning of a salvaged item (no face)",
+        "a drying rack of recovered contents",
+        "a restorability triage layout"
+      ],
+      "palette": "cool water blues with warm neutral object tones",
+      "mood": "calm, professional, trustworthy; competence and care; Australian restoration-industry training",
+      "style": "photoreal",
+      "composition": "keep the upper-left third calm, darker and uncluttered so a white course title can be overlaid; place the main subject toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that does not bury the subject",
+      "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage, no UI, no readable displays, no human faces",
+      "authorNote": "Contents recovery (restorability, preservation, cleaning) — careful handling of salvaged belongings conveys the human value."
+    },
+    {
+      "slug": "introduction-to-restoration-of-antiques-and-fine-furnishings",
+      "title": "Introduction to Restoration of Antiques and Fine Furnishings",
+      "discipline": null,
+      "concept": "Restoring delicate antiques and fine furniture exposed to moisture, with care for authenticity.",
+      "motifs": [
+        "a fine antique timber cabinet under soft museum lighting",
+        "a restorer's brushes and hand tools laid out",
+        "a close detail of wood grain being gently cleaned",
+        "a delicate chair drying carefully"
+      ],
+      "palette": "warm walnut and amber wood tones with soft museum lighting",
+      "mood": "calm, professional, trustworthy; competence and care; Australian restoration-industry training",
+      "style": "photoreal",
+      "composition": "keep the upper-left third calm, darker and uncluttered so a white course title can be overlaid; place the main subject toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that does not bury the subject",
+      "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage, no UI, no readable displays, no human faces",
+      "authorNote": "Antiques/fine furnishings restoration (material integrity, appraisal) — warm craftsmanship tone signals delicacy and expertise."
+    },
+    {
+      "slug": "introduction-to-ultraviolet-light-and-fluorescence",
+      "title": "Introduction to Ultraviolet Light and Fluorescence",
+      "discipline": null,
+      "concept": "Using ultraviolet light and fluorescence to inspect water losses and reveal hidden contamination.",
+      "motifs": [
+        "a UV inspection torch revealing fluorescing traces across a darkened floor",
+        "a violet-blue glow spreading over a surface",
+        "hidden water-loss residues fluorescing under UV",
+        "a low-light inspection scene"
+      ],
+      "palette": "deep violet-blue UV glow against near-black with cool highlights",
+      "mood": "calm, professional, trustworthy; competence and care; Australian restoration-industry training",
+      "style": "photoreal",
+      "composition": "keep the upper-left third calm, darker and uncluttered so a white course title can be overlaid; place the main subject toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that does not bury the subject",
+      "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage, no UI, no readable displays, no human faces",
+      "authorNote": "UV light + fluorescence for water-loss inspection; the glowing dark scene is unmistakably UV inspection — strong, distinctive thumbnail."
+    },
+    {
+      "slug": "introduction-to-water-damage-litigation-support",
+      "title": "Introduction to Water Damage Litigation Support",
+      "discipline": "WRT",
+      "concept": "Forensic water-damage investigation and documentation to support litigation.",
+      "motifs": [
+        "a forensic moisture investigation with precise measurement tools",
+        "an orderly evidence-documentation table",
+        "a moisture map of a building structure",
+        "a magnifier over a sample of building material"
+      ],
+      "palette": "cool corporate blues with neutral document greys",
+      "mood": "calm, professional, trustworthy; competence and care; Australian restoration-industry training",
+      "style": "photoreal",
+      "composition": "keep the upper-left third calm, darker and uncluttered so a white course title can be overlaid; place the main subject toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that does not bury the subject",
+      "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage, no UI, no readable displays, no human faces",
+      "authorNote": "Forensic/litigation support (moisture tracing, scope, reporting) — WRT; the methodical, evidentiary tone conveys credibility."
+    },
+    {
+      "slug": "moisture-mould-and-indoor-air-quality-understanding-the-link",
+      "title": "Moisture, Mould, and Indoor Air Quality: Understanding the Link",
+      "discipline": "AMRT",
+      "concept": "The link between moisture, mould growth and indoor air quality.",
+      "motifs": [
+        "moisture beading on a cool surface beside early mould growth",
+        "a moisture/humidity meter against a damp wall",
+        "subtle mould on a building material (clinical, restrained)",
+        "airflow drifting over a damp surface"
+      ],
+      "palette": "clean clinical greens with cool neutral greys",
+      "mood": "calm, professional, trustworthy; competence and care; Australian restoration-industry training",
+      "style": "photoreal",
+      "composition": "keep the upper-left third calm, darker and uncluttered so a white course title can be overlaid; place the main subject toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that does not bury the subject",
+      "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage, no UI, no readable displays, no human faces",
+      "authorNote": "Moisture–mould–IAQ link — AMRT; the moisture-to-mould motif shows cause and effect that defines the course."
+    },
+    {
+      "slug": "using-air-scrubbers-and-afds-to-improve-job-site-air-quality",
+      "title": "Using Air Scrubbers and AFDs to Improve Job Site Air Quality",
+      "discipline": null,
+      "concept": "Setting up air scrubbers and air filtration devices to clean job-site air.",
+      "motifs": [
+        "a negative-air machine / air scrubber with ducting on a restoration job site",
+        "stacked HEPA filter stages inside a unit",
+        "airflow being drawn through the device",
+        "a tidy job site with the AFD positioned for air changes"
+      ],
+      "palette": "clean cool cyan and soft teal with fresh white daylight",
+      "mood": "calm, professional, trustworthy; competence and care; Australian restoration-industry training",
+      "style": "photoreal",
+      "composition": "keep the upper-left third calm, darker and uncluttered so a white course title can be overlaid; place the main subject toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that does not bury the subject",
+      "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage, no UI, no readable displays, no human faces",
+      "authorNote": "Practical AFD/air-scrubber setup (recirculation vs negative pressure, ACH) — the equipment in situ is the literal subject."
+    },
+    {
+      "slug": "wrt-water-damage-essentials",
+      "title": "Water Damage Restoration — Essentials (WRT-aligned)",
+      "discipline": "WRT",
+      "concept": "Core water-damage restoration fundamentals: categories of water, classes of loss, safety and the drying workflow.",
+      "motifs": [
+        "a moisture meter pressed to a damp skirting board",
+        "air movers and a dehumidifier drying a room",
+        "a faint tide line on a wall",
+        "a clean, restored interior"
+      ],
+      "palette": "cool corporate blues and clean water tones",
+      "mood": "calm, professional, trustworthy; competence and care; Australian restoration-industry training",
+      "style": "photoreal",
+      "composition": "keep the upper-left third calm, darker and uncluttered so a white course title can be overlaid; place the main subject toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that does not bury the subject",
+      "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage, no UI, no readable displays, no human faces",
+      "authorNote": "WRT-aligned fundamentals; classic restoration motifs (moisture meter, air movers) read instantly as water-damage training."
+    }
+  ]
+}

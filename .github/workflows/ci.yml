@@ -148,6 +148,19 @@ jobs:
       - name: Apply Prisma migrations to test DB
         run: npx prisma migrate deploy
 
+      # Seed the course catalogue so the data-dependent journeys in
+      # e2e/carsi-journeys.spec.ts (course list, WRT filter, "Carpet" search,
+      # course detail by slug) run against real data instead of an empty DB.
+      - name: Seed course catalogue for E2E
+        run: npm run db:seed-courses
+
+      # Seed the deterministic E2E student (student@carsi.com.au / student123) and
+      # enrol them in the first catalogue course. Must run AFTER db:seed-courses so
+      # the enrolled course exists. The auth.setup project logs in as this user to
+      # mint a real session for the protected /dashboard journeys.
+      - name: Seed E2E test user
+        run: npx tsx scripts/seed-e2e-user.ts
+
       - name: Cache Playwright browsers
         id: playwright-cache
         uses: actions/cache@v4
@@ -169,6 +182,16 @@ jobs:
         run: npm run test:e2e
         env:
           CI: true
+          # /prd, /workflows, /design-system, /agents are internal-tool routes that
+          # middleware 302-redirects to "/" unless this is set. The PRD-generation
+          # E2E journeys exercise /prd, so enable internal tools for the test run.
+          INTERNAL_TOOLS_ENABLED: 'true'
+          # The CI webServer runs a production build (`npm run start` → NODE_ENV=production),
+          # where the JWT secret resolver THROWS unless JWT_SECRET is set to a strong
+          # (>=32 char) value. The auth.setup project performs a real /api/auth/login that
+          # signs/verifies the session JWT, so this must be present. Test-only value — do
+          # NOT reuse in any real environment.
+          JWT_SECRET: 'ci-e2e-test-only-jwt-secret-min-32-chars-1234567890'
           # DATABASE_URL inherited from job-level env (postgresql://root:root@localhost:5432/carsi).
           # The previous step-level starter_db override caused P1000 auth failure
           # because the postgres service uses root:root, not starter_user.
