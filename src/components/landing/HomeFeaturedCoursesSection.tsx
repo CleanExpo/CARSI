@@ -4,7 +4,7 @@ import { AnimatedCard } from '@/components/landing/AnimatedHero';
 import { PUBLIC_SHELL_INNER_CLASS } from '@/components/landing/public-shell-width';
 import { CourseBrowseProvider } from '@/components/lms/CourseBrowseContext';
 import { CourseCard } from '@/components/lms/CourseCard';
-import type { CourseListItem } from '@/lib/wordpress-export-courses';
+import type { CourseListItem } from '@/lib/course-list-item';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 
