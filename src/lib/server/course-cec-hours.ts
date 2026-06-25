@@ -1,9 +1,9 @@
 import { formatCecHoursForDisplay } from '@/lib/cec-display';
 import {
-  inferCecHoursFromDuration,
-  resolveCatalogCecHours,
-  resolveDurationHours,
-} from '@/lib/seed/cec-hours';
+  getProfessionalCecAssignment,
+  isCecExcludedSlug,
+} from '@/lib/seed/cec-professional-assignments';
+import { resolveCatalogCecHours } from '@/lib/seed/cec-hours';
 
 /** Course fields used to resolve IICRC CEC hours for certificates and credentials. */
 export type LmsCourseCecSource = {
@@ -16,17 +16,14 @@ export type LmsCourseCecSource = {
   iicrcDiscipline?: string | null;
 };
 
-function hasIicrcDiscipline(discipline: string | null | undefined): boolean {
-  const value = discipline?.trim();
-  return Boolean(value && value !== '—' && value !== '-');
-}
-
 /**
  * Best available CEC hours for a completed course from LMS database fields:
- * `cec_hours` column, course meta / description text, then duration-based inference
- * for IICRC-discipline courses.
+ * `cec_hours` column, course meta / description text, duration-based inference,
+ * then reviewer-assigned professional values for gaps (never overrides stored CEC).
  */
 export function resolveLmsCourseCecHours(course: LmsCourseCecSource): number | null {
+  if (isCecExcludedSlug(course.slug)) return null;
+
   const fromCatalog = resolveCatalogCecHours({
     cecHours: course.cecHours,
     shortDescription: course.shortDescription,
@@ -37,14 +34,7 @@ export function resolveLmsCourseCecHours(course: LmsCourseCecSource): number | n
   });
   if (fromCatalog != null && fromCatalog > 0) return fromCatalog;
 
-  if (!hasIicrcDiscipline(course.iicrcDiscipline)) return null;
-
-  const duration = resolveDurationHours({
-    durationHours: course.durationHours,
-    shortDescription: course.shortDescription,
-    description: course.description,
-  });
-  return duration != null ? inferCecHoursFromDuration(duration) : null;
+  return getProfessionalCecAssignment(course.slug);
 }
 
 /** Formatted CEC label for listings and certificates (`"4"`, `"2.5"`, or null). */
