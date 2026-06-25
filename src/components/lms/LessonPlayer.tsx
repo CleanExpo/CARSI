@@ -29,15 +29,15 @@ export function LessonPlayer({ lesson, resources = [], footer }: LessonPlayerPro
   return (
     <div className="space-y-4">
       <div className="flex items-start gap-3">
-        <h1 className="flex-1 text-2xl font-bold text-white">{lesson.title}</h1>
+        <h1 className="flex-1 text-2xl font-bold text-slate-900">{lesson.title}</h1>
         <div className="flex shrink-0 gap-2">
           {lesson.is_preview && (
-            <Badge variant="outline" className="border-white/20 text-white/70">
+            <Badge variant="outline" className="border-slate-300 text-slate-600">
               Preview
             </Badge>
           )}
           {lesson.duration_minutes ? (
-            <span className="text-sm text-white/45">{lesson.duration_minutes} min</span>
+            <span className="text-sm text-slate-500">{lesson.duration_minutes} min</span>
           ) : null}
         </div>
       </div>
@@ -45,11 +45,8 @@ export function LessonPlayer({ lesson, resources = [], footer }: LessonPlayerPro
       <div className="rounded-lg">{renderContent(lesson)}</div>
 
       {downloads.length > 0 && (
-        <div
-          className="rounded-lg border border-white/[0.08] p-4"
-          style={{ background: 'rgba(36,144,237,0.06)' }}
-        >
-          <p className="mb-3 text-xs font-semibold tracking-wider text-white/50 uppercase">
+        <div className="rounded-lg border border-[#2490ed]/20 bg-[#eef7ff] p-4">
+          <p className="mb-3 text-xs font-semibold tracking-wider text-slate-500 uppercase">
             Downloads & resources
           </p>
           <ul className="space-y-2">
@@ -59,7 +56,7 @@ export function LessonPlayer({ lesson, resources = [], footer }: LessonPlayerPro
                   href={r.url!}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-sm text-[#7ec5ff] hover:underline"
+                  className="inline-flex items-center gap-2 text-sm text-[#146fc2] hover:underline"
                 >
                   <Download className="h-4 w-4 shrink-0 opacity-80" />
                   {r.label}
@@ -111,7 +108,7 @@ function renderContent(lesson: Lesson) {
   switch (lesson.content_type) {
     case 'video': {
       const src = lesson.content_body?.trim() ?? '';
-      if (!src) return <p className="text-white/50">No video URL configured.</p>;
+      if (!src) return <p className="text-slate-500">No video URL configured.</p>;
       const yt = youtubeEmbedUrl(src);
       if (yt) {
         return (
@@ -151,18 +148,18 @@ function renderContent(lesson: Lesson) {
       return (
         <iframe
           src={lesson.content_body ?? undefined}
-          className="h-[min(70vh,700px)] w-full rounded-lg border border-white/10"
+          className="h-[min(70vh,700px)] w-full rounded-lg border border-slate-200"
           title="PDF viewer"
         />
       );
 
     case 'drive_file':
-      if (!lesson.drive_file_id) return <p className="text-white/50">No file attached.</p>;
+      if (!lesson.drive_file_id) return <p className="text-slate-500">No file attached.</p>;
       return <DriveFileViewer driveFileId={lesson.drive_file_id} />;
 
     case 'text':
     default: {
-      return <CourseFormattedBody text={lesson.content_body} />;
+      return <CourseFormattedBody text={lesson.content_body} tone="light" />;
     }
   }
 }
