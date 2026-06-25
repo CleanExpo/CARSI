@@ -21,6 +21,13 @@ const CEC_TEXT_PATTERNS: RegExp[] = [
   /(\d+(?:\.\d+)?)\s*IICRC\s+CEC(?:\s+Hours?|\s+Credits?)?/i,
 ];
 
+/** Course duration lines in Woo short descriptions (e.g. "Approx 4Hours"). */
+const DURATION_TEXT_PATTERNS: RegExp[] = [
+  /(?:Course\s+Duration|Duration)\s*:?\s*\n?\s*Approx(?:imately)?\s*(\d+(?:\.\d+)?)\s*Hours?/i,
+  /Approx(?:imately)?\s*(\d+(?:\.\d+)?)\s*Hours?/i,
+  /Approximately\s+(\d+(?:\.\d+)?)\s*Minutes?/i,
+];
+
 function parsePositiveHours(value: unknown): number | null {
   if (value == null || value === '') return null;
   const n = typeof value === 'number' ? value : parseFloat(String(value));
@@ -38,6 +45,41 @@ export function extractCecHoursFromText(text: string | null | undefined): number
     }
   }
   return null;
+}
+
+export function extractDurationHoursFromText(text: string | null | undefined): number | null {
+  if (!text?.trim()) return null;
+  for (const pattern of DURATION_TEXT_PATTERNS) {
+    const match = pattern.exec(text);
+    if (!match?.[1]) continue;
+    const value = parsePositiveHours(match[1]);
+    if (value == null) continue;
+    if (/minutes?/i.test(match[0])) return value / 60;
+    return value;
+  }
+  return null;
+}
+
+/** CARSI-approved courses often award whole CEC hours rounded up from contact time. */
+export function inferCecHoursFromDuration(durationHours: number): number | null {
+  if (!Number.isFinite(durationHours) || durationHours <= 0) return null;
+  return Math.max(1, Math.ceil(durationHours));
+}
+
+export function resolveDurationHours(row: {
+  durationHours?: number | null;
+  duration_hours?: number | null;
+  shortDescription?: string | null;
+  short_description?: string | null;
+  description?: string | null;
+}): number | null {
+  const explicit = parsePositiveHours(row.durationHours ?? row.duration_hours);
+  if (explicit != null) return explicit;
+
+  const text = [row.shortDescription ?? row.short_description, row.description]
+    .filter(Boolean)
+    .join('\n');
+  return extractDurationHoursFromText(text);
 }
 
 /** Read CEC from Woo `meta_data` array (`{ key, value }[]`) or plain object meta. */
@@ -73,7 +115,14 @@ export type CecResolvable = {
   short_description?: string | null;
   description?: string | null;
   meta?: unknown;
+  duration_hours?: number | null;
+  iicrc_discipline?: string | null;
 };
+
+function hasIicrcDiscipline(discipline: string | null | undefined): boolean {
+  const value = discipline?.trim();
+  return Boolean(value && value !== '—' && value !== '-');
+}
 
 /** Best available CEC hours for a WP-export or catalog-shaped row. */
 export function resolveCecHours(row: CecResolvable): number | null {
@@ -84,7 +133,17 @@ export function resolveCecHours(row: CecResolvable): number | null {
   if (fromMeta != null) return fromMeta;
 
   const text = [row.short_description, row.description].filter(Boolean).join('\n');
-  return extractCecHoursFromText(text);
+  const fromText = extractCecHoursFromText(text);
+  if (fromText != null) return fromText;
+
+  if (!hasIicrcDiscipline(row.iicrc_discipline)) return null;
+
+  const duration = resolveDurationHours({
+    duration_hours: row.duration_hours,
+    short_description: row.short_description,
+    description: row.description,
+  });
+  return duration != null ? inferCecHoursFromDuration(duration) : null;
 }
 
 export function enrichCourseWithCecHours<T extends CecResolvable>(
@@ -99,6 +158,8 @@ export function resolveCatalogCecHours(course: {
   shortDescription?: string | null;
   description?: string | null;
   meta?: unknown;
+  durationHours?: number | null;
+  iicrcDiscipline?: string | null;
 }): number | null {
   const explicit = parsePositiveHours(course.cecHours);
   if (explicit != null) return explicit;
@@ -106,5 +167,7 @@ export function resolveCatalogCecHours(course: {
     short_description: course.shortDescription,
     description: course.description,
     meta: course.meta,
+    duration_hours: course.durationHours,
+    iicrc_discipline: course.iicrcDiscipline,
   });
 }
