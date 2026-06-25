@@ -1,8 +1,8 @@
 import type { Prisma } from '@/generated/prisma/client';
-import { resolveCecHoursLabelForSlug } from '@/lib/cec-display';
+import type { CheckoutCourse, CourseListItem } from '@/lib/course-list-item';
 import { prisma } from '@/lib/prisma';
 import { normalizePublicAssetUrl } from '@/lib/remote-image';
-import type { CourseListItem, WpExportCourse } from '@/lib/wordpress-export-courses';
+import { formatLmsCourseCecHoursLabel } from '@/lib/server/course-cec-hours';
 
 /** Same filter as the public `/courses` catalogue when loaded from Prisma. */
 export const lmsPublishedCourseWhere: Prisma.LmsCourseWhereInput = {
@@ -16,6 +16,26 @@ const draftWhere = {
 };
 
 export type DashboardCourseStatusFilter = 'all' | 'draft' | 'published';
+
+function cecHoursLabelForRow(c: {
+  slug: string;
+  cecHours: number | null;
+  shortDescription?: string | null;
+  description?: string | null;
+  meta?: unknown;
+  durationHours?: number | null;
+  iicrcDiscipline?: string | null;
+}): string | null {
+  return formatLmsCourseCecHoursLabel({
+    slug: c.slug,
+    cecHours: c.cecHours,
+    shortDescription: c.shortDescription,
+    description: c.description,
+    meta: c.meta,
+    durationHours: c.durationHours,
+    iicrcDiscipline: c.iicrcDiscipline,
+  });
+}
 
 function mapDashboardCourseRow(c: {
   id: string;
@@ -51,7 +71,7 @@ function mapDashboardCourseRow(c: {
     instructor: null,
     catalog_status: st === 'draft' ? 'draft' : 'published',
     module_count: c._count.modules,
-    cec_hours: resolveCecHoursLabelForSlug(c.slug, c.cecHours),
+    cec_hours: cecHoursLabelForRow(c),
     duration_hours: c.durationHours != null ? String(c.durationHours) : null,
   };
 }
@@ -144,7 +164,7 @@ function mapLmsCourseToPublicListItem(c: LmsCoursePublicListRow): CourseListItem
     module_count: c._count.modules,
     updated_at: c.updatedAt.toISOString(),
     instructor: c.instructor?.fullName ? { full_name: c.instructor.fullName } : null,
-    cec_hours: resolveCecHoursLabelForSlug(c.slug, c.cecHours),
+    cec_hours: cecHoursLabelForRow(c),
     duration_hours: c.durationHours != null ? String(c.durationHours) : null,
   };
 }
@@ -329,7 +349,15 @@ export async function getPublishedCourseDetailBySlugFromDatabase(slug: string) {
     level: row.level ?? null,
     category: row.category ?? null,
     iicrc_discipline: row.iicrcDiscipline ?? null,
-    cec_hours: resolveCecHoursLabelForSlug(row.slug, row.cecHours),
+    cec_hours: cecHoursLabelForRow({
+      slug: row.slug,
+      cecHours: row.cecHours,
+      shortDescription: row.shortDescription,
+      description: row.description,
+      meta: row.meta,
+      durationHours: row.durationHours,
+      iicrcDiscipline: row.iicrcDiscipline,
+    }),
     duration_hours: row.durationHours != null ? String(row.durationHours) : null,
     thumbnail_url: normalizePublicAssetUrl(row.thumbnailUrl),
     module_count: row._count.modules,
@@ -338,12 +366,11 @@ export async function getPublishedCourseDetailBySlugFromDatabase(slug: string) {
 }
 
 /**
- * Stripe/checkout line item metadata: same published course as the catalogue when using Prisma.
- * Shaped like a WP export row so `createStripeCheckoutForCourse` can stay unchanged.
+ * Stripe/checkout line item metadata from the published LMS catalogue.
  */
-export async function getPublishedCourseAsWpExportForCheckout(
+export async function getPublishedCourseForCheckout(
   slug: string
-): Promise<WpExportCourse | null> {
+): Promise<CheckoutCourse | null> {
   if (!process.env.DATABASE_URL?.trim()) return null;
   const target = decodeURIComponent(slug).trim();
   if (!target) return null;
@@ -360,17 +387,28 @@ export async function getPublishedCourseAsWpExportForCheckout(
   const isFree = row.isFree === true || !Number.isFinite(priceNum) || priceNum <= 0;
 
   return {
-    wp_id: 0,
     slug: row.slug,
     title: row.title,
-    description: row.description ?? undefined,
     short_description: row.shortDescription ?? undefined,
-    thumbnail_url: normalizePublicAssetUrl(row.thumbnailUrl),
     price_aud: isFree ? 0 : priceNum,
     is_free: isFree,
-    iicrc_discipline: row.iicrcDiscipline,
-    status: row.status,
-    level: row.level,
-    category: row.category,
   };
+}
+
+/** Published course slugs for sitemap generation. */
+export async function getPublishedCourseSlugsFromDatabase(): Promise<
+  Array<{ slug: string; updated_at: string }>
+> {
+  if (!process.env.DATABASE_URL?.trim()) return [];
+
+  const rows = await prisma.lmsCourse.findMany({
+    where: publishedWhere,
+    select: { slug: true, updatedAt: true },
+    orderBy: { updatedAt: 'desc' },
+  });
+
+  return rows.map((row) => ({
+    slug: row.slug,
+    updated_at: row.updatedAt.toISOString(),
+  }));
 }
