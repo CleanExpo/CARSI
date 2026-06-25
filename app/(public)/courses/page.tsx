@@ -14,11 +14,7 @@ import {
   deriveCatalogueFactsFromCourseItems,
 } from '@/lib/server/public-catalogue-facts';
 import { getPublishedCourseListItemsFromDatabase } from '@/lib/server/public-courses-list';
-import {
-  loadWpExportCourses,
-  mapWpExportToCourseListItem,
-  type CourseListItem,
-} from '@/lib/wordpress-export-courses';
+import type { CourseListItem } from '@/lib/course-list-item';
 
 export const dynamic = 'force-dynamic';
 
@@ -85,11 +81,6 @@ async function getCourses() {
     }
   }
 
-  const exported = loadWpExportCourses();
-  if (exported && exported.length > 0) {
-    const items = exported.map(mapWpExportToCourseListItem);
-    return { items, total: items.length };
-  }
   return getCoursesFromBackend();
 }
 
