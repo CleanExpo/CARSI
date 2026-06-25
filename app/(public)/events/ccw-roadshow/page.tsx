@@ -128,7 +128,10 @@ export default function CcwRoadshowPage() {
         />
       ))}
 
-      <MarketingPageShell id="main-content">
+      <MarketingPageShell
+        id="main-content"
+        innerClassName="relative z-10 mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16"
+      >
 
         {/* Hero */}
         <section className="relative z-10 pb-12 sm:pb-14">
