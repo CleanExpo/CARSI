@@ -91,7 +91,7 @@ export function CECProgressRing({
             cx={50}
             cy={50}
             r={radius}
-            stroke="rgba(255,255,255,0.08)"
+            stroke="rgba(15,23,42,0.1)"
             strokeWidth={stroke}
             fill="none"
           />
@@ -110,21 +110,21 @@ export function CECProgressRing({
           />
         </svg>
         <div className="absolute flex flex-col items-center">
-          <span className="font-mono text-xl leading-none font-bold text-white">{cecEarned}</span>
-          <span className="text-xs leading-none text-white/40">/{cecRequired}</span>
-          <span className="mt-0.5 text-[10px] leading-none text-white/30">
+          <span className="font-mono text-xl leading-none font-bold text-slate-900">{cecEarned}</span>
+          <span className="text-xs leading-none text-slate-500">/{cecRequired}</span>
+          <span className="mt-0.5 text-[10px] leading-none text-slate-400">
             <AcronymTooltip term="CEC">CECs</AcronymTooltip>
           </span>
         </div>
       </div>
 
       <div className="flex flex-col items-center gap-0.5">
-        {discipline && <span className="font-mono text-xs text-cyan-400">{discipline}</span>}
-        <span className="text-xs text-white/40">
+        {discipline && <span className="font-mono text-xs text-[#146fc2]">{discipline}</span>}
+        <span className="text-xs text-slate-500">
           {percentage}% {cycleLabel}
         </span>
         {normalised >= 1 && (
-          <span className="font-mono text-xs text-emerald-400">Renewal requirement met</span>
+          <span className="font-mono text-xs text-emerald-600">Renewal requirement met</span>
         )}
         {milestone && (
           <span className="mt-1 font-mono text-xs text-amber-400">
