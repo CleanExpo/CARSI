@@ -1,4 +1,4 @@
-import { resolveCecHoursLabelForSlug } from '@/lib/cec-display';
+import { resolveLmsCourseCecHours } from '@/lib/server/course-cec-hours';
 
 /** IICRC CEC auto-submission configuration (course completion → renewals@iicrcnet.org). */
 
@@ -19,24 +19,37 @@ export function isIicrcCecAutoSubmitEnabled(): boolean {
 export function resolveEffectiveCecHours(course: {
   slug?: string | null;
   cecHours: unknown;
+  shortDescription?: string | null;
+  description?: string | null;
+  meta?: unknown;
+  durationHours?: number | null;
+  iicrcDiscipline?: string | null;
 }): number | null {
   const direct = toFiniteNumber(course.cecHours);
   if (direct !== null && direct > 0) return direct;
 
-  const slug = course.slug?.trim().toLowerCase();
+  const slug = course.slug?.trim();
   if (!slug) return direct;
 
-  const label = resolveCecHoursLabelForSlug(slug, null);
-  if (!label) return direct;
-
-  const parsed = parseFloat(label);
-  return Number.isFinite(parsed) && parsed > 0 ? parsed : direct;
+  return resolveLmsCourseCecHours({
+    slug,
+    cecHours: direct,
+    shortDescription: course.shortDescription,
+    description: course.description,
+    meta: course.meta,
+    durationHours: course.durationHours,
+    iicrcDiscipline: course.iicrcDiscipline,
+  });
 }
 
 export function courseEligibleForIicrcCecSubmission(course: {
   slug?: string | null;
   cecHours: unknown;
   iicrcDiscipline: string | null;
+  shortDescription?: string | null;
+  description?: string | null;
+  meta?: unknown;
+  durationHours?: number | null;
 }): boolean {
   const cec = resolveEffectiveCecHours(course);
   if (cec !== null && cec > 0) return true;
