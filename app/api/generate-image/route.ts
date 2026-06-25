@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateImage, generateIcon, getAPIStatus } from '@/lib/image-generation/gemini-client';
 import { registerImageAsset, registerIconAsset } from '@/lib/image-generation/asset-manager';
+import { getAdminSessionOrNull } from '@/lib/admin/admin-session';
 import type {
   ImageGenerationConfig,
   IconGenerationConfig,
@@ -46,6 +47,16 @@ export async function GET(): Promise<NextResponse> {
    ---------------------------------------- */
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
+    // Entitlement gate: image/icon generation spends the Gemini API budget and
+    // writes assets, so it is an admin-only authoring tool — never public.
+    const session = await getAdminSessionOrNull();
+    if (!session) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
     // Rate limiting
     const ip = request.headers.get('x-forwarded-for') || 'unknown';
     if (!checkRateLimit(ip)) {
@@ -149,10 +160,12 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   } catch (error) {
     console.error('[API] Image generation error:', error);
 
+    // Do not echo raw exception text to the client (leaks internals) — log
+    // server-side above and return a generic message. (Gate rule #4.)
     return NextResponse.json(
       {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error occurred',
+        error: 'Image generation failed',
       },
       { status: 500 }
     );

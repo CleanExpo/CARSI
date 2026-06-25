@@ -114,6 +114,32 @@ CTA: [Action]
 4. **Email Sequences** — Use `objections_and_responses` for nurture content
 5. **Event Marketing** — Use `conferences` for event sponsorship/attendance
 6. **Association Partnerships** — Use `industry_associations` for co-marketing
+7. **Video Assets** — Use real-product demo screencasts + narrated avatar videos (see below)
+
+### Video Assets (demo screencasts + brand avatar videos)
+
+CARSI can produce **real-product video** that pairs a narrated HeyGen avatar (the brand
+assistant "Claire") with a screen recording of the live platform driven by the seeded demo
+account. Two pipelines feed these assets:
+
+- **Brand/avatar videos** — `src/lib/brand-video-assistant.ts` scripts produced via
+  `scripts/automate-brand-videos.ts` (`npm run video:brand:*`). Five scripts exist today
+  (homepage hero, RestoreAssist, NRPG/disaster-recovery, day-3 learner nudge, team-owner nudge).
+- **Demo screencasts** — `src/lib/screencast/demo-flows.ts` flows produced via
+  `scripts/generate-demo-videos.ts` (`npm run video:demo:*`): the avatar is composited as a
+  picture-in-picture corner over real product footage. Each flow has a `purpose`:
+  - `lesson-walkthrough` — "how to use CARSI" clips that can embed inside lessons.
+  - `brand-broll` — silent product footage to enrich the brand/avatar videos.
+  - `marketing-reel` — a public product tour suitable for ads, landing pages, and social.
+
+**Using video in SYNTHEX campaigns:** reference the marketing-reel / brand-video MP4s
+(stored on Cloudinary, folder `carsi/demo-videos`) as creative for LinkedIn/Meta video ads,
+landing-page hero loops, and email embeds. Every video ends with **one** CTA and carries
+captions + transcript — keep the SYNTHEX copy's CTA consistent with the video's.
+
+**Producing/refreshing the assets:** see the operator runbook
+`docs/marketing/demo-video-production.md`. Requires the `HEYGEN_*` and `CLOUDINARY_*`
+secrets (registered in the SYNTHEX deploy environment — see `docs/PRODUCTION_DEPLOY.md`).
 
 ---
 

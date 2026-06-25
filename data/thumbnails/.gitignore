@@ -1,0 +1,4 @@
+# Resumable run manifest written by scripts/generate-course-thumbnails.ts — records
+# generated Cloudinary URLs + per-course status for resumability. Not committed (run state,
+# not source of truth). The authored briefs (course-thumbnail-briefs.json) ARE committed.
+course-thumbnail-results.json

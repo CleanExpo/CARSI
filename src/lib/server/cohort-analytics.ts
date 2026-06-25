@@ -31,6 +31,9 @@ export async function getCohortAnalytics(): Promise<CohortSummary> {
   const since = thirtyDaysAgo();
 
   const courses = await prisma.lmsCourse.findMany({
+    // Defensive cap: this pulls nested enrolments + lessons per course, so an
+    // unbounded fetch is the heaviest query here. Generous for current scale.
+    take: 1000,
     where: lmsPublishedCourseWhere,
     select: {
       id: true,
