@@ -14,11 +14,11 @@ function DisciplineBar({ label, value, max }: { label: string; value: number; ma
   const pct = max > 0 ? Math.min(100, Math.round((value / max) * 100)) : 0;
   return (
     <div>
-      <div className="flex justify-between text-[11px] text-white/50">
+      <div className="flex justify-between text-[11px] text-slate-500">
         <span className="font-mono uppercase">{label}</span>
-        <span className="tabular-nums text-white/70">{value.toFixed(1)}</span>
+        <span className="text-slate-700 tabular-nums">{value.toFixed(1)}</span>
       </div>
-      <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-white/[0.06]">
+      <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-slate-200">
         <div
           className="h-full rounded-full bg-[#2490ed]/80 transition-all"
           style={{ width: `${pct}%` }}
@@ -44,7 +44,7 @@ function SuggestionCard({
   thumbnailUrl: string | null;
 }) {
   return (
-    <div className="flex min-w-[240px] max-w-[300px] flex-shrink-0 flex-col gap-2 rounded-xl border border-white/10 bg-[#060a14] p-4">
+    <div className="flex max-w-[300px] min-w-[240px] flex-shrink-0 flex-col gap-2 rounded-xl border border-white/10 bg-[#060a14] p-4">
       {thumbnailUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={thumbnailUrl} alt="" className="h-28 w-full rounded-lg object-cover" />
@@ -55,16 +55,16 @@ function SuggestionCard({
       )}
       <div className="flex flex-wrap items-center gap-2">
         {discipline ? (
-          <span className="rounded px-1.5 py-0.5 font-mono text-[10px] font-semibold tracking-wider text-[#2490ed] uppercase bg-[#2490ed]/15">
+          <span className="rounded bg-[#2490ed]/15 px-1.5 py-0.5 font-mono text-[10px] font-semibold tracking-wider text-[#2490ed] uppercase">
             {discipline}
           </span>
         ) : null}
         {cecHours !== null ? (
-          <span className="font-mono text-[10px] text-white/35">{cecHours} CEC hrs</span>
+          <span className="font-mono text-[10px] text-slate-500">{cecHours} CEC hrs</span>
         ) : null}
       </div>
-      <h3 className="line-clamp-2 text-sm font-semibold text-white">{title}</h3>
-      <p className="line-clamp-2 text-xs italic text-white/40">{reason}</p>
+      <h3 className="line-clamp-2 text-sm font-semibold text-slate-900">{title}</h3>
+      <p className="line-clamp-2 text-xs text-slate-500 italic">{reason}</p>
       <Link
         href={`/courses/${slug}`}
         className="mt-auto inline-flex items-center justify-center gap-1 rounded-lg bg-[#2490ed] px-3 py-2 text-xs font-medium text-white transition hover:bg-[#1f82d4]"
@@ -90,9 +90,7 @@ export function RenewalCockpit() {
       );
       setData(json);
     } catch (e) {
-      setError(
-        e instanceof Error ? e.message : 'Could not load IICRC renewal summary.'
-      );
+      setError(e instanceof Error ? e.message : 'Could not load IICRC renewal summary.');
       setData(null);
     } finally {
       setLoading(false);
@@ -105,18 +103,14 @@ export function RenewalCockpit() {
 
   if (loading) {
     return (
-      <section
-        className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-8"
-        aria-busy
-        aria-label="Loading renewal summary"
-      >
+      <section className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8" aria-busy aria-label="Loading renewal summary">
         <div className="animate-pulse space-y-6">
-          <div className="h-4 w-48 rounded bg-white/10" />
+          <div className="h-4 w-48 rounded bg-slate-200" />
           <div className="flex gap-8">
-            <div className="h-36 w-36 rounded-full bg-white/10" />
+            <div className="h-36 w-36 rounded-full bg-slate-200" />
             <div className="flex-1 space-y-3">
-              <div className="h-3 w-full rounded bg-white/10" />
-              <div className="h-3 w-4/5 rounded bg-white/10" />
+              <div className="h-3 w-full rounded bg-slate-200" />
+              <div className="h-3 w-4/5 rounded bg-slate-200" />
             </div>
           </div>
         </div>
@@ -126,7 +120,7 @@ export function RenewalCockpit() {
 
   if (error || !data) {
     return (
-      <section className="rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-8">
+      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
         {error ? <ErrorBanner message={error} onRetry={load} /> : null}
       </section>
     );
@@ -146,33 +140,33 @@ export function RenewalCockpit() {
   const sortedDisc = Object.entries(data.by_discipline).sort((a, b) => b[1] - a[1]);
 
   return (
-    <section className="relative overflow-hidden rounded-2xl border border-[#2490ed]/20 bg-gradient-to-br from-[#2490ed]/10 via-white/[0.03] to-transparent shadow-[0_0_0_1px_rgba(36,144,237,0.12)_inset]">
+    <section className="relative overflow-hidden rounded-2xl border border-[#2490ed]/20 bg-gradient-to-br from-[#eef7ff] via-white to-white shadow-sm">
       <div
-        className="pointer-events-none absolute -left-24 top-0 h-48 w-48 rounded-full bg-[#2490ed]/15 blur-3xl"
+        className="pointer-events-none absolute top-0 -left-24 h-48 w-48 rounded-full bg-[#2490ed]/15 blur-3xl"
         aria-hidden
       />
       <div className="relative px-5 py-8 sm:px-10 sm:py-10">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <p className="text-[11px] font-semibold tracking-[0.2em] text-[#7ec5ff]/90 uppercase">
+            <p className="text-[11px] font-semibold tracking-[0.2em] text-[#146fc2] uppercase">
               IICRC renewal
             </p>
-            <h2 className="mt-1 text-xl font-semibold tracking-tight text-white sm:text-2xl">
+            <h2 className="mt-1 text-xl font-semibold tracking-tight text-slate-900 sm:text-2xl">
               Your certification cockpit
             </h2>
-            <p className="mt-2 max-w-xl text-sm text-white/50">
-              <AcronymTooltip term="CEC" /> progress toward your renewal target, discipline mix,
-              and the next courses that close your gaps.
+            <p className="mt-2 max-w-xl text-sm text-slate-600">
+              <AcronymTooltip term="CEC" /> progress toward your renewal target, discipline mix, and
+              the next courses that close your gaps.
             </p>
             {data.some_cecs_estimated ? (
-              <p className="mt-3 max-w-xl text-xs leading-relaxed text-amber-200/80">
-                Some completed courses have no CEC hours stored in the catalogue — each counts as{' '}
-                1 CEC toward this summary until hours are set in admin.
+              <p className="mt-3 max-w-xl text-xs leading-relaxed text-amber-800">
+                Some completed courses have no CEC hours stored in the catalogue — each counts as 1
+                CEC toward this summary until hours are set in admin.
               </p>
             ) : null}
           </div>
           {data.renewal_urgent && data.days_until_expiry !== null ? (
-            <div className="flex items-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-2 text-amber-100">
+            <div className="flex items-center gap-2 rounded-xl border border-amber-300 bg-amber-50 px-4 py-2 text-amber-900">
               <AlertTriangle className="h-4 w-4 shrink-0" />
               <span className="text-xs font-medium">
                 {data.days_until_expiry < 0
@@ -191,13 +185,13 @@ export function RenewalCockpit() {
               totalCecLifetime={data.cec_earned_lifetime}
               cycleLabel={cycleLabel}
             />
-            <div className="w-full max-w-[220px] space-y-2 text-center text-xs text-white/45 lg:text-left">
+            <div className="w-full max-w-[220px] space-y-2 text-center text-xs text-slate-500 lg:text-left">
               {data.has_renewal_expiry && data.renewal_expiry_date ? (
                 <p className="flex items-center justify-center gap-2 lg:justify-start">
-                  <Calendar className="h-3.5 w-3.5 text-white/35" />
+                  <Calendar className="h-3.5 w-3.5 text-slate-400" />
                   <span>
                     Renewal due{' '}
-                    <span className="text-white/80">
+                    <span className="text-slate-800">
                       {new Date(data.renewal_expiry_date + 'T12:00:00').toLocaleDateString(
                         'en-AU',
                         {
@@ -214,7 +208,7 @@ export function RenewalCockpit() {
                   Add your IICRC renewal date in{' '}
                   <Link
                     href="/dashboard/student/profile"
-                    className="text-[#7ec5ff] underline-offset-2 hover:underline"
+                    className="text-[#146fc2] underline-offset-2 hover:underline"
                   >
                     profile
                   </Link>{' '}
@@ -226,7 +220,7 @@ export function RenewalCockpit() {
                   Link your{' '}
                   <Link
                     href="/dashboard/student/profile"
-                    className="text-[#7ec5ff] underline-offset-2 hover:underline"
+                    className="text-[#146fc2] underline-offset-2 hover:underline"
                   >
                     IICRC member number
                   </Link>{' '}
@@ -238,12 +232,12 @@ export function RenewalCockpit() {
 
           <div className="space-y-6">
             <div>
-              <h3 className="text-[11px] font-semibold tracking-[0.18em] text-white/35 uppercase">
+              <h3 className="text-[11px] font-semibold tracking-[0.18em] text-slate-400 uppercase">
                 Discipline mix (this view)
               </h3>
               <div className="mt-4 space-y-3">
                 {sortedDisc.length === 0 ? (
-                  <p className="text-sm text-white/40">
+                  <p className="text-sm text-slate-500">
                     Complete a course with <AcronymTooltip term="CEC" /> hours to see your mix here.
                   </p>
                 ) : (
@@ -255,12 +249,15 @@ export function RenewalCockpit() {
             </div>
 
             <div>
-              <h3 className="text-[11px] font-semibold tracking-[0.18em] text-white/35 uppercase">
+              <h3 className="text-[11px] font-semibold tracking-[0.18em] text-slate-400 uppercase">
                 Suggested next courses
               </h3>
-              <div className="mt-4 flex gap-4 overflow-x-auto pb-2" style={{ scrollbarWidth: 'thin' }}>
+              <div
+                className="mt-4 flex gap-4 overflow-x-auto pb-2"
+                style={{ scrollbarWidth: 'thin' }}
+              >
                 {data.suggested_courses.length === 0 ? (
-                  <p className="text-sm text-white/40">
+                  <p className="text-sm text-slate-500">
                     No catalogue matches right now — browse all courses when you are ready.
                   </p>
                 ) : (
