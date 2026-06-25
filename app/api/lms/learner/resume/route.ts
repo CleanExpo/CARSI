@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { verifySessionToken } from '@/lib/auth/session-jwt';
+import {
+  getBearerAuthorizationFromRequest,
+  getSessionClaimsFromRequest,
+} from '@/lib/server/auth-from-request';
 import { getResumeSnapshotForStudent } from '@/lib/server/learner-dashboard-data';
 import { getUpstreamBaseUrl } from '@/lib/server/upstream-api';
 
@@ -8,20 +11,17 @@ import { getUpstreamBaseUrl } from '@/lib/server/upstream-api';
  * GET — best “continue where you left off” lesson for the signed-in learner.
  */
 export async function GET(request: NextRequest) {
-  const auth = request.headers.get('authorization');
-  if (!auth?.startsWith('Bearer ')) {
-    return NextResponse.json({ detail: 'Unauthorized' }, { status: 401 });
-  }
-  const claims = await verifySessionToken(auth.slice(7));
+  const claims = await getSessionClaimsFromRequest(request);
   if (!claims) {
-    return NextResponse.json({ detail: 'Invalid token' }, { status: 401 });
+    return NextResponse.json({ detail: 'Unauthorized' }, { status: 401 });
   }
 
   const upstream = getUpstreamBaseUrl();
   if (upstream) {
+    const auth = getBearerAuthorizationFromRequest(request);
     const url = `${upstream.replace(/\/$/, '')}/api/lms/learner/resume`;
     const res = await fetch(url, {
-      headers: { authorization: auth, cookie: request.headers.get('cookie') ?? '' },
+      headers: { authorization: auth ?? '', cookie: request.headers.get('cookie') ?? '' },
       cache: 'no-store',
     });
     const contentType = res.headers.get('content-type') || 'application/json';
