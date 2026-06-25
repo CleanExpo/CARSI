@@ -4,6 +4,7 @@ import {
   buildCompletionCertificatePdf,
   completionCertificateDataFromEnrollment,
 } from '@/lib/server/certificate-pdf';
+import { resolveLmsCourseCecHours } from '@/lib/server/course-cec-hours';
 
 /** Public verification JSON (matches CredentialVerificationCard + certificate preview). */
 export type PublicCredentialJson = {
@@ -55,7 +56,7 @@ export async function getPublicCredentialJson(
     student_name: studentName,
     course_title: row.course.title,
     iicrc_discipline: disc,
-    cec_hours: Number(row.course.cecHours ?? 0),
+    cec_hours: resolveLmsCourseCecHours(row.course) ?? 0,
     issued_date: issued.toISOString().slice(0, 10),
     issuing_organisation: 'CARSI Learning',
     verification_url: `${origin.replace(/\/$/, '')}/verify/credential/${row.id}`,
@@ -86,6 +87,9 @@ export async function getPublicCredentialPdfBuffer(credentialId: string): Promis
           slug: true,
           iicrcDiscipline: true,
           cecHours: true,
+          shortDescription: true,
+          description: true,
+          meta: true,
           durationHours: true,
           level: true,
         },
