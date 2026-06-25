@@ -71,7 +71,9 @@
     "db:analyze-module-mismatch": "npx tsx scripts/analyze-module-title-mismatch.ts",
     "db:sync-specialty-modules": "npx tsx scripts/sync-specialty-modules-from-collection-txt.ts",
     "db:seed-specialty-collection-txt": "npx tsx scripts/seed-carsi-specialty-courses-collection-txt.ts",
-    "db:strip-ai-vendor-refs": "npx tsx scripts/strip-ai-vendor-references-from-lms.ts"
+    "db:strip-ai-vendor-refs": "npx tsx scripts/strip-ai-vendor-references-from-lms.ts",
+    "ccw:scrape:plan": "npx tsx scripts/scrape-ccw-products.ts --plan",
+    "ccw:scrape": "npx tsx scripts/scrape-ccw-products.ts"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.3",

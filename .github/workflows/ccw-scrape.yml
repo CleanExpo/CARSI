@@ -1,0 +1,111 @@
+name: Scrape CCW products
+
+# Manual "Run workflow" button (Actions tab → Scrape CCW products → Run workflow).
+# Runs the scraper on GitHub's runners — which have open outbound internet — then
+# opens a PR (and uploads an artifact) with the populated data/seed/ccw-products.json.
+# Shopify stores (like ccwonline.com.au) use the products.json + SDS-page engine.
+on:
+  # Pushing a change to .github/ccw-run.txt triggers a fresh scrape on the
+  # pushed branch's code — a reliable alternative to the "Run workflow" button.
+  push:
+    paths:
+      - ".github/ccw-run.txt"
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: "Store/index URL to scrape"
+        required: true
+        default: "https://ccwonline.com.au/"
+      max:
+        description: "Max number of products to fetch"
+        required: false
+        default: "250"
+      fetch_sds:
+        description: "Also download each SDS PDF to extract text + hazards (slower)"
+        type: boolean
+        default: false
+      sds_page:
+        description: "SDS index page URL (blank = auto-discover / /blogs/safety-data-sheets)"
+        required: false
+        default: ""
+      product_match:
+        description: "Advanced (jina fallback): regex a link must match to be a product page"
+        required: false
+        default: ""
+      sds_match:
+        description: "Advanced (jina fallback): regex for SDS document links"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run CCW scrape
+        env:
+          JINA_API_KEY: ${{ secrets.JINA_API_KEY }}
+          BASE_URL: ${{ inputs.base_url || 'https://ccwonline.com.au/' }}
+          MAX: ${{ inputs.max || '250' }}
+          FETCH_SDS: ${{ inputs.fetch_sds || 'false' }}
+          SDS_PAGE: ${{ inputs.sds_page || '' }}
+          PRODUCT_MATCH: ${{ inputs.product_match || '' }}
+          SDS_MATCH: ${{ inputs.sds_match || '' }}
+        run: |
+          ARGS=(--url "$BASE_URL" --max "$MAX")
+          if [ "$FETCH_SDS" = "true" ]; then ARGS+=(--fetch-sds); fi
+          if [ -n "$SDS_PAGE" ]; then ARGS+=(--sds-page "$SDS_PAGE"); fi
+          if [ -n "$PRODUCT_MATCH" ]; then ARGS+=(--product-match "$PRODUCT_MATCH"); fi
+          if [ -n "$SDS_MATCH" ]; then ARGS+=(--sds-match "$SDS_MATCH"); fi
+          npx tsx scripts/scrape-ccw-products.ts "${ARGS[@]}"
+
+      - name: Upload results as downloadable artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ccw-products
+          path: data/seed/ccw-products.json
+          if-no-files-found: warn
+
+      - name: Open a PR with the scraped data
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE_URL: ${{ inputs.base_url || 'https://ccwonline.com.au/' }}
+        run: |
+          if git diff --quiet -- data/seed/ccw-products.json; then
+            echo "No changes to data/seed/ccw-products.json — nothing to commit."
+            exit 0
+          fi
+          BRANCH="ccw-scrape/results-${{ github.run_id }}-${{ github.run_attempt }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          git add data/seed/ccw-products.json
+          git commit -m "data(ccw): scraped products + SDS from ${BASE_URL}"
+          git push -u origin "$BRANCH"
+          COMPARE_URL="${{ github.server_url }}/${{ github.repository }}/pull/new/${BRANCH}"
+          if gh pr create --base main --head "$BRANCH" \
+            --title "CCW scrape results" \
+            --body "Automated CCW product + SDS scrape from ${BASE_URL}. Review the data file and merge if it looks right." \
+            --draft; then
+            echo "Opened a draft PR for branch $BRANCH."
+          else
+            echo "::warning::Could not auto-open a PR (enable Settings → Actions → General → 'Allow GitHub Actions to create and approve pull requests')."
+            echo "Open the PR yourself in one click: $COMPARE_URL"
+          fi
+          echo "### CCW scrape complete ✅" >> "$GITHUB_STEP_SUMMARY"
+          echo "Results committed to branch \`$BRANCH\`." >> "$GITHUB_STEP_SUMMARY"
+          echo "If no PR opened automatically, [open one here]($COMPARE_URL)." >> "$GITHUB_STEP_SUMMARY"

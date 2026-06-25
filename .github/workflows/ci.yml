@@ -170,6 +170,17 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-playwright-
 
+      # GitHub-hosted runner images sometimes ship broken Microsoft apt sources
+      # (packages.microsoft.com returns 403), which makes `apt-get update` fail
+      # and breaks Playwright's --with-deps / install-deps. Drop those sources so
+      # the remaining Ubuntu mirrors install Chromium's system deps cleanly.
+      - name: Remove broken Microsoft apt sources
+        run: |
+          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list \
+                     /etc/apt/sources.list.d/microsoft-prod.sources \
+                     /etc/apt/sources.list.d/azure-cli.list \
+                     /etc/apt/sources.list.d/azure-cli.sources || true
+
       - name: Install Playwright browsers
         if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps chromium
@@ -261,6 +272,15 @@ jobs:
           key: ${{ runner.os }}-playwright-${{ hashFiles('package.json') }}
           restore-keys: |
             ${{ runner.os }}-playwright-
+
+      # See the E2E job: drop broken Microsoft apt sources so apt-get update
+      # (run by Playwright's --with-deps / install-deps) does not 403.
+      - name: Remove broken Microsoft apt sources
+        run: |
+          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list \
+                     /etc/apt/sources.list.d/microsoft-prod.sources \
+                     /etc/apt/sources.list.d/azure-cli.list \
+                     /etc/apt/sources.list.d/azure-cli.sources || true
 
       - name: Install Playwright browsers
         if: steps.a11y-playwright-cache.outputs.cache-hit != 'true'
