@@ -13,8 +13,8 @@ services:
       deploy_on_push: true
 
     dockerfile_path: Dockerfile
-    # Must match Dockerfile WORKDIR /app — do not use `npm start` (it bypasses this script).
-    run_command: /app/docker-entrypoint.sh
+    # Docker: /app/scripts/docker-entrypoint.sh — Buildpack: npm start (uses scripts/start-server.sh)
+    run_command: npm start
     http_port: 8080
     source_dir: /
     instance_count: 2

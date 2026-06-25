@@ -1,8 +1,6 @@
 #!/bin/sh
 set -e
 
-# DigitalOcean App Platform may still invoke `npm start`; Dockerfile ENTRYPOINT/CMD should
-# prefer this script. Migrations are opt-in — schema was already applied via `prisma migrate deploy`.
 normalize_do_database_url() {
   if [ -z "$DATABASE_URL" ]; then
     return
@@ -28,11 +26,10 @@ normalize_do_database_url
 if [ "$PRISMA_MIGRATE_ON_START" = "true" ] && [ -n "$DATABASE_URL" ] && [ -x ./node_modules/.bin/prisma ]; then
   echo "PRISMA_MIGRATE_ON_START=true — running prisma migrate deploy..."
   if ! ./node_modules/.bin/prisma migrate deploy; then
-    echo "WARN: prisma migrate deploy failed; starting app anyway (set PRISMA_MIGRATE_ON_START=false to skip)."
+    echo "WARN: prisma migrate deploy failed; starting app anyway."
   fi
 else
   echo "Skipping prisma migrate on start (PRISMA_MIGRATE_ON_START is not true)."
 fi
 
-echo "Starting Next.js server on port ${PORT:-8080}..."
-exec node server.js
+exec sh ./scripts/start-server.sh
