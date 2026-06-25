@@ -29,7 +29,32 @@ export interface CertificatePreviewProps {
 function disciplineCode(raw?: string): string {
   const c = raw?.trim().toUpperCase();
   if (!c || c === '—' || c === '-') return 'GEN';
-  return c;
+  const match = c.match(/\b(WRT|CRT|ASD|AMRT|FSRT|OCT|CCT)\b/);
+  return match?.[1] ?? c.split('/')[0]?.trim() ?? 'GEN';
+}
+
+function ProgrammeDetail({
+  label,
+  value,
+  accent,
+}: {
+  label: string;
+  value: string;
+  accent?: string;
+}) {
+  return (
+    <div className="flex min-w-[5.5rem] flex-col items-center px-3 text-center sm:min-w-[6.5rem] sm:px-4">
+      <span className="text-[8px] font-medium tracking-[0.14em] text-white/38 uppercase sm:text-[9px]">
+        {label}
+      </span>
+      <span
+        className="mt-1.5 text-[10px] font-medium leading-snug text-white/88 sm:text-[11px]"
+        style={accent ? { color: accent } : undefined}
+      >
+        {value}
+      </span>
+    </div>
+  );
 }
 
 export function CertificatePreview({
@@ -48,22 +73,20 @@ export function CertificatePreview({
 }: CertificatePreviewProps) {
   const discCode = disciplineCode(discipline);
   const discColor = DISCIPLINE_COLORS[discCode] ?? '#2490ed';
-  const discLabel = IICRC_DISCIPLINE_LONG[discCode] ?? discipline;
+  const discLabel =
+    discCode === 'GEN'
+      ? 'General restoration training'
+      : (IICRC_DISCIPLINE_LONG[discCode] ?? discipline);
   const issued = issuedDate ?? completedDate;
   const credentialRef = credentialId ? formatCredentialRef(credentialId) : 'CARSI-EXAMPLE000';
   const cecValue =
     cecHours != null && cecHours > 0
-      ? `${cecHours % 1 === 0 ? cecHours : cecHours.toFixed(1)} CEC hours`
+      ? `${cecHours % 1 === 0 ? cecHours : cecHours.toFixed(1)} IICRC CEC hour${cecHours === 1 ? '' : 's'}`
       : 'Per course listing';
-  const metrics = [
-    { label: 'Completed', value: completedDate },
-    { label: 'CEC credits', value: cecValue },
-    { label: 'Programme level', value: courseLevel ?? 'Professional development' },
-  ] as const;
 
   return (
     <div
-      className="relative mx-auto w-full max-w-2xl select-none"
+      className="relative mx-auto w-full max-w-6xl select-none"
       role="img"
       aria-label={`Certificate of Completion for ${studentName} — ${courseName}`}
     >
@@ -74,184 +97,178 @@ export function CertificatePreview({
         }}
       >
         <div
-          className="relative rounded-sm bg-[#0a0e14] px-6 py-8 text-center sm:px-10 sm:py-10"
+          className="relative flex flex-col overflow-hidden rounded-sm bg-[#0a0e14] text-center"
           style={{
             border: `1.5px solid ${discColor}66`,
-            boxShadow: '0 12px 48px rgba(0,0,0,0.5)',
+            boxShadow: '0 16px 56px rgba(0,0,0,0.4)',
+            aspectRatio: '842 / 595',
           }}
         >
+          {/* Corner brackets */}
           <div
-            className="absolute top-4 left-4 h-5 w-5 border-t-2 border-l-2"
+            className="absolute top-3 left-3 h-4 w-4 border-t-2 border-l-2 sm:top-4 sm:left-4 sm:h-5 sm:w-5"
             style={{ borderColor: discColor }}
             aria-hidden
           />
           <div
-            className="absolute top-4 right-4 h-5 w-5 border-t-2 border-r-2"
+            className="absolute top-3 right-3 h-4 w-4 border-t-2 border-r-2 sm:top-4 sm:right-4 sm:h-5 sm:w-5"
             style={{ borderColor: discColor }}
             aria-hidden
           />
           <div
-            className="absolute bottom-4 left-4 h-5 w-5 border-b-2 border-l-2"
+            className="absolute bottom-3 left-3 h-4 w-4 border-b-2 border-l-2 sm:bottom-4 sm:left-4 sm:h-5 sm:w-5"
             style={{ borderColor: discColor }}
             aria-hidden
           />
           <div
-            className="absolute right-4 bottom-4 h-5 w-5 border-r-2 border-b-2"
+            className="absolute right-3 bottom-3 h-4 w-4 border-r-2 border-b-2 sm:right-4 sm:bottom-4 sm:h-5 sm:w-5"
             style={{ borderColor: discColor }}
             aria-hidden
           />
 
-          <div className="mx-auto mb-3 flex justify-center">
+          {/* Main award body */}
+          <div className="flex flex-1 flex-col items-center justify-center px-6 pt-5 pb-3 sm:px-10 sm:pt-6">
             <Image
               src="/logo/logo1.png"
               alt=""
-              width={168}
-              height={48}
-              className="h-11 w-auto max-w-[168px] object-contain"
+              width={198}
+              height={92}
+              className="mb-2 h-[92px] w-auto max-w-[198px] object-contain sm:h-[96px] sm:max-w-[208px]"
               priority
               aria-hidden
             />
-          </div>
-          <p className="mb-4 text-[10px] tracking-wide text-white/40">
-            Centre for Applied Restoration Science &amp; Industry
-          </p>
+            <p className="mb-4 text-[9px] tracking-[0.04em] text-white/38 sm:text-[10px]">
+              Centre for Applied Restoration Science &amp; Industry
+            </p>
 
-          <h2
-            className="mb-1 text-2xl font-light tracking-wide text-white/95 sm:text-[1.65rem]"
-            style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
-          >
-            Certificate of Completion
-          </h2>
-          <p className="mb-3 text-[11px] text-white/45">Official record of achievement</p>
-          <div className="mx-auto mb-6 h-px w-28" style={{ backgroundColor: discColor }} />
-
-          <p className="mb-2 text-[10px] font-semibold tracking-[0.12em] text-white/45 uppercase">
-            This is to certify that
-          </p>
-          <p
-            className="mb-3 text-xl text-[#7ec5ff] sm:text-2xl"
-            style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontStyle: 'italic' }}
-          >
-            {studentName}
-          </p>
-          <p className="mx-auto mb-1 max-w-md text-xs leading-relaxed text-white/50">
-            has demonstrated the required competency and
-            <br />
-            successfully completed the accredited programme
-          </p>
-          <p
-            className="mx-auto mt-3 mb-6 max-w-lg text-base font-semibold text-white/92 sm:text-lg"
-            style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
-          >
-            {courseName}
-          </p>
-
-          <div
-            className="mx-auto mb-5 max-w-lg overflow-hidden rounded-sm border text-left"
-            style={{ borderColor: `${discColor}55`, backgroundColor: 'rgba(14,18,26,0.95)' }}
-          >
-            <div
-              className="flex items-center justify-between gap-3 px-4 py-2.5 sm:px-5"
-              style={{ backgroundColor: `${discColor}2e` }}
+            <h2
+              className="text-[1.35rem] font-light tracking-[0.02em] text-white/96 sm:text-[1.65rem]"
+              style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
             >
-              <span className="text-[10px] font-bold tracking-[0.14em] text-white/55 uppercase">
-                Programme record
-              </span>
-              <span
-                className="shrink-0 rounded-sm px-2.5 py-1 text-[10px] font-bold tracking-wider text-white"
-                style={{ backgroundColor: discColor }}
-              >
-                {discCode}
-              </span>
-            </div>
-            <p className="border-b border-white/6 px-4 py-2 text-left text-xs text-white/75 sm:px-5">
-              {discLabel}
+              Certificate of Completion
+            </h2>
+            <p className="mt-1 text-[10px] text-white/42">Official record of achievement</p>
+            <div
+              className="my-4 h-px w-20 sm:my-5 sm:w-24"
+              style={{ backgroundColor: `${discColor}cc` }}
+            />
+
+            <p className="mb-2 text-[9px] font-semibold tracking-[0.16em] text-white/42 uppercase sm:text-[10px]">
+              This is to certify that
             </p>
-            <div className="grid grid-cols-3 divide-x divide-white/6">
-              {metrics.map((m) => (
-                <div
-                  key={m.label}
-                  className="px-3 py-3 sm:px-4"
-                >
-                  <p className="text-[9px] font-semibold tracking-wide text-white/40 uppercase">
-                    {m.label}
-                  </p>
-                  <p className="mt-1 text-xs font-semibold leading-snug text-white/92 sm:text-sm">
-                    {m.value}
-                  </p>
-                </div>
-              ))}
-            </div>
-            <p className="border-t border-white/6 px-4 py-2.5 font-mono text-[10px] text-white/45 sm:px-5">
-              Credential {credentialRef}
+            <p
+              className="mb-3 max-w-2xl text-[1.45rem] leading-tight text-[#8fd0ff] sm:mb-4 sm:text-[1.75rem]"
+              style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontStyle: 'italic' }}
+            >
+              {studentName}
+            </p>
+            <p className="mb-3 max-w-lg text-[11px] leading-relaxed text-white/48 sm:text-xs">
+              has demonstrated the required competency and successfully completed the accredited
+              programme
+            </p>
+            <p
+              className="max-w-2xl text-sm font-semibold leading-snug text-white/93 sm:text-base"
+              style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
+            >
+              {courseName}
             </p>
           </div>
 
-          <p
-            className="mx-auto mb-6 max-w-lg rounded-sm px-4 py-2.5 text-[11px] leading-relaxed text-white/60"
-            style={{ backgroundColor: `${discColor}22` }}
+          {/* Programme details — integrated metadata band */}
+          <div
+            className="mx-6 border-t sm:mx-10"
+            style={{ borderColor: `${discColor}33` }}
           >
-            This programme is designed for IICRC Continuing Education Credits (CECs) where
-            applicable. Maintain this certificate with your renewal records.
-          </p>
+            <div className="py-4 sm:py-5">
+              <p className="mb-3 text-[8px] font-semibold tracking-[0.2em] text-white/35 uppercase sm:text-[9px]">
+                Programme details
+              </p>
+              <div className="flex flex-wrap items-start justify-center divide-x divide-white/10">
+                <ProgrammeDetail label="Discipline" value={discLabel} accent={discColor} />
+                <ProgrammeDetail label="Completed" value={completedDate ?? '—'} />
+                <ProgrammeDetail label="CEC credits" value={cecValue} />
+                <ProgrammeDetail
+                  label="Programme level"
+                  value={courseLevel ?? 'Professional development'}
+                />
+              </div>
+              <p className="mt-3 font-mono text-[9px] tracking-wide text-white/38 sm:text-[10px]">
+                Credential {credentialRef}
+              </p>
+              <p className="mx-auto mt-3 max-w-xl text-[9px] leading-relaxed text-white/42 italic sm:text-[10px]">
+                Designed for IICRC Continuing Education Credits (CECs) where applicable. Retain this
+                certificate with your renewal records.
+              </p>
+            </div>
+          </div>
 
-          <div className="mx-auto grid max-w-lg grid-cols-3 items-end gap-4 border-t border-white/8 pt-6 text-center">
-            <div>
-              <p className="text-[10px] font-semibold tracking-wide text-white/40 uppercase">
+          {/* Official footer band */}
+          <div
+            className="grid shrink-0 grid-cols-[1fr_auto_1fr] items-end gap-2 border-t px-6 py-4 sm:gap-4 sm:px-10 sm:py-5"
+            style={{ borderColor: 'rgba(255,255,255,0.07)' }}
+          >
+            <div className="text-left">
+              <p className="text-[8px] font-semibold tracking-[0.14em] text-white/38 uppercase sm:text-[9px]">
                 Date issued
               </p>
-              <p className="mt-1 text-xs text-white/75">{issued}</p>
+              <p className="mt-1 text-[10px] text-white/72 sm:text-[11px]">{issued}</p>
+              <p className="mt-2 text-[8px] text-white/28 sm:text-[9px]">CARSI Learning</p>
             </div>
-            <div className="flex flex-col items-center justify-center">
+
+            <div className="flex flex-col items-center px-2">
               <div
-                className="relative flex h-[62px] w-[62px] items-center justify-center rounded-full border-2 bg-[#0a0e14]"
-                style={{ borderColor: `${discColor}99` }}
+                className="relative flex h-[54px] w-[54px] items-center justify-center rounded-full border-2 bg-[#0a0e14] sm:h-[60px] sm:w-[60px]"
+                style={{ borderColor: `${discColor}88` }}
               >
                 <div
                   className="absolute inset-[5px] rounded-full border"
-                  style={{ borderColor: `${discColor}44` }}
+                  style={{ borderColor: `${discColor}40` }}
                   aria-hidden
                 />
                 <div className="relative text-center leading-tight">
                   <span
-                    className="block text-[10px] font-extrabold tracking-[0.16em]"
+                    className="block text-[9px] font-extrabold tracking-[0.14em] sm:text-[10px]"
                     style={{ color: discColor }}
                   >
                     CARSI
                   </span>
-                  <span className="block text-[7px] font-bold tracking-[0.18em] text-white/80">
+                  <span className="block text-[6px] font-bold tracking-[0.16em] text-white/78 sm:text-[7px]">
                     VERIFIED
                   </span>
-                  <span className="block text-[6px] tracking-[0.12em] text-white/45 uppercase">
+                  <span className="block text-[5px] tracking-[0.1em] text-white/40 uppercase sm:text-[6px]">
                     Completion
-                  </span>
-                  <span
-                    className="mt-0.5 block text-[6px] font-bold tracking-wider uppercase"
-                    style={{ color: discColor }}
-                  >
-                    IICRC CEC
                   </span>
                 </div>
               </div>
+              <p className="mt-2 max-w-[9rem] text-center text-[7px] leading-snug text-white/30 sm:text-[8px]">
+                IICRC CEC accredited · carsi.com.au
+              </p>
             </div>
-            <div>
-              <p className="text-[10px] font-semibold tracking-wide text-white/40 uppercase">
+
+            <div className="text-right">
+              <p className="text-[8px] font-semibold tracking-[0.14em] text-white/38 uppercase sm:text-[9px]">
                 Authorised signatory
               </p>
-              <p
-                className="mt-1 text-lg text-white/85"
-                style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontStyle: 'italic' }}
-              >
-                Philip McGurk
-              </p>
-              <div className="mx-auto mt-1 mb-1 h-px w-24 bg-white/20" />
-              <p className="text-[10px] tracking-wide text-white/40 uppercase">Training Director</p>
+              <div className="mt-2 inline-block text-right">
+                <p
+                  className="text-base text-white/88 sm:text-lg"
+                  style={{
+                    fontFamily: 'Georgia, "Times New Roman", serif',
+                    fontStyle: 'italic',
+                  }}
+                >
+                  Philip McGurk
+                </p>
+                <div className="ml-auto mt-1 h-px w-24 bg-white/18" />
+                <p className="mt-1 text-[8px] tracking-[0.08em] text-white/38 uppercase sm:text-[9px]">
+                  Training Director
+                </p>
+                <p className="mt-0.5 text-[8px] text-white/28 sm:text-[9px]">
+                  Centre for Applied Restoration Science &amp; Industry
+                </p>
+              </div>
             </div>
           </div>
-
-          <p className="mt-5 text-[10px] text-white/30">
-            CARSI Learning · carsi.com.au · IICRC CEC accredited restoration courses
-          </p>
         </div>
       </div>
     </div>
