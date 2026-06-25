@@ -523,7 +523,7 @@ export function LearnCourseShell({ slug }: { slug: string }) {
 
   if (loadingCurriculum) {
     return (
-      <div className="flex min-h-[50vh] items-center justify-center gap-2 text-white/60">
+      <div className="flex min-h-[50vh] items-center justify-center gap-2 text-slate-500">
         <Loader2 className="h-5 w-5 animate-spin" />
         Loading course…
       </div>
@@ -532,9 +532,9 @@ export function LearnCourseShell({ slug }: { slug: string }) {
 
   if (curriculumError || !curriculum) {
     return (
-      <div className="mx-auto max-w-lg rounded-xl border border-white/10 bg-white/3 p-8 text-center">
-        <p className="text-white/80">{curriculumError ?? 'Course unavailable'}</p>
-        <Button asChild variant="outline" className="mt-4 border-white/20 text-white">
+      <div className="mx-auto max-w-lg rounded-xl border border-slate-200 bg-white p-8 text-center">
+        <p className="text-slate-800">{curriculumError ?? 'Course unavailable'}</p>
+        <Button asChild variant="outline" className="mt-4 border-slate-300 text-slate-700">
           <Link href="/dashboard/student">Back to My Learning</Link>
         </Button>
       </div>
@@ -543,9 +543,9 @@ export function LearnCourseShell({ slug }: { slug: string }) {
 
   if (curriculum.modules.length === 0 || flatLessons.length === 0) {
     return (
-      <div className="mx-auto max-w-lg rounded-xl border border-white/10 bg-white/3 p-8 text-center">
-        <p className="text-white/80">This course does not have any lessons yet.</p>
-        <Button asChild variant="outline" className="mt-4 border-white/20 text-white">
+      <div className="mx-auto max-w-lg rounded-xl border border-slate-200 bg-white p-8 text-center">
+        <p className="text-slate-800">This course does not have any lessons yet.</p>
+        <Button asChild variant="outline" className="mt-4 border-slate-300 text-slate-700">
           <Link href="/dashboard/student">Back to My Learning</Link>
         </Button>
       </div>
@@ -573,11 +573,11 @@ export function LearnCourseShell({ slug }: { slug: string }) {
 
       {!online ? (
         <div
-          className="rounded-xl border border-amber-500/35 bg-amber-500/10 px-4 py-3 text-sm text-amber-50/95"
+          className="rounded-xl border border-amber-500/35 bg-amber-500/10 px-4 py-3 text-sm text-amber-900"
           role="status"
         >
-          <span className="font-semibold text-amber-200">You&apos;re offline.</span>{' '}
-          <span className="text-amber-100/90">
+          <span className="font-semibold text-amber-800">You&apos;re offline.</span>{' '}
+          <span className="text-amber-800/90">
             Lessons you opened while online may load from your browser cache (PWA). Progress sync
             needs a connection — reconnect when you can.
           </span>
@@ -585,9 +585,9 @@ export function LearnCourseShell({ slug }: { slug: string }) {
       ) : null}
 
       {online && !reliabilityTipDismissed ? (
-        <div className="flex items-start justify-between gap-3 rounded-xl border border-white/10 bg-white/4 px-4 py-3 text-xs leading-relaxed text-white/55">
+        <div className="flex items-start justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-xs leading-relaxed text-slate-500">
           <p>
-            <span className="font-medium text-white/70">Reliability tip · </span>
+            <span className="font-medium text-slate-600">Reliability tip · </span>
             Open each lesson once while you have signal so your installed PWA can cache lesson API
             responses and static assets — helpful for patchy field coverage. PDFs and videos cache when
             your browser fetches them.
@@ -602,7 +602,7 @@ export function LearnCourseShell({ slug }: { slug: string }) {
               }
               setReliabilityTipDismissed(true);
             }}
-            className="shrink-0 rounded-md border border-white/15 px-2 py-1 text-[10px] font-medium text-white/50 uppercase tracking-wide hover:border-white/25 hover:text-white/75"
+            className="shrink-0 rounded-md border border-slate-300 px-2 py-1 text-[10px] font-medium text-slate-500 uppercase tracking-wide hover:border-slate-300 hover:text-slate-700"
           >
             Dismiss
           </button>
@@ -611,16 +611,16 @@ export function LearnCourseShell({ slug }: { slug: string }) {
 
       <div className="flex min-h-[calc(100vh-6rem)] w-full max-w-none flex-col gap-8 lg:flex-row lg:gap-10">
       <aside className="w-full shrink-0 lg:w-[min(100%,280px)]">
-        <div className="rounded-2xl border border-white/10 bg-white/3 p-4 backdrop-blur-sm lg:sticky lg:top-6">
-          <div className="mb-5 space-y-2 border-b border-white/8 pb-4">
+        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm lg:sticky lg:top-6">
+          <div className="mb-5 space-y-2 border-b border-slate-200 pb-4">
             <Link
               href="/dashboard/student"
-              className="inline-flex items-center gap-1.5 text-xs font-medium tracking-wider text-[#7ec5ff] uppercase hover:underline"
+              className="inline-flex items-center gap-1.5 text-xs font-medium tracking-wider text-[#146fc2] uppercase hover:underline"
             >
               <Home className="h-3.5 w-3.5" aria-hidden />
               My Learning
             </Link>
-            <h1 className="text-balance text-lg font-semibold leading-snug text-white">
+            <h1 className="text-balance text-lg font-semibold leading-snug text-slate-900">
               {curriculum.course.title}
             </h1>
           </div>
@@ -633,8 +633,8 @@ export function LearnCourseShell({ slug }: { slug: string }) {
               const moduleOverviewActive = view === 'module' && activeModuleId === mod.id;
               return (
                 <div key={mod.id}>
-                  <p className="mb-2 flex items-center gap-2 text-[10px] font-semibold tracking-widest text-white/40 uppercase">
-                    <span className="font-mono text-white/55">M{modNum}</span>
+                  <p className="mb-2 flex items-center gap-2 text-[10px] font-semibold tracking-widest text-slate-400 uppercase">
+                    <span className="font-mono text-slate-500">M{modNum}</span>
                     <span className="min-w-0 truncate">{mod.title}</span>
                   </p>
                   <div className="mb-2">
@@ -643,15 +643,15 @@ export function LearnCourseShell({ slug }: { slug: string }) {
                       onClick={() => selectModuleOverview(mod.id)}
                       className={`flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-xs font-medium transition-colors ${
                         moduleOverviewActive
-                          ? 'bg-[#2490ed]/20 text-white ring-1 ring-[#2490ed]/30'
-                          : 'text-white/60 hover:bg-white/6 hover:text-white/90'
+                          ? 'bg-[#2490ed]/15 text-[#146fc2] ring-1 ring-[#2490ed]/30'
+                          : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900'
                       }`}
                     >
-                      <Layers className="h-3.5 w-3.5 shrink-0 text-[#7ec5ff]" aria-hidden />
+                      <Layers className="h-3.5 w-3.5 shrink-0 text-[#146fc2]" aria-hidden />
                       <span>Module overview</span>
                     </button>
                   </div>
-                  <ul className="space-y-0.5 border-l border-white/10 pl-3">
+                  <ul className="space-y-0.5 border-l border-slate-200 pl-3">
                     {mod.lessons.map((les) => {
                       const active = view === 'lesson' && les.id === activeLessonId;
                       return (
@@ -661,15 +661,15 @@ export function LearnCourseShell({ slug }: { slug: string }) {
                             onClick={() => selectLesson(les.id)}
                             className={`flex w-full items-start gap-2 rounded-md px-2 py-2 text-left text-sm transition-colors ${
                               active
-                                ? 'bg-[#2490ed]/20 text-white'
-                                : 'text-white/75 hover:bg-white/6'
+                                ? 'bg-[#2490ed]/15 text-[#146fc2]'
+                                : 'text-slate-700 hover:bg-slate-100'
                             }`}
                           >
                             <span className="mt-0.5 shrink-0">
                               {les.completed ? (
                                 <Check className="h-4 w-4 text-emerald-400" aria-hidden />
                               ) : (
-                                <span className="block h-4 w-4 rounded-full border border-white/25" />
+                                <span className="block h-4 w-4 rounded-full border border-slate-300" />
                               )}
                             </span>
                             <span className="min-w-0 leading-snug">{les.title}</span>
@@ -687,7 +687,7 @@ export function LearnCourseShell({ slug }: { slug: string }) {
 
       <div className="min-w-0 flex-1">
         {view === 'module' && activeModuleId && !activeModule ? (
-          <p className="rounded-xl border border-white/10 bg-white/3 px-6 py-8 text-center text-white/70">
+          <p className="rounded-xl border border-slate-200 bg-white px-6 py-8 text-center text-slate-600">
             This module is not part of this course, or the link is out of date.
           </p>
         ) : view === 'module' && activeModule ? (
@@ -701,26 +701,26 @@ export function LearnCourseShell({ slug }: { slug: string }) {
         ) : view === 'lesson' && activeLessonId ? (
           <>
             {activeModule ? (
-              <div className="mb-6 flex flex-wrap items-center gap-2 border-b border-white/10 pb-4 text-sm text-white/50">
-                <span className="rounded-md bg-white/6 px-2 py-0.5 font-mono text-[11px] text-white/70">
+              <div className="mb-6 flex flex-wrap items-center gap-2 border-b border-slate-200 pb-4 text-sm text-slate-500">
+                <span className="rounded-md bg-slate-100 px-2 py-0.5 font-mono text-[11px] text-slate-600">
                   Module {moduleIndex}
                 </span>
                 <ChevronRight className="h-3.5 w-3.5 shrink-0 opacity-40" aria-hidden />
-                <span className="min-w-0 font-medium text-white/75">{activeModule.title}</span>
+                <span className="min-w-0 font-medium text-slate-700">{activeModule.title}</span>
               </div>
             ) : null}
 
             {loadingLesson && !lessonDetail ? (
-              <div className="flex items-center gap-2 text-white/60">
+              <div className="flex items-center gap-2 text-slate-500">
                 <Loader2 className="h-5 w-5 animate-spin" />
                 Loading lesson…
               </div>
             ) : lessonError ? (
-              <p className="text-red-300/90">{lessonError}</p>
+              <p className="text-red-600">{lessonError}</p>
             ) : lessonDetail ? (
-              <article className="rounded-2xl border border-white/8 bg-white/2 p-5 sm:p-8">
+              <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-8">
                 {loadingQuiz ? (
-                  <div className="mb-6 flex items-center gap-2 text-white/60">
+                  <div className="mb-6 flex items-center gap-2 text-slate-500">
                     <Loader2 className="h-5 w-5 animate-spin" />
                     Loading assessment…
                   </div>
@@ -732,8 +732,8 @@ export function LearnCourseShell({ slug }: { slug: string }) {
                       <p
                         className={`mt-6 rounded-lg border px-4 py-3 text-sm ${
                           quizResult.passed
-                            ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-100'
-                            : 'border-amber-500/40 bg-amber-500/10 text-amber-100'
+                            ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-800'
+                            : 'border-amber-500/40 bg-amber-500/10 text-amber-800'
                         }`}
                       >
                         Score: {quizResult.score_percent}% —{' '}
@@ -747,11 +747,11 @@ export function LearnCourseShell({ slug }: { slug: string }) {
                   resources={lessonDetail.resources}
                   footer={
                     <>
-                      <div className="mt-8 rounded-xl border border-white/10 bg-white/3 p-4 sm:p-5">
+                      <div className="mt-8 rounded-xl border border-slate-200 bg-white p-4 sm:p-5">
                         <div className="mb-2 flex items-center justify-between gap-2">
-                          <h3 className="text-sm font-semibold text-white/85">My notes</h3>
+                          <h3 className="text-sm font-semibold text-slate-800">My notes</h3>
                           {loadingNote ? (
-                            <span className="text-xs text-white/45">Loading…</span>
+                            <span className="text-xs text-slate-400">Loading…</span>
                           ) : null}
                         </div>
                         <div className="mb-2 flex flex-wrap gap-1.5">
@@ -768,7 +768,7 @@ export function LearnCourseShell({ slug }: { slug: string }) {
                               key={action}
                               type="button"
                               onClick={() => applyFormat(action)}
-                              className="rounded border border-white/12 bg-white/4 px-2 py-1 text-[11px] text-white/70 hover:border-white/25 hover:text-white"
+                              className="rounded border border-slate-200 bg-slate-50 px-2 py-1 text-[11px] text-slate-600 hover:border-slate-300 hover:text-slate-900"
                             >
                               {label}
                             </button>
@@ -780,7 +780,7 @@ export function LearnCourseShell({ slug }: { slug: string }) {
                           onChange={(e) => setNoteText(e.target.value)}
                           rows={5}
                           placeholder="Write your lesson notes here…"
-                          className="w-full resize-y rounded-lg border border-white/12 bg-black/30 px-3 py-2 text-sm text-white placeholder:text-white/35 focus:border-[#2490ed]/45 focus:outline-none"
+                          className="w-full resize-y rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#2490ed]/45 focus:outline-none focus:ring-2 focus:ring-[#2490ed]/20"
                         />
                         <div className="mt-3 flex flex-wrap items-center gap-2">
                           <Button
@@ -796,26 +796,26 @@ export function LearnCourseShell({ slug }: { slug: string }) {
                             variant="outline"
                             onClick={() => void deleteLessonNote()}
                             disabled={savingNote || deletingNote || loadingNote || !noteText.trim()}
-                            className="h-8 border-white/20 px-3 text-xs text-white/80"
+                            className="h-8 border-slate-300 px-3 text-xs text-slate-800"
                           >
                             {deletingNote ? 'Deleting…' : 'Delete note'}
                           </Button>
                           <Link
                             href="/dashboard/student/notes"
-                            className="ml-auto text-xs text-[#7ec5ff] hover:underline"
+                            className="ml-auto text-xs text-[#146fc2] hover:underline"
                           >
                             View all notes
                           </Link>
                         </div>
-                        {noteStatus ? <p className="mt-2 text-xs text-white/50">{noteStatus}</p> : null}
+                        {noteStatus ? <p className="mt-2 text-xs text-slate-500">{noteStatus}</p> : null}
                       </div>
-                      <div className="mt-8 flex flex-col gap-4 border-t border-white/10 pt-6 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="mt-8 flex flex-col gap-4 border-t border-slate-200 pt-6 sm:flex-row sm:items-center sm:justify-between">
                         <div className="flex flex-wrap gap-2">
                           <Button
                             type="button"
                             variant="outline"
                             disabled={!prevLesson}
-                            className="gap-1 border-white/20 text-white"
+                            className="gap-1 border-slate-300 text-slate-700"
                             onClick={() => prevLesson && selectLesson(prevLesson.id)}
                           >
                             <ChevronLeft className="h-4 w-4" />
@@ -825,7 +825,7 @@ export function LearnCourseShell({ slug }: { slug: string }) {
                             type="button"
                             variant="outline"
                             disabled={!nextLesson}
-                            className="gap-1 border-white/20 text-white"
+                            className="gap-1 border-slate-300 text-slate-700"
                             onClick={() => nextLesson && selectLesson(nextLesson.id)}
                           >
                             Next
@@ -838,7 +838,7 @@ export function LearnCourseShell({ slug }: { slug: string }) {
                               type="button"
                               variant="outline"
                               onClick={openLessonSharePrompt}
-                              className="gap-1.5 border-[#2490ed]/35 bg-[#2490ed]/10 text-[#7ec5ff] hover:bg-[#2490ed]/20"
+                              className="gap-1.5 border-[#2490ed]/35 bg-[#2490ed]/10 text-[#146fc2] hover:bg-[#2490ed]/20"
                             >
                               <Share2 className="h-4 w-4" aria-hidden />
                               Share progress
@@ -862,7 +862,7 @@ export function LearnCourseShell({ slug }: { slug: string }) {
             ) : null}
           </>
         ) : (
-          <p className="text-white/50">Select a module or lesson to begin.</p>
+          <p className="text-slate-500">Select a module or lesson to begin.</p>
         )}
       </div>
       </div>
