@@ -6,7 +6,6 @@ import { sendEnrollmentWelcomeEmail } from '@/lib/server/enrollment-email';
 import { enrollStudentInCourse } from '@/lib/server/enrollment-service';
 import { findOrCreateGuestUser } from '@/lib/server/guest-checkout';
 import { getFirstLessonLearnPath } from '@/lib/server/first-lesson';
-import { findCourseInExport } from '@/lib/server/local-course-checkout';
 import { getOrCreateCourseBySlug } from '@/lib/server/course-catalog-sync';
 
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
@@ -37,19 +36,12 @@ export async function POST(request: NextRequest) {
   }
 
   let isFree = false;
-  const wp = findCourseInExport(slug);
-  if (wp) {
-    const price = Number(wp.price_aud);
-    isFree = wp.is_free === true || !Number.isFinite(price) || price <= 0;
-  }
   try {
     const db = await getOrCreateCourseBySlug(slug);
     const listAud = Number(db.priceAud);
-    isFree = isFree || db.isFree || !Number.isFinite(listAud) || listAud <= 0;
+    isFree = db.isFree || !Number.isFinite(listAud) || listAud <= 0;
   } catch {
-    if (!wp) {
-      return NextResponse.json({ detail: 'Course not found' }, { status: 404 });
-    }
+    return NextResponse.json({ detail: 'Course not found' }, { status: 404 });
   }
 
   if (!isFree) {
