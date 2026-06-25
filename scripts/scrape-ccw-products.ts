@@ -30,7 +30,7 @@ import { writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { jinaRead, type JinaLink } from '../src/lib/scrape/jina-reader';
+import { jinaRead, type JinaLink, type JinaReadResult } from '../src/lib/scrape/jina-reader';
 import {
   CCW_PRODUCTS_CATALOG_VERSION,
   type CcwProduct,
@@ -65,7 +65,10 @@ function parseArgs(argv: string[]): Args {
   return {
     url: get('--url') ?? process.env.CCW_SCRAPE_BASE_URL ?? null,
     plan: has('--plan') || has('--dry-run'),
-    max: Number(get('--max') ?? '50') || 50,
+    max: (() => {
+      const n = Number(get('--max') ?? '50');
+      return Number.isFinite(n) && n >= 0 ? n : 50;
+    })(),
     fetchSds: has('--fetch-sds'),
     productMatch: get('--product-match') ? new RegExp(get('--product-match') as string, 'i') : null,
     sdsMatch: new RegExp(get('--sds-match') ?? 'sds|safety[-_ ]?data|\\.pdf($|\\?)', 'i'),
@@ -142,7 +145,7 @@ async function scrapeProduct(
   args: Args,
   apiKey: string | undefined,
 ): Promise<CcwProduct | null> {
-  let page;
+  let page: JinaReadResult;
   try {
     page = await jinaRead(productUrl, { apiKey, withLinks: true, withImages: true });
   } catch (err) {
@@ -222,9 +225,17 @@ async function main() {
   console.log(`Found ${candidates.length} candidate product links; fetching up to ${args.max}.`);
 
   const products: CcwProduct[] = [];
+  const usedSlugs = new Set<string>();
   for (const url of candidates.slice(0, args.max)) {
     const product = await scrapeProduct(url, args, apiKey);
     if (product) {
+      // Enforce the "unique within the file" slug contract: distinct products that
+      // slugify to the same value get a stable numeric suffix.
+      const baseSlug = product.slug;
+      let slug = baseSlug;
+      for (let i = 2; usedSlugs.has(slug); i++) slug = `${baseSlug}-${i}`;
+      usedSlugs.add(slug);
+      product.slug = slug;
       products.push(product);
       console.log(`  + ${product.name} (${product.sds.length} SDS)`);
     }

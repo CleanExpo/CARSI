@@ -90,9 +90,19 @@ export async function jinaRead(targetUrl: string, options: JinaReadOptions = {})
   if (withImages) headers['X-With-Images-Summary'] = 'true';
 
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  let timedOut = false;
+  const timer = setTimeout(() => {
+    timedOut = true;
+    controller.abort();
+  }, timeoutMs);
   try {
-    const res = await fetch(JINA_READER_BASE + targetUrl, { headers, signal: controller.signal });
+    let res: Response;
+    try {
+      res = await fetch(JINA_READER_BASE + targetUrl, { headers, signal: controller.signal });
+    } catch (err) {
+      if (timedOut) throw new Error(`Jina read timed out for ${targetUrl} after ${timeoutMs}ms`);
+      throw err;
+    }
     if (!res.ok) {
       const body = await res.text().catch(() => '');
       throw new Error(`Jina read failed for ${targetUrl}: HTTP ${res.status} ${res.statusText} ${body.slice(0, 300)}`);
