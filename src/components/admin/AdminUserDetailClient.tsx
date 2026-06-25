@@ -484,7 +484,7 @@ export function AdminUserDetailClient({
       } else if (payload.status === 'skipped') {
         setActionError(
           payload.detail ??
-            'IICRC submission was skipped — verify course CEC eligibility, RESEND_API_KEY, and completion status.',
+            'IICRC submission was skipped — verify course CEC eligibility, MAILTRAP_API_KEY, and completion status.',
         );
       }
       router.refresh();
