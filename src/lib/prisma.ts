@@ -14,6 +14,12 @@ const PRISMA_CLIENT_PLACEHOLDER_URL =
 
 let cachedCaPath: string | undefined;
 
+function appendQueryParam(url: string, key: string, value: string): string {
+  if (new RegExp(`[?&]${key}=`, 'i').test(url)) return url;
+  const sep = url.includes('?') ? '&' : '?';
+  return `${url}${sep}${key}=${encodeURIComponent(value)}`;
+}
+
 /**
  * Connection string for PrismaPg. Does not mutate `process.env.DATABASE_URL`.
  * When DATABASE_URL is unset (CI/build), uses a placeholder so the module can load; real
@@ -26,19 +32,32 @@ function getConnectionStringForAdapter(): string {
   }
 
   const b64 = process.env.DATABASE_CA_CERT?.trim();
-  if (!b64) {
-    return base;
+  if (b64) {
+    if (!cachedCaPath) {
+      const certPath = join(tmpdir(), `carsi-pg-ca-${randomUUID()}.crt`);
+      const pem = Buffer.from(b64, 'base64').toString('utf8');
+      writeFileSync(certPath, pem, { mode: 0o600 });
+      cachedCaPath = certPath;
+    }
+
+    let url = base;
+    if (!/sslmode=/i.test(url)) {
+      url = appendQueryParam(url, 'sslmode', 'verify-full');
+    }
+    return appendQueryParam(url, 'sslrootcert', cachedCaPath);
   }
 
-  if (!cachedCaPath) {
-    const certPath = join(tmpdir(), `carsi-pg-ca-${randomUUID()}.crt`);
-    const pem = Buffer.from(b64, 'base64').toString('utf8');
-    writeFileSync(certPath, pem, { mode: 0o600 });
-    cachedCaPath = certPath;
+  // node-pg treats sslmode=require as verify-full; DigitalOcean needs libpq-compat or a CA file.
+  // See https://github.com/brianc/node-postgres/issues/2558
+  let url = base;
+  if (/\.db\.ondigitalocean\.com/i.test(url) && !/sslmode=/i.test(url)) {
+    url = appendQueryParam(url, 'sslmode', 'require');
+  }
+  if (/sslmode=require/i.test(url) && !/uselibpqcompat=/i.test(url)) {
+    url = appendQueryParam(url, 'uselibpqcompat', 'true');
   }
 
-  const sep = base.includes('?') ? '&' : '?';
-  return `${base}${sep}sslrootcert=${encodeURIComponent(cachedCaPath)}`;
+  return url;
 }
 
 function createClient() {
