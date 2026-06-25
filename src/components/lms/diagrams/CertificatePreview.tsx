@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 
+import { formatCecHoursForCertificate } from '@/lib/cec-display';
 import { formatCredentialRef } from '@/lib/credential-format';
 import { IICRC_DISCIPLINE_LONG } from '@/lib/iicrc-discipline-display';
 
@@ -79,10 +80,7 @@ export function CertificatePreview({
       : (IICRC_DISCIPLINE_LONG[discCode] ?? discipline);
   const issued = issuedDate ?? completedDate;
   const credentialRef = credentialId ? formatCredentialRef(credentialId) : 'CARSI-EXAMPLE000';
-  const cecValue =
-    cecHours != null && cecHours > 0
-      ? `${cecHours % 1 === 0 ? cecHours : cecHours.toFixed(1)} IICRC CEC hour${cecHours === 1 ? '' : 's'}`
-      : 'Per course listing';
+  const cecValue = formatCecHoursForCertificate(cecHours);
 
   return (
     <div
@@ -186,7 +184,7 @@ export function CertificatePreview({
               <div className="flex flex-wrap items-start justify-center divide-x divide-white/10">
                 <ProgrammeDetail label="Discipline" value={discLabel} accent={discColor} />
                 <ProgrammeDetail label="Completed" value={completedDate ?? '—'} />
-                <ProgrammeDetail label="CEC credits" value={cecValue} />
+                {cecValue ? <ProgrammeDetail label="CEC credits" value={cecValue} /> : null}
                 <ProgrammeDetail
                   label="Programme level"
                   value={courseLevel ?? 'Professional development'}
