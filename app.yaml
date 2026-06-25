@@ -13,8 +13,8 @@ services:
       deploy_on_push: true
 
     dockerfile_path: Dockerfile
-    # Overrides default `npm start`; use entrypoint (migrate + standalone server).
-    run_command: ./docker-entrypoint.sh
+    # Must match Dockerfile WORKDIR /app — do not use `npm start` (it bypasses this script).
+    run_command: /app/docker-entrypoint.sh
     http_port: 8080
     source_dir: /
     instance_count: 2
@@ -41,6 +41,10 @@ services:
 
       - key: DATABASE_CA_CERT
         scope: RUN_AND_BUILD_TIME
+
+      - key: PRISMA_MIGRATE_ON_START
+        value: 'false'
+        scope: RUN_TIME
 
       - key: JWT_SECRET
         scope: RUN_TIME

@@ -58,4 +58,5 @@ RUN chmod +x ./docker-entrypoint.sh
 USER nextjs
 EXPOSE 8080
 
-ENTRYPOINT ["./docker-entrypoint.sh"]
+ENTRYPOINT ["/app/docker-entrypoint.sh"]
+CMD ["/app/docker-entrypoint.sh"]
