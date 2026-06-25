@@ -1,7 +1,1322 @@
 {
   "version": 1,
-  "scrapedAt": "1970-01-01T00:00:00.000Z",
-  "sourceBaseUrl": "",
+  "scrapedAt": "2026-06-25T07:49:00.150Z",
+  "sourceBaseUrl": "https://ccwonline.com.au/",
   "engine": "jina",
-  "products": []
+  "products": [
+    {
+      "slug": "404-not-found",
+      "name": "404 Not Found",
+      "sourceUrl": "https://ccwonline.com.au/collections/versaclean-portables",
+      "brand": null,
+      "category": null,
+      "description": "Skip to content",
+      "imageUrl": "https://ccwonline.com.au/cdn/shop/files/website_logo.png?v=1780628157",
+      "sds": [
+        {
+          "documentUrl": "https://ccwonline.com.au/blogs/safety-data-sheets",
+          "label": "Safety Data Sheets",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        },
+        {
+          "documentUrl": "https://cdn.shopify.com/s/files/1/2179/6391/files/Covid_Safe_Plan.pdf?v=1597707004",
+          "label": "Covid Safe Plan",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        }
+      ],
+      "scrapedAt": "2026-06-25T07:43:47.096Z"
+    },
+    {
+      "slug": "404-not-found-2",
+      "name": "404 Not Found",
+      "sourceUrl": "https://ccwonline.com.au/collections/steam-cleaners",
+      "brand": null,
+      "category": null,
+      "description": "Skip to content",
+      "imageUrl": "https://ccwonline.com.au/cdn/shop/files/website_logo.png?v=1780628157",
+      "sds": [
+        {
+          "documentUrl": "https://ccwonline.com.au/blogs/safety-data-sheets",
+          "label": "Safety Data Sheets",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        },
+        {
+          "documentUrl": "https://cdn.shopify.com/s/files/1/2179/6391/files/Covid_Safe_Plan.pdf?v=1597707004",
+          "label": "Covid Safe Plan",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        }
+      ],
+      "scrapedAt": "2026-06-25T07:45:02.117Z"
+    },
+    {
+      "slug": "accessories",
+      "name": "Accessories",
+      "sourceUrl": "https://ccwonline.com.au/collections/accessories",
+      "brand": null,
+      "category": null,
+      "description": "Skip to content",
+      "imageUrl": "https://ccwonline.com.au/cdn/shop/files/website_logo.png?v=1780628157",
+      "sds": [
+        {
+          "documentUrl": "https://ccwonline.com.au/blogs/safety-data-sheets",
+          "label": "Safety Data Sheets",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        },
+        {
+          "documentUrl": "https://cdn.shopify.com/s/files/1/2179/6391/files/Covid_Safe_Plan.pdf?v=1597707004",
+          "label": "Covid Safe Plan",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        }
+      ],
+      "scrapedAt": "2026-06-25T07:49:00.143Z"
+    },
+    {
+      "slug": "air-scrubbers",
+      "name": "Air Scrubbers",
+      "sourceUrl": "https://ccwonline.com.au/collections/air-scrubbers",
+      "brand": null,
+      "category": null,
+      "description": "Skip to content",
+      "imageUrl": "https://ccwonline.com.au/cdn/shop/files/website_logo.png?v=1780628157",
+      "sds": [
+        {
+          "documentUrl": "https://ccwonline.com.au/blogs/safety-data-sheets",
+          "label": "Safety Data Sheets",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        },
+        {
+          "documentUrl": "https://cdn.shopify.com/s/files/1/2179/6391/files/Covid_Safe_Plan.pdf?v=1597707004",
+          "label": "Covid Safe Plan",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        }
+      ],
+      "scrapedAt": "2026-06-25T07:44:35.427Z"
+    },
+    {
+      "slug": "airmovers",
+      "name": "Airmovers",
+      "sourceUrl": "https://ccwonline.com.au/collections/airmovers",
+      "brand": null,
+      "category": null,
+      "description": "Skip to content",
+      "imageUrl": "https://ccwonline.com.au/cdn/shop/files/website_logo.png?v=1780628157",
+      "sds": [
+        {
+          "documentUrl": "https://ccwonline.com.au/blogs/safety-data-sheets",
+          "label": "Safety Data Sheets",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        },
+        {
+          "documentUrl": "https://cdn.shopify.com/s/files/1/2179/6391/files/Covid_Safe_Plan.pdf?v=1597707004",
+          "label": "Covid Safe Plan",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        }
+      ],
+      "scrapedAt": "2026-06-25T07:44:19.562Z"
+    },
+    {
+      "slug": "cordless-extraction-tools-cet",
+      "name": "Cordless Extraction Tools (CET)",
+      "sourceUrl": "https://ccwonline.com.au/collections/cordless-extraction-tools-cet",
+      "brand": null,
+      "category": null,
+      "description": "Skip to content",
+      "imageUrl": "https://ccwonline.com.au/cdn/shop/files/website_logo.png?v=1780628157",
+      "sds": [
+        {
+          "documentUrl": "https://ccwonline.com.au/blogs/safety-data-sheets",
+          "label": "Safety Data Sheets",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        },
+        {
+          "documentUrl": "https://cdn.shopify.com/s/files/1/2179/6391/files/Covid_Safe_Plan.pdf?v=1597707004",
+          "label": "Covid Safe Plan",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        }
+      ],
+      "scrapedAt": "2026-06-25T07:48:06.277Z"
+    },
+    {
+      "slug": "covid-19-deep-cleaning",
+      "name": "Covid-19 Deep Cleaning",
+      "sourceUrl": "https://ccwonline.com.au/collections/covid-19-deep-cleaning",
+      "brand": null,
+      "category": null,
+      "description": "Skip to content",
+      "imageUrl": "https://ccwonline.com.au/cdn/shop/files/website_logo.png?v=1780628157",
+      "sds": [
+        {
+          "documentUrl": "https://ccwonline.com.au/blogs/safety-data-sheets",
+          "label": "Safety Data Sheets",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        },
+        {
+          "documentUrl": "https://cdn.shopify.com/s/files/1/2179/6391/files/Covid_Safe_Plan.pdf?v=1597707004",
+          "label": "Covid Safe Plan",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        },
+        {
+          "documentUrl": "https://cdn.shopify.com/s/files/1/2179/6391/files/c19COVID_19_IICRC_RIA_Essential_1.pdf?v=1598505988",
+          "label": "IICRC/RIA Managing and Sustaining your Organization amidst the COVID-19 Pandemic",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        },
+        {
+          "documentUrl": "https://cdn.shopify.com/s/files/1/2179/6391/files/IAQAA-COVID-19-PCV-ReferenceGuidelines-Issued06052020.pdf?v=1598842906",
+          "label": "IAQAA Draft Reference and Guidelines for Post Cleaning Validation of Structures Contaminated with SARS-CoV-2",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        }
+      ],
+      "scrapedAt": "2026-06-25T07:42:16.159Z"
+    },
+    {
+      "slug": "dehumidifiers",
+      "name": "Dehumidifiers",
+      "sourceUrl": "https://ccwonline.com.au/collections/dehumidifiers",
+      "brand": null,
+      "category": null,
+      "description": "Skip to content",
+      "imageUrl": "https://ccwonline.com.au/cdn/shop/files/website_logo.png?v=1780628157",
+      "sds": [
+        {
+          "documentUrl": "https://ccwonline.com.au/blogs/safety-data-sheets",
+          "label": "Safety Data Sheets",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        },
+        {
+          "documentUrl": "https://cdn.shopify.com/s/files/1/2179/6391/files/Covid_Safe_Plan.pdf?v=1597707004",
+          "label": "Covid Safe Plan",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        }
+      ],
+      "scrapedAt": "2026-06-25T07:44:26.442Z"
+    },
+    {
+      "slug": "delmhorst-moisture-meters",
+      "name": "Delmhorst Moisture Meters",
+      "sourceUrl": "https://ccwonline.com.au/collections/delmhorst-moisture-meters",
+      "brand": null,
+      "category": null,
+      "description": "Skip to content",
+      "imageUrl": "https://ccwonline.com.au/cdn/shop/files/website_logo.png?v=1780628157",
+      "sds": [
+        {
+          "documentUrl": "https://ccwonline.com.au/blogs/safety-data-sheets",
+          "label": "Safety Data Sheets",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        },
+        {
+          "documentUrl": "https://cdn.shopify.com/s/files/1/2179/6391/files/Covid_Safe_Plan.pdf?v=1597707004",
+          "label": "Covid Safe Plan",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        }
+      ],
+      "scrapedAt": "2026-06-25T07:45:52.288Z"
+    },
+    {
+      "slug": "dri-eaz-moisture-meters",
+      "name": "Dri-eaz Moisture Meters",
+      "sourceUrl": "https://ccwonline.com.au/collections/dri-eaz-moisture-meters",
+      "brand": null,
+      "category": null,
+      "description": "Skip to content",
+      "imageUrl": "https://ccwonline.com.au/cdn/shop/files/website_logo.png?v=1780628157",
+      "sds": [
+        {
+          "documentUrl": "https://ccwonline.com.au/blogs/safety-data-sheets",
+          "label": "Safety Data Sheets",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        },
+        {
+          "documentUrl": "https://cdn.shopify.com/s/files/1/2179/6391/files/Covid_Safe_Plan.pdf?v=1597707004",
+          "label": "Covid Safe Plan",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        }
+      ],
+      "scrapedAt": "2026-06-25T07:46:41.352Z"
+    },
+    {
+      "slug": "electrostatic-sprayers",
+      "name": "Electrostatic Sprayers",
+      "sourceUrl": "https://ccwonline.com.au/collections/electrostatic-sprayers",
+      "brand": null,
+      "category": null,
+      "description": "Skip to content",
+      "imageUrl": "https://ccwonline.com.au/cdn/shop/files/website_logo.png?v=1780628157",
+      "sds": [
+        {
+          "documentUrl": "https://ccwonline.com.au/blogs/safety-data-sheets",
+          "label": "Safety Data Sheets",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        },
+        {
+          "documentUrl": "https://cdn.shopify.com/s/files/1/2179/6391/files/Covid_Safe_Plan.pdf?v=1597707004",
+          "label": "Covid Safe Plan",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        }
+      ],
+      "scrapedAt": "2026-06-25T07:44:53.194Z"
+    },
+    {
+      "slug": "encapsulation-carpet-cleaning-equipment",
+      "name": "Encapsulation Carpet Cleaning Equipment",
+      "sourceUrl": "https://ccwonline.com.au/collections/cimex-encapsulation-carpet-cleaning-equipment",
+      "brand": null,
+      "category": null,
+      "description": "Skip to content",
+      "imageUrl": "https://ccwonline.com.au/cdn/shop/files/website_logo.png?v=1780628157",
+      "sds": [
+        {
+          "documentUrl": "https://ccwonline.com.au/blogs/safety-data-sheets",
+          "label": "Safety Data Sheets",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        },
+        {
+          "documentUrl": "https://cdn.shopify.com/s/files/1/2179/6391/files/Covid_Safe_Plan.pdf?v=1597707004",
+          "label": "Covid Safe Plan",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        }
+      ],
+      "scrapedAt": "2026-06-25T07:47:58.470Z"
+    },
+    {
+      "slug": "equipment",
+      "name": "Equipment",
+      "sourceUrl": "https://ccwonline.com.au/collections/equipment",
+      "brand": null,
+      "category": null,
+      "description": "Skip to content",
+      "imageUrl": "https://ccwonline.com.au/cdn/shop/files/website_logo.png?v=1780628157",
+      "sds": [
+        {
+          "documentUrl": "https://ccwonline.com.au/blogs/safety-data-sheets",
+          "label": "Safety Data Sheets",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        },
+        {
+          "documentUrl": "https://cdn.shopify.com/s/files/1/2179/6391/files/Covid_Safe_Plan.pdf?v=1597707004",
+          "label": "Covid Safe Plan",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        }
+      ],
+      "scrapedAt": "2026-06-25T07:42:42.712Z"
+    },
+    {
+      "slug": "extech-moisture-meters",
+      "name": "Extech Moisture Meters",
+      "sourceUrl": "https://ccwonline.com.au/collections/extech-moisture-meters",
+      "brand": null,
+      "category": null,
+      "description": "Skip to content",
+      "imageUrl": "https://ccwonline.com.au/cdn/shop/files/website_logo.png?v=1780628157",
+      "sds": [
+        {
+          "documentUrl": "https://ccwonline.com.au/blogs/safety-data-sheets",
+          "label": "Safety Data Sheets",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        },
+        {
+          "documentUrl": "https://cdn.shopify.com/s/files/1/2179/6391/files/Covid_Safe_Plan.pdf?v=1597707004",
+          "label": "Covid Safe Plan",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        }
+      ],
+      "scrapedAt": "2026-06-25T07:46:24.222Z"
+    },
+    {
+      "slug": "flood-extraction",
+      "name": "Flood Extraction",
+      "sourceUrl": "https://ccwonline.com.au/collections/flood-extraction",
+      "brand": null,
+      "category": null,
+      "description": "Skip to content",
+      "imageUrl": "https://ccwonline.com.au/cdn/shop/files/website_logo.png?v=1780628157",
+      "sds": [
+        {
+          "documentUrl": "https://ccwonline.com.au/blogs/safety-data-sheets",
+          "label": "Safety Data Sheets",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        },
+        {
+          "documentUrl": "https://cdn.shopify.com/s/files/1/2179/6391/files/Covid_Safe_Plan.pdf?v=1597707004",
+          "label": "Covid Safe Plan",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        }
+      ],
+      "scrapedAt": "2026-06-25T07:45:12.045Z"
+    },
+    {
+      "slug": "foggers",
+      "name": "Foggers",
+      "sourceUrl": "https://ccwonline.com.au/collections/foggers",
+      "brand": null,
+      "category": null,
+      "description": "Skip to content",
+      "imageUrl": "https://ccwonline.com.au/cdn/shop/files/website_logo.png?v=1780628157",
+      "sds": [
+        {
+          "documentUrl": "https://ccwonline.com.au/blogs/safety-data-sheets",
+          "label": "Safety Data Sheets",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        },
+        {
+          "documentUrl": "https://cdn.shopify.com/s/files/1/2179/6391/files/Covid_Safe_Plan.pdf?v=1597707004",
+          "label": "Covid Safe Plan",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        }
+      ],
+      "scrapedAt": "2026-06-25T07:44:42.664Z"
+    },
+    {
+      "slug": "gekko-tools",
+      "name": "Gekko Tools",
+      "sourceUrl": "https://ccwonline.com.au/collections/gekko-tools",
+      "brand": null,
+      "category": null,
+      "description": "Skip to content",
+      "imageUrl": "https://ccwonline.com.au/cdn/shop/files/website_logo.png?v=1780628157",
+      "sds": [
+        {
+          "documentUrl": "https://ccwonline.com.au/blogs/safety-data-sheets",
+          "label": "Safety Data Sheets",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        },
+        {
+          "documentUrl": "https://cdn.shopify.com/s/files/1/2179/6391/files/Covid_Safe_Plan.pdf?v=1597707004",
+          "label": "Covid Safe Plan",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        }
+      ],
+      "scrapedAt": "2026-06-25T07:47:50.329Z"
+    },
+    {
+      "slug": "hvac-cleaning-equipment",
+      "name": "HVAC Cleaning Equipment",
+      "sourceUrl": "https://ccwonline.com.au/collections/duct-cleaning",
+      "brand": null,
+      "category": null,
+      "description": "Skip to content",
+      "imageUrl": "https://ccwonline.com.au/cdn/shop/files/website_logo.png?v=1780628157",
+      "sds": [
+        {
+          "documentUrl": "https://ccwonline.com.au/blogs/safety-data-sheets",
+          "label": "Safety Data Sheets",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        },
+        {
+          "documentUrl": "https://cdn.shopify.com/s/files/1/2179/6391/files/Covid_Safe_Plan.pdf?v=1597707004",
+          "label": "Covid Safe Plan",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        }
+      ],
+      "scrapedAt": "2026-06-25T07:48:43.629Z"
+    },
+    {
+      "slug": "hydramaster",
+      "name": "Hydramaster",
+      "sourceUrl": "https://ccwonline.com.au/collections/hydramaster-truckmounts",
+      "brand": null,
+      "category": null,
+      "description": "Skip to content",
+      "imageUrl": "https://ccwonline.com.au/cdn/shop/files/website_logo.png?v=1780628157",
+      "sds": [
+        {
+          "documentUrl": "https://ccwonline.com.au/blogs/safety-data-sheets",
+          "label": "Safety Data Sheets",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        },
+        {
+          "documentUrl": "https://cdn.shopify.com/s/files/1/2179/6391/files/Covid_Safe_Plan.pdf?v=1597707004",
+          "label": "Covid Safe Plan",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        }
+      ],
+      "scrapedAt": "2026-06-25T07:42:59.450Z"
+    },
+    {
+      "slug": "hydro-shark-moisture-meters",
+      "name": "Hydro Shark Moisture Meters",
+      "sourceUrl": "https://ccwonline.com.au/collections/hydro-shark-moisture-meters",
+      "brand": null,
+      "category": null,
+      "description": "Skip to content",
+      "imageUrl": "https://ccwonline.com.au/cdn/shop/files/website_logo.png?v=1780628157",
+      "sds": [
+        {
+          "documentUrl": "https://ccwonline.com.au/blogs/safety-data-sheets",
+          "label": "Safety Data Sheets",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        },
+        {
+          "documentUrl": "https://cdn.shopify.com/s/files/1/2179/6391/files/Covid_Safe_Plan.pdf?v=1597707004",
+          "label": "Covid Safe Plan",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        }
+      ],
+      "scrapedAt": "2026-06-25T07:46:51.978Z"
+    },
+    {
+      "slug": "hygiena",
+      "name": "Hygiena",
+      "sourceUrl": "https://ccwonline.com.au/collections/hygiena",
+      "brand": null,
+      "category": null,
+      "description": "Skip to content",
+      "imageUrl": "https://ccwonline.com.au/cdn/shop/files/website_logo.png?v=1780628157",
+      "sds": [
+        {
+          "documentUrl": "https://ccwonline.com.au/blogs/safety-data-sheets",
+          "label": "Safety Data Sheets",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        },
+        {
+          "documentUrl": "https://cdn.shopify.com/s/files/1/2179/6391/files/Covid_Safe_Plan.pdf?v=1597707004",
+          "label": "Covid Safe Plan",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        }
+      ],
+      "scrapedAt": "2026-06-25T07:46:59.466Z"
+    },
+    {
+      "slug": "hygiene-testing",
+      "name": "Hygiene Testing",
+      "sourceUrl": "https://ccwonline.com.au/collections/atp-testing-luminometers",
+      "brand": null,
+      "category": null,
+      "description": "Skip to content",
+      "imageUrl": "https://ccwonline.com.au/cdn/shop/files/website_logo.png?v=1780628157",
+      "sds": [
+        {
+          "documentUrl": "https://ccwonline.com.au/blogs/safety-data-sheets",
+          "label": "Safety Data Sheets",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        },
+        {
+          "documentUrl": "https://cdn.shopify.com/s/files/1/2179/6391/files/Covid_Safe_Plan.pdf?v=1597707004",
+          "label": "Covid Safe Plan",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        }
+      ],
+      "scrapedAt": "2026-06-25T07:45:37.263Z"
+    },
+    {
+      "slug": "moisture-meters",
+      "name": "Moisture Meters",
+      "sourceUrl": "https://ccwonline.com.au/collections/moisture-meters-1",
+      "brand": null,
+      "category": null,
+      "description": "Skip to content",
+      "imageUrl": "https://ccwonline.com.au/cdn/shop/files/website_logo.png?v=1780628157",
+      "sds": [
+        {
+          "documentUrl": "https://ccwonline.com.au/blogs/safety-data-sheets",
+          "label": "Safety Data Sheets",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        },
+        {
+          "documentUrl": "https://cdn.shopify.com/s/files/1/2179/6391/files/Covid_Safe_Plan.pdf?v=1597707004",
+          "label": "Covid Safe Plan",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        }
+      ],
+      "scrapedAt": "2026-06-25T07:45:43.720Z"
+    },
+    {
+      "slug": "phoenix-moisture-meters",
+      "name": "Phoenix Moisture Meters",
+      "sourceUrl": "https://ccwonline.com.au/collections/phoenix-moisture-meters",
+      "brand": null,
+      "category": null,
+      "description": "Skip to content",
+      "imageUrl": "https://ccwonline.com.au/cdn/shop/files/website_logo.png?v=1780628157",
+      "sds": [
+        {
+          "documentUrl": "https://ccwonline.com.au/blogs/safety-data-sheets",
+          "label": "Safety Data Sheets",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        },
+        {
+          "documentUrl": "https://cdn.shopify.com/s/files/1/2179/6391/files/Covid_Safe_Plan.pdf?v=1597707004",
+          "label": "Covid Safe Plan",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        }
+      ],
+      "scrapedAt": "2026-06-25T07:46:31.511Z"
+    },
+    {
+      "slug": "portable-carpet-cleaning-equipment-extractors-ccw-australia",
+      "name": "Portable Carpet Cleaning Equipment & Extractors | CCW Australia",
+      "sourceUrl": "https://ccwonline.com.au/collections/portable-carpet-cleaning-equipment",
+      "brand": null,
+      "category": null,
+      "description": "Skip to content",
+      "imageUrl": "https://ccwonline.com.au/cdn/shop/files/website_logo.png?v=1780628157",
+      "sds": [
+        {
+          "documentUrl": "https://ccwonline.com.au/blogs/safety-data-sheets",
+          "label": "Safety Data Sheets",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        },
+        {
+          "documentUrl": "https://cdn.shopify.com/s/files/1/2179/6391/files/Covid_Safe_Plan.pdf?v=1597707004",
+          "label": "Covid Safe Plan",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        }
+      ],
+      "scrapedAt": "2026-06-25T07:43:14.393Z"
+    },
+    {
+      "slug": "portable-carpet-cleaning-equipment-extractors-ccw-australia-2",
+      "name": "Portable Carpet Cleaning Equipment & Extractors | CCW Australia",
+      "sourceUrl": "https://ccwonline.com.au/collections/mytee-portables",
+      "brand": null,
+      "category": null,
+      "description": "Skip to content",
+      "imageUrl": "https://ccwonline.com.au/cdn/shop/files/website_logo.png?v=1780628157",
+      "sds": [
+        {
+          "documentUrl": "https://ccwonline.com.au/blogs/safety-data-sheets",
+          "label": "Safety Data Sheets",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        },
+        {
+          "documentUrl": "https://cdn.shopify.com/s/files/1/2179/6391/files/Covid_Safe_Plan.pdf?v=1597707004",
+          "label": "Covid Safe Plan",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        }
+      ],
+      "scrapedAt": "2026-06-25T07:43:40.521Z"
+    },
+    {
+      "slug": "portable-startup-package-deals",
+      "name": "Portable Startup Package Deals",
+      "sourceUrl": "https://ccwonline.com.au/collections/portable-startup-package-deals",
+      "brand": null,
+      "category": null,
+      "description": "Skip to content",
+      "imageUrl": "https://ccwonline.com.au/cdn/shop/files/website_logo.png?v=1780628157",
+      "sds": [
+        {
+          "documentUrl": "https://ccwonline.com.au/blogs/safety-data-sheets",
+          "label": "Safety Data Sheets",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        },
+        {
+          "documentUrl": "https://cdn.shopify.com/s/files/1/2179/6391/files/Covid_Safe_Plan.pdf?v=1597707004",
+          "label": "Covid Safe Plan",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        }
+      ],
+      "scrapedAt": "2026-06-25T07:43:22.137Z"
+    },
+    {
+      "slug": "protimeter-moisture-meters",
+      "name": "Protimeter Moisture Meters",
+      "sourceUrl": "https://ccwonline.com.au/collections/protimeter-moisture-meters",
+      "brand": null,
+      "category": null,
+      "description": "Skip to content",
+      "imageUrl": "https://ccwonline.com.au/cdn/shop/files/website_logo.png?v=1780628157",
+      "sds": [
+        {
+          "documentUrl": "https://ccwonline.com.au/blogs/safety-data-sheets",
+          "label": "Safety Data Sheets",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        },
+        {
+          "documentUrl": "https://cdn.shopify.com/s/files/1/2179/6391/files/Covid_Safe_Plan.pdf?v=1597707004",
+          "label": "Covid Safe Plan",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        }
+      ],
+      "scrapedAt": "2026-06-25T07:46:09.173Z"
+    },
+    {
+      "slug": "razorback-portables",
+      "name": "Razorback Portables",
+      "sourceUrl": "https://ccwonline.com.au/collections/razorback-portables",
+      "brand": null,
+      "category": null,
+      "description": "Skip to content",
+      "imageUrl": "https://ccwonline.com.au/cdn/shop/files/website_logo.png?v=1780628157",
+      "sds": [
+        {
+          "documentUrl": "https://ccwonline.com.au/blogs/safety-data-sheets",
+          "label": "Safety Data Sheets",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        },
+        {
+          "documentUrl": "https://cdn.shopify.com/s/files/1/2179/6391/files/Covid_Safe_Plan.pdf?v=1597707004",
+          "label": "Covid Safe Plan",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        }
+      ],
+      "scrapedAt": "2026-06-25T07:43:34.643Z"
+    },
+    {
+      "slug": "rethink-restoration-with-razorback",
+      "name": "Rethink Restoration with RAZORBACK...",
+      "sourceUrl": "https://ccwonline.com.au/collections/rethink-restoration-with-razorback",
+      "brand": null,
+      "category": null,
+      "description": "Skip to content",
+      "imageUrl": "https://ccwonline.com.au/cdn/shop/files/website_logo.png?v=1780628157",
+      "sds": [
+        {
+          "documentUrl": "https://ccwonline.com.au/blogs/safety-data-sheets",
+          "label": "Safety Data Sheets",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        },
+        {
+          "documentUrl": "https://cdn.shopify.com/s/files/1/2179/6391/files/Covid_Safe_Plan.pdf?v=1597707004",
+          "label": "Covid Safe Plan",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        }
+      ],
+      "scrapedAt": "2026-06-25T07:44:10.203Z"
+    },
+    {
+      "slug": "rotary-extractors",
+      "name": "Rotary Extractors",
+      "sourceUrl": "https://ccwonline.com.au/collections/rotary-extractors",
+      "brand": null,
+      "category": null,
+      "description": "Skip to content",
+      "imageUrl": "https://ccwonline.com.au/cdn/shop/files/website_logo.png?v=1780628157",
+      "sds": [
+        {
+          "documentUrl": "https://ccwonline.com.au/blogs/safety-data-sheets",
+          "label": "Safety Data Sheets",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        },
+        {
+          "documentUrl": "https://cdn.shopify.com/s/files/1/2179/6391/files/Covid_Safe_Plan.pdf?v=1597707004",
+          "label": "Covid Safe Plan",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        }
+      ],
+      "scrapedAt": "2026-06-25T07:48:20.464Z"
+    },
+    {
+      "slug": "rotary-scrubbers",
+      "name": "Rotary Scrubbers",
+      "sourceUrl": "https://ccwonline.com.au/collections/rotary-scrubbers",
+      "brand": null,
+      "category": null,
+      "description": "Skip to content",
+      "imageUrl": "https://ccwonline.com.au/cdn/shop/files/website_logo.png?v=1780628157",
+      "sds": [
+        {
+          "documentUrl": "https://ccwonline.com.au/blogs/safety-data-sheets",
+          "label": "Safety Data Sheets",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        },
+        {
+          "documentUrl": "https://cdn.shopify.com/s/files/1/2179/6391/files/Covid_Safe_Plan.pdf?v=1597707004",
+          "label": "Covid Safe Plan",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        }
+      ],
+      "scrapedAt": "2026-06-25T07:48:12.366Z"
+    },
+    {
+      "slug": "rotary-tile-spinners",
+      "name": "Rotary Tile Spinners",
+      "sourceUrl": "https://ccwonline.com.au/collections/rotary-tile-spinners",
+      "brand": null,
+      "category": null,
+      "description": "Skip to content",
+      "imageUrl": "https://ccwonline.com.au/cdn/shop/files/website_logo.png?v=1780628157",
+      "sds": [
+        {
+          "documentUrl": "https://ccwonline.com.au/blogs/safety-data-sheets",
+          "label": "Safety Data Sheets",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        },
+        {
+          "documentUrl": "https://cdn.shopify.com/s/files/1/2179/6391/files/Covid_Safe_Plan.pdf?v=1597707004",
+          "label": "Covid Safe Plan",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        }
+      ],
+      "scrapedAt": "2026-06-25T07:47:41.426Z"
+    },
+    {
+      "slug": "rug-cleaning-equipment",
+      "name": "Rug Cleaning Equipment",
+      "sourceUrl": "https://ccwonline.com.au/collections/rug-cleaning-equipment",
+      "brand": null,
+      "category": null,
+      "description": "Skip to content",
+      "imageUrl": "https://ccwonline.com.au/cdn/shop/files/website_logo.png?v=1780628157",
+      "sds": [
+        {
+          "documentUrl": "https://ccwonline.com.au/blogs/safety-data-sheets",
+          "label": "Safety Data Sheets",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        },
+        {
+          "documentUrl": "https://cdn.shopify.com/s/files/1/2179/6391/files/Covid_Safe_Plan.pdf?v=1597707004",
+          "label": "Covid Safe Plan",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        }
+      ],
+      "scrapedAt": "2026-06-25T07:48:34.670Z"
+    },
+    {
+      "slug": "sapphire-scientific-truckmounts",
+      "name": "Sapphire Scientific Truckmounts",
+      "sourceUrl": "https://ccwonline.com.au/collections/sapphire-scientific-truckmounts",
+      "brand": null,
+      "category": null,
+      "description": "Skip to content",
+      "imageUrl": "https://ccwonline.com.au/cdn/shop/files/website_logo.png?v=1780628157",
+      "sds": [
+        {
+          "documentUrl": "https://ccwonline.com.au/blogs/safety-data-sheets",
+          "label": "Safety Data Sheets",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        },
+        {
+          "documentUrl": "https://cdn.shopify.com/s/files/1/2179/6391/files/Covid_Safe_Plan.pdf?v=1597707004",
+          "label": "Covid Safe Plan",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        }
+      ],
+      "scrapedAt": "2026-06-25T07:43:07.802Z"
+    },
+    {
+      "slug": "specialty-meters-ph-distance-temperature-airflow-etc",
+      "name": "Specialty Meters, pH, Distance, Temperature, Airflow, Etc.",
+      "sourceUrl": "https://ccwonline.com.au/collections/specialty-meters-ph-distance-temperature-airflow-etc",
+      "brand": null,
+      "category": null,
+      "description": "Skip to content",
+      "imageUrl": "https://ccwonline.com.au/cdn/shop/files/website_logo.png?v=1780628157",
+      "sds": [
+        {
+          "documentUrl": "https://ccwonline.com.au/blogs/safety-data-sheets",
+          "label": "Safety Data Sheets",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        },
+        {
+          "documentUrl": "https://cdn.shopify.com/s/files/1/2179/6391/files/Covid_Safe_Plan.pdf?v=1597707004",
+          "label": "Covid Safe Plan",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        }
+      ],
+      "scrapedAt": "2026-06-25T07:47:11.803Z"
+    },
+    {
+      "slug": "structural-heat-drying",
+      "name": "Structural & Heat Drying",
+      "sourceUrl": "https://ccwonline.com.au/collections/structural-drying",
+      "brand": null,
+      "category": null,
+      "description": "Skip to content",
+      "imageUrl": "https://ccwonline.com.au/cdn/shop/files/website_logo.png?v=1780628157",
+      "sds": [
+        {
+          "documentUrl": "https://ccwonline.com.au/blogs/safety-data-sheets",
+          "label": "Safety Data Sheets",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        },
+        {
+          "documentUrl": "https://cdn.shopify.com/s/files/1/2179/6391/files/Covid_Safe_Plan.pdf?v=1597707004",
+          "label": "Covid Safe Plan",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        }
+      ],
+      "scrapedAt": "2026-06-25T07:45:20.289Z"
+    },
+    {
+      "slug": "thermal-imaging",
+      "name": "Thermal Imaging",
+      "sourceUrl": "https://ccwonline.com.au/collections/thermal-imaging",
+      "brand": null,
+      "category": null,
+      "description": "Skip to content",
+      "imageUrl": "https://ccwonline.com.au/cdn/shop/files/website_logo.png?v=1780628157",
+      "sds": [
+        {
+          "documentUrl": "https://ccwonline.com.au/blogs/safety-data-sheets",
+          "label": "Safety Data Sheets",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        },
+        {
+          "documentUrl": "https://cdn.shopify.com/s/files/1/2179/6391/files/Covid_Safe_Plan.pdf?v=1597707004",
+          "label": "Covid Safe Plan",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        }
+      ],
+      "scrapedAt": "2026-06-25T07:45:27.144Z"
+    },
+    {
+      "slug": "tile-and-grout-cleaning-chemicals",
+      "name": "Tile and Grout Cleaning Chemicals",
+      "sourceUrl": "https://ccwonline.com.au/collections/tile-grout-cleaning",
+      "brand": null,
+      "category": null,
+      "description": "Skip to content",
+      "imageUrl": "https://ccwonline.com.au/cdn/shop/files/website_logo.png?v=1780628157",
+      "sds": [
+        {
+          "documentUrl": "https://ccwonline.com.au/blogs/safety-data-sheets",
+          "label": "Safety Data Sheets",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        },
+        {
+          "documentUrl": "https://cdn.shopify.com/s/files/1/2179/6391/files/Covid_Safe_Plan.pdf?v=1597707004",
+          "label": "Covid Safe Plan",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        }
+      ],
+      "scrapedAt": "2026-06-25T07:47:20.592Z"
+    },
+    {
+      "slug": "tile-cleaning-portable-extractors",
+      "name": "Tile Cleaning Portable Extractors",
+      "sourceUrl": "https://ccwonline.com.au/collections/tile-cleaning-extractors",
+      "brand": null,
+      "category": null,
+      "description": "Skip to content",
+      "imageUrl": "https://ccwonline.com.au/cdn/shop/files/website_logo.png?v=1780628157",
+      "sds": [
+        {
+          "documentUrl": "https://ccwonline.com.au/blogs/safety-data-sheets",
+          "label": "Safety Data Sheets",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        },
+        {
+          "documentUrl": "https://cdn.shopify.com/s/files/1/2179/6391/files/Covid_Safe_Plan.pdf?v=1597707004",
+          "label": "Covid Safe Plan",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        }
+      ],
+      "scrapedAt": "2026-06-25T07:47:26.890Z"
+    },
+    {
+      "slug": "tramex-moisture-meters",
+      "name": "Tramex Moisture Meters",
+      "sourceUrl": "https://ccwonline.com.au/collections/tramex-moisture-meters",
+      "brand": null,
+      "category": null,
+      "description": "Skip to content",
+      "imageUrl": "https://ccwonline.com.au/cdn/shop/files/website_logo.png?v=1780628157",
+      "sds": [
+        {
+          "documentUrl": "https://ccwonline.com.au/blogs/safety-data-sheets",
+          "label": "Safety Data Sheets",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        },
+        {
+          "documentUrl": "https://cdn.shopify.com/s/files/1/2179/6391/files/Covid_Safe_Plan.pdf?v=1597707004",
+          "label": "Covid Safe Plan",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        }
+      ],
+      "scrapedAt": "2026-06-25T07:46:17.546Z"
+    },
+    {
+      "slug": "truckmounted-carpet-cleaning-equipment",
+      "name": "Truckmounted Carpet Cleaning Equipment",
+      "sourceUrl": "https://ccwonline.com.au/collections/truckmounted-carpet-cleaning-equipment",
+      "brand": null,
+      "category": null,
+      "description": "Skip to content",
+      "imageUrl": "https://ccwonline.com.au/cdn/shop/files/website_logo.png?v=1780628157",
+      "sds": [
+        {
+          "documentUrl": "https://ccwonline.com.au/blogs/safety-data-sheets",
+          "label": "Safety Data Sheets",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        },
+        {
+          "documentUrl": "https://cdn.shopify.com/s/files/1/2179/6391/files/Covid_Safe_Plan.pdf?v=1597707004",
+          "label": "Covid Safe Plan",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        }
+      ],
+      "scrapedAt": "2026-06-25T07:42:52.958Z"
+    },
+    {
+      "slug": "vacu-boom-waste-water-capture-system",
+      "name": "Vacu-boom Waste Water Capture System",
+      "sourceUrl": "https://ccwonline.com.au/collections/vacu-boom-waste-water-capture-system",
+      "brand": null,
+      "category": null,
+      "description": "Skip to content",
+      "imageUrl": "https://ccwonline.com.au/cdn/shop/files/website_logo.png?v=1780628157",
+      "sds": [
+        {
+          "documentUrl": "https://ccwonline.com.au/blogs/safety-data-sheets",
+          "label": "Safety Data Sheets",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        },
+        {
+          "documentUrl": "https://cdn.shopify.com/s/files/1/2179/6391/files/Covid_Safe_Plan.pdf?v=1597707004",
+          "label": "Covid Safe Plan",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        }
+      ],
+      "scrapedAt": "2026-06-25T07:48:52.738Z"
+    },
+    {
+      "slug": "vacuum-boosters",
+      "name": "Vacuum Boosters",
+      "sourceUrl": "https://ccwonline.com.au/collections/vacuum-boosters",
+      "brand": null,
+      "category": null,
+      "description": "Skip to content",
+      "imageUrl": "https://ccwonline.com.au/cdn/shop/files/website_logo.png?v=1780628157",
+      "sds": [
+        {
+          "documentUrl": "https://ccwonline.com.au/blogs/safety-data-sheets",
+          "label": "Safety Data Sheets",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        },
+        {
+          "documentUrl": "https://cdn.shopify.com/s/files/1/2179/6391/files/Covid_Safe_Plan.pdf?v=1597707004",
+          "label": "Covid Safe Plan",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        }
+      ],
+      "scrapedAt": "2026-06-25T07:43:56.528Z"
+    },
+    {
+      "slug": "vacuum-cleaners",
+      "name": "Vacuum Cleaners",
+      "sourceUrl": "https://ccwonline.com.au/collections/vacuum-cleaners",
+      "brand": null,
+      "category": null,
+      "description": "Skip to content",
+      "imageUrl": "https://ccwonline.com.au/cdn/shop/files/website_logo.png?v=1780628157",
+      "sds": [
+        {
+          "documentUrl": "https://ccwonline.com.au/blogs/safety-data-sheets",
+          "label": "Safety Data Sheets",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        },
+        {
+          "documentUrl": "https://cdn.shopify.com/s/files/1/2179/6391/files/Covid_Safe_Plan.pdf?v=1597707004",
+          "label": "Covid Safe Plan",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        }
+      ],
+      "scrapedAt": "2026-06-25T07:48:27.813Z"
+    },
+    {
+      "slug": "wagner-moisture-meters",
+      "name": "Wagner Moisture Meters",
+      "sourceUrl": "https://ccwonline.com.au/collections/wagner-moisture-meters",
+      "brand": null,
+      "category": null,
+      "description": "Skip to content",
+      "imageUrl": "https://ccwonline.com.au/cdn/shop/files/website_logo.png?v=1780628157",
+      "sds": [
+        {
+          "documentUrl": "https://ccwonline.com.au/blogs/safety-data-sheets",
+          "label": "Safety Data Sheets",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        },
+        {
+          "documentUrl": "https://cdn.shopify.com/s/files/1/2179/6391/files/Covid_Safe_Plan.pdf?v=1597707004",
+          "label": "Covid Safe Plan",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        }
+      ],
+      "scrapedAt": "2026-06-25T07:45:59.908Z"
+    },
+    {
+      "slug": "water-damage-fire-damage-restoration-accessories",
+      "name": "Water Damage & Fire Damage Restoration Accessories",
+      "sourceUrl": "https://ccwonline.com.au/collections/water-damage-fire-damage-restoration-accessories",
+      "brand": null,
+      "category": null,
+      "description": "Skip to content",
+      "imageUrl": "https://ccwonline.com.au/cdn/shop/files/website_logo.png?v=1780628157",
+      "sds": [
+        {
+          "documentUrl": "https://ccwonline.com.au/blogs/safety-data-sheets",
+          "label": "Safety Data Sheets",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        },
+        {
+          "documentUrl": "https://cdn.shopify.com/s/files/1/2179/6391/files/Covid_Safe_Plan.pdf?v=1597707004",
+          "label": "Covid Safe Plan",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        }
+      ],
+      "scrapedAt": "2026-06-25T07:44:03.443Z"
+    },
+    {
+      "slug": "web-specials",
+      "name": "Web Specials",
+      "sourceUrl": "https://ccwonline.com.au/collections/web-specials",
+      "brand": null,
+      "category": null,
+      "description": "Skip to content",
+      "imageUrl": "https://ccwonline.com.au/cdn/shop/files/website_logo.png?v=1780628157",
+      "sds": [
+        {
+          "documentUrl": "https://ccwonline.com.au/blogs/safety-data-sheets",
+          "label": "Safety Data Sheets",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        },
+        {
+          "documentUrl": "https://cdn.shopify.com/s/files/1/2179/6391/files/Covid_Safe_Plan.pdf?v=1597707004",
+          "label": "Covid Safe Plan",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        }
+      ],
+      "scrapedAt": "2026-06-25T07:42:34.633Z"
+    },
+    {
+      "slug": "what-s-new",
+      "name": "What's New",
+      "sourceUrl": "https://ccwonline.com.au/collections/whats-new",
+      "brand": null,
+      "category": null,
+      "description": "Skip to content",
+      "imageUrl": "https://ccwonline.com.au/cdn/shop/files/website_logo.png?v=1780628157",
+      "sds": [
+        {
+          "documentUrl": "https://ccwonline.com.au/blogs/safety-data-sheets",
+          "label": "Safety Data Sheets",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        },
+        {
+          "documentUrl": "https://cdn.shopify.com/s/files/1/2179/6391/files/Covid_Safe_Plan.pdf?v=1597707004",
+          "label": "Covid Safe Plan",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        }
+      ],
+      "scrapedAt": "2026-06-25T07:42:24.795Z"
+    },
+    {
+      "slug": "your-shopping-cart",
+      "name": "Your Shopping Cart",
+      "sourceUrl": "https://ccwonline.com.au/cart",
+      "brand": null,
+      "category": null,
+      "description": "Skip to content",
+      "imageUrl": "https://ccwonline.com.au/cdn/shop/files/website_logo.png?v=1780628157",
+      "sds": [
+        {
+          "documentUrl": "https://ccwonline.com.au/blogs/safety-data-sheets",
+          "label": "Safety Data Sheets",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        },
+        {
+          "documentUrl": "https://cdn.shopify.com/s/files/1/2179/6391/files/Covid_Safe_Plan.pdf?v=1597707004",
+          "label": "Covid Safe Plan",
+          "issuedAt": null,
+          "hazards": [],
+          "extractedText": ""
+        }
+      ],
+      "scrapedAt": "2026-06-25T07:41:51.787Z"
+    }
+  ]
 }
