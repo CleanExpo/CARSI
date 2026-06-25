@@ -65,6 +65,7 @@ async function lessonTotalsForCourse(courseId: string): Promise<{ ids: string[];
 export async function forceCompleteEnrollment(
   enrollmentId: string,
   studentId: string,
+  options?: { initiatedByAdminEmail?: string | null },
 ): Promise<{ lessonsMarked: number }> {
   const en = await prisma.lmsEnrollment.findFirst({
     where: { id: enrollmentId, studentId },
@@ -76,7 +77,7 @@ export async function forceCompleteEnrollment(
   const now = new Date();
 
   if (total === 0) {
-    await syncEnrollmentCompletion(en.id, en.studentId, en.courseId);
+    await syncEnrollmentCompletion(en.id, en.studentId, en.courseId, options);
     return { lessonsMarked: 0 };
   }
 
@@ -104,14 +105,15 @@ export async function forceCompleteEnrollment(
     }),
   ]);
 
-  await syncEnrollmentCompletion(en.id, en.studentId, en.courseId);
+  await syncEnrollmentCompletion(en.id, en.studentId, en.courseId, options);
   return { lessonsMarked: total };
 }
 
 export async function syncEnrollmentCompletion(
   enrollmentId: string,
   studentId: string,
-  courseId: string
+  courseId: string,
+  options?: { initiatedByAdminEmail?: string | null; skipIicrcAutoSubmit?: boolean },
 ): Promise<void> {
   const { ids, total } = await lessonTotalsForCourse(courseId);
   const prior = await prisma.lmsEnrollment.findUnique({
@@ -144,11 +146,13 @@ export async function syncEnrollmentCompletion(
     },
   });
 
-  if (allDone && !wasAlreadyCompleted) {
+  if (allDone && !wasAlreadyCompleted && !options?.skipIicrcAutoSubmit) {
     const { processIicrcCecSubmissionForEnrollment } = await import(
       '@/lib/server/iicrc-cec-submission'
     );
-    void processIicrcCecSubmissionForEnrollment(enrollmentId).catch((e) =>
+    void processIicrcCecSubmissionForEnrollment(enrollmentId, {
+      initiatedByAdminEmail: options?.initiatedByAdminEmail ?? null,
+    }).catch((e) =>
       console.error('[enrollment] IICRC CEC auto-submit', enrollmentId, e),
     );
   }

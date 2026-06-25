@@ -17,7 +17,7 @@ import {
   Trash2,
   UserRound,
 } from 'lucide-react';
-import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
+import { Cell, Pie, PieChart, Tooltip } from 'recharts';
 
 import type { AdminCatalogCourseOption, AdminUserProgress } from '@/lib/admin/admin-user-progress';
 import type { AdminCourseProgressForUser } from '@/lib/admin/admin-user-progress';
@@ -31,10 +31,11 @@ import {
   LearnerAvatar,
   StatusBadge,
 } from '@/components/admin/admin-learner-ui';
+import { renewalStatusLabel, type RenewalStatus } from '@/types/iicrc-renewal';
 import { AdminCourseMultiPicker } from '@/components/admin/AdminCourseMultiPicker';
 import { ProgressBar } from '@/components/lms/ProgressBar';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 
 const chartTooltipProps = {
@@ -47,27 +48,46 @@ const chartTooltipProps = {
   itemStyle: { color: 'rgba(255, 255, 255, 0.95)', fontSize: 13 },
 } as const;
 
+function isCecEligibleEnrollment(enrollment: AdminCourseProgressForUser): boolean {
+  return (
+    (enrollment.cecHours != null && enrollment.cecHours > 0) ||
+    Boolean(enrollment.discipline?.trim())
+  );
+}
+
 function CourseEnrollmentCard({
   enrollment,
   pendingRevoke,
   pendingComplete,
+  pendingSendIicrc,
+  hasIicrcMemberNumber,
   selectable,
   selected,
   onToggleSelect,
   onRevoke,
   onMarkComplete,
+  onSendIicrc,
 }: {
   enrollment: AdminCourseProgressForUser;
   pendingRevoke: boolean;
   pendingComplete: boolean;
+  pendingSendIicrc: boolean;
+  hasIicrcMemberNumber: boolean;
   selectable: boolean;
   selected: boolean;
   onToggleSelect: () => void;
   onRevoke: (id: string) => void;
   onMarkComplete: (id: string) => void;
+  onSendIicrc: (id: string) => void;
 }) {
   const statusLabel = enrollment.status.replace(/_/g, ' ');
   const isComplete = enrollment.completionPct >= 100;
+  const cecEligible = isCecEligibleEnrollment(enrollment);
+  const renewalAlreadySent =
+    enrollment.renewalStatus === 'sent' ||
+    enrollment.renewalStatus === 'approved' ||
+    enrollment.renewalStatus === 'completed';
+  const canSendIicrc = isComplete && cecEligible && hasIicrcMemberNumber && !renewalAlreadySent;
   return (
     <article
       className={cn(
@@ -164,6 +184,76 @@ function CourseEnrollmentCard({
         <div className="mt-4">
           <ProgressBar percentage={enrollment.completionPct} label="Course completion" />
         </div>
+        {isComplete && cecEligible ? (
+          <div className="mt-4 rounded-xl border border-[#2490ed]/20 bg-[#2490ed]/[0.06] px-4 py-3">
+            <p className="text-[10px] font-semibold tracking-[0.18em] text-[#7ec5ff]/80 uppercase">
+              IICRC renewal
+            </p>
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              {enrollment.renewalStatus ? (
+                <StatusBadge
+                  label={renewalStatusLabel(enrollment.renewalStatus as RenewalStatus)}
+                  tone={
+                    enrollment.renewalStatus === 'approved' ||
+                    enrollment.renewalStatus === 'completed' ||
+                    enrollment.renewalStatus === 'sent'
+                      ? 'success'
+                      : enrollment.renewalStatus === 'awaiting_response'
+                        ? 'warning'
+                        : enrollment.renewalStatus === 'failed' || enrollment.renewalStatus === 'rejected'
+                          ? 'warning'
+                          : 'muted'
+                  }
+                />
+              ) : (
+                <StatusBadge label="Not sent" tone="muted" />
+              )}
+              {enrollment.renewalSentAt ? (
+                <span className="text-xs text-white/45">
+                  Sent {formatAdminDateTime(enrollment.renewalSentAt)}
+                </span>
+              ) : null}
+              {enrollment.renewalCommunicationCount > 0 ? (
+                <span className="text-xs text-white/40">
+                  {enrollment.renewalCommunicationCount} message
+                  {enrollment.renewalCommunicationCount === 1 ? '' : 's'}
+                </span>
+              ) : null}
+            </div>
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              {canSendIicrc ? (
+                <Button
+                  type="button"
+                  size="sm"
+                  className="h-8 rounded-lg bg-[#2490ed] px-3 text-xs font-semibold hover:bg-[#1a7fd4]"
+                  disabled={pendingSendIicrc || pendingComplete || pendingRevoke}
+                  onClick={() => onSendIicrc(enrollment.enrollmentId)}
+                >
+                  {pendingSendIicrc ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <>
+                      <Mail className="mr-1.5 h-3.5 w-3.5" />
+                      Send IICRC email
+                    </>
+                  )}
+                </Button>
+              ) : null}
+              {!hasIicrcMemberNumber && isComplete ? (
+                <span className="text-xs text-amber-200/70">IICRC member number required</span>
+              ) : null}
+              {enrollment.renewalSubmissionId ? (
+                <Link
+                  href={`/admin/iicrc-cec/${enrollment.renewalSubmissionId}`}
+                  className="inline-flex items-center gap-1 text-xs font-medium text-[#7ec5ff] hover:underline"
+                >
+                  <Mail className="h-3 w-3" />
+                  View communication log
+                </Link>
+              ) : null}
+            </div>
+          </div>
+        ) : null}
       </div>
       <div className="bg-black/15 px-5 py-4 sm:px-6">
         <p className="mb-3 text-[10px] font-semibold tracking-[0.18em] text-white/38 uppercase">Modules</p>
@@ -215,7 +305,9 @@ export function AdminUserDetailClient({
   const [pendingRevokeId, setPendingRevokeId] = useState<string | null>(null);
   const [pendingCompleteIds, setPendingCompleteIds] = useState<Set<string>>(() => new Set());
   const [selectedEnrollmentIds, setSelectedEnrollmentIds] = useState<Set<string>>(() => new Set());
+  const [pendingSendIicrcIds, setPendingSendIicrcIds] = useState<Set<string>>(() => new Set());
   const [actionError, setActionError] = useState<string | null>(null);
+  const [actionSuccess, setActionSuccess] = useState<string | null>(null);
 
   const incompleteEnrollments = useMemo(
     () => user.enrollments.filter((e) => e.completionPct < 100),
@@ -240,7 +332,12 @@ export function AdminUserDetailClient({
     [user.overallCompletionPct],
   );
 
-  const displayName = user.fullName?.trim() || user.email.split('@')[0] || 'Learner';
+  const cecEligibleCompleted = useMemo(
+    () => user.enrollments.filter((e) => e.completionPct >= 100 && isCecEligibleEnrollment(e)),
+    [user.enrollments],
+  );
+
+  const hasIicrcMemberNumber = Boolean(user.iicrcMemberNumber?.trim());
 
   async function grantSelectedCourses() {
     setActionError(null);
@@ -329,8 +426,83 @@ export function AdminUserDetailClient({
     }
   }
 
+  async function sendIicrcRenewalEmail(enrollmentId: string) {
+    setActionError(null);
+    setActionSuccess(null);
+
+    const enrollment = user.enrollments.find((e) => e.enrollmentId === enrollmentId);
+    const iicrcMemberNumber = user.iicrcMemberNumber?.trim();
+    if (!iicrcMemberNumber) {
+      setActionError('Add an IICRC member number to this learner profile before sending renewal email.');
+      return;
+    }
+
+    setPendingSendIicrcIds(new Set([enrollmentId]));
+    try {
+      const res = await fetch('/api/admin/iicrc-cec-submissions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        signal: AbortSignal.timeout(15_000),
+        body: JSON.stringify({
+          enrollmentId,
+          studentId: user.userId,
+          iicrcMemberNumber,
+          cecHours: enrollment?.cecHours ?? null,
+        }),
+      });
+      const payload = (await res.json().catch(() => ({}))) as {
+        detail?: string;
+        status?: string;
+        alreadySent?: boolean;
+        failureReason?: string;
+      };
+      if (res.status === 202 || payload.status === 'processing') {
+        setActionSuccess(
+          payload.detail ??
+            'IICRC renewal email is being sent. Refresh in a moment or check Admin → IICRC CEC.',
+        );
+        router.refresh();
+        return;
+      }
+      if (!res.ok) {
+        if (res.status === 504) {
+          setActionError(
+            'Request timed out while sending to IICRC. Check Admin → IICRC CEC for whether the email was logged.',
+          );
+          return;
+        }
+        setActionError(payload.detail ?? 'Could not send IICRC renewal email');
+        return;
+      }
+      if (payload.alreadySent) {
+        setActionSuccess('IICRC renewal email was already sent for this course.');
+      } else if (payload.status === 'sent') {
+        setActionSuccess('IICRC renewal email sent successfully.');
+      } else if (payload.status === 'failed') {
+        setActionError(payload.detail ?? 'IICRC email delivery failed — check the communication log.');
+      } else if (payload.status === 'skipped') {
+        setActionError(
+          payload.detail ??
+            'IICRC submission was skipped — verify course CEC eligibility, RESEND_API_KEY, and completion status.',
+        );
+      }
+      router.refresh();
+    } finally {
+      setPendingSendIicrcIds(new Set());
+    }
+  }
+
+  const displayName = user.fullName?.trim() || user.email.split('@')[0] || 'Learner';
+
   const bulkCompletePending = pendingCompleteIds.size > 0;
   const selectedCount = selectedEnrollmentIds.size;
+  const enrollDisabled =
+    selectedCourseSlugs.size === 0 || pendingGrant || grantableCount === 0;
+  const enrollButtonLabel =
+    selectedCourseSlugs.size > 0
+      ? `Enroll in ${selectedCourseSlugs.size} course${selectedCourseSlugs.size === 1 ? '' : 's'}`
+      : 'Enroll learner';
 
   return (
     <div className="relative px-5 py-8 pb-24 sm:px-8 sm:py-10">
@@ -350,6 +522,15 @@ export function AdminUserDetailClient({
         <ArrowLeft className="h-4 w-4" />
         Back to learner directory
       </Link>
+
+      {actionSuccess ? (
+        <div
+          className="mb-6 rounded-xl border border-emerald-400/25 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100"
+          role="status"
+        >
+          {actionSuccess}
+        </div>
+      ) : null}
 
       {actionError ? (
         <div
@@ -395,25 +576,23 @@ export function AdminUserDetailClient({
               </div>
             </div>
             <div className="relative mx-auto h-[140px] w-[140px] shrink-0 lg:mx-0">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={gaugeData}
-                    dataKey="value"
-                    cx="50%"
-                    cy="50%"
-                    innerRadius="58%"
-                    outerRadius="82%"
-                    startAngle={90}
-                    endAngle={-270}
-                    stroke="none"
-                  >
-                    <Cell fill="#2490ed" />
-                    <Cell fill="rgba(255,255,255,0.07)" />
-                  </Pie>
-                  <Tooltip {...chartTooltipProps} />
-                </PieChart>
-              </ResponsiveContainer>
+              <PieChart width={140} height={140}>
+                <Pie
+                  data={gaugeData}
+                  dataKey="value"
+                  cx={70}
+                  cy={70}
+                  innerRadius={40}
+                  outerRadius={57}
+                  startAngle={90}
+                  endAngle={-270}
+                  stroke="none"
+                >
+                  <Cell fill="#2490ed" />
+                  <Cell fill="rgba(255,255,255,0.07)" />
+                </Pie>
+                <Tooltip {...chartTooltipProps} />
+              </PieChart>
               <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
                 <span
                   className="text-3xl font-black tabular-nums"
@@ -492,6 +671,57 @@ export function AdminUserDetailClient({
                 No IICRC member number on file. Add it from the learner profile when they update credentials.
               </p>
             ) : null}
+
+            {cecEligibleCompleted.length > 0 ? (
+              <div className="rounded-xl border border-[#2490ed]/20 bg-[#2490ed]/[0.05] p-4">
+                <div className="flex items-center gap-2">
+                  <Mail className="h-4 w-4 text-[#7ec5ff]" />
+                  <p className="text-sm font-semibold text-white/88">Manual IICRC renewal</p>
+                </div>
+                <p className="mt-1 text-xs text-white/45">
+                  Send certificate of completion to IICRC using member number{' '}
+                  <span className="font-medium text-white/70">{user.iicrcMemberNumber}</span>
+                </p>
+                <ul className="mt-3 space-y-2">
+                  {cecEligibleCompleted.map((e) => {
+                    const alreadySent =
+                      e.renewalStatus === 'sent' ||
+                      e.renewalStatus === 'approved' ||
+                      e.renewalStatus === 'completed';
+                    return (
+                      <li
+                        key={e.enrollmentId}
+                        className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-white/[0.06] bg-black/20 px-3 py-2"
+                      >
+                        <div className="min-w-0">
+                          <p className="truncate text-xs font-medium text-white/80">{e.courseTitle}</p>
+                          {e.cecHours != null && e.cecHours > 0 ? (
+                            <p className="text-[10px] text-white/40">{e.cecHours} CEC hours</p>
+                          ) : null}
+                        </div>
+                        {alreadySent ? (
+                          <StatusBadge label="Sent" tone="success" />
+                        ) : hasIicrcMemberNumber ? (
+                          <Button
+                            type="button"
+                            size="sm"
+                            className="h-7 rounded-lg bg-[#2490ed] px-2.5 text-[11px] font-semibold hover:bg-[#1a7fd4]"
+                            disabled={pendingSendIicrcIds.has(e.enrollmentId)}
+                            onClick={() => void sendIicrcRenewalEmail(e.enrollmentId)}
+                          >
+                            {pendingSendIicrcIds.has(e.enrollmentId) ? (
+                              <Loader2 className="h-3 w-3 animate-spin" />
+                            ) : (
+                              'Send email'
+                            )}
+                          </Button>
+                        ) : null}
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            ) : null}
           </CardContent>
         </Card>
 
@@ -510,22 +740,8 @@ export function AdminUserDetailClient({
                 </div>
               </div>
               <div className="space-y-3">
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="text-[10px] font-semibold tracking-[0.16em] text-white/38 uppercase">
-                    Add courses
-                  </div>
-                  <Button
-                    type="button"
-                    className="h-10 shrink-0 rounded-xl px-5 font-semibold sm:self-start"
-                    disabled={selectedCourseSlugs.size === 0 || pendingGrant || grantableCount === 0}
-                    onClick={() => void grantSelectedCourses()}
-                  >
-                    {pendingGrant ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      `Grant access${selectedCourseSlugs.size > 0 ? ` (${selectedCourseSlugs.size})` : ''}`
-                    )}
-                  </Button>
+                <div className="text-[10px] font-semibold tracking-[0.16em] text-white/38 uppercase">
+                  Add courses
                 </div>
                 <AdminCourseMultiPicker
                   courses={catalogCourses}
@@ -533,9 +749,44 @@ export function AdminUserDetailClient({
                   selectedSlugs={selectedCourseSlugs}
                   onSelectionChange={setSelectedCourseSlugs}
                   disabled={pendingGrant || grantableCount === 0}
+                  onEnroll={() => void grantSelectedCourses()}
+                  enrollPending={pendingGrant}
+                  enrollDisabled={enrollDisabled}
                 />
+                {grantableCount === 0 ? (
+                  <p className="rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white/45">
+                    This learner is already enrolled in every course in the catalog.
+                  </p>
+                ) : null}
               </div>
             </CardHeader>
+            <CardFooter className="flex flex-col gap-3 border-t border-white/[0.06] bg-black/20 px-6 py-4">
+              <p className="text-sm text-white/50">
+                {selectedCourseSlugs.size > 0 ? (
+                  <>
+                    <span className="font-medium text-white/85">
+                      {selectedCourseSlugs.size} course
+                      {selectedCourseSlugs.size === 1 ? '' : 's'} ready to assign
+                    </span>
+                    {' · '}Confirm enrollment below
+                  </>
+                ) : (
+                  'Select one or more courses, then confirm enrollment'
+                )}
+              </p>
+              <Button
+                type="button"
+                className="h-12 w-full rounded-xl bg-[#2490ed] px-6 text-base font-semibold text-white shadow-lg shadow-[#2490ed]/25 hover:bg-[#1a7fd4] disabled:opacity-40"
+                disabled={enrollDisabled}
+                onClick={() => void grantSelectedCourses()}
+              >
+                {pendingGrant ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  enrollButtonLabel
+                )}
+              </Button>
+            </CardFooter>
           </Card>
 
           {user.enrollments.length > 0 ? (
@@ -602,6 +853,8 @@ export function AdminUserDetailClient({
                   <CourseEnrollmentCard
                     key={e.enrollmentId}
                     enrollment={e}
+                    hasIicrcMemberNumber={hasIicrcMemberNumber}
+                    pendingSendIicrc={pendingSendIicrcIds.has(e.enrollmentId)}
                     selectable={isIncomplete}
                     selected={selectedEnrollmentIds.has(e.enrollmentId)}
                     pendingRevoke={pendingRevokeId === e.enrollmentId}
@@ -615,6 +868,7 @@ export function AdminUserDetailClient({
                         ? () => {}
                         : (id) => void markEnrollmentsComplete([id])
                     }
+                    onSendIicrc={(id) => void sendIicrcRenewalEmail(id)}
                   />
                 );
               })}
@@ -623,15 +877,39 @@ export function AdminUserDetailClient({
             <div
               className={cn(
                 adminGlassCard,
-                'flex flex-col items-center justify-center gap-3 py-16 text-center',
+                'flex flex-col items-center justify-center gap-4 py-16 text-center',
               )}
             >
               <Calendar className="h-10 w-10 text-white/25" strokeWidth={1.25} />
               <p className="text-sm font-medium text-white/70">No course enrollments yet</p>
-              <p className="max-w-sm text-xs text-white/45">
-                Grant a course from the catalog above to start tracking this learner&apos;s modules and
-                completion.
-              </p>
+              {selectedCourseSlugs.size > 0 ? (
+                <>
+                  <p className="max-w-sm text-xs text-white/45">
+                    {selectedCourseSlugs.size} course
+                    {selectedCourseSlugs.size === 1 ? '' : 's'} selected — use the blue{' '}
+                    <span className="font-medium text-white/65">Enroll</span> button in the panel
+                    above to grant access.
+                  </p>
+                  <Button
+                    type="button"
+                    className="h-11 rounded-xl bg-[#2490ed] px-8 font-semibold text-white hover:bg-[#1a7fd4] disabled:opacity-40"
+                    disabled={enrollDisabled}
+                    onClick={() => void grantSelectedCourses()}
+                  >
+                    {pendingGrant ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      enrollButtonLabel
+                    )}
+                  </Button>
+                </>
+              ) : (
+                <p className="max-w-sm text-xs text-white/45">
+                  Select courses in the panel above, then click{' '}
+                  <span className="font-medium text-white/65">Enroll learner</span> to grant access
+                  and start tracking modules and completion.
+                </p>
+              )}
             </div>
           )}
         </div>

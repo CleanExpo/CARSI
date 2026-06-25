@@ -56,10 +56,17 @@ function clientHasTeamCoursePurchases(client: PrismaClient): boolean {
   );
 }
 
+function clientHasRenewalCommunications(client: PrismaClient): boolean {
+  return Boolean(
+    (client as PrismaClient & { lmsIicrcCecCommunication?: { groupBy?: unknown } })
+      .lmsIicrcCecCommunication?.groupBy,
+  );
+}
+
 /** Dev HMR can keep a Prisma client generated before new models exist — refresh when stale. */
 function getPrismaClient(): PrismaClient {
   let client = globalForPrisma.prisma ?? createClient();
-  if (!clientHasTeamCoursePurchases(client)) {
+  if (!clientHasTeamCoursePurchases(client) || !clientHasRenewalCommunications(client)) {
     client = createClient();
   }
   if (process.env.NODE_ENV !== 'production') {

@@ -197,32 +197,108 @@ model LmsEnrollment {
 
 /// Auto-submitted IICRC CEC certificate emails (renewals@iicrcnet.org) on course completion.
 model LmsIicrcCecSubmission {
-  id                String    @id @default(uuid()) @db.Uuid
-  enrollmentId      String    @unique @map("enrollment_id") @db.Uuid
-  studentId         String    @map("student_id") @db.Uuid
-  courseId          String    @map("course_id") @db.Uuid
-  recipientEmail    String    @map("recipient_email") @db.VarChar(320)
-  technicianEmail   String    @map("technician_email") @db.VarChar(320)
-  status            String    @default("pending") @db.VarChar(16)
-  cecHours          Float?    @map("cec_hours")
-  iicrcDiscipline   String?   @map("iicrc_discipline") @db.VarChar(16)
-  iicrcMemberNumber String?   @map("iicrc_member_number") @db.VarChar(32)
-  emailSubject      String?   @map("email_subject") @db.Text
-  emailTextBody     String?   @map("email_text_body") @db.Text
-  providerMessageId String?   @map("provider_message_id") @db.VarChar(128)
-  failureReason     String?   @map("failure_reason") @db.Text
-  sentAt            DateTime? @map("sent_at") @db.Timestamptz(6)
-  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt         DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  id                    String    @id @default(uuid()) @db.Uuid
+  enrollmentId          String    @unique @map("enrollment_id") @db.Uuid
+  studentId             String    @map("student_id") @db.Uuid
+  courseId              String    @map("course_id") @db.Uuid
+  recipientEmail        String    @map("recipient_email") @db.VarChar(320)
+  technicianEmail       String    @map("technician_email") @db.VarChar(320)
+  /// Delivery status: pending | sent | failed | skipped
+  status                String    @default("pending") @db.VarChar(16)
+  /// Workflow status: pending | sent | awaiting_response | approved | rejected | completed | skipped | failed
+  renewalStatus         String    @default("pending") @map("renewal_status") @db.VarChar(24)
+  initiatedByAdminEmail String?   @map("initiated_by_admin_email") @db.VarChar(320)
+  cecHours              Float?    @map("cec_hours")
+  iicrcDiscipline       String?   @map("iicrc_discipline") @db.VarChar(16)
+  iicrcMemberNumber     String?   @map("iicrc_member_number") @db.VarChar(32)
+  emailSubject          String?   @map("email_subject") @db.Text
+  emailTextBody         String?   @map("email_text_body") @db.Text
+  emailHtmlBody         String?   @map("email_html_body") @db.Text
+  ccEmails              String?   @map("cc_emails") @db.Text
+  providerMessageId     String?   @map("provider_message_id") @db.VarChar(128)
+  failureReason         String?   @map("failure_reason") @db.Text
+  sentAt                DateTime? @map("sent_at") @db.Timestamptz(6)
+  createdAt             DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt             DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  enrollment LmsEnrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
-  student    LmsUser       @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  course     LmsCourse     @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  enrollment     LmsEnrollment                 @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  student        LmsUser                       @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  course         LmsCourse                     @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  communications LmsIicrcCecCommunication[]
+  notes          LmsIicrcCecSubmissionNote[]
 
   @@index([studentId])
   @@index([status])
+  @@index([renewalStatus])
   @@index([sentAt])
   @@map("lms_iicrc_cec_submissions")
+}
+
+/// Individual email in the renewal communication audit trail (outbound or inbound).
+model LmsIicrcCecCommunication {
+  id                    String    @id @default(uuid()) @db.Uuid
+  submissionId          String    @map("submission_id") @db.Uuid
+  enrollmentId          String    @map("enrollment_id") @db.Uuid
+  studentId             String    @map("student_id") @db.Uuid
+  courseId              String    @map("course_id") @db.Uuid
+  /// outbound | inbound
+  direction             String    @db.VarChar(12)
+  /// iicrc_submission | technician_receipt | inbound_reply | admin_manual
+  kind                  String    @db.VarChar(24)
+  initiatedByAdminEmail String?   @map("initiated_by_admin_email") @db.VarChar(320)
+  fromEmail             String    @map("from_email") @db.VarChar(320)
+  toEmails              String    @map("to_emails") @db.Text
+  ccEmails              String?   @map("cc_emails") @db.Text
+  subject               String    @db.Text
+  textBody              String?   @map("text_body") @db.Text
+  htmlBody              String?   @map("html_body") @db.Text
+  /// pending | sent | delivered | failed | bounced | skipped
+  deliveryStatus        String    @default("pending") @map("delivery_status") @db.VarChar(16)
+  providerMessageId     String?   @map("provider_message_id") @db.VarChar(128)
+  failureReason         String?   @map("failure_reason") @db.Text
+  sentAt                DateTime? @map("sent_at") @db.Timestamptz(6)
+  receivedAt            DateTime? @map("received_at") @db.Timestamptz(6)
+  createdAt             DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  submission  LmsIicrcCecSubmission              @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  attachments LmsIicrcCecCommunicationAttachment[]
+
+  @@index([submissionId])
+  @@index([studentId])
+  @@index([enrollmentId])
+  @@index([createdAt])
+  @@map("lms_iicrc_cec_communications")
+}
+
+model LmsIicrcCecCommunicationAttachment {
+  id              String @id @default(uuid()) @db.Uuid
+  communicationId String @map("communication_id") @db.Uuid
+  filename        String @db.VarChar(255)
+  mimeType        String @map("mime_type") @db.VarChar(128)
+  sizeBytes       Int?   @map("size_bytes")
+  /// outbound | inbound
+  direction       String @db.VarChar(12)
+
+  communication LmsIicrcCecCommunication @relation(fields: [communicationId], references: [id], onDelete: Cascade)
+
+  @@index([communicationId])
+  @@map("lms_iicrc_cec_communication_attachments")
+}
+
+/// Internal admin notes and follow-up actions for a renewal submission.
+model LmsIicrcCecSubmissionNote {
+  id              String    @id @default(uuid()) @db.Uuid
+  submissionId    String    @map("submission_id") @db.Uuid
+  authorAdminEmail String   @map("author_admin_email") @db.VarChar(320)
+  body            String    @db.Text
+  followUpAction  String?   @map("follow_up_action") @db.Text
+  followUpDueAt   DateTime? @map("follow_up_due_at") @db.Timestamptz(6)
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  submission LmsIicrcCecSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+
+  @@index([submissionId])
+  @@map("lms_iicrc_cec_submission_notes")
 }
 
 model LmsCategory {

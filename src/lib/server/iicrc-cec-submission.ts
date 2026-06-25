@@ -7,9 +7,14 @@ import {
 } from '@/lib/server/certificate-pdf';
 import { sendEmail } from '@/lib/server/email';
 import {
+  isCloudinaryConfigured,
+  uploadCertificatePdfToCloudinary,
+} from '@/lib/server/cloudinary-upload';
+import {
   courseEligibleForIicrcCecSubmission,
   getIicrcCecSubmissionEmail,
   isIicrcCecAutoSubmitEnabled,
+  resolveEffectiveCecHours,
 } from '@/lib/server/iicrc-cec-config';
 import {
   buildIicrcCecSubmissionHtml,
@@ -20,7 +25,25 @@ import {
   type IicrcCecSubmissionEmailContent,
 } from '@/lib/server/iicrc-cec-email';
 
+import { logRenewalCommunication } from '@/lib/server/iicrc-renewal-communication';
+
+type LoadedEnrollment = NonNullable<Awaited<ReturnType<typeof loadEnrollmentForSubmission>>>;
+
 export type IicrcCecSubmissionStatus = 'pending' | 'sent' | 'failed' | 'skipped';
+
+export type ProcessIicrcCecSubmissionOptions = {
+  initiatedByAdminEmail?: string | null;
+  /** Admin-initiated send bypasses IICRC_CEC_AUTO_SUBMIT=false. */
+  forceSend?: boolean;
+  /** Admin payload override — persisted to learner profile when provided. */
+  iicrcMemberNumber?: string | null;
+  /** Admin payload override for CEC hours on this submission. */
+  cecHoursOverride?: number | null;
+};
+
+function emailFromAddress(): string {
+  return process.env.EMAIL_FROM?.trim() || 'CARSI Learning <noreply@carsi.com.au>';
+}
 
 export type IicrcCecSubmissionRow = {
   id: string;
@@ -31,6 +54,9 @@ export type IicrcCecSubmissionRow = {
   course_title: string;
   course_slug: string;
   status: IicrcCecSubmissionStatus;
+  renewal_status: string;
+  initiated_by_admin_email: string | null;
+  communication_count: number;
   cec_hours: number | null;
   iicrc_discipline: string | null;
   iicrc_member_number: string | null;
@@ -84,12 +110,13 @@ async function loadEnrollmentForSubmission(enrollmentId: string) {
 }
 
 function emailContentFromEnrollment(
-  row: NonNullable<Awaited<ReturnType<typeof loadEnrollmentForSubmission>>>,
+  row: LoadedEnrollment,
   completedAt: Date,
+  cecHoursOverride?: number | null
 ): IicrcCecSubmissionEmailContent {
   const origin = appOrigin();
   const studentName = row.student.fullName?.trim() || row.student.email;
-  const cecHours = Number(row.course.cecHours ?? 0);
+  const cecHours = resolvedCecHoursForCourse(row.course, cecHoursOverride) ?? 0;
   return {
     studentName,
     studentEmail: row.student.email,
@@ -103,13 +130,69 @@ function emailContentFromEnrollment(
   };
 }
 
+function resolvedCecHoursForCourse(
+  course: {
+    slug: string;
+    cecHours: unknown;
+  },
+  override?: number | null
+): number | null {
+  const direct =
+    typeof override === 'number' && Number.isFinite(override) && override > 0 ? override : null;
+  if (direct != null) return direct;
+  return resolveEffectiveCecHours({ slug: course.slug, cecHours: course.cecHours });
+}
+
+function courseCtxForSubmission(
+  enrollment: LoadedEnrollment,
+  options?: ProcessIicrcCecSubmissionOptions
+) {
+  return {
+    slug: enrollment.course.slug,
+    cecHours: resolvedCecHoursForCourse(enrollment.course, options?.cecHoursOverride),
+    iicrcDiscipline: enrollment.course.iicrcDiscipline,
+  };
+}
+
+async function applySubmissionOverrides(
+  enrollment: LoadedEnrollment,
+  options?: ProcessIicrcCecSubmissionOptions
+): Promise<LoadedEnrollment> {
+  const member = options?.iicrcMemberNumber?.trim();
+  let row = enrollment;
+
+  if (member && row.student.iicrcMemberNumber !== member) {
+    await prisma.lmsUser.update({
+      where: { id: row.studentId },
+      data: { iicrcMemberNumber: member },
+    });
+    row = {
+      ...row,
+      student: { ...row.student, iicrcMemberNumber: member },
+    };
+  }
+
+  const hours = resolvedCecHoursForCourse(row.course, options?.cecHoursOverride);
+  if (hours != null) {
+    row = {
+      ...row,
+      course: { ...row.course, cecHours: hours },
+    };
+  }
+
+  return row;
+}
+
 /**
  * Queue IICRC CEC submission after course completion. Idempotent per enrollment.
  * Safe to call fire-and-forget from enrollment sync.
  */
 export async function processIicrcCecSubmissionForEnrollment(
   enrollmentId: string,
+  options?: ProcessIicrcCecSubmissionOptions
 ): Promise<{ status: IicrcCecSubmissionStatus; submissionId?: string }> {
+  const initiatedByAdminEmail = options?.initiatedByAdminEmail?.trim() || null;
+  const forceSend = options?.forceSend === true;
   if (!process.env.DATABASE_URL?.trim()) {
     return { status: 'skipped' };
   }
@@ -122,12 +205,19 @@ export async function processIicrcCecSubmissionForEnrollment(
     return { status: 'sent', submissionId: existing.id };
   }
 
-  const enrollment = await loadEnrollmentForSubmission(enrollmentId);
-  if (!enrollment || enrollment.status !== 'completed' || !enrollment.completedAt) {
+  const rawEnrollment = await loadEnrollmentForSubmission(enrollmentId);
+  if (!rawEnrollment || rawEnrollment.status !== 'completed' || !rawEnrollment.completedAt) {
     return { status: 'skipped' };
   }
 
-  if (!courseEligibleForIicrcCecSubmission(enrollment.course)) {
+  const enrollment = await applySubmissionOverrides(rawEnrollment, options);
+  const completedAt = enrollment.completedAt;
+  if (!completedAt) {
+    return { status: 'skipped' };
+  }
+
+  const courseCtx = courseCtxForSubmission(enrollment, options);
+  if (!courseEligibleForIicrcCecSubmission(courseCtx)) {
     if (!existing) {
       await prisma.lmsIicrcCecSubmission.create({
         data: {
@@ -138,8 +228,10 @@ export async function processIicrcCecSubmissionForEnrollment(
           recipientEmail: getIicrcCecSubmissionEmail(),
           technicianEmail: enrollment.student.email,
           status: 'skipped',
+          renewalStatus: 'skipped',
+          initiatedByAdminEmail,
           failureReason: 'course_not_cec_eligible',
-          cecHours: enrollment.course.cecHours,
+          cecHours: resolvedCecHoursForCourse(enrollment.course),
           iicrcDiscipline: enrollment.course.iicrcDiscipline,
           iicrcMemberNumber: enrollment.student.iicrcMemberNumber,
         },
@@ -148,12 +240,14 @@ export async function processIicrcCecSubmissionForEnrollment(
     return { status: 'skipped' };
   }
 
-  if (!isIicrcCecAutoSubmitEnabled()) {
+  if (!forceSend && !isIicrcCecAutoSubmitEnabled()) {
     const submission = existing
       ? await prisma.lmsIicrcCecSubmission.update({
           where: { id: existing.id },
           data: {
             status: 'skipped',
+            renewalStatus: 'skipped',
+            initiatedByAdminEmail: initiatedByAdminEmail ?? undefined,
             failureReason: 'auto_submit_disabled',
           },
         })
@@ -166,20 +260,38 @@ export async function processIicrcCecSubmissionForEnrollment(
             recipientEmail: getIicrcCecSubmissionEmail(),
             technicianEmail: enrollment.student.email,
             status: 'skipped',
+            renewalStatus: 'skipped',
+            initiatedByAdminEmail,
             failureReason: 'auto_submit_disabled',
-            cecHours: enrollment.course.cecHours,
+            cecHours: resolvedCecHoursForCourse(enrollment.course),
             iicrcDiscipline: enrollment.course.iicrcDiscipline,
             iicrcMemberNumber: enrollment.student.iicrcMemberNumber,
           },
         });
+
+    await logRenewalCommunication({
+      submissionId: submission.id,
+      enrollmentId: enrollment.id,
+      studentId: enrollment.studentId,
+      courseId: enrollment.courseId,
+      direction: 'outbound',
+      kind: 'iicrc_submission',
+      initiatedByAdminEmail,
+      fromEmail: emailFromAddress(),
+      toEmails: submission.recipientEmail,
+      subject: 'CEC submission skipped — auto-submit disabled',
+      textBody: 'Automatic IICRC renewal email was not sent because auto-submit is disabled.',
+      deliveryStatus: 'skipped',
+      failureReason: 'auto_submit_disabled',
+    });
+
     return { status: 'skipped', submissionId: submission.id };
   }
 
   const recipient = getIicrcCecSubmissionEmail();
-  const content = emailContentFromEnrollment(enrollment, enrollment.completedAt);
-  const subject = buildIicrcCecSubmissionSubject(content);
-  const textBody = buildIicrcCecSubmissionText(content);
-  const htmlBody = buildIicrcCecSubmissionHtml(content);
+  const ccList = [enrollment.student.email];
+  const baseContent = emailContentFromEnrollment(enrollment, completedAt, options?.cecHoursOverride);
+  const subject = buildIicrcCecSubmissionSubject(baseContent);
 
   const submission =
     existing != null
@@ -187,13 +299,17 @@ export async function processIicrcCecSubmissionForEnrollment(
           where: { id: existing.id },
           data: {
             status: 'pending',
+            renewalStatus: 'pending',
             recipientEmail: recipient,
             technicianEmail: enrollment.student.email,
-            cecHours: enrollment.course.cecHours,
+            initiatedByAdminEmail,
+            cecHours: resolvedCecHoursForCourse(enrollment.course),
             iicrcDiscipline: enrollment.course.iicrcDiscipline,
             iicrcMemberNumber: enrollment.student.iicrcMemberNumber,
             emailSubject: subject,
-            emailTextBody: textBody,
+            emailTextBody: null,
+            emailHtmlBody: null,
+            ccEmails: JSON.stringify(ccList),
             failureReason: null,
             sentAt: null,
             providerMessageId: null,
@@ -208,20 +324,26 @@ export async function processIicrcCecSubmissionForEnrollment(
             recipientEmail: recipient,
             technicianEmail: enrollment.student.email,
             status: 'pending',
-            cecHours: enrollment.course.cecHours,
+            renewalStatus: 'pending',
+            initiatedByAdminEmail,
+            cecHours: resolvedCecHoursForCourse(enrollment.course),
             iicrcDiscipline: enrollment.course.iicrcDiscipline,
             iicrcMemberNumber: enrollment.student.iicrcMemberNumber,
             emailSubject: subject,
-            emailTextBody: textBody,
+            ccEmails: JSON.stringify(ccList),
           },
         });
+
+  const pdfFilename = `carsi-certificate-${enrollment.course.slug}.pdf`;
+  let textBody: string | undefined;
+  let htmlBody: string | undefined;
 
   try {
     const pdf = await buildCompletionCertificatePdf(
       completionCertificateDataFromEnrollment(
         {
           id: enrollment.id,
-          completedAt: enrollment.completedAt,
+          completedAt,
           certificateIssuedAt: enrollment.certificateIssuedAt,
           student: {
             email: enrollment.student.email,
@@ -230,19 +352,41 @@ export async function processIicrcCecSubmissionForEnrollment(
           course: {
             title: enrollment.course.title,
             iicrcDiscipline: enrollment.course.iicrcDiscipline,
-            cecHours: enrollment.course.cecHours,
+            cecHours: resolvedCecHoursForCourse(enrollment.course),
             level: enrollment.course.level,
           },
         },
-        appOrigin(),
-      ),
+        appOrigin()
+      )
     );
+
+    if (!isCloudinaryConfigured()) {
+      throw new Error('CLOUDINARY_NOT_CONFIGURED');
+    }
+
+    const { url: certificateDownloadUrl } = await uploadCertificatePdfToCloudinary(
+      Buffer.from(pdf),
+      enrollment.id
+    );
+
+    const content: IicrcCecSubmissionEmailContent = {
+      ...baseContent,
+      certificateDownloadUrl,
+    };
+    textBody = buildIicrcCecSubmissionText(content);
+    htmlBody = buildIicrcCecSubmissionHtml(content);
+
+    await prisma.lmsIicrcCecSubmission.update({
+      where: { id: submission.id },
+      data: { emailTextBody: textBody, emailHtmlBody: htmlBody },
+    });
 
     await prisma.lmsEnrollment.update({
       where: { id: enrollment.id },
       data: { certificateIssuedAt: new Date() },
     });
 
+    const sentAt = new Date();
     const iicrcResult = await sendEmail({
       to: recipient,
       cc: enrollment.student.email,
@@ -250,22 +394,45 @@ export async function processIicrcCecSubmissionForEnrollment(
       html: htmlBody,
       text: textBody,
       replyTo: enrollment.student.email,
-      attachments: [
-        {
-          filename: `carsi-certificate-${enrollment.course.slug}.pdf`,
-          content: pdf,
-        },
-      ],
     });
 
     if (!iicrcResult.sent) {
+      const failureReason = iicrcResult.reason ?? 'send_failed';
       await prisma.lmsIicrcCecSubmission.update({
         where: { id: submission.id },
         data: {
           status: 'failed',
-          failureReason: iicrcResult.reason ?? 'send_failed',
+          renewalStatus: 'failed',
+          failureReason,
         },
       });
+
+      await logRenewalCommunication({
+        submissionId: submission.id,
+        enrollmentId: enrollment.id,
+        studentId: enrollment.studentId,
+        courseId: enrollment.courseId,
+        direction: 'outbound',
+        kind: 'iicrc_submission',
+        initiatedByAdminEmail,
+        fromEmail: emailFromAddress(),
+        toEmails: recipient,
+        ccEmails: ccList,
+        subject,
+        textBody,
+        htmlBody,
+        deliveryStatus: 'failed',
+        failureReason,
+        attachments: [
+          {
+            filename: pdfFilename,
+            mimeType: 'application/pdf',
+            sizeBytes: pdf.length,
+            direction: 'outbound',
+          },
+        ],
+      });
+
       return { status: 'failed', submissionId: submission.id };
     }
 
@@ -273,18 +440,71 @@ export async function processIicrcCecSubmissionForEnrollment(
       where: { id: submission.id },
       data: {
         status: 'sent',
-        sentAt: new Date(),
+        renewalStatus: 'sent',
+        sentAt,
         providerMessageId: iicrcResult.messageId ?? null,
         failureReason: null,
       },
     });
 
+    await logRenewalCommunication({
+      submissionId: submission.id,
+      enrollmentId: enrollment.id,
+      studentId: enrollment.studentId,
+      courseId: enrollment.courseId,
+      direction: 'outbound',
+      kind: 'iicrc_submission',
+      initiatedByAdminEmail,
+      fromEmail: emailFromAddress(),
+      toEmails: recipient,
+      ccEmails: ccList,
+      subject,
+      textBody,
+      htmlBody,
+      deliveryStatus: 'sent',
+      providerMessageId: iicrcResult.messageId ?? null,
+      sentAt,
+      attachments: [
+        {
+          filename: pdfFilename,
+          mimeType: 'application/pdf',
+          sizeBytes: pdf.length,
+          direction: 'outbound',
+        },
+      ],
+    });
+
+    const receiptSubject = `CEC submitted to IICRC — ${enrollment.course.title}`;
+    const receiptText = buildTechnicianCecReceiptText(content);
+    const receiptHtml = buildTechnicianCecReceiptHtml(content);
+
     void sendEmail({
       to: enrollment.student.email,
-      subject: `CEC submitted to IICRC — ${enrollment.course.title}`,
-      html: buildTechnicianCecReceiptHtml(content),
-      text: buildTechnicianCecReceiptText(content),
-    }).catch((e) => console.error('[iicrc-cec] technician receipt', e));
+      subject: receiptSubject,
+      html: receiptHtml,
+      text: receiptText,
+    })
+      .then(async (receiptResult) => {
+        await logRenewalCommunication({
+          submissionId: submission.id,
+          enrollmentId: enrollment.id,
+          studentId: enrollment.studentId,
+          courseId: enrollment.courseId,
+          direction: 'outbound',
+          kind: 'technician_receipt',
+          initiatedByAdminEmail,
+          fromEmail: emailFromAddress(),
+          toEmails: enrollment.student.email,
+          subject: receiptSubject,
+          textBody: receiptText,
+          htmlBody: receiptHtml,
+          deliveryStatus: receiptResult.sent ? 'sent' : 'failed',
+          providerMessageId: receiptResult.messageId ?? null,
+          failureReason: receiptResult.sent ? null : (receiptResult.reason ?? 'send_failed'),
+          sentAt: receiptResult.sent ? new Date() : null,
+        });
+      })
+      .catch((e) => console.error('[iicrc-cec] technician receipt', e));
 
     return { status: 'sent', submissionId: submission.id };
   } catch (e) {
@@ -292,18 +512,40 @@ export async function processIicrcCecSubmissionForEnrollment(
     console.error('[iicrc-cec] submission failed', enrollmentId, e);
     await prisma.lmsIicrcCecSubmission.update({
       where: { id: submission.id },
-      data: { status: 'failed', failureReason: msg.slice(0, 500) },
+      data: { status: 'failed', renewalStatus: 'failed', failureReason: msg.slice(0, 500) },
     });
+
+    await logRenewalCommunication({
+      submissionId: submission.id,
+      enrollmentId: enrollment.id,
+      studentId: enrollment.studentId,
+      courseId: enrollment.courseId,
+      direction: 'outbound',
+      kind: 'iicrc_submission',
+      initiatedByAdminEmail,
+      fromEmail: emailFromAddress(),
+      toEmails: recipient,
+      ccEmails: ccList,
+      subject,
+      textBody,
+      htmlBody,
+      deliveryStatus: 'failed',
+      failureReason: msg.slice(0, 500),
+    }).catch((logErr) => console.error('[iicrc-cec] audit log failed', logErr));
+
     return { status: 'failed', submissionId: submission.id };
   }
 }
 
-export async function retryIicrcCecSubmission(submissionId: string): Promise<{
+export async function retryIicrcCecSubmission(
+  submissionId: string,
+  options?: ProcessIicrcCecSubmissionOptions
+): Promise<{
   status: IicrcCecSubmissionStatus;
 }> {
   const row = await prisma.lmsIicrcCecSubmission.findUnique({
     where: { id: submissionId },
-    select: { enrollmentId: true, status: true },
+    select: { enrollmentId: true, status: true, initiatedByAdminEmail: true },
   });
   if (!row) throw new Error('SUBMISSION_NOT_FOUND');
   if (row.status === 'sent') return { status: 'sent' };
@@ -313,13 +555,163 @@ export async function retryIicrcCecSubmission(submissionId: string): Promise<{
     data: { status: 'pending', failureReason: null, sentAt: null, providerMessageId: null },
   });
 
-  const result = await processIicrcCecSubmissionForEnrollment(row.enrollmentId);
+  const result = await processIicrcCecSubmissionForEnrollment(row.enrollmentId, {
+    initiatedByAdminEmail: options?.initiatedByAdminEmail ?? row.initiatedByAdminEmail,
+    forceSend: true,
+  });
   return { status: result.status };
 }
 
-export async function getCecSubmissionSummaryForEnrollment(
-  enrollmentId: string,
-): Promise<{
+export type ManualIicrcSendResult = {
+  status: IicrcCecSubmissionStatus;
+  submissionId?: string;
+  alreadySent?: boolean;
+  failureReason?: string | null;
+  detail?: string;
+};
+
+async function ensureEnrollmentReadyForIicrcManual(enrollmentId: string): Promise<void> {
+  const row = await prisma.lmsEnrollment.findUnique({
+    where: { id: enrollmentId },
+    select: { status: true, completedAt: true },
+  });
+
+  if (row?.status === 'completed' && row.completedAt) return;
+
+  await prisma.lmsEnrollment.update({
+    where: { id: enrollmentId },
+    data: {
+      status: 'completed',
+      completedAt: row?.completedAt ?? new Date(),
+    },
+  });
+}
+
+async function loadSubmissionFailureReason(
+  submissionId: string | undefined
+): Promise<string | null> {
+  if (!submissionId) return null;
+  const row = await prisma.lmsIicrcCecSubmission.findUnique({
+    where: { id: submissionId },
+    select: { failureReason: true },
+  });
+  return row?.failureReason ?? null;
+}
+
+export function iicrcSubmissionFailureMessage(reason: string | null | undefined): string {
+  switch (reason) {
+    case 'not_configured':
+      return 'Email is not configured on the server. Set RESEND_API_KEY and EMAIL_FROM.';
+    case 'send_failed':
+      return 'Email delivery failed. Check server logs and network access to api.resend.com.';
+    case 'resend_error':
+      return 'Resend rejected the email. Verify your API key and verified sending domain.';
+    case 'course_not_cec_eligible':
+      return 'This course is not eligible for IICRC CEC submission.';
+    case 'auto_submit_disabled':
+      return 'IICRC auto-submit is disabled and manual send did not complete.';
+    case 'CLOUDINARY_NOT_CONFIGURED':
+    case 'cloudinary_not_configured':
+      return 'Certificate upload is not configured. Set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET on the server.';
+    case 'submission_skipped':
+      return 'IICRC submission was skipped. Ensure the course is complete and CEC-eligible.';
+    default:
+      return reason?.trim() || 'IICRC renewal email could not be sent.';
+  }
+}
+
+/** Admin-triggered IICRC renewal email for a completed, CEC-eligible enrollment. */
+export async function manualSendIicrcCecForEnrollment(params: {
+  enrollmentId: string;
+  studentId: string;
+  iicrcMemberNumber?: string | null;
+  cecHours?: number | null;
+  initiatedByAdminEmail?: string | null;
+}): Promise<ManualIicrcSendResult> {
+  const enrollmentId = params.enrollmentId.trim();
+  const studentId = params.studentId.trim();
+  if (!enrollmentId || !studentId) throw new Error('INVALID_PARAMS');
+
+  const iicrcMemberNumber = params.iicrcMemberNumber?.trim() || null;
+  const cecHoursOverride =
+    typeof params.cecHours === 'number' && Number.isFinite(params.cecHours) && params.cecHours > 0
+      ? params.cecHours
+      : null;
+
+  let enrollment = await loadEnrollmentForSubmission(enrollmentId);
+  if (!enrollment || enrollment.studentId !== studentId) {
+    throw new Error('ENROLLMENT_NOT_FOUND');
+  }
+
+  const effectiveMember = iicrcMemberNumber || enrollment.student.iicrcMemberNumber?.trim();
+  if (!effectiveMember) {
+    throw new Error('IICRC_MEMBER_NUMBER_REQUIRED');
+  }
+
+  await ensureEnrollmentReadyForIicrcManual(enrollmentId);
+
+  const reloaded = await loadEnrollmentForSubmission(enrollmentId);
+  if (!reloaded || reloaded.status !== 'completed' || !reloaded.completedAt) {
+    throw new Error('ENROLLMENT_NOT_COMPLETED');
+  }
+
+  enrollment = await applySubmissionOverrides(reloaded, {
+    iicrcMemberNumber: effectiveMember,
+    cecHoursOverride,
+  });
+
+  if (
+    !courseEligibleForIicrcCecSubmission(courseCtxForSubmission(enrollment, { cecHoursOverride }))
+  ) {
+    throw new Error('COURSE_NOT_CEC_ELIGIBLE');
+  }
+
+  const existing = await prisma.lmsIicrcCecSubmission.findUnique({
+    where: { enrollmentId },
+    select: { id: true, status: true },
+  });
+  if (existing?.status === 'sent') {
+    return { status: 'sent', submissionId: existing.id, alreadySent: true };
+  }
+
+  if (existing) {
+    await prisma.lmsIicrcCecSubmission.update({
+      where: { id: existing.id },
+      data: {
+        status: 'pending',
+        renewalStatus: 'pending',
+        failureReason: null,
+        sentAt: null,
+        providerMessageId: null,
+        iicrcMemberNumber: enrollment.student.iicrcMemberNumber,
+      },
+    });
+  }
+
+  const result = await processIicrcCecSubmissionForEnrollment(enrollmentId, {
+    initiatedByAdminEmail: params.initiatedByAdminEmail,
+    forceSend: true,
+    iicrcMemberNumber: effectiveMember,
+    cecHoursOverride,
+  });
+
+  const failureReason = await loadSubmissionFailureReason(result.submissionId);
+  const detail =
+    result.status === 'failed' || result.status === 'skipped'
+      ? iicrcSubmissionFailureMessage(
+          failureReason ?? (result.status === 'skipped' ? 'submission_skipped' : 'send_failed')
+        )
+      : undefined;
+
+  return {
+    status: result.status,
+    submissionId: result.submissionId,
+    failureReason,
+    detail,
+  };
+}
+
+export async function getCecSubmissionSummaryForEnrollment(enrollmentId: string): Promise<{
   status: IicrcCecSubmissionStatus | null;
   sent_at: string | null;
   recipient_email: string | null;
@@ -350,6 +742,19 @@ export async function listIicrcCecSubmissionsForAdmin(options?: {
     },
   });
 
+  const submissionIds = rows.map((r) => r.id);
+  const countBySubmission = new Map<string, number>();
+  if (submissionIds.length > 0) {
+    const countRows = await prisma.lmsIicrcCecCommunication.groupBy({
+      by: ['submissionId'],
+      where: { submissionId: { in: submissionIds } },
+      _count: { _all: true },
+    });
+    for (const c of countRows) {
+      countBySubmission.set(c.submissionId, c._count._all);
+    }
+  }
+
   return rows.map((r) => ({
     id: r.id,
     enrollment_id: r.enrollmentId,
@@ -359,6 +764,9 @@ export async function listIicrcCecSubmissionsForAdmin(options?: {
     course_title: r.course.title,
     course_slug: r.course.slug,
     status: r.status as IicrcCecSubmissionStatus,
+    renewal_status: r.renewalStatus,
+    initiated_by_admin_email: r.initiatedByAdminEmail,
+    communication_count: countBySubmission.get(r.id) ?? 0,
     cec_hours: r.cecHours,
     iicrc_discipline: r.iicrcDiscipline,
     iicrc_member_number: r.iicrcMemberNumber,
@@ -371,7 +779,7 @@ export async function listIicrcCecSubmissionsForAdmin(options?: {
 }
 
 export async function getCecSubmissionsByEnrollmentIds(
-  enrollmentIds: string[],
+  enrollmentIds: string[]
 ): Promise<Map<string, { status: string; sent_at: string | null }>> {
   const out = new Map<string, { status: string; sent_at: string | null }>();
   if (enrollmentIds.length === 0) return out;

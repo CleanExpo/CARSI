@@ -1,3 +1,5 @@
+import { resolveCecHoursLabelForSlug } from '@/lib/cec-display';
+
 /** IICRC CEC auto-submission configuration (course completion → renewals@iicrcnet.org). */
 
 export const DEFAULT_IICRC_CEC_SUBMISSION_EMAIL = 'renewals@iicrcnet.org';
@@ -14,11 +16,29 @@ export function isIicrcCecAutoSubmitEnabled(): boolean {
   return true;
 }
 
+export function resolveEffectiveCecHours(course: {
+  slug?: string | null;
+  cecHours: unknown;
+}): number | null {
+  const direct = toFiniteNumber(course.cecHours);
+  if (direct !== null && direct > 0) return direct;
+
+  const slug = course.slug?.trim().toLowerCase();
+  if (!slug) return direct;
+
+  const label = resolveCecHoursLabelForSlug(slug, null);
+  if (!label) return direct;
+
+  const parsed = parseFloat(label);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : direct;
+}
+
 export function courseEligibleForIicrcCecSubmission(course: {
+  slug?: string | null;
   cecHours: unknown;
   iicrcDiscipline: string | null;
 }): boolean {
-  const cec = toFiniteNumber(course.cecHours);
+  const cec = resolveEffectiveCecHours(course);
   if (cec !== null && cec > 0) return true;
   const disc = course.iicrcDiscipline?.trim();
   return Boolean(disc && disc !== '—' && disc !== '-');

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useId, useMemo, type ReactNode } from 'react';
+import { useId, useMemo, useState, type ReactNode } from 'react';
 import {
   Area,
   AreaChart,
@@ -23,9 +23,11 @@ import {
   BarChart3,
   CheckCircle2,
   ChevronRight,
+  Hash,
   LayoutDashboard,
   LineChart as LineChartIcon,
   PieChart as PieChartIcon,
+  Search,
   TrendingUp,
   Users,
 } from 'lucide-react';
@@ -35,7 +37,9 @@ import type { AdminDashboardClientData } from '@/lib/admin/admin-dashboard-data'
 import {
   adminGlassCard,
   completionColor,
+  formatAdminDateTime,
   LearnerAvatar,
+  StatusBadge,
 } from '@/components/admin/admin-learner-ui';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -196,6 +200,24 @@ function KpiCard({
 
 export function AdminDashboardClient({ data }: { data: AdminDashboardClientData }) {
   const chartUid = useId().replace(/:/g, '');
+  const [userQuery, setUserQuery] = useState('');
+
+  const filteredUsers = useMemo(() => {
+    const q = userQuery.trim().toLowerCase();
+    if (!q) return data.users;
+    return data.users.filter((u) => {
+      const haystack = [u.fullName, u.email, u.iicrcMemberNumber, u.role]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase();
+      return haystack.includes(q);
+    });
+  }, [data.users, userQuery]);
+
+  const learnersWithEnrollments = useMemo(
+    () => data.users.filter((u) => u.enrollmentCount > 0).length,
+    [data.users],
+  );
 
   const generatedLabel = useMemo(() => {
     try {
@@ -574,14 +596,29 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
       <section>
         <SectionHeading
           title="Learner directory"
-          description="Open a learner profile for full progress, enrollments, modules, and course access."
+          description="Live data from LMS enrollments and lesson progress. Open a profile for enrollments, IICRC renewal, and course access."
         />
         <Card className={adminGlassCard}>
-          <CardHeader className="border-b border-white/[0.06] pb-4">
-            <CardTitle className="text-base font-semibold text-white/88">All learners</CardTitle>
-            <CardDescription className="text-white/45">
-              {data.users.length.toLocaleString()} registered · click a row for the full profile
-            </CardDescription>
+          <CardHeader className="space-y-4 border-b border-white/[0.06] pb-4">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <CardTitle className="text-base font-semibold text-white/88">All learners</CardTitle>
+                <CardDescription className="text-white/45">
+                  {filteredUsers.length.toLocaleString()} shown · {learnersWithEnrollments.toLocaleString()} with
+                  enrollments · catalog from {data.catalogMeta.catalogSource}
+                </CardDescription>
+              </div>
+              <div className="relative w-full max-w-sm">
+                <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-white/35" />
+                <input
+                  type="search"
+                  value={userQuery}
+                  onChange={(e) => setUserQuery(e.target.value)}
+                  placeholder="Search name, email, IICRC #…"
+                  className="h-10 w-full rounded-xl border border-white/10 bg-black/25 pr-3 pl-9 text-sm text-white/85 placeholder:text-white/35 outline-none focus:border-[#2490ed]/40 focus:ring-1 focus:ring-[#2490ed]/30"
+                />
+              </div>
+            </div>
           </CardHeader>
           <CardContent className="p-0 pt-2">
             <div className="overflow-auto rounded-xl border border-white/[0.06] bg-black/20">
@@ -591,8 +628,14 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
                     <TableHead className="sticky top-0 z-[1] bg-[rgba(8,12,22,0.97)] py-3 text-[11px] font-semibold tracking-wide text-white/45 uppercase backdrop-blur-sm">
                       Learner
                     </TableHead>
+                    <TableHead className="sticky top-0 z-[1] hidden bg-[rgba(8,12,22,0.97)] py-3 text-[11px] font-semibold tracking-wide text-white/45 uppercase backdrop-blur-sm md:table-cell">
+                      IICRC
+                    </TableHead>
+                    <TableHead className="sticky top-0 z-[1] hidden bg-[rgba(8,12,22,0.97)] py-3 text-[11px] font-semibold tracking-wide text-white/45 uppercase backdrop-blur-sm lg:table-cell">
+                      Courses
+                    </TableHead>
                     <TableHead className="sticky top-0 z-[1] hidden bg-[rgba(8,12,22,0.97)] py-3 text-[11px] font-semibold tracking-wide text-white/45 uppercase backdrop-blur-sm sm:table-cell">
-                      Enrollments
+                      Last active
                     </TableHead>
                     <TableHead className="sticky top-0 z-[1] bg-[rgba(8,12,22,0.97)] py-3 text-right text-[11px] font-semibold tracking-wide text-white/45 uppercase backdrop-blur-sm">
                       Progress
@@ -601,7 +644,14 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {data.users.map((u) => (
+                  {filteredUsers.length === 0 ? (
+                    <TableRow className="hover:bg-transparent">
+                      <TableCell colSpan={6} className="py-12 text-center text-sm text-white/45">
+                        No learners match your search.
+                      </TableCell>
+                    </TableRow>
+                  ) : null}
+                  {filteredUsers.map((u) => (
                     <TableRow
                       key={u.userId}
                       className="group border-white/[0.04] transition-colors hover:bg-white/[0.04]"
@@ -613,25 +663,64 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
                         >
                           <LearnerAvatar user={u} />
                           <div className="min-w-0">
-                            <div className="truncate text-sm font-medium text-white/90 group-hover:text-white">
-                              {u.fullName ?? u.email}
+                            <div className="flex flex-wrap items-center gap-1.5">
+                              <span className="truncate text-sm font-medium text-white/90 group-hover:text-white">
+                                {u.fullName ?? u.email}
+                              </span>
+                              {!u.isActive ? <StatusBadge label="Inactive" tone="muted" /> : null}
+                              {u.isVerified ? <StatusBadge label="Verified" tone="success" /> : null}
                             </div>
                             <div className="truncate text-xs text-white/42">{u.email}</div>
                           </div>
                         </Link>
                       </TableCell>
-                      <TableCell className="hidden py-3 text-sm text-white/55 sm:table-cell">
-                        <Link href={`/admin/users/${u.userId}`} className="block tabular-nums">
-                          {u.enrollments.length}
+                      <TableCell className="hidden py-3 md:table-cell">
+                        {u.iicrcMemberNumber ? (
+                          <span className="inline-flex items-center gap-1 text-xs text-white/65">
+                            <Hash className="h-3 w-3 text-white/35" />
+                            {u.iicrcMemberNumber}
+                          </span>
+                        ) : (
+                          <span className="text-xs text-white/30">—</span>
+                        )}
+                      </TableCell>
+                      <TableCell className="hidden py-3 lg:table-cell">
+                        <Link href={`/admin/users/${u.userId}`} className="block text-sm text-white/65">
+                          {u.enrollmentCount === 0 ? (
+                            <span className="text-white/35">No enrollments</span>
+                          ) : (
+                            <span className="tabular-nums">
+                              <span className="font-medium text-white/85">{u.completedCourseCount}</span>
+                              <span className="text-white/35"> / {u.enrollmentCount} complete</span>
+                              {u.activeCourseCount > 0 ? (
+                                <span className="ml-1 text-[#7ec5ff]">· {u.activeCourseCount} in progress</span>
+                              ) : null}
+                            </span>
+                          )}
                         </Link>
+                      </TableCell>
+                      <TableCell className="hidden py-3 text-xs text-white/45 sm:table-cell">
+                        {formatAdminDateTime(u.lastActiveAt)}
                       </TableCell>
                       <TableCell className="py-3 text-right">
                         <Link
                           href={`/admin/users/${u.userId}`}
-                          className="text-sm font-bold tabular-nums"
-                          style={{ color: completionColor(u.overallCompletionPct) }}
+                          className="inline-flex flex-col items-end gap-0.5"
                         >
-                          {u.overallCompletionPct}%
+                          <span
+                            className="text-sm font-bold tabular-nums"
+                            style={{ color: completionColor(u.overallCompletionPct) }}
+                          >
+                            {u.enrollmentCount === 0 ? '—' : `${u.overallCompletionPct}%`}
+                          </span>
+                          {u.enrollmentCount > 0 ? (
+                            <span className="h-1 w-14 overflow-hidden rounded-full bg-white/10">
+                              <span
+                                className="block h-full rounded-full bg-[#2490ed]"
+                                style={{ width: `${u.overallCompletionPct}%` }}
+                              />
+                            </span>
+                          ) : null}
                         </Link>
                       </TableCell>
                       <TableCell className="py-3 text-right">

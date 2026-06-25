@@ -2,6 +2,15 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { getAdminSessionOrNull } from '@/lib/admin/admin-session';
 import { adminGrantEnrollment, adminGrantEnrollments } from '@/lib/admin/admin-enrollment-mutations';
+import { isUniqueConstraintError } from '@/lib/server/db-errors';
+
+function prismaErrorCode(error: unknown): string | null {
+  if (error && typeof error === 'object' && 'code' in error) {
+    const code = (error as { code?: unknown }).code;
+    return typeof code === 'string' ? code : null;
+  }
+  return null;
+}
 
 export async function POST(request: NextRequest) {
   const session = await getAdminSessionOrNull();
@@ -48,12 +57,23 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: true, ...result });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
+    const code = prismaErrorCode(e);
+    console.error('[admin/enrollments] grant failed', { studentId, courseSlugs, msg, code, error: e });
     if (msg === 'USER_NOT_FOUND') return NextResponse.json({ detail: 'User not found' }, { status: 404 });
     if (msg === 'NO_COURSES' || msg === 'INVALID_COURSE_SLUG') {
       return NextResponse.json({ detail: 'Invalid course selection' }, { status: 400 });
     }
     if (msg === 'WORKBOOK_COURSE_NOT_FOUND' || msg === 'COURSE_NOT_FOUND') {
       return NextResponse.json({ detail: 'Course not found in catalog' }, { status: 400 });
+    }
+    if (code === 'P2028') {
+      return NextResponse.json(
+        { detail: 'Course materialisation timed out — retry or ensure the course exists in the LMS catalog' },
+        { status: 504 },
+      );
+    }
+    if (isUniqueConstraintError(e)) {
+      return NextResponse.json({ detail: 'Learner is already enrolled in one of these courses' }, { status: 409 });
     }
     return NextResponse.json({ detail: 'Failed to grant enrollment' }, { status: 500 });
   }

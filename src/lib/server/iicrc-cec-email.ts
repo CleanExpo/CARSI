@@ -10,6 +10,7 @@ export type IicrcCecSubmissionEmailContent = {
   completedDate: string;
   credentialId: string;
   verificationUrl: string;
+  certificateDownloadUrl?: string | null;
 };
 
 export function buildIicrcCecSubmissionSubject(params: IicrcCecSubmissionEmailContent): string {
@@ -23,14 +24,16 @@ export function buildIicrcCecSubmissionText(params: IicrcCecSubmissionEmailConte
   return [
     'IICRC Renewals,',
     '',
-    'Please find attached the Certificate of Completion for the following CARSI Learning course.',
+    params.certificateDownloadUrl
+      ? `Certificate of Completion (PDF): ${params.certificateDownloadUrl}`
+      : 'Please find the attached Certificate of Completion for the following CARSI Learning course.',
     '',
     `Technician name: ${params.studentName}`,
     `Technician email: ${params.studentEmail}`,
     `IICRC member number: ${member}`,
     `Course: ${params.courseTitle}`,
     `IICRC discipline: ${params.iicrcDiscipline}`,
-    `CEC hours: ${params.cecHours > 0 ? params.cecHours : 'See attached certificate'}`,
+    `CEC hours: ${params.cecHours > 0 ? params.cecHours : 'See certificate'}`,
     `Completion date: ${params.completedDate}`,
     `CARSI credential ID: ${params.credentialId}`,
     `Online verification: ${params.verificationUrl}`,
@@ -61,6 +64,14 @@ export function buildIicrcCecSubmissionHtml(params: IicrcCecSubmissionEmailConte
       'Verification',
       `<a href="${escapeHtml(params.verificationUrl)}">${escapeHtml(params.verificationUrl)}</a>`,
     ],
+    ...(params.certificateDownloadUrl
+      ? [
+          [
+            'Certificate PDF',
+            `<a href="${escapeHtml(params.certificateDownloadUrl)}">${escapeHtml(params.certificateDownloadUrl)}</a>`,
+          ],
+        ]
+      : []),
   ];
 
   const tableRows = rows
@@ -77,7 +88,7 @@ export function buildIicrcCecSubmissionHtml(params: IicrcCecSubmissionEmailConte
   <div style="max-width:600px;margin:0 auto;padding:32px 20px;">
     <p style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#2490ed;margin:0 0 8px;">CARSI Learning — CEC submission</p>
     <h1 style="font-size:20px;margin:0 0 16px;color:#fff;">Certificate of Completion</h1>
-    <p style="font-size:15px;line-height:1.6;color:rgba(255,255,255,0.65);">Please find the attached Certificate of Completion for the course details below. This submission was sent on behalf of the technician.</p>
+    <p style="font-size:15px;line-height:1.6;color:rgba(255,255,255,0.65);">Please use the certificate link below for the course details. This submission was sent on behalf of the technician.</p>
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:20px 0;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:4px;">${tableRows}</table>
     <p style="font-size:13px;color:rgba(255,255,255,0.45);">CARSI Learning · carsi.com.au</p>
   </div></body></html>`;

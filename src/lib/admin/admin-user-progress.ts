@@ -1,7 +1,10 @@
 import type { AdminCatalogCourse } from '@/lib/admin/load-admin-catalog';
-import { loadAdminCatalogFromXlsx } from '@/lib/admin/load-admin-catalog';
+import { loadAdminCatalogSource, type AdminCatalogCourseOption } from '@/lib/admin/admin-catalog-source';
 import { buildAdminCatalogFromSeed } from '@/lib/lms-seed-catalog';
 import { prisma } from '@/lib/prisma';
+import { getRenewalSummaryByEnrollmentIds } from '@/lib/server/iicrc-renewal-communication';
+
+export type { AdminCatalogCourseOption };
 
 export type AdminCourseModuleProgress = {
   moduleNo: number;
@@ -26,6 +29,10 @@ export type AdminCourseProgressForUser = {
   completedModules: number;
   remainingLessons: number;
   modules: AdminCourseModuleProgress[];
+  renewalSubmissionId: string | null;
+  renewalStatus: string | null;
+  renewalCommunicationCount: number;
+  renewalSentAt: string | null;
 };
 
 export type AdminUserProgress = {
@@ -41,13 +48,10 @@ export type AdminUserProgress = {
   updatedAt: string;
   lastActiveAt: string | null;
   overallCompletionPct: number;
+  enrollmentCount: number;
+  completedCourseCount: number;
+  activeCourseCount: number;
   enrollments: AdminCourseProgressForUser[];
-};
-
-export type AdminCatalogCourseOption = {
-  slug: string;
-  title: string;
-  moduleCount: number;
 };
 
 export type AdminCatalogContext = {
@@ -112,7 +116,14 @@ type EnrollmentRow = {
   paymentReference: string | null;
   enrolledAt: Date;
   completedAt: Date | null;
-  course: { id: string; slug: string; title: string; iicrcDiscipline: string | null; cecHours: number | null };
+  course: {
+    id: string;
+    slug: string;
+    title: string;
+    iicrcDiscipline: string | null;
+    cecHours: number | null;
+    modules: { lessons: { id: string }[] }[];
+  };
 };
 
 type UserRow = {
@@ -128,38 +139,79 @@ type UserRow = {
   updatedAt: Date;
 };
 
+function lessonCountForEnrollment(
+  e: EnrollmentRow,
+  catalogBySlug: Map<string, AdminCatalogCourse>,
+): number {
+  const fromCatalog = catalogBySlug.get(e.course.slug.trim().toLowerCase())?.moduleCount;
+  if (fromCatalog != null && fromCatalog > 0) return fromCatalog;
+
+  const fromDbLessons = e.course.modules.reduce((acc, m) => acc + m.lessons.length, 0);
+  if (fromDbLessons > 0) return fromDbLessons;
+
+  const moduleCount = e.course.modules.length;
+  return moduleCount > 0 ? moduleCount : 0;
+}
+
+function completedLessonsForEnrollment(
+  userId: string,
+  e: EnrollmentRow,
+  totalLessons: number,
+  completedLessonCounts: Map<string, number>,
+): number {
+  if (normalizeEnrollmentStatus(e.status) === 'completed') {
+    return totalLessons;
+  }
+  const key = `${userId}-${e.courseId}`;
+  return clamp(completedLessonCounts.get(key) ?? 0, 0, totalLessons);
+}
+
 export function mapUserToAdminProgress(
   user: UserRow,
   userEnrollments: EnrollmentRow[],
   catalogBySlug: Map<string, AdminCatalogCourse>,
   completedLessonCounts: Map<string, number>,
   lastActiveAt: Date | null,
+  renewalByEnrollment?: Map<
+    string,
+    {
+      submission_id: string;
+      status: string;
+      renewal_status: string;
+      sent_at: string | null;
+      communication_count: number;
+    }
+  >
 ): AdminUserProgress {
-  const totalLessonsSum = userEnrollments.reduce((acc, e) => {
-    const course = catalogBySlug.get(e.course.slug);
-    return acc + (course?.moduleCount ?? 0);
-  }, 0);
+  const totalLessonsSum = userEnrollments.reduce(
+    (acc, e) => acc + lessonCountForEnrollment(e, catalogBySlug),
+    0,
+  );
 
   const completedLessonsSum = userEnrollments.reduce((acc, e) => {
-    const key = `${user.id}-${e.courseId}`;
-    const completed = completedLessonCounts.get(key) ?? 0;
-    const course = catalogBySlug.get(e.course.slug);
-    const totalLessons = course?.moduleCount ?? 0;
-    return acc + clamp(completed, 0, totalLessons);
+    const totalLessons = lessonCountForEnrollment(e, catalogBySlug);
+    return acc + completedLessonsForEnrollment(user.id, e, totalLessons, completedLessonCounts);
   }, 0);
 
   const overallCompletionPct = completionPct(completedLessonsSum, totalLessonsSum);
 
   const enrollmentsProgress: AdminCourseProgressForUser[] = userEnrollments.map((e) => {
     const courseSlug = e.course.slug;
-    const course = catalogBySlug.get(courseSlug);
-    const totalLessons = course?.moduleCount ?? 0;
-    const key = `${user.id}-${e.courseId}`;
-    const completedRaw = completedLessonCounts.get(key) ?? 0;
-    const completedLessons = clamp(completedRaw, 0, totalLessons);
+    const course = catalogBySlug.get(courseSlug.trim().toLowerCase());
+    const totalLessons = lessonCountForEnrollment(e, catalogBySlug);
+    const completedLessons = completedLessonsForEnrollment(
+      user.id,
+      e,
+      totalLessons,
+      completedLessonCounts,
+    );
     const completedModules = completedLessons;
     const remainingLessons = Math.max(0, totalLessons - completedModules);
-    const pct = totalLessons > 0 ? Math.round((completedModules / totalLessons) * 100) : 0;
+    const pctFromLessons =
+      totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
+    const pct = normalizeEnrollmentStatus(e.status) === 'completed' ? 100 : pctFromLessons;
+
+    const renewal = renewalByEnrollment?.get(e.id);
 
     return {
       enrollmentId: e.id,
@@ -177,8 +229,17 @@ export function mapUserToAdminProgress(
       completedModules,
       remainingLessons,
       modules: course ? buildModuleProgress(course, completedModules) : [],
+      renewalSubmissionId: renewal?.submission_id ?? null,
+      renewalStatus: renewal?.renewal_status ?? null,
+      renewalCommunicationCount: renewal?.communication_count ?? 0,
+      renewalSentAt: renewal?.sent_at ?? null,
     };
   });
+
+  const completedCourseCount = enrollmentsProgress.filter((e) => e.completionPct >= 100).length;
+  const activeCourseCount = enrollmentsProgress.filter(
+    (e) => e.completionPct > 0 && e.completionPct < 100,
+  ).length;
 
   return {
     userId: user.id,
@@ -193,6 +254,9 @@ export function mapUserToAdminProgress(
     updatedAt: user.updatedAt.toISOString(),
     lastActiveAt: lastActiveAt?.toISOString() ?? null,
     overallCompletionPct,
+    enrollmentCount: enrollmentsProgress.length,
+    completedCourseCount,
+    activeCourseCount,
     enrollments: enrollmentsProgress.sort((a, b) => b.completionPct - a.completionPct),
   };
 }
@@ -212,6 +276,12 @@ const enrollmentSelect = {
       title: true,
       iicrcDiscipline: true,
       cecHours: true,
+      modules: {
+        orderBy: { orderIndex: 'asc' },
+        select: {
+          lessons: { select: { id: true } },
+        },
+      },
     },
   },
 } as const;
@@ -231,7 +301,7 @@ const userSelect = {
 
 export async function fetchCompletedLessonCounts(
   userIds: string[],
-  courseIds: string[],
+  courseIds: string[]
 ): Promise<Map<string, number>> {
   const completedLessonCounts = new Map<string, number>();
   if (userIds.length === 0 || courseIds.length === 0) return completedLessonCounts;
@@ -257,7 +327,9 @@ export async function fetchCompletedLessonCounts(
   return completedLessonCounts;
 }
 
-export async function fetchLastActiveByUserId(userIds: string[]): Promise<Map<string, Date | null>> {
+export async function fetchLastActiveByUserId(
+  userIds: string[]
+): Promise<Map<string, Date | null>> {
   const lastActiveByUserId = new Map<string, Date | null>();
   if (userIds.length === 0) return lastActiveByUserId;
 
@@ -273,9 +345,19 @@ export async function fetchLastActiveByUserId(userIds: string[]): Promise<Map<st
   return lastActiveByUserId;
 }
 
+export async function fetchEnrollmentsForUsers(userIds: string[]): Promise<EnrollmentRow[]> {
+  if (userIds.length === 0) return [];
+  return prisma.lmsEnrollment.findMany({
+    where: { studentId: { in: userIds } },
+    select: enrollmentSelect,
+    orderBy: { enrolledAt: 'desc' },
+  }) as Promise<EnrollmentRow[]>;
+}
+
+/** @deprecated Prefer fetchEnrollmentsForUsers — kept for slug-scoped catalog queries. */
 export async function fetchCatalogEnrollmentsForUsers(
   userIds: string[],
-  catalogSlugs: string[],
+  catalogSlugs: string[]
 ): Promise<EnrollmentRow[]> {
   if (userIds.length === 0) return [];
   return prisma.lmsEnrollment.findMany({
@@ -284,6 +366,7 @@ export async function fetchCatalogEnrollmentsForUsers(
       course: { slug: { in: catalogSlugs } },
     },
     select: enrollmentSelect,
+    orderBy: { enrolledAt: 'desc' },
   }) as Promise<EnrollmentRow[]>;
 }
 
@@ -292,19 +375,9 @@ export async function getAdminUserDetail(userId: string): Promise<{
   roleNames: string[];
   catalogCourses: AdminCatalogCourseOption[];
 } | null> {
-  let workbookCourses: AdminCatalogCourse[];
-  try {
-    const workbook = await loadAdminCatalogFromXlsx();
-    workbookCourses = workbook.courses;
-  } catch (err) {
-    console.error('[admin] workbook catalog load failed, using seed fallback', err);
-    workbookCourses = buildAdminCatalogFromSeed().courses;
-  }
-  const catalogBySlug = new Map(workbookCourses.map((c) => [c.slug, c]));
-  const catalogSlugs = workbookCourses.map((c) => c.slug);
-  const catalogCourses = workbookCourses
-    .map((c) => ({ slug: c.slug, title: c.title, moduleCount: c.moduleCount }))
-    .sort((a, b) => a.title.localeCompare(b.title));
+  const catalog = await loadAdminCatalogSource();
+  const catalogBySlug = catalog.catalogBySlug;
+  const catalogCourses = catalog.catalogCourses;
 
   const user = await prisma.lmsUser.findUnique({
     where: { id: userId },
@@ -315,10 +388,12 @@ export async function getAdminUserDetail(userId: string): Promise<{
   });
   if (!user) return null;
 
-  const enrollments = await fetchCatalogEnrollmentsForUsers([userId], catalogSlugs);
+  const enrollments = await fetchEnrollmentsForUsers([userId]);
   const courseIds = Array.from(new Set(enrollments.map((e) => e.courseId)));
+  const enrollmentIds = enrollments.map((e) => e.id);
   const completedLessonCounts = await fetchCompletedLessonCounts([userId], courseIds);
   const lastActiveMap = await fetchLastActiveByUserId([userId]);
+  const renewalByEnrollment = await getRenewalSummaryByEnrollmentIds(enrollmentIds);
   const roleNames = user.userRoles.map((ur) => ur.role.name);
 
   const progress = mapUserToAdminProgress(
@@ -327,6 +402,7 @@ export async function getAdminUserDetail(userId: string): Promise<{
     catalogBySlug,
     completedLessonCounts,
     lastActiveMap.get(userId) ?? null,
+    renewalByEnrollment
   );
 
   return {
