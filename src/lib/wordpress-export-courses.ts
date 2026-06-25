@@ -34,6 +34,7 @@ export interface WpExportCourse {
   is_free?: boolean;
   iicrc_discipline?: string | null;
   cec_hours?: number | null;
+  duration_hours?: number | null;
   status?: string;
   wp_id: number;
   level?: string | null;
