@@ -5,6 +5,11 @@ name: Scrape CCW products
 # opens a PR (and uploads an artifact) with the populated data/seed/ccw-products.json.
 # Shopify stores (like ccwonline.com.au) use the products.json + SDS-page engine.
 on:
+  # Pushing a change to .github/ccw-run.txt triggers a fresh scrape on the
+  # pushed branch's code — a reliable alternative to the "Run workflow" button.
+  push:
+    paths:
+      - ".github/ccw-run.txt"
   workflow_dispatch:
     inputs:
       base_url:
@@ -53,12 +58,12 @@ jobs:
       - name: Run CCW scrape
         env:
           JINA_API_KEY: ${{ secrets.JINA_API_KEY }}
-          BASE_URL: ${{ inputs.base_url }}
-          MAX: ${{ inputs.max }}
-          FETCH_SDS: ${{ inputs.fetch_sds }}
-          SDS_PAGE: ${{ inputs.sds_page }}
-          PRODUCT_MATCH: ${{ inputs.product_match }}
-          SDS_MATCH: ${{ inputs.sds_match }}
+          BASE_URL: ${{ inputs.base_url || 'https://ccwonline.com.au/' }}
+          MAX: ${{ inputs.max || '250' }}
+          FETCH_SDS: ${{ inputs.fetch_sds || 'false' }}
+          SDS_PAGE: ${{ inputs.sds_page || '' }}
+          PRODUCT_MATCH: ${{ inputs.product_match || '' }}
+          SDS_MATCH: ${{ inputs.sds_match || '' }}
         run: |
           ARGS=(--url "$BASE_URL" --max "$MAX")
           if [ "$FETCH_SDS" = "true" ]; then ARGS+=(--fetch-sds); fi
@@ -78,7 +83,7 @@ jobs:
       - name: Open a PR with the scraped data
         env:
           GH_TOKEN: ${{ github.token }}
-          BASE_URL: ${{ inputs.base_url }}
+          BASE_URL: ${{ inputs.base_url || 'https://ccwonline.com.au/' }}
         run: |
           if git diff --quiet -- data/seed/ccw-products.json; then
             echo "No changes to data/seed/ccw-products.json — nothing to commit."
