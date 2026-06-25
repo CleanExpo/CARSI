@@ -1,7 +1,7 @@
 # Skills Index
 
-**Total Skills**: 36+
-**Last Updated**: CARSI LLM and stack hardening refresh, 18/06/2026
+**Total Skills**: 38+
+**Last Updated**: Course-creation pipeline + course-voiceover skill, 25/06/2026
 
 ---
 
@@ -29,7 +29,7 @@ Project knowledge and orchestration patterns.
 
 ---
 
-### Design (3 skills)
+### Design (4 skills)
 
 CARSI visual system, accessible LMS interfaces, purposeful assets, locked design tokens.
 
@@ -38,6 +38,18 @@ CARSI visual system, accessible LMS interfaces, purposeful assets, locked design
 | **design-system.skill.md**    | 1        | ✅        | Locked design tokens, CARSI LMS patterns, accessible controls, no generic template UI                    |
 | **foundation-first.skill.md** | 2        | ❌        | 7-layer foundation (psychology → personas → journeys → emotions → acceptance criteria), 8 missing states |
 | **tailwind.skill.md**         | 3        | ❌        | Tailwind v4 patterns, utility-first CSS, responsive design                                               |
+| **course-thumbnails.skill.md**| 4        | ❌        | Generate on-brand, text-free course thumbnail backgrounds via OpenAI gpt-image-1 → Cloudinary → catalogue |
+
+---
+
+### Content (2 skills)
+
+Media production for courses — demo screencasts, and ElevenLabs voice narration. Driven by the `/course-media` slash command in the course-creation pipeline.
+
+| Skill                          | Priority | Auto-load | Description                                                                                              |
+| ------------------------------ | -------- | --------- | -------------------------------------------------------------------------------------------------------- |
+| **demo-screencasts.skill.md**  | 5        | ❌        | Record the seeded demo account with Playwright, composite a HeyGen avatar as a PiP overlay via FFmpeg → Cloudinary → lessons |
+| **course-voiceover.skill.md**  | 5        | ❌        | Author + generate on-brand en-AU lesson narration via ElevenLabs → Cloudinary → the course catalogue |
 
 ---
 
@@ -200,7 +212,7 @@ These 4 skills are **ALWAYS** loaded on every response:
 | **Backend/Server**  | project-context.skill.md, advanced-tool-use.skill.md; legacy fastapi/langgraph only if paths exist |
 | **Database**        | migrations.skill.md                                                                                |
 | **SEO**             | search-dominance.skill.md, blue-ocean.skill.md, geo-australian.skill.md, rank-monitoring.skill.md  |
-| **Content**         | truth-finder.skill.md                                                                              |
+| **Content**         | truth-finder.skill.md, course-thumbnails.skill.md, course-voiceover.skill.md, demo-screencasts.skill.md |
 | **New Feature**     | feature-development.skill.md, foundation-first.skill.md                                            |
 | **Bug Fix**         | bug-fixing.skill.md, error-handling.skill.md                                                       |
 | **Autonomous Loop** | ralph-wiggum.skill.md, verification-first.skill.md                                                 |

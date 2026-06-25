@@ -4,10 +4,14 @@ import { Readable } from 'node:stream';
 import { v2 as cloudinary } from 'cloudinary';
 
 const DEFAULT_FOLDER = 'carsi/admin-courses';
+const DEFAULT_VIDEO_FOLDER = 'carsi/demo-videos';
+const DEFAULT_AUDIO_FOLDER = 'carsi/course-audio';
 const CERTIFICATE_FOLDER = 'carsi/certificates';
 
 /** Cloudinary Node SDK defaults to 60s; large/slow uploads hit 499 TimeoutError. */
 const UPLOAD_TIMEOUT_MS = 180_000;
+/** Video files are larger than thumbnails; give the upload stream a longer ceiling. */
+const VIDEO_UPLOAD_TIMEOUT_MS = 600_000;
 const UPLOAD_MAX_ATTEMPTS = 3;
 
 function getConfig(): { cloud_name: string; api_key: string; api_secret: string } | null {
@@ -155,6 +159,88 @@ export async function uploadCourseThumbnailToCloudinary(
     }
   }
   throw lastErr instanceof Error ? lastErr : new Error(String(lastErr));
+}
+
+function uploadVideoStreamOnce(
+  buffer: Buffer,
+  cfg: NonNullable<ReturnType<typeof getConfig>>,
+  folder: string
+): Promise<{ url: string; publicId: string }> {
+  cloudinary.config({
+    cloud_name: cfg.cloud_name,
+    api_key: cfg.api_key,
+    api_secret: cfg.api_secret,
+    secure: true,
+  });
+
+  const publicId = randomUUID();
+
+  return new Promise((resolve, reject) => {
+    const upload = cloudinary.uploader.upload_stream(
+      {
+        folder,
+        public_id: publicId,
+        resource_type: 'video',
+        overwrite: false,
+        invalidate: true,
+        timeout: VIDEO_UPLOAD_TIMEOUT_MS,
+      },
+      (err, result) => {
+        if (err || !result?.secure_url) {
+          reject(err ?? new Error('Cloudinary video upload failed'));
+          return;
+        }
+        resolve({
+          url: result.secure_url,
+          publicId: result.public_id ?? `${folder}/${publicId}`,
+        });
+      }
+    );
+
+    Readable.from(buffer).pipe(upload);
+  });
+}
+
+/**
+ * Upload a video buffer (e.g. a composited demo screencast MP4) to Cloudinary. Returns an
+ * HTTPS URL suitable for storing in `LmsLesson.contentBody`. Mirrors the thumbnail uploader:
+ * same config/retry-on-timeout behaviour, but `resource_type: 'video'` and a longer timeout.
+ */
+export async function uploadVideoToCloudinary(
+  buffer: Buffer,
+  folder: string = DEFAULT_VIDEO_FOLDER
+): Promise<{ url: string; publicId: string }> {
+  const cfg = getConfig();
+  if (!cfg) {
+    throw new Error('Cloudinary is not configured (set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET)');
+  }
+
+  let lastErr: unknown;
+  for (let attempt = 1; attempt <= UPLOAD_MAX_ATTEMPTS; attempt += 1) {
+    try {
+      return await uploadVideoStreamOnce(buffer, cfg, folder);
+    } catch (e) {
+      lastErr = e;
+      if (attempt < UPLOAD_MAX_ATTEMPTS && isLikelyUploadTimeout(e)) {
+        await new Promise((r) => setTimeout(r, 1000 * attempt));
+        continue;
+      }
+      throw e;
+    }
+  }
+  throw lastErr instanceof Error ? lastErr : new Error(String(lastErr));
+}
+
+/**
+ * Upload a lesson narration MP3 to Cloudinary. Returns an HTTPS URL suitable for storing in a
+ * lesson's `resources` JSON. Cloudinary stores audio under the `video` resource type, so this
+ * reuses the same streaming/retry path as the demo-video uploader, only with the audio folder.
+ */
+export async function uploadCourseAudioToCloudinary(
+  buffer: Buffer,
+  folder: string = DEFAULT_AUDIO_FOLDER
+): Promise<{ url: string; publicId: string }> {
+  return uploadVideoToCloudinary(buffer, folder);
 }
 
 /**
