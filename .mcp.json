@@ -6,13 +6,6 @@
       "env": {
         "ELEVENLABS_API_KEY": "${ELEVENLABS_API_KEY}"
       }
-    },
-    "brightdata": {
-      "command": "npx",
-      "args": ["-y", "@brightdata/mcp"],
-      "env": {
-        "API_TOKEN": "${BRIGHTDATA_API_TOKEN}"
-      }
     }
   }
 }
