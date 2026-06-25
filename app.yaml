@@ -13,6 +13,8 @@ services:
       deploy_on_push: true
 
     dockerfile_path: Dockerfile
+    # Overrides default `npm start`; use entrypoint (migrate + standalone server).
+    run_command: ./docker-entrypoint.sh
     http_port: 8080
     source_dir: /
     instance_count: 2
