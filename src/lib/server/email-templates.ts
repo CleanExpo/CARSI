@@ -402,6 +402,38 @@ export function renderYearlyMembershipEmail(params: {
   );
 }
 
+export function renderAdminPasswordResetEmail(params: {
+  appOrigin: string;
+  memberName: string;
+  memberEmail: string;
+  temporaryPassword: string;
+  loginUrl: string;
+}): RenderedEmail {
+  const name = params.memberName.trim() || params.memberEmail.split('@')[0] || 'there';
+  const details: CarsiEmailDetail[] = [
+    { label: 'Sign-in email', value: params.memberEmail },
+    { label: 'Your new password', value: params.temporaryPassword },
+  ];
+
+  return render(
+    {
+      appOrigin: params.appOrigin,
+      preheader: 'Your CARSI Learning password was updated',
+      eyebrow: 'Account security',
+      title: 'Your password was reset',
+      greeting: `Hi ${name},`,
+      paragraphs: [
+        'A CARSI administrator has set a new password for your learning account.',
+        'Sign in with the details below. We recommend changing your password after your first login.',
+      ],
+      details,
+      cta: { label: 'Sign in to CARSI', href: params.loginUrl },
+      noteHtml: `If you did not expect this change, contact ${brandLink(`${params.appOrigin}/contact`, 'CARSI support')} immediately.`,
+    },
+    `Hi ${name},\n\nA CARSI administrator has set a new password for your learning account.\n\nSign-in email: ${params.memberEmail}\nNew password: ${params.temporaryPassword}\n\nSign in: ${params.loginUrl}\n\nIf you did not expect this change, contact CARSI support.`
+  );
+}
+
 export function renderCcwRoadshowBookingConfirmationEmail(params: {
   appOrigin: string;
   attendeeName: string;

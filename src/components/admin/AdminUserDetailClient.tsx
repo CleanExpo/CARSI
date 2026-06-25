@@ -8,9 +8,13 @@ import {
   Award,
   BookOpen,
   Calendar,
+  Check,
   CheckCircle2,
   Clock,
+  Copy,
+  Download,
   Hash,
+  KeyRound,
   Loader2,
   Mail,
   Shield,
@@ -36,6 +40,16 @@ import { AdminCourseMultiPicker } from '@/components/admin/AdminCourseMultiPicke
 import { ProgressBar } from '@/components/lms/ProgressBar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 
 const chartTooltipProps = {
@@ -60,6 +74,7 @@ function CourseEnrollmentCard({
   pendingRevoke,
   pendingComplete,
   pendingSendIicrc,
+  pendingDownloadCertificate,
   hasIicrcMemberNumber,
   selectable,
   selected,
@@ -67,11 +82,13 @@ function CourseEnrollmentCard({
   onRevoke,
   onMarkComplete,
   onSendIicrc,
+  onDownloadCertificate,
 }: {
   enrollment: AdminCourseProgressForUser;
   pendingRevoke: boolean;
   pendingComplete: boolean;
   pendingSendIicrc: boolean;
+  pendingDownloadCertificate: boolean;
   hasIicrcMemberNumber: boolean;
   selectable: boolean;
   selected: boolean;
@@ -79,6 +96,7 @@ function CourseEnrollmentCard({
   onRevoke: (id: string) => void;
   onMarkComplete: (id: string) => void;
   onSendIicrc: (id: string) => void;
+  onDownloadCertificate: (id: string, slug: string) => void;
 }) {
   const statusLabel = enrollment.status.replace(/_/g, ' ');
   const isComplete = enrollment.completionPct >= 100;
@@ -164,6 +182,25 @@ function CourseEnrollmentCard({
                   <>
                     <CheckCircle2 className="mr-1.5 h-3.5 w-3.5" />
                     Mark complete
+                  </>
+                )}
+              </Button>
+            ) : null}
+            {isComplete ? (
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                className="h-9 rounded-lg border-white/10 bg-white/[0.06] text-white/85 hover:bg-white/10"
+                disabled={pendingDownloadCertificate || pendingRevoke || pendingComplete}
+                onClick={() => onDownloadCertificate(enrollment.enrollmentId, enrollment.courseSlug)}
+              >
+                {pendingDownloadCertificate ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <>
+                    <Download className="mr-1.5 h-3.5 w-3.5" />
+                    Certificate
                   </>
                 )}
               </Button>
@@ -306,8 +343,19 @@ export function AdminUserDetailClient({
   const [pendingCompleteIds, setPendingCompleteIds] = useState<Set<string>>(() => new Set());
   const [selectedEnrollmentIds, setSelectedEnrollmentIds] = useState<Set<string>>(() => new Set());
   const [pendingSendIicrcIds, setPendingSendIicrcIds] = useState<Set<string>>(() => new Set());
+  const [pendingDownloadIds, setPendingDownloadIds] = useState<Set<string>>(() => new Set());
   const [actionError, setActionError] = useState<string | null>(null);
   const [actionSuccess, setActionSuccess] = useState<string | null>(null);
+  const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
+  const [passwordMode, setPasswordMode] = useState<'generate' | 'custom'>('generate');
+  const [customPassword, setCustomPassword] = useState('');
+  const [sendPasswordEmail, setSendPasswordEmail] = useState(true);
+  const [pendingPasswordReset, setPendingPasswordReset] = useState(false);
+  const [resetResult, setResetResult] = useState<{
+    password: string;
+    emailSent: boolean;
+  } | null>(null);
+  const [passwordCopied, setPasswordCopied] = useState(false);
 
   const incompleteEnrollments = useMemo(
     () => user.enrollments.filter((e) => e.completionPct < 100),
@@ -493,6 +541,98 @@ export function AdminUserDetailClient({
     }
   }
 
+  function openPasswordDialog() {
+    setActionError(null);
+    setResetResult(null);
+    setPasswordCopied(false);
+    setPasswordMode('generate');
+    setCustomPassword('');
+    setSendPasswordEmail(true);
+    setPasswordDialogOpen(true);
+  }
+
+  function closePasswordDialog() {
+    setPasswordDialogOpen(false);
+    setResetResult(null);
+    setCustomPassword('');
+    setPasswordCopied(false);
+  }
+
+  async function resetUserPassword() {
+    if (passwordMode === 'custom' && customPassword.trim().length < 8) {
+      setActionError('Custom password must be at least 8 characters.');
+      return;
+    }
+
+    setPendingPasswordReset(true);
+    setActionError(null);
+    try {
+      const res = await fetch(`/api/admin/users/${user.userId}/reset-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          password: passwordMode === 'custom' ? customPassword : undefined,
+          sendEmail: sendPasswordEmail,
+        }),
+      });
+      const payload = (await res.json().catch(() => ({}))) as {
+        detail?: string;
+        password?: string;
+        emailSent?: boolean;
+      };
+      if (!res.ok) {
+        setActionError(payload.detail ?? 'Could not reset password');
+        return;
+      }
+      if (typeof payload.password === 'string') {
+        setResetResult({
+          password: payload.password,
+          emailSent: payload.emailSent === true,
+        });
+      }
+    } finally {
+      setPendingPasswordReset(false);
+    }
+  }
+
+  async function copyResetPassword() {
+    if (!resetResult?.password) return;
+    try {
+      await navigator.clipboard.writeText(resetResult.password);
+      setPasswordCopied(true);
+      window.setTimeout(() => setPasswordCopied(false), 2000);
+    } catch {
+      setActionError('Could not copy to clipboard. Select and copy the password manually.');
+    }
+  }
+
+  async function downloadCertificate(enrollmentId: string, courseSlug: string) {
+    setActionError(null);
+    setPendingDownloadIds(new Set([enrollmentId]));
+    try {
+      const res = await fetch(
+        `/api/admin/enrollments/${encodeURIComponent(enrollmentId)}/certificate?studentId=${encodeURIComponent(user.userId)}`,
+        { credentials: 'include' },
+      );
+      if (!res.ok) {
+        const payload = (await res.json().catch(() => ({}))) as { detail?: string };
+        setActionError(payload.detail ?? 'Could not download certificate');
+        return;
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = `carsi-certificate-${courseSlug}.pdf`;
+      anchor.click();
+      URL.revokeObjectURL(url);
+      setActionSuccess('Certificate downloaded.');
+    } finally {
+      setPendingDownloadIds(new Set());
+    }
+  }
+
   const displayName = user.fullName?.trim() || user.email.split('@')[0] || 'Learner';
 
   const bulkCompletePending = pendingCompleteIds.size > 0;
@@ -671,6 +811,28 @@ export function AdminUserDetailClient({
                 No IICRC member number on file. Add it from the learner profile when they update credentials.
               </p>
             ) : null}
+
+            <div className="rounded-xl border border-white/[0.08] bg-black/20 p-4">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="flex items-center gap-2 text-sm font-semibold text-white/88">
+                    <KeyRound className="h-4 w-4 text-[#7ec5ff]" />
+                    Password
+                  </p>
+                  <p className="mt-1 text-xs text-white/45">
+                    Generate a secure password or set a custom one. Optionally email it to the learner.
+                  </p>
+                </div>
+                <Button
+                  type="button"
+                  size="sm"
+                  className="h-8 shrink-0 rounded-lg bg-[#2490ed] px-3 text-xs font-semibold hover:bg-[#1a7fd4]"
+                  onClick={openPasswordDialog}
+                >
+                  Reset password
+                </Button>
+              </div>
+            </div>
 
             {cecEligibleCompleted.length > 0 ? (
               <div className="rounded-xl border border-[#2490ed]/20 bg-[#2490ed]/[0.05] p-4">
@@ -855,6 +1017,7 @@ export function AdminUserDetailClient({
                     enrollment={e}
                     hasIicrcMemberNumber={hasIicrcMemberNumber}
                     pendingSendIicrc={pendingSendIicrcIds.has(e.enrollmentId)}
+                    pendingDownloadCertificate={pendingDownloadIds.has(e.enrollmentId)}
                     selectable={isIncomplete}
                     selected={selectedEnrollmentIds.has(e.enrollmentId)}
                     pendingRevoke={pendingRevokeId === e.enrollmentId}
@@ -869,6 +1032,7 @@ export function AdminUserDetailClient({
                         : (id) => void markEnrollmentsComplete([id])
                     }
                     onSendIicrc={(id) => void sendIicrcRenewalEmail(id)}
+                    onDownloadCertificate={(id, slug) => void downloadCertificate(id, slug)}
                   />
                 );
               })}
@@ -914,6 +1078,152 @@ export function AdminUserDetailClient({
           )}
         </div>
       </div>
+
+      <Dialog open={passwordDialogOpen} onOpenChange={(open) => (open ? setPasswordDialogOpen(true) : closePasswordDialog())}>
+        <DialogContent className="border-white/10 bg-[#0a0f1a] text-white sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-white">
+              {resetResult ? 'Password updated' : 'Reset learner password'}
+            </DialogTitle>
+            <DialogDescription className="text-white/50">
+              {resetResult
+                ? `New sign-in details for ${user.email}. Copy the password now — it will not be shown again.`
+                : `Set a new password for ${displayName}. The previous password will stop working immediately.`}
+            </DialogDescription>
+          </DialogHeader>
+
+          {resetResult ? (
+            <div className="space-y-4">
+              <div className="rounded-xl border border-emerald-400/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100">
+                {resetResult.emailSent
+                  ? 'Password updated and emailed to the learner.'
+                  : 'Password updated. Email was not sent — share the password securely.'}
+              </div>
+              <div className="space-y-2">
+                <Label className="text-white/60">New password</Label>
+                <div className="flex gap-2">
+                  <Input
+                    readOnly
+                    value={resetResult.password}
+                    className="font-mono text-sm border-white/10 bg-black/30 text-white"
+                  />
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    className="shrink-0 border-white/10 bg-white/[0.06] text-white hover:bg-white/10"
+                    onClick={() => void copyResetPassword()}
+                  >
+                    {passwordCopied ? (
+                      <Check className="h-4 w-4" />
+                    ) : (
+                      <Copy className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="grid gap-2">
+                <Label className="text-white/60">Password option</Label>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  <button
+                    type="button"
+                    onClick={() => setPasswordMode('generate')}
+                    className={cn(
+                      'rounded-xl border px-3 py-3 text-left text-sm transition-colors',
+                      passwordMode === 'generate'
+                        ? 'border-[#2490ed]/40 bg-[#2490ed]/10 text-white'
+                        : 'border-white/10 bg-white/[0.03] text-white/70 hover:bg-white/[0.05]',
+                    )}
+                  >
+                    <span className="font-medium">Generate secure password</span>
+                    <p className="mt-1 text-xs text-white/45">Recommended — random Carsi-… format</p>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPasswordMode('custom')}
+                    className={cn(
+                      'rounded-xl border px-3 py-3 text-left text-sm transition-colors',
+                      passwordMode === 'custom'
+                        ? 'border-[#2490ed]/40 bg-[#2490ed]/10 text-white'
+                        : 'border-white/10 bg-white/[0.03] text-white/70 hover:bg-white/[0.05]',
+                    )}
+                  >
+                    <span className="font-medium">Set custom password</span>
+                    <p className="mt-1 text-xs text-white/45">Minimum 8 characters</p>
+                  </button>
+                </div>
+              </div>
+
+              {passwordMode === 'custom' ? (
+                <div className="space-y-2">
+                  <Label htmlFor="admin-custom-password" className="text-white/60">
+                    Custom password
+                  </Label>
+                  <Input
+                    id="admin-custom-password"
+                    type="password"
+                    autoComplete="new-password"
+                    value={customPassword}
+                    onChange={(e) => setCustomPassword(e.target.value)}
+                    placeholder="At least 8 characters"
+                    className="border-white/10 bg-black/30 text-white placeholder:text-white/30"
+                  />
+                </div>
+              ) : null}
+
+              <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-3">
+                <input
+                  type="checkbox"
+                  checked={sendPasswordEmail}
+                  onChange={(e) => setSendPasswordEmail(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 rounded border-white/20 bg-white/5 accent-[#2490ed]"
+                />
+                <span className="text-sm text-white/75">
+                  Email new password to <span className="font-medium text-white">{user.email}</span>
+                </span>
+              </label>
+            </div>
+          )}
+
+          <DialogFooter className="gap-2 sm:gap-0">
+            {resetResult ? (
+              <Button
+                type="button"
+                className="bg-[#2490ed] hover:bg-[#1a7fd4]"
+                onClick={closePasswordDialog}
+              >
+                Done
+              </Button>
+            ) : (
+              <>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="text-white/70 hover:bg-white/10 hover:text-white"
+                  onClick={closePasswordDialog}
+                  disabled={pendingPasswordReset}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="button"
+                  className="bg-[#2490ed] hover:bg-[#1a7fd4]"
+                  disabled={pendingPasswordReset}
+                  onClick={() => void resetUserPassword()}
+                >
+                  {pendingPasswordReset ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    'Reset password'
+                  )}
+                </Button>
+              </>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
