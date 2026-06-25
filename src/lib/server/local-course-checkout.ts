@@ -1,13 +1,6 @@
+import type { CheckoutCourse } from '@/lib/course-list-item';
 import { getStripeClient } from '@/lib/api/stripe';
-import { loadWpExportCourses, type WpExportCourse } from '@/lib/wordpress-export-courses';
 import { verifySessionToken } from '@/lib/auth/session-jwt';
-
-export function findCourseInExport(slug: string): WpExportCourse | null {
-  const rows = loadWpExportCourses();
-  if (!rows?.length) return null;
-  const target = slug.trim().toLowerCase();
-  return rows.find((c) => (c.slug ?? '').trim().toLowerCase() === target) ?? null;
-}
 
 /**
  * Resolve payer email: local HS256 session cookie, backend /me when upstream + Bearer cookie,
@@ -39,7 +32,7 @@ export async function resolveCheckoutEmail(params: {
 
 export async function createStripeCheckoutForCourse(params: {
   slug: string;
-  course: WpExportCourse;
+  course: CheckoutCourse;
   success_url: string;
   cancel_url: string;
   customer_email: string;

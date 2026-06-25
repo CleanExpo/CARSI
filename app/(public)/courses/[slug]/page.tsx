@@ -9,14 +9,7 @@ import { CourseHubContext } from '@/components/lms/CourseHubContext';
 import { CourseSchema, BreadcrumbSchema } from '@/components/seo';
 import { getBackendOrigin, getPublicSiteUrl } from '@/lib/env/public-url';
 import { normalizePublicAssetUrl } from '@/lib/remote-image';
-import { resolveCecHoursLabelForSlug } from '@/lib/cec-display';
-import { resolveCecHours } from '@/lib/seed/cec-hours';
 import { getPublishedCourseDetailBySlugFromDatabase } from '@/lib/server/public-courses-list';
-import {
-  inferDisciplineFromWpExport,
-  loadWpExportCourses,
-  type WpExportCourse,
-} from '@/lib/wordpress-export-courses';
 
 export const dynamic = 'force-dynamic';
 
@@ -49,57 +42,14 @@ function resolveAssetUrl(url?: string | null): string | null {
   return `${backendUrl}${path}`;
 }
 
-function mapWpExportToCourseDetail(row: WpExportCourse): CourseDetail {
-  const cec = resolveCecHours({
-    cec_hours: row.cec_hours,
-    short_description: row.short_description,
-    description: row.description,
-    meta: row.meta,
-  });
-
-  return {
-    id: String(row.wp_id),
-    slug: row.slug,
-    title: row.title,
-    description: row.description ?? null,
-    short_description: row.short_description ?? null,
-    price_aud: String(row.price_aud ?? 0),
-    is_free: row.is_free === true || Number(row.price_aud ?? 0) === 0,
-    level: row.level ?? null,
-    category: row.category ?? null,
-    iicrc_discipline: row.iicrc_discipline ?? inferDisciplineFromWpExport(row) ?? null,
-    cec_hours: resolveCecHoursLabelForSlug(row.slug, cec),
-    duration_hours: null,
-    thumbnail_url: resolveAssetUrl(row.thumbnail_url),
-    module_count: null,
-    instructor: null,
-  };
-}
-
-function withCourseCecFallback(course: CourseDetail): CourseDetail {
-  return {
-    ...course,
-    cec_hours: resolveCecHoursLabelForSlug(course.slug, course.cec_hours),
-  };
-}
-
-async function getCourse(slug: string): Promise<CourseDetail | null> {
-  const targetSlug = decodeURIComponent(slug).trim().toLowerCase();
-
+export async function getCourse(slug: string): Promise<CourseDetail | null> {
   if (process.env.DATABASE_URL?.trim()) {
     try {
       const fromDb = await getPublishedCourseDetailBySlugFromDatabase(slug);
-      if (fromDb) return withCourseCecFallback(fromDb);
+      if (fromDb) return fromDb;
     } catch (e) {
       console.error('[courses/[slug]] Failed to load course from database', e);
     }
-  }
-
-  // Prefer local WordPress export when available so /courses/[slug] matches listing cards.
-  const exported = loadWpExportCourses();
-  if (exported && exported.length > 0) {
-    const match = exported.find((c) => (c.slug ?? '').trim().toLowerCase() === targetSlug);
-    if (match) return withCourseCecFallback(mapWpExportToCourseDetail(match));
   }
 
   const base = backendUrl.replace(/\/$/, '');
@@ -111,8 +61,7 @@ async function getCourse(slug: string): Promise<CourseDetail | null> {
     });
     if (res.status === 404) return null;
     if (!res.ok) return null;
-    const data = (await res.json()) as CourseDetail;
-    return withCourseCecFallback(data);
+    return (await res.json()) as CourseDetail;
   } catch {
     return null;
   }
@@ -741,11 +690,15 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                         : 'General',
                       accent: true,
                     },
-                    {
-                      label: 'CEC Hours',
-                      value: course.cec_hours ? `${course.cec_hours} credits` : 'N/A',
-                      accent: false,
-                    },
+                    ...(course.cec_hours
+                      ? [
+                          {
+                            label: 'CEC Hours',
+                            value: `${course.cec_hours} credits`,
+                            accent: false,
+                          },
+                        ]
+                      : []),
                     {
                       label: 'Duration',
                       value: course.duration_hours

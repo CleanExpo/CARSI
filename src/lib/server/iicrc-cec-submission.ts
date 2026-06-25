@@ -10,11 +10,11 @@ import {
   isCloudinaryConfigured,
   uploadCertificatePdfToCloudinary,
 } from '@/lib/server/cloudinary-upload';
+import { resolveLmsCourseCecHours } from '@/lib/server/course-cec-hours';
 import {
   courseEligibleForIicrcCecSubmission,
   getIicrcCecSubmissionEmail,
   isIicrcCecAutoSubmitEnabled,
-  resolveEffectiveCecHours,
 } from '@/lib/server/iicrc-cec-config';
 import {
   buildIicrcCecSubmissionHtml,
@@ -102,6 +102,9 @@ async function loadEnrollmentForSubmission(enrollmentId: string) {
           slug: true,
           iicrcDiscipline: true,
           cecHours: true,
+          shortDescription: true,
+          description: true,
+          meta: true,
           level: true,
         },
       },
@@ -134,13 +137,29 @@ function resolvedCecHoursForCourse(
   course: {
     slug: string;
     cecHours: unknown;
+    shortDescription?: string | null;
+    description?: string | null;
+    meta?: unknown;
+    durationHours?: number | null;
+    iicrcDiscipline?: string | null;
   },
   override?: number | null
 ): number | null {
   const direct =
     typeof override === 'number' && Number.isFinite(override) && override > 0 ? override : null;
   if (direct != null) return direct;
-  return resolveEffectiveCecHours({ slug: course.slug, cecHours: course.cecHours });
+  return resolveLmsCourseCecHours({
+    slug: course.slug,
+    cecHours:
+      course.cecHours != null && course.cecHours !== ''
+        ? Number(course.cecHours)
+        : null,
+    shortDescription: course.shortDescription,
+    description: course.description,
+    meta: course.meta,
+    durationHours: course.durationHours,
+    iicrcDiscipline: course.iicrcDiscipline,
+  });
 }
 
 function courseCtxForSubmission(
@@ -351,8 +370,12 @@ export async function processIicrcCecSubmissionForEnrollment(
           },
           course: {
             title: enrollment.course.title,
+            slug: enrollment.course.slug,
             iicrcDiscipline: enrollment.course.iicrcDiscipline,
             cecHours: resolvedCecHoursForCourse(enrollment.course),
+            shortDescription: enrollment.course.shortDescription,
+            description: enrollment.course.description,
+            meta: enrollment.course.meta,
             level: enrollment.course.level,
           },
         },

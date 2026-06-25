@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
+import { dash } from '@/lib/dashboard-light-ui';
 
 const SECTIONS = [
   { id: 'overview', label: 'Overview' },
@@ -154,7 +155,7 @@ export default function StudentProfilePage() {
 
   if (!authUser) {
     return (
-      <div className="mx-auto max-w-lg p-8 text-sm text-white/50">
+      <div className="mx-auto max-w-lg p-8 text-sm text-slate-500">
         Sign in to view your profile.
       </div>
     );
@@ -172,20 +173,20 @@ export default function StudentProfilePage() {
       >
         <Link
           href="/dashboard/student"
-          className="mb-6 inline-flex items-center gap-1 text-xs font-medium text-[#7ec5ff] hover:underline"
+          className="mb-6 inline-flex items-center gap-1 text-xs font-medium text-[#146fc2] hover:underline"
         >
           ← Back to My learning
         </Link>
-        <p className="mb-3 text-[10px] font-semibold tracking-[0.2em] text-white/35 uppercase">
+        <p className="mb-3 text-[10px] font-semibold tracking-[0.2em] text-slate-400 uppercase">
           Profile
         </p>
-        <ul className="flex flex-wrap gap-2 lg:flex-col lg:gap-0 lg:border-l border-white/10 lg:pl-4">
+        <ul className="flex flex-wrap gap-2 lg:flex-col lg:gap-0 lg:border-l lg:border-slate-200 lg:pl-4">
           {SECTIONS.map((s) => (
             <li key={s.id}>
               <button
                 type="button"
                 onClick={() => scrollTo(s.id)}
-                className="w-full rounded-lg px-0 py-2 text-left text-sm text-white/55 transition hover:text-white lg:rounded-none lg:py-2"
+                className="w-full rounded-lg px-0 py-2 text-left text-sm text-slate-600 transition hover:text-slate-900 lg:rounded-none lg:py-2"
               >
                 {s.label}
               </button>
@@ -193,27 +194,27 @@ export default function StudentProfilePage() {
           ))}
         </ul>
 
-        <div className="mt-8 hidden space-y-1 border-t border-white/10 pt-6 lg:block">
-          <p className="mb-2 text-[10px] font-semibold tracking-wider text-white/30 uppercase">
+        <div className="mt-8 hidden space-y-1 border-t border-slate-200 pt-6 lg:block">
+          <p className="mb-2 text-[10px] font-semibold tracking-wider text-slate-400 uppercase">
             Shortcuts
           </p>
           <Link
             href="/dashboard/student"
-            className="flex items-center gap-2 rounded-lg px-2 py-2 text-xs text-white/50 transition hover:bg-white/5 hover:text-white/80"
+            className="flex items-center gap-2 rounded-lg px-2 py-2 text-xs text-slate-500 transition hover:bg-slate-50 hover:text-slate-800"
           >
             <LayoutDashboard className="h-3.5 w-3.5 shrink-0" />
             Dashboard
           </Link>
           <Link
             href="/dashboard/courses"
-            className="flex items-center gap-2 rounded-lg px-2 py-2 text-xs text-white/50 transition hover:bg-white/5 hover:text-white/80"
+            className="flex items-center gap-2 rounded-lg px-2 py-2 text-xs text-slate-500 transition hover:bg-slate-50 hover:text-slate-800"
           >
             <BookOpen className="h-3.5 w-3.5 shrink-0" />
             Browse courses
           </Link>
           <Link
             href="/dashboard/student/credentials"
-            className="flex items-center gap-2 rounded-lg px-2 py-2 text-xs text-white/50 transition hover:bg-white/5 hover:text-white/80"
+            className="flex items-center gap-2 rounded-lg px-2 py-2 text-xs text-slate-500 transition hover:bg-slate-50 hover:text-slate-800"
           >
             <Award className="h-3.5 w-3.5 shrink-0" />
             Certificates
@@ -230,19 +231,19 @@ export default function StudentProfilePage() {
 
         {loading ? (
           <div className="space-y-4 animate-pulse">
-            <div className="h-40 rounded-2xl bg-white/5" />
-            <div className="h-32 rounded-2xl bg-white/5" />
+            <div className="h-40 rounded-2xl bg-slate-50" />
+            <div className="h-32 rounded-2xl bg-slate-50" />
           </div>
         ) : (
           <>
             <section
               id="overview"
-              className="scroll-mt-24 overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#2490ed]/12 via-white/[0.03] to-transparent p-6 sm:p-8"
+              className="scroll-mt-24 overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-[#2490ed]/10 via-white to-slate-50 p-6 shadow-sm sm:p-8"
             >
               <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
                 <div className="flex gap-5">
                   <div
-                    className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl text-xl font-bold text-white shadow-lg sm:h-24 sm:w-24 sm:text-2xl"
+                    className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl text-xl font-bold text-slate-900 shadow-lg sm:h-24 sm:w-24 sm:text-2xl"
                     style={{
                       background: 'linear-gradient(135deg, #2490ed 0%, #1a6bb8 100%)',
                       boxShadow: '0 12px 40px -12px rgba(36, 144, 237, 0.5)',
@@ -252,17 +253,17 @@ export default function StudentProfilePage() {
                     {initialsFromUser(profile ?? authUser)}
                   </div>
                   <div className="min-w-0">
-                    <h1 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">
+                    <h1 className="text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
                       {displayName}
                     </h1>
-                    <p className="mt-1 truncate text-sm text-white/50">{authUser.email}</p>
+                    <p className="mt-1 truncate text-sm text-slate-500">{authUser.email}</p>
                     <div className="mt-3 flex flex-wrap items-center gap-2">
-                      <span className="inline-flex items-center gap-1 rounded-md border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] font-medium text-white/70 capitalize">
+                      <span className="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-medium text-slate-700 capitalize">
                         <Shield className="h-3 w-3 text-[#2490ed]" aria-hidden />
                         {roleLabel}
                       </span>
                       {authUser.is_verified ? (
-                        <span className="rounded-md border border-emerald-500/25 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-medium text-emerald-300/90">
+                        <span className="rounded-md border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[11px] font-medium text-emerald-700">
                           Verified account
                         </span>
                       ) : null}
@@ -271,13 +272,13 @@ export default function StudentProfilePage() {
                 </div>
                 <Link
                   href="/dashboard/student"
-                  className="inline-flex shrink-0 items-center gap-2 self-start rounded-xl border border-white/12 bg-white/5 px-4 py-2.5 text-sm font-medium text-white/85 transition hover:border-[#2490ed]/35 hover:bg-[#2490ed]/10"
+                  className="inline-flex shrink-0 items-center gap-2 self-start rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm font-medium text-slate-800 transition hover:border-[#2490ed]/35 hover:bg-[#2490ed]/10"
                 >
                   Go to learning
                   <ChevronRight className="h-4 w-4 opacity-70" />
                 </Link>
               </div>
-              <p className="mt-6 max-w-2xl text-sm leading-relaxed text-white/45">
+              <p className="mt-6 max-w-2xl text-sm leading-relaxed text-slate-500">
                 Manage how you appear in CARSI and your <AcronymTooltip term="IICRC" /> renewal
                 details — similar to account hubs on platforms like Coursera or Udemy.
               </p>
@@ -286,18 +287,18 @@ export default function StudentProfilePage() {
             <section id="account" className="scroll-mt-24">
               <div className="mb-4 flex items-center gap-2">
                 <UserIcon className="h-4 w-4 text-[#2490ed]" aria-hidden />
-                <h2 className="text-lg font-semibold text-white">Account</h2>
+                <h2 className="text-lg font-semibold text-slate-900">Account</h2>
               </div>
-              <p className="mb-6 text-sm text-white/45">
+              <p className="mb-6 text-sm text-slate-500">
                 Your sign-in email is managed for security. Update the name shown across your
                 dashboard and certificates.
               </p>
               <form
                 onSubmit={saveAccount}
-                className="space-y-5 rounded-2xl border border-white/10 bg-white/[0.03] p-6 sm:p-8"
+                className={`space-y-5 ${dash.panelInset} p-6 sm:p-8`}
               >
                 <div>
-                  <label htmlFor="full_name" className="block text-xs font-medium text-white/50">
+                  <label htmlFor="full_name" className="block text-xs font-medium text-slate-500">
                     Full name
                   </label>
                   <input
@@ -305,12 +306,12 @@ export default function StudentProfilePage() {
                     type="text"
                     value={fullName}
                     onChange={(ev) => setFullName(ev.target.value)}
-                    className="mt-2 w-full max-w-md rounded-xl border border-white/10 bg-[#0a0f1a] px-4 py-3 text-sm text-white placeholder:text-white/30 focus:border-[#2490ed]/50 focus:outline-none"
+                    className={`mt-2 w-full max-w-md ${dash.input}`}
                     autoComplete="name"
                   />
                 </div>
                 <div>
-                  <label htmlFor="email_ro" className="block text-xs font-medium text-white/50">
+                  <label htmlFor="email_ro" className="block text-xs font-medium text-slate-500">
                     Email
                   </label>
                   <input
@@ -318,15 +319,15 @@ export default function StudentProfilePage() {
                     type="email"
                     value={authUser.email}
                     readOnly
-                    className="mt-2 w-full max-w-md cursor-not-allowed rounded-xl border border-white/6 bg-white/[0.04] px-4 py-3 text-sm text-white/45"
+                    className="mt-2 w-full max-w-md cursor-not-allowed rounded-xl border border-slate-200 bg-slate-100 px-4 py-3 text-sm text-slate-500"
                   />
-                  <p className="mt-1.5 text-xs text-white/35">
+                  <p className="mt-1.5 text-xs text-slate-400">
                     Contact support to change your email or reset your password from the login page.
                   </p>
                 </div>
                 <div>
-                  <span className="block text-xs font-medium text-white/50">Account ID</span>
-                  <p className="mt-2 font-mono text-xs text-white/40 break-all">{authUser.id}</p>
+                  <span className="block text-xs font-medium text-slate-500">Account ID</span>
+                  <p className="mt-2 font-mono text-xs text-slate-500 break-all">{authUser.id}</p>
                 </div>
                 <Button
                   type="submit"
@@ -341,18 +342,18 @@ export default function StudentProfilePage() {
             <section id="recognition" className="scroll-mt-24">
               <div className="mb-4 flex items-center gap-2">
                 <Award className="h-4 w-4 text-[#2490ed]" aria-hidden />
-                <h2 className="text-lg font-semibold text-white">Recognition</h2>
+                <h2 className="text-lg font-semibold text-slate-900">Recognition</h2>
               </div>
-              <p className="mb-6 text-sm text-white/45">
+              <p className="mb-6 text-sm text-slate-500">
                 The monthly board highlights completion-based activity for the current calendar month
                 (Australia/Sydney). It is{' '}
-                <span className="text-white/70">anonymous by default</span> — only an optional label
+                <span className="text-slate-700">anonymous by default</span> — only an optional label
                 you enter here can appear publicly. Your email and account name are never shown on
                 the board.
               </p>
               <form
                 onSubmit={saveRecognition}
-                className="space-y-5 rounded-2xl border border-white/10 bg-white/[0.03] p-6 sm:p-8"
+                className={`space-y-5 ${dash.panelInset} p-6 sm:p-8`}
               >
                 <div className="flex items-start gap-3">
                   <input
@@ -360,19 +361,19 @@ export default function StudentProfilePage() {
                     type="checkbox"
                     checked={leaderboardShow}
                     onChange={(ev) => setLeaderboardShow(ev.target.checked)}
-                    className="mt-1 h-4 w-4 rounded border-white/20 bg-[#0a0f1a] text-[#2490ed] focus:ring-[#2490ed]/40"
+                    className="mt-1 h-4 w-4 rounded border-slate-300 bg-white text-[#2490ed] focus:ring-[#2490ed]/40"
                   />
                   <div>
-                    <label htmlFor="lb_show" className="text-sm font-medium text-white/80">
+                    <label htmlFor="lb_show" className="text-sm font-medium text-slate-800">
                       Show my chosen public label on the monthly recognition board
                     </label>
-                    <p className="mt-1 text-xs text-white/35">
+                    <p className="mt-1 text-xs text-slate-400">
                       If off, you appear as a neutral professional identifier (not your real name).
                     </p>
                   </div>
                 </div>
                 <div>
-                  <label htmlFor="lb_name" className="block text-xs font-medium text-white/50">
+                  <label htmlFor="lb_name" className="block text-xs font-medium text-slate-500">
                     Public label (optional, max 48 characters)
                   </label>
                   <input
@@ -382,10 +383,10 @@ export default function StudentProfilePage() {
                     onChange={(ev) => setLeaderboardName(ev.target.value.slice(0, 48))}
                     disabled={!leaderboardShow}
                     placeholder="e.g. Alex K., WRT · QLD"
-                    className="mt-2 w-full max-w-md rounded-xl border border-white/10 bg-[#0a0f1a] px-4 py-3 text-sm text-white placeholder:text-white/30 focus:border-[#2490ed]/50 focus:outline-none disabled:cursor-not-allowed disabled:opacity-45"
+                    className={`mt-2 w-full max-w-md ${dash.input} disabled:cursor-not-allowed disabled:opacity-45`}
                     autoComplete="off"
                   />
-                  <p className="mt-1.5 text-xs text-white/35">
+                  <p className="mt-1.5 text-xs text-slate-400">
                     Do not use your email. This is only for the leaderboard — not certificates or
                     verification.
                   </p>
@@ -403,20 +404,20 @@ export default function StudentProfilePage() {
             <section id="iicrc" className="scroll-mt-24">
               <div className="mb-4 flex items-center gap-2">
                 <GraduationCap className="h-4 w-4 text-[#2490ed]" aria-hidden />
-                <h2 className="text-lg font-semibold text-white">
+                <h2 className="text-lg font-semibold text-slate-900">
                   <AcronymTooltip term="IICRC" /> &amp; renewal
                 </h2>
               </div>
-              <p className="mb-6 text-sm text-white/45">
+              <p className="mb-6 text-sm text-slate-500">
                 Used for your renewal cockpit, <AcronymTooltip term="CEC" /> tracking, and reporting.
                 Keep your member number and renewal date current.
               </p>
               <form
                 onSubmit={saveIicrc}
-                className="space-y-5 rounded-2xl border border-white/10 bg-white/[0.03] p-6 sm:p-8"
+                className={`space-y-5 ${dash.panelInset} p-6 sm:p-8`}
               >
                 <div>
-                  <label htmlFor="iicrc_member" className="block text-xs font-medium text-white/50">
+                  <label htmlFor="iicrc_member" className="block text-xs font-medium text-slate-500">
                     IICRC member number
                   </label>
                   <input
@@ -424,28 +425,28 @@ export default function StudentProfilePage() {
                     type="text"
                     value={member}
                     onChange={(ev) => setMember(ev.target.value)}
-                    className="mt-2 w-full max-w-md rounded-xl border border-white/10 bg-[#0a0f1a] px-4 py-3 text-sm text-white placeholder:text-white/30 focus:border-[#2490ed]/50 focus:outline-none"
+                    className={`mt-2 w-full max-w-md ${dash.input}`}
                     placeholder="Optional"
                     autoComplete="off"
                   />
                 </div>
                 <div>
-                  <label htmlFor="iicrc_expiry" className="block text-xs font-medium text-white/50">
+                  <label htmlFor="iicrc_expiry" className="block text-xs font-medium text-slate-500">
                     Certification / renewal expiry date
                   </label>
                   <div className="mt-2 flex max-w-md items-center gap-2">
-                    <Calendar className="h-4 w-4 shrink-0 text-white/30" aria-hidden />
+                    <Calendar className="h-4 w-4 shrink-0 text-slate-400" aria-hidden />
                     <input
                       id="iicrc_expiry"
                       type="date"
                       value={expiry}
                       onChange={(ev) => setExpiry(ev.target.value)}
-                      className="w-full rounded-xl border border-white/10 bg-[#0a0f1a] px-4 py-3 text-sm text-white focus:border-[#2490ed]/50 focus:outline-none"
+                      className={`w-full ${dash.input}`}
                     />
                   </div>
                 </div>
                 <div>
-                  <label htmlFor="iicrc_card_url" className="block text-xs font-medium text-white/50">
+                  <label htmlFor="iicrc_card_url" className="block text-xs font-medium text-slate-500">
                     Member card image URL
                   </label>
                   <input
@@ -453,25 +454,25 @@ export default function StudentProfilePage() {
                     type="url"
                     value={cardUrl}
                     onChange={(ev) => setCardUrl(ev.target.value)}
-                    className="mt-2 w-full max-w-lg rounded-xl border border-white/10 bg-[#0a0f1a] px-4 py-3 text-sm text-white placeholder:text-white/30 focus:border-[#2490ed]/50 focus:outline-none"
+                    className={`mt-2 w-full max-w-lg ${dash.input}`}
                     placeholder="https://…"
                     autoComplete="off"
                   />
-                  <p className="mt-1.5 text-xs text-white/35">
+                  <p className="mt-1.5 text-xs text-slate-400">
                     Optional link to your stored card image (e.g. cloud or intranet URL).
                   </p>
                 </div>
                 {certs.length > 0 ? (
                   <div>
-                    <span className="block text-xs font-medium text-white/50">Certifications on file</span>
-                    <ul className="mt-3 divide-y divide-white/8 rounded-xl border border-white/8">
+                    <span className="block text-xs font-medium text-slate-500">Certifications on file</span>
+                    <ul className="mt-3 divide-y divide-slate-200 rounded-xl border border-slate-200 bg-white">
                       {certs.map((c, i) => (
                         <li
                           key={`${c.discipline}-${c.certified_at}-${i}`}
                           className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 text-sm"
                         >
-                          <span className="font-mono text-[#7ec5ff]">{c.discipline}</span>
-                          <span className="text-white/45">
+                          <span className="font-mono text-[#146fc2]">{c.discipline}</span>
+                          <span className="text-slate-500">
                             {new Date(c.certified_at + 'T12:00:00').toLocaleDateString('en-AU', {
                               day: 'numeric',
                               month: 'short',

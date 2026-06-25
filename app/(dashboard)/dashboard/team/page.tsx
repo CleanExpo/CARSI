@@ -311,8 +311,8 @@ function TeamDashboardPage() {
           <p className="text-[11px] font-semibold tracking-[0.2em] text-[#2490ed]/80 uppercase">
             Team setup
           </p>
-          <h1 className="mt-2 text-2xl font-bold text-white">Your team is ready</h1>
-          <p className="mt-2 text-sm text-white/50">
+          <h1 className="mt-2 text-2xl font-bold text-slate-900">Your team is ready</h1>
+          <p className="mt-2 text-sm text-slate-500">
             Payment received{purchasedSeats ? ` for ${purchasedSeats} seats` : ''}. Name your team,
             set a password, then add learners by email.
           </p>
@@ -320,25 +320,25 @@ function TeamDashboardPage() {
         {error ? <ErrorBanner message={error} /> : null}
         <form
           onSubmit={handleCheckoutSetup}
-          className="space-y-4 rounded-2xl border border-white/10 p-6"
+          className="space-y-4 rounded-2xl border border-slate-200 p-6"
         >
           {checkoutEmail ? (
-            <p className="text-sm text-white/55">
-              Account email: <span className="text-white/85">{checkoutEmail}</span>
+            <p className="text-sm text-slate-600">
+              Account email: <span className="text-slate-800">{checkoutEmail}</span>
             </p>
           ) : null}
-          <label className="block text-sm text-white/70">
+          <label className="block text-sm text-slate-700">
             Team name
             <input
               required
               minLength={2}
               value={teamName}
               onChange={(e) => setTeamName(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-white/12 bg-black/30 px-3 py-2 text-white"
+              className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-slate-900"
               placeholder="e.g. Acme Restoration"
             />
           </label>
-          <label className="block text-sm text-white/70">
+          <label className="block text-sm text-slate-700">
             Password (for your CARSI account)
             <input
               required
@@ -346,7 +346,7 @@ function TeamDashboardPage() {
               minLength={8}
               value={setupPassword}
               onChange={(e) => setSetupPassword(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-white/12 bg-black/30 px-3 py-2 text-white"
+              className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-slate-900"
             />
           </label>
           <button
@@ -363,8 +363,8 @@ function TeamDashboardPage() {
 
   if (!user) {
     return (
-      <p className="text-white/60">
-        <Link href="/login" className="text-[#7ec5ff] hover:underline">
+      <p className="text-slate-600">
+        <Link href="/login" className="text-[#146fc2] hover:underline">
           Sign in
         </Link>{' '}
         to manage your team.
@@ -373,7 +373,7 @@ function TeamDashboardPage() {
   }
 
   if (loading) {
-    return <p className="text-white/50">Loading your team…</p>;
+    return <p className="text-slate-500">Loading your team…</p>;
   }
 
   if (!team && showAnnualPlanForm) {
@@ -383,10 +383,10 @@ function TeamDashboardPage() {
           <p className="text-[11px] font-semibold tracking-[0.2em] text-[#2490ed]/80 uppercase">
             Teams
           </p>
-          <h1 className="mt-2 text-2xl font-bold text-white">Annual team plan</h1>
-          <p className="mt-2 text-sm text-white/50">
+          <h1 className="mt-2 text-2xl font-bold text-slate-900">Annual team plan</h1>
+          <p className="mt-2 text-sm text-slate-500">
             Subscribe to a yearly team bundle from{' '}
-            <Link href="/pricing" className="text-[#7ec5ff] hover:underline">
+            <Link href="/pricing" className="text-[#146fc2] hover:underline">
               pricing
             </Link>
             .
@@ -395,23 +395,23 @@ function TeamDashboardPage() {
         {error ? <ErrorBanner message={error} /> : null}
         <form
           onSubmit={handleCreateAnnualTeam}
-          className="space-y-4 rounded-2xl border border-white/10 p-6"
+          className="space-y-4 rounded-2xl border border-slate-200 p-6"
         >
-          <label className="block text-sm text-white/70">
+          <label className="block text-sm text-slate-700">
             Team name
             <input
               required
               value={teamName}
               onChange={(e) => setTeamName(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-white/12 bg-black/30 px-3 py-2 text-white"
+              className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-slate-900"
             />
           </label>
-          <label className="block text-sm text-white/70">
+          <label className="block text-sm text-slate-700">
             Bundle
             <select
               value={selectedTier}
               onChange={(e) => setSelectedTier(e.target.value as TeamBundleTierId)}
-              className="mt-1 w-full rounded-lg border border-white/12 bg-black/30 px-3 py-2 text-white"
+              className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-slate-900"
             >
               {TEAM_TIERS.map((t) => (
                 <option key={t.id} value={t.id}>
@@ -435,8 +435,8 @@ function TeamDashboardPage() {
   if (!team) {
     return (
       <div className="mx-auto max-w-lg space-y-4">
-        <h1 className="text-xl font-bold text-white">No team on this account</h1>
-        <p className="text-sm text-white/55">
+        <h1 className="text-xl font-bold text-slate-900">No team on this account</h1>
+        <p className="text-sm text-slate-600">
           Course team seats are created when you complete team checkout on a course page. If you
           already paid, try restoring your purchase below.
         </p>
@@ -461,7 +461,7 @@ function TeamDashboardPage() {
           </button>
           <Link
             href="/courses"
-            className="rounded-lg border border-white/15 px-4 py-2 text-sm text-white/70 hover:text-white"
+            className="rounded-lg border border-slate-200 px-4 py-2 text-sm text-slate-700 hover:text-slate-900"
           >
             Browse courses
           </Link>
@@ -483,24 +483,24 @@ function TeamDashboardPage() {
           <p className="text-[11px] font-semibold tracking-[0.2em] text-[#2490ed]/80 uppercase">
             Team access
           </p>
-          <h1 className="mt-2 text-2xl font-bold text-white">{team.name}</h1>
-          <p className="mt-2 text-sm text-white/55">
+          <h1 className="mt-2 text-2xl font-bold text-slate-900">{team.name}</h1>
+          <p className="mt-2 text-sm text-slate-600">
             You were added to this team by{' '}
-            <span className="font-medium text-white/85">{addedBy}</span>
+            <span className="font-medium text-slate-800">{addedBy}</span>
             {team.added_by?.email ? (
-              <span className="text-white/40"> ({team.added_by.email})</span>
+              <span className="text-slate-500"> ({team.added_by.email})</span>
             ) : null}
             .
           </p>
         </header>
 
-        <section className="rounded-2xl border border-white/10 p-6">
-          <h2 className="text-sm font-semibold text-white">Your courses</h2>
-          <p className="mt-1 text-xs text-white/45">
+        <section className="rounded-2xl border border-slate-200 p-6">
+          <h2 className="text-sm font-semibold text-slate-900">Your courses</h2>
+          <p className="mt-1 text-xs text-slate-500">
             Only the courses your team owner assigned to you are listed here.
           </p>
           {courses.length === 0 ? (
-            <p className="mt-4 text-sm text-white/50">
+            <p className="mt-4 text-sm text-slate-500">
               No courses assigned yet. Ask your team owner if you expected access.
             </p>
           ) : (
@@ -508,9 +508,9 @@ function TeamDashboardPage() {
               {courses.map((c) => (
                 <li
                   key={c.slug}
-                  className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-black/20 px-4 py-3"
+                  className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3"
                 >
-                  <span className="text-sm font-medium text-white/90">{c.title}</span>
+                  <span className="text-sm font-medium text-slate-900">{c.title}</span>
                   <Link
                     href={`/dashboard/learn/${encodeURIComponent(c.slug)}`}
                     className="shrink-0 rounded-lg bg-[#2490ed] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#1a7fd4]"
@@ -523,8 +523,8 @@ function TeamDashboardPage() {
           )}
         </section>
 
-        <p className="text-center text-xs text-white/35">
-          <Link href="/dashboard/student" className="text-[#7ec5ff] hover:underline">
+        <p className="text-center text-xs text-slate-400">
+          <Link href="/dashboard/student" className="text-[#146fc2] hover:underline">
             Go to your dashboard
           </Link>
         </p>
@@ -551,14 +551,14 @@ function TeamDashboardPage() {
         </p>
         {showNameEditor ? (
           <form onSubmit={handleSaveTeamName} className="mt-3 space-y-2">
-            <label className="block text-sm text-white/70">
+            <label className="block text-sm text-slate-700">
               Team name
               <input
                 required
                 minLength={2}
                 value={teamName}
                 onChange={(e) => setTeamName(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-white/12 bg-black/30 px-3 py-2 text-lg font-bold text-white"
+                className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-lg font-bold text-slate-900"
               />
             </label>
             <button
@@ -571,7 +571,7 @@ function TeamDashboardPage() {
           </form>
         ) : (
           <>
-            <h1 className="mt-2 text-2xl font-bold text-white">{team.name}</h1>
+            <h1 className="mt-2 text-2xl font-bold text-slate-900">{team.name}</h1>
             {team.is_owner ? (
               <button
                 type="button"
@@ -579,7 +579,7 @@ function TeamDashboardPage() {
                   setTeamName(team.name);
                   setEditingName(true);
                 }}
-                className="mt-1 text-xs text-[#7ec5ff] hover:underline"
+                className="mt-1 text-xs text-[#146fc2] hover:underline"
               >
                 Edit team name
               </button>
@@ -587,16 +587,16 @@ function TeamDashboardPage() {
           </>
         )}
         {!isCourseTeam ? (
-          <p className="mt-2 text-sm text-white/45">
+          <p className="mt-2 text-sm text-slate-500">
             {team.bundle_tier.replace(/_/g, ' ')} · {team.seats_used}/{team.seat_limit} seats used
           </p>
         ) : null}
       </header>
 
       {isCourseTeam && purchases.length > 0 ? (
-        <section className="rounded-2xl border border-white/10 p-6">
-          <h2 className="text-sm font-semibold text-white">Team course purchases</h2>
-          <p className="mt-1 text-xs text-white/45">
+        <section className="rounded-2xl border border-slate-200 p-6">
+          <h2 className="text-sm font-semibold text-slate-900">Team course purchases</h2>
+          <p className="mt-1 text-xs text-slate-500">
             Each checkout is listed separately. Seat use is counted per course.
           </p>
           <ul className="mt-4 space-y-3">
@@ -605,22 +605,22 @@ function TeamDashboardPage() {
               return (
                 <li
                   key={p.id}
-                  className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm"
+                  className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm"
                 >
                   <div className="flex flex-wrap items-baseline justify-between gap-2">
-                    <span className="font-medium text-white/90">{p.course_title}</span>
-                    <span className="text-xs text-[#7ec5ff]">Team purchase</span>
+                    <span className="font-medium text-slate-900">{p.course_title}</span>
+                    <span className="text-xs text-[#146fc2]">Team purchase</span>
                   </div>
-                  <p className="mt-1 text-white/55">
+                  <p className="mt-1 text-slate-600">
                     {p.seat_limit} seats in this purchase
                     {pool && (pool.purchase_count > 1 || pool.purchases.length > 1) ? (
-                      <span className="text-white/40">
+                      <span className="text-slate-500">
                         {' '}
                         · {pool.seats_used}/{pool.seat_limit} used across{' '}
                         {pool.purchase_count} purchases for this course
                       </span>
                     ) : (
-                      <span className="text-white/40">
+                      <span className="text-slate-500">
                         {' '}
                         · {p.seats_used}/{p.seat_limit} seats used
                       </span>
@@ -631,12 +631,12 @@ function TeamDashboardPage() {
             })}
           </ul>
           {pools.some((p) => p.purchase_count > 1) ? (
-            <ul className="mt-4 space-y-2 border-t border-white/8 pt-4 text-xs text-white/50">
+            <ul className="mt-4 space-y-2 border-t border-slate-200 pt-4 text-xs text-slate-500">
               {pools
                 .filter((p) => p.purchase_count > 1)
                 .map((p) => (
                   <li key={p.course_slug}>
-                    <strong className="text-white/70">{p.course_title}</strong>:{' '}
+                    <strong className="text-slate-700">{p.course_title}</strong>:{' '}
                     {p.purchase_count} team purchases · {p.seat_limit} seats total ·{' '}
                     {p.seats_used}/{p.seat_limit} used
                   </li>
@@ -645,16 +645,16 @@ function TeamDashboardPage() {
           ) : null}
         </section>
       ) : isCourseTeam ? (
-        <p className="text-sm text-white/45">
+        <p className="text-sm text-slate-500">
           Course · {(purchasedCourse ?? team.course_slug ?? '').replace(/-/g, ' ')} ·{' '}
           {team.seats_used}/{team.seat_limit} seats used
         </p>
       ) : null}
 
       {showPurchaseBanner ? (
-        <div className="rounded-2xl border border-[#2490ed]/35 bg-[#2490ed]/10 p-4 text-sm text-white/80">
-          <p className="font-semibold text-white">Add your team</p>
-          <p className="mt-1 text-white/60">
+        <div className="rounded-2xl border border-[#2490ed]/35 bg-[#2490ed]/10 p-4 text-sm text-slate-800">
+          <p className="font-semibold text-slate-900">Add your team</p>
+          <p className="mt-1 text-slate-600">
             {isCourseTeam && pools.length > 0
               ? 'Pick which courses they get — the email only mentions those. Each course has its own seat pool from your team purchases.'
               : `Invite up to ${seatsRemaining} more ${seatsRemaining === 1 ? 'learner' : 'learners'}. Pick which of your courses they get — the email only mentions those.`}
@@ -664,32 +664,32 @@ function TeamDashboardPage() {
 
       {error ? <ErrorBanner message={error} /> : null}
       {success ? (
-        <p className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
+        <p className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-800">
           {success}
         </p>
       ) : null}
 
-      <section className="rounded-2xl border border-white/10 p-6">
-        <h2 className="text-sm font-semibold text-white">Members</h2>
-        <ul className="mt-3 divide-y divide-white/8">
+      <section className="rounded-2xl border border-slate-200 p-6">
+        <h2 className="text-sm font-semibold text-slate-900">Members</h2>
+        <ul className="mt-3 divide-y divide-slate-200">
           {(team.members ?? []).map((m) => (
             <li key={m.user_id} className="flex justify-between py-2 text-sm">
-              <span className="text-white/85">{m.full_name || m.email}</span>
-              <span className="text-white/40 capitalize">{m.role}</span>
+              <span className="text-slate-800">{m.full_name || m.email}</span>
+              <span className="text-slate-500 capitalize">{m.role}</span>
             </li>
           ))}
         </ul>
       </section>
 
       {team.is_owner && canInviteMore ? (
-        <section className="rounded-2xl border border-white/10 p-6">
-          <h2 className="text-sm font-semibold text-white">Add team member</h2>
-          <p className="mt-1 text-xs text-white/45">
+        <section className="rounded-2xl border border-slate-200 p-6">
+          <h2 className="text-sm font-semibold text-slate-900">Add team member</h2>
+          <p className="mt-1 text-xs text-slate-500">
             Enter their email, tick the courses they should access, then send. They only get
             enrolment and email text for the courses you select.
           </p>
           <form onSubmit={handleInvite} className="mt-4 space-y-4">
-            <label className="block text-sm text-white/70">
+            <label className="block text-sm text-slate-700">
               Email
               <input
                 type="email"
@@ -697,19 +697,19 @@ function TeamDashboardPage() {
                 value={inviteEmail}
                 onChange={(e) => setInviteEmail(e.target.value)}
                 placeholder="tech@company.com.au"
-                className="mt-1 w-full rounded-lg border border-white/12 bg-black/30 px-3 py-2 text-sm text-white"
+                className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900"
               />
             </label>
             <fieldset className="space-y-2">
-              <legend className="text-sm font-medium text-white/70">Courses they can access</legend>
+              <legend className="text-sm font-medium text-slate-700">Courses they can access</legend>
               {coursesLoading ? (
-                <p className="text-xs text-white/40">Loading your courses…</p>
+                <p className="text-xs text-slate-500">Loading your courses…</p>
               ) : assignableCourses.length === 0 ? (
-                <p className="text-xs text-amber-200/80">
+                <p className="text-xs text-amber-700">
                   You have no enrolled courses to assign. Enrol in a course first, then return here.
                 </p>
               ) : (
-                <ul className="max-h-48 space-y-2 overflow-y-auto rounded-lg border border-white/10 bg-black/20 p-3">
+                <ul className="max-h-48 space-y-2 overflow-y-auto rounded-lg border border-slate-200 bg-slate-50 p-3">
                   {assignableCourses.map((c) => {
                     const noSeats =
                       c.is_team_purchase_course &&
@@ -718,7 +718,7 @@ function TeamDashboardPage() {
                     return (
                       <li key={c.slug}>
                         <label
-                          className={`flex items-start gap-2.5 text-sm ${noSeats ? 'cursor-not-allowed opacity-50' : 'cursor-pointer text-white/85'}`}
+                          className={`flex items-start gap-2.5 text-sm ${noSeats ? 'cursor-not-allowed opacity-50' : 'cursor-pointer text-slate-800'}`}
                         >
                           <input
                             type="checkbox"
@@ -730,7 +730,7 @@ function TeamDashboardPage() {
                           <span>
                             {c.title}
                             {c.is_team_purchase_course ? (
-                              <span className="ml-1 text-xs text-[#7ec5ff]">
+                              <span className="ml-1 text-xs text-[#146fc2]">
                                 (team purchase
                                 {typeof c.seats_used === 'number' && typeof c.seat_limit === 'number'
                                   ? ` · ${c.seats_used}/${c.seat_limit} seats`
@@ -742,7 +742,7 @@ function TeamDashboardPage() {
                               </span>
                             ) : null}
                             {noSeats ? (
-                              <span className="ml-1 text-xs text-amber-200/80">— full</span>
+                              <span className="ml-1 text-xs text-amber-700">— full</span>
                             ) : null}
                           </span>
                         </label>
@@ -764,7 +764,7 @@ function TeamDashboardPage() {
       ) : null}
 
       {team.is_owner && !canInviteMore ? (
-        <p className="text-sm text-white/45">
+        <p className="text-sm text-slate-500">
           {isCourseTeam
             ? 'All seats are in use for your team-purchased courses.'
             : 'All seats are in use.'}
@@ -776,7 +776,7 @@ function TeamDashboardPage() {
 
 export default function TeamPage() {
   return (
-    <Suspense fallback={<p className="text-white/50">Loading team…</p>}>
+    <Suspense fallback={<p className="text-slate-500">Loading team…</p>}>
       <TeamDashboardPage />
     </Suspense>
   );

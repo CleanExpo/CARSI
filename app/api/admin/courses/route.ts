@@ -7,7 +7,7 @@ import {
   adminCreateCourse,
   adminListCourses,
   courseToAdminDto,
-  type AdminCourseWriteInput,
+  parseAdminCourseWriteBody,
   type AdminListCoursesOptions,
 } from '@/lib/admin/admin-courses-service';
 import { getAdminSessionOrNull } from '@/lib/admin/admin-session';
@@ -30,7 +30,11 @@ function parseListQuery(request: NextRequest) {
   const sort: NonNullable<AdminListCoursesOptions['sort']> =
     sortRaw === 'title' || sortRaw === 'modules' || sortRaw === 'updated' ? sortRaw : 'updated';
 
-  return { status, q: q || undefined, sort };
+  const cecRaw = searchParams.get('cec');
+  const cec: NonNullable<AdminListCoursesOptions['cec']> =
+    cecRaw === 'missing' ? 'missing' : 'all';
+
+  return { status, q: q || undefined, sort, cec };
 }
 
 export async function GET(request: NextRequest) {
@@ -44,8 +48,8 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const { status, q, sort } = parseListQuery(request);
-    const courses = await adminListCourses({ status, q, sort });
+    const { status, q, sort, cec } = parseListQuery(request);
+    const courses = await adminListCourses({ status, q, sort, cec });
     return NextResponse.json(
       { courses },
       {
@@ -60,48 +64,8 @@ export async function GET(request: NextRequest) {
   }
 }
 
-function parseBody(body: unknown): AdminCourseWriteInput | null {
-  if (!body || typeof body !== 'object') return null;
-  const o = body as Record<string, unknown>;
-  const title = typeof o.title === 'string' ? o.title.trim() : '';
-  if (!title) return null;
-
-  const modulesRaw = Array.isArray(o.modules) ? o.modules : [];
-  const modules = modulesRaw
-    .map((row) => {
-      if (!row || typeof row !== 'object') return null;
-      const m = row as Record<string, unknown>;
-      const modTitle = typeof m.title === 'string' ? m.title.trim() : '';
-      if (!modTitle) return null;
-      return {
-        id: typeof m.id === 'string' && m.id.trim() ? m.id.trim() : undefined,
-        title: modTitle,
-        textContent: typeof m.textContent === 'string' ? m.textContent : undefined,
-        videoUrl: typeof m.videoUrl === 'string' ? m.videoUrl : undefined,
-      };
-    })
-    .filter(Boolean) as AdminCourseWriteInput['modules'];
-
-  const priceRaw = o.priceAud;
-  const priceAud =
-    typeof priceRaw === 'number' && Number.isFinite(priceRaw)
-      ? priceRaw
-      : typeof priceRaw === 'string'
-        ? Number.parseFloat(priceRaw)
-        : 0;
-
-  return {
-    title,
-    description: typeof o.description === 'string' ? o.description : undefined,
-    thumbnailUrl: typeof o.thumbnailUrl === 'string' ? o.thumbnailUrl : undefined,
-    introVideoUrl: typeof o.introVideoUrl === 'string' ? o.introVideoUrl : undefined,
-    introThumbnailUrl: typeof o.introThumbnailUrl === 'string' ? o.introThumbnailUrl : undefined,
-    slug: typeof o.slug === 'string' ? o.slug : undefined,
-    isFree: Boolean(o.isFree),
-    priceAud: Number.isFinite(priceAud) ? priceAud : 0,
-    published: Boolean(o.published),
-    modules,
-  };
+function parseBody(body: unknown) {
+  return parseAdminCourseWriteBody(body);
 }
 
 function parseBulkCourseIds(body: unknown): string[] | null {

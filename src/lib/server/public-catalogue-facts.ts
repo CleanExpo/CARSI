@@ -1,16 +1,12 @@
 import { cache } from 'react';
 
 import { getBackendOrigin } from '@/lib/env/public-url';
+import type { CourseListItem } from '@/lib/course-list-item';
 import { prisma } from '@/lib/prisma';
-import type { CourseListItem } from '@/lib/wordpress-export-courses';
-import {
-  loadWpExportCourses,
-  mapWpExportToCourseListItem,
-} from '@/lib/wordpress-export-courses';
 
 import { lmsPublishedCourseWhere } from '@/lib/server/public-courses-list';
 
-export type CatalogueFactsSource = 'database' | 'wordpress_export' | 'api' | 'none';
+export type CatalogueFactsSource = 'database' | 'api' | 'none';
 
 export type PublicCatalogueFacts = {
   /** Number of published courses in the active catalogue source (matches `/courses` listing). */
@@ -84,7 +80,7 @@ async function fetchBackendCatalogueFacts(): Promise<PublicCatalogueFacts | null
 
 /**
  * Published course count and distinct IICRC discipline codes — **same resolution order** as
- * `getCourses()` on `/courses`: Prisma published courses → WordPress/seed export → LMS API.
+ * `getCourses()` on `/courses`: Prisma published courses → LMS API.
  *
  * Use `deriveCatalogueFactsFromCourseItems` when you already have the listing array (avoids a
  * second query). For the homepage (no full list), call this directly.
@@ -107,16 +103,6 @@ async function computePublicCatalogueFacts(): Promise<PublicCatalogueFacts> {
     } catch (e) {
       console.error('[catalogue-facts] database query failed', e);
     }
-  }
-
-  const exported = loadWpExportCourses();
-  if (exported && exported.length > 0) {
-    const items = exported.map(mapWpExportToCourseListItem);
-    return {
-      publishedCourseCount: items.length,
-      disciplineCodes: collectDisciplineCodes(items.map((i) => i.discipline)),
-      source: 'wordpress_export',
-    };
   }
 
   const apiFacts = await fetchBackendCatalogueFacts();

@@ -1,5 +1,6 @@
 'use client';
 
+import { usePathname } from 'next/navigation';
 import { createContext, useContext, useEffect, useState } from 'react';
 
 import { apiClient } from '@/lib/api/client';
@@ -24,6 +25,15 @@ function readStoredTheme(): Theme | null {
   }
 }
 
+function isDashboardPath(pathname: string): boolean {
+  return (
+    pathname === '/dashboard' ||
+    pathname.startsWith('/dashboard/') ||
+    pathname === '/student' ||
+    pathname.startsWith('/student/')
+  );
+}
+
 export function ThemeProvider({
   children,
   initialTheme = 'light',
@@ -31,7 +41,9 @@ export function ThemeProvider({
   children: React.ReactNode;
   initialTheme?: Theme;
 }) {
+  const pathname = usePathname();
   const [theme, setThemeState] = useState<Theme>(initialTheme);
+  const forceLight = isDashboardPath(pathname ?? '');
 
   useEffect(() => {
     const stored = readStoredTheme();
@@ -39,13 +51,18 @@ export function ThemeProvider({
   }, []);
 
   useEffect(() => {
-    document.documentElement.classList.toggle('dark', theme === 'dark');
+    document.documentElement.classList.toggle('dark', theme === 'dark' && !forceLight);
+    if (forceLight) {
+      document.documentElement.style.colorScheme = 'light';
+    } else {
+      document.documentElement.style.colorScheme = '';
+    }
     try {
       localStorage.setItem(STORAGE_KEY, theme);
     } catch {
       /* private mode */
     }
-  }, [theme]);
+  }, [theme, forceLight]);
 
   const setTheme = (next: Theme) => setThemeState(next);
 

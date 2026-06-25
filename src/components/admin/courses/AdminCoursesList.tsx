@@ -35,10 +35,14 @@ type Row = {
   iicrcDiscipline?: string | null;
   cecHours?: string | null;
   durationHours?: string | null;
+  resolvedCecHours?: string | null;
+  cecMissing?: boolean;
+  cecExcluded?: boolean;
 };
 
 type StatusFilter = 'all' | 'draft' | 'in_review' | 'published';
 type SortKey = 'updated' | 'title' | 'modules';
+type CecFilter = 'all' | 'missing';
 
 function parseStatus(raw: string | null): StatusFilter {
   if (raw === 'draft' || raw === 'published' || raw === 'in_review') return raw;
@@ -50,12 +54,22 @@ function parseSort(raw: string | null): SortKey {
   return 'updated';
 }
 
-function buildCourseListParams(parts: { status: StatusFilter; q: string; sort: SortKey }) {
+function parseCec(raw: string | null): CecFilter {
+  return raw === 'missing' ? 'missing' : 'all';
+}
+
+function buildCourseListParams(parts: {
+  status: StatusFilter;
+  q: string;
+  sort: SortKey;
+  cec: CecFilter;
+}) {
   const p = new URLSearchParams();
   if (parts.status !== 'all') p.set('status', parts.status);
   const qt = parts.q.trim();
   if (qt) p.set('q', qt);
   if (parts.sort !== 'updated') p.set('sort', parts.sort);
+  if (parts.cec === 'missing') p.set('cec', 'missing');
   return p;
 }
 
@@ -129,6 +143,7 @@ export function AdminCoursesList() {
   const status = parseStatus(searchParams.get('status'));
   const qFromUrl = searchParams.get('q')?.trim() ?? '';
   const sort = parseSort(searchParams.get('sort'));
+  const cec = parseCec(searchParams.get('cec'));
 
   const [queryDraft, setQueryDraft] = useState(qFromUrl);
   useEffect(() => {
@@ -136,10 +151,10 @@ export function AdminCoursesList() {
   }, [qFromUrl]);
 
   const apiUrl = useMemo(() => {
-    const p = buildCourseListParams({ status, q: qFromUrl, sort });
+    const p = buildCourseListParams({ status, q: qFromUrl, sort, cec });
     const qs = p.toString();
     return qs ? `/api/admin/courses?${qs}` : '/api/admin/courses';
-  }, [status, qFromUrl, sort]);
+  }, [status, qFromUrl, sort, cec]);
 
   const [rows, setRows] = useState<Row[] | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -156,7 +171,7 @@ export function AdminCoursesList() {
 
   useEffect(() => {
     setSelected(new Set());
-  }, [status, qFromUrl, sort]);
+  }, [status, qFromUrl, sort, cec]);
 
   const load = useCallback(async () => {
     setLoadError(null);
@@ -188,18 +203,24 @@ export function AdminCoursesList() {
     const normalized = queryDraft.trim();
     if (normalized === qFromUrl.trim()) return;
     const t = window.setTimeout(() => {
-      const p = buildCourseListParams({ status, q: normalized, sort });
+      const p = buildCourseListParams({ status, q: normalized, sort, cec });
       const qs = p.toString();
       router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
     }, 380);
     return () => window.clearTimeout(t);
-  }, [queryDraft, qFromUrl, status, sort, pathname, router]);
+  }, [queryDraft, qFromUrl, status, sort, cec, pathname, router]);
 
-  function replaceWithParams(next: { status?: StatusFilter; q?: string; sort?: SortKey }) {
+  function replaceWithParams(next: {
+    status?: StatusFilter;
+    q?: string;
+    sort?: SortKey;
+    cec?: CecFilter;
+  }) {
     const p = buildCourseListParams({
       status: next.status ?? status,
       q: next.q !== undefined ? next.q : queryDraft,
       sort: next.sort ?? sort,
+      cec: next.cec ?? cec,
     });
     const qs = p.toString();
     router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
@@ -211,7 +232,11 @@ export function AdminCoursesList() {
   }
 
   const hasActiveFilters =
-    status !== 'all' || Boolean(qFromUrl) || sort !== 'updated' || queryDraft.trim() !== qFromUrl;
+    status !== 'all' ||
+    Boolean(qFromUrl) ||
+    sort !== 'updated' ||
+    cec !== 'all' ||
+    queryDraft.trim() !== qFromUrl;
 
   const listRows = rows ?? [];
   const allVisibleSelected = listRows.length > 0 && listRows.every((r) => selected.has(r.id));
@@ -423,6 +448,20 @@ export function AdminCoursesList() {
               })}
             </div>
 
+            <button
+              type="button"
+              onClick={() =>
+                replaceWithParams({ cec: cec === 'missing' ? 'all' : 'missing' })
+              }
+              className={`rounded-xl border px-3 py-2 text-xs font-semibold transition-colors ${
+                cec === 'missing'
+                  ? 'border-amber-500/40 bg-amber-500/15 text-amber-100'
+                  : 'border-white/12 bg-black/30 text-white/55 hover:text-white/80'
+              }`}
+            >
+              {cec === 'missing' ? 'CEC missing' : 'Missing CEC'}
+            </button>
+
             <label className="flex items-center gap-2 text-xs text-white/50">
               <span className="whitespace-nowrap">Sort</span>
               <select
@@ -591,9 +630,14 @@ export function AdminCoursesList() {
                   category={c.category}
                   level={c.level}
                   iicrcDiscipline={c.iicrcDiscipline}
-                  cecHours={c.cecHours}
+                  cecHours={c.cecHours ?? c.resolvedCecHours}
                   durationHours={c.durationHours}
                 />
+                {c.cecMissing ? (
+                  <span className="absolute bottom-2 left-2 z-20 rounded-md border border-amber-500/40 bg-amber-500/20 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-amber-100 uppercase">
+                    CEC missing
+                  </span>
+                ) : null}
 
                 <label
                   className="absolute top-2 right-2 z-20 flex cursor-pointer items-center gap-2 rounded-md border border-white/20 bg-black/55 px-2 py-1.5 text-[11px] font-medium text-white/90 backdrop-blur-sm transition-colors hover:bg-black/70"

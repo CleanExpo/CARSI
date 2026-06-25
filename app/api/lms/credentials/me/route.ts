@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
+import { resolveLmsCourseCecHours } from '@/lib/server/course-cec-hours';
 import { getUpstreamBaseUrl } from '@/lib/server/upstream-api';
 import { prisma } from '@/lib/prisma';
 
@@ -51,7 +52,7 @@ export async function GET(request: NextRequest) {
     credential_id: e.id,
     course_title: e.course.title,
     iicrc_discipline: e.course.iicrcDiscipline,
-    cec_hours: Number(e.course.cecHours ?? 0),
+    cec_hours: resolveLmsCourseCecHours(e.course) ?? 0,
     cppp40421_unit_code: null as string | null,
     issued_date: (e.certificateIssuedAt ?? e.completedAt)!.toISOString().slice(0, 10),
     verification_url: `${origin}/dashboard/credentials/${e.id}`,

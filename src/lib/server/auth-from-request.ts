@@ -26,3 +26,19 @@ export async function getSessionClaimsFromRequest(
 
   return null;
 }
+
+/** Bearer header for upstream LMS proxy (Authorization header or session cookie). */
+export function getBearerAuthorizationFromRequest(request: NextRequest): string | null {
+  const auth = request.headers.get('authorization');
+  if (auth?.startsWith('Bearer ')) {
+    return auth;
+  }
+
+  const cookie =
+    request.cookies.get('auth_token')?.value ?? request.cookies.get('carsi_token')?.value;
+  if (cookie) {
+    return `Bearer ${cookie}`;
+  }
+
+  return null;
+}

@@ -1,15 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { Prisma } from '@/generated/prisma/client';
-import { verifySessionToken } from '@/lib/auth/session-jwt';
 import { setOnboardingCompletedCookie } from '@/lib/auth/onboarding-cookie';
+import {
+  getBearerAuthorizationFromRequest,
+  getSessionClaimsFromRequest,
+} from '@/lib/server/auth-from-request';
+import { prisma } from '@/lib/prisma';
 import {
   buildOnboardingDashboardUrls,
   pathwayDescription,
   pathwayLabel,
   resolveRecommendedPathwayCode,
 } from '@/lib/server/onboarding-pathway';
-import { prisma } from '@/lib/prisma';
 import { getUpstreamBaseUrl } from '@/lib/server/upstream-api';
 
 /**
@@ -17,25 +20,21 @@ import { getUpstreamBaseUrl } from '@/lib/server/upstream-api';
  * return onboarding_completed without a database (local / headless dev).
  */
 export async function POST(request: NextRequest) {
-  const auth = request.headers.get('authorization');
-  if (!auth?.startsWith('Bearer ')) {
-    return NextResponse.json({ detail: 'Unauthorized' }, { status: 401 });
-  }
-  const token = auth.slice(7);
-  const claims = await verifySessionToken(token);
+  const claims = await getSessionClaimsFromRequest(request);
   if (!claims) {
-    return NextResponse.json({ detail: 'Invalid token' }, { status: 401 });
+    return NextResponse.json({ detail: 'Unauthorized' }, { status: 401 });
   }
 
   const upstream = getUpstreamBaseUrl();
   const bodyText = await request.text();
 
   if (upstream) {
+    const auth = getBearerAuthorizationFromRequest(request);
     const url = `${upstream.replace(/\/$/, '')}/api/lms/auth/onboarding`;
     const res = await fetch(url, {
       method: 'POST',
       headers: {
-        authorization: auth,
+        authorization: auth ?? '',
         'content-type': request.headers.get('content-type') || 'application/json',
       },
       body: bodyText || undefined,
@@ -70,9 +69,7 @@ export async function POST(request: NextRequest) {
     primary_goal: String(raw.primary_goal ?? ''),
     disciplines_held: disciplinesHeld,
     renewal_date:
-      raw.renewal_date == null || raw.renewal_date === ''
-        ? null
-        : String(raw.renewal_date),
+      raw.renewal_date == null || raw.renewal_date === '' ? null : String(raw.renewal_date),
     resume_reminder_opt_in: String(raw.resume_reminder_opt_in ?? 'none'),
   };
 

@@ -22,7 +22,7 @@ interface RPLSubmission {
 }
 
 const STATUS_STYLES: Record<string, string> = {
-  pending: 'bg-zinc-800 text-zinc-400',
+  pending: 'bg-slate-100 text-zinc-400',
   under_review: 'bg-amber-950 text-amber-400',
   approved: 'bg-emerald-950 text-emerald-400',
   rejected: 'bg-red-950 text-red-400',
@@ -113,23 +113,23 @@ export default function RPLPortfolioPage() {
   return (
     <div className="flex max-w-3xl flex-col gap-8 p-6">
       <div className="flex flex-col gap-2">
-        <h1 className="font-mono text-2xl font-bold text-white">RPL Portfolio</h1>
-        <p className="text-sm leading-relaxed text-white/50">
+        <h1 className="font-mono text-2xl font-bold text-slate-900">RPL Portfolio</h1>
+        <p className="text-sm leading-relaxed text-slate-500">
           Submit evidence of your existing skills and experience. Mapped to the CPP40421 reference
           framework — for skill tracking purposes only.
         </p>
       </div>
 
-      {loading && <p className="text-sm text-white/40">Loading…</p>}
+      {loading && <p className="text-sm text-slate-500">Loading…</p>}
       {error && <p className="text-sm text-red-400">{error}</p>}
 
       {/* Submission form */}
       {!loading && (
         <form
           onSubmit={handleSubmit}
-          className="flex flex-col gap-4 rounded-sm border border-white/[0.06] bg-zinc-900/50 p-6"
+          className="flex flex-col gap-4 rounded-sm border border-slate-200 bg-white border border-slate-200 p-6"
         >
-          <h2 className="font-mono text-xs tracking-widest text-white/40 uppercase">
+          <h2 className="font-mono text-xs tracking-widest text-slate-500 uppercase">
             New Application
           </h2>
 
@@ -137,7 +137,7 @@ export default function RPLPortfolioPage() {
             value={form.unit_code}
             onChange={handleUnitSelect}
             required
-            className="rounded-sm border border-white/[0.08] bg-zinc-800 px-3 py-2 font-mono text-sm text-white focus:border-cyan-500/50 focus:outline-none"
+            className="rounded-sm border border-slate-200 bg-slate-100 px-3 py-2 font-mono text-sm text-slate-900 focus:border-cyan-500/50 focus:outline-none"
           >
             <option value="">Select CPP40421 unit…</option>
             {units.map((u) => (
@@ -153,13 +153,13 @@ export default function RPLPortfolioPage() {
             onChange={(e) => setForm((f) => ({ ...f, evidence_description: e.target.value }))}
             rows={5}
             required
-            className="rounded-sm border border-white/[0.08] bg-zinc-800 px-3 py-2 text-sm text-white placeholder-white/20 focus:border-cyan-500/50 focus:outline-none"
+            className="rounded-sm border border-slate-200 bg-slate-100 px-3 py-2 text-sm text-slate-900 placeholder-white/20 focus:border-cyan-500/50 focus:outline-none"
           />
 
           <button
             type="submit"
             disabled={submitting}
-            className="self-start rounded-sm bg-cyan-600 px-4 py-2 font-mono text-sm font-semibold text-white transition-colors hover:bg-cyan-500 disabled:opacity-50"
+            className="self-start rounded-sm bg-cyan-600 px-4 py-2 font-mono text-sm font-semibold text-slate-900 transition-colors hover:bg-cyan-500 disabled:opacity-50"
           >
             {submitting ? 'Submitting…' : 'Submit Application'}
           </button>
@@ -169,20 +169,20 @@ export default function RPLPortfolioPage() {
       {/* Submission history */}
       {submissions.length > 0 && (
         <div className="flex flex-col gap-3">
-          <h2 className="font-mono text-xs tracking-widest text-white/40 uppercase">
+          <h2 className="font-mono text-xs tracking-widest text-slate-500 uppercase">
             Your Submissions
           </h2>
           {submissions.map((sub) => (
             <div
               key={sub.id}
-              className="flex flex-col gap-3 rounded-sm border border-white/[0.06] bg-zinc-900/50 p-5"
+              className="flex flex-col gap-3 rounded-sm border border-slate-200 bg-white border border-slate-200 p-5"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex flex-col gap-1">
-                  <span className="font-mono text-sm font-semibold text-white">
+                  <span className="font-mono text-sm font-semibold text-slate-900">
                     {sub.unit_code}
                   </span>
-                  <span className="text-xs text-white/40">{sub.unit_name}</span>
+                  <span className="text-xs text-slate-500">{sub.unit_name}</span>
                 </div>
                 <span
                   className={`shrink-0 rounded-sm px-2.5 py-1 font-mono text-xs font-semibold ${
@@ -193,17 +193,17 @@ export default function RPLPortfolioPage() {
                 </span>
               </div>
 
-              <p className="text-sm leading-relaxed text-white/60">{sub.evidence_description}</p>
+              <p className="text-sm leading-relaxed text-slate-600">{sub.evidence_description}</p>
 
               {sub.reviewer_notes && (
-                <div className="rounded-sm border border-white/[0.04] bg-zinc-800/50 px-3 py-2">
-                  <p className="text-xs text-white/40">Reviewer notes</p>
-                  <p className="mt-0.5 text-sm text-white/70">{sub.reviewer_notes}</p>
+                <div className="rounded-sm border border-white/[0.04] bg-slate-50 px-3 py-2">
+                  <p className="text-xs text-slate-500">Reviewer notes</p>
+                  <p className="mt-0.5 text-sm text-slate-700">{sub.reviewer_notes}</p>
                 </div>
               )}
 
               <div className="flex items-center justify-between">
-                <span className="text-xs text-white/30">
+                <span className="text-xs text-slate-400">
                   Submitted {_formatDate(sub.created_at)}
                   {sub.reviewed_at && ` · Reviewed ${_formatDate(sub.reviewed_at)}`}
                 </span>
@@ -211,7 +211,7 @@ export default function RPLPortfolioPage() {
                   <button
                     onClick={() => handleWithdraw(sub.id)}
                     disabled={withdrawingId === sub.id}
-                    className="text-xs text-white/30 underline transition-colors hover:text-red-400 disabled:opacity-40"
+                    className="text-xs text-slate-400 underline transition-colors hover:text-red-400 disabled:opacity-40"
                   >
                     {withdrawingId === sub.id ? 'Withdrawing…' : 'Withdraw'}
                   </button>
@@ -223,7 +223,7 @@ export default function RPLPortfolioPage() {
       )}
 
       {!loading && submissions.length === 0 && (
-        <p className="text-sm text-white/30">No applications submitted yet.</p>
+        <p className="text-sm text-slate-400">No applications submitted yet.</p>
       )}
     </div>
   );

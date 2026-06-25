@@ -139,6 +139,7 @@ export default async function DashboardCoursesPage({
                 initialTab={disciplineTab ?? 'All'}
                 showModulesSort
                 initialSortBy={status === 'draft' ? 'modules' : 'updated'}
+                surface="light"
               />
             )}
           </div>

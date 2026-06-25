@@ -84,12 +84,12 @@ function NoteCard({
   }
 
   return (
-    <div className="flex flex-col gap-3 rounded-sm border border-white/[0.06] bg-zinc-900/50 p-5">
+    <div className="flex flex-col gap-3 rounded-sm border border-slate-200 bg-white border border-slate-200 p-5">
       {/* Lesson heading */}
       <div className="flex flex-col gap-0.5">
-        <h3 className="text-sm leading-snug font-semibold text-white">{note.lesson_title}</h3>
+        <h3 className="text-sm leading-snug font-semibold text-slate-900">{note.lesson_title}</h3>
         {note.module_title && (
-          <p className="font-mono text-xs tracking-widest text-white/40 uppercase">
+          <p className="font-mono text-xs tracking-widest text-slate-500 uppercase">
             {note.module_title}
           </p>
         )}
@@ -112,7 +112,7 @@ function NoteCard({
                 key={action}
                 type="button"
                 onClick={() => applyFormat(action)}
-                className="rounded border border-white/12 bg-white/[0.03] px-2 py-1 text-[11px] text-white/65 transition-colors hover:border-white/25 hover:text-white"
+                className="rounded border border-slate-200 bg-white px-2 py-1 text-[11px] text-slate-600 transition-colors hover:border-slate-300 hover:text-slate-900"
               >
                 {label}
               </button>
@@ -120,7 +120,7 @@ function NoteCard({
           </div>
           <textarea
             ref={editRef}
-            className="w-full resize-none rounded-sm border border-white/[0.06] bg-zinc-800 p-3 text-sm text-white focus:border-white/20 focus:outline-none"
+            className="w-full resize-none rounded-sm border border-slate-200 bg-white p-3 text-sm text-slate-900 focus:border-[#2490ed]/40 focus:outline-none focus:ring-2 focus:ring-[#2490ed]/20"
             rows={5}
             value={editContent}
             onChange={(e) => onEditChange(e.target.value)}
@@ -131,26 +131,26 @@ function NoteCard({
       ) : (
         <div>
           {note.content ? (
-            <CourseFormattedBody text={note.content} className="text-sm" />
+            <CourseFormattedBody text={note.content} className="text-sm" tone="light" />
           ) : (
-            <p className="text-sm text-white/30 italic">No content yet.</p>
+            <p className="text-sm text-slate-400 italic">No content yet.</p>
           )}
         </div>
       )}
 
       {/* Updated timestamp (read-only mode) */}
       {!isEditing && note.updated_at && (
-        <p className="font-mono text-xs text-white/30">
+        <p className="font-mono text-xs text-slate-400">
           Last updated {formatDate(note.updated_at)}
         </p>
       )}
 
       {/* Action row */}
-      <div className="flex flex-wrap items-center gap-3 border-t border-white/[0.06] pt-4">
+      <div className="flex flex-wrap items-center gap-3 border-t border-slate-200 pt-4">
         {/* Go to lesson — always visible */}
         <Link
           href={`/dashboard/learn/${encodeURIComponent(note.course_slug)}?lesson=${encodeURIComponent(note.lesson_id)}`}
-          className="rounded-sm border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 font-mono text-xs text-white/70 transition-colors hover:border-white/20 hover:text-white"
+          className="rounded-sm border border-slate-200 bg-slate-50 px-3 py-1.5 font-mono text-xs text-slate-700 transition-colors hover:border-white/20 hover:text-slate-900"
         >
           Go to lesson
         </Link>
@@ -167,7 +167,7 @@ function NoteCard({
             <button
               onClick={onEditCancel}
               disabled={saving}
-              className="rounded-sm border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 font-mono text-xs text-white/50 transition-colors hover:border-white/20 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+              className="rounded-sm border border-slate-200 bg-slate-50 px-3 py-1.5 font-mono text-xs text-slate-500 transition-colors hover:border-white/20 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-40"
             >
               Cancel
             </button>
@@ -176,7 +176,7 @@ function NoteCard({
           <>
             <button
               onClick={() => onEditStart(note.lesson_id, note.content ?? '')}
-              className="rounded-sm border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 font-mono text-xs text-white/70 transition-colors hover:border-white/20 hover:text-white"
+              className="rounded-sm border border-slate-200 bg-slate-50 px-3 py-1.5 font-mono text-xs text-slate-700 transition-colors hover:border-white/20 hover:text-slate-900"
             >
               Edit
             </button>
@@ -196,17 +196,17 @@ function NoteCard({
 
 function EmptyState() {
   return (
-    <div className="flex flex-col items-center gap-4 rounded-sm border border-white/[0.06] bg-zinc-900/50 px-6 py-12 text-center">
-      <FileText className="h-10 w-10 text-white/10" />
+    <div className="flex flex-col items-center gap-4 rounded-sm border border-slate-200 bg-white border border-slate-200 px-6 py-12 text-center">
+      <FileText className="h-10 w-10 text-slate-200" />
       <div className="flex flex-col gap-1">
-        <p className="text-sm font-medium text-white/40">No notes yet.</p>
-        <p className="text-sm text-white/30">
+        <p className="text-sm font-medium text-slate-500">No notes yet.</p>
+        <p className="text-sm text-slate-400">
           Open any lesson and jot notes as you learn. They&apos;ll all appear here.
         </p>
       </div>
       <Link
         href="/dashboard/courses"
-        className="mt-2 rounded-sm border border-white/[0.08] bg-white/[0.03] px-4 py-2 font-mono text-xs text-white/60 transition-colors hover:border-white/20 hover:text-white"
+        className="mt-2 rounded-sm border border-slate-200 bg-slate-50 px-4 py-2 font-mono text-xs text-slate-600 transition-colors hover:border-white/20 hover:text-slate-900"
       >
         Browse courses
       </Link>
@@ -300,19 +300,19 @@ export default function StudentNotesPage() {
     <main className="flex max-w-4xl flex-col gap-6 p-6">
       {/* Page header */}
       <div className="flex flex-col gap-1">
-        <h1 className="font-mono text-2xl font-bold text-white">My Notes</h1>
-        <p className="text-sm text-white/40">Your private notes from each lesson.</p>
+        <h1 className="font-mono text-2xl font-bold text-slate-900">My Notes</h1>
+        <p className="text-sm text-slate-500">Your private notes from each lesson.</p>
       </div>
 
       {/* Loading */}
-      {loading && <p className="text-sm text-white/30">Loading notes…</p>}
+      {loading && <p className="text-sm text-slate-400">Loading notes…</p>}
 
       {/* Error */}
       {error && <ErrorBanner message={error} onRetry={fetchNotes} />}
 
       {/* Note count summary */}
       {!loading && !error && notes.length > 0 && (
-        <p className="font-mono text-xs tracking-widest text-white/40 uppercase">
+        <p className="font-mono text-xs tracking-widest text-slate-500 uppercase">
           {notes.length} {notes.length === 1 ? 'note' : 'notes'} across {totalCourses}{' '}
           {totalCourses === 1 ? 'course' : 'courses'}
         </p>
@@ -327,7 +327,7 @@ export default function StudentNotesPage() {
           {groups.map((group) => (
             <section key={group.course_slug} className="flex flex-col gap-4">
               {/* Course group header */}
-              <h2 className="font-mono text-xs tracking-widest text-white/40 uppercase">
+              <h2 className="font-mono text-xs tracking-widest text-slate-500 uppercase">
                 {group.course_title}
               </h2>
 

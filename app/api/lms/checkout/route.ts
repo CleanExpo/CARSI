@@ -2,7 +2,7 @@
  * POST /api/lms/checkout
  * Body: { slug, success_url?, cancel_url?, customer_email? }
  *
- * Stripe Checkout via STRIPE_SECRET_KEY + local catalog (WordPress export); enrolment finalised in-app.
+ * Stripe Checkout via STRIPE_SECRET_KEY + published LMS catalogue; enrolment finalised in-app.
  * Applies `user_discounts` when the learner has an active row for the course in Postgres.
  */
 
@@ -17,7 +17,6 @@ import {
 } from '@/lib/checkout-purchase-mode';
 import {
   createStripeCheckoutForCourse,
-  findCourseInExport,
   resolveCheckoutEmail,
 } from '@/lib/server/local-course-checkout';
 import {
@@ -28,7 +27,7 @@ import {
 } from '@/lib/server/user-discounts';
 import { getOrCreateCourseBySlug } from '@/lib/server/course-catalog-sync';
 import { getFirstLessonLearnPath } from '@/lib/server/first-lesson';
-import { getPublishedCourseAsWpExportForCheckout } from '@/lib/server/public-courses-list';
+import { getPublishedCourseForCheckout } from '@/lib/server/public-courses-list';
 
 export async function POST(request: NextRequest) {
   try {
@@ -104,13 +103,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    let course = findCourseInExport(slug);
-    if (!course) {
-      course = await getPublishedCourseAsWpExportForCheckout(slug);
-    }
+    const course = await getPublishedCourseForCheckout(slug);
     if (!course) {
       return NextResponse.json(
-        { detail: 'Course not found in catalogue (export or published database course).' },
+        { detail: 'Course not found in published catalogue.' },
         { status: 404 }
       );
     }

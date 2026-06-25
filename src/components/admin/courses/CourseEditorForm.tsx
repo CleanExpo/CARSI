@@ -14,6 +14,7 @@ import { cn } from '@/lib/utils';
 
 import { CourseFormattedBody } from '@/components/lms/CourseFormattedBody';
 import { CourseTextThumbnail } from '@/components/lms/CourseTextThumbnail';
+import { IICRC_DISCIPLINE_SHORT } from '@/lib/iicrc-discipline-display';
 
 type Mod = {
   key: string;
@@ -35,6 +36,13 @@ type CourseDto = {
   priceAud: number;
   published: boolean;
   workflow_status?: 'draft' | 'in_review' | 'published';
+  cecHours?: string | null;
+  durationHours?: string | null;
+  iicrcDiscipline?: string | null;
+  level?: string | null;
+  resolvedCecHours?: string | null;
+  cecMissing?: boolean;
+  cecExcluded?: boolean;
   modules: {
     id: string;
     title: string;
@@ -93,6 +101,13 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
     'draft'
   );
   const [workflowBusy, setWorkflowBusy] = useState(false);
+  const [cecHours, setCecHours] = useState('');
+  const [durationHours, setDurationHours] = useState('');
+  const [iicrcDiscipline, setIicrcDiscipline] = useState('');
+  const [level, setLevel] = useState('');
+  const [cecMissing, setCecMissing] = useState(false);
+  const [cecExcluded, setCecExcluded] = useState(false);
+  const [resolvedCecHours, setResolvedCecHours] = useState<string | null>(null);
   const [modules, setModules] = useState<Mod[]>([emptyModule()]);
   const [uploading, setUploading] = useState(false);
 
@@ -114,6 +129,13 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
       setPriceAud(String(Number(c.priceAud)));
       setPublished(c.published);
       setWorkflowStatus(c.workflow_status ?? (c.published ? 'published' : 'draft'));
+      setCecHours(c.cecHours ?? '');
+      setDurationHours(c.durationHours ?? '');
+      setIicrcDiscipline(c.iicrcDiscipline ?? '');
+      setLevel(c.level ?? '');
+      setCecMissing(Boolean(c.cecMissing));
+      setCecExcluded(Boolean(c.cecExcluded));
+      setResolvedCecHours(c.resolvedCecHours ?? null);
       setModules(
         c.modules.length > 0
           ? c.modules.map((m) => ({
@@ -244,6 +266,8 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
     try {
       const price = Number.parseFloat(priceAud);
       const resolvedPrice = isFree ? 0 : Number.isFinite(price) ? price : 0;
+      const parsedCec = cecHours.trim() ? Number.parseFloat(cecHours) : null;
+      const parsedDuration = durationHours.trim() ? Number.parseFloat(durationHours) : null;
       const payload = {
         title: title.trim(),
         description: description.trim(),
@@ -253,6 +277,14 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
         isFree,
         priceAud: resolvedPrice,
         published,
+        cecHours:
+          parsedCec != null && Number.isFinite(parsedCec) && parsedCec >= 0 ? parsedCec : null,
+        durationHours:
+          parsedDuration != null && Number.isFinite(parsedDuration) && parsedDuration >= 0
+            ? parsedDuration
+            : null,
+        iicrcDiscipline: iicrcDiscipline.trim() || null,
+        level: level.trim() || null,
         modules: modules.map((m) => ({
           id: m.id,
           title: m.title.trim(),
@@ -497,6 +529,93 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
                     </Label>
                   </div>
                 )}
+              </div>
+            </section>
+
+            <section className={cn(panelClass, 'space-y-5 p-5 sm:p-6')}>
+              <SectionTitle>IICRC &amp; programme record</SectionTitle>
+              <p className="text-xs leading-relaxed text-white/45">
+                CEC hours appear on course listings, completion certificates, and learner credential
+                records. Leave blank only for non-training products (memberships, downloads).
+              </p>
+              {cecMissing && !cecExcluded ? (
+                <p className="rounded-lg border border-amber-500/35 bg-amber-500/10 px-3 py-2 text-xs text-amber-100">
+                  This course has no resolvable CEC hours
+                  {resolvedCecHours ? ` (effective: ${resolvedCecHours})` : ''}. Set CEC hours below
+                  before publishing to learners.
+                </p>
+              ) : null}
+              {cecExcluded ? (
+                <p className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs text-white/55">
+                  Catalogue product — CEC not applicable.
+                </p>
+              ) : null}
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="cec-hours" className="text-white/65">
+                    CEC hours
+                  </Label>
+                  <Input
+                    id="cec-hours"
+                    type="number"
+                    min={0}
+                    step="0.5"
+                    inputMode="decimal"
+                    value={cecHours}
+                    onChange={(e) => setCecHours(e.target.value)}
+                    className={cn('h-11 tabular-nums', fieldClass)}
+                    placeholder="e.g. 2"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="duration-hours" className="text-white/65">
+                    Duration (hours)
+                  </Label>
+                  <Input
+                    id="duration-hours"
+                    type="number"
+                    min={0}
+                    step="0.5"
+                    inputMode="decimal"
+                    value={durationHours}
+                    onChange={(e) => setDurationHours(e.target.value)}
+                    className={cn('h-11 tabular-nums', fieldClass)}
+                    placeholder="e.g. 1.5"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="iicrc-discipline" className="text-white/65">
+                    IICRC discipline
+                  </Label>
+                  <select
+                    id="iicrc-discipline"
+                    value={iicrcDiscipline}
+                    onChange={(e) => setIicrcDiscipline(e.target.value)}
+                    className={cn(
+                      'h-11 w-full rounded-md border px-3 text-sm',
+                      fieldClass
+                    )}
+                  >
+                    <option value="">General / not discipline-specific</option>
+                    {Object.entries(IICRC_DISCIPLINE_SHORT).map(([code, label]) => (
+                      <option key={code} value={code}>
+                        {code} — {label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="programme-level" className="text-white/65">
+                    Programme level
+                  </Label>
+                  <Input
+                    id="programme-level"
+                    value={level}
+                    onChange={(e) => setLevel(e.target.value)}
+                    className={cn('h-11', fieldClass)}
+                    placeholder="e.g. Professional development"
+                  />
+                </div>
               </div>
             </section>
           </div>

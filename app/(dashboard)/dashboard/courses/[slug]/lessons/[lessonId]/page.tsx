@@ -54,13 +54,12 @@ export default function LessonPage() {
           <LessonPlayer lesson={lesson} />
           {lesson.quiz_id && (
             <div
-              className="mt-6 rounded-sm border p-4"
-              style={{ borderColor: 'rgba(36,144,237,0.25)', background: 'rgba(36,144,237,0.06)' }}
+              className="mt-6 rounded-xl border border-[#2490ed]/20 bg-[#eef7ff] p-4"
             >
               <div className="flex items-center justify-between gap-4">
                 <div>
-                  <p className="text-sm font-semibold text-white">Assessment</p>
-                  <p className="mt-0.5 text-xs text-white/50">
+                  <p className="text-sm font-semibold text-slate-900">Assessment</p>
+                  <p className="mt-0.5 text-xs text-slate-500">
                     Test your knowledge for this lesson
                   </p>
                 </div>

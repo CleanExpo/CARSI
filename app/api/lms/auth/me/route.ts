@@ -3,20 +3,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import { Prisma } from '@/generated/prisma/client';
 import type { IicrcCertificationEntry, User } from '@/lib/api/auth';
 import { hasCompletedOnboarding, setOnboardingCompletedCookie } from '@/lib/auth/onboarding-cookie';
-import { verifySessionToken } from '@/lib/auth/session-jwt';
+import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
+import { prisma } from '@/lib/prisma';
 import { parseIicrcCertifications } from '@/lib/server/iicrc-profile-json';
 import { sanitizeLeaderboardDisplayName } from '@/lib/server/leaderboard-xp';
-import { prisma } from '@/lib/prisma';
 
 async function requireClaims(request: NextRequest) {
-  const auth = request.headers.get('authorization');
-  if (!auth?.startsWith('Bearer ')) {
-    return { error: NextResponse.json({ detail: 'Unauthorized' }, { status: 401 }) };
-  }
-  const token = auth.slice(7);
-  const claims = await verifySessionToken(token);
+  const claims = await getSessionClaimsFromRequest(request);
   if (!claims) {
-    return { error: NextResponse.json({ detail: 'Invalid token' }, { status: 401 }) };
+    return { error: NextResponse.json({ detail: 'Unauthorized' }, { status: 401 }) };
   }
   return { claims };
 }

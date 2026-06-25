@@ -97,18 +97,18 @@ export default function LeaderboardPage() {
   return (
     <main className="mx-auto flex max-w-2xl flex-col gap-6 p-6">
       <div className="flex flex-col gap-2">
-        <p className="font-mono text-[10px] tracking-[0.2em] text-white/35 uppercase">
+        <p className="font-mono text-[10px] tracking-[0.2em] text-slate-400 uppercase">
           Community
         </p>
-        <h1 className="font-mono text-2xl font-bold text-white">Monthly recognition</h1>
-        <p className="text-sm text-white/45">
+        <h1 className="font-mono text-2xl font-bold text-slate-900">Monthly recognition</h1>
+        <p className="text-sm text-slate-500">
           {periodLabel} ({meta?.period_timezone ?? 'Australia/Sydney'}) — top learners by
           completion-based activity this month. Names are{' '}
-          <span className="text-white/70">anonymous by default</span>; you can opt in to a display
+          <span className="text-slate-700">anonymous by default</span>; you can opt in to a display
           name from{' '}
           <Link
             href="/dashboard/student/profile#recognition"
-            className="text-[#7ec5ff] underline-offset-2 hover:underline"
+            className="text-[#146fc2] underline-offset-2 hover:underline"
           >
             your profile
           </Link>
@@ -117,7 +117,7 @@ export default function LeaderboardPage() {
       </div>
 
       <div className="flex flex-col gap-2">
-        <span className="font-mono text-[10px] tracking-widest text-white/35 uppercase">
+        <span className="font-mono text-[10px] tracking-widest text-slate-400 uppercase">
           IICRC discipline
         </span>
         <div className="flex flex-wrap gap-2">
@@ -130,8 +130,8 @@ export default function LeaderboardPage() {
                 onClick={() => setDiscipline(opt.value)}
                 className={`rounded-sm border px-3 py-1.5 font-mono text-xs transition-colors ${
                   active
-                    ? 'border-[#2490ed]/50 bg-[#2490ed]/15 text-white'
-                    : 'border-white/[0.08] bg-white/[0.03] text-white/55 hover:border-white/15 hover:text-white/80'
+                    ? 'border-[#2490ed]/50 bg-[#2490ed]/15 text-[#146fc2]'
+                    : 'border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-300 hover:text-slate-800'
                 }`}
               >
                 {opt.label}
@@ -139,25 +139,25 @@ export default function LeaderboardPage() {
             );
           })}
         </div>
-        <p className="text-xs text-white/30">
+        <p className="text-xs text-slate-400">
           Filter limits XP to courses tagged with that discipline. Your level still reflects all
           completed learning.
         </p>
       </div>
 
-      {loading && <p className="text-sm text-white/40">Loading…</p>}
+      {loading && <p className="text-sm text-slate-500">Loading…</p>}
 
       {error && <p className="text-sm text-red-400">{error}</p>}
 
       {!loading && !error && entries.length === 0 && (
-        <p className="text-sm text-white/40">
+        <p className="text-sm text-slate-500">
           No qualifying activity this month for this view. Complete a lesson or course to appear —
           or check back after others begin the month&apos;s training.
         </p>
       )}
 
       {entries.length > 0 && (
-        <div className="flex flex-col divide-y divide-white/[0.04] rounded-sm border border-white/[0.06] bg-zinc-900/30">
+        <div className="flex flex-col divide-y divide-slate-200 rounded-xl border border-slate-200 bg-white shadow-sm">
           {entries.map((entry, index) => {
             const topTier = entry.rank <= 3;
 
@@ -165,18 +165,18 @@ export default function LeaderboardPage() {
               <div
                 key={`${entry.rank}-${index}`}
                 className={`flex items-center justify-between gap-4 px-4 py-4 ${
-                  topTier ? 'bg-white/[0.02]' : ''
+                  topTier ? 'bg-slate-50' : ''
                 }`}
               >
                 <div className="flex min-w-0 items-center gap-4">
                   <span
-                    className="w-10 shrink-0 text-center font-mono text-sm text-white/50"
+                    className="w-10 shrink-0 text-center font-mono text-sm text-slate-500"
                     aria-label={`Rank ${entry.rank}`}
                   >
                     {entry.rank}
                   </span>
                   <div className="min-w-0 flex flex-col gap-0.5">
-                    <span className="truncate font-mono text-sm text-white">{entry.display_name}</span>
+                    <span className="truncate font-mono text-sm text-slate-900">{entry.display_name}</span>
                     <span
                       className={`font-mono text-xs ${LEVEL_COLOURS[entry.current_level] ?? 'text-zinc-400'}`}
                     >
@@ -186,10 +186,10 @@ export default function LeaderboardPage() {
                 </div>
 
                 <div className="flex shrink-0 flex-col items-end gap-0.5">
-                  <span className="font-mono text-sm font-semibold text-white tabular-nums">
+                  <span className="font-mono text-sm font-semibold text-slate-900 tabular-nums">
                     {entry.total_xp.toLocaleString()}
                   </span>
-                  <span className="text-[10px] tracking-wider text-white/30 uppercase">XP</span>
+                  <span className="text-[10px] tracking-wider text-slate-400 uppercase">XP</span>
                 </div>
               </div>
             );
@@ -197,7 +197,7 @@ export default function LeaderboardPage() {
         </div>
       )}
 
-      <p className="text-xs leading-relaxed text-white/30">
+      <p className="text-xs leading-relaxed text-slate-400">
         XP is earned from lesson and course completions only — not from quizzes or social features.
         This board is meant as lightweight industry recognition, not a competition for points.
       </p>

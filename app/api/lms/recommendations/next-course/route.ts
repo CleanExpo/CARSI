@@ -1,16 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { verifySessionToken } from '@/lib/auth/session-jwt';
+import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { getNextCourseRecommendationsForStudent } from '@/lib/server/renewal-summary';
 
 export async function GET(request: NextRequest) {
-  const auth = request.headers.get('authorization');
-  if (!auth?.startsWith('Bearer ')) {
-    return NextResponse.json({ detail: 'Unauthorized' }, { status: 401 });
-  }
-  const claims = await verifySessionToken(auth.slice(7));
+  const claims = await getSessionClaimsFromRequest(request);
   if (!claims) {
-    return NextResponse.json({ detail: 'Invalid token' }, { status: 401 });
+    return NextResponse.json({ detail: 'Unauthorized' }, { status: 401 });
   }
 
   if (!process.env.DATABASE_URL?.trim()) {

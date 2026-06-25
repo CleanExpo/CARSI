@@ -26,7 +26,7 @@ export default async function DashboardCredentialPage({
   const cecSubmission = await getCecSubmissionSummaryForEnrollment(credentialId);
 
   return (
-    <main className="mx-auto w-full max-w-4xl px-4 pb-12">
+    <main className="mx-auto w-full max-w-7xl px-4 pb-12">
       <CredentialVerificationPageContent
         credential={credential}
         credentialId={credentialId}

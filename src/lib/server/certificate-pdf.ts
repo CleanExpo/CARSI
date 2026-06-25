@@ -3,8 +3,10 @@ import path from 'node:path';
 
 import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from 'pdf-lib';
 
+import { formatCecHoursForCertificate } from '@/lib/cec-display';
 import { formatCredentialRef } from '@/lib/credential-format';
 import { IICRC_DISCIPLINE_LONG } from '@/lib/iicrc-discipline-display';
+import { resolveLmsCourseCecHours, type LmsCourseCecSource } from '@/lib/server/course-cec-hours';
 
 const DISCIPLINE_HEX: Record<string, string> = {
   WRT: '#2490ed',
@@ -16,10 +18,12 @@ const DISCIPLINE_HEX: Record<string, string> = {
   AMRT: '#27ae60',
 };
 
-const PAGE_W = 595;
-const PAGE_H = 842;
-const MARGIN = 44;
+const PAGE_W = 842;
+const PAGE_H = 595;
+const MARGIN = 40;
 const CONTENT_W = PAGE_W - MARGIN * 2;
+/** Fixed baseline for the footer signature row (PDF y-axis, points from bottom). */
+const FOOTER_ROW_Y = MARGIN + 52;
 
 export type CompletionCertificateData = {
   studentName: string;
@@ -157,149 +161,71 @@ function drawCornerBracket(
 
 type ProgrammeMetric = { label: string; value: string };
 
-function drawProgrammeRecordPanel(
+function drawProgrammeDetailsBand(
   page: PDFPage,
   opts: {
-    x: number;
     yTop: number;
-    width: number;
-    discCode: string;
+    xMid: number;
+    margin: number;
+    contentW: number;
     discRgb: ReturnType<typeof rgb>;
-    fill: ReturnType<typeof rgb>;
-    disciplineName: string;
-    metrics: ProgrammeMetric[];
+    items: ProgrammeMetric[];
     credentialRef: string;
+    notice: string;
     helvetica: PDFFont;
     helveticaBold: PDFFont;
   }
 ): number {
-  const { x, width, discCode, discRgb, fill, disciplineName, metrics, credentialRef } = opts;
-  const headerH = 22;
-  const subHeaderH = 16;
-  const cellH = 34;
-  const footerH = 20;
-  const metricCount = Math.max(1, opts.metrics.length);
-  const gridRows = 1;
-  const panelH = headerH + subHeaderH + cellH * gridRows + footerH;
-  const yBottom = opts.yTop - panelH;
+  const { yTop, xMid, margin, contentW, discRgb, items, credentialRef, notice, helvetica, helveticaBold } =
+    opts;
 
-  page.drawRectangle({
-    x,
-    y: yBottom,
-    width,
-    height: panelH,
-    color: fill,
-    borderColor: discRgb,
-    borderWidth: 1,
-    borderOpacity: 0.4,
-  });
-  page.drawRectangle({
-    x,
-    y: opts.yTop - headerH,
-    width,
-    height: headerH,
+  page.drawLine({
+    start: { x: margin, y: yTop },
+    end: { x: PAGE_W - margin, y: yTop },
+    thickness: 0.5,
     color: discRgb,
-    opacity: 0.18,
-    borderWidth: 0,
+    opacity: 0.28,
   });
 
-  const padX = 14;
-  page.drawText('PROGRAMME RECORD', {
-    x: x + padX,
-    y: opts.yTop - headerH + 9,
-    size: 7,
-    font: opts.helveticaBold,
-    color: rgb(0.72, 0.74, 0.78),
-  });
+  let y = yTop - 14;
+  drawCenteredText(page, 'PROGRAMME DETAILS', xMid, y, 6.5, helveticaBold, rgb(0.42, 0.44, 0.48));
+  y -= 22;
 
-  const badgeText = discCode;
-  const badgeSize = 8;
-  const badgePadX = 8;
-  const badgeW = opts.helveticaBold.widthOfTextAtSize(badgeText, badgeSize) + badgePadX * 2;
-  const badgeH = 14;
-  const badgeX = x + width - padX - badgeW;
-  const badgeY = opts.yTop - headerH + 6;
-  page.drawRectangle({
-    x: badgeX,
-    y: badgeY,
-    width: badgeW,
-    height: badgeH,
-    color: discRgb,
-  });
-  page.drawText(badgeText, {
-    x: badgeX + badgePadX,
-    y: badgeY + 3,
-    size: badgeSize,
-    font: opts.helveticaBold,
-    color: rgb(1, 1, 1),
-  });
+  const colCount = Math.max(1, items.length);
+  const colW = contentW / colCount;
+  const labelColor = rgb(0.45, 0.47, 0.5);
+  const valueColor = rgb(0.88, 0.9, 0.93);
 
-  const subY = opts.yTop - headerH - subHeaderH;
-  page.drawText(disciplineName, {
-    x: x + padX,
-    y: subY + 5,
-    size: 8,
-    font: opts.helvetica,
-    color: rgb(0.78, 0.8, 0.84),
-  });
-
-  const gridTop = subY;
-  const colW = width / metricCount;
-  const labelColor = rgb(0.5, 0.52, 0.56);
-  const valueColor = rgb(0.92, 0.93, 0.96);
-  const cellY = gridTop - cellH;
-
-  for (let i = 1; i < metricCount; i++) {
-    const dividerX = x + colW * i;
+  for (let i = 1; i < colCount; i++) {
+    const dividerX = margin + colW * i;
     page.drawLine({
-      start: { x: dividerX, y: cellY },
-      end: { x: dividerX, y: gridTop },
-      thickness: 0.5,
-      color: discRgb,
-      opacity: 0.22,
+      start: { x: dividerX, y: y - 20 },
+      end: { x: dividerX, y: y + 2 },
+      thickness: 0.4,
+      color: rgb(1, 1, 1),
+      opacity: 0.08,
     });
   }
 
-  metrics.forEach((m, i) => {
-    const cellX = x + colW * i;
-    const cellPad = i === 0 ? padX : 10;
-    page.drawText(m.label.toUpperCase(), {
-      x: cellX + cellPad,
-      y: cellY + cellH - 20,
-      size: 6.5,
-      font: opts.helveticaBold,
-      color: labelColor,
-    });
-    const maxChars = Math.floor((colW - cellPad * 2) / 5);
-    const valLines = wrapLines(m.value, Math.max(14, maxChars));
-    const valueSize = valLines[0]!.length > 22 ? 8 : 9;
-    page.drawText(valLines[0] ?? m.value, {
-      x: cellX + cellPad,
-      y: cellY + cellH - 32,
-      size: valueSize,
-      font: opts.helveticaBold,
-      color: valueColor,
-    });
-    if (valLines[1]) {
-      page.drawText(valLines[1], {
-        x: cellX + cellPad,
-        y: cellY + 6,
-        size: 7.5,
-        font: opts.helvetica,
-        color: rgb(0.75, 0.77, 0.8),
-      });
-    }
+  items.forEach((item, i) => {
+    const cx = margin + colW * i + colW / 2;
+    drawCenteredText(page, item.label.toUpperCase(), cx, y, 6, helveticaBold, labelColor);
+    const valLine = wrapLines(item.value, 24)[0] ?? item.value;
+    const valSize = valLine.length > 26 ? 7 : 7.5;
+    drawCenteredText(page, valLine, cx, y - 12, valSize, helvetica, valueColor);
   });
 
-  page.drawText(`Credential  ${credentialRef}`, {
-    x: x + padX,
-    y: yBottom + 7,
-    size: 7,
-    font: opts.helvetica,
-    color: rgb(0.55, 0.57, 0.62),
-  });
+  y -= 30;
+  drawCenteredText(page, `Credential  ${credentialRef}`, xMid, y, 6.5, helvetica, rgb(0.5, 0.52, 0.55));
+  y -= 14;
 
-  return yBottom;
+  const noticeLines = wrapLines(notice, 108);
+  for (const line of noticeLines.slice(0, 2)) {
+    drawCenteredText(page, line, xMid, y, 6.5, helvetica, rgb(0.52, 0.54, 0.58));
+    y -= 10;
+  }
+
+  return y;
 }
 
 function drawVerificationSeal(
@@ -356,12 +282,10 @@ export async function buildCompletionCertificatePdf(
   const discHex = DISCIPLINE_HEX[discCode] ?? '#2490ed';
   const discRgb = hexToRgb(discHex);
   const cardFill = rgb(10 / 255, 14 / 255, 20 / 255);
-  const panelFill = rgb(14 / 255, 18 / 255, 26 / 255);
 
   const doc = await PDFDocument.create();
   const page = doc.addPage([PAGE_W, PAGE_H]);
   const xMid = PAGE_W / 2;
-  const contentLeft = MARGIN;
 
   const timesBold = await doc.embedFont(StandardFonts.TimesRomanBold);
   const timesItalic = await doc.embedFont(StandardFonts.TimesRomanItalic);
@@ -404,20 +328,20 @@ export async function buildCompletionCertificatePdf(
     opacity: 0,
   });
 
-  const arm = 16;
-  const cornerInset = frameInset + 18;
+  const arm = 14;
+  const cornerInset = frameInset + 16;
   const t = 1.5;
   drawCornerBracket(page, cornerInset, PAGE_H - cornerInset, arm, t, discRgb, 'tl');
   drawCornerBracket(page, PAGE_W - cornerInset, PAGE_H - cornerInset, arm, t, discRgb, 'tr');
   drawCornerBracket(page, cornerInset, cornerInset, arm, t, discRgb, 'bl');
   drawCornerBracket(page, PAGE_W - cornerInset, cornerInset, arm, t, discRgb, 'br');
 
-  let y = PAGE_H - MARGIN - 8;
+  let y = PAGE_H - MARGIN - 4;
 
   const logoBytes = await loadLogoPng();
   if (logoBytes) {
     const pngImage = await doc.embedPng(logoBytes);
-    const maxW = 168;
+    const maxW = 198;
     const scale = maxW / pngImage.width;
     const imgW = maxW;
     const imgH = pngImage.height * scale;
@@ -427,7 +351,7 @@ export async function buildCompletionCertificatePdf(
       width: imgW,
       height: imgH,
     });
-    y -= imgH + 6;
+    y -= imgH + 10;
   }
 
   drawCenteredText(
@@ -435,55 +359,56 @@ export async function buildCompletionCertificatePdf(
     'Centre for Applied Restoration Science & Industry',
     xMid,
     y,
-    7,
+    6.5,
     helvetica,
     rgb(0.5, 0.52, 0.56)
   );
-  y -= 22;
+  y -= 20;
 
-  drawCenteredText(page, 'Certificate of Completion', xMid, y, 24, timesRoman, rgb(0.96, 0.96, 0.98));
-  y -= 14;
+  drawCenteredText(page, 'Certificate of Completion', xMid, y, 23, timesRoman, rgb(0.96, 0.96, 0.98));
+  y -= 18;
   drawCenteredText(
     page,
     'Official record of achievement',
     xMid,
     y,
-    9,
+    8,
     helvetica,
     rgb(0.58, 0.6, 0.64)
   );
-  y -= 10;
+  y -= 20;
 
-  const ruleW = 120;
+  const ruleW = 88;
   page.drawLine({
     start: { x: xMid - ruleW / 2, y },
     end: { x: xMid + ruleW / 2, y },
     thickness: 1.2,
     color: discRgb,
   });
-  y -= 26;
+  y -= 28;
 
-  drawCenteredText(page, 'THIS IS TO CERTIFY THAT', xMid, y, 8, helveticaBold, rgb(0.58, 0.6, 0.64));
-  y -= 22;
+  drawCenteredText(page, 'THIS IS TO CERTIFY THAT', xMid, y, 7.5, helveticaBold, rgb(0.58, 0.6, 0.64));
+  y -= 24;
 
-  const nameSize = 20;
+  const nameSize = 22;
   drawCenteredText(page, studentName, xMid, y, nameSize, timesItalic, rgb(126 / 255, 197 / 255, 1));
-  y -= nameSize + 12;
+  y -= nameSize + 16;
 
   const bodyMuted = rgb(0.62, 0.64, 0.68);
-  const bodyLines = [
-    'has demonstrated the required competency and',
-    'successfully completed the accredited programme',
-  ];
-  for (const line of bodyLines) {
-    drawCenteredText(page, line, xMid, y, 9, helvetica, bodyMuted);
-    y -= 12;
-  }
-  y -= 6;
+  drawCenteredText(
+    page,
+    'has demonstrated the required competency and successfully completed the accredited programme',
+    xMid,
+    y,
+    8.5,
+    helvetica,
+    bodyMuted
+  );
+  y -= 22;
 
-  const courseLines = wrapLines(courseTitle, 52);
+  const courseLines = wrapLines(courseTitle, 72);
   for (const line of courseLines) {
-    drawCenteredText(page, line, xMid, y, 15, timesBold, rgb(0.93, 0.94, 0.96));
+    drawCenteredText(page, line, xMid, y, 13, timesBold, rgb(0.93, 0.94, 0.96));
     y -= 17;
   }
   y -= 8;
@@ -491,77 +416,100 @@ export async function buildCompletionCertificatePdf(
   const completedStr = formatAuDate(completedDate);
   const issuedStr = formatAuDate(issuedDate ?? completedDate);
   const credRef = credentialId ? formatCredentialRef(credentialId) : '—';
-  const cecStr =
-    cecHours != null && cecHours > 0
-      ? `${Number(cecHours) % 1 === 0 ? cecHours : cecHours.toFixed(1)} IICRC CEC hour${cecHours === 1 ? '' : 's'}`
-      : 'Per course listing';
+  const cecStr = formatCecHoursForCertificate(cecHours);
   const levelStr = courseLevel?.trim() ? courseLevel.trim() : 'Professional development';
+  const discName = disciplineLabel(discCode);
 
-  y = drawProgrammeRecordPanel(page, {
-    x: contentLeft,
-    yTop: y,
-    width: CONTENT_W,
-    discCode,
+  const bandTop = Math.max(y, FOOTER_ROW_Y + 118);
+  const bandItems = [
+    { label: 'Discipline', value: discName },
+    { label: 'Completed', value: completedStr },
+    ...(cecStr ? [{ label: 'CEC credits', value: cecStr }] : []),
+    { label: 'Programme level', value: levelStr },
+  ];
+  drawProgrammeDetailsBand(page, {
+    yTop: bandTop,
+    xMid,
+    margin: MARGIN,
+    contentW: CONTENT_W,
     discRgb,
-    fill: panelFill,
-    disciplineName: disciplineLabel(discCode),
-    metrics: [
-      { label: 'Completed', value: completedStr },
-      { label: 'CEC credits', value: cecStr },
-      { label: 'Programme level', value: levelStr },
-    ],
+    items: bandItems,
     credentialRef: credRef,
+    notice:
+      'Designed for IICRC Continuing Education Credits (CECs) where applicable. Retain this certificate with your renewal records.',
     helvetica,
     helveticaBold,
   });
-  y -= 14;
 
-  const noticeH = 24;
-  page.drawRectangle({
-    x: contentLeft,
-    y: y - noticeH,
-    width: CONTENT_W,
-    height: noticeH,
-    color: discRgb,
-    opacity: 0.14,
-    borderWidth: 0,
+  const footerTop = FOOTER_ROW_Y + 44;
+  page.drawLine({
+    start: { x: MARGIN, y: footerTop + 8 },
+    end: { x: PAGE_W - MARGIN, y: footerTop + 8 },
+    thickness: 0.5,
+    color: rgb(1, 1, 1),
+    opacity: 0.07,
   });
-  const notice =
-    'This programme is designed for IICRC Continuing Education Credits (CECs) where applicable. ' +
-    'Maintain this certificate with your renewal records.';
-  const noticeLines = wrapLines(notice, 88);
-  let noticeY = y - 10;
-  for (const line of noticeLines.slice(0, 2)) {
-    drawCenteredText(page, line, xMid, noticeY, 7.5, helvetica, rgb(0.72, 0.74, 0.78));
-    noticeY -= 10;
-  }
-  y -= noticeH + 18;
 
-  const footerTop = y;
   const colW = CONTENT_W / 3;
-  const col1Center = contentLeft + colW / 2;
-  const col2Center = contentLeft + colW + colW / 2;
-  const col3Center = PAGE_W - MARGIN - colW / 2;
+  const col1Center = MARGIN + colW / 2;
+  const col2Center = xMid;
 
   drawCenteredText(page, 'Date issued', col1Center, footerTop, 7, helveticaBold, rgb(0.5, 0.52, 0.56));
   drawCenteredText(page, issuedStr, col1Center, footerTop - 14, 9, helvetica, rgb(0.78, 0.8, 0.84));
+  drawCenteredText(page, 'CARSI Learning', col1Center, footerTop - 28, 6.5, helvetica, rgb(0.42, 0.44, 0.48));
 
-  drawVerificationSeal(page, col2Center, footerTop - 24, 22, discRgb, helveticaBold, helvetica);
+  drawVerificationSeal(page, col2Center, footerTop - 18, 19, discRgb, helveticaBold, helvetica);
+  drawCenteredText(
+    page,
+    'IICRC CEC accredited · carsi.com.au',
+    col2Center,
+    footerTop - 44,
+    6,
+    helvetica,
+    rgb(0.42, 0.44, 0.48)
+  );
 
-  drawCenteredText(page, 'Authorised signatory', col3Center, footerTop, 7, helveticaBold, rgb(0.5, 0.52, 0.56));
-  drawCenteredText(page, 'Philip McGurk', col3Center, footerTop - 20, 16, timesItalic, rgb(0.88, 0.89, 0.92));
-  const sigLineW = 110;
+  const sigRightX = PAGE_W - MARGIN;
+  page.drawText('AUTHORISED SIGNATORY', {
+    x: sigRightX - helveticaBold.widthOfTextAtSize('AUTHORISED SIGNATORY', 7),
+    y: footerTop,
+    size: 7,
+    font: helveticaBold,
+    color: rgb(0.5, 0.52, 0.56),
+  });
+  const sigName = 'Philip McGurk';
+  const sigNameSize = 15;
+  page.drawText(sigName, {
+    x: sigRightX - timesItalic.widthOfTextAtSize(sigName, sigNameSize),
+    y: footerTop - 18,
+    size: sigNameSize,
+    font: timesItalic,
+    color: rgb(0.88, 0.89, 0.92),
+  });
+  const sigLineW = 100;
   page.drawLine({
-    start: { x: col3Center - sigLineW / 2, y: footerTop - 38 },
-    end: { x: col3Center + sigLineW / 2, y: footerTop - 38 },
+    start: { x: sigRightX - sigLineW, y: footerTop - 34 },
+    end: { x: sigRightX, y: footerTop - 34 },
     thickness: 0.5,
     color: rgb(0.55, 0.57, 0.6),
-    opacity: 0.5,
+    opacity: 0.45,
   });
-  drawCenteredText(page, 'Training Director', col3Center, footerTop - 50, 7, helvetica, rgb(0.5, 0.52, 0.56));
-
-  const footerTag = 'CARSI Learning · carsi.com.au · IICRC CEC accredited restoration courses';
-  drawCenteredText(page, footerTag, xMid, MARGIN - 4, 6.5, helvetica, rgb(0.42, 0.44, 0.48));
+  const titleText = 'Training Director';
+  page.drawText(titleText, {
+    x: sigRightX - helvetica.widthOfTextAtSize(titleText, 7),
+    y: footerTop - 46,
+    size: 7,
+    font: helvetica,
+    color: rgb(0.5, 0.52, 0.56),
+  });
+  const orgText = 'Centre for Applied Restoration Science & Industry';
+  page.drawText(orgText, {
+    x: sigRightX - helvetica.widthOfTextAtSize(orgText, 6),
+    y: footerTop - 56,
+    size: 6,
+    font: helvetica,
+    color: rgb(0.42, 0.44, 0.48),
+  });
 
   return doc.save();
 }
@@ -575,8 +523,13 @@ export function completionCertificateDataFromEnrollment(
     student: { fullName: string | null; email: string };
     course: {
       title: string;
-      iicrcDiscipline: string | null;
+      slug: string;
+      iicrcDiscipline?: string | null;
       cecHours?: unknown;
+      shortDescription?: string | null;
+      description?: string | null;
+      meta?: unknown;
+      durationHours?: unknown;
       level?: string | null;
     };
   },
@@ -584,17 +537,26 @@ export function completionCertificateDataFromEnrollment(
 ): CompletionCertificateData {
   void verificationOrigin;
   const studentName = row.student.fullName?.trim() || row.student.email;
-  const cec =
-    row.course.cecHours != null && row.course.cecHours !== ''
-      ? Number(row.course.cecHours)
-      : null;
+  const cecSource: LmsCourseCecSource = {
+    slug: row.course.slug,
+    cecHours:
+      row.course.cecHours != null && row.course.cecHours !== ''
+        ? Number(row.course.cecHours)
+        : null,
+    shortDescription: row.course.shortDescription,
+    description: row.course.description,
+    meta: row.course.meta,
+    durationHours:
+      row.course.durationHours != null ? Number(row.course.durationHours) : null,
+    iicrcDiscipline: row.course.iicrcDiscipline,
+  };
   return {
     studentName,
     courseTitle: row.course.title,
     completedDate: row.completedAt,
     issuedDate: row.certificateIssuedAt ?? row.completedAt,
     discipline: row.course.iicrcDiscipline?.trim() || undefined,
-    cecHours: Number.isFinite(cec) ? cec : null,
+    cecHours: resolveLmsCourseCecHours(cecSource),
     courseLevel: row.course.level,
     credentialId: row.id,
   };

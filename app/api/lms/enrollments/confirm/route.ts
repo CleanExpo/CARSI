@@ -5,7 +5,6 @@ import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { notifyCrmEnrollmentCreated } from '@/lib/server/crm-enrollment-notify';
 import { sendEnrollmentWelcomeEmail } from '@/lib/server/enrollment-email';
 import { fulfillCourseCheckoutForUser } from '@/lib/server/team-course-purchase';
-import { findCourseInExport } from '@/lib/server/local-course-checkout';
 import { computeDiscountedAud, findActiveUserDiscount } from '@/lib/server/user-discounts';
 import { getOrCreateCourseBySlug } from '@/lib/server/course-catalog-sync';
 
@@ -74,19 +73,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ detail: 'slug or session_id required' }, { status: 400 });
     }
 
-    const wp = findCourseInExport(slug);
-    const price = wp ? Number(wp.price_aud) : NaN;
-    const isFreeCatalog = wp?.is_free === true || !Number.isFinite(price) || price <= 0;
+    let dbCourse: { id: string; priceAud: unknown; isFree: boolean };
+    try {
+      dbCourse = await getOrCreateCourseBySlug(slug);
+    } catch {
+      return NextResponse.json({ detail: 'Course not found' }, { status: 404 });
+    }
+
+    const listAud = Number(dbCourse.priceAud);
+    const isFreeCatalog =
+      dbCourse.isFree === true || !Number.isFinite(listAud) || listAud <= 0;
 
     if (isFreeCatalog) {
       paymentReference = 'free';
     } else {
-      let dbCourse: { id: string; priceAud: unknown };
-      try {
-        dbCourse = await getOrCreateCourseBySlug(slug);
-      } catch {
-        return NextResponse.json({ detail: 'Course not found' }, { status: 404 });
-      }
       const disc = await findActiveUserDiscount(claims.sub, dbCourse.id);
       if (disc) {
         const listAud = Number(dbCourse.priceAud);

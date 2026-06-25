@@ -5,21 +5,12 @@ import { Prisma } from '@/generated/prisma/client';
 import { prisma } from '@/lib/prisma';
 import type { SeedLessonModule } from '@/lib/lms-seed-catalog';
 import { getSeedCourseFull } from '@/lib/lms-seed-catalog';
-import { findCourseInExport } from '@/lib/server/local-course-checkout';
 
 export const DEFAULT_INSTRUCTOR_ID =
   process.env.LMS_SYSTEM_INSTRUCTOR_ID?.trim() ||
   'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
 
 const SYSTEM_INSTRUCTOR_EMAIL = 'system.instructor@carsi.internal';
-
-function escapeHtml(s: string): string {
-  return s
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}
 
 export async function ensureCatalogInstructor(): Promise<void> {
   const existing = await prisma.lmsUser.findUnique({ where: { id: DEFAULT_INSTRUCTOR_ID } });
@@ -174,65 +165,5 @@ export async function getOrCreateCourseBySlug(slug: string): Promise<CourseWithC
   });
   if (existingLegacy) return existingLegacy;
 
-  const wp = findCourseInExport(normalized);
-  if (!wp) {
-    throw new Error('COURSE_NOT_FOUND');
-  }
-
-  await ensureCatalogInstructor();
-
-  const courseId = randomUUID();
-  const moduleId = randomUUID();
-  const lessonId = randomUUID();
-  const title = (wp.title ?? normalized).trim() || normalized;
-  const priceNum = Number(wp.price_aud);
-  const isFree = wp.is_free === true || !Number.isFinite(priceNum) || priceNum <= 0;
-
-  await prisma.$transaction(async (tx) => {
-    await tx.lmsCourse.create({
-      data: {
-        id: courseId,
-        slug: normalized,
-        title,
-        description: wp.description ?? null,
-        shortDescription: wp.short_description ?? null,
-        thumbnailUrl: wp.thumbnail_url ?? null,
-        instructorId: DEFAULT_INSTRUCTOR_ID,
-        status: wp.status === 'published' ? 'published' : 'draft',
-        priceAud: new Prisma.Decimal(isFree ? 0 : priceNum),
-        isFree,
-        level: wp.level ?? null,
-        category: wp.category ?? null,
-        iicrcDiscipline: wp.iicrc_discipline ?? null,
-        meta: wp.meta === undefined ? undefined : (wp.meta as Prisma.InputJsonValue),
-        isPublished: wp.status === 'published',
-      },
-    });
-
-    await tx.lmsModule.create({
-      data: {
-        id: moduleId,
-        courseId,
-        title: 'Introduction',
-        orderIndex: 0,
-      },
-    });
-
-    await tx.lmsLesson.create({
-      data: {
-        id: lessonId,
-        moduleId,
-        title: 'Welcome',
-        contentType: 'text',
-        contentBody: `<p>Welcome to <strong>${escapeHtml(title)}</strong>. Your enrolment is active; additional modules and lessons appear here as they are published in the catalog.</p>`,
-        orderIndex: 0,
-        isPreview: false,
-      },
-    });
-  });
-
-  return prisma.lmsCourse.findUniqueOrThrow({
-    where: { id: courseId },
-    include: courseWithCurriculum,
-  });
+  throw new Error('COURSE_NOT_FOUND');
 }

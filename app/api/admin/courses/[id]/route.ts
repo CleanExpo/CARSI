@@ -6,53 +6,14 @@ import {
   adminGetCourse,
   adminUpdateCourse,
   courseToAdminDto,
+  parseAdminCourseWriteBody,
   type AdminCourseWriteInput,
 } from '@/lib/admin/admin-courses-service';
 
 type Ctx = { params: Promise<{ id: string }> };
 
 function parseBody(body: unknown): AdminCourseWriteInput | null {
-  if (!body || typeof body !== 'object') return null;
-  const o = body as Record<string, unknown>;
-  const title = typeof o.title === 'string' ? o.title.trim() : '';
-  if (!title) return null;
-
-  const modulesRaw = Array.isArray(o.modules) ? o.modules : [];
-  const modules = modulesRaw
-    .map((row) => {
-      if (!row || typeof row !== 'object') return null;
-      const m = row as Record<string, unknown>;
-      const modTitle = typeof m.title === 'string' ? m.title.trim() : '';
-      if (!modTitle) return null;
-      return {
-        id: typeof m.id === 'string' && m.id.trim() ? m.id.trim() : undefined,
-        title: modTitle,
-        textContent: typeof m.textContent === 'string' ? m.textContent : undefined,
-        videoUrl: typeof m.videoUrl === 'string' ? m.videoUrl : undefined,
-      };
-    })
-    .filter(Boolean) as AdminCourseWriteInput['modules'];
-
-  const priceRaw = o.priceAud;
-  const priceAud =
-    typeof priceRaw === 'number' && Number.isFinite(priceRaw)
-      ? priceRaw
-      : typeof priceRaw === 'string'
-        ? Number.parseFloat(priceRaw)
-        : 0;
-
-  return {
-    title,
-    description: typeof o.description === 'string' ? o.description : undefined,
-    thumbnailUrl: typeof o.thumbnailUrl === 'string' ? o.thumbnailUrl : undefined,
-    introVideoUrl: typeof o.introVideoUrl === 'string' ? o.introVideoUrl : undefined,
-    introThumbnailUrl: typeof o.introThumbnailUrl === 'string' ? o.introThumbnailUrl : undefined,
-    slug: typeof o.slug === 'string' ? o.slug : undefined,
-    isFree: Boolean(o.isFree),
-    priceAud: Number.isFinite(priceAud) ? priceAud : 0,
-    published: Boolean(o.published),
-    modules,
-  };
+  return parseAdminCourseWriteBody(body);
 }
 
 export async function GET(_request: NextRequest, ctx: Ctx) {

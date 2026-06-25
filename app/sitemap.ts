@@ -3,7 +3,7 @@ import { getBackendOrigin, getPublicSiteUrl } from '@/lib/env/public-url';
 import { authorityPath } from '@/lib/marketing/authority';
 import { ccwRoadshowPath } from '@/lib/marketing/ccw-roadshow';
 import { startSmartBasePath, startSmartPages } from '@/lib/marketing/start-smart';
-import { loadWpExportCourses } from '@/lib/wordpress-export-courses';
+import { getPublishedCourseSlugsFromDatabase } from '@/lib/server/public-courses-list';
 
 export const dynamic = 'force-dynamic';
 
@@ -114,9 +114,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: page.priority,
   }));
 
-  // Dynamic course pages — prefer local LMS seed / export over remote API
-  const localCourses = loadWpExportCourses();
-  const courses = localCourses?.length ? localCourses : await getCourses();
+  // Dynamic course pages — published LMS catalogue, then remote API fallback
+  const dbCourses = await getPublishedCourseSlugsFromDatabase();
+  const courses = dbCourses.length > 0 ? dbCourses : await getCourses();
   const courseEntries: MetadataRoute.Sitemap = courses.map((course) => ({
     url: `${baseUrl}/courses/${course.slug}`,
     lastModified:
