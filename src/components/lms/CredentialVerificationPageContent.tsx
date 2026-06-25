@@ -67,20 +67,14 @@ export function CredentialVerificationPageContent({
       ) : null}
 
       <header className="mt-8 text-center">
-        <p className="text-[11px] font-semibold tracking-[0.2em] text-[#2490ed]/80 uppercase">
+        <p className="text-[11px] font-semibold tracking-[0.2em] text-[#146fc2] uppercase">
           Certificate
         </p>
-        <h1 className="mt-2 text-2xl font-bold text-white">{credential.course_title}</h1>
-        <p className="mt-1 text-sm text-white/50">{credential.student_name}</p>
+        <h1 className="mt-2 text-2xl font-bold text-slate-900">{credential.course_title}</h1>
+        <p className="mt-1 text-sm text-slate-500">{credential.student_name}</p>
       </header>
 
-      <section className="mt-10">
-        <h2
-          className="mb-4 text-center text-lg font-semibold"
-          style={{ color: 'rgba(255,255,255,0.85)' }}
-        >
-          Certificate Preview
-        </h2>
+      <section className="mt-8">
         <CertificatePreview
           studentName={credential.student_name ?? undefined}
           courseName={credential.course_title ?? undefined}
@@ -120,7 +114,7 @@ export function CredentialVerificationPageContent({
         </a>
         <Link
           href="/dashboard/student/credentials"
-          className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/15 bg-white/5 px-6 py-3 text-sm font-medium text-white/85 transition-colors hover:bg-white/10"
+          className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-6 py-3 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
         >
           <Award className="h-4 w-4 text-[#7ec5ff]" aria-hidden />
           All credentials
