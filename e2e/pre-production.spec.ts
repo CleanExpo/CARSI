@@ -258,8 +258,15 @@ test.describe('1. Homepage', () => {
     await mockCourseAPI(page);
     await page.goto('/');
 
-    // H1 exists
-    const h1 = page.locator('h1');
+    // The hero H1 is a framer-motion `motion.h1` that animates in from its
+    // parent's `initial="hidden"` variant; during the enter animation (and a
+    // brief hydration window) a bare `page.locator('h1')` can race — match zero
+    // (not yet visible) or transiently two (hydration). Target the specific
+    // heading by role + accessible name and take the first match so the assertion
+    // is strict-safe and waits for the real, settled heading.
+    const h1 = page
+      .getByRole('heading', { level: 1, name: /Professional training that fits the workday/i })
+      .first();
     await expect(h1).toBeVisible({ timeout: 15_000 });
 
     expect(pageErrors).toEqual([]);
@@ -384,14 +391,21 @@ test.describe('4. Auth: logout', { tag: '@authenticated' }, () => {
     await page.waitForLoadState('domcontentloaded');
 
     // The persistent sidebar (LMSContextPanel) renders a "Sign out" button at
-    // desktop widths; the desktop-chromium project uses a wide viewport so it is
-    // visible. Clicking it calls /api/auth/logout then router.push('/login').
+    // desktop widths. Clicking it calls signOut() then router.push('/login').
     const logoutBtn = page.getByRole('button', { name: /sign out/i });
     await expect(logoutBtn).toBeVisible({ timeout: 10_000 });
+
+    // The AuthProvider loads `user` via a client fetch AFTER first paint; until it
+    // resolves the sidebar reflows (the button's title gains the user's email and
+    // role-gated nav items appear above it), shifting this button. Clicking mid-
+    // reflow makes Playwright wait for a stable box and time out. Wait for the
+    // auth-settled signal — the title acquiring the "(email)" suffix — so the
+    // sidebar has stopped moving before we click.
+    await expect(logoutBtn).toHaveAttribute('title', /\(.+@.+\)/, { timeout: 10_000 });
     await logoutBtn.click();
 
     // Sign-out clears the session and routes to /login.
-    await page.waitForURL('**/login**', { timeout: 10_000 });
+    await page.waitForURL('**/login**', { timeout: 15_000 });
   });
 });
 
