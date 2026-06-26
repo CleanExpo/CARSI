@@ -3058,6 +3058,464 @@
           ]
         }
       ]
+    },
+    {
+      "id": "6011d465-1981-487b-84e3-a53b10a2bd07",
+      "slug": "floor-care-onboarding-operational-readiness",
+      "title": "Professional Floor Care Onboarding & Operational Readiness",
+      "description": "<p>The internal onboarding program for floor-care technicians, supervisors and facilities staff who deliver cleaning, polishing, sealing, maintenance and hygiene services across schools, childcare, education, public buildings, commercial and high-traffic facilities.</p><p>Twelve modules take a new starter from induction to independent operator: what professional floor care is and why it matters, health and hygiene in child-sensitive environments, WHS/PPE/SDS and chemical safety, surface identification, methods, machinery, vehicle and equipment readiness, site setup and hazard control, professional conduct, confidentiality and CCTV awareness, job completion and evidence, and a final practical assessment. Written in Australian English; training supports good judgement and does not replace the SDS/TDS, standards, or a site&rsquo;s own rules.</p>",
+      "shortDescription": "Internal onboarding for floor-care technicians, supervisors and facilities staff — safety, hygiene, methods, operational readiness and professional conduct across sensitive sites.",
+      "thumbnailUrl": null,
+      "instructorId": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+      "status": "draft",
+      "priceAud": "0",
+      "isFree": true,
+      "durationHours": 8,
+      "level": "Foundational",
+      "category": "Facilities Management",
+      "tags": [
+        "floor care",
+        "onboarding",
+        "WHS",
+        "facilities management",
+        "operational readiness"
+      ],
+      "iicrcDiscipline": null,
+      "cecHours": null,
+      "meta": {
+        "audience": "internal staff",
+        "program": "Professional Floor Care Onboarding & Operational Readiness Program",
+        "docs": "docs/onboarding/floor-care/"
+      },
+      "isPublished": false,
+      "modules": [
+        {
+          "id": "0de25eb6-b9e5-432f-8df7-d2a75d01599c",
+          "title": "Module 1: Introduction to Professional Floor Care",
+          "orderIndex": 0,
+          "lessons": [
+            {
+              "id": "fcb635ab-c432-400f-9b86-e99a9638d42a",
+              "title": "What professional floor care is",
+              "contentType": "text",
+              "contentBody": "<p>Welcome. This program is for technicians, supervisors and facilities staff who deliver floor surface cleaning, polishing, sealing, maintenance and hygiene services across schools, childcare, education and public buildings, commercial sites and other high-traffic facilities.</p><p>Professional floor care is more than cleaning. It is a <strong>safety, hygiene, presentation, asset-protection and operational-readiness</strong> service. There are five service types you will hear about:</p><ul><li><strong>Routine cleaning</strong> — regular removal of soil and spills.</li><li><strong>Deep / restorative cleaning</strong> — periodic, heavier soil removal.</li><li><strong>Polishing / burnishing</strong> — restoring finish and appearance.</li><li><strong>Sealing / coating</strong> — protecting the surface.</li><li><strong>Maintenance</strong> — keeping the result so the next visit is easier.</li></ul><p>We use careful language about what floor care does. It <em>supports</em> hygiene, <em>reduces</em> soil load and <em>helps manage</em> contaminants. We do not make medical claims and we do not claim to sterilise.</p>",
+              "orderIndex": 0,
+              "isPreview": true,
+              "resources": null
+            },
+            {
+              "id": "29fdf97d-d2e5-49dc-a5fd-3771c26dfb65",
+              "title": "Why floors matter in sensitive facilities",
+              "contentType": "text",
+              "contentBody": "<p>Floors are high-contact, high-risk surfaces. Everyone walks on them, and they carry tracked-in soil, spills and contaminants. In schools, childcare and public buildings, children, staff and vulnerable people use those floors at close range.</p><p>How we clean and maintain a floor affects:</p><ul><li>hygiene and the soil load underfoot;</li><li>slip, trip and fall risk;</li><li>the presentation of the facility and the client&rsquo;s confidence in us;</li><li>the life of the floor — an expensive asset we protect or damage.</li></ul><p>Poor floor care does the opposite: it spreads soil, creates slip hazards, looks bad, and shortens the life of the surface. That is why the standard matters on every job.</p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "114be4c4-63be-48e6-9c8d-53a7fdb34094",
+              "title": "Knowledge check: introduction",
+              "contentType": "text",
+              "contentBody": "<p>Use this short self-check to confirm the foundations. Pick one answer (A&ndash;D), then check the key below.</p><h3>Questions</h3><p><strong>1. Which of these is <em>maintenance</em> rather than deep cleaning?</strong></p><ul><li>A. A heavy periodic soil removal</li><li>B. Keeping the finished result so the next visit is easier</li><li>C. Stripping an old sealer off vinyl</li><li>D. A one-off restorative scrub</li></ul><p><strong>2. Why is a childcare floor treated as a higher-risk surface than a back-of-house storeroom?</strong></p><ul><li>A. It is always a different material</li><li>B. Children and vulnerable people use it at close range</li><li>C. It is cleaned less often</li><li>D. It is never sealed</li></ul><p><strong>3. Which statement about floor care is allowed under our guardrails?</strong></p><ul><li>A. It sterilises the floor</li><li>B. It prevents illness</li><li>C. It supports hygiene and reduces soil load</li><li>D. It is medically proven to kill germs</li></ul><h3>Answer key</h3><p><strong>1.</strong> B &nbsp; <strong>2.</strong> B &nbsp; <strong>3.</strong> C</p>",
+              "orderIndex": 2,
+              "isPreview": false,
+              "resources": null
+            }
+          ]
+        },
+        {
+          "id": "8ee04558-dd87-4a12-8659-efb47f086f65",
+          "title": "Module 2: Health, Hygiene & Child-Sensitive Environments",
+          "orderIndex": 1,
+          "lessons": [
+            {
+              "id": "a1eff659-2ed3-4db9-812f-707aa54913ce",
+              "title": "The contaminants we help manage",
+              "contentType": "text",
+              "contentBody": "<p>Floor care helps manage a range of contaminants that build up or get tracked in:</p><ul><li>pollen, dust and dirt;</li><li>body soils, food soils and spills;</li><li>tracked-in contaminants from outside;</li><li>conditions that support mould growth when moisture is left behind.</li></ul><p>Our job is to remove and reduce that load with the correct process &mdash; not to spread it around. Dirty pads, mops and cleaning solution re-deposit soil, so clean equipment and the right method matter as much as the chemical.</p><p>Careful language again: we <em>support</em> a facility&rsquo;s hygiene and <em>help manage</em> contaminants. We do not make disinfection or health-outcome claims.</p>",
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "15ef25a6-5c40-41ca-9a7f-dba72b7df55e",
+              "title": "Cross-contamination control and child-sensitive work",
+              "contentType": "text",
+              "contentBody": "<p>Two habits prevent cross-contamination:</p><ul><li>work <strong>clean-to-dirty</strong> &mdash; from cleaner areas toward dirtier ones;</li><li>keep <strong>colour-coded equipment</strong> separated, especially toilet and kitchen tools from general-area tools.</li></ul><p>In child-occupied and sensitive spaces, adjust the job:</p><ul><li>choose lower-tox products where suitable and read the SDS;</li><li>ventilate the room when using chemicals;</li><li>isolate and sign wet areas, and keep chemicals away from children;</li><li>time the work around occupancy where you can.</li></ul><p>Infection-control <em>awareness</em> means we support the facility&rsquo;s hygiene practices &mdash; we do not claim to disinfect or guarantee an outcome.</p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "51e88cc5-ff33-4050-a05b-38dc5d14e2a3",
+              "title": "Knowledge check: health and hygiene",
+              "contentType": "text",
+              "contentBody": "<p>Confirm the hygiene and child-sensitive basics.</p><h3>Questions</h3><p><strong>1. Why do we work from clean areas toward dirty areas?</strong></p><ul><li>A. It is faster</li><li>B. To avoid spreading soil into areas already cleaned</li><li>C. It uses less chemical</li><li>D. The client prefers it</li></ul><p><strong>2. Name a correct adjustment when working in an occupied childcare room.</strong></p><ul><li>A. Use the strongest chemical available</li><li>B. Ventilate, isolate wet areas, and keep chemicals away from children</li><li>C. Skip signage to save time</li><li>D. Work faster and skip the rinse</li></ul><p><strong>3. Why does clean equipment matter?</strong></p><ul><li>A. It looks professional only</li><li>B. Dirty pads, mops and solution re-deposit soil</li><li>C. It is a legal requirement to shine tools</li><li>D. It has no real effect</li></ul><h3>Answer key</h3><p><strong>1.</strong> B &nbsp; <strong>2.</strong> B &nbsp; <strong>3.</strong> B</p>",
+              "orderIndex": 2,
+              "isPreview": false,
+              "resources": null
+            }
+          ]
+        },
+        {
+          "id": "d806c9ed-1a4b-4b2c-877c-28128c86e9d7",
+          "title": "Module 3: WHS, PPE, SDS & Chemical Safety",
+          "orderIndex": 2,
+          "lessons": [
+            {
+              "id": "6453d548-b107-4ec0-b786-a72bf379f9c1",
+              "title": "Reading a Safety Data Sheet (SDS)",
+              "contentType": "text",
+              "contentBody": "<p>Our chemicals include strippers and acids/alkalis that can burn skin and eyes and give off fumes. The Safety Data Sheet tells you how to use them safely &mdash; it is not optional reading.</p><p>Under the model WHS framework, a workplace must keep <strong>current SDS</strong> (not more than five years old) and a <strong>hazardous chemicals register</strong>, accessible to workers. The sections you use most on the job are: hazards, PPE, first aid, handling and storage, and spill response.</p><p><strong>Jurisdiction flag:</strong> most states follow the model WHS framework, but <strong>Victoria operates under its own OHS Act and Regulations</strong>. Check the rules for the state you are working in.</p>",
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "818e17e0-ae49-497f-a0f2-f26d5da956b3",
+              "title": "PPE and the hierarchy of controls",
+              "contentType": "text",
+              "contentBody": "<p>PPE is the <strong>last resort</strong> in the hierarchy of controls &mdash; used after elimination, substitution, isolation and engineering controls have been considered. PPE supplements those higher controls; it does not replace them.</p><p>Select your PPE <strong>from the product SDS</strong> &mdash; it specifies gloves, eye protection and respiratory protection for that chemical. Check PPE condition before use and carry spares.</p><p>Ventilation matters too: a workplace must keep airborne contaminants below the relevant exposure standard. The SDS carries that exposure information &mdash; read it to judge whether you need extra ventilation, especially in occupied or child-occupied rooms.</p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "8e7a87a4-f04d-4af3-9a14-5297537c2218",
+              "title": "Labelling, storage and spills",
+              "contentType": "text",
+              "contentBody": "<p><strong>Labelling:</strong> every container must be labelled, including decanted ones &mdash; on the body of the container, clearly visible. The only exception is a chemical used immediately after decanting where the container is then cleaned out. If a decant is left for later or for another worker, it <strong>must</strong> be labelled.</p><p><strong>Storage:</strong> segregate incompatible chemicals (acids vs alkalis, oxidisers) per the SDS storage advice &mdash; on the vehicle and on site.</p><p><strong>Spills:</strong> keep a spill kit available; the SDS gives spill and disposal advice. Contain, clean up and dispose per the SDS and the site emergency plan.</p><p>The &ldquo;never&rdquo; list: no unlabelled bottles; never mix chemicals; never leave a decant for another worker unlabelled.</p>",
+              "orderIndex": 2,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "a566d515-2b80-465b-b4df-9eeb5cee92d1",
+              "title": "Knowledge check: WHS, PPE and SDS",
+              "contentType": "text",
+              "contentBody": "<p>This is a safety-critical module &mdash; aim for 90%.</p><h3>Questions</h3><p><strong>1. How current must an SDS be to be considered current under the model WHS framework?</strong></p><ul><li>A. Every 12 months</li><li>B. Not more than 5 years old</li><li>C. Only when the product changes</li><li>D. Every 10 years</li></ul><p><strong>2. Where does PPE sit in the hierarchy of controls?</strong></p><ul><li>A. First and most effective</li><li>B. The last resort, supplementing higher controls</li><li>C. It replaces engineering controls</li><li>D. It is not part of the hierarchy</li></ul><p><strong>3. You decant a stripper into a spray bottle and will use it later. What must you do?</strong></p><ul><li>A. Nothing, decants are exempt</li><li>B. Label the container on its body before use</li><li>C. Only label it if asked</li><li>D. Leave it for the next worker unlabelled</li></ul><p><strong>4. Which is correct about Victoria?</strong></p><ul><li>A. It uses the model WHS framework</li><li>B. It operates under its own OHS Act and Regulations</li><li>C. It has no chemical safety laws</li><li>D. It does not require SDS</li></ul><h3>Answer key</h3><p><strong>1.</strong> B &nbsp; <strong>2.</strong> B &nbsp; <strong>3.</strong> B &nbsp; <strong>4.</strong> B</p>",
+              "orderIndex": 3,
+              "isPreview": false,
+              "resources": null
+            }
+          ]
+        },
+        {
+          "id": "b6c67700-6d42-47f5-9e6b-daf772a4cdf0",
+          "title": "Module 4: Floor Surface Identification",
+          "orderIndex": 3,
+          "lessons": [
+            {
+              "id": "528132bd-6e03-49ad-a913-8de8973f8e32",
+              "title": "Recognising the common surfaces",
+              "contentType": "text",
+              "contentBody": "<p>The fastest way to cause expensive damage is to use the wrong chemical or pad on a surface. Start every job by identifying what you are working on. Common surfaces:</p><ul><li>vinyl, VCT and linoleum;</li><li>rubber;</li><li>concrete (sealed or unsealed);</li><li>terrazzo;</li><li>ceramic and porcelain tile;</li><li>natural stone;</li><li>timber and engineered timber;</li><li>epoxy / resin;</li><li>carpet and carpet tiles.</li></ul><p>See the full surface guide in the onboarding pack (<em>standards/floor-surface-identification.md</em>) for how to recognise each one and the safe and unsafe chemistry for it.</p>",
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "4ede6992-b7c4-404a-86d2-58301deff288",
+              "title": "Porosity, sealed vs unsealed, and pH",
+              "contentType": "text",
+              "contentBody": "<p>Two properties decide how you treat a floor:</p><ul><li><strong>Porosity</strong> &mdash; porous, semi-porous or non-porous. Porous surfaces absorb, so dwell time and chemical choice change.</li><li><strong>Sealed vs unsealed</strong> &mdash; always confirm whether a surface (e.g. vinyl or concrete) is sealed before stripping or applying aggressive chemistry.</li></ul><p>Basic chemistry: cleaners are <strong>neutral, alkaline or acidic</strong>; plus solvents, strippers, sealers and polishes. Each belongs in particular places. Two rules to remember:</p><ul><li>Never use a strong <strong>acidic</strong> cleaner on natural stone &mdash; it etches.</li><li>Keep water and strippers off untreated <strong>timber</strong> &mdash; it is water/stripper sensitive.</li></ul><p>Always test a small, inconspicuous area first. Cure, dilution and slip-rating figures come from the SDS/TDS and the relevant standard &mdash; not from guesswork.</p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "350e9d49-db75-4bae-a40e-83018b01b307",
+              "title": "Knowledge check: surface identification",
+              "contentType": "text",
+              "contentBody": "<p>Confirm you can match surface to safe method.</p><h3>Questions</h3><p><strong>1. Why should you never use a strong acidic cleaner on natural stone?</strong></p><ul><li>A. It is too expensive</li><li>B. It etches and damages the stone</li><li>C. It does not clean</li><li>D. It voids the warranty only</li></ul><p><strong>2. What must you confirm before stripping a vinyl floor?</strong></p><ul><li>A. The colour</li><li>B. Whether it is sealed</li><li>C. The brand of mop</li><li>D. The time of day</li></ul><p><strong>3. Where do dilution and cure figures come from?</strong></p><ul><li>A. Experience and guesswork</li><li>B. The SDS/TDS and the relevant standard</li><li>C. The client</li><li>D. The thickest coat possible</li></ul><h3>Answer key</h3><p><strong>1.</strong> B &nbsp; <strong>2.</strong> B &nbsp; <strong>3.</strong> B</p>",
+              "orderIndex": 2,
+              "isPreview": false,
+              "resources": null
+            }
+          ]
+        },
+        {
+          "id": "5621f491-4746-4c31-a458-7bc8f1909f16",
+          "title": "Module 5: Cleaning, Polishing, Sealing & Maintenance Methods",
+          "orderIndex": 4,
+          "lessons": [
+            {
+              "id": "9e55809a-495c-4bb9-9ac4-1128098886d1",
+              "title": "Why method discipline matters",
+              "contentType": "text",
+              "contentBody": "<p>Method discipline is what makes the result consistent. Each step does a job:</p><ul><li><strong>Dwell time</strong> &mdash; lets the chemical work;</li><li><strong>Agitation</strong> &mdash; breaks the soil free;</li><li><strong>Extraction</strong> &mdash; removes soil and solution;</li><li><strong>Rinsing / neutralising</strong> &mdash; removes residue so the floor does not re-soil or stay slippery;</li><li><strong>Polishing / sealing</strong> &mdash; finishes and protects.</li></ul><p>Skipping dwell, rinsing or neutralising is what causes streaking, residue, fast re-soiling and slip problems.</p>",
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "8dd5ddb6-6e0a-4fb1-8ed7-0ac19a78ed85",
+              "title": "Carpet: extraction vs encapsulation",
+              "contentType": "text",
+              "contentBody": "<p>Two common carpet methods, and a trade-off:</p><ul><li><strong>Hot water extraction (HWE)</strong> &mdash; deeper soil removal, but longer dry time.</li><li><strong>Encapsulation</strong> &mdash; low-moisture, faster return to service &mdash; useful in occupied rooms.</li></ul><p>In an occupied school or care room, the dry-time vs soil-removal trade-off often points to encapsulation so the space comes back into use quickly. Do not state fixed dry times &mdash; they depend on the product and conditions.</p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "62ae3e18-aac4-4d00-9b8e-461dae46ec9a",
+              "title": "Hard floors, strip & seal, and slip resistance",
+              "contentType": "text",
+              "contentBody": "<p>Hard-floor cleaning (including tile and grout) needs the right dwell, agitation and rinse, then a check on slip resistance after cleaning or sealing.</p><p>Vinyl strip-and-seal, end to end: <strong>strip &rarr; rinse/neutralise &rarr; dry &rarr; thin sealer/finish coats</strong>. Strippers are typically alkaline/caustic &mdash; ventilation and PPE are required, and a wet or curing floor is a slip/access hazard, so isolate and sign it.</p><p><strong>Cure, re-entry and dilution come from the SDS/TDS, not guesswork.</strong> Slip-resistance targets come from the relevant standard (AS 4663 / HB 198 / NCC). After sealing, verify the finished floor against the target class.</p>",
+              "orderIndex": 2,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "a1134f21-bfd5-4691-b680-295d60630416",
+              "title": "Knowledge check: methods",
+              "contentType": "text",
+              "contentBody": "<p>Confirm the method essentials.</p><h3>Questions</h3><p><strong>1. Where do you get the re-entry time for a freshly sealed floor?</strong></p><ul><li>A. From experience</li><li>B. From the product SDS/TDS</li><li>C. From the client</li><li>D. There is a fixed national time</li></ul><p><strong>2. When would you choose encapsulation over hot water extraction in a school?</strong></p><ul><li>A. Never</li><li>B. When fast return-to-service in an occupied room matters</li><li>C. Only outdoors</li><li>D. When you want the longest dry time</li></ul><p><strong>3. Why do we rinse / neutralise after cleaning?</strong></p><ul><li>A. To use more product</li><li>B. To remove residue so the floor does not re-soil or stay slippery</li><li>C. It is optional</li><li>D. To add gloss</li></ul><h3>Answer key</h3><p><strong>1.</strong> B &nbsp; <strong>2.</strong> B &nbsp; <strong>3.</strong> B</p>",
+              "orderIndex": 3,
+              "isPreview": false,
+              "resources": null
+            }
+          ]
+        },
+        {
+          "id": "80004a34-e239-4ecf-9eb9-f30c3326b771",
+          "title": "Module 6: Machinery & Tool Operation",
+          "orderIndex": 5,
+          "lessons": [
+            {
+              "id": "f5444f22-5008-4e9c-9b6b-d0f0c0ef70ed",
+              "title": "The machines and what they do",
+              "contentType": "text",
+              "contentBody": "<p>Floor-care machines are powerful and run on power or batteries near water and people. Know what each does and when to use it:</p><ul><li><strong>Rotary machine</strong> &mdash; scrubbing, stripping, polishing (pad/brush dependent);</li><li><strong>Auto scrubber</strong> &mdash; scrub and recover in one pass;</li><li><strong>Burnisher</strong> &mdash; high-speed finish/polish;</li><li><strong>Wet vacuum / extractor</strong> &mdash; recover water and solution;</li><li><strong>Pressure system</strong> &mdash; hard outdoor surfaces (with run-off control).</li></ul><p>Run a pre-use check before any machine touches the floor.</p>",
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "e8472f6f-6a8a-4330-81f3-2fdaab95c083",
+              "title": "Pads, brushes and safe operation",
+              "contentType": "text",
+              "contentBody": "<p>Pad and brush selection changes the result &mdash; an aggressive pad on a soft finish causes damage, the wrong brush on grout wastes effort.</p><p>Electrical and trip safety:</p><ul><li>Portable equipment (floor polishers, extension leads) needs <strong>RCD / safety-switch</strong> protection; operate a portable RCD&rsquo;s test button each time you plug in.</li><li>Check leads for damage on the pre-start; a test-and-tag program (referencing AS/NZS 3760) is how we show equipment is maintained &mdash; intervals vary by state.</li><li>Manage leads and hoses so they are not trip hazards, especially across paths children use.</li></ul><p>Any unsafe act in operation is an automatic fail in assessment. When in doubt, stop.</p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "120a2252-f165-41af-bf70-85d5cedfec6c",
+              "title": "Knowledge check: machinery operation",
+              "contentType": "text",
+              "contentBody": "<p>Safety-critical module &mdash; aim for 90%.</p><h3>Questions</h3><p><strong>1. What do you do with a portable RCD each time you plug in?</strong></p><ul><li>A. Nothing</li><li>B. Operate its test button</li><li>C. Remove it to save time</li><li>D. Bypass it if it trips</li></ul><p><strong>2. Which pad choice risks damage?</strong></p><ul><li>A. Matching the pad to the surface and task</li><li>B. An aggressive pad on a soft finish</li><li>C. Checking the pad before use</li><li>D. Carrying spare pads</li></ul><p><strong>3. A circuit keeps tripping the RCD. What is correct?</strong></p><ul><li>A. Bypass the RCD</li><li>B. Stop and report a possible electrical fault</li><li>C. Tape the breaker on</li><li>D. Ignore it and continue</li></ul><h3>Answer key</h3><p><strong>1.</strong> B &nbsp; <strong>2.</strong> B &nbsp; <strong>3.</strong> B</p>",
+              "orderIndex": 2,
+              "isPreview": false,
+              "resources": null
+            }
+          ]
+        },
+        {
+          "id": "5aa05c98-cb15-4d17-b0f1-5ee2264f044d",
+          "title": "Module 7: Vehicle, Machine & Equipment Maintenance",
+          "orderIndex": 6,
+          "lessons": [
+            {
+              "id": "c0f91425-eb90-4d43-90a8-d13c0f53f2e4",
+              "title": "If it is not checked, it can stop the job",
+              "contentType": "text",
+              "contentBody": "<p>A job does not fail only because of poor cleaning. It fails because the vehicle is not ready, the TruckMount cannot get to site, a machine will not start, the right tool was left behind, PPE or chemical is missing, a battery is flat, or a hose is damaged.</p><p><strong>If it is not checked, it can stop the job.</strong> That is why the daily pre-start, completed and signed <em>before</em> you leave, is mandatory. It covers the vehicle, TruckMount (where fitted), machines, batteries, hoses and leads, tools, pads/brushes, PPE, signage and barriers, chemical stock, spill kit, first-aid kit and fire extinguisher.</p><p>Carry the standard spares &mdash; spare pads, fuses, hose fittings and key chemicals &mdash; so a small fault does not stop a whole job.</p>",
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "5164cd65-e1e4-41dc-a8d4-f29ca5154200",
+              "title": "Daily, weekly and monthly maintenance, and fault reporting",
+              "contentType": "text",
+              "contentBody": "<p>Keep equipment ready on three cycles:</p><ul><li><strong>Daily</strong> &mdash; post-use clean-down, empty/rinse tanks, inspect pads/brushes/hoses/leads, charge batteries.</li><li><strong>Weekly</strong> &mdash; deeper clean, filters, wear checks, hose fittings, lead/RCD inspection, lubrication per the manual.</li><li><strong>Monthly</strong> &mdash; service items, tool-inventory reconciliation, restock signage/first-aid/spill kit, fire-extinguisher check, review electrical test-and-tag status.</li></ul><p><strong>Fault reporting:</strong> log the fault, tell the right person, and <strong>tag faulty equipment out of service</strong> &mdash; do not keep using it. A machine that fails its pre-start does not go to site.</p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "80b5038e-3502-41d9-9780-04e899206baa",
+              "title": "Knowledge check: maintenance",
+              "contentType": "text",
+              "contentBody": "<p>Safety-critical module &mdash; aim for 90%.</p><h3>Questions</h3><p><strong>1. Name a reason a job can fail that is not about cleaning skill.</strong></p><ul><li>A. The client is fussy</li><li>B. A flat battery, missing tool or damaged hose</li><li>C. The weather is fine</li><li>D. The floor is clean</li></ul><p><strong>2. A machine fails its pre-start check. What do you do?</strong></p><ul><li>A. Take it to site anyway</li><li>B. Tag it out of service and raise a fault report</li><li>C. Hide the fault</li><li>D. Use it once more</li></ul><p><strong>3. When must the daily pre-start be completed?</strong></p><ul><li>A. After the first job</li><li>B. Before you leave</li><li>C. Only weekly</li><li>D. Only if a machine looks faulty</li></ul><h3>Answer key</h3><p><strong>1.</strong> B &nbsp; <strong>2.</strong> B &nbsp; <strong>3.</strong> B</p>",
+              "orderIndex": 2,
+              "isPreview": false,
+              "resources": null
+            }
+          ]
+        },
+        {
+          "id": "8a45fadb-77e5-42f7-802f-9960e5d3eb20",
+          "title": "Module 8: Site Setup & Hazard Control",
+          "orderIndex": 7,
+          "lessons": [
+            {
+              "id": "2840f999-b537-49c5-b7f3-06ba0fd74a6a",
+              "title": "Arrival, sign-in and the job briefing",
+              "contentType": "text",
+              "contentBody": "<p>Most incidents and complaints come from the setup, not the cleaning. Run the arrival sequence every time:</p><ul><li>park and unload per the site&rsquo;s rules;</li><li>complete site sign-in;</li><li>make contact with the site contact;</li><li>take the job briefing &mdash; scope, access, occupancy, and water and power access.</li></ul><p>Confirm you can physically get equipment to the work area before you start unloading everything.</p>",
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "fec077d6-9543-4976-a100-03b13858ca1c",
+              "title": "Inspection, risk assessment and work-zone control",
+              "contentType": "text",
+              "contentBody": "<p>Before you start: inspect the surface and do an on-the-spot risk assessment &mdash; hazards, occupancy, children present, and your wet-floor plan.</p><p>Then set up a controlled work zone:</p><ul><li>put up wet-floor signage and barricade / exclude the area <strong>before</strong> the floor is wet;</li><li>keep exits and pedestrian paths clear;</li><li>route and manage leads and hoses so they are not trip hazards;</li><li>ventilate occupied or child-occupied rooms when using chemicals;</li><li>place chemicals where they are secure and never within reach of children.</li></ul><p>Remember: signage is an <em>administrative</em> control that supplements separating people from wet areas &mdash; it is not the primary control.</p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "f1123628-b3f0-4bce-b196-84f0d14b94fe",
+              "title": "Knowledge check: site setup",
+              "contentType": "text",
+              "contentBody": "<p>Safety-critical module &mdash; aim for 90%.</p><h3>Questions</h3><p><strong>1. What goes up before you make a floor wet?</strong></p><ul><li>A. Nothing</li><li>B. Wet-floor signage and barricading/exclusion</li><li>C. A coffee break</li><li>D. The invoice</li></ul><p><strong>2. You must run a lead across a corridor children use. What do you do?</strong></p><ul><li>A. Leave it loose</li><li>B. Route and manage it so it is not a trip hazard, or find another path</li><li>C. Tell no one</li><li>D. Run several leads to be safe</li></ul><p><strong>3. Signage for a wet floor is&hellip;</strong></p><ul><li>A. The primary control</li><li>B. An administrative control that supplements separating people from the wet area</li><li>C. Optional in occupied buildings</li><li>D. Only for outdoors</li></ul><h3>Answer key</h3><p><strong>1.</strong> B &nbsp; <strong>2.</strong> B &nbsp; <strong>3.</strong> B</p>",
+              "orderIndex": 2,
+              "isPreview": false,
+              "resources": null
+            }
+          ]
+        },
+        {
+          "id": "3c7b8391-b120-4711-b0b0-254418fccb91",
+          "title": "Module 9: Professional Conduct & Client Expectations",
+          "orderIndex": 8,
+          "lessons": [
+            {
+              "id": "99936489-21ab-4b11-92de-c173db22b2e1",
+              "title": "The professionalism standard",
+              "contentType": "text",
+              "contentBody": "<p>On a school or childcare site, how we behave is as visible as how we clean. Professional conduct is what earns the trust that keeps the contract. The standard covers:</p><ul><li>company uniform, personal hygiene and presentation;</li><li>behaviour and language on site;</li><li>respect for children, staff, teachers, visitors, tenants and facility users;</li><li>vehicle cleanliness and where you park;</li><li>where you unload, where chemicals go, and how hoses and leads are run.</li></ul><p>See the full professionalism standard in the onboarding pack (<em>standards/professionalism-conduct.md</em>).</p>",
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "aeb01b7f-1792-40be-99d4-881f8cf4b9c8",
+              "title": "Presentation, communication and trust",
+              "contentType": "text",
+              "contentBody": "<p>Control your work zone so it does not disrupt site operations &mdash; classes, drop-off, deliveries. If a teacher needs you to move for a class, respond politely and adjust.</p><p>Communicate delays, risks and issues <strong>early and plainly</strong>. A site contact who hears about a delay early stays a happy client; one who finds out late does not.</p><p>Professionalism is not extra &mdash; it is the difference between a job we did and a contract we keep.</p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "19ebda26-bf49-47e5-9df1-23b43060e0b8",
+              "title": "Knowledge check: professional conduct",
+              "contentType": "text",
+              "contentBody": "<p>Confirm the conduct standard.</p><h3>Questions</h3><p><strong>1. A teacher asks you to move because a class is coming through. What is the professional response?</strong></p><ul><li>A. Refuse &mdash; you were there first</li><li>B. Respond politely and adjust your work zone</li><li>C. Ignore them</li><li>D. Pack up and leave the site</li></ul><p><strong>2. When should you communicate a delay or issue?</strong></p><ul><li>A. After the job, if asked</li><li>B. Early and plainly, as soon as you know</li><li>C. Never &mdash; keep it quiet</li><li>D. Only to other technicians</li></ul><p><strong>3. Where should chemicals never be placed on a childcare site?</strong></p><ul><li>A. In the locked vehicle</li><li>B. Within reach of children</li><li>C. In a secure staging area</li><li>D. With the rest of the equipment</li></ul><h3>Answer key</h3><p><strong>1.</strong> B &nbsp; <strong>2.</strong> B &nbsp; <strong>3.</strong> B</p>",
+              "orderIndex": 2,
+              "isPreview": false,
+              "resources": null
+            }
+          ]
+        },
+        {
+          "id": "6e2c881d-0d31-4d9e-88ae-56e1d9a284dd",
+          "title": "Module 10: Confidentiality, Security & CCTV Awareness",
+          "orderIndex": 9,
+          "lessons": [
+            {
+              "id": "64aa3c81-8013-4a00-96c4-c82d02e8c169",
+              "title": "Confidentiality and the photo rule",
+              "contentType": "text",
+              "contentBody": "<p>We work inside other people&rsquo;s facilities, often around children and private information. One photo of a screen or a child, or one careless comment, can breach trust and the law.</p><p>Images of an identifiable person are <strong>personal information</strong> under the Privacy Act 1988, collected only where reasonably necessary. So the default is clear:</p><ul><li>do not discuss private site information;</li><li>do not photograph people, children, documents, screens or private information;</li><li>when you need a before/after photo, frame out people and private information &mdash; if you cannot, record why in the notes instead.</li></ul>",
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "8b8dc8dd-f7b9-4250-8a69-af2659b79079",
+              "title": "Security, restricted areas and assume-CCTV conduct",
+              "contentType": "text",
+              "contentBody": "<p>Keep work zones clean, controlled and secure. Do not prop or block secure doors. Respect restricted areas. On child-occupied sites, follow child-safe conduct &mdash; never be alone with a child. A Working With Children check is a <strong>starting point</strong>, not the whole obligation; it sits alongside the child-safe code of conduct.</p><p><strong>Assume CCTV is operating.</strong> Behave as though every action is visible to the client. That single habit protects you and the company&rsquo;s reputation.</p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "ef0e91d0-f8d9-45eb-9d48-5715f0d5fa33",
+              "title": "Knowledge check: confidentiality and security",
+              "contentType": "text",
+              "contentBody": "<p>Reputation-critical module &mdash; aim for 90%.</p><h3>Questions</h3><p><strong>1. You need a before/after photo but a child&rsquo;s drawing with names is on the wall. What do you do?</strong></p><ul><li>A. Photograph it anyway</li><li>B. Frame it out, or record why no photo was taken</li><li>C. Post it online</li><li>D. Ask the child to move it</li></ul><p><strong>2. A Working With Children check means&hellip;</strong></p><ul><li>A. You have met every child-safe obligation</li><li>B. It is a starting point alongside the code of conduct and supervision</li><li>C. You can be alone with children</li><li>D. Photos of children are fine</li></ul><p><strong>3. How should you behave regarding CCTV on site?</strong></p><ul><li>A. Assume it is operating and act accordingly</li><li>B. Assume there is none</li><li>C. Cover the cameras</li><li>D. Only behave when supervised</li></ul><h3>Answer key</h3><p><strong>1.</strong> B &nbsp; <strong>2.</strong> B &nbsp; <strong>3.</strong> A</p>",
+              "orderIndex": 2,
+              "isPreview": false,
+              "resources": null
+            }
+          ]
+        },
+        {
+          "id": "db9d7e74-78aa-4587-9675-3cd61be2d01c",
+          "title": "Module 11: Job Completion, Evidence & Handover",
+          "orderIndex": 10,
+          "lessons": [
+            {
+              "id": "b163e330-68bf-4244-996f-bf50578ea4b8",
+              "title": "Final inspection, pack-down and evidence",
+              "contentType": "text",
+              "contentBody": "<p>If we cannot show what we did, we cannot defend the work or get paid cleanly. Finish every job properly:</p><ul><li>final inspection against the job scope;</li><li>pack-down &mdash; equipment, leads, hoses and signage, and leave the area clean;</li><li>photo evidence within the confidentiality rules;</li><li>clear, complete completion notes.</li></ul><p>If you find pre-existing damage during the final inspection, photograph and record it so it is not wrongly attributed to us.</p>",
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "d5ff1a67-db83-473f-a1b7-6c77422c1dd9",
+              "title": "Defect reporting, escalation and handover",
+              "contentType": "text",
+              "contentBody": "<p>Report defects and anything outside the standard, and follow the escalation process for anything you cannot resolve on site (unexpected floor condition, equipment failure, access problem, confidentiality conflict).</p><p>Then hand over to the client/site contact and get sign-off where required. A clean handover is what turns a finished job into a renewed contract.</p><p>Escalation contacts and timeframes are set by the company &mdash; know yours before you go solo.</p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "54c89670-f067-45c6-b168-6dc57bb67e2d",
+              "title": "Knowledge check: completion and handover",
+              "contentType": "text",
+              "contentBody": "<p>Confirm the close-out essentials.</p><h3>Questions</h3><p><strong>1. What do you do when you find pre-existing damage during final inspection?</strong></p><ul><li>A. Ignore it</li><li>B. Photograph and record it in the notes</li><li>C. Repair it yourself</li><li>D. Blame the last cleaner</li></ul><p><strong>2. Why does photo evidence and completion notes matter?</strong></p><ul><li>A. They are busywork</li><li>B. They prove the work and protect us in disputes</li><li>C. Only the client needs them</li><li>D. They replace the clean</li></ul><p><strong>3. A job cannot be completed to scope. What is correct?</strong></p><ul><li>A. Leave quietly</li><li>B. Document it and escalate to the supervisor</li><li>C. Invent a completion note</li><li>D. Do something not in scope to fill time</li></ul><h3>Answer key</h3><p><strong>1.</strong> B &nbsp; <strong>2.</strong> B &nbsp; <strong>3.</strong> B</p>",
+              "orderIndex": 2,
+              "isPreview": false,
+              "resources": null
+            }
+          ]
+        },
+        {
+          "id": "2ed33b7b-df37-4a03-bb36-3e6db832c503",
+          "title": "Module 12: Final Practical Assessment",
+          "orderIndex": 11,
+          "lessons": [
+            {
+              "id": "f61638d1-b021-45e8-807e-c8beb3d833e0",
+              "title": "What the final assessment covers",
+              "contentType": "text",
+              "contentBody": "<p>This is the gate to working solo. It proves the standard holds when no one is guiding each step. You will run a full standard job, end to end, assessed by a supervisor against the checklists and standards:</p><ul><li>vehicle and equipment readiness;</li><li>site arrival, sign-in, briefing and setup;</li><li>surface identification and the correct method and chemical;</li><li>safe machine operation and hazard control;</li><li>professional conduct and confidentiality/security;</li><li>close-out with evidence and a clear handover.</li></ul><p><strong>Pass:</strong> at least 85% overall <strong>and</strong> 100% on every safety-critical and reputation-critical item &mdash; no automatic-fail acts.</p>",
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "8081416c-a508-4184-8601-4641bdaea7a6",
+              "title": "Scenario walk-throughs",
+              "contentType": "text",
+              "contentBody": "<p>Be ready to talk through judgement, not just steps:</p><ul><li>Mid-job you find the surface is not what the scope said. What do you change, and who do you tell? (Stop before damage, document, confirm a revised method or re-scope.)</li><li>A flat battery stops your scrubber halfway. What is your recovery and escalation? (Switch to a backup if in scope; otherwise notify, complete what is safe, re-book.)</li><li>You need a photo but private information is in shot. What do you do? (Frame it out or record why no photo was taken.)</li></ul><p>Knowing <strong>when to stop and escalate</strong> is part of passing.</p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "4166a24e-cbb5-4841-8547-997556ae47d9",
+              "title": "Independent-operator clearance",
+              "contentType": "text",
+              "contentBody": "<p>When you pass Module 12 and all 12 modules are signed off, your supervisor signs the <strong>independent-operator clearance</strong> &mdash; you are cleared to run standard jobs on your own, with named escalation paths for anything outside the standard.</p><p>Independence is the start of the standard, not the end of development. Expect refreshers on the safety-critical modules and ongoing toolbox talks drawn from real jobs.</p><p>There is no time pressure to pass. Competence comes before the calendar &mdash; the clearance is signed when the work earns it.</p>",
+              "orderIndex": 2,
+              "isPreview": false,
+              "resources": null
+            }
+          ]
+        }
+      ]
     }
   ]
 }
