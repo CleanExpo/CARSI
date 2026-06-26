@@ -3115,11 +3115,16 @@
             {
               "id": "114be4c4-63be-48e6-9c8d-53a7fdb34094",
               "title": "Knowledge check: introduction",
-              "contentType": "text",
-              "contentBody": "<p>Use this short self-check to confirm the foundations. Pick one answer (A&ndash;D), then check the key below.</p><h3>Questions</h3><p><strong>1. Which of these is <em>maintenance</em> rather than deep cleaning?</strong></p><ul><li>A. A heavy periodic soil removal</li><li>B. Keeping the finished result so the next visit is easier</li><li>C. Stripping an old sealer off vinyl</li><li>D. A one-off restorative scrub</li></ul><p><strong>2. Why is a childcare floor treated as a higher-risk surface than a back-of-house storeroom?</strong></p><ul><li>A. It is always a different material</li><li>B. Children and vulnerable people use it at close range</li><li>C. It is cleaned less often</li><li>D. It is never sealed</li></ul><p><strong>3. Which statement about floor care is allowed under our guardrails?</strong></p><ul><li>A. It sterilises the floor</li><li>B. It prevents illness</li><li>C. It supports hygiene and reduces soil load</li><li>D. It is medically proven to kill germs</li></ul><h3>Answer key</h3><p><strong>1.</strong> B &nbsp; <strong>2.</strong> B &nbsp; <strong>3.</strong> C</p>",
+              "contentType": "quiz",
+              "contentBody": "49cd42e8-3c5e-4a14-9be5-af5fe9d08787",
               "orderIndex": 2,
               "isPreview": false,
-              "resources": null
+              "resources": [
+                {
+                  "label": "Knowledge check",
+                  "url": "quiz:49cd42e8-3c5e-4a14-9be5-af5fe9d08787"
+                }
+              ]
             }
           ]
         },
@@ -3149,11 +3154,16 @@
             {
               "id": "51e88cc5-ff33-4050-a05b-38dc5d14e2a3",
               "title": "Knowledge check: health and hygiene",
-              "contentType": "text",
-              "contentBody": "<p>Confirm the hygiene and child-sensitive basics.</p><h3>Questions</h3><p><strong>1. Why do we work from clean areas toward dirty areas?</strong></p><ul><li>A. It is faster</li><li>B. To avoid spreading soil into areas already cleaned</li><li>C. It uses less chemical</li><li>D. The client prefers it</li></ul><p><strong>2. Name a correct adjustment when working in an occupied childcare room.</strong></p><ul><li>A. Use the strongest chemical available</li><li>B. Ventilate, isolate wet areas, and keep chemicals away from children</li><li>C. Skip signage to save time</li><li>D. Work faster and skip the rinse</li></ul><p><strong>3. Why does clean equipment matter?</strong></p><ul><li>A. It looks professional only</li><li>B. Dirty pads, mops and solution re-deposit soil</li><li>C. It is a legal requirement to shine tools</li><li>D. It has no real effect</li></ul><h3>Answer key</h3><p><strong>1.</strong> B &nbsp; <strong>2.</strong> B &nbsp; <strong>3.</strong> B</p>",
+              "contentType": "quiz",
+              "contentBody": "b909272f-3f41-4202-aa4e-7265db3c3645",
               "orderIndex": 2,
               "isPreview": false,
-              "resources": null
+              "resources": [
+                {
+                  "label": "Knowledge check",
+                  "url": "quiz:b909272f-3f41-4202-aa4e-7265db3c3645"
+                }
+              ]
             }
           ]
         },
@@ -3192,11 +3202,16 @@
             {
               "id": "a566d515-2b80-465b-b4df-9eeb5cee92d1",
               "title": "Knowledge check: WHS, PPE and SDS",
-              "contentType": "text",
-              "contentBody": "<p>This is a safety-critical module &mdash; aim for 90%.</p><h3>Questions</h3><p><strong>1. How current must an SDS be to be considered current under the model WHS framework?</strong></p><ul><li>A. Every 12 months</li><li>B. Not more than 5 years old</li><li>C. Only when the product changes</li><li>D. Every 10 years</li></ul><p><strong>2. Where does PPE sit in the hierarchy of controls?</strong></p><ul><li>A. First and most effective</li><li>B. The last resort, supplementing higher controls</li><li>C. It replaces engineering controls</li><li>D. It is not part of the hierarchy</li></ul><p><strong>3. You decant a stripper into a spray bottle and will use it later. What must you do?</strong></p><ul><li>A. Nothing, decants are exempt</li><li>B. Label the container on its body before use</li><li>C. Only label it if asked</li><li>D. Leave it for the next worker unlabelled</li></ul><p><strong>4. Which is correct about Victoria?</strong></p><ul><li>A. It uses the model WHS framework</li><li>B. It operates under its own OHS Act and Regulations</li><li>C. It has no chemical safety laws</li><li>D. It does not require SDS</li></ul><h3>Answer key</h3><p><strong>1.</strong> B &nbsp; <strong>2.</strong> B &nbsp; <strong>3.</strong> B &nbsp; <strong>4.</strong> B</p>",
+              "contentType": "quiz",
+              "contentBody": "f2f81d2f-7dc3-412f-b3b7-9b807c56c2c9",
               "orderIndex": 3,
               "isPreview": false,
-              "resources": null
+              "resources": [
+                {
+                  "label": "Knowledge check",
+                  "url": "quiz:f2f81d2f-7dc3-412f-b3b7-9b807c56c2c9"
+                }
+              ]
             }
           ]
         },
@@ -3226,11 +3241,16 @@
             {
               "id": "350e9d49-db75-4bae-a40e-83018b01b307",
               "title": "Knowledge check: surface identification",
-              "contentType": "text",
-              "contentBody": "<p>Confirm you can match surface to safe method.</p><h3>Questions</h3><p><strong>1. Why should you never use a strong acidic cleaner on natural stone?</strong></p><ul><li>A. It is too expensive</li><li>B. It etches and damages the stone</li><li>C. It does not clean</li><li>D. It voids the warranty only</li></ul><p><strong>2. What must you confirm before stripping a vinyl floor?</strong></p><ul><li>A. The colour</li><li>B. Whether it is sealed</li><li>C. The brand of mop</li><li>D. The time of day</li></ul><p><strong>3. Where do dilution and cure figures come from?</strong></p><ul><li>A. Experience and guesswork</li><li>B. The SDS/TDS and the relevant standard</li><li>C. The client</li><li>D. The thickest coat possible</li></ul><h3>Answer key</h3><p><strong>1.</strong> B &nbsp; <strong>2.</strong> B &nbsp; <strong>3.</strong> B</p>",
+              "contentType": "quiz",
+              "contentBody": "aa6cd121-ce69-4b3d-8cd0-93da77389a63",
               "orderIndex": 2,
               "isPreview": false,
-              "resources": null
+              "resources": [
+                {
+                  "label": "Knowledge check",
+                  "url": "quiz:aa6cd121-ce69-4b3d-8cd0-93da77389a63"
+                }
+              ]
             }
           ]
         },
@@ -3269,11 +3289,16 @@
             {
               "id": "a1134f21-bfd5-4691-b680-295d60630416",
               "title": "Knowledge check: methods",
-              "contentType": "text",
-              "contentBody": "<p>Confirm the method essentials.</p><h3>Questions</h3><p><strong>1. Where do you get the re-entry time for a freshly sealed floor?</strong></p><ul><li>A. From experience</li><li>B. From the product SDS/TDS</li><li>C. From the client</li><li>D. There is a fixed national time</li></ul><p><strong>2. When would you choose encapsulation over hot water extraction in a school?</strong></p><ul><li>A. Never</li><li>B. When fast return-to-service in an occupied room matters</li><li>C. Only outdoors</li><li>D. When you want the longest dry time</li></ul><p><strong>3. Why do we rinse / neutralise after cleaning?</strong></p><ul><li>A. To use more product</li><li>B. To remove residue so the floor does not re-soil or stay slippery</li><li>C. It is optional</li><li>D. To add gloss</li></ul><h3>Answer key</h3><p><strong>1.</strong> B &nbsp; <strong>2.</strong> B &nbsp; <strong>3.</strong> B</p>",
+              "contentType": "quiz",
+              "contentBody": "5c5b4488-ceb5-4c6f-8992-3158e6354885",
               "orderIndex": 3,
               "isPreview": false,
-              "resources": null
+              "resources": [
+                {
+                  "label": "Knowledge check",
+                  "url": "quiz:5c5b4488-ceb5-4c6f-8992-3158e6354885"
+                }
+              ]
             }
           ]
         },
@@ -3303,11 +3328,16 @@
             {
               "id": "120a2252-f165-41af-bf70-85d5cedfec6c",
               "title": "Knowledge check: machinery operation",
-              "contentType": "text",
-              "contentBody": "<p>Safety-critical module &mdash; aim for 90%.</p><h3>Questions</h3><p><strong>1. What do you do with a portable RCD each time you plug in?</strong></p><ul><li>A. Nothing</li><li>B. Operate its test button</li><li>C. Remove it to save time</li><li>D. Bypass it if it trips</li></ul><p><strong>2. Which pad choice risks damage?</strong></p><ul><li>A. Matching the pad to the surface and task</li><li>B. An aggressive pad on a soft finish</li><li>C. Checking the pad before use</li><li>D. Carrying spare pads</li></ul><p><strong>3. A circuit keeps tripping the RCD. What is correct?</strong></p><ul><li>A. Bypass the RCD</li><li>B. Stop and report a possible electrical fault</li><li>C. Tape the breaker on</li><li>D. Ignore it and continue</li></ul><h3>Answer key</h3><p><strong>1.</strong> B &nbsp; <strong>2.</strong> B &nbsp; <strong>3.</strong> B</p>",
+              "contentType": "quiz",
+              "contentBody": "85f058f5-e666-46a6-9eba-1e2b305ed201",
               "orderIndex": 2,
               "isPreview": false,
-              "resources": null
+              "resources": [
+                {
+                  "label": "Knowledge check",
+                  "url": "quiz:85f058f5-e666-46a6-9eba-1e2b305ed201"
+                }
+              ]
             }
           ]
         },
@@ -3337,11 +3367,16 @@
             {
               "id": "80b5038e-3502-41d9-9780-04e899206baa",
               "title": "Knowledge check: maintenance",
-              "contentType": "text",
-              "contentBody": "<p>Safety-critical module &mdash; aim for 90%.</p><h3>Questions</h3><p><strong>1. Name a reason a job can fail that is not about cleaning skill.</strong></p><ul><li>A. The client is fussy</li><li>B. A flat battery, missing tool or damaged hose</li><li>C. The weather is fine</li><li>D. The floor is clean</li></ul><p><strong>2. A machine fails its pre-start check. What do you do?</strong></p><ul><li>A. Take it to site anyway</li><li>B. Tag it out of service and raise a fault report</li><li>C. Hide the fault</li><li>D. Use it once more</li></ul><p><strong>3. When must the daily pre-start be completed?</strong></p><ul><li>A. After the first job</li><li>B. Before you leave</li><li>C. Only weekly</li><li>D. Only if a machine looks faulty</li></ul><h3>Answer key</h3><p><strong>1.</strong> B &nbsp; <strong>2.</strong> B &nbsp; <strong>3.</strong> B</p>",
+              "contentType": "quiz",
+              "contentBody": "1a4a5d66-1406-46e7-ad86-c18cb0c55962",
               "orderIndex": 2,
               "isPreview": false,
-              "resources": null
+              "resources": [
+                {
+                  "label": "Knowledge check",
+                  "url": "quiz:1a4a5d66-1406-46e7-ad86-c18cb0c55962"
+                }
+              ]
             }
           ]
         },
@@ -3371,11 +3406,16 @@
             {
               "id": "f1123628-b3f0-4bce-b196-84f0d14b94fe",
               "title": "Knowledge check: site setup",
-              "contentType": "text",
-              "contentBody": "<p>Safety-critical module &mdash; aim for 90%.</p><h3>Questions</h3><p><strong>1. What goes up before you make a floor wet?</strong></p><ul><li>A. Nothing</li><li>B. Wet-floor signage and barricading/exclusion</li><li>C. A coffee break</li><li>D. The invoice</li></ul><p><strong>2. You must run a lead across a corridor children use. What do you do?</strong></p><ul><li>A. Leave it loose</li><li>B. Route and manage it so it is not a trip hazard, or find another path</li><li>C. Tell no one</li><li>D. Run several leads to be safe</li></ul><p><strong>3. Signage for a wet floor is&hellip;</strong></p><ul><li>A. The primary control</li><li>B. An administrative control that supplements separating people from the wet area</li><li>C. Optional in occupied buildings</li><li>D. Only for outdoors</li></ul><h3>Answer key</h3><p><strong>1.</strong> B &nbsp; <strong>2.</strong> B &nbsp; <strong>3.</strong> B</p>",
+              "contentType": "quiz",
+              "contentBody": "3177b729-77f0-4e47-98c6-90bd7cb75884",
               "orderIndex": 2,
               "isPreview": false,
-              "resources": null
+              "resources": [
+                {
+                  "label": "Knowledge check",
+                  "url": "quiz:3177b729-77f0-4e47-98c6-90bd7cb75884"
+                }
+              ]
             }
           ]
         },
@@ -3405,11 +3445,16 @@
             {
               "id": "19ebda26-bf49-47e5-9df1-23b43060e0b8",
               "title": "Knowledge check: professional conduct",
-              "contentType": "text",
-              "contentBody": "<p>Confirm the conduct standard.</p><h3>Questions</h3><p><strong>1. A teacher asks you to move because a class is coming through. What is the professional response?</strong></p><ul><li>A. Refuse &mdash; you were there first</li><li>B. Respond politely and adjust your work zone</li><li>C. Ignore them</li><li>D. Pack up and leave the site</li></ul><p><strong>2. When should you communicate a delay or issue?</strong></p><ul><li>A. After the job, if asked</li><li>B. Early and plainly, as soon as you know</li><li>C. Never &mdash; keep it quiet</li><li>D. Only to other technicians</li></ul><p><strong>3. Where should chemicals never be placed on a childcare site?</strong></p><ul><li>A. In the locked vehicle</li><li>B. Within reach of children</li><li>C. In a secure staging area</li><li>D. With the rest of the equipment</li></ul><h3>Answer key</h3><p><strong>1.</strong> B &nbsp; <strong>2.</strong> B &nbsp; <strong>3.</strong> B</p>",
+              "contentType": "quiz",
+              "contentBody": "13977ff6-bf74-4274-b19c-4f67183208bf",
               "orderIndex": 2,
               "isPreview": false,
-              "resources": null
+              "resources": [
+                {
+                  "label": "Knowledge check",
+                  "url": "quiz:13977ff6-bf74-4274-b19c-4f67183208bf"
+                }
+              ]
             }
           ]
         },
@@ -3439,11 +3484,16 @@
             {
               "id": "ef0e91d0-f8d9-45eb-9d48-5715f0d5fa33",
               "title": "Knowledge check: confidentiality and security",
-              "contentType": "text",
-              "contentBody": "<p>Reputation-critical module &mdash; aim for 90%.</p><h3>Questions</h3><p><strong>1. You need a before/after photo but a child&rsquo;s drawing with names is on the wall. What do you do?</strong></p><ul><li>A. Photograph it anyway</li><li>B. Frame it out, or record why no photo was taken</li><li>C. Post it online</li><li>D. Ask the child to move it</li></ul><p><strong>2. A Working With Children check means&hellip;</strong></p><ul><li>A. You have met every child-safe obligation</li><li>B. It is a starting point alongside the code of conduct and supervision</li><li>C. You can be alone with children</li><li>D. Photos of children are fine</li></ul><p><strong>3. How should you behave regarding CCTV on site?</strong></p><ul><li>A. Assume it is operating and act accordingly</li><li>B. Assume there is none</li><li>C. Cover the cameras</li><li>D. Only behave when supervised</li></ul><h3>Answer key</h3><p><strong>1.</strong> B &nbsp; <strong>2.</strong> B &nbsp; <strong>3.</strong> A</p>",
+              "contentType": "quiz",
+              "contentBody": "5467bf93-f5eb-45b0-8857-905420d315aa",
               "orderIndex": 2,
               "isPreview": false,
-              "resources": null
+              "resources": [
+                {
+                  "label": "Knowledge check",
+                  "url": "quiz:5467bf93-f5eb-45b0-8857-905420d315aa"
+                }
+              ]
             }
           ]
         },
@@ -3473,11 +3523,16 @@
             {
               "id": "54c89670-f067-45c6-b168-6dc57bb67e2d",
               "title": "Knowledge check: completion and handover",
-              "contentType": "text",
-              "contentBody": "<p>Confirm the close-out essentials.</p><h3>Questions</h3><p><strong>1. What do you do when you find pre-existing damage during final inspection?</strong></p><ul><li>A. Ignore it</li><li>B. Photograph and record it in the notes</li><li>C. Repair it yourself</li><li>D. Blame the last cleaner</li></ul><p><strong>2. Why does photo evidence and completion notes matter?</strong></p><ul><li>A. They are busywork</li><li>B. They prove the work and protect us in disputes</li><li>C. Only the client needs them</li><li>D. They replace the clean</li></ul><p><strong>3. A job cannot be completed to scope. What is correct?</strong></p><ul><li>A. Leave quietly</li><li>B. Document it and escalate to the supervisor</li><li>C. Invent a completion note</li><li>D. Do something not in scope to fill time</li></ul><h3>Answer key</h3><p><strong>1.</strong> B &nbsp; <strong>2.</strong> B &nbsp; <strong>3.</strong> B</p>",
+              "contentType": "quiz",
+              "contentBody": "d4531d69-920d-4f90-b9e6-693b7879b958",
               "orderIndex": 2,
               "isPreview": false,
-              "resources": null
+              "resources": [
+                {
+                  "label": "Knowledge check",
+                  "url": "quiz:d4531d69-920d-4f90-b9e6-693b7879b958"
+                }
+              ]
             }
           ]
         },

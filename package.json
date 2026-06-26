@@ -49,6 +49,7 @@
     "type-check": "tsc --noEmit",
     "test:stripe-webhook": "node scripts/test-stripe-webhook-idempotency.mjs",
     "db:seed-phase2": "npx tsx scripts/seed-phase2-pathways-quizzes.ts",
+    "db:seed-floor-care-quizzes": "npx tsx scripts/seed-floor-care-quizzes.ts",
     "test:a11y": "playwright test tests/accessibility",
     "test:e2e": "playwright test e2e",
     "test:unit": "vitest run",

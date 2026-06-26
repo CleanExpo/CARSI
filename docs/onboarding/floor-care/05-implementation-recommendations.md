@@ -22,9 +22,21 @@ A matching LMS course has been authored into the CARSI catalogue
 - Keep the LMS lesson content and these docs in step — the docs are the master; the course is the
   delivery. When a doc changes, update the matching lesson.
 
+**Structured quizzes (built).** The 11 module knowledge-checks are now structured, auto-marked quizzes
+(`LmsQuiz` / `LmsQuizQuestion`) instead of self-marked inline text. The question bank lives in
+`data/seed/floor-care-quizzes.json`; the matching lessons carry `contentType: 'quiz'`, so the lesson
+player renders them via `QuizPlayer`, scores them server-side, enforces attempts, and records each
+attempt against the learner. Each quiz's pass mark mirrors `03-assessment-framework.md` (90% for the
+safety/reputation-critical modules, 80–85% elsewhere).
+
+> **Seed order matters.** Quizzes are a separate seed step from the catalogue:
+> ```bash
+> npm run db:seed-courses              # recreates lessons (knowledge-checks are contentType 'quiz')
+> npm run db:seed-floor-care-quizzes   # creates the LmsQuiz/LmsQuizQuestion rows they point to
+> ```
+> Run the catalogue seed first (the quiz needs its course to exist); both steps are idempotent.
+
 **Recommended next LMS steps:**
-- Add structured quizzes (the data model supports `LmsQuiz`/`LmsQuizQuestion`) so knowledge checks are
-  auto-marked and recorded against the learner, instead of self-marked inline.
 - Track practical sign-offs against the learner record so the 30/60/90 gates are visible to supervisors.
 - Only publish (move off draft) once content is reviewed against the guardrails and the company
   placeholders are filled.
