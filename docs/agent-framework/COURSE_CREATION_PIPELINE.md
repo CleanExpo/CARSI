@@ -30,6 +30,8 @@ invoke `npm run …`, the skills, and (for previews) MCP tools.
 
 ## Connectors
 
+> Full connector map (ingest, export, media, products): [`CONNECTORS.md`](./CONNECTORS.md).
+
 - **ChatGPT image generator** = OpenAI `gpt-image-1` — `scripts/generate-course-thumbnails.ts` (`npm run db:thumbnails:*`). Already wired.
 - **ElevenLabs voice** — NEW `scripts/generate-course-voiceover.ts` (`npm run voice:plan` / `voice:generate`), skill `skills/content/course-voiceover.skill.md`, briefs `data/voice/course-voice-briefs.json`. Also exposed as an MCP server in `.mcp.json` (`elevenlabs`) for interactive previews — but committed, spend-capped narration must come from the script.
 - **HeyGen video** — existing repo pipeline `scripts/automate-brand-videos.ts` (`npm run video:brand:*`) + `src/lib/brand-video-assistant.ts`. The HyperFrames MCP `compose`/`render_video` tools are **disabled on CLI agents**, so do not route generation through MCP.
