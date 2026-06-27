@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+import { parseOnboardingMeta, isOnboardingCourse } from '@/lib/onboarding/enterprise';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { prisma } from '@/lib/prisma';
 import { getUpstreamBaseUrl } from '@/lib/server/upstream-api';
@@ -78,6 +79,13 @@ export async function GET(request: NextRequest, ctx: Ctx) {
       title: course.title,
       slug: course.slug,
       thumbnail_url: course.thumbnailUrl,
+      category: course.category,
+      is_onboarding: isOnboardingCourse({
+        slug: course.slug,
+        category: course.category,
+        meta: course.meta,
+      }),
+      meta: parseOnboardingMeta(course.meta),
     },
     enrollment_id: enrollment.id,
     modules: course.modules.map((mod) => ({
