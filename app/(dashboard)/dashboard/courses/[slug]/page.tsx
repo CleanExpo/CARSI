@@ -1,10 +1,11 @@
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 
 import { CourseFormattedBody } from '@/components/lms/CourseFormattedBody';
 import { CourseThumbnail } from '@/components/lms/CourseThumbnail';
 import { EnrolButton } from '@/components/lms/EnrolButton';
 import { dash } from '@/lib/dashboard-light-ui';
+import { isOnboardingCourse } from '@/lib/onboarding/enterprise';
 import { normalizePublicAssetUrl } from '@/lib/remote-image';
 import { getBackendOrigin } from '@/lib/env/public-url';
 import { getCourse, generateMetadata } from '../../../../(public)/courses/[slug]/page';
@@ -28,8 +29,18 @@ export default async function DashboardCourseDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const course = await getCourse(slug);
+  const normalizedSlug = slug.trim().toLowerCase();
+
+  if (isOnboardingCourse({ slug: normalizedSlug })) {
+    redirect(`/dashboard/onboarding/${normalizedSlug}`);
+  }
+
+  const course = await getCourse(normalizedSlug);
   if (!course) notFound();
+
+  if (isOnboardingCourse({ slug: course.slug, category: course.category })) {
+    redirect(`/dashboard/onboarding/${course.slug}`);
+  }
 
   const priceNum = parseFloat(course.price_aud);
   const price = course.is_free || priceNum === 0 ? 'Free' : `$${priceNum.toFixed(0)}`;
