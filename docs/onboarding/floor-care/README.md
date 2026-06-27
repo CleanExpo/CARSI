@@ -42,6 +42,7 @@ content for a future LMS course.
 | `04-pathways-30-60-90.md` | 30-day onboarding, 60-day competency and 90-day independent-operator pathways | HR, supervisors |
 | `05-implementation-recommendations.md` | Next steps — LMS, video training, SOPs, toolbox talks | Management, L&D |
 | `publish-runbook.md` | Verify & publish the LMS course (seed order, smoke test, go-live) | Operators, L&D |
+| `video-runbook.md` | Render per-lesson HeyGen videos with subtitles (spend-bearing, manual) | Operators, L&D |
 
 Supporting evidence for the claims in this pack sits in
 `data/courses/floor-care-onboarding-operational-readiness/research.md` (source-cited, confidence-rated).
