@@ -50,6 +50,7 @@
     "test:stripe-webhook": "node scripts/test-stripe-webhook-idempotency.mjs",
     "db:seed-phase2": "npx tsx scripts/seed-phase2-pathways-quizzes.ts",
     "db:seed-floor-care-quizzes": "npx tsx scripts/seed-floor-care-quizzes.ts",
+    "db:seed-floor-care-course": "npx tsx scripts/seed-courses-catalog.ts --slug=floor-care-onboarding-operational-readiness",
     "test:a11y": "playwright test tests/accessibility",
     "test:e2e": "playwright test e2e",
     "test:unit": "vitest run",
