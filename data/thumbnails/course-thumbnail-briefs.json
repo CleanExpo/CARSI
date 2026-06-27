@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-06-24T03:09:09.513Z",
+  "generatedAt": "2026-06-27T04:47:09.227Z",
   "briefs": [
     {
       "slug": "air-quality-and-odour-identification-and-deodorisation-essentials",
@@ -398,6 +398,24 @@
       "composition": "keep the upper-left third calm, darker and uncluttered for a white course title overlay; place the equipment/clean-floor subject toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that keeps the subject readable",
       "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage text, no UI, no readable displays, no human faces, no children, no people",
       "authorNote": "Commercial floor care (carpet, tile, vinyl strip & seal, pressure washing) for schools/childcare — no IICRC discipline (keep null, no CEC overclaim). Imagery must be child-safe: empty, spotless facility + equipment, absolutely no children or faces."
+    },
+    {
+      "slug": "floor-care-onboarding-operational-readiness",
+      "title": "CARSI Maintenance Company Onboarding — Professional Floor Care & Operational Readiness",
+      "discipline": null,
+      "concept": "A professional technician maintaining a gleaming hard floor in a bright, empty school or childcare corridor before the day begins — safe, clean and ready to open.",
+      "motifs": [
+        "a freshly cleaned vinyl or tiled corridor with a soft, even sheen",
+        "a professional floor scrubber or burnisher at rest, clean and ready",
+        "a discreet wet-floor sign and a tidy equipment trolley",
+        "early-morning daylight through large windows in an empty education facility"
+      ],
+      "palette": "CARSI blue with warm safety-orange accents against clean neutrals and bright daylight",
+      "mood": "calm, professional, trustworthy; safety and operational readiness; Australian facilities-maintenance training",
+      "style": "photoreal",
+      "composition": "keep the upper-left third calm, darker and uncluttered so a white course title can be overlaid; place the floor and equipment toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that does not bury the subject",
+      "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage, no UI, no readable displays, no human faces",
+      "authorNote": "Internal staff onboarding for professional floor care in sensitive facilities (schools/childcare/public buildings). Motifs evoke a safe, clean, ready-to-open facility without literal branding or faces. Not an IICRC discipline, so no discipline accent colour."
     }
   ]
 }
