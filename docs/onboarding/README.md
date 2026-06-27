@@ -1,5 +1,9 @@
 # CARSI Maintenance Company Onboarding
 
+> **Going live?** Start at [`HANDOFF.md`](./HANDOFF.md) — the operator runbook for seeding,
+> smoke-testing, the access-control decision, publishing, and the deferred builds (subscription
+> billing, company placeholders). It covers everything that must run against production.
+
 The umbrella brand for CARSI Maintenance Company's staff onboarding programs. Each program inducts new
 technicians, supervisors and facilities staff to a single standard for safe, professional, consistent
 service delivery across sensitive sites — schools, childcare, education, public buildings, commercial

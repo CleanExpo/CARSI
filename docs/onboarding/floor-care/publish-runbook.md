@@ -1,5 +1,9 @@
 # Publish Runbook — Floor Care Onboarding course
 
+> **Operators:** the authoritative handoff with safety controls (DB snapshot, drift check, the
+> `isFree` access-control decision) and the deferred builds is [`../HANDOFF.md`](../HANDOFF.md). This
+> file is the concise publish sequence; HANDOFF.md supersedes it for go-live.
+
 How to verify and take the `floor-care-onboarding-operational-readiness` course live. The course is
 branded (**CARSI Maintenance Company Onboarding — Professional Floor Care & Operational Readiness**) and
 currently `status: draft` / `isPublished: false` in `data/seed/courses-catalog.json`.
