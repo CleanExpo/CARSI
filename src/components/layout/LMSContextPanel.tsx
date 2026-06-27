@@ -119,6 +119,16 @@ export function LMSContextPanel() {
         </nav>
 
         <div className="mt-6 border-t border-slate-200 pt-4">
+          <p className="mb-2 px-3 text-[10px] font-semibold tracking-wider text-slate-500 uppercase">
+            Program types
+          </p>
+          <Link
+            href="/dashboard/onboarding"
+            className="mb-3 flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-[#146fc2] transition hover:bg-[#eef7ff]"
+          >
+            <Building2 className="h-4 w-4 shrink-0" aria-hidden />
+            Organisation onboarding
+          </Link>
           <button
             type="button"
             onClick={() => setFiltersOpen((v) => !v)}
