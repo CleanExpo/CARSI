@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { Metadata } from 'next';
 import { CoursesIndexLink } from '@/components/lms/CoursesIndexLink';
 import { EnrolButton } from '@/components/lms/EnrolButton';
@@ -8,6 +8,7 @@ import { CourseThumbnail } from '@/components/lms/CourseThumbnail';
 import { CourseHubContext } from '@/components/lms/CourseHubContext';
 import { CourseSchema, BreadcrumbSchema } from '@/components/seo';
 import { getBackendOrigin, getPublicSiteUrl } from '@/lib/env/public-url';
+import { isOnboardingCourse } from '@/lib/onboarding/enterprise';
 import { normalizePublicAssetUrl } from '@/lib/remote-image';
 import { getPublishedCourseDetailBySlugFromDatabase } from '@/lib/server/public-courses-list';
 
@@ -263,6 +264,10 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
   const course = await getCourse(slug);
 
   if (!course) notFound();
+
+  if (isOnboardingCourse({ slug: course.slug, category: course.category })) {
+    redirect(`/dashboard/onboarding/${course.slug}`);
+  }
 
   const priceNum = parseFloat(course.price_aud);
   const price = course.is_free || priceNum === 0 ? 'Free' : `$${priceNum.toFixed(0)}`;
