@@ -45,6 +45,7 @@ import {
   type LessonVideoResource,
   type VideoBriefsFile,
 } from '../src/lib/video/course-lesson-video-briefs-types';
+import { buildSrt, mergeVideoResource } from '../src/lib/video/lesson-video-helpers';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const CATALOG_PATH = join(__dirname, '..', 'data', 'seed', 'courses-catalog.json');
@@ -187,39 +188,6 @@ async function scaffold(timestamp: string, force: boolean): Promise<void> {
   const authored = briefs.filter(isVideoBriefComplete).length;
   console.log(`Scaffolded ${briefs.length} brief(s) → ${BRIEFS_PATH}`);
   console.log(`  ${authored} authored, ${briefs.length - authored} awaiting a script.`);
-}
-
-// ---------------------------------------------------------------------------
-// SRT caption track (built from the script; mirrors automate-brand-videos.ts)
-// ---------------------------------------------------------------------------
-
-function formatSrtTime(seconds: number): string {
-  const ms = Math.floor((seconds % 1) * 1000);
-  const total = Math.floor(seconds);
-  const s = total % 60;
-  const m = Math.floor(total / 60) % 60;
-  const h = Math.floor(total / 3600);
-  const pad = (n: number, w = 2) => String(n).padStart(w, '0');
-  return `${pad(h)}:${pad(m)}:${pad(s)},${pad(ms, 3)}`;
-}
-
-/** Approximate caption timing from sentence length (~15 chars/sec spoken). */
-function buildSrt(script: string): string {
-  const sentences = script
-    .replace(/\s+/g, ' ')
-    .match(/[^.!?]+[.!?]*/g)
-    ?.map((s) => s.trim())
-    .filter(Boolean) ?? [script.trim()];
-  let cursor = 0;
-  return sentences
-    .map((sentence, index) => {
-      const duration = Math.max(1.6, sentence.length / 15);
-      const start = cursor;
-      const end = cursor + duration;
-      cursor = end;
-      return `${index + 1}\n${formatSrtTime(start)} --> ${formatSrtTime(end)}\n${sentence}\n`;
-    })
-    .join('\n');
 }
 
 // ---------------------------------------------------------------------------
