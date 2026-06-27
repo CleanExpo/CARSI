@@ -3,6 +3,7 @@
 import {
   Award,
   BookOpen,
+  Building2,
   ChevronDown,
   FileText,
   GraduationCap,
@@ -38,6 +39,7 @@ type NavItem = {
 
 const primaryNav: NavItem[] = [
   { href: '/dashboard', label: 'Overview', icon: LayoutDashboard },
+  { href: '/dashboard/onboarding', label: 'Onboarding', icon: Building2 },
   { href: '/dashboard/courses', label: 'Browse courses', icon: BookOpen },
   { href: '/dashboard/student', label: 'My learning', icon: GraduationCap },
   { href: '/dashboard/student/profile', label: 'Profile', icon: User },
