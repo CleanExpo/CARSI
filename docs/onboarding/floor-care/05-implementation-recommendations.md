@@ -52,6 +52,12 @@ recurring subscription billing (Stripe) is a separate build** and is not part of
 
 ## 3. Add video training (where it earns its place)
 
+> **Built.** A per-lesson video pipeline is wired: 27 lesson scripts in
+> `data/video/course-lesson-video-briefs.json` and a generator (`npm run video:lessons:plan` /
+> `video:lessons:generate`) that renders HeyGen avatar videos with SRT subtitles and writes them into
+> each lesson's `resources`. It is language-ready (English + subtitles now; other languages later).
+> Run it per `video-runbook.md` on a machine with the API keys — it is spend-bearing and manual.
+
 Video is worth it for the things words struggle to show — **technique and safety**:
 
 - Priority clips: PPE selection from an SDS; correct labelling/decanting; machine setup and safe
