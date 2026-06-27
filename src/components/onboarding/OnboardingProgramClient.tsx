@@ -155,7 +155,7 @@ export function OnboardingProgramClient({ slug }: { slug: string }) {
   }
 
   return (
-    <div className="w-full space-y-10 px-4 py-8 sm:px-6 lg:py-10">
+    <div className="w-full max-w-none space-y-10 pb-16">
       <nav className="text-sm text-slate-500">
         <Link href="/dashboard/onboarding" className="hover:text-[#146fc2]">
           Onboarding
