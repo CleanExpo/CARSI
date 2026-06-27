@@ -5,18 +5,20 @@ import { Search, SlidersHorizontal } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useTheme } from '@/components/ThemeProvider';
+import { isOnboardingCourse } from '@/lib/onboarding/enterprise';
 import { CourseCard } from './CourseCard';
 import { CourseGridSkeleton } from './CourseCardSkeleton';
 
 const smoothEase: [number, number, number, number] = [0.4, 0, 0.2, 1];
 
-const DISCIPLINE_TABS = ['All', 'WRT', 'CRT', 'ASD', 'OCT', 'CCT', 'FSRT', 'AMRT', 'Free'] as const;
+const DISCIPLINE_TABS = ['All', 'Onboarding', 'WRT', 'CRT', 'ASD', 'OCT', 'CCT', 'FSRT', 'AMRT', 'Free'] as const;
 type DisciplineTab = (typeof DISCIPLINE_TABS)[number];
 type PriceFilter = 'all' | 'free' | 'paid';
 type CecFilter = 'all' | 'has-cec';
 type DurationFilter = 'all' | 'short' | 'medium' | 'long';
 
 const tabColors: Record<string, string> = {
+  Onboarding: '#ed9d24',
   WRT: '#0f5fa8',
   CRT: '#26c4a0',
   ASD: '#6c63ff',
@@ -84,6 +86,9 @@ function sortCourses(courses: Course[], sortBy: SortKey): Course[] {
 
 function matchesDiscipline(course: Course, tab: DisciplineTab): boolean {
   if (tab === 'All') return true;
+  if (tab === 'Onboarding') {
+    return isOnboardingCourse({ slug: course.slug, category: course.category });
+  }
   if (tab === 'Free') {
     const p = priceNum(course.price_aud);
     return course.is_free === true || p === 0;
