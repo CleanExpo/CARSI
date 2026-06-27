@@ -1,7 +1,9 @@
 import Link from 'next/link';
-import { Award, CheckCircle2, Download, PartyPopper } from 'lucide-react';
+import { Award, Building2, CheckCircle2, Download, PartyPopper } from 'lucide-react';
 
 import { CertificatePreview } from '@/components/lms/diagrams/CertificatePreview';
+import { dash } from '@/lib/dashboard-light-ui';
+import { FLOOR_CARE_ONBOARDING_SLUG, isOnboardingCourse, ONBOARDING_BRAND } from '@/lib/onboarding/enterprise';
 import type { PublicCredentialJson } from '@/lib/server/credential-public';
 
 type Props = {
@@ -24,6 +26,13 @@ export function CredentialVerificationPageContent({
 }: Props) {
   const pdfUrl = `/api/lms/credentials/${encodeURIComponent(credentialId)}?pdf=1`;
   const cecSubmitted = cecSubmissionStatus === 'sent';
+  const isOnboardingCredential =
+    courseSlug != null &&
+    isOnboardingCourse({ slug: courseSlug });
+  const onboardingHubHref =
+    courseSlug && courseSlug !== FLOOR_CARE_ONBOARDING_SLUG
+      ? `/dashboard/onboarding/${courseSlug}`
+      : `/dashboard/onboarding/${FLOOR_CARE_ONBOARDING_SLUG}`;
   const cecSubmittedLabel = cecSubmittedAt
     ? new Date(cecSubmittedAt).toLocaleString(undefined, {
         dateStyle: 'medium',
@@ -35,17 +44,44 @@ export function CredentialVerificationPageContent({
     <div className="w-full max-w-6xl">
       {justCompleted ? (
         <div
-          className="mt-6 rounded-2xl border border-emerald-500/25 bg-gradient-to-br from-emerald-500/15 via-[#2490ed]/10 to-transparent px-5 py-5 sm:px-7"
+          className={
+            isOnboardingCredential
+              ? 'mt-6 overflow-hidden rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50 via-white to-[#eef7ff] px-5 py-6 sm:px-8'
+              : 'mt-6 rounded-2xl border border-emerald-500/25 bg-gradient-to-br from-emerald-500/15 via-[#2490ed]/10 to-transparent px-5 py-5 sm:px-7'
+          }
           role="status"
         >
-          <p className="flex flex-wrap items-center gap-2 text-lg font-semibold text-white">
-            <PartyPopper className="h-5 w-5 text-amber-300" aria-hidden />
-            Course complete!
+          {isOnboardingCredential ? (
+            <p className={dash.eyebrow}>{ONBOARDING_BRAND}</p>
+          ) : null}
+          <p
+            className={`mt-2 flex flex-wrap items-center gap-2 text-lg font-semibold ${
+              isOnboardingCredential ? 'text-slate-900' : 'text-white'
+            }`}
+          >
+            <PartyPopper
+              className={`h-5 w-5 ${isOnboardingCredential ? 'text-amber-500' : 'text-amber-300'}`}
+              aria-hidden
+            />
+            {isOnboardingCredential ? 'Operational readiness achieved' : 'Course complete!'}
           </p>
-          <p className="mt-2 text-sm text-white/70">
-            You finished <span className="font-medium text-white/90">{credential.course_title}</span>.
-            View your certificate below or download the PDF.
+          <p
+            className={`mt-2 text-sm ${isOnboardingCredential ? 'text-slate-600' : 'text-white/70'}`}
+          >
+            You finished{' '}
+            <span className={`font-medium ${isOnboardingCredential ? 'text-slate-900' : 'text-white/90'}`}>
+              {credential.course_title?.replace(`${ONBOARDING_BRAND} — `, '')}
+            </span>
+            . View your certificate below or download the PDF for your organisation records.
           </p>
+          {isOnboardingCredential ? (
+            <div className="mt-4 flex flex-wrap gap-3">
+              <Link href={onboardingHubHref} className={dash.btnSecondary}>
+                <Building2 className="h-4 w-4" aria-hidden />
+                Program hub
+              </Link>
+            </div>
+          ) : null}
         </div>
       ) : null}
 
@@ -68,7 +104,7 @@ export function CredentialVerificationPageContent({
 
       <header className="mt-8 text-center">
         <p className="text-[11px] font-semibold tracking-[0.2em] text-[#146fc2] uppercase">
-          Certificate
+          {isOnboardingCredential ? 'Program credential' : 'Certificate'}
         </p>
         <h1 className="mt-2 text-2xl font-bold text-slate-900">{credential.course_title}</h1>
         <p className="mt-1 text-sm text-slate-500">{credential.student_name}</p>
