@@ -1,14 +1,20 @@
-# Professional Floor Care Onboarding & Operational Readiness Program
+# CARSI Maintenance Company Onboarding — Professional Floor Care & Operational Readiness
+
+> Part of **CARSI Maintenance Company Onboarding** (the umbrella brand —
+> [`../README.md`](../README.md)). The operating company is **CARSI Maintenance Company**.
 
 > **This onboarding program teaches staff that professional floor care is not just cleaning. It is a
 > safety, hygiene, presentation, asset-protection, and operational-readiness service. Every
 > technician must understand the surfaces, chemicals, equipment, risks, site expectations, and
 > professional standards required to deliver consistent results in sensitive facilities.**
 
-This pack is the master onboarding program for technicians, supervisors and facilities staff who
-deliver floor surface cleaning, polishing, sealing, maintenance and hygiene services across schools,
-childcare and education facilities, public buildings, commercial sites and other high-traffic
-environments.
+This pack is the master onboarding program for CARSI Maintenance Company technicians, supervisors and
+facilities staff who deliver floor surface cleaning, polishing, sealing, maintenance and hygiene
+services across schools, childcare and education facilities, public buildings, commercial sites and
+other high-traffic environments.
+
+> **Availability:** delivered to client organisations as a subscription — **AUD $1,295/month + GST,
+> unlimited students**. See [`../README.md`](../README.md) and `publish-runbook.md`.
 
 It is written in Australian English and in plain trade language. It is built to be used as a real
 onboarding document, training manual, induction pack, supervisor checklist set, and the source
@@ -35,6 +41,7 @@ content for a future LMS course.
 | `03-assessment-framework.md` | Assessment framework — how competency is checked and signed off | Trainers, supervisors |
 | `04-pathways-30-60-90.md` | 30-day onboarding, 60-day competency and 90-day independent-operator pathways | HR, supervisors |
 | `05-implementation-recommendations.md` | Next steps — LMS, video training, SOPs, toolbox talks | Management, L&D |
+| `publish-runbook.md` | Verify & publish the LMS course (seed order, smoke test, go-live) | Operators, L&D |
 
 Supporting evidence for the claims in this pack sits in
 `data/courses/floor-care-onboarding-operational-readiness/research.md` (source-cited, confidence-rated).
