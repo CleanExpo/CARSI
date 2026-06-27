@@ -3062,9 +3062,9 @@
     {
       "id": "6011d465-1981-487b-84e3-a53b10a2bd07",
       "slug": "floor-care-onboarding-operational-readiness",
-      "title": "Professional Floor Care Onboarding & Operational Readiness",
-      "description": "<p>The internal onboarding program for floor-care technicians, supervisors and facilities staff who deliver cleaning, polishing, sealing, maintenance and hygiene services across schools, childcare, education, public buildings, commercial and high-traffic facilities.</p><p>Twelve modules take a new starter from induction to independent operator: what professional floor care is and why it matters, health and hygiene in child-sensitive environments, WHS/PPE/SDS and chemical safety, surface identification, methods, machinery, vehicle and equipment readiness, site setup and hazard control, professional conduct, confidentiality and CCTV awareness, job completion and evidence, and a final practical assessment. Written in Australian English; training supports good judgement and does not replace the SDS/TDS, standards, or a site&rsquo;s own rules.</p>",
-      "shortDescription": "Internal onboarding for floor-care technicians, supervisors and facilities staff — safety, hygiene, methods, operational readiness and professional conduct across sensitive sites.",
+      "title": "CARSI Maintenance Company Onboarding — Professional Floor Care & Operational Readiness",
+      "description": "<p><strong>Part of CARSI Maintenance Company Onboarding.</strong> The internal induction for CARSI Maintenance Company floor-care technicians, supervisors and facilities staff who deliver cleaning, polishing, sealing, maintenance and hygiene services across schools, childcare, education, public buildings, commercial and high-traffic facilities.</p><p>Twelve modules take a new starter from induction to independent operator: what professional floor care is and why it matters, health and hygiene in child-sensitive environments, WHS/PPE/SDS and chemical safety, surface identification, methods, machinery, vehicle and equipment readiness, site setup and hazard control, professional conduct, confidentiality and CCTV awareness, job completion and evidence, and a final practical assessment. Each module ends in an auto-marked knowledge check. Written in Australian English; training supports good judgement and does not replace the SDS/TDS, standards, or a site&rsquo;s own rules.</p>",
+      "shortDescription": "CARSI Maintenance Company Onboarding — the floor-care induction for technicians, supervisors and facilities staff: safety, hygiene, methods, operational readiness and professional conduct across sensitive sites.",
       "thumbnailUrl": null,
       "instructorId": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
       "status": "draft",
@@ -3072,12 +3072,13 @@
       "isFree": true,
       "durationHours": 8,
       "level": "Foundational",
-      "category": "Facilities Management",
+      "category": "CARSI Maintenance Company Onboarding",
       "tags": [
+        "CARSI Maintenance Company Onboarding",
+        "facilities management",
         "floor care",
         "onboarding",
         "WHS",
-        "facilities management",
         "operational readiness"
       ],
       "iicrcDiscipline": null,
@@ -3085,7 +3086,17 @@
       "meta": {
         "audience": "internal staff",
         "program": "Professional Floor Care Onboarding & Operational Readiness Program",
-        "docs": "docs/onboarding/floor-care/"
+        "docs": "docs/onboarding/floor-care/",
+        "brand": "CARSI Maintenance Company Onboarding",
+        "company": "CARSI Maintenance Company",
+        "pricing": {
+          "model": "org_subscription",
+          "billingCycle": "monthly",
+          "amountAud": 1295,
+          "gst": "exclusive",
+          "seats": "unlimited",
+          "note": "Organisation subscription: AUD $1,295/month + GST, unlimited students. Provisioned manually; recurring billing is not yet wired (Stripe subscription build is separate)."
+        }
       },
       "isPublished": false,
       "modules": [

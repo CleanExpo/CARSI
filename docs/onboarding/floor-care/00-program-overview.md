@@ -1,5 +1,8 @@
 # Program Overview — Professional Floor Care Onboarding & Operational Readiness
 
+> Part of **CARSI Maintenance Company Onboarding**. Operating company: **CARSI Maintenance Company**.
+> Delivered to client organisations as a subscription — **AUD $1,295/month + GST, unlimited students**.
+
 > This onboarding program teaches staff that professional floor care is not just cleaning. It is a
 > safety, hygiene, presentation, asset-protection, and operational-readiness service. Every
 > technician must understand the surfaces, chemicals, equipment, risks, site expectations, and
@@ -9,7 +12,8 @@
 
 ## 1. Executive summary
 
-We deliver professional floor surface cleaning, polishing, sealing, maintenance and hygiene services
+CARSI Maintenance Company delivers professional floor surface cleaning, polishing, sealing, maintenance
+and hygiene services
 across sensitive environments — schools, childcare and education facilities, public buildings,
 commercial sites and high-traffic facilities. In these places the floor is one of the most used,
 most visible and highest-risk surfaces on site. The way we clean and maintain it affects hygiene,

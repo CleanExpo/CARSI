@@ -36,6 +36,15 @@ safety/reputation-critical modules, 80–85% elsewhere).
 > ```
 > Run the catalogue seed first (the quiz needs its course to exist); both steps are idempotent.
 
+**Publishing.** To verify and take the course live, follow `publish-runbook.md` (seed order, quiz
+smoke-test, go-live and rollback). Publishing is an operator step against the production database.
+
+**Pricing / billing.** The course is sold as a **CARSI Maintenance Company Onboarding** organisation
+subscription — **AUD $1,295/month + GST, unlimited students** — recorded on the course in `meta.pricing`
+and in `docs/onboarding/README.md`. It is provisioned for the client (not individual self-checkout), so
+the course is kept `isFree`/`$0` in the catalogue to avoid a misleading one-off price. **Wiring the
+recurring subscription billing (Stripe) is a separate build** and is not part of this content work.
+
 **Recommended next LMS steps:**
 - Track practical sign-offs against the learner record so the 30/60/90 gates are visible to supervisors.
 - Only publish (move off draft) once content is reviewed against the guardrails and the company
