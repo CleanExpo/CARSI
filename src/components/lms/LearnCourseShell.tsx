@@ -370,6 +370,7 @@ export function LearnCourseShell({ slug }: { slug: string }) {
 
   async function toggleComplete(completed: boolean) {
     if (!activeLessonId) return;
+    const lessonToAdvance = completed ? nextLesson : null;
     setSavingComplete(true);
     try {
       await apiClient.patch(`/api/lms/lessons/${encodeURIComponent(activeLessonId)}/progress`, {
@@ -450,9 +451,14 @@ export function LearnCourseShell({ slug }: { slug: string }) {
         router.push(
           `/dashboard/credentials/${encodeURIComponent(certificateEnrollmentId)}?completed=1&course=${encodeURIComponent(slug)}`,
         );
-      } else if (nextShare) {
-        setShareDraft(nextShare);
-        if (nextShareKey) shownShareKeysRef.current.add(nextShareKey);
+      } else {
+        if (nextShare) {
+          setShareDraft(nextShare);
+          if (nextShareKey) shownShareKeysRef.current.add(nextShareKey);
+        }
+        if (lessonToAdvance) {
+          selectLesson(lessonToAdvance.id);
+        }
       }
     } finally {
       setSavingComplete(false);
