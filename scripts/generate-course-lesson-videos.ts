@@ -302,20 +302,9 @@ async function loadResults(): Promise<ResultsFile> {
 }
 
 // ---------------------------------------------------------------------------
-// Persistence into lesson resources (idempotent per language)
+// Persistence into lesson resources (idempotent per language) — mergeVideoResource is imported
+// from src/lib/video/lesson-video-helpers.ts
 // ---------------------------------------------------------------------------
-
-function mergeVideoResource(existing: unknown, res: LessonVideoResource): LessonVideoResource[] {
-  const base = Array.isArray(existing)
-    ? (existing as unknown[]).filter((r) => {
-        if (typeof r !== 'object' || r === null) return true;
-        const o = r as Record<string, unknown>;
-        // keep non-video resources and video resources for OTHER languages
-        return o.kind !== 'video' || (o.language ?? 'en-AU') !== (res.language ?? 'en-AU');
-      })
-    : [];
-  return [...(base as LessonVideoResource[]), res];
-}
 
 async function persistToSeed(updates: Map<string, LessonVideoResource>): Promise<number> {
   const catalog = await readCatalog();
