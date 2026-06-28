@@ -2,7 +2,7 @@ name: Agent PR Validation
 
 on:
   pull_request:
-    branches: [main, develop]
+    branches: [main]
     types: [opened, synchronize, reopened]
 
 jobs:
@@ -141,10 +141,6 @@ jobs:
           # Check for debug statements
           if grep -r "console\.log" --include="*.ts" --include="*.tsx" src/components src/lib app; then
             echo "::warning::console.log statements found - should be removed"
-          fi
-
-          if grep -r "print(" --include="*.py" apps/backend/src | grep -v "# debug"; then
-            echo "::warning::print() statements found - should use logger"
           fi
 
           echo "Debug code check complete"

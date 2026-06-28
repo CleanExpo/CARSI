@@ -36,11 +36,6 @@
     "**/*.test.ts",
     "src/__tests__/**/*",
     "tests/**/*",
-    "src/components/JobCard.tsx",
-    "src/lib/image-generation/*",
-    "src/lib/image-generation/**/*",
-    "app/api/generate-image/*",
-    "src/hooks/use-image-generation.ts",
     "packages/news-worker/**/*"
   ]
 }
