@@ -1,9 +1,12 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 import { ONBOARDING_COOKIE } from '@/lib/auth/onboarding-cookie';
 
-export async function POST() {
-  const response = NextResponse.json({ success: true });
+export async function POST(request: NextRequest) {
+  const acceptsHtml = request.headers.get('accept')?.includes('text/html') ?? false;
+  const response = acceptsHtml
+    ? NextResponse.redirect(new URL('/login', request.url), { status: 303 })
+    : NextResponse.json({ success: true });
 
   const clearOptions = {
     secure: process.env.NODE_ENV === 'production',
