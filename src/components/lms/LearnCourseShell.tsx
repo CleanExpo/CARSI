@@ -864,7 +864,13 @@ export function LearnCourseShell({ slug }: { slug: string }) {
                             scorePercent={quizResult.score_percent}
                             passPercentage={quizData.pass_percentage}
                             onContinue={() => {
-                              if (nextLesson) selectLesson(nextLesson.id);
+                              // Must pass to advance; a failed check re-opens the
+                              // quiz for another attempt instead of moving on.
+                              if (quizResult.passed) {
+                                if (nextLesson) selectLesson(nextLesson.id);
+                              } else {
+                                setQuizResult(null);
+                              }
                             }}
                           />
                         </div>
