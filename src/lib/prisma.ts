@@ -14,6 +14,23 @@ const PRISMA_CLIENT_PLACEHOLDER_URL =
 
 let cachedCaPath: string | undefined;
 
+export function normalizePostgresSslMode(connectionString: string): string {
+  try {
+    const url = new URL(connectionString);
+    if (url.protocol !== 'postgresql:' && url.protocol !== 'postgres:') {
+      return connectionString;
+    }
+    const sslMode = url.searchParams.get('sslmode');
+    if (sslMode === 'require' || sslMode === 'prefer' || sslMode === 'verify-ca') {
+      url.searchParams.set('sslmode', 'verify-full');
+      return url.toString();
+    }
+    return connectionString;
+  } catch {
+    return connectionString;
+  }
+}
+
 /**
  * Connection string for PrismaPg. Does not mutate `process.env.DATABASE_URL`.
  * When DATABASE_URL is unset (CI/build), uses a placeholder so the module can load; real
@@ -25,9 +42,11 @@ function getConnectionStringForAdapter(): string {
     return PRISMA_CLIENT_PLACEHOLDER_URL;
   }
 
+  const connectionString = normalizePostgresSslMode(base);
+
   const b64 = process.env.DATABASE_CA_CERT?.trim();
   if (!b64) {
-    return base;
+    return connectionString;
   }
 
   if (!cachedCaPath) {
@@ -37,8 +56,8 @@ function getConnectionStringForAdapter(): string {
     cachedCaPath = certPath;
   }
 
-  const sep = base.includes('?') ? '&' : '?';
-  return `${base}${sep}sslrootcert=${encodeURIComponent(cachedCaPath)}`;
+  const sep = connectionString.includes('?') ? '&' : '?';
+  return `${connectionString}${sep}sslrootcert=${encodeURIComponent(cachedCaPath)}`;
 }
 
 function createClient() {
