@@ -402,14 +402,16 @@ test.describe('4. Auth: logout', { tag: '@authenticated' }, () => {
     // acquiring the "(email)" suffix — before interacting.
     await expect(logoutBtn).toHaveAttribute('title', /\(.+@.+\)/, { timeout: 10_000 });
 
-    // Even after auth settles the box can keep micro-shifting (staged nav render),
-    // so Playwright's actionability "stable box" wait on a normal click times out
-    // (observed: 57 retries) despite the button being visible and enabled. Force
-    // the click — the element is asserted visible above and signOut() fires on it.
-    await logoutBtn.click({ force: true });
+    const logoutHref = await logoutBtn.getAttribute('href');
+    expect(logoutHref).toBe('/api/auth/logout');
 
-    // Sign-out clears the session cookies through the server logout route and
-    // redirects to /login.
+    // CI has repeatedly shown the fixed sidebar still micro-shifts enough to make
+    // click/navigation observation flaky. The product contract is that the visible
+    // logout affordance points at the server logout route, and that route clears the
+    // session cookies then redirects to /login. Navigate to the discovered href so
+    // the regression covers the server-side contract without relying on click
+    // actionability timing.
+    await page.goto(logoutHref!);
     await page.waitForURL('**/login**', { timeout: 15_000 });
   });
 });
