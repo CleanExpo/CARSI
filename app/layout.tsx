@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import { headers } from 'next/headers';
 import { Outfit, DM_Sans } from 'next/font/google';
 import './globals.css';
 import { AppToastProvider } from '@/hooks/use-toast';
@@ -97,17 +98,21 @@ export const viewport: Viewport = {
   maximumScale: 5,
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Per-request CSP nonce set by middleware — applied to the inline theme
+  // bootstrap so it runs under the nonce-based CSP (no 'unsafe-inline').
+  const nonce = (await headers()).get('x-nonce') ?? undefined;
   return (
     <html lang="en-AU" suppressHydrationWarning>
       <head>
         <OrganizationSchema />
         <WebsiteSchema />
         <script
+          nonce={nonce}
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var t=localStorage.getItem('carsi-theme');if(t==='dark')document.documentElement.classList.add('dark');}catch(e){}})();`,
           }}

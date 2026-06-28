@@ -15,6 +15,7 @@ import { isValidAdminSessionCookie } from '@/lib/admin/admin-session-edge';
 import type { SessionClaims } from '@/lib/auth/session-jwt';
 import { verifySessionToken } from '@/lib/auth/session-jwt';
 import { internalToolsEnabled, isInternalToolPath } from '@/lib/internal-tools';
+import { buildContentSecurityPolicy } from '@/lib/security/csp';
 
 interface User {
   id: string;
@@ -61,7 +62,24 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url, 308);
   }
 
-  const response = NextResponse.next();
+  // Per-request CSP nonce: propagate via the request header (so Next applies it
+  // to its own scripts and the layout can read it) and set the CSP on the
+  // response. strict-dynamic + nonce replaces script-src 'unsafe-inline'.
+  const nonce = crypto.randomUUID();
+  const isDev = process.env.NODE_ENV === 'development';
+  const appOrigin = (
+    process.env.NEXT_PUBLIC_APP_URL ||
+    process.env.NEXT_PUBLIC_FRONTEND_URL ||
+    'http://localhost:3000'
+  ).trim();
+  const csp = buildContentSecurityPolicy(nonce, isDev, appOrigin);
+
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set('x-nonce', nonce);
+  requestHeaders.set('content-security-policy', csp);
+
+  const response = NextResponse.next({ request: { headers: requestHeaders } });
+  response.headers.set('Content-Security-Policy', csp);
 
   const token = request.cookies.get('auth_token')?.value;
 
