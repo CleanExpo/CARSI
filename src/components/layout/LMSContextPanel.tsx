@@ -15,7 +15,7 @@ import {
   Users,
 } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 
 import { useAuth } from '@/components/auth/auth-provider';
@@ -52,7 +52,6 @@ const primaryNav: NavItem[] = [
 
 export function LMSContextPanel() {
   const pathname = usePathname();
-  const router = useRouter();
   const { user, signOut } = useAuth();
   const [filtersOpen, setFiltersOpen] = useState(false);
 
@@ -62,7 +61,7 @@ export function LMSContextPanel() {
 
   async function handleSignOut() {
     await signOut();
-    router.push('/login');
+    window.location.assign('/login');
   }
 
   return (

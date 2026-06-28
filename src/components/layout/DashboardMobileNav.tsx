@@ -16,7 +16,7 @@ import {
   X,
 } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import { useAuth } from '@/components/auth/auth-provider';
@@ -43,7 +43,6 @@ const primaryNav: NavItem[] = [
 
 export function DashboardMobileNav() {
   const pathname = usePathname();
-  const router = useRouter();
   const { user, signOut } = useAuth();
   const [open, setOpen] = useState(false);
   const section = getDashboardSectionLabel(pathname);
@@ -63,7 +62,7 @@ export function DashboardMobileNav() {
 
   async function handleSignOut() {
     await signOut();
-    router.push('/login');
+    window.location.assign('/login');
   }
 
   return (
