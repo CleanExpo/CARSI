@@ -15,7 +15,7 @@ import {
   Users,
 } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 
 import { useAuth } from '@/components/auth/auth-provider';
@@ -52,18 +52,12 @@ const primaryNav: NavItem[] = [
 
 export function LMSContextPanel() {
   const pathname = usePathname();
-  const router = useRouter();
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   const [filtersOpen, setFiltersOpen] = useState(false);
 
   const isAdmin = user?.roles?.includes('admin') ?? false;
   const isInstructor = isAdmin || (user?.roles?.includes('instructor') ?? false);
   const section = getDashboardSectionLabel(pathname);
-
-  async function handleSignOut() {
-    await signOut();
-    router.push('/login');
-  }
 
   return (
     <aside
@@ -165,15 +159,15 @@ export function LMSContextPanel() {
 
       {/* Fixed footer — sign out always visible */}
       <div className="shrink-0 border-t border-slate-200 px-2 py-3">
-        <button
-          type="button"
-          onClick={() => void handleSignOut()}
+        <a
+          href="/api/auth/logout"
+          data-testid="dashboard-sign-out"
           className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-950"
           title={user?.email ? `Sign out (${user.email})` : 'Sign out'}
         >
           <LogOut className="h-4 w-4 shrink-0 opacity-90" aria-hidden />
           <span className="min-w-0 truncate">Sign out</span>
-        </button>
+        </a>
       </div>
     </aside>
   );

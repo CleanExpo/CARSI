@@ -16,7 +16,7 @@ import {
   X,
 } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import { useAuth } from '@/components/auth/auth-provider';
@@ -43,7 +43,6 @@ const primaryNav: NavItem[] = [
 
 export function DashboardMobileNav() {
   const pathname = usePathname();
-  const router = useRouter();
   const { user, signOut } = useAuth();
   const [open, setOpen] = useState(false);
   const section = getDashboardSectionLabel(pathname);
@@ -63,7 +62,7 @@ export function DashboardMobileNav() {
 
   async function handleSignOut() {
     await signOut();
-    router.push('/login');
+    window.location.assign('/login');
   }
 
   return (
@@ -132,6 +131,7 @@ export function DashboardMobileNav() {
             <div className="border-t border-slate-200 p-2">
               <button
                 type="button"
+                data-testid="mobile-dashboard-sign-out"
                 onClick={() => void handleSignOut()}
                 className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-slate-600 hover:bg-slate-100"
               >
