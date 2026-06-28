@@ -7,7 +7,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import type Stripe from 'stripe';
 
-import { constructWebhookEvent } from '@/lib/api/stripe';
+import { constructWebhookEvent, getStripeClient } from '@/lib/api/stripe';
 import { processCcwRoadshowBookingConfirmation } from '@/lib/server/ccw-roadshow-booking-email';
 import { getAppOrigin } from '@/lib/server/app-url';
 import { notifyCrmEnrollmentCreated } from '@/lib/server/crm-enrollment-notify';
@@ -23,12 +23,46 @@ import {
 import { fulfillCourseCheckoutForUser } from '@/lib/server/team-course-purchase';
 import { shouldRetryWebhookFulfillment } from '@/lib/server/stripe-webhook-policy';
 import { resolveStripePaymentReference } from '@/lib/server/stripe-payment-reference';
+import { revokeEnrollmentsByPaymentReference } from '@/lib/server/stripe-revocation';
 
 type StripeWebhookEventDelegate = {
   create(args: { data: { id: string; type: string } }): Promise<unknown>;
   update(args: { where: { id: string }; data: { processedAt: Date } }): Promise<unknown>;
   delete(args: { where: { id: string } }): Promise<unknown>;
+  findUnique(args: {
+    where: { id: string };
+  }): Promise<{ processedAt: Date | null; createdAt: Date } | null>;
 };
+
+/**
+ * Revoke course access when a payment is reversed (refund or chargeback).
+ * Maps the charge's payment intent back to the checkout session(s) whose id was
+ * stored as the enrollment paymentReference at fulfillment.
+ */
+async function handleStripeRevocation(event: Stripe.Event): Promise<void> {
+  const reason = event.type === 'charge.dispute.created' ? 'disputed' : 'refunded';
+  let paymentIntentId: string | null = null;
+
+  if (event.type === 'charge.refunded') {
+    const charge = event.data.object as Stripe.Charge;
+    // Only a FULL refund revokes access; ignore partial refunds.
+    if (typeof charge.amount === 'number' && charge.amount_refunded < charge.amount) return;
+    paymentIntentId = typeof charge.payment_intent === 'string' ? charge.payment_intent : null;
+  } else {
+    const dispute = event.data.object as Stripe.Dispute;
+    paymentIntentId = typeof dispute.payment_intent === 'string' ? dispute.payment_intent : null;
+  }
+  if (!paymentIntentId) return;
+
+  const sessions = await getStripeClient().checkout.sessions.list({
+    payment_intent: paymentIntentId,
+    limit: 10,
+  });
+  for (const s of sessions.data) {
+    const ref = resolveStripePaymentReference(s.id);
+    if (ref) await revokeEnrollmentsByPaymentReference(ref, reason);
+  }
+}
 
 export async function POST(request: NextRequest) {
   const rawBody = await request.text();
@@ -75,6 +109,11 @@ export async function POST(request: NextRequest) {
   };
 
   try {
+    if (event.type === 'charge.refunded' || event.type === 'charge.dispute.created') {
+      await handleStripeRevocation(event);
+      return await acknowledge();
+    }
+
     if (event.type !== 'checkout.session.completed') {
       return await acknowledge();
     }
