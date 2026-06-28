@@ -17,7 +17,7 @@ export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = buildIndustryMetadata(
   'hospitality',
-  'Hospitality IICRC CEC Training | CARSI',
+  'Hospitality IICRC CEC Training',
   'IICRC-certified training for Australian hotels and resorts. WRT, CRT, ASD and OCT courses for water damage, carpet care, structural drying and odour control.',
   [
     'hospitality IICRC CEC training',

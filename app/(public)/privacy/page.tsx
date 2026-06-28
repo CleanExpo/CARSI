@@ -10,7 +10,7 @@ import {
 } from '@/components/marketing/LegalDocumentShell';
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy | CARSI',
+  title: 'Privacy Policy',
   description: 'Privacy Policy for CARSI Learning Management System',
 };
 

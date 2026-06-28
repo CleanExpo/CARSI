@@ -12,7 +12,7 @@ import { IndustryRecommendedCourses } from '@/components/industries/IndustryReco
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Retail & Shopping Centre IICRC CEC Training | CARSI',
+  title: 'Retail & Shopping Centre IICRC CEC Training',
   description:
     'IICRC CEC training for shopping centre maintenance teams. Pre-qualify for major landlord panels with WRT, CRT and OCT credentials.',
   keywords: [

@@ -7,7 +7,7 @@ import {
 } from '@/components/marketing/LegalDocumentShell';
 
 export const metadata: Metadata = {
-  title: 'Terms of Service | CARSI',
+  title: 'Terms of Service',
   description: 'Terms of Service for CARSI Learning Management System',
 };
 

@@ -12,7 +12,7 @@ import { IndustryRecommendedCourses } from '@/components/industries/IndustryReco
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Property Management IICRC CEC Training | CARSI',
+  title: 'Property Management IICRC CEC Training',
   description:
     'IICRC restoration training for Australian property and strata managers. Mould, water damage and carpet credentials for RTA compliance.',
   keywords: [

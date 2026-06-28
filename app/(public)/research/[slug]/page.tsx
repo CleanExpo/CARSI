@@ -81,7 +81,7 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const { slug } = await params;
   const article = await getArticle(slug);
-  if (!article) return { title: 'Article Not Found | CARSI' };
+  if (!article) return { title: 'Article Not Found' };
 
   const title = article.seo_title ?? `${article.title} | CARSI Research`;
   const description =

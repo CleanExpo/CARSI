@@ -12,7 +12,7 @@ import { IndustryRecommendedCourses } from '@/components/industries/IndustryReco
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Insurance Professional IICRC CEC Training | CARSI',
+  title: 'Insurance Professional IICRC CEC Training',
   description:
     'IICRC CEC training for loss adjusters and claims assessors. Scope restoration claims accurately with WRT, FSRT and AMRT certification.',
   keywords: [
