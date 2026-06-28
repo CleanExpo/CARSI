@@ -392,7 +392,7 @@ test.describe('4. Auth: logout', { tag: '@authenticated' }, () => {
 
     // The persistent sidebar (LMSContextPanel) renders a "Sign out" button at
     // desktop widths. Clicking it calls signOut() then router.push('/login').
-    const logoutBtn = page.getByRole('button', { name: /sign out/i });
+    const logoutBtn = page.getByTestId('dashboard-sign-out');
     await expect(logoutBtn).toBeVisible({ timeout: 10_000 });
 
     // The AuthProvider loads `user` via a client fetch AFTER first paint; the
@@ -405,7 +405,11 @@ test.describe('4. Auth: logout', { tag: '@authenticated' }, () => {
     // so Playwright's actionability "stable box" wait on a normal click times out
     // (observed: 57 retries) despite the button being visible and enabled. Force
     // the click — the element is asserted visible above and signOut() fires on it.
+    const logoutResponse = page.waitForResponse(
+      (response) => response.url().includes('/api/auth/logout') && response.status() === 200,
+    );
     await logoutBtn.click({ force: true });
+    await logoutResponse;
 
     // Sign-out clears the session and routes to /login.
     await page.waitForURL('**/login**', { timeout: 15_000 });

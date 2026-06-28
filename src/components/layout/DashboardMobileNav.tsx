@@ -131,6 +131,7 @@ export function DashboardMobileNav() {
             <div className="border-t border-slate-200 p-2">
               <button
                 type="button"
+                data-testid="mobile-dashboard-sign-out"
                 onClick={() => void handleSignOut()}
                 className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-slate-600 hover:bg-slate-100"
               >
