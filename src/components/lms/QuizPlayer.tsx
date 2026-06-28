@@ -243,7 +243,7 @@ export function EnterpriseQuizResult({
       </p>
       {onContinue ? (
         <Button className="mt-6" onClick={onContinue}>
-          Continue training
+          {passed ? 'Continue training' : 'Try again'}
         </Button>
       ) : null}
     </div>

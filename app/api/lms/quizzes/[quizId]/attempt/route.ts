@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 
 import { prisma } from '@/lib/prisma';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
+import { computeQuizResult } from '@/lib/server/lms-completion';
 
 type Ctx = { params: Promise<{ quizId: string }> };
 
@@ -61,9 +62,13 @@ export async function POST(request: NextRequest, ctx: Ctx) {
       }
     }
 
-    const scorePercent =
-      totalPoints > 0 ? Math.round((earned / totalPoints) * 100) : 0;
-    const passed = scorePercent >= quiz.passPercentage;
+    // Pass/fail compares the UNROUNDED ratio so a raw 69.5% cannot round up
+    // into a 70% pass; scorePercent stays rounded for display.
+    const { scorePercent, passed } = computeQuizResult(
+      earned,
+      totalPoints,
+      quiz.passPercentage,
+    );
 
     const attempt = await prisma.lmsQuizAttempt.create({
       data: {
