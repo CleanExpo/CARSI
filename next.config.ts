@@ -104,38 +104,10 @@ const nextConfig: NextConfig = {
     unoptimized: true,
   },
   async headers() {
-    const isDev = process.env.NODE_ENV === 'development';
-    const scriptSrc = isDev
-      ? "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://js.stripe.com https://www.googletagmanager.com"
-      : "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://js.stripe.com https://www.googletagmanager.com";
-
-    const appOrigin = (
-      process.env.NEXT_PUBLIC_APP_URL ||
-      process.env.NEXT_PUBLIC_FRONTEND_URL ||
-      'http://localhost:3000'
-    ).trim();
-    const connectParts = [
-      "'self'",
-      appOrigin,
-      'https://api.stripe.com',
-      // Google Analytics / GTM beacons (gtag.js loads from googletagmanager.com,
-      // sends to *.google-analytics.com / *.analytics.google.com)
-      'https://www.googletagmanager.com',
-      'https://www.google-analytics.com',
-      'https://*.google-analytics.com',
-      'https://*.analytics.google.com',
-      ...(isDev
-        ? [
-            'ws:',
-            'wss:',
-            'http://localhost:3000',
-            'http://localhost:3001',
-            'http://127.0.0.1:3000',
-            'http://127.0.0.1:3001',
-          ]
-        : []),
-    ];
-
+    // NOTE: Content-Security-Policy is set per-request (with a nonce) in
+    // middleware (src/lib/api/middleware.ts + src/lib/security/csp.ts) so it can
+    // use 'nonce-<n>' 'strict-dynamic' instead of 'unsafe-inline'. The remaining
+    // static security headers stay here.
     return [
       {
         source: '/privacy',
@@ -165,19 +137,6 @@ const nextConfig: NextConfig = {
       {
         source: '/:path*',
         headers: [
-          {
-            key: 'Content-Security-Policy',
-            value: [
-              "default-src 'self'",
-              scriptSrc,
-              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-              "font-src 'self' https://fonts.gstatic.com",
-              "img-src 'self' data: https: blob:",
-              `connect-src ${connectParts.join(' ')}`,
-              'frame-src https://js.stripe.com https://hooks.stripe.com',
-              "frame-ancestors 'none'",
-            ].join('; '),
-          },
           {
             key: 'X-Frame-Options',
             value: 'DENY',

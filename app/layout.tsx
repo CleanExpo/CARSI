@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import Script from 'next/script';
 import { Outfit, DM_Sans } from 'next/font/google';
 import './globals.css';
 import { AppToastProvider } from '@/hooks/use-toast';
@@ -107,11 +108,10 @@ export default function RootLayout({
       <head>
         <OrganizationSchema />
         <WebsiteSchema />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('carsi-theme');if(t==='dark')document.documentElement.classList.add('dark');}catch(e){}})();`,
-          }}
-        />
+        {/* External ('self') theme bootstrap via next/script (beforeInteractive)
+            — runs early for FOUC prevention, is auto-nonced by Next, and keeps
+            the root layout static-capable (no inline script / per-request nonce). */}
+        <Script src="/theme-init.js" strategy="beforeInteractive" />
       </head>
       <body className={`${outfit.variable} ${dmSans.variable} font-sans`} suppressHydrationWarning>
         <AuthProvider>
