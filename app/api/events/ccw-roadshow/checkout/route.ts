@@ -16,6 +16,7 @@ import {
 } from '@/lib/server/ccw-roadshow-registry';
 import { addRegistrationToCalendar } from '@/lib/server/ccw-roadshow-calendar';
 import { isMissingTableError } from '@/lib/server/db-errors';
+import { getAppOrigin } from '@/lib/server/app-url';
 import { sendCcwRoadshowRegistrationEmail } from '@/lib/server/transactional-email';
 
 type AttendeeBody = { fullName?: string; yearsExperience?: string; goals?: string };
@@ -137,7 +138,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const origin = request.nextUrl.origin;
+    const origin = getAppOrigin(request);
     const successParams = new URLSearchParams({
       token: freeEntryToken,
       event: event.slug,
