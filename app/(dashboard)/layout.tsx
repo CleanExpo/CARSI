@@ -6,6 +6,11 @@ import { PageTransition } from '@/components/layout/PageTransition';
 import FloatingChatGate from '@/components/lms/FloatingChatGate';
 import { OnboardingCheck } from '@/components/lms/OnboardingCheck';
 
+// Authenticated app surface renders dynamically so the strict (nonce-based,
+// no 'unsafe-inline') CSP from middleware applies cleanly — Next nonces its
+// scripts on dynamic renders. Public/marketing pages stay static (SSG).
+export const dynamic = 'force-dynamic';
+
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <div

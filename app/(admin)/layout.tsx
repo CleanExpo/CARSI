@@ -1,3 +1,7 @@
+// Rendered dynamically so the strict (nonce-based) CSP from middleware applies
+// cleanly to this authenticated surface.
+export const dynamic = 'force-dynamic';
+
 export default function AdminRouteGroupLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="relative flex min-h-screen" style={{ background: '#060a14' }}>

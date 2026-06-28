@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { headers } from 'next/headers';
+import Script from 'next/script';
 import { Outfit, DM_Sans } from 'next/font/google';
 import './globals.css';
 import { AppToastProvider } from '@/hooks/use-toast';
@@ -98,25 +98,20 @@ export const viewport: Viewport = {
   maximumScale: 5,
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Per-request CSP nonce set by middleware — applied to the inline theme
-  // bootstrap so it runs under the nonce-based CSP (no 'unsafe-inline').
-  const nonce = (await headers()).get('x-nonce') ?? undefined;
   return (
     <html lang="en-AU" suppressHydrationWarning>
       <head>
         <OrganizationSchema />
         <WebsiteSchema />
-        <script
-          nonce={nonce}
-          dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('carsi-theme');if(t==='dark')document.documentElement.classList.add('dark');}catch(e){}})();`,
-          }}
-        />
+        {/* External ('self') theme bootstrap via next/script (beforeInteractive)
+            — runs early for FOUC prevention, is auto-nonced by Next, and keeps
+            the root layout static-capable (no inline script / per-request nonce). */}
+        <Script src="/theme-init.js" strategy="beforeInteractive" />
       </head>
       <body className={`${outfit.variable} ${dmSans.variable} font-sans`} suppressHydrationWarning>
         <AuthProvider>

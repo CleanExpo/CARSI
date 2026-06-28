@@ -15,7 +15,7 @@ import { isValidAdminSessionCookie } from '@/lib/admin/admin-session-edge';
 import type { SessionClaims } from '@/lib/auth/session-jwt';
 import { verifySessionToken } from '@/lib/auth/session-jwt';
 import { internalToolsEnabled, isInternalToolPath } from '@/lib/internal-tools';
-import { buildContentSecurityPolicy } from '@/lib/security/csp';
+import { buildContentSecurityPolicy, isStrictCspPath } from '@/lib/security/csp';
 
 interface User {
   id: string;
@@ -62,9 +62,10 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url, 308);
   }
 
-  // Per-request CSP nonce: propagate via the request header (so Next applies it
-  // to its own scripts and the layout can read it) and set the CSP on the
-  // response. strict-dynamic + nonce replaces script-src 'unsafe-inline'.
+  // Per-route CSP. Authenticated app routes (already dynamic) get a STRICT nonce
+  // policy with no 'unsafe-inline'; public/marketing routes keep the relaxed
+  // policy so they remain statically generated. The nonce is propagated on the
+  // request header so Next applies it to its own scripts on the strict routes.
   const nonce = crypto.randomUUID();
   const isDev = process.env.NODE_ENV === 'development';
   const appOrigin = (
@@ -72,7 +73,8 @@ export async function updateSession(request: NextRequest) {
     process.env.NEXT_PUBLIC_FRONTEND_URL ||
     'http://localhost:3000'
   ).trim();
-  const csp = buildContentSecurityPolicy(nonce, isDev, appOrigin);
+  const strict = isStrictCspPath(pathname);
+  const csp = buildContentSecurityPolicy({ nonce, isDev, appOrigin, strict });
 
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set('x-nonce', nonce);
