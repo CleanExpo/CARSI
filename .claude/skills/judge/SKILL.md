@@ -2,7 +2,6 @@
 name: judge
 description: Mandatory pre-build challenge gate. Use before approving or building any feature, connector, automation, agent, hook, MCP server, UI change, database change, or architecture plan. It performs first-source evidence review, devil's advocate critique, existing capability review, UX review, security/privacy review, test/stress review, and return-on-effort scoring.
 argument-hint: "<feature, idea, ticket, branch, PR, spec, or plan to judge>"
-disable-model-invocation: true
 allowed-tools: Read, Grep, Glob, LS, Bash
 ---
 

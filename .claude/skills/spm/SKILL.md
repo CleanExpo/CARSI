@@ -2,7 +2,6 @@
 name: spm
 description: Senior Project Manager command. Use before implementation when the user asks to perform, plan, build, fix, improve, investigate, or design a project task. Produces a decision-grade spec.md using project inspection, specialist review, judge-style challenge, verification planning, stress testing, and goal-ready acceptance criteria.
 argument-hint: "<task, feature, bug, idea, ticket, PR, repo area, or implementation request>"
-disable-model-invocation: true
 allowed-tools: Read, Grep, Glob, LS, Bash
 ---
 
@@ -28,7 +27,7 @@ No spec. No build.
 
 The output of this command is a decision-grade SPM Spec.
 
-Implementation comes later through `/goal`, after the spec is accepted.
+Implementation comes later through `/execute-goal`, after the spec is accepted.
 
 ## Required read-only project scan
 
@@ -272,10 +271,10 @@ Each criterion must be objectively checkable. Avoid vague criteria such as "work
 
 ## 16. Goal command
 
-Write the exact `/goal` command to run after the spec is accepted.
+Write the exact `/execute-goal` command to run after the spec is accepted.
 
 ```text
-/goal Implement the accepted SPM spec for <task>. Completion condition: <clear measurable condition>. Required proof: <commands, files, screenshots, logs, or checks>. Constraints: no unrelated files changed; no secrets added; no destructive operations; stop and produce /session-handoff if blocked by missing credentials, permissions, external service access, or destructive migration approval.
+/execute-goal Implement the accepted SPM spec for <task>. Completion condition: <clear measurable condition>. Required proof: <commands, files, screenshots, logs, or checks>. Constraints: no unrelated files changed; no secrets added; no destructive operations; stop and produce /session-handoff if blocked by missing credentials, permissions, external service access, or destructive migration approval.
 ```
 
 The goal must include: what files or behaviours must exist, which checks must pass, what proof must be shown, what must not be changed, when to stop if blocked.

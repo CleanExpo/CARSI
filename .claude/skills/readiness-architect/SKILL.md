@@ -1,8 +1,7 @@
 ---
 name: readiness-architect
-description: Generates a complete SPM-ready readiness scope for any project, product, app, authority site, CRM, contractor network, training platform, marketing engine, mobile app, internal operating system, AI agent system, or launch-readiness task. Use when preparing a project for /spm, /judge, /goal, shipit, launch, production readiness, operational readiness, connector readiness, security readiness, or client purchase readiness.
+description: Generates a complete SPM-ready readiness scope for any project, product, app, authority site, CRM, contractor network, training platform, marketing engine, mobile app, internal operating system, AI agent system, or launch-readiness task. Use when preparing a project for /spm, /judge, /execute-goal, shipit, launch, production readiness, operational readiness, connector readiness, security readiness, or client purchase readiness.
 argument-hint: "<project, repo, product, task, launch goal, readiness goal, or business idea>"
-disable-model-invocation: true
 allowed-tools: Read, Grep, Glob, LS, Bash
 ---
 
@@ -30,7 +29,7 @@ If `$ARGUMENTS` is empty, ask the user what project, repo, product, feature, or 
 /readiness-architect <project or task>
 /spm <generated scope>
 /judge <generated SPM spec>
-/goal <accepted implementation goal>
+/execute-goal <accepted implementation goal>
 /session-handoff
 /resume-from-handoff
 ```
@@ -222,7 +221,7 @@ Show:
 /readiness-architect <project>
 /spm <generated scope>
 /judge <generated spec>
-/goal <accepted goal>
+/execute-goal <accepted goal>
 /session-handoff
 /resume-from-handoff
 ```
@@ -278,7 +277,7 @@ The prompt must include:
 
 The `/spm` prompt must be directly usable in the CLI.
 
-## 6. Recommended /goal command after /spm and /judge
+## 6. Recommended /execute-goal command after /spm and /judge
 
 Generate the implementation goal command.
 
@@ -324,4 +323,4 @@ Before finalising, check:
 - The scope has clear stop conditions.
 - The scope uses project-specific specialist roles.
 - The scope prevents unsupported claims.
-- The next `/goal` command is measurable.
+- The next `/execute-goal` command is measurable.

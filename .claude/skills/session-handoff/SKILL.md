@@ -2,7 +2,6 @@
 name: session-handoff
 description: Generate a precise session handoff before stopping, switching terminals, opening a PR, handing work to another agent, or resuming work later. Captures what was done, where it started, decisions locked, files changed, running state, verification steps, deferred questions, and exact pickup point.
 argument-hint: "[optional: ticket, branch, PR, feature, repo area, or handoff scope]"
-disable-model-invocation: true
 allowed-tools: Read, Grep, Glob, LS, Bash
 ---
 

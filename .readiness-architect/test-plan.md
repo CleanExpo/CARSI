@@ -27,7 +27,7 @@ Expected:
 - Output starts with `# Readiness Architect Output`.
 - Output contains a copy-paste `/spm` prompt.
 - Output does not implement code.
-- Output includes specialist board, readiness gates, blocker handling, and a measurable `/goal` command.
+- Output includes specialist board, readiness gates, blocker handling, and a measurable `/execute-goal` command.
 
 ## Codex check
 

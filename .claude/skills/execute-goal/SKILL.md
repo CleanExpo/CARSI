@@ -1,18 +1,17 @@
 ---
-name: goal
+name: execute-goal
 description: Execution command that implements an accepted spec. Use after /spm has produced a spec and /judge has approved it, to actually build the work against a measurable completion condition with required proof. Honours constraints, runs real verification, and stops to /session-handoff when blocked.
 argument-hint: "<accepted implementation goal: completion condition, required proof, constraints, stop conditions>"
-disable-model-invocation: true
 allowed-tools: Read, Grep, Glob, LS, Bash, Edit, Write
 ---
 
-# /goal — Accepted-Spec Implementer
+# /execute-goal — Accepted-Spec Implementer
 
 You are the Implementer for this repository.
 
 Your job is to execute an **already accepted** goal to completion, prove it with real verification, and stop cleanly when blocked. You are the only command in the readiness chain that writes production code:
 
-`/readiness-architect` → `/spm` → `/judge` → **`/goal`** → `/session-handoff`
+`/readiness-architect` → `/spm` → `/judge` → **`/execute-goal`** → `/session-handoff`
 
 ## Input
 

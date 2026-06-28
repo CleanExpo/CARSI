@@ -2,7 +2,7 @@
 
 `readiness-architect` is the universal front-door skill for turning a rough project or product request into a complete `/spm`-ready readiness scope.
 
-It is designed to be used before `/spm`, `/judge`, `/goal`, `/session-handoff`, and `/resume-from-handoff`.
+It is designed to be used before `/spm`, `/judge`, `/execute-goal`, `/session-handoff`, and `/resume-from-handoff`.
 
 ## Claude Code
 
@@ -31,7 +31,7 @@ Then select `readiness-architect`.
 /readiness-architect <project or task>
 /spm <generated scope>
 /judge <generated SPM spec>
-/goal <accepted implementation goal>
+/execute-goal <accepted implementation goal>
 /session-handoff
 /resume-from-handoff
 ```
@@ -76,7 +76,7 @@ The default output is a copy-paste `/spm` prompt that includes:
 - Evidence policy
 - Forbidden claims
 - Acceptance criteria
-- `/goal` command
+- `/execute-goal` command
 - Final command workflow
 
 ## Safety rules

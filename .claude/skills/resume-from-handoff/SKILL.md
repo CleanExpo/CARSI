@@ -2,7 +2,6 @@
 name: resume-from-handoff
 description: Resume work from a session handoff. Reads the latest handoff, verifies current repo state against it, reconciles any drift, then continues the work from the documented pickup point without re-deriving old context. Verification is read-only and mandatory before any work resumes.
 argument-hint: "[optional: path to a handoff file, pasted handoff, branch, or PR]"
-disable-model-invocation: true
 allowed-tools: Read, Grep, Glob, LS, Bash, Edit, Write
 ---
 

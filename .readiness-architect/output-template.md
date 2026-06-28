@@ -8,7 +8,7 @@ Use this template to validate `readiness-architect` output.
 /readiness-architect <project>
 /spm <generated scope>
 /judge <generated spec>
-/goal <accepted goal>
+/execute-goal <accepted goal>
 /session-handoff
 /resume-from-handoff
 ```
@@ -50,7 +50,7 @@ The generated prompt must include:
 - Blocker handling
 - Final line
 
-## 6. Recommended /goal command after /spm and /judge
+## 6. Recommended /execute-goal command after /spm and /judge
 
 The goal must include:
 
