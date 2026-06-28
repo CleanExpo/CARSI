@@ -390,8 +390,9 @@ test.describe('4. Auth: logout', { tag: '@authenticated' }, () => {
     await page.goto('/dashboard/student');
     await page.waitForLoadState('domcontentloaded');
 
-    // The persistent sidebar (LMSContextPanel) renders a "Sign out" button at
-    // desktop widths. Clicking it calls signOut() then router.push('/login').
+    // The persistent sidebar (LMSContextPanel) renders a real anchor for sign-out
+    // at desktop widths. Auth/logout is a side-effecting server route, so it must
+    // use browser document navigation rather than Next.js client routing.
     const logoutBtn = page.getByTestId('dashboard-sign-out');
     await expect(logoutBtn).toBeVisible({ timeout: 10_000 });
 
@@ -407,8 +408,8 @@ test.describe('4. Auth: logout', { tag: '@authenticated' }, () => {
     // the click — the element is asserted visible above and signOut() fires on it.
     await logoutBtn.click({ force: true });
 
-    // Sign-out posts through the server logout route, clears the session cookies,
-    // and redirects to /login.
+    // Sign-out clears the session cookies through the server logout route and
+    // redirects to /login.
     await page.waitForURL('**/login**', { timeout: 15_000 });
   });
 });

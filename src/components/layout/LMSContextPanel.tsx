@@ -159,7 +159,7 @@ export function LMSContextPanel() {
 
       {/* Fixed footer — sign out always visible */}
       <div className="shrink-0 border-t border-slate-200 px-2 py-3">
-        <Link
+        <a
           href="/api/auth/logout"
           data-testid="dashboard-sign-out"
           className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-950"
@@ -167,7 +167,7 @@ export function LMSContextPanel() {
         >
           <LogOut className="h-4 w-4 shrink-0 opacity-90" aria-hidden />
           <span className="min-w-0 truncate">Sign out</span>
-        </Link>
+        </a>
       </div>
     </aside>
   );
