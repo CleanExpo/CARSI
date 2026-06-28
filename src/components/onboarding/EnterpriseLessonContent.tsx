@@ -126,7 +126,7 @@ function HtmlListBlock({ items }: { items: Array<{ html: string }> }) {
 
 function StructuredHtmlLesson({ html }: { html: string }) {
   const blocks = parseHtmlLessonBlocks(html);
-  let introUsed = false;
+  const firstParagraphIndex = blocks.findIndex((block) => block.type !== 'list');
 
   return (
     <div className="space-y-8">
@@ -134,13 +134,11 @@ function StructuredHtmlLesson({ html }: { html: string }) {
         if (block.type === 'list') {
           return <HtmlListBlock key={`list-${i}`} items={block.items} />;
         }
-        const isIntro = !introUsed;
-        introUsed = true;
         return (
           <HtmlParagraph
             key={`p-${i}`}
             html={block.html}
-            variant={isIntro ? 'intro' : 'body'}
+            variant={i === firstParagraphIndex ? 'intro' : 'body'}
           />
         );
       })}
