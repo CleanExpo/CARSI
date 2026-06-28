@@ -12,6 +12,7 @@ const row: RegistryRow = {
   contactPhone: '0400000000',
   ccwCustomerStatus: 'current',
   seatCount: 2,
+  calendarSynced: true,
   createdAt: new Date('2026-06-22T00:00:00.000Z'),
   attendees: [
     { fullName: 'Jane Smith', yearsExperience: '2-5', goals: 'Quote with confidence' },
@@ -25,6 +26,8 @@ describe('registryToCsv', () => {
     const lines = csv.trim().split('\n');
     expect(lines).toHaveLength(3); // header + 2 attendees
     expect(lines[0]).toContain('attendee_name');
+    expect(lines[0]).toContain('calendar_synced');
+    expect(lines[1]).toContain(',true,');
     expect(lines[1]).toContain('Jane Smith');
     expect(lines[2]).toContain('John Doe');
   });

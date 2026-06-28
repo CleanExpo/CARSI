@@ -21,6 +21,7 @@ type RegistryRow = {
   contactPhone: string | null;
   ccwCustomerStatus: string | null;
   seatCount: number;
+  calendarSynced: boolean;
   createdAt: string;
   attendees: { fullName: string; yearsExperience: string; goals: string }[];
 };
@@ -82,6 +83,20 @@ export function AdminCcwRoadshowClient() {
     await load();
   }
 
+  async function retryCalendarSync(row: RegistryRow) {
+    const res = await fetch('/api/admin/ccw-roadshow/sync-calendar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ registrationId: row.registrationId }),
+    });
+    if (!res.ok) {
+      const payload = (await res.json().catch(() => ({}))) as { detail?: string };
+      setError(payload.detail || 'Failed to sync calendar');
+      return;
+    }
+    await load();
+  }
+
   if (loading) return <div className="p-6">Loading registry…</div>;
 
   return (
@@ -117,6 +132,7 @@ export function AdminCcwRoadshowClient() {
               <th className="p-2">Status</th>
               <th className="p-2">Company</th>
               <th className="p-2">Contact</th>
+              <th className="p-2">Calendar</th>
               <th className="p-2">Attendees</th>
               <th className="p-2">Token</th>
               <th className="p-2">Action</th>
@@ -132,6 +148,25 @@ export function AdminCcwRoadshowClient() {
                   {row.contactEmail}
                   <br />
                   {row.contactPhone ?? '—'}
+                </td>
+                <td className="p-2">
+                  {row.calendarSynced ? (
+                    <span className="rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-800">
+                      Synced
+                    </span>
+                  ) : row.status === 'confirmed' ? (
+                    <button
+                      type="button"
+                      onClick={() => retryCalendarSync(row)}
+                      className="rounded-full border border-amber-300 bg-amber-50 px-2 py-1 text-xs font-medium text-amber-800"
+                    >
+                      Not synced · retry
+                    </button>
+                  ) : (
+                    <span className="rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600">
+                      Pending
+                    </span>
+                  )}
                 </td>
                 <td className="p-2">
                   <ul className="space-y-1">
