@@ -84,6 +84,7 @@ const pwaConfig = withPWA({
 const nextConfig: NextConfig = {
   output: 'standalone',
   reactStrictMode: true,
+  poweredByHeader: false,
   devIndicators: false,
   async redirects() {
     return [
@@ -105,8 +106,8 @@ const nextConfig: NextConfig = {
   async headers() {
     const isDev = process.env.NODE_ENV === 'development';
     const scriptSrc = isDev
-      ? "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://js.stripe.com"
-      : "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://js.stripe.com";
+      ? "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://js.stripe.com https://www.googletagmanager.com"
+      : "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://js.stripe.com https://www.googletagmanager.com";
 
     const appOrigin = (
       process.env.NEXT_PUBLIC_APP_URL ||
@@ -117,6 +118,12 @@ const nextConfig: NextConfig = {
       "'self'",
       appOrigin,
       'https://api.stripe.com',
+      // Google Analytics / GTM beacons (gtag.js loads from googletagmanager.com,
+      // sends to *.google-analytics.com / *.analytics.google.com)
+      'https://www.googletagmanager.com',
+      'https://www.google-analytics.com',
+      'https://*.google-analytics.com',
+      'https://*.analytics.google.com',
       ...(isDev
         ? [
             'ws:',
@@ -188,8 +195,10 @@ const nextConfig: NextConfig = {
             value: 'camera=(), microphone=(), geolocation=()',
           },
           {
+            // Deprecated header; the legacy XSS auditor it enables has its own
+            // bugs. Modern guidance is to disable it and rely on CSP.
             key: 'X-XSS-Protection',
-            value: '1; mode=block',
+            value: '0',
           },
           {
             key: 'Strict-Transport-Security',
