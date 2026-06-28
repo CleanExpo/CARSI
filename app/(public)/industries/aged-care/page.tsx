@@ -13,7 +13,7 @@ import { FAQSchema } from '@/components/seo/JsonLd';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Aged Care IICRC CEC Training | CARSI',
+  title: 'Aged Care IICRC CEC Training',
   description:
     'NQF-compliant IICRC CEC training for aged care facilities. CRT and AMRT courses for carpet restoration, mould remediation, and infection control.',
   keywords: [

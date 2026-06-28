@@ -12,7 +12,7 @@ import { IndustryRecommendedCourses } from '@/components/industries/IndustryReco
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Mining Site IICRC CEC Restoration Training | CARSI',
+  title: 'Mining Site IICRC CEC Restoration Training',
   description:
     'WHS-compliant IICRC restoration training for Australian mining operations. WRT, AMRT, and ASD courses for water damage, mould, and structural drying on remote sites.',
   keywords: [

@@ -7,7 +7,7 @@ import { getPublicSiteUrl } from '@/lib/env/public-url';
 const siteUrl = getPublicSiteUrl();
 
 export const metadata: Metadata = {
-  title: 'The Carpet Cleaning Workshop | CARSI',
+  title: 'The Carpet Cleaning Workshop',
   description:
     'CARSI · 2 days · hands-on — fibre, chemistry, methods, upholstery, hard floors, business, maintenance. Anchored in ANSI/IICRC S100 · S300 · S220. Participant resources (password).',
   alternates: { canonical: `${siteUrl}/ccw-training` },

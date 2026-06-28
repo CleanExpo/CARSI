@@ -17,7 +17,7 @@ export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = buildIndustryMetadata(
   'commercial-cleaning',
-  'Commercial Cleaning IICRC CEC Training | CARSI',
+  'Commercial Cleaning IICRC CEC Training',
   'IICRC CEC accredited courses for commercial cleaning contractors in Australia. CRT, CCT, and OCT topics for carpet restoration, odour control, and insurance panel readiness.',
   [
     'commercial cleaning IICRC CEC training',

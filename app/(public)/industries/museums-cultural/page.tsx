@@ -13,7 +13,7 @@ import { FAQSchema } from '@/components/seo/JsonLd';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Museums & Cultural Institutions IICRC CEC Training | CARSI',
+  title: 'Museums & Cultural Institutions IICRC CEC Training',
   description:
     'Heritage preservation and artifact protection training for Australian museums, galleries, and cultural institutions. AMRT, WRT and ASD courses for climate-controlled environments.',
   keywords: [

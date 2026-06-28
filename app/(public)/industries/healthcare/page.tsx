@@ -17,7 +17,7 @@ export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = buildIndustryMetadata(
   'healthcare',
-  'Healthcare IICRC CEC Training | CARSI',
+  'Healthcare IICRC CEC Training',
   'NSQHS-aligned IICRC CEC training for Australian hospitals. AMRT, WRT, FSRT and ASD courses supporting Standard 3 compliance and JCI accreditation.',
   [
     'healthcare IICRC CEC training',

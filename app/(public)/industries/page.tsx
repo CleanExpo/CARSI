@@ -28,9 +28,10 @@ import {
 // ---------------------------------------------------------------------------
 
 export const metadata: Metadata = {
-  title: 'Industry Training Solutions | CARSI',
+  title: 'Industry Training Solutions',
   description:
     'IICRC-certified training for 19 industries across Australia. Sector-specific restoration courses with verifiable credentials for healthcare, hospitality, mining, plumbing, NDIS, real estate, and more.',
+  alternates: { canonical: '/industries' },
 };
 
 // ---------------------------------------------------------------------------

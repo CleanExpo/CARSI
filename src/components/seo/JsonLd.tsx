@@ -13,7 +13,7 @@ interface OrganizationSchemaProps {
 export function OrganizationSchema({
   name = 'CARSI',
   url = 'https://carsi.com.au',
-  logo = 'https://carsi.com.au/logo1.png',
+  logo = 'https://carsi.com.au/logo.png',
   sameAs = [
     'https://www.facebook.com/CARSIaus',
     'https://www.linkedin.com/company/carsiaus',
@@ -178,13 +178,18 @@ function courseOffer(url: string, price: number | undefined) {
 }
 
 function selfPacedCourseInstance(name: string, url: string, duration?: string | null) {
-  return {
+  const instance: Record<string, unknown> = {
     '@type': 'CourseInstance',
     name: `${name} online self-paced course`,
     courseMode: 'online',
     url,
-    courseWorkload: duration ? `PT${duration}H` : 'Self-paced online course; workload varies by learner',
   };
+  // Google requires courseWorkload as an ISO-8601 duration; emit it only when a
+  // real duration is known, otherwise omit (free text is ignored/flagged).
+  if (duration) {
+    instance.courseWorkload = `PT${duration}H`;
+  }
+  return instance;
 }
 
 export function CourseSchema({

@@ -12,7 +12,7 @@ import { IndustryRecommendedCourses } from '@/components/industries/IndustryReco
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Construction IICRC CEC Training | CARSI',
+  title: 'Construction IICRC CEC Training',
   description:
     'IICRC water damage and mould management training for Australian construction sites. WRT, ASD and AMRT courses supporting NCC compliance.',
   keywords: [

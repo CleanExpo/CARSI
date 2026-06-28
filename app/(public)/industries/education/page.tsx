@@ -12,7 +12,7 @@ import { IndustryRecommendedCourses } from '@/components/industries/IndustryReco
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Education Sector IICRC CEC Training | CARSI',
+  title: 'Education Sector IICRC CEC Training',
   description:
     'IICRC CEC training for school and university maintenance teams. WRT, CRT, AMRT and ASD training for Australian education facilities.',
   keywords: [

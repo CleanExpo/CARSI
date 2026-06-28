@@ -17,7 +17,7 @@ export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = buildIndustryMetadata(
   'government-defence',
-  'Government & Defence IICRC CEC Training | CARSI',
+  'Government & Defence IICRC CEC Training',
   'WHS-compliant IICRC CEC training for Australian councils, agencies and defence facilities. AMRT, WRT, ASD and FSRT courses for AusTender compliance.',
   [
     'government IICRC CEC training',

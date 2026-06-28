@@ -13,7 +13,7 @@ import { FAQSchema } from '@/components/seo/JsonLd';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Food Processing Facility IICRC CEC Training | CARSI',
+  title: 'Food Processing Facility IICRC CEC Training',
   description:
     'HACCP-aligned IICRC CEC training for Australian food processing facilities. AMRT, OCT and CCT courses supporting hygiene compliance, cold storage maintenance, and contamination prevention.',
   keywords: [
