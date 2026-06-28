@@ -80,7 +80,7 @@ export const ccwRoadshowEvents: CcwRoadshowEvent[] = [
     description:
       'Two practical days with Phill McGurk and the CCW team, connecting training, equipment, service design, chemistry, quoting confidence and business growth for carpet, rug, stain and tile cleaning operators.',
     capacity: 10,
-    calendarEventId: '1d1uqjm6an36n1kgc6s4s3ln7s',
+    calendarEventId: 'fvuaa6bo5muljkdaorpp17lndk',
   },
   {
     slug: 'sydney',
@@ -99,7 +99,7 @@ export const ccwRoadshowEvents: CcwRoadshowEvent[] = [
     description:
       'Two practical days with Phill McGurk and the CCW team, connecting training, equipment, service design, chemistry, quoting confidence and business growth for carpet, rug, stain and tile cleaning operators.',
     capacity: 12,
-    calendarEventId: 'h6qm8t3muuv44ht9gqann5dhuk',
+    calendarEventId: '4nut26p4pg0i46mb0kh32if3l8',
   },
 ];
 

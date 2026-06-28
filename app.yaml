@@ -70,3 +70,15 @@ services:
         scope: RUN_AND_BUILD_TIME
       - key: NEXT_PUBLIC_APP_URL
         scope: RUN_AND_BUILD_TIME
+
+      # CCW Roadshow Google Calendar sync. Values are set in DigitalOcean
+      # App Platform as encrypted runtime env vars; do not commit secrets here.
+      - key: GOOGLE_CALENDAR_ID
+        value: spprtcarsi@gmail.com
+        scope: RUN_TIME
+      - key: GOOGLE_CALENDAR_CLIENT_ID
+        scope: RUN_TIME
+      - key: GOOGLE_CALENDAR_CLIENT_SECRET
+        scope: RUN_TIME
+      - key: GOOGLE_CALENDAR_OAUTH_REFRESH_TOKEN
+        scope: RUN_TIME
