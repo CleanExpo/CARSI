@@ -70,6 +70,7 @@ export type RegistryRow = {
   contactPhone: string | null;
   ccwCustomerStatus: string | null;
   seatCount: number;
+  calendarSynced: boolean;
   createdAt: Date;
   attendees: { fullName: string; yearsExperience: string; goals: string }[];
 };
@@ -145,6 +146,7 @@ export async function listRoadshowRegistry(eventSlug?: string): Promise<Registry
     contactPhone: row.contactPhone,
     ccwCustomerStatus: row.ccwCustomerStatus,
     seatCount: row.seatCount,
+    calendarSynced: row.calendarSynced,
     createdAt: row.createdAt,
     attendees: row.attendees.map((a) => ({
       fullName: a.fullName,
@@ -193,6 +195,13 @@ export async function setRegistrationCalendarSynced(registrationId: string): Pro
   await prisma.ccwRoadshowRegistration.update({
     where: { id: registrationId },
     data: { calendarSynced: true },
+  });
+}
+
+export async function getRoadshowRegistrationForCalendarSync(registrationId: string) {
+  return prisma.ccwRoadshowRegistration.findUnique({
+    where: { id: registrationId },
+    include: { attendees: { take: 1, orderBy: { createdAt: 'asc' } } },
   });
 }
 
