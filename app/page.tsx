@@ -175,7 +175,7 @@ export default async function Home() {
               </p>
               <Link
                 href="/pathways"
-                className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[#146fc2] hover:text-[#0f5fa8]"
+                className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[#146fc2] hover:text-[#0f5fa8] dark:text-[#8fd0ff] dark:hover:text-[#b8e2ff]"
               >
                 Browse structured pathways <ArrowRight className="h-4 w-4" aria-hidden />
               </Link>
@@ -229,7 +229,7 @@ export default async function Home() {
       </section>
 
       <AnimatedSection label="Multi-industry training" title="Built for every sector you serve">
-        <p className="mb-8 max-w-2xl text-sm leading-relaxed text-slate-600 md:text-base">
+        <p className="mb-8 max-w-2xl text-sm leading-relaxed text-slate-600 md:text-base dark:text-white/70">
           From hospitals to hotels, government facilities to commercial buildings — CARSI provides
           industry-specific training pathways for every sector that needs{' '}
           <AcronymTooltip term="IICRC" /> credentials.
@@ -266,7 +266,7 @@ export default async function Home() {
         <div className="mt-8 text-center">
           <Link
             href="/industries"
-            className="inline-flex items-center gap-2 text-sm font-semibold text-[#146fc2] hover:text-[#0f5fa8]"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-[#146fc2] hover:text-[#0f5fa8] dark:text-[#8fd0ff] dark:hover:text-[#b8e2ff]"
           >
             View all industries <ArrowRight className="h-4 w-4" aria-hidden />
           </Link>
