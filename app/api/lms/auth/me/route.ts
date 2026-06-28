@@ -35,6 +35,7 @@ export async function GET(request: NextRequest) {
   let resume_reminder: 'none' | 'email' | 'sms' | null = null;
   let leaderboard_show_display_name = false;
   let leaderboard_display_name: string | null = null;
+  let is_verified = false;
 
   if (process.env.DATABASE_URL?.trim()) {
     const row = await prisma.lmsUser.findUnique({
@@ -50,10 +51,12 @@ export async function GET(request: NextRequest) {
         resumeReminderOptIn: true,
         leaderboardShowDisplayName: true,
         leaderboardDisplayName: true,
+        isVerified: true,
       },
     });
     if (row?.fullName?.trim()) displayName = row.fullName.trim();
     if (row?.themePreference) theme_preference = row.themePreference;
+    if (row) is_verified = row.isVerified;
     iicrc_member_number = row?.iicrcMemberNumber ?? null;
     if (row?.iicrcExpiryDate) {
       iicrc_expiry_date = row.iicrcExpiryDate.toISOString().slice(0, 10);
@@ -74,7 +77,7 @@ export async function GET(request: NextRequest) {
     roles: [claims.role],
     theme_preference,
     is_active: true,
-    is_verified: true,
+    is_verified,
     onboarding_completed: dbOnboardingDone || hasCompletedOnboarding(request, claims.sub),
     resume_reminder_opt_in: resume_reminder,
     iicrc_member_number,
@@ -173,6 +176,7 @@ export async function PATCH(request: NextRequest) {
 
   let patchResumeReminder: 'none' | 'email' | 'sms' | null = null;
   let patchOnboardingDone = false;
+  let patch_is_verified = false;
   let patchLeaderboardShow = false;
   let patchLeaderboardName: string | null = null;
 
@@ -190,8 +194,10 @@ export async function PATCH(request: NextRequest) {
         resumeReminderOptIn: true,
         leaderboardShowDisplayName: true,
         leaderboardDisplayName: true,
+        isVerified: true,
       },
     });
+    if (row) patch_is_verified = row.isVerified;
     if (row?.fullName?.trim()) patchDisplayName = row.fullName.trim();
     if (row?.themePreference) theme_preference = row.themePreference;
     iicrc_member_number = row?.iicrcMemberNumber ?? null;
@@ -214,7 +220,7 @@ export async function PATCH(request: NextRequest) {
     roles: [claims.role],
     theme_preference,
     is_active: true,
-    is_verified: true,
+    is_verified: patch_is_verified,
     onboarding_completed:
       patch.onboarding_completed === true
         ? true
