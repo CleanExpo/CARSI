@@ -28,6 +28,7 @@ export default function EditCoursePage() {
   const [course, setCourse] = useState<Course | null>(null);
   const [modules, setModules] = useState<Module[]>([]);
   const [loading, setLoading] = useState(true);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   const loadData = useCallback(async () => {
     const [courseData, modulesData] = await Promise.all([
@@ -52,28 +53,43 @@ export default function EditCoursePage() {
   async function handleAddModule() {
     const title = prompt('Module title:');
     if (!title) return;
-    await apiClient.post(`/api/lms/courses/${params.slug}/modules`, {
-      title,
-      order_index: modules.length + 1,
-    });
-    loadData();
+    setActionError(null);
+    try {
+      await apiClient.post(`/api/lms/courses/${params.slug}/modules`, {
+        title,
+        order_index: modules.length + 1,
+      });
+      loadData();
+    } catch {
+      setActionError('Could not add the module. Please try again.');
+    }
   }
 
   async function handleDeleteModule(moduleId: string) {
-    await apiClient.delete(`/api/lms/modules/${moduleId}`);
-    setModules((prev) => prev.filter((m) => m.id !== moduleId));
+    setActionError(null);
+    try {
+      await apiClient.delete(`/api/lms/modules/${moduleId}`);
+      setModules((prev) => prev.filter((m) => m.id !== moduleId));
+    } catch {
+      setActionError('Could not delete the module. Please try again.');
+    }
   }
 
   async function handleAddLesson(moduleId: string) {
     const title = prompt('Lesson title:');
     if (!title) return;
+    setActionError(null);
     const nextOrder = (modules.find((m) => m.id === moduleId)?.lessons.length ?? 0) + 1;
-    await apiClient.post(`/api/lms/modules/${moduleId}/lessons`, {
-      title,
-      order_index: nextOrder,
-      content_type: 'text',
-    });
-    loadData();
+    try {
+      await apiClient.post(`/api/lms/modules/${moduleId}/lessons`, {
+        title,
+        order_index: nextOrder,
+        content_type: 'text',
+      });
+      loadData();
+    } catch {
+      setActionError('Could not add the lesson. Please try again.');
+    }
   }
 
   if (loading) return <p className="text-muted-foreground">Loading…</p>;
@@ -105,6 +121,11 @@ export default function EditCoursePage() {
 
       <section>
         <h2 className="mb-4 text-xl font-semibold">Modules &amp; Lessons</h2>
+        {actionError && (
+          <p role="alert" className="mb-3 text-sm text-red-600">
+            {actionError}
+          </p>
+        )}
         <ModuleEditor
           modules={modules}
           onAddModule={handleAddModule}

@@ -102,9 +102,12 @@ export default function RPLPortfolioPage() {
 
   async function handleWithdraw(id: string) {
     setWithdrawingId(id);
+    setError(null);
     try {
       await apiClient.delete(`/api/lms/rpl/portfolio/${id}`);
       setSubmissions((prev) => prev.filter((s) => s.id !== id));
+    } catch {
+      setError('Could not withdraw application. Please try again.');
     } finally {
       setWithdrawingId(null);
     }
