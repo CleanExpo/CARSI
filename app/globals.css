@@ -1,5 +1,14 @@
 @import "tailwindcss";
 
+/* Drive `dark:` utilities from the `.dark` class (set by public/theme-init.js +
+   ThemeProvider), NOT the OS `prefers-color-scheme`. Tailwind v4 defaults the
+   `dark:` variant to the media query and ignores `darkMode: 'class'` in the JS
+   config, so without this the theme toggle is bypassed and OS-dark users get
+   `dark:` utilities (e.g. white text) layered on the light, class-based theme —
+   producing white-on-white text. This realigns utilities with the `.dark`
+   token block below and the site's light-first toggle. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* ============================================
    CARSI CAMPUS DESIGN SYSTEM
    Light-first professional LMS theme
