@@ -1,5 +1,3 @@
-import { Prisma } from '@/generated/prisma/client';
-
 import { prisma } from '@/lib/prisma';
 import {
   computeAvailability,
@@ -7,35 +5,7 @@ import {
   type CcwRoadshowEvent,
   type RegistrationStatus,
 } from '@/lib/marketing/ccw-roadshow';
-import { isSerializationConflict } from '@/lib/server/db-retry';
-
-const MAX_TX_ATTEMPTS = 3;
-
-/**
- * Run a transaction at SERIALIZABLE isolation, retrying a bounded number of
- * times if Postgres reports a serialization conflict. This is what prevents two
- * concurrent registrations from both reading the same confirmed-seat count and
- * both confirming past the cap.
- */
-async function runSerializable<T>(
-  fn: (tx: Prisma.TransactionClient) => Promise<T>,
-): Promise<T> {
-  let lastError: unknown;
-  for (let attempt = 1; attempt <= MAX_TX_ATTEMPTS; attempt += 1) {
-    try {
-      return await prisma.$transaction(fn, {
-        isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
-      });
-    } catch (error) {
-      lastError = error;
-      if (isSerializationConflict(error) && attempt < MAX_TX_ATTEMPTS) {
-        continue;
-      }
-      throw error;
-    }
-  }
-  throw lastError;
-}
+import { runSerializable } from '@/lib/server/db-tx';
 
 export type AttendeeInput = {
   fullName: string;
