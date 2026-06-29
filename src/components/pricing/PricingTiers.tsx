@@ -8,8 +8,8 @@ export function PricingTiers() {
       <section aria-label="Individual pricing" className="mb-16">
         <h2 className="mb-2 text-center text-2xl font-bold text-slate-950">Individual</h2>
         <p className="mb-8 text-center text-sm text-slate-600">
-          One learner — buy a single course, or use a monthly/yearly membership for 100% access to
-          all published courses.
+          One learner — buy a single course, or choose a yearly membership for 100% access to all
+          published courses.
         </p>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           {INDIVIDUAL_TIERS.map((tier) => (
