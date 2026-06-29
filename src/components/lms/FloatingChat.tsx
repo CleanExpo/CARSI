@@ -69,11 +69,10 @@ function FormattedAssistantText({ text }: { text: string }) {
 export default function FloatingChat() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const searchKey = searchParams.toString();
 
   const pageContext = useMemo(
     () => deriveChatPageContext(pathname, searchParams),
-    [pathname, searchKey, searchParams]
+    [pathname, searchParams]
   );
 
   const focusSubtitle = pageContext

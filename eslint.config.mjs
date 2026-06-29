@@ -49,6 +49,9 @@ const config = [
       "@typescript-eslint/no-require-imports": "error",
       "import/no-anonymous-default-export": "error",
       "prefer-const": "error",
+      // #120 batch 2 — these classes are fully cleared, so they're back to error:
+      "react-hooks/purity": "error",
+      "react-hooks/exhaustive-deps": "error",
     },
   },
   {
@@ -60,10 +63,8 @@ const config = [
       "react-hooks/set-state-in-effect": "warn",
       "react-hooks/preserve-manual-memoization": "warn",
       "react-hooks/refs": "warn",
-      "react-hooks/purity": "warn",
       "react-hooks/static-components": "warn",
       "react-hooks/error-boundaries": "warn",
-      "react-hooks/exhaustive-deps": "warn",
       "react-hooks/rules-of-hooks": "warn",
       "@typescript-eslint/no-explicit-any": "warn",
       "react/no-unescaped-entities": "warn",

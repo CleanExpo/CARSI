@@ -56,7 +56,7 @@ export function CourseFormattedBody({
     return (
       <div
         className={cn(proseByTone[tone], className)}
-        // eslint-disable-next-line react/no-danger -- sanitized with DOMPurify
+        // sanitized with DOMPurify above
         dangerouslySetInnerHTML={{ __html: safe }}
       />
     );
