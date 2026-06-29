@@ -21,6 +21,7 @@ import {
   marketingTextMuted,
   marketingTextSubtle,
 } from '@/lib/marketing/marketing-ui';
+import { OG_IMAGES } from '@/lib/seo/og-image';
 
 const siteUrl = getPublicSiteUrl();
 
@@ -41,6 +42,7 @@ export const metadata: Metadata = {
     'CARSI podcast',
   ],
   openGraph: {
+    images: OG_IMAGES,
     title: 'Podcast Directory | CARSI Industry Hub',
     description:
       'The best podcasts for Australian restoration, HVAC, flooring, and indoor environment professionals — curated by CARSI.',

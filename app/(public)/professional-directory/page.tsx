@@ -10,6 +10,7 @@
 import type { Metadata } from 'next';
 import { SchemaMarkup, buildPersonSchema, buildLocalBusinessSchema } from '@/lib/schema';
 import { getProfessionals, type Professional } from '@/lib/professionals';
+import { OG_IMAGES } from '@/lib/seo/og-image';
 
 export const metadata: Metadata = {
   title: 'Professional Directory | CARSI Industry Hub',
@@ -25,6 +26,7 @@ export const metadata: Metadata = {
     'CARSI professional directory',
   ],
   openGraph: {
+    images: OG_IMAGES,
     title: 'Professional Directory | CARSI Industry Hub',
     description: 'Find NRPG-accredited restoration professionals across Australia.',
     type: 'website',

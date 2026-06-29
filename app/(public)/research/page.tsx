@@ -18,6 +18,7 @@ import {
   marketingTextSubtle,
   marketingTopicPill,
 } from '@/lib/marketing/marketing-ui';
+import { OG_IMAGES } from '@/lib/seo/og-image';
 
 const siteUrl = getPublicSiteUrl();
 
@@ -35,6 +36,7 @@ export const metadata: Metadata = {
     'NRPG articles',
   ],
   openGraph: {
+    images: OG_IMAGES,
     title: 'Research Articles | CARSI Industry Hub',
     description:
       'Expert research and analysis on the Australian restoration, indoor environment, and HVAC industries.',

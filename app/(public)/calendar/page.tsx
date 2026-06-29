@@ -19,6 +19,7 @@ import {
   marketingTextSubtle,
   marketingTopicPill,
 } from '@/lib/marketing/marketing-ui';
+import { OG_IMAGES } from '@/lib/seo/og-image';
 
 export const metadata: Metadata = {
   title: 'Industry Calendar — Restoration & Indoor Environment Events',
@@ -34,6 +35,7 @@ export const metadata: Metadata = {
     'industry networking Australia',
   ],
   openGraph: {
+    images: OG_IMAGES,
     title: 'Industry Calendar | CARSI Hub',
     description:
       'National calendar of Australian restoration and indoor environment industry events.',

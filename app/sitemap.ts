@@ -9,6 +9,13 @@ export const dynamic = 'force-dynamic';
 
 const baseUrl = getPublicSiteUrl();
 
+// Stable lastmod for static pages: evaluated once per server lifetime (≈ deploy
+// time) instead of `new Date()` per request. Emitting request-time "now" on every
+// crawl makes Google distrust and ignore lastmod entirely — a stable, deploy-
+// pinned date is honest and usable. Content-backed routes below still use their
+// own `updated_at`.
+const STATIC_LASTMOD = new Date();
+
 // Static pages with their priorities and change frequencies
 const staticPages = [
   { path: '/', priority: 1.0, changeFreq: 'weekly' as const },
@@ -111,7 +118,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Static pages
   const staticEntries: MetadataRoute.Sitemap = staticPages.map((page) => ({
     url: `${baseUrl}${page.path}`,
-    lastModified: new Date(),
+    lastModified: STATIC_LASTMOD,
     changeFrequency: page.changeFreq,
     priority: page.priority,
   }));
@@ -124,7 +131,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     lastModified:
       'updated_at' in course && course.updated_at
         ? new Date(course.updated_at)
-        : new Date(),
+        : STATIC_LASTMOD,
     changeFrequency: 'weekly' as const,
     priority: 0.8,
   }));
@@ -133,7 +140,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const pathways = await getPathways();
   const pathwayEntries: MetadataRoute.Sitemap = pathways.map((pathway) => ({
     url: `${baseUrl}/pathways/${pathway.slug}`,
-    lastModified: pathway.updated_at ? new Date(pathway.updated_at) : new Date(),
+    lastModified: pathway.updated_at ? new Date(pathway.updated_at) : STATIC_LASTMOD,
     changeFrequency: 'weekly' as const,
     priority: 0.7,
   }));

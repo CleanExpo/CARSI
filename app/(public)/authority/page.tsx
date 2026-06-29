@@ -41,6 +41,7 @@ import {
   marketingSection,
   marketingTopicPill,
 } from '@/lib/marketing/marketing-ui';
+import { OG_IMAGES } from '@/lib/seo/og-image';
 
 const siteUrl = getPublicSiteUrl();
 
@@ -59,6 +60,7 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: `${siteUrl}${authorityPath}` },
   openGraph: {
+    images: OG_IMAGES,
     title: 'CARSI Authority Hub',
     description:
       'Citation-ready CARSI links, evidence standards and community pathways for cleaning and restoration education.',

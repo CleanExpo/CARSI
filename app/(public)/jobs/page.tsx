@@ -21,6 +21,7 @@ import {
   marketingTextSubtle,
   marketingTopicPill,
 } from '@/lib/marketing/marketing-ui';
+import { OG_IMAGES } from '@/lib/seo/og-image';
 
 export const metadata: Metadata = {
   title: 'Jobs | CARSI Industry Hub',
@@ -36,6 +37,7 @@ export const metadata: Metadata = {
     'CARSI job board',
   ],
   openGraph: {
+    images: OG_IMAGES,
     title: 'Jobs | CARSI Industry Hub',
     description: 'Industry jobs across restoration, HVAC, flooring, and indoor environments.',
     type: 'website',

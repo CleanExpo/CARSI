@@ -1,9 +1,10 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 import { MarketingPageShell } from '@/components/marketing/MarketingPageShell';
 import { Badge } from '@/components/ui/badge';
-import { getBackendOrigin } from '@/lib/env/public-url';
+import { getBackendOrigin, getPublicSiteUrl } from '@/lib/env/public-url';
 import {
   marketingBodySm,
   marketingHeading,
@@ -11,8 +12,11 @@ import {
   marketingTextMuted,
   marketingTextStrong,
 } from '@/lib/marketing/marketing-ui';
+import { OG_IMAGES, OG_IMAGE_URLS } from '@/lib/seo/og-image';
 
 export const dynamic = 'force-dynamic';
+
+const siteUrl = getPublicSiteUrl();
 
 interface PathwayCourse {
   course_id: string;
@@ -47,6 +51,53 @@ async function getPathway(slug: string): Promise<PathwayDetail | null> {
   } catch {
     return null;
   }
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const pathway = await getPathway(slug);
+
+  if (!pathway) {
+    return {
+      title: 'Pathway Not Found',
+      description: 'The requested training pathway could not be found.',
+    };
+  }
+
+  const disciplineText = pathway.iicrc_discipline ? `IICRC ${pathway.iicrc_discipline} ` : '';
+  const certText = pathway.target_certification
+    ? ` Builds toward ${pathway.target_certification}.`
+    : '';
+  const description = (
+    pathway.description?.trim() ||
+    `${pathway.title} — a structured ${disciplineText}CEC training pathway for cleaning and restoration professionals.${certText}`
+  ).slice(0, 160);
+  const canonical = `${siteUrl}/pathways/${slug}`;
+
+  return {
+    title: pathway.title,
+    description,
+    alternates: { canonical },
+    openGraph: {
+      title: `${pathway.title} | CARSI`,
+      description,
+      url: canonical,
+      siteName: 'CARSI',
+      images: OG_IMAGES,
+      locale: 'en_AU',
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${pathway.title} | CARSI`,
+      description,
+      images: OG_IMAGE_URLS,
+    },
+  };
 }
 
 export default async function PathwayDetailPage({ params }: { params: Promise<{ slug: string }> }) {

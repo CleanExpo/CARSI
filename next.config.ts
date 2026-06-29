@@ -123,6 +123,28 @@ const nextConfig: NextConfig = {
         ],
       },
       {
+        // Static Open Graph / share images are effectively immutable content.
+        // Give them a long cache so social crawlers and the CDN don't refetch
+        // them on every share. (Scoped to image assets only — NOT '/:path*',
+        // which would risk caching authenticated HTML.)
+        source: '/og-image.png',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=86400, stale-while-revalidate=604800',
+          },
+        ],
+      },
+      {
+        source: '/images/og/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=86400, stale-while-revalidate=604800',
+          },
+        ],
+      },
+      {
         source: '/api/:path*',
         headers: [
           { key: 'Access-Control-Allow-Credentials', value: 'true' },
