@@ -17,6 +17,8 @@ function JoinTeamInner() {
 
   useEffect(() => {
     if (!user || !token) return;
+    // Enter the working state, then accept the invite asynchronously.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setStatus('working');
     apiClient
       .post<{ team_slug: string }>('/api/lms/teams/invite/accept', { token })

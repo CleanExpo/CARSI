@@ -22,6 +22,9 @@ export function usePushNotifications() {
   const [isSubscribed, setIsSubscribed] = useState(false);
 
   useEffect(() => {
+    // Browser capability + permission detection — only available after mount
+    // on the client, so this is intentionally set post-render (not in render).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsSupported('serviceWorker' in navigator && 'PushManager' in window);
     setPermission(Notification.permission);
   }, []);

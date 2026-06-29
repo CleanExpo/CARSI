@@ -46,7 +46,10 @@ export function ThemeProvider({
   const forceLight = isDashboardPath(pathname ?? '');
 
   useEffect(() => {
+    // Hydrate from localStorage after mount — can't read it during SSR, and a
+    // lazy initializer would cause a hydration mismatch against the server HTML.
     const stored = readStoredTheme();
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (stored) setThemeState(stored);
   }, []);
 

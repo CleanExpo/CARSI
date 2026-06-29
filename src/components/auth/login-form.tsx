@@ -134,6 +134,8 @@ export function LoginForm() {
       <form
         ref={formRef}
         id="login-form"
+        // formRef.current is only read inside onSubmit (a submit handler), never during render
+        // eslint-disable-next-line react-hooks/refs
         onSubmit={form.handleSubmit(onSubmit)}
         className="space-y-4"
         autoComplete="on"

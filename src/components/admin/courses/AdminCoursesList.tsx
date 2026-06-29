@@ -107,6 +107,9 @@ function AdminCourseListThumb({
   const src = normalizeImageSrcForApp(thumbnailUrl);
 
   useEffect(() => {
+    // Reset the load-failed flag when the thumbnail source changes so a new URL
+    // re-attempts rather than staying stuck on the previous failure.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setFailed(false);
   }, [thumbnailUrl]);
 

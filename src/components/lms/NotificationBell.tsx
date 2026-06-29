@@ -34,6 +34,8 @@ export function NotificationBell() {
   }, []);
 
   useEffect(() => {
+    // Fetch notifications on mount; state is set asynchronously after the await.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchNotifications();
   }, [fetchNotifications]);
 
