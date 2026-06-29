@@ -1,14 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { getUpstreamBaseUrl, upstreamNotConfigured } from '@/lib/server/upstream-api';
+import { authorizeWorkflowRequest, withForwardedAuth } from '@/lib/server/workflow-auth';
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const auth = await authorizeWorkflowRequest(request);
+  if (!auth.ok) return auth.response;
+
   const BACKEND_URL = getUpstreamBaseUrl();
   if (!BACKEND_URL) return upstreamNotConfigured();
 
   try {
     const { id } = await params;
-    const response = await fetch(`${BACKEND_URL}/api/workflows/${id}`);
+    const response = await fetch(`${BACKEND_URL}/api/workflows/${id}`, {
+      headers: withForwardedAuth(auth.authorization),
+    });
     const data = await response.json();
 
     return NextResponse.json(data, { status: response.status });
@@ -19,6 +25,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 }
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const auth = await authorizeWorkflowRequest(request);
+  if (!auth.ok) return auth.response;
+
   const BACKEND_URL = getUpstreamBaseUrl();
   if (!BACKEND_URL) return upstreamNotConfigured();
 
@@ -28,9 +37,9 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
     const response = await fetch(`${BACKEND_URL}/api/workflows/${id}`, {
       method: 'PUT',
-      headers: {
+      headers: withForwardedAuth(auth.authorization, {
         'Content-Type': 'application/json',
-      },
+      }),
       body: JSON.stringify(body),
     });
 
@@ -44,6 +53,9 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 }
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const auth = await authorizeWorkflowRequest(request);
+  if (!auth.ok) return auth.response;
+
   const BACKEND_URL = getUpstreamBaseUrl();
   if (!BACKEND_URL) return upstreamNotConfigured();
 
@@ -53,9 +65,9 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
     const response = await fetch(`${BACKEND_URL}/api/workflows/${id}`, {
       method: 'PATCH',
-      headers: {
+      headers: withForwardedAuth(auth.authorization, {
         'Content-Type': 'application/json',
-      },
+      }),
       body: JSON.stringify(body),
     });
 
@@ -69,9 +81,12 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 }
 
 export async function DELETE(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const auth = await authorizeWorkflowRequest(request);
+  if (!auth.ok) return auth.response;
+
   const BACKEND_URL = getUpstreamBaseUrl();
   if (!BACKEND_URL) return upstreamNotConfigured();
 
@@ -79,6 +94,7 @@ export async function DELETE(
     const { id } = await params;
     const response = await fetch(`${BACKEND_URL}/api/workflows/${id}`, {
       method: 'DELETE',
+      headers: withForwardedAuth(auth.authorization),
     });
 
     if (response.status === 204) {
