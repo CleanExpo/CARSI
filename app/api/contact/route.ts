@@ -6,6 +6,7 @@ import { emitCrmEvent } from '@/lib/server/crm-sync';
 import { getAppOrigin } from '@/lib/server/app-url';
 import { sendContactNotificationEmail } from '@/lib/server/transactional-email';
 import { applyRateLimit, UNKNOWN_IP } from '@/lib/rate-limit';
+import { verifyTurnstileToken } from '@/lib/server/turnstile';
 import { prisma } from '@/lib/prisma';
 
 interface ContactPayload {
@@ -13,6 +14,7 @@ interface ContactPayload {
   lastName: string;
   email: string;
   message: string;
+  turnstileToken?: string;
   leadContext?: {
     source?: string;
     topic?: string;
@@ -80,6 +82,11 @@ export async function POST(req: NextRequest) {
     }
 
     const body = (await req.json()) as ContactPayload;
+
+    const turnstile = await verifyTurnstileToken(body.turnstileToken, ip);
+    if (!turnstile.ok) {
+      return NextResponse.json({ error: 'Verification failed. Please try again.' }, { status: 403 });
+    }
 
     if (!body.firstName || !body.lastName || !body.email || !body.message) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });

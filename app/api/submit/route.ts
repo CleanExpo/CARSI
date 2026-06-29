@@ -2,6 +2,7 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 import { applyRateLimit, UNKNOWN_IP } from '@/lib/rate-limit';
+import { verifyTurnstileToken } from '@/lib/server/turnstile';
 
 /* ─── Rate limit config ───────────────────────────────────────────────────── */
 
@@ -35,6 +36,7 @@ interface SubmissionPayload {
   submission_description?: string;
   terms_accepted: boolean;
   guidelines_accepted: boolean;
+  turnstileToken?: string;
 }
 
 interface HubSubmissionInsert {
@@ -103,6 +105,15 @@ export async function POST(req: NextRequest) {
     body = (await req.json()) as SubmissionPayload;
   } catch {
     return NextResponse.json({ success: false, error: 'Invalid request body.' }, { status: 400 });
+  }
+
+  /* 1b. Bot check (issue #118) — skipped when TURNSTILE_SECRET_KEY is unset. */
+  const turnstile = await verifyTurnstileToken(body.turnstileToken, ip);
+  if (!turnstile.ok) {
+    return NextResponse.json(
+      { success: false, error: 'Verification failed. Please try again.' },
+      { status: 403 }
+    );
   }
 
   /* 2. Validate required fields */
