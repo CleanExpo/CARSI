@@ -9,6 +9,17 @@ export default function SubscribeSuccessPage() {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get('session_id');
   const [showConfetti, setShowConfetti] = useState(true);
+  // Generate the confetti pieces once on mount — keeps Math.random out of the
+  // render path (purity) and stops the pieces re-randomising on every render.
+  const [confetti] = useState(() =>
+    Array.from({ length: 50 }, (_, i) => ({
+      left: Math.random() * 100,
+      color: ['#00F5FF', '#00FF88', '#FFB800', '#FF00FF'][i % 4],
+      rotate: Math.random() * 360,
+      duration: 2 + Math.random() * 2,
+      delay: Math.random() * 0.5,
+    }))
+  );
 
   useEffect(() => {
     // Hide confetti after animation
@@ -21,23 +32,23 @@ export default function SubscribeSuccessPage() {
       {/* Success confetti effect */}
       {showConfetti && (
         <div className="pointer-events-none fixed inset-0 overflow-hidden">
-          {Array.from({ length: 50 }).map((_, i) => (
+          {confetti.map((piece, i) => (
             <motion.div
               key={i}
               className="absolute h-3 w-3 rounded-full"
               style={{
-                left: `${Math.random() * 100}%`,
-                background: ['#00F5FF', '#00FF88', '#FFB800', '#FF00FF'][i % 4],
+                left: `${piece.left}%`,
+                background: piece.color,
               }}
               initial={{ y: -20, opacity: 1 }}
               animate={{
                 y: window.innerHeight + 20,
                 opacity: 0,
-                rotate: Math.random() * 360,
+                rotate: piece.rotate,
               }}
               transition={{
-                duration: 2 + Math.random() * 2,
-                delay: Math.random() * 0.5,
+                duration: piece.duration,
+                delay: piece.delay,
                 ease: 'easeOut',
               }}
             />

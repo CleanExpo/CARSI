@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useAgentRuns, type AgentRunStatus } from '@/hooks/use-agent-runs';
 import { AgentRunMonitor } from '@/components/agent-run-monitor';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -28,6 +28,14 @@ export default function AgentRunsDashboard() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<AgentRunStatus | 'all'>('all');
   const [selectedRunId, setSelectedRunId] = useState<string | null>(null);
+  // Clock for live durations of in-progress runs — kept in state (ticking on an
+  // interval) so render stays pure rather than calling Date.now() inline.
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
 
   // Filter and search runs
   const filteredRuns = useMemo(() => {
@@ -217,7 +225,7 @@ export default function AgentRunsDashboard() {
                           new Date(run.started_at).getTime()) /
                           1000
                       )
-                    : Math.round((Date.now() - new Date(run.started_at).getTime()) / 1000);
+                    : Math.round((now - new Date(run.started_at).getTime()) / 1000);
 
                   return (
                     <TableRow
