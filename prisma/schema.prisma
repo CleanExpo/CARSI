@@ -54,6 +54,7 @@ model LmsUser {
   ownedTeams         LmsTeam[]       @relation("TeamOwner")
   quizAttempts       LmsQuizAttempt[]
   iicrcCecSubmissions LmsIicrcCecSubmission[]
+  lessonProgress     LmsLessonProgress[]
 
   @@map("lms_users")
 }
@@ -169,7 +170,8 @@ model LmsLessonProgress {
   lastAccessedAt DateTime  @default(now()) @map("last_accessed_at") @db.Timestamptz(6)
   updatedAt      DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  lesson LmsLesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  lesson  LmsLesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  student LmsUser   @relation(fields: [studentId], references: [id], onDelete: Cascade)
 
   @@unique([studentId, lessonId], map: "uq_lms_lesson_progress_student_lesson")
   @@map("lms_lesson_progress")
