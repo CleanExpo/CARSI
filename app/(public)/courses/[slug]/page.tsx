@@ -12,8 +12,19 @@ import { isOnboardingCourse } from '@/lib/onboarding/enterprise';
 import { normalizePublicAssetUrl } from '@/lib/remote-image';
 import { OG_IMAGES, OG_IMAGE_URLS } from '@/lib/seo/og-image';
 import { getPublishedCourseDetailBySlugFromDatabase } from '@/lib/server/public-courses-list';
+import { stripLegacyPurchaseCta } from '@/lib/lms/format-course-body';
 
 export const dynamic = 'force-dynamic';
+
+/**
+ * Strip the legacy WooCommerce "Already Purchased This Course? → Access Here" lead block
+ * (issue #126) from a loaded course so it leaks into neither the rendered hero nor the SEO
+ * metadata / JSON-LD schema (which read `description` directly, bypassing CourseFormattedBody).
+ */
+function sanitizeCourseDetail<T extends { description?: string | null }>(course: T): T {
+  if (!course.description) return course;
+  return { ...course, description: stripLegacyPurchaseCta(course.description) };
+}
 
 interface CourseDetail {
   id: string;
@@ -48,7 +59,7 @@ export async function getCourse(slug: string): Promise<CourseDetail | null> {
   if (process.env.DATABASE_URL?.trim()) {
     try {
       const fromDb = await getPublishedCourseDetailBySlugFromDatabase(slug);
-      if (fromDb) return fromDb;
+      if (fromDb) return sanitizeCourseDetail(fromDb);
     } catch (e) {
       console.error('[courses/[slug]] Failed to load course from database', e);
     }
@@ -63,7 +74,7 @@ export async function getCourse(slug: string): Promise<CourseDetail | null> {
     });
     if (res.status === 404) return null;
     if (!res.ok) return null;
-    return (await res.json()) as CourseDetail;
+    return sanitizeCourseDetail((await res.json()) as CourseDetail);
   } catch {
     return null;
   }
