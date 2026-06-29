@@ -117,7 +117,7 @@ assets/artlist/
 .claude/data/minion-state.json
 .worktrees/
 .env*.local
-# WordPress migration export (regenerate with: pnpm wp:migrate). courses.json is tracked for deploy seeds.
+# WordPress migration export (legacy one-time migration; live scrape retired — see docs/agent-framework/CONNECTORS.md). courses.json is tracked for deploy seeds.
 data/wordpress-export/*
 !data/wordpress-export/courses.json
 !data/wordpress-export/carsi.WordPress.2026-04-05.xml.gz
