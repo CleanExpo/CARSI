@@ -5,7 +5,7 @@ import { PricingTiers } from '@/components/pricing/PricingTiers';
 import { BreadcrumbSchema, FAQSchema } from '@/components/seo';
 
 export const metadata: Metadata = {
-  title: 'Pricing | CARSI — Restoration Training Online',
+  title: 'Pricing — Restoration Training Online',
   description:
     'CARSI membership from $44/month — monthly or yearly subscriptions unlock 100% access to all published courses, CEC tracking, and verified CARSI certificates. Free Library available to all.',
   keywords: [

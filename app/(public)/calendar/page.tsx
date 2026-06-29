@@ -21,7 +21,7 @@ import {
 } from '@/lib/marketing/marketing-ui';
 
 export const metadata: Metadata = {
-  title: 'Industry Calendar | CARSI Hub',
+  title: 'Industry Calendar — Restoration & Indoor Environment Events',
   description:
     'National calendar of Australian restoration, HVAC, flooring, and indoor environment industry events — conferences, training, webinars, and workshops. Stay connected with your industry.',
   keywords: [
