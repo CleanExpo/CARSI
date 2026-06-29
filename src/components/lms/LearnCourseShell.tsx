@@ -116,6 +116,7 @@ export function LearnCourseShell({ slug }: { slug: string }) {
   const [loadingLesson, setLoadingLesson] = useState(false);
   const [lessonError, setLessonError] = useState<string | null>(null);
   const [savingComplete, setSavingComplete] = useState(false);
+  const [completeError, setCompleteError] = useState<string | null>(null);
   const [noteText, setNoteText] = useState('');
   const [loadingNote, setLoadingNote] = useState(false);
   const [savingNote, setSavingNote] = useState(false);
@@ -371,6 +372,7 @@ export function LearnCourseShell({ slug }: { slug: string }) {
   async function toggleComplete(completed: boolean) {
     if (!activeLessonId) return;
     const lessonToAdvance = completed ? nextLesson : null;
+    setCompleteError(null);
     setSavingComplete(true);
     try {
       await apiClient.patch(`/api/lms/lessons/${encodeURIComponent(activeLessonId)}/progress`, {
@@ -460,6 +462,12 @@ export function LearnCourseShell({ slug }: { slug: string }) {
           selectLesson(lessonToAdvance.id);
         }
       }
+    } catch (e) {
+      setCompleteError(
+        e instanceof ApiClientError
+          ? e.message
+          : 'Could not save your progress. Please check your connection and try again.'
+      );
     } finally {
       setSavingComplete(false);
     }
@@ -1031,6 +1039,14 @@ export function LearnCourseShell({ slug }: { slug: string }) {
                             {currentMeta?.completed ? 'Lesson completed' : 'Mark lesson complete'}
                           </Button>
                         </div>
+                        {completeError ? (
+                          <p
+                            role="alert"
+                            className="text-right text-sm text-red-600"
+                          >
+                            {completeError}
+                          </p>
+                        ) : null}
                       </div>
                     </>
                     )
