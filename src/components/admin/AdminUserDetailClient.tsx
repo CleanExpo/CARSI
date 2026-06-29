@@ -409,6 +409,8 @@ export function AdminUserDetailClient({
       }
       setSelectedCourseSlugs(new Set());
       router.refresh();
+    } catch {
+      setActionError('Could not grant course access. Please check your connection and try again.');
     } finally {
       setPendingGrant(false);
     }
@@ -430,6 +432,8 @@ export function AdminUserDetailClient({
         return next;
       });
       router.refresh();
+    } catch {
+      setActionError('Could not remove course. Please check your connection and try again.');
     } finally {
       setPendingRevokeId(null);
     }
@@ -469,6 +473,8 @@ export function AdminUserDetailClient({
       }
       setSelectedEnrollmentIds(new Set());
       router.refresh();
+    } catch {
+      setActionError('Could not mark courses complete. Please check your connection and try again.');
     } finally {
       setPendingCompleteIds(new Set());
     }

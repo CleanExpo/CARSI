@@ -20,11 +20,13 @@ export interface CourseFormValues {
 }
 
 interface CourseBuilderProps {
-  onSubmit: (values: CourseFormValues) => void;
+  onSubmit: (values: CourseFormValues) => void | Promise<void>;
   initialValues?: CourseFormValues;
 }
 
 export function CourseBuilder({ onSubmit, initialValues }: CourseBuilderProps) {
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [values, setValues] = useState<CourseFormValues>({
     title: '',
     slug: '',
@@ -45,9 +47,17 @@ export function CourseBuilder({ onSubmit, initialValues }: CourseBuilderProps) {
 
   return (
     <form
-      onSubmit={(e) => {
+      onSubmit={async (e) => {
         e.preventDefault();
-        onSubmit(values);
+        setError(null);
+        setSubmitting(true);
+        try {
+          await onSubmit(values);
+        } catch {
+          setError('Could not save the course. Please check the details and try again.');
+        } finally {
+          setSubmitting(false);
+        }
       }}
       className="space-y-6"
     >
@@ -135,7 +145,15 @@ export function CourseBuilder({ onSubmit, initialValues }: CourseBuilderProps) {
         </div>
       </div>
 
-      <Button type="submit">Save Course</Button>
+      {error && (
+        <p role="alert" className="text-sm text-red-600">
+          {error}
+        </p>
+      )}
+
+      <Button type="submit" disabled={submitting}>
+        {submitting ? 'Saving…' : 'Save Course'}
+      </Button>
     </form>
   );
 }

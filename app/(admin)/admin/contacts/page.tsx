@@ -88,12 +88,21 @@ export default function AdminContactsPage() {
   }, [load]);
 
   async function setStatus(id: string, status: string) {
-    await fetch('/api/admin/contacts', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id, status }),
-    });
-    void load();
+    setError(null);
+    try {
+      const res = await fetch('/api/admin/contacts', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, status }),
+      });
+      if (!res.ok) {
+        setError('Could not update contact status. Please try again.');
+        return;
+      }
+      void load();
+    } catch {
+      setError('Could not update contact status. Please try again.');
+    }
   }
 
   function handleLeadFilter(intent: string) {
