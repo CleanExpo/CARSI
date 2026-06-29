@@ -15,7 +15,7 @@ function sanitizeCourseText(s: string | null | undefined): string {
     .replace(/\r\n/g, '\n');
 }
 
-/** Path to `wp:migrate` output (gitignored in development). */
+/** Path to the committed WordPress export (gitignored in development). */
 export const WP_EXPORT_COURSES_PATH = path.join(
   process.cwd(),
   'data',
@@ -49,7 +49,7 @@ export interface WpExportCourse {
   };
 }
 
-/** Map WooCommerce / WP category slugs to IICRC tab codes (extends wp-migrate heuristics). */
+/** Map legacy WP category slugs (from the migration export) to IICRC tab codes. */
 const CATEGORY_SLUG_TO_DISCIPLINE: Record<string, string> = {
   'water-restoration': 'WRT',
   'water-damage-restoration': 'WRT',
@@ -73,7 +73,7 @@ const CATEGORY_SLUG_TO_DISCIPLINE: Record<string, string> = {
 
 /**
  * Many exports have `iicrc_discipline: null` but carry discipline via `meta.wp_categories` slugs.
- * Used so CourseGrid discipline tabs (e.g. WRT) match wp-migrate output.
+ * Used so CourseGrid discipline tabs (e.g. WRT) match the WP migration export.
  */
 export function inferDisciplineFromWpExport(row: WpExportCourse): string | null {
   if (row.iicrc_discipline) return row.iicrc_discipline;

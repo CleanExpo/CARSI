@@ -43,11 +43,6 @@ services:
       - key: JWT_SECRET
         scope: RUN_TIME
 
-      - key: WC_CONSUMER_KEY
-        scope: RUN_AND_BUILD_TIME
-      - key: WC_CONSUMER_SECRET
-        scope: RUN_AND_BUILD_TIME
-
       - key: STRIPE_SECRET_KEY
         scope: RUN_AND_BUILD_TIME
       - key: STRIPE_WEBHOOK_SECRET

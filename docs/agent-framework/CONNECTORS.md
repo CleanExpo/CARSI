@@ -42,12 +42,17 @@ Catalogue types and the CEC resolver live in `src/lib/seed/` (`courses-catalog-t
 
 ## 2. WordPress connectors
 
-The legacy carsi.com.au site (WordPress + WooCommerce + LearnDash) is migrated through a
-multi-step chain that lands in `data/wordpress-export/*.json` first, then into Postgres.
+The legacy carsi.com.au site (WordPress + WooCommerce + LearnDash) was migrated through a
+multi-step chain that landed in `data/wordpress-export/*.json` first, then into Postgres.
+
+> **Live WP/WooCommerce scrape is retired.** carsi.com.au is now this DigitalOcean app —
+> there is no WordPress/WooCommerce source to scrape anymore. The committed
+> `data/wordpress-export/*.json` exports are the source of truth the seed scripts below
+> read; the original scraper (`wp-migrate.ts`) and its `WC_CONSUMER_KEY/SECRET` were
+> removed in #122. The export JSON remains in git history if a re-scrape is ever needed.
 
 | Connector | npm script | What it does |
 | --- | --- | --- |
-| `wp-migrate.ts` | — (`npx ts-node`; `--dry-run`, `--generate-sql`) | Scrapes the WP REST API → `data/wordpress-export/{posts,pages,products,courses,users,categories,tags,media,memberships,url-redirects}.json` |
 | `enrich-wp-export-cec.ts` | `db:enrich-wp-export-cec` (`--dry-run`) | Fills `cec_hours` on `wordpress-export/courses.json` from meta + description text |
 | `seed-wordpress-export-courses.ts` | `db:seed-wp-export` | Upserts **published** Woo courses → `lms_courses`, **excluding** the 20 pilot courses already in the catalogue snapshot |
 | `seed-wordpress-lessons-wxr.ts` | `db:seed-wp-lessons` | Imports LearnDash `sfwd-lessons` from a WXR export → `lms_modules`/`lms_lessons` for the Woo-seeded courses |
