@@ -12,6 +12,19 @@ export default {
          COLORS
          ---------------------------------------- */
       colors: {
+        // IICRC discipline palette (issue #70) — canonical source of truth, kept in
+        // sync with the `.discipline-*` tokens in app/globals.css and the
+        // DISCIPLINE_HEX map in src/lib/server/certificate-pdf.ts. Use as
+        // `bg-iicrc-wrt`, `text-iicrc-amrt`, etc.
+        iicrc: {
+          wrt: '#2490ed', // Water Restoration
+          crt: '#26c4a0', // Carpet Restoration
+          asd: '#6c63ff', // Applied Structural Drying
+          amrt: '#27ae60', // Microbial Remediation
+          fsrt: '#f05a35', // Fire & Smoke
+          oct: '#9b59b6', // Odour Control
+          cct: '#17b8d4', // Commercial Carpet Cleaning
+        },
         // Base shadcn tokens
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',

@@ -19,3 +19,7 @@ Autonomous and semi-autonomous work follows the continuous ship loop in
 Compound → Kanban movement). Every code-modifying pass must pass the
 `docs/agent-framework/CARSI_VERIFICATION_GATE.md` checklist, and `npm run
 type-check` is mandatory before any pass is marked Done.
+
+## Continual Learning
+
+This repo emits signal to `.harness/learning/*.jsonl` for the weekly distillation routine (RA-1745). If you notice something the system should learn from, append a structured entry — do not stop work to reason about meta-rules. Schema and consumer per RA-1745.
