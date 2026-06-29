@@ -32,7 +32,6 @@ export function parseHtmlLessonBlocks(html: string): HtmlLessonBlock[] {
   if (!raw) return [];
 
   const blocks: HtmlLessonBlock[] = [];
-  let remaining = raw;
 
   const listRe = /<(ul|ol)[^>]*>[\s\S]*?<\/\1>/gi;
   let listMatch: RegExpExecArray | null;

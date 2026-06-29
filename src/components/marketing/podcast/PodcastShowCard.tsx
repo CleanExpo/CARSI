@@ -182,7 +182,6 @@ export function PodcastCategoryPills({
   activeCategory?: string;
   searchQuery?: string;
 }) {
-  const baseQuery = searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : '';
 
   return (
     <div className="flex flex-wrap gap-2">

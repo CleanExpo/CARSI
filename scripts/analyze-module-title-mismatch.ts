@@ -100,9 +100,7 @@ async function main() {
     for (const [slug] of idx) {
       if (!sourceIndex.has(slug)) sourceIndex.set(slug, src);
     }
-    // Also match by title substring in raw file
     if (existsSync(full)) {
-      const raw = readFileSync(full, 'utf8');
       sourceIndex.set(`__file__:${src.file}`, src);
     }
   }

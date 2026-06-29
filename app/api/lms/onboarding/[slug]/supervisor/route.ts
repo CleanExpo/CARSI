@@ -1,9 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import {
-  computeProgressFromModules,
-  type CurriculumModuleShape,
-} from '@/lib/onboarding/enterprise';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { getOnboardingCourseBySlug } from '@/lib/server/onboarding-programs';
 import { prisma } from '@/lib/prisma';

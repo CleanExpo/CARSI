@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { Award, Building2 } from 'lucide-react';
 
-import { dash } from '@/lib/dashboard-light-ui';
 import { formatOnboardingPrice, ONBOARDING_BRAND, type OnboardingPricingMeta } from '@/lib/onboarding/enterprise';
 
 type Props = {

@@ -17,7 +17,7 @@ export function EnterpriseLessonSidebar({ contentBody, contentType }: Props) {
 
   const highlights = extractLessonHighlights(contentBody);
   let objectives = highlights.objectives;
-  let checklist = highlights.checklist;
+  const checklist = highlights.checklist;
 
   if (objectives.length === 0 && contentBody && looksLikeHtmlFragment(contentBody)) {
     const blocks = parseHtmlLessonBlocks(contentBody);

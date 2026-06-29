@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 const DISCIPLINES = [
   {
@@ -75,7 +75,6 @@ export function IICRCDisciplineMap() {
   const [locked, setLocked] = useState<string | null>(null);
 
   const activeId = locked ?? hovered;
-  const active = useMemo(() => DISCIPLINES.find((d) => d.id === activeId) ?? null, [activeId]);
 
   const setHover = useCallback((id: string | null) => {
     setHovered(id);

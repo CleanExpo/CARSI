@@ -62,7 +62,7 @@ export function parseMicrobialSectionBCompendium(paras: string[]): MicrobialPars
   for (let ci = 0; ci < courseStarts.length; ci += 1) {
     const from = courseStarts[ci]!;
     const to = courseStarts[ci + 1] ?? paras.length;
-    let block = paras.slice(from, to);
+    const block = paras.slice(from, to);
 
     const cm = block[0]!.match(COURSE_HEAD);
     const title = cm?.[2]?.trim();

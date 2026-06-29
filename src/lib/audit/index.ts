@@ -10,6 +10,13 @@
  * - Report Generation
  */
 
+import { APIRouteAuditor } from './api-route-auditor';
+import { EvidenceCollector } from './evidence-collector';
+import { ReportGenerator } from './report-generator';
+import { ScheduledAuditRunner } from './scheduled-audit-runner';
+import { UserJourneyRunner } from './user-journey-runner';
+import { UXFrictionDetector } from './ux-friction-detector';
+
 // Core Components
 export { UserJourneyRunner, COMMON_JOURNEYS } from './user-journey-runner';
 export type {
@@ -76,13 +83,6 @@ export function createAuditSystem(options?: {
   apiDir?: string;
   evidenceStorage?: string;
 }) {
-  const { UserJourneyRunner } = require('./user-journey-runner');
-  const { UXFrictionDetector } = require('./ux-friction-detector');
-  const { EvidenceCollector } = require('./evidence-collector');
-  const { APIRouteAuditor } = require('./api-route-auditor');
-  const { ScheduledAuditRunner } = require('./scheduled-audit-runner');
-  const { ReportGenerator } = require('./report-generator');
-
   return {
     journeyRunner: new UserJourneyRunner(),
     frictionDetector: new UXFrictionDetector(),

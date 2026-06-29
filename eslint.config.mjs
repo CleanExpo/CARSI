@@ -15,7 +15,7 @@
 import nextCoreWebVitals from "eslint-config-next/core-web-vitals";
 import nextTypescript from "eslint-config-next/typescript";
 
-export default [
+const config = [
   {
     ignores: [
       ".next/**",
@@ -33,9 +33,29 @@ export default [
   ...nextCoreWebVitals,
   ...nextTypescript,
   {
-    // RA-3015 — downgrade React 19 hooks-purity rules to warnings for
-    // existing violations. Fix the underlying code in a follow-up
-    // sweep; promote back to errors once the code is clean.
+    // #120 (RA-4192) — mechanical lint debt cleared and these rules promoted
+    // back to `error`. `no-unused-vars` honours the repo's `_`-prefix
+    // convention for intentionally-unused bindings (params kept for a
+    // signature, caught-but-unused errors, etc.).
+    rules: {
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          caughtErrorsIgnorePattern: "^_",
+        },
+      ],
+      "@typescript-eslint/no-require-imports": "error",
+      "import/no-anonymous-default-export": "error",
+      "prefer-const": "error",
+    },
+  },
+  {
+    // #120 remainder — React 19 hooks-purity rules are behaviour-sensitive and
+    // are being fixed per-site in a separate pass, not bulk-swept. Kept as
+    // warnings until that work lands so CI stays unblocked without masking
+    // genuine regressions in the rules above.
     rules: {
       "react-hooks/set-state-in-effect": "warn",
       "react-hooks/preserve-manual-memoization": "warn",
@@ -45,12 +65,11 @@ export default [
       "react-hooks/error-boundaries": "warn",
       "react-hooks/exhaustive-deps": "warn",
       "react-hooks/rules-of-hooks": "warn",
-      "@typescript-eslint/no-unused-vars": "warn",
       "@typescript-eslint/no-explicit-any": "warn",
-      "@typescript-eslint/no-require-imports": "warn",
-      "prefer-const": "warn",
       "react/no-unescaped-entities": "warn",
       "@next/next/no-img-element": "warn",
     },
   },
 ];
+
+export default config;
