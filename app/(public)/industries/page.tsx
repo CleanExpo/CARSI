@@ -304,7 +304,7 @@ export default function IndustriesPage() {
               <Link
                 href="/courses"
                 className="inline-flex items-center gap-2 rounded-md px-6 py-2.5 text-sm font-medium text-white transition-opacity duration-150 hover:opacity-90"
-                style={{ background: '#ed9d24' }}
+                style={{ background: '#a85500' }}
               >
                 Browse All Courses
               </Link>
