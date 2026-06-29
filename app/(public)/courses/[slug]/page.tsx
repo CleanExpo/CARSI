@@ -14,7 +14,10 @@ import { OG_IMAGES, OG_IMAGE_URLS } from '@/lib/seo/og-image';
 import { getPublishedCourseDetailBySlugFromDatabase } from '@/lib/server/public-courses-list';
 import { stripLegacyPurchaseCta } from '@/lib/lms/format-course-body';
 
-export const dynamic = 'force-dynamic';
+// ISR: render each course detail on demand and cache for 5 minutes (issue #129).
+// Build-safe via the build-phase guard in getCourse's DB reader; publish busts the
+// cache via revalidatePath in the admin workflow route.
+export const revalidate = 300;
 
 /**
  * Strip the legacy WooCommerce "Already Purchased This Course? → Access Here" lead block

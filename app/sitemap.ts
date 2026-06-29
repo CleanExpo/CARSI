@@ -4,8 +4,11 @@ import { authorityPath } from '@/lib/marketing/authority';
 import { ccwRoadshowPath } from '@/lib/marketing/ccw-roadshow';
 import { startSmartBasePath, startSmartPages } from '@/lib/marketing/start-smart';
 import { getPublishedCourseSlugsFromDatabase } from '@/lib/server/public-courses-list';
+import { isBuildPhase } from '@/lib/server/build-phase';
 
-export const dynamic = 'force-dynamic';
+// ISR: regenerate every 5 minutes instead of on every crawl (issue #129). Build-safe
+// because getCourses/getPathways short-circuit during the build phase.
+export const revalidate = 300;
 
 const baseUrl = getPublicSiteUrl();
 
@@ -87,6 +90,7 @@ const staticPages = [
 ];
 
 async function getCourses(): Promise<{ slug: string; updated_at?: string }[]> {
+  if (isBuildPhase()) return [];
   const backendUrl = getBackendOrigin();
   try {
     const res = await fetch(`${backendUrl}/api/lms/courses?limit=500`, {
@@ -101,6 +105,7 @@ async function getCourses(): Promise<{ slug: string; updated_at?: string }[]> {
 }
 
 async function getPathways(): Promise<{ slug: string; updated_at?: string }[]> {
+  if (isBuildPhase()) return [];
   const backendUrl = getBackendOrigin();
   try {
     const res = await fetch(`${backendUrl}/api/lms/pathways`, {

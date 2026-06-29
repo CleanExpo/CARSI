@@ -1,6 +1,7 @@
 import { cache } from 'react';
 
 import { getBackendOrigin } from '@/lib/env/public-url';
+import { isBuildPhase } from '@/lib/server/build-phase';
 import type { CourseListItem } from '@/lib/course-list-item';
 import { prisma } from '@/lib/prisma';
 
@@ -86,6 +87,12 @@ async function fetchBackendCatalogueFacts(): Promise<PublicCatalogueFacts | null
  * second query). For the homepage (no full list), call this directly.
  */
 async function computePublicCatalogueFacts(): Promise<PublicCatalogueFacts> {
+  // At build time the DB/backend are unreachable; return the empty fallback instantly
+  // so ISR pages prerender without hanging, then hydrate real facts at runtime (#129).
+  if (isBuildPhase()) {
+    return { publishedCourseCount: 0, disciplineCodes: [], source: 'none' };
+  }
+
   if (process.env.DATABASE_URL?.trim()) {
     try {
       const count = await prisma.lmsCourse.count({ where: lmsPublishedCourseWhere });

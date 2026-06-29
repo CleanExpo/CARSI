@@ -32,7 +32,10 @@ import {
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-export const dynamic = 'force-dynamic';
+// ISR: serve a CDN-cached render, refreshed every 5 minutes, instead of SSR on every
+// request (issue #129). Build-safe via the build-phase guard in the catalogue readers;
+// publish busts the cache via revalidatePath in the admin workflow route.
+export const revalidate = 300;
 
 export async function generateMetadata(): Promise<Metadata> {
   const facts = await getPublicCatalogueFacts();
