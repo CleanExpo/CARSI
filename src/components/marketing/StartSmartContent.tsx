@@ -37,9 +37,6 @@ import {
   marketingPanel,
   marketingPanelHover,
   marketingSection,
-  marketingTextMuted,
-  marketingTextStrong,
-  marketingTextSubtle,
 } from '@/lib/marketing/marketing-ui';
 import {
   getStartSmartOperatingConnections,

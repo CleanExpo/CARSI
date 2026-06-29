@@ -18,7 +18,6 @@ import {
   marketingTextMuted,
   marketingTextStrong,
   marketingTextSubtle,
-  marketingTopicPill,
 } from '@/lib/marketing/marketing-ui';
 
 export function HubPageHeader({

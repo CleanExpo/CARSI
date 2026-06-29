@@ -44,10 +44,6 @@ function formatRelativeDate(dateStr: string | null | undefined): string {
   return `${Math.floor(days / 30)}mo ago`;
 }
 
-function formatLevel(level: string): string {
-  return level.charAt(0).toUpperCase() + level.slice(1).toLowerCase();
-}
-
 const smoothEase: [number, number, number, number] = [0.4, 0, 0.2, 1];
 
 const cardShellClass =
