@@ -461,7 +461,7 @@ export async function buildCompletionCertificatePdf(
   drawVerificationSeal(page, col2Center, footerTop - 18, 19, discRgb, helveticaBold, helvetica);
   drawCenteredText(
     page,
-    'IICRC CEC accredited · carsi.com.au',
+    'IICRC-aligned CEC · carsi.com.au',
     col2Center,
     footerTop - 44,
     6,

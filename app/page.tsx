@@ -52,7 +52,7 @@ async function getFeaturedCourses(): Promise<CourseListItem[]> {
 
 const benefits = [
   '24/7 access — learn anytime, anywhere',
-  'IICRC CEC accredited courses',
+  'IICRC-aligned CEC courses',
   'Beginner, intermediate, and advanced levels',
   'Automatic credit tracking',
   'Verifiable digital credentials',
@@ -78,7 +78,7 @@ function buildHomeFaqs(facts: { publishedCourseCount: number; disciplineCodes: s
   const n = facts.publishedCourseCount;
   const d = facts.disciplineCodes.length;
   const coursePhrase =
-    n > 0 ? `${n} published course${n === 1 ? '' : 's'}` : 'IICRC CEC accredited courses';
+    n > 0 ? `${n} published course${n === 1 ? '' : 's'}` : 'IICRC-aligned CEC courses';
   const disciplinePhrase =
     d > 0 ? `${d} IICRC discipline${d === 1 ? '' : 's'}` : 'the core IICRC disciplines';
 

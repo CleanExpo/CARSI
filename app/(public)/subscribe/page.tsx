@@ -43,7 +43,7 @@ const PLAN_OPTIONS: Record<
 const PRO_FEATURES = [
   '100% access to all published CARSI courses',
   'Beginner, intermediate, and advanced levels',
-  'IICRC CEC accredited courses where stated',
+  'IICRC-aligned CEC courses where stated',
   'CEC tracking for completed eligible courses',
   'Water Restoration Technician (WRT) courses',
   'Carpet Cleaning Technician (CCT) courses',

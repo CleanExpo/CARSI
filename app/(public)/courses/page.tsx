@@ -22,7 +22,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const { items } = await getCoursesCached();
   const facts = deriveCatalogueFactsFromCourseItems(items);
   return {
-    title: 'IICRC CEC Accredited Restoration Courses',
+    title: 'IICRC-aligned CEC Restoration Courses',
     description: coursesIndexMetaDescription(facts),
     alternates: { canonical: '/courses' },
   };

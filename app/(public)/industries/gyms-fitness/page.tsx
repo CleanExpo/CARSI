@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'IICRC CEC Mould & Odour Training for Gyms & Fitness Centres',
   description:
-    'Protect your members and your reputation. IICRC AMRT, OCT, and CRT training for Australian gyms, pools, and fitness facilities. Online, self-paced, CEC accredited.',
+    'Protect your members and your reputation. IICRC AMRT, OCT, and CRT training for Australian gyms, pools, and fitness facilities. Online, self-paced, CEC-aligned.',
   keywords: [
     'gym mould training Australia',
     'fitness centre IICRC certification',

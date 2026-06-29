@@ -57,7 +57,7 @@ const faqs = [
   {
     question: 'Can gallery and museum staff complete IICRC CEC training online?',
     answer:
-      'Yes. CARSI offers IICRC CEC accredited courses online and self-paced, ideal for museum staff who need to maintain building operations during opening hours. Courses can be completed around exhibition schedules and issue verifiable digital credentials on completion.',
+      'Yes. CARSI offers IICRC-aligned CEC courses online and self-paced, ideal for museum staff who need to maintain building operations during opening hours. Courses can be completed around exhibition schedules and issue verifiable digital credentials on completion.',
   },
   {
     question: 'What is the emergency response protocol for water damage in a museum?',

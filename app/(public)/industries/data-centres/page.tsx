@@ -62,7 +62,7 @@ const faqs = [
   {
     question: 'Can data centre operations staff complete IICRC CEC training without downtime?',
     answer:
-      'Yes. CARSI offers IICRC CEC accredited courses online and self-paced. NOC and facility staff can complete modules during scheduled maintenance windows or between shifts. All courses issue verifiable digital credentials on completion.',
+      'Yes. CARSI offers IICRC-aligned CEC courses online and self-paced. NOC and facility staff can complete modules during scheduled maintenance windows or between shifts. All courses issue verifiable digital credentials on completion.',
   },
 ];
 

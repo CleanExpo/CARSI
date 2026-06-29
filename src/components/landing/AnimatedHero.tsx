@@ -26,7 +26,7 @@ const staggerContainer = {
 };
 
 const trustPoints = [
-  'IICRC CEC accredited',
+  'IICRC-aligned CEC',
   'Beginner to advanced',
   'Learn around the roster',
 ] as const;

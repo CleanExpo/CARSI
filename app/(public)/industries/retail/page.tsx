@@ -79,7 +79,7 @@ export default async function RetailIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Shopping Centre"
         headlineAccent="Restoration Training"
-        description="IICRC-certified training for retail property maintenance teams. Pre-qualify for major landlord panels and deliver rapid-response restoration across shopping centre portfolios."
+        description="IICRC-aligned training for retail property maintenance teams. Pre-qualify for major landlord panels and deliver rapid-response restoration across shopping centre portfolios."
         disciplines={disciplines}
         stats={stats}
       />

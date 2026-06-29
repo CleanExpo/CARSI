@@ -135,9 +135,9 @@ export function catalogueMetaDescription(
       ? codes.join(', ')
       : 'WRT, CRT, ASD, AMRT, FSRT, OCT and CCT';
   if (n <= 0) {
-    return `Browse IICRC CEC accredited restoration and cleaning courses across ${list}. Earn continuing education credits online with CARSI.`;
+    return `Browse IICRC-aligned CEC restoration and cleaning courses across ${list}. Earn continuing education credits online with CARSI.`;
   }
-  return `Browse ${n} IICRC CEC accredited restoration and cleaning courses across ${list}. Earn continuing education credits online with CARSI.`;
+  return `Browse ${n} IICRC-aligned CEC restoration and cleaning courses across ${list}. Earn continuing education credits online with CARSI.`;
 }
 
 /** `/courses` index — question-led SEO line without a duplicated “Browse”. */
@@ -151,7 +151,7 @@ export function coursesIndexMetaDescription(facts: PublicCatalogueFacts): string
   const n = facts.publishedCourseCount;
   const core =
     n > 0
-      ? `${n} IICRC CEC accredited restoration and cleaning courses across ${list}. Earn continuing education credits online with CARSI.`
-      : `IICRC CEC accredited restoration and cleaning courses across ${list}. Earn continuing education credits online with CARSI.`;
+      ? `${n} IICRC-aligned CEC restoration and cleaning courses across ${list}. Earn continuing education credits online with CARSI.`
+      : `IICRC-aligned CEC restoration and cleaning courses across ${list}. Earn continuing education credits online with CARSI.`;
   return `What courses does CARSI offer? ${core}`;
 }
