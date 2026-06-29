@@ -1,3 +1,4 @@
+import { revalidatePath } from 'next/cache';
 import { NextRequest, NextResponse } from 'next/server';
 
 import {
@@ -40,6 +41,12 @@ export async function POST(request: NextRequest, ctx: Ctx) {
     if (!course) {
       return NextResponse.json({ detail: 'Not found' }, { status: 404 });
     }
+    // Bust the ISR cache for the public catalogue pages (issue #129) so a
+    // publish/unpublish is reflected immediately rather than after the 5-min window.
+    revalidatePath('/');
+    revalidatePath('/courses');
+    if (course.slug) revalidatePath(`/courses/${course.slug}`);
+    revalidatePath('/sitemap.xml');
     return NextResponse.json({ course: courseToAdminDto(course) });
   } catch (e) {
     console.error('[admin/courses/workflow]', e);

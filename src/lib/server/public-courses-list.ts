@@ -2,6 +2,7 @@ import type { Prisma } from '@/generated/prisma/client';
 import type { CheckoutCourse, CourseListItem } from '@/lib/course-list-item';
 import { prisma } from '@/lib/prisma';
 import { normalizePublicAssetUrl } from '@/lib/remote-image';
+import { isBuildPhase } from '@/lib/server/build-phase';
 import { formatLmsCourseCecHoursLabel } from '@/lib/server/course-cec-hours';
 
 /** Same filter as the public `/courses` catalogue when loaded from Prisma. */
@@ -83,7 +84,7 @@ function mapDashboardCourseRow(c: {
 export async function getDashboardCourseListItemsFromDatabase(options: {
   status: DashboardCourseStatusFilter;
 }): Promise<CourseListItem[]> {
-  if (!process.env.DATABASE_URL?.trim()) {
+  if (isBuildPhase() || !process.env.DATABASE_URL?.trim()) {
     return [];
   }
 
@@ -175,7 +176,7 @@ function mapLmsCourseToPublicListItem(c: LmsCoursePublicListRow): CourseListItem
  * Fills missing slots from newest published courses.
  */
 export async function getHomepageFeaturedCourses(): Promise<CourseListItem[]> {
-  if (!process.env.DATABASE_URL?.trim()) {
+  if (isBuildPhase() || !process.env.DATABASE_URL?.trim()) {
     return [];
   }
 
@@ -303,7 +304,7 @@ export async function getHomepageFeaturedCourses(): Promise<CourseListItem[]> {
 export async function getPublishedCourseListItemsFromDatabase(options?: {
   limit?: number;
 }): Promise<CourseListItem[]> {
-  if (!process.env.DATABASE_URL?.trim()) {
+  if (isBuildPhase() || !process.env.DATABASE_URL?.trim()) {
     return [];
   }
 
@@ -371,7 +372,7 @@ export async function getPublishedCourseDetailBySlugFromDatabase(slug: string) {
 export async function getPublishedCourseForCheckout(
   slug: string
 ): Promise<CheckoutCourse | null> {
-  if (!process.env.DATABASE_URL?.trim()) return null;
+  if (isBuildPhase() || !process.env.DATABASE_URL?.trim()) return null;
   const target = decodeURIComponent(slug).trim();
   if (!target) return null;
 
@@ -399,7 +400,7 @@ export async function getPublishedCourseForCheckout(
 export async function getPublishedCourseSlugsFromDatabase(): Promise<
   Array<{ slug: string; updated_at: string }>
 > {
-  if (!process.env.DATABASE_URL?.trim()) return [];
+  if (isBuildPhase() || !process.env.DATABASE_URL?.trim()) return [];
 
   const rows = await prisma.lmsCourse.findMany({
     where: publishedWhere,
