@@ -1,14 +1,18 @@
 'use client';
 
+import { Award, BookOpen, ClipboardCheck, Share2, UserPlus, Zap } from 'lucide-react';
+
 import { useTheme } from '@/components/ThemeProvider';
 
+// Icons use the IICRC discipline palette colours. Replaces the old single-letter
+// glyphs (E/L/Q/X/C/S) with lucide icons for a clearer step indicator (issue #65).
 const STEPS = [
-  { label: 'Enrol', icon: 'E', color: '#2490ed' },
-  { label: 'Learn', icon: 'L', color: '#26c4a0' },
-  { label: 'Quiz', icon: 'Q', color: '#6c63ff' },
-  { label: 'Earn XP', icon: 'X', color: '#ed9d24' },
-  { label: 'Certificate', icon: 'C', color: '#27ae60' },
-  { label: 'Share', icon: 'S', color: '#17b8d4' },
+  { label: 'Enrol', Icon: UserPlus, color: '#2490ed' },
+  { label: 'Learn', Icon: BookOpen, color: '#26c4a0' },
+  { label: 'Quiz', Icon: ClipboardCheck, color: '#6c63ff' },
+  { label: 'Earn XP', Icon: Zap, color: '#ed9d24' },
+  { label: 'Certificate', Icon: Award, color: '#27ae60' },
+  { label: 'Share', Icon: Share2, color: '#17b8d4' },
 ];
 
 const STEP_Y = 65;
@@ -128,20 +132,15 @@ export function StudentJourneyMap({ activeStep = 0 }: { activeStep?: number }) {
               }}
             />
 
-            <text
-              x={x}
-              y={STEP_Y + 1}
-              textAnchor="middle"
-              dominantBaseline="central"
-              fill={
-                isActive ? '#ffffff' : isCompleted ? completedIconFill : inactiveIconFill
-              }
-              fontSize={14}
-              fontWeight={700}
-              fontFamily="system-ui, sans-serif"
-            >
-              {step.icon}
-            </text>
+            <g transform={`translate(${x - 9}, ${STEP_Y - 9})`}>
+              <step.Icon
+                width={18}
+                height={18}
+                strokeWidth={2.25}
+                color={isActive ? '#ffffff' : isCompleted ? completedIconFill : inactiveIconFill}
+                aria-hidden
+              />
+            </g>
 
             <text
               x={x}
