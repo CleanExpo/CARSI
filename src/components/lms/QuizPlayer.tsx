@@ -115,7 +115,7 @@ export function QuizPlayer({ quiz, onSubmit, variant = 'default' }: QuizPlayerPr
         </div>
 
         <div className="p-6">
-          <p className="mb-2 text-xs font-semibold tracking-wide text-slate-400 uppercase">
+          <p className="mb-2 text-xs font-semibold tracking-wide text-slate-600 uppercase">
             Question {activeIndex + 1} of {quiz.questions.length}
           </p>
           <h3 className="text-lg font-medium text-slate-900">{current.question_text}</h3>
@@ -138,7 +138,7 @@ export function QuizPlayer({ quiz, onSubmit, variant = 'default' }: QuizPlayerPr
                   <span
                     className={cn(
                       'mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border',
-                      selected ? 'border-[#2490ed] bg-[#2490ed] text-white' : 'border-slate-300'
+                      selected ? 'border-[#146fc2] bg-[#146fc2] text-white' : 'border-slate-300'
                     )}
                   >
                     {selected ? <CheckCircle2 className="h-3.5 w-3.5" /> : null}

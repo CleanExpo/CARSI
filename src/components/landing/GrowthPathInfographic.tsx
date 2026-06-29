@@ -47,7 +47,7 @@ export function GrowthPathInfographic({ className = '' }: { className?: string }
         animate={float(0.5)}
         className="absolute -top-2 right-3 z-20 flex items-center gap-2 rounded-xl border border-[#ed9d24]/30 bg-white/95 px-2.5 py-2 shadow-[0_14px_36px_-16px_rgba(237,157,36,0.4)] backdrop-blur-md dark:border-[#ed9d24]/35 dark:bg-[#0f172a]/95"
       >
-        <CalendarDays className="h-3.5 w-3.5 text-[#ed9d24]" aria-hidden />
+        <CalendarDays className="h-3.5 w-3.5 text-[#a85500] dark:text-[#ed9d24]" aria-hidden />
         <span className="text-[10px] font-semibold text-slate-800 dark:text-white/90">
           Melbourne · Sydney
         </span>
@@ -63,7 +63,7 @@ export function GrowthPathInfographic({ className = '' }: { className?: string }
               <span className="h-2 w-2 rounded-full bg-[#febc2e]" aria-hidden />
               <span className="h-2 w-2 rounded-full bg-[#28c840]" aria-hidden />
             </div>
-            <p className="text-[10px] font-semibold tracking-[0.16em] text-slate-500 uppercase dark:text-white/40">
+            <p className="text-[10px] font-semibold tracking-[0.16em] text-slate-600 uppercase dark:text-white/55">
               Growth pathway
             </p>
             <span className="inline-flex items-center gap-1 rounded-full border border-[#2490ed]/25 bg-[#eef7ff] px-2 py-0.5 text-[9px] font-semibold text-[#146fc2] dark:border-[#2490ed]/30 dark:bg-[#2490ed]/10 dark:text-[#8fd0ff]">
@@ -165,10 +165,10 @@ export function GrowthPathInfographic({ className = '' }: { className?: string }
                   className="relative flex h-[72px] w-[72px] items-center justify-center rounded-full border border-[#ed9d24]/40 bg-gradient-to-br from-[#fff8ed] to-white shadow-[0_0_0_8px_rgba(237,157,36,0.08)] dark:from-[#ed9d24]/15 dark:to-[#0f172a] dark:shadow-[0_0_0_10px_rgba(237,157,36,0.12)]"
                 >
                   <span className="absolute inset-0 rounded-full border border-[#ed9d24]/20" aria-hidden />
-                  <TrendingUp className="h-5 w-5 text-[#ed9d24]" aria-hidden />
+                  <TrendingUp className="h-5 w-5 text-[#a85500] dark:text-[#ed9d24]" aria-hidden />
                 </motion.div>
                 <p className="mt-2 text-center text-[11px] font-bold text-slate-900 dark:text-white">Grow</p>
-                <p className="text-center text-[9px] text-slate-500 dark:text-white/45">your business</p>
+                <p className="text-center text-[9px] text-slate-600 dark:text-white/55">your business</p>
               </div>
 
               {/* In-person node */}
@@ -192,7 +192,7 @@ export function GrowthPathInfographic({ className = '' }: { className?: string }
                       key={city}
                       className="flex items-center gap-2 rounded-md border border-slate-200/70 bg-white/80 px-2 py-1 dark:border-white/10 dark:bg-white/[0.04]"
                     >
-                      <MapPin className={`h-3 w-3 shrink-0 text-slate-400`} aria-hidden />
+                      <MapPin className={`h-3 w-3 shrink-0 text-slate-500`} aria-hidden />
                       <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${tone}`} aria-hidden />
                       <span className="text-[9px] font-medium text-slate-700 dark:text-white/75">{city}</span>
                     </li>
@@ -210,7 +210,7 @@ export function GrowthPathInfographic({ className = '' }: { className?: string }
               </span>
               <div>
                 <p className="text-[10px] font-semibold text-slate-900 dark:text-white">2-Day CCW Workshop</p>
-                <p className="text-[9px] text-slate-500 dark:text-white/45">Hands-on carpet cleaning</p>
+                <p className="text-[9px] text-slate-600 dark:text-white/55">Hands-on carpet cleaning</p>
               </div>
             </div>
             <p className="text-right text-[9px] font-semibold tracking-wide text-[#146fc2] uppercase dark:text-[#8fd0ff]">
@@ -236,7 +236,7 @@ export function GrowthPathInfographic({ className = '' }: { className?: string }
                   {item.step}
                 </span>
                 <p className="mt-1 text-[10px] font-semibold text-slate-800 dark:text-white">{item.label}</p>
-                <p className="text-[8px] text-slate-500 dark:text-white/40">{item.sub}</p>
+                <p className="text-[8px] text-slate-600 dark:text-white/55">{item.sub}</p>
               </div>
             ))}
           </div>

@@ -76,7 +76,7 @@ export function ProgressSharePrompt({ draft, onClose }: ProgressSharePromptProps
           <Button
             type="button"
             onClick={() => void copyPost()}
-            className="bg-[#2490ed] text-white hover:bg-[#1e7bc9]"
+            className="bg-[#146fc2] text-white hover:bg-[#0f5fa8]"
           >
             {copied ? (
               <>

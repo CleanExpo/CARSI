@@ -12,7 +12,7 @@ import {
 export function HeroPathwaysStrip() {
   return (
     <div aria-label="CARSI pathways and events" className="mt-10 lg:mt-0">
-      <p className="mb-3 text-[11px] font-semibold tracking-[0.18em] text-slate-500 uppercase">
+      <p className="mb-3 text-[11px] font-semibold tracking-[0.18em] text-slate-600 uppercase">
         Also explore
       </p>
 

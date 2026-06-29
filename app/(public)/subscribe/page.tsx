@@ -117,7 +117,7 @@ export default function SubscribePage() {
           <div>
             <div className="flex items-baseline gap-2">
               <span className="text-5xl font-bold text-slate-950">${selectedPlan.price}</span>
-              <span className="text-slate-500">{selectedPlan.suffix}</span>
+              <span className="text-slate-600">{selectedPlan.suffix}</span>
             </div>
             <p className="mt-2 text-sm text-slate-600">{selectedPlan.helper}</p>
             <p className="mt-3 rounded-lg border border-[#f2cf8f] bg-[#fff8ed] px-3 py-2 text-sm font-medium text-[#7a3500]">
@@ -143,7 +143,7 @@ export default function SubscribePage() {
             >
               {loading ? 'Opening checkout…' : 'Start Membership'}
             </button>
-            <p className="text-center text-xs text-slate-500">
+            <p className="text-center text-xs text-slate-600">
               Card required. Cancel anytime.
             </p>
           </div>
@@ -161,7 +161,7 @@ export default function SubscribePage() {
         </div>
 
         {/* Legal links */}
-        <p className="text-center text-xs leading-relaxed text-slate-500">
+        <p className="text-center text-xs leading-relaxed text-slate-600">
           By subscribing, you agree to our{' '}
           <Link href="/terms" className="font-medium text-[#146fc2] underline">
             Terms of Service

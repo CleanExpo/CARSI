@@ -89,7 +89,7 @@ export default async function AboutPage() {
       label: 'IICRC disciplines',
       accent: '#26c4a0',
     },
-    { value: '12+', label: 'Industries served', accent: '#ed9d24' },
+    { value: '12+', label: 'Industries served', accent: '#c2740a' },
   ];
 
   return (

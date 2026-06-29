@@ -147,7 +147,7 @@ export function AnimatedStats({ stats }: AnimatedStatsProps) {
               <p className="text-2xl font-bold text-[#146fc2] tabular-nums sm:text-3xl dark:text-[#8fd0ff]">
                 {stat.value}
               </p>
-              <p className="mt-1 text-xs font-semibold tracking-wider text-slate-500 uppercase dark:text-white/45">
+              <p className="mt-1 text-xs font-semibold tracking-wider text-slate-600 uppercase dark:text-white/55">
                 {stat.label}
               </p>
             </div>

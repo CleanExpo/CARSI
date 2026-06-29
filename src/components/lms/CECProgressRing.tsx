@@ -112,7 +112,7 @@ export function CECProgressRing({
         <div className="absolute flex flex-col items-center">
           <span className="font-mono text-xl leading-none font-bold text-slate-900">{cecEarned}</span>
           <span className="text-xs leading-none text-slate-500">/{cecRequired}</span>
-          <span className="mt-0.5 text-[10px] leading-none text-slate-400">
+          <span className="mt-0.5 text-[10px] leading-none text-slate-600">
             <AcronymTooltip term="CEC">CECs</AcronymTooltip>
           </span>
         </div>

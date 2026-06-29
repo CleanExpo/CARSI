@@ -199,7 +199,7 @@ export function PaymentSuccessClient() {
                 />
               </div>
               {confirmError ? <p className="text-sm text-amber-200/90">{confirmError}</p> : null}
-              <Button type="submit" disabled={submitting} className="w-full bg-[#2490ed]">
+              <Button type="submit" disabled={submitting} className="w-full bg-[#146fc2]">
                 {submitting ? 'Setting up…' : 'Start lesson 1'}
               </Button>
             </form>

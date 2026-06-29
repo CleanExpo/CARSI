@@ -127,11 +127,11 @@ export default function SubscribeSuccessPage() {
         </div>
 
         {/* Receipt note */}
-        <p className="text-xs text-white/30">
+        <p className="text-xs text-white/70">
           A receipt has been sent to your email. Your membership starts now.
           {sessionId && (
             <span className="mt-1 block">
-              Session: <code className="text-white/20">{sessionId.slice(0, 16)}...</code>
+              Session: <code className="text-white/55">{sessionId.slice(0, 16)}...</code>
             </span>
           )}
         </p>

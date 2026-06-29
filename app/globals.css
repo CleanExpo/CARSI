@@ -398,6 +398,13 @@
     border: 1px solid rgba(15 23 42 / 0.1);
   }
 
+  /* Dark theme: keep the panel dark so `dark:text-white/*` content stays legible
+     (the light near-white panel above would otherwise hide white text). #122/a11y. */
+  .dark .glass-strong {
+    background: rgba(11 17 32 / 0.92);
+    border: 1px solid rgba(255 255 255 / 0.1);
+  }
+
   /* ── Glass card with interactive state ──── */
   .glass-card {
     background: var(--glass-bg);

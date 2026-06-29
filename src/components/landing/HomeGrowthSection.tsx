@@ -90,7 +90,7 @@ export function HomeGrowthSection({ stats }: HomeGrowthSectionProps) {
         />
 
         <div className={`relative ${PUBLIC_SHELL_INNER_CLASS} py-8 md:py-10`}>
-          <p className="mb-5 text-center text-[11px] font-semibold tracking-[0.2em] text-slate-500 uppercase dark:text-white/40">
+          <p className="mb-5 text-center text-[11px] font-semibold tracking-[0.2em] text-slate-600 uppercase dark:text-white/55">
             Platform at a glance
           </p>
 
@@ -132,7 +132,7 @@ export function HomeGrowthSection({ stats }: HomeGrowthSectionProps) {
                   <p className="relative mt-1 text-[11px] font-semibold tracking-[0.14em] text-slate-600 uppercase dark:text-white/55">
                     {stat.label}
                   </p>
-                  <p className="relative mt-1 text-[11px] leading-snug text-slate-500 dark:text-white/40">
+                  <p className="relative mt-1 text-[11px] leading-snug text-slate-600 dark:text-white/55">
                     {meta.detail}
                   </p>
                 </div>
@@ -190,7 +190,7 @@ export function HomeGrowthSection({ stats }: HomeGrowthSectionProps) {
                         </span>
                       </span>
                       <ArrowRight
-                        className="mt-1 h-4 w-4 shrink-0 text-slate-400 transition group-hover:translate-x-0.5 group-hover:text-[#146fc2] dark:text-white/40 dark:group-hover:text-[#8fd0ff]"
+                        className="mt-1 h-4 w-4 shrink-0 text-slate-500 transition group-hover:translate-x-0.5 group-hover:text-[#146fc2] dark:text-white/55 dark:group-hover:text-[#8fd0ff]"
                         aria-hidden
                       />
                     </Link>

@@ -1,5 +1,8 @@
+import type { CSSProperties } from 'react';
+
 import type { LucideIcon } from 'lucide-react';
 
+import { accentTextVars } from './accentContrast';
 import {
   marketingBodySm,
   marketingEyebrowPill,
@@ -32,13 +35,19 @@ export function IndustryWhySection({
   accentColor = '#2490ed',
   cards,
 }: IndustryWhySectionProps) {
+  const accent = accentTextVars(accentColor, 'large');
   return (
     <section className={marketingSection}>
       <div className="mb-8 max-w-4xl md:mb-10">
         <p className={`mb-3 ${marketingEyebrowPill}`}>Why {industryName} choose CARSI</p>
         <h2 className={marketingSectionTitle}>
           {headline}{' '}
-          <span style={{ color: accentColor }}>{headlineAccent}</span>
+          <span
+            className="text-[color:var(--carsi-accent-l)] dark:text-[color:var(--carsi-accent-d)]"
+            style={{ '--carsi-accent-l': accent.light, '--carsi-accent-d': accent.dark } as CSSProperties}
+          >
+            {headlineAccent}
+          </span>
         </h2>
         <div
           className="mt-4 h-1 w-16 rounded-full bg-gradient-to-r from-[#2490ed] via-[#5eb3ff] to-[#00d4aa]"

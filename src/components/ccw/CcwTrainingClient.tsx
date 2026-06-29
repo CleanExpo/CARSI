@@ -185,7 +185,7 @@ export function CcwTrainingClient() {
     <MarketingPageShell innerClassName={marketingPageInnerNarrowClass}>
       {/* Hero */}
       <header className="text-center">
-        <p className="mb-4 text-[10px] font-semibold tracking-[0.22em] text-slate-500 uppercase dark:text-white/40">
+        <p className="mb-4 text-[10px] font-semibold tracking-[0.22em] text-slate-600 uppercase dark:text-white/55">
           CARSI · 2 DAYS · HANDS-ON
         </p>
         <h1 className={`text-balance ${marketingHeading}`}>The Carpet Cleaning Workshop</h1>
@@ -193,10 +193,10 @@ export function CcwTrainingClient() {
           className="mx-auto mt-6 h-px w-16 bg-linear-to-r from-transparent via-[#2490ed]/80 to-transparent"
           aria-hidden
         />
-        <p className="mx-auto mt-6 max-w-3xl text-sm leading-relaxed tracking-wide text-slate-500 md:text-[15px] dark:text-white/45">
+        <p className="mx-auto mt-6 max-w-3xl text-sm leading-relaxed tracking-wide text-slate-600 md:text-[15px] dark:text-white/55">
           {PILLAR_LINE}
         </p>
-        <p className="mx-auto mt-4 max-w-2xl text-xs font-medium text-[#7ec5ff]/90 md:text-sm">
+        <p className="mx-auto mt-4 max-w-2xl text-xs font-medium text-[#146fc2] dark:text-[#7ec5ff]/90 md:text-sm">
           {ANCHORED_HERO}
         </p>
         <p className="mx-auto mt-8 max-w-2xl text-base leading-relaxed text-pretty text-slate-600 md:text-lg dark:text-white/50">
@@ -208,7 +208,7 @@ export function CcwTrainingClient() {
       {/* Your trainer */}
       <section className="mt-20 md:mt-24" aria-labelledby="ccw-trainer-heading">
         <div className="mb-8 border-b border-white/8 pb-6">
-          <p className="text-[10px] font-semibold tracking-[0.22em] text-slate-400 uppercase dark:text-white/35">
+          <p className="text-[10px] font-semibold tracking-[0.22em] text-slate-600 uppercase dark:text-white/55">
             Your trainer
           </p>
           <h2
@@ -225,7 +225,7 @@ export function CcwTrainingClient() {
         <div className="grid gap-4 sm:grid-cols-2">
           {trainerMeta.map(({ term, text }) => (
             <div key={term} className={`rounded-2xl p-5 md:p-6 ${marketingPanel}`}>
-              <p className="text-[10px] font-semibold tracking-[0.18em] text-[#7ec5ff]/80 uppercase">
+              <p className="text-[10px] font-semibold tracking-[0.18em] text-[#146fc2] dark:text-[#7ec5ff] uppercase">
                 {term}
               </p>
               <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-white/60">
@@ -240,7 +240,7 @@ export function CcwTrainingClient() {
       <section className="mt-20 md:mt-24" aria-labelledby="ccw-agenda-heading">
         <div className="mb-8 flex flex-col gap-2 border-b border-white/8 pb-6 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="text-[10px] font-semibold tracking-[0.22em] text-slate-400 uppercase dark:text-white/35">
+            <p className="text-[10px] font-semibold tracking-[0.22em] text-slate-600 uppercase dark:text-white/55">
               Agenda
             </p>
             <h2
@@ -254,10 +254,10 @@ export function CcwTrainingClient() {
         <div className="grid gap-6 lg:grid-cols-2 lg:gap-8">
           <div className={`flex flex-col rounded-2xl p-6 md:p-8 ${marketingPanel}`}>
             <div className="mb-4 flex items-center gap-2 border-b border-white/8 pb-4">
-              <GraduationCap className="h-5 w-5 text-[#7ec5ff]" aria-hidden />
+              <GraduationCap className="h-5 w-5 text-[#146fc2] dark:text-[#7ec5ff]" aria-hidden />
               <span className="text-sm font-semibold text-slate-900 dark:text-white/90">Day 1</span>
             </div>
-            <p className="mb-4 text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-white/45">
+            <p className="mb-4 text-xs font-medium tracking-wide text-slate-600 uppercase dark:text-white/55">
               Carpet &amp; Stain Fundamentals
             </p>
             <ul className="list-none space-y-0">
@@ -268,10 +268,10 @@ export function CcwTrainingClient() {
           </div>
           <div className={`flex flex-col rounded-2xl p-6 md:p-8 ${marketingPanel}`}>
             <div className="mb-4 flex items-center gap-2 border-b border-white/8 pb-4">
-              <GraduationCap className="h-5 w-5 text-[#7ec5ff]" aria-hidden />
+              <GraduationCap className="h-5 w-5 text-[#146fc2] dark:text-[#7ec5ff]" aria-hidden />
               <span className="text-sm font-semibold text-slate-900 dark:text-white/90">Day 2</span>
             </div>
-            <p className="mb-4 text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-white/45">
+            <p className="mb-4 text-xs font-medium tracking-wide text-slate-600 uppercase dark:text-white/55">
               Upholstery · Hard Floors · Business · Maintenance
             </p>
             <ul className="list-none space-y-0">
@@ -286,7 +286,7 @@ export function CcwTrainingClient() {
       {/* What's included */}
       <section className="mt-20 md:mt-24" aria-labelledby="ccw-included-heading">
         <div className="mb-8">
-          <p className="text-[10px] font-semibold tracking-[0.22em] text-slate-400 uppercase dark:text-white/35">
+          <p className="text-[10px] font-semibold tracking-[0.22em] text-slate-600 uppercase dark:text-white/55">
             Deliverables
           </p>
           <h2
@@ -303,10 +303,10 @@ export function CcwTrainingClient() {
               className="glass-card rounded-2xl p-6 transition-none hover:translate-y-0"
             >
               <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl border border-white/8 bg-white/4">
-                <Icon className="h-5 w-5 text-[#7ec5ff]" aria-hidden />
+                <Icon className="h-5 w-5 text-[#146fc2] dark:text-[#7ec5ff]" aria-hidden />
               </div>
               <h3 className="text-sm font-semibold text-slate-900 dark:text-white/95">{title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-slate-500 dark:text-white/45">
+              <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-white/55">
                 {body}
               </p>
             </div>
@@ -317,7 +317,7 @@ export function CcwTrainingClient() {
       {/* Materials gate */}
       <section className="mt-20 md:mt-28" aria-labelledby="ccw-access-heading">
         <div className="mb-8 text-center md:mb-10">
-          <p className="text-[10px] font-semibold tracking-[0.22em] text-slate-400 uppercase dark:text-white/35">
+          <p className="text-[10px] font-semibold tracking-[0.22em] text-slate-600 uppercase dark:text-white/55">
             Participants
           </p>
           <h2
@@ -326,7 +326,7 @@ export function CcwTrainingClient() {
           >
             Workshop materials
           </h2>
-          <p className="mx-auto mt-2 max-w-md text-sm text-slate-500 dark:text-white/40">
+          <p className="mx-auto mt-2 max-w-md text-sm text-slate-600 dark:text-white/55">
             Unlock below to download the take-home pack for your cohort.
           </p>
         </div>
@@ -342,7 +342,7 @@ export function CcwTrainingClient() {
                   <Button
                     type="button"
                     size="lg"
-                    className="mt-8 w-full rounded-xl bg-[#2490ed] text-[15px] font-semibold text-white shadow-lg shadow-[#2490ed]/20 hover:bg-[#1f82d4] sm:w-auto sm:min-w-[220px]"
+                    className="mt-8 w-full rounded-xl bg-[#146fc2] text-[15px] font-semibold text-white shadow-lg shadow-[#2490ed]/20 hover:bg-[#1769b8] sm:w-auto sm:min-w-[220px]"
                     onClick={() => setGateOpen(true)}
                   >
                     Access Course
@@ -352,13 +352,13 @@ export function CcwTrainingClient() {
               ) : (
                 <form onSubmit={onUnlock} className="space-y-6">
                   <div className="text-center">
-                    <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl border border-[#2490ed]/30 bg-[#2490ed]/10 text-[#7ec5ff]">
+                    <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl border border-[#2490ed]/30 bg-[#2490ed]/10 text-[#146fc2] dark:text-[#7ec5ff]">
                       <Lock className="h-6 w-6" aria-hidden />
                     </div>
                     <p className="text-sm font-medium text-slate-900 dark:text-white/90">
                       Enter access password
                     </p>
-                    <p className="mt-1 text-xs text-slate-500 dark:text-white/40">
+                    <p className="mt-1 text-xs text-slate-600 dark:text-white/55">
                       Case-sensitive.
                     </p>
                   </div>
@@ -378,7 +378,7 @@ export function CcwTrainingClient() {
                     <button
                       type="button"
                       onClick={() => setShowPw(!showPw)}
-                      className="absolute top-1/2 right-2 -translate-y-1/2 rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700 dark:text-white/40 dark:hover:bg-white/5 dark:hover:text-white/75"
+                      className="absolute top-1/2 right-2 -translate-y-1/2 rounded-lg p-2 text-slate-600 hover:bg-slate-100 hover:text-slate-700 dark:text-white/55 dark:hover:bg-white/5 dark:hover:text-white/75"
                       aria-label={showPw ? 'Hide password' : 'Show password'}
                     >
                       {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -393,7 +393,7 @@ export function CcwTrainingClient() {
                     <Button
                       type="button"
                       variant="ghost"
-                      className="text-slate-500 hover:text-slate-800 dark:text-white/45 dark:hover:text-white/75"
+                      className="text-slate-600 hover:text-slate-800 dark:text-white/55 dark:hover:text-white/75"
                       onClick={() => {
                         setGateOpen(false);
                         setError(null);
@@ -405,7 +405,7 @@ export function CcwTrainingClient() {
                     <Button
                       type="submit"
                       disabled={pending || !password.trim()}
-                      className="rounded-xl bg-[#2490ed] hover:bg-[#1f82d4]"
+                      className="rounded-xl bg-[#146fc2] hover:bg-[#1769b8]"
                     >
                       {pending ? (
                         <>
@@ -440,12 +440,12 @@ export function CcwTrainingClient() {
               <a
                 href={CCW_COURSE_ZIP_HREF}
                 download
-                className="inline-flex w-full items-center justify-center gap-3 rounded-xl border border-white/10 bg-[#2490ed] px-6 py-4 text-sm font-semibold text-white transition hover:bg-[#1f82d4] sm:w-auto"
+                className="inline-flex w-full items-center justify-center gap-3 rounded-xl border border-white/10 bg-[#146fc2] px-6 py-4 text-sm font-semibold text-white transition hover:bg-[#1769b8] sm:w-auto"
               >
                 <Download className="h-5 w-5 shrink-0" aria-hidden />
                 Download workshop pack (ZIP)
               </a>
-              <p className="mt-4 font-mono text-[11px] break-all text-slate-400 dark:text-white/30">
+              <p className="mt-4 font-mono text-[11px] break-all text-slate-600 dark:text-white/55">
                 {CCW_COURSE_ZIP_PATH.replace(/^\//, '')}
               </p>
             </section>
@@ -456,7 +456,7 @@ export function CcwTrainingClient() {
       {/* FAQ */}
       <section className="mx-auto mt-20 max-w-3xl md:mt-24" aria-labelledby="ccw-faq-heading">
         <div className="mb-8 text-center">
-          <p className="text-[10px] font-semibold tracking-[0.22em] text-slate-400 uppercase dark:text-white/35">
+          <p className="text-[10px] font-semibold tracking-[0.22em] text-slate-600 uppercase dark:text-white/55">
             Help
           </p>
           <h2
@@ -475,11 +475,11 @@ export function CcwTrainingClient() {
               <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-4 text-left text-sm font-medium text-slate-800 dark:text-white/85 [&::-webkit-details-marker]:hidden">
                 {item.q}
                 <ChevronDown
-                  className="h-4 w-4 shrink-0 text-slate-400 transition-transform group-open:rotate-180 dark:text-white/35"
+                  className="h-4 w-4 shrink-0 text-slate-600 transition-transform group-open:rotate-180 dark:text-white/55"
                   aria-hidden
                 />
               </summary>
-              <p className="border-t border-slate-200/80 pt-0 pb-4 text-sm leading-relaxed text-slate-500 dark:border-white/6 dark:text-white/45">
+              <p className="border-t border-slate-200/80 pt-0 pb-4 text-sm leading-relaxed text-slate-600 dark:border-white/6 dark:text-white/55">
                 {item.a}
               </p>
             </details>
