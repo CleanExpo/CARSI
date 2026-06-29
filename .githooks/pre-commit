@@ -1,0 +1,9 @@
+#!/usr/bin/env sh
+# CARSI pre-commit guard — blocks committing live-looking secrets.
+# Origin: issue #122 (leaked WooCommerce REST credentials in .env.example).
+# Wired via the package.json "prepare" script (git config core.hooksPath .githooks),
+# so it propagates to every clone/CI on `npm install`.
+#
+# Bypass for a verified false positive: git commit --no-verify
+
+exec node "$(git rev-parse --show-toplevel)/scripts/check-secrets.mjs"
