@@ -5,7 +5,6 @@ import { fileURLToPath } from 'node:url';
 import type { NextConfig } from 'next';
 
 const require = createRequire(import.meta.url);
-const withPWA = require('next-pwa');
 
 // Pin the workspace root to this project. Without this, Next infers the root
 // from the nearest lockfile and can wrongly select a parent directory (e.g. a
@@ -33,53 +32,13 @@ function webpackReactAliases(config: {
   return config;
 }
 
-const pwaConfig = withPWA({
-  dest: 'public',
-  disable: process.env.NODE_ENV === 'development',
-  register: true,
-  skipWaiting: true,
-  runtimeCaching: [
-    {
-      urlPattern: /\/courses\/.+\/lessons\/.+/,
-      handler: 'NetworkFirst',
-      options: {
-        cacheName: 'lesson-content',
-        expiration: { maxEntries: 20, maxAgeSeconds: 86400 },
-      },
-    },
-    /** Lesson detail API — NetworkFirst so techs can reopen last lessons offline after one online visit. */
-    {
-      urlPattern: /\/api\/lms\/lessons\//,
-      handler: 'NetworkFirst',
-      method: 'GET',
-      options: {
-        cacheName: 'lms-lesson-api',
-        networkTimeoutSeconds: 12,
-        expiration: { maxEntries: 48, maxAgeSeconds: 7 * 86400 },
-      },
-    },
-    /** Curriculum tree for /dashboard/learn/[slug]. */
-    {
-      urlPattern: /\/api\/lms\/courses\/[^/]+\/curriculum/,
-      handler: 'NetworkFirst',
-      method: 'GET',
-      options: {
-        cacheName: 'lms-curriculum-api',
-        networkTimeoutSeconds: 12,
-        expiration: { maxEntries: 24, maxAgeSeconds: 7 * 86400 },
-      },
-    },
-    {
-      urlPattern: /\/dashboard\/learn\//,
-      handler: 'NetworkFirst',
-      options: {
-        cacheName: 'learn-pages',
-        networkTimeoutSeconds: 8,
-        expiration: { maxEntries: 16, maxAgeSeconds: 86400 },
-      },
-    },
-  ],
-});
+// NOTE: this project does NOT use a build-time PWA plugin. The service worker is
+// hand-written at `public/sw.js` (carsi-v3, with push-notification handling) and
+// registered by `src/components/lms/ServiceWorkerRegistration.tsx`. `next-pwa`
+// was removed (#121): it generated nothing under the Turbopack build and only
+// pulled a vulnerable workbox/serialize-javascript dependency chain. To add
+// build-time precaching later, adopt a Turbopack-compatible approach (e.g.
+// @serwist/next) rather than reinstating next-pwa.
 
 const nextConfig: NextConfig = {
   output: 'standalone',
@@ -195,4 +154,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default pwaConfig(nextConfig);
+export default nextConfig;
