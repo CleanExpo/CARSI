@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 
 import { prisma } from '@/lib/prisma';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
+import { runSerializable } from '@/lib/server/db-tx';
 import { computeQuizResult } from '@/lib/server/lms-completion';
 
 type Ctx = { params: Promise<{ quizId: string }> };
@@ -45,13 +46,6 @@ export async function POST(request: NextRequest, ctx: Ctx) {
       return NextResponse.json({ detail: 'Enrollment required' }, { status: 403 });
     }
 
-    const attemptsUsed = await prisma.lmsQuizAttempt.count({
-      where: { quizId, studentId: claims.sub },
-    });
-    if (attemptsUsed >= quiz.attemptsAllowed) {
-      return NextResponse.json({ detail: 'No attempts remaining' }, { status: 409 });
-    }
-
     let earned = 0;
     let totalPoints = 0;
     for (const q of quiz.questions) {
@@ -70,22 +64,41 @@ export async function POST(request: NextRequest, ctx: Ctx) {
       quiz.passPercentage,
     );
 
-    const attempt = await prisma.lmsQuizAttempt.create({
-      data: {
-        quizId,
-        studentId: claims.sub,
-        scorePercent,
-        passed,
-        answers,
-      },
+    // The attempt-limit guard and the insert MUST be atomic. A plain
+    // count()-then-create() is a TOCTOU race: concurrent submissions all read
+    // the same count, all pass the check, and all insert — blowing past
+    // attemptsAllowed. SERIALIZABLE isolation makes Postgres detect the
+    // read/write conflict and abort all but one racer (retried below), so the
+    // limit holds under concurrency.
+    const result = await runSerializable(async (tx) => {
+      const attemptsUsed = await tx.lmsQuizAttempt.count({
+        where: { quizId, studentId: claims.sub },
+      });
+      if (attemptsUsed >= quiz.attemptsAllowed) {
+        return { limitReached: true as const };
+      }
+      const attempt = await tx.lmsQuizAttempt.create({
+        data: {
+          quizId,
+          studentId: claims.sub,
+          scorePercent,
+          passed,
+          answers,
+        },
+      });
+      return { limitReached: false as const, attempt, attemptsUsed };
     });
 
+    if (result.limitReached) {
+      return NextResponse.json({ detail: 'No attempts remaining' }, { status: 409 });
+    }
+
     return NextResponse.json({
-      attempt_id: attempt.id,
+      attempt_id: result.attempt.id,
       score_percent: scorePercent,
       passed,
       pass_percentage: quiz.passPercentage,
-      attempts_remaining: Math.max(0, quiz.attemptsAllowed - attemptsUsed - 1),
+      attempts_remaining: Math.max(0, quiz.attemptsAllowed - result.attemptsUsed - 1),
     });
   } catch (e) {
     console.error('[quizzes/attempt]', e);
