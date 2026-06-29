@@ -10,6 +10,7 @@ import { CourseSchema, BreadcrumbSchema } from '@/components/seo';
 import { getBackendOrigin, getPublicSiteUrl } from '@/lib/env/public-url';
 import { isOnboardingCourse } from '@/lib/onboarding/enterprise';
 import { normalizePublicAssetUrl } from '@/lib/remote-image';
+import { OG_IMAGES, OG_IMAGE_URLS } from '@/lib/seo/og-image';
 import { getPublishedCourseDetailBySlugFromDatabase } from '@/lib/server/public-courses-list';
 
 export const dynamic = 'force-dynamic';
@@ -111,7 +112,7 @@ export async function generateMetadata({
       siteName: 'CARSI',
       images: thumbnailUrl
         ? [{ url: thumbnailUrl, width: 1200, height: 630, alt: course.title }]
-        : undefined,
+        : OG_IMAGES,
       locale: 'en_AU',
       type: 'website',
     },
@@ -119,7 +120,7 @@ export async function generateMetadata({
       card: 'summary_large_image',
       title: `${course.title} | CARSI`,
       description,
-      images: thumbnailUrl ? [thumbnailUrl] : undefined,
+      images: thumbnailUrl ? [thumbnailUrl] : OG_IMAGE_URLS,
     },
     alternates: {
       canonical: `${siteUrl}/courses/${slug}`,

@@ -3,6 +3,7 @@ import Link from 'next/link';
 
 import { PricingTiers } from '@/components/pricing/PricingTiers';
 import { BreadcrumbSchema, FAQSchema } from '@/components/seo';
+import { OG_IMAGES } from '@/lib/seo/og-image';
 
 export const metadata: Metadata = {
   title: 'Pricing — Restoration Training Online',
@@ -17,6 +18,7 @@ export const metadata: Metadata = {
     'mould remediation online course',
   ],
   openGraph: {
+    images: OG_IMAGES,
     title: 'Pricing | CARSI — Restoration Training Online',
     description:
       'Free Library, monthly membership from $44/mo, and yearly membership at $795/yr. Paid memberships include 100% course access.',
