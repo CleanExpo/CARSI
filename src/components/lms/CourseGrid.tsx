@@ -17,6 +17,7 @@ type PriceFilter = 'all' | 'free' | 'paid';
 type CecFilter = 'all' | 'has-cec';
 type DurationFilter = 'all' | 'short' | 'medium' | 'long';
 
+// Bright accents — used on dark surfaces only (active-tab text sits on a ~9% tint of itself).
 const tabColors: Record<string, string> = {
   Onboarding: '#ed9d24',
   WRT: '#0f5fa8',
@@ -26,6 +27,18 @@ const tabColors: Record<string, string> = {
   CCT: '#17b8d4',
   FSRT: '#f05a35',
   AMRT: '#27ae60',
+};
+
+// WCAG AA light-mode accents — darkened so active-tab text clears 4.5:1 on its pale tint over white.
+const tabColorsLight: Record<string, string> = {
+  Onboarding: '#a85500',
+  WRT: '#0f5fa8',
+  CRT: '#0f766e',
+  ASD: '#4f46e5',
+  OCT: '#7e3ba0',
+  CCT: '#0e7490',
+  FSRT: '#c2410c',
+  AMRT: '#157a55',
 };
 
 interface Course {
@@ -210,7 +223,8 @@ export function CourseGrid({
       >
         {DISCIPLINE_TABS.map((tab) => {
           const isActive = activeTab === tab;
-          const accentColor = tabColors[tab] ?? '#0f5fa8';
+          const accentColor =
+            (isDark ? tabColors[tab] : (tabColorsLight[tab] ?? tabColors[tab])) ?? '#0f5fa8';
           return (
             <button
               key={tab}

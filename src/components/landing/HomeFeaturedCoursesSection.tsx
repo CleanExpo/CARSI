@@ -88,8 +88,8 @@ export function HomeFeaturedCoursesSection({
         </CourseBrowseProvider>
 
         {courses.length > 0 ? (
-          <p className="mt-8 flex items-center justify-center gap-2 text-center text-xs text-slate-500 dark:text-white/45">
-            <Sparkles className="h-3.5 w-3.5 text-[#ed9d24]" aria-hidden />
+          <p className="mt-8 flex items-center justify-center gap-2 text-center text-xs text-slate-600 dark:text-white/55">
+            <Sparkles className="h-3.5 w-3.5 text-[#a85500] dark:text-[#ed9d24]" aria-hidden />
             Every course tracks progress and CEC hours in your learner dashboard.
           </p>
         ) : null}

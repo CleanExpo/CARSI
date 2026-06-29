@@ -1,7 +1,10 @@
+import type { CSSProperties } from 'react';
+
 import { CheckCircle2, ArrowRight, Briefcase } from 'lucide-react';
 import Link from 'next/link';
 
 import { MarketingSectionHeader } from '@/components/marketing/MarketingSectionHeader';
+import { accentTextVars } from './accentContrast';
 import {
   cleanerUpgrades,
   industryAddonContent,
@@ -27,6 +30,8 @@ interface ContractorAddOnsProps {
 
 export function ContractorAddOns({ accentColor = '#2490ed', variant = 'default' }: ContractorAddOnsProps) {
   const content = industryAddonContent[variant];
+  const accent = accentTextVars(accentColor, 'large');
+  const accentPill = accentTextVars(accentColor, 'normal');
 
   return (
     <>
@@ -35,7 +40,12 @@ export function ContractorAddOns({ accentColor = '#2490ed', variant = 'default' 
           <p className={`mb-3 ${marketingEyebrowPill}`}>{content.eyebrow}</p>
           <h2 className={marketingSectionTitle}>
             {content.title}{' '}
-            <span style={{ color: accentColor }}>{content.titleAccent}</span>
+            <span
+              className="text-[color:var(--carsi-accent-l)] dark:text-[color:var(--carsi-accent-d)]"
+              style={{ '--carsi-accent-l': accent.light, '--carsi-accent-d': accent.dark } as CSSProperties}
+            >
+              {content.titleAccent}
+            </span>
           </h2>
           <p className={`mt-4 max-w-3xl ${marketingBodySm}`}>{content.body}</p>
           <div
@@ -78,12 +88,13 @@ export function ContractorAddOns({ accentColor = '#2490ed', variant = 'default' 
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-slate-400 dark:text-white/35">+</span>
                   <span
-                    className="rounded-full border px-2.5 py-0.5 font-mono text-xs font-bold"
+                    className="rounded-full border px-2.5 py-0.5 font-mono text-xs font-bold text-[color:var(--carsi-accent-l)] dark:text-[color:var(--carsi-accent-d)]"
                     style={{
                       background: `${accentColor}20`,
-                      color: accentColor,
                       borderColor: `${accentColor}40`,
-                    }}
+                      '--carsi-accent-l': accentPill.light,
+                      '--carsi-accent-d': accentPill.dark,
+                    } as CSSProperties}
                   >
                     {upgrade.addon}
                   </span>

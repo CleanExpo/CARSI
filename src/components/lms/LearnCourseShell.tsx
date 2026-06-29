@@ -732,8 +732,8 @@ export function LearnCourseShell({ slug }: { slug: string }) {
               const moduleOverviewActive = view === 'module' && activeModuleId === mod.id;
               return (
                 <div key={mod.id}>
-                  <p className="mb-2 flex items-center gap-2 text-[10px] font-semibold tracking-widest text-slate-400 uppercase">
-                    <span className="font-mono text-slate-500">M{modNum}</span>
+                  <p className="mb-2 flex items-center gap-2 text-[10px] font-semibold tracking-widest text-slate-600 uppercase">
+                    <span className="font-mono text-slate-600">M{modNum}</span>
                     <span className="min-w-0 truncate">{mod.title}</span>
                   </p>
                   <div className="mb-2">
@@ -929,7 +929,7 @@ export function LearnCourseShell({ slug }: { slug: string }) {
                         <div className="mb-2 flex items-center justify-between gap-2">
                           <h3 className="text-sm font-semibold text-slate-800">My notes</h3>
                           {loadingNote ? (
-                            <span className="text-xs text-slate-400">Loading…</span>
+                            <span className="text-xs text-slate-600">Loading…</span>
                           ) : null}
                         </div>
                         <div className="mb-2 flex flex-wrap gap-1.5">
@@ -965,7 +965,7 @@ export function LearnCourseShell({ slug }: { slug: string }) {
                             type="button"
                             onClick={() => void saveLessonNote()}
                             disabled={savingNote || deletingNote || loadingNote}
-                            className="h-8 rounded-md bg-[#2490ed] px-3 text-xs text-white hover:bg-[#1e7bc9] disabled:opacity-50"
+                            className="h-8 rounded-md bg-[#146fc2] px-3 text-xs text-white hover:bg-[#0f5fa8] disabled:opacity-50"
                           >
                             {savingNote ? 'Saving…' : 'Save note'}
                           </Button>

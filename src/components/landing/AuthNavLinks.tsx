@@ -23,7 +23,7 @@ export function AuthNavLinks({
     if (variant === 'desktop') {
       return (
         <span
-          className={`text-sm ${tone === 'chrome' ? 'text-white/40' : 'text-slate-400'}`}
+          className={`text-sm ${tone === 'chrome' ? 'text-white/55' : 'text-slate-600'}`}
           aria-hidden
         >
           ...
@@ -40,7 +40,7 @@ export function AuthNavLinks({
   const chromeMuted =
     'rounded-md px-2 py-2 text-sm font-medium text-white/55 transition-colors duration-150 hover:bg-white/[0.08] hover:text-white focus-visible:ring-2 focus-visible:ring-[#2490ed]/45 focus-visible:outline-none';
   const lightMuted =
-    'rounded-md px-2 py-2 text-sm font-medium text-slate-500 transition-colors duration-150 hover:bg-slate-100 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-[#2490ed]/40 focus-visible:outline-none';
+    'rounded-md px-2 py-2 text-sm font-medium text-slate-600 transition-colors duration-150 hover:bg-slate-100 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-[#2490ed]/40 focus-visible:outline-none';
   const dashboardLink = tone === 'chrome' ? chromeLink : lightLink;
   const signOutLink = tone === 'chrome' ? chromeMuted : lightMuted;
   const signInLink = tone === 'chrome' ? chromeLink : lightLink;

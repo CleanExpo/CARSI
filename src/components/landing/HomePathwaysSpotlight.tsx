@@ -86,7 +86,7 @@ export function HomePathwaysSpotlight() {
                 <p className="mt-1 text-sm font-medium text-slate-900">
                   2-Day Carpet Cleaning Workshop (CCW) — participant resources
                 </p>
-                <p className="mt-0.5 text-xs text-slate-500">Schedules, materials and cohort access</p>
+                <p className="mt-0.5 text-xs text-slate-600">Schedules, materials and cohort access</p>
               </div>
             </div>
             <span className="inline-flex shrink-0 items-center gap-1.5 text-sm font-medium text-[#146fc2] transition-colors group-hover:text-[#0f5fa8]">

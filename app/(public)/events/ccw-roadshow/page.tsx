@@ -140,7 +140,7 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
 
         {focusEvent ? (
           <nav className="relative z-10 flex flex-wrap items-center gap-x-2 gap-y-1 pt-2 text-sm text-slate-600 dark:text-white/60">
-            <Link href={ccwRoadshowPath} className="font-medium text-[#7ec5ff] transition-colors hover:text-white">
+            <Link href={ccwRoadshowPath} className="font-medium text-[#146fc2] dark:text-[#7ec5ff] transition-colors hover:text-white">
               All CCW locations
             </Link>
             {ccwRoadshowEvents
@@ -150,7 +150,7 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
                   <span aria-hidden className="text-slate-400 dark:text-white/30">·</span>
                   <Link
                     href={`/ccw-${event.slug}`}
-                    className="font-medium text-[#7ec5ff] transition-colors hover:text-white"
+                    className="font-medium text-[#146fc2] dark:text-[#7ec5ff] transition-colors hover:text-white"
                   >
                     {event.city} event
                   </Link>
@@ -164,7 +164,7 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
           <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(300px,420px)] lg:items-start lg:gap-12">
             <div className="min-w-0">
               <span
-                className={`inline-flex items-center gap-2 rounded-full border border-[#ed9d24]/25 bg-[#ed9d24]/10 px-3 py-1 text-xs font-medium text-[#ed9d24]`}
+                className={`inline-flex items-center gap-2 rounded-full border border-[#ed9d24]/25 bg-[#ed9d24]/10 px-3 py-1 text-xs font-medium text-[#a85500] dark:text-[#ed9d24]`}
               >
                 <span className="relative flex h-2 w-2">
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#ed9d24] opacity-40" />
@@ -179,7 +179,7 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
 
               <h1 className={`mt-3 ${marketingHeading}`}>{ccwRoadshowHeroHeadline}</h1>
 
-              <p className="mt-3 text-lg font-semibold text-[#ed9d24]">
+              <p className="mt-3 text-lg font-semibold text-[#a85500] dark:text-[#ed9d24]">
                 Spend two days with {ccwRoadshowPresenter.name}
               </p>
 
@@ -191,7 +191,7 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
 
               <div className="mt-8 grid gap-3 sm:grid-cols-3">
                 <div className={marketingStatCard}>
-                  <CalendarDays className="mb-3 h-4 w-4 text-[#2490ed]/80" aria-hidden />
+                  <CalendarDays className="mb-3 h-4 w-4 text-[#146fc2] dark:text-[#7ec5ff]" aria-hidden />
                   <p className="text-sm font-semibold text-slate-900 dark:text-white/90">July 2026</p>
                   <p className={`mt-1 ${marketingBodySm}`}>Melbourne 22-23, Sydney 30-31</p>
                 </div>
@@ -201,7 +201,7 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
                   <p className={`mt-1 ${marketingBodySm}`}>Past/current customers claim a token</p>
                 </div>
                 <div className={marketingStatCard}>
-                  <Sparkles className="mb-3 h-4 w-4 text-[#2490ed]/80" aria-hidden />
+                  <Sparkles className="mb-3 h-4 w-4 text-[#146fc2] dark:text-[#7ec5ff]" aria-hidden />
                   <p className="text-sm font-semibold text-slate-900 dark:text-white/90">Limited seats</p>
                   <p className={`mt-1 ${marketingBodySm}`}>Small group format. Register early.</p>
                 </div>
@@ -247,7 +247,7 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
               <article key={event.slug} className={`p-5 ${marketingPanel} ${marketingPanelHover}`}>
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <p className="text-xs font-semibold tracking-[0.14em] text-[#7ec5ff] uppercase">
+                    <p className="text-xs font-semibold tracking-[0.14em] text-[#146fc2] dark:text-[#7ec5ff] uppercase">
                       {event.city}
                     </p>
                     <h3 className="mt-2 text-xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-2xl">
@@ -255,13 +255,13 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
                     </h3>
                     <p className={`mt-2 ${marketingBodySm}`}>{event.timeLabel}</p>
                   </div>
-                  <span className="rounded-full border border-[#2490ed]/25 bg-[#2490ed]/10 px-3 py-1 text-[10px] font-semibold tracking-wide text-[#7ec5ff] uppercase">
+                  <span className="rounded-full border border-[#2490ed]/25 bg-[#2490ed]/10 px-3 py-1 text-[10px] font-semibold tracking-wide text-[#146fc2] dark:text-[#7ec5ff] uppercase">
                     2 days
                   </span>
                 </div>
 
                 <div className="mt-5 flex gap-3 border-t border-white/[0.06] pt-5">
-                  <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#2490ed]/70" aria-hidden />
+                  <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#146fc2] dark:text-[#7ec5ff]" aria-hidden />
                   <div>
                     <p className="text-sm font-semibold text-slate-800 dark:text-white/85">{event.venueName}</p>
                     <p className={`mt-1 ${marketingBodySm}`}>
@@ -272,7 +272,7 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
 
                 <Link
                   href={`/ccw-${event.slug}`}
-                  className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-[#7ec5ff] transition-colors hover:text-white"
+                  className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-[#146fc2] dark:text-[#7ec5ff] transition-colors hover:text-white"
                 >
                   {event.city} details &amp; registration
                   <ArrowRight className="h-4 w-4" aria-hidden />
@@ -296,7 +296,7 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
           <div className="grid gap-4 lg:grid-cols-3">
             {Object.values(ccwRoadshowCampaignPillars).map((pillar) => (
               <article key={pillar.eyebrow} className={`p-5 ${marketingPanel}`}>
-                <p className="text-[10px] font-semibold tracking-[0.14em] text-[#2490ed]/80 uppercase">
+                <p className="text-[10px] font-semibold tracking-[0.14em] text-[#146fc2] dark:text-[#7ec5ff] uppercase">
                   {pillar.eyebrow}
                 </p>
                 <h3 className="mt-3 text-lg font-bold leading-snug text-slate-900 dark:text-white">{pillar.title}</h3>
@@ -351,7 +351,7 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
               </div>
               <Link
                 href="#booking"
-                className="mt-5 inline-flex items-center gap-2 rounded-full border border-[#2490ed]/35 bg-[#2490ed]/10 px-5 py-2.5 text-sm font-semibold text-[#7ec5ff] transition-all hover:border-[#2490ed]/50 hover:bg-[#2490ed]/18"
+                className="mt-5 inline-flex items-center gap-2 rounded-full border border-[#2490ed]/35 bg-[#2490ed]/10 px-5 py-2.5 text-sm font-semibold text-[#146fc2] dark:text-[#7ec5ff] transition-all hover:border-[#2490ed]/50 hover:bg-[#2490ed]/18"
               >
                 Claim your free entry token <ArrowRight className="h-4 w-4" aria-hidden />
               </Link>

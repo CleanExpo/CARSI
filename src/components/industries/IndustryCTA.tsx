@@ -1,6 +1,9 @@
+import type { CSSProperties } from 'react';
+
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 
+import { accentTextVars } from './accentContrast';
 import {
   marketingBtnPrimary,
   marketingBtnSecondary,
@@ -33,12 +36,19 @@ export function IndustryCTA({
   secondaryText = 'Browse all courses',
   accentColor,
 }: IndustryCTAProps) {
+  const accent = accentTextVars(accentColor, 'large');
   return (
     <section className={marketingSection}>
       <div className="mx-auto max-w-2xl text-center">
         <p className={`mb-3 ${marketingEyebrow}`}>{subtitle}</p>
         <h2 className={marketingSectionTitle}>
-          {title} <span style={{ color: accentColor }}>{price}</span>
+          {title}{' '}
+          <span
+            className="text-[color:var(--carsi-accent-l)] dark:text-[color:var(--carsi-accent-d)]"
+            style={{ '--carsi-accent-l': accent.light, '--carsi-accent-d': accent.dark } as CSSProperties}
+          >
+            {price}
+          </span>
         </h2>
         <p className={`mx-auto mt-4 max-w-xl ${marketingBodySm}`}>{description}</p>
         <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">

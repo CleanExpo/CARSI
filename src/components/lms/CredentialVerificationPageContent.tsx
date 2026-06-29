@@ -152,7 +152,7 @@ export function CredentialVerificationPageContent({
           href="/dashboard/student/credentials"
           className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-6 py-3 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
         >
-          <Award className="h-4 w-4 text-[#7ec5ff]" aria-hidden />
+          <Award className="h-4 w-4 text-[#146fc2]" aria-hidden />
           All credentials
         </Link>
         {courseSlug ? (

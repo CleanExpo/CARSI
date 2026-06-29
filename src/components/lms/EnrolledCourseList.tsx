@@ -124,7 +124,7 @@ export function EnrolledCourseList({ enrollments }: EnrolledCourseListProps) {
                       <ProgressBar percentage={enr.completion_percentage} label="Progress" />
                     </div>
                     <div className="flex flex-wrap gap-2 pt-1">
-                      <Button asChild className="gap-2 rounded-lg bg-[#2490ed] text-white hover:bg-[#1a7fd4]">
+                      <Button asChild className="gap-2 rounded-lg bg-[#146fc2] text-white hover:bg-[#0f5fa8]">
                         <Link href={continueHref} onClick={(e) => e.stopPropagation()}>
                           <PlayCircle className="h-4 w-4" />
                           {done ? 'Review lessons' : onboarding ? 'Continue lesson' : 'Continue learning'}

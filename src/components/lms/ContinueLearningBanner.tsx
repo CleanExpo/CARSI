@@ -58,7 +58,7 @@ export function ContinueLearningBanner({
         <div className="flex flex-wrap gap-2 sm:shrink-0">
         <Link
           href={snapshot.resume_href}
-          className="inline-flex shrink-0 items-center justify-center gap-2 self-start rounded-xl bg-[#2490ed] px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#1a7fd4] sm:self-center"
+          className="inline-flex shrink-0 items-center justify-center gap-2 self-start rounded-xl bg-[#146fc2] px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#0f5fa8] sm:self-center"
         >
           Resume
           <ArrowRight className="h-4 w-4" aria-hidden />

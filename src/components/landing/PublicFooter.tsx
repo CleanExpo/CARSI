@@ -50,7 +50,7 @@ function FooterSectionLabel({ children }: { children: ReactNode }) {
   return (
     <div className="mb-4 flex items-center gap-3">
       <span className="h-px w-6 bg-gradient-to-r from-[#2490ed] to-[#00d4aa]" aria-hidden />
-      <p className="text-[10px] font-semibold tracking-[0.2em] text-white/45 uppercase">
+      <p className="text-[10px] font-semibold tracking-[0.2em] text-white/60 uppercase">
         {children}
       </p>
     </div>
@@ -133,7 +133,7 @@ export function PublicFooter() {
               className="pointer-events-none absolute -top-px right-8 left-8 h-px bg-gradient-to-r from-transparent via-[#2490ed]/50 to-transparent"
               aria-hidden
             />
-            <p className="text-[10px] font-semibold tracking-[0.18em] text-white/35 uppercase">
+            <p className="text-[10px] font-semibold tracking-[0.18em] text-white/60 uppercase">
               Built for the field
             </p>
             <p className="mt-2 text-lg font-semibold leading-snug text-white/90">
@@ -204,7 +204,7 @@ export function PublicFooter() {
             </ul>
 
             <div className="mt-6 border-t border-white/[0.06] pt-5">
-              <p className="mb-3 text-[10px] font-semibold tracking-[0.16em] text-white/35 uppercase">
+              <p className="mb-3 text-[10px] font-semibold tracking-[0.16em] text-white/60 uppercase">
                 Follow CARSI
               </p>
               <div className="flex flex-wrap gap-2">
@@ -229,7 +229,7 @@ export function PublicFooter() {
               Staff login
             </Link>
           </p>
-          <p className="max-w-xl text-[11px] leading-relaxed text-white/45 sm:text-right">
+          <p className="max-w-xl text-[11px] leading-relaxed text-white/60 sm:text-right">
             <AcronymTooltip term="IICRC" />
             <span> CEC continuing education — not an </span>
             <AcronymTooltip term="RTO" />

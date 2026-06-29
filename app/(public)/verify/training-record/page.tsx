@@ -58,18 +58,18 @@ function TrainingRecordContent() {
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-12 sm:px-6 md:py-16">
-      <p className="text-[10px] font-semibold tracking-[0.22em] text-white/35 uppercase">
+      <p className="text-[10px] font-semibold tracking-[0.22em] text-slate-600 dark:text-white/55 uppercase">
         CARSI verification
       </p>
-      <h1 className="mt-2 text-2xl font-semibold tracking-tight text-white md:text-3xl">
+      <h1 className="mt-2 text-2xl font-semibold tracking-tight text-slate-900 dark:text-white md:text-3xl">
         Training &amp; CEC summary
       </h1>
-      <p className="mt-2 text-sm text-white/45">
+      <p className="mt-2 text-sm text-slate-600 dark:text-white/55">
         For employer, HR, or insurer evidence. Each course links to a public credential check.
       </p>
 
       {loading && (
-        <div className="mt-10 flex items-center gap-2 text-sm text-white/50">
+        <div className="mt-10 flex items-center gap-2 text-sm text-slate-600 dark:text-white/50">
           <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
           Loading record…
         </div>
@@ -77,13 +77,13 @@ function TrainingRecordContent() {
 
       {!loading && error && (
         <div
-          className="mt-10 flex gap-3 rounded-xl border border-amber-500/25 bg-amber-500/10 px-4 py-3 text-sm text-amber-100/90"
+          className="mt-10 flex gap-3 rounded-xl border border-amber-500/25 bg-amber-500/10 px-4 py-3 text-sm text-amber-900 dark:text-amber-100/90"
           role="alert"
         >
           <AlertCircle className="h-5 w-5 shrink-0 text-amber-400" aria-hidden />
           <div>
             <p className="font-medium">{error}</p>
-            <Link href="/login" className="mt-2 inline-block text-[#7ec5ff] hover:underline">
+            <Link href="/login" className="mt-2 inline-block text-[#146fc2] dark:text-[#7ec5ff] hover:underline">
               Learner sign in
             </Link>
           </div>
@@ -95,49 +95,49 @@ function TrainingRecordContent() {
           <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
             <dl className="grid gap-3 text-sm sm:grid-cols-2">
               <div>
-                <dt className="text-[10px] font-semibold tracking-widest text-white/35 uppercase">
+                <dt className="text-[10px] font-semibold tracking-widest text-slate-600 dark:text-white/55 uppercase">
                   Learner
                 </dt>
-                <dd className="mt-1 font-medium text-white">{data.learner_name}</dd>
+                <dd className="mt-1 font-medium text-slate-900 dark:text-white">{data.learner_name}</dd>
               </div>
               <div>
-                <dt className="text-[10px] font-semibold tracking-widest text-white/35 uppercase">
+                <dt className="text-[10px] font-semibold tracking-widest text-slate-600 dark:text-white/55 uppercase">
                   Email
                 </dt>
-                <dd className="mt-1 text-white/70">{data.learner_email}</dd>
+                <dd className="mt-1 text-slate-700 dark:text-white/70">{data.learner_email}</dd>
               </div>
               <div>
-                <dt className="text-[10px] font-semibold tracking-widest text-white/35 uppercase">
+                <dt className="text-[10px] font-semibold tracking-widest text-slate-600 dark:text-white/55 uppercase">
                   Issuer
                 </dt>
-                <dd className="mt-1 text-white/70">{data.issuing_organisation}</dd>
+                <dd className="mt-1 text-slate-700 dark:text-white/70">{data.issuing_organisation}</dd>
               </div>
               <div>
-                <dt className="text-[10px] font-semibold tracking-widest text-white/35 uppercase">
+                <dt className="text-[10px] font-semibold tracking-widest text-slate-600 dark:text-white/55 uppercase">
                   Generated
                 </dt>
-                <dd className="mt-1 text-white/70">{formatGenerated(data.generated_at)}</dd>
+                <dd className="mt-1 text-slate-700 dark:text-white/70">{formatGenerated(data.generated_at)}</dd>
               </div>
             </dl>
             <div className="mt-6 flex flex-wrap gap-4 border-t border-white/10 pt-6">
               <div>
-                <p className="text-[10px] font-semibold tracking-widest text-white/35 uppercase">
+                <p className="text-[10px] font-semibold tracking-widest text-slate-600 dark:text-white/55 uppercase">
                   Completed courses
                 </p>
-                <p className="mt-1 text-xl font-semibold text-white">{data.summary.completed_courses}</p>
+                <p className="mt-1 text-xl font-semibold text-slate-900 dark:text-white">{data.summary.completed_courses}</p>
               </div>
               <div>
-                <p className="text-[10px] font-semibold tracking-widest text-white/35 uppercase">
+                <p className="text-[10px] font-semibold tracking-widest text-slate-600 dark:text-white/55 uppercase">
                   Total CEC hours
                 </p>
-                <p className="mt-1 text-xl font-semibold text-[#7ec5ff]">
+                <p className="mt-1 text-xl font-semibold text-[#146fc2] dark:text-[#7ec5ff]">
                   {data.summary.total_cec_hours}
                 </p>
               </div>
             </div>
             <a
               href={pdfHref}
-              className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[#2490ed] px-5 py-3 text-sm font-semibold text-white hover:bg-[#1f82d4]"
+              className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[#146fc2] px-5 py-3 text-sm font-semibold text-white hover:bg-[#1769b8]"
             >
               <Download className="h-4 w-4" aria-hidden />
               Download PDF pack
@@ -146,17 +146,17 @@ function TrainingRecordContent() {
 
           {data.cec_by_discipline.length > 0 && (
             <section aria-labelledby="cec-heading">
-              <h2 id="cec-heading" className="text-sm font-semibold text-white">
+              <h2 id="cec-heading" className="text-sm font-semibold text-slate-900 dark:text-white">
                 CEC by discipline
               </h2>
               <ul className="mt-3 divide-y divide-white/10 rounded-xl border border-white/10">
                 {data.cec_by_discipline.map((row) => (
                   <li
                     key={row.discipline}
-                    className="flex items-center justify-between px-4 py-3 text-sm text-white/80"
+                    className="flex items-center justify-between px-4 py-3 text-sm text-slate-700 dark:text-white/80"
                   >
-                    <span className="font-mono text-xs text-white/90">{row.discipline}</span>
-                    <span className="tabular-nums text-white/60">{row.cec_hours} hrs</span>
+                    <span className="font-mono text-xs text-slate-900 dark:text-white/90">{row.discipline}</span>
+                    <span className="tabular-nums text-slate-600 dark:text-white/60">{row.cec_hours} hrs</span>
                   </li>
                 ))}
               </ul>
@@ -164,7 +164,7 @@ function TrainingRecordContent() {
           )}
 
           <section aria-labelledby="courses-heading">
-            <h2 id="courses-heading" className="text-sm font-semibold text-white">
+            <h2 id="courses-heading" className="text-sm font-semibold text-slate-900 dark:text-white">
               Completed courses &amp; credential IDs
             </h2>
             <ul className="mt-3 space-y-4">
@@ -173,16 +173,16 @@ function TrainingRecordContent() {
                   key={c.credential_id}
                   className="rounded-xl border border-white/10 bg-white/[0.02] p-4 text-sm"
                 >
-                  <p className="font-medium text-white">{c.course_title}</p>
-                  <p className="mt-1 text-xs text-white/45">
+                  <p className="font-medium text-slate-900 dark:text-white">{c.course_title}</p>
+                  <p className="mt-1 text-xs text-slate-600 dark:text-white/55">
                     {c.iicrc_discipline ?? '—'} · {c.cec_hours} CEC · issued {c.issued_date}
                   </p>
-                  <p className="mt-1 font-mono text-[11px] text-white/35">ID {c.credential_id}</p>
+                  <p className="mt-1 font-mono text-[11px] text-slate-600 dark:text-white/55">ID {c.credential_id}</p>
                   <a
                     href={c.verification_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-[#7ec5ff] hover:underline"
+                    className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-[#146fc2] dark:text-[#7ec5ff] hover:underline"
                   >
                     Verify credential
                     <ExternalLink className="h-3 w-3" aria-hidden />
@@ -191,11 +191,11 @@ function TrainingRecordContent() {
               ))}
             </ul>
             {data.credentials.length === 0 && (
-              <p className="mt-3 text-sm text-white/40">No completed courses on this record.</p>
+              <p className="mt-3 text-sm text-slate-600 dark:text-white/55">No completed courses on this record.</p>
             )}
           </section>
 
-          <p className="text-xs text-white/30">
+          <p className="text-xs text-slate-600 dark:text-white/55">
             Shared links expire after a limited time and should be treated as confidential.
           </p>
         </div>
@@ -207,7 +207,7 @@ function TrainingRecordContent() {
 function TrainingRecordFallback() {
   return (
     <main className="mx-auto max-w-3xl px-4 py-12 sm:px-6 md:py-16">
-      <div className="flex items-center gap-2 text-sm text-white/50">
+      <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-white/50">
         <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
         Loading…
       </div>

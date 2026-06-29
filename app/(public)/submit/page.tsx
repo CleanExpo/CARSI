@@ -125,8 +125,8 @@ export default function SubmitIndexPage() {
                 <h2 className="text-base font-semibold text-white/85 transition-colors group-hover:text-white">
                   {item.title}
                 </h2>
-                <p className="text-sm leading-relaxed text-white/45">{item.description}</p>
-                <p className="text-xs text-white/25">{item.detail}</p>
+                <p className="text-sm leading-relaxed text-white/70">{item.description}</p>
+                <p className="text-xs text-white/70">{item.detail}</p>
               </div>
 
               {/* CTA */}
@@ -148,7 +148,7 @@ export default function SubmitIndexPage() {
 
         {/* Footer note */}
         <div className="mt-10 rounded-sm border-[0.5px] border-white/[0.06] bg-white/[0.02] px-6 py-4">
-          <p className="text-xs leading-relaxed text-white/35">
+          <p className="text-xs leading-relaxed text-white/60">
             All submissions are reviewed by the CARSI editorial team. We aim to respond within{' '}
             <span className="text-white/55">5 business days</span>. Approved listings are published
             free of charge. Commercial advertising enquiries should be directed to{' '}

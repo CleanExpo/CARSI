@@ -46,7 +46,7 @@ export function CourseHubContext({ slug }: CourseHubContextProps) {
       className="rounded-sm border border-white/[0.06] bg-[#060a14] p-5"
       aria-label="Career opportunities for this discipline"
     >
-      <h3 className="mb-3 text-xs font-semibold tracking-widest text-white/40 uppercase">
+      <h3 className="mb-3 text-xs font-semibold tracking-widest text-white/60 uppercase">
         Career Opportunities
       </h3>
 
@@ -68,7 +68,7 @@ export function CourseHubContext({ slug }: CourseHubContextProps) {
       </ul>
 
       {data.related_disciplines.length > 1 && (
-        <p className="mt-4 text-xs text-white/30">
+        <p className="mt-4 text-xs text-white/60">
           Also relevant to:{' '}
           <span className="text-white/50">
             {data.related_disciplines.filter((d) => d !== data.discipline).join(', ')}

@@ -63,25 +63,25 @@ export default function CourseIdeasPage() {
   return (
     <main className="flex max-w-3xl flex-col gap-8 px-4 py-12">
       <div className="flex flex-col gap-2">
-        <h1 className="font-mono text-3xl font-bold text-white">Course Ideas</h1>
-        <p className="text-sm leading-relaxed text-white/50">
+        <h1 className="font-mono text-3xl font-bold text-slate-900 dark:text-white">Course Ideas</h1>
+        <p className="text-sm leading-relaxed text-slate-600 dark:text-white/50">
           Vote for courses you&apos;d like CARSI to build. Instructors use your votes to prioritise
           development.
         </p>
       </div>
 
-      {loading && <p className="text-sm text-white/40">Loading…</p>}
+      {loading && <p className="text-sm text-slate-600 dark:text-white/55">Loading…</p>}
       {error && <p className="text-sm text-red-400">{error}</p>}
 
       {!loading && !error && ideas.length === 0 && (
-        <p className="text-sm text-white/40">No course ideas yet. Be the first to suggest one!</p>
+        <p className="text-sm text-slate-600 dark:text-white/55">No course ideas yet. Be the first to suggest one!</p>
       )}
 
       <div className="flex flex-col gap-4">
         {ideas.map((idea) => (
           <div
             key={idea.id}
-            className="flex items-start gap-4 rounded-sm border border-white/[0.06] bg-zinc-900/50 p-5"
+            className="flex items-start gap-4 rounded-sm border border-white/[0.06] bg-zinc-900 p-5"
           >
             {/* Vote button */}
             <button
@@ -89,7 +89,7 @@ export default function CourseIdeasPage() {
               disabled={votingId === idea.id}
               className="flex min-w-[52px] flex-col items-center gap-0.5 rounded-sm border border-white/[0.08] bg-zinc-800 px-3 py-2 transition-colors hover:border-cyan-500/40 hover:bg-zinc-700 disabled:opacity-50"
             >
-              <span className="text-xs text-white/40">▲</span>
+              <span className="text-xs text-white/60">▲</span>
               <span className="font-mono text-sm font-bold text-white">{idea.vote_count}</span>
             </button>
 
@@ -106,7 +106,7 @@ export default function CourseIdeasPage() {
                     {idea.iicrc_discipline}
                   </span>
                 )}
-                <span className="rounded-sm bg-zinc-800 px-2 py-0.5 font-mono text-xs text-white/40">
+                <span className="rounded-sm bg-zinc-800 px-2 py-0.5 font-mono text-xs text-white/60">
                   {STATUS_LABELS[idea.status] ?? idea.status}
                 </span>
                 {idea.ai_outline && (

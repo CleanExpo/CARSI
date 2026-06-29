@@ -90,7 +90,7 @@ export function LearnModuleOverview({
             <div className="pt-2">
               <Button
                 type="button"
-                className="rounded-md bg-[#2490ed] px-5 text-white hover:bg-[#1a7fd4]"
+                className="rounded-md bg-[#146fc2] px-5 text-white hover:bg-[#0f5fa8]"
                 onClick={() => onSelectLesson(ctaTarget.id)}
               >
                 {firstIncomplete ? 'Continue to next lesson' : 'Review first lesson'}
