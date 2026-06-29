@@ -8,20 +8,20 @@ import { OG_IMAGES } from '@/lib/seo/og-image';
 export const metadata: Metadata = {
   title: 'Pricing — Restoration Training Online',
   description:
-    'CARSI membership from $44/month — monthly or yearly subscriptions unlock 100% access to all published courses, CEC tracking, and verified CARSI certificates. Free Library available to all.',
+    'Buy any CARSI course individually, or choose a yearly membership for 100% access to all published courses — with IICRC CEC tracking and verified certificates. Free Library available to everyone, no card required.',
   keywords: [
     'CARSI pricing',
     'restoration training membership',
     'IICRC CEC courses online',
     'building restoration courses Australia',
-    'water damage training subscription',
+    'water damage training course',
     'mould remediation online course',
   ],
   openGraph: {
     images: OG_IMAGES,
     title: 'Pricing | CARSI — Restoration Training Online',
     description:
-      'Free Library, monthly membership from $44/mo, and yearly membership at $795/yr. Paid memberships include 100% course access.',
+      'Free Library for everyone, per-course enrolment, and a yearly membership at $795/yr for 100% course access.',
     type: 'website',
     url: 'https://carsi.com.au/pricing',
   },
@@ -30,24 +30,24 @@ export const metadata: Metadata = {
 
 const FAQ_ITEMS = [
   {
-    question: 'Can I cancel my membership at any time?',
+    question: 'Do I have to buy anything to start?',
     answer:
-      'Yes — cancel any time from your student dashboard. Your access continues until the end of the current billing period. No lock-in contracts, no cancellation fees.',
+      'No. Every learner gets the Free Library at no cost and no card required. When you are ready, buy any individual course outright — a yearly membership is an optional path for 100% access.',
   },
   {
-    question: "What's the difference between monthly and yearly membership?",
+    question: "What's included in a yearly membership?",
     answer:
-      'Both paid membership paths unlock 100% access to all published CARSI courses while the membership is active. Monthly membership is flexible and cancel-anytime; yearly membership is the full-year option for learners planning multiple courses or ongoing CEC maintenance.',
+      '100% access to all published CARSI courses for one learner for 12 months, plus the IICRC CEC tracking dashboard and your certificate wallet. Yearly membership is for learners planning multiple courses or ongoing CEC maintenance.',
   },
   {
     question: 'Do CARSI courses count toward IICRC CECs?',
     answer:
-      "CARSI's catalogue includes IICRC-aligned CEC courses where stated. Your membership includes a CEC tracking dashboard that logs completed credits, broken down by discipline (WRT, CRT, OCT, ASD, CCT and more).",
+      "CARSI's catalogue includes IICRC-aligned CEC courses where stated. Your dashboard includes a CEC tracking dashboard that logs completed credits, broken down by discipline (WRT, CRT, OCT, ASD, CCT and more).",
   },
   {
-    question: 'What happens if my membership lapses?',
+    question: 'What happens when my yearly membership ends?',
     answer:
-      'Your course access closes when the billing period ends. Your progress and certificates are saved — resume immediately when you renew. There is no data loss.',
+      'Your course progress and certificates are saved. Renew any time to restore 100% access — there is no data loss. Courses you bought individually stay yours.',
   },
 ];
 
@@ -69,37 +69,6 @@ const FREE_FEATURES = [
   'ChatGPT Cheat Sheet for Restorers',
 ];
 
-const FOUNDATION_EXTRAS = [
-  'Everything in Free Library',
-  '100% access to all published CARSI courses',
-  'Beginner, intermediate, and advanced course levels',
-  'IICRC CEC tracking dashboard',
-  'PDF certificate wallet',
-  'Policies & Procedures',
-  'Donning & Doffing PPE (valued at $39)',
-  'Microbe Clean Basic Understanding (valued at $99)',
-  'Level 1 Mould Remediation (valued at $49)',
-  'Starting a Business course',
-  'Moisture Meter Course (valued at $39)',
-  'Carpet Cleaning Basics (valued at $55)',
-  'Safety Data Sheets Course',
-  'ToolBox Meetings Assistance',
-];
-
-const GROWTH_EXTRAS = [
-  'Everything in monthly membership',
-  '100% access to all published CARSI courses',
-  'BONUS Policies & Procedures',
-  'NeoSan Labs Product Course (valued at $99)',
-  'Social Media Marketing (valued at $79)',
-  'Admin Course (valued at $275)',
-  'Level 2 Mould Remediation (valued at $99)',
-  'Asthma & Allergy Course (valued at $129)',
-  'ALL Introduction To courses (value $500+)',
-  'Monthly activity recognition (anonymous by default) & streak tracker',
-  'Shareable credential profile',
-];
-
 export default function PricingPage() {
   return (
     <>
@@ -116,8 +85,8 @@ export default function PricingPage() {
               Membership &amp; Pricing
             </h1>
             <p className="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-slate-600">
-              Buy any course individually today. Monthly and yearly membership — 100% access to
-              all published courses — is launching soon.
+              Buy any course individually, or choose a yearly membership for 100% access to all
+              published courses. Free Library for everyone — no card required.
             </p>
           </section>
 
@@ -147,43 +116,18 @@ export default function PricingPage() {
 
           <PricingTiers />
 
-          <section
-            aria-label="Membership tiers"
-            className="mb-16 grid grid-cols-1 gap-6 md:grid-cols-3"
-          >
-            <MembershipCard
-              title="Free Library"
-              price="FREE"
-              priceSuffix="No card required"
-              features={FREE_FEATURES}
-              cta="Create Free Account"
-              href="/register"
-              tone="neutral"
-            />
-            <MembershipCard
-              title="Foundation"
-              price="$44"
-              priceSuffix="AUD / month"
-              helper="100% course access · GST included · Cancel anytime"
-              features={FOUNDATION_EXTRAS}
-              cta="Browse courses"
-              href="/courses"
-              note="Memberships launching soon — enrol per course in the meantime."
-              badge="Launching soon"
-              tone="blue"
-            />
-            <MembershipCard
-              title="Growth"
-              price="$99"
-              priceSuffix="AUD / month"
-              helper="100% course access · GST included · Cancel anytime"
-              features={GROWTH_EXTRAS}
-              cta="Browse courses"
-              href="/courses"
-              note="Memberships launching soon — enrol per course in the meantime."
-              badge="Launching soon"
-              tone="green"
-            />
+          <section aria-label="Free Library" className="mb-16">
+            <div className="mx-auto max-w-md">
+              <MembershipCard
+                title="Free Library"
+                price="FREE"
+                priceSuffix="No card required"
+                features={FREE_FEATURES}
+                cta="Create Free Account"
+                href="/register"
+                tone="neutral"
+              />
+            </div>
           </section>
 
           <section
@@ -226,7 +170,7 @@ export default function PricingPage() {
           </section>
 
           <p className="text-center text-xs text-slate-600">
-            Prices in AUD. GST included. Billed monthly or yearly depending on the option selected.
+            Prices in AUD. GST included. Pay once per course, or yearly for membership.
             Managed via Stripe — secure payment processing.
             <br />
             Questions?{' '}
