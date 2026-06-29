@@ -65,8 +65,13 @@ Each phase is one coherent, independently-shippable batch from the register.
 | 8 | Auth session lifecycle | medium | per-request isActive/role, stop hardcoding is_active | unit + e2e |
 | 9 | CSP nonce migration | **high** | nonce script-src, drop unsafe-inline | full e2e + real browser |
 | 10 | Compliance copy | ✅ done (founder chose Option B) | IICRC CEC accredited→IICRC-aligned CEC, IICRC-certified training→IICRC-aligned training, dropped IAG/Suncorp/QBE names, qualified "only holder" superlative; person/IICRC-cert-code refs preserved | type-check, lint, test:unit, build |
-| 11 | Secret rotation + history scrub | 🟡 partial — placeholder landed; **rotation + history scrub still founder-gated** | docs literal whsec_→placeholder (done); founder rotates in Stripe + `git filter-repo` history scrub (pending) | founder rotates first |
+| 11 | Secret rotation + history scrub | ✅ done (rotate-only; scrub deliberately skipped) | literal whsec_→placeholder (#246); founder+RANA rotated the secret in Stripe → leaked value is dead; history rewrite skipped (rotated ⇒ near-zero added security vs repo-wide force-push disruption + persistent GitHub caches) | #246 + Stripe rotation |
 | 12 | Frontend contrast / a11y | low | 7 homepage contrast violations + re-run failed frontend dimension | test:a11y + axe |
 | 13 | Bloat cleanup | none | react-hot-toast, concurrently, output/pdf, dup course file | build |
 
-Phases 1–4, 6–9, 12–13 are agent-autonomous. Phases 5, 10, 11 stop for founder input.
+Phases 1–4, 6–9, 12–13 are agent-autonomous. Phases 5, 10, 11 were founder-gated.
+
+**ALL 13 phases shipped (2026-06-29).** Final gated outcomes: P5 FK migrated (#247, orphans=0,
+deploy-verified); P10 compliance copy qualified — Option B (#245, prod-verified); P11 secret
+redacted (#246) + rotated in Stripe (founder+RANA) → closed rotate-only, history scrub skipped
+as disproportionate for a dead secret.
