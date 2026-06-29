@@ -3,6 +3,8 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
+import { TurnstileWidget } from '@/components/security/TurnstileWidget';
+
 interface SubmissionFormProps {
   submissionType: string;
   urlLabel: string;
@@ -45,6 +47,7 @@ export function SubmissionForm({ submissionType, urlLabel }: SubmissionFormProps
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
   const [submitting, setSubmitting] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
+  const [turnstileToken, setTurnstileToken] = useState('');
 
   function setField<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -87,7 +90,7 @@ export function SubmissionForm({ submissionType, urlLabel }: SubmissionFormProps
       const res = await fetch('/api/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, submission_type: submissionType }),
+        body: JSON.stringify({ ...form, submission_type: submissionType, turnstileToken }),
       });
 
       const json = (await res.json()) as { success?: boolean; error?: string };
@@ -358,6 +361,7 @@ export function SubmissionForm({ submissionType, urlLabel }: SubmissionFormProps
 
         {/* Submit */}
         <div className="mt-8">
+          <TurnstileWidget onVerify={setTurnstileToken} />
           <button
             type="submit"
             disabled={submitting}

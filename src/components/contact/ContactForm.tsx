@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 
+import { TurnstileWidget } from '@/components/security/TurnstileWidget';
+
 interface FormState {
   firstName: string;
   lastName: string;
@@ -37,6 +39,7 @@ export function ContactForm({ leadContext }: { leadContext?: ContactLeadContext 
   const [form, setForm] = useState<FormState>(initialForm);
   const [status, setStatus] = useState<Status>('idle');
   const [reference, setReference] = useState<string | null>(null);
+  const [turnstileToken, setTurnstileToken] = useState('');
   const hasLeadContext = Boolean(
     leadContext?.source || leadContext?.topic || leadContext?.pathway || leadContext?.intent,
   );
@@ -52,7 +55,7 @@ export function ContactForm({ leadContext }: { leadContext?: ContactLeadContext 
       const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, leadContext }),
+        body: JSON.stringify({ ...form, leadContext, turnstileToken }),
       });
       const data = (await res.json().catch(() => ({}))) as { reference?: string; error?: string };
       if (!res.ok) throw new Error(data.error ?? 'Failed');
@@ -230,6 +233,8 @@ export function ContactForm({ leadContext }: { leadContext?: ContactLeadContext 
           Something went wrong. Please try again or email support@carsi.com.au
         </p>
       )}
+
+      <TurnstileWidget onVerify={setTurnstileToken} />
 
       <button
         type="submit"
