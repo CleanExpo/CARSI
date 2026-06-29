@@ -90,6 +90,10 @@ const nextConfig: NextConfig = {
     return [
       { source: '/student', destination: '/dashboard/student', permanent: true },
       { source: '/student/:path*', destination: '/dashboard/student/:path*', permanent: true },
+      // CCW Business Growth Days convenience redirects → the combined event page.
+      // (/ccw-melbourne and /ccw-sydney are real dedicated pages, not redirects.)
+      { source: '/ccw-roadshow', destination: '/events/ccw-roadshow', permanent: false },
+      { source: '/roadshow', destination: '/events/ccw-roadshow', permanent: false },
     ];
   },
   typescript: {

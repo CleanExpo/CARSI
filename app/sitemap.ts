@@ -35,6 +35,8 @@ const staticPages = [
   { path: '/terms', priority: 0.25, changeFreq: 'yearly' as const },
   { path: authorityPath, priority: 0.82, changeFreq: 'weekly' as const },
   { path: ccwRoadshowPath, priority: 0.9, changeFreq: 'daily' as const },
+  { path: '/ccw-melbourne', priority: 0.85, changeFreq: 'daily' as const },
+  { path: '/ccw-sydney', priority: 0.85, changeFreq: 'daily' as const },
   { path: startSmartBasePath, priority: 0.85, changeFreq: 'weekly' as const },
   ...startSmartPages.map((page) => ({
     path: `${startSmartBasePath}/${page.slug}`,
