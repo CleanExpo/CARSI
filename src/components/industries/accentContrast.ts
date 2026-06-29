@@ -100,3 +100,33 @@ export function accentTextVars(
     dark: accentOn(hex, DARK_SURFACE, target),
   };
 }
+
+/** Alpha-composite `fg` at `alpha` (0–1) over opaque `bg`. */
+function composite(fg: RGB, alpha: number, bg: RGB): RGB {
+  return {
+    r: fg.r * alpha + bg.r * (1 - alpha),
+    g: fg.g * alpha + bg.g * (1 - alpha),
+    b: fg.b * alpha + bg.b * (1 - alpha),
+  };
+}
+
+/**
+ * Accent text rendered ON a faint tint of the same accent (e.g. the pill
+ * `background: ${accent}20` ≈ 12.5% over the card). That tint is darker than the
+ * page surface, so the text must be derived against the actual composited tint,
+ * not the surface — otherwise it lands just under AA (the #122/a11y pills).
+ * Light card base = #ffffff; dark panel base ≈ #0b0f19.
+ */
+export function accentPillTextVars(
+  hex: string,
+  alpha = 0x20 / 0xff,
+): { light: string; dark: string } {
+  const accent = parseHex(hex);
+  const lightTint = toHex(composite(accent, alpha, parseHex('#ffffff')));
+  const darkTint = toHex(composite(accent, alpha, parseHex('#0b0f19')));
+  return {
+    // small extra margin (4.7) so minor base-surface variance still clears 4.5
+    light: accentOn(hex, lightTint, 4.7),
+    dark: accentOn(hex, darkTint, NORMAL_TEXT_TARGET),
+  };
+}

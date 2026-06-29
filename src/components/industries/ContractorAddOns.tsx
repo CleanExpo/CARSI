@@ -4,7 +4,7 @@ import { CheckCircle2, ArrowRight, Briefcase } from 'lucide-react';
 import Link from 'next/link';
 
 import { MarketingSectionHeader } from '@/components/marketing/MarketingSectionHeader';
-import { accentTextVars } from './accentContrast';
+import { accentTextVars, accentPillTextVars } from './accentContrast';
 import {
   cleanerUpgrades,
   industryAddonContent,
@@ -31,7 +31,7 @@ interface ContractorAddOnsProps {
 export function ContractorAddOns({ accentColor = '#2490ed', variant = 'default' }: ContractorAddOnsProps) {
   const content = industryAddonContent[variant];
   const accent = accentTextVars(accentColor, 'large');
-  const accentPill = accentTextVars(accentColor, 'normal');
+  const accentPill = accentPillTextVars(accentColor);
 
   return (
     <>

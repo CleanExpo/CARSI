@@ -110,7 +110,7 @@ export default function SubmitIndexPage() {
             >
               {/* Icon */}
               <div
-                className="flex h-10 w-10 items-center justify-center rounded-sm text-xl"
+                className="flex h-10 w-10 items-center justify-center rounded-sm text-xl text-white/80"
                 style={{
                   background: 'rgba(255,255,255,0.04)',
                   border: '0.5px solid rgba(255,255,255,0.07)',
