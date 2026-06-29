@@ -64,7 +64,7 @@ Each phase is one coherent, independently-shippable batch from the register.
 | 7 | Stripe revocation | medium | refund/dispute/chargeback handlers, idempotency reclaim | test:stripe-webhook + unit |
 | 8 | Auth session lifecycle | medium | per-request isActive/role, stop hardcoding is_active | unit + e2e |
 | 9 | CSP nonce migration | **high** | nonce script-src, drop unsafe-inline | full e2e + real browser |
-| 10 | Compliance copy | **founder-gated** | IICRC qualify, IAG/Suncorp/QBE, CEC labels, superlatives | founder sign-off |
+| 10 | Compliance copy | ✅ done (founder chose Option B) | IICRC CEC accredited→IICRC-aligned CEC, IICRC-certified training→IICRC-aligned training, dropped IAG/Suncorp/QBE names, qualified "only holder" superlative; person/IICRC-cert-code refs preserved | type-check, lint, test:unit, build |
 | 11 | Secret rotation + history scrub | **founder-gated** | rotate whsec_, scrub git history | founder rotates first |
 | 12 | Frontend contrast / a11y | low | 7 homepage contrast violations + re-run failed frontend dimension | test:a11y + axe |
 | 13 | Bloat cleanup | none | react-hot-toast, concurrently, output/pdf, dup course file | build |

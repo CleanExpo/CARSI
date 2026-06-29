@@ -54,7 +54,7 @@ export default function ForgotPasswordPage() {
           Enter your email address and we&apos;ll send you a reset link
         </p>
         <p className="text-xs font-semibold tracking-wide text-[#146fc2]">
-          IICRC CEC accredited restoration courses
+          IICRC-aligned CEC restoration courses
         </p>
       </div>
 

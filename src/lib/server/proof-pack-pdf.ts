@@ -79,7 +79,7 @@ export async function buildProofPackPdf(payload: ProofPackPayload): Promise<Uint
   });
   y -= 26;
 
-  page.drawText('For employer, HR, or insurer evidence — IICRC CEC accredited completions on CARSI.', {
+  page.drawText('For employer, HR, or insurer evidence — IICRC-aligned CEC completions on CARSI.', {
     x: MARGIN,
     y,
     size: 9,
@@ -237,7 +237,7 @@ export async function buildProofPackPdf(payload: ProofPackPayload): Promise<Uint
   }
 
   for (const p of doc.getPages()) {
-    p.drawText('CARSI · carsi.com.au · IICRC CEC accredited course completions', {
+    p.drawText('CARSI · carsi.com.au · IICRC-aligned CEC course completions', {
       x: MARGIN,
       y: 32,
       size: 7,

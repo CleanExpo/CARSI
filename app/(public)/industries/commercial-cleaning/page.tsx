@@ -18,7 +18,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = buildIndustryMetadata(
   'commercial-cleaning',
   'Commercial Cleaning IICRC CEC Training',
-  'IICRC CEC accredited courses for commercial cleaning contractors in Australia. CRT, CCT, and OCT topics for carpet restoration, odour control, and insurance panel readiness.',
+  'IICRC-aligned CEC courses for commercial cleaning contractors in Australia. CRT, CCT, and OCT topics for carpet restoration, odour control, and insurance panel readiness.',
   [
     'commercial cleaning IICRC CEC training',
     'cleaning contractor training Australia',
@@ -61,7 +61,7 @@ const faqs = [
   {
     question: 'What is the cost of IICRC CEC training for cleaning staff in Australia?',
     answer:
-      'CARSI offers IICRC CEC accredited courses from $795 AUD per year per seat, which includes access to courses, verifiable CARSI digital credentials, and CEC tracking. Bulk team pricing is available for cleaning companies training multiple technicians. Courses are online and self-paced, eliminating travel and downtime costs.',
+      'CARSI offers IICRC-aligned CEC courses from $795 AUD per year per seat, which includes access to courses, verifiable CARSI digital credentials, and CEC tracking. Bulk team pricing is available for cleaning companies training multiple technicians. Courses are online and self-paced, eliminating travel and downtime costs.',
   },
   {
     question: 'How do cleaning contractors track IICRC CEC credits for their team?',
@@ -104,7 +104,7 @@ export default async function CommercialCleaningIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Commercial Cleaning"
         headlineAccent="Professional CEC Training"
-        description="IICRC CEC accredited courses for commercial cleaning contractors. Build CARSI credentials in carpet restoration, commercial carpet care, and odour control."
+        description="IICRC-aligned CEC courses for commercial cleaning contractors. Build CARSI credentials in carpet restoration, commercial carpet care, and odour control."
         disciplines={disciplines}
         stats={stats}
       />
