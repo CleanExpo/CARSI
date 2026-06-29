@@ -8,6 +8,7 @@ import {
   ccwRoadshowExperienceBands,
   ccwRoadshowFreeEntryOffer,
   ccwRoadshowTicketPackages,
+  resolveInitialEventSlug,
   type CcwRoadshowTicketPackage,
 } from '@/lib/marketing/ccw-roadshow';
 import {
@@ -40,9 +41,15 @@ function emptyAttendee(): AttendeeForm {
   return { fullName: '', yearsExperience: '', goals: '' };
 }
 
-export function CcwRoadshowBooking({ events }: { events: CcwRoadshowEvent[] }) {
+export function CcwRoadshowBooking({
+  events,
+  initialSlug,
+}: {
+  events: CcwRoadshowEvent[];
+  initialSlug?: string;
+}) {
   const [form, setForm] = useState<BookingFormState>({
-    eventSlug: events[0]?.slug ?? '',
+    eventSlug: resolveInitialEventSlug(initialSlug, events),
     packageId: 'single',
     ccwCustomerStatus: 'current',
     companyName: '',
@@ -61,6 +68,17 @@ export function CcwRoadshowBooking({ events }: { events: CcwRoadshowEvent[] }) {
   const selectedPackage =
     ccwRoadshowTicketPackages.find((pkg) => pkg.id === form.packageId) ??
     ccwRoadshowTicketPackages[0];
+
+  // On the dedicated /ccw-melbourne and /ccw-sydney pages the city is fixed via
+  // `initialSlug` (preselected server-side, no flash). On the combined page,
+  // honour a `?event=` query param if present. Runs once on mount; `events` is a
+  // stable module constant, so it never clobbers a manual change.
+  useEffect(() => {
+    if (initialSlug) return;
+    const param = new URLSearchParams(window.location.search).get('event');
+    const slug = resolveInitialEventSlug(param, events);
+    setForm((prev) => (slug && slug !== prev.eventSlug ? { ...prev, eventSlug: slug } : prev));
+  }, [events, initialSlug]);
 
   useEffect(() => {
     let active = true;

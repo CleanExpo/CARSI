@@ -35,6 +35,7 @@ import {
   ccwRoadshowTitle,
   ccwRoadshowTopics,
   formatAudFromCents,
+  getCcwRoadshowEvent,
 } from '@/lib/marketing/ccw-roadshow';
 
 const siteUrl = getPublicSiteUrl();
@@ -93,7 +94,11 @@ const faqs = [
   },
 ];
 
-export default function CcwRoadshowPage() {
+type CcwFocusCity = 'melbourne' | 'sydney';
+
+export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) {
+  const focusEvent = focusSlug ? getCcwRoadshowEvent(focusSlug) : null;
+
   return (
     <>
       <BreadcrumbSchema items={breadcrumbs} />
@@ -133,6 +138,27 @@ export default function CcwRoadshowPage() {
         innerClassName="relative z-10 mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16"
       >
 
+        {focusEvent ? (
+          <nav className="relative z-10 flex flex-wrap items-center gap-x-2 gap-y-1 pt-2 text-sm text-slate-600 dark:text-white/60">
+            <Link href={ccwRoadshowPath} className="font-medium text-[#7ec5ff] transition-colors hover:text-white">
+              All CCW locations
+            </Link>
+            {ccwRoadshowEvents
+              .filter((event) => event.slug !== focusSlug)
+              .map((event) => (
+                <span key={event.slug} className="flex items-center gap-2">
+                  <span aria-hidden className="text-slate-400 dark:text-white/30">·</span>
+                  <Link
+                    href={`/ccw-${event.slug}`}
+                    className="font-medium text-[#7ec5ff] transition-colors hover:text-white"
+                  >
+                    {event.city} event
+                  </Link>
+                </span>
+              ))}
+          </nav>
+        ) : null}
+
         {/* Hero */}
         <section className="relative z-10 pb-12 sm:pb-14">
           <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(300px,420px)] lg:items-start lg:gap-12">
@@ -144,7 +170,7 @@ export default function CcwRoadshowPage() {
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#ed9d24] opacity-40" />
                   <span className="relative inline-flex h-2 w-2 rounded-full bg-[#ed9d24]" />
                 </span>
-                Melbourne + Sydney · July 2026
+                {focusEvent ? `${focusEvent.city} · ${focusEvent.dates}` : 'Melbourne + Sydney · July 2026'}
               </span>
 
               <p className={`mt-5 ${marketingEyebrowAmber}`}>
@@ -197,7 +223,7 @@ export default function CcwRoadshowPage() {
             </div>
 
             <div id="booking" className="lg:sticky lg:top-24">
-              <CcwRoadshowBooking events={ccwRoadshowEvents} />
+              <CcwRoadshowBooking events={ccwRoadshowEvents} initialSlug={focusSlug} />
             </div>
           </div>
         </section>
@@ -243,6 +269,14 @@ export default function CcwRoadshowPage() {
                     </p>
                   </div>
                 </div>
+
+                <Link
+                  href={`/ccw-${event.slug}`}
+                  className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-[#7ec5ff] transition-colors hover:text-white"
+                >
+                  {event.city} details &amp; registration
+                  <ArrowRight className="h-4 w-4" aria-hidden />
+                </Link>
               </article>
             ))}
           </div>
@@ -349,4 +383,8 @@ export default function CcwRoadshowPage() {
       </MarketingPageShell>
     </>
   );
+}
+
+export default function CcwRoadshowPage() {
+  return <CcwRoadshowContent />;
 }

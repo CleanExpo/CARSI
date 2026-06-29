@@ -170,6 +170,21 @@ export function getCcwRoadshowEvent(slug: string | null | undefined) {
   return ccwRoadshowEvents.find((event) => event.slug === normalized) ?? null;
 }
 
+/**
+ * Resolve which event the booking form should preselect from a `?event=` query
+ * param (set by the /ccw-melbourne and /ccw-sydney vanity-URL redirects on the
+ * printed flyer QR codes). Unknown or missing params fall back to the first
+ * event so the form is never left without a selection.
+ */
+export function resolveInitialEventSlug(
+  rawParam: string | null | undefined,
+  events: readonly { slug: string }[],
+): string {
+  const normalized = rawParam?.trim().toLowerCase();
+  const match = events.find((event) => event.slug === normalized);
+  return match?.slug ?? events[0]?.slug ?? '';
+}
+
 export function getCcwRoadshowTicketPackage(id: string | null | undefined) {
   const normalized = id?.trim().toLowerCase();
   return ccwRoadshowTicketPackages.find((pkg) => pkg.id === normalized) ?? null;
