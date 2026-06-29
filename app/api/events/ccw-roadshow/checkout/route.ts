@@ -1,15 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { randomBytes } from 'node:crypto';
 
-import { getStripeClient } from '@/lib/api/stripe';
 import {
+  ccwRoadshowFreeEntryOffer,
   ccwRoadshowPath,
   getCcwRoadshowEvent,
   getCcwRoadshowTicketPackage,
 } from '@/lib/marketing/ccw-roadshow';
+import { emitCrmEvent } from '@/lib/server/crm-sync';
 
 type RoadshowCheckoutBody = {
   eventSlug?: string;
   packageId?: string;
+  ccwCustomerStatus?: string;
   fullName?: string;
   businessName?: string;
   email?: string;
@@ -22,6 +25,16 @@ function clean(value: unknown, maxLength = 240) {
 
 function isValidEmail(value: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+function getEventTokenCode(eventSlug: string) {
+  return eventSlug.trim().slice(0, 3).toUpperCase();
+}
+
+function generateFreeEntryToken(eventSlug: string) {
+  const eventCode = getEventTokenCode(eventSlug);
+  const randomPart = randomBytes(4).toString('hex').toUpperCase();
+  return `${ccwRoadshowFreeEntryOffer.tokenPrefix}-${eventCode}-${randomPart}`;
 }
 
 export async function POST(request: NextRequest) {
@@ -42,6 +55,7 @@ export async function POST(request: NextRequest) {
     const businessName = clean(body.businessName, 160);
     const email = clean(body.email, 160).toLowerCase();
     const phone = clean(body.phone, 80);
+    const ccwCustomerStatus = clean(body.ccwCustomerStatus, 40) || 'not_sure';
 
     if (!fullName) {
       return NextResponse.json({ detail: 'Name is required.' }, { status: 400 });
@@ -51,65 +65,41 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ detail: 'A valid email is required.' }, { status: 400 });
     }
 
-    if (!process.env.STRIPE_SECRET_KEY?.trim()) {
-      return NextResponse.json(
-        { detail: 'Payments are not configured yet. Set STRIPE_SECRET_KEY to enable bookings.' },
-        { status: 503 },
-      );
-    }
-
     const origin = request.nextUrl.origin;
-    const successUrl = `${origin}${ccwRoadshowPath}/success?session_id={CHECKOUT_SESSION_ID}`;
-    const cancelUrl = `${origin}${ccwRoadshowPath}?event=${event.slug}`;
-    const stripe = getStripeClient();
+    const freeEntryToken = generateFreeEntryToken(event.slug);
+    const successParams = new URLSearchParams({
+      token: freeEntryToken,
+      event: event.slug,
+      city: event.city,
+      dates: event.dates,
+      seats: String(ticketPackage.attendeeCount),
+    });
+    const bookingUrl = `${origin}${ccwRoadshowPath}/success?${successParams.toString()}`;
 
-    const session = await stripe.checkout.sessions.create({
-      mode: 'payment',
-      customer_email: email,
-      phone_number_collection: { enabled: true },
-      success_url: successUrl,
-      cancel_url: cancelUrl,
-      metadata: {
-        source: 'carsi-ccw-roadshow',
-        event_slug: event.slug,
-        event_city: event.city,
-        event_dates: event.dates,
-        ticket_package: ticketPackage.id,
-        attendee_count: String(ticketPackage.attendeeCount),
-        attendee_name: fullName,
-        business_name: businessName,
-        phone,
-      },
-      line_items: [
-        {
-          quantity: 1,
-          price_data: {
-            currency: 'aud',
-            unit_amount: ticketPackage.unitAmountCents,
-            product_data: {
-              name: `${event.title} - ${ticketPackage.label}`,
-              description: `${event.dateRangeLabel}, ${event.timeLabel}. ${event.venueName}. ${ticketPackage.description}`,
-              metadata: {
-                event_slug: event.slug,
-                ticket_package: ticketPackage.id,
-              },
-            },
-          },
-        },
-      ],
+    await emitCrmEvent('roadshow.registration.created', {
+      source: 'carsi-ccw-roadshow',
+      free_entry_token: freeEntryToken,
+      event_slug: event.slug,
+      event_city: event.city,
+      event_dates: event.dates,
+      ticket_package: ticketPackage.id,
+      attendee_count: ticketPackage.attendeeCount,
+      attendee_name: fullName,
+      business_name: businessName,
+      email,
+      phone,
+      ccw_customer_status: ccwCustomerStatus,
+      amount_cents: 0,
+      currency: 'AUD',
+      registration_url: bookingUrl,
     });
 
-    if (!session.url) {
-      return NextResponse.json({ detail: 'Stripe did not return a checkout URL.' }, { status: 500 });
-    }
-
-    return NextResponse.json({ checkout_url: session.url });
+    return NextResponse.json({
+      booking_url: bookingUrl,
+      free_entry_token: freeEntryToken,
+    });
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    if (message.includes('Stripe secret key not configured')) {
-      return NextResponse.json({ detail: 'STRIPE_SECRET_KEY is not set.' }, { status: 503 });
-    }
-    console.error('[ccw-roadshow-checkout] error:', error);
-    return NextResponse.json({ detail: 'Failed to start event checkout.' }, { status: 500 });
+    console.error('[ccw-roadshow-registration] error:', error);
+    return NextResponse.json({ detail: 'Failed to reserve free event entry.' }, { status: 500 });
   }
 }

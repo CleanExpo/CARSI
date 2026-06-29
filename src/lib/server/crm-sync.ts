@@ -6,7 +6,8 @@ import { prisma } from '@/lib/prisma';
 export type CrmEventType =
   | 'contact.created'
   | 'enrollment.created'
-  | 'enrollment.completed';
+  | 'enrollment.completed'
+  | 'roadshow.registration.created';
 
 export interface CrmContactPayload {
   submission_id: string;

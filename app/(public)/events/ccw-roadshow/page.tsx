@@ -10,6 +10,7 @@ import {
   ccwRoadshowCampaignPillars,
   ccwRoadshowEvents,
   ccwRoadshowFacilityAdvantages,
+  ccwRoadshowFreeEntryOffer,
   ccwRoadshowHeroHeadline,
   ccwRoadshowPath,
   ccwRoadshowPresenter,
@@ -25,7 +26,7 @@ const canonical = `${siteUrl}${ccwRoadshowPath}`;
 export const metadata: Metadata = {
   title: 'Grow Your Cleaning Business | CARSI x CCW Roadshow 2026',
   description:
-    'Spend two practical days with Phil McGurk at CCW Melbourne or Sydney. Build quoting confidence, avoid costly mistakes and grow a stronger cleaning business.',
+    'Free for CCW past and current customers. Spend two practical days with Phil McGurk at CCW Melbourne or Sydney and claim a free entry token when you register.',
   alternates: { canonical },
   keywords: [
     'carpet cleaning training Melbourne',
@@ -61,7 +62,7 @@ const faqs = [
   {
     question: 'How much does it cost?',
     answer:
-      'Bookings are $175 per person or $500 for a team pack of five seats. Payment is taken through Stripe Checkout.',
+      'All CCW past and current customers can attend free. Register on the CARSI event page to claim a free entry token for check-in.',
   },
   {
     question: 'Where are the Melbourne and Sydney events held?',
@@ -104,7 +105,7 @@ export default function CcwRoadshowPage() {
           organiserName="CARSI and Carpet Cleaners Warehouse"
           organiserUrl="https://www.carsi.com.au"
           ticketUrl={canonical}
-          isFree={false}
+          isFree
           image={`${siteUrl}/og-image.png`}
           eventType="BusinessEvent"
         />
@@ -151,8 +152,8 @@ export default function CcwRoadshowPage() {
                 </div>
                 <div className="rounded-lg border border-[#d8e0ea] bg-white p-4 shadow-sm">
                   <Users className="mb-3 h-5 w-5 text-[#34d399]" aria-hidden />
-                  <p className="text-sm font-semibold text-[#0b0f14]">Seats paid online</p>
-                  <p className="mt-1 text-sm text-[#5b6878]">$175 each or $500 for 5</p>
+                  <p className="text-sm font-semibold text-[#0b0f14]">Free CCW entry</p>
+                  <p className="mt-1 text-sm text-[#5b6878]">Past/current customers claim a token</p>
                 </div>
                 <div className="rounded-lg border border-[#d8e0ea] bg-white p-4 shadow-sm">
                   <Sparkles className="mb-3 h-5 w-5 text-[#fbbf24]" aria-hidden />
@@ -292,7 +293,13 @@ export default function CcwRoadshowPage() {
             </div>
 
             <div className="rounded-lg border border-[rgba(52,211,153,0.24)] bg-[rgba(52,211,153,0.08)] p-5">
-              <p className="text-sm font-semibold text-[#34d399]">Pricing</p>
+              <p className="text-sm font-semibold text-[#34d399]">Free CCW customer entry</p>
+              <h2 className="mt-2 text-2xl font-semibold tracking-tight text-[#0b0f14]">
+                {ccwRoadshowFreeEntryOffer.headline}
+              </h2>
+              <p className="mt-3 text-sm leading-relaxed text-[#465466]">
+                {ccwRoadshowFreeEntryOffer.detail}
+              </p>
               <div className="mt-4 space-y-3">
                 {ccwRoadshowTicketPackages.map((pkg) => (
                   <div key={pkg.id} className="rounded-lg border border-[#d8e0ea] bg-white p-4">
@@ -308,7 +315,7 @@ export default function CcwRoadshowPage() {
                 href="#booking"
                 className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-[#0b0f14] hover:text-[#2490ed]"
               >
-                Book through Stripe <ArrowRight className="h-4 w-4" aria-hidden />
+                Claim your free entry token <ArrowRight className="h-4 w-4" aria-hidden />
               </Link>
             </div>
           </div>

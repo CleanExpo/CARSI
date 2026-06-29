@@ -195,12 +195,12 @@ def draw_footer(c: canvas.Canvas, page_w: float, y: float) -> None:
     c.setFont("Helvetica", 7.5)
     c.setFillColor(MUTED)
     c.drawString(36, y, "CARSI is professional continuing education and is not an RTO.")
-    c.drawRightString(page_w - 36, y, "Limited places - book at carsi.com.au/events/ccw-roadshow")
+    c.drawRightString(page_w - 36, y, "Past/current CCW customers free - claim token online")
 
 
 def draw_price_pills(c: canvas.Canvas, x: float, y: float, gap: float = 12) -> None:
-    pill(c, x, y, "$175 each", GREEN, text=INK)
-    pill(c, x + 90 + gap, y, "$500 for 5", GOLD, text=INK)
+    pill(c, x, y, "Free entry", GREEN, text=INK)
+    pill(c, x + 106 + gap, y, "CCW customers", GOLD, text=INK)
 
 
 def flyer(c: canvas.Canvas, event: OfficeEvent) -> None:
@@ -250,7 +250,7 @@ def flyer(c: canvas.Canvas, event: OfficeEvent) -> None:
     draw_qr(c, booking_url(event), page_w - margin - 105, page_h - 145, 95)
     c.setFillColor(INK)
     c.setFont("Helvetica-Bold", 9)
-    c.drawCentredString(page_w - margin - 57, page_h - 164, "SCAN TO BOOK")
+    c.drawCentredString(page_w - margin - 57, page_h - 164, "SCAN FOR TOKEN")
 
     content_top = page_h - 292
     left_w = 305
@@ -295,7 +295,7 @@ def flyer(c: canvas.Canvas, event: OfficeEvent) -> None:
     c.roundRect(right_x, content_top - 52, page_w - right_x - margin, 52, 12, fill=1, stroke=0)
     c.setFillColor(colors.white)
     c.setFont("Helvetica-Bold", 14)
-    c.drawString(right_x + 18, content_top - 32, "Limited places available")
+    c.drawString(right_x + 18, content_top - 32, "Free entry token")
 
     info_y = content_top - 78
     details = [
@@ -323,11 +323,11 @@ def flyer(c: canvas.Canvas, event: OfficeEvent) -> None:
 
     c.setFillColor(GREEN)
     c.setFont("Helvetica-Bold", 9)
-    c.drawString(right_x + 18, info_y, "PRICE")
+    c.drawString(right_x + 18, info_y, "ENTRY")
     c.setFillColor(INK)
     c.setFont("Helvetica-Bold", 12)
-    c.drawString(right_x + 18, info_y - 15, "$175 per person")
-    c.drawString(right_x + 18, info_y - 31, "$500 for 5 seats")
+    c.drawString(right_x + 18, info_y - 15, "Past/current CCW customers free")
+    c.drawString(right_x + 18, info_y - 31, "Claim entry token online")
 
     draw_footer(c, page_w, 34)
     c.showPage()
@@ -371,13 +371,13 @@ def counter_card(c: canvas.Canvas, event: OfficeEvent) -> None:
     c.roundRect(margin, card_y - 130, page_w - margin * 2, 130, 14, fill=1, stroke=1)
     c.setFillColor(INK)
     c.setFont("Helvetica-Bold", 16)
-    c.drawCentredString(page_w / 2, card_y - 28, "Limited places available")
+    c.drawCentredString(page_w / 2, card_y - 28, "Past/current CCW customers free")
     c.setFillColor(BLUE)
     c.setFont("Helvetica-Bold", 20)
-    c.drawCentredString(page_w / 2, card_y - 60, "$175 per person")
+    c.drawCentredString(page_w / 2, card_y - 60, "Past and current customers")
     c.setFillColor(INK)
     c.setFont("Helvetica-Bold", 20)
-    c.drawCentredString(page_w / 2, card_y - 88, "$500 for 5 seats")
+    c.drawCentredString(page_w / 2, card_y - 88, "Claim a free entry token")
     draw_centered_wrapped(
         c,
         f"{event.venue} - {event.address}",
@@ -396,7 +396,7 @@ def counter_card(c: canvas.Canvas, event: OfficeEvent) -> None:
     draw_qr(c, booking_url(event), qr_x, qr_y, qr_size)
     c.setFillColor(INK)
     c.setFont("Helvetica-Bold", 12)
-    c.drawCentredString(page_w / 2, qr_y - 26, "SCAN TO BOOK")
+    c.drawCentredString(page_w / 2, qr_y - 26, "SCAN FOR FREE TOKEN")
     c.setFont("Helvetica", 8.5)
     c.setFillColor(MUTED)
     c.drawCentredString(page_w / 2, 26, "carsi.com.au/events/ccw-roadshow")

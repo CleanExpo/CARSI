@@ -42,6 +42,7 @@ const itemVariants = {
 const navItems = [
   { href: '/courses', label: 'Courses' },
   { href: '/start-carpet-cleaning-business', label: 'Start Smart' },
+  { href: '/authority', label: 'Authority' },
   { href: '/industries', label: 'Industries' },
   { href: '/pathways', label: 'Pathways' },
   { href: '/pricing', label: 'Pricing' },
@@ -75,7 +76,7 @@ export default function MobileNav() {
   }, [isOpen]);
 
   return (
-    <div className="md:hidden">
+    <div className="lg:hidden">
       {/* Hamburger button */}
       <button
         onClick={() => setIsOpen(!isOpen)}

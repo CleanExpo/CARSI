@@ -152,7 +152,7 @@ def draw_asset(spec: AssetSpec) -> Image.Image:
     sub_y = hero_bottom + 24
 
     pill(draw, (margin, sub_y), "Spend two days with Phil McGurk", GREEN, WHITE)
-    pill(draw, (margin, sub_y + 66), "Limited places available", GOLD, INK)
+    pill(draw, (margin, sub_y + 66), "Past/current CCW customers free", GOLD, INK)
 
     footer_h = 150 if compact else 168 if spec.variant != "story" else 230
     footer_top = h - footer_h - margin // 2
@@ -174,13 +174,13 @@ def draw_asset(spec: AssetSpec) -> Image.Image:
         )
         draw.text(
             (margin + 34, f_y + 42),
-            "$175 per person or $500 for five seats",
+            "Free for CCW past and current customers",
             font=font(23, True),
             fill=BLUE,
         )
         draw.text(
             (margin + 34, f_y + 78),
-            "Book at carsi.com.au/events/ccw-roadshow",
+            "Claim your free entry token online",
             font=font(20),
             fill=MUTED,
         )
@@ -210,8 +210,8 @@ def draw_asset(spec: AssetSpec) -> Image.Image:
     f_y = footer_top + 30
     footer_font = font(30 if not compact else 24, True)
     draw.text((margin + 34, f_y), "Melbourne 22-23 July | Sydney 30-31 July", font=footer_font, fill=INK)
-    draw.text((margin + 34, f_y + 46), "$175 per person or $500 for five seats", font=font(28 if not compact else 22, True), fill=BLUE)
-    draw.text((margin + 34, f_y + 88), "Book at carsi.com.au/events/ccw-roadshow", font=font(24 if not compact else 20), fill=MUTED)
+    draw.text((margin + 34, f_y + 46), "Free for CCW past and current customers", font=font(28 if not compact else 22, True), fill=BLUE)
+    draw.text((margin + 34, f_y + 88), "Claim your free entry token online", font=font(24 if not compact else 20), fill=MUTED)
 
     return img.convert("RGB")
 

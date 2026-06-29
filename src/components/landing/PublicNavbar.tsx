@@ -34,10 +34,11 @@ export function PublicNavbar() {
             />
           </Link>
 
-          <div className="hidden items-center gap-8 md:flex">
+          <div className="hidden items-center gap-8 lg:flex">
             {[
               { label: 'Courses', href: '/courses' },
               { label: 'Start Smart', href: '/start-carpet-cleaning-business' },
+              { label: 'Authority', href: '/authority' },
               { label: 'Industries', href: '/industries' },
               { label: 'Pathways', href: '/pathways' },
               { label: 'Pricing', href: '/pricing' },
@@ -53,7 +54,7 @@ export function PublicNavbar() {
             ))}
           </div>
 
-          <div className="hidden items-center gap-4 md:flex">
+          <div className="hidden items-center gap-4 lg:flex">
             <AuthNavLinks variant="desktop" />
           </div>
 

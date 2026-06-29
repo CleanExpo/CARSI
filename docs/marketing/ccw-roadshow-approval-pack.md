@@ -1,8 +1,8 @@
 # CARSI x CCW Roadshow Approval Pack
 
-Last updated: 17 June 2026
+Last updated: 18 June 2026
 
-Status: visual proof approved by Phill on 17 June 2026. Organic social may proceed through Synthex. CCW client-list email remains blocked until consent, unsubscribe, segment and suppression checks are complete.
+Status: free-entry proof set updated for CCW past and current customers. Organic social may proceed through Synthex after final approval. CCW client-list email remains blocked until consent, unsubscribe, segment and suppression checks are complete.
 
 ## Proof Assets
 
@@ -34,10 +34,10 @@ Generators:
 
 ## Approval Gates
 
-- Phill approved the visual proof set in chat on 17 June 2026.
-- CCW confirms venue details, addresses, pricing, seat capacity, brand use and facility wording.
+- Phill approved the original visual proof set in chat on 17 June 2026; 18 June free-entry copy has now been applied to the proof set.
+- CCW confirms venue details, addresses, free-entry eligibility, seat capacity, brand use and facility wording.
 - Phil approves name prominence, role line and any image/bio before a headshot or expanded presenter copy is used.
-- CARSI confirms course outline, chemical-detail wording, booking terms, refund terms and non-RTO boundary.
+- CARSI confirms course outline, chemical-detail wording, free-entry token terms and non-RTO boundary.
 - CCW confirms email-list consent basis, suppression list, unsubscribe URL, sender profile and audience segments.
 - Synthex confirms final UTM links, publish dates/times, platform owners and rollback owner.
 

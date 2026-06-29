@@ -6,8 +6,8 @@ import { getCheckoutSession } from '@/lib/api/stripe';
 import { ccwRoadshowPath, ccwRoadshowTitle } from '@/lib/marketing/ccw-roadshow';
 
 export const metadata: Metadata = {
-  title: 'Roadshow Booking Confirmed | CARSI',
-  description: 'Confirmation page for CARSI x CCW Business Growth Days bookings.',
+  title: 'Roadshow Free Entry Confirmed | CARSI',
+  description: 'Free entry token confirmation page for CARSI x CCW Business Growth Days.',
   robots: { index: false, follow: false },
 };
 
@@ -41,10 +41,23 @@ async function getBookingSummary(sessionId: string | undefined): Promise<StripeB
 export default async function CcwRoadshowSuccessPage({
   searchParams,
 }: {
-  searchParams: Promise<{ session_id?: string }>;
+  searchParams: Promise<{
+    session_id?: string;
+    token?: string;
+    city?: string;
+    dates?: string;
+    seats?: string;
+  }>;
 }) {
-  const { session_id: sessionId } = await searchParams;
+  const {
+    session_id: sessionId,
+    token: freeEntryToken,
+    city: freeCity,
+    dates: freeDates,
+    seats: freeSeats,
+  } = await searchParams;
   const booking = await getBookingSummary(sessionId);
+  const hasFreeEntry = Boolean(freeEntryToken);
 
   return (
     <main className="min-h-screen bg-[#050505] px-4 py-16 text-white">
@@ -52,15 +65,34 @@ export default async function CcwRoadshowSuccessPage({
         <div className="rounded-2xl border border-[rgba(52,211,153,0.25)] bg-white/[0.04] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.28)]">
           <CheckCircle2 className="h-12 w-12 text-[#34d399]" aria-hidden />
           <p className="mt-5 text-xs font-semibold tracking-[0.18em] text-[#34d399] uppercase">
-            Booking Confirmed
+            {hasFreeEntry ? 'Free Entry Confirmed' : 'Booking Confirmed'}
           </p>
           <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white">
-            You are booked for {ccwRoadshowTitle}
+            {hasFreeEntry
+              ? `Your free entry token for ${ccwRoadshowTitle} is ready`
+              : `You are booked for ${ccwRoadshowTitle}`}
           </h1>
           <p className="mt-3 text-sm leading-relaxed text-white/58">
-            Payment has been sent through Stripe. Keep an eye on the booking email for your receipt
-            and event details.
+            {hasFreeEntry
+              ? 'No payment is required for CCW past and current customers. Save this token and show it at check-in when you arrive at the CCW location.'
+              : 'Payment has been sent through Stripe. Keep an eye on the booking email for your receipt and event details.'}
           </p>
+
+          {hasFreeEntry && (
+            <div className="mt-6 rounded-xl border border-[#34d399]/35 bg-[#34d399]/10 p-5">
+              <p className="text-xs font-semibold tracking-[0.18em] text-[#34d399] uppercase">
+                Free Entry Token
+              </p>
+              <p className="mt-3 break-all font-mono text-2xl font-semibold tracking-wide text-white">
+                {freeEntryToken}
+              </p>
+              <p className="mt-3 text-sm leading-relaxed text-white/58">
+                This token covers {freeSeats ?? '1'} {freeSeats === '1' ? 'seat' : 'seats'}
+                {freeCity ? ` for ${freeCity}` : ''}
+                {freeDates ? `, ${freeDates}` : ''}.
+              </p>
+            </div>
+          )}
 
           {booking && (
             <div className="mt-6 grid gap-3 rounded-lg border border-white/10 bg-[#050505] p-4 text-sm">

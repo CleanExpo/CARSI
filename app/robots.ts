@@ -15,6 +15,11 @@ export default function robots(): MetadataRoute.Robots {
           '/student/',
           '/dashboard/',
           '/api/',
+          '/workflows',
+          '/workflows/',
+          '/design-system',
+          '/prd',
+          '/agents',
           '/login',
           '/register',
           '/forgot-password',
@@ -22,7 +27,17 @@ export default function robots(): MetadataRoute.Robots {
       },
       // AI crawlers — allow for GEO visibility
       {
+        userAgent: 'OAI-SearchBot',
+        allow: '/',
+        disallow: ['/admin/', '/api/'],
+      },
+      {
         userAgent: 'GPTBot',
+        allow: '/',
+        disallow: ['/admin/', '/api/'],
+      },
+      {
+        userAgent: 'ChatGPT-User',
         allow: '/',
         disallow: ['/admin/', '/api/'],
       },
@@ -32,7 +47,17 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ['/admin/', '/api/'],
       },
       {
+        userAgent: 'anthropic-ai',
+        allow: '/',
+        disallow: ['/admin/', '/api/'],
+      },
+      {
         userAgent: 'PerplexityBot',
+        allow: '/',
+        disallow: ['/admin/', '/api/'],
+      },
+      {
+        userAgent: 'CCBot',
         allow: '/',
         disallow: ['/admin/', '/api/'],
       },

@@ -49,6 +49,7 @@ export function PublicFooter() {
               {[
                 { label: 'Courses', href: '/courses' },
                 { label: 'CCW Workshop', href: '/ccw-training' },
+                { label: 'Authority Hub', href: '/authority' },
                 { label: 'Pathways', href: '/pathways' },
                 { label: 'Pricing', href: '/pricing' },
                 { label: 'About', href: '/about' },

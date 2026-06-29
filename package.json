@@ -1,7 +1,7 @@
 {
   "name": "CARSI",
   "version": "1.0.0",
-  "description": "CARSI \u2014 learning platform for courses, enrollments, and progress. Next.js, Prisma, PostgreSQL, and Stripe.",
+  "description": "CARSI - learning platform for courses, enrollments, and progress. Next.js, Prisma, PostgreSQL, and Stripe.",
   "author": "Philip McGurk",
   "contributors": [
     "Rana Muzamil (Technical Lead & Manager)"
@@ -30,6 +30,7 @@
     "db:set-wp-export-draft": "npx tsx scripts/set-wp-export-courses-draft.ts",
     "db:export-draft-courses-wp": "npx tsx scripts/export-draft-courses-wp-dump.ts",
     "db:seed-air-quality-docx": "npx tsx scripts/seed-air-quality-docx.ts",
+    "seo:submit-indexnow": "node scripts/submit-indexnow.mjs",
     "db:seed-safety-ppe-docx": "npx tsx scripts/seed-safety-ppe-docx.ts",
     "db:seed-whs-compliance-docx": "npx tsx scripts/seed-whs-compliance-docx.ts",
     "db:seed-marketing-business-docx": "npx tsx scripts/seed-marketing-business-docx.ts",
