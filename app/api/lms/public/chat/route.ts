@@ -15,8 +15,12 @@ const MODEL = process.env.OPENAI_CHAT_MODEL?.trim() || 'gpt-4o-mini';
 
 // Public (unauthenticated) endpoint that spends on OpenAI — cap per IP so a
 // bot can't drive unbounded model cost. Best-effort (in-process) limiter.
-const CHAT_RATE_LIMIT = 12;
+// Public, unauthenticated, spends on OpenAI — cap per IP per minute AND per day so
+// a bot can't drive unbounded model cost (issue #131): 5/min/IP + 100/day/IP.
+const CHAT_RATE_LIMIT = 5;
 const CHAT_RATE_WINDOW_MS = 60_000;
+const CHAT_DAILY_LIMIT = 100;
+const CHAT_DAY_WINDOW_MS = 24 * 60 * 60 * 1000;
 
 type ChatTurn = { role: 'user' | 'assistant'; content: string };
 
@@ -62,7 +66,16 @@ export async function POST(request: NextRequest) {
     request.headers.get('x-forwarded-for'),
     request.headers.get('x-real-ip')
   );
-  const rl = await applyRateLimitDistributed(`public-chat:${ip}`, CHAT_RATE_LIMIT, CHAT_RATE_WINDOW_MS);
+  // Per-minute first; only charge the daily bucket when the minute check passes,
+  // so a blocked request doesn't also consume a day-slot.
+  const minute = await applyRateLimitDistributed(
+    `public-chat:${ip}`,
+    CHAT_RATE_LIMIT,
+    CHAT_RATE_WINDOW_MS
+  );
+  const rl = minute.ok
+    ? await applyRateLimitDistributed(`public-chat-day:${ip}`, CHAT_DAILY_LIMIT, CHAT_DAY_WINDOW_MS)
+    : minute;
   if (!rl.ok) {
     return NextResponse.json(
       { detail: 'Too many requests. Please wait a moment and try again.' },
