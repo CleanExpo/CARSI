@@ -17,7 +17,9 @@ export function stripLegacyPurchaseCta(raw: string): string {
   if (!raw) return raw;
   return raw
     .replace(
-      /<h3>\s*Already Purchased This Course\?\s*<\/h3>\s*<p>[\s\S]*?Access Here[\s\S]*?<\/p>\s*/i,
+      // Heading is <h2> or <h3> (the export uses both), may carry attributes, and the
+      // trailing "?" is optional; the following <p> holds the off-site "Access Here" link.
+      /<h[1-6][^>]*>\s*Already Purchased This Course\s*\??\s*<\/h[1-6]>\s*<p\b[^>]*>[\s\S]*?Access Here[\s\S]*?<\/p>\s*/i,
       ''
     )
     .replace(/^\s+/, '');
