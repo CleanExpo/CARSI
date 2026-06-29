@@ -415,7 +415,7 @@ vercel env add NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
 
 - URL: `https://carsi-backend.fly.dev/api/webhooks/stripe`
 - Events: Full event set (231 events)
-- Secret: `whsec_RnKM4pM0Ew0w2OTXUEIF4SdkwWuoOsrE`
+- Secret: `whsec_...` (retrieve from the Stripe Dashboard → Developers → Webhooks → your endpoint → "Signing secret"; store in the `STRIPE_WEBHOOK_SECRET` env var — never commit the real value)
 
 **To create new webhook (if needed):**
 
