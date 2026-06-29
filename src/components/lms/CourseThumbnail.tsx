@@ -45,6 +45,9 @@ export function CourseThumbnail({
   const [backdropFailed, setBackdropFailed] = useState(false);
 
   useEffect(() => {
+    // Reset the load-failed flag when the source changes so a new thumbnail
+    // re-attempts instead of staying on the previous failure.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setBackdropFailed(false);
   }, [src]);
 

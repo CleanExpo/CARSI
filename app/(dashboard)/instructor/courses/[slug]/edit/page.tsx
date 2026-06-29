@@ -40,6 +40,8 @@ export default function EditCoursePage() {
   }, [params.slug]);
 
   useEffect(() => {
+    // Load course + modules on mount; state is set asynchronously after awaits.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadData();
   }, [loadData]);
 

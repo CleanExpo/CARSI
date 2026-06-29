@@ -49,26 +49,26 @@ const config = [
       "@typescript-eslint/no-require-imports": "error",
       "import/no-anonymous-default-export": "error",
       "prefer-const": "error",
-      // #120 batch 2 — these classes are fully cleared, so they're back to error:
+      // #120 — these classes are fully cleared (real fixes where clean, justified
+      // per-site eslint-disable where the flagged pattern is legitimate), so
+      // they're back to error to stop the debt regrowing:
       "react-hooks/purity": "error",
       "react-hooks/exhaustive-deps": "error",
+      "react-hooks/set-state-in-effect": "error",
+      "react-hooks/refs": "error",
+      "@next/next/no-img-element": "error",
     },
   },
   {
-    // #120 remainder — React 19 hooks-purity rules are behaviour-sensitive and
-    // are being fixed per-site in a separate pass, not bulk-swept. Kept as
-    // warnings until that work lands so CI stays unblocked without masking
-    // genuine regressions in the rules above.
+    // Rules with no current violations but not part of the #120 sweep — kept as
+    // warnings rather than asserting a clean baseline we didn't verify.
     rules: {
-      "react-hooks/set-state-in-effect": "warn",
       "react-hooks/preserve-manual-memoization": "warn",
-      "react-hooks/refs": "warn",
       "react-hooks/static-components": "warn",
       "react-hooks/error-boundaries": "warn",
       "react-hooks/rules-of-hooks": "warn",
       "@typescript-eslint/no-explicit-any": "warn",
       "react/no-unescaped-entities": "warn",
-      "@next/next/no-img-element": "warn",
     },
   },
 ];

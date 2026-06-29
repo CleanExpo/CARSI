@@ -48,6 +48,8 @@ export function DashboardMobileNav() {
   const section = getDashboardSectionLabel(pathname);
 
   useEffect(() => {
+    // Close the mobile nav whenever the route changes.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setOpen(false);
   }, [pathname]);
 

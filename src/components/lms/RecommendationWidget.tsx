@@ -64,6 +64,9 @@ function RecommendationCard({ course }: { course: RecommendedCourse }) {
     >
       {/* Thumbnail */}
       {course.thumbnail_url ? (
+        // Small, below-the-fold recommendation thumbnail from arbitrary external
+        // URLs — next/image would need proxy routing + remotePatterns config.
+        // eslint-disable-next-line @next/next/no-img-element
         <img
           src={course.thumbnail_url}
           alt={course.title}

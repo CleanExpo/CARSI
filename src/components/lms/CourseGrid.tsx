@@ -170,6 +170,8 @@ export function CourseGrid({
     const n = courses.filter((c) => matchesDiscipline(c, validInitial)).length;
     if (n === 0) {
       didFallbackTab.current = true;
+      // One-time correction once data loads, guarded by the ref above.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setActiveTab('All');
     }
   }, [courses, loading, validInitial]);
