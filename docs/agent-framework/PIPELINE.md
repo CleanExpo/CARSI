@@ -59,7 +59,7 @@ Each phase is one coherent, independently-shippable batch from the register.
 | 2 | Safe config hardening | low | GA/GTM CSP allowlist, poweredByHeader, X-XSS, forgot-pw rate-limit, .env.example | type-check, lint, build |
 | 3 | Demo/dev page leak | low | noindex/remove /demo,/demo-live,/council-demo,/status-demo | build, live curl robots/meta |
 | 4 | Type-gate + CI integrity | low | drop tsconfig excludes, wire test:unit, delete dead workflows, set required checks | type-check, full CI |
-| 5 | Data integrity (migration) | **founder-gated** | lms_lesson_progress.student_id FK | migrate on prod w/ approval |
+| 5 | Data integrity (migration) | ✅ done (orphans=0, founder-verified) | lms_lesson_progress.student_id FK → lms_users ON DELETE CASCADE; schema relation + migration; applies via `prisma migrate deploy` on prod start | prisma validate, type-check, test:unit, build |
 | 6 | LMS assessment integrity | medium | quiz-gates-completion, server-side lesson gating, quiz Continue gate, score round, attempt race | unit + e2e |
 | 7 | Stripe revocation | medium | refund/dispute/chargeback handlers, idempotency reclaim | test:stripe-webhook + unit |
 | 8 | Auth session lifecycle | medium | per-request isActive/role, stop hardcoding is_active | unit + e2e |
