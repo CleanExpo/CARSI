@@ -33,6 +33,23 @@ const platformLinks = [
   { label: 'Podcast', href: '/podcast' },
 ];
 
+const communityLinks = [
+  { label: 'Industry News', href: '/news' },
+  { label: 'Jobs Board', href: '/jobs' },
+  { label: 'Industry Calendar', href: '/calendar' },
+  { label: 'Research', href: '/research' },
+  { label: 'YouTube Hub', href: '/youtube' },
+  { label: 'Community Ideas', href: '/ideas' },
+  { label: 'Submit Content', href: '/submit' },
+];
+
+const eventLinks = [
+  { label: 'CCW Roadshow', href: '/events/ccw-roadshow' },
+  { label: 'CCW Melbourne', href: '/ccw-melbourne' },
+  { label: 'CCW Sydney', href: '/ccw-sydney' },
+  { label: 'CCW Materials', href: '/ccw-materials' },
+];
+
 const socialLinks = [
   { label: 'Facebook', href: 'https://www.facebook.com/CARSIaus' },
   {
@@ -215,6 +232,28 @@ export function PublicFooter() {
                 ))}
               </div>
             </div>
+          </div>
+
+          <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-5 sm:p-6 lg:col-span-8">
+            <FooterSectionLabel>Community &amp; Resources</FooterSectionLabel>
+            <ul className="grid gap-x-6 gap-y-1 sm:grid-cols-2 lg:grid-cols-3">
+              {communityLinks.map((item) => (
+                <li key={item.label}>
+                  <FooterLink href={item.href}>{item.label}</FooterLink>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-5 sm:p-6 lg:col-span-4">
+            <FooterSectionLabel>Events</FooterSectionLabel>
+            <ul className="grid gap-x-6 gap-y-1 sm:grid-cols-2 lg:grid-cols-1">
+              {eventLinks.map((item) => (
+                <li key={item.label}>
+                  <FooterLink href={item.href}>{item.label}</FooterLink>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
 
