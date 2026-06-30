@@ -3,13 +3,8 @@
   "project_ref": "ofzafxvxobjggjisrbsa",
   "generated_at": "2026-06-30",
   "advisor_type": "security",
-  "count": 29,
+  "count": 28,
   "fingerprints": [
-    {
-      "name": "extension_in_public",
-      "level": "WARN",
-      "entity": "public.vector"
-    },
     {
       "name": "rls_enabled_no_policy",
       "level": "INFO",

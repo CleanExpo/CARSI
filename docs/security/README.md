@@ -32,15 +32,20 @@ authenticated) exposure.
 `pg_trgm` and `unaccent` were verified **unused** (no indexes, functions, TS
 configs, generated columns, or views referenced them) and **dropped** with
 `DROP EXTENSION … RESTRICT` — clearing 2 of the 3 `extension_in_public` warnings.
-Only **`vector`** remains in `public` (deferred): it backs 4 embedding columns
-(`documents`/`domain_memories`/`document_chunks`/`search_queries`) + the
-`match_documents`/`hybrid_search`/`find_similar_memories` functions, so moving it
-needs a coordinated migration (relocate + add `extensions` to those functions'
-search_path).
+**`vector` was moved to the `extensions` schema** (2026-06-30) via
+`ALTER EXTENSION vector SET SCHEMA extensions`, with `extensions` added to the
+search_path of the 3 vector functions (`match_documents`/`hybrid_search`/
+`find_similar_memories`) in the same transaction. Pre-flight confirmed pgvector
+relocatable and exactly those 3 functions reference it. Verified post-move:
+functions EXPLAIN clean, ivfflat indexes intact (OID-stable), site 200.
+
+### Result
+All 3 `extension_in_public` advisories cleared. **CARSI Supabase security board:
+0 ERROR, 0 WARN — 28 INFO (`rls_enabled_no_policy`, the intended deny-all state).**
 
 ### Deferred
-The `vector` extension move (above) and the 729 performance advisors (unused
-indexes, duplicate policies, unindexed FKs).
+Only the 729 performance advisors (unused indexes, duplicate policies, unindexed
+FKs) — non-security, triage separately.
 
 ## `advisor-baseline.json` + drift check — stops regressions
 
