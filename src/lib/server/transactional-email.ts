@@ -309,6 +309,84 @@ export async function sendCcwRoadshowRegistrationEmail(params: {
   return sendEmail({ to: params.to, subject, html, text });
 }
 
+/**
+ * Internal notification to the campaign owner(s) when someone registers for a
+ * roadshow city event (Melbourne → Phill; Sydney → Toby + Phill). Recipients are
+ * resolved server-side via getRoadshowNotifyRecipients. No-op caller-side when the
+ * recipient list is empty. Rides the same Mailtrap transport as attendee email.
+ */
+export async function sendCcwRoadshowOrganizerNotificationEmail(params: {
+  to: string[];
+  eventCity: string;
+  dateRangeLabel: string;
+  registrationStatus: string;
+  seatCount: number;
+  freeEntryToken: string;
+  companyName?: string;
+  contactEmail: string;
+  contactPhone?: string;
+  attendees: { fullName: string; yearsExperience: string; goals: string }[];
+  appOrigin: string;
+}): Promise<SendEmailResult> {
+  if (params.to.length === 0) {
+    return { sent: false, reason: 'not_configured' };
+  }
+
+  const base = params.appOrigin.replace(/\/$/, '');
+  const adminUrl = `${base}/admin/ccw-roadshow`;
+  const statusLabel = params.registrationStatus === 'confirmed' ? 'Confirmed' : 'Waitlisted';
+  const esc = (v: string) =>
+    v.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+  const attendeeLinesText = params.attendees
+    .map((a, i) => `  ${i + 1}. ${a.fullName} (${a.yearsExperience} yrs) — ${a.goals}`)
+    .join('\n');
+  const attendeeLinesHtml = params.attendees
+    .map(
+      (a) =>
+        `<li><strong>${esc(a.fullName)}</strong> (${esc(a.yearsExperience)} yrs) — ${esc(a.goals)}</li>`,
+    )
+    .join('');
+
+  const text = [
+    `New CARSI x CCW ${params.eventCity} registration — ${statusLabel}`,
+    '',
+    `Event: ${params.eventCity} (${params.dateRangeLabel})`,
+    `Status: ${statusLabel}`,
+    `Seats: ${params.seatCount}`,
+    `Free-entry token: ${params.freeEntryToken}`,
+    `Business: ${params.companyName || '—'}`,
+    `Contact: ${params.contactEmail}${params.contactPhone ? ` / ${params.contactPhone}` : ''}`,
+    '',
+    'Attendees:',
+    attendeeLinesText || '  (none)',
+    '',
+    `Manage: ${adminUrl}`,
+  ].join('\n');
+
+  const html = `
+    <div style="font-family:system-ui,Segoe UI,Arial,sans-serif;font-size:14px;color:#0f172a;">
+      <h2 style="margin:0 0 12px;">New CARSI x CCW ${esc(params.eventCity)} registration — ${statusLabel}</h2>
+      <p style="margin:0 0 4px;"><strong>Event:</strong> ${esc(params.eventCity)} (${esc(params.dateRangeLabel)})</p>
+      <p style="margin:0 0 4px;"><strong>Status:</strong> ${statusLabel}</p>
+      <p style="margin:0 0 4px;"><strong>Seats:</strong> ${params.seatCount}</p>
+      <p style="margin:0 0 4px;"><strong>Free-entry token:</strong> ${esc(params.freeEntryToken)}</p>
+      <p style="margin:0 0 4px;"><strong>Business:</strong> ${esc(params.companyName || '—')}</p>
+      <p style="margin:0 0 12px;"><strong>Contact:</strong> ${esc(params.contactEmail)}${params.contactPhone ? ` / ${esc(params.contactPhone)}` : ''}</p>
+      <p style="margin:0 0 4px;"><strong>Attendees:</strong></p>
+      <ul style="margin:0 0 12px;padding-left:18px;">${attendeeLinesHtml || '<li>(none)</li>'}</ul>
+      <p style="margin:0;"><a href="${adminUrl}">Manage roadshow registrations</a></p>
+    </div>`;
+
+  return sendEmail({
+    to: params.to,
+    replyTo: params.contactEmail,
+    subject: `[CCW ${params.eventCity}] ${statusLabel} registration — ${params.companyName || params.contactEmail}`,
+    html,
+    text,
+  });
+}
+
 export async function sendContactNotificationEmail(params: {
   appOrigin: string;
   ticketRef: string;
