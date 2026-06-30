@@ -2,8 +2,12 @@
 -- #121 — CARSI Supabase security-advisor remediation  (DRAFT FOR REVIEW)
 -- Project: ofzafxvxobjggjisrbsa (CARSI, ap-northeast-2)
 -- Generated: 2026-06-30 from live advisor + pg_catalog introspection
+-- APPLIED TO PROD: 2026-06-30 (founder-approved) via Management API query
+--   endpoint. Result: security advisors 70 → 31 (ERROR 23 → 0); the 31 remaining
+--   are 28 rls_enabled_no_policy (INFO — the intended deny-all state) + 3
+--   extension_in_public (WARN — deferred). App verified healthy (prod 200).
+--   Tier 4 was corrected post-apply to REVOKE FROM PUBLIC (see note below).
 --
--- DO NOT APPLY TO PROD UNTIL REVIEWED + FOUNDER-APPROVED.
 -- Apply via Supabase SQL editor or Management API query endpoint.
 -- This file is intentionally NOT in prisma/migrations (RLS is not
 -- Prisma-managed; some tables belong to the agent/audit framework).
@@ -121,7 +125,10 @@ END $$;
 -- TIER 4 (WARN) — revoke EXECUTE on SECURITY DEFINER functions from the
 -- public API roles (8 functions flagged for both anon + authenticated).
 -- The app calls these server-side as postgres; PostgREST RPC by anon/
--- authenticated is not used.
+-- authenticated is not used. NOTE: these functions hold EXECUTE via the
+-- implicit PUBLIC grant, so we must REVOKE FROM PUBLIC (revoking from anon/
+-- authenticated alone is a no-op). postgres (owner) + service_role keep their
+-- explicit grants, so the app and service-role access are unaffected.
 -- ---------------------------------------------------------------------
 DO $$
 DECLARE r record;
@@ -136,7 +143,7 @@ BEGIN
     FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace
     WHERE n.nspname='public' AND p.proname = ANY(fns)
   LOOP
-    EXECUTE format('REVOKE ALL ON FUNCTION %s FROM anon, authenticated', r.sig);
+    EXECUTE format('REVOKE EXECUTE ON FUNCTION %s FROM PUBLIC, anon, authenticated', r.sig);
   END LOOP;
 END $$;
 
