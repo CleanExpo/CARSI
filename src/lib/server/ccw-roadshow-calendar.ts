@@ -10,6 +10,11 @@
 const CALENDAR_ID = process.env.GOOGLE_CALENDAR_ID || 'phill.mcgurk@gmail.com';
 const TOKEN_URL = 'https://oauth2.googleapis.com/token';
 const CALENDAR_API = 'https://www.googleapis.com/calendar/v3';
+// Bound every Google API call. Without this a stalled request (e.g. blocked
+// egress from the host) hangs until the platform gateway 504s — which also
+// stalls the checkout POST that awaits this. Failing fast keeps registration
+// (and the admin sync UI) responsive; calendar sync degrades gracefully.
+const CALENDAR_FETCH_TIMEOUT_MS = 8000;
 
 function getCredentials(): { clientId: string; clientSecret: string; refreshToken: string } | null {
   const clientId = process.env.GOOGLE_CALENDAR_CLIENT_ID;
@@ -35,6 +40,7 @@ async function getAccessToken(creds: {
       refresh_token: creds.refreshToken,
       grant_type: 'refresh_token',
     }),
+    signal: AbortSignal.timeout(CALENDAR_FETCH_TIMEOUT_MS),
   });
   if (!res.ok) {
     console.error('[ccw-roadshow-calendar] token refresh failed:', res.status);
@@ -68,6 +74,7 @@ export async function addRegistrationToCalendar(params: {
 
     const getRes = await fetch(eventUrl, {
       headers: { Authorization: `Bearer ${accessToken}` },
+      signal: AbortSignal.timeout(CALENDAR_FETCH_TIMEOUT_MS),
     });
     if (!getRes.ok) {
       console.error('[ccw-roadshow-calendar] failed to load event:', getRes.status);
@@ -90,6 +97,7 @@ export async function addRegistrationToCalendar(params: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ attendees: [...attendees, { email: params.attendeeEmail }] }),
+      signal: AbortSignal.timeout(CALENDAR_FETCH_TIMEOUT_MS),
     });
     if (!patchRes.ok) {
       console.error('[ccw-roadshow-calendar] failed to add guest:', patchRes.status);
