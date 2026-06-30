@@ -137,7 +137,6 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
         id="main-content"
         innerClassName="relative z-10 mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16"
       >
-
         {focusEvent ? (
           <nav className="relative z-10 flex flex-wrap items-center gap-x-2 gap-y-1 pt-2 text-sm text-slate-600 dark:text-white/60">
             <Link href={ccwRoadshowPath} className="font-medium text-[#146fc2] dark:text-[#7ec5ff] transition-colors hover:text-white">
