@@ -3,18 +3,8 @@
   "project_ref": "ofzafxvxobjggjisrbsa",
   "generated_at": "2026-06-30",
   "advisor_type": "security",
-  "count": 31,
+  "count": 29,
   "fingerprints": [
-    {
-      "name": "extension_in_public",
-      "level": "WARN",
-      "entity": "public.pg_trgm"
-    },
-    {
-      "name": "extension_in_public",
-      "level": "WARN",
-      "entity": "public.unaccent"
-    },
     {
       "name": "extension_in_public",
       "level": "WARN",

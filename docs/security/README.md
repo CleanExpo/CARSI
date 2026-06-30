@@ -28,9 +28,19 @@ authenticated) exposure.
 - **Tier 3/4:** pin `search_path` on 19 functions; revoke EXECUTE on 8
   SECURITY DEFINER functions from anon/authenticated.
 
-### Deferred (separate, higher risk)
-`extension_in_public` (pg_trgm/unaccent/vector) and the 729 performance
-advisors (unused indexes, duplicate policies, unindexed FKs).
+### Extensions in public (post-apply, 2026-06-30)
+`pg_trgm` and `unaccent` were verified **unused** (no indexes, functions, TS
+configs, generated columns, or views referenced them) and **dropped** with
+`DROP EXTENSION … RESTRICT` — clearing 2 of the 3 `extension_in_public` warnings.
+Only **`vector`** remains in `public` (deferred): it backs 4 embedding columns
+(`documents`/`domain_memories`/`document_chunks`/`search_queries`) + the
+`match_documents`/`hybrid_search`/`find_similar_memories` functions, so moving it
+needs a coordinated migration (relocate + add `extensions` to those functions'
+search_path).
+
+### Deferred
+The `vector` extension move (above) and the 729 performance advisors (unused
+indexes, duplicate policies, unindexed FKs).
 
 ## `advisor-baseline.json` + drift check — stops regressions
 
