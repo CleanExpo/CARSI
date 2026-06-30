@@ -1,90 +1,10 @@
 {
-  "_comment": "Baseline snapshot of CARSI Supabase SECURITY advisors. Generated 2026-06-30, PRE-#121. The recurring check (scripts/check-supabase-advisors.mjs) fails only on advisors NOT in this list, so new RLS-disabled tables are caught. After the #121 migration applies, regenerate with: node scripts/check-supabase-advisors.mjs --update-baseline",
+  "_comment": "Baseline snapshot of CARSI Supabase SECURITY advisors. The recurring check fails only on advisors NOT in this list, so new RLS-disabled tables are caught. Regenerate after intentional schema/security changes.",
   "project_ref": "ofzafxvxobjggjisrbsa",
   "generated_at": "2026-06-30",
   "advisor_type": "security",
-  "count": 70,
+  "count": 31,
   "fingerprints": [
-    {
-      "name": "anon_security_definer_function_executable",
-      "level": "WARN",
-      "entity": "public.get_active_agent_runs"
-    },
-    {
-      "name": "anon_security_definer_function_executable",
-      "level": "WARN",
-      "entity": "public.handle_new_user"
-    },
-    {
-      "name": "anon_security_definer_function_executable",
-      "level": "WARN",
-      "entity": "public.handle_user_delete"
-    },
-    {
-      "name": "anon_security_definer_function_executable",
-      "level": "WARN",
-      "entity": "public.handle_user_update"
-    },
-    {
-      "name": "anon_security_definer_function_executable",
-      "level": "WARN",
-      "entity": "public.lms_has_active_subscription"
-    },
-    {
-      "name": "anon_security_definer_function_executable",
-      "level": "WARN",
-      "entity": "public.lms_is_admin"
-    },
-    {
-      "name": "anon_security_definer_function_executable",
-      "level": "WARN",
-      "entity": "public.lms_is_enrolled"
-    },
-    {
-      "name": "anon_security_definer_function_executable",
-      "level": "WARN",
-      "entity": "public.lms_is_instructor"
-    },
-    {
-      "name": "authenticated_security_definer_function_executable",
-      "level": "WARN",
-      "entity": "public.get_active_agent_runs"
-    },
-    {
-      "name": "authenticated_security_definer_function_executable",
-      "level": "WARN",
-      "entity": "public.handle_new_user"
-    },
-    {
-      "name": "authenticated_security_definer_function_executable",
-      "level": "WARN",
-      "entity": "public.handle_user_delete"
-    },
-    {
-      "name": "authenticated_security_definer_function_executable",
-      "level": "WARN",
-      "entity": "public.handle_user_update"
-    },
-    {
-      "name": "authenticated_security_definer_function_executable",
-      "level": "WARN",
-      "entity": "public.lms_has_active_subscription"
-    },
-    {
-      "name": "authenticated_security_definer_function_executable",
-      "level": "WARN",
-      "entity": "public.lms_is_admin"
-    },
-    {
-      "name": "authenticated_security_definer_function_executable",
-      "level": "WARN",
-      "entity": "public.lms_is_enrolled"
-    },
-    {
-      "name": "authenticated_security_definer_function_executable",
-      "level": "WARN",
-      "entity": "public.lms_is_instructor"
-    },
     {
       "name": "extension_in_public",
       "level": "WARN",
@@ -101,259 +21,144 @@
       "entity": "public.vector"
     },
     {
-      "name": "function_search_path_mutable",
-      "level": "WARN",
-      "entity": "public.aggregate_hourly_metrics"
-    },
-    {
-      "name": "function_search_path_mutable",
-      "level": "WARN",
-      "entity": "public.cleanup_expired_evidence"
-    },
-    {
-      "name": "function_search_path_mutable",
-      "level": "WARN",
-      "entity": "public.find_similar_memories"
-    },
-    {
-      "name": "function_search_path_mutable",
-      "level": "WARN",
-      "entity": "public.get_active_agent_runs"
-    },
-    {
-      "name": "function_search_path_mutable",
-      "level": "WARN",
-      "entity": "public.handle_new_user"
-    },
-    {
-      "name": "function_search_path_mutable",
-      "level": "WARN",
-      "entity": "public.handle_user_delete"
-    },
-    {
-      "name": "function_search_path_mutable",
-      "level": "WARN",
-      "entity": "public.handle_user_update"
-    },
-    {
-      "name": "function_search_path_mutable",
-      "level": "WARN",
-      "entity": "public.hybrid_search"
-    },
-    {
-      "name": "function_search_path_mutable",
-      "level": "WARN",
-      "entity": "public.increment_memory_access"
-    },
-    {
-      "name": "function_search_path_mutable",
-      "level": "WARN",
-      "entity": "public.lms_handle_updated_at"
-    },
-    {
-      "name": "function_search_path_mutable",
-      "level": "WARN",
-      "entity": "public.lms_has_active_subscription"
-    },
-    {
-      "name": "function_search_path_mutable",
-      "level": "WARN",
-      "entity": "public.lms_is_admin"
-    },
-    {
-      "name": "function_search_path_mutable",
-      "level": "WARN",
-      "entity": "public.lms_is_enrolled"
-    },
-    {
-      "name": "function_search_path_mutable",
-      "level": "WARN",
-      "entity": "public.lms_is_instructor"
-    },
-    {
-      "name": "function_search_path_mutable",
-      "level": "WARN",
-      "entity": "public.match_documents"
-    },
-    {
-      "name": "function_search_path_mutable",
-      "level": "WARN",
-      "entity": "public.notify_agent_run_status_change"
-    },
-    {
-      "name": "function_search_path_mutable",
-      "level": "WARN",
-      "entity": "public.prune_stale_memories"
-    },
-    {
-      "name": "function_search_path_mutable",
-      "level": "WARN",
-      "entity": "public.update_content_tsvector"
-    },
-    {
-      "name": "function_search_path_mutable",
-      "level": "WARN",
-      "entity": "public.update_updated_at_column"
-    },
-    {
-      "name": "rls_disabled_in_public",
-      "level": "ERROR",
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
       "entity": "public.alembic_version"
     },
     {
-      "name": "rls_disabled_in_public",
-      "level": "ERROR",
-      "entity": "public.lms_audit_log"
-    },
-    {
-      "name": "rls_disabled_in_public",
-      "level": "ERROR",
-      "entity": "public.lms_bundle_courses"
-    },
-    {
-      "name": "rls_disabled_in_public",
-      "level": "ERROR",
-      "entity": "public.lms_bundles"
-    },
-    {
-      "name": "rls_disabled_in_public",
-      "level": "ERROR",
-      "entity": "public.lms_cec_reports"
-    },
-    {
-      "name": "rls_disabled_in_public",
-      "level": "ERROR",
-      "entity": "public.lms_course_idea_votes"
-    },
-    {
-      "name": "rls_disabled_in_public",
-      "level": "ERROR",
-      "entity": "public.lms_course_ideas"
-    },
-    {
-      "name": "rls_disabled_in_public",
-      "level": "ERROR",
-      "entity": "public.lms_course_prerequisites"
-    },
-    {
-      "name": "rls_disabled_in_public",
-      "level": "ERROR",
-      "entity": "public.lms_google_oauth_tokens"
-    },
-    {
-      "name": "rls_disabled_in_public",
-      "level": "ERROR",
-      "entity": "public.lms_learning_pathway_courses"
-    },
-    {
-      "name": "rls_disabled_in_public",
-      "level": "ERROR",
-      "entity": "public.lms_learning_pathways"
-    },
-    {
-      "name": "rls_disabled_in_public",
-      "level": "ERROR",
-      "entity": "public.lms_lesson_views"
-    },
-    {
-      "name": "rls_disabled_in_public",
-      "level": "ERROR",
-      "entity": "public.lms_migration_jobs"
-    },
-    {
-      "name": "rls_disabled_in_public",
-      "level": "ERROR",
-      "entity": "public.lms_notifications"
-    },
-    {
-      "name": "rls_disabled_in_public",
-      "level": "ERROR",
-      "entity": "public.lms_push_subscriptions"
-    },
-    {
-      "name": "rls_disabled_in_public",
-      "level": "ERROR",
-      "entity": "public.lms_rpl_portfolios"
-    },
-    {
-      "name": "rls_disabled_in_public",
-      "level": "ERROR",
-      "entity": "public.lms_student_risk_scores"
-    },
-    {
-      "name": "rls_disabled_in_public",
-      "level": "ERROR",
-      "entity": "public.lms_user_levels"
-    },
-    {
-      "name": "rls_disabled_in_public",
-      "level": "ERROR",
-      "entity": "public.lms_user_sessions"
-    },
-    {
-      "name": "rls_disabled_in_public",
-      "level": "ERROR",
-      "entity": "public.lms_utm_captures"
-    },
-    {
-      "name": "rls_disabled_in_public",
-      "level": "ERROR",
-      "entity": "public.lms_xp_events"
-    },
-    {
-      "name": "rls_policy_always_true",
-      "level": "WARN",
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
       "entity": "public.audit_alerts"
     },
     {
-      "name": "rls_policy_always_true",
-      "level": "WARN",
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
       "entity": "public.audit_evidence"
     },
     {
-      "name": "rls_policy_always_true",
-      "level": "WARN",
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
       "entity": "public.audit_runs"
     },
     {
-      "name": "rls_policy_always_true",
-      "level": "WARN",
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
       "entity": "public.audit_schedules"
     },
     {
-      "name": "rls_policy_always_true",
-      "level": "WARN",
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
       "entity": "public.friction_analyses"
     },
     {
-      "name": "rls_policy_always_true",
-      "level": "WARN",
-      "entity": "public.hub_submissions"
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "entity": "public.lms_audit_log"
     },
     {
-      "name": "rls_policy_always_true",
-      "level": "WARN",
-      "entity": "public.hub_submissions"
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "entity": "public.lms_bundle_courses"
     },
     {
-      "name": "rls_policy_always_true",
-      "level": "WARN",
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "entity": "public.lms_bundles"
+    },
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "entity": "public.lms_cec_reports"
+    },
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "entity": "public.lms_course_idea_votes"
+    },
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "entity": "public.lms_course_ideas"
+    },
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "entity": "public.lms_course_prerequisites"
+    },
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "entity": "public.lms_google_oauth_tokens"
+    },
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "entity": "public.lms_learning_pathway_courses"
+    },
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "entity": "public.lms_learning_pathways"
+    },
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "entity": "public.lms_lesson_views"
+    },
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "entity": "public.lms_migration_jobs"
+    },
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "entity": "public.lms_notifications"
+    },
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "entity": "public.lms_push_subscriptions"
+    },
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "entity": "public.lms_rpl_portfolios"
+    },
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "entity": "public.lms_student_risk_scores"
+    },
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "entity": "public.lms_user_levels"
+    },
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "entity": "public.lms_user_sessions"
+    },
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "entity": "public.lms_utm_captures"
+    },
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "entity": "public.lms_xp_events"
+    },
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
       "entity": "public.route_audit_results"
     },
     {
-      "name": "rls_policy_always_true",
-      "level": "WARN",
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
       "entity": "public.verification_results"
-    },
-    {
-      "name": "security_definer_view",
-      "level": "ERROR",
-      "entity": "public.agent_run_summaries"
-    },
-    {
-      "name": "sensitive_columns_exposed",
-      "level": "ERROR",
-      "entity": "public.lms_google_oauth_tokens"
     }
   ]
 }
