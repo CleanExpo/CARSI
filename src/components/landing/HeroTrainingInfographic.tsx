@@ -137,9 +137,11 @@ export function HeroTrainingInfographic() {
                 <p className="text-[10px] font-semibold tracking-wider text-[#146fc2] uppercase dark:text-[#8fd0ff]">
                   In progress
                 </p>
-                <h3 className="mt-1 text-sm font-bold leading-snug text-slate-900 dark:text-white">
+                {/* Decorative mockup label — intentionally not a heading element so it
+                    stays out of the document outline (avoids an H1 → H3 skip; #304). */}
+                <p className="mt-1 text-sm font-bold leading-snug text-slate-900 dark:text-white">
                   Water Damage Restoration — Essentials
-                </h3>
+                </p>
 
                 <div className="mt-3">
                   <div className="mb-1.5 flex items-center justify-between text-[10px]">
