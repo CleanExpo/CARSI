@@ -56,6 +56,25 @@ export default function robots(): MetadataRoute.Robots {
         allow: '/',
         disallow: ['/admin/', '/api/'],
       },
+      // Perplexity's user-initiated fetch (distinct from the index crawler) —
+      // required to be cited in live Perplexity answers.
+      {
+        userAgent: 'Perplexity-User',
+        allow: '/',
+        disallow: ['/admin/', '/api/'],
+      },
+      // Claude's search + user-fetch agents (distinct from the ClaudeBot
+      // training crawler) — required to be cited in Claude's web answers.
+      {
+        userAgent: 'Claude-SearchBot',
+        allow: '/',
+        disallow: ['/admin/', '/api/'],
+      },
+      {
+        userAgent: 'Claude-User',
+        allow: '/',
+        disallow: ['/admin/', '/api/'],
+      },
       {
         userAgent: 'CCBot',
         allow: '/',

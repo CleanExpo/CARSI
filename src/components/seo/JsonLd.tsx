@@ -557,6 +557,7 @@ interface NewsArticleSchemaProps {
   url: string;
   image?: string;
   datePublished?: string;
+  dateModified?: string;
   authorName?: string;
   publisherName?: string;
   keywords?: string[];
@@ -568,6 +569,7 @@ export function NewsArticleSchema({
   url,
   image,
   datePublished,
+  dateModified,
   authorName,
   publisherName,
   keywords,
@@ -588,6 +590,9 @@ export function NewsArticleSchema({
   if (description) schema.description = description;
   if (image) schema.image = image;
   if (datePublished) schema.datePublished = datePublished;
+  // Freshness signal: fall back to datePublished when no separate modified date
+  // exists (article unchanged since publish — a valid equality per Google).
+  if (dateModified ?? datePublished) schema.dateModified = dateModified ?? datePublished;
   if (authorName) {
     schema.author = { '@type': 'Person', name: authorName };
   }

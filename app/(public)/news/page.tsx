@@ -223,6 +223,7 @@ export default async function NewsPage({
           url={a.source_url}
           image={a.image_url ?? undefined}
           datePublished={a.published_at ?? undefined}
+          dateModified={a.published_at ?? undefined}
           authorName={a.author ?? undefined}
           publisherName={a.source_name ?? undefined}
           keywords={a.ai_tags}
