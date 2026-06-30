@@ -3,6 +3,8 @@
 // Note: Using dangerouslySetInnerHTML is the standard pattern for JSON-LD in React.
 // Content is server-generated from controlled objects, not user input.
 
+import { buildFounderPersonSchema } from '@/lib/schema/founder';
+
 interface OrganizationSchemaProps {
   name?: string;
   url?: string;
@@ -96,6 +98,8 @@ export function OrganizationSchema({
       'building restoration',
     ],
     sameAs,
+    // E-E-A-T: name the real person behind CARSI as a resolvable entity.
+    founder: buildFounderPersonSchema(),
     contactPoint: {
       '@type': 'ContactPoint',
       telephone: '+61457123005',
