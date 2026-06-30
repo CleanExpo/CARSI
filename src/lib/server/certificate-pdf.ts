@@ -7,6 +7,7 @@ import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from 'pdf
 import { formatCecHoursForCertificate } from '@/lib/cec-display';
 import { formatCredentialRef } from '@/lib/credential-format';
 import { IICRC_DISCIPLINE_LONG } from '@/lib/iicrc-discipline-display';
+import { certificateHolderDisplayName } from '@/lib/server/certificate-name';
 import { resolveLmsCourseCecHours, type LmsCourseCecSource } from '@/lib/server/course-cec-hours';
 
 const DISCIPLINE_HEX: Record<string, string> = {
@@ -585,7 +586,7 @@ export function completionCertificateDataFromEnrollment(
   verificationOrigin?: string
 ): CompletionCertificateData {
   void verificationOrigin;
-  const studentName = row.student.fullName?.trim() || row.student.email;
+  const studentName = certificateHolderDisplayName(row.student);
   const cecSource: LmsCourseCecSource = {
     slug: row.course.slug,
     cecHours:

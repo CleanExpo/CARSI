@@ -5,6 +5,7 @@ import {
   buildCompletionCertificatePdf,
   completionCertificateDataFromEnrollment,
 } from '@/lib/server/certificate-pdf';
+import { canIssueCertificate } from '@/lib/server/certificate-name';
 import { getEnrollmentForCertificate, markCertificateIssued } from '@/lib/server/enrollment-service';
 
 export const dynamic = 'force-dynamic';
@@ -40,6 +41,19 @@ export async function GET(request: NextRequest, context: RouteContext) {
       return NextResponse.json(
         { detail: 'Certificate is available only after the course is fully complete.' },
         { status: 403 },
+      );
+    }
+
+    // A certificate must name its holder (#302). Don't mint one addressed to an
+    // email/email-prefix — this learner has no name on file.
+    if (!canIssueCertificate(row.student)) {
+      return NextResponse.json(
+        {
+          detail:
+            'This learner has no full name on file, so a certificate cannot be issued. Ask them to add their name in their profile.',
+          code: 'name_required',
+        },
+        { status: 422 },
       );
     }
 

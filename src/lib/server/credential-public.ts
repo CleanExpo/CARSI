@@ -4,6 +4,7 @@ import {
   buildCompletionCertificatePdf,
   completionCertificateDataFromEnrollment,
 } from '@/lib/server/certificate-pdf';
+import { certificateHolderDisplayName } from '@/lib/server/certificate-name';
 import { resolveLmsCourseCecHours } from '@/lib/server/course-cec-hours';
 
 /** Public verification JSON (matches CredentialVerificationCard + certificate preview). */
@@ -45,7 +46,7 @@ export async function getPublicCredentialJson(
   });
   if (!row) return null;
 
-  const studentName = row.student.fullName?.trim() || row.student.email;
+  const studentName = certificateHolderDisplayName(row.student);
   const issued = row.certificateIssuedAt ?? row.completedAt!;
   const disc = row.course.iicrcDiscipline?.trim() || '—';
 
