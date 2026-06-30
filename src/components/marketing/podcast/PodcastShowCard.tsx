@@ -182,7 +182,6 @@ export function PodcastCategoryPills({
   activeCategory?: string;
   searchQuery?: string;
 }) {
-  const baseQuery = searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : '';
 
   return (
     <div className="flex flex-wrap gap-2">
@@ -190,7 +189,7 @@ export function PodcastCategoryPills({
         href={searchQuery ? `/podcast?q=${encodeURIComponent(searchQuery)}` : '/podcast'}
         className={
           !activeCategory
-            ? 'rounded-full bg-[#2490ed] px-4 py-1.5 text-sm font-semibold text-white shadow-sm'
+            ? 'rounded-full bg-[#146fc2] px-4 py-1.5 text-sm font-semibold text-white shadow-sm'
             : marketingTopicPill + ' px-4 py-1.5 transition hover:border-[#2490ed]/35'
         }
       >
@@ -205,7 +204,7 @@ export function PodcastCategoryPills({
             href={href}
             className={
               active
-                ? 'rounded-full bg-[#2490ed] px-4 py-1.5 text-sm font-semibold text-white shadow-sm'
+                ? 'rounded-full bg-[#146fc2] px-4 py-1.5 text-sm font-semibold text-white shadow-sm'
                 : marketingTopicPill + ' px-4 py-1.5 transition hover:border-[#2490ed]/35'
             }
           >

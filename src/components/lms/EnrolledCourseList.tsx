@@ -6,7 +6,9 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { dash } from '@/lib/dashboard-light-ui';
-import { Award, CheckCircle2, PlayCircle } from 'lucide-react';
+import { isOnboardingCourse } from '@/lib/onboarding/enterprise';
+import { getOnboardingLearnPath, getOnboardingProgramPath } from '@/lib/onboarding/navigation';
+import { Award, Building2, CheckCircle2, PlayCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -45,11 +47,14 @@ export function EnrolledCourseList({ enrollments }: EnrolledCourseListProps) {
   return (
     <ul className="space-y-4">
       {enrollments.map((enr) => {
-        const learnBase = `/dashboard/learn/${encodeURIComponent(enr.course_slug)}`;
+        const onboarding = isOnboardingCourse({ slug: enr.course_slug });
+        const learnBase = getOnboardingLearnPath(enr.course_slug);
         const continueHref =
           enr.last_lesson_id != null
-            ? `${learnBase}?lesson=${encodeURIComponent(enr.last_lesson_id)}`
+            ? getOnboardingLearnPath(enr.course_slug, enr.last_lesson_id)
             : learnBase;
+        const hubHref = getOnboardingProgramPath(enr.course_slug);
+        const openHref = onboarding ? hubHref : continueHref;
         const done = enr.all_lessons_complete === true || enr.status === 'completed';
         const cecSubmitted = enr.cec_submission_status === 'sent';
         const cecSubmittedAt = enr.cec_submitted_at
@@ -67,11 +72,11 @@ export function EnrolledCourseList({ enrollments }: EnrolledCourseListProps) {
               role="link"
               tabIndex={0}
               aria-label={`Open course: ${enr.course_title}`}
-              onClick={() => router.push(continueHref)}
+              onClick={() => router.push(openHref)}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                   e.preventDefault();
-                  router.push(continueHref);
+                  router.push(openHref);
                 }
               }}
             >
@@ -94,6 +99,12 @@ export function EnrolledCourseList({ enrollments }: EnrolledCourseListProps) {
                           In progress
                         </Badge>
                       )}
+                      {onboarding ? (
+                        <Badge className="gap-1 border-[#2490ed]/25 bg-[#eef7ff] text-[#146fc2]">
+                          <Building2 className="h-3 w-3" aria-hidden />
+                          Organisation program
+                        </Badge>
+                      ) : null}
                       {cecSubmitted ? (
                         <Badge className="gap-1 border-sky-200 bg-sky-50 text-sky-800">
                           <CheckCircle2 className="h-3 w-3" aria-hidden />
@@ -113,12 +124,24 @@ export function EnrolledCourseList({ enrollments }: EnrolledCourseListProps) {
                       <ProgressBar percentage={enr.completion_percentage} label="Progress" />
                     </div>
                     <div className="flex flex-wrap gap-2 pt-1">
-                      <Button asChild className="gap-2 rounded-lg bg-[#2490ed] text-white hover:bg-[#1a7fd4]">
+                      <Button asChild className="gap-2 rounded-lg bg-[#146fc2] text-white hover:bg-[#0f5fa8]">
                         <Link href={continueHref} onClick={(e) => e.stopPropagation()}>
                           <PlayCircle className="h-4 w-4" />
-                          {done ? 'Review course' : 'Continue learning'}
+                          {done ? 'Review lessons' : onboarding ? 'Continue lesson' : 'Continue learning'}
                         </Link>
                       </Button>
+                      {onboarding ? (
+                        <Button
+                          asChild
+                          variant="outline"
+                          className="gap-2 rounded-lg border-[#2490ed]/25 text-[#146fc2] hover:bg-[#eef7ff]"
+                        >
+                          <Link href={hubHref} onClick={(e) => e.stopPropagation()}>
+                            <Building2 className="h-4 w-4" />
+                            Program hub
+                          </Link>
+                        </Button>
+                      ) : null}
                       {done ? (
                         <Button
                           asChild

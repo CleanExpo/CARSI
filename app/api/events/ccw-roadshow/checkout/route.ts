@@ -16,7 +16,12 @@ import {
 } from '@/lib/server/ccw-roadshow-registry';
 import { addRegistrationToCalendar } from '@/lib/server/ccw-roadshow-calendar';
 import { isMissingTableError } from '@/lib/server/db-errors';
-import { sendCcwRoadshowRegistrationEmail } from '@/lib/server/transactional-email';
+import { getAppOrigin } from '@/lib/server/app-url';
+import {
+  sendCcwRoadshowRegistrationEmail,
+  sendCcwRoadshowOrganizerNotificationEmail,
+} from '@/lib/server/transactional-email';
+import { getRoadshowNotifyRecipients } from '@/lib/server/ccw-roadshow-notify';
 
 type AttendeeBody = { fullName?: string; yearsExperience?: string; goals?: string };
 type RoadshowCheckoutBody = {
@@ -137,7 +142,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const origin = request.nextUrl.origin;
+    const origin = getAppOrigin(request);
     const successParams = new URLSearchParams({
       token: freeEntryToken,
       event: event.slug,
@@ -187,6 +192,28 @@ export async function POST(request: NextRequest) {
       });
     } catch (emailErr) {
       console.error('[ccw-roadshow] registration email failed (non-fatal):', emailErr);
+    }
+
+    // Notify the campaign owner(s) for this city (Melbourne → Phill; Sydney → Toby + Phill).
+    try {
+      const notifyTo = getRoadshowNotifyRecipients(event.slug);
+      if (notifyTo.length > 0) {
+        await sendCcwRoadshowOrganizerNotificationEmail({
+          to: notifyTo,
+          eventCity: event.city,
+          dateRangeLabel: event.dateRangeLabel,
+          registrationStatus: result.status,
+          seatCount: result.seatCount,
+          freeEntryToken,
+          companyName,
+          contactEmail,
+          contactPhone,
+          attendees,
+          appOrigin: origin,
+        });
+      }
+    } catch (notifyErr) {
+      console.error('[ccw-roadshow] organizer notification failed (non-fatal):', notifyErr);
     }
 
     return NextResponse.json({

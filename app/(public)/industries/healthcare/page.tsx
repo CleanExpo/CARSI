@@ -17,7 +17,7 @@ export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = buildIndustryMetadata(
   'healthcare',
-  'Healthcare IICRC CEC Training | CARSI',
+  'Healthcare IICRC CEC Training',
   'NSQHS-aligned IICRC CEC training for Australian hospitals. AMRT, WRT, FSRT and ASD courses supporting Standard 3 compliance and JCI accreditation.',
   [
     'healthcare IICRC CEC training',
@@ -57,7 +57,7 @@ const faqs = [
   {
     question: 'Can hospital maintenance staff complete IICRC CEC training online?',
     answer:
-      'Yes. CARSI offers IICRC CEC accredited courses online and self-paced, designed to fit around 24/7 hospital shift patterns. Staff can complete modules between shifts without leaving the facility. Eligible courses count toward IICRC Continuing Education Credits (CECs) and issue verifiable digital credentials on completion.',
+      'Yes. CARSI offers IICRC-aligned CEC courses online and self-paced, designed to fit around 24/7 hospital shift patterns. Staff can complete modules between shifts without leaving the facility. Eligible courses count toward IICRC Continuing Education Credits (CECs) and issue verifiable digital credentials on completion.',
   },
   {
     question: 'What is mould remediation training for healthcare facilities?',

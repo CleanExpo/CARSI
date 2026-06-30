@@ -10,6 +10,7 @@ import { ErrorBanner } from '@/components/lms/ErrorBanner';
 import { LearningMomentumLoop } from '@/components/lms/LearningMomentumLoop';
 import { PathwayProgressCard } from '@/components/lms/PathwayProgressCard';
 import { PopularForYouStrip } from '@/components/lms/PopularForYouStrip';
+import { OnboardingProgramsStrip, OnboardingQuickLink } from '@/components/onboarding/OnboardingProgramsStrip';
 import { PushNotificationPrompt } from '@/components/lms/PushNotificationPrompt';
 import { RenewalCockpit } from '@/components/lms/RenewalCockpit';
 import { apiClient } from '@/lib/api/client';
@@ -177,6 +178,8 @@ export default function StudentDashboardPage() {
 
       <ContinueLearningBanner snapshot={resume} />
 
+      <OnboardingProgramsStrip />
+
       <LearningMomentumLoop
         resume={resume}
         enrollments={enrollments}
@@ -205,6 +208,7 @@ export default function StudentDashboardPage() {
                 Browse catalogue
                 <ArrowRight className="h-4 w-4 opacity-90" aria-hidden />
               </Link>
+              <OnboardingQuickLink />
               <Link href="/dashboard/student/credentials" className={dash.btnSecondary}>
                 Certificates
               </Link>

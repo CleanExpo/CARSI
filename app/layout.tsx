@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import Script from 'next/script';
 import { Outfit, DM_Sans } from 'next/font/google';
 import './globals.css';
 import { AppToastProvider } from '@/hooks/use-toast';
@@ -30,7 +31,7 @@ export const metadata: Metadata = {
     template: '%s | CARSI',
   },
   description:
-    'IICRC CEC accredited courses for cleaning and restoration professionals in Australia. Earn continuing education credits, track your progress, and receive CARSI completion certificates.',
+    'IICRC-aligned CEC courses for cleaning and restoration professionals in Australia. Earn continuing education credits, track your progress, and receive CARSI completion certificates.',
   keywords: [
     'restoration training',
     'IICRC CECs',
@@ -63,7 +64,7 @@ export const metadata: Metadata = {
     siteName: 'CARSI',
     title: 'CARSI | Restoration Training — IICRC CEC Platform',
     description:
-      'IICRC CEC accredited courses for cleaning and restoration professionals in Australia. Earn continuing education credits and track your progress.',
+      'IICRC-aligned CEC courses for cleaning and restoration professionals in Australia. Earn continuing education credits and track your progress.',
     images: [
       {
         url: `${siteUrl}/og-image.png`,
@@ -77,7 +78,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'CARSI | Restoration Training — IICRC CEC Platform',
     description:
-      'IICRC CEC accredited courses for cleaning and restoration professionals in Australia.',
+      'IICRC-aligned CEC courses for cleaning and restoration professionals in Australia.',
     images: [`${siteUrl}/og-image.png`],
     creator: '@carsi_au',
   },
@@ -107,11 +108,10 @@ export default function RootLayout({
       <head>
         <OrganizationSchema />
         <WebsiteSchema />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('carsi-theme');if(t==='dark')document.documentElement.classList.add('dark');}catch(e){}})();`,
-          }}
-        />
+        {/* External ('self') theme bootstrap via next/script (beforeInteractive)
+            — runs early for FOUC prevention, is auto-nonced by Next, and keeps
+            the root layout static-capable (no inline script / per-request nonce). */}
+        <Script src="/theme-init.js" strategy="beforeInteractive" />
       </head>
       <body className={`${outfit.variable} ${dmSans.variable} font-sans`} suppressHydrationWarning>
         <AuthProvider>

@@ -1,22 +1,26 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useSyncExternalStore } from 'react';
+
+function subscribe(callback: () => void): () => void {
+  window.addEventListener('online', callback);
+  window.addEventListener('offline', callback);
+  return () => {
+    window.removeEventListener('online', callback);
+    window.removeEventListener('offline', callback);
+  };
+}
+
+function getSnapshot(): boolean {
+  return navigator.onLine;
+}
+
+/** Assume online during SSR — matches the previous initial state and avoids a hydration flash. */
+function getServerSnapshot(): boolean {
+  return true;
+}
 
 /** `true` when the browser reports a live network connection. */
 export function useOnlineStatus(): boolean {
-  const [online, setOnline] = useState(true);
-
-  useEffect(() => {
-    setOnline(typeof navigator !== 'undefined' ? navigator.onLine : true);
-    const onOnline = () => setOnline(true);
-    const onOffline = () => setOnline(false);
-    window.addEventListener('online', onOnline);
-    window.addEventListener('offline', onOffline);
-    return () => {
-      window.removeEventListener('online', onOnline);
-      window.removeEventListener('offline', onOffline);
-    };
-  }, []);
-
-  return online;
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }

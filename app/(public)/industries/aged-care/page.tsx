@@ -13,7 +13,7 @@ import { FAQSchema } from '@/components/seo/JsonLd';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Aged Care IICRC CEC Training | CARSI',
+  title: 'Aged Care IICRC CEC Training',
   description:
     'NQF-compliant IICRC CEC training for aged care facilities. CRT and AMRT courses for carpet restoration, mould remediation, and infection control.',
   keywords: [
@@ -56,7 +56,7 @@ const faqs = [
   {
     question: 'Can aged care staff complete IICRC CEC training around shift work?',
     answer:
-      'Yes. CARSI offers IICRC CEC accredited courses online and self-paced, designed to fit around 24/7 aged care operations. Staff can complete modules between shifts without leaving the facility. All courses issue verifiable digital credentials on completion.',
+      'Yes. CARSI offers IICRC-aligned CEC courses online and self-paced, designed to fit around 24/7 aged care operations. Staff can complete modules between shifts without leaving the facility. All courses issue verifiable digital credentials on completion.',
   },
 ];
 
@@ -65,7 +65,7 @@ const whyCards = [
     icon: Shield,
     title: 'NQF Compliance',
     description:
-      'Meet National Quality Framework infection control requirements with IICRC CEC accredited courses for cleaning and maintenance teams.',
+      'Meet National Quality Framework infection control requirements with IICRC-aligned CEC courses for cleaning and maintenance teams.',
     color: '#27ae60',
   },
   {

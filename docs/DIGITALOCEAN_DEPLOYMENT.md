@@ -29,7 +29,6 @@ declares the keys and their scope. Secrets should be marked **Encrypted** in the
 | `DATABASE_URL` | run+build | Postgres connection string |
 | `DATABASE_CA_CERT` | run+build | Managed-DB CA cert (PEM) |
 | `JWT_SECRET` | run | Auth signing key — **canonical name is `JWT_SECRET`** (not `JWT_SECRET_KEY`) |
-| `WC_CONSUMER_KEY` / `WC_CONSUMER_SECRET` | run+build | WooCommerce REST (rotate if ever leaked — see issue #122) |
 | `STRIPE_SECRET_KEY` | run+build | Stripe API |
 | `STRIPE_WEBHOOK_SECRET` | run | Stripe webhook signing |
 | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | run+build | Stripe publishable |

@@ -1,6 +1,7 @@
 import { cache } from 'react';
 
 import { getBackendOrigin } from '@/lib/env/public-url';
+import { isBuildPhase } from '@/lib/server/build-phase';
 import type { CourseListItem } from '@/lib/course-list-item';
 import { prisma } from '@/lib/prisma';
 
@@ -86,6 +87,12 @@ async function fetchBackendCatalogueFacts(): Promise<PublicCatalogueFacts | null
  * second query). For the homepage (no full list), call this directly.
  */
 async function computePublicCatalogueFacts(): Promise<PublicCatalogueFacts> {
+  // At build time the DB/backend are unreachable; return the empty fallback instantly
+  // so ISR pages prerender without hanging, then hydrate real facts at runtime (#129).
+  if (isBuildPhase()) {
+    return { publishedCourseCount: 0, disciplineCodes: [], source: 'none' };
+  }
+
   if (process.env.DATABASE_URL?.trim()) {
     try {
       const count = await prisma.lmsCourse.count({ where: lmsPublishedCourseWhere });
@@ -135,9 +142,9 @@ export function catalogueMetaDescription(
       ? codes.join(', ')
       : 'WRT, CRT, ASD, AMRT, FSRT, OCT and CCT';
   if (n <= 0) {
-    return `Browse IICRC CEC accredited restoration and cleaning courses across ${list}. Earn continuing education credits online with CARSI.`;
+    return `Browse IICRC-aligned CEC restoration and cleaning courses across ${list}. Earn continuing education credits online with CARSI.`;
   }
-  return `Browse ${n} IICRC CEC accredited restoration and cleaning courses across ${list}. Earn continuing education credits online with CARSI.`;
+  return `Browse ${n} IICRC-aligned CEC restoration and cleaning courses across ${list}. Earn continuing education credits online with CARSI.`;
 }
 
 /** `/courses` index — question-led SEO line without a duplicated “Browse”. */
@@ -151,7 +158,7 @@ export function coursesIndexMetaDescription(facts: PublicCatalogueFacts): string
   const n = facts.publishedCourseCount;
   const core =
     n > 0
-      ? `${n} IICRC CEC accredited restoration and cleaning courses across ${list}. Earn continuing education credits online with CARSI.`
-      : `IICRC CEC accredited restoration and cleaning courses across ${list}. Earn continuing education credits online with CARSI.`;
+      ? `${n} IICRC-aligned CEC restoration and cleaning courses across ${list}. Earn continuing education credits online with CARSI.`
+      : `IICRC-aligned CEC restoration and cleaning courses across ${list}. Earn continuing education credits online with CARSI.`;
   return `What courses does CARSI offer? ${core}`;
 }

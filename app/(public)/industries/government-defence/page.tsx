@@ -17,7 +17,7 @@ export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = buildIndustryMetadata(
   'government-defence',
-  'Government & Defence IICRC CEC Training | CARSI',
+  'Government & Defence IICRC CEC Training',
   'WHS-compliant IICRC CEC training for Australian councils, agencies and defence facilities. AMRT, WRT, ASD and FSRT courses for AusTender compliance.',
   [
     'government IICRC CEC training',
@@ -62,7 +62,7 @@ const faqs = [
   {
     question: 'Can government facility staff complete IICRC CEC training online?',
     answer:
-      'Yes. CARSI offers IICRC CEC accredited courses online and self-paced, suitable for council and agency staff across metropolitan and regional Australia. Courses issue verifiable digital credentials that satisfy audit and procurement compliance requirements. Bulk seat licensing is available for departments and councils.',
+      'Yes. CARSI offers IICRC-aligned CEC courses online and self-paced, suitable for council and agency staff across metropolitan and regional Australia. Courses issue verifiable digital credentials that satisfy audit and procurement compliance requirements. Bulk seat licensing is available for departments and councils.',
   },
 ];
 

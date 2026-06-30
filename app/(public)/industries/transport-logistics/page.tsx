@@ -13,7 +13,7 @@ import { FAQSchema } from '@/components/seo/JsonLd';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Transport & Logistics IICRC CEC Training | CARSI',
+  title: 'Transport & Logistics IICRC CEC Training',
   description:
     'IICRC restoration training for Australian transport and logistics operations. WRT, CRT and OCT courses for vehicle interiors, warehouses, and loading dock maintenance.',
   keywords: [
@@ -62,7 +62,7 @@ const faqs = [
   {
     question: 'Can transport and logistics staff train online around shift schedules?',
     answer:
-      'Yes. CARSI offers IICRC CEC accredited courses online and self-paced. Drivers and warehouse staff can complete modules during downtime, between shifts, or during scheduled stand-down periods. All courses issue verifiable digital credentials on completion.',
+      'Yes. CARSI offers IICRC-aligned CEC courses online and self-paced. Drivers and warehouse staff can complete modules during downtime, between shifts, or during scheduled stand-down periods. All courses issue verifiable digital credentials on completion.',
   },
 ];
 

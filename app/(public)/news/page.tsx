@@ -18,6 +18,7 @@ import {
   marketingTextSubtle,
   marketingTopicPill,
 } from '@/lib/marketing/marketing-ui';
+import { OG_IMAGES } from '@/lib/seo/og-image';
 
 const siteUrl = getPublicSiteUrl();
 
@@ -35,6 +36,7 @@ export const metadata: Metadata = {
     'disaster recovery Australia',
   ],
   openGraph: {
+    images: OG_IMAGES,
     title: 'Industry News | CARSI Hub',
     description:
       'AI-curated news from the Australian restoration, HVAC, flooring, and indoor environment industries.',
@@ -221,6 +223,7 @@ export default async function NewsPage({
           url={a.source_url}
           image={a.image_url ?? undefined}
           datePublished={a.published_at ?? undefined}
+          dateModified={a.published_at ?? undefined}
           authorName={a.author ?? undefined}
           publisherName={a.source_name ?? undefined}
           keywords={a.ai_tags}

@@ -21,6 +21,7 @@ import {
   marketingTextSubtle,
   marketingTopicPill,
 } from '@/lib/marketing/marketing-ui';
+import { OG_IMAGES } from '@/lib/seo/og-image';
 
 const BACKEND_URL = getBackendOrigin();
 
@@ -90,6 +91,7 @@ export async function generateMetadata({
     title: `${job.title} at ${job.company_name} | CARSI Jobs`,
     description: description.slice(0, 155),
     openGraph: {
+      images: OG_IMAGES,
       title: `${job.title} — ${job.company_name}`,
       description: description.slice(0, 155),
       type: 'website',

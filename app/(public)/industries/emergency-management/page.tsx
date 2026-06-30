@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'IICRC CEC Training for Emergency Management & SES | CARSI Australia',
   description:
-    'Train SES volunteers and council emergency teams before disaster strikes. IICRC WRT, FSRT, ASD, and AMRT certification for flood and fire response. Online, CEC accredited.',
+    'Train SES volunteers and council emergency teams before disaster strikes. IICRC WRT, FSRT, ASD, and AMRT certification for flood and fire response. Online, CEC-aligned.',
   keywords: [
     'SES IICRC CEC training Australia',
     'emergency management restoration training',

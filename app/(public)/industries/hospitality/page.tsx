@@ -17,8 +17,8 @@ export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = buildIndustryMetadata(
   'hospitality',
-  'Hospitality IICRC CEC Training | CARSI',
-  'IICRC-certified training for Australian hotels and resorts. WRT, CRT, ASD and OCT courses for water damage, carpet care, structural drying and odour control.',
+  'Hospitality IICRC CEC Training',
+  'IICRC-aligned training for Australian hotels and resorts. WRT, CRT, ASD and OCT courses for water damage, carpet care, structural drying and odour control.',
   [
     'hospitality IICRC CEC training',
     'hotel restoration training',
@@ -62,7 +62,7 @@ const faqs = [
   {
     question: 'Can hospitality teams complete IICRC CEC training online?',
     answer:
-      'Yes. CARSI offers IICRC CEC accredited courses online and self-paced, ideal for hotel teams working rotating rosters. Staff can complete modules between shifts. Courses issue verifiable digital credentials and count toward IICRC Continuing Education Credits.',
+      'Yes. CARSI offers IICRC-aligned CEC courses online and self-paced, ideal for hotel teams working rotating rosters. Staff can complete modules between shifts. Courses issue verifiable digital credentials and count toward IICRC Continuing Education Credits.',
   },
   {
     question: 'What is structural drying training for hotel pool and spa areas?',
@@ -105,7 +105,7 @@ export default async function HospitalityIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Hospitality"
         headlineAccent="Restoration Training"
-        description="Keep guests comfortable and properties protected. IICRC-certified training for hotel maintenance teams covering water damage, carpet care, structural drying, and odour control."
+        description="Keep guests comfortable and properties protected. IICRC-aligned training for hotel maintenance teams covering water damage, carpet care, structural drying, and odour control."
         disciplines={disciplines}
         stats={stats}
       />

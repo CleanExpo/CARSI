@@ -136,7 +136,6 @@ See `app.yaml` for DigitalOcean scopes. Common variables:
 - `OPENAI_API_KEY`: optional AI features
 - `OPENAI_CHAT_MODEL`: optional public/learner assistant model override
 - `GOOGLE_AI_API_KEY`: optional Gemini/image-generation features
-- `WC_CONSUMER_KEY` / `WC_CONSUMER_SECRET`: WordPress/WooCommerce integration keys
 
 ---
 

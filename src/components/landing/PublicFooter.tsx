@@ -33,6 +33,23 @@ const platformLinks = [
   { label: 'Podcast', href: '/podcast' },
 ];
 
+const communityLinks = [
+  { label: 'Industry News', href: '/news' },
+  { label: 'Jobs Board', href: '/jobs' },
+  { label: 'Industry Calendar', href: '/calendar' },
+  { label: 'Research', href: '/research' },
+  { label: 'YouTube Hub', href: '/youtube' },
+  { label: 'Community Ideas', href: '/ideas' },
+  { label: 'Submit Content', href: '/submit' },
+];
+
+const eventLinks = [
+  { label: 'CCW Roadshow', href: '/events/ccw-roadshow' },
+  { label: 'CCW Melbourne', href: '/ccw-melbourne' },
+  { label: 'CCW Sydney', href: '/ccw-sydney' },
+  { label: 'CCW Materials', href: '/ccw-materials' },
+];
+
 const socialLinks = [
   { label: 'Facebook', href: 'https://www.facebook.com/CARSIaus' },
   {
@@ -50,7 +67,7 @@ function FooterSectionLabel({ children }: { children: ReactNode }) {
   return (
     <div className="mb-4 flex items-center gap-3">
       <span className="h-px w-6 bg-gradient-to-r from-[#2490ed] to-[#00d4aa]" aria-hidden />
-      <p className="text-[10px] font-semibold tracking-[0.2em] text-white/45 uppercase">
+      <p className="text-[10px] font-semibold tracking-[0.2em] text-white/60 uppercase">
         {children}
       </p>
     </div>
@@ -117,14 +134,14 @@ export function PublicFooter() {
             <p className="mb-4 text-[11px] font-semibold tracking-[0.22em] text-[#7ec5ff]/90 uppercase">
               Australian restoration training
             </p>
-            <Link href="/" className="inline-block">
+            <Link href="/" aria-label="CARSI home" className="inline-block">
               <PublicLogo variant="footer" />
             </Link>
             <p className="mt-5 max-w-md text-sm leading-relaxed text-white/58">
               Australia&apos;s industry training leader.
               <br />
               24/7 online. <AcronymTooltip term="IICRC" />
-              <span> CEC accredited courses.</span>
+              <span> CEC-aligned courses.</span>
             </p>
           </div>
 
@@ -133,7 +150,7 @@ export function PublicFooter() {
               className="pointer-events-none absolute -top-px right-8 left-8 h-px bg-gradient-to-r from-transparent via-[#2490ed]/50 to-transparent"
               aria-hidden
             />
-            <p className="text-[10px] font-semibold tracking-[0.18em] text-white/35 uppercase">
+            <p className="text-[10px] font-semibold tracking-[0.18em] text-white/60 uppercase">
               Built for the field
             </p>
             <p className="mt-2 text-lg font-semibold leading-snug text-white/90">
@@ -204,7 +221,7 @@ export function PublicFooter() {
             </ul>
 
             <div className="mt-6 border-t border-white/[0.06] pt-5">
-              <p className="mb-3 text-[10px] font-semibold tracking-[0.16em] text-white/35 uppercase">
+              <p className="mb-3 text-[10px] font-semibold tracking-[0.16em] text-white/60 uppercase">
                 Follow CARSI
               </p>
               <div className="flex flex-wrap gap-2">
@@ -216,6 +233,28 @@ export function PublicFooter() {
               </div>
             </div>
           </div>
+
+          <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-5 sm:p-6 lg:col-span-8">
+            <FooterSectionLabel>Community &amp; Resources</FooterSectionLabel>
+            <ul className="grid gap-x-6 gap-y-1 sm:grid-cols-2 lg:grid-cols-3">
+              {communityLinks.map((item) => (
+                <li key={item.label}>
+                  <FooterLink href={item.href}>{item.label}</FooterLink>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-5 sm:p-6 lg:col-span-4">
+            <FooterSectionLabel>Events</FooterSectionLabel>
+            <ul className="grid gap-x-6 gap-y-1 sm:grid-cols-2 lg:grid-cols-1">
+              {eventLinks.map((item) => (
+                <li key={item.label}>
+                  <FooterLink href={item.href}>{item.label}</FooterLink>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
 
         {/* Legal strip */}
@@ -223,13 +262,27 @@ export function PublicFooter() {
           <p className="text-[11px] leading-relaxed text-white/50">
             © 2026 CARSI Pty Ltd. All rights reserved. ·{' '}
             <Link
+              href="/privacy"
+              className="font-medium text-white/65 underline-offset-2 transition-colors hover:text-white hover:underline"
+            >
+              Privacy
+            </Link>
+            {' · '}
+            <Link
+              href="/terms"
+              className="font-medium text-white/65 underline-offset-2 transition-colors hover:text-white hover:underline"
+            >
+              Terms
+            </Link>
+            {' · '}
+            <Link
               href="/admin"
               className="font-medium text-white/65 underline-offset-2 transition-colors hover:text-white hover:underline"
             >
               Staff login
             </Link>
           </p>
-          <p className="max-w-xl text-[11px] leading-relaxed text-white/45 sm:text-right">
+          <p className="max-w-xl text-[11px] leading-relaxed text-white/60 sm:text-right">
             <AcronymTooltip term="IICRC" />
             <span> CEC continuing education — not an </span>
             <AcronymTooltip term="RTO" />

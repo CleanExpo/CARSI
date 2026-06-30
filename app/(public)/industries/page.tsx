@@ -28,9 +28,10 @@ import {
 // ---------------------------------------------------------------------------
 
 export const metadata: Metadata = {
-  title: 'Industry Training Solutions | CARSI',
+  title: 'Industry Training Solutions',
   description:
-    'IICRC-certified training for 19 industries across Australia. Sector-specific restoration courses with verifiable credentials for healthcare, hospitality, mining, plumbing, NDIS, real estate, and more.',
+    'IICRC-aligned training for 19 industries across Australia. Sector-specific restoration courses with verifiable credentials for healthcare, hospitality, mining, plumbing, NDIS, real estate, and more.',
+  alternates: { canonical: '/industries' },
 };
 
 // ---------------------------------------------------------------------------
@@ -224,7 +225,7 @@ export default function IndustriesPage() {
             className="max-w-2xl text-lg leading-relaxed"
             style={{ color: 'rgba(255,255,255,0.5)' }}
           >
-            IICRC-certified training for 19 industries across Australia. Each pathway includes
+            IICRC-aligned training for 19 industries across Australia. Each pathway includes
             sector-specific courses, verifiable credentials, and continuing education credits.
           </p>
         </section>
@@ -303,7 +304,7 @@ export default function IndustriesPage() {
               <Link
                 href="/courses"
                 className="inline-flex items-center gap-2 rounded-md px-6 py-2.5 text-sm font-medium text-white transition-opacity duration-150 hover:opacity-90"
-                style={{ background: '#ed9d24' }}
+                style={{ background: '#a85500' }}
               >
                 Browse All Courses
               </Link>

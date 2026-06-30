@@ -16,14 +16,17 @@ import {
 import { getPublishedCourseListItemsFromDatabase } from '@/lib/server/public-courses-list';
 import type { CourseListItem } from '@/lib/course-list-item';
 
-export const dynamic = 'force-dynamic';
+// ISR: cache the catalogue render, refreshed every 5 minutes (issue #129).
+// Discipline-filter variants that read searchParams still render per-request.
+export const revalidate = 300;
 
 export async function generateMetadata(): Promise<Metadata> {
   const { items } = await getCoursesCached();
   const facts = deriveCatalogueFactsFromCourseItems(items);
   return {
-    title: 'IICRC CEC Accredited Restoration Courses | CARSI',
+    title: 'IICRC-aligned CEC Restoration Courses',
     description: coursesIndexMetaDescription(facts),
+    alternates: { canonical: '/courses' },
   };
 }
 

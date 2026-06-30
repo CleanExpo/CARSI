@@ -48,7 +48,7 @@ export function buildCarsiWordmarkHtml(appOrigin: string): string {
       </span>
     </a>
     <p style="margin: 12px 0 0; font-family: ${BRAND.font}; font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: ${BRAND.blue};">
-      IICRC CEC accredited restoration courses
+      IICRC-aligned CEC restoration courses
     </p>`;
 }
 
@@ -252,7 +252,7 @@ export function renderRegistrationWelcomeEmail(params: {
       title: "You're all set",
       greeting: `Hi ${params.name},`,
       paragraphs: [
-        'Thank you for joining CARSI Learning — professional IICRC CEC accredited restoration courses for Australian technicians and teams.',
+        'Thank you for joining CARSI Learning — professional IICRC-aligned CEC restoration courses for Australian technicians and teams.',
         'Your account is active. Sign in to browse courses, track CEC progress, and continue your learning path.',
       ],
       details: [

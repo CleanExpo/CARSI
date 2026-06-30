@@ -1,0 +1,480 @@
+{
+  "version": 1,
+  "courseSlug": "floor-care-onboarding-operational-readiness",
+  "note": "Structured quizzes for the floor-care onboarding course. Seed AFTER db:seed-courses via: npm run db:seed-floor-care-quizzes",
+  "quizzes": [
+    {
+      "quizId": "49cd42e8-3c5e-4a14-9be5-af5fe9d08787",
+      "lessonTitle": "Knowledge check: introduction",
+      "title": "Knowledge check — introduction",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Which of these is maintenance rather than deep cleaning?",
+          "options": [
+            "A heavy periodic soil removal",
+            "Keeping the finished result so the next visit is easier",
+            "Stripping an old sealer off vinyl",
+            "A one-off restorative scrub"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "Why is a childcare floor treated as a higher-risk surface than a back-of-house storeroom?",
+          "options": [
+            "It is always a different material",
+            "Children and vulnerable people use it at close range",
+            "It is cleaned less often",
+            "It is never sealed"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "Which statement about floor care is allowed under our guardrails?",
+          "options": [
+            "It sterilises the floor",
+            "It prevents illness",
+            "It supports hygiene and reduces soil load",
+            "It is medically proven to kill germs"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "quizId": "b909272f-3f41-4202-aa4e-7265db3c3645",
+      "lessonTitle": "Knowledge check: health and hygiene",
+      "title": "Knowledge check — health and hygiene",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Why do we work from clean areas toward dirty areas?",
+          "options": [
+            "It is faster",
+            "To avoid spreading soil into areas already cleaned",
+            "It uses less chemical",
+            "The client prefers it"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "Name a correct adjustment when working in an occupied childcare room.",
+          "options": [
+            "Use the strongest chemical available",
+            "Ventilate, isolate wet areas, and keep chemicals away from children",
+            "Skip signage to save time",
+            "Work faster and skip the rinse"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "Why does clean equipment matter?",
+          "options": [
+            "It looks professional only",
+            "Dirty pads, mops and solution re-deposit soil",
+            "It is a legal requirement to shine tools",
+            "It has no real effect"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "quizId": "f2f81d2f-7dc3-412f-b3b7-9b807c56c2c9",
+      "lessonTitle": "Knowledge check: WHS, PPE and SDS",
+      "title": "Knowledge check — WHS, PPE and SDS",
+      "passPercentage": 90,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "How current must an SDS be to be considered current under the model WHS framework?",
+          "options": [
+            "Every 12 months",
+            "Not more than 5 years old",
+            "Only when the product changes",
+            "Every 10 years"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "Where does PPE sit in the hierarchy of controls?",
+          "options": [
+            "First and most effective",
+            "The last resort, supplementing higher controls",
+            "It replaces engineering controls",
+            "It is not part of the hierarchy"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "You decant a stripper into a spray bottle and will use it later. What must you do?",
+          "options": [
+            "Nothing, decants are exempt",
+            "Label the container on its body before use",
+            "Only label it if asked",
+            "Leave it for the next worker unlabelled"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "Which is correct about Victoria?",
+          "options": [
+            "It uses the model WHS framework",
+            "It operates under its own OHS Act and Regulations",
+            "It has no chemical safety laws",
+            "It does not require SDS"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "quizId": "aa6cd121-ce69-4b3d-8cd0-93da77389a63",
+      "lessonTitle": "Knowledge check: surface identification",
+      "title": "Knowledge check — surface identification",
+      "passPercentage": 85,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Why should you never use a strong acidic cleaner on natural stone?",
+          "options": [
+            "It is too expensive",
+            "It etches and damages the stone",
+            "It does not clean",
+            "It voids the warranty only"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "What must you confirm before stripping a vinyl floor?",
+          "options": [
+            "The colour",
+            "Whether it is sealed",
+            "The brand of mop",
+            "The time of day"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "Where do dilution and cure figures come from?",
+          "options": [
+            "Experience and guesswork",
+            "The SDS/TDS and the relevant standard",
+            "The client",
+            "The thickest coat possible"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "quizId": "5c5b4488-ceb5-4c6f-8992-3158e6354885",
+      "lessonTitle": "Knowledge check: methods",
+      "title": "Knowledge check — methods",
+      "passPercentage": 85,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Where do you get the re-entry time for a freshly sealed floor?",
+          "options": [
+            "From experience",
+            "From the product SDS/TDS",
+            "From the client",
+            "There is a fixed national time"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "When would you choose encapsulation over hot water extraction in a school?",
+          "options": [
+            "Never",
+            "When fast return-to-service in an occupied room matters",
+            "Only outdoors",
+            "When you want the longest dry time"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "Why do we rinse / neutralise after cleaning?",
+          "options": [
+            "To use more product",
+            "To remove residue so the floor does not re-soil or stay slippery",
+            "It is optional",
+            "To add gloss"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "quizId": "85f058f5-e666-46a6-9eba-1e2b305ed201",
+      "lessonTitle": "Knowledge check: machinery operation",
+      "title": "Knowledge check — machinery operation",
+      "passPercentage": 90,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "What do you do with a portable RCD each time you plug in?",
+          "options": [
+            "Nothing",
+            "Operate its test button",
+            "Remove it to save time",
+            "Bypass it if it trips"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "Which pad choice risks damage?",
+          "options": [
+            "Matching the pad to the surface and task",
+            "An aggressive pad on a soft finish",
+            "Checking the pad before use",
+            "Carrying spare pads"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "A circuit keeps tripping the RCD. What is correct?",
+          "options": [
+            "Bypass the RCD",
+            "Stop and report a possible electrical fault",
+            "Tape the breaker on",
+            "Ignore it and continue"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "quizId": "1a4a5d66-1406-46e7-ad86-c18cb0c55962",
+      "lessonTitle": "Knowledge check: maintenance",
+      "title": "Knowledge check — maintenance",
+      "passPercentage": 90,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Name a reason a job can fail that is not about cleaning skill.",
+          "options": [
+            "The client is fussy",
+            "A flat battery, missing tool or damaged hose",
+            "The weather is fine",
+            "The floor is clean"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "A machine fails its pre-start check. What do you do?",
+          "options": [
+            "Take it to site anyway",
+            "Tag it out of service and raise a fault report",
+            "Hide the fault",
+            "Use it once more"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "When must the daily pre-start be completed?",
+          "options": [
+            "After the first job",
+            "Before you leave",
+            "Only weekly",
+            "Only if a machine looks faulty"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "quizId": "3177b729-77f0-4e47-98c6-90bd7cb75884",
+      "lessonTitle": "Knowledge check: site setup",
+      "title": "Knowledge check — site setup",
+      "passPercentage": 90,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "What goes up before you make a floor wet?",
+          "options": [
+            "Nothing",
+            "Wet-floor signage and barricading/exclusion",
+            "A coffee break",
+            "The invoice"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "You must run a lead across a corridor children use. What do you do?",
+          "options": [
+            "Leave it loose",
+            "Route and manage it so it is not a trip hazard, or find another path",
+            "Tell no one",
+            "Run several leads to be safe"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "Signage for a wet floor is...",
+          "options": [
+            "The primary control",
+            "An administrative control that supplements separating people from the wet area",
+            "Optional in occupied buildings",
+            "Only for outdoors"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "quizId": "13977ff6-bf74-4274-b19c-4f67183208bf",
+      "lessonTitle": "Knowledge check: professional conduct",
+      "title": "Knowledge check — professional conduct",
+      "passPercentage": 85,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "A teacher asks you to move because a class is coming through. What is the professional response?",
+          "options": [
+            "Refuse — you were there first",
+            "Respond politely and adjust your work zone",
+            "Ignore them",
+            "Pack up and leave the site"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "When should you communicate a delay or issue?",
+          "options": [
+            "After the job, if asked",
+            "Early and plainly, as soon as you know",
+            "Never — keep it quiet",
+            "Only to other technicians"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "Where should chemicals never be placed on a childcare site?",
+          "options": [
+            "In the locked vehicle",
+            "Within reach of children",
+            "In a secure staging area",
+            "With the rest of the equipment"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "quizId": "5467bf93-f5eb-45b0-8857-905420d315aa",
+      "lessonTitle": "Knowledge check: confidentiality and security",
+      "title": "Knowledge check — confidentiality and security",
+      "passPercentage": 90,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "You need a before/after photo but a child’s drawing with names is on the wall. What do you do?",
+          "options": [
+            "Photograph it anyway",
+            "Frame it out, or record why no photo was taken",
+            "Post it online",
+            "Ask the child to move it"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "A Working With Children check means...",
+          "options": [
+            "You have met every child-safe obligation",
+            "It is a starting point alongside the code of conduct and supervision",
+            "You can be alone with children",
+            "Photos of children are fine"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "How should you behave regarding CCTV on site?",
+          "options": [
+            "Assume it is operating and act accordingly",
+            "Assume there is none",
+            "Cover the cameras",
+            "Only behave when supervised"
+          ],
+          "correctIndex": 0,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "quizId": "d4531d69-920d-4f90-b9e6-693b7879b958",
+      "lessonTitle": "Knowledge check: completion and handover",
+      "title": "Knowledge check — completion and handover",
+      "passPercentage": 85,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "What do you do when you find pre-existing damage during final inspection?",
+          "options": [
+            "Ignore it",
+            "Photograph and record it in the notes",
+            "Repair it yourself",
+            "Blame the last cleaner"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "Why does photo evidence and completion notes matter?",
+          "options": [
+            "They are busywork",
+            "They prove the work and protect us in disputes",
+            "Only the client needs them",
+            "They replace the clean"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "A job cannot be completed to scope. What is correct?",
+          "options": [
+            "Leave quietly",
+            "Document it and escalate to the supervisor",
+            "Invent a completion note",
+            "Do something not in scope to fill time"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        }
+      ]
+    }
+  ]
+}

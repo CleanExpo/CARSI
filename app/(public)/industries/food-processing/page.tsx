@@ -13,7 +13,7 @@ import { FAQSchema } from '@/components/seo/JsonLd';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Food Processing Facility IICRC CEC Training | CARSI',
+  title: 'Food Processing Facility IICRC CEC Training',
   description:
     'HACCP-aligned IICRC CEC training for Australian food processing facilities. AMRT, OCT and CCT courses supporting hygiene compliance, cold storage maintenance, and contamination prevention.',
   keywords: [
@@ -62,7 +62,7 @@ const faqs = [
   {
     question: 'Can food processing staff complete IICRC CEC training while maintaining shift patterns?',
     answer:
-      'Yes. CARSI offers IICRC CEC accredited courses online and self-paced. Staff can complete modules around production schedules and shift rotations. Eligible courses count toward IICRC Continuing Education Credits (CECs) and issue verifiable digital credentials on completion.',
+      'Yes. CARSI offers IICRC-aligned CEC courses online and self-paced. Staff can complete modules around production schedules and shift rotations. Eligible courses count toward IICRC Continuing Education Credits (CECs) and issue verifiable digital credentials on completion.',
   },
 ];
 

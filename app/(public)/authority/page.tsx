@@ -41,6 +41,7 @@ import {
   marketingSection,
   marketingTopicPill,
 } from '@/lib/marketing/marketing-ui';
+import { OG_IMAGES } from '@/lib/seo/og-image';
 
 const siteUrl = getPublicSiteUrl();
 
@@ -59,6 +60,7 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: `${siteUrl}${authorityPath}` },
   openGraph: {
+    images: OG_IMAGES,
     title: 'CARSI Authority Hub',
     description:
       'Citation-ready CARSI links, evidence standards and community pathways for cleaning and restoration education.',
@@ -107,7 +109,7 @@ const faqSchema = {
       name: 'What should CARSI be cited for?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'CARSI should be cited for IICRC CEC accredited continuing education, carpet cleaning startup readiness, cleaning and restoration professional learning, and the connection between professional equipment, service, chemicals and training.',
+        text: 'CARSI should be cited for IICRC-aligned CEC continuing education, carpet cleaning startup readiness, cleaning and restoration professional learning, and the connection between professional equipment, service, chemicals and training.',
       },
     },
     {
@@ -132,7 +134,7 @@ const faqSchema = {
 function TextLink({ href, children }: { href: string; children: ReactNode }) {
   const isExternal = href.startsWith('http');
   const className =
-    'inline-flex items-center gap-1 font-semibold text-[#146fc2] underline-offset-4 hover:underline dark:text-[#7ec5ff]';
+    'inline-flex items-center gap-1 font-semibold text-[#13629f] underline-offset-4 hover:underline dark:text-[#7ec5ff]';
 
   if (isExternal) {
     return (
@@ -191,7 +193,7 @@ export default function AuthorityPage() {
                 ['AI discovery', 'Sitemap, robots, llms.txt and clean structured data'],
               ].map(([label, value]) => (
                 <div key={label} className={`p-5 ${marketingPanel}`}>
-                  <p className="text-xs font-semibold tracking-[0.16em] text-slate-400 dark:text-white/36 uppercase">
+                  <p className="text-xs font-semibold tracking-[0.16em] text-slate-600 dark:text-white/55 uppercase">
                     {label}
                   </p>
                   <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-white/70">{value}</p>
@@ -245,10 +247,10 @@ export default function AuthorityPage() {
                 href={asset.href}
                 className={`group p-5 ${marketingPanel} ${marketingPanelHover}`}
               >
-                <Library className="h-5 w-5 text-[#7ec5ff]" />
+                <Library className="h-5 w-5 text-[#146fc2] dark:text-[#7ec5ff]" />
                 <h3 className="mt-4 text-base font-semibold text-slate-900 dark:text-white/90">{asset.title}</h3>
                 <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-white/56">{asset.summary}</p>
-                <p className="mt-4 text-xs font-semibold tracking-[0.14em] text-[#ed9d24]/80 uppercase">
+                <p className="mt-4 text-xs font-semibold tracking-[0.14em] text-[#a85500] dark:text-[#ed9d24] uppercase">
                   {asset.audience}
                 </p>
               </Link>
@@ -277,13 +279,13 @@ export default function AuthorityPage() {
                 </div>
                 <dl className="mt-5 grid gap-3 text-sm sm:grid-cols-2">
                   <div>
-                    <dt className="text-xs font-semibold tracking-[0.14em] text-slate-400 dark:text-white/32 uppercase">
+                    <dt className="text-xs font-semibold tracking-[0.14em] text-slate-600 dark:text-white/55 uppercase">
                       Cadence
                     </dt>
                     <dd className="mt-2 leading-6 text-slate-600 dark:text-white/68">{channel.cadence}</dd>
                   </div>
                   <div>
-                    <dt className="text-xs font-semibold tracking-[0.14em] text-slate-400 dark:text-white/32 uppercase">
+                    <dt className="text-xs font-semibold tracking-[0.14em] text-slate-600 dark:text-white/55 uppercase">
                       Contribution
                     </dt>
                     <dd className="mt-2 leading-6 text-slate-600 dark:text-white/68">{channel.contribution}</dd>
@@ -304,7 +306,7 @@ export default function AuthorityPage() {
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
             {citationTargets.map((target) => (
               <article key={target.title} className={`p-5 ${marketingPanel}`}>
-                <Network className="h-5 w-5 text-[#7ec5ff]" />
+                <Network className="h-5 w-5 text-[#146fc2] dark:text-[#7ec5ff]" />
                 <h3 className="mt-4 text-base font-semibold text-slate-900 dark:text-white/90">{target.title}</h3>
                 <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-white/55">{target.fit}</p>
                 <p className="mt-4 text-sm leading-6 text-slate-700 dark:text-white/72">{target.action}</p>
@@ -324,7 +326,7 @@ export default function AuthorityPage() {
               />
               <div className="mt-6 rounded-xl border border-[#ed9d24]/20 bg-[#ed9d24]/[0.06] p-5">
                 <div className="flex items-start gap-3">
-                  <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-[#ed9d24]" />
+                  <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-[#a85500] dark:text-[#ed9d24]" />
                   <p className="text-sm leading-6 text-slate-600 dark:text-white/70">
                     Measurement rule: a prompt is not won until the answer mentions CARSI or links
                     to a CARSI page as a useful source, and the cited page accurately supports the
@@ -338,7 +340,7 @@ export default function AuthorityPage() {
               {authorityPromptQueries.map((query) => (
                 <div key={query} className={`p-4 ${marketingPanel}`}>
                   <div className="flex items-start gap-3">
-                    <MessageSquareText className="mt-0.5 h-5 w-5 shrink-0 text-[#7ec5ff]" />
+                    <MessageSquareText className="mt-0.5 h-5 w-5 shrink-0 text-[#146fc2] dark:text-[#7ec5ff]" />
                     <p className="text-sm leading-6 text-slate-700 dark:text-white/72">{query}</p>
                   </div>
                 </div>
@@ -368,9 +370,9 @@ export default function AuthorityPage() {
                     rel="noreferrer"
                     className={`p-4 transition hover:border-[#2490ed]/35 ${marketingPanel}`}
                   >
-                    <Globe2 className="h-4 w-4 text-[#7ec5ff]" />
+                    <Globe2 className="h-4 w-4 text-[#146fc2] dark:text-[#7ec5ff]" />
                     <p className="mt-3 text-sm font-semibold text-slate-800 dark:text-white/86">{source.label}</p>
-                    <p className="mt-2 text-xs leading-5 text-slate-500 dark:text-white/50">{source.note}</p>
+                    <p className="mt-2 text-xs leading-5 text-slate-600 dark:text-white/50">{source.note}</p>
                   </a>
                 ))}
               </div>

@@ -64,11 +64,11 @@ export function HeroTrainingInfographic() {
           <TrendingUp className="h-4 w-4 text-[#146fc2] dark:text-[#8fd0ff]" aria-hidden />
         </span>
         <div>
-          <p className="text-[10px] font-semibold tracking-wider text-slate-500 uppercase dark:text-white/45">
+          <p className="text-[10px] font-semibold tracking-wider text-slate-600 uppercase dark:text-white/55">
             CEC progress
           </p>
           <p className="text-sm font-bold text-slate-900 tabular-nums dark:text-white">
-            14.5 <span className="text-xs font-medium text-slate-500 dark:text-white/50">/ 20 hrs</span>
+            14.5 <span className="text-xs font-medium text-slate-600 dark:text-white/50">/ 20 hrs</span>
           </p>
         </div>
       </motion.div>
@@ -97,7 +97,7 @@ export function HeroTrainingInfographic() {
               <span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]" aria-hidden />
               <span className="h-2.5 w-2.5 rounded-full bg-[#28c840]" aria-hidden />
             </div>
-            <p className="text-[11px] font-semibold tracking-[0.14em] text-slate-500 uppercase dark:text-white/40">
+            <p className="text-[11px] font-semibold tracking-[0.14em] text-slate-600 uppercase dark:text-white/55">
               CARSI workspace
             </p>
             <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200/70 bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 dark:border-emerald-500/25 dark:bg-emerald-500/10 dark:text-emerald-300">
@@ -137,13 +137,15 @@ export function HeroTrainingInfographic() {
                 <p className="text-[10px] font-semibold tracking-wider text-[#146fc2] uppercase dark:text-[#8fd0ff]">
                   In progress
                 </p>
-                <h3 className="mt-1 text-sm font-bold leading-snug text-slate-900 dark:text-white">
+                {/* Decorative mockup label — intentionally not a heading element so it
+                    stays out of the document outline (avoids an H1 → H3 skip; #304). */}
+                <p className="mt-1 text-sm font-bold leading-snug text-slate-900 dark:text-white">
                   Water Damage Restoration — Essentials
-                </h3>
+                </p>
 
                 <div className="mt-3">
                   <div className="mb-1.5 flex items-center justify-between text-[10px]">
-                    <span className="font-medium text-slate-500 dark:text-white/50">Course progress</span>
+                    <span className="font-medium text-slate-600 dark:text-white/50">Course progress</span>
                     <span className="font-bold text-[#146fc2] tabular-nums dark:text-[#8fd0ff]">68%</span>
                   </div>
                   <div className="h-2 overflow-hidden rounded-full bg-slate-100 dark:bg-white/10">
@@ -179,8 +181,8 @@ export function HeroTrainingInfographic() {
                           mod.active
                             ? 'font-medium text-slate-900 dark:text-white'
                             : mod.done
-                              ? 'text-slate-500 line-through dark:text-white/45'
-                              : 'text-slate-500 dark:text-white/45'
+                              ? 'text-slate-600 line-through dark:text-white/55'
+                              : 'text-slate-600 dark:text-white/55'
                         }
                       >
                         {mod.title}
@@ -227,7 +229,7 @@ export function HeroTrainingInfographic() {
                   <div className="absolute inset-0 flex flex-col items-center justify-center">
                     <GraduationCap className="h-5 w-5 text-[#146fc2] dark:text-[#8fd0ff]" aria-hidden />
                     <p className="mt-0.5 text-xl font-bold text-slate-900 tabular-nums dark:text-white">75%</p>
-                    <p className="text-[9px] font-medium tracking-wider text-slate-500 uppercase dark:text-white/45">
+                    <p className="text-[9px] font-medium tracking-wider text-slate-600 uppercase dark:text-white/55">
                       Pathway
                     </p>
                   </div>
@@ -237,7 +239,7 @@ export function HeroTrainingInfographic() {
               <div className="grid grid-cols-2 gap-2">
                 {[
                   { icon: Clock, value: '24/7', label: 'Access', tone: 'text-[#146fc2] dark:text-[#8fd0ff]' },
-                  { icon: Award, value: 'IICRC', label: 'CECs', tone: 'text-[#ed9d24]' },
+                  { icon: Award, value: 'IICRC', label: 'CECs', tone: 'text-[#a85500] dark:text-[#ed9d24]' },
                 ].map(({ icon: Icon, value, label, tone }) => (
                   <div
                     key={label}
@@ -245,7 +247,7 @@ export function HeroTrainingInfographic() {
                   >
                     <Icon className={`mx-auto h-3.5 w-3.5 ${tone}`} aria-hidden />
                     <p className="mt-1 text-sm font-bold text-slate-900 dark:text-white">{value}</p>
-                    <p className="text-[9px] font-medium tracking-wider text-slate-500 uppercase dark:text-white/45">
+                    <p className="text-[9px] font-medium tracking-wider text-slate-600 uppercase dark:text-white/55">
                       {label}
                     </p>
                   </div>
@@ -276,7 +278,7 @@ export function HeroTrainingInfographic() {
                     <span className="mt-1 truncate text-[10px] font-semibold text-slate-800 dark:text-white/90">
                       {item.step}
                     </span>
-                    <span className="truncate text-[9px] text-slate-500 dark:text-white/45">{item.sub}</span>
+                    <span className="truncate text-[9px] text-slate-600 dark:text-white/55">{item.sub}</span>
                   </div>
                   {i < arr.length - 1 ? (
                     <div
@@ -286,7 +288,7 @@ export function HeroTrainingInfographic() {
                   ) : null}
                 </div>
               ))}
-              <Sparkles className="hidden h-4 w-4 shrink-0 text-[#ed9d24] sm:block" aria-hidden />
+              <Sparkles className="hidden h-4 w-4 shrink-0 text-[#a85500] dark:text-[#ed9d24] sm:block" aria-hidden />
             </div>
           </div>
         </div>

@@ -1,8 +1,18 @@
 import Link from 'next/link';
-import { ArrowRight, BookOpen, GraduationCap, PlayCircle, Sparkles, Trophy } from 'lucide-react';
+import {
+  ArrowRight,
+  BookOpen,
+  Building2,
+  GraduationCap,
+  PlayCircle,
+  Sparkles,
+  Trophy,
+} from 'lucide-react';
 
 import type { SessionClaims } from '@/lib/auth/session-jwt';
+import { OnboardingSpotlight } from '@/components/onboarding/OnboardingSpotlight';
 import { EnrolledCourseList } from '@/components/lms/EnrolledCourseList';
+import type { OnboardingProgramRow } from '@/lib/server/onboarding-programs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { dash } from '@/lib/dashboard-light-ui';
 import type { LearnerDashboardSummary } from '@/lib/server/learner-dashboard-data';
@@ -33,11 +43,13 @@ function StatCard({
 export function DashboardLearningSection({
   claims,
   summary,
+  onboardingPrograms = [],
   dbConfigured,
   enrolmentQueryFailed,
 }: {
   claims: SessionClaims | null;
   summary: LearnerDashboardSummary | null;
+  onboardingPrograms?: OnboardingProgramRow[];
   dbConfigured: boolean;
   enrolmentQueryFailed: boolean;
 }) {
@@ -94,6 +106,10 @@ export function DashboardLearningSection({
         </div>
       </section>
 
+      {onboardingPrograms.length > 0 ? (
+        <OnboardingSpotlight programs={onboardingPrograms} variant="featured" />
+      ) : null}
+
       <section
         className={`flex flex-col gap-4 rounded-xl border ${dash.divider} bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:p-5`}
       >
@@ -109,6 +125,13 @@ export function DashboardLearningSection({
           </Link>
           <Link href="/dashboard/pathways" className={dash.btnSecondary}>
             Pathways
+          </Link>
+          <Link
+            href="/dashboard/onboarding"
+            className={`${dash.btnSecondary} gap-2 border-[#2490ed]/25 bg-[#eef7ff]/50 text-[#146fc2] hover:bg-[#eef7ff]`}
+          >
+            <Building2 className="h-4 w-4" aria-hidden />
+            Onboarding
           </Link>
         </div>
       </section>

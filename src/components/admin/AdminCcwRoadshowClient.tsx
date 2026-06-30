@@ -21,9 +21,14 @@ type RegistryRow = {
   contactPhone: string | null;
   ccwCustomerStatus: string | null;
   seatCount: number;
+  calendarSynced: boolean;
   createdAt: string;
   attendees: { fullName: string; yearsExperience: string; goals: string }[];
 };
+
+const surface = 'rounded-2xl border border-white/10 bg-white/[0.04] shadow-[0_1px_0_rgba(255,255,255,0.04)_inset]';
+const mutedText = 'text-white/70';
+const strongText = 'text-white';
 
 export function AdminCcwRoadshowClient() {
   const [cities, setCities] = useState<CitySummary[]>([]);
@@ -82,76 +87,120 @@ export function AdminCcwRoadshowClient() {
     await load();
   }
 
-  if (loading) return <div className="p-6">Loading registry…</div>;
+  async function retryCalendarSync(row: RegistryRow) {
+    const res = await fetch('/api/admin/ccw-roadshow/sync-calendar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ registrationId: row.registrationId }),
+    });
+    if (!res.ok) {
+      const payload = (await res.json().catch(() => ({}))) as { detail?: string };
+      setError(payload.detail || 'Failed to sync calendar');
+      return;
+    }
+    await load();
+  }
+
+  if (loading) return <div className="p-6 text-white">Loading registry…</div>;
 
   return (
-    <div className="space-y-6 p-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">CCW Roadshow Registry</h1>
+    <div className="space-y-6 p-6 text-white">
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <p className="text-[11px] font-semibold tracking-[0.2em] text-white/55 uppercase">
+            Admin registry
+          </p>
+          <h1 className="mt-1 text-2xl font-bold tracking-tight text-white">CCW Roadshow Registry</h1>
+        </div>
         <a
           href="/api/admin/ccw-roadshow?format=csv"
-          className="rounded-lg border px-3 py-2 text-sm font-medium"
+          className="rounded-lg border border-white/15 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/15"
         >
           Export CSV
         </a>
       </div>
 
-      {error && <p className="rounded-lg bg-red-100 px-3 py-2 text-sm text-red-800">{error}</p>}
+      {error && <p className="rounded-lg border border-red-400/30 bg-red-400/10 px-3 py-2 text-sm text-red-100">{error}</p>}
 
       <div className="grid gap-3 sm:grid-cols-2">
         {cities.map((c) => (
-          <div key={c.slug} className="rounded-xl border p-4">
-            <h2 className="text-lg font-semibold">{c.city}</h2>
-            <p className="text-sm text-gray-600">
+          <div key={c.slug} className={`${surface} p-4`}>
+            <h2 className="text-lg font-semibold text-white">{c.city}</h2>
+            <p className="text-sm text-white/70">
               {c.confirmed} / {c.capacity} confirmed · {c.remaining} left · {c.waitlisted} waitlisted
             </p>
           </div>
         ))}
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse text-sm">
-          <thead>
-            <tr className="border-b text-left">
-              <th className="p-2">Event</th>
-              <th className="p-2">Status</th>
-              <th className="p-2">Company</th>
-              <th className="p-2">Contact</th>
-              <th className="p-2">Attendees</th>
-              <th className="p-2">Token</th>
-              <th className="p-2">Action</th>
+      <div className="overflow-x-auto rounded-2xl border border-white/10 bg-[#09111f]/95 shadow-[0_18px_48px_-32px_rgba(0,0,0,0.8)]">
+        <table className="w-full min-w-[1040px] border-collapse text-sm text-white">
+          <thead className="bg-white/[0.06] text-white/85">
+            <tr className="border-b border-white/10 text-left">
+              <th className="p-3 font-semibold">Event</th>
+              <th className="p-3 font-semibold">Status</th>
+              <th className="p-3 font-semibold">Company</th>
+              <th className="p-3 font-semibold">Contact</th>
+              <th className="p-3 font-semibold">Calendar</th>
+              <th className="p-3 font-semibold">Attendees</th>
+              <th className="p-3 font-semibold">Token</th>
+              <th className="p-3 font-semibold">Action</th>
             </tr>
           </thead>
           <tbody>
             {rows.map((row) => (
-              <tr key={row.registrationId} className="border-b align-top">
-                <td className="p-2">{row.eventSlug}</td>
-                <td className="p-2">{row.status}</td>
-                <td className="p-2">{row.companyName ?? '—'}</td>
-                <td className="p-2">
-                  {row.contactEmail}
+              <tr key={row.registrationId} className="border-b border-white/8 align-top last:border-0 odd:bg-white/[0.025] hover:bg-white/[0.055]">
+                <td className={`p-3 font-medium ${strongText}`}>{row.eventSlug}</td>
+                <td className="p-3">
+                  <span className={`rounded-full border px-2 py-1 text-xs font-semibold ${row.status === 'confirmed' ? 'border-emerald-400/30 bg-emerald-400/10 text-emerald-100' : 'border-amber-400/30 bg-amber-400/10 text-amber-100'}`}>
+                    {row.status}
+                  </span>
+                </td>
+                <td className={`p-3 ${strongText}`}>{row.companyName ?? '—'}</td>
+                <td className={`p-3 ${mutedText}`}>
+                  <span className="text-white">{row.contactEmail}</span>
                   <br />
                   {row.contactPhone ?? '—'}
                 </td>
-                <td className="p-2">
-                  <ul className="space-y-1">
+                <td className="p-3">
+                  {row.calendarSynced ? (
+                    <span className="rounded-full border border-green-400/30 bg-green-400/10 px-2 py-1 text-xs font-semibold text-green-100">
+                      Synced
+                    </span>
+                  ) : row.status === 'confirmed' ? (
+                    <button
+                      type="button"
+                      onClick={() => retryCalendarSync(row)}
+                      className="rounded-full border border-amber-300/40 bg-amber-300/10 px-2 py-1 text-xs font-semibold text-amber-100 transition hover:bg-amber-300/15"
+                    >
+                      Not synced · retry
+                    </button>
+                  ) : (
+                    <span className="rounded-full border border-white/10 bg-white/5 px-2 py-1 text-xs font-semibold text-white/65">
+                      Pending
+                    </span>
+                  )}
+                </td>
+                <td className="p-3">
+                  <ul className="space-y-2">
                     {row.attendees.map((a, i) => (
                       <li key={i}>
-                        <span className="font-medium">{a.fullName}</span> · {a.yearsExperience}
+                        <span className="font-semibold text-white">{a.fullName}</span>{' '}
+                        <span className="text-white/65">· {a.yearsExperience}</span>
                         <br />
-                        <span className="text-gray-600">{a.goals}</span>
+                        <span className="text-white/70">{a.goals}</span>
                       </li>
                     ))}
                   </ul>
                 </td>
-                <td className="p-2 font-mono text-xs">{row.freeEntryToken}</td>
-                <td className="p-2">
+                <td className="max-w-[220px] break-all p-3 font-mono text-xs text-white/75">{row.freeEntryToken}</td>
+                <td className="p-3">
                   <div className="flex gap-2">
                     {row.status === 'waitlisted' && (
                       <button
                         type="button"
                         onClick={() => promote(row)}
-                        className="rounded-lg border px-2 py-1 text-xs font-medium"
+                        className="rounded-lg border border-white/15 bg-white/10 px-2 py-1 text-xs font-semibold text-white transition hover:bg-white/15"
                       >
                         Promote
                       </button>
@@ -159,7 +208,7 @@ export function AdminCcwRoadshowClient() {
                     <button
                       type="button"
                       onClick={() => remove(row)}
-                      className="rounded-lg border border-red-300 px-2 py-1 text-xs font-medium text-red-700"
+                      className="rounded-lg border border-red-300/40 bg-red-400/10 px-2 py-1 text-xs font-semibold text-red-100 transition hover:bg-red-400/15"
                     >
                       Delete
                     </button>

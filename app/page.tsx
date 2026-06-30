@@ -32,7 +32,10 @@ import {
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-export const dynamic = 'force-dynamic';
+// ISR: serve a CDN-cached render, refreshed every 5 minutes, instead of SSR on every
+// request (issue #129). Build-safe via the build-phase guard in the catalogue readers;
+// publish busts the cache via revalidatePath in the admin workflow route.
+export const revalidate = 300;
 
 export async function generateMetadata(): Promise<Metadata> {
   const facts = await getPublicCatalogueFacts();
@@ -52,7 +55,7 @@ async function getFeaturedCourses(): Promise<CourseListItem[]> {
 
 const benefits = [
   '24/7 access — learn anytime, anywhere',
-  'IICRC CEC accredited courses',
+  'IICRC-aligned CEC courses',
   'Beginner, intermediate, and advanced levels',
   'Automatic credit tracking',
   'Verifiable digital credentials',
@@ -78,7 +81,7 @@ function buildHomeFaqs(facts: { publishedCourseCount: number; disciplineCodes: s
   const n = facts.publishedCourseCount;
   const d = facts.disciplineCodes.length;
   const coursePhrase =
-    n > 0 ? `${n} published course${n === 1 ? '' : 's'}` : 'IICRC CEC accredited courses';
+    n > 0 ? `${n} published course${n === 1 ? '' : 's'}` : 'IICRC-aligned CEC courses';
   const disciplinePhrase =
     d > 0 ? `${d} IICRC discipline${d === 1 ? '' : 's'}` : 'the core IICRC disciplines';
 
@@ -175,7 +178,7 @@ export default async function Home() {
               </p>
               <Link
                 href="/pathways"
-                className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[#146fc2] hover:text-[#0f5fa8]"
+                className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[#146fc2] hover:text-[#0f5fa8] dark:text-[#8fd0ff] dark:hover:text-[#b8e2ff]"
               >
                 Browse structured pathways <ArrowRight className="h-4 w-4" aria-hidden />
               </Link>
@@ -229,7 +232,7 @@ export default async function Home() {
       </section>
 
       <AnimatedSection label="Multi-industry training" title="Built for every sector you serve">
-        <p className="mb-8 max-w-2xl text-sm leading-relaxed text-slate-600 md:text-base">
+        <p className="mb-8 max-w-2xl text-sm leading-relaxed text-slate-600 md:text-base dark:text-white/70">
           From hospitals to hotels, government facilities to commercial buildings — CARSI provides
           industry-specific training pathways for every sector that needs{' '}
           <AcronymTooltip term="IICRC" /> credentials.
@@ -266,7 +269,7 @@ export default async function Home() {
         <div className="mt-8 text-center">
           <Link
             href="/industries"
-            className="inline-flex items-center gap-2 text-sm font-semibold text-[#146fc2] hover:text-[#0f5fa8]"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-[#146fc2] hover:text-[#0f5fa8] dark:text-[#8fd0ff] dark:hover:text-[#b8e2ff]"
           >
             View all industries <ArrowRight className="h-4 w-4" aria-hidden />
           </Link>

@@ -3,6 +3,7 @@
 import {
   Award,
   BookOpen,
+  Building2,
   ChevronDown,
   FileText,
   GraduationCap,
@@ -14,7 +15,7 @@ import {
   Users,
 } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 
 import { useAuth } from '@/components/auth/auth-provider';
@@ -38,6 +39,7 @@ type NavItem = {
 
 const primaryNav: NavItem[] = [
   { href: '/dashboard', label: 'Overview', icon: LayoutDashboard },
+  { href: '/dashboard/onboarding', label: 'Onboarding', icon: Building2 },
   { href: '/dashboard/courses', label: 'Browse courses', icon: BookOpen },
   { href: '/dashboard/student', label: 'My learning', icon: GraduationCap },
   { href: '/dashboard/student/profile', label: 'Profile', icon: User },
@@ -50,18 +52,12 @@ const primaryNav: NavItem[] = [
 
 export function LMSContextPanel() {
   const pathname = usePathname();
-  const router = useRouter();
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   const [filtersOpen, setFiltersOpen] = useState(false);
 
   const isAdmin = user?.roles?.includes('admin') ?? false;
   const isInstructor = isAdmin || (user?.roles?.includes('instructor') ?? false);
   const section = getDashboardSectionLabel(pathname);
-
-  async function handleSignOut() {
-    await signOut();
-    router.push('/login');
-  }
 
   return (
     <aside
@@ -117,6 +113,16 @@ export function LMSContextPanel() {
         </nav>
 
         <div className="mt-6 border-t border-slate-200 pt-4">
+          <p className="mb-2 px-3 text-[10px] font-semibold tracking-wider text-slate-500 uppercase">
+            Program types
+          </p>
+          <Link
+            href="/dashboard/onboarding"
+            className="mb-3 flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-[#146fc2] transition hover:bg-[#eef7ff]"
+          >
+            <Building2 className="h-4 w-4 shrink-0" aria-hidden />
+            Organisation onboarding
+          </Link>
           <button
             type="button"
             onClick={() => setFiltersOpen((v) => !v)}
@@ -153,15 +159,15 @@ export function LMSContextPanel() {
 
       {/* Fixed footer — sign out always visible */}
       <div className="shrink-0 border-t border-slate-200 px-2 py-3">
-        <button
-          type="button"
-          onClick={() => void handleSignOut()}
+        <a
+          href="/api/auth/logout"
+          data-testid="dashboard-sign-out"
           className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-950"
           title={user?.email ? `Sign out (${user.email})` : 'Sign out'}
         >
           <LogOut className="h-4 w-4 shrink-0 opacity-90" aria-hidden />
           <span className="min-w-0 truncate">Sign out</span>
-        </button>
+        </a>
       </div>
     </aside>
   );

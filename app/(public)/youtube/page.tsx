@@ -18,6 +18,7 @@ import {
   marketingTextSubtle,
   marketingTopicPill,
 } from '@/lib/marketing/marketing-ui';
+import { OG_IMAGES } from '@/lib/seo/og-image';
 
 export const metadata: Metadata = {
   title: 'YouTube Channel Directory | CARSI Industry Hub',
@@ -34,6 +35,7 @@ export const metadata: Metadata = {
     'pest control training',
   ],
   openGraph: {
+    images: OG_IMAGES,
     title: 'YouTube Channel Directory | CARSI Industry Hub',
     description:
       'The best YouTube channels for Australian restoration, HVAC, flooring, and indoor environment professionals — curated by CARSI.',

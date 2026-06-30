@@ -25,7 +25,7 @@ export function PublicNavbar() {
       />
       <div className={`relative ${PUBLIC_SHELL_INNER_CLASS}`}>
         <div className="flex h-[72px] items-center justify-between gap-4">
-          <Link href="/" className="flex shrink-0 items-center gap-2">
+          <Link href="/" aria-label="CARSI home" className="flex shrink-0 items-center gap-2">
             <PublicLogo variant="nav" />
           </Link>
 

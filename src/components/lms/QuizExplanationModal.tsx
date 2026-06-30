@@ -29,9 +29,13 @@ export default function QuizExplanationModal({
     if (!isOpen || !questionId) return;
 
     let cancelled = false;
+    // Reset to a clean loading state each time the modal opens for a new
+    // question, before the fetch below resolves.
+    /* eslint-disable react-hooks/set-state-in-effect */
     setLoading(true);
     setError(null);
     setData(null);
+    /* eslint-enable react-hooks/set-state-in-effect */
 
     const backendUrl = getBackendOrigin();
 

@@ -23,7 +23,7 @@ export const homePathwayItems: HomePathwayItem[] = [
     detail: '8 sub-pillars — equipment, chemistry, quoting and trust',
     cta: 'Explore pathway',
     icon: Compass,
-    accentClass: 'text-[#9a4a00]',
+    accentClass: 'text-[#9a4a00] dark:text-[#f2b14f]',
     borderHoverClass: 'hover:border-[#ed9d24]/40',
   },
   {
@@ -33,7 +33,7 @@ export const homePathwayItems: HomePathwayItem[] = [
     detail: 'Free entry for CCW customers · register for your check-in token',
     cta: 'Book your seat',
     icon: Ticket,
-    accentClass: 'text-emerald-700',
+    accentClass: 'text-emerald-700 dark:text-emerald-400',
     borderHoverClass: 'hover:border-emerald-400/45',
   },
   {
@@ -43,7 +43,7 @@ export const homePathwayItems: HomePathwayItem[] = [
     detail: 'Why attend, who it is for, venues and daily focus',
     cta: 'View program',
     icon: Sparkles,
-    accentClass: 'text-[#146fc2]',
+    accentClass: 'text-[#146fc2] dark:text-[#8fd0ff]',
     borderHoverClass: 'hover:border-[#2490ed]/45',
   },
 ];

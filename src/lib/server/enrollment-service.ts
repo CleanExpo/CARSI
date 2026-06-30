@@ -5,6 +5,29 @@ import { prisma } from '@/lib/prisma';
 import { getOrCreateCourseBySlug } from '@/lib/server/course-catalog-sync';
 import { ensureLmsUserFromClaims } from '@/lib/server/lms-user-sync';
 import { isUniqueConstraintError } from '@/lib/server/db-errors';
+import { decideEnrollmentCompleted } from '@/lib/server/lms-completion';
+
+/**
+ * Quiz gate for completion (Phase 6, 2026-06-29 audit): a course is only
+ * "complete" once every quiz in it has at least one passing attempt by the
+ * student. A course with no quizzes is trivially satisfied.
+ */
+async function allCourseQuizzesPassed(
+  courseId: string,
+  studentId: string,
+): Promise<boolean> {
+  const quizIds = (
+    await prisma.lmsQuiz.findMany({ where: { courseId }, select: { id: true } })
+  ).map((q) => q.id);
+  if (quizIds.length === 0) return true;
+
+  const passed = await prisma.lmsQuizAttempt.findMany({
+    where: { quizId: { in: quizIds }, studentId, passed: true },
+    select: { quizId: true },
+    distinct: ['quizId'],
+  });
+  return passed.length >= quizIds.length;
+}
 
 export type EnrollResult =
   | 'already_enrolled'
@@ -77,7 +100,10 @@ export async function forceCompleteEnrollment(
   const now = new Date();
 
   if (total === 0) {
-    await syncEnrollmentCompletion(en.id, en.studentId, en.courseId, options);
+    await syncEnrollmentCompletion(en.id, en.studentId, en.courseId, {
+    ...options,
+    bypassQuizGate: true,
+  });
     return { lessonsMarked: 0 };
   }
 
@@ -105,7 +131,10 @@ export async function forceCompleteEnrollment(
     }),
   ]);
 
-  await syncEnrollmentCompletion(en.id, en.studentId, en.courseId, options);
+  await syncEnrollmentCompletion(en.id, en.studentId, en.courseId, {
+    ...options,
+    bypassQuizGate: true,
+  });
   return { lessonsMarked: total };
 }
 
@@ -113,7 +142,12 @@ export async function syncEnrollmentCompletion(
   enrollmentId: string,
   studentId: string,
   courseId: string,
-  options?: { initiatedByAdminEmail?: string | null; skipIicrcAutoSubmit?: boolean },
+  options?: {
+    initiatedByAdminEmail?: string | null;
+    skipIicrcAutoSubmit?: boolean;
+    /** Admin force-complete bypasses the quiz gate. */
+    bypassQuizGate?: boolean;
+  },
 ): Promise<void> {
   const { ids, total } = await lessonTotalsForCourse(courseId);
   const prior = await prisma.lmsEnrollment.findUnique({
@@ -136,17 +170,32 @@ export async function syncEnrollmentCompletion(
     where: { studentId, lessonId: { in: ids }, completed: true },
   });
 
-  const allDone = completed >= total;
+  const allLessonsDone = completed >= total;
+  const quizGateSatisfied =
+    options?.bypassQuizGate === true ||
+    (await allCourseQuizzesPassed(courseId, studentId));
+
+  // Certificate/CEC integrity: completion needs lessons AND required quizzes
+  // passed, but an already-completed enrollment is never downgraded.
+  const isCompleted = decideEnrollmentCompleted({
+    allLessonsDone,
+    quizGateSatisfied,
+    wasAlreadyCompleted,
+  });
+
+  // Only fire the (irreversible) IICRC CEC auto-submit on a genuinely new,
+  // fully-gated completion — not on a lesson-count-only or downgrade-protected one.
+  const newlyGatedCompletion = allLessonsDone && quizGateSatisfied && !wasAlreadyCompleted;
 
   await prisma.lmsEnrollment.update({
     where: { id: enrollmentId },
     data: {
-      status: allDone ? 'completed' : 'active',
-      completedAt: allDone ? (prior?.completedAt ?? new Date()) : null,
+      status: isCompleted ? 'completed' : 'active',
+      completedAt: isCompleted ? (prior?.completedAt ?? new Date()) : null,
     },
   });
 
-  if (allDone && !wasAlreadyCompleted && !options?.skipIicrcAutoSubmit) {
+  if (newlyGatedCompletion && !options?.skipIicrcAutoSubmit) {
     const { processIicrcCecSubmissionForEnrollment } = await import(
       '@/lib/server/iicrc-cec-submission'
     );

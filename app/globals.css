@@ -1,5 +1,14 @@
 @import "tailwindcss";
 
+/* Drive `dark:` utilities from the `.dark` class (set by public/theme-init.js +
+   ThemeProvider), NOT the OS `prefers-color-scheme`. Tailwind v4 defaults the
+   `dark:` variant to the media query and ignores `darkMode: 'class'` in the JS
+   config, so without this the theme toggle is bypassed and OS-dark users get
+   `dark:` utilities (e.g. white text) layered on the light, class-based theme —
+   producing white-on-white text. This realigns utilities with the `.dark`
+   token block below and the site's light-first toggle. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* ============================================
    CARSI CAMPUS DESIGN SYSTEM
    Light-first professional LMS theme
@@ -387,6 +396,13 @@
     backdrop-filter: blur(18px) saturate(150%);
     -webkit-backdrop-filter: blur(18px) saturate(150%);
     border: 1px solid rgba(15 23 42 / 0.1);
+  }
+
+  /* Dark theme: keep the panel dark so `dark:text-white/*` content stays legible
+     (the light near-white panel above would otherwise hide white text). #122/a11y. */
+  .dark .glass-strong {
+    background: rgba(11 17 32 / 0.92);
+    border: 1px solid rgba(255 255 255 / 0.1);
   }
 
   /* ── Glass card with interactive state ──── */

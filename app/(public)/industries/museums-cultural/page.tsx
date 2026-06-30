@@ -13,7 +13,7 @@ import { FAQSchema } from '@/components/seo/JsonLd';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Museums & Cultural Institutions IICRC CEC Training | CARSI',
+  title: 'Museums & Cultural Institutions IICRC CEC Training',
   description:
     'Heritage preservation and artifact protection training for Australian museums, galleries, and cultural institutions. AMRT, WRT and ASD courses for climate-controlled environments.',
   keywords: [
@@ -57,7 +57,7 @@ const faqs = [
   {
     question: 'Can gallery and museum staff complete IICRC CEC training online?',
     answer:
-      'Yes. CARSI offers IICRC CEC accredited courses online and self-paced, ideal for museum staff who need to maintain building operations during opening hours. Courses can be completed around exhibition schedules and issue verifiable digital credentials on completion.',
+      'Yes. CARSI offers IICRC-aligned CEC courses online and self-paced, ideal for museum staff who need to maintain building operations during opening hours. Courses can be completed around exhibition schedules and issue verifiable digital credentials on completion.',
   },
   {
     question: 'What is the emergency response protocol for water damage in a museum?',

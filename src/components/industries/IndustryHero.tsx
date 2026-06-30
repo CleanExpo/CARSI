@@ -1,6 +1,9 @@
+import type { CSSProperties } from 'react';
+
 import type { LucideIcon } from 'lucide-react';
 
 import { marketingBody, marketingHeading } from '@/lib/marketing/marketing-ui';
+import { accentTextVars } from './accentContrast';
 import { DisciplinePill } from './DisciplinePill';
 import { GlassStatCard } from './GlassStatCard';
 
@@ -36,16 +39,21 @@ export function IndustryHero({
   disciplines,
   stats,
 }: IndustryHeroProps) {
+  const accent = accentTextVars(accentColor, 'large');
+  const accentBadge = accentTextVars(accentColor, 'normal');
   return (
     <section className="pt-2 pb-12 sm:pb-14">
       <div className="max-w-4xl">
         <div
-          className="mb-6 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-[11px] font-semibold tracking-[0.14em] uppercase"
-          style={{
-            background: `${accentColor}15`,
-            borderColor: `${accentColor}35`,
-            color: accentColor,
-          }}
+          className="mb-6 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-[11px] font-semibold tracking-[0.14em] uppercase text-[color:var(--carsi-badge-l)] dark:text-[color:var(--carsi-badge-d)]"
+          style={
+            {
+              background: `${accentColor}15`,
+              borderColor: `${accentColor}35`,
+              '--carsi-badge-l': accentBadge.light,
+              '--carsi-badge-d': accentBadge.dark,
+            } as CSSProperties
+          }
         >
           <Icon className="h-4 w-4" aria-hidden />
           {industryName}
@@ -54,7 +62,12 @@ export function IndustryHero({
         <h1 className={`max-w-5xl ${marketingHeading}`}>
           {headline}
           <br />
-          <span style={{ color: accentColor }}>{headlineAccent}</span>
+          <span
+            className="text-[color:var(--carsi-accent-l)] dark:text-[color:var(--carsi-accent-d)]"
+            style={{ '--carsi-accent-l': accent.light, '--carsi-accent-d': accent.dark } as CSSProperties}
+          >
+            {headlineAccent}
+          </span>
         </h1>
 
         <p className={`mt-5 max-w-3xl ${marketingBody}`}>{description}</p>

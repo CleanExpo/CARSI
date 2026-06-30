@@ -13,7 +13,7 @@ import { FAQSchema } from '@/components/seo/JsonLd';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Data Centre IICRC CEC Training | CARSI',
+  title: 'Data Centre IICRC CEC Training',
   description:
     'IICRC restoration training for Australian data centres. WRT, ASD and FSRT courses for water damage prevention, climate control recovery, and fire suppression system response.',
   keywords: [
@@ -62,7 +62,7 @@ const faqs = [
   {
     question: 'Can data centre operations staff complete IICRC CEC training without downtime?',
     answer:
-      'Yes. CARSI offers IICRC CEC accredited courses online and self-paced. NOC and facility staff can complete modules during scheduled maintenance windows or between shifts. All courses issue verifiable digital credentials on completion.',
+      'Yes. CARSI offers IICRC-aligned CEC courses online and self-paced. NOC and facility staff can complete modules during scheduled maintenance windows or between shifts. All courses issue verifiable digital credentials on completion.',
   },
 ];
 

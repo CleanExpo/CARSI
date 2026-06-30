@@ -9,7 +9,11 @@ import { CampusTopBar } from '@/components/layout/CampusTopBar';
 import { CourseCompletionBanner } from '@/components/lms/CourseCompletionBanner';
 import { LearnModuleOverview } from '@/components/lms/LearnModuleOverview';
 import { LessonPlayer } from '@/components/lms/LessonPlayer';
-import { QuizPlayer } from '@/components/lms/QuizPlayer';
+import { EnterpriseLessonFooter } from '@/components/onboarding/EnterpriseLessonFooter';
+import { OnboardingCurriculumNav } from '@/components/onboarding/OnboardingCurriculumNav';
+import { OnboardingLearnHeader } from '@/components/onboarding/OnboardingLearnHeader';
+import { OnboardingModuleOverview } from '@/components/onboarding/OnboardingModuleOverview';
+import { EnterpriseQuizResult, QuizPlayer } from '@/components/lms/QuizPlayer';
 import { ProgressSharePrompt } from '@/components/lms/ProgressSharePrompt';
 import { Button } from '@/components/ui/button';
 import { apiClient, ApiClientError } from '@/lib/api/client';
@@ -20,6 +24,7 @@ import {
   type ProgressShareDraft,
   type ProgressShareType,
 } from '@/lib/lms/progress-share-post';
+import { isOnboardingCourse, parseOnboardingMeta } from '@/lib/onboarding/enterprise';
 import { extractQuizIdFromLesson } from '@/lib/lms/quiz-from-lesson';
 
 interface CurriculumLesson {
@@ -39,7 +44,15 @@ interface CurriculumModule {
 }
 
 interface CurriculumResponse {
-  course: { id: string; title: string; slug: string; thumbnail_url: string | null };
+  course: {
+    id: string;
+    title: string;
+    slug: string;
+    thumbnail_url: string | null;
+    category?: string | null;
+    is_onboarding?: boolean;
+    meta?: ReturnType<typeof parseOnboardingMeta>;
+  };
   enrollment_id: string;
   modules: CurriculumModule[];
 }
@@ -103,6 +116,7 @@ export function LearnCourseShell({ slug }: { slug: string }) {
   const [loadingLesson, setLoadingLesson] = useState(false);
   const [lessonError, setLessonError] = useState<string | null>(null);
   const [savingComplete, setSavingComplete] = useState(false);
+  const [completeError, setCompleteError] = useState<string | null>(null);
   const [noteText, setNoteText] = useState('');
   const [loadingNote, setLoadingNote] = useState(false);
   const [savingNote, setSavingNote] = useState(false);
@@ -357,6 +371,8 @@ export function LearnCourseShell({ slug }: { slug: string }) {
 
   async function toggleComplete(completed: boolean) {
     if (!activeLessonId) return;
+    const lessonToAdvance = completed ? nextLesson : null;
+    setCompleteError(null);
     setSavingComplete(true);
     try {
       await apiClient.patch(`/api/lms/lessons/${encodeURIComponent(activeLessonId)}/progress`, {
@@ -437,10 +453,21 @@ export function LearnCourseShell({ slug }: { slug: string }) {
         router.push(
           `/dashboard/credentials/${encodeURIComponent(certificateEnrollmentId)}?completed=1&course=${encodeURIComponent(slug)}`,
         );
-      } else if (nextShare) {
-        setShareDraft(nextShare);
-        if (nextShareKey) shownShareKeysRef.current.add(nextShareKey);
+      } else {
+        if (nextShare) {
+          setShareDraft(nextShare);
+          if (nextShareKey) shownShareKeysRef.current.add(nextShareKey);
+        }
+        if (lessonToAdvance) {
+          selectLesson(lessonToAdvance.id);
+        }
       }
+    } catch (e) {
+      setCompleteError(
+        e instanceof ApiClientError
+          ? e.message
+          : 'Could not save your progress. Please check your connection and try again.'
+      );
     } finally {
       setSavingComplete(false);
     }
@@ -521,6 +548,40 @@ export function LearnCourseShell({ slug }: { slug: string }) {
 
   const currentMeta = flatLessons.find((l) => l.id === activeLessonId);
 
+  const lessonPosition = useMemo(() => {
+    if (!activeLessonId || flatLessons.length === 0) return null;
+    const idx = flatLessons.findIndex((l) => l.id === activeLessonId);
+    return idx >= 0 ? { current: idx + 1, total: flatLessons.length } : null;
+  }, [activeLessonId, flatLessons]);
+
+  const moduleLessonPosition = useMemo(() => {
+    if (!activeModule || !activeLessonId) return null;
+    const idx = activeModule.lessons.findIndex((l) => l.id === activeLessonId);
+    return idx >= 0
+      ? { current: idx + 1, total: activeModule.lessons.length }
+      : null;
+  }, [activeModule, activeLessonId]);
+
+  const isOnboardingProgram =
+    curriculum?.course.is_onboarding ??
+    (curriculum
+      ? isOnboardingCourse({
+          slug: curriculum.course.slug,
+          category: curriculum.course.category,
+          meta: curriculum.course.meta,
+        })
+      : false);
+
+  const onboardingProgressPct = useMemo(() => {
+    if (!curriculum) return 0;
+    const total = curriculum.modules.reduce((s, m) => s + m.lessons.length, 0);
+    const done = curriculum.modules.reduce(
+      (s, m) => s + m.lessons.filter((l) => l.completed).length,
+      0
+    );
+    return total > 0 ? Math.round((done / total) * 100) : 0;
+  }, [curriculum]);
+
   if (loadingCurriculum) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center gap-2 text-slate-500">
@@ -555,18 +616,39 @@ export function LearnCourseShell({ slug }: { slug: string }) {
   return (
     <div className="flex w-full min-w-0 max-w-none flex-col gap-6">
       <CampusTopBar
-        section="Campus · Learn"
-        breadcrumbs={[
-          { label: 'My learning', href: '/dashboard/student' },
-          { label: curriculum?.course.title ?? 'Course' },
-        ]}
+        section={isOnboardingProgram ? 'Onboarding · Learn' : 'Campus · Learn'}
+        breadcrumbs={
+          isOnboardingProgram
+            ? [
+                { label: 'Onboarding', href: '/dashboard/onboarding' },
+                {
+                  label: curriculum.course.title.replace(/^CARSI Maintenance Company Onboarding — /, ''),
+                  href: `/dashboard/onboarding/${curriculum.course.slug}`,
+                },
+                { label: 'Training' },
+              ]
+            : [
+                { label: 'My learning', href: '/dashboard/student' },
+                { label: curriculum?.course.title ?? 'Course' },
+              ]
+        }
       />
+      {isOnboardingProgram ? (
+        <OnboardingLearnHeader
+          company={curriculum.course.meta?.company}
+          programName={curriculum.course.meta?.program}
+          pricing={curriculum.course.meta?.pricing}
+          progressPercent={onboardingProgressPct}
+          hubHref={`/dashboard/onboarding/${curriculum.course.slug}`}
+        />
+      ) : null}
       {allLessonsComplete ? (
         <CourseCompletionBanner
           courseTitle={curriculum.course.title}
           enrollmentId={curriculum.enrollment_id}
           courseSlug={curriculum.course.slug}
           onShare={openCourseSharePrompt}
+          variant={isOnboardingProgram ? 'enterprise' : 'default'}
         />
       ) : null}
       <ProgressSharePrompt draft={shareDraft} onClose={() => setShareDraft(null)} />
@@ -610,15 +692,40 @@ export function LearnCourseShell({ slug }: { slug: string }) {
       ) : null}
 
       <div className="flex min-h-[calc(100vh-6rem)] w-full max-w-none flex-col gap-8 lg:flex-row lg:gap-10">
-      <aside className="w-full shrink-0 lg:w-[min(100%,280px)]">
+      <aside className="w-full shrink-0 lg:w-[min(100%,300px)]">
+        {isOnboardingProgram ? (
+          <OnboardingCurriculumNav
+            courseSlug={curriculum.course.slug}
+            courseTitle={curriculum.course.title}
+            modules={curriculum.modules.map((m) => ({
+              id: m.id,
+              title: m.title,
+              lessons: m.lessons.map((l) => ({
+                id: l.id,
+                title: l.title,
+                completed: l.completed,
+                content_type: l.content_type,
+              })),
+            }))}
+            activeLessonId={activeLessonId}
+            activeModuleId={activeModuleId}
+            view={view}
+            onSelectLesson={selectLesson}
+            onSelectModule={selectModuleOverview}
+          />
+        ) : (
         <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm lg:sticky lg:top-6">
           <div className="mb-5 space-y-2 border-b border-slate-200 pb-4">
             <Link
-              href="/dashboard/student"
+              href={
+                isOnboardingProgram
+                  ? `/dashboard/onboarding/${curriculum.course.slug}`
+                  : '/dashboard/student'
+              }
               className="inline-flex items-center gap-1.5 text-xs font-medium tracking-wider text-[#146fc2] uppercase hover:underline"
             >
               <Home className="h-3.5 w-3.5" aria-hidden />
-              My Learning
+              {isOnboardingProgram ? 'Program hub' : 'My Learning'}
             </Link>
             <h1 className="text-balance text-lg font-semibold leading-snug text-slate-900">
               {curriculum.course.title}
@@ -633,8 +740,8 @@ export function LearnCourseShell({ slug }: { slug: string }) {
               const moduleOverviewActive = view === 'module' && activeModuleId === mod.id;
               return (
                 <div key={mod.id}>
-                  <p className="mb-2 flex items-center gap-2 text-[10px] font-semibold tracking-widest text-slate-400 uppercase">
-                    <span className="font-mono text-slate-500">M{modNum}</span>
+                  <p className="mb-2 flex items-center gap-2 text-[10px] font-semibold tracking-widest text-slate-600 uppercase">
+                    <span className="font-mono text-slate-600">M{modNum}</span>
                     <span className="min-w-0 truncate">{mod.title}</span>
                   </p>
                   <div className="mb-2">
@@ -683,6 +790,7 @@ export function LearnCourseShell({ slug }: { slug: string }) {
             })}
           </nav>
         </div>
+        )}
       </aside>
 
       <div className="min-w-0 flex-1">
@@ -691,6 +799,21 @@ export function LearnCourseShell({ slug }: { slug: string }) {
             This module is not part of this course, or the link is out of date.
           </p>
         ) : view === 'module' && activeModule ? (
+          isOnboardingProgram ? (
+            <OnboardingModuleOverview
+              courseTitle={curriculum.course.title}
+              module={{
+                ...activeModule,
+                lessons: activeModule.lessons.map((l) => ({
+                  ...l,
+                  content_type: l.content_type,
+                })),
+              }}
+              moduleNumber={moduleIndex}
+              totalModules={curriculum.modules.length}
+              onSelectLesson={selectLesson}
+            />
+          ) : (
           <LearnModuleOverview
             courseTitle={curriculum.course.title}
             module={activeModule}
@@ -698,9 +821,10 @@ export function LearnCourseShell({ slug }: { slug: string }) {
             totalModules={curriculum.modules.length}
             onSelectLesson={selectLesson}
           />
+          )
         ) : view === 'lesson' && activeLessonId ? (
           <>
-            {activeModule ? (
+            {!isOnboardingProgram && activeModule ? (
               <div className="mb-6 flex flex-wrap items-center gap-2 border-b border-slate-200 pb-4 text-sm text-slate-500">
                 <span className="rounded-md bg-slate-100 px-2 py-0.5 font-mono text-[11px] text-slate-600">
                   Module {moduleIndex}
@@ -718,7 +842,13 @@ export function LearnCourseShell({ slug }: { slug: string }) {
             ) : lessonError ? (
               <p className="text-red-600">{lessonError}</p>
             ) : lessonDetail ? (
-              <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-8">
+              <article
+                className={
+                  isOnboardingProgram
+                    ? 'min-w-0'
+                    : 'rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-8'
+                }
+              >
                 {loadingQuiz ? (
                   <div className="mb-6 flex items-center gap-2 text-slate-500">
                     <Loader2 className="h-5 w-5 animate-spin" />
@@ -727,31 +857,87 @@ export function LearnCourseShell({ slug }: { slug: string }) {
                 ) : null}
                 {quizData ? (
                   <>
-                    <QuizPlayer quiz={quizData} onSubmit={(a) => void submitQuiz(a)} />
+                    {!(isOnboardingProgram && quizResult) ? (
+                      <QuizPlayer
+                        quiz={quizData}
+                        variant={isOnboardingProgram ? 'enterprise' : 'default'}
+                        onSubmit={(a) => void submitQuiz(a)}
+                      />
+                    ) : null}
                     {quizResult ? (
-                      <p
-                        className={`mt-6 rounded-lg border px-4 py-3 text-sm ${
-                          quizResult.passed
-                            ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-800'
-                            : 'border-amber-500/40 bg-amber-500/10 text-amber-800'
-                        }`}
-                      >
-                        Score: {quizResult.score_percent}% —{' '}
-                        {quizResult.passed ? 'Passed' : 'Not passed yet'}
-                      </p>
+                      isOnboardingProgram ? (
+                        <div className="mt-6">
+                          <EnterpriseQuizResult
+                            passed={quizResult.passed}
+                            scorePercent={quizResult.score_percent}
+                            passPercentage={quizData.pass_percentage}
+                            onContinue={() => {
+                              // Must pass to advance; a failed check re-opens the
+                              // quiz for another attempt instead of moving on.
+                              if (quizResult.passed) {
+                                if (nextLesson) selectLesson(nextLesson.id);
+                              } else {
+                                setQuizResult(null);
+                              }
+                            }}
+                          />
+                        </div>
+                      ) : (
+                        <p
+                          className={`mt-6 rounded-lg border px-4 py-3 text-sm ${
+                            quizResult.passed
+                              ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-800'
+                              : 'border-amber-500/40 bg-amber-500/10 text-amber-800'
+                          }`}
+                        >
+                          Score: {quizResult.score_percent}% —{' '}
+                          {quizResult.passed ? 'Passed' : 'Not passed yet'}
+                        </p>
+                      )
                     ) : null}
                   </>
                 ) : (
                 <LessonPlayer
                   lesson={lessonDetail.lesson}
                   resources={lessonDetail.resources}
+                  variant={isOnboardingProgram ? 'enterprise' : 'default'}
+                  moduleTitle={activeModule?.title}
+                  completed={currentMeta?.completed}
+                  lessonNumber={lessonPosition?.current}
+                  totalLessons={lessonPosition?.total}
+                  moduleLessonNumber={moduleLessonPosition?.current}
+                  moduleLessonTotal={moduleLessonPosition?.total}
+                  courseProgressPercent={isOnboardingProgram ? onboardingProgressPct : null}
                   footer={
+                    isOnboardingProgram ? (
+                      <EnterpriseLessonFooter
+                        noteText={noteText}
+                        onNoteChange={setNoteText}
+                        noteEditorRef={noteEditorRef}
+                        onFormat={applyFormat}
+                        onSaveNote={() => void saveLessonNote()}
+                        onDeleteNote={() => void deleteLessonNote()}
+                        loadingNote={loadingNote}
+                        savingNote={savingNote}
+                        deletingNote={deletingNote}
+                        noteStatus={noteStatus}
+                        onPrevious={() => prevLesson && selectLesson(prevLesson.id)}
+                        onNext={() => nextLesson && selectLesson(nextLesson.id)}
+                        hasPrevious={Boolean(prevLesson)}
+                        hasNext={Boolean(nextLesson)}
+                        onShare={openLessonSharePrompt}
+                        showShare={Boolean(currentMeta?.completed)}
+                        onComplete={() => void toggleComplete(true)}
+                        savingComplete={savingComplete}
+                        completed={Boolean(currentMeta?.completed)}
+                      />
+                    ) : (
                     <>
                       <div className="mt-8 rounded-xl border border-slate-200 bg-white p-4 sm:p-5">
                         <div className="mb-2 flex items-center justify-between gap-2">
                           <h3 className="text-sm font-semibold text-slate-800">My notes</h3>
                           {loadingNote ? (
-                            <span className="text-xs text-slate-400">Loading…</span>
+                            <span className="text-xs text-slate-600">Loading…</span>
                           ) : null}
                         </div>
                         <div className="mb-2 flex flex-wrap gap-1.5">
@@ -787,7 +973,7 @@ export function LearnCourseShell({ slug }: { slug: string }) {
                             type="button"
                             onClick={() => void saveLessonNote()}
                             disabled={savingNote || deletingNote || loadingNote}
-                            className="h-8 rounded-md bg-[#2490ed] px-3 text-xs text-white hover:bg-[#1e7bc9] disabled:opacity-50"
+                            className="h-8 rounded-md bg-[#146fc2] px-3 text-xs text-white hover:bg-[#0f5fa8] disabled:opacity-50"
                           >
                             {savingNote ? 'Saving…' : 'Save note'}
                           </Button>
@@ -853,8 +1039,17 @@ export function LearnCourseShell({ slug }: { slug: string }) {
                             {currentMeta?.completed ? 'Lesson completed' : 'Mark lesson complete'}
                           </Button>
                         </div>
+                        {completeError ? (
+                          <p
+                            role="alert"
+                            className="text-right text-sm text-red-600"
+                          >
+                            {completeError}
+                          </p>
+                        ) : null}
                       </div>
                     </>
+                    )
                   }
                 />
                 )}

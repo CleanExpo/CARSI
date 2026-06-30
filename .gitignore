@@ -103,6 +103,9 @@ ai-review/screenshots/
 # Demo screencast pipeline (generated recordings, composites, results manifest)
 output/demo-screencast/
 
+# Generated print artifacts (regenerated on demand; not source)
+output/pdf/
+
 # Course voiceover pipeline — resumable run state (briefs themselves are committed)
 data/voice/course-voice-results.json
 
@@ -114,7 +117,7 @@ assets/artlist/
 .claude/data/minion-state.json
 .worktrees/
 .env*.local
-# WordPress migration export (regenerate with: pnpm wp:migrate). courses.json is tracked for deploy seeds.
+# WordPress migration export (legacy one-time migration; live scrape retired — see docs/agent-framework/CONNECTORS.md). courses.json is tracked for deploy seeds.
 data/wordpress-export/*
 !data/wordpress-export/courses.json
 !data/wordpress-export/carsi.WordPress.2026-04-05.xml.gz

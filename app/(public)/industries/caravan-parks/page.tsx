@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'IICRC CEC Mould & Restoration Training for Caravan Parks | CARSI Australia',
   description:
-    'Protect guests and comply with state Fair Trading obligations. IICRC AMRT, CRT, and WRT training for Australian caravan parks and holiday accommodation. Online, CEC accredited.',
+    'Protect guests and comply with state Fair Trading obligations. IICRC AMRT, CRT, and WRT training for Australian caravan parks and holiday accommodation. Online, CEC-aligned.',
   keywords: [
     'caravan park mould training Australia',
     'holiday park IICRC certification',

@@ -19,7 +19,7 @@ export const PUBLIC_CHROME_LINK_CLASS =
 export const PUBLIC_CHROME_BODY_CLASS = 'text-white/62';
 
 export const PUBLIC_CHROME_HEADING_CLASS =
-  'text-[10px] font-semibold tracking-wide text-white/42 uppercase';
+  'text-[10px] font-semibold tracking-wide text-white/55 uppercase';
 
 export const PUBLIC_CHROME_AUTH_BAND_CLASS =
   'relative overflow-hidden rounded-2xl border border-white/[0.08] bg-gradient-to-b from-[#152238] via-[#0f172a] to-[#0d1524] px-6 py-10 shadow-[0_20px_50px_-28px_rgba(15,23,42,0.65)]';

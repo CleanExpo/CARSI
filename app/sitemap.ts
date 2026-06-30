@@ -4,10 +4,20 @@ import { authorityPath } from '@/lib/marketing/authority';
 import { ccwRoadshowPath } from '@/lib/marketing/ccw-roadshow';
 import { startSmartBasePath, startSmartPages } from '@/lib/marketing/start-smart';
 import { getPublishedCourseSlugsFromDatabase } from '@/lib/server/public-courses-list';
+import { isBuildPhase } from '@/lib/server/build-phase';
 
-export const dynamic = 'force-dynamic';
+// ISR: regenerate every 5 minutes instead of on every crawl (issue #129). Build-safe
+// because getCourses/getPathways short-circuit during the build phase.
+export const revalidate = 300;
 
 const baseUrl = getPublicSiteUrl();
+
+// Stable lastmod for static pages: evaluated once per server lifetime (≈ deploy
+// time) instead of `new Date()` per request. Emitting request-time "now" on every
+// crawl makes Google distrust and ignore lastmod entirely — a stable, deploy-
+// pinned date is honest and usable. Content-backed routes below still use their
+// own `updated_at`.
+const STATIC_LASTMOD = new Date();
 
 // Static pages with their priorities and change frequencies
 const staticPages = [
@@ -35,6 +45,8 @@ const staticPages = [
   { path: '/terms', priority: 0.25, changeFreq: 'yearly' as const },
   { path: authorityPath, priority: 0.82, changeFreq: 'weekly' as const },
   { path: ccwRoadshowPath, priority: 0.9, changeFreq: 'daily' as const },
+  { path: '/ccw-melbourne', priority: 0.85, changeFreq: 'daily' as const },
+  { path: '/ccw-sydney', priority: 0.85, changeFreq: 'daily' as const },
   { path: startSmartBasePath, priority: 0.85, changeFreq: 'weekly' as const },
   ...startSmartPages.map((page) => ({
     path: `${startSmartBasePath}/${page.slug}`,
@@ -78,6 +90,7 @@ const staticPages = [
 ];
 
 async function getCourses(): Promise<{ slug: string; updated_at?: string }[]> {
+  if (isBuildPhase()) return [];
   const backendUrl = getBackendOrigin();
   try {
     const res = await fetch(`${backendUrl}/api/lms/courses?limit=500`, {
@@ -92,6 +105,7 @@ async function getCourses(): Promise<{ slug: string; updated_at?: string }[]> {
 }
 
 async function getPathways(): Promise<{ slug: string; updated_at?: string }[]> {
+  if (isBuildPhase()) return [];
   const backendUrl = getBackendOrigin();
   try {
     const res = await fetch(`${backendUrl}/api/lms/pathways`, {
@@ -109,7 +123,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Static pages
   const staticEntries: MetadataRoute.Sitemap = staticPages.map((page) => ({
     url: `${baseUrl}${page.path}`,
-    lastModified: new Date(),
+    lastModified: STATIC_LASTMOD,
     changeFrequency: page.changeFreq,
     priority: page.priority,
   }));
@@ -122,7 +136,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     lastModified:
       'updated_at' in course && course.updated_at
         ? new Date(course.updated_at)
-        : new Date(),
+        : STATIC_LASTMOD,
     changeFrequency: 'weekly' as const,
     priority: 0.8,
   }));
@@ -131,7 +145,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const pathways = await getPathways();
   const pathwayEntries: MetadataRoute.Sitemap = pathways.map((pathway) => ({
     url: `${baseUrl}/pathways/${pathway.slug}`,
-    lastModified: pathway.updated_at ? new Date(pathway.updated_at) : new Date(),
+    lastModified: pathway.updated_at ? new Date(pathway.updated_at) : STATIC_LASTMOD,
     changeFrequency: 'weekly' as const,
     priority: 0.7,
   }));

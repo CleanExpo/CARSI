@@ -37,9 +37,6 @@ import {
   marketingPanel,
   marketingPanelHover,
   marketingSection,
-  marketingTextMuted,
-  marketingTextStrong,
-  marketingTextSubtle,
 } from '@/lib/marketing/marketing-ui';
 import {
   getStartSmartOperatingConnections,
@@ -74,7 +71,7 @@ function SourceList({ sources }: { sources: StartSmartSource[] }) {
               <p className="text-sm font-semibold text-slate-900 dark:text-white/90">{source.label}</p>
               <p className="mt-2 text-xs leading-5 text-slate-600 dark:text-white/55">{source.note}</p>
             </div>
-            <ExternalLink className="mt-0.5 h-4 w-4 shrink-0 text-[#7ec5ff]" aria-hidden="true" />
+            <ExternalLink className="mt-0.5 h-4 w-4 shrink-0 text-[#146fc2] dark:text-[#7ec5ff]" aria-hidden="true" />
           </div>
         </a>
       ))}
@@ -84,7 +81,7 @@ function SourceList({ sources }: { sources: StartSmartSource[] }) {
 
 function Pill({ children }: { children: string }) {
   return (
-    <span className="rounded-full border border-[#2490ed]/20 bg-[#2490ed]/10 px-3 py-1 text-xs font-medium text-[#7ec5ff]">
+    <span className="rounded-full border border-[#2490ed]/20 bg-[#2490ed]/10 px-3 py-1 text-xs font-medium text-[#146fc2] dark:text-[#7ec5ff]">
       {children}
     </span>
   );
@@ -120,7 +117,7 @@ function ReadinessPillarCard({ pillar }: { pillar: StartSmartReadinessPillar }) 
       <p className="mt-4 border-t border-slate-200/80 dark:border-white/[0.07] pt-4 text-xs leading-5 text-slate-600 dark:text-white/55">
         Proof question: {pillar.proofQuestion}
       </p>
-      <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[#7ec5ff]">
+      <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[#146fc2] dark:text-[#7ec5ff]">
         Connect this piece <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
       </span>
     </Link>
@@ -146,7 +143,7 @@ function ProfessionalReadinessLoop({ compact = false }: { compact?: boolean }) {
         <div className="mt-5 grid gap-3 md:grid-cols-2">
           {startSmartReadinessRules.map((rule) => (
             <div key={rule} className={`flex gap-3 p-4 ${marketingPanel}`}>
-              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#7ec5ff]" aria-hidden="true" />
+              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#146fc2] dark:text-[#7ec5ff]" aria-hidden="true" />
               <p className="text-sm leading-6 text-slate-600 dark:text-white/68">
                 {rule}
               </p>
@@ -164,7 +161,7 @@ function OperatingConnectionCard({ connection }: { connection: StartSmartOperati
   return (
     <div className={`p-5 ${marketingPanel}`}>
       <div className="flex items-start gap-3">
-        <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[#2490ed]/25 bg-[#2490ed]/10 text-[#7ec5ff]`}>
+        <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[#2490ed]/25 bg-[#2490ed]/10 text-[#146fc2] dark:text-[#7ec5ff]`}>
           <Icon className="h-4 w-4" aria-hidden="true" />
         </div>
         <div>
@@ -238,7 +235,7 @@ function LeadPathCard({ path }: { path: StartSmartLeadPath }) {
       <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-white/55">
         {path.body}
       </p>
-      <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[#7ec5ff]">
+      <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[#146fc2] dark:text-[#7ec5ff]">
         {path.label} <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
       </span>
     </Link>
@@ -358,7 +355,7 @@ export function StartSmartHub({ siteUrl }: { siteUrl: string }) {
                 <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-white/55">
                   {page.directAnswer}
                 </p>
-                <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[#7ec5ff]">
+                <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[#146fc2] dark:text-[#7ec5ff]">
                   Read page <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
                 </span>
               </Link>
@@ -389,7 +386,7 @@ export function StartSmartHub({ siteUrl }: { siteUrl: string }) {
             },
           ].map(({ icon: Icon, title, body }) => (
             <div key={title} className={`p-5 ${marketingPanel}`}>
-              <Icon className="h-6 w-6 text-[#7ec5ff]" aria-hidden="true" />
+              <Icon className="h-6 w-6 text-[#146fc2] dark:text-[#7ec5ff]" aria-hidden="true" />
               <h2 className="mt-4 text-lg font-semibold text-slate-900 dark:text-white/90">
                 {title}
               </h2>
@@ -477,7 +474,7 @@ export function StartSmartDetail({ page, siteUrl }: { page: StartSmartPage; site
           <div>
             <Link
               href={startSmartBasePath}
-              className="mb-5 inline-flex items-center gap-2 text-sm font-semibold text-[#7ec5ff]"
+              className="mb-5 inline-flex items-center gap-2 text-sm font-semibold text-[#146fc2] dark:text-[#7ec5ff]"
             >
               Back to Start Smart
             </Link>
@@ -525,7 +522,7 @@ export function StartSmartDetail({ page, siteUrl }: { page: StartSmartPage; site
 
         <section className={`grid gap-5 ${marketingSection} lg:grid-cols-3`}>
           <div className={`p-5 lg:col-span-1 ${marketingPanel}`}>
-            <AlertTriangle className="h-6 w-6 text-[#ed9d24]" aria-hidden="true" />
+            <AlertTriangle className="h-6 w-6 text-[#a85500] dark:text-[#ed9d24]" aria-hidden="true" />
             <h2 className="mt-4 text-xl font-semibold text-slate-900 dark:text-white/90">
               Beginner risks to avoid
             </h2>
@@ -540,14 +537,14 @@ export function StartSmartDetail({ page, siteUrl }: { page: StartSmartPage; site
           </div>
 
           <div className={`p-5 lg:col-span-2 ${marketingPanel}`}>
-            <BookOpen className="h-6 w-6 text-[#7ec5ff]" aria-hidden="true" />
+            <BookOpen className="h-6 w-6 text-[#146fc2] dark:text-[#7ec5ff]" aria-hidden="true" />
             <h2 className="mt-4 text-xl font-semibold text-slate-900 dark:text-white/90">
               What to learn first
             </h2>
             <div className="mt-5 grid gap-3 sm:grid-cols-2">
               {page.learnFirst.map((item) => (
                 <div key={item} className="flex gap-3 rounded-xl border border-slate-200/80 dark:border-white/6 bg-slate-50 dark:bg-white/[0.03] p-3 text-sm leading-6 text-slate-600 dark:text-white/55">
-                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#7ec5ff]" aria-hidden="true" />
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#146fc2] dark:text-[#7ec5ff]" aria-hidden="true" />
                   <span>{item}</span>
                 </div>
               ))}
@@ -568,7 +565,7 @@ export function StartSmartDetail({ page, siteUrl }: { page: StartSmartPage; site
           <div className="grid gap-4 md:grid-cols-4">
             {page.actionSteps.map((step, index) => (
               <div key={step} className={`p-5 ${marketingPanel}`}>
-                <div className="mb-4 flex h-9 w-9 items-center justify-center rounded-xl border border-[#2490ed]/25 bg-[#2490ed]/10 font-mono text-sm text-[#7ec5ff]">
+                <div className="mb-4 flex h-9 w-9 items-center justify-center rounded-xl border border-[#2490ed]/25 bg-[#2490ed]/10 font-mono text-sm text-[#146fc2] dark:text-[#7ec5ff]">
                   {index + 1}
                 </div>
                 <p className="text-sm leading-6 text-slate-600 dark:text-white/68">
@@ -587,7 +584,7 @@ export function StartSmartDetail({ page, siteUrl }: { page: StartSmartPage; site
 
         <section className={`grid gap-5 ${marketingSection} lg:grid-cols-[0.8fr_1.2fr]`}>
           <div className={`p-6 ${marketingPanel}`}>
-            <Target className="h-6 w-6 text-[#7ec5ff]" aria-hidden="true" />
+            <Target className="h-6 w-6 text-[#146fc2] dark:text-[#7ec5ff]" aria-hidden="true" />
             <h2 className="mt-4 text-xl font-semibold text-slate-900 dark:text-white/90">
               {page.cta.title}
             </h2>
@@ -603,7 +600,7 @@ export function StartSmartDetail({ page, siteUrl }: { page: StartSmartPage; site
           </div>
 
           <div className={`p-6 ${marketingPanel}`}>
-            <HelpCircle className="h-6 w-6 text-[#ed9d24]" aria-hidden="true" />
+            <HelpCircle className="h-6 w-6 text-[#a85500] dark:text-[#ed9d24]" aria-hidden="true" />
             <h2 className="mt-4 text-xl font-semibold text-slate-900 dark:text-white/90">
               Questions this page answers
             </h2>
@@ -640,7 +637,7 @@ export function StartSmartDetail({ page, siteUrl }: { page: StartSmartPage; site
                 href={`${startSmartBasePath}/${related.slug}`}
                 className={`group p-4 ${marketingPanel} ${marketingPanelHover}`}
               >
-                <GraduationCap className="h-5 w-5 text-[#7ec5ff]" aria-hidden="true" />
+                <GraduationCap className="h-5 w-5 text-[#146fc2] dark:text-[#7ec5ff]" aria-hidden="true" />
                 <p className="mt-3 text-sm font-semibold text-slate-900 dark:text-white/90">
                   {related.shortTitle}
                 </p>
@@ -662,7 +659,7 @@ export function StartSmartIndexingNote() {
   return (
     <div className={`p-5 ${marketingPanel}`}>
       <div className="flex items-start gap-3">
-        <ClipboardCheck className="mt-0.5 h-5 w-5 shrink-0 text-[#7ec5ff]" aria-hidden="true" />
+        <ClipboardCheck className="mt-0.5 h-5 w-5 shrink-0 text-[#146fc2] dark:text-[#7ec5ff]" aria-hidden="true" />
         <div>
           <p className="text-sm font-semibold text-slate-900 dark:text-white/90">
             Indexing setup

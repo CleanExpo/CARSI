@@ -5,7 +5,6 @@ import { fileURLToPath } from 'node:url';
 import type { NextConfig } from 'next';
 
 const require = createRequire(import.meta.url);
-const withPWA = require('next-pwa');
 
 // Pin the workspace root to this project. Without this, Next infers the root
 // from the nearest lockfile and can wrongly select a parent directory (e.g. a
@@ -33,62 +32,27 @@ function webpackReactAliases(config: {
   return config;
 }
 
-const pwaConfig = withPWA({
-  dest: 'public',
-  disable: process.env.NODE_ENV === 'development',
-  register: true,
-  skipWaiting: true,
-  runtimeCaching: [
-    {
-      urlPattern: /\/courses\/.+\/lessons\/.+/,
-      handler: 'NetworkFirst',
-      options: {
-        cacheName: 'lesson-content',
-        expiration: { maxEntries: 20, maxAgeSeconds: 86400 },
-      },
-    },
-    /** Lesson detail API — NetworkFirst so techs can reopen last lessons offline after one online visit. */
-    {
-      urlPattern: /\/api\/lms\/lessons\//,
-      handler: 'NetworkFirst',
-      method: 'GET',
-      options: {
-        cacheName: 'lms-lesson-api',
-        networkTimeoutSeconds: 12,
-        expiration: { maxEntries: 48, maxAgeSeconds: 7 * 86400 },
-      },
-    },
-    /** Curriculum tree for /dashboard/learn/[slug]. */
-    {
-      urlPattern: /\/api\/lms\/courses\/[^/]+\/curriculum/,
-      handler: 'NetworkFirst',
-      method: 'GET',
-      options: {
-        cacheName: 'lms-curriculum-api',
-        networkTimeoutSeconds: 12,
-        expiration: { maxEntries: 24, maxAgeSeconds: 7 * 86400 },
-      },
-    },
-    {
-      urlPattern: /\/dashboard\/learn\//,
-      handler: 'NetworkFirst',
-      options: {
-        cacheName: 'learn-pages',
-        networkTimeoutSeconds: 8,
-        expiration: { maxEntries: 16, maxAgeSeconds: 86400 },
-      },
-    },
-  ],
-});
+// NOTE: this project does NOT use a build-time PWA plugin. The service worker is
+// hand-written at `public/sw.js` (carsi-v3, with push-notification handling) and
+// registered by `src/components/lms/ServiceWorkerRegistration.tsx`. `next-pwa`
+// was removed (#121): it generated nothing under the Turbopack build and only
+// pulled a vulnerable workbox/serialize-javascript dependency chain. To add
+// build-time precaching later, adopt a Turbopack-compatible approach (e.g.
+// @serwist/next) rather than reinstating next-pwa.
 
 const nextConfig: NextConfig = {
   output: 'standalone',
   reactStrictMode: true,
+  poweredByHeader: false,
   devIndicators: false,
   async redirects() {
     return [
       { source: '/student', destination: '/dashboard/student', permanent: true },
       { source: '/student/:path*', destination: '/dashboard/student/:path*', permanent: true },
+      // CCW Business Growth Days convenience redirects → the combined event page.
+      // (/ccw-melbourne and /ccw-sydney are real dedicated pages, not redirects.)
+      { source: '/ccw-roadshow', destination: '/events/ccw-roadshow', permanent: false },
+      { source: '/roadshow', destination: '/events/ccw-roadshow', permanent: false },
     ];
   },
   typescript: {
@@ -103,32 +67,10 @@ const nextConfig: NextConfig = {
     unoptimized: true,
   },
   async headers() {
-    const isDev = process.env.NODE_ENV === 'development';
-    const scriptSrc = isDev
-      ? "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://js.stripe.com"
-      : "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://js.stripe.com";
-
-    const appOrigin = (
-      process.env.NEXT_PUBLIC_APP_URL ||
-      process.env.NEXT_PUBLIC_FRONTEND_URL ||
-      'http://localhost:3000'
-    ).trim();
-    const connectParts = [
-      "'self'",
-      appOrigin,
-      'https://api.stripe.com',
-      ...(isDev
-        ? [
-            'ws:',
-            'wss:',
-            'http://localhost:3000',
-            'http://localhost:3001',
-            'http://127.0.0.1:3000',
-            'http://127.0.0.1:3001',
-          ]
-        : []),
-    ];
-
+    // NOTE: Content-Security-Policy is set per-request (with a nonce) in
+    // middleware (src/lib/api/middleware.ts + src/lib/security/csp.ts) so it can
+    // use 'nonce-<n>' 'strict-dynamic' instead of 'unsafe-inline'. The remaining
+    // static security headers stay here.
     return [
       {
         source: '/privacy',
@@ -136,6 +78,28 @@ const nextConfig: NextConfig = {
           {
             key: 'Cache-Control',
             value: 'no-store, no-cache, must-revalidate, proxy-revalidate',
+          },
+        ],
+      },
+      {
+        // Static Open Graph / share images are effectively immutable content.
+        // Give them a long cache so social crawlers and the CDN don't refetch
+        // them on every share. (Scoped to image assets only — NOT '/:path*',
+        // which would risk caching authenticated HTML.)
+        source: '/og-image.png',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=86400, stale-while-revalidate=604800',
+          },
+        ],
+      },
+      {
+        source: '/images/og/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=86400, stale-while-revalidate=604800',
           },
         ],
       },
@@ -159,19 +123,6 @@ const nextConfig: NextConfig = {
         source: '/:path*',
         headers: [
           {
-            key: 'Content-Security-Policy',
-            value: [
-              "default-src 'self'",
-              scriptSrc,
-              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-              "font-src 'self' https://fonts.gstatic.com",
-              "img-src 'self' data: https: blob:",
-              `connect-src ${connectParts.join(' ')}`,
-              'frame-src https://js.stripe.com https://hooks.stripe.com',
-              "frame-ancestors 'none'",
-            ].join('; '),
-          },
-          {
             key: 'X-Frame-Options',
             value: 'DENY',
           },
@@ -188,8 +139,10 @@ const nextConfig: NextConfig = {
             value: 'camera=(), microphone=(), geolocation=()',
           },
           {
+            // Deprecated header; the legacy XSS auditor it enables has its own
+            // bugs. Modern guidance is to disable it and rely on CSP.
             key: 'X-XSS-Protection',
-            value: '1; mode=block',
+            value: '0',
           },
           {
             key: 'Strict-Transport-Security',
@@ -201,4 +154,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default pwaConfig(nextConfig);
+export default nextConfig;

@@ -49,7 +49,7 @@ export function PushNotificationPrompt() {
       <div className="flex shrink-0 items-center gap-3">
         <button
           onClick={handleEnable}
-          className="rounded-lg bg-[#2490ed] px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-[#1a7fd4]"
+          className="rounded-lg bg-[#146fc2] px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-[#0f5fa8]"
         >
           Enable Notifications
         </button>

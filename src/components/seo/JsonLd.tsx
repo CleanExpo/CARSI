@@ -3,6 +3,8 @@
 // Note: Using dangerouslySetInnerHTML is the standard pattern for JSON-LD in React.
 // Content is server-generated from controlled objects, not user input.
 
+import { buildFounderPersonSchema } from '@/lib/schema/founder';
+
 interface OrganizationSchemaProps {
   name?: string;
   url?: string;
@@ -13,7 +15,7 @@ interface OrganizationSchemaProps {
 export function OrganizationSchema({
   name = 'CARSI',
   url = 'https://carsi.com.au',
-  logo = 'https://carsi.com.au/logo1.png',
+  logo = 'https://carsi.com.au/logo.png',
   sameAs = [
     'https://www.facebook.com/CARSIaus',
     'https://www.linkedin.com/company/carsiaus',
@@ -31,7 +33,7 @@ export function OrganizationSchema({
     logo,
     image: `${url}/og-image.png`,
     description:
-      "Australia's leading online training platform for disaster restoration professionals. IICRC CEC accredited courses in water, fire, and carpet restoration delivered to students Australia-wide.",
+      "Australia's leading online training platform for disaster restoration professionals. IICRC-aligned CEC courses in water, fire, and carpet restoration delivered to students Australia-wide.",
     telephone: '+61457123005',
     email: 'support@carsi.com.au',
     // SAB: postal address only — no street address exposed publicly
@@ -96,6 +98,8 @@ export function OrganizationSchema({
       'building restoration',
     ],
     sameAs,
+    // E-E-A-T: name the real person behind CARSI as a resolvable entity.
+    founder: buildFounderPersonSchema(),
     contactPoint: {
       '@type': 'ContactPoint',
       telephone: '+61457123005',
@@ -178,13 +182,18 @@ function courseOffer(url: string, price: number | undefined) {
 }
 
 function selfPacedCourseInstance(name: string, url: string, duration?: string | null) {
-  return {
+  const instance: Record<string, unknown> = {
     '@type': 'CourseInstance',
     name: `${name} online self-paced course`,
     courseMode: 'online',
     url,
-    courseWorkload: duration ? `PT${duration}H` : 'Self-paced online course; workload varies by learner',
   };
+  // Google requires courseWorkload as an ISO-8601 duration; emit it only when a
+  // real duration is known, otherwise omit (free text is ignored/flagged).
+  if (duration) {
+    instance.courseWorkload = `PT${duration}H`;
+  }
+  return instance;
 }
 
 export function CourseSchema({
@@ -552,6 +561,7 @@ interface NewsArticleSchemaProps {
   url: string;
   image?: string;
   datePublished?: string;
+  dateModified?: string;
   authorName?: string;
   publisherName?: string;
   keywords?: string[];
@@ -563,6 +573,7 @@ export function NewsArticleSchema({
   url,
   image,
   datePublished,
+  dateModified,
   authorName,
   publisherName,
   keywords,
@@ -583,6 +594,9 @@ export function NewsArticleSchema({
   if (description) schema.description = description;
   if (image) schema.image = image;
   if (datePublished) schema.datePublished = datePublished;
+  // Freshness signal: fall back to datePublished when no separate modified date
+  // exists (article unchanged since publish — a valid equality per Google).
+  if (dateModified ?? datePublished) schema.dateModified = dateModified ?? datePublished;
   if (authorName) {
     schema.author = { '@type': 'Person', name: authorName };
   }

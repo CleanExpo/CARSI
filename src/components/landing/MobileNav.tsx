@@ -117,7 +117,7 @@ export default function MobileNav() {
             >
               <nav className="p-4" aria-label="Mobile navigation">
                 <div className="mb-4 flex items-center justify-between px-4">
-                  <span className="text-xs font-semibold tracking-wide text-slate-500 uppercase">
+                  <span className="text-xs font-semibold tracking-wide text-slate-600 uppercase">
                     Appearance
                   </span>
                   <PublicThemeToggle variant="light" />

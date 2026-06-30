@@ -1,11 +1,13 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
+import fontkit from '@pdf-lib/fontkit';
 import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from 'pdf-lib';
 
 import { formatCecHoursForCertificate } from '@/lib/cec-display';
 import { formatCredentialRef } from '@/lib/credential-format';
 import { IICRC_DISCIPLINE_LONG } from '@/lib/iicrc-discipline-display';
+import { certificateHolderDisplayName } from '@/lib/server/certificate-name';
 import { resolveLmsCourseCecHours, type LmsCourseCecSource } from '@/lib/server/course-cec-hours';
 
 const DISCIPLINE_HEX: Record<string, string> = {
@@ -88,6 +90,40 @@ async function loadLogoPng(): Promise<Uint8Array | null> {
     return await readFile(p);
   } catch {
     return null;
+  }
+}
+
+/**
+ * Noto Sans (Latin/Greek/Cyrillic + diacritics) used as a Unicode fallback for
+ * learner-supplied text. The pdf-lib StandardFonts (Helvetica/Times) encode via
+ * WinAnsi and THROW on any codepoint outside Latin-1 — e.g. a Māori macron (ā,
+ * U+0101) — which would otherwise crash certificate generation for the first
+ * Indigenous/multilingual name. Embedded with subset:true so only the glyphs
+ * actually drawn are written into the PDF (keeps the file small).
+ */
+async function loadNotoSansTtf(): Promise<Uint8Array | null> {
+  try {
+    const p = path.join(process.cwd(), 'public', 'fonts', 'NotoSans-Regular.ttf');
+    return await readFile(p);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Pick the font for a string: keep the elegant Times/Helvetica face when the
+ * text is WinAnsi-encodable (the common Latin case), and fall back to the
+ * embedded Unicode face only when the preferred font cannot encode a character.
+ * Returns `preferred` when no Unicode font is available so Latin certs still
+ * render exactly as before.
+ */
+function fontFor(text: string, preferred: PDFFont, unicode: PDFFont | null): PDFFont {
+  if (!unicode) return preferred;
+  try {
+    preferred.encodeText(text);
+    return preferred;
+  } catch {
+    return unicode;
   }
 }
 
@@ -174,9 +210,10 @@ function drawProgrammeDetailsBand(
     notice: string;
     helvetica: PDFFont;
     helveticaBold: PDFFont;
+    unicodeFont: PDFFont | null;
   }
 ): number {
-  const { yTop, xMid, margin, contentW, discRgb, items, credentialRef, notice, helvetica, helveticaBold } =
+  const { yTop, xMid, margin, contentW, discRgb, items, credentialRef, notice, helvetica, helveticaBold, unicodeFont } =
     opts;
 
   page.drawLine({
@@ -212,7 +249,7 @@ function drawProgrammeDetailsBand(
     drawCenteredText(page, item.label.toUpperCase(), cx, y, 6, helveticaBold, labelColor);
     const valLine = wrapLines(item.value, 24)[0] ?? item.value;
     const valSize = valLine.length > 26 ? 7 : 7.5;
-    drawCenteredText(page, valLine, cx, y - 12, valSize, helvetica, valueColor);
+    drawCenteredText(page, valLine, cx, y - 12, valSize, fontFor(valLine, helvetica, unicodeFont), valueColor);
   });
 
   y -= 30;
@@ -284,6 +321,7 @@ export async function buildCompletionCertificatePdf(
   const cardFill = rgb(10 / 255, 14 / 255, 20 / 255);
 
   const doc = await PDFDocument.create();
+  doc.registerFontkit(fontkit);
   const page = doc.addPage([PAGE_W, PAGE_H]);
   const xMid = PAGE_W / 2;
 
@@ -292,6 +330,9 @@ export async function buildCompletionCertificatePdf(
   const timesRoman = await doc.embedFont(StandardFonts.TimesRoman);
   const helvetica = await doc.embedFont(StandardFonts.Helvetica);
   const helveticaBold = await doc.embedFont(StandardFonts.HelveticaBold);
+
+  const notoBytes = await loadNotoSansTtf();
+  const unicodeFont = notoBytes ? await doc.embedFont(notoBytes, { subset: true }) : null;
 
   page.drawRectangle({ x: 0, y: 0, width: PAGE_W, height: PAGE_H, color: cardFill });
   page.drawRectangle({
@@ -391,7 +432,15 @@ export async function buildCompletionCertificatePdf(
   y -= 24;
 
   const nameSize = 22;
-  drawCenteredText(page, studentName, xMid, y, nameSize, timesItalic, rgb(126 / 255, 197 / 255, 1));
+  drawCenteredText(
+    page,
+    studentName,
+    xMid,
+    y,
+    nameSize,
+    fontFor(studentName, timesItalic, unicodeFont),
+    rgb(126 / 255, 197 / 255, 1)
+  );
   y -= nameSize + 16;
 
   const bodyMuted = rgb(0.62, 0.64, 0.68);
@@ -408,7 +457,7 @@ export async function buildCompletionCertificatePdf(
 
   const courseLines = wrapLines(courseTitle, 72);
   for (const line of courseLines) {
-    drawCenteredText(page, line, xMid, y, 13, timesBold, rgb(0.93, 0.94, 0.96));
+    drawCenteredText(page, line, xMid, y, 13, fontFor(line, timesBold, unicodeFont), rgb(0.93, 0.94, 0.96));
     y -= 17;
   }
   y -= 8;
@@ -439,6 +488,7 @@ export async function buildCompletionCertificatePdf(
       'Designed for IICRC Continuing Education Credits (CECs) where applicable. Retain this certificate with your renewal records.',
     helvetica,
     helveticaBold,
+    unicodeFont,
   });
 
   const footerTop = FOOTER_ROW_Y + 44;
@@ -461,7 +511,7 @@ export async function buildCompletionCertificatePdf(
   drawVerificationSeal(page, col2Center, footerTop - 18, 19, discRgb, helveticaBold, helvetica);
   drawCenteredText(
     page,
-    'IICRC CEC accredited · carsi.com.au',
+    'IICRC-aligned CEC · carsi.com.au',
     col2Center,
     footerTop - 44,
     6,
@@ -536,7 +586,7 @@ export function completionCertificateDataFromEnrollment(
   verificationOrigin?: string
 ): CompletionCertificateData {
   void verificationOrigin;
-  const studentName = row.student.fullName?.trim() || row.student.email;
+  const studentName = certificateHolderDisplayName(row.student);
   const cecSource: LmsCourseCecSource = {
     slug: row.course.slug,
     cecHours:

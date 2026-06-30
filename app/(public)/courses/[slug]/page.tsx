@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { Metadata } from 'next';
 import { CoursesIndexLink } from '@/components/lms/CoursesIndexLink';
 import { EnrolButton } from '@/components/lms/EnrolButton';
@@ -8,10 +8,26 @@ import { CourseThumbnail } from '@/components/lms/CourseThumbnail';
 import { CourseHubContext } from '@/components/lms/CourseHubContext';
 import { CourseSchema, BreadcrumbSchema } from '@/components/seo';
 import { getBackendOrigin, getPublicSiteUrl } from '@/lib/env/public-url';
+import { isOnboardingCourse } from '@/lib/onboarding/enterprise';
 import { normalizePublicAssetUrl } from '@/lib/remote-image';
+import { OG_IMAGES, OG_IMAGE_URLS } from '@/lib/seo/og-image';
 import { getPublishedCourseDetailBySlugFromDatabase } from '@/lib/server/public-courses-list';
+import { stripLegacyPurchaseCta } from '@/lib/lms/format-course-body';
 
-export const dynamic = 'force-dynamic';
+// ISR: render each course detail on demand and cache for 5 minutes (issue #129).
+// Build-safe via the build-phase guard in getCourse's DB reader; publish busts the
+// cache via revalidatePath in the admin workflow route.
+export const revalidate = 300;
+
+/**
+ * Strip the legacy WooCommerce "Already Purchased This Course? → Access Here" lead block
+ * (issue #126) from a loaded course so it leaks into neither the rendered hero nor the SEO
+ * metadata / JSON-LD schema (which read `description` directly, bypassing CourseFormattedBody).
+ */
+function sanitizeCourseDetail<T extends { description?: string | null }>(course: T): T {
+  if (!course.description) return course;
+  return { ...course, description: stripLegacyPurchaseCta(course.description) };
+}
 
 interface CourseDetail {
   id: string;
@@ -46,7 +62,7 @@ export async function getCourse(slug: string): Promise<CourseDetail | null> {
   if (process.env.DATABASE_URL?.trim()) {
     try {
       const fromDb = await getPublishedCourseDetailBySlugFromDatabase(slug);
-      if (fromDb) return fromDb;
+      if (fromDb) return sanitizeCourseDetail(fromDb);
     } catch (e) {
       console.error('[courses/[slug]] Failed to load course from database', e);
     }
@@ -61,7 +77,7 @@ export async function getCourse(slug: string): Promise<CourseDetail | null> {
     });
     if (res.status === 404) return null;
     if (!res.ok) return null;
-    return (await res.json()) as CourseDetail;
+    return sanitizeCourseDetail((await res.json()) as CourseDetail);
   } catch {
     return null;
   }
@@ -110,7 +126,7 @@ export async function generateMetadata({
       siteName: 'CARSI',
       images: thumbnailUrl
         ? [{ url: thumbnailUrl, width: 1200, height: 630, alt: course.title }]
-        : undefined,
+        : OG_IMAGES,
       locale: 'en_AU',
       type: 'website',
     },
@@ -118,7 +134,7 @@ export async function generateMetadata({
       card: 'summary_large_image',
       title: `${course.title} | CARSI`,
       description,
-      images: thumbnailUrl ? [thumbnailUrl] : undefined,
+      images: thumbnailUrl ? [thumbnailUrl] : OG_IMAGE_URLS,
     },
     alternates: {
       canonical: `${siteUrl}/courses/${slug}`,
@@ -264,6 +280,10 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
 
   if (!course) notFound();
 
+  if (isOnboardingCourse({ slug: course.slug, category: course.category })) {
+    redirect(`/dashboard/onboarding/${course.slug}`);
+  }
+
   const priceNum = parseFloat(course.price_aud);
   const price = course.is_free || priceNum === 0 ? 'Free' : `$${priceNum.toFixed(0)}`;
   const discipline = course.iicrc_discipline?.toUpperCase() ?? '';
@@ -310,7 +330,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
               <nav className="mb-8" aria-label="Breadcrumb">
                 <ol
                   className="flex items-center gap-1.5 text-xs"
-                  style={{ color: 'rgba(255,255,255,0.35)' }}
+                  style={{ color: 'rgba(255,255,255,0.6)' }}
                 >
                   <li>
                     <Link href="/" className="transition-colors hover:text-white/60">
@@ -435,7 +455,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                         >
                           {course.instructor.full_name}
                         </p>
-                        <p className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                        <p className="text-xs" style={{ color: 'rgba(255,255,255,0.6)' }}>
                           Course Instructor
                         </p>
                       </div>
@@ -451,7 +471,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                       <p className="text-lg font-bold" style={{ color: '#ed9d24' }}>
                         {price}
                       </p>
-                      <p className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                      <p className="text-xs" style={{ color: 'rgba(255,255,255,0.6)' }}>
                         {course.is_free || priceNum === 0 ? 'No cost' : 'AUD'}
                       </p>
                     </div>
@@ -460,7 +480,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                         <p className="text-lg font-bold" style={{ color: '#00F5FF' }}>
                           {course.cec_hours}
                         </p>
-                        <p className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                        <p className="text-xs" style={{ color: 'rgba(255,255,255,0.6)' }}>
                           CECs
                         </p>
                       </div>
@@ -470,7 +490,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                         <p className="text-lg font-bold" style={{ color: 'rgba(255,255,255,0.8)' }}>
                           {course.duration_hours}h
                         </p>
-                        <p className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                        <p className="text-xs" style={{ color: 'rgba(255,255,255,0.6)' }}>
                           Duration
                         </p>
                       </div>
@@ -517,13 +537,13 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                         {!course.is_free && priceNum > 0 && (
                           <span
                             className="ml-2 text-sm"
-                            style={{ color: 'rgba(255,255,255,0.35)' }}
+                            style={{ color: 'rgba(255,255,255,0.6)' }}
                           >
                             AUD
                           </span>
                         )}
                       </div>
-                      <p className="mb-6 text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                      <p className="mb-6 text-xs" style={{ color: 'rgba(255,255,255,0.6)' }}>
                         {course.is_free || priceNum === 0
                           ? 'Free access — no payment required'
                           : 'One-time payment — lifetime access'}
@@ -541,7 +561,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                       {/* Pro subscription note */}
                       <p
                         className="mb-6 text-center text-xs"
-                        style={{ color: 'rgba(255,255,255,0.3)' }}
+                        style={{ color: 'rgba(255,255,255,0.7)' }}
                       >
                         or included with{' '}
                         <Link
@@ -564,7 +584,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                       <div className="space-y-3">
                         {course.duration_hours && (
                           <div className="flex items-center justify-between text-sm">
-                            <span style={{ color: 'rgba(255,255,255,0.4)' }}>Duration</span>
+                            <span style={{ color: 'rgba(255,255,255,0.65)' }}>Duration</span>
                             <span style={{ color: 'rgba(255,255,255,0.8)' }}>
                               {course.duration_hours} hours
                             </span>
@@ -572,32 +592,32 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                         )}
                         {course.cec_hours && (
                           <div className="flex items-center justify-between text-sm">
-                            <span style={{ color: 'rgba(255,255,255,0.4)' }}>CECs awarded</span>
+                            <span style={{ color: 'rgba(255,255,255,0.65)' }}>CECs awarded</span>
                             <span style={{ color: '#00F5FF' }}>{course.cec_hours} credits</span>
                           </div>
                         )}
                         {course.level && (
                           <div className="flex items-center justify-between text-sm">
-                            <span style={{ color: 'rgba(255,255,255,0.4)' }}>Level</span>
+                            <span style={{ color: 'rgba(255,255,255,0.65)' }}>Level</span>
                             <span style={{ color: 'rgba(255,255,255,0.8)' }}>{course.level}</span>
                           </div>
                         )}
                         {course.iicrc_discipline && (
                           <div className="flex items-center justify-between text-sm">
-                            <span style={{ color: 'rgba(255,255,255,0.4)' }}>Discipline</span>
+                            <span style={{ color: 'rgba(255,255,255,0.65)' }}>Discipline</span>
                             <span style={{ color: '#ed9d24' }}>
                               IICRC {course.iicrc_discipline}
                             </span>
                           </div>
                         )}
                         <div className="flex items-center justify-between text-sm">
-                          <span style={{ color: 'rgba(255,255,255,0.4)' }}>Format</span>
+                          <span style={{ color: 'rgba(255,255,255,0.65)' }}>Format</span>
                           <span style={{ color: 'rgba(255,255,255,0.8)' }}>
                             Online / Self-paced
                           </span>
                         </div>
                         <div className="flex items-center justify-between text-sm">
-                          <span style={{ color: 'rgba(255,255,255,0.4)' }}>Certificate</span>
+                          <span style={{ color: 'rgba(255,255,255,0.65)' }}>Certificate</span>
                           <span style={{ color: 'rgba(255,255,255,0.8)' }}>Digital credential</span>
                         </div>
                       </div>
@@ -720,7 +740,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                     <div key={item.label} className="p-5" style={{ background: '#060a14' }}>
                       <p
                         className="mb-1 text-xs font-medium tracking-wider uppercase"
-                        style={{ color: 'rgba(255,255,255,0.3)' }}
+                        style={{ color: 'rgba(255,255,255,0.7)' }}
                       >
                         {item.label}
                       </p>
@@ -793,7 +813,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                       </h3>
                       <p
                         className="text-xs leading-relaxed"
-                        style={{ color: 'rgba(255,255,255,0.45)' }}
+                        style={{ color: 'rgba(255,255,255,0.7)' }}
                       >
                         Receive a verifiable digital credential with a unique public URL. Share
                         directly to LinkedIn or include in job applications.
@@ -817,7 +837,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                       </h3>
                       <p
                         className="text-xs leading-relaxed"
-                        style={{ color: 'rgba(255,255,255,0.45)' }}
+                        style={{ color: 'rgba(255,255,255,0.7)' }}
                       >
                         {course.cec_hours
                           ? `This course awards ${course.cec_hours} IICRC Continuing Education Credits. Credits are automatically recorded and exportable for IICRC submission.`
@@ -855,7 +875,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
               </h2>
               <p
                 className="mx-auto mb-8 max-w-lg text-sm leading-relaxed"
-                style={{ color: 'rgba(255,255,255,0.45)' }}
+                style={{ color: 'rgba(255,255,255,0.7)' }}
               >
                 {course.cec_hours
                   ? `Earn ${course.cec_hours} IICRC CECs and receive a verifiable digital credential upon completion of ${course.title}.`
@@ -866,7 +886,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                 <div className="w-full">
                   <EnrolButton slug={course.slug} priceAud={priceNum} isFree={course.is_free} />
                 </div>
-                <p className="text-xs" style={{ color: 'rgba(255,255,255,0.25)' }}>
+                <p className="text-xs" style={{ color: 'rgba(255,255,255,0.7)' }}>
                   {course.is_free || priceNum === 0
                     ? 'Free — no payment or credit card required'
                     : 'Secure checkout — or access all courses with CARSI Pro'}
@@ -876,7 +896,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
               <div className="mt-8">
                 <CoursesIndexLink
                   className="text-sm underline transition-colors"
-                  style={{ color: 'rgba(255,255,255,0.35)' }}
+                  style={{ color: 'rgba(255,255,255,0.6)' }}
                 >
                   Browse all courses
                 </CoursesIndexLink>

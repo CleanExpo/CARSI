@@ -25,7 +25,10 @@ export function useElapsedTime(
 
   // Update elapsed time
   useEffect(() => {
-    // Initial calculation
+    // Seed/reset the displayed value when the target window changes. Intentional
+    // timer reset, not a render cascade — the "pure" alternative would read the
+    // clock during render instead.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setElapsed(calculateElapsed());
 
     // If there's an end time, don't start interval
@@ -64,6 +67,7 @@ export function useCountdown(estimatedSeconds: number | null): UseElapsedTimeRes
 
   useEffect(() => {
     if (estimatedSeconds === null || estimatedSeconds <= 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- reset countdown when the estimate clears
       setRemaining(0);
       return;
     }

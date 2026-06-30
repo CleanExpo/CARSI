@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'IICRC CEC Training for Plumbers & Trades | CARSI Australia',
   description:
-    'Turn water damage call-outs into drying contracts. IICRC WRT and ASD certification for Australian plumbers and trade contractors — online, self-paced, CEC accredited.',
+    'Turn water damage call-outs into drying contracts. IICRC WRT and ASD certification for Australian plumbers and trade contractors — online, self-paced, CEC-aligned.',
   keywords: [
     'IICRC CEC training plumbers Australia',
     'WRT certification plumbing',
@@ -62,7 +62,7 @@ const faqs = [
   {
     question: 'Can I complete IICRC CEC training online while running a plumbing business?',
     answer:
-      'Yes. CARSI offers IICRC CEC accredited courses online and fully self-paced. There are no fixed class times — modules are completed between jobs, in the evening, or on weekends. Most WRT courses take 8–12 hours of study, which plumbers typically spread over two weeks. On completion, you receive a verifiable digital credential and IICRC Continuing Education Credits (CECs) towards your professional standing.',
+      'Yes. CARSI offers IICRC-aligned CEC courses online and fully self-paced. There are no fixed class times — modules are completed between jobs, in the evening, or on weekends. Most WRT courses take 8–12 hours of study, which plumbers typically spread over two weeks. On completion, you receive a verifiable digital credential and IICRC Continuing Education Credits (CECs) towards your professional standing.',
   },
 ];
 
@@ -128,7 +128,7 @@ export default async function PlumbingTradesIndustryPage() {
         subtitle="Plumbing & Trades Training"
         title="Trades Restoration Bundle"
         price="$245"
-        description="WRT + ASD training for licensed plumbers and trade contractors. Complete online between jobs. IICRC CEC accredited."
+        description="WRT + ASD training for licensed plumbers and trade contractors. Complete online between jobs. IICRC-aligned CEC."
         ctaText="Add Restoration to Your Business"
         accentColor={ACCENT_COLOR}
       />

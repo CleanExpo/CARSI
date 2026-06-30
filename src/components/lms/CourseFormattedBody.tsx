@@ -1,7 +1,11 @@
 import DOMPurify from 'isomorphic-dompurify';
 
 import { cn } from '@/lib/utils';
-import { looksLikeHtmlFragment, parseCourseBody } from '@/lib/lms/format-course-body';
+import {
+  looksLikeHtmlFragment,
+  parseCourseBody,
+  stripLegacyPurchaseCta,
+} from '@/lib/lms/format-course-body';
 
 export interface CourseFormattedBodyProps {
   /** Raw course description (plain conventions or legacy HTML). */
@@ -39,7 +43,10 @@ export function CourseFormattedBody({
   className,
   tone = 'dark',
 }: CourseFormattedBodyProps) {
-  const raw = text?.trim() ?? '';
+  // Strip the legacy WooCommerce "Already Purchased This Course? → Access Here"
+  // lead block (issue #126) at the render path, so every source (DB, backend API,
+  // or WP export) is covered and a re-import can't reintroduce the off-site CTA.
+  const raw = stripLegacyPurchaseCta(text ?? '').trim();
   if (!raw) return null;
 
   const styles = textByTone[tone];
@@ -49,7 +56,7 @@ export function CourseFormattedBody({
     return (
       <div
         className={cn(proseByTone[tone], className)}
-        // eslint-disable-next-line react/no-danger -- sanitized with DOMPurify
+        // sanitized with DOMPurify above
         dangerouslySetInnerHTML={{ __html: safe }}
       />
     );

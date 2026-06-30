@@ -22,9 +22,10 @@ import {
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'IICRC CEC Learning Pathways — Which Restoration Course Path Is Right for You? | CARSI',
+  title: 'IICRC CEC Learning Pathways — Which Restoration Course Path Is Right for You?',
   description:
     'Explore structured IICRC CEC pathways for water restoration, mould remediation, carpet cleaning and more. Find the right learning path for your career stage and earn CECs in the correct order.',
+  alternates: { canonical: '/pathways' },
 };
 
 interface Pathway {
@@ -144,7 +145,7 @@ export default async function PathwaysPage() {
         <section className="mb-10">
           <div className={`mx-auto max-w-xl px-6 py-16 text-center ${marketingPanel}`}>
             <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl border border-[#ed9d24]/30 bg-[#ed9d24]/10">
-              <GraduationCap className="h-9 w-9 text-[#ed9d24]" aria-hidden />
+              <GraduationCap className="h-9 w-9 text-[#a85500] dark:text-[#ed9d24]" aria-hidden />
             </div>
 
             <h2 className={`font-display mb-3 text-xl font-semibold ${marketingTextStrong}`}>

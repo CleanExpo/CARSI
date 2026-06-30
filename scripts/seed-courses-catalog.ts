@@ -7,6 +7,7 @@
  *
  * Optional:
  *   SEED_INSTRUCTOR_ID=<uuid> — force every course to use this instructor (must exist or be listed in JSON).
+ *   --slug=<slug> — seed only one course (e.g. floor-care-onboarding-operational-readiness).
  *
  * Loads `.env` when present via dotenv/config.
  *
@@ -179,6 +180,13 @@ async function seedCourse(c: CatalogCourse, instructorOverride: string | undefin
   });
 }
 
+function argSlug(): string | undefined {
+  const fromEnv = process.env.SEED_COURSE_SLUG?.trim();
+  if (fromEnv) return fromEnv.toLowerCase();
+  const flag = process.argv.find((a) => a.startsWith('--slug='));
+  return flag ? flag.slice('--slug='.length).trim().toLowerCase() : undefined;
+}
+
 async function main() {
   if (!process.env.DATABASE_URL?.trim()) {
     console.error('DATABASE_URL is not set.');
@@ -194,7 +202,16 @@ async function main() {
     process.exit(1);
   }
 
-  if (data.courses.length === 0) {
+  const onlySlug = argSlug();
+  const courses = onlySlug
+    ? data.courses.filter((c) => c.slug.trim().toLowerCase() === onlySlug)
+    : data.courses;
+
+  if (courses.length === 0) {
+    if (onlySlug) {
+      console.error(`No course with slug "${onlySlug}" in ${CATALOG_PATH}.`);
+      process.exit(1);
+    }
     console.log('No courses in catalog; nothing to seed. Run db:export-courses locally and commit JSON.');
     return;
   }
@@ -211,12 +228,13 @@ async function main() {
     }
   }
 
-  for (const c of data.courses) {
+  for (const c of courses) {
     await seedCourse(c, override);
     console.log(`Seeded course: ${c.slug}`);
   }
 
-  console.log(`Done. ${data.courses.length} course(s) from ${CATALOG_PATH}`);
+  const scope = onlySlug ? `slug "${onlySlug}"` : `${courses.length} course(s)`;
+  console.log(`Done. ${scope} from ${CATALOG_PATH}`);
 }
 
 main()

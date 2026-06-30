@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { apiClient } from '@/lib/api/client';
+import { apiClient, ApiClientError } from '@/lib/api/client';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -70,7 +70,21 @@ export function PaymentSuccessClient() {
           router.push(dest);
         }
         return;
-      } catch {
+      } catch (err) {
+        // A 401/403 means "not logged in" → fall through to guest checkout
+        // completion below. Any other failure (5xx, timeout, network) is a real
+        // error on a payment path and must NOT be silently treated as a guest:
+        // surface it so the buyer knows their enrolment didn't confirm.
+        const status = err instanceof ApiClientError ? err.status : 0;
+        if (status !== 401 && status !== 403) {
+          if (!cancelled) {
+            setPhase('error');
+            setConfirmError(
+              'We could not confirm your enrolment. Your payment is safe — please contact support if this persists.',
+            );
+          }
+          return;
+        }
         // Not logged in — guest checkout completion
       }
 
@@ -199,7 +213,7 @@ export function PaymentSuccessClient() {
                 />
               </div>
               {confirmError ? <p className="text-sm text-amber-200/90">{confirmError}</p> : null}
-              <Button type="submit" disabled={submitting} className="w-full bg-[#2490ed]">
+              <Button type="submit" disabled={submitting} className="w-full bg-[#146fc2]">
                 {submitting ? 'Setting up…' : 'Start lesson 1'}
               </Button>
             </form>

@@ -239,7 +239,7 @@ export function CertificatePreview({
                 </div>
               </div>
               <p className="mt-2 max-w-[9rem] text-center text-[7px] leading-snug text-white/30 sm:text-[8px]">
-                IICRC CEC accredited · carsi.com.au
+                IICRC-aligned CEC · carsi.com.au
               </p>
             </div>
 

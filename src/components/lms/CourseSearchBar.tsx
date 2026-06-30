@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Search, X, Loader2 } from 'lucide-react';
 import { useCourseBrowseBase } from '@/components/lms/CourseBrowseContext';
 import { getBackendOrigin } from '@/lib/env/public-url';
+import { resolveDashboardCourseHref } from '@/lib/onboarding/navigation';
 
 interface SearchResult {
   id: string;
@@ -12,6 +13,8 @@ interface SearchResult {
   title: string;
   iicrc_discipline?: string | null;
   cec_hours?: string | null;
+  is_onboarding?: boolean;
+  program_label?: string | null;
 }
 
 interface CourseSearchBarProps {
@@ -84,10 +87,13 @@ export function CourseSearchBar({
   }, []);
 
   const handleSelect = useCallback(
-    (slug: string) => {
+    (result: SearchResult) => {
       setOpen(false);
       setQuery('');
-      router.push(`${courseLinkBase}/${slug}`);
+      const href = result.is_onboarding
+        ? resolveDashboardCourseHref({ slug: result.slug, courseLinkBase: courseLinkBase })
+        : `${courseLinkBase}/${result.slug}`;
+      router.push(href);
     },
     [router, courseLinkBase]
   );
@@ -193,16 +199,33 @@ export function CourseSearchBar({
                     onMouseLeave={(e) =>
                       ((e.currentTarget as HTMLButtonElement).style.background = 'transparent')
                     }
-                    onClick={() => handleSelect(result.slug)}
+                    onClick={() => handleSelect(result)}
                   >
                     <span
-                      className="flex-1 truncate text-sm"
-                      style={{ color: 'rgba(255,255,255,0.85)' }}
+                      className="flex min-w-0 flex-1 flex-col gap-0.5 truncate text-left"
                     >
-                      {result.title}
+                      <span className="truncate text-sm" style={{ color: 'rgba(255,255,255,0.85)' }}>
+                        {result.title}
+                      </span>
+                      {result.is_onboarding && result.program_label ? (
+                        <span className="truncate text-[10px]" style={{ color: 'rgba(255,255,255,0.45)' }}>
+                          {result.program_label}
+                        </span>
+                      ) : null}
                     </span>
 
                     <div className="flex shrink-0 items-center gap-2">
+                      {result.is_onboarding ? (
+                        <span
+                          className="rounded-sm px-2 py-0.5 text-xs font-medium"
+                          style={{
+                            background: 'rgba(237,157,36,0.15)',
+                            color: '#ed9d24',
+                          }}
+                        >
+                          Onboarding
+                        </span>
+                      ) : null}
                       {result.iicrc_discipline && (
                         <span
                           className="rounded-sm px-2 py-0.5 text-xs font-medium"

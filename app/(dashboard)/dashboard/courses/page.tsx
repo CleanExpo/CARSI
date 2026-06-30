@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import { DashboardCatalogueHeader } from '@/components/layout/DashboardCatalogueHeader';
+import { OnboardingSpotlight } from '@/components/onboarding/OnboardingSpotlight';
 import { CourseGrid } from '@/components/lms/CourseGrid';
 import { CourseSearchBar } from '@/components/lms/CourseSearchBar';
 import { AcronymTooltip } from '@/components/ui/AcronymTooltip';
@@ -9,6 +10,8 @@ import {
   type DashboardCourseStatusFilter,
   getDashboardCourseListItemsFromDatabase,
 } from '@/lib/server/public-courses-list';
+import { listOnboardingProgramsForUser } from '@/lib/server/onboarding-programs';
+import { getServerSessionClaims } from '@/lib/server/session-server';
 
 export const dynamic = 'force-dynamic';
 
@@ -55,6 +58,11 @@ export default async function DashboardCoursesPage({
 
   const courses = await getDashboardCourseListItemsFromDatabase({ status });
   const total = courses.length;
+  const claims = await getServerSessionClaims();
+  const onboardingPrograms =
+    claims && process.env.DATABASE_URL?.trim()
+      ? await listOnboardingProgramsForUser(claims.sub)
+      : [];
 
   const filterBtn =
     'inline-flex min-h-[40px] items-center rounded-lg px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/50';
@@ -81,6 +89,12 @@ export default async function DashboardCoursesPage({
             ordered with the most modules first.
           </p>
         </header>
+
+        {onboardingPrograms.length > 0 ? (
+          <div className="mb-8">
+            <OnboardingSpotlight programs={onboardingPrograms} variant="compact" />
+          </div>
+        ) : null}
 
         <div className="relative mx-auto mb-6 max-w-2xl">
           <CourseSearchBar />

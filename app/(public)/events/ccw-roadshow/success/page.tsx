@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { CheckCircle2, Clock } from 'lucide-react';
+import { CalendarPlus, CheckCircle2, Clock, Download } from 'lucide-react';
 
 import { MarketingPageShell } from '@/components/marketing/MarketingPageShell';
 import {
@@ -14,11 +14,15 @@ import {
 
 import { getCheckoutSession } from '@/lib/api/stripe';
 import { processCcwRoadshowBookingConfirmation } from '@/lib/server/ccw-roadshow-booking-email';
-import { ccwRoadshowPath, ccwRoadshowTitle } from '@/lib/marketing/ccw-roadshow';
+import { ccwRoadshowPath, ccwRoadshowTitle, getCcwRoadshowEvent } from '@/lib/marketing/ccw-roadshow';
+import {
+  buildGoogleCalendarLink,
+  buildIcsDataUri,
+} from '@/lib/marketing/ccw-roadshow-calendar-links';
 import { getRoadshowSuccessView } from '@/lib/marketing/ccw-roadshow-success';
 
 export const metadata: Metadata = {
-  title: 'Roadshow Free Entry Confirmed | CARSI',
+  title: 'Roadshow Free Entry Confirmed',
   description: 'Free entry token confirmation page for CARSI x CCW Business Growth Days.',
   robots: { index: false, follow: false },
 };
@@ -69,6 +73,7 @@ export default async function CcwRoadshowSuccessPage({
   searchParams: Promise<{
     session_id?: string;
     token?: string;
+    event?: string;
     city?: string;
     dates?: string;
     seats?: string;
@@ -78,6 +83,7 @@ export default async function CcwRoadshowSuccessPage({
   const {
     session_id: sessionId,
     token: freeEntryToken,
+    event: eventSlug,
     city: freeCity,
     dates: freeDates,
     seats: freeSeats,
@@ -92,6 +98,8 @@ export default async function CcwRoadshowSuccessPage({
     eventTitle: ccwRoadshowTitle,
   });
   const isWaitlisted = view.variant === 'waitlisted';
+  const calendarEvent = getCcwRoadshowEvent(eventSlug);
+  const showAddToCalendar = !isWaitlisted && Boolean(calendarEvent);
 
   return (
     <MarketingPageShell className="flex items-center py-16 sm:py-20">
@@ -135,6 +143,37 @@ export default async function CcwRoadshowSuccessPage({
                   ? `This token covers ${freeSeats ?? '1'} ${freeSeats === '1' ? 'seat' : 'seats'}${freeCity ? ` for ${freeCity}` : ''}${freeDates ? `, ${freeDates}` : ''}.`
                   : `We'll email you if a seat opens up${freeCity ? ` for ${freeCity}` : ''}${freeDates ? `, ${freeDates}` : ''}. Please don't rely on this reference for entry until we confirm.`}
               </p>
+            </div>
+          )}
+
+          {showAddToCalendar && calendarEvent && (
+            <div className={`mt-6 rounded-xl border p-5 ${marketingPanel}`}>
+              <p className={`text-xs font-semibold tracking-[0.18em] uppercase ${marketingTextSubtle}`}>
+                Add it to your calendar
+              </p>
+              <p className={`mt-2 text-sm leading-relaxed ${marketingTextMuted}`}>
+                {calendarEvent.city}, {calendarEvent.dateRangeLabel} · {calendarEvent.timeLabel}. We&apos;ll
+                also email you a calendar invite — this is a quick self-serve copy.
+              </p>
+              <div className="mt-4 flex flex-wrap gap-3">
+                <a
+                  href={buildGoogleCalendarLink(calendarEvent)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`inline-flex items-center gap-2 ${marketingBtnSecondary}`}
+                >
+                  <CalendarPlus className="h-4 w-4" aria-hidden />
+                  Add to Google Calendar
+                </a>
+                <a
+                  href={buildIcsDataUri(calendarEvent)}
+                  download={`carsi-ccw-${calendarEvent.slug}.ics`}
+                  className={`inline-flex items-center gap-2 ${marketingBtnSecondary}`}
+                >
+                  <Download className="h-4 w-4" aria-hidden />
+                  Download .ics (Apple/Outlook)
+                </a>
+              </div>
             </div>
           )}
 

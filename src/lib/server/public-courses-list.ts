@@ -2,11 +2,20 @@ import type { Prisma } from '@/generated/prisma/client';
 import type { CheckoutCourse, CourseListItem } from '@/lib/course-list-item';
 import { prisma } from '@/lib/prisma';
 import { normalizePublicAssetUrl } from '@/lib/remote-image';
+import { isBuildPhase } from '@/lib/server/build-phase';
 import { formatLmsCourseCecHoursLabel } from '@/lib/server/course-cec-hours';
 
-/** Same filter as the public `/courses` catalogue when loaded from Prisma. */
+/**
+ * Same filter as the public `/courses` catalogue when loaded from Prisma.
+ *
+ * `status` is the canonical publication flag (#137). The legacy `isPublished` boolean is
+ * retained as a dual-write column for one sprint but is no longer read here — the
+ * `137-canonicalize-course-status` migration backfills `status='published'` for every row
+ * the old `isPublished OR status` predicate counted as published, so this narrowing is
+ * non-regressing. That migration MUST be applied to prod before this code ships.
+ */
 export const lmsPublishedCourseWhere: Prisma.LmsCourseWhereInput = {
-  OR: [{ isPublished: true }, { status: { equals: 'published', mode: 'insensitive' } }],
+  status: { equals: 'published', mode: 'insensitive' },
 };
 
 const publishedWhere = lmsPublishedCourseWhere;
@@ -83,7 +92,7 @@ function mapDashboardCourseRow(c: {
 export async function getDashboardCourseListItemsFromDatabase(options: {
   status: DashboardCourseStatusFilter;
 }): Promise<CourseListItem[]> {
-  if (!process.env.DATABASE_URL?.trim()) {
+  if (isBuildPhase() || !process.env.DATABASE_URL?.trim()) {
     return [];
   }
 
@@ -175,7 +184,7 @@ function mapLmsCourseToPublicListItem(c: LmsCoursePublicListRow): CourseListItem
  * Fills missing slots from newest published courses.
  */
 export async function getHomepageFeaturedCourses(): Promise<CourseListItem[]> {
-  if (!process.env.DATABASE_URL?.trim()) {
+  if (isBuildPhase() || !process.env.DATABASE_URL?.trim()) {
     return [];
   }
 
@@ -303,7 +312,7 @@ export async function getHomepageFeaturedCourses(): Promise<CourseListItem[]> {
 export async function getPublishedCourseListItemsFromDatabase(options?: {
   limit?: number;
 }): Promise<CourseListItem[]> {
-  if (!process.env.DATABASE_URL?.trim()) {
+  if (isBuildPhase() || !process.env.DATABASE_URL?.trim()) {
     return [];
   }
 
@@ -371,7 +380,7 @@ export async function getPublishedCourseDetailBySlugFromDatabase(slug: string) {
 export async function getPublishedCourseForCheckout(
   slug: string
 ): Promise<CheckoutCourse | null> {
-  if (!process.env.DATABASE_URL?.trim()) return null;
+  if (isBuildPhase() || !process.env.DATABASE_URL?.trim()) return null;
   const target = decodeURIComponent(slug).trim();
   if (!target) return null;
 
@@ -399,7 +408,7 @@ export async function getPublishedCourseForCheckout(
 export async function getPublishedCourseSlugsFromDatabase(): Promise<
   Array<{ slug: string; updated_at: string }>
 > {
-  if (!process.env.DATABASE_URL?.trim()) return [];
+  if (isBuildPhase() || !process.env.DATABASE_URL?.trim()) return [];
 
   const rows = await prisma.lmsCourse.findMany({
     where: publishedWhere,

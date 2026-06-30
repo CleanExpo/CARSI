@@ -76,6 +76,30 @@ jobs:
       - name: Type check
         run: npm run type-check
 
+  unit-tests:
+    name: Unit Tests
+    needs: [dependency-verification]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Pure-logic vitest suite (no DB). Previously run by no workflow, so
+      # security-relevant tests (jwt-secret strength, Postgres SSL-mode
+      # normalization, rate-limit fallback) gated nothing. ~0.4s runtime.
+      - name: Run unit tests
+        run: npm run test:unit
+
   build:
     name: Build Check
     runs-on: ubuntu-latest

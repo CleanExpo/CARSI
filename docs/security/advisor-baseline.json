@@ -1,0 +1,149 @@
+{
+  "_comment": "Baseline snapshot of CARSI Supabase SECURITY advisors. The recurring check fails only on advisors NOT in this list, so new RLS-disabled tables are caught. Regenerate after intentional schema/security changes.",
+  "project_ref": "ofzafxvxobjggjisrbsa",
+  "generated_at": "2026-06-30",
+  "advisor_type": "security",
+  "count": 28,
+  "fingerprints": [
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "entity": "public.alembic_version"
+    },
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "entity": "public.audit_alerts"
+    },
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "entity": "public.audit_evidence"
+    },
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "entity": "public.audit_runs"
+    },
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "entity": "public.audit_schedules"
+    },
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "entity": "public.friction_analyses"
+    },
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "entity": "public.lms_audit_log"
+    },
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "entity": "public.lms_bundle_courses"
+    },
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "entity": "public.lms_bundles"
+    },
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "entity": "public.lms_cec_reports"
+    },
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "entity": "public.lms_course_idea_votes"
+    },
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "entity": "public.lms_course_ideas"
+    },
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "entity": "public.lms_course_prerequisites"
+    },
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "entity": "public.lms_google_oauth_tokens"
+    },
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "entity": "public.lms_learning_pathway_courses"
+    },
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "entity": "public.lms_learning_pathways"
+    },
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "entity": "public.lms_lesson_views"
+    },
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "entity": "public.lms_migration_jobs"
+    },
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "entity": "public.lms_notifications"
+    },
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "entity": "public.lms_push_subscriptions"
+    },
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "entity": "public.lms_rpl_portfolios"
+    },
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "entity": "public.lms_student_risk_scores"
+    },
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "entity": "public.lms_user_levels"
+    },
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "entity": "public.lms_user_sessions"
+    },
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "entity": "public.lms_utm_captures"
+    },
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "entity": "public.lms_xp_events"
+    },
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "entity": "public.route_audit_results"
+    },
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "entity": "public.verification_results"
+    }
+  ]
+}

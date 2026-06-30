@@ -14,6 +14,9 @@ export function isDashboardNavActive(pathname: string, href: string): boolean {
   const h = normalizeDashboardPath(href);
 
   if (h === '/dashboard') return p === '/dashboard';
+  if (h === '/dashboard/onboarding') {
+    return p === '/dashboard/onboarding' || p.startsWith('/dashboard/onboarding/');
+  }
   if (h === '/dashboard/courses') return p === '/dashboard/courses' || p.startsWith('/dashboard/courses/');
   if (h === '/dashboard/student/profile') {
     return p === '/dashboard/student/profile' || p.startsWith('/dashboard/student/profile/');
@@ -34,6 +37,7 @@ export function isDashboardNavActive(pathname: string, href: string): boolean {
     if (p.startsWith('/dashboard/student/credentials')) return false;
     if (p.startsWith('/dashboard/student/leaderboard')) return false;
     if (p.startsWith('/dashboard/student/notes')) return false;
+    if (p.startsWith('/dashboard/onboarding')) return false;
     if (/^\/dashboard\/credentials\//.test(p)) return false;
     if (p.startsWith('/dashboard/student')) return true;
     if (p.startsWith('/dashboard/learn')) return true;
@@ -49,6 +53,7 @@ export function isDashboardNavActive(pathname: string, href: string): boolean {
 export function getDashboardSectionLabel(pathname: string): string {
   const p = normalizeDashboardPath(pathname);
   if (p === '/dashboard') return 'Overview';
+  if (p.startsWith('/dashboard/onboarding')) return 'Onboarding';
   if (p.startsWith('/dashboard/courses')) return 'Courses';
   if (p.startsWith('/dashboard/learn')) return 'Learning';
   if (p.startsWith('/dashboard/student/credentials') || p.startsWith('/dashboard/credentials/')) {

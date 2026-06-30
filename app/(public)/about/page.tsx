@@ -41,8 +41,8 @@ export async function generateMetadata(): Promise<Metadata> {
   const d = facts.disciplineCodes.length;
   const coursePhrase =
     n > 0
-      ? `${formatCourseCountForCopy(n)} IICRC CEC accredited course${n === 1 ? '' : 's'}`
-      : 'IICRC CEC accredited courses';
+      ? `${formatCourseCountForCopy(n)} IICRC-aligned CEC course${n === 1 ? '' : 's'}`
+      : 'IICRC-aligned CEC courses';
   const discPhrase =
     d > 0 ? `${d} discipline${d === 1 ? '' : 's'}` : 'multiple IICRC disciplines';
   return {
@@ -54,8 +54,8 @@ export async function generateMetadata(): Promise<Metadata> {
 const credentials = [
   {
     icon: Shield,
-    title: "Australia's Only CFO & CBFRS",
-    desc: 'Certified Flooring Organisation and Certified Building Flood Recovery Specialist — the only holder of both credentials in Australia.',
+    title: 'CFO & CBFRS Credentialed',
+    desc: 'Certified Flooring Organisation and Certified Building Flood Recovery Specialist — one of very few holders of both credentials in Australia.',
   },
   {
     icon: Award,
@@ -89,7 +89,7 @@ export default async function AboutPage() {
       label: 'IICRC disciplines',
       accent: '#26c4a0',
     },
-    { value: '12+', label: 'Industries served', accent: '#ed9d24' },
+    { value: '12+', label: 'Industries served', accent: '#c2740a' },
   ];
 
   return (
@@ -205,8 +205,8 @@ export default async function AboutPage() {
             <Shield className="mb-3 h-5 w-5 text-emerald-600 dark:text-emerald-400" aria-hidden />
             <p>
               CARSI is a core pillar of the National Restoration Professionals Group (NRPG)
-              onboarding pathway. Our training is recognised by major Australian insurers including
-              IAG, Suncorp, and QBE as evidence of professional competency.
+              onboarding pathway. Our training is recognised by major Australian insurers as
+              evidence of professional competency.
             </p>
           </div>
         </div>
@@ -219,7 +219,7 @@ export default async function AboutPage() {
           body={
             d > 0
               ? `Published courses tagged across ${d} IICRC discipline${d === 1 ? '' : 's'} — each counting toward continuing education credits.`
-              : 'CEC accredited courses across all seven core IICRC disciplines.'
+              : 'CEC-aligned courses across all seven core IICRC disciplines.'
           }
         />
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
@@ -266,7 +266,7 @@ export default async function AboutPage() {
           IICRC Certification; it only qualifies continuing education hours where applicable.
         </p>
         <p className={`mt-3 text-xs font-medium ${marketingTextStrong}`}>
-          CARSI courses are IICRC CEC accredited where stated.
+          CARSI courses are IICRC-aligned CEC courses where stated.
         </p>
       </section>
     </MarketingPageShell>

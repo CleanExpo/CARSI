@@ -6,6 +6,8 @@ import Link from 'next/link';
 
 import { useCourseBrowseBase } from '@/components/lms/CourseBrowseContext';
 import { CourseTextThumbnail } from '@/components/lms/CourseTextThumbnail';
+import { isOnboardingCourse, ONBOARDING_BRAND } from '@/lib/onboarding/enterprise';
+import { resolveDashboardCourseHref } from '@/lib/onboarding/navigation';
 
 interface CourseCardProps {
   /** First visible cards: eager load + higher fetch priority (catalog / home grids). */
@@ -42,10 +44,6 @@ function formatRelativeDate(dateStr: string | null | undefined): string {
   return `${Math.floor(days / 30)}mo ago`;
 }
 
-function formatLevel(level: string): string {
-  return level.charAt(0).toUpperCase() + level.slice(1).toLowerCase();
-}
-
 const smoothEase: [number, number, number, number] = [0.4, 0, 0.2, 1];
 
 const cardShellClass =
@@ -69,7 +67,15 @@ export function CourseCard({ course, priorityImage, variant = 'catalog' }: Cours
   const { courseLinkBase } = useCourseBrowseBase();
   const thumbSrc = course.thumbnail_url ?? undefined;
   const isFeatured = variant === 'featured';
-  const href = `${courseLinkBase}/${course.slug}`;
+  const onboarding = isOnboardingCourse({ slug: course.slug, category: course.category });
+  const href = resolveDashboardCourseHref({
+    slug: course.slug,
+    category: course.category,
+    courseLinkBase,
+  });
+  const displayTitle = onboarding
+    ? course.title.replace(`${ONBOARDING_BRAND} — `, '')
+    : course.title;
 
   return (
     <motion.article
@@ -81,7 +87,7 @@ export function CourseCard({ course, priorityImage, variant = 'catalog' }: Cours
         <CourseTextThumbnail
           variant="card"
           title={course.title}
-          category={course.category}
+          category={onboarding ? 'Organisation onboarding' : course.category}
           discipline={discipline}
           priceLabel={price}
           isFree={isFree}
@@ -105,7 +111,7 @@ export function CourseCard({ course, priorityImage, variant = 'catalog' }: Cours
           }`}
         >
           <Link href={href} className="transition-colors hover:text-[#146fc2] dark:hover:text-[#8fd0ff]">
-            {course.title}
+            {displayTitle}
           </Link>
         </h3>
 

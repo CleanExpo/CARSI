@@ -7,7 +7,7 @@ import {
 } from '@/components/marketing/LegalDocumentShell';
 
 export const metadata: Metadata = {
-  title: 'Terms of Service | CARSI',
+  title: 'Terms of Service',
   description: 'Terms of Service for CARSI Learning Management System',
 };
 
@@ -27,7 +27,7 @@ export default function TermsPage() {
         <h2 className={marketingLegalH2}>2. Description of Service</h2>
         <p>
           CARSI provides online education and training courses primarily for the restoration and
-          cleaning industry. Our courses include IICRC CEC accredited Continuing Education Credit
+          cleaning industry. Our courses include IICRC-aligned CEC Continuing Education Credit
           (CEC) courses and general professional development content.
         </p>
         <p>

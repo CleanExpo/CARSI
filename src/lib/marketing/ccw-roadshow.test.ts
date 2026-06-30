@@ -5,7 +5,30 @@ import {
   isValidExperienceBand,
   ccwRoadshowEvents,
   getCcwRoadshowEvent,
+  resolveInitialEventSlug,
 } from './ccw-roadshow';
+
+describe('resolveInitialEventSlug (QR/vanity-URL preselect)', () => {
+  it('returns the matching slug when the ?event= param is a known city', () => {
+    expect(resolveInitialEventSlug('sydney', ccwRoadshowEvents)).toBe('sydney');
+    expect(resolveInitialEventSlug('melbourne', ccwRoadshowEvents)).toBe('melbourne');
+  });
+
+  it('normalises case and whitespace', () => {
+    expect(resolveInitialEventSlug('  SYDNEY ', ccwRoadshowEvents)).toBe('sydney');
+  });
+
+  it('falls back to the first event for an unknown or missing param', () => {
+    const first = ccwRoadshowEvents[0].slug;
+    expect(resolveInitialEventSlug('perth', ccwRoadshowEvents)).toBe(first);
+    expect(resolveInitialEventSlug(null, ccwRoadshowEvents)).toBe(first);
+    expect(resolveInitialEventSlug(undefined, ccwRoadshowEvents)).toBe(first);
+  });
+
+  it('returns empty string when there are no events', () => {
+    expect(resolveInitialEventSlug('sydney', [])).toBe('');
+  });
+});
 
 describe('event capacity config', () => {
   it('caps Melbourne at 10 and Sydney at 12', () => {
@@ -17,6 +40,15 @@ describe('event capacity config', () => {
     for (const event of ccwRoadshowEvents) {
       expect(event.calendarEventId.length).toBeGreaterThan(0);
     }
+  });
+
+  // Regression lock: these must match the REAL Google Calendar events on
+  // phill.mcgurk@gmail.com. Earlier ids were stale and the guest-add 404'd
+  // silently for every registrant (calendar showed 0 attendees). Verified
+  // against the live calendar 2026-06-30 — do not change without re-verifying.
+  it('points each event at its real Google Calendar id', () => {
+    expect(getCcwRoadshowEvent('melbourne')?.calendarEventId).toBe('1d1uqjm6an36n1kgc6s4s3ln7s');
+    expect(getCcwRoadshowEvent('sydney')?.calendarEventId).toBe('h6qm8t3muuv44ht9gqann5dhuk');
   });
 });
 

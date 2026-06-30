@@ -12,7 +12,7 @@ import { IndustryRecommendedCourses } from '@/components/industries/IndustryReco
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Strata & Body Corporate IICRC CEC Training | CARSI',
+  title: 'Strata & Body Corporate IICRC CEC Training',
   description:
     'IICRC CEC training for strata managers and building managers. Protect common property with WRT, AMRT and ASD restoration credentials.',
   keywords: [

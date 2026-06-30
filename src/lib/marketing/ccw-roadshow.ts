@@ -80,6 +80,9 @@ export const ccwRoadshowEvents: CcwRoadshowEvent[] = [
     description:
       'Two practical days with Phill McGurk and the CCW team, connecting training, equipment, service design, chemistry, quoting confidence and business growth for carpet, rug, stain and tile cleaning operators.',
     capacity: 10,
+    // Real recurring event on phill.mcgurk@gmail.com ("CARSI x CCW Business Growth
+    // Days — Melbourne", 22–23 Jul 2026). The previous id was stale → guest-add 404'd
+    // silently. Verified against Google Calendar 2026-06-30.
     calendarEventId: '1d1uqjm6an36n1kgc6s4s3ln7s',
   },
   {
@@ -99,6 +102,9 @@ export const ccwRoadshowEvents: CcwRoadshowEvent[] = [
     description:
       'Two practical days with Phill McGurk and the CCW team, connecting training, equipment, service design, chemistry, quoting confidence and business growth for carpet, rug, stain and tile cleaning operators.',
     capacity: 12,
+    // Real recurring event on phill.mcgurk@gmail.com ("CARSI x CCW Business Growth
+    // Days — Sydney", 30–31 Jul 2026). The previous id was stale → guest-add 404'd
+    // silently. Verified against Google Calendar 2026-06-30.
     calendarEventId: 'h6qm8t3muuv44ht9gqann5dhuk',
   },
 ];
@@ -168,6 +174,21 @@ export const ccwRoadshowCampaignPillars = {
 export function getCcwRoadshowEvent(slug: string | null | undefined) {
   const normalized = slug?.trim().toLowerCase();
   return ccwRoadshowEvents.find((event) => event.slug === normalized) ?? null;
+}
+
+/**
+ * Resolve which event the booking form should preselect from a `?event=` query
+ * param (set by the /ccw-melbourne and /ccw-sydney vanity-URL redirects on the
+ * printed flyer QR codes). Unknown or missing params fall back to the first
+ * event so the form is never left without a selection.
+ */
+export function resolveInitialEventSlug(
+  rawParam: string | null | undefined,
+  events: readonly { slug: string }[],
+): string {
+  const normalized = rawParam?.trim().toLowerCase();
+  const match = events.find((event) => event.slug === normalized);
+  return match?.slug ?? events[0]?.slug ?? '';
 }
 
 export function getCcwRoadshowTicketPackage(id: string | null | undefined) {
