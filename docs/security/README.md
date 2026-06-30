@@ -32,6 +32,23 @@ authenticated) exposure.
 `extension_in_public` (pg_trgm/unaccent/vector) and the 729 performance
 advisors (unused indexes, duplicate policies, unindexed FKs).
 
+## `advisor-baseline.json` + drift check — stops regressions
+
+`scripts/check-supabase-advisors.mjs` pulls live SECURITY advisors and diffs
+them against `advisor-baseline.json`, failing only on advisors **not** in the
+baseline — so a new `public` table created without RLS is caught, while the
+known #121 backlog / deferred items don't false-alarm.
+
+- CI guard: `SUPABASE_ACCESS_TOKEN=… node scripts/check-supabase-advisors.mjs`
+- Full report: `… --report`
+- Re-baseline (run **after** the #121 migration applies, so the baseline
+  shrinks to ~0): `… --update-baseline`
+
+Runs weekly via `.github/workflows/supabase-advisors.yml`. To activate (founder,
+one-time): add the `SUPABASE_ACCESS_TOKEN` Actions **secret** and set the
+`SUPABASE_ADVISOR_CHECK` Actions **variable** to `true`. Until then the job is
+skipped, so it never blocks CI.
+
 ### How to apply (after approval)
 Run the whole file (single transaction) via the Supabase SQL editor, or the
 Management API query endpoint, then run the verification queries at the bottom
