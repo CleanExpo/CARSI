@@ -41,6 +41,15 @@ describe('event capacity config', () => {
       expect(event.calendarEventId.length).toBeGreaterThan(0);
     }
   });
+
+  // Regression lock: these must match the REAL Google Calendar events on
+  // phill.mcgurk@gmail.com. Earlier ids were stale and the guest-add 404'd
+  // silently for every registrant (calendar showed 0 attendees). Verified
+  // against the live calendar 2026-06-30 — do not change without re-verifying.
+  it('points each event at its real Google Calendar id', () => {
+    expect(getCcwRoadshowEvent('melbourne')?.calendarEventId).toBe('1d1uqjm6an36n1kgc6s4s3ln7s');
+    expect(getCcwRoadshowEvent('sydney')?.calendarEventId).toBe('h6qm8t3muuv44ht9gqann5dhuk');
+  });
 });
 
 describe('decideRegistrationStatus', () => {
