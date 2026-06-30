@@ -12,8 +12,12 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
       <Suspense fallback={null}>
         <UtmCapture />
       </Suspense>
-      <PublicNavbar />
-      <div className={PUBLIC_PAGE_FULL_CLASS}>{children}</div>
+      <header>
+        <PublicNavbar />
+      </header>
+      <main id="main-content" className={PUBLIC_PAGE_FULL_CLASS}>
+        {children}
+      </main>
       <PublicFooter />
       <FloatingChatGate />
     </div>
