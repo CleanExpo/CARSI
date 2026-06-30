@@ -10,6 +10,10 @@ import {
   isCloudinaryConfigured,
   uploadCertificatePdfToCloudinary,
 } from '@/lib/server/cloudinary-upload';
+import {
+  canIssueCertificate,
+  certificateHolderDisplayName,
+} from '@/lib/server/certificate-name';
 import { resolveLmsCourseCecHours } from '@/lib/server/course-cec-hours';
 import {
   courseEligibleForIicrcCecSubmission,
@@ -118,7 +122,7 @@ function emailContentFromEnrollment(
   cecHoursOverride?: number | null
 ): IicrcCecSubmissionEmailContent {
   const origin = appOrigin();
-  const studentName = row.student.fullName?.trim() || row.student.email;
+  const studentName = certificateHolderDisplayName(row.student);
   const cecHours = resolvedCecHoursForCourse(row.course, cecHoursOverride) ?? 0;
   return {
     studentName,
@@ -257,6 +261,40 @@ export async function processIicrcCecSubmissionForEnrollment(
       });
     }
     return { status: 'skipped' };
+  }
+
+  // A certificate must name its holder (#302). Never submit a CEC certificate
+  // to IICRC addressed to an email/email-prefix; skip (retryable) until the
+  // learner has a real name on file.
+  if (!canIssueCertificate(enrollment.student)) {
+    const submission = existing
+      ? await prisma.lmsIicrcCecSubmission.update({
+          where: { id: existing.id },
+          data: {
+            status: 'skipped',
+            renewalStatus: 'skipped',
+            initiatedByAdminEmail: initiatedByAdminEmail ?? undefined,
+            failureReason: 'missing_learner_name',
+          },
+        })
+      : await prisma.lmsIicrcCecSubmission.create({
+          data: {
+            id: randomUUID(),
+            enrollmentId: enrollment.id,
+            studentId: enrollment.studentId,
+            courseId: enrollment.courseId,
+            recipientEmail: getIicrcCecSubmissionEmail(),
+            technicianEmail: enrollment.student.email,
+            status: 'skipped',
+            renewalStatus: 'skipped',
+            initiatedByAdminEmail,
+            failureReason: 'missing_learner_name',
+            cecHours: resolvedCecHoursForCourse(enrollment.course),
+            iicrcDiscipline: enrollment.course.iicrcDiscipline,
+            iicrcMemberNumber: enrollment.student.iicrcMemberNumber,
+          },
+        });
+    return { status: 'skipped', submissionId: submission.id };
   }
 
   if (!forceSend && !isIicrcCecAutoSubmitEnabled()) {
@@ -634,6 +672,8 @@ export function iicrcSubmissionFailureMessage(reason: string | null | undefined)
       return 'This course is not eligible for IICRC CEC submission.';
     case 'auto_submit_disabled':
       return 'IICRC auto-submit is disabled and manual send did not complete.';
+    case 'missing_learner_name':
+      return 'This learner has no full name on file. A certificate cannot be issued until they add their name (Profile → Full name); then retry.';
     case 'CLOUDINARY_NOT_CONFIGURED':
     case 'cloudinary_not_configured':
       return 'Certificate upload is not configured. Set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET on the server.';
@@ -783,7 +823,7 @@ export async function listIicrcCecSubmissionsForAdmin(options?: {
     id: r.id,
     enrollment_id: r.enrollmentId,
     student_id: r.studentId,
-    student_name: r.student.fullName?.trim() || r.student.email,
+    student_name: certificateHolderDisplayName(r.student),
     student_email: r.student.email,
     course_title: r.course.title,
     course_slug: r.course.slug,

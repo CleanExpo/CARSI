@@ -15,7 +15,9 @@ export async function findOrCreateGuestUser(params: {
   password?: string;
 }): Promise<{ claims: SessionClaims; created: boolean }> {
   const email = params.email.trim().toLowerCase();
-  const fullName = params.fullName.trim() || email.split('@')[0];
+  // Never derive a name from the email — an email-prefix is not a usable name
+  // and poisons certificates (#302). Empty means "no name on file".
+  const fullName = params.fullName.trim();
 
   const existing = await prisma.lmsUser.findUnique({ where: { email } });
   if (existing) {
@@ -67,7 +69,8 @@ export async function ensureGuestUserFromStripeEmail(
         id,
         email: normalized,
         hashedPassword,
-        fullName: fullName?.trim() || normalized.split('@')[0],
+        // No email-derived name — store null when unknown (#302).
+        fullName: fullName?.trim() || null,
         isActive: true,
         isVerified: false,
       },

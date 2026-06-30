@@ -112,7 +112,9 @@ export async function addCourseTeamMemberByEmail(params: {
         id,
         email,
         hashedPassword,
-        fullName: email.split('@')[0],
+        // No email-derived name — store null when unknown (#302). The member
+        // sets their real name on first login / before certificate issuance.
+        fullName: null,
         isActive: true,
         isVerified: false,
       },

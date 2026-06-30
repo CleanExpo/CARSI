@@ -6,6 +6,7 @@ import {
   buildCompletionCertificatePdf,
   completionCertificateDataFromEnrollment,
 } from '@/lib/server/certificate-pdf';
+import { canIssueCertificate } from '@/lib/server/certificate-name';
 import { getEnrollmentForCertificate, markCertificateIssued } from '@/lib/server/enrollment-service';
 
 type Ctx = { params: Promise<{ enrollmentId: string }> };
@@ -53,6 +54,18 @@ export async function GET(request: NextRequest, ctx: Ctx) {
       return NextResponse.json(
         { detail: 'Certificate available only after all lessons are complete.' },
         { status: 403 }
+      );
+    }
+
+    // A certificate must name its holder (#302). Don't mint one addressed to an
+    // email/email-prefix — require the learner to add their name first.
+    if (!canIssueCertificate(row.student)) {
+      return NextResponse.json(
+        {
+          detail: 'Add your full name to your profile before downloading your certificate.',
+          code: 'name_required',
+        },
+        { status: 422 }
       );
     }
 
