@@ -39,8 +39,14 @@ export type AdminDashboardClientData = {
     catalogSource: 'database' | 'workbook' | 'seed';
   };
   catalogCourses: AdminCatalogCourseOption[];
-  users: AdminUserProgress[];
+  users: AdminDashboardUserEntry[];
 };
+
+// The overview users table renders only the flat summary fields; the heavy
+// per-enrollment `modules` tree (AdminCourseProgressForUser[]) is unused here
+// and is shown on the /admin/users/[userId] detail page instead. Omitting it
+// keeps the serialized dashboard payload small (it was ~700KB of dead weight).
+export type AdminDashboardUserEntry = Omit<AdminUserProgress, 'enrollments'>;
 
 export async function getAdminDashboardData(): Promise<AdminDashboardClientData> {
   const catalog = await loadAdminCatalogSource();
@@ -205,6 +211,8 @@ export async function getAdminDashboardData(): Promise<AdminDashboardClientData>
       catalogSource: catalog.source,
     },
     catalogCourses,
-    users: usersWithProgress,
+    // Strip the unused per-enrollment `modules` detail before serializing to the
+    // client — the overview table needs only the flat summary fields.
+    users: usersWithProgress.map(({ enrollments: _enrollments, ...summary }) => summary),
   };
 }
