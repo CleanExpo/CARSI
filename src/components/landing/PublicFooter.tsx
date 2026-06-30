@@ -117,7 +117,7 @@ export function PublicFooter() {
             <p className="mb-4 text-[11px] font-semibold tracking-[0.22em] text-[#7ec5ff]/90 uppercase">
               Australian restoration training
             </p>
-            <Link href="/" className="inline-block">
+            <Link href="/" aria-label="CARSI home" className="inline-block">
               <PublicLogo variant="footer" />
             </Link>
             <p className="mt-5 max-w-md text-sm leading-relaxed text-white/58">
@@ -222,6 +222,20 @@ export function PublicFooter() {
         <div className="flex flex-col gap-4 rounded-2xl border border-white/[0.08] bg-[#080c14]/60 px-5 py-5 backdrop-blur-sm sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <p className="text-[11px] leading-relaxed text-white/50">
             © 2026 CARSI Pty Ltd. All rights reserved. ·{' '}
+            <Link
+              href="/privacy"
+              className="font-medium text-white/65 underline-offset-2 transition-colors hover:text-white hover:underline"
+            >
+              Privacy
+            </Link>
+            {' · '}
+            <Link
+              href="/terms"
+              className="font-medium text-white/65 underline-offset-2 transition-colors hover:text-white hover:underline"
+            >
+              Terms
+            </Link>
+            {' · '}
             <Link
               href="/admin"
               className="font-medium text-white/65 underline-offset-2 transition-colors hover:text-white hover:underline"
