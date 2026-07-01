@@ -5,6 +5,7 @@ import { Bot, MessageCircle, RotateCcw, Send, Sparkles, X } from 'lucide-react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
+import { ASSISTANT_DISCLAIMER } from '@/lib/assistant-disclaimer';
 import { deriveChatPageContext } from '@/lib/chat-page-context';
 
 const ASSISTANT_NAME = process.env.NEXT_PUBLIC_AI_ASSISTANT_NAME?.trim() || 'Claire';
@@ -260,6 +261,13 @@ export default function FloatingChat() {
               </div>
             </div>
 
+            {/* First-open disclaimer notice (shown until the first exchange) */}
+            {messages.length <= 1 && (
+              <div className="shrink-0 border-b border-white/[0.06] px-3 py-2">
+                <p className="text-[11px] leading-snug text-amber-200/70">{ASSISTANT_DISCLAIMER}</p>
+              </div>
+            )}
+
             {/* Suggested prompts */}
             {messages.length <= 1 && (
               <div className="shrink-0 space-y-1.5 border-b border-white/[0.06] px-3 py-2.5">
@@ -342,8 +350,8 @@ export default function FloatingChat() {
                   <Send size={18} className="text-white" />
                 </button>
               </div>
-              <p className="mt-2 text-center text-[10px] text-white/25">
-                AI can make mistakes — verify important details on course pages.
+              <p className="mt-2 text-center text-[10px] leading-snug text-white/30">
+                {ASSISTANT_DISCLAIMER}
               </p>
             </div>
           </motion.div>
