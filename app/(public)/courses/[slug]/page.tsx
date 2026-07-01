@@ -6,7 +6,7 @@ import { EnrolButton } from '@/components/lms/EnrolButton';
 import { CourseFormattedBody } from '@/components/lms/CourseFormattedBody';
 import { CourseThumbnail } from '@/components/lms/CourseThumbnail';
 import { CourseHubContext } from '@/components/lms/CourseHubContext';
-import { CourseSchema, BreadcrumbSchema } from '@/components/seo';
+import { CourseSchema, BreadcrumbSchema, VideoObjectSchema } from '@/components/seo';
 import { getBackendOrigin, getPublicSiteUrl } from '@/lib/env/public-url';
 import { isOnboardingCourse } from '@/lib/onboarding/enterprise';
 import { normalizePublicAssetUrl } from '@/lib/remote-image';
@@ -45,6 +45,7 @@ interface CourseDetail {
   thumbnail_url?: string | null;
   module_count?: number | null;
   instructor?: { full_name: string } | null;
+  intro_video_url?: string | null;
 }
 
 const backendUrl = getBackendOrigin();
@@ -309,6 +310,16 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
         educationalLevel={course.level ?? undefined}
         teaches={course.iicrc_discipline ? [`IICRC ${course.iicrc_discipline}`] : undefined}
       />
+      {course.intro_video_url ? (
+        <VideoObjectSchema
+          name={`${course.title} — course trailer`}
+          description={course.short_description ?? course.description ?? course.title}
+          thumbnailUrl={thumbnailUrl ?? undefined}
+          url={course.intro_video_url}
+          channelName="CARSI"
+          channelUrl="https://carsi.com.au"
+        />
+      ) : null}
       <BreadcrumbSchema items={breadcrumbs} />
 
       <main id="main-content" className="relative min-h-screen" style={{ background: '#060a14' }}>
@@ -506,6 +517,20 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                 {/* ── Hero Right: Sticky Price Card (desktop) ── */}
                 <div className="hidden lg:block">
                   <div className="sticky top-8">
+                    {/* Intro/marketing video trailer (plays inline when the course has one) */}
+                    {course.intro_video_url ? (
+                      <div className="mb-4 overflow-hidden rounded-2xl border border-white/10 bg-black">
+                        <video
+                          controls
+                          preload="metadata"
+                          poster={thumbnailUrl ?? undefined}
+                          className="aspect-video w-full"
+                          src={course.intro_video_url}
+                        >
+                          Your browser does not support the video tag.
+                        </video>
+                      </div>
+                    ) : null}
                     {/* Thumbnail */}
                     <CourseThumbnail
                       src={thumbnailUrl}
