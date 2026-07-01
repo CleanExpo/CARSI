@@ -3067,7 +3067,7 @@
       "shortDescription": "CARSI Maintenance Company Onboarding — the floor-care induction for technicians, supervisors and facilities staff: safety, hygiene, methods, operational readiness and professional conduct across sensitive sites.",
       "thumbnailUrl": null,
       "instructorId": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
-      "status": "draft",
+      "status": "published",
       "priceAud": "0",
       "isFree": true,
       "durationHours": 8,
@@ -3098,7 +3098,7 @@
           "note": "Organisation subscription: AUD $1,295/month + GST, unlimited students. Provisioned manually; recurring billing is not yet wired (Stripe subscription build is separate)."
         }
       },
-      "isPublished": false,
+      "isPublished": true,
       "modules": [
         {
           "id": "0de25eb6-b9e5-432f-8df7-d2a75d01599c",

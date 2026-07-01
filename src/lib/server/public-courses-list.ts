@@ -371,7 +371,20 @@ export async function getPublishedCourseDetailBySlugFromDatabase(slug: string) {
     thumbnail_url: normalizePublicAssetUrl(row.thumbnailUrl),
     module_count: row._count.modules,
     instructor: row.instructor?.fullName ? { full_name: row.instructor.fullName } : null,
+    intro_video_url: readIntroVideoUrlFromMeta(row.meta),
   };
+}
+
+/**
+ * The admin editor stores the course intro/marketing video under `meta.introVideoUrl`
+ * (see admin-courses-service). Surface it to the public course page so it can render a
+ * hero player and emit VideoObject JSON-LD (video rich results + GEO). Returns null unless
+ * a non-empty string URL is present.
+ */
+function readIntroVideoUrlFromMeta(meta: unknown): string | null {
+  if (!meta || typeof meta !== 'object' || Array.isArray(meta)) return null;
+  const value = (meta as Record<string, unknown>).introVideoUrl;
+  return typeof value === 'string' && value.trim() ? value.trim() : null;
 }
 
 /**
