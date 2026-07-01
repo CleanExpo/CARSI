@@ -476,9 +476,49 @@ model ContactSubmission {
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
+  replyDrafts ContactReplyDraft[]
+
   @@index([status, createdAt(sort: Desc)])
   @@index([email])
   @@map("contact_submissions")
+}
+
+/// IICRC-grounded contact replies (Phase 2). An AI draft (or a human's inline
+/// reply) plus the provenance/audit record for every outbound. A `pending_approval`
+/// draft that cleared the deterministic gates (no-verbatim + judge) is auto-sent
+/// once the 2h SLA elapses with no human reply (founder-authorized 2026-07-01).
+/// See docs/specs/2026-07-01-carsi-assistant-and-contact-reply.md §14a.
+model ContactReplyDraft {
+  id               String    @id @default(uuid()) @db.Uuid
+  submissionId     String?   @map("submission_id") @db.Uuid
+  recipientEmail   String    @map("recipient_email") @db.VarChar(320)
+  recipientName    String    @map("recipient_name") @db.VarChar(240)
+  question         String    @db.Text
+  replyBody        String    @map("reply_body") @db.Text
+  standardsCited   String[]  @map("standards_cited")
+  stormSources     Json      @map("storm_sources")
+  judgeVerdict     Json?     @map("judge_verdict")
+  /// Always "pass" — a draft that fails the >= 8-gram guard is never persisted.
+  ngramCheck       String    @default("pass") @map("ngram_check") @db.VarChar(16)
+  /// Cleared judge + no-verbatim gates → eligible for 2h auto-send.
+  autoSendEligible Boolean   @default(false) @map("auto_send_eligible")
+  /// "agent:<skill>" for an AI draft, "admin:<email>" for an inline human reply.
+  draftedBy        String    @map("drafted_by") @db.VarChar(160)
+  /// Human email who approved, or "auto:sla-2h" when the SLA fired. Null while pending.
+  approvedBy       String?   @map("approved_by") @db.VarChar(320)
+  /// "human" | "auto" — how the send was triggered.
+  sentVia          String?   @map("sent_via") @db.VarChar(16)
+  /// "pending_approval" | "sent" | "discarded".
+  status           String    @default("pending_approval") @db.VarChar(32)
+  sentAt           DateTime? @map("sent_at") @db.Timestamptz(6)
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  submission ContactSubmission? @relation(fields: [submissionId], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt(sort: Desc)])
+  @@index([submissionId])
+  @@map("contact_reply_drafts")
 }
 
 /// Outbound CRM/webhook events (Phase 3) — contact, enrollment, etc.

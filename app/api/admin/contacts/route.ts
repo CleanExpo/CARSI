@@ -70,11 +70,19 @@ export async function GET(request: NextRequest) {
       },
       orderBy: { createdAt: 'desc' },
       take: limit,
+      include: {
+        replyDrafts: {
+          where: { status: 'pending_approval' },
+          orderBy: { createdAt: 'desc' },
+          take: 1,
+        },
+      },
     });
 
     return NextResponse.json({
       items: items.map((r) => {
         const parsed = parseLeadContext(r.message);
+        const draft = r.replyDrafts[0];
 
         return {
           id: r.id,
@@ -87,6 +95,16 @@ export async function GET(request: NextRequest) {
           status: r.status,
           source_ip: r.sourceIp,
           created_at: r.createdAt.toISOString(),
+          pending_draft: draft
+            ? {
+                id: draft.id,
+                reply_body: draft.replyBody,
+                standards_cited: draft.standardsCited,
+                auto_send_eligible: draft.autoSendEligible,
+                drafted_by: draft.draftedBy,
+                created_at: draft.createdAt.toISOString(),
+              }
+            : null,
         };
       }),
     });
