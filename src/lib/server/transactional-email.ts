@@ -9,6 +9,7 @@ import { isEmailConfigured, sendEmail, type SendEmailResult } from '@/lib/server
 import {
   renderCcwRoadshowBookingConfirmationEmail,
   renderContactNotificationEmail,
+  renderContactReplyEmail,
   renderEnrollmentWelcomeEmail,
   renderPasswordResetEmail,
   renderRegistrationWelcomeEmail,
@@ -411,6 +412,39 @@ export async function sendContactNotificationEmail(params: {
     to: params.notifyTo,
     replyTo: params.email,
     subject: `[CARSI Contact #${params.ticketRef}] ${params.firstName} ${params.lastName}`,
+    html,
+    text,
+  });
+}
+
+/**
+ * Send an IICRC-grounded reply to a contact enquiry (Phase 2). Used by both the
+ * founder's inline reply from the Contacts section and the 2h SLA auto-dispatch.
+ * `replyBody` is the exact composed, cited, disclaimered text — never mutated here.
+ */
+export async function sendContactReplyEmail(params: {
+  appOrigin: string;
+  to: string;
+  replyBody: string;
+  ticketRef?: string;
+  replyTo?: string;
+}): Promise<SendEmailResult> {
+  const base = params.appOrigin.replace(/\/$/, '');
+  const ref = params.ticketRef?.trim();
+  const { html, text } = renderContactReplyEmail({
+    appOrigin: base,
+    replyBody: params.replyBody,
+    ticketRef: ref,
+  });
+
+  return sendEmail({
+    to: params.to,
+    replyTo:
+      params.replyTo?.trim() ||
+      process.env.CONTACT_NOTIFY_EMAIL?.trim() ||
+      process.env.ADMIN_EMAIL?.trim() ||
+      'support@carsi.com.au',
+    subject: ref ? `Re: your enquiry to CARSI [#${ref}]` : 'Re: your enquiry to CARSI',
     html,
     text,
   });

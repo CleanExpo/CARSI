@@ -524,3 +524,29 @@ export function renderContactNotificationEmail(params: {
     `Contact #${params.ticketRef}\nFrom: ${fullName} <${params.email}>\n\n${params.message}\n\nAdmin: ${params.adminContactsUrl}`
   );
 }
+
+/**
+ * Outbound reply to a contact enquiry (Phase 2). `replyBody` is the full composed
+ * text — greeting, paraphrased answer, standard citation, and the finalized
+ * disclaimer footer — so the branded email renders exactly what is stored and
+ * audited, with no room for the disclaimer to drift away from the sent content.
+ */
+export function renderContactReplyEmail(params: {
+  appOrigin: string;
+  replyBody: string;
+  ticketRef?: string;
+}): RenderedEmail {
+  const base = params.appOrigin.replace(/\/$/, '');
+  const ref = params.ticketRef?.trim();
+  return render(
+    {
+      appOrigin: base,
+      preheader: 'A response from the CARSI team',
+      eyebrow: 'CARSI response',
+      title: ref ? `Re: your enquiry · #${ref}` : 'Re: your enquiry',
+      messageHtml: formatPlainMessageAsHtml(params.replyBody),
+      noteHtml: `You're receiving this because you contacted ${brandLink(`${base}/contact`, 'carsi.com.au')}.`,
+    },
+    params.replyBody
+  );
+}

@@ -3,14 +3,19 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Archive,
+  Check,
   Clock,
   Filter,
   Inbox,
   Mail,
   MessageSquare,
   Reply,
+  Send,
   Sparkles,
+  Trash2,
   User,
+  X,
+  Zap,
 } from 'lucide-react';
 
 import { adminGlassCard, formatAdminDateTime } from '@/components/admin/admin-learner-ui';
@@ -33,7 +38,24 @@ type ContactRow = {
   };
   status: string;
   created_at: string;
+  pending_draft?: {
+    id: string;
+    reply_body: string;
+    standards_cited: string[];
+    auto_send_eligible: boolean;
+    drafted_by: string;
+    created_at: string;
+  } | null;
 };
+
+const SLA_MS = 2 * 60 * 60 * 1000;
+
+function slaCountdown(createdAt: string) {
+  const remaining = new Date(createdAt).getTime() + SLA_MS - Date.now();
+  if (remaining <= 0) return 'auto-sending imminently';
+  const mins = Math.round(remaining / 60000);
+  return mins >= 60 ? `auto-sends in ~${Math.round(mins / 60)}h` : `auto-sends in ~${mins}m`;
+}
 
 const LEAD_FILTERS = [
   { label: 'All leads', value: '' },
@@ -65,6 +87,9 @@ export default function AdminContactsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [leadIntent, setLeadIntent] = useState('');
+  const [replyOpen, setReplyOpen] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState('');
+  const [busyId, setBusyId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -107,6 +132,57 @@ export default function AdminContactsPage() {
 
   function handleLeadFilter(intent: string) {
     setLeadIntent(intent);
+  }
+
+  function openReply(row: ContactRow) {
+    setReplyOpen(row.id);
+    setReplyText(row.pending_draft?.reply_body ?? '');
+  }
+
+  async function sendManualReply(submissionId: string) {
+    if (!replyText.trim()) return;
+    setBusyId(submissionId);
+    setError(null);
+    try {
+      const res = await fetch('/api/admin/contacts/reply', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ submissionId, replyBody: replyText }),
+      });
+      if (!res.ok) {
+        setError('Could not send the reply. Please try again.');
+        return;
+      }
+      setReplyOpen(null);
+      setReplyText('');
+      void load();
+    } catch {
+      setError('Could not send the reply. Please try again.');
+    } finally {
+      setBusyId(null);
+    }
+  }
+
+  async function actOnDraft(id: string, action: 'send' | 'discard', body?: string) {
+    setBusyId(id);
+    setError(null);
+    try {
+      const res = await fetch('/api/admin/contacts/reply-drafts', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, action, ...(body ? { replyBody: body } : {}) }),
+      });
+      if (!res.ok) {
+        setError(action === 'send' ? 'Could not send the draft.' : 'Could not discard the draft.');
+        return;
+      }
+      setReplyOpen(null);
+      void load();
+    } catch {
+      setError('Could not update the draft. Please try again.');
+    } finally {
+      setBusyId(null);
+    }
   }
 
   const stats = useMemo(() => {
@@ -283,7 +359,119 @@ export default function AdminContactsPage() {
                 <p className="text-sm leading-relaxed whitespace-pre-wrap text-white/72">{row.message}</p>
               </div>
 
+              {row.pending_draft ? (
+                <div className="border-t border-emerald-400/15 bg-emerald-400/[0.04] px-5 py-4 sm:px-6">
+                  <div className="mb-2 flex flex-wrap items-center gap-2">
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2.5 py-1 text-[10px] font-semibold tracking-wide text-emerald-200 uppercase">
+                      <Sparkles className="h-3 w-3" />
+                      AI draft ready
+                    </span>
+                    {row.pending_draft.standards_cited.map((s) => (
+                      <span
+                        key={s}
+                        className="rounded-full border border-white/10 bg-white/[0.04] px-2 py-0.5 text-[10px] text-white/60"
+                      >
+                        {s}
+                      </span>
+                    ))}
+                    {row.pending_draft.auto_send_eligible ? (
+                      <span className="inline-flex items-center gap-1 text-[10px] font-medium text-amber-200/90">
+                        <Zap className="h-3 w-3" />
+                        {slaCountdown(row.pending_draft.created_at)}
+                      </span>
+                    ) : (
+                      <span className="text-[10px] text-white/40">awaiting your approval (no auto-send)</span>
+                    )}
+                  </div>
+                  <p className="max-h-40 overflow-y-auto rounded-lg border border-white/[0.06] bg-black/25 px-3 py-2.5 text-xs leading-relaxed whitespace-pre-wrap text-white/70">
+                    {row.pending_draft.reply_body}
+                  </p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <Button
+                      size="sm"
+                      className="rounded-full bg-emerald-500/90 hover:bg-emerald-500"
+                      disabled={busyId === row.pending_draft.id}
+                      onClick={() => row.pending_draft && void actOnDraft(row.pending_draft.id, 'send')}
+                    >
+                      <Check className="mr-1.5 h-3.5 w-3.5" />
+                      Approve &amp; send
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="rounded-full border-white/12 text-white/65 hover:bg-white/[0.05]"
+                      onClick={() => openReply(row)}
+                    >
+                      <Reply className="mr-1.5 h-3.5 w-3.5" />
+                      Edit before sending
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="rounded-full border-red-400/20 text-red-200/80 hover:bg-red-500/10"
+                      disabled={busyId === row.pending_draft.id}
+                      onClick={() => row.pending_draft && void actOnDraft(row.pending_draft.id, 'discard')}
+                    >
+                      <Trash2 className="mr-1.5 h-3.5 w-3.5" />
+                      Discard
+                    </Button>
+                  </div>
+                </div>
+              ) : null}
+
+              {replyOpen === row.id ? (
+                <div className="border-t border-white/[0.06] bg-black/20 px-5 py-4 sm:px-6">
+                  <label className="mb-2 block text-[10px] font-semibold tracking-[0.14em] text-white/35 uppercase">
+                    Reply to {row.first_name || row.email}
+                  </label>
+                  <textarea
+                    value={replyText}
+                    onChange={(e) => setReplyText(e.target.value)}
+                    rows={6}
+                    placeholder="Write your reply — the CARSI disclaimer footer is added automatically."
+                    className="w-full resize-y rounded-lg border border-white/12 bg-black/30 px-3 py-2.5 text-sm leading-relaxed text-white/85 outline-none focus:border-[#2490ed]/50"
+                  />
+                  <div className="mt-2.5 flex flex-wrap gap-2">
+                    <Button
+                      size="sm"
+                      className="rounded-full bg-[#2490ed] hover:bg-[#1f7fd0]"
+                      disabled={busyId === row.id || !replyText.trim()}
+                      onClick={() =>
+                        row.pending_draft
+                          ? void actOnDraft(row.pending_draft.id, 'send', replyText)
+                          : void sendManualReply(row.id)
+                      }
+                    >
+                      <Send className="mr-1.5 h-3.5 w-3.5" />
+                      Send reply
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="rounded-full border-white/12 text-white/60 hover:bg-white/[0.05]"
+                      onClick={() => {
+                        setReplyOpen(null);
+                        setReplyText('');
+                      }}
+                    >
+                      <X className="mr-1.5 h-3.5 w-3.5" />
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              ) : null}
+
               <div className="flex flex-wrap gap-2 border-t border-white/[0.06] bg-black/15 px-5 py-3 sm:px-6">
+                {replyOpen !== row.id ? (
+                  <Button
+                    size="sm"
+                    className="rounded-full bg-[#2490ed] hover:bg-[#1f7fd0]"
+                    onClick={() => openReply(row)}
+                  >
+                    <Reply className="mr-1.5 h-3.5 w-3.5" />
+                    Reply
+                  </Button>
+                ) : null}
                 {(['read', 'replied', 'archived'] as const).map((s) => {
                   const Icon = s === 'read' ? Mail : s === 'replied' ? Reply : Archive;
                   return (
