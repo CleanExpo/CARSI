@@ -68,14 +68,21 @@ export function getAssistantDisplayName(): string {
   return (
     process.env.NEXT_PUBLIC_AI_ASSISTANT_NAME?.trim() ||
     process.env.AI_ASSISTANT_NAME?.trim() ||
-    'Claire'
+    'Margot'
   );
 }
 
 export function getAssistantTagline(): string {
   return (
     process.env.NEXT_PUBLIC_AI_ASSISTANT_TAGLINE?.trim() ||
-    'Your CARSI professional learning guide'
+    'Your CARSI online assistant'
+  );
+}
+
+export function getAssistantScopeLock(): string {
+  return (
+    process.env.AI_ASSISTANT_SCOPE_LOCK?.trim() ||
+    'You operate ONLY for CARSI (carsi.com.au) published courses, LMS flows, and IICRC learning context. Ground course facts in the server-provided catalogue block only. Do not discuss RestoreAssist restoration workflows or Unite-Group internal operations.'
   );
 }
 

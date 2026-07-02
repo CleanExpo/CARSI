@@ -5,6 +5,7 @@ import {
   getAssistantCourseContextText,
   getAssistantDisplayName,
   getAssistantPageFocusContext,
+  getAssistantScopeLock,
   getAssistantTagline,
 } from '@/lib/server/ai-assistant-context';
 import { buildAssistantSystemPrompt } from '@/lib/server/assistant-prompt';
@@ -30,7 +31,7 @@ type RequestBody = {
   conversation_id?: string | null;
   /** Prior turns (excluding the current `message`); max ~12 each side enforced server-side */
   history?: ChatTurn[];
-  /** Optional: URL-derived focus so Claire can answer in course/lesson context (validated server-side). */
+  /** Optional: URL-derived focus so Margot can answer in course/lesson context (validated server-side). */
   page_context?: { course_slug?: string; lesson_id?: string };
 };
 
@@ -134,6 +135,7 @@ export async function POST(request: NextRequest) {
 
   const name = getAssistantDisplayName();
   const tagline = getAssistantTagline();
+  const scopeLock = getAssistantScopeLock();
 
   const focusSection = pageFocus
     ? `
@@ -150,6 +152,7 @@ When CURRENT PAGE FOCUS is present, prioritise it for questions about "this cour
     tagline,
     courseContext,
     focusSection,
+    scopeLock,
   });
 
   const openaiMessages: { role: 'system' | 'user' | 'assistant'; content: string }[] = [

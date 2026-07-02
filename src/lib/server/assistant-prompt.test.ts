@@ -44,4 +44,13 @@ describe('buildAssistantSystemPrompt', () => {
     expect(prompt.indexOf('FOCUS_MARKER')).toBeGreaterThan(-1);
     expect(prompt.indexOf('FOCUS_MARKER')).toBeLessThan(prompt.indexOf('BEGIN CATALOGUE'));
   });
+
+  it('embeds tenant scope lock when provided', () => {
+    const prompt = buildAssistantSystemPrompt({
+      ...base,
+      scopeLock: 'CARSI-only scope marker',
+    });
+    expect(prompt).toContain('PROJECT SCOPE (mandatory):');
+    expect(prompt).toContain('CARSI-only scope marker');
+  });
 });
