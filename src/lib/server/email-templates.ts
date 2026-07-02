@@ -263,7 +263,15 @@ export function renderToolboxTalkEmail(params: {
   talkTitle: string;
   monthLabel: string;
   courseUrl: string;
+  /** Public one-click unsubscribe URL (Spam Act). Optional so tests/callers can omit. */
+  unsubscribeUrl?: string;
 }): RenderedEmail {
+  const unsubHtml = params.unsubscribeUrl
+    ? ` No longer want these? ${brandLink(params.unsubscribeUrl, 'Unsubscribe')}.`
+    : '';
+  const unsubText = params.unsubscribeUrl
+    ? `\n\nUnsubscribe from toolbox-talk emails: ${params.unsubscribeUrl}`
+    : '';
   return render(
     {
       appOrigin: params.appOrigin,
@@ -280,9 +288,9 @@ export function renderToolboxTalkEmail(params: {
         { label: 'Format', value: 'Quick refresher — do it, don’t just read it' },
       ],
       cta: { label: 'Open this month’s talk', href: params.courseUrl },
-      noteHtml: `You’re receiving this as part of your CARSI toolbox-talk subscription. Open ${brandLink(params.courseUrl, 'the course')} to view all talks.`,
+      noteHtml: `You’re receiving this as part of your CARSI toolbox-talk subscription. Open ${brandLink(params.courseUrl, 'the course')} to view all talks.${unsubHtml}`,
     },
-    `Hi ${params.name},\n\nThis month's toolbox talk is ready: "${params.talkTitle}".\n\nOpen it: ${params.courseUrl}`,
+    `Hi ${params.name},\n\nThis month's toolbox talk is ready: "${params.talkTitle}".\n\nOpen it: ${params.courseUrl}${unsubText}`,
   );
 }
 

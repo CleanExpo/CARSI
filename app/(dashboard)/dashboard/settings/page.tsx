@@ -1,7 +1,7 @@
 'use client';
 
 import { useAuth } from '@/components/auth/auth-provider';
-import { ChevronRight, UserCircle } from 'lucide-react';
+import { Bell, ChevronRight, UserCircle } from 'lucide-react';
 import Link from 'next/link';
 
 import { dash } from '@/lib/dashboard-light-ui';
@@ -42,6 +42,23 @@ export default function DashboardSettingsPage() {
               <span className="block text-sm font-medium text-slate-900">Profile &amp; account</span>
               <span className={`mt-0.5 block text-xs ${dash.muted}`}>
                 Name, email, IICRC details, and renewal tracking.
+              </span>
+            </span>
+            <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" aria-hidden />
+          </Link>
+        </li>
+        <li>
+          <Link
+            href="/dashboard/settings/notifications"
+            className="flex items-start gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-slate-300 hover:shadow-md"
+          >
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#eef7ff] text-[#146fc2]">
+              <Bell className="h-5 w-5" />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-sm font-medium text-slate-900">Notifications</span>
+              <span className={`mt-0.5 block text-xs ${dash.muted}`}>
+                Choose which emails CARSI sends you, including toolbox-talk updates.
               </span>
             </span>
             <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" aria-hidden />
