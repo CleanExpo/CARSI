@@ -160,6 +160,7 @@ interface CourseSchemaProps {
   duration?: string;
   educationalLevel?: string;
   teaches?: string[];
+  aggregateRating?: { ratingValue: number; reviewCount: number };
 }
 
 function normalizeCoursePrice(price: number | undefined): number | undefined {
@@ -204,6 +205,7 @@ export function CourseSchema({
   duration,
   educationalLevel,
   teaches,
+  aggregateRating,
 }: CourseSchemaProps) {
   const schema: Record<string, unknown> = {
     '@context': 'https://schema.org',
@@ -236,6 +238,16 @@ export function CourseSchema({
 
   if (teaches && teaches.length > 0) {
     schema.teaches = teaches;
+  }
+
+  if (aggregateRating && aggregateRating.reviewCount > 0) {
+    schema.aggregateRating = {
+      '@type': 'AggregateRating',
+      ratingValue: aggregateRating.ratingValue,
+      reviewCount: aggregateRating.reviewCount,
+      bestRating: 5,
+      worstRating: 1,
+    };
   }
 
   return (

@@ -115,6 +115,24 @@ export async function getCourseReviews(
   return { reviews: rows.map(toReviewDto), summary: summarizeReviews(rows) };
 }
 
+/**
+ * Lightweight aggregate for SEO (`AggregateRating` JSON-LD) — average + count only,
+ * no row fetch. Returns null when there are no published reviews (omit the schema then;
+ * Google flags an AggregateRating with reviewCount 0).
+ */
+export async function getAggregateRating(
+  courseId: string
+): Promise<{ ratingValue: number; reviewCount: number } | null> {
+  const agg = await prisma.lmsCourseReview.aggregate({
+    where: { courseId, isPublished: true },
+    _avg: { rating: true },
+    _count: { _all: true },
+  });
+  const reviewCount = agg._count._all;
+  if (reviewCount === 0) return null;
+  return { ratingValue: Math.round((agg._avg.rating ?? 0) * 10) / 10, reviewCount };
+}
+
 /** The current student's own review for a course, if any. */
 export async function getOwnReview(
   studentId: string,
