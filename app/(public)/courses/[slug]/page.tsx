@@ -12,6 +12,7 @@ import { isOnboardingCourse } from '@/lib/onboarding/enterprise';
 import { normalizePublicAssetUrl } from '@/lib/remote-image';
 import { OG_IMAGES, OG_IMAGE_URLS } from '@/lib/seo/og-image';
 import { getPublishedCourseDetailBySlugFromDatabase } from '@/lib/server/public-courses-list';
+import { getAggregateRating } from '@/lib/server/course-reviews';
 import { stripLegacyPurchaseCta } from '@/lib/lms/format-course-body';
 
 // ISR: render each course detail on demand and cache for 5 minutes (issue #129).
@@ -299,6 +300,11 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
     { name: course.title, url: `${siteUrl}/courses/${slug}` },
   ];
 
+  // AggregateRating for Course rich results — omit silently if unavailable (build/no reviews).
+  const aggregateRating = course.id
+    ? await getAggregateRating(course.id).catch(() => null)
+    : null;
+
   return (
     <>
       <CourseSchema
@@ -309,6 +315,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
         duration={course.duration_hours ?? undefined}
         educationalLevel={course.level ?? undefined}
         teaches={course.iicrc_discipline ? [`IICRC ${course.iicrc_discipline}`] : undefined}
+        aggregateRating={aggregateRating ?? undefined}
       />
       {course.intro_video_url ? (
         <VideoObjectSchema
