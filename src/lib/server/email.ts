@@ -19,6 +19,8 @@ export type SendEmailParams = {
   cc?: string | string[];
   bcc?: string | string[];
   attachments?: EmailAttachment[];
+  /** Extra SMTP headers (e.g. List-Unsubscribe / List-Unsubscribe-Post for RFC 8058). */
+  headers?: Record<string, string>;
 };
 
 export type SendEmailResult = {
@@ -138,6 +140,7 @@ export async function sendEmail(params: SendEmailParams): Promise<SendEmailResul
     html: params.html,
   };
   if (params.text) payload.text = params.text;
+  if (params.headers && Object.keys(params.headers).length > 0) payload.headers = params.headers;
   if (params.replyTo) payload.reply_to = parseEmailAddress(params.replyTo);
   if (params.cc) payload.cc = toAddressList(params.cc);
   if (params.bcc) payload.bcc = toAddressList(params.bcc);

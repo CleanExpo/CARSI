@@ -81,3 +81,32 @@ export async function verifyProofPackShareToken(token: string): Promise<string |
     return null;
   }
 }
+
+const EMAIL_UNSUBSCRIBE_AUDIENCE = 'carsi-email-unsubscribe';
+
+/**
+ * One-click unsubscribe token embedded in marketing/drip emails. Intentionally
+ * has NO expiry — an unsubscribe facility must stay functional indefinitely
+ * (Spam Act 2003 s.18: a functional unsubscribe for the life of the address).
+ */
+export async function signEmailUnsubscribeToken(userId: string): Promise<string> {
+  return new SignJWT({ purpose: 'email_unsubscribe' })
+    .setProtectedHeader({ alg: 'HS256' })
+    .setSubject(userId)
+    .setAudience(EMAIL_UNSUBSCRIBE_AUDIENCE)
+    .setIssuedAt()
+    .sign(getSessionSecretBytes());
+}
+
+export async function verifyEmailUnsubscribeToken(token: string): Promise<string | null> {
+  try {
+    const { payload } = await jwtVerify(token, getSessionSecretBytes(), {
+      audience: EMAIL_UNSUBSCRIBE_AUDIENCE,
+    });
+    if (payload.purpose !== 'email_unsubscribe') return null;
+    const sub = typeof payload.sub === 'string' ? payload.sub : '';
+    return sub || null;
+  } catch {
+    return null;
+  }
+}

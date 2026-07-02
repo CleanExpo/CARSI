@@ -117,6 +117,7 @@ export async function runToolboxDrip(now: Date = new Date()): Promise<DripRunRes
           try {
             await sendToolboxTalkEmail({
               to: student.email,
+              userId,
               name: student.fullName?.trim() || student.email.split('@')[0],
               talkTitle: talk.title,
               monthLabel,

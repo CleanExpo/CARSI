@@ -3,8 +3,10 @@
  * Uses branded templates from email-templates.ts and delivery from email.ts.
  */
 
+import { signEmailUnsubscribeToken } from '@/lib/auth/session-jwt';
 import { prisma } from '@/lib/prisma';
 import { getAppOrigin } from '@/lib/server/app-url';
+import { buildUnsubscribeUrl } from '@/lib/server/email-preferences';
 import { isEmailConfigured, sendEmail, type SendEmailResult } from '@/lib/server/email';
 import {
   renderCcwRoadshowBookingConfirmationEmail,
@@ -95,24 +97,36 @@ export async function sendRecertReminderEmail(params: {
 
 export async function sendToolboxTalkEmail(params: {
   to: string;
+  /** Recipient's LMS user id — used to mint the one-click unsubscribe token. */
+  userId: string;
   name: string;
   talkTitle: string;
   monthLabel: string;
   courseUrl: string;
 }): Promise<SendEmailResult> {
   const appOrigin = getAppOrigin();
+  const unsubscribeUrl = buildUnsubscribeUrl(
+    appOrigin,
+    await signEmailUnsubscribeToken(params.userId),
+  );
   const { html, text } = renderToolboxTalkEmail({
     appOrigin,
     name: params.name,
     talkTitle: params.talkTitle,
     monthLabel: params.monthLabel,
     courseUrl: params.courseUrl,
+    unsubscribeUrl,
   });
   return sendEmail({
     to: params.to,
     subject: `${params.monthLabel} Toolbox Talk: ${params.talkTitle}`,
     html,
     text,
+    headers: {
+      // RFC 8058 one-click unsubscribe (Gmail/Yahoo bulk-sender requirement).
+      'List-Unsubscribe': `<${unsubscribeUrl}>`,
+      'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+    },
   });
 }
 
