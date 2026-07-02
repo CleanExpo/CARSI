@@ -61,41 +61,19 @@ const DISCIPLINE_ACCENTS: Record<
   },
 };
 
-const CATEGORY_ACCENTS: { test: (c: string) => boolean; key: string }[] = [
-  { test: (c) => /safety|ppe/i.test(c), key: 'safety' },
-  { test: (c) => /whs|compliance/i.test(c), key: 'whs' },
-  { test: (c) => /marketing|business/i.test(c), key: 'mkt' },
-];
-
-const EXTRA_ACCENTS: Record<string, (typeof DISCIPLINE_ACCENTS)['WRT']> = {
-  safety: {
-    fg: '#a16207',
-    glow: 'rgba(240,180,41,0.18)',
-    from: '#fff8e6',
-    via: '#fff1c2',
-    to: '#ffffff',
-  },
-  whs: {
-    fg: '#0369a1',
-    glow: 'rgba(125,211,252,0.18)',
-    from: '#eff9ff',
-    via: '#dff3ff',
-    to: '#ffffff',
-  },
-  mkt: {
-    fg: '#be185d',
-    glow: 'rgba(244,114,182,0.18)',
-    from: '#fff1f7',
-    via: '#ffe1ee',
-    to: '#ffffff',
-  },
+/**
+ * Single on-brand accent for courses without an IICRC discipline (general / knowledge
+ * courses). Replaces the former per-title random-hue fallback so the card grid reads as one
+ * consistent system: IICRC-discipline courses take their discipline accent, everything else
+ * takes this one CARSI-neutral treatment.
+ */
+const CARSI_NEUTRAL: (typeof DISCIPLINE_ACCENTS)['WRT'] = {
+  fg: '#9a4526',
+  glow: 'rgba(184,92,56,0.16)',
+  from: '#faf5ef',
+  via: '#f2e8db',
+  to: '#ffffff',
 };
-
-function hashHue(title: string): number {
-  let h = 0;
-  for (let i = 0; i < title.length; i += 1) h = (h * 31 + title.charCodeAt(i)) >>> 0;
-  return h % 360;
-}
 
 function inferDisciplineCode(
   category: string | null | undefined,
@@ -117,26 +95,12 @@ function shouldShowCategoryLabel(category: string | null | undefined, code: stri
 }
 
 export function getCourseTextAccent(
-  title: string,
   category?: string | null,
   discipline?: string | null
 ): (typeof DISCIPLINE_ACCENTS)['WRT'] {
   const code = inferDisciplineCode(category, discipline);
   if (code && DISCIPLINE_ACCENTS[code]) return DISCIPLINE_ACCENTS[code]!;
-
-  const catLower = category?.toLowerCase() ?? '';
-  for (const { test, key } of CATEGORY_ACCENTS) {
-    if (test(catLower) && EXTRA_ACCENTS[key]) return EXTRA_ACCENTS[key]!;
-  }
-
-  const hue = hashHue(title);
-  return {
-    fg: `hsl(${hue} 64% 34%)`,
-    glow: `hsla(${hue}, 70%, 50%, 0.16)`,
-    from: `hsl(${hue} 80% 96%)`,
-    via: `hsl(${(hue + 12) % 360} 78% 92%)`,
-    to: '#ffffff',
-  };
+  return CARSI_NEUTRAL;
 }
 
 export type CourseTextThumbnailProps = {
@@ -215,7 +179,7 @@ export function CourseTextThumbnail({
   backdropImageReferrerPolicy,
   onBackdropImageError,
 }: CourseTextThumbnailProps) {
-  const accent = getCourseTextAccent(title, category, discipline);
+  const accent = getCourseTextAccent(category, discipline);
   const code = inferDisciplineCode(category, discipline);
   const showCategory = shouldShowCategoryLabel(category, code);
   const hasBackdrop = Boolean(backdropImageSrc?.trim());
