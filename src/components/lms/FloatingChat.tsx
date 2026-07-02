@@ -386,9 +386,11 @@ export default function FloatingChat() {
         onClick={() => setOpen((v) => !v)}
         whileHover={{ scale: 1.06 }}
         whileTap={{ scale: 0.96 }}
-        className="flex min-h-12 min-w-12 items-center justify-center gap-2 rounded-full p-1 text-sm font-semibold text-white shadow-lg transition-shadow hover:shadow-xl sm:min-w-0 sm:rounded-full sm:px-1 sm:py-1"
+        className="flex min-h-12 min-w-12 items-center justify-center gap-2 rounded-full p-1 text-sm font-semibold text-white shadow-lg transition-shadow hover:shadow-xl sm:min-w-0 sm:rounded-full sm:py-1 sm:pr-3 sm:pl-1"
         style={{
-          background: open ? '#0f5fa8' : 'transparent',
+          // Solid fill required when the sm+ "Ask Margot" label is visible — white text on
+          // transparent fails WCAG contrast against marketing page backgrounds (#f6f8fb).
+          background: '#0f5fa8',
           boxShadow: open ? undefined : `0 8px 24px ${MARGOT_ACCENT}55`,
         }}
         aria-label={open ? 'Close chat' : `Open ${ASSISTANT_NAME}`}
