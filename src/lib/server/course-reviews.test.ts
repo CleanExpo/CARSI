@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   canManageReviews,
+  canModerateReviews,
   isValidRating,
   summarizeReviews,
   toReviewDto,
@@ -52,6 +53,7 @@ describe('toReviewDto', () => {
     body: 'Learned a lot.',
     reply: null,
     repliedAt: null,
+    isPublished: true,
     createdAt: new Date('2026-07-02T00:00:00.000Z'),
     student: { fullName: 'Sam Rivers', email: 'sam@example.com' },
   };
@@ -64,6 +66,7 @@ describe('toReviewDto', () => {
       body: 'Learned a lot.',
       reply: null,
       replied_at: null,
+      is_published: true,
       author: 'Sam',
       created_at: '2026-07-02T00:00:00.000Z',
     });
@@ -92,5 +95,14 @@ describe('canManageReviews', () => {
     expect(canManageReviews('student')).toBe(false);
     expect(canManageReviews(null)).toBe(false);
     expect(canManageReviews(undefined)).toBe(false);
+  });
+});
+
+describe('canModerateReviews', () => {
+  it('allows admin only (instructors have a conflict of interest)', () => {
+    expect(canModerateReviews('admin')).toBe(true);
+    expect(canModerateReviews('instructor')).toBe(false);
+    expect(canModerateReviews('student')).toBe(false);
+    expect(canModerateReviews(null)).toBe(false);
   });
 });

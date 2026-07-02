@@ -19,6 +19,7 @@ export type ReviewRow = {
   body: string | null;
   reply: string | null;
   repliedAt: Date | null;
+  isPublished: boolean;
   createdAt: Date;
   student: { fullName: string | null; email: string } | null;
 };
@@ -31,6 +32,8 @@ export type ReviewDto = {
   /** Public instructor/admin response, if any (GP-118). */
   reply: string | null;
   replied_at: string | null;
+  /** Whether the review is publicly visible (false = admin-hidden). */
+  is_published: boolean;
   author: string;
   created_at: string;
 };
@@ -38,6 +41,11 @@ export type ReviewDto = {
 /** Roles allowed to publish a response to a review (mirrors WORKFLOW_ROLES). */
 export function canManageReviews(role: string | null | undefined): boolean {
   return role === 'admin' || role === 'instructor';
+}
+
+/** Only admins may hide/unhide (moderate) a review — instructors would have a conflict of interest. */
+export function canModerateReviews(role: string | null | undefined): boolean {
+  return role === 'admin';
 }
 
 export type ReviewSummary = {
@@ -69,6 +77,7 @@ export function toReviewDto(row: ReviewRow): ReviewDto {
     body: row.body,
     reply: row.reply,
     replied_at: row.repliedAt ? row.repliedAt.toISOString() : null,
+    is_published: row.isPublished,
     author: displayAuthor(row.student),
     created_at: row.createdAt.toISOString(),
   };
@@ -108,12 +117,17 @@ export async function isEnrolledInCourse(studentId: string, courseId: string): P
   return enrolment !== null;
 }
 
-/** Published reviews for a course, newest first, plus the aggregate summary. */
+/**
+ * Reviews for a course, newest first, plus the aggregate summary.
+ * `includeHidden` (moderators only) also returns admin-hidden reviews; the public
+ * summary is always computed from published reviews only, so hidden ones never skew it.
+ */
 export async function getCourseReviews(
-  courseId: string
+  courseId: string,
+  includeHidden = false
 ): Promise<{ reviews: ReviewDto[]; summary: ReviewSummary }> {
   const rows = await prisma.lmsCourseReview.findMany({
-    where: { courseId, isPublished: true },
+    where: includeHidden ? { courseId } : { courseId, isPublished: true },
     orderBy: { createdAt: 'desc' },
     select: {
       id: true,
@@ -122,11 +136,21 @@ export async function getCourseReviews(
       body: true,
       reply: true,
       repliedAt: true,
+      isPublished: true,
       createdAt: true,
       student: { select: { fullName: true, email: true } },
     },
   });
-  return { reviews: rows.map(toReviewDto), summary: summarizeReviews(rows) };
+  const summary = summarizeReviews(rows.filter((r) => r.isPublished));
+  return { reviews: rows.map(toReviewDto), summary };
+}
+
+/** Hide or unhide a review from public listings (admin moderation). */
+export async function setReviewPublished(reviewId: string, isPublished: boolean): Promise<void> {
+  await prisma.lmsCourseReview.update({
+    where: { id: reviewId },
+    data: { isPublished },
+  });
 }
 
 /** Minimal review lookup for reply validation (confirms it belongs to the course). */
