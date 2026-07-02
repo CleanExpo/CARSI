@@ -64,6 +64,19 @@ jobs:
           echo "::add-mask::$RESOLVED"
           echo "DATABASE_URL=$RESOLVED" >> "$GITHUB_ENV"
 
+      - name: Diagnose DB env (dry-run only — names + hosts, no credentials)
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.apply != true }}
+        run: |
+          node -e '
+            require("dotenv").config();
+            const keys = Object.keys(process.env).filter((k) => /DATABASE|DIRECT|SUPABASE|POSTGRES|(^|_)PG|(^|_)DB_/.test(k));
+            console.log("DB-related env keys present:", keys.sort().join(", ") || "(none)");
+            const host = (v) => { try { const u = new URL(v); return `${u.protocol}//${u.hostname}:${u.port || "(default)"}`; } catch { return "(unparseable)"; } };
+            for (const k of ["DATABASE_URL","DIRECT_URL","DIRECT_DATABASE_URL","DATABASE_URL_UNPOOLED","MIGRATE_DATABASE_URL"]) {
+              if (process.env[k]) console.log(`${k} host:`, host(process.env[k]));
+            }
+          ' | tee -a "$GITHUB_STEP_SUMMARY"
+
       - name: Migration status (always — non-mutating)
         run: |
           echo "### Migration status" >> "$GITHUB_STEP_SUMMARY"
