@@ -37,6 +37,11 @@ export const courseWithCurriculum = {
       lessons: { orderBy: { orderIndex: 'asc' as const } },
     },
   },
+  quizzes: {
+    include: {
+      questions: { orderBy: { orderIndex: 'asc' as const } },
+    },
+  },
 } as const;
 
 export type CourseWithCurriculum = Prisma.LmsCourseGetPayload<{
