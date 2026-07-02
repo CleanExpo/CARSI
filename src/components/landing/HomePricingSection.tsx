@@ -99,7 +99,7 @@ export function HomePricingSection() {
                 <span className="text-3xl font-bold text-slate-950 dark:text-white">
                   {tier.price}
                 </span>
-                <span className="text-xs text-slate-500 dark:text-white/50">{tier.cadence}</span>
+                <span className="text-xs text-slate-600 dark:text-white/60">{tier.cadence}</span>
               </p>
               <p className="mt-3 flex-1 text-sm leading-relaxed text-slate-600 dark:text-white/65">
                 {tier.description}
