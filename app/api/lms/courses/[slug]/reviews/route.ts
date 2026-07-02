@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import {
+  canManageReviews,
   getCourseIdBySlug,
   getCourseReviews,
   getOwnReview,
@@ -22,6 +23,7 @@ export async function GET(request: NextRequest, ctx: { params: Promise<{ slug: s
       reviews: [],
       summary: { average: 0, count: 0, distribution: { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 } },
       can_review: false,
+      can_manage: false,
       own_review: null,
     });
   }
@@ -34,16 +36,24 @@ export async function GET(request: NextRequest, ctx: { params: Promise<{ slug: s
 
     const { reviews, summary } = await getCourseReviews(course.id);
 
-    // Optional auth: enrich with the caller's own-review state when signed in.
+    // Optional auth: enrich with the caller's own-review + moderation state when signed in.
     const claims = await getSessionClaimsFromRequest(request);
     let canReview = false;
+    let canManage = false;
     let ownReview = null;
     if (claims) {
+      canManage = canManageReviews(claims.role);
       canReview = await isEnrolledInCourse(claims.sub, course.id);
       ownReview = canReview ? await getOwnReview(claims.sub, course.id) : null;
     }
 
-    return NextResponse.json({ reviews, summary, can_review: canReview, own_review: ownReview });
+    return NextResponse.json({
+      reviews,
+      summary,
+      can_review: canReview,
+      can_manage: canManage,
+      own_review: ownReview,
+    });
   } catch (e) {
     console.error('[courses/:slug/reviews GET]', e);
     return NextResponse.json({ detail: 'Failed to load reviews' }, { status: 500 });

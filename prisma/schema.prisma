@@ -59,7 +59,8 @@ model LmsUser {
   iicrcCecSubmissions LmsIicrcCecSubmission[]
   lessonProgress     LmsLessonProgress[]
   notifications      LmsNotification[]
-  courseReviews      LmsCourseReview[]
+  courseReviews      LmsCourseReview[] @relation("ReviewStudent")
+  reviewReplies      LmsCourseReview[] @relation("ReviewReplyAuthor")
 
   @@map("lms_users")
 }
@@ -135,18 +136,23 @@ model LmsCourse {
 /// (`uq_lms_course_review`), gated on an existing enrolment. `isPublished` lets an
 /// admin hide a review without deleting it; public listings filter on it.
 model LmsCourseReview {
-  id          String   @id @default(uuid()) @db.Uuid
-  courseId    String   @map("course_id") @db.Uuid
-  studentId   String   @map("student_id") @db.Uuid
+  id          String    @id @default(uuid()) @db.Uuid
+  courseId    String    @map("course_id") @db.Uuid
+  studentId   String    @map("student_id") @db.Uuid
   rating      Int
-  title       String?  @db.Text
-  body        String?  @db.Text
-  isPublished Boolean  @default(true) @map("is_published")
-  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  title       String?   @db.Text
+  body        String?   @db.Text
+  isPublished Boolean   @default(true) @map("is_published")
+  /// Public instructor/admin response to the review (GP-118).
+  reply       String?   @db.Text
+  repliedAt   DateTime? @map("replied_at") @db.Timestamptz(6)
+  repliedById String?   @map("replied_by_id") @db.Uuid
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  course  LmsCourse @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  student LmsUser   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  course    LmsCourse @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  student   LmsUser   @relation("ReviewStudent", fields: [studentId], references: [id], onDelete: Cascade)
+  repliedBy LmsUser?  @relation("ReviewReplyAuthor", fields: [repliedById], references: [id], onDelete: SetNull)
 
   @@unique([courseId, studentId], map: "uq_lms_course_review")
   @@index([courseId, isPublished], map: "ix_lms_course_review_course_published")

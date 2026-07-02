@@ -10,6 +10,8 @@ type ReviewDto = {
   rating: number;
   title: string | null;
   body: string | null;
+  reply: string | null;
+  replied_at: string | null;
   author: string;
   created_at: string;
 };
@@ -24,6 +26,7 @@ type ReviewsResponse = {
   reviews: ReviewDto[];
   summary: Summary;
   can_review: boolean;
+  can_manage: boolean;
   own_review: { rating: number; title: string | null; body: string | null } | null;
 };
 
@@ -82,6 +85,140 @@ function formatDate(iso: string): string {
   }
 }
 
+function ReviewItem({
+  review,
+  slug,
+  canManage,
+  onChanged,
+}: {
+  review: ReviewDto;
+  slug: string;
+  canManage: boolean;
+  onChanged: () => Promise<void>;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [text, setText] = useState(review.reply ?? '');
+  const [busy, setBusy] = useState(false);
+  const [drafting, setDrafting] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+
+  const draftWithAi = useCallback(async () => {
+    setDrafting(true);
+    setErr(null);
+    try {
+      const res = await apiClient.post<{ draft: string | null }>(
+        `/api/lms/courses/${slug}/reviews/${review.id}/reply/draft`,
+        {}
+      );
+      if (res.draft) setText(res.draft);
+      else setErr('AI drafting is unavailable right now — write a reply manually.');
+    } catch {
+      setErr('Could not draft a reply. Please try again.');
+    } finally {
+      setDrafting(false);
+    }
+  }, [slug, review.id]);
+
+  const save = useCallback(
+    async (reply: string | null) => {
+      setBusy(true);
+      setErr(null);
+      try {
+        await apiClient.post(`/api/lms/courses/${slug}/reviews/${review.id}/reply`, { reply });
+        setEditing(false);
+        await onChanged();
+      } catch {
+        setErr('Could not save the reply. Please try again.');
+      } finally {
+        setBusy(false);
+      }
+    },
+    [slug, review.id, onChanged]
+  );
+
+  return (
+    <li className="border-b border-slate-100 pb-5 last:border-0">
+      <div className="flex items-center gap-2">
+        <Stars value={review.rating} />
+        {review.title && <span className="text-sm font-semibold text-slate-900">{review.title}</span>}
+      </div>
+      {review.body && <p className="mt-1.5 text-sm leading-relaxed text-slate-700">{review.body}</p>}
+      <p className="mt-1.5 text-xs text-slate-400">
+        {review.author} · {formatDate(review.created_at)}
+      </p>
+
+      {review.reply && !editing && (
+        <div className="mt-3 rounded-lg border-l-2 border-[#2490ed] bg-slate-50 p-3">
+          <p className="text-xs font-semibold text-[#146fc2]">Response from the instructor</p>
+          <p className="mt-1 text-sm leading-relaxed text-slate-700">{review.reply}</p>
+        </div>
+      )}
+
+      {canManage && !editing && (
+        <button
+          type="button"
+          onClick={() => {
+            setText(review.reply ?? '');
+            setEditing(true);
+          }}
+          className="mt-2 text-xs font-medium text-[#146fc2] hover:underline"
+        >
+          {review.reply ? 'Edit response' : 'Reply'}
+        </button>
+      )}
+
+      {canManage && editing && (
+        <div className="mt-3 rounded-lg border border-slate-200 bg-slate-50 p-3">
+          <textarea
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            rows={3}
+            maxLength={2000}
+            placeholder="Write a public response…"
+            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#2490ed]/50 focus:outline-none focus:ring-2 focus:ring-[#2490ed]/20"
+          />
+          {err && <p className="mt-1 text-xs text-red-600">{err}</p>}
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => save(text)}
+              disabled={busy || !text.trim()}
+              className="inline-flex items-center gap-2 rounded-lg bg-[#2490ed] px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-[#1a7fd4] disabled:opacity-60"
+            >
+              {busy ? 'Saving…' : 'Publish response'}
+            </button>
+            <button
+              type="button"
+              onClick={draftWithAi}
+              disabled={drafting}
+              className="inline-flex items-center gap-2 rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-white disabled:opacity-60"
+            >
+              {drafting ? 'Drafting…' : '✨ Draft with AI'}
+            </button>
+            {review.reply && (
+              <button
+                type="button"
+                onClick={() => save(null)}
+                disabled={busy}
+                className="text-xs font-medium text-red-600 hover:underline disabled:opacity-60"
+              >
+                Remove
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => setEditing(false)}
+              className="text-xs font-medium text-slate-500 hover:underline"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+    </li>
+  );
+}
+
 export function CourseReviews({ slug }: { slug: string }) {
   const [data, setData] = useState<ReviewsResponse | null>(null);
   const [rating, setRating] = useState(0);
@@ -106,6 +243,7 @@ export function CourseReviews({ slug }: { slug: string }) {
         reviews: [],
         summary: { average: 0, count: 0, distribution: { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 } },
         can_review: false,
+        can_manage: false,
         own_review: null,
       });
     }
@@ -136,7 +274,7 @@ export function CourseReviews({ slug }: { slug: string }) {
 
   if (!data) return null;
 
-  const { summary, reviews, can_review, own_review } = data;
+  const { summary, reviews, can_review, can_manage, own_review } = data;
 
   return (
     <div aria-label="Course reviews">
@@ -200,16 +338,7 @@ export function CourseReviews({ slug }: { slug: string }) {
       {reviews.length > 0 && (
         <ul className="mt-6 space-y-5">
           {reviews.map((r) => (
-            <li key={r.id} className="border-b border-slate-100 pb-5 last:border-0">
-              <div className="flex items-center gap-2">
-                <Stars value={r.rating} />
-                {r.title && <span className="text-sm font-semibold text-slate-900">{r.title}</span>}
-              </div>
-              {r.body && <p className="mt-1.5 text-sm leading-relaxed text-slate-700">{r.body}</p>}
-              <p className="mt-1.5 text-xs text-slate-400">
-                {r.author} · {formatDate(r.created_at)}
-              </p>
-            </li>
+            <ReviewItem key={r.id} review={r} slug={slug} canManage={can_manage} onChanged={load} />
           ))}
         </ul>
       )}
