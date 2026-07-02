@@ -60,6 +60,16 @@ function getConnectionStringForAdapter(): string {
   return `${connectionString}${sep}sslrootcert=${encodeURIComponent(cachedCaPath)}`;
 }
 
+/**
+ * The fully-resolved Postgres connection string the app uses — sslmode normalised to
+ * `verify-full` and `DATABASE_CA_CERT` (base64) written to a temp file + referenced via
+ * `sslrootcert`. Exported so out-of-band tooling (e.g. the production migration runner) connects
+ * to the managed database identically to the app. Does not mutate `process.env`.
+ */
+export function resolvePrismaDatabaseUrl(): string {
+  return getConnectionStringForAdapter();
+}
+
 function createClient() {
   const adapter = new PrismaPg({ connectionString: getConnectionStringForAdapter() });
   return new PrismaClient({
