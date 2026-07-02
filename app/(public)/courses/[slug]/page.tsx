@@ -439,6 +439,27 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                     </p>
                   )}
 
+                  {/* Star rating (social proof) — only when the course has published reviews */}
+                  {aggregateRating && (
+                    <div
+                      className="mb-4 inline-flex items-center gap-2"
+                      aria-label={`Rated ${aggregateRating.ratingValue} out of 5 from ${aggregateRating.reviewCount} reviews`}
+                    >
+                      <span aria-hidden style={{ color: '#ed9d24', letterSpacing: '2px', fontSize: '18px' }}>
+                        {'★'.repeat(Math.round(aggregateRating.ratingValue))}
+                        <span style={{ color: 'rgba(255,255,255,0.25)' }}>
+                          {'★'.repeat(5 - Math.round(aggregateRating.ratingValue))}
+                        </span>
+                      </span>
+                      <span className="text-sm font-semibold" style={{ color: 'rgba(255,255,255,0.9)' }}>
+                        {aggregateRating.ratingValue.toFixed(1)}
+                      </span>
+                      <span className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                        ({aggregateRating.reviewCount} review{aggregateRating.reviewCount === 1 ? '' : 's'})
+                      </span>
+                    </div>
+                  )}
+
                   {/* Short description or description excerpt */}
                   <p
                     className="mb-6 max-w-2xl text-base leading-relaxed sm:text-lg"
