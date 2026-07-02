@@ -1,18 +1,28 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { Bot, MessageCircle, RotateCcw, Send, Sparkles, X } from 'lucide-react';
+import { MessageCircle, RotateCcw, Send, Sparkles, X } from 'lucide-react';
+import Image from 'next/image';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { ASSISTANT_DISCLAIMER } from '@/lib/assistant-disclaimer';
 import { deriveChatPageContext } from '@/lib/chat-page-context';
+import {
+  MARGOT_ACCENT,
+  MARGOT_AVATAR_PATH,
+  MARGOT_DISPLAY_NAME,
+  MARGOT_ROLE_LABEL,
+  MARGOT_WELCOME,
+} from '@/lib/margot-surface';
 
-const ASSISTANT_NAME = process.env.NEXT_PUBLIC_AI_ASSISTANT_NAME?.trim() || 'Claire';
+const ASSISTANT_NAME =
+  process.env.NEXT_PUBLIC_AI_ASSISTANT_NAME?.trim() || MARGOT_DISPLAY_NAME;
 const ASSISTANT_TAGLINE =
-  process.env.NEXT_PUBLIC_AI_ASSISTANT_TAGLINE?.trim() || 'Your CARSI professional learning guide';
+  process.env.NEXT_PUBLIC_AI_ASSISTANT_TAGLINE?.trim() || MARGOT_ROLE_LABEL;
 
-const WELCOME_MESSAGE = `Hi — I'm ${ASSISTANT_NAME}, ${ASSISTANT_TAGLINE}. Ask me about CARSI courses, IICRC disciplines, enrolment, or your dashboard.`;
+const WELCOME_MESSAGE =
+  process.env.NEXT_PUBLIC_AI_ASSISTANT_WELCOME?.trim() || MARGOT_WELCOME;
 
 interface Message {
   id: string;
@@ -25,6 +35,19 @@ const SUGGESTED_PROMPTS = [
   'How do CEC credits work?',
   'How do I find my certificates?',
 ];
+
+function MargotAvatar({ size = 40, className = '' }: { size?: number; className?: string }) {
+  return (
+    <Image
+      src={MARGOT_AVATAR_PATH}
+      alt={`${ASSISTANT_NAME} avatar`}
+      width={size}
+      height={size}
+      className={`rounded-full object-cover ring-2 ring-white/10 ${className}`}
+      priority
+    />
+  );
+}
 
 function TypingIndicator() {
   return (
@@ -211,14 +234,14 @@ export default function FloatingChat() {
             >
               <div className="flex min-w-0 items-center gap-3">
                 <div
-                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-sm"
+                  className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full"
                   style={{
-                    background: 'rgba(36,144,237,0.2)',
-                    border: '1px solid rgba(36,144,237,0.35)',
+                    border: `1px solid ${MARGOT_ACCENT}55`,
+                    boxShadow: `0 0 0 2px ${MARGOT_ACCENT}22`,
                   }}
                   aria-hidden
                 >
-                  <Bot className="h-5 w-5 text-[#2490ed]" strokeWidth={1.75} />
+                  <MargotAvatar size={40} className="ring-0" />
                 </div>
                 <div className="min-w-0">
                   <div className="flex items-center gap-1.5">
@@ -363,8 +386,13 @@ export default function FloatingChat() {
         onClick={() => setOpen((v) => !v)}
         whileHover={{ scale: 1.06 }}
         whileTap={{ scale: 0.96 }}
-        className="flex min-h-12 min-w-12 items-center justify-center gap-2 rounded-sm px-3 py-3 text-sm font-semibold text-white shadow-lg transition-shadow hover:shadow-xl sm:min-w-0 sm:px-4"
-        style={{ background: '#0f5fa8' }}
+        className="flex min-h-12 min-w-12 items-center justify-center gap-2 rounded-full p-1 text-sm font-semibold text-white shadow-lg transition-shadow hover:shadow-xl sm:min-w-0 sm:rounded-full sm:py-1 sm:pr-3 sm:pl-1"
+        style={{
+          // Solid fill required when the sm+ "Ask Margot" label is visible — white text on
+          // transparent fails WCAG contrast against marketing page backgrounds (#f6f8fb).
+          background: '#0f5fa8',
+          boxShadow: open ? undefined : `0 8px 24px ${MARGOT_ACCENT}55`,
+        }}
         aria-label={open ? 'Close chat' : `Open ${ASSISTANT_NAME}`}
       >
         <AnimatePresence mode="wait" initial={false}>
@@ -375,22 +403,33 @@ export default function FloatingChat() {
               animate={{ opacity: 1, rotate: 0 }}
               exit={{ opacity: 0, rotate: 90 }}
               transition={{ duration: 0.15 }}
+              className="flex h-12 w-12 items-center justify-center rounded-full"
+              style={{ background: '#0f5fa8' }}
             >
-              <X size={18} />
+              <X size={18} className="text-white" />
             </motion.span>
           ) : (
             <motion.span
               key="open"
-              initial={{ opacity: 0, rotate: 90 }}
-              animate={{ opacity: 1, rotate: 0 }}
-              exit={{ opacity: 0, rotate: -90 }}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
               transition={{ duration: 0.15 }}
+              className="relative flex h-14 w-14 items-center justify-center"
             >
-              <MessageCircle size={18} />
+              <MargotAvatar size={56} className="ring-2 ring-white/20" />
+              <span
+                className="absolute -right-0.5 -bottom-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-[#0f5fa8] ring-2 ring-[#060a14]"
+                aria-hidden
+              >
+                <MessageCircle size={11} className="text-white" />
+              </span>
             </motion.span>
           )}
         </AnimatePresence>
-        {!open && <span className="hidden sm:inline">Ask {ASSISTANT_NAME}</span>}
+        {!open && (
+          <span className="hidden pr-2 sm:inline">Ask {ASSISTANT_NAME}</span>
+        )}
       </motion.button>
     </div>
   );

@@ -1,7 +1,7 @@
 import { ASSISTANT_DISCLAIMER } from '@/lib/assistant-disclaimer';
 
 export interface AssistantSystemPromptArgs {
-  /** Assistant display name (e.g. "Claire"). */
+  /** Assistant display name (e.g. "Margot"). */
   name: string;
   /** Short tagline used in the persona line. */
   tagline: string;
@@ -9,6 +9,8 @@ export interface AssistantSystemPromptArgs {
   courseContext: string;
   /** Optional current-page focus block, already delimited, or '' when absent. */
   focusSection?: string;
+  /** Tenant scope lock — restricts assistant to CARSI-only context. */
+  scopeLock?: string;
 }
 
 /**
@@ -23,9 +25,17 @@ export function buildAssistantSystemPrompt({
   tagline,
   courseContext,
   focusSection = '',
+  scopeLock = '',
 }: AssistantSystemPromptArgs): string {
-  return `You are ${name}, ${tagline} for CARSI (Centre for Applied Restoration and Specialist Industries / carsi.com.au).
+  const scopeSection = scopeLock.trim()
+    ? `
+PROJECT SCOPE (mandatory):
+${scopeLock.trim()}
+`
+    : '';
 
+  return `You are ${name}, ${tagline} for CARSI (Centre for Applied Restoration and Specialist Industries / carsi.com.au).
+${scopeSection}
 Persona: professional, warm, concise, Australian English. You help visitors and enrolled learners with:
 - Questions about published courses (titles, price in AUD, categories, IICRC disciplines, module counts, URLs like /courses/[slug])
 - How enrolment, modules, lessons, progress, and certificates work on the platform
