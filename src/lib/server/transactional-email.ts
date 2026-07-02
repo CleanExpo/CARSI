@@ -12,6 +12,7 @@ import {
   renderContactReplyEmail,
   renderEnrollmentWelcomeEmail,
   renderPasswordResetEmail,
+  renderRecertReminderEmail,
   renderRegistrationWelcomeEmail,
   renderAdminPasswordResetEmail,
   renderTeamMemberAddedEmail,
@@ -66,6 +67,29 @@ export async function sendRegistrationWelcomeEmail(params: {
     html,
     text,
   });
+}
+
+export async function sendRecertReminderEmail(params: {
+  to: string;
+  name: string;
+  expiryDate: string;
+  milestone: 't_minus_30' | 't_minus_7' | 'overdue';
+  appOrigin: string;
+}): Promise<SendEmailResult> {
+  const base = params.appOrigin.replace(/\/$/, '');
+  const renewalsUrl = `${base}/dashboard/credentials`;
+  const { html, text } = renderRecertReminderEmail({
+    appOrigin: params.appOrigin,
+    name: params.name,
+    expiryDate: params.expiryDate,
+    milestone: params.milestone,
+    renewalsUrl,
+  });
+  const subject =
+    params.milestone === 'overdue'
+      ? 'Your IICRC certification has expired'
+      : `IICRC certification renewal due (expires ${params.expiryDate})`;
+  return sendEmail({ to: params.to, subject, html, text });
 }
 
 export async function sendEnrollmentWelcomeEmail(params: {

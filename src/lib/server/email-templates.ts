@@ -216,6 +216,47 @@ function render(content: CarsiEmailContent, textBody: string): RenderedEmail {
   return { html: buildCarsiEmailHtml(content), text: textBody };
 }
 
+export function renderRecertReminderEmail(params: {
+  appOrigin: string;
+  name: string;
+  expiryDate: string;
+  milestone: 't_minus_30' | 't_minus_7' | 'overdue';
+  renewalsUrl: string;
+}): RenderedEmail {
+  const expired = params.milestone === 'overdue';
+  const lead = expired
+    ? `Your IICRC certification expired on ${params.expiryDate}. Renew now to restore compliance.`
+    : `Your IICRC certification expires on ${params.expiryDate}.`;
+  return render(
+    {
+      appOrigin: params.appOrigin,
+      preheader: expired
+        ? 'Your IICRC certification has expired — renew now'
+        : `IICRC renewal due — expires ${params.expiryDate}`,
+      eyebrow: expired ? 'Certification expired' : 'Renewal reminder',
+      title: expired ? 'Your IICRC certification has expired' : 'IICRC certification renewal due',
+      greeting: `Hi ${params.name},`,
+      paragraphs: [
+        lead,
+        'Complete CEC-eligible CARSI courses to accrue the hours you need, then submit your renewal. Your dashboard tracks CEC progress and outstanding requirements.',
+      ],
+      details: [
+        { label: 'Certification', value: 'IICRC' },
+        { label: expired ? 'Expired' : 'Expires', value: params.expiryDate },
+        {
+          label: 'Next action',
+          value: expired
+            ? 'Renew now to restore compliance'
+            : 'Plan CEC courses and submit your renewal',
+        },
+      ],
+      cta: { label: 'View renewal status', href: params.renewalsUrl },
+      noteHtml: `Open ${brandLink(params.renewalsUrl, 'Credentials')} to track CEC progress and submit your renewal.`,
+    },
+    `Hi ${params.name},\n\n${lead}\n\nComplete CEC-eligible courses and submit your renewal.\n\nCredentials: ${params.renewalsUrl}`,
+  );
+}
+
 export function renderPasswordResetEmail(params: {
   appOrigin: string;
   name: string;

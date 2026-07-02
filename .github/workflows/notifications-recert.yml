@@ -1,0 +1,20 @@
+name: Recertification reminders (daily)
+
+# Daily IICRC recertification reminders (Phase B).
+# Requires a repo secret CRON_SECRET that matches the app's CRON_SECRET env var on DigitalOcean.
+# If CRON_SECRET is not set on the app, the route returns 503 (fail-closed) and this job errors.
+
+on:
+  schedule:
+    - cron: '0 9 * * *' # 09:00 UTC daily (~19:00 AEST / 20:00 AEDT)
+  workflow_dispatch: {}
+
+jobs:
+  recert-reminders:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger recert-reminders cron
+        run: |
+          curl -fsS --max-time 120 -X GET \
+            "https://carsi.com.au/api/cron/recert-reminders" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
