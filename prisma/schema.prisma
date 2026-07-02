@@ -55,8 +55,30 @@ model LmsUser {
   quizAttempts       LmsQuizAttempt[]
   iicrcCecSubmissions LmsIicrcCecSubmission[]
   lessonProgress     LmsLessonProgress[]
+  notifications      LmsNotification[]
 
   @@map("lms_users")
+}
+
+/// In-app (and optionally emailable) notifications: toolbox-talk drip, recert reminders, system.
+/// Idempotent on `dedupe_key` (type + subject + period + user) so crons can re-run safely.
+model LmsNotification {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @map("user_id") @db.Uuid
+  /// 'toolbox_talk' | 'recert_due' | 'system' | …
+  type      String
+  title     String
+  body      String    @db.Text
+  linkUrl   String?   @map("link_url") @db.Text
+  /// Idempotency key — a unique upsert target so the same notification is never created twice.
+  dedupeKey String    @unique @map("dedupe_key")
+  readAt    DateTime? @map("read_at") @db.Timestamptz(6)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user LmsUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt])
+  @@map("lms_notifications")
 }
 
 /// Junction table: `ON CONFLICT DO NOTHING` on (user_id, role_id) in loaders.

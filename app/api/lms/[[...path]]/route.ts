@@ -92,17 +92,8 @@ async function localStub(
     return NextResponse.json({ url: '' });
   }
 
-  if (method === 'GET' && key === 'notifications/me') {
-    return NextResponse.json({ notifications: [], unread_count: 0 });
-  }
-
-  if (method === 'POST' && key === 'notifications/me/read-all') {
-    return NextResponse.json({ ok: true });
-  }
-
-  if (method === 'PATCH' && segments[0] === 'notifications' && segments[2] === 'read') {
-    return NextResponse.json({ ok: true });
-  }
+  // notifications/me, notifications/me/read-all, notifications/:id/read are now real routes
+  // under app/api/lms/notifications/** (Phase A) — they shadow this catch-all.
 
   if (method === 'GET' && key === 'notes/me') {
     const notes = Array.from(notesStore.values()).sort((a, b) => {
