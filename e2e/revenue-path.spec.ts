@@ -70,7 +70,7 @@ test.describe('Authenticated learner journey @authenticated', () => {
     // The course detail shell renders. (The reviews section — GP-117 — is a
     // client-fetched island verified by its own unit tests + API; asserting it
     // here would couple this journey to that async fetch, so we don't.)
-    await expect(page.locator('#main-content')).toBeVisible({ timeout: 15_000 });
+    await expect(page.locator('#main-content').first()).toBeVisible({ timeout: 15_000 });
   });
 
   test('course player renders lesson content for the enrolled course', async ({ page }) => {
@@ -79,7 +79,7 @@ test.describe('Authenticated learner journey @authenticated', () => {
 
     // The dashboard nests a <main> inside the layout's #main-content; target the
     // stable outer id to avoid a strict-mode "2 elements" violation.
-    const shell = page.locator('#main-content');
+    const shell = page.locator('#main-content').first();
     const playerLink = page.locator('a[href*="/dashboard/learn/"]').first();
     if (await playerLink.count()) {
       const href = await playerLink.getAttribute('href');
@@ -96,6 +96,6 @@ test.describe('Authenticated learner journey @authenticated', () => {
     await page.goto('/dashboard/student/credentials');
     await page.waitForLoadState('domcontentloaded');
     await expect(page).toHaveURL(/\/dashboard\/student\/credentials/, { timeout: 20_000 });
-    await expect(page.locator('#main-content')).toBeVisible({ timeout: 15_000 });
+    await expect(page.locator('#main-content').first()).toBeVisible({ timeout: 15_000 });
   });
 });
