@@ -3,6 +3,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import {
   canManageReviews,
+  canModerateReviews,
   getCourseIdBySlug,
   getCourseReviews,
   getOwnReview,
@@ -24,6 +25,7 @@ export async function GET(request: NextRequest, ctx: { params: Promise<{ slug: s
       summary: { average: 0, count: 0, distribution: { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 } },
       can_review: false,
       can_manage: false,
+      can_moderate: false,
       own_review: null,
     });
   }
@@ -34,24 +36,28 @@ export async function GET(request: NextRequest, ctx: { params: Promise<{ slug: s
       return NextResponse.json({ detail: 'Course not found' }, { status: 404 });
     }
 
-    const { reviews, summary } = await getCourseReviews(course.id);
-
     // Optional auth: enrich with the caller's own-review + moderation state when signed in.
     const claims = await getSessionClaimsFromRequest(request);
     let canReview = false;
     let canManage = false;
+    let canModerate = false;
     let ownReview = null;
     if (claims) {
       canManage = canManageReviews(claims.role);
+      canModerate = canModerateReviews(claims.role);
       canReview = await isEnrolledInCourse(claims.sub, course.id);
       ownReview = canReview ? await getOwnReview(claims.sub, course.id) : null;
     }
+
+    // Moderators also see admin-hidden reviews (so they can unhide them).
+    const { reviews, summary } = await getCourseReviews(course.id, canModerate);
 
     return NextResponse.json({
       reviews,
       summary,
       can_review: canReview,
       can_manage: canManage,
+      can_moderate: canModerate,
       own_review: ownReview,
     });
   } catch (e) {

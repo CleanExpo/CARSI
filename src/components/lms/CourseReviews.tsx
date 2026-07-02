@@ -12,6 +12,7 @@ type ReviewDto = {
   body: string | null;
   reply: string | null;
   replied_at: string | null;
+  is_published: boolean;
   author: string;
   created_at: string;
 };
@@ -27,6 +28,7 @@ type ReviewsResponse = {
   summary: Summary;
   can_review: boolean;
   can_manage: boolean;
+  can_moderate: boolean;
   own_review: { rating: number; title: string | null; body: string | null } | null;
 };
 
@@ -89,18 +91,39 @@ function ReviewItem({
   review,
   slug,
   canManage,
+  canModerate,
   onChanged,
 }: {
   review: ReviewDto;
   slug: string;
   canManage: boolean;
+  canModerate: boolean;
   onChanged: () => Promise<void>;
 }) {
   const [editing, setEditing] = useState(false);
   const [text, setText] = useState(review.reply ?? '');
   const [busy, setBusy] = useState(false);
   const [drafting, setDrafting] = useState(false);
+  const [moderating, setModerating] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+
+  const setPublished = useCallback(
+    async (isPublished: boolean) => {
+      if (moderating) return;
+      setModerating(true);
+      try {
+        await apiClient.post(`/api/lms/courses/${slug}/reviews/${review.id}/publish`, {
+          is_published: isPublished,
+        });
+        await onChanged();
+      } catch {
+        setErr('Could not update visibility. Please try again.');
+      } finally {
+        setModerating(false);
+      }
+    },
+    [slug, review.id, moderating, onChanged]
+  );
 
   const draftWithAi = useCallback(async () => {
     setDrafting(true);
@@ -137,15 +160,31 @@ function ReviewItem({
   );
 
   return (
-    <li className="border-b border-slate-100 pb-5 last:border-0">
+    <li className={`border-b border-slate-100 pb-5 last:border-0 ${!review.is_published ? 'opacity-60' : ''}`}>
       <div className="flex items-center gap-2">
         <Stars value={review.rating} />
         {review.title && <span className="text-sm font-semibold text-slate-900">{review.title}</span>}
+        {!review.is_published && (
+          <span className="rounded bg-slate-200 px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-slate-600 uppercase">
+            Hidden
+          </span>
+        )}
       </div>
       {review.body && <p className="mt-1.5 text-sm leading-relaxed text-slate-700">{review.body}</p>}
       <p className="mt-1.5 text-xs text-slate-400">
         {review.author} · {formatDate(review.created_at)}
       </p>
+
+      {canModerate && (
+        <button
+          type="button"
+          onClick={() => setPublished(!review.is_published)}
+          disabled={moderating}
+          className="mt-2 mr-3 text-xs font-medium text-slate-500 hover:text-slate-800 hover:underline disabled:opacity-60"
+        >
+          {moderating ? 'Updating…' : review.is_published ? 'Hide review' : 'Unhide review'}
+        </button>
+      )}
 
       {review.reply && !editing && (
         <div className="mt-3 rounded-lg border-l-2 border-[#2490ed] bg-slate-50 p-3">
@@ -244,6 +283,7 @@ export function CourseReviews({ slug }: { slug: string }) {
         summary: { average: 0, count: 0, distribution: { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 } },
         can_review: false,
         can_manage: false,
+        can_moderate: false,
         own_review: null,
       });
     }
@@ -274,7 +314,7 @@ export function CourseReviews({ slug }: { slug: string }) {
 
   if (!data) return null;
 
-  const { summary, reviews, can_review, can_manage, own_review } = data;
+  const { summary, reviews, can_review, can_manage, can_moderate, own_review } = data;
 
   return (
     <div aria-label="Course reviews">
@@ -338,7 +378,14 @@ export function CourseReviews({ slug }: { slug: string }) {
       {reviews.length > 0 && (
         <ul className="mt-6 space-y-5">
           {reviews.map((r) => (
-            <ReviewItem key={r.id} review={r} slug={slug} canManage={can_manage} onChanged={load} />
+            <ReviewItem
+              key={r.id}
+              review={r}
+              slug={slug}
+              canManage={can_manage}
+              canModerate={can_moderate}
+              onChanged={load}
+            />
           ))}
         </ul>
       )}
