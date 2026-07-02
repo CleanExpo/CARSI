@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 
 import { CourseFormattedBody } from '@/components/lms/CourseFormattedBody';
+import { CourseReviews } from '@/components/lms/CourseReviews';
 import { CourseThumbnail } from '@/components/lms/CourseThumbnail';
 import { EnrolButton } from '@/components/lms/EnrolButton';
 import { dash } from '@/lib/dashboard-light-ui';
@@ -106,6 +107,10 @@ export default async function DashboardCourseDetailPage({
               <CourseFormattedBody text={course.description} tone="light" />
             </section>
           ) : null}
+
+          <section className={`${dash.panel} p-6 sm:p-8`}>
+            <CourseReviews slug={course.slug} />
+          </section>
         </div>
 
         <aside className="space-y-4 lg:sticky lg:top-6 lg:self-start">
