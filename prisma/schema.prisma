@@ -39,6 +39,9 @@ model LmsUser {
   onboarding            Json?
   /// none | email | sms — preference for unfinished-lesson reminders (delivery not yet wired for sms).
   resumeReminderOptIn   String?   @map("resume_reminder_opt_in")
+  /// Marketing-style email opt-out (Australian Spam Act). When true, the monthly toolbox-talk drip
+  /// email is suppressed. In-app notifications and compliance (recert) emails are NOT affected.
+  emailOptOut           Boolean   @default(false) @map("email_opt_out")
   /// When true, `leaderboardDisplayName` may appear on the monthly leaderboard; otherwise an anonymous label is shown.
   leaderboardShowDisplayName Boolean @default(false) @map("leaderboard_show_display_name")
   /// Optional public label for the monthly leaderboard only (never auto-filled from legal name).

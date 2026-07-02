@@ -14,6 +14,7 @@ import {
   renderPasswordResetEmail,
   renderRecertReminderEmail,
   renderRegistrationWelcomeEmail,
+  renderToolboxTalkEmail,
   renderAdminPasswordResetEmail,
   renderTeamMemberAddedEmail,
   renderYearlyMembershipEmail,
@@ -90,6 +91,29 @@ export async function sendRecertReminderEmail(params: {
       ? 'Your IICRC certification has expired'
       : `IICRC certification renewal due (expires ${params.expiryDate})`;
   return sendEmail({ to: params.to, subject, html, text });
+}
+
+export async function sendToolboxTalkEmail(params: {
+  to: string;
+  name: string;
+  talkTitle: string;
+  monthLabel: string;
+  courseUrl: string;
+}): Promise<SendEmailResult> {
+  const appOrigin = getAppOrigin();
+  const { html, text } = renderToolboxTalkEmail({
+    appOrigin,
+    name: params.name,
+    talkTitle: params.talkTitle,
+    monthLabel: params.monthLabel,
+    courseUrl: params.courseUrl,
+  });
+  return sendEmail({
+    to: params.to,
+    subject: `${params.monthLabel} Toolbox Talk: ${params.talkTitle}`,
+    html,
+    text,
+  });
 }
 
 export async function sendEnrollmentWelcomeEmail(params: {
