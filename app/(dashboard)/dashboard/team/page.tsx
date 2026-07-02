@@ -584,6 +584,16 @@ function TeamDashboardPage() {
                 Edit team name
               </button>
             ) : null}
+            {team.is_owner ? (
+              <div className="mt-1">
+                <Link
+                  href="/dashboard/team/records"
+                  className="text-xs font-semibold text-[#146fc2] hover:underline"
+                >
+                  View training records →
+                </Link>
+              </div>
+            ) : null}
           </>
         )}
         {!isCourseTeam ? (
