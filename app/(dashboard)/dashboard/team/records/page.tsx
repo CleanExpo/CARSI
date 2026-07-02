@@ -26,6 +26,29 @@ export default function TeamRecordsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [downloading, setDownloading] = useState(false);
+
+  const downloadCsv = useCallback(async () => {
+    setDownloading(true);
+    setError(null);
+    try {
+      const res = await fetch('/api/lms/teams/records?format=csv', { credentials: 'include' });
+      if (!res.ok) throw new Error('Download failed');
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${records?.teamName?.replace(/[^a-z0-9]+/gi, '-') ?? 'team'}-training-records.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch {
+      setError('Could not download the CSV. Please try again.');
+    } finally {
+      setDownloading(false);
+    }
+  }, [records]);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -69,12 +92,14 @@ export default function TeamRecordsPage() {
           </p>
         </div>
         {records && records.members.length > 0 ? (
-          <a
-            href="/api/lms/teams/records?format=csv"
-            className="rounded-md border border-[#146fc2]/30 bg-[#eef7ff] px-3 py-2 text-sm font-semibold text-[#146fc2] hover:bg-[#e0efff]"
+          <button
+            type="button"
+            onClick={() => void downloadCsv()}
+            disabled={downloading}
+            className="rounded-md border border-[#146fc2]/30 bg-[#eef7ff] px-3 py-2 text-sm font-semibold text-[#146fc2] hover:bg-[#e0efff] disabled:opacity-60"
           >
-            Download CSV
-          </a>
+            {downloading ? 'Preparing…' : 'Download CSV'}
+          </button>
         ) : null}
       </div>
 
