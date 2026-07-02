@@ -17,16 +17,15 @@ async function postSubscription(token: string, resubscribe: boolean): Promise<bo
 
 function UnsubscribeCard() {
   const token = useSearchParams().get('token') ?? '';
-  const [status, setStatus] = useState<Status>('working');
+  // A missing token is an error state from the first render — deriving it in the
+  // initializer avoids a synchronous setState inside the effect (react-hooks rule).
+  const [status, setStatus] = useState<Status>(token ? 'working' : 'error');
   const [pending, setPending] = useState(false);
 
   // Auto opt-out on load. Running in the browser (not a link prefetch/scanner)
   // means we honour genuine clicks without an extra confirmation step.
   useEffect(() => {
-    if (!token) {
-      setStatus('error');
-      return;
-    }
+    if (!token) return;
     let active = true;
     postSubscription(token, false).then((ok) => {
       if (active) setStatus(ok ? 'unsubscribed' : 'error');
