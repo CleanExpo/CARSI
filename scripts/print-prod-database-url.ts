@@ -11,11 +11,27 @@
  */
 import 'dotenv/config';
 
-import { resolvePrismaDatabaseUrl } from '../src/lib/prisma';
+/**
+ * Prisma's migrate engine needs a DIRECT (non-pooler) connection — Supabase's transaction/session
+ * pooler rejects it (`P1000` auth / unsupported). Prefer an explicit direct URL when the prod env
+ * provides one; fall back to DATABASE_URL. Supabase exposes the direct string as DIRECT_URL.
+ */
+const directUrl =
+  process.env.DIRECT_URL?.trim() ||
+  process.env.DIRECT_DATABASE_URL?.trim() ||
+  process.env.DATABASE_URL_UNPOOLED?.trim() ||
+  process.env.MIGRATE_DATABASE_URL?.trim();
+
+if (directUrl) {
+  // resolvePrismaDatabaseUrl reads process.env.DATABASE_URL — point it at the direct URL.
+  process.env.DATABASE_URL = directUrl;
+}
 
 if (!process.env.DATABASE_URL?.trim()) {
-  console.error('DATABASE_URL is not set (did the production .env get pulled?)');
+  console.error('No database URL set (did the production .env get pulled?)');
   process.exit(1);
 }
 
+// Imported after DATABASE_URL is finalised (module resolves the connection string at load).
+const { resolvePrismaDatabaseUrl } = await import('../src/lib/prisma');
 process.stdout.write(resolvePrismaDatabaseUrl());

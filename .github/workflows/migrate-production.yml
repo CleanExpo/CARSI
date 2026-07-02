@@ -9,8 +9,11 @@ name: Migrate production database
 #  - manual (workflow_dispatch) → defaults to a SAFE dry-run (migrate status only); set apply=true
 #    to actually deploy. Use the dry-run first to verify the connection + see pending migrations.
 #
-# Prod DATABASE_URL + DATABASE_CA_CERT are pulled from Vercel (project carsi-web) using VERCEL_TOKEN,
-# then resolved to the app's exact SSL connection string via scripts/print-prod-database-url.ts.
+# Prod env is pulled from Vercel (project carsi-web) using VERCEL_TOKEN, then resolved via
+# scripts/print-prod-database-url.ts. IMPORTANT: the prod DB is Supabase — Prisma's migrate engine
+# needs the DIRECT (non-pooler) connection, so the Vercel production env must expose DIRECT_URL
+# (Supabase's direct connection string). The resolver prefers DIRECT_URL and falls back to
+# DATABASE_URL (the pooler URL the app uses, which migrate cannot authenticate against → P1000).
 
 on:
   workflow_dispatch:
@@ -63,8 +66,15 @@ jobs:
 
       - name: Migration status (always — non-mutating)
         run: |
-          echo "### Pending migrations (before)" >> "$GITHUB_STEP_SUMMARY"
-          npx prisma migrate status 2>&1 | tee -a "$GITHUB_STEP_SUMMARY" || true
+          echo "### Migration status" >> "$GITHUB_STEP_SUMMARY"
+          # migrate status exits non-zero for BOTH "pending migrations" (fine) and connection
+          # errors (not fine). Tolerate the former, fail loudly on the latter.
+          OUT="$(npx prisma migrate status 2>&1 || true)"
+          echo "$OUT" | tee -a "$GITHUB_STEP_SUMMARY"
+          if echo "$OUT" | grep -qiE "P100[0-9]|authentication failed|can't reach|could not connect|error:"; then
+            echo "::error::Cannot connect to the production database (see status above). Migrations need the DIRECT (non-pooler) Supabase connection — set DIRECT_URL in the Vercel production env."
+            exit 1
+          fi
 
       - name: Apply pending migrations
         if: ${{ github.event_name == 'push' || inputs.apply == true }}
