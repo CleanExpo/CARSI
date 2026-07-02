@@ -1,0 +1,20 @@
+name: Toolbox-talk drip (monthly)
+
+# Monthly Toolbox-Talk drip (Phase C), fired on the 1st of each month.
+# Requires a repo secret CRON_SECRET that matches the app's CRON_SECRET env var on DigitalOcean.
+# If CRON_SECRET is not set on the app, the route returns 503 (fail-closed) and this job errors.
+
+on:
+  schedule:
+    - cron: '0 22 1 * *' # 22:00 UTC on the 1st (~08:00 AEST / 09:00 AEDT on the 2nd)
+  workflow_dispatch: {}
+
+jobs:
+  toolbox-drip:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger toolbox-talk drip cron
+        run: |
+          curl -fsS --max-time 120 -X GET \
+            "https://carsi.com.au/api/cron/toolbox-talk-drip" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"

@@ -257,6 +257,35 @@ export function renderRecertReminderEmail(params: {
   );
 }
 
+export function renderToolboxTalkEmail(params: {
+  appOrigin: string;
+  name: string;
+  talkTitle: string;
+  monthLabel: string;
+  courseUrl: string;
+}): RenderedEmail {
+  return render(
+    {
+      appOrigin: params.appOrigin,
+      preheader: `${params.monthLabel} toolbox talk: ${params.talkTitle}`,
+      eyebrow: 'Monthly toolbox talk',
+      title: `${params.monthLabel} Toolbox Talk`,
+      greeting: `Hi ${params.name},`,
+      paragraphs: [
+        `This month's toolbox talk is ready: "${params.talkTitle}".`,
+        'A short, run-with-your-crew refresher — the hazard, the control, and the sign-off. Open it before your next job to keep the team sharp and compliant.',
+      ],
+      details: [
+        { label: 'This month', value: params.talkTitle },
+        { label: 'Format', value: 'Quick refresher — do it, don’t just read it' },
+      ],
+      cta: { label: 'Open this month’s talk', href: params.courseUrl },
+      noteHtml: `You’re receiving this as part of your CARSI toolbox-talk subscription. Open ${brandLink(params.courseUrl, 'the course')} to view all talks.`,
+    },
+    `Hi ${params.name},\n\nThis month's toolbox talk is ready: "${params.talkTitle}".\n\nOpen it: ${params.courseUrl}`,
+  );
+}
+
 export function renderPasswordResetEmail(params: {
   appOrigin: string;
   name: string;
