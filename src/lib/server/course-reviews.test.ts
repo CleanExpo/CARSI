@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  canManageReviews,
   isValidRating,
   summarizeReviews,
   toReviewDto,
@@ -49,23 +50,47 @@ describe('toReviewDto', () => {
     rating: 5,
     title: 'Excellent',
     body: 'Learned a lot.',
+    reply: null,
+    repliedAt: null,
     createdAt: new Date('2026-07-02T00:00:00.000Z'),
     student: { fullName: 'Sam Rivers', email: 'sam@example.com' },
   };
 
-  it('exposes only the reviewer first name and ISO date', () => {
+  it('exposes only the reviewer first name and ISO date, null reply by default', () => {
     expect(toReviewDto(base)).toEqual({
       id: 'r1',
       rating: 5,
       title: 'Excellent',
       body: 'Learned a lot.',
+      reply: null,
+      replied_at: null,
       author: 'Sam',
       created_at: '2026-07-02T00:00:00.000Z',
     });
   });
 
+  it('includes an instructor reply + ISO replied_at when present', () => {
+    const dto = toReviewDto({
+      ...base,
+      reply: 'Thanks for the feedback!',
+      repliedAt: new Date('2026-07-03T00:00:00.000Z'),
+    });
+    expect(dto.reply).toBe('Thanks for the feedback!');
+    expect(dto.replied_at).toBe('2026-07-03T00:00:00.000Z');
+  });
+
   it('falls back to the email local-part, then "Student", when no name', () => {
     expect(toReviewDto({ ...base, student: { fullName: null, email: 'jo@carsi.com.au' } }).author).toBe('jo');
     expect(toReviewDto({ ...base, student: null }).author).toBe('Student');
+  });
+});
+
+describe('canManageReviews', () => {
+  it('allows admin and instructor only', () => {
+    expect(canManageReviews('admin')).toBe(true);
+    expect(canManageReviews('instructor')).toBe(true);
+    expect(canManageReviews('student')).toBe(false);
+    expect(canManageReviews(null)).toBe(false);
+    expect(canManageReviews(undefined)).toBe(false);
   });
 });

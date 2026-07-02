@@ -17,6 +17,8 @@ export type ReviewRow = {
   rating: number;
   title: string | null;
   body: string | null;
+  reply: string | null;
+  repliedAt: Date | null;
   createdAt: Date;
   student: { fullName: string | null; email: string } | null;
 };
@@ -26,9 +28,17 @@ export type ReviewDto = {
   rating: number;
   title: string | null;
   body: string | null;
+  /** Public instructor/admin response, if any (GP-118). */
+  reply: string | null;
+  replied_at: string | null;
   author: string;
   created_at: string;
 };
+
+/** Roles allowed to publish a response to a review (mirrors WORKFLOW_ROLES). */
+export function canManageReviews(role: string | null | undefined): boolean {
+  return role === 'admin' || role === 'instructor';
+}
 
 export type ReviewSummary = {
   average: number;
@@ -57,6 +67,8 @@ export function toReviewDto(row: ReviewRow): ReviewDto {
     rating: row.rating,
     title: row.title,
     body: row.body,
+    reply: row.reply,
+    replied_at: row.repliedAt ? row.repliedAt.toISOString() : null,
     author: displayAuthor(row.student),
     created_at: row.createdAt.toISOString(),
   };
@@ -108,11 +120,41 @@ export async function getCourseReviews(
       rating: true,
       title: true,
       body: true,
+      reply: true,
+      repliedAt: true,
       createdAt: true,
       student: { select: { fullName: true, email: true } },
     },
   });
   return { reviews: rows.map(toReviewDto), summary: summarizeReviews(rows) };
+}
+
+/** Minimal review lookup for reply validation (confirms it belongs to the course). */
+export async function getReviewForCourse(
+  reviewId: string,
+  courseId: string
+): Promise<{ id: string; rating: number; title: string | null; body: string | null } | null> {
+  return prisma.lmsCourseReview.findFirst({
+    where: { id: reviewId, courseId },
+    select: { id: true, rating: true, title: true, body: true },
+  });
+}
+
+/** Publish (or clear) an instructor/admin response to a review. */
+export async function setReviewReply(params: {
+  reviewId: string;
+  reply: string | null;
+  repliedById: string;
+}): Promise<void> {
+  const reply = params.reply?.trim() || null;
+  await prisma.lmsCourseReview.update({
+    where: { id: params.reviewId },
+    data: {
+      reply,
+      repliedAt: reply ? new Date() : null,
+      repliedById: reply ? params.repliedById : null,
+    },
+  });
 }
 
 /**
