@@ -2,6 +2,7 @@ import { AnimatedCard, AnimatedHero, AnimatedSection } from '@/components/landin
 import { HomeCertificationsSection } from '@/components/landing/HomeCertificationsSection';
 import { HomeFeaturedCoursesSection } from '@/components/landing/HomeFeaturedCoursesSection';
 import { HomeGrowthSection } from '@/components/landing/HomeGrowthSection';
+import { HomePricingSection } from '@/components/landing/HomePricingSection';
 import { PublicFooter } from '@/components/landing/PublicFooter';
 import { PublicNavbar } from '@/components/landing/PublicNavbar';
 import { PUBLIC_SHELL_INNER_CLASS } from '@/components/landing/public-shell-width';
@@ -158,6 +159,8 @@ export default async function Home() {
             : undefined
         }
       />
+
+      <HomePricingSection />
 
       <HomeCertificationsSection disciplineCountLabel={disciplineCountLabel} />
 
