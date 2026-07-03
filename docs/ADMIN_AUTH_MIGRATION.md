@@ -37,7 +37,7 @@ single-admin login path stays active until at least one row exists in
 pnpm prisma migrate deploy
 
 # 2. Bootstrap the first admin from the existing env vars
-npx tsx scripts/admin-bootstrap.ts
+pnpm db:admin-bootstrap   # alias for: npx tsx scripts/admin-bootstrap.ts
 
 # 3. Test admin login via the UI (should still work — same creds)
 
