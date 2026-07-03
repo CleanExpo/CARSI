@@ -5,6 +5,7 @@ import { Prisma } from '@/generated/prisma/client';
 import { prisma } from '@/lib/prisma';
 import { isCecExcludedSlug } from '@/lib/seed/cec-professional-assignments';
 import { resolveLmsCourseCecHours } from '@/lib/server/course-cec-hours';
+import { formatLmsCourseDurationHoursLabel } from '@/lib/server/course-duration-hours';
 import {
   courseWithCurriculum,
   DEFAULT_INSTRUCTOR_ID,
@@ -459,6 +460,12 @@ export function courseToAdminDto(course: CourseWithCurriculum) {
     durationHours: course.durationHours != null ? Number(course.durationHours) : null,
     iicrcDiscipline: course.iicrcDiscipline,
   });
+  const resolvedDuration = formatLmsCourseDurationHoursLabel({
+    slug: course.slug,
+    durationHours: course.durationHours != null ? Number(course.durationHours) : null,
+    shortDescription: course.shortDescription,
+    description: course.description,
+  });
   return {
     id: course.id,
     slug: course.slug,
@@ -478,6 +485,8 @@ export function courseToAdminDto(course: CourseWithCurriculum) {
     resolvedCecHours: resolved != null ? String(resolved) : null,
     cecMissing: !isCecExcludedSlug(course.slug) && resolved == null,
     cecExcluded: isCecExcludedSlug(course.slug),
+    resolvedDurationHours: resolvedDuration,
+    durationMissing: resolvedDuration == null,
     modules: course.modules.map((mod) => {
       const lessons = [...mod.lessons].sort((a, b) => a.orderIndex - b.orderIndex);
       const text = lessons.find((l) => l.contentType === 'text');
@@ -610,6 +619,12 @@ export async function adminListCourses(options: AdminListCoursesOptions = {}) {
       durationHours: c.durationHours != null ? Number(c.durationHours) : null,
       iicrcDiscipline: c.iicrcDiscipline,
     });
+    const resolvedDuration = formatLmsCourseDurationHoursLabel({
+      slug: c.slug,
+      durationHours: c.durationHours != null ? Number(c.durationHours) : null,
+      shortDescription: c.shortDescription,
+      description: c.description,
+    });
     return {
       id: c.id,
       slug: c.slug,
@@ -630,6 +645,8 @@ export async function adminListCourses(options: AdminListCoursesOptions = {}) {
       resolvedCecHours: resolved != null ? String(resolved) : null,
       cecMissing: !isCecExcludedSlug(c.slug) && resolved == null,
       cecExcluded: isCecExcludedSlug(c.slug),
+      resolvedDurationHours: resolvedDuration,
+      durationMissing: resolvedDuration == null,
     };
   });
 
@@ -643,6 +660,50 @@ export async function adminGetCourse(id: string): Promise<CourseWithCurriculum |
   return prisma.lmsCourse.findUnique({
     where: { id },
     include: courseWithCurriculum,
+  });
+}
+
+export type LmsCourseDraftInput = {
+  title: string;
+  slug?: string | null;
+  description?: string | null;
+  short_description?: string | null;
+  price_aud?: number | null;
+  is_free?: boolean | null;
+  level?: string | null;
+  category?: string | null;
+  iicrc_discipline?: string | null;
+  cec_hours?: number | null;
+};
+
+/**
+ * Bare draft course for the instructor "New Course" flow (`POST /api/lms/courses`).
+ * Modules and lessons are added afterwards in the course editor, so unlike
+ * `adminCreateCourse` this does not require curriculum.
+ */
+export async function lmsCreateCourseDraft(input: LmsCourseDraftInput) {
+  await ensureCatalogInstructor();
+
+  const slug = await uniqueSlug(slugify(input.slug?.trim() || input.title));
+  const priceNum = Number(input.price_aud);
+
+  return prisma.lmsCourse.create({
+    data: {
+      id: randomUUID(),
+      slug,
+      title: input.title.trim(),
+      description: input.description?.trim() || null,
+      shortDescription: input.short_description?.trim() || null,
+      instructorId: DEFAULT_INSTRUCTOR_ID,
+      status: 'draft',
+      priceAud: new Prisma.Decimal(Number.isFinite(priceNum) ? priceNum : 0),
+      isFree: Boolean(input.is_free),
+      level: input.level?.trim() || null,
+      category: input.category?.trim() || null,
+      cecHours: parseOptionalHours(input.cec_hours),
+      iicrcDiscipline: input.iicrc_discipline?.trim() || null,
+      isPublished: false,
+    },
   });
 }
 

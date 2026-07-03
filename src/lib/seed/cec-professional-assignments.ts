@@ -1,19 +1,25 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { resolveCecHours, type CecResolvable } from '@/lib/seed/cec-hours';
+import {
+  resolveCecHours,
+  resolveDurationHours,
+  type CecResolvable,
+} from '@/lib/seed/cec-hours';
 
 type CecProfessionalAssignmentsFile = {
   version: number;
   excludedSlugs?: string[];
   assignments?: Record<string, number>;
   slugAliases?: Record<string, string>;
+  durationAssignments?: Record<string, number>;
 };
 
 let cached: {
   excluded: Set<string>;
   assignments: Map<string, number>;
   aliases: Map<string, string>;
+  durationAssignments: Map<string, number>;
   wpBySlug: Map<string, CecResolvable> | null;
 } | null = null;
 
@@ -40,6 +46,7 @@ function loadAssignmentsFile(): {
   excluded: Set<string>;
   assignments: Map<string, number>;
   aliases: Map<string, string>;
+  durationAssignments: Map<string, number>;
   wpBySlug: Map<string, CecResolvable>;
 } {
   if (cached) {
@@ -47,6 +54,7 @@ function loadAssignmentsFile(): {
       excluded: cached.excluded,
       assignments: cached.assignments,
       aliases: cached.aliases,
+      durationAssignments: cached.durationAssignments,
       wpBySlug: cached.wpBySlug ?? new Map(),
     };
   }
@@ -57,8 +65,20 @@ function loadAssignmentsFile(): {
     raw = JSON.parse(readFileSync(path, 'utf8')) as CecProfessionalAssignmentsFile;
   } catch {
     const wpBySlug = loadWpBySlug();
-    cached = { excluded: new Set(), assignments: new Map(), aliases: new Map(), wpBySlug };
-    return { excluded: cached.excluded, assignments: cached.assignments, aliases: cached.aliases, wpBySlug };
+    cached = {
+      excluded: new Set(),
+      assignments: new Map(),
+      aliases: new Map(),
+      durationAssignments: new Map(),
+      wpBySlug,
+    };
+    return {
+      excluded: cached.excluded,
+      assignments: cached.assignments,
+      aliases: cached.aliases,
+      durationAssignments: cached.durationAssignments,
+      wpBySlug,
+    };
   }
 
   const excluded = new Set(
@@ -74,10 +94,15 @@ function loadAssignmentsFile(): {
     if (!from.trim() || !to.trim()) continue;
     aliases.set(normalizeSlug(from), normalizeSlug(to));
   }
+  const durationAssignments = new Map<string, number>();
+  for (const [slug, hours] of Object.entries(raw.durationAssignments ?? {})) {
+    if (typeof hours !== 'number' || !Number.isFinite(hours) || hours <= 0) continue;
+    durationAssignments.set(normalizeSlug(slug), hours);
+  }
 
   const wpBySlug = loadWpBySlug();
-  cached = { excluded, assignments, aliases, wpBySlug };
-  return { excluded, assignments, aliases, wpBySlug };
+  cached = { excluded, assignments, aliases, durationAssignments, wpBySlug };
+  return { excluded, assignments, aliases, durationAssignments, wpBySlug };
 }
 
 function resolveFromWpCatalog(slug: string): number | null {
@@ -110,6 +135,29 @@ export function getProfessionalCecAssignment(slug: string | null | undefined): n
   if (fromAssignment != null) return fromAssignment;
 
   return resolveFromWpCatalog(key);
+}
+
+/**
+ * Duration hours from the WordPress export catalogue (via slug or slugAliases),
+ * falling back to reviewer-assigned `durationAssignments` for courses whose
+ * content exists only in the live DB. Used when the LMS row has no
+ * `duration_hours` and no parseable duration prose.
+ */
+export function getWpCatalogDurationHours(slug: string | null | undefined): number | null {
+  if (!slug?.trim()) return null;
+  const key = normalizeSlug(slug);
+  const { aliases, durationAssignments, wpBySlug } = loadAssignmentsFile();
+  const canonical = aliases.get(key) ?? key;
+  const row = wpBySlug.get(canonical);
+  if (row) {
+    const hours = resolveDurationHours({
+      duration_hours: row.duration_hours,
+      short_description: row.short_description,
+      description: row.description,
+    });
+    if (hours != null && hours > 0) return hours;
+  }
+  return durationAssignments.get(key) ?? durationAssignments.get(canonical) ?? null;
 }
 
 /** For tests and seed scripts — reset in-memory cache after file edits. */

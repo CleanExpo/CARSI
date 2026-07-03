@@ -38,6 +38,8 @@ type Row = {
   resolvedCecHours?: string | null;
   cecMissing?: boolean;
   cecExcluded?: boolean;
+  resolvedDurationHours?: string | null;
+  durationMissing?: boolean;
 };
 
 type StatusFilter = 'all' | 'draft' | 'in_review' | 'published';
@@ -634,7 +636,7 @@ export function AdminCoursesList() {
                   level={c.level}
                   iicrcDiscipline={c.iicrcDiscipline}
                   cecHours={c.cecHours ?? c.resolvedCecHours}
-                  durationHours={c.durationHours}
+                  durationHours={c.durationHours ?? c.resolvedDurationHours}
                 />
                 {c.cecMissing ? (
                   <span className="absolute bottom-2 left-2 z-20 rounded-md border border-amber-500/40 bg-amber-500/20 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-amber-100 uppercase">

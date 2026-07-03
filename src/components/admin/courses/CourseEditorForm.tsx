@@ -43,6 +43,7 @@ type CourseDto = {
   resolvedCecHours?: string | null;
   cecMissing?: boolean;
   cecExcluded?: boolean;
+  resolvedDurationHours?: string | null;
   modules: {
     id: string;
     title: string;
@@ -108,6 +109,7 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
   const [cecMissing, setCecMissing] = useState(false);
   const [cecExcluded, setCecExcluded] = useState(false);
   const [resolvedCecHours, setResolvedCecHours] = useState<string | null>(null);
+  const [resolvedDurationHours, setResolvedDurationHours] = useState<string | null>(null);
   const [modules, setModules] = useState<Mod[]>([emptyModule()]);
   const [uploading, setUploading] = useState(false);
 
@@ -136,6 +138,7 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
       setCecMissing(Boolean(c.cecMissing));
       setCecExcluded(Boolean(c.cecExcluded));
       setResolvedCecHours(c.resolvedCecHours ?? null);
+      setResolvedDurationHours(c.resolvedDurationHours ?? null);
       setModules(
         c.modules.length > 0
           ? c.modules.map((m) => ({
@@ -566,6 +569,12 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
                     className={cn('h-11 tabular-nums', fieldClass)}
                     placeholder="e.g. 2"
                   />
+                  {!cecHours.trim() && !cecExcluded && resolvedCecHours ? (
+                    <p className="text-xs text-white/45">
+                      Effective on site: {resolvedCecHours} CEC (resolved from the course
+                      catalogue). Set a value here to override.
+                    </p>
+                  ) : null}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="duration-hours" className="text-white/65">
@@ -582,6 +591,12 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
                     className={cn('h-11 tabular-nums', fieldClass)}
                     placeholder="e.g. 1.5"
                   />
+                  {!durationHours.trim() && resolvedDurationHours ? (
+                    <p className="text-xs text-white/45">
+                      Effective on site: {resolvedDurationHours} h (resolved from the course
+                      catalogue). Set a value here to override.
+                    </p>
+                  ) : null}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="iicrc-discipline" className="text-white/65">
