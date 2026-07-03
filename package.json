@@ -28,6 +28,7 @@
     "db:thumbnails:generate": "npx tsx scripts/generate-course-thumbnails.ts --generate",
     "db:seed-e2e-user": "npx tsx scripts/seed-e2e-user.ts",
     "db:seed-admin": "npx tsx scripts/seed-admin-credentials.ts",
+    "db:admin-bootstrap": "npx tsx scripts/admin-bootstrap.ts",
     "db:seed-wp-export": "npx tsx scripts/seed-wordpress-export-courses.ts",
     "db:enrich-wp-export-cec": "npx tsx scripts/enrich-wp-export-cec.ts",
     "db:seed-cec-hours": "npx tsx scripts/seed-course-cec-hours.ts",
