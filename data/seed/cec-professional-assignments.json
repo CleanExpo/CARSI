@@ -24,7 +24,8 @@
     "technician-flow-chart",
     "carsi-chatgpt-ebook",
     "adjusters",
-    "insurance-adjusters-and-their-roles"
+    "insurance-adjusters-and-their-roles",
+    "carsi-maintenance-toolbox-talks-monthly-refreshers"
   ],
   "slugAliases": {
     "introduction-to-advanced-structural-drying-concepts": "advancedstructural",
@@ -76,7 +77,12 @@
     "introduction-to-drying-industrial-and-manufacturing-sites": "industrial-2",
     "introduction-to-drying-educational-and-institutional-sites": "educational",
     "introduction-to-drying-hospitality-and-lodging-sites": "hospitality",
-    "introduction-to-drying-health-care-facilities": "drying-healthcare"
+    "introduction-to-drying-health-care-facilities": "drying-healthcare",
+    "carpet-cleaning-basics-b66757ce": "carpet-cleaning-basics",
+    "level-1-mould-remediation-2cc96b85": "level-1-mould-remediation",
+    "level-2-mould-remediation-30ee3492": "level-2-mould-remediation",
+    "level-3-mould-remediation-c5797369": "level-3-mould-remediation",
+    "introduction-to-basic-carpet-cleaning-and-drying": "carpet-cleaning"
   },
   "assignments": {
     "duct-cleaning": 3,
@@ -94,6 +100,8 @@
     "carpet-cleaning-basics": 3,
     "glass-cleaning-course-ccw": 1,
     "level-2-mould-remediation": 4,
-    "wrt-water-damage-essentials": 4
+    "wrt-water-damage-essentials": 4,
+    "air-movers-for-professional-restoration-specs-selection-on-site-assessment": 1,
+    "tile-cleaning-for-carpet-cleaners": 1
   }
 }

@@ -1,7 +1,11 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { resolveCecHours, type CecResolvable } from '@/lib/seed/cec-hours';
+import {
+  resolveCecHours,
+  resolveDurationHours,
+  type CecResolvable,
+} from '@/lib/seed/cec-hours';
 
 type CecProfessionalAssignmentsFile = {
   version: number;
@@ -110,6 +114,25 @@ export function getProfessionalCecAssignment(slug: string | null | undefined): n
   if (fromAssignment != null) return fromAssignment;
 
   return resolveFromWpCatalog(key);
+}
+
+/**
+ * Duration hours from the WordPress export catalogue (via slug or slugAliases).
+ * Used when the LMS row has no `duration_hours` and no parseable duration prose.
+ */
+export function getWpCatalogDurationHours(slug: string | null | undefined): number | null {
+  if (!slug?.trim()) return null;
+  const key = normalizeSlug(slug);
+  const { aliases, wpBySlug } = loadAssignmentsFile();
+  const canonical = aliases.get(key) ?? key;
+  const row = wpBySlug.get(canonical);
+  if (!row) return null;
+  const hours = resolveDurationHours({
+    duration_hours: row.duration_hours,
+    short_description: row.short_description,
+    description: row.description,
+  });
+  return hours != null && hours > 0 ? hours : null;
 }
 
 /** For tests and seed scripts — reset in-memory cache after file edits. */

@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma';
 import { normalizePublicAssetUrl } from '@/lib/remote-image';
 import { isBuildPhase } from '@/lib/server/build-phase';
 import { formatLmsCourseCecHoursLabel } from '@/lib/server/course-cec-hours';
+import { formatLmsCourseDurationHoursLabel } from '@/lib/server/course-duration-hours';
 
 /**
  * Same filter as the public `/courses` catalogue when loaded from Prisma.
@@ -46,11 +47,26 @@ function cecHoursLabelForRow(c: {
   });
 }
 
+function durationHoursLabelForRow(c: {
+  slug: string;
+  durationHours: number | null;
+  shortDescription?: string | null;
+  description?: string | null;
+}): string | null {
+  return formatLmsCourseDurationHoursLabel({
+    slug: c.slug,
+    durationHours: c.durationHours,
+    shortDescription: c.shortDescription,
+    description: c.description,
+  });
+}
+
 function mapDashboardCourseRow(c: {
   id: string;
   slug: string;
   title: string;
   shortDescription: string | null;
+  description?: string | null;
   priceAud: { toString(): string };
   isFree: boolean;
   iicrcDiscipline: string | null;
@@ -81,7 +97,7 @@ function mapDashboardCourseRow(c: {
     catalog_status: st === 'draft' ? 'draft' : 'published',
     module_count: c._count.modules,
     cec_hours: cecHoursLabelForRow(c),
-    duration_hours: c.durationHours != null ? String(c.durationHours) : null,
+    duration_hours: durationHoursLabelForRow(c),
   };
 }
 
@@ -174,7 +190,7 @@ function mapLmsCourseToPublicListItem(c: LmsCoursePublicListRow): CourseListItem
     updated_at: c.updatedAt.toISOString(),
     instructor: c.instructor?.fullName ? { full_name: c.instructor.fullName } : null,
     cec_hours: cecHoursLabelForRow(c),
-    duration_hours: c.durationHours != null ? String(c.durationHours) : null,
+    duration_hours: durationHoursLabelForRow(c),
   };
 }
 
@@ -367,7 +383,12 @@ export async function getPublishedCourseDetailBySlugFromDatabase(slug: string) {
       durationHours: row.durationHours,
       iicrcDiscipline: row.iicrcDiscipline,
     }),
-    duration_hours: row.durationHours != null ? String(row.durationHours) : null,
+    duration_hours: durationHoursLabelForRow({
+      slug: row.slug,
+      durationHours: row.durationHours,
+      shortDescription: row.shortDescription,
+      description: row.description,
+    }),
     thumbnail_url: normalizePublicAssetUrl(row.thumbnailUrl),
     module_count: row._count.modules,
     instructor: row.instructor?.fullName ? { full_name: row.instructor.fullName } : null,
