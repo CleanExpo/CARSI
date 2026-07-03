@@ -41,6 +41,20 @@ describe('resolveLmsCourseDurationHours', () => {
     ).toBe(1.5);
   });
 
+  it('resolves the repaired structural-drying alias to its WP duration prose', () => {
+    // slugAliases: introduction-to-applied-structural-drying → structural-drying-2
+    // ("Approximately 30 minutes" in the WP export)
+    expect(
+      resolveLmsCourseDurationHours({ slug: 'introduction-to-applied-structural-drying', durationHours: null })
+    ).toBe(0.5);
+  });
+
+  it('falls back to reviewer durationAssignments for DB-only courses', () => {
+    expect(
+      resolveLmsCourseDurationHours({ slug: 'large-loss-mastery-course', durationHours: null })
+    ).toBe(8);
+  });
+
   it('returns null when no duration source exists', () => {
     expect(
       resolveLmsCourseDurationHours({ slug: 'tile-cleaning-for-carpet-cleaners', durationHours: null })

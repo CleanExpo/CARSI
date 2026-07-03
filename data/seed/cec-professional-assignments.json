@@ -34,8 +34,8 @@
     "introduction-to-advanced-applied-structural-drying-free-iicrc-asd-6-modules": "advanced-applied",
     "introduction-to-advanced-drying-equipment-and-methods-aud-29-iicrc-asd-5-modules": "introduction-to-advanced-drying-equipment-and-methods",
     "introduction-to-applied-microbial-remediation": "applied-microbial",
-    "introduction-to-applied-structural-drying": "structural-drying-ccw",
-    "introduction-to-applied-structural-drying-aud-29-iicrc-asd-5-modules": "structural-drying-ccw",
+    "introduction-to-applied-structural-drying": "structural-drying-2",
+    "introduction-to-applied-structural-drying-aud-29-iicrc-asd-5-modules": "structural-drying-2",
     "introduction-to-asbestos-asbestos-awareness": "asbestos",
     "introduction-to-consulting-for-complex-water-losses": "complex-water-losses",
     "introduction-to-controlled-environment-drying-methods": "controlled-drying",
@@ -82,7 +82,9 @@
     "level-1-mould-remediation-2cc96b85": "level-1-mould-remediation",
     "level-2-mould-remediation-30ee3492": "level-2-mould-remediation",
     "level-3-mould-remediation-c5797369": "level-3-mould-remediation",
-    "introduction-to-basic-carpet-cleaning-and-drying": "carpet-cleaning"
+    "introduction-to-basic-carpet-cleaning-and-drying": "carpet-cleaning",
+    "air-quality-and-odour-identification-and-deodorisation-essentials": "air-quality-and-odour",
+    "introduction-to-creating-a-clean-air-environment-best-practices-for-final-cleara": "introduction-to-creating-a-clean-air-environment"
   },
   "assignments": {
     "duct-cleaning": 3,
@@ -103,5 +105,13 @@
     "wrt-water-damage-essentials": 4,
     "air-movers-for-professional-restoration-specs-selection-on-site-assessment": 1,
     "tile-cleaning-for-carpet-cleaners": 1
+  },
+  "durationAssignments": {
+    "introduction-to-residential-duct-cleaning": 3,
+    "large-loss-mastery-course": 8,
+    "fundamental-business-framework": 4,
+    "documenting-and-reporting-air-quality-improvements": 1,
+    "moisture-mould-and-indoor-air-quality-understanding-the-link": 1.5,
+    "insurance-adjusters-and-their-roles": 0.5
   }
 }
