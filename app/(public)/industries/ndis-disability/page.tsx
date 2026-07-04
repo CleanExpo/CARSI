@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'IICRC CEC Training for NDIS & Disability Services | CARSI Australia',
   description:
-    'Meet NDIS Practice Standards with IICRC mould and water damage certification. AMRT, WRT, and CRT training for disability support providers. Online, CEC-aligned.',
+    'Meet NDIS Practice Standards with IICRC mould and water damage CEC courses. AMRT, WRT, and CRT continuing-education training for disability support providers. Online, CEC-aligned — not IICRC certification.',
   keywords: [
     'NDIS IICRC CEC training',
     'disability services mould training Australia',
@@ -104,7 +104,7 @@ export default async function NDISDisabilityIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Meet NDIS Quality"
         headlineAccent="Safeguards"
-        description="600,000+ Australians rely on NDIS providers to maintain safe accommodation. IICRC AMRT and WRT certification demonstrates staff competency for NDIS Practice Standards audits — protecting participants and provider registration."
+        description="600,000+ Australians rely on NDIS providers to maintain safe accommodation. IICRC AMRT and WRT CEC courses build staff competency for NDIS Practice Standards audits — protecting participants and provider registration. CARSI courses earn IICRC CECs; they are not IICRC certification."
         disciplines={disciplines}
         stats={stats}
       />

@@ -191,7 +191,7 @@ Apply across all campaigns to prevent wasted spend:
 | Headline 4 | Recognised Across Australia |
 | Headline 5 | Digital Certificate on Completion |
 | Description 1 | Your IICRC credentials require ongoing CECs. Complete approved courses online from CARSI — Australia's specialist restoration training platform. Enrol now. |
-| Description 2 | Self-paced IICRC courses designed for working technicians. Earn CECs, download your certificate, and share it on LinkedIn. No classroom attendance required. |
+| Description 2 | Self-paced IICRC CEC courses designed for working technicians. Earn CECs, download your certificate, and share it on LinkedIn. No classroom attendance required. |
 
 **Variation C — Value**
 | Element | Copy |
@@ -222,7 +222,7 @@ Apply across all campaigns to prevent wasted spend:
 |---------|------|
 | Headline 1 | FIFO Mould Training — Protect Your Site |
 | Headline 2 | Avoid $500K+ Mould Liability Costs |
-| Headline 3 | Online IICRC Courses for Mining Teams |
+| Headline 3 | Online IICRC CEC Courses for Mining Teams |
 | Headline 4 | Group Licensing Available |
 | Headline 5 | Trusted by WA & QLD Mining Sites |
 | Description 1 | One mould incident at a FIFO camp can cost $500K+. Train supervisors in IICRC-approved mould assessment for a fraction of the cost. Group rates available. |
@@ -232,7 +232,7 @@ Apply across all campaigns to prevent wasted spend:
 | Element | Copy |
 |---------|------|
 | Headline 1 | Start Mining Safety Training Today |
-| Headline 2 | IICRC Courses — Instant Online Access |
+| Headline 2 | IICRC CEC Courses — Instant Online Access |
 | Headline 3 | No Classroom — No Roster Disruption |
 | Headline 4 | Certificate on Completion |
 | Headline 5 | WHS Mould & Water Damage Courses |

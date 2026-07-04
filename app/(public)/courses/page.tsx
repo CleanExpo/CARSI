@@ -174,6 +174,11 @@ export default async function CoursesPage({
             {displayTotal !== 1 ? 's' : ''} across 7 <AcronymTooltip term="IICRC" /> disciplines —
             track <AcronymTooltip term="CEC">CECs</AcronymTooltip> online, at your own pace
           </p>
+          <p className="mt-3 rounded-lg border border-[#f2cf8f] bg-[#fff8ed] px-4 py-3 text-sm leading-relaxed text-[#7a3500]">
+            CARSI courses earn IICRC Continuing Education Credits (CECs). They are not IICRC
+            certification courses — IICRC certifications are obtained through IICRC-approved schools
+            and examinations.
+          </p>
           <div className="mt-4 rounded-lg border border-[#b8dbfb] bg-white px-4 py-3 shadow-sm">
             <p className="text-sm leading-relaxed text-slate-700">
               Not sure where to start, or comparing several courses?{' '}

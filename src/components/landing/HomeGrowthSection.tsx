@@ -158,8 +158,8 @@ export function HomeGrowthSection({ stats }: HomeGrowthSectionProps) {
               Learn online. Scale in person.
             </h2>
             <p className="mt-3 max-w-xl text-sm leading-relaxed text-slate-600 md:text-base dark:text-white/65">
-              Start with self-paced IICRC courses, then join CARSI × CCW Business Growth Days or the
-              CCW workshop when you are ready to grow on site.
+              Start with self-paced IICRC CEC courses, then join CARSI × CCW Business Growth Days or
+              the CCW workshop when you are ready to grow on site.
             </p>
 
             <ul className="mt-8 space-y-3">

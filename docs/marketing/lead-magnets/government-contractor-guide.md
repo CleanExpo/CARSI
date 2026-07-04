@@ -301,7 +301,7 @@ Coastal Restoration Services had been operating for 4 years with strong commerci
 2. **IICRC certifications are the entry ticket** — Without documented competency, your application will be rejected regardless of your experience.
 3. **WHS compliance is non-negotiable** — Government agencies audit WHS records. Your system must be documented, current, and evidence-based.
 4. **Start with your state** — Local and state government panels are easier to access than federal panels. Build your track record locally first.
-5. **Online training eliminates the biggest barrier** — CARSI's 24/7, self-paced IICRC courses mean your team can upskill without losing a single billable day.
+5. **Online training eliminates the biggest barrier** — CARSI's 24/7, self-paced IICRC CEC courses mean your team can upskill without losing a single billable day.
 
 ---
 

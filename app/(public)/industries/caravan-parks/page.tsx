@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     'Protect guests and comply with state Fair Trading obligations. IICRC AMRT, CRT, and WRT training for Australian caravan parks and holiday accommodation. Online, CEC-aligned.',
   keywords: [
     'caravan park mould training Australia',
-    'holiday park IICRC certification',
+    'holiday park IICRC CEC course',
     'AMRT caravan park remediation',
     'cabin mould restoration training',
     'holiday accommodation hygiene compliance',
@@ -104,7 +104,7 @@ export default async function CaravanParksIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Protect Guest Accommodation"
         headlineAccent="All Season Long"
-        description="Australia's 2,800+ caravan parks face persistent mould, moisture, and storm damage risk. IICRC AMRT, CRT, and WRT certification gives park maintenance teams the protocols to inspect, remediate, and document — protecting guests, reputation, and revenue."
+        description="Australia's 2,800+ caravan parks face persistent mould, moisture, and storm damage risk. IICRC AMRT, CRT, and WRT CEC courses give park maintenance teams the protocols to inspect, remediate, and document — protecting guests, reputation, and revenue. CARSI courses earn IICRC CECs; they are not IICRC certification."
         disciplines={disciplines}
         stats={stats}
       />

@@ -72,7 +72,7 @@ export function ContractorAddOns({ accentColor = '#2490ed', variant = 'default' 
           <MarketingSectionHeader
             eyebrow="For cleaning contractors"
             title="Upgrade your service offering"
-            body="ISSA-aligned cleaning businesses can add IICRC certifications to differentiate from competitors, qualify for insurance work, and charge higher rates for restoration services."
+            body="ISSA-aligned cleaning businesses can add IICRC CEC courses to build restoration skills, differentiate from competitors, and charge higher rates for restoration services. CARSI delivers continuing education credits, not IICRC certification."
           />
 
           <div className="space-y-3">
@@ -110,7 +110,7 @@ export function ContractorAddOns({ accentColor = '#2490ed', variant = 'default' 
 
           <div className="mt-8 flex flex-wrap gap-3">
             <Link href="/courses" className={marketingBtnPrimary}>
-              Browse certification courses <ArrowRight className="h-4 w-4" aria-hidden />
+              Browse CEC courses <ArrowRight className="h-4 w-4" aria-hidden />
             </Link>
             <Link href="/pathways" className={marketingBtnSecondary}>
               View learning pathways

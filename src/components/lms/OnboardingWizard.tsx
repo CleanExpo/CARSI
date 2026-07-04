@@ -132,7 +132,7 @@ const FLOW: FlowItem[] = [
     answers: [
       {
         value: 'new_cert',
-        label: 'Earn a new IICRC certification',
+        label: 'Build toward a new IICRC discipline (CEC courses)',
         icon: <GraduationCap className="h-6 w-6" />,
       },
       { value: 'cec_renewal', label: 'Renew CECs', icon: <RefreshCw className="h-6 w-6" /> },

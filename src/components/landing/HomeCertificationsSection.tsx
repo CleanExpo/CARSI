@@ -38,7 +38,7 @@ export function HomeCertificationsSection({ disciplineCountLabel }: HomeCertific
         <div className="grid gap-12 lg:grid-cols-[minmax(280px,0.92fr)_minmax(0,1.08fr)] lg:items-start lg:gap-14">
           <div>
             <p className="text-[11px] font-semibold tracking-[0.18em] text-[#146fc2] uppercase dark:text-[#8fd0ff]">
-              Certifications
+              IICRC CEC Disciplines
             </p>
             <h2
               id="home-certifications-heading"
@@ -47,8 +47,8 @@ export function HomeCertificationsSection({ disciplineCountLabel }: HomeCertific
               <AcronymTooltip term="IICRC" /> discipline map
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-slate-600 md:text-base dark:text-white/65">
-              Seven core pathways orbit IICRC standards. Hover or tap any node to see the full
-              certification name and jump straight into filtered courses.
+              Seven core CEC pathways orbit IICRC standards. Hover or tap any node to see the full
+              discipline name and jump straight into filtered CEC courses.
             </p>
 
             <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-[#b8dbfb] bg-[#eef7ff] px-3 py-1 text-xs font-semibold text-[#146fc2] dark:border-[#2490ed]/30 dark:bg-[#2490ed]/10 dark:text-[#8fd0ff]">
