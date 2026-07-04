@@ -11,6 +11,8 @@ export interface IndividualTier {
   description: string;
   cta: string;
   href: string;
+  /** WS0 (GP-440): true while checkout for this tier cannot be delivered. No CTA, no href. */
+  comingSoon?: boolean;
 }
 
 export interface TeamTier {
@@ -23,6 +25,8 @@ export interface TeamTier {
   description: string;
   features: string[];
   cta: string;
+  /** WS0 (GP-440): true while checkout for this tier cannot be delivered. No CTA, no href. */
+  comingSoon?: boolean;
 }
 
 export const INDIVIDUAL_TIERS: IndividualTier[] = [
@@ -41,8 +45,9 @@ export const INDIVIDUAL_TIERS: IndividualTier[] = [
     priceLabel: '$795 / year',
     priceCents: 79500,
     description: '100% access to all published CARSI courses for one learner for 12 months.',
-    cta: 'Choose yearly',
+    cta: 'Coming soon',
     href: '/subscribe',
+    comingSoon: true,
   },
 ];
 
@@ -56,7 +61,8 @@ export const TEAM_TIERS: TeamTier[] = [
     perSeatExpansionLabel: '+$49/seat',
     description: 'Small restoration crews — core water & mould pathways.',
     features: ['5 seats included', 'Owner dashboard & invites', 'Progress across seats'],
-    cta: 'Start team',
+    cta: 'Coming soon',
+    comingSoon: true,
   },
   {
     id: 'growth',
@@ -67,7 +73,8 @@ export const TEAM_TIERS: TeamTier[] = [
     perSeatExpansionLabel: '+$39/seat',
     description: 'Growing businesses training multiple technicians.',
     features: ['15 seats included', 'All Starter features', 'Priority email support'],
-    cta: 'Start team',
+    cta: 'Coming soon',
+    comingSoon: true,
   },
   {
     id: 'full_library',
@@ -78,7 +85,8 @@ export const TEAM_TIERS: TeamTier[] = [
     perSeatExpansionLabel: '+$29/seat',
     description: 'Enterprise-style access to the full published catalogue.',
     features: ['25 seats included', 'All Growth features', 'Dedicated onboarding call'],
-    cta: 'Contact sales',
+    cta: 'Coming soon',
+    comingSoon: true,
   },
 ];
 
