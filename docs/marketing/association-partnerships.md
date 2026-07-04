@@ -21,7 +21,7 @@ Establish CARSI as a recognised training partner across 7+ Australian industry a
 | Detail                      | Information                                                                                                                       |
 | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
 | **Relevance**               | Peak body for cleaning, maintenance and facilities contractors. Direct alignment with IICRC cleaning and restoration disciplines. |
-| **Proposition**             | Endorsed CPD provider for BSCAA members. Co-branded certificates for IICRC courses.                                               |
+| **Proposition**             | Endorsed CPD provider for BSCAA members. Co-branded certificates for IICRC CEC courses.                                               |
 | **Contact Strategy**        | Email CEO/National Director → follow up with partnership proposal PDF → video call demo of platform.                              |
 | **Partnership Tier Target** | Preferred Training Partner (member discount + newsletter feature)                                                                 |
 | **URL**                     | bscaa.com                                                                                                                         |
@@ -31,7 +31,7 @@ Establish CARSI as a recognised training partner across 7+ Australian industry a
 | Detail                      | Information                                                                                                                                  |
 | --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Relevance**               | Global cleaning industry body with strong ANZ presence. Members include commercial cleaning operators, product suppliers, facility managers. |
-| **Proposition**             | Co-branded IICRC course bundle exclusive to ISSA ANZ members. Joint webinar series on mould remediation best practice.                       |
+| **Proposition**             | Co-branded IICRC CEC course bundle exclusive to ISSA ANZ members. Joint webinar series on mould remediation best practice.                       |
 | **Contact Strategy**        | Attend ISSA Cleaning & Hygiene Expo → introduce CARSI at the education booth → follow up with co-branding proposal.                          |
 | **Partnership Tier Target** | Preferred Training Partner (co-branded bundle + member discount)                                                                             |
 | **URL**                     | issa.com (ANZ chapter via ISSA APAC)                                                                                                         |
@@ -41,7 +41,7 @@ Establish CARSI as a recognised training partner across 7+ Australian industry a
 | Detail                      | Information                                                                                                                   |
 | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
 | **Relevance**               | Peak body for aged care providers. Mould and indoor air quality in aged care facilities is a growing compliance focus.        |
-| **Proposition**             | Member training benefit — discounted IICRC courses relevant to facility maintenance and infection control compliance.         |
+| **Proposition**             | Member training benefit — discounted IICRC CEC courses relevant to facility maintenance and infection control compliance.         |
 | **Contact Strategy**        | Email Membership Director → propose pilot with 3 member organisations → present results to LASA board for formal endorsement. |
 | **Partnership Tier Target** | Endorsed Provider (free listing + co-branded certificate) → upgrade to Preferred after pilot                                  |
 | **URL**                     | lasa.asn.au                                                                                                                   |
@@ -61,7 +61,7 @@ Establish CARSI as a recognised training partner across 7+ Australian industry a
 | Detail                      | Information                                                                                                                            |
 | --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
 | **Relevance**               | Peak body for the building and construction industry. Water damage, structural drying and mould during construction are common issues. |
-| **Proposition**             | Construction safety training partner — IICRC courses in WRT, ASD and mould assessment as CPD for builder registration renewal.         |
+| **Proposition**             | Construction safety training partner — IICRC CEC courses in WRT, ASD and mould assessment as CPD for builder registration renewal.         |
 | **Contact Strategy**        | Approach state branches first (MBA VIC, MBA QLD, MBA WA) → local partnership → escalate to national body.                              |
 | **Partnership Tier Target** | Preferred Training Partner (CPD recognition + member discount)                                                                         |
 | **URL**                     | masterbuilders.com.au                                                                                                                  |
@@ -81,7 +81,7 @@ Establish CARSI as a recognised training partner across 7+ Australian industry a
 | Detail                      | Information                                                                                                                                                                                                                                           |
 | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Relevance**               | Local government facility managers oversee community buildings, libraries, pools and public housing — all susceptible to mould and water damage. IPWEA (Institute of Public Works Engineering Australasia) members manage infrastructure maintenance. |
-| **Proposition**             | Government facility manager training — IICRC courses as CPD for council maintenance teams and public works engineers.                                                                                                                                 |
+| **Proposition**             | Government facility manager training — IICRC CEC courses as CPD for council maintenance teams and public works engineers.                                                                                                                                 |
 | **Contact Strategy**        | Email LGAQ (QLD) and IPWEA national → propose group licensing trial for 2–3 councils → publish case study → expand nationally.                                                                                                                        |
 | **Partnership Tier Target** | Endorsed Provider → Preferred (bulk licensing for council teams)                                                                                                                                                                                      |
 | **URLs**                    | lgaq.asn.au, ipwea.org                                                                                                                                                                                                                                |
@@ -152,7 +152,7 @@ carsi.com.au | training@carsi.com.au
 
 ### Version 2: Medium (~ 250 words)
 
-**Subject:** Training Partnership Opportunity — IICRC Courses for [Association Name] Members
+**Subject:** Training Partnership Opportunity — IICRC CEC Courses for [Association Name] Members
 
 ---
 

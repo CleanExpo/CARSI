@@ -15,12 +15,12 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'IICRC CEC Training for Real Estate & Property Sales | CARSI Australia',
   description:
-    'Vendor disclosure compliance and pre-sale remediation. IICRC WRT, ASD, and AMRT certification for real estate agents, property managers, and conveyancers. Online, CEC-aligned.',
+    'Vendor disclosure compliance and pre-sale remediation. IICRC WRT, ASD, and AMRT CEC courses for real estate agents, property managers, and conveyancers. Online, CEC-aligned — continuing education credits, not IICRC certification.',
   keywords: [
     'real estate IICRC CEC training Australia',
     'water damage disclosure property',
     'mould training real estate agent',
-    'WRT property sales certification',
+    'WRT property sales CEC course',
     'pre-sale remediation training',
   ],
 };

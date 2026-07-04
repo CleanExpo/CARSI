@@ -32,6 +32,19 @@ standards (IICRC framed in the AU context), and **AUD** pricing. US/UK spelling,
 US-only products are defects — fix before publish. Full standard + checklist:
 `.claude/skills/carsi-course-production/SKILL.md` (invoke it for any course work).
 
+## IICRC CEC terminology — licence-critical (MUST)
+
+**CARSI sells IICRC CEC courses, not IICRC certification.** In any public, marketing, SEO,
+schema, email or in-app selling copy, describe what CARSI offers as "IICRC CEC courses" /
+"IICRC Continuing Education Credit (CEC) courses" / "courses carrying IICRC CEC approval".
+**Never** write copy implying CARSI delivers "IICRC courses", "IICRC certification course(s)",
+"IICRC-certified course(s)", or "get IICRC certified with CARSI". IICRC certification is
+obtained only through IICRC-approved schools and examinations — CARSI courses earn CECs toward
+maintaining an existing IICRC certification. Referencing a student's own existing IICRC
+certification (recert reminders, member number, CEC tracking) and accurate "IICRC CEC-approved"
+claims are fine. Selling CARSI as delivering IICRC certification can cost the licence to sell
+courses — treat it as a release blocker. Enforced by `npm run check:iicrc-terminology`.
+
 ## Continual Learning
 
 This repo emits signal to `.harness/learning/*.jsonl` for the weekly distillation routine (RA-1745). If you notice something the system should learn from, append a structured entry — do not stop work to reason about meta-rules. Schema and consumer per RA-1745.

@@ -15,13 +15,13 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'IICRC CEC Training for Plumbers & Trades | CARSI Australia',
   description:
-    'Turn water damage call-outs into drying contracts. IICRC WRT and ASD certification for Australian plumbers and trade contractors — online, self-paced, CEC-aligned.',
+    'Turn water damage call-outs into drying contracts. IICRC WRT and ASD CEC courses for Australian plumbers and trade contractors — online, self-paced, CEC-aligned. These are continuing education (CEC) courses, not IICRC certification.',
   keywords: [
     'IICRC CEC training plumbers Australia',
-    'WRT certification plumbing',
+    'WRT CEC course plumbing',
     'water damage restoration plumber',
     'ASD structural drying trade',
-    'IICRC plumber certification online',
+    'IICRC CEC courses for plumbers online',
   ],
 };
 
@@ -104,7 +104,7 @@ export default async function PlumbingTradesIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Turn Call-Outs Into"
         headlineAccent="Drying Contracts"
-        description="85,000+ licensed Australian plumbers leave water damage behind every day. IICRC WRT and ASD certification gives your trade business the credentials to capture the full remediation scope — and the revenue that comes with it."
+        description="85,000+ licensed Australian plumbers leave water damage behind every day. IICRC WRT and ASD CEC courses give your trade business the continuing-education grounding to capture the full remediation scope — and the revenue that comes with it. CARSI courses earn IICRC CECs; they are not IICRC certification."
         disciplines={disciplines}
         stats={stats}
       />

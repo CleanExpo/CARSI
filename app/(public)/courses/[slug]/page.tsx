@@ -220,7 +220,7 @@ function getLearningOutcomes(course: CourseDetail): string[] {
 
   outcomes.push(
     'Apply industry-standard methodologies to real-world restoration scenarios',
-    'Demonstrate competency aligned with IICRC certification requirements',
+    'Build competency aligned with IICRC standards (continuing education, not IICRC certification)',
     'Receive a verifiable digital credential for your professional portfolio'
   );
 
@@ -250,7 +250,7 @@ function getAudienceItems(course: CourseDetail): string[] {
   }
   return [
     'Restoration and cleaning industry professionals',
-    'Technicians seeking IICRC certification credits',
+    'Technicians earning IICRC Continuing Education Credits (CECs)',
     'Trade professionals expanding their qualifications',
     'Business owners investing in team development',
   ];
@@ -898,6 +898,17 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                       </p>
                     </div>
                   </div>
+                  <p
+                    className="mt-6 border-t pt-4 text-xs leading-relaxed"
+                    style={{
+                      color: 'rgba(255,255,255,0.6)',
+                      borderColor: 'rgba(255,255,255,0.08)',
+                    }}
+                  >
+                    This is an IICRC Continuing Education Credit (CEC) course. It is not an IICRC
+                    certification course — IICRC certifications are obtained through IICRC-approved
+                    schools and examinations.
+                  </p>
                 </div>
               </section>
 

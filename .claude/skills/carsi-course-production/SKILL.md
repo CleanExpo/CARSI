@@ -56,6 +56,22 @@ edit is saved.
 - Cite Australian bodies and sources; anchor authority to the Australian industry and the founder
   (Phill McGurk). Honour the SEO/GEO/AEO initiative (see memory `carsi-seo-geo-aeo-initiative`).
 
+### 8. IICRC CEC terminology — licence-critical (MUST)
+- CARSI sells **IICRC CEC courses**, NOT IICRC certification. In every course title, description,
+  lesson, quiz and piece of course marketing copy, describe what CARSI offers as "IICRC CEC
+  courses" / "IICRC Continuing Education Credit (CEC) courses" / "courses carrying IICRC CEC
+  approval".
+- BANNED in any selling/descriptive context: "IICRC courses", "IICRC certification course(s)",
+  "IICRC-certified course(s)", "get IICRC certified with CARSI", or any copy implying CARSI
+  delivers IICRC certification, examinations, or credentials. IICRC certification is obtained only
+  through **IICRC-approved schools and examinations**; CARSI courses earn **CECs** toward
+  maintaining an existing IICRC certification.
+- FINE: a student's own existing IICRC certification (recert reminders, member number, CEC
+  tracking), accurate "IICRC CEC-approved" claims, "WRT/ASD/AMRT-aligned" content descriptors, and
+  discipline badges framed as CEC discipline alignment.
+- Getting this wrong can cost the licence to sell courses — treat as a release blocker. Enforced by
+  `npm run check:iicrc-terminology`.
+
 ## Course quality bar (applies with the AU standard)
 - Real, substantive modules (not stubs); consistent structure; correct `iicrcDiscipline` (or neutral
   for general/knowledge courses); CEC only when genuinely accredited (founder decides value).
@@ -68,6 +84,8 @@ Scan the content and reject on any hit:
 - US spellings (color/odor/meter/mold/fiber/center/license-noun).
 - `115V` / `15A circuit` / feet / sq ft / inches without a metric primary.
 - US-only products or US voltages presented as locally available.
+- IICRC terminology: "IICRC course(s)" / "IICRC certification course" / "IICRC-certified course" /
+  "get IICRC certified with CARSI" in selling copy — must be "IICRC CEC course(s)".
 - Silent trailer (no audio stream).
 Fix all before the course goes live. Prod publish/unpublish remains founder-gated.
 

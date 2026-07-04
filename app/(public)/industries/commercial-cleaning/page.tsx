@@ -46,7 +46,7 @@ const faqs = [
   {
     question: 'How do cleaning companies add restoration services in Australia?',
     answer:
-      'Commercial cleaning businesses expand into restoration by upskilling existing staff with IICRC certifications. CRT (Carpet Restoration), WRT (Water Damage Restoration), and OCT (Odour Control) are the most common entry points. These credentials allow cleaners to offer insured restoration work alongside routine cleaning contracts, increasing revenue per client.',
+      'Commercial cleaning businesses expand into restoration by upskilling existing staff with IICRC CEC courses in the core disciplines. CRT (Carpet Restoration), WRT (Water Damage Restoration), and OCT (Odour Control) are the most common entry points. This continuing-education grounding helps cleaners offer restoration work alongside routine cleaning contracts, increasing revenue per client. CARSI delivers CEC courses, not IICRC certification — certification is obtained through IICRC-approved schools.',
   },
   {
     question: 'What IICRC certifications help win insurance restoration panels?',

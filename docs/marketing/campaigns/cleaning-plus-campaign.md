@@ -109,7 +109,7 @@ CTA: See the restoration pathway →
 #### Carousel Ad — "4 Steps to Restoration Revenue"
 
 - Card 1: "You're already on-site" (cleaning crew image)
-- Card 2: "Get IICRC certified online" (credential image)
+- Card 2: "Earn IICRC CECs online" (credential image)
 - Card 3: "Win restoration contracts" (job site image)
 - Card 4: "Charge 3–5x more per job" (revenue comparison)
 
@@ -193,7 +193,7 @@ CTA: See the restoration pathway →
 | "We don't have the equipment"               | "Start with water damage restoration — the core equipment (extractors, dehumidifiers, air movers) is a $15K–25K investment that pays for itself in 2–3 jobs."                                    |
 | "Insurance work is too hard to get into"    | "Insurers are actively looking for credentialed contractors. IICRC certification is the #1 requirement for panel membership. CARSI gets you there faster than any face-to-face course."          |
 | "Online training isn't as good as hands-on" | "CARSI's courses are IICRC board-approved — the same credential standard as any classroom course. Plus, your crew gets hands-on experience on real job sites, which no classroom can replicate." |
-| "$795 per year is too expensive"            | "That's $2.18/day for unlimited courses for your entire team. One restoration job covers the annual cost. Compare that to $2,000–5,000 per person for face-to-face IICRC courses."               |
+| "$795 per year is too expensive"            | "That's $2.18/day for unlimited courses for your entire team. One restoration job covers the annual cost. Compare that to $2,000–5,000 per person for face-to-face IICRC certification training at approved schools."               |
 
 ---
 

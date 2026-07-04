@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     'restoration professionals directory',
     'certified water damage specialists',
     'mould remediation professionals',
-    'IICRC certified technicians',
+    'IICRC CEC-trained technicians',
     'indoor environment professionals',
     'CARSI professional directory',
   ],

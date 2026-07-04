@@ -162,7 +162,7 @@ secrets (registered in the SYNTHEX deploy environment — see `docs/PRODUCTION_D
 | Competitor Type            | CARSI Advantage                                 |
 | -------------------------- | ----------------------------------------------- |
 | **Traditional RTOs**       | Online vs face-to-face. No travel. No downtime. |
-| **US-based IICRC courses** | Australian focus. AUD pricing. Local examples.  |
+| **US-based IICRC CEC courses** | Australian focus. AUD pricing. Local examples.  |
 | **In-house training**      | External verification. Audit-ready credentials. |
 | **No training at all**     | WHS due diligence. Insurance requirements.      |
 

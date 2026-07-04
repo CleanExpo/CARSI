@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     'Protect your members and your reputation. IICRC AMRT, OCT, and CRT training for Australian gyms, pools, and fitness facilities. Online, self-paced, CEC-aligned.',
   keywords: [
     'gym mould training Australia',
-    'fitness centre IICRC certification',
+    'fitness centre IICRC CEC course',
     'AMRT gym remediation',
     'OCT odour control gym',
     'mould liability fitness centre',
@@ -104,7 +104,7 @@ export default async function GymsFitnessIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Protect Your Members"
         headlineAccent="and Your Reputation"
-        description="Australian gyms face constant mould and odour risk from high-humidity environments. IICRC AMRT and OCT certification gives your maintenance team the protocols to keep facilities clean, compliant, and member-ready."
+        description="Australian gyms face constant mould and odour risk from high-humidity environments. IICRC AMRT and OCT CEC courses give your maintenance team the protocols to keep facilities clean, compliant, and member-ready. CARSI courses earn IICRC CECs; they are not IICRC certification."
         disciplines={disciplines}
         stats={stats}
       />

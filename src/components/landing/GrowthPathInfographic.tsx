@@ -34,7 +34,7 @@ export function GrowthPathInfographic({ className = '' }: { className?: string }
     <div
       className={`relative mx-auto w-full min-h-[340px] max-w-[520px] select-none lg:max-w-none ${className}`}
       role="img"
-      aria-label="Online IICRC courses connect to in-person CCW Business Growth Days and workshop"
+      aria-label="Online IICRC CEC courses connect to in-person CCW Business Growth Days and workshop"
     >
       {/* Ambient depth */}
       <div

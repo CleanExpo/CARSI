@@ -112,7 +112,7 @@ Downloadable PDF preview in feed — users swipe through pages, then submit lead
 
 **Variation C — Efficiency Angle**
 
-> **Hook:** 40+ IICRC courses. Zero classroom time. One annual subscription.
+> **Hook:** 40+ IICRC CEC courses. Zero classroom time. One annual subscription.
 >
 > **Body:** CARSI gives mining companies unlimited access to IICRC-approved restoration and safety training for $795/year per user. WRT, ASD, AMRT and more — all self-paced, all verifiable, all built for shift workers.
 >
