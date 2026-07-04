@@ -1,0 +1,151 @@
+{
+  "version": 1,
+  "status": "DRAFT — NOT PUBLISHED — SME REVIEW REQUIRED — THIN SOURCE COVERAGE",
+  "courseSlug": "level-2-mould-remediation",
+  "note": "DRAFT end-of-course assessment for GP-445 pilot (WS2b). This course carries IICRC CEC hours (4) and its live description/slug advertise the course without any assessment currently seeded — see GP-444 evidence. Structured identically to data/seed/floor-care-quizzes.json (courseSlug binding, quiz array, questions/options/correctIndex). SOURCE COVERAGE IS THIN: unlike the other two GP-445 pilot courses, there is no dedicated docx or lesson-body text file for 'level-2-mould-remediation' in this repo — only the WordPress export module-title outline (data/wordpress-export/courses.json) and the CEC/discipline record (data/seed/cec-professional-assignments.json, 4 CEC). This file deliberately holds FEWER questions (10, the low end of the 10-15 target for a 4-5 CEC course) because most module titles in the outline have no elaborated body text to write a defensible question from. Every question below is grounded either in the course's own WP module-title outline, in Australian WHS facts already verified in-repo for the same regulatory topics on other CARSI courses (cited by file), or in moisture-meter/containment technical facts verified in other CARSI structural-drying course text files (data/CARSI_Specialty_Courses_Collection.txt, data/water_damage_restoration_courses.txt) — NOT this course's own material, since none exists. DO NOT seed or publish until the founder (SME) has supplied or approved the missing module content — see docs/runbooks/sme-review-checklist.md, which lists every flagged gap for this course explicitly. sourceRef is a review aid only and is not consumed by the seed script.",
+  "sourceGaps": [
+    "Introduction to Mould — outline title only, no elaborated body text in repo. SME must supply or confirm mould biology/growth-condition content before this module can be assessed.",
+    "Preparation for Mould Remediation - Level 2 — outline title only, no elaborated body text in repo.",
+    "The Framework of Health and Safety Regulations — outline title only; question below uses general Model WHS framework facts verified elsewhere in the CARSI corpus, not this course's own text.",
+    "Cleaning Chemicals — outline title only, no product/dilution detail in repo for this course specifically.",
+    "Biological Hazards — outline title only, no elaborated body text in repo for this course specifically (cf. Microbial.docx courses, which do have this detail but are different courses).",
+    "Initial Inspection - Level 2 — outline title only; no described inspection method or Level 2-specific criteria in repo.",
+    "Plant and Machinery — outline title only, no equipment list or spec detail in repo.",
+    "Emergency Situations / Emergency Documentation — outline titles only, no elaborated procedure in repo.",
+    "Mould Remediation Processes — outline title only; this is the course's core technical content and has NO elaborated source text in repo. This is the single largest gap — the founder must supply the actual remediation method/sequence before a defensible assessment of this module can be written.",
+    "Disposal Mould Course / Removing Waste — outline titles only, no waste-classification detail specific to mould in repo.",
+    "Upgrade to Level 3 - Mould Remediation — this is a marketing/upsell line in the outline, not course content; excluded from the assessment entirely.",
+    "Level 1 prerequisite content — the course description says it 'follows on from Level 1', but no Level 1 Mould Remediation docx or text source was found in repo either, so no Level-1-recap question could be grounded."
+  ],
+  "quizzes": [
+    {
+      "quizId": "cc653cdc-72d2-4e8f-8bef-a818b83ff340",
+      "lessonTitle": "End-of-course assessment: Level 2 - Mould Remediation",
+      "title": "Level 2 - Mould Remediation Quiz",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "This course states it follows on from an earlier mould remediation course. What does the live course description say this Level 2 course builds toward?",
+          "options": [
+            "It replaces the need for any prior mould training",
+            "It follows on from Level 1 and provides a further look at mould remediation, providing extended skills for business requirements",
+            "It is a standalone course with no relationship to other mould courses",
+            "It is only intended for business owners, not technicians"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "data/wordpress-export/courses.json — level-2-mould-remediation short_description"
+        },
+        {
+          "questionText": "Which topic in this course's outline addresses working in high-temperature conditions such as full PPE in a contained mould-affected space?",
+          "options": [
+            "Heat Exhaustion and Heat Stroke",
+            "Documentation",
+            "Finalise Tasks",
+            "Moisture Meters"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "data/wordpress-export/courses.json — level-2-mould-remediation description (module outline)"
+        },
+        {
+          "questionText": "A pin-type moisture meter is used to check a mould-affected wall. Why must the correct material calibration setting be selected before taking a reading?",
+          "options": [
+            "Calibration only affects the display brightness",
+            "Different materials have different resistance-to-moisture relationships — using the wrong material setting (e.g. a wood setting on gypsum) produces a meaningless reading",
+            "Calibration is a marketing feature and does not affect accuracy",
+            "Pin meters do not require calibration"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "data/CARSI_Specialty_Courses_Collection.txt (moisture meter technical content, verified elsewhere in the CARSI corpus — NOT this course's own docx; flagged for SME confirmation that Level 2 teaches the same standard)"
+        },
+        {
+          "questionText": "Why is a non-invasive (pinless) moisture meter typically used before a pin-type meter when scanning a mould-affected area?",
+          "options": [
+            "It is more accurate than a pin meter in every situation",
+            "It scans quickly to identify wet zones without penetrating the surface, with any elevated reading then confirmed using a pin meter",
+            "It eliminates the need for any further testing",
+            "It is only used outdoors"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "data/CARSI_Specialty_Courses_Collection.txt (moisture meter technical content, verified elsewhere in the CARSI corpus — NOT this course's own docx; flagged for SME confirmation)"
+        },
+        {
+          "questionText": "Why is containment established under negative pressure when mould is present in the work area?",
+          "options": [
+            "Negative pressure keeps the work area warmer",
+            "It ensures air movement through the containment boundary is inward, from clean areas into the contaminated zone, preventing spread of contamination outward",
+            "It is only a comfort measure for workers",
+            "Negative pressure is only relevant to water damage jobs, not mould"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "data/CARSI_Specialty_Courses_Collection.txt (containment technical content, verified elsewhere in the CARSI corpus — NOT this course's own docx; flagged for SME confirmation that Level 2 teaches the same containment standard)"
+        },
+        {
+          "questionText": "This course's outline lists 'Containment' as a distinct topic. In an occupied residential property, what must be communicated to occupants before containment is established?",
+          "options": [
+            "Nothing — containment can be set up without notice",
+            "The containment boundaries and access restrictions, ensuring essential facilities such as bathrooms and kitchen access are not eliminated",
+            "Only the expected completion date",
+            "Containment is never used in occupied properties"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "data/CARSI_Specialty_Courses_Collection.txt (containment technical content, verified elsewhere in the CARSI corpus — NOT this course's own docx; flagged for SME confirmation)"
+        },
+        {
+          "questionText": "The course outline includes 'Job Safety and Environmental Analysis' as a topic. Based on the same JSEA requirement documented for other CARSI restoration courses, when must a JSEA be reviewed and updated during a job?",
+          "options": [
+            "JSEAs are fixed once signed and are never updated",
+            "When site conditions change, additional contamination is discovered, or an incident/exposure occurs",
+            "Only at the very end of the job, for record-keeping",
+            "Only if requested by the client"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Cross-referenced against Microbial.docx JSEA content (Infectious Control for the Business Owner, Module 16) for the same JSEA update-trigger requirement — this course's own outline names 'Job Safety and Environmental Analysis' as a topic but has no elaborated body text; SME must confirm Level 2 teaches the same trigger list"
+        },
+        {
+          "questionText": "The course outline lists 'Safety Data Sheets' as a topic for handling cleaning chemicals used in mould remediation. Which SDS sections are the standard priority for a field worker before first using a new chemical?",
+          "options": [
+            "Section 2 (hazard identification) and Section 8 (exposure controls and PPE)",
+            "Section 1 (identification) only",
+            "Section 16 (other information) only",
+            "There is no priority — all sections carry equal field relevance"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "Cross-referenced against Microbial.docx SDS content (Microbe Clean Basic Understanding Course, Module 15) for the same SDS priority-section guidance — this course's own outline names 'Safety Data Sheets' as a topic but has no elaborated body text; SME must confirm Level 2 teaches the same standard"
+        },
+        {
+          "questionText": "The course outline lists 'Finalise Tasks' near the end of the module sequence. Based on the equivalent completion/handover step verified in other CARSI restoration course content, what should happen when a job cannot be completed to the agreed scope?",
+          "options": [
+            "Leave the site quietly without informing anyone",
+            "Document the reason and escalate to the supervisor rather than inventing a completion note",
+            "Complete unrelated extra work to fill the time instead",
+            "Ignore the shortfall since the client was already informed verbally at the start"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Cross-referenced against data/seed/floor-care-quizzes.json completion/handover principle (same CARSI professional-conduct standard) — this course's own outline names 'Finalise Tasks' as a topic but has no elaborated body text; SME must confirm Level 2 teaches an equivalent handover procedure"
+        },
+        {
+          "questionText": "Which of the following is explicitly listed in this course's own module outline (as opposed to being inferred from another CARSI course)?",
+          "options": [
+            "Moisture Meters",
+            "ATP Terminology",
+            "Donning and Doffing PPE",
+            "Bacteria and Modes of Transmission"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "data/wordpress-export/courses.json — level-2-mould-remediation description (module outline includes 'Moisture Meters' verbatim)"
+        }
+      ]
+    }
+  ]
+}

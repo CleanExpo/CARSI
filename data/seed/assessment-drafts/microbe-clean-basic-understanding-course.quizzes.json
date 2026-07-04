@@ -1,0 +1,197 @@
+{
+  "version": 1,
+  "status": "DRAFT — NOT PUBLISHED — SME REVIEW REQUIRED",
+  "courseSlug": "microbe-clean-basic-understanding-course",
+  "note": "DRAFT end-of-course assessment for GP-445 pilot (WS2b). This course carries IICRC CEC hours (5) and its live WordPress description outline already ends with 'Microbe Clean - Basic Understanding Quiz', but no assessment currently exists — see GP-444 evidence. Structured identically to data/seed/floor-care-quizzes.json (courseSlug binding, quiz array, questions/options/correctIndex). DO NOT seed or publish until the founder (SME) has reviewed each question against docs/runbooks/sme-review-checklist.md and ticked this course off. Source: data/Microbial.docx 'Microbe Clean Basic Understanding Course' course record (20 modules) plus data/wordpress-export/courses.json live description (slug match confirmed). Every question includes a sourceRef note field citing the docx module for SME traceability — sourceRef is a review aid only and is not consumed by the seed script.",
+  "quizzes": [
+    {
+      "quizId": "e9012bc2-2bfb-4e3d-a5b3-815e6527aa40",
+      "lessonTitle": "End-of-course assessment: Microbe Clean — Basic Understanding",
+      "title": "Microbe Clean - Basic Understanding Quiz",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Why can a virus not multiply on a surface the way bacteria can?",
+          "options": [
+            "Viruses replicate only inside a host cell and cannot reproduce independently on surfaces",
+            "Viruses are actually a type of bacteria",
+            "Viruses die immediately on contact with any surface",
+            "Viruses only exist in liquid form"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "Microbial.docx — Microbe Clean Basic Understanding Course, Module 1: Virus Facts"
+        },
+        {
+          "questionText": "Which bacterial form is described as the most resistant to standard disinfectants and requiring physical removal before disinfection?",
+          "options": [
+            "Free-floating Gram-positive bacteria",
+            "Biofilm — bacteria embedded in a self-produced polymer matrix on a surface",
+            "Airborne bacteria only",
+            "Bacteria found only in soil"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Microbial.docx — Microbe Clean Basic Understanding Course, Module 2: Bacteria and Modes of Transmission"
+        },
+        {
+          "questionText": "According to the five moments for hand hygiene in a cleaning context, when must hand hygiene be performed?",
+          "options": [
+            "Only at the start of the shift",
+            "Before entering a contaminated zone, before touching a clean surface after handling contaminated material, after removing gloves, after handling waste, and before leaving site",
+            "Only if visibly dirty",
+            "Only once per site visit"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Microbial.docx — Microbe Clean Basic Understanding Course, Module 3: Hygiene Practices"
+        },
+        {
+          "questionText": "Why must a surface be cleaned before it is disinfected?",
+          "options": [
+            "Cleaning and disinfecting achieve exactly the same result",
+            "Organic matter neutralises most disinfectants, so disinfection is only effective after physical cleaning removes it",
+            "Disinfecting first always saves time",
+            "Cleaning is only cosmetic and has no bearing on disinfection"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Microbial.docx — Microbe Clean Basic Understanding Course, Module 4: Cleaning and Disinfecting for Health"
+        },
+        {
+          "questionText": "What distinguishes a high-touch surface from a low-touch surface?",
+          "options": [
+            "High-touch surfaces are touched by multiple people multiple times per day, such as door handles and lift buttons",
+            "High-touch surfaces are always made of metal",
+            "Low-touch surfaces never require cleaning",
+            "There is no meaningful distinction"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "Microbial.docx — Microbe Clean Basic Understanding Course, Module 5: Cleaning Types and Touch Points"
+        },
+        {
+          "questionText": "What is the correct cleaning direction to avoid re-depositing contamination on already-cleaned surfaces?",
+          "options": [
+            "Work randomly across the site",
+            "Work from the cleanest areas to the most contaminated areas, and from high surfaces to low surfaces",
+            "Work from the most contaminated area outward in all directions",
+            "Direction does not matter if the same cloth is used throughout"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Microbial.docx — Microbe Clean Basic Understanding Course, Module 6: Cross Contamination"
+        },
+        {
+          "questionText": "What is the minimum respiratory protection specified for environments with an aerosolisation risk from high-pressure cleaning or mould?",
+          "options": [
+            "No respiratory protection is required if gloves are worn",
+            "P2 minimum",
+            "A basic surgical mask is always sufficient",
+            "Full-face SCBA is required for every job"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Microbial.docx — Microbe Clean Basic Understanding Course, Module 7: Personal Protective Equipment PPE"
+        },
+        {
+          "questionText": "In the correct doffing (removal) sequence for contaminated PPE, which item must always come off last, and why?",
+          "options": [
+            "Gloves — because hands are the dirtiest part of the body",
+            "The respirator — removing it earlier means removing airway protection at the point of highest contamination contact risk",
+            "Boots — because they are hardest to remove",
+            "Eye protection — because it is the cheapest item to replace"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Microbial.docx — Microbe Clean Basic Understanding Course, Module 8: Donning and Doffing PPE"
+        },
+        {
+          "questionText": "What is a recognised sign of heat stroke that requires an immediate call to 000?",
+          "options": [
+            "Mild thirst and light sweating",
+            "Core temperature above 39 degrees Celsius, hot red skin, rapid strong pulse, confusion or unconsciousness",
+            "Slight tiredness after a normal shift",
+            "A single sneeze"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Microbial.docx — Microbe Clean Basic Understanding Course, Module 9: Heat Exhaustion and Heat Stroke"
+        },
+        {
+          "questionText": "Before starting an infection control or microbial remediation job, what should hazard identification specifically cover?",
+          "options": [
+            "Only the client's verbal description of the job",
+            "Biological, chemical, physical and environmental hazards, using a standardised site entry checklist",
+            "Only chemical hazards, since biological risks are covered elsewhere",
+            "Hazard identification is optional for routine jobs"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Microbial.docx — Microbe Clean Basic Understanding Course, Module 10: Hazard Identification"
+        },
+        {
+          "questionText": "Under Model WHS Act s.18, what must a documented risk assessment demonstrate for each specific infection control job?",
+          "options": [
+            "That the PCBU has managed risks so far as is reasonably practicable",
+            "That the client has agreed to a price",
+            "That the job was completed on time",
+            "That no risk assessment is legally required"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "Microbial.docx — Microbe Clean Basic Understanding Course, Module 11: Risk Assessments"
+        },
+        {
+          "questionText": "Which sections of an SDS are identified as the priority for field workers before using a chemical for the first time?",
+          "options": [
+            "Section 2 (hazard identification) and Section 8 (exposure controls and PPE)",
+            "Section 1 (identification) only",
+            "Section 16 (other information) only",
+            "The SDS has no prioritised sections"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "Microbial.docx — Microbe Clean Basic Understanding Course, Module 15: Safety Data Sheets"
+        },
+        {
+          "questionText": "Why must oxidisers, acids, and alkalis be physically separated in chemical storage?",
+          "options": [
+            "It has no safety basis, only tidiness",
+            "Incompatible chemicals stored together can react — for example, sodium hypochlorite stored near acidic cleaners creates a chlorine gas risk",
+            "Separation is only required for chemicals of different colours",
+            "It is only relevant to office storage, not vehicles"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Microbial.docx — Microbe Clean Basic Understanding Course, Module 17: Handling and Storage"
+        },
+        {
+          "questionText": "What must a worker do if a disinfected surface dries before the minimum dwell time has elapsed?",
+          "options": [
+            "Consider the disinfection complete regardless",
+            "Reapply the product and restart the dwell time count, since dry application does not equal effective disinfection",
+            "Wipe the surface with a dry cloth and move on",
+            "Apply a different, unrelated chemical to compensate"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Microbial.docx — Microbe Clean Basic Understanding Course, Module 18: Cleaning Procedures"
+        },
+        {
+          "questionText": "Under Model WHS Regulations r.299, what must an infection control business be able to produce on demand during a regulatory inspection?",
+          "options": [
+            "A verbal explanation of past jobs",
+            "A copy of every SWMS relevant to the work, kept and made available to any person involved in that work",
+            "Only the business's ABN",
+            "Nothing — SWMS are internal documents only"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Microbial.docx — Microbe Clean Basic Understanding Course, Module 20: Safe Work Method Statements"
+        }
+      ]
+    }
+  ]
+}
