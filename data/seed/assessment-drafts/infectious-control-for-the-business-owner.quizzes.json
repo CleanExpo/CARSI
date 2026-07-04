@@ -1,0 +1,257 @@
+{
+  "version": 1,
+  "status": "DRAFT — NOT PUBLISHED — SME REVIEW REQUIRED",
+  "courseSlug": "infectious-control-for-the-business-owner",
+  "note": "DRAFT end-of-course assessment for GP-445 pilot (WS2b). This course carries IICRC CEC hours (7) and its live WordPress description advertises a 'Quiz' with no assessment currently seeded — see GP-444 evidence. Structured identically to data/seed/floor-care-quizzes.json (courseSlug binding, quiz array, questions/options/correctIndex). DO NOT seed or publish until the founder (SME) has reviewed each question against docs/runbooks/sme-review-checklist.md and ticked this course off. Source: data/Microbial.docx 'Infectious Control for the Business Owner' course record (20 modules) plus data/wordpress-export/courses.json live description (slug match confirmed). Every question includes a sourceRef note field citing the docx module for SME traceability — sourceRef is a review aid only and is not consumed by the seed script.",
+  "quizzes": [
+    {
+      "quizId": "dcbaac25-84ef-4942-a4c6-87e4c61cbd51",
+      "lessonTitle": "End-of-course assessment: Infectious Control for the Business Owner",
+      "title": "Infectious Control for the Business Owner — Final Assessment",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Why can a disinfectant that is effective against influenza fail against norovirus, even at the same site?",
+          "options": [
+            "Norovirus is a non-enveloped virus and lacks the lipid membrane that many disinfectants target",
+            "Norovirus only lives in the air, not on surfaces",
+            "All disinfectants work identically against every virus type",
+            "Influenza is always harder to kill than norovirus"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "Microbial.docx — Infectious Control for the Business Owner, Module 1: Virus Facts"
+        },
+        {
+          "questionText": "What minimum available chlorine concentration is identified for effective decontamination against spore-forming bacteria such as C. difficile?",
+          "options": [
+            "100 ppm",
+            "500 ppm",
+            "1000 ppm",
+            "No chlorine-based product is effective against spores"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "sourceRef": "Microbial.docx — Infectious Control for the Business Owner, Module 2: Bacteria and Modes of Transmission"
+        },
+        {
+          "questionText": "A technician is about to disinfect a visibly soiled high-touch surface. What is the compliant sequence?",
+          "options": [
+            "Apply disinfectant directly to the soiled surface to save time",
+            "Clean to physically remove organic matter first, then disinfect",
+            "Sterilise the surface instead of disinfecting it",
+            "Disinfect twice instead of cleaning"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Microbial.docx — Infectious Control for the Business Owner, Module 3: Cleaning and Disinfecting for Health"
+        },
+        {
+          "questionText": "Which regulatory requirement governs the disinfectant products a business can legally claim as effective against pathogens in Australia?",
+          "options": [
+            "Products must be registered with the Therapeutic Goods Administration (TGA)",
+            "Any commercially available cleaning product may be marketed as a disinfectant",
+            "Only imported products require registration",
+            "State health departments issue their own separate disinfectant licences"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "Microbial.docx — Infectious Control for the Business Owner, Module 3: Cleaning and Disinfecting for Health (Compliance note)"
+        },
+        {
+          "questionText": "Why should jewellery such as rings and watches be removed before a worker enters a contaminated zone?",
+          "options": [
+            "It is a uniform policy with no hygiene basis",
+            "It impedes effective hand hygiene and can harbour and transport pathogens between sites",
+            "It slows the worker down physically",
+            "It has no bearing on infection control"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Microbial.docx — Infectious Control for the Business Owner, Module 4: Hygiene Practices"
+        },
+        {
+          "questionText": "Why does infection control work in an aged care or childcare setting carry a heightened duty of care compared to a standard commercial job?",
+          "options": [
+            "These sites pay less, so more care must be taken to justify cost",
+            "Vulnerable populations mean a failure carries significantly higher regulatory and legal consequences",
+            "There is no difference in duty of care between site types",
+            "These sites are exempt from WHS regulation"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Microbial.docx — Infectious Control for the Business Owner, Module 5: Understanding Risks"
+        },
+        {
+          "questionText": "As a business owner, what is your personal legal exposure under the WHS Act if your infection control teams are inadequately trained, equipped, or supervised?",
+          "options": [
+            "None — liability sits only with the individual worker",
+            "You may be personally liable as an officer for failing to exercise due diligence over WHS systems",
+            "Liability only applies to publicly listed companies",
+            "Liability transfers entirely to the client once the contract is signed"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Microbial.docx — Infectious Control for the Business Owner, Module 5: Understanding Risks (Compliance note)"
+        },
+        {
+          "questionText": "What document should every client receive that specifies surfaces cleaned, method, chemical and dilution, and frequency?",
+          "options": [
+            "A verbal summary at the end of the job",
+            "A written cleaning schedule, which is also the primary defence against a claim that cleaning was not performed as agreed",
+            "No documentation is required if the client trusts the business",
+            "Only the invoice"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Microbial.docx — Infectious Control for the Business Owner, Module 6: Cleaning Types and Touch Points"
+        },
+        {
+          "questionText": "What is the minimum thermal disinfection standard given for reusable microfibre before it is stored and reused?",
+          "options": [
+            "40 degrees Celsius for 5 minutes",
+            "60 degrees Celsius minimum for 10 minutes",
+            "Cold wash only",
+            "No thermal standard is specified; any wash cycle is acceptable"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Microbial.docx — Infectious Control for the Business Owner, Module 7: Cross Contamination"
+        },
+        {
+          "questionText": "A prospective client wants to engage your business for a confirmed outbreak response job. What should you confirm first regarding insurance?",
+          "options": [
+            "That your standard general public liability policy automatically covers all biohazard work",
+            "Whether your policy has sub-limits or exclusions for infection control, mould remediation, or biohazard response, and confirm coverage in writing",
+            "Insurance is not relevant to infection control contracts",
+            "Only workers compensation needs to be checked"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Microbial.docx — Infectious Control for the Business Owner, Module 8: Insurance and Liability"
+        },
+        {
+          "questionText": "A client rings to report a 'routine clean' following a suspected COVID exposure. What must the business do before finalising the job scope?",
+          "options": [
+            "Accept the client's phone description as the final scope",
+            "Conduct a physical site inspection, since the site may in fact present as a higher-category biohazard scene",
+            "Quote based on the phone call only to save time",
+            "Refuse the job outright without inspection"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Microbial.docx — Infectious Control for the Business Owner, Module 10: Hazard Identification"
+        },
+        {
+          "questionText": "Under Model WHS Act s.18, what is the primary evidence that a PCBU has actively managed risks so far as is reasonably practicable for a specific infection control job?",
+          "options": [
+            "A verbal assurance from the site supervisor",
+            "A documented, site-specific risk assessment for that job",
+            "The absence of any prior complaints",
+            "A general company safety policy with no job-specific detail"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Microbial.docx — Infectious Control for the Business Owner, Module 11: Risk Assessments"
+        },
+        {
+          "questionText": "When scoping an infection control job, in what order should the Hierarchy of Controls be applied?",
+          "options": [
+            "PPE first, then work backwards to other controls",
+            "Elimination and substitution and engineering and administrative controls worked through first, with PPE addressing only the residual risk",
+            "All controls are equally weighted and can be applied in any order",
+            "PPE is the only control that matters for biological hazards"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Microbial.docx — Infectious Control for the Business Owner, Module 12: Hierarchy of Controls"
+        },
+        {
+          "questionText": "Under Model WHS Regulations r.337, who must be provided the SDS for a hazardous chemical used on an infection control job?",
+          "options": [
+            "Only the team leader",
+            "Every worker likely to be affected by the hazardous chemical",
+            "Only the business owner",
+            "The client only, on request"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Microbial.docx — Infectious Control for the Business Owner, Module 13: Safety Data Sheets"
+        },
+        {
+          "questionText": "Under Model WHS Regulations r.330, does a spray bottle prepared on site and used for only 30 minutes still require a label?",
+          "options": [
+            "No, short-duration working containers are exempt",
+            "Yes — all containers of hazardous chemicals must be labelled regardless of size or duration of use",
+            "Only if it leaves the site",
+            "Only if the client asks to see it"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Microbial.docx — Infectious Control for the Business Owner, Module 14: Labelling"
+        },
+        {
+          "questionText": "How often must workers sign off that they have read and understood the relevant infection control SOPs?",
+          "options": [
+            "Once, at initial induction only",
+            "Before starting each infection control job, not as a one-time induction step",
+            "Only after an incident occurs",
+            "Sign-off is not required if the worker has prior experience"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Microbial.docx — Infectious Control for the Business Owner, Module 15: Standard Operating Procedures"
+        },
+        {
+          "questionText": "What triggers a review of a JSEA already in progress on an infection control job?",
+          "options": [
+            "JSEAs are fixed for the life of the job and cannot be updated",
+            "Discovery of additional contaminated areas, a change in identified pathogen, a change in cleaning method, or a PPE failure/exposure incident",
+            "Only the end of the working day",
+            "Only a written request from the client"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Microbial.docx — Infectious Control for the Business Owner, Module 16: Job Safety and Environmental Analysis (JSEA)"
+        },
+        {
+          "questionText": "Under Model WHS Regulations r.291, when must a SWMS for high-risk infection control work (e.g. confined space entry) be prepared?",
+          "options": [
+            "At any point during the job, including after the fact for record-keeping",
+            "Before the high-risk construction work commences — a retroactively prepared SWMS provides no legal protection",
+            "Only if requested by the regulator during an inspection",
+            "SWMS are optional for infection control businesses"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Microbial.docx — Infectious Control for the Business Owner, Module 17: Safe Work Method Statements (SWMS)"
+        },
+        {
+          "questionText": "What does RLU (Relative Light Units) measure in an ATP hygiene verification protocol?",
+          "options": [
+            "The temperature of the disinfected surface",
+            "The bioluminescent reaction between residual ATP and the luciferin-luciferase reagent, indicating incomplete removal of biological material",
+            "The concentration of chlorine remaining on the surface",
+            "The number of workers who touched the surface"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Microbial.docx — Infectious Control for the Business Owner, Module 18: ATP Terminology"
+        },
+        {
+          "questionText": "Before fixing a pass/fail RLU threshold for a new client site or surface type, what does the course recommend?",
+          "options": [
+            "Set the threshold immediately from a single test result",
+            "Collect baseline ATP data over at least three cleaning cycles before fixing a threshold, since single-point data is not statistically reliable",
+            "Use the same threshold for every site regardless of sector",
+            "Skip threshold-setting entirely and rely on visual inspection"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Microbial.docx — Infectious Control for the Business Owner, Module 20: ATP and Protocols"
+        }
+      ]
+    }
+  ]
+}
