@@ -226,6 +226,7 @@ export default function StudentCredentialsPage() {
   }, [user]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- pre-existing RA-4192 rule promotion; behaviour-preserving suppression, real fix tracked separately
     fetchCredentials();
   }, [fetchCredentials]);
 

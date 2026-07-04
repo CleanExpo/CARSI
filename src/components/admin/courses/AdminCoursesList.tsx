@@ -152,6 +152,7 @@ export function AdminCoursesList() {
 
   const [queryDraft, setQueryDraft] = useState(qFromUrl);
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- pre-existing RA-4192 rule promotion; behaviour-preserving suppression, real fix tracked separately
     setQueryDraft(qFromUrl);
   }, [qFromUrl]);
 
@@ -175,6 +176,7 @@ export function AdminCoursesList() {
   const bulkBusy = bulkSaving || bulkDeleting;
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- pre-existing RA-4192 rule promotion; behaviour-preserving suppression, real fix tracked separately
     setSelected(new Set());
   }, [status, qFromUrl, sort, cec]);
 
@@ -200,6 +202,7 @@ export function AdminCoursesList() {
   }, [apiUrl]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- pre-existing RA-4192 rule promotion; behaviour-preserving suppression, real fix tracked separately
     void load();
   }, [load]);
 

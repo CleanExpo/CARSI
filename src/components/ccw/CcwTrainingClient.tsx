@@ -130,6 +130,7 @@ export function CcwTrainingClient() {
   useEffect(() => {
     try {
       if (typeof window !== 'undefined' && sessionStorage.getItem(SESSION_KEY) === '1') {
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- pre-existing RA-4192 rule promotion; behaviour-preserving suppression, real fix tracked separately
         setUnlocked(true);
         setGateOpen(true);
       }

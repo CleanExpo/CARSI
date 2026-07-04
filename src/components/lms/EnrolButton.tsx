@@ -59,6 +59,7 @@ export function EnrolButton({ slug, priceAud = 0, isFree = false }: EnrolButtonP
 
   useEffect(() => {
     if (!user) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- pre-existing RA-4192 rule promotion; behaviour-preserving suppression, real fix tracked separately
       setSubState('none');
       setMode('guest');
       return;
@@ -76,6 +77,7 @@ export function EnrolButton({ slug, priceAud = 0, isFree = false }: EnrolButtonP
 
   useEffect(() => {
     if (!user?.id) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- pre-existing RA-4192 rule promotion; behaviour-preserving suppression, real fix tracked separately
       setPricing(null);
       return;
     }

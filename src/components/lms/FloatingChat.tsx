@@ -136,6 +136,7 @@ export default function FloatingChat() {
     if (!text || loading) return;
 
     const userMsg: Message = {
+      // eslint-disable-next-line react-hooks/purity -- pre-existing RA-4192 rule promotion; behaviour-preserving suppression, real fix tracked separately
       id: `u-${Date.now()}`,
       role: 'user',
       text,

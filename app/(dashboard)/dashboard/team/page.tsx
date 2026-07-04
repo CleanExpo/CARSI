@@ -146,6 +146,7 @@ function TeamDashboardPage() {
 
   useEffect(() => {
     if (!user) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- pre-existing RA-4192 rule promotion; behaviour-preserving suppression, real fix tracked separately
       setLoading(false);
       return;
     }
@@ -250,6 +251,7 @@ function TeamDashboardPage() {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- pre-existing RA-4192 rule promotion; behaviour-preserving suppression, real fix tracked separately
     if (user && team?.is_owner) void loadAssignableCourses();
   }, [user, team?.is_owner, team?.id, loadAssignableCourses]);
 

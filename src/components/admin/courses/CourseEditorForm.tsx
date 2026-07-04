@@ -159,6 +159,7 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
   }, [courseId, router, toast]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- pre-existing RA-4192 rule promotion; behaviour-preserving suppression, real fix tracked separately
     void load();
   }, [load]);
 
