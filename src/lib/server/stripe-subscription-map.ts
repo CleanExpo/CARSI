@@ -86,3 +86,26 @@ export function readInvoiceEmail(invoice: Stripe.Invoice): string | null {
   const email = (invoice as unknown as { customer_email?: unknown }).customer_email;
   return typeof email === 'string' && email.trim() ? email.trim().toLowerCase() : null;
 }
+
+/**
+ * Read the subscription id a PaymentIntent belongs to, tolerant of API-version
+ * shape drift. A refund/dispute only carries a `payment_intent`; the subscription
+ * link lives on the invoice that the PaymentIntent settled. On the pinned
+ * `2026-02-25.clover` version the invoice is fetched by expansion
+ * (`payment_intent.invoice`) and the subscription sits under
+ * `invoice.parent.subscription_details.subscription`; older versions exposed a
+ * top-level `payment_intent.invoice` id and `invoice.subscription`. We accept an
+ * expanded invoice object OR an invoice id string, and delegate the invoice-shape
+ * reading to `readInvoiceSubscriptionId`. Returns null for a one-off
+ * (non-subscription) charge — the caller then leaves the subscription untouched.
+ */
+export function readSubscriptionIdFromPaymentIntent(
+  paymentIntent: Stripe.PaymentIntent,
+): string | null {
+  const invoice = (paymentIntent as unknown as { invoice?: unknown }).invoice;
+  // Expanded invoice object → read its subscription link directly.
+  if (invoice && typeof invoice === 'object') {
+    return readInvoiceSubscriptionId(invoice as Stripe.Invoice);
+  }
+  return null;
+}

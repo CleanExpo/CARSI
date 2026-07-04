@@ -123,7 +123,16 @@ Use Stripe **Test mode** keys and a **Stripe Test Clock** to prove the lapse beh
 
 4. **Non-member direct hit.** As a signed-in learner **without** a membership, call `POST /api/lms/subscription/enroll` directly. Expect **403** and **no course content** in the response.
 
-Only once all four pass in Test mode, repeat Step A (create the Live Price with the same lookup key + inclusive tax) and set the Live env vars, then flip `SUBSCRIPTIONS_ENABLED=true` in the Live app.
+5. **Refund / chargeback → access revoked, progress + certificate retained (GP-441).**
+   - With an **active** test membership (from step 1), confirm `GET /api/lms/subscription/status` shows `status: "active"` and a paid course opens via **Access Course — Included in Pro**.
+   - In the Stripe Dashboard (Test mode) → **Payments**, open the membership's most recent **subscription invoice** payment and issue a **full Refund** (or simulate a dispute with test card `4000 0000 0000 0259`, which triggers `charge.dispute.created`).
+   - Stripe delivers `charge.refunded` (or `charge.dispute.created`) to the webhook. The route follows the charge's payment intent → invoice → subscription and marks the membership **`canceled`**.
+   - Re-check `GET /api/lms/subscription/status`: expect `has_subscription: false` (or `status: "canceled"`), `reason: "lapsed"`.
+   - Attempt a **new** enrolment (`POST /api/lms/subscription/enroll`): expect **403** with a renew hint.
+   - Confirm the learner's **existing** enrolments, lesson progress, and any issued certificate are **still present** — a refund stops NEW catalogue access but never removes an earned certificate (parity with the one-off lapse policy).
+   - **Idempotency:** re-send the same `charge.refunded` event (Webhooks → the event → **Resend**). The membership stays `canceled`; no error, no second effect.
+
+Only once all five pass in Test mode, repeat Step A (create the Live Price with the same lookup key + inclusive tax) and set the Live env vars, then flip `SUBSCRIPTIONS_ENABLED=true` in the Live app.
 
 ---
 
@@ -141,6 +150,6 @@ Before go-live, confirm no yearly/Teams subscription was ever charged in the pas
 
 - Confirmation that the **Live** Price exists with lookup key `carsi_pro_annual`, A$795.00/year, **GST inclusive**.
 - Confirmation the five subscription webhook events are enabled on the live endpoint.
-- The Step D test-mode evidence (subscribe works; test-clock lapse blocks new enrolment; progress + certificate retained; replay = single grant; non-member = 403).
+- The Step D test-mode evidence (subscribe works; test-clock lapse blocks new enrolment; progress + certificate retained; replay = single grant; non-member = 403; **refund/chargeback revokes catalogue access while retaining progress + certificate**).
 - The Step E zero-historical-charges result.
 - The moment `SUBSCRIPTIONS_ENABLED=true` is set live (the membership goes on sale at that instant).

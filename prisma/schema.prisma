@@ -620,6 +620,10 @@ model LmsSubscription {
   plan                 String    @default("pro_annual") @map("plan") @db.VarChar(32)
   currentPeriodEnd     DateTime? @map("current_period_end") @db.Timestamptz(6)
   cancelAtPeriodEnd    Boolean   @default(false) @map("cancel_at_period_end")
+  /// Stripe event.created of the snapshot that last set `status`. Out-of-order
+  /// guard: a snapshot is applied only when its event timestamp is >= this.
+  /// NULL = no ordered write yet (always overwritable; pre-migration rows).
+  statusEventAt        DateTime? @map("status_event_at") @db.Timestamptz(6)
   createdAt            DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt            DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 

@@ -29,6 +29,7 @@ import {
   markSubscriptionStatusBySubscriptionId,
   resolveUserIdForStripeSubscription,
   upsertSubscription,
+  upsertTerminalSubscriptionStatus,
 } from '@/lib/server/subscription-store';
 
 /** Stripe subscription lifecycle + invoice events this module owns. */
@@ -62,8 +63,23 @@ async function emailForSubscriptionCustomer(
   return null;
 }
 
-/** Upsert the membership from a full subscription object. */
-async function applySubscriptionSnapshot(subscription: Stripe.Subscription): Promise<void> {
+/** Unix-seconds Stripe `event.created` → Date, or null when absent/invalid. */
+function eventCreatedToDate(event: Stripe.Event): Date | null {
+  const secs = (event as unknown as { created?: unknown }).created;
+  if (typeof secs !== 'number' || !Number.isFinite(secs)) return null;
+  const d = new Date(secs * 1000);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
+/**
+ * Upsert the membership from a full subscription object. `eventTimestamp` is the
+ * source event's `event.created`; it drives the out-of-order guard in
+ * `upsertSubscription` so a late (stale) snapshot cannot overwrite newer state.
+ */
+async function applySubscriptionSnapshot(
+  subscription: Stripe.Subscription,
+  eventTimestamp: Date | null,
+): Promise<void> {
   const email = await emailForSubscriptionCustomer(subscription);
   const userId = await resolveUserIdForStripeSubscription(subscription, email);
   if (!userId) {
@@ -80,6 +96,7 @@ async function applySubscriptionSnapshot(subscription: Stripe.Subscription): Pro
     status: subscription.status,
     currentPeriodEnd: readCurrentPeriodEnd(subscription),
     cancelAtPeriodEnd: readCancelAtPeriodEnd(subscription),
+    eventTimestamp,
   });
 }
 
@@ -89,20 +106,39 @@ async function applySubscriptionSnapshot(subscription: Stripe.Subscription): Pro
  * return a 5xx and let Stripe retry; returns normally on terminal/no-op cases.
  */
 export async function handleSubscriptionEvent(event: Stripe.Event): Promise<void> {
+  const eventTimestamp = eventCreatedToDate(event);
+
   switch (event.type) {
     case 'customer.subscription.created':
     case 'customer.subscription.updated': {
-      await applySubscriptionSnapshot(event.data.object as Stripe.Subscription);
+      await applySubscriptionSnapshot(event.data.object as Stripe.Subscription, eventTimestamp);
       return;
     }
 
     case 'customer.subscription.deleted': {
       const subscription = event.data.object as Stripe.Subscription;
       // Prefer the canonical status; deleted subscriptions are 'canceled'.
-      await markSubscriptionStatusBySubscriptionId(
-        subscription.id,
-        subscription.status || 'canceled',
-      );
+      const status = subscription.status || 'canceled';
+      // Resolve the user so the cancellation is STICKY even when this deleted
+      // event arrives before `created` (row absent) — a plain updateMany would
+      // no-op and lose the cancel. Falls back to the plain status write only if
+      // the user cannot be resolved (no row to create against safely).
+      const email = await emailForSubscriptionCustomer(subscription);
+      const userId = await resolveUserIdForStripeSubscription(subscription, email);
+      if (userId && eventTimestamp) {
+        await upsertTerminalSubscriptionStatus({
+          userId,
+          stripeCustomerId: readCustomerId(subscription),
+          stripeSubscriptionId: subscription.id,
+          status,
+          eventTimestamp,
+        });
+      } else {
+        // No resolvable user (or no event timestamp) — we cannot safely create a
+        // guarded row. Fall back to the id-keyed status write: it updates the row
+        // if it already exists, and no-ops otherwise (unchanged legacy path).
+        await markSubscriptionStatusBySubscriptionId(subscription.id, status);
+      }
       return;
     }
 
@@ -134,6 +170,7 @@ export async function handleSubscriptionEvent(event: Stripe.Event): Promise<void
           status: subscription.status,
           currentPeriodEnd: readCurrentPeriodEnd(subscription),
           cancelAtPeriodEnd: readCancelAtPeriodEnd(subscription),
+          eventTimestamp,
         });
       } catch (error) {
         console.error('[subscription-webhook] invoice subscription refresh failed:', error);
