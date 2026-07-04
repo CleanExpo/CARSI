@@ -1,6 +1,6 @@
 # SPM Spec — CARSI "Next Step Up": Revenue & Credential Integrity Release
 
-> Status: DRAFT for founder acceptance · Author: Claude (SPM, read-only session) · 2026-07-04 · Rev 2: corrected per the §20 adversarial verification addendum
+> Status: DRAFT for founder acceptance · Author: Claude (SPM, read-only session) · 2026-07-04 · Rev 3: §20 adversarial verification + production DB verification (GP-444 closed Done)
 > Base: `main` @ `fbb26155` (clean tree) · Evidence tags: [VERIFIED] repo file:line or GitHub issue read this session · [INFERENCE] reasoned from verified facts · [UNCONFIRMED] assumption needing founder/ops input
 
 ---
@@ -437,3 +437,24 @@ GitHub-issue, fresh-eyes critique) plus a live crawl of carsi.com.au. Outcomes:
   G-Pilot); GP-439 (the six §8 inputs) is the operative gate. Base note: this file's initial
   commit `72ff4153` was auto-pushed by a local "autogit" daemon atop the analysed base
   `fbb26155`; Rev 2 is the first deliberate, reviewed revision.
+
+### Production verification (2026-07-04 — GP-444 close-out, Rev 3)
+
+Read-only query executed against the live `carsi-db` from the DigitalOcean app console
+(founder-authenticated; strict CA-verified TLS; node + pg; six SELECTs, zero writes):
+
+- 72 published courses; **exactly 1 has any quiz rows** — `floor-care-onboarding-operational-
+  readiness` (11 quizzes). **61 of 62** published courses with raw `cec_hours > 0` have zero
+  assessments; the sole exception is floor-care, whose CEC is display-excluded — so **100% of
+  the customer-visible CEC catalogue certifies without assessment** (production-proven; was
+  inference in Rev 2).
+- The 3 courses with no in-repo content source (`air-movers…`, `tile-cleaning-for-carpet-
+  cleaners`, `large-loss-mastery-course`) all confirmed **0 quizzes**.
+- `lms_learning_pathways` is **empty** — the phase2-sampler residual in §20 is void; the site's
+  "View learning pathways" link has no data behind it (gate honestly or seed — WS0/WS4 note).
+- Raw-vs-displayed CEC divergence confirmed: 62 raw vs 69 displayed; the assignments overlay
+  supplies the rest (air-movers raw 0 → displays 1; large-loss raw 0 → displays 8).
+- New: floor-care carries raw `cec_hours = 8` in the DB — the founder-call CEC exclusion is
+  overlay-level only; zero the column or move the exclusion data-level for consistency.
+
+WS2a (Linear GP-444) is closed **Done** on this evidence; the WS2b work-list (GP-445) is final.
