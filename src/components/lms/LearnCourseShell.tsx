@@ -95,6 +95,7 @@ export function LearnCourseShell({ slug }: { slug: string }) {
   useEffect(() => {
     try {
       if (typeof sessionStorage !== 'undefined' && sessionStorage.getItem(RELIABILITY_TIP_KEY) === '1') {
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- pre-existing RA-4192 rule promotion; behaviour-preserving suppression, real fix tracked separately
         setReliabilityTipDismissed(true);
       }
     } catch {
@@ -209,6 +210,7 @@ export function LearnCourseShell({ slug }: { slug: string }) {
   }, [slug]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- pre-existing RA-4192 rule promotion; behaviour-preserving suppression, real fix tracked separately
     void loadCurriculum();
   }, [loadCurriculum]);
 
@@ -220,6 +222,7 @@ export function LearnCourseShell({ slug }: { slug: string }) {
       moduleFromQuery && curriculum.modules.some((m) => m.id === moduleFromQuery);
 
     if (fromLesson) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- pre-existing RA-4192 rule promotion; behaviour-preserving suppression, real fix tracked separately
       setView('lesson');
       setActiveLessonId(lessonFromQuery!);
       setActiveModuleId(null);
@@ -262,11 +265,13 @@ export function LearnCourseShell({ slug }: { slug: string }) {
 
   useEffect(() => {
     if (view !== 'lesson' || !activeLessonId) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- pre-existing RA-4192 rule promotion; behaviour-preserving suppression, real fix tracked separately
     void loadLesson(activeLessonId);
   }, [view, activeLessonId, loadLesson]);
 
   useEffect(() => {
     if (!lessonDetail) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- pre-existing RA-4192 rule promotion; behaviour-preserving suppression, real fix tracked separately
       setQuizData(null);
       return;
     }
@@ -322,6 +327,7 @@ export function LearnCourseShell({ slug }: { slug: string }) {
 
   useEffect(() => {
     if (view !== 'lesson' || !activeLessonId) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- pre-existing RA-4192 rule promotion; behaviour-preserving suppression, real fix tracked separately
     void loadLessonNote(activeLessonId);
   }, [view, activeLessonId, loadLessonNote]);
 

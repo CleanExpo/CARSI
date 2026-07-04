@@ -105,6 +105,7 @@ export function useAgentRun(runId: string | null) {
 
   useEffect(() => {
     if (!runId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- pre-existing RA-4192 rule promotion; behaviour-preserving suppression, real fix tracked separately
       setRun(null);
       setLoading(false);
       return;

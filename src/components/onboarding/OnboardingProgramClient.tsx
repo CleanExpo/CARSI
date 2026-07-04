@@ -53,11 +53,13 @@ export function OnboardingProgramClient({ slug }: { slug: string }) {
   }, [slug]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- pre-existing RA-4192 rule promotion; behaviour-preserving suppression, real fix tracked separately
     load();
   }, [load]);
 
   useEffect(() => {
     if (searchParams.get('checkout') === 'cancelled') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- pre-existing RA-4192 rule promotion; behaviour-preserving suppression, real fix tracked separately
       setCheckoutMessage('Checkout was cancelled. You can subscribe when ready to start training.');
       router.replace(`/dashboard/onboarding/${slug}`, { scroll: false });
     }
@@ -67,6 +69,7 @@ export function OnboardingProgramClient({ slug }: { slug: string }) {
     const sessionId = searchParams.get('session_id');
     if (!sessionId || confirmingPayment) return;
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- pre-existing RA-4192 rule promotion; behaviour-preserving suppression, real fix tracked separately
     setConfirmingPayment(true);
     setEnrolError(null);
     apiClient

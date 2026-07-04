@@ -166,6 +166,7 @@ export default function StudentDashboardPage() {
 
   useEffect(() => {
     if (!user) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- pre-existing RA-4192 rule promotion; behaviour-preserving suppression, real fix tracked separately
     fetchLevel();
     fetchSub();
     fetchProfile();

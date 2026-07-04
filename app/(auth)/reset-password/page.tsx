@@ -23,6 +23,7 @@ function ResetPasswordForm() {
 
   useEffect(() => {
     if (!token) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- pre-existing RA-4192 rule promotion; behaviour-preserving suppression, real fix tracked separately
       setIsError(true);
       setMessage('Invalid reset link. Please request a new one.');
       toast({

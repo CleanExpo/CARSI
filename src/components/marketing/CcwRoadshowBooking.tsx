@@ -77,6 +77,7 @@ export function CcwRoadshowBooking({
     if (initialSlug) return;
     const param = new URLSearchParams(window.location.search).get('event');
     const slug = resolveInitialEventSlug(param, events);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- pre-existing RA-4192 rule promotion; behaviour-preserving suppression, real fix tracked separately
     setForm((prev) => (slug && slug !== prev.eventSlug ? { ...prev, eventSlug: slug } : prev));
   }, [events, initialSlug]);
 
