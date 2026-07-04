@@ -24,6 +24,10 @@ import { fulfillCourseCheckoutForUser } from '@/lib/server/team-course-purchase'
 import { shouldRetryWebhookFulfillment } from '@/lib/server/stripe-webhook-policy';
 import { resolveStripePaymentReference } from '@/lib/server/stripe-payment-reference';
 import { revokeEnrollmentsByPaymentReference } from '@/lib/server/stripe-revocation';
+import {
+  handleSubscriptionEvent,
+  isSubscriptionEvent,
+} from '@/lib/server/subscription-webhook';
 
 type StripeWebhookEventDelegate = {
   create(args: { data: { id: string; type: string } }): Promise<unknown>;
@@ -111,6 +115,15 @@ export async function POST(request: NextRequest) {
   try {
     if (event.type === 'charge.refunded' || event.type === 'charge.dispute.created') {
       await handleStripeRevocation(event);
+      return await acknowledge();
+    }
+
+    // WS1-E1 (GP-441): individual annual membership lifecycle. Additive handlers
+    // under this same signature-verified, idempotency-claimed route. A transient
+    // failure throws and is caught below → 5xx → Stripe retries (single grant
+    // guaranteed by the upsert keyed on the unique subscription id).
+    if (isSubscriptionEvent(event.type)) {
+      await handleSubscriptionEvent(event);
       return await acknowledge();
     }
 

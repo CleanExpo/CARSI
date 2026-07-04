@@ -1,8 +1,23 @@
 import Link from 'next/link';
 
-import { INDIVIDUAL_TIERS, TEAM_TIERS } from '@/lib/lms/pricing-tiers';
+import { INDIVIDUAL_TIERS, TEAM_TIERS, type IndividualTier } from '@/lib/lms/pricing-tiers';
 
-export function PricingTiers() {
+/**
+ * When SUBSCRIPTIONS_ENABLED is on (passed from the server page), the individual
+ * `pro_annual` tier becomes purchasable — its coming-soon lock is lifted and the
+ * CTA links to /subscribe. Teams tiers stay coming-soon (WS1-E2, not in scope).
+ */
+function resolveIndividualTiers(subscriptionsEnabled: boolean): IndividualTier[] {
+  if (!subscriptionsEnabled) return INDIVIDUAL_TIERS;
+  return INDIVIDUAL_TIERS.map((tier) =>
+    tier.id === 'pro_annual'
+      ? { ...tier, comingSoon: false, cta: 'Start membership', href: '/subscribe' }
+      : tier,
+  );
+}
+
+export function PricingTiers({ subscriptionsEnabled = false }: { subscriptionsEnabled?: boolean }) {
+  const individualTiers = resolveIndividualTiers(subscriptionsEnabled);
   return (
     <>
       <section aria-label="Individual pricing" className="mb-16">
@@ -12,7 +27,7 @@ export function PricingTiers() {
           published courses.
         </p>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          {INDIVIDUAL_TIERS.map((tier) => (
+          {individualTiers.map((tier) => (
             <div
               key={tier.id}
               className="flex flex-col rounded-lg border bg-white p-6 shadow-sm"

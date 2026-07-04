@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { PricingTiers } from '@/components/pricing/PricingTiers';
 import { BreadcrumbSchema, FAQSchema } from '@/components/seo';
 import { OG_IMAGES } from '@/lib/seo/og-image';
+import { subscriptionsEnabled } from '@/lib/server/subscriptions-flag';
 
 export const metadata: Metadata = {
   title: 'Pricing — Restoration Training Online',
@@ -114,7 +115,7 @@ export default function PricingPage() {
             </Link>
           </section>
 
-          <PricingTiers />
+          <PricingTiers subscriptionsEnabled={subscriptionsEnabled()} />
 
           <section aria-label="Free Library" className="mb-16">
             <div className="mx-auto max-w-md">
