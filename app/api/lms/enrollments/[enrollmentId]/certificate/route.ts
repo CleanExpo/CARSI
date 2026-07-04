@@ -8,6 +8,7 @@ import {
 } from '@/lib/server/certificate-pdf';
 import { canIssueCertificate } from '@/lib/server/certificate-name';
 import { getEnrollmentForCertificate, markCertificateIssued } from '@/lib/server/enrollment-service';
+import { captureServerError } from '@/lib/server/sentry';
 
 type Ctx = { params: Promise<{ enrollmentId: string }> };
 
@@ -88,6 +89,7 @@ export async function GET(request: NextRequest, ctx: Ctx) {
     });
   } catch (e) {
     console.error('[certificate]', e);
+    void captureServerError(e, { route: '/api/lms/enrollments/[enrollmentId]/certificate' });
     return NextResponse.json({ detail: 'Failed to generate certificate' }, { status: 500 });
   }
 }

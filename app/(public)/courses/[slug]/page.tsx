@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { Metadata } from 'next';
+import { CourseViewTracker } from '@/components/analytics/CourseViewTracker';
 import { CoursesIndexLink } from '@/components/lms/CoursesIndexLink';
 import { EnrolButton } from '@/components/lms/EnrolButton';
 import { CourseFormattedBody } from '@/components/lms/CourseFormattedBody';
@@ -307,6 +308,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
 
   return (
     <>
+      <CourseViewTracker slug={course.slug} title={course.title} />
       <CourseSchema
         name={course.title}
         description={course.description ?? course.short_description ?? course.title}

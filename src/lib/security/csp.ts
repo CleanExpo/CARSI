@@ -34,6 +34,12 @@ export function buildContentSecurityPolicy(opts: {
     'https://www.google-analytics.com',
     'https://*.google-analytics.com',
     'https://*.analytics.google.com',
+    // PostHog (WS3 / GP-447): bundled via npm (posthog-js), not an external
+    // <script> tag, so it runs under 'self' script-src — only its network
+    // calls need a connect-src allowance. Both regions allowlisted since
+    // NEXT_PUBLIC_POSTHOG_HOST can point at either.
+    'https://us.i.posthog.com',
+    'https://eu.i.posthog.com',
     ...(isDev ? ['ws:', 'wss:', 'http://localhost:3000', 'http://127.0.0.1:3000'] : []),
   ];
 

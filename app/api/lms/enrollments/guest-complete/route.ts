@@ -5,6 +5,7 @@ import { getStripeClient } from '@/lib/api/stripe';
 import { notifyCrmEnrollmentCreated } from '@/lib/server/crm-enrollment-notify';
 import { sendEnrollmentWelcomeEmail } from '@/lib/server/enrollment-email';
 import { findOrCreateGuestUser } from '@/lib/server/guest-checkout';
+import { captureServerError } from '@/lib/server/sentry';
 import { getTeamForUser } from '@/lib/server/teams';
 import { fulfillCourseCheckoutForUser } from '@/lib/server/team-course-purchase';
 import { prisma } from '@/lib/prisma';
@@ -137,6 +138,7 @@ export async function POST(request: NextRequest) {
       );
     }
     console.error('[guest-complete]', e);
+    void captureServerError(e, { route: '/api/lms/enrollments/guest-complete' });
     return NextResponse.json({ detail: 'Could not complete enrolment' }, { status: 500 });
   }
 }
