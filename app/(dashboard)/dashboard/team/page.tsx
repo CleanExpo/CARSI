@@ -87,9 +87,6 @@ function TeamDashboardPage() {
 
   const [teamName, setTeamName] = useState('My team');
   const [editingName, setEditingName] = useState(false);
-  const [selectedTier, setSelectedTier] = useState<TeamBundleTierId>(
-    createTier && TEAM_TIERS.some((t) => t.id === createTier) ? createTier : 'starter',
-  );
   const [inviteEmail, setInviteEmail] = useState('');
   const [assignableCourses, setAssignableCourses] = useState<
     {
@@ -231,23 +228,6 @@ function TeamDashboardPage() {
     }
   }
 
-  async function handleCreateAnnualTeam(e: React.FormEvent) {
-    e.preventDefault();
-    setBusy(true);
-    setError(null);
-    try {
-      await apiClient.post('/api/lms/teams', {
-        name: teamName,
-        bundle_tier: selectedTier,
-      });
-      await syncTeam();
-    } catch (err) {
-      setError(err instanceof ApiClientError ? err.message : 'Could not create team');
-    } finally {
-      setBusy(false);
-    }
-  }
-
   const loadAssignableCourses = useCallback(async () => {
     setCoursesLoading(true);
     try {
@@ -383,51 +363,22 @@ function TeamDashboardPage() {
           <p className="text-[11px] font-semibold tracking-[0.2em] text-[#2490ed]/80 uppercase">
             Teams
           </p>
-          <h1 className="mt-2 text-2xl font-bold text-slate-900">Annual team plan</h1>
+          <h1 className="mt-2 text-2xl font-bold text-slate-900">Teams — coming soon</h1>
           <p className="mt-2 text-sm text-slate-500">
-            Subscribe to a yearly team bundle from{' '}
+            Annual Teams plans are not available to purchase yet. See{' '}
             <Link href="/pricing" className="text-[#146fc2] hover:underline">
               pricing
-            </Link>
-            .
+            </Link>{' '}
+            for what is available today, or browse individual courses.
           </p>
         </header>
         {error ? <ErrorBanner message={error} /> : null}
-        <form
-          onSubmit={handleCreateAnnualTeam}
-          className="space-y-4 rounded-2xl border border-slate-200 p-6"
+        <Link
+          href="/courses"
+          className="flex min-h-11 w-full items-center justify-center rounded-xl bg-[#2490ed] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#1a7fd4]"
         >
-          <label className="block text-sm text-slate-700">
-            Team name
-            <input
-              required
-              value={teamName}
-              onChange={(e) => setTeamName(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-slate-900"
-            />
-          </label>
-          <label className="block text-sm text-slate-700">
-            Bundle
-            <select
-              value={selectedTier}
-              onChange={(e) => setSelectedTier(e.target.value as TeamBundleTierId)}
-              className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-slate-900"
-            >
-              {TEAM_TIERS.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.name} — {t.priceLabel} ({t.seatsIncluded} seats)
-                </option>
-              ))}
-            </select>
-          </label>
-          <button
-            type="submit"
-            disabled={busy}
-            className="w-full rounded-xl bg-[#2490ed] py-2.5 text-sm font-semibold text-white disabled:opacity-50"
-          >
-            {busy ? 'Creating…' : 'Create team'}
-          </button>
-        </form>
+          Browse courses
+        </Link>
       </div>
     );
   }

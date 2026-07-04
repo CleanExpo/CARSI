@@ -28,17 +28,26 @@ export function PricingTiers() {
               <h3 className="mb-1 text-lg font-bold text-slate-950">{tier.name}</h3>
               <p className="text-3xl font-bold text-slate-950">{tier.priceLabel}</p>
               <p className="mt-3 flex-1 text-sm text-slate-600">{tier.description}</p>
-              <Link
-                href={tier.href}
-                className="mt-6 flex min-h-11 w-full items-center justify-center rounded-lg px-4 py-2.5 text-sm font-semibold transition-opacity hover:opacity-90"
-                style={{
-                  background: tier.id === 'pro_annual' ? '#0f5fa8' : 'transparent',
-                  color: tier.id === 'pro_annual' ? '#ffffff' : '#146fc2',
-                  border: tier.id === 'pro_annual' ? 'none' : '1px solid rgba(15,95,168,0.35)',
-                }}
-              >
-                {tier.cta}
-              </Link>
+              {tier.comingSoon ? (
+                <span
+                  aria-disabled="true"
+                  className="mt-6 flex min-h-11 w-full cursor-not-allowed items-center justify-center rounded-lg border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm font-semibold text-slate-500"
+                >
+                  {tier.cta}
+                </span>
+              ) : (
+                <Link
+                  href={tier.href}
+                  className="mt-6 flex min-h-11 w-full items-center justify-center rounded-lg px-4 py-2.5 text-sm font-semibold transition-opacity hover:opacity-90"
+                  style={{
+                    background: tier.id === 'pro_annual' ? '#0f5fa8' : 'transparent',
+                    color: tier.id === 'pro_annual' ? '#ffffff' : '#146fc2',
+                    border: tier.id === 'pro_annual' ? 'none' : '1px solid rgba(15,95,168,0.35)',
+                  }}
+                >
+                  {tier.cta}
+                </Link>
+              )}
             </div>
           ))}
         </div>
@@ -76,21 +85,30 @@ export function PricingTiers() {
                   </li>
                 ))}
               </ul>
-              <Link
-                href={
-                  tier.id === 'full_library'
-                    ? '/contact?subject=teams-full-library'
-                    : `/dashboard/team?create=${tier.id}`
-                }
-                className="mt-6 flex min-h-11 w-full items-center justify-center rounded-lg px-4 py-2.5 text-sm font-semibold transition-opacity hover:opacity-90"
-                style={{
-                  background: tier.id === 'growth' ? '#0f5fa8' : 'transparent',
-                  color: tier.id === 'growth' ? '#ffffff' : '#146fc2',
-                  border: tier.id === 'growth' ? 'none' : '1px solid rgba(15,95,168,0.35)',
-                }}
-              >
-                {tier.cta}
-              </Link>
+              {tier.comingSoon ? (
+                <span
+                  aria-disabled="true"
+                  className="mt-6 flex min-h-11 w-full cursor-not-allowed items-center justify-center rounded-lg border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm font-semibold text-slate-500"
+                >
+                  {tier.cta}
+                </span>
+              ) : (
+                <Link
+                  href={
+                    tier.id === 'full_library'
+                      ? '/contact?subject=teams-full-library'
+                      : `/dashboard/team?create=${tier.id}`
+                  }
+                  className="mt-6 flex min-h-11 w-full items-center justify-center rounded-lg px-4 py-2.5 text-sm font-semibold transition-opacity hover:opacity-90"
+                  style={{
+                    background: tier.id === 'growth' ? '#0f5fa8' : 'transparent',
+                    color: tier.id === 'growth' ? '#ffffff' : '#146fc2',
+                    border: tier.id === 'growth' ? 'none' : '1px solid rgba(15,95,168,0.35)',
+                  }}
+                >
+                  {tier.cta}
+                </Link>
+              )}
             </div>
           ))}
         </div>

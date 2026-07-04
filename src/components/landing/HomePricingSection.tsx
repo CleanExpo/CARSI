@@ -15,6 +15,7 @@ type HomeTier = {
   cta: string;
   href: string;
   highlighted: boolean;
+  comingSoon?: boolean;
 };
 
 const TIERS: HomeTier[] = [
@@ -45,9 +46,10 @@ const TIERS: HomeTier[] = [
     description:
       yearly?.description ??
       '100% access to all published CARSI courses for one learner for 12 months.',
-    cta: yearly?.cta ?? 'Choose yearly',
+    cta: yearly?.cta ?? 'Coming soon',
     href: yearly?.href ?? '/subscribe',
-    highlighted: true,
+    highlighted: !yearly?.comingSoon,
+    comingSoon: yearly?.comingSoon ?? true,
   },
 ];
 
@@ -104,16 +106,25 @@ export function HomePricingSection() {
               <p className="mt-3 flex-1 text-sm leading-relaxed text-slate-600 dark:text-white/65">
                 {tier.description}
               </p>
-              <Link
-                href={tier.href}
-                className={`mt-6 inline-flex min-h-11 items-center justify-center rounded-lg px-4 py-2.5 text-sm font-semibold transition-opacity hover:opacity-90 ${
-                  tier.highlighted
-                    ? 'bg-[#146fc2] text-white'
-                    : 'border border-[#146fc2]/35 text-[#146fc2] dark:border-[#2490ed]/40 dark:text-[#8fd0ff]'
-                }`}
-              >
-                {tier.cta}
-              </Link>
+              {tier.comingSoon ? (
+                <span
+                  aria-disabled="true"
+                  className="mt-6 inline-flex min-h-11 cursor-not-allowed items-center justify-center rounded-lg border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm font-semibold text-slate-500 dark:border-white/10 dark:bg-white/[0.03] dark:text-white/40"
+                >
+                  {tier.cta}
+                </span>
+              ) : (
+                <Link
+                  href={tier.href}
+                  className={`mt-6 inline-flex min-h-11 items-center justify-center rounded-lg px-4 py-2.5 text-sm font-semibold transition-opacity hover:opacity-90 ${
+                    tier.highlighted
+                      ? 'bg-[#146fc2] text-white'
+                      : 'border border-[#146fc2]/35 text-[#146fc2] dark:border-[#2490ed]/40 dark:text-[#8fd0ff]'
+                  }`}
+                >
+                  {tier.cta}
+                </Link>
+              )}
             </div>
           ))}
         </div>

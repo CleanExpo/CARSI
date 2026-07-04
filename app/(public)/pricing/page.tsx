@@ -8,7 +8,7 @@ import { OG_IMAGES } from '@/lib/seo/og-image';
 export const metadata: Metadata = {
   title: 'Pricing — Restoration Training Online',
   description:
-    'Buy any CARSI course individually, or choose a yearly membership for 100% access to all published courses — with IICRC CEC tracking and verified certificates. Free Library available to everyone, no card required.',
+    'Buy any CARSI course individually — with IICRC CEC tracking and verified certificates. Free Library available to everyone, no card required. Yearly membership and Teams plans are coming soon.',
   keywords: [
     'CARSI pricing',
     'restoration training membership',
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     images: OG_IMAGES,
     title: 'Pricing | CARSI — Restoration Training Online',
     description:
-      'Free Library for everyone, per-course enrolment, and a yearly membership at $795/yr for 100% course access.',
+      'Free Library for everyone and per-course enrolment, available today. Yearly membership and Teams plans are coming soon.',
     type: 'website',
     url: 'https://carsi.com.au/pricing',
   },
@@ -37,17 +37,12 @@ const FAQ_ITEMS = [
   {
     question: "What's included in a yearly membership?",
     answer:
-      '100% access to all published CARSI courses for one learner for 12 months, plus the IICRC CEC tracking dashboard and your certificate wallet. Yearly membership is for learners planning multiple courses or ongoing CEC maintenance.',
+      'Yearly membership is coming soon and is not available to purchase yet. When it launches, it will give 100% access to all published CARSI courses for one learner for 12 months, plus the IICRC CEC tracking dashboard and certificate wallet. Buy any course individually today.',
   },
   {
     question: 'Do CARSI courses count toward IICRC CECs?',
     answer:
       "CARSI's catalogue includes IICRC-aligned CEC courses where stated. Your dashboard includes a CEC tracking dashboard that logs completed credits, broken down by discipline (WRT, CRT, OCT, ASD, CCT and more).",
-  },
-  {
-    question: 'What happens when my yearly membership ends?',
-    answer:
-      'Your course progress and certificates are saved. Renew any time to restore 100% access — there is no data loss. Courses you bought individually stay yours.',
   },
 ];
 
@@ -85,8 +80,8 @@ export default function PricingPage() {
               Membership &amp; Pricing
             </h1>
             <p className="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-slate-600">
-              Buy any course individually, or choose a yearly membership for 100% access to all
-              published courses. Free Library for everyone — no card required.
+              Buy any course individually. Free Library for everyone — no card required. Yearly
+              membership and Teams plans are coming soon.
             </p>
           </section>
 
@@ -99,10 +94,10 @@ export default function PricingPage() {
                 Not sure what to buy or learn first?
               </p>
               <h2 className="text-xl font-semibold text-slate-950">
-                Buying more than one course? Compare it with membership first.
+                Buying more than one course? Find your pathway first.
               </h2>
               <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
-                Membership is built for learners maintaining CECs, refreshing knowledge across
+                See which courses suit learners maintaining CECs, refreshing knowledge across
                 multiple disciplines, or planning beginner through advanced study over time.
               </p>
             </div>
@@ -170,8 +165,8 @@ export default function PricingPage() {
           </section>
 
           <p className="text-center text-xs text-slate-600">
-            Prices in AUD. GST included. Pay once per course, or yearly for membership.
-            Managed via Stripe — secure payment processing.
+            Prices in AUD. GST included. Pay once per course. Managed via Stripe — secure payment
+            processing.
             <br />
             Questions?{' '}
             <Link href="/contact" className="font-medium text-[#146fc2] underline">
