@@ -129,7 +129,7 @@ export default async function Home() {
       value:
         catalogueFacts.publishedCourseCount > 0
           ? formatCourseCountForCopy(catalogueFacts.publishedCourseCount)
-          : '-',
+          : '70+',
       label: 'Courses',
     },
     {
