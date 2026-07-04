@@ -7,6 +7,7 @@ import { enrollStudentInCourse } from '@/lib/server/enrollment-service';
 import { findOrCreateGuestUser } from '@/lib/server/guest-checkout';
 import { getFirstLessonLearnPath } from '@/lib/server/first-lesson';
 import { getOrCreateCourseBySlug } from '@/lib/server/course-catalog-sync';
+import { captureServerError } from '@/lib/server/sentry';
 
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
 
@@ -86,6 +87,7 @@ export async function POST(request: NextRequest) {
     return response;
   } catch (e) {
     console.error('[guest-free]', e);
+    void captureServerError(e, { route: '/api/lms/enrollments/guest-free' });
     return NextResponse.json({ detail: 'Enrolment failed' }, { status: 500 });
   }
 }

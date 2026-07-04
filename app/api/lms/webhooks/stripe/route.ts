@@ -13,8 +13,10 @@ import { getAppOrigin } from '@/lib/server/app-url';
 import { notifyCrmEnrollmentCreated } from '@/lib/server/crm-enrollment-notify';
 import { sendEnrollmentWelcomeEmail } from '@/lib/server/enrollment-email';
 import { ensureGuestUserFromStripeEmail } from '@/lib/server/guest-checkout';
+import { sendGa4PurchaseEvent } from '@/lib/server/ga4-measurement-protocol';
 import { sessionClaimsForUserId } from '@/lib/server/lms-auth';
 import { prisma } from '@/lib/prisma';
+import { captureServerError } from '@/lib/server/sentry';
 import {
   claimStripeWebhookEvent,
   markStripeWebhookEventProcessed,
@@ -24,6 +26,16 @@ import { fulfillCourseCheckoutForUser } from '@/lib/server/team-course-purchase'
 import { shouldRetryWebhookFulfillment } from '@/lib/server/stripe-webhook-policy';
 import { resolveStripePaymentReference } from '@/lib/server/stripe-payment-reference';
 import { revokeEnrollmentsByPaymentReference } from '@/lib/server/stripe-revocation';
+
+/**
+ * WS3 / GP-447 boundary note: this handler only sends the one-off course
+ * `purchase` event via GA4 Measurement Protocol. It does NOT add or touch
+ * any subscription_* event or subscription webhook handling — that is owned
+ * by the parallel feat/gp-441-e1-annual-entitlement branch, which should
+ * reuse `sendGa4MeasurementProtocolEvent` (see ga4-measurement-protocol.ts)
+ * for its own subscription_started/renewed/lapsed events rather than adding
+ * a second Measurement Protocol client.
+ */
 
 type StripeWebhookEventDelegate = {
   create(args: { data: { id: string; type: string } }): Promise<unknown>;
@@ -195,6 +207,18 @@ export async function POST(request: NextRequest) {
           studentId: claims.sub,
           courseId: fulfilled.courseId,
         });
+
+        // WS3 / GP-447: server-side `purchase` event (GA4 Measurement Protocol).
+        // Never blocks fulfilment — the utility itself no-ops/swallows errors.
+        const valueAud =
+          typeof session.amount_total === 'number' ? session.amount_total / 100 : 0;
+        void sendGa4PurchaseEvent({
+          clientId: ref,
+          userId: claims.sub,
+          courseSlug: slug,
+          valueAud,
+          transactionId: ref,
+        }).catch((e) => console.error('[stripe webhook] ga4 purchase event', e));
       }
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
@@ -202,6 +226,7 @@ export async function POST(request: NextRequest) {
         // Transient/unexpected failure — return 5xx so Stripe retries instead of
         // silently dropping a paid enrolment.
         console.error('[stripe webhook] enrolment error (returning 500 so Stripe retries):', e);
+        void captureServerError(e, { route: '/api/lms/webhooks/stripe', tags: { slug } });
         return await retryLater('Enrolment failed; Stripe will retry.');
       }
       // Terminal business condition — acknowledge so Stripe does not retry.
@@ -213,6 +238,7 @@ export async function POST(request: NextRequest) {
     // Unexpected failure around fulfillment — release the claim so Stripe's retry
     // can re-process this event instead of it being skipped as a duplicate.
     console.error('[stripe webhook] unexpected error (returning 500 so Stripe retries):', e);
+    void captureServerError(e, { route: '/api/lms/webhooks/stripe', tags: { eventType: event.type } });
     return await retryLater('Stripe webhook processing failed.');
   }
 }

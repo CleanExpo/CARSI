@@ -12,6 +12,7 @@ import {
   type CoursePurchaseMode,
   validateTeamSeatCount,
 } from '@/lib/checkout-purchase-mode';
+import { trackFunnelEvent } from '@/lib/analytics/track-funnel-event';
 
 type Props = {
   slug: string;
@@ -33,6 +34,13 @@ export function GuestEnrolForm({ slug, priceAud, isFree, showTeamOption = false 
     e.preventDefault();
     setLoading(true);
     setError(null);
+
+    trackFunnelEvent({
+      name: 'enrol_click',
+      course_slug: slug,
+      purchase_mode: purchaseMode,
+      is_free: isFree || priceAud <= 0,
+    });
 
     try {
       if (isFree || priceAud <= 0) {
@@ -90,6 +98,12 @@ export function GuestEnrolForm({ slug, priceAud, isFree, showTeamOption = false 
         return;
       }
       if (data.checkout_url) {
+        trackFunnelEvent({
+          name: 'checkout_started',
+          course_slug: slug,
+          purchase_mode: purchaseMode,
+          value_aud: purchaseMode === 'team' ? priceAud * teamSeats : priceAud,
+        });
         sessionStorage.setItem(
           'carsi_guest_checkout',
           JSON.stringify({ email, fullName, slug }),

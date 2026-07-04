@@ -12,6 +12,7 @@ import {
   type CoursePurchaseMode,
   validateTeamSeatCount,
 } from '@/lib/checkout-purchase-mode';
+import { trackFunnelEvent } from '@/lib/analytics/track-funnel-event';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -116,6 +117,13 @@ export function EnrolButton({ slug, priceAud = 0, isFree = false }: EnrolButtonP
     setLoading(true);
     setError(null);
 
+    trackFunnelEvent({
+      name: 'enrol_click',
+      course_slug: slug,
+      purchase_mode: purchaseMode,
+      is_free: effectiveFree,
+    });
+
     const returnTo = pathname && pathname.startsWith('/') ? pathname : `/courses/${slug}`;
 
     const currentUser = user ?? (await authApi.getCurrentUser());
@@ -166,6 +174,12 @@ export function EnrolButton({ slug, priceAud = 0, isFree = false }: EnrolButtonP
       }
 
       if (data.checkout_url) {
+        trackFunnelEvent({
+          name: 'checkout_started',
+          course_slug: slug,
+          purchase_mode: purchaseMode,
+          value_aud: purchaseMode === 'team' ? effectivePrice * teamSeats : effectivePrice,
+        });
         window.location.href = data.checkout_url;
         return;
       }

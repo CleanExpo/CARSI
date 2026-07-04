@@ -7,6 +7,7 @@ import {
 } from '@/lib/server/certificate-pdf';
 import { canIssueCertificate } from '@/lib/server/certificate-name';
 import { getEnrollmentForCertificate, markCertificateIssued } from '@/lib/server/enrollment-service';
+import { captureServerError } from '@/lib/server/sentry';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -78,6 +79,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
     });
   } catch (e) {
     console.error('[admin/certificate]', e);
+    void captureServerError(e, { route: '/api/admin/enrollments/[enrollmentId]/certificate' });
     return NextResponse.json({ detail: 'Failed to generate certificate' }, { status: 500 });
   }
 }

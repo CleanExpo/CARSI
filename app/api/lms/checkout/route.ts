@@ -28,6 +28,7 @@ import {
 import { getOrCreateCourseBySlug } from '@/lib/server/course-catalog-sync';
 import { getFirstLessonLearnPath } from '@/lib/server/first-lesson';
 import { getPublishedCourseForCheckout } from '@/lib/server/public-courses-list';
+import { captureServerError } from '@/lib/server/sentry';
 
 export async function POST(request: NextRequest) {
   try {
@@ -223,6 +224,7 @@ export async function POST(request: NextRequest) {
     }
   } catch (error) {
     console.error('[checkout] error:', error);
+    void captureServerError(error, { route: '/api/lms/checkout' });
     return NextResponse.json({ error: 'Failed to create checkout session' }, { status: 500 });
   }
 }

@@ -4,6 +4,7 @@ import {
   manualSendIicrcCecForEnrollment,
   retryIicrcCecSubmission,
 } from '@/lib/server/iicrc-cec-submission';
+import { captureServerError } from '@/lib/server/sentry';
 
 /** PDF + Cloudinary + Resend can exceed the default serverless limit. */
 export const maxDuration = 60;
@@ -51,6 +52,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ detail: 'Submission not found' }, { status: 404 });
       }
       console.error('[iicrc-cec-submissions/process] retry', e);
+      void captureServerError(e, { route: '/api/admin/iicrc-cec-submissions/process' });
       return NextResponse.json({ detail: 'Retry failed' }, { status: 500 });
     }
   }
@@ -85,6 +87,7 @@ export async function POST(request: NextRequest) {
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     console.error('[iicrc-cec-submissions/process] manual send', e);
+    void captureServerError(e, { route: '/api/admin/iicrc-cec-submissions/process' });
     return NextResponse.json({ detail: msg }, { status: 500 });
   }
 }

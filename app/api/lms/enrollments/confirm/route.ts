@@ -4,6 +4,7 @@ import { getStripeClient } from '@/lib/api/stripe';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { notifyCrmEnrollmentCreated } from '@/lib/server/crm-enrollment-notify';
 import { sendEnrollmentWelcomeEmail } from '@/lib/server/enrollment-email';
+import { captureServerError } from '@/lib/server/sentry';
 import { fulfillCourseCheckoutForUser } from '@/lib/server/team-course-purchase';
 import { computeDiscountedAud, findActiveUserDiscount } from '@/lib/server/user-discounts';
 import { getOrCreateCourseBySlug } from '@/lib/server/course-catalog-sync';
@@ -65,6 +66,7 @@ export async function POST(request: NextRequest) {
       }
     } catch (e) {
       console.error('[enrollments/confirm] stripe', e);
+      void captureServerError(e, { route: '/api/lms/enrollments/confirm' });
       return NextResponse.json({ detail: 'Invalid checkout session' }, { status: 400 });
     }
     paymentReference = sessionId;
@@ -153,6 +155,7 @@ export async function POST(request: NextRequest) {
       );
     }
     console.error('[enrollments/confirm]', e);
+    void captureServerError(e, { route: '/api/lms/enrollments/confirm' });
     return NextResponse.json({ detail: 'Enrolment failed' }, { status: 500 });
   }
 }
