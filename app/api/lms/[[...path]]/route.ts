@@ -71,24 +71,15 @@ async function localStub(
     });
   }
 
-  if (method === 'GET' && key === 'subscription/status') {
-    return NextResponse.json({
-      has_subscription: false,
-      status: null,
-      plan: null,
-      current_period_end: null,
-      trial_end: null,
-    });
-  }
+  // subscription/status and subscription/checkout are now REAL routes
+  // (app/api/lms/subscription/status/route.ts + .../checkout/route.ts, WS1-E1
+  // GP-441) and shadow this catch-all. The status route returns the WS0
+  // "no subscription" payload when SUBSCRIPTIONS_ENABLED is off, so behaviour is
+  // unchanged until the feature is switched on.
 
   // gamification/me/level — handled by app/api/lms/gamification/me/level/route.ts (real DB XP)
 
   if (method === 'POST' && key === 'subscription/portal') {
-    return NextResponse.json({ url: '' });
-  }
-
-  if (method === 'POST' && key === 'subscription/checkout') {
-    // Avoid 503 so the client can show a message instead of a generic network error.
     return NextResponse.json({ url: '' });
   }
 

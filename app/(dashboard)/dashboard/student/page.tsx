@@ -36,6 +36,9 @@ interface SubData {
   plan: string | null;
   current_period_end: string | null;
   trial_end: string | null;
+  reason?: 'active' | 'grace' | 'lapsed' | 'none' | 'unknown';
+  cancel_at_period_end?: boolean;
+  in_grace?: boolean;
 }
 
 interface ProfileData {
@@ -276,6 +279,28 @@ export default function StudentDashboardPage() {
 
       <RenewalCockpit />
 
+      {/* Membership status — grace (past due) or lapsed. Progress is always retained. */}
+      {sub?.reason === 'grace' ? (
+        <div className="rounded-2xl border border-[#f2cf8f] bg-[#fff8ed] px-5 py-4 text-sm font-medium text-[#7a3500]">
+          Your membership payment is past due. You keep full access during a 7-day grace period —
+          please update your payment to avoid interruption.{' '}
+          <Link href="/subscribe" className="underline">
+            Manage membership
+          </Link>
+        </div>
+      ) : sub?.reason === 'lapsed' ? (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#f2b8b8] bg-[#fff5f5] px-5 py-4 text-sm font-medium text-[#8a1c1c]">
+          <span>
+            Your membership has lapsed. Renew to enrol in new courses — your progress and
+            certificates are retained.
+          </span>
+          <Link href="/subscribe" className={dash.btnPrimary}>
+            Renew membership
+            <ArrowRight className="h-4 w-4" aria-hidden />
+          </Link>
+        </div>
+      ) : null}
+
       {/* My courses — primary workspace */}
       <section className={`${dash.card} relative overflow-hidden`}>
         <div className="relative px-5 py-8 sm:px-10 sm:py-10">
@@ -301,7 +326,7 @@ export default function StudentDashboardPage() {
                 </p>
               </div>
             </div>
-            {sub?.has_subscription && ['active', 'trialling'].includes(sub.status ?? '') ? (
+            {sub?.has_subscription ? (
               <Link href="/dashboard/courses" className={`${dash.btnSecondary} self-start lg:mt-1`}>
                 Browse catalogue
                 <ArrowRight className="h-4 w-4 opacity-80" aria-hidden />

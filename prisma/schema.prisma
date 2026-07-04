@@ -61,6 +61,7 @@ model LmsUser {
   notifications      LmsNotification[]
   courseReviews      LmsCourseReview[] @relation("ReviewStudent")
   reviewReplies      LmsCourseReview[] @relation("ReviewReplyAuthor")
+  subscription       LmsSubscription?
 
   @@map("lms_users")
 }
@@ -600,6 +601,36 @@ model StripeWebhookEvent {
   createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
 
   @@map("stripe_webhook_events")
+}
+
+/// WS1-E1 (GP-441): individual annual membership (`pro_annual`, A$795/yr).
+/// One row per learner; mirrors the Stripe subscription lifecycle. The
+/// `getEntitlements` service reads `status` + `currentPeriodEnd` to decide new-
+/// enrolment access (active / 7-day past-due grace / lapsed). Additive table —
+/// no existing one-off purchase flow depends on it.
+model LmsSubscription {
+  id                   String    @id @default(uuid()) @db.Uuid
+  userId               String    @unique @map("user_id") @db.Uuid
+  stripeCustomerId     String?   @map("stripe_customer_id") @db.VarChar(255)
+  /// Unique when present so a replayed webhook cannot create a second row.
+  stripeSubscriptionId String?   @unique @map("stripe_subscription_id") @db.VarChar(255)
+  /// Stripe subscription status: active | trialing | past_due | canceled | unpaid | incomplete | incomplete_expired.
+  status               String    @db.VarChar(32)
+  /// Plan identifier for UI (currently always `pro_annual`).
+  plan                 String    @default("pro_annual") @map("plan") @db.VarChar(32)
+  currentPeriodEnd     DateTime? @map("current_period_end") @db.Timestamptz(6)
+  cancelAtPeriodEnd    Boolean   @default(false) @map("cancel_at_period_end")
+  /// Stripe event.created of the snapshot that last set `status`. Out-of-order
+  /// guard: a snapshot is applied only when its event timestamp is >= this.
+  /// NULL = no ordered write yet (always overwritable; pre-migration rows).
+  statusEventAt        DateTime? @map("status_event_at") @db.Timestamptz(6)
+  createdAt            DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt            DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user LmsUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([stripeCustomerId], map: "idx_lms_subscriptions_customer")
+  @@map("lms_subscriptions")
 }
 
 model AdminUser {

@@ -99,3 +99,47 @@ test.describe('Authenticated learner journey @authenticated', () => {
     await expect(page.locator('#main-content').first()).toBeVisible({ timeout: 15_000 });
   });
 });
+
+// =========================================================================
+// GP-441 WS1-E1 — individual annual membership entitlement (ships DARK).
+//
+// CI runs with SUBSCRIPTIONS_ENABLED unset (off), so these assert the
+// fail-closed / coming-soon behaviour, which is the safe production default.
+// The full subscribe→lapse→retain journey needs live Stripe TEST keys + a Test
+// Clock and is covered by the Rana runbook's Step D manual checklist
+// (docs/runbooks/rana-stripe-connection.md) — it cannot run in headless CI
+// without Stripe secrets, and a faked-green version would be worse than absent.
+// =========================================================================
+test.describe('Membership entitlement — flag off (fail closed)', () => {
+  test('subscription status API reports no membership when unauthenticated / flag off', async ({
+    request,
+  }) => {
+    const res = await request.get('/api/lms/subscription/status');
+    expect(res.ok()).toBeTruthy();
+    const body = await res.json();
+    // Fail closed: no membership is granted without an active, flagged subscription.
+    expect(body.has_subscription).toBe(false);
+  });
+
+  test('membership enrol API refuses a direct hit (no course content leaks)', async ({
+    request,
+  }) => {
+    const res = await request.post('/api/lms/subscription/enroll', {
+      data: { slug: 'water-damage-restoration' },
+    });
+    // 503 (flag off) or 401/403 (flag on, no session) — never 200, never content.
+    expect([401, 403, 503]).toContain(res.status());
+    const body = await res.json().catch(() => ({}));
+    expect(body).not.toHaveProperty('learn_url');
+    expect(body.included_in_membership).toBeUndefined();
+  });
+
+  test('subscription checkout API fails closed for an anonymous caller', async ({ request }) => {
+    const res = await request.post('/api/lms/subscription/checkout', { data: {} });
+    // Flag off → 503; flag on but anonymous → 401. Either way, no checkout url.
+    expect([401, 503]).toContain(res.status());
+    const body = await res.json().catch(() => ({}));
+    expect(body.url).toBeUndefined();
+    expect(body.checkout_url).toBeUndefined();
+  });
+});

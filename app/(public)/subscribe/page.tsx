@@ -1,10 +1,16 @@
 import type { Metadata } from 'next';
+import { cookies } from 'next/headers';
 import Link from 'next/link';
 
+import { getEntitlements, type Entitlements } from '@/lib/server/entitlements';
+import { subscriptionsEnabled } from '@/lib/server/subscriptions-flag';
+import { verifySessionToken } from '@/lib/auth/session-jwt';
+import { SubscribeCta } from './SubscribeCta';
+
 export const metadata: Metadata = {
-  title: 'Membership — Coming Soon | CARSI',
+  title: 'Yearly Membership | CARSI',
   description:
-    'Yearly membership is coming soon. Buy any CARSI course individually today — no card required for the Free Library.',
+    'CARSI yearly membership — 100% access to all published courses for one learner for 12 months. GST included.',
 };
 
 const PLAN = {
@@ -17,7 +23,7 @@ const PLAN = {
 const PRO_FEATURES = [
   '100% access to all published CARSI courses',
   'Beginner, intermediate, and advanced levels',
-  'IICRC-aligned CEC courses where stated',
+  'IICRC CEC courses where stated',
   'CEC tracking for completed eligible courses',
   'Water Restoration Technician (WRT) courses',
   'Carpet Cleaning Technician (CCT) courses',
@@ -30,7 +36,41 @@ const PRO_FEATURES = [
   'Priority email support',
 ];
 
-export default function SubscribePage() {
+/** Resolve the signed-in learner's membership, honouring the ship-dark flag. */
+async function loadMembership(): Promise<Entitlements | null> {
+  if (!subscriptionsEnabled()) return null;
+  const jar = await cookies();
+  const token = jar.get('auth_token')?.value ?? jar.get('carsi_token')?.value;
+  if (!token) return null;
+  const claims = await verifySessionToken(token);
+  if (!claims?.sub) return null;
+  return getEntitlements(claims.sub);
+}
+
+function GraceBanner({ periodEnd }: { periodEnd: Date | null }) {
+  return (
+    <p className="rounded-lg border border-[#f2cf8f] bg-[#fff8ed] px-3 py-2 text-sm font-medium text-[#7a3500]">
+      Your membership payment is past due. You still have full access during a 7-day grace period
+      {periodEnd ? ` from ${periodEnd.toLocaleDateString('en-AU')}` : ''}. Please update your payment
+      to avoid interruption — your progress and certificates are always retained.
+    </p>
+  );
+}
+
+function LapsedBanner() {
+  return (
+    <p className="rounded-lg border border-[#f2b8b8] bg-[#fff5f5] px-3 py-2 text-sm font-medium text-[#8a1c1c]">
+      Your membership has lapsed. Renew to enrol in new courses. Everything you have already
+      enrolled in, your progress, and your issued certificates remain intact.
+    </p>
+  );
+}
+
+export default async function SubscribePage() {
+  const enabled = subscriptionsEnabled();
+  const membership = await loadMembership();
+  const status = membership?.reason ?? null;
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-[#f6f8fb] px-4 py-16 text-slate-900">
       <div className="flex w-full max-w-lg flex-col gap-8">
@@ -53,10 +93,25 @@ export default function SubscribePage() {
               <span className="text-slate-600">{PLAN.suffix}</span>
             </div>
             <p className="mt-2 text-sm text-slate-600">{PLAN.helper}</p>
-            <p className="mt-3 rounded-lg border border-[#f2cf8f] bg-[#fff8ed] px-3 py-2 text-sm font-medium text-[#7a3500]">
-              Membership is best for clients planning multiple courses, refreshing knowledge across
-              levels, or maintaining CECs over time.
-            </p>
+
+            {status === 'active' ? (
+              <p className="mt-3 rounded-lg border border-[#9fdab8] bg-[#f1fbf5] px-3 py-2 text-sm font-medium text-[#1b5e37]">
+                Your membership is active — every published course is included, no extra payment.
+              </p>
+            ) : status === 'grace' ? (
+              <div className="mt-3">
+                <GraceBanner periodEnd={membership?.currentPeriodEnd ?? null} />
+              </div>
+            ) : status === 'lapsed' ? (
+              <div className="mt-3">
+                <LapsedBanner />
+              </div>
+            ) : (
+              <p className="mt-3 rounded-lg border border-[#f2cf8f] bg-[#fff8ed] px-3 py-2 text-sm font-medium text-[#7a3500]">
+                Membership is best for clients planning multiple courses, refreshing knowledge across
+                levels, or maintaining CECs over time.
+              </p>
+            )}
           </div>
 
           <ul className="flex flex-col gap-3 text-sm text-slate-700">
@@ -69,16 +124,7 @@ export default function SubscribePage() {
           </ul>
 
           <div className="flex flex-col gap-3">
-            <span
-              aria-disabled="true"
-              className="flex w-full cursor-not-allowed items-center justify-center rounded-lg border border-slate-200 bg-slate-50 py-3 text-sm font-semibold text-slate-500"
-            >
-              Coming soon
-            </span>
-            <p className="text-center text-xs text-slate-600">
-              Yearly membership checkout is not available yet. Buy any course individually below in
-              the meantime.
-            </p>
+            <SubscribeCta enabled={enabled} reason={status} />
           </div>
         </div>
 

@@ -24,6 +24,12 @@ import { fulfillCourseCheckoutForUser } from '@/lib/server/team-course-purchase'
 import { shouldRetryWebhookFulfillment } from '@/lib/server/stripe-webhook-policy';
 import { resolveStripePaymentReference } from '@/lib/server/stripe-payment-reference';
 import { revokeEnrollmentsByPaymentReference } from '@/lib/server/stripe-revocation';
+import { readSubscriptionIdFromPaymentIntent } from '@/lib/server/stripe-subscription-map';
+import { markSubscriptionStatusBySubscriptionId } from '@/lib/server/subscription-store';
+import {
+  handleSubscriptionEvent,
+  isSubscriptionEvent,
+} from '@/lib/server/subscription-webhook';
 
 type StripeWebhookEventDelegate = {
   create(args: { data: { id: string; type: string } }): Promise<unknown>;
@@ -35,9 +41,24 @@ type StripeWebhookEventDelegate = {
 };
 
 /**
- * Revoke course access when a payment is reversed (refund or chargeback).
- * Maps the charge's payment intent back to the checkout session(s) whose id was
- * stored as the enrollment paymentReference at fulfillment.
+ * Revoke access when a payment is reversed (refund or chargeback). Handles BOTH
+ * revenue paths:
+ *
+ *  1. One-off course purchases — map the charge's payment intent back to the
+ *     checkout session(s) whose id was stored as the enrollment paymentReference
+ *     at fulfillment, and revoke those `LmsEnrollment` rows.
+ *
+ *  2. Individual annual membership (WS1-E1, GP-441) — a subscription invoice
+ *     charge has NO checkout-session paymentReference, so path 1 is a no-op for
+ *     it. Instead we follow the payment intent → invoice → subscription id and
+ *     mark the `LmsSubscription` non-entitling (`canceled`), so a refunded /
+ *     charged-back member loses catalogue access. Parity with the one-off lapse
+ *     policy: existing progress and issued certificates are RETAINED — only NEW
+ *     enrolment entitlement stops (the gate reads `getEntitlements`, which treats
+ *     `canceled` as lapsed).
+ *
+ * Idempotent under the existing StripeWebhookEvent claim: re-delivery re-applies
+ * the same terminal states and never double-acts.
  */
 async function handleStripeRevocation(event: Stripe.Event): Promise<void> {
   const reason = event.type === 'charge.dispute.created' ? 'disputed' : 'refunded';
@@ -54,7 +75,35 @@ async function handleStripeRevocation(event: Stripe.Event): Promise<void> {
   }
   if (!paymentIntentId) return;
 
-  const sessions = await getStripeClient().checkout.sessions.list({
+  const stripe = getStripeClient();
+
+  // Path 2: is this a SUBSCRIPTION charge? Follow payment intent → invoice →
+  // subscription id (version-tolerant). If so, revoke the membership. We do this
+  // first so a subscription refund always lands even if there is no matching
+  // checkout session (there never is for subscription invoices).
+  try {
+    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId, {
+      expand: ['invoice'],
+    });
+    const subscriptionId = readSubscriptionIdFromPaymentIntent(paymentIntent);
+    if (subscriptionId) {
+      // Terminal, non-entitling state. `canceled` is treated as lapsed by
+      // getEntitlements → hasActiveMembership:false → no new catalogue access.
+      await markSubscriptionStatusBySubscriptionId(subscriptionId, 'canceled');
+      console.warn(
+        `[stripe webhook] revoked membership for subscription=${subscriptionId} (${reason})`,
+      );
+    }
+  } catch (error) {
+    // Re-throw so the route returns 5xx and Stripe retries — a subscription
+    // refund we failed to apply must NOT be silently dropped (a charged-back
+    // member would otherwise keep full access).
+    console.error('[stripe webhook] subscription revocation lookup failed:', error);
+    throw error;
+  }
+
+  // Path 1: one-off course enrolments keyed by the checkout-session reference.
+  const sessions = await stripe.checkout.sessions.list({
     payment_intent: paymentIntentId,
     limit: 10,
   });
@@ -111,6 +160,15 @@ export async function POST(request: NextRequest) {
   try {
     if (event.type === 'charge.refunded' || event.type === 'charge.dispute.created') {
       await handleStripeRevocation(event);
+      return await acknowledge();
+    }
+
+    // WS1-E1 (GP-441): individual annual membership lifecycle. Additive handlers
+    // under this same signature-verified, idempotency-claimed route. A transient
+    // failure throws and is caught below → 5xx → Stripe retries (single grant
+    // guaranteed by the upsert keyed on the unique subscription id).
+    if (isSubscriptionEvent(event.type)) {
+      await handleSubscriptionEvent(event);
       return await acknowledge();
     }
 

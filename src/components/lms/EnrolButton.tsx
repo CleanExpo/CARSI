@@ -66,8 +66,9 @@ export function EnrolButton({ slug, priceAud = 0, isFree = false }: EnrolButtonP
     apiClient
       .get<SubStatusResponse>('/api/lms/subscription/status')
       .then((data) => {
-        const active = data.has_subscription && ['active', 'trialling'].includes(data.status ?? '');
-        setSubState(active ? 'subscribed' : 'none');
+        // Server is the source of truth for entitlement (active or in grace);
+        // has_subscription is already the fail-closed decision.
+        setSubState(data.has_subscription ? 'subscribed' : 'none');
       })
       .catch(() => setSubState('none'));
   }, [user]);
@@ -132,6 +133,24 @@ export function EnrolButton({ slug, priceAud = 0, isFree = false }: EnrolButtonP
         setLoading(false);
         return;
       }
+    }
+
+    // Active member on a self enrolment → included in membership, no charge.
+    // The server re-checks entitlement and fails closed; this is only the UX.
+    if (subState === 'subscribed' && purchaseMode !== 'team') {
+      try {
+        const enrolled = await apiClient.post<ConfirmResponse>('/api/lms/subscription/enroll', {
+          slug,
+        });
+        window.location.href = enrolled.learn_url ?? '/dashboard/student';
+      } catch (err) {
+        const msg =
+          err instanceof ApiClientError ? err.message : 'Could not enrol with your membership.';
+        setError(msg);
+      } finally {
+        setLoading(false);
+      }
+      return;
     }
 
     try {
