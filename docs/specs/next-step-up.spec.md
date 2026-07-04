@@ -1,6 +1,6 @@
 # SPM Spec — CARSI "Next Step Up": Revenue & Credential Integrity Release
 
-> Status: DRAFT for founder acceptance · Author: Claude (SPM, read-only session) · 2026-07-04
+> Status: DRAFT for founder acceptance · Author: Claude (SPM, read-only session) · 2026-07-04 · Rev 2: corrected per the §20 adversarial verification addendum
 > Base: `main` @ `fbb26155` (clean tree) · Evidence tags: [VERIFIED] repo file:line or GitHub issue read this session · [INFERENCE] reasoned from verified facts · [UNCONFIRMED] assumption needing founder/ops input
 
 ---
@@ -28,9 +28,11 @@ recurring-revenue credential platform and unblocks both already-approved growth 
   promotion. [VERIFIED git log `fbb26155..1cbcce3f` etc.]
 - Governance: Compound Engineering loop + verification gate; `npm run type-check` mandatory;
   all course content Australian-produced (230 V/50 Hz, metric, AS/NZS, AUD). [VERIFIED `CLAUDE.md`, `AGENTS.md`]
-- Two SPM specs are already approved and queued: Search Authority (91/100; Phase 0 shipped —
-  founder E-E-A-T schema `53a7c8b6`, AI citation-bot allow-list `b55be683`; Phase 1 approved) and
-  Behind Closed Doors members engine (85/100; **explicitly blocked on #271**). [VERIFIED
+- Two sibling SPM specs are drafted and queued — both headed "Status: DRAFT for founder
+  acceptance", not formally approved: Search Authority (scored 91/100; Phase 0 shipped de facto —
+  founder E-E-A-T schema `53a7c8b6`, AI citation-bot allow-list `b55be683`; Phase 1 pending
+  acceptance) and Behind Closed Doors members engine (scored 85/100; **explicitly blocked on
+  #271**). [VERIFIED
   `docs/specs/2026-07-01-search-authority-geo-aeo.md:88-90`,
   `docs/specs/2026-07-01-behind-closed-doors-members-engine.md:12`]
 
@@ -39,13 +41,22 @@ recurring-revenue credential platform and unblocks both already-approved growth 
 CARSI currently sells outcomes its code does not deliver, and certifies competence it does not
 assess. Three first-source facts, all re-verified in the working tree this session:
 
-1. **Paid membership is never granted.** `/pricing` actively sells `pro_annual` ($795/yr →
-   `/subscribe`) and three Teams tiers ($299 / $799 / $2,499 per year, per-seat expansion)
-   [VERIFIED `src/lib/lms/pricing-tiers.ts:39-78`], but the subscription status endpoint returns a
-   hard-coded stub — `has_subscription: false` [VERIFIED `app/api/lms/[[...path]]/route.ts:76`].
-   A buyer can complete Stripe checkout for a yearly or Teams plan and never receive the promised
-   "100% access to all published courses". [VERIFIED issue #271, open since 2026-06-29, P1]
-   On a live Australian site this is Australian Consumer Law exposure, not just a bug. [INFERENCE]
+1. **Paid membership is never granted — and cannot currently even be bought.** `/pricing`
+   actively advertises `pro_annual` ($795/yr → `/subscribe`) and three Teams tiers ($299 / $799 /
+   $2,499 per year, per-seat expansion) [VERIFIED `src/lib/lms/pricing-tiers.ts:39-78`], but the
+   subscription status endpoint returns a hard-coded stub — `has_subscription: false` [VERIFIED
+   `app/api/lms/[[...path]]/route.ts:76`] — and the subscription checkout endpoint is equally
+   stubbed, returning `{url:''}` [VERIFIED `app/api/lms/[[...path]]/route.ts:90-93`], with
+   `/subscribe` rendering "Subscription billing checkout is not available in this deployment"
+   [VERIFIED `app/(public)/subscribe/page.tsx:87-92`]. The Teams CTA creates a team via
+   `POST /api/lms/teams` with no payment step at all [VERIFIED `app/api/lms/teams/route.ts:10-55`].
+   No buyer can currently be charged for these tiers: the mis-sell is **advertised dead-end
+   products**, not charge-without-delivery (corrected 2026-07-04 — see §20). [VERIFIED issue
+   #271, open since 2026-06-29, P1]
+   On a live Australian site, advertising memberships that cannot be purchased or delivered
+   remains consumer-trust / misleading-conduct exposure, but materially lower than
+   charged-without-delivery; the §8 item-6 Stripe-history check closes the question of whether
+   any historical charges exist. [INFERENCE]
 2. **CEC certificates issue without any knowledge check.** The completion gate passes when "the
    course has no quizzes" [VERIFIED `src/lib/server/lms-completion.ts:36-38`]; issue #301 verified
    live that a 4-CEC-hour course with 10 reading modules and zero assessments issues a CEC
@@ -80,9 +91,12 @@ funnel that mis-sells and a credential competitors can attack as unassessed.
 **In scope**
 - WS1: Membership entitlement engine (individual `pro_annual`, Teams seats, org monthly), Stripe
   subscription lifecycle webhooks, server-side access gating, self-serve + ops provisioning.
-- WS0 (immediate interim): stop the mis-sell within hours — mark yearly/Teams tiers
-  non-purchasable ("coming soon") until WS1 grants entitlement (issue #271 option 2 as bridge to
-  option 1).
+- WS0 (immediate interim): stop the mis-advertising within hours — mark yearly/Teams tiers
+  non-purchasable ("coming soon"; if waitlist copy is used, specify the capture destination or
+  drop the waitlist promise) until WS1 grants entitlement (issue #271 option 2 as bridge to
+  option 1); remove the board-killed $44/$99 monthly SKUs still advertised on `/subscribe`
+  [VERIFIED `app/(public)/subscribe/page.tsx:20-33`; board kill: issue #130, CLOSED]; close or
+  gate the payment-free team-creation path until WS1-E2 wires purchase → seats.
 - WS2: Assessment-gated CEC integrity — audit of published CEC courses lacking quizzes, authoring
   of required assessments (Australian-produced), policy gate so CEC issuance requires ≥1 passing
   required assessment.
@@ -172,7 +186,7 @@ superseded — `/api/contact` now sends transactional email with Turnstile + rat
 
 | Category | Score | Notes |
 |---|--:|---|
-| First-source evidence | 25/25 | Every load-bearing claim re-verified in-tree this session (file:line above); stale findings excluded |
+| First-source evidence | 25/25 | Every load-bearing claim re-verified in-tree this session (file:line above); stale findings excluded — §20 records one §3.1 claim later contradicted and corrected |
 | Clear problem, real users | 20/20 | Live mis-sell (P1 #271), live credential-integrity failure (#301), measured-zero funnel (#128) |
 | Reuse over rebuild | 14/15 | Subscription helpers, team models, idempotency, org-billing design, quiz engine all reused; −1: entitlement service is genuinely new code |
 | Security | 14/15 | Server-side fail-closed gate, existing webhook hardening; −1 residual: Stripe lifecycle edge-cases (past_due grace) need explicit decision |
@@ -189,11 +203,19 @@ by founder/ops input, not by more analysis:
    in the live account and record ids — founder/ops action.
 3. Decide the past-due grace policy (recommend: 7-day grace, then gate) — founder decision.
 4. Commit SME review of authored CEC assessments before publish — founder commitment.
+5. Decide GST treatment for the new annual/Teams recurring Prices — inclusive pricing vs Stripe
+   Tax (live `/subscribe` copy says "GST included"; the org-monthly plan doc discusses both) —
+   founder decision. [Added by the 2026-07-04 verification pass]
+6. Run the 2-minute Stripe-dashboard history check confirming zero historical yearly/Teams
+   subscription charges (expected zero — the subscription checkout was never wired; §3.1) —
+   founder/ops action. [Added by the 2026-07-04 verification pass]
 
-With those four locked, **Phase E1 (WS0 + individual annual entitlement) re-scores 100/100 and is
-APPROVE BUILD**; E2 (Teams) and E3 (org monthly) each re-judge at phase start (expected 100 given
-E1 patterns). WS2 and WS3 are APPROVE BUILD at 100 as specified (no external blockers; WS2 publish
-step is SME-gated by design).
+With those six locked, **Phase E1 (WS0 + individual annual entitlement) is build-ready**. The
+"re-scores 100/100" framing in the first revision was directional, not derived — the residual
+judge deductions (lapse-copy tone pass; Stripe lifecycle edge-cases) close via decision 3 and
+the E1 UX pass, and closure of the decisions ticket (Linear GP-439) is the operative gate. E2
+(Teams) and E3 (org monthly) each re-judge at phase start. WS2 and WS3 remain approved as
+specified (no external blockers; WS2 publish step is SME-gated by design).
 
 ## 9. Proposed solution (phased)
 
@@ -248,6 +270,11 @@ untouched).
 | WS4a | Members engine Phase 1 | its own spec (`2026-07-01-behind-closed-doors-members-engine.md`) + `design-audit` for teaser/paywall UX | per that spec |
 | WS4b | Search Authority Phase 2 | its own spec + `seo-audit`, `seo-schema`, `seo-sitemap`, `seo-geo`, in-repo `search-dominance` | `seo-technical` re-crawl |
 | Sidecar | #298 directory gating · #293 retire Vercel · #289 rotate doadmin | `fix` (directory) · ops runbooks already written in issues #293/#289 | `security-audit` sign-off |
+
+Note (2026-07-04): `test-writer`, `researcher`, and the other named executors are Claude-Code
+session agents/skills supplied by the dispatching harness — they are not defined in this repo's
+tree. The dispatcher owns providing them; in-repo skills (`carsi-course-production`,
+`search-dominance`) were verified present.
 
 ## 11. UX requirements (essentials)
 
@@ -306,8 +333,9 @@ evidence.
 
 ## 15. Acceptance criteria (Given/When/Then)
 
-1. Given a visitor on `/pricing` before WS1-E1 ships, when they view yearly/Teams tiers, then no
-   purchasable checkout exists for an entitlement the system cannot grant (WS0).
+1. Given a visitor on `/pricing` or `/subscribe` before WS1-E1 ships, when they view membership
+   options, then no purchasable-looking CTA is presented for an entitlement the system cannot
+   grant, and the board-killed $44/$99 monthly SKUs are absent (WS0).
 2. Given a user completes Stripe checkout for `pro_annual`, when the webhook processes, then
    `/api/lms/subscription/status` reflects an active subscription and every published course is
    enrollable by that user without further payment.
@@ -320,7 +348,8 @@ evidence.
    then the response is 401/403 with no course-content payload.
 6. Given a published CEC-bearing course with zero required assessments, when a learner completes
    all lessons, then no CEC certificate issues (and after WS2b, no published CEC course is in
-   this state).
+   this state). Sequencing note: until WS2b coverage completes, this criterion is proven by
+   unit/e2e fixture tests only — the production gate must not ship early and strand learners.
 7. Given a learner passes the required assessment, when completion evaluates, then the certificate
    and IICRC CEC submission pipeline behave exactly as today (no regression).
 8. Given a sandbox subscription purchase, when the webhook fires, then GA4 records `purchase` and
@@ -336,14 +365,15 @@ evidence.
 /goal Execute docs/specs/next-step-up.spec.md phase-by-phase: WS0 immediately (coming-soon interim
 on pro_annual + Teams tiers); then WS1-E1 individual annual entitlement per §9/§12 with the §14
 verification plan; WS2a/WS2b and WS3 in parallel PR streams; E2, E3, then WS4 dispatch. Blockers
-to resolve with founder before E1 code: #271 option lock, Stripe Price ids, grace policy, SME
-assessment review commitment. Every phase: verification gate + type-check + evidence note. Do not
+to resolve with founder before E1 code: the six GP-439 inputs (#271 option lock, Stripe Price
+ids + env names, grace policy, SME assessment review, GST treatment, Stripe-history zero-charge
+check). Every phase: verification gate + type-check + evidence note. Do not
 start E2 until E1 acceptance criteria 2/3/5 pass in CI.
 ```
 
 ## 17. Implementation sequence
 
-1. Founder locks the four decisions (§8) — 15 minutes, unblocks everything.
+1. Founder locks the six decisions (§8; Linear GP-439) — ~20 minutes, unblocks everything.
 2. WS0 interim (hours) → deploy.
 3. WS1-E1 (est. 2–3 days per #271) ‖ WS2a audit (half-day) ‖ WS3 (day).
 4. WS2b assessment authoring (SME-paced) → WS2c policy gate.
@@ -360,7 +390,8 @@ start E2 until E1 acceptance criteria 2/3/5 pass in CI.
   quiz-gate context `src/lib/server/enrollment-service.ts:8-187`; org plan
   `docs/plans/2026-06-27-org-subscription-billing.md`; webhook
   `app/api/lms/webhooks/stripe/route.ts`; e2e base `e2e/revenue-path.spec.ts`.
-- **Open founder inputs:** the four §8 items. **Pickup point:** §17 step 1.
+- **Open founder inputs:** the six §8 items, tracked as Linear GP-439. **Pickup point:** §17
+  step 1. Programme backlog: Linear GP-439…GP-450 (project CARSI, team GP).
 - **Stale-issue note for triage:** #135 superseded by current `/api/contact`; #128 half-done (GA4
   pageviews exist; events/PostHog remain); 2026-03-22 audit P0s resolved on current main.
 
@@ -370,11 +401,39 @@ start E2 until E1 acceptance criteria 2/3/5 pass in CI.
 phased E1→E3 entitlement with parallel CEC assessment gating and funnel instrumentation — because
 it is the only candidate that simultaneously removes live legal/trust exposure, turns the pricing
 page into real recurring revenue using designs and models that already exist in the repo, makes
-the IICRC credential defensible (the stated moat), and unblocks both growth specs the project has
-already approved. **Runners-up:** (2) Search Authority Phase 2 + members engine first — rejected
+the IICRC credential defensible (the stated moat), and unblocks both growth specs already drafted and
+queued (founder acceptance pending — see §2). **Runners-up:** (2) Search Authority Phase 2 + members engine first — rejected
 as first move because the members gate is blocked on #271 and amplified traffic amplifies the
 mis-sell; dispatched instead as WS4 fast-follow. (3) Catalogue expansion to S540/S900/S800 + RIA
 (#296) — high-value but sequenced after credential integrity so new CEC courses launch assessed.
 
-*Honest ceiling as-written: 96/100 (REDUCE SCOPE → phase). Phase E1 becomes APPROVE BUILD at
-100/100 the moment the four founder inputs in §8 are locked; no further analysis is required.*
+*Honest ceiling as-written: 96/100 (REDUCE SCOPE → phase). Phase E1 becomes build-ready the
+moment the six founder inputs in §8 (Linear GP-439) are locked; no further analysis is required.*
+
+## 20. Adversarial verification addendum (2026-07-04)
+
+After authoring, this spec was verified by three independent agents (code-evidence,
+GitHub-issue, fresh-eyes critique) plus a live crawl of carsi.com.au. Outcomes:
+
+- **Confirmed:** all three §3 code anchors (status stub `route.ts:74-82`; tiers
+  `pricing-tiers.ts:39-83`; zero-quiz completion via `lms-completion.ts:41-48` +
+  `enrollment-service.ts:13,174-176`); issues #271/#301 open and as characterised; #135
+  stale-superseded; #128 half-done; live /pricing sells the cited tiers; live-site constraint
+  check passed (no ungated destructive step anywhere in the plan).
+- **Corrected in Rev 2:** §3.1 charge-without-delivery claim (subscription checkout is also
+  stubbed — no money can be taken; the mis-sell is advertised-dead-end, and the Teams CTA
+  creates teams with no payment step); §2/§19 "approved" sibling specs → DRAFT for founder
+  acceptance (Search Authority Phase 0 shipped de facto only); §8 founder decisions extended
+  from four to six (GST treatment; Stripe-history zero-charge check); "re-scores 100/100"
+  reframed as directional; WS0 scope extended to the board-killed $44/$99 monthly SKUs on
+  `/subscribe` (#130) and the payment-free team-creation path; §15 AC1 broadened and AC6
+  sequencing clarified; §10 executor-availability note added.
+- **Known residuals:** the issue #146 board quote is taken on trust (not verifiable in-tree);
+  the E2 seat-expansion billing mechanism (Stripe quantity vs per-seat Price, proration) must
+  be designed on Linear GP-442 before build; production /pricing still renders Foundation
+  ($44/mo) and Growth ($99/mo) SKUs with card-capturing trials despite the #130 board kill —
+  deployed-vs-repo drift to be confirmed and resolved inside Linear GP-440.
+- **Tracking:** the programme is dispatched as Linear **GP-439…GP-450** (project CARSI, team
+  G-Pilot); GP-439 (the six §8 inputs) is the operative gate. Base note: this file's initial
+  commit `72ff4153` was auto-pushed by a local "autogit" daemon atop the analysed base
+  `fbb26155`; Rev 2 is the first deliberate, reviewed revision.
