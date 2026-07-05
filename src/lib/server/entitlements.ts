@@ -290,51 +290,87 @@ export async function getTeamEntitlements(userId: string): Promise<TeamEntitleme
   try {
     const { prisma } = await import('@/lib/prisma');
 
-    const membership = await prisma.lmsTeamMember.findFirst({
+    // A user can be on multiple teams. Scan ALL of them and grant if ANY holds
+    // an entitled seat for this user — mirroring getOrgEntitlements. A single
+    // findFirst() with no orderBy is non-deterministic and can wrongly DENY an
+    // entitled user by arbitrarily picking a lapsed team. Deterministic by
+    // teamId so the "report first team for honest UI" fallback is stable too.
+    const memberships = await prisma.lmsTeamMember.findMany({
       where: { userId },
       select: { teamId: true },
+      orderBy: { teamId: 'asc' },
     });
-    if (!membership) return NO_TEAM_SEAT;
+    if (memberships.length === 0) return NO_TEAM_SEAT;
 
-    const teamId = membership.teamId;
+    const teamIds = memberships.map((m) => m.teamId);
 
-    const [sub, members, team] = await Promise.all([
-      prisma.lmsTeamSubscription.findUnique({
-        where: { teamId },
-        select: { status: true, currentPeriodEnd: true, seatLimit: true },
+    const [subs, members, teams] = await Promise.all([
+      prisma.lmsTeamSubscription.findMany({
+        where: { teamId: { in: teamIds } },
+        select: { teamId: true, status: true, currentPeriodEnd: true, seatLimit: true },
       }),
       prisma.lmsTeamMember.findMany({
-        where: { teamId },
-        select: { userId: true },
+        where: { teamId: { in: teamIds } },
+        select: { teamId: true, userId: true },
         orderBy: { joinedAt: 'asc' },
       }),
-      prisma.lmsTeam.findUnique({ where: { id: teamId }, select: { ownerId: true } }),
+      prisma.lmsTeam.findMany({
+        where: { id: { in: teamIds } },
+        select: { id: true, ownerId: true },
+      }),
     ]);
 
-    if (!sub) return { ...NO_TEAM_SEAT, teamId, isOwner: team?.ownerId === userId };
+    const subByTeam = new Map(subs.map((s) => [s.teamId, s]));
+    const ownerByTeam = new Map(teams.map((t) => [t.id, t.ownerId]));
+    const membersByTeam = new Map<string, { userId: string }[]>();
+    for (const m of members) {
+      const list = membersByTeam.get(m.teamId) ?? [];
+      list.push({ userId: m.userId });
+      membersByTeam.set(m.teamId, list);
+    }
 
-    const decision = decideTeamSeatSubscription({
-      status: sub.status,
-      currentPeriodEnd: sub.currentPeriodEnd,
-      seatLimit: sub.seatLimit,
-    });
+    // Compute the per-team seat result for this user, in deterministic order.
+    const evaluate = (teamId: string): TeamEntitlements => {
+      const sub = subByTeam.get(teamId);
+      const teamMembers = membersByTeam.get(teamId) ?? [];
+      const isOwner = ownerByTeam.get(teamId) === userId;
 
-    // Owner always occupies seat 0; remaining seats fill by join order. This is
-    // the same ordering the invite path enforces, so the decision is stable.
-    const seatIndex = members.findIndex((m) => m.userId === userId);
-    const seat = isSeatEntitled(decision, seatIndex);
+      if (!sub) return { ...NO_TEAM_SEAT, teamId, isOwner };
 
-    return {
-      hasActiveSeat: seat.entitled,
-      reason: seat.reason,
-      entitledCourseIds: seat.entitled ? 'ALL' : null,
-      status: sub.status,
-      currentPeriodEnd: sub.currentPeriodEnd,
-      seatLimit: decision.seatLimit,
-      seatsUsed: Math.min(members.length, decision.seatLimit),
-      teamId,
-      isOwner: team?.ownerId === userId,
+      const decision = decideTeamSeatSubscription({
+        status: sub.status,
+        currentPeriodEnd: sub.currentPeriodEnd,
+        seatLimit: sub.seatLimit,
+      });
+
+      // Owner always occupies seat 0; remaining seats fill by join order. This
+      // is the same ordering the invite path enforces, so the decision is stable.
+      const seatIndex = teamMembers.findIndex((m) => m.userId === userId);
+      const seat = isSeatEntitled(decision, seatIndex);
+
+      return {
+        hasActiveSeat: seat.entitled,
+        reason: seat.reason,
+        entitledCourseIds: seat.entitled ? 'ALL' : null,
+        status: sub.status,
+        currentPeriodEnd: sub.currentPeriodEnd,
+        seatLimit: decision.seatLimit,
+        seatsUsed: Math.min(teamMembers.length, decision.seatLimit),
+        teamId,
+        isOwner,
+      };
     };
+
+    // Grant on the FIRST team (deterministic order) where this user holds an
+    // entitled seat.
+    for (const teamId of teamIds) {
+      const result = evaluate(teamId);
+      if (result.hasActiveSeat) return result;
+    }
+
+    // Not entitled anywhere: report the first team's status for honest UI
+    // (mirrors getOrgEntitlements), still fail-closed on entitlement.
+    return evaluate(teamIds[0]);
   } catch (error) {
     console.error('[entitlements] team lookup failed, denying (fail-closed):', error);
     return NO_TEAM_SEAT;

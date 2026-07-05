@@ -2,11 +2,18 @@ import { type NextRequest, NextResponse } from 'next/server';
 
 import { prisma } from '@/lib/prisma';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
+import { runSerializable } from '@/lib/server/db-tx';
+import { subscriptionsEnabled } from '@/lib/server/subscriptions-flag';
 import { enrollTeamMemberInPurchasedCourse } from '@/lib/server/team-course-purchase';
-import { countTeamSeatsUsed } from '@/lib/server/teams';
 
 /** POST /api/lms/teams/invite/accept — accept invite token. */
 export async function POST(request: NextRequest) {
+  // Membership-mutating route: gated behind the subscriptions flag for
+  // consistency with the sibling Teams/org routes (teams/enroll, org/enroll, …).
+  if (!subscriptionsEnabled()) {
+    return NextResponse.json({ detail: 'Teams membership is not yet available.' }, { status: 503 });
+  }
+
   const claims = await getSessionClaimsFromRequest(request);
   if (!claims) {
     return NextResponse.json({ detail: 'Unauthorized' }, { status: 401 });
@@ -57,8 +64,49 @@ export async function POST(request: NextRequest) {
         : null;
     const effectiveSeatLimit = teamSub ? teamSub.seatLimit : invite.team.seatLimit;
 
-    const seatsUsed = await countTeamSeatsUsed(invite.teamId);
-    if (seatsUsed >= effectiveSeatLimit) {
+    // The seat-limit guard and the member insert MUST be atomic. A plain
+    // count()-then-insert() is a TOCTOU race: two concurrent acceptances on the
+    // last free seat both read the same count, both pass the guard, and both
+    // insert — putting member rows past the paid seat limit (the sibling
+    // count-then-create in the quiz-attempt route hit the same class of bug).
+    // SERIALIZABLE isolation makes Postgres detect the read/write conflict and
+    // abort all but one racer (retried by runSerializable), so the (seatLimit+1)th
+    // concurrent acceptance is rejected here with the same 409 + seat-expansion
+    // path the non-concurrent over-limit case returns. The invite is consumed in
+    // the same transaction, so it is only marked accepted when the member is
+    // actually seated. An already-seated member (idempotent re-accept) does not
+    // consume a fresh seat.
+    const result = await runSerializable(async (tx) => {
+      const existing = await tx.lmsTeamMember.findUnique({
+        where: { teamId_userId: { teamId: invite.teamId, userId: claims.sub } },
+        select: { userId: true },
+      });
+      if (!existing) {
+        const seatsUsed = await tx.lmsTeamMember.count({ where: { teamId: invite.teamId } });
+        if (seatsUsed >= effectiveSeatLimit) {
+          return { seatFull: true as const };
+        }
+      }
+
+      await tx.lmsTeamMember.upsert({
+        where: {
+          teamId_userId: { teamId: invite.teamId, userId: claims.sub },
+        },
+        create: {
+          teamId: invite.teamId,
+          userId: claims.sub,
+          role: invite.role,
+        },
+        update: { role: invite.role },
+      });
+      await tx.lmsTeamInvite.update({
+        where: { id: invite.id },
+        data: { acceptedAt: new Date() },
+      });
+      return { seatFull: false as const };
+    });
+
+    if (result.seatFull) {
       return NextResponse.json(
         teamSub
           ? {
@@ -69,24 +117,6 @@ export async function POST(request: NextRequest) {
         { status: 409 },
       );
     }
-
-    await prisma.$transaction([
-      prisma.lmsTeamMember.upsert({
-        where: {
-          teamId_userId: { teamId: invite.teamId, userId: claims.sub },
-        },
-        create: {
-          teamId: invite.teamId,
-          userId: claims.sub,
-          role: invite.role,
-        },
-        update: { role: invite.role },
-      }),
-      prisma.lmsTeamInvite.update({
-        where: { id: invite.id },
-        data: { acceptedAt: new Date() },
-      }),
-    ]);
 
     try {
       await enrollTeamMemberInPurchasedCourse(claims.sub, invite.teamId);
