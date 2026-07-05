@@ -212,9 +212,8 @@ export default function PrivacyPage() {
           Privacy Officer:{' '}
           <Link href="/contact" className={marketingLink}>
             CARSI contact page
-          </Link>
-          <br />
-          Phone: 1300 434 287
+          </Link>{' '}
+          (or ask Margot, our online assistant, bottom-right of every page)
           <br />
           Address: Sydney, NSW, Australia
         </address>

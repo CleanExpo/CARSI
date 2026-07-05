@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import Link from 'next/link';
-import { ArrowUpRight, Mail, MapPin, Phone } from 'lucide-react';
+import { ArrowUpRight, Mail, MapPin, MessageCircle } from 'lucide-react';
 
 import {
   PUBLIC_CHROME_FOOTER_CLASS,
@@ -209,14 +209,11 @@ export function PublicFooter() {
                   <span>Contact CARSI support</span>
                 </a>
               </li>
-              <li>
-                <a
-                  href="tel:+61457123005"
-                  className="group inline-flex items-center gap-3 text-white/62 transition-colors hover:text-white"
-                >
-                  <Phone className="h-4 w-4 shrink-0 text-[#7ec5ff]/70" aria-hidden />
-                  <span>0457 123 005</span>
-                </a>
+              <li className="flex gap-3">
+                <MessageCircle className="mt-0.5 h-4 w-4 shrink-0 text-[#7ec5ff]/70" aria-hidden />
+                <span className="leading-relaxed">
+                  Ask Margot, our online assistant — bottom-right of every page
+                </span>
               </li>
             </ul>
 

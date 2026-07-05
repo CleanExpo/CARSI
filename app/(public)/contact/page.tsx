@@ -98,13 +98,21 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
                   <p className="mb-1 font-semibold tracking-wide text-slate-700 uppercase">Email</p>
                   <p>Use the form and CARSI support will reply by email.</p>
                 </div>
-                <div>
-                  <p className="mb-1 font-semibold tracking-wide text-slate-700 uppercase">Phone</p>
-                  <a href="tel:+61457123005" className="font-semibold text-[#146fc2] hover:text-[#0f5fa8]">
-                    0457 123 005
-                  </a>
-                </div>
               </div>
+            </div>
+
+            <div className="rounded-xl border border-[#b8dbfb] bg-[#eef7ff] p-5">
+              <p className="text-[10px] font-semibold tracking-wide text-[#146fc2] uppercase">
+                Fastest answer
+              </p>
+              <h2 className="mt-2 text-sm font-semibold text-slate-950">Ask Margot</h2>
+              <p className="mt-2 text-xs leading-relaxed text-slate-600">
+                Have a question? Ask Margot, our online assistant — she answers instantly on the
+                bottom-right of every page. Look for the{' '}
+                <span className="font-semibold text-[#146fc2]">Ask Margot</span> button in the corner
+                to start a chat. Prefer to write? The form is here as your fallback and CARSI support
+                will reply by email.
+              </p>
             </div>
 
             <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">

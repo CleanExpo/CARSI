@@ -136,9 +136,8 @@ export default function TermsPage() {
         <address className="mt-2 not-italic">
           <strong className={marketingTextStrong}>CARSI Pty Ltd</strong>
           <br />
-          Support: use the CARSI contact page
-          <br />
-          Phone: 1300 434 287
+          Support: use the CARSI contact page, or ask Margot, our online assistant (bottom-right of
+          every page)
         </address>
       </section>
     </LegalDocumentShell>

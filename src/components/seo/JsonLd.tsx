@@ -34,7 +34,6 @@ export function OrganizationSchema({
     image: `${url}/og-image.png`,
     description:
       "Australia's leading online training platform for disaster restoration professionals. IICRC-aligned CEC courses in water, fire, and carpet restoration delivered to students Australia-wide.",
-    telephone: '+61457123005',
     email: 'support@carsi.com.au',
     // SAB: postal address only — no street address exposed publicly
     address: {
@@ -102,11 +101,11 @@ export function OrganizationSchema({
     founder: buildFounderPersonSchema(),
     contactPoint: {
       '@type': 'ContactPoint',
-      telephone: '+61457123005',
+      contactType: 'customer support',
       email: 'support@carsi.com.au',
-      contactType: 'customer service',
+      url: 'https://carsi.com.au/contact',
       areaServed: 'AU',
-      availableLanguage: 'en-AU',
+      availableLanguage: 'en',
     },
   };
 
