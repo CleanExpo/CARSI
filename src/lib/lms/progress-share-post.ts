@@ -14,6 +14,15 @@ export type ProgressShareDraft = {
   copyText: string;
 };
 
+/** Define supported social platforms for content variants */
+export type SocialPlatform = 'linkedin' | 'twitter' | 'generic';
+
+/** Extended draft with platform-specific metadata */
+export interface ProgressSharePlatformDraft extends ProgressShareDraft {
+  platform: SocialPlatform;
+  charCount: number;
+}
+
 /** Official site for CTAs in shared posts (organic traffic). */
 export const CARSI_SITE_URL = 'https://carsi.com.au/';
 
@@ -56,6 +65,32 @@ function closingCta(): string {
   return (
     `If you want to explore courses, resources, or your next step in restoration and cleaning training, start here:\n👉 ${CARSI_SITE_URL}`
   );
+}
+
+/**
+ * Truncates a string to a maximum character limit, preserving word and sentence boundaries.
+ * Appends '…' if truncated.
+ * @param text - the text to truncate
+ * @param limit - maximum character count (e.g., 280 for Twitter)
+ * @returns truncated string
+ */
+function truncateToCharLimit(text: string, limit: number): string {
+  if (text.length <= limit) return text;
+  
+  // Try to break at sentence end first
+  const sentenceEnd = text.lastIndexOf('.', limit);
+  if (sentenceEnd > limit - 20 && sentenceEnd > 0) {
+    return text.slice(0, sentenceEnd + 1).trim() + '…';
+  }
+  
+  // Then break at word boundary
+  const wordBreak = text.lastIndexOf(' ', limit);
+  if (wordBreak > 0) {
+    return text.slice(0, wordBreak).trim() + '…';
+  }
+  
+  // Fallback: truncate at exact limit
+  return text.slice(0, limit).trim() + '…';
 }
 
 export function buildProgressShareDraft(payload: ProgressSharePayload): ProgressShareDraft {
@@ -115,5 +150,44 @@ export function buildProgressShareDraft(payload: ProgressSharePayload): Progress
     subtitle:
       'Professional, readable, and built for engagement—ends with a clear next step on carsi.com.au.',
     copyText,
+  };
+}
+
+/**
+ * Generates platform-specific drafts for LinkedIn, Twitter, and generic (original) output.
+ * This preserves legacy behavior (generic) while enabling platform-tailored variants.
+ * All variants reuse the core copy logic via buildProgressShareDraft.
+ */
+export function buildPlatformDrafts(payload: ProgressSharePayload): Record<SocialPlatform, ProgressSharePlatformDraft> {
+  // Re-use the existing generic draft
+  const genericDraft = buildProgressShareDraft(payload);
+  
+  // Build LinkedIn variant: professional tone, no truncation
+  const linkedinDraft: ProgressSharePlatformDraft = {
+    ...genericDraft,
+    platform: 'linkedin',
+    charCount: genericDraft.copyText.length,
+  };
+  
+  // Build Twitter variant: truncated to 280 chars
+  const twitterCopyText = truncateToCharLimit(genericDraft.copyText, 280);
+  const twitterDraft: ProgressSharePlatformDraft = {
+    ...genericDraft,
+    platform: 'twitter',
+    copyText: twitterCopyText,
+    charCount: twitterCopyText.length,
+  };
+  
+  // Build generic variant: explicit marker for compatibility
+  const genericWithPlatform: ProgressSharePlatformDraft = {
+    ...genericDraft,
+    platform: 'generic',
+    charCount: genericDraft.copyText.length,
+  };
+  
+  return {
+    linkedin: linkedinDraft,
+    twitter: twitterDraft,
+    generic: genericWithPlatform,
   };
 }
