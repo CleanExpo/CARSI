@@ -5,6 +5,7 @@ import {
   BarChart3,
   BookOpen,
   CalendarDays,
+  ClipboardCheck,
   LogOut,
   Mail,
   Percent,
@@ -62,6 +63,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const analyticsActive = pathname.startsWith('/admin/analytics');
   const yearlyMembershipActive = pathname.startsWith('/admin/yearly-membership');
   const iicrcCecActive = pathname.startsWith('/admin/iicrc-cec');
+  const assessmentsActive = pathname.startsWith('/admin/practical-assessments');
   const ccwRoadshowActive = pathname.startsWith('/admin/ccw-roadshow');
 
   async function handleSignOut() {
@@ -110,6 +112,12 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             label="IICRC CEC"
             icon={Send}
             active={iicrcCecActive}
+          />
+          <NavButton
+            href="/admin/practical-assessments"
+            label="Assessments"
+            icon={ClipboardCheck}
+            active={assessmentsActive}
           />
           <NavButton href="/admin/contacts" label="Contacts" icon={Mail} active={contactsActive} />
           <NavButton
