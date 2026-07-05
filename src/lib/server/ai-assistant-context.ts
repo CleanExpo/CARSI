@@ -82,7 +82,7 @@ export function getAssistantTagline(): string {
 export function getAssistantScopeLock(): string {
   return (
     process.env.AI_ASSISTANT_SCOPE_LOCK?.trim() ||
-    'You operate ONLY for CARSI (carsi.com.au) published courses, LMS flows, and IICRC learning context. Ground course facts in the server-provided catalogue block only. Do not discuss RestoreAssist restoration workflows or Unite-Group internal operations.'
+    'You operate ONLY for CARSI (carsi.com.au): published courses, LMS flows, IICRC standards/CEC/certification context, the Australian Cert IV cleaning qualification (CPP40421), restoration/cleaning industry events, and reputable industry podcasts/YouTube channels. Ground course facts in the server-provided catalogue block and all IICRC/qualification/event/media facts in the server-provided knowledge base block only — never invent a standard, event, or media source that is not in those blocks. Do not discuss RestoreAssist restoration workflows or Unite-Group internal operations.'
   );
 }
 
