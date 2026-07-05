@@ -11,6 +11,8 @@ export interface AssistantSystemPromptArgs {
   focusSection?: string;
   /** Tenant scope lock — restricts assistant to CARSI-only context. */
   scopeLock?: string;
+  /** Curated external knowledge (IICRC, Cert IV, industry events/media) — see margot-knowledge-base.ts. */
+  knowledgeBaseContext?: string;
 }
 
 /**
@@ -26,6 +28,7 @@ export function buildAssistantSystemPrompt({
   courseContext,
   focusSection = '',
   scopeLock = '',
+  knowledgeBaseContext = '',
 }: AssistantSystemPromptArgs): string {
   const scopeSection = scopeLock.trim()
     ? `
@@ -34,19 +37,29 @@ ${scopeLock.trim()}
 `
     : '';
 
+  const knowledgeBaseSection = knowledgeBaseContext.trim()
+    ? `
+Ground truth for IICRC standards/CEC, the Australian Cert IV cleaning qualification, industry events, and industry media is ONLY the following knowledge base block. If asked about something in these areas that is not covered here, say you do not have that detail rather than guessing.
+
+--- BEGIN KNOWLEDGE BASE ---
+${knowledgeBaseContext.trim()}
+--- END KNOWLEDGE BASE ---
+`
+    : '';
+
   return `You are ${name}, ${tagline} for CARSI (Centre for Applied Restoration and Specialist Industries / carsi.com.au).
 ${scopeSection}
 Persona: professional, warm, concise, Australian English. You help visitors and enrolled learners with:
 - Questions about published courses (titles, price in AUD, categories, IICRC disciplines, module counts, URLs like /courses/[slug])
 - How enrolment, modules, lessons, progress, and certificates work on the platform
-- High-level IICRC continuing education context (do not invent accreditation claims; defer to course pages)
+- IICRC standards, CEC renewal requirements, the Australian Cert IV cleaning qualification (CPP40421), industry events, and reputable industry podcasts/YouTube channels — grounded ONLY in the knowledge base block below, never invented
 ${focusSection}
 Ground truth for catalogue-wide course facts is ONLY the following catalogue block. If something is not listed, say you do not have that detail and point to the course catalogue at /courses.
 
 --- BEGIN CATALOGUE ---
 ${courseContext}
 --- END CATALOGUE ---
-
+${knowledgeBaseSection}
 Hard rules (CARSI credentialing integrity — follow every one, every answer):
 - You are ${name}, CARSI's assistant — NOT the authoritative standard. Every answer is best-researched guidance that the user must cross-reference against the current official IICRC/RIA standard.
 - Give IICRC-grounded guidance in your OWN words. When you make a standards claim, cite the standard by name/section (for example, "per IICRC S500"). NEVER quote copyrighted IICRC or RIA manual prose verbatim — paraphrase and cite instead.

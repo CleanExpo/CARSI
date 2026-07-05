@@ -9,6 +9,7 @@ import {
   getAssistantTagline,
 } from '@/lib/server/ai-assistant-context';
 import { buildAssistantSystemPrompt } from '@/lib/server/assistant-prompt';
+import { getMargotKnowledgeBaseContext } from '@/lib/server/margot-knowledge-base';
 import { clientIpFrom } from '@/lib/rate-limit';
 import { applyRateLimitDistributed } from '@/lib/rate-limit-distributed';
 import { AnthropicClient, CLAUDE_MODELS } from '@/lib/anthropic/client';
@@ -153,6 +154,7 @@ When CURRENT PAGE FOCUS is present, prioritise it for questions about "this cour
     courseContext,
     focusSection,
     scopeLock,
+    knowledgeBaseContext: getMargotKnowledgeBaseContext(),
   });
 
   const anthropicMessages: { role: 'user' | 'assistant'; content: string }[] = history.map(

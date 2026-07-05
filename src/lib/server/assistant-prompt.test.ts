@@ -53,4 +53,18 @@ describe('buildAssistantSystemPrompt', () => {
     expect(prompt).toContain('PROJECT SCOPE (mandatory):');
     expect(prompt).toContain('CARSI-only scope marker');
   });
+
+  it('omits the knowledge base block when not provided', () => {
+    expect(buildAssistantSystemPrompt(base)).not.toContain('BEGIN KNOWLEDGE BASE');
+  });
+
+  it('embeds the knowledge base block, after the catalogue, when provided', () => {
+    const prompt = buildAssistantSystemPrompt({
+      ...base,
+      knowledgeBaseContext: 'IICRC_KB_MARKER',
+    });
+    expect(prompt).toContain('BEGIN KNOWLEDGE BASE');
+    expect(prompt).toContain('IICRC_KB_MARKER');
+    expect(prompt.indexOf('END CATALOGUE')).toBeLessThan(prompt.indexOf('BEGIN KNOWLEDGE BASE'));
+  });
 });
