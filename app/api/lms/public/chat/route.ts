@@ -12,13 +12,13 @@ import { buildAssistantSystemPrompt } from '@/lib/server/assistant-prompt';
 import { getMargotKnowledgeBaseContext } from '@/lib/server/margot-knowledge-base';
 import { clientIpFrom } from '@/lib/rate-limit';
 import { applyRateLimitDistributed } from '@/lib/rate-limit-distributed';
-import { AnthropicClient, CLAUDE_MODELS } from '@/lib/anthropic/client';
+import { DEFAULT_OPENROUTER_MODEL, OpenRouterClient } from '@/lib/openrouter/client';
 
-const MODEL = CLAUDE_MODELS.HAIKU_4_5;
+const MODEL = process.env.OPENROUTER_MODEL?.trim() || DEFAULT_OPENROUTER_MODEL;
 
-// Public (unauthenticated) endpoint that spends on Anthropic — cap per IP so a
+// Public (unauthenticated) endpoint that spends on OpenRouter — cap per IP so a
 // bot can't drive unbounded model cost. Best-effort (in-process) limiter.
-// Public, unauthenticated, spends on Anthropic — cap per IP per minute AND per day so
+// Public, unauthenticated, spends on OpenRouter — cap per IP per minute AND per day so
 // a bot can't drive unbounded model cost (issue #131): 5/min/IP + 100/day/IP.
 const CHAT_RATE_LIMIT = 5;
 const CHAT_RATE_WINDOW_MS = 60_000;
@@ -53,12 +53,12 @@ function trimHistory(history: ChatTurn[] | undefined): ChatTurn[] {
 }
 
 export async function POST(request: NextRequest) {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) {
     return NextResponse.json(
       {
         detail:
-          'Chat assistant is not configured. Ask your administrator to set ANTHROPIC_API_KEY in the environment.',
+          'Chat assistant is not configured. Ask your administrator to set OPENROUTER_API_KEY in the environment.',
       },
       { status: 503 }
     );
@@ -157,22 +157,25 @@ When CURRENT PAGE FOCUS is present, prioritise it for questions about "this cour
     knowledgeBaseContext: getMargotKnowledgeBaseContext(),
   });
 
-  const anthropicMessages: { role: 'user' | 'assistant'; content: string }[] = history.map(
+  const conversationMessages: { role: 'user' | 'assistant'; content: string }[] = history.map(
     (h) => ({ role: h.role, content: h.content })
   );
-  anthropicMessages.push({ role: 'user', content: message });
+  conversationMessages.push({ role: 'user', content: message });
 
   try {
-    const client = new AnthropicClient({ apiKey });
-    const response = await client.messages({
+    const client = new OpenRouterClient({
+      apiKey,
+      referer: 'https://carsi.com.au',
+      appTitle: 'CARSI Margot',
+    });
+    const response = await client.chat({
       model: MODEL,
       max_tokens: 900,
-      system: systemContent,
-      messages: anthropicMessages,
+      messages: [{ role: 'system', content: systemContent }, ...conversationMessages],
     });
 
     const reply =
-      AnthropicClient.extractText(response).trim() ||
+      OpenRouterClient.extractText(response).trim() ||
       "I'm not sure how to answer that right now. Please try rephrasing your question.";
 
     return NextResponse.json({

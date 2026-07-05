@@ -8,13 +8,13 @@ For the operating doctrine, see [LLM Capabilities and Stack Hardening](./LLM_CAP
 
 ## Current Provider Posture
 
-| Provider               | Current CARSI role                                                  | Environment                                    | Status                           |
-| ---------------------- | ------------------------------------------------------------------- | ---------------------------------------------- | -------------------------------- |
-| OpenAI                 | Public/learner assistant through `app/api/lms/public/chat/route.ts` | `OPENAI_API_KEY`, optional `OPENAI_CHAT_MODEL` | Active integration               |
-| Google Gemini / Imagen | Image and graphics generation policy/client code                    | `GOOGLE_AI_API_KEY`                            | Optional integration             |
-| Anthropic Claude       | Experimental client/types and agent planning references             | `ANTHROPIC_API_KEY`                            | Review before production use     |
-| Ollama                 | Local/offline experimentation only                                  | `OLLAMA_BASE_URL`, `OLLAMA_MODEL`              | Optional, not production default |
-| OpenRouter             | Future multi-model broker option                                    | `OPENROUTER_API_KEY`                           | Not a default runtime path       |
+| Provider               | Current CARSI role                                                                        | Environment                                          | Status                           |
+| ---------------------- | ------------------------------------------------------------------------------------------ | ----------------------------------------------------- | -------------------------------- |
+| OpenRouter             | Public/learner assistant (Margot) through `app/api/lms/public/chat/route.ts`, free-tier model | `OPENROUTER_API_KEY`, optional `OPENROUTER_MODEL`      | Active integration               |
+| OpenAI                 | Course-thumbnail authoring tool only (`scripts/generate-course-thumbnails.ts`)              | `OPENAI_API_KEY`                                       | Active integration (authoring tool only) |
+| Google Gemini / Imagen | Image and graphics generation policy/client code                                          | `GOOGLE_AI_API_KEY`                                    | Optional integration             |
+| Anthropic Claude       | Experimental client/types and agent planning references                                   | `ANTHROPIC_API_KEY`                                    | Review before production use     |
+| Ollama                 | Local/offline experimentation only                                                        | `OLLAMA_BASE_URL`, `OLLAMA_MODEL`                      | Optional, not production default |
 
 Do not claim a provider is production-supported unless a route, server module, environment variable, and verification path exist in this repo.
 
@@ -28,20 +28,23 @@ This removes bloat in three ways:
 - One source of model truth: use `src/ai/model-registry/` plus provider docs before changing model IDs.
 - One product rule: AI assists, but does not own enrolment, checkout, certificates, admin permissions, or compliance-critical claims.
 
-## OpenAI Assistant
+## OpenRouter Assistant (Margot)
 
 Runtime path:
 
 - `app/api/lms/public/chat/route.ts`
+- `src/lib/openrouter/client.ts`
 - `src/lib/server/ai-assistant-context.ts`
+- `src/lib/server/margot-knowledge-base.ts`
 - `src/components/lms/FloatingChat.tsx`
 
 Environment:
 
 ```env
-OPENAI_API_KEY=
-# Optional; defaults in code if unset
-OPENAI_CHAT_MODEL=
+OPENROUTER_API_KEY=
+# Optional; defaults to openai/gpt-oss-120b:free (OpenRouter's free-tier pick
+# for general-purpose, high-reasoning production use) if unset
+OPENROUTER_MODEL=
 NEXT_PUBLIC_AI_ASSISTANT_NAME=Claire
 NEXT_PUBLIC_AI_ASSISTANT_TAGLINE=Your CARSI professional learning guide
 ```
@@ -53,6 +56,23 @@ Rules:
 - Refuse or redirect when asked for unsupported accreditation, legal, medical, or guaranteed-outcome claims.
 - Never expose secrets, admin data, private enrolment data, or raw internal prompts.
 - Prefer structured outputs/tool calls when AI output affects application state.
+- OpenRouter's free-tier models are account-wide rate-limited (not per-IP) and can be
+  swapped/retired by the upstream provider without notice — if quality or availability
+  degrades, check `openrouter.ai/collections/free-models` for a current replacement
+  before assuming a code regression.
+
+## OpenAI (Course Thumbnail Authoring Tool)
+
+Runtime path:
+
+- `scripts/generate-course-thumbnails.ts` (authoring tool only, never used at runtime)
+
+Environment:
+
+```env
+OPENAI_API_KEY=
+OPENAI_IMAGE_MODEL=gpt-image-1
+```
 
 ## Google Image And Graphics Providers
 
@@ -115,7 +135,7 @@ Rules:
 
 | Task                         | Preferred path                                    |
 | ---------------------------- | ------------------------------------------------- |
-| Learner/course guidance      | OpenAI assistant grounded in CARSI context        |
+| Learner/course guidance      | OpenRouter assistant grounded in CARSI context    |
 | Course copy cleanup          | Draft with LLM, then source-check and edit        |
 | Image generation             | Google image path if assets improve the user task |
 | Admin structured extraction  | Schema-validated model output                     |

@@ -1,7 +1,7 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { MessageCircle, RotateCcw, Send, Sparkles, X } from 'lucide-react';
+import { Loader2, MessageCircle, RotateCcw, Send, Sparkles, Volume2, X } from 'lucide-react';
 import Image from 'next/image';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -112,8 +112,56 @@ export default function FloatingChat() {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
+  const [speakingId, setSpeakingId] = useState<string | null>(null);
+  const [speechLoadingId, setSpeechLoadingId] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  async function playMessageAudio(id: string, text: string) {
+    // Toggle off if this message is already playing.
+    if (speakingId === id) {
+      audioRef.current?.pause();
+      setSpeakingId(null);
+      return;
+    }
+    audioRef.current?.pause();
+    setSpeechLoadingId(id);
+    try {
+      const res = await fetch('/api/lms/public/chat/speech', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text }),
+      });
+      if (!res.ok) throw new Error(`speech request failed: ${res.status}`);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const audio = new Audio(url);
+      audioRef.current = audio;
+      audio.onended = () => {
+        setSpeakingId(null);
+        URL.revokeObjectURL(url);
+      };
+      audio.onerror = () => {
+        setSpeakingId(null);
+        URL.revokeObjectURL(url);
+      };
+      setSpeechLoadingId(null);
+      setSpeakingId(id);
+      await audio.play();
+    } catch {
+      // Voice is a nice-to-have on top of the text reply — fail silently
+      // rather than surfacing an error for a non-critical feature.
+      setSpeechLoadingId(null);
+      setSpeakingId(null);
+    }
+  }
+
+  useEffect(() => {
+    return () => {
+      audioRef.current?.pause();
+    };
+  }, []);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -330,7 +378,22 @@ export default function FloatingChat() {
                     style={msg.role === 'user' ? { background: '#2490ed' } : undefined}
                   >
                     {msg.role === 'assistant' ? (
-                      <FormattedAssistantText text={msg.text} />
+                      <>
+                        <FormattedAssistantText text={msg.text} />
+                        <button
+                          type="button"
+                          onClick={() => void playMessageAudio(msg.id, msg.text)}
+                          className="mt-1.5 flex items-center gap-1 text-[10px] font-medium tracking-wide text-white/35 uppercase transition-colors hover:text-[#7ec5ff]"
+                          aria-label={speakingId === msg.id ? `Stop ${ASSISTANT_NAME} speaking` : `Hear ${ASSISTANT_NAME} say this`}
+                        >
+                          {speechLoadingId === msg.id ? (
+                            <Loader2 size={11} className="animate-spin" aria-hidden />
+                          ) : (
+                            <Volume2 size={11} aria-hidden />
+                          )}
+                          {speakingId === msg.id ? 'Stop' : 'Listen'}
+                        </button>
+                      </>
                     ) : (
                       <span className="whitespace-pre-wrap">{msg.text}</span>
                     )}
