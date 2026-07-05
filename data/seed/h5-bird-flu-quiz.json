@@ -1,0 +1,137 @@
+{
+  "version": 1,
+  "status": "DRAFT — NOT SEEDED — SME/FOUNDER SIGN-OFF REQUIRED BEFORE PUBLISH (GP-456)",
+  "courseSlug": "avian-influenza-awareness-restoration-iaq-facilities",
+  "note": "Knowledge-check quiz for the Australian H5 Bird Flu Awareness course, transcribed verbatim from docs/campaigns/avian-influenza/course/quiz-bank.md. attemptsAllowed uses 999 as a practical stand-in for the 'unlimited retakes' rule specified in lms-import-plan.md — the schema (LmsQuiz.attemptsAllowed) has no unlimited sentinel; raise if a true unlimited flag is added later. Official-source currency for the reporting message (hotline number, low public-risk framing, migratory-seabird-only detections) was re-verified live against DAFF/Australian CDC/Animal Health Australia on 2026-07-05 — no content changes required. Do not run the seed script until founder/SME content sign-off is recorded on GP-456.",
+  "quizzes": [
+    {
+      "quizId": "caa45e76-f500-424f-a056-c9ab1b4e6d98",
+      "lessonTitle": "Knowledge check",
+      "title": "Australian H5 Bird Flu Awareness — Knowledge Check",
+      "passPercentage": 80,
+      "attemptsAllowed": 999,
+      "questions": [
+        {
+          "questionText": "A member of the public reports a dead bird near a public walkway. What is the first approved message?",
+          "options": [
+            "Bag the bird and bring it to the office.",
+            "Do not touch it, avoid the area, record the location and call 1800 675 888.",
+            "Spray the area immediately and post online.",
+            "Tell the client the site has bird flu."
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "docs/campaigns/avian-influenza/course/quiz-bank.md Q1; hotline re-verified live 2026-07-05"
+        },
+        {
+          "questionText": "What is the professional restoration role in this campaign?",
+          "options": [
+            "Diagnose avian influenza.",
+            "Replace government biosecurity teams.",
+            "Support documentation, worker safety planning, cleaning records and client communication within scope.",
+            "Certify infected premises as disease-free."
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "sourceRef": "docs/campaigns/avian-influenza/course/quiz-bank.md Q2"
+        },
+        {
+          "questionText": "Which statement is acceptable?",
+          "options": [
+            "Dry fogging is required by the Australian Government for H5 bird flu.",
+            "Halosil kills Australian H5 in all field conditions.",
+            "Product use must follow label, SDS, regulator position, evidence and authority directions.",
+            "NeoSan is approved for every avian influenza job without review."
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "sourceRef": "docs/campaigns/avian-influenza/course/quiz-bank.md Q3"
+        },
+        {
+          "questionText": "What should the field record show?",
+          "options": [
+            "Only the invoice.",
+            "Only the technician's memory of the job.",
+            "Observations, reporting pathway, photos, worker attendance, PPE record, cleaning record, limitations and client communication.",
+            "A disease-free certificate."
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "sourceRef": "docs/campaigns/avian-influenza/course/quiz-bank.md Q4"
+        },
+        {
+          "questionText": "Which phrase best represents the CARSI communication position?",
+          "options": [
+            "Panic now, sell later.",
+            "Report first, protect workers, clean before disinfecting and document clearly.",
+            "Make strong product claims to stand out.",
+            "Avoid official sources."
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "docs/campaigns/avian-influenza/course/quiz-bank.md Q5"
+        },
+        {
+          "questionText": "What should a professional do if asked to remove a sick or dead wild bird?",
+          "options": [
+            "Accept immediately.",
+            "Ask the client to move it first.",
+            "Confirm authority direction and stay within training, authorisation and scope.",
+            "Use any available PPE and remove it."
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "sourceRef": "docs/campaigns/avian-influenza/course/quiz-bank.md Q6"
+        },
+        {
+          "questionText": "Why should panic language be avoided?",
+          "options": [
+            "It improves trust.",
+            "It reduces the need for sources.",
+            "It can mislead the public and damage credibility.",
+            "It guarantees rankings."
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "sourceRef": "docs/campaigns/avian-influenza/course/quiz-bank.md Q7"
+        },
+        {
+          "questionText": "Which contact block is approved for this campaign draft?",
+          "options": [
+            "Ivi Sims with an unverified direct email.",
+            "Ivi Sims with a fake portrait.",
+            "Ivi Sims, 1300 654 684, LinkedIn profile and CARSI contact pathway.",
+            "No contact details at all."
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "sourceRef": "docs/campaigns/avian-influenza/course/quiz-bank.md Q8"
+        },
+        {
+          "questionText": "What is the role of RestoreAssist.app in the course?",
+          "options": [
+            "Diagnose disease.",
+            "Replace government reporting.",
+            "Provide structured field documentation for photos, notes, PPE records, cleaning records and limitations.",
+            "Certify regulatory compliance automatically."
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "sourceRef": "docs/campaigns/avian-influenza/course/quiz-bank.md Q9"
+        },
+        {
+          "questionText": "Which source layer should be checked before publishing updated course content?",
+          "options": [
+            "Social comments only.",
+            "Australian Government, Australian CDC, Animal Health Australia and relevant state/territory guidance.",
+            "A contractor's opinion.",
+            "Product marketing only."
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "docs/campaigns/avian-influenza/course/quiz-bank.md Q10"
+        }
+      ]
+    }
+  ]
+}
