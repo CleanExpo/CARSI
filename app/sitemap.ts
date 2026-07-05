@@ -23,6 +23,7 @@ const STATIC_LASTMOD = new Date();
 const staticPages = [
   { path: '/', priority: 1.0, changeFreq: 'weekly' as const },
   { path: '/courses', priority: 0.9, changeFreq: 'daily' as const },
+  { path: '/avian-influenza-readiness', priority: 0.92, changeFreq: 'daily' as const },
   { path: '/pathways', priority: 0.8, changeFreq: 'weekly' as const },
   { path: '/industries', priority: 0.8, changeFreq: 'monthly' as const },
   { path: '/ccw-training', priority: 0.78, changeFreq: 'weekly' as const },
