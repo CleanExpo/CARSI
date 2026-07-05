@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+import { isLmsClaimsAllowedAdminPanel } from '@/lib/admin/admin-panel-access';
 import { parseOnboardingMeta, isOnboardingCourse } from '@/lib/onboarding/enterprise';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
+import { ensureAdminEnrollmentForCourse } from '@/lib/server/enrollment-service';
 import { prisma } from '@/lib/prisma';
 import { getUpstreamBaseUrl } from '@/lib/server/upstream-api';
 
@@ -54,11 +56,20 @@ export async function GET(request: NextRequest, ctx: Ctx) {
     return NextResponse.json({ detail: 'Course not found' }, { status: 404 });
   }
 
-  const enrollment = await prisma.lmsEnrollment.findUnique({
+  let enrollment = await prisma.lmsEnrollment.findUnique({
     where: {
       studentId_courseId: { studentId: claims.sub, courseId: course.id },
     },
   });
+
+  if (!enrollment && isLmsClaimsAllowedAdminPanel(claims)) {
+    await ensureAdminEnrollmentForCourse(claims, course.id);
+    enrollment = await prisma.lmsEnrollment.findUnique({
+      where: {
+        studentId_courseId: { studentId: claims.sub, courseId: course.id },
+      },
+    });
+  }
 
   if (!enrollment) {
     return NextResponse.json({ detail: 'Not enrolled in this course' }, { status: 403 });
