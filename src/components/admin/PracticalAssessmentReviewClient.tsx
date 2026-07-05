@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 
 type QueueItem = {
@@ -155,12 +156,20 @@ export function PracticalAssessmentReviewClient() {
             Grade student practical-assessment submissions against their rubric.
           </p>
         </div>
-        <button
-          onClick={() => void loadQueue()}
-          className="rounded-lg border border-white/15 px-3 py-1.5 text-xs font-medium text-white/70 hover:border-white/30"
-        >
-          Refresh
-        </button>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/admin/practical-assessments/manage"
+            className="rounded-lg border border-white/15 px-3 py-1.5 text-xs font-medium text-white/70 hover:border-white/30"
+          >
+            Manage assessments
+          </Link>
+          <button
+            onClick={() => void loadQueue()}
+            className="rounded-lg border border-white/15 px-3 py-1.5 text-xs font-medium text-white/70 hover:border-white/30"
+          >
+            Refresh
+          </button>
+        </div>
       </div>
 
       {flash && (

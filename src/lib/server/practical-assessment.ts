@@ -282,3 +282,162 @@ export async function getPublishedAssessment(assessmentId: string) {
     })),
   };
 }
+
+// ---------------------------------------------------------------------------
+// Authoring (admin) — create / list / edit / delete assessments + rubrics
+// ---------------------------------------------------------------------------
+
+function clampThreshold(n: number): number {
+  const v = Math.round(Number.isFinite(n) ? n : 70);
+  return Math.max(0, Math.min(100, v));
+}
+
+export type AuthoringInput = {
+  courseId: string;
+  title: string;
+  instructions: string;
+  passThreshold: number;
+  isPublished: boolean;
+  criteria: { label: string; description?: string; maxPoints: number }[];
+};
+
+/** Narrow an untyped request body into AuthoringInput (route helper). */
+export function parseAuthoringInput(raw: unknown): AuthoringInput {
+  const o = (raw ?? {}) as Record<string, unknown>;
+  const criteriaRaw = Array.isArray(o.criteria) ? o.criteria : [];
+  const criteria = criteriaRaw.map((c) => {
+    const x = (c ?? {}) as Record<string, unknown>;
+    return {
+      label: typeof x.label === 'string' ? x.label : '',
+      description: typeof x.description === 'string' ? x.description : '',
+      maxPoints: Number(x.maxPoints ?? 5),
+    };
+  });
+  return {
+    courseId: typeof o.courseId === 'string' ? o.courseId : '',
+    title: typeof o.title === 'string' ? o.title : '',
+    instructions: typeof o.instructions === 'string' ? o.instructions : '',
+    passThreshold: Number(o.passThreshold ?? 70),
+    isPublished: o.isPublished === true,
+    criteria,
+  };
+}
+
+function criteriaCreate(criteria: AuthoringInput['criteria']) {
+  return criteria
+    .filter((c) => c.label.trim())
+    .map((c, i) => ({
+      label: c.label.trim(),
+      description: (c.description ?? '').trim(),
+      maxPoints: Math.max(1, Math.round(c.maxPoints) || 1),
+      orderIndex: i,
+    }));
+}
+
+/** Create a practical assessment + its rubric criteria. */
+export async function createPracticalAssessment(input: AuthoringInput): Promise<{ id: string }> {
+  if (!input.title.trim()) throw new AssessmentError(400, 'Title is required');
+  const course = await prisma.lmsCourse.findUnique({
+    where: { id: input.courseId },
+    select: { id: true },
+  });
+  if (!course) throw new AssessmentError(400, 'A valid course is required');
+  const created = await prisma.lmsPracticalAssessment.create({
+    data: {
+      courseId: input.courseId,
+      title: input.title.trim(),
+      instructions: input.instructions.trim(),
+      passThreshold: clampThreshold(input.passThreshold),
+      isPublished: input.isPublished,
+      criteria: { create: criteriaCreate(input.criteria) },
+    },
+    select: { id: true },
+  });
+  return { id: created.id };
+}
+
+/** All assessments for the admin authoring list. */
+export async function listPracticalAssessments() {
+  const rows = await prisma.lmsPracticalAssessment.findMany({
+    orderBy: { createdAt: 'desc' },
+    include: {
+      course: { select: { title: true } },
+      _count: { select: { criteria: true, submissions: true } },
+    },
+  });
+  return rows.map((r) => ({
+    id: r.id,
+    title: r.title,
+    courseTitle: r.course.title,
+    passThreshold: r.passThreshold,
+    isPublished: r.isPublished,
+    criteriaCount: r._count.criteria,
+    submissionCount: r._count.submissions,
+    createdAt: r.createdAt.toISOString(),
+  }));
+}
+
+/** Course id/title options for the authoring form. */
+export async function listCoursesForPicker() {
+  const rows = await prisma.lmsCourse.findMany({
+    orderBy: { title: 'asc' },
+    select: { id: true, title: true },
+  });
+  return rows.map((r) => ({ id: r.id, title: r.title }));
+}
+
+/** Full assessment (incl. unpublished) for the admin editor. */
+export async function getPracticalAssessmentForAdmin(id: string) {
+  const a = await prisma.lmsPracticalAssessment.findUnique({
+    where: { id },
+    include: { criteria: { orderBy: { orderIndex: 'asc' } } },
+  });
+  if (!a) return null;
+  return {
+    id: a.id,
+    courseId: a.courseId,
+    title: a.title,
+    instructions: a.instructions,
+    passThreshold: a.passThreshold,
+    isPublished: a.isPublished,
+    criteria: a.criteria.map((c) => ({
+      id: c.id,
+      label: c.label,
+      description: c.description,
+      maxPoints: c.maxPoints,
+      orderIndex: c.orderIndex,
+    })),
+  };
+}
+
+/** Update an assessment's fields + replace its rubric criteria. */
+export async function updatePracticalAssessment(id: string, input: AuthoringInput): Promise<void> {
+  if (!input.title.trim()) throw new AssessmentError(400, 'Title is required');
+  await runSerializable(async (tx) => {
+    const existing = await tx.lmsPracticalAssessment.findUnique({
+      where: { id },
+      select: { id: true },
+    });
+    if (!existing) throw new AssessmentError(404, 'Assessment not found');
+    await tx.lmsRubricCriterion.deleteMany({ where: { assessmentId: id } });
+    await tx.lmsPracticalAssessment.update({
+      where: { id },
+      data: {
+        title: input.title.trim(),
+        instructions: input.instructions.trim(),
+        passThreshold: clampThreshold(input.passThreshold),
+        isPublished: input.isPublished,
+        criteria: { create: criteriaCreate(input.criteria) },
+      },
+    });
+  });
+}
+
+/** Delete an assessment (blocked once it has submissions — unpublish instead). */
+export async function deletePracticalAssessment(id: string): Promise<void> {
+  const count = await prisma.lmsAssessmentSubmission.count({ where: { assessmentId: id } });
+  if (count > 0) {
+    throw new AssessmentError(409, 'Cannot delete an assessment with submissions; unpublish it instead');
+  }
+  await prisma.lmsPracticalAssessment.deleteMany({ where: { id } });
+}
