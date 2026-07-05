@@ -3,7 +3,7 @@ import Link from 'next/link'
 
 const pageUrl = 'https://carsi.com.au/avian-influenza-readiness'
 const heroImage =
-  'https://carsi.com.au/images/campaigns/avian-influenza/carsi-bird-flu-infographic-corrected-ivi-contact.svg'
+  'https://carsi.com.au/images/campaigns/avian-influenza/course/public-reporting-process-infographic.png'
 const datePublished = '2026-07-05T09:00:00+10:00'
 const dateModified = '2026-07-05T12:00:00+10:00'
 
@@ -41,7 +41,7 @@ export const metadata: Metadata = {
     url: pageUrl,
     publishedTime: datePublished,
     modifiedTime: dateModified,
-    images: [{ url: heroImage, width: 1600, height: 900, alt: 'CARSI Australian H5 readiness infographic' }],
+    images: [{ url: heroImage, width: 1672, height: 941, alt: 'CARSI Australian H5 public reporting process infographic' }],
   },
   twitter: {
     card: 'summary_large_image',
@@ -163,10 +163,10 @@ const jsonLd = {
       '@type': 'ImageObject',
       '@id': `${pageUrl}#primaryimage`,
       url: heroImage,
-      width: 1600,
-      height: 900,
+      width: 1672,
+      height: 941,
       caption:
-        'CARSI Australian H5 readiness infographic with corrected Ivi Sims contact details and no false portrait.',
+        'CARSI Australian H5 public reporting process infographic.',
     },
     {
       '@type': 'Article',
@@ -372,14 +372,14 @@ export default function AvianInfluenzaReadinessPage() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={heroImage}
-              alt="CARSI Australian H5 bird flu readiness infographic with the corrected Ivi Sims contact details"
-              width={1600}
-              height={900}
+              alt="CARSI Australian H5 public reporting process infographic"
+              width={1672}
+              height={941}
               className="h-auto w-full"
               loading="eager"
             />
             <figcaption className="border-t border-slate-200 px-5 py-3 text-xs text-slate-600">
-              CARSI Australian H5 readiness infographic — corrected Ivi Sims contact details, no false portrait.
+              CARSI Australian H5 public reporting process infographic.
             </figcaption>
           </figure>
         </div>
