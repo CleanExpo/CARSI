@@ -34,7 +34,7 @@ The repo is a Next.js 16 / React 19 / Prisma 7 / PostgreSQL / Stripe LMS. The ac
 
 | Surface                                            | Current role                                                                | Hardening rule                                                                                  |
 | -------------------------------------------------- | --------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| `app/api/lms/public/chat/route.ts`                 | Public and learner assistant using `OPENAI_API_KEY` and `OPENAI_CHAT_MODEL` | Keep answers grounded in CARSI context; no unsupported training, legal, or accreditation claims |
+| `app/api/lms/public/chat/route.ts`                 | Public and learner assistant using `OPENROUTER_API_KEY` and `OPENROUTER_MODEL` | Keep answers grounded in CARSI context; no unsupported training, legal, or accreditation claims |
 | `src/lib/server/ai-assistant-context.ts`           | Course catalogue context for the assistant                                  | Keep snippets compact and source-backed                                                         |
 | `src/ai/model-registry/`                           | Approved model registry and routing intent                                  | Treat model IDs as volatile; verify against provider docs before changing                       |
 | `src/lib/image-generation/` and `src/ai/graphics/` | AI-assisted image/graphic generation policy                                 | Generate assets only when they improve the product, not as decoration                           |

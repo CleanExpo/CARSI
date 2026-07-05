@@ -69,7 +69,7 @@ export function buildCarsiConnectionStatus(
   const stripeReady = envSet("STRIPE_SECRET_KEY", env);
   const stripeWebhookReady = envSet("STRIPE_WEBHOOK_SECRET", env);
   const emailReady = envSet("MAILTRAP_API_KEY", env);
-  const aiChatReady = envSet("OPENAI_API_KEY", env);
+  const aiChatReady = envSet("OPENROUTER_API_KEY", env);
   const turnstileReady = envSet("TURNSTILE_SECRET_KEY", env) && envSet("NEXT_PUBLIC_TURNSTILE_SITE_KEY", env);
   const cloudinaryReady =
     envSet("CLOUDINARY_CLOUD_NAME", env) &&
@@ -126,13 +126,13 @@ export function buildCarsiConnectionStatus(
     },
     {
       id: "ai_chat",
-      label: "AI assistant (OpenAI)",
+      label: "AI assistant (OpenRouter)",
       state: aiChatReady ? "ready" : "blocked",
       safeForMissionControl: true,
       detail: aiChatReady
-        ? "OpenAI key present; the public/dashboard chat assistant can run (billing applies on use)."
-        : "OPENAI_API_KEY is not set — /api/lms/public/chat degrades.",
-      nextAction: aiChatReady ? undefined : "Set OPENAI_API_KEY.",
+        ? "OpenRouter key present; the public/dashboard chat assistant can run (free-tier model, rate-limited)."
+        : "OPENROUTER_API_KEY is not set — /api/lms/public/chat degrades.",
+      nextAction: aiChatReady ? undefined : "Set OPENROUTER_API_KEY.",
     },
     {
       id: "turnstile",
