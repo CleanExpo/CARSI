@@ -4,6 +4,8 @@ import Link from 'next/link'
 const pageUrl = 'https://carsi.com.au/avian-influenza-readiness'
 const heroImage =
   'https://carsi.com.au/images/campaigns/avian-influenza/course/public-reporting-process-infographic.png'
+const heroImageWebp =
+  'https://carsi.com.au/images/campaigns/avian-influenza/course/public-reporting-process-infographic.webp'
 const datePublished = '2026-07-05T09:00:00+10:00'
 const dateModified = '2026-07-05T12:00:00+10:00'
 
@@ -369,15 +371,18 @@ export default function AvianInfluenzaReadinessPage() {
       <section className="border-b border-slate-200 bg-slate-50">
         <div className="mx-auto max-w-6xl px-6 py-12">
           <figure className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={heroImage}
-              alt="CARSI Australian H5 public reporting process infographic"
-              width={1672}
-              height={941}
-              className="h-auto w-full"
-              loading="eager"
-            />
+            <picture>
+              <source srcSet={heroImageWebp} type="image/webp" />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={heroImage}
+                alt="CARSI Australian H5 public reporting process infographic"
+                width={1672}
+                height={941}
+                className="h-auto w-full"
+                loading="eager"
+              />
+            </picture>
             <figcaption className="border-t border-slate-200 px-5 py-3 text-xs text-slate-600">
               CARSI Australian H5 public reporting process infographic.
             </figcaption>
