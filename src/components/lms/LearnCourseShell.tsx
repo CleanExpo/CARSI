@@ -890,6 +890,8 @@ export function LearnCourseShell({ slug }: { slug: string }) {
                         </div>
                       ) : (
                         <p
+                          role="status"
+                          aria-live="polite"
                           className={`mt-6 rounded-lg border px-4 py-3 text-sm ${
                             quizResult.passed
                               ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-800'

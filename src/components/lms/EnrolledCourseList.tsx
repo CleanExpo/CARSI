@@ -66,19 +66,21 @@ export function EnrolledCourseList({ enrollments }: EnrolledCourseListProps) {
 
         return (
           <li key={enr.id}>
+            {/*
+              Card is clickable as a convenience, but must not expose a
+              competing `role="link"`/tabIndex on the whole card: it already
+              contains real <a>/<button> descendants (Continue, Program hub,
+              Certificate) that stop propagation. A card-level interactive
+              role here creates nested-interactive controls, which conflicts
+              with WCAG 4.1.2 (Name, Role, Value) and confuses screen reader
+              and keyboard navigation. Keyboard/AT users reach every action
+              via the real controls inside; the click-to-navigate affordance
+              below is a pointer-only convenience.
+            */}
             <Card
               className={dash.enrollmentCard}
               style={{ cursor: 'pointer' }}
-              role="link"
-              tabIndex={0}
-              aria-label={`Open course: ${enr.course_title}`}
               onClick={() => router.push(openHref)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  router.push(openHref);
-                }
-              }}
             >
               <CardContent className="p-0">
                 <div className="flex flex-col gap-5 p-5 sm:flex-row sm:gap-8 sm:p-6">
