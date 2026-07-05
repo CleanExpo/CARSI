@@ -23,13 +23,26 @@ export async function createUniqueTeamSlug(base: string): Promise<string> {
   return slug;
 }
 
+/**
+ * Container tiers for subscription-backed teams (WS1-E2/E3). These are NOT
+ * per-course pricing tiers — the authoritative seat limit lives on the seat
+ * subscription (E2) or is unlimited (E3), so the team seat_limit starts at 0
+ * and is set by the subscription webhook.
+ */
+export type TeamContainerTier = 'teams_subscription' | 'org_subscription';
+export type TeamBundleTierArg = TeamBundleTierId | TeamContainerTier;
+
 export async function createTeamForOwner(params: {
   ownerId: string;
   name: string;
-  bundleTier: TeamBundleTierId;
+  bundleTier: TeamBundleTierArg;
 }): Promise<{ id: string; slug: string }> {
   const slug = await createUniqueTeamSlug(params.name);
-  const seatLimit = teamSeatLimitForTier(params.bundleTier);
+  // Container tiers derive their seat limit from the subscription, not the tier.
+  const seatLimit =
+    params.bundleTier === 'teams_subscription' || params.bundleTier === 'org_subscription'
+      ? 0
+      : teamSeatLimitForTier(params.bundleTier);
 
   const team = await prisma.lmsTeam.create({
     data: {

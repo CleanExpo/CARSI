@@ -153,3 +153,64 @@ Before go-live, confirm no yearly/Teams subscription was ever charged in the pas
 - The Step D test-mode evidence (subscribe works; test-clock lapse blocks new enrolment; progress + certificate retained; replay = single grant; non-member = 403; **refund/chargeback revokes catalogue access while retaining progress + certificate**).
 - The Step E zero-historical-charges result.
 - The moment `SUBSCRIPTIONS_ENABLED=true` is set live (the membership goes on sale at that instant).
+
+---
+
+# WS1-E2 / E3 — Teams seat plans + Organisation monthly (GP-442 / GP-443)
+
+E2 (Teams seats) and E3 (organisation monthly) ship behind the **same**
+`SUBSCRIPTIONS_ENABLED` flag and the **same** webhook endpoint as E1. Nothing is
+user-visible until (a) the Prices exist, and (b) the flag is on. The webhook
+routes each subscription to the right record by its `plan` metadata, so no new
+webhook or new events are needed — the same five events from Step C cover E2/E3.
+
+## Prices Rana must create (Test mode first, then Live)
+
+| Plan | Product name | Amount | Recurring | Lookup key | Optional env override | Metadata `plan` the app sets at checkout |
+|---|---|---|---|---|---|---|
+| Teams Starter (5 seats) | CARSI Teams Starter | A$299.00 | Yearly | `carsi_teams_starter` | `STRIPE_PRICE_TEAMS_STARTER` | `starter` |
+| Teams Growth (15 seats) | CARSI Teams Growth | A$799.00 | Yearly | `carsi_teams_growth` | `STRIPE_PRICE_TEAMS_GROWTH` | `growth` |
+| Teams Full Library (25 seats) | CARSI Teams Full Library | A$2,499.00 | Yearly | `carsi_teams_full_library` | `STRIPE_PRICE_TEAMS_FULL_LIBRARY` | `full_library` |
+| Organisation monthly (unlimited) | CARSI Organisation Onboarding | A$1,295.00 | **Monthly** | `carsi_org_monthly` | `STRIPE_PRICE_ORG_MONTHLY` | `org_monthly` |
+
+Notes:
+- **Teams seat billing = subscription `quantity`.** Create ONE Price per tier as a
+  per-unit price; the app sets the `quantity` to the tier's included seats
+  (5 / 15 / 25) at checkout. Seat expansion increases the `quantity` with
+  proration — no separate per-seat Price is required. So set each Teams Price as
+  a **standard per-unit** price (e.g. Starter = A$299 ÷ 5 = A$59.80/seat) OR keep
+  it a flat tier price and rely on Stripe's quantity multiplication — confirm the
+  per-seat unit amount with Phill before creating, since it multiplies by seats.
+- **GST**: match E1's decision. E1's A$795 annual is **inclusive**. Confirm with
+  the accountant whether Teams/org Prices are inclusive or use Stripe Tax. The org
+  plan is quoted "$1,295/month **+ GST**" in the plan doc — if that means GST is
+  added on top, set the org Price tax behaviour to **exclusive** + Stripe Tax, or
+  create it as A$1,424.50 inclusive. **This is a founder/accountant decision.**
+- Lookup keys are matched exactly (lower case, underscores). If a key/env is
+  absent, that plan's checkout fails **closed** ("not yet available") — it never
+  charges against a wrong Price.
+
+## Env vars (DigitalOcean App-Level)
+Optional explicit bindings (the app resolves by lookup key without them):
+`STRIPE_PRICE_TEAMS_STARTER`, `STRIPE_PRICE_TEAMS_GROWTH`,
+`STRIPE_PRICE_TEAMS_FULL_LIBRARY`, `STRIPE_PRICE_ORG_MONTHLY`.
+The go/no-go flag is the same `SUBSCRIPTIONS_ENABLED=true`.
+
+## E3 — flip the onboarding course off `isFree` (ops, LAST)
+Once the org Price exists, the flag is on, and at least one org is provisioned
+(or a grace window is agreed), run against the target DB (never in CI):
+`DATABASE_URL="..." npm run db:gate-onboarding-off-free -- --dry-run` then without
+`--dry-run`. Reversible with `-- --revert`. Direct onboarding enrolment is already
+gated to active-org members (402 for everyone else), so this only removes the
+"free" affordance — it never strands an entitled org learner.
+
+## Verify (Test mode), per plan
+- **Teams**: start a Starter checkout → 5 seats provisioned; invite 5 members →
+  all seated; the **6th invite is rejected 409 with a seat-expansion path**;
+  `POST /api/lms/subscription/teams/expand-seats {additional_seats:1}` raises the
+  quantity (proration) → the 6th can then join. Refund → seats revoked.
+- **Org**: start an org checkout with an organisation name → subscription active →
+  a member of that org can enrol in an onboarding-brand course; cancel/refund →
+  new enrolment blocked, existing progress + certificates retained.
+- **No regression**: E1 individual `pro_annual` still behaves exactly as before
+  (routing is by `plan` metadata).

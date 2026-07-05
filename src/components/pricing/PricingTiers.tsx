@@ -1,11 +1,12 @@
 import Link from 'next/link';
 
-import { INDIVIDUAL_TIERS, TEAM_TIERS, type IndividualTier } from '@/lib/lms/pricing-tiers';
+import { INDIVIDUAL_TIERS, TEAM_TIERS, type IndividualTier, type TeamTier } from '@/lib/lms/pricing-tiers';
 
 /**
  * When SUBSCRIPTIONS_ENABLED is on (passed from the server page), the individual
  * `pro_annual` tier becomes purchasable — its coming-soon lock is lifted and the
- * CTA links to /subscribe. Teams tiers stay coming-soon (WS1-E2, not in scope).
+ * CTA links to /subscribe. Teams tiers (WS1-E2, GP-442) likewise become
+ * purchasable — see resolveTeamTiers.
  */
 function resolveIndividualTiers(subscriptionsEnabled: boolean): IndividualTier[] {
   if (!subscriptionsEnabled) return INDIVIDUAL_TIERS;
@@ -14,6 +15,16 @@ function resolveIndividualTiers(subscriptionsEnabled: boolean): IndividualTier[]
       ? { ...tier, comingSoon: false, cta: 'Start membership', href: '/subscribe' }
       : tier,
   );
+}
+
+/**
+ * When the flag is on, lift the Teams coming-soon lock (WS1-E2, GP-442). The CTA
+ * routes owners to the team dashboard where they start the seat subscription
+ * checkout; the full-library tier stays sales-led (contact) as before.
+ */
+function resolveTeamTiers(subscriptionsEnabled: boolean): TeamTier[] {
+  if (!subscriptionsEnabled) return TEAM_TIERS;
+  return TEAM_TIERS.map((tier) => ({ ...tier, comingSoon: false, cta: 'Start Teams plan' }));
 }
 
 export function PricingTiers({ subscriptionsEnabled = false }: { subscriptionsEnabled?: boolean }) {
@@ -75,7 +86,7 @@ export function PricingTiers({ subscriptionsEnabled = false }: { subscriptionsEn
           across your crew.
         </p>
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          {TEAM_TIERS.map((tier) => (
+          {resolveTeamTiers(subscriptionsEnabled).map((tier) => (
             <div
               key={tier.id}
               className="flex flex-col rounded-lg border bg-white p-6 shadow-sm"
@@ -112,7 +123,7 @@ export function PricingTiers({ subscriptionsEnabled = false }: { subscriptionsEn
                   href={
                     tier.id === 'full_library'
                       ? '/contact?subject=teams-full-library'
-                      : `/dashboard/team?create=${tier.id}`
+                      : `/dashboard/team?start=${tier.id}`
                   }
                   className="mt-6 flex min-h-11 w-full items-center justify-center rounded-lg px-4 py-2.5 text-sm font-semibold transition-opacity hover:opacity-90"
                   style={{

@@ -48,9 +48,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Enforce the PAID seat limit for Teams subscription teams (E2, GP-442); the
+    // 6th acceptance on a 5-seat plan is rejected (spec §15 #4). Other teams use
+    // the team.seatLimit column.
+    const teamSub =
+      invite.team.bundleTier === 'teams_subscription'
+        ? await prisma.lmsTeamSubscription.findUnique({ where: { teamId: invite.teamId } })
+        : null;
+    const effectiveSeatLimit = teamSub ? teamSub.seatLimit : invite.team.seatLimit;
+
     const seatsUsed = await countTeamSeatsUsed(invite.teamId);
-    if (seatsUsed >= invite.team.seatLimit) {
-      return NextResponse.json({ detail: 'Team is full' }, { status: 409 });
+    if (seatsUsed >= effectiveSeatLimit) {
+      return NextResponse.json(
+        teamSub
+          ? {
+              detail: 'This team has no seats left. Ask the owner to add seats.',
+              reason: 'seat_full',
+            }
+          : { detail: 'Team is full' },
+        { status: 409 },
+      );
     }
 
     await prisma.$transaction([

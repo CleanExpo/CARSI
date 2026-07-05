@@ -172,3 +172,269 @@ export async function getEntitlements(userId: string): Promise<Entitlements> {
     return NOT_ENTITLED;
   }
 }
+
+/* -------------------------------------------------------------------------- */
+/* WS1-E2 (GP-442) — Teams seat entitlement.                                   */
+/*                                                                            */
+/* A team's seat subscription grants WHOLE-CATALOGUE access to exactly        */
+/* `seatLimit` members while the subscription is active/in-grace. The         */
+/* status→entitled machine is IDENTICAL to the individual membership          */
+/* (`decideMembershipEntitlement`) — it is reused verbatim below, then a       */
+/* per-member SEAT check is layered on top. Both fail closed.                  */
+/* -------------------------------------------------------------------------- */
+
+export interface TeamSeatSubscriptionInput {
+  status: string | null;
+  currentPeriodEnd: Date | null;
+  /** Purchased seat count (= Stripe subscription quantity). */
+  seatLimit: number;
+}
+
+export type TeamSeatReason = MembershipDecisionReason | 'seat_full';
+
+export interface TeamSeatDecision {
+  /** True when the subscription is live (before the per-member seat check). */
+  subscriptionEntitled: boolean;
+  reason: MembershipDecisionReason;
+  seatLimit: number;
+}
+
+/**
+ * PURE decision core for a team seat subscription. Decides ONLY whether the
+ * subscription itself is live (active/grace) — the same rules as the individual
+ * membership. The per-member seat-index check (`memberSeatIndex < seatLimit`) is
+ * a separate pure function (`isSeatEntitled`) so callers can decide, for a given
+ * member, whether a seat is held. Fails closed on every uncertain input.
+ */
+export function decideTeamSeatSubscription(
+  sub: TeamSeatSubscriptionInput | null,
+  now: Date = new Date(),
+): TeamSeatDecision {
+  if (!sub) {
+    return { subscriptionEntitled: false, reason: 'none', seatLimit: 0 };
+  }
+  const base = decideMembershipEntitlement(
+    { status: sub.status, currentPeriodEnd: sub.currentPeriodEnd },
+    now,
+  );
+  const seatLimit = Number.isFinite(sub.seatLimit) && sub.seatLimit > 0 ? sub.seatLimit : 0;
+  return { subscriptionEntitled: base.entitled, reason: base.reason, seatLimit };
+}
+
+/**
+ * PURE: is a member holding seat index `memberSeatIndex` (0-based, ordered by
+ * join time) entitled? Requires the subscription to be live AND the member's
+ * seat index to fall within the purchased `seatLimit`. This is what enforces
+ * spec §15 #4: on a 5-seat plan, members at indexes 0..4 are entitled and the
+ * 6th (index 5) is not — seat-full.
+ */
+export function isSeatEntitled(
+  decision: TeamSeatDecision,
+  memberSeatIndex: number,
+): { entitled: boolean; reason: TeamSeatReason } {
+  if (!decision.subscriptionEntitled) {
+    return { entitled: false, reason: decision.reason };
+  }
+  if (
+    !Number.isInteger(memberSeatIndex) ||
+    memberSeatIndex < 0 ||
+    memberSeatIndex >= decision.seatLimit
+  ) {
+    return { entitled: false, reason: 'seat_full' };
+  }
+  return { entitled: true, reason: decision.reason };
+}
+
+export interface TeamEntitlements {
+  /** True when this specific user holds an entitled seat on an active team sub. */
+  hasActiveSeat: boolean;
+  reason: TeamSeatReason;
+  /** Course scope for an entitled seat: whole catalogue, else null. */
+  entitledCourseIds: 'ALL' | null;
+  status: string | null;
+  currentPeriodEnd: Date | null;
+  seatLimit: number;
+  /** Seats currently held (team member count, capped at seatLimit for UI). */
+  seatsUsed: number;
+  teamId: string | null;
+  isOwner: boolean;
+}
+
+const NO_TEAM_SEAT: TeamEntitlements = {
+  hasActiveSeat: false,
+  reason: 'none',
+  entitledCourseIds: null,
+  status: null,
+  currentPeriodEnd: null,
+  seatLimit: 0,
+  seatsUsed: 0,
+  teamId: null,
+  isOwner: false,
+};
+
+/**
+ * Data wrapper: does `userId` hold an entitled seat via a team seat
+ * subscription? Loads the user's team membership + that team's seat
+ * subscription, orders members by join time to assign stable seat indexes, and
+ * applies the pure decision. FAILS CLOSED on any error or missing data.
+ *
+ * Whole-catalogue entitlement (like the individual membership) — a seated
+ * member may enrol in any published course. Distinct from the per-course seat
+ * bundles (`LmsTeamCoursePurchase`), which remain in force independently.
+ */
+export async function getTeamEntitlements(userId: string): Promise<TeamEntitlements> {
+  if (!userId || !process.env.DATABASE_URL?.trim()) {
+    return NO_TEAM_SEAT;
+  }
+
+  try {
+    const { prisma } = await import('@/lib/prisma');
+
+    const membership = await prisma.lmsTeamMember.findFirst({
+      where: { userId },
+      select: { teamId: true },
+    });
+    if (!membership) return NO_TEAM_SEAT;
+
+    const teamId = membership.teamId;
+
+    const [sub, members, team] = await Promise.all([
+      prisma.lmsTeamSubscription.findUnique({
+        where: { teamId },
+        select: { status: true, currentPeriodEnd: true, seatLimit: true },
+      }),
+      prisma.lmsTeamMember.findMany({
+        where: { teamId },
+        select: { userId: true },
+        orderBy: { joinedAt: 'asc' },
+      }),
+      prisma.lmsTeam.findUnique({ where: { id: teamId }, select: { ownerId: true } }),
+    ]);
+
+    if (!sub) return { ...NO_TEAM_SEAT, teamId, isOwner: team?.ownerId === userId };
+
+    const decision = decideTeamSeatSubscription({
+      status: sub.status,
+      currentPeriodEnd: sub.currentPeriodEnd,
+      seatLimit: sub.seatLimit,
+    });
+
+    // Owner always occupies seat 0; remaining seats fill by join order. This is
+    // the same ordering the invite path enforces, so the decision is stable.
+    const seatIndex = members.findIndex((m) => m.userId === userId);
+    const seat = isSeatEntitled(decision, seatIndex);
+
+    return {
+      hasActiveSeat: seat.entitled,
+      reason: seat.reason,
+      entitledCourseIds: seat.entitled ? 'ALL' : null,
+      status: sub.status,
+      currentPeriodEnd: sub.currentPeriodEnd,
+      seatLimit: decision.seatLimit,
+      seatsUsed: Math.min(members.length, decision.seatLimit),
+      teamId,
+      isOwner: team?.ownerId === userId,
+    };
+  } catch (error) {
+    console.error('[entitlements] team lookup failed, denying (fail-closed):', error);
+    return NO_TEAM_SEAT;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* WS1-E3 (GP-443) — Organisation monthly (unlimited) entitlement.             */
+/*                                                                            */
+/* An org subscription grants access to courses in its entitled CATEGORY to   */
+/* ANY member of the org (seatModel 'unlimited') while active/in-grace. Reuses */
+/* the identical status machine; no seat cap.                                  */
+/* -------------------------------------------------------------------------- */
+
+export interface OrgEntitlements {
+  /** True when this user is a member of an org whose subscription is live. */
+  hasActiveOrg: boolean;
+  reason: MembershipDecisionReason;
+  /** The course category this org entitles (null when not entitled). */
+  entitledCategory: string | null;
+  status: string | null;
+  currentPeriodEnd: Date | null;
+  teamId: string | null;
+}
+
+const NO_ORG: OrgEntitlements = {
+  hasActiveOrg: false,
+  reason: 'none',
+  entitledCategory: null,
+  status: null,
+  currentPeriodEnd: null,
+  teamId: null,
+};
+
+/**
+ * Data wrapper: is `userId` entitled via an active org subscription, and if so
+ * to which course category? Unlimited seats — membership alone (plus a live
+ * subscription) entitles. FAILS CLOSED on any error.
+ */
+export async function getOrgEntitlements(userId: string): Promise<OrgEntitlements> {
+  if (!userId || !process.env.DATABASE_URL?.trim()) {
+    return NO_ORG;
+  }
+
+  try {
+    const { prisma } = await import('@/lib/prisma');
+
+    const memberships = await prisma.lmsTeamMember.findMany({
+      where: { userId },
+      select: { teamId: true },
+    });
+    if (memberships.length === 0) return NO_ORG;
+
+    const teamIds = memberships.map((m) => m.teamId);
+    const orgSubs = await prisma.lmsOrgSubscription.findMany({
+      where: { teamId: { in: teamIds } },
+      select: {
+        teamId: true,
+        status: true,
+        currentPeriodEnd: true,
+        entitledCategory: true,
+      },
+    });
+
+    for (const org of orgSubs) {
+      const decision = decideMembershipEntitlement(
+        { status: org.status, currentPeriodEnd: org.currentPeriodEnd },
+      );
+      if (decision.entitled) {
+        return {
+          hasActiveOrg: true,
+          reason: decision.reason,
+          entitledCategory: org.entitledCategory,
+          status: org.status,
+          currentPeriodEnd: org.currentPeriodEnd,
+          teamId: org.teamId,
+        };
+      }
+    }
+
+    // Report the first org's status for honest UI even when lapsed.
+    const first = orgSubs[0];
+    if (first) {
+      const decision = decideMembershipEntitlement({
+        status: first.status,
+        currentPeriodEnd: first.currentPeriodEnd,
+      });
+      return {
+        hasActiveOrg: false,
+        reason: decision.reason,
+        entitledCategory: null,
+        status: first.status,
+        currentPeriodEnd: first.currentPeriodEnd,
+        teamId: first.teamId,
+      };
+    }
+
+    return NO_ORG;
+  } catch (error) {
+    console.error('[entitlements] org lookup failed, denying (fail-closed):', error);
+    return NO_ORG;
+  }
+}
