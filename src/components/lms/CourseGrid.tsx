@@ -59,6 +59,7 @@ interface Course {
   instructor?: { full_name: string } | null;
   cec_hours?: string | null;
   duration_hours?: string | null;
+  tags?: string[] | null;
 }
 
 interface CourseGridProps {
@@ -115,6 +116,11 @@ function normalizedLevel(course: Course): string {
   return course.level?.trim().toLowerCase() || 'all levels';
 }
 
+function matchesTag(course: Course, tag: string): boolean {
+  if (tag === 'all') return true;
+  return (course.tags ?? []).some((t) => t.toLowerCase() === tag.toLowerCase());
+}
+
 function courseDurationHours(course: Course): number | null {
   const raw = course.duration_hours;
   if (!raw) return null;
@@ -154,6 +160,7 @@ export function CourseGrid({
   const [priceFilter, setPriceFilter] = useState<PriceFilter>('all');
   const [cecFilter, setCecFilter] = useState<CecFilter>('all');
   const [durationFilter, setDurationFilter] = useState<DurationFilter>('all');
+  const [tagFilter, setTagFilter] = useState('all');
   const [sortBy, setSortBy] = useState<SortKey>(() => {
     if (initialSortBy === 'modules') return showModulesSort ? 'modules' : 'updated';
     if (initialSortBy === 'price') return 'price';
@@ -185,6 +192,17 @@ export function CourseGrid({
     return [...levels].sort((a, b) => a.localeCompare(b));
   }, [courses]);
 
+  const tagOptions = useMemo(() => {
+    const tags = new Set<string>();
+    for (const course of courses) {
+      for (const tag of course.tags ?? []) {
+        const trimmed = tag.trim();
+        if (trimmed) tags.add(trimmed);
+      }
+    }
+    return [...tags].sort((a, b) => a.localeCompare(b));
+  }, [courses]);
+
   const filtered = useMemo(() => {
     const q = searchQuery.toLowerCase();
     const base = courses.filter(
@@ -202,6 +220,7 @@ export function CourseGrid({
           levelMatches &&
           cecMatches &&
           matchesDuration(c, durationFilter) &&
+          matchesTag(c, tagFilter) &&
         (q === '' ||
           c.title.toLowerCase().includes(q) ||
           (c.short_description ?? '').toLowerCase().includes(q))
@@ -209,7 +228,17 @@ export function CourseGrid({
       }
     );
     return sortCourses(base, sortBy);
-  }, [courses, activeTab, searchQuery, sortBy, levelFilter, priceFilter, cecFilter, durationFilter]);
+  }, [
+    courses,
+    activeTab,
+    searchQuery,
+    sortBy,
+    levelFilter,
+    priceFilter,
+    cecFilter,
+    durationFilter,
+    tagFilter,
+  ]);
 
   return (
     <div>
@@ -254,7 +283,13 @@ export function CourseGrid({
 
       {/* Search + sort */}
       <div className="mb-6 grid gap-3 lg:grid-cols-[minmax(220px,1fr)_auto] lg:items-end">
-        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-[minmax(220px,1.3fr)_repeat(4,minmax(130px,0.8fr))]">
+        <div
+          className={
+            tagOptions.length > 0
+              ? 'grid gap-3 md:grid-cols-2 xl:grid-cols-[minmax(220px,1.3fr)_repeat(5,minmax(130px,0.8fr))]'
+              : 'grid gap-3 md:grid-cols-2 xl:grid-cols-[minmax(220px,1.3fr)_repeat(4,minmax(130px,0.8fr))]'
+          }
+        >
           <div className="relative">
             <Search
               className="absolute top-1/2 left-3 h-3.5 w-3.5 -translate-y-1/2"
@@ -321,6 +356,22 @@ export function CourseGrid({
             <option value="medium">1-3h</option>
             <option value="long">3h+</option>
           </select>
+
+          {tagOptions.length > 0 ? (
+            <select
+              value={tagFilter}
+              onChange={(e) => setTagFilter(e.target.value)}
+              aria-label="Filter by tag"
+              className={controlClass}
+            >
+              <option value="all">All tags</option>
+              {tagOptions.map((tag) => (
+                <option key={tag} value={tag}>
+                  {tag}
+                </option>
+              ))}
+            </select>
+          ) : null}
         </div>
 
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center lg:justify-end">

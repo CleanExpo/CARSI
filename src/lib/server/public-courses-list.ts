@@ -1,5 +1,5 @@
 import type { Prisma } from '@/generated/prisma/client';
-import type { CheckoutCourse, CourseListItem } from '@/lib/course-list-item';
+import { normalizeCourseTags, type CheckoutCourse, type CourseListItem } from '@/lib/course-list-item';
 import { prisma } from '@/lib/prisma';
 import { normalizePublicAssetUrl } from '@/lib/remote-image';
 import { isBuildPhase } from '@/lib/server/build-phase';
@@ -73,6 +73,7 @@ function mapDashboardCourseRow(c: {
   thumbnailUrl: string | null;
   level: string | null;
   category: string | null;
+  tags?: unknown;
   status: string;
   updatedAt: Date;
   cecHours: number | null;
@@ -91,6 +92,7 @@ function mapDashboardCourseRow(c: {
     thumbnail_url: normalizePublicAssetUrl(c.thumbnailUrl),
     level: c.level,
     category: c.category,
+    tags: normalizeCourseTags(c.tags),
     lesson_count: null,
     updated_at: c.updatedAt.toISOString(),
     instructor: null,
@@ -166,6 +168,7 @@ type LmsCoursePublicListRow = {
   thumbnailUrl: string | null;
   level: string | null;
   category: string | null;
+  tags?: unknown;
   cecHours: number | null;
   durationHours: number | null;
   updatedAt: Date;
@@ -185,6 +188,7 @@ function mapLmsCourseToPublicListItem(c: LmsCoursePublicListRow): CourseListItem
     thumbnail_url: normalizePublicAssetUrl(c.thumbnailUrl),
     level: c.level,
     category: c.category,
+    tags: normalizeCourseTags(c.tags),
     lesson_count: null,
     module_count: c._count.modules,
     updated_at: c.updatedAt.toISOString(),
