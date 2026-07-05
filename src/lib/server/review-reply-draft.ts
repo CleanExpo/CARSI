@@ -1,13 +1,15 @@
 /**
  * AI-drafted instructor replies to course reviews (GP-118 — "AI Feedback Response").
  *
- * Reuses the same direct OpenAI chat-completions call the public chat assistant uses
- * (no SDK dependency). The draft is only a *suggestion* — the instructor edits and
- * publishes it via the reply endpoint, so this never posts anything on its own.
+ * Reuses the same Anthropic client the public chat assistant uses. The draft is only
+ * a *suggestion* — the instructor edits and publishes it via the reply endpoint, so
+ * this never posts anything on its own.
  */
 
-const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
-const MODEL = process.env.OPENAI_CHAT_MODEL?.trim() || 'gpt-4o-mini';
+import { AnthropicClient, CLAUDE_MODELS } from '@/lib/anthropic/client';
+
+const MODEL = CLAUDE_MODELS.HAIKU_4_5;
+const REQUEST_TIMEOUT_MS = 20_000;
 
 export type ReviewReplyDraftInput = {
   courseTitle: string;
@@ -45,27 +47,26 @@ export function buildReviewReplyMessages(input: ReviewReplyDraftInput): ChatMess
  * Callers treat null as "AI drafting unavailable" and fall back to writing manually.
  */
 export async function draftReviewReply(input: ReviewReplyDraftInput): Promise<string | null> {
-  const apiKey = process.env.OPENAI_API_KEY?.trim();
+  const apiKey = process.env.ANTHROPIC_API_KEY?.trim();
   if (!apiKey) return null;
 
+  const [system, user] = buildReviewReplyMessages(input);
+
   try {
-    const res = await fetch(OPENAI_API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
-      body: JSON.stringify({
+    const client = new AnthropicClient({ apiKey });
+    const timeout = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('review-reply-draft: request timed out')), REQUEST_TIMEOUT_MS)
+    );
+    const response = await Promise.race([
+      client.messages({
         model: MODEL,
-        messages: buildReviewReplyMessages(input),
-        temperature: 0.5,
         max_tokens: 220,
+        system: system.content,
+        messages: [{ role: 'user', content: user.content }],
       }),
-      signal: AbortSignal.timeout(20_000),
-    });
-    if (!res.ok) {
-      console.error('[review-reply-draft] OpenAI error', res.status, await res.text().catch(() => ''));
-      return null;
-    }
-    const data = (await res.json()) as { choices?: { message?: { content?: string } }[] };
-    return data.choices?.[0]?.message?.content?.trim() || null;
+      timeout,
+    ]);
+    return AnthropicClient.extractText(response).trim() || null;
   } catch (e) {
     console.error('[review-reply-draft]', e);
     return null;

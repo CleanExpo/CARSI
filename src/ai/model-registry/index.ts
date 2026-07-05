@@ -32,12 +32,12 @@ export interface ModelConfig {
 }
 
 /**
- * Approved model defaults as of 06/03/2026.
+ * Approved model defaults as of 07/05/2026.
  * Update this registry when models are upgraded or deprecated.
  */
 export const APPROVED_MODELS: ModelConfig[] = [
   {
-    id: 'claude-sonnet-4-6',
+    id: 'claude-sonnet-5',
     provider: 'anthropic',
     taskTypes: ['reasoning', 'orchestration'],
     approvedDefault: true,
@@ -45,7 +45,7 @@ export const APPROVED_MODELS: ModelConfig[] = [
     notes: 'Primary reasoning and orchestration model',
   },
   {
-    id: 'claude-opus-4-6',
+    id: 'claude-opus-4-8',
     provider: 'anthropic',
     taskTypes: ['reasoning'],
     approvedDefault: true,

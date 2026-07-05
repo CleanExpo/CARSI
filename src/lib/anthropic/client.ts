@@ -45,7 +45,7 @@ export interface AnthropicClientConfig {
 
 const DEFAULT_CONFIG: Required<Omit<AnthropicClientConfig, 'apiKey'>> = {
   baseUrl: 'https://api.anthropic.com/v1',
-  defaultModel: CLAUDE_MODELS.SONNET_4_5,
+  defaultModel: CLAUDE_MODELS.SONNET_5,
   defaultMaxTokens: 4096,
   features: {
     promptCaching: {
@@ -362,7 +362,7 @@ export class AnthropicClient {
     const model = options.model ?? this.defaultModel;
 
     // Use appropriate tool version based on model
-    const toolType = model === CLAUDE_MODELS.OPUS_4_5 ? 'computer_20251124' : 'computer_20250124';
+    const toolType = model === CLAUDE_MODELS.OPUS_4_8 ? 'computer_20251124' : 'computer_20250124';
 
     return {
       type: toolType,
@@ -439,7 +439,7 @@ export class AnthropicAPIError extends Error {
 export function createThinkingClient(apiKey?: string): AnthropicClient {
   return new AnthropicClient({
     apiKey,
-    defaultModel: CLAUDE_MODELS.SONNET_4_5,
+    defaultModel: CLAUDE_MODELS.SONNET_5,
     defaultMaxTokens: 16384,
     features: {
       promptCaching: {
@@ -460,7 +460,7 @@ export function createThinkingClient(apiKey?: string): AnthropicClient {
 export function createComputerUseClient(apiKey?: string): AnthropicClient {
   return new AnthropicClient({
     apiKey,
-    defaultModel: CLAUDE_MODELS.SONNET_4_5,
+    defaultModel: CLAUDE_MODELS.SONNET_5,
     defaultMaxTokens: 4096,
     features: {
       computerUse: {
@@ -483,7 +483,7 @@ export function createComputerUseClient(apiKey?: string): AnthropicClient {
 export function createLongOutputClient(apiKey?: string): AnthropicClient {
   return new AnthropicClient({
     apiKey,
-    defaultModel: CLAUDE_MODELS.SONNET_4_5,
+    defaultModel: CLAUDE_MODELS.SONNET_5,
     defaultMaxTokens: 128000,
     features: {
       output128k: true,

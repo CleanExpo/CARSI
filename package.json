@@ -59,6 +59,7 @@
     "db:gate-onboarding-off-free": "npx tsx scripts/gate-onboarding-course-off-free.ts",
     "test:a11y": "playwright test tests/accessibility",
     "test:e2e": "playwright test e2e",
+    "test:smoke": "playwright test e2e/smoke.spec.ts",
     "test:unit": "vitest run",
     "voice:plan": "npx tsx scripts/generate-course-voiceover.ts --plan",
     "voice:generate": "npx tsx scripts/generate-course-voiceover.ts --generate",
