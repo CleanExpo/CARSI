@@ -8,6 +8,7 @@ import {
   ContractorAddOns,
 } from '@/components/industries';
 import { IndustryRecommendedCourses } from '@/components/industries/IndustryRecommendedCourses';
+import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 
 export const dynamic = 'force-dynamic';
 
@@ -102,7 +103,7 @@ export default async function MiningIndustryPage() {
       <IndustryCTA
         subtitle="Mining Site Training"
         title="Mining Restoration Bundle"
-        price="$245"
+        price={industryBundlePriceLabel('mining')}
         description="WRT + AMRT + ASD training for mining site teams. Bulk licensing available for camp accommodation managers."
         ctaText="Train Your Site Team"
         accentColor={ACCENT_COLOR}

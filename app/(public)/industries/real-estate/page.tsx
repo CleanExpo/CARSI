@@ -9,6 +9,7 @@ import {
 } from '@/components/industries';
 import { IndustryRecommendedCourses } from '@/components/industries/IndustryRecommendedCourses';
 import { FAQSchema } from '@/components/seo/JsonLd';
+import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 
 export const dynamic = 'force-dynamic';
 
@@ -128,7 +129,7 @@ export default async function RealEstateIndustryPage() {
       <IndustryCTA
         subtitle="Real Estate Training"
         title="Property Professional Bundle"
-        price="$225"
+        price={industryBundlePriceLabel('real-estate')}
         description="WRT + AMRT awareness training for real estate agents, conveyancers, and property managers. Identify water damage and mould during inspections with IICRC-recognised credentials."
         ctaText="Protect Your Practice"
         accentColor={ACCENT_COLOR}

@@ -8,6 +8,7 @@ import {
   ContractorAddOns,
 } from '@/components/industries';
 import { IndustryRecommendedCourses } from '@/components/industries/IndustryRecommendedCourses';
+import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 
 export const dynamic = 'force-dynamic';
 
@@ -102,7 +103,7 @@ export default async function StrataIndustryPage() {
       <IndustryCTA
         subtitle="Strata & Body Corporate Training"
         title="Building Manager Bundle"
-        price="$295"
+        price={industryBundlePriceLabel('strata')}
         description="WRT + AMRT training for strata maintenance teams. Equip your building managers with the credentials to handle water damage and mould remediation across common property."
         ctaText="Enquire Now"
         accentColor={ACCENT_COLOR}

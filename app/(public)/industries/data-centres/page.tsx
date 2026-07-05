@@ -9,6 +9,7 @@ import {
 } from '@/components/industries';
 import { IndustryRecommendedCourses } from '@/components/industries/IndustryRecommendedCourses';
 import { FAQSchema } from '@/components/seo/JsonLd';
+import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 
 export const dynamic = 'force-dynamic';
 
@@ -127,7 +128,7 @@ export default async function DataCentresIndustryPage() {
       <IndustryCTA
         subtitle="Data Centre Training"
         title="Data Centre Protection Bundle"
-        price="$285"
+        price={industryBundlePriceLabel('data-centres')}
         description="WRT + ASD + FSRT training for data centre facility teams. Includes cooling system failure response and post-suppression cleanup protocols. Online, self-paced — fits around maintenance windows."
         ctaText="Protect Your Infrastructure"
         accentColor={ACCENT_COLOR}

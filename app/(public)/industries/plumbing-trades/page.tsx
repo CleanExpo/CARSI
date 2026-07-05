@@ -9,6 +9,7 @@ import {
 } from '@/components/industries';
 import { IndustryRecommendedCourses } from '@/components/industries/IndustryRecommendedCourses';
 import { FAQSchema } from '@/components/seo/JsonLd';
+import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 
 export const dynamic = 'force-dynamic';
 
@@ -127,7 +128,7 @@ export default async function PlumbingTradesIndustryPage() {
       <IndustryCTA
         subtitle="Plumbing & Trades Training"
         title="Trades Restoration Bundle"
-        price="$245"
+        price={industryBundlePriceLabel('plumbing-trades')}
         description="WRT + ASD training for licensed plumbers and trade contractors. Complete online between jobs. IICRC-aligned CEC."
         ctaText="Add Restoration to Your Business"
         accentColor={ACCENT_COLOR}

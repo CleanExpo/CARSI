@@ -12,6 +12,7 @@ import {
 } from '@/components/industries';
 import { FAQSchema } from '@/components/seo/JsonLd';
 import { buildIndustryMetadata } from '@/lib/marketing/industry-metadata';
+import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 
 export const dynamic = 'force-dynamic';
 
@@ -130,7 +131,7 @@ export default async function CommercialCleaningIndustryPage() {
       <IndustryCTA
         subtitle="Cleaning professional training"
         title="Pro Cleaning Bundle"
-        price="$195"
+        price={industryBundlePriceLabel('commercial-cleaning')}
         description="CRT Carpet Restoration + CCT Commercial Carpet + OCT Odour Control. Perfect for cleaning contractors seeking IICRC credentials."
         ctaText="View pricing"
         ctaHref="/pricing"

@@ -8,6 +8,7 @@ import {
   ContractorAddOns,
 } from '@/components/industries';
 import { IndustryRecommendedCourses } from '@/components/industries/IndustryRecommendedCourses';
+import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 
 export const dynamic = 'force-dynamic';
 
@@ -102,7 +103,7 @@ export default async function PropertyManagementIndustryPage() {
       <IndustryCTA
         subtitle="Property Management Training"
         title="Property Bundle"
-        price="$195"
+        price={industryBundlePriceLabel('property-management')}
         description="AMRT Mould Basics + WRT Water Damage + CRT Carpet Assessment. Agency bulk pricing available for 10+ property managers."
         ctaText="Get Certified"
         accentColor={ACCENT_COLOR}

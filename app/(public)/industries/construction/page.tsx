@@ -8,6 +8,7 @@ import {
   ContractorAddOns,
 } from '@/components/industries';
 import { IndustryRecommendedCourses } from '@/components/industries/IndustryRecommendedCourses';
+import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 
 export const dynamic = 'force-dynamic';
 
@@ -101,7 +102,7 @@ export default async function ConstructionIndustryPage() {
       <IndustryCTA
         subtitle="Construction Restoration Training"
         title="Site Restoration Bundle"
-        price="$245"
+        price={industryBundlePriceLabel('construction')}
         description="WRT Water Damage + ASD Structural Drying + AMRT Mould Assessment + Moisture Detection bonus module. Bulk team pricing available."
         ctaText="Train Your Site Team"
         accentColor={ACCENT_COLOR}

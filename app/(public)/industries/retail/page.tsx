@@ -8,6 +8,7 @@ import {
   ContractorAddOns,
 } from '@/components/industries';
 import { IndustryRecommendedCourses } from '@/components/industries/IndustryRecommendedCourses';
+import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 
 export const dynamic = 'force-dynamic';
 
@@ -102,7 +103,7 @@ export default async function RetailIndustryPage() {
       <IndustryCTA
         subtitle="Shopping Centre Training"
         title="Retail Contractor Bundle"
-        price="$295"
+        price={industryBundlePriceLabel('retail')}
         description="WRT + CRT + OCT training for shopping centre maintenance teams. Equip your crew for rapid tenant restoration and food court compliance."
         ctaText="Get Started"
         accentColor={ACCENT_COLOR}
