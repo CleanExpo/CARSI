@@ -47,11 +47,14 @@ export function DashboardMobileNav() {
   const [open, setOpen] = useState(false);
   const section = getDashboardSectionLabel(pathname);
 
-  useEffect(() => {
-    // Close the mobile nav whenever the route changes.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+  // Close the mobile nav whenever the route changes. Adjusting during render
+  // (React's documented "store previous value" pattern) is behaviour-identical
+  // to a close-in-effect but avoids the extra commit pass.
+  const [prevPathname, setPrevPathname] = useState(pathname);
+  if (prevPathname !== pathname) {
+    setPrevPathname(pathname);
     setOpen(false);
-  }, [pathname]);
+  }
 
   useEffect(() => {
     if (!open) return;

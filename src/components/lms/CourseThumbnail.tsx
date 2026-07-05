@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { bypassNextImageOptimizer, normalizePublicAssetUrl } from '@/lib/remote-image';
 
@@ -43,13 +43,15 @@ export function CourseThumbnail({
   draft,
 }: CourseThumbnailProps) {
   const [backdropFailed, setBackdropFailed] = useState(false);
-
-  useEffect(() => {
-    // Reset the load-failed flag when the source changes so a new thumbnail
-    // re-attempts instead of staying on the previous failure.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+  // Reset the load-failed flag when the source changes so a new thumbnail
+  // re-attempts instead of staying on the previous failure. Deriving the reset
+  // during render (React's documented "adjust state on prop change" pattern) is
+  // behaviour-identical to a reset-in-effect but avoids the extra commit pass.
+  const [prevSrc, setPrevSrc] = useState(src);
+  if (prevSrc !== src) {
+    setPrevSrc(src);
     setBackdropFailed(false);
-  }, [src]);
+  }
 
   const resolvedSrc = useMemo(() => {
     const normalized = normalizePublicAssetUrl(src);
