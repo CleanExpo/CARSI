@@ -24,17 +24,6 @@ import {
 } from 'lucide-react';
 
 // ---------------------------------------------------------------------------
-// Metadata
-// ---------------------------------------------------------------------------
-
-export const metadata: Metadata = {
-  title: 'Industry Training Solutions',
-  description:
-    'IICRC-aligned training for 19 industries across Australia. Sector-specific restoration courses with verifiable credentials for healthcare, hospitality, mining, plumbing, NDIS, real estate, and more.',
-  alternates: { canonical: '/industries' },
-};
-
-// ---------------------------------------------------------------------------
 // Data
 // ---------------------------------------------------------------------------
 
@@ -194,6 +183,18 @@ const industries = [
 ];
 
 // ---------------------------------------------------------------------------
+// Metadata
+// ---------------------------------------------------------------------------
+// Count derives from `industries.length` (not hardcoded) so copy and the actual
+// list can never drift apart again — same pattern as the GP-450 course-count fix.
+
+export const metadata: Metadata = {
+  title: 'Industry Training Solutions',
+  description: `IICRC-aligned training for ${industries.length} industries across Australia. Sector-specific restoration courses with verifiable credentials for healthcare, hospitality, mining, plumbing, NDIS, real estate, and more.`,
+  alternates: { canonical: '/industries' },
+};
+
+// ---------------------------------------------------------------------------
 // Page
 // ---------------------------------------------------------------------------
 
@@ -225,8 +226,8 @@ export default function IndustriesPage() {
             className="max-w-2xl text-lg leading-relaxed"
             style={{ color: 'rgba(255,255,255,0.5)' }}
           >
-            IICRC-aligned training for 19 industries across Australia. Each pathway includes
-            sector-specific courses, verifiable credentials, and continuing education credits.
+            IICRC-aligned training for {industries.length} industries across Australia. Each pathway
+            includes sector-specific courses, verifiable credentials, and continuing education credits.
           </p>
         </section>
 
