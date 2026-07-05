@@ -144,7 +144,7 @@
           "sourceRef": "Microbial.docx — Infectious Control for the Business Owner, Module 10: Hazard Identification"
         },
         {
-          "questionText": "Under Model WHS Act s.18, what is the primary evidence that a PCBU has actively managed risks so far as is reasonably practicable for a specific infection control job?",
+          "questionText": "Under Model WHS Act s.19, what is the primary evidence that a PCBU has actively managed risks so far as is reasonably practicable for a specific infection control job?",
           "options": [
             "A verbal assurance from the site supervisor",
             "A documented, site-specific risk assessment for that job",
@@ -168,7 +168,7 @@
           "sourceRef": "Microbial.docx — Infectious Control for the Business Owner, Module 12: Hierarchy of Controls"
         },
         {
-          "questionText": "Under Model WHS Regulations r.337, who must be provided the SDS for a hazardous chemical used on an infection control job?",
+          "questionText": "Under Model WHS Regulations r.344, who must be provided the SDS for a hazardous chemical used on an infection control job?",
           "options": [
             "Only the team leader",
             "Every worker likely to be affected by the hazardous chemical",
@@ -216,7 +216,7 @@
           "sourceRef": "Microbial.docx — Infectious Control for the Business Owner, Module 16: Job Safety and Environmental Analysis (JSEA)"
         },
         {
-          "questionText": "Under Model WHS Regulations r.291, when must a SWMS for high-risk infection control work (e.g. confined space entry) be prepared?",
+          "questionText": "Under Model WHS Regulations r.299, when must a SWMS for high-risk infection control work (e.g. confined space entry) be prepared?",
           "options": [
             "At any point during the job, including after the fact for record-keeping",
             "Before the high-risk construction work commences — a retroactively prepared SWMS provides no legal protection",
