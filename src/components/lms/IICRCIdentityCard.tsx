@@ -73,6 +73,7 @@ export function IICRCIdentityCard({
             src={cardImageUrl}
             alt="IICRC member card"
             className="h-16 rounded-sm border border-white/[0.08] object-cover"
+            referrerPolicy="no-referrer"
           />
         )}
       </div>

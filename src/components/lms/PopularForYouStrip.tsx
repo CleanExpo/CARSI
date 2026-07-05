@@ -30,6 +30,7 @@ export function PopularForYouStrip({ courses }: { courses: RenewalCourseSuggesti
                 src={c.thumbnail_url}
                 alt=""
                 className="mb-3 h-24 w-full rounded-lg object-cover"
+                referrerPolicy="no-referrer"
               />
             ) : (
               <div className="mb-3 flex h-24 w-full items-center justify-center rounded-lg bg-[#eef7ff]">

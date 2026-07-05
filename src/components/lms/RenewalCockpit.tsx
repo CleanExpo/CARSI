@@ -47,7 +47,12 @@ function SuggestionCard({
     <div className="flex max-w-[300px] min-w-[240px] flex-shrink-0 flex-col gap-2 rounded-xl border border-white/10 bg-[#060a14] p-4">
       {thumbnailUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={thumbnailUrl} alt="" className="h-28 w-full rounded-lg object-cover" />
+        <img
+          src={thumbnailUrl}
+          alt=""
+          className="h-28 w-full rounded-lg object-cover"
+          referrerPolicy="no-referrer"
+        />
       ) : (
         <div className="flex h-28 w-full items-center justify-center rounded-lg bg-[#2490ed]/10">
           <span className="font-mono text-xs text-[#2490ed]/50">{discipline ?? 'CARSI'}</span>

@@ -71,6 +71,7 @@ function RecommendationCard({ course }: { course: RecommendedCourse }) {
           src={course.thumbnail_url}
           alt={course.title}
           className="h-32 w-full rounded-sm object-cover"
+          referrerPolicy="no-referrer"
         />
       ) : (
         <div
