@@ -41,12 +41,18 @@ export interface AnthropicClientConfig {
   defaultModel?: ClaudeModel;
   defaultMaxTokens?: number;
   features?: BetaFeatureConfig;
+  /** Request timeout in ms. The raw `fetch` call has no timeout otherwise, so a
+   * hung or unreachable upstream (network path issue, Anthropic outage) blocks
+   * the caller indefinitely until an external gateway kills it — surfacing as
+   * an opaque 504 with no diagnostic info instead of a fast, clear error. */
+  timeoutMs?: number;
 }
 
 const DEFAULT_CONFIG: Required<Omit<AnthropicClientConfig, 'apiKey'>> = {
   baseUrl: 'https://api.anthropic.com/v1',
   defaultModel: CLAUDE_MODELS.SONNET_5,
   defaultMaxTokens: 4096,
+  timeoutMs: 25_000,
   features: {
     promptCaching: {
       enabled: true,
@@ -66,6 +72,7 @@ export class AnthropicClient {
   private defaultModel: ClaudeModel;
   private defaultMaxTokens: number;
   private features: BetaFeatureConfig;
+  private timeoutMs: number;
 
   constructor(config: AnthropicClientConfig = {}) {
     const apiKey = config.apiKey ?? process.env.ANTHROPIC_API_KEY;
@@ -81,6 +88,14 @@ export class AnthropicClient {
     this.defaultModel = config.defaultModel ?? DEFAULT_CONFIG.defaultModel;
     this.defaultMaxTokens = config.defaultMaxTokens ?? DEFAULT_CONFIG.defaultMaxTokens;
     this.features = config.features ?? DEFAULT_CONFIG.features;
+    this.timeoutMs = config.timeoutMs ?? DEFAULT_CONFIG.timeoutMs;
+  }
+
+  /** AbortSignal that fires after `timeoutMs` — pass to every outbound `fetch`
+   * so a hung upstream fails fast with a clear error instead of hanging until
+   * an external gateway times out. */
+  private timeoutSignal(): AbortSignal {
+    return AbortSignal.timeout(this.timeoutMs);
   }
 
   // ==========================================================================
@@ -101,11 +116,20 @@ export class AnthropicClient {
 
     const headers = this.buildHeaders(fullRequest.model as ClaudeModel);
 
-    const response = await fetch(`${this.baseUrl}/messages`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(fullRequest),
-    });
+    let response: Response;
+    try {
+      response = await fetch(`${this.baseUrl}/messages`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(fullRequest),
+        signal: this.timeoutSignal(),
+      });
+    } catch (e) {
+      if (e instanceof DOMException && e.name === 'TimeoutError') {
+        throw new Error(`Anthropic API request timed out after ${this.timeoutMs}ms`);
+      }
+      throw e;
+    }
 
     if (!response.ok) {
       const error = await response.json();
