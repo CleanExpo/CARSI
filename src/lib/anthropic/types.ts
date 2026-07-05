@@ -15,9 +15,9 @@
 // ============================================================================
 
 export const CLAUDE_MODELS = {
-  // Claude 4.6 Family (Latest) — IDs sourced from src/ai/model-registry (source of truth)
-  OPUS_4_5: 'claude-opus-4-6',
-  SONNET_4_5: 'claude-sonnet-4-6',
+  // Latest generation — IDs sourced from src/ai/model-registry (source of truth)
+  OPUS_4_8: 'claude-opus-4-8',
+  SONNET_5: 'claude-sonnet-5',
   HAIKU_4_5: 'claude-haiku-4-5-20251001',
 
   // Claude 4 Family
@@ -334,7 +334,7 @@ export function buildBetaHeader(
 
   if (features.computerUse?.enabled) {
     const header =
-      model === CLAUDE_MODELS.OPUS_4_5
+      model === CLAUDE_MODELS.OPUS_4_8
         ? BETA_HEADERS.COMPUTER_USE_OPUS_4_5
         : BETA_HEADERS.COMPUTER_USE_STANDARD;
     headers.push(header);
@@ -360,7 +360,7 @@ export function buildBetaHeader(
     headers.push(BETA_HEADERS.CONTEXT_MANAGEMENT);
   }
 
-  if (features.effort && model === CLAUDE_MODELS.OPUS_4_5) {
+  if (features.effort && model === CLAUDE_MODELS.OPUS_4_8) {
     headers.push(BETA_HEADERS.EFFORT);
   }
 

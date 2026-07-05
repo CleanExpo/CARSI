@@ -9,19 +9,22 @@ export interface ModelConfig {
   temperature?: number;
 }
 
-// Model identifiers — IDs sourced from src/ai/model-registry (source of truth)
+// Model identifiers — SSOT is src/ai/model-registry/index.ts (APPROVED_MODELS in the
+// main app package). This is a separate published package (@shared/types) so it can't
+// import that module directly across the package boundary — keep these values aligned
+// with the registry by hand whenever it changes.
 export const MODELS = {
   anthropic: {
-    opus: 'claude-opus-4-6',
-    sonnet: 'claude-sonnet-4-6',
+    opus: 'claude-opus-4-8',
+    sonnet: 'claude-sonnet-5',
     haiku: 'claude-haiku-4-5-20251001',
   },
   google: {
     pro: 'gemini-2.0-flash-exp',
   },
   openrouter: {
-    opus: 'anthropic/claude-opus-4-6',
-    sonnet: 'anthropic/claude-sonnet-4-6',
+    opus: 'anthropic/claude-opus-4-8',
+    sonnet: 'anthropic/claude-sonnet-5',
     pro: 'google/gemini-2.0-flash-exp',
   },
 } as const;
