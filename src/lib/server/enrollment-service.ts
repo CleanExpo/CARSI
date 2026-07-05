@@ -71,6 +71,44 @@ export async function enrollStudentInCourse(
   }
 }
 
+/** Marks enrolments created for admin-panel users so analytics can exclude them. */
+export const ADMIN_ACCESS_PAYMENT_REFERENCE = 'admin:full-access';
+
+/**
+ * Admin-panel users get a self-service enrolment on first access so the whole
+ * learner stack (curriculum, lesson view, progress, certificates) works for any
+ * course without a purchase.
+ */
+export async function ensureAdminEnrollmentForCourse(
+  claims: SessionClaims,
+  courseId: string
+): Promise<void> {
+  await ensureLmsUserFromClaims(claims);
+  try {
+    await prisma.lmsEnrollment.upsert({
+      where: { studentId_courseId: { studentId: claims.sub, courseId } },
+      create: {
+        id: randomUUID(),
+        studentId: claims.sub,
+        courseId,
+        status: 'active',
+        paymentReference: ADMIN_ACCESS_PAYMENT_REFERENCE,
+      },
+      update: {},
+    });
+  } catch (error) {
+    if (!isUniqueConstraintError(error)) throw error;
+  }
+}
+
+export async function getCourseIdForLesson(lessonId: string): Promise<string | null> {
+  const lesson = await prisma.lmsLesson.findUnique({
+    where: { id: lessonId },
+    select: { module: { select: { courseId: true } } },
+  });
+  return lesson?.module.courseId ?? null;
+}
+
 async function lessonTotalsForCourse(courseId: string): Promise<{ ids: string[]; total: number }> {
   const course = await prisma.lmsCourse.findUnique({
     where: { id: courseId },

@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+import { isLmsClaimsAllowedAdminPanel } from '@/lib/admin/admin-panel-access';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
-import { getLessonContextForStudent, touchLessonProgress } from '@/lib/server/enrollment-service';
+import {
+  ensureAdminEnrollmentForCourse,
+  getCourseIdForLesson,
+  getLessonContextForStudent,
+  touchLessonProgress,
+} from '@/lib/server/enrollment-service';
 import { getUpstreamBaseUrl } from '@/lib/server/upstream-api';
 
 type Ctx = { params: Promise<{ lessonId: string }> };
@@ -52,6 +58,12 @@ export async function GET(request: NextRequest, ctx: Ctx) {
   }
 
   const { lessonId } = await ctx.params;
+
+  if (isLmsClaimsAllowedAdminPanel(claims)) {
+    const courseId = await getCourseIdForLesson(lessonId);
+    if (courseId) await ensureAdminEnrollmentForCourse(claims, courseId);
+  }
+
   const ctxRow = await getLessonContextForStudent(lessonId, claims.sub);
   if (!ctxRow) {
     return NextResponse.json({ detail: 'Lesson not found or access denied' }, { status: 404 });

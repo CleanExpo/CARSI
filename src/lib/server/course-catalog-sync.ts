@@ -79,13 +79,22 @@ async function insertSeedModulesTx(
 }
 
 /**
- * Load course from DB or materialise from the LMS seed catalog / legacy export.
- * Seed courses include eight modules with full lesson HTML each.
+ * Seed materialisation is opt-in via `LMS_SEED_AUTOCREATE=1`. Without it this
+ * function is lookup-only: deleted catalog courses must stay deleted, and routine
+ * traffic to pricing/checkout/enrolment routes must not resurrect them.
+ */
+function seedAutocreateEnabled(): boolean {
+  return process.env.LMS_SEED_AUTOCREATE?.trim() === '1';
+}
+
+/**
+ * Load course from DB, or — only when `LMS_SEED_AUTOCREATE=1` — materialise it
+ * from the LMS seed catalog / legacy export (eight modules with lesson HTML each).
  */
 export async function getOrCreateCourseBySlug(slug: string): Promise<CourseWithCurriculum> {
   const normalized = slug.trim().toLowerCase();
 
-  const seedFull = getSeedCourseFull(normalized);
+  const seedFull = seedAutocreateEnabled() ? getSeedCourseFull(normalized) : null;
   if (seedFull) {
     await ensureCatalogInstructor();
     const wp = seedFull.export;
