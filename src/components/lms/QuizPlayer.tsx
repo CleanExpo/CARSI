@@ -93,6 +93,13 @@ export function QuizPlayer({ quiz, onSubmit, variant = 'default' }: QuizPlayerPr
 
   return (
     <div className="space-y-6">
+      {/* Screen-reader-only announcement so Previous/Next/Submit are heard —
+          visually nothing changes, the on-screen "Question X of Y" copy
+          below already communicates this to sighted users. */}
+      <p className="sr-only" role="status" aria-live="polite">
+        Question {activeIndex + 1} of {quiz.questions.length}
+        {answers[current.id] != null ? ', answered' : ', not yet answered'}
+      </p>
       <div className={`${dash.panel} overflow-hidden`}>
         <div className="border-b border-slate-200 bg-gradient-to-r from-[#eef7ff] to-white px-6 py-5">
           <p className={dash.eyebrow}>Knowledge check</p>
@@ -219,6 +226,8 @@ export function EnterpriseQuizResult({
         'p-8 text-center',
         passed ? 'border-emerald-200' : 'border-amber-200'
       )}
+      role="status"
+      aria-live="polite"
     >
       <div
         className={cn(
