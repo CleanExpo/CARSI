@@ -21,7 +21,19 @@ export type CourseListItem = {
   cec_hours?: string | null;
   /** Estimated or published duration hours. */
   duration_hours?: string | null;
+  /** Free-text keyword tags (LMS `tags` JSON column); used for catalogue tag filtering. */
+  tags?: string[] | null;
 };
+
+/** Normalises the Prisma `tags` JSON column (array of strings, or null/malformed) to a clean string array. */
+export function normalizeCourseTags(raw: unknown): string[] | null {
+  if (!Array.isArray(raw)) return null;
+  const tags = raw
+    .filter((t): t is string => typeof t === 'string')
+    .map((t) => t.trim())
+    .filter(Boolean);
+  return tags.length > 0 ? tags : null;
+}
 
 /** Minimal published course row for Stripe checkout. */
 export type CheckoutCourse = {
