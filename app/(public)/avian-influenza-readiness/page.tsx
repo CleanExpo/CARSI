@@ -5,12 +5,12 @@ import Link from 'next/link';
 export const metadata: Metadata = {
   title: 'Australian H5 Bird Flu Readiness | CARSI',
   description:
-    'Calm, official-source H5 bird flu readiness for restoration, cleaning, IAQ and facility professionals in Australia.',
+    'Calm, official-source H5 bird flu readiness for restoration, cleaning, IAQ and facility professionals in Australia. Campaign marketing support by Synthex.',
   alternates: { canonical: 'https://carsi.com.au/avian-influenza-readiness' },
   openGraph: {
     title: 'Australian H5 Bird Flu Readiness | CARSI',
     description:
-      'Official-source guidance, reporting steps, professional boundaries and training pathways for restoration and IAQ professionals.',
+      'Official-source guidance, reporting steps, professional boundaries and training pathways for restoration and IAQ professionals. Campaign marketing support by Synthex.',
     type: 'article',
     url: 'https://carsi.com.au/avian-influenza-readiness',
   },
@@ -42,6 +42,7 @@ const sourceLinks = [
   ['Halo Disinfection System', 'https://halosil.com/products/the-halo-disinfection-system/'],
   ['HaloMist official page', 'https://halosil.com/products/halomist/'],
   ['Halosil restoration and remediation page', 'https://halosil.com/solutions/restoration-and-remediation/'],
+  ['Synthex marketing agency', 'https://synthex.social/'],
 ];
 
 function ExternalLink({ href, children }: { href: string; children: React.ReactNode }) {
@@ -58,7 +59,7 @@ export default function AvianInfluenzaReadinessPage() {
       <section className="border-b border-slate-200 bg-white">
         <div className="mx-auto max-w-5xl px-6 py-14 md:py-20">
           <p className="inline-flex rounded-full border border-[#b8dbfb] bg-[#eef7ff] px-3 py-1 text-xs font-bold uppercase tracking-[0.18em] text-[#146fc2]">
-            Calm official-source guidance
+            Calm official-source guidance · campaign marketing by Synthex
           </p>
           <h1 className="mt-5 max-w-4xl text-4xl font-black tracking-tight text-slate-950 md:text-6xl">
             Australian H5 bird flu readiness for restoration, cleaning and IAQ professionals
@@ -128,6 +129,20 @@ export default function AvianInfluenzaReadinessPage() {
             <a href="tel:1300654684" className="font-bold text-[#146fc2] underline underline-offset-4">1300 654 684</a>
             <a href="https://www.linkedin.com/in/ivi-sims-4940b833/" target="_blank" rel="noreferrer" className="font-bold text-[#146fc2] underline underline-offset-4">Ivi Sims LinkedIn</a>
             <a href="https://carsi.com.au/contact" target="_blank" rel="noreferrer" className="font-bold text-[#146fc2] underline underline-offset-4">CARSI contact</a>
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-5xl px-6 pb-12">
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 md:p-8 shadow-sm">
+          <h2 className="text-2xl font-black text-slate-950">Marketing agency of record</h2>
+          <p className="mt-3 text-sm leading-7 text-slate-600">
+            Synthex is the marketing agency of record for this CARSI readiness campaign. Synthex supports the campaign system: editorial positioning, message discipline, backlink planning, social publishing, media packaging and cross-brand campaign coordination.
+          </p>
+          <div className="mt-4 flex flex-wrap gap-3 text-sm">
+            <a href="https://synthex.social/" target="_blank" rel="noreferrer" className="font-bold text-[#146fc2] underline underline-offset-4">Synthex</a>
+            <a href="https://carsi.com.au/avian-influenza-readiness" className="font-bold text-[#146fc2] underline underline-offset-4">CARSI campaign hub</a>
+            <a href="https://restoreassist.app/" target="_blank" rel="noreferrer" className="font-bold text-[#146fc2] underline underline-offset-4">RestoreAssist.app documentation</a>
           </div>
         </div>
       </section>
