@@ -1,0 +1,125 @@
+{
+  "version": 1,
+  "status": "DRAFT — NOT PUBLISHED — SME REVIEW REQUIRED",
+  "courseSlug": "mould-identification",
+  "note": "DRAFT end-of-course assessment authored for RA-7001. Every question is grounded in this course's newly authored lesson bodies (data/wordpress-export/courses.json) and paraphrases/applies ANSI/IICRC S520:2024 with clause citations — it does not reproduce the Standard's copyrighted text. Australian English, metric units and AS/NZS context. sourceRef is a review aid only and is not consumed by the seed script. DO NOT seed or publish until a qualified subject-matter expert has reviewed both the course content and these questions for technical accuracy. Structured identically to data/seed/floor-care-quizzes.json. This course carries 1 IICRC CEC hours.",
+  "quizzes": [
+    {
+      "quizId": "f3bf6103-7d56-4300-ac81-7096fd0169ca",
+      "lessonTitle": "End-of-course assessment: Introduction to Mould Identification and Remediation",
+      "title": "Introduction to Mould Identification and Remediation Quiz",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Under ANSI/IICRC S520:2024, what is the goal of mould remediation?",
+          "options": [
+            "To achieve a completely spore-free indoor environment",
+            "To return the affected environment to Condition 1 (normal fungal ecology)",
+            "To kill all mould with antimicrobial chemicals",
+            "To seal the mould behind new plasterboard"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Course module 1 & 7; S520:2024 Condition 1 definition"
+        },
+        {
+          "questionText": "Mould needs a food source, a suitable temperature, time and one further factor. In an occupied Australian home, which factor is normally the one you can actually control?",
+          "options": [
+            "Temperature",
+            "The organic food source",
+            "Moisture",
+            "Time"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "sourceRef": "Course module 2; S520:2024 §3"
+        },
+        {
+          "questionText": "Which S520:2024 Condition describes actual mould growth that may be active, dormant, dead, visible or hidden?",
+          "options": [
+            "Condition 1",
+            "Condition 2",
+            "Condition 3",
+            "Condition 4"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "sourceRef": "Course module 7; S520:2024 Condition 3 definition"
+        },
+        {
+          "questionText": "A room has settled spores and residual mould material that has drifted from a growth source in the same building, but no actual growth of its own. How is that room classified?",
+          "options": [
+            "Condition 1",
+            "Condition 2",
+            "Condition 3",
+            "It cannot be classified without sampling"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Course module 7; S520:2024 Condition 2 definition"
+        },
+        {
+          "questionText": "What is the correct role of air and surface sampling during a mould assessment?",
+          "options": [
+            "It replaces the need to find the moisture source",
+            "It is a pass/fail test that proves a building is safe",
+            "It is one supporting input to the assessment and does not replace locating and fixing moisture",
+            "It is mandatory before any visible mould can be called mould"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "sourceRef": "Course module 6; S520:2024 §7 preliminary determination"
+        },
+        {
+          "questionText": "Which Australian/New Zealand Standard is referenced for the collection of air samples in an indoor air quality assessment?",
+          "options": [
+            "AS/NZS 3760",
+            "AS/NZS 4849.1",
+            "AS 1668.2",
+            "AS/NZS 1716"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Course module 6; AS/NZS 4849.1"
+        },
+        {
+          "questionText": "Mains-powered inspection equipment used on an Australian mould job operates on which supply, and what protection is required on a potentially damp site?",
+          "options": [
+            "115 V / 15 A, no special protection",
+            "230 V / 50 Hz through a 10 A outlet, protected by an RCD/safety switch",
+            "240 V, protected only by the building's main fuse",
+            "12 V battery only, RCDs are not used in Australia"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Course module 5; AS/NZS 3760, Australian 230 V supply"
+        },
+        {
+          "questionText": "An occupant tells you they believe the mould is making them unwell. What is the appropriate response for a technician identifying mould?",
+          "options": [
+            "Diagnose the likely illness from the mould species present",
+            "Reassure them that mould is harmless",
+            "Record the concern and refer them to a medical practitioner; control the exposure, do not diagnose",
+            "Refuse to proceed until they provide a medical certificate"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "sourceRef": "Course module 3; S520:2024 susceptible occupants"
+        },
+        {
+          "questionText": "During the S520:2024 §7 inspection process, which activity comes first in building the picture of a mould problem?",
+          "options": [
+            "Removing plasterboard to expose the wall cavity",
+            "Gathering the building history and occupant information, then inspecting systematically",
+            "Taking air samples in every room",
+            "Applying a fungicidal coating to visible growth"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Course module 4; S520:2024 §7.3"
+        }
+      ]
+    }
+  ]
+}
