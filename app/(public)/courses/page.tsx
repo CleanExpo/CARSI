@@ -5,7 +5,7 @@ import { cache } from 'react';
 import { BundlePricingCard } from '@/components/lms/BundlePricingCard';
 import { CourseGrid } from '@/components/lms/CourseGrid';
 import { IICRCDisciplineMap } from '@/components/lms/diagrams/IICRCDisciplineMap';
-import { ItemListSchema } from '@/components/seo';
+import { CitablePassage, ItemListSchema } from '@/components/seo';
 import { CECCalculator } from '@/components/tools/CECCalculator';
 import { AcronymTooltip } from '@/components/ui/AcronymTooltip';
 import { getBackendOrigin, getPublicSiteUrl } from '@/lib/env/public-url';
@@ -284,7 +284,7 @@ export default async function CoursesPage({
                 </svg>
               </summary>
               <div className="px-5 pb-5">
-                <p className="text-sm leading-relaxed text-slate-600">
+                <CitablePassage variant="faq-answer" className="text-sm leading-relaxed text-slate-600">
                   CARSI offers <AcronymTooltip term="IICRC" /> <AcronymTooltip term="CEC" />{' '}
                   accredited courses across seven core disciplines: Water Restoration
                   Technology (<AcronymTooltip term="WRT" />
@@ -308,7 +308,7 @@ export default async function CoursesPage({
                   from any location. Eligible courses show their <AcronymTooltip term="CEC" /> value
                   so learners can track continuing education progress without implying{' '}
                   <AcronymTooltip term="IICRC" /> delivery status.
-                </p>
+                </CitablePassage>
               </div>
             </details>
 
@@ -337,7 +337,7 @@ export default async function CoursesPage({
                 </svg>
               </summary>
               <div className="px-5 pb-5">
-                <p className="text-sm leading-relaxed text-slate-600">
+                <CitablePassage variant="faq-answer" className="text-sm leading-relaxed text-slate-600">
                   Your discipline choice depends on your current role and career goals. Water
                   Restoration Technology (<AcronymTooltip term="WRT" />) is the most common starting
                   point, providing foundational knowledge applicable across all restoration work
@@ -354,7 +354,7 @@ export default async function CoursesPage({
                   sources in residential and commercial settings. Commercial Carpet Cleaning
                   Technology (<AcronymTooltip term="CCT" />) targets contract cleaners working in
                   commercial environments.
-                </p>
+                </CitablePassage>
               </div>
             </details>
 
@@ -384,7 +384,7 @@ export default async function CoursesPage({
                 </svg>
               </summary>
               <div className="px-5 pb-5">
-                <p className="text-sm leading-relaxed text-slate-600">
+                <CitablePassage variant="faq-answer" className="text-sm leading-relaxed text-slate-600">
                   <AcronymTooltip term="IICRC" /> Continuing Education Credits (
                   <AcronymTooltip term="CEC">CECs</AcronymTooltip>) are the industry standard for
                   tracking professional development in the cleaning and restoration sector.
@@ -400,7 +400,7 @@ export default async function CoursesPage({
                   credentials with a public URL that employers and clients can use to confirm your
                   qualifications. This system ensures your professional development is documented,
                   portable, and recognised internationally across the restoration industry.
-                </p>
+                </CitablePassage>
               </div>
             </details>
           </div>

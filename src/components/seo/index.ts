@@ -12,3 +12,5 @@ export {
   VideoObjectSchema,
   PodcastSeriesSchema,
 } from './JsonLd';
+
+export { CitablePassage, type CitablePassageVariant } from './CitablePassage';
