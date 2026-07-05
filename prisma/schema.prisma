@@ -56,6 +56,8 @@ model LmsUser {
   teamMemberships    LmsTeamMember[]
   ownedTeams         LmsTeam[]       @relation("TeamOwner")
   quizAttempts       LmsQuizAttempt[]
+  assessmentSubmissions LmsAssessmentSubmission[] @relation("AssessmentSubmissionStudent")
+  assessmentReviews     LmsAssessmentSubmission[] @relation("AssessmentSubmissionReviewer")
   iicrcCecSubmissions LmsIicrcCecSubmission[]
   lessonProgress     LmsLessonProgress[]
   notifications      LmsNotification[]
@@ -127,6 +129,7 @@ model LmsCourse {
   userDiscounts    UserDiscount[]
   pathwayCourses   LmsLearningPathwayCourse[]
   quizzes          LmsQuiz[]
+  practicalAssessments LmsPracticalAssessment[]
   iicrcCecSubmissions LmsIicrcCecSubmission[]
   reviews          LmsCourseReview[]
 
@@ -445,6 +448,68 @@ model LmsQuizAttempt {
 
   @@index([quizId, studentId])
   @@map("lms_quiz_attempts")
+}
+
+/// Practical (instructor-graded) assessment attached to a course, with a scoring rubric (GP-457).
+model LmsPracticalAssessment {
+  id            String   @id @default(uuid()) @db.Uuid
+  courseId      String   @map("course_id") @db.Uuid
+  title         String
+  instructions  String   @db.Text
+  /// Minimum % of total rubric points required to pass.
+  passThreshold Int      @default(70) @map("pass_threshold")
+  isPublished   Boolean  @default(false) @map("is_published")
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  course      LmsCourse                 @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  criteria    LmsRubricCriterion[]
+  submissions LmsAssessmentSubmission[]
+
+  @@index([courseId])
+  @@map("lms_practical_assessments")
+}
+
+/// One rubric criterion for a practical assessment (GP-457).
+model LmsRubricCriterion {
+  id           String @id @default(uuid()) @db.Uuid
+  assessmentId String @map("assessment_id") @db.Uuid
+  label        String
+  description  String @default("") @db.Text
+  maxPoints    Int    @default(5) @map("max_points")
+  orderIndex   Int    @default(0) @map("order_index")
+
+  assessment LmsPracticalAssessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+
+  @@index([assessmentId])
+  @@map("lms_rubric_criteria")
+}
+
+/// A student submission for a practical assessment + its instructor review (GP-457).
+model LmsAssessmentSubmission {
+  id              String    @id @default(uuid()) @db.Uuid
+  assessmentId    String    @map("assessment_id") @db.Uuid
+  studentId       String    @map("student_id") @db.Uuid
+  evidenceText    String    @map("evidence_text") @db.Text
+  /// Optional evidence links; portfolio file uploads are tracked separately (GP-122).
+  evidenceUrls    Json      @default("[]") @map("evidence_urls")
+  /// pending | under_review | passed | failed
+  status          String    @default("pending")
+  /// JSON array of { criterionId, points, comment } captured at review time.
+  criterionScores Json      @default("[]") @map("criterion_scores")
+  totalScore      Int?      @map("total_score")
+  reviewerId      String?   @map("reviewer_id") @db.Uuid
+  reviewerNotes   String?   @map("reviewer_notes") @db.Text
+  reviewedAt      DateTime? @map("reviewed_at") @db.Timestamptz(6)
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  assessment LmsPracticalAssessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  student    LmsUser                @relation("AssessmentSubmissionStudent", fields: [studentId], references: [id], onDelete: Cascade)
+  reviewer   LmsUser?               @relation("AssessmentSubmissionReviewer", fields: [reviewerId], references: [id], onDelete: SetNull)
+
+  @@index([assessmentId])
+  @@index([studentId])
+  @@index([status])
+  @@map("lms_assessment_submissions")
 }
 
 /// B2B team (Phase 2) — seat-based bundles.
