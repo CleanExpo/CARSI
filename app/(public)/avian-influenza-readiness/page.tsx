@@ -2,17 +2,52 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 
+const pageUrl = 'https://carsi.com.au/avian-influenza-readiness';
+const heroImage = 'https://carsi.com.au/images/campaigns/avian-influenza/carsi-bird-flu-infographic-corrected-ivi-contact.svg';
+const datePublished = '2026-07-05T09:00:00+10:00';
+const dateModified = '2026-07-05T12:00:00+10:00';
+
 export const metadata: Metadata = {
-  title: 'Australian H5 Bird Flu Readiness | CARSI',
+  title: 'Australian H5 Bird Flu Readiness | CARSI Training, IAQ & Restoration Guidance',
   description:
-    'Calm, official-source H5 bird flu readiness for restoration, cleaning, IAQ and facility professionals in Australia. Campaign marketing support by Synthex.',
-  alternates: { canonical: 'https://carsi.com.au/avian-influenza-readiness' },
+    'Official-source Australian H5 readiness guidance for restoration, cleaning, IAQ and facility professionals: hotline reporting, worker safety, documentation, dry-fogging limits and CARSI training. Campaign marketing by Synthex.',
+  keywords: [
+    'Australian H5 bird flu readiness',
+    'bird flu hotline Australia',
+    'avian influenza restoration training Australia',
+    'H5 cleaning protocol Australia',
+    'IAQ biosecurity training',
+    'RestoreAssist field documentation',
+    'Halosil dry fogging compliance',
+    'CARSI biosecurity readiness',
+  ],
+  alternates: { canonical: pageUrl },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+      'max-video-preview': -1,
+    },
+  },
   openGraph: {
     title: 'Australian H5 Bird Flu Readiness | CARSI',
     description:
       'Official-source guidance, reporting steps, professional boundaries and training pathways for restoration and IAQ professionals. Campaign marketing support by Synthex.',
     type: 'article',
-    url: 'https://carsi.com.au/avian-influenza-readiness',
+    url: pageUrl,
+    publishedTime: datePublished,
+    modifiedTime: dateModified,
+    images: [{ url: heroImage, width: 1600, height: 900, alt: 'CARSI Australian H5 readiness infographic' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Australian H5 Bird Flu Readiness | CARSI',
+    description: 'Report first, protect workers, document clearly. Official-source readiness guidance for Australian restoration and IAQ professionals.',
+    images: [heroImage],
   },
 };
 
@@ -45,6 +80,145 @@ const sourceLinks = [
   ['Synthex marketing agency', 'https://synthex.social/'],
 ];
 
+const answerBlocks = [
+  {
+    question: 'What should I do if I find a sick or dead bird in Australia?',
+    answer:
+      'Do not touch, collect or move it. Keep people and pets away, record the location, take photos or video only if safe, and report it to the 24-hour Emergency Animal Disease Hotline on 1800 675 888.',
+  },
+  {
+    question: 'Is Australian H5 bird flu currently a human-health emergency?',
+    answer:
+      'The current public message is measured. Australian Government sources report H5 detections in migratory seabirds and state that the current risk to people in Australia is considered low.',
+  },
+  {
+    question: 'Can restoration contractors handle sick or dead birds?',
+    answer:
+      'Restoration, cleaning and IAQ professionals should not handle sick or dead birds unless authorised. Their role is supporting documentation, access control, worker-safety records, cleaning records and client communication within scope.',
+  },
+  {
+    question: 'Is dry fogging required for Australian H5 control measures?',
+    answer:
+      'CARSI does not claim that dry fogging, Halosil, HaloFogger, NeoSan or any product is required by Australian Government H5 control measures. Product discussion must remain label-led, SDS-led, authority-aware and evidence-backed.',
+  },
+];
+
+const faqItems = answerBlocks.map((item) => ({
+  '@type': 'Question',
+  name: item.question,
+  acceptedAnswer: { '@type': 'Answer', text: item.answer },
+}));
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebPage',
+      '@id': `${pageUrl}#webpage`,
+      url: pageUrl,
+      name: 'Australian H5 Bird Flu Readiness for Restoration, Cleaning and IAQ Professionals',
+      description: metadata.description,
+      datePublished,
+      dateModified,
+      isPartOf: { '@id': 'https://carsi.com.au/#website' },
+      about: [
+        { '@type': 'Thing', name: 'H5 avian influenza readiness' },
+        { '@type': 'Thing', name: 'restoration industry training' },
+        { '@type': 'Thing', name: 'indoor air quality documentation' },
+      ],
+      primaryImageOfPage: { '@id': `${pageUrl}#primaryimage` },
+      reviewedBy: { '@id': 'https://www.linkedin.com/in/ivi-sims-4940b833/#person' },
+      publisher: { '@id': 'https://carsi.com.au/#organization' },
+    },
+    {
+      '@type': 'ImageObject',
+      '@id': `${pageUrl}#primaryimage`,
+      url: heroImage,
+      width: 1600,
+      height: 900,
+      caption: 'CARSI Australian H5 readiness infographic with corrected Ivi Sims contact details and no false portrait.',
+    },
+    {
+      '@type': 'Article',
+      '@id': `${pageUrl}#article`,
+      headline: 'Australian H5 Bird Flu Readiness for Restoration, Cleaning and IAQ Professionals',
+      description: metadata.description,
+      image: [heroImage],
+      datePublished,
+      dateModified,
+      author: [{ '@id': 'https://carsi.com.au/#organization' }],
+      contributor: [{ '@id': 'https://synthex.social/#organization' }],
+      reviewedBy: { '@id': 'https://www.linkedin.com/in/ivi-sims-4940b833/#person' },
+      publisher: { '@id': 'https://carsi.com.au/#organization' },
+      mainEntityOfPage: { '@id': `${pageUrl}#webpage` },
+      citation: sourceLinks.slice(0, 4).map(([, href]) => href),
+    },
+    {
+      '@type': 'Organization',
+      '@id': 'https://carsi.com.au/#organization',
+      name: 'CARSI',
+      alternateName: 'Cleaning and Restoration Science Institute',
+      url: 'https://carsi.com.au/',
+      contactPoint: [{ '@type': 'ContactPoint', telephone: '+61-1300-654-684', contactType: 'customer support', areaServed: 'AU' }],
+      sameAs: ['https://carsi.com.au/contact'],
+    },
+    {
+      '@type': 'Organization',
+      '@id': 'https://synthex.social/#organization',
+      name: 'Synthex',
+      url: 'https://synthex.social/',
+      description: 'Marketing agency of record for the CARSI H5 readiness campaign.',
+    },
+    {
+      '@type': 'Person',
+      '@id': 'https://www.linkedin.com/in/ivi-sims-4940b833/#person',
+      name: 'Ivi Sims',
+      url: 'https://www.linkedin.com/in/ivi-sims-4940b833/',
+      telephone: '+61-1300-654-684',
+      jobTitle: 'CARSI avian-influenza readiness point of contact',
+      affiliation: { '@id': 'https://carsi.com.au/#organization' },
+    },
+    {
+      '@type': 'Course',
+      '@id': `${pageUrl}#course`,
+      name: 'Australian H5 Bird Flu Awareness for Restoration, IAQ and Facility Professionals',
+      description: 'CARSI readiness training covering official reporting, WHS, PPE, professional boundaries, cleaning records and RestoreAssist documentation.',
+      provider: { '@id': 'https://carsi.com.au/#organization' },
+      educationalLevel: 'Professional awareness',
+      teaches: courseModules,
+      isAccessibleForFree: true,
+    },
+    {
+      '@type': 'FAQPage',
+      '@id': `${pageUrl}#faq`,
+      mainEntity: faqItems,
+    },
+    {
+      '@type': 'BreadcrumbList',
+      '@id': `${pageUrl}#breadcrumb`,
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://carsi.com.au/' },
+        { '@type': 'ListItem', position: 2, name: 'Australian H5 readiness', item: pageUrl },
+      ],
+    },
+    {
+      '@type': 'ItemList',
+      '@id': `${pageUrl}#sources`,
+      name: 'Official and technical source register',
+      itemListElement: sourceLinks.map(([label, href], index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        name: label,
+        url: href,
+      })),
+    },
+  ],
+};
+
+function jsonLdString(data: unknown) {
+  return JSON.stringify(data).replace(/</g, '\\u003c');
+}
+
 function ExternalLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer" className="font-semibold text-[#146fc2] underline decoration-[#146fc2]/30 underline-offset-4 hover:text-[#0f5fa8]">
@@ -56,6 +230,7 @@ function ExternalLink({ href, children }: { href: string; children: React.ReactN
 export default function AvianInfluenzaReadinessPage() {
   return (
     <main className="min-h-screen bg-[#f6f8fb] text-slate-900">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(jsonLd) }} />
       <section className="border-b border-slate-200 bg-white">
         <div className="mx-auto max-w-5xl px-6 py-14 md:py-20">
           <p className="inline-flex rounded-full border border-[#b8dbfb] bg-[#eef7ff] px-3 py-1 text-xs font-bold uppercase tracking-[0.18em] text-[#146fc2]">
@@ -67,6 +242,9 @@ export default function AvianInfluenzaReadinessPage() {
           <p className="mt-5 max-w-3xl text-lg leading-8 text-slate-700">
             CARSI is publishing this page to help professional restoration, cleaning, indoor air quality and facility teams communicate clearly, act within scope and follow Australian Government advice without creating public alarm.
           </p>
+          <div className="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm leading-6 text-slate-600">
+            <strong className="text-slate-950">Reviewed and source-checked:</strong> 5 July 2026 · Publisher: CARSI · Marketing agency of record: Synthex · Campaign contact: Ivi Sims.
+          </div>
           <div className="mt-8 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 shadow-sm">
             <Image src="/images/campaigns/avian-influenza/carsi-bird-flu-infographic-corrected-ivi-contact.svg" alt="CARSI Australian H5 bird flu readiness infographic with the corrected Ivi Sims contact details" width={1600} height={900} className="h-auto w-full" priority unoptimized />
           </div>
@@ -109,12 +287,38 @@ export default function AvianInfluenzaReadinessPage() {
 
       <section className="mx-auto max-w-5xl px-6 pb-12">
         <div className="rounded-2xl border border-slate-200 bg-white p-6 md:p-8 shadow-sm">
+          <h2 className="text-2xl font-black text-slate-950">Answer-engine quick answers</h2>
+          <div className="mt-6 grid gap-4 md:grid-cols-2">
+            {answerBlocks.map((item) => (
+              <article key={item.question} className="rounded-xl border border-slate-100 bg-slate-50 p-4">
+                <h3 className="font-black text-slate-950">{item.question}</h3>
+                <p className="mt-2 text-sm leading-6 text-slate-700">{item.answer}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-5xl px-6 pb-12">
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 md:p-8 shadow-sm">
           <h2 className="text-2xl font-black text-slate-950">Professional role and boundaries</h2>
           <p className="mt-3 text-sm leading-7 text-slate-600">
             Professional Indoor Remediation and Air Quality members can assist with documentation, worker-safety controls, cleaning records and client communication. They do not replace government, veterinary, wildlife or public-health authorities.
           </p>
           <div className="mt-5 rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm leading-7 text-slate-700">
             Product and dry-fogging discussion must remain label-led, SDS-led and authority-aware. CARSI does not claim that any product or dry-fogging method is required by Australian Government H5 control measures.
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-5xl px-6 pb-12">
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 md:p-8 shadow-sm">
+          <h2 className="text-2xl font-black text-slate-950">Experience, expertise, authority and trust</h2>
+          <div className="mt-5 grid gap-4 md:grid-cols-2">
+            <div className="rounded-lg border border-slate-100 bg-slate-50 p-4 text-sm leading-7 text-slate-700"><strong>Publisher:</strong> CARSI, the Cleaning and Restoration Science Institute.</div>
+            <div className="rounded-lg border border-slate-100 bg-slate-50 p-4 text-sm leading-7 text-slate-700"><strong>Reviewer/contact:</strong> Ivi Sims for IAQ and building science campaign coordination.</div>
+            <div className="rounded-lg border border-slate-100 bg-slate-50 p-4 text-sm leading-7 text-slate-700"><strong>Agency of record:</strong> Synthex for editorial, SEO, backlink and campaign packaging.</div>
+            <div className="rounded-lg border border-slate-100 bg-slate-50 p-4 text-sm leading-7 text-slate-700"><strong>Correction policy:</strong> update this page when official Australian Government or Australian CDC advice changes.</div>
           </div>
         </div>
       </section>
