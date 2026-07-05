@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 
 const pageUrl = 'https://carsi.com.au/avian-influenza-readiness'
 const heroImage =
@@ -189,7 +190,7 @@ const jsonLd = {
       alternateName: 'Cleaning and Restoration Science Institute',
       url: 'https://carsi.com.au/',
       contactPoint: [
-        { '@type': 'ContactPoint', telephone: '+61-1300-654-684', contactType: 'customer support', areaServed: 'AU' },
+        { '@type': 'ContactPoint', contactType: 'customer support', areaServed: 'AU', url: 'https://carsi.com.au/contact' },
       ],
       sameAs: ['https://carsi.com.au/contact'],
     },
@@ -205,7 +206,6 @@ const jsonLd = {
       '@id': 'https://www.linkedin.com/in/ivi-sims-4940b833/#person',
       name: 'Ivi Sims',
       url: 'https://www.linkedin.com/in/ivi-sims-4940b833/',
-      telephone: '+61-1300-654-684',
       jobTitle: 'CARSI avian-influenza readiness point of contact',
       affiliation: { '@id': 'https://carsi.com.au/#organization' },
     },
@@ -313,12 +313,12 @@ export default function AvianInfluenzaReadinessPage() {
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
-              <a
+              <Link
                 href="/courses"
                 className="inline-flex items-center gap-2 rounded-md bg-[#146fc2] px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#115a9e] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#146fc2]"
               >
                 View CARSI training
-              </a>
+              </Link>
               <a
                 href="https://restoreassist.app/"
                 target="_blank"
@@ -498,12 +498,6 @@ export default function AvianInfluenzaReadinessPage() {
               no unapproved direct email.
             </p>
             <div className="mt-5 flex flex-col gap-2 text-sm">
-              <a
-                href="tel:1300654684"
-                className="inline-flex items-center gap-2 font-semibold text-[#146fc2] underline underline-offset-4"
-              >
-                1300 654 684
-              </a>
               <ExternalLink href="https://www.linkedin.com/in/ivi-sims-4940b833/">Ivi Sims on LinkedIn</ExternalLink>
               <ExternalLink href="https://carsi.com.au/contact">CARSI contact</ExternalLink>
             </div>
