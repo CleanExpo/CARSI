@@ -18,6 +18,10 @@ OpenAI image generation produced a clean course visual set for review and CARSI 
 | `course-landing-page-ui-concept.png` | LMS landing page UI direction | `/images/campaigns/avian-influenza/course/course-landing-page-ui-concept.png` |
 | `lesson-dashboard-ui-concept.png` | Lesson player UI direction | `/images/campaigns/avian-influenza/course/lesson-dashboard-ui-concept.png` |
 
+## WebP variants
+
+Each asset also ships as a WebP conversion (sharp, quality 82) at the same public path with a `.webp` extension — 56–139 KB each versus 1–2 MB for the PNG originals. Prefer the `.webp` path when embedding directly; pages using `next/image` can keep referencing the PNG and let Next.js optimise delivery.
+
 ## Course placement plan
 
 1. Hero: `australian-coastal-seabird-editorial-hero.png`
