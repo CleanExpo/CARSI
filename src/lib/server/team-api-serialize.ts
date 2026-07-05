@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { decideTeamSeatSubscription } from '@/lib/server/entitlements';
 import {
   getTeamCoursePurchases,
   getTeamCourseSeatPools,
@@ -40,11 +41,39 @@ export async function serializeTeamForClient(team: TeamRecord, claimsSub: string
     };
   }
 
-  const [seatsUsed, coursePurchases, courseSeatPools] = await Promise.all([
+  const [seatsUsed, coursePurchases, courseSeatPools, teamSub] = await Promise.all([
     countTeamSeatsUsed(team.id),
     getTeamCoursePurchases(team.id),
     getTeamCourseSeatPools(team.id),
+    // WS1-E2 (GP-442): the recurring seat subscription, when this is a Teams
+    // subscription team. Drives the owner dashboard seats/usage + status block.
+    team.bundleTier === 'teams_subscription'
+      ? prisma.lmsTeamSubscription.findUnique({ where: { teamId: team.id } })
+      : Promise.resolve(null),
   ]);
+
+  const teamSubscription = teamSub
+    ? (() => {
+        const decision = decideTeamSeatSubscription({
+          status: teamSub.status,
+          currentPeriodEnd: teamSub.currentPeriodEnd,
+          seatLimit: teamSub.seatLimit,
+        });
+        return {
+          plan: teamSub.plan,
+          status: teamSub.status,
+          reason: decision.reason,
+          active: decision.subscriptionEntitled,
+          seat_limit: teamSub.seatLimit,
+          seats_used: Math.min(seatsUsed, teamSub.seatLimit),
+          seats_remaining: Math.max(0, teamSub.seatLimit - seatsUsed),
+          current_period_end: teamSub.currentPeriodEnd
+            ? teamSub.currentPeriodEnd.toISOString()
+            : null,
+          cancel_at_period_end: teamSub.cancelAtPeriodEnd,
+        };
+      })()
+    : null;
 
   return {
     id: team.id,
@@ -52,10 +81,12 @@ export async function serializeTeamForClient(team: TeamRecord, claimsSub: string
     slug: team.slug,
     bundle_tier: team.bundleTier,
     course_slug: team.courseSlug,
-    seat_limit: team.seatLimit,
+    // For a Teams subscription team the PAID seat count is authoritative.
+    seat_limit: teamSub ? teamSub.seatLimit : team.seatLimit,
     seats_used: seatsUsed,
     owner_id: team.ownerId,
     is_owner: true,
+    team_subscription: teamSubscription,
     course_purchases: coursePurchases,
     course_seat_pools: courseSeatPools.map((p) => ({
       course_slug: p.course_slug,

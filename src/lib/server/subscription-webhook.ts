@@ -22,7 +22,6 @@ import {
   readCancelAtPeriodEnd,
   readCurrentPeriodEnd,
   readCustomerId,
-  readInvoiceEmail,
   readInvoiceSubscriptionId,
 } from '@/lib/server/stripe-subscription-map';
 import {
@@ -31,6 +30,18 @@ import {
   upsertSubscription,
   upsertTerminalSubscriptionStatus,
 } from '@/lib/server/subscription-store';
+import {
+  markTeamSubscriptionStatusBySubscriptionId,
+  readSubscriptionSeatQuantity,
+  resolveTeamIdForStripeSubscription,
+  upsertTeamSubscription,
+  upsertTerminalTeamSubscriptionStatus,
+} from '@/lib/server/team-subscription-store';
+import {
+  markOrgSubscriptionStatusBySubscriptionId,
+  resolveTeamIdForOrgSubscription,
+  updateOrgSubscriptionFromStripe,
+} from '@/lib/server/org-subscription-store';
 
 /** Stripe subscription lifecycle + invoice events this module owns. */
 export const SUBSCRIPTION_EVENT_TYPES = new Set<string>([
@@ -43,6 +54,38 @@ export const SUBSCRIPTION_EVENT_TYPES = new Set<string>([
 
 export function isSubscriptionEvent(type: string): boolean {
   return SUBSCRIPTION_EVENT_TYPES.has(type);
+}
+
+/**
+ * Which product a Stripe subscription belongs to, read from its metadata `plan`.
+ *  - individual `pro_annual`               → E1 `LmsSubscription`
+ *  - Teams tiers (starter|growth|full_…)   → E2 `LmsTeamSubscription`
+ *  - `org_monthly`                          → E3 `LmsOrgSubscription`
+ * Fails closed to `individual` only for the historical individual metadata; any
+ * unknown plan is `unknown` and skipped (never mis-attached to a wrong table).
+ */
+export type SubscriptionKind = 'individual' | 'team' | 'org' | 'unknown';
+
+const TEAM_PLANS = new Set(['starter', 'growth', 'full_library', 'teams']);
+
+export function subscriptionKindFromPlan(plan: string | null | undefined): SubscriptionKind {
+  const p = (plan ?? '').trim().toLowerCase();
+  if (p === 'pro_annual') return 'individual';
+  if (p === 'org_monthly') return 'org';
+  if (TEAM_PLANS.has(p) || p.startsWith('teams_')) return 'team';
+  return 'unknown';
+}
+
+function subscriptionKind(subscription: Stripe.Subscription): SubscriptionKind {
+  const plan =
+    typeof subscription.metadata?.plan === 'string' ? subscription.metadata.plan : null;
+  const kind = subscriptionKindFromPlan(plan);
+  // Back-compat: an individual membership created before `plan` metadata was set
+  // still carries `carsi_user_id` and no team/org id — treat as individual.
+  if (kind === 'unknown' && typeof subscription.metadata?.carsi_user_id === 'string') {
+    return 'individual';
+  }
+  return kind;
 }
 
 /** Best-effort email for a subscription's customer (to map to a CARSI user). */
@@ -72,14 +115,80 @@ function eventCreatedToDate(event: Stripe.Event): Date | null {
 }
 
 /**
- * Upsert the membership from a full subscription object. `eventTimestamp` is the
- * source event's `event.created`; it drives the out-of-order guard in
- * `upsertSubscription` so a late (stale) snapshot cannot overwrite newer state.
+ * Upsert the correct subscription record from a full subscription object,
+ * dispatching by the subscription's `plan` metadata (individual / team / org).
+ * `eventTimestamp` is the source event's `event.created`; it drives the
+ * out-of-order guard in each store so a late (stale) snapshot cannot overwrite
+ * newer state. Unknown/unresolvable → log-and-skip (never a wrong grant).
  */
 async function applySubscriptionSnapshot(
   subscription: Stripe.Subscription,
   eventTimestamp: Date | null,
 ): Promise<void> {
+  const kind = subscriptionKind(subscription);
+
+  if (kind === 'team') {
+    const teamId = await resolveTeamIdForStripeSubscription(subscription);
+    if (!teamId) {
+      console.warn('[subscription-webhook] team: could not resolve CARSI team; skipping', {
+        subscriptionId: subscription.id,
+      });
+      return;
+    }
+    const plan =
+      typeof subscription.metadata?.plan === 'string'
+        ? subscription.metadata.plan.trim().toLowerCase()
+        : 'starter';
+    await upsertTeamSubscription({
+      teamId,
+      stripeCustomerId: readCustomerId(subscription),
+      stripeSubscriptionId: subscription.id,
+      status: subscription.status,
+      seatLimit: readSubscriptionSeatQuantity(subscription),
+      currentPeriodEnd: readCurrentPeriodEnd(subscription),
+      cancelAtPeriodEnd: readCancelAtPeriodEnd(subscription),
+      plan,
+      eventTimestamp,
+    });
+    return;
+  }
+
+  if (kind === 'org') {
+    const teamId = await resolveTeamIdForOrgSubscription(subscription);
+    if (!teamId) {
+      console.warn('[subscription-webhook] org: could not resolve CARSI org; skipping', {
+        subscriptionId: subscription.id,
+      });
+      return;
+    }
+    const applied = await updateOrgSubscriptionFromStripe({
+      teamId,
+      stripeCustomerId: readCustomerId(subscription),
+      stripeSubscriptionId: subscription.id,
+      status: subscription.status,
+      currentPeriodEnd: readCurrentPeriodEnd(subscription),
+      cancelAtPeriodEnd: readCancelAtPeriodEnd(subscription),
+      eventTimestamp,
+    });
+    if (!applied) {
+      // Row not yet created (checkout success writes it with org name/contact).
+      // A pure webhook cannot invent those fields — skip until the row exists.
+      console.warn('[subscription-webhook] org: subscription row not yet provisioned; skipping', {
+        subscriptionId: subscription.id,
+      });
+    }
+    return;
+  }
+
+  if (kind === 'unknown') {
+    console.warn('[subscription-webhook] unknown subscription plan; skipping', {
+      subscriptionId: subscription.id,
+      plan: subscription.metadata?.plan,
+    });
+    return;
+  }
+
+  // Individual membership (E1) — unchanged behaviour.
   const email = await emailForSubscriptionCustomer(subscription);
   const userId = await resolveUserIdForStripeSubscription(subscription, email);
   if (!userId) {
@@ -119,6 +228,60 @@ export async function handleSubscriptionEvent(event: Stripe.Event): Promise<void
       const subscription = event.data.object as Stripe.Subscription;
       // Prefer the canonical status; deleted subscriptions are 'canceled'.
       const status = subscription.status || 'canceled';
+      const kind = subscriptionKind(subscription);
+
+      if (kind === 'team') {
+        const teamId = await resolveTeamIdForStripeSubscription(subscription);
+        if (teamId && eventTimestamp) {
+          const plan =
+            typeof subscription.metadata?.plan === 'string'
+              ? subscription.metadata.plan.trim().toLowerCase()
+              : 'starter';
+          await upsertTerminalTeamSubscriptionStatus({
+            teamId,
+            stripeCustomerId: readCustomerId(subscription),
+            stripeSubscriptionId: subscription.id,
+            status,
+            seatLimit: readSubscriptionSeatQuantity(subscription),
+            plan,
+            eventTimestamp,
+          });
+        } else {
+          await markTeamSubscriptionStatusBySubscriptionId(subscription.id, status);
+        }
+        return;
+      }
+
+      if (kind === 'org') {
+        // The org row is provisioned with name/contact; a canceled snapshot only
+        // needs the status. The id-keyed write is sticky enough here because the
+        // row already exists (provisioned at checkout), and the ordering guard in
+        // updateOrgSubscriptionFromStripe handles late-active-after-cancel.
+        const teamId = await resolveTeamIdForOrgSubscription(subscription);
+        if (teamId) {
+          await updateOrgSubscriptionFromStripe({
+            teamId,
+            stripeCustomerId: readCustomerId(subscription),
+            stripeSubscriptionId: subscription.id,
+            status,
+            currentPeriodEnd: readCurrentPeriodEnd(subscription),
+            cancelAtPeriodEnd: readCancelAtPeriodEnd(subscription),
+            eventTimestamp,
+          });
+        } else {
+          await markOrgSubscriptionStatusBySubscriptionId(subscription.id, status);
+        }
+        return;
+      }
+
+      if (kind === 'unknown') {
+        console.warn('[subscription-webhook] deleted: unknown plan; skipping', {
+          subscriptionId: subscription.id,
+        });
+        return;
+      }
+
+      // Individual membership (E1) — unchanged behaviour.
       // Resolve the user so the cancellation is STICKY even when this deleted
       // event arrives before `created` (row absent) — a plain updateMany would
       // no-op and lose the cancel. Falls back to the plain status write only if
@@ -134,9 +297,6 @@ export async function handleSubscriptionEvent(event: Stripe.Event): Promise<void
           eventTimestamp,
         });
       } else {
-        // No resolvable user (or no event timestamp) — we cannot safely create a
-        // guarded row. Fall back to the id-keyed status write: it updates the row
-        // if it already exists, and no-ops otherwise (unchanged legacy path).
         await markSubscriptionStatusBySubscriptionId(subscription.id, status);
       }
       return;
@@ -151,27 +311,11 @@ export async function handleSubscriptionEvent(event: Stripe.Event): Promise<void
         return;
       }
       // Re-fetch the authoritative subscription so status + period end reflect
-      // the post-invoice truth (Stripe has already applied the state change).
+      // the post-invoice truth (Stripe has already applied the state change), then
+      // dispatch to the correct store by plan (applySubscriptionSnapshot routes).
       try {
         const subscription = await getStripeClient().subscriptions.retrieve(subscriptionId);
-        // Ensure email mapping still works even if metadata is absent.
-        const email = readInvoiceEmail(invoice) ?? (await emailForSubscriptionCustomer(subscription));
-        const userId = await resolveUserIdForStripeSubscription(subscription, email);
-        if (!userId) {
-          console.warn('[subscription-webhook] invoice: could not resolve CARSI user; skipping', {
-            subscriptionId,
-          });
-          return;
-        }
-        await upsertSubscription({
-          userId,
-          stripeCustomerId: readCustomerId(subscription),
-          stripeSubscriptionId: subscription.id,
-          status: subscription.status,
-          currentPeriodEnd: readCurrentPeriodEnd(subscription),
-          cancelAtPeriodEnd: readCancelAtPeriodEnd(subscription),
-          eventTimestamp,
-        });
+        await applySubscriptionSnapshot(subscription, eventTimestamp);
       } catch (error) {
         console.error('[subscription-webhook] invoice subscription refresh failed:', error);
         throw error; // transient — let the route return 5xx so Stripe retries

@@ -463,6 +463,8 @@ model LmsTeam {
   members          LmsTeamMember[]
   invites          LmsTeamInvite[]
   coursePurchases  LmsTeamCoursePurchase[]
+  teamSubscription LmsTeamSubscription?
+  orgSubscription  LmsOrgSubscription?
 
   @@map("lms_teams")
 }
@@ -631,6 +633,72 @@ model LmsSubscription {
 
   @@index([stripeCustomerId], map: "idx_lms_subscriptions_customer")
   @@map("lms_subscriptions")
+}
+
+/// WS1-E2 (GP-442): seat-based Teams subscription. A recurring Stripe
+/// subscription whose `quantity` is the seat count; while `active`/in grace,
+/// exactly `seatLimit` members of the team hold whole-catalogue entitlement.
+/// Parallels `LmsSubscription` (individual) but is keyed on the team, so a team
+/// has at most one active seat subscription. Distinct from the one-off,
+/// per-course `LmsTeamCoursePurchase` block — this is recurring + all-courses.
+model LmsTeamSubscription {
+  id                   String    @id @default(uuid()) @db.Uuid
+  teamId               String    @unique @map("team_id") @db.Uuid
+  stripeCustomerId     String?   @map("stripe_customer_id") @db.VarChar(255)
+  /// Unique when present so a replayed webhook cannot create a second row.
+  stripeSubscriptionId String?   @unique @map("stripe_subscription_id") @db.VarChar(255)
+  /// Stripe subscription status: active | trialing | past_due | canceled | unpaid | incomplete | incomplete_expired.
+  status               String    @db.VarChar(32)
+  /// Teams tier id for UI: starter | growth | full_library.
+  plan                 String    @default("starter") @map("plan") @db.VarChar(32)
+  /// Purchased seat count (= Stripe subscription quantity). Members beyond this
+  /// index are NOT entitled; the owner expands by increasing the quantity.
+  seatLimit            Int       @map("seat_limit")
+  currentPeriodEnd     DateTime? @map("current_period_end") @db.Timestamptz(6)
+  cancelAtPeriodEnd    Boolean   @default(false) @map("cancel_at_period_end")
+  /// Out-of-order guard — see LmsSubscription.statusEventAt.
+  statusEventAt        DateTime? @map("status_event_at") @db.Timestamptz(6)
+  createdAt            DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt            DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  team LmsTeam @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@index([stripeCustomerId], map: "idx_lms_team_subscriptions_customer")
+  @@map("lms_team_subscriptions")
+}
+
+/// WS1-E3 (GP-443): organisation monthly subscription (A$1,295/month + GST,
+/// unlimited learners). Executes docs/plans/2026-06-27-org-subscription-billing.md.
+/// Reuses `LmsTeam` as the organisation container (members link via LmsTeamMember);
+/// entitlement = "member of an org whose subscription is active and which entitles
+/// this course category". `seatModel` is always 'unlimited' for this plan.
+model LmsOrgSubscription {
+  id                   String    @id @default(uuid()) @db.Uuid
+  teamId               String    @unique @map("team_id") @db.Uuid
+  organisationName     String    @map("organisation_name") @db.VarChar(255)
+  contactEmail         String    @map("contact_email") @db.VarChar(320)
+  stripeCustomerId     String?   @map("stripe_customer_id") @db.VarChar(255)
+  /// Unique when present so a replayed webhook cannot create a second row.
+  stripeSubscriptionId String?   @unique @map("stripe_subscription_id") @db.VarChar(255)
+  /// Stripe subscription status: active | trialing | past_due | canceled | unpaid | incomplete | incomplete_expired.
+  status               String    @db.VarChar(32)
+  plan                 String    @default("org_monthly") @map("plan") @db.VarChar(32)
+  /// Seat model — always 'unlimited' for the org monthly plan.
+  seatModel            String    @default("unlimited") @map("seat_model") @db.VarChar(16)
+  /// Course category this subscription entitles (the CARSI Maintenance Company
+  /// Onboarding brand). Members enrol freely in courses in this category.
+  entitledCategory     String    @default("CARSI Maintenance Company Onboarding") @map("entitled_category") @db.VarChar(128)
+  currentPeriodEnd     DateTime? @map("current_period_end") @db.Timestamptz(6)
+  cancelAtPeriodEnd    Boolean   @default(false) @map("cancel_at_period_end")
+  /// Out-of-order guard — see LmsSubscription.statusEventAt.
+  statusEventAt        DateTime? @map("status_event_at") @db.Timestamptz(6)
+  createdAt            DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt            DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  team LmsTeam @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@index([stripeCustomerId], map: "idx_lms_org_subscriptions_customer")
+  @@map("lms_org_subscriptions")
 }
 
 model AdminUser {

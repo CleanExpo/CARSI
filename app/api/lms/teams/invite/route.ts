@@ -69,9 +69,32 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    // Seat-based Teams SUBSCRIPTION teams (E2, GP-442) enforce the seat limit
+    // against the paid `LmsTeamSubscription.seatLimit` and expose a
+    // seat-expansion path on exhaustion (spec §15 #4). Other teams use the
+    // team.seatLimit column as before.
+    const teamSub =
+      team.bundleTier === 'teams_subscription'
+        ? await prisma.lmsTeamSubscription.findUnique({ where: { teamId: team.id } })
+        : null;
+    const effectiveSeatLimit = teamSub ? teamSub.seatLimit : team.seatLimit;
+
     const seatsUsed = await countTeamSeatsUsed(team.id);
     const pending = team.invites.length;
-    if (seatsUsed + pending >= team.seatLimit) {
+    if (seatsUsed + pending >= effectiveSeatLimit) {
+      if (teamSub) {
+        // The 6th invite on a 5-seat plan lands here → reject WITH an expansion path.
+        return NextResponse.json(
+          {
+            detail: 'All seats on your Teams plan are in use. Add seats to invite more members.',
+            reason: 'seat_full',
+            seat_limit: effectiveSeatLimit,
+            seats_used: seatsUsed,
+            expand_url: '/api/lms/subscription/teams/expand-seats',
+          },
+          { status: 409 },
+        );
+      }
       return NextResponse.json({ detail: 'No seats available' }, { status: 409 });
     }
 

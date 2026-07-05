@@ -28,6 +28,8 @@ import { resolveStripePaymentReference } from '@/lib/server/stripe-payment-refer
 import { revokeEnrollmentsByPaymentReference } from '@/lib/server/stripe-revocation';
 import { readSubscriptionIdFromPaymentIntent } from '@/lib/server/stripe-subscription-map';
 import { markSubscriptionStatusBySubscriptionId } from '@/lib/server/subscription-store';
+import { markTeamSubscriptionStatusBySubscriptionId } from '@/lib/server/team-subscription-store';
+import { markOrgSubscriptionStatusBySubscriptionId } from '@/lib/server/org-subscription-store';
 import {
   handleSubscriptionEvent,
   isSubscriptionEvent,
@@ -99,11 +101,18 @@ async function handleStripeRevocation(event: Stripe.Event): Promise<void> {
     });
     const subscriptionId = readSubscriptionIdFromPaymentIntent(paymentIntent);
     if (subscriptionId) {
-      // Terminal, non-entitling state. `canceled` is treated as lapsed by
-      // getEntitlements → hasActiveMembership:false → no new catalogue access.
-      await markSubscriptionStatusBySubscriptionId(subscriptionId, 'canceled');
+      // Terminal, non-entitling state. `canceled` is treated as lapsed by every
+      // entitlement decision (individual/team/org) → no new catalogue access.
+      // The subscription id is unique per table; each mark is a no-op when the id
+      // is not in that table, so we fan out to all three revenue paths (E1/E2/E3)
+      // without needing to know the plan up front.
+      await Promise.all([
+        markSubscriptionStatusBySubscriptionId(subscriptionId, 'canceled'),
+        markTeamSubscriptionStatusBySubscriptionId(subscriptionId, 'canceled'),
+        markOrgSubscriptionStatusBySubscriptionId(subscriptionId, 'canceled'),
+      ]);
       console.warn(
-        `[stripe webhook] revoked membership for subscription=${subscriptionId} (${reason})`,
+        `[stripe webhook] revoked subscription entitlement for subscription=${subscriptionId} (${reason})`,
       );
     }
   } catch (error) {
