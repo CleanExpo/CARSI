@@ -3582,6 +3582,168 @@
           ]
         }
       ]
+    },
+    {
+      "id": "133d2075-047d-4a0a-b16a-3601e0acdef0",
+      "slug": "avian-influenza-awareness-restoration-iaq-facilities",
+      "title": "Australian H5 Bird Flu Awareness for Restoration, IAQ and Facility Professionals",
+      "description": "This course helps Australian restoration, cleaning, indoor air quality, facility, strata, insurance-support and professional remediation teams communicate calmly, report correctly, protect workers, stay within scope, document field work and avoid unsupported claims about H5 bird flu.\n\nIt is for professionals who may receive questions about sick or dead birds, field documentation, building contamination concerns or client communication during the current Australian H5 bird flu detections in migratory seabirds.\n\nThis course is not veterinary training, wildlife handling training, public-health diagnosis, government biosecurity response training or product endorsement training. It follows the official Australian Government and Australian Centre for Disease Control reporting pathway: do not touch sick or dead birds, record what you see and report to the Emergency Animal Disease Hotline on 1800 675 888.",
+      "shortDescription": "Report correctly, protect workers, document field work and communicate calmly about H5 bird flu — professional-boundary awareness training for Australian restoration, IAQ and facility teams.",
+      "thumbnailUrl": null,
+      "instructorId": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+      "status": "draft",
+      "priceAud": "0",
+      "isFree": true,
+      "durationHours": 1,
+      "level": "Awareness",
+      "category": "Biosecurity Readiness",
+      "tags": [
+        "biosecurity",
+        "avian influenza",
+        "H5 bird flu",
+        "restoration",
+        "indoor air quality",
+        "WHS",
+        "emergency animal disease",
+        "campaign"
+      ],
+      "iicrcDiscipline": null,
+      "cecHours": null,
+      "meta": {
+        "campaign": "avian-influenza",
+        "campaignHub": "https://carsi.com.au/avian-influenza-readiness",
+        "sourceDocs": "docs/campaigns/avian-influenza/course/",
+        "sourceRegister": "docs/campaigns/avian-influenza/course/source-register.md",
+        "marketingAgencyOfRecord": "Synthex",
+        "campaignContact": "Ivi Sims, 1300 654 684",
+        "buildStage": "seeded-unpublished-pending-sme-review",
+        "linearIssue": "GP-456",
+        "officialSourceRecheck": "2026-07-05: DAFF/Australian CDC/Animal Health Australia guidance reconfirmed current — migratory seabird detections only (WA, SA), no poultry, public risk low, hotline 1800 675 888 correct. Recheck again before publish per lms-import-plan.md gate 1."
+      },
+      "isPublished": false,
+      "modules": [
+        {
+          "id": "b307e210-838b-44a7-9e56-562c2ba753e5",
+          "title": "Official message and reporting pathway",
+          "orderIndex": 0,
+          "lessons": [
+            {
+              "id": "5d4ac645-cb73-4a1e-9034-c805fee069da",
+              "title": "Official message and reporting pathway — Reading",
+              "contentType": "text",
+              "contentBody": "<p>Australia has reported H5 bird flu detections in migratory seabirds. The professional communication position is calm and evidence-led: follow Australian Government and Australian Centre for Disease Control (CDC) advice, avoid speculation and direct the public to the correct reporting pathway.</p><p>If a sick or dead bird or animal is found, the public message is simple:</p><ol><li>Do not touch it.</li><li>Avoid the area.</li><li>Keep children and pets away.</li><li>Record the location and what is seen.</li><li>Take photos or video only if safe.</li><li>Report to the Emergency Animal Disease Hotline on 1800 675 888.</li></ol><blockquote>Report first. Do not touch. Record the location. Call 1800 675 888.</blockquote><p><strong>Professional caution:</strong> Do not tell the public that a site is infected or safe. Use neutral language: observed, reported, excluded from scope, referred to authority.</p>",
+              "orderIndex": 0,
+              "isPreview": true,
+              "resources": null
+            }
+          ]
+        },
+        {
+          "id": "3c8b01a5-24a9-49f2-b664-bdc900187b1b",
+          "title": "Professional role, scope and boundaries",
+          "orderIndex": 1,
+          "lessons": [
+            {
+              "id": "97d0aa9d-8924-4df9-9ca6-985ec9ee791e",
+              "title": "Professional role, scope and boundaries — Reading",
+              "contentType": "text",
+              "contentBody": "<p>Professional restoration and IAQ members may be asked to assist property owners, facility managers, strata managers, insurers or contractors. The role is support, not authority replacement.</p><p><strong>Professionals can assist with:</strong></p><ul><li>site notes and photo records</li><li>access control and exclusion-zone records</li><li>worker-safety planning</li><li>PPE record keeping</li><li>cleaning records</li><li>product-label and SDS record checks</li><li>client communication notes</li><li>RestoreAssist.app reporting</li><li>escalation to the correct authority pathway</li></ul><p><strong>Professionals must not:</strong></p><ul><li>handle wildlife without authorisation</li><li>diagnose avian influenza</li><li>certify a site as disease-free</li><li>override government, veterinary, wildlife or public-health authorities</li><li>claim that a product or dry-fogging method is required unless written authority direction and product evidence support that claim</li></ul><blockquote>Our role is to document, protect workers and communicate clearly. Official disease response sits with the relevant authorities.</blockquote>",
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": null
+            }
+          ]
+        },
+        {
+          "id": "3b8a5d0a-4dcf-45ba-bde9-bd23f829c469",
+          "title": "Worker safety, PPE awareness and clean/dirty zones",
+          "orderIndex": 2,
+          "lessons": [
+            {
+              "id": "d1e076f8-7f37-42a5-b216-ff21e37ca220",
+              "title": "Worker safety, PPE awareness and clean/dirty zones — Reading",
+              "contentType": "text",
+              "contentBody": "<p>Before any site work, complete a site-specific WHS risk assessment. Determine what has been observed, whether authorities have been contacted, whether the site is under direction and whether the work is within the contractor's scope.</p><p>Use clean and dirty zones to reduce confusion and cross-contamination risk. This course does not prescribe a universal PPE set because PPE must be matched to task, risk, authority guidance, product label and SDS. However, records should show what PPE was selected, who wore it, whether there were breaches and what waste or equipment movement was excluded from the job.</p><p><strong>Documentation fields:</strong></p><ul><li>Who attended</li><li>What was observed</li><li>Whether sick or dead birds or animals were present</li><li>Whether the hotline or authority pathway was used</li><li>PPE selected</li><li>Access restrictions</li><li>Client instructions</li><li>Work not performed</li><li>Photos and timestamps</li></ul><blockquote>If it is not documented, it cannot be reviewed.</blockquote>",
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": null
+            }
+          ]
+        },
+        {
+          "id": "f898cfd6-502c-4536-afa8-b68666b4345e",
+          "title": "Cleaning-before-disinfection and product-claim limits",
+          "orderIndex": 3,
+          "lessons": [
+            {
+              "id": "4d967acf-9282-490c-8b47-1bca768a2485",
+              "title": "Cleaning-before-disinfection and product-claim limits — Reading",
+              "contentType": "text",
+              "contentBody": "<p>CARSI's training position is simple: clean first, disinfect second, document third. Disinfection claims must never exceed the product label, SDS, regulator position or evidence base.</p><p>Hydrogen-peroxide dry fogging, including Halosil or HaloFogger-style systems, must not be described as required by Australian Government H5 control measures unless a written authority direction and product evidence support that claim. This course may discuss dry fogging only as a possible adjunct method where legal, label-supported, risk-assessed, unoccupied where required, and performed by trained operators after source removal and cleaning.</p><p>NeoSan or any other product training must remain label-led and SDS-led until approved H5 or relevant organism claims are verified.</p><blockquote>Product training is not product hype. Use the label, SDS, evidence and authority direction.</blockquote>",
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": null
+            }
+          ]
+        },
+        {
+          "id": "39abd80f-ad0e-4239-86ee-e0d32bb4da0b",
+          "title": "RestoreAssist.app documentation pathway",
+          "orderIndex": 4,
+          "lessons": [
+            {
+              "id": "ff0fc2db-5ccf-42dc-a23c-3594d0d78f09",
+              "title": "RestoreAssist.app documentation pathway — Reading",
+              "contentType": "text",
+              "contentBody": "<p>RestoreAssist.app is the documentation pathway for campaign field records. A professional file should allow a client, insurer, supervisor or authority to understand what was observed, what was reported, what was done, what was not done and what evidence supported the decision.</p><p><strong>Suggested record sections:</strong></p><ul><li>intake notes</li><li>site address and contact</li><li>observation notes</li><li>authority/reporting record</li><li>photos and captions</li><li>worker attendance</li><li>PPE record</li><li>access control</li><li>cleaning record</li><li>product and SDS record</li><li>exclusion and limitation notes</li><li>client communication</li><li>completion statement</li></ul><blockquote>RestoreAssist turns the job from a memory into a defensible record.</blockquote>",
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": null
+            }
+          ]
+        },
+        {
+          "id": "d37a9981-5fb8-414a-90cb-bc5325c396d6",
+          "title": "Client, media and social communication",
+          "orderIndex": 5,
+          "lessons": [
+            {
+              "id": "01ea7a49-f975-4121-978d-6b9469c9b182",
+              "title": "Client, media and social communication — Reading",
+              "contentType": "text",
+              "contentBody": "<p>This campaign is a public-interest and professional-readiness campaign. The tone must be measured. Do not use terms such as crisis, outbreak or emergency unless those are the exact words used by authorities for the current situation.</p><p><strong>Use approved wording:</strong></p><ul><li>We follow Australian Government advice.</li><li>Do not touch sick or dead birds.</li><li>Report to 1800 675 888.</li><li>Our role is documentation, worker safety and professional support.</li><li>We do not replace government, veterinary, wildlife or public-health authorities.</li><li>Product use must follow label, SDS and authority requirements.</li></ul><p><strong>Avoid:</strong></p><ul><li>fear-based headlines</li><li>unsupported claims</li><li>fake statistics</li><li>fake expert quotes</li><li>fake portraits</li><li>unapproved personal contact details</li><li>product claims that exceed evidence</li></ul><blockquote>Calm language builds trust. Panic language damages credibility.</blockquote>",
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": null
+            }
+          ]
+        },
+        {
+          "id": "39f682bd-59de-480f-97a1-6f0a25a38173",
+          "title": "Knowledge check and completion",
+          "orderIndex": 6,
+          "lessons": [
+            {
+              "id": "d3e343d1-e98f-46f9-ab52-5886c8272f12",
+              "title": "Professional-boundary statement",
+              "contentType": "text",
+              "contentBody": "<p>Before the knowledge check, confirm you understand the professional-boundary statement below. You will be asked to apply it while answering the quiz questions.</p><blockquote>I understand that my role is to report, protect, document and communicate within scope. I do not diagnose bird flu, handle wildlife without authorisation, certify sites as disease-free or make product claims that are not supported by label, SDS, regulator position and evidence.</blockquote><p><strong>Certificate disclaimer:</strong> Awareness training only. Not veterinary, medical, wildlife handling or government biosecurity response training.</p>",
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "27ee0231-4a34-4b67-b050-31c1f2d0ee36",
+              "title": "Knowledge check",
+              "contentType": "quiz",
+              "contentBody": "caa45e76-f500-424f-a056-c9ab1b4e6d98",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": null
+            }
+          ]
+        }
+      ]
     }
   ]
 }
