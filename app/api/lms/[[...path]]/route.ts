@@ -79,9 +79,10 @@ async function localStub(
 
   // gamification/me/level — handled by app/api/lms/gamification/me/level/route.ts (real DB XP)
 
-  if (method === 'POST' && key === 'subscription/portal') {
-    return NextResponse.json({ url: '' });
-  }
+  // subscription/portal is now a REAL route
+  // (app/api/lms/subscription/portal/route.ts, GP-458) that shadows this
+  // catch-all: it opens the Stripe Customer Portal for the signed-in member and
+  // returns 503 while SUBSCRIPTIONS_ENABLED is off (unchanged dark behaviour).
 
   // notifications/me, notifications/me/read-all, notifications/:id/read are now real routes
   // under app/api/lms/notifications/** (Phase A) — they shadow this catch-all.

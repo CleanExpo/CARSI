@@ -82,6 +82,10 @@ export async function POST(request: NextRequest) {
         source: 'carsi-pro-annual',
       },
       subscription_data: {
+        // 7-day free trial on the individual annual membership (GP-458). The
+        // subscription starts `trialing` (entitled per decideMembershipEntitlement)
+        // and converts to `active` on first successful charge after the trial.
+        trial_period_days: 7,
         metadata: { carsi_user_id: claims.sub, plan: 'pro_annual' },
       },
       allow_promotion_codes: true,
