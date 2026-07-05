@@ -7,19 +7,6 @@ import { NextRequest, NextResponse } from 'next/server';
 
 type Ctx = { params: Promise<{ path?: string[] }> };
 
-type StubLessonNote = {
-  id: string;
-  lesson_id: string;
-  lesson_title: string;
-  module_title: string | null;
-  course_title: string;
-  course_slug: string;
-  content: string | null;
-  updated_at: string | null;
-};
-
-const notesStore = new Map<string, StubLessonNote>();
-
 function inferDisciplineFromCourseSlug(slug: string): string {
   const s = slug.toLowerCase();
   if (/(odou?r|odor|deodor|smell|air-quality)/.test(s)) return 'OCT';
@@ -47,13 +34,7 @@ const HUB_KEYWORDS: Record<string, string[]> = {
   ASD: ['Structural drying technician', 'Water restoration'],
 };
 
-async function localStub(
-  method: string,
-  segments: string[],
-  request?: NextRequest
-): Promise<NextResponse | null> {
-  const key = segments.join('/');
-
+async function localStub(method: string, segments: string[]): Promise<NextResponse | null> {
   if (
     method === 'GET' &&
     segments[0] === 'hub' &&
@@ -87,73 +68,8 @@ async function localStub(
   // notifications/me, notifications/me/read-all, notifications/:id/read are now real routes
   // under app/api/lms/notifications/** (Phase A) — they shadow this catch-all.
 
-  if (method === 'GET' && key === 'notes/me') {
-    const notes = Array.from(notesStore.values()).sort((a, b) => {
-      const ta = a.updated_at ? new Date(a.updated_at).getTime() : 0;
-      const tb = b.updated_at ? new Date(b.updated_at).getTime() : 0;
-      return tb - ta;
-    });
-    return NextResponse.json(notes);
-  }
-
-  if (method === 'PUT' && segments[0] === 'notes' && segments[1]) {
-    const lessonId = segments[1];
-    let content = '';
-    let courseSlug: string | undefined;
-    let courseTitle: string | undefined;
-    let lessonTitle: string | undefined;
-    let moduleTitle: string | null | undefined;
-    try {
-      const body = (await request?.json()) as
-        | {
-            content?: unknown;
-            course_slug?: unknown;
-            course_title?: unknown;
-            lesson_title?: unknown;
-            module_title?: unknown;
-          }
-        | undefined;
-      content = typeof body?.content === 'string' ? body.content : '';
-      courseSlug =
-        typeof body?.course_slug === 'string' && body.course_slug.trim()
-          ? body.course_slug
-          : undefined;
-      courseTitle =
-        typeof body?.course_title === 'string' && body.course_title.trim()
-          ? body.course_title
-          : undefined;
-      lessonTitle =
-        typeof body?.lesson_title === 'string' && body.lesson_title.trim()
-          ? body.lesson_title
-          : undefined;
-      moduleTitle =
-        typeof body?.module_title === 'string' && body.module_title.trim()
-          ? body.module_title
-          : undefined;
-    } catch {
-      content = '';
-    }
-
-    const now = new Date().toISOString();
-    const existing = notesStore.get(lessonId);
-    const next: StubLessonNote = {
-      id: `stub-note-${lessonId}`,
-      lesson_id: lessonId,
-      lesson_title: lessonTitle ?? existing?.lesson_title ?? 'Lesson note',
-      module_title: moduleTitle ?? existing?.module_title ?? null,
-      course_title: courseTitle ?? existing?.course_title ?? 'Course',
-      course_slug: courseSlug ?? existing?.course_slug ?? 'course',
-      content,
-      updated_at: now,
-    };
-    notesStore.set(lessonId, next);
-    return NextResponse.json(next);
-  }
-
-  if (method === 'DELETE' && segments[0] === 'notes' && segments[1]) {
-    notesStore.delete(segments[1]);
-    return NextResponse.json({ ok: true });
-  }
+  // notes/me + notes/:lessonId are now real DB-backed routes under app/api/lms/notes/** (GP-459) —
+  // they shadow this catch-all. The former in-memory notesStore stub was removed.
 
   return null;
 }
@@ -165,31 +81,31 @@ function notConfiguredResponse(): NextResponse {
   );
 }
 
-async function handle(method: string, ctx: Ctx, request?: NextRequest): Promise<NextResponse> {
+async function handle(method: string, ctx: Ctx): Promise<NextResponse> {
   const { path = [] } = await ctx.params;
 
-  const stub = await localStub(method, path, request);
+  const stub = await localStub(method, path);
   if (stub) return stub;
 
   return notConfiguredResponse();
 }
 
 export async function GET(_request: NextRequest, ctx: Ctx) {
-  return handle('GET', ctx, _request);
+  return handle('GET', ctx);
 }
 
-export async function POST(request: NextRequest, ctx: Ctx) {
-  return handle('POST', ctx, request);
+export async function POST(_request: NextRequest, ctx: Ctx) {
+  return handle('POST', ctx);
 }
 
-export async function PATCH(request: NextRequest, ctx: Ctx) {
-  return handle('PATCH', ctx, request);
+export async function PATCH(_request: NextRequest, ctx: Ctx) {
+  return handle('PATCH', ctx);
 }
 
-export async function PUT(request: NextRequest, ctx: Ctx) {
-  return handle('PUT', ctx, request);
+export async function PUT(_request: NextRequest, ctx: Ctx) {
+  return handle('PUT', ctx);
 }
 
-export async function DELETE(request: NextRequest, ctx: Ctx) {
-  return handle('DELETE', ctx, request);
+export async function DELETE(_request: NextRequest, ctx: Ctx) {
+  return handle('DELETE', ctx);
 }

@@ -60,12 +60,36 @@ model LmsUser {
   assessmentReviews     LmsAssessmentSubmission[] @relation("AssessmentSubmissionReviewer")
   iicrcCecSubmissions LmsIicrcCecSubmission[]
   lessonProgress     LmsLessonProgress[]
+  lessonNotes        LmsLessonNote[]
   notifications      LmsNotification[]
   courseReviews      LmsCourseReview[] @relation("ReviewStudent")
   reviewReplies      LmsCourseReview[] @relation("ReviewReplyAuthor")
   subscription       LmsSubscription?
 
   @@map("lms_users")
+}
+
+/// Private per-student note attached to a lesson. Durable replacement for the former in-memory
+/// stub (GP-459). Upserted by (user_id, lesson_id); the denormalised course/lesson/module titles
+/// let `GET /api/lms/notes/me` render the notes list without joining the (external) course catalogue.
+model LmsLessonNote {
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  lessonId    String   @map("lesson_id")
+  content     String   @db.Text
+  /// Denormalised display metadata captured at save time (course catalogue lives outside this DB).
+  lessonTitle String?  @map("lesson_title")
+  moduleTitle String?  @map("module_title")
+  courseTitle String?  @map("course_title")
+  courseSlug  String?  @map("course_slug")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user LmsUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lessonId])
+  @@index([userId, updatedAt])
+  @@map("lms_lesson_notes")
 }
 
 /// In-app (and optionally emailable) notifications: toolbox-talk drip, recert reminders, system.
