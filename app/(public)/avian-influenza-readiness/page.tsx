@@ -159,7 +159,7 @@ const jsonLd = {
       name: 'CARSI',
       alternateName: 'Cleaning and Restoration Science Institute',
       url: 'https://carsi.com.au/',
-      contactPoint: [{ '@type': 'ContactPoint', telephone: '+61-1300-654-684', contactType: 'customer support', areaServed: 'AU' }],
+      contactPoint: [{ '@type': 'ContactPoint', contactType: 'customer support', areaServed: 'AU', url: 'https://carsi.com.au/contact' }],
       sameAs: ['https://carsi.com.au/contact'],
     },
     {
@@ -174,7 +174,6 @@ const jsonLd = {
       '@id': 'https://www.linkedin.com/in/ivi-sims-4940b833/#person',
       name: 'Ivi Sims',
       url: 'https://www.linkedin.com/in/ivi-sims-4940b833/',
-      telephone: '+61-1300-654-684',
       jobTitle: 'CARSI avian-influenza readiness point of contact',
       affiliation: { '@id': 'https://carsi.com.au/#organization' },
     },
@@ -330,7 +329,6 @@ export default function AvianInfluenzaReadinessPage() {
             Ivi Sims is the CARSI avian-influenza readiness point of contact. This campaign uses no false portrait and no unapproved direct email.
           </p>
           <div className="mt-4 flex flex-wrap gap-3 text-sm">
-            <a href="tel:1300654684" className="font-bold text-[#146fc2] underline underline-offset-4">1300 654 684</a>
             <a href="https://www.linkedin.com/in/ivi-sims-4940b833/" target="_blank" rel="noreferrer" className="font-bold text-[#146fc2] underline underline-offset-4">Ivi Sims LinkedIn</a>
             <a href="https://carsi.com.au/contact" target="_blank" rel="noreferrer" className="font-bold text-[#146fc2] underline underline-offset-4">CARSI contact</a>
           </div>
