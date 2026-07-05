@@ -16,7 +16,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'IICRC CEC Training for Plumbers & Trades | CARSI Australia',
   description:
-    'Turn water damage call-outs into drying contracts. IICRC WRT and ASD CEC courses for Australian plumbers and trade contractors — online, self-paced, CEC-aligned. These are continuing education (CEC) courses, not IICRC certification.',
+    'Turn water damage call-outs into drying contracts. IICRC WRT and ASD CEC courses for Australian plumbers and trade contractors — online, self-paced, CEC Accredited. These are continuing education (CEC) courses, not IICRC certification.',
   keywords: [
     'IICRC CEC training plumbers Australia',
     'WRT CEC course plumbing',
@@ -63,7 +63,7 @@ const faqs = [
   {
     question: 'Can I complete IICRC CEC training online while running a plumbing business?',
     answer:
-      'Yes. CARSI offers IICRC-aligned CEC courses online and fully self-paced. There are no fixed class times — modules are completed between jobs, in the evening, or on weekends. Most WRT courses take 8–12 hours of study, which plumbers typically spread over two weeks. On completion, you receive a verifiable digital credential and IICRC Continuing Education Credits (CECs) towards your professional standing.',
+      'Yes. CARSI offers IICRC CEC Accredited courses online and fully self-paced. There are no fixed class times — modules are completed between jobs, in the evening, or on weekends. Most WRT courses take 8–12 hours of study, which plumbers typically spread over two weeks. On completion, you receive a verifiable digital credential and IICRC Continuing Education Credits (CECs) towards your professional standing.',
   },
 ];
 
@@ -129,7 +129,7 @@ export default async function PlumbingTradesIndustryPage() {
         subtitle="Plumbing & Trades Training"
         title="Trades Restoration Bundle"
         price={industryBundlePriceLabel('plumbing-trades')}
-        description="WRT + ASD training for licensed plumbers and trade contractors. Complete online between jobs. IICRC-aligned CEC."
+        description="WRT + ASD training for licensed plumbers and trade contractors. Complete online between jobs. IICRC CEC Accredited."
         ctaText="Add Restoration to Your Business"
         accentColor={ACCENT_COLOR}
       />

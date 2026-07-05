@@ -53,7 +53,7 @@ const faqs = [
   {
     question: 'How does water damage training help warehouse operations?',
     answer:
-      'Australian warehouses face water damage from storm events, roof failures, and sprinkler activations. IICRC WRT training equips logistics teams to respond immediately — extracting water, protecting inventory, and deploying drying equipment to minimise stock loss and downtime. Early response can reduce insurance claims and prevent secondary mould damage.',
+      'Australian warehouses face water damage from storm events, roof failures, and sprinkler activations. WRT-aligned CEC training equips logistics teams to respond immediately — extracting water, protecting inventory, and deploying drying equipment to minimise stock loss and downtime. Early response can reduce insurance claims and prevent secondary mould damage.',
   },
   {
     question: 'What is vehicle interior restoration training?',
@@ -63,7 +63,7 @@ const faqs = [
   {
     question: 'Can transport and logistics staff train online around shift schedules?',
     answer:
-      'Yes. CARSI offers IICRC-aligned CEC courses online and self-paced. Drivers and warehouse staff can complete modules during downtime, between shifts, or during scheduled stand-down periods. All courses issue verifiable digital credentials on completion.',
+      'Yes. CARSI offers IICRC CEC Accredited courses online and self-paced. Drivers and warehouse staff can complete modules during downtime, between shifts, or during scheduled stand-down periods. All courses issue verifiable digital credentials on completion.',
   },
 ];
 

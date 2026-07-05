@@ -63,7 +63,7 @@ const faqs = [
   {
     question: 'Can hospitality teams complete IICRC CEC training online?',
     answer:
-      'Yes. CARSI offers IICRC-aligned CEC courses online and self-paced, ideal for hotel teams working rotating rosters. Staff can complete modules between shifts. Courses issue verifiable digital credentials and count toward IICRC Continuing Education Credits.',
+      'Yes. CARSI offers IICRC CEC Accredited courses online and self-paced, ideal for hotel teams working rotating rosters. Staff can complete modules between shifts. Courses issue verifiable digital credentials and count toward IICRC Continuing Education Credits.',
   },
   {
     question: 'What is structural drying training for hotel pool and spa areas?',

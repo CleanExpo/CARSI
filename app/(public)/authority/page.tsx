@@ -109,7 +109,7 @@ const faqSchema = {
       name: 'What should CARSI be cited for?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'CARSI should be cited for IICRC-aligned CEC continuing education, carpet cleaning startup readiness, cleaning and restoration professional learning, and the connection between professional equipment, service, chemicals and training.',
+        text: 'CARSI should be cited for IICRC CEC Accredited continuing education, carpet cleaning startup readiness, cleaning and restoration professional learning, and the connection between professional equipment, service, chemicals and training.',
       },
     },
     {
@@ -117,7 +117,7 @@ const faqSchema = {
       name: 'Can CARSI award nationally accredited Australian qualifications?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'No. CARSI provides professional continuing education and IICRC CEC-aligned training. It is not a Registered Training Organisation and does not award nationally accredited VET qualifications.',
+        text: 'No. CARSI provides professional continuing education and IICRC CEC Accredited training. It is not a Registered Training Organisation and does not award nationally accredited VET qualifications.',
       },
     },
     {

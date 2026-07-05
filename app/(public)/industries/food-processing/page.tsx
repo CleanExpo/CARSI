@@ -53,17 +53,17 @@ const faqs = [
   {
     question: 'How does IICRC CEC training support HACCP compliance in food facilities?',
     answer:
-      'HACCP plans require demonstrated competency in contamination prevention. IICRC AMRT certification provides verifiable evidence that maintenance teams can identify and remediate microbial hazards including mould, bacteria, and biofilms in cold storage rooms, processing lines, and drainage systems — all critical control points in a HACCP plan.',
+      "HACCP plans require demonstrated competency in contamination prevention. CARSI's AMRT-aligned CEC training provides verifiable evidence that maintenance teams can identify and remediate microbial hazards including mould, bacteria, and biofilms in cold storage rooms, processing lines, and drainage systems — all critical control points in a HACCP plan.",
   },
   {
     question: 'What is mould remediation training for cold storage facilities?',
     answer:
-      'IICRC AMRT training covers identification and remediation of mould and microbial growth in temperature-controlled environments. For Australian food facilities, this is critical in cold rooms, blast chillers, loading docks, and drainage channels where condensation creates ideal conditions for microbial contamination that can affect product safety.',
+      'AMRT-aligned CEC training covers identification and remediation of mould and microbial growth in temperature-controlled environments. For Australian food facilities, this is critical in cold rooms, blast chillers, loading docks, and drainage channels where condensation creates ideal conditions for microbial contamination that can affect product safety.',
   },
   {
     question: 'Can food processing staff complete IICRC CEC training while maintaining shift patterns?',
     answer:
-      'Yes. CARSI offers IICRC-aligned CEC courses online and self-paced. Staff can complete modules around production schedules and shift rotations. Eligible courses count toward IICRC Continuing Education Credits (CECs) and issue verifiable digital credentials on completion.',
+      'Yes. CARSI offers IICRC CEC Accredited courses online and self-paced. Staff can complete modules around production schedules and shift rotations. Eligible courses count toward IICRC Continuing Education Credits (CECs) and issue verifiable digital credentials on completion.',
   },
 ];
 

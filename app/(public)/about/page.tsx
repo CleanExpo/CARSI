@@ -41,8 +41,8 @@ export async function generateMetadata(): Promise<Metadata> {
   const d = facts.disciplineCodes.length;
   const coursePhrase =
     n > 0
-      ? `${formatCourseCountForCopy(n)} IICRC-aligned CEC course${n === 1 ? '' : 's'}`
-      : 'IICRC-aligned CEC courses';
+      ? `${formatCourseCountForCopy(n)} IICRC CEC Accredited course${n === 1 ? '' : 's'}`
+      : 'IICRC CEC Accredited courses';
   const discPhrase =
     d > 0 ? `${d} discipline${d === 1 ? '' : 's'}` : 'multiple IICRC disciplines';
   return {
@@ -219,7 +219,7 @@ export default async function AboutPage() {
           body={
             d > 0
               ? `Published courses tagged across ${d} IICRC discipline${d === 1 ? '' : 's'} — each counting toward continuing education credits.`
-              : 'CEC-aligned courses across all seven core IICRC disciplines.'
+              : 'CEC Accredited courses across all seven core IICRC disciplines.'
           }
         />
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
@@ -266,7 +266,7 @@ export default async function AboutPage() {
           IICRC Certification; it only qualifies continuing education hours where applicable.
         </p>
         <p className={`mt-3 text-xs font-medium ${marketingTextStrong}`}>
-          CARSI courses are IICRC-aligned CEC courses where stated.
+          CARSI courses are IICRC CEC Accredited courses where stated.
         </p>
       </section>
     </MarketingPageShell>

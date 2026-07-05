@@ -141,7 +141,7 @@ export function PublicFooter() {
               Australia&apos;s industry training leader.
               <br />
               24/7 online. <AcronymTooltip term="IICRC" />
-              <span> CEC-aligned courses.</span>
+              <span> CEC Accredited courses.</span>
             </p>
           </div>
 

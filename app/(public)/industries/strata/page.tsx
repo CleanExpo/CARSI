@@ -80,7 +80,7 @@ export default async function StrataIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Strata & Body Corporate"
         headlineAccent="Restoration Training"
-        description="Certified restoration training for strata managers, building managers, and body corporate committees. Protect common property assets with IICRC-accredited credentials."
+        description="Certified restoration training for strata managers, building managers, and body corporate committees. Protect common property assets with IICRC CEC Accredited credentials."
         disciplines={disciplines}
         stats={stats}
       />

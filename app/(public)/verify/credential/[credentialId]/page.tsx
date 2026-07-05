@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: { params: Promise<{ credentia
   const { credentialId } = await params;
   return {
     title: `Verify credential ${credentialId.slice(0, 8)}… | CARSI`,
-    description: 'Employer verification for CARSI IICRC-aligned CEC courses credentials',
+    description: 'Employer verification for CARSI IICRC CEC Accredited courses credentials',
     robots: 'index, follow',
   };
 }

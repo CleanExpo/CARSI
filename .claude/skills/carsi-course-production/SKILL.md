@@ -57,18 +57,26 @@ edit is saved.
   (Phill McGurk). Honour the SEO/GEO/AEO initiative (see memory `carsi-seo-geo-aeo-initiative`).
 
 ### 8. IICRC CEC terminology — licence-critical (MUST)
-- CARSI sells **IICRC CEC courses**, NOT IICRC certification. In every course title, description,
-  lesson, quiz and piece of course marketing copy, describe what CARSI offers as "IICRC CEC
-  courses" / "IICRC Continuing Education Credit (CEC) courses" / "courses carrying IICRC CEC
-  approval".
+- CARSI is accredited as an **IICRC CEC provider** — NOT accredited to deliver IICRC courses or
+  certification. In every course title, description, lesson, quiz and piece of course marketing
+  copy, describe what CARSI offers as "IICRC CEC Accredited courses" / "IICRC CEC Accredited" /
+  "IICRC Continuing Education Credit (CEC) courses".
+- "Accredited" must always be paired with "CEC" (e.g. "IICRC CEC Accredited"). BANNED: bare
+  "IICRC Accredited" (drop the CEC qualifier) and "IICRC Course Accredited" / "IICRC-accredited
+  course(s)" — both wrongly imply IICRC accredits the course/certification itself rather than
+  CARSI's standing as a CEC provider.
 - BANNED in any selling/descriptive context: "IICRC courses", "IICRC certification course(s)",
   "IICRC-certified course(s)", "get IICRC certified with CARSI", or any copy implying CARSI
   delivers IICRC certification, examinations, or credentials. IICRC certification is obtained only
   through **IICRC-approved schools and examinations**; CARSI courses earn **CECs** toward
   maintaining an existing IICRC certification.
+- Also avoid bare "IICRC [discipline] training" (e.g. "IICRC FSRT training") or "[discipline]
+  certification covers…" when describing CARSI's own course content — say "[discipline]-aligned
+  CEC training" instead, so it reads as CARSI's course aligning to the discipline, not as the
+  IICRC certification itself.
 - FINE: a student's own existing IICRC certification (recert reminders, member number, CEC
-  tracking), accurate "IICRC CEC-approved" claims, "WRT/ASD/AMRT-aligned" content descriptors, and
-  discipline badges framed as CEC discipline alignment.
+  tracking), "WRT/ASD/AMRT-aligned" content descriptors, and discipline badges framed as CEC
+  discipline alignment.
 - Getting this wrong can cost the licence to sell courses — treat as a release blocker. Enforced by
   `npm run check:iicrc-terminology`.
 

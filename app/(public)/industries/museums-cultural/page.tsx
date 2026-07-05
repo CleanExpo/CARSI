@@ -53,17 +53,17 @@ const faqs = [
   {
     question: 'How does mould affect museum collections and how does IICRC CEC training help?',
     answer:
-      'Mould poses a critical threat to paper, textile, and organic artefacts in museum storage. IICRC AMRT training teaches staff to identify microbial growth early, implement containment protocols, and remediate without damaging collection items. For Australian institutions in humid coastal climates, this training is essential for preventive conservation programs.',
+      'Mould poses a critical threat to paper, textile, and organic artefacts in museum storage. AMRT-aligned CEC training teaches staff to identify microbial growth early, implement containment protocols, and remediate without damaging collection items. For Australian institutions in humid coastal climates, this training is essential for preventive conservation programs.',
   },
   {
     question: 'Can gallery and museum staff complete IICRC CEC training online?',
     answer:
-      'Yes. CARSI offers IICRC-aligned CEC courses online and self-paced, ideal for museum staff who need to maintain building operations during opening hours. Courses can be completed around exhibition schedules and issue verifiable digital credentials on completion.',
+      'Yes. CARSI offers IICRC CEC Accredited courses online and self-paced, ideal for museum staff who need to maintain building operations during opening hours. Courses can be completed around exhibition schedules and issue verifiable digital credentials on completion.',
   },
   {
     question: 'What is the emergency response protocol for water damage in a museum?',
     answer:
-      'IICRC WRT training covers triage-based water damage response: isolate the source, protect high-value items, extract standing water, and deploy drying equipment. For museums, this includes specific protocols for waterlogged documents, textiles, and framed works. ASD training complements this with structural moisture monitoring to prevent secondary mould growth.',
+      'WRT-aligned CEC training covers triage-based water damage response: isolate the source, protect high-value items, extract standing water, and deploy drying equipment. For museums, this includes specific protocols for waterlogged documents, textiles, and framed works. ASD training complements this with structural moisture monitoring to prevent secondary mould growth.',
   },
 ];
 

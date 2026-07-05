@@ -44,7 +44,7 @@ const STAT_PRESENTATION: Record<
   },
   'IICRC Disciplines': {
     icon: Award,
-    detail: 'CEC-aligned course tracks',
+    detail: 'CEC Accredited course tracks',
     badge: 'IICRC CEC',
     accent: 'text-[#9a4a00] dark:text-[#f2b14f]',
     glow: 'from-[#ed9d24]/14 to-transparent dark:from-[#ed9d24]/20',
