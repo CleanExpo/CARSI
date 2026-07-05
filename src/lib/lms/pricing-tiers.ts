@@ -32,8 +32,10 @@ export interface TeamTier {
 export const INDIVIDUAL_TIERS: IndividualTier[] = [
   {
     id: 'per_course',
+    // Published course prices currently range from $20 to $770; keep this in sync
+    // with the actual lowest-priced published course, not an assumed/rounded figure.
     name: 'Per course',
-    priceLabel: 'From $149',
+    priceLabel: 'From $20',
     priceCents: null,
     description: 'Pay once per IICRC-aligned CEC course. CECs tracked on completion.',
     cta: 'Browse courses',
