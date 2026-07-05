@@ -1,0 +1,173 @@
+{
+  "version": 1,
+  "status": "DRAFT — NOT PUBLISHED — SME REVIEW REQUIRED",
+  "courseSlug": "level-3-mould-remediation",
+  "note": "DRAFT end-of-course assessment authored for RA-7001. Every question is grounded in this course's newly authored lesson bodies (data/wordpress-export/courses.json) and paraphrases/applies ANSI/IICRC S520:2024 with clause citations — it does not reproduce the Standard's copyrighted text. Australian English, metric units and AS/NZS context. sourceRef is a review aid only and is not consumed by the seed script. DO NOT seed or publish until a qualified subject-matter expert has reviewed both the course content and these questions for technical accuracy. Structured identically to data/seed/floor-care-quizzes.json. This course carries 5 IICRC CEC hours.",
+  "quizzes": [
+    {
+      "quizId": "1a7e3be1-7e7c-4326-adcf-484cf0bc0450",
+      "lessonTitle": "End-of-course assessment: Level 3 - Mould Remediation",
+      "title": "Level 3 - Mould Remediation Quiz",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "S520:2024 §8 is titled Limitations, Complexities, Complications and Conflicts. What is its relevance to a Level 3 job?",
+          "options": [
+            "It lists the chemicals approved for large jobs",
+            "It frames the factors — large or hidden contamination, susceptible occupants, disputes, Category 3 water — that escalate a job beyond a standard remediation",
+            "It sets the maximum price a remediator may charge",
+            "It is only relevant to residential jobs"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Course module 1; S520:2024 §8.1–§8.4"
+        },
+        {
+          "questionText": "Full containment for a complex job typically includes which of the following?",
+          "options": [
+            "An open work area with a fan pointing outward",
+            "Critical barriers over openings, an anteroom/decontamination chamber, and continuous negative pressure",
+            "A single sheet of plastic taped to one wall",
+            "Positive air pressure to push air out of the room"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Course module 2; S520:2024 §9.2, §9.3.3"
+        },
+        {
+          "questionText": "Why should the pressure differential of a full containment be monitored and logged (for example with a manometer)?",
+          "options": [
+            "To calculate the electricity bill",
+            "To be able to demonstrate that negative pressure — and therefore containment — was maintained for the duration of the works",
+            "It is not necessary on any job",
+            "To measure the outdoor temperature"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Course module 2; S520:2024 §9.3.3, §9.3.5"
+        },
+        {
+          "questionText": "In Australian construction, which locations are common hiding places for hidden/systemic mould on a large job?",
+          "options": [
+            "Only the visible face of interior walls",
+            "Wall cavities behind Gyprock, the sub-floor, the roof void and behind sarking, plus double-brick cavities and party walls",
+            "Only inside light fittings",
+            "Mould never hides inside building assemblies"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Course module 3; S520:2024 §9.3.7, §8.6"
+        },
+        {
+          "questionText": "Under S520:2024 §11, what is the correct first step when handling contents in affected areas?",
+          "options": [
+            "Dispose of everything immediately",
+            "Inspect and evaluate each item for restorability, then inventory and pack items removed from affected areas",
+            "Clean everything with bleach on site",
+            "Return all items to the occupant untouched"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Course module 4; S520:2024 §11.1, §11.2"
+        },
+        {
+          "questionText": "How should high-value and irreplaceable items (artworks, documents, heirlooms) be handled?",
+          "options": [
+            "Treated exactly like ordinary contents",
+            "Given special care and, where appropriate, specialist referral, per §11.4",
+            "Always discarded as unrestorable",
+            "Left in the contaminated area"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Course module 4; S520:2024 §11.4, §11.5"
+        },
+        {
+          "questionText": "A ducted HVAC system serves a large affected building. Why is it a particular concern on a Level 3 job?",
+          "options": [
+            "It cannot spread contamination",
+            "It can distribute spores building-wide, so it must be isolated, assessed and, where required, cleaned; Australian mechanical ventilation is designed to AS 1668.2",
+            "It is always outside the remediation scope",
+            "It should be run continuously to dry the building"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Course module 5; S520:2024 §10; AS 1668.2"
+        },
+        {
+          "questionText": "Why should the Indoor Environmental Professional who performs independent clearance not be the party that did the remediation?",
+          "options": [
+            "To increase the total invoice",
+            "Because independence — the verifier being different from the remediator — is the point of an arm's-length clearance",
+            "Because remediators are not allowed to see the results",
+            "It makes no difference who verifies"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Course module 6; S520:2024 §7.1, §12"
+        },
+        {
+          "questionText": "You uncover material likely to contain asbestos in a pre-2004 building during mould works. Under S520:2024 §8.5 and §8.9, what must you do?",
+          "options": [
+            "Continue the mould works and remove the asbestos yourself",
+            "Stop the mould work and engage licensed removalists under the relevant WHS asbestos regulations before continuing",
+            "Cover it with plastic and keep working",
+            "Ignore it because mould is the priority"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Course module 7; S520:2024 §8.5, §8.9; WHS asbestos regulations"
+        },
+        {
+          "questionText": "Which items form the litigation-grade documentation package expected on a complex mould project?",
+          "options": [
+            "Only the final invoice",
+            "Written scope and work plan, photographic evidence, pressure and moisture logs, waste records, change orders, and any deviation with its rationale",
+            "A verbal handover to the site manager",
+            "The technician's personal notes, kept privately"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Course module 8; S520:2024 §1.2, §6.3, §6.3.4, §8.7"
+        },
+        {
+          "questionText": "For how long should project records be handled after close-out?",
+          "options": [
+            "They can be deleted as soon as the invoice is paid",
+            "They should be retained for the required retention period per §6.4",
+            "Only until the occupant returns",
+            "Records retention does not apply to mould work"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Course module 9; S520:2024 §6.4"
+        },
+        {
+          "questionText": "Large projects involve owners, occupants and insurers whose interests can conflict (§8.4). What is the best practice for managing this?",
+          "options": [
+            "Avoid communicating to prevent disagreement",
+            "Communicate health concerns and process honestly, manage expectations about what verification can prove, and keep approvals in writing",
+            "Let the insurer make all technical decisions",
+            "Promise occupants a spore-free result"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Course module 9; S520:2024 §6.2, §8.4"
+        },
+        {
+          "questionText": "What marks the true completion of a Level 3 project?",
+          "options": [
+            "When the visible mould is gone",
+            "When independent verification confirms a return to Condition 1 and the documentation/evidence trail is complete",
+            "When the containment is taken down",
+            "When the final coat of paint is applied"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Course module 10; S520:2024 §12, §6.4"
+        }
+      ]
+    }
+  ]
+}
