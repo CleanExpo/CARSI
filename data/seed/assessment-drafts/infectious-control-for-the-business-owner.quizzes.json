@@ -24,7 +24,7 @@
           "sourceRef": "Microbial.docx — Infectious Control for the Business Owner, Module 1: Virus Facts"
         },
         {
-          "questionText": "What minimum available chlorine concentration is identified for effective decontamination against spore-forming bacteria such as C. difficile?",
+          "questionText": "What available chlorine concentration do current Australian state health guidelines (e.g. Queensland Health, NSW Clinical Excellence Commission, SA Health) specify for cleaning surfaces where C. difficile is suspected or confirmed?",
           "options": [
             "100 ppm",
             "500 ppm",
@@ -33,7 +33,7 @@
           ],
           "correctIndex": 2,
           "points": 1,
-          "sourceRef": "Microbial.docx — Infectious Control for the Business Owner, Module 2: Bacteria and Modes of Transmission"
+          "sourceRef": "Microbial.docx Module 2 (Bacteria and Modes of Transmission); 1000 ppm verified 2026-07-05 against Queensland Health CDI guideline (2024), NSW CEC and SA Health (0.1% = 1000 ppm). NHMRC prints no ppm; ACIPC/ASID notes 5000 mg/L for consistent sporicidal efficacy — stem reframed to ask what AU guidance specifies, not a universal spore-kill claim. SME to ratify."
         },
         {
           "questionText": "A technician is about to disinfect a visibly soiled high-touch surface. What is the compliant sequence?",
@@ -180,16 +180,16 @@
           "sourceRef": "Microbial.docx — Infectious Control for the Business Owner, Module 13: Safety Data Sheets"
         },
         {
-          "questionText": "Under Model WHS Regulations r.330, does a spray bottle prepared on site and used for only 30 minutes still require a label?",
+          "questionText": "Under Model WHS Regulations r.342, does a hazardous chemical decanted into a spray bottle on site require a label?",
           "options": [
-            "No, short-duration working containers are exempt",
-            "Yes — all containers of hazardous chemicals must be labelled regardless of size or duration of use",
-            "Only if it leaves the site",
-            "Only if the client asks to see it"
+            "It is exempt only if the chemical is used immediately and the container is thoroughly cleaned after use so no residue remains; otherwise it must be labelled",
+            "No container of a hazardous chemical ever requires a label",
+            "It must always be labelled regardless of how it is used",
+            "It is exempt as long as it is used within the same work shift"
           ],
-          "correctIndex": 1,
+          "correctIndex": 0,
           "points": 1,
-          "sourceRef": "Microbial.docx — Infectious Control for the Business Owner, Module 14: Labelling"
+          "sourceRef": "Model WHS Regulations 2011 r.342 (Labelling hazardous chemicals—containers), verified 2026-07-05 against legislation.gov.au F2011L02664. Corrects the earlier r.330 citation and the answer: r.330 is manufacturer SDS preparation, and r.342's decant/immediate-use exemption means the previous flat 'always label regardless of duration' key was legally wrong. SME to ratify."
         },
         {
           "questionText": "How often must workers sign off that they have read and understood the relevant infection control SOPs?",
