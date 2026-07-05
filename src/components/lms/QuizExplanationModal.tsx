@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { getBackendOrigin } from '@/lib/env/public-url';
 
 interface ExplanationData {
@@ -24,6 +24,24 @@ export default function QuizExplanationModal({
   const [data, setData] = useState<ExplanationData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+
+  // Escape closes the modal; keyboard users otherwise have no way to dismiss
+  // it (the backdrop-click handler has no keyboard equivalent).
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [isOpen, onClose]);
+
+  // Move focus into the dialog when it opens so keyboard/screen-reader users
+  // land somewhere sensible instead of on whatever was focused underneath.
+  useEffect(() => {
+    if (isOpen) closeButtonRef.current?.focus();
+  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen || !questionId) return;
@@ -72,6 +90,9 @@ export default function QuizExplanationModal({
     >
       {/* Modal panel */}
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="quiz-explanation-modal-title"
         className="relative w-full max-w-lg rounded-sm border"
         style={{
           backgroundColor: '#060a14',
@@ -84,10 +105,14 @@ export default function QuizExplanationModal({
           className="flex items-center justify-between border-b px-6 py-4"
           style={{ borderColor: 'rgba(255,255,255,0.06)' }}
         >
-          <h2 className="text-sm font-semibold tracking-widest text-white/70 uppercase">
+          <h2
+            id="quiz-explanation-modal-title"
+            className="text-sm font-semibold tracking-widest text-white/70 uppercase"
+          >
             Answer Explanation
           </h2>
           <button
+            ref={closeButtonRef}
             onClick={onClose}
             className="text-white/40 transition-colors hover:text-white/80"
             aria-label="Close explanation modal"
