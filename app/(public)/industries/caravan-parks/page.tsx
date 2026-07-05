@@ -9,6 +9,7 @@ import {
 } from '@/components/industries';
 import { IndustryRecommendedCourses } from '@/components/industries/IndustryRecommendedCourses';
 import { FAQSchema } from '@/components/seo/JsonLd';
+import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 
 export const dynamic = 'force-dynamic';
 
@@ -127,7 +128,7 @@ export default async function CaravanParksIndustryPage() {
       <IndustryCTA
         subtitle="Holiday Park Training"
         title="Holiday Park Bundle"
-        price="$225"
+        price={industryBundlePriceLabel('caravan-parks')}
         description="AMRT + CRT + WRT training for caravan park and holiday accommodation maintenance staff. Seasonal inspection protocols included. Online, self-paced."
         ctaText="Train Your Park Team"
         accentColor={ACCENT_COLOR}

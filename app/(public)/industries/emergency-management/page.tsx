@@ -9,6 +9,7 @@ import {
 } from '@/components/industries';
 import { IndustryRecommendedCourses } from '@/components/industries/IndustryRecommendedCourses';
 import { FAQSchema } from '@/components/seo/JsonLd';
+import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 
 export const dynamic = 'force-dynamic';
 
@@ -129,7 +130,7 @@ export default async function EmergencyManagementIndustryPage() {
       <IndustryCTA
         subtitle="Emergency Management Training"
         title="Emergency Response Bundle"
-        price="$265"
+        price={industryBundlePriceLabel('emergency-management')}
         description="WRT + FSRT + ASD training for SES volunteers, council emergency managers, and community resilience teams. Bulk licensing available for units and councils."
         ctaText="Train Your Response Team"
         accentColor={ACCENT_COLOR}

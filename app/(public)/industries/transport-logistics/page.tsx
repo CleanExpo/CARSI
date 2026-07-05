@@ -9,6 +9,7 @@ import {
 } from '@/components/industries';
 import { IndustryRecommendedCourses } from '@/components/industries/IndustryRecommendedCourses';
 import { FAQSchema } from '@/components/seo/JsonLd';
+import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 
 export const dynamic = 'force-dynamic';
 
@@ -127,7 +128,7 @@ export default async function TransportLogisticsIndustryPage() {
       <IndustryCTA
         subtitle="Transport & Logistics Training"
         title="Logistics Restoration Bundle"
-        price="$255"
+        price={industryBundlePriceLabel('transport-logistics')}
         description="WRT + CRT + OCT training for transport and warehouse teams. Includes fleet maintenance and warehouse flood response protocols. Online, self-paced — fits around shift schedules."
         ctaText="Train Your Operations Team"
         accentColor={ACCENT_COLOR}

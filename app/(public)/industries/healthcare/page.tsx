@@ -12,6 +12,7 @@ import {
 } from '@/components/industries';
 import { FAQSchema } from '@/components/seo/JsonLd';
 import { buildIndustryMetadata } from '@/lib/marketing/industry-metadata';
+import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 
 export const dynamic = 'force-dynamic';
 
@@ -126,7 +127,7 @@ export default async function HealthcareIndustryPage() {
       <IndustryCTA
         subtitle="Healthcare facility training"
         title="Healthcare Bundle"
-        price="$295"
+        price={industryBundlePriceLabel('healthcare')}
         description="WRT + AMRT + FSRT training + Healthcare-Specific Mould Risk Assessment bonus module. Online, self-paced — fits around 24/7 hospital shift patterns."
         ctaText="Train your team"
         ctaHref="/contact"

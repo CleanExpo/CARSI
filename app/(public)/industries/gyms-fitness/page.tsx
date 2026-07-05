@@ -9,6 +9,7 @@ import {
 } from '@/components/industries';
 import { IndustryRecommendedCourses } from '@/components/industries/IndustryRecommendedCourses';
 import { FAQSchema } from '@/components/seo/JsonLd';
+import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 
 export const dynamic = 'force-dynamic';
 
@@ -127,7 +128,7 @@ export default async function GymsFitnessIndustryPage() {
       <IndustryCTA
         subtitle="Gym & Fitness Training"
         title="Fitness Facility Bundle"
-        price="$225"
+        price={industryBundlePriceLabel('gyms-fitness')}
         description="AMRT + OCT training for gym maintenance staff. Covers mould identification, remediation, and odour control. Online, self-paced — fits around your facility's operating hours."
         ctaText="Train Your Maintenance Staff"
         accentColor={ACCENT_COLOR}

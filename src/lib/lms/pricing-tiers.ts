@@ -97,3 +97,49 @@ export function teamTierById(id: string): TeamTier | undefined {
 export function teamSeatLimitForTier(tierId: TeamBundleTierId): number {
   return teamTierById(tierId)?.seatsIncluded ?? 5;
 }
+
+/**
+ * Industry-specific bundle CTA prices (GP-460), shown on each
+ * `app/(public)/industries/*` marketing page. These are display-only —
+ * every CTA links to `/pricing` or `/courses`, not a distinct Stripe Price —
+ * so cents here are for consistent formatting, not checkout.
+ *
+ * Previously hardcoded as a `price="$XXX"` string literal on each of the 22
+ * industry pages that advertise a bundle price (aged-care is excluded — it
+ * advertises the individual annual membership price instead, a different
+ * concept out of this map's scope). Single-sourced here so a price change
+ * doesn't require editing 22 files.
+ */
+export const INDUSTRY_BUNDLE_PRICE_CENTS: Record<string, number> = {
+  'caravan-parks': 22500,
+  childcare: 19500,
+  'commercial-cleaning': 19500,
+  construction: 24500,
+  'data-centres': 28500,
+  education: 29500,
+  'emergency-management': 26500,
+  'food-processing': 27500,
+  'government-defence': 29500,
+  'gyms-fitness': 22500,
+  healthcare: 29500,
+  hospitality: 29500,
+  insurance: 29500,
+  mining: 24500,
+  'museums-cultural': 26500,
+  'ndis-disability': 26500,
+  'plumbing-trades': 24500,
+  'property-management': 19500,
+  'real-estate': 22500,
+  retail: 29500,
+  strata: 29500,
+  'transport-logistics': 25500,
+};
+
+/** Formats an industry-bundle price as the existing "$XXX" display convention. */
+export function industryBundlePriceLabel(industrySlug: string): string {
+  const cents = INDUSTRY_BUNDLE_PRICE_CENTS[industrySlug];
+  if (cents === undefined) {
+    throw new Error(`No industry bundle price configured for slug "${industrySlug}"`);
+  }
+  return `$${Math.round(cents / 100)}`;
+}

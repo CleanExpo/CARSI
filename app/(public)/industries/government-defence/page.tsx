@@ -12,6 +12,7 @@ import {
 } from '@/components/industries';
 import { FAQSchema } from '@/components/seo/JsonLd';
 import { buildIndustryMetadata } from '@/lib/marketing/industry-metadata';
+import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 
 export const dynamic = 'force-dynamic';
 
@@ -126,7 +127,7 @@ export default async function GovernmentDefenceIndustryPage() {
       <IndustryCTA
         subtitle="Government facility training"
         title="Facility Restoration Bundle"
-        price="$295"
+        price={industryBundlePriceLabel('government-defence')}
         description="WRT + AMRT + ASD training for government facility teams. Bulk 10+ seat licensing available for councils and departments."
         ctaText="Request bulk pricing"
         ctaHref="/contact"

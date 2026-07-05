@@ -12,6 +12,7 @@ import {
 } from '@/components/industries';
 import { FAQSchema } from '@/components/seo/JsonLd';
 import { buildIndustryMetadata } from '@/lib/marketing/industry-metadata';
+import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 
 export const dynamic = 'force-dynamic';
 
@@ -131,7 +132,7 @@ export default async function HospitalityIndustryPage() {
       <IndustryCTA
         subtitle="Hospitality training bundle"
         title="Hotel Maintenance Bundle"
-        price="$295"
+        price={industryBundlePriceLabel('hospitality')}
         description="WRT + CRT + OCT training for hotel maintenance teams. Bulk licensing available for hotel chains and resort groups."
         ctaText="Request bundle pricing"
         ctaHref="/contact"

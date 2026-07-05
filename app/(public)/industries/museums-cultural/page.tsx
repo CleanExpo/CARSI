@@ -9,6 +9,7 @@ import {
 } from '@/components/industries';
 import { IndustryRecommendedCourses } from '@/components/industries/IndustryRecommendedCourses';
 import { FAQSchema } from '@/components/seo/JsonLd';
+import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 
 export const dynamic = 'force-dynamic';
 
@@ -127,7 +128,7 @@ export default async function MuseumsCulturalIndustryPage() {
       <IndustryCTA
         subtitle="Cultural Institution Training"
         title="Heritage Preservation Bundle"
-        price="$265"
+        price={industryBundlePriceLabel('museums-cultural')}
         description="AMRT + WRT + ASD training for museum and gallery teams. Includes collection-specific emergency response protocols. Online, self-paced — fits around exhibition schedules."
         ctaText="Protect Your Collection"
         accentColor={ACCENT_COLOR}

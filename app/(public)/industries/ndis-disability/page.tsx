@@ -9,6 +9,7 @@ import {
 } from '@/components/industries';
 import { IndustryRecommendedCourses } from '@/components/industries/IndustryRecommendedCourses';
 import { FAQSchema } from '@/components/seo/JsonLd';
+import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 
 export const dynamic = 'force-dynamic';
 
@@ -127,7 +128,7 @@ export default async function NDISDisabilityIndustryPage() {
       <IndustryCTA
         subtitle="NDIS Provider Training"
         title="NDIS Compliance Bundle"
-        price="$265"
+        price={industryBundlePriceLabel('ndis-disability')}
         description="AMRT + WRT training for NDIS maintenance and facilities staff. Verifiable IICRC credentials for NDIS Quality and Safeguards Commission audits."
         ctaText="Train Your Maintenance Team"
         accentColor={ACCENT_COLOR}

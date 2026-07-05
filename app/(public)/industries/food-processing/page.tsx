@@ -9,6 +9,7 @@ import {
 } from '@/components/industries';
 import { IndustryRecommendedCourses } from '@/components/industries/IndustryRecommendedCourses';
 import { FAQSchema } from '@/components/seo/JsonLd';
+import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 
 export const dynamic = 'force-dynamic';
 
@@ -127,7 +128,7 @@ export default async function FoodProcessingIndustryPage() {
       <IndustryCTA
         subtitle="Food Processing Training"
         title="Food Safety Bundle"
-        price="$275"
+        price={industryBundlePriceLabel('food-processing')}
         description="AMRT + OCT + CCT training for food processing teams. Includes cold storage mould prevention protocols. Online, self-paced — fits around production schedules."
         ctaText="Train Your Facility Team"
         accentColor={ACCENT_COLOR}
