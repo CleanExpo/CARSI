@@ -35,8 +35,6 @@ const HUB_KEYWORDS: Record<string, string[]> = {
 };
 
 async function localStub(method: string, segments: string[]): Promise<NextResponse | null> {
-  const key = segments.join('/');
-
   if (
     method === 'GET' &&
     segments[0] === 'hub' &&
