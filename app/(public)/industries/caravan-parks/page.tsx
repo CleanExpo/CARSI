@@ -16,7 +16,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'IICRC CEC Mould & Restoration Training for Caravan Parks | CARSI Australia',
   description:
-    'Protect guests and comply with state Fair Trading obligations. IICRC AMRT, CRT, and WRT training for Australian caravan parks and holiday accommodation. Online, CEC-aligned.',
+    'Protect guests and comply with state Fair Trading obligations. IICRC AMRT, CRT, and WRT training for Australian caravan parks and holiday accommodation. Online, CEC Accredited.',
   keywords: [
     'caravan park mould training Australia',
     'holiday park IICRC CEC course',
@@ -72,7 +72,7 @@ const whyCards = [
     icon: Droplets,
     title: 'Seasonal Moisture & Mould',
     description:
-      'Cabins left unoccupied during off-season develop mould in walls, subfloors, and ensuite blocks. IICRC AMRT training gives maintenance staff the protocols to inspect and remediate before peak season.',
+      'Cabins left unoccupied during off-season develop mould in walls, subfloors, and ensuite blocks. AMRT-aligned CEC training gives maintenance staff the protocols to inspect and remediate before peak season.',
     color: '#26a69a',
   },
   {

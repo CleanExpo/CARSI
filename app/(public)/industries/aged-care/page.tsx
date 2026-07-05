@@ -51,12 +51,12 @@ const faqs = [
   {
     question: 'How does IICRC CEC training support Aged Care Quality Standards?',
     answer:
-      'The Aged Care Quality Standards require facilities to demonstrate safe, clean environments for residents. IICRC AMRT certification provides verifiable evidence that cleaning teams are trained in mould identification, remediation protocols, and infection prevention — directly relevant to Standard 3 (Personal Care and Clinical Care) compliance.',
+      "The Aged Care Quality Standards require facilities to demonstrate safe, clean environments for residents. CARSI's AMRT-aligned CEC training provides verifiable evidence that cleaning teams are trained in mould identification, remediation protocols, and infection prevention — directly relevant to Standard 3 (Personal Care and Clinical Care) compliance.",
   },
   {
     question: 'Can aged care staff complete IICRC CEC training around shift work?',
     answer:
-      'Yes. CARSI offers IICRC-aligned CEC courses online and self-paced, designed to fit around 24/7 aged care operations. Staff can complete modules between shifts without leaving the facility. All courses issue verifiable digital credentials on completion.',
+      'Yes. CARSI offers IICRC CEC Accredited courses online and self-paced, designed to fit around 24/7 aged care operations. Staff can complete modules between shifts without leaving the facility. All courses issue verifiable digital credentials on completion.',
   },
 ];
 
@@ -65,7 +65,7 @@ const whyCards = [
     icon: Shield,
     title: 'NQF Compliance',
     description:
-      'Meet National Quality Framework infection control requirements with IICRC-aligned CEC courses for cleaning and maintenance teams.',
+      'Meet National Quality Framework infection control requirements with IICRC CEC Accredited courses for cleaning and maintenance teams.',
     color: '#27ae60',
   },
   {

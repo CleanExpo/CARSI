@@ -53,17 +53,17 @@ const faqs = [
   {
     question: 'How does water damage training protect data centre infrastructure?',
     answer:
-      'Water is the leading cause of unplanned data centre outages after power failures. IICRC WRT training equips facility teams to respond within minutes to CRAC unit leaks, overhead pipe bursts, or cooling system failures — containing water spread, protecting rack infrastructure, and deploying extraction equipment before corrosion or short circuits occur.',
+      'Water is the leading cause of unplanned data centre outages after power failures. WRT-aligned CEC training equips facility teams to respond within minutes to CRAC unit leaks, overhead pipe bursts, or cooling system failures — containing water spread, protecting rack infrastructure, and deploying extraction equipment before corrosion or short circuits occur.',
   },
   {
     question: 'What happens after a fire suppression system activates in a data centre?',
     answer:
-      'After clean agent or water mist suppression activation, residue and moisture must be professionally removed to prevent corrosion and equipment failure. IICRC FSRT training covers post-suppression assessment, residue cleanup, and air quality restoration. Combined with ASD for moisture management, this ensures rapid return to operational status.',
+      'After clean agent or water mist suppression activation, residue and moisture must be professionally removed to prevent corrosion and equipment failure. FSRT-aligned CEC training covers post-suppression assessment, residue cleanup, and air quality restoration. Combined with ASD for moisture management, this ensures rapid return to operational status.',
   },
   {
     question: 'Can data centre operations staff complete IICRC CEC training without downtime?',
     answer:
-      'Yes. CARSI offers IICRC-aligned CEC courses online and self-paced. NOC and facility staff can complete modules during scheduled maintenance windows or between shifts. All courses issue verifiable digital credentials on completion.',
+      'Yes. CARSI offers IICRC CEC Accredited courses online and self-paced. NOC and facility staff can complete modules during scheduled maintenance windows or between shifts. All courses issue verifiable digital credentials on completion.',
   },
 ];
 
@@ -86,7 +86,7 @@ const whyCards = [
     icon: Flame,
     title: 'Fire Suppression Recovery',
     description:
-      'Post-suppression cleanup requires specialist knowledge. FSRT certification covers residue removal, air quality restoration, and equipment assessment after clean agent or water mist activation.',
+      "Post-suppression cleanup requires specialist knowledge. CARSI's FSRT-aligned CEC training covers residue removal, air quality restoration, and equipment assessment after clean agent or water mist activation.",
     color: '#ed9d24',
   },
 ];

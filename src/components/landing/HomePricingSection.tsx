@@ -34,7 +34,7 @@ const TIERS: HomeTier[] = [
     price: perCourse?.priceLabel ?? 'From $20',
     cadence: 'per course',
     description:
-      perCourse?.description ?? 'Pay once per IICRC-aligned CEC course. CECs tracked on completion.',
+      perCourse?.description ?? 'Pay once per IICRC CEC Accredited course. CECs tracked on completion.',
     cta: perCourse?.cta ?? 'Browse courses',
     href: perCourse?.href ?? '/courses',
     highlighted: false,

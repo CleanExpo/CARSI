@@ -5,7 +5,7 @@ import { ContactForm, type ContactLeadContext } from '@/components/contact/Conta
 export const metadata: Metadata = {
   title: 'Contact — Cleaning and Restoration Science Institute',
   description:
-    'Get in touch with CARSI for course enquiries, membership support, or questions about IICRC-aligned CEC courses.',
+    'Get in touch with CARSI for course enquiries, membership support, or questions about IICRC CEC Accredited courses.',
 };
 
 type ContactPageProps = {

@@ -53,12 +53,12 @@ const faqs = [
   {
     question: 'How does IICRC CEC training support NSQHS Standard 3 compliance?',
     answer:
-      'NSQHS Standard 3 (Preventing and Controlling Infections) requires healthcare facilities to demonstrate staff competency in infection prevention. IICRC AMRT certification provides verifiable evidence that environmental services teams are trained in mould identification, remediation protocols, and contamination prevention — all directly relevant to Standard 3 audit requirements.',
+      "NSQHS Standard 3 (Preventing and Controlling Infections) requires healthcare facilities to demonstrate staff competency in infection prevention. CARSI's AMRT-aligned CEC training provides verifiable evidence that environmental services teams are trained in mould identification, remediation protocols, and contamination prevention — all directly relevant to Standard 3 audit requirements.",
   },
   {
     question: 'Can hospital maintenance staff complete IICRC CEC training online?',
     answer:
-      'Yes. CARSI offers IICRC-aligned CEC courses online and self-paced, designed to fit around 24/7 hospital shift patterns. Staff can complete modules between shifts without leaving the facility. Eligible courses count toward IICRC Continuing Education Credits (CECs) and issue verifiable digital credentials on completion.',
+      'Yes. CARSI offers IICRC CEC Accredited courses online and self-paced, designed to fit around 24/7 hospital shift patterns. Staff can complete modules between shifts without leaving the facility. Eligible courses count toward IICRC Continuing Education Credits (CECs) and issue verifiable digital credentials on completion.',
   },
   {
     question: 'What is mould remediation training for healthcare facilities?',

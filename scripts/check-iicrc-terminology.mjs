@@ -2,17 +2,20 @@
 /**
  * IICRC CEC terminology guard (Linear GP-451).
  *
- * Licence-critical: CARSI sells IICRC *CEC courses* (Continuing Education Credit
- * courses that carry IICRC CEC approval). CARSI does NOT deliver IICRC
- * certification — that is obtained only through IICRC-approved schools and
- * examinations. Selling copy that implies CARSI grants IICRC certification can
+ * Licence-critical: CARSI is accredited as an IICRC *CEC provider* (Continuing
+ * Education Credit) — "IICRC CEC Accredited". CARSI is NOT accredited to
+ * deliver IICRC courses or certification — that is obtained only through
+ * IICRC-approved schools and examinations. Selling copy that implies CARSI
+ * grants IICRC certification, or that IICRC accredits CARSI's courses
+ * generally (rather than CARSI's CEC-provider standing specifically), can
  * cost the founder's licence to sell courses, so it is a release blocker.
  *
  * This scanner blocks the banned selling phrasings in source copy. It is
  * deliberately narrow: it flags only phrases that assert CARSI delivers IICRC
- * courses/certification, and leaves legitimate copy untouched — a student's own
- * existing IICRC certification (recert reminders, member number, CEC tracking),
- * accurate "IICRC CEC-approved" claims, and third-person industry facts such as
+ * courses/certification/accreditation, and leaves legitimate copy untouched —
+ * a student's own existing IICRC certification (recert reminders, member
+ * number, CEC tracking), accurate "IICRC CEC Accredited" claims, discipline
+ * descriptors like "WRT-aligned", and third-person industry facts such as
  * "IICRC certification is required for insurance panels".
  *
  * Modes:
@@ -51,6 +54,27 @@ const BANNED = [
     re: /IICRC[\s-]*certif\w*\s+with\s+CARSI/i,
     allow: null,
     message: 'Do not imply CARSI grants IICRC certification.',
+  },
+  {
+    // Bare "IICRC Accredited" (no CEC in between) — must always be "IICRC CEC
+    // Accredited". Note: this naturally does NOT match "IICRC CEC Accredited"
+    // itself, since "CEC" breaks the [\s-]* adjacency between IICRC and Accredited.
+    re: /\bIICRC[\s-]*Accredited\b/i,
+    allow: null,
+    message: 'Say "IICRC CEC Accredited", never bare "IICRC Accredited" — CARSI is accredited as a CEC provider, not accredited by IICRC generally.',
+  },
+  {
+    // "IICRC-accredited course(s)" / "IICRC accredited course(s)" (no CEC) —
+    // implies IICRC accredits the course/certification itself.
+    re: /\bIICRC[\s-]*accredited[\s-]+courses?\b/i,
+    allow: null,
+    message: 'CARSI courses are not "IICRC-accredited" — say "IICRC CEC Accredited course(s)".',
+  },
+  {
+    // "IICRC course(s) accredited/accreditation" (reversed word order).
+    re: /\bIICRC[\s-]+courses?[\s-]+accredit\w*\b/i,
+    allow: null,
+    message: 'Do not imply IICRC accredits CARSI\'s courses — say "IICRC CEC Accredited course(s)".',
   },
 ];
 

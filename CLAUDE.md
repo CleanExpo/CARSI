@@ -34,16 +34,24 @@ US-only products are defects — fix before publish. Full standard + checklist:
 
 ## IICRC CEC terminology — licence-critical (MUST)
 
-**CARSI sells IICRC CEC courses, not IICRC certification.** In any public, marketing, SEO,
-schema, email or in-app selling copy, describe what CARSI offers as "IICRC CEC courses" /
-"IICRC Continuing Education Credit (CEC) courses" / "courses carrying IICRC CEC approval".
+**CARSI is accredited as an IICRC CEC provider — it is not accredited to deliver IICRC courses or
+certification.** In any public, marketing, SEO, schema, email or in-app selling copy, describe
+what CARSI offers as "IICRC CEC Accredited courses" / "IICRC CEC Accredited" / "IICRC
+Continuing Education Credit (CEC) courses". The word "Accredited" must always appear together
+with "CEC" (e.g. "IICRC CEC Accredited") — **never** bare "IICRC Accredited" and **never**
+"IICRC Course Accredited" / "IICRC-accredited course(s)", both of which wrongly imply IICRC
+accredits the course or certification itself rather than CARSI's standing as a CEC provider.
 **Never** write copy implying CARSI delivers "IICRC courses", "IICRC certification course(s)",
-"IICRC-certified course(s)", or "get IICRC certified with CARSI". IICRC certification is
-obtained only through IICRC-approved schools and examinations — CARSI courses earn CECs toward
-maintaining an existing IICRC certification. Referencing a student's own existing IICRC
-certification (recert reminders, member number, CEC tracking) and accurate "IICRC CEC-approved"
-claims are fine. Selling CARSI as delivering IICRC certification can cost the licence to sell
-courses — treat it as a release blocker. Enforced by `npm run check:iicrc-terminology`.
+"IICRC-certified course(s)", or "get IICRC certified with CARSI". Also avoid bare "IICRC
+[discipline] training" (e.g. "IICRC FSRT training") or "[discipline] certification covers…" when
+describing CARSI's own course content — use "[discipline]-aligned CEC training" instead, so it's
+clear CARSI's course aligns to the discipline rather than being the IICRC certification. IICRC
+certification is obtained only through IICRC-approved schools and examinations — CARSI courses
+earn CECs toward maintaining an existing IICRC certification. Referencing a student's own
+existing IICRC certification (recert reminders, member number, CEC tracking) and discipline
+descriptors like "WRT/ASD/AMRT-aligned" are fine. Selling CARSI as delivering IICRC certification
+can cost the licence to sell courses — treat it as a release blocker. Enforced by
+`npm run check:iicrc-terminology`.
 
 ## Continual Learning
 

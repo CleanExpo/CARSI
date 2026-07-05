@@ -17,7 +17,7 @@ export default function RegisterPage() {
           Enter your details to create your account
         </p>
         <p className="text-xs font-semibold tracking-wide text-[#146fc2]">
-          IICRC-aligned CEC restoration training
+          IICRC CEC Accredited restoration training
         </p>
       </div>
 

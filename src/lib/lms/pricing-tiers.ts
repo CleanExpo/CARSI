@@ -37,7 +37,7 @@ export const INDIVIDUAL_TIERS: IndividualTier[] = [
     name: 'Per course',
     priceLabel: 'From $20',
     priceCents: null,
-    description: 'Pay once per IICRC-aligned CEC course. CECs tracked on completion.',
+    description: 'Pay once per IICRC CEC Accredited course. CECs tracked on completion.',
     cta: 'Browse courses',
     href: '/courses',
   },
