@@ -441,3 +441,54 @@ export async function deletePracticalAssessment(id: string): Promise<void> {
   }
   await prisma.lmsPracticalAssessment.deleteMany({ where: { id } });
 }
+
+/**
+ * Published practical assessments for the courses a student is enrolled in, each with its
+ * rubric and the student's latest submission (if any) — powers the student submission page.
+ */
+export async function listAvailableAssessmentsForStudent(studentId: string) {
+  const enrolments = await prisma.lmsEnrollment.findMany({
+    where: { studentId, status: { not: 'cancelled' } },
+    select: { courseId: true },
+  });
+  const courseIds = [...new Set(enrolments.map((e) => e.courseId))];
+  if (courseIds.length === 0) return [];
+
+  const assessments = await prisma.lmsPracticalAssessment.findMany({
+    where: { courseId: { in: courseIds }, isPublished: true },
+    orderBy: { createdAt: 'desc' },
+    include: {
+      course: { select: { title: true } },
+      criteria: { orderBy: { orderIndex: 'asc' } },
+      submissions: { where: { studentId }, orderBy: { createdAt: 'desc' }, take: 1 },
+    },
+  });
+
+  return assessments.map((a) => {
+    const sub = a.submissions[0];
+    return {
+      id: a.id,
+      title: a.title,
+      instructions: a.instructions,
+      passThreshold: a.passThreshold,
+      courseTitle: a.course.title,
+      maxPoints: a.criteria.reduce((acc, c) => acc + c.maxPoints, 0),
+      criteria: a.criteria.map((c) => ({
+        id: c.id,
+        label: c.label,
+        description: c.description,
+        maxPoints: c.maxPoints,
+      })),
+      submission: sub
+        ? {
+            id: sub.id,
+            status: sub.status,
+            totalScore: sub.totalScore,
+            reviewerNotes: sub.reviewerNotes,
+            createdAt: sub.createdAt.toISOString(),
+            reviewedAt: sub.reviewedAt ? sub.reviewedAt.toISOString() : null,
+          }
+        : null,
+    };
+  });
+}
