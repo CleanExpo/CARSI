@@ -99,13 +99,20 @@ function clientHasNotifications(client: PrismaClient): boolean {
   );
 }
 
+function clientHasHubSubmissions(client: PrismaClient): boolean {
+  return Boolean(
+    (client as PrismaClient & { hubSubmission?: { create?: unknown } }).hubSubmission?.create,
+  );
+}
+
 /** Dev HMR can keep a Prisma client generated before new models exist — refresh when stale. */
-function getPrismaClient(): PrismaClient {
+export function getPrismaClient(): PrismaClient {
   let client = globalForPrisma.prisma ?? createClient();
   if (
     !clientHasTeamCoursePurchases(client) ||
     !clientHasRenewalCommunications(client) ||
-    !clientHasNotifications(client)
+    !clientHasNotifications(client) ||
+    !clientHasHubSubmissions(client)
   ) {
     client = createClient();
   }
