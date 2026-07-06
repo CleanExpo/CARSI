@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { clientIpFrom } from '@/lib/rate-limit';
-import { applyRateLimitDistributed } from '@/lib/rate-limit-distributed';
+import { applyRateLimit, clientIpFrom } from '@/lib/rate-limit';
 import { stripMarkdownForSpeech } from '@/lib/server/text-to-speech-format';
 
 // Vercel's default function timeout can be shorter than this route's own
@@ -46,17 +45,9 @@ export async function POST(request: NextRequest) {
     request.headers.get('x-forwarded-for'),
     request.headers.get('x-real-ip')
   );
-  const minute = await applyRateLimitDistributed(
-    `public-chat-speech:${ip}`,
-    SPEECH_RATE_LIMIT,
-    SPEECH_RATE_WINDOW_MS
-  );
+  const minute = applyRateLimit(`public-chat-speech:${ip}`, SPEECH_RATE_LIMIT, SPEECH_RATE_WINDOW_MS);
   const rl = minute.ok
-    ? await applyRateLimitDistributed(
-        `public-chat-speech-day:${ip}`,
-        SPEECH_DAILY_LIMIT,
-        SPEECH_DAY_WINDOW_MS
-      )
+    ? applyRateLimit(`public-chat-speech-day:${ip}`, SPEECH_DAILY_LIMIT, SPEECH_DAY_WINDOW_MS)
     : minute;
   if (!rl.ok) {
     return NextResponse.json(

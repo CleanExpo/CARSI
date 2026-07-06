@@ -25,12 +25,11 @@ describe('buildCarsiConnectionStatus', () => {
     expect(byId.ai_chat.state).toBe('blocked');
     expect(byId.turnstile.state).toBe('unknown');
     expect(byId.cloudinary.state).toBe('unknown');
-    expect(byId.rate_limit_redis.state).toBe('unknown');
     expect(byId.unite_group.state).toBe('ready');
 
     expect(status.summary.total).toBe(status.connections.length);
     expect(status.summary.blocked).toBe(5);
-    expect(status.summary.unknown).toBe(3);
+    expect(status.summary.unknown).toBe(2);
     expect(status.summary.ready).toBe(1);
   });
 
@@ -49,8 +48,6 @@ describe('buildCarsiConnectionStatus', () => {
       CLOUDINARY_CLOUD_NAME: 'demo',
       CLOUDINARY_API_KEY: 'ck_xxx',
       CLOUDINARY_API_SECRET: 'cs_xxx',
-      UPSTASH_REDIS_REST_URL: 'https://example.upstash.io',
-      UPSTASH_REDIS_REST_TOKEN: 'token_xxx',
     };
 
     const status = buildCarsiConnectionStatus(env, FIXED_NOW);
@@ -64,7 +61,6 @@ describe('buildCarsiConnectionStatus', () => {
     expect(byId.ai_chat.state).toBe('ready');
     expect(byId.turnstile.state).toBe('ready');
     expect(byId.cloudinary.state).toBe('ready');
-    expect(byId.rate_limit_redis.state).toBe('ready');
     expect(byId.unite_group.state).toBe('ready');
 
     expect(status.summary.blocked).toBe(0);
@@ -87,7 +83,6 @@ describe('buildCarsiConnectionStatus', () => {
       'sk-super-secret-openrouter-key',
       'ts_super_secret_turnstile_key',
       'cloudinary_super_secret',
-      'upstash_super_secret_token',
     ];
 
     const env = {
@@ -102,8 +97,6 @@ describe('buildCarsiConnectionStatus', () => {
       CLOUDINARY_CLOUD_NAME: 'demo',
       CLOUDINARY_API_KEY: 'ck_public_looking',
       CLOUDINARY_API_SECRET: secretValues[6],
-      UPSTASH_REDIS_REST_URL: 'https://example.upstash.io',
-      UPSTASH_REDIS_REST_TOKEN: secretValues[7],
     };
 
     const status = buildCarsiConnectionStatus(env, FIXED_NOW);
