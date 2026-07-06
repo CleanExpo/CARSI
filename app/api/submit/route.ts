@@ -2,14 +2,13 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 import { applyRateLimit, UNKNOWN_IP } from '@/lib/rate-limit';
+import { emitCrmEvent } from '@/lib/server/crm-sync';
+import { createHubSubmission } from '@/lib/server/hub-submission-store';
+import { sendHubSubmissionNotificationEmail } from '@/lib/server/transactional-email';
 import { verifyTurnstileToken } from '@/lib/server/turnstile';
 
-/* ─── Rate limit config ───────────────────────────────────────────────────── */
-
 const LIMIT = 5;
-const WINDOW_MS = 60 * 60 * 1000; // 5/hour per IP
-
-/* ─── Types ───────────────────────────────────────────────────────────────── */
+const WINDOW_MS = 60 * 60 * 1000;
 
 const VALID_TYPES = [
   'podcast',
@@ -37,27 +36,12 @@ interface SubmissionPayload {
   terms_accepted: boolean;
   guidelines_accepted: boolean;
   turnstileToken?: string;
+  leadContext?: {
+    source?: string;
+    intent?: string;
+    pageUrl?: string;
+  };
 }
-
-interface HubSubmissionInsert {
-  submission_type: SubmissionType;
-  status: 'pending';
-  submitter_name: string;
-  submitter_email: string;
-  submitter_phone: string | null;
-  submitter_company: string | null;
-  submitter_role: string | null;
-  submission_title: string;
-  submission_url: string | null;
-  submission_description: string | null;
-  submission_data: Record<string, never>;
-  terms_accepted: boolean;
-  guidelines_accepted: boolean;
-  ip_address: string | null;
-  user_agent: string | null;
-}
-
-/* ─── Helpers ─────────────────────────────────────────────────────────────── */
 
 function isValidType(value: string): value is SubmissionType {
   return (VALID_TYPES as readonly string[]).includes(value);
@@ -81,10 +65,38 @@ function getClientIpForLimit(req: NextRequest): string {
   return getClientIp(req) ?? UNKNOWN_IP;
 }
 
-/* ─── Route handler ───────────────────────────────────────────────────────── */
+function cleanLeadValue(value: unknown, maxLength: number): string | undefined {
+  return typeof value === 'string'
+    ? value.replace(/[<>]/g, '').trim().slice(0, maxLength) || undefined
+    : undefined;
+}
+
+async function forwardToLegacyHubIntake(
+  apiUrl: string,
+  record: Record<string, unknown>,
+  intakeSecret?: string
+): Promise<boolean> {
+  const forwardHeaders: Record<string, string> = {
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+  };
+  if (intakeSecret?.trim()) {
+    forwardHeaders['X-Internal-Auth'] = intakeSecret.trim();
+  }
+
+  try {
+    const res = await fetch(`${apiUrl.replace(/\/$/, '')}/api/hub/submissions/intake`, {
+      method: 'POST',
+      headers: forwardHeaders,
+      body: JSON.stringify(record),
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
 
 export async function POST(req: NextRequest) {
-  /* RA-3022 — 1. Rate limit BEFORE parsing body so abusers cost less per request. */
   const ip = getClientIpForLimit(req);
   const rl = applyRateLimit(ip, LIMIT, WINDOW_MS);
   if (!rl.ok) {
@@ -95,11 +107,10 @@ export async function POST(req: NextRequest) {
         headers: {
           'Retry-After': String(Math.ceil((rl.resetAt - Date.now()) / 1000)),
         },
-      },
+      }
     );
   }
 
-  /* 1. Parse body */
   let body: SubmissionPayload;
   try {
     body = (await req.json()) as SubmissionPayload;
@@ -107,7 +118,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: false, error: 'Invalid request body.' }, { status: 400 });
   }
 
-  /* 1b. Bot check (issue #118) — skipped when TURNSTILE_SECRET_KEY is unset. */
   const turnstile = await verifyTurnstileToken(body.turnstileToken, ip);
   if (!turnstile.ok) {
     return NextResponse.json(
@@ -116,7 +126,6 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  /* 2. Validate required fields */
   if (!body.submitter_name?.trim()) {
     return NextResponse.json(
       { success: false, error: 'submitter_name is required.' },
@@ -144,88 +153,102 @@ export async function POST(req: NextRequest) {
       { status: 400 }
     );
   }
-  if (!body.terms_accepted) {
+  if (!body.terms_accepted || !body.guidelines_accepted) {
     return NextResponse.json(
-      { success: false, error: 'terms_accepted must be true.' },
-      { status: 400 }
-    );
-  }
-  if (!body.guidelines_accepted) {
-    return NextResponse.json(
-      { success: false, error: 'guidelines_accepted must be true.' },
+      { success: false, error: 'You must accept the terms and submission guidelines.' },
       { status: 400 }
     );
   }
 
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-  if (!apiUrl) {
-    console.error('[submit] NEXT_PUBLIC_API_URL is not configured');
+  const leadSource = cleanLeadValue(body.leadContext?.source, 48);
+  const leadIntent = cleanLeadValue(body.leadContext?.intent, 80);
+  const leadPageUrl = cleanLeadValue(body.leadContext?.pageUrl, 240);
+
+  const submissionData: Record<string, unknown> = {};
+  if (leadSource) submissionData.lead_source = leadSource;
+  if (leadIntent) submissionData.lead_intent = leadIntent;
+  if (leadPageUrl) submissionData.lead_page_url = leadPageUrl;
+
+  const saved = await createHubSubmission({
+    submissionType: body.submission_type,
+    submitterName: body.submitter_name.trim(),
+    submitterEmail: body.submitter_email.trim().toLowerCase(),
+    submitterPhone: nullify(body.submitter_phone),
+    submitterCompany: nullify(body.submitter_company),
+    submitterRole: nullify(body.submitter_role),
+    submissionTitle: body.submission_title.trim(),
+    submissionUrl: nullify(body.submission_url),
+    submissionDescription: nullify(body.submission_description),
+    submissionData,
+    termsAccepted: true,
+    guidelinesAccepted: true,
+    ipAddress: getClientIp(req),
+    userAgent: req.headers.get('user-agent'),
+  });
+
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL?.trim();
+  if (apiUrl) {
+    void forwardToLegacyHubIntake(
+      apiUrl,
+      {
+        submission_type: body.submission_type,
+        status: 'pending',
+        submitter_name: body.submitter_name.trim(),
+        submitter_email: body.submitter_email.trim().toLowerCase(),
+        submitter_phone: nullify(body.submitter_phone),
+        submitter_company: nullify(body.submitter_company),
+        submitter_role: nullify(body.submitter_role),
+        submission_title: body.submission_title.trim(),
+        submission_url: nullify(body.submission_url),
+        submission_description: nullify(body.submission_description),
+        submission_data: submissionData,
+        terms_accepted: true,
+        guidelines_accepted: true,
+        ip_address: getClientIp(req),
+        user_agent: req.headers.get('user-agent'),
+      },
+      process.env.HUB_INTAKE_SECRET
+    );
+  }
+
+  if (!saved && !apiUrl) {
+    console.error('[submit] DATABASE_URL and NEXT_PUBLIC_API_URL are both unavailable');
     return NextResponse.json(
       { success: false, error: 'Service temporarily unavailable. Please try again later.' },
       { status: 503 }
     );
   }
 
-  /* 3. Build insert record */
-  const record: HubSubmissionInsert = {
-    submission_type: body.submission_type as SubmissionType,
-    status: 'pending',
-    submitter_name: body.submitter_name.trim(),
+  const reference = saved?.reference ?? 'QUEUED';
+  const notifyTo =
+    process.env.CONTACT_NOTIFY_EMAIL?.trim() ||
+    process.env.ADMIN_EMAIL?.trim() ||
+    'support@carsi.com.au';
+
+  void emitCrmEvent('hub.submission.created', {
+    submission_id: saved?.id ?? null,
+    submission_type: body.submission_type,
     submitter_email: body.submitter_email.trim().toLowerCase(),
-    submitter_phone: nullify(body.submitter_phone),
-    submitter_company: nullify(body.submitter_company),
-    submitter_role: nullify(body.submitter_role),
     submission_title: body.submission_title.trim(),
-    submission_url: nullify(body.submission_url),
-    submission_description: nullify(body.submission_description),
-    submission_data: {},
-    terms_accepted: true,
-    guidelines_accepted: true,
-    ip_address: getClientIp(req),
-    user_agent: req.headers.get('user-agent'),
-  };
+    reference,
+    lead_source: leadSource,
+    lead_intent: leadIntent,
+    lead_page_url: leadPageUrl,
+  });
 
-  /* 4. Forward to FastAPI hub intake — RA-3022 adds X-Internal-Auth so the
-        FastAPI side can reject anything that didn't go through this gate. */
-  const intakeSecret = process.env.HUB_INTAKE_SECRET;
-  const forwardHeaders: Record<string, string> = {
-    'Content-Type': 'application/json',
-    Accept: 'application/json',
-  };
-  if (intakeSecret?.trim()) {
-    forwardHeaders['X-Internal-Auth'] = intakeSecret;
-  }
-  try {
-    const res = await fetch(`${apiUrl.replace(/\/$/, '')}/api/hub/submissions/intake`, {
-      method: 'POST',
-      headers: forwardHeaders,
-      body: JSON.stringify(record),
-    });
+  void sendHubSubmissionNotificationEmail({
+    notifyTo,
+    submissionType: body.submission_type,
+    reference,
+    submitterName: body.submitter_name.trim(),
+    submitterEmail: body.submitter_email.trim().toLowerCase(),
+    submissionTitle: body.submission_title.trim(),
+    submissionUrl: nullify(body.submission_url),
+    submissionDescription: nullify(body.submission_description),
+    leadSource: leadSource ?? null,
+  }).catch((error) => {
+    console.warn('[submit] notification email not sent:', error);
+  });
 
-    if (res.status === 503) {
-      const errJson = (await res.json().catch(() => ({}))) as { detail?: string };
-      console.error('[submit] Hub intake unavailable:', errJson.detail ?? res.statusText);
-      return NextResponse.json(
-        { success: false, error: 'Service temporarily unavailable. Please try again later.' },
-        { status: 503 }
-      );
-    }
-
-    if (!res.ok) {
-      const text = await res.text();
-      console.error(`[submit] Hub intake failed (${res.status}): ${text}`);
-      return NextResponse.json(
-        { success: false, error: 'Failed to save submission. Please try again.' },
-        { status: 502 }
-      );
-    }
-
-    return NextResponse.json({ success: true }, { status: 200 });
-  } catch (err) {
-    console.error('[submit] Unexpected error during hub intake:', err);
-    return NextResponse.json(
-      { success: false, error: 'An unexpected error occurred. Please try again.' },
-      { status: 500 }
-    );
-  }
+  return NextResponse.json({ success: true, reference }, { status: 200 });
 }
