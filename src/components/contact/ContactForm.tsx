@@ -18,6 +18,7 @@ export interface ContactLeadContext {
   intent?: string;
   pageUrl?: string;
   initialMessage?: string;
+  variant?: 'directory-notify';
 }
 
 type Status = 'idle' | 'sending' | 'success' | 'error';
@@ -40,6 +41,7 @@ export function ContactForm({ leadContext }: { leadContext?: ContactLeadContext 
   const [status, setStatus] = useState<Status>('idle');
   const [reference, setReference] = useState<string | null>(null);
   const [turnstileToken, setTurnstileToken] = useState('');
+  const isDirectoryNotify = leadContext?.variant === 'directory-notify';
   const hasLeadContext = Boolean(
     leadContext?.source || leadContext?.topic || leadContext?.pathway || leadContext?.intent,
   );
@@ -85,12 +87,16 @@ export function ContactForm({ leadContext }: { leadContext?: ContactLeadContext 
         }}
       >
         <p className="mb-2 text-2xl font-bold text-slate-950">
-          Message sent
+          {isDirectoryNotify ? "You're on the list" : 'Message sent'}
         </p>
         <p className="text-sm text-slate-600">
-          {reference
-            ? `Reference ${reference}. We reply within one business day.`
-            : 'Thanks for reaching out. We reply within one business day.'}
+          {isDirectoryNotify
+            ? reference
+              ? `Reference ${reference}. We will email you when the professional directory goes live.`
+              : 'Thanks — we will notify you when verified NRPG listings are live on CARSI.'
+            : reference
+              ? `Reference ${reference}. We reply within one business day.`
+              : 'Thanks for reaching out. We reply within one business day.'}
         </p>
         <button
           type="button"
@@ -126,7 +132,7 @@ export function ContactForm({ leadContext }: { leadContext?: ContactLeadContext 
           }}
         >
           <p className="text-xs font-semibold tracking-wide text-[#146fc2] uppercase">
-            Lead context attached
+            {isDirectoryNotify ? 'Directory launch list' : 'Lead context attached'}
           </p>
           <div className="mt-3 grid gap-2 sm:grid-cols-2">
             {[
@@ -242,7 +248,7 @@ export function ContactForm({ leadContext }: { leadContext?: ContactLeadContext 
         className="min-h-12 rounded-lg px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md disabled:opacity-60"
         style={{ background: '#146fc2' }}
       >
-        {status === 'sending' ? 'Sending…' : 'Send Message'}
+        {status === 'sending' ? 'Sending…' : isDirectoryNotify ? 'Join launch list' : 'Send Message'}
       </button>
     </form>
   );
