@@ -479,6 +479,41 @@ export async function sendContactNotificationEmail(params: {
   });
 }
 
+export async function sendHubSubmissionNotificationEmail(params: {
+  notifyTo: string;
+  submissionType: string;
+  reference: string;
+  submitterName: string;
+  submitterEmail: string;
+  submissionTitle: string;
+  submissionUrl?: string | null;
+  submissionDescription?: string | null;
+  leadSource?: string | null;
+}): Promise<SendEmailResult> {
+  const lines = [
+    `New ${params.submissionType} hub submission (#${params.reference})`,
+    '',
+    `Name: ${params.submitterName}`,
+    `Email: ${params.submitterEmail}`,
+    `Title: ${params.submissionTitle}`,
+    params.submissionUrl ? `URL: ${params.submissionUrl}` : null,
+    params.leadSource ? `Lead source: ${params.leadSource}` : null,
+    '',
+    params.submissionDescription?.trim() || '(No description provided)',
+  ].filter((line): line is string => line !== null);
+
+  const text = lines.join('\n');
+  const html = `<pre style="font-family:ui-monospace,monospace;font-size:13px;line-height:1.5">${text.replace(/</g, '&lt;')}</pre>`;
+
+  return sendEmail({
+    to: params.notifyTo,
+    replyTo: params.submitterEmail,
+    subject: `[CARSI Hub #${params.reference}] ${params.submissionType} — ${params.submissionTitle}`,
+    html,
+    text,
+  });
+}
+
 /**
  * Send an IICRC-grounded reply to a contact enquiry (Phase 2). Used by both the
  * founder's inline reply from the Contacts section and the 2h SLA auto-dispatch.
