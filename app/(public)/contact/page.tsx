@@ -2,12 +2,6 @@ import type { Metadata } from 'next';
 
 import { ContactForm, type ContactLeadContext } from '@/components/contact/ContactForm';
 
-export const metadata: Metadata = {
-  title: 'Contact — Cleaning and Restoration Science Institute',
-  description:
-    'Get in touch with CARSI for course enquiries, membership support, or questions about IICRC CEC Accredited courses.',
-};
-
 type ContactPageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
@@ -30,6 +24,18 @@ function buildLeadContext(params: Awaited<ContactPageProps['searchParams']>): Co
     return undefined;
   }
 
+  if (source === 'professional-directory' && intent === 'directory-notify') {
+    return {
+      source,
+      topic,
+      intent,
+      pageUrl: '/professional-directory',
+      initialMessage:
+        'Hi CARSI — please add me to the notification list for when the NRPG-verified professional directory goes live on carsi.com.au.',
+      variant: 'directory-notify',
+    };
+  }
+
   const pathwayText = pathway ? ` from the ${pathway.replaceAll('-', ' ')} Start Smart pathway` : '';
   const topicText = topic ? ` about ${topic}` : '';
 
@@ -43,21 +49,45 @@ function buildLeadContext(params: Awaited<ContactPageProps['searchParams']>): Co
   };
 }
 
+export async function generateMetadata({
+  searchParams,
+}: ContactPageProps): Promise<Metadata> {
+  const params = await searchParams;
+  const intent = cleanParam(firstParam(params.intent), 80);
+  const source = cleanParam(firstParam(params.source), 48);
+
+  if (source === 'professional-directory' && intent === 'directory-notify') {
+    return {
+      title: 'Notify Me — Professional Directory | CARSI',
+      description:
+        'Join the CARSI professional directory launch list. We will email you when verified NRPG listings go live.',
+    };
+  }
+
+  return {
+    title: 'Contact — Cleaning and Restoration Science Institute',
+    description:
+      'Get in touch with CARSI for course enquiries, membership support, or questions about IICRC CEC Accredited courses.',
+  };
+}
+
 export default async function ContactPage({ searchParams }: ContactPageProps) {
   const leadContext = buildLeadContext(await searchParams);
+  const isDirectoryNotify = leadContext?.variant === 'directory-notify';
 
   return (
     <main id="main-content" className="min-h-screen bg-[#f6f8fb] text-slate-900">
       <div className="mx-auto max-w-5xl px-6 py-14">
         <p className="mb-2 text-xs font-semibold tracking-wide text-[#146fc2] uppercase">
-          Get in touch
+          {isDirectoryNotify ? 'Professional directory' : 'Get in touch'}
         </p>
         <h1 className="mb-3 text-4xl font-bold tracking-tight text-slate-950">
-          Contact CARSI
+          {isDirectoryNotify ? 'Join the launch list' : 'Contact CARSI'}
         </h1>
         <p className="mb-10 max-w-2xl text-sm leading-relaxed text-slate-600">
-          Have a question about courses, membership, IICRC CECs, or team training? Send the details
-          and CARSI support will route it to the right conversation.
+          {isDirectoryNotify
+            ? 'Leave your details and we will notify you when verified NRPG professional listings go live on CARSI.'
+            : 'Have a question about courses, membership, IICRC CECs, or team training? Send the details and CARSI support will route it to the right conversation.'}
         </p>
 
         <div className="grid gap-8 lg:grid-cols-[1fr_340px]">
@@ -69,14 +99,17 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
             {leadContext ? (
               <div className="rounded-xl border border-[#b8dbfb] bg-[#eef7ff] p-5">
                 <p className="text-[10px] font-semibold tracking-wide text-[#146fc2] uppercase">
-                  Start Smart enquiry
+                  {leadContext.source === 'professional-directory'
+                    ? 'Directory enquiry'
+                    : 'Start Smart enquiry'}
                 </p>
                 <h2 className="mt-2 text-sm font-semibold text-slate-950">
                   Routed to the right conversation
                 </h2>
                 <p className="mt-2 text-xs leading-relaxed text-slate-600">
-                  This enquiry includes the source, topic and pathway so CARSI can quickly see what
-                  guidance you need.
+                  {leadContext.source === 'professional-directory'
+                    ? 'This enquiry is tagged for the professional directory launch list.'
+                    : 'This enquiry includes the source, topic and pathway so CARSI can quickly see what guidance you need.'}
                 </p>
               </div>
             ) : null}
