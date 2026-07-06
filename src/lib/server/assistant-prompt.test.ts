@@ -67,4 +67,11 @@ describe('buildAssistantSystemPrompt', () => {
     expect(prompt).toContain('IICRC_KB_MARKER');
     expect(prompt.indexOf('END CATALOGUE')).toBeLessThan(prompt.indexOf('BEGIN KNOWLEDGE BASE'));
   });
+
+  it('requires a human, conversational voice', () => {
+    const prompt = buildAssistantSystemPrompt(base);
+    expect(prompt).toMatch(/Voice & conversation style/i);
+    expect(prompt).toMatch(/first person/i);
+    expect(prompt).toMatch(/Avoid robotic/i);
+  });
 });
