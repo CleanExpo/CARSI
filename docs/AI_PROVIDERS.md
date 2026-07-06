@@ -10,7 +10,7 @@ For the operating doctrine, see [LLM Capabilities and Stack Hardening](./LLM_CAP
 
 | Provider               | Current CARSI role                                                                        | Environment                                          | Status                           |
 | ---------------------- | ------------------------------------------------------------------------------------------ | ----------------------------------------------------- | -------------------------------- |
-| OpenRouter             | Public/learner assistant (Margot) through `app/api/lms/public/chat/route.ts`, free-tier model | `OPENROUTER_API_KEY`, optional `OPENROUTER_MODEL`      | Active integration               |
+| OpenRouter             | Public/learner assistant (Margot) through `app/api/margot/chat/route.ts`, free-tier model | `OPENROUTER_API_KEY`, optional `OPENROUTER_MODEL`      | Active integration               |
 | OpenAI                 | Course-thumbnail authoring tool only (`scripts/generate-course-thumbnails.ts`)              | `OPENAI_API_KEY`                                       | Active integration (authoring tool only) |
 | Google Gemini / Imagen | Image and graphics generation policy/client code                                          | `GOOGLE_AI_API_KEY`                                    | Optional integration             |
 | Anthropic Claude       | Experimental client/types and agent planning references                                   | `ANTHROPIC_API_KEY`                                    | Review before production use     |
@@ -32,7 +32,7 @@ This removes bloat in three ways:
 
 Runtime path:
 
-- `app/api/lms/public/chat/route.ts`
+- `app/api/margot/chat/route.ts`
 - `src/lib/openrouter/client.ts`
 - `src/lib/server/ai-assistant-context.ts`
 - `src/lib/server/margot-knowledge-base.ts`

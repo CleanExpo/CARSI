@@ -128,7 +128,7 @@ export default function FloatingChat() {
     audioRef.current?.pause();
     setSpeechLoadingId(id);
     try {
-      const res = await fetch('/api/lms/public/chat/speech', {
+      const res = await fetch('/api/margot/chat/speech', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text }),
@@ -203,7 +203,7 @@ export default function FloatingChat() {
       }));
 
     try {
-      const res = await fetch('/api/lms/public/chat', {
+      const res = await fetch('/api/margot/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
