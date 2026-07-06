@@ -20,7 +20,7 @@ describe('OpenRouterClient.chat', () => {
 
     const client = new OpenRouterClient({ apiKey: 'test-key', timeoutMs: 50 });
     const response = await client.chat({
-      model: 'openai/gpt-oss-120b:free',
+      model: 'google/gemma-4-31b-it:free',
       messages: [{ role: 'user', content: 'hi' }],
     });
 
@@ -40,7 +40,7 @@ describe('OpenRouterClient.chat', () => {
       appTitle: 'CARSI Margot',
     });
     await client.chat({
-      model: 'openai/gpt-oss-120b:free',
+      model: 'google/gemma-4-31b-it:free',
       max_tokens: 900,
       messages: [
         { role: 'system', content: 'sys' },
@@ -54,7 +54,7 @@ describe('OpenRouterClient.chat', () => {
     expect(init.headers['HTTP-Referer']).toBe('https://carsi.com.au');
     expect(init.headers['X-Title']).toBe('CARSI Margot');
     const body = JSON.parse(init.body);
-    expect(body.model).toBe('openai/gpt-oss-120b:free');
+    expect(body.model).toBe('google/gemma-4-31b-it:free');
     expect(body.max_tokens).toBe(900);
     expect(body.messages).toEqual([
       { role: 'system', content: 'sys' },
@@ -75,7 +75,7 @@ describe('OpenRouterClient.chat', () => {
 
     const start = Date.now();
     await expect(
-      client.chat({ model: 'openai/gpt-oss-120b:free', messages: [{ role: 'user', content: 'hi' }] })
+      client.chat({ model: 'google/gemma-4-31b-it:free', messages: [{ role: 'user', content: 'hi' }] })
     ).rejects.toThrow('OpenRouter API request timed out after 30ms');
     const elapsed = Date.now() - start;
 
@@ -92,7 +92,7 @@ describe('OpenRouterClient.chat', () => {
     const client = new OpenRouterClient({ apiKey: 'test-key' });
 
     await expect(
-      client.chat({ model: 'openai/gpt-oss-120b:free', messages: [{ role: 'user', content: 'hi' }] })
+      client.chat({ model: 'google/gemma-4-31b-it:free', messages: [{ role: 'user', content: 'hi' }] })
     ).rejects.toThrow(OpenRouterAPIError);
   });
 
