@@ -106,8 +106,11 @@ export class OpenRouterClient {
   }
 }
 
-/** Free, open-weight model OpenRouter designates for general-purpose,
- * high-reasoning production use — chosen so Margot follows the strict
- * scope/disclaimer/citation rules in her system prompt reliably. Override
- * via OPENROUTER_MODEL if OpenRouter's free-tier lineup changes. */
-export const DEFAULT_OPENROUTER_MODEL = 'openai/gpt-oss-120b:free';
+/** Google Gemma 4 (dense 31B instruct), free on OpenRouter — strong
+ * instruction-following so Margot honours the strict scope/disclaimer/citation
+ * rules in her system prompt, with a 262k context window for her knowledge base.
+ * Preferred over the heavily-contended openai/gpt-oss-120b:free, whose free-tier
+ * routing queue was long enough to push Margot's chat route into gateway 504s.
+ * Override via OPENROUTER_MODEL if OpenRouter's free-tier lineup changes
+ * (google/gemma-4-26b-a4b-it:free is a lower-latency fallback). */
+export const DEFAULT_OPENROUTER_MODEL = 'google/gemma-4-31b-it:free';
