@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
   try {
     courseContext = await getAssistantCourseContextText();
   } catch (e) {
-    console.error('[lms/public/chat] course context failed:', e);
+    console.error('[margot/chat] course context failed:', e);
     courseContext =
       'Course catalogue could not be loaded. Still help with general IICRC and LMS guidance, and suggest /courses.';
   }
@@ -131,7 +131,7 @@ export async function POST(request: NextRequest) {
       try {
         pageFocus = await getAssistantPageFocusContext(slug, lid);
       } catch (e) {
-        console.error('[lms/public/chat] page focus failed:', e);
+        console.error('[margot/chat] page focus failed:', e);
       }
     }
   }
@@ -186,7 +186,7 @@ When CURRENT PAGE FOCUS is present, prioritise it for questions about "this cour
       assistant_name: name,
     });
   } catch (error) {
-    console.error('[lms/public/chat] request failed:', error);
+    console.error('[margot/chat] request failed:', error);
     return NextResponse.json(
       {
         detail:

@@ -82,7 +82,7 @@ CARSI treats LLMs as bounded assistants, not as the product's source of truth. A
 
 Current AI posture:
 
-- Public/learner assistant: `app/api/lms/public/chat/route.ts`
+- Public/learner assistant: `app/api/margot/chat/route.ts`
 - Assistant context: `src/lib/server/ai-assistant-context.ts`
 - Model policy: `src/ai/model-registry/`
 - Image generation policy/client code: `src/lib/image-generation/`, `src/ai/graphics/`

@@ -129,7 +129,7 @@ export function buildCarsiConnectionStatus(
       safeForMissionControl: true,
       detail: aiChatReady
         ? "OpenRouter key present; the public/dashboard chat assistant can run (free-tier model, rate-limited)."
-        : "OPENROUTER_API_KEY is not set — /api/lms/public/chat degrades.",
+        : "OPENROUTER_API_KEY is not set — /api/margot/chat degrades.",
       nextAction: aiChatReady ? undefined : "Set OPENROUTER_API_KEY.",
     },
     {

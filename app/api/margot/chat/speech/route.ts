@@ -94,7 +94,7 @@ export async function POST(request: NextRequest) {
 
     if (!response.ok) {
       const detail = await response.text().catch(() => '');
-      console.error(`[lms/public/chat/speech] ElevenLabs ${response.status}: ${detail.slice(0, 400)}`);
+      console.error(`[margot/chat/speech] ElevenLabs ${response.status}: ${detail.slice(0, 400)}`);
       return NextResponse.json(
         { detail: 'Voice is temporarily unavailable. Please try again shortly.' },
         { status: 502 }
@@ -110,7 +110,7 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('[lms/public/chat/speech] request failed:', error);
+    console.error('[margot/chat/speech] request failed:', error);
     return NextResponse.json(
       { detail: 'Voice is temporarily unavailable due to a network error. Please try again shortly.' },
       { status: 502 }
