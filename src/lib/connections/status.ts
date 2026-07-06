@@ -1,9 +1,12 @@
+import { getElevenLabsEnv } from "@/lib/server/elevenlabs-env";
+
 export type CarsiConnectionId =
   | "database"
   | "auth"
   | "stripe"
   | "email"
   | "ai_chat"
+  | "ai_voice"
   | "turnstile"
   | "cloudinary"
   | "unite_group";
@@ -69,6 +72,7 @@ export function buildCarsiConnectionStatus(
   const stripeWebhookReady = envSet("STRIPE_WEBHOOK_SECRET", env);
   const emailReady = envSet("MAILTRAP_API_KEY", env);
   const aiChatReady = envSet("OPENROUTER_API_KEY", env);
+  const aiVoiceReady = getElevenLabsEnv(env).configured;
   const turnstileReady = envSet("TURNSTILE_SECRET_KEY", env) && envSet("NEXT_PUBLIC_TURNSTILE_SITE_KEY", env);
   const cloudinaryReady =
     envSet("CLOUDINARY_CLOUD_NAME", env) &&
@@ -128,9 +132,19 @@ export function buildCarsiConnectionStatus(
       state: aiChatReady ? "ready" : "blocked",
       safeForMissionControl: true,
       detail: aiChatReady
-        ? "OpenRouter key present; the public/dashboard chat assistant can run (free-tier model, rate-limited)."
+        ? "OpenRouter key present; Margot chat can run (rate-limited, model via OPENROUTER_MODEL)."
         : "OPENROUTER_API_KEY is not set — /api/margot/chat degrades.",
       nextAction: aiChatReady ? undefined : "Set OPENROUTER_API_KEY.",
+    },
+    {
+      id: "ai_voice",
+      label: "Margot voice (ElevenLabs TTS)",
+      state: aiVoiceReady ? "ready" : "blocked",
+      safeForMissionControl: true,
+      detail: aiVoiceReady
+        ? "ElevenLabs key and voice id present; Listen playback on Margot replies is available."
+        : "ELEVENLABS_API_KEY or ELEVENLABS_VOICE_ID is not set — /api/margot/chat/speech degrades.",
+      nextAction: aiVoiceReady ? undefined : "Set ELEVENLABS_API_KEY and ELEVENLABS_VOICE_ID.",
     },
     {
       id: "turnstile",

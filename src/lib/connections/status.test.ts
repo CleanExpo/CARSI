@@ -23,12 +23,13 @@ describe('buildCarsiConnectionStatus', () => {
     expect(byId.stripe.state).toBe('blocked');
     expect(byId.email.state).toBe('blocked');
     expect(byId.ai_chat.state).toBe('blocked');
+    expect(byId.ai_voice.state).toBe('blocked');
     expect(byId.turnstile.state).toBe('unknown');
     expect(byId.cloudinary.state).toBe('unknown');
     expect(byId.unite_group.state).toBe('ready');
 
     expect(status.summary.total).toBe(status.connections.length);
-    expect(status.summary.blocked).toBe(5);
+    expect(status.summary.blocked).toBe(6);
     expect(status.summary.unknown).toBe(2);
     expect(status.summary.ready).toBe(1);
   });
@@ -43,6 +44,8 @@ describe('buildCarsiConnectionStatus', () => {
       STRIPE_WEBHOOK_SECRET: 'whsec_xxx',
       MAILTRAP_API_KEY: 'mt_xxx',
       OPENROUTER_API_KEY: 'sk-or-xxx',
+      ELEVENLABS_API_KEY: 'el_xxx',
+      ELEVENLABS_VOICE_ID: 'voice_xxx',
       TURNSTILE_SECRET_KEY: 'ts_secret_xxx',
       NEXT_PUBLIC_TURNSTILE_SITE_KEY: 'ts_site_xxx',
       CLOUDINARY_CLOUD_NAME: 'demo',
@@ -59,6 +62,7 @@ describe('buildCarsiConnectionStatus', () => {
     expect(byId.stripe.state).toBe('ready');
     expect(byId.email.state).toBe('ready');
     expect(byId.ai_chat.state).toBe('ready');
+    expect(byId.ai_voice.state).toBe('ready');
     expect(byId.turnstile.state).toBe('ready');
     expect(byId.cloudinary.state).toBe('ready');
     expect(byId.unite_group.state).toBe('ready');

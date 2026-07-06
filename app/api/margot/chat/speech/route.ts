@@ -1,21 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+import { getElevenLabsEnv } from '@/lib/server/elevenlabs-env';
 import { applyRateLimit, clientIpFrom } from '@/lib/rate-limit';
 import { stripMarkdownForSpeech } from '@/lib/server/text-to-speech-format';
 
-// Vercel's default function timeout can be shorter than this route's own
-// TTS_TIMEOUT_MS — without this, the platform could kill the function before
-// the AbortSignal below fires cleanly (see the identical bug fixed on the
-// chat route). Same fix, applied preemptively here.
 export const maxDuration = 30;
 
 const ELEVENLABS_TTS_BASE = 'https://api.elevenlabs.io/v1/text-to-speech';
-const DEFAULT_MODEL_ID = 'eleven_multilingual_v2';
-const TTS_TIMEOUT_MS = 20_000;
+const TTS_TIMEOUT_MS = 25_000;
 
-// Public, unauthenticated, spends on ElevenLabs — same shape of cap as the
-// chat endpoint itself (one speech request per chat reply is the expected
-// pattern, so mirroring those limits is generous, not tight).
 const SPEECH_RATE_LIMIT = 5;
 const SPEECH_RATE_WINDOW_MS = 60_000;
 const SPEECH_DAILY_LIMIT = 100;
@@ -27,11 +20,30 @@ type RequestBody = {
   text?: string;
 };
 
-export async function POST(request: NextRequest) {
-  const apiKey = process.env.ELEVENLABS_API_KEY?.trim();
-  const voiceId = process.env.ELEVENLABS_VOICE_ID?.trim();
+function mapElevenLabsError(status: number): string {
+  if (status === 401) {
+    return 'Voice authentication failed on the server. Please contact CARSI support.';
+  }
+  if (status === 404) {
+    return 'Voice profile is misconfigured on the server. Please contact CARSI support.';
+  }
+  if (status === 422) {
+    return 'This message could not be converted to speech. Try a shorter reply.';
+  }
+  if (status === 429) {
+    return 'Voice service is busy. Please wait a moment and try again.';
+  }
+  return 'Voice is temporarily unavailable. Please try again shortly.';
+}
 
-  if (!apiKey || !voiceId) {
+export async function GET() {
+  return NextResponse.json({ available: getElevenLabsEnv().configured });
+}
+
+export async function POST(request: NextRequest) {
+  const { apiKey, voiceId, modelId, configured } = getElevenLabsEnv();
+
+  if (!configured) {
     return NextResponse.json(
       {
         detail:
@@ -51,7 +63,7 @@ export async function POST(request: NextRequest) {
     : minute;
   if (!rl.ok) {
     return NextResponse.json(
-      { detail: 'Too many requests. Please wait a moment and try again.' },
+      { detail: 'Too many voice requests. Please wait a moment and try again.' },
       {
         status: 429,
         headers: { 'Retry-After': String(Math.max(1, Math.ceil((rl.resetAt - Date.now()) / 1000))) },
@@ -75,6 +87,12 @@ export async function POST(request: NextRequest) {
   }
 
   const text = stripMarkdownForSpeech(rawText);
+  if (!text.trim()) {
+    return NextResponse.json(
+      { detail: 'Nothing speakable in this message after formatting.' },
+      { status: 400 }
+    );
+  }
 
   try {
     const response = await fetch(`${ELEVENLABS_TTS_BASE}/${encodeURIComponent(voiceId)}`, {
@@ -86,7 +104,7 @@ export async function POST(request: NextRequest) {
       },
       body: JSON.stringify({
         text,
-        model_id: process.env.ELEVENLABS_MODEL_ID?.trim() || DEFAULT_MODEL_ID,
+        model_id: modelId,
         voice_settings: { stability: 0.5, similarity_boost: 0.75, style: 0 },
       }),
       signal: AbortSignal.timeout(TTS_TIMEOUT_MS),
@@ -96,12 +114,19 @@ export async function POST(request: NextRequest) {
       const detail = await response.text().catch(() => '');
       console.error(`[margot/chat/speech] ElevenLabs ${response.status}: ${detail.slice(0, 400)}`);
       return NextResponse.json(
-        { detail: 'Voice is temporarily unavailable. Please try again shortly.' },
-        { status: 502 }
+        { detail: mapElevenLabsError(response.status) },
+        { status: response.status === 429 ? 429 : 502 }
       );
     }
 
     const audio = await response.arrayBuffer();
+    if (audio.byteLength === 0) {
+      return NextResponse.json(
+        { detail: 'Voice service returned empty audio. Please try again.' },
+        { status: 502 }
+      );
+    }
+
     return new NextResponse(audio, {
       status: 200,
       headers: {
@@ -110,9 +135,14 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
+    const timedOut = error instanceof Error && error.name === 'TimeoutError';
     console.error('[margot/chat/speech] request failed:', error);
     return NextResponse.json(
-      { detail: 'Voice is temporarily unavailable due to a network error. Please try again shortly.' },
+      {
+        detail: timedOut
+          ? 'Voice took too long to generate. Try again with a shorter message.'
+          : 'Voice is temporarily unavailable due to a network error. Please try again shortly.',
+      },
       { status: 502 }
     );
   }
