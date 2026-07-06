@@ -2,6 +2,9 @@ import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { SubmissionForm } from '@/components/submit/SubmissionForm';
+import {
+  buildSubmissionLeadContext,
+} from '@/lib/submission-lead-context';
 
 /* ─── Allowed submission types ───────────────────────────────────────────── */
 
@@ -136,8 +139,15 @@ export function generateStaticParams() {
 
 /* ─── Page ────────────────────────────────────────────────────────────────── */
 
-export default async function SubmitTypePage({ params }: { params: Promise<{ type: string }> }) {
+export default async function SubmitTypePage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ type: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const { type } = await params;
+  const leadContext = buildSubmissionLeadContext(await searchParams);
 
   if (!isValidType(type)) {
     redirect('/submit');
@@ -145,6 +155,7 @@ export default async function SubmitTypePage({ params }: { params: Promise<{ typ
 
   const config = TYPE_CONFIG[type];
   const guidelines = await getGuidelines(type);
+  const fromDirectory = leadContext?.source === 'professional-directory';
 
   return (
     <main className="min-h-screen bg-[#050505] px-4 py-16">
@@ -174,7 +185,11 @@ export default async function SubmitTypePage({ params }: { params: Promise<{ typ
             <h1 className="text-3xl font-bold tracking-tight text-white/90 md:text-4xl">
               Submit a {config.label}
             </h1>
-            <p className="mt-2 text-sm leading-relaxed text-white/45">{config.tagline}</p>
+            <p className="mt-2 text-sm leading-relaxed text-white/45">
+              {fromDirectory && type === 'professional'
+                ? 'Submit your profile for the CARSI professional directory launch queue. We will verify details before any NRPG-backed listing goes live.'
+                : config.tagline}
+            </p>
           </div>
         </div>
 
@@ -266,7 +281,11 @@ export default async function SubmitTypePage({ params }: { params: Promise<{ typ
         )}
 
         {/* Form */}
-        <SubmissionForm submissionType={type} urlLabel={config.urlLabel} />
+        <SubmissionForm
+          submissionType={type}
+          urlLabel={config.urlLabel}
+          leadContext={leadContext}
+        />
       </div>
     </main>
   );
