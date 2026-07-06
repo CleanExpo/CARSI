@@ -47,11 +47,13 @@ export class OpenRouterAPIError extends Error {
 }
 
 const DEFAULT_BASE_URL = 'https://openrouter.ai/api/v1';
-// Free-tier models get lower routing priority on OpenRouter and can be slow.
-// Kept safely under the chat route's maxDuration (60s) so this client's own
-// AbortSignal fires and returns a clean error before the platform hard-kills
-// the function and returns a raw, undiagnosable 504 instead.
-const DEFAULT_TIMEOUT_MS = 45_000;
+// Diagnostic + UX value: shortened from 45s after raising maxDuration to 60s
+// had zero effect on live 504s and produced no server-side logs at all,
+// suggesting requests may not be completing within a much shorter window
+// than expected. A short timeout fails fast with OUR clean error message
+// instead of an opaque platform 504, and confirms whether this code path
+// is even being reached.
+const DEFAULT_TIMEOUT_MS = 15_000;
 
 export class OpenRouterClient {
   private apiKey: string;
