@@ -111,7 +111,7 @@ export async function POST(req: NextRequest) {
           lastName: body.lastName.trim(),
           email,
           message: enrichedMessage,
-          status: 'new',
+          status: leadContext.intent === 'directory-notify' ? 'directory_notify' : 'new',
           sourceIp: ip === UNKNOWN_IP ? null : ip,
         },
       });
