@@ -9,23 +9,23 @@ import {
   getAssistantTagline,
 } from '@/lib/server/ai-assistant-context';
 import { buildAssistantSystemPrompt } from '@/lib/server/assistant-prompt';
+import {
+  appendMargotTurn,
+  loadMargotHistory,
+  margotConversationExists,
+} from '@/lib/server/margot-conversation-store';
 import { getMargotKnowledgeBaseContext } from '@/lib/server/margot-knowledge-base';
+import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { applyRateLimit, clientIpFrom } from '@/lib/rate-limit';
-import { DEFAULT_OPENROUTER_MODEL, OpenRouterClient } from '@/lib/openrouter/client';
+import { DEFAULT_OPENROUTER_MODEL, OpenRouterAPIError, OpenRouterClient } from '@/lib/openrouter/client';
 
-// OpenRouter's free-tier models can take well over Vercel's default function
-// timeout to respond (lower routing priority than paid tiers). Without this,
-// the platform kills the function before OpenRouterClient's own AbortSignal
-// timeout gets a chance to return a clean error — surfacing as a raw 504
-// instead, the same failure class as the original Anthropic timeout bug.
 export const maxDuration = 60;
 
 const MODEL = process.env.OPENROUTER_MODEL?.trim() || DEFAULT_OPENROUTER_MODEL;
+const OPENROUTER_TIMEOUT_MS = 50_000;
+const MAX_TOKENS = 1_000;
+const CHAT_TEMPERATURE = 0.72;
 
-// Public (unauthenticated) endpoint that spends on OpenRouter — cap per IP so a
-// bot can't drive unbounded model cost. Best-effort (in-process) limiter.
-// Public, unauthenticated, spends on OpenRouter — cap per IP per minute AND per day so
-// a bot can't drive unbounded model cost (issue #131): 5/min/IP + 100/day/IP.
 const CHAT_RATE_LIMIT = 5;
 const CHAT_RATE_WINDOW_MS = 60_000;
 const CHAT_DAILY_LIMIT = 100;
@@ -36,10 +36,9 @@ type ChatTurn = { role: 'user' | 'assistant'; content: string };
 type RequestBody = {
   message?: string;
   conversation_id?: string | null;
-  /** Prior turns (excluding the current `message`); max ~12 each side enforced server-side */
   history?: ChatTurn[];
-  /** Optional: URL-derived focus so Margot can answer in course/lesson context (validated server-side). */
   page_context?: { course_slug?: string; lesson_id?: string };
+  page_path?: string;
 };
 
 const MAX_MESSAGE_LEN = 2_000;
@@ -58,6 +57,31 @@ function trimHistory(history: ChatTurn[] | undefined): ChatTurn[] {
   return cleaned.slice(-MAX_HISTORY_TURNS);
 }
 
+function openRouterErrorResponse(error: unknown): NextResponse {
+  if (error instanceof OpenRouterAPIError) {
+    if (error.statusCode === 429) {
+      return NextResponse.json(
+        { detail: 'The assistant is busy right now. Please wait a moment and try again.' },
+        { status: 429 }
+      );
+    }
+    console.error('[margot/chat] OpenRouter error:', error.statusCode, error.message);
+    return NextResponse.json(
+      { detail: 'The assistant is temporarily unavailable. Please try again shortly.' },
+      { status: 502 }
+    );
+  }
+
+  console.error('[margot/chat] request failed:', error);
+  return NextResponse.json(
+    {
+      detail:
+        'The assistant is temporarily unavailable due to a network error. Please try again shortly.',
+    },
+    { status: 502 }
+  );
+}
+
 export async function POST(request: NextRequest) {
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) {
@@ -70,13 +94,10 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // Rate-limit before spending on the model. Keyed per client IP.
   const ip = clientIpFrom(
     request.headers.get('x-forwarded-for'),
     request.headers.get('x-real-ip')
   );
-  // Per-minute first; only charge the daily bucket when the minute check passes,
-  // so a blocked request doesn't also consume a day-slot.
   const minute = applyRateLimit(`public-chat:${ip}`, CHAT_RATE_LIMIT, CHAT_RATE_WINDOW_MS);
   const rl = minute.ok
     ? applyRateLimit(`public-chat-day:${ip}`, CHAT_DAILY_LIMIT, CHAT_DAY_WINDOW_MS)
@@ -111,7 +132,14 @@ export async function POST(request: NextRequest) {
   }
 
   const conversationId = incomingConversationId || randomUUID();
-  const history = trimHistory(body.history);
+  const claims = await getSessionClaimsFromRequest(request);
+
+  let history: ChatTurn[];
+  if (incomingConversationId && (await margotConversationExists(conversationId))) {
+    history = await loadMargotHistory(conversationId);
+  } else {
+    history = trimHistory(body.history);
+  }
 
   let courseContext: string;
   try {
@@ -124,15 +152,13 @@ export async function POST(request: NextRequest) {
 
   let pageFocus: string | null = null;
   const pc = body.page_context;
-  if (pc && typeof pc === 'object') {
-    const slug = typeof pc.course_slug === 'string' ? pc.course_slug : undefined;
-    const lid = typeof pc.lesson_id === 'string' ? pc.lesson_id : undefined;
-    if (slug?.trim() || lid?.trim()) {
-      try {
-        pageFocus = await getAssistantPageFocusContext(slug, lid);
-      } catch (e) {
-        console.error('[margot/chat] page focus failed:', e);
-      }
+  const courseSlug = typeof pc?.course_slug === 'string' ? pc.course_slug.trim() : '';
+  const lessonId = typeof pc?.lesson_id === 'string' ? pc.lesson_id.trim() : '';
+  if (courseSlug || lessonId) {
+    try {
+      pageFocus = await getAssistantPageFocusContext(courseSlug || undefined, lessonId || undefined);
+    } catch (e) {
+      console.error('[margot/chat] page focus failed:', e);
     }
   }
 
@@ -164,15 +190,22 @@ When CURRENT PAGE FOCUS is present, prioritise it for questions about "this cour
   );
   conversationMessages.push({ role: 'user', content: message });
 
+  const pagePath =
+    typeof body.page_path === 'string' && body.page_path.trim()
+      ? body.page_path.trim().slice(0, 512)
+      : null;
+
   try {
     const client = new OpenRouterClient({
       apiKey,
       referer: 'https://carsi.com.au',
       appTitle: 'CARSI Margot',
+      timeoutMs: OPENROUTER_TIMEOUT_MS,
     });
     const response = await client.chat({
       model: MODEL,
-      max_tokens: 900,
+      max_tokens: MAX_TOKENS,
+      temperature: CHAT_TEMPERATURE,
       messages: [{ role: 'system', content: systemContent }, ...conversationMessages],
     });
 
@@ -180,19 +213,28 @@ When CURRENT PAGE FOCUS is present, prioritise it for questions about "this cour
       OpenRouterClient.extractText(response).trim() ||
       "I'm not sure how to answer that right now. Please try rephrasing your question.";
 
+    void appendMargotTurn({
+      conversationId,
+      userMessage: message,
+      assistantMessage: reply,
+      model: MODEL,
+      meta: {
+        userId: claims?.sub ?? null,
+        sourceIp: ip,
+        pagePath,
+        courseSlug: courseSlug || null,
+        lessonId: lessonId || null,
+      },
+    }).catch((e) => {
+      console.error('[margot/chat] failed to persist conversation:', e);
+    });
+
     return NextResponse.json({
       reply,
       conversation_id: conversationId,
       assistant_name: name,
     });
   } catch (error) {
-    console.error('[margot/chat] request failed:', error);
-    return NextResponse.json(
-      {
-        detail:
-          'The assistant is temporarily unavailable due to a network error. Please try again shortly.',
-      },
-      { status: 502 }
-    );
+    return openRouterErrorResponse(error);
   }
 }

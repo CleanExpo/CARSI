@@ -65,6 +65,7 @@ model LmsUser {
   courseReviews      LmsCourseReview[] @relation("ReviewStudent")
   reviewReplies      LmsCourseReview[] @relation("ReviewReplyAuthor")
   subscription       LmsSubscription?
+  margotConversations MargotConversation[]
 
   @@map("lms_users")
 }
@@ -836,4 +837,38 @@ model CcwRoadshowAttendee {
 
   @@index([registrationId])
   @@map("ccw_roadshow_attendees")
+}
+
+/// Margot public assistant — conversation threads (anonymous or linked to a learner).
+model MargotConversation {
+  id         String   @id @default(uuid()) @db.Uuid
+  userId     String?  @map("user_id") @db.Uuid
+  sourceIp   String?  @map("source_ip") @db.VarChar(64)
+  pagePath   String?  @map("page_path") @db.VarChar(512)
+  courseSlug String?  @map("course_slug") @db.VarChar(200)
+  lessonId   String?  @map("lesson_id") @db.Uuid
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt  DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user     LmsUser?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+  messages MargotMessage[]
+
+  @@index([updatedAt(sort: Desc)])
+  @@index([userId])
+  @@map("margot_conversations")
+}
+
+/// Individual turns in a Margot conversation.
+model MargotMessage {
+  id             String   @id @default(uuid()) @db.Uuid
+  conversationId String   @map("conversation_id") @db.Uuid
+  role           String   @db.VarChar(16)
+  content        String   @db.Text
+  model          String?  @db.VarChar(120)
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  conversation MargotConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId, createdAt])
+  @@map("margot_messages")
 }
