@@ -684,6 +684,32 @@ model CrmEventLog {
   @@map("crm_event_logs")
 }
 
+/// Industry Hub intake (`/submit/*`) — podcasts, professionals, events, etc.
+model HubSubmission {
+  id                    String   @id @default(uuid()) @db.Uuid
+  submissionType        String   @map("submission_type") @db.VarChar(32)
+  status                String   @default("pending") @db.VarChar(32)
+  submitterName         String   @map("submitter_name") @db.VarChar(200)
+  submitterEmail        String   @map("submitter_email") @db.VarChar(320)
+  submitterPhone        String?  @map("submitter_phone") @db.VarChar(64)
+  submitterCompany      String?  @map("submitter_company") @db.VarChar(200)
+  submitterRole         String?  @map("submitter_role") @db.VarChar(200)
+  submissionTitle       String   @map("submission_title") @db.VarChar(300)
+  submissionUrl         String?  @map("submission_url") @db.Text
+  submissionDescription String?  @map("submission_description") @db.Text
+  submissionData        Json     @default("{}") @map("submission_data")
+  termsAccepted         Boolean  @map("terms_accepted")
+  guidelinesAccepted    Boolean  @map("guidelines_accepted")
+  ipAddress             String?  @map("ip_address") @db.VarChar(64)
+  userAgent             String?  @map("user_agent") @db.VarChar(512)
+  createdAt             DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt             DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@index([submissionType, status, createdAt(sort: Desc)])
+  @@index([submitterEmail])
+  @@map("hub_submissions")
+}
+
 /// Stripe webhook idempotency guard. Stripe delivers webhooks at least once,
 /// so handlers must claim event IDs before side effects and skip replays.
 model StripeWebhookEvent {
