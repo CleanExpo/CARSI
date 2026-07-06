@@ -6,7 +6,6 @@ export type CarsiConnectionId =
   | "ai_chat"
   | "turnstile"
   | "cloudinary"
-  | "rate_limit_redis"
   | "unite_group";
 
 export type CarsiConnectionState = "connected" | "ready" | "mock" | "blocked" | "unknown";
@@ -55,8 +54,8 @@ function connectionSummary(connections: CarsiConnection[]): CarsiConnectionStatu
  * secret material is ever included in the payload. "connected" is reserved
  * for infrastructure the app cannot boot without; integrations whose live
  * use is still gated report "ready" at best; integrations that degrade
- * gracefully when unset (Turnstile, Cloudinary, distributed rate limiting)
- * report "unknown" rather than "blocked" since their absence is by design.
+ * gracefully when unset (Turnstile, Cloudinary) report "unknown" rather
+ * than "blocked" since their absence is by design.
  */
 export function buildCarsiConnectionStatus(
   env: NodeJS.ProcessEnv = process.env,
@@ -75,7 +74,6 @@ export function buildCarsiConnectionStatus(
     envSet("CLOUDINARY_CLOUD_NAME", env) &&
     envSet("CLOUDINARY_API_KEY", env) &&
     envSet("CLOUDINARY_API_SECRET", env);
-  const redisReady = envSet("UPSTASH_REDIS_REST_URL", env) && envSet("UPSTASH_REDIS_REST_TOKEN", env);
 
   const connections: CarsiConnection[] = [
     {
@@ -155,16 +153,6 @@ export function buildCarsiConnectionStatus(
         ? "Cloudinary credentials present; admin uploads and generated media are hosted there."
         : "Cloudinary is unset — admin uploads fall back to local disk storage.",
       nextAction: cloudinaryReady ? undefined : "Set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET.",
-    },
-    {
-      id: "rate_limit_redis",
-      label: "Distributed rate limiting (Upstash Redis)",
-      state: redisReady ? "ready" : "unknown",
-      safeForMissionControl: true,
-      detail: redisReady
-        ? "Upstash REST credentials present; AI/abuse rate limits are cross-instance."
-        : "Upstash is unset — rate limiting falls back to the in-process limiter automatically.",
-      nextAction: redisReady ? undefined : "Set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN.",
     },
     {
       id: "unite_group",

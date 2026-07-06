@@ -7,9 +7,8 @@
 //
 // Limitation: stateless serverless functions reset memory per cold
 // start, so the window is best-effort across invocations on the same
-// worker. For globally consistent quotas, migrate to Vercel KV /
-// Upstash Redis (`@upstash/ratelimit`) — left as a follow-up since
-// adding a dep + provisioning Redis is a separate workstream.
+// worker. CARSI runs on Vercel only (no Redis) — this in-process
+// window is the intentional rate-limiting approach, not a stopgap.
 //
 // In practice, Cloudflare Turnstile + an instance-local memory window
 // blocks the abuse class this fix targets (anonymous bots filling the

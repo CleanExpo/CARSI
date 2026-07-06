@@ -10,8 +10,7 @@ import {
 } from '@/lib/server/ai-assistant-context';
 import { buildAssistantSystemPrompt } from '@/lib/server/assistant-prompt';
 import { getMargotKnowledgeBaseContext } from '@/lib/server/margot-knowledge-base';
-import { clientIpFrom } from '@/lib/rate-limit';
-import { applyRateLimitDistributed } from '@/lib/rate-limit-distributed';
+import { applyRateLimit, clientIpFrom } from '@/lib/rate-limit';
 import { DEFAULT_OPENROUTER_MODEL, OpenRouterClient } from '@/lib/openrouter/client';
 
 // OpenRouter's free-tier models can take well over Vercel's default function
@@ -78,13 +77,9 @@ export async function POST(request: NextRequest) {
   );
   // Per-minute first; only charge the daily bucket when the minute check passes,
   // so a blocked request doesn't also consume a day-slot.
-  const minute = await applyRateLimitDistributed(
-    `public-chat:${ip}`,
-    CHAT_RATE_LIMIT,
-    CHAT_RATE_WINDOW_MS
-  );
+  const minute = applyRateLimit(`public-chat:${ip}`, CHAT_RATE_LIMIT, CHAT_RATE_WINDOW_MS);
   const rl = minute.ok
-    ? await applyRateLimitDistributed(`public-chat-day:${ip}`, CHAT_DAILY_LIMIT, CHAT_DAY_WINDOW_MS)
+    ? applyRateLimit(`public-chat-day:${ip}`, CHAT_DAILY_LIMIT, CHAT_DAY_WINDOW_MS)
     : minute;
   if (!rl.ok) {
     return NextResponse.json(
