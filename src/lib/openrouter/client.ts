@@ -106,11 +106,11 @@ export class OpenRouterClient {
   }
 }
 
-/** Google Gemma 4 (dense 31B instruct), free on OpenRouter — strong
- * instruction-following so Margot honours the strict scope/disclaimer/citation
- * rules in her system prompt, with a 262k context window for her knowledge base.
- * Preferred over the heavily-contended openai/gpt-oss-120b:free, whose free-tier
- * routing queue was long enough to push Margot's chat route into gateway 504s.
- * Override via OPENROUTER_MODEL if OpenRouter's free-tier lineup changes
- * (google/gemma-4-26b-a4b-it:free is a lower-latency fallback). */
-export const DEFAULT_OPENROUTER_MODEL = 'google/gemma-4-31b-it:free';
+/** z-ai GLM-5.2 on OpenRouter — strong instruction-following so Margot honours
+ * the strict scope/disclaimer/citation rules in her system prompt, with a 1M
+ * context window for her knowledge base. Paid (~$0.69/1M in, ~$2.16/1M out) —
+ * cheap, but note this endpoint is public/unauthenticated, so per-IP rate limits
+ * (5/min + 100/day) are what cap spend. Voice playback is ElevenLabs TTS on the
+ * reply text and is independent of this model. Override via OPENROUTER_MODEL
+ * (google/gemma-4-31b-it:free is a zero-cost fallback). */
+export const DEFAULT_OPENROUTER_MODEL = 'z-ai/glm-5.2';
