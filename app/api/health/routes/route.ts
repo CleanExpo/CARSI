@@ -36,6 +36,11 @@ const KNOWN_ROUTES: Array<{ path: string; methods: string[]; file: string }> = [
   { path: '/api/margot/chat', methods: ['POST'], file: 'app/api/margot/chat/route.ts' },
   { path: '/api/margot/chat/history', methods: ['GET'], file: 'app/api/margot/chat/history/route.ts' },
   { path: '/api/margot/chat/speech', methods: ['GET', 'POST'], file: 'app/api/margot/chat/speech/route.ts' },
+  {
+    path: '/api/health/professional-directory',
+    methods: ['GET'],
+    file: 'app/api/health/professional-directory/route.ts',
+  },
 ];
 
 async function discoverRoutes(apiDir: string): Promise<RouteInfo[]> {
