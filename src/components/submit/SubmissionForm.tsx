@@ -4,10 +4,15 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { TurnstileWidget } from '@/components/security/TurnstileWidget';
+import {
+  buildSubmissionFormDefaults,
+  type SubmissionLeadContext,
+} from '@/lib/submission-lead-context';
 
 interface SubmissionFormProps {
   submissionType: string;
   urlLabel: string;
+  leadContext?: SubmissionLeadContext;
 }
 
 interface FormState {
@@ -41,9 +46,17 @@ const fieldStyle =
 
 const labelStyle = 'block mb-1.5 text-xs font-medium text-white/55';
 
-export function SubmissionForm({ submissionType, urlLabel }: SubmissionFormProps) {
+export function SubmissionForm({
+  submissionType,
+  urlLabel,
+  leadContext,
+}: SubmissionFormProps) {
   const router = useRouter();
-  const [form, setForm] = useState<FormState>(INITIAL_STATE);
+  const defaults = buildSubmissionFormDefaults(submissionType, leadContext);
+  const [form, setForm] = useState<FormState>({
+    ...INITIAL_STATE,
+    ...defaults,
+  });
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
   const [submitting, setSubmitting] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
@@ -90,7 +103,12 @@ export function SubmissionForm({ submissionType, urlLabel }: SubmissionFormProps
       const res = await fetch('/api/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, submission_type: submissionType, turnstileToken }),
+        body: JSON.stringify({
+          ...form,
+          submission_type: submissionType,
+          turnstileToken,
+          leadContext,
+        }),
       });
 
       const json = (await res.json()) as { success?: boolean; error?: string };
@@ -110,6 +128,12 @@ export function SubmissionForm({ submissionType, urlLabel }: SubmissionFormProps
 
   return (
     <form onSubmit={handleSubmit} noValidate>
+      {leadContext?.source === 'professional-directory' ? (
+        <div className="mb-6 rounded-sm border border-[#00F5FF]/20 bg-[#00F5FF]/5 px-4 py-3 text-xs leading-relaxed text-white/60">
+          You are submitting a <strong className="text-white/80">professional directory profile</strong>{' '}
+          for review ahead of the NRPG-verified CARSI directory launch.
+        </div>
+      ) : null}
       <div className="rounded-sm border-[0.5px] border-white/[0.06] bg-white/[0.02] p-6 md:p-8">
         <h2 className="mb-6 text-sm font-semibold tracking-wider text-white/40 uppercase">
           Your Details
@@ -221,7 +245,11 @@ export function SubmissionForm({ submissionType, urlLabel }: SubmissionFormProps
               id="submission_title"
               type="text"
               className={fieldStyle}
-              placeholder="Name of the podcast, channel, event, or resource"
+              placeholder={
+                submissionType === 'professional'
+                  ? 'e.g. Jane Smith — ACME Restoration Pty Ltd'
+                  : 'Name of the podcast, channel, event, or resource'
+              }
               value={form.submission_title}
               onChange={(e) => setField('submission_title', e.target.value)}
               aria-invalid={!!errors.submission_title}
@@ -408,7 +436,11 @@ export function SubmissionForm({ submissionType, urlLabel }: SubmissionFormProps
               'Submit for Review →'
             )}
           </button>
-          <p className="mt-3 text-xs text-white/25">We aim to respond within 5 business days.</p>
+          <p className="mt-3 text-xs text-white/25">
+            {leadContext?.source === 'professional-directory'
+              ? 'We will review your profile for the directory launch queue.'
+              : 'We aim to respond within 5 business days.'}
+          </p>
         </div>
       </div>
     </form>
