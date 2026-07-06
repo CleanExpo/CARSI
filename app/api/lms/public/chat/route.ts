@@ -14,6 +14,13 @@ import { clientIpFrom } from '@/lib/rate-limit';
 import { applyRateLimitDistributed } from '@/lib/rate-limit-distributed';
 import { DEFAULT_OPENROUTER_MODEL, OpenRouterClient } from '@/lib/openrouter/client';
 
+// OpenRouter's free-tier models can take well over Vercel's default function
+// timeout to respond (lower routing priority than paid tiers). Without this,
+// the platform kills the function before OpenRouterClient's own AbortSignal
+// timeout gets a chance to return a clean error — surfacing as a raw 504
+// instead, the same failure class as the original Anthropic timeout bug.
+export const maxDuration = 60;
+
 const MODEL = process.env.OPENROUTER_MODEL?.trim() || DEFAULT_OPENROUTER_MODEL;
 
 // Public (unauthenticated) endpoint that spends on OpenRouter — cap per IP so a

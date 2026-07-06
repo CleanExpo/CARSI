@@ -4,6 +4,12 @@ import { clientIpFrom } from '@/lib/rate-limit';
 import { applyRateLimitDistributed } from '@/lib/rate-limit-distributed';
 import { stripMarkdownForSpeech } from '@/lib/server/text-to-speech-format';
 
+// Vercel's default function timeout can be shorter than this route's own
+// TTS_TIMEOUT_MS — without this, the platform could kill the function before
+// the AbortSignal below fires cleanly (see the identical bug fixed on the
+// chat route). Same fix, applied preemptively here.
+export const maxDuration = 30;
+
 const ELEVENLABS_TTS_BASE = 'https://api.elevenlabs.io/v1/text-to-speech';
 const DEFAULT_MODEL_ID = 'eleven_multilingual_v2';
 const TTS_TIMEOUT_MS = 20_000;
