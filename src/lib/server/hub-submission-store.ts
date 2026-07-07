@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 
+import { Prisma } from '@/generated/prisma/client';
 import { getPrismaClient } from '@/lib/prisma';
 
 export type HubSubmissionInput = {
@@ -47,7 +48,7 @@ export async function createHubSubmission(
         submissionTitle: input.submissionTitle,
         submissionUrl: input.submissionUrl ?? null,
         submissionDescription: input.submissionDescription ?? null,
-        submissionData: input.submissionData ?? {},
+        submissionData: (input.submissionData ?? {}) as Prisma.InputJsonValue,
         termsAccepted: input.termsAccepted,
         guidelinesAccepted: input.guidelinesAccepted,
         ipAddress: input.ipAddress ?? null,

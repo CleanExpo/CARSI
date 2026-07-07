@@ -19,7 +19,7 @@ export function ProfessionalDirectoryComingSoon() {
       <MarketingSectionHeader
         eyebrow="Professional directory"
         title="Verified NRPG professionals — coming soon"
-        description="We are integrating with the National Restoration Professionals Guild member registry. Every profile listed here will be a real, verified member — no placeholder listings."
+        body="We are integrating with the National Restoration Professionals Guild member registry. Every profile listed here will be a real, verified member — no placeholder listings."
       />
 
       <div className="grid gap-4 md:grid-cols-3">

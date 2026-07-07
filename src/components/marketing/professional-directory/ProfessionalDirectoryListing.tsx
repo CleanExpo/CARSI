@@ -28,7 +28,7 @@ export function ProfessionalDirectoryListing({
       <MarketingSectionHeader
         eyebrow="Professional directory"
         title="NRPG-verified professionals"
-        description={`${professionals.length} verified profile${professionals.length === 1 ? '' : 's'} from the National Restoration Professionals Guild registry.`}
+        body={`${professionals.length} verified profile${professionals.length === 1 ? '' : 's'} from the National Restoration Professionals Guild registry.`}
       />
 
       <ul className="grid gap-4 md:grid-cols-2">
