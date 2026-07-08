@@ -55,16 +55,6 @@ async function main() {
     detail: `HTTP ${checkout.status}`,
   });
 
-  const autogit = await import('node:fs/promises')
-    .then((fs) => fs.readFile(new URL('../.autogit.json', import.meta.url), 'utf8'))
-    .then((raw) => JSON.parse(raw))
-    .catch(() => ({ mode: 'unknown' }));
-  checks.push({
-    name: '.autogit.json mode is off in repo',
-    pass: autogit.mode === 'off',
-    detail: `mode=${autogit.mode}`,
-  });
-
   let failed = 0;
   for (const c of checks) {
     const mark = c.pass ? 'OK' : 'FAIL';

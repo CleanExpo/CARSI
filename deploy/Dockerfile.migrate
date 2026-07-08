@@ -1,0 +1,15 @@
+# DigitalOcean PRE_DEPLOY job — app.yaml sets dockerfile_path to deploy/Dockerfile.migrate.
+FROM node:22-bookworm-slim
+WORKDIR /app
+
+RUN apt-get update -y && apt-get install -y --no-install-recommends openssl ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
+
+COPY package.json package-lock.json ./
+COPY prisma ./prisma/
+COPY prisma.config.ts ./
+COPY scripts/do-migrate.sh ./scripts/do-migrate.sh
+
+RUN npm ci --ignore-scripts && chmod +x ./scripts/do-migrate.sh
+
+CMD ["bash", "./scripts/do-migrate.sh"]

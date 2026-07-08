@@ -1,5 +1,4 @@
-# DigitalOcean App Platform: set dockerfile_path to "Dockerfile" (no leading slash).
-# Prisma needs DATABASE_URL at install/build for generate; migrate runs after `next build` in this stage.
+# DigitalOcean App Platform: app.yaml sets dockerfile_path to deploy/Dockerfile (build context: repo root).
 
 FROM node:22-bookworm-slim AS deps
 WORKDIR /app
@@ -30,7 +29,6 @@ ENV NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL}
 ENV NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}
 
 RUN npm run build
-# Migrations run at container start via scripts/docker-entrypoint.sh (runtime has DB access).
 
 FROM node:22-bookworm-slim AS runner
 WORKDIR /app

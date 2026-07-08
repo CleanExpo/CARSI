@@ -97,7 +97,7 @@ function inScope(file) {
 const EXEMPT = [
   'scripts/check-iicrc-terminology.mjs',
   'CLAUDE.md',
-  '.claude/skills/carsi-course-production/SKILL.md',
+  'skills/context/project-context.skill.md',
 ];
 
 function isExempt(file) {
