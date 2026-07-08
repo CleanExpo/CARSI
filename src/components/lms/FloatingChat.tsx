@@ -122,6 +122,7 @@ export default function FloatingChat() {
     try {
       const stored = localStorage.getItem(CONVERSATION_STORAGE_KEY);
       if (stored?.trim()) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time hydration from localStorage on mount (SSR-safe)
         setConversationId(stored.trim());
       }
     } catch {
@@ -247,6 +248,7 @@ export default function FloatingChat() {
   }, [stopSpeech]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- syncing speech playback to open/close state
     if (!open) stopSpeech();
   }, [open, stopSpeech]);
 
@@ -273,6 +275,7 @@ export default function FloatingChat() {
     if (!text || loading) return;
 
     const userMsg: Message = {
+      // eslint-disable-next-line react-hooks/purity -- id generated in an event handler, not during render
       id: `u-${Date.now()}`,
       role: 'user',
       text,
