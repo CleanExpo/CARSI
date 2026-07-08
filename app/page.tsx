@@ -17,6 +17,7 @@ import {
   getPublicCatalogueFacts,
 } from '@/lib/server/public-catalogue-facts';
 import { getHomepageFeaturedCourses } from '@/lib/server/public-courses-list';
+import { subscriptionsEnabled } from '@/lib/server/subscriptions-flag';
 import type { CourseListItem } from '@/lib/course-list-item';
 import {
   ArrowRight,
@@ -160,7 +161,7 @@ export default async function Home() {
         }
       />
 
-      <HomePricingSection />
+      <HomePricingSection subscriptionsEnabled={subscriptionsEnabled()} />
 
       <HomeCertificationsSection disciplineCountLabel={disciplineCountLabel} />
 
