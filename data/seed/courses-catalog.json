@@ -4031,7 +4031,7 @@
         "CCW"
       ],
       "iicrcDiscipline": null,
-      "cecHours": null,
+      "cecHours": 0,
       "meta": {
         "coBrand": "CARSI × Carpet Cleaners Warehouse (CCW)",
         "publicPage": "https://carsi.com.au/ccw-truckmount-operations",
@@ -4041,7 +4041,8 @@
         "buildStage": "seeded-unpublished-pending-founder-review",
         "verificationGate": "Unit 3.6 Gate A: every safety-critical setpoint must be verified against the specific unit + engine manual and the operator’s State before delivery as fact.",
         "practicalAssessmentFollowUp": "Unit 3.6 is delivered as a reading lesson in this increment; a rubric-scored LmsPracticalAssessment (Gate A/B + CO) is the fast-follow per GP-497.",
-        "notIicrc": "Manufacturer/operator course — not IICRC CEC-accredited; no CEC hours."
+        "notIicrc": "Manufacturer/operator course — not IICRC CEC-accredited; no CEC hours.",
+        "cecHours": "0 — manufacturer/operator course, NOT IICRC CEC-accredited. Explicit 0 blocks the seed duration→CEC inference so no IICRC CEC claim renders on any surface."
       },
       "isPublished": false,
       "modules": [
