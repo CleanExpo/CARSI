@@ -106,6 +106,9 @@ output/demo-screencast/
 # Generated print artifacts (regenerated on demand; not source)
 output/pdf/
 
+# Generated course images, infographics and other render artifacts (hosted on Cloudinary; not source)
+output/
+
 # Course voiceover pipeline — resumable run state (briefs themselves are committed)
 data/voice/course-voice-results.json
 

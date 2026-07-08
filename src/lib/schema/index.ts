@@ -24,3 +24,9 @@ export type { PersonSchemaInput, LocalBusinessSchemaInput } from './person';
 
 export { buildOrganizationSchema } from './organization';
 export type { OrganizationSchemaInput } from './organization';
+
+export { buildCourseSchema } from './course';
+export type { CourseSchemaInput } from './course';
+
+export { buildFaqSchema } from './faq';
+export type { FaqSchemaInput } from './faq';

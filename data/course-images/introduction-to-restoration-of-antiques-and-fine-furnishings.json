@@ -1,0 +1,37 @@
+{
+  "courseSlug": "introduction-to-restoration-of-antiques-and-fine-furnishings",
+  "brandColors": ["30 46% 38%", "38 56% 54%", "42 24% 90%"],
+  "notes": "Australian conservation workshop. Warm timber tones, meticulous and gentle craftsmanship that preserves authenticity and patina. Gloved hands on task; antique timber furniture is being carefully conserved, not stripped or damaged. No on-image text or brand names.",
+  "images": [
+    {
+      "id": "hero",
+      "context": "Course hero image for 'Introduction to Restoration of Antiques and Fine Furnishings'",
+      "category": "hero",
+      "aspectRatio": "16:9",
+      "resolution": "2K",
+      "style": "professional",
+      "prompt": "A skilled furniture conservator in cotton gloves working attentively on an antique timber cabinet in a warm, well-lit Australian restoration workshop, hand tools and soft brushes arranged neatly on the bench. Rich timber tones, natural window light, calm and precise craftsmanship. Realistic professional photography.",
+      "negativePrompt": "no on-image text, no logos, no brand names, no watermarks, no gore, no distressing imagery, no identifiable face-forward portraits, no damaged or broken furniture, no aggressive stripping or sanding, no clutter"
+    },
+    {
+      "id": "gentle-surface-cleaning",
+      "context": "Module 3 — Cleaning Technique Selection: gentle poultice and controlled cleaning that preserves patina",
+      "category": "illustration",
+      "aspectRatio": "4:3",
+      "resolution": "2K",
+      "style": "professional",
+      "prompt": "Close-up of a conservator's gloved hands gently applying a soft cleaning poultice with a fine brush to the patinated surface of an antique timber cabinet door, lifting soiling without disturbing the original finish. Warm workshop light, shallow depth of field, delicate and controlled. Realistic professional photography.",
+      "negativePrompt": "no on-image text, no logos, no brand names, no watermarks, no gore, no distressing imagery, no identifiable face-forward portraits, no harsh scrubbing, no stripped or bare timber, no damage"
+    },
+    {
+      "id": "joint-consolidation",
+      "context": "Module 2 — Handling Precautions: securing loose joinery before moving a fragile piece",
+      "category": "illustration",
+      "aspectRatio": "4:3",
+      "resolution": "2K",
+      "style": "professional",
+      "prompt": "Mid-distance view of a conservator in gloves carefully stabilising a loose joint on an antique carved timber chair frame in an Australian workshop, using a fine applicator and a soft clamp with protective padding. Warm timber tones, meticulous and structural, hands-on-task framing. Realistic professional photography.",
+      "negativePrompt": "no on-image text, no logos, no brand names, no watermarks, no gore, no distressing imagery, no identifiable face-forward portraits, no broken or splintered furniture, no clutter, no power sanders"
+    }
+  ]
+}

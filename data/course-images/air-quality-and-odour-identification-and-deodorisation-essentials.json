@@ -1,0 +1,37 @@
+{
+  "courseSlug": "air-quality-and-odour-identification-and-deodorisation-essentials",
+  "brandColors": ["205 55% 40%", "185 40% 45%", "210 15% 92%"],
+  "notes": "IAQ/odour remediation. Depict source-based deodorisation, not masking. Only occupant-safe devices shown with a technician present (air scrubbers, hydroxyl generators) — never ozone machines around people. Australian restoration settings, metric context, professional PPE. No on-image text, no brand names/logos.",
+  "images": [
+    {
+      "id": "hero",
+      "context": "Course hero for 'Air Quality and Odour: Identification and Deodorisation Essentials'",
+      "category": "hero",
+      "aspectRatio": "16:9",
+      "resolution": "2K",
+      "style": "professional",
+      "prompt": "A professional restoration technician in nitrile gloves and an N95 respirator working in a bright, freshly dried Australian home interior, positioned over the shoulder and mid-distance, setting up a HEPA-and-carbon air scrubber to control lingering odour after water damage. Clean skirting boards and pale walls, warm daylight through the windows, orderly and methodical. Realistic professional photography, aspirational and calm.",
+      "negativePrompt": "no on-image text, no logos, no brand names, no watermarks, no gore, no distressing imagery, no identifiable face-forward portraits, no visible mould or filth, no smoke haze, no ozone machine near people"
+    },
+    {
+      "id": "hydroxyl-air-scrubber",
+      "context": "Module 7 & 8 — deodorisation equipment: HEPA/carbon air scrubber and occupant-safe hydroxyl generator",
+      "category": "illustration",
+      "aspectRatio": "4:3",
+      "resolution": "2K",
+      "style": "professional",
+      "prompt": "A close, hands-on-task view of a technician's gloved hands adjusting a portable air scrubber fitted with an activated carbon filter, with a hydroxyl generator running nearby in a clean, empty Australian room. Neat power lead to a standard Australian GPO, tidy setup, cool professional lighting. Realistic professional photography.",
+      "negativePrompt": "no on-image text, no logos, no brand names, no watermarks, no gore, no distressing imagery, no identifiable face-forward portraits, no ozone machine, no US-style power outlets, no clutter"
+    },
+    {
+      "id": "odour-source-assessment",
+      "context": "Module 5 — assessment: identifying the odour source with a handheld PID/VOC meter and moisture meter",
+      "category": "illustration",
+      "aspectRatio": "4:3",
+      "resolution": "2K",
+      "style": "professional",
+      "prompt": "Over-the-shoulder view of a technician in gloves holding a handheld photoionisation VOC meter close to a wall cavity while a pin moisture meter rests on a clipboard nearby, methodically tracing an odour source in a bright Australian interior. Focus on the instrument reading and the hands, shallow depth of field, professional and precise. Realistic professional photography.",
+      "negativePrompt": "no on-image text, no logos, no brand names, no watermarks, no gore, no distressing imagery, no identifiable face-forward portraits, no fake screen numbers, no clutter, no visible mould growth"
+    }
+  ]
+}

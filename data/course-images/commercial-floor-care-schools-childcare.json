@@ -1,0 +1,37 @@
+{
+  "courseSlug": "commercial-floor-care-schools-childcare",
+  "brandColors": ["205 55% 35%", "150 35% 45%", "40 20% 92%"],
+  "notes": "B2B contract-readiness. Bright, clean, professional, aspirational. Australian schools/childcare settings, done safely and out-of-hours (no children present near wet/treated floors). No on-image text, no real brand names/logos.",
+  "images": [
+    {
+      "id": "hero",
+      "context": "Course hero image for 'Commercial Floor Care for Schools & Childcare Contracts'",
+      "category": "hero",
+      "aspectRatio": "16:9",
+      "resolution": "2K",
+      "style": "professional",
+      "prompt": "A bright, modern Australian primary school corridor after hours, empty of children, where a professional cleaner in plain branded workwear operates a walk-behind floor scrubber on gleaming polished vinyl flooring. A yellow wet-floor caution sign stands nearby. Clean, aspirational, professional, warm daylight through the windows. Realistic photography.",
+      "negativePrompt": "no children present, no clutter, no mess, no on-image text, no logos or brand names, no watermarks"
+    },
+    {
+      "id": "strip-and-seal",
+      "context": "Module on vinyl strip and seal — the high-risk job",
+      "category": "illustration",
+      "aspectRatio": "4:3",
+      "resolution": "2K",
+      "style": "professional",
+      "prompt": "A professional performing a vinyl strip-and-seal job in a bright Australian childcare hall, the work area cordoned off with wet-floor safety signs, applying floor sealer in thin even coats with proper gloves and knee pads. Orderly, safe, methodical, freshly glossy floor. Realistic photography.",
+      "negativePrompt": "no children present, no on-image text, no logos or brand names, no watermarks"
+    },
+    {
+      "id": "tile-grout",
+      "context": "Module on tile and grout cleaning",
+      "category": "illustration",
+      "aspectRatio": "4:3",
+      "resolution": "2K",
+      "style": "professional",
+      "prompt": "A close-up of gleaming, freshly cleaned tile and grout in a bright, spotless Australian childcare bathroom, with a professional's gloved hand and a colour-coded cleaning brush visible. Clean, hygienic, high-quality result. Realistic photography.",
+      "negativePrompt": "no children present, no grime remaining, no on-image text, no logos, no watermarks"
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "courseSlug": "hvac-systems-and-indoor-air-quality-what-every-technician-should-know",
+  "brandColors": ["208 58% 40%", "188 42% 44%", "210 15% 93%"],
+  "notes": "HVAC servicing for IAQ. Depict real tasks taught: filter selection, UV-C at the coil, duct inspection/cleaning and sealing. Australian settings, 230V/metric context, professional PPE. No on-image text, no brand names/logos.",
+  "images": [
+    {
+      "id": "hero",
+      "context": "Course hero for 'HVAC Systems and Indoor Air Quality: What Every Technician Should Know'",
+      "category": "hero",
+      "aspectRatio": "16:9",
+      "resolution": "2K",
+      "style": "professional",
+      "prompt": "An HVAC technician in hi-vis and gloves servicing a ceiling-mounted air handling unit in a bright Australian commercial building, mid-distance and over the shoulder, checking airflow at the unit. Clean plant space, cool daylight, competent and methodical, focus on the hands and the equipment. Realistic professional photography, aspirational.",
+      "negativePrompt": "no on-image text, no logos, no brand names, no watermarks, no gore, no distressing imagery, no identifiable face-forward portraits, no clutter, no visible rust or filth"
+    },
+    {
+      "id": "filter-uvc",
+      "context": "Module 3 — filtration & air cleaning: fitting a pleated MERV filter with a UV-C lamp near the coil",
+      "category": "illustration",
+      "aspectRatio": "4:3",
+      "resolution": "2K",
+      "style": "professional",
+      "prompt": "A close hands-on-task view of a technician's gloved hands fitting a clean pleated filter at an air handler, with a UV-C lamp installed near the evaporator coil glowing softly in the background. Bright, tidy mechanical space, focus on the filter and coil, professional and precise. Realistic professional photography.",
+      "negativePrompt": "no on-image text, no logos, no brand names, no watermarks, no gore, no distressing imagery, no identifiable face-forward portraits, no direct harsh UV glare at camera, no grime, no clutter"
+    },
+    {
+      "id": "duct-inspection",
+      "context": "Module 7 — ductwork: inspecting and cleaning ducts with a camera, flashlight and soft-bristle brush",
+      "category": "illustration",
+      "aspectRatio": "4:3",
+      "resolution": "2K",
+      "style": "professional",
+      "prompt": "An over-the-shoulder view of a technician inspecting inside ductwork with a small inspection camera and a torch, a soft-bristle duct brush and a high-efficiency vacuum hose ready beside them, in a clean Australian ceiling space. Focus on the hands and the duct opening, methodical and controlled. Realistic professional photography.",
+      "negativePrompt": "no on-image text, no logos, no brand names, no watermarks, no gore, no distressing imagery, no identifiable face-forward portraits, no heavy dust clouds, no visible mould growth, no clutter"
+    }
+  ]
+}

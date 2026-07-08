@@ -1,0 +1,57 @@
+{
+  "slug": "introduction-to-air-quality-fundamentals",
+  "seoTitle": "Indoor Air Quality Fundamentals Course | CARSI",
+  "metaDescription": "Foundational indoor air quality (IAQ) course for cleaning and restoration pros — contaminants, ventilation, monitoring tools and control strategies.",
+  "imageAlt": "Cleaning professional setting up a HEPA negative air machine and containment sheeting in an Australian home",
+  "og": {
+    "title": "Introduction to Air Quality Fundamentals | CARSI",
+    "description": "A CARSI foundations course in indoor air quality for cleaning and restoration — pollutant types, ventilation and air changes per hour, monitoring tools, and strategies to keep indoor air safe."
+  },
+  "keywords": [
+    "indoor air quality basics",
+    "IAQ course for cleaners",
+    "restoration air quality training australia",
+    "ventilation air changes per hour",
+    "VOC mould particulate contaminants",
+    "negative air HEPA containment",
+    "air quality monitoring tools",
+    "mould remediation air quality"
+  ],
+  "faq": [
+    {
+      "q": "What are the main indoor air contaminants covered?",
+      "a": "The course groups indoor air pollutants into biological contaminants (mould, bacteria, viruses), chemical contaminants such as VOCs from cleaning agents and paints, and particulate matter like dust, soot and debris disturbed during cleaning or demolition."
+    },
+    {
+      "q": "What is 'air changes per hour' and why does it matter?",
+      "a": "Air changes per hour (ACH) measures how many times the air in a room is replaced or cleaned each hour. Restoration work aims for a higher ACH to reduce contaminant load and support drying. Recommended rates vary by space type."
+    },
+    {
+      "q": "What Australian standards or humidity ranges does the course reference?",
+      "a": "It references Australian Standard AS 1668.2 for mechanical ventilation design and recommends keeping indoor relative humidity between 30 and 60 per cent to limit mould and dust mites, alongside MERV 13 or higher filters for better fine-particle capture."
+    },
+    {
+      "q": "Is this course suitable for beginners?",
+      "a": "Yes. It is a foundational course for cleaning and restoration professionals who are just starting out or reinforcing the basics, priced at AUD $29 with no prerequisites."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Introduction to Air Quality Fundamentals",
+    "description": "A CARSI foundations course introducing indoor air quality for cleaning and restoration professionals — pollutant types, ventilation, monitoring tools and practical strategies to manage and improve indoor environments.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "29",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    },
+    "coursePrerequisites": "None — open entry"
+  }
+}

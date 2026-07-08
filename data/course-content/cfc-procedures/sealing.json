@@ -1,0 +1,111 @@
+{
+  "procedure": "Sealing",
+  "moduleTitle": "Service Procedure — Applying Floor Seal to a Prepared Floor",
+  "summary": "A service procedure for applying floor sealer/finish to an already-prepared floor: an acrylic/polymer seal and finish on resilient floors (vinyl/PVC), and a penetrating/impregnating sealer on tile, grout and concrete. It assumes the floor is already clean, stripped where needed, neutralised and fully dry — the full strip-and-reseal is a separate procedure — and covers surface-readiness checks, thin even coats, tack-free and recoat timing, coat count and cure, all governed by the product SDS/TDS, with a final AS 4663 check so the seal does not create a slip hazard.",
+  "steps": [
+    {
+      "n": 1,
+      "title": "Confirm scope: seal application to a prepared floor",
+      "detail": "This procedure is the application of seal/finish to a floor that is already prepared. Stripping the old finish, rinsing and neutralising a resilient floor is the separate strip-and-reseal procedure — do not fold it in here. Confirm from the contract specification which floors are being sealed and with what system, and schedule the work into a deep-clean or school-holiday window so the area can be closed for the whole application and cure. Prepare a SWMS/JSEA, and confirm Working With Children checks, site induction and access before you begin."
+    },
+    {
+      "n": 2,
+      "title": "Verify the floor is genuinely prepared and dry",
+      "detail": "A seal only performs on a sound surface. Confirm the floor is clean and free of soil, old finish residue and detergent film; for resilient floors, confirm it has been stripped and then neutralised — for example with Actichem Pre-Seal / Preseal Pro (SDS AP171) — so the new coats bond and no stripper residue is trapped beneath them. Confirm the floor is fully dry: any trapped moisture or residue will cloud the seal and weaken adhesion. If the floor is not fully prepared, stop and complete the preparation (or the strip-and-reseal procedure) before sealing."
+    },
+    {
+      "n": 3,
+      "title": "Select the sealer and read the SDS and TDS",
+      "detail": "Match the sealer to the floor. For resilient floors (vinyl/PVC), use an acrylic/polymer seal-and-finish system — for example Actichem Instaseal (SDS AP420) as the sealer base, then Actichem Instagloss (SDS AP422) as the finish/gloss coats. For tile, grout and concrete, use a penetrating/impregnating sealer that soaks into the porous surface rather than forming a film on top; obtain the current SDS and TDS for that product from the supplier before use — do not guess a code for a product you do not have a current SDS for. Choose lower-tox products suited to a child-occupied facility where the system allows, and read every SDS for hazards, PPE, handling and first aid before opening a container."
+    },
+    {
+      "n": 4,
+      "title": "Check conditions, coverage and equipment readiness",
+      "detail": "Confirm the temperature, humidity and ventilation are within the range the TDS specifies — sealers and finishes cure differently outside it. Read the coverage rate (m²/L) from the TDS to work out how much product the floor needs and to plan thin, even coats rather than a thick pour. Prepare clean, correct applicators (for resilient finishes, a suitable applicator such as a microfibre or finish applicator; for penetrating sealer, applicator plus lint-free cloths to wipe excess). Any mains equipment — air movers, lighting — must be AS/NZS 3760 test-and-tagged and run on a 230 V / 50 Hz, 10 A GPO through an RCD/safety switch."
+    },
+    {
+      "n": 5,
+      "title": "Isolate and sign the area for the whole job",
+      "detail": "A freshly sealed floor is wet, then curing, and is a slip and chemical-contact hazard for the entire duration. Before the first coat, isolate the area — locked-off rooms, barriers, out-of-hours or holiday scheduling — and sign it clearly, and plan to keep it isolated through every coat and the full cure. In a school or childcare facility, physical isolation protects children far better than a sign alone, because children may not read or heed it. Keep children, staff and pets out, and keep the area well ventilated throughout."
+    },
+    {
+      "n": 6,
+      "title": "Apply the first coat — thin and even",
+      "detail": "Apply the first coat thin and even in the manufacturer's recommended direction and pattern, keeping a wet edge and avoiding puddling or overlap ridges. Thin coats dry and cure more predictably and produce a more durable, even surface than one thick layer. For a penetrating sealer on tile, grout or concrete, apply so the product soaks into the surface, allow it to penetrate for the time the TDS states, then wipe off any excess before it dries so it does not leave a blotchy film on top — follow the TDS exactly, because penetrating and film-forming products behave very differently."
+    },
+    {
+      "n": 7,
+      "title": "Wait for tack-free / recoat time before the next coat",
+      "detail": "Let each coat reach the tack-free / recoat point the TDS specifies before the next coat goes down. Applying a coat before the one beneath it is ready traps solvent or water, clouds the finish and weakens adhesion. Do not carry a fixed drying time in your head: how long a coat takes to become recoatable is product-specific and is affected by temperature, humidity, airflow and coat thickness. The only correct source is the product TDS — read it and plan around it. Manage airflow and ventilation to support drying rather than committing to a number."
+    },
+    {
+      "n": 8,
+      "title": "Apply the remaining coats to the TDS coat count",
+      "detail": "Build the finish up in the number of thin, even coats the TDS specifies — no more and no fewer — allowing each to reach tack-free before the next. On resilient floors this typically means the Instaseal (AP420) sealer base followed by Instagloss (AP422) finish/gloss coats, all per the TDS. For a penetrating sealer, apply the number of coats the TDS specifies, wiping excess each time and avoiding film build-up on the surface. How thin each coat should be, and how many coats to apply, are product-specific values from the TDS, not a fixed rule."
+    },
+    {
+      "n": 9,
+      "title": "Allow full cure before any return to service",
+      "detail": "Tack-free is not cured. Plan the job backwards from the TDS: count the coats, add the manufacturer's drying time between each, then allow for full cure before the floor carries traffic — and only then commit a return-to-service date to the client. Keep the area isolated and signed for the whole drying and curing period. This is precisely why sealing work is scheduled into deep-clean or holiday windows: there has to be enough closed time for the floor to dry and cure properly. Never state a fixed cure or re-entry time from memory; take it from the product TDS/SDS."
+    },
+    {
+      "n": 10,
+      "title": "Verify slip resistance so the seal is not a hazard",
+      "detail": "A freshly sealed floor can have a different slip resistance from the bare or previously finished surface, and a glossy finish may behave differently underfoot, especially when wet. After the finish has cured per the TDS, arrange measurement of the finished, in-service floor under AS 4663 to confirm it still meets the target slip class for that location — AS 4663 measures existing in-service surfaces, whereas AS 4586 classifies new surfaces before installation. AS 4663 measures and classifies slip resistance only; it does not set cure or re-entry times and does not tell you when it is safe to reopen. Decide the target slip class with reference to SA HB 198 and the NCC rather than quoting a rating from memory."
+    },
+    {
+      "n": 11,
+      "title": "Reinstate the area and hand back",
+      "detail": "Once the floor is fully cured, verified and safe, remove the isolation and signage, confirm the surface is clean and free of applicator debris, and hand the area back to the site. Coordinate the exact re-entry with the centre or school, based on the TDS cure guidance, so children and staff only return to a floor that is genuinely ready. Provide any first-use or maintenance guidance the client needs to protect the new finish."
+    },
+    {
+      "n": 12,
+      "title": "Document the sealing job",
+      "detail": "Record the method and the system used per surface (resilient acrylic/polymer seal and finish, or penetrating sealer on tile/grout/concrete), the products with their current SDS and TDS, the coverage achieved (m²/L), the number of coats, and the AS 4663 slip-resistance verification result. Note that dilution, coat counts and drying/cure times were followed from each product's SDS/TDS. That record turns 'the floor looks great' into documented evidence that it was sealed safely and performs to the agreed slip class — exactly the documentation a school or childcare contract expects."
+    }
+  ],
+  "safety": [
+    "Sealing is applied to a prepared floor; if the floor still needs stripping, that is the separate strip-and-reseal procedure, which uses caustic strippers and its own controls — do not attempt it under this procedure.",
+    "As a PCBU, keep a current SDS (within 5 years) and TDS for every sealer and finish, maintain a hazardous chemicals register (model WHS Reg 346) accessible at the workplace, and correctly label every decanted container.",
+    "Victoria operates under its own OHS Act and Regulations — check WorkSafe Victoria for VIC contracts; elsewhere use your state regulator (e.g. SafeWork NSW, Workplace Health and Safety Queensland).",
+    "Wear the PPE the sealer/finish SDS specifies and provide ventilation as directed — sealers can release fumes during application and drying; know the SDS first aid and keep the Poisons Information Centre number 13 11 26 to hand.",
+    "A freshly sealed floor is a slip and chemical-contact hazard for the whole application and cure period — isolate and sign it and keep it off-limits until fully cured, verified and safe.",
+    "Never state a fixed dry, cure, re-entry or recoat time, or a specific slip rating, from memory — take drying/cure from the TDS/SDS and slip-class guidance from AS 4663, SA HB 198 and the NCC.",
+    "Run only current AS/NZS 3760 test-and-tagged mains equipment on a 230 V / 50 Hz, 10 A GPO protected by an RCD/safety switch, and prepare a SWMS/JSEA for the task."
+  ],
+  "childSafe": [
+    "Choose lower-tox sealers and finishes suited to a child-occupied facility where the system allows, and read each SDS before it comes on site.",
+    "Schedule sealing into deep-clean or school-holiday windows so the area is closed for the full application and cure with no children present.",
+    "Physically isolate and sign the area for the whole drying and curing period — barriers or a locked-off room, not a single sign, because children may not read or heed it.",
+    "Keep children, staff and pets out until the floor is fully cured, slip-verified and handed back; coordinate exact re-entry with the centre based on the TDS.",
+    "Ventilate throughout application and drying to keep fumes away from occupied areas.",
+    "Verifying slip resistance under AS 4663 before hand-back protects children in wet-entry and spill-prone areas and supports the centre's NQS Quality Area 2 (children's health and safety) obligations.",
+    "Workers doing child-related work generally require the correct state/territory Working With Children check plus any site child-safe induction."
+  ],
+  "standards": [
+    "AS 4663 — slip resistance of existing (in-service) pedestrian surfaces; the correct basis to re-verify a finished sealed floor against a target slip class.",
+    "AS 4586 — slip resistance classification of new pedestrian surfaces before installation (distinct from AS 4663; not used to re-verify a sealed in-service floor).",
+    "SA HB 198 and the National Construction Code (NCC) — recommended minimum slip classifications by location type; consult directly rather than quoting a rating from memory.",
+    "AS/NZS 3760 — in-service safety inspection and testing (test-and-tag) for mains air movers, lighting and other equipment used on the job.",
+    "Model WHS Act and Regulations (Safe Work Australia), incl. Reg 346 hazardous chemicals register — noting Victoria's separate OHS Act and Regulations; GHS-classified SDS.",
+    "Education and Care Services National Law and National Regulations / National Quality Standard Quality Area 2 (children's health and safety), overseen by ACECQA — the centre's obligation, which your sealing method and scheduling should support.",
+    "Product SDS and TDS govern dilution, coat count, tack-free/recoat, drying and cure times — no fixed figures are quoted here. This course is not IICRC-accredited and awards no IICRC CECs."
+  ],
+  "documentation": [
+    "SWMS/JSEA for the sealing task.",
+    "Current SDS and TDS for every sealer and finish (each within 5 years), held in an accessible hazardous chemicals register (Reg 346).",
+    "Confirmation the floor was prepared, neutralised and fully dry before sealing (or a record that the separate strip-and-reseal procedure was completed first).",
+    "Method statement per surface, recording the system used, coverage (m²/L), number of coats, and tack-free/cure timings followed from the TDS.",
+    "Correct state/territory Working With Children checks for each worker, plus any site child-safe induction record.",
+    "Equipment AS/NZS 3760 test-and-tag records for mains machines.",
+    "AS 4663 slip-resistance verification record for the finished floor, with the target slip class referenced to SA HB 198 / the NCC and any contract requirement.",
+    "The client's return-to-service date, derived from the TDS cure guidance, and any first-use/maintenance guidance provided."
+  ],
+  "productAvailability": [
+    "Actichem Instaseal (SDS AP420) acrylic/polymer sealer base and Actichem Instagloss (SDS AP422) finish/gloss — Australian-made (Actichem, QLD); available through the CCW catalogue in Australia. Availability checked 8 July 2026.",
+    "Actichem Pre-Seal / Preseal Pro (SDS AP171) surface prep/neutraliser (used in the preceding preparation/strip-and-reseal step) — Australian-made (Actichem); available through the CCW catalogue in Australia. Availability checked 8 July 2026.",
+    "Penetrating/impregnating sealer for tile, grout and concrete — select an Australian-available product and obtain its current SDS and TDS from the supplier before use; do not guess a product code. Availability to be confirmed at time of purchase (checked 8 July 2026).",
+    "Air movers, task lighting and any mains equipment — specify Australian 230 V / 50 Hz, 10 A GPO models with current AS/NZS 3760 test-and-tag. Availability checked 8 July 2026."
+  ],
+  "contentBodyHtml": "<h3>Applying floor seal to a prepared floor</h3><p>This procedure covers applying sealer and finish to a floor that is <em>already prepared</em>. Two systems are in scope: an acrylic/polymer seal and finish on resilient floors (vinyl/PVC), and a penetrating/impregnating sealer on tile, grout and concrete. Stripping an old finish, rinsing and neutralising a resilient floor is the <strong>separate strip-and-reseal procedure</strong> &mdash; it is not part of this one. Throughout, dilution, coat count, tack-free/recoat and cure times come from each product's Safety Data Sheet (SDS) and Technical Data Sheet (TDS), never from memory.</p><ol><li><strong>Confirm scope.</strong> This is seal application to a prepared floor. Confirm which floors and which system from the contract spec, schedule into a deep-clean or holiday window, and confirm SWMS/JSEA, Working With Children checks, induction and access.</li><li><strong>Verify the floor is prepared and dry.</strong> Confirm it is clean, stripped where needed, neutralised (e.g. with Actichem Pre-Seal / Preseal Pro, SDS AP171) and fully dry. If it is not, complete preparation (or the strip-and-reseal procedure) first.</li><li><strong>Select the sealer and read the SDS/TDS.</strong> Resilient floors: acrylic/polymer system &mdash; Actichem Instaseal (SDS AP420) base then Actichem Instagloss (SDS AP422) finish. Tile/grout/concrete: a penetrating/impregnating sealer &mdash; obtain its current SDS and TDS from the supplier; do not guess a code. Choose lower-tox products for a child-occupied facility where the system allows.</li><li><strong>Check conditions, coverage and equipment.</strong> Confirm temperature, humidity and ventilation are within the TDS range, read the coverage rate (m&sup2;/L) from the TDS to plan thin even coats, prepare clean applicators, and confirm mains equipment is AS/NZS 3760 test-and-tagged on a 230 V / 50 Hz, 10 A GPO through an RCD.</li><li><strong>Isolate and sign the area.</strong> A sealed floor is a slip and chemical-contact hazard through every coat and the full cure. Isolate physically and sign, keep children, staff and pets out, and ventilate throughout.</li><li><strong>Apply the first coat &mdash; thin and even.</strong> Keep a wet edge and avoid puddling. For a penetrating sealer, let it soak in for the TDS time then wipe off excess before it dries so it does not leave a film.</li><li><strong>Wait for tack-free / recoat time.</strong> Let each coat reach the tack-free point the TDS specifies before the next. Recoating too early traps solvent or water and weakens adhesion. Do not use a fixed time &mdash; take it from the TDS.</li><li><strong>Apply the remaining coats.</strong> Build up the number of thin even coats the TDS specifies &mdash; for resilient floors, Instaseal (AP420) base then Instagloss (AP422) finish; for penetrating sealer, wipe excess each coat and avoid film build.</li><li><strong>Allow full cure.</strong> Tack-free is not cured. Plan the job backwards from the TDS &mdash; coats, drying between, then full cure &mdash; and keep the area isolated for the whole period before committing a return-to-service date.</li><li><strong>Verify slip resistance.</strong> After cure, measure the finished in-service floor under AS 4663 to confirm the target slip class (AS 4586 classifies new surfaces only). AS 4663 measures slip resistance &mdash; it does not set cure or re-entry times. Set the target class from SA HB 198 and the NCC, not from memory.</li><li><strong>Reinstate and hand back.</strong> Once fully cured, verified and safe, remove isolation, confirm the surface is clean, coordinate exact re-entry with the site, and provide first-use/maintenance guidance.</li><li><strong>Document the job.</strong> Record the system per surface, products with SDS/TDS, coverage (m&sup2;/L), coat count and the AS 4663 result.</li></ol><section><h3>Safety</h3><ul><li>Sealing is applied to a prepared floor; if stripping is still needed, that is the separate strip-and-reseal procedure with its own caustic-chemistry controls.</li><li>As a PCBU, keep a current SDS (within 5 years) and TDS for every sealer/finish, maintain a hazardous chemicals register (Reg 346), and label all decanted containers.</li><li>Victoria uses its own OHS Act and Regulations &mdash; check WorkSafe Victoria; elsewhere use your state regulator (SafeWork NSW, Workplace Health and Safety Queensland).</li><li>Wear the SDS-specified PPE, ventilate as directed, know the SDS first aid, and keep the Poisons Information Centre number 13&nbsp;11&nbsp;26 to hand.</li><li>A freshly sealed floor is a slip and chemical-contact hazard for the whole cure &mdash; isolate and sign it until fully cured, verified and safe.</li><li>Never quote a fixed dry, cure, re-entry or recoat time, or a specific slip rating, from memory &mdash; use the TDS/SDS and AS 4663 / SA HB 198 / NCC.</li><li>Run only AS/NZS 3760 test-and-tagged mains equipment on a 230 V / 50 Hz, 10 A GPO protected by an RCD; prepare a SWMS/JSEA.</li></ul></section><section><h3>Child-safe practice</h3><ul><li>Choose lower-tox sealers and finishes for a child-occupied facility where the system allows.</li><li>Schedule sealing into deep-clean or holiday windows so the area is closed for the full application and cure with no children present.</li><li>Isolate physically and sign for the whole cure period &mdash; a barrier or locked room, not just a sign.</li><li>Keep children, staff and pets out until the floor is fully cured, slip-verified and handed back; coordinate re-entry with the centre from the TDS.</li><li>Ventilate throughout to keep fumes away from occupied areas.</li><li>AS 4663 verification before hand-back protects children in wet and spill-prone areas and supports the centre's NQS Quality Area 2 obligations.</li></ul></section><section><h3>Standards</h3><ul><li>AS 4663 &mdash; slip resistance of existing, in-service surfaces (used to re-verify the finished sealed floor).</li><li>AS 4586 &mdash; slip resistance of new surfaces before installation (distinct from AS 4663).</li><li>SA HB 198 and the NCC &mdash; recommended minimum slip classifications by location; consult directly.</li><li>AS/NZS 3760 &mdash; test-and-tag for mains air movers, lighting and equipment.</li><li>Model WHS Act and Regulations incl. Reg 346 (Safe Work Australia); Victoria's separate OHS framework; GHS-classified SDS.</li><li>Education and Care Services National Law / NQS Quality Area 2 (ACECQA). Dilution, coats and cure times come from the SDS/TDS; this course is not IICRC-accredited and awards no IICRC CECs.</li></ul></section><section><h3>Document this</h3><ul><li>SWMS/JSEA for the task.</li><li>Current SDS and TDS for every sealer and finish in an accessible register (Reg 346).</li><li>Confirmation the floor was prepared, neutralised and fully dry (or that strip-and-reseal was completed first).</li><li>Method statement per surface: system, coverage (m&sup2;/L), coat count and tack-free/cure timings followed from the TDS.</li><li>Working With Children checks and site induction records.</li><li>AS/NZS 3760 test-and-tag records for mains equipment.</li><li>AS 4663 slip-resistance verification for the finished floor, with the target class referenced to SA HB 198 / the NCC.</li><li>Return-to-service date derived from the TDS cure guidance, plus first-use/maintenance guidance provided.</li></ul></section>"
+}

@@ -1,0 +1,58 @@
+{
+  "slug": "commercial-floor-care-schools-childcare",
+  "seoTitle": "Commercial Floor Care for Schools & Childcare | CARSI",
+  "metaDescription": "A free CARSI course in contract-ready floor care for schools and childcare: carpet, tile and grout, vinyl strip and seal, and pressure washing.",
+  "imageAlt": "Cleaning contractor stripping and sealing a vinyl floor with wet-floor barriers in an empty Australian school hall.",
+  "og": {
+    "title": "Commercial Floor Care for Schools & Childcare — Free CARSI Course",
+    "description": "A free CARSI course taking cleaners to a contract-ready floor-care service for schools and childcare — carpet, tile and grout, vinyl strip and seal, pressure washing, plus the compliance it expects."
+  },
+  "keywords": [
+    "commercial floor care",
+    "school cleaning contracts",
+    "childcare floor cleaning",
+    "vinyl strip and seal",
+    "tile and grout cleaning",
+    "carpet cleaning schools",
+    "pressure washing run-off control",
+    "AS 4663 slip resistance",
+    "WHS SDS cleaning compliance"
+  ],
+  "faq": [
+    {
+      "q": "Does this course award IICRC CECs?",
+      "a": "No. This is professional development and contract-readiness training. It is not an IICRC-accredited course and does not award IICRC Continuing Education Credits (CECs). Where it references a standard such as ANSI/IICRC S100, it treats it as a recognised standard of care, not law."
+    },
+    {
+      "q": "What floor-care services does the course cover?",
+      "a": "The four jobs that win school and childcare work: carpet cleaning (hot water extraction and low-moisture encapsulation), tile and grout cleaning, vinyl strip and seal, and pressure washing with run-off control."
+    },
+    {
+      "q": "How is slip resistance verified after sealing?",
+      "a": "On the basis of AS 4663, which measures slip resistance of existing, in-service surfaces (as distinct from AS 4586, which classifies new surfaces). AS 4663 measures and classifies only — it does not set cure or re-entry times, which come from the product SDS/TDS."
+    },
+    {
+      "q": "How should pressure-washing run-off be managed?",
+      "a": "Keep it out of stormwater, which generally flows untreated to waterways. Confine the area, collect the wash water and direct it to sewer — which needs prior written approval, a trade-waste agreement, from the water authority."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Commercial Floor Care for Schools & Childcare Contracts",
+    "description": "A free CARSI professional-development course taking experienced cleaners to a contract-ready floor-care service for Australian schools and childcare centres, covering carpet, tile and grout, vinyl strip and seal, and pressure washing, each paired with the WHS, SDS, child-safety, slip-resistance and run-off requirements a contract expects. This is contract-readiness training; it is not an IICRC-accredited course and does not award IICRC Continuing Education Credits (CECs).",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    },
+    "coursePrerequisites": "Hands-on cleaning experience recommended — suited to commercial cleaners and small cleaning-business owners."
+  }
+}

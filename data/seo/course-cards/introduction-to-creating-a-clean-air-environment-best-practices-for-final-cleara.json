@@ -1,0 +1,58 @@
+{
+  "slug": "introduction-to-creating-a-clean-air-environment-best-practices-for-final-cleara",
+  "seoTitle": "Final Clearance & Air Quality Handover Course | CARSI",
+  "metaDescription": "Learn to assess indoor air quality, run final clearance testing and hand over remediation projects safely. Australian-produced professional course.",
+  "imageAlt": "Restoration technician using a particle counter to check indoor air quality during final clearance, Australian site.",
+  "og": {
+    "title": "Final Clearance & Air Quality: Remediation Handover | CARSI",
+    "description": "A CARSI professional course on achieving a clean-air environment: air quality testing, visual inspections, clearance equipment and clear client handover after restoration or mould remediation."
+  },
+  "keywords": [
+    "final clearance testing",
+    "indoor air quality restoration",
+    "post-remediation verification",
+    "mould remediation clearance",
+    "air quality testing restoration",
+    "IAQ handover",
+    "remediation handover report",
+    "HEPA air scrubber",
+    "restoration final inspection"
+  ],
+  "faq": [
+    {
+      "q": "What is final clearance in air quality remediation?",
+      "a": "Final clearance is the stage where a restoration professional confirms all contamination has been removed and a space is safe to reoccupy. It verifies that hazardous airborne particles such as mould spores, dust and volatile organic compounds (VOCs) have been eliminated before the space is handed back to occupants."
+    },
+    {
+      "q": "What air quality tests does the course cover?",
+      "a": "The course covers testing for airborne particulate matter (including PM2.5), airborne mould spores, volatile organic compounds (VOCs) and indicator gases such as carbon dioxide and carbon monoxide, using tools like particle counters and gas detectors, with results interpreted by a qualified indoor environmental professional."
+    },
+    {
+      "q": "What equipment is used during final clearance?",
+      "a": "The course introduces air scrubbers, HEPA vacuums, moisture meters, hygrometers, airborne particle counters, gas detectors and personal protective equipment (PPE) used to test, clean and verify air quality before handover, including keeping relative humidity below 60% to prevent mould regrowth."
+    },
+    {
+      "q": "What should a handover report include?",
+      "a": "A comprehensive handover report should summarise the initial assessment and scope of work, the remediation methods used, the final clearance inspection and test results, confirmation that agreed clearance criteria were met, photographic documentation, and any warranties plus preventative advice for the client."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Introduction to Creating a Clean Air Environment: Best Practices for Final Clearance and Handover",
+    "description": "An introductory CARSI course on creating a clean-air environment, covering indoor air quality assessment, final clearance testing, visual inspection, documentation and professional client handover after restoration or remediation work.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "28.97",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    },
+    "coursePrerequisites": "None — an introductory course for restoration and remediation professionals."
+  }
+}

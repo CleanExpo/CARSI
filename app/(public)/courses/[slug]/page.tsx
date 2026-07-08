@@ -8,6 +8,8 @@ import { CourseFormattedBody } from '@/components/lms/CourseFormattedBody';
 import { CourseThumbnail } from '@/components/lms/CourseThumbnail';
 import { CourseHubContext } from '@/components/lms/CourseHubContext';
 import { CourseSchema, BreadcrumbSchema, VideoObjectSchema } from '@/components/seo';
+import { SchemaMarkup, buildFaqSchema } from '@/lib/schema';
+import { getCourseMarketing } from '@/lib/seo/course-marketing';
 import { getBackendOrigin, getPublicSiteUrl } from '@/lib/env/public-url';
 import { isOnboardingCourse } from '@/lib/onboarding/enterprise';
 import { normalizePublicAssetUrl } from '@/lib/remote-image';
@@ -330,6 +332,11 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
         />
       ) : null}
       <BreadcrumbSchema items={breadcrumbs} />
+      {(() => {
+        // AEO/GEO: FAQPage JSON-LD from the course's marketing metadata (data/seo/course-cards).
+        const faqs = getCourseMarketing(slug)?.faq;
+        return faqs?.length ? <SchemaMarkup schema={buildFaqSchema({ faqs })} /> : null;
+      })()}
 
       <main id="main-content" className="relative min-h-screen" style={{ background: '#060a14' }}>
         {/* ── Mesh background ── */}
