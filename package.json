@@ -41,6 +41,7 @@
     "seo:submit-indexnow": "node scripts/submit-indexnow.mjs",
     "seo:audit-surface": "node scripts/audit-seo-surface.mjs",
     "verify:professional-directory": "node scripts/verify-professional-directory.mjs",
+    "verify:go-live-readiness": "node scripts/verify-go-live-readiness.mjs",
     "db:seed-safety-ppe-docx": "npx tsx scripts/seed-safety-ppe-docx.ts",
     "db:seed-whs-compliance-docx": "npx tsx scripts/seed-whs-compliance-docx.ts",
     "db:seed-marketing-business-docx": "npx tsx scripts/seed-marketing-business-docx.ts",
