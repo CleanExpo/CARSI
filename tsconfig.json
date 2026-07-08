@@ -35,7 +35,6 @@
     "vitest.config.ts",
     "**/*.test.ts",
     "src/__tests__/**/*",
-    "tests/**/*",
     "packages/news-worker/**/*"
   ]
 }
