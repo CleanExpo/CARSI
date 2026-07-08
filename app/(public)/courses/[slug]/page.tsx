@@ -153,7 +153,7 @@ export async function generateMetadata({
 
 const DISCIPLINE_LABELS: Record<string, string> = {
   WRT: 'Water Restoration Technology',
-  CRT: 'Carpet Repair & Reinstallation Technology',
+  RRT: 'Carpet Repair & Reinstallation Technology',
   ASD: 'Applied Structural Drying',
   AMRT: 'Applied Microbial Remediation Technology',
   FSRT: 'Fire & Smoke Restoration Technology',
@@ -168,11 +168,11 @@ const DISCIPLINE_AUDIENCE: Record<string, string[]> = {
     'Property managers handling water emergencies',
     'Technicians pursuing IICRC WRT certification',
   ],
-  CRT: [
+  RRT: [
     'Carpet and flooring restoration technicians',
     'Soft furnishing specialists',
     'Insurance restoration professionals',
-    'Technicians pursuing IICRC CRT certification',
+    'Technicians pursuing IICRC RRT certification',
   ],
   ASD: [
     'Senior restoration technicians advancing from WRT',
@@ -237,7 +237,7 @@ function getLearningOutcomes(course: CourseDetail): string[] {
     outcomes.push('Evaluate fire and smoke damage to determine appropriate restoration methods');
   } else if (discipline === 'OCT') {
     outcomes.push('Identify odour sources and select effective deodorisation techniques');
-  } else if (discipline === 'CRT') {
+  } else if (discipline === 'RRT') {
     outcomes.push('Master carpet seaming, stretching, and reinstallation techniques');
   } else if (discipline === 'CCT') {
     outcomes.push('Select correct cleaning methods for commercial carpet fibre types');

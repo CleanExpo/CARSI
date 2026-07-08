@@ -16,7 +16,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'IICRC CEC Training for NDIS & Disability Services | CARSI Australia',
   description:
-    'Meet NDIS Practice Standards with IICRC mould and water damage CEC courses. AMRT, WRT, and CRT continuing-education training for disability support providers. Online, CEC Accredited — not IICRC certification.',
+    'Meet NDIS Practice Standards with IICRC mould and water damage CEC courses. AMRT, WRT, and RRT continuing-education training for disability support providers. Online, CEC Accredited — not IICRC certification.',
   keywords: [
     'NDIS IICRC CEC training',
     'disability services mould training Australia',
@@ -35,7 +35,7 @@ const ACCENT_COLOR = '#5c6bc0';
 const disciplines = [
   { code: 'AMRT', label: 'Applied Microbial Remediation', color: '#5c6bc0' },
   { code: 'WRT', label: 'Water Damage Restoration', color: '#4a5aa8' },
-  { code: 'CRT', label: 'Carpet Cleaning Technician', color: '#3949ab' },
+  { code: 'RRT', label: 'Carpet Cleaning Technician', color: '#3949ab' },
 ];
 
 const stats = [
@@ -119,8 +119,8 @@ export default async function NDISDisabilityIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="NDIS & Disability Services"
-        disciplineList="AMRT, WRT & CRT"
-        disciplines={['AMRT', 'WRT', 'CRT']}
+        disciplineList="AMRT, WRT & RRT"
+        disciplines={['AMRT', 'WRT', 'RRT']}
       />
 
       <ContractorAddOns accentColor={ACCENT_COLOR} />

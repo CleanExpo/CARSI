@@ -19,11 +19,11 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = buildIndustryMetadata(
   'commercial-cleaning',
   'Commercial Cleaning IICRC CEC Training',
-  'IICRC CEC Accredited courses for commercial cleaning contractors in Australia. CRT, CCT, and OCT topics for carpet restoration, odour control, and insurance panel readiness.',
+  'IICRC CEC Accredited courses for commercial cleaning contractors in Australia. RRT, CCT, and OCT topics for carpet restoration, odour control, and insurance panel readiness.',
   [
     'commercial cleaning IICRC CEC training',
     'cleaning contractor training Australia',
-    'CRT certification',
+    'RRT certification',
     'CCT commercial carpet',
     'OCT odour control training',
   ]
@@ -32,7 +32,7 @@ export const metadata: Metadata = buildIndustryMetadata(
 const ACCENT_COLOR = '#2490ed';
 
 const disciplines = [
-  { code: 'CRT', label: 'Carpet Restoration', color: '#2490ed' },
+  { code: 'RRT', label: 'Carpet Restoration', color: '#2490ed' },
   { code: 'CCT', label: 'Commercial Carpet', color: '#1976d2' },
   { code: 'OCT', label: 'Odour Control', color: '#1565c0' },
 ];
@@ -47,7 +47,7 @@ const faqs = [
   {
     question: 'How do cleaning companies add restoration services in Australia?',
     answer:
-      'Commercial cleaning businesses expand into restoration by upskilling existing staff with IICRC CEC courses in the core disciplines. CRT (Carpet Restoration), WRT (Water Damage Restoration), and OCT (Odour Control) are the most common entry points. This continuing-education grounding helps cleaners offer restoration work alongside routine cleaning contracts, increasing revenue per client. CARSI delivers CEC courses, not IICRC certification — certification is obtained through IICRC-approved schools.',
+      'Commercial cleaning businesses expand into restoration by upskilling existing staff with IICRC CEC courses in the core disciplines. RRT (Carpet Restoration), WRT (Water Damage Restoration), and OCT (Odour Control) are the most common entry points. This continuing-education grounding helps cleaners offer restoration work alongside routine cleaning contracts, increasing revenue per client. CARSI delivers CEC courses, not IICRC certification — certification is obtained through IICRC-approved schools.',
   },
   {
     question: 'What IICRC certifications help win insurance restoration panels?',
@@ -120,8 +120,8 @@ export default async function CommercialCleaningIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="Commercial Cleaning"
-        disciplineList="CRT, CCT & OCT"
-        disciplines={['CRT', 'CCT', 'OCT']}
+        disciplineList="RRT, CCT & OCT"
+        disciplines={['RRT', 'CCT', 'OCT']}
       />
 
       <ContractorAddOns accentColor={ACCENT_COLOR} variant="commercial-cleaning" />
@@ -132,7 +132,7 @@ export default async function CommercialCleaningIndustryPage() {
         subtitle="Cleaning professional training"
         title="Pro Cleaning Bundle"
         price={industryBundlePriceLabel('commercial-cleaning')}
-        description="CRT Carpet Restoration + CCT Commercial Carpet + OCT Odour Control. Perfect for cleaning contractors seeking IICRC credentials."
+        description="RRT Carpet Restoration + CCT Commercial Carpet + OCT Odour Control. Perfect for cleaning contractors seeking IICRC credentials."
         ctaText="View pricing"
         ctaHref="/pricing"
         secondaryHref="/courses"

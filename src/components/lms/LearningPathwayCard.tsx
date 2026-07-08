@@ -17,7 +17,7 @@ interface LearningPathwayCardProps {
 
 const DISCIPLINE_COLOURS: Record<string, string> = {
   WRT: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20',
-  CRT: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+  RRT: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
   OCT: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
   ASD: 'bg-violet-500/10 text-violet-400 border-violet-500/20',
   CCT: 'bg-pink-500/10 text-pink-400 border-pink-500/20',

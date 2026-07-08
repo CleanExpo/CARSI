@@ -33,7 +33,7 @@ const ACCENT_COLOR = '#673ab7';
 const disciplines = [
   { code: 'AMRT', label: 'Applied Microbial Remediation', color: '#673ab7' },
   { code: 'WRT', label: 'Water Damage Restoration', color: '#512da8' },
-  { code: 'CRT', label: 'Carpet Repair Technology', color: '#4527a0' },
+  { code: 'RRT', label: 'Carpet Repair Technology', color: '#4527a0' },
   { code: 'ASD', label: 'Applied Structural Drying', color: '#311b92' },
 ];
 
@@ -94,8 +94,8 @@ export default async function PropertyManagementIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="Property Management"
-        disciplineList="AMRT, WRT, CRT & ASD"
-        disciplines={['AMRT', 'WRT', 'CRT', 'ASD']}
+        disciplineList="AMRT, WRT, RRT & ASD"
+        disciplines={['AMRT', 'WRT', 'RRT', 'ASD']}
       />
 
       <ContractorAddOns accentColor={ACCENT_COLOR} />
@@ -104,7 +104,7 @@ export default async function PropertyManagementIndustryPage() {
         subtitle="Property Management Training"
         title="Property Bundle"
         price={industryBundlePriceLabel('property-management')}
-        description="AMRT Mould Basics + WRT Water Damage + CRT Carpet Assessment. Agency bulk pricing available for 10+ property managers."
+        description="AMRT Mould Basics + WRT Water Damage + RRT Carpet Assessment. Agency bulk pricing available for 10+ property managers."
         ctaText="Get Certified"
         accentColor={ACCENT_COLOR}
       />

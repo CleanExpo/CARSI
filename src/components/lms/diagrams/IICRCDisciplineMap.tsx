@@ -13,8 +13,8 @@ const DISCIPLINES = [
     blurb: 'Drying, psychrometry & flood response.',
   },
   {
-    id: 'CRT',
-    label: 'CRT',
+    id: 'RRT',
+    label: 'RRT',
     fullName: 'Carpet Repair & Reinstallation',
     color: '#047857',
     blurb: 'Repair, re-stretch & installation standards.',

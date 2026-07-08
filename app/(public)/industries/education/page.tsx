@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Education Sector IICRC CEC Training',
   description:
-    'IICRC CEC training for school and university maintenance teams. WRT, CRT, AMRT and ASD training for Australian education facilities.',
+    'IICRC CEC training for school and university maintenance teams. WRT, RRT, AMRT and ASD training for Australian education facilities.',
   keywords: [
     'education IICRC CEC training',
     'school restoration certification',
@@ -33,7 +33,7 @@ const ACCENT_COLOR = '#2196f3';
 const disciplines = [
   { code: 'AMRT', label: 'Applied Microbial Remediation', color: '#2196f3' },
   { code: 'WRT', label: 'Water Damage Restoration', color: '#1976d2' },
-  { code: 'CRT', label: 'Carpet Repair & Reinstallation', color: '#1565c0' },
+  { code: 'RRT', label: 'Carpet Repair & Reinstallation', color: '#1565c0' },
   { code: 'ASD', label: 'Applied Structural Drying', color: '#0d47a1' },
 ];
 
@@ -94,8 +94,8 @@ export default async function EducationIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="Education"
-        disciplineList="AMRT, WRT, CRT & ASD"
-        disciplines={['AMRT', 'WRT', 'CRT', 'ASD']}
+        disciplineList="AMRT, WRT, RRT & ASD"
+        disciplines={['AMRT', 'WRT', 'RRT', 'ASD']}
       />
 
       <ContractorAddOns accentColor={ACCENT_COLOR} />

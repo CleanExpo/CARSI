@@ -32,7 +32,7 @@ const ACCENT_COLOR = '#7c3aed';
 
 const disciplines = [
   { code: 'WRT', label: 'Water Damage Restoration', color: '#7c3aed' },
-  { code: 'CRT', label: 'Carpet Repair & Reinstallation', color: '#6d28d9' },
+  { code: 'RRT', label: 'Carpet Repair & Reinstallation', color: '#6d28d9' },
   { code: 'AMRT', label: 'Applied Microbial Remediation', color: '#5b21b6' },
   { code: 'ASD', label: 'Applied Structural Drying', color: '#4c1d95' },
 ];
@@ -94,8 +94,8 @@ export default async function StrataIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="Strata & Body Corporate"
-        disciplineList="WRT, CRT, AMRT & ASD"
-        disciplines={['WRT', 'CRT', 'AMRT', 'ASD']}
+        disciplineList="WRT, RRT, AMRT & ASD"
+        disciplines={['WRT', 'RRT', 'AMRT', 'ASD']}
       />
 
       <ContractorAddOns accentColor={ACCENT_COLOR} />

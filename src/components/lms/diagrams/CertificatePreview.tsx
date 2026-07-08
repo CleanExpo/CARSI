@@ -8,7 +8,7 @@ import { IICRC_DISCIPLINE_LONG } from '@/lib/iicrc-discipline-display';
 
 const DISCIPLINE_COLORS: Record<string, string> = {
   WRT: '#2490ed',
-  CRT: '#26c4a0',
+  RRT: '#26c4a0',
   ASD: '#6c63ff',
   OCT: '#9b59b6',
   CCT: '#17b8d4',
@@ -30,8 +30,9 @@ export interface CertificatePreviewProps {
 function disciplineCode(raw?: string): string {
   const c = raw?.trim().toUpperCase();
   if (!c || c === '—' || c === '-') return 'GEN';
-  const match = c.match(/\b(WRT|CRT|ASD|AMRT|FSRT|OCT|CCT)\b/);
-  return match?.[1] ?? c.split('/')[0]?.trim() ?? 'GEN';
+  const match = c.match(/\b(WRT|RRT|CRT|ASD|AMRT|FSRT|OCT|CCT)\b/);
+  const code = match?.[1] ?? c.split('/')[0]?.trim() ?? 'GEN';
+  return code === 'CRT' ? 'RRT' : code; // legacy CARSI code for Carpet Repair & Reinstallation
 }
 
 function ProgrammeDetail({

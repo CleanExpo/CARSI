@@ -16,12 +16,12 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Transport & Logistics IICRC CEC Training',
   description:
-    'IICRC restoration training for Australian transport and logistics operations. WRT, CRT and OCT courses for vehicle interiors, warehouses, and loading dock maintenance.',
+    'IICRC restoration training for Australian transport and logistics operations. WRT, RRT and OCT courses for vehicle interiors, warehouses, and loading dock maintenance.',
   keywords: [
     'transport IICRC CEC training Australia',
     'logistics warehouse restoration',
     'WRT water damage warehouse',
-    'CRT carpet cleaning vehicle interiors',
+    'RRT carpet cleaning vehicle interiors',
     'OCT odour control transport',
   ],
 };
@@ -34,7 +34,7 @@ const ACCENT_COLOR = '#1565C0';
 
 const disciplines = [
   { code: 'WRT', label: 'Water Damage Restoration', color: '#1565C0' },
-  { code: 'CRT', label: 'Carpet & Upholstery Cleaning', color: '#0D47A1' },
+  { code: 'RRT', label: 'Carpet & Upholstery Cleaning', color: '#0D47A1' },
   { code: 'OCT', label: 'Odour Control', color: '#1976D2' },
 ];
 
@@ -48,7 +48,7 @@ const faqs = [
   {
     question: 'What IICRC CEC training do Australian transport companies need?',
     answer:
-      'Australian transport and logistics operators benefit from WRT (Water Damage Restoration) for warehouse flooding and roof leak response, CRT (Carpet & Upholstery Cleaning) for vehicle interior maintenance across fleets, and OCT (Odour Control) for managing contamination odours in enclosed cargo areas and passenger vehicles. These certifications support Chain of Responsibility compliance and fleet asset protection.',
+      'Australian transport and logistics operators benefit from WRT (Water Damage Restoration) for warehouse flooding and roof leak response, RRT (Carpet & Upholstery Cleaning) for vehicle interior maintenance across fleets, and OCT (Odour Control) for managing contamination odours in enclosed cargo areas and passenger vehicles. These certifications support Chain of Responsibility compliance and fleet asset protection.',
   },
   {
     question: 'How does water damage training help warehouse operations?',
@@ -58,7 +58,7 @@ const faqs = [
   {
     question: 'What is vehicle interior restoration training?',
     answer:
-      'IICRC CRT (Carpet & Upholstery Cleaning) training covers fabric and surface restoration techniques for vehicle interiors including buses, coaches, trucks, and fleet cars. For transport operators, this means extending asset life, maintaining hygiene standards for passenger vehicles, and reducing outsourced detailing costs across large fleets.',
+      'IICRC RRT (Carpet & Upholstery Cleaning) training covers fabric and surface restoration techniques for vehicle interiors including buses, coaches, trucks, and fleet cars. For transport operators, this means extending asset life, maintaining hygiene standards for passenger vehicles, and reducing outsourced detailing costs across large fleets.',
   },
   {
     question: 'Can transport and logistics staff train online around shift schedules?',
@@ -86,7 +86,7 @@ const whyCards = [
     icon: Wind,
     title: 'Fleet Interior Maintenance',
     description:
-      'Vehicle interiors across bus, coach, and truck fleets require specialist cleaning. CRT and OCT certifications reduce outsourced costs and extend asset life.',
+      'Vehicle interiors across bus, coach, and truck fleets require specialist cleaning. RRT and OCT certifications reduce outsourced costs and extend asset life.',
     color: '#ed9d24',
   },
 ];
@@ -119,8 +119,8 @@ export default async function TransportLogisticsIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="Transport & Logistics"
-        disciplineList="WRT, CRT & OCT"
-        disciplines={['WRT', 'CRT', 'OCT']}
+        disciplineList="WRT, RRT & OCT"
+        disciplines={['WRT', 'RRT', 'OCT']}
       />
 
       <ContractorAddOns accentColor={ACCENT_COLOR} />
@@ -129,7 +129,7 @@ export default async function TransportLogisticsIndustryPage() {
         subtitle="Transport & Logistics Training"
         title="Logistics Restoration Bundle"
         price={industryBundlePriceLabel('transport-logistics')}
-        description="WRT + CRT + OCT training for transport and warehouse teams. Includes fleet maintenance and warehouse flood response protocols. Online, self-paced — fits around shift schedules."
+        description="WRT + RRT + OCT training for transport and warehouse teams. Includes fleet maintenance and warehouse flood response protocols. Online, self-paced — fits around shift schedules."
         ctaText="Train Your Operations Team"
         accentColor={ACCENT_COLOR}
       />

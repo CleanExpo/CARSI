@@ -29,7 +29,7 @@ const PRO_FEATURES = [
   'Carpet Cleaning Technician (CCT) courses',
   'Odour Control Technician (OCT) courses',
   'Applied Structural Drying (ASD) courses',
-  'Carpet Repair & Reinstallation (CRT) courses',
+  'Carpet Repair & Reinstallation (RRT) courses',
   'PDF certificates for every course',
   'IICRC CEC tracking dashboard',
   'Monthly activity recognition (anonymous by default) & streak tracker',
