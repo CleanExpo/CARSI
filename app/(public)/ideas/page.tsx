@@ -17,7 +17,7 @@ interface CourseIdea {
 
 const DISCIPLINE_COLOURS: Record<string, string> = {
   WRT: 'bg-cyan-950 text-cyan-400',
-  CRT: 'bg-blue-950 text-blue-400',
+  RRT: 'bg-blue-950 text-blue-400',
   OCT: 'bg-purple-950 text-purple-400',
   ASD: 'bg-emerald-950 text-emerald-400',
   CCT: 'bg-amber-950 text-amber-400',

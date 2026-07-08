@@ -33,7 +33,7 @@ const DISCIPLINE_OPTIONS = [
   { value: 'OCT', label: 'OCT' },
   { value: 'AMRT', label: 'AMRT' },
   { value: 'FSRT', label: 'FSRT' },
-  { value: 'CRT', label: 'CRT' },
+  { value: 'RRT', label: 'RRT' },
   { value: 'CCT', label: 'CCT' },
   { value: 'ASD', label: 'ASD' },
 ] as const;

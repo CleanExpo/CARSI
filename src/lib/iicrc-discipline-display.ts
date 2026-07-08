@@ -1,7 +1,7 @@
 /** Short labels for homepage / nav pills (matches previous marketing copy where possible). */
 export const IICRC_DISCIPLINE_SHORT: Record<string, string> = {
   WRT: 'Water Restoration',
-  CRT: 'Carpet Restoration',
+  RRT: 'Carpet Repair',
   ASD: 'Structural Drying',
   AMRT: 'Microbial Remediation',
   FSRT: 'Fire & Smoke',
@@ -12,7 +12,7 @@ export const IICRC_DISCIPLINE_SHORT: Record<string, string> = {
 /** Long labels for About / legal-adjacent copy. */
 export const IICRC_DISCIPLINE_LONG: Record<string, string> = {
   WRT: 'Water Restoration Technician',
-  CRT: 'Carpet Repair and Reinstallation Technician',
+  RRT: 'Carpet Repair and Reinstallation Technician',
   ASD: 'Applied Structural Drying',
   AMRT: 'Applied Microbial Remediation Technician',
   FSRT: 'Fire and Smoke Restoration Technician',
@@ -22,14 +22,13 @@ export const IICRC_DISCIPLINE_LONG: Record<string, string> = {
 
 /**
  * Official IICRC page per discipline (verified live 2026-07-08: each URL 200s
- * and the page body names the discipline). CRT deliberately points at
- * iicrc.org/rrt/ — IICRC's own /crt/ page is Color Repair Technician, a
- * different discipline; RRT (Repair & Reinstallation) is the page matching
- * CARSI's "Carpet Repair and Reinstallation" node.
+ * and the page body names the discipline). Carpet Repair & Reinstallation is
+ * RRT — IICRC's CRT is Color Repair Technician, a different discipline, which
+ * is why the legacy CARSI code "CRT" normalizes to RRT below.
  */
 export const IICRC_DISCIPLINE_URL: Record<string, string> = {
   WRT: 'https://iicrc.org/wrt/',
-  CRT: 'https://iicrc.org/rrt/',
+  RRT: 'https://iicrc.org/rrt/',
   ASD: 'https://iicrc.org/asd/',
   AMRT: 'https://iicrc.org/amrt/',
   FSRT: 'https://iicrc.org/fsrt/',
@@ -37,13 +36,15 @@ export const IICRC_DISCIPLINE_URL: Record<string, string> = {
   CCT: 'https://iicrc.org/cct/',
 };
 
-const DEFAULT_ORDER = ['WRT', 'CRT', 'ASD', 'AMRT', 'FSRT', 'OCT', 'CCT'] as const;
+const DEFAULT_ORDER = ['WRT', 'RRT', 'ASD', 'AMRT', 'FSRT', 'OCT', 'CCT'] as const;
 const KNOWN_CODES = new Set<string>(DEFAULT_ORDER);
 
 export function normalizeDisciplineCodes(codes: string[]): string[] {
   return codes.flatMap((raw) => {
-    const matches = raw.toUpperCase().match(/\b(WRT|CRT|ASD|AMRT|FSRT|OCT|CCT)\b/g);
-    return matches ?? [];
+    const matches = raw.toUpperCase().match(/\b(WRT|RRT|CRT|ASD|AMRT|FSRT|OCT|CCT)\b/g);
+    // Legacy alias: stored course categories may still say CRT, which CARSI
+    // always used to mean Carpet Repair & Reinstallation (IICRC code RRT).
+    return (matches ?? []).map((c) => (c === 'CRT' ? 'RRT' : c));
   });
 }
 

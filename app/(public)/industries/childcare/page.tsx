@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Childcare IICRC CEC Training',
   description:
-    'IICRC CEC training for childcare centre maintenance. AMRT and CRT training supporting NQF compliance across Australian early learning centres.',
+    'IICRC CEC training for childcare centre maintenance. AMRT and RRT training supporting NQF compliance across Australian early learning centres.',
   keywords: [
     'childcare IICRC CEC training',
     'early learning centre cleaning',
@@ -32,7 +32,7 @@ const ACCENT_COLOR = '#e91e63';
 
 const disciplines = [
   { code: 'AMRT', label: 'Applied Microbial Remediation', color: '#e91e63' },
-  { code: 'CRT', label: 'Carpet Restoration', color: '#9c27b0' },
+  { code: 'RRT', label: 'Carpet Restoration', color: '#9c27b0' },
   { code: 'WRT', label: 'Water Damage Restoration', color: '#673ab7' },
 ];
 
@@ -93,8 +93,8 @@ export default async function ChildcareIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="Childcare Industry"
-        disciplineList="AMRT, CRT & WRT"
-        disciplines={['CRT', 'AMRT', 'WRT']}
+        disciplineList="AMRT, RRT & WRT"
+        disciplines={['RRT', 'AMRT', 'WRT']}
       />
 
       <ContractorAddOns accentColor={ACCENT_COLOR} />
@@ -103,7 +103,7 @@ export default async function ChildcareIndustryPage() {
         subtitle="Childcare Compliance Training"
         title="Childcare Compliance Bundle"
         price={industryBundlePriceLabel('childcare')}
-        description="AMRT Infection Control + CRT Carpet Basics + WRT Fundamentals. Minimal roster disruption — 2-4 hour self-paced modules."
+        description="AMRT Infection Control + RRT Carpet Basics + WRT Fundamentals. Minimal roster disruption — 2-4 hour self-paced modules."
         ctaText="Get Started"
         accentColor={ACCENT_COLOR}
       />

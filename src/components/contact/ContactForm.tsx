@@ -230,7 +230,7 @@ export function ContactForm({ leadContext }: { leadContext?: ContactLeadContext 
           className={fieldClass}
           style={{ ...fieldStyle, resize: 'vertical' }}
           // @ts-expect-error WebMCP attribute — W3C draft, not yet in React types
-          toolparamdescription="Free-text enquiry (max 3000 chars). Mention which IICRC discipline (WRT, CRT, ASD, AMRT, FSRT, OCT, CCT) if applicable, and whether the enquiry is for individual or group/corporate enrolment."
+          toolparamdescription="Free-text enquiry (max 3000 chars). Mention which IICRC discipline (WRT, RRT, ASD, AMRT, FSRT, OCT, CCT) if applicable, and whether the enquiry is for individual or group/corporate enrolment."
         />
       </div>
 

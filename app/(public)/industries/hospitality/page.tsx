@@ -19,7 +19,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = buildIndustryMetadata(
   'hospitality',
   'Hospitality IICRC CEC Training',
-  'IICRC-aligned training for Australian hotels and resorts. WRT, CRT, ASD and OCT courses for water damage, carpet care, structural drying and odour control.',
+  'IICRC-aligned training for Australian hotels and resorts. WRT, RRT, ASD and OCT courses for water damage, carpet care, structural drying and odour control.',
   [
     'hospitality IICRC CEC training',
     'hotel restoration training',
@@ -33,7 +33,7 @@ const ACCENT_COLOR = '#ed9d24';
 
 const disciplines = [
   { code: 'WRT', label: 'Water Damage Restoration', color: '#ed9d24' },
-  { code: 'CRT', label: 'Carpet Repair & Reinstallation', color: '#d48b1e' },
+  { code: 'RRT', label: 'Carpet Repair & Reinstallation', color: '#d48b1e' },
   { code: 'ASD', label: 'Applied Structural Drying', color: '#bb7918' },
   { code: 'OCT', label: 'Odour Control', color: '#a36712' },
 ];
@@ -53,7 +53,7 @@ const faqs = [
   {
     question: 'What carpet maintenance training do hotel staff need?',
     answer:
-      'Hotel maintenance teams benefit from IICRC CRT (Carpet Repair & Reinstallation) certification for lobbies, corridors, and conference rooms that see thousands of daily footfalls. Training covers spot dyeing, re-stretching, seam repair, and pattern matching — skills that extend carpet lifespan and reduce replacement costs across large properties.',
+      'Hotel maintenance teams benefit from IICRC RRT (Carpet Repair & Reinstallation) certification for lobbies, corridors, and conference rooms that see thousands of daily footfalls. Training covers spot dyeing, re-stretching, seam repair, and pattern matching — skills that extend carpet lifespan and reduce replacement costs across large properties.',
   },
   {
     question: 'How do you remove odours from hotel rooms in Australia?',
@@ -84,7 +84,7 @@ const whyCards = [
     icon: Footprints,
     title: 'High-Traffic Areas',
     description:
-      'Professional carpet maintenance for lobbies, corridors, and conference rooms. CRT-certified technicians extend carpet lifespan in areas with thousands of daily footfalls.',
+      'Professional carpet maintenance for lobbies, corridors, and conference rooms. RRT-certified technicians extend carpet lifespan in areas with thousands of daily footfalls.',
     color: '#d48b1e',
   },
   {
@@ -121,8 +121,8 @@ export default async function HospitalityIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="Hospitality & Tourism"
-        disciplineList="WRT, CRT, ASD & OCT"
-        disciplines={['WRT', 'CRT', 'ASD', 'OCT']}
+        disciplineList="WRT, RRT, ASD & OCT"
+        disciplines={['WRT', 'RRT', 'ASD', 'OCT']}
       />
 
       <ContractorAddOns accentColor={ACCENT_COLOR} variant="hospitality" />
@@ -133,7 +133,7 @@ export default async function HospitalityIndustryPage() {
         subtitle="Hospitality training bundle"
         title="Hotel Maintenance Bundle"
         price={industryBundlePriceLabel('hospitality')}
-        description="WRT + CRT + OCT training for hotel maintenance teams. Bulk licensing available for hotel chains and resort groups."
+        description="WRT + RRT + OCT training for hotel maintenance teams. Bulk licensing available for hotel chains and resort groups."
         ctaText="Request bundle pricing"
         ctaHref="/contact"
         accentColor={ACCENT_COLOR}

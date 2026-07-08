@@ -51,7 +51,7 @@ export const featuredIndustryLinks: FeaturedIndustryLink[] = [
     href: '/industries/commercial-cleaning',
     label: 'Commercial Cleaning',
     title: 'Contractor growth & panels',
-    detail: 'CRT, CCT and OCT credentials for insurance work and tender differentiation',
+    detail: 'RRT, CCT and OCT credentials for insurance work and tender differentiation',
     icon: Sparkles,
   },
 ];
@@ -80,7 +80,7 @@ const healthcarePanels: IndustryAddonPanel[] = [
 
 const hospitalityPanels: IndustryAddonPanel[] = [
   { name: 'Guest room turnaround', requirement: 'Rapid WRT response to minimise room downtime' },
-  { name: 'High-traffic carpet care', requirement: 'CRT maintenance for lobbies and conference floors' },
+  { name: 'High-traffic carpet care', requirement: 'RRT maintenance for lobbies and conference floors' },
   { name: 'Pool & spa incidents', requirement: 'ASD drying for wet-area overflow events' },
   { name: 'Odour remediation', requirement: 'OCT methods for enclosed guest bathrooms and suites' },
   { name: 'Chain bulk licensing', requirement: 'Team dashboards for multi-property hotel groups' },
@@ -166,7 +166,7 @@ export const cleanerUpgrades: IndustryUpgradeRow[] = [
   },
   {
     base: 'Carpet cleaning',
-    addon: 'CRT',
+    addon: 'RRT',
     benefit: 'Insurance restoration work with higher margins',
   },
   {

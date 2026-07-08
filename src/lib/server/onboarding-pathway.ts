@@ -15,7 +15,7 @@ export type OnboardingAnswersInput = {
 const PATHWAY_LABELS: Record<string, string> = {
   WRT: 'Water Damage Restoration Technician (WRT)',
   ASD: 'Applied Structural Drying (ASD)',
-  CRT: 'Carpet Repair & Reinstallation (CRT)',
+  RRT: 'Carpet Repair & Reinstallation (RRT)',
   AMRT: 'Applied Microbial Remediation Technician (AMRT)',
   FSRT: 'Fire & Smoke Restoration (FSRT)',
   OCT: 'Odour Control Technician (OCT)',
@@ -38,7 +38,7 @@ function normalizeDisciplines(raw: unknown): string[] {
 export function resolveRecommendedPathwayCode(input: OnboardingAnswersInput): string {
   const held = normalizeDisciplines(input.disciplines_held);
   if (held.length > 0) {
-    const priority = ['WRT', 'AMRT', 'FSRT', 'ASD', 'CRT', 'OCT', 'CCT'];
+    const priority = ['WRT', 'AMRT', 'FSRT', 'ASD', 'RRT', 'OCT', 'CCT'];
     for (const p of priority) {
       if (held.includes(p)) return p;
     }

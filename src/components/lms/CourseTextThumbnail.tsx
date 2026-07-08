@@ -17,7 +17,7 @@ const DISCIPLINE_ACCENTS: Record<
     via: '#dceeff',
     to: '#ffffff',
   },
-  CRT: {
+  RRT: {
     fg: '#047f6f',
     glow: 'rgba(38,196,160,0.2)',
     from: '#ecfdf7',
@@ -82,8 +82,11 @@ function inferDisciplineCode(
   const d = discipline?.trim().toUpperCase();
   if (d && DISCIPLINE_ACCENTS[d]) return d;
   const cat = category?.trim() ?? '';
-  const m = cat.match(/^(WRT|CRT|ASD|OCT|CCT|FSRT|AMRT)\b/i);
-  if (m) return m[1]!.toUpperCase();
+  const m = cat.match(/^(WRT|RRT|CRT|ASD|OCT|CCT|FSRT|AMRT)\b/i);
+  if (m) {
+    const code = m[1]!.toUpperCase();
+    return code === 'CRT' ? 'RRT' : code; // legacy CARSI code for Carpet Repair & Reinstallation
+  }
   return null;
 }
 

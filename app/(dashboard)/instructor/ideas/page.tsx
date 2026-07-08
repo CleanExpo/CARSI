@@ -13,7 +13,7 @@ interface CourseIdea {
   ai_outline: Record<string, unknown> | null;
 }
 
-const DISCIPLINES = ['WRT', 'CRT', 'OCT', 'ASD', 'CCT'];
+const DISCIPLINES = ['WRT', 'RRT', 'OCT', 'ASD', 'CCT'];
 
 export default function InstructorIdeasPage() {
   const [ideas, setIdeas] = useState<CourseIdea[]>([]);

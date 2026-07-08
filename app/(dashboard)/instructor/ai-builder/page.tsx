@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { apiClient } from '@/lib/api/client';
 
-const DISCIPLINES = ['WRT', 'ASD', 'AMRT', 'CCT', 'FSRT', 'CRT', 'OCT'] as const;
+const DISCIPLINES = ['WRT', 'ASD', 'AMRT', 'CCT', 'FSRT', 'RRT', 'OCT'] as const;
 
 interface QuizQuestion {
   question: string;

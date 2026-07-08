@@ -76,7 +76,7 @@ export default async function AboutPage() {
   const disciplineRows =
     d > 0
       ? disciplineRowsFromCodes(facts.disciplineCodes)
-      : disciplineRowsFromCodes(['WRT', 'CRT', 'ASD', 'AMRT', 'FSRT', 'OCT', 'CCT']);
+      : disciplineRowsFromCodes(['WRT', 'RRT', 'ASD', 'AMRT', 'FSRT', 'OCT', 'CCT']);
 
   const stats = [
     {

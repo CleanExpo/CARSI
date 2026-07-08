@@ -18,7 +18,8 @@ export const ACRONYMS: Record<string, string> = {
   RTO: 'Registered Training Organisation',
   TAFE: 'Technical and Further Education',
   CPP: 'Certificate in Property Services (Cleaning Operations)',
-  CRT: 'Carpet Repair and Reinstallation Technician',
+  RRT: 'Carpet Repair and Reinstallation Technician',
+  CRT: 'Carpet Repair and Reinstallation Technician (legacy CARSI code — IICRC code is RRT)',
   RPL: 'Recognition of Prior Learning',
   LMS: 'Learning Management System',
 };

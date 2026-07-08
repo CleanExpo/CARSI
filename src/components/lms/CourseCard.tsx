@@ -60,11 +60,13 @@ export function CourseCard({ course, priorityImage, variant = 'catalog' }: Cours
   const isFree = course.is_free || priceNum === 0;
   const price = isFree ? 'Free' : `$${priceNum.toFixed(0)}`;
 
-  const discipline =
+  const rawDiscipline =
     course.discipline ??
-    (course.category?.match(/^(WRT|CRT|ASD|OCT|CCT|FSRT|AMRT)/)
+    (course.category?.match(/^(WRT|RRT|CRT|ASD|OCT|CCT|FSRT|AMRT)/)
       ? course.category.split(' ')[0]
       : null);
+  // Legacy CARSI code for Carpet Repair & Reinstallation (IICRC code is RRT).
+  const discipline = rawDiscipline === 'CRT' ? 'RRT' : rawDiscipline;
 
   const { courseLinkBase } = useCourseBrowseBase();
   const thumbSrc = course.thumbnail_url ?? undefined;

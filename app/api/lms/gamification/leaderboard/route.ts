@@ -5,12 +5,14 @@ import {
   leaderboardPeriodLabelNow,
 } from '@/lib/server/leaderboard-xp';
 
-const DISCIPLINES = new Set(['WRT', 'OCT', 'AMRT', 'FSRT', 'CRT', 'CCT', 'ASD']);
+const DISCIPLINES = new Set(['WRT', 'OCT', 'AMRT', 'FSRT', 'RRT', 'CCT', 'ASD']);
 
 function parseDiscipline(raw: string | null): string | null {
   if (!raw || raw === '' || raw.toLowerCase() === 'all') return null;
   const u = raw.trim().toUpperCase();
-  return DISCIPLINES.has(u) ? u : null;
+  // Legacy CARSI code for Carpet Repair & Reinstallation (IICRC code is RRT).
+  const canonical = u === 'CRT' ? 'RRT' : u;
+  return DISCIPLINES.has(canonical) ? canonical : null;
 }
 
 /**
@@ -26,7 +28,7 @@ export async function GET(request: NextRequest) {
   if (requested && requested !== '' && requested.toLowerCase() !== 'all' && !discipline) {
     return NextResponse.json(
       {
-        detail: 'Invalid discipline. Use WRT, OCT, AMRT, FSRT, CRT, CCT, ASD, or omit for all.',
+        detail: 'Invalid discipline. Use WRT, OCT, AMRT, FSRT, RRT, CCT, ASD, or omit for all.',
       },
       { status: 400 }
     );

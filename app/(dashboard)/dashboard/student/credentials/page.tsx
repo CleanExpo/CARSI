@@ -21,11 +21,11 @@ interface CredentialOut {
   status: string;
 }
 
-type DisciplineKey = 'WRT' | 'CRT' | 'OCT' | 'ASD' | 'CCT';
+type DisciplineKey = 'WRT' | 'RRT' | 'OCT' | 'ASD' | 'CCT';
 
 const DISCIPLINE_COLOURS: Record<DisciplineKey, string> = {
   WRT: 'text-cyan-700 bg-cyan-50 border border-cyan-200',
-  CRT: 'text-emerald-700 bg-emerald-50 border border-emerald-200',
+  RRT: 'text-emerald-700 bg-emerald-50 border border-emerald-200',
   OCT: 'text-amber-700 bg-amber-50 border border-amber-200',
   ASD: 'text-blue-700 bg-blue-50 border border-blue-200',
   CCT: 'text-fuchsia-700 bg-fuchsia-50 border border-fuchsia-200',
