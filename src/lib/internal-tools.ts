@@ -1,5 +1,12 @@
 /** Internal dev/agent routes — hidden on public deploy unless explicitly enabled. */
-const INTERNAL_PREFIXES = ['/workflows', '/design-system', '/prd', '/agents'] as const;
+const INTERNAL_PREFIXES = [
+  '/workflows',
+  '/design-system',
+  '/prd',
+  '/agents',
+  '/tasks',
+  '/dashboard/agent-runs',
+] as const;
 
 export function isInternalToolPath(pathname: string): boolean {
   return INTERNAL_PREFIXES.some(

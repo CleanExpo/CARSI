@@ -281,7 +281,7 @@ export default async function CalendarPage({
         <HubCtaBanner
           title="Have an industry event to list?"
           description="Submit it for free — we review and publish within 24 hours."
-          href="/calendar/submit"
+          href="/submit/event"
           ctaLabel="Submit Event"
         />
 
