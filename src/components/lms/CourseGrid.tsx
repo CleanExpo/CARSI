@@ -223,7 +223,10 @@ export function CourseGrid({
           matchesTag(c, tagFilter) &&
         (q === '' ||
           c.title.toLowerCase().includes(q) ||
-          (c.short_description ?? '').toLowerCase().includes(q))
+          (c.short_description ?? '').toLowerCase().includes(q) ||
+          (c.category ?? '').toLowerCase().includes(q) ||
+          c.slug.toLowerCase().includes(q) ||
+          (c.tags ?? []).some((t) => t.toLowerCase().includes(q)))
         );
       }
     );
