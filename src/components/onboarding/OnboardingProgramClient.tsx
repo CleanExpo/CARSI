@@ -43,6 +43,7 @@ export function OnboardingProgramClient({ slug }: { slug: string }) {
   const [enrolError, setEnrolError] = useState<string | null>(null);
   const [checkoutMessage, setCheckoutMessage] = useState<string | null>(null);
   const [confirmingPayment, setConfirmingPayment] = useState(false);
+  const [organisationName, setOrganisationName] = useState('');
 
   const load = useCallback(() => {
     setError(null);
@@ -56,6 +57,14 @@ export function OnboardingProgramClient({ slug }: { slug: string }) {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- pre-existing RA-4192 rule promotion; behaviour-preserving suppression, real fix tracked separately
     load();
   }, [load]);
+
+  useEffect(() => {
+    if (!data?.program) return;
+    const defaultOrgName =
+      data.program.meta?.company?.trim() ||
+      data.program.title.replace(/^CARSI Maintenance Company Onboarding — /, '').trim();
+    setOrganisationName((prev) => prev || defaultOrgName);
+  }, [data?.program]);
 
   useEffect(() => {
     if (searchParams.get('checkout') === 'cancelled') {
@@ -137,9 +146,10 @@ export function OnboardingProgramClient({ slug }: { slug: string }) {
       const res = await apiClient.post<{ checkout_url?: string }>(
         `/api/lms/onboarding/${encodeURIComponent(slug)}/checkout`,
         {
+          organisation_name: organisationName,
           success_url: `${origin}/dashboard/onboarding/${encodeURIComponent(slug)}?session_id={CHECKOUT_SESSION_ID}`,
           cancel_url: `${origin}/dashboard/onboarding/${encodeURIComponent(slug)}?checkout=cancelled`,
-        }
+        },
       );
       if (res.checkout_url) {
         window.location.href = res.checkout_url;
@@ -201,11 +211,23 @@ export function OnboardingProgramClient({ slug }: { slug: string }) {
         <OnboardingLearnerDashboard slug={slug} modules={modules} />
       ) : (
         <div
-          className={`${dash.cardInset} border-[#2490ed]/20 bg-[#eef7ff]/50 p-6 text-sm text-slate-700`}
+          className={`${dash.cardInset} space-y-4 border-[#2490ed]/20 bg-[#eef7ff]/50 p-6 text-sm text-slate-700`}
         >
-          <strong className="text-slate-900">Organisation subscription.</strong> Access is
-          provisioned after payment ({priceLabel}). Unlimited learners per organisation — subscribe
-          to assign training across your maintenance team.
+          <p>
+            <strong className="text-slate-900">Organisation subscription.</strong> Access is
+            provisioned after payment ({priceLabel}). Unlimited learners per organisation.
+          </p>
+          <label className="block text-sm text-slate-800">
+            Organisation name
+            <input
+              required
+              minLength={2}
+              value={organisationName}
+              onChange={(e) => setOrganisationName(e.target.value)}
+              className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-slate-900"
+              placeholder="e.g. Acme Facilities Pty Ltd"
+            />
+          </label>
         </div>
       )}
 
