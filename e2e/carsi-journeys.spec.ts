@@ -47,7 +47,7 @@ test.describe('Public course catalogue', () => {
     await expect(page.locator('h1')).toContainText('Restoration Training Courses');
 
     // Discipline tabs rendered
-    for (const tab of ['All', 'WRT', 'CRT', 'ASD', 'OCT', 'CCT', 'FSRT', 'AMRT', 'Free']) {
+    for (const tab of ['All', 'WRT', 'RRT', 'ASD', 'OCT', 'CCT', 'FSRT', 'AMRT', 'Free']) {
       await expect(page.getByRole('tab', { name: tab, exact: true })).toBeVisible();
     }
   });
