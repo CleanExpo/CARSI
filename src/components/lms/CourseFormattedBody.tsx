@@ -52,7 +52,8 @@ export function CourseFormattedBody({
   const styles = textByTone[tone];
 
   if (looksLikeHtmlFragment(raw)) {
-    const safe = DOMPurify.sanitize(raw);
+    // ADD_ATTR keeps target="_blank" on external resource links (e.g. SDS PDFs).
+    const safe = DOMPurify.sanitize(raw, { ADD_ATTR: ['target'] });
     return (
       <div
         className={cn(proseByTone[tone], className)}
