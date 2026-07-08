@@ -373,7 +373,6 @@ export default function AvianInfluenzaReadinessPage() {
           <figure className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
             <picture>
               <source srcSet={heroImageWebp} type="image/webp" />
-              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={heroImage}
                 alt="CARSI Australian H5 public reporting process infographic"
