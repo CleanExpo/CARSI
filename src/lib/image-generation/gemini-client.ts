@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenerativeAI, type GenerationConfig } from '@google/generative-ai';
 import type {
   ImageGenerationConfig,
   IconGenerationConfig,
@@ -85,9 +85,9 @@ export async function generateImage(
     );
   }
 
-  const model = genAI.getGenerativeModel({
-    model: 'gemini-2.0-flash-exp',
-  });
+  // Nano Banana (Gemini 2.5 Flash Image) by default; override with GEMINI_IMAGE_MODEL.
+  const modelId = process.env.GEMINI_IMAGE_MODEL || 'gemini-2.5-flash-image';
+  const model = genAI.getGenerativeModel({ model: modelId });
 
   const prompt = buildImagePrompt(config);
 
@@ -99,24 +99,41 @@ export async function generateImage(
           parts: [{ text: prompt }],
         },
       ],
-      generationConfig: {
-        // Note: Actual image generation config depends on API version
-        // This is a placeholder structure
-        maxOutputTokens: 8192,
-      },
+      // Image-generation models return bytes only when IMAGE is an allowed response modality.
+      generationConfig: { responseModalities: ['TEXT', 'IMAGE'] } as unknown as GenerationConfig,
     });
 
     const response = result.response;
-    const text = response.text();
+    const parts = response.candidates?.[0]?.content?.parts ?? [];
 
-    // For now, return a placeholder since actual image generation
-    // depends on the specific Gemini API version being used
+    let base64: string | undefined;
+    let mimeType: GeneratedImage['mimeType'] = 'image/png';
+    let thinking = '';
+    for (const part of parts) {
+      const inline = (part as { inlineData?: { data?: string; mimeType?: string } }).inlineData;
+      if (inline?.data) {
+        base64 = inline.data;
+        if (inline.mimeType === 'image/jpeg' || inline.mimeType === 'image/webp') {
+          mimeType = inline.mimeType;
+        }
+      } else if (typeof (part as { text?: string }).text === 'string') {
+        thinking += (part as { text?: string }).text;
+      }
+    }
+
+    if (!base64) {
+      throw new Error(
+        `Gemini model "${modelId}" returned no image data.` +
+          (thinking ? ` Model text: ${thinking.slice(0, 300)}` : ' Response had no inline image part.')
+      );
+    }
+
     const generatedImage: GeneratedImage = {
       id: generateId(),
-      data: '', // Would contain base64 image data
-      mimeType: 'image/png',
+      data: base64,
+      mimeType,
       altText: `${config.style} image for ${config.context}`,
-      thinking: text,
+      thinking: thinking || undefined,
       config,
       createdAt: new Date(),
     };

@@ -1,0 +1,57 @@
+{
+  "slug": "floor-care-onboarding-operational-readiness",
+  "seoTitle": "Professional Floor Care Onboarding & Readiness | CARSI",
+  "metaDescription": "CARSI's internal floor-care onboarding: WHS, PPE and SDS, surface identification, cleaning and sealing methods, machinery, hazard control and job evidence.",
+  "imageAlt": "Floor-care technician operating a rotary scrubbing machine with wet-floor signage in an Australian school corridor.",
+  "og": {
+    "title": "Professional Floor Care Onboarding — CARSI Operational Readiness",
+    "description": "CARSI Maintenance Company's internal floor-care induction — health and hygiene, WHS and chemical safety, surface identification, methods, machinery, site setup, conduct, and a final assessment."
+  },
+  "keywords": [
+    "professional floor care",
+    "commercial cleaning induction",
+    "floor stripping and sealing",
+    "WHS SDS chemical safety",
+    "floor surface identification",
+    "cleaning machinery operation",
+    "school and childcare floor care",
+    "floor-care operational readiness"
+  ],
+  "faq": [
+    {
+      "q": "Who is this onboarding for?",
+      "a": "It is the internal induction for CARSI Maintenance Company floor-care technicians, supervisors and facilities staff who deliver cleaning, polishing, sealing, maintenance and hygiene services across schools, childcare, education, public buildings and high-traffic commercial sites."
+    },
+    {
+      "q": "Does this course award IICRC CECs?",
+      "a": "No. It is an internal operational-readiness induction and does not award continuing education credits. It supports good judgement and does not replace the SDS/TDS, standards, or a site's own rules."
+    },
+    {
+      "q": "What does the final assessment involve?",
+      "a": "A supervised, end-to-end standard job assessed against the checklists: vehicle and equipment readiness, site arrival and setup, surface identification and correct method, safe machine operation and hazard control, professional conduct and confidentiality, and close-out with evidence and handover. A pass requires at least 85% overall and 100% on every safety-critical and reputation-critical item."
+    },
+    {
+      "q": "What safety topics are covered?",
+      "a": "WHS duties, the hierarchy of controls, PPE selection from the SDS, reading Safety Data Sheets, chemical labelling and storage, spill response, and electrical and trip safety, including RCD/safety-switch use and test-and-tag referencing AS/NZS 3760."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "CARSI Maintenance Company Onboarding — Professional Floor Care & Operational Readiness",
+    "description": "CARSI Maintenance Company's internal onboarding for floor-care technicians and supervisors, covering health and hygiene, WHS and chemical safety, surface identification, cleaning and sealing methods, machinery, site setup, conduct and a final practical assessment. This is an internal induction and does not award continuing education credits (CECs).",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    },
+    "coursePrerequisites": "None — internal induction for CARSI Maintenance Company floor-care staff."
+  }
+}

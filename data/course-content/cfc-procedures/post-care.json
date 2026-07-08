@@ -1,0 +1,104 @@
+{
+  "procedure": "Post Care",
+  "moduleTitle": "Service Procedure — Post Care",
+  "summary": "The handover and ongoing-care programme that runs after the job is finished: confirming return-to-service, managing the wet or curing period, timing the client's first routine clean, setting up walk-off matting, and giving the client a written maintenance schedule. Good post care protects the result you just delivered and is often what turns a one-off job into a renewed contract.",
+  "steps": [
+    {
+      "n": 1,
+      "title": "Confirm return-to-service readiness",
+      "detail": "A floor is only ready when it is genuinely dry (carpet) or dried and cured (sealed hard floors) — not when a clock says so. Confirm readiness against the product SDS and TDS, which hold the correct dry-between-coats, full-cure and re-entry guidance for that exact product, and against the conditions on the day (airflow, temperature and humidity all affect drying). Never hand a floor back on a fixed dry or cure time carried from memory; verify the actual surface before you release it."
+    },
+    {
+      "n": 2,
+      "title": "Manage the wet or curing period",
+      "detail": "Until a floor is genuinely ready, it stays a slip and access hazard, so keep the work zone isolated and clearly signed for the whole wet or curing period. In schools and childcare centres, where children may not read or heed a sign, rely on physical isolation — barriers, locked-off rooms, or scheduling into holiday or out-of-hours periods — rather than signage alone. Manage drying actively with airflow and ventilation, and keep trailing cords and equipment out of any area children can reach."
+    },
+    {
+      "n": 3,
+      "title": "Verify slip resistance before handover on sealed hard floors",
+      "detail": "A freshly sealed floor can behave differently underfoot from the bare or previously finished surface, especially when wet. Where you have stripped and sealed a hard floor, arrange slip-resistance measurement on the basis of AS 4663 (existing, in-service surfaces) after the finish has cured per the TDS, and check it against the target slip class agreed with the site. Decide that target with reference to SA HB 198 and the National Construction Code rather than a rating value from memory, and keep the result with the job records — AS 4663 measures slip resistance only and does not tell you when the floor is safe to reopen."
+    },
+    {
+      "n": 4,
+      "title": "Run a formal handover walk-through",
+      "detail": "Walk the serviced areas with the site contact and formally hand the floor back. Point out what was done, which areas are fully released and which (if any) remain isolated and until when, and confirm who is responsible for removing barriers and signage once the area is ready. A recorded handover — even a short signed note or dated photo set — closes the loop on your isolation controls and gives the centre a clear point at which the space returns to normal use."
+    },
+    {
+      "n": 5,
+      "title": "Give first-clean timing guidance for newly sealed floors",
+      "detail": "A new sealer and finish continue to harden after they are walkable, so cleaning them too soon or too aggressively can mar the surface you just built. Advise the client to hold off on wet mopping, scrubbing or any harsh chemistry on a newly sealed floor and to resume routine cleaning only after the finish has properly hardened. The exact timing and the first-clean method (for example, dust mopping and gentle neutral-pH cleaning first) come from the finish manufacturer's TDS, so give the client that source rather than a fixed number of days."
+    },
+    {
+      "n": 6,
+      "title": "Set up a walk-off matting programme",
+      "detail": "The cheapest soil to remove is the soil that never gets tracked in. Recommend and, where in scope, install walk-off matting at building entries and high-traffic transitions to capture grit and moisture before they reach carpet and hard floors — dry particulate soil tracked in on shoes is the bulk of what lands on a school or childcare floor. Advise on mat length (long enough for several footfalls), regular vacuuming or swap-out of mats, and keeping mats flat so they are not themselves a trip hazard in a child-occupied space."
+    },
+    {
+      "n": 7,
+      "title": "Hand over a written client maintenance schedule",
+      "detail": "Give the client a simple written schedule that splits routine work from periodic work. Routine (daily/weekly): dry vacuuming of carpet and dust mopping of hard floors to lift particulate soil, prompt spot and spill attention, and damp cleaning of tile and vinyl with a suitable neutral-pH product. Periodic (termly / holiday windows): carpet encapsulation or hot water extraction, tile-and-grout deep clean, and vinyl strip and seal. Map periodic tasks to term breaks and deep-clean windows and note that frequencies must be confirmed against the current contract specification and any published school cleaning standard rather than assumed."
+    },
+    {
+      "n": 8,
+      "title": "Advise on child-safe products for the client's own routine cleaning",
+      "detail": "The client's in-house cleaning between your visits should uphold the same child-safety standard your work does. Advise choosing lower-tox products suited to occupied, child-occupied spaces, diluting strictly per the label (stronger is not safer and leaves more residue), keeping a current SDS for each product in an accessible register, and correctly labelling any decanted spray bottle or bucket. Reinforce that this supports the centre's obligations under National Quality Standard Quality Area 2 (children's health and safety)."
+    },
+    {
+      "n": 9,
+      "title": "Leave a wet-floor management protocol",
+      "detail": "Spills and routine mopping create the everyday slip risk between your services, so leave the client a short protocol: attend to spills promptly, use wet-floor signage and cordon the area while a floor is wet, keep children clear until it is dry, and mop toward a controlled point rather than spreading water across a walkway. For any pressure-wash maintenance the client arranges themselves, remind them that wash water must be kept out of stormwater and directed to sewer under a trade-waste agreement with the water authority."
+    },
+    {
+      "n": 10,
+      "title": "Hand over the documentation pack",
+      "detail": "Give the client a tidy pack that proves the work and equips them to maintain it: the SDS register for products used, your method statements, the completion report with before-and-after evidence, any AS 4663 slip-resistance verification records, and the written maintenance schedule and first-clean guidance. This is the paperwork a contract, an audit or a parent question might demand, and handing it over cleanly is part of what makes a client renew."
+    },
+    {
+      "n": 11,
+      "title": "Book the next periodic service into a low-occupancy window",
+      "detail": "Close the loop by scheduling the next periodic service — strip and seal, or carpet extraction — into a term break, holiday or deep-clean window, where there is uninterrupted access, room to ventilate caustic strippers, time for multiple thin coats with proper drying between them, and the closed time needed to re-verify slip resistance before students or children return. Confirm the dates and access with the site and check frequencies against the current contract specification rather than assumed intervals."
+    },
+    {
+      "n": 12,
+      "title": "Set a feedback and re-inspection trigger",
+      "detail": "Agree a simple follow-up: a check-in after the first routine cleaning cycle, a defined re-inspection point (for example ahead of the next holiday window), and a clear contact for any concern about a floor between visits. Treat client feedback and your own re-inspection as the input that tunes the maintenance schedule over time — this ongoing-care loop is what keeps the floor safe and serviceable and keeps the contract in place."
+    }
+  ],
+  "safety": [
+    "A floor stays a slip and access hazard until it is genuinely dry or cured; keep it isolated and signed for the whole period and confirm readiness against the SDS/TDS, never a remembered time.",
+    "In child-occupied areas, rely on physical isolation (barriers, locked rooms, out-of-hours scheduling), not signage alone.",
+    "Manage drying with airflow and ventilation; keep cords and equipment out of areas children can reach.",
+    "Leave the client a wet-floor protocol for spills and routine mopping, and keep any client-run pressure-wash run-off out of stormwater (trade-waste to sewer).",
+    "Reinforce label-rate dilution and correct labelling of decanted containers for the client's own cleaning; Poisons Information is 13 11 26."
+  ],
+  "childSafe": [
+    "Hold physical isolation of wet or curing floors until genuinely ready — children may not read or heed a warning sign.",
+    "Advise the client to use lower-tox products suited to occupied spaces, diluted per label, with a current SDS held for each.",
+    "Schedule periodic deep treatments into term breaks or holiday windows so heavy chemistry and drying happen away from children.",
+    "Keep walk-off mats flat and maintained so matting reduces tracked-in soil without becoming a trip hazard.",
+    "Frame the maintenance programme as supporting National Quality Standard Quality Area 2 (children's health and safety); you support the centre's obligation, you do not certify it."
+  ],
+  "standards": [
+    "Product SDS and TDS — the only correct source for dry-between-coats, full-cure, re-entry and first-clean timing; do not quote a fixed time.",
+    "AS 4663 — slip resistance of existing (in-service) surfaces; the basis for verifying a sealed floor before handover.",
+    "AS 4586 — slip resistance classification of new surfaces (pre-installation), noted to distinguish it from AS 4663.",
+    "SA HB 198 and the National Construction Code (NCC) — recommended minimum slip classifications by location type.",
+    "Model WHS Regulations (Safe Work Australia) — current SDS within 5 years, Reg 346 register, correct labelling including decanted containers (Victoria under its own OHS Act and Regulations); state water authority trade-waste approval and state EPA duties for any client-run pressure washing.",
+    "AS/NZS 3760 — test-and-tag currency of any portable electrical equipment left or used on site.",
+    "ANSI/IICRC S100 — recognised standard of care for carpet maintenance (guidance, not law); this course/service is NOT IICRC-accredited and awards no CECs.",
+    "National Quality Framework / National Quality Standard Quality Area 2 (ACECQA) and the current contract specification / published school cleaning standard, which govern actual maintenance frequencies."
+  ],
+  "documentation": [
+    "Return-to-service confirmation referencing the SDS/TDS and on-the-day conditions.",
+    "Handover record: signed note or dated photo set showing areas released and any that remain isolated and until when.",
+    "AS 4663 slip-resistance verification for any sealed hard floor, checked against the agreed target class.",
+    "Written client maintenance schedule splitting routine (daily/weekly) from periodic (termly/holiday) work.",
+    "First-clean guidance for newly sealed floors, with timing and method deferred to the finish TDS.",
+    "Walk-off matting recommendation (placement, length, maintenance).",
+    "Child-safe product guidance for the client's own cleaning (low-tox selection, label-rate dilution, SDS register, labelling).",
+    "Wet-floor management protocol and, where relevant, run-off / trade-waste guidance for client-run pressure washing.",
+    "Documentation pack handed over: SDS register, method statements, completion report with before-and-after evidence, slip-resistance records, maintenance schedule.",
+    "Next periodic service booking (into a low-occupancy window, verified against the contract spec) and the agreed feedback / re-inspection trigger."
+  ],
+  "contentBodyHtml": "<h3>Service Procedure — Post Care</h3>\n<p>Post care is the handover and ongoing-care programme that runs after the job is finished. It protects the result you just delivered by confirming a genuine return-to-service, managing the wet or curing period, timing the client's first routine clean, setting up walk-off matting, and giving the client a written maintenance schedule they can actually follow. Done well, it is often the difference between a one-off job and a renewed contract, because it shows the client you understand how a child-occupied site keeps running after you leave.</p>\n<ol>\n<li><strong>Confirm return-to-service readiness.</strong> A floor is ready when it is genuinely dry (carpet) or dried and cured (sealed hard floors), not when a clock says so. Confirm against the product SDS and TDS and the conditions on the day, and verify the actual surface before you release it &mdash; never hand back on a remembered dry or cure time.</li>\n<li><strong>Manage the wet or curing period.</strong> Keep the work zone isolated and signed for the whole wet or curing period, relying on physical isolation in child areas rather than a sign alone, and manage drying with airflow while keeping cords and equipment away from children.</li>\n<li><strong>Verify slip resistance before handover on sealed hard floors.</strong> After the finish has cured per the TDS, arrange AS 4663 measurement (existing, in-service surfaces) against the target slip class agreed with the site by reference to SA HB 198 and the NCC &mdash; remembering AS 4663 measures slip resistance only and does not set re-entry times.</li>\n<li><strong>Run a formal handover walk-through.</strong> Walk the areas with the site contact, point out what was done and which areas are released or still isolated and until when, and confirm who removes barriers and signage. Record the handover with a short signed note or dated photos.</li>\n<li><strong>Give first-clean timing guidance for newly sealed floors.</strong> A new finish keeps hardening after it is walkable, so advise the client to hold off on wet mopping, scrubbing or harsh chemistry and to resume routine cleaning only once it has properly hardened &mdash; with the exact timing and first-clean method taken from the finish TDS, not a fixed number of days.</li>\n<li><strong>Set up a walk-off matting programme.</strong> Recommend or install walk-off matting at entries and high-traffic transitions to capture grit and moisture before they reach the floor, advise on mat length, regular cleaning or swap-out, and keeping mats flat so they are not a trip hazard.</li>\n<li><strong>Hand over a written client maintenance schedule.</strong> Split routine work (dry vacuuming, dust mopping, prompt spot and spill attention, neutral-pH damp cleaning) from periodic work (encapsulation or hot water extraction, tile-and-grout deep clean, vinyl strip and seal), map periodic tasks to term breaks and holiday windows, and confirm frequencies against the current contract specification.</li>\n<li><strong>Advise on child-safe products for the client's own cleaning.</strong> Recommend lower-tox products suited to occupied spaces, diluted strictly per label, with a current SDS held in an accessible register and correct labelling of any decanted container &mdash; supporting NQS Quality Area 2.</li>\n<li><strong>Leave a wet-floor management protocol.</strong> Give the client a short protocol for spills and routine mopping (prompt attention, wet-floor signage, keep children clear until dry), and remind them any client-run pressure-wash run-off must be kept out of stormwater and directed to sewer under a trade-waste agreement.</li>\n<li><strong>Hand over the documentation pack.</strong> Provide the SDS register, method statements, completion report with before-and-after evidence, any AS 4663 slip-resistance records, and the written maintenance schedule and first-clean guidance.</li>\n<li><strong>Book the next periodic service into a low-occupancy window.</strong> Schedule the next strip and seal or carpet extraction into a term break, holiday or deep-clean window with uninterrupted access, ventilation and drying time, and confirm dates and frequencies against the contract spec.</li>\n<li><strong>Set a feedback and re-inspection trigger.</strong> Agree a check-in after the first routine cleaning cycle, a defined re-inspection point, and a clear contact for concerns &mdash; using feedback and re-inspection to tune the maintenance schedule over time.</li>\n</ol>\n<div class=\"lesson-box lesson-box--safety\">\n<h4>Safety</h4>\n<ul>\n<li>A floor stays a slip and access hazard until genuinely dry or cured; keep it isolated and signed and confirm readiness against the SDS/TDS, never a remembered time.</li>\n<li>In child-occupied areas rely on physical isolation (barriers, locked rooms, out-of-hours scheduling), not signage alone; manage drying with airflow and keep cords clear.</li>\n<li>Leave a wet-floor protocol for spills and routine mopping, and keep any client-run pressure-wash run-off out of stormwater (trade-waste to sewer).</li>\n<li>Reinforce label-rate dilution and correct labelling of decanted containers for the client's own cleaning. Poisons Information is 13 11 26.</li>\n</ul>\n</div>\n<div class=\"lesson-box lesson-box--child-safe\">\n<h4>Child-safe</h4>\n<ul>\n<li>Hold physical isolation of wet or curing floors until genuinely ready &mdash; children may not read or heed a sign.</li>\n<li>Advise lower-tox products suited to occupied spaces, diluted per label, with a current SDS held for each.</li>\n<li>Schedule periodic deep treatments into term breaks or holiday windows so heavy chemistry and drying happen away from children.</li>\n<li>Keep walk-off mats flat and maintained so matting reduces tracked-in soil without becoming a trip hazard; frame the programme as supporting NQS Quality Area 2.</li>\n</ul>\n</div>\n<div class=\"lesson-box lesson-box--standards\">\n<h4>Standards</h4>\n<ul>\n<li>Product SDS/TDS &mdash; the only correct source for dry-between-coats, full-cure, re-entry and first-clean timing; do not quote a fixed time.</li>\n<li>AS 4663 (existing/in-service surfaces) for verifying a sealed floor; AS 4586 (new surfaces) noted for contrast; SA HB 198 and the NCC for recommended slip classes.</li>\n<li>Model WHS Regulations (current SDS within 5 years, Reg 346 register, labelling of decanted containers; Victoria under its own OHS Act); state water-authority trade-waste and state EPA duties for client-run pressure washing; AS/NZS 3760 for equipment left or used on site.</li>\n<li>ANSI/IICRC S100 as a recognised standard of care only &mdash; this service is NOT IICRC-accredited and awards no CECs; NQF / NQS Quality Area 2 (ACECQA) and the current contract spec govern maintenance frequencies.</li>\n</ul>\n</div>\n<div class=\"lesson-box lesson-box--document\">\n<h4>Document this</h4>\n<ul>\n<li>Return-to-service confirmation referencing the SDS/TDS and on-the-day conditions, plus a handover record (signed note or dated photos) showing areas released or still isolated.</li>\n<li>AS 4663 slip-resistance verification for any sealed floor, checked against the agreed target class.</li>\n<li>Written client maintenance schedule (routine vs periodic) and first-clean guidance deferred to the finish TDS.</li>\n<li>Walk-off matting recommendation and child-safe product guidance for the client's own cleaning (low-tox, label-rate dilution, SDS register, labelling).</li>\n<li>Wet-floor and run-off / trade-waste guidance for client-run pressure washing.</li>\n<li>Documentation pack handed over (SDS register, method statements, completion report, slip records, schedule) and the next periodic booking plus feedback / re-inspection trigger.</li>\n</ul>\n</div>"
+}

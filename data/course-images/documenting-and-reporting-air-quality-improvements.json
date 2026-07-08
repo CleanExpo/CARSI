@@ -1,0 +1,37 @@
+{
+  "courseSlug": "documenting-and-reporting-air-quality-improvements",
+  "brandColors": ["210 55% 38%", "195 38% 46%", "210 14% 93%"],
+  "notes": "Job-site air quality monitoring, documentation and reporting. Emphasise data capture, real instruments and safe mitigation. Australian restoration job site, metric readings, professional PPE. No on-image text (so no readable report pages or screen values), no brand names/logos.",
+  "images": [
+    {
+      "id": "hero",
+      "context": "Course hero for 'Documenting and Reporting Air Quality Improvements'",
+      "category": "hero",
+      "aspectRatio": "16:9",
+      "resolution": "2K",
+      "style": "professional",
+      "prompt": "A restoration technician in hi-vis and an N95 respirator on a tidy Australian job site, mid-distance and over the shoulder, recording air quality readings onto a rugged tablet on a clipboard while a HEPA air scrubber runs in the background. Bright, organised worksite, cool daylight, focused and professional. Realistic professional photography, aspirational.",
+      "negativePrompt": "no on-image text, no logos, no brand names, no watermarks, no gore, no distressing imagery, no identifiable face-forward portraits, no readable screen text, no clutter, no debris piles"
+    },
+    {
+      "id": "monitoring-instruments",
+      "context": "Module 3 — tools for monitoring: particulate counter and gas detection meter",
+      "category": "illustration",
+      "aspectRatio": "4:3",
+      "resolution": "2K",
+      "style": "professional",
+      "prompt": "A close hands-on-task view of a technician's gloved hands holding a handheld particulate counter, with a compact multi-gas detection meter clipped to a chest strap, taking a reading in a bright Australian interior undergoing restoration. Focus on the instruments, shallow depth of field, clean and precise. Realistic professional photography.",
+      "negativePrompt": "no on-image text, no logos, no brand names, no watermarks, no gore, no distressing imagery, no identifiable face-forward portraits, no fake numeric readouts, no clutter"
+    },
+    {
+      "id": "hepa-negative-air",
+      "context": "Module 4 — mitigation: HEPA air scrubber and negative air machine controlling contaminants",
+      "category": "illustration",
+      "aspectRatio": "4:3",
+      "resolution": "2K",
+      "style": "professional",
+      "prompt": "A HEPA air scrubber and a negative air machine set up in a containment area sealed with plastic sheeting on a bright Australian restoration site, ducting neatly routed, a technician in PPE checking the setup in the mid-distance. Orderly, safe, professional airflow management. Realistic professional photography.",
+      "negativePrompt": "no on-image text, no logos, no brand names, no watermarks, no gore, no distressing imagery, no identifiable face-forward portraits, no visible mould, no mess, no US-style power outlets"
+    }
+  ]
+}

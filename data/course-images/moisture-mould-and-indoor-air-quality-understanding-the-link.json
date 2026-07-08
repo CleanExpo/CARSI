@@ -1,0 +1,37 @@
+{
+  "courseSlug": "moisture-mould-and-indoor-air-quality-understanding-the-link",
+  "brandColors": ["150 24% 38%", "200 30% 44%", "40 16% 92%"],
+  "notes": "Moisture and IAQ science — clinical, investigative, professional. Muted green accent. Australian settings, metric readings. Keep any mould implied and clinical, never dramatic, hazardous or distressing. Focus on assessment tools and containment, not faces. No on-image text, no real brand names/logos.",
+  "images": [
+    {
+      "id": "hero",
+      "context": "Course hero image for 'Moisture, Mould, and Indoor Air Quality: Understanding the Link'",
+      "category": "hero",
+      "aspectRatio": "16:9",
+      "resolution": "2K",
+      "style": "professional",
+      "prompt": "A restoration technician in nitrile gloves and a light respirator methodically surveying an interior wall with a handheld thermal imaging camera, the camera's screen showing a cool blue patch indicating hidden moisture. A moisture meter and a thermo-hygrometer rest on a nearby stool. Bright, clean, clinical Australian home interior, professional and investigative mood, muted green and blue tones. Over-shoulder framing, realistic photography.",
+      "negativePrompt": "no on-image text, no logos, no brand names, no watermarks, no gore, no distressing/dramatic mould, no black mould splatter, no courtroom, no identifiable face-forward portraits, no imperial units"
+    },
+    {
+      "id": "moisture-assessment",
+      "context": "Modules on identifying moisture sources and detection tools — moisture meter and hygrometer",
+      "category": "illustration",
+      "aspectRatio": "4:3",
+      "resolution": "2K",
+      "style": "professional",
+      "prompt": "Close-up of a technician's gloved hand holding a pinless moisture meter flat against painted plasterboard near a window reveal, with a digital hygrometer beside it reading relative humidity. Clean, well-lit Australian interior, precise and clinical, subtle muted green accents. Hands-on-task framing, realistic photography.",
+      "negativePrompt": "no on-image text, no logos, no brand names, no watermarks, no gore, no distressing/dramatic mould, no black mould splatter, no courtroom, no identifiable face-forward portraits, no imperial units"
+    },
+    {
+      "id": "containment-setup",
+      "context": "Modules on remediation and air quality recovery — containment with negative air",
+      "category": "illustration",
+      "aspectRatio": "4:3",
+      "resolution": "2K",
+      "style": "professional",
+      "prompt": "A tidy containment barrier of clear plastic sheeting and a zip-wall sealing off a doorway in a bright Australian building, with a HEPA negative-air machine running beside it and its exhaust ducted neatly toward a window. Clean, orderly, clinical remediation setup, professional and controlled, no visible contamination. Mid-distance framing, realistic photography.",
+      "negativePrompt": "no on-image text, no logos, no brand names, no watermarks, no gore, no distressing/dramatic mould, no black mould splatter, no courtroom, no identifiable face-forward portraits, no imperial units"
+    }
+  ]
+}

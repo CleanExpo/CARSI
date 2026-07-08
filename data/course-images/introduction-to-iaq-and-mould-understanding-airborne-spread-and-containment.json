@@ -1,0 +1,37 @@
+{
+  "courseSlug": "introduction-to-iaq-and-mould-understanding-airborne-spread-and-containment",
+  "brandColors": ["150 32% 40%", "110 22% 46%", "130 14% 93%"],
+  "notes": "IAQ and mould containment training — keep it clinical and professional, NO dramatic or close-up mould and no gore. Technicians in full PPE (respirator, coveralls, gloves, goggles). Real taught methods only — plastic-sheeting containment barriers, negative-pressure HEPA air scrubbers/negative air machines, spore-trap air sampling. Australian settings, metric, 230 V / AU equipment. Bright, clean, well lit.",
+  "images": [
+    {
+      "id": "hero",
+      "context": "Course hero image for 'IAQ and Mould: Understanding Airborne Spread and Containment'",
+      "category": "hero",
+      "aspectRatio": "16:9",
+      "resolution": "2K",
+      "style": "professional",
+      "prompt": "A professional mould remediation technician in full white PPE — respirator, coveralls, gloves and goggles — standing inside a sealed containment zone built from floor-to-ceiling clear plastic sheeting with a zippered entry in an Australian home, a HEPA negative-air machine ducted through the barrier maintaining negative pressure, clean, clinical and well lit. Realistic documentary photography, mid-distance framing.",
+      "negativePrompt": "no on-image text, no logos, no brand names, no watermarks, no gore, no distressing/dramatic mould close-ups, no identifiable face-forward portraits, no visible mould growth, no dirt or grime, no US power outlets"
+    },
+    {
+      "id": "hepa-air-scrubber-negative-pressure",
+      "context": "Module on containment strategies and negative pressure using HEPA air scrubbers",
+      "category": "illustration",
+      "aspectRatio": "4:3",
+      "resolution": "2K",
+      "style": "professional",
+      "prompt": "A HEPA air scrubber and negative air machine running inside a sealed remediation containment area with clear plastic sheeting walls, flexible ducting venting through the barrier, a technician in full PPE adjusting the unit, bright clean clinical lighting in an Australian interior. Realistic photography, mid-distance framing on the equipment.",
+      "negativePrompt": "no on-image text, no logos, no brand names, no watermarks, no gore, no distressing/dramatic mould close-ups, no identifiable face-forward portraits, no visible mould growth, no US power outlets"
+    },
+    {
+      "id": "spore-trap-air-sampling",
+      "context": "Module on monitoring and maintaining IAQ after remediation via air sampling",
+      "category": "illustration",
+      "aspectRatio": "4:3",
+      "resolution": "2K",
+      "style": "professional",
+      "prompt": "Close mid-distance of a technician's gloved hands operating a calibrated air sampling pump connected to a spore-trap cassette on a small tripod, collecting a post-remediation indoor air sample in a clean, dry Australian room, professional and clinical. Realistic photography, over-shoulder hands-on-task framing.",
+      "negativePrompt": "no on-image text, no logos, no brand names, no watermarks, no gore, no distressing/dramatic mould close-ups, no identifiable face-forward portraits, no visible mould growth, no readable text or numbers on device screens, no US power outlets"
+    }
+  ]
+}

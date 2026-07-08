@@ -1,0 +1,37 @@
+{
+  "courseSlug": "introduction-to-ultraviolet-light-and-fluorescence",
+  "brandColors": ["255 55% 46%", "224 60% 40%", "270 38% 60%"],
+  "notes": "Australian water-loss inspection under UV. Controlled low-light, moody but professional and clean — never spooky, horror or forensic-crime toned. Technician wears UV-protective eyewear. Fluorescence appears as a natural soft glow on real surfaces, not a painted-on graphic. No on-image text or brand names.",
+  "images": [
+    {
+      "id": "hero",
+      "context": "Course hero image for 'Introduction to Ultraviolet Light and Fluorescence'",
+      "category": "hero",
+      "aspectRatio": "16:9",
+      "resolution": "2K",
+      "style": "professional",
+      "prompt": "A professional Australian restoration technician wearing UV-protective eyewear and gloves, sweeping a handheld UV inspection torch across an interior wall in a darkened room during a water-loss inspection, revealing a soft natural fluorescent glow where moisture and residues sit. Controlled low light with a cool violet-blue cast, calm and technical, over-the-shoulder framing. Realistic professional photography.",
+      "negativePrompt": "no on-image text, no logos, no brand names, no watermarks, no gore, no distressing imagery, no identifiable face-forward portraits, no spooky or horror mood, no crime-scene styling, no painted-on graphic glow, no neon signage"
+    },
+    {
+      "id": "uv-dye-leak-trace",
+      "context": "Module 4 — Water Loss Inspection Uses: tracing leak sources with UV-responsive dye tracer",
+      "category": "illustration",
+      "aspectRatio": "4:3",
+      "resolution": "2K",
+      "style": "professional",
+      "prompt": "Close mid-distance shot of a gloved technician in UV-protective eyewear directing a UV torch at plumbing under a sink, where a UV-responsive dye tracer glows softly along a pipe join to reveal a leak path. Darkened cabinet interior with a cool violet-blue light, clear diagnostic focus. Realistic professional photography.",
+      "negativePrompt": "no on-image text, no logos, no brand names, no watermarks, no gore, no distressing imagery, no identifiable face-forward portraits, no spooky mood, no crime-scene styling, no fake painted glow, no neon"
+    },
+    {
+      "id": "uv-documentation-camera",
+      "context": "Module 3 — Equipment Application: capturing fluorescing indications with UV imaging support",
+      "category": "illustration",
+      "aspectRatio": "4:3",
+      "resolution": "2K",
+      "style": "professional",
+      "prompt": "A restoration technician in UV-protective eyewear and gloves photographing a softly fluorescing wall area with a camera on a small tripod during a darkened UV inspection in an Australian home, a handheld UV lamp illuminating the surface. Controlled low light, cool violet-blue tone, methodical documentation, hands-on-task framing. Realistic professional photography.",
+      "negativePrompt": "no on-image text, no logos, no brand names, no watermarks, no gore, no distressing imagery, no identifiable face-forward portraits, no spooky or horror mood, no crime-scene styling, no painted-on graphic glow, no legible screen text"
+    }
+  ]
+}
