@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 
 import { useAuth } from '@/components/auth/auth-provider';
 import { ErrorBanner } from '@/components/lms/ErrorBanner';
-import { TEAM_TIERS, type TeamBundleTierId } from '@/lib/lms/pricing-tiers';
+import { teamTierById, type TeamBundleTierId } from '@/lib/lms/pricing-tiers';
 import { apiClient, ApiClientError } from '@/lib/api/client';
 
 interface TeamMember {
@@ -74,10 +74,9 @@ function TeamDashboardPage() {
   const fromPurchase = searchParams.get('from_purchase') === '1';
   const purchasedCourse = searchParams.get('course');
   const purchasedSeats = searchParams.get('seats');
-  const createTier = searchParams.get('create') as TeamBundleTierId | null;
-  const showAnnualPlanForm = Boolean(
-    createTier && TEAM_TIERS.some((t) => t.id === createTier),
-  );
+  const createTier = (searchParams.get('create') ?? searchParams.get('start')) as TeamBundleTierId | null;
+  const tierConfig = createTier ? teamTierById(createTier) : undefined;
+  const showAnnualPlanForm = Boolean(createTier && tierConfig);
 
   const [team, setTeam] = useState<TeamPayload | null>(null);
   const [loading, setLoading] = useState(true);
@@ -102,6 +101,10 @@ function TeamDashboardPage() {
   const [selectedCourseSlugs, setSelectedCourseSlugs] = useState<string[]>([]);
   const [coursesLoading, setCoursesLoading] = useState(false);
 
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [seatExpansionOpen, setSeatExpansionOpen] = useState(false);
+  const [additionalSeats, setAdditionalSeats] = useState(1);
+  const [expandLoading, setExpandLoading] = useState(false);
   const [checkoutEmail, setCheckoutEmail] = useState('');
   const [setupPassword, setSetupPassword] = useState('');
   const [setupLoading, setSetupLoading] = useState(false);
@@ -182,6 +185,58 @@ function TeamDashboardPage() {
       cancelled = true;
     };
   }, [user, syncTeam, router, searchParams]);
+
+  async function handleTeamsSubscriptionCheckout(e: React.FormEvent) {
+    e.preventDefault();
+    if (!createTier) return;
+    setCheckoutLoading(true);
+    setError(null);
+    try {
+      const origin = window.location.origin;
+      const data = await apiClient.post<{ url?: string; checkout_url?: string }>(
+        '/api/lms/subscription/teams/checkout',
+        {
+          tier: createTier,
+          success_url: `${origin}/dashboard/team?membership=active`,
+          cancel_url: `${origin}/pricing?checkout=cancelled`,
+        },
+      );
+      const url = data.url ?? data.checkout_url;
+      if (url) {
+        window.location.href = url;
+        return;
+      }
+      setError('Teams checkout is not available yet. Please try again later.');
+    } catch (err) {
+      setError(
+        err instanceof ApiClientError
+          ? err.message
+          : 'Could not start Teams checkout. Please try again.',
+      );
+    } finally {
+      setCheckoutLoading(false);
+    }
+  }
+
+  async function handleExpandSeats() {
+    setExpandLoading(true);
+    setError(null);
+    setSuccess(null);
+    try {
+      await apiClient.post('/api/lms/subscription/teams/expand-seats', {
+        additional_seats: additionalSeats,
+      });
+      setSuccess(
+        `Added ${additionalSeats} seat${additionalSeats === 1 ? '' : 's'}. You can invite again.`,
+      );
+      setSeatExpansionOpen(false);
+      await syncTeam();
+    } catch (err) {
+      setError(err instanceof ApiClientError ? err.message : 'Could not add seats.');
+    } finally {
+      setExpandLoading(false);
+    }
+  }
 
   async function handleCheckoutSetup(e: React.FormEvent) {
     e.preventDefault();
@@ -280,7 +335,19 @@ function TeamDashboardPage() {
       setSuccess(data.message ?? `Added ${data.email}. They will receive an email with access details.`);
       await syncTeam();
     } catch (err) {
-      setError(err instanceof ApiClientError ? err.message : 'Could not add team member');
+      if (err instanceof ApiClientError && err.status === 409) {
+        const seatFull =
+          err.message.toLowerCase().includes('seats') ||
+          err.message.toLowerCase().includes('seat');
+        if (seatFull && team?.bundle_tier === 'teams_subscription') {
+          setSeatExpansionOpen(true);
+          setError(err.message);
+        } else {
+          setError(err.message);
+        }
+      } else {
+        setError(err instanceof ApiClientError ? err.message : 'Could not add team member');
+      }
     } finally {
       setBusy(false);
     }
@@ -358,28 +425,46 @@ function TeamDashboardPage() {
     return <p className="text-slate-500">Loading your team…</p>;
   }
 
-  if (!team && showAnnualPlanForm) {
+  if (!team && showAnnualPlanForm && tierConfig) {
     return (
       <div className="mx-auto max-w-lg space-y-6">
         <header>
           <p className="text-[11px] font-semibold tracking-[0.2em] text-[#2490ed]/80 uppercase">
             Teams
           </p>
-          <h1 className="mt-2 text-2xl font-bold text-slate-900">Teams — coming soon</h1>
+          <h1 className="mt-2 text-2xl font-bold text-slate-900">Start {tierConfig.name}</h1>
           <p className="mt-2 text-sm text-slate-500">
-            Annual Teams plans are not available to purchase yet. See{' '}
-            <Link href="/pricing" className="text-[#146fc2] hover:underline">
-              pricing
-            </Link>{' '}
-            for what is available today, or browse individual courses.
+            {tierConfig.seatsIncluded} seats included · {tierConfig.priceLabel} ·{' '}
+            {tierConfig.perSeatExpansionLabel} for extra seats.
           </p>
         </header>
         {error ? <ErrorBanner message={error} /> : null}
-        <Link
-          href="/courses"
-          className="flex min-h-11 w-full items-center justify-center rounded-xl bg-[#2490ed] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#1a7fd4]"
+        <form
+          onSubmit={handleTeamsSubscriptionCheckout}
+          className="space-y-4 rounded-2xl border border-slate-200 p-6"
         >
-          Browse courses
+          <p className="text-sm text-slate-600">{tierConfig.description}</p>
+          <ul className="space-y-2 text-sm text-slate-600">
+            {tierConfig.features.map((f) => (
+              <li key={f} className="flex gap-2">
+                <span className="text-[#2490ed]">✓</span>
+                {f}
+              </li>
+            ))}
+          </ul>
+          <button
+            type="submit"
+            disabled={checkoutLoading}
+            className="flex min-h-11 w-full items-center justify-center rounded-xl bg-[#2490ed] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#1a7fd4] disabled:opacity-50"
+          >
+            {checkoutLoading ? 'Starting checkout…' : `Subscribe — ${tierConfig.priceLabel}`}
+          </button>
+          <p className="text-center text-xs text-slate-500">
+            Secure checkout via Stripe. GST included per your plan configuration.
+          </p>
+        </form>
+        <Link href="/pricing" className="block text-center text-sm text-[#146fc2] hover:underline">
+          Compare all Teams plans
         </Link>
       </div>
     );
@@ -726,7 +811,48 @@ function TeamDashboardPage() {
         </section>
       ) : null}
 
-      {team.is_owner && !canInviteMore ? (
+      {team.is_owner && !canInviteMore && team.bundle_tier === 'teams_subscription' ? (
+        <section className="rounded-2xl border border-amber-200 bg-amber-50 p-6">
+          <h2 className="text-sm font-semibold text-slate-900">All seats in use</h2>
+          <p className="mt-1 text-sm text-slate-600">
+            Add seats to your Teams subscription to invite more learners. Prorated billing applies
+            for the rest of your billing period.
+          </p>
+          {seatExpansionOpen ? (
+            <div className="mt-4 flex flex-wrap items-end gap-3">
+              <label className="text-sm text-slate-700">
+                Additional seats
+                <input
+                  type="number"
+                  min={1}
+                  max={50}
+                  value={additionalSeats}
+                  onChange={(e) => setAdditionalSeats(Number(e.target.value))}
+                  className="mt-1 block w-24 rounded-lg border border-slate-200 px-3 py-2"
+                />
+              </label>
+              <button
+                type="button"
+                onClick={() => void handleExpandSeats()}
+                disabled={expandLoading}
+                className="rounded-lg bg-[#2490ed] px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+              >
+                {expandLoading ? 'Adding…' : 'Add seats'}
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setSeatExpansionOpen(true)}
+              className="mt-4 rounded-lg bg-[#2490ed] px-4 py-2 text-sm font-semibold text-white"
+            >
+              Expand seats
+            </button>
+          )}
+        </section>
+      ) : null}
+
+      {team.is_owner && !canInviteMore && team.bundle_tier !== 'teams_subscription' ? (
         <p className="text-sm text-slate-500">
           {isCourseTeam
             ? 'All seats are in use for your team-purchased courses.'
