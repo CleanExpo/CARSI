@@ -3054,6 +3054,15 @@
                   "kind": "audio"
                 }
               ]
+            },
+            {
+              "id": "40cd9e31-14fe-44c5-8c84-34f35a78341b",
+              "title": "Final knowledge check",
+              "contentType": "quiz",
+              "contentBody": "f3a1c9d2-6b47-4e58-9a0c-2d5e8b1f7c34",
+              "orderIndex": 4,
+              "isPreview": false,
+              "resources": null
             }
           ]
         }
