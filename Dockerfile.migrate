@@ -11,10 +11,19 @@ RUN apt-get update -y && apt-get install -y --no-install-recommends openssl ca-c
 COPY package.json package-lock.json ./
 COPY prisma ./prisma/
 COPY prisma.config.ts ./
+COPY tsconfig.json ./
 COPY scripts/do-migrate.sh ./scripts/do-migrate.sh
+COPY scripts/seed-courses-catalog.ts scripts/seed-all-quizzes.ts ./scripts/
+COPY src/lib ./src/lib/
+COPY data/seed ./data/seed/
 
-# Install deps for the Prisma CLI. --ignore-scripts skips postinstall (`prisma generate`): migrate
-# deploy needs the CLI + schema + migrations, not a generated client.
-RUN npm ci --ignore-scripts && chmod +x ./scripts/do-migrate.sh
+# Install deps for the Prisma CLI + the course/quiz seeders (GP-482/GP-484): the runtime image is a
+# pure Next standalone server that never runs npm scripts, so deploy-time seeding lives in this
+# PRE_DEPLOY job. `prisma generate` is needed because the seeders import the generated client;
+# tsx is fetched here (not a package.json dep) to execute the TypeScript seeders.
+RUN npm ci --ignore-scripts \
+  && npx prisma generate \
+  && npm install --no-save tsx@4 \
+  && chmod +x ./scripts/do-migrate.sh
 
 CMD ["bash", "./scripts/do-migrate.sh"]
