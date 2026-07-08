@@ -42,6 +42,7 @@ import {
   resolveTeamIdForOrgSubscription,
   updateOrgSubscriptionFromStripe,
 } from '@/lib/server/org-subscription-store';
+import { trackSubscriptionLifecycleEvent } from '@/lib/server/subscription-analytics';
 
 /** Stripe subscription lifecycle + invoice events this module owns. */
 export const SUBSCRIPTION_EVENT_TYPES = new Set<string>([
@@ -67,6 +68,33 @@ export function isSubscriptionEvent(type: string): boolean {
 export type SubscriptionKind = 'individual' | 'team' | 'org' | 'unknown';
 
 const TEAM_PLANS = new Set(['starter', 'growth', 'full_library', 'teams']);
+
+function planFromSubscription(subscription: Stripe.Subscription): string {
+  const plan = subscription.metadata?.plan;
+  return typeof plan === 'string' && plan.trim() ? plan.trim().toLowerCase() : 'pro_annual';
+}
+
+async function trackStarted(subscription: Stripe.Subscription): Promise<void> {
+  if (subscription.status !== 'active' && subscription.status !== 'trialing') return;
+  const userId = await resolveUserIdForStripeSubscription(
+    subscription,
+    await emailForSubscriptionCustomer(subscription),
+  );
+  void trackSubscriptionLifecycleEvent({
+    event: 'subscription_started',
+    plan: planFromSubscription(subscription),
+    userId: userId ?? undefined,
+    subscriptionId: subscription.id,
+  });
+}
+
+async function trackLapsed(subscription: Stripe.Subscription): Promise<void> {
+  void trackSubscriptionLifecycleEvent({
+    event: 'subscription_lapsed',
+    plan: planFromSubscription(subscription),
+    subscriptionId: subscription.id,
+  });
+}
 
 export function subscriptionKindFromPlan(plan: string | null | undefined): SubscriptionKind {
   const p = (plan ?? '').trim().toLowerCase();
@@ -220,12 +248,17 @@ export async function handleSubscriptionEvent(event: Stripe.Event): Promise<void
   switch (event.type) {
     case 'customer.subscription.created':
     case 'customer.subscription.updated': {
-      await applySubscriptionSnapshot(event.data.object as Stripe.Subscription, eventTimestamp);
+      const subscription = event.data.object as Stripe.Subscription;
+      await applySubscriptionSnapshot(subscription, eventTimestamp);
+      if (event.type === 'customer.subscription.created') {
+        await trackStarted(subscription);
+      }
       return;
     }
 
     case 'customer.subscription.deleted': {
       const subscription = event.data.object as Stripe.Subscription;
+      await trackLapsed(subscription);
       // Prefer the canonical status; deleted subscriptions are 'canceled'.
       const status = subscription.status || 'canceled';
       const kind = subscriptionKind(subscription);
@@ -316,6 +349,16 @@ export async function handleSubscriptionEvent(event: Stripe.Event): Promise<void
       try {
         const subscription = await getStripeClient().subscriptions.retrieve(subscriptionId);
         await applySubscriptionSnapshot(subscription, eventTimestamp);
+        if (
+          event.type === 'invoice.paid' &&
+          invoice.billing_reason === 'subscription_cycle'
+        ) {
+          void trackSubscriptionLifecycleEvent({
+            event: 'subscription_renewed',
+            plan: planFromSubscription(subscription),
+            subscriptionId: subscription.id,
+          });
+        }
       } catch (error) {
         console.error('[subscription-webhook] invoice subscription refresh failed:', error);
         throw error; // transient — let the route return 5xx so Stripe retries
