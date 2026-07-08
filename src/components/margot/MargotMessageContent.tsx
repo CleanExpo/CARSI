@@ -115,7 +115,7 @@ function MessageBlocks({ text, emphasizeLead }: { text: string; emphasizeLead?: 
     );
   }
 
-  let paragraphIndex = 0;
+  const firstParagraphIndex = blocks.findIndex((b) => b.type === 'paragraph');
 
   return (
     <div className="space-y-3 text-[13.5px] leading-[1.65] text-white/80">
@@ -161,8 +161,7 @@ function MessageBlocks({ text, emphasizeLead }: { text: string; emphasizeLead?: 
           );
         }
 
-        const isLead = emphasizeLead && block.type === 'paragraph' && paragraphIndex === 0;
-        paragraphIndex += 1;
+        const isLead = emphasizeLead && block.type === 'paragraph' && index === firstParagraphIndex;
 
         return (
           <p
