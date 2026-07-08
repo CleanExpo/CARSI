@@ -6,12 +6,14 @@ import {
   marketingPageInnerNarrowClass,
 } from '@/components/marketing/MarketingPageShell';
 import {
+  TRUCKMOUNT_COURSE_HREF,
   TRUCKMOUNT_PACK_HTML_HREF,
   TRUCKMOUNT_PACK_PDF_HREF,
 } from '@/lib/ccw/truckmount-course';
 import { ccwWorkshopPath } from '@/lib/marketing/marketing-growth-links';
 import { marketingHeading, marketingPanel } from '@/lib/marketing/marketing-ui';
 import {
+  Award,
   BookOpen,
   Download,
   ExternalLink,
@@ -132,13 +134,20 @@ export function CcwCarsiTruckmountClient() {
         </p>
         <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <a
+            href={TRUCKMOUNT_COURSE_HREF}
+            className="inline-flex w-full items-center justify-center gap-3 rounded-xl border border-white/10 bg-[#146fc2] px-6 py-4 text-sm font-semibold text-white transition hover:bg-[#1769b8] sm:w-auto"
+          >
+            <Award className="h-5 w-5 shrink-0" aria-hidden />
+            Enrol to get certified
+          </a>
+          <a
             href={TRUCKMOUNT_PACK_HTML_HREF}
             target="_blank"
             rel="noopener"
-            className="inline-flex w-full items-center justify-center gap-3 rounded-xl border border-white/10 bg-[#146fc2] px-6 py-4 text-sm font-semibold text-white transition hover:bg-[#1769b8] sm:w-auto"
+            className="inline-flex w-full items-center justify-center gap-3 rounded-xl border border-slate-300 bg-white px-6 py-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-50 sm:w-auto dark:border-white/15 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
           >
             <ExternalLink className="h-5 w-5 shrink-0" aria-hidden />
-            Open the course pack
+            Read the course pack
           </a>
           <a
             href={TRUCKMOUNT_PACK_PDF_HREF}
@@ -149,6 +158,11 @@ export function CcwCarsiTruckmountClient() {
             Download PDF
           </a>
         </div>
+        <p className="mx-auto mt-4 max-w-xl text-xs leading-relaxed text-slate-500 dark:text-white/45">
+          Enrol to have your progress and Unit 3.6 competency sign-off recorded in CARSI and a
+          certificate issued on completion — or read the full pack and take the PDF without
+          enrolling.
+        </p>
       </header>
 
       {/* What the course delivers */}
