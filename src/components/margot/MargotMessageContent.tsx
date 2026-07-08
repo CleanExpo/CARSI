@@ -162,6 +162,7 @@ function MessageBlocks({ text, emphasizeLead }: { text: string; emphasizeLead?: 
         }
 
         const isLead = emphasizeLead && block.type === 'paragraph' && paragraphIndex === 0;
+        // eslint-disable-next-line react-hooks/immutability -- render-scoped counter over blocks; pre-existing rule promotion, behaviour-preserving suppression
         paragraphIndex += 1;
 
         return (

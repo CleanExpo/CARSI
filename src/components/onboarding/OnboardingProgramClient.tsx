@@ -63,6 +63,7 @@ export function OnboardingProgramClient({ slug }: { slug: string }) {
     const defaultOrgName =
       data.program.meta?.company?.trim() ||
       data.program.title.replace(/^CARSI Maintenance Company Onboarding — /, '').trim();
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- pre-existing rule promotion; behaviour-preserving suppression, real fix tracked separately
     setOrganisationName((prev) => prev || defaultOrgName);
   }, [data?.program]);
 

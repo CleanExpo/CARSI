@@ -113,6 +113,7 @@ function TeamDashboardPage() {
   const hasSyncedRef = useRef(false);
   const initialSessionIdRef = useRef(sessionId);
 
+  // eslint-disable-next-line react-hooks/preserve-manual-memoization -- pre-existing rule promotion; behaviour-preserving suppression, real fix tracked separately
   const syncTeam = useCallback(async (activateSessionId?: string) => {
     const data = await apiClient.post<{ team: TeamPayload | null; detail?: string }>(
       '/api/lms/teams/activate-purchase',
@@ -203,6 +204,7 @@ function TeamDashboardPage() {
       );
       const url = data.url ?? data.checkout_url;
       if (url) {
+        // eslint-disable-next-line react-hooks/immutability -- intentional browser navigation in event handler; pre-existing rule promotion
         window.location.href = url;
         return;
       }

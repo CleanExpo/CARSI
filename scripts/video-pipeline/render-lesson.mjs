@@ -15,8 +15,7 @@
  */
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
-import { mkdir, rm, writeFile, readFile, readdir } from 'node:fs/promises';
-import { existsSync } from 'node:fs';
+import { mkdir, rm, writeFile, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -57,7 +56,7 @@ const log = (...m) => console.log('•', ...m);
 function splitSentences(text) {
   const raw = text.match(/[^.!?]+[.!?]+/g) || [text];
   const segs = [];
-  for (let s of raw.map((x) => x.trim()).filter(Boolean)) {
+  for (const s of raw.map((x) => x.trim()).filter(Boolean)) {
     // merge very short fragments into the previous segment
     if (segs.length && s.length < 28) segs[segs.length - 1] += ' ' + s;
     else segs.push(s);
