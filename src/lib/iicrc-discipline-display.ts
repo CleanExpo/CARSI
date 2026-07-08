@@ -20,6 +20,23 @@ export const IICRC_DISCIPLINE_LONG: Record<string, string> = {
   CCT: 'Commercial Carpet Cleaning Technician',
 };
 
+/**
+ * Official IICRC page per discipline (verified live 2026-07-08: each URL 200s
+ * and the page body names the discipline). CRT deliberately points at
+ * iicrc.org/rrt/ — IICRC's own /crt/ page is Color Repair Technician, a
+ * different discipline; RRT (Repair & Reinstallation) is the page matching
+ * CARSI's "Carpet Repair and Reinstallation" node.
+ */
+export const IICRC_DISCIPLINE_URL: Record<string, string> = {
+  WRT: 'https://iicrc.org/wrt/',
+  CRT: 'https://iicrc.org/rrt/',
+  ASD: 'https://iicrc.org/asd/',
+  AMRT: 'https://iicrc.org/amrt/',
+  FSRT: 'https://iicrc.org/fsrt/',
+  OCT: 'https://iicrc.org/oct/',
+  CCT: 'https://iicrc.org/cct/',
+};
+
 const DEFAULT_ORDER = ['WRT', 'CRT', 'ASD', 'AMRT', 'FSRT', 'OCT', 'CCT'] as const;
 const KNOWN_CODES = new Set<string>(DEFAULT_ORDER);
 
