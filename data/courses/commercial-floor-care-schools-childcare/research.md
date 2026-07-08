@@ -97,6 +97,11 @@ Source: `data/seed/ccw-products.json` (250 products; 116 with SDS). **76 product
 
 > Note: a handful of CCW entries lacked a current SDS (e.g., `Solv Sealer Gold`, some accessories) — for those, the course must say "obtain the current SDS from the supplier" rather than cite one.
 
+> SDS hyperlinks: the SDS codes cited in lesson bodies are hyperlinked to the actual SDS PDFs
+> from `data/reference/ccw-products.json` (`sdsUrls`, checked 2026-07-08 — see that file's
+> `sdsMethod`). Anchor text stays the bare code, so a link that later rots degrades to the
+> original citation. Knowledge-check lessons are deliberately unlinked.
+
 ---
 
 ## AU regulatory hooks (quick map for content)
