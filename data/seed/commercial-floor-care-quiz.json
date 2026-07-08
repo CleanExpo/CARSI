@@ -1,0 +1,147 @@
+{
+  "version": 1,
+  "courseSlug": "commercial-floor-care-schools-childcare",
+  "quizzes": [
+    {
+      "quizId": "f3a1c9d2-6b47-4e58-9a0c-2d5e8b1f7c34",
+      "lessonTitle": "Knowledge check",
+      "title": "Commercial Floor Care for Schools & Childcare — Knowledge Check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "You decant a floor stripper from its drum into a spray bottle for the day's work. Under the model WHS Regulations, what must you do?",
+          "options": [
+            "Nothing — only the original drum needs a label",
+            "Correctly label the spray bottle (the decanted container) as well",
+            "Add it to a manifest before it can be used on site",
+            "Dispose of it the same day so no label is needed"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "What is the best practice for cleaning responsibly in an occupied, child-occupied room?",
+          "options": [
+            "Use the strongest chemistry available to be sure surfaces are clean",
+            "Skip reading the SDS to save time, since the product name tells you enough",
+            "Select lower-tox products, read each SDS, dilute per the label, ventilate, and isolate wet or treated areas from children",
+            "Reserve gentle products for periodic deep cleans and use caustic strippers for the daily routine"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "Compared with encapsulation, hot water extraction (HWE) is generally associated with:",
+          "options": [
+            "Deeper soil removal but more moisture and a longer return to service",
+            "The lowest moisture and the fastest return to service",
+            "No need to vacuum the carpet beforehand",
+            "A guaranteed fixed dry time you can quote the client"
+          ],
+          "correctIndex": 0,
+          "points": 1
+        },
+        {
+          "questionText": "When cleaning carpet in a child-occupied classroom or care room, which is the better practice?",
+          "options": [
+            "Quote the client a fixed dry time so they can plan the day",
+            "Leave cords running across walkways so you can reach the far wall",
+            "Isolate and sign damp floors, manage cords, and sequence rooms so each dries and reopens while you move on",
+            "Clean every room at once so the whole job finishes quickly"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "Why do grout lines tend to look dingy even when the tiles themselves look clean?",
+          "options": [
+            "Grout is always manufactured in a darker colour than tile",
+            "Tiles are never sealed and grout always is",
+            "Grout is porous and traps soil below the surface, while the denser tile face rinses clean",
+            "Mopping cleans grout more effectively than it cleans tile"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "What is the correct order for a sound tile and grout cleaning method?",
+          "options": [
+            "Recover, rinse, agitate, dwell, apply, pre-wet",
+            "Pre-wet, apply, dwell, agitate, rinse, recover",
+            "Apply, recover, pre-wet, rinse, dwell, agitate",
+            "Agitate, apply, dwell, pre-wet, recover, rinse"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "In the generic vinyl strip-and-seal process, what is the correct order of stages?",
+          "options": [
+            "Apply finish, then strip, then rinse and neutralise",
+            "Strip the old finish, rinse and neutralise, dry, then apply multiple thin sealer and finish coats with drying between each coat",
+            "Dry the floor, strip, apply one thick coat, then reopen straight away",
+            "Neutralise, apply finish, strip, then rinse"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "A freshly stripped and sealed floor is an existing, in-service surface that must be re-verified for slip resistance. Which statement is correct?",
+          "options": [
+            "AS 4663 measures the finished in-service floor's slip resistance but does not set cure or re-entry times",
+            "AS 4663 tells you exactly when the floor is safe to reopen to children",
+            "AS 4586 is the right basis because the floor has a new finish on it",
+            "The sealer's SDS sets the required slip-resistance class for the site"
+          ],
+          "correctIndex": 0,
+          "points": 1
+        },
+        {
+          "questionText": "You are pressure washing a sand-jointed paver path at a childcare centre. Which approach best avoids surface damage?",
+          "options": [
+            "Use the narrowest jet at maximum pressure to finish faster",
+            "Use the widest practical fan, keep the nozzle moving, and test a small out-of-the-way area first",
+            "Hold a tight jet on each joint until it is fully cleared",
+            "Increase the pressure until the jointing sand washes out of the joints"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "How should pressure-washing run-off be handled on a school or childcare site?",
+          "options": [
+            "Hosed straight into the nearest stormwater drain once the job is done",
+            "Left to evaporate off the surface on its own",
+            "Confined and collected, then directed to sewer under a trade-waste agreement with the water authority",
+            "Tipped into a nearby garden bed away from the play area"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "Periodic work such as hard-floor strip and seal or carpet hot water extraction is typically scheduled into:",
+          "options": [
+            "The daily routine clean",
+            "Peak occupancy, so the client can see the work being done",
+            "Whenever a worker happens to have a spare hour",
+            "Deep-clean or school-holiday windows, then verified against the current contract spec"
+          ],
+          "correctIndex": 3,
+          "points": 1
+        },
+        {
+          "questionText": "Working With Children checks for contractors at schools and childcare centres are:",
+          "options": [
+            "A single national check that is valid in every state and territory",
+            "Issued only to permanent school staff and never to contractors",
+            "State and territory based, generally not auto-transferable, and not necessarily the only screening a site requires",
+            "Fully replaced by an ordinary police check"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        }
+      ]
+    }
+  ]
+}
