@@ -9,8 +9,7 @@
   "license": "MIT",
   "private": true,
   "engines": {
-    "node": "22.x",
-    "npm": ">=10.0.0"
+    "node": "22.x"
   },
   "type": "module",
   "scripts": {
