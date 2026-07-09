@@ -183,7 +183,8 @@ test.describe('Course detail page', () => {
     });
 
     // Price is shown in the enrol panel (this WP-era course is free). Assert on the
-    // main landmark's text content so responsive duplicate/hidden copies don't flake.
-    await expect(page.getByRole('main')).toContainText(/Free|\$/i);
+    // outer main landmark's text so responsive duplicate/hidden copies don't flake.
+    // `.first()` because the layout + page each render a #main-content <main>.
+    await expect(page.getByRole('main').first()).toContainText(/Free|\$/i);
   });
 });
