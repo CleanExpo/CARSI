@@ -24,7 +24,7 @@ export type CourseThumbnailBrief = {
   slug: string;
   /** Denormalised for human review of the JSON diff; never used to build prompt identity. */
   title: string;
-  /** IICRC code (WRT/RRT/ASD/AMRT/FSRT/OCT/CCT) or null when the course isn't discipline-coded. */
+  /** IICRC code (WRT/CRT/ASD/AMRT/FSRT/OCT/CCT) or null when the course isn't discipline-coded. */
   discipline: string | null;
   /** One-sentence core idea grounded in the course subject + learner benefit. */
   concept: string;

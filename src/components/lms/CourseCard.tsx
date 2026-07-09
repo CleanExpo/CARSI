@@ -28,8 +28,6 @@ interface CourseCardProps {
     module_count?: number | null;
     catalog_status?: string | null;
     thumbnail_url?: string | null;
-    /** Descriptive alt text for the hero image (a11y + image SEO). Falls back to title. */
-    image_alt?: string | null;
     updated_at?: string | null;
     instructor?: { full_name: string } | null;
     cec_hours?: string | null;
@@ -60,13 +58,11 @@ export function CourseCard({ course, priorityImage, variant = 'catalog' }: Cours
   const isFree = course.is_free || priceNum === 0;
   const price = isFree ? 'Free' : `$${priceNum.toFixed(0)}`;
 
-  const rawDiscipline =
+  const discipline =
     course.discipline ??
-    (course.category?.match(/^(WRT|RRT|CRT|ASD|OCT|CCT|FSRT|AMRT)/)
+    (course.category?.match(/^(WRT|CRT|ASD|OCT|CCT|FSRT|AMRT)/)
       ? course.category.split(' ')[0]
       : null);
-  // Legacy CARSI code for Carpet Repair & Reinstallation (IICRC code is RRT).
-  const discipline = rawDiscipline === 'CRT' ? 'RRT' : rawDiscipline;
 
   const { courseLinkBase } = useCourseBrowseBase();
   const thumbSrc = course.thumbnail_url ?? undefined;
@@ -87,65 +83,28 @@ export function CourseCard({ course, priorityImage, variant = 'catalog' }: Cours
       whileHover={{ y: isFeatured ? -4 : -2 }}
       transition={{ duration: 0.22, ease: smoothEase }}
     >
-      <Link
-        href={href}
-        className="relative block aspect-[16/10] w-full shrink-0 overflow-hidden bg-slate-100 dark:bg-[#0a0c10]"
-      >
-        {thumbSrc ? (
-          // Real hero image renders clean — course title/discipline/price live in the
-          // white caption box below, which keeps text real (accessible + SEO-friendly).
-          // eslint-disable-next-line @next/next/no-img-element -- external / CDN URLs
-          <img
-            src={thumbSrc}
-            alt={course.image_alt ?? course.title}
-            loading={priorityImage ? 'eager' : 'lazy'}
-            fetchPriority={priorityImage ? 'high' : 'auto'}
-            decoding="async"
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-          />
-        ) : (
-          <CourseTextThumbnail
-            variant="card"
-            title={course.title}
-            category={onboarding ? 'Organisation onboarding' : course.category}
-            discipline={discipline}
-            priceLabel={price}
-            isFree={isFree}
-            level={course.level}
-            cecHours={course.cec_hours}
-            moduleCount={course.module_count}
-            lessonCount={course.lesson_count}
-            durationHours={course.duration_hours}
-            shortDescription={course.short_description}
-            draft={course.catalog_status === 'draft'}
-          />
-        )}
-        {course.catalog_status === 'draft' ? (
-          <span className="absolute top-2 left-2 rounded-md bg-amber-500/95 px-1.5 py-0.5 text-[9px] font-bold tracking-wide text-black uppercase">
-            Draft
-          </span>
-        ) : null}
+      <Link href={href} className="relative block aspect-[16/10] w-full shrink-0 overflow-hidden">
+        <CourseTextThumbnail
+          variant="card"
+          title={course.title}
+          category={onboarding ? 'Organisation onboarding' : course.category}
+          discipline={discipline}
+          priceLabel={price}
+          isFree={isFree}
+          level={course.level}
+          cecHours={course.cec_hours}
+          moduleCount={course.module_count}
+          lessonCount={course.lesson_count}
+          durationHours={course.duration_hours}
+          shortDescription={course.short_description}
+          draft={course.catalog_status === 'draft'}
+          backdropImageSrc={thumbSrc}
+          backdropImageLoading={priorityImage ? 'eager' : 'lazy'}
+          backdropImageFetchPriority={priorityImage ? 'high' : 'auto'}
+        />
       </Link>
 
       <div className={`flex flex-1 flex-col ${isFeatured ? 'gap-3 p-5' : 'gap-2.5 p-4'}`}>
-        <div className="flex items-center justify-between gap-2">
-          {onboarding || discipline ? (
-            <span className="rounded-md border border-[#2490ed]/20 bg-[#eef7ff] px-1.5 py-0.5 font-mono text-[10px] font-bold tracking-wide text-[#146fc2] uppercase dark:border-[#2490ed]/25 dark:bg-[#0e2439] dark:text-[#8fd0ff]">
-              {onboarding ? 'Onboarding' : discipline}
-            </span>
-          ) : (
-            <span aria-hidden />
-          )}
-          <span
-            className={
-              isFree
-                ? 'rounded-md border border-emerald-500/25 bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 dark:border-emerald-400/25 dark:bg-emerald-950/40 dark:text-emerald-300'
-                : 'rounded-md border border-amber-500/25 bg-amber-50 px-2 py-0.5 text-[11px] font-semibold tabular-nums text-amber-800 dark:border-amber-400/25 dark:bg-amber-950/40 dark:text-amber-200'
-            }
-          >
-            {price}
-          </span>
-        </div>
         <h3
           className={`line-clamp-2 font-semibold leading-snug text-slate-950 dark:text-white ${
             isFeatured ? 'text-[1.05rem]' : 'text-[0.95rem]'

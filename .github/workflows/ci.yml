@@ -75,6 +75,14 @@ jobs:
       - name: IICRC CEC terminology guard
         run: npm run check:iicrc-terminology
 
+      # Licence-critical backstop: scans all course-content + marketing surfaces
+      # (data/seed, public/courses, docs/marketing, docs/content) for stray IICRC
+      # placements, banned "IICRC-approved"/"certified with CARSI" phrasing, and
+      # unapproved specific CEC-hour claims. The systemic fix for the truckmount +
+      # CEC-inference incidents.
+      - name: IICRC / CEC compliance guard
+        run: npm run check:iicrc-compliance
+
       - name: Lint
         run: npm run lint
 
@@ -251,92 +259,4 @@ jobs:
           name: e2e-test-results
           path: test-results/
 
-  accessibility-tests:
-    name: Accessibility Tests
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    needs: [frontend-tests]
-
-    # Postgres service: Playwright's webServer (Next dev) needs a reachable DB.
-    # Without this DATABASE_URL fell through to the production DigitalOcean URL
-    # which is unreachable from GitHub runners (P1001 ECONNREFUSED).
-    services:
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_USER: root
-          POSTGRES_PASSWORD: root
-          POSTGRES_DB: carsi
-        ports: ['5432:5432']
-        options: >-
-          --health-cmd "pg_isready -U root"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-    env:
-      DATABASE_URL: postgresql://root:root@localhost:5432/carsi
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Apply Prisma migrations to test DB
-        run: npx prisma migrate deploy
-
-      - name: Cache Playwright browsers
-        id: a11y-playwright-cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('package.json') }}
-          restore-keys: |
-            ${{ runner.os }}-playwright-
-
-      # See the E2E job: drop broken Microsoft apt sources so apt-get update
-      # (run by Playwright's --with-deps / install-deps) does not 403.
-      - name: Remove broken Microsoft apt sources
-        run: |
-          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list \
-                     /etc/apt/sources.list.d/microsoft-prod.sources \
-                     /etc/apt/sources.list.d/azure-cli.list \
-                     /etc/apt/sources.list.d/azure-cli.sources || true
-
-      - name: Install Playwright browsers
-        if: steps.a11y-playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps chromium
-
-      - name: Install Playwright system dependencies
-        if: steps.a11y-playwright-cache.outputs.cache-hit == 'true'
-        run: npx playwright install-deps chromium
-
-      - name: Run accessibility tests
-        run: npm run test:a11y
-        env:
-          CI: true
-          PLAYWRIGHT_BASE_URL: http://127.0.0.1:3000
-
-      - name: Upload accessibility test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: accessibility-test-results
-          path: test-results/
-          retention-days: 30
-
-      - name: Upload Playwright report (accessibility)
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: accessibility-playwright-report
-          path: playwright-report/
-          retention-days: 30
+  # accessibility-tests job removed — Playwright a11y specs lived under tests/ (deleted).

@@ -63,12 +63,12 @@ const MOCK_COURSES = [
     id: 'c2',
     slug: 'carpet-repair-technician',
     title: 'Carpet Repair Technician',
-    short_description: 'RRT practical training for carpet restoration.',
+    short_description: 'CRT practical training for carpet restoration.',
     price_aud: '295.00',
     is_free: false,
     level: 'intermediate',
     category: 'Carpet Restoration',
-    discipline: 'RRT',
+    discipline: 'CRT',
     lesson_count: 8,
     thumbnail_url: null,
     updated_at: '2026-02-15T00:00:00Z',
@@ -309,7 +309,7 @@ test.describe('2. Course catalogue', () => {
     await page.goto('/courses');
     await page.waitForLoadState('domcontentloaded');
 
-    for (const tab of ['All', 'WRT', 'RRT']) {
+    for (const tab of ['All', 'WRT', 'CRT']) {
       await expect(page.locator('button', { hasText: tab })).toBeVisible();
     }
   });

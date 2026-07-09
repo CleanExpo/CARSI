@@ -9,7 +9,7 @@
 ## How it deploys
 
 - **Platform:** DigitalOcean App Platform, app name `carsi`, region `blr`.
-- **Build:** Docker — `Dockerfile` at the repo root (`dockerfile_path: Dockerfile`).
+- **Build:** Docker — `deploy/Dockerfile` (`dockerfile_path: deploy/Dockerfile` in `app.yaml`; context is repo root).
 - **Runtime:** one service `carsi` listening on **port 8080** (`http_port` / `PORT=8080`).
 - **Scale:** `instance_count: 2`, `instance_size_slug: apps-s-1vcpu-1gb`.
 - **Auto-deploy:** every push to **`main`** redeploys (`deploy_on_push: true`).
@@ -61,7 +61,7 @@ doctl apps create-deployment <APP_ID>
 ## Notes
 
 - A push to `main` is a production deploy — gate merges on green CI.
-- `Dockerfile` must expose and listen on `8080`; `app.yaml` health check hits `/api/health`,
+- `deploy/Dockerfile` must expose and listen on `8080`; `app.yaml` health check hits `/api/health`,
   so that route must return 200 once the server is up.
 - Frontend preview deploys (the `carsi-web` Vercel checks on PRs) are **separate** from this
   production App Platform deployment and are used for review only.

@@ -47,7 +47,7 @@ test.describe('Public course catalogue', () => {
     await expect(page.locator('h1')).toContainText('Restoration Training Courses');
 
     // Discipline tabs rendered
-    for (const tab of ['All', 'WRT', 'RRT', 'ASD', 'OCT', 'CCT', 'FSRT', 'AMRT', 'Free']) {
+    for (const tab of ['All', 'WRT', 'CRT', 'ASD', 'OCT', 'CCT', 'FSRT', 'AMRT', 'Free']) {
       await expect(page.getByRole('tab', { name: tab, exact: true })).toBeVisible();
     }
   });
@@ -85,7 +85,11 @@ test.describe('Public course catalogue', () => {
     const searchInput = page.locator('input[placeholder="Search courses..."]');
     await searchInput.fill('Carpet');
 
-    await expect(page.getByText(/Carpet/i).first()).toBeVisible();
+    // Assert on a visible course CARD, not any text node — the tag-filter <select>
+    // now contains a hidden "carpet cleaning" <option> that getByText would match first.
+    await expect(
+      page.locator('a[href*="/courses/"]').filter({ hasText: /Carpet/i }).first()
+    ).toBeVisible();
     await expect(page.getByText(DETAIL_COURSE.title)).not.toBeVisible();
   });
 

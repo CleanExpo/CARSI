@@ -140,7 +140,7 @@ export function catalogueMetaDescription(
   const list =
     codes.length > 0
       ? codes.join(', ')
-      : 'WRT, RRT, ASD, AMRT, FSRT, OCT and CCT';
+      : 'WRT, CRT, ASD, AMRT, FSRT, OCT and CCT';
   if (n <= 0) {
     return `Browse IICRC CEC Accredited restoration and cleaning courses across ${list}. Earn continuing education credits online with CARSI.`;
   }
@@ -154,7 +154,7 @@ export function coursesIndexMetaDescription(facts: PublicCatalogueFacts): string
   const list =
     codes.length > 0
       ? codes.join(', ')
-      : 'WRT, RRT, ASD, AMRT, FSRT, OCT and CCT';
+      : 'WRT, CRT, ASD, AMRT, FSRT, OCT and CCT';
   const n = facts.publishedCourseCount;
   const core =
     n > 0

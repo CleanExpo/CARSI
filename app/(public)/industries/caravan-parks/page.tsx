@@ -16,7 +16,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'IICRC CEC Mould & Restoration Training for Caravan Parks | CARSI Australia',
   description:
-    'Protect guests and comply with state Fair Trading obligations. IICRC AMRT, RRT, and WRT training for Australian caravan parks and holiday accommodation. Online, CEC Accredited.',
+    'Protect guests and comply with state Fair Trading obligations. IICRC AMRT, CRT, and WRT training for Australian caravan parks and holiday accommodation. Online, CEC Accredited.',
   keywords: [
     'caravan park mould training Australia',
     'holiday park IICRC CEC course',
@@ -34,7 +34,7 @@ const ACCENT_COLOR = '#26a69a';
 
 const disciplines = [
   { code: 'AMRT', label: 'Applied Microbial Remediation', color: '#26a69a' },
-  { code: 'RRT', label: 'Carpet Cleaning Technician', color: '#00897b' },
+  { code: 'CRT', label: 'Carpet Cleaning Technician', color: '#00897b' },
   { code: 'WRT', label: 'Water Damage Restoration', color: '#00796b' },
 ];
 
@@ -61,9 +61,9 @@ const faqs = [
       'Caravan park operators owe guests a duty of care under Australian Consumer Law and state-specific tourism accommodation legislation. Providing accommodation with hidden mould or water damage exposes operators to Fair Trading complaints, negative TripAdvisor reviews, and potential personal injury claims if guests suffer health impacts. IICRC AMRT certification demonstrates that maintenance staff are competent to identify and remediate mould — providing a defensible record that standards-based inspections and remediation were performed, which is increasingly expected by park accreditation bodies.',
   },
   {
-    question: 'What is RRT training and how does it help holiday accommodation?',
+    question: 'What is CRT training and how does it help holiday accommodation?',
     answer:
-      'RRT (Carpet Cleaning Technician) is an IICRC certification covering hot water extraction methodology, pre-treatment chemistry, soil removal, and moisture management in carpet systems. For caravan parks and holiday accommodation, RRT training enables in-house staff to maintain carpet in cabins and common areas to a standard that extends asset life and prevents odour complaints — avoiding the cost of outsourcing routine carpet maintenance to contractors. RRT certification also covers water damage response in carpeted areas, which is directly applicable to flood and plumbing failure events.',
+      'CRT (Carpet Cleaning Technician) is an IICRC certification covering hot water extraction methodology, pre-treatment chemistry, soil removal, and moisture management in carpet systems. For caravan parks and holiday accommodation, CRT training enables in-house staff to maintain carpet in cabins and common areas to a standard that extends asset life and prevents odour complaints — avoiding the cost of outsourcing routine carpet maintenance to contractors. CRT certification also covers water damage response in carpeted areas, which is directly applicable to flood and plumbing failure events.',
   },
 ];
 
@@ -105,7 +105,7 @@ export default async function CaravanParksIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Protect Guest Accommodation"
         headlineAccent="All Season Long"
-        description="Australia's 2,800+ caravan parks face persistent mould, moisture, and storm damage risk. IICRC AMRT, RRT, and WRT CEC courses give park maintenance teams the protocols to inspect, remediate, and document — protecting guests, reputation, and revenue. CARSI courses earn IICRC CECs; they are not IICRC certification."
+        description="Australia's 2,800+ caravan parks face persistent mould, moisture, and storm damage risk. IICRC AMRT, CRT, and WRT CEC courses give park maintenance teams the protocols to inspect, remediate, and document — protecting guests, reputation, and revenue. CARSI courses earn IICRC CECs; they are not IICRC certification."
         disciplines={disciplines}
         stats={stats}
       />
@@ -119,8 +119,8 @@ export default async function CaravanParksIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="Caravan Parks & Holiday Accommodation"
-        disciplineList="AMRT, RRT & WRT"
-        disciplines={['AMRT', 'RRT', 'WRT']}
+        disciplineList="AMRT, CRT & WRT"
+        disciplines={['AMRT', 'CRT', 'WRT']}
       />
 
       <ContractorAddOns accentColor={ACCENT_COLOR} />
@@ -129,7 +129,7 @@ export default async function CaravanParksIndustryPage() {
         subtitle="Holiday Park Training"
         title="Holiday Park Bundle"
         price={industryBundlePriceLabel('caravan-parks')}
-        description="AMRT + RRT + WRT training for caravan park and holiday accommodation maintenance staff. Seasonal inspection protocols included. Online, self-paced."
+        description="AMRT + CRT + WRT training for caravan park and holiday accommodation maintenance staff. Seasonal inspection protocols included. Online, self-paced."
         ctaText="Train Your Park Team"
         accentColor={ACCENT_COLOR}
       />

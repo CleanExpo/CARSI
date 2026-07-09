@@ -100,8 +100,8 @@ Government procurement officers evaluate contractors on documented competency. I
 IICRC certifications require ongoing education to maintain active status:
 
 - **14 CECs per certification** over a defined cycle
-- CECs must be earned through IICRC-approved education providers
-- CARSI courses are IICRC board-approved and award CECs automatically upon completion
+- CECs must be earned through IICRC-recognised CEC providers
+- CARSI is an IICRC CEC Accredited provider — its courses earn CECs toward maintaining your existing IICRC certification
 - Government panels may audit your CEC records — keep them current
 
 **Pro tip:** An annual CARSI subscription ($795 AUD/year) provides unlimited access to all CEC-eligible courses. This is significantly cheaper than attending face-to-face training sessions ($2,000–5,000 per course per person).

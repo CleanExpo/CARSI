@@ -288,7 +288,7 @@ export default async function CoursesPage({
                   CARSI offers <AcronymTooltip term="IICRC" /> <AcronymTooltip term="CEC" />{' '}
                   accredited courses across seven core disciplines: Water Restoration
                   Technology (<AcronymTooltip term="WRT" />
-                  ), Carpet Repair and Reinstallation Technology (<AcronymTooltip term="RRT" />
+                  ), Carpet Repair and Reinstallation Technology (<AcronymTooltip term="CRT" />
                   ), Applied Structural Drying (<AcronymTooltip term="ASD" />
                   ), Applied Microbial Remediation Technology (<AcronymTooltip term="AMRT" />
                   ), Fire and Smoke Restoration Technology (<AcronymTooltip term="FSRT" />
@@ -342,7 +342,7 @@ export default async function CoursesPage({
                   Restoration Technology (<AcronymTooltip term="WRT" />) is the most common starting
                   point, providing foundational knowledge applicable across all restoration work
                   including flood damage, burst pipes, and storm recovery. Carpet Repair and
-                  Reinstallation Technology (<AcronymTooltip term="RRT" />) suits technicians
+                  Reinstallation Technology (<AcronymTooltip term="CRT" />) suits technicians
                   working in flooring and soft furnishing restoration. Applied Structural Drying (
                   <AcronymTooltip term="ASD" />) builds on <AcronymTooltip term="WRT" /> with
                   advanced moisture control techniques for structural elements. Applied Microbial

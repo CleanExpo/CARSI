@@ -81,6 +81,8 @@ async function deleteCourseCurriculum(tx: PrismaTx, courseId: string) {
 
 async function seedCourse(c: CatalogCourse, instructorOverride: string | undefined) {
   const instructorId = instructorOverride?.trim() || c.instructorId;
+  // Store the catalog's explicit value verbatim (0 = the not-CEC-approved opt-out, which the
+  // read-time resolvers honour); only derive for legacy null entries.
   const cecHours = c.cecHours ?? resolveCatalogCecHours(c);
 
   await prisma.$transaction(async (tx) => {

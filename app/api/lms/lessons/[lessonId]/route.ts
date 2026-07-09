@@ -8,26 +8,10 @@ import {
   getLessonContextForStudent,
   touchLessonProgress,
 } from '@/lib/server/enrollment-service';
+import { parseLessonResources } from '@/lib/lms/lesson-resources';
 import { getUpstreamBaseUrl } from '@/lib/server/upstream-api';
 
 type Ctx = { params: Promise<{ lessonId: string }> };
-
-function parseResources(raw: unknown): { label?: string; url?: string }[] {
-  if (!Array.isArray(raw)) return [];
-  const out: { label?: string; url?: string }[] = [];
-  for (const item of raw) {
-    if (item && typeof item === 'object' && 'url' in item) {
-      const o = item as { label?: string; url?: string };
-      if (typeof o.url === 'string' && o.url) {
-        out.push({
-          url: o.url,
-          label: typeof o.label === 'string' ? o.label : 'Resource',
-        });
-      }
-    }
-  }
-  return out;
-}
 
 export async function GET(request: NextRequest, ctx: Ctx) {
   const upstream = getUpstreamBaseUrl();
@@ -93,7 +77,7 @@ export async function GET(request: NextRequest, ctx: Ctx) {
       order_index: lesson.orderIndex,
       course_id: lesson.module.courseId,
     },
-    resources: parseResources(lesson.resources),
+    resources: parseLessonResources(lesson.resources),
     enrollment_id: ctxRow.enrollmentId,
     course: {
       id: lesson.module.course.id,

@@ -12,7 +12,7 @@ import { resolveLmsCourseCecHours, type LmsCourseCecSource } from '@/lib/server/
 
 const DISCIPLINE_HEX: Record<string, string> = {
   WRT: '#2490ed',
-  RRT: '#26c4a0',
+  CRT: '#26c4a0',
   ASD: '#6c63ff',
   OCT: '#9b59b6',
   CCT: '#17b8d4',

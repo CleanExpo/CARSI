@@ -6,46 +6,54 @@ import { BreadcrumbSchema, FAQSchema } from '@/components/seo';
 import { OG_IMAGES } from '@/lib/seo/og-image';
 import { subscriptionsEnabled } from '@/lib/server/subscriptions-flag';
 
-export const metadata: Metadata = {
-  title: 'Pricing — Restoration Training Online',
-  description:
-    'Buy any CARSI course individually — with IICRC CEC tracking and verified certificates. Free Library available to everyone, no card required. Yearly membership and Teams plans are coming soon.',
-  keywords: [
-    'CARSI pricing',
-    'restoration training membership',
-    'IICRC CEC courses online',
-    'building restoration courses Australia',
-    'water damage training course',
-    'mould remediation online course',
-  ],
-  openGraph: {
-    images: OG_IMAGES,
-    title: 'Pricing | CARSI — Restoration Training Online',
-    description:
-      'Free Library for everyone and per-course enrolment, available today. Yearly membership and Teams plans are coming soon.',
-    type: 'website',
-    url: 'https://carsi.com.au/pricing',
-  },
-  alternates: { canonical: 'https://carsi.com.au/pricing' },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const live = subscriptionsEnabled();
+  return {
+    title: 'Pricing — Restoration Training Online',
+    description: live
+      ? 'Buy any CARSI course individually or choose yearly membership and Teams plans. Free Library available to everyone, no card required.'
+      : 'Buy any CARSI course individually — with IICRC CEC tracking and verified certificates. Free Library available to everyone, no card required. Yearly membership and Teams plans are coming soon.',
+    keywords: [
+      'CARSI pricing',
+      'restoration training membership',
+      'IICRC CEC courses online',
+      'building restoration courses Australia',
+      'water damage training course',
+      'mould remediation online course',
+    ],
+    openGraph: {
+      images: OG_IMAGES,
+      title: 'Pricing | CARSI — Restoration Training Online',
+      description: live
+        ? 'Free Library, per-course enrolment, yearly membership, and Teams seat plans.'
+        : 'Free Library for everyone and per-course enrolment, available today. Yearly membership and Teams plans are coming soon.',
+      type: 'website',
+      url: 'https://carsi.com.au/pricing',
+    },
+    alternates: { canonical: 'https://carsi.com.au/pricing' },
+  };
+}
 
-const FAQ_ITEMS = [
-  {
-    question: 'Do I have to buy anything to start?',
-    answer:
-      'No. Every learner gets the Free Library at no cost and no card required. When you are ready, buy any individual course outright — a yearly membership is an optional path for 100% access.',
-  },
-  {
-    question: "What's included in a yearly membership?",
-    answer:
-      'Yearly membership is coming soon and is not available to purchase yet. When it launches, it will give 100% access to all published CARSI courses for one learner for 12 months, plus the IICRC CEC tracking dashboard and certificate wallet. Buy any course individually today.',
-  },
-  {
-    question: 'Do CARSI courses count toward IICRC CECs?',
-    answer:
-      "CARSI's catalogue includes IICRC CEC Accredited courses where stated. Your dashboard includes a CEC tracking dashboard that logs completed credits, broken down by discipline (WRT, RRT, OCT, ASD, CCT and more).",
-  },
-];
+function buildFaqItems(live: boolean) {
+  return [
+    {
+      question: 'Do I have to buy anything to start?',
+      answer:
+        'No. Every learner gets the Free Library at no cost and no card required. When you are ready, buy any individual course outright — a yearly membership is an optional path for 100% access.',
+    },
+    {
+      question: "What's included in a yearly membership?",
+      answer: live
+        ? 'Yearly membership gives 100% access to all published CARSI courses for one learner for 12 months, plus the IICRC CEC tracking dashboard and certificate wallet.'
+        : 'Yearly membership is coming soon and is not available to purchase yet. When it launches, it will give 100% access to all published CARSI courses for one learner for 12 months, plus the IICRC CEC tracking dashboard and certificate wallet. Buy any course individually today.',
+    },
+    {
+      question: 'Do CARSI courses count toward IICRC CECs?',
+      answer:
+        "CARSI's catalogue includes IICRC CEC Accredited courses where stated. Your dashboard includes a CEC tracking dashboard that logs completed credits, broken down by discipline (WRT, CRT, OCT, ASD, CCT and more).",
+    },
+  ];
+}
 
 const breadcrumbs = [
   { name: 'Home', url: 'https://carsi.com.au' },
@@ -66,10 +74,13 @@ const FREE_FEATURES = [
 ];
 
 export default function PricingPage() {
+  const live = subscriptionsEnabled();
+  const faqItems = buildFaqItems(live);
+
   return (
     <>
       <BreadcrumbSchema items={breadcrumbs} />
-      <FAQSchema questions={FAQ_ITEMS} />
+      <FAQSchema questions={faqItems} />
 
       <main id="main-content" className="min-h-screen bg-[#f6f8fb] px-4 py-14 text-slate-900">
         <div className="mx-auto max-w-6xl">
@@ -81,8 +92,9 @@ export default function PricingPage() {
               Membership &amp; Pricing
             </h1>
             <p className="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-slate-600">
-              Buy any course individually. Free Library for everyone — no card required. Yearly
-              membership and Teams plans are coming soon.
+              {live
+                ? 'Buy any course individually, unlock 100% access with yearly membership, or choose Teams seat plans for your crew.'
+                : 'Buy any course individually. Free Library for everyone — no card required. Yearly membership and Teams plans are coming soon.'}
             </p>
             <p className="mx-auto mt-4 max-w-2xl rounded-lg border border-[#f2cf8f] bg-[#fff8ed] px-4 py-3 text-sm leading-relaxed text-[#7a3500]">
               CARSI courses earn IICRC Continuing Education Credits (CECs). They are not IICRC
@@ -115,7 +127,7 @@ export default function PricingPage() {
             </Link>
           </section>
 
-          <PricingTiers subscriptionsEnabled={subscriptionsEnabled()} />
+          <PricingTiers subscriptionsEnabled={live} />
 
           <section aria-label="Free Library" className="mb-16">
             <div className="mx-auto max-w-md">
@@ -153,7 +165,7 @@ export default function PricingPage() {
           <section aria-label="Frequently asked questions" className="mb-8">
             <h2 className="mb-6 text-2xl font-bold text-slate-950">Frequently Asked Questions</h2>
             <div className="flex flex-col divide-y divide-slate-200 rounded-lg border border-slate-200 bg-white px-5 shadow-sm">
-              {FAQ_ITEMS.map((item) => (
+              {faqItems.map((item) => (
                 <details key={item.question} className="group py-4">
                   <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-sm font-medium text-slate-800 hover:text-slate-950">
                     {item.question}

@@ -174,12 +174,12 @@ Apply across all campaigns to prevent wasted spend:
 **Variation A — Authority**
 | Element | Copy |
 |---------|------|
-| Headline 1 | IICRC-Approved Restoration Courses |
+| Headline 1 | IICRC CEC Accredited Restoration Courses |
 | Headline 2 | Online Training — Study at Your Pace |
 | Headline 3 | Earn CECs From Anywhere in Australia |
 | Headline 4 | WRT, ASD, AMRT Certifications |
 | Headline 5 | Trusted by 500+ Australian Technicians |
-| Description 1 | Gain IICRC-approved certifications in water damage restoration, mould remediation and structural drying. 100% online, self-paced. Start today. |
+| Description 1 | Earn IICRC CECs toward your certification in water damage restoration, mould remediation and structural drying. 100% online, self-paced. Start today. |
 | Description 2 | Earn Continuing Education Credits recognised across Australia. Complete courses between jobs — no roster disruption. Verifiable digital certificates included. |
 
 **Variation B — Urgency**
@@ -197,7 +197,7 @@ Apply across all campaigns to prevent wasted spend:
 | Element | Copy |
 |---------|------|
 | Headline 1 | Restoration Training Bundles from $295 |
-| Headline 2 | IICRC-Approved — Earn Real CECs |
+| Headline 2 | IICRC CEC Accredited — Earn Real CECs |
 | Headline 3 | 40+ Courses Available Online |
 | Headline 4 | Subscription Access — $795/Year |
 | Headline 5 | Upskill Without Leaving the Job Site |
@@ -214,7 +214,7 @@ Apply across all campaigns to prevent wasted spend:
 | Headline 3 | IICRC Certifications for Mining Sites |
 | Headline 4 | FIFO-Friendly — Study Between Shifts |
 | Headline 5 | Reduce Mould Liability on Site |
-| Description 1 | Mould in FIFO accommodation is a costly liability. Train your team in IICRC-approved mould assessment and remediation — fully online, no roster disruption. |
+| Description 1 | Mould in FIFO accommodation is a costly liability. Train your team in IICRC CEC Accredited mould assessment and remediation — fully online, no roster disruption. |
 | Description 2 | WHS compliance training designed for mining professionals. Earn verifiable IICRC credentials your HSE team can audit. Digital certificates with public verification URL. |
 
 **Variation B — ROI**
@@ -225,7 +225,7 @@ Apply across all campaigns to prevent wasted spend:
 | Headline 3 | Online IICRC CEC Courses for Mining Teams |
 | Headline 4 | Group Licensing Available |
 | Headline 5 | Trusted by WA & QLD Mining Sites |
-| Description 1 | One mould incident at a FIFO camp can cost $500K+. Train supervisors in IICRC-approved mould assessment for a fraction of the cost. Group rates available. |
+| Description 1 | One mould incident at a FIFO camp can cost $500K+. Train supervisors in IICRC CEC Accredited mould assessment for a fraction of the cost. Group rates available. |
 | Description 2 | Upskill your mining crew in water damage, mould and structural drying. Self-paced courses designed for shift workers. Bulk enrolment discounts for 10+ seats. |
 
 **Variation C — Speed**
@@ -236,7 +236,7 @@ Apply across all campaigns to prevent wasted spend:
 | Headline 3 | No Classroom — No Roster Disruption |
 | Headline 4 | Certificate on Completion |
 | Headline 5 | WHS Mould & Water Damage Courses |
-| Description 1 | Enrol your team in minutes. IICRC-approved courses in mould assessment, water damage response and structural drying. Ideal for FIFO rosters — 100% online. |
+| Description 1 | Enrol your team in minutes. IICRC CEC Accredited courses in mould assessment, water damage response and structural drying. Ideal for FIFO rosters — 100% online. |
 | Description 2 | Mining safety training that fits around shift work. Complete modules on any device, earn your certificate, and verify credentials via public URL. Start now. |
 
 ### Campaign 3: Aged Care
@@ -246,10 +246,10 @@ Apply across all campaigns to prevent wasted spend:
 |---------|------|
 | Headline 1 | Aged Care Mould Training — Online |
 | Headline 2 | Infection Control Certification |
-| Headline 3 | IICRC-Approved for Facility Managers |
+| Headline 3 | IICRC CEC Accredited for Facility Managers |
 | Headline 4 | Protect Residents & Staff |
 | Headline 5 | Comply with Aged Care Standards |
-| Description 1 | Mould and water damage in aged care facilities put vulnerable residents at risk. Train your team in IICRC-approved remediation — fully online, self-paced. |
+| Description 1 | Mould and water damage in aged care facilities put vulnerable residents at risk. Train your team in IICRC CEC Accredited remediation — fully online, self-paced. |
 | Description 2 | Meet facility compliance requirements with certified mould and infection control training. Digital certificates included. Group licensing for multi-site operators. |
 
 **Variation B — Risk**
@@ -261,7 +261,7 @@ Apply across all campaigns to prevent wasted spend:
 | Headline 4 | Verifiable Digital Certificates |
 | Headline 5 | Group Rates for Multi-Site Operators |
 | Description 1 | Aged care quality standards require proactive mould management. Ensure your team holds IICRC-recognised credentials. Enrol online — no disruption to care rosters. |
-| Description 2 | From facility managers to maintenance staff — everyone handling mould should be trained. CARSI offers IICRC-approved courses tailored to aged care environments. |
+| Description 2 | From facility managers to maintenance staff — everyone handling mould should be trained. CARSI offers IICRC CEC Accredited courses tailored to aged care environments. |
 
 **Variation C — Value**
 | Element | Copy |
@@ -271,20 +271,20 @@ Apply across all campaigns to prevent wasted spend:
 | Headline 3 | Unlimited Access — $795/Year |
 | Headline 4 | Train Your Whole Team Online |
 | Headline 5 | Australian-Owned Training Platform |
-| Description 1 | Affordable IICRC-approved training for aged care teams. Individual courses from $79 or unlimited annual access at $795. Bulk discounts for 10+ staff. |
-| Description 2 | Australian-owned, IICRC-approved training designed for aged care. Mould assessment, remediation, indoor air quality. Start your team today — instant access. |
+| Description 1 | Affordable IICRC CEC Accredited training for aged care teams. Individual courses from $79 or unlimited annual access at $795. Bulk discounts for 10+ staff. |
+| Description 2 | Australian-owned, IICRC CEC Accredited training designed for aged care. Mould assessment, remediation, indoor air quality. Start your team today — instant access. |
 
 ### Campaign 4: Healthcare
 
 **Variation A**
 | Element | Copy |
 |---------|------|
-| Headline 1 | Hospital Mould Training — IICRC Approved |
+| Headline 1 | Hospital Mould Training — IICRC CEC Accredited |
 | Headline 2 | Healthcare Remediation Courses Online |
 | Headline 3 | Protect Patients & Meet Compliance |
 | Headline 4 | Digital Certificates Included |
 | Headline 5 | Self-Paced — No Roster Disruption |
-| Description 1 | Healthcare facilities face strict indoor air quality standards. Train your maintenance team in IICRC-approved mould remediation and water damage response. 100% online. |
+| Description 1 | Healthcare facilities face strict indoor air quality standards. Train your maintenance team in IICRC CEC Accredited mould remediation and water damage response. 100% online. |
 | Description 2 | From hospitals to medical centres — mould is a patient safety issue. Earn IICRC credentials your compliance team can verify. Group enrolment rates available. |
 
 ### Campaign 5: Commercial Cleaning
@@ -310,7 +310,7 @@ Apply across all campaigns to prevent wasted spend:
 | Headline 3 | Structural Drying Certification |
 | Headline 4 | Protect Your Builds from Mould |
 | Headline 5 | Digital Certificate on Completion |
-| Description 1 | Water ingress and mould during construction cause costly delays. Train your site team in IICRC-approved structural drying and mould prevention. Fully online. |
+| Description 1 | Water ingress and mould during construction cause costly delays. Train your site team in IICRC CEC Accredited structural drying and mould prevention. Fully online. |
 | Description 2 | Builders and project managers — reduce defect liability with IICRC credentials. Self-paced courses in water damage, mould assessment and restoration. Start today. |
 
 ---

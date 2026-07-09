@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Retail & Shopping Centre IICRC CEC Training',
   description:
-    'IICRC CEC training for shopping centre maintenance teams. Pre-qualify for major landlord panels with WRT, RRT and OCT credentials.',
+    'IICRC CEC training for shopping centre maintenance teams. Pre-qualify for major landlord panels with WRT, CRT and OCT credentials.',
   keywords: [
     'retail IICRC CEC training',
     'shopping centre restoration',
@@ -32,7 +32,7 @@ const ACCENT_COLOR = '#dc2626';
 
 const disciplines = [
   { code: 'WRT', label: 'Water Damage Restoration', color: '#dc2626' },
-  { code: 'RRT', label: 'Carpet Repair & Reinstallation', color: '#b91c1c' },
+  { code: 'CRT', label: 'Carpet Repair & Reinstallation', color: '#b91c1c' },
   { code: 'OCT', label: 'Odour Control', color: '#991b1b' },
   { code: 'FSRT', label: 'Fire & Smoke Restoration', color: '#7f1d1d' },
 ];
@@ -94,8 +94,8 @@ export default async function RetailIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="Retail & Shopping Centres"
-        disciplineList="WRT, RRT, OCT & FSRT"
-        disciplines={['WRT', 'RRT', 'OCT', 'FSRT']}
+        disciplineList="WRT, CRT, OCT & FSRT"
+        disciplines={['WRT', 'CRT', 'OCT', 'FSRT']}
       />
 
       <ContractorAddOns accentColor={ACCENT_COLOR} />
@@ -104,7 +104,7 @@ export default async function RetailIndustryPage() {
         subtitle="Shopping Centre Training"
         title="Retail Contractor Bundle"
         price={industryBundlePriceLabel('retail')}
-        description="WRT + RRT + OCT training for shopping centre maintenance teams. Equip your crew for rapid tenant restoration and food court compliance."
+        description="WRT + CRT + OCT training for shopping centre maintenance teams. Equip your crew for rapid tenant restoration and food court compliance."
         ctaText="Get Started"
         accentColor={ACCENT_COLOR}
       />

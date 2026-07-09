@@ -118,7 +118,7 @@ export const pathwayAdvisorOptions: PathwayAdvisorOption[] = [
       'Busy restoration staff',
       'Learners with an expiry date',
     ],
-    recommendedDisciplines: ['WRT', 'ASD', 'AMRT', 'FSRT', 'OCT', 'RRT', 'CCT'],
+    recommendedDisciplines: ['WRT', 'ASD', 'AMRT', 'FSRT', 'OCT', 'CRT', 'CCT'],
     firstAction:
       'Pick a discipline, enrol, complete the required modules, then download certificate evidence.',
     retentionCue:
@@ -174,7 +174,7 @@ export const pathwayAdvisorOptions: PathwayAdvisorOption[] = [
     summary:
       'For healthcare, hospitality, education, aged care, logistics, and facility teams facing water, mould, odour, carpet, or downtime risk.',
     bestFor: ['Facility managers', 'Hotel and healthcare teams', 'Education and logistics sites'],
-    recommendedDisciplines: ['WRT', 'AMRT', 'OCT', 'RRT'],
+    recommendedDisciplines: ['WRT', 'AMRT', 'OCT', 'CRT'],
     firstAction:
       'Choose the industry risk, then enrol the team in the matching first-response course set.',
     retentionCue:

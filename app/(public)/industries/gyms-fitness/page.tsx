@@ -16,7 +16,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'IICRC CEC Mould & Odour Training for Gyms & Fitness Centres',
   description:
-    'Protect your members and your reputation. IICRC AMRT, OCT, and RRT training for Australian gyms, pools, and fitness facilities. Online, self-paced, CEC Accredited.',
+    'Protect your members and your reputation. IICRC AMRT, OCT, and CRT training for Australian gyms, pools, and fitness facilities. Online, self-paced, CEC Accredited.',
   keywords: [
     'gym mould training Australia',
     'fitness centre IICRC CEC course',
@@ -35,7 +35,7 @@ const ACCENT_COLOR = '#43a047';
 const disciplines = [
   { code: 'AMRT', label: 'Applied Microbial Remediation', color: '#43a047' },
   { code: 'OCT', label: 'Odour Control Technician', color: '#388e3c' },
-  { code: 'RRT', label: 'Carpet Cleaning Technician', color: '#2e7d32' },
+  { code: 'CRT', label: 'Carpet Cleaning Technician', color: '#2e7d32' },
 ];
 
 const stats = [
@@ -119,8 +119,8 @@ export default async function GymsFitnessIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="Gyms & Fitness Centres"
-        disciplineList="AMRT, OCT & RRT"
-        disciplines={['AMRT', 'OCT', 'RRT']}
+        disciplineList="AMRT, OCT & CRT"
+        disciplines={['AMRT', 'OCT', 'CRT']}
       />
 
       <ContractorAddOns accentColor={ACCENT_COLOR} />

@@ -97,7 +97,13 @@ function inScope(file) {
 const EXEMPT = [
   'scripts/check-iicrc-terminology.mjs',
   'CLAUDE.md',
-  '.claude/skills/carsi-course-production/SKILL.md',
+  'skills/context/project-context.skill.md',
+  // The course-asset-kit engine's banned-phrase scanner mirrors this guard's
+  // regexes and messages, and its tests use the banned phrases as fixtures to
+  // prove the scan fires — same rationale as exempting this guard itself.
+  'src/lib/course-kit/iicrc-phrases.ts',
+  'src/lib/course-kit/iicrc-phrases.test.ts',
+  'src/lib/course-kit/scaffold.test.ts',
 ];
 
 function isExempt(file) {

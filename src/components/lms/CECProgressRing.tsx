@@ -36,7 +36,7 @@ const DISCIPLINE_BADGES: Record<string, string> = {
   FSRT: '/images/badges/discipline-fsrt.webp',
   OCT: '/images/badges/discipline-oct.webp',
   CCT: '/images/badges/discipline-cct.webp',
-  RRT: '/images/badges/discipline-rrt.webp',
+  CRT: '/images/badges/discipline-crt.webp',
 };
 
 export function CECProgressRing({

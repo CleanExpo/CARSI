@@ -42,7 +42,7 @@ const industries = [
     description: 'Hotels, resorts, casinos, cruise ships',
     Icon: Hotel,
     color: '#8e44ad',
-    disciplines: ['WRT', 'RRT', 'ASD', 'OCT'],
+    disciplines: ['WRT', 'CRT', 'ASD', 'OCT'],
   },
   {
     slug: 'government-defence',
@@ -58,7 +58,7 @@ const industries = [
     description: 'Cleaning contractors, facility services',
     Icon: Sparkles,
     color: '#2490ed',
-    disciplines: ['CCT', 'RRT', 'WRT', 'AMRT'],
+    disciplines: ['CCT', 'CRT', 'WRT', 'AMRT'],
   },
   {
     slug: 'aged-care',
@@ -66,7 +66,7 @@ const industries = [
     description: 'Residential aged care facilities',
     Icon: Shield,
     color: '#27ae60',
-    disciplines: ['RRT', 'AMRT', 'WRT'],
+    disciplines: ['CRT', 'AMRT', 'WRT'],
   },
   {
     slug: 'education',
@@ -74,7 +74,7 @@ const industries = [
     description: 'Schools, universities',
     Icon: GraduationCap,
     color: '#3498db',
-    disciplines: ['AMRT', 'WRT', 'RRT', 'ASD'],
+    disciplines: ['AMRT', 'WRT', 'CRT', 'ASD'],
   },
   {
     slug: 'insurance',
@@ -90,7 +90,7 @@ const industries = [
     description: 'Building managers, body corporate',
     Icon: Layers,
     color: '#9b59b6',
-    disciplines: ['WRT', 'RRT', 'AMRT', 'ASD'],
+    disciplines: ['WRT', 'CRT', 'AMRT', 'ASD'],
   },
   {
     slug: 'mining',
@@ -106,7 +106,7 @@ const industries = [
     description: 'Shopping centres, major landlords',
     Icon: Store,
     color: '#e74c3c',
-    disciplines: ['WRT', 'RRT', 'OCT', 'FSRT'],
+    disciplines: ['WRT', 'CRT', 'OCT', 'FSRT'],
   },
   {
     slug: 'childcare',
@@ -114,7 +114,7 @@ const industries = [
     description: 'Early childhood centres',
     Icon: Baby,
     color: '#e91e63',
-    disciplines: ['RRT', 'AMRT'],
+    disciplines: ['CRT', 'AMRT'],
   },
   {
     slug: 'construction',
@@ -130,7 +130,7 @@ const industries = [
     description: 'Property managers, real estate',
     Icon: Building,
     color: '#673ab7',
-    disciplines: ['WRT', 'RRT', 'ASD'],
+    disciplines: ['WRT', 'CRT', 'ASD'],
   },
   {
     slug: 'plumbing-trades',
@@ -146,7 +146,7 @@ const industries = [
     description: 'SIL, SDA, disability providers',
     Icon: Heart,
     color: '#5c6bc0',
-    disciplines: ['AMRT', 'WRT', 'RRT'],
+    disciplines: ['AMRT', 'WRT', 'CRT'],
   },
   {
     slug: 'gyms-fitness',
@@ -154,7 +154,7 @@ const industries = [
     description: 'Gyms, pools, fitness facilities',
     Icon: Activity,
     color: '#43a047',
-    disciplines: ['AMRT', 'OCT', 'RRT'],
+    disciplines: ['AMRT', 'OCT', 'CRT'],
   },
   {
     slug: 'real-estate',
@@ -178,7 +178,7 @@ const industries = [
     description: 'Caravan parks, holiday accommodation',
     Icon: Tent,
     color: '#26a69a',
-    disciplines: ['AMRT', 'RRT', 'WRT'],
+    disciplines: ['AMRT', 'CRT', 'WRT'],
   },
 ];
 

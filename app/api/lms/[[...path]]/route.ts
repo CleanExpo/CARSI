@@ -13,7 +13,7 @@ function inferDisciplineFromCourseSlug(slug: string): string {
   if (/(water|flood|moisture|wrt|drying|psychrom)/.test(s)) return 'WRT';
   if (/(mould|mold|microbial|amrt|bio)/.test(s)) return 'AMRT';
   if (/(fire|smoke|soot|fsrt)/.test(s)) return 'FSRT';
-  if (/(carpet.*repair|\brrt\b|\bcrt\b)/.test(s)) return 'RRT'; // legacy 'crt' input still maps here
+  if (/(carpet.*repair|crt|\bcrt\b)/.test(s)) return 'CRT';
   if (/(carpet.*clean|commercial.*clean|cct)/.test(s)) return 'CCT';
   if (/(structural.*dry|asd\b)/.test(s)) return 'ASD';
   return 'WRT';
@@ -29,7 +29,7 @@ const HUB_KEYWORDS: Record<string, string[]> = {
   WRT: ['Water damage technician', 'Restoration technician', 'Flood response'],
   AMRT: ['Mould remediation technician', 'Microbial remediation'],
   FSRT: ['Fire restoration technician', 'Smoke damage specialist'],
-  RRT: ['Carpet repair technician', 'Flooring restoration'],
+  CRT: ['Carpet repair technician', 'Flooring restoration'],
   CCT: ['Commercial carpet cleaning', 'Carpet cleaning technician'],
   ASD: ['Structural drying technician', 'Water restoration'],
 };

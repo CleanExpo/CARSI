@@ -45,16 +45,9 @@ export function SubscribeCta({
     );
   }
 
-  // Active member — nothing to buy; point them at the catalogue.
+  // Active member — catalogue + billing portal.
   if (reason === 'active' || reason === 'grace') {
-    return (
-      <Link
-        href="/dashboard/courses"
-        className="flex w-full items-center justify-center rounded-lg bg-[#1b7f48] py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-      >
-        Browse your included courses
-      </Link>
-    );
+    return <ActiveMembershipActions />;
   }
 
   async function startCheckout() {
@@ -97,6 +90,52 @@ export function SubscribeCta({
       </button>
       {error ? <p className="text-center text-sm text-red-600">{error}</p> : null}
       <p className="text-center text-xs text-slate-600">Secure checkout via Stripe. GST included.</p>
+    </>
+  );
+}
+
+function ActiveMembershipActions() {
+  const [portalLoading, setPortalLoading] = useState(false);
+  const [portalError, setPortalError] = useState<string | null>(null);
+
+  async function openPortal() {
+    setPortalLoading(true);
+    setPortalError(null);
+    try {
+      const data = await apiClient.post<{ url?: string }>('/api/lms/subscription/portal', {
+        return_url: `${window.location.origin}/subscribe`,
+      });
+      if (data.url) {
+        window.location.href = data.url;
+        return;
+      }
+      setPortalError('Billing portal is not available yet.');
+    } catch (err) {
+      setPortalError(
+        err instanceof ApiClientError ? err.message : 'Could not open billing portal.',
+      );
+    } finally {
+      setPortalLoading(false);
+    }
+  }
+
+  return (
+    <>
+      <Link
+        href="/dashboard/courses"
+        className="flex w-full items-center justify-center rounded-lg bg-[#1b7f48] py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+      >
+        Browse your included courses
+      </Link>
+      <button
+        type="button"
+        onClick={openPortal}
+        disabled={portalLoading}
+        className="text-center text-sm text-[#146fc2] underline hover:text-[#0f5fa8] disabled:opacity-60"
+      >
+        {portalLoading ? 'Opening billing portal…' : 'Manage billing & payment method'}
+      </button>
+      {portalError ? <p className="text-center text-sm text-red-600">{portalError}</p> : null}
     </>
   );
 }

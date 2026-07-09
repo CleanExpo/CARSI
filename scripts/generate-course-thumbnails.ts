@@ -56,12 +56,12 @@ const MODEL = process.env.OPENAI_IMAGE_MODEL?.trim() || 'gpt-image-1';
 const IMAGE_SIZE = '1536x1024';
 const HARD_CAP = Number(process.env.THUMBNAIL_MAX_GENERATIONS ?? 25);
 
-const DISCIPLINE_CODES = ['WRT', 'RRT', 'ASD', 'OCT', 'CCT', 'FSRT', 'AMRT'] as const;
+const DISCIPLINE_CODES = ['WRT', 'CRT', 'ASD', 'OCT', 'CCT', 'FSRT', 'AMRT'] as const;
 
 /** Discipline accent translated to colour WORDS (gpt-image-1 follows prose better than hex). */
 const DISCIPLINE_PALETTE_WORDS: Record<string, string> = {
   WRT: 'cool corporate blues and clean water tones (#146fc2 family)',
-  RRT: 'fresh teal and soft restorative green tones',
+  CRT: 'fresh teal and soft restorative green tones',
   ASD: 'calm indigo and structural blue-violet tones',
   OCT: 'soft purples and fresh, airy lilac tones',
   CCT: 'bright clean cyan and aqua tones',
@@ -183,11 +183,8 @@ function inferDiscipline(course: CourseLite): string | null {
   const explicit = course.iicrcDiscipline?.trim().toUpperCase();
   if (explicit && (DISCIPLINE_CODES as readonly string[]).includes(explicit)) return explicit;
 
-  const catMatch = course.category?.trim().match(/^(WRT|RRT|CRT|ASD|OCT|CCT|FSRT|AMRT)\b/i);
-  if (catMatch) {
-    const code = catMatch[1]!.toUpperCase();
-    return code === 'CRT' ? 'RRT' : code; // legacy CARSI code for Carpet Repair & Reinstallation
-  }
+  const catMatch = course.category?.trim().match(/^(WRT|CRT|ASD|OCT|CCT|FSRT|AMRT)\b/i);
+  if (catMatch) return catMatch[1]!.toUpperCase();
 
   const hay = `${course.title} ${course.category ?? ''}`.toLowerCase();
   if (/\bfire|smoke|soot\b/.test(hay)) return 'FSRT';
@@ -195,7 +192,7 @@ function inferDiscipline(course: CourseLite): string | null {
   if (/structural drying|applied structural/.test(hay)) return 'ASD';
   if (/\bodour|odor|deodoris|deodoriz\b/.test(hay)) return 'OCT';
   if (/commercial carpet/.test(hay)) return 'CCT';
-  if (/carpet/.test(hay)) return 'RRT';
+  if (/carpet/.test(hay)) return 'CRT';
   if (/water (damage|restoration)|\bwrt\b/.test(hay)) return 'WRT';
   return null;
 }

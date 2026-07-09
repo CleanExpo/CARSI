@@ -55,9 +55,7 @@ function HtmlParagraph({
   html: string;
   variant: 'intro' | 'body';
 }) {
-  // ADD_ATTR keeps target="_blank" on external resource links (e.g. SDS PDFs);
-  // rel="noopener noreferrer" is authored alongside it in the lesson content.
-  const safe = DOMPurify.sanitize(html, { ADD_ATTR: ['target'] });
+  const safe = DOMPurify.sanitize(html);
   if (variant === 'intro') {
     return (
       <div className="relative overflow-hidden rounded-xl border border-[#2490ed]/20 bg-gradient-to-br from-[#eef7ff] via-white to-white p-6 sm:p-7">
@@ -94,7 +92,7 @@ function HtmlListBlock({ items }: { items: Array<{ html: string }> }) {
       <ul className="grid gap-3 sm:grid-cols-2">
         {items.map((item, i) => {
           const { title, body } = splitListItemTitle(item.html);
-          const safe = DOMPurify.sanitize(item.html, { ADD_ATTR: ['target'] });
+          const safe = DOMPurify.sanitize(item.html);
           return (
             <li
               key={i}

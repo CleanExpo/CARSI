@@ -1,0 +1,225 @@
+{
+  "courseSlug": "avian-influenza-awareness-restoration-iaq-facilities",
+  "version": 1,
+  "decks": [
+    {
+      "module": "Module 1: Official message and reporting pathway",
+      "cards": [
+        {
+          "front": "If a sick or dead bird or animal is found, what is the public message?",
+          "back": "Do not touch it. Avoid the area. Keep children and pets away. Record the location and what is seen, take photos or video only if safe, and report to the Emergency Animal Disease Hotline on 1800 675 888."
+        },
+        {
+          "front": "What is the Emergency Animal Disease Hotline number?",
+          "back": "1800 675 888 - the number to report a sick or dead bird or animal."
+        },
+        {
+          "front": "What is the professional communication position on H5 bird flu?",
+          "back": "Calm and evidence-led: follow Australian Government and Australian Centre for Disease Control advice, avoid speculation, and direct the public to the correct reporting pathway."
+        },
+        {
+          "front": "Why should a professional never tell the public a site is 'infected' or 'safe'?",
+          "back": "That judgement sits with the relevant authorities. Use neutral language instead: observed, reported, excluded from scope, referred to authority."
+        },
+        {
+          "front": "What has Australia reported in relation to H5 bird flu?",
+          "back": "H5 bird flu detections in migratory seabirds."
+        },
+        {
+          "front": "What short reminder captures the reporting pathway?",
+          "back": "Report first. Do not touch. Record the location. Call 1800 675 888."
+        },
+        {
+          "front": "Whose advice should professionals follow on H5 bird flu?",
+          "back": "Australian Government and Australian Centre for Disease Control (CDC) advice."
+        }
+      ]
+    },
+    {
+      "module": "Module 2: Professional role, scope and boundaries",
+      "cards": [
+        {
+          "front": "What is the restoration or IAQ professional's role in an H5 situation?",
+          "back": "Support, not authority replacement. The role is to document, protect workers and communicate clearly; official disease response sits with the relevant authorities."
+        },
+        {
+          "front": "Name tasks a professional can assist with.",
+          "back": "Site notes and photo records, access control and exclusion-zone records, worker-safety planning, PPE record keeping, cleaning records, product-label and SDS record checks, client communication notes, RestoreAssist.app reporting, and escalation to the correct authority pathway."
+        },
+        {
+          "front": "What must professionals not do?",
+          "back": "Handle wildlife without authorisation, diagnose avian influenza, certify a site as disease-free, override government/veterinary/wildlife/public-health authorities, or claim a product or dry-fogging method is required without written authority direction and product evidence."
+        },
+        {
+          "front": "Can a professional certify a site as disease-free?",
+          "back": "No. Certifying a site as disease-free is outside scope; official disease response sits with the relevant authorities."
+        },
+        {
+          "front": "Who might a restoration or IAQ professional be asked to assist?",
+          "back": "Property owners, facility managers, strata managers, insurers or contractors."
+        },
+        {
+          "front": "Under what condition may a professional claim a dry-fogging method is required?",
+          "back": "Only where written authority direction and product evidence support that claim - never as a default assumption."
+        },
+        {
+          "front": "What three actions summarise the professional's proper role?",
+          "back": "Document, protect workers, and communicate clearly."
+        }
+      ]
+    },
+    {
+      "module": "Module 3: Worker safety, PPE awareness and clean/dirty zones",
+      "cards": [
+        {
+          "front": "What must be completed before any site work?",
+          "back": "A site-specific WHS risk assessment."
+        },
+        {
+          "front": "Why does this course not prescribe a universal PPE set?",
+          "back": "Because PPE must be matched to the task, risk, authority guidance, product label and SDS."
+        },
+        {
+          "front": "What is the purpose of clean and dirty zones?",
+          "back": "To reduce confusion and cross-contamination risk."
+        },
+        {
+          "front": "What should PPE records show?",
+          "back": "What PPE was selected, who wore it, whether there were breaches, and what waste or equipment movement was excluded from the job."
+        },
+        {
+          "front": "What does the site-specific WHS risk assessment help you determine?",
+          "back": "What has been observed, whether authorities have been contacted, whether the site is under direction, and whether the work is within the contractor's scope."
+        },
+        {
+          "front": "List some documentation fields for a site.",
+          "back": "Who attended, what was observed, whether sick or dead birds or animals were present, whether the hotline or authority pathway was used, PPE selected, access restrictions, client instructions, work not performed, and photos with timestamps."
+        },
+        {
+          "front": "What principle sums up the importance of records in this module?",
+          "back": "If it is not documented, it cannot be reviewed."
+        }
+      ]
+    },
+    {
+      "module": "Module 4: Cleaning-before-disinfection and product-claim limits",
+      "cards": [
+        {
+          "front": "What is CARSI's training position on the order of work?",
+          "back": "Clean first, disinfect second, document third."
+        },
+        {
+          "front": "What limits apply to disinfection claims?",
+          "back": "They must never exceed the product label, SDS, regulator position or evidence base."
+        },
+        {
+          "front": "Can hydrogen-peroxide dry fogging (e.g. Halosil or HaloFogger-style systems) be described as required by Australian Government H5 control measures?",
+          "back": "No - not unless a written authority direction and product evidence support that claim."
+        },
+        {
+          "front": "Under what conditions may dry fogging be discussed as a possible adjunct method?",
+          "back": "Only where it is legal, label-supported, risk-assessed, unoccupied where required, and performed by trained operators after source removal and cleaning."
+        },
+        {
+          "front": "How must NeoSan or any other product training be approached?",
+          "back": "It must remain label-led and SDS-led until approved H5 or relevant organism claims are verified."
+        },
+        {
+          "front": "What separates product training from product hype?",
+          "back": "Product training is led by the label, SDS, evidence and authority direction; it is not hype."
+        }
+      ]
+    },
+    {
+      "module": "Module 5: RestoreAssist.app documentation pathway",
+      "cards": [
+        {
+          "front": "What is RestoreAssist.app?",
+          "back": "The documentation pathway for campaign field records."
+        },
+        {
+          "front": "What should a professional file allow a reader to understand?",
+          "back": "What was observed, what was reported, what was done, what was not done, and what evidence supported the decision."
+        },
+        {
+          "front": "Name some suggested record sections in a RestoreAssist file.",
+          "back": "Intake notes, site address and contact, observation notes, authority/reporting record, photos and captions, worker attendance, PPE record, access control, cleaning record, product and SDS record, exclusion and limitation notes, client communication, and a completion statement."
+        },
+        {
+          "front": "Who should be able to understand a professional file?",
+          "back": "A client, insurer, supervisor or authority."
+        },
+        {
+          "front": "What does RestoreAssist turn a job into?",
+          "back": "A defensible record rather than a memory."
+        },
+        {
+          "front": "Why include exclusion and limitation notes in a file?",
+          "back": "To record what was not done and the scope limits, so the file clearly explains the decisions and the evidence behind them."
+        }
+      ]
+    },
+    {
+      "module": "Module 6: Client, media and social communication",
+      "cards": [
+        {
+          "front": "What tone must this campaign's communication take?",
+          "back": "Measured and calm."
+        },
+        {
+          "front": "When may terms such as 'crisis', 'outbreak' or 'emergency' be used?",
+          "back": "Only if those are the exact words used by authorities for the current situation."
+        },
+        {
+          "front": "Give an example of approved wording.",
+          "back": "'We follow Australian Government advice. Do not touch sick or dead birds. Report to 1800 675 888. Our role is documentation, worker safety and professional support.'"
+        },
+        {
+          "front": "What should professional communication avoid?",
+          "back": "Fear-based headlines, unsupported claims, fake statistics, fake expert quotes, fake portraits, unapproved personal contact details, and product claims that exceed evidence."
+        },
+        {
+          "front": "How is the professional's role described in public wording?",
+          "back": "Documentation, worker safety and professional support - not replacing government, veterinary, wildlife or public-health authorities."
+        },
+        {
+          "front": "What is the effect of calm language versus panic language?",
+          "back": "Calm language builds trust; panic language damages credibility."
+        },
+        {
+          "front": "What must any product-use messaging follow?",
+          "back": "Label, SDS and authority requirements."
+        }
+      ]
+    },
+    {
+      "module": "Module 7: Knowledge check and completion",
+      "cards": [
+        {
+          "front": "What professional-boundary statement must you confirm before the knowledge check?",
+          "back": "That your role is to report, protect, document and communicate within scope - you do not diagnose bird flu, handle wildlife without authorisation, certify sites as disease-free, or make product claims unsupported by label, SDS, regulator position and evidence."
+        },
+        {
+          "front": "What four actions define the professional's role in the boundary statement?",
+          "back": "Report, protect, document and communicate - always within scope."
+        },
+        {
+          "front": "What does the certificate disclaimer state this training is?",
+          "back": "Awareness training only - not veterinary, medical, wildlife handling or government biosecurity response training."
+        },
+        {
+          "front": "On what basis must any product claim be supported?",
+          "back": "Label, SDS, regulator position and evidence."
+        },
+        {
+          "front": "Is this course veterinary or wildlife-handling training?",
+          "back": "No. It is awareness training only and does not cover veterinary, medical, wildlife handling or government biosecurity response."
+        },
+        {
+          "front": "What must you do with the professional-boundary statement during the quiz?",
+          "back": "Apply it while answering the quiz questions."
+        }
+      ]
+    }
+  ]
+}

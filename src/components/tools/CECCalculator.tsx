@@ -27,7 +27,7 @@ import {
    IICRC CEC Requirements Data
    ---------------------------------------- */
 
-type Discipline = 'WRT' | 'RRT' | 'ASD' | 'AMRT' | 'FSRT' | 'OCT' | 'CCT';
+type Discipline = 'WRT' | 'CRT' | 'ASD' | 'AMRT' | 'FSRT' | 'OCT' | 'CCT';
 type CertLevel = 'none' | 'technician' | 'master';
 
 interface DisciplineInfo {
@@ -49,7 +49,7 @@ const DISCIPLINES: DisciplineInfo[] = [
     avgCecsPerCourse: 3,
   },
   {
-    code: 'RRT',
+    code: 'CRT',
     name: 'Carpet Repair & Reinstallation Technology',
     description: 'Flooring and soft furnishing restoration',
     cecsPerCycle: { none: 0, technician: 14, master: 21 },

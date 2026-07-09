@@ -2,8 +2,6 @@
 
 import { useCallback, useState } from 'react';
 
-import { IICRC_DISCIPLINE_URL } from '@/lib/iicrc-discipline-display';
-
 const DISCIPLINES = [
   {
     id: 'WRT',
@@ -13,8 +11,8 @@ const DISCIPLINES = [
     blurb: 'Drying, psychrometry & flood response.',
   },
   {
-    id: 'RRT',
-    label: 'RRT',
+    id: 'CRT',
+    label: 'CRT',
     fullName: 'Carpet Repair & Reinstallation',
     color: '#047857',
     blurb: 'Repair, re-stretch & installation standards.',
@@ -77,7 +75,6 @@ export function IICRCDisciplineMap() {
   const [locked, setLocked] = useState<string | null>(null);
 
   const activeId = locked ?? hovered;
-  const activeDiscipline = DISCIPLINES.find((d) => d.id === activeId) ?? null;
 
   const setHover = useCallback((id: string | null) => {
     setHovered(id);
@@ -330,22 +327,8 @@ export function IICRCDisciplineMap() {
           })}
         </div>
 
-        <p className="relative z-[1] px-4 pb-1 text-center text-[11px] text-slate-600">
+        <p className="relative z-[1] px-4 pb-4 text-center text-[11px] text-slate-600">
           Hover on desktop or tap a node on mobile — tap again to clear.
-        </p>
-        <p className="relative z-[1] min-h-[28px] px-4 pb-4 text-center text-[12px]">
-          {activeDiscipline && IICRC_DISCIPLINE_URL[activeDiscipline.id] ? (
-            <a
-              href={IICRC_DISCIPLINE_URL[activeDiscipline.id]}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-medium text-[#0f5fa8] underline underline-offset-2 hover:text-[#0b4e88]"
-            >
-              {activeDiscipline.label} — {activeDiscipline.fullName} on iicrc.org ↗
-            </a>
-          ) : (
-            <span className="text-slate-400">Select a discipline to view it on iicrc.org.</span>
-          )}
         </p>
       </div>
     </div>

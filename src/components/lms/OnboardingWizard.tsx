@@ -117,7 +117,7 @@ const FLOW: FlowItem[] = [
     key: 'disciplines_held',
     options: [
       { value: 'WRT', label: 'WRT — Water' },
-      { value: 'RRT', label: 'RRT — Carpet' },
+      { value: 'CRT', label: 'CRT — Carpet' },
       { value: 'ASD', label: 'ASD — Structural drying' },
       { value: 'AMRT', label: 'AMRT — Microbial' },
       { value: 'FSRT', label: 'FSRT — Fire & smoke' },

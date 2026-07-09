@@ -36,7 +36,7 @@ const TESTIMONIALS: Testimonial[] = [
     name: 'Yasser Mohamed',
     company: 'Black Gold Carpet Cleaning',
     quote:
-      "Running my own carpet cleaning business means training has to fit around the job. CARSI's 24/7 online access let me complete my RRT preparation between callouts. Worth every dollar.",
+      "Running my own carpet cleaning business means training has to fit around the job. CARSI's 24/7 online access let me complete my CRT preparation between callouts. Worth every dollar.",
   },
   {
     name: 'Klark Brown',

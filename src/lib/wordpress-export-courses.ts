@@ -56,9 +56,8 @@ const CATEGORY_SLUG_TO_DISCIPLINE: Record<string, string> = {
   'water-damage-courses': 'WRT',
   wrt: 'WRT',
   'carpet-cleaning': 'CCT',
-  'carpet-restoration': 'RRT',
-  crt: 'RRT',
-  rrt: 'RRT',
+  'carpet-restoration': 'CRT',
+  crt: 'CRT',
   'odour-control': 'OCT',
   'odor-control': 'OCT',
   oct: 'OCT',
@@ -88,10 +87,9 @@ export function inferDisciplineFromWpExport(row: WpExportCourse): string | null 
     }
   }
   const combined = `${row.category ?? ''} ${row.title ?? ''}`.toUpperCase();
-  for (const code of ['WRT', 'RRT', 'ASD', 'AMRT', 'OCT', 'CCT', 'FSRT'] as const) {
+  for (const code of ['WRT', 'CRT', 'ASD', 'AMRT', 'OCT', 'CCT', 'FSRT'] as const) {
     if (combined.includes(code)) return code;
   }
-  if (combined.includes('CRT')) return 'RRT'; // legacy CARSI code for Carpet Repair & Reinstallation
   const title = (row.title ?? '').toLowerCase();
   if (title.includes('water') || title.includes('flood')) return 'WRT';
   if (title.includes('mould') || title.includes('mold') || title.includes('microbial'))

@@ -15,13 +15,13 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Aged Care IICRC CEC Training',
   description:
-    'NQF-compliant IICRC CEC training for aged care facilities. RRT and AMRT courses for carpet restoration, mould remediation, and infection control.',
+    'NQF-compliant IICRC CEC training for aged care facilities. CRT and AMRT courses for carpet restoration, mould remediation, and infection control.',
   keywords: [
     'aged care IICRC CEC training',
     'NQF compliance training',
     'residential care cleaning certification',
     'AMRT aged care',
-    'RRT aged care Australia',
+    'CRT aged care Australia',
   ],
 };
 
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
 const ACCENT_COLOR = '#27ae60';
 
 const disciplines = [
-  { code: 'RRT', label: 'Carpet Restoration', color: '#26c4a0' },
+  { code: 'CRT', label: 'Carpet Restoration', color: '#26c4a0' },
   { code: 'AMRT', label: 'Applied Microbial Remediation', color: '#27ae60' },
 ];
 
@@ -46,7 +46,7 @@ const faqs = [
   {
     question: 'What IICRC certifications do aged care facilities need?',
     answer:
-      'Australian aged care facilities typically require RRT (Carpet Restoration) for high-traffic flooring maintenance and AMRT (Applied Microbial Remediation) for mould and infection control. These certifications support National Quality Framework compliance and demonstrate competency to aged care auditors.',
+      'Australian aged care facilities typically require CRT (Carpet Restoration) for high-traffic flooring maintenance and AMRT (Applied Microbial Remediation) for mould and infection control. These certifications support National Quality Framework compliance and demonstrate competency to aged care auditors.',
   },
   {
     question: 'How does IICRC CEC training support Aged Care Quality Standards?',
@@ -112,8 +112,8 @@ export default async function AgedCareIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="Aged Care Industry"
-        disciplineList="RRT & AMRT"
-        disciplines={['RRT', 'AMRT']}
+        disciplineList="CRT & AMRT"
+        disciplines={['CRT', 'AMRT']}
       />
 
       <ContractorAddOns accentColor={ACCENT_COLOR} />

@@ -8,8 +8,6 @@ import { CourseFormattedBody } from '@/components/lms/CourseFormattedBody';
 import { CourseThumbnail } from '@/components/lms/CourseThumbnail';
 import { CourseHubContext } from '@/components/lms/CourseHubContext';
 import { CourseSchema, BreadcrumbSchema, VideoObjectSchema } from '@/components/seo';
-import { SchemaMarkup, buildFaqSchema } from '@/lib/schema';
-import { getCourseMarketing } from '@/lib/seo/course-marketing';
 import { getBackendOrigin, getPublicSiteUrl } from '@/lib/env/public-url';
 import { isOnboardingCourse } from '@/lib/onboarding/enterprise';
 import { normalizePublicAssetUrl } from '@/lib/remote-image';
@@ -153,7 +151,7 @@ export async function generateMetadata({
 
 const DISCIPLINE_LABELS: Record<string, string> = {
   WRT: 'Water Restoration Technology',
-  RRT: 'Carpet Repair & Reinstallation Technology',
+  CRT: 'Carpet Repair & Reinstallation Technology',
   ASD: 'Applied Structural Drying',
   AMRT: 'Applied Microbial Remediation Technology',
   FSRT: 'Fire & Smoke Restoration Technology',
@@ -168,11 +166,11 @@ const DISCIPLINE_AUDIENCE: Record<string, string[]> = {
     'Property managers handling water emergencies',
     'Technicians pursuing IICRC WRT certification',
   ],
-  RRT: [
+  CRT: [
     'Carpet and flooring restoration technicians',
     'Soft furnishing specialists',
     'Insurance restoration professionals',
-    'Technicians pursuing IICRC RRT certification',
+    'Technicians pursuing IICRC CRT certification',
   ],
   ASD: [
     'Senior restoration technicians advancing from WRT',
@@ -237,7 +235,7 @@ function getLearningOutcomes(course: CourseDetail): string[] {
     outcomes.push('Evaluate fire and smoke damage to determine appropriate restoration methods');
   } else if (discipline === 'OCT') {
     outcomes.push('Identify odour sources and select effective deodorisation techniques');
-  } else if (discipline === 'RRT') {
+  } else if (discipline === 'CRT') {
     outcomes.push('Master carpet seaming, stretching, and reinstallation techniques');
   } else if (discipline === 'CCT') {
     outcomes.push('Select correct cleaning methods for commercial carpet fibre types');
@@ -332,11 +330,6 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
         />
       ) : null}
       <BreadcrumbSchema items={breadcrumbs} />
-      {(() => {
-        // AEO/GEO: FAQPage JSON-LD from the course's marketing metadata (data/seo/course-cards).
-        const faqs = getCourseMarketing(slug)?.faq;
-        return faqs?.length ? <SchemaMarkup schema={buildFaqSchema({ faqs })} /> : null;
-      })()}
 
       <main id="main-content" className="relative min-h-screen" style={{ background: '#060a14' }}>
         {/* ── Mesh background ── */}
@@ -915,8 +908,8 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                     }}
                   >
                     This is an IICRC Continuing Education Credit (CEC) course. It is not an IICRC
-                    certification course — IICRC certifications are obtained through IICRC-approved
-                    schools and examinations.
+                    certification course — IICRC certifications are obtained through
+                    IICRC-approved schools and examinations.
                   </p>
                 </div>
               </section>

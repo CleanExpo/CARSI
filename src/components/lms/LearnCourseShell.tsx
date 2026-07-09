@@ -25,6 +25,7 @@ import {
   type ProgressShareType,
 } from '@/lib/lms/progress-share-post';
 import { isOnboardingCourse, parseOnboardingMeta } from '@/lib/onboarding/enterprise';
+import type { LessonResource } from '@/lib/lms/lesson-resources';
 import { extractQuizIdFromLesson } from '@/lib/lms/quiz-from-lesson';
 
 interface CurriculumLesson {
@@ -71,7 +72,7 @@ interface LessonApiLesson {
 
 interface LessonDetailResponse {
   lesson: LessonApiLesson;
-  resources: { label?: string; url?: string }[];
+  resources: LessonResource[];
   enrollment_id: string;
   course: { id: string; slug: string; title: string };
 }

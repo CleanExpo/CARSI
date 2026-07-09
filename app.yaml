@@ -12,7 +12,7 @@ services:
       branch: main
       deploy_on_push: true
 
-    dockerfile_path: Dockerfile
+    dockerfile_path: deploy/Dockerfile
     http_port: 8080
     source_dir: /
     instance_count: 2
@@ -86,7 +86,7 @@ services:
 jobs:
   - name: migrate
     kind: PRE_DEPLOY
-    dockerfile_path: Dockerfile.migrate
+    dockerfile_path: deploy/Dockerfile.migrate
     source_dir: /
     github:
       repo: CleanExpo/CARSI
