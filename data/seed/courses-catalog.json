@@ -5365,6 +5365,219 @@
           ]
         }
       ]
+    },
+    {
+      "id": "7a186ba6-90ee-45a4-b8da-f67dbc5b2076",
+      "slug": "category-3-sewage-black-water-remediation",
+      "title": "Category 3 — Sewage & Black-Water Remediation",
+      "description": "<p>A foundational, Australian-produced course for restoration technicians and supervisors who respond to grossly contaminated water losses &mdash; sewage overflows, failed septic systems and flood water &mdash; and for supervisors and insurance-support staff who need to understand how these high-risk jobs are controlled. It is <strong>S500-aligned CEC training</strong> &mdash; it aligns to the principles of professional water damage restoration for Category&nbsp;3 losses and is designed to build sound field judgement, not to replace a technician&rsquo;s own certification, a manufacturer&rsquo;s instructions, a Safety Data Sheet, or a site&rsquo;s own rules.</p><p>Seven modules treat Category&nbsp;3 as the health-and-safety job it is: what black water is and why porous materials usually cannot be saved, the health hazards and a documented risk assessment/SWMS, PPE selection and decontamination for a biohazard, containment/removal/cleaning with <strong>Australian-registered (APVMA/TGA) products</strong>, lawful disposal under the state EPA and water authority (trade waste, AS/NZS&nbsp;3500), and drying, verification and a defensible file. Australian throughout: Safe Work Australia and state WHS duties, Poisons Information 13&nbsp;11&nbsp;26, AU building stock, and the mould-remediation sequence (AFDs + dehumidifiers, air movers only after clearance). A ten-question knowledge check closes the course.</p>",
+      "shortDescription": "S500-aligned CEC training in Category&nbsp;3 (sewage &amp; black-water) remediation &mdash; hazard-led risk assessment and SWMS, biohazard PPE and decontamination, containment/removal/cleaning with Australian-registered products, lawful disposal under state EPA/water authority, and drying and verification, produced for Australian conditions.",
+      "thumbnailUrl": null,
+      "instructorId": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+      "status": "draft",
+      "priceAud": "0",
+      "isFree": true,
+      "durationHours": 4,
+      "level": "Foundational",
+      "category": "Water Damage Restoration",
+      "tags": [
+        "category 3",
+        "sewage",
+        "black water",
+        "biohazard",
+        "PPE",
+        "decontamination",
+        "S500-aligned",
+        "Australian"
+      ],
+      "iicrcDiscipline": "WRT",
+      "cecHours": 0,
+      "meta": {
+        "audience": "restoration technicians and supervisors",
+        "discipline": "S500-aligned CEC training (Category 3)",
+        "buildStage": "seeded-unpublished-draft-pending-founder-review",
+        "linearIssue": "GP-472",
+        "australianProduced": true,
+        "standardsReferenced": "Nominative only (ANSI/IICRC S500 Category 3; AS/NZS 3500 sanitary plumbing). No standard text reproduced (IICRC AI Use Policy honoured)."
+      },
+      "isPublished": false,
+      "modules": [
+        {
+          "id": "3cbefc8f-ef5e-4ead-9c46-cdb3cec2ffa6",
+          "title": "Module 1: Course Objectives & How This Training Works",
+          "orderIndex": 0,
+          "lessons": [
+            {
+              "id": "317ddc13-bfb6-4f32-813e-b3944547ad2f",
+              "title": "What this course covers and who it is for",
+              "contentType": "text",
+              "contentBody": "<p>Welcome to <strong>Category&nbsp;3 &mdash; Sewage &amp; Black-Water Remediation</strong>. This course is for restoration technicians and supervisors in Australia who attend jobs involving grossly contaminated water &mdash; sewage overflows, rising flood water and similar &mdash; and for supervisors and insurance-support staff who need to understand how these high-risk jobs are assessed, controlled and documented. By the end you will be able to:</p><ul><li>identify Category&nbsp;3 (black) water and explain why it is treated as a biological hazard, not just \"dirty water\";</li><li>carry out a health-and-safety risk assessment before work starts, including the people in and around the building;</li><li>select and use the correct personal protective equipment (PPE) for a biohazard, and decontaminate properly;</li><li>set up containment, decide what must be discarded, and clean and sanitise salvageable materials with Australian-registered products;</li><li>dispose of contaminated water and waste lawfully under the relevant state regulator and Australian rules; and</li><li>dry, verify and document the job to a defensible standard.</li></ul><p>This is <strong>S500-aligned CEC training</strong>: it aligns to the principles of professional water damage restoration for Category&nbsp;3 losses. It builds field judgement and does not replace your own certification, a manufacturer&rsquo;s instructions, a Safety Data Sheet (SDS), a relevant Australian standard, or a site&rsquo;s own rules. Category&nbsp;3 work can make people seriously ill &mdash; when in doubt, stop and escalate.</p>",
+              "orderIndex": 0,
+              "isPreview": true,
+              "resources": null
+            },
+            {
+              "id": "7c454b01-42cb-4784-aa45-7d48a380851f",
+              "title": "How this fits with water damage restoration and where the line is",
+              "contentType": "text",
+              "contentBody": "<p>Water damage restoration categorises water by how contaminated it is likely to be. <strong>Category&nbsp;1</strong> is clean water from a sanitary source; <strong>Category&nbsp;2</strong> is significantly contaminated (\"grey\") water that can cause illness; <strong>Category&nbsp;3</strong> is grossly contaminated (\"black\") water that contains harmful agents &mdash; sewage, water from beyond the toilet trap, rising ground water and flood water from rivers or the sea, and any water that has been sitting long enough or in conditions that let microbial growth take hold.</p><p>Category is not fixed. Category&nbsp;1 or 2 water that is left, that passes through contaminated materials, or that supports microbial growth <strong>deteriorates to Category&nbsp;3</strong> over time and conditions. Treat the water in front of you by what it is now, not by where it started.</p><p>This is fundamentally a <strong>health-and-safety job</strong> that happens to involve water. In Australia it sits under Safe Work Australia and state WHS duties for biological hazards, and the disposal side sits under state environment and water authorities. If mould is also present, the mould-remediation sequence applies (Module&nbsp;7) &mdash; do not simply blow air across contaminated surfaces.</p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": null
+            }
+          ]
+        },
+        {
+          "id": "24612020-fdc8-4d25-bb65-ce059fa2bd43",
+          "title": "Module 2: What Category 3 Water Is & Why It Is Different",
+          "orderIndex": 1,
+          "lessons": [
+            {
+              "id": "a4a9031e-7d0d-4389-9a27-d8d942cc3af0",
+              "title": "Sources and behaviour of black water",
+              "contentType": "text",
+              "contentBody": "<p>Category&nbsp;3 water carries harmful agents &mdash; bacteria, viruses, protozoa, and often chemicals and silt. Common Australian sources include:</p><ul><li><strong>Sewage</strong> &mdash; toilet overflows involving anything beyond the trap, blocked or surcharging sewer mains, failed septic systems (common in regional and rural properties on-site wastewater).</li><li><strong>Flood water</strong> &mdash; river and stormwater flooding, which in Australia can carry agricultural chemicals, animal waste, fuel, silt and debris from a large catchment.</li><li><strong>Rising ground water and sea water</strong> intruding into a building.</li><li><strong>Deteriorated Category&nbsp;1/2 water</strong> that has supported microbial growth.</li></ul><p>Because the hazard is biological and chemical, the response is decontamination and safe disposal, not simply extraction and drying. Assume the water, and everything it has touched, is contaminated until your assessment says otherwise.</p>",
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "c308ea9d-1872-4570-8fe3-01f0e8995843",
+              "title": "Why porous materials usually cannot be saved",
+              "contentType": "text",
+              "contentBody": "<p>The more porous a material, the deeper contamination penetrates and the harder &mdash; usually impossible &mdash; it is to clean and verify. As a general rule for Category&nbsp;3:</p><ul><li><strong>Discard</strong> saturated porous materials that cannot be effectively cleaned and verified: carpet and underlay, most insulation, contaminated plasterboard/gyprock, particleboard and chipboard, and soft furnishings that were wetted.</li><li><strong>Assess and often salvage</strong> non-porous and semi-porous materials &mdash; sealed concrete, glass, metal, glazed tile, solid timber &mdash; if they can be thoroughly cleaned, sanitised and verified.</li></ul><p>The decision is driven by health risk and whether cleaning can be <em>verified</em>, not by replacement cost. Removing contaminated porous material is often the single most important step in making the building safe, and it must be bagged and disposed of as contaminated waste (Module&nbsp;6). Record what was removed and why &mdash; it is central to a defensible file and to the insurance discussion.</p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": null
+            }
+          ]
+        },
+        {
+          "id": "18f4860c-187b-4a87-a8b9-30e4f438edb0",
+          "title": "Module 3: Health Hazards & Risk Assessment",
+          "orderIndex": 2,
+          "lessons": [
+            {
+              "id": "63f8eca3-d4e4-4308-bc17-bbcdb8b5a88b",
+              "title": "The health hazards of Category 3 work",
+              "contentType": "text",
+              "contentBody": "<p>Category&nbsp;3 water can cause gastrointestinal illness, skin and wound infections, respiratory illness and, less commonly, serious disease. Routes of exposure are ingestion (hand-to-mouth), contact with broken skin, and inhalation of aerosols and, later, mould spores. Risk is higher for the very young, the elderly, pregnant people and anyone immune-compromised &mdash; who must be kept away from the affected area.</p><p>Two hazards often travel with sewage and flood jobs and must be considered in the assessment: <strong>mould</strong>, which grows quickly on wet organic material and is handled by the remediation sequence in Module&nbsp;7; and, in older Australian buildings, <strong>asbestos-containing materials</strong> in wet sheeting, vinyl and eaves &mdash; if asbestos is suspected, stop and treat it under the separate asbestos process, do not disturb it.</p>",
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "ef2da34b-6fa4-4aee-9ca3-3d7e9f15dc45",
+              "title": "Risk assessment before work starts",
+              "contentType": "text",
+              "contentBody": "<p>Before anyone enters, complete a documented risk assessment and a <strong>Safe Work Method Statement (SWMS)</strong>. Cover: the source and extent of the water; who is in and around the building (and getting vulnerable occupants out); electrical safety on a wet site (isolate power, use a safety switch/RCD); structural and slip hazards; the presence of mould or suspected asbestos; PPE required (Module&nbsp;4); containment and access; and the disposal plan (Module&nbsp;6).</p><p>Keep the Australian emergency and information numbers to hand: <strong>000</strong> for emergencies and the <strong>Poisons Information Centre on 13&nbsp;11&nbsp;26</strong> for exposure advice. Induct every worker to the SWMS before they start, and record it. On a Category&nbsp;3 site the risk assessment is not paperwork for its own sake &mdash; it is what keeps your crew and the occupants from getting sick.</p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": null
+            }
+          ]
+        },
+        {
+          "id": "ef558a37-acfc-4777-86e6-d2127553c0be",
+          "title": "Module 4: PPE & Personal Safety",
+          "orderIndex": 3,
+          "lessons": [
+            {
+              "id": "fd9a0df5-0545-4e04-85ff-ffd5cc933bb5",
+              "title": "Selecting PPE for a biohazard",
+              "contentType": "text",
+              "contentBody": "<p>PPE for Category&nbsp;3 is selected for the biological (and any chemical) hazard, not by habit. A typical minimum for hands-on sewage/black-water work includes:</p><ul><li><strong>Body:</strong> a fluid-resistant coverall (disposable where practical);</li><li><strong>Hands:</strong> chemical/biological-resistant gloves, often over an inner glove;</li><li><strong>Feet:</strong> waterproof boots that can be cleaned or are disposable;</li><li><strong>Eyes/face:</strong> goggles or a face shield to stop splashes;</li><li><strong>Respiratory:</strong> at least a properly fitted P2 respirator; a higher level where aerosols, strong odours or mould are present.</li></ul><p>Respiratory protection only works if it <strong>fits and seals</strong> &mdash; fit-test, and no facial hair under the seal. Match the PPE to the hazards found in the risk assessment, and step it up (for example, to fuller respiratory protection) whenever the assessment says so. All PPE and its selection should be recorded in the SWMS.</p>",
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "c399c6e4-5aa6-42b1-b836-b01ffb266eda",
+              "title": "Hygiene, decontamination and avoiding cross-contamination",
+              "contentType": "text",
+              "contentBody": "<p>The point of PPE is to keep contamination on the outside and off the worker &mdash; so how you remove it matters as much as wearing it. Set up a <strong>decontamination routine</strong>: a clean/dirty boundary at the exit of the work area; remove PPE in the right order so contaminated surfaces do not touch skin; bag disposable PPE as contaminated waste; and wash hands and any exposed skin thoroughly.</p><p>Do not eat, drink, smoke or touch your face in the work area. Keep contaminated tools, materials and PPE from travelling into clean parts of the building or into vehicles &mdash; cross-contamination undoes the whole job and can spread illness. Anyone who suffers a cut, splash to the eyes or mouth, or feels unwell should stop, decontaminate, and seek advice (Poisons Information 13&nbsp;11&nbsp;26, or medical care for injuries or illness). Record any incident.</p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": null
+            }
+          ]
+        },
+        {
+          "id": "120bb9f2-1099-42b6-b5f1-f756cbc6f32f",
+          "title": "Module 5: Containment, Removal, Cleaning & Sanitising",
+          "orderIndex": 4,
+          "lessons": [
+            {
+              "id": "3f396d75-da68-4896-b006-ad4ebd91f466",
+              "title": "Containment and removal",
+              "contentType": "text",
+              "contentBody": "<p>Contain the affected area before disturbing anything, so contamination and aerosols do not spread through the building: isolate the space (close it off or use containment sheeting), control access through the decontamination boundary, and use air filtration (negative air / AFDs with HEPA filtration) where aerosols or mould are a concern.</p><p>Then remove what cannot be saved (Module&nbsp;2): extract the contaminated water, and cut out and bag saturated porous materials &mdash; carpet and underlay, affected plasterboard, insulation, particleboard. Double-bag or wrap contaminated waste at the point of removal and take it out through the controlled route, not through clean areas. Removing the contaminated material is what actually reduces the hazard; cleaning comes after removal, not instead of it.</p>",
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "fba6eaa9-ab26-4b33-8889-6bcf82e27e76",
+              "title": "Cleaning and sanitising with Australian-registered products",
+              "contentType": "text",
+              "contentBody": "<p>Once contaminated porous materials are out, clean all salvageable surfaces: remove visible soiling first (you cannot sanitise over grime), then apply an appropriate antimicrobial and allow the required contact (\"dwell\") time. Cleaning is mechanical; sanitising only works on an already-clean surface.</p><p><strong>Use products that are legal to use for this purpose in Australia.</strong> Antimicrobial and disinfectant products are regulated here &mdash; agricultural/veterinary and many surface antimicrobials fall under the <strong>APVMA</strong>, and products making therapeutic claims fall under the <strong>TGA</strong>; do not rely on a US EPA registration as if it applied here. Follow the Australian label and the SDS exactly: dilution, contact time, ventilation and PPE. Never mix products (for example, bleach with acids or ammonia) &mdash; it can create dangerous gases. Record the products used, their registration, and dwell times in the job file.</p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": null
+            }
+          ]
+        },
+        {
+          "id": "3d507762-ac2c-411c-9dcf-f3036ca6ad4a",
+          "title": "Module 6: Safe Disposal & the Australian Regulatory Context",
+          "orderIndex": 5,
+          "lessons": [
+            {
+              "id": "981554ab-4305-4ef5-8faf-6628deceb276",
+              "title": "Disposing of contaminated water and waste lawfully",
+              "contentType": "text",
+              "contentBody": "<p>Category&nbsp;3 water and the materials it soaked are <strong>contaminated waste</strong> and must be disposed of lawfully &mdash; you cannot simply pour sewage water down a stormwater drain or send saturated sewage-soaked material to general landfill without checking the rules.</p><ul><li><strong>Contaminated water</strong> generally goes to the sewer under the water authority&rsquo;s <strong>trade-waste</strong> rules, or is removed by a licensed liquid-waste contractor &mdash; not to stormwater, which runs to the environment.</li><li><strong>Solid contaminated waste</strong> (bagged porous materials, PPE) is disposed of per the <strong>state environment authority (EPA)</strong> and the receiving facility&rsquo;s requirements for that waste type.</li><li>Plumbing and sanitary work interfaces with <strong>AS/NZS&nbsp;3500</strong> and must be done by appropriately licensed trades.</li></ul><p>Rules vary by state and local council, so confirm the requirements for the job&rsquo;s location before you dispose of anything, and keep disposal records (dockets, contractor details). Lawful disposal is both a legal duty and part of a defensible file.</p>",
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "57378979-c2ef-44fa-ba41-a20b54916419",
+              "title": "Working within Australian regulation",
+              "contentType": "text",
+              "contentBody": "<p>Category&nbsp;3 restoration sits inside several Australian regulatory systems at once, and knowing which body governs what keeps the job lawful:</p><ul><li><strong>Safe Work Australia and the state WHS regulator</strong> &mdash; worker health and safety, biological hazards, PPE, SWMS.</li><li><strong>State environment authority (EPA)</strong> and the <strong>water authority</strong> &mdash; disposal of contaminated water and waste, trade-waste approvals.</li><li><strong>APVMA / TGA</strong> &mdash; the antimicrobial and disinfectant products you are allowed to use and the claims that can be made.</li><li><strong>Australian Consumer Law</strong> &mdash; honest description of the work and outcomes to the customer and insurer.</li></ul><p>You do not need to be a lawyer, but you do need to know that these systems apply, work to Australian labels and standards rather than imported US ones, and bring in licensed trades (plumbing, asbestos, liquid-waste) when the job calls for them.</p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": null
+            }
+          ]
+        },
+        {
+          "id": "c28b3086-091e-443d-b847-a57755dd8a0e",
+          "title": "Module 7: Drying, Verification & Documentation",
+          "orderIndex": 6,
+          "lessons": [
+            {
+              "id": "5a6c6bd9-34c8-41b7-9c32-bd67d4ba42a2",
+              "title": "Drying after decontamination — and the mould rule",
+              "contentType": "text",
+              "contentBody": "<p>Structural drying comes <strong>after</strong> the contamination is removed and surfaces are cleaned and sanitised &mdash; you dry a clean structure, not a contaminated one. Once decontamination is complete, apply the applied-structural-drying approach: set a dry standard, use dehumidification and controlled airflow, and monitor with metric psychrometry until materials reach goal.</p><p><strong>The mould rule governs the airflow decision.</strong> If mould is present or found, do not run air movers across affected surfaces &mdash; contain, run air filtration devices (AFDs) and dehumidifiers to control moisture, remediate (clean and remove) the mould, and only introduce air movers once the area is cleaned and cleared. Blowing air across mouldy or still-contaminated material spreads spores and pathogens through the building and undoes the decontamination.</p>",
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "d8f93a76-14d2-41ea-a61e-6a971b9c2268",
+              "title": "Verification, clearance and the defensible file",
+              "contentType": "text",
+              "contentBody": "<p>A Category&nbsp;3 job is finished when the area is verified clean, dry and safe &mdash; not when it merely looks tidy. Verify by the standard set for the job: contamination removed, surfaces cleaned and sanitised, materials dried to the dry standard confirmed by readings, and, where mould was involved, the area cleaned and cleared before it was closed.</p><p>The documentation is what protects everyone afterwards, in an Australian insurance or health context. A defensible file records: the initial risk assessment and SWMS; the category determination and why; what was removed and why; the products used with their Australian registration and dwell times; the disposal records; the drying record and final readings; and any incidents. If you cannot show it was done safely and completely, you cannot prove the building is safe &mdash; and on a sewage or flood job, that proof is the whole point.</p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": null
+            }
+          ]
+        }
+      ]
     }
   ]
 }

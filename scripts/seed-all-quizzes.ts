@@ -32,6 +32,7 @@ const QUIZ_FILES = [
   'water-damage-restoration-fundamentals-quiz.json',
   'applied-microbial-remediation-mould-fundamentals-quiz.json',
   'applied-structural-drying-fundamentals-quiz.json',
+  'category-3-sewage-black-water-remediation-quiz.json',
 ];
 
 type QuizQuestion = {
