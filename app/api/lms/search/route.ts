@@ -53,7 +53,8 @@ export async function GET(request: NextRequest) {
         slug: course.slug,
         title: course.title,
         iicrc_discipline: course.iicrcDiscipline,
-        cec_hours: course.cecHours != null ? String(course.cecHours) : null,
+        cec_hours:
+          course.cecHours != null && Number(course.cecHours) > 0 ? String(course.cecHours) : null,
         is_onboarding: onboarding,
         program_label: onboarding ? (meta?.program ?? 'Organisation onboarding') : null,
       };
