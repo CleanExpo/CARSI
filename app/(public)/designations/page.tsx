@@ -10,7 +10,7 @@ export const revalidate = 300;
 export const metadata = {
   title: 'CARSI Designations — Southern Hemisphere Restoration Credentials',
   description:
-    'Earn a CARSI Southern Hemisphere Restoration Designation — Australian-produced restoration credentials that also earn IICRC Continuing Education Credits (CECs).',
+    'CARSI Southern Hemisphere Restoration Designations complement the IICRC — Australian-produced credentials for training the IICRC does not offer, that also earn IICRC Continuing Education Credits (CECs). Not an IICRC certification.',
 };
 
 export default function DesignationsIndexPage() {
@@ -29,6 +29,12 @@ export default function DesignationsIndexPage() {
       <p className="mt-4 max-w-3xl text-base leading-relaxed text-slate-600">
         {registry.programSummary}
       </p>
+
+      {registry.positioning && (
+        <p className="mt-5 max-w-3xl rounded-xl border border-[#2490ed]/20 bg-[#2490ed]/[0.05] px-4 py-3 text-sm font-medium text-[#0f5fa8]">
+          {registry.positioning}
+        </p>
+      )}
 
       <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {summaries.map((s) => (

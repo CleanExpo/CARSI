@@ -32,6 +32,8 @@ export type DesignationRegistry = {
   version: number;
   program: string;
   programSummary: string;
+  /** One-line complement-not-compete positioning for prominent display. */
+  positioning?: string;
   designations: DesignationDefinition[];
 };
 
@@ -57,4 +59,18 @@ export function getDesignationDefinition(slug: string): DesignationDefinition | 
 /** Pathway steps sorted by their `order`. */
 export function orderedSteps(designation: DesignationDefinition): DesignationPathwayStep[] {
   return [...designation.pathwaySteps].sort((a, b) => a.order - b.order);
+}
+
+/**
+ * The CARSI designation a course *earns* (its credential course), or null.
+ * A course is a designation's credential when it appears as a `credential`
+ * pathway step. Used to brand the course detail page with its CARSI designation
+ * instead of an IICRC discipline. Safe on both server and client.
+ */
+export function getDesignationForCourseSlug(courseSlug: string): DesignationDefinition | null {
+  return (
+    REGISTRY.designations.find((d) =>
+      d.pathwaySteps.some((s) => s.role === 'credential' && s.courseSlug === courseSlug),
+    ) ?? null
+  );
 }

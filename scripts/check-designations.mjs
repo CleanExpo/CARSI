@@ -33,6 +33,15 @@ if (cat && reg) {
     if (seenSlug.has(d.slug)) err(`${id}: duplicate designation slug`);
     seenSlug.add(d.slug);
     if (!d.name || !d.name.startsWith('CARSI ')) err(`${id}: name must start with "CARSI "`);
+    // Practitioner-only convention: CARSI designations must NOT reuse IICRC's
+    // credential nouns (Technician/Specialist/Master), so no CARSI designation is
+    // identical to an IICRC one (founder directive 2026-07-10).
+    if (d.name && !/\bPractitioner$/.test(d.name)) {
+      err(`${id}: name must end with "Practitioner" (CARSI designations must not reuse IICRC nouns like Technician/Specialist)`);
+    }
+    if (d.name && /\b(Technician|Specialist|Master)\b/.test(d.name)) {
+      err(`${id}: name reuses an IICRC credential noun (Technician/Specialist/Master) — use "Practitioner"`);
+    }
     if (!d.summary || d.summary.length < 20) err(`${id}: summary missing/too short`);
     if (d.alsoEarnsCec !== true && d.alsoEarnsCec !== false) err(`${id}: alsoEarnsCec must be boolean`);
     if (d.completionRule !== 'all-required') err(`${id}: completionRule must be "all-required"`);
