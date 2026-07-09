@@ -21,7 +21,7 @@ export interface CecApprovalEntry {
   /** Catalog course slug (must exist in data/seed/courses-catalog.json). */
   slug: string;
   status: CecApprovalStatus;
-  /** CEC hours the IICRC approved for this course (whole number ≥ 1). Only meaningful when status is 'approved'. */
+  /** CEC hours the IICRC has approved for this course (whole number ≥ 1). Only meaningful when status is 'approved'. */
   approvedHours?: number | null;
   /** ISO date the IICRC confirmed approval. */
   approvedAt?: string | null;
@@ -67,7 +67,7 @@ export function getCecApproval(slug: string | null | undefined): CecApprovalEntr
 }
 
 /**
- * CEC hours the IICRC approved for a course, or null when the course has no recorded
+ * CEC hours the IICRC has approved for a course, or null when the course has no recorded
  * approval. This is the ONLY legitimate read path for a CEC-hours display value.
  */
 export function getApprovedCecHours(slug: string | null | undefined): number | null {
