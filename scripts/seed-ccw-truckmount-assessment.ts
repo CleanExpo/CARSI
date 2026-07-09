@@ -11,8 +11,8 @@
  * seeded here.
  *
  * Idempotent: upserts the assessment by its stable id and replaces its criteria,
- * so re-running against an unchanged file is a no-op. Kept unpublished
- * (`isPublished: false`) — the course itself is a founder-gated draft.
+ * so re-running against an unchanged file is a no-op. `isPublished` is read from
+ * the JSON (published once the course goes live).
  *
  * Run AFTER the catalog seed (which creates the course):
  *   DATABASE_URL="postgresql://..." npm run db:seed-courses

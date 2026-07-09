@@ -4010,7 +4010,7 @@
       "shortDescription": "Specialised HydraMaster & Sapphire Scientific truck-mount operator course — Australian configuration, safe operation, transport and road-safety compliance, maintenance, and a competency sign-off. A CARSI × Carpet Cleaners Warehouse course.",
       "thumbnailUrl": null,
       "instructorId": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
-      "status": "draft",
+      "status": "published",
       "priceAud": "0",
       "isFree": true,
       "durationHours": 6,
@@ -4038,7 +4038,7 @@
         "sourceRepo": "CleanExpo/CCW-CRM docs/training/restoration-manual (Module 02 + Module 03 Units 3.1–3.6)",
         "sourceCommit": "c75f95a102e5092dc63b9b1639cd4da631d0012f",
         "linearIssue": "GP-497",
-        "buildStage": "seeded-unpublished-pending-founder-review",
+        "buildStage": "published-live (Phase 1 interactive; produced media = Phase 2)",
         "verificationGate": "Unit 3.6 Gate A: every safety-critical setpoint must be verified against the specific unit + engine manual and the operator’s State before delivery as fact.",
         "structure": "Phase 1 (interactive-first, per Toby feedback): machine-selection opener + spec cards, 7 unit reading lessons each with a flashcard deck, an auto-marked knowledge-check quiz, and a two-gate practical sign-off. Produced media (NotebookLM audio/video, slideshows, schematics) is Phase 2 via generate-course-media.yml.",
         "machineSelection": "Guided pick + tailored spec reference in the opener; the actual machine make/model/serial is captured in the practical-assessment submission (the legal record).",
@@ -4048,7 +4048,7 @@
         "notIicrc": "Manufacturer/operator course — not IICRC CEC-accredited; no CEC hours.",
         "cecHours": "0 — manufacturer/operator course, NOT IICRC CEC-accredited. Explicit 0 blocks the seed duration→CEC inference so no IICRC CEC claim renders on any surface."
       },
-      "isPublished": false,
+      "isPublished": true,
       "modules": [
         {
           "id": "b0a10000-0e5c-4b8a-9d3e-7a6f2c9b1d40",
