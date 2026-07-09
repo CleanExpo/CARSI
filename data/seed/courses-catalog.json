@@ -2549,6 +2549,11 @@
                   "label": "Lesson narration (audio)",
                   "url": "https://res.cloudinary.com/dmaulkthb/video/upload/v1782411688/carsi/course-audio/d9bd611c-8f02-426c-b944-c012375c7278.mp3",
                   "kind": "audio"
+                },
+                {
+                  "label": "The four floor-care jobs — infographic (SVG download)",
+                  "url": "https://res.cloudinary.com/dmaulkthb/image/upload/v1783556998/carsi/infographics/commercial-floor-care-four-jobs.svg",
+                  "kind": "image"
                 }
               ]
             },
