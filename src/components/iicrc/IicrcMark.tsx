@@ -37,8 +37,8 @@ export function IicrcMark({
   className,
 }: IicrcMarkProps) {
   if (!IICRC_MARK_ENABLED || !IICRC_MARK_ASSET) return null;
-  // eslint-disable-next-line @next/next/no-img-element
   return (
+    // eslint-disable-next-line @next/next/no-img-element
     <img
       src={IICRC_MARK_ASSET}
       alt={alt}
