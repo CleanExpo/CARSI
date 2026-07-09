@@ -15,6 +15,10 @@ import { OG_IMAGES, OG_IMAGE_URLS } from '@/lib/seo/og-image';
 import { getPublishedCourseDetailBySlugFromDatabase } from '@/lib/server/public-courses-list';
 import { getAggregateRating } from '@/lib/server/course-reviews';
 import { stripLegacyPurchaseCta } from '@/lib/lms/format-course-body';
+import {
+  getDesignationForCourseSlug,
+  type DesignationDefinition,
+} from '@/lib/designations/registry';
 
 // ISR: render each course detail on demand and cache for 5 minutes (issue #129).
 // Build-safe via the build-phase guard in getCourse's DB reader; publish busts the
@@ -105,7 +109,8 @@ export async function generateMetadata({
   const priceNum = parseFloat(course.price_aud);
   const thumbnailUrl = resolveAssetUrl(course.thumbnail_url);
   const priceText = course.is_free || priceNum === 0 ? 'Free' : `$${priceNum.toFixed(0)} AUD`;
-  const disciplineText = course.iicrc_discipline ? `IICRC ${course.iicrc_discipline}` : '';
+  const designation = getDesignationForCourseSlug(slug);
+  const disciplineText = designation ? `CARSI ${designation.disciplineTopic}` : 'restoration';
 
   const description =
     course.short_description ??
@@ -117,8 +122,9 @@ export async function generateMetadata({
     description,
     keywords: [
       course.title,
-      course.iicrc_discipline ?? '',
-      'IICRC training',
+      designation?.name ?? '',
+      designation?.disciplineTopic ?? '',
+      'IICRC CEC course',
       'restoration course',
       'CARSI',
     ].filter(Boolean),
@@ -149,105 +155,48 @@ export async function generateMetadata({
  * Helpers
  * --------------------------------------------------------------------------- */
 
-const DISCIPLINE_LABELS: Record<string, string> = {
-  WRT: 'Water Restoration Technology',
-  CRT: 'Carpet Repair & Reinstallation Technology',
-  ASD: 'Applied Structural Drying',
-  AMRT: 'Applied Microbial Remediation Technology',
-  FSRT: 'Fire & Smoke Restoration Technology',
-  OCT: 'Odour Control Technology',
-  CCT: 'Commercial Carpet Cleaning Technology',
-};
-
-const DISCIPLINE_AUDIENCE: Record<string, string[]> = {
-  WRT: [
-    'Water damage restoration technicians',
-    'Insurance assessors working flood & storm claims',
-    'Property managers handling water emergencies',
-    'Technicians pursuing IICRC WRT certification',
-  ],
-  CRT: [
-    'Carpet and flooring restoration technicians',
-    'Soft furnishing specialists',
-    'Insurance restoration professionals',
-    'Technicians pursuing IICRC CRT certification',
-  ],
-  ASD: [
-    'Senior restoration technicians advancing from WRT',
-    'Project managers overseeing structural drying operations',
-    'Building consultants specialising in moisture control',
-    'Technicians pursuing IICRC ASD certification',
-  ],
-  AMRT: [
-    'Mould remediation technicians',
-    'Indoor air quality specialists',
-    'Environmental health professionals',
-    'Technicians pursuing IICRC AMRT certification',
-  ],
-  FSRT: [
-    'Fire damage restoration technicians',
-    'Insurance restoration project managers',
-    'Contents restoration specialists',
-    'Technicians pursuing IICRC FSRT certification',
-  ],
-  OCT: [
-    'Odour control and deodorisation technicians',
-    'Restoration professionals expanding their service range',
-    'Commercial cleaning operators',
-    'Technicians pursuing IICRC OCT certification',
-  ],
-  CCT: [
-    'Commercial carpet cleaning operators',
-    'Contract cleaners servicing commercial facilities',
-    'Cleaning business owners expanding into commercial work',
-    'Technicians pursuing IICRC CCT certification',
-  ],
-};
-
-function getLearningOutcomes(course: CourseDetail): string[] {
+function getLearningOutcomes(
+  course: CourseDetail,
+  designation: DesignationDefinition | null
+): string[] {
   const outcomes: string[] = [];
-  const discipline = course.iicrc_discipline?.toUpperCase() ?? '';
-  const disciplineFull = DISCIPLINE_LABELS[discipline] ?? discipline;
 
-  if (disciplineFull) {
-    outcomes.push(`Understand core principles and standards of ${disciplineFull}`);
+  if (designation) {
+    outcomes.push(
+      `Work to the CARSI ${designation.disciplineTopic} standard, built for Southern-Hemisphere conditions`
+    );
   }
 
   if (course.cec_hours) {
     outcomes.push(
-      `Earn ${course.cec_hours} IICRC Continuing Education Credits (CECs) upon completion`
+      `Earn ${course.cec_hours} IICRC Continuing Education Credits (CECs) toward maintaining an existing IICRC certification`
     );
   }
 
   outcomes.push(
-    'Apply industry-standard methodologies to real-world restoration scenarios',
-    'Build competency aligned with IICRC standards (continuing education, not IICRC certification)',
+    'Apply current Australian and New Zealand methods to real-world restoration jobs',
+    'Build competency in training the IICRC does not offer locally — a CARSI-issued credential, not an IICRC certification',
     'Receive a verifiable digital credential for your professional portfolio'
   );
 
-  if (discipline === 'WRT') {
-    outcomes.push('Identify water damage categories and implement appropriate drying strategies');
-  } else if (discipline === 'ASD') {
-    outcomes.push('Calculate psychrometric conditions and design optimal drying plans');
-  } else if (discipline === 'AMRT') {
-    outcomes.push('Assess mould contamination levels and execute safe remediation protocols');
-  } else if (discipline === 'FSRT') {
-    outcomes.push('Evaluate fire and smoke damage to determine appropriate restoration methods');
-  } else if (discipline === 'OCT') {
-    outcomes.push('Identify odour sources and select effective deodorisation techniques');
-  } else if (discipline === 'CRT') {
-    outcomes.push('Master carpet seaming, stretching, and reinstallation techniques');
-  } else if (discipline === 'CCT') {
-    outcomes.push('Select correct cleaning methods for commercial carpet fibre types');
+  if (designation) {
+    outcomes.push(`Complete a required step toward the ${designation.name} designation`);
   }
 
   return outcomes;
 }
 
-function getAudienceItems(course: CourseDetail): string[] {
-  const discipline = course.iicrc_discipline?.toUpperCase() ?? '';
-  if (DISCIPLINE_AUDIENCE[discipline]) {
-    return DISCIPLINE_AUDIENCE[discipline];
+function getAudienceItems(
+  course: CourseDetail,
+  designation: DesignationDefinition | null
+): string[] {
+  if (designation) {
+    return [
+      `Restoration professionals working in ${designation.disciplineTopic}`,
+      'Technicians earning IICRC Continuing Education Credits (CECs)',
+      `Practitioners pursuing the ${designation.name} designation`,
+      'Australian and New Zealand trade professionals expanding their qualifications',
+    ];
   }
   return [
     'Restoration and cleaning industry professionals',
@@ -289,11 +238,10 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
 
   const priceNum = parseFloat(course.price_aud);
   const price = course.is_free || priceNum === 0 ? 'Free' : `$${priceNum.toFixed(0)}`;
-  const discipline = course.iicrc_discipline?.toUpperCase() ?? '';
-  const disciplineFull = DISCIPLINE_LABELS[discipline] ?? '';
+  const designation = getDesignationForCourseSlug(course.slug);
   const thumbnailUrl = resolveAssetUrl(course.thumbnail_url);
-  const learningOutcomes = getLearningOutcomes(course);
-  const audienceItems = getAudienceItems(course);
+  const learningOutcomes = getLearningOutcomes(course, designation);
+  const audienceItems = getAudienceItems(course, designation);
 
   const breadcrumbs = [
     { name: 'Home', url: siteUrl },
@@ -316,7 +264,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
         price={priceNum}
         duration={course.duration_hours ?? undefined}
         educationalLevel={course.level ?? undefined}
-        teaches={course.iicrc_discipline ? [`IICRC ${course.iicrc_discipline}`] : undefined}
+        teaches={designation ? [designation.disciplineTopic] : undefined}
         aggregateRating={aggregateRating ?? undefined}
       />
       {course.intro_video_url ? (
@@ -373,7 +321,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                 <div className="lg:col-span-2">
                   {/* Badges */}
                   <div className="mb-5 flex flex-wrap items-center gap-2">
-                    {course.iicrc_discipline && (
+                    {designation && (
                       <span
                         className="rounded-sm px-2.5 py-1 text-xs font-semibold tracking-wide uppercase"
                         style={{
@@ -382,7 +330,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                           border: '1px solid rgba(237,157,36,0.25)',
                         }}
                       >
-                        IICRC {course.iicrc_discipline}
+                        CARSI Designation
                       </span>
                     )}
                     {course.level && (
@@ -431,13 +379,13 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                     {course.title}
                   </h1>
 
-                  {/* Discipline full name */}
-                  {disciplineFull && (
+                  {/* CARSI designation this course earns */}
+                  {designation && (
                     <p
-                      className="mb-4 text-sm font-medium tracking-wide uppercase"
+                      className="mb-4 text-sm font-medium tracking-wide"
                       style={{ color: '#ed9d24' }}
                     >
-                      {disciplineFull}
+                      Earns the {designation.name}
                     </p>
                   )}
 
@@ -469,7 +417,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                   >
                     {course.short_description ??
                       course.description?.slice(0, 280) ??
-                      'Professional restoration training aligned with IICRC standards.'}
+                      'Australian-produced restoration training — a CARSI credential that also earns IICRC CECs.'}
                   </p>
 
                   {/* Instructor */}
@@ -566,7 +514,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                       src={thumbnailUrl}
                       title={course.title}
                       category={course.category}
-                      discipline={course.iicrc_discipline}
+                      discipline={designation?.disciplineTopic ?? null}
                       priceLabel={
                         course.is_free || priceNum === 0 ? 'Free' : `$${priceNum.toFixed(0)} AUD`
                       }
@@ -657,11 +605,11 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                             <span style={{ color: 'rgba(255,255,255,0.8)' }}>{course.level}</span>
                           </div>
                         )}
-                        {course.iicrc_discipline && (
-                          <div className="flex items-center justify-between text-sm">
-                            <span style={{ color: 'rgba(255,255,255,0.65)' }}>Discipline</span>
-                            <span style={{ color: '#ed9d24' }}>
-                              IICRC {course.iicrc_discipline}
+                        {designation && (
+                          <div className="flex items-center justify-between gap-4 text-sm">
+                            <span style={{ color: 'rgba(255,255,255,0.65)' }}>Designation</span>
+                            <span className="text-right" style={{ color: '#ed9d24' }}>
+                              {designation.name}
                             </span>
                           </div>
                         )}
@@ -681,7 +629,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                     {/* Career context */}
                     <div className="mt-4">
                       <CourseHubContext
-                        discipline={course.iicrc_discipline ?? ''}
+                        discipline={designation?.disciplineTopic ?? ''}
                         slug={course.slug}
                       />
                     </div>
@@ -759,10 +707,8 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                       accent: false,
                     },
                     {
-                      label: 'Discipline',
-                      value: course.iicrc_discipline
-                        ? `IICRC ${course.iicrc_discipline}`
-                        : 'General',
+                      label: 'Designation',
+                      value: designation ? designation.name : 'General',
                       accent: true,
                     },
                     ...(course.cec_hours
@@ -907,16 +853,18 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                       borderColor: 'rgba(255,255,255,0.08)',
                     }}
                   >
-                    This is an IICRC Continuing Education Credit (CEC) course. It is not an IICRC
-                    certification course — IICRC certifications are obtained through
-                    IICRC-approved schools and examinations.
+                    {designation ? `${designation.name} is a CARSI credential that ` : 'This CARSI course '}
+                    complements the IICRC — it is Southern-Hemisphere training the IICRC does not
+                    offer, not an IICRC certification. It earns IICRC Continuing Education Credits
+                    (CECs) toward maintaining an existing IICRC certification, which is obtained
+                    separately through IICRC-approved schools and examinations.
                   </p>
                 </div>
               </section>
 
               {/* ── Career context (mobile) ── */}
               <div className="lg:hidden">
-                <CourseHubContext discipline={course.iicrc_discipline ?? ''} slug={course.slug} />
+                <CourseHubContext discipline={designation?.disciplineTopic ?? ''} slug={course.slug} />
               </div>
             </div>
 

@@ -45,8 +45,8 @@ accredits the course or certification itself rather than CARSI's standing as a C
 "IICRC-certified course(s)", or "get IICRC certified with CARSI".
 
 **CARSI designation rule (founder 2026-07-10 — MUST).** CARSI issues its OWN credentials — the
-**CARSI Southern Hemisphere Restoration Designations** (e.g. "CARSI Water Restoration Technician",
-"CARSI Mould Remediation Specialist") — the way the RIA issues its own designations rather than
+**CARSI Southern Hemisphere Restoration Designations** (e.g. "CARSI Water Restoration Practitioner",
+"CARSI Mould Remediation Practitioner") — the way the RIA issues its own designations rather than
 teaching IICRC's. CARSI courses are therefore **never** branded with IICRC Registered-Training-School
 discipline **designations/acronyms** (WRT/ASD/AMRT/FSRT/CCT/TCST) and **never** described as
 "[discipline]-aligned". Set `iicrcDiscipline: null` and carry the credential in `meta.designation`.

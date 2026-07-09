@@ -125,7 +125,7 @@ const BANNED = [
     re: /\b(WRT|ASD|AMRT|FSRT|CCT|TCST|S\d{3})[\s-]*aligned\b/i,
     allow: null,
     message:
-      'CARSI courses are not "[discipline]-aligned" — brand them with their CARSI Southern Hemisphere designation (e.g. "CARSI Water Restoration Technician"). Reference IICRC S-standards nominatively only.',
+      'CARSI courses are not "[discipline]-aligned" — brand them with their CARSI Southern Hemisphere designation (e.g. "CARSI Water Restoration Practitioner"). Reference IICRC S-standards nominatively only.',
   },
   {
     // Seed course data must not store an IICRC school-designation acronym as the

@@ -21,8 +21,8 @@ vi.mock('@/lib/prisma', () => ({
 }));
 
 const DESIGNATION: DesignationDefinition = {
-  slug: 'carsi-water-restoration-technician',
-  name: 'CARSI Water Restoration Technician',
+  slug: 'carsi-water-restoration-practitioner',
+  name: 'CARSI Water Restoration Practitioner',
   disciplineTopic: 'water restoration',
   summary: 'A designation summary long enough to be valid.',
   pathwaySteps: [
