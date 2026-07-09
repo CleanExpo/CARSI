@@ -31,6 +31,7 @@ const QUIZ_FILES = [
   'ccw-truckmount.quizzes.json',
   'water-damage-restoration-fundamentals-quiz.json',
   'applied-microbial-remediation-mould-fundamentals-quiz.json',
+  'applied-structural-drying-fundamentals-quiz.json',
 ];
 
 type QuizQuestion = {
