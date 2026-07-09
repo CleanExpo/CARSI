@@ -100,7 +100,7 @@ const faq = [
   },
   {
     q: 'What standards does it draw on?',
-    a: 'Manufacturer service and owner manuals, and Australian primary authorities — NHVR, NTC, Safe Work Australia, state transport and water authorities — plus IICRC alignment. Sources are listed at the foot of each unit.',
+    a: 'Manufacturer service and owner manuals, and Australian primary authorities — NHVR, NTC, Safe Work Australia, state transport and water authorities. Sources are listed at the foot of each unit.',
   },
   {
     q: 'How do I use the pack?',
