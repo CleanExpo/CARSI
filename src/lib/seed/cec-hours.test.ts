@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { resolveCatalogCecHours, resolveCecHours } from './cec-hours';
 
-describe('CEC hours resolution — IICRC approval discipline', () => {
+describe('CEC hours resolution — IICRC approval discipline (registry SSOT)', () => {
   it('explicit 0 is a hard opt-out: never derives from duration', () => {
     expect(
       resolveCecHours({ cec_hours: 0, duration_hours: 1, short_description: null, description: null })
@@ -32,15 +32,27 @@ describe('CEC hours resolution — IICRC approval discipline', () => {
     expect(resolveCatalogCecHours({ cecHours: 2.5 })).toBe(2.5);
   });
 
-  it('null cec_hours with only a duration no longer derives — fail-closed (root-cause fix)', () => {
+  it('null cec_hours with only a duration never derives — fail-closed (root-cause fix)', () => {
     expect(resolveCecHours({ cec_hours: null, duration_hours: 4 })).toBeNull();
     expect(resolveCatalogCecHours({ cecHours: null, durationHours: 4 })).toBeNull();
   });
 
-  it('a source CEC statement in prose or meta is still honoured (legacy approved courses)', () => {
+  it('prose CEC statements are NOT approval — derivation branch deleted (2026-07-09)', () => {
     expect(
       resolveCecHours({ short_description: 'Continuing Education Credit (CEC) : 3 Hours' })
-    ).toBe(3);
-    expect(resolveCecHours({ meta: { cec_hours: 2 } })).toBe(2);
+    ).toBeNull();
+    expect(
+      resolveCecHours({ description: 'Approved for IICRC Continuing Education Credit (CEC) : 4 Hours' })
+    ).toBeNull();
+  });
+
+  it('meta CEC keys are NOT approval — derivation branch deleted (2026-07-09)', () => {
+    expect(resolveCecHours({ meta: { cec_hours: 2 } })).toBeNull();
+    expect(resolveCecHours({ meta: [{ key: 'cec_hours', value: 3 }] })).toBeNull();
+  });
+
+  it('an unknown slug gets nothing from the (empty) approvals registry', () => {
+    expect(resolveCecHours({ slug: 'no-such-course', cec_hours: null })).toBeNull();
+    expect(resolveCatalogCecHours({ slug: 'no-such-course', cecHours: null })).toBeNull();
   });
 });

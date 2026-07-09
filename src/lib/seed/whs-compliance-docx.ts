@@ -1,3 +1,5 @@
+import { hoistObjectivesFirst } from '@/lib/seed/objectives-module';
+
 const COURSE_HEAD = /^COURSE #\d+:\s*(.+)$/i;
 const MODULE_HEAD = /^Module \d+:/i;
 /** Series-level trailer appended after the final course in the compendium (not part of the last module body). */
@@ -109,7 +111,8 @@ export function parseWhsComplianceCompendium(paras: string[]): WhsCompliancePars
       slug: slugify(title),
       priceAud,
       overviewParagraphs,
-      modules,
+      // GP-434: the source doc places WHAT YOU WILL LEARN last; learners see objectives first.
+      modules: hoistObjectivesFirst(modules),
     });
   }
 

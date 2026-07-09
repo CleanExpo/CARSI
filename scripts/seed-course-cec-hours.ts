@@ -1,6 +1,9 @@
 /**
- * Backfill `lms_courses.cec_hours` using the full CEC resolver (export text, duration,
- * professional reviewer assignments). Never overwrites existing DB values unless --overwrite.
+ * Backfill `lms_courses.cec_hours` from the CEC approvals registry
+ * (`data/seed/cec-approvals.json`, the SSOT) / explicit founder-set values via
+ * `resolveLmsCourseCecHours`. Nothing is derived from text, duration or reviewer
+ * assignments (licence-critical, founder directive 2026-07-09). Never overwrites
+ * existing DB values unless --overwrite.
  *
  *   DATABASE_URL="..." npm run db:seed-cec-hours
  *   npm run db:seed-cec-hours -- --overwrite

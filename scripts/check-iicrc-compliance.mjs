@@ -20,10 +20,34 @@
  */
 import { execSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-/** Founder-approved IICRC-CEC course slugs. Empty until a course is confirmed IICRC-approved.
- *  Adding a slug here is the ONLY way a specific CEC-hour claim for it passes this guard. */
-const CEC_APPROVED_SLUGS = [];
+/** Founder-approved IICRC-CEC course slugs — read from the CEC approvals registry
+ *  (`data/seed/cec-approvals.json`, the SSOT; validated by `npm run check:cec`).
+ *  A course enters this list ONLY via a registry entry with status "approved" — that is
+ *  the ONLY way a specific CEC-hour claim for it passes this guard. Fail-closed: a
+ *  missing/unreadable registry yields an empty list (every CEC-hour claim flagged). */
+const CEC_APPROVED_SLUGS = loadApprovedSlugsFromRegistry();
+
+function loadApprovedSlugsFromRegistry() {
+  const registryPath = join(
+    dirname(fileURLToPath(import.meta.url)),
+    '..',
+    'data',
+    'seed',
+    'cec-approvals.json'
+  );
+  try {
+    const parsed = JSON.parse(readFileSync(registryPath, 'utf8'));
+    if (!Array.isArray(parsed?.approvals)) return [];
+    return parsed.approvals
+      .filter((e) => e && e.status === 'approved' && typeof e.slug === 'string' && e.slug.trim())
+      .map((e) => e.slug.trim());
+  } catch {
+    return [];
+  }
+}
 
 const BANNED = [
   { re: /\bIICRC[\s-]+courses?\b/i, allow: /\bIICRC[\s-]+(CEC|Continuing[\s-]+Education[\s-]+Credit)/i,

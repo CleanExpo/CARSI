@@ -1,3 +1,4 @@
+import { hoistObjectivesFirst } from '@/lib/seed/objectives-module';
 import { sanitizeLearnerContent } from '@/lib/seed/sanitize-learner-content';
 
 const COURSE_TITLE = /^COURSE TITLE:\s*(.+)$/i;
@@ -164,7 +165,8 @@ function parseCourseTitleBlock(lines: string[], start: number): { course: Specia
       isFree,
       kind: 'course',
       overviewParagraphs,
-      modules,
+      // GP-434: the source doc places WHAT YOU WILL LEARN last; learners see objectives first.
+      modules: hoistObjectivesFirst(modules),
     },
     nextI: i,
   };

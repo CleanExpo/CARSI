@@ -26,7 +26,7 @@ import { prisma } from '../src/lib/prisma';
 type PrismaTx = Parameters<Parameters<typeof prisma.$transaction>[0]>[0];
 import type { CatalogCourse, CoursesCatalogFile } from '../src/lib/seed/courses-catalog-types';
 import { COURSES_CATALOG_VERSION, isCoursesCatalogFile } from '../src/lib/seed/courses-catalog-types';
-import { resolveCatalogCecHours } from '../src/lib/seed/cec-hours';
+import { getApprovedCecHours } from '../src/lib/seed/cec-approvals';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const CATALOG_PATH = join(__dirname, '..', 'data', 'seed', 'courses-catalog.json');
@@ -81,9 +81,10 @@ async function deleteCourseCurriculum(tx: PrismaTx, courseId: string) {
 
 async function seedCourse(c: CatalogCourse, instructorOverride: string | undefined) {
   const instructorId = instructorOverride?.trim() || c.instructorId;
-  // Store the catalog's explicit value verbatim (0 = the not-CEC-approved opt-out, which the
-  // read-time resolvers honour); only derive for legacy null entries.
-  const cecHours = c.cecHours ?? resolveCatalogCecHours(c);
+  // CEC hours come ONLY from the approvals registry (data/seed/cec-approvals.json, the SSOT)
+  // or the catalog's explicit founder-set value, stored verbatim (0 = the not-CEC-approved
+  // opt-out, which the read-time resolvers honour). Nothing is derived (licence-critical).
+  const cecHours = getApprovedCecHours(c.slug) ?? c.cecHours ?? null;
 
   await prisma.$transaction(async (tx) => {
     const existing = await tx.lmsCourse.findUnique({

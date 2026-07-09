@@ -83,6 +83,13 @@ jobs:
       - name: IICRC / CEC compliance guard
         run: npm run check:iicrc-compliance
 
+      # Licence-critical: validates data/seed/cec-approvals.json — the SSOT any displayed
+      # CEC hours must come from. Slugs must exist in the catalog, approved hours are
+      # whole numbers >= 1 and never exceed course educational hours (1 CEC = 1 contact
+      # hour, iicrc.org). Fail-closed.
+      - name: CEC approvals registry check
+        run: npm run check:cec
+
       - name: Lint
         run: npm run lint
 

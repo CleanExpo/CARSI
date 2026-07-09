@@ -1,3 +1,5 @@
+import { hoistObjectivesFirst } from '@/lib/seed/objectives-module';
+
 const COURSE_HEAD = /^Course \d+(?:\s*\/\s*\d+)?:\s*(.+)$/i;
 const MODULE_HEAD = /^Module \d+:/i;
 const SECTION_HEAD = /^SECTION \d+:/i;
@@ -170,7 +172,8 @@ export function parseOdourSmokePsychroDryingCompendium(paras: string[]): OdourSm
       isFree,
       iicrcDiscipline,
       overviewParagraphs,
-      modules,
+      // GP-434: the source doc places WHAT YOU WILL LEARN last; learners see objectives first.
+      modules: hoistObjectivesFirst(modules),
     });
   }
 

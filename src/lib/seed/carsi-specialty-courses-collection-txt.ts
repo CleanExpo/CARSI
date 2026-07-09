@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 
+import { hoistObjectivesFirst } from '@/lib/seed/objectives-module';
 import { sanitizeLearnerContent } from '@/lib/seed/sanitize-learner-content';
 
 export type SpecialtyParsedModule = { title: string; bodyText: string };
@@ -137,7 +138,8 @@ export function parseSpecialtyCoursesCollectionTxt(raw: string): SpecialtyParsed
         isFree: meta.isFree,
         iicrcDiscipline: meta.iicrcDiscipline,
         overviewParagraphs,
-        modules,
+        // GP-434: the source doc places WHAT YOU WILL LEARN last; learners see objectives first.
+        modules: hoistObjectivesFirst(modules),
       });
     }
   }
