@@ -85,7 +85,11 @@ test.describe('Public course catalogue', () => {
     const searchInput = page.locator('input[placeholder="Search courses..."]');
     await searchInput.fill('Carpet');
 
-    await expect(page.getByText(/Carpet/i).first()).toBeVisible();
+    // Assert on a visible course CARD, not any text node — the tag-filter <select>
+    // now contains a hidden "carpet cleaning" <option> that getByText would match first.
+    await expect(
+      page.locator('a[href*="/courses/"]').filter({ hasText: /Carpet/i }).first()
+    ).toBeVisible();
     await expect(page.getByText(DETAIL_COURSE.title)).not.toBeVisible();
   });
 
