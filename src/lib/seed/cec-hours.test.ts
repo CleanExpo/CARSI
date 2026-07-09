@@ -32,7 +32,15 @@ describe('CEC hours resolution — IICRC approval discipline', () => {
     expect(resolveCatalogCecHours({ cecHours: 2.5 })).toBe(2.5);
   });
 
-  it('legacy null still derives (unchanged behaviour for existing courses)', () => {
-    expect(resolveCecHours({ cec_hours: null, duration_hours: 4 })).toBe(4);
+  it('null cec_hours with only a duration no longer derives — fail-closed (root-cause fix)', () => {
+    expect(resolveCecHours({ cec_hours: null, duration_hours: 4 })).toBeNull();
+    expect(resolveCatalogCecHours({ cecHours: null, durationHours: 4 })).toBeNull();
+  });
+
+  it('a source CEC statement in prose or meta is still honoured (legacy approved courses)', () => {
+    expect(
+      resolveCecHours({ short_description: 'Continuing Education Credit (CEC) : 3 Hours' })
+    ).toBe(3);
+    expect(resolveCecHours({ meta: { cec_hours: 2 } })).toBe(2);
   });
 });
