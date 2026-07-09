@@ -42,14 +42,21 @@ with "CEC" (e.g. "IICRC CEC Accredited") — **never** bare "IICRC Accredited" a
 "IICRC Course Accredited" / "IICRC-accredited course(s)", both of which wrongly imply IICRC
 accredits the course or certification itself rather than CARSI's standing as a CEC provider.
 **Never** write copy implying CARSI delivers "IICRC courses", "IICRC certification course(s)",
-"IICRC-certified course(s)", or "get IICRC certified with CARSI". Also avoid bare "IICRC
-[discipline] training" (e.g. "IICRC FSRT training") or "[discipline] certification covers…" when
-describing CARSI's own course content — use "[discipline]-aligned CEC training" instead, so it's
-clear CARSI's course aligns to the discipline rather than being the IICRC certification. IICRC
-certification is obtained only through IICRC-approved schools and examinations — CARSI courses
-earn CECs toward maintaining an existing IICRC certification. Referencing a student's own
-existing IICRC certification (recert reminders, member number, CEC tracking) and discipline
-descriptors like "WRT/ASD/AMRT-aligned" are fine. Selling CARSI as delivering IICRC certification
+"IICRC-certified course(s)", or "get IICRC certified with CARSI".
+
+**CARSI designation rule (founder 2026-07-10 — MUST).** CARSI issues its OWN credentials — the
+**CARSI Southern Hemisphere Restoration Designations** (e.g. "CARSI Water Restoration Technician",
+"CARSI Mould Remediation Specialist") — the way the RIA issues its own designations rather than
+teaching IICRC's. CARSI courses are therefore **never** branded with IICRC Registered-Training-School
+discipline **designations/acronyms** (WRT/ASD/AMRT/FSRT/CCT/TCST) and **never** described as
+"[discipline]-aligned". Set `iicrcDiscipline: null` and carry the credential in `meta.designation`.
+You MAY still *reference* an IICRC discipline/certification third-person (e.g. "FSRT is an IICRC
+certification covering…", a student's own recert / member number / CEC tracking), and you MAY cite an
+IICRC S-standard **nominatively** ("aligned to ANSI/IICRC S500") — only using an IICRC discipline
+acronym to name/brand a CARSI course is banned. The dual value stays: a CARSI designation that **also
+earns IICRC CECs**. IICRC certification is obtained only through IICRC-approved schools and
+examinations — CARSI courses earn CECs toward maintaining an existing IICRC certification. Selling
+CARSI as delivering IICRC certification
 can cost the licence to sell courses — treat it as a release blocker. Enforced by
 `npm run check:iicrc-terminology`.
 

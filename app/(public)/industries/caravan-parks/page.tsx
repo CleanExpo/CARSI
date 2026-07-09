@@ -72,7 +72,7 @@ const whyCards = [
     icon: Droplets,
     title: 'Seasonal Moisture & Mould',
     description:
-      'Cabins left unoccupied during off-season develop mould in walls, subfloors, and ensuite blocks. AMRT-aligned CEC training gives maintenance staff the protocols to inspect and remediate before peak season.',
+      'Cabins left unoccupied during off-season develop mould in walls, subfloors, and ensuite blocks. CEC-accredited mould remediation training gives maintenance staff the protocols to inspect and remediate before peak season.',
     color: '#26a69a',
   },
   {

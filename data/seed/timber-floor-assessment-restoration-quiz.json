@@ -1,0 +1,125 @@
+{
+  "version": 1,
+  "courseSlug": "timber-floor-assessment-restoration",
+  "quizzes": [
+    {
+      "quizId": "12e1a643-d4ce-42d2-bb55-256c43996f3d",
+      "lessonTitle": "Coating behaviour in Australian humidity and documenting the job",
+      "title": "Timber Floor Assessment & Restoration — Knowledge Check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Which factor most determines how much a particular timber floor board will expand and contract as its moisture content changes?",
+          "options": [
+            "The colour of the coating applied to the floor",
+            "The timber species and its inherent hardness and moisture-movement characteristics",
+            "The brand of moisture meter used to test it",
+            "Whether the floor was installed before or after 2010"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "Compared with solid strip timber flooring, engineered timber flooring generally:",
+          "options": [
+            "Holds moisture longer and is more tolerant of prolonged wetting",
+            "Cannot be tested with a moisture meter",
+            "Dries faster near the surface but is less tolerant of prolonged wetting, with a real risk of delamination between the wear layer and substrate",
+            "Is always installed directly over a suspended timber subfloor"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "A timber floor shows edges higher than the centre along each board, consistent with the underside being wetter than the top. This distortion is known as:",
+          "options": [
+            "Crowning",
+            "Buckling",
+            "Cupping",
+            "Permanent set"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "Crowning (the centre of each board higher than its edges) is most often seen when:",
+          "options": [
+            "A floor that was cupped is dried too fast from the top, or sanded flat before the underside has caught up and dried",
+            "The floor was never wet in the first place",
+            "A moisture meter reading is taken incorrectly",
+            "Subfloor vents are fully open and unobstructed"
+          ],
+          "correctIndex": 0,
+          "points": 1
+        },
+        {
+          "questionText": "What distinguishes permanent set from ordinary moisture-driven cupping?",
+          "options": [
+            "Permanent set only affects engineered floors, never solid timber",
+            "Permanent set always looks more cupped than ordinary cupping",
+            "The distortion in permanent set does not relax even once the board is confirmed at or near the dry standard on a moisture meter, because the wood fibres have been crushed or damaged",
+            "Permanent set can only be confirmed after the floor has been sanded"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "The \"dry standard\" for a timber floor restoration job is best defined as:",
+          "options": [
+            "A single fixed moisture-content percentage that applies to every timber species",
+            "The moisture content reading of the same or a comparable species in an unaffected part of the same floor or building, using the same meter and settings",
+            "The moisture reading taken on the day the drying equipment is removed, regardless of what it shows",
+            "Whatever moisture reading makes the floor feel dry underfoot"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "In a suspended timber subfloor affected by water damage, poor subfloor ventilation most directly increases the risk of:",
+          "options": [
+            "Faster, more even drying of the floor above",
+            "Sustained subfloor moisture, extending the drying timeline and creating conditions favourable to termite activity",
+            "Automatically improved dry standard readings",
+            "A reduction in the load on electrical circuits used for drying"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "During assessment of a subfloor void, a technician notices mud shelter tubes on the piers and soft, hollow-sounding timber. The correct response is to:",
+          "options": [
+            "Identify the termite species and apply a suitable treatment before continuing",
+            "Ignore it and proceed with drying, since termites are not a restoration concern",
+            "Stop, document what was observed, and refer the client to a licensed pest inspector or timber pest technician before continuing structural work in that area",
+            "Increase air mover speed in the subfloor void to discourage termite activity"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "Visible mould is present in a subfloor void beneath a water-damaged timber floor. The correct approach to airflow is to:",
+          "options": [
+            "Run air movers in the void to dry the mould out faster",
+            "Do not run air movers across the affected area; contain, filter with AFDs and dehumidify first, and introduce air movers only after the area is cleaned and cleared",
+            "Treat the subfloor void differently from the room above, since the mould rule only applies indoors",
+            "Increase airflow to vent the spores out through the subfloor vents"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "Why is timber floor drying generally staged, favouring dehumidification early and only introducing broader airflow once surface moisture has come down?",
+          "options": [
+            "Because airflow is more expensive to run than dehumidification",
+            "Because drying the surface much faster than moisture can migrate up from the core creates a steep internal moisture gradient, causing splitting, checking or crowning",
+            "Because Australian standards prohibit air movers on timber floors under any circumstances",
+            "Because moisture meters cannot function while air movers are running"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        }
+      ]
+    }
+  ]
+}

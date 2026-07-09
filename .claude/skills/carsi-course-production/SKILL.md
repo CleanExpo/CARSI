@@ -70,13 +70,17 @@ edit is saved.
   delivers IICRC certification, examinations, or credentials. IICRC certification is obtained only
   through **IICRC-approved schools and examinations**; CARSI courses earn **CECs** toward
   maintaining an existing IICRC certification.
-- Also avoid bare "IICRC [discipline] training" (e.g. "IICRC FSRT training") or "[discipline]
-  certification covers…" when describing CARSI's own course content — say "[discipline]-aligned
-  CEC training" instead, so it reads as CARSI's course aligning to the discipline, not as the
-  IICRC certification itself.
-- FINE: a student's own existing IICRC certification (recert reminders, member number, CEC
-  tracking), "WRT/ASD/AMRT-aligned" content descriptors, and discipline badges framed as CEC
-  discipline alignment.
+- **CARSI DESIGNATION RULE (founder 2026-07-10 — MUST).** CARSI issues its OWN credentials, the
+  **CARSI Southern Hemisphere Restoration Designations** (e.g. "CARSI Water Restoration Technician",
+  "CARSI Mould Remediation Specialist") — like the RIA issuing its own designations, not teaching
+  IICRC's. So a CARSI course is **never** branded with an IICRC discipline **acronym**
+  (WRT/ASD/AMRT/FSRT/CCT/TCST) and **never** "[discipline]-aligned". Set `iicrcDiscipline: null`;
+  put the credential in `meta.designation` + `meta.designationProgram`. Dual value: a CARSI
+  designation that **also earns IICRC CECs**.
+- FINE: *referencing* a student's own existing IICRC certification (recert reminders, member number,
+  CEC tracking), a third-person fact ("FSRT is an IICRC certification covering…"), and citing an
+  IICRC S-standard **nominatively** ("ANSI/IICRC S500"). BANNED: using an IICRC discipline acronym or
+  "[discipline]-aligned" to name/brand a CARSI course or its trainees.
 - Getting this wrong can cost the licence to sell courses — treat as a release blocker. Enforced by
   `npm run check:iicrc-terminology`.
 

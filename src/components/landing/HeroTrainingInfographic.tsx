@@ -125,7 +125,7 @@ export function HeroTrainingInfographic() {
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.25),transparent_45%)]" aria-hidden />
                 <div className="relative flex h-full items-end justify-between p-3">
                   <span className="rounded-md bg-white/20 px-2 py-0.5 text-[10px] font-semibold text-white backdrop-blur-sm">
-                    WRT-aligned
+                    CEC-accredited water restoration
                   </span>
                   <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/15 backdrop-blur-sm">
                     <BookOpen className="h-4 w-4 text-white" aria-hidden />

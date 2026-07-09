@@ -48,7 +48,7 @@ const MOCK_COURSES = [
     id: 'c1',
     slug: 'water-damage-restoration-fundamentals',
     title: 'Water Damage Restoration Fundamentals',
-    short_description: 'IICRC WRT-aligned course covering water damage restoration basics.',
+    short_description: 'CEC-accredited water restoration course covering water damage restoration basics.',
     price_aud: '349.00',
     is_free: false,
     level: 'beginner',

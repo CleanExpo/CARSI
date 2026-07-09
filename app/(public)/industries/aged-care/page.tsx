@@ -51,7 +51,7 @@ const faqs = [
   {
     question: 'How does IICRC CEC training support Aged Care Quality Standards?',
     answer:
-      "The Aged Care Quality Standards require facilities to demonstrate safe, clean environments for residents. CARSI's AMRT-aligned CEC training provides verifiable evidence that cleaning teams are trained in mould identification, remediation protocols, and infection prevention — directly relevant to Standard 3 (Personal Care and Clinical Care) compliance.",
+      "The Aged Care Quality Standards require facilities to demonstrate safe, clean environments for residents. CARSI's CEC-accredited mould remediation training provides verifiable evidence that cleaning teams are trained in mould identification, remediation protocols, and infection prevention — directly relevant to Standard 3 (Personal Care and Clinical Care) compliance.",
   },
   {
     question: 'Can aged care staff complete IICRC CEC training around shift work?',

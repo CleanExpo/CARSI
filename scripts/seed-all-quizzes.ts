@@ -30,10 +30,16 @@ const QUIZ_FILES = [
   'commercial-floor-care-quiz.json',
   'ccw-truckmount.quizzes.json',
   'water-damage-restoration-fundamentals-quiz.json',
-  'applied-microbial-remediation-mould-fundamentals-quiz.json',
-  'applied-structural-drying-fundamentals-quiz.json',
+  'mould-remediation-fundamentals-quiz.json',
+  'structural-drying-fundamentals-quiz.json',
   'category-3-sewage-black-water-remediation-quiz.json',
   'asbestos-awareness-for-restoration-technicians-quiz.json',
+  'psychrometry-building-science-for-drying-quiz.json',
+  'fire-smoke-damage-restoration-fundamentals-quiz.json',
+  'trauma-crime-scene-decontamination-fundamentals-quiz.json',
+  'carpet-cleaning-technician-fundamentals-quiz.json',
+  'timber-floor-assessment-restoration-quiz.json',
+  'assessing-indoor-environment-conditions-quiz.json',
 ];
 
 type QuizQuestion = {
