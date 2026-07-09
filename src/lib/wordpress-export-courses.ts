@@ -128,10 +128,8 @@ export type CourseListItem = {
 
 export function mapWpExportToCourseListItem(row: WpExportCourse): CourseListItem {
   const cec = resolveCecHours({
+    slug: row.slug,
     cec_hours: row.cec_hours,
-    short_description: row.short_description,
-    description: row.description,
-    meta: row.meta,
   });
 
   return {

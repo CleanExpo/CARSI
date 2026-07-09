@@ -53,7 +53,7 @@ multi-step chain that landed in `data/wordpress-export/*.json` first, then into 
 
 | Connector | npm script | What it does |
 | --- | --- | --- |
-| `enrich-wp-export-cec.ts` | `db:enrich-wp-export-cec` (`--dry-run`) | Fills `cec_hours` on `wordpress-export/courses.json` from meta + description text |
+| `enrich-wp-export-cec.ts` | — (removed 2026-07-09) | Retired: derived `cec_hours` from meta/description prose, which is not IICRC approval. CEC hours now come only from `data/seed/cec-approvals.json` (the registry SSOT) or explicit founder-set values |
 | `seed-wordpress-export-courses.ts` | `db:seed-wp-export` | Upserts **published** Woo courses → `lms_courses`, **excluding** the 20 pilot courses already in the catalogue snapshot |
 | `seed-wordpress-lessons-wxr.ts` | `db:seed-wp-lessons` | Imports LearnDash `sfwd-lessons` from a WXR export → `lms_modules`/`lms_lessons` for the Woo-seeded courses |
 | `set-wp-export-courses-draft.ts` | `db:set-wp-export-draft` | Sets the Woo-imported set to `draft` / `isPublished:false` (re-running `db:seed-wp-export` republishes) |

@@ -16,16 +16,17 @@ export type LmsCourseCecSource = {
 /**
  * CEC hours for a course on public listings, certificates and credentials.
  *
- * FAIL-CLOSED (licence-critical): CEC hours are shown ONLY when the founder has set an
- * explicit, founder-approved positive `cecHours` on the course. There is deliberately no
- * fallback to duration, description/meta prose, or reviewer/professional assignment — none
- * of those is IICRC approval, and deriving a CEC claim from them is a licence-critical false
- * claim (founder directive 2026-07-09). An unapproved course shows no CEC, never a fabricated one.
+ * FAIL-CLOSED (licence-critical): CEC hours are shown ONLY from the CEC approvals registry
+ * (data/seed/cec-approvals.json, the SSOT) or an explicit, founder-approved positive
+ * `cecHours` on the course. There is deliberately no fallback to duration, description/meta
+ * prose, or reviewer/professional assignment — none of those is IICRC approval, and deriving
+ * a CEC claim from them is a licence-critical false claim (founder directive 2026-07-09).
+ * An unapproved course shows no CEC, never a fabricated one.
  */
 export function resolveLmsCourseCecHours(course: LmsCourseCecSource): number | null {
   if (isCecExcludedSlug(course.slug)) return null;
 
-  const approved = resolveCatalogCecHours({ cecHours: course.cecHours });
+  const approved = resolveCatalogCecHours({ slug: course.slug, cecHours: course.cecHours });
   return approved != null && approved > 0 ? approved : null;
 }
 
