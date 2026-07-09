@@ -88,7 +88,12 @@ function inScope(f) { const n = f.replace(/\\/g, '/'); return SCANNED_DIRS.some(
 function isExempt(f) { const n = f.replace(/\\/g, '/'); return EXEMPT.some((e) => n === e || n.endsWith('/' + e)); }
 
 function scanLine(file, lineNo, content, findings) {
+  // A specific CEC-hour claim is exempt ONLY when the file belongs to a founder-approved
+  // course — i.e. its path contains a slug listed in CEC_APPROVED_SLUGS (empty = none approved).
+  const nf = file.replace(/\\/g, '/');
+  const cecApproved = CEC_APPROVED_SLUGS.some((slug) => nf.includes(slug));
   for (const rule of [...BANNED, CEC_NUMBER]) {
+    if (rule === CEC_NUMBER && cecApproved) continue;
     if (rule.re.test(content) && !(rule.allow && rule.allow.test(content))) {
       findings.push(`  ${file}:${lineNo}: ${rule.message}\n    → ${content.trim().slice(0, 150)}`);
     }
