@@ -1,0 +1,125 @@
+{
+  "version": 1,
+  "courseSlug": "applied-structural-drying-fundamentals",
+  "quizzes": [
+    {
+      "quizId": "5af581e8-4ccc-43d7-9937-2f365da76d0f",
+      "lessonTitle": "When to change the plan, and closing the job",
+      "title": "Applied Structural Drying Fundamentals — Knowledge Check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "What is the \"dry standard\" used to set a drying goal?",
+          "options": [
+            "A fixed moisture percentage that applies to every building",
+            "The moisture reading of the same or similar material in an unaffected part of the building",
+            "The reading on the day the equipment is removed",
+            "The manufacturer&rsquo;s rated output for the dehumidifier"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "Why can relative humidity (RH) alone be misleading when judging how much water is in the air?",
+          "options": [
+            "RH is only measured in the United States",
+            "RH cannot be measured with a hygrometer",
+            "RH depends on temperature, so the same amount of water shows a different RH as the air warms or cools",
+            "RH is always higher than the dew point"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "In Australian practice, specific humidity (the actual mass of water in the air) is expressed in:",
+          "options": [
+            "Relative humidity as a percentage (%)",
+            "Grams of water per kilogram of dry air (g/kg)",
+            "Litres per square metre",
+            "Degrees Celsius (&deg;C)"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "What is the main job of an air mover in structural drying?",
+          "options": [
+            "To remove water from the air",
+            "To heat the structure to boiling point",
+            "To move air across wet surfaces, breaking up the moist boundary layer so evaporation continues",
+            "To replace the need for a dehumidifier"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "The drying space is warm and clammy and windows are beginning to sweat. What does this most likely indicate?",
+          "options": [
+            "Drying is finished and equipment can be removed",
+            "There is more evaporation (airflow) than the dehumidification can remove, so add dehumidification or reduce airflow",
+            "The dry standard was set too low",
+            "The air movers should all be switched off permanently"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "Which dehumidifier type generally keeps working best in cool and already-dry air where refrigerant units fade?",
+          "options": [
+            "Conventional refrigerant",
+            "Desiccant",
+            "A pedestal fan",
+            "None — all stop working when cool"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "A standard Australian general power outlet (GPO) is rated at:",
+          "options": [
+            "15 A at 230 V",
+            "10 A at 230 V",
+            "20 A at 250 V",
+            "32 A at 400 V three-phase"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "When budgeting electrical load for a drying setup on an Australian site, you should:",
+          "options": [
+            "Use overseas equipment guides that quote current at a lower mains voltage without adjustment",
+            "Assume every power outlet is on its own independent circuit",
+            "Add up each machine&rsquo;s running current at 230 V, keep the total on any circuit below its rating, and spread machines across circuits",
+            "Run all machines through a single daisy-chained power board"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "Visible mould is present on a water-damaged wall. What is the correct approach to airflow?",
+          "options": [
+            "Aim air movers directly at the mould to dry it faster",
+            "Do not run air movers across affected surfaces; contain, filter (AFDs) and dehumidify first, and introduce air movers only after the area is cleaned and cleared",
+            "Increase air mover speed to blow the spores outside",
+            "Ignore the mould and continue normal drying"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "Material moisture readings have stopped falling for more than a day. The best response is to:",
+          "options": [
+            "Simply wait several more days without changing anything",
+            "Declare the job complete because the readings are stable",
+            "Investigate the cause (chamber leaking, dehumidification not keeping up, airflow not reaching a wet area, or a hidden water reservoir) and change the drying design",
+            "Remove all equipment and issue the certificate"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        }
+      ]
+    }
+  ]
+}

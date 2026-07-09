@@ -5152,6 +5152,219 @@
           ]
         }
       ]
+    },
+    {
+      "id": "234eb5f5-8a6f-4438-a8b6-515ade44b4fb",
+      "slug": "applied-structural-drying-fundamentals",
+      "title": "Applied Structural Drying Fundamentals",
+      "description": "<p>A foundational, Australian-produced course for restoration technicians and supervisors who dry water-damaged buildings and contents, and for cleaners and insurance-support staff who need to understand how a drying job is planned, run and proven. It is <strong>ASD-aligned CEC training</strong> &mdash; it aligns to the principles of professional applied structural drying practice and is designed to build sound field judgement, not to replace a technician&rsquo;s own certification, a manufacturer&rsquo;s instructions, a Safety Data Sheet, or a site&rsquo;s own rules.</p><p>Seven modules take a technician from the drying goal to a defensible drying file: what applied structural drying is and how to set a dry standard, metric psychrometry (temperature, RH, dew point and specific humidity in g/kg) and how to use it to prove drying is working, airflow and air-mover placement, dehumidification (refrigerant, LGR and desiccant) and how to size it for an Australian job, drying-system design with realistic <strong>230&nbsp;V / 10&nbsp;A</strong> power budgets and RCD/test-and-tag electrical safety, and daily monitoring, documentation and knowing when to change the plan. Every figure is metric, every power calculation assumes Australian mains, and the mould-remediation sequence is respected throughout. A ten-question knowledge check closes the course.</p>",
+      "shortDescription": "ASD-aligned CEC training in applied structural drying &mdash; the dry standard, metric psychrometry, airflow, dehumidifier selection and sizing, 230&nbsp;V/10&nbsp;A drying-system design and electrical safety, and drying documentation, produced for Australian conditions.",
+      "thumbnailUrl": null,
+      "instructorId": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+      "status": "draft",
+      "priceAud": "0",
+      "isFree": true,
+      "durationHours": 4,
+      "level": "Foundational",
+      "category": "Water Damage Restoration",
+      "tags": [
+        "applied structural drying",
+        "ASD-aligned",
+        "psychrometry",
+        "dehumidification",
+        "air movers",
+        "drying goal",
+        "electrical safety",
+        "Australian"
+      ],
+      "iicrcDiscipline": "ASD",
+      "cecHours": 0,
+      "meta": {
+        "audience": "restoration technicians and supervisors",
+        "discipline": "ASD-aligned CEC training",
+        "buildStage": "seeded-unpublished-draft-pending-founder-review",
+        "linearIssue": "GP-470",
+        "australianProduced": true,
+        "standardsReferenced": "Nominative only (ANSI/IICRC S500; AS/NZS 3760/3112 for electrical test-and-tag). No standard text reproduced (IICRC AI Use Policy honoured)."
+      },
+      "isPublished": false,
+      "modules": [
+        {
+          "id": "8fa7d611-91e0-434f-a7f5-8a350d055425",
+          "title": "Module 1: Course Objectives & How This Training Works",
+          "orderIndex": 0,
+          "lessons": [
+            {
+              "id": "99090fca-0b7f-4212-ad8a-b738b25b545e",
+              "title": "What this course covers and who it is for",
+              "contentType": "text",
+              "contentBody": "<p>Welcome to <strong>Applied Structural Drying Fundamentals</strong>. This course is for restoration technicians and supervisors in Australia who dry water-damaged buildings and contents, and for cleaners and insurance-support staff who want to understand how a drying job is planned, run and proven. By the end you will be able to:</p><ul><li>explain what applied structural drying is and set a defensible <strong>dry goal</strong> from a reference material;</li><li>read the air with metric psychrometry &mdash; temperature, relative humidity, dew point and specific humidity (g/kg) &mdash; and use it to prove drying is working;</li><li>place air movers to drive evaporation without spreading contamination or causing secondary damage;</li><li>choose between refrigerant, low-grain refrigerant (LGR) and desiccant dehumidification and size it for an Australian job in metric units;</li><li>build a drying system that stays inside a realistic <strong>230&nbsp;V / 10&nbsp;A</strong> power budget with a working safety switch (RCD) and test-and-tagged equipment; and</li><li>monitor daily, keep a drying record, and produce documentation that stands up in an Australian insurance and dispute context.</li></ul><p>This is <strong>ASD-aligned CEC training</strong>: it aligns to the principles of professional applied structural drying practice. It builds field judgement and does not replace your own certification, a manufacturer&rsquo;s instructions, a Safety Data Sheet (SDS), a relevant Australian standard, or a site&rsquo;s own rules.</p>",
+              "orderIndex": 0,
+              "isPreview": true,
+              "resources": null
+            },
+            {
+              "id": "4fbd5019-33b1-4aa7-9761-33adfe614b6b",
+              "title": "How structural drying fits with water damage restoration",
+              "contentType": "text",
+              "contentBody": "<p>Water damage restoration first makes a building safe, stops the water, removes what cannot be saved and extracts standing water. <strong>Applied structural drying</strong> is the stage that follows: returning the remaining structure and salvageable contents to a dry, stable condition so that mould does not grow and materials do not continue to degrade. Extraction removes the bulk of the water; drying removes what has soaked into materials and moved through the building as vapour.</p><p>Good drying is deliberate, not \"put out some fans and come back in a week\". You set a target, create the conditions for water to leave the materials, measure whether it is leaving, and adjust. A drying job that is not measured cannot be defended, and in the Australian insurance context an undefended job is a disputed job. Throughout this course, every number is metric and every power figure assumes Australian mains (230&nbsp;V nominal, 50&nbsp;Hz).</p><p><strong>Safety note that governs the whole course:</strong> if visible mould or a confirmed microbial contamination is present, do <em>not</em> run air movers across affected surfaces. Follow the mould remediation sequence &mdash; containment, then air filtration devices (AFDs/negative air) and dehumidifiers to control moisture &mdash; and only introduce air movers after the area has been cleaned and cleared. Blowing air across mouldy material spreads spores through the building.</p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": null
+            }
+          ]
+        },
+        {
+          "id": "8b4325fa-4665-456b-a20e-4529c46fd739",
+          "title": "Module 2: What Applied Structural Drying Is & Setting the Drying Goal",
+          "orderIndex": 1,
+          "lessons": [
+            {
+              "id": "53eb07e8-0458-4323-a1c6-1cc5004d4761",
+              "title": "The dry standard and the drying goal",
+              "contentType": "text",
+              "contentBody": "<p>You cannot know when a material is \"dry\" without a reference. The <strong>dry standard</strong> is the moisture level of the same or similar material in an unaffected part of the building &mdash; for example, the moisture reading of skirting or a wall cavity in a room the water never reached. The <strong>drying goal</strong> is to bring the affected material back to at or near that reference reading and keep it there.</p><p>Set the dry standard at the start, in writing, before you place a single machine. Record it in the same units and with the same instrument you will use each day, so your daily readings are comparable. A drying goal expressed as \"return the affected timber sub-floor to within a few points of the 12&nbsp;% reading taken in the adjoining dry room\" is defensible; \"dry it out\" is not.</p><p>Australian building stock matters here: brick veneer, suspended timber sub-floors, lightweight framing, and slab-on-ground all hold and release moisture differently, and our climate zones (from tropical far north to cool temperate south) change how quickly a building will give up water. The dry standard anchors your goal to <em>this</em> building in <em>this</em> location, not a textbook average.</p>",
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "9534c5fa-71b6-4294-b2a3-584057e1761a",
+              "title": "The factors you control",
+              "contentType": "text",
+              "contentBody": "<p>Drying is the management of four things:</p><ul><li><strong>Temperature</strong> &mdash; warmer air holds and moves more moisture, and warming a material helps water leave it. In Australian conditions you are often managing existing heat rather than adding it, but temperature is still a lever.</li><li><strong>Humidity</strong> &mdash; the drier the surrounding air, the faster water evaporates from wet materials. Lowering the humidity of the drying space is the dehumidifier&rsquo;s job.</li><li><strong>Airflow</strong> &mdash; moving air across a wet surface carries evaporated water away and replaces it with drier air. This is the air mover&rsquo;s job.</li><li><strong>The materials themselves</strong> &mdash; how porous they are and how much water they hold decides how hard the job is. A saturated carpet and underlay dry very differently from a dense hardwood floor.</li></ul><p>These four interact: raising airflow does little if the surrounding air is already saturated, and dehumidification does little if no air is moving moisture off the materials. Applied structural drying is getting the balance right for the class of water intrusion in front of you, then proving with measurements that the balance is working.</p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": null
+            }
+          ]
+        },
+        {
+          "id": "acf278a4-63d1-4c46-bff8-85cb3447d31e",
+          "title": "Module 3: Psychrometry for Drying Decisions",
+          "orderIndex": 2,
+          "lessons": [
+            {
+              "id": "9f04ced9-7c7b-494a-b0db-6ef9408aa5b0",
+              "title": "Reading the air — temperature, RH, dew point and specific humidity",
+              "contentType": "text",
+              "contentBody": "<p>Psychrometry is the study of the properties of moist air. Four readings drive drying decisions:</p><ul><li><strong>Temperature (&deg;C)</strong> &mdash; how warm the air is.</li><li><strong>Relative humidity (RH, %)</strong> &mdash; how full the air is <em>relative to what it could hold at that temperature</em>. Because it depends on temperature, RH alone can mislead: the same amount of water shows a higher RH in cool air and a lower RH in warm air.</li><li><strong>Dew point (&deg;C)</strong> &mdash; the temperature at which the air would become saturated and condensation would form. It is a direct measure of how much water the air is carrying.</li><li><strong>Specific humidity</strong> &mdash; the actual mass of water in the air, expressed in Australian practice as <strong>grams of water per kilogram of dry air (g/kg)</strong>. It is the most reliable figure for drying because, unlike RH, it does not change as the air warms or cools.</li></ul><p>For drying, specific humidity and dew point are more useful than RH because they tell you the real quantity of water in the air, independent of temperature. A hygrometer that reports temperature and RH lets you derive the others from a psychrometric chart or calculator.</p>",
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "d253d4da-da1e-4e70-b871-7a7e5d1f43e2",
+              "title": "Using readings to prove drying is working",
+              "contentType": "text",
+              "contentBody": "<p>Take a consistent set of readings every visit and compare them. The useful comparisons are:</p><ul><li><strong>Inside the drying space vs outside</strong> &mdash; your dehumidification should make the affected area <em>drier</em> (lower specific humidity / lower dew point) than unaffected or outside air. If the drying space is not drier than ambient, your dehumidification is not keeping up.</li><li><strong>Affected area vs an unaffected control area</strong> inside the building &mdash; the gap between them should shrink day by day as materials give up water.</li><li><strong>Material moisture readings vs the dry standard</strong> &mdash; the direct proof that the structure is approaching goal.</li></ul><p>Record all four air readings plus material readings each day, at roughly the same time and location, with the same instruments. A drying record that shows specific humidity falling and material readings approaching the dry standard is your evidence that the job is on track &mdash; and, if a claim is disputed, your evidence that it was done properly. Readings that flatline tell you to change the plan (Module 7).</p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": null
+            }
+          ]
+        },
+        {
+          "id": "1eb0ab17-7a7a-48bc-848d-1f68ae603c06",
+          "title": "Module 4: Airflow & Air Movers",
+          "orderIndex": 3,
+          "lessons": [
+            {
+              "id": "a92ee568-e30a-4d40-94c4-a2cfcf73e978",
+              "title": "How evaporation works and where to place air movers",
+              "contentType": "text",
+              "contentBody": "<p>Evaporation happens at the surface of a wet material. As water leaves the surface, a thin layer of moist air forms right against it; if that layer is not moved away, evaporation slows. <strong>Air movers</strong> break up that boundary layer and replace it with drier air, so evaporation continues.</p><p>Place air movers to sweep air <em>along</em> wet surfaces at a shallow angle rather than blasting straight at them &mdash; you want a moving sheet of air travelling across the floor or up a wall and around the room. Space them so the airflow from one continues past the next, keeping air circulating around the whole affected area. On a wet timber or hard floor, low, angled placement moves air across the surface; for walls, direct airflow up the affected face.</p><p>More air movers is not automatically better: once the surfaces have enough airflow, extra machines mainly add heat, noise and electrical load without drying faster. Match the number to the wet surface area and the room, then let the dehumidifier remove the moisture the moving air has released.</p>",
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "1720e993-7daa-412e-b436-78f844a22676",
+              "title": "The drying chamber, balance and avoiding secondary damage",
+              "contentType": "text",
+              "contentBody": "<p>Drying is faster and cheaper when you dry the smallest sensible space &mdash; a <strong>drying chamber</strong>. Close doors, or use containment sheeting, to isolate the wet area so your dehumidification is not fighting the whole building. A smaller, contained space reaches a low humidity quickly and stays there.</p><p>Balance airflow against dehumidification: moving air releases moisture into the space, and the dehumidifier must remove at least that much or the air becomes saturated and drying stalls. If windows and surfaces start to sweat, or the space feels warm and clammy, you have more evaporation than dehumidification &mdash; add dehumidification or reduce airflow.</p><p>Avoid <strong>secondary damage</strong>: do not aim high-velocity air at fragile finishes, artwork or loose materials; do not drive moist air into unaffected cavities or adjoining rooms; and, as covered in Module 1, <strong>never run air movers where mould is present</strong> &mdash; contain, filter and dehumidify first, and only introduce airflow after the area is cleaned and cleared. The goal is to move water out of the building, not to redistribute it.</p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": null
+            }
+          ]
+        },
+        {
+          "id": "4ee36ea0-f362-465f-90ad-6b56c29c201b",
+          "title": "Module 5: Dehumidification Systems",
+          "orderIndex": 4,
+          "lessons": [
+            {
+              "id": "1a52fc2a-9efd-4d60-9ca6-59ca3f6fd36f",
+              "title": "Refrigerant, LGR and desiccant — how each works and when to use it",
+              "contentType": "text",
+              "contentBody": "<p>A dehumidifier removes water from the air so that moving air can keep picking up more from the materials. Three types are used in Australian restoration:</p><ul><li><strong>Conventional refrigerant</strong> &mdash; cools air below its dew point so water condenses out, then reheats it. Effective in warm, humid conditions common across much of Australia; less effective as the air gets cold or already quite dry.</li><li><strong>Low-grain refrigerant (LGR)</strong> &mdash; a refrigerant unit that pre-cools the incoming air so it can pull the air down to a much lower specific humidity. Better for reaching a dry finish and for cooler conditions.</li><li><strong>Desiccant</strong> &mdash; passes air over a moisture-absorbing wheel rather than cooling it, so it keeps working in cool and already-dry air where refrigerant units fade. Useful for dense materials, cooler southern conditions, and jobs needing very low humidity.</li></ul><p>Choose by the conditions and the target: refrigerant/LGR for typical warm-to-mild jobs, desiccant when it is cool or you need to push the air very dry. All units are mains-powered and must be part of your power budget (Module 6).</p>",
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "7d4dbfa0-dad1-4e00-8b6a-c994251e315a",
+              "title": "Sizing dehumidification for an Australian job",
+              "contentType": "text",
+              "contentBody": "<p>Size dehumidification to the volume of the drying space and the amount of water to be removed, which depends on the <strong>class</strong> of water intrusion &mdash; how much material is wet and how porous it is. A small area of a single low-porosity surface needs far less than a room where carpet, underlay, plaster and framing are all saturated.</p><p>Manufacturers rate water-removal capacity in <strong>litres per day</strong> under stated conditions; some imported units quote US pints per day (1&nbsp;US pint &asymp; 0.47&nbsp;L) &mdash; convert to litres as your working figure, and note the rating conditions, because a unit&rsquo;s real output on site is usually lower than its headline figure. Work out the space volume in cubic metres, estimate the water load from the class and wet materials, then select equipment (often more than one unit, or a mix of types) to remove it within your target timeframe.</p><p>Always confirm the units you specify are <strong>sold in Australia in 240&nbsp;V / 50&nbsp;Hz configuration</strong> through an Australian distributor, and record the date of your availability check &mdash; models and distributors change. Do not size a job around a US-voltage unit that cannot be run here. <em>(Availability of AU-configured refrigerant, LGR and desiccant units confirmed generally available through Australian restoration suppliers as at July&nbsp;2026; confirm the specific model before quoting.)</em></p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": null
+            }
+          ]
+        },
+        {
+          "id": "9f70e6cc-f831-489a-b660-754686b2ab06",
+          "title": "Module 6: Drying System Design, Power & Electrical Safety",
+          "orderIndex": 5,
+          "lessons": [
+            {
+              "id": "264d263f-4e15-4e70-9c6a-11d04039e421",
+              "title": "Building the drying system",
+              "contentType": "text",
+              "contentBody": "<p>A drying system is the deliberate combination of airflow and dehumidification for the space in front of you: enough air movement to release water from every wet surface, and enough dehumidification to remove that water from the air, all inside a contained drying chamber. Design it before you plug anything in.</p><p>Work through it in order: define the drying chamber and the wet surfaces; decide the airflow needed to move air across those surfaces; choose the dehumidification type and capacity to remove the released moisture; then check the total electrical load fits the power available (next lesson). Write the design down &mdash; machine types, numbers and placement &mdash; so the daily monitoring can tell you whether the design is working or needs adjustment.</p><p>Revisit the design as the job progresses. Early on, wet materials release a lot of water and you need full airflow and dehumidification; as materials approach the dry standard you can often reduce equipment. Drying is a plan you adjust from evidence, not a fixed rig you leave running.</p>",
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "7d043999-96a1-4af8-99dd-179add340fc4",
+              "title": "Power and load at 230 V / 10 A — amp budgets, RCDs and test-and-tag",
+              "contentType": "text",
+              "contentBody": "<p>Australian mains are <strong>230&nbsp;V nominal, 50&nbsp;Hz</strong>. A standard general power outlet (GPO) is rated <strong>10&nbsp;A</strong>, giving roughly 2,300&nbsp;W of usable capacity on that circuit &mdash; and several GPOs often share one circuit, so you cannot assume each outlet is independent. Overloading a circuit trips the breaker (best case) or creates a fire risk (worst case), and on a water-damaged site electrical safety is already compromised.</p><p>Budget your load in amps at 230&nbsp;V. Add up the running current of every machine &mdash; each air mover and each dehumidifier draws its own amps &mdash; and keep the total on any one circuit comfortably below its rating, allowing for start-up surges. Because current falls as voltage rises for the same wattage, overseas equipment guides that quote current at a lower mains voltage will overstate the amps drawn on Australian 230&nbsp;V mains; always redo the sum at 230&nbsp;V. Spread machines across separate circuits, and never run drying equipment through daisy-chained power boards.</p><p>Every portable lead and appliance on site must have a working <strong>safety switch (RCD)</strong> in the circuit and be <strong>tested and tagged</strong> in line with AS/NZS&nbsp;3760, using AS/NZS&nbsp;3112 plugs and leads. This is a Safe Work Australia / state WHS duty, not an optional extra, and it is the single most important control protecting your crew on a wet site. Prepare a SWMS for the electrical and drying setup and induct everyone to it.</p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": null
+            }
+          ]
+        },
+        {
+          "id": "6e9aa2fc-5dc2-4280-bd9d-84bf68efbe7b",
+          "title": "Module 7: Monitoring, Documentation & Knowing When to Adjust",
+          "orderIndex": 6,
+          "lessons": [
+            {
+              "id": "a9ad3280-81c8-4fdc-86e4-7594934429b5",
+              "title": "Daily monitoring and the drying record",
+              "contentType": "text",
+              "contentBody": "<p>Once the system is running, the job is monitoring and proof. Each visit, take the same readings at the same places with the same instruments: air temperature, RH, dew point and specific humidity in the drying space, in an unaffected control area, and (where practical) outside; plus material moisture readings at marked points against the dry standard set in Module 2.</p><p>Record it all in a <strong>drying record</strong> &mdash; a dated log per visit, ideally with photos of the meter readings and machine placement. A good record shows a clear trend: specific humidity in the drying space staying below ambient, and material readings falling toward the dry standard. This log is both your management tool and, in an Australian insurance or dispute context, your evidence that the structure actually reached a dry, stable condition.</p>",
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "a4490112-fcdb-484d-a7e4-aa9a3ecdc926",
+              "title": "When to change the plan, and closing the job",
+              "contentType": "text",
+              "contentBody": "<p>Readings tell you when to act. If material readings <strong>stop falling</strong> for more than a day, something is limiting the job: the drying chamber is leaking to the rest of the building, dehumidification is not keeping the air dry enough, airflow is not reaching a wet area, or there is a hidden reservoir of water (a wall cavity, under a cabinet, beneath a floor) you have not reached. Investigate and change the design &mdash; add or reposition equipment, tighten containment, or open up a trapped area &mdash; rather than simply waiting longer.</p><p>Close the job only when the affected materials have reached the dry standard and held it, confirmed by readings on the drying record, not by how a surface looks or feels. Then remove equipment, take final readings and photos, and complete the documentation: the dry standard set at the start, the daily record, the final readings proving goal was met, and any variations. <strong>Remember the mould rule</strong>: if microbial growth was present or found during the job, it is a remediation matter to be contained, cleaned and cleared &mdash; drying alone does not resolve mould. A defensible drying file is a proven drying file.</p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": null
+            }
+          ]
+        }
+      ]
     }
   ]
 }
