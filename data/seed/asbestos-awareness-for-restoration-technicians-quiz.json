@@ -1,0 +1,125 @@
+{
+  "version": 1,
+  "courseSlug": "asbestos-awareness-for-restoration-technicians",
+  "quizzes": [
+    {
+      "quizId": "77d42a0f-2ae0-4040-ac4c-9243665a6ce9",
+      "lessonTitle": "Where to get help and stay current",
+      "title": "Asbestos Awareness for Restoration Technicians — Knowledge Check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "What does this awareness course authorise you to do?",
+          "options": [
+            "Remove non-friable asbestos up to 10 m² on any job",
+            "Sample and identify asbestos yourself",
+            "Recognise likely asbestos and respond correctly — it does NOT licence you to sample, remove or work on asbestos",
+            "Supervise a licensed asbestos removalist"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "Can you confirm whether a material contains asbestos just by looking at it?",
+          "options": [
+            "Yes, experienced technicians can always tell by sight",
+            "No — only laboratory testing can confirm it, so suspect material is presumed to be asbestos until confirmed otherwise",
+            "Yes, if it is grey and fibrous",
+            "Only if it is broken"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "What is the difference between friable and non-friable (bonded) asbestos?",
+          "options": [
+            "Friable is safe; non-friable is dangerous",
+            "They are the same thing",
+            "Friable can be crumbled to powder by hand and releases fibres very easily (higher risk); non-friable is bound in a matrix and is lower risk while intact but dangerous when broken or cut",
+            "Non-friable cannot contain asbestos"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "Why is restoration work a particular asbestos risk?",
+          "options": [
+            "Because restoration only happens in new buildings",
+            "Because water, fire and storm damage break, cut, wet and pull apart the very materials that often contain asbestos, which can release fibres",
+            "Because asbestos is added during restoration",
+            "It is not a risk at all"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "A building from which era should be presumed to contain asbestos-containing materials unless shown otherwise?",
+          "options": [
+            "Built after 2010",
+            "Built or renovated before the 2003 ban (especially before the late 1980s)",
+            "Only buildings built this year",
+            "Age makes no difference"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "What is the safe level of asbestos exposure?",
+          "options": [
+            "A small amount each day is fine",
+            "There is no known safe level of exposure — the risk comes from disturbing ACM and releasing fibres",
+            "Exposure is only harmful above a set number of hours",
+            "Any exposure outdoors is safe"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "Under Australian WHS law, who may remove FRIABLE asbestos?",
+          "options": [
+            "Any restoration technician",
+            "Anyone with a White Card",
+            "Only a removalist holding a Class A asbestos removal licence",
+            "No licence is needed for friable asbestos"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "You should check for which document before starting work in an older building, as it records known asbestos locations?",
+          "options": [
+            "The building&rsquo;s original sales brochure",
+            "An asbestos register (and management plan) — workplaces built before 2004 are generally required to have one",
+            "The council rates notice",
+            "The manufacturer&rsquo;s warranty"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "You uncover broken sheeting of unknown origin in a pre-1990 bathroom during a water-damage job. What is the correct response?",
+          "options": [
+            "Sand a small area to see if it is asbestos",
+            "Sweep it up quickly and bin it",
+            "Stop, do not disturb it, isolate the area, and report/escalate to a licensed asbestos assessor and, if needed, a licensed removalist — following the site&rsquo;s asbestos management plan",
+            "Water-blast it to remove the dust"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "For current, authoritative asbestos requirements on an Australian job, you should rely on:",
+          "options": [
+            "US EPA asbestos guidance",
+            "Your state/territory WHS regulator, Safe Work Australia codes, and ASEA — confirming current rules for each job and location",
+            "A general internet search",
+            "Whatever the last technician told you"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        }
+      ]
+    }
+  ]
+}

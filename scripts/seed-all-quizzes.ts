@@ -33,6 +33,7 @@ const QUIZ_FILES = [
   'applied-microbial-remediation-mould-fundamentals-quiz.json',
   'applied-structural-drying-fundamentals-quiz.json',
   'category-3-sewage-black-water-remediation-quiz.json',
+  'asbestos-awareness-for-restoration-technicians-quiz.json',
 ];
 
 type QuizQuestion = {

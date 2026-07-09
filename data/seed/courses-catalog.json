@@ -5578,6 +5578,194 @@
           ]
         }
       ]
+    },
+    {
+      "id": "ec0fcc4d-5ae9-43e3-9dde-53eebb4a492a",
+      "slug": "asbestos-awareness-for-restoration-technicians",
+      "title": "Asbestos Awareness for Restoration Technicians",
+      "description": "<p>A foundational, Australian-produced <strong>awareness</strong> course for restoration and cleaning technicians, supervisors and support staff who attend water-, fire- and storm-damaged buildings, where asbestos-containing materials (ACM) may be disturbed. It builds the single most important safety behaviour on older buildings: recognise likely asbestos, do not disturb it, and escalate to the right licensed professionals.</p><p>Six modules cover what asbestos is (friable vs non-friable), where ACM is found in Australian buildings, the health risk and the 2003 Australian ban, your legal duties at an awareness level under the model WHS Regulations Part 8.7 and the Safe Work Australia codes (with AS 4964 and AS 2601 referenced nominatively), how to recognise likely ACM using building age and the asbestos register, and the correct <strong>stop&ndash;do-not-disturb&ndash;isolate&ndash;escalate</strong> response. Australian throughout: state WHS regulators, ASEA, licensing classes, and Australian building stock. A ten-question knowledge check closes the course.</p><p><strong>Important:</strong> this is an awareness course only. It does not licence or qualify anyone to sample, remove or work on asbestos &mdash; that is work for licensed asbestos assessors and licensed removalists.</p>",
+      "shortDescription": "Australian-produced asbestos AWARENESS training for restoration technicians &mdash; recognise likely asbestos-containing materials, understand the health risk and WHS duties, and respond correctly (stop, do not disturb, isolate, escalate to licensed professionals). Not a removal or assessment qualification.",
+      "thumbnailUrl": null,
+      "instructorId": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+      "status": "draft",
+      "priceAud": "0",
+      "isFree": true,
+      "durationHours": 3,
+      "level": "Foundational",
+      "category": "Health & Safety",
+      "tags": [
+        "asbestos awareness",
+        "WHS",
+        "Safe Work Australia",
+        "ACM",
+        "restoration safety",
+        "do not disturb",
+        "Australian"
+      ],
+      "iicrcDiscipline": null,
+      "cecHours": 0,
+      "meta": {
+        "audience": "restoration technicians, supervisors and support staff",
+        "discipline": "WHS awareness (asbestos)",
+        "buildStage": "seeded-unpublished-draft-pending-founder-review",
+        "linearIssue": "GP-477",
+        "australianProduced": true,
+        "courseType": "awareness-only (not a removal/assessment qualification)",
+        "standardsReferenced": "Nominative only (model WHS Regulations Part 8.7; Safe Work Australia asbestos codes; AS 4964; AS 2601). No standard text reproduced."
+      },
+      "isPublished": false,
+      "modules": [
+        {
+          "id": "bb9b4b33-c03d-41ff-bcea-24f79e58c503",
+          "title": "Module 1: Course Objectives & How This Training Works",
+          "orderIndex": 0,
+          "lessons": [
+            {
+              "id": "1bdc56ff-cb25-41b6-9099-6bf9e5eb5c8e",
+              "title": "What this course covers and who it is for",
+              "contentType": "text",
+              "contentBody": "<p>Welcome to <strong>Asbestos Awareness for Restoration Technicians</strong>. This course is for restoration and cleaning technicians, supervisors and support staff in Australia who attend water-, fire- and storm-damaged buildings, where asbestos-containing materials (ACM) may be disturbed. By the end you will be able to:</p><ul><li>explain what asbestos is, the difference between friable and non-friable (bonded) ACM, and why any exposure matters;</li><li>recognise where ACM is <em>likely</em> to be found in Australian buildings and on restoration jobs;</li><li>understand the health risk and the Australian ban, and why disturbing ACM is the danger;</li><li>know your legal duties under Australian WHS law at an awareness level; and</li><li>respond correctly when you suspect asbestos &mdash; stop, isolate, do not disturb, and escalate to the right licensed professionals.</li></ul><p><strong>This is an awareness course, not a removal or assessment qualification.</strong> It does not licence or authorise you to sample, remove, or work on asbestos. Its purpose is to keep you and others safe by helping you recognise likely ACM and take the correct step: stop and get the right people in. It supports, and does not replace, your legal duties, your employer&rsquo;s procedures, a licensed asbestos assessor, or a licensed removalist.</p>",
+              "orderIndex": 0,
+              "isPreview": true,
+              "resources": null
+            },
+            {
+              "id": "38daff4a-2991-4c64-a6de-d2e750586edb",
+              "title": "Why awareness matters in restoration work",
+              "contentType": "text",
+              "contentBody": "<p>Restoration is exactly the kind of work that disturbs asbestos. Water, fire and storm damage break, wet, cut and pull apart the very materials that in older Australian buildings often contain asbestos &mdash; eaves and soffits, wall and wet-area sheeting (\"fibro\"), vinyl floor tiles and their backing, roofing, and some insulation. Cutting, drilling, sanding, water-blasting, demolishing or even handling damaged ACM can release fibres into the air.</p><p>You cannot tell whether a material contains asbestos just by looking at it &mdash; only laboratory testing can confirm it. That is why the safe default on any older building is to <strong>presume</strong> suspect materials contain asbestos until a competent person confirms otherwise, and to avoid disturbing them. Awareness is the control that stops a routine restoration task from becoming an exposure that harms you, your workmates, and the building&rsquo;s occupants.</p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": null
+            }
+          ]
+        },
+        {
+          "id": "8a5abb8b-383c-40d8-81a7-4fbda3778c24",
+          "title": "Module 2: What Asbestos Is",
+          "orderIndex": 1,
+          "lessons": [
+            {
+              "id": "7795fd8e-cd12-442d-88e2-bb03e024fa15",
+              "title": "Friable and non-friable asbestos",
+              "contentType": "text",
+              "contentBody": "<p>Asbestos is a group of naturally occurring fibrous minerals that were used widely in Australian building products until they were banned. Because the fibres are strong, heat-resistant and cheap, they were mixed into many materials. Asbestos-containing materials are grouped by how easily they release fibres:</p><ul><li><strong>Non-friable (bonded) ACM</strong> &mdash; asbestos bound firmly in a matrix such as cement sheeting (\"fibro\"), vinyl floor tiles, and some adhesives. It is lower risk while intact, but becomes dangerous when it is broken, cut, drilled, sanded or weathered &mdash; which is common on damaged buildings.</li><li><strong>Friable ACM</strong> &mdash; asbestos that can be crumbled to powder by hand pressure when dry, such as some pipe lagging, sprayed insulation and old heat shields. It releases fibres very easily and is the higher-risk form; work on friable asbestos is tightly restricted to specially licensed removalists.</li></ul><p>Damage changes the picture: fire, water and impact can turn intact bonded material into friable debris. Treat damaged suspect material with extra caution.</p>",
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "9eee546e-847d-42f9-9cad-f3c68d6c8dff",
+              "title": "Where asbestos is found in Australian buildings",
+              "contentType": "text",
+              "contentBody": "<p>Asbestos was used extensively in Australian construction, so it can be almost anywhere in older buildings. As a guide, buildings built or renovated <strong>before the 2003 ban</strong> (and especially before the late 1980s) should be presumed to contain ACM unless shown otherwise. Common locations relevant to restoration include:</p><ul><li>eaves, soffits and gable sheeting;</li><li>internal wall and ceiling sheeting, and wet-area (bathroom, laundry) linings;</li><li>vinyl floor tiles and sheet-vinyl backing, and the adhesives under them;</li><li>corrugated cement roofing and fencing;</li><li>pipe lagging, flue and heater components, and some textured coatings.</li></ul><p>Restoration work regularly touches these exact materials. Because you cannot confirm asbestos by sight, use the building&rsquo;s age and an <strong>asbestos register</strong> (workplaces built before 2004 are generally required to have one) as your first indicators, and presume suspect materials are ACM until a competent person confirms otherwise.</p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": null
+            }
+          ]
+        },
+        {
+          "id": "14ac78bc-0c96-4288-8fed-260b74adad15",
+          "title": "Module 3: The Health Risk & the Australian Ban",
+          "orderIndex": 2,
+          "lessons": [
+            {
+              "id": "5ddf2330-2f87-452c-910f-f708b94531ce",
+              "title": "How asbestos harms health",
+              "contentType": "text",
+              "contentBody": "<p>Asbestos harms health when its fibres are <strong>airborne and inhaled</strong>. The fibres are tiny and sharp; once breathed deep into the lungs the body cannot clear them, and over years they can cause serious, often fatal, disease &mdash; asbestosis (scarring of the lungs), lung cancer, and mesothelioma (a cancer of the lining of the lungs or abdomen). These diseases typically appear decades after exposure.</p><p>There is <strong>no known safe level of exposure</strong>. The risk is driven by disturbing ACM and releasing fibres, so intact, undisturbed, well-maintained material is far less of a hazard than the same material once it is cut, broken or weathered. This is why the whole approach is built around <em>not disturbing</em> suspect material rather than around a \"safe amount\" of handling. Smoking greatly multiplies the lung-cancer risk from asbestos exposure.</p>",
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "e8229faa-b9dc-40b6-ba97-e16c1f79b699",
+              "title": "The Australian ban and what it means on site",
+              "contentType": "text",
+              "contentBody": "<p>Australia banned the manufacture, import, supply and use of all forms of asbestos from <strong>31 December 2003</strong>. That ban is about new asbestos &mdash; it does not remove the enormous quantity already in existing buildings, which is exactly what restoration technicians encounter. The national body coordinating asbestos (and silica) safety and awareness is the <strong>Asbestos and Silica Safety and Eradication Agency (ASEA)</strong>.</p><p>On site, the ban means two things for you: any building from before the ban may contain legacy ACM, and there is never a legitimate reason to install or reuse asbestos material. Your job is not to deal with the asbestos yourself, but to recognise it may be present, avoid disturbing it, and bring in the licensed professionals the law requires. The next module covers those legal duties at an awareness level.</p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": null
+            }
+          ]
+        },
+        {
+          "id": "65057da4-7fa5-44f7-91b8-ed6933b09127",
+          "title": "Module 4: Your Legal Duties (Awareness Level)",
+          "orderIndex": 3,
+          "lessons": [
+            {
+              "id": "df353dbc-93d7-47f8-ae69-9072030841a3",
+              "title": "The Australian WHS framework for asbestos",
+              "contentType": "text",
+              "contentBody": "<p>Asbestos work in Australia is governed by the <strong>model Work Health and Safety (WHS) Regulations, Part 8.7</strong> (adopted by most states and territories; Victoria has equivalent OHS provisions), supported by Safe Work Australia codes of practice: <em>How to Manage and Control Asbestos in the Workplace</em> and <em>How to Safely Remove Asbestos</em>. Related standards include <strong>AS 4964</strong> (method for identifying asbestos in samples) and <strong>AS 2601</strong> (demolition).</p><p>Key duties this framework creates (which your employer and the site controller must meet): identifying or presuming asbestos and keeping an <strong>asbestos register</strong> and management plan; ensuring anyone who may disturb asbestos has had <strong>asbestos-awareness training</strong>; and ensuring removal work is done by appropriately <strong>licensed removalists</strong> with <strong>air monitoring</strong> and clearance where required. You do not need to memorise the regulation numbers; you do need to know this framework exists and that it puts hard limits on who may disturb asbestos and how.</p>",
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "3486af7f-a302-4dfb-a330-3e0016add39e",
+              "title": "Licensing and the limits on who may disturb asbestos",
+              "contentType": "text",
+              "contentBody": "<p>Australian WHS law restricts asbestos removal by licence class. In broad terms: a <strong>Class A licence</strong> is required to remove <em>friable</em> asbestos (and any non-friable); a <strong>Class B licence</strong> covers <em>non-friable</em> asbestos removal. A very limited amount of non-friable ACM (up to <strong>10&nbsp;m&sup2;</strong>) may be removed without a licence under the regulations &mdash; but only by a competent person following the code, with the right controls, and never where the material is friable or the situation is uncertain.</p><p>For a restoration technician the safe and lawful position is simple: <strong>treat asbestos removal as work for licensed removalists</strong>, and treat identification as work for a licensed or competent <strong>asbestos assessor</strong>. This awareness course does not make you either. Even where a small non-friable removal might be technically allowed unlicensed, the presence of water or fire damage, the difficulty of confirming the material, and the risk to occupants mean the right call on a restoration job is almost always to stop and bring in the licensed professionals. When in doubt, do not disturb it.</p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": null
+            }
+          ]
+        },
+        {
+          "id": "2c9a9719-40e6-416d-95c6-8f7a137e2c65",
+          "title": "Module 5: Recognising & Responding to Suspected Asbestos",
+          "orderIndex": 4,
+          "lessons": [
+            {
+              "id": "af735088-5742-4e1c-88ce-2fdc49902aec",
+              "title": "Recognising likely ACM on a restoration job",
+              "contentType": "text",
+              "contentBody": "<p>You will not confirm asbestos by eye, but you can recognise when it is <em>likely</em> and raise the alarm. Treat material as suspect when: the building predates the 2003 ban (especially pre-1990); you are looking at the common ACM locations from Module&nbsp;2 (eaves, fibro sheeting, wet-area linings, vinyl tiles and backing, cement roofing, pipe lagging); or the damage has produced broken sheeting, dust or debris of unknown origin.</p><p>Before starting work, check for an <strong>asbestos register</strong> and management plan for the site and read it &mdash; a workplace built before 2004 should generally have one, and it tells you where known ACM is. If there is no register, or the damaged material is not listed, presume suspect materials are ACM. Never sand, cut, drill, water-blast or sweep up suspect material to \"check\" it &mdash; those are the actions that release fibres.</p>",
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "510a43aa-2a81-4f6f-9155-d3ef074f772d",
+              "title": "Stop, isolate, escalate — the correct response",
+              "contentType": "text",
+              "contentBody": "<p>When you suspect asbestos, follow a simple, disciplined response:</p><ul><li><strong>Stop</strong> work in the area immediately &mdash; do not continue the task that would disturb the material.</li><li><strong>Do not disturb</strong> it &mdash; no cutting, drilling, sanding, breaking, sweeping or water-blasting. Do not try to remove it yourself.</li><li><strong>Isolate</strong> the area &mdash; keep yourself, other workers and occupants away; restrict access; and, where it is safe to do so, avoid tracking any dust or debris elsewhere.</li><li><strong>Report and escalate</strong> &mdash; tell your supervisor and the site controller, and have the material identified by a licensed/competent <strong>asbestos assessor</strong> and, if it must be removed, by a <strong>licensed removalist</strong>. Follow the site&rsquo;s asbestos management plan.</li></ul><p>If you believe you or others have already disturbed suspect material and may have been exposed, stop, keep people out of the area, and report it straight away so it can be assessed and any exposure managed. The correct response is never to \"push on and finish the job\".</p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": null
+            }
+          ]
+        },
+        {
+          "id": "3cb90911-aa27-459b-b07d-a4743db08e5d",
+          "title": "Module 6: Course Summary & Where to Get Help",
+          "orderIndex": 5,
+          "lessons": [
+            {
+              "id": "42d7bb51-0d44-4307-b439-b730f4ede794",
+              "title": "The awareness technician’s takeaways",
+              "contentType": "text",
+              "contentBody": "<p>The whole course reduces to a few reliable rules for a restoration technician:</p><ul><li>Older Australian buildings (pre-2003, especially pre-1990) are <strong>presumed</strong> to contain asbestos until a competent person confirms otherwise.</li><li>You <strong>cannot</strong> confirm asbestos by sight &mdash; only testing can.</li><li>The danger is <strong>disturbing</strong> ACM and releasing fibres; there is no safe exposure level.</li><li>You are <strong>not licensed</strong> by this course to sample, remove or work on asbestos.</li><li>When in doubt: <strong>stop, do not disturb, isolate, and escalate</strong> to a licensed assessor and licensed removalist, following the site&rsquo;s asbestos management plan.</li></ul><p>Getting this right protects you, your workmates, the occupants and future occupants from a disease that can take decades to appear. It also protects your business: disturbing asbestos unlawfully is a serious WHS breach.</p>",
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "bba7c29f-febb-462a-898a-ae1572a06897",
+              "title": "Where to get help and stay current",
+              "contentType": "text",
+              "contentBody": "<p>For authoritative Australian guidance, go to the source rather than overseas material:</p><ul><li><strong>Your state or territory WHS regulator</strong> (for example SafeWork NSW, WorkSafe Victoria, Workplace Health and Safety Queensland) &mdash; the legal duties, licensing, and how to report concerns.</li><li><strong>Safe Work Australia</strong> &mdash; the model WHS Regulations and the asbestos codes of practice.</li><li><strong>The Asbestos and Silica Safety and Eradication Agency (ASEA)</strong> &mdash; national coordination, awareness resources and the national strategic plan.</li></ul><p>Because rules, licence conditions and codes are updated over time, confirm the current requirements with your state regulator for each job and location rather than relying on memory. If you regularly work in older buildings, keep your <strong>asbestos-awareness training current</strong> and hold the general construction induction (White Card) your work requires. This awareness training is a starting point for safe recognition and response &mdash; it is not, and does not replace, a licence to work on asbestos.</p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": null
+            }
+          ]
+        }
+      ]
     }
   ]
 }
