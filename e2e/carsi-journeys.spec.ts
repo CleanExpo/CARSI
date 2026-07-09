@@ -40,14 +40,14 @@ test.describe('Public course catalogue', () => {
     await expect(browseCta).toBeVisible();
   });
 
-  test('courses page shows discipline tabs', async ({ page }) => {
+  test('courses page shows topic tabs', async ({ page }) => {
     await page.goto('/courses');
 
     // Page heading
     await expect(page.locator('h1')).toContainText('Restoration Training Courses');
 
-    // Discipline tabs rendered
-    for (const tab of ['All', 'WRT', 'CRT', 'ASD', 'OCT', 'CCT', 'FSRT', 'AMRT', 'Free']) {
+    // Topic tabs rendered (de-IICRC: plain restoration topics, no discipline acronyms)
+    for (const tab of ['All', 'Onboarding', 'Water Damage', 'Mould', 'Fire & Smoke', 'Cleaning', 'Free']) {
       await expect(page.getByRole('tab', { name: tab, exact: true })).toBeVisible();
     }
   });
