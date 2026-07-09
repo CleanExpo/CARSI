@@ -1,6 +1,7 @@
 'use client';
 
 import { MarketingGrowthLinks } from '@/components/marketing/MarketingGrowthLinks';
+import { CitablePassage, FAQSchema } from '@/components/seo';
 import {
   MarketingPageShell,
   marketingPageInnerNarrowClass,
@@ -105,6 +106,10 @@ const faq = [
   {
     q: 'How do I use the pack?',
     a: 'Open the interactive pack in your browser and read it on screen, or download the PDF edition. The pack opens with a “how to use” gate that explains the verification step before delivery.',
+  },
+  {
+    q: 'Does this course help with my insurance cover?',
+    a: 'No industry body certifies truck-mount vehicle, gas or electrical safety, so the certificate binds the separate statutory sign-offs — road, gas, electrical and water — into one dossier. Use the compliance points in the course as a discussion point to start the conversation with your insurance broker, so your cover reflects how the unit is actually built, installed, transported and operated.',
   },
 ] as const;
 
@@ -262,6 +267,7 @@ export function CcwCarsiTruckmountClient() {
       </section>
 
       {/* FAQ */}
+      <FAQSchema questions={faq.map(({ q, a }) => ({ question: q, answer: a }))} />
       <section className="mx-auto mt-20 max-w-3xl md:mt-24" aria-labelledby="tm-faq-heading">
         <div className="mb-8 text-center">
           <p className="text-[10px] font-semibold tracking-[0.22em] text-slate-600 uppercase dark:text-white/55">
@@ -286,7 +292,12 @@ export function CcwCarsiTruckmountClient() {
                   +
                 </span>
               </summary>
-              <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-white/60">{a}</p>
+              <CitablePassage
+                variant="faq-answer"
+                className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-white/60"
+              >
+                {a}
+              </CitablePassage>
             </details>
           ))}
         </div>
