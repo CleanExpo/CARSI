@@ -16,6 +16,7 @@ import {
   htmlToText,
 } from './html-extract';
 import { scanText, type BannedPhraseHit } from './iicrc-phrases';
+import { scanTextForStandardExcerpt, type StandardExcerptHit } from './standards-excerpt';
 import {
   SCAFFOLD_STATUS,
   type AudioScriptScaffold,
@@ -174,6 +175,26 @@ export function scanCourseForBannedPhrases(course: KitCourse): BannedPhraseHit[]
       for (const text of texts) {
         hits.push(...scanText(text, where));
       }
+    }
+  }
+  return hits;
+}
+
+/**
+ * Run the IICRC standards verbatim-excerpt heuristic over every lesson body
+ * (CLAUDE.md § "IICRC standards IP + AI use"): standards are copyright-protected
+ * and must never be reproduced in course content beyond a brief attributed
+ * reference. Reporter only — a hit must be cleared by a human before ship.
+ */
+export function scanCourseForStandardExcerpts(course: KitCourse): StandardExcerptHit[] {
+  const hits: StandardExcerptHit[] = [];
+  for (const mod of course.modules) {
+    for (const lesson of mod.lessons) {
+      const hit = scanTextForStandardExcerpt(
+        htmlToText(lesson.contentBody),
+        `${lesson.id} (${lesson.title})`
+      );
+      if (hit) hits.push(hit);
     }
   }
   return hits;

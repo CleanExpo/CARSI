@@ -76,6 +76,45 @@ const BANNED = [
     allow: null,
     message: 'Do not imply IICRC accredits CARSI\'s courses — say "IICRC CEC Accredited course(s)".',
   },
+  {
+    // "IICRC Approved School" / "IICRC Approved Instructor" as a positive claim about
+    // CARSI — Schools/Instructors are a different IICRC licence class CARSI does not hold.
+    // Third-person facts ("certification is obtained through an IICRC-approved school")
+    // are allowed via the preposition context.
+    re: /\bIICRC[\s-]+Approved[\s-]+(School|Instructor)\b/i,
+    allow: /\b(through|via|from|at)\s+(an?\s+)?IICRC[\s-]+approved\s+school\b/i,
+    message: 'CARSI is not an IICRC Approved School or Instructor — never claim that status (it is a separate IICRC licence class).',
+  },
+  {
+    // Endorsement claims. The IICRC states it "does not promote any particular
+    // educational provider" — endorsement/partnership/promotion claims are banned.
+    re: /endorsed[\s-]+by[\s-]+(the[\s-]+)?IICRC/i,
+    allow: null,
+    message: 'The IICRC does not endorse providers — never claim IICRC endorsement.',
+  },
+  {
+    re: /IICRC[\s-]+endorsed/i,
+    allow: null,
+    message: 'The IICRC does not endorse providers — never claim "IICRC endorsed".',
+  },
+  {
+    re: /IICRC[\s-]+partner(ship)?/i,
+    allow: null,
+    message: 'CARSI is an approved CEC provider, not an IICRC partner — never claim an IICRC partnership.',
+  },
+  {
+    re: /promoted[\s-]+by[\s-]+(the[\s-]+)?IICRC/i,
+    allow: null,
+    message: 'The IICRC does not promote any particular educational provider — never claim IICRC promotion.',
+  },
+  {
+    // Founder brand-exclusion rule (2026-07-09): COACH8 must never appear in any CARSI
+    // copy or content surface (see src/lib/calendar/event-exclusions.ts for the calendar
+    // enforcement of the same rule).
+    re: /\bCOACH[\s-]?8\b/i,
+    allow: null,
+    message: 'COACH8 is excluded from all CARSI surfaces (founder brand-exclusion rule) — remove it.',
+  },
 ];
 
 // Only these source-copy extensions carry public/marketing/in-app strings.
@@ -87,9 +126,15 @@ const COPY_EXT = /\.(tsx?|jsx?|mdx?)$/;
 // it uses technical phrasings like "non-IICRC courses" that are not selling copy.
 const SCANNED_DIRS = ['app/', 'src/', 'templates/', 'docs/marketing/'];
 
+// Seed JSON is production copy (course descriptions, marketing prose) that ships to the
+// live DB via the PRE_DEPLOY seeder — scan it too (gap closed 2026-07-09).
+const JSON_SCANNED_DIRS = ['data/seed/'];
+
 function inScope(file) {
   const norm = file.replace(/\\/g, '/');
-  return SCANNED_DIRS.some((d) => norm.startsWith(d));
+  if (COPY_EXT.test(norm) && SCANNED_DIRS.some((d) => norm.startsWith(d))) return true;
+  if (norm.endsWith('.json') && JSON_SCANNED_DIRS.some((d) => norm.startsWith(d))) return true;
+  return false;
 }
 
 /** Files intentionally exempt: this guard, the rule docs, and skill/spec text
@@ -104,6 +149,10 @@ const EXEMPT = [
   'src/lib/course-kit/iicrc-phrases.ts',
   'src/lib/course-kit/iicrc-phrases.test.ts',
   'src/lib/course-kit/scaffold.test.ts',
+  // The calendar exclusion module + test enforce the COACH8 brand-exclusion rule and
+  // legitimately name the excluded brand (same rationale as the phrase catalogue above).
+  'src/lib/calendar/event-exclusions.ts',
+  'src/lib/calendar/event-exclusions.test.ts',
 ];
 
 function isExempt(file) {
@@ -148,8 +197,7 @@ if (staged) {
       continue;
     }
     if (!line.startsWith('+') || line.startsWith('+++')) continue;
-    if (!currentFile || !COPY_EXT.test(currentFile) || !inScope(currentFile) || isExempt(currentFile))
-      continue;
+    if (!currentFile || !inScope(currentFile) || isExempt(currentFile)) continue;
     scanLine(currentFile, lineNo, line.slice(1), findings);
     lineNo++;
   }
@@ -165,7 +213,7 @@ if (staged) {
   const files = list
     .split('\n')
     .map((f) => f.trim())
-    .filter((f) => f && COPY_EXT.test(f) && inScope(f) && !isExempt(f));
+    .filter((f) => f && inScope(f) && !isExempt(f));
   for (const file of files) {
     let text = '';
     try {

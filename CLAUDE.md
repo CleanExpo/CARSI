@@ -70,9 +70,12 @@ root cause: **IICRC/CEC framing was fail-OPEN — present by default and removed
 standing fix inverts that to **fail-CLOSED — absent by default, added only by explicit approval:**
 
 - **CEC is fail-closed.** `resolveCecHours` / `resolveCatalogCecHours` / `resolveLmsCourseCecHours`
-  return CEC hours ONLY for an explicit, founder-set positive `cecHours`. There is no fallback to
-  duration, prose, meta or reviewer/professional assignment. Absence of an approval yields **no
-  CEC**, never a derived one. Do not re-introduce any inference path.
+  return CEC hours ONLY from the CEC approvals registry (`data/seed/cec-approvals.json` — the SSOT,
+  one entry per IICRC-confirmed approval, validated by `npm run check:cec`) or an explicit,
+  founder-set positive `cecHours`. There is no fallback to duration, prose, meta or
+  reviewer/professional assignment (those branches were deleted 2026-07-09). Absence of an approval
+  yields **no CEC**, never a derived one. Do not re-introduce any inference path. Submission packs
+  for per-course approval: `npx tsx scripts/generate-cec-submission.ts <slug>`.
 - **IICRC framing is opt-in per course.** Reference IICRC, an S-standard, or CEC hours only on a
   course that genuinely maps to an IICRC discipline. Non-restoration courses (vehicle/truckmount,
   floor-care, facilities/biosecurity, admin, product training) carry **no** IICRC/S-standard/CEC
@@ -85,6 +88,27 @@ standing fix inverts that to **fail-CLOSED — absent by default, added only by 
   CEC-hour claims). A specific CEC-hour claim only passes once the founder adds the slug to
   `CEC_APPROVED_SLUGS` in `scripts/check-iicrc-compliance.mjs`. Fix a false positive by tightening
   the rule's allow-list, never by disabling the rule.
+
+## IICRC standards IP + AI use — prohibited (MUST)
+
+Per the IICRC's published AI Use Policy and copyright terms on its official standards store
+(iicrc.gilmoreglobal.com), and its brand/trademark enforcement:
+
+- **Never feed IICRC standard text into any AI tooling.** The IICRC prohibits entry of its
+  standards and related intellectual property into any form of AI tool, and prohibits creating AI
+  derivatives of its published and draft standards. This binds every CARSI content pipeline
+  (course-asset-kit, AI course creation, prompt contexts, RAG/embedding corpora) — violation risks
+  access suspension and legal action against the licence holder.
+- **Never reproduce standard text beyond a brief, attributed reference.** Standards are
+  copyright-protected and not printable ("printing limited to small sections for reference only").
+  Courses may reference a standard nominatively ("aligned to ANSI/IICRC S500:2021") — never paste
+  its sections, tables or procedures. The course-kit excerpt heuristic
+  (`src/lib/course-kit/standards-excerpt.ts`, `scanCourseForStandardExcerpts`) flags suspected
+  pasted standard text at scaffold time — treat a hit as a release blocker until cleared.
+- **Never use IICRC logos or marks without written permission.** The "IICRC" wordmark is
+  nominative-use only; logo rights attach to Certified Firms/Registrants under signed agreements,
+  and the IICRC publicly enforces violations (its "Invalid Firms" list). CARSI currently uses no
+  IICRC mark — keep it that way unless the founder holds written permission.
 
 ## Continual Learning
 

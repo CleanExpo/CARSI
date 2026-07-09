@@ -1,0 +1,5 @@
+{
+  "version": 1,
+  "note": "IICRC CEC approvals registry — the single source of truth for CEC hours (licence-critical). A course may display CEC hours ONLY when it has an entry here with status 'approved' and founder-recorded approvedHours. Entries are added by the founder after per-course IICRC approval via CECCourse@iicrcnet.org (submission pack: scripts/generate-cec-submission.ts). Validated in CI by npm run check:cec. Ships empty until the first genuine approval is confirmed.",
+  "approvals": []
+}
