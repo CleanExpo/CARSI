@@ -1,0 +1,125 @@
+{
+  "version": 1,
+  "courseSlug": "water-damage-restoration-fundamentals",
+  "quizzes": [
+    {
+      "quizId": "e7798876-961d-4e4c-a2f0-f91ded4cc2d1",
+      "lessonTitle": "Final knowledge check",
+      "title": "Water Damage Restoration Fundamentals — Knowledge Check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "A supply line to a bathroom vanity has burst, releasing clean mains water that has not contacted contaminated materials. How is this water categorised?",
+          "options": [
+            "Category 1 — clean water",
+            "Category 2 — significantly contaminated (grey water)",
+            "Category 3 — grossly contaminated (black water)",
+            "It cannot be categorised until laboratory testing is complete"
+          ],
+          "correctIndex": 0,
+          "points": 1
+        },
+        {
+          "questionText": "Clean (Category 1) water has been sitting in a warm, closed building for several days. What is the correct professional position on its category?",
+          "options": [
+            "It remains Category 1 permanently because it started clean",
+            "It can degrade toward Category 2 or 3 over time and should be reassessed, and when unsure treated as the worse category",
+            "It automatically becomes Category 3 after 24 hours in all cases",
+            "Category does not change once it has been recorded on the first visit"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "In the classes of water intrusion, what does Class 4 describe?",
+          "options": [
+            "The least amount of water, affecting only part of a room",
+            "An entire room with carpet and underlay affected and wicking up walls",
+            "Specialty drying situations where water is bound in low-permeability materials such as hardwood, plaster or concrete",
+            "Any job involving Category 3 water regardless of how much water is present"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "Before entering standing water near electrical fittings on an Australian job site, what is the correct approach?",
+          "options": [
+            "Enter immediately because 230 V mains is low enough to be safe in water",
+            "Ensure the supply is isolated where needed, use a residual current device (safety switch/RCD) on portable equipment, and use only tested-and-tagged leads",
+            "Only wear rubber boots and proceed, as boots fully remove the electrical risk",
+            "Switch off one power point and assume the whole area is now de-energised"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "You are working with Category 3 (black water / sewage). Which PPE approach is appropriate?",
+          "options": [
+            "Gloves only, since sewage dries quickly",
+            "Full skin protection — fluid-resistant coveralls, gloves, boots and eye protection — plus P2 or higher respiratory protection fit-checked to the wearer",
+            "A dust mask and ordinary work clothes",
+            "No PPE is required once the bulk water has been extracted"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "What is the purpose of taking a 'dry standard' reading during moisture assessment?",
+          "options": [
+            "To record the outdoor humidity for the day",
+            "To provide a reference reading from unaffected material of the same type, which becomes the target the wet material is dried back to",
+            "To calibrate the thermal imaging camera against the moisture meter",
+            "To set an arbitrary fixed number that applies to every job regardless of the building"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "Why must dehumidification be balanced with airflow during structural drying?",
+          "options": [
+            "Because airflow alone, without removing the evaporated moisture, just raises the humidity in the room and stalls drying",
+            "Because dehumidifiers replace the need to measure moisture readings",
+            "Because airflow lowers the room temperature below freezing",
+            "Because dehumidification is only needed in dry inland climates"
+          ],
+          "correctIndex": 0,
+          "points": 1
+        },
+        {
+          "questionText": "On a standard Australian 10 A GPO circuit (approximately 2300 W total at 230 V, often shared across several outlets), how should drying equipment be powered?",
+          "options": [
+            "Plug in as many machines as physically fit into the available outlets",
+            "Add up each machine's actual current draw at 230 V, keep the total safely below each circuit's rating, and spread load across separate circuits",
+            "Assume every outlet is on its own dedicated 20 A circuit",
+            "Run all equipment from a single power board on one outlet to keep leads tidy"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "Visible mould is present in a water-damaged room. What is the correct drying approach?",
+          "options": [
+            "Run air movers at full speed to dry the mould as fast as possible",
+            "Do not run air movers; dry using air filtration devices (AFDs/air scrubbers) and dehumidifiers only under containment, and introduce air movers only after remediation and a clearance",
+            "Air movers are fine as long as a dehumidifier is also running",
+            "Open all windows and use air movers to push the spores outside"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "Why does measured drying documentation matter in the Australian insurance context?",
+          "options": [
+            "It is optional paperwork that only slows the job down",
+            "Insurers and assessors expect measured evidence — readings trending to a dry standard — not just 'it looks dry', and a clear dated file protects the customer, technician and insurer if a claim is later questioned",
+            "It replaces the need to obtain authority for scope changes",
+            "It allows the technician to guarantee a fixed dry time to the client"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        }
+      ]
+    }
+  ]
+}
