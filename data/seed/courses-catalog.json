@@ -3697,6 +3697,336 @@
                   "label": "Course video overview — narrated slides (7 min)",
                   "url": "https://res.cloudinary.com/dmaulkthb/video/upload/v1783556488/carsi/course-video-overview/h5-bird-flu-awareness-30cfc54f.mp4",
                   "kind": "video"
+                },
+                {
+                  "label": "Lesson slides — all modules",
+                  "kind": "slides",
+                  "decks": [
+                    {
+                      "module": "Official message and reporting pathway",
+                      "slides": [
+                        {
+                          "title": "The official position",
+                          "bullets": [
+                            "Australia has reported H5 bird flu detections in migratory seabirds.",
+                            "The professional communication position is calm and evidence-led.",
+                            "Follow Australian Government and Australian CDC advice.",
+                            "Avoid speculation and direct the public to the correct reporting pathway."
+                          ],
+                          "speakerNotes": "Australia has recorded H5 bird flu detections in migratory seabirds, and our job is to stay calm and evidence-led. That means following Australian Government and Australian Centre for Disease Control advice, avoiding speculation, and pointing people to the correct reporting pathway."
+                        },
+                        {
+                          "title": "If you find a sick or dead bird or animal",
+                          "bullets": [
+                            "Do not touch it.",
+                            "Avoid the area.",
+                            "Keep children and pets away.",
+                            "Record the location and what is seen.",
+                            "Take photos or video only if safe.",
+                            "Report to the Emergency Animal Disease Hotline on 1800 675 888."
+                          ],
+                          "speakerNotes": "If a sick or dead bird or animal is found, the public message is simple. Do not touch it, avoid the area, and keep children and pets away. Then record the location, take photos or video only if it is safe, and report to the Emergency Animal Disease Hotline on 1800 675 888."
+                        },
+                        {
+                          "title": "Report first",
+                          "bullets": [
+                            "Report first.",
+                            "Do not touch.",
+                            "Record the location.",
+                            "Call 1800 675 888."
+                          ],
+                          "speakerNotes": "The whole pathway compresses into four words: report first, do not touch, record the location, and call 1800 675 888. If you remember nothing else from this module, remember that sequence."
+                        },
+                        {
+                          "title": "Use neutral, professional language",
+                          "bullets": [
+                            "Do not tell the public that a site is infected.",
+                            "Do not tell the public that a site is safe.",
+                            "Use neutral language: observed, reported, excluded from scope, referred to authority."
+                          ],
+                          "speakerNotes": "A key professional caution: never tell the public a site is infected, and never tell them it is safe. Stick to neutral, defensible language such as observed, reported, excluded from scope, or referred to authority."
+                        }
+                      ]
+                    },
+                    {
+                      "module": "Professional role, scope and boundaries",
+                      "slides": [
+                        {
+                          "title": "Support, not authority replacement",
+                          "bullets": [
+                            "Members may assist property owners, facility and strata managers, insurers or contractors.",
+                            "The role is support, not authority replacement.",
+                            "Official disease response sits with the relevant authorities."
+                          ],
+                          "speakerNotes": "Restoration and IAQ members are often asked to help property owners, facility and strata managers, insurers or contractors. Our role here is support, not replacing anyone in authority, because official disease response sits with the relevant government, veterinary, wildlife and public-health bodies."
+                        },
+                        {
+                          "title": "What professionals can assist with",
+                          "bullets": [
+                            "Site notes and photo records.",
+                            "Access control and exclusion-zone records.",
+                            "Worker-safety planning and PPE record keeping.",
+                            "Cleaning records and product-label and SDS record checks."
+                          ],
+                          "speakerNotes": "There is plenty we can legitimately do. That includes site notes and photo records, access control and exclusion-zone records, worker-safety planning, PPE record keeping, cleaning records, and checking product-label and SDS records."
+                        },
+                        {
+                          "title": "Assisting continues",
+                          "bullets": [
+                            "Client communication notes.",
+                            "RestoreAssist.app reporting.",
+                            "Escalation to the correct authority pathway."
+                          ],
+                          "speakerNotes": "Our support role also covers writing up client communication notes, capturing the job in RestoreAssist.app, and escalating to the correct authority pathway. In every case we are documenting and routing, not deciding disease outcomes."
+                        },
+                        {
+                          "title": "What professionals must not do",
+                          "bullets": [
+                            "Handle wildlife without authorisation.",
+                            "Diagnose avian influenza.",
+                            "Certify a site as disease-free.",
+                            "Override government, veterinary, wildlife or public-health authorities.",
+                            "Claim a product or dry-fogging method is required without authority direction and product evidence."
+                          ],
+                          "speakerNotes": "There are firm boundaries. Do not handle wildlife without authorisation, do not diagnose avian influenza, and do not certify a site as disease-free. Never override the authorities, and never claim a product or dry-fogging method is required unless written authority direction and product evidence support it."
+                        },
+                        {
+                          "title": "Our role in one line",
+                          "bullets": [
+                            "Document.",
+                            "Protect workers.",
+                            "Communicate clearly.",
+                            "Leave official disease response to the relevant authorities."
+                          ],
+                          "speakerNotes": "In a single line: our role is to document, protect workers and communicate clearly. Official disease response stays with the relevant authorities, and holding that boundary is what keeps us credible."
+                        }
+                      ]
+                    },
+                    {
+                      "module": "Worker safety, PPE awareness and clean/dirty zones",
+                      "slides": [
+                        {
+                          "title": "Start with a WHS risk assessment",
+                          "bullets": [
+                            "Complete a site-specific WHS risk assessment before any site work.",
+                            "Determine what has been observed.",
+                            "Check whether authorities have been contacted and whether the site is under direction.",
+                            "Confirm the work is within the contractor's scope."
+                          ],
+                          "speakerNotes": "Before anyone starts work, complete a site-specific WHS risk assessment. Establish what has been observed, whether authorities have already been contacted, whether the site is under direction, and whether the work actually falls within your scope."
+                        },
+                        {
+                          "title": "Use clean and dirty zones",
+                          "bullets": [
+                            "Use clean and dirty zones on site.",
+                            "Zones reduce confusion.",
+                            "Zones reduce cross-contamination risk."
+                          ],
+                          "speakerNotes": "Clean and dirty zones are a simple but powerful control. They cut down confusion about where you are in the process and reduce the risk of cross-contamination between areas."
+                        },
+                        {
+                          "title": "PPE is matched, not prescribed",
+                          "bullets": [
+                            "This course does not prescribe a universal PPE set.",
+                            "PPE must be matched to task, risk, authority guidance, product label and SDS.",
+                            "Records should show PPE selected, who wore it, and any breaches.",
+                            "Records should show what waste or equipment movement was excluded from the job."
+                          ],
+                          "speakerNotes": "There is no universal PPE set in this course, because PPE has to be matched to the task, the risk, authority guidance, and the product label and SDS. What matters is that your records show what PPE was selected, who wore it, whether there were any breaches, and what waste or equipment movement was excluded."
+                        },
+                        {
+                          "title": "What to document",
+                          "bullets": [
+                            "Who attended and what was observed.",
+                            "Whether sick or dead birds or animals were present.",
+                            "Whether the hotline or authority pathway was used.",
+                            "PPE selected, access restrictions and client instructions.",
+                            "Work not performed, plus photos and timestamps."
+                          ],
+                          "speakerNotes": "Your documentation should capture who attended, what was observed, and whether any sick or dead birds or animals were present. Record whether the hotline or authority pathway was used, the PPE selected, access restrictions, client instructions, any work not performed, and photos with timestamps."
+                        },
+                        {
+                          "title": "If it is not documented, it cannot be reviewed",
+                          "bullets": [
+                            "Records make the work reviewable.",
+                            "If it is not documented, it cannot be reviewed."
+                          ],
+                          "speakerNotes": "The guiding principle here is straightforward: if it is not documented, it cannot be reviewed. Good records are what make your safety decisions defensible later."
+                        }
+                      ]
+                    },
+                    {
+                      "module": "Cleaning-before-disinfection and product-claim limits",
+                      "slides": [
+                        {
+                          "title": "Clean first, disinfect second, document third",
+                          "bullets": [
+                            "CARSI's training position is simple.",
+                            "Clean first.",
+                            "Disinfect second.",
+                            "Document third."
+                          ],
+                          "speakerNotes": "CARSI's training position on this is deliberately simple. Clean first, disinfect second, and document third. That order is the backbone of every job."
+                        },
+                        {
+                          "title": "Disinfection claims have limits",
+                          "bullets": [
+                            "Disinfection claims must never exceed the product label.",
+                            "They must never exceed the SDS or the regulator position.",
+                            "They must never exceed the evidence base."
+                          ],
+                          "speakerNotes": "Disinfection claims are bounded. They must never go beyond the product label, the SDS, the regulator position, or the underlying evidence base. When in doubt, claim less."
+                        },
+                        {
+                          "title": "Dry fogging: an adjunct, never required",
+                          "bullets": [
+                            "Hydrogen-peroxide dry fogging includes Halosil or HaloFogger-style systems.",
+                            "It must not be described as required by Australian Government H5 control measures without written authority direction and product evidence.",
+                            "It may only be an adjunct where legal, label-supported, risk-assessed and unoccupied where required.",
+                            "It is performed by trained operators after source removal and cleaning."
+                          ],
+                          "speakerNotes": "Hydrogen-peroxide dry fogging, including Halosil or HaloFogger-style systems, must never be described as required by Australian Government H5 control measures unless written authority direction and product evidence support that. At most it is a possible adjunct method, and only where it is legal, label-supported, risk-assessed, unoccupied where required, and performed by trained operators after source removal and cleaning."
+                        },
+                        {
+                          "title": "Product training stays label- and SDS-led",
+                          "bullets": [
+                            "NeoSan or any other product training must remain label-led and SDS-led.",
+                            "This holds until approved H5 or relevant organism claims are verified.",
+                            "Product training is not product hype.",
+                            "Use the label, SDS, evidence and authority direction."
+                          ],
+                          "speakerNotes": "NeoSan, or any other product training, stays label-led and SDS-led until approved H5 or relevant-organism claims are actually verified. Product training is not product hype; we lean on the label, the SDS, the evidence and authority direction."
+                        }
+                      ]
+                    },
+                    {
+                      "module": "RestoreAssist.app documentation pathway",
+                      "slides": [
+                        {
+                          "title": "The documentation pathway",
+                          "bullets": [
+                            "RestoreAssist.app is the documentation pathway for campaign field records.",
+                            "A professional file lets a client, insurer, supervisor or authority understand the job.",
+                            "It shows what was observed, reported, done, not done, and what evidence supported the decision."
+                          ],
+                          "speakerNotes": "RestoreAssist.app is the documentation pathway for campaign field records. A well-built file lets a client, insurer, supervisor or authority quickly understand what was observed, what was reported, what was done and not done, and what evidence backed each decision."
+                        },
+                        {
+                          "title": "Suggested record sections",
+                          "bullets": [
+                            "Intake notes.",
+                            "Site address and contact.",
+                            "Observation notes.",
+                            "Authority and reporting record.",
+                            "Photos and captions."
+                          ],
+                          "speakerNotes": "A good record starts with intake notes, the site address and contact, and your observation notes. It also captures the authority and reporting record, plus photos with clear captions."
+                        },
+                        {
+                          "title": "Suggested record sections continued",
+                          "bullets": [
+                            "Worker attendance and PPE record.",
+                            "Access control.",
+                            "Cleaning record.",
+                            "Product and SDS record.",
+                            "Exclusion and limitation notes, client communication, and a completion statement."
+                          ],
+                          "speakerNotes": "The file then covers worker attendance and PPE, access control, the cleaning record, and the product and SDS record. Finish with exclusion and limitation notes, client communication, and a clear completion statement."
+                        },
+                        {
+                          "title": "From memory to defensible record",
+                          "bullets": [
+                            "RestoreAssist turns the job from a memory into a defensible record."
+                          ],
+                          "speakerNotes": "The point of all of this is simple. RestoreAssist turns the job from a memory into a defensible record that stands up to review."
+                        }
+                      ]
+                    },
+                    {
+                      "module": "Client, media and social communication",
+                      "slides": [
+                        {
+                          "title": "A measured tone",
+                          "bullets": [
+                            "This is a public-interest and professional-readiness campaign.",
+                            "The tone must be measured.",
+                            "Do not use crisis, outbreak or emergency unless those are the exact words used by authorities for the current situation."
+                          ],
+                          "speakerNotes": "This is a public-interest and professional-readiness campaign, so the tone must stay measured. Avoid words like crisis, outbreak or emergency unless those are the exact terms the authorities are using for the current situation."
+                        },
+                        {
+                          "title": "Use approved wording",
+                          "bullets": [
+                            "We follow Australian Government advice.",
+                            "Do not touch sick or dead birds.",
+                            "Report to 1800 675 888.",
+                            "Our role is documentation, worker safety and professional support.",
+                            "We do not replace government, veterinary, wildlife or public-health authorities. Product use must follow label, SDS and authority requirements."
+                          ],
+                          "speakerNotes": "Lean on approved wording. We follow Australian Government advice, do not touch sick or dead birds, and report to 1800 675 888. Our role is documentation, worker safety and professional support; we do not replace the authorities, and product use follows the label, SDS and authority requirements."
+                        },
+                        {
+                          "title": "What to avoid",
+                          "bullets": [
+                            "Fear-based headlines and unsupported claims.",
+                            "Fake statistics, fake expert quotes and fake portraits.",
+                            "Unapproved personal contact details.",
+                            "Product claims that exceed evidence."
+                          ],
+                          "speakerNotes": "There is a clear avoid list. Steer away from fear-based headlines and unsupported claims, and never use fake statistics, fake expert quotes or fake portraits. Do not publish unapproved personal contact details, and never make product claims that exceed the evidence."
+                        },
+                        {
+                          "title": "Calm language builds trust",
+                          "bullets": [
+                            "Calm language builds trust.",
+                            "Panic language damages credibility."
+                          ],
+                          "speakerNotes": "The takeaway is short. Calm language builds trust, while panic language damages credibility, so choose your words with that trade-off in mind."
+                        }
+                      ]
+                    },
+                    {
+                      "module": "Knowledge check and completion",
+                      "slides": [
+                        {
+                          "title": "Confirm the professional-boundary statement",
+                          "bullets": [
+                            "Before the knowledge check, confirm you understand the professional-boundary statement.",
+                            "You will be asked to apply it while answering the quiz questions."
+                          ],
+                          "speakerNotes": "Before the knowledge check, take a moment to confirm you understand the professional-boundary statement. You will be asked to apply it directly while you answer the quiz questions."
+                        },
+                        {
+                          "title": "The boundary statement",
+                          "bullets": [
+                            "My role is to report, protect, document and communicate within scope.",
+                            "I do not diagnose bird flu or handle wildlife without authorisation.",
+                            "I do not certify sites as disease-free.",
+                            "I do not make product claims that are not supported by label, SDS, regulator position and evidence."
+                          ],
+                          "speakerNotes": "The statement is your anchor. Your role is to report, protect, document and communicate within scope. You do not diagnose bird flu, handle wildlife without authorisation, certify sites as disease-free, or make product claims that the label, SDS, regulator position and evidence do not support."
+                        },
+                        {
+                          "title": "What this training is not",
+                          "bullets": [
+                            "Awareness training only.",
+                            "Not veterinary or medical training.",
+                            "Not wildlife-handling training.",
+                            "Not government biosecurity response training."
+                          ],
+                          "speakerNotes": "Be clear about the certificate's scope. This is awareness training only. It is not veterinary, medical, wildlife-handling or government biosecurity response training."
+                        },
+                        {
+                          "title": "Apply it in the knowledge check",
+                          "bullets": [
+                            "Hold the boundary statement in mind as you answer.",
+                            "Answer each question within scope."
+                          ],
+                          "speakerNotes": "As you move into the knowledge check, keep the boundary statement in mind. Answer each question from within your professional scope, and you will be applying exactly what this course has taught."
+                        }
+                      ]
+                    }
+                  ]
                 }
               ]
             }
