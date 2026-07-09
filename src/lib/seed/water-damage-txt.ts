@@ -1,3 +1,5 @@
+import { hoistObjectivesFirst } from '@/lib/seed/objectives-module';
+
 const COURSE_HEADER = /^COURSE (\d+) OF (\d+)\s*$/i;
 const MODULE_HEAD = /^MODULE (\d+):\s*(.*)$/i;
 const DASH_RULE = /^-{3,}\s*$/;
@@ -179,7 +181,8 @@ export function parseWaterDamageRestorationTxt(text: string): WaterDamageParsedC
         isFree,
         iicrcDiscipline,
         overviewParagraphs,
-        modules,
+        // GP-434: the source doc places WHAT YOU WILL LEARN last; learners see objectives first.
+        modules: hoistObjectivesFirst(modules),
       });
     }
   }

@@ -289,7 +289,11 @@ export default async function YouTubePage({
                   })}
                 </span>
               ) : (
-                <span>Weekly stats sync pending API key</span>
+                // GP-431: don't leak an internal "pending API key" status to the
+                // public. The channels below are real and curated; only the
+                // optional view-count stats sync is unwired, so say nothing about
+                // a stats cadence until it is.
+                <span>Curated weekly by CARSI</span>
               )}
             </>
           }
