@@ -17,6 +17,7 @@
     "build": "prisma generate && next build",
     "check:secrets": "node scripts/check-secrets.mjs",
     "check:iicrc-terminology": "node scripts/check-iicrc-terminology.mjs",
+    "check:iicrc-compliance": "node scripts/check-iicrc-compliance.mjs",
     "dev": "prisma generate && next dev",
     "dev:with-migrate": "prisma generate && prisma migrate deploy && next dev",
     "start": "prisma migrate deploy && next start",
