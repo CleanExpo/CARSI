@@ -120,7 +120,8 @@ async function getEvents(eventType?: string, category?: string): Promise<EventLi
     clearTimeout(timeoutId);
     if (!res.ok) return { data: [], total: 0, limit: 50, offset: 0 };
     const json = (await res.json()) as EventListResponse;
-    // Hard exclusion (founder directive): COACH8 must never appear on the calendar.
+    // Hard exclusion (founder directive): the excluded coaching brand must never appear
+    // on the calendar — see src/lib/calendar/event-exclusions.ts.
     return { ...json, data: filterExcludedEvents(json.data ?? []) };
   } catch {
     return { data: [], total: 0, limit: 50, offset: 0 };
