@@ -53,6 +53,14 @@ descriptors like "WRT/ASD/AMRT-aligned" are fine. Selling CARSI as delivering II
 can cost the licence to sell courses — treat it as a release blocker. Enforced by
 `npm run check:iicrc-terminology`.
 
+**CEC hours require per-course IICRC approval (founder directive 2026-07-09).** A course may only
+show CEC hours (badge, filter, schema, marketing, video/infographic frames) after it has been
+submitted to and approved by the IICRC — the founder confirms this per course. Every NEW course
+MUST ship with `cecHours: 0` in `data/seed/courses-catalog.json` (the explicit "not CEC-approved"
+opt-out; `resolveCecHours` then never derives a value from duration/prose/meta). Only the founder
+flips a course to its approved hours. Never rely on the legacy duration-derived fallback for new
+content — deriving a CEC claim for an unapproved course is a licence-critical defect.
+
 ## Continual Learning
 
 This repo emits signal to `.harness/learning/*.jsonl` for the weekly distillation routine (RA-1745). If you notice something the system should learn from, append a structured entry — do not stop work to reason about meta-rules. Schema and consumer per RA-1745.
