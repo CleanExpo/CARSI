@@ -45,7 +45,9 @@ test.describe('smoke: deploy health', () => {
     const response = await page.goto('/courses');
     expect(response?.status()).toBe(200);
 
-    await expect(page.locator('h1')).toBeVisible({ timeout: 10_000 });
+    // .first(): the E2E dev server can transiently render a duplicate h1 (hydration
+    // artifact — prod serves exactly one); strict mode would fail on the duplicate.
+    await expect(page.locator('h1').first()).toBeVisible({ timeout: 10_000 });
     await expect(page.locator('a[href*="/courses/"]').first()).toBeVisible({
       timeout: 10_000,
     });
