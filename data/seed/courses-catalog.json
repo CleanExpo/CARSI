@@ -4732,6 +4732,208 @@
           ]
         }
       ]
+    },
+    {
+      "id": "e040bb6d-5abc-41f8-bb78-1bb0846a79b7",
+      "slug": "water-damage-restoration-fundamentals",
+      "title": "Water Damage Restoration Fundamentals",
+      "description": "<p>A foundational, Australian-produced course for restoration technicians, supervisors, cleaners and insurance-support staff who respond to water-damaged buildings and contents. It is <strong>WRT-aligned CEC training</strong> &mdash; it aligns to the principles of professional water damage restoration practice and is designed to build sound field judgement, not to replace a technician&rsquo;s own certification, a manufacturer&rsquo;s instructions, a Safety Data Sheet, or a site&rsquo;s own rules.</p><p>Six modules take a new technician from first principles to a defensible job file: what water damage restoration is and how to think about it, how water is categorised (Category 1/2/3) and classified by the extent of intrusion, hazard-led safety and PPE selection, moisture assessment with metric instruments and Australian-available equipment, drying principles with realistic 230&nbsp;V / 10&nbsp;A power awareness, and documentation, reporting and the Australian insurance context. Each idea is grounded in Australian power (230&nbsp;V, 10&nbsp;A GPO, RCD/safety switch), metric units, Australian standards and regulators (AS/NZS, Safe Work Australia, state WHS), and Australian job realities. A ten-question knowledge check closes the course.</p>",
+      "shortDescription": "WRT-aligned CEC training in the fundamentals of professional water damage restoration &mdash; water categories and classes, hazard-led safety, moisture assessment, drying principles and documentation, produced for Australian conditions.",
+      "thumbnailUrl": null,
+      "instructorId": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+      "status": "draft",
+      "priceAud": "0",
+      "isFree": true,
+      "durationHours": 4,
+      "level": "Foundational",
+      "category": "Water Damage Restoration",
+      "tags": [
+        "water damage restoration",
+        "WRT-aligned",
+        "category 1 2 3",
+        "drying",
+        "moisture assessment",
+        "PPE",
+        "documentation",
+        "Australian"
+      ],
+      "iicrcDiscipline": "WRT",
+      "cecHours": 0,
+      "meta": {
+        "audience": "restoration technicians and supervisors",
+        "discipline": "WRT-aligned CEC training",
+        "buildStage": "seeded-unpublished-draft-pending-founder-review",
+        "linearIssue": "GP-469",
+        "australianProduced": true,
+        "standardsReferenced": "Nominative only (ANSI/IICRC S500); no standard text reproduced (IICRC AI Use Policy honoured)."
+      },
+      "isPublished": false,
+      "modules": [
+        {
+          "id": "d57e0237-3855-4903-8564-d0cbf46c2502",
+          "title": "Module 1: Course Objectives & How This Training Works",
+          "orderIndex": 0,
+          "lessons": [
+            {
+              "id": "d4c218ea-bb56-4a2c-beff-29154009d0ab",
+              "title": "What this course covers and who it is for",
+              "contentType": "text",
+              "contentBody": "<p>Welcome to <strong>Water Damage Restoration Fundamentals</strong>. This course is for technicians, supervisors, cleaners and insurance-support staff who attend water-damaged buildings and contents in Australia. By the end you will be able to:</p><ul><li>describe what professional water damage restoration is and why a structured process matters;</li><li>categorise water by likely contamination (Category&nbsp;1, 2 and 3) and describe how the extent of intrusion is classified;</li><li>identify site hazards and select personal protective equipment (PPE) by the hazard present, not by habit;</li><li>take and interpret moisture readings with metric instruments and set a defensible dry goal;</li><li>explain the principles of structural drying and size equipment with realistic power awareness at 230&nbsp;V / 10&nbsp;A; and</li><li>produce documentation that stands up in an Australian insurance and dispute context.</li></ul><p>This is <strong>WRT-aligned CEC training</strong>: it aligns to the principles of professional water damage restoration practice. It supports good judgement and does not replace your own certification, a manufacturer&rsquo;s instructions, a Safety Data Sheet (SDS), a relevant Australian standard, or a site&rsquo;s own rules.</p>",
+              "orderIndex": 0,
+              "isPreview": true,
+              "resources": null
+            },
+            {
+              "id": "50355ac7-88f6-4431-998c-65b851347823",
+              "title": "How the restoration mindset works",
+              "contentType": "text",
+              "contentBody": "<p>Water damage restoration is a race between drying and damage. Wet materials do not just look bad &mdash; over hours and days they support microbial growth, corrosion, swelling and delamination. The professional aim is to <strong>return the structure and restorable contents to a dry, safe condition quickly, safely and with evidence</strong>, and to know when a material should be restored versus removed.</p><p>A reliable job follows a repeatable arc: make it safe, understand the water and the affected materials, control the source and remove bulk water, assess moisture and set a dry goal, apply the right drying strategy, monitor to the goal, then verify and document. Australia adds its own constraints at every step &mdash; 230&nbsp;V power and 10&nbsp;A circuits, metric measurement, Australian climate and building types, and Australian work-health-and-safety law. We build each of those in as we go. Where standards are named, we reference them nominatively (for example, aligning to ANSI/IICRC&nbsp;S500) and never reproduce their text.</p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": null
+            }
+          ]
+        },
+        {
+          "id": "5087cb5d-c882-4f51-95a4-0b8d2f2e7bad",
+          "title": "Module 2: Water Categories & Classes",
+          "orderIndex": 1,
+          "lessons": [
+            {
+              "id": "549e8ba9-cec0-4a48-b286-b86676295418",
+              "title": "The three water categories",
+              "contentType": "text",
+              "contentBody": "<p>Water is described by how contaminated it is likely to be. Three categories are used:</p><ul><li><strong>Category&nbsp;1 &mdash; clean water.</strong> Originates from a sanitary source with no substantial contamination, for example a burst mains supply line, an overflowing tap or rainwater ingress that has not passed through contaminated materials.</li><li><strong>Category&nbsp;2 &mdash; significantly contaminated (&ldquo;grey water&rdquo;).</strong> Contains contamination that could cause discomfort or illness if contacted or consumed, for example discharge from a dishwasher or washing machine, or a toilet overflow containing urine but no faeces.</li><li><strong>Category&nbsp;3 &mdash; grossly contaminated (&ldquo;black water&rdquo;).</strong> May contain harmful agents, for example sewage, water from beyond the toilet trap, or floodwater from rivers or the sea.</li></ul><p>Two rules matter on site. First, <strong>a category can worsen over time</strong> &mdash; clean water left in a warm building can degrade toward Category&nbsp;2 or 3 as it contacts soils and supports growth. Second, <strong>when you are unsure, treat water as the worse category</strong> and reassess. Category drives the safety, PPE, cleaning and disposal decisions that follow.</p>",
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "8e3ac808-501b-419f-a3a2-cb54ef0e3fb8",
+              "title": "Classes: how much water and how hard to dry",
+              "contentType": "text",
+              "contentBody": "<p>Where category describes contamination, <strong>class</strong> describes the amount of water and the likely rate of evaporation &mdash; how big the drying job is. In broad terms:</p><ul><li><strong>Class&nbsp;1</strong> &mdash; the least water; only part of a room or materials of low porosity are affected. Fastest to dry.</li><li><strong>Class&nbsp;2</strong> &mdash; a larger amount of water; an entire room, carpet and cushion (underlay), and wicking up walls to around 300&nbsp;mm.</li><li><strong>Class&nbsp;3</strong> &mdash; the greatest amount of water; ceilings, walls, insulation and subfloor are saturated, often from above.</li><li><strong>Class&nbsp;4</strong> &mdash; specialty drying situations, where water is bound in low-permeability materials such as hardwood, plaster, masonry or concrete that dry very slowly and need specialist methods.</li></ul><p>Class shapes how much drying capacity you need and how long the job will take. A Class&nbsp;3 ceiling collapse needs far more airflow and dehumidification than a Class&nbsp;1 spill. Getting the class right early prevents both under-drying (a callback and a mould claim) and over-resourcing.</p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": null
+            }
+          ]
+        },
+        {
+          "id": "6755660a-d970-494f-8c2f-65f5b4c00e0d",
+          "title": "Module 3: Safety & PPE by Hazard",
+          "orderIndex": 2,
+          "lessons": [
+            {
+              "id": "51c6821e-1153-4319-a977-a18768e45ac7",
+              "title": "Identify the hazards first",
+              "contentType": "text",
+              "contentBody": "<p>Safety comes before drying. Under the model Work Health and Safety (WHS) laws administered through Safe Work Australia and your state regulator, hazards are identified and controlled before work begins &mdash; often recorded in a Safe Work Method Statement (SWMS) or JSEA, with a site induction where required. Common water-damage hazards include:</p><ul><li><strong>Electrical</strong> &mdash; water and 230&nbsp;V mains do not mix. Do not enter standing water near live electrical fittings; have supply isolated where needed and use a residual current device (safety switch, RCD) on portable equipment. All portable electrical gear should be tested and tagged (AS/NZS&nbsp;3760).</li><li><strong>Biological</strong> &mdash; Category&nbsp;2 and 3 water carries micro-organisms; sewage is a biohazard.</li><li><strong>Slips, trips and falls</strong> &mdash; wet floors, trailing leads and ladders.</li><li><strong>Structural</strong> &mdash; saturated ceilings and floors can collapse; a wet plaster ceiling holding water is a serious overhead hazard.</li><li><strong>Chemical</strong> &mdash; cleaning and antimicrobial products; always read the SDS.</li><li><strong>Confined spaces and heat</strong> &mdash; subfloors, roof voids and hot drying environments.</li></ul><p>If a hazard cannot be controlled, the correct decision may be to stop and escalate &mdash; for example, an electrician or structural engineer, or the poisons information line 13&nbsp;11&nbsp;26 for a chemical exposure.</p>",
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "39679c17-e9e1-47f5-aba8-1239efcdd7d3",
+              "title": "Select PPE by the hazard present",
+              "contentType": "text",
+              "contentBody": "<p>PPE is chosen for the hazard in front of you, then stated in the job file. It is the last line of defence, after isolation and engineering controls. A practical guide by category and task:</p><ul><li><strong>Category&nbsp;1 (clean water):</strong> safety footwear, gloves, eye protection; respiratory protection if disturbing dusty or mouldy materials.</li><li><strong>Category&nbsp;2 (grey water):</strong> the above plus fluid-resistant gloves, and a properly fitted P2 respirator when generating aerosols or working with contaminated materials.</li><li><strong>Category&nbsp;3 (black water / sewage):</strong> full skin protection &mdash; fluid-resistant coveralls, gloves, boots and eye protection, and P2 (or higher) respiratory protection fit-checked to the wearer. Treat everything contacted as contaminated.</li></ul><p>Where mould is present, respiratory and skin protection are selected for the mould hazard as well &mdash; covered in CARSI&rsquo;s AMRT-aligned course. Respirators only protect when they seal, so fit matters, and facial hair breaks the seal. Record the PPE actually used, not just the PPE available.</p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": null
+            }
+          ]
+        },
+        {
+          "id": "6e724002-0c48-4b26-8e82-60b936b3b3a5",
+          "title": "Module 4: Moisture Assessment Fundamentals",
+          "orderIndex": 3,
+          "lessons": [
+            {
+              "id": "e95fd84c-cf63-40b7-816d-cf642c35e307",
+              "title": "Instruments and what they tell you",
+              "contentType": "text",
+              "contentBody": "<p>You cannot dry what you cannot measure. Moisture assessment uses several instruments, each answering a different question, and all read in metric:</p><ul><li><strong>Non-invasive (capacitance/radio-frequency) meters</strong> &mdash; scan a surface without pinholes to find where moisture is, quickly, for mapping.</li><li><strong>Pin (resistance) moisture meters</strong> &mdash; give a quantitative moisture reading in a specific material such as timber or plaster.</li><li><strong>Thermo-hygrometers</strong> &mdash; read air temperature (&deg;C) and relative humidity (%RH), from which you work out dew point and specific humidity (grams of water per kilogram of air).</li><li><strong>Thermal imaging cameras</strong> &mdash; show temperature patterns that suggest where evaporative cooling (and therefore moisture) may be; always confirm a thermal indication with a moisture meter.</li></ul><p>Instruments sold in Australia in 240&nbsp;V/battery form &mdash; brands such as Protimeter, Tramex, Delmhorst and FLIR are widely distributed here (availability checked 2026-07-09) &mdash; are the practical toolkit. Calibrate and check instruments per the manufacturer&rsquo;s instructions; an uncalibrated meter produces confident but wrong numbers.</p>",
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "b5aff281-5122-439b-9e7d-6ba20f9a4be3",
+              "title": "Mapping moisture and setting a dry goal",
+              "contentType": "text",
+              "contentBody": "<p>A defensible drying job starts with a <strong>dry standard</strong> &mdash; a reference reading taken from the same material in an unaffected area of the same building. That is your target: you dry the wet material back to the reference reading, not to an arbitrary number.</p><p>Map the affected area on day one: mark the boundary of moisture, record readings at labelled points, note the material and the instrument used, and photograph the readings. Repeat at the same points each visit so the numbers are comparable. A drying job is complete when affected materials reach the dry standard and readings are stable &mdash; measured, not assumed. Metric everywhere: metres and millimetres for extent, &deg;C and %RH for air, grams per kilogram for specific humidity. This measured trail is what later proves the structure was returned to a dry, safe condition.</p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": null
+            }
+          ]
+        },
+        {
+          "id": "5d214687-deaf-4a30-856c-a6b9a31455c9",
+          "title": "Module 5: Drying Principles & Equipment Basics",
+          "orderIndex": 4,
+          "lessons": [
+            {
+              "id": "9df19425-5d0f-42c7-b3ef-b8c134a84571",
+              "title": "The drying equation: heat, airflow and humidity",
+              "contentType": "text",
+              "contentBody": "<p>Structural drying is applied psychrometrics &mdash; the behaviour of water in air. Four levers control the rate of drying:</p><ul><li><strong>Evaporation</strong> &mdash; moving air across a wet surface speeds evaporation (this is what air movers do).</li><li><strong>Dehumidification</strong> &mdash; removing the evaporated moisture from the air so drying can continue (refrigerant and desiccant dehumidifiers).</li><li><strong>Temperature</strong> &mdash; warmer air holds and releases moisture more readily, within sensible limits.</li><li><strong>Air exchange or containment</strong> &mdash; either bringing in drier outside air or sealing the area so equipment can control it.</li></ul><p>The balance matters: adding airflow without dehumidification just raises the humidity in the room and stalls drying (and risks secondary damage). You add evaporative energy and remove moisture together, then measure the result. Australian climate matters too &mdash; a humid coastal summer needs more dehumidification than a dry inland winter.</p>",
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "2511b0e2-c687-452a-85a0-206659c47150",
+              "title": "Equipment, power budgeting and the mould rule",
+              "contentType": "text",
+              "contentBody": "<p>The core drying kit is <strong>air movers</strong> (to drive evaporation), <strong>dehumidifiers</strong> (to remove moisture), <strong>air filtration devices / air scrubbers</strong> (to manage airborne particulates), and <strong>heat</strong> where appropriate. In Australia this equipment runs on <strong>230&nbsp;V, 50&nbsp;Hz</strong> and plugs into <strong>10&nbsp;A GPOs</strong>, so power is a real constraint, not an afterthought.</p><p><strong>Budget the power before you deploy.</strong> A standard 10&nbsp;A GPO circuit delivers roughly 2300&nbsp;W (230&nbsp;V &times; 10&nbsp;A) in total, and several outlets often share one circuit breaker. Add up each machine&rsquo;s actual current draw (from its rating plate, in amps at 230&nbsp;V) and keep the total on any circuit safely below its rating &mdash; a low-amperage (LGR) refrigerant dehumidifier plus a few air movers can approach a single circuit&rsquo;s limit. Overloading trips the breaker (drying stops, unnoticed, overnight) or, worse, overheats wiring. Spread load across separate circuits, use an RCD, and use only tested-and-tagged leads.</p><p><strong>Hard rule &mdash; mould changes the sequence.</strong> If visible mould is present, <strong>do not run air movers</strong>: high airflow across mouldy surfaces aerosolises spores and spreads contamination through the building. While mould is present, dry using <strong>air filtration devices (AFDs/air scrubbers) and dehumidifiers only</strong>, under containment. Air movers are introduced <strong>only after remediation and a clearance</strong> confirm the mould has been addressed. When in doubt, treat suspected mould as mould and hold the air movers.</p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": null
+            }
+          ]
+        },
+        {
+          "id": "2fefd087-17bd-49de-8dc3-a36cd504ba6f",
+          "title": "Module 6: Documentation, Reporting & the Australian Insurance Context",
+          "orderIndex": 5,
+          "lessons": [
+            {
+              "id": "11361327-8613-44d4-9b39-07cac71a405a",
+              "title": "Build a defensible job file",
+              "contentType": "text",
+              "contentBody": "<p>If it is not documented, it did not happen. A professional water-damage job file records, from the first attendance:</p><ul><li>the loss &mdash; cause, category and class, date and time of attendance;</li><li>photographs of the affected areas, the source and the damage;</li><li>a moisture map with labelled readings, the dry standard, the instruments used, and repeat readings each visit;</li><li>the drying plan &mdash; equipment placed, where, and why, including power arrangements;</li><li>daily monitoring &mdash; air temperature, %RH, specific humidity and material readings, trending toward the dry goal;</li><li>safety &mdash; hazards identified, controls applied, PPE used, and any specialist called; and</li><li>authorities and decisions &mdash; what was restored, what was removed and why, and who authorised it.</li></ul><p>The file tells a complete story: this was the condition, this is what we did, this is the evidence it is dry. That trail protects the customer, the technician and the insurer alike.</p>",
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "29848630-0d50-4a7d-9a1f-215f44c80709",
+              "title": "The Australian insurance context",
+              "contentType": "text",
+              "contentBody": "<p>Most water-damage work in Australia is delivered inside an insurance claim, so the job file is also a claim document. A few Australian realities shape the work:</p><ul><li><strong>Scope and authority.</strong> Work is usually carried out to an agreed scope; changes (extra drying days, removing a material, engaging a trade) should be authorised and recorded, not assumed.</li><li><strong>Evidence expectations.</strong> Insurers and their assessors expect measured drying evidence &mdash; readings trending to a dry standard &mdash; not just &ldquo;it looks dry&rdquo;. Your metric readings are the proof.</li><li><strong>Consumer protection.</strong> Australian Consumer Law applies to the services you provide; avoid over-claiming (for example, do not promise a material is &ldquo;sterilised&rdquo; or guarantee a fixed dry time).</li><li><strong>Pricing.</strong> Quotes and invoices are in Australian dollars (AUD), noting GST where relevant.</li><li><strong>Disputes.</strong> A clear, dated, measured file is your best protection if a claim is questioned months later.</li></ul><p>Restoration is a trusted role: you are drying someone&rsquo;s home or business and creating the record an insurer relies on. Accuracy, honesty and good documentation are the professional standard.</p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "9f90d75e-75e4-404c-9c18-484063db52da",
+              "title": "Final knowledge check",
+              "contentType": "quiz",
+              "contentBody": "e7798876-961d-4e4c-a2f0-f91ded4cc2d1",
+              "orderIndex": 2,
+              "isPreview": false,
+              "resources": [
+                {
+                  "label": "Knowledge check",
+                  "url": "quiz:e7798876-961d-4e4c-a2f0-f91ded4cc2d1"
+                }
+              ]
+            }
+          ]
+        }
+      ]
     }
   ]
 }
