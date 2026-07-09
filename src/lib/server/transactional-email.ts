@@ -13,6 +13,7 @@ import {
   renderContactNotificationEmail,
   renderContactReplyEmail,
   renderEnrollmentWelcomeEmail,
+  renderGovContractorGuideEmail,
   renderPasswordResetEmail,
   renderRecertReminderEmail,
   renderRegistrationWelcomeEmail,
@@ -474,6 +475,29 @@ export async function sendContactNotificationEmail(params: {
     to: params.notifyTo,
     replyTo: params.email,
     subject: `[CARSI Contact #${params.ticketRef}] ${params.firstName} ${params.lastName}`,
+    html,
+    text,
+  });
+}
+
+/**
+ * GP-199: deliver the government-contractor lead-magnet guide to the lead who
+ * requested it. `downloadUrl` should be absolute so it works from any inbox.
+ */
+export async function sendGovContractorGuideEmail(params: {
+  to: string;
+  appOrigin: string;
+  downloadUrl: string;
+}): Promise<SendEmailResult> {
+  const base = params.appOrigin.replace(/\/$/, '');
+  const { html, text } = renderGovContractorGuideEmail({
+    appOrigin: base,
+    downloadUrl: params.downloadUrl,
+  });
+
+  return sendEmail({
+    to: params.to,
+    subject: 'Your guide: How to Get on Government Restoration Panels',
     html,
     text,
   });

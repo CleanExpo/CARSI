@@ -344,6 +344,47 @@ export function renderRegistrationWelcomeEmail(params: {
   );
 }
 
+/**
+ * GP-199 lead-magnet delivery email — sent to the person who requested the
+ * "How to Get on Government Restoration Panels" guide, carrying the download
+ * link. Copy is IICRC-CEC compliant: CARSI is described only as an IICRC CEC
+ * Accredited provider (never as an IICRC certification/training school).
+ */
+export function renderGovContractorGuideEmail(params: {
+  appOrigin: string;
+  downloadUrl: string;
+}): RenderedEmail {
+  const title = 'How to Get on Government Restoration Panels';
+  const paragraphs = [
+    'Thanks for requesting the CARSI guide to winning government restoration panel work in Australia.',
+    'Your download link is below. The guide covers how government procurement panels work, the IICRC certifications procurement officers look for, a WHS compliance checklist, and a 90-day path to panel readiness.',
+  ];
+  const text = [
+    title,
+    '',
+    ...paragraphs,
+    '',
+    `Download the guide (PDF): ${params.downloadUrl}`,
+    '',
+    'CARSI is an IICRC CEC Accredited provider — our courses earn Continuing Education Credits (CECs) toward maintaining an existing IICRC certification.',
+    '',
+    `CARSI Learning — ${params.appOrigin}`,
+  ].join('\n');
+  return render(
+    {
+      appOrigin: params.appOrigin,
+      preheader: 'Your download link to the government restoration panels guide.',
+      eyebrow: 'Your free guide',
+      title,
+      paragraphs,
+      cta: { label: 'Download the guide (PDF)', href: params.downloadUrl },
+      noteHtml:
+        'CARSI is an IICRC CEC Accredited provider — our courses earn Continuing Education Credits (CECs) toward maintaining an existing IICRC certification.',
+    },
+    text
+  );
+}
+
 export function renderEnrollmentWelcomeEmail(params: {
   appOrigin: string;
   name: string;
