@@ -40,42 +40,42 @@ test.describe('Public course catalogue', () => {
     await expect(browseCta).toBeVisible();
   });
 
-  test('courses page shows discipline tabs', async ({ page }) => {
+  test('courses page shows topic tabs', async ({ page }) => {
     await page.goto('/courses');
 
     // Page heading
     await expect(page.locator('h1')).toContainText('Restoration Training Courses');
 
-    // Discipline tabs rendered
-    for (const tab of ['All', 'WRT', 'CRT', 'ASD', 'OCT', 'CCT', 'FSRT', 'AMRT', 'Free']) {
+    // Topic tabs rendered (de-IICRC: plain restoration topics, no discipline acronyms)
+    for (const tab of ['All', 'Onboarding', 'Water Damage', 'Mould', 'Fire & Smoke', 'Cleaning', 'Free']) {
       await expect(page.getByRole('tab', { name: tab, exact: true })).toBeVisible();
     }
   });
 
-  test('discipline filter works — clicking WRT shows only WRT courses', async ({ page }) => {
+  test('topic filter works — clicking Water Damage shows only water-damage courses', async ({
+    page,
+  }) => {
     await page.goto('/courses');
 
     const main = page.getByRole('main');
 
-    // Default ("All") view lists every published course, including a non-WRT one
-    // (the air-quality essentials course). Assert it is present before filtering so
-    // the post-filter "hidden" check below is meaningful.
-    const nonWrtHeading = main
+    // Default ("All") view lists every published course, including a non-water one
+    // (the air-quality / odour essentials course). Assert it is present before
+    // filtering so the post-filter "hidden" check below is meaningful.
+    const nonWaterHeading = main
       .getByRole('heading', { name: /Air Quality and Odour/i })
       .first();
-    await expect(nonWrtHeading).toBeVisible({ timeout: 10_000 });
+    await expect(nonWaterHeading).toBeVisible({ timeout: 10_000 });
 
-    // Click the WRT tab.
-    const wrtTab = page.getByRole('tab', { name: 'WRT', exact: true });
-    await wrtTab.click();
-    await expect(wrtTab).toHaveAttribute('aria-selected', 'true');
+    // Click the "Water Damage" topic tab (de-IICRC: topic tabs replace WRT/ASD/etc).
+    const waterTab = page.getByRole('tab', { name: 'Water Damage', exact: true });
+    await waterTab.click();
+    await expect(waterTab).toHaveAttribute('aria-selected', 'true');
 
-    // Only the single WRT-coded course remains: its heading is shown and the
-    // non-WRT course is filtered out — i.e. the WRT tab shows only WRT courses.
-    // (Asserting the filtered set directly rather than the "N course(s)" toolbar
-    // text, which renders outside the <main> landmark.)
+    // The water-damage course (matched by title/category) is shown and the
+    // air-quality / odour course is filtered out — the topic tab narrows the set.
     await expect(main.getByRole('heading', { name: DETAIL_COURSE.title })).toBeVisible();
-    await expect(nonWrtHeading).toBeHidden();
+    await expect(nonWaterHeading).toBeHidden();
   });
 
   test('search narrows results', async ({ page }) => {
@@ -174,7 +174,7 @@ test.describe('Course detail page', () => {
     });
   });
 
-  test('course detail shows discipline and price', async ({ page }) => {
+  test('course detail shows title and price', async ({ page }) => {
     await page.goto(`/courses/${DETAIL_COURSE.slug}`);
 
     // Wait for content
@@ -182,6 +182,9 @@ test.describe('Course detail page', () => {
       timeout: 10_000,
     });
 
-    await expect(page.getByText(/WRT|Water Restoration|Free/i).first()).toBeVisible();
+    // Price is shown in the enrol panel (this WP-era course is free). Assert on the
+    // outer main landmark's text so responsive duplicate/hidden copies don't flake.
+    // `.first()` because the layout + page each render a #main-content <main>.
+    await expect(page.getByRole('main').first()).toContainText(/Free|\$/i);
   });
 });

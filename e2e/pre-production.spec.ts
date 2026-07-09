@@ -305,12 +305,14 @@ test.describe('2. Course catalogue', () => {
     });
   });
 
-  test('discipline filter tabs are rendered', async ({ page }) => {
+  test('topic filter tabs are rendered', async ({ page }) => {
     await page.goto('/courses');
     await page.waitForLoadState('domcontentloaded');
 
-    for (const tab of ['All', 'WRT', 'CRT']) {
-      await expect(page.locator('button', { hasText: tab })).toBeVisible();
+    // De-IICRC: topic tabs (Water Damage/Mould/…) replaced the WRT/CRT/ASD tabs.
+    // Use the tab role + exact name to avoid strict-mode matches on substrings.
+    for (const tab of ['All', 'Water Damage', 'Mould']) {
+      await expect(page.getByRole('tab', { name: tab, exact: true })).toBeVisible();
     }
   });
 });
