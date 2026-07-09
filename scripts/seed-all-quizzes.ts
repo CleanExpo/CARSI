@@ -30,6 +30,7 @@ const QUIZ_FILES = [
   'commercial-floor-care-quiz.json',
   'ccw-truckmount.quizzes.json',
   'water-damage-restoration-fundamentals-quiz.json',
+  'applied-microbial-remediation-mould-fundamentals-quiz.json',
 ];
 
 type QuizQuestion = {

@@ -4934,6 +4934,224 @@
           ]
         }
       ]
+    },
+    {
+      "id": "58af5a2e-c6ee-481d-ad3a-21f4c156b03b",
+      "slug": "applied-microbial-remediation-mould-fundamentals",
+      "title": "Applied Microbial Remediation: Mould Fundamentals",
+      "description": "<p>A foundational, Australian-produced course for restoration and remediation technicians, supervisors, indoor air quality (IAQ) and facility staff who assess and remediate mould in Australian buildings. It is <strong>AMRT-aligned CEC training</strong> &mdash; it aligns to the principles of professional microbial remediation practice and is designed to build sound, safe field judgement. It supports good judgement and does not replace a technician&rsquo;s own certification, a manufacturer&rsquo;s instructions, a Safety Data Sheet, an occupational hygienist&rsquo;s advice, a relevant Australian standard, or a site&rsquo;s own rules.</p><p>Seven modules take a technician from mould biology to a verified, documented remediation: how mould grows and why it matters to health, how a site is assessed using the Condition&nbsp;1/2/3 framing, how to design containment and engineering controls, the correct remediation sequence, PPE selected by the condition present, and post-remediation verification and documentation. Australian throughout: 230&nbsp;V / 10&nbsp;A power, metric units, Australian-available equipment, and Australian standards and regulators (AS/NZS, Safe Work Australia, state WHS). A ten-question knowledge check closes the course.</p>",
+      "shortDescription": "AMRT-aligned CEC training in the fundamentals of professional mould remediation &mdash; mould biology and health, Condition 1/2/3 assessment, containment, the correct remediation sequence, PPE by condition and verification, produced for Australian conditions.",
+      "thumbnailUrl": null,
+      "instructorId": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+      "status": "draft",
+      "priceAud": "0",
+      "isFree": true,
+      "durationHours": 5,
+      "level": "Foundational",
+      "category": "Mould Remediation",
+      "tags": [
+        "mould remediation",
+        "microbial remediation",
+        "AMRT-aligned",
+        "condition 1 2 3",
+        "containment",
+        "PPE",
+        "indoor air quality",
+        "Australian"
+      ],
+      "iicrcDiscipline": "AMRT",
+      "cecHours": 0,
+      "meta": {
+        "audience": "remediation technicians, supervisors and IAQ staff",
+        "discipline": "AMRT-aligned CEC training",
+        "buildStage": "seeded-unpublished-draft-pending-founder-review",
+        "linearIssue": "GP-474",
+        "australianProduced": true,
+        "standardsReferenced": "Nominative only (ANSI/IICRC S520); no standard text reproduced (IICRC AI Use Policy honoured)."
+      },
+      "isPublished": false,
+      "modules": [
+        {
+          "id": "d587ea11-8d53-46b1-8703-f5e45bb3134f",
+          "title": "Module 1: Course Objectives & How This Training Works",
+          "orderIndex": 0,
+          "lessons": [
+            {
+              "id": "95db566a-26d4-4129-8b11-7b6255a32651",
+              "title": "What this course covers and who it is for",
+              "contentType": "text",
+              "contentBody": "<p>Welcome to <strong>Applied Microbial Remediation: Mould Fundamentals</strong>. This course is for restoration and remediation technicians, supervisors, IAQ and facility staff who assess and remediate mould in Australian buildings. By the end you will be able to:</p><ul><li>explain how mould grows, what it needs, and why it matters to health and to buildings;</li><li>assess a mould situation using the <strong>Condition&nbsp;1/2/3</strong> framing used in Australian practice;</li><li>design containment and engineering controls appropriate to the size and severity of the job;</li><li>carry out remediation in the correct <strong>sequence</strong>, including the rule that air movers are not used while mould is present;</li><li>select PPE by the condition present; and</li><li>verify the remediation and document it defensibly.</li></ul><p>This is <strong>AMRT-aligned CEC training</strong>: it aligns to the principles of professional microbial remediation practice. It supports good judgement and does not replace your own certification, a Safety Data Sheet, a manufacturer&rsquo;s instructions, an occupational hygienist&rsquo;s advice, a relevant Australian standard, or a site&rsquo;s own rules. Where standards are named, we reference them nominatively (for example, aligning to ANSI/IICRC&nbsp;S520) and never reproduce their text.</p>",
+              "orderIndex": 0,
+              "isPreview": true,
+              "resources": null
+            },
+            {
+              "id": "48fa6240-5236-4926-a1cb-fcf3a73db835",
+              "title": "The remediation mindset",
+              "contentType": "text",
+              "contentBody": "<p>Mould remediation has one job: <strong>remove the mould and the moisture that feeds it, without spreading contamination and without harming people</strong>. Two ideas sit underneath everything that follows. First, <strong>mould is a moisture problem</strong> &mdash; you cannot successfully remediate mould while the water source that caused it remains, so finding and fixing the moisture is part of the work, not separate from it. Second, <strong>disturbing mould releases spores</strong>, so the whole method is built to contain and capture what you disturb rather than blow it around the building.</p><p>A reliable remediation follows an arc: make it safe and identify the moisture source, assess the extent and condition, contain the area and set up engineering controls, remediate in the correct sequence, then verify and document that the area is returned to a normal (Condition&nbsp;1) state. Australia frames all of this within AS/NZS standards, Safe Work Australia and state WHS law, metric measurement and 230&nbsp;V power.</p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": null
+            }
+          ]
+        },
+        {
+          "id": "d6d8589f-5685-43e9-918c-9360ad713b09",
+          "title": "Module 2: Mould Biology & Health Considerations",
+          "orderIndex": 1,
+          "lessons": [
+            {
+              "id": "d7d85a55-266c-458e-ba2d-63ce1a346f42",
+              "title": "How mould grows and what it needs",
+              "contentType": "text",
+              "contentBody": "<p>Mould is a fungus. It is a normal part of the outdoor environment, and its microscopic spores are present in ordinary indoor air. It becomes a problem indoors when it finds what it needs to grow:</p><ul><li><strong>Moisture</strong> &mdash; the controlling factor. Leaks, flooding, condensation, or high humidity keeping materials damp.</li><li><strong>A food source</strong> &mdash; organic materials such as plasterboard paper, timber, dust, carpet and soft furnishings.</li><li><strong>Suitable temperature</strong> &mdash; ordinary indoor temperatures suit most moulds.</li><li><strong>Time</strong> &mdash; growth can begin within one to two days of a material staying wet.</li></ul><p>Because temperature and food are almost always available indoors, <strong>moisture is the factor we control</strong>. Remove the moisture and keep materials dry, and mould cannot establish. This is why every remediation includes finding and fixing the water source, and why Australia&rsquo;s humid coastal climates make moisture control an ongoing task in many buildings.</p>",
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "59bb42cc-13c3-4267-bd3f-3582496c6779",
+              "title": "Why mould matters to health and buildings",
+              "contentType": "text",
+              "contentBody": "<p>Mould matters for two reasons: people and property.</p><p><strong>Health.</strong> Exposure to damp and mould is associated with respiratory symptoms, allergy and asthma aggravation, and irritation of the eyes, nose and throat; some people &mdash; infants, the elderly, and those with respiratory conditions or reduced immunity &mdash; are more sensitive. We describe these as <strong>health considerations</strong> and follow Australian public-health guidance; we do not diagnose individuals or make medical claims, and we refer health questions to a medical professional.</p><p><strong>Buildings.</strong> Mould degrades the materials it grows on &mdash; staining and weakening plasterboard, timber and finishes &mdash; and signals a moisture problem that will keep causing damage until it is fixed. Musty odour is often the first sign of hidden growth. Our role is to control the exposure, remove the growth safely, and remove the moisture that caused it &mdash; not to alarm occupants. Calm, evidence-led communication is part of the professional standard.</p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": null
+            }
+          ]
+        },
+        {
+          "id": "c3dc7880-2c1c-4a13-b3e2-89d9f86a8e4c",
+          "title": "Module 3: Assessing the Site — Condition 1/2/3",
+          "orderIndex": 2,
+          "lessons": [
+            {
+              "id": "00e0238a-7eb4-4380-aae3-2c5880730879",
+              "title": "The three conditions",
+              "contentType": "text",
+              "contentBody": "<p>Australian remediation practice describes an indoor environment using three conditions, which set the goal of the work:</p><ul><li><strong>Condition&nbsp;1 &mdash; normal fungal ecology.</strong> An indoor environment that may have settled spores and normal fungal traces but no actual growth. This is the <strong>target end state</strong> of remediation.</li><li><strong>Condition&nbsp;2 &mdash; settled spores.</strong> An indoor environment primarily contaminated with settled spores that were dispersed directly or indirectly from a Condition&nbsp;3 area &mdash; for example, a room downwind of active growth.</li><li><strong>Condition&nbsp;3 &mdash; actual growth.</strong> An indoor environment contaminated with the presence of actual mould growth and associated spores &mdash; visible or hidden active growth on materials.</li></ul><p>The purpose of remediation is to <strong>return a Condition&nbsp;2 or 3 area to Condition&nbsp;1</strong>. Naming the condition for each affected area drives the containment, PPE and verification decisions that follow.</p>",
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "3dae611c-dd3d-49d3-9cb9-b1251ed1aafa",
+              "title": "Inspection and finding the moisture",
+              "contentType": "text",
+              "contentBody": "<p>Assessment combines what you can see, smell and measure. On site you:</p><ul><li><strong>Inspect visually</strong> &mdash; look for growth, staining, damage and the tell-tale musty odour, including hidden areas such as behind skirting, inside wall cavities, under flooring and in roof voids.</li><li><strong>Find the moisture</strong> &mdash; use metric moisture meters, thermo-hygrometers (&deg;C, %RH) and thermal imaging to locate damp materials and the water source. Mould marks where water has been.</li><li><strong>Define the extent</strong> &mdash; establish the boundary of affected material and assign a condition to each area, in metric (m&sup2; of affected surface).</li><li><strong>Decide on sampling</strong> &mdash; where independent confirmation is needed (for example, sensitive occupants, disputes, or clearance), sampling and interpretation are best carried out by a suitably qualified occupational hygienist.</li></ul><p>Assessment produces a plan: which areas are which condition, where the moisture is coming from, how big the job is, and what containment and controls it needs. Large or complex jobs may warrant an independent assessment before and after works.</p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": null
+            }
+          ]
+        },
+        {
+          "id": "09552b87-3a46-43fb-a086-042acda95e6d",
+          "title": "Module 4: Containment & Engineering Controls",
+          "orderIndex": 3,
+          "lessons": [
+            {
+              "id": "834cd0a0-81a2-4b1e-bd70-8fafd8f41a68",
+              "title": "Containment: stop the spread",
+              "contentType": "text",
+              "contentBody": "<p>Because disturbing mould releases spores, <strong>containment</strong> keeps that contamination inside the work area and out of the rest of the building. The level of containment scales with the size and severity of the job:</p><ul><li><strong>Source/limited containment</strong> &mdash; for small areas, isolate the immediate work zone, often with a single layer of sheeting, and minimise disturbance.</li><li><strong>Full containment</strong> &mdash; for larger or higher-risk jobs, seal the work area with sheeting, close off vents and openings, and control entry and exit, often through a decontamination arrangement so people and waste leave without carrying contamination.</li></ul><p>The point is the same at any scale: what you disturb stays in the contained zone and is captured and removed, rather than migrating to clean parts of the building through the air or on people and equipment.</p>",
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "b0d93520-b8ee-4916-8fe6-b74d93437637",
+              "title": "Engineering controls: negative pressure and air filtration",
+              "contentType": "text",
+              "contentBody": "<p>Containment is made effective by engineering controls that manage the air:</p><ul><li><strong>Air filtration devices (AFDs / air scrubbers) with HEPA filtration</strong> &mdash; capture airborne particulates, including spores, from the air inside the containment.</li><li><strong>Negative pressure</strong> &mdash; by extracting air from the contained area (ideally exhausting outside), the containment is held at a slightly lower pressure than the surrounding building. Air then flows <em>into</em> the work area through any gaps, not out of it, so contamination cannot drift into clean spaces.</li><li><strong>HEPA vacuuming</strong> &mdash; for capturing settled particulates from surfaces during cleaning.</li></ul><p>In Australia this equipment runs on <strong>230&nbsp;V and plugs into 10&nbsp;A GPOs</strong>, so plan the power: add up each machine&rsquo;s current draw (amps at 230&nbsp;V), keep the total safely under each circuit&rsquo;s rating, spread load across circuits, use an RCD, and run only tested-and-tagged leads. An AFD that trips a breaker overnight leaves the containment unmanaged.</p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": null
+            }
+          ]
+        },
+        {
+          "id": "8323012f-7f37-41c7-9d06-ca6fde9f9e4e",
+          "title": "Module 5: The Remediation Sequence",
+          "orderIndex": 4,
+          "lessons": [
+            {
+              "id": "2bbf5627-4553-45d0-9f32-266007b8da46",
+              "title": "The correct order of work",
+              "contentType": "text",
+              "contentBody": "<p>Remediation follows a deliberate sequence so that contamination is captured, not spread:</p><ol><li><strong>Fix the moisture source</strong> &mdash; remediation will fail if the water that caused the mould is still active.</li><li><strong>Establish containment and engineering controls</strong> &mdash; set up containment, negative pressure and HEPA air filtration before disturbing anything.</li><li><strong>Remove contaminated porous materials</strong> &mdash; porous materials with actual growth (for example mould-affected plasterboard, insulation, carpet and underlay) generally cannot be reliably cleaned and are removed and bagged for disposal within the containment.</li><li><strong>Clean recoverable surfaces and structure</strong> &mdash; HEPA-vacuum and damp-wipe salvageable non-porous and semi-porous surfaces to remove settled spores and residue.</li><li><strong>Dry the structure</strong> &mdash; bring affected materials back to a dry standard so mould cannot return (see the airflow rule below).</li><li><strong>Verify</strong> &mdash; confirm the area is visibly clean, dry and returned to Condition&nbsp;1 before removing containment.</li></ol><p>Work clean-as-you-go: HEPA-vacuum and wipe down within the containment so you leave a clean zone, not a cloud of disturbed spores.</p>",
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "6b2bb55e-32f1-40b7-9c3d-b66303812ecd",
+              "title": "The airflow rule: AFDs and dehumidifiers only while mould is present",
+              "contentType": "text",
+              "contentBody": "<p>This is the most important operational rule in mould drying, and it is a hard rule:</p><p><strong>While mould is present, do not run air movers.</strong> Air movers drive high-velocity air across surfaces &mdash; exactly what is needed for ordinary structural drying, but exactly what you must avoid around mould, because that airflow aerosolises spores and blasts contamination through the containment and the building.</p><p><strong>While mould is present, dry using air filtration devices (AFDs / air scrubbers) and dehumidifiers only.</strong> AFDs capture airborne particulates and dehumidifiers pull moisture out of the air and materials, lowering humidity <em>without</em> creating the aggressive surface airflow that spreads spores.</p><p><strong>Air movers are introduced only after remediation and a clearance</strong> confirm the mould has been removed and the area is verified clean. Once the area is Condition&nbsp;1 and cleared, normal drying with air movers is appropriate to finish drying the structure. When you are unsure whether mould is still present, treat it as present and keep the air movers off. Getting this sequence wrong can convert a contained, localised job into a building-wide contamination event.</p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": null
+            }
+          ]
+        },
+        {
+          "id": "c643d4d8-60f6-433d-976d-c9e828682868",
+          "title": "Module 6: PPE by Condition",
+          "orderIndex": 5,
+          "lessons": [
+            {
+              "id": "0fe664ae-2d2c-492a-9a2e-a0e1d485d6e2",
+              "title": "Selecting PPE for the mould condition",
+              "contentType": "text",
+              "contentBody": "<p>As with all restoration work, PPE is selected for the hazard &mdash; here, the mould condition and the task &mdash; and is the last line of defence after containment and engineering controls. A practical guide:</p><ul><li><strong>Minor / limited work in a low-condition area:</strong> a properly fitted <strong>P2 respirator</strong>, gloves and eye protection at a minimum.</li><li><strong>Moderate to large remediation, or Condition&nbsp;3 growth:</strong> increased protection &mdash; a higher level of respiratory protection (for example a P2/P3 or, for heavy work, a powered respirator fit-checked to the wearer), disposable coveralls, gloves and eye protection, so spores are kept off skin, clothing and the airway.</li><li><strong>Wet or contaminated water combined with mould:</strong> add fluid-resistant protection as for the relevant water category.</li></ul><p>Respiratory protection only works when it seals to the face, so fit matters and facial hair breaks the seal. Don PPE before entering containment and remove it as part of leaving the containment so you do not carry contamination out. Record the PPE actually used in the job file.</p>",
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": null
+            }
+          ]
+        },
+        {
+          "id": "00886977-410a-4147-890c-f88e90fab698",
+          "title": "Module 7: Post-Remediation Verification & Documentation",
+          "orderIndex": 6,
+          "lessons": [
+            {
+              "id": "5d2b7111-8264-4315-a7f9-7afdbd38dac6",
+              "title": "Verifying the area is returned to Condition 1",
+              "contentType": "text",
+              "contentBody": "<p>Remediation is not finished when the mould is gone from view &mdash; it is finished when the area is <strong>verified</strong> as returned to Condition&nbsp;1. Verification checks that the work achieved its goal before containment comes down:</p><ul><li><strong>Visual</strong> &mdash; the area is visibly clean, with no remaining growth, dust or debris, and materials are dry.</li><li><strong>Dryness</strong> &mdash; affected materials have reached the dry standard (metric moisture readings back to the unaffected reference), so mould cannot re-establish.</li><li><strong>Independent clearance where warranted</strong> &mdash; for larger, higher-risk or disputed jobs, or where sensitive occupants are involved, an <strong>independent occupational hygienist</strong> assesses the area (which may include sampling) and issues a clearance. Keeping assessment and clearance independent of the party doing the works avoids a conflict of interest.</li></ul><p>Only once the area passes verification are containment and engineering controls removed and normal drying (including air movers, if still needed) resumed.</p>",
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "d2e87f23-e9be-45a5-81de-f41ba8bc7dbd",
+              "title": "Documenting the remediation",
+              "contentType": "text",
+              "contentBody": "<p>The job file tells the complete story and protects everyone involved. A professional mould-remediation file records:</p><ul><li>the assessment &mdash; conditions assigned to each area, the moisture source, and the extent in metric (m&sup2;);</li><li>photographs before, during and after;</li><li>the moisture source and how it was fixed;</li><li>containment and engineering controls used, and the drying approach (AFDs and dehumidifiers while mould present; air movers only after clearance);</li><li>materials removed and disposed of, and surfaces cleaned;</li><li>safety &mdash; hazards, controls and the PPE actually used;</li><li>verification &mdash; final readings, visual check and any independent clearance; and</li><li>authorities and decisions &mdash; who authorised the scope and any variations.</li></ul><p>Work in Australia sits within AS/NZS standards, Safe Work Australia and state WHS law, Australian Consumer Law (avoid over-claiming &mdash; do not promise a building is &ldquo;mould-proof&rdquo; or &ldquo;sterilised&rdquo;), and AUD pricing noting GST where relevant. A clear, dated, measured, verified file is the professional standard and the best protection if the work is ever questioned.</p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": null
+            },
+            {
+              "id": "25e00ed1-4a7d-4f5c-ac54-7b348913ea52",
+              "title": "Final knowledge check",
+              "contentType": "quiz",
+              "contentBody": "ce8d62e3-21da-47a9-b987-d627d1b25c22",
+              "orderIndex": 2,
+              "isPreview": false,
+              "resources": [
+                {
+                  "label": "Knowledge check",
+                  "url": "quiz:ce8d62e3-21da-47a9-b987-d627d1b25c22"
+                }
+              ]
+            }
+          ]
+        }
+      ]
     }
   ]
 }
