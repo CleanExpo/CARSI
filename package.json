@@ -26,6 +26,7 @@
     "db:seed-courses": "npx tsx scripts/seed-courses-catalog.ts",
     "db:seed-quizzes": "npx tsx scripts/seed-all-quizzes.ts",
     "db:seed-commercial-floor-care-quiz": "npx tsx scripts/seed-commercial-floor-care-quiz.ts",
+    "db:seed-ccw-truckmount-assessment": "npx tsx scripts/seed-ccw-truckmount-assessment.ts",
     "db:cleanup-placeholder-courses": "npx tsx scripts/cleanup-placeholder-seed-courses.ts",
     "db:thumbnails:plan": "npx tsx scripts/generate-course-thumbnails.ts --plan",
     "db:thumbnails:generate": "npx tsx scripts/generate-course-thumbnails.ts --generate",

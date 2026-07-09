@@ -28,6 +28,7 @@ const QUIZ_FILES = [
   'h5-bird-flu-quiz.json',
   'floor-care-quizzes.json',
   'commercial-floor-care-quiz.json',
+  'ccw-truckmount.quizzes.json',
 ];
 
 type QuizQuestion = {

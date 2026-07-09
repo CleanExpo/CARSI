@@ -11,3 +11,11 @@ export const TRUCKMOUNT_PACK_PDF_PATH =
 /** Safe hrefs for links/downloads (encodes any spaces). */
 export const TRUCKMOUNT_PACK_HTML_HREF = encodeURI(TRUCKMOUNT_PACK_HTML_PATH);
 export const TRUCKMOUNT_PACK_PDF_HREF = encodeURI(TRUCKMOUNT_PACK_PDF_PATH);
+
+/**
+ * LMS course (enrolment path). Enrolling records progress and the competency
+ * sign-off against the learner in CARSI. Seeded via `data/seed/courses-catalog.json`
+ * (slug below); listed publicly once the founder publishes it.
+ */
+export const TRUCKMOUNT_COURSE_SLUG = 'ccw-carsi-truckmount-operations' as const;
+export const TRUCKMOUNT_COURSE_HREF = `/courses/${TRUCKMOUNT_COURSE_SLUG}` as const;
