@@ -3687,6 +3687,11 @@
                       "back": "Australian Government and Australian Centre for Disease Control (CDC) advice."
                     }
                   ]
+                },
+                {
+                  "label": "Course video overview — narrated slides (7 min)",
+                  "url": "https://res.cloudinary.com/dmaulkthb/video/upload/v1783556488/carsi/course-video-overview/h5-bird-flu-awareness-30cfc54f.mp4",
+                  "kind": "video"
                 }
               ]
             }
