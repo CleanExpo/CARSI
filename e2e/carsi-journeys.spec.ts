@@ -17,7 +17,7 @@ import { test, expect } from '@playwright/test';
 
 const DETAIL_COURSE = {
   slug: 'wrt-water-damage-essentials',
-  title: 'Water Damage Restoration — Essentials (WRT-aligned)',
+  title: 'Water Damage Restoration — Essentials',
 };
 
 // =========================================================================

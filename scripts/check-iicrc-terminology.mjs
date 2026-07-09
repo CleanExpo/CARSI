@@ -14,9 +14,19 @@
  * deliberately narrow: it flags only phrases that assert CARSI delivers IICRC
  * courses/certification/accreditation, and leaves legitimate copy untouched —
  * a student's own existing IICRC certification (recert reminders, member
- * number, CEC tracking), accurate "IICRC CEC Accredited" claims, discipline
- * descriptors like "WRT-aligned", and third-person industry facts such as
- * "IICRC certification is required for insurance panels".
+ * number, CEC tracking), accurate "IICRC CEC Accredited" claims, and
+ * third-person industry facts such as "IICRC certification is required for
+ * insurance panels".
+ *
+ * CARSI DESIGNATION RULE (founder, 2026-07-10): CARSI issues its OWN
+ * "CARSI Southern Hemisphere Restoration Designations" (e.g. "CARSI Water
+ * Restoration Technician") — it does NOT brand its courses with IICRC
+ * Registered-Training-School discipline designations. So the IICRC discipline
+ * ACRONYMS (WRT/ASD/AMRT/FSRT/CCT/TCST) and the "[discipline]-aligned" framing
+ * may NOT be used to name/brand a CARSI course, and iicrcDiscipline must be
+ * null in seed data. Referencing a student's own IICRC discipline certification
+ * remains fine; using an S-standard NOMINATIVELY (e.g. "ANSI/IICRC S500")
+ * remains fine — only the "-aligned" designation framing is banned.
  *
  * Modes:
  *   node scripts/check-iicrc-terminology.mjs           # scan tracked source copy (CI + manual)
@@ -108,6 +118,25 @@ const BANNED = [
     message: 'The IICRC does not promote any particular educational provider — never claim IICRC promotion.',
   },
   {
+    // CARSI designation rule (founder 2026-07-10): IICRC discipline designations are
+    // Registered-Training-School marks — a CARSI course may not be branded as
+    // "[discipline]-aligned". Use the CARSI Southern Hemisphere designation instead.
+    // Nominative S-standards ("ANSI/IICRC S500") are NOT "-aligned" so are untouched.
+    re: /\b(WRT|ASD|AMRT|FSRT|CCT|TCST|S\d{3})[\s-]*aligned\b/i,
+    allow: null,
+    message:
+      'CARSI courses are not "[discipline]-aligned" — brand them with their CARSI Southern Hemisphere designation (e.g. "CARSI Water Restoration Technician"). Reference IICRC S-standards nominatively only.',
+  },
+  {
+    // Seed course data must not store an IICRC school-designation acronym as the
+    // course discipline — CARSI courses carry CARSI designations (iicrcDiscipline: null).
+    re: /"iicrcDiscipline"\s*:\s*"(WRT|ASD|AMRT|FSRT|CCT|TCST|S\d{3})"/i,
+    allow: null,
+    seedOnly: true,
+    message:
+      'iicrcDiscipline must be null — a CARSI course does not carry an IICRC discipline designation. Set the CARSI designation in meta.designation instead.',
+  },
+  {
     // Founder brand-exclusion rule (2026-07-09): COACH8 must never appear in any CARSI
     // copy or content surface (see src/lib/calendar/event-exclusions.ts for the calendar
     // enforcement of the same rule).
@@ -161,7 +190,9 @@ function isExempt(file) {
 }
 
 function scanLine(file, lineNo, content, findings) {
+  const norm = file.replace(/\\/g, '/');
   for (const rule of BANNED) {
+    if (rule.seedOnly && !norm.startsWith('data/seed/')) continue;
     if (rule.re.test(content) && !(rule.allow && rule.allow.test(content))) {
       findings.push(`  ${file}:${lineNo}: ${rule.message}\n    → ${content.trim().slice(0, 140)}`);
     }
