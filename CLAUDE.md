@@ -61,6 +61,31 @@ opt-out; `resolveCecHours` then never derives a value from duration/prose/meta).
 flips a course to its approved hours. Never rely on the legacy duration-derived fallback for new
 content — deriving a CEC claim for an unapproved course is a licence-critical defect.
 
+## IICRC / CEC — root cause + enforcement (systemic, applies to every future course/project)
+
+Two incidents recurred: (1) IICRC/S-standard/CEC framing templated onto courses that are **not**
+IICRC-related (the CCW truckmount course), and (2) specific CEC-hour claims rendered for courses
+the IICRC has not approved (22 of 25 catalogue courses, via duration inference). Both share one
+root cause: **IICRC/CEC framing was fail-OPEN — present by default and removed by exception.** The
+standing fix inverts that to **fail-CLOSED — absent by default, added only by explicit approval:**
+
+- **CEC is fail-closed.** `resolveCecHours` / `resolveCatalogCecHours` / `resolveLmsCourseCecHours`
+  return CEC hours ONLY for an explicit, founder-set positive `cecHours`. There is no fallback to
+  duration, prose, meta or reviewer/professional assignment. Absence of an approval yields **no
+  CEC**, never a derived one. Do not re-introduce any inference path.
+- **IICRC framing is opt-in per course.** Reference IICRC, an S-standard, or CEC hours only on a
+  course that genuinely maps to an IICRC discipline. Non-restoration courses (vehicle/truckmount,
+  floor-care, facilities/biosecurity, admin, product training) carry **no** IICRC/S-standard/CEC
+  content; if a disclaimer is needed, write "not IICRC CEC accredited" (never the bare literals
+  "IICRC-accredited course" / "IICRC certification course", even when negated).
+- **Two CI guards enforce this — do not weaken them.** `npm run check:iicrc-terminology` (narrow
+  selling-phrase guard) and `npm run check:iicrc-compliance` (the backstop: scans all course-content
+  and marketing surfaces — `data/seed`, `public/courses`, `docs/marketing`, `docs/content` — for
+  stray IICRC placements, banned "IICRC-approved"/"certified with CARSI" phrasing, and unapproved
+  CEC-hour claims). A specific CEC-hour claim only passes once the founder adds the slug to
+  `CEC_APPROVED_SLUGS` in `scripts/check-iicrc-compliance.mjs`. Fix a false positive by tightening
+  the rule's allow-list, never by disabling the rule.
+
 ## Continual Learning
 
 This repo emits signal to `.harness/learning/*.jsonl` for the weekly distillation routine (RA-1745). If you notice something the system should learn from, append a structured entry — do not stop work to reason about meta-rules. Schema and consumer per RA-1745.

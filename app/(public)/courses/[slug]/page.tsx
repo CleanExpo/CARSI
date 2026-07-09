@@ -908,8 +908,8 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                     }}
                   >
                     This is an IICRC Continuing Education Credit (CEC) course. It is not an IICRC
-                    certification course — IICRC certifications are obtained through IICRC-approved
-                    schools and examinations.
+                    certification course — IICRC certifications are obtained through
+                    IICRC-approved schools and examinations.
                   </p>
                 </div>
               </section>

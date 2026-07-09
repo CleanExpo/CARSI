@@ -72,7 +72,7 @@ CTA: [Start with free course / Browse courses]
 ```
 BEFORE: [Current state without CARSI]
 AFTER: [Desired state with CARSI credentials]
-BRIDGE: Get certified online with CARSI — 24/7, self-paced, IICRC-approved
+BRIDGE: Earn IICRC CECs online with CARSI — 24/7, self-paced, IICRC CEC Accredited
 CTA: [Action]
 ```
 
@@ -148,7 +148,7 @@ secrets (registered in the SYNTHEX deploy environment — see `docs/PRODUCTION_D
 | Differentiator          | Proof Point                                             |
 | ----------------------- | ------------------------------------------------------- |
 | **24/7 Online**         | "Learn at 2am or 2pm — we never close"                  |
-| **IICRC Approved**      | "The global standard recognised by Australian insurers" |
+| **IICRC CEC Accredited**      | "The global standard recognised by Australian insurers" |
 | **Self-Paced**          | "30-minute modules. No travel. No downtime."            |
 | **12+ Industries**      | "From hospitals to hotels, we train them all"           |
 | **NRPG Partner**        | "One of the 4 core pillars of NRPG onboarding"          |

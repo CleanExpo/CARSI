@@ -2,7 +2,7 @@
   "version": 1,
   "status": "DRAFT — NOT PUBLISHED — SME REVIEW REQUIRED",
   "courseSlug": "level-3-mould-remediation",
-  "note": "DRAFT end-of-course assessment authored for RA-7001. Every question is grounded in this course's newly authored lesson bodies (data/wordpress-export/courses.json) and paraphrases/applies ANSI/IICRC S520:2024 with clause citations — it does not reproduce the Standard's copyrighted text. Australian English, metric units and AS/NZS context. sourceRef is a review aid only and is not consumed by the seed script. DO NOT seed or publish until a qualified subject-matter expert has reviewed both the course content and these questions for technical accuracy. Structured identically to data/seed/floor-care-quizzes.json. This course carries 5 IICRC CEC hours.",
+  "note": "DRAFT end-of-course assessment authored for RA-7001. Every question is grounded in this course's newly authored lesson bodies (data/wordpress-export/courses.json) and paraphrases/applies ANSI/IICRC S520:2024 with clause citations — it does not reproduce the Standard's copyrighted text. Australian English, metric units and AS/NZS context. sourceRef is a review aid only and is not consumed by the seed script. DO NOT seed or publish until a qualified subject-matter expert has reviewed both the course content and these questions for technical accuracy. Structured identically to data/seed/floor-care-quizzes.json. This course carries no IICRC CECs (pending IICRC approval).",
   "quizzes": [
     {
       "quizId": "1a7e3be1-7e7c-4326-adcf-484cf0bc0450",

@@ -3,6 +3,10 @@
  *
  * Priority: explicit `cec_hours` → Woo meta keys → prose in short_description / description
  * (e.g. "Continuing Education Credit (CEC) : 3 Hours").
+ *
+ * FAIL-CLOSED: course duration is deliberately NOT a source of CEC hours. A CEC claim
+ * requires a founder-approved value or an explicit source CEC statement; length is never
+ * approval. Absence of any of these yields null (no CEC), never a derived number.
  */
 
 export const CEC_META_KEYS = [
@@ -69,12 +73,6 @@ export function extractDurationHoursFromText(text: string | null | undefined): n
     return value;
   }
   return null;
-}
-
-/** CARSI-approved courses often award whole CEC hours rounded up from contact time. */
-export function inferCecHoursFromDuration(durationHours: number): number | null {
-  if (!Number.isFinite(durationHours) || durationHours <= 0) return null;
-  return Math.max(1, Math.ceil(durationHours));
 }
 
 export function resolveDurationHours(row: {
@@ -146,12 +144,12 @@ export function resolveCecHours(row: CecResolvable): number | null {
   const fromText = extractCecHoursFromText(text);
   if (fromText != null) return fromText;
 
-  const duration = resolveDurationHours({
-    duration_hours: row.duration_hours,
-    short_description: row.short_description,
-    description: row.description,
-  });
-  return duration != null ? inferCecHoursFromDuration(duration) : null;
+  // Fail-closed: a CEC claim requires an explicit approved value (cec_hours) or a source
+  // CEC statement in meta/prose. Course DURATION is NOT approval — never infer CEC from
+  // length. Deriving CECs for a course the IICRC has not approved is a licence-critical
+  // false claim (founder directive 2026-07-09). This is the root-cause fix for the
+  // duration-inference trap: absence of an approval must yield no CEC, not a fabricated one.
+  return null;
 }
 
 export function enrichCourseWithCecHours<T extends CecResolvable>(

@@ -75,6 +75,14 @@ jobs:
       - name: IICRC CEC terminology guard
         run: npm run check:iicrc-terminology
 
+      # Licence-critical backstop: scans all course-content + marketing surfaces
+      # (data/seed, public/courses, docs/marketing, docs/content) for stray IICRC
+      # placements, banned "IICRC-approved"/"certified with CARSI" phrasing, and
+      # unapproved specific CEC-hour claims. The systemic fix for the truckmount +
+      # CEC-inference incidents.
+      - name: IICRC / CEC compliance guard
+        run: npm run check:iicrc-compliance
+
       - name: Lint
         run: npm run lint
 
