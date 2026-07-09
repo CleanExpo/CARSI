@@ -81,7 +81,7 @@ async function deleteCourseCurriculum(tx: PrismaTx, courseId: string) {
 
 async function seedCourse(c: CatalogCourse, instructorOverride: string | undefined) {
   const instructorId = instructorOverride?.trim() || c.instructorId;
-  const cecHours = c.cecHours ?? resolveCatalogCecHours(c);
+  const cecHours = resolveCatalogCecHours(c);
 
   await prisma.$transaction(async (tx) => {
     const existing = await tx.lmsCourse.findUnique({

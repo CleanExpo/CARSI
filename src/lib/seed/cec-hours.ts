@@ -133,6 +133,10 @@ export type CecResolvable = {
 /** Best available CEC hours for a WP-export or catalog-shaped row. */
 export function resolveCecHours(row: CecResolvable): number | null {
   const explicit = parsePositiveHours(row.cec_hours);
+  // Explicit 0 is a deliberate opt-out: the course has NOT been submitted to / approved by
+  // IICRC for CECs, so no value may be derived from meta, prose or duration. Claiming CECs
+  // without IICRC approval is a licence-critical defect (founder directive 2026-07-09).
+  if (explicit === 0) return null;
   if (explicit != null) return explicit;
 
   const fromMeta = extractCecHoursFromMeta(row.meta);
@@ -166,6 +170,8 @@ export function resolveCatalogCecHours(course: {
   iicrcDiscipline?: string | null;
 }): number | null {
   const explicit = parsePositiveHours(course.cecHours);
+  // Explicit 0 = not CEC-approved; never derive (see resolveCecHours).
+  if (explicit === 0) return null;
   if (explicit != null) return explicit;
   return resolveCecHours({
     short_description: course.shortDescription,
