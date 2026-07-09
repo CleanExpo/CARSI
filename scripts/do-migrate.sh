@@ -45,4 +45,8 @@ echo "Seeding course catalog…"
 npx tsx scripts/seed-courses-catalog.ts
 echo "Seeding course quizzes…"
 npx tsx scripts/seed-all-quizzes.ts
+# CCW-CARSI truckmount practical assessment (the trainer sign-off / legal record). Non-blocking:
+# the assessment is an unpublished draft, so a failure here must not block the deploy.
+echo "Seeding CCW-CARSI truckmount practical assessment…"
+npx tsx scripts/seed-ccw-truckmount-assessment.ts || echo "WARN: truckmount assessment seed failed (non-blocking)"
 echo "Content seed complete."

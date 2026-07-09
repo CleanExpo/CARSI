@@ -13,7 +13,7 @@ COPY prisma ./prisma/
 COPY prisma.config.ts ./
 COPY tsconfig.json ./
 COPY scripts/do-migrate.sh ./scripts/do-migrate.sh
-COPY scripts/seed-courses-catalog.ts scripts/seed-all-quizzes.ts ./scripts/
+COPY scripts/seed-courses-catalog.ts scripts/seed-all-quizzes.ts scripts/seed-ccw-truckmount-assessment.ts ./scripts/
 COPY src/lib ./src/lib/
 COPY data/seed ./data/seed/
 
