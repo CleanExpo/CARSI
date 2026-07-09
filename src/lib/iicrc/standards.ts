@@ -26,6 +26,8 @@ export interface IicrcStandard {
 /** Current editions, keyed by code. Update a single entry when a standard is revised. */
 export const IICRC_STANDARDS: Record<string, IicrcStandard> = {
   S100: { code: 'S100', title: 'Professional Cleaning of Textile Floor Coverings', edition: '7th', year: 2021 },
+  S220: { code: 'S220', title: 'Professional Inspection of Hard Surface Floor Coverings', edition: '1st', year: 2021 },
+  S300: { code: 'S300', title: 'Professional Upholstery Cleaning', edition: '2nd', year: 2025 },
   S500: { code: 'S500', title: 'Professional Water Damage Restoration', edition: '5th', year: 2021 },
   S520: { code: 'S520', title: 'Professional Mold Remediation', edition: '4th', year: 2024 },
   S540: { code: 'S540', title: 'Trauma and Crime Scene Cleanup', edition: '2nd', year: 2023 },
