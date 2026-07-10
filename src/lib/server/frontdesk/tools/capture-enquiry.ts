@@ -14,6 +14,7 @@ import { prisma } from '@/lib/prisma';
 import { emitCrmEvent } from '@/lib/server/crm-sync';
 import { sendContactNotificationEmail } from '@/lib/server/transactional-email';
 import { signAction } from '../action-token';
+import { emitFrontDeskWitness } from '../witness-emit';
 import type { CommitContext, WriteTool, WriteToolProposal } from '../types';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -121,6 +122,10 @@ export const captureEnquiryTool: WriteTool = {
     if (!emailResult.sent) {
       console.warn('[capture_enquiry] notification email not sent:', emailResult.reason, '→', notifyTo);
     }
+
+    // Estate witness — report the captured lead to the Nexus CRM. Dark unless
+    // WITNESS_URL + WITNESS_SECRET are set; best-effort, never blocks the lead.
+    await emitFrontDeskWitness({ reference: ticketRef, email: v.email });
 
     return { ok: true, reference: ticketRef };
   },
