@@ -37,17 +37,27 @@ echo "Applying pending Prisma migrations to the production database…"
 npx prisma migrate deploy
 echo "Migrations up to date."
 
-# Deploy-time content convergence (GP-482/GP-484): the runtime image is a pure Next standalone
-# server, so the course catalog + quizzes seed here, where the real DATABASE_URL lives.
-# A catalog-seed failure blocks the deploy (set -e) — the old release keeps serving, and the
-# failure is visible in the deploy log. The quiz seeder is internally fault-tolerant (exit 0).
-echo "Seeding course catalog…"
-npx tsx scripts/seed-courses-catalog.ts
-echo "Seeding course quizzes…"
-npx tsx scripts/seed-all-quizzes.ts
-# CCW-CARSI truckmount practical assessment (the trainer sign-off / legal record). Non-blocking:
-# a seed failure here must not take down the whole app deploy — the course still serves its
-# readings/flashcards/quiz and the WARN is visible in the deploy log.
-echo "Seeding CCW-CARSI truckmount practical assessment…"
-npx tsx scripts/seed-ccw-truckmount-assessment.ts || echo "WARN: truckmount assessment seed failed (non-blocking)"
-echo "Content seed complete."
+# Deploy-time course seeding is DISABLED BY DEFAULT (data-safety incident 2026-07-10).
+#
+# The upsert seeders below rewrite live course rows to match the repo's
+# data/seed/courses-catalog.json — which OVERWRITES manually-curated production course
+# content (uploaded via the live app over ~a week). The LIVE DATABASE is the source of
+# truth for course content, NOT the repo JSON. Running these on every deploy silently
+# clobbers that data.
+#
+# Migrations above (prisma migrate deploy) are schema-only and always run. Content seeding
+# only runs when an operator explicitly opts in for a controlled, reviewed re-seed by
+# setting SEED_ON_DEPLOY=true — and even then, only against a database whose course content
+# is known to be repo-authored.
+if [ "${SEED_ON_DEPLOY:-false}" = "true" ]; then
+  echo "SEED_ON_DEPLOY=true — running deploy-time content seed (this OVERWRITES live course data)…"
+  echo "Seeding course catalog…"
+  npx tsx scripts/seed-courses-catalog.ts
+  echo "Seeding course quizzes…"
+  npx tsx scripts/seed-all-quizzes.ts
+  echo "Seeding CCW-CARSI truckmount practical assessment…"
+  npx tsx scripts/seed-ccw-truckmount-assessment.ts || echo "WARN: truckmount assessment seed failed (non-blocking)"
+  echo "Content seed complete."
+else
+  echo "SEED_ON_DEPLOY not set — skipping deploy-time course seeding (live DB is the source of truth)."
+fi
