@@ -22,6 +22,7 @@ end-of-module quiz — and to the same standard.
 | `14-add-on-services.md` | Module 10 (Business) | The one-visit margin maths and a full add-on menu mapped to CARSI/IICRC credentials, the honest-offer script, KPIs, quiz. |
 | `15-marketing-engine.md` | Module 10 (Business) | The **YouTube → Social → Local-discovery** system with **sourced 2026 data**, the connect-your-channels wiring, content playbook, image/asset plan, measurement, ACL compliance, quiz. |
 | `quizzes-answer-key.md` | — | Trainer answer key for all five module quizzes. |
+| `substantiation-ledger.md` | — | Frozen `nexus-copywriter` CITE-OR-CUT record — every checkable claim → source → status (VERIFIED / ATTRIBUTED / CUT). Travels with the asset; re-run before any customer-facing use. |
 
 ## The CCW machine map (referenced throughout)
 

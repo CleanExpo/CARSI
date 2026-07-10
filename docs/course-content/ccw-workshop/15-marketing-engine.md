@@ -13,21 +13,26 @@ of your competitors are doing it well.
 
 ## The 2026 Reality — What the Data Says
 
-Four findings, all sourced, that decide where a cleaner's marketing hour is best spent:
+Three findings that decide where a cleaner's marketing hour is best spent. Each is sourced and — this is
+the CARSI standard — **carries its provenance and its limits with it**, so you can weigh it honestly:
 
-- **The "Local Pack" is where local customers land.** In a 2026 study of home-services searches, the
-  Google **Local Pack** (the top-3 map block) appeared in **98% of searches** — far more consistently
-  than paid ads — and it is the one placement you **earn** (through your Google Business Profile, reviews
-  and relevance) rather than **buy**. *(WebFX, 2026.)*
+- **The "Local Pack" is where local customers land.** In a **2026 WebFX study of 100 US home-services
+  keywords** (500 searches), the Google **Local Pack** (the top-3 map block) appeared in **98% of
+  searches** — far more consistently than paid ads — and it is the one placement you **earn** (through
+  your Google Business Profile, reviews and relevance) rather than **buy**. *Read it as directional for an
+  Australian carpet-cleaning business: US market, home-services broadly (HVAC/plumbing/roofing), not
+  carpet-specific — but the "own your Local Pack" lesson travels.* *(WebFX, 2026, primary-verified.)*
 - **Video is the new front door — and almost no one uses it.** On Google Business Profiles, **videos are
-  viewed about 2× more often than photos, yet only ~4% of profiles use video.** That gap is the single
-  biggest under-exploited local-marketing opportunity available to a cleaner right now. *(SOCi / Publer.)*
-- **A complete profile converts.** Google's own data: customers are **70% more likely to visit** and
-  **50% more likely to consider purchasing** from a business with a **complete Business Profile**, and
-  **2.7× more likely to consider it reputable**. *(Google.)*
-- **Local search is high-intent.** **76% of people who run a local search visit a related business within
-  24 hours**, and ~46% of all Google searches have local intent. *(Google / industry data via BrightLocal
-  & Searchlab.)*
+  reported to be viewed about 2× more often than photos, while only ~4% of profiles use video.** That gap
+  is the single biggest under-exploited local-marketing opening available to a cleaner right now.
+  *(SOCi / Publer — publisher-reported; directional, not independently audited.)*
+- **A complete profile with photos correlates with more engagement.** Google states customers are
+  **70% more likely to visit** and **50% more likely to consider purchasing** from a business with a
+  **complete Business Profile**, and that profiles **with photos get 42% more direction requests**.
+  *(Google-attributed. Honesty note: the 70%/50% figures are ubiquitous but Google no longer publishes
+  them at a current dated URL — treat them as Google-attributed directional claims, not independently
+  audited metrics. The defensible takeaway stands on its own: complete, photo-rich, video-carrying
+  profiles engage more.)*
 
 > **The founder's insight, formalised.** *"YouTube needs to be connected to their social media pages."*
 > Exactly — because the video that earns trust on YouTube should also be **surfacing on the map listing,
@@ -164,19 +169,30 @@ service and season; make "most real, most consistently" your competitive moat.
 
 ---
 
-## Sources
+## Sources & provenance
 
-- **WebFX (2026)** — *Local Services Ads vs. Google Ads vs. Local Pack: 2026 Study.* Local Pack appeared
-  in 488/500 (~98%) of home-services searches; earned not bought.
-- **SOCi / Publer** — GBP videos viewed ~2× more than photos; only ~4% of profiles use video. SOCi 2026 —
-  customer photos → 42% more direction requests; ~3% conversion lift per 10 reviews.
-- **Google** (Business Profile data) — complete profile: 70% more likely to visit, 50% more likely to
-  consider purchasing, 2.7× more likely to consider reputable; 3+ photos per category guidance.
+Every figure below carries its status. **Verified** = traced to the primary publisher's methodology.
+**Attributed** = named source states it but no independently-auditable primary was confirmed — used as
+directional, never as hard fact.
+
+- **WebFX (2026)** — *Local Services Ads vs. Google Ads vs. Local Pack: 2026 Study.* Local Pack in
+  488/500 (~98%) of searches; 100 **US home-services** keywords; earned not bought. **Verified** (study
+  methodology published). *Context limit: US, home-services broadly — directional for AU carpet.*
+- **SOCi / Publer** — GBP videos viewed ~2× more than photos; ~4% of profiles use video; customer photos
+  → 42% more direction requests; ~3% conversion lift per 10 reviews. **Attributed** (publisher-reported).
+- **Google** (Business Profile) — complete profile: 70% more likely to visit, 50% more likely to consider
+  purchasing, 2.7× more reputable. **Attributed** — ubiquitous but **not tied to a current dated Google
+  primary URL** (independent audit, Christoph Olivier Consulting, 2026). Directional only.
 - **ClickyOwl (2026)** — GBP video best practice: <30 s, 3 s location + 15–20 s work + result; one video
-  per week; UTM tagging; judge over 60–90 days.
+  per week; UTM tagging; judge over 60–90 days. **Attributed** (practitioner guidance).
 - **E-Business Nest (2026)** — "video is the new front door" for home services; authenticity > production.
-- **BrightLocal / Searchlab (2026)** — 76% of local searchers visit within 24 h; ~46% of searches have
-  local intent; average SMB ≈ 1,009 GBP searches/month.
+  **Attributed** (industry commentary).
 
-*Figures verified July 2026. Re-confirm before quoting in customer-facing copy — the CARSI standard is
-prove-it-or-cut-it.*
+**Cut on review (nexus-copywriter CITE-OR-CUT gate):** the widely-repeated *"76% of local searchers
+visit within 24 hours"* and *"46% of searches have local intent"* were **removed** — the 76% figure
+traces to Think with Google's 2016 US retail-shopping diary (a decade old, wrong market and vertical) and
+the 46% figure has no confirmable current primary. Repeating stale, out-of-context statistics as current
+fact is a hard stop. See `substantiation-ledger.md` for the full audit.
+
+*Figures verified/re-checked July 2026. Any figure entering **customer-facing** copy must clear the
+`nexus-copywriter` gate again at that time — the CARSI standard is prove-it-or-cut-it.*

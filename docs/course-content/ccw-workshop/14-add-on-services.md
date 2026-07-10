@@ -54,18 +54,49 @@ and is quoted, not assumed.
 | Service | What it is | Natural trigger |
 |---|---|---|
 | **Pet treatment package** | Urine decontamination + deodorise + protector | Pet households (see Module 12) |
-| **Vehicle & marine interior** | Automotive/boat carpet & upholstery | Startup packages already include auto tools |
+| **Vehicle & marine interior** | Automotive/boat carpet & upholstery | Startup packages already include auto tools — **see safety callout below** |
 | **End-of-lease / bond clean carpets** | Documented clean to a standard | Rental turnover — huge AU market |
 | **Commercial maintenance plan** | Scheduled interim + restorative cadence | Any commercial site (points toward CCMT) |
 | **Post-event / hospitality** | Rapid turnaround venue carpets | Function centres, clubs |
 
 > **DID YOU KNOW · Australia's end-of-lease market is a standing add-on.** With roughly a third of
-> Australian households renting, **bond/end-of-lease carpet cleaning** is a continuous, documented,
+> Australian households renting (ABS Census 2021, ~30.6%), **bond/end-of-lease carpet cleaning** is a continuous, documented,
 > repeatable job type — often with a receipt the tenant *needs* for their bond. It attaches to the same
 > skills you already have and rewards a clean, dated, photographed report (your Module 4 drying discipline
 > and Appendix D checklist become the deliverable).
 
 ---
+
+## Vehicle, Boat & Caravan Detailing — Remove the Fuel Hazard First *(mandatory safety step)*
+
+Interior detailing is a natural add-on — the CCW startup packages already include the auto tools — but
+cleaning inside an **enclosed vehicle, boat or caravan** carries a hazard a carpet-only job does not:
+**petrol vapour**. Before any wet extraction or mains-powered cleaning inside a closed cabin or cargo
+space:
+
+- **Remove any fuel cell, auxiliary tank, jerry can or portable fuel container enclosed within the
+  vehicle** — from the cabin, boot or cargo bay — before you start. This is the step that is most often
+  skipped and matters most. **Petrol vapour is heavier than air**: it sinks and pools in **footwells,
+  boot wells and low cargo areas** — exactly where you kneel and extract — while your **230 V extractor,
+  leads, switches and vacuum motor are ignition sources**. A closed vehicle + pooled fuel vapour + an
+  electrical ignition source is an explosion risk, not a theoretical one.
+- **Ventilate fully** — open all doors/hatches and air the space before and during work; a closed cabin
+  concentrates both fuel vapour and cleaning-solvent fumes.
+- **Control ignition** — no smoking, no naked flame; use **RCD-protected leads** and keep switching gear
+  out of any low-lying vapour.
+- **Flag LPG / dual-fuel and EV/hybrid vehicles** — LPG systems and high-voltage battery systems have
+  their own isolation requirements; if you are not competent to make them safe, do not proceed.
+- **Never run a combustion engine** (a truck-mount included) in an unventilated garage or enclosed space
+  — that is a **carbon-monoxide** hazard on top of the fuel-vapour one.
+
+> **CARSI EXPERT NUGGET · Vapour Sinks to Where You Work**
+> The reason "just leave the fuel can in the boot" is dangerous is pure physics: petrol vapour is roughly
+> three to four times the density of air, so it does not disperse upward and out — it **falls and pools
+> in the lowest enclosed space it can find**, which in a car is the footwell and boot well you are about
+> to soak and extract with a 230 V machine. Removing the fuel cell from the vehicle before you start is
+> not caution for its own sake; it removes the fuel side of the fire triangle entirely, so that even if a
+> switch arcs, there is nothing at floor level to ignite. Make it step one of every vehicle job, on the
+> Appendix D sheet, before a hose comes off the van.
 
 ## Which Add-On Needs Which CARSI/IICRC Credential
 
@@ -103,7 +134,8 @@ for all three on one visit (Appendix G). That is the credential-stacking argumen
 ## Three-Tier Take-Aways
 
 **NEWBY** — Learn the menu; offer only what you can competently deliver; find add-ons at inspection and
-disclose them honestly. Never invent a problem.
+disclose them honestly. Never invent a problem. On any vehicle/boat/caravan job, **remove enclosed fuel
+cells and ventilate before you start** — step one, every time.
 
 **INTERMEDIATE** — Track **services-per-visit** and average job value; attach Tier-1 protector/deodorise
 to most jobs; quote each service with its own line.
