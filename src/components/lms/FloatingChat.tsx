@@ -505,15 +505,44 @@ export default function FloatingChat() {
         return;
       }
 
-      const data = (await res.json()) as {
-        reply: string;
-        conversation_id: string;
-      };
-      persistConversationId(data.conversation_id);
-      setMessages((prev) => [
-        ...prev,
-        { id: `a-${Date.now()}`, role: 'assistant', text: data.reply },
-      ]);
+      const contentType = res.headers.get('content-type') ?? '';
+      if (res.body && contentType.includes('text/plain')) {
+        // AI Front Desk streaming path (MARGOT_STREAMING on): render tokens as
+        // they arrive into a single assistant bubble. The one-shot JSON path
+        // below stays exactly as-is when the flag is off.
+        const streamedConversationId = res.headers.get('X-Conversation-Id');
+        if (streamedConversationId) persistConversationId(streamedConversationId);
+        const assistantId = `a-${Date.now()}`;
+        setMessages((prev) => [...prev, { id: assistantId, role: 'assistant', text: '' }]);
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let acc = '';
+        for (;;) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          acc += decoder.decode(value, { stream: true });
+          setMessages((prev) => prev.map((m) => (m.id === assistantId ? { ...m, text: acc } : m)));
+        }
+        if (!acc) {
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === assistantId
+                ? { ...m, text: "I'm not sure how to answer that right now. Please try rephrasing your question." }
+                : m
+            )
+          );
+        }
+      } else {
+        const data = (await res.json()) as {
+          reply: string;
+          conversation_id: string;
+        };
+        persistConversationId(data.conversation_id);
+        setMessages((prev) => [
+          ...prev,
+          { id: `a-${Date.now()}`, role: 'assistant', text: data.reply },
+        ]);
+      }
     } catch {
       setMessages((prev) => [
         ...prev,
