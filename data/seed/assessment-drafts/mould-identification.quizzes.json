@@ -86,7 +86,7 @@
         {
           "questionText": "Mains-powered inspection equipment used on an Australian mould job operates on which supply, and what protection is required on a potentially damp site?",
           "options": [
-            "115 V / 15 A, no special protection",
+            "US 115 V / 15 A, no special protection",
             "230 V / 50 Hz through a 10 A outlet, protected by an RCD/safety switch",
             "240 V, protected only by the building's main fuse",
             "12 V battery only, RCDs are not used in Australia"

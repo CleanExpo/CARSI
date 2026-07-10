@@ -1,0 +1,90 @@
+{
+  "version": 1,
+  "status": "draft",
+  "courseSlug": "psychrometry-building-science-for-drying",
+  "disclaimer": "Educational assessment. CARSI is an IICRC-approved CEC provider; this is CARSI-original Australian training, not IICRC certification.",
+  "note": "Australian-produced. Grounded in the course's own modules. Founder to review before wiring live.",
+  "quizzes": [
+    {
+      "quizId": "4762cfb1-0e9c-534e-a6ef-9d26e7bc4ed2",
+      "lessonTitle": "Knowledge check",
+      "title": "CARSI Psychrometry & Building Science for Drying — Knowledge Check",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Dew point is the temperature at which…",
+          "options": [
+            "Water boils",
+            "The air becomes saturated and moisture begins to condense",
+            "Mould dies",
+            "The dehumidifier switches off"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M2 — Dew point"
+        },
+        {
+          "questionText": "The actual amount of water in the air is best expressed as…",
+          "options": [
+            "Relative humidity alone",
+            "Specific humidity (e.g. grains per pound / g per kg)",
+            "Temperature",
+            "Air pressure"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M2 — Specific humidity"
+        },
+        {
+          "questionText": "Water moves from wet materials into the air when…",
+          "options": [
+            "Vapour pressure is higher in the material than in the air",
+            "The air is more humid than the material",
+            "The temperature is below zero",
+            "There is no airflow"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M4 — Vapour pressure"
+        },
+        {
+          "questionText": "The dry standard for a material is…",
+          "options": [
+            "Always 0% moisture",
+            "The equilibrium moisture content of the same unaffected material",
+            "A fixed industry number",
+            "The reading on day one"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M5 — Dry standard & EMC"
+        },
+        {
+          "questionText": "To speed drying you generally…",
+          "options": [
+            "Raise relative humidity",
+            "Lower the air's humidity and/or warm it to increase its capacity to hold vapour",
+            "Seal the room airtight and wait",
+            "Cool the air below dew point"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M6 — Proving drying works"
+        },
+        {
+          "questionText": "Australian EMC targets vary with…",
+          "options": [
+            "Nothing — one number nationwide",
+            "Climate — Bureau of Meteorology data and NCC climate zone",
+            "The client's postcode only",
+            "Brand of meter"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M7 — Australian conditions"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,90 @@
+{
+  "version": 1,
+  "status": "draft",
+  "courseSlug": "fire-smoke-damage-restoration-fundamentals",
+  "disclaimer": "Educational assessment. CARSI is an IICRC-approved CEC provider; this is CARSI-original Australian training, not IICRC certification.",
+  "note": "Australian-produced. Grounded in the course's own modules. Founder to review before wiring live.",
+  "quizzes": [
+    {
+      "quizId": "4ee8e7e2-f882-5a90-a753-592cd2d00d7b",
+      "lessonTitle": "Knowledge check",
+      "title": "CARSI Fire & Smoke Restoration Practitioner — Knowledge Check",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Dry (protein/paper) smoke residue is generally cleaned with…",
+          "options": [
+            "Heavy solvents first",
+            "Dry methods first (vacuum, dry sponge) before wet cleaning",
+            "Water flooding",
+            "Nothing — it self-cleans"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M3 — Residue types & method"
+        },
+        {
+          "questionText": "Acidic soot on metals and electronics is urgent because it…",
+          "options": [
+            "Smells bad",
+            "Corrodes surfaces quickly, so early action limits damage",
+            "Is flammable",
+            "Changes colour"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M6 — Corrosion urgency"
+        },
+        {
+          "questionText": "Effective deodorisation depends first on…",
+          "options": [
+            "Masking with fragrance",
+            "Removing the source of the odour before treating the air",
+            "Painting walls",
+            "Opening one window"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M6 — Deodorisation"
+        },
+        {
+          "questionText": "The building's HVAC system in a fire is important because it…",
+          "options": [
+            "Is irrelevant",
+            "Can spread smoke and soot through the whole structure",
+            "Filters the smoke perfectly",
+            "Should be run at full to clear smoke"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M5 — HVAC impact"
+        },
+        {
+          "questionText": "PPE on a fire job protects primarily against…",
+          "options": [
+            "Noise",
+            "Soot particulates and combustion by-products",
+            "Cold water",
+            "Bright light"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M7 — Safety & PPE"
+        },
+        {
+          "questionText": "Cleaning method is selected mainly by…",
+          "options": [
+            "The customer's budget",
+            "The smoke residue type on each surface",
+            "The time of day",
+            "The size of the truck"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M3 — Method selection"
+        }
+      ]
+    }
+  ]
+}

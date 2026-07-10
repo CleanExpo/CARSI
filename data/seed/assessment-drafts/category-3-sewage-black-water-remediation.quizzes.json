@@ -1,0 +1,90 @@
+{
+  "version": 1,
+  "status": "draft",
+  "courseSlug": "category-3-sewage-black-water-remediation",
+  "disclaimer": "Educational assessment. CARSI is an IICRC-approved CEC provider; this is CARSI-original Australian training, not IICRC certification.",
+  "note": "Australian-produced. Grounded in the course's own modules. Founder to review before wiring live.",
+  "quizzes": [
+    {
+      "quizId": "afffd0ed-c2d1-5adc-a8a0-1eb7d9459837",
+      "lessonTitle": "Knowledge check",
+      "title": "CARSI Contaminated-Water Practitioner — Knowledge Check",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Category 3 water is dangerous because it…",
+          "options": [
+            "Is simply dirty",
+            "May contain pathogens, sewage and toxic contaminants",
+            "Is always cold",
+            "Stains carpet"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M2 — What Cat 3 is"
+        },
+        {
+          "questionText": "Porous materials saturated by Category 3 water are generally…",
+          "options": [
+            "Cleaned and reused",
+            "Removed and disposed of, as they cannot be reliably decontaminated",
+            "Dried and left in place",
+            "Painted over"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M5 — Removal & cleaning"
+        },
+        {
+          "questionText": "PPE for Category 3 work typically includes…",
+          "options": [
+            "Gloves only",
+            "Respiratory protection, full body/skin protection and eye protection",
+            "A hi-vis vest only",
+            "No PPE if working quickly"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M4 — PPE"
+        },
+        {
+          "questionText": "Disposal of Category 3 waste in Australia must…",
+          "options": [
+            "Go in the household bin",
+            "Follow the state regulatory and waste requirements",
+            "Be buried on site",
+            "Be washed to the storm drain"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M6 — Disposal & regulation"
+        },
+        {
+          "questionText": "Before restoration can be verified complete you must…",
+          "options": [
+            "Repaint",
+            "Clean, sanitise, dry and document to a defensible standard",
+            "Invoice the client",
+            "Remove the signage"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M7 — Verification"
+        },
+        {
+          "questionText": "A risk assessment for Cat 3 work is…",
+          "options": [
+            "Optional",
+            "Essential, and drives the controls and PPE",
+            "Only for large jobs",
+            "The client's responsibility"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M3 — Risk assessment"
+        }
+      ]
+    }
+  ]
+}

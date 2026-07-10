@@ -1,0 +1,90 @@
+{
+  "version": 1,
+  "status": "draft",
+  "courseSlug": "structural-drying-fundamentals",
+  "disclaimer": "Educational assessment. CARSI is an IICRC-approved CEC provider; this is CARSI-original Australian training, not IICRC certification.",
+  "note": "Australian-produced. Grounded in the course's own modules. Founder to review before wiring live.",
+  "quizzes": [
+    {
+      "quizId": "d314efd8-0db7-58d5-a685-e992fc2ecf17",
+      "lessonTitle": "Knowledge check",
+      "title": "CARSI Structural Drying Practitioner — Knowledge Check",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "A dehumidifier contributes to drying by…",
+          "options": [
+            "Heating the room only",
+            "Lowering the vapour pressure/humidity of the air so materials release moisture",
+            "Blowing air across surfaces",
+            "Adding water to the air"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M5 — Dehumidification"
+        },
+        {
+          "questionText": "Air movers are placed to…",
+          "options": [
+            "Point straight down",
+            "Create airflow across wet surfaces at a shallow angle, moving the boundary layer",
+            "Face the doorway",
+            "Blow toward the dehumidifier intake only"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M4 — Airflow & air movers"
+        },
+        {
+          "questionText": "On an Australian site, drying equipment power planning must respect…",
+          "options": [
+            "Only the total area",
+            "230 V mains and the amperage each circuit (e.g. 10 A / 15 A) can safely carry",
+            "US 120 V ratings",
+            "The colour of the leads"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M6 — Power & electrical safety"
+        },
+        {
+          "questionText": "The drying goal is set by…",
+          "options": [
+            "A fixed number of days",
+            "The dry standard taken from unaffected materials",
+            "The customer's schedule",
+            "The equipment available"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M2 — Setting the drying goal"
+        },
+        {
+          "questionText": "Daily monitoring exists to…",
+          "options": [
+            "Fill in paperwork",
+            "Prove drying is progressing and trigger adjustment when it stalls",
+            "Justify the invoice",
+            "Keep the technician busy"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M7 — Monitoring"
+        },
+        {
+          "questionText": "An RCD (safety switch) on portable drying gear is…",
+          "options": [
+            "Optional on dry days",
+            "A required electrical-safety control, tested before use",
+            "Only for truck-mounts",
+            "A humidity sensor"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M6 — Electrical safety"
+        }
+      ]
+    }
+  ]
+}
