@@ -7,8 +7,13 @@
   "brandContext": {
     "producer": "CARSI — Cleaning and Restoration Science Institute (carsi.com.au)",
     "market": "Australia",
-    "palette": ["#146fc2", "#2490ed", "#0c141d", "#f6f8fb"],
-    "voiceId": "SANCTIONED_SYNTHEX_ELEVENLABS_VOICE",
+    "palette": [
+      "#146fc2",
+      "#2490ed",
+      "#0c141d",
+      "#f6f8fb"
+    ],
+    "voiceId": "ELEVENLABS_VOICE_ID (unset in Synthex prod — required only for the phase-2 talking-presenter videos; phase-1 b-roll needs no voice)",
     "styleNotes": "Australian-produced, clean scientific-professional, 230V/10A context, metric, AU workplaces. No text in imagery implying IICRC certification — CARSI is an IICRC-approved CEC provider only. No fabricated performance claims baked into any asset.",
     "targetConsumer": "Synthex /api/media/generate/{image,video,voice}"
   },
@@ -26,7 +31,13 @@
         "negativePrompt": "photorealistic clutter, US power outlets, logos, watermarks, human faces, text",
         "aspectRatio": "16:9"
       },
-      "tags": ["carsi", "ccw-workshop", "module-9", "maintenance", "training-hero"],
+      "tags": [
+        "carsi",
+        "ccw-workshop",
+        "module-9",
+        "maintenance",
+        "training-hero"
+      ],
       "status": "pending"
     },
     {
@@ -41,7 +52,12 @@
         "negativePrompt": "photoreal, clutter, watermark, dense text paragraphs",
         "aspectRatio": "16:9"
       },
-      "tags": ["carsi", "ccw-workshop", "module-9", "infographic"],
+      "tags": [
+        "carsi",
+        "ccw-workshop",
+        "module-9",
+        "infographic"
+      ],
       "status": "pending"
     },
     {
@@ -52,16 +68,31 @@
       "placement": "Module 9+ intro video (introVideoUrl candidate)",
       "endpoint": "/api/media/generate/video",
       "request": {
-        "type": "avatar",
-        "script": "Machines don't break down mysteriously — they degrade measurably. In this module you'll match your own Carpet Cleaners Warehouse machine — a Razorback portable or a Sapphire or HydraMaster truck-mount — to a six-interval care schedule: daily, weekly, monthly, quarterly, half-year and end-of-year, plus the hours-based triggers that override the calendar when you're flat out. Whichever comes first, wins. Get this right and every dollar of preventive care saves five to ten in emergency repair.",
+        "type": "text-to-video",
+        "prompt": "Clean branded b-roll for a machine-maintenance training module: close-ups of a portable carpet extractor and a van truck-mount, an oil-level check, filters, hoses and a spanner, calm technical blue-accented motion (#146fc2), room for on-screen text, no faces, no logos.",
+        "duration": 20,
         "aspectRatio": "16:9",
         "resolution": "1080p",
-        "provider": "d-id",
-        "voiceId": "SANCTIONED_SYNTHEX_ELEVENLABS_VOICE",
+        "style": "cinematic",
+        "motionAmount": "subtle",
         "saveToLibrary": true
       },
-      "tags": ["carsi", "ccw-workshop", "module-9", "explainer"],
-      "status": "pending"
+      "tags": [
+        "carsi",
+        "ccw-workshop",
+        "module-9",
+        "explainer"
+      ],
+      "status": "pending",
+      "narrationScript": "Machines don't break down mysteriously — they degrade measurably. In this module you'll match your own Carpet Cleaners Warehouse machine — a Razorback portable or a Sapphire or HydraMaster truck-mount — to a six-interval care schedule: daily, weekly, monthly, quarterly, half-year and end-of-year, plus the hours-based triggers that override the calendar when you're flat out. Whichever comes first, wins. Get this right and every dollar of preventive care saves five to ten in emergency repair.",
+      "phase2Presenter": {
+        "provider": "heygen",
+        "endpoint": "/api/heygen/video",
+        "note": "Talking-presenter upgrade: HeyGen avatar narrating narrationScript in the branded CARSI ElevenLabs voice. HEYGEN_API_KEY + ELEVENLABS_API_KEY are set in Synthex prod.",
+        "needs": [
+          "ELEVENLABS_VOICE_ID"
+        ]
+      }
     },
     {
       "id": "ccw-m12-escalation-ladder",
@@ -75,7 +106,12 @@
         "negativePrompt": "photoreal, clutter, watermark, gore, hazard imagery",
         "aspectRatio": "9:16"
       },
-      "tags": ["carsi", "ccw-workshop", "module-12", "infographic"],
+      "tags": [
+        "carsi",
+        "ccw-workshop",
+        "module-12",
+        "infographic"
+      ],
       "status": "pending"
     },
     {
@@ -90,7 +126,12 @@
         "negativePrompt": "specific real brand labels, watermark, faces, US products",
         "aspectRatio": "16:9"
       },
-      "tags": ["carsi", "ccw-workshop", "module-12", "training-hero"],
+      "tags": [
+        "carsi",
+        "ccw-workshop",
+        "module-12",
+        "training-hero"
+      ],
       "status": "pending"
     },
     {
@@ -105,7 +146,12 @@
         "negativePrompt": "photoreal, clutter, watermark, dense paragraphs",
         "aspectRatio": "16:9"
       },
-      "tags": ["carsi", "ccw-workshop", "module-13", "infographic"],
+      "tags": [
+        "carsi",
+        "ccw-workshop",
+        "module-13",
+        "infographic"
+      ],
       "status": "pending"
     },
     {
@@ -116,16 +162,31 @@
       "placement": "Module 13 intro video",
       "endpoint": "/api/media/generate/video",
       "request": {
-        "type": "avatar",
-        "script": "Strip and seal is one of the highest-value add-ons a carpet cleaner can bolt on — and it carries the highest chemical and slip risk, so we teach it as a disciplined nine-step sequence, not a knack. It's a resilient-floor service: vinyl and VCT, never timber, laminate or stone. And remember the rule that separates a job that lasts a year from a callback in three weeks: nine times out of ten a failed strip-and-seal failed at the neutral rinse, not the sealer. Get the rinse right and the finish bonds.",
+        "type": "text-to-video",
+        "prompt": "Branded b-roll of a resilient vinyl floor being stripped and sealed: milky stripper slurry lifted by a rotary machine, a neutral-rinse pass, then a glossy sealed finish, blue-accented professional motion (#146fc2), room for on-screen text, no faces.",
+        "duration": 20,
         "aspectRatio": "16:9",
         "resolution": "1080p",
-        "provider": "d-id",
-        "voiceId": "SANCTIONED_SYNTHEX_ELEVENLABS_VOICE",
+        "style": "cinematic",
+        "motionAmount": "subtle",
         "saveToLibrary": true
       },
-      "tags": ["carsi", "ccw-workshop", "module-13", "explainer"],
-      "status": "pending"
+      "tags": [
+        "carsi",
+        "ccw-workshop",
+        "module-13",
+        "explainer"
+      ],
+      "status": "pending",
+      "narrationScript": "Strip and seal is one of the highest-value add-ons a carpet cleaner can bolt on — and it carries the highest chemical and slip risk, so we teach it as a disciplined nine-step sequence, not a knack. It's a resilient-floor service: vinyl and VCT, never timber, laminate or stone. And remember the rule that separates a job that lasts a year from a callback in three weeks: nine times out of ten a failed strip-and-seal failed at the neutral rinse, not the sealer. Get the rinse right and the finish bonds.",
+      "phase2Presenter": {
+        "provider": "heygen",
+        "endpoint": "/api/heygen/video",
+        "note": "Talking-presenter upgrade: HeyGen avatar narrating narrationScript in the branded CARSI ElevenLabs voice. HEYGEN_API_KEY + ELEVENLABS_API_KEY are set in Synthex prod.",
+        "needs": [
+          "ELEVENLABS_VOICE_ID"
+        ]
+      }
     },
     {
       "id": "ccw-m14-addon-menu",
@@ -139,7 +200,12 @@
         "negativePrompt": "photoreal, clutter, watermark, dollar signs, hype imagery",
         "aspectRatio": "16:9"
       },
-      "tags": ["carsi", "ccw-workshop", "module-14", "infographic"],
+      "tags": [
+        "carsi",
+        "ccw-workshop",
+        "module-14",
+        "infographic"
+      ],
       "status": "pending"
     },
     {
@@ -154,7 +220,13 @@
         "negativePrompt": "fire, explosion gore, photoreal, watermark, graphic hazard",
         "aspectRatio": "16:9"
       },
-      "tags": ["carsi", "ccw-workshop", "module-14", "safety", "infographic"],
+      "tags": [
+        "carsi",
+        "ccw-workshop",
+        "module-14",
+        "safety",
+        "infographic"
+      ],
       "status": "pending"
     },
     {
@@ -169,7 +241,12 @@
         "negativePrompt": "photoreal, clutter, watermark, specific brand logos",
         "aspectRatio": "16:9"
       },
-      "tags": ["carsi", "ccw-workshop", "module-15", "infographic"],
+      "tags": [
+        "carsi",
+        "ccw-workshop",
+        "module-15",
+        "infographic"
+      ],
       "status": "pending"
     },
     {
@@ -180,16 +257,31 @@
       "placement": "Module 15 intro video",
       "endpoint": "/api/media/generate/video",
       "request": {
-        "type": "avatar",
-        "script": "Technical excellence with an empty diary is a hobby. In 2026, video connected across your channels is the front door to a local cleaning business — and almost none of your competitors are doing it well. One honest thirty-second before-and-after, filmed on the job, surfacing on your YouTube, your Google Business Profile, Facebook, Instagram and your website — from one filming session. This module shows you exactly how to wire those channels together and the weekly rhythm that fills the diary.",
+        "type": "text-to-video",
+        "prompt": "Branded b-roll for a local-marketing module: a phone filming a carpet before/after on the job, social feeds and a Google map pin, an upward-trending motion feel, blue-accented professional (#2490ed), room for on-screen text, no real brand logos.",
+        "duration": 20,
         "aspectRatio": "16:9",
         "resolution": "1080p",
-        "provider": "d-id",
-        "voiceId": "SANCTIONED_SYNTHEX_ELEVENLABS_VOICE",
+        "style": "cinematic",
+        "motionAmount": "subtle",
         "saveToLibrary": true
       },
-      "tags": ["carsi", "ccw-workshop", "module-15", "explainer"],
-      "status": "pending"
+      "tags": [
+        "carsi",
+        "ccw-workshop",
+        "module-15",
+        "explainer"
+      ],
+      "status": "pending",
+      "narrationScript": "Technical excellence with an empty diary is a hobby. In 2026, video connected across your channels is the front door to a local cleaning business — and almost none of your competitors are doing it well. One honest thirty-second before-and-after, filmed on the job, surfacing on your YouTube, your Google Business Profile, Facebook, Instagram and your website — from one filming session. This module shows you exactly how to wire those channels together and the weekly rhythm that fills the diary.",
+      "phase2Presenter": {
+        "provider": "heygen",
+        "endpoint": "/api/heygen/video",
+        "note": "Talking-presenter upgrade: HeyGen avatar narrating narrationScript in the branded CARSI ElevenLabs voice. HEYGEN_API_KEY + ELEVENLABS_API_KEY are set in Synthex prod.",
+        "needs": [
+          "ELEVENLABS_VOICE_ID"
+        ]
+      }
     },
     {
       "id": "ccw-mkt-course-thumbnail",
@@ -203,7 +295,12 @@
         "negativePrompt": "clutter, watermark, US imagery, stocky people",
         "aspectRatio": "16:9"
       },
-      "tags": ["carsi", "ccw-workshop", "marketing", "thumbnail"],
+      "tags": [
+        "carsi",
+        "ccw-workshop",
+        "marketing",
+        "thumbnail"
+      ],
       "status": "pending"
     },
     {
@@ -218,7 +315,13 @@
         "negativePrompt": "hype, fake badges, watermark, dense text, US spelling",
         "aspectRatio": "1:1"
       },
-      "tags": ["carsi", "ccw-workshop", "marketing", "social", "square"],
+      "tags": [
+        "carsi",
+        "ccw-workshop",
+        "marketing",
+        "social",
+        "square"
+      ],
       "status": "pending"
     },
     {
@@ -233,7 +336,13 @@
         "negativePrompt": "hype, fake badges, watermark, US spelling",
         "aspectRatio": "9:16"
       },
-      "tags": ["carsi", "ccw-workshop", "marketing", "social", "story"],
+      "tags": [
+        "carsi",
+        "ccw-workshop",
+        "marketing",
+        "social",
+        "story"
+      ],
       "status": "pending"
     },
     {
@@ -253,8 +362,17 @@
         "motionAmount": "subtle",
         "saveToLibrary": true
       },
-      "tags": ["carsi", "ccw-workshop", "marketing", "trailer"],
+      "tags": [
+        "carsi",
+        "ccw-workshop",
+        "marketing",
+        "trailer"
+      ],
       "status": "pending"
     }
-  ]
+  ],
+  "phases": {
+    "phase1_broll": "Ships now against the keys set in Synthex prod (images via OPENAI/GEMINI; video via FAL_API_KEY text-to-video; ElevenLabs voice available). All 15 assets generate.",
+    "phase2_presenter": "Optional upgrade: 3 module explainers as HeyGen talking-presenter videos in the CARSI voice. Needs ELEVENLABS_VOICE_ID provisioned."
+  }
 }
