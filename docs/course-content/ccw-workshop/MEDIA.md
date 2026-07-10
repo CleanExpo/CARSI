@@ -43,6 +43,27 @@ SYNTHEX_BASE_URL=https://<synthex-host> SYNTHEX_MEDIA_TOKEN=… \
 # subset: --only=ccw-mkt-course-trailer,ccw-m9-machine-archetypes-hero   --kind=image
 ```
 
+## Key readiness (Synthex prod, confirmed 2026-07-11 — presence only)
+
+| Capability | Key(s) | Status |
+|---|---|---|
+| Images (10 assets) | `OPENAI_API_KEY`, `GEMINI_API_KEY` | ✅ set |
+| Generative video (fal) | `FAL_API_KEY`, `FAL_WEBHOOK_SECRET` | ✅ set |
+| Voice | `ELEVENLABS_API_KEY` | ✅ set |
+| Presenter video (HeyGen) | `HEYGEN_API_KEY` | ✅ set |
+| Branded voice id | `ELEVENLABS_VOICE_ID` | ⚠️ **unset** — phase-2 only |
+| Alt providers (d-id/runway/synthesia/stability) | — | ⚪ not set, not needed |
+
+**All 15 assets can generate now.** The only gap (`ELEVENLABS_VOICE_ID`) affects only the optional
+phase-2 presenter videos, not the phase-1 run.
+
+## Phased video (decision 2026-07-11)
+
+- **Phase 1 — ships now.** The 3 module explainers are **fal text-to-video b-roll** (branded motion +
+  on-screen text) — no presenter, no voice id needed. Runs against the keys already set.
+- **Phase 2 — presenter upgrade.** Each explainer's `narrationScript` + `phase2Presenter` block wires a
+  **HeyGen talking-presenter** version in the CARSI ElevenLabs voice. Gated only on `ELEVENLABS_VOICE_ID`.
+
 ## What's in the v1 manifest (15 assets)
 
 | Scope | Assets |
