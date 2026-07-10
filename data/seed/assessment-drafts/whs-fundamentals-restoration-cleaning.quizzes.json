@@ -1,0 +1,157 @@
+{
+ "version": 1,
+ "status": "DRAFT — NOT PUBLISHED — SME REVIEW REQUIRED",
+ "courseSlug": "whs-fundamentals-for-restoration-and-cleaning-professionals",
+ "disclaimer": "EDUCATIONAL & PRE-TRAINING USE ONLY — NOT LEGAL ADVICE. These questions test the best-practice educational content of the course. They are not legal advice or Australian/New Zealand legal representation. Always verify against current legislation, the official Codes of Practice, Australian Standards and your state or territory WHS regulator before acting.",
+ "note": "DRAFT end-of-course knowledge check for the CARSI-original 'Work Health and Safety (WHS) Fundamentals for Restoration and Cleaning Professionals' course. Structured identically to the other files in data/seed/assessment-drafts/ (quizId binds to the course's quiz lesson; questions/options/correctIndex/points/sourceRef). Every factual answer is anchored to a Tier-1 source recorded in docs/courses/whs-fundamentals-restoration/source-register.md. DO NOT seed or publish until the founder (SME) has reviewed each question and confirmed currency (see officialSourceRecheck in the course meta). cecHours is null — this course makes no IICRC CEC claim.",
+ "quizzes": [
+  {
+   "quizId": "94af6268-0220-5ca7-a0b4-0bdc01665fae",
+   "lessonTitle": "Knowledge check",
+   "title": "WHS Fundamentals for Restoration and Cleaning — Knowledge Check",
+   "passPercentage": 70,
+   "attemptsAllowed": 3,
+   "questions": [
+    {
+     "questionText": "How should you treat the guidance in this course?",
+     "options": [
+      "As legally binding Australian legal advice you can rely on in court",
+      "As educational, best-practice material that you must verify against current law and your WHS regulator before acting",
+      "As a licence to perform asbestos removal and confined-space entry",
+      "As a replacement for the Safety Data Sheet"
+     ],
+     "correctIndex": 1,
+     "points": 1,
+     "sourceRef": "Module 0 — important notice; course disclaimer"
+    },
+    {
+     "questionText": "In Australia, who ENFORCES work health and safety law (inspections, notices, prosecutions)?",
+     "options": [
+      "Safe Work Australia",
+      "OSHA",
+      "Your state or territory WHS regulator (e.g. SafeWork NSW, WorkSafe Victoria)",
+      "The Fair Work Commission"
+     ],
+     "correctIndex": 2,
+     "points": 1,
+     "sourceRef": "Module 1; Safe Work Australia is the policy body and does not enforce — https://www.safeworkaustralia.gov.au/"
+    },
+    {
+     "questionText": "Which Australian jurisdiction has NOT adopted the model WHS laws and runs its own Occupational Health and Safety Act 2004?",
+     "options": ["New South Wales", "Queensland", "Western Australia", "Victoria"],
+     "correctIndex": 3,
+     "points": 1,
+     "sourceRef": "Module 1; WorkSafe Victoria — https://www.worksafe.vic.gov.au/occupational-health-and-safety-act-and-regulations"
+    },
+    {
+     "questionText": "When you apply the hierarchy of controls, where does personal protective equipment (PPE) sit?",
+     "options": [
+      "First — put PPE on before anything else",
+      "Last — after elimination, substitution, isolation, engineering and administrative controls",
+      "It is not part of the hierarchy",
+      "Equal first with elimination"
+     ],
+     "correctIndex": 1,
+     "points": 1,
+     "sourceRef": "Module 2; hierarchy of controls, PPE is the last line"
+    },
+    {
+     "questionText": "You are removing 12 m² of non-friable (bonded) asbestos cement sheet from a factory. What is required (outside the ACT)?",
+     "options": [
+      "No licence — it is bonded, not friable",
+      "A Class B (or Class A) asbestos removal licence, because it is more than 10 m² of non-friable asbestos",
+      "Only a White Card",
+      "A Class A licence is the only option"
+     ],
+     "correctIndex": 1,
+     "points": 1,
+     "sourceRef": "Module 3; WHS Regulation 487 — https://www.safeworkaustralia.gov.au/safety-topic/hazards/asbestos/whs-duties (ACT: any amount needs a licence)"
+    },
+    {
+     "questionText": "Since 1 July 2024, what is the status of engineered stone benchtops, panels and slabs in Australia?",
+     "options": [
+      "Allowed if you wear a P2 respirator",
+      "The manufacture, supply, processing and installation is prohibited; import prohibited from 1 January 2025",
+      "Only banned in Victoria",
+      "Allowed for repairs but banned for new kitchens only"
+     ],
+     "correctIndex": 1,
+     "points": 1,
+     "sourceRef": "Module 3; https://www.safeworkaustralia.gov.au/safety-topic/hazards/silica/engineered-stone-ban"
+    },
+    {
+     "questionText": "You must cut and grind concrete and fibre-cement during a strip-out, and the work is assessed as high-risk crystalline silica processing. What must the PCBU do BEFORE work starts?",
+     "options": [
+      "Nothing extra — just wear a dust mask",
+      "Prepare a written Silica Risk Control Plan, and arrange air monitoring, health monitoring and silica training",
+      "Notify OSHA",
+      "Only wet the surface"
+     ],
+     "correctIndex": 1,
+     "points": 1,
+     "sourceRef": "Module 3; crystalline silica substances regime from 1 Sep 2024 — https://www.safeworkaustralia.gov.au/media-centre/news/stronger-regulation-crystalline-silica-substances-1-september-2024"
+    },
+    {
+     "questionText": "What is the Australian baseline respirator for mould and general fire/soot clean-up, and to which standard is it marked?",
+     "options": [
+      "An N95, marked to NIOSH 42 CFR 84",
+      "A P2, marked to AS/NZS 1716 (fit-tested if tight-fitting)",
+      "A P1, marked to AS/NZS 1715",
+      "Any dust mask"
+     ],
+     "correctIndex": 1,
+     "points": 1,
+     "sourceRef": "Module 4; AS/NZS 1716:2012 (device), AS/NZS 1715:2009 (selection/use); specify P2 not N95"
+    },
+    {
+     "questionText": "You arrive at a flooded home with standing water and running extraction gear. What is the correct electrical-safety approach?",
+     "options": [
+      "Trust the home's own power points and safety switches",
+      "Ensure all portable equipment and leads are protected by a 30 mA RCD — bring your own portable RCD and confirm isolation before entering standing water near live circuits",
+      "Only use battery tools; mains is never safe",
+      "A GFCI on the US 120 V standard is fine"
+     ],
+     "correctIndex": 1,
+     "points": 1,
+     "sourceRef": "Module 5; AS/NZS 3012 & AS/NZS 3760; 230 V/50 Hz; ~30 mA can be fatal"
+    },
+    {
+     "questionText": "A saturated subfloor with sewage needs entry. What must be in place before anyone goes in?",
+     "options": [
+      "Just a P2 mask",
+      "A confined-space risk assessment, entry permit, atmospheric testing, ventilation, a standby person and a rescue plan (AS 2865 + Confined Spaces COP)",
+      "Nothing if it is only a small space",
+      "A White Card"
+     ],
+     "correctIndex": 1,
+     "points": 1,
+     "sourceRef": "Module 5; AS 2865:2009 + Safe Work Australia Confined Spaces Code of Practice — no entry without a rescue plan"
+    },
+    {
+     "questionText": "Mould is present on a water-damaged job. What is the correct drying approach?",
+     "options": [
+      "Run air movers immediately to dry fastest",
+      "Use air-filtration devices and dehumidifiers, and do NOT run air movers (which aerosolise spores) until the area is contained and cleared to Condition 1",
+      "Fog with antimicrobial and leave it",
+      "Open all windows and use pedestal fans"
+     ],
+     "correctIndex": 1,
+     "points": 1,
+     "sourceRef": "Module 5; WHS duty + enHealth guidance + IICRC S520 as industry method; contain first, HEPA negative air"
+    },
+    {
+     "questionText": "A worker is taken to hospital as an in-patient after an incident on site. What are your duties?",
+     "options": [
+      "Log it internally and continue work",
+      "Notify your state/territory WHS regulator immediately, keep records for at least 5 years, and preserve the incident site until an inspector or the regulator directs otherwise",
+      "Report to OSHA within 8 hours on a 300 log",
+      "Only notify if the worker does not return the next day"
+     ],
+     "correctIndex": 1,
+     "points": 1,
+     "sourceRef": "Module 7; notifiable incidents (model WHS Act ss.35–39) + site preservation (s.39)"
+    }
+   ]
+  }
+ ]
+}
