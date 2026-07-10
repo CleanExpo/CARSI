@@ -90,24 +90,3 @@ services:
         scope: RUN_TIME
       - key: GOOGLE_CALENDAR_OAUTH_REFRESH_TOKEN
         scope: RUN_TIME
-
-# PRE_DEPLOY job: apply pending Prisma migrations to the live database before a new deployment goes
-# live. Uses the app's own DATABASE_URL + DATABASE_CA_CERT (the direct connection), so it always
-# targets the correct production database. A migration failure blocks the deploy (desired).
-# NOTE: DATABASE_URL + DATABASE_CA_CERT must be available to this job — if they are set at the
-# component (service) level rather than app level in the DO dashboard, add them to this job too.
-jobs:
-  - name: migrate
-    kind: PRE_DEPLOY
-    dockerfile_path: deploy/Dockerfile.migrate
-    source_dir: /
-    github:
-      repo: CleanExpo/CARSI
-      branch: main
-      deploy_on_push: true
-    instance_size_slug: apps-s-1vcpu-1gb
-    envs:
-      - key: DATABASE_URL
-        scope: RUN_TIME
-      - key: DATABASE_CA_CERT
-        scope: RUN_TIME

@@ -30,7 +30,6 @@ ENV NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL}
 ENV NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}
 
 RUN npm run build
-# Migrations run at container start via scripts/docker-entrypoint.sh (runtime has DB access).
 
 FROM node:22-bookworm-slim AS runner
 WORKDIR /app
@@ -47,7 +46,19 @@ COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
+# Migrate on container start (replaces DO PRE_DEPLOY job; no deploy-time course seeding).
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
+COPY --from=deps /app/node_modules/prisma ./node_modules/prisma
+COPY --from=deps /app/node_modules/@prisma ./node_modules/@prisma
+COPY --from=deps /app/node_modules/dotenv ./node_modules/dotenv
+COPY --from=builder /app/scripts/do-migrate.sh ./scripts/do-migrate.sh
+COPY --from=builder /app/scripts/start-production.sh ./scripts/start-production.sh
+RUN chmod +x ./scripts/do-migrate.sh ./scripts/start-production.sh \
+  && chown -R nextjs:nodejs ./package.json ./prisma ./prisma.config.ts ./node_modules ./scripts
+
 USER nextjs
 EXPOSE 8080
 
-CMD ["node", "server.js"]
+CMD ["npm", "run", "start:production"]
