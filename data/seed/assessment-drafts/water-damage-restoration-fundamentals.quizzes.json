@@ -1,0 +1,90 @@
+{
+  "version": 1,
+  "status": "draft",
+  "courseSlug": "water-damage-restoration-fundamentals",
+  "disclaimer": "Educational assessment. CARSI is an IICRC-approved CEC provider; this is CARSI-original Australian training, not IICRC certification.",
+  "note": "Australian-produced. Grounded in the course's own modules. Founder to review before wiring live.",
+  "quizzes": [
+    {
+      "quizId": "459ef333-f67e-5516-a2ed-cb2426b27916",
+      "lessonTitle": "Knowledge check",
+      "title": "CARSI Water Restoration Practitioner — Knowledge Check",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Category 1 water originates from…",
+          "options": [
+            "A sanitary source such as a broken supply line",
+            "A washing-machine or dishwasher overflow",
+            "Sewage or a flooded river",
+            "Sea water"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M2 — Water categories"
+        },
+        {
+          "questionText": "Category 3 water is best described as…",
+          "options": [
+            "Clean water from a tap",
+            "Slightly contaminated grey water",
+            "Grossly contaminated water that may contain pathogens (e.g. sewage)",
+            "Condensation"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "sourceRef": "M2 — Water categories"
+        },
+        {
+          "questionText": "The 'Class' of a water loss describes…",
+          "options": [
+            "The legal class action risk",
+            "The amount of wet material and the resulting evaporation load",
+            "The insurance excess",
+            "The colour of the water"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M2 — Classes"
+        },
+        {
+          "questionText": "Category 1 water left untreated in a warm building will…",
+          "options": [
+            "Stay Category 1 indefinitely",
+            "Degrade toward Category 2 or 3 over time",
+            "Become cleaner as it dries",
+            "Turn into Category 0"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M2 — Categories over time"
+        },
+        {
+          "questionText": "PPE for a water job is selected primarily by…",
+          "options": [
+            "The customer's preference",
+            "The hazard class of the water and site (e.g. Cat 3 needs more)",
+            "The size of the room",
+            "The day of the week"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M3 — PPE by hazard"
+        },
+        {
+          "questionText": "A defensible dry standard is set by…",
+          "options": [
+            "Guessing when the floor feels dry",
+            "Taking moisture readings from unaffected reference materials of the same type",
+            "Waiting exactly 3 days",
+            "Reading the air temperature only"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M4 — Moisture assessment"
+        }
+      ]
+    }
+  ]
+}

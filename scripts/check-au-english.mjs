@@ -75,7 +75,9 @@ function walk(node, file, path) {
 }
 
 const tracked = new Set(execSync('git ls-files', { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }).split('\n'));
-for (const file of COURSE_DATA) {
+// Assessment/quiz drafts are AU-produced course copy too — scan them all.
+const draftFiles = [...tracked].filter((f) => f.startsWith('data/seed/assessment-drafts/') && f.endsWith('.json'));
+for (const file of [...COURSE_DATA, ...draftFiles]) {
   if (!tracked.has(file)) continue;
   let json;
   try { json = JSON.parse(readFileSync(file, 'utf8')); } catch (e) { console.error(`check-au-english: cannot parse ${file}: ${e.message}`); process.exit(1); }

@@ -1,0 +1,90 @@
+{
+  "version": 1,
+  "status": "draft",
+  "courseSlug": "assessing-indoor-environment-conditions",
+  "disclaimer": "Educational assessment. CARSI is an IICRC-approved CEC provider; this is CARSI-original Australian training, not IICRC certification.",
+  "note": "Australian-produced. Grounded in the course's own modules. Founder to review before wiring live.",
+  "quizzes": [
+    {
+      "quizId": "16f9c422-8e30-5484-a126-32565b8144a6",
+      "lessonTitle": "Knowledge check",
+      "title": "CARSI Indoor Environment Assessment Practitioner — Knowledge Check",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Treating the building 'as a system' means…",
+          "options": [
+            "Looking only at the visible mould",
+            "Understanding how moisture, air, materials and occupants interact",
+            "Measuring temperature only",
+            "Ignoring the HVAC"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M3 — Building as a system"
+        },
+        {
+          "questionText": "A basic indoor-environment assessment typically measures…",
+          "options": [
+            "Wi-Fi strength",
+            "Temperature, relative humidity, surface moisture and particulates",
+            "Only the floor area",
+            "Paint gloss"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M4 — What to measure"
+        },
+        {
+          "questionText": "When you recognise mould during an assessment you should…",
+          "options": [
+            "Remediate it immediately yourself",
+            "Document it and, where beyond your scope, refer for remediation",
+            "Ignore it if small",
+            "Paint over it"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M6 — Interpreting & recognising mould"
+        },
+        {
+          "questionText": "A defensible report is…",
+          "options": [
+            "A verbal summary",
+            "Objective, evidence-based, and clear about method and limits",
+            "A marketing brochure",
+            "A single photo"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M7 — Defensible report"
+        },
+        {
+          "questionText": "Knowing your limits means…",
+          "options": [
+            "Never asking for help",
+            "Recognising when a finding needs a specialist or laboratory",
+            "Guessing confidently",
+            "Skipping documentation"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M7 — Knowing your limits"
+        },
+        {
+          "questionText": "Mapping findings during inspection helps…",
+          "options": [
+            "Fill time",
+            "Communicate where issues are and support the report",
+            "Increase the price",
+            "Avoid measuring"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M5 — Inspection & mapping"
+        }
+      ]
+    }
+  ]
+}

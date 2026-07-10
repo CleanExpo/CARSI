@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "status": "draft",
+  "courseSlug": "carpet-cleaning-technician-fundamentals",
+  "disclaimer": "Educational assessment. CARSI is an IICRC-approved CEC provider; this is CARSI-original Australian training, not IICRC certification.",
+  "note": "Australian-produced. Grounded in the course's own modules. Founder to review before wiring live.",
+  "quizzes": [
+    {
+      "quizId": "35dc1ae4-d9ac-5042-aaae-36c391313d27",
+      "lessonTitle": "Knowledge check",
+      "title": "CARSI Carpet Cleaning Practitioner — Knowledge Check",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Which carpet fibre demands the most conservative chemistry — acid-side pH and low heat?",
+          "options": [
+            "Nylon",
+            "Polyester",
+            "Wool",
+            "Olefin"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "sourceRef": "Module 2 — Fibre types"
+        },
+        {
+          "questionText": "You are cleaning an 80% wool / 20% nylon blend. How do you choose your chemistry?",
+          "options": [
+            "Treat it as nylon because nylon is the majority by resilience",
+            "Treat it as wool — the more delicate fibre governs (weakest-member rule)",
+            "Use the strongest alkaline the nylon allows",
+            "Alternate wool and nylon products across the room"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Module 2 — Construction & method"
+        },
+        {
+          "questionText": "In the CHAT model, the four variables you can trade against one another are Chemistry, Heat, Agitation and…",
+          "options": [
+            "Temperature",
+            "Time",
+            "Traction",
+            "Turbulence"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Module 3 — Cleaning chemistry"
+        },
+        {
+          "questionText": "Which method uses the least moisture and suits interim maintenance of commercial carpet?",
+          "options": [
+            "Hot water extraction",
+            "Low-moisture encapsulation",
+            "Flood-and-extract",
+            "Saturation shampoo"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Module 4 — Cleaning methods"
+        },
+        {
+          "questionText": "What is the correct first step of the cleaning process, before any chemistry is applied?",
+          "options": [
+            "Pre-spray the traffic lanes",
+            "Thorough dry vacuuming to remove dry soil",
+            "Hot rinse the whole floor",
+            "Groom the pile"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Module 6 — The cleaning process"
+        },
+        {
+          "questionText": "Before applying any product to a carpet you should always…",
+          "options": [
+            "Trust the manufacturer label and proceed",
+            "Pre-inspect and test in an inconspicuous area",
+            "Apply to the most visible stain first",
+            "Skip testing on synthetic fibres"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Module 5 — Pre-inspection & testing"
+        },
+        {
+          "questionText": "To treat a spot correctly you should…",
+          "options": [
+            "Rub vigorously from the outside in",
+            "Blot — never rub — to preserve pile geometry",
+            "Scrub with a stiff brush",
+            "Apply heat immediately to every spot"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Module 6 — Spot & stain treatment"
+        },
+        {
+          "questionText": "Mould is present after water exposure. What is the correct drying approach?",
+          "options": [
+            "Run air movers immediately to dry faster",
+            "Use air-filtration devices and dehumidifiers only — no air movers until clearance",
+            "Open all windows and use fans",
+            "Apply more heat to kill the mould"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Module 7 — Drying & the mould rule"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,90 @@
+{
+  "version": 1,
+  "status": "draft",
+  "courseSlug": "trauma-crime-scene-decontamination-fundamentals",
+  "disclaimer": "Educational assessment. CARSI is an IICRC-approved CEC provider; this is CARSI-original Australian training, not IICRC certification.",
+  "note": "Australian-produced. Grounded in the course's own modules. Founder to review before wiring live.",
+  "quizzes": [
+    {
+      "quizId": "66e11c08-d560-5638-a739-d75cbd10a6bb",
+      "lessonTitle": "Knowledge check",
+      "title": "CARSI Trauma & Biohazard Decontamination Practitioner — Knowledge Check",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Under standard (universal) precautions, blood and body fluids should be treated as…",
+          "options": [
+            "Safe unless proven otherwise",
+            "Potentially infectious in every case",
+            "A stain to clean normally",
+            "Hazardous only if visibly dirty"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M3 — Bloodborne pathogens"
+        },
+        {
+          "questionText": "Before starting trauma decontamination you must prepare…",
+          "options": [
+            "A price list",
+            "A risk assessment and Safe Work Method Statement",
+            "A marketing photo",
+            "A new uniform"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M4 — Risk assessment & SWMS"
+        },
+        {
+          "questionText": "PPE for biohazard decontamination is…",
+          "options": [
+            "Gloves only",
+            "Full — including respiratory, skin and eye protection with non-permeable barriers",
+            "Optional if you are careful",
+            "A hi-vis vest"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M5 — PPE selection"
+        },
+        {
+          "questionText": "Biohazard and clinical waste must be…",
+          "options": [
+            "Placed in the general bin",
+            "Contained and disposed of lawfully through approved waste streams",
+            "Buried on site",
+            "Rinsed to the drain"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M7 — Lawful disposal"
+        },
+        {
+          "questionText": "Duty of care on a trauma job includes…",
+          "options": [
+            "Sharing details online",
+            "Discretion, dignity and respect for those affected",
+            "Fast work above all",
+            "Ignoring the family"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M2 — Duty of care & discretion"
+        },
+        {
+          "questionText": "Psychological safety of the technician is…",
+          "options": [
+            "Not relevant",
+            "A real consideration to plan for and support",
+            "A weakness",
+            "Only for large scenes"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M7 — Psychological safety"
+        }
+      ]
+    }
+  ]
+}

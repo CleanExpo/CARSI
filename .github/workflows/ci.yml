@@ -78,6 +78,12 @@ jobs:
       - name: Australian-English course-content guard
         run: npm run check:au-english
 
+      # Advisory course-completeness scorecard (assessment, thumbnail, intro
+      # video, card metadata, scaffolds, depth). Non-blocking today; promote a
+      # finalised series with --enforce=<slugs> once it is green.
+      - name: Course completeness scorecard (advisory)
+        run: npm run check:course-completeness
+
       # Licence-critical backstop: scans all course-content + marketing surfaces
       # (data/seed, public/courses, docs/marketing, docs/content) for stray IICRC
       # placements, banned "IICRC-approved"/"certified with CARSI" phrasing, and
