@@ -66,6 +66,19 @@ services:
       - key: NEXT_PUBLIC_APP_URL
         scope: RUN_AND_BUILD_TIME
 
+      # Cloudflare Turnstile bot protection + FastAPI hub-intake auth (RA-4190).
+      # Values are set in DigitalOcean App Platform as encrypted env vars; do not
+      # commit secrets here. NEXT_PUBLIC_TURNSTILE_SITE_KEY is BUILD-scoped so
+      # Next.js inlines the public site key into the client bundle — the widget
+      # renders nothing without it. HUB_INTAKE_SECRET must match the value on the
+      # FastAPI /api/hub/submissions/intake receiver.
+      - key: TURNSTILE_SECRET_KEY
+        scope: RUN_TIME
+      - key: NEXT_PUBLIC_TURNSTILE_SITE_KEY
+        scope: RUN_AND_BUILD_TIME
+      - key: HUB_INTAKE_SECRET
+        scope: RUN_TIME
+
       # CCW Roadshow Google Calendar sync. Values are set in DigitalOcean
       # App Platform as encrypted runtime env vars; do not commit secrets here.
       - key: GOOGLE_CALENDAR_ID
