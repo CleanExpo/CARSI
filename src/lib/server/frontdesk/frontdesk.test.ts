@@ -42,14 +42,24 @@ const SAMPLE = [
   },
 ];
 
-describe('front-desk registry (Phase 1 invariants)', () => {
-  it('exposes at least one tool and every tool is read-only', () => {
+describe('front-desk registry invariants', () => {
+  it('default tool set (no write) is entirely read-only', () => {
     const tools = getFrontDeskTools();
     expect(tools.length).toBeGreaterThan(0);
-    for (const t of tools) {
-      // Phase 1 hard invariant: no write tools in the registry.
-      expect(t.readOnly).toBe(true);
+    for (const t of tools) expect(t.readOnly).toBe(true);
+  });
+
+  it('write tools are only included with includeWrite AND are confirm-gated', () => {
+    const withWrite = getFrontDeskTools({ includeWrite: true });
+    const writeTools = withWrite.filter((t) => !t.readOnly);
+    expect(writeTools.length).toBeGreaterThan(0);
+    // Hard invariant: any non-read-only tool MUST require confirmation.
+    for (const t of writeTools) {
+      expect(t.readOnly).toBe(false);
+      if (!t.readOnly) expect(t.requiresConfirmation).toBe(true);
     }
+    // ...and the default set must NOT contain them.
+    expect(getFrontDeskTools().some((t) => !t.readOnly)).toBe(false);
   });
 
   it('registers find_courses and renders an OpenAI-shaped tools payload', () => {
@@ -63,21 +73,19 @@ describe('front-desk registry (Phase 1 invariants)', () => {
   });
 
   it('returns a structured error for an unknown tool (never throws)', async () => {
-    const out = await executeToolCall({
-      id: 'c1',
-      type: 'function',
-      function: { name: 'delete_everything', arguments: '{}' },
-    });
-    expect(JSON.parse(out)).toHaveProperty('error');
+    const out = await executeToolCall(
+      { id: 'c1', type: 'function', function: { name: 'delete_everything', arguments: '{}' } },
+      getFrontDeskTools()
+    );
+    expect(JSON.parse(out.forModel)).toHaveProperty('error');
   });
 
   it('returns a structured error for malformed argument JSON (never throws)', async () => {
-    const out = await executeToolCall({
-      id: 'c2',
-      type: 'function',
-      function: { name: 'find_courses', arguments: '{not json' },
-    });
-    expect(JSON.parse(out)).toHaveProperty('error');
+    const out = await executeToolCall(
+      { id: 'c2', type: 'function', function: { name: 'find_courses', arguments: '{not json' } },
+      getFrontDeskTools()
+    );
+    expect(JSON.parse(out.forModel)).toHaveProperty('error');
   });
 });
 
