@@ -1,17 +1,19 @@
 /**
- * Front-desk streaming transport (Phase 1).
+ * Front-desk streaming transport (Phase 1 read tools + Phase 2 write proposals).
  *
  * A minimal, dependency-free agent loop over OpenRouter's OpenAI-compatible SSE
  * endpoint: it streams text deltas to the caller and, when the model asks to call
- * a tool, runs the tool (read-only in Phase 1) and streams the grounded follow-up.
+ * a tool, runs read tools inline and turns a write tool into a signed proposal
+ * appended as a trailer frame (never committing here — the confirm endpoint does).
  *
  * Kept separate from the tested one-shot `OpenRouterClient` so the streaming path
  * cannot destabilise today's default. Transport lives here; tools live in the
  * registry — the same split `@nexus/front-desk` will extract.
  */
 
-import { executeToolCall, toolsForRequest } from './registry';
-import type { FrontDeskMessage, ToolCall } from './types';
+import { ACTION_TRAILER_PREFIX } from '@/lib/frontdesk-protocol';
+import { executeToolCall, getFrontDeskTools } from './registry';
+import type { FrontDeskMessage, FrontDeskTool, ToolCall, WriteToolProposal } from './types';
 
 const BASE_URL = 'https://openrouter.ai/api/v1';
 
@@ -26,6 +28,8 @@ export interface RunFrontDeskStreamParams {
   appTitle?: string;
   /** Cap on tool rounds. Phase 1 = 1 (one look-up, then answer). */
   maxToolRounds?: number;
+  /** Offer confirm-gated write tools (caller checked flag + secret). */
+  includeWrite?: boolean;
   /** Notified with the tool name when the model calls a tool (for UI status). */
   onToolCall?: (name: string) => void;
 }
@@ -50,25 +54,35 @@ export async function* runFrontDeskStream(
 ): AsyncGenerator<string, void, unknown> {
   const maxRounds = params.maxToolRounds ?? 1;
   const messages: FrontDeskMessage[] = [...params.messages];
+  const tools = getFrontDeskTools({ includeWrite: params.includeWrite });
+  // One confirm-gated proposal per turn (Phase 2). Surfaced as a trailer at the end.
+  let proposal: WriteToolProposal | undefined;
 
   for (let round = 0; round <= maxRounds; round++) {
     // Offer tools only while a tool round is still permitted.
     const offerTools = round < maxRounds;
-    const { assembledToolCalls } = yield* streamOneRequest(params, messages, offerTools);
+    const { assembledToolCalls } = yield* streamOneRequest(params, messages, offerTools, tools);
 
     if (assembledToolCalls.length === 0) {
-      return; // Model produced a final answer (already yielded).
+      break; // Model produced a final answer (already yielded).
     }
 
     // Record the assistant's tool-call turn, then run each tool and append results.
     messages.push({ role: 'assistant', content: null, tool_calls: assembledToolCalls });
     for (const call of assembledToolCalls) {
       params.onToolCall?.(call.function.name);
-      const content = await executeToolCall(call);
-      messages.push({ role: 'tool', tool_call_id: call.id, content });
+      const result = await executeToolCall(call, tools);
+      if (result.proposal && !proposal) proposal = result.proposal;
+      messages.push({ role: 'tool', tool_call_id: call.id, content: result.forModel });
     }
     // Loop: next request has the tool results in context; on the final round
     // `offerTools` is false, so the model must answer in prose.
+  }
+
+  // A write tool prepared a proposal → append the trailer so the client can render
+  // a Confirm card. The route strips this before persisting the conversation turn.
+  if (proposal) {
+    yield `\n${ACTION_TRAILER_PREFIX}${JSON.stringify(proposal)}\n`;
   }
 }
 
@@ -79,7 +93,8 @@ export async function* runFrontDeskStream(
 async function* streamOneRequest(
   params: RunFrontDeskStreamParams,
   messages: FrontDeskMessage[],
-  offerTools: boolean
+  offerTools: boolean,
+  tools: readonly FrontDeskTool[]
 ): AsyncGenerator<string, { assembledToolCalls: ToolCall[] }, unknown> {
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
@@ -96,7 +111,10 @@ async function* streamOneRequest(
     temperature: params.temperature ?? 0.72,
   };
   if (offerTools) {
-    body.tools = toolsForRequest();
+    body.tools = tools.map((t) => ({
+      type: 'function',
+      function: { name: t.name, description: t.description, parameters: t.parameters },
+    }));
     body.tool_choice = 'auto';
   }
 

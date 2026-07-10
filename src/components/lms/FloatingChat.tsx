@@ -44,6 +44,11 @@ import {
   serializePosition,
   type MargotPosition,
 } from '@/lib/client/margot-position';
+import {
+  ACTION_SENTINEL,
+  ACTION_TRAILER_PREFIX,
+  type ActionProposalFrame,
+} from '@/lib/frontdesk-protocol';
 import { deriveChatPageContext } from '@/lib/chat-page-context';
 import {
   MARGOT_ACCENT,
@@ -63,6 +68,10 @@ interface Message {
   id: string;
   role: 'assistant' | 'user';
   text: string;
+  /** A confirm-gated write proposal the user can Confirm/Dismiss (Phase 2). */
+  action?: ActionProposalFrame;
+  actionState?: 'idle' | 'sending' | 'done' | 'error';
+  actionResult?: string;
 }
 
 const SUGGESTED_PROMPTS = [
@@ -521,9 +530,15 @@ export default function FloatingChat() {
           const { done, value } = await reader.read();
           if (done) break;
           acc += decoder.decode(value, { stream: true });
-          setMessages((prev) => prev.map((m) => (m.id === assistantId ? { ...m, text: acc } : m)));
+          // A confirm-gated action trailer (if any) starts at ACTION_SENTINEL —
+          // only the text before it is the visible message.
+          const sep = acc.indexOf(ACTION_SENTINEL);
+          const visible = sep === -1 ? acc : acc.slice(0, sep);
+          setMessages((prev) => prev.map((m) => (m.id === assistantId ? { ...m, text: visible } : m)));
         }
-        if (!acc) {
+        const sepIdx = acc.indexOf(ACTION_SENTINEL);
+        const finalVisible = (sepIdx === -1 ? acc : acc.slice(0, sepIdx)).trim();
+        if (!finalVisible) {
           setMessages((prev) =>
             prev.map((m) =>
               m.id === assistantId
@@ -531,6 +546,22 @@ export default function FloatingChat() {
                 : m
             )
           );
+        }
+        if (sepIdx !== -1) {
+          const trailer = acc.slice(sepIdx);
+          const jsonStr = trailer.startsWith(ACTION_TRAILER_PREFIX)
+            ? trailer.slice(ACTION_TRAILER_PREFIX.length).trim()
+            : '';
+          if (jsonStr) {
+            try {
+              const frame = JSON.parse(jsonStr) as ActionProposalFrame;
+              setMessages((prev) =>
+                prev.map((m) => (m.id === assistantId ? { ...m, action: frame, actionState: 'idle' } : m))
+              );
+            } catch {
+              // malformed trailer — ignore, the text answer still stands
+            }
+          }
         }
       } else {
         const data = (await res.json()) as {
@@ -562,6 +593,43 @@ export default function FloatingChat() {
       e.preventDefault();
       void sendMessage();
     }
+  }
+
+  // Execute a confirm-gated action: the only path that turns Margot's proposal
+  // into a real write, gated by this explicit user click + a server-verified token.
+  async function confirmAction(messageId: string, token: string) {
+    setMessages((prev) => prev.map((m) => (m.id === messageId ? { ...m, actionState: 'sending' } : m)));
+    try {
+      const res = await fetch('/api/margot/action/confirm', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token }),
+      });
+      if (res.ok) {
+        setMessages((prev) => prev.map((m) => (m.id === messageId ? { ...m, actionState: 'done' } : m)));
+      } else {
+        const data = (await res.json().catch(() => ({}))) as { detail?: string };
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === messageId
+              ? { ...m, actionState: 'error', actionResult: data.detail ?? 'Could not send. Please try again.' }
+              : m
+          )
+        );
+      }
+    } catch {
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === messageId ? { ...m, actionState: 'error', actionResult: 'Connection error. Please try again.' } : m
+        )
+      );
+    }
+  }
+
+  function dismissAction(messageId: string) {
+    setMessages((prev) =>
+      prev.map((m) => (m.id === messageId ? { ...m, action: undefined, actionState: undefined } : m))
+    );
   }
 
   const showSuggested =
@@ -705,6 +773,37 @@ export default function FloatingChat() {
                     <MargotAvatar size={28} variant="inline" className="mb-5 hidden sm:block" />
                     <div className="min-w-0 max-w-[calc(100%-2rem)] flex-1 rounded-2xl rounded-bl-md border border-white/[0.07] bg-white/[0.045] px-3.5 py-2.5 sm:max-w-[92%]">
                       <MargotMessageContent text={msg.text} />
+                      {msg.action && msg.actionState !== 'done' ? (
+                        <div className="mt-3 rounded-xl border border-white/10 bg-white/[0.05] p-3">
+                          <p className="text-xs leading-relaxed text-white/70">{msg.action.summary}</p>
+                          {msg.actionState === 'error' ? (
+                            <p className="mt-1.5 text-xs text-red-300">{msg.actionResult}</p>
+                          ) : null}
+                          <div className="mt-2.5 flex gap-2">
+                            <button
+                              type="button"
+                              disabled={msg.actionState === 'sending'}
+                              onClick={() => msg.action && void confirmAction(msg.id, msg.action.token)}
+                              className="rounded-lg px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-opacity disabled:cursor-not-allowed disabled:opacity-50"
+                              style={{ background: MARGOT_ACCENT }}
+                            >
+                              {msg.actionState === 'sending' ? 'Sending…' : 'Confirm'}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => dismissAction(msg.id)}
+                              className="rounded-lg border border-white/10 px-3 py-1.5 text-xs font-medium text-white/60 transition-colors hover:bg-white/[0.04] hover:text-white/80"
+                            >
+                              Dismiss
+                            </button>
+                          </div>
+                        </div>
+                      ) : null}
+                      {msg.actionState === 'done' ? (
+                        <p className="mt-2 text-xs font-medium text-emerald-300">
+                          ✓ Sent — the CARSI team will be in touch.
+                        </p>
+                      ) : null}
                       {voiceAvailable ? (
                         <button
                           type="button"

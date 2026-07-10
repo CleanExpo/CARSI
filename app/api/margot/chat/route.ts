@@ -19,8 +19,10 @@ import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { applyRateLimit, clientIpFrom } from '@/lib/rate-limit';
 import { DEFAULT_OPENROUTER_MODEL, OpenRouterAPIError, OpenRouterClient } from '@/lib/openrouter/client';
 import { margotStreamingEnabled } from '@/lib/server/margot-streaming-flag';
+import { margotWriteToolsEnabled } from '@/lib/server/margot-write-tools-flag';
 import { runFrontDeskStream } from '@/lib/server/frontdesk/stream';
 import type { FrontDeskMessage } from '@/lib/server/frontdesk/types';
+import { ACTION_SENTINEL } from '@/lib/frontdesk-protocol';
 
 const FALLBACK_REPLY =
   "I'm not sure how to answer that right now. Please try rephrasing your question.";
@@ -245,6 +247,7 @@ When CURRENT PAGE FOCUS is present, prioritise it for questions about "this cour
             timeoutMs: OPENROUTER_TIMEOUT_MS,
             referer: 'https://carsi.com.au',
             appTitle: 'CARSI Margot',
+            includeWrite: margotWriteToolsEnabled(),
           })) {
             assembled += delta;
             controller.enqueue(encoder.encode(delta));
@@ -273,7 +276,9 @@ When CURRENT PAGE FOCUS is present, prioritise it for questions about "this cour
           }
         } finally {
           controller.close();
-          void persistTurn(assembled || FALLBACK_REPLY);
+          // Strip any confirm-gated action trailer before persisting the turn.
+          const persistText = assembled.split(ACTION_SENTINEL)[0].trim() || FALLBACK_REPLY;
+          void persistTurn(persistText);
         }
       },
     });

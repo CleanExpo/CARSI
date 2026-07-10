@@ -1,34 +1,64 @@
 /**
- * AI Front Desk — shared contracts (Phase 1).
+ * AI Front Desk — shared contracts (Phase 1 read tools + Phase 2 write tools).
  *
- * These types are deliberately transport-agnostic and provider-agnostic: they are
- * the surface that later extracts to `@nexus/front-desk` and is reused across the
- * estate (RestoreAssist, Disaster Recovery, NRPG, CCW-CRM, Unite-Group). Keep them
- * free of CARSI-specific or Prisma-specific imports.
+ * Transport- and provider-agnostic; the surface that extracts to
+ * `@nexus/front-desk`. Keep it free of CARSI-specific or Prisma-specific imports.
  */
 
 /** OpenAI/OpenRouter-compatible JSON-schema fragment describing a tool's params. */
 export type JsonSchema = Record<string, unknown>;
 
-/**
- * A front-desk tool the assistant may call mid-conversation.
- *
- * Phase 1 INVARIANT: every tool is `readOnly: true`. Write actions (booking,
- * enrolment, CRM, email) arrive in Phase 2, each behind its own approval gate.
- * The `readOnly` literal is asserted by a unit test so a write tool cannot be
- * added to the registry without also changing this contract on purpose.
- */
-export interface FrontDeskTool {
+interface BaseTool {
   /** Stable machine name sent to the model (snake_case). */
   readonly name: string;
   /** One-sentence description the model uses to decide when to call it. */
   readonly description: string;
   /** JSON-schema for the arguments object. */
   readonly parameters: JsonSchema;
-  /** Phase 1: always true. A write tool would set this false and must be gated. */
+}
+
+/**
+ * A read-only tool the model may call and whose result is fed straight back.
+ * `execute` MUST NOT mutate external state.
+ */
+export interface ReadTool extends BaseTool {
   readonly readOnly: true;
-  /** Execute the tool. MUST NOT mutate external state while `readOnly` is true. */
+  readonly requiresConfirmation?: false;
   execute(args: Record<string, unknown>): Promise<unknown>;
+}
+
+/**
+ * A write tool. The model can only **propose** — `propose` validates the args
+ * and returns a signed, short-TTL proposal token; it performs NO write. The
+ * actual mutation happens only in `commit`, which the confirm endpoint calls
+ * **after** verifying the token AND a human clicking Confirm. So the model can
+ * never mutate state on its own, and prompt-injection has no path to a write.
+ */
+export interface WriteTool extends BaseTool {
+  readonly readOnly: false;
+  readonly requiresConfirmation: true;
+  /** Validate args → signed proposal. NO side effects. Throws on invalid input. */
+  propose(args: Record<string, unknown>): Promise<WriteToolProposal>;
+  /** Execute the mutation. Called ONLY by the confirm endpoint post-verification. */
+  commit(data: Record<string, unknown>, ctx: CommitContext): Promise<unknown>;
+}
+
+export type FrontDeskTool = ReadTool | WriteTool;
+
+/** A tamper-proof proposal surfaced to the client for human confirmation. */
+export interface WriteToolProposal {
+  tool: string;
+  /** Human- and model-facing one-liner of what Confirm will do. */
+  summary: string;
+  /** HMAC-signed, short-TTL token encoding the validated payload. */
+  token: string;
+  expiresAt: number;
+}
+
+/** Request-scoped context the confirm endpoint supplies to `commit`. */
+export interface CommitContext {
+  appOrigin: string;
+  sourceIp: string | null;
 }
 
 /** A minimal OpenAI/OpenRouter chat message (system/user/assistant/tool). */
