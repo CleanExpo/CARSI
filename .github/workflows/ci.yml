@@ -75,6 +75,9 @@ jobs:
       - name: IICRC CEC terminology guard
         run: npm run check:iicrc-terminology
 
+      - name: Australian-English course-content guard
+        run: npm run check:au-english
+
       # Licence-critical backstop: scans all course-content + marketing surfaces
       # (data/seed, public/courses, docs/marketing, docs/content) for stray IICRC
       # placements, banned "IICRC-approved"/"certified with CARSI" phrasing, and
