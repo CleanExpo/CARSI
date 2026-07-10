@@ -157,7 +157,7 @@ const SCANNED_DIRS = ['app/', 'src/', 'templates/', 'docs/marketing/'];
 
 // Seed JSON is production copy (course descriptions, marketing prose) that ships to the
 // live DB via the PRE_DEPLOY seeder — scan it too (gap closed 2026-07-09).
-const JSON_SCANNED_DIRS = ['data/seed/'];
+const JSON_SCANNED_DIRS = ['data/seed/', '.curation/', 'data/wordpress-export/'];
 
 function inScope(file) {
   const norm = file.replace(/\\/g, '/');

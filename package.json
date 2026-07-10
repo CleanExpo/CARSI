@@ -17,6 +17,7 @@
     "build": "prisma generate && next build",
     "check:secrets": "node scripts/check-secrets.mjs",
     "check:iicrc-terminology": "node scripts/check-iicrc-terminology.mjs",
+    "check:au-english": "node scripts/check-au-english.mjs",
     "check:iicrc-compliance": "node scripts/check-iicrc-compliance.mjs",
     "check:cec": "node scripts/check-cec-approvals.mjs",
     "check:designations": "node scripts/check-designations.mjs",
