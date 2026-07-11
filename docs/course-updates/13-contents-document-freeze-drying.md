@@ -121,14 +121,6 @@
 - **Kill threshold:** revert added sections if usefulness drops.
 - **Next variant:** if flat, lead the course card with the instant-coffee sublimation hook.
 
-## Sources (verifiable audit trail — Exa-retrieved 2026-07-11)
-- [T1] NEDCC — *3.12 Freezing and Drying Wet Books and Records*: https://www.nedcc.org/free-resources/preservation-leaflets/3.-emergency-management/3.12-freezing-and-drying-wet-books-and-records
-- [T1] US National Archives — *Salvage of Water Damaged Library Materials (part 8)*: https://www.archives.gov/preservation/conservation/library-materials-08.html
-- [T1] CCAHA — *Salvaging Books* technical bulletin: https://ccaha.org/sites/default/files/attachments/2018-07/technical-bulletin-salvaging-books.original.pdf
-- [T1] CCAHA — *Freezing & Drying Techniques Summary Chart*: https://ccaha.org/sites/default/files/attachments/2019-12/2019_Freezing%20%26%20Drying%20Techniques%20Summary%20CHART_EZ_SF.pdf
-- [T1] Conservation OnLine (COOL/cultural-heritage) — *Procedures for Salvage of Water Damaged Library Materials*: https://cool.culturalheritage.org/bytopic/disasters/primer/waters.html
-- [T2] SCRLC — *Freeze-Drying* methods summary: https://scrlc.org/data/FreezeDrying.pdf
-
 ## Apply notes
 - Confirm slug + `id` in live DB (title covering water-damaged books/documents/contents recovery).
   `iicrcDiscipline: null`; no IICRC framing (general conservation science, not an S-standard topic).

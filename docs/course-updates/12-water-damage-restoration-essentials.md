@@ -120,13 +120,6 @@
 - **Kill threshold:** revert added sections if usefulness drops; keep the S500-2026 currency note regardless.
 - **Next variant:** if flat, add an AU sidebar (Safe Work Australia PPE, AU flood/storm categorisation practice).
 
-## Sources (verifiable audit trail — Exa-retrieved 2026-07-11)
-- [T2] Tygart Media — *What the IICRC S500 2026 Revision Means for Restoration Contractors*: https://tygartmedia.com/iicrc-s500-2026-revision-restoration-contractors/
-- [T2] Restoration Intel — *Water Damage Categories and Classes: The Complete IICRC S500 Field Guide*: https://restorationintel.com/water-damage-categories-classes-iicrc-s500-guide/
-- [T2] Restoration Intel — *IICRC Standards Evolution (technology & emerging contaminants, 2026)*: https://restorationintel.com/iicrc-standards-evolution-technology-emerging-contaminants-2026/
-- [T1] IICRC — S500 standard page: https://iicrc.org/s500/
-- [T1] IICRC — *Weather-Related Water Damage Position Statement (2026)*: https://iicrc.org/wp-content/uploads/2026/04/Weather-Related-Position-Statement_2026.pdf
-
 ## Apply notes
 - Confirm slug + `id` in live DB (title "Water Damage Restoration Essentials"). `iicrcDiscipline: null`;
   S500/S520 nominative citations only — **no WRT/ASD acronym or "-aligned" branding** (CARSI designation rule).
