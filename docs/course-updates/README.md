@@ -127,4 +127,15 @@ the **drying-vertical series** (`introduction-to-drying-health-care-facilities`,
 no IICRC framing) · `commercial-floor-care-schools-childcare` + `floor-care-onboarding-operational-readiness`
 (**non-IICRC** — no S-standard/CEC content).
 
+### 💲 Pricing model + 5 new Business & AI courses (2026-07-12)
+
+See **[PRICING-AND-NEW-COURSES.md](PRICING-AND-NEW-COURSES.md)** — staged proposal covering: (1) the Stripe
+answer (per-course checkout uses inline `price_data` from `priceAud`, so **any number of courses needs zero new
+Stripe price objects**; subscriptions already unlock the whole library); (2) a **two-price-point model** ($29
+Essentials / $49 Professional) that puts a price on every course while keeping "the same numbers"; and (3) five
+**$49** SMB-owner courses (AI, speed-to-lead job conversion, Google Business Profile, reputation/reviews, AI
+comms) with value props grounded in current 2026 data. Business courses are **non-IICRC** (`cecHours: 0`,
+`iicrcDiscipline: null`, no S-standard/CEC framing). One flagged founder call: 32 currently-free courses become
+paid. Staged — founder applies to live DB; no deploy-time seeding; no Stripe changes required.
+
 Batches continue across loop iterations; newest course drafts append to this ledger.
