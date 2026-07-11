@@ -10,8 +10,8 @@ datasource db {
 }
 
 model LmsRole {
-  id          Int    @id @default(autoincrement())
-  name        String @unique
+  id          Int     @id @default(autoincrement())
+  name        String  @unique
   description String?
 
   userRoles LmsUserRole[]
@@ -20,52 +20,52 @@ model LmsRole {
 }
 
 model LmsUser {
-  id                String   @id @db.Uuid
-  email             String   @unique
-  hashedPassword    String   @map("hashed_password")
-  fullName          String?  @map("full_name")
-  isActive          Boolean  @default(true) @map("is_active")
-  isVerified        Boolean  @default(false) @map("is_verified")
-  themePreference   String?  @map("theme_preference")
+  id                         String    @id @db.Uuid
+  email                      String    @unique
+  hashedPassword             String    @map("hashed_password")
+  fullName                   String?   @map("full_name")
+  isActive                   Boolean   @default(true) @map("is_active")
+  isVerified                 Boolean   @default(false) @map("is_verified")
+  themePreference            String?   @map("theme_preference")
   /// Present in some deployments (`scripts/seed_production.py`); omit in queries if unused.
-  role              String?
-  iicrcMemberNumber   String?   @map("iicrc_member_number")
-  iicrcExpiryDate     DateTime? @map("iicrc_expiry_date") @db.Date
-  iicrcCardImageUrl   String?   @map("iicrc_card_image_url") @db.Text
-  iicrcCertifications Json?     @map("iicrc_certifications")
+  role                       String?
+  iicrcMemberNumber          String?   @map("iicrc_member_number")
+  iicrcExpiryDate            DateTime? @map("iicrc_expiry_date") @db.Date
+  iicrcCardImageUrl          String?   @map("iicrc_card_image_url") @db.Text
+  iicrcCertifications        Json?     @map("iicrc_certifications")
   /// First-run dashboard onboarding (industry, disciplines, goals). Set when wizard completes.
-  onboardingCompletedAt DateTime? @map("onboarding_completed_at") @db.Timestamptz(6)
+  onboardingCompletedAt      DateTime? @map("onboarding_completed_at") @db.Timestamptz(6)
   /// JSON: industry, role, iicrc_experience, disciplines_held[], primary_goal, etc.
-  onboarding            Json?
+  onboarding                 Json?
   /// none | email | sms — preference for unfinished-lesson reminders (delivery not yet wired for sms).
-  resumeReminderOptIn   String?   @map("resume_reminder_opt_in")
+  resumeReminderOptIn        String?   @map("resume_reminder_opt_in")
   /// Marketing-style email opt-out (Australian Spam Act). When true, the monthly toolbox-talk drip
   /// email is suppressed. In-app notifications and compliance (recert) emails are NOT affected.
-  emailOptOut           Boolean   @default(false) @map("email_opt_out")
+  emailOptOut                Boolean   @default(false) @map("email_opt_out")
   /// When true, `leaderboardDisplayName` may appear on the monthly leaderboard; otherwise an anonymous label is shown.
-  leaderboardShowDisplayName Boolean @default(false) @map("leaderboard_show_display_name")
+  leaderboardShowDisplayName Boolean   @default(false) @map("leaderboard_show_display_name")
   /// Optional public label for the monthly leaderboard only (never auto-filled from legal name).
-  leaderboardDisplayName     String? @map("leaderboard_display_name") @db.VarChar(48)
-  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt         DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  leaderboardDisplayName     String?   @map("leaderboard_display_name") @db.VarChar(48)
+  createdAt                  DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt                  DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  userRoles          LmsUserRole[]
-  enrollments        LmsEnrollment[] @relation("EnrollmentStudent")
-  coursesInstructing LmsCourse[]     @relation("CourseInstructor")
-  userDiscounts      UserDiscount[]
-  teamMemberships    LmsTeamMember[]
-  ownedTeams         LmsTeam[]       @relation("TeamOwner")
-  quizAttempts       LmsQuizAttempt[]
+  userRoles             LmsUserRole[]
+  enrollments           LmsEnrollment[]           @relation("EnrollmentStudent")
+  coursesInstructing    LmsCourse[]               @relation("CourseInstructor")
+  userDiscounts         UserDiscount[]
+  teamMemberships       LmsTeamMember[]
+  ownedTeams            LmsTeam[]                 @relation("TeamOwner")
+  quizAttempts          LmsQuizAttempt[]
   assessmentSubmissions LmsAssessmentSubmission[] @relation("AssessmentSubmissionStudent")
   assessmentReviews     LmsAssessmentSubmission[] @relation("AssessmentSubmissionReviewer")
-  iicrcCecSubmissions LmsIicrcCecSubmission[]
-  lessonProgress     LmsLessonProgress[]
-  lessonNotes        LmsLessonNote[]
-  notifications      LmsNotification[]
-  courseReviews      LmsCourseReview[] @relation("ReviewStudent")
-  reviewReplies      LmsCourseReview[] @relation("ReviewReplyAuthor")
-  subscription       LmsSubscription?
-  margotConversations MargotConversation[]
+  iicrcCecSubmissions   LmsIicrcCecSubmission[]
+  lessonProgress        LmsLessonProgress[]
+  lessonNotes           LmsLessonNote[]
+  notifications         LmsNotification[]
+  courseReviews         LmsCourseReview[]         @relation("ReviewStudent")
+  reviewReplies         LmsCourseReview[]         @relation("ReviewReplyAuthor")
+  subscription          LmsSubscription?
+  margotConversations   MargotConversation[]
 
   @@map("lms_users")
 }
@@ -148,15 +148,15 @@ model LmsCourse {
   createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt        DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  instructor       LmsUser                  @relation("CourseInstructor", fields: [instructorId], references: [id])
-  modules          LmsModule[]
-  enrollments      LmsEnrollment[]
-  userDiscounts    UserDiscount[]
-  pathwayCourses   LmsLearningPathwayCourse[]
-  quizzes          LmsQuiz[]
+  instructor           LmsUser                    @relation("CourseInstructor", fields: [instructorId], references: [id])
+  modules              LmsModule[]
+  enrollments          LmsEnrollment[]
+  userDiscounts        UserDiscount[]
+  pathwayCourses       LmsLearningPathwayCourse[]
+  quizzes              LmsQuiz[]
   practicalAssessments LmsPracticalAssessment[]
-  iicrcCecSubmissions LmsIicrcCecSubmission[]
-  reviews          LmsCourseReview[]
+  iicrcCecSubmissions  LmsIicrcCecSubmission[]
+  reviews              LmsCourseReview[]
 
   @@map("lms_courses")
 }
@@ -197,16 +197,16 @@ enum DiscountType {
 
 /// Per-user, per-course pricing overrides managed in admin (`/admin/discounts`).
 model UserDiscount {
-  id             String       @id @default(uuid()) @db.Uuid
-  userId         String       @map("user_id") @db.Uuid
-  courseId       String       @map("course_id") @db.Uuid
-  discountType   DiscountType @map("discount_type")
+  id            String       @id @default(uuid()) @db.Uuid
+  userId        String       @map("user_id") @db.Uuid
+  courseId      String       @map("course_id") @db.Uuid
+  discountType  DiscountType @map("discount_type")
   /// Percentage (0–100), flat AUD off, custom AUD price; null when `free`.
-  discountValue  Decimal?     @map("discount_value") @db.Decimal(12, 2)
-  expiryDate     DateTime?    @map("expiry_date") @db.Timestamptz(6)
-  note           String?      @db.Text
-  isActive       Boolean      @default(true) @map("is_active")
-  createdAt      DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+  discountValue Decimal?     @map("discount_value") @db.Decimal(12, 2)
+  expiryDate    DateTime?    @map("expiry_date") @db.Timestamptz(6)
+  note          String?      @db.Text
+  isActive      Boolean      @default(true) @map("is_active")
+  createdAt     DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
 
   user   LmsUser   @relation(fields: [userId], references: [id], onDelete: Cascade)
   course LmsCourse @relation(fields: [courseId], references: [id], onDelete: Cascade)
@@ -222,7 +222,7 @@ model LmsModule {
   orderIndex Int      @map("order_index")
   createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
 
-  course  LmsCourse  @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  course  LmsCourse   @relation(fields: [courseId], references: [id], onDelete: Cascade)
   lessons LmsLesson[]
 
   @@map("lms_modules")
@@ -273,8 +273,8 @@ model LmsEnrollment {
   completedAt          DateTime? @map("completed_at") @db.Timestamptz(6)
   certificateIssuedAt  DateTime? @map("certificate_issued_at") @db.Timestamptz(6)
 
-  student LmsUser   @relation("EnrollmentStudent", fields: [studentId], references: [id], onDelete: Cascade)
-  course  LmsCourse @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  student            LmsUser                @relation("EnrollmentStudent", fields: [studentId], references: [id], onDelete: Cascade)
+  course             LmsCourse              @relation(fields: [courseId], references: [id], onDelete: Cascade)
   iicrcCecSubmission LmsIicrcCecSubmission?
 
   @@unique([studentId, courseId], map: "uq_lms_enrollment")
@@ -307,9 +307,9 @@ model LmsIicrcCecSubmission {
   createdAt             DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt             DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  enrollment     LmsEnrollment                 @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
-  student        LmsUser                       @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  course         LmsCourse                     @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  enrollment     LmsEnrollment               @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  student        LmsUser                     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  course         LmsCourse                   @relation(fields: [courseId], references: [id], onDelete: Cascade)
   communications LmsIicrcCecCommunication[]
   notes          LmsIicrcCecSubmissionNote[]
 
@@ -346,7 +346,7 @@ model LmsIicrcCecCommunication {
   receivedAt            DateTime? @map("received_at") @db.Timestamptz(6)
   createdAt             DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
 
-  submission  LmsIicrcCecSubmission              @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  submission  LmsIicrcCecSubmission                @relation(fields: [submissionId], references: [id], onDelete: Cascade)
   attachments LmsIicrcCecCommunicationAttachment[]
 
   @@index([submissionId])
@@ -373,13 +373,13 @@ model LmsIicrcCecCommunicationAttachment {
 
 /// Internal admin notes and follow-up actions for a renewal submission.
 model LmsIicrcCecSubmissionNote {
-  id              String    @id @default(uuid()) @db.Uuid
-  submissionId    String    @map("submission_id") @db.Uuid
-  authorAdminEmail String   @map("author_admin_email") @db.VarChar(320)
-  body            String    @db.Text
-  followUpAction  String?   @map("follow_up_action") @db.Text
-  followUpDueAt   DateTime? @map("follow_up_due_at") @db.Timestamptz(6)
-  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  id               String    @id @default(uuid()) @db.Uuid
+  submissionId     String    @map("submission_id") @db.Uuid
+  authorAdminEmail String    @map("author_admin_email") @db.VarChar(320)
+  body             String    @db.Text
+  followUpAction   String?   @map("follow_up_action") @db.Text
+  followUpDueAt    DateTime? @map("follow_up_due_at") @db.Timestamptz(6)
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
 
   submission LmsIicrcCecSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
 
@@ -399,15 +399,15 @@ model LmsCategory {
 }
 
 model LmsLearningPathway {
-  id                  String   @id @db.Uuid
-  slug                String   @unique
+  id                  String  @id @db.Uuid
+  slug                String  @unique
   title               String
-  description         String?  @db.Text
-  iicrcDiscipline     String?  @map("iicrc_discipline")
-  targetCertification String?  @map("target_certification") @db.Text
-  estimatedHours      Float?   @map("estimated_hours")
-  isPublished         Boolean  @default(false) @map("is_published")
-  orderIndex          Int      @default(0) @map("order_index")
+  description         String? @db.Text
+  iicrcDiscipline     String? @map("iicrc_discipline")
+  targetCertification String? @map("target_certification") @db.Text
+  estimatedHours      Float?  @map("estimated_hours")
+  isPublished         Boolean @default(false) @map("is_published")
+  orderIndex          Int     @default(0) @map("order_index")
 
   courses LmsLearningPathwayCourse[]
 
@@ -420,7 +420,7 @@ model LmsLearningPathwayCourse {
   orderIndex Int    @default(0) @map("order_index")
 
   pathway LmsLearningPathway @relation(fields: [pathwayId], references: [id], onDelete: Cascade)
-  course  LmsCourse            @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  course  LmsCourse          @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
   @@id([pathwayId, courseId])
   @@map("lms_learning_pathway_courses")
@@ -445,13 +445,13 @@ model LmsQuiz {
 }
 
 model LmsQuizQuestion {
-  id            String @id @default(uuid()) @db.Uuid
-  quizId        String @map("quiz_id") @db.Uuid
-  questionText  String @map("question_text") @db.Text
-  options       Json
-  correctIndex  Int    @map("correct_index")
-  orderIndex    Int    @default(0) @map("order_index")
-  points        Int    @default(1)
+  id           String @id @default(uuid()) @db.Uuid
+  quizId       String @map("quiz_id") @db.Uuid
+  questionText String @map("question_text") @db.Text
+  options      Json
+  correctIndex Int    @map("correct_index")
+  orderIndex   Int    @default(0) @map("order_index")
+  points       Int    @default(1)
 
   quiz LmsQuiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
 
@@ -460,16 +460,16 @@ model LmsQuizQuestion {
 }
 
 model LmsQuizAttempt {
-  id          String   @id @default(uuid()) @db.Uuid
-  quizId      String   @map("quiz_id") @db.Uuid
-  studentId   String   @map("student_id") @db.Uuid
-  scorePercent Int     @map("score_percent")
-  passed      Boolean
-  answers     Json
-  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  id           String   @id @default(uuid()) @db.Uuid
+  quizId       String   @map("quiz_id") @db.Uuid
+  studentId    String   @map("student_id") @db.Uuid
+  scorePercent Int      @map("score_percent")
+  passed       Boolean
+  answers      Json
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
 
-  quiz    LmsQuiz  @relation(fields: [quizId], references: [id], onDelete: Cascade)
-  student LmsUser  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  quiz    LmsQuiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  student LmsUser @relation(fields: [studentId], references: [id], onDelete: Cascade)
 
   @@index([quizId, studentId])
   @@map("lms_quiz_attempts")
@@ -539,17 +539,17 @@ model LmsAssessmentSubmission {
 
 /// B2B team (Phase 2) — seat-based bundles.
 model LmsTeam {
-  id           String   @id @default(uuid()) @db.Uuid
-  name         String
-  slug         String   @unique
-  ownerId      String   @map("owner_id") @db.Uuid
-  bundleTier   String   @map("bundle_tier") @db.VarChar(32)
-  courseSlug   String?  @map("course_slug") @db.VarChar(128)
-  seatLimit    Int      @default(5) @map("seat_limit")
-  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt    DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  id         String   @id @default(uuid()) @db.Uuid
+  name       String
+  slug       String   @unique
+  ownerId    String   @map("owner_id") @db.Uuid
+  bundleTier String   @map("bundle_tier") @db.VarChar(32)
+  courseSlug String?  @map("course_slug") @db.VarChar(128)
+  seatLimit  Int      @default(5) @map("seat_limit")
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt  DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  owner            LmsUser                @relation("TeamOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  owner            LmsUser                 @relation("TeamOwner", fields: [ownerId], references: [id], onDelete: Cascade)
   members          LmsTeamMember[]
   invites          LmsTeamInvite[]
   coursePurchases  LmsTeamCoursePurchase[]
@@ -561,12 +561,12 @@ model LmsTeam {
 
 /// Seats purchased for a specific course on a team (one row per team checkout).
 model LmsTeamCoursePurchase {
-  id                String   @id @default(uuid()) @db.Uuid
-  teamId            String   @map("team_id") @db.Uuid
-  courseSlug        String   @map("course_slug") @db.VarChar(128)
-  seatLimit         Int      @map("seat_limit")
-  paymentReference  String?  @map("payment_reference") @db.VarChar(255)
-  purchasedAt       DateTime @default(now()) @map("purchased_at") @db.Timestamptz(6)
+  id               String   @id @default(uuid()) @db.Uuid
+  teamId           String   @map("team_id") @db.Uuid
+  courseSlug       String   @map("course_slug") @db.VarChar(128)
+  seatLimit        Int      @map("seat_limit")
+  paymentReference String?  @map("payment_reference") @db.VarChar(255)
+  purchasedAt      DateTime @default(now()) @map("purchased_at") @db.Timestamptz(6)
 
   team LmsTeam @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
@@ -589,14 +589,14 @@ model LmsTeamMember {
 }
 
 model LmsTeamInvite {
-  id        String    @id @default(uuid()) @db.Uuid
-  teamId    String    @map("team_id") @db.Uuid
-  email     String    @db.VarChar(320)
-  role      String    @default("member") @db.VarChar(16)
-  token     String    @unique
-  expiresAt DateTime  @map("expires_at") @db.Timestamptz(6)
+  id         String    @id @default(uuid()) @db.Uuid
+  teamId     String    @map("team_id") @db.Uuid
+  email      String    @db.VarChar(320)
+  role       String    @default("member") @db.VarChar(16)
+  token      String    @unique
+  expiresAt  DateTime  @map("expires_at") @db.Timestamptz(6)
   acceptedAt DateTime? @map("accepted_at") @db.Timestamptz(6)
-  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
 
   team LmsTeam @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
@@ -818,15 +818,15 @@ model LmsOrgSubscription {
 }
 
 model AdminUser {
-  id             String    @id @default(uuid()) @db.Uuid
-  email          String    @unique
-  passwordHash   String    @map("password_hash")
-  role           String    @default("admin")
-  isActive       Boolean   @default(true) @map("is_active")
-  lastLoginAt    DateTime? @map("last_login_at") @db.Timestamptz(6)
-  lastLoginIp    String?   @map("last_login_ip")
-  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt      DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  id           String    @id @default(uuid()) @db.Uuid
+  email        String    @unique
+  passwordHash String    @map("password_hash")
+  role         String    @default("admin")
+  isActive     Boolean   @default(true) @map("is_active")
+  lastLoginAt  DateTime? @map("last_login_at") @db.Timestamptz(6)
+  lastLoginIp  String?   @map("last_login_ip")
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   @@map("admin_users")
 }
@@ -897,4 +897,44 @@ model MargotMessage {
 
   @@index([conversationId, createdAt])
   @@map("margot_messages")
+}
+
+/// AI Website — a marketing/enrolment lead captured by the CARSI AI Website front-end.
+/// The "employee" that answers, qualifies and remembers every visitor (see docs/ai-website/RUNBOOK.md).
+model AiWebsiteLead {
+  id             String   @id @db.Uuid
+  name           String
+  email          String
+  phone          String?
+  role           String?
+  source         String   @default("ai-website") @map("source")
+  emailVerified  Boolean  @default(false) @map("email_verified")
+  status         String   @default("new") // new | contacted | booked | enrolled | closed
+  advisorPathway String?  @map("advisor_pathway") // discipline the advisor mapped, if any
+  meta           Json?
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  events AiWebsiteEvent[]
+
+  @@index([email])
+  @@index([status, createdAt])
+  @@map("ai_website_leads")
+}
+
+/// AI Website — an automation event fired on a lead (the n8n-style enrolment flow steps).
+/// The notifier writes one row per step; a real email/SMS provider is plugged in behind the
+/// notifier interface (src/lib/ai-website/notifier.ts) — off by default, logged here regardless.
+model AiWebsiteEvent {
+  id        String   @id @db.Uuid
+  leadId    String   @map("lead_id") @db.Uuid
+  kind      String // lead_captured | email_verified | welcome_email | sms_followup | followup_email | callback_booked
+  channel   String? // email | sms | system
+  detail    String?
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  lead AiWebsiteLead @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  @@index([leadId, createdAt])
+  @@map("ai_website_events")
 }
