@@ -24,6 +24,8 @@ nexus-copywriter standard.
 | 1 | Australian H5 Bird Flu Awareness for Restoration, IAQ and Facility Professionals | `h5-bird-flu-awareness` (confirm) | [01-h5-bird-flu-awareness.md](01-h5-bird-flu-awareness.md) | DRAFT — awaiting founder review |
 | 2 | Introduction to Infrared Thermography for Drying | confirm | [02-infrared-thermography-for-drying.md](02-infrared-thermography-for-drying.md) | DRAFT — awaiting founder review |
 | 3 | Moisture, Mould, and Indoor Air Quality: Understanding the Link | confirm | [03-moisture-mould-and-iaq.md](03-moisture-mould-and-iaq.md) | DRAFT — awaiting founder review |
+| 4 | Truckmount Operations Course — HydraMaster & Sapphire Scientific | confirm | [04-truckmount-operations.md](04-truckmount-operations.md) | DRAFT — awaiting founder review |
+| 5 | Using Air Scrubbers and AFDs to Improve Job Site Air Quality | confirm | [05-air-scrubbers-and-afds.md](05-air-scrubbers-and-afds.md) | DRAFT — awaiting founder review |
 
 **Non-CEC courses remaining (~37):** the "Not specified" CEC-value courses from the carsi.com.au
 catalog — e.g. Truckmount Operations, Water Damage Restoration Essentials, Air Scrubbers & AFDs,
