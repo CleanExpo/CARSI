@@ -3,8 +3,6 @@
 import { useState } from 'react';
 import { apiClient } from '@/lib/api/client';
 
-const DISCIPLINES = ['WRT', 'ASD', 'AMRT', 'CCT', 'FSRT', 'CRT', 'OCT'] as const;
-
 interface QuizQuestion {
   question: string;
   options: string[];
@@ -29,8 +27,8 @@ interface AIBuilderResult {
 }
 
 export default function AIBuilderPage() {
-  const [standardOutline, setStandardOutline] = useState('');
-  const [discipline, setDiscipline] = useState('');
+  const [courseOutline, setCourseOutline] = useState('');
+  const [category, setCategory] = useState('');
   const [title, setTitle] = useState('');
   const [moduleCount, setModuleCount] = useState(3);
   const [loading, setLoading] = useState(false);
@@ -52,7 +50,7 @@ export default function AIBuilderPage() {
 
   async function handleGenerate(e: React.FormEvent) {
     e.preventDefault();
-    if (!title.trim() || !discipline || !standardOutline.trim()) return;
+    if (!title.trim() || !courseOutline.trim()) return;
 
     setLoading(true);
     setError(null);
@@ -61,8 +59,8 @@ export default function AIBuilderPage() {
     try {
       const data = await apiClient.post<AIBuilderResult>('/api/lms/admin/ai-course-builder', {
         title,
-        iicrc_discipline: discipline,
-        standard_outline: standardOutline,
+        category,
+        course_outline: courseOutline,
         module_count: moduleCount,
       });
       setResult(data);
@@ -80,7 +78,9 @@ export default function AIBuilderPage() {
       <div className="flex flex-col gap-1">
         <h1 className="font-mono text-2xl font-bold text-white">AI Course Builder</h1>
         <p className="text-sm text-white/40">
-          Generate structured lesson content from IICRC standards using AI.
+          Generate AU-original lesson drafts from your own course outline. Do not paste IICRC (or
+          any third-party) standard text — describe the topic in your own words; reference a
+          standard nominatively only (e.g. &ldquo;aligned to ANSI/IICRC S500&rdquo;).
         </p>
       </div>
 
@@ -102,19 +102,13 @@ export default function AIBuilderPage() {
           className="rounded-sm border border-white/[0.08] bg-zinc-800 px-3 py-2 font-mono text-sm text-white placeholder-white/20 focus:border-cyan-500/50 focus:outline-none"
         />
 
-        <select
-          value={discipline}
-          onChange={(e) => setDiscipline(e.target.value)}
-          required
-          className="rounded-sm border border-white/[0.08] bg-zinc-800 px-3 py-2 font-mono text-sm text-white focus:border-cyan-500/50 focus:outline-none"
-        >
-          <option value="">Select IICRC Discipline</option>
-          {DISCIPLINES.map((d) => (
-            <option key={d} value={d}>
-              {d}
-            </option>
-          ))}
-        </select>
+        <input
+          type="text"
+          placeholder="Category / subject area (optional, e.g. Water Damage, Mould Remediation)"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          className="rounded-sm border border-white/[0.08] bg-zinc-800 px-3 py-2 font-mono text-sm text-white placeholder-white/20 focus:border-cyan-500/50 focus:outline-none"
+        />
 
         <div className="flex flex-col gap-1">
           <label htmlFor="module-count" className="font-mono text-xs text-white/40">
@@ -132,9 +126,9 @@ export default function AIBuilderPage() {
         </div>
 
         <textarea
-          placeholder="Paste the IICRC standard outline here (e.g. S500, S520 key topics)..."
-          value={standardOutline}
-          onChange={(e) => setStandardOutline(e.target.value)}
+          placeholder="Describe the course topic or paste your own CARSI-authored outline / learning objectives (your words — never IICRC standard text)..."
+          value={courseOutline}
+          onChange={(e) => setCourseOutline(e.target.value)}
           required
           rows={8}
           className="rounded-sm border border-white/[0.08] bg-zinc-800 px-3 py-2 text-sm text-white placeholder-white/20 focus:border-cyan-500/50 focus:outline-none"
