@@ -80,12 +80,51 @@ Two litigation/large-loss drafts also carry a **jurisdiction caveat**: their str
 principles and label the US-specific items, but a future pass should add AU-jurisdiction sidebars
 (expert-witness duties under AU court rules; AUD large-loss thresholds).
 
-**Non-CEC courses remaining (~37):** the "Not specified" CEC-value courses from the carsi.com.au
-catalog — e.g. Truckmount Operations, Water Damage Restoration Essentials, Air Scrubbers & AFDs,
-UV & Fluorescence, Antiques restoration, Submerged Items recovery, the Drying-vertical series
-(Health Care / Educational / Hospitality / Industrial / Transportation), HVAC & IAQ, Dust &
-Particulates, Air Quality & Odour, Fire & Smoke Core, Applied Structural Drying Core, Maintenance
-Toolbox Talks, Air Movers, Tile Cleaning, Large Loss Mastery, Insurance Adjusters. Processed
-newest-first as the loop continues.
+### ✅ Catalogue grounding (verified 2026-07-12 against `data/seed/courses-catalog.json`)
+
+The live seed catalogue holds **37 courses, all currently non-CEC** (`cecHours: 0`/absent — the fail-closed
+default; only the founder flips a course to its IICRC-approved hours). Confirmed real slugs now let each draft
+attach to an actual course instead of an assumed one. **Draft → confirmed slug (founder to ratify):**
+
+| Draft | Confirmed slug | IICRC-mappable? |
+|---|---|---|
+| 01 | `avian-influenza-awareness-restoration-iaq-facilities` | IAQ/biosecurity — no S-standard framing |
+| 02 | `introduction-to-infrared-thermography-for-drying` | yes (S500 nominative) |
+| 03 | `moisture-mould-and-indoor-air-quality-understanding-the-link` | yes |
+| 04 | `ccw-carsi-truckmount-operations` | **NO** — floor-care/equipment, carries **no** IICRC/S-standard/CEC content |
+| 05 | `using-air-scrubbers-and-afds-to-improve-job-site-air-quality` | yes |
+| 06 | `introduction-to-water-damage-litigation-support` | yes |
+| 08 | `introduction-to-ultraviolet-light-and-fluorescence` | yes |
+| 09 | `fire-smoke-damage-restoration-fundamentals` | yes (S700 nominative) |
+| 10 | `structural-drying-fundamentals` | yes |
+| 11 | `hvac-systems-and-indoor-air-quality-what-every-technician-should-know` | yes |
+| 12 | `wrt-water-damage-essentials` / `water-damage-restoration-fundamentals` | yes |
+| 14 | `air-quality-and-odour-identification-and-deodorisation-essentials` | yes |
+| 15 | `introduction-to-restoration-of-antiques-and-fine-furnishings` | yes |
+| 16 | `carpet-cleaning-technician-fundamentals` | yes |
+| 17 | `trauma-crime-scene-decontamination-fundamentals` | yes (S540 nominative) |
+| 19 | `dust-and-particulates-in-indoor-air-control-and-cleaning-strategies` (partial) | yes |
+| 21 | `category-3-sewage-black-water-remediation` | yes |
+| 22 | `mould-remediation-fundamentals` | yes (S520 nominative) |
+| 24 | `whs-fundamentals-for-restoration-and-cleaning-professionals` (partial) | WHS — Safe Work Australia framing |
+| 26 | `psychrometry-building-science-for-drying` | yes |
+| 27 | `psychrometry-building-science-for-drying` / `structural-drying-fundamentals` | yes |
+
+**Drafts with no 1:1 catalogue course (content is sound; founder decides attachment or drop): 07 Large Loss,
+13 Freeze-drying, 18 Tile/Grout/Stone, 20 Estimating/Insurance, 23 Crawl-space, 25 Pet Urine.** These likely
+fold into a broader course (e.g. 25→carpet, 23→structural drying) rather than standing alone.
+
+**Real non-CEC courses NOT yet drafted — target list for batches 15+ (newest-first):**
+`documenting-and-reporting-air-quality-improvements` · `introduction-to-air-quality-fundamentals` ·
+`introduction-to-creating-a-clean-air-environment-best-practices-for-final-clearance` ·
+`introduction-to-iaq-and-mould-understanding-airborne-spread-and-containment` ·
+`introduction-to-improving-indoor-air-quality-after-water-damage` ·
+the **drying-vertical series** (`introduction-to-drying-health-care-facilities`,
+`…educational-and-institutional-sites`, `…hospitality-and-lodging-sites`,
+`…industrial-and-manufacturing-sites`, `…transportation-and-vehicles`) ·
+`introduction-to-recovery-of-submerged-items-and-contents` · `timber-floor-assessment-restoration` ·
+`assessing-indoor-environment-conditions` · `asbestos-awareness-for-restoration-technicians` (Safe Work AU,
+no IICRC framing) · `commercial-floor-care-schools-childcare` + `floor-care-onboarding-operational-readiness`
+(**non-IICRC** — no S-standard/CEC content).
 
 Batches continue across loop iterations; newest course drafts append to this ledger.
