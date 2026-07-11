@@ -36,21 +36,29 @@ the number; §1). Boundary reading: exactly 1h = $29; exactly 2h = $49; anything
 **Applied to `data/seed/courses-catalog.json` (staged; not seeded on deploy):** `priceAud` set + `isFree: false`
 on all 37 courses. Odd-cent legacy prices ($28.97 / $28.98) normalised to $29.
 
-### Result — all 37 courses (17 by set `durationHours`, 20 estimated ⚠)
+### Result — all 37 courses ($29×14 · $49×8 · $99×15)
+
+The 17 courses with an authored `durationHours` are priced deterministically. The **20 that were
+`durationHours: null` are now CONFIRMED** by measuring each course's actual content: **duration = (words ÷ 140
+wpm comprehension reading) + (5 min/lesson engagement)**, calibrated against CARSI's own authored courses. The
+computed `durationHours` is now written into the seed for every course, so each price is traceable. *(EST) marks
+a content-computed duration; (SET) marks a pre-authored one.*
 
 **→ $99 Build — > 2h (15, all durations SET):**
 `water-damage-restoration-fundamentals` (4h) · `mould-remediation-fundamentals` (5h) · `structural-drying-fundamentals` (4h) · `category-3-sewage-black-water-remediation` (4h) · `psychrometry-building-science-for-drying` (4h) · `fire-smoke-damage-restoration-fundamentals` (4h) · `trauma-crime-scene-decontamination-fundamentals` (4h) · `carpet-cleaning-technician-fundamentals` (4h) · `timber-floor-assessment-restoration` (4h) · `assessing-indoor-environment-conditions` (4h) · `asbestos-awareness-for-restoration-technicians` (3h) · `whs-fundamentals-for-restoration-and-cleaning-professionals` (3h) · `ccw-carsi-truckmount-operations` (6h) · `commercial-floor-care-schools-childcare` (6h) · `floor-care-onboarding-operational-readiness` (8h)
 
-**→ $49 Professional — > 1h to 2h (6):**
-`wrt-water-damage-essentials` (2h, SET) · `air-quality-and-odour-identification-and-deodorisation-essentials` (⚠~2h, 10 lessons) · `dust-and-particulates-in-indoor-air-control-and-cleaning-strategies` (⚠~2h, 10) · `hvac-systems-and-indoor-air-quality-what-every-technician-should-know` (⚠~2h, 10) · `moisture-mould-and-indoor-air-quality-understanding-the-link` (⚠~2h, 10) · `using-air-scrubbers-and-afds-to-improve-job-site-air-quality` (⚠~2h, 10)
+**→ $49 Professional — > 1h to 2h (8):**
+`wrt-water-damage-essentials` (2h SET) · `introduction-to-drying-health-care-facilities` (1.1h EST) · `introduction-to-drying-educational-and-institutional-sites` (1.1h EST) · `air-quality-and-odour-identification-and-deodorisation-essentials` (1.2h EST) · `hvac-systems-and-indoor-air-quality-what-every-technician-should-know` (1.2h EST) · `using-air-scrubbers-and-afds-to-improve-job-site-air-quality` (1.2h EST) · `moisture-mould-and-indoor-air-quality-understanding-the-link` (1.1h EST) · `dust-and-particulates-in-indoor-air-control-and-cleaning-strategies` (1.1h EST)
 
-**→ $29 Essentials — ≤ 1h (16):**
-`avian-influenza-awareness-restoration-iaq-facilities` (1h, SET) · `documenting-and-reporting-air-quality-improvements` (⚠~1h, 5 lessons) · `introduction-to-air-quality-fundamentals` (⚠~1h, 5) · `introduction-to-creating-a-clean-air-environment-…-final-clearance` (⚠~1h, 5) · `introduction-to-drying-educational-and-institutional-sites` (⚠~1h, 5) · `introduction-to-drying-health-care-facilities` (⚠~1h, 5) · `introduction-to-drying-hospitality-and-lodging-sites` (⚠~1h, 5) · `introduction-to-drying-industrial-and-manufacturing-sites` (⚠~1h, 5) · `introduction-to-drying-transportation-and-vehicles` (⚠~1h, 5) · `introduction-to-iaq-and-mould-understanding-airborne-spread-and-containment` (⚠~1h, 5) · `introduction-to-improving-indoor-air-quality-after-water-damage` (⚠~1h, 5) · `introduction-to-infrared-thermography-for-drying` (⚠~1h, 5) · `introduction-to-recovery-of-submerged-items-and-contents` (⚠~1h, 5) · `introduction-to-restoration-of-antiques-and-fine-furnishings` (⚠~1h, 5) · `introduction-to-ultraviolet-light-and-fluorescence` (⚠~1h, 5) · `introduction-to-water-damage-litigation-support` (⚠~1h, 5)
+**→ $29 Essentials — ≤ 1h (14):**
+`avian-influenza-awareness-restoration-iaq-facilities` (1h SET) · `introduction-to-drying-industrial-and-manufacturing-sites` (1.0h EST) · `introduction-to-drying-transportation-and-vehicles` (1.0h EST) · `introduction-to-creating-a-clean-air-environment-…-final-clearance` (0.7h EST) · `introduction-to-air-quality-fundamentals` (0.7h EST) · `introduction-to-iaq-and-mould-understanding-airborne-spread-and-containment` (0.6h EST) · `documenting-and-reporting-air-quality-improvements` (0.6h EST) · `introduction-to-improving-indoor-air-quality-after-water-damage` (0.6h EST) · `introduction-to-infrared-thermography-for-drying` (0.5h EST) · `introduction-to-restoration-of-antiques-and-fine-furnishings` (0.5h EST) · `introduction-to-recovery-of-submerged-items-and-contents` (0.5h EST) · `introduction-to-water-damage-litigation-support` (0.5h EST) · `introduction-to-ultraviolet-light-and-fluorescence` (0.5h EST) · `introduction-to-drying-hospitality-and-lodging-sites` (0.5h EST)
 
-**⚠ 20 courses have `durationHours: null`** — priced from lesson count as a proxy (≤5 lessons → ~1h → $29; 6–10
-lessons → ~2h → $49; no lesson-level durations exist in the data). **Founder action:** confirm the real duration
-for these 20 and correct any tier before apply — a course whose true length crosses a boundary moves a tier. The
-17 courses with a set `durationHours` are deterministic.
+**One assumption to confirm:** the 20 EST durations reflect each course **as currently authored (text-only)**. The
+17 authored courses run longer because they carry video/practical/assessment the text export can't measure — if
+any of these 20 gain that media (matching the fundamentals' depth), it lengthens and can move up a tier. Prices
+above are for the current content; adjust `durationHours`/`priceAud` if a course is slated for media expansion.
+The two content-heaviest drying courses (health-care 6,022 words, educational 5,520) already crossed 1h and sit
+at $49.
 
 ### One commercially-weighty call, flagged (not blocking)
 32 courses were **free**; the rule makes them **paid**. The subscription still gives them to members, and standalone
