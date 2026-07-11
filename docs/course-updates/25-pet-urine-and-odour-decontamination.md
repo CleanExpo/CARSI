@@ -4,6 +4,7 @@
 **Type:** Non-CEC (no IICRC discipline / CEC-hours claim)
 **Drafted:** 2026-07-12 · via nexus-copywriter standard · freshness lane: **Exa** (6 sources; Tier-1 peer-reviewed cat-urine VOC study, Tier-2 professional carpet/odour technical guides)
 **Status:** DRAFT — founder review before any DB apply. Live DB is source of truth; never seed on deploy.
+**Data currency:** July 2026 — every figure/claim carries a **live source link** (see *Sources & Get the latest* below); open the link to obtain the **current** version. Where an authoritative source predates July 2026, it is the current published edition, linked so students can get any update.
 
 ---
 
@@ -113,7 +114,9 @@
 - **Kill threshold:** revert added sections if usefulness drops.
 - **Next variant:** if flat, lead with the hygroscopic-crystal hook (3f) as the course spine.
 
-## Sources (verifiable audit trail — Exa-retrieved 2026-07-12)
+## Sources & Get the latest — student-facing (data current as at July 2026)
+
+> **For students — get the latest:** every source below is a **live link**. Open it to obtain the **current** version. Data compiled **July 2026**; standards, statistics and product specs change, so treat the linked source as the live source of truth and re-check a figure before relying on it.
 - [T1] MDPI *Data* — *Volatile Compounds Emitted from Cat-Urine-Contaminated Carpet before and after Treatment*: https://www.mdpi.com/2306-5729/5/4/88
 - [T2] Enviroguard — *The Chemistry of Pet Odor: Why Cleaning Isn't Enough*: https://enviroguarddirect.com/the-chemistry-of-pet-odor-why-cleaning-isnt-enough/
 - [T2] Carpet Cleaning Digital — *Pet Urine Removal: The Pro Carpet Cleaning Guide*: https://carpetcleaningdigital.com/pet-urine-removal-carpet-cleaning-guide/

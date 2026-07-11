@@ -4,6 +4,7 @@
 **Type:** Non-CEC (no IICRC discipline / CEC-hours claim)
 **Drafted:** 2026-07-11 · via nexus-copywriter standard · freshness lane: **Exa** (5 sources; Tier-1 ASTM/IICRC-standard + Tier-2 industry)
 **Status:** DRAFT — founder review before any DB apply. Live DB is source of truth; never seed on deploy.
+**Data currency:** July 2026 — every figure/claim carries a **live source link** (see *Sources & Get the latest* below); open the link to obtain the **current** version. Source-URL backfill **complete** (Exa pass 2026-07-12).
 
 ---
 
@@ -86,6 +87,18 @@
 - **Target:** +5 pts pass-rate on the verification question over 30 days post-apply.
 - **Kill threshold:** revert the added sections if usefulness rating drops vs baseline.
 - **Next variant:** if flat, promote 3d to the course card subtitle.
+
+## Sources & Get the latest — student-facing (data current as at July 2026)
+
+> **For students — get the latest:** every source below is a **live link**. Open it to obtain the **current** version. Data compiled **July 2026**; standards, statistics and figures change, so treat the linked source as the live source of truth and re-check before relying on a figure.
+
+- [T1] ASTM International — *ASTM E3216, Standard Guide for Use of Infrared Thermography in Evaluation of Buildings, Building Systems, and Equipment* (current edition E3216-26, 2026): https://store.astm.org/e3216-26.html
+- [T2] ASTM International — *ASTM C1153, Standard Practice for Location of Wet Insulation in Roofing Systems Using Infrared Imaging* (current edition C1153-23, 2023): https://store.astm.org/c1153-23.html
+- [T3] IICRC — *ANSI/IICRC S500 Standard for Professional Water Damage Restoration* (Fifth Edition, 2021; official IICRC standards store — cited nominatively): https://iicrc.gilmoreglobal.com/en/product/540bc8f5-9326-43e6-9551-e47446457d38
+- [T4] Water Restoration Authority — *Thermal Imaging in Water Damage Detection* (industry reference; undated — verify current on open): https://waterrestorationauthority.com/thermal-imaging-water-damage-detection
+- [T5] Advanced Restoration Colorado — *Thermal Imaging in Water Detection: What It Finds and What It Doesn't* (published April 2026): https://advancedrestorationcolorado.com/thermal-imaging-in-water-detection-what-it-finds-and-what-it-doesnt/
+- [T6] Advanced Disaster Recovery Inc. (ADRI) — *Thermal Imaging Water Detection: Ultimate Expert Guide* (published November 2025): https://advanceddri.com/thermal-imaging-water-detection
+- [T7] Simpson Gumpertz & Heger (SGH) — *Infrared Technology Application in Building Envelopes: Applications, ASTM Standards, and Limitations* (Christopher Grey; source for the ASTM C1153 roof-scan citation): https://www.sgh.com/insight/infrared-technology-application-in-building-envelopes-in-the-united-states-applications-astm-standards-and-limitations/
 
 ## Apply notes
 - Confirm slug + `id` in live DB (catalog title "Introduction to Infrared Thermography for Drying").

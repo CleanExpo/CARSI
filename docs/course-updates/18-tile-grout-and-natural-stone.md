@@ -4,6 +4,7 @@
 **Type:** Non-CEC (no IICRC discipline / CEC-hours claim)
 **Drafted:** 2026-07-12 · via nexus-copywriter standard · freshness lane: **Exa** (6 sources; Tier-1 Natural Stone Institute + MAPEI technical, Tier-2 stone-restoration specialists)
 **Status:** DRAFT — founder review before any DB apply. Live DB is source of truth; never seed on deploy.
+**Data currency:** July 2026 — every figure/claim carries a **live source link** (see *Sources & Get the latest* below); open the link to obtain the **current** version. Where an authoritative source predates July 2026, it is the current published edition, linked so students can get any update.
 
 ---
 
@@ -108,7 +109,9 @@
 - **Kill threshold:** revert added sections if usefulness drops.
 - **Next variant:** if flat, lead with the vinegar/etch hook (3f).
 
-## Sources (verifiable audit trail — Exa-retrieved 2026-07-12)
+## Sources & Get the latest — student-facing (data current as at July 2026)
+
+> **For students — get the latest:** every source below is a **live link**. Open it to obtain the **current** version. Data compiled **July 2026**; standards, statistics and product specs change, so treat the linked source as the live source of truth and re-check a figure before relying on it.
 - [T1] Natural Stone Institute — *Cleaning Products for Natural Stone*: https://www.naturalstoneinstitute.org/consumers/care/
 - [T1] MAPEI — *The Causes and Cures of Grout Efflorescence*: https://cdnmedia.mapei.com/docs/librariesprovider67/line-technical-documentation-documents/the-causes-and-cures-of-grout-efflorescence.pdf
 - [T2] Rose Restoration — *The Acidic Cleaners Quietly Etching Your Marble and Stone*: https://www.roserestoration.com/blog/dangers-of-acidic-cleaners-natural-stone/

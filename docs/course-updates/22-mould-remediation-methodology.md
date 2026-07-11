@@ -4,6 +4,7 @@
 **Type:** Non-CEC (no IICRC discipline / CEC-hours claim)
 **Drafted:** 2026-07-12 · via nexus-copywriter standard · freshness lane: **Exa** (6 sources; Tier-1 IICRC S520-2024 + US EPA mould guide, Tier-2 remediation technical press)
 **Status:** DRAFT — founder review before any DB apply. Live DB is source of truth; never seed on deploy.
+**Data currency:** July 2026 — every figure/claim carries a **live source link** (see *Sources & Get the latest* below); open the link to obtain the **current** version. Where an authoritative source predates July 2026, it is the current published edition, linked so students can get any update.
 
 ---
 
@@ -117,7 +118,9 @@
 - **Kill threshold:** revert added sections if usefulness drops; keep the removal-first + bleach sections regardless.
 - **Next variant:** if flat, lead with the bleach myth-buster (3f).
 
-## Sources (verifiable audit trail — Exa-retrieved 2026-07-12)
+## Sources & Get the latest — student-facing (data current as at July 2026)
+
+> **For students — get the latest:** every source below is a **live link**. Open it to obtain the **current** version. Data compiled **July 2026**; standards, statistics and product specs change, so treat the linked source as the live source of truth and re-check a figure before relying on it.
 - [T1] IICRC — *S520 Standard and Reference Guide for Professional Mold Remediation*: https://img1.wsimg.com/blobby/go/7cd72fc2-f438-4fff-bf50-2e131d91bb52/IICRC-S520-Standard-and-Reference-Guide-for-Pr.pdf
 - [T1] ANSI Blog — *ANSI/IICRC S520-2024: Professional Mold Remediation* (Condition 2 updates): https://blog.ansi.org/ansi/ansi-iicrc-s520-2024-professional-mold-remediation/
 - [T1] US EPA — *Mold Remediation in Schools and Commercial Buildings, Chapter 3*: https://www.epa.gov/mold/mold-remediation-schools-and-commercial-buildings-guide-chapter-3

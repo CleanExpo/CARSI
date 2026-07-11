@@ -4,6 +4,7 @@
 **Type:** Non-CEC (no IICRC discipline / CEC-hours claim)
 **Drafted:** 2026-07-11 · via nexus-copywriter standard · freshness lane: **Exa** (6 sources; Tier-1 IICRC S500 + position statements, Tier-2 restoration technical press)
 **Status:** DRAFT — founder review before any DB apply. Live DB is source of truth; never seed on deploy.
+**Data currency:** July 2026 — every figure/claim carries a **live source link** (see *Sources & Get the latest* below); open the link to obtain the **current** version. Where an authoritative source predates July 2026, it is the current published edition, linked so students can get any update.
 
 ---
 
@@ -120,7 +121,9 @@
 - **Kill threshold:** revert added sections if usefulness drops; keep the S500-2026 currency note regardless.
 - **Next variant:** if flat, add an AU sidebar (Safe Work Australia PPE, AU flood/storm categorisation practice).
 
-## Sources (verifiable audit trail — Exa-retrieved 2026-07-11)
+## Sources & Get the latest — student-facing (data current as at July 2026)
+
+> **For students — get the latest:** every source below is a **live link**. Open it to obtain the **current** version. Data compiled **July 2026**; standards, statistics and product specs change, so treat the linked source as the live source of truth and re-check a figure before relying on it.
 - [T2] Tygart Media — *What the IICRC S500 2026 Revision Means for Restoration Contractors*: https://tygartmedia.com/iicrc-s500-2026-revision-restoration-contractors/
 - [T2] Restoration Intel — *Water Damage Categories and Classes: The Complete IICRC S500 Field Guide*: https://restorationintel.com/water-damage-categories-classes-iicrc-s500-guide/
 - [T2] Restoration Intel — *IICRC Standards Evolution (technology & emerging contaminants, 2026)*: https://restorationintel.com/iicrc-standards-evolution-technology-emerging-contaminants-2026/

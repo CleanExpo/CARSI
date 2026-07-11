@@ -4,6 +4,7 @@
 **Type:** Non-CEC (no IICRC discipline / CEC-hours claim)
 **Drafted:** 2026-07-11 · via nexus-copywriter standard · freshness lane: **Exa** (5 sources; Tier-1 peer-reviewed forensic/conservation journals, Tier-2 industry)
 **Status:** DRAFT — founder review before any DB apply. Live DB is source of truth; never seed on deploy.
+**Data currency:** July 2026 — every figure/claim carries a **live source link** (see *Sources & Get the latest* below); open the link to obtain the **current** version. Source-URL backfill **complete** (Exa pass 2026-07-12).
 
 ---
 
@@ -90,6 +91,15 @@
 - **Target:** +5 pts over 30 days post-apply.
 - **Kill threshold:** revert added sections if usefulness drops.
 - **Next variant:** if flat, A/B 3e as the course card subtitle.
+
+## Sources & Get the latest — student-facing (data current as at July 2026)
+
+> **For students — get the latest:** every source below is a **live link**. Open it to obtain the **current** version. Data compiled **July 2026**; standards, statistics and figures change, so treat the linked source as the live source of truth and re-check before relying on a figure.
+
+- [T2] Spectro-UV (Spectroline) — *Forensics 101: How UV Light Reveals Hidden Evidence* (published 31 Mar 2025; open the page for the current revision): https://www.spectro-uv.com/blogs/all/forensics-101-how-uv-light-reveals-hidden-evidence
+- [T1] Cultural-heritage UVF review — Lanteri, Pelosi & Pogliani, *Three-Dimensional Ultraviolet Fluorescence Imaging in Cultural Heritage: A Review of Applications in Multi-Material Artworks*, J. Imaging 11(7):245 (2025; open-access, peer-reviewed): https://doi.org/10.3390/jimaging11070245
+- [T2] UVET — *365nm UV Inspection Light: Vital Tool for Quality & Safety* (published 22 Jun 2025; open the page for the current revision): https://www.uvndt.com/365nm-uv-inspection-light/
+- [T1] UV365 serum study — Kearse KP, *Ultraviolet 365 as an Alternative Light Source for Detection of Blood Serum*, J Forensic Sci 65(5):1716–1721 (2020; peer-reviewed): https://pmc.ncbi.nlm.nih.gov/articles/PMC7496641/
 
 ## Apply notes
 - Confirm slug + `id` in live DB (title "Introduction to Ultraviolet Light and Fluorescence").

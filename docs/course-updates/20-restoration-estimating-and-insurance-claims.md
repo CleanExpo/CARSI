@@ -4,6 +4,7 @@
 **Type:** Non-CEC (no IICRC discipline / CEC-hours claim)
 **Drafted:** 2026-07-12 · via nexus-copywriter standard · freshness lane: **Exa** (6 sources; Tier-2 restoration-estimating technical press + glossaries citing IICRC standards & case law)
 **Status:** DRAFT — founder review before any DB apply. Live DB is source of truth; never seed on deploy.
+**Data currency:** July 2026 — every figure/claim carries a **live source link** (see *Sources & Get the latest* below); open the link to obtain the **current** version. Where an authoritative source predates July 2026, it is the current published edition, linked so students can get any update.
 
 ---
 
@@ -115,7 +116,9 @@
 - **Kill threshold:** revert added sections if usefulness drops.
 - **Next variant:** if flat, add an AU sidebar (AU estimating platforms/insurer practice, AUD figures).
 
-## Sources (verifiable audit trail — Exa-retrieved 2026-07-12)
+## Sources & Get the latest — student-facing (data current as at July 2026)
+
+> **For students — get the latest:** every source below is a **live link**. Open it to obtain the **current** version. Data compiled **July 2026**; standards, statistics and product specs change, so treat the linked source as the live source of truth and re-check a figure before relying on it.
 - [T2] Tygart Media — *Xactimate Strategy for Restoration Contractors: 2026 Operator's Guide*: https://tygartmedia.com/xactimate-strategy-restoration-contractors/
 - [T2] Restoration Intel — *Xactimate and Scope Development: How Carriers Price Restoration Claims*: https://restorationintel.com/xactimate-scope-development-how-carriers-price-restoration-claims/
 - [T2] CapOut — *Insurance Claim Supplements: How to File and Win*: https://capout.ai/resources/blog/insurance-claim-supplements

@@ -20,6 +20,40 @@ nexus-copywriter standard.
   make **no** `cecHours` claim. If applying a draft ever creates a **new** catalogue row, it MUST ship
   `cecHours: 0` in `data/seed/courses-catalog.json` (the explicit "not CEC-approved" opt-out) per CLAUDE.md
   — never a duration-derived value. Only the founder flips a course to its IICRC-approved hours.
+- **July-2026 currency + student-facing links (founder directive 2026-07-12 — LOCKED).** All data must be
+  current as at **July 2026**, and **every data point carries a live source link so students can open it and
+  obtain the latest version**. Rules: (1) use the freshest available figure — where the newest authoritative
+  source predates July 2026, that IS the current published edition, so link the live page that carries any
+  update; (2) each draft stamps `**Data currency:** July 2026` under its Status line; (3) each draft ends with
+  a `## Sources & Get the latest — student-facing` block whose links are the ones students click to verify
+  currency; (4) never assert a bare figure without its link. Applies retroactively and to every future batch.
+
+### 🔗 July-2026 currency pass (applied 2026-07-12)
+
+All 36 drafts stamped `**Data currency:** July 2026`, and **all now carry live student-facing source URLs**
+in a `Sources & Get the latest — student-facing` block. **Catalogue coverage is now complete: all 37 non-CEC
+courses in `data/seed/courses-catalog.json` have a draft** (draft 36, *Creating a Clean Air Environment / Final
+Clearance & Handover*, closed the last gap on 2026-07-12; its catalogue slug is stored truncated at 79 chars —
+flagged for founder repair in that draft's apply notes). Drafts **12–35** were URL-bearing from drafting;
+drafts **01–11** (early-template, sources named only) were **backfilled via Exa on 2026-07-12** — every named
+source now resolves to its current canonical live page (official/authoritative first, AU-first where a source
+exists; IICRC/ASTM/ASHRAE standards cited nominatively to official pages only, never pirated copies).
+
+**Source-URL backfill queue — ✅ COMPLETE (Exa pass 2026-07-12):**
+
+| Draft | Course | Backfill status |
+|---|---|---|
+| 01 | avian-influenza-awareness | ✅ 5 links — Wildlife Health Australia (live, 9 Jul 2026) + WA Health clinician alert (Jun 2026) + NSW Gov + Australian CDC + DAFF |
+| 02 | infrared-thermography-for-drying | ✅ 7 links — ASTM E3216-26 / C1153-23 (official store) + IICRC S500 nominative + SGH + industry |
+| 03 | moisture-mould-and-iaq | ✅ WA Health (Feb 2024) + ABCB Condensation handbook v4.0 (May 2026, NCC 2025) + WHO 2009 |
+| 04 | truckmount-operations | ✅ 4 links — HydraMaster TITAN 575HP/375 + Sapphire 370 EFI (OEM) + Cleanfax (Apr 2026); non-IICRC kept clean |
+| 05 | air-scrubbers-and-afds | ✅ 7 links — IICRC S520 (official) + Reets + CDC Appendix B + EPA 40 CFR 763 + ASHE ICRA |
+| 06 | water-damage-litigation-support | ✅ 5 links — IICRC S500 (official) + 8th Cir. opinion (Nov 2025) + Cornell LII FRE 702/703 (US, illustrative) + industry |
+| 07 | large-loss-mastery | ✅ 3 links — Restoration Intel (Mar 2026) + Palm Build (Jun 2026) + Tygart Media (Apr 2026) |
+| 08 | uv-light-and-fluorescence | ✅ 4 links — Spectro-UV + J.Imaging 2025 (DOI) + UVET + J.Forensic.Sci 2020 (PMC) |
+| 09 | fire-and-smoke-core-principles | ✅ 5 links — IICRC S700 (2025, official) + press release + IICRC/RIA/CIRI wildfire guide v2 (Dec 2025) + industry |
+| 10 | applied-structural-drying-core | ✅ 5 links — IICRC S500 (official) + Restoration Intel (Mar 2026) + C&R Mag + MyClean (May 2026) + Tygart |
+| 11 | hvac-systems-and-iaq | ✅ 9 links — ASHRAE 62.1/62.2/52.2/180/241 (2025 eds) + EPA IAQ (MERV/HEPA/air-cleaners) + NADCA ACR 2025 |
 
 ## Status ledger
 
@@ -50,6 +84,26 @@ nexus-copywriter standard.
 | 23 | Crawl Space & Subfloor Moisture Control | confirm | [23-crawl-space-and-subfloor-moisture.md](23-crawl-space-and-subfloor-moisture.md) | DRAFT — awaiting founder review |
 | 24 | PPE & Respiratory Protection | confirm | [24-ppe-and-respiratory-protection.md](24-ppe-and-respiratory-protection.md) | DRAFT — awaiting founder review |
 | 25 | Pet Urine & Odour Decontamination | confirm | [25-pet-urine-and-odour-decontamination.md](25-pet-urine-and-odour-decontamination.md) | DRAFT — awaiting founder review |
+| 26 | Dehumidifier Selection & Psychrometrics (LGR vs Desiccant) | confirm | [26-dehumidifier-selection-psychrometrics.md](26-dehumidifier-selection-psychrometrics.md) | DRAFT — awaiting founder review |
+| 27 | Moisture Measurement & Documentation | confirm | [27-moisture-measurement-and-documentation.md](27-moisture-measurement-and-documentation.md) | DRAFT — awaiting founder review |
+| 34 | Introduction to Drying Health Care Facilities | `introduction-to-drying-health-care-facilities` | [34-drying-health-care-facilities.md](34-drying-health-care-facilities.md) | DRAFT — awaiting founder review |
+| 35 | Introduction to Drying Educational and Institutional Sites | `introduction-to-drying-educational-and-institutional-sites` | [35-drying-educational-and-institutional-sites.md](35-drying-educational-and-institutional-sites.md) | DRAFT — awaiting founder review |
+
+### 🚀 New "Grow Your Business" courses — $49, non-IICRC (drafted 2026-07-12)
+
+Full content drafts for the 5 new SMB-owner courses proposed in [PRICING-AND-NEW-COURSES.md](PRICING-AND-NEW-COURSES.md).
+All **`iicrcDiscipline: null`, `cecHours: 0`, no IICRC/S-standard/CEC framing** (business courses); AU-first data.
+
+| # | Course | Slug | Price | Draft | Status |
+|---|---|---|---|---|---|
+| 28 | AI for Service Businesses: Practical Tools That Win More Jobs | `ai-for-service-businesses-practical-tools` | $49 | [28-ai-for-service-businesses-practical-tools.md](28-ai-for-service-businesses-practical-tools.md) | DRAFT — awaiting founder review |
+| 29 | Speed to Lead: Turn Enquiries into Booked Jobs | `speed-to-lead-job-conversion` | $49 | [29-speed-to-lead-job-conversion.md](29-speed-to-lead-job-conversion.md) | DRAFT — awaiting founder review |
+| 30 | The Google Business Profile Playbook: Get Found, Get Called | `google-business-profile-playbook` | $49 | [30-google-business-profile-playbook.md](30-google-business-profile-playbook.md) | DRAFT — awaiting founder review |
+| 31 | The 5-Star Reputation Engine: Reviews, Referrals & Retention | `reputation-engine-reviews-referrals` | $49 | [31-reputation-engine-reviews-referrals.md](31-reputation-engine-reviews-referrals.md) | DRAFT — awaiting founder review |
+| 32 | AI-Powered Customer Communication & Follow-Up | `ai-customer-communication-followup` | $49 | [32-ai-customer-communication-followup.md](32-ai-customer-communication-followup.md) | DRAFT — awaiting founder review |
+| 33 | Modern Websites & AI Websites: Rank, Convert, Automate | `modern-and-ai-websites` | **$99** | [33-modern-and-ai-websites.md](33-modern-and-ai-websites.md) | DRAFT — awaiting founder review (capstone; new "Build" tier) |
+
+**Draft 33** is the track **capstone** and introduces a **third price point ($99 "Build" tier)** — it teaches modern-website ranking (Core Web Vitals, mobile-first, AU hosting, schema, AI-search readiness) **and** the "AI Website" model (landing page + admin-owned CRM back end holding the n8n-style flows/triggers), with a guided build session. Grounded AU-first (CodeQy, 3P Digital, Vynlox, ReadyToRank) and aligned to the estate's own **"positioning flip"** framing + live `ai-website` pipeline (Synthex generate; Unite-Group agent/CRM/drip Phase 2). The Ponte vault note is flagged Tier-3/unverified (revenue figures not cited).
 
 ### ⚠ Designation-rule correction (applied 2026-07-11)
 
@@ -78,12 +132,62 @@ Two litigation/large-loss drafts also carry a **jurisdiction caveat**: their str
 principles and label the US-specific items, but a future pass should add AU-jurisdiction sidebars
 (expert-witness duties under AU court rules; AUD large-loss thresholds).
 
-**Non-CEC courses remaining (~37):** the "Not specified" CEC-value courses from the carsi.com.au
-catalog — e.g. Truckmount Operations, Water Damage Restoration Essentials, Air Scrubbers & AFDs,
-UV & Fluorescence, Antiques restoration, Submerged Items recovery, the Drying-vertical series
-(Health Care / Educational / Hospitality / Industrial / Transportation), HVAC & IAQ, Dust &
-Particulates, Air Quality & Odour, Fire & Smoke Core, Applied Structural Drying Core, Maintenance
-Toolbox Talks, Air Movers, Tile Cleaning, Large Loss Mastery, Insurance Adjusters. Processed
-newest-first as the loop continues.
+### ✅ Catalogue grounding (verified 2026-07-12 against `data/seed/courses-catalog.json`)
+
+The live seed catalogue holds **37 courses, all currently non-CEC** (`cecHours: 0`/absent — the fail-closed
+default; only the founder flips a course to its IICRC-approved hours). Confirmed real slugs now let each draft
+attach to an actual course instead of an assumed one. **Draft → confirmed slug (founder to ratify):**
+
+| Draft | Confirmed slug | IICRC-mappable? |
+|---|---|---|
+| 01 | `avian-influenza-awareness-restoration-iaq-facilities` | IAQ/biosecurity — no S-standard framing |
+| 02 | `introduction-to-infrared-thermography-for-drying` | yes (S500 nominative) |
+| 03 | `moisture-mould-and-indoor-air-quality-understanding-the-link` | yes |
+| 04 | `ccw-carsi-truckmount-operations` | **NO** — floor-care/equipment, carries **no** IICRC/S-standard/CEC content |
+| 05 | `using-air-scrubbers-and-afds-to-improve-job-site-air-quality` | yes |
+| 06 | `introduction-to-water-damage-litigation-support` | yes |
+| 08 | `introduction-to-ultraviolet-light-and-fluorescence` | yes |
+| 09 | `fire-smoke-damage-restoration-fundamentals` | yes (S700 nominative) |
+| 10 | `structural-drying-fundamentals` | yes |
+| 11 | `hvac-systems-and-indoor-air-quality-what-every-technician-should-know` | yes |
+| 12 | `wrt-water-damage-essentials` / `water-damage-restoration-fundamentals` | yes |
+| 14 | `air-quality-and-odour-identification-and-deodorisation-essentials` | yes |
+| 15 | `introduction-to-restoration-of-antiques-and-fine-furnishings` | yes |
+| 16 | `carpet-cleaning-technician-fundamentals` | yes |
+| 17 | `trauma-crime-scene-decontamination-fundamentals` | yes (S540 nominative) |
+| 19 | `dust-and-particulates-in-indoor-air-control-and-cleaning-strategies` (partial) | yes |
+| 21 | `category-3-sewage-black-water-remediation` | yes |
+| 22 | `mould-remediation-fundamentals` | yes (S520 nominative) |
+| 24 | `whs-fundamentals-for-restoration-and-cleaning-professionals` (partial) | WHS — Safe Work Australia framing |
+| 26 | `psychrometry-building-science-for-drying` | yes |
+| 27 | `psychrometry-building-science-for-drying` / `structural-drying-fundamentals` | yes |
+
+**Drafts with no 1:1 catalogue course (content is sound; founder decides attachment or drop): 07 Large Loss,
+13 Freeze-drying, 18 Tile/Grout/Stone, 20 Estimating/Insurance, 23 Crawl-space, 25 Pet Urine.** These likely
+fold into a broader course (e.g. 25→carpet, 23→structural drying) rather than standing alone.
+
+**Real non-CEC courses NOT yet drafted — target list for batches 15+ (newest-first):**
+`documenting-and-reporting-air-quality-improvements` · `introduction-to-air-quality-fundamentals` ·
+`introduction-to-creating-a-clean-air-environment-best-practices-for-final-clearance` ·
+`introduction-to-iaq-and-mould-understanding-airborne-spread-and-containment` ·
+`introduction-to-improving-indoor-air-quality-after-water-damage` ·
+the **drying-vertical series** — health-care (draft 34 ✅) and educational/institutional (draft 35 ✅) now
+drafted; remaining: `…hospitality-and-lodging-sites`, `…industrial-and-manufacturing-sites`,
+`…transportation-and-vehicles` ·
+`introduction-to-recovery-of-submerged-items-and-contents` · `timber-floor-assessment-restoration` ·
+`assessing-indoor-environment-conditions` · `asbestos-awareness-for-restoration-technicians` (Safe Work AU,
+no IICRC framing) · `commercial-floor-care-schools-childcare` + `floor-care-onboarding-operational-readiness`
+(**non-IICRC** — no S-standard/CEC content).
+
+### 💲 Pricing model + 5 new Business & AI courses (2026-07-12)
+
+See **[PRICING-AND-NEW-COURSES.md](PRICING-AND-NEW-COURSES.md)** — staged proposal covering: (1) the Stripe
+answer (per-course checkout uses inline `price_data` from `priceAud`, so **any number of courses needs zero new
+Stripe price objects**; subscriptions already unlock the whole library); (2) a **two-price-point model** ($29
+Essentials / $49 Professional) that puts a price on every course while keeping "the same numbers"; and (3) five
+**$49** SMB-owner courses (AI, speed-to-lead job conversion, Google Business Profile, reputation/reviews, AI
+comms) with value props grounded in current 2026 data. Business courses are **non-IICRC** (`cecHours: 0`,
+`iicrcDiscipline: null`, no S-standard/CEC framing). One flagged founder call: 32 currently-free courses become
+paid. Staged — founder applies to live DB; no deploy-time seeding; no Stripe changes required.
 
 Batches continue across loop iterations; newest course drafts append to this ledger.

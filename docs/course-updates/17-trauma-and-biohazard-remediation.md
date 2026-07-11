@@ -4,6 +4,7 @@
 **Type:** Non-CEC (no IICRC discipline / CEC-hours claim)
 **Drafted:** 2026-07-12 · via nexus-copywriter standard · freshness lane: **Exa** (6 sources; Tier-1 IICRC S540 + OSHA regulation/interpretations, Tier-2 trade summary)
 **Status:** DRAFT — founder review before any DB apply. Live DB is source of truth; never seed on deploy.
+**Data currency:** July 2026 — every figure/claim carries a **live source link** (see *Sources & Get the latest* below); open the link to obtain the **current** version. Where an authoritative source predates July 2026, it is the current published edition, linked so students can get any update.
 
 ---
 
@@ -115,7 +116,9 @@
 - **Kill threshold:** revert added sections if usefulness drops; keep the jurisdiction box regardless.
 - **Next variant:** if flat, add an AU-specific compliance sidebar (state WHS regulator, clinical-waste rules by state).
 
-## Sources (verifiable audit trail — Exa-retrieved 2026-07-12)
+## Sources & Get the latest — student-facing (data current as at July 2026)
+
+> **For students — get the latest:** every source below is a **live link**. Open it to obtain the **current** version. Data compiled **July 2026**; standards, statistics and product specs change, so treat the linked source as the live source of truth and re-check a figure before relying on it.
 - [T1] IICRC — *S540 Standard for Trauma and Crime Scene Cleanup*: https://iicrc.org/s540/
 - [T1] OSHA — *1910.1030 Bloodborne Pathogens*: https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.1030
 - [T1] OSHA — *HAZWOPER applicability to blood/trauma cleanup* (2020 interpretation): https://www.osha.gov/laws-regs/standardinterpretations/2020-12-15

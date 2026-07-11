@@ -4,6 +4,7 @@
 **Type:** Non-CEC (no IICRC discipline / CEC-hours claim)
 **Drafted:** 2026-07-12 · via nexus-copywriter standard · freshness lane: **Exa** (6 sources; Tier-1 IICRC S500 + SCRT technical guidance, Tier-2 restoration authority sites)
 **Status:** DRAFT — founder review before any DB apply. Live DB is source of truth; never seed on deploy.
+**Data currency:** July 2026 — every figure/claim carries a **live source link** (see *Sources & Get the latest* below); open the link to obtain the **current** version. Where an authoritative source predates July 2026, it is the current published edition, linked so students can get any update.
 
 ---
 
@@ -110,7 +111,9 @@
 - **Kill threshold:** revert added sections if usefulness drops; keep the trap-side classification rule regardless.
 - **Next variant:** if flat, add an AU sidebar (state health-department sewage rules, AU clinical/biohazard waste disposal).
 
-## Sources (verifiable audit trail — Exa-retrieved 2026-07-12)
+## Sources & Get the latest — student-facing (data current as at July 2026)
+
+> **For students — get the latest:** every source below is a **live link**. Open it to obtain the **current** version. Data compiled **July 2026**; standards, statistics and product specs change, so treat the linked source as the live source of truth and re-check a figure before relying on it.
 - [T1] IICRC — *S500 Standard for Professional Water Damage Restoration*: https://iicrc.org/s500/
 - [T1] SCRT — *Black Water Loss* (S500 §12 Cat-3 decontamination Q&A): https://www.scrt.org/31-faqs/general/45-black-water-loss
 - [T2] Water Mitigation Authority — *Sewage Backup Mitigation Services: Protocols and Safety*: https://watermitigationauthority.com/sewage-backup-mitigation-services

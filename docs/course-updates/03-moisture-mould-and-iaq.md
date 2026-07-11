@@ -4,6 +4,7 @@
 **Type:** Non-CEC (no IICRC discipline / CEC-hours claim)
 **Drafted:** 2026-07-11 · via nexus-copywriter standard · freshness lane: **Exa** (5 Tier-1 sources: WHO, WA Health, NCC/ABCB, NCBI)
 **Status:** DRAFT — founder review before any DB apply. Live DB is source of truth; never seed on deploy.
+**Data currency:** July 2026 — every figure/claim carries a **live source link** (see *Sources & Get the latest* below); open the link to obtain the **current** version. Source-URL backfill **complete** (Exa pass 2026-07-12): WA Health guidance is the Feb-2024 edition (current); ABCB Condensation handbook is v4.0 (May 2026, NCC 2025); WHO dampness-and-mould remains the 2009 canonical reference.
 
 ---
 
@@ -86,6 +87,16 @@
 - **Kill threshold:** revert added sections if usefulness drops vs baseline; the causal-vs-association
   correction (3a) stays regardless — it's an accuracy fix.
 - **Next variant:** if flat, A/B 3d as the course card subtitle.
+
+## Sources & Get the latest — student-facing (data current as at July 2026)
+
+> **For students — get the latest:** every source below is a **live link**. Open it to obtain the **current** version. Data compiled **July 2026**; standards, statistics and figures change, so treat the linked source as the live source of truth and re-check before relying on a figure.
+
+- [T1] WA Health — *Mould and dampness* (public hub; links the guideline PDFs below): https://www.health.wa.gov.au/Articles/J_M/Mould-and-dampness
+- [T1] WA Health — *Indoor Mould – Health Risk Assessment and Management* (Feb 2024; causal asthma-in-children, one-third–half of AU homes affected): https://www.health.wa.gov.au/~/media/Corp/Documents/Health-for/Mould/Indoor-Mould--Health-Risk-Assessment-and-Management.pdf
+- [T1] WA Health — *Guidelines for Managing Mould and Dampness Related Public Health Risks in Buildings* (moisture = key determinant; excess moisture harmful irrespective of visible mould): https://www.health.wa.gov.au/~/media/Corp/Documents/Health-for/Mould/Guidelines-for-Managing-Mould-and-Dampness-Related-Public-Health-Risks-in-BuildingsV20.pdf
+- [T1] ABCB — *Condensation in Buildings Handbook* (v4.0, May 2026, aligned to NCC 2025; vapour loads, RH bands, interstitial condensation): https://ncc.abcb.gov.au/resource/handbook/condensation-buildings-handbook-0
+- [T1] WHO — *Guidelines for Indoor Air Quality: Dampness and Mould* (2009; still the current WHO reference — association vs causation, no established dose-response): https://www.who.int/publications/i/item/9789289041683
 
 ## Apply notes
 - Confirm slug + `id` in live DB (title "Moisture, Mould, and Indoor Air Quality: Understanding the Link").
