@@ -40,7 +40,7 @@ linked. **Source-URL backfill queue (Exa currency pass, one/two per loop iterati
 |---|---|---|
 | 01 | avian-influenza-awareness | pending — named sources: WHO/WOAH, AU Dept Health, state health |
 | 02 | infrared-thermography-for-drying | pending — ASTM/IICRC-nominative + industry |
-| 03 | moisture-mould-and-iaq | pending — WHO, WA Health, NCC/ABCB, NCBI |
+| 03 | moisture-mould-and-iaq | ✅ **backfilled 2026-07-12** — WA Health (Feb 2024) + ABCB Condensation handbook v4.0 (May 2026, NCC 2025) + WHO 2009, all linked |
 | 04 | truckmount-operations | pending — equipment/industry (non-IICRC) |
 | 05 | air-scrubbers-and-afds | pending — AHAM/industry IAQ |
 | 06 | water-damage-litigation-support | pending — legal/insurance industry |
