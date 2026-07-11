@@ -26,6 +26,22 @@ nexus-copywriter standard.
 | 3 | Moisture, Mould, and Indoor Air Quality: Understanding the Link | confirm | [03-moisture-mould-and-iaq.md](03-moisture-mould-and-iaq.md) | DRAFT — awaiting founder review |
 | 4 | Truckmount Operations Course — HydraMaster & Sapphire Scientific | confirm | [04-truckmount-operations.md](04-truckmount-operations.md) | DRAFT — awaiting founder review |
 | 5 | Using Air Scrubbers and AFDs to Improve Job Site Air Quality | confirm | [05-air-scrubbers-and-afds.md](05-air-scrubbers-and-afds.md) | DRAFT — awaiting founder review |
+| 6 | Introduction to Water Damage Litigation Support | confirm | [06-water-damage-litigation-support.md](06-water-damage-litigation-support.md) | DRAFT — awaiting founder review |
+| 7 | Large Loss Mastery Course | confirm | [07-large-loss-mastery.md](07-large-loss-mastery.md) | DRAFT — awaiting founder review |
+
+### ⚠ Cross-cutting finding (founder decision needed)
+
+Research surfaced that the **IICRC S500 2026 revision is now published** — the most consequential update
+to the water-damage standard in ~a decade (documentation promoted to a central requirement; tighter
+Category/Class definitions; sharper S500↔S520 boundary). **This affects EVERY CARSI course that cites
+S500-2021, not just the litigation course.** Recommend a separate catalogue-wide audit pass of standard
+citations (grep `S500-2021` / "2021 edition" across course content) once these drafts are approved. Not
+actioned here — flagged for a deliberate decision.
+
+Two litigation/large-loss drafts also carry a **jurisdiction caveat**: their strongest sources are US
+(IICRC, US Federal Rules of Evidence, a US court case, US$ thresholds). The drafts teach the transferable
+principles and label the US-specific items, but a future pass should add AU-jurisdiction sidebars
+(expert-witness duties under AU court rules; AUD large-loss thresholds).
 
 **Non-CEC courses remaining (~37):** the "Not specified" CEC-value courses from the carsi.com.au
 catalog — e.g. Truckmount Operations, Water Damage Restoration Essentials, Air Scrubbers & AFDs,
