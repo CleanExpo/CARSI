@@ -5,6 +5,7 @@
 **Type:** **Non-IICRC business course** — `iicrcDiscipline: null`, `cecHours: 0`, **no** IICRC/S-standard/CEC framing.
 **Drafted:** 2026-07-12 · via nexus-copywriter standard · freshness lane: **Exa** (AU-first: CodeQy, Vynlox, 3P Digital, ReadyToRank; product examples PageX/Centripe/n8n)
 **Status:** DRAFT — founder review + brand-guardian before any DB apply. Live DB is source of truth; never seed on deploy.
+**Data currency:** July 2026 — every figure/claim carries a **live source link** (see *Sources & Get the latest* below); open the link to obtain the **current** version. Where an authoritative source predates July 2026, it is the current published edition, linked so students can get any update.
 **Positioning:** the **capstone** of the Grow Your Business track — GBP (course 30) sends the click, this is the site that catches it and the AI-Website engine that works the lead while you're on the job. Bundles a guided **AI-Website build session**, which is why it sits at the $99 Build tier, not $49.
 
 ---
@@ -159,7 +160,9 @@
 - **Kill threshold:** revise if completion <45% or the build-action rate <20%.
 - **Next variant:** if the build step stalls, split into two modules (Rank & Convert / Automate) and gate the AI-Website build behind a short readiness check.
 
-## Sources (verifiable audit trail — Exa-retrieved 2026-07-12)
+## Sources & Get the latest — student-facing (data current as at July 2026)
+
+> **For students — get the latest:** every source below is a **live link**. Open it to obtain the **current** version. Data compiled **July 2026**; standards, statistics and product specs change, so treat the linked source as the live source of truth and re-check a figure before relying on it.
 - [T2] UnderCurrent Automations — *Small Business Website Design: Build One That Ranks in 2026* (AU; found/understood/trusted, schema, AI-search): https://undercurrentautomations.com/blog/small-business-website-design
 - [T2] CodeQy — *Web Design for Australian Small Businesses: The Complete 2026 Guide* (AU; 3s bounce, mobile-first, essentials): https://codeqy.com.au/blog/web-design-small-business-australia-ultimate-guide
 - [T2] Vynlox — *Small Business Website Design Australia: 2026 Playbook* (AU; conversion fundamentals, pricing tiers, 3–7%): https://vynlox.com/blog/small-business-website-design-australia

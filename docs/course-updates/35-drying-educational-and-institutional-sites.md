@@ -5,6 +5,7 @@
 **Type:** Non-CEC (no IICRC discipline / CEC-hours claim) · `iicrcDiscipline: null`
 **Drafted:** 2026-07-12 · via nexus-copywriter standard · freshness lane: **Exa** (AU framing over US/UK sources: US EPA IAQ Tools for Schools, UK/US sector guides)
 **Status:** DRAFT — founder review before any DB apply. Live DB is source of truth; never seed on deploy.
+**Data currency:** July 2026 — every figure/claim carries a **live source link** (see *Sources & Get the latest* below); open the link to obtain the **current** version. Where an authoritative source predates July 2026, it is the current published edition, linked so students can get any update.
 
 ---
 
@@ -110,7 +111,9 @@
 - **Kill threshold:** revert added sections if usefulness drops.
 - **Next variant:** if flat, lead with 3d (asbestos recognise-stop-refer) for the risk-first learner.
 
-## Sources (verifiable audit trail — Exa-retrieved 2026-07-12)
+## Sources & Get the latest — student-facing (data current as at July 2026)
+
+> **For students — get the latest:** every source below is a **live link**. Open it to obtain the **current** version. Data compiled **July 2026**; standards, statistics and product specs change, so treat the linked source as the live source of truth and re-check a figure before relying on it.
 - [T1] US EPA — *Reference Guide for Indoor Air Quality in Schools*: https://www.epa.gov/iaq-schools/reference-guide-indoor-air-quality-schools
 - [T1] US EPA — *Mold Remediation in Schools and Commercial Buildings* (402-K-01-001): https://inspectapedia.com/sickhouse/US_EPA_Mold_Remediation_Schools.pdf
 - [T2] WrightWay — *School & Educational Facility Restoration* (after-hours, calendar-sensitive, clearance): https://wrightway.com/school-restoration/

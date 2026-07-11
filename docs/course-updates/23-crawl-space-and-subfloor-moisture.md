@@ -4,6 +4,7 @@
 **Type:** Non-CEC (no IICRC discipline / CEC-hours claim)
 **Drafted:** 2026-07-12 · via nexus-copywriter standard · freshness lane: **Exa** (6 sources; Tier-1 Building Science Corporation + Advanced Energy field study + NAHB, Tier-2 building-science press)
 **Status:** DRAFT — founder review before any DB apply. Live DB is source of truth; never seed on deploy.
+**Data currency:** July 2026 — every figure/claim carries a **live source link** (see *Sources & Get the latest* below); open the link to obtain the **current** version. Where an authoritative source predates July 2026, it is the current published edition, linked so students can get any update.
 
 ---
 
@@ -116,7 +117,9 @@
 - **Kill threshold:** revert added sections if usefulness drops; keep the vented-vs-sealed section regardless.
 - **Next variant:** if flat, add an AU climate-zone sidebar (which AU regions are humid enough that sealing wins).
 
-## Sources (verifiable audit trail — Exa-retrieved 2026-07-12)
+## Sources & Get the latest — student-facing (data current as at July 2026)
+
+> **For students — get the latest:** every source below is a **live link**. Open it to obtain the **current** version. Data compiled **July 2026**; standards, statistics and product specs change, so treat the linked source as the live source of truth and re-check a figure before relying on it.
 - [T2] Crawlspace Energy Institute — *How Crawlspaces Affect Your Home: Stack Effect Science*: https://crawlspaceenergyinstitute.com/crawlspace-science/
 - [T1] NAHB — *Floors above Crawl Spaces: Reducing Moisture Accumulation (hot-humid climates)*: https://www.nahb.org/-/media/NAHB/advocacy/docs/top-priorities/codes/technotes/tn03-floors-above-crawl-spaces-201705.pdf
 - [T1] Building Science Corporation — *BSI-115: Crawlspaces — Either In or Out* (Lstiburek): https://buildingscience.com/sites/default/files/document/bsi-115_crawlspaces_-_either_in_or_out_c_0.pdf

@@ -4,6 +4,7 @@
 **Type:** Non-CEC (no IICRC discipline / CEC-hours claim)
 **Drafted:** 2026-07-12 · via nexus-copywriter standard · freshness lane: **Exa** (6 sources; Tier-1 psychrometric/engineering references, Tier-2 restoration technical guides — all 2025–2026)
 **Status:** DRAFT — founder review before any DB apply. Live DB is source of truth; never seed on deploy.
+**Data currency:** July 2026 — every figure/claim carries a **live source link** (see *Sources & Get the latest* below); open the link to obtain the **current** version. Where an authoritative source predates July 2026, it is the current published edition, linked so students can get any update.
 
 ---
 
@@ -111,7 +112,9 @@
 - **Kill threshold:** revert added sections if usefulness drops.
 - **Next variant:** if flat, lead with the inlet/outlet-delta test (3b) as the practical spine.
 
-## Sources (verifiable audit trail — Exa-retrieved 2026-07-12)
+## Sources & Get the latest — student-facing (data current as at July 2026)
+
+> **For students — get the latest:** every source below is a **live link**. Open it to obtain the **current** version. Data compiled **July 2026**; standards, statistics and product specs change, so treat the linked source as the live source of truth and re-check a figure before relying on it.
 - [T1] Restoration Intel — *Structural Drying Systems: Psychrometrics, Equipment Sizing, and LGR vs. Desiccant* (2026-03): https://restorationintel.com/structural-drying-systems-psychrometrics-lgr-desiccant-guide/
 - [T1] Water Restoration Authority — *Psychrometrics in Water Restoration*: https://waterrestorationauthority.com/psychrometrics-in-water-restoration
 - [T2] Upper Restoration — *LGR vs. Desiccant Dehumidifiers: Choosing the Right Tech for Commercial Water Damage* (2026-02): https://upperrestoration.com/lgr-vs-desiccant-dehumidifiers-choosing-the-right-tech-for-commercial-water-damage/

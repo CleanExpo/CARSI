@@ -5,6 +5,7 @@
 **Type:** Non-CEC (no IICRC discipline / CEC-hours claim) · `iicrcDiscipline: null`
 **Drafted:** 2026-07-12 · via nexus-copywriter standard · freshness lane: **Exa** (AU framing over US primary sources: CDC, ASHE ICRA 2.0, WMC-ICRA/ASHRAE 188)
 **Status:** DRAFT — founder review before any DB apply. Live DB is source of truth; never seed on deploy.
+**Data currency:** July 2026 — every figure/claim carries a **live source link** (see *Sources & Get the latest* below); open the link to obtain the **current** version. Where an authoritative source predates July 2026, it is the current published edition, linked so students can get any update.
 
 ---
 
@@ -111,7 +112,9 @@
 - **Kill threshold:** revert added sections if usefulness drops.
 - **Next variant:** if flat, lead with 3f (drying aerosolises the danger) as the course spine.
 
-## Sources (verifiable audit trail — Exa-retrieved 2026-07-12)
+## Sources & Get the latest — student-facing (data current as at July 2026)
+
+> **For students — get the latest:** every source below is a **live link**. Open it to obtain the **current** version. Data compiled **July 2026**; standards, statistics and product specs change, so treat the linked source as the live source of truth and re-check a figure before relying on it.
 - [T1] CDC — *Guidance for Reopening Healthcare Facilities After Water and Wind Damage* (2025): https://www.cdc.gov/infection-control/hcp/reopen-health-facilities/water-wind-damage.html
 - [T1] PMC — *Reducing HAI Risk from Legionella using a Water Management for Construction (WMC) ICRA Tool* (ASHRAE 188): https://pmc.ncbi.nlm.nih.gov/articles/PMC9149880/
 - [T2] ASHE (American Society for Health Care Engineering) — *ICRA 2.0 Tool + Permit*: https://www.ashe.org/system/files/media/file/2022/08/ICRA%202.0%20Tool%20%2B%20Permit.pdf

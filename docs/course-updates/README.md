@@ -20,6 +20,35 @@ nexus-copywriter standard.
   make **no** `cecHours` claim. If applying a draft ever creates a **new** catalogue row, it MUST ship
   `cecHours: 0` in `data/seed/courses-catalog.json` (the explicit "not CEC-approved" opt-out) per CLAUDE.md
   — never a duration-derived value. Only the founder flips a course to its IICRC-approved hours.
+- **July-2026 currency + student-facing links (founder directive 2026-07-12 — LOCKED).** All data must be
+  current as at **July 2026**, and **every data point carries a live source link so students can open it and
+  obtain the latest version**. Rules: (1) use the freshest available figure — where the newest authoritative
+  source predates July 2026, that IS the current published edition, so link the live page that carries any
+  update; (2) each draft stamps `**Data currency:** July 2026` under its Status line; (3) each draft ends with
+  a `## Sources & Get the latest — student-facing` block whose links are the ones students click to verify
+  currency; (4) never assert a bare figure without its link. Applies retroactively and to every future batch.
+
+### 🔗 July-2026 currency pass (applied 2026-07-12)
+
+All 35 drafts stamped `**Data currency:** July 2026`. Drafts **12–35** carry live source URLs — their
+Sources block was relabelled `Sources & Get the latest — student-facing` with a click-through lead for
+students. Drafts **01–11** are early-template drafts that cite sources **by name only (0 URLs)** — they carry
+the stamp + an explicit ⚠ *URL backfill pending* section and are **not publish-ready** until each source is
+linked. **Source-URL backfill queue (Exa currency pass, one/two per loop iteration):**
+
+| Draft | Course | Backfill status |
+|---|---|---|
+| 01 | avian-influenza-awareness | pending — named sources: WHO/WOAH, AU Dept Health, state health |
+| 02 | infrared-thermography-for-drying | pending — ASTM/IICRC-nominative + industry |
+| 03 | moisture-mould-and-iaq | pending — WHO, WA Health, NCC/ABCB, NCBI |
+| 04 | truckmount-operations | pending — equipment/industry (non-IICRC) |
+| 05 | air-scrubbers-and-afds | pending — AHAM/industry IAQ |
+| 06 | water-damage-litigation-support | pending — legal/insurance industry |
+| 07 | large-loss-mastery | pending — industry/insurance |
+| 08 | uv-light-and-fluorescence | pending — scientific/industry |
+| 09 | fire-and-smoke-core-principles | pending — S700(2025)-nominative + industry |
+| 10 | applied-structural-drying-core | pending — psychrometrics/industry |
+| 11 | hvac-systems-and-iaq | pending — ASHRAE/industry IAQ |
 
 ## Status ledger
 

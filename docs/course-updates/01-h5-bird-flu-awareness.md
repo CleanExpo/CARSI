@@ -4,6 +4,7 @@
 **Type:** Non-CEC (no IICRC discipline / CEC-hours claim)
 **Drafted:** 2026-07-11 · via nexus-copywriter standard · freshness lane: **Exa** (6 Tier-1 sources fetched)
 **Status:** DRAFT — founder review before any DB apply. Live DB is source of truth; never seed on deploy.
+**Data currency:** July 2026 — every figure/claim must carry a **live source link** so students can open it and obtain the **current** version. **This draft predates the URL-in-sources standard: its sources are named in the Block 2 evidence map but not yet linked — queued for the source-URL backfill pass (see README).**
 
 ---
 
@@ -127,6 +128,12 @@ wild seabirds; here is the current picture and your role."
 - **Next variant:** if flat, A/B the interesting-fact hook (3c) as the course card subtitle.
 
 ---
+
+## Sources & Get the latest — student-facing (data current as at July 2026)
+
+> **For students — get the latest:** the sources behind each claim are named in the **Block 2 evidence map** above. Data compiled **July 2026**; standards, statistics and product specs change, so always open the current published source before relying on a figure.
+>
+> ⚠️ **URL backfill pending.** This is an early-template draft — the canonical live-source **links** have not yet been added. It is queued for the July-2026 source-URL currency pass; do not publish to students until each source carries a clickable link to its current version.
 
 ## Apply notes (for the deliberate, separate apply step — NOT automatic)
 

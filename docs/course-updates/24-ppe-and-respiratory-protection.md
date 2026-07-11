@@ -4,6 +4,7 @@
 **Type:** Non-CEC (no IICRC discipline / CEC-hours claim)
 **Drafted:** 2026-07-12 · via nexus-copywriter standard · freshness lane: **Exa** (6 sources; Tier-1 OSHA 1910.134 + APF tables + CDC/NIOSH, Tier-2 restoration trade with IICRC Field-Guide experts)
 **Status:** DRAFT — founder review before any DB apply. Live DB is source of truth; never seed on deploy.
+**Data currency:** July 2026 — every figure/claim carries a **live source link** (see *Sources & Get the latest* below); open the link to obtain the **current** version. Where an authoritative source predates July 2026, it is the current published edition, linked so students can get any update.
 
 ---
 
@@ -117,7 +118,9 @@
 - **Kill threshold:** revert added sections if usefulness drops; keep the fit-test/seal-check section regardless.
 - **Next variant:** if flat, add an AU sidebar (AS/NZS 1715/1716 selection tables, Safe Work Australia program requirements).
 
-## Sources (verifiable audit trail — Exa-retrieved 2026-07-12)
+## Sources & Get the latest — student-facing (data current as at July 2026)
+
+> **For students — get the latest:** every source below is a **live link**. Open it to obtain the **current** version. Data compiled **July 2026**; standards, statistics and product specs change, so treat the linked source as the live source of truth and re-check a figure before relying on it.
 - [T1] OSHA — *Mold Hazards during Disaster Cleanup* (respirator thresholds): https://www.osha.gov/sites/default/files/publications/OSHA3713.pdf
 - [T1] OSHA — *Assigned Protection Factors for the Revised Respiratory Protection Standard*: https://www.osha.gov/sites/default/files/publications/3352-APF-RESPIRATORS.pdf
 - [T1] OSHA — *1910.134 App A: Fit Testing Procedures (Mandatory)*: https://osha.prod.pace.dol.gov/laws-regs/regulations/standardnumber/1910/1910.134AppA

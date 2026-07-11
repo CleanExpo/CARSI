@@ -4,6 +4,7 @@
 **Type:** Non-CEC (no IICRC discipline / CEC-hours claim)
 **Drafted:** 2026-07-12 · via nexus-copywriter standard · freshness lane: **Exa** (6 sources; Tier-1 NCCA study guide + Cleanfax technical, Tier-2 trade/AU commercial cleaners citing AS 3733.1)
 **Status:** DRAFT — founder review before any DB apply. Live DB is source of truth; never seed on deploy.
+**Data currency:** July 2026 — every figure/claim carries a **live source link** (see *Sources & Get the latest* below); open the link to obtain the **current** version. Where an authoritative source predates July 2026, it is the current published edition, linked so students can get any update.
 
 ---
 
@@ -115,7 +116,9 @@
 - **Kill threshold:** revert added sections if usefulness drops; keep the wool-safety rule regardless.
 - **Next variant:** if flat, lead with the burn-test hook (3f).
 
-## Sources (verifiable audit trail — Exa-retrieved 2026-07-12)
+## Sources & Get the latest — student-facing (data current as at July 2026)
+
+> **For students — get the latest:** every source below is a **live link**. Open it to obtain the **current** version. Data compiled **July 2026**; standards, statistics and product specs change, so treat the linked source as the live source of truth and re-check a figure before relying on it.
 - [T2] Aramsco — *Browning, Yellowing, or Wicking*: https://blog.aramsco.com/browning-yellowing-or-wicking
 - [T2] Clean Group (AU) — *Hot Water Extraction vs Encapsulation* (cites AS 3733.1): https://commercialcleaning.au/cleaning-hot-water-extraction-vs-encapsulation-for-carpet/
 - [T1] NCCA — *Professional Carpet & Upholstery Cleaning Study Guide*: https://ncca.co.uk/wp-content/uploads/2020/10/Study-Guide-V7.pdf

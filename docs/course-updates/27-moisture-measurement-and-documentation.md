@@ -4,6 +4,7 @@
 **Type:** Non-CEC (no IICRC discipline / CEC-hours claim)
 **Drafted:** 2026-07-12 · via nexus-copywriter standard · freshness lane: **Exa** (6 sources; Tier-1 government/standards guidance, Tier-2 restoration technical guides — 2024–2026)
 **Status:** DRAFT — founder review before any DB apply. Live DB is source of truth; never seed on deploy.
+**Data currency:** July 2026 — every figure/claim carries a **live source link** (see *Sources & Get the latest* below); open the link to obtain the **current** version. Where an authoritative source predates July 2026, it is the current published edition, linked so students can get any update.
 
 ---
 
@@ -111,7 +112,9 @@
 - **Kill threshold:** revert added sections if usefulness drops.
 - **Next variant:** if flat, lead with the points-not-percent hook (3f) as the course spine.
 
-## Sources (verifiable audit trail — Exa-retrieved 2026-07-12)
+## Sources & Get the latest — student-facing (data current as at July 2026)
+
+> **For students — get the latest:** every source below is a **live link**. Open it to obtain the **current** version. Data compiled **July 2026**; standards, statistics and product specs change, so treat the linked source as the live source of truth and re-check a figure before relying on it.
 - [T1] Mass.gov — *Use of Moisture Measuring Devices for Evaluating Water Damage in Buildings*: https://www.mass.gov/info-details/use-of-moisture-measuring-devices-for-evaluating-water-damage-in-buildings
 - [T1/2] My Clean Magazine — *Dry Standards and Drying Goals in Water Damage Restoration* (S500 §10.6.6, 2026-05): https://mycleanmagazine.com/the-importance-of-moisture-targets-dry-standards-and-drying-goals-defined/
 - [T2] R&R Magazine — *Moisture Meters 101: Choosing, Using and Maintaining the Right Tools* (2025-06): https://www.randrmagonline.com/articles/91429-moisture-meters-101-choosing-using-and-maintaining-the-right-tools

@@ -5,6 +5,7 @@
 **Type:** **Non-IICRC business course** — `iicrcDiscipline: null`, `cecHours: 0`, **no** IICRC/S-standard/CEC framing.
 **Drafted:** 2026-07-12 · via nexus-copywriter standard · freshness lane: **Exa** (AU-first: ServiceScale, Dynamic Business, Starworks AU; US benchmarks secondary)
 **Status:** DRAFT — founder review + brand-guardian before any DB apply. Live DB is source of truth; never seed on deploy.
+**Data currency:** July 2026 — every figure/claim carries a **live source link** (see *Sources & Get the latest* below); open the link to obtain the **current** version. Where an authoritative source predates July 2026, it is the current published edition, linked so students can get any update.
 
 ---
 
@@ -101,7 +102,9 @@
 - **Kill threshold:** revise if the action rate <25%.
 - **Next variant:** if flat, lead with 3f (GBP feeds AI) to make the stakes current.
 
-## Sources (verifiable audit trail — Exa-retrieved 2026-07-12)
+## Sources & Get the latest — student-facing (data current as at July 2026)
+
+> **For students — get the latest:** every source below is a **live link**. Open it to obtain the **current** version. Data compiled **July 2026**; standards, statistics and product specs change, so treat the linked source as the live source of truth and re-check a figure before relying on it.
 - [T2] ServiceScale — *Tradie Lead Generation 2026* (AU; GBP as highest-ROI free tool, map pack): https://www.servicescale.com.au/blog/what-a-good-cost-per-lead-actually-looks-like-for-australian-service-businesses
 - [T2] Dynamic Business / Perth Digital Edge — *The AI search shake-up: what every Australian SME needs to know* (AU; GBP > website, feeds AI): https://dynamicbusiness.com/brand-account/the-ai-search-shake-up-what-every-australian-sme-needs-to-know-about-getting-found-online-in-2026.html
 - [T2] Elev8 Operations — *Contractor Marketing Statistics 2026* (US; 7× clicks, 520% photos, 4.7★+30 → top-3): https://www.elev8operations.com/guides/contractor-marketing-statistics-2026

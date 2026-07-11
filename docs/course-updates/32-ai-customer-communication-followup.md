@@ -5,6 +5,7 @@
 **Type:** **Non-IICRC business course** — `iicrcDiscipline: null`, `cecHours: 0`, **no** IICRC/S-standard/CEC framing.
 **Drafted:** 2026-07-12 · via nexus-copywriter standard · freshness lane: **Exa** (AU-first: Thryv AU/NZ, National AI Centre, ServiceScale; US secondary)
 **Status:** DRAFT — founder review + brand-guardian before any DB apply. Live DB is source of truth; never seed on deploy.
+**Data currency:** July 2026 — every figure/claim carries a **live source link** (see *Sources & Get the latest* below); open the link to obtain the **current** version. Where an authoritative source predates July 2026, it is the current published edition, linked so students can get any update.
 
 ---
 
@@ -109,7 +110,9 @@
 - **Kill threshold:** revise if the setup rate <20%.
 - **Next variant:** if flat, lead with 3a (the follow-up that never gets sent) and add a restoration-specific sequence example.
 
-## Sources (verifiable audit trail — Exa-retrieved 2026-07-12)
+## Sources & Get the latest — student-facing (data current as at July 2026)
+
+> **For students — get the latest:** every source below is a **live link**. Open it to obtain the **current** version. Data compiled **July 2026**; standards, statistics and product specs change, so treat the linked source as the live source of truth and re-check a figure before relying on it.
 - [T1] National AI Centre (Australian Government) — *AI adoption insights: Dec 2025–Feb 2026* (trust barrier ~65%; check-before-customer safeguard): https://www.ai.gov.au/news-and-insights/blog/ai-adoption-insights-december-2025-february-2026
 - [T2] Thryv — *2025 AUS/NZ Business Index & Consumer Report* (channel preference, personalisation, perception gap 72% vs 49%): https://www.thryv.com.au/pdfs/guides/2025-AUS-NZ-report-final.pdf
 - [T2] PipelineOn — *2026 Home Service Marketing Benchmarks* (multi-touch 89.9% vs 8.6%): https://pipelineon.com/blog/home-service-marketing-benchmarks-2026/

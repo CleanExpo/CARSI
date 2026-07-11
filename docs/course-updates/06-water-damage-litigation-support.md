@@ -4,6 +4,7 @@
 **Type:** Non-CEC (no IICRC discipline / CEC-hours claim)
 **Drafted:** 2026-07-11 · via nexus-copywriter standard · freshness lane: **Exa** (5 sources; Tier-1 IICRC + US Court of Appeals opinion, Tier-2 trade)
 **Status:** DRAFT — founder review before any DB apply. Live DB is source of truth; never seed on deploy.
+**Data currency:** July 2026 — every figure/claim must carry a **live source link** so students can open it and obtain the **current** version. **This draft predates the URL-in-sources standard: its sources are named in the Block 2 evidence map but not yet linked — queued for the source-URL backfill pass (see README).**
 
 > ⚠ **Jurisdiction note (important):** the strongest sources here are US (IICRC standards, US Federal Rules of Evidence, a US appeals-court case). The *principles* — contemporaneous documentation, intrusive inspection, establishing timing, standard-of-care — transfer to Australia, but **US procedural law (Daubert, FRE 702/703) is NOT Australian law.** Draft below teaches the transferable discipline and labels the US-specific items as illustrative, not as AU legal advice.
 
@@ -90,6 +91,12 @@
 - **Target:** +5 pts over 30 days post-apply.
 - **Kill threshold:** revert added sections if usefulness drops; keep the S500-2026 currency note regardless.
 - **Next variant:** commission an AU-jurisdiction sidebar (expert-witness duties under AU court rules).
+
+## Sources & Get the latest — student-facing (data current as at July 2026)
+
+> **For students — get the latest:** the sources behind each claim are named in the **Block 2 evidence map** above. Data compiled **July 2026**; standards, statistics and product specs change, so always open the current published source before relying on a figure.
+>
+> ⚠️ **URL backfill pending.** This is an early-template draft — the canonical live-source **links** have not yet been added. It is queued for the July-2026 source-URL currency pass; do not publish to students until each source carries a clickable link to its current version.
 
 ## Apply notes
 - Confirm slug + `id` in live DB (title "Introduction to Water Damage Litigation Support").

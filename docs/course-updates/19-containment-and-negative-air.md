@@ -4,6 +4,7 @@
 **Type:** Non-CEC (no IICRC discipline / CEC-hours claim)
 **Drafted:** 2026-07-12 · via nexus-copywriter standard · freshness lane: **Exa** (6 sources; Tier-1 IICRC S520 references + US DOE HEPA + OSHA asbestos NPE appendix, Tier-2 R&R Magazine containment series)
 **Status:** DRAFT — founder review before any DB apply. Live DB is source of truth; never seed on deploy.
+**Data currency:** July 2026 — every figure/claim carries a **live source link** (see *Sources & Get the latest* below); open the link to obtain the **current** version. Where an authoritative source predates July 2026, it is the current published edition, linked so students can get any update.
 
 ---
 
@@ -116,7 +117,9 @@
 - **Kill threshold:** revert added sections if usefulness drops.
 - **Next variant:** if flat, promote the scrubber-vs-NAM hook (3f) to the course spine.
 
-## Sources (verifiable audit trail — Exa-retrieved 2026-07-12)
+## Sources & Get the latest — student-facing (data current as at July 2026)
+
+> **For students — get the latest:** every source below is a **live link**. Open it to obtain the **current** version. Data compiled **July 2026**; standards, statistics and product specs change, so treat the linked source as the live source of truth and re-check a figure before relying on it.
 - [T2] R&R Magazine — *Containment: Controlling Contaminants During Remediation* (Pinto series pt.1): https://www.randrmagonline.com/articles/91825-containment-controlling-contaminants-during-remediation-and-restoration-activities
 - [T2] R&R Magazine — *Improving Negative-Pressure Containment for Biological Contaminants* (Pinto series pt.3): https://www.randrmagonline.com/articles/91944-improving-negative-pressure-containment-for-biological-contaminants
 - [T2] Mold Remediation Authority — *Air Filtration and Negative Pressure in Mold Remediation* (cites IICRC S520, DOE HEPA): https://moldremediationauthority.com/air-filtration-and-negative-pressure

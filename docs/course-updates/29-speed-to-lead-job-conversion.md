@@ -5,6 +5,7 @@
 **Type:** **Non-IICRC business course** — `iicrcDiscipline: null`, `cecHours: 0`, **no** IICRC/S-standard/CEC framing.
 **Drafted:** 2026-07-12 · via nexus-copywriter standard · freshness lane: **Exa** (AU-first: ServiceScale AU; US benchmarks secondary)
 **Status:** DRAFT — founder review + brand-guardian before any DB apply. Live DB is source of truth; never seed on deploy.
+**Data currency:** July 2026 — every figure/claim carries a **live source link** (see *Sources & Get the latest* below); open the link to obtain the **current** version. Where an authoritative source predates July 2026, it is the current published edition, linked so students can get any update.
 
 ---
 
@@ -99,7 +100,9 @@
 - **Kill threshold:** revise if the setup-action rate <25%.
 - **Next variant:** if flat, open with 3c (the missed-call text-back) as the quick-win spine.
 
-## Sources (verifiable audit trail — Exa-retrieved 2026-07-12)
+## Sources & Get the latest — student-facing (data current as at July 2026)
+
+> **For students — get the latest:** every source below is a **live link**. Open it to obtain the **current** version. Data compiled **July 2026**; standards, statistics and product specs change, so treat the linked source as the live source of truth and re-check a figure before relying on it.
 - [T2] ServiceScale — *Tradie Lead Generation 2026 / What a Good Cost-Per-Lead Looks Like for Australian Service Businesses* (AU): https://www.servicescale.com.au/blog/what-a-good-cost-per-lead-actually-looks-like-for-australian-service-businesses
 - [T2] CustomerFlows — *Home Service Business Statistics 2026* (5-min = 21×; 78% first responder): https://customerflows.com/resources/home-service-business-statistics/
 - [T2] PipelineOn — *2026 Home Service Marketing Benchmarks* (multi-touch 89.9% vs 8.6%; 47-hour avg): https://pipelineon.com/blog/home-service-marketing-benchmarks-2026/
