@@ -52,6 +52,8 @@ nexus-copywriter standard.
 | 25 | Pet Urine & Odour Decontamination | confirm | [25-pet-urine-and-odour-decontamination.md](25-pet-urine-and-odour-decontamination.md) | DRAFT — awaiting founder review |
 | 26 | Dehumidifier Selection & Psychrometrics (LGR vs Desiccant) | confirm | [26-dehumidifier-selection-psychrometrics.md](26-dehumidifier-selection-psychrometrics.md) | DRAFT — awaiting founder review |
 | 27 | Moisture Measurement & Documentation | confirm | [27-moisture-measurement-and-documentation.md](27-moisture-measurement-and-documentation.md) | DRAFT — awaiting founder review |
+| 34 | Introduction to Drying Health Care Facilities | `introduction-to-drying-health-care-facilities` | [34-drying-health-care-facilities.md](34-drying-health-care-facilities.md) | DRAFT — awaiting founder review |
+| 35 | Introduction to Drying Educational and Institutional Sites | `introduction-to-drying-educational-and-institutional-sites` | [35-drying-educational-and-institutional-sites.md](35-drying-educational-and-institutional-sites.md) | DRAFT — awaiting founder review |
 
 ### 🚀 New "Grow Your Business" courses — $49, non-IICRC (drafted 2026-07-12)
 
@@ -135,9 +137,9 @@ fold into a broader course (e.g. 25→carpet, 23→structural drying) rather tha
 `introduction-to-creating-a-clean-air-environment-best-practices-for-final-clearance` ·
 `introduction-to-iaq-and-mould-understanding-airborne-spread-and-containment` ·
 `introduction-to-improving-indoor-air-quality-after-water-damage` ·
-the **drying-vertical series** (`introduction-to-drying-health-care-facilities`,
-`…educational-and-institutional-sites`, `…hospitality-and-lodging-sites`,
-`…industrial-and-manufacturing-sites`, `…transportation-and-vehicles`) ·
+the **drying-vertical series** — health-care (draft 34 ✅) and educational/institutional (draft 35 ✅) now
+drafted; remaining: `…hospitality-and-lodging-sites`, `…industrial-and-manufacturing-sites`,
+`…transportation-and-vehicles` ·
 `introduction-to-recovery-of-submerged-items-and-contents` · `timber-floor-assessment-restoration` ·
 `assessing-indoor-environment-conditions` · `asbestos-awareness-for-restoration-technicians` (Safe Work AU,
 no IICRC framing) · `commercial-floor-care-schools-childcare` + `floor-care-onboarding-operational-readiness`
