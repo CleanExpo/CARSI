@@ -1,0 +1,45 @@
+name: Live CEC Compliance Guard
+
+# Guards against unapproved IICRC CEC claims reappearing on the live site (GP-498) —
+# stale prod-DB `cec_hours` values that the repo-file scans (`check:iicrc-compliance`)
+# cannot see, because the exposure lives in persisted prod data, not the repo. Asserts
+# the prod DB against the approvals registry SSOT and fails if any course shows CEC
+# hours without a recorded IICRC approval.
+#
+# Setup (one-time, founder):
+#   1. Repo Settings → Secrets → Actions → add CARSI_PROD_DATABASE_URL
+#      (the live DigitalOcean Postgres connection string).
+#   2. Repo Settings → Variables → Actions → set LIVE_CEC_CHECK = true.
+# Until both are set, the job is skipped (no-op), so this never blocks CI.
+
+on:
+  schedule:
+    # Daily, 02:00 UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  live-cec-guard:
+    name: Live CEC Compliance Guard
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: ${{ vars.LIVE_CEC_CHECK == 'true' }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Assert no unapproved CEC claims in prod
+        env:
+          DATABASE_URL: ${{ secrets.CARSI_PROD_DATABASE_URL }}
+        run: npx tsx scripts/check-live-cec.ts
