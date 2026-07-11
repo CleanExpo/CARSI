@@ -48,6 +48,8 @@ nexus-copywriter standard.
 | 21 | Category 3 & Sewage Water Cleanup | confirm | [21-category-3-sewage-water-cleanup.md](21-category-3-sewage-water-cleanup.md) | DRAFT — awaiting founder review |
 | 22 | Mould Remediation Methodology | confirm | [22-mould-remediation-methodology.md](22-mould-remediation-methodology.md) | DRAFT — awaiting founder review |
 | 23 | Crawl Space & Subfloor Moisture Control | confirm | [23-crawl-space-and-subfloor-moisture.md](23-crawl-space-and-subfloor-moisture.md) | DRAFT — awaiting founder review |
+| 24 | PPE & Respiratory Protection | confirm | [24-ppe-and-respiratory-protection.md](24-ppe-and-respiratory-protection.md) | DRAFT — awaiting founder review |
+| 25 | Pet Urine & Odour Decontamination | confirm | [25-pet-urine-and-odour-decontamination.md](25-pet-urine-and-odour-decontamination.md) | DRAFT — awaiting founder review |
 
 ### ⚠ Designation-rule correction (applied 2026-07-11)
 
