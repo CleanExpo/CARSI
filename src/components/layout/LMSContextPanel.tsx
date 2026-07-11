@@ -20,6 +20,7 @@ import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 
 import { useAuth } from '@/components/auth/auth-provider';
+import { ViewModeToggle } from '@/components/layout/ViewModeToggle';
 import { getDashboardSectionLabel, isDashboardNavActive } from '@/lib/dashboard-nav-active';
 
 const disciplines = [
@@ -73,6 +74,9 @@ export function LMSContextPanel() {
         <p className="text-[10px] font-semibold tracking-[0.2em] text-[#146fc2] uppercase">CARSI</p>
         <p className="mt-1.5 text-[15px] font-semibold tracking-tight text-slate-950">{section}</p>
         <p className="mt-1 text-xs leading-snug text-slate-500">Learning workspace</p>
+        <div className="mt-3">
+          <ViewModeToggle tone="light" />
+        </div>
       </div>
 
       {/* Scrollable: menu + filters only; sidebar shell stays fixed */}
