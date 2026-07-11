@@ -38,6 +38,8 @@ nexus-copywriter standard.
 | 11 | HVAC Systems and Indoor Air Quality | confirm | [11-hvac-systems-and-iaq.md](11-hvac-systems-and-iaq.md) | DRAFT — awaiting founder review |
 | 12 | Water Damage Restoration Essentials | confirm | [12-water-damage-restoration-essentials.md](12-water-damage-restoration-essentials.md) | DRAFT — awaiting founder review |
 | 13 | Contents & Document Recovery (Freezing & Freeze-Drying) | confirm | [13-contents-document-freeze-drying.md](13-contents-document-freeze-drying.md) | DRAFT — awaiting founder review |
+| 14 | Odour Control & Deodorisation (Air Quality & Odour) | confirm | [14-odour-control-and-deodorisation.md](14-odour-control-and-deodorisation.md) | DRAFT — awaiting founder review |
+| 15 | Antique & Fine Furniture Restoration | confirm | [15-antique-and-fine-furniture-restoration.md](15-antique-and-fine-furniture-restoration.md) | DRAFT — awaiting founder review |
 
 ### ⚠ Designation-rule correction (applied 2026-07-11)
 
