@@ -99,14 +99,8 @@ Each new course, when built, gets a full nexus-copywriter content draft (like th
 
 ## 4 · Apply notes (staged — founder applies; not seeded on deploy)
 
-- **Existing courses:** set `priceAud` to 29 or 49 per the §2 map and `isFree: false` (or keep/restore `true` for any deliberate lead magnet). No other field changes. **No Stripe changes.**
-- **New courses:** add to `data/seed/courses-catalog.json` **as a scaffold record only** with:
-  ```json
-  { "slug": "ai-for-service-businesses-practical-tools", "title": "AI for Service Businesses: Practical Tools That Win More Jobs",
-    "priceAud": 49, "isFree": false, "cecHours": 0, "iicrcDiscipline": null,
-    "category": "Grow Your Business", "status": "draft", "isPublished": false }
-  ```
-  `cecHours: 0` is mandatory (fail-closed, CLAUDE.md); `iicrcDiscipline: null` and **no** IICRC/S-standard/CEC content (business courses are non-IICRC). Publish only after the content draft + `brand-guardian`.
+- **Existing courses:** `priceAud` + `isFree: false` applied per the §2 duration map (or keep/restore `true` for any deliberate lead magnet). No other field changes. **No Stripe changes.**
+- **New courses — ✅ SCAFFOLDED (2026-07-12):** all 6 are now **draft rows in `data/seed/courses-catalog.json`** (`status: draft`, `isPublished: false`, `cecHours: 0`, `iicrcDiscipline: null`, `category: "Grow Your Business"`, `modules: []`). Prices set: the 5 business courses **$49** (`durationHours: 1.5` estimate), the capstone **$99** (`durationHours: 2.5` estimate) — durations are placeholders for unbuilt courses so the tier is self-consistent; correct them when the modules are built. **Founder to do before publish:** build the module/lesson structure (content drafts 28–33 are the source), run `brand-guardian`, then flip `isPublished`. `cecHours: 0` mandatory (fail-closed, CLAUDE.md); no IICRC/S-standard/CEC content (non-IICRC business courses).
 - **Stripe:** nothing to create. Single-purchase uses the existing inline `price_data` path; subscription already grants library-wide access, new courses included automatically on publish.
 - **Guards:** these are business courses — keep them clear of IICRC framing so `check:iicrc-terminology` / `check:iicrc-compliance` stay green (a non-IICRC course carrying S-standard/CEC text is exactly the fail-OPEN defect the guards exist to catch).
 
