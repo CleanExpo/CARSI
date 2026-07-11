@@ -22,5 +22,15 @@ nexus-copywriter standard.
 | # | Course | Slug (to confirm in DB) | Draft | Status |
 |---|---|---|---|---|
 | 1 | Australian H5 Bird Flu Awareness for Restoration, IAQ and Facility Professionals | `h5-bird-flu-awareness` (confirm) | [01-h5-bird-flu-awareness.md](01-h5-bird-flu-awareness.md) | DRAFT — awaiting founder review |
+| 2 | Introduction to Infrared Thermography for Drying | confirm | [02-infrared-thermography-for-drying.md](02-infrared-thermography-for-drying.md) | DRAFT — awaiting founder review |
+| 3 | Moisture, Mould, and Indoor Air Quality: Understanding the Link | confirm | [03-moisture-mould-and-iaq.md](03-moisture-mould-and-iaq.md) | DRAFT — awaiting founder review |
+
+**Non-CEC courses remaining (~37):** the "Not specified" CEC-value courses from the carsi.com.au
+catalog — e.g. Truckmount Operations, Water Damage Restoration Essentials, Air Scrubbers & AFDs,
+UV & Fluorescence, Antiques restoration, Submerged Items recovery, the Drying-vertical series
+(Health Care / Educational / Hospitality / Industrial / Transportation), HVAC & IAQ, Dust &
+Particulates, Air Quality & Odour, Fire & Smoke Core, Applied Structural Drying Core, Maintenance
+Toolbox Talks, Air Movers, Tile Cleaning, Large Loss Mastery, Insurance Adjusters. Processed
+newest-first as the loop continues.
 
 Batches continue across loop iterations; newest course drafts append to this ledger.
