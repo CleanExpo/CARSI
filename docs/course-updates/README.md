@@ -42,6 +42,8 @@ nexus-copywriter standard.
 | 15 | Antique & Fine Furniture Restoration | confirm | [15-antique-and-fine-furniture-restoration.md](15-antique-and-fine-furniture-restoration.md) | DRAFT — awaiting founder review |
 | 16 | Carpet & Upholstery Cleaning (Carpet Cleaning Workshop) | confirm | [16-carpet-and-upholstery-cleaning.md](16-carpet-and-upholstery-cleaning.md) | DRAFT — awaiting founder review |
 | 17 | Trauma & Biohazard Remediation — Principles | confirm | [17-trauma-and-biohazard-remediation.md](17-trauma-and-biohazard-remediation.md) | DRAFT — awaiting founder review |
+| 18 | Tile, Grout & Natural Stone Cleaning | confirm | [18-tile-grout-and-natural-stone.md](18-tile-grout-and-natural-stone.md) | DRAFT — awaiting founder review |
+| 19 | Containment & Negative-Air Control (Dust & Particulate) | confirm | [19-containment-and-negative-air.md](19-containment-and-negative-air.md) | DRAFT — awaiting founder review |
 
 ### ⚠ Designation-rule correction (applied 2026-07-11)
 
