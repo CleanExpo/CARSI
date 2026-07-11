@@ -21,6 +21,7 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import { useAuth } from '@/components/auth/auth-provider';
+import { ViewModeToggle } from '@/components/layout/ViewModeToggle';
 import { getDashboardSectionLabel, isDashboardNavActive } from '@/lib/dashboard-nav-active';
 
 type NavItem = {
@@ -79,14 +80,17 @@ export function DashboardMobileNav() {
           <p className="text-[10px] font-semibold tracking-[0.2em] text-[#146fc2] uppercase">CARSI</p>
           <p className="truncate text-sm font-semibold text-slate-950">{section}</p>
         </div>
-        <button
-          type="button"
-          onClick={() => setOpen(true)}
-          className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 text-slate-700"
-          aria-label="Open navigation menu"
-        >
-          <Menu className="h-5 w-5" aria-hidden />
-        </button>
+        <div className="flex shrink-0 items-center gap-2">
+          <ViewModeToggle tone="light" />
+          <button
+            type="button"
+            onClick={() => setOpen(true)}
+            className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 text-slate-700"
+            aria-label="Open navigation menu"
+          >
+            <Menu className="h-5 w-5" aria-hidden />
+          </button>
+        </div>
       </header>
 
       {open ? (
