@@ -40,6 +40,8 @@ nexus-copywriter standard.
 | 13 | Contents & Document Recovery (Freezing & Freeze-Drying) | confirm | [13-contents-document-freeze-drying.md](13-contents-document-freeze-drying.md) | DRAFT — awaiting founder review |
 | 14 | Odour Control & Deodorisation (Air Quality & Odour) | confirm | [14-odour-control-and-deodorisation.md](14-odour-control-and-deodorisation.md) | DRAFT — awaiting founder review |
 | 15 | Antique & Fine Furniture Restoration | confirm | [15-antique-and-fine-furniture-restoration.md](15-antique-and-fine-furniture-restoration.md) | DRAFT — awaiting founder review |
+| 16 | Carpet & Upholstery Cleaning (Carpet Cleaning Workshop) | confirm | [16-carpet-and-upholstery-cleaning.md](16-carpet-and-upholstery-cleaning.md) | DRAFT — awaiting founder review |
+| 17 | Trauma & Biohazard Remediation — Principles | confirm | [17-trauma-and-biohazard-remediation.md](17-trauma-and-biohazard-remediation.md) | DRAFT — awaiting founder review |
 
 ### ⚠ Designation-rule correction (applied 2026-07-11)
 
