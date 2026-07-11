@@ -4,7 +4,7 @@
 **Type:** Non-CEC (no IICRC discipline / CEC-hours claim)
 **Drafted:** 2026-07-11 · via nexus-copywriter standard · freshness lane: **Exa** (5 sources; Tier-1 IICRC S700 + IICRC/RIA/CIRI wildfire guide, Tier-2 trade)
 **Status:** DRAFT — founder review before any DB apply. Live DB is source of truth; never seed on deploy.
-**Data currency:** July 2026 — every figure/claim must carry a **live source link** so students can open it and obtain the **current** version. **This draft predates the URL-in-sources standard: its sources are named in the Block 2 evidence map but not yet linked — queued for the source-URL backfill pass (see README).**
+**Data currency:** July 2026 — every figure/claim carries a **live source link** (see *Sources & Get the latest* below); open the link to obtain the **current** version. Source-URL backfill **complete** (Exa pass 2026-07-12).
 
 ---
 
@@ -110,9 +110,13 @@
 
 ## Sources & Get the latest — student-facing (data current as at July 2026)
 
-> **For students — get the latest:** the sources behind each claim are named in the **Block 2 evidence map** above. Data compiled **July 2026**; standards, statistics and product specs change, so always open the current published source before relying on a figure.
->
-> ⚠️ **URL backfill pending.** This is an early-template draft — the canonical live-source **links** have not yet been added. It is queued for the July-2026 source-URL currency pass; do not publish to students until each source carries a clickable link to its current version.
+> **For students — get the latest:** every source below is a **live link**. Open it to obtain the **current** version. Data compiled **July 2026**; standards, statistics and figures change, so treat the linked source as the live source of truth and re-check before relying on a figure.
+
+- [T1] ANSI/IICRC S700 — *Standard for Professional Fire and Smoke Damage Restoration, First Edition (2025)* (published Jan 2025; a revision was opened Dec 2025 — always confirm the current edition on the official IICRC page/store before relying on it): https://iicrc.org/s700/
+- [T1] IICRC — *Press release: New Standard Published — ANSI/IICRC S700 Standard for Fire and Smoke Damage Restoration* (2 January 2025): https://iicrc.org/wp-content/uploads/2025/01/IICRC-S700-Published-Press-Release_2025.pdf
+- [T2] Restoration Intel — *Fire Damage Restoration: The Complete Professional Guide* (dated 2026; re-check the page for the latest revision): https://restorationintel.com/fire-damage-restoration-complete-professional-guide/
+- [T2] Restoration Intel — *Smoke Residue Types and Odour Elimination: The Chemistry and Science of Fire Restoration* (dated 2026): https://restorationintel.com/smoke-odor-elimination-chemistry-science-fire-restoration/
+- [T1] IICRC / RIA / CIRI — *Technical Guide for Wildfire Restoration, Version 2* (9 December 2025; the official current-version landing page is iicrc.org/iicrcresources): https://iicrc.org/wp-content/uploads/2025/12/IICRC.RIA_.CIRI-Technical-Guide-for-Wildfire-Restoration-V2-Final-2025-12.09.pdf
 
 ## Apply notes
 - Confirm slug + `id` in live DB (title "Fire & Smoke Restoration — Core Principles"). **Do not brand with the

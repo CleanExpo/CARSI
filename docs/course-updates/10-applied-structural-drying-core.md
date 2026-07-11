@@ -4,7 +4,7 @@
 **Type:** Non-CEC (no IICRC discipline / CEC-hours claim)
 **Drafted:** 2026-07-11 · via nexus-copywriter standard · freshness lane: **Exa** (5 sources; Tier-1 IICRC S500 + Tier-2 restoration technical press)
 **Status:** DRAFT — founder review before any DB apply. Live DB is source of truth; never seed on deploy.
-**Data currency:** July 2026 — every figure/claim must carry a **live source link** so students can open it and obtain the **current** version. **This draft predates the URL-in-sources standard: its sources are named in the Block 2 evidence map but not yet linked — queued for the source-URL backfill pass (see README).**
+**Data currency:** July 2026 — every figure/claim carries a **live source link** (see *Sources & Get the latest* below); open the link to obtain the **current** version. Source-URL backfill **complete** (Exa pass 2026-07-12).
 
 ---
 
@@ -105,9 +105,13 @@
 
 ## Sources & Get the latest — student-facing (data current as at July 2026)
 
-> **For students — get the latest:** the sources behind each claim are named in the **Block 2 evidence map** above. Data compiled **July 2026**; standards, statistics and product specs change, so always open the current published source before relying on a figure.
->
-> ⚠️ **URL backfill pending.** This is an early-template draft — the canonical live-source **links** have not yet been added. It is queued for the July-2026 source-URL currency pass; do not publish to students until each source carries a clickable link to its current version.
+> **For students — get the latest:** every source below is a **live link**. Open it to obtain the **current** version. Data compiled **July 2026**; standards, statistics and figures change, so treat the linked source as the live source of truth and re-check before relying on a figure.
+
+- [T1] IICRC S500 — *ANSI/IICRC S500 Standard for Professional Water Damage Restoration* (cited nominatively; current published edition is the Fifth Edition: 2021, with a 2026 revision under way — buy/confirm the current edition from the official IICRC page): https://iicrc.org/s500/
+- [T2] Restoration Intel — *Structural Drying Systems: Psychrometrics, Equipment Sizing, and LGR vs. Desiccant* (published 17 March 2026): https://restorationintel.com/structural-drying-systems-psychrometrics-lgr-desiccant-guide/
+- [T2] C&R Magazine — *Structural Drying in the Field: Bringing Chapter 12 of the S500 Standard to Life* (published 1 October 2025): https://www.candrmagazine.com/structural-drying-in-the-field-bringing-chapter-12-of-the-s500-standard-to-life/
+- [T2] MyClean Magazine — *Dry Standards and Drying Goals in Water Damage Restoration* (covers S500 §10.6.6; published 12 May 2026): https://mycleanmagazine.com/the-importance-of-moisture-targets-dry-standards-and-drying-goals-defined/
+- [T2] Tygart Media — *What the IICRC S500 2026 Revision Means for Restoration Contractors* (published 23 April 2026): https://tygartmedia.com/iicrc-s500-2026-revision-restoration-contractors/
 
 ## Apply notes
 - Confirm slug + `id` in live DB (title "Applied Structural Drying — Core Concepts). **Do not brand with the

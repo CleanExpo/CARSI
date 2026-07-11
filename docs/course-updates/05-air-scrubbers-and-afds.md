@@ -4,7 +4,7 @@
 **Type:** Non-CEC (no IICRC discipline / CEC-hours claim)
 **Drafted:** 2026-07-11 · via nexus-copywriter standard · freshness lane: **Exa** (5 sources; Tier-1 IICRC S520 + CDC, Tier-2 trade)
 **Status:** DRAFT — founder review before any DB apply. Live DB is source of truth; never seed on deploy.
-**Data currency:** July 2026 — every figure/claim must carry a **live source link** so students can open it and obtain the **current** version. **This draft predates the URL-in-sources standard: its sources are named in the Block 2 evidence map but not yet linked — queued for the source-URL backfill pass (see README).**
+**Data currency:** July 2026 — every figure/claim carries a **live source link** (see *Sources & Get the latest* below); open the link to obtain the **current** version. Source-URL backfill **complete** (Exa pass 2026-07-12).
 
 ---
 
@@ -95,9 +95,15 @@
 
 ## Sources & Get the latest — student-facing (data current as at July 2026)
 
-> **For students — get the latest:** the sources behind each claim are named in the **Block 2 evidence map** above. Data compiled **July 2026**; standards, statistics and product specs change, so always open the current published source before relying on a figure.
->
-> ⚠️ **URL backfill pending.** This is an early-template draft — the canonical live-source **links** have not yet been added. It is queued for the July-2026 source-URL currency pass; do not publish to students until each source carries a clickable link to its current version.
+> **For students — get the latest:** every source below is a **live link**. Open it to obtain the **current** version. Data compiled **July 2026**; standards, statistics and figures change, so treat the linked source as the live source of truth and re-check before relying on a figure.
+
+- [T1] IICRC S520 (E1, E2, E3, E7) — *ANSI/IICRC S520 Standard for Professional Mold Remediation* (Fourth Edition: 2024 — current; official IICRC page, cited nominatively): https://iicrc.org/s520/
+- [T2] Reets Drying Academy (E3, E4) — *How to Calculate Air Filtration Devices (AFDs) the Right Way* (published Apr 2026): https://reetsdryingacademy.com/blog/how-to-calculate-air-filtration-devices-afds-the-right-way/
+- [T2] US Cleaning Tools — calculator (E4) — *Air Scrubber Calculator* (live tool; ACH/CFM sizing): https://uscleaningtools.com/pages/air-scrubber-calculator
+- [T2] US Cleaning Tools — guide (E5, E8) — *What Are Air Exchanges Per Hour (ACH)?* (published Feb 2026; application ACH + filter cadence): https://uscleaningtools.com/blogs/guides/air-exchanges-per-hour
+- [T1] CDC (E6) — *Guidelines for Environmental Infection Control in Health-Care Facilities — Appendix B. Air, Table B.1 (ACH and time to remove airborne contaminants)*: https://www.cdc.gov/infection-control/hcp/environmental-control/appendix-b-air.html
+- [T1] EPA / 40 CFR 763 (E5, asbestos) — *eCFR Title 40 Part 763 — Asbestos* (current consolidated regulation text): https://www.ecfr.gov/current/title-40/part-763
+- [T2] ICRA (E5, active construction/demolition) — *ASHE ICRA 2.0 Matrix of Precautions for Construction, Renovation and Operations* (current toolkit): https://www.ashe.org/icra2
 
 ## Apply notes
 - Confirm slug + `id` in live DB (title "Using Air Scrubbers and AFDs to Improve Job Site Air Quality").

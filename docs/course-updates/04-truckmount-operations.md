@@ -4,7 +4,7 @@
 **Type:** Non-CEC (no IICRC discipline / CEC-hours claim)
 **Drafted:** 2026-07-11 · via nexus-copywriter standard · freshness lane: **Exa** (5 sources; Tier-1 manufacturer manuals + Tier-2 trade press)
 **Status:** DRAFT — founder review before any DB apply. Live DB is source of truth; never seed on deploy.
-**Data currency:** July 2026 — every figure/claim must carry a **live source link** so students can open it and obtain the **current** version. **This draft predates the URL-in-sources standard: its sources are named in the Block 2 evidence map but not yet linked — queued for the source-URL backfill pass (see README).**
+**Data currency:** July 2026 — every figure/claim carries a **live source link** (see *Sources & Get the latest* below); open the link to obtain the **current** version. Source-URL backfill **complete** (Exa pass 2026-07-12).
 
 ---
 
@@ -93,9 +93,12 @@
 
 ## Sources & Get the latest — student-facing (data current as at July 2026)
 
-> **For students — get the latest:** the sources behind each claim are named in the **Block 2 evidence map** above. Data compiled **July 2026**; standards, statistics and product specs change, so always open the current published source before relying on a figure.
->
-> ⚠️ **URL backfill pending.** This is an early-template draft — the canonical live-source **links** have not yet been added. It is queued for the July-2026 source-URL currency pass; do not publish to students until each source carries a clickable link to its current version.
+> **For students — get the latest:** every source below is a **live link**. Open it to obtain the **current** version. Data compiled **July 2026**; standards, statistics and figures change, so treat the linked source as the live source of truth and re-check before relying on a figure.
+
+- [T1] HydraMaster — *TITAN 575HP Truckmount* product page (manufacturer; carries the 2026 spec, page current as at July 2026 — sold in Australia via distributor Padres, padres.au): https://hydramaster.com/hydramaster-titan-575-hp-truckmount/
+- [T2] Cleanfax — *Upgraded HydraMaster TITAN 575HP Truckmount Debuts* (trade press; published 21 Apr 2026): https://cleanfax.com/upgraded-hydramaster-titan-575hp-truckmount-debuts/
+- [T1] Legend Brands (Sapphire Scientific) — *370 EFI Truckmount* product page (manufacturer; current as at July 2026): https://www.legendbrands.com/products/370-efi-truckmount
+- [T1] HydraMaster — *TITAN 375 Owner's Manual* (OEM manual, Rev A, dated 9/2025; full manuals index at hydramaster.com/manuals): https://hydramaster.com/wp-content/uploads/2025/09/MAN-47899-TITAN-375-OWNERS-MANUAL-REV_A.pdf
 
 ## Apply notes
 - Confirm slug + `id` in live DB (title "Truckmount Operations Course — HydraMaster & Sapphire Scientific").

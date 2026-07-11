@@ -30,25 +30,27 @@ nexus-copywriter standard.
 
 ### 🔗 July-2026 currency pass (applied 2026-07-12)
 
-All 35 drafts stamped `**Data currency:** July 2026`. Drafts **12–35** carry live source URLs — their
-Sources block was relabelled `Sources & Get the latest — student-facing` with a click-through lead for
-students. Drafts **01–11** are early-template drafts that cite sources **by name only (0 URLs)** — they carry
-the stamp + an explicit ⚠ *URL backfill pending* section and are **not publish-ready** until each source is
-linked. **Source-URL backfill queue (Exa currency pass, one/two per loop iteration):**
+All 35 drafts stamped `**Data currency:** July 2026`, and **all now carry live student-facing source URLs**
+in a `Sources & Get the latest — student-facing` block. Drafts **12–35** were URL-bearing from drafting;
+drafts **01–11** (early-template, sources named only) were **backfilled via Exa on 2026-07-12** — every named
+source now resolves to its current canonical live page (official/authoritative first, AU-first where a source
+exists; IICRC/ASTM/ASHRAE standards cited nominatively to official pages only, never pirated copies).
+
+**Source-URL backfill queue — ✅ COMPLETE (Exa pass 2026-07-12):**
 
 | Draft | Course | Backfill status |
 |---|---|---|
-| 01 | avian-influenza-awareness | pending — named sources: WHO/WOAH, AU Dept Health, state health |
-| 02 | infrared-thermography-for-drying | pending — ASTM/IICRC-nominative + industry |
-| 03 | moisture-mould-and-iaq | ✅ **backfilled 2026-07-12** — WA Health (Feb 2024) + ABCB Condensation handbook v4.0 (May 2026, NCC 2025) + WHO 2009, all linked |
-| 04 | truckmount-operations | pending — equipment/industry (non-IICRC) |
-| 05 | air-scrubbers-and-afds | pending — AHAM/industry IAQ |
-| 06 | water-damage-litigation-support | pending — legal/insurance industry |
-| 07 | large-loss-mastery | pending — industry/insurance |
-| 08 | uv-light-and-fluorescence | pending — scientific/industry |
-| 09 | fire-and-smoke-core-principles | pending — S700(2025)-nominative + industry |
-| 10 | applied-structural-drying-core | pending — psychrometrics/industry |
-| 11 | hvac-systems-and-iaq | pending — ASHRAE/industry IAQ |
+| 01 | avian-influenza-awareness | ✅ 5 links — Wildlife Health Australia (live, 9 Jul 2026) + WA Health clinician alert (Jun 2026) + NSW Gov + Australian CDC + DAFF |
+| 02 | infrared-thermography-for-drying | ✅ 7 links — ASTM E3216-26 / C1153-23 (official store) + IICRC S500 nominative + SGH + industry |
+| 03 | moisture-mould-and-iaq | ✅ WA Health (Feb 2024) + ABCB Condensation handbook v4.0 (May 2026, NCC 2025) + WHO 2009 |
+| 04 | truckmount-operations | ✅ 4 links — HydraMaster TITAN 575HP/375 + Sapphire 370 EFI (OEM) + Cleanfax (Apr 2026); non-IICRC kept clean |
+| 05 | air-scrubbers-and-afds | ✅ 7 links — IICRC S520 (official) + Reets + CDC Appendix B + EPA 40 CFR 763 + ASHE ICRA |
+| 06 | water-damage-litigation-support | ✅ 5 links — IICRC S500 (official) + 8th Cir. opinion (Nov 2025) + Cornell LII FRE 702/703 (US, illustrative) + industry |
+| 07 | large-loss-mastery | ✅ 3 links — Restoration Intel (Mar 2026) + Palm Build (Jun 2026) + Tygart Media (Apr 2026) |
+| 08 | uv-light-and-fluorescence | ✅ 4 links — Spectro-UV + J.Imaging 2025 (DOI) + UVET + J.Forensic.Sci 2020 (PMC) |
+| 09 | fire-and-smoke-core-principles | ✅ 5 links — IICRC S700 (2025, official) + press release + IICRC/RIA/CIRI wildfire guide v2 (Dec 2025) + industry |
+| 10 | applied-structural-drying-core | ✅ 5 links — IICRC S500 (official) + Restoration Intel (Mar 2026) + C&R Mag + MyClean (May 2026) + Tygart |
+| 11 | hvac-systems-and-iaq | ✅ 9 links — ASHRAE 62.1/62.2/52.2/180/241 (2025 eds) + EPA IAQ (MERV/HEPA/air-cleaners) + NADCA ACR 2025 |
 
 ## Status ledger
 

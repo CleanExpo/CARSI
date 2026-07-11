@@ -4,7 +4,7 @@
 **Type:** Non-CEC (no IICRC discipline / CEC-hours claim)
 **Drafted:** 2026-07-11 · via nexus-copywriter standard · freshness lane: **Exa** (5 sources; Tier-1 IICRC + US Court of Appeals opinion, Tier-2 trade)
 **Status:** DRAFT — founder review before any DB apply. Live DB is source of truth; never seed on deploy.
-**Data currency:** July 2026 — every figure/claim must carry a **live source link** so students can open it and obtain the **current** version. **This draft predates the URL-in-sources standard: its sources are named in the Block 2 evidence map but not yet linked — queued for the source-URL backfill pass (see README).**
+**Data currency:** July 2026 — every figure/claim carries a **live source link** (see *Sources & Get the latest* below); open the link to obtain the **current** version. Source-URL backfill **complete** (Exa pass 2026-07-12).
 
 > ⚠ **Jurisdiction note (important):** the strongest sources here are US (IICRC standards, US Federal Rules of Evidence, a US appeals-court case). The *principles* — contemporaneous documentation, intrusive inspection, establishing timing, standard-of-care — transfer to Australia, but **US procedural law (Daubert, FRE 702/703) is NOT Australian law.** Draft below teaches the transferable discipline and labels the US-specific items as illustrative, not as AU legal advice.
 
@@ -94,9 +94,13 @@
 
 ## Sources & Get the latest — student-facing (data current as at July 2026)
 
-> **For students — get the latest:** the sources behind each claim are named in the **Block 2 evidence map** above. Data compiled **July 2026**; standards, statistics and product specs change, so always open the current published source before relying on a figure.
->
-> ⚠️ **URL backfill pending.** This is an early-template draft — the canonical live-source **links** have not yet been added. It is queued for the July-2026 source-URL currency pass; do not publish to students until each source carries a clickable link to its current version.
+> **For students — get the latest:** every source below is a **live link**. Open it to obtain the **current** version. Data compiled **July 2026**; standards, statistics and figures change, so treat the linked source as the live source of truth and re-check before relying on a figure.
+
+- [T1] IICRC — *ANSI/IICRC S500 Standard for Professional Water Damage Restoration* (official standard page; open it for the current published edition — standard of care is judged against the most current version): https://iicrc.org/s500/
+- [T2] Tygart Media — *What the IICRC S500 2026 Revision Means for Restoration Contractors* (trade analysis, published Apr 2026; source for the S500 2026 documentation / Category-Class / S500↔S520 changes): https://tygartmedia.com/iicrc-s500-2026-revision-restoration-contractors/
+- [T2] Gary Rosen, Ph.D. — *Anatomy of an ANSI/IICRC S500-2021 Compliant Water Damage Inspection* (white paper citing S500-2021 §1.2.2.1 on "should" = required, intrusive + immediate inspection; Rev. 7-12-24): https://www.d-d-r-s.org/wp-content/uploads/2025/04/Anatomy-of-a-Water-Damage-Inspection-Rev-7-12-24.pdf
+- [T1] US Court of Appeals, 8th Circuit — *Bliv, Inc. v. The Charter Oak Fire Insurance Company*, No. 24-3123 (published opinion filed 12 Nov 2025; the excluded-expert case) — **US law, illustrative only**: https://ecf.ca8.uscourts.gov/opndir/25/11/243123P.pdf
+- [T1] Legal Information Institute (Cornell Law School) — *Federal Rules of Evidence: Rule 702 (Testimony by Expert Witnesses) and Rule 703 (Bases of an Expert's Opinion Testimony)* (official free text; kept current with amendments) — **US law, illustrative only**: https://www.law.cornell.edu/rules/fre/rule_702 and https://www.law.cornell.edu/rules/fre/rule_703
 
 ## Apply notes
 - Confirm slug + `id` in live DB (title "Introduction to Water Damage Litigation Support").

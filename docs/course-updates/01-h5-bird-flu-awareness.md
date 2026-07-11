@@ -4,7 +4,7 @@
 **Type:** Non-CEC (no IICRC discipline / CEC-hours claim)
 **Drafted:** 2026-07-11 · via nexus-copywriter standard · freshness lane: **Exa** (6 Tier-1 sources fetched)
 **Status:** DRAFT — founder review before any DB apply. Live DB is source of truth; never seed on deploy.
-**Data currency:** July 2026 — every figure/claim must carry a **live source link** so students can open it and obtain the **current** version. **This draft predates the URL-in-sources standard: its sources are named in the Block 2 evidence map but not yet linked — queued for the source-URL backfill pass (see README).**
+**Data currency:** July 2026 — every figure/claim carries a **live source link** (see *Sources & Get the latest* below); open the link to obtain the **current** version. Source-URL backfill **complete** (Exa pass 2026-07-12).
 
 ---
 
@@ -131,9 +131,13 @@ wild seabirds; here is the current picture and your role."
 
 ## Sources & Get the latest — student-facing (data current as at July 2026)
 
-> **For students — get the latest:** the sources behind each claim are named in the **Block 2 evidence map** above. Data compiled **July 2026**; standards, statistics and product specs change, so always open the current published source before relying on a figure.
->
-> ⚠️ **URL backfill pending.** This is an early-template draft — the canonical live-source **links** have not yet been added. It is queued for the July-2026 source-URL currency pass; do not publish to students until each source carries a clickable link to its current version.
+> **For students — get the latest:** every source below is a **live link**. Open it to obtain the **current** version. Data compiled **July 2026**; standards, statistics and figures change, so treat the linked source as the live source of truth and re-check before relying on a figure.
+
+- [T1] Wildlife Health Australia — *Incident – H5N1 high pathogenicity avian influenza (H5 bird flu) in migratory seabirds, Australia (ongoing)* (national wildlife-health incident page, updated 9 Jul 2026 — carries the live case count): https://wildlifehealthaustralia.com.au/Incidents/Incident-Information/incident-h5n1-high-pathogenicity-avian-influenza-h5-bird-flu-in-migratory-seabirds-australia-ongoing
+- [T1] WA Department of Health — *Alert for Clinicians: Detection of H5N1 avian influenza in seabirds near Esperance, WA* (state clinician alert PDF, 24 Jun 2026): https://pch.health.wa.gov.au/~/media/Corp/Documents/Health-for/Infectious-disease-alerts/2026/Clinician-alert-Detection-of-H5N1-avian-influenza-June-2026.pdf
+- [T1] NSW Government — *H5 avian influenza preparedness* (state preparedness page, updated 8 Jul 2026): https://www.nsw.gov.au/emergency/h5-avian-influenza-preparedness
+- [T1] Australian CDC (Centre for Disease Control) — *Bird flu (avian influenza)* (national health-risk page, updated 25 Feb 2026): https://www.cdc.gov.au/diseases/bird-flu-avian-influenza
+- [T1] Department of Agriculture, Fisheries and Forestry (DAFF) — *Bird flu (Avian influenza)* (national bird-flu page + Emergency Animal Disease Hotline 1800 675 888, updated 5 Jul 2026): https://www.agriculture.gov.au/biosecurity-trade/pests-diseases-weeds/animal/avian-influenza
 
 ## Apply notes (for the deliberate, separate apply step — NOT automatic)
 

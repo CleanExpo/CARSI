@@ -4,7 +4,7 @@
 **Type:** Non-CEC (no IICRC discipline / CEC-hours claim)
 **Drafted:** 2026-07-11 · via nexus-copywriter standard · freshness lane: **Exa** (5 sources; Tier-1 ASHRAE/NADCA standards, Tier-2 HVAC/IAQ technical press)
 **Status:** DRAFT — founder review before any DB apply. Live DB is source of truth; never seed on deploy.
-**Data currency:** July 2026 — every figure/claim must carry a **live source link** so students can open it and obtain the **current** version. **This draft predates the URL-in-sources standard: its sources are named in the Block 2 evidence map but not yet linked — queued for the source-URL backfill pass (see README).**
+**Data currency:** July 2026 — every figure/claim carries a **live source link** (see *Sources & Get the latest* below); open the link to obtain the **current** version. Source-URL backfill **complete** (Exa pass 2026-07-12).
 
 ---
 
@@ -114,9 +114,17 @@
 
 ## Sources & Get the latest — student-facing (data current as at July 2026)
 
-> **For students — get the latest:** the sources behind each claim are named in the **Block 2 evidence map** above. Data compiled **July 2026**; standards, statistics and product specs change, so always open the current published source before relying on a figure.
->
-> ⚠️ **URL backfill pending.** This is an early-template draft — the canonical live-source **links** have not yet been added. It is queued for the July-2026 source-URL currency pass; do not publish to students until each source carries a clickable link to its current version.
+> **For students — get the latest:** every source below is a **live link**. Open it to obtain the **current** version. Data compiled **July 2026**; standards, statistics and figures change, so treat the linked source as the live source of truth and re-check before relying on a figure.
+
+- [T1] ASHRAE Standards 62.1 & 62.2 — *Ventilation and Acceptable Indoor Air Quality* (current editions 62.1-2025 / 62.2-2025; the 2025 edition of 62.2 raised the residential minimum filter from MERV 6 to MERV 11): https://www.ashrae.org/technical-resources/bookstore/standards-62-1-62-2
+- [T1] ASHRAE — *Free read-only versions of ASHRAE standards* (open 62.1-2025 and 62.2-2025 at no cost to confirm the current edition): https://www.ashrae.org/technical-resources/standards-and-guidelines/read-only-versions-of-ashrae-standards
+- [T1] ASHRAE Standard 52.2 — *Method of Testing General Ventilation Air-Cleaning Devices for Removal Efficiency by Particle Size* (defines the MERV 1–16 scale; current edition 52.2-2025): https://tpc.ashrae.org/?cmtKey=2eafbbbc-35c9-4d85-8bca-367548cb318e
+- [T1] ASHRAE Standard 180 — *Standard Practice for Inspection and Maintenance of Commercial Building HVAC Systems* (current edition 180-2018; shared page with Standard 211): https://www.ashrae.org/technical-resources/bookstore/standards-180-and-211
+- [T1] ASHRAE Standard 241 — *Control of Infectious Aerosols* (current edition 241-2023; equivalent-clean-airflow targets, mechanical filters ≥ MERV-A 11): https://www.ashrae.org/technical-resources/bookstore/ashrae-standard-241-control-of-infectious-aerosols
+- [T1] US EPA — *What is a MERV rating?* (Indoor Air Quality; MERV reports capture of 0.3–10 µm particles, based on ASHRAE 52.2): https://www.epa.gov/indoor-air-quality-iaq/what-merv-rating
+- [T1] US EPA — *Guide to Air Cleaners in the Home* (HVAC/furnace filters; use the highest MERV the system accepts; MERV 13+ demonstrate ≥ 50% removal of the smallest particles tested): https://www.epa.gov/indoor-air-quality-iaq/guide-air-cleaners-home
+- [T1] US EPA — *What is a HEPA filter?* (US Department of Energy definition: ≥ 99.97% capture at 0.3 µm, the most-penetrating particle size): https://www.epa.gov/indoor-air-quality-iaq/what-hepa-filter
+- [T1] NADCA — *ACR, The NADCA Standard for Assessment, Cleaning & Restoration of HVAC Systems* (current edition 2025; free copy download): https://acrstandard.nadca.com/
 
 ## Apply notes
 - Confirm slug + `id` in live DB (title "HVAC Systems and Indoor Air Quality").

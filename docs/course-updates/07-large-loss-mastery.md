@@ -4,7 +4,7 @@
 **Type:** Non-CEC (no IICRC discipline / CEC-hours claim)
 **Drafted:** 2026-07-11 · via nexus-copywriter standard · freshness lane: **Exa** (5 sources; Tier-2 restoration trade + IICRC S500 for the standard)
 **Status:** DRAFT — founder review before any DB apply. Live DB is source of truth; never seed on deploy.
-**Data currency:** July 2026 — every figure/claim must carry a **live source link** so students can open it and obtain the **current** version. **This draft predates the URL-in-sources standard: its sources are named in the Block 2 evidence map but not yet linked — queued for the source-URL backfill pass (see README).**
+**Data currency:** July 2026 — every figure/claim carries a **live source link** (see *Sources & Get the latest* below); open the link to obtain the **current** version. Source-URL backfill **complete** (Exa pass 2026-07-12).
 
 ---
 
@@ -97,9 +97,11 @@
 
 ## Sources & Get the latest — student-facing (data current as at July 2026)
 
-> **For students — get the latest:** the sources behind each claim are named in the **Block 2 evidence map** above. Data compiled **July 2026**; standards, statistics and product specs change, so always open the current published source before relying on a figure.
->
-> ⚠️ **URL backfill pending.** This is an early-template draft — the canonical live-source **links** have not yet been added. It is queued for the July-2026 source-URL currency pass; do not publish to students until each source carries a clickable link to its current version.
+> **For students — get the latest:** every source below is a **live link**. Open it to obtain the **current** version. Data compiled **July 2026**; standards, statistics and figures change, so treat the linked source as the live source of truth and re-check before relying on a figure.
+
+- [T2] Restoration Intel — *Commercial Water Damage Restoration: Large Loss Protocol, Business Continuity, and Scope Management* (published Mar 2026; open for the current version) — backs E1, E2, E4, E5, E7: https://restorationintel.com/commercial-water-damage-restoration-large-loss-protocol/
+- [T2] Palm Build — *Large Loss vs Standard Claim: What Changes* (published Jun 2026; open for the current version) — backs E1 thresholds, E3 (TPA role), E6 (documentation depth): https://www.palmbld.com/blog/large-loss-vs-standard-restoration-claim
+- [T2] Tygart Media — *The Documented Mitigation Prep Standard: The Operational Artifact Almost No Restoration Company Actually Has* (published Apr 2026; open for the current version) — backs E8 (handoff + quarterly-revised 10–20pp prep standard): https://tygartmedia.com/documented-mitigation-prep-standard/
 
 ## Apply notes
 - Confirm slug + `id` in live DB (title "Large Loss Mastery Course").
