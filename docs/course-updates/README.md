@@ -16,6 +16,10 @@ nexus-copywriter standard.
   no CEC-hours or IICRC-approval claim.
 - **Evidence-tagged.** Every added fact carries a source URL + tier + `[VERIFIED]`/`[INFERENCE]`
   tag per the nexus-copywriter M-1 standard. AU English throughout.
+- **CEC is fail-closed on apply.** These drafts add learning content to **existing** non-CEC courses and
+  make **no** `cecHours` claim. If applying a draft ever creates a **new** catalogue row, it MUST ship
+  `cecHours: 0` in `data/seed/courses-catalog.json` (the explicit "not CEC-approved" opt-out) per CLAUDE.md
+  — never a duration-derived value. Only the founder flips a course to its IICRC-approved hours.
 
 ## Status ledger
 
