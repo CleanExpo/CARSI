@@ -18,31 +18,44 @@
 
 ---
 
-## 2 · Proposed pricing model — two shared price points
+## 2 · Pricing model — by course duration (founder rule, 2026-07-12) — APPLIED
 
-Today's catalogue is inconsistent: **32 free, 3 × $29, 1 × $28.98, 1 × $28.97.** The odd cents and the mostly-free state mean there's no coherent single-purchase price. Proposal — **two numbers only**, so "same numbers" holds and the value ladder is obvious:
+**The rule (founder GO 2026-07-12):** price is set by course length. Three numbers only:
 
-| Tier | Price (AUD) | What sits here | Rationale |
+| Tier | Price (AUD) | Duration rule | Subscription |
 |---|---|---|---|
-| **Essentials** | **$29** | short *"Introduction to…"* / single-topic awareness micro-courses | matches the existing clean $29 point; normalises the $28.97/$28.98 oddities |
-| **Professional** | **$49** | credential-bearing *"CARSI … Practitioner"* / Fundamentals courses, specialised operational courses, **and the 5 new Business & AI courses** | the $49 the new courses need; higher value = a real credential or business outcome |
-| **Build** | **$99** | the capstone build-and-setup course (**Modern Websites & AI Websites**, draft 33) — hands-on, includes a guided AI-Website build session | double the skills tier because it's a build course with a setup session and a done-for-you upsell path |
-| **Subscription** | monthly / yearly (existing plans) | **all courses, all tiers** | already built (`full_library`); the all-you-can-learn unlock |
+| **Essentials** | **$29** | **≤ 1 hour** | included |
+| **Professional** | **$49** | **> 1 hour to 2 hours** | included |
+| **Build** | **$99** | **> 2 hours** | included |
+| **Subscription** | monthly / yearly (existing plans) | **unlocks all courses, all tiers** — already built (`full_library`) | — |
 
-Four "numbers" total ($29, $49, $99, + the subscription plans). Every course maps to one of the three price points — **no per-course Stripe object at any tier** (inline `price_data` keyed on the number).
+Three "numbers" total ($29 / $49 / $99) plus the subscription plans. Every course maps to one by its
+`durationHours` — **no per-course Stripe object at any tier** (single-purchase uses inline `price_data` keyed on
+the number; §1). Boundary reading: exactly 1h = $29; exactly 2h = $49; anything over 2h = $99.
+
+**Applied to `data/seed/courses-catalog.json` (staged; not seeded on deploy):** `priceAud` set + `isFree: false`
+on all 37 courses. Odd-cent legacy prices ($28.97 / $28.98) normalised to $29.
+
+### Result — all 37 courses (17 by set `durationHours`, 20 estimated ⚠)
+
+**→ $99 Build — > 2h (15, all durations SET):**
+`water-damage-restoration-fundamentals` (4h) · `mould-remediation-fundamentals` (5h) · `structural-drying-fundamentals` (4h) · `category-3-sewage-black-water-remediation` (4h) · `psychrometry-building-science-for-drying` (4h) · `fire-smoke-damage-restoration-fundamentals` (4h) · `trauma-crime-scene-decontamination-fundamentals` (4h) · `carpet-cleaning-technician-fundamentals` (4h) · `timber-floor-assessment-restoration` (4h) · `assessing-indoor-environment-conditions` (4h) · `asbestos-awareness-for-restoration-technicians` (3h) · `whs-fundamentals-for-restoration-and-cleaning-professionals` (3h) · `ccw-carsi-truckmount-operations` (6h) · `commercial-floor-care-schools-childcare` (6h) · `floor-care-onboarding-operational-readiness` (8h)
+
+**→ $49 Professional — > 1h to 2h (6):**
+`wrt-water-damage-essentials` (2h, SET) · `air-quality-and-odour-identification-and-deodorisation-essentials` (⚠~2h, 10 lessons) · `dust-and-particulates-in-indoor-air-control-and-cleaning-strategies` (⚠~2h, 10) · `hvac-systems-and-indoor-air-quality-what-every-technician-should-know` (⚠~2h, 10) · `moisture-mould-and-indoor-air-quality-understanding-the-link` (⚠~2h, 10) · `using-air-scrubbers-and-afds-to-improve-job-site-air-quality` (⚠~2h, 10)
+
+**→ $29 Essentials — ≤ 1h (16):**
+`avian-influenza-awareness-restoration-iaq-facilities` (1h, SET) · `documenting-and-reporting-air-quality-improvements` (⚠~1h, 5 lessons) · `introduction-to-air-quality-fundamentals` (⚠~1h, 5) · `introduction-to-creating-a-clean-air-environment-…-final-clearance` (⚠~1h, 5) · `introduction-to-drying-educational-and-institutional-sites` (⚠~1h, 5) · `introduction-to-drying-health-care-facilities` (⚠~1h, 5) · `introduction-to-drying-hospitality-and-lodging-sites` (⚠~1h, 5) · `introduction-to-drying-industrial-and-manufacturing-sites` (⚠~1h, 5) · `introduction-to-drying-transportation-and-vehicles` (⚠~1h, 5) · `introduction-to-iaq-and-mould-understanding-airborne-spread-and-containment` (⚠~1h, 5) · `introduction-to-improving-indoor-air-quality-after-water-damage` (⚠~1h, 5) · `introduction-to-infrared-thermography-for-drying` (⚠~1h, 5) · `introduction-to-recovery-of-submerged-items-and-contents` (⚠~1h, 5) · `introduction-to-restoration-of-antiques-and-fine-furnishings` (⚠~1h, 5) · `introduction-to-ultraviolet-light-and-fluorescence` (⚠~1h, 5) · `introduction-to-water-damage-litigation-support` (⚠~1h, 5)
+
+**⚠ 20 courses have `durationHours: null`** — priced from lesson count as a proxy (≤5 lessons → ~1h → $29; 6–10
+lessons → ~2h → $49; no lesson-level durations exist in the data). **Founder action:** confirm the real duration
+for these 20 and correct any tier before apply — a course whose true length crosses a boundary moves a tier. The
+17 courses with a set `durationHours` are deterministic.
 
 ### One commercially-weighty call, flagged (not blocking)
-32 courses are currently **free**; "all courses need a price" makes them **paid** ($29 or $49 per the tier map below). That converts free intro courses into paid + subscription-included. Recommended and applied in this proposal, because the subscription still gives them away to members and standalone pricing ends the "everything's free" leak. **This is the one line to consciously confirm at review** — flip any course back to `isFree: true` if it's meant to stay a lead magnet.
-
-### Full tier map (current → proposed) — all 37 existing courses
-
-**→ $49 Professional (16):**
-`wrt-water-damage-essentials` · `water-damage-restoration-fundamentals` · `mould-remediation-fundamentals` · `structural-drying-fundamentals` · `category-3-sewage-black-water-remediation` · `psychrometry-building-science-for-drying` · `fire-smoke-damage-restoration-fundamentals` · `trauma-crime-scene-decontamination-fundamentals` · `carpet-cleaning-technician-fundamentals` · `timber-floor-assessment-restoration` · `assessing-indoor-environment-conditions` · `asbestos-awareness-for-restoration-technicians` · `whs-fundamentals-for-restoration-and-cleaning-professionals` · `ccw-carsi-truckmount-operations` · `commercial-floor-care-schools-childcare` · `floor-care-onboarding-operational-readiness`
-
-**→ $29 Essentials (21):**
-`air-quality-and-odour-identification-and-deodorisation-essentials` · `documenting-and-reporting-air-quality-improvements` · `dust-and-particulates-in-indoor-air-control-and-cleaning-strategies` · `hvac-systems-and-indoor-air-quality-what-every-technician-should-know` · `introduction-to-air-quality-fundamentals` · `introduction-to-creating-a-clean-air-environment-best-practices-for-final-clearance` · `introduction-to-drying-educational-and-institutional-sites` · `introduction-to-drying-health-care-facilities` · `introduction-to-drying-hospitality-and-lodging-sites` · `introduction-to-drying-industrial-and-manufacturing-sites` · `introduction-to-drying-transportation-and-vehicles` · `introduction-to-iaq-and-mould-understanding-airborne-spread-and-containment` · `introduction-to-improving-indoor-air-quality-after-water-damage` · `introduction-to-infrared-thermography-for-drying` · `introduction-to-recovery-of-submerged-items-and-contents` · `introduction-to-restoration-of-antiques-and-fine-furnishings` · `introduction-to-ultraviolet-light-and-fluorescence` · `introduction-to-water-damage-litigation-support` · `moisture-mould-and-indoor-air-quality-understanding-the-link` · `using-air-scrubbers-and-afds-to-improve-job-site-air-quality` · `avian-influenza-awareness-restoration-iaq-facilities`
-
-*(Tier calls are eyeball-adjustable — move any slug between the two lists at review; the price is just the number.)*
+32 courses were **free**; the rule makes them **paid**. The subscription still gives them to members, and standalone
+pricing ends the "everything's free" leak. Applied in the staged file — **flip any course back to `isFree: true` at
+review if it's meant to stay a lead magnet.**
 
 ---
 
