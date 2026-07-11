@@ -11,8 +11,11 @@
  *
  * Loads `.env` when present via dotenv/config.
  *
- * Suggested deploy:
- *   npx prisma migrate deploy && npm run db:seed-courses && npm run start
+ * MANUAL ONLY — do NOT wire this into the deploy/boot path. Production boot (`start:production`)
+ * applies migrations and starts the server without seeding; the live DB is the source of truth
+ * for course content, so seeding at deploy would overwrite manually-curated prod rows (GP-503).
+ * Run only for a deliberate, reviewed re-seed:
+ *   DATABASE_URL="postgresql://..." npm run db:seed-courses
  */
 import 'dotenv/config';
 

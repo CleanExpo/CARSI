@@ -1,14 +1,17 @@
 /**
- * Seed ALL course knowledge-check quizzes as part of the deploy boot path (GP-484).
+ * Seed ALL course knowledge-check quizzes from the repo's seed data (GP-484).
  *
- * Runs after `db:seed-courses` inside `start:with-course-seed`, so every deploy converges
- * prod quizzes with the repo's seed data. Each quiz file follows the shared schema
- * (`courseSlug`, `quizzes[]` with `quizId/title/passPercentage/attemptsAllowed/questions[]`)
- * used by seed-h5-bird-flu-quiz.ts / seed-floor-care-quizzes.ts /
- * seed-commercial-floor-care-quiz.ts, which remain for targeted one-off runs.
+ * MANUAL ONLY — this does NOT run at deploy. The production boot path is `start:production`
+ * (do-migrate.sh → node server.js), which applies Prisma migrations and never seeds course
+ * content; the live DB is the source of truth for quizzes/courses (GP-503). Run this by hand
+ * only for a deliberate, reviewed re-seed (it also runs inside the manual `start:with-course-seed`
+ * convenience script). Each quiz file follows the shared schema (`courseSlug`, `quizzes[]` with
+ * `quizId/title/passPercentage/attemptsAllowed/questions[]`) used by seed-h5-bird-flu-quiz.ts /
+ * seed-floor-care-quizzes.ts / seed-commercial-floor-care-quiz.ts, which remain for targeted
+ * one-off runs.
  *
  * FAULT-TOLERANT BY DESIGN: this script always exits 0. A bad quiz file or a missing course
- * must never stop `next start` from running — a boot-blocking seeder would take prod down.
+ * must never stop the process it is run alongside — a boot-blocking seeder would take prod down.
  * Failures are logged loudly and the affected quiz is skipped.
  *
  * Idempotent: upserts each quiz by its stable id and replaces its questions.
