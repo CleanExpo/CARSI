@@ -50,6 +50,8 @@ nexus-copywriter standard.
 | 23 | Crawl Space & Subfloor Moisture Control | confirm | [23-crawl-space-and-subfloor-moisture.md](23-crawl-space-and-subfloor-moisture.md) | DRAFT — awaiting founder review |
 | 24 | PPE & Respiratory Protection | confirm | [24-ppe-and-respiratory-protection.md](24-ppe-and-respiratory-protection.md) | DRAFT — awaiting founder review |
 | 25 | Pet Urine & Odour Decontamination | confirm | [25-pet-urine-and-odour-decontamination.md](25-pet-urine-and-odour-decontamination.md) | DRAFT — awaiting founder review |
+| 26 | Dehumidifier Selection & Psychrometrics (LGR vs Desiccant) | confirm | [26-dehumidifier-selection-psychrometrics.md](26-dehumidifier-selection-psychrometrics.md) | DRAFT — awaiting founder review |
+| 27 | Moisture Measurement & Documentation | confirm | [27-moisture-measurement-and-documentation.md](27-moisture-measurement-and-documentation.md) | DRAFT — awaiting founder review |
 
 ### ⚠ Designation-rule correction (applied 2026-07-11)
 
