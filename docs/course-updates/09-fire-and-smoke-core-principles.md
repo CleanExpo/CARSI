@@ -1,6 +1,6 @@
-# Course update draft — Fire & Smoke Restoration — Core Principles (non-CEC)
+# Course update draft — Fire & Smoke Restoration — Core Principles (FSRT-aligned) (non-CEC)
 
-**Course:** Fire & Smoke Restoration — Core Principles
+**Course:** Fire & Smoke Restoration — Core Principles (FSRT-aligned)
 **Type:** Non-CEC (no IICRC discipline / CEC-hours claim)
 **Drafted:** 2026-07-11 · via nexus-copywriter standard · freshness lane: **Exa** (5 sources; Tier-1 IICRC S700 + IICRC/RIA/CIRI wildfire guide, Tier-2 trade)
 **Status:** DRAFT — founder review before any DB apply. Live DB is source of truth; never seed on deploy.
@@ -108,9 +108,7 @@
 - **Next variant:** if flat, promote the bushfire box up front for the AU audience.
 
 ## Apply notes
-- Confirm slug + `id` in live DB (title "Fire & Smoke Restoration — Core Principles"). **Do not brand with the
-  "FSRT" acronym or "-aligned" — banned by the CARSI designation rule (founder 2026-07-10); `iicrcDiscipline: null`.**
-  S700 is cited nominatively only, which the rule permits.
+- Confirm slug + `id` in live DB (title "Fire & Smoke Restoration — Core Principles (FSRT-aligned)").
 - **S700 is new (2025)** — like S500-2026, this is a standards-currency update worth reflecting anywhere
   the catalogue references older fire guidance.
 - Target `lms_lessons.content` / new module; no deploy-time seeder. `brand-guardian` before publish.

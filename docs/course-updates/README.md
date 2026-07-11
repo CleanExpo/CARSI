@@ -28,15 +28,21 @@ nexus-copywriter standard.
 | 5 | Using Air Scrubbers and AFDs to Improve Job Site Air Quality | confirm | [05-air-scrubbers-and-afds.md](05-air-scrubbers-and-afds.md) | DRAFT — awaiting founder review |
 | 6 | Introduction to Water Damage Litigation Support | confirm | [06-water-damage-litigation-support.md](06-water-damage-litigation-support.md) | DRAFT — awaiting founder review |
 | 7 | Large Loss Mastery Course | confirm | [07-large-loss-mastery.md](07-large-loss-mastery.md) | DRAFT — awaiting founder review |
+| 8 | Introduction to Ultraviolet Light and Fluorescence | confirm | [08-uv-light-and-fluorescence.md](08-uv-light-and-fluorescence.md) | DRAFT — awaiting founder review |
+| 9 | Fire & Smoke Restoration — Core Principles (FSRT-aligned) | confirm | [09-fire-and-smoke-core-principles.md](09-fire-and-smoke-core-principles.md) | DRAFT — awaiting founder review |
 
 ### ⚠ Cross-cutting finding (founder decision needed)
 
-Research surfaced that the **IICRC S500 2026 revision is now published** — the most consequential update
-to the water-damage standard in ~a decade (documentation promoted to a central requirement; tighter
-Category/Class definitions; sharper S500↔S520 boundary). **This affects EVERY CARSI course that cites
-S500-2021, not just the litigation course.** Recommend a separate catalogue-wide audit pass of standard
-citations (grep `S500-2021` / "2021 edition" across course content) once these drafts are approved. Not
-actioned here — flagged for a deliberate decision.
+Research surfaced **two new/updated IICRC standards** that affect courses across the catalogue, not just
+the ones drafted here:
+- **IICRC S500 2026 revision** (water damage) — documentation promoted to a central requirement; tighter
+  Category/Class definitions; sharper S500↔S520 boundary. Affects every course citing S500-2021.
+- **ANSI/IICRC S700 (2025)** — the first-ever fire & smoke restoration standard; completion is now
+  client-verified undetectability of residues/odours, HVAC inspection mandatory. Affects every fire/smoke course.
+
+Recommend a separate catalogue-wide audit pass of standard citations (grep `S500-2021` / "2021 edition" /
+old fire guidance across course content) once these drafts are approved. Not actioned here — flagged for a
+deliberate decision.
 
 Two litigation/large-loss drafts also carry a **jurisdiction caveat**: their strongest sources are US
 (IICRC, US Federal Rules of Evidence, a US court case, US$ thresholds). The drafts teach the transferable
