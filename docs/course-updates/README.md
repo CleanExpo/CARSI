@@ -29,7 +29,18 @@ nexus-copywriter standard.
 | 6 | Introduction to Water Damage Litigation Support | confirm | [06-water-damage-litigation-support.md](06-water-damage-litigation-support.md) | DRAFT — awaiting founder review |
 | 7 | Large Loss Mastery Course | confirm | [07-large-loss-mastery.md](07-large-loss-mastery.md) | DRAFT — awaiting founder review |
 | 8 | Introduction to Ultraviolet Light and Fluorescence | confirm | [08-uv-light-and-fluorescence.md](08-uv-light-and-fluorescence.md) | DRAFT — awaiting founder review |
-| 9 | Fire & Smoke Restoration — Core Principles (FSRT-aligned) | confirm | [09-fire-and-smoke-core-principles.md](09-fire-and-smoke-core-principles.md) | DRAFT — awaiting founder review |
+| 9 | Fire & Smoke Restoration — Core Principles | confirm | [09-fire-and-smoke-core-principles.md](09-fire-and-smoke-core-principles.md) | DRAFT — awaiting founder review |
+| 10 | Applied Structural Drying — Core Concepts | confirm | [10-applied-structural-drying-core.md](10-applied-structural-drying-core.md) | DRAFT — awaiting founder review |
+| 11 | HVAC Systems and Indoor Air Quality | confirm | [11-hvac-systems-and-iaq.md](11-hvac-systems-and-iaq.md) | DRAFT — awaiting founder review |
+
+### ⚠ Designation-rule correction (applied 2026-07-11)
+
+Drafts 9 and 10 originally carried "(FSRT-aligned)" / "(ASD-aligned)" in the course title. That
+violates the **CARSI designation rule** (founder 2026-07-10, CLAUDE.md MUST): CARSI courses are never
+branded with IICRC discipline acronyms (WRT/ASD/AMRT/FSRT/CCT/TCST) or "[discipline]-aligned", and
+carry `iicrcDiscipline: null`. Titles corrected to the plain technique name; S500/S700 are still cited
+**nominatively only**, which the rule permits. Any live-DB course still holding an "-aligned" title is a
+pre-existing defect to sweep in the catalogue-wide audit below.
 
 ### ⚠ Cross-cutting finding (founder decision needed)
 
