@@ -20,18 +20,28 @@
 
 ## 2 · Pricing model — by course duration (founder rule, 2026-07-12) — APPLIED
 
-**The rule (founder GO 2026-07-12):** price is set by course length. Three numbers only:
+**The rule (founder GO 2026-07-12):** price is set by course length — **except a Senior tier that is set by level, not duration.**
 
-| Tier | Price (AUD) | Duration rule | Subscription |
+| Tier | Price (AUD) | Rule | Subscription |
 |---|---|---|---|
-| **Essentials** | **$29** | **≤ 1 hour** | included |
-| **Professional** | **$49** | **> 1 hour to 2 hours** | included |
-| **Build** | **$99** | **> 2 hours** | included |
+| **Essentials** | **$29** | duration **≤ 1 hour** | included |
+| **Professional** | **$49** | duration **> 1 hour to 2 hours** | included |
+| **Build** | **$99** | duration **> 2 hours** | included |
+| **Senior** | **$149** | **high-value senior-level courses — set by LEVEL, overrides duration** (e.g. *Mould Level 3*, advanced/master certifications). $139 accepted as an equivalent — any course already at $139/$149 is **left as-is, never downgraded** by the duration rule. | included |
 | **Subscription** | monthly / yearly (existing plans) | **unlocks all courses, all tiers** — already built (`full_library`) | — |
 
-Three "numbers" total ($29 / $49 / $99) plus the subscription plans. Every course maps to one by its
-`durationHours` — **no per-course Stripe object at any tier** (single-purchase uses inline `price_data` keyed on
-the number; §1). Boundary reading: exactly 1h = $29; exactly 2h = $49; anything over 2h = $99.
+Four price points ($29 / $49 / $99 / $149) plus the subscription plans — **no per-course Stripe object at any
+tier** (single-purchase uses inline `price_data` keyed on the number; §1). Boundary reading of the duration
+tiers: exactly 1h = $29; exactly 2h = $49; over 2h = $99. **The Senior $149 tier is level-driven and takes
+precedence over duration:** a genuinely senior/advanced course (progression "Level 3", master/advanced
+certification) is $149 regardless of its hours; and a course already priced $139 or $149 is preserved.
+
+**Senior tier — current catalogue:** **no course qualifies today.** All 37 are entry-grade (`level`:
+Foundational / Beginner / Intermediate / Awareness / Specialised); there is no Advanced/Senior/Level-3 course, and
+none is currently at $139/$149, so **no catalogue price changed for this rule.** `mould-remediation-fundamentals`
+is Foundational (entry), **not** the "Mould Level 3" example — that senior course, when created, is $149. The
+Intermediate (*Commercial Floor Care*) and Specialised (*Truckmount Operations*) courses are operational $99
+courses, not senior certifications, so they stay at $99.
 
 **Applied to `data/seed/courses-catalog.json` (staged; not seeded on deploy):** `priceAud` set + `isFree: false`
 on all 37 courses. Odd-cent legacy prices ($28.97 / $28.98) normalised to $29.
