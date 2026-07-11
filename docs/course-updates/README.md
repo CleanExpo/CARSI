@@ -30,8 +30,11 @@ nexus-copywriter standard.
 
 ### 🔗 July-2026 currency pass (applied 2026-07-12)
 
-All 35 drafts stamped `**Data currency:** July 2026`, and **all now carry live student-facing source URLs**
-in a `Sources & Get the latest — student-facing` block. Drafts **12–35** were URL-bearing from drafting;
+All 36 drafts stamped `**Data currency:** July 2026`, and **all now carry live student-facing source URLs**
+in a `Sources & Get the latest — student-facing` block. **Catalogue coverage is now complete: all 37 non-CEC
+courses in `data/seed/courses-catalog.json` have a draft** (draft 36, *Creating a Clean Air Environment / Final
+Clearance & Handover*, closed the last gap on 2026-07-12; its catalogue slug is stored truncated at 79 chars —
+flagged for founder repair in that draft's apply notes). Drafts **12–35** were URL-bearing from drafting;
 drafts **01–11** (early-template, sources named only) were **backfilled via Exa on 2026-07-12** — every named
 source now resolves to its current canonical live page (official/authoritative first, AU-first where a source
 exists; IICRC/ASTM/ASHRAE standards cited nominatively to official pages only, never pirated copies).
