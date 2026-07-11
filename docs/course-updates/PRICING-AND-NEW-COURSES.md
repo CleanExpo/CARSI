@@ -26,9 +26,10 @@ Today's catalogue is inconsistent: **32 free, 3 × $29, 1 × $28.98, 1 × $28.97
 |---|---|---|---|
 | **Essentials** | **$29** | short *"Introduction to…"* / single-topic awareness micro-courses | matches the existing clean $29 point; normalises the $28.97/$28.98 oddities |
 | **Professional** | **$49** | credential-bearing *"CARSI … Practitioner"* / Fundamentals courses, specialised operational courses, **and the 5 new Business & AI courses** | the $49 the new courses need; higher value = a real credential or business outcome |
-| **Subscription** | monthly / yearly (existing plans) | **all courses, both tiers** | already built (`full_library`); the all-you-can-learn unlock |
+| **Build** | **$99** | the capstone build-and-setup course (**Modern Websites & AI Websites**, draft 33) — hands-on, includes a guided AI-Website build session | double the skills tier because it's a build course with a setup session and a done-for-you upsell path |
+| **Subscription** | monthly / yearly (existing plans) | **all courses, all tiers** | already built (`full_library`); the all-you-can-learn unlock |
 
-Three "numbers" total ($29, $49, + the subscription plans). Every course maps to $29 or $49 — **no per-course Stripe object either way.**
+Four "numbers" total ($29, $49, $99, + the subscription plans). Every course maps to one of the three price points — **no per-course Stripe object at any tier** (inline `price_data` keyed on the number).
 
 ### One commercially-weighty call, flagged (not blocking)
 32 courses are currently **free**; "all courses need a price" makes them **paid** ($29 or $49 per the tier map below). That converts free intro courses into paid + subscription-included. Recommended and applied in this proposal, because the subscription still gives them away to members and standalone pricing ends the "everything's free" leak. **This is the one line to consciously confirm at review** — flip any course back to `isFree: true` if it's meant to stay a lead magnet.
@@ -59,7 +60,9 @@ A new **"Grow Your Business"** category, deliberately **outside the IICRC/restor
 
 **Funnel logic of the five:** N3 *get found* → N2 *respond & convert* → N1/N5 *win and communicate with AI* → N4 *retain & multiply.* Sold individually at $49 or bundled/subscription. High appeal because every hook maps to money an SMB owner is visibly leaving on the table.
 
-Each new course, when built, gets a full nexus-copywriter content draft (like the 27 restoration drafts in this folder) with the Exa sources cited inline. Sources for the hooks above are in §5.
+Each new course, when built, gets a full nexus-copywriter content draft (like the 27 restoration drafts in this folder) with the Exa sources cited inline. Sources for the hooks above are in §5. **All five now drafted:** [28](28-ai-for-service-businesses-practical-tools.md)–[32](32-ai-customer-communication-followup.md).
+
+**Plus a 6th new course — the $99 "Build" capstone:** [33 · Modern Websites & AI Websites: Rank, Convert, Automate](33-modern-and-ai-websites.md). It teaches modern-website ranking + the "AI Website" model (landing page + admin CRM back end holding the n8n-style flows/triggers) with a guided build session, and introduces the third price point. Aligned to the estate's own `ai-website` pipeline and "positioning flip" framing.
 
 ---
 

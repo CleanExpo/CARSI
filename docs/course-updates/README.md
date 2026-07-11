@@ -65,6 +65,9 @@ All **`iicrcDiscipline: null`, `cecHours: 0`, no IICRC/S-standard/CEC framing** 
 | 30 | The Google Business Profile Playbook: Get Found, Get Called | `google-business-profile-playbook` | $49 | [30-google-business-profile-playbook.md](30-google-business-profile-playbook.md) | DRAFT — awaiting founder review |
 | 31 | The 5-Star Reputation Engine: Reviews, Referrals & Retention | `reputation-engine-reviews-referrals` | $49 | [31-reputation-engine-reviews-referrals.md](31-reputation-engine-reviews-referrals.md) | DRAFT — awaiting founder review |
 | 32 | AI-Powered Customer Communication & Follow-Up | `ai-customer-communication-followup` | $49 | [32-ai-customer-communication-followup.md](32-ai-customer-communication-followup.md) | DRAFT — awaiting founder review |
+| 33 | Modern Websites & AI Websites: Rank, Convert, Automate | `modern-and-ai-websites` | **$99** | [33-modern-and-ai-websites.md](33-modern-and-ai-websites.md) | DRAFT — awaiting founder review (capstone; new "Build" tier) |
+
+**Draft 33** is the track **capstone** and introduces a **third price point ($99 "Build" tier)** — it teaches modern-website ranking (Core Web Vitals, mobile-first, AU hosting, schema, AI-search readiness) **and** the "AI Website" model (landing page + admin-owned CRM back end holding the n8n-style flows/triggers), with a guided build session. Grounded AU-first (CodeQy, 3P Digital, Vynlox, ReadyToRank) and aligned to the estate's own **"positioning flip"** framing + live `ai-website` pipeline (Synthex generate; Unite-Group agent/CRM/drip Phase 2). The Ponte vault note is flagged Tier-3/unverified (revenue figures not cited).
 
 ### ⚠ Designation-rule correction (applied 2026-07-11)
 
