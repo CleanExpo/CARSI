@@ -4,7 +4,8 @@
 **Date:** 12/07/2026
 **Locale:** en-AU · Australia/Brisbane · dates DD/MM/YYYY
 **Owner:** CARSI course-production
-**Related PRs:** #563 (CEC signature), #564 (briefs + course drafts), #565 (thumbnails → main)
+**Related PRs:** #563 (CEC signature), #564 (briefs + course drafts), #565 (thumbnails → main), #568 (CI → repo secrets, DO)
+**Host:** DigitalOcean App Platform (deploy-on-push `main`)
 
 ---
 
@@ -133,15 +134,17 @@ until the founder confirms per-course IICRC approval. No IICRC marks introduced.
 
 ## 7. What remains (founder-only — cannot be done by the agent)
 
-1. **Confirm PR #565 has merged to `main`** (in flight; auto-merges on green). After merge,
-   `origin/main` catalogue must show 15 populated `thumbnailUrl`s. DigitalOcean deploys
-   `main` on push, so this ships to production automatically.
-2. **Restore automated generation (CI).** `.github/workflows/generate-course-media.yml`
-   still points at the empty `carsi-web` Vercel project and its `VERCEL_TOKEN` repo secret
-   (last updated 25/06/2026) lost access (`Project not found`). Fix: add `OPENAI_API_KEY` +
-   `CLOUDINARY_CLOUD_NAME/API_KEY/API_SECRET` to `carsi-web` production (or repoint the
-   workflow at `restoreassist`), and refresh `VERCEL_TOKEN`. Until then, generation runs
-   locally via the runbook below.
+1. **PR #565 merged** (sha `8665f1d9`) — `origin/main` catalogue now shows 37/37 populated
+   `thumbnailUrl`s. DigitalOcean deploys `main` on push, so the thumbnails ship to
+   production automatically. *(Done.)*
+2. **Add the CI repo secrets** (workflow already fixed — PR #568). CARSI is hosted on
+   **DigitalOcean**, so `.github/workflows/generate-course-media.yml` no longer pulls from
+   Vercel — it now reads GitHub Actions repo secrets directly. To activate automated
+   generation, add these at Settings → Secrets and variables → Actions:
+   `CLOUDINARY_CLOUD_NAME` (= `dmaulkthb`), `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`,
+   `OPENAI_API_KEY`, plus (voice) `ELEVENLABS_API_KEY` + `ELEVENLABS_VOICE_ID` and (seed)
+   `DATABASE_URL`. Until they're added, generation runs locally via the runbook below. The
+   old `VERCEL_TOKEN` secret is no longer used.
 3. **Activate the accredited look (per course).** For each course the IICRC has genuinely
    approved for CEC, add a `status: 'approved'` entry (slug + hours) to
    `data/seed/cec-approvals.json`, then re-run the generator with `--force` for that slug —
