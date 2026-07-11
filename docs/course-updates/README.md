@@ -46,6 +46,8 @@ nexus-copywriter standard.
 | 19 | Containment & Negative-Air Control (Dust & Particulate) | confirm | [19-containment-and-negative-air.md](19-containment-and-negative-air.md) | DRAFT — awaiting founder review |
 | 20 | Restoration Estimating & Insurance Claims | confirm | [20-restoration-estimating-and-insurance-claims.md](20-restoration-estimating-and-insurance-claims.md) | DRAFT — awaiting founder review |
 | 21 | Category 3 & Sewage Water Cleanup | confirm | [21-category-3-sewage-water-cleanup.md](21-category-3-sewage-water-cleanup.md) | DRAFT — awaiting founder review |
+| 22 | Mould Remediation Methodology | confirm | [22-mould-remediation-methodology.md](22-mould-remediation-methodology.md) | DRAFT — awaiting founder review |
+| 23 | Crawl Space & Subfloor Moisture Control | confirm | [23-crawl-space-and-subfloor-moisture.md](23-crawl-space-and-subfloor-moisture.md) | DRAFT — awaiting founder review |
 
 ### ⚠ Designation-rule correction (applied 2026-07-11)
 
