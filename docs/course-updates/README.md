@@ -53,6 +53,19 @@ nexus-copywriter standard.
 | 26 | Dehumidifier Selection & Psychrometrics (LGR vs Desiccant) | confirm | [26-dehumidifier-selection-psychrometrics.md](26-dehumidifier-selection-psychrometrics.md) | DRAFT — awaiting founder review |
 | 27 | Moisture Measurement & Documentation | confirm | [27-moisture-measurement-and-documentation.md](27-moisture-measurement-and-documentation.md) | DRAFT — awaiting founder review |
 
+### 🚀 New "Grow Your Business" courses — $49, non-IICRC (drafted 2026-07-12)
+
+Full content drafts for the 5 new SMB-owner courses proposed in [PRICING-AND-NEW-COURSES.md](PRICING-AND-NEW-COURSES.md).
+All **`iicrcDiscipline: null`, `cecHours: 0`, no IICRC/S-standard/CEC framing** (business courses); AU-first data.
+
+| # | Course | Slug | Price | Draft | Status |
+|---|---|---|---|---|---|
+| 28 | AI for Service Businesses: Practical Tools That Win More Jobs | `ai-for-service-businesses-practical-tools` | $49 | [28-ai-for-service-businesses-practical-tools.md](28-ai-for-service-businesses-practical-tools.md) | DRAFT — awaiting founder review |
+| 29 | Speed to Lead: Turn Enquiries into Booked Jobs | `speed-to-lead-job-conversion` | $49 | [29-speed-to-lead-job-conversion.md](29-speed-to-lead-job-conversion.md) | DRAFT — awaiting founder review |
+| 30 | The Google Business Profile Playbook: Get Found, Get Called | `google-business-profile-playbook` | $49 | [30-google-business-profile-playbook.md](30-google-business-profile-playbook.md) | DRAFT — awaiting founder review |
+| 31 | The 5-Star Reputation Engine: Reviews, Referrals & Retention | `reputation-engine-reviews-referrals` | $49 | [31-reputation-engine-reviews-referrals.md](31-reputation-engine-reviews-referrals.md) | DRAFT — awaiting founder review |
+| 32 | AI-Powered Customer Communication & Follow-Up | `ai-customer-communication-followup` | $49 | [32-ai-customer-communication-followup.md](32-ai-customer-communication-followup.md) | DRAFT — awaiting founder review |
+
 ### ⚠ Designation-rule correction (applied 2026-07-11)
 
 Drafts 9 and 10 originally carried "(FSRT-aligned)" / "(ASD-aligned)" in the course title. That
