@@ -13,6 +13,7 @@ import {
   validateTeamSeatCount,
 } from '@/lib/checkout-purchase-mode';
 import { trackFunnelEvent } from '@/lib/analytics/track-funnel-event';
+import { TurnstileWidget } from '@/components/security/TurnstileWidget';
 
 type Props = {
   slug: string;
@@ -29,6 +30,7 @@ export function GuestEnrolForm({ slug, priceAud, isFree, showTeamOption = false 
   const [error, setError] = useState<string | null>(null);
   const [purchaseMode, setPurchaseMode] = useState<CoursePurchaseMode>('self');
   const [teamSeats, setTeamSeats] = useState(MIN_TEAM_SEATS);
+  const [turnstileToken, setTurnstileToken] = useState('');
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -47,17 +49,21 @@ export function GuestEnrolForm({ slug, priceAud, isFree, showTeamOption = false 
         const res = await fetch('/api/lms/enrollments/guest-free', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ slug, email, password, full_name: fullName }),
+          body: JSON.stringify({ slug, email, password, full_name: fullName, turnstileToken }),
         });
         const data = (await res.json().catch(() => ({}))) as {
           learn_url?: string;
           detail?: string;
+          requires_sign_in?: boolean;
         };
         if (!res.ok) {
           setError(data.detail ?? 'Could not complete enrolment');
           return;
         }
-        window.location.href = data.learn_url ?? '/dashboard/student';
+        // Existing account: the server enrols nothing and grants no session — the
+        // user is sent to sign in (learn_url points to /login) to finish enrolling.
+        window.location.href =
+          data.learn_url ?? (data.requires_sign_in ? '/login' : '/dashboard/student');
         return;
       }
 
@@ -173,6 +179,7 @@ export function GuestEnrolForm({ slug, priceAud, isFree, showTeamOption = false 
           disabled={loading}
         />
       ) : null}
+      <TurnstileWidget onVerify={setTurnstileToken} />
       {error ? <p className="text-sm text-red-300">{error}</p> : null}
       <Button
         type="submit"

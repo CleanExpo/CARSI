@@ -63,11 +63,28 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ detail: 'Invalid checkout session' }, { status: 400 });
     }
 
-    const { claims } = await findOrCreateGuestUser({
+    // Stripe-verified payer email: allow claiming an *unclaimed provisional*
+    // account (one auto-created by the webhook for this purchase), but NEVER
+    // overwrite the password of, or mint a session for, an *established* account.
+    // The Stripe customer email is not proof the caller controls that inbox, so
+    // an existing real account must sign in — its enrolment is granted
+    // idempotently by the checkout.session.completed webhook regardless.
+    const outcome = await findOrCreateGuestUser({
       email,
       fullName: fullName || email.split('@')[0],
       password,
+      allowClaim: true,
     });
+
+    if (outcome.status === 'exists') {
+      return NextResponse.json({
+        ok: true,
+        requires_sign_in: true,
+        learn_url: `/login?next=${encodeURIComponent(`/courses/${slug}`)}`,
+      });
+    }
+
+    const { claims } = outcome;
 
     const purchaseMode = session.metadata?.purchase_mode === 'team' ? 'team' : 'self';
     const seatsMeta = session.metadata?.team_seat_count;
