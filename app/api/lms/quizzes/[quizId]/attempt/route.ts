@@ -3,6 +3,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { runSerializable } from '@/lib/server/db-tx';
+import { ACCESS_GRANTING_STATUS_LIST } from '@/lib/server/enrollment-access';
 import { computeQuizResult } from '@/lib/server/lms-completion';
 
 type Ctx = { params: Promise<{ quizId: string }> };
@@ -35,11 +36,13 @@ export async function POST(request: NextRequest, ctx: Ctx) {
       return NextResponse.json({ detail: 'Quiz not found' }, { status: 404 });
     }
 
+    // Allow-set (WS3 / P0-C): a revoked/refunded learner cannot submit a graded
+    // attempt (which would also feed the completion sync and drive a re-issue).
     const enrollment = await prisma.lmsEnrollment.findFirst({
       where: {
         studentId: claims.sub,
         courseId: quiz.courseId,
-        status: { not: 'cancelled' },
+        status: { in: [...ACCESS_GRANTING_STATUS_LIST] },
       },
     });
     if (!enrollment) {

@@ -6,6 +6,7 @@ import { getOrCreateCourseBySlug } from '@/lib/server/course-catalog-sync';
 import { ensureLmsUserFromClaims } from '@/lib/server/lms-user-sync';
 import { isUniqueConstraintError } from '@/lib/server/db-errors';
 import { decideEnrollmentCompleted } from '@/lib/server/lms-completion';
+import { isEnrolmentAccessAllowed, isRevokedStatus } from '@/lib/server/enrollment-access';
 
 /**
  * Quiz gate for completion (Phase 6, 2026-06-29 audit): a course is only
@@ -193,6 +194,16 @@ export async function syncEnrollmentCompletion(
     select: { completedAt: true, status: true },
   });
 
+  // STICKY REVOCATION (WS3 / P0-C): a revoked/refunded/disputed enrolment is a
+  // terminal state. NEVER resurrect it to active/completed on a later sync —
+  // otherwise a refunded learner un-revokes themselves simply by marking a lesson
+  // or opening their certificate (completedAt survives revocation, so the
+  // wasAlreadyCompleted branch below would flip it straight back). This guard
+  // covers BOTH the zero-lesson branch and the main completion write.
+  if (isRevokedStatus(prior?.status)) {
+    return;
+  }
+
   const wasAlreadyCompleted =
     prior?.status === 'completed' || prior?.completedAt != null;
 
@@ -348,6 +359,12 @@ export async function getEnrollmentForCertificate(
   });
   if (!row) return null;
 
+  // No certificate for a revoked/refunded enrolment (WS3 / P0-C). Short-circuit
+  // BEFORE syncEnrollmentCompletion — otherwise the sync (were the sticky guard
+  // ever bypassed) plus the completed-check below would hand a refunded learner a
+  // fresh certificate.
+  if (isRevokedStatus(row.status)) return null;
+
   await syncEnrollmentCompletion(row.id, row.studentId, row.courseId);
 
   const refreshed = await prisma.lmsEnrollment.findFirst({
@@ -383,8 +400,11 @@ export async function getEnrollmentForCertificate(
 }
 
 export async function markCertificateIssued(enrollmentId: string): Promise<void> {
-  await prisma.lmsEnrollment.update({
-    where: { id: enrollmentId },
+  // Re-assert completion at MINT time (WS3 / P0-C): if a revocation webhook lands
+  // between getEnrollmentForCertificate and here, the guarded updateMany is a no-op
+  // so a refunded enrolment can never have its certificateIssuedAt (re)stamped.
+  await prisma.lmsEnrollment.updateMany({
+    where: { id: enrollmentId, status: 'completed' },
     data: { certificateIssuedAt: new Date() },
   });
 }
@@ -431,9 +451,11 @@ export async function getLessonContextForStudent(
     where: {
       studentId_courseId: { studentId, courseId: lesson.module.courseId },
     },
-    select: { id: true },
+    select: { id: true, status: true },
   });
-  if (!enr) return null;
+  // Deny paid lesson content to a revoked/refunded/cancelled enrolment (WS3 / P0-C).
+  // Existence alone is not entitlement.
+  if (!enr || !isEnrolmentAccessAllowed(enr.status)) return null;
 
   return {
     lesson: {

@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 
 import { prisma } from '@/lib/prisma';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
+import { ACCESS_GRANTING_STATUS_LIST } from '@/lib/server/enrollment-access';
 type Ctx = { params: Promise<{ quizId: string }> };
 
 function parseQuizOptions(raw: unknown): { text: string }[] {
@@ -40,11 +41,13 @@ export async function GET(request: NextRequest, ctx: Ctx) {
       return NextResponse.json({ detail: 'Quiz not found' }, { status: 404 });
     }
 
+    // Allow-set (WS3 / P0-C): only active/completed enrolments may view a quiz —
+    // a revoked/refunded row is denied (the old `not: 'cancelled'` admitted it).
     const enrollment = await prisma.lmsEnrollment.findFirst({
       where: {
         studentId: claims.sub,
         courseId: quiz.courseId,
-        status: { not: 'cancelled' },
+        status: { in: [...ACCESS_GRANTING_STATUS_LIST] },
       },
     });
 
