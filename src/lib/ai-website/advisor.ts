@@ -2,7 +2,7 @@
  * CARSI Course Advisor — the "employee" behind the AI Website.
  *
  * Grounded on the real CARSI disciplines and licence-correct wording (IICRC CEC Accredited,
- * CARSI Southern Hemisphere Restoration Designations — never bare "IICRC Accredited").
+ * CARSI Southern Hemisphere Restoration Designations — always include CEC in accreditation wording).
  *
  * This is a DETERMINISTIC knowledge-base responder: it needs no external LLM key, so it works in
  * production the moment the flag is on. The `answer()` signature is the seam for a live LLM upgrade —
