@@ -37,6 +37,13 @@ services:
       - key: DATABASE_URL
         scope: RUN_AND_BUILD_TIME
 
+      # WS6 (RA-1807 guard): a DIRECT, session-mode connection (DO managed-Postgres
+      # port 25060, never a pgBouncer pooler) used by `prisma migrate deploy` so DDL
+      # can't silently no-op through a transaction pooler. Falls back to DATABASE_URL
+      # when unset. Set as an encrypted env var in DO.
+      - key: DIRECT_URL
+        scope: RUN_AND_BUILD_TIME
+
       - key: DATABASE_CA_CERT
         scope: RUN_AND_BUILD_TIME
 

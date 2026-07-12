@@ -12,7 +12,13 @@ const GENERATE_ONLY_URL =
   'postgresql://prisma:prisma@127.0.0.1:5432/prisma_generate_only?schema=public';
 
 function resolveDatabaseUrl(): string {
-  const direct = process.env.DATABASE_URL?.trim();
+  // WS6 (RA-1807 guard): prefer DIRECT_URL for migrate/introspect. In Prisma 7 the
+  // config-file datasource.url IS the connection `prisma migrate deploy` uses, so if
+  // DATABASE_URL points at a pgBouncer transaction pooler (port 6543) migrations can
+  // silently no-op DDL. Set DIRECT_URL to a direct, session-mode connection (DO
+  // managed-Postgres port 25060) and migrations run against it; the runtime client
+  // (src/lib/prisma.ts) keeps using DATABASE_URL. Falls back to DATABASE_URL when unset.
+  const direct = (process.env.DIRECT_URL ?? process.env.DATABASE_URL)?.trim();
   if (direct) return direct;
 
   const user = process.env.DB_USER?.trim();
