@@ -23,11 +23,13 @@ describe('buildApiCorsHeaders', () => {
     }
   });
 
-  it('echoes exactly the configured origin with credentials when set', () => {
+  it('echoes exactly the configured origin with credentials when set (Methods/Headers survive)', () => {
     const hs = buildApiCorsHeaders('https://carsi.com.au');
     const map = Object.fromEntries(hs.map((h) => [h.key, h.value]));
     expect(map['Access-Control-Allow-Origin']).toBe('https://carsi.com.au');
     expect(map['Access-Control-Allow-Credentials']).toBe('true');
+    expect(keys(hs)).toContain('Access-Control-Allow-Methods');
+    expect(keys(hs)).toContain('Access-Control-Allow-Headers');
   });
 
   it('never falls back to localhost with credentials', () => {

@@ -1,6 +1,6 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
-import { confirmEmailOwnershipOk } from './enrollment-confirm-guard';
+import { confirmEmailOwnershipOk, resolveAccountEmail } from './enrollment-confirm-guard';
 
 /**
  * WS5 — enrollments/confirm payer-email ownership. FAIL CLOSED: both the Stripe
@@ -25,5 +25,23 @@ describe('confirmEmailOwnershipOk', () => {
     expect(confirmEmailOwnershipOk(null, 'buyer@example.com')).toBe(false);
     expect(confirmEmailOwnershipOk('', '')).toBe(false);
     expect(confirmEmailOwnershipOk('   ', 'buyer@example.com')).toBe(false);
+  });
+});
+
+describe('resolveAccountEmail', () => {
+  it('prefers the JWT email claim without hitting the DB', async () => {
+    const lookup = vi.fn(async () => 'db@example.com');
+    expect(await resolveAccountEmail('claim@example.com', lookup)).toBe('claim@example.com');
+    expect(lookup).not.toHaveBeenCalled();
+  });
+
+  it('falls back to the DB email when the claim is absent/blank', async () => {
+    expect(await resolveAccountEmail(undefined, async () => 'db@example.com')).toBe('db@example.com');
+    expect(await resolveAccountEmail('  ', async () => 'db@example.com')).toBe('db@example.com');
+  });
+
+  it('returns null when neither the claim nor the DB has an email (never falls to the session email)', async () => {
+    expect(await resolveAccountEmail(null, async () => null)).toBeNull();
+    expect(await resolveAccountEmail('', async () => undefined)).toBeNull();
   });
 });

@@ -19,3 +19,20 @@ export function confirmEmailOwnershipOk(
   const account = normaliseEmail(accountEmail);
   return session.length > 0 && account.length > 0 && session === account;
 }
+
+/**
+ * Resolve the ACCOUNT email to compare against the Stripe payer email: prefer the
+ * JWT claim, else look it up by id. The Stripe session email is NEVER a source
+ * here — it is the value being checked against, not a fallback. DB lookup is
+ * injected so this is unit-testable.
+ */
+export async function resolveAccountEmail(
+  claimEmail: string | null | undefined,
+  lookupEmailById: () => Promise<string | null | undefined>,
+): Promise<string | null> {
+  const claim = (claimEmail ?? '').trim();
+  if (claim) return claim;
+  const dbEmail = (await lookupEmailById()) ?? null;
+  const trimmed = dbEmail?.trim();
+  return trimmed ? trimmed : null;
+}

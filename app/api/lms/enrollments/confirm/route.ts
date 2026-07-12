@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getStripeClient } from '@/lib/api/stripe';
 import { prisma } from '@/lib/prisma';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
-import { confirmEmailOwnershipOk } from '@/lib/server/enrollment-confirm-guard';
+import { confirmEmailOwnershipOk, resolveAccountEmail } from '@/lib/server/enrollment-confirm-guard';
 import { notifyCrmEnrollmentCreated } from '@/lib/server/crm-enrollment-notify';
 import { sendEnrollmentWelcomeEmail } from '@/lib/server/enrollment-email';
 import { captureServerError } from '@/lib/server/sentry';
@@ -41,6 +41,14 @@ export async function POST(request: NextRequest) {
     if (!process.env.STRIPE_SECRET_KEY?.trim()) {
       return NextResponse.json({ detail: 'Stripe not configured' }, { status: 503 });
     }
+    // WS5: resolve the account email BEFORE calling Stripe, so a DB fault surfaces
+    // as a real error rather than being mislabeled 'invalid checkout session'.
+    const accountEmail = await resolveAccountEmail(
+      claims.email,
+      async () =>
+        (await prisma.lmsUser.findUnique({ where: { id: claims.sub }, select: { email: true } }))
+          ?.email ?? null,
+    );
     try {
       const stripe = getStripeClient();
       const session = await stripe.checkout.sessions.retrieve(sessionId);
@@ -58,15 +66,9 @@ export async function POST(request: NextRequest) {
         const n = Number.parseInt(seatsMeta, 10);
         if (Number.isFinite(n)) teamSeatCount = n;
       }
-      // WS5: UNCONDITIONAL payer-email ownership check (fail closed). Resolve the
-      // account email from the DB by claims.sub when the JWT carries no email claim,
-      // so a token without an email can't finalise a session paid under another email.
+      // WS5: UNCONDITIONAL payer-email ownership check (fail closed) — a token
+      // without an email claim can't finalise a session paid under another email.
       const sessionEmail = session.customer_email ?? session.customer_details?.email;
-      const accountEmail =
-        claims.email?.trim() ||
-        (await prisma.lmsUser.findUnique({ where: { id: claims.sub }, select: { email: true } }))
-          ?.email ||
-        null;
       if (!confirmEmailOwnershipOk(sessionEmail, accountEmail)) {
         return NextResponse.json({ detail: 'Session email does not match account' }, { status: 403 });
       }

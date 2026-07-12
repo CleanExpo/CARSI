@@ -17,15 +17,9 @@
  */
 import { execSync } from 'node:child_process';
 
+import { findSecretToken } from './secret-scan-core.mjs';
+
 const scanAll = process.argv.includes('--all');
-
-// Live-key prefixes (Stripe/WooCommerce/webhook/restricted) + 16+ token chars.
-// The optional live_/test_ infix catches real Stripe keys (sk_live_… / pk_test_…)
-// whose underscore would otherwise break the token; ck_/cs_/whsec_ have no infix.
-const SECRET_RE = /(ck|cs|sk|pk|whsec|rk)_(live_|test_)?[A-Za-z0-9]{16,}/;
-
-// Lines that look like placeholders/examples are not real secrets.
-const PLACEHOLDER_RE = /xxx|your[_-]|example|redacted|placeholder|changeme|dummy|\.\.\.|<[^>]+>|\$\{/i;
 
 let diff = '';
 try {
@@ -62,8 +56,8 @@ for (const line of diff.split('\n')) {
   if (!line.startsWith('+') || line.startsWith('+++')) continue;
 
   const content = line.slice(1);
-  if (SECRET_RE.test(content) && !PLACEHOLDER_RE.test(content)) {
-    const token = content.match(SECRET_RE)?.[0] ?? '';
+  const token = findSecretToken(content);
+  if (token) {
     const masked = token.slice(0, 6) + '…' + token.slice(-4);
     findings.push(`  ${currentFile ?? '(unknown)'}: ${masked}`);
   }
