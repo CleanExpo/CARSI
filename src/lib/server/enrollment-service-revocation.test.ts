@@ -69,8 +69,12 @@ vi.mock('@/lib/server/iicrc-cec-submission', () => ({
   processIicrcCecSubmissionForEnrollment: vi.fn(async () => {}),
 }));
 
-const { syncEnrollmentCompletion, getEnrollmentForCertificate, getLessonContextForStudent } =
-  await import('./enrollment-service');
+const {
+  syncEnrollmentCompletion,
+  getEnrollmentForCertificate,
+  getLessonContextForStudent,
+  markCertificateIssued,
+} = await import('./enrollment-service');
 
 const COURSE = {
   title: 'T',
@@ -129,8 +133,16 @@ describe('WS3 sticky revocation — a revoked enrolment is terminal', () => {
     it(`syncEnrollmentCompletion never resurrects a '${status}' enrolment (completedAt survives from before the refund)`, async () => {
       seedEnrollment(status, new Date('2026-01-01T00:00:00.000Z'));
       await syncEnrollmentCompletion('enr-r', 'stu', 'crs');
+      // Load-bearing: status stays terminal (it flips to 'completed' on origin/main).
       expect(state.enrollment?.status).toBe(status);
-      expect(state.enrollment?.certificateIssuedAt).toBeNull();
+    });
+
+    it(`syncEnrollmentCompletion never resurrects a '${status}' zero-lesson enrolment (the total===0 admin path)`, async () => {
+      seedEnrollment(status, new Date('2026-01-01T00:00:00.000Z'));
+      state.lessonIds = []; // zero-lesson course: the total===0 branch runs
+      await syncEnrollmentCompletion('enr-r', 'stu', 'crs');
+      expect(state.enrollment?.status).toBe(status);
+      expect(state.enrollment?.completedAt).toEqual(new Date('2026-01-01T00:00:00.000Z'));
     });
 
     it(`getEnrollmentForCertificate returns null for a '${status}' enrolment and does not flip it`, async () => {
@@ -147,6 +159,20 @@ describe('WS3 sticky revocation — a revoked enrolment is terminal', () => {
       expect(ctx).toBeNull();
     });
   }
+});
+
+describe('WS3 markCertificateIssued — mint-time gate (WD)', () => {
+  it('does NOT stamp certificateIssuedAt on a revoked enrolment (closes the revoke-vs-download race)', async () => {
+    seedEnrollment('revoked', new Date('2026-01-01T00:00:00.000Z'));
+    await markCertificateIssued('enr-r');
+    expect(state.enrollment?.certificateIssuedAt).toBeNull();
+  });
+
+  it('DOES stamp a genuinely completed enrolment (positive control)', async () => {
+    seedEnrollment('completed', new Date('2026-01-01T00:00:00.000Z'));
+    await markCertificateIssued('enr-r');
+    expect(state.enrollment?.certificateIssuedAt).not.toBeNull();
+  });
 });
 
 describe('WS3 legit states still pass (no false-deny)', () => {

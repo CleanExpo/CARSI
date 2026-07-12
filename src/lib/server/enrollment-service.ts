@@ -46,8 +46,28 @@ export async function enrollStudentInCourse(
     where: {
       studentId_courseId: { studentId: claims.sub, courseId: course.id },
     },
+    select: { id: true, status: true },
   });
-  if (existing) return 'already_enrolled';
+  if (existing) {
+    // Re-purchase after a refund (WS3 / P0-C): a revoked enrolment MUST be
+    // reactivated on a fresh fulfilment — this path only runs after a verified
+    // payment (or a free-course enrol), so a customer who was refunded and pays
+    // again is not left locked out by the read gates that now deny 'revoked'.
+    // An active/completed row is a genuine duplicate and stays 'already_enrolled'.
+    if (isRevokedStatus(existing.status)) {
+      await prisma.lmsEnrollment.update({
+        where: { id: existing.id },
+        data: {
+          status: 'active',
+          paymentReference,
+          completedAt: null,
+          certificateIssuedAt: null,
+        },
+      });
+      return { enrollmentId: existing.id, courseId: course.id };
+    }
+    return 'already_enrolled';
+  }
 
   try {
     const enrollment = await prisma.lmsEnrollment.create({
