@@ -1,14 +1,15 @@
 /**
  * AI-drafted instructor replies to course reviews (GP-118 — "AI Feedback Response").
  *
- * Reuses the same Anthropic client the public chat assistant uses. The draft is only
- * a *suggestion* — the instructor edits and publishes it via the reply endpoint, so
- * this never posts anything on its own.
+ * Uses CARSI's AI provider of record — OpenRouter — the same provider as the
+ * public assistant (WS2 / P0-B, AC-4: one provider, no hardcoded api.anthropic.com).
+ * The draft is only a *suggestion* — the instructor edits and publishes it via the
+ * reply endpoint, so this never posts anything on its own.
  */
 
-import { AnthropicClient, CLAUDE_MODELS } from '@/lib/anthropic/client';
+import { OpenRouterClient } from '@/lib/openrouter/client';
+import { resolveOpenRouterConfig } from '@/lib/openrouter/provider';
 
-const MODEL = CLAUDE_MODELS.HAIKU_4_5;
 const REQUEST_TIMEOUT_MS = 20_000;
 
 export type ReviewReplyDraftInput = {
@@ -47,26 +48,25 @@ export function buildReviewReplyMessages(input: ReviewReplyDraftInput): ChatMess
  * Callers treat null as "AI drafting unavailable" and fall back to writing manually.
  */
 export async function draftReviewReply(input: ReviewReplyDraftInput): Promise<string | null> {
-  const apiKey = process.env.ANTHROPIC_API_KEY?.trim();
-  if (!apiKey) return null;
+  const cfg = resolveOpenRouterConfig();
+  if (!cfg.configured) return null;
 
-  const [system, user] = buildReviewReplyMessages(input);
+  const messages = buildReviewReplyMessages(input);
 
   try {
-    const client = new AnthropicClient({ apiKey });
-    const timeout = new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error('review-reply-draft: request timed out')), REQUEST_TIMEOUT_MS)
-    );
-    const response = await Promise.race([
-      client.messages({
-        model: MODEL,
-        max_tokens: 220,
-        system: system.content,
-        messages: [{ role: 'user', content: user.content }],
-      }),
-      timeout,
-    ]);
-    return AnthropicClient.extractText(response).trim() || null;
+    const client = new OpenRouterClient({
+      apiKey: cfg.apiKey,
+      baseUrl: cfg.baseUrl,
+      referer: cfg.referer,
+      appTitle: cfg.appTitle,
+      timeoutMs: REQUEST_TIMEOUT_MS,
+    });
+    const response = await client.chat({
+      model: cfg.model,
+      max_tokens: 220,
+      messages,
+    });
+    return OpenRouterClient.extractText(response).trim() || null;
   } catch (e) {
     console.error('[review-reply-draft]', e);
     return null;

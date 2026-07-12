@@ -17,7 +17,8 @@ import {
 import { getMargotKnowledgeBaseContext } from '@/lib/server/margot-knowledge-base';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { applyRateLimit, clientIpFrom } from '@/lib/rate-limit';
-import { DEFAULT_OPENROUTER_MODEL, OpenRouterAPIError, OpenRouterClient } from '@/lib/openrouter/client';
+import { OpenRouterAPIError, OpenRouterClient } from '@/lib/openrouter/client';
+import { resolveOpenRouterConfig } from '@/lib/openrouter/provider';
 import { margotStreamingEnabled } from '@/lib/server/margot-streaming-flag';
 import { margotWriteToolsEnabled } from '@/lib/server/margot-write-tools-flag';
 import { runFrontDeskStream } from '@/lib/server/frontdesk/stream';
@@ -29,7 +30,7 @@ const FALLBACK_REPLY =
 
 export const maxDuration = 60;
 
-const MODEL = process.env.OPENROUTER_MODEL?.trim() || DEFAULT_OPENROUTER_MODEL;
+const MODEL = resolveOpenRouterConfig().model;
 const OPENROUTER_TIMEOUT_MS = 50_000;
 const MAX_TOKENS = 1_000;
 const CHAT_TEMPERATURE = 0.72;
@@ -91,8 +92,8 @@ function openRouterErrorResponse(error: unknown): NextResponse {
 }
 
 export async function POST(request: NextRequest) {
-  const apiKey = process.env.OPENROUTER_API_KEY;
-  if (!apiKey) {
+  const { apiKey, configured } = resolveOpenRouterConfig();
+  if (!configured) {
     return NextResponse.json(
       {
         detail:

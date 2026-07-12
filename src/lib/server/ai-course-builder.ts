@@ -14,13 +14,17 @@
 
 import { z } from 'zod';
 
-import { AnthropicClient } from '@/lib/anthropic/client';
-import { CLAUDE_MODELS, type TextBlock } from '@/lib/anthropic/types';
+import { OpenRouterClient } from '@/lib/openrouter/client';
+import { resolveOpenRouterConfig } from '@/lib/openrouter/provider';
 import {
   CourseBuilderInputError,
   assertNoStandardText,
 } from '@/lib/course-kit/ai-course-builder-guard';
 import { scanManyForStandardExcerpts } from '@/lib/course-kit/standards-excerpt';
+
+// A full course draft can be large; give the model room beyond the client's
+// default 15s timeout so long generations don't abort mid-stream.
+const COURSE_BUILDER_TIMEOUT_MS = 60_000;
 
 export class AiCourseBuilderError extends Error {
   readonly status: number;
@@ -105,21 +109,14 @@ const SYSTEM_PROMPT = [
   'each quiz question with 4 options and a 0-based correct_index.',
 ].join('\n');
 
-function extractText(blocks: Array<{ type: string }>): string {
-  return blocks
-    .filter((b): b is TextBlock => b.type === 'text')
-    .map((b) => b.text)
-    .join('')
-    .trim();
-}
-
 function stripJsonFences(text: string): string {
   const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/i);
   return (fenced ? fenced[1] : text).trim();
 }
 
 /**
- * Guard the input, call Claude Sonnet, validate + excerpt-scan the output.
+ * Guard the input, call the OpenRouter provider of record, validate +
+ * excerpt-scan the output.
  * Throws {@link AiCourseBuilderError} with an HTTP status on any failure.
  */
 export async function generateCourseDraft(input: AiCourseBuilderInput): Promise<AiCourseDraft> {
@@ -137,7 +134,8 @@ export async function generateCourseDraft(input: AiCourseBuilderInput): Promise<
     throw err;
   }
 
-  if (!process.env.ANTHROPIC_API_KEY?.trim()) {
+  const cfg = resolveOpenRouterConfig();
+  if (!cfg.configured) {
     throw new AiCourseBuilderError('AI course builder is not configured', 503);
   }
 
@@ -152,18 +150,26 @@ export async function generateCourseDraft(input: AiCourseBuilderInput): Promise<
     .filter(Boolean)
     .join('\n');
 
-  const client = new AnthropicClient({ defaultModel: CLAUDE_MODELS.SONNET_5 });
+  const client = new OpenRouterClient({
+    apiKey: cfg.apiKey,
+    baseUrl: cfg.baseUrl,
+    referer: cfg.referer,
+    appTitle: cfg.appTitle,
+    timeoutMs: COURSE_BUILDER_TIMEOUT_MS,
+  });
 
   let raw: string;
   try {
-    const response = await client.messages({
-      model: CLAUDE_MODELS.SONNET_5,
+    const response = await client.chat({
+      model: cfg.model,
       max_tokens: 8000,
       temperature: 0.4,
-      system: SYSTEM_PROMPT,
-      messages: [{ role: 'user', content: userPrompt }],
+      messages: [
+        { role: 'system', content: SYSTEM_PROMPT },
+        { role: 'user', content: userPrompt },
+      ],
     });
-    raw = extractText(response.content);
+    raw = OpenRouterClient.extractText(response);
   } catch (err) {
     throw new AiCourseBuilderError(
       `Course generation failed: ${err instanceof Error ? err.message : 'unknown error'}`,

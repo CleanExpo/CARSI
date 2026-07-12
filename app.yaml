@@ -58,7 +58,17 @@ services:
       - key: NEXT_PUBLIC_ADMIN_EMAIL
         scope: RUN_AND_BUILD_TIME
 
-      - key: OPENAI_API_KEY
+      # AI provider of record: OpenRouter (WS2 / P0-B). Margot, the review-reply
+      # drafter, and the AI course builder all resolve their key/model through
+      # src/lib/openrouter/provider.ts. The boot validator (instrumentation.ts)
+      # refuses to start in production when OPENROUTER_API_KEY is missing, so a
+      # mis-provisioned deploy fails the /api/health gate fast (the original
+      # "Margot" outage class). Value is set as an encrypted env var in DO.
+      - key: OPENROUTER_API_KEY
+        scope: RUN_TIME
+      # Optional model override (defaults to z-ai/glm-5.2). e.g. set
+      # anthropic/claude-sonnet-5 to route via a Claude model on OpenRouter.
+      - key: OPENROUTER_MODEL
         scope: RUN_TIME
 
       - key: NEXT_PUBLIC_FRONTEND_URL
