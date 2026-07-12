@@ -192,11 +192,12 @@ export async function sendEmail(params: SendEmailParams): Promise<SendEmailResul
 
     const messageId = parsed.message_ids?.[0];
     if (messageId) {
-      console.info('[email] sent', params.subject, '→', to.join(', '), 'id=', messageId);
+      // WS6: do not write recipient email addresses (PII) to prod logs.
+      console.info('[email] sent', params.subject, '→', `${to.length} recipient(s)`, 'id=', messageId);
       return { sent: true, messageId };
     }
 
-    console.info('[email] sent', params.subject, '→', to.join(', '));
+    console.info('[email] sent', params.subject, '→', `${to.length} recipient(s)`);
     return { sent: true };
   } catch (err) {
     if (devConsoleEnabled() && isEmailNetworkError(err)) {

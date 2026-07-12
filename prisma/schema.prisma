@@ -158,6 +158,7 @@ model LmsCourse {
   iicrcCecSubmissions  LmsIicrcCecSubmission[]
   reviews              LmsCourseReview[]
 
+  @@index([instructorId], map: "ix_lms_courses_instructor_id")
   @@map("lms_courses")
 }
 
@@ -225,6 +226,7 @@ model LmsModule {
   course  LmsCourse   @relation(fields: [courseId], references: [id], onDelete: Cascade)
   lessons LmsLesson[]
 
+  @@index([courseId], map: "ix_lms_modules_course_id")
   @@map("lms_modules")
 }
 
@@ -242,6 +244,7 @@ model LmsLesson {
   module          LmsModule           @relation(fields: [moduleId], references: [id], onDelete: Cascade)
   progressRecords LmsLessonProgress[]
 
+  @@index([moduleId], map: "ix_lms_lessons_module_id")
   @@map("lms_lessons")
 }
 
@@ -258,6 +261,7 @@ model LmsLessonProgress {
   student LmsUser   @relation(fields: [studentId], references: [id], onDelete: Cascade)
 
   @@unique([studentId, lessonId], map: "uq_lms_lesson_progress_student_lesson")
+  @@index([lessonId], map: "ix_lms_lesson_progress_lesson_id")
   @@map("lms_lesson_progress")
 }
 
@@ -278,6 +282,7 @@ model LmsEnrollment {
   iicrcCecSubmission LmsIicrcCecSubmission?
 
   @@unique([studentId, courseId], map: "uq_lms_enrollment")
+  @@index([courseId], map: "ix_lms_enrollments_course_id")
   @@map("lms_enrollments")
 }
 
@@ -307,9 +312,14 @@ model LmsIicrcCecSubmission {
   createdAt             DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt             DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  enrollment     LmsEnrollment               @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
-  student        LmsUser                     @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  course         LmsCourse                   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  // WS6 regulatory retention (P1): an IICRC CEC submission is a compliance record
+  // filed with the regulator — it must NEVER be cascade-erased by deleting a
+  // learner, enrolment, or course. Restrict blocks the parent delete instead
+  // (all three FK columns are NOT NULL, so SetNull is not possible). App delete
+  // paths pre-check for a CEC record and soft-handle it.
+  enrollment     LmsEnrollment               @relation(fields: [enrollmentId], references: [id], onDelete: Restrict)
+  student        LmsUser                     @relation(fields: [studentId], references: [id], onDelete: Restrict)
+  course         LmsCourse                   @relation(fields: [courseId], references: [id], onDelete: Restrict)
   communications LmsIicrcCecCommunication[]
   notes          LmsIicrcCecSubmissionNote[]
 
@@ -549,7 +559,10 @@ model LmsTeam {
   createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt  DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  owner            LmsUser                 @relation("TeamOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  // WS6 (P1): don't destroy a team + its Stripe-linked subscriptions when the
+  // owner account is deleted. Restrict forces an ownership transfer first
+  // (ownerId is NOT NULL, so SetNull would break the billing/seat invariant).
+  owner            LmsUser                 @relation("TeamOwner", fields: [ownerId], references: [id], onDelete: Restrict)
   members          LmsTeamMember[]
   invites          LmsTeamInvite[]
   coursePurchases  LmsTeamCoursePurchase[]
