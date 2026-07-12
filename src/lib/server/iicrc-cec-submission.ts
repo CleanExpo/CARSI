@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 
 import { prisma } from '@/lib/prisma';
+import { isRevokedStatus } from '@/lib/server/enrollment-access';
 import {
   buildCompletionCertificatePdf,
   completionCertificateDataFromEnrollment,
@@ -636,6 +637,12 @@ async function ensureEnrollmentReadyForIicrcManual(enrollmentId: string): Promis
     where: { id: enrollmentId },
     select: { status: true, completedAt: true },
   });
+
+  // Never force-complete a revoked/refunded enrolment (WS3 / P0-C) — that would
+  // resurrect it AND re-file the CEC with IICRC for a learner who was refunded.
+  // Leaving it revoked makes the caller's `status !== 'completed'` reload check
+  // throw ENROLLMENT_NOT_COMPLETED, which is the correct fail-closed outcome.
+  if (isRevokedStatus(row?.status)) return;
 
   if (row?.status === 'completed' && row.completedAt) return;
 

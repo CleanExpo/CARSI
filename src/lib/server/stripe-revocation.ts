@@ -18,7 +18,11 @@ export async function revokeEnrollmentsByPaymentReference(
 
   const result = await prisma.lmsEnrollment.updateMany({
     where: { paymentReference: ref, status: { not: 'revoked' } },
-    data: { status: 'revoked', certificateIssuedAt: null },
+    // Clear completedAt too (WS3 / P0-C): the completion sync derives
+    // `wasAlreadyCompleted` from a non-null completedAt, so leaving it set was the
+    // fuel that let a later sync resurrect the row. The sticky-revoke guard in
+    // syncEnrollmentCompletion is the primary fix; this is defence-in-depth.
+    data: { status: 'revoked', certificateIssuedAt: null, completedAt: null },
   });
 
   if (result.count > 0) {
