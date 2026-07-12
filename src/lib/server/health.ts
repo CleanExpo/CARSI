@@ -1,17 +1,23 @@
 /**
- * Real health check (WS2 / P0-B, AC-6).
+ * Health checks (WS2 / P0-B, AC-6) — deliberately split into liveness vs readiness.
  *
- * DigitalOcean's health probe hits GET /api/health. It used to return a static
- * always-'healthy' 200 that verified nothing, so a deploy with a dead database or
- * a missing AI key still passed the gate. `getHealth()` now probes a real
- * dependency (a cheap `SELECT 1`) and the AI provider config, and returns 503
- * unless BOTH pass — so a broken deploy fails the gate instead of going live.
+ * DigitalOcean App Platform uses ONE health_check block as both the deploy gate
+ * AND the runtime liveness probe: sustained failure RESTARTS the instance. So the
+ * probe DO polls (`/api/health`) must be a shallow *liveness* check — it must NOT
+ * depend on the database, or a transient DB blip (failover / pool exhaustion)
+ * would restart every instance at once and amplify a survivable event into a full
+ * outage. Deep *readiness* (DB reachable + AI configured) lives at
+ * `/api/health/ready` for CI / monitoring, where a 503 informs but never restarts.
  *
- * The pure `computeHealth` aggregator is separated from the side-effecting
- * `probeDatabase` so the status/HTTP-code logic is trivially unit-testable.
+ * A mis-provisioned deploy (the original "Margot" outage) is still caught: the
+ * boot validator (instrumentation.ts / boot-env.ts) refuses to start in
+ * production when a required secret is missing, so the server never serves.
  */
 import { resolveOpenRouterConfig } from '@/lib/openrouter/provider';
 import { prisma } from '@/lib/prisma';
+
+/** Bound the DB probe so a hung connection can't stall a readiness response. */
+const PROBE_TIMEOUT_MS = 4_000;
 
 export type HealthChecks = { db: boolean; ai: boolean };
 
@@ -19,6 +25,12 @@ export type HealthResult = {
   status: 'healthy' | 'unhealthy';
   httpStatus: 200 | 503;
   checks: HealthChecks;
+};
+
+export type LivenessResult = {
+  status: 'healthy' | 'unhealthy';
+  httpStatus: 200 | 503;
+  checks: { ai: boolean };
 };
 
 /** Pure: healthy (200) only when every dependency check passes; otherwise 503. */
@@ -31,17 +43,38 @@ export function computeHealth(input: { dbOk: boolean; aiConfigured: boolean }): 
   };
 }
 
-/** Cheap DB reachability probe. Maps any failure to `false` — never throws. */
-export async function probeDatabase(): Promise<boolean> {
+/** Cheap DB reachability probe, bounded by a timeout. Maps any failure — including
+ *  a hang — to `false`; never throws. */
+export async function probeDatabase(timeoutMs: number = PROBE_TIMEOUT_MS): Promise<boolean> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
   try {
-    await prisma.$queryRaw`SELECT 1`;
+    const timeout = new Promise<never>((_, reject) => {
+      timer = setTimeout(() => reject(new Error('probeDatabase: timed out')), timeoutMs);
+    });
+    await Promise.race([prisma.$queryRaw`SELECT 1`, timeout]);
     return true;
   } catch {
     return false;
+  } finally {
+    if (timer) clearTimeout(timer);
   }
 }
 
-/** Run the real dependency checks and aggregate them into a health result. */
+/**
+ * Liveness (the endpoint DigitalOcean's health_check polls): the process is up
+ * and the AI provider is configured. Env-only, so it can NEVER flap on a DB
+ * outage — that is the whole point of separating it from readiness.
+ */
+export function getLiveness(env: NodeJS.ProcessEnv = process.env): LivenessResult {
+  const ai = resolveOpenRouterConfig(env).configured;
+  return {
+    status: ai ? 'healthy' : 'unhealthy',
+    httpStatus: ai ? 200 : 503,
+    checks: { ai },
+  };
+}
+
+/** Readiness (CI / monitoring, NOT the DO restart probe): DB reachable + AI configured. */
 export async function getHealth(env: NodeJS.ProcessEnv = process.env): Promise<HealthResult> {
   const dbOk = await probeDatabase();
   const aiConfigured = resolveOpenRouterConfig(env).configured;

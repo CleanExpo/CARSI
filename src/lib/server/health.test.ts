@@ -12,7 +12,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const mock = vi.hoisted(() => ({ queryRaw: vi.fn() }));
 vi.mock('@/lib/prisma', () => ({ prisma: { $queryRaw: mock.queryRaw } }));
 
-import { computeHealth, probeDatabase, getHealth } from './health';
+import { computeHealth, getLiveness, probeDatabase, getHealth } from './health';
 
 beforeEach(() => {
   mock.queryRaw.mockReset();
@@ -50,6 +50,30 @@ describe('probeDatabase', () => {
   it('returns false (never throws) when the query fails', async () => {
     mock.queryRaw.mockRejectedValueOnce(new Error('connection refused'));
     expect(await probeDatabase()).toBe(false);
+  });
+
+  it('returns false when the query hangs past the timeout (never blocks the probe)', async () => {
+    // A DB that accepts the connection but never answers must not stall the probe.
+    mock.queryRaw.mockReturnValueOnce(new Promise(() => {}));
+    expect(await probeDatabase(20)).toBe(false);
+  });
+});
+
+describe('getLiveness', () => {
+  it('is 200 when the AI provider is configured — and never touches the DB', () => {
+    const r = getLiveness({ OPENROUTER_API_KEY: 'sk-or-x' });
+    expect(r.httpStatus).toBe(200);
+    expect(r.status).toBe('healthy');
+    expect(r.checks).toEqual({ ai: true });
+    // Liveness must not depend on the DB — the prisma probe is never invoked here.
+    expect(mock.queryRaw).not.toHaveBeenCalled();
+  });
+
+  it('is 503 when the AI key is unset', () => {
+    const r = getLiveness({});
+    expect(r.httpStatus).toBe(503);
+    expect(r.checks.ai).toBe(false);
+    expect(mock.queryRaw).not.toHaveBeenCalled();
   });
 });
 

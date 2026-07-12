@@ -49,6 +49,17 @@ describe('findMissingRequiredEnv', () => {
       /JWT_SECRET/,
     );
   });
+
+  it('reports EVERY missing var at once (so the operator fixes them in one redeploy)', () => {
+    // The whole operational point of AC-5: a fully unprovisioned env lists all
+    // four, not just the first — a regression to first-miss-only must fail here.
+    expect(findMissingRequiredEnv({ NODE_ENV: 'production' })).toEqual([
+      'DATABASE_URL',
+      'STRIPE_SECRET_KEY',
+      'OPENROUTER_API_KEY',
+      'JWT_SECRET (min 32 chars)',
+    ]);
+  });
 });
 
 describe('validateRequiredEnv', () => {
@@ -72,6 +83,12 @@ describe('validateRequiredEnv', () => {
 
   it('does not throw in production when everything is present', () => {
     expect(() => validateRequiredEnv(FULL_ENV)).not.toThrow();
+  });
+
+  it('names every missing var in the single thrown message', () => {
+    expect(() => validateRequiredEnv({ NODE_ENV: 'production' })).toThrow(
+      /DATABASE_URL.*STRIPE_SECRET_KEY.*OPENROUTER_API_KEY.*JWT_SECRET/s,
+    );
   });
 
   it('does not throw outside production, only warns', () => {

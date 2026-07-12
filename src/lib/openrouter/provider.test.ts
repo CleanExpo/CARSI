@@ -50,4 +50,24 @@ describe('resolveOpenRouterConfig', () => {
     expect(cfg.apiKey).toBe('sk-or-real');
     expect(cfg.baseUrl).not.toContain('anthropic');
   });
+
+  it('defaults appTitle to CARSI and honours OPENROUTER_APP_TITLE', () => {
+    expect(resolveOpenRouterConfig({}).appTitle).toBe('CARSI');
+    expect(resolveOpenRouterConfig({ OPENROUTER_APP_TITLE: 'CARSI Margot' }).appTitle).toBe(
+      'CARSI Margot',
+    );
+  });
+
+  it('derives referer from NEXT_PUBLIC_FRONTEND_URL, but OPENROUTER_REFERER wins', () => {
+    expect(resolveOpenRouterConfig({}).referer).toBeUndefined();
+    expect(
+      resolveOpenRouterConfig({ NEXT_PUBLIC_FRONTEND_URL: 'https://carsi.com.au' }).referer,
+    ).toBe('https://carsi.com.au');
+    expect(
+      resolveOpenRouterConfig({
+        OPENROUTER_REFERER: 'https://override.example',
+        NEXT_PUBLIC_FRONTEND_URL: 'https://carsi.com.au',
+      }).referer,
+    ).toBe('https://override.example');
+  });
 });
