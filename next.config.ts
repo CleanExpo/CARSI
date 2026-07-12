@@ -4,6 +4,8 @@ import { fileURLToPath } from 'node:url';
 
 import type { NextConfig } from 'next';
 
+import { buildApiCorsHeaders } from './src/lib/security/api-cors';
+
 const require = createRequire(import.meta.url);
 
 // Pin the workspace root to this project. Without this, Next infers the root
@@ -104,20 +106,10 @@ const nextConfig: NextConfig = {
         ],
       },
       {
+        // WS5: fail closed — emit the credentialed CORS grant only when
+        // NEXT_PUBLIC_FRONTEND_URL is set (never the localhost fallback).
         source: '/api/:path*',
-        headers: [
-          { key: 'Access-Control-Allow-Credentials', value: 'true' },
-          {
-            key: 'Access-Control-Allow-Origin',
-            value: process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://localhost:3000',
-          },
-          { key: 'Access-Control-Allow-Methods', value: 'GET,POST,PUT,DELETE,OPTIONS' },
-          {
-            key: 'Access-Control-Allow-Headers',
-            value:
-              'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version',
-          },
-        ],
+        headers: buildApiCorsHeaders(process.env.NEXT_PUBLIC_FRONTEND_URL),
       },
       {
         source: '/:path*',

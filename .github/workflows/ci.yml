@@ -129,6 +129,26 @@ jobs:
       - name: Run unit tests
         run: npm run test:unit
 
+  # WS5: enforce the secret scanner in CI (not just the bypassable local
+  # pre-commit hook). Scans the whole tracked tree, so a committed live-looking
+  # key fails the build even if the local hook was skipped. Dependency-free —
+  # scripts/check-secrets.mjs only uses node + git, so no `npm ci` is needed.
+  secret-scan:
+    name: Secret Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Scan tracked tree for secrets
+        run: node scripts/check-secrets.mjs --all
+
   build:
     name: Build Check
     runs-on: ubuntu-latest

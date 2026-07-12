@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { getStripeClient } from '@/lib/api/stripe';
+import { prisma } from '@/lib/prisma';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
+import { confirmEmailOwnershipOk } from '@/lib/server/enrollment-confirm-guard';
 import { notifyCrmEnrollmentCreated } from '@/lib/server/crm-enrollment-notify';
 import { sendEnrollmentWelcomeEmail } from '@/lib/server/enrollment-email';
 import { captureServerError } from '@/lib/server/sentry';
@@ -56,12 +58,16 @@ export async function POST(request: NextRequest) {
         const n = Number.parseInt(seatsMeta, 10);
         if (Number.isFinite(n)) teamSeatCount = n;
       }
-      const email = session.customer_email ?? session.customer_details?.email;
-      if (
-        email &&
-        claims.email &&
-        email.toLowerCase() !== claims.email.toLowerCase()
-      ) {
+      // WS5: UNCONDITIONAL payer-email ownership check (fail closed). Resolve the
+      // account email from the DB by claims.sub when the JWT carries no email claim,
+      // so a token without an email can't finalise a session paid under another email.
+      const sessionEmail = session.customer_email ?? session.customer_details?.email;
+      const accountEmail =
+        claims.email?.trim() ||
+        (await prisma.lmsUser.findUnique({ where: { id: claims.sub }, select: { email: true } }))
+          ?.email ||
+        null;
+      if (!confirmEmailOwnershipOk(sessionEmail, accountEmail)) {
         return NextResponse.json({ detail: 'Session email does not match account' }, { status: 403 });
       }
     } catch (e) {
