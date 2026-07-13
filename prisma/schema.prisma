@@ -276,6 +276,10 @@ model LmsEnrollment {
   lastAccessedLessonId String?   @map("last_accessed_lesson_id") @db.Uuid
   completedAt          DateTime? @map("completed_at") @db.Timestamptz(6)
   certificateIssuedAt  DateTime? @map("certificate_issued_at") @db.Timestamptz(6)
+  /// Why a revoked row was revoked: 'disputed' | 'refunded' (null when active).
+  /// A dispute-won re-grant reactivates ONLY 'disputed' rows; a later refund
+  /// downgrades a 'disputed' row to 'refunded' so it can never be re-granted.
+  revokedReason        String?   @map("revoked_reason")
 
   student            LmsUser                @relation("EnrollmentStudent", fields: [studentId], references: [id], onDelete: Cascade)
   course             LmsCourse              @relation(fields: [courseId], references: [id], onDelete: Cascade)
