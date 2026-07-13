@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 
+import { requireCron } from '@/lib/server/cron-auth';
 import { getBackendOrigin, getHealthCheckPath } from '@/lib/env/public-url';
 import { logger } from '@/lib/logger';
 
@@ -11,10 +12,8 @@ import { logger } from '@/lib/logger';
  */
 export async function GET(request: Request) {
   try {
-    const authHeader = request.headers.get('authorization');
-    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-      return new NextResponse('Unauthorized', { status: 401 });
-    }
+    const denied = requireCron(request);
+    if (denied) return denied;
 
     const backendUrl = getBackendOrigin();
     const healthPath = getHealthCheckPath();

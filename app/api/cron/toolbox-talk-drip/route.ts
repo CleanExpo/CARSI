@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 
+import { requireCron } from '@/lib/server/cron-auth';
 import { runToolboxDrip } from '@/lib/server/toolbox-drip';
 
 /**
@@ -11,12 +12,8 @@ import { runToolboxDrip } from '@/lib/server/toolbox-drip';
  * (see .github/workflows/notifications-toolbox-drip.yml).
  */
 export async function GET(request: Request) {
-  if (!process.env.CRON_SECRET) {
-    return new NextResponse('Cron not configured', { status: 503 });
-  }
-  if (request.headers.get('authorization') !== `Bearer ${process.env.CRON_SECRET}`) {
-    return new NextResponse('Unauthorized', { status: 401 });
-  }
+  const denied = requireCron(request);
+  if (denied) return denied;
   if (!process.env.DATABASE_URL?.trim()) {
     return NextResponse.json({ ok: true, dispatched: 0, reason: 'no_database' });
   }

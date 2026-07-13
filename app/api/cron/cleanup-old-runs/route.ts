@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import { logger } from '@/lib/logger';
+import { requireCron } from '@/lib/server/cron-auth';
 import { getUpstreamBaseUrl } from '@/lib/server/upstream-api';
 
 /**
@@ -11,10 +12,8 @@ import { getUpstreamBaseUrl } from '@/lib/server/upstream-api';
  */
 export async function GET(request: Request) {
   try {
-    const authHeader = request.headers.get('authorization');
-    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-      return new NextResponse('Unauthorized', { status: 401 });
-    }
+    const denied = requireCron(request);
+    if (denied) return denied;
 
     const upstream = getUpstreamBaseUrl();
     if (!upstream) {
