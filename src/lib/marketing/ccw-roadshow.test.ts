@@ -31,8 +31,8 @@ describe('resolveInitialEventSlug (QR/vanity-URL preselect)', () => {
 });
 
 describe('event capacity config', () => {
-  it('caps Melbourne at 10 and Sydney at 12', () => {
-    expect(getCcwRoadshowEvent('melbourne')?.capacity).toBe(10);
+  it('caps Melbourne at 15 and Sydney at 12', () => {
+    expect(getCcwRoadshowEvent('melbourne')?.capacity).toBe(15);
     expect(getCcwRoadshowEvent('sydney')?.capacity).toBe(12);
   });
 
