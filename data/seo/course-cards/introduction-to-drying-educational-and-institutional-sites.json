@@ -1,0 +1,57 @@
+{
+  "slug": "introduction-to-drying-educational-and-institutional-sites",
+  "seoTitle": "Drying Educational & Institutional Sites Course | CARSI",
+  "metaDescription": "Free CARSI course on drying water-damaged schools, universities and institutions — protect laboratories, auditoriums, archives and campus infrastructure.",
+  "imageAlt": "Restoration technician positioning drying equipment in a flood-affected university laboratory in Australia.",
+  "og": {
+    "title": "Drying Educational & Institutional Sites | Free CARSI Course",
+    "description": "A free CARSI course on managing structural drying in schools, universities and institutions — safeguarding laboratories, auditoriums, data corridors, archives and campus communities during recovery."
+  },
+  "keywords": [
+    "water damage restoration schools",
+    "drying university buildings",
+    "institutional water damage",
+    "laboratory flood restoration",
+    "campus structural drying",
+    "archive water damage recovery",
+    "free drying course",
+    "flood restoration training"
+  ],
+  "faq": [
+    {
+      "q": "What types of sites does this course cover?",
+      "a": "The course covers drying and water damage recovery across educational and institutional sites, including university laboratories, auditoriums with expansive hardwood stages, underground IT and fibre-optic corridors, libraries, and archives holding irreplaceable artefacts and collections."
+    },
+    {
+      "q": "How does the course address protecting sensitive laboratory equipment?",
+      "a": "It explains safeguarding laboratory exhaust ventilation, chemical trench drains and emergency eye wash stations from moisture, assessing damage to sensitive equipment such as scales, microscopes and reagents, and maintaining continuous monitoring to prevent contamination and disruption."
+    },
+    {
+      "q": "What is incremental drying?",
+      "a": "Incremental drying divides affected wings into compartmentalised drying zones that are renovated on a staggered basis. This lets some areas reopen while others are still being repaired, avoiding lengthy full-facility shutdowns and making better use of resources."
+    },
+    {
+      "q": "How can institutions maintain continuity during drying works?",
+      "a": "The course covers temporary relocations such as leasing modular classroom trailers, arranging alternative study spaces and support for affected students, and supplementary utility provisions like chilled-water bypasses from adjoining plants to keep critical research running."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Introduction to Drying Educational and Institutional Sites",
+    "description": "A free introductory CARSI course on structural drying and water damage recovery in educational and institutional settings, covering special design features, shared infrastructure, building population factors, regulatory oversight and loss limitation tactics.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    },
+    "coursePrerequisites": "None — an introductory course for restoration and facilities professionals."
+  }
+}

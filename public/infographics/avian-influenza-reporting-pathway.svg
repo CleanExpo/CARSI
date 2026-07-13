@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="1131" viewBox="0 0 800 1131" role="img" aria-labelledby="title desc" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+  <title id="title">H5 bird flu: public reporting pathway</title>
+  <desc id="desc">If you find a sick or dead bird or animal: do not touch it; move people and pets away; record the location and take photos only if safe; report to the Emergency Animal Disease Hotline on 1800 675 888, 24 hours.</desc>
+
+  <!-- Background -->
+  <rect width="800" height="1131" fill="#e9e7e2"/>
+
+  <!-- Header band -->
+  <rect x="0" y="0" width="800" height="176" fill="#1f3a52"/>
+  <text x="60" y="70" fill="#cfe0ea" font-size="19" font-weight="600" letter-spacing="1.5">CARSI READINESS &#183; AUSTRALIAN H5 BIRD FLU</text>
+  <text x="60" y="118" fill="#ffffff" font-size="40" font-weight="700">Public reporting pathway</text>
+  <text x="60" y="152" fill="#bcd0dd" font-size="18" font-weight="400">Follow Australian Government and Australian CDC advice. Stay calm.</text>
+
+  <!-- Intro prompt -->
+  <text x="60" y="232" fill="#1f3a52" font-size="23" font-weight="700">If you find a sick or dead bird or animal</text>
+  <rect x="60" y="248" width="680" height="3" fill="#7594a3"/>
+
+  <!-- STEP 1 -->
+  <g>
+    <rect x="60" y="272" width="680" height="120" rx="14" fill="#ffffff" stroke="#d5cec2" stroke-width="1.5"/>
+    <circle cx="126" cy="332" r="34" fill="#1f3a52"/>
+    <text x="126" y="343" fill="#ffffff" font-size="32" font-weight="700" text-anchor="middle">1</text>
+    <text x="188" y="318" fill="#1f3a52" font-size="24" font-weight="700">Do not touch it</text>
+    <text x="188" y="349" fill="#334155" font-size="18">Do not touch or move a sick or dead bird or animal.</text>
+    <text x="188" y="374" fill="#334155" font-size="18">Avoid the area.</text>
+  </g>
+
+  <!-- connector -->
+  <line x1="126" y1="392" x2="126" y2="412" stroke="#7594a3" stroke-width="3"/>
+
+  <!-- STEP 2 -->
+  <g>
+    <rect x="60" y="412" width="680" height="120" rx="14" fill="#ffffff" stroke="#d5cec2" stroke-width="1.5"/>
+    <circle cx="126" cy="472" r="34" fill="#1f3a52"/>
+    <text x="126" y="483" fill="#ffffff" font-size="32" font-weight="700" text-anchor="middle">2</text>
+    <text x="188" y="458" fill="#1f3a52" font-size="24" font-weight="700">Move people and pets away</text>
+    <text x="188" y="489" fill="#334155" font-size="18">Keep children and pets away from the area.</text>
+    <text x="188" y="514" fill="#334155" font-size="18">Stop others from approaching or handling it.</text>
+  </g>
+
+  <line x1="126" y1="532" x2="126" y2="552" stroke="#7594a3" stroke-width="3"/>
+
+  <!-- STEP 3 -->
+  <g>
+    <rect x="60" y="552" width="680" height="120" rx="14" fill="#ffffff" stroke="#d5cec2" stroke-width="1.5"/>
+    <circle cx="126" cy="612" r="34" fill="#1f3a52"/>
+    <text x="126" y="623" fill="#ffffff" font-size="32" font-weight="700" text-anchor="middle">3</text>
+    <text x="188" y="598" fill="#1f3a52" font-size="24" font-weight="700">Record what you see</text>
+    <text x="188" y="629" fill="#334155" font-size="18">Note the location and what has been observed.</text>
+    <text x="188" y="654" fill="#334155" font-size="18">Take photos or video only if it is safe to do so.</text>
+  </g>
+
+  <line x1="126" y1="672" x2="126" y2="692" stroke="#7594a3" stroke-width="3"/>
+
+  <!-- STEP 4 -->
+  <g>
+    <rect x="60" y="692" width="680" height="120" rx="14" fill="#1f3a52"/>
+    <circle cx="126" cy="752" r="34" fill="#ffffff"/>
+    <text x="126" y="763" fill="#1f3a52" font-size="32" font-weight="700" text-anchor="middle">4</text>
+    <text x="188" y="738" fill="#ffffff" font-size="24" font-weight="700">Report it</text>
+    <text x="188" y="769" fill="#cfe0ea" font-size="18">Call the Emergency Animal Disease Hotline.</text>
+    <text x="188" y="794" fill="#cfe0ea" font-size="18">Give the location and what you observed.</text>
+  </g>
+
+  <!-- Hotline block -->
+  <rect x="60" y="840" width="680" height="150" rx="14" fill="#ffffff" stroke="#1f3a52" stroke-width="3"/>
+  <text x="400" y="884" fill="#334155" font-size="18" font-weight="600" text-anchor="middle" letter-spacing="0.5">EMERGENCY ANIMAL DISEASE HOTLINE</text>
+  <text x="400" y="945" fill="#1f3a52" font-size="60" font-weight="700" text-anchor="middle" letter-spacing="2">1800 675 888</text>
+  <text x="400" y="975" fill="#486577" font-size="19" font-weight="600" text-anchor="middle">Open 24 hours</text>
+
+  <!-- Footer -->
+  <line x1="60" y1="1024" x2="740" y2="1024" stroke="#c9c2b6" stroke-width="1.5"/>
+  <text x="60" y="1052" fill="#5b5346" font-size="14">Source: Australian Government (DAFF) and Australian Centre for Disease Control bird flu guidance.</text>
+  <text x="60" y="1074" fill="#5b5346" font-size="14">Restoration and IAQ professionals support documentation and worker safety. They do not replace</text>
+  <text x="60" y="1094" fill="#5b5346" font-size="14">government, veterinary, wildlife or public-health authorities.</text>
+  <text x="60" y="1116" fill="#7a7263" font-size="13" font-style="italic">Awareness only &#183; not veterinary, medical, wildlife-handling or biosecurity response advice &#183; carsi.com.au/avian-influenza-readiness</text>
+</svg>

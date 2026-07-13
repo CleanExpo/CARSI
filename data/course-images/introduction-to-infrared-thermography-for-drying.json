@@ -1,0 +1,37 @@
+{
+  "courseSlug": "introduction-to-infrared-thermography-for-drying",
+  "brandColors": ["28 65% 52%", "34 32% 44%", "40 25% 92%"],
+  "notes": "Australian water-damage restoration. Warm, professional, technical. Real thermal-imaging camera with its own on-device heatmap screen only — never a fake false-colour overlay painted onto the wall. No on-image text or temperature numbers. Gloves on task, over-shoulder framing.",
+  "images": [
+    {
+      "id": "hero",
+      "context": "Course hero image for 'Introduction to Infrared Thermography for Drying'",
+      "category": "hero",
+      "aspectRatio": "16:9",
+      "resolution": "2K",
+      "style": "professional",
+      "prompt": "Over-the-shoulder view of a professional Australian restoration technician in plain workwear holding a handheld thermal-imaging camera up to an interior plaster wall in a flood-affected suburban home, checking for hidden moisture during drying. The camera's own small built-in screen shows a soft false-colour heat pattern. Warm natural daylight, air-movers and a dehumidifier visible in the background, tidy work site. Realistic professional photography.",
+      "negativePrompt": "no on-image text, no logos, no brand names, no watermarks, no gore, no distressing imagery, no identifiable face-forward portraits, no fake false-colour heatmap painted on the wall, no temperature numbers, no floodwater or mess"
+    },
+    {
+      "id": "wall-cavity-scan",
+      "context": "Module 3 — Moisture Detection Applications: identifying saturation extents across wall cavities",
+      "category": "illustration",
+      "aspectRatio": "4:3",
+      "resolution": "2K",
+      "style": "professional",
+      "prompt": "Close mid-distance shot of a gloved technician slowly panning a handheld thermal-imaging camera across the base of an internal wall and skirting in an Australian home to map how far moisture has migrated, the camera's compact rear display showing a gentle blue-to-amber heat gradient. Clean, controlled drying environment, air-mover in soft focus behind. Realistic professional photography.",
+      "negativePrompt": "no on-image text, no logos, no brand names, no watermarks, no gore, no distressing imagery, no identifiable face-forward portraits, no fake heatmap overlay on the wall, no visible temperature readouts or numbers"
+    },
+    {
+      "id": "moisture-meter-cross-check",
+      "context": "Module 5 — Result Analysis: complementary techniques, confirming thermal indications with a moisture meter",
+      "category": "illustration",
+      "aspectRatio": "4:3",
+      "resolution": "2K",
+      "style": "professional",
+      "prompt": "Gloved hands of a restoration technician cross-checking a suspected damp area by pressing a handheld pin-type moisture meter against timber framing, with a thermal-imaging camera resting on a nearby drop sheet. Bright, methodical, evidence-based verification in an Australian job site, hands-on-task framing. Realistic professional photography.",
+      "negativePrompt": "no on-image text, no logos, no brand names, no watermarks, no gore, no distressing imagery, no identifiable face-forward portraits, no fake overlays, no legible digital readouts or numbers"
+    }
+  ]
+}

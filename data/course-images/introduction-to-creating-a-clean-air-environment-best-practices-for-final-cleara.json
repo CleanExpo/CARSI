@@ -1,0 +1,37 @@
+{
+  "courseSlug": "introduction-to-creating-a-clean-air-environment-best-practices-for-final-cleara",
+  "brandColors": ["190 45% 42%", "205 40% 55%", "40 20% 94%"],
+  "notes": "Final clearance & handover after remediation. Show verification/documentation only (air sampling, particle counter, moisture meter, HEPA air scrubber, handover report). Bright, clean, trustworthy. Australian, metric. No on-image text, no logos, no patients.",
+  "images": [
+    {
+      "id": "hero",
+      "context": "Course hero — post-remediation air sampling for final clearance and handover",
+      "category": "hero",
+      "aspectRatio": "16:9",
+      "resolution": "2K",
+      "style": "professional",
+      "prompt": "A restoration professional in nitrile gloves conducting post-remediation air sampling for final clearance in a bright, freshly restored Australian room, operating a calibrated air sampling pump on a tripod that draws air through a spore-trap collection cassette, a clipboard and handheld particle counter resting on a nearby bench. Clean, methodical, professional, soft natural daylight. Realistic photography, mid-distance framing.",
+      "negativePrompt": "no on-image text, no logos, no brand names, no watermarks, no gore, no distressing imagery, no patients, no identifiable face-forward portraits, no visible mould or damage, no US power outlets, no imperial-only units"
+    },
+    {
+      "id": "air-quality-testing",
+      "context": "Module 2 & 4 — air quality testing with particle counter and gas detector",
+      "category": "illustration",
+      "aspectRatio": "4:3",
+      "resolution": "2K",
+      "style": "professional",
+      "prompt": "Over-the-shoulder close-up of a technician's gloved hands holding a handheld airborne particle counter and a gas detector, taking indoor air quality readings in a clean, restored Australian interior, an air scrubber quietly running in the soft-focus background. Hands-on-task framing, precise and calm. Realistic photography.",
+      "negativePrompt": "no on-image text, no logos, no brand names, no watermarks, no gore, no distressing imagery, no patients, no identifiable face-forward portraits, no visible contamination, no US power outlets, no imperial-only units"
+    },
+    {
+      "id": "clearance-handover",
+      "context": "Module 3 & 5 — clearance documentation and client handover report",
+      "category": "illustration",
+      "aspectRatio": "4:3",
+      "resolution": "2K",
+      "style": "professional",
+      "prompt": "A restoration professional in gloves completing a final clearance handover report on a tablet held over a clipboard in a bright, clean, empty Australian home, a moisture meter and a HEPA air scrubber visible nearby, documenting readings ahead of the client walk-through. Organised, professional, reassuring, natural daylight. Realistic photography, mid-distance framing.",
+      "negativePrompt": "no on-image text, no logos, no brand names, no watermarks, no gore, no distressing imagery, no patients, no identifiable face-forward portraits, no readable document text, no US power outlets, no imperial-only units"
+    }
+  ]
+}

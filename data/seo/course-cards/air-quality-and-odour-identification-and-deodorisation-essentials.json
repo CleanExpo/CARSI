@@ -1,0 +1,57 @@
+{
+  "slug": "air-quality-and-odour-identification-and-deodorisation-essentials",
+  "seoTitle": "Odour Identification & Deodorisation Course | CARSI",
+  "metaDescription": "Learn to identify, assess and deodorise indoor odours from mould, smoke, VOCs and biological sources. Free air quality course for restoration pros.",
+  "imageAlt": "Restoration technician using an air scrubber to deodorise a water-damaged Australian home interior",
+  "og": {
+    "title": "Air Quality & Odour: Identification & Deodorisation | CARSI",
+    "description": "Free CARSI course on finding and treating indoor odours at the source — microbial, smoke, chemical and biological — with air scrubbers, hydroxyl and ozone generators, carbon and thermal fogging."
+  },
+  "keywords": [
+    "odour removal restoration",
+    "deodorisation training",
+    "smoke odour removal",
+    "hydroxyl generator training",
+    "ozone treatment restoration",
+    "air scrubber deodorising",
+    "mould musty odour treatment",
+    "indoor air quality course australia"
+  ],
+  "faq": [
+    {
+      "q": "What deodorisation methods does this course cover?",
+      "a": "It covers source removal, chemical neutralisation (enzyme cleaners, odour counteractants and masking agents), oxidation with ozone and hydroxyl generators, and physical methods including activated carbon filtration, air scrubbers and thermal fogging."
+    },
+    {
+      "q": "Is masking a smell the same as deodorising?",
+      "a": "No. The course stresses that masking agents only hide odours temporarily and can irritate occupants. Effective deodorisation identifies and removes the source through cleaning, drying, ventilation and targeted treatment, then verifies the result."
+    },
+    {
+      "q": "What is the difference between ozone and hydroxyl generators?",
+      "a": "Ozone generators produce a strong oxidant and must only be used in unoccupied, sealed spaces because of health risks. Hydroxyl generators produce hydroxyl radicals that can be used safely in occupied areas and leave no harmful residue."
+    },
+    {
+      "q": "Who is this course for and does it cost anything?",
+      "a": "It is a free course for professionals in restoration, environmental cleaning, HVAC and property management who deal with odours from water, fire, mould, biohazards or pet and tobacco smells. There are no prerequisites."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Air Quality and Odour: Identification and Deodorisation Essentials",
+    "description": "A CARSI course on identifying, assessing and deodorising indoor air odours from microbial, smoke, chemical and biological sources using proven source-removal and treatment methods.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    },
+    "coursePrerequisites": "None — open entry"
+  }
+}

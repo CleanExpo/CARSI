@@ -1,0 +1,57 @@
+{
+  "slug": "moisture-mould-and-indoor-air-quality-understanding-the-link",
+  "seoTitle": "Moisture, Mould & Indoor Air Quality | CARSI",
+  "metaDescription": "Free CARSI course on how moisture drives mould growth and harms indoor air quality — detection, health effects, drying, remediation and documentation.",
+  "imageAlt": "Environmental technician using a moisture meter and thermal imaging to inspect a damp wall in an Australian building.",
+  "og": {
+    "title": "Moisture, Mould & Indoor Air Quality — Free CARSI Course",
+    "description": "A free CARSI course on the link between moisture, mould and indoor air quality — spore activation, MVOCs, high-risk materials, HVAC and humidity, health effects, air sampling, drying and remediation."
+  },
+  "keywords": [
+    "mould remediation australia",
+    "indoor air quality",
+    "moisture and mould",
+    "mould inspection",
+    "air sampling for mould",
+    "HVAC mould control",
+    "drying after water damage",
+    "mould health effects"
+  ],
+  "faq": [
+    {
+      "q": "How quickly can mould grow after water damage?",
+      "a": "Once moisture is introduced, dormant spores can germinate and grow into mature colonies within 24 to 48 hours, especially in warm, nutrient-rich conditions. This is why rapid drying is central to preventing mould."
+    },
+    {
+      "q": "What indoor humidity level encourages mould?",
+      "a": "Relative humidity consistently above 60% strongly favours mould growth. Keeping indoor RH between 30% and 50% is widely recommended to limit mould and maintain occupant comfort."
+    },
+    {
+      "q": "Does visible mould always require air sampling?",
+      "a": "No. In many cases visible mould is enough to warrant remediation. Air sampling is most useful for suspected hidden mould, real estate transactions or legal cases, and results should be interpreted by a qualified professional against outdoor comparison samples."
+    },
+    {
+      "q": "Who is this course for?",
+      "a": "Restoration, building, environmental health and facilities professionals who want a stronger foundation in identifying, investigating and managing moisture and mould, and in protecting indoor air quality."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Moisture, Mould, and Indoor Air Quality: Understanding the Link",
+    "description": "A free CARSI course explaining how moisture activates mould and affects indoor air quality, covering detection tools, health effects, HVAC and humidity control, drying, safe remediation and documentation.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    },
+    "coursePrerequisites": "None — suitable for restoration, building, environmental health and facilities professionals."
+  }
+}
