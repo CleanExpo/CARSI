@@ -49,6 +49,20 @@ export default function PrivacyPage() {
           <li>Log data: IP address, access times, error logs</li>
           <li>Cookies and similar technologies (see Section 7)</li>
         </ul>
+
+        <h3 className={marketingLegalH3}>2.3 Voice Assistant</h3>
+        <p>
+          If you use the voice option of our online assistant (bottom-right of every page), we
+          collect the audio of your conversation and a text transcript of it, to answer your
+          questions, provide support, and improve the assistant. The voice conversation is processed
+          by our voice provider, ElevenLabs, whose servers are located outside Australia (including
+          the United States and Singapore) — see Section 9. The assistant tells you this at the start
+          of a voice conversation. You can use the written chat or the{' '}
+          <Link href="/contact" className={marketingLink}>
+            CARSI contact page
+          </Link>{' '}
+          instead at any time.
+        </p>
       </section>
 
       <section>
@@ -80,7 +94,8 @@ export default function PrivacyPage() {
           </li>
           <li>
             <strong className={marketingTextStrong}>Service providers:</strong> Payment processors
-            (Stripe), hosting providers (Vercel, Fly.io), email services, and analytics tools.
+            (Stripe), hosting providers (Vercel, Fly.io), email services, analytics tools, and our
+            voice-assistant provider (ElevenLabs).
           </li>
           <li>
             <strong className={marketingTextStrong}>Legal requirements:</strong> When required by
