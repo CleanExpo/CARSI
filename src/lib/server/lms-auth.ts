@@ -12,12 +12,30 @@ function isJwtProvisionedPasswordHash(hash: string): boolean {
   return hash.startsWith('jwt:');
 }
 
+const PROVISIONAL_PASSWORD_PREFIX = 'provisional:';
+
+/**
+ * An account whose password was never set by a human — a JWT-sync placeholder
+ * (`jwt:`) or a Stripe-provisioned guest (`provisional:`). Such an account may be
+ * *claimed* by its rightful owner (finish signup / set a password). An
+ * *established* real-password account must never be overwritten by an
+ * unauthenticated path — that is the guest-checkout account-takeover (WS1 / P0-A).
+ */
+export function isProvisionalPasswordHash(hash: string): boolean {
+  return isJwtProvisionedPasswordHash(hash) || hash.startsWith(PROVISIONAL_PASSWORD_PREFIX);
+}
+
+/** An opaque, non-authenticating placeholder for an unclaimed provisional account. */
+export function provisionalPasswordHash(): string {
+  return `${PROVISIONAL_PASSWORD_PREFIX}${randomUUID()}`;
+}
+
 export async function hashPassword(plain: string): Promise<string> {
   return bcrypt.hash(plain, BCRYPT_ROUNDS);
 }
 
 export async function verifyPassword(plain: string, stored: string): Promise<boolean> {
-  if (!stored || isJwtProvisionedPasswordHash(stored)) return false;
+  if (!stored || isProvisionalPasswordHash(stored)) return false;
   if (stored.startsWith('$2')) {
     return bcrypt.compare(plain, stored);
   }

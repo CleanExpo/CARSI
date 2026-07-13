@@ -1,0 +1,78 @@
+{
+  "version": 1,
+  "status": "draft",
+  "courseSlug": "asbestos-awareness-for-restoration-technicians",
+  "disclaimer": "Educational assessment. CARSI is an IICRC-approved CEC provider; this is CARSI-original Australian training, not IICRC certification.",
+  "note": "Australian-produced. Grounded in the course's own modules. Founder to review before wiring live.",
+  "quizzes": [
+    {
+      "quizId": "fada5305-bf97-5e47-a9c0-400bc6b61b29",
+      "lessonTitle": "Knowledge check",
+      "title": "CARSI Asbestos Awareness for Restoration — Knowledge Check",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "At an awareness level, if you suspect asbestos you should…",
+          "options": [
+            "Remove it quickly and quietly",
+            "Stop work, do not disturb it, and refer to a licensed professional",
+            "Wet it and bag it yourself",
+            "Ignore it if it looks intact"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M5 — Recognising & responding"
+        },
+        {
+          "questionText": "Asbestos was fully banned in Australia from…",
+          "options": [
+            "1980",
+            "31 December 2003",
+            "2015",
+            "It is not banned"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M3 — The Australian ban"
+        },
+        {
+          "questionText": "Buildings most likely to contain asbestos materials are…",
+          "options": [
+            "Built after 2010",
+            "Built before the late 1980s",
+            "Only commercial towers",
+            "Only in Queensland"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M5 — Recognising suspected asbestos"
+        },
+        {
+          "questionText": "The health risk from asbestos is driven by…",
+          "options": [
+            "Skin contact",
+            "Inhaling airborne fibres — there is no known safe exposure level",
+            "Swallowing dust only",
+            "Loud noise"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M3 — Health risk"
+        },
+        {
+          "questionText": "Your legal duty at awareness level is governed by…",
+          "options": [
+            "Nothing",
+            "Work Health and Safety law and Safe Work Australia guidance",
+            "The client's rules",
+            "IICRC certification"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M4 — Legal duties"
+        }
+      ]
+    }
+  ]
+}

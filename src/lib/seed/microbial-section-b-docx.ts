@@ -1,3 +1,5 @@
+import { hoistObjectivesFirst } from '@/lib/seed/objectives-module';
+
 /** Full banner in the Word doc (uppercase SECTION — avoids matching the early TOC line 5). */
 const SECTION_B_BANNER =
   /^SECTION B:\s*MICROBIAL, INFECTION CONTROL & HYGIENE COURSES\s*$/;
@@ -124,7 +126,8 @@ export function parseMicrobialSectionBCompendium(paras: string[]): MicrobialPars
       slug: slugify(title),
       priceAud,
       overviewParagraphs,
-      modules,
+      // GP-434: the source doc places WHAT YOU WILL LEARN last; learners see objectives first.
+      modules: hoistObjectivesFirst(modules),
     });
   }
 

@@ -9,6 +9,7 @@ import {
   PUBLIC_SHELL_INNER_CLASS,
 } from '@/components/landing/public-shell-width';
 import { PUBLIC_PRIMARY_NAV } from '@/lib/navigation/public-nav';
+import { designationsEnabled } from '@/lib/server/designations-flag';
 
 import MobileNav from './MobileNav';
 
@@ -17,6 +18,10 @@ import MobileNav from './MobileNav';
  * Only high-value product links; secondary routes are in the footer.
  */
 export function PublicNavbar() {
+  // "Designations" appears only when the CARSI designation experience is enabled.
+  const navItems: readonly { label: string; href: string }[] = designationsEnabled()
+    ? [...PUBLIC_PRIMARY_NAV, { label: 'Designations', href: '/designations' }]
+    : PUBLIC_PRIMARY_NAV;
   return (
     <nav aria-label="Main navigation" className={PUBLIC_CHROME_NAV_CLASS}>
       <div
@@ -30,7 +35,7 @@ export function PublicNavbar() {
           </Link>
 
           <div className="hidden items-center gap-7 lg:flex">
-            {PUBLIC_PRIMARY_NAV.map((item) => (
+            {navItems.map((item) => (
               <Link key={item.href} href={item.href} className={PUBLIC_CHROME_LINK_CLASS}>
                 {item.label}
               </Link>
@@ -42,7 +47,7 @@ export function PublicNavbar() {
             <AuthNavLinks variant="desktop" tone="chrome" />
           </div>
 
-          <MobileNav />
+          <MobileNav items={navItems} />
         </div>
       </div>
     </nav>

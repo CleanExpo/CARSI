@@ -1,0 +1,125 @@
+{
+  "version": 1,
+  "courseSlug": "mould-remediation-fundamentals",
+  "quizzes": [
+    {
+      "quizId": "ce8d62e3-21da-47a9-b987-d627d1b25c22",
+      "lessonTitle": "Final knowledge check",
+      "title": "Applied Microbial Remediation: Mould Fundamentals — Knowledge Check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Indoors, temperature and a food source are almost always available to mould. Which factor do we therefore control to prevent mould establishing?",
+          "options": [
+            "Light levels",
+            "Moisture",
+            "Air pressure",
+            "The age of the building"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "Roughly how quickly can mould growth begin on a material that stays wet?",
+          "options": [
+            "Within one to two days",
+            "Only after several months",
+            "Only after a full year of dampness",
+            "Mould never grows on building materials indoors"
+          ],
+          "correctIndex": 0,
+          "points": 1
+        },
+        {
+          "questionText": "In the Condition 1/2/3 framing, what does Condition 1 describe, and what is its significance to a remediation?",
+          "options": [
+            "Actual mould growth; it is the starting point of every job",
+            "Settled spores dispersed from a growth area; it is the most contaminated state",
+            "A normal fungal ecology with no actual growth; it is the target end state of remediation",
+            "A sealed containment zone under negative pressure"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "An area is 'primarily contaminated with settled spores dispersed directly or indirectly from a Condition 3 area'. Which condition is this?",
+          "options": [
+            "Condition 1",
+            "Condition 2",
+            "Condition 3",
+            "Condition 4"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "Why is finding and fixing the moisture source treated as part of the remediation rather than a separate task?",
+          "options": [
+            "Because insurers will not pay unless the leak is photographed",
+            "Because remediation will fail and mould will return if the water that caused it remains active",
+            "Because the moisture source determines the colour-coding of equipment",
+            "It is not part of remediation; plumbing is always a separate trade's concern"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "What is the purpose of holding a mould containment under negative pressure?",
+          "options": [
+            "To make the air movers work harder inside the zone",
+            "So air flows into the work area through any gaps rather than out of it, preventing contamination drifting into clean spaces",
+            "To raise the temperature inside the containment",
+            "To remove the need for HEPA air filtration"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "In the remediation sequence, when should containment and engineering controls be established?",
+          "options": [
+            "After the contaminated materials have already been removed",
+            "Before disturbing any contaminated material",
+            "Only if an occupational hygienist requests it",
+            "At the very end, just before verification"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "While mould is still present, which equipment is used for drying, and which is withheld?",
+          "options": [
+            "Air movers only; dehumidifiers are withheld",
+            "Air filtration devices (AFDs/air scrubbers) and dehumidifiers only; air movers are withheld until after remediation and a clearance",
+            "All drying equipment including air movers, run at maximum",
+            "No drying equipment of any kind may be used at any stage"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "Why must air movers NOT be run while mould is present?",
+          "options": [
+            "They use too much power on a 10 A circuit",
+            "Their high-velocity surface airflow aerosolises spores and spreads contamination through the containment and building",
+            "They cannot be tested and tagged",
+            "They lower the humidity too quickly for mould to be removed"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "When is a mould remediation considered finished?",
+          "options": [
+            "As soon as the visible mould has been wiped away",
+            "When the area is verified as returned to Condition 1 — visibly clean, dried to the dry standard, and cleared (with independent clearance where warranted) before containment is removed",
+            "When the client says the smell has gone",
+            "When the invoice has been issued in AUD"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        }
+      ]
+    }
+  ]
+}

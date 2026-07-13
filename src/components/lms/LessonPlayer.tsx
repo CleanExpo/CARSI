@@ -7,7 +7,14 @@ import type { ReactNode } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { CourseFormattedBody } from '@/components/lms/CourseFormattedBody';
 import { DriveFileViewer } from '@/components/lms/DriveFileViewer';
+import { FlashcardDeck } from '@/components/lms/FlashcardDeck';
+import { SlideDeckViewer } from '@/components/lms/SlideDeckViewer';
 import { dash } from '@/lib/dashboard-light-ui';
+import {
+  isFlashcardResource,
+  isSlidesResource,
+  type LessonResource,
+} from '@/lib/lms/lesson-resources';
 import { EnterpriseLessonContent } from '@/components/onboarding/EnterpriseLessonContent';
 import { EnterpriseLessonHeader } from '@/components/onboarding/EnterpriseLessonHeader';
 import { EnterpriseLessonSidebar } from '@/components/onboarding/EnterpriseLessonSidebar';
@@ -27,7 +34,7 @@ interface Lesson {
 
 interface LessonPlayerProps {
   lesson: Lesson;
-  resources?: { label?: string; url?: string }[];
+  resources?: LessonResource[];
   footer?: ReactNode;
   variant?: 'default' | 'enterprise';
   moduleTitle?: string | null;
@@ -52,7 +59,12 @@ export function LessonPlayer({
   moduleLessonTotal,
   courseProgressPercent,
 }: LessonPlayerProps) {
-  const downloads = resources.filter((r) => r.url && r.label);
+  const flashcardDecks = resources.filter(isFlashcardResource);
+  const slideResources = resources.filter(isSlidesResource);
+  const downloads = resources.filter(
+    (r): r is { label?: string; url?: string } =>
+      !isFlashcardResource(r) && !isSlidesResource(r) && Boolean(r.url && r.label)
+  );
   const enterprise = variant === 'enterprise';
 
   if (enterprise) {
@@ -82,6 +94,17 @@ export function LessonPlayer({
             >
               <EnterpriseLessonContent lesson={lesson} />
             </div>
+            {slideResources.map((slidesResource, i) => (
+              <SlideDeckViewer
+                key={`slides-${i}`}
+                label={slidesResource.label}
+                decks={slidesResource.decks}
+                enterprise
+              />
+            ))}
+            {flashcardDecks.map((deck, i) => (
+              <FlashcardDeck key={`flashcards-${i}`} label={deck.label} cards={deck.cards} enterprise />
+            ))}
             {downloads.length > 0 ? (
               <DownloadsPanel downloads={downloads} enterprise />
             ) : null}
@@ -117,6 +140,16 @@ export function LessonPlayer({
 
       <div className="rounded-lg">{renderDefaultContent(lesson)}</div>
 
+      {slideResources.map((slidesResource, i) => (
+        <SlideDeckViewer
+          key={`slides-${i}`}
+          label={slidesResource.label}
+          decks={slidesResource.decks}
+        />
+      ))}
+      {flashcardDecks.map((deck, i) => (
+        <FlashcardDeck key={`flashcards-${i}`} label={deck.label} cards={deck.cards} />
+      ))}
       {downloads.length > 0 ? <DownloadsPanel downloads={downloads} /> : null}
       {footer}
     </div>

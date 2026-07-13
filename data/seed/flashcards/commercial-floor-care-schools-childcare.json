@@ -1,0 +1,228 @@
+{
+  "courseSlug": "commercial-floor-care-schools-childcare",
+  "version": 1,
+  "decks": [
+    {
+      "module": "Module 1: Foundations: WHS, SDS & Child-Safe Selection",
+      "cards": [
+        {
+          "front": "How often must a Safety Data Sheet be reviewed to be considered 'current'?",
+          "back": "At least every 5 years. 'Current' means not more than five years old, and each SDS states its last-reviewed date."
+        },
+        {
+          "front": "Which state operates under its own OHS Act and Regulations rather than the model WHS framework?",
+          "back": "Victoria. For a VIC contract, work to OHS and check with WorkSafe Victoria; the duties are broadly similar but the wording and references differ."
+        },
+        {
+          "front": "You decant a stripper from its drum into a spray bottle. What must you do?",
+          "back": "Correctly label the decanted (secondary) container as well, not just the original drum."
+        },
+        {
+          "front": "What is a hazardous chemicals register and under which regulation is it required?",
+          "back": "A maintained register with a current SDS for each hazardous chemical you keep, kept accessible to workers - required under model WHS Regulation 346."
+        },
+        {
+          "front": "When is a manifest required?",
+          "back": "Only above the Schedule 11 threshold quantities for placarding/manifest. Ordinary floor-care quantities are generally well below those thresholds, so do not confuse the everyday register (which you need) with a manifest."
+        },
+        {
+          "front": "Which National Quality Standard Quality Area is the main 'why' for child-safe, low-tox product selection?",
+          "back": "Quality Area 2 - Children's health and safety (Standard 2.1 Health and Standard 2.2 Safety), under the NQF and overseen by ACECQA."
+        },
+        {
+          "front": "What are the practical steps for cleaning responsibly in occupied, child-occupied rooms?",
+          "back": "Select lower-tox products, dilute per the label (no stronger 'to be sure'), ventilate while working and while products dry, and isolate wet or treated areas from children until they are genuinely ready."
+        },
+        {
+          "front": "Is this course IICRC CEC accredited or does it award CECs?",
+          "back": "No. It is professional development and contract-readiness training; it is not an IICRC CEC accredited course and it does not award IICRC Continuing Education Credits."
+        }
+      ]
+    },
+    {
+      "module": "Module 2: Carpet Cleaning for Occupied Facilities",
+      "cards": [
+        {
+          "front": "What is the recognised standard of care for textile floor coverings?",
+          "back": "ANSI/IICRC S100 (current edition S100-2021). It is a standard of care that supports your judgement, not law; the IICRC is an industry certification body, not a government regulator."
+        },
+        {
+          "front": "How does hot water extraction (HWE) compare with encapsulation?",
+          "back": "HWE gives deeper soil removal but puts more moisture in, so the carpet takes longer to return to service. Encapsulation is low-moisture with a faster return to service but is lighter on heavy embedded soil."
+        },
+        {
+          "front": "Why is encapsulation often preferred for occupied classrooms and care rooms?",
+          "back": "It is a low-moisture method, so the carpet returns to service faster - suiting rooms you cannot take out of action for long."
+        },
+        {
+          "front": "How should you decide between HWE and encapsulation?",
+          "back": "By matching soil load against how fast the space must reopen: HWE for depth when you have a drying window, encapsulation for speed and low disruption."
+        },
+        {
+          "front": "Why should you not quote a fixed dry time?",
+          "back": "Drying depends on the carpet's fibre and construction, how much moisture was applied, airflow, temperature and humidity, so it is genuinely conditions-dependent."
+        },
+        {
+          "front": "Before using an Actichem product such as a pre-spray or spotter, what should you do?",
+          "back": "Read the current SDS and dilute strictly per the product label. The AP-code only tells you which sheet to read, not how to use the product."
+        },
+        {
+          "front": "Why does pre-inspection matter under S100?",
+          "back": "It lets you identify fibre and construction, read the soil load, find pre-existing damage or staining and set realistic client expectations - and it protects you commercially so pre-existing problems are not later blamed on your visit."
+        },
+        {
+          "front": "When cleaning carpet in a child-occupied room, which hazard controls apply?",
+          "back": "Isolate and sign damp floors, route and manage cords so they are not a trip hazard, keep equipment away from children, and sequence rooms so each dries and reopens."
+        }
+      ]
+    },
+    {
+      "module": "Module 3: Tile & Grout Cleaning",
+      "cards": [
+        {
+          "front": "Why do grout lines look dingy even when the tiles look clean?",
+          "back": "Grout is porous and traps greasy and particulate soil below the surface, while the denser, largely sealed tile face rinses clean."
+        },
+        {
+          "front": "What three things must work together to clean tile and grout effectively?",
+          "back": "The right chemistry to loosen and suspend the soil, mechanical agitation to break it free from inside the grout, and proper rinse and recovery to remove the suspended soil rather than redepositing it."
+        },
+        {
+          "front": "What is the correct order for a sound tile and grout method?",
+          "back": "Pre-wet, apply the solution, dwell (per the label), agitate, rinse, then recover."
+        },
+        {
+          "front": "Which CCW tool suits production cleaning across an open tiled floor?",
+          "back": "The Hydroforce SX-7 spinner head, which pairs pressurised solution with a contained spinning action to clean and recover in one pass. The Dirty Grout Demon brushes suit detail, edges and small areas."
+        },
+        {
+          "front": "What does the SDS for an alkaline product such as Defender SV (AP672) provide?",
+          "back": "The hazards, PPE, safe handling and storage, and first-aid measures - not the site's slip class and not a re-entry time."
+        },
+        {
+          "front": "What does AS 4663 do, and how does it differ from AS 4586?",
+          "back": "AS 4663 measures slip resistance of existing, in-service surfaces (the correct basis to confirm a cleaned floor against a target slip class). AS 4586 classifies new surfaces before installation."
+        },
+        {
+          "front": "Do AS 4586 and AS 4663 set cure, dry or re-entry times?",
+          "back": "No. They classify and measure slip resistance only; they do not tell you when it is safe to walk on a floor."
+        },
+        {
+          "front": "How do you control residue on a cleaned tile floor?",
+          "back": "Apply only as much product as you can rinse and recover, keep dwell within the label's guidance, rinse properly and recover well. If in doubt, an extra rinse pass is cheaper than a callback."
+        }
+      ]
+    },
+    {
+      "module": "Module 4: Vinyl Strip & Seal - the high-risk job",
+      "cards": [
+        {
+          "front": "What is the correct order of stages in the generic strip-and-seal process?",
+          "back": "Strip the old finish, rinse and neutralise, dry the floor, then apply multiple thin coats of sealer and finish with drying between each coat."
+        },
+        {
+          "front": "Where do dilution, coat counts and dry/cure/re-entry times come from?",
+          "back": "Only the product's SDS and TDS - never a fixed rule or memory, because they are product-specific and two products can behave very differently."
+        },
+        {
+          "front": "Vinyl floor strippers such as Actichem Instastrip (SDS AP400) are typically what?",
+          "back": "Alkaline/caustic - which is why appropriate PPE and ventilation per the product SDS are required."
+        },
+        {
+          "front": "Why must you never state a fixed cure or re-entry time?",
+          "back": "Different sealers and finishes cure at different rates, affected by temperature, humidity, airflow and coat thickness; the correct dry-between-coats, full-cure and re-entry guidance lives in that product's TDS."
+        },
+        {
+          "front": "While a stripped or freshly recoated floor is wet or curing, what is the correct control?",
+          "back": "Isolate the area and sign it, keeping people out for the whole wet/curing period. In childcare, physical isolation (barriers, locked-off rooms, out-of-hours scheduling) protects children far better than a sign alone."
+        },
+        {
+          "front": "Which standard is the correct basis to verify slip resistance of the finished, in-service floor?",
+          "back": "AS 4663:2013, which measures existing in-service surfaces. AS 4586:2013 classifies new surfaces before installation, so it is not the right basis here."
+        },
+        {
+          "front": "Why apply sealer and finish in thin, even coats rather than one thick layer?",
+          "back": "Thin coats dry and cure more predictably and give a more durable, even surface. Applying a coat before the one beneath is ready traps solvent or water, clouds the finish and weakens adhesion."
+        },
+        {
+          "front": "What controls should be ready for caustic strippers?",
+          "back": "PPE (gloves, eye protection and clothing per the SDS), ventilation as the SDS directs, spill control ready to confine and clean up spills, and knowing the SDS first-aid response before you start."
+        }
+      ]
+    },
+    {
+      "module": "Module 5: Pressure Washing & Run-off Control",
+      "cards": [
+        {
+          "front": "How do you choose pressure and nozzle for a surface?",
+          "back": "Match them to the surface: hard sound concrete tolerates higher pressure, while pavers, soft-fall, painted line-marking, timber and coated surfaces need the lowest practical pressure or another method. Use the widest fan that still works, keep the nozzle moving, and test a small out-of-the-way patch first if unsure."
+        },
+        {
+          "front": "Why treat the pressure washer as a genuine injury hazard?",
+          "back": "High-pressure water can break skin and inject contaminants. Never point the lance at yourself or anyone, never clear a blockage with the trigger live, and wear eye protection, sturdy footwear and hearing protection as needed."
+        },
+        {
+          "front": "When should outdoor pressure washing be scheduled at a childcare centre?",
+          "back": "When the area is vacated - before children arrive, after they leave, or during holiday/deep-clean programs - with the work zone physically cordoned off so children are nowhere near it."
+        },
+        {
+          "front": "What does 'the drain is just for rain' mean?",
+          "back": "Stormwater drains generally flow untreated straight to creeks, rivers and the sea, so contaminated wash water must not be allowed to enter them."
+        },
+        {
+          "front": "How do you control pressure-washing run-off?",
+          "back": "Confine the area (booms, absorbent socks, temporary bunding, and covers over nearby stormwater pits), recover the wash water (usually with a wet vacuum or vacuum-recovery system), and direct it to sewer."
+        },
+        {
+          "front": "What approval is needed before discharging trade wastewater to the sewer?",
+          "back": "Prior written approval from the water authority - a trade-waste agreement - which must be in place before you discharge, not arranged afterwards."
+        },
+        {
+          "front": "What is the general environmental duty?",
+          "back": "The broad obligation to take reasonable and practicable steps to prevent or minimise harm to the environment from your activities; it is on you to plan the job so run-off is controlled from the start."
+        },
+        {
+          "front": "How should you treat a specific dollar penalty quoted for a water-pollution offence?",
+          "back": "As illustrative and jurisdiction-specific - verify against the current Act, because offences, defences and penalty amounts differ between states and territories and change over time."
+        }
+      ]
+    },
+    {
+      "module": "Module 6: Winning & Servicing the Contract",
+      "cards": [
+        {
+          "front": "How does school and childcare floor-care work split?",
+          "back": "Into daily or routine work (light, frequent cleaning) and periodic work (heavy, intermittent jobs like hard-floor strip and seal and carpet hot water extraction)."
+        },
+        {
+          "front": "Why is periodic work scheduled into deep-clean or school-holiday windows?",
+          "back": "Strip and seal leaves floors wet and curing (a slip and access hazard) and extraction adds moisture that needs drying time; you cannot reliably run either through a facility full of children."
+        },
+        {
+          "front": "What three levers reduce disruption when working in an occupied facility?",
+          "back": "Sequencing (work room by room so usable space always remains), drying (build in realistic drying time and do not quote a fixed figure), and signage and isolation of wet or curing floors."
+        },
+        {
+          "front": "Is a Working With Children check a single national credential?",
+          "back": "No. WWC checks are legislated and administered separately per state/territory (NSW WWCC, VIC Working with Children Check, QLD Blue Card, ACT WWVP), are generally not auto-transferable, and may not be the only screening a site requires."
+        },
+        {
+          "front": "What is the standard for a 'current' SDS in the pre-contract paperwork baseline?",
+          "back": "Not more than five years old, with a stated last-reviewed date, held in an accessible hazardous chemicals register with a current SDS for each chemical."
+        },
+        {
+          "front": "Where is the binding detail on cleaning frequency and timing found?",
+          "back": "In the current contract specification. Published standards such as those from School Infrastructure NSW are directional for planning, but you verify against the spec rather than assuming frequencies."
+        },
+        {
+          "front": "What should the one-page service offer commit to for slip resistance?",
+          "back": "Re-verifying slip resistance on finished hard floors after sealing on the basis of AS 4663 (which measures existing in-service surfaces), while being clear that AS 4663 measures only and does not set cure or re-entry times."
+        },
+        {
+          "front": "What documentation does a school or childcare contract expect you to provide?",
+          "back": "The SDS register, the correct state or territory WWC checks for your workers plus any site induction, your method statements, and your slip-resistance verification records."
+        }
+      ]
+    }
+  ]
+}

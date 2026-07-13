@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
-# DigitalOcean App Platform PRE_DEPLOY job: apply pending Prisma migrations to the live database.
-# Uses the app's own DATABASE_URL + DATABASE_CA_CERT (the direct connection the app already uses),
-# so it always targets the correct production database. Idempotent (applies pending only); a failure
-# blocks the deploy, which is the desired safety behaviour.
+# Production database migrate: apply pending Prisma migrations using DATABASE_URL +
+# DATABASE_CA_CERT (DigitalOcean managed Postgres). Idempotent; failure blocks container start.
 set -euo pipefail
 
 if [ -z "${DATABASE_URL:-}" ]; then
@@ -33,6 +31,6 @@ RESOLVED_URL="$(node -e '
 ')"
 export DATABASE_URL="$RESOLVED_URL"
 
-echo "Applying pending Prisma migrations to the production database…"
+echo "Applying pending Prisma migrations…"
 npx prisma migrate deploy
 echo "Migrations up to date."

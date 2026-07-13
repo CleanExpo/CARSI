@@ -1,0 +1,125 @@
+{
+  "version": 1,
+  "courseSlug": "category-3-sewage-black-water-remediation",
+  "quizzes": [
+    {
+      "quizId": "fb3c36ab-c28e-465a-b3ba-b36c0afeb8f6",
+      "lessonTitle": "Verification, clearance and the defensible file",
+      "title": "Category 3 — Sewage & Black-Water Remediation — Knowledge Check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Which best describes Category 3 (\"black\") water?",
+          "options": [
+            "Clean water from a sanitary source such as a supply line",
+            "Grossly contaminated water containing harmful agents — e.g. sewage, flood water, rising ground water",
+            "Slightly used water with no health risk",
+            "Any water that is coloured or discoloured"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "Category 1 or 2 water that is left and supports microbial growth or passes through contaminated materials:",
+          "options": [
+            "Stays the same category permanently",
+            "Becomes safe to drink over time",
+            "Deteriorates to Category 3 and must be treated as such",
+            "Only changes category if a laboratory confirms it"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "For a saturated Category 3 job, how should porous materials such as carpet, underlay and wet plasterboard generally be treated?",
+          "options": [
+            "Dried in place and kept, because replacement is expensive",
+            "Discarded as contaminated waste — they usually cannot be effectively cleaned and verified",
+            "Sprayed with fragrance and left",
+            "Sent to general household recycling"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "What must happen before any worker enters a Category 3 site?",
+          "options": [
+            "Nothing — start extraction immediately to save time",
+            "A documented risk assessment and Safe Work Method Statement (SWMS), with vulnerable occupants removed and power isolated",
+            "Only a photo of the damage for the insurer",
+            "A coat of antimicrobial over everything"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "Which is the minimum respiratory protection typically appropriate for hands-on sewage/black-water work, and what makes it effective?",
+          "options": [
+            "A cloth mask, effective in all situations",
+            "A properly fit-tested P2 (or higher) respirator that seals against the face",
+            "No respirator is needed for water work",
+            "Any dust mask, worn loosely for comfort"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "Where should contaminated Category 3 water generally be disposed of?",
+          "options": [
+            "Into the nearest stormwater drain",
+            "Onto the garden or nature strip",
+            "To sewer under the water authority&rsquo;s trade-waste rules, or via a licensed liquid-waste contractor",
+            "Left on site to evaporate"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "When choosing an antimicrobial/disinfectant for a Category 3 job in Australia, you should:",
+          "options": [
+            "Use any product with a US EPA registration as if it applied here",
+            "Use a product legal for the purpose in Australia (e.g. APVMA/TGA as applicable), following the Australian label and SDS",
+            "Mix bleach with an acid cleaner for extra strength",
+            "Apply antimicrobial over visible soiling without cleaning first"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "Mould is found on a wall during a sewage remediation. What is the correct approach to airflow?",
+          "options": [
+            "Aim air movers at the mould to dry it quickly",
+            "Contain, run AFDs and dehumidifiers, remediate the mould, and introduce air movers only after the area is cleaned and cleared",
+            "Increase fan speed to push spores outside",
+            "Ignore it and keep drying"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "What is the correct order for cleaning and sanitising a salvageable surface?",
+          "options": [
+            "Sanitise first, then remove soiling",
+            "Remove visible soiling first, then apply the antimicrobial and allow the required contact (dwell) time",
+            "Apply antimicrobial and wipe it straight off",
+            "Only sanitise; cleaning is unnecessary"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "A Category 3 job is complete when:",
+          "options": [
+            "The area looks tidy and smells clean",
+            "The contamination is removed, surfaces are cleaned and sanitised, materials are dried to the dry standard, any mould is cleared, and it is all documented",
+            "The water has been extracted",
+            "The customer says it looks fine"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        }
+      ]
+    }
+  ]
+}

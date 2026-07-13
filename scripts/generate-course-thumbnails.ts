@@ -28,6 +28,7 @@
 import 'dotenv/config';
 
 import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { createInterface } from 'node:readline/promises';
 import { dirname, join } from 'node:path';
@@ -67,6 +68,55 @@ const DISCIPLINE_PALETTE_WORDS: Record<string, string> = {
   CCT: 'bright clean cyan and aqua tones',
   FSRT: 'warm ember orange against deep charcoal',
   AMRT: 'clean clinical greens',
+};
+
+// ---------------------------------------------------------------------------
+// IICRC CEC Accredited signature (licence-critical, FAIL-CLOSED)
+// ---------------------------------------------------------------------------
+// A course earns the unified "accredited" thumbnail look ONLY when it appears in
+// the CEC approvals registry (data/seed/cec-approvals.json) with status
+// 'approved' — the SAME SSOT the compliance guards read
+// (scripts/check-iicrc-compliance.mjs). An empty/unreadable registry yields an
+// empty set → NO course is styled as accredited. This makes it impossible to
+// imply CEC accreditation on a course the IICRC has not approved.
+//
+// The signature is COLOUR + FINISH only — never a seal, badge, medallion, crest
+// or any mark. IICRC logos/marks are prohibited (CARSI/CLAUDE.md), and a generic
+// "accreditation seal" could imply one, so the negative prompt below forbids all
+// emblem forms and the distinction is carried purely by a shared navy/gold
+// palette + finish, giving every accredited course one recognisable look.
+const CEC_APPROVALS_PATH = join(__dirname, '..', 'data', 'seed', 'cec-approvals.json');
+
+function loadApprovedCecSlugs(): Set<string> {
+  try {
+    const parsed = JSON.parse(readFileSync(CEC_APPROVALS_PATH, 'utf8')) as {
+      approvals?: Array<{ slug?: unknown; status?: unknown }>;
+    };
+    if (!Array.isArray(parsed?.approvals)) return new Set();
+    return new Set(
+      parsed.approvals
+        .filter((e) => e && e.status === 'approved' && typeof e.slug === 'string' && e.slug.trim())
+        .map((e) => (e.slug as string).trim()),
+    );
+  } catch {
+    return new Set(); // fail-closed: unreadable registry → no accredited styling
+  }
+}
+
+const CEC_APPROVED_SLUGS: Set<string> = loadApprovedCecSlugs();
+
+const CEC_SIGNATURE = {
+  palette:
+    'a single unified accreditation signature palette shared by every accredited course: ' +
+    'deep authoritative navy and midnight blue, richer and darker than standard course art, ' +
+    'lifted by refined brushed-gold and warm amber accents',
+  mood: 'prestigious, credentialed, authoritative; a premium continuing-education standard; quietly distinguished',
+  finish:
+    'Accreditation finish: a consistent premium treatment — a soft warm golden rim-light on the ' +
+    'subject and a subtle radial gold glow in the darker upper region — so every accredited ' +
+    'course shares the same recognisable distinguished look.',
+  // Reinforce the mark ban: no invented seal/badge that could read as an IICRC mark.
+  negative: 'no seals, no badges, no medallions, no crests, no emblems, no ribbons, no stamps, no shields',
 };
 
 // Prisma is loaded lazily: --plan, --dry-run and the default seed-JSON source need no DB,
@@ -269,8 +319,17 @@ async function scaffold(timestamp: string, force: boolean): Promise<void> {
 // ---------------------------------------------------------------------------
 
 function buildPrompt(brief: CourseThumbnailBrief): string {
-  const palette = brief.palette.trim() || 'professional, restrained, brand-aligned tones';
-  const mood = brief.mood.trim() || 'calm, professional, trustworthy';
+  // Fail-closed: only registry-approved courses carry the unified accredited look.
+  const isCecAccredited = CEC_APPROVED_SLUGS.has(brief.slug);
+
+  // For accredited courses the per-course discipline palette/mood is overridden by
+  // the single shared CEC signature — that shared palette IS the distinction.
+  const palette = isCecAccredited
+    ? CEC_SIGNATURE.palette
+    : brief.palette.trim() || 'professional, restrained, brand-aligned tones';
+  const mood = isCecAccredited
+    ? CEC_SIGNATURE.mood
+    : brief.mood.trim() || 'calm, professional, trustworthy';
   const composition =
     brief.composition.trim() ||
     'keep the focal subject off-centre and toward the lower-right; keep depth and background space';
@@ -279,12 +338,15 @@ function buildPrompt(brief: CourseThumbnailBrief): string {
     `Concept: ${brief.concept.trim().replace(/\.+$/, '')}.`,
     brief.motifs.length ? `Visual elements: ${brief.motifs.join(', ')}.` : '',
     `Colour palette: ${palette}. Mood: ${mood}.`,
+    isCecAccredited ? CEC_SIGNATURE.finish : '',
     `Composition: ${composition}. Wide 3:2 landscape.`,
     'Leave the upper-left third calm, uncluttered and darker so a white title can be overlaid;',
     'compose for a soft dark vertical vignette without losing the subject.',
     // Hard exclusions — always appended, never left solely to the brief.
     'Absolutely no text, no words, no letters, no numbers, no logos, no watermarks, no signage,',
     `no UI elements, no captions. ${brief.negativePrompt.trim()}.`,
+    // Accredited courses additionally forbid any invented emblem that could read as an IICRC mark.
+    isCecAccredited ? `${CEC_SIGNATURE.negative}.` : '',
     'Professional, modern, Australian restoration-industry context. High detail, photographic lighting,',
     'clean and uncluttered.',
   ]

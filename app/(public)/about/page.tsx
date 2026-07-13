@@ -10,6 +10,8 @@ import {
 } from 'lucide-react';
 
 import { AboutMissionPillars } from '@/components/marketing/about/AboutMissionPillars';
+import { MeetTheBoard } from '@/components/marketing/about/MeetTheBoard';
+import { getBoardMembers } from '@/lib/board-members';
 import { MarketingPageShell } from '@/components/marketing/MarketingPageShell';
 import { MarketingSectionHeader } from '@/components/marketing/MarketingSectionHeader';
 import { GlassStatCard } from '@/components/industries/GlassStatCard';
@@ -235,6 +237,16 @@ export default async function AboutPage() {
             </div>
           ))}
         </div>
+      </section>
+
+      <section className="mb-10" aria-labelledby="board-heading">
+        <h2 id="board-heading" className={`text-xl font-bold sm:text-2xl ${marketingTextStrong}`}>
+          Meet the Board
+        </h2>
+        <p className={`mt-2 max-w-xl ${marketingBodySm}`}>
+          The people leading CARSI’s direction, course standards and industry partnerships.
+        </p>
+        <MeetTheBoard members={getBoardMembers()} />
       </section>
 
       <section

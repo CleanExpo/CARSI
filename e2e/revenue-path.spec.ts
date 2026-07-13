@@ -33,9 +33,11 @@ test.describe('Subscription & pricing', () => {
     await expect(page.getByText(/\$?\s?795/).first()).toBeVisible({ timeout: 15_000 });
     // A membership/checkout affordance is present (revenue entry point wired). It's a
     // button ("Start Membership") on this page, so match link OR button, role-agnostic.
+    // With SUBSCRIPTIONS_ENABLED off, SubscribeCta shows "Coming soon" (span).
+    // With flag on, it shows "Start membership". Match either revenue entry or honest gate.
     const cta = page
-      .locator('a, button')
-      .filter({ hasText: /start membership|subscribe|join|get started|enrol/i })
+      .locator('a, button, span[aria-disabled]')
+      .filter({ hasText: /start membership|coming soon|subscribe|join|get started|enrol/i })
       .first();
     await expect(cta).toBeVisible({ timeout: 10_000 });
   });

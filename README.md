@@ -72,7 +72,7 @@ This repo contains the full CARSI web application: public marketing pages, the l
 - **ORM**: Prisma 7
 - **Payments**: Stripe
 - **AI**: focused provider integrations for assistant, image generation, and verification workflows
-- **Deployment**: Docker + DigitalOcean App Platform (`app.yaml`, `Dockerfile`)
+- **Deployment**: Docker + DigitalOcean App Platform (`app.yaml`, `deploy/Dockerfile`)
 
 ---
 
@@ -163,7 +163,7 @@ Production build runs:
 Deployment uses:
 
 - `app.yaml`: service definition + environment variable scopes
-- `Dockerfile`: multi-stage build + Next.js standalone output
+- `deploy/Dockerfile`: multi-stage build + Next.js standalone output
 
 Notes:
 

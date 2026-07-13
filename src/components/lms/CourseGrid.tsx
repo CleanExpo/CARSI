@@ -11,7 +11,10 @@ import { CourseGridSkeleton } from './CourseCardSkeleton';
 
 const smoothEase: [number, number, number, number] = [0.4, 0, 0.2, 1];
 
-const DISCIPLINE_TABS = ['All', 'Onboarding', 'WRT', 'CRT', 'ASD', 'OCT', 'CCT', 'FSRT', 'AMRT', 'Free'] as const;
+// Topic tabs (de-IICRC 2026-07-10): CARSI does not brand courses with IICRC
+// discipline acronyms, so the catalogue filters by plain restoration topic
+// (matched against course title/category), not by WRT/ASD/etc.
+const DISCIPLINE_TABS = ['All', 'Onboarding', 'Water Damage', 'Mould', 'Fire & Smoke', 'Cleaning', 'Free'] as const;
 type DisciplineTab = (typeof DISCIPLINE_TABS)[number];
 type PriceFilter = 'all' | 'free' | 'paid';
 type CecFilter = 'all' | 'has-cec';
@@ -20,25 +23,19 @@ type DurationFilter = 'all' | 'short' | 'medium' | 'long';
 // Bright accents — used on dark surfaces only (active-tab text sits on a ~9% tint of itself).
 const tabColors: Record<string, string> = {
   Onboarding: '#ed9d24',
-  WRT: '#0f5fa8',
-  CRT: '#26c4a0',
-  ASD: '#6c63ff',
-  OCT: '#9b59b6',
-  CCT: '#17b8d4',
-  FSRT: '#f05a35',
-  AMRT: '#27ae60',
+  'Water Damage': '#0f5fa8',
+  Mould: '#27ae60',
+  'Fire & Smoke': '#f05a35',
+  Cleaning: '#17b8d4',
 };
 
 // WCAG AA light-mode accents — darkened so active-tab text clears 4.5:1 on its pale tint over white.
 const tabColorsLight: Record<string, string> = {
   Onboarding: '#a85500',
-  WRT: '#0f5fa8',
-  CRT: '#0f766e',
-  ASD: '#4f46e5',
-  OCT: '#7e3ba0',
-  CCT: '#0e7490',
-  FSRT: '#c2410c',
-  AMRT: '#157a55',
+  'Water Damage': '#0f5fa8',
+  Mould: '#157a55',
+  'Fire & Smoke': '#c2410c',
+  Cleaning: '#0e7490',
 };
 
 interface Course {
@@ -107,9 +104,14 @@ function matchesDiscipline(course: Course, tab: DisciplineTab): boolean {
     const p = priceNum(course.price_aud);
     return course.is_free === true || p === 0;
   }
-  const disc = (course.discipline ?? course.category ?? '').toUpperCase();
-  if (disc.includes(tab)) return true;
-  return false;
+  // Match the topic tab against the course's category AND title (WP-era courses
+  // often have a null category, so title is needed). `discipline` is retained for
+  // any legacy rows but is null across the CARSI catalogue post-de-IICRC.
+  const hay = [course.discipline, course.category, course.title]
+    .filter(Boolean)
+    .join(' ')
+    .toUpperCase();
+  return hay.includes(tab.toUpperCase());
 }
 
 function normalizedLevel(course: Course): string {
@@ -223,7 +225,10 @@ export function CourseGrid({
           matchesTag(c, tagFilter) &&
         (q === '' ||
           c.title.toLowerCase().includes(q) ||
-          (c.short_description ?? '').toLowerCase().includes(q))
+          (c.short_description ?? '').toLowerCase().includes(q) ||
+          (c.category ?? '').toLowerCase().includes(q) ||
+          c.slug.toLowerCase().includes(q) ||
+          (c.tags ?? []).some((t) => t.toLowerCase().includes(q)))
         );
       }
     );
@@ -250,7 +255,7 @@ export function CourseGrid({
             : 'scrollbar-hide mb-5 flex gap-2 overflow-x-auto rounded-lg border border-slate-200 bg-white p-1'
         }
         role="tablist"
-        aria-label="Filter by discipline"
+        aria-label="Filter by topic"
       >
         {DISCIPLINE_TABS.map((tab) => {
           const isActive = activeTab === tab;

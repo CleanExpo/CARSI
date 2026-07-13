@@ -11,6 +11,7 @@ import {
   HubSecondaryPills,
 } from '@/components/marketing/hub/HubUi';
 import { getBackendOrigin } from '@/lib/env/public-url';
+import { filterExcludedEvents } from '@/lib/calendar/event-exclusions';
 import {
   marketingHubCard,
   marketingHubSectionLabel,
@@ -50,6 +51,8 @@ const BACKEND_URL = getBackendOrigin();
 const EVENT_TYPES = [
   { value: 'conference', label: 'Conferences' },
   { value: 'training', label: 'Training' },
+  { value: 'iicrc-school', label: 'IICRC Schools' },
+  { value: 'carsi-training', label: 'CARSI Training Days' },
   { value: 'webinar', label: 'Webinars' },
   { value: 'workshop', label: 'Workshops' },
   { value: 'networking', label: 'Networking' },
@@ -68,6 +71,8 @@ const INDUSTRY_SEGMENTS = [
 const EVENT_TYPE_COLOURS: Record<string, string> = {
   conference: 'bg-[#eef7ff] text-[#146fc2] dark:bg-[rgba(36,144,237,0.15)] dark:text-[#2490ed]',
   training: 'bg-emerald-50 text-emerald-700 dark:bg-[rgba(52,211,153,0.15)] dark:text-[#34d399]',
+  'iicrc-school': 'bg-[#eef7ff] text-[#146fc2] dark:bg-[rgba(36,144,237,0.15)] dark:text-[#2490ed]',
+  'carsi-training': 'bg-sky-50 text-sky-700 dark:bg-[rgba(56,189,248,0.15)] dark:text-[#38bdf8]',
   webinar: 'bg-violet-50 text-violet-700 dark:bg-[rgba(167,139,250,0.15)] dark:text-[#a78bfa]',
   workshop: 'bg-amber-50 text-amber-700 dark:bg-[rgba(251,191,36,0.15)] dark:text-[#fbbf24]',
   networking: 'bg-red-50 text-red-600 dark:bg-[rgba(248,113,113,0.15)] dark:text-[#f87171]',
@@ -114,7 +119,10 @@ async function getEvents(eventType?: string, category?: string): Promise<EventLi
     });
     clearTimeout(timeoutId);
     if (!res.ok) return { data: [], total: 0, limit: 50, offset: 0 };
-    return res.json();
+    const json = (await res.json()) as EventListResponse;
+    // Hard exclusion (founder directive): the excluded coaching brand must never appear
+    // on the calendar — see src/lib/calendar/event-exclusions.ts.
+    return { ...json, data: filterExcludedEvents(json.data ?? []) };
   } catch {
     return { data: [], total: 0, limit: 50, offset: 0 };
   }
@@ -281,7 +289,7 @@ export default async function CalendarPage({
         <HubCtaBanner
           title="Have an industry event to list?"
           description="Submit it for free — we review and publish within 24 hours."
-          href="/calendar/submit"
+          href="/submit/event"
           ctaLabel="Submit Event"
         />
 

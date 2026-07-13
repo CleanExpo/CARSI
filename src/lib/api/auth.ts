@@ -14,6 +14,8 @@ export interface User {
   email: string;
   full_name: string;
   roles: string[];
+  /** True when this account may open `/admin` (JWT role admin, or email allowlisted). */
+  can_access_admin?: boolean;
   theme_preference: string;
   is_active: boolean;
   is_verified: boolean;

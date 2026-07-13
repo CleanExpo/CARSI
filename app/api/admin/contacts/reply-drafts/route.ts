@@ -20,13 +20,6 @@ function hasAgentSecret(request: NextRequest): boolean {
   return request.headers.get('authorization') === `Bearer ${secret}`;
 }
 
-/** A judge verdict counts as a PASS (auto-send-eligible) when explicitly approved. */
-function judgePassed(verdict?: JudgeVerdict | null): boolean {
-  if (!verdict) return false;
-  if (typeof verdict.verdict === 'string' && /approve/i.test(verdict.verdict)) return true;
-  return typeof verdict.score === 'number' && verdict.score >= 90;
-}
-
 interface CreateDraftBody {
   submissionId?: string;
   recipientEmail?: string;
@@ -130,7 +123,12 @@ export async function POST(request: NextRequest) {
   }
 
   const draftedBy = body.draftedBy?.trim() || (session ? `admin:${session.email}` : 'agent:carsi-contact-reply');
-  const autoSendEligible = judgePassed(body.judgeVerdict);
+  // WS5: NEVER derive auto-send eligibility from a caller-supplied verdict — the
+  // drafting model must not approve its own outbound email. Drafts are created
+  // not-eligible; a human approves via PATCH (and the SLA cron is additionally
+  // gated behind CONTACT_REPLY_AUTOSEND_ENABLED). The verdict is kept as advisory
+  // provenance only.
+  const autoSendEligible = false;
   const provenance = buildReplyProvenance({
     question,
     sources,

@@ -115,7 +115,7 @@ function MessageBlocks({ text, emphasizeLead }: { text: string; emphasizeLead?: 
     );
   }
 
-  const firstParagraphIndex = blocks.findIndex((b) => b.type === 'paragraph');
+  let paragraphIndex = 0;
 
   return (
     <div className="space-y-3 text-[13.5px] leading-[1.65] text-white/80">
@@ -161,7 +161,9 @@ function MessageBlocks({ text, emphasizeLead }: { text: string; emphasizeLead?: 
           );
         }
 
-        const isLead = emphasizeLead && block.type === 'paragraph' && index === firstParagraphIndex;
+        const isLead = emphasizeLead && block.type === 'paragraph' && paragraphIndex === 0;
+        // eslint-disable-next-line react-hooks/immutability -- render-scoped counter over blocks; pre-existing rule promotion, behaviour-preserving suppression
+        paragraphIndex += 1;
 
         return (
           <p

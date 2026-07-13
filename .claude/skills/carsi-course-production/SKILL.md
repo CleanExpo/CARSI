@@ -70,13 +70,17 @@ edit is saved.
   delivers IICRC certification, examinations, or credentials. IICRC certification is obtained only
   through **IICRC-approved schools and examinations**; CARSI courses earn **CECs** toward
   maintaining an existing IICRC certification.
-- Also avoid bare "IICRC [discipline] training" (e.g. "IICRC FSRT training") or "[discipline]
-  certification covers…" when describing CARSI's own course content — say "[discipline]-aligned
-  CEC training" instead, so it reads as CARSI's course aligning to the discipline, not as the
-  IICRC certification itself.
-- FINE: a student's own existing IICRC certification (recert reminders, member number, CEC
-  tracking), "WRT/ASD/AMRT-aligned" content descriptors, and discipline badges framed as CEC
-  discipline alignment.
+- **CARSI DESIGNATION RULE (founder 2026-07-10 — MUST).** CARSI issues its OWN credentials, the
+  **CARSI Southern Hemisphere Restoration Designations** (e.g. "CARSI Water Restoration Practitioner",
+  "CARSI Mould Remediation Practitioner") — like the RIA issuing its own designations, not teaching
+  IICRC's. So a CARSI course is **never** branded with an IICRC discipline **acronym**
+  (WRT/ASD/AMRT/FSRT/CCT/TCST) and **never** "[discipline]-aligned". Set `iicrcDiscipline: null`;
+  put the credential in `meta.designation` + `meta.designationProgram`. Dual value: a CARSI
+  designation that **also earns IICRC CECs**.
+- FINE: *referencing* a student's own existing IICRC certification (recert reminders, member number,
+  CEC tracking), a third-person fact ("FSRT is an IICRC certification covering…"), and citing an
+  IICRC S-standard **nominatively** ("ANSI/IICRC S500"). BANNED: using an IICRC discipline acronym or
+  "[discipline]-aligned" to name/brand a CARSI course or its trainees.
 - Getting this wrong can cost the licence to sell courses — treat as a release blocker. Enforced by
   `npm run check:iicrc-terminology`.
 
@@ -100,3 +104,24 @@ Fix all before the course goes live. Prod publish/unpublish remains founder-gate
 ## Governance
 Prod DB is unreachable locally; course data changes go via the founder's authed admin session (guarded
 full-echo PATCH — preserve modules/price/publish/introVideoUrl). `main = prod` (DO deploy_on_push).
+
+## IICRC standards IP + AI use — prohibited (MUST)
+
+Per the IICRC's published AI Use Policy and copyright terms on its official standards store
+(iicrc.gilmoreglobal.com), and its brand/trademark enforcement:
+
+- **Never feed IICRC standard text into any AI tooling.** The IICRC prohibits entry of its
+  standards and related intellectual property into any form of AI tool, and prohibits creating AI
+  derivatives of its published and draft standards. This binds every CARSI content pipeline
+  (course-asset-kit, AI course creation, prompt contexts, RAG/embedding corpora) — violation risks
+  access suspension and legal action against the licence holder.
+- **Never reproduce standard text beyond a brief, attributed reference.** Standards are
+  copyright-protected and not printable ("printing limited to small sections for reference only").
+  Courses may reference a standard nominatively ("aligned to ANSI/IICRC S500:2021") — never paste
+  its sections, tables or procedures. The course-kit excerpt heuristic
+  (`src/lib/course-kit/standards-excerpt.ts`, `scanCourseForStandardExcerpts`) flags suspected
+  pasted standard text at scaffold time — treat a hit as a release blocker until cleared.
+- **Never use IICRC logos or marks without written permission.** The "IICRC" wordmark is
+  nominative-use only; logo rights attach to Certified Firms/Registrants under signed agreements,
+  and the IICRC publicly enforces violations (its "Invalid Firms" list). CARSI currently uses no
+  IICRC mark — keep it that way unless the founder holds written permission.

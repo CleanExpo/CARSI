@@ -1,0 +1,125 @@
+{
+  "version": 1,
+  "courseSlug": "psychrometry-building-science-for-drying",
+  "quizzes": [
+    {
+      "quizId": "02f50dfb-f5e3-4b1e-8108-4cdce4e6f4cd",
+      "lessonTitle": "EMC targets by NCC climate zone",
+      "title": "Psychrometry & Building Science for Drying — Knowledge Check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Which four measurements together describe the state of moist air for drying decisions?",
+          "options": [
+            "Colour, odour, texture and weight",
+            "Temperature, relative humidity, dew point, and specific humidity (g/kg)",
+            "Wind speed, air pressure, rainfall and cloud cover",
+            "Only relative humidity, read at the start and end of the job"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "Why can relative humidity (RH) alone be misleading when judging how much water is in the air?",
+          "options": [
+            "RH cannot be measured with a standard hygrometer",
+            "RH depends on temperature, so the same mass of water in the air shows a different RH reading as temperature rises or falls",
+            "RH is only relevant to outdoor air, never indoor air",
+            "RH and dew point always move in opposite directions"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "What is dew point?",
+          "options": [
+            "The temperature at which air becomes saturated (100% RH) and begins to condense moisture",
+            "The maximum safe operating temperature for a dehumidifier",
+            "The average daily temperature recorded by the Bureau of Meteorology",
+            "A fixed value that never changes regardless of how much water is in the air"
+          ],
+          "correctIndex": 0,
+          "points": 1
+        },
+        {
+          "questionText": "In Australian practice, specific humidity (the actual mass of water carried by the air) is expressed in:",
+          "options": [
+            "Relative humidity as a percentage (%)",
+            "Grams of water per kilogram of dry air (g/kg)",
+            "Litres per square metre",
+            "Degrees Celsius (&deg;C)"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "What does a psychrometric chart or digital psychrometric calculator let a technician do?",
+          "options": [
+            "Replace the need for a hygrometer entirely",
+            "Enter any two known air properties (such as temperature and RH) and read off the related properties, such as dew point and specific humidity",
+            "Predict the exact day the job will finish",
+            "Measure moisture content inside a solid material without a moisture meter"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "What causes water vapour to move out of a wet material and into the surrounding air?",
+          "options": [
+            "A vapour pressure gradient — vapour pressure at the wet surface is higher than in the surrounding air, so moisture moves from high to low pressure",
+            "Gravity pulling the water molecules downward",
+            "The material&rsquo;s colour absorbing more heat",
+            "Air pressure remaining exactly equal everywhere in the building"
+          ],
+          "correctIndex": 0,
+          "points": 1
+        },
+        {
+          "questionText": "What does equilibrium moisture content (EMC) describe?",
+          "options": [
+            "The moisture content a material settles at once it is in balance with the surrounding temperature and RH",
+            "The moisture content of a material the moment it gets wet",
+            "A single fixed percentage that applies to every material in every building",
+            "The reading taken only on the last day of a drying job"
+          ],
+          "correctIndex": 0,
+          "points": 1
+        },
+        {
+          "questionText": "How should a technician use EMC when setting a dry standard on a real job?",
+          "options": [
+            "Apply a fixed moisture percentage that applies to every building, regardless of material or climate",
+            "Measure the same material type in an unaffected, comparable area of the building and use that reading as the drying target",
+            "Estimate the dry standard from memory without taking any reference reading",
+            "Use the manufacturer&rsquo;s rated output figure for the dehumidifier as the drying target"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "Which three readings should be logged at the same time each day to prove a drying job is progressing?",
+          "options": [
+            "Only the drying space reading, taken once at the start of the job",
+            "The drying space, an unaffected control area, and outside the building",
+            "The dehumidifier&rsquo;s power draw, the air mover speed setting, and the room floor area",
+            "The insurer&rsquo;s claim number, the job address, and the technician&rsquo;s name"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "How do Bureau of Meteorology (BoM) climatology and NCC climate zones inform an Australian drying plan?",
+          "options": [
+            "They replace the need to take any readings on site",
+            "They provide regional humidity/dew-point context and typical EMC expectations, which support and explain the on-site dry standard reading — not replace it",
+            "They only apply to new-building design, never to restoration drying",
+            "They set a single national EMC target that applies regardless of location"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        }
+      ]
+    }
+  ]
+}

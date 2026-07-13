@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+import { isLmsClaimsAllowedAdminPanel } from '@/lib/admin/admin-panel-access';
 import { verifySessionToken } from '@/lib/auth/session-jwt';
 import { prisma } from '@/lib/prisma';
 
@@ -51,6 +52,10 @@ export async function GET(request: NextRequest) {
     email: claims.email,
     full_name,
     roles: [claims.role],
+    // True when this session may open the admin panel — either JWT role `admin`
+    // or an email on the ADMIN_PANEL_EMAILS allowlist (e.g. support@carsi.com.au).
+    // The client uses this to decide whether to show the admin/learner view toggle.
+    can_access_admin: isLmsClaimsAllowedAdminPanel(claims),
     theme_preference,
     is_active,
     is_verified,

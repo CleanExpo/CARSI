@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { isRevokedStatus } from '@/lib/server/enrollment-access';
 import { lmsPublishedCourseWhere } from '@/lib/server/public-courses-list';
 
 export interface CohortCourseRow {
@@ -89,7 +90,8 @@ export async function getCohortAnalytics(): Promise<CohortSummary> {
     for (const en of course.enrollments) {
       totalEnrollments += 1;
       const status = en.status.toLowerCase();
-      if (status !== 'cancelled') activeCount += 1;
+      // Don't count a revoked/refunded enrolment as active (WS3 / P0-C vocab unify).
+      if (!isRevokedStatus(status)) activeCount += 1;
       if (en.completedAt || status === 'completed') completedCount += 1;
       if (en.enrolledAt >= since) last30 += 1;
       if (en.enrolledAt >= since) activeStudents30d.add(en.studentId);

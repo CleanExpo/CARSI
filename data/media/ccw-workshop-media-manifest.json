@@ -1,0 +1,378 @@
+{
+  "version": 1,
+  "manifest": "ccw-workshop-media",
+  "generatedAt": "2026-07-11T00:00:00.000Z",
+  "course": "ccw-workshop",
+  "courseTitle": "The Carpet Cleaning Workshop (CCW)",
+  "brandContext": {
+    "producer": "CARSI — Cleaning and Restoration Science Institute (carsi.com.au)",
+    "market": "Australia",
+    "palette": [
+      "#146fc2",
+      "#2490ed",
+      "#0c141d",
+      "#f6f8fb"
+    ],
+    "voiceId": "ELEVENLABS_VOICE_ID (unset in Synthex prod — required only for the phase-2 talking-presenter videos; phase-1 b-roll needs no voice)",
+    "styleNotes": "Australian-produced, clean scientific-professional, 230V/10A context, metric, AU workplaces. No text in imagery implying IICRC certification — CARSI is an IICRC-approved CEC provider only. No fabricated performance claims baked into any asset.",
+    "targetConsumer": "Synthex /api/media/generate/{image,video,voice}"
+  },
+  "note": "Source of truth for the images/video the CCW training modules and marketing need. Consumed by the Synthex bridge (scripts/generate-course-media.mjs). Each entry.request is a verbatim payload for the matching Synthex media-gen endpoint. Outputs land in the Synthex media library tagged with entry.tags, and the asset map is written back to ccw-workshop-media-assets.generated.json.",
+  "assets": [
+    {
+      "id": "ccw-m9-machine-archetypes-hero",
+      "module": "09-machine-maintenance-schedules",
+      "kind": "image",
+      "purpose": "module-hero",
+      "placement": "Module 9+ header; course thumbnail candidate",
+      "endpoint": "/api/media/generate/image",
+      "request": {
+        "prompt": "Clean professional illustration for an Australian carpet-cleaning training module: a Razorback-style portable carpet extractor beside a van-mounted truck-mount unit, labelled schematic style, blue and slate palette (#146fc2), technical-diagram aesthetic, white background, no text overlays, crisp vector look.",
+        "negativePrompt": "photorealistic clutter, US power outlets, logos, watermarks, human faces, text",
+        "aspectRatio": "16:9"
+      },
+      "tags": [
+        "carsi",
+        "ccw-workshop",
+        "module-9",
+        "maintenance",
+        "training-hero"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "ccw-m9-six-interval-diagram",
+      "module": "09-machine-maintenance-schedules",
+      "kind": "image",
+      "purpose": "training-diagram",
+      "placement": "Module 9+ 'Six-Interval Care System' table visual",
+      "endpoint": "/api/media/generate/image",
+      "request": {
+        "prompt": "Infographic showing a six-step maintenance cadence timeline: Daily, Weekly, Monthly, Quarterly, Half-Year, End-of-Year, as connected nodes on a rising arc, blue accent (#146fc2) on light background, clean flat design, icon per interval (droplet, filter, valve, descale coil, motor brush, spanner), space for short labels.",
+        "negativePrompt": "photoreal, clutter, watermark, dense text paragraphs",
+        "aspectRatio": "16:9"
+      },
+      "tags": [
+        "carsi",
+        "ccw-workshop",
+        "module-9",
+        "infographic"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "ccw-m9-maintenance-explainer",
+      "module": "09-machine-maintenance-schedules",
+      "kind": "video",
+      "purpose": "module-explainer",
+      "placement": "Module 9+ intro video (introVideoUrl candidate)",
+      "endpoint": "/api/media/generate/video",
+      "request": {
+        "type": "text-to-video",
+        "prompt": "Clean branded b-roll for a machine-maintenance training module: close-ups of a portable carpet extractor and a van truck-mount, an oil-level check, filters, hoses and a spanner, calm technical blue-accented motion (#146fc2), room for on-screen text, no faces, no logos.",
+        "duration": 20,
+        "aspectRatio": "16:9",
+        "resolution": "1080p",
+        "style": "cinematic",
+        "motionAmount": "subtle",
+        "saveToLibrary": true
+      },
+      "tags": [
+        "carsi",
+        "ccw-workshop",
+        "module-9",
+        "explainer"
+      ],
+      "status": "pending",
+      "narrationScript": "Machines don't break down mysteriously — they degrade measurably. In this module you'll match your own Carpet Cleaners Warehouse machine — a Razorback portable or a Sapphire or HydraMaster truck-mount — to a six-interval care schedule: daily, weekly, monthly, quarterly, half-year and end-of-year, plus the hours-based triggers that override the calendar when you're flat out. Whichever comes first, wins. Get this right and every dollar of preventive care saves five to ten in emergency repair.",
+      "phase2Presenter": {
+        "provider": "heygen",
+        "endpoint": "/api/heygen/video",
+        "note": "Talking-presenter upgrade: HeyGen avatar narrating narrationScript in the branded CARSI ElevenLabs voice. HEYGEN_API_KEY + ELEVENLABS_API_KEY are set in Synthex prod.",
+        "needs": [
+          "ELEVENLABS_VOICE_ID"
+        ]
+      }
+    },
+    {
+      "id": "ccw-m12-escalation-ladder",
+      "module": "12-advanced-stain-removal",
+      "kind": "image",
+      "purpose": "training-diagram",
+      "placement": "Module 12 'Escalation Ladder' section",
+      "endpoint": "/api/media/generate/image",
+      "request": {
+        "prompt": "Vertical ladder infographic titled feel for a stain-removal escalation sequence: six rungs labelled aqueous spotter, pH shift, enzyme, solvent, oxidiser, reducing agent, ascending, blue-to-deep-blue gradient (#2490ed to #146fc2), clean flat vector, light background, small icon per rung.",
+        "negativePrompt": "photoreal, clutter, watermark, gore, hazard imagery",
+        "aspectRatio": "9:16"
+      },
+      "tags": [
+        "carsi",
+        "ccw-workshop",
+        "module-12",
+        "infographic"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "ccw-m12-stain-classes-hero",
+      "module": "12-advanced-stain-removal",
+      "kind": "image",
+      "purpose": "module-hero",
+      "placement": "Module 12 header",
+      "endpoint": "/api/media/generate/image",
+      "request": {
+        "prompt": "Professional training illustration of a carpet spot-and-stain kit: labelled spray bottles for acid-side, alkaline-side, enzyme, solvent, oxidiser and reducer, arranged neatly, blue accent palette, clean studio-diagram style, white background, no readable brand names.",
+        "negativePrompt": "specific real brand labels, watermark, faces, US products",
+        "aspectRatio": "16:9"
+      },
+      "tags": [
+        "carsi",
+        "ccw-workshop",
+        "module-12",
+        "training-hero"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "ccw-m13-strip-seal-sequence",
+      "module": "13-strip-and-seal",
+      "kind": "image",
+      "purpose": "training-diagram",
+      "placement": "Module 13 'Nine-Step Sequence'",
+      "endpoint": "/api/media/generate/image",
+      "request": {
+        "prompt": "Nine-step process infographic for stripping and sealing a resilient vinyl floor: numbered steps inspect, protect, dust-mop, apply stripper, agitate, extract, neutral rinse, dry, seal-coats — as a horizontal numbered flow, blue accent (#146fc2), flat clean vector, light background, a small icon per step, step 7 (neutral rinse) subtly emphasised.",
+        "negativePrompt": "photoreal, clutter, watermark, dense paragraphs",
+        "aspectRatio": "16:9"
+      },
+      "tags": [
+        "carsi",
+        "ccw-workshop",
+        "module-13",
+        "infographic"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "ccw-m13-strip-seal-explainer",
+      "module": "13-strip-and-seal",
+      "kind": "video",
+      "purpose": "module-explainer",
+      "placement": "Module 13 intro video",
+      "endpoint": "/api/media/generate/video",
+      "request": {
+        "type": "text-to-video",
+        "prompt": "Branded b-roll of a resilient vinyl floor being stripped and sealed: milky stripper slurry lifted by a rotary machine, a neutral-rinse pass, then a glossy sealed finish, blue-accented professional motion (#146fc2), room for on-screen text, no faces.",
+        "duration": 20,
+        "aspectRatio": "16:9",
+        "resolution": "1080p",
+        "style": "cinematic",
+        "motionAmount": "subtle",
+        "saveToLibrary": true
+      },
+      "tags": [
+        "carsi",
+        "ccw-workshop",
+        "module-13",
+        "explainer"
+      ],
+      "status": "pending",
+      "narrationScript": "Strip and seal is one of the highest-value add-ons a carpet cleaner can bolt on — and it carries the highest chemical and slip risk, so we teach it as a disciplined nine-step sequence, not a knack. It's a resilient-floor service: vinyl and VCT, never timber, laminate or stone. And remember the rule that separates a job that lasts a year from a callback in three weeks: nine times out of ten a failed strip-and-seal failed at the neutral rinse, not the sealer. Get the rinse right and the finish bonds.",
+      "phase2Presenter": {
+        "provider": "heygen",
+        "endpoint": "/api/heygen/video",
+        "note": "Talking-presenter upgrade: HeyGen avatar narrating narrationScript in the branded CARSI ElevenLabs voice. HEYGEN_API_KEY + ELEVENLABS_API_KEY are set in Synthex prod.",
+        "needs": [
+          "ELEVENLABS_VOICE_ID"
+        ]
+      }
+    },
+    {
+      "id": "ccw-m14-addon-menu",
+      "module": "14-add-on-services",
+      "kind": "image",
+      "purpose": "training-diagram",
+      "placement": "Module 14 'The CARSI Add-On Menu'",
+      "endpoint": "/api/media/generate/image",
+      "request": {
+        "prompt": "Clean 'profit multiplier' infographic: a central carpet-cleaning visit with spokes to add-on services — carpet protector, deodorising, upholstery, tile & grout, strip & seal, rug cleaning, vehicle interior — hub-and-spoke, blue palette (#146fc2), flat vector, light background, one small icon per spoke, space for labels.",
+        "negativePrompt": "photoreal, clutter, watermark, dollar signs, hype imagery",
+        "aspectRatio": "16:9"
+      },
+      "tags": [
+        "carsi",
+        "ccw-workshop",
+        "module-14",
+        "infographic"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "ccw-m14-vehicle-fuel-safety",
+      "module": "14-add-on-services",
+      "kind": "image",
+      "purpose": "safety-diagram",
+      "placement": "Module 14 'Remove the Fuel Hazard First' callout",
+      "endpoint": "/api/media/generate/image",
+      "request": {
+        "prompt": "Safety diagram for vehicle interior detailing: cross-section of a car showing petrol vapour (shown as heavier-than-air shading) pooling in the footwell and boot, with a clear icon indicating remove the enclosed fuel container before cleaning, warning-amber and blue palette, clean technical-safety illustration, light background, no faces.",
+        "negativePrompt": "fire, explosion gore, photoreal, watermark, graphic hazard",
+        "aspectRatio": "16:9"
+      },
+      "tags": [
+        "carsi",
+        "ccw-workshop",
+        "module-14",
+        "safety",
+        "infographic"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "ccw-m15-marketing-hub-spoke",
+      "module": "15-marketing-engine",
+      "kind": "image",
+      "purpose": "training-diagram",
+      "placement": "Module 15 'The Connected System'",
+      "endpoint": "/api/media/generate/image",
+      "request": {
+        "prompt": "Hub-and-spoke marketing diagram: one video at the centre flowing to five channels — YouTube, Google Business Profile, Facebook, Instagram, Website — each labelled with its role (library, shopfront, reminders, reels, closes the sale), blue palette (#146fc2), clean flat vector, light background, connecting lines back to a service page.",
+        "negativePrompt": "photoreal, clutter, watermark, specific brand logos",
+        "aspectRatio": "16:9"
+      },
+      "tags": [
+        "carsi",
+        "ccw-workshop",
+        "module-15",
+        "infographic"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "ccw-m15-marketing-explainer",
+      "module": "15-marketing-engine",
+      "kind": "video",
+      "purpose": "module-explainer",
+      "placement": "Module 15 intro video",
+      "endpoint": "/api/media/generate/video",
+      "request": {
+        "type": "text-to-video",
+        "prompt": "Branded b-roll for a local-marketing module: a phone filming a carpet before/after on the job, social feeds and a Google map pin, an upward-trending motion feel, blue-accented professional (#2490ed), room for on-screen text, no real brand logos.",
+        "duration": 20,
+        "aspectRatio": "16:9",
+        "resolution": "1080p",
+        "style": "cinematic",
+        "motionAmount": "subtle",
+        "saveToLibrary": true
+      },
+      "tags": [
+        "carsi",
+        "ccw-workshop",
+        "module-15",
+        "explainer"
+      ],
+      "status": "pending",
+      "narrationScript": "Technical excellence with an empty diary is a hobby. In 2026, video connected across your channels is the front door to a local cleaning business — and almost none of your competitors are doing it well. One honest thirty-second before-and-after, filmed on the job, surfacing on your YouTube, your Google Business Profile, Facebook, Instagram and your website — from one filming session. This module shows you exactly how to wire those channels together and the weekly rhythm that fills the diary.",
+      "phase2Presenter": {
+        "provider": "heygen",
+        "endpoint": "/api/heygen/video",
+        "note": "Talking-presenter upgrade: HeyGen avatar narrating narrationScript in the branded CARSI ElevenLabs voice. HEYGEN_API_KEY + ELEVENLABS_API_KEY are set in Synthex prod.",
+        "needs": [
+          "ELEVENLABS_VOICE_ID"
+        ]
+      }
+    },
+    {
+      "id": "ccw-mkt-course-thumbnail",
+      "module": "marketing",
+      "kind": "image",
+      "purpose": "course-thumbnail",
+      "placement": "Course card thumbnailUrl",
+      "endpoint": "/api/media/generate/image",
+      "request": {
+        "prompt": "Course card thumbnail for 'The Carpet Cleaning Workshop' by CARSI: a clean confident cover with a subtle carpet-fibre texture and a truck-mount silhouette, deep blue (#0c141d) to accent blue (#146fc2), premium training-brand look, room for a title, no readable body text.",
+        "negativePrompt": "clutter, watermark, US imagery, stocky people",
+        "aspectRatio": "16:9"
+      },
+      "tags": [
+        "carsi",
+        "ccw-workshop",
+        "marketing",
+        "thumbnail"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "ccw-mkt-social-square",
+      "module": "marketing",
+      "kind": "image",
+      "purpose": "marketing-social",
+      "placement": "Instagram/Facebook square promo",
+      "endpoint": "/api/media/generate/image",
+      "request": {
+        "prompt": "Social media square promo for an Australian 2-day carpet cleaning workshop: bold clean composition, blue accent (#2490ed), a hands-on-training feel, space for a headline, professional and trustworthy, no fabricated claims or statistics in the image.",
+        "negativePrompt": "hype, fake badges, watermark, dense text, US spelling",
+        "aspectRatio": "1:1"
+      },
+      "tags": [
+        "carsi",
+        "ccw-workshop",
+        "marketing",
+        "social",
+        "square"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "ccw-mkt-social-story",
+      "module": "marketing",
+      "kind": "image",
+      "purpose": "marketing-social",
+      "placement": "Instagram/Facebook story promo (9:16)",
+      "endpoint": "/api/media/generate/image",
+      "request": {
+        "prompt": "Vertical story promo for the CARSI 2-day Carpet Cleaning Workshop: clean premium look, blue palette, space for a headline and a call-to-action at the base, professional Australian training brand, no fabricated claims.",
+        "negativePrompt": "hype, fake badges, watermark, US spelling",
+        "aspectRatio": "9:16"
+      },
+      "tags": [
+        "carsi",
+        "ccw-workshop",
+        "marketing",
+        "social",
+        "story"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "ccw-mkt-course-trailer",
+      "module": "marketing",
+      "kind": "video",
+      "purpose": "marketing-trailer",
+      "placement": "Course trailer (introVideoUrl) + social cut",
+      "endpoint": "/api/media/generate/video",
+      "request": {
+        "type": "text-to-video",
+        "prompt": "A 30-second premium trailer feel for an Australian hands-on 2-day carpet cleaning workshop: clean blue-accented brand motion, glimpses of carpet fibre, a truck-mount, a strip-and-seal floor and a before/after, professional and calm, room for title cards.",
+        "duration": 30,
+        "aspectRatio": "16:9",
+        "resolution": "1080p",
+        "style": "cinematic",
+        "motionAmount": "subtle",
+        "saveToLibrary": true
+      },
+      "tags": [
+        "carsi",
+        "ccw-workshop",
+        "marketing",
+        "trailer"
+      ],
+      "status": "pending"
+    }
+  ],
+  "phases": {
+    "phase1_broll": "Ships now against the keys set in Synthex prod (images via OPENAI/GEMINI; video via FAL_API_KEY text-to-video; ElevenLabs voice available). All 15 assets generate.",
+    "phase2_presenter": "Optional upgrade: 3 module explainers as HeyGen talking-presenter videos in the CARSI voice. Needs ELEVENLABS_VOICE_ID provisioned."
+  }
+}

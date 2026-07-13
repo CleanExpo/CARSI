@@ -16,6 +16,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 
 import { useAuth } from '@/components/auth/auth-provider';
+import { ViewModeToggle } from '@/components/layout/ViewModeToggle';
 
 function NavButton({
   href,
@@ -90,6 +91,9 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             CARSI
           </p>
           <p className="mt-1 text-lg font-bold tracking-tight text-white/95">Admin</p>
+          <div className="mt-3">
+            <ViewModeToggle tone="dark" />
+          </div>
         </div>
 
         <nav className="flex flex-1 flex-col gap-0.5 px-2 py-4">

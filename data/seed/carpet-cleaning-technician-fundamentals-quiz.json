@@ -1,0 +1,125 @@
+{
+  "version": 1,
+  "courseSlug": "carpet-cleaning-technician-fundamentals",
+  "quizzes": [
+    {
+      "quizId": "9e586bc9-f573-4fa8-b5e7-d1ab58378c88",
+      "lessonTitle": "Drying failures, secondary damage and the mould rule",
+      "title": "Carpet Cleaning Technician Fundamentals — Knowledge Check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Which carpet fibre is a natural protein fibre that is sensitive to high alkalinity, high heat and over-wetting?",
+          "options": [
+            "Nylon",
+            "Polyester",
+            "Wool",
+            "Olefin (polypropylene)"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "A carpet has a jute backing woven into its construction. What is the main risk if it is over-wet during cleaning?",
+          "options": [
+            "The pile will become permanently glossy",
+            "The jute backing can brown and wick moisture badly",
+            "The fibre will change colour to white",
+            "Over-wetting has no effect on woven carpet"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "Oily and greasy soil in carpet is best broken down before extraction by:",
+          "options": [
+            "Cold water alone",
+            "A surfactant-based pre-spray matched to oily soil",
+            "Increasing vacuum-only dry time",
+            "A strongly acidic rinse applied first"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "What is the correct practice regarding cleaning chemical products in carpet cleaning?",
+          "options": [
+            "Mix two compatible-sounding brands for a stronger result",
+            "Always use the strongest available concentration",
+            "Never mix cleaning chemical products, and always check the current label and SDS before use",
+            "Mixing is safe as long as both products are alkaline"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "Which cleaning method introduces the most moisture and therefore needs the most careful drying management?",
+          "options": [
+            "Dry compound cleaning",
+            "Bonnet cleaning",
+            "Low-moisture encapsulation",
+            "Hot water extraction (steam)"
+          ],
+          "correctIndex": 3,
+          "points": 1
+        },
+        {
+          "questionText": "A commercial site needs a same-day appearance refresh on a low-pile carpet with minimal downtime. Which method best suits this situation?",
+          "options": [
+            "Hot water extraction with maximum solution",
+            "Bonnet cleaning",
+            "A strongly alkaline soak with no extraction",
+            "Leaving the carpet to air-dry for two days before any work"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "Before applying a cleaning product across a visible area of carpet, what should a technician always do first?",
+          "options": [
+            "Apply it directly to the most visible area to check the result",
+            "Test it on a small, inconspicuous area for colourfastness and fibre reaction",
+            "Double the manufacturer&rsquo;s recommended dilution",
+            "Skip testing if the fibre looks like nylon"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "What is the correct order of the core cleaning process for carpet?",
+          "options": [
+            "Extract, then vacuum, then pre-spray",
+            "Pre-spray, then vacuum, then groom, then extract",
+            "Vacuum, pre-spray and agitate, extract, then groom",
+            "Groom, agitate, vacuum, then pre-spray"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "A standard Australian general power outlet (GPO) used to power drying equipment on a carpet cleaning job is rated at:",
+          "options": [
+            "10 A at 230 V",
+            "15 A at 230 V",
+            "20 A at 250 V",
+            "32 A at 400 V three-phase"
+          ],
+          "correctIndex": 0,
+          "points": 1
+        },
+        {
+          "questionText": "Visible mould is found in the underlay beneath a carpet being cleaned. What is the correct approach to drying?",
+          "options": [
+            "Run air movers directly over the affected area to dry it as fast as possible",
+            "Do not run air movers across the affected area; contain, use AFDs and dehumidifiers first, and introduce air movers only after the area is cleaned and cleared",
+            "Increase airflow to blow the spores outside through an open window",
+            "Continue the normal drying plan unchanged"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        }
+      ]
+    }
+  ]
+}

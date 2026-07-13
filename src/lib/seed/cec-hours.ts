@@ -1,30 +1,23 @@
 /**
  * Resolve IICRC CEC hours for WooCommerce / LMS course rows.
  *
- * Priority: explicit `cec_hours` → Woo meta keys → prose in short_description / description
- * (e.g. "Continuing Education Credit (CEC) : 3 Hours").
+ * Priority: the CEC approvals registry (`data/seed/cec-approvals.json`, the SSOT —
+ * see `./cec-approvals`) → explicit founder-set `cec_hours` (the write-path override
+ * until registry migration completes).
+ *
+ * FAIL-CLOSED (licence-critical): there is deliberately NO derivation of CEC hours
+ * from course duration, description/short-description prose, or Woo meta. None of
+ * those is IICRC approval — a CEC claim requires a recorded per-course IICRC approval
+ * (registry entry) or an explicit founder-approved value. Absence of an approval
+ * yields null (no CEC), never a derived number (founder directive 2026-07-09; the
+ * duration/prose/meta fallback branches were removed 2026-07-09 as part of the
+ * registry-SSOT cutover). Do not re-introduce any inference path.
  */
 
-export const CEC_META_KEYS = [
-  'cec_hours',
-  '_cec_hours',
-  'iicrc_cec',
-  'continuing_education_credits',
-] as const;
+import { getApprovedCecHours } from './cec-approvals';
 
-/** Common phrasing in CARSI Woo short descriptions. */
-const CEC_TEXT_PATTERNS: RegExp[] = [
-  /Continuing Education Credit\s*\(CEC\)\s*:\s*(\d+(?:\.\d+)?)\s*Hours?/i,
-  /Continuing Education Credit\s*:\s*(\d+(?:\.\d+)?)\s*Hours?/i,
-  /approved for IICRC Continuing Education Credit\s*\(CEC\)\s*:\s*(\d+(?:\.\d+)?)\s*Hours?/i,
-  /CEC\s+Credits?\s*[\n:]\s*(\d+(?:\.\d+)?)\s*Hours?/i,
-  /\(CEC\)\s*:\s*(\d+(?:\.\d+)?)\s*Hours?/i,
-  /\(CEC\)\s*:\s*(\d+(?:\.\d+)?)\b/i,
-  /\bCEC\s*:\s*(\d+(?:\.\d+)?)\s*Hours?/i,
-  /(\d+(?:\.\d+)?)\s*IICRC\s+CEC(?:\s+Hours?|\s+Credits?)?/i,
-];
-
-/** Course duration lines in Woo short descriptions (e.g. "Approx 4Hours"). */
+/** Course duration lines in Woo short descriptions (e.g. "Approx 4Hours").
+ *  Duration is display metadata only — it is NEVER a source of CEC hours. */
 const DURATION_TEXT_PATTERNS: RegExp[] = [
   /(?:Course\s+Duration|Duration)\s*:?\s*\n?\s*Approx(?:imately)?\s*(\d+(?:\.\d+)?)\s*Hours?/i,
   /(?:Course\s+Duration|Duration)\s*:?\s*\n?\s*(\d+(?:\.\d+)?)\s*to\s*(\d+(?:\.\d+)?)\s*Hours?/i,
@@ -38,18 +31,6 @@ function parsePositiveHours(value: unknown): number | null {
   const n = typeof value === 'number' ? value : parseFloat(String(value));
   if (!Number.isFinite(n) || n < 0) return null;
   return n;
-}
-
-export function extractCecHoursFromText(text: string | null | undefined): number | null {
-  if (!text?.trim()) return null;
-  for (const pattern of CEC_TEXT_PATTERNS) {
-    const match = pattern.exec(text);
-    if (match?.[1]) {
-      const hours = parsePositiveHours(match[1]);
-      if (hours != null) return hours;
-    }
-  }
-  return null;
 }
 
 export function extractDurationHoursFromText(text: string | null | undefined): number | null {
@@ -71,12 +52,6 @@ export function extractDurationHoursFromText(text: string | null | undefined): n
   return null;
 }
 
-/** CARSI-approved courses often award whole CEC hours rounded up from contact time. */
-export function inferCecHoursFromDuration(durationHours: number): number | null {
-  if (!Number.isFinite(durationHours) || durationHours <= 0) return null;
-  return Math.max(1, Math.ceil(durationHours));
-}
-
 export function resolveDurationHours(row: {
   durationHours?: number | null;
   duration_hours?: number | null;
@@ -93,35 +68,8 @@ export function resolveDurationHours(row: {
   return extractDurationHoursFromText(text);
 }
 
-/** Read CEC from Woo `meta_data` array (`{ key, value }[]`) or plain object meta. */
-export function extractCecHoursFromMeta(meta: unknown): number | null {
-  if (meta == null) return null;
-
-  if (Array.isArray(meta)) {
-    for (const entry of meta) {
-      if (!entry || typeof entry !== 'object') continue;
-      const key = String((entry as { key?: unknown }).key ?? '').toLowerCase();
-      if (!CEC_META_KEYS.includes(key as (typeof CEC_META_KEYS)[number])) continue;
-      const hours = parsePositiveHours((entry as { value?: unknown }).value);
-      if (hours != null) return hours;
-    }
-    return null;
-  }
-
-  if (typeof meta === 'object') {
-    const record = meta as Record<string, unknown>;
-    for (const [rawKey, rawValue] of Object.entries(record)) {
-      const key = rawKey.toLowerCase();
-      if (!CEC_META_KEYS.includes(key as (typeof CEC_META_KEYS)[number])) continue;
-      const hours = parsePositiveHours(rawValue);
-      if (hours != null) return hours;
-    }
-  }
-
-  return null;
-}
-
 export type CecResolvable = {
+  slug?: string | null;
   cec_hours?: number | null;
   short_description?: string | null;
   description?: string | null;
@@ -130,24 +78,25 @@ export type CecResolvable = {
   iicrc_discipline?: string | null;
 };
 
-/** Best available CEC hours for a WP-export or catalog-shaped row. */
+/**
+ * CEC hours for a WP-export or catalog-shaped row: registry approval (by slug) →
+ * explicit founder-set `cec_hours` → null. Nothing is derived.
+ */
 export function resolveCecHours(row: CecResolvable): number | null {
+  // The approvals registry is the SSOT: a recorded IICRC approval wins outright.
+  const fromRegistry = getApprovedCecHours(row.slug);
+  if (fromRegistry != null) return fromRegistry;
+
   const explicit = parsePositiveHours(row.cec_hours);
+  // Explicit 0 is a deliberate opt-out: the course has NOT been approved by IICRC for
+  // CECs. Claiming CECs without IICRC approval is a licence-critical defect (founder
+  // directive 2026-07-09).
+  if (explicit === 0) return null;
   if (explicit != null) return explicit;
 
-  const fromMeta = extractCecHoursFromMeta(row.meta);
-  if (fromMeta != null) return fromMeta;
-
-  const text = [row.short_description, row.description].filter(Boolean).join('\n');
-  const fromText = extractCecHoursFromText(text);
-  if (fromText != null) return fromText;
-
-  const duration = resolveDurationHours({
-    duration_hours: row.duration_hours,
-    short_description: row.short_description,
-    description: row.description,
-  });
-  return duration != null ? inferCecHoursFromDuration(duration) : null;
+  // Fail-closed: no approval recorded and no explicit value — no CEC claim. Duration,
+  // prose and meta are NOT approval and are never consulted.
+  return null;
 }
 
 export function enrichCourseWithCecHours<T extends CecResolvable>(
@@ -156,8 +105,9 @@ export function enrichCourseWithCecHours<T extends CecResolvable>(
   return { ...row, cec_hours: resolveCecHours(row) };
 }
 
-/** Catalog JSON uses camelCase `cecHours`. */
+/** Catalog JSON uses camelCase `cecHours`. Same rules as `resolveCecHours`. */
 export function resolveCatalogCecHours(course: {
+  slug?: string | null;
   cecHours?: number | null;
   shortDescription?: string | null;
   description?: string | null;
@@ -165,13 +115,13 @@ export function resolveCatalogCecHours(course: {
   durationHours?: number | null;
   iicrcDiscipline?: string | null;
 }): number | null {
+  const fromRegistry = getApprovedCecHours(course.slug);
+  if (fromRegistry != null) return fromRegistry;
+
   const explicit = parsePositiveHours(course.cecHours);
+  // Explicit 0 = not CEC-approved; never derive (see resolveCecHours).
+  if (explicit === 0) return null;
   if (explicit != null) return explicit;
-  return resolveCecHours({
-    short_description: course.shortDescription,
-    description: course.description,
-    meta: course.meta,
-    duration_hours: course.durationHours,
-    iicrc_discipline: course.iicrcDiscipline,
-  });
+
+  return null;
 }

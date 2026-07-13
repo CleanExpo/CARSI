@@ -46,7 +46,7 @@ export class OpenRouterAPIError extends Error {
   }
 }
 
-const DEFAULT_BASE_URL = 'https://openrouter.ai/api/v1';
+export const DEFAULT_BASE_URL = 'https://openrouter.ai/api/v1';
 // Diagnostic + UX value: shortened from 45s after raising maxDuration to 60s
 // had zero effect on live 504s and produced no server-side logs at all,
 // suggesting requests may not be completing within a much shorter window

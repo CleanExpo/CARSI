@@ -1,6 +1,8 @@
 /** @deprecated import from `@/lib/seed/docx-extract` */
 export { extractDocxParagraphs } from '@/lib/seed/docx-extract';
 
+import { hoistObjectivesFirst } from '@/lib/seed/objectives-module';
+
 export type AirQualityParsedModule = { title: string; bodyParagraphs: string[] };
 
 export type AirQualityParsedCourse = {
@@ -98,7 +100,8 @@ export function parseAirQualityCompendium(paras: string[]): AirQualityParsedCour
       slug: slugify(title),
       priceAud,
       overviewParagraphs,
-      modules,
+      // GP-434: the source doc places WHAT YOU WILL LEARN last; learners see objectives first.
+      modules: hoistObjectivesFirst(modules),
     });
   }
 

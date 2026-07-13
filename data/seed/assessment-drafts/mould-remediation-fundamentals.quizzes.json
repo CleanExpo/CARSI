@@ -1,0 +1,90 @@
+{
+  "version": 1,
+  "status": "draft",
+  "courseSlug": "mould-remediation-fundamentals",
+  "disclaimer": "Educational assessment. CARSI is an IICRC-approved CEC provider; this is CARSI-original Australian training, not IICRC certification.",
+  "note": "Australian-produced. Grounded in the course's own modules. Founder to review before wiring live.",
+  "quizzes": [
+    {
+      "quizId": "e0d560f4-05fa-5649-ade5-2309311645a9",
+      "lessonTitle": "Knowledge check",
+      "title": "CARSI Mould Remediation Practitioner — Knowledge Check",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Condition 1 (the goal of remediation) means…",
+          "options": [
+            "Heavy visible mould growth",
+            "Normal fungal ecology for that indoor environment",
+            "Settled spores from a nearby Condition 3 area",
+            "Active water intrusion"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M3 — Condition 1/2/3"
+        },
+        {
+          "questionText": "When mould is present, air movers should be…",
+          "options": [
+            "Run immediately to speed drying",
+            "Withheld until clearance — use air-filtration devices and dehumidifiers only",
+            "Pointed directly at the mould",
+            "Used only at night"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M5 — Remediation sequence"
+        },
+        {
+          "questionText": "The purpose of containment with negative pressure and HEPA filtration is to…",
+          "options": [
+            "Make the site look professional",
+            "Prevent cross-contamination of clean areas by spores",
+            "Dry the structure faster",
+            "Reduce the power bill"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M4 — Containment & controls"
+        },
+        {
+          "questionText": "Post-remediation verification confirms…",
+          "options": [
+            "The invoice is paid",
+            "The area has returned to Condition 1 and is visibly and verifiably clean",
+            "The customer is happy",
+            "The mould was photographed"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M7 — Verification"
+        },
+        {
+          "questionText": "PPE for mould work should…",
+          "options": [
+            "Be the same for every job",
+            "Escalate with the Condition and the scale of contamination",
+            "Never include a respirator",
+            "Be chosen by the client"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M6 — PPE by condition"
+        },
+        {
+          "questionText": "Remediation must always be paired with…",
+          "options": [
+            "A social-media post",
+            "Fixing the moisture source, or the mould returns",
+            "A new carpet",
+            "A price increase"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M5 — Remediation sequence"
+        }
+      ]
+    }
+  ]
+}

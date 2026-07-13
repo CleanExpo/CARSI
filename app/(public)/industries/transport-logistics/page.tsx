@@ -53,7 +53,7 @@ const faqs = [
   {
     question: 'How does water damage training help warehouse operations?',
     answer:
-      'Australian warehouses face water damage from storm events, roof failures, and sprinkler activations. WRT-aligned CEC training equips logistics teams to respond immediately — extracting water, protecting inventory, and deploying drying equipment to minimise stock loss and downtime. Early response can reduce insurance claims and prevent secondary mould damage.',
+      'Australian warehouses face water damage from storm events, roof failures, and sprinkler activations. CEC-accredited water restoration training equips logistics teams to respond immediately — extracting water, protecting inventory, and deploying drying equipment to minimise stock loss and downtime. Early response can reduce insurance claims and prevent secondary mould damage.',
   },
   {
     question: 'What is vehicle interior restoration training?',

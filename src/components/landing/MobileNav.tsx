@@ -33,7 +33,11 @@ const itemVariants = {
   }),
 };
 
-export default function MobileNav() {
+export default function MobileNav({
+  items = PUBLIC_PRIMARY_NAV,
+}: {
+  items?: readonly { label: string; href: string }[];
+}) {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
@@ -124,7 +128,7 @@ export default function MobileNav() {
                 </div>
 
                 <ul className="space-y-1">
-                  {PUBLIC_PRIMARY_NAV.map((item, i) => (
+                  {items.map((item, i) => (
                     <motion.li
                       key={item.href}
                       custom={i}

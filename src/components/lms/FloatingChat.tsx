@@ -1,8 +1,15 @@
 'use client';
 
-import { AnimatePresence, motion } from 'framer-motion';
+import {
+  animate,
+  AnimatePresence,
+  motion,
+  useDragControls,
+  useMotionValue,
+} from 'framer-motion';
 import {
   ChevronDown,
+  GripVertical,
   Loader2,
   RotateCcw,
   Send,
@@ -11,7 +18,14 @@ import {
   X,
 } from 'lucide-react';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from 'react';
 
 import { MargotAvatar } from '@/components/margot/MargotAvatar';
 import { MargotChatLauncher } from '@/components/margot/MargotChatLauncher';
@@ -22,6 +36,19 @@ import {
   unlockMargotAudio,
 } from '@/lib/client/margot-audio-player';
 import { ASSISTANT_DISCLAIMER } from '@/lib/assistant-disclaimer';
+import {
+  clampOffsetToViewport,
+  clampRectShift,
+  MARGOT_POSITION_STORAGE_KEY,
+  parseStoredPosition,
+  serializePosition,
+  type MargotPosition,
+} from '@/lib/client/margot-position';
+import {
+  ACTION_SENTINEL,
+  ACTION_TRAILER_PREFIX,
+  type ActionProposalFrame,
+} from '@/lib/frontdesk-protocol';
 import { deriveChatPageContext } from '@/lib/chat-page-context';
 import {
   MARGOT_ACCENT,
@@ -41,6 +68,10 @@ interface Message {
   id: string;
   role: 'assistant' | 'user';
   text: string;
+  /** A confirm-gated write proposal the user can Confirm/Dismiss (Phase 2). */
+  action?: ActionProposalFrame;
+  actionState?: 'idle' | 'sending' | 'done' | 'error';
+  actionResult?: string;
 }
 
 const SUGGESTED_PROMPTS = [
@@ -48,6 +79,27 @@ const SUGGESTED_PROMPTS = [
   'How do CEC credits work?',
   'How do I find my certificates?',
 ];
+
+/**
+ * GP-500: dragging is desktop-only — a precise pointer AND a >=768px viewport.
+ * Touch-primary devices keep the fixed corner (dragging a full-width sheet is
+ * a footgun).
+ */
+const DRAG_MEDIA_QUERY = '(pointer: fine) and (min-width: 768px)';
+
+function subscribeCanDrag(onChange: () => void): () => void {
+  const mql = window.matchMedia(DRAG_MEDIA_QUERY);
+  mql.addEventListener('change', onChange);
+  return () => mql.removeEventListener('change', onChange);
+}
+
+function useCanDrag(): boolean {
+  return useSyncExternalStore(
+    subscribeCanDrag,
+    () => window.matchMedia(DRAG_MEDIA_QUERY).matches,
+    () => false
+  );
+}
 
 function TypingIndicator() {
   return (
@@ -99,6 +151,149 @@ export default function FloatingChat() {
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // GP-500 — draggable/repositionable widget (desktop only)
+  const canDrag = useCanDrag();
+  const dragControls = useDragControls();
+  const posX = useMotionValue(0);
+  const posY = useMotionValue(0);
+  const dragAreaRef = useRef<HTMLDivElement>(null);
+  const widgetRef = useRef<HTMLDivElement>(null);
+  const wasDraggedRef = useRef(false);
+
+  const persistPosition = useCallback((pos: MargotPosition | null) => {
+    try {
+      if (pos && (pos.x !== 0 || pos.y !== 0)) {
+        localStorage.setItem(MARGOT_POSITION_STORAGE_KEY, serializePosition(pos));
+      } else {
+        localStorage.removeItem(MARGOT_POSITION_STORAGE_KEY);
+      }
+    } catch {
+      // localStorage may be unavailable in strict privacy modes
+    }
+  }, []);
+
+  /** Shift the rendered widget back inside the viewport if it overflows. */
+  const clampWidgetToViewport = useCallback(
+    (persist: boolean) => {
+      const el = widgetRef.current;
+      if (!el) return;
+      const current = { x: posX.get(), y: posY.get() };
+      const next = clampRectShift(
+        current,
+        el.getBoundingClientRect(),
+        window.innerWidth,
+        window.innerHeight
+      );
+      if (next.x !== current.x || next.y !== current.y) {
+        posX.set(next.x);
+        posY.set(next.y);
+        if (persist) persistPosition(next);
+      }
+    },
+    [posX, posY, persistPosition]
+  );
+
+  const resetPosition = useCallback(() => {
+    void animate(posX, 0, { duration: 0.2, ease: 'easeOut' });
+    void animate(posY, 0, { duration: 0.2, ease: 'easeOut' });
+    persistPosition(null);
+  }, [posX, posY, persistPosition]);
+
+  const startDrag = useCallback(
+    (e: React.PointerEvent) => {
+      if (!canDrag) return;
+      dragControls.start(e);
+    },
+    [canDrag, dragControls]
+  );
+
+  // Restore the persisted position on mount / when drag eligibility changes.
+  // Motion values (not React state), so no set-state-in-effect concern.
+  useEffect(() => {
+    if (!canDrag) {
+      posX.set(0);
+      posY.set(0);
+      return;
+    }
+    let stored: MargotPosition | null = null;
+    try {
+      stored = parseStoredPosition(localStorage.getItem(MARGOT_POSITION_STORAGE_KEY));
+    } catch {
+      stored = null;
+    }
+    if (stored) {
+      const next = clampOffsetToViewport(stored, window.innerWidth, window.innerHeight);
+      posX.set(next.x);
+      posY.set(next.y);
+    }
+  }, [canDrag, posX, posY]);
+
+  // A stale position must never leave the widget off-screen after a resize.
+  useEffect(() => {
+    if (!canDrag) return;
+    const onResize = () => clampWidgetToViewport(true);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, [canDrag, clampWidgetToViewport]);
+
+  // The open chat window is much taller than the launcher: re-clamp once the
+  // open animation (220ms) settles so the panel never opens off the top edge.
+  useEffect(() => {
+    if (!canDrag || !open) return;
+    const timer = setTimeout(() => clampWidgetToViewport(true), 260);
+    return () => clearTimeout(timer);
+  }, [open, canDrag, clampWidgetToViewport]);
+
+  function handleDragStart() {
+    wasDraggedRef.current = true;
+  }
+
+  function handleDragEnd() {
+    const el = widgetRef.current;
+    const current = { x: posX.get(), y: posY.get() };
+    const next = el
+      ? clampRectShift(current, el.getBoundingClientRect(), window.innerWidth, window.innerHeight)
+      : current;
+    if (next.x !== current.x) posX.set(next.x);
+    if (next.y !== current.y) posY.set(next.y);
+    persistPosition(next);
+  }
+
+  function handleHeaderPointerDown(e: React.PointerEvent) {
+    if (!canDrag) return;
+    const target = e.target as HTMLElement;
+    // Header buttons (reset chat / close) keep their normal behaviour — only
+    // the grip handle and the inert header surface start a drag.
+    if (target.closest('button') && !target.closest('[data-drag-handle]')) return;
+    e.preventDefault();
+    startDrag(e);
+  }
+
+  function handleGripKeyDown(e: React.KeyboardEvent) {
+    if (e.key === 'Home') {
+      e.preventDefault();
+      resetPosition();
+      return;
+    }
+    const step = e.shiftKey ? 32 : 8;
+    let dx = 0;
+    let dy = 0;
+    if (e.key === 'ArrowLeft') dx = -step;
+    else if (e.key === 'ArrowRight') dx = step;
+    else if (e.key === 'ArrowUp') dy = -step;
+    else if (e.key === 'ArrowDown') dy = step;
+    else return;
+    e.preventDefault();
+    const next = clampOffsetToViewport(
+      { x: posX.get() + dx, y: posY.get() + dy },
+      window.innerWidth,
+      window.innerHeight
+    );
+    posX.set(next.x);
+    posY.set(next.y);
+    persistPosition(next);
+  }
+
   const stopSpeech = useCallback(() => {
     stopMargotAudio();
     setSpeakingId(null);
@@ -122,7 +317,7 @@ export default function FloatingChat() {
     try {
       const stored = localStorage.getItem(CONVERSATION_STORAGE_KEY);
       if (stored?.trim()) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time hydration from localStorage on mount (SSR-safe)
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- pre-existing rule promotion; behaviour-preserving suppression, real fix tracked separately
         setConversationId(stored.trim());
       }
     } catch {
@@ -248,7 +443,7 @@ export default function FloatingChat() {
   }, [stopSpeech]);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- syncing speech playback to open/close state
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- pre-existing rule promotion; behaviour-preserving suppression, real fix tracked separately
     if (!open) stopSpeech();
   }, [open, stopSpeech]);
 
@@ -275,7 +470,7 @@ export default function FloatingChat() {
     if (!text || loading) return;
 
     const userMsg: Message = {
-      // eslint-disable-next-line react-hooks/purity -- id generated in an event handler, not during render
+      // eslint-disable-next-line react-hooks/purity -- event handler, not render; pre-existing rule promotion, behaviour-preserving suppression
       id: `u-${Date.now()}`,
       role: 'user',
       text,
@@ -319,15 +514,66 @@ export default function FloatingChat() {
         return;
       }
 
-      const data = (await res.json()) as {
-        reply: string;
-        conversation_id: string;
-      };
-      persistConversationId(data.conversation_id);
-      setMessages((prev) => [
-        ...prev,
-        { id: `a-${Date.now()}`, role: 'assistant', text: data.reply },
-      ]);
+      const contentType = res.headers.get('content-type') ?? '';
+      if (res.body && contentType.includes('text/plain')) {
+        // AI Front Desk streaming path (MARGOT_STREAMING on): render tokens as
+        // they arrive into a single assistant bubble. The one-shot JSON path
+        // below stays exactly as-is when the flag is off.
+        const streamedConversationId = res.headers.get('X-Conversation-Id');
+        if (streamedConversationId) persistConversationId(streamedConversationId);
+        const assistantId = `a-${Date.now()}`;
+        setMessages((prev) => [...prev, { id: assistantId, role: 'assistant', text: '' }]);
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let acc = '';
+        for (;;) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          acc += decoder.decode(value, { stream: true });
+          // A confirm-gated action trailer (if any) starts at ACTION_SENTINEL —
+          // only the text before it is the visible message.
+          const sep = acc.indexOf(ACTION_SENTINEL);
+          const visible = sep === -1 ? acc : acc.slice(0, sep);
+          setMessages((prev) => prev.map((m) => (m.id === assistantId ? { ...m, text: visible } : m)));
+        }
+        const sepIdx = acc.indexOf(ACTION_SENTINEL);
+        const finalVisible = (sepIdx === -1 ? acc : acc.slice(0, sepIdx)).trim();
+        if (!finalVisible) {
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === assistantId
+                ? { ...m, text: "I'm not sure how to answer that right now. Please try rephrasing your question." }
+                : m
+            )
+          );
+        }
+        if (sepIdx !== -1) {
+          const trailer = acc.slice(sepIdx);
+          const jsonStr = trailer.startsWith(ACTION_TRAILER_PREFIX)
+            ? trailer.slice(ACTION_TRAILER_PREFIX.length).trim()
+            : '';
+          if (jsonStr) {
+            try {
+              const frame = JSON.parse(jsonStr) as ActionProposalFrame;
+              setMessages((prev) =>
+                prev.map((m) => (m.id === assistantId ? { ...m, action: frame, actionState: 'idle' } : m))
+              );
+            } catch {
+              // malformed trailer — ignore, the text answer still stands
+            }
+          }
+        }
+      } else {
+        const data = (await res.json()) as {
+          reply: string;
+          conversation_id: string;
+        };
+        persistConversationId(data.conversation_id);
+        setMessages((prev) => [
+          ...prev,
+          { id: `a-${Date.now()}`, role: 'assistant', text: data.reply },
+        ]);
+      }
     } catch {
       setMessages((prev) => [
         ...prev,
@@ -349,11 +595,63 @@ export default function FloatingChat() {
     }
   }
 
+  // Execute a confirm-gated action: the only path that turns Margot's proposal
+  // into a real write, gated by this explicit user click + a server-verified token.
+  async function confirmAction(messageId: string, token: string) {
+    setMessages((prev) => prev.map((m) => (m.id === messageId ? { ...m, actionState: 'sending' } : m)));
+    try {
+      const res = await fetch('/api/margot/action/confirm', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token }),
+      });
+      if (res.ok) {
+        setMessages((prev) => prev.map((m) => (m.id === messageId ? { ...m, actionState: 'done' } : m)));
+      } else {
+        const data = (await res.json().catch(() => ({}))) as { detail?: string };
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === messageId
+              ? { ...m, actionState: 'error', actionResult: data.detail ?? 'Could not send. Please try again.' }
+              : m
+          )
+        );
+      }
+    } catch {
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === messageId ? { ...m, actionState: 'error', actionResult: 'Connection error. Please try again.' } : m
+        )
+      );
+    }
+  }
+
+  function dismissAction(messageId: string) {
+    setMessages((prev) =>
+      prev.map((m) => (m.id === messageId ? { ...m, action: undefined, actionState: undefined } : m))
+    );
+  }
+
   const showSuggested =
     messages.length <= 1 || (messages.length === 1 && messages[0]?.id === 'welcome');
 
   return (
-    <div className="fixed right-3 bottom-3 z-50 flex flex-col items-end gap-2 sm:right-6 sm:bottom-6">
+    <>
+      {/* Full-viewport drag bounds for the widget (GP-500) */}
+      <div ref={dragAreaRef} className="pointer-events-none fixed inset-0 z-40" aria-hidden />
+      <motion.div
+        ref={widgetRef}
+        drag={canDrag}
+        dragListener={false}
+        dragControls={dragControls}
+        dragConstraints={dragAreaRef}
+        dragMomentum={false}
+        dragElastic={0}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+        style={{ x: posX, y: posY }}
+        className="fixed right-3 bottom-3 z-50 flex flex-col items-end gap-2 sm:right-6 sm:bottom-6"
+      >
       <AnimatePresence>
         {open && (
           <motion.div
@@ -366,10 +664,14 @@ export default function FloatingChat() {
             style={{ height: 'min(560px, calc(100vh - 5.5rem))', background: '#060a14' }}
           >
             <div
-              className="flex shrink-0 items-center justify-between gap-2 border-b border-white/[0.08] px-4 py-3.5"
+              onPointerDown={handleHeaderPointerDown}
+              className={`flex shrink-0 items-center justify-between gap-2 border-b border-white/[0.08] px-4 py-3.5${
+                canDrag ? ' cursor-grab select-none active:cursor-grabbing' : ''
+              }`}
               style={{
                 background:
                   'linear-gradient(180deg, rgba(36,144,237,0.14) 0%, rgba(6,10,20,0.98) 100%)',
+                ...(canDrag ? { touchAction: 'none' } : null),
               }}
             >
               <div className="flex min-w-0 items-center gap-3">
@@ -395,6 +697,19 @@ export default function FloatingChat() {
                 </div>
               </div>
               <div className="flex shrink-0 items-center gap-0.5">
+                {canDrag ? (
+                  <button
+                    type="button"
+                    data-drag-handle
+                    onDoubleClick={resetPosition}
+                    onKeyDown={handleGripKeyDown}
+                    className="cursor-grab rounded-lg p-2 text-white/35 transition-colors hover:bg-white/[0.06] hover:text-white/75 active:cursor-grabbing"
+                    aria-label="Move chat"
+                    title="Drag to move · double-click to reset position (arrow keys nudge, Home resets)"
+                  >
+                    <GripVertical size={16} />
+                  </button>
+                ) : null}
                 <button
                   type="button"
                   onClick={() => resetChat()}
@@ -458,6 +773,37 @@ export default function FloatingChat() {
                     <MargotAvatar size={28} variant="inline" className="mb-5 hidden sm:block" />
                     <div className="min-w-0 max-w-[calc(100%-2rem)] flex-1 rounded-2xl rounded-bl-md border border-white/[0.07] bg-white/[0.045] px-3.5 py-2.5 sm:max-w-[92%]">
                       <MargotMessageContent text={msg.text} />
+                      {msg.action && msg.actionState !== 'done' ? (
+                        <div className="mt-3 rounded-xl border border-white/10 bg-white/[0.05] p-3">
+                          <p className="text-xs leading-relaxed text-white/70">{msg.action.summary}</p>
+                          {msg.actionState === 'error' ? (
+                            <p className="mt-1.5 text-xs text-red-300">{msg.actionResult}</p>
+                          ) : null}
+                          <div className="mt-2.5 flex gap-2">
+                            <button
+                              type="button"
+                              disabled={msg.actionState === 'sending'}
+                              onClick={() => msg.action && void confirmAction(msg.id, msg.action.token)}
+                              className="rounded-lg px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-opacity disabled:cursor-not-allowed disabled:opacity-50"
+                              style={{ background: MARGOT_ACCENT }}
+                            >
+                              {msg.actionState === 'sending' ? 'Sending…' : 'Confirm'}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => dismissAction(msg.id)}
+                              className="rounded-lg border border-white/10 px-3 py-1.5 text-xs font-medium text-white/60 transition-colors hover:bg-white/[0.04] hover:text-white/80"
+                            >
+                              Dismiss
+                            </button>
+                          </div>
+                        </div>
+                      ) : null}
+                      {msg.actionState === 'done' ? (
+                        <p className="mt-2 text-xs font-medium text-emerald-300">
+                          ✓ Sent — the CARSI team will be in touch.
+                        </p>
+                      ) : null}
                       {voiceAvailable ? (
                         <button
                           type="button"
@@ -557,12 +903,23 @@ export default function FloatingChat() {
       ) : (
         <MargotChatLauncher
           onClick={() => {
+            // A drag gesture must not open the chat (GP-500)
+            if (wasDraggedRef.current) {
+              wasDraggedRef.current = false;
+              return;
+            }
             unlockMargotAudio();
             setOpen(true);
           }}
+          onDragPointerDown={(e) => {
+            wasDraggedRef.current = false;
+            startDrag(e);
+          }}
+          draggable={canDrag}
           assistantName={ASSISTANT_NAME}
         />
       )}
-    </div>
+      </motion.div>
+    </>
   );
 }

@@ -123,7 +123,7 @@ export function PricingTiers({ subscriptionsEnabled = false }: { subscriptionsEn
                   href={
                     tier.id === 'full_library'
                       ? '/contact?subject=teams-full-library'
-                      : `/dashboard/team?start=${tier.id}`
+                      : `/dashboard/team?create=${tier.id}`
                   }
                   className="mt-6 flex min-h-11 w-full items-center justify-center rounded-lg px-4 py-2.5 text-sm font-semibold transition-opacity hover:opacity-90"
                   style={{

@@ -1,8 +1,5 @@
 import { formatCecHoursForDisplay } from '@/lib/cec-display';
-import {
-  getProfessionalCecAssignment,
-  isCecExcludedSlug,
-} from '@/lib/seed/cec-professional-assignments';
+import { isCecExcludedSlug } from '@/lib/seed/cec-professional-assignments';
 import { resolveCatalogCecHours } from '@/lib/seed/cec-hours';
 
 /** Course fields used to resolve IICRC CEC hours for certificates and credentials. */
@@ -17,24 +14,20 @@ export type LmsCourseCecSource = {
 };
 
 /**
- * Best available CEC hours for a completed course from LMS database fields:
- * `cec_hours` column, course meta / description text, duration-based inference,
- * then reviewer-assigned professional values for gaps (never overrides stored CEC).
+ * CEC hours for a course on public listings, certificates and credentials.
+ *
+ * FAIL-CLOSED (licence-critical): CEC hours are shown ONLY from the CEC approvals registry
+ * (data/seed/cec-approvals.json, the SSOT) or an explicit, founder-approved positive
+ * `cecHours` on the course. There is deliberately no fallback to duration, description/meta
+ * prose, or reviewer/professional assignment — none of those is IICRC approval, and deriving
+ * a CEC claim from them is a licence-critical false claim (founder directive 2026-07-09).
+ * An unapproved course shows no CEC, never a fabricated one.
  */
 export function resolveLmsCourseCecHours(course: LmsCourseCecSource): number | null {
   if (isCecExcludedSlug(course.slug)) return null;
 
-  const fromCatalog = resolveCatalogCecHours({
-    cecHours: course.cecHours,
-    shortDescription: course.shortDescription,
-    description: course.description,
-    meta: course.meta,
-    durationHours: course.durationHours,
-    iicrcDiscipline: course.iicrcDiscipline,
-  });
-  if (fromCatalog != null && fromCatalog > 0) return fromCatalog;
-
-  return getProfessionalCecAssignment(course.slug);
+  const approved = resolveCatalogCecHours({ slug: course.slug, cecHours: course.cecHours });
+  return approved != null && approved > 0 ? approved : null;
 }
 
 /** Formatted CEC label for listings and certificates (`"4"`, `"2.5"`, or null). */

@@ -25,7 +25,11 @@ import {
 import { fulfillCourseCheckoutForUser } from '@/lib/server/team-course-purchase';
 import { shouldRetryWebhookFulfillment } from '@/lib/server/stripe-webhook-policy';
 import { resolveStripePaymentReference } from '@/lib/server/stripe-payment-reference';
-import { revokeEnrollmentsByPaymentReference } from '@/lib/server/stripe-revocation';
+import {
+  revokeEnrollmentsByPaymentReference,
+  reactivateDisputeWonEnrollmentsByPaymentReference,
+  isDisputeWon,
+} from '@/lib/server/stripe-revocation';
 import { readSubscriptionIdFromPaymentIntent } from '@/lib/server/stripe-subscription-map';
 import { markSubscriptionStatusBySubscriptionId } from '@/lib/server/subscription-store';
 import { markTeamSubscriptionStatusBySubscriptionId } from '@/lib/server/team-subscription-store';
@@ -134,6 +138,56 @@ async function handleStripeRevocation(event: Stripe.Event): Promise<void> {
   }
 }
 
+/**
+ * Re-grant access when a chargeback is resolved in the merchant's favour.
+ *
+ * `charge.dispute.closed` with status='won' means the customer's dispute failed —
+ * they legitimately paid — so the one-off enrolment that `charge.dispute.created`
+ * revoked is restored (ACCESS ONLY; no certificate re-issue, no completion
+ * resurrection — see reactivateDisputeWonEnrollmentsByPaymentReference). Any
+ * other close status ('lost'/'warning_closed'/…) leaves the enrolment revoked,
+ * and a row a later refund downgraded to 'refunded' is never re-granted.
+ *
+ * SCOPE — one-off course enrolments only (reverses handleStripeRevocation's
+ * PATH 1: checkout-session → enrolment). It does NOT re-entitle a subscription
+ * membership that path 2 marked `canceled` on dispute.created: a dispute WIN
+ * does not change the Stripe subscription status, so no subscription lifecycle
+ * event fires to restore it. Subscription re-entitlement on a won dispute is a
+ * KNOWN FOLLOW-UP owned by the subscription path (feat/gp-441-e1-annual-
+ * entitlement; see the boundary note at the top of this file) — until then, an
+ * annual member who wins a dispute stays lapsed until the next invoice.paid.
+ *
+ * ORDERING — this and handleStripeRevocation are two independently-claimed
+ * events with no Stripe delivery-order guarantee. If charge.dispute.closed(won)
+ * is processed BEFORE charge.dispute.created (e.g. a created-retry after a
+ * transient 5xx), this re-grant no-ops (nothing is revoked yet) and the later
+ * created leaves the row revoked. Safe-direction (access withheld, never wrongly
+ * granted). A robust fix is an ordering guard on the enrolment row (compare-and-
+ * set, mirroring subscription-store's statusEventAt) — deferred as it changes
+ * the shipped WS3 revoke path.
+ *
+ * Idempotent under the StripeWebhookEvent claim + the reactivate query (an
+ * already-active row matches nothing).
+ */
+async function handleDisputeWonRegrant(event: Stripe.Event): Promise<void> {
+  const dispute = event.data.object as Stripe.Dispute;
+  if (!isDisputeWon(dispute.status)) return;
+
+  const paymentIntentId =
+    typeof dispute.payment_intent === 'string' ? dispute.payment_intent : null;
+  if (!paymentIntentId) return;
+
+  const stripe = getStripeClient();
+  const sessions = await stripe.checkout.sessions.list({
+    payment_intent: paymentIntentId,
+    limit: 10,
+  });
+  for (const s of sessions.data) {
+    const ref = resolveStripePaymentReference(s.id);
+    if (ref) await reactivateDisputeWonEnrollmentsByPaymentReference(ref);
+  }
+}
+
 export async function POST(request: NextRequest) {
   const rawBody = await request.text();
   const stripeSignature = request.headers.get('stripe-signature') ?? '';
@@ -181,6 +235,11 @@ export async function POST(request: NextRequest) {
   try {
     if (event.type === 'charge.refunded' || event.type === 'charge.dispute.created') {
       await handleStripeRevocation(event);
+      return await acknowledge();
+    }
+
+    if (event.type === 'charge.dispute.closed') {
+      await handleDisputeWonRegrant(event);
       return await acknowledge();
     }
 

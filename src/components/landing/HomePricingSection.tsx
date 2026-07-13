@@ -4,8 +4,16 @@ import Link from 'next/link';
 import { PUBLIC_SHELL_INNER_CLASS } from '@/components/landing/public-shell-width';
 import { INDIVIDUAL_TIERS } from '@/lib/lms/pricing-tiers';
 
-const perCourse = INDIVIDUAL_TIERS.find((t) => t.id === 'per_course');
-const yearly = INDIVIDUAL_TIERS.find((t) => t.id === 'pro_annual');
+function buildHomeTiers(subscriptionsEnabled: boolean) {
+  const perCourse = INDIVIDUAL_TIERS.find((t) => t.id === 'per_course');
+  const yearlyBase = INDIVIDUAL_TIERS.find((t) => t.id === 'pro_annual');
+  const yearlyLive =
+    subscriptionsEnabled && yearlyBase
+      ? { ...yearlyBase, comingSoon: false, cta: 'Start membership', href: '/subscribe' }
+      : yearlyBase;
+
+  return { perCourse, yearly: yearlyLive };
+}
 
 type HomeTier = {
   name: string;
@@ -18,42 +26,48 @@ type HomeTier = {
   comingSoon?: boolean;
 };
 
-const TIERS: HomeTier[] = [
-  {
-    name: 'Free Library',
-    price: '$0',
-    cadence: 'no card required',
-    description:
-      'Every learner gets the Free Library at no cost — start building skills and CEC tracking today.',
-    cta: 'Start free',
-    href: '/courses',
-    highlighted: false,
-  },
-  {
-    name: perCourse?.name ?? 'Per course',
-    price: perCourse?.priceLabel ?? 'From $20',
-    cadence: 'per course',
-    description:
-      perCourse?.description ?? 'Pay once per IICRC CEC Accredited course. CECs tracked on completion.',
-    cta: perCourse?.cta ?? 'Browse courses',
-    href: perCourse?.href ?? '/courses',
-    highlighted: false,
-  },
-  {
-    name: yearly?.name ?? 'Yearly membership',
-    price: '$795',
-    cadence: '/ year · 100% access',
-    description:
-      yearly?.description ??
-      '100% access to all published CARSI courses for one learner for 12 months.',
-    cta: yearly?.cta ?? 'Coming soon',
-    href: yearly?.href ?? '/subscribe',
-    highlighted: !yearly?.comingSoon,
-    comingSoon: yearly?.comingSoon ?? true,
-  },
-];
+export function HomePricingSection({
+  subscriptionsEnabled = false,
+}: {
+  subscriptionsEnabled?: boolean;
+}) {
+  const { perCourse, yearly } = buildHomeTiers(subscriptionsEnabled);
 
-export function HomePricingSection() {
+  const tiers: HomeTier[] = [
+    {
+      name: 'Free Library',
+      price: '$0',
+      cadence: 'no card required',
+      description:
+        'Every learner gets the Free Library at no cost — start building skills and CEC tracking today.',
+      cta: 'Start free',
+      href: '/courses',
+      highlighted: false,
+    },
+    {
+      name: perCourse?.name ?? 'Per course',
+      price: perCourse?.priceLabel ?? 'From $20',
+      cadence: 'per course',
+      description:
+        perCourse?.description ??
+        'Pay once per IICRC CEC Accredited course. CECs tracked on completion.',
+      cta: perCourse?.cta ?? 'Browse courses',
+      href: perCourse?.href ?? '/courses',
+      highlighted: false,
+    },
+    {
+      name: yearly?.name ?? 'Yearly membership',
+      price: '$795',
+      cadence: '/ year · 100% access',
+      description:
+        yearly?.description ??
+        '100% access to all published CARSI courses for one learner for 12 months.',
+      cta: yearly?.cta ?? 'Coming soon',
+      href: yearly?.href ?? '/subscribe',
+      highlighted: !yearly?.comingSoon,
+      comingSoon: yearly?.comingSoon ?? true,
+    },
+  ];
   return (
     <section
       aria-labelledby="home-pricing-heading"
@@ -82,7 +96,7 @@ export function HomePricingSection() {
         </div>
 
         <div className="mt-10 grid gap-6 md:grid-cols-3">
-          {TIERS.map((tier) => (
+          {tiers.map((tier) => (
             <div
               key={tier.name}
               className={`relative flex flex-col rounded-xl border p-6 ${

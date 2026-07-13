@@ -1,11 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+import { getStripeClient } from '@/lib/api/stripe';
+import { parseOnboardingMeta } from '@/lib/onboarding/enterprise';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import {
   buildOnboardingCheckoutUrls,
   createOnboardingStripeCheckout,
 } from '@/lib/server/onboarding-checkout';
 import { getOnboardingCourseBySlug } from '@/lib/server/onboarding-programs';
+import { resolveOrgMonthlyPriceId } from '@/lib/server/org-subscription-price';
+import { provisionOrgSubscriptionContainer } from '@/lib/server/org-subscription-provision';
+import { subscriptionsEnabled } from '@/lib/server/subscriptions-flag';
 import { prisma } from '@/lib/prisma';
 
 type Ctx = { params: Promise<{ slug: string }> };
@@ -23,7 +28,7 @@ export async function POST(request: NextRequest, ctx: Ctx) {
   if (!process.env.STRIPE_SECRET_KEY?.trim()) {
     return NextResponse.json(
       { detail: 'Payments not configured. Contact CARSI to provision access.' },
-      { status: 503 }
+      { status: 503 },
     );
   }
 
@@ -38,12 +43,16 @@ export async function POST(request: NextRequest, ctx: Ctx) {
     where: { studentId_courseId: { studentId: claims.sub, courseId: course.id } },
   });
   if (existing) {
-    return NextResponse.json({ detail: 'Already enrolled in this program', enrolled: true }, { status: 409 });
+    return NextResponse.json(
+      { detail: 'Already enrolled in this program', enrolled: true },
+      { status: 409 },
+    );
   }
 
   const body = (await request.json().catch(() => ({}))) as {
     success_url?: string;
     cancel_url?: string;
+    organisation_name?: string;
   };
 
   const defaults = buildOnboardingCheckoutUrls(request.nextUrl.origin, slug);
@@ -55,6 +64,81 @@ export async function POST(request: NextRequest, ctx: Ctx) {
     typeof body.cancel_url === 'string' && body.cancel_url.startsWith('http')
       ? body.cancel_url
       : defaults.cancel_url;
+
+  const meta = parseOnboardingMeta(course.meta);
+  const organisationName = (
+    body.organisation_name?.trim() ||
+    meta?.company?.trim() ||
+    course.title.replace(/^CARSI Maintenance Company Onboarding — /, '').trim()
+  ).slice(0, 200);
+
+  if (subscriptionsEnabled()) {
+    const priceId = await resolveOrgMonthlyPriceId();
+    if (priceId) {
+      if (organisationName.length < 2) {
+        return NextResponse.json({ detail: 'Organisation name is required.' }, { status: 400 });
+      }
+
+      const contactEmail = claims.email?.trim().toLowerCase() ?? '';
+      let teamId: string;
+      try {
+        const provisioned = await provisionOrgSubscriptionContainer({
+          ownerId: claims.sub,
+          organisationName,
+          contactEmail,
+        });
+        teamId = provisioned.teamId;
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
+        if (msg === 'ALREADY_ON_TEAM') {
+          return NextResponse.json(
+            {
+              detail:
+                'You are already on a team. Contact CARSI support to provision organisation access.',
+            },
+            { status: 409 },
+          );
+        }
+        console.error('[onboarding/checkout] org provision failed:', e);
+        return NextResponse.json({ detail: 'Could not start checkout' }, { status: 500 });
+      }
+
+      try {
+        const session = await getStripeClient().checkout.sessions.create({
+          mode: 'subscription',
+          line_items: [{ price: priceId, quantity: 1 }],
+          customer_email: contactEmail || undefined,
+          success_url: successUrl,
+          cancel_url: cancelUrl,
+          metadata: {
+            carsi_user_id: claims.sub,
+            carsi_team_id: teamId,
+            plan: 'org_monthly',
+            organisation_name: organisationName,
+            onboarding_slug: slug,
+            source: 'carsi-org-subscription',
+          },
+          subscription_data: {
+            metadata: {
+              carsi_user_id: claims.sub,
+              carsi_team_id: teamId,
+              plan: 'org_monthly',
+              onboarding_slug: slug,
+            },
+          },
+          allow_promotion_codes: true,
+        });
+
+        if (!session.url) {
+          return NextResponse.json({ detail: 'Could not start checkout' }, { status: 500 });
+        }
+        return NextResponse.json({ checkout_url: session.url });
+      } catch (e) {
+        console.error('[onboarding/checkout] org Stripe session failed:', e);
+        return NextResponse.json({ detail: 'Could not start checkout' }, { status: 500 });
+      }
+    }
+  }
 
   try {
     const { checkout_url } = await createOnboardingStripeCheckout({

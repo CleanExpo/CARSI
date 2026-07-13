@@ -53,7 +53,7 @@ const faqs = [
   {
     question: 'What causes mould in Australian fitness centres and how can it be prevented?',
     answer:
-      'The primary mould drivers in Australian gyms are inadequate ventilation in wet areas, condensation on cold surfaces in air-conditioned spaces, water ingress around pool surrounds and wet decks, and porous materials (grout, carpet, ceiling tiles) that retain moisture. AMRT-aligned CEC training covers moisture mapping, relative humidity monitoring, and containment procedures that allow maintenance staff to identify and address these conditions systematically before mould becomes visible — preventing the costly remediation and member complaints that follow.',
+      'The primary mould drivers in Australian gyms are inadequate ventilation in wet areas, condensation on cold surfaces in air-conditioned spaces, water ingress around pool surrounds and wet decks, and porous materials (grout, carpet, ceiling tiles) that retain moisture. CEC-accredited mould remediation training covers moisture mapping, relative humidity monitoring, and containment procedures that allow maintenance staff to identify and address these conditions systematically before mould becomes visible — preventing the costly remediation and member complaints that follow.',
   },
   {
     question: 'How does IICRC CEC training reduce liability for gym operators?',
@@ -72,7 +72,7 @@ const whyCards = [
     icon: Activity,
     title: 'High-Humidity Mould Risk',
     description:
-      'Changerooms, pool decks, and wet areas generate constant humidity. AMRT-aligned CEC training gives maintenance staff the protocols to identify, contain, and remediate mould before it affects members.',
+      'Changerooms, pool decks, and wet areas generate constant humidity. CEC-accredited mould remediation training gives maintenance staff the protocols to identify, contain, and remediate mould before it affects members.',
     color: '#43a047',
   },
   {

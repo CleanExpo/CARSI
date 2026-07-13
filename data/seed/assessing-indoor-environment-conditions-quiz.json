@@ -1,0 +1,125 @@
+{
+  "version": 1,
+  "courseSlug": "assessing-indoor-environment-conditions",
+  "quizzes": [
+    {
+      "quizId": "c53ece9f-fdd0-494b-8fa9-38ad3552ed9a",
+      "lessonTitle": "Producing a clear, defensible assessment report",
+      "title": "Assessing Indoor Environment Conditions — Knowledge Check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "What best describes indoor environmental quality (IEQ) as covered in this course?",
+          "options": [
+            "Only whether a building smells clean",
+            "The condition of a building&rsquo;s air, surfaces and moisture balance as they affect the building and its occupants",
+            "A fixed pass/fail score set by the manufacturer of the moisture meter",
+            "A measure that only applies to commercial buildings, not homes"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "What is the correct order of the assessor&rsquo;s core role?",
+          "options": [
+            "Recommend, then measure, then observe",
+            "Guess, then confirm with a single reading",
+            "Observe, measure, interpret, recommend",
+            "Measure only, since observation is subjective"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "Why should an assessor view a building as a system rather than assessing the wet patch alone?",
+          "options": [
+            "Because moisture, ventilation, HVAC and occupancy all interact to shape drying and mould risk",
+            "Because building system checks are required only for commercial insurance claims",
+            "Because HVAC systems never affect areas outside the room where they are installed",
+            "Because occupancy has no measurable effect on indoor moisture"
+          ],
+          "correctIndex": 0,
+          "points": 1
+        },
+        {
+          "questionText": "Why is specific humidity (g/kg) useful for comparing two rooms at different temperatures, when relative humidity (RH) alone is not?",
+          "options": [
+            "Specific humidity is measured in the United States and is therefore more standardised",
+            "Specific humidity records the actual mass of water in the air, so it does not change just because temperature changes",
+            "RH is always a more precise reading than specific humidity",
+            "Specific humidity replaces the need to record temperature at all"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "When comparing a material moisture reading in an affected room, what should it be compared against?",
+          "options": [
+            "A generic published number for that material type",
+            "An unaffected reference reading of the same material, taken on the same day with the same instrument",
+            "The previous tenant&rsquo;s reported comfort level",
+            "The reading taken outdoors"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "A hygrometer shows moderate relative humidity in a room, but a nearby window is visibly sweating. What does this indicate?",
+          "options": [
+            "The instrument is faulty and should be discarded",
+            "The room is fully dry and no further action is needed",
+            "The dew point is close to the window&rsquo;s surface temperature, creating a condensation risk despite the moderate RH reading",
+            "Condensation on glass has no relationship to dew point"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "What is the correct approach when mould is present or strongly suspected during an inspection?",
+          "options": [
+            "Run air movers across the affected surfaces immediately to dry them out faster",
+            "Use air filtration devices (AFDs) and dehumidifiers to manage moisture and airborne spores, and introduce air movers only after the area is cleaned and cleared",
+            "Ignore it unless the occupant specifically raises a health complaint",
+            "Ventilate the area briefly and then proceed as normal with standard drying equipment"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "During an inspection, a technician suspects a wall sheet installed before the mid-1980s may contain asbestos. What is the correct action?",
+          "options": [
+            "Sand a small section to confirm visually before deciding",
+            "Continue the assessment as normal since it is only a suspicion, not a confirmed finding",
+            "Stop, do not disturb the material, secure the area, and refer to a licensed asbestos assessor",
+            "Remove the material carefully by hand and dispose of it with general waste"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "Why does Australian climate zone and season matter when interpreting a moisture or humidity reading?",
+          "options": [
+            "It does not matter; a single national baseline applies everywhere",
+            "Because a reading considered normal in a tropical wet season may look elevated in an arid region in winter, and vice versa, so the reference must reflect local, current conditions",
+            "Because climate zone only affects outdoor readings, never indoor ones",
+            "Because instruments read differently depending on the manufacturer&rsquo;s country of origin"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "What makes an indoor environment assessment report defensible in an Australian insurance or dispute context?",
+          "options": [
+            "Confident, authoritative language regardless of the underlying evidence",
+            "A visible, checkable trail from observations and measurements, through reference comparison and interpretation, to a proportionate recommendation and stated limitations",
+            "Omitting any findings that could be seen as uncertain or inconclusive",
+            "A single overall pass/fail rating with no supporting detail"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        }
+      ]
+    }
+  ]
+}

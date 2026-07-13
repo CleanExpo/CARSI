@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { ACCESS_GRANTING_STATUS_LIST } from '@/lib/server/enrollment-access';
 import { normalizeEnrollmentStatus } from '@/lib/server/learner-dashboard-data';
 
 export interface PathwayCourseProgress {
@@ -67,7 +68,9 @@ export async function getPathwayProgressForStudent(
   });
 
   const enrollments = await prisma.lmsEnrollment.findMany({
-    where: { studentId, status: { not: 'cancelled' } },
+    // Allow-set (WS3 / P0-C vocab unify): a revoked/refunded course does not count
+    // toward pathway progress.
+    where: { studentId, status: { in: [...ACCESS_GRANTING_STATUS_LIST] } },
     select: {
       courseId: true,
       status: true,

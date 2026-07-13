@@ -8,7 +8,8 @@ export type CrmEventType =
   | 'enrollment.created'
   | 'enrollment.completed'
   | 'roadshow.registration.created'
-  | 'hub.submission.created';
+  | 'hub.submission.created'
+  | 'lead.captured';
 
 export interface CrmContactPayload {
   submission_id: string;

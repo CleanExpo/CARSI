@@ -137,7 +137,7 @@ Dear [Name],
 
 I'm Phill from CARSI (carsi.com.au), an Australian-owned online training platform delivering IICRC CEC-approved courses in restoration, mould remediation and water damage management.
 
-We'd like to explore a training partnership with [Association Name] — offering your members discounted access to 40+ IICRC-approved courses, all available online and self-paced.
+We'd like to explore a training partnership with [Association Name] — offering your members discounted access to 40+ IICRC CEC Accredited courses, all available online and self-paced.
 
 There's no cost to the association. Members receive a discount code and verifiable digital certificates on completion.
 
@@ -162,7 +162,7 @@ I'm writing to introduce CARSI (carsi.com.au), an Australian-owned platform deli
 
 We believe there's a strong alignment between CARSI's course catalogue and the professional development needs of [Association Name] members. Specifically:
 
-- **40+ IICRC-approved courses** — covering WRT, ASD, AMRT, CCT and more
+- **40+ IICRC CEC Accredited courses** — covering WRT, ASD, AMRT, CCT and more
 - **100% online, self-paced** — no classroom attendance or roster disruption
 - **Verifiable digital certificates** — public credential URL for employer and client verification
 - **Continuing Education Credits** — recognised IICRC CECs for credential maintenance
@@ -286,7 +286,7 @@ Contact: training@carsi.com.au | carsi.com.au
 
 **What's included per seat:**
 
-- Unlimited access to all 40+ IICRC-approved courses for 12 months
+- Unlimited access to all 40+ IICRC CEC Accredited courses for 12 months
 - All CECs earned and tracked per user
 - Digital certificate per course completion
 - Admin dashboard: enrolment tracking, completion rates, CEC reports

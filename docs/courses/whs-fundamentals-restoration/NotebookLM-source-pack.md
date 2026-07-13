@@ -170,7 +170,7 @@ US term (wrong here) | Correct Australian term / standard |
 N95 / P100 respirator | P2 / P3 (AS/NZS 1716) |
 OSHA 1910.134 (respirators) | AS/NZS 1715 |
 GFCI | RCD / safety switch (AS/NZS 3012, 3760) |
-120 V / 60 Hz | 230 V / 50 Hz |
+US 120 V / 60 Hz | 230 V / 50 Hz |
 MSDS | SDS (GHS 7) |
 HAZWOPER (29 CFR 1910.120) | No Australian equivalent — WHS Regs + Codes of Practice |
 OSHA / PEL | Safe Work Australia / WES (WEL from Dec 2026) |

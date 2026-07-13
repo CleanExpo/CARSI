@@ -1,4 +1,5 @@
 import { normalizeEnrollmentStatus } from '@/lib/server/learner-dashboard-data';
+import { isRevokedStatus } from '@/lib/server/enrollment-access';
 import { normalizePublicAssetUrl } from '@/lib/remote-image';
 import { prisma } from '@/lib/prisma';
 import type {
@@ -99,10 +100,14 @@ function resolveCecHoursFromCourse(course: {
   return { hours: 0, estimated: false };
 }
 
-function isCompleteEnrollment(args: {
+export function isCompleteEnrollment(args: {
   status: string;
   allLessonsComplete: boolean;
 }): boolean {
+  // A revoked/refunded course credits NO CEC toward IICRC renewal (WS3 / P0-C,
+  // AC-8). Revocation clears status + completedAt but leaves lesson-progress rows,
+  // so `allLessonsComplete` alone would otherwise keep counting a refunded course.
+  if (isRevokedStatus(args.status)) return false;
   return (
     args.allLessonsComplete || normalizeEnrollmentStatus(args.status) === 'completed'
   );

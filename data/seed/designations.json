@@ -1,0 +1,115 @@
+{
+  "version": 1,
+  "program": "CARSI Southern Hemisphere Restoration Designations",
+  "programSummary": "CARSI designations complement the IICRC — Southern-Hemisphere training the IICRC does not offer, produced for Australian and New Zealand conditions: AS/NZS standards, 230 V/10 A power, metric units and our climate. They are not IICRC certifications and do not use IICRC designations; each is a distinct CARSI-issued credential earned through CARSI CEC-accredited training that also earns IICRC Continuing Education Credits (CECs) toward maintaining an existing IICRC certification.",
+  "positioning": "Complements the IICRC — we offer Southern-Hemisphere courses they do not. Not an IICRC certification; earns IICRC CECs.",
+  "designations": [
+    {
+      "slug": "carsi-water-restoration-practitioner",
+      "name": "CARSI Water Restoration Practitioner",
+      "disciplineTopic": "water restoration",
+      "summary": "The Southern Hemisphere credential for professional water damage restoration — water categories and classes, hazard-led safety, moisture assessment, drying principles and documentation.",
+      "pathwaySteps": [
+        { "courseSlug": "asbestos-awareness-for-restoration-technicians", "order": 1, "required": false, "role": "foundation" },
+        { "courseSlug": "psychrometry-building-science-for-drying", "order": 2, "required": false, "role": "foundation" },
+        { "courseSlug": "water-damage-restoration-fundamentals", "order": 3, "required": true, "role": "credential" }
+      ],
+      "completionRule": "all-required",
+      "alsoEarnsCec": true
+    },
+    {
+      "slug": "carsi-structural-drying-practitioner",
+      "name": "CARSI Structural Drying Practitioner",
+      "disciplineTopic": "structural drying",
+      "summary": "The Southern Hemisphere credential for applied structural drying — the dry standard, metric psychrometry, airflow and dehumidifier selection, 230 V/10 A drying-system design and electrical safety.",
+      "pathwaySteps": [
+        { "courseSlug": "psychrometry-building-science-for-drying", "order": 1, "required": false, "role": "foundation" },
+        { "courseSlug": "structural-drying-fundamentals", "order": 2, "required": true, "role": "credential" }
+      ],
+      "completionRule": "all-required",
+      "alsoEarnsCec": true
+    },
+    {
+      "slug": "carsi-mould-remediation-practitioner",
+      "name": "CARSI Mould Remediation Practitioner",
+      "disciplineTopic": "mould remediation",
+      "summary": "The Southern Hemisphere credential for professional mould remediation — mould biology and health, Condition 1/2/3 assessment, containment, the correct remediation sequence, PPE by condition and verification.",
+      "pathwaySteps": [
+        { "courseSlug": "asbestos-awareness-for-restoration-technicians", "order": 1, "required": false, "role": "foundation" },
+        { "courseSlug": "mould-remediation-fundamentals", "order": 2, "required": true, "role": "credential" }
+      ],
+      "completionRule": "all-required",
+      "alsoEarnsCec": true
+    },
+    {
+      "slug": "carsi-contaminated-water-practitioner",
+      "name": "CARSI Contaminated-Water Practitioner",
+      "disciplineTopic": "Category 3 (sewage / black-water) remediation",
+      "summary": "The Southern Hemisphere credential for Category 3 contaminated-water work — hazard-led risk assessment and SWMS, biohazard PPE and decontamination, Australian-registered products, and lawful disposal under state EPA / water authority.",
+      "pathwaySteps": [
+        { "courseSlug": "asbestos-awareness-for-restoration-technicians", "order": 1, "required": false, "role": "foundation" },
+        { "courseSlug": "category-3-sewage-black-water-remediation", "order": 2, "required": true, "role": "credential" }
+      ],
+      "completionRule": "all-required",
+      "alsoEarnsCec": true
+    },
+    {
+      "slug": "carsi-fire-smoke-restoration-practitioner",
+      "name": "CARSI Fire & Smoke Restoration Practitioner",
+      "disciplineTopic": "fire and smoke restoration",
+      "summary": "The Southern Hemisphere credential for fire and smoke damage restoration — smoke and soot behaviour, residue types and cleaning-method selection, structural deodorisation, corrosion urgency, and Australian bushfire-ash and asbestos-in-debris hazards.",
+      "pathwaySteps": [
+        { "courseSlug": "asbestos-awareness-for-restoration-technicians", "order": 1, "required": false, "role": "foundation" },
+        { "courseSlug": "fire-smoke-damage-restoration-fundamentals", "order": 2, "required": true, "role": "credential" }
+      ],
+      "completionRule": "all-required",
+      "alsoEarnsCec": true
+    },
+    {
+      "slug": "carsi-trauma-biohazard-decontamination-practitioner",
+      "name": "CARSI Trauma & Biohazard Decontamination Practitioner",
+      "disciplineTopic": "trauma and biohazard decontamination",
+      "summary": "The Southern Hemisphere credential for trauma and biohazard decontamination — bloodborne-pathogen safety, biohazard PPE, decontamination sequence, clinical-waste disposal, and worker psychological safety.",
+      "pathwaySteps": [
+        { "courseSlug": "trauma-crime-scene-decontamination-fundamentals", "order": 1, "required": true, "role": "credential" }
+      ],
+      "completionRule": "all-required",
+      "alsoEarnsCec": true
+    },
+    {
+      "slug": "carsi-carpet-cleaning-practitioner",
+      "name": "CARSI Carpet Cleaning Practitioner",
+      "disciplineTopic": "carpet cleaning",
+      "summary": "The Southern Hemisphere credential for professional carpet cleaning — carpet fibres and soil, hot-water extraction and encapsulation, method selection, stain treatment and correct drying.",
+      "pathwaySteps": [
+        { "courseSlug": "carpet-cleaning-technician-fundamentals", "order": 1, "required": true, "role": "credential" }
+      ],
+      "completionRule": "all-required",
+      "alsoEarnsCec": true
+    },
+    {
+      "slug": "carsi-timber-floor-restoration-practitioner",
+      "name": "CARSI Timber Floor Restoration Practitioner",
+      "disciplineTopic": "timber floor assessment and restoration",
+      "summary": "The Southern Hemisphere credential for timber floor assessment and restoration — Australian timber species, cupping and crowning, moisture measurement, the dry standard, subfloor ventilation and electrical safety.",
+      "pathwaySteps": [
+        { "courseSlug": "psychrometry-building-science-for-drying", "order": 1, "required": false, "role": "foundation" },
+        { "courseSlug": "timber-floor-assessment-restoration", "order": 2, "required": true, "role": "credential" }
+      ],
+      "completionRule": "all-required",
+      "alsoEarnsCec": true
+    },
+    {
+      "slug": "carsi-indoor-environment-assessment-practitioner",
+      "name": "CARSI Indoor Environment Assessment Practitioner",
+      "disciplineTopic": "indoor environment assessment",
+      "summary": "The Southern Hemisphere credential for assessing indoor environment conditions — indoor environmental quality, psychrometry, moisture inspection, mould recognition, assessor competency and defensible reporting.",
+      "pathwaySteps": [
+        { "courseSlug": "psychrometry-building-science-for-drying", "order": 1, "required": false, "role": "foundation" },
+        { "courseSlug": "assessing-indoor-environment-conditions", "order": 2, "required": true, "role": "credential" }
+      ],
+      "completionRule": "all-required",
+      "alsoEarnsCec": true
+    }
+  ]
+}

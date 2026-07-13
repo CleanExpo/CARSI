@@ -8,6 +8,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 
+import { applyRateLimit, clientIpFrom } from '@/lib/rate-limit';
 import {
   getPublicCredentialJson,
   getPublicCredentialPdfBuffer,
@@ -15,6 +16,13 @@ import {
 import { getUpstreamBaseUrl } from '@/lib/server/upstream-api';
 
 type Ctx = { params: Promise<{ credentialId: string }> };
+
+// Public, unauthenticated credential verification (WS4 / P0-D). The id is a random
+// UUIDv4 (unguessable) and a revoked cert already 404s (WS3), but there is no auth,
+// so a per-IP limit throttles bulk scraping of the endpoint if a set of ids leaks.
+// Generous for a legitimate employer verifying a handful of credentials.
+const CREDENTIAL_VERIFY_LIMIT = 30;
+const CREDENTIAL_VERIFY_WINDOW_MS = 60_000;
 
 async function respondFromLocalDatabase(
   request: NextRequest,
@@ -49,6 +57,21 @@ async function respondFromLocalDatabase(
 }
 
 export async function GET(request: NextRequest, ctx: Ctx) {
+  const ip = clientIpFrom(
+    request.headers.get('x-forwarded-for'),
+    request.headers.get('x-real-ip'),
+  );
+  const rl = applyRateLimit(`credential-verify:${ip}`, CREDENTIAL_VERIFY_LIMIT, CREDENTIAL_VERIFY_WINDOW_MS);
+  if (!rl.ok) {
+    return NextResponse.json(
+      { detail: 'Too many requests. Please try again later.' },
+      {
+        status: 429,
+        headers: { 'Retry-After': String(Math.max(1, Math.ceil((rl.resetAt - Date.now()) / 1000))) },
+      },
+    );
+  }
+
   const { credentialId } = await ctx.params;
   const wantPdf = request.nextUrl.searchParams.get('pdf') === '1';
 

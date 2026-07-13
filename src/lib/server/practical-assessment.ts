@@ -9,6 +9,7 @@
  */
 import { prisma } from '@/lib/prisma';
 import { runSerializable } from '@/lib/server/db-tx';
+import { ACCESS_GRANTING_STATUS_LIST } from '@/lib/server/enrollment-access';
 
 /** Roles permitted to review practical-assessment submissions (mirrors course-review roles). */
 export function canReviewAssessments(role: string | null | undefined): boolean {
@@ -160,11 +161,13 @@ export async function submitPracticalAssessment(input: {
   if (!assessment || !assessment.isPublished) {
     throw new AssessmentError(404, 'Assessment not found');
   }
+  // Allow-set (WS3 / P0-C): a revoked/refunded enrolment cannot submit assessment
+  // evidence (another graded artefact that could advance completion/CEC).
   const enrolment = await prisma.lmsEnrollment.findFirst({
     where: {
       studentId: input.studentId,
       courseId: assessment.courseId,
-      status: { not: 'cancelled' },
+      status: { in: [...ACCESS_GRANTING_STATUS_LIST] },
     },
   });
   if (!enrolment) {
@@ -448,7 +451,7 @@ export async function deletePracticalAssessment(id: string): Promise<void> {
  */
 export async function listAvailableAssessmentsForStudent(studentId: string) {
   const enrolments = await prisma.lmsEnrollment.findMany({
-    where: { studentId, status: { not: 'cancelled' } },
+    where: { studentId, status: { in: [...ACCESS_GRANTING_STATUS_LIST] } },
     select: { courseId: true },
   });
   const courseIds = [...new Set(enrolments.map((e) => e.courseId))];

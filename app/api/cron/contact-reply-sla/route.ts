@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 
+import { requireCron } from '@/lib/server/cron-auth';
+import { autoSendEnabled } from '@/lib/server/contact-reply-autosend';
 import { isDueForAutoSend } from '@/lib/server/contact-reply';
 import { dispatchContactReplyDraft } from '@/lib/server/contact-reply-dispatch';
 import { getAppOrigin } from '@/lib/server/app-url';
@@ -17,8 +19,13 @@ import { prisma } from '@/lib/prisma';
  * Wire to a scheduler hitting this every ~10 min with `Authorization: Bearer $CRON_SECRET`.
  */
 export async function GET(request: Request) {
-  if (request.headers.get('authorization') !== `Bearer ${process.env.CRON_SECRET}`) {
-    return new NextResponse('Unauthorized', { status: 401 });
+  const denied = requireCron(request);
+  if (denied) return denied;
+  // WS5: auto-send is OFF unless an operator explicitly opts in. Even if a draft
+  // is somehow auto-send-eligible, nothing is emailed without this flag — so the
+  // dark→live flip is a deliberate, auditable decision, separate from wiring a scheduler.
+  if (!autoSendEnabled()) {
+    return NextResponse.json({ ok: true, dispatched: 0, reason: 'disabled' });
   }
   if (!process.env.DATABASE_URL?.trim()) {
     return NextResponse.json({ ok: true, dispatched: 0, reason: 'no_database' });

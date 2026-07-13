@@ -4,6 +4,7 @@ import { isLmsClaimsAllowedAdminPanel } from '@/lib/admin/admin-panel-access';
 import { parseOnboardingMeta, isOnboardingCourse } from '@/lib/onboarding/enterprise';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { ensureAdminEnrollmentForCourse } from '@/lib/server/enrollment-service';
+import { isEnrolmentAccessAllowed } from '@/lib/server/enrollment-access';
 import { prisma } from '@/lib/prisma';
 import { getUpstreamBaseUrl } from '@/lib/server/upstream-api';
 
@@ -71,7 +72,9 @@ export async function GET(request: NextRequest, ctx: Ctx) {
     });
   }
 
-  if (!enrollment) {
+  // Allow-set (WS3 / P0-C): a revoked/refunded enrolment must not receive the
+  // curriculum map (from which every lesson-content GET can be driven).
+  if (!enrollment || !isEnrolmentAccessAllowed(enrollment.status)) {
     return NextResponse.json({ detail: 'Not enrolled in this course' }, { status: 403 });
   }
 

@@ -14,9 +14,19 @@
  * deliberately narrow: it flags only phrases that assert CARSI delivers IICRC
  * courses/certification/accreditation, and leaves legitimate copy untouched —
  * a student's own existing IICRC certification (recert reminders, member
- * number, CEC tracking), accurate "IICRC CEC Accredited" claims, discipline
- * descriptors like "WRT-aligned", and third-person industry facts such as
- * "IICRC certification is required for insurance panels".
+ * number, CEC tracking), accurate "IICRC CEC Accredited" claims, and
+ * third-person industry facts such as "IICRC certification is required for
+ * insurance panels".
+ *
+ * CARSI DESIGNATION RULE (founder, 2026-07-10): CARSI issues its OWN
+ * "CARSI Southern Hemisphere Restoration Designations" (e.g. "CARSI Water
+ * Restoration Technician") — it does NOT brand its courses with IICRC
+ * Registered-Training-School discipline designations. So the IICRC discipline
+ * ACRONYMS (WRT/ASD/AMRT/FSRT/CCT/TCST) and the "[discipline]-aligned" framing
+ * may NOT be used to name/brand a CARSI course, and iicrcDiscipline must be
+ * null in seed data. Referencing a student's own IICRC discipline certification
+ * remains fine; using an S-standard NOMINATIVELY (e.g. "ANSI/IICRC S500")
+ * remains fine — only the "-aligned" designation framing is banned.
  *
  * Modes:
  *   node scripts/check-iicrc-terminology.mjs           # scan tracked source copy (CI + manual)
@@ -76,6 +86,64 @@ const BANNED = [
     allow: null,
     message: 'Do not imply IICRC accredits CARSI\'s courses — say "IICRC CEC Accredited course(s)".',
   },
+  {
+    // "IICRC Approved School" / "IICRC Approved Instructor" as a positive claim about
+    // CARSI — Schools/Instructors are a different IICRC licence class CARSI does not hold.
+    // Third-person facts ("certification is obtained through an IICRC-approved school")
+    // are allowed via the preposition context.
+    re: /\bIICRC[\s-]+Approved[\s-]+(School|Instructor)\b/i,
+    allow: /\b(through|via|from|at)\s+(an?\s+)?IICRC[\s-]+approved\s+school\b/i,
+    message: 'CARSI is not an IICRC Approved School or Instructor — never claim that status (it is a separate IICRC licence class).',
+  },
+  {
+    // Endorsement claims. The IICRC states it "does not promote any particular
+    // educational provider" — endorsement/partnership/promotion claims are banned.
+    re: /endorsed[\s-]+by[\s-]+(the[\s-]+)?IICRC/i,
+    allow: null,
+    message: 'The IICRC does not endorse providers — never claim IICRC endorsement.',
+  },
+  {
+    re: /IICRC[\s-]+endorsed/i,
+    allow: null,
+    message: 'The IICRC does not endorse providers — never claim "IICRC endorsed".',
+  },
+  {
+    re: /IICRC[\s-]+partner(ship)?/i,
+    allow: null,
+    message: 'CARSI is an approved CEC provider, not an IICRC partner — never claim an IICRC partnership.',
+  },
+  {
+    re: /promoted[\s-]+by[\s-]+(the[\s-]+)?IICRC/i,
+    allow: null,
+    message: 'The IICRC does not promote any particular educational provider — never claim IICRC promotion.',
+  },
+  {
+    // CARSI designation rule (founder 2026-07-10): IICRC discipline designations are
+    // Registered-Training-School marks — a CARSI course may not be branded as
+    // "[discipline]-aligned". Use the CARSI Southern Hemisphere designation instead.
+    // Nominative S-standards ("ANSI/IICRC S500") are NOT "-aligned" so are untouched.
+    re: /\b(WRT|ASD|AMRT|FSRT|CCT|TCST|S\d{3})[\s-]*aligned\b/i,
+    allow: null,
+    message:
+      'CARSI courses are not "[discipline]-aligned" — brand them with their CARSI Southern Hemisphere designation (e.g. "CARSI Water Restoration Practitioner"). Reference IICRC S-standards nominatively only.',
+  },
+  {
+    // Seed course data must not store an IICRC school-designation acronym as the
+    // course discipline — CARSI courses carry CARSI designations (iicrcDiscipline: null).
+    re: /"iicrcDiscipline"\s*:\s*"(WRT|ASD|AMRT|FSRT|CCT|TCST|S\d{3})"/i,
+    allow: null,
+    seedOnly: true,
+    message:
+      'iicrcDiscipline must be null — a CARSI course does not carry an IICRC discipline designation. Set the CARSI designation in meta.designation instead.',
+  },
+  {
+    // Founder brand-exclusion rule (2026-07-09): COACH8 must never appear in any CARSI
+    // copy or content surface (see src/lib/calendar/event-exclusions.ts for the calendar
+    // enforcement of the same rule).
+    re: /\bCOACH[\s-]?8\b/i,
+    allow: null,
+    message: 'COACH8 is excluded from all CARSI surfaces (founder brand-exclusion rule) — remove it.',
+  },
 ];
 
 // Only these source-copy extensions carry public/marketing/in-app strings.
@@ -87,9 +155,15 @@ const COPY_EXT = /\.(tsx?|jsx?|mdx?)$/;
 // it uses technical phrasings like "non-IICRC courses" that are not selling copy.
 const SCANNED_DIRS = ['app/', 'src/', 'templates/', 'docs/marketing/'];
 
+// Seed JSON is production copy (course descriptions, marketing prose) that ships to the
+// live DB via the PRE_DEPLOY seeder — scan it too (gap closed 2026-07-09).
+const JSON_SCANNED_DIRS = ['data/seed/', '.curation/', 'data/wordpress-export/'];
+
 function inScope(file) {
   const norm = file.replace(/\\/g, '/');
-  return SCANNED_DIRS.some((d) => norm.startsWith(d));
+  if (COPY_EXT.test(norm) && SCANNED_DIRS.some((d) => norm.startsWith(d))) return true;
+  if (norm.endsWith('.json') && JSON_SCANNED_DIRS.some((d) => norm.startsWith(d))) return true;
+  return false;
 }
 
 /** Files intentionally exempt: this guard, the rule docs, and skill/spec text
@@ -97,7 +171,17 @@ function inScope(file) {
 const EXEMPT = [
   'scripts/check-iicrc-terminology.mjs',
   'CLAUDE.md',
-  '.claude/skills/carsi-course-production/SKILL.md',
+  'skills/context/project-context.skill.md',
+  // The course-asset-kit engine's banned-phrase scanner mirrors this guard's
+  // regexes and messages, and its tests use the banned phrases as fixtures to
+  // prove the scan fires — same rationale as exempting this guard itself.
+  'src/lib/course-kit/iicrc-phrases.ts',
+  'src/lib/course-kit/iicrc-phrases.test.ts',
+  'src/lib/course-kit/scaffold.test.ts',
+  // The calendar exclusion module + test enforce the COACH8 brand-exclusion rule and
+  // legitimately name the excluded brand (same rationale as the phrase catalogue above).
+  'src/lib/calendar/event-exclusions.ts',
+  'src/lib/calendar/event-exclusions.test.ts',
 ];
 
 function isExempt(file) {
@@ -106,7 +190,9 @@ function isExempt(file) {
 }
 
 function scanLine(file, lineNo, content, findings) {
+  const norm = file.replace(/\\/g, '/');
   for (const rule of BANNED) {
+    if (rule.seedOnly && !norm.startsWith('data/seed/')) continue;
     if (rule.re.test(content) && !(rule.allow && rule.allow.test(content))) {
       findings.push(`  ${file}:${lineNo}: ${rule.message}\n    → ${content.trim().slice(0, 140)}`);
     }
@@ -142,8 +228,7 @@ if (staged) {
       continue;
     }
     if (!line.startsWith('+') || line.startsWith('+++')) continue;
-    if (!currentFile || !COPY_EXT.test(currentFile) || !inScope(currentFile) || isExempt(currentFile))
-      continue;
+    if (!currentFile || !inScope(currentFile) || isExempt(currentFile)) continue;
     scanLine(currentFile, lineNo, line.slice(1), findings);
     lineNo++;
   }
@@ -159,7 +244,7 @@ if (staged) {
   const files = list
     .split('\n')
     .map((f) => f.trim())
-    .filter((f) => f && COPY_EXT.test(f) && inScope(f) && !isExempt(f));
+    .filter((f) => f && inScope(f) && !isExempt(f));
   for (const file of files) {
     let text = '';
     try {

@@ -2,8 +2,8 @@ name: Generate course media & seed
 
 # Manual "Run workflow" button (Actions tab → Generate course media & seed → Run workflow).
 #
-# Runs the cost-bearing authoring scripts on GitHub's runners, which have the API
-# credentials (pulled from Vercel) that a local shell may lack:
+# Runs the cost-bearing authoring scripts on GitHub's runners, which hold the API
+# credentials (GitHub Actions repo secrets) that a local shell may lack:
 #   - db:thumbnails:generate  → OpenAI gpt-image-1 background → Cloudinary → writes
 #     thumbnailUrl into data/seed/courses-catalog.json
 #   - voice:generate          → ElevenLabs TTS → Cloudinary → writes the audio URL
@@ -14,10 +14,13 @@ name: Generate course media & seed
 #
 # The optional `seed` job imports the catalogue into Postgres (db:seed-courses). It is
 # OFF by default and only runs when seed_after=true AND mode=generate, against the
-# DATABASE_URL pulled from Vercel production.
+# DATABASE_URL repo secret.
 #
-# Secrets are sourced from Vercel (project carsi-web) via `vercel env pull`, so the only
-# GitHub secret required is VERCEL_TOKEN. The non-secret org/project IDs are inlined below.
+# CARSI is hosted on DigitalOcean — CI credentials are GitHub Actions repo secrets
+# (Settings → Secrets and variables → Actions), NOT pulled from Vercel. Required secrets:
+# CLOUDINARY_CLOUD_NAME (= dmaulkthb), CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET,
+# OPENAI_API_KEY (thumbnails), ELEVENLABS_API_KEY + ELEVENLABS_VOICE_ID (voice),
+# DATABASE_URL (only when seed_after=true).
 
 on:
   workflow_dispatch:
@@ -50,9 +53,16 @@ permissions:
   pull-requests: write
 
 env:
-  # Non-secret — from .vercel/repo.json (project carsi-web, team unite-group).
-  VERCEL_ORG_ID: team_KMZACI5rIltoCRhAtGCXlxUf
-  VERCEL_PROJECT_ID: prj_hIQAdXiHQGGec6nNKEGzn7SyMh9p
+  # Credentials for the authoring scripts (read via process.env; dotenv/config is a no-op
+  # when no .env is present). CARSI runs on DigitalOcean — these are GitHub Actions repo
+  # secrets, not a Vercel pull. CLOUDINARY_CLOUD_NAME must be 'dmaulkthb'.
+  CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
+  CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
+  CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+  ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+  ELEVENLABS_VOICE_ID: ${{ secrets.ELEVENLABS_VOICE_ID }}
+  DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
 jobs:
   generate:
@@ -69,30 +79,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Pull secrets from Vercel (production)
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      - name: Validate credentials
         run: |
-          if [ -z "$VERCEL_TOKEN" ]; then
-            echo "::error::VERCEL_TOKEN repo secret is not set. Add it at Settings → Secrets and variables → Actions."
-            exit 1
-          fi
-          # Pull the production env into .env (gitignored); the scripts auto-load it via dotenv.
-          npx --yes vercel@latest env pull .env --yes --environment=production --token="$VERCEL_TOKEN"
-          echo "Pulled $(grep -c '=' .env) environment variables."
-
-      - name: Normalise + validate credentials
-        run: |
-          set -e
-          # Fix the known Vercel key typo: scripts read ELEVENLABS_VOICE_ID, Vercel stores
-          # the value under ELEVENLABS_VIOCE_ID. Alias it without exposing the value.
-          if ! grep -q '^ELEVENLABS_VOICE_ID=' .env && grep -q '^ELEVENLABS_VIOCE_ID=' .env; then
-            sed -n 's/^ELEVENLABS_VIOCE_ID=/ELEVENLABS_VOICE_ID=/p' .env >> .env
-            echo "Aliased ELEVENLABS_VIOCE_ID → ELEVENLABS_VOICE_ID."
-          fi
-
           MISSING=""
-          need() { grep -q "^$1=" .env || MISSING="$MISSING $1"; }
+          need() { [ -n "${!1}" ] || MISSING="$MISSING $1"; }
 
           # Cloudinary is required for any upload (thumbnails AND voice).
           need CLOUDINARY_CLOUD_NAME
@@ -107,9 +97,9 @@ jobs:
           if [ "${{ inputs.seed_after }}" = "true" ]; then need DATABASE_URL; fi
 
           if [ -n "$MISSING" ]; then
-            echo "::error::Missing required env in Vercel production:$MISSING"
-            echo "::error::Add them in Vercel → carsi-web → Settings → Environment Variables."
-            echo "::error::Note: CLOUDINARY_CLOUD_NAME is the cloud your API key/secret belong to — the catalogue's active cloud is 'dsppmoo9z' (legacy: 'dmaulkthb'). Set it to match your key."
+            echo "::error::Missing required GitHub Actions repo secrets:$MISSING"
+            echo "::error::Add them at Settings → Secrets and variables → Actions (CARSI runs on DigitalOcean)."
+            echo "::error::CLOUDINARY_CLOUD_NAME must be 'dmaulkthb' — the cloud the catalogue's thumbnails use."
             exit 1
           fi
           echo "All required credentials present for media='${{ inputs.media }}', mode='${{ inputs.mode }}'."
@@ -192,10 +182,6 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
-      - name: Pull secrets from Vercel (production)
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-        run: npx --yes vercel@latest env pull .env --yes --environment=production --token="$VERCEL_TOKEN"
       - name: Seed courses into Postgres
         run: |
           echo "Seeding production catalogue into Postgres (db:seed-courses)…"

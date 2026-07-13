@@ -98,6 +98,7 @@ The webhook route already exists and is signature-verified + idempotent. You onl
    - `customer.subscription.deleted`
    - `invoice.paid`
    - `invoice.payment_failed`
+   - `charge.dispute.closed` — **required for the dispute-won re-grant**: when a chargeback is resolved in your favour (`status = won`), the route restores the one-off enrolment that `charge.dispute.created` revoked. The handler is inert until this event is enabled on the endpoint.
 4. Copy the endpoint's **Signing secret** (`whsec_...`) and confirm it matches `STRIPE_WEBHOOK_SECRET` in DigitalOcean for that mode. Test mode and Live mode have **different** signing secrets — use the right one per environment.
 
 ---

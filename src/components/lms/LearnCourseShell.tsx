@@ -25,6 +25,7 @@ import {
   type ProgressShareType,
 } from '@/lib/lms/progress-share-post';
 import { isOnboardingCourse, parseOnboardingMeta } from '@/lib/onboarding/enterprise';
+import type { LessonResource } from '@/lib/lms/lesson-resources';
 import { extractQuizIdFromLesson } from '@/lib/lms/quiz-from-lesson';
 
 interface CurriculumLesson {
@@ -71,7 +72,7 @@ interface LessonApiLesson {
 
 interface LessonDetailResponse {
   lesson: LessonApiLesson;
-  resources: { label?: string; url?: string }[];
+  resources: LessonResource[];
   enrollment_id: string;
   course: { id: string; slug: string; title: string };
 }
@@ -479,6 +480,18 @@ export function LearnCourseShell({ slug }: { slug: string }) {
     }
   }
 
+  // Completing a quiz lesson. A passed quiz records the lesson as complete
+  // (patchLessonProgress) AND advances to the next lesson via toggleComplete —
+  // this is the ONLY path that records progress for a quiz lesson, so without it
+  // a passed quiz never advances. A failed quiz re-opens for another attempt.
+  function handleQuizContinue() {
+    if (quizResult?.passed) {
+      void toggleComplete(true);
+    } else {
+      setQuizResult(null);
+    }
+  }
+
   function openCourseSharePrompt() {
     if (!curriculum) return;
     setShareDraft(
@@ -863,7 +876,7 @@ export function LearnCourseShell({ slug }: { slug: string }) {
                 ) : null}
                 {quizData ? (
                   <>
-                    {!(isOnboardingProgram && quizResult) ? (
+                    {!quizResult ? (
                       <QuizPlayer
                         quiz={quizData}
                         variant={isOnboardingProgram ? 'enterprise' : 'default'}
@@ -877,30 +890,54 @@ export function LearnCourseShell({ slug }: { slug: string }) {
                             passed={quizResult.passed}
                             scorePercent={quizResult.score_percent}
                             passPercentage={quizData.pass_percentage}
-                            onContinue={() => {
-                              // Must pass to advance; a failed check re-opens the
-                              // quiz for another attempt instead of moving on.
-                              if (quizResult.passed) {
-                                if (nextLesson) selectLesson(nextLesson.id);
-                              } else {
-                                setQuizResult(null);
-                              }
-                            }}
+                            onContinue={handleQuizContinue}
                           />
+                          {completeError ? (
+                            <p role="alert" className="mt-2 text-sm text-red-600">
+                              {completeError}
+                            </p>
+                          ) : null}
                         </div>
                       ) : (
-                        <p
-                          role="status"
-                          aria-live="polite"
-                          className={`mt-6 rounded-lg border px-4 py-3 text-sm ${
-                            quizResult.passed
-                              ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-800'
-                              : 'border-amber-500/40 bg-amber-500/10 text-amber-800'
-                          }`}
-                        >
-                          Score: {quizResult.score_percent}% —{' '}
-                          {quizResult.passed ? 'Passed' : 'Not passed yet'}
-                        </p>
+                        <div className="mt-6 space-y-3">
+                          <p
+                            role="status"
+                            aria-live="polite"
+                            className={`rounded-lg border px-4 py-3 text-sm ${
+                              quizResult.passed
+                                ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-800'
+                                : 'border-amber-500/40 bg-amber-500/10 text-amber-800'
+                            }`}
+                          >
+                            Score: {quizResult.score_percent}% —{' '}
+                            {quizResult.passed
+                              ? 'Passed. Your progress has been recorded.'
+                              : `Not passed yet — you need ${quizData.pass_percentage}% to continue.`}
+                          </p>
+                          <Button
+                            type="button"
+                            disabled={savingComplete}
+                            onClick={handleQuizContinue}
+                            className={
+                              quizResult.passed
+                                ? 'rounded-md bg-emerald-600 text-white hover:bg-emerald-500 disabled:opacity-50'
+                                : 'rounded-md bg-[#146fc2] text-white hover:bg-[#0f5fa8] disabled:opacity-50'
+                            }
+                          >
+                            {savingComplete
+                              ? 'Saving…'
+                              : quizResult.passed
+                                ? nextLesson
+                                  ? 'Mark complete & continue'
+                                  : 'Mark lesson complete'
+                                : 'Try again'}
+                          </Button>
+                          {completeError ? (
+                            <p role="alert" className="text-sm text-red-600">
+                              {completeError}
+                            </p>
+                          ) : null}
+                        </div>
                       )
                     ) : null}
                   </>

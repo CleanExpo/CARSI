@@ -913,6 +913,13 @@ export async function adminDeleteCourse(id: string): Promise<void> {
   if (!existing) {
     throw new Error('NOT_FOUND');
   }
+  // WS6: refuse to hard-delete a course carrying filed IICRC CEC compliance
+  // records (now FK-RESTRICT-protected). Archive (unpublish) instead — a delete
+  // would either erase the regulatory trail or fail with an opaque FK error.
+  const cecCount = await prisma.lmsIicrcCecSubmission.count({ where: { courseId: id } });
+  if (cecCount > 0) {
+    throw new Error('COURSE_HAS_CEC_RECORDS');
+  }
   await prisma.lmsCourse.delete({ where: { id } });
 }
 
@@ -955,8 +962,22 @@ export async function adminBulkDeleteCourses(ids: string[]): Promise<number> {
     throw new Error('TOO_MANY_IDS');
   }
 
+  // WS6: exclude courses carrying filed IICRC CEC compliance records (now
+  // FK-RESTRICT-protected) — including one in a deleteMany would P2003 and fail
+  // the whole batch. The returned count reflects only the courses actually deleted.
+  const withCec = await prisma.lmsIicrcCecSubmission.findMany({
+    where: { courseId: { in: unique } },
+    select: { courseId: true },
+    distinct: ['courseId'],
+  });
+  const blocked = new Set(withCec.map((r) => r.courseId));
+  const deletable = unique.filter((id) => !blocked.has(id));
+  if (deletable.length === 0) {
+    return 0;
+  }
+
   const result = await prisma.lmsCourse.deleteMany({
-    where: { id: { in: unique } },
+    where: { id: { in: deletable } },
   });
   return result.count;
 }

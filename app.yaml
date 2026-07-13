@@ -12,7 +12,7 @@ services:
       branch: main
       deploy_on_push: true
 
-    dockerfile_path: Dockerfile
+    dockerfile_path: deploy/Dockerfile
     http_port: 8080
     source_dir: /
     instance_count: 2
@@ -37,6 +37,13 @@ services:
       - key: DATABASE_URL
         scope: RUN_AND_BUILD_TIME
 
+      # WS6 (RA-1807 guard): a DIRECT, session-mode connection (DO managed-Postgres
+      # port 25060, never a pgBouncer pooler) used by `prisma migrate deploy` so DDL
+      # can't silently no-op through a transaction pooler. Falls back to DATABASE_URL
+      # when unset. Set as an encrypted env var in DO.
+      - key: DIRECT_URL
+        scope: RUN_AND_BUILD_TIME
+
       - key: DATABASE_CA_CERT
         scope: RUN_AND_BUILD_TIME
 
@@ -58,13 +65,36 @@ services:
       - key: NEXT_PUBLIC_ADMIN_EMAIL
         scope: RUN_AND_BUILD_TIME
 
-      - key: OPENAI_API_KEY
+      # AI provider of record: OpenRouter (WS2 / P0-B). Margot, the review-reply
+      # drafter, and the AI course builder all resolve their key/model through
+      # src/lib/openrouter/provider.ts. The boot validator (instrumentation.ts)
+      # refuses to start in production when OPENROUTER_API_KEY is missing, so a
+      # mis-provisioned deploy fails the /api/health gate fast (the original
+      # "Margot" outage class). Value is set as an encrypted env var in DO.
+      - key: OPENROUTER_API_KEY
+        scope: RUN_TIME
+      # Optional model override (defaults to z-ai/glm-5.2). e.g. set
+      # anthropic/claude-sonnet-5 to route via a Claude model on OpenRouter.
+      - key: OPENROUTER_MODEL
         scope: RUN_TIME
 
       - key: NEXT_PUBLIC_FRONTEND_URL
         scope: RUN_AND_BUILD_TIME
       - key: NEXT_PUBLIC_APP_URL
         scope: RUN_AND_BUILD_TIME
+
+      # Cloudflare Turnstile bot protection + FastAPI hub-intake auth (RA-4190).
+      # Values are set in DigitalOcean App Platform as encrypted env vars; do not
+      # commit secrets here. NEXT_PUBLIC_TURNSTILE_SITE_KEY is BUILD-scoped so
+      # Next.js inlines the public site key into the client bundle — the widget
+      # renders nothing without it. HUB_INTAKE_SECRET must match the value on the
+      # FastAPI /api/hub/submissions/intake receiver.
+      - key: TURNSTILE_SECRET_KEY
+        scope: RUN_TIME
+      - key: NEXT_PUBLIC_TURNSTILE_SITE_KEY
+        scope: RUN_AND_BUILD_TIME
+      - key: HUB_INTAKE_SECRET
+        scope: RUN_TIME
 
       # CCW Roadshow Google Calendar sync. Values are set in DigitalOcean
       # App Platform as encrypted runtime env vars; do not commit secrets here.
@@ -76,25 +106,4 @@ services:
       - key: GOOGLE_CALENDAR_CLIENT_SECRET
         scope: RUN_TIME
       - key: GOOGLE_CALENDAR_OAUTH_REFRESH_TOKEN
-        scope: RUN_TIME
-
-# PRE_DEPLOY job: apply pending Prisma migrations to the live database before a new deployment goes
-# live. Uses the app's own DATABASE_URL + DATABASE_CA_CERT (the direct connection), so it always
-# targets the correct production database. A migration failure blocks the deploy (desired).
-# NOTE: DATABASE_URL + DATABASE_CA_CERT must be available to this job — if they are set at the
-# component (service) level rather than app level in the DO dashboard, add them to this job too.
-jobs:
-  - name: migrate
-    kind: PRE_DEPLOY
-    dockerfile_path: Dockerfile.migrate
-    source_dir: /
-    github:
-      repo: CleanExpo/CARSI
-      branch: main
-      deploy_on_push: true
-    instance_size_slug: apps-s-1vcpu-1gb
-    envs:
-      - key: DATABASE_URL
-        scope: RUN_TIME
-      - key: DATABASE_CA_CERT
         scope: RUN_TIME

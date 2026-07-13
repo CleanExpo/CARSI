@@ -132,6 +132,11 @@ export async function adminRevokeEnrollment(enrollmentId: string) {
     select: { id: true },
   });
 
+  // WS6: soft-revoke instead of hard-delete. A hard delete would erase any filed
+  // IICRC CEC compliance record (now FK-RESTRICT-protected — the delete would
+  // P2003) along with the enrolment's own history. Setting status='revoked'
+  // removes access via the WS3 read gates while preserving the audit trail and
+  // the regulatory record.
   await prisma.$transaction([
     prisma.lmsLessonProgress.deleteMany({
       where: {
@@ -139,7 +144,10 @@ export async function adminRevokeEnrollment(enrollmentId: string) {
         lessonId: { in: lessonIds.map((l) => l.id) },
       },
     }),
-    prisma.lmsEnrollment.delete({ where: { id: en.id } }),
+    prisma.lmsEnrollment.update({
+      where: { id: en.id },
+      data: { status: 'revoked', certificateIssuedAt: null, completedAt: null },
+    }),
   ]);
 }
 

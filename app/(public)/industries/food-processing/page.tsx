@@ -53,12 +53,12 @@ const faqs = [
   {
     question: 'How does IICRC CEC training support HACCP compliance in food facilities?',
     answer:
-      "HACCP plans require demonstrated competency in contamination prevention. CARSI's AMRT-aligned CEC training provides verifiable evidence that maintenance teams can identify and remediate microbial hazards including mould, bacteria, and biofilms in cold storage rooms, processing lines, and drainage systems — all critical control points in a HACCP plan.",
+      "HACCP plans require demonstrated competency in contamination prevention. CARSI's CEC-accredited mould remediation training provides verifiable evidence that maintenance teams can identify and remediate microbial hazards including mould, bacteria, and biofilms in cold storage rooms, processing lines, and drainage systems — all critical control points in a HACCP plan.",
   },
   {
     question: 'What is mould remediation training for cold storage facilities?',
     answer:
-      'AMRT-aligned CEC training covers identification and remediation of mould and microbial growth in temperature-controlled environments. For Australian food facilities, this is critical in cold rooms, blast chillers, loading docks, and drainage channels where condensation creates ideal conditions for microbial contamination that can affect product safety.',
+      'CEC-accredited mould remediation training covers identification and remediation of mould and microbial growth in temperature-controlled environments. For Australian food facilities, this is critical in cold rooms, blast chillers, loading docks, and drainage channels where condensation creates ideal conditions for microbial contamination that can affect product safety.',
   },
   {
     question: 'Can food processing staff complete IICRC CEC training while maintaining shift patterns?',

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-06-27T04:47:09.227Z",
+  "generatedAt": "2026-07-11T16:23:36.720Z",
   "briefs": [
     {
       "slug": "air-quality-and-odour-identification-and-deodorisation-essentials",
@@ -364,7 +364,7 @@
     },
     {
       "slug": "wrt-water-damage-essentials",
-      "title": "Water Damage Restoration — Essentials (WRT-aligned)",
+      "title": "Water Damage Restoration — Essentials",
       "discipline": "WRT",
       "concept": "Core water-damage restoration fundamentals: categories of water, classes of loss, safety and the drying workflow.",
       "motifs": [
@@ -416,6 +416,258 @@
       "composition": "keep the upper-left third calm, darker and uncluttered so a white course title can be overlaid; place the floor and equipment toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that does not bury the subject",
       "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage, no UI, no readable displays, no human faces",
       "authorNote": "Internal staff onboarding for professional floor care in sensitive facilities (schools/childcare/public buildings). Motifs evoke a safe, clean, ready-to-open facility without literal branding or faces. Not an IICRC discipline, so no discipline accent colour."
+    },
+    {
+      "slug": "avian-influenza-awareness-restoration-iaq-facilities",
+      "title": "Australian H5 Bird Flu Awareness for Restoration, IAQ and Facility Professionals",
+      "discipline": null,
+      "concept": "A calm Australian biosecurity-awareness scene: professional decontamination and PPE readiness at a facility entrance, conveying safe, considered field practice around avian-influenza risk.",
+      "motifs": [
+        "clean disposable coveralls and a P2/respirator laid out ready on a bench",
+        "a biosecurity decontamination step-off station with footbath and sanitiser",
+        "a rural Australian facility or shed exterior softened in the background",
+        "a tidy field clipboard and gloves conveying calm documentation"
+      ],
+      "palette": "clinical teal-green and clean whites with a warm caution-amber accent",
+      "mood": "calm, professional, biosecurity-aware; careful Australian field practice",
+      "style": "photoreal",
+      "composition": "keep the upper-left third calm, darker and uncluttered so a white course title can be overlaid; place the main subject toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that does not bury the subject",
+      "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage, no UI, no readable displays, no human faces, no live birds, no distressed animals, no gore",
+      "authorNote": "Australian-produced CARSI course; photoreal scene, no faces or branding. Not styled as IICRC CEC accredited (registry-gated)."
+    },
+    {
+      "slug": "ccw-carsi-truckmount-operations",
+      "title": "Truckmount Operations Course — HydraMaster & Sapphire Scientific (Australian configuration)",
+      "discipline": null,
+      "concept": "A professional truck-mounted extraction unit set up in an Australian service van, hoses run out and ready for a job — capable, mechanical, well-maintained.",
+      "motifs": [
+        "a truck-mount extraction machine mounted in a clean service-van interior",
+        "coiled vacuum and solution hoses run out through the open van door",
+        "a cleaning wand resting on freshly extracted carpet",
+        "an Australian suburban streetscape softly blurred beyond the van"
+      ],
+      "palette": "deep industrial charcoal and brushed steel with a warm equipment-orange accent",
+      "mood": "capable, mechanical, professional; specialised operator competence",
+      "style": "photoreal",
+      "composition": "keep the upper-left third calm, darker and uncluttered so a white course title can be overlaid; place the main subject toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that does not bury the subject",
+      "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage, no UI, no readable displays, no human faces",
+      "authorNote": "Australian-produced CARSI course; photoreal scene, no faces or branding. Not styled as IICRC CEC accredited (registry-gated)."
+    },
+    {
+      "slug": "water-damage-restoration-fundamentals",
+      "title": "CARSI Water Restoration Practitioner",
+      "discipline": null,
+      "concept": "A methodical water-damage assessment inside an Australian home: moisture being measured on a wet wall while drying equipment runs — competent and systematic.",
+      "motifs": [
+        "a moisture meter reading a damp skirting board and wall",
+        "air movers and a dehumidifier working on a wet timber floor",
+        "soft reflections of water on a hard floor near a skirting",
+        "a clean assessment clipboard and torch on a bench"
+      ],
+      "palette": "cool corporate blues and clean water tones with neutral greys",
+      "mood": "competent, methodical, trustworthy; professional restoration practice",
+      "style": "photoreal",
+      "composition": "keep the upper-left third calm, darker and uncluttered so a white course title can be overlaid; place the main subject toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that does not bury the subject",
+      "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage, no UI, no readable displays, no human faces",
+      "authorNote": "Australian-produced CARSI course; photoreal scene, no faces or branding. Not styled as IICRC CEC accredited (registry-gated)."
+    },
+    {
+      "slug": "mould-remediation-fundamentals",
+      "title": "CARSI Mould Remediation Practitioner",
+      "discipline": null,
+      "concept": "A controlled mould remediation in an Australian building: containment and negative-air in place while an affected wall is assessed — careful and health-focused.",
+      "motifs": [
+        "a containment zone of plastic sheeting with a taped zipper door",
+        "a HEPA air scrubber running with flexible ducting",
+        "a section of mould-affected wall being inspected up close",
+        "a respirator and nitrile gloves laid out ready"
+      ],
+      "palette": "clean clinical greens and soft neutral greys with cool daylight",
+      "mood": "careful, controlled, health-focused; professional remediation",
+      "style": "photoreal",
+      "composition": "keep the upper-left third calm, darker and uncluttered so a white course title can be overlaid; place the main subject toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that does not bury the subject",
+      "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage, no UI, no readable displays, no human faces",
+      "authorNote": "Australian-produced CARSI course; photoreal scene, no faces or branding. Not styled as IICRC CEC accredited (registry-gated)."
+    },
+    {
+      "slug": "structural-drying-fundamentals",
+      "title": "CARSI Structural Drying Practitioner",
+      "discipline": null,
+      "concept": "An applied structural-drying setup on a wet Australian floor: an LGR dehumidifier and a fan array driving a drying system, with a psychrometric, technical feel.",
+      "motifs": [
+        "a low-grain refrigerant dehumidifier with ducting at work",
+        "a row of air movers along a drying wall",
+        "a thermo-hygrometer being read against the drying space",
+        "faint condensation and a sense of moving air in soft light"
+      ],
+      "palette": "calm indigo and structural blue-violet tones with clean neutrals",
+      "mood": "technical, precise, systematic; the science of drying",
+      "style": "photoreal",
+      "composition": "keep the upper-left third calm, darker and uncluttered so a white course title can be overlaid; place the main subject toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that does not bury the subject",
+      "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage, no UI, no readable displays, no human faces",
+      "authorNote": "Australian-produced CARSI course; photoreal scene, no faces or branding. Not styled as IICRC CEC accredited (registry-gated)."
+    },
+    {
+      "slug": "category-3-sewage-black-water-remediation",
+      "title": "CARSI Contaminated-Water Practitioner",
+      "discipline": null,
+      "concept": "A hazard-led Category 3 contaminated-water cleanup in an Australian setting: full PPE, containment and safe waste handling — serious and disciplined.",
+      "motifs": [
+        "full PPE with respirator and gloves donned and ready",
+        "labelled biohazard waste bags and a lined bin",
+        "a wet-vac extracting dark contaminated water from a hard floor",
+        "a decontamination step-off station at a containment threshold"
+      ],
+      "palette": "cautionary amber and restrained warning-red against deep charcoal",
+      "mood": "serious, hazard-aware, disciplined; contaminated-water safety",
+      "style": "photoreal",
+      "composition": "keep the upper-left third calm, darker and uncluttered so a white course title can be overlaid; place the main subject toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that does not bury the subject",
+      "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage, no UI, no readable displays, no human faces, no gore, no graphic filth, no distressing imagery",
+      "authorNote": "Australian-produced CARSI course; photoreal scene, no faces or branding. Not styled as IICRC CEC accredited (registry-gated)."
+    },
+    {
+      "slug": "asbestos-awareness-for-restoration-technicians",
+      "title": "CARSI Asbestos Awareness for Restoration",
+      "discipline": null,
+      "concept": "An asbestos-awareness scene in an older Australian building: recognising likely asbestos-containing materials and stopping to assess — cautious, WHS-led, no disturbance.",
+      "motifs": [
+        "a detail of old fibre-cement sheeting and aged building fabric",
+        "a caution barrier and hazard tape across a work area",
+        "a respirator and disposable coveralls set aside, unused",
+        "a hazard-assessment clipboard resting on a step ladder"
+      ],
+      "palette": "caution amber-yellow and hazard black with neutral concrete greys",
+      "mood": "cautious, WHS-led, awareness; recognise and do not disturb",
+      "style": "photoreal",
+      "composition": "keep the upper-left third calm, darker and uncluttered so a white course title can be overlaid; place the main subject toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that does not bury the subject",
+      "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage, no UI, no readable displays, no human faces",
+      "authorNote": "Australian-produced CARSI course; photoreal scene, no faces or branding. Not styled as IICRC CEC accredited (registry-gated)."
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "title": "CARSI Psychrometry & Building Science for Drying",
+      "discipline": null,
+      "concept": "A building-science study of drying: instruments and airflow measured against a room, an analytical, scientific treatment of temperature, humidity and moisture.",
+      "motifs": [
+        "a thermo-hygrometer beside a psychrometric chart on a bench",
+        "moisture mapping marked lightly across a wall",
+        "warm and cool air movement suggested through soft directional light",
+        "a data notebook with neat readings and a pen"
+      ],
+      "palette": "cool teal-blue and clean graph-paper neutrals with a warm amber accent",
+      "mood": "analytical, scientific, precise; the building science behind drying",
+      "style": "photoreal",
+      "composition": "keep the upper-left third calm, darker and uncluttered so a white course title can be overlaid; place the main subject toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that does not bury the subject",
+      "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage, no UI, no readable displays, no human faces",
+      "authorNote": "Australian-produced CARSI course; photoreal scene, no faces or branding. Not styled as IICRC CEC accredited (registry-gated)."
+    },
+    {
+      "slug": "fire-smoke-damage-restoration-fundamentals",
+      "title": "CARSI Fire & Smoke Restoration Practitioner",
+      "discipline": null,
+      "concept": "A fire and smoke restoration in progress in an Australian interior: soot-affected surfaces being cleaned back toward restored, conveying transformation and control.",
+      "motifs": [
+        "a soot-stained wall and ceiling detail mid-clean",
+        "chemical sponges and cleaning cloths lifting soot from a surface",
+        "an air scrubber working against a faint smoky haze",
+        "a clear contrast between a cleaned section and a soot-darkened one"
+      ],
+      "palette": "warm ember orange against deep charcoal and soot-grey",
+      "mood": "restorative, controlled, transformation; bringing a space back",
+      "style": "photoreal",
+      "composition": "keep the upper-left third calm, darker and uncluttered so a white course title can be overlaid; place the main subject toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that does not bury the subject",
+      "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage, no UI, no readable displays, no human faces",
+      "authorNote": "Australian-produced CARSI course; photoreal scene, no faces or branding. Not styled as IICRC CEC accredited (registry-gated)."
+    },
+    {
+      "slug": "trauma-crime-scene-decontamination-fundamentals",
+      "title": "CARSI Trauma & Biohazard Decontamination Practitioner",
+      "discipline": null,
+      "concept": "A respectful, professional biohazard decontamination: a neutral Australian room being made safe under full PPE and protocol — discreet, dignified, never graphic.",
+      "motifs": [
+        "full PPE and a respirator neatly donned and ready",
+        "sealed biohazard waste containers with correct labelling",
+        "a decontamination station with wipes and disinfectant",
+        "a calm, plain, orderly room being restored to safe condition"
+      ],
+      "palette": "sombre deep teal and clinical white with a restrained biohazard-red accent",
+      "mood": "respectful, professional, discreet; dignified biohazard practice",
+      "style": "photoreal",
+      "composition": "keep the upper-left third calm, darker and uncluttered so a white course title can be overlaid; place the main subject toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that does not bury the subject",
+      "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage, no UI, no readable displays, no human faces, no blood, no bodies, no injuries, no crime-scene imagery, no distressing or graphic content, no people",
+      "authorNote": "Australian-produced CARSI course; photoreal scene, no faces or branding. Not styled as IICRC CEC accredited (registry-gated)."
+    },
+    {
+      "slug": "carpet-cleaning-technician-fundamentals",
+      "title": "CARSI Carpet Cleaning Practitioner",
+      "discipline": null,
+      "concept": "Professional carpet cleaning in an Australian home: an extraction wand drawing clean lines across carpet, with a focus on fibre, chemistry and thorough result.",
+      "motifs": [
+        "a carpet extraction wand leaving fresh, even clean stripes",
+        "a close detail of carpet fibre and pile texture",
+        "pre-spray and a grooming brush agitating the pile",
+        "a tidy trolley of labelled cleaning solutions (no readable text)"
+      ],
+      "palette": "fresh teal and clean aqua tones with warm neutral daylight",
+      "mood": "fresh, thorough, satisfying; professional carpet-care craft",
+      "style": "photoreal",
+      "composition": "keep the upper-left third calm, darker and uncluttered so a white course title can be overlaid; place the main subject toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that does not bury the subject",
+      "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage, no UI, no readable displays, no human faces",
+      "authorNote": "Australian-produced CARSI course; photoreal scene, no faces or branding. Not styled as IICRC CEC accredited (registry-gated)."
+    },
+    {
+      "slug": "timber-floor-assessment-restoration",
+      "title": "CARSI Timber Floor Restoration Practitioner",
+      "discipline": null,
+      "concept": "A timber-floor assessment in an Australian home: measuring moisture and reading movement in the boards, with warm daylight on the grain — craftsmanship and care.",
+      "motifs": [
+        "a moisture meter placed on timber floorboards",
+        "subtle cupping and movement caught along the board grain",
+        "assessment and sanding tools laid out neatly",
+        "warm daylight raking across a timber floor"
+      ],
+      "palette": "warm walnut and amber timber tones with a cool measurement-blue accent",
+      "mood": "craftsmanship, assessment, care; understanding timber and moisture",
+      "style": "photoreal",
+      "composition": "keep the upper-left third calm, darker and uncluttered so a white course title can be overlaid; place the main subject toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that does not bury the subject",
+      "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage, no UI, no readable displays, no human faces",
+      "authorNote": "Australian-produced CARSI course; photoreal scene, no faces or branding. Not styled as IICRC CEC accredited (registry-gated)."
+    },
+    {
+      "slug": "assessing-indoor-environment-conditions",
+      "title": "CARSI Indoor Environment Assessment Practitioner",
+      "discipline": null,
+      "concept": "An indoor-environment assessment of an Australian interior treated as a system: instruments measuring air and moisture, methodical inspection and mapping.",
+      "motifs": [
+        "a handheld IAQ / particle meter taking a reading in a room",
+        "a thermo-hygrometer held against a wall",
+        "daylight and a sense of airflow moving through the space",
+        "an inspection notebook and a simple floor plan on a bench"
+      ],
+      "palette": "clean fresh blues and airy neutrals with a soft green wellbeing accent",
+      "mood": "methodical, health-focused, systematic; the building as a system",
+      "style": "photoreal",
+      "composition": "keep the upper-left third calm, darker and uncluttered so a white course title can be overlaid; place the main subject toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that does not bury the subject",
+      "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage, no UI, no readable displays, no human faces",
+      "authorNote": "Australian-produced CARSI course; photoreal scene, no faces or branding. Not styled as IICRC CEC accredited (registry-gated)."
+    },
+    {
+      "slug": "whs-fundamentals-for-restoration-and-cleaning-professionals",
+      "title": "Work Health and Safety (WHS) Fundamentals for Restoration and Cleaning Professionals",
+      "discipline": null,
+      "concept": "Work-health-and-safety foundations for an Australian restoration and cleaning site: PPE, safe electrical practice and clear hazard control — safety-first and orderly.",
+      "motifs": [
+        "PPE laid out ready — gloves, respirator and hi-vis",
+        "a safety switch / RCD and careful wet-site electrical setup",
+        "hazard signage and a barrier defining a safe work area",
+        "a safe-work-method clipboard on a tidy site bench"
+      ],
+      "palette": "safety hi-vis yellow and orange against neutral greys and deep navy",
+      "mood": "safety-first, duty of care, orderly; Australian WHS foundations",
+      "style": "photoreal",
+      "composition": "keep the upper-left third calm, darker and uncluttered so a white course title can be overlaid; place the main subject toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that does not bury the subject",
+      "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage, no UI, no readable displays, no human faces",
+      "authorNote": "Australian-produced CARSI course; photoreal scene, no faces or branding. Not styled as IICRC CEC accredited (registry-gated)."
     }
   ]
 }

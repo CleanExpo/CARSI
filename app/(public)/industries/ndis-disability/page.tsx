@@ -53,7 +53,7 @@ const faqs = [
   {
     question: 'How does mould affect NDIS participants and their accommodation?',
     answer:
-      'Many NDIS participants have compromised immune systems, respiratory conditions, or sensitivities that make mould exposure significantly more dangerous than for the general population. Under NDIS Practice Standards, providers must ensure accommodation is safe and hygienic. Unaddressed mould in SIL or SDA properties can result in NDIS Quality and Safeguards Commission investigations, worker banning orders, and loss of registration. AMRT-aligned CEC training ensures maintenance staff can identify and remediate mould before it becomes a compliance issue.',
+      'Many NDIS participants have compromised immune systems, respiratory conditions, or sensitivities that make mould exposure significantly more dangerous than for the general population. Under NDIS Practice Standards, providers must ensure accommodation is safe and hygienic. Unaddressed mould in SIL or SDA properties can result in NDIS Quality and Safeguards Commission investigations, worker banning orders, and loss of registration. CEC-accredited mould remediation training ensures maintenance staff can identify and remediate mould before it becomes a compliance issue.',
   },
   {
     question: 'Does IICRC certification help NDIS providers during audits?',
@@ -72,7 +72,7 @@ const whyCards = [
     icon: ClipboardCheck,
     title: 'NDIS Practice Standards',
     description:
-      "Module 3 (Supports Provision Environment) requires safe, hygienic accommodation. CARSI's AMRT-aligned CEC training provides verifiable evidence of mould and remediation competency for audits.",
+      "Module 3 (Supports Provision Environment) requires safe, hygienic accommodation. CARSI's CEC-accredited mould remediation training provides verifiable evidence of mould and remediation competency for audits.",
     color: '#5c6bc0',
   },
   {

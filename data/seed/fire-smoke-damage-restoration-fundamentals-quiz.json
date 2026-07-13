@@ -1,0 +1,125 @@
+{
+  "version": 1,
+  "courseSlug": "fire-smoke-damage-restoration-fundamentals",
+  "quizzes": [
+    {
+      "quizId": "ce2e5ad2-3bec-4437-9572-8e1b22c4d1bd",
+      "lessonTitle": "Australian-specific hazards &mdash; bushfire ash and asbestos-in-debris",
+      "title": "Fire & Smoke Damage Restoration Fundamentals — Knowledge Check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Which smoke residue type results from a fast, high-heat fire of natural materials and is generally the easiest to remove?",
+          "options": [
+            "Wet smoke residue",
+            "Protein smoke residue",
+            "Dry smoke residue",
+            "Fuel-oil smoke residue"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "A room shows a near-invisible, yellowed film with an extremely strong odour out of proportion to visible residue, following a cooking incident. This is most likely:",
+          "options": [
+            "Dry smoke residue",
+            "Protein smoke residue",
+            "Fuel-oil smoke residue",
+            "Wet smoke residue"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "Why is identifying the smoke residue type the most important assessment decision before cleaning begins?",
+          "options": [
+            "It determines the insurance excess payable",
+            "It has no real effect on the job &mdash; all residue is cleaned the same way",
+            "It determines the cleaning chemistry and method used, and the wrong choice can smear or drive residue deeper into the surface",
+            "It only matters for contents, never for structural surfaces"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "Why does smoke commonly contaminate rooms with no visible fire damage?",
+          "options": [
+            "It does not &mdash; only the room of origin is ever affected",
+            "Heat, buoyancy, the stack effect, pressure differentials and the building&rsquo;s own HVAC system carry smoke well beyond the point of origin",
+            "Smoke only spreads if every internal door is left open",
+            "Smoke migration only occurs in single-storey buildings"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "A fire-affected building&rsquo;s HVAC system was running during the fire. What is the correct action before the system is used again?",
+          "options": [
+            "Run it as normal &mdash; HVAC systems are not affected by smoke",
+            "Increase the fan speed to clear the smoke faster",
+            "Have it professionally cleaned and filters replaced before restarting, to avoid re-contaminating already-cleaned rooms",
+            "Disconnect it permanently regardless of the extent of contamination"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "Why is corrosion control on exposed metal treated as time-critical, first-24&ndash;48-hour emergency mitigation?",
+          "options": [
+            "Acidic soot residue can actively corrode appliances, wiring and electronics within hours to days if left untreated",
+            "Metal surfaces are the only thing insurers assess",
+            "Corrosion only matters if the fire was caused by an electrical fault",
+            "It is not time-critical &mdash; it can be scheduled with the general cleaning scope"
+          ],
+          "correctIndex": 0,
+          "points": 1
+        },
+        {
+          "questionText": "In structural deodorisation, why must source removal and cleaning happen before deodorisation techniques are applied?",
+          "options": [
+            "Deodorisation is always done first to make the space pleasant to clean",
+            "Masking an odour source that has not been physically removed only hides the problem temporarily",
+            "Deodorisation equipment cannot operate in a dirty structure",
+            "There is no required sequence &mdash; either can be done first"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "Firefighting water has left a structure wet, and mould is later found during the dry-out. What is the correct approach to airflow?",
+          "options": [
+            "Run air movers directly across the mouldy surfaces to dry them faster",
+            "Use air filtration devices (AFDs) and dehumidifiers only; do not run air movers until the area is cleaned and cleared",
+            "Increase airflow and skip dehumidification since the fire has already dried most surfaces",
+            "Ignore the mould, since it is a fire job rather than a water damage job"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "Ash from a structure fire is found to include burnt CCA-treated timber (fencing or decking). What does this mean for handling the ash?",
+          "options": [
+            "It can be swept up dry like ordinary wood ash",
+            "It should be treated the same as any US wildfire ash guidance describes",
+            "It may carry arsenic, copper and chromium compounds and must be handled as contaminated waste, not dry-swept, and disposed of per state EPA requirements",
+            "It is only a concern if the timber was still burning when crews arrived"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "During debris removal on a fire job in an older Australian building, a technician suspects a broken sheet of fibro (asbestos-containing material) among the debris. What is the correct response?",
+          "options": [
+            "Bag it with the rest of the fire debris and continue the job",
+            "Wet it down and sweep it up quickly to limit dust",
+            "Stop work immediately, do not disturb the material, and hand the area over to the separate licensed asbestos removal process",
+            "Continue cleaning around it as long as PPE is worn"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        }
+      ]
+    }
+  ]
+}

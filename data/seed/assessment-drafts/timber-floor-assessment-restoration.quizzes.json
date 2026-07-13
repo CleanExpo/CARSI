@@ -1,0 +1,90 @@
+{
+  "version": 1,
+  "status": "draft",
+  "courseSlug": "timber-floor-assessment-restoration",
+  "disclaimer": "Educational assessment. CARSI is an IICRC-approved CEC provider; this is CARSI-original Australian training, not IICRC certification.",
+  "note": "Australian-produced. Grounded in the course's own modules. Founder to review before wiring live.",
+  "quizzes": [
+    {
+      "quizId": "7fbd5502-8fd6-5026-ab27-10b350fb7f63",
+      "lessonTitle": "Knowledge check",
+      "title": "CARSI Timber Floor Restoration Practitioner — Knowledge Check",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "A timber floor's dry standard is set by…",
+          "options": [
+            "A fixed 8% everywhere",
+            "The equilibrium moisture content of unaffected boards of the same species",
+            "The manufacturer's warranty",
+            "The air temperature"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M4 — Dry standard"
+        },
+        {
+          "questionText": "Cupping of boards is typically caused by…",
+          "options": [
+            "Too much sunlight",
+            "A moisture gradient — wetter underside than top",
+            "Vacuuming",
+            "Cold air"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M3 — How water damages timber"
+        },
+        {
+          "questionText": "Drying a timber floor too aggressively risks…",
+          "options": [
+            "Nothing",
+            "Checking, splitting and permanent distortion",
+            "A faster invoice",
+            "Better colour"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M6 — Drying strategy"
+        },
+        {
+          "questionText": "In Australian housing, a key subfloor factor is…",
+          "options": [
+            "Snow load",
+            "Subfloor ventilation and termite/moisture management",
+            "Altitude",
+            "The paint brand"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M5 — Subfloor & termites"
+        },
+        {
+          "questionText": "The restore-or-replace decision depends on…",
+          "options": [
+            "The customer's mood",
+            "The extent of damage, moisture readings and species/construction",
+            "The day of the week",
+            "The colour"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M7 — Restore or replace"
+        },
+        {
+          "questionText": "Australian timber floors are complicated by…",
+          "options": [
+            "A single national timber",
+            "Many species and a standards gap requiring careful assessment",
+            "No moisture issues",
+            "Only imported timber"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M2 — AU species & standards gap"
+        }
+      ]
+    }
+  ]
+}

@@ -12,7 +12,7 @@ Government restoration work represents some of the most reliable, high-value con
 
 Getting onto a government panel means predictable revenue, professional credibility, and a competitive moat that smaller operators struggle to cross.
 
-This guide walks you through the exact requirements, certifications, and application process to win government restoration panel positions across Australia.
+This guide walks you through the requirements, certifications, and application process for pursuing government restoration panel positions across Australia.
 
 ---
 
@@ -26,8 +26,8 @@ Government agencies at all levels (federal, state, and local) use **standing off
 
 - **Faster engagement** — No need to compete for every individual job
 - **Predictable pipeline** — Panel members receive work on rotation or by capability
-- **Higher rates** — Government rates are typically 10–20% above commercial market rates
-- **Payment reliability** — Government agencies pay on terms (usually 30 days, guaranteed)
+- **Established rates** — Panel rates are agreed up front through the procurement process, rather than renegotiated job by job
+- **Payment reliability** — Government agencies pay on agreed terms (typically 30 days)
 
 ### Key Procurement Platforms
 
@@ -62,7 +62,9 @@ When searching for relevant panels, look for these category descriptions:
 
 ### Why IICRC Credentials Are Non-Negotiable
 
-Government procurement officers evaluate contractors on documented competency. IICRC (Institute of Inspection Cleaning and Restoration Certification) is the global standard for restoration qualifications, and Australian government agencies explicitly reference IICRC standards in their tender specifications.
+Government procurement officers evaluate contractors on documented competency. IICRC (Institute of Inspection Cleaning and Restoration Certification) is a globally recognised standard for restoration qualifications, and many Australian government tender specifications for restoration work reference IICRC standards and certifications.
+
+**One important distinction before you plan your training:** IICRC certification itself (WRT, ASD, FSRT and so on) is obtained only through IICRC-approved schools and examinations. CARSI is an IICRC CEC Accredited provider — CARSI courses earn Continuing Education Credits (CECs) toward maintaining an existing IICRC certification. CARSI courses do not grant IICRC certification.
 
 **What procurement officers look for:**
 
@@ -77,7 +79,7 @@ Government procurement officers evaluate contractors on documented competency. I
 
 | Certification                | Code | Why It's Required                                                                                               |
 | ---------------------------- | ---- | --------------------------------------------------------------------------------------------------------------- |
-| Water Restoration Technician | WRT  | Foundation for all water damage work. Referenced in virtually every government restoration panel specification. |
+| Water Restoration Technician | WRT  | Foundation for all water damage work. Commonly referenced in government restoration panel specifications.        |
 | Applied Structural Drying    | ASD  | Demonstrates advanced drying science knowledge. Required for complex structural drying projects.                |
 
 #### Tier 2: Specialist (Broadens Panel Eligibility)
@@ -100,11 +102,11 @@ Government procurement officers evaluate contractors on documented competency. I
 IICRC certifications require ongoing education to maintain active status:
 
 - **14 CECs per certification** over a defined cycle
-- CECs must be earned through IICRC-approved education providers
-- CARSI courses are IICRC board-approved and award CECs automatically upon completion
+- CECs must be earned through IICRC-approved CE providers
+- CARSI is an IICRC CEC Accredited provider — its courses earn CECs toward maintaining your existing IICRC certification
 - Government panels may audit your CEC records — keep them current
 
-**Pro tip:** An annual CARSI subscription ($795 AUD/year) provides unlimited access to all CEC-eligible courses. This is significantly cheaper than attending face-to-face training sessions ($2,000–5,000 per course per person).
+**Pro tip:** A CARSI yearly membership ($795 AUD/year, per learner) provides access to all published CARSI courses, and team plans are available for crews and larger businesses — see carsi.com.au/pricing for current options. Online, self-paced CEC training also avoids the travel and downtime costs of face-to-face sessions.
 
 ---
 
@@ -237,44 +239,37 @@ Some government panels require a presentation or interview. Prepare for:
 
 ---
 
-## Chapter 5: Case Study — Successful Panel Application
+## Chapter 5: Worked Example — What Panel Readiness Looks Like
 
-### Coastal Restoration Services (Name Changed)
+_The scenario below is illustrative. It is a composite example of the panel-readiness path, not an account of a specific CARSI client, and the figures are indicative only._
+
+### An Illustrative Mid-Sized Restoration Business
 
 **Company profile:**
 
 - Location: South-East Queensland
 - Staff: 14 (8 technicians, 3 project managers, 3 admin)
-- Revenue: $3.2M AUD (prior year)
-- Established: 2018
+- Established restoration business with strong commercial and insurance work
 
 **The challenge:**
 
-Coastal Restoration Services had been operating for 4 years with strong commercial and insurance work but zero government contracts. The owner knew government panels offered stable, high-value work but had been unsuccessful in two previous applications.
+The business has been operating for several years with steady commercial and insurance work but zero government contracts. The owner knows government panels offer stable, high-value work but earlier applications went nowhere — the experience was there, but the documented evidence wasn't.
 
-**What they changed:**
+**What a panel-ready business changes:**
 
-1. **Upskilled the entire team through CARSI** — All 8 technicians completed WRT certification online over 6 weeks. 3 senior techs completed ASD and OCT as well. Total cost: $795 x 3 subscriptions = $2,385 (vs estimated $40,000+ for equivalent face-to-face training).
+1. **Closes the certification gap** — Technicians who need IICRC certification book it through an IICRC-approved school and examination. Everyone who already holds a certification keeps it current with IICRC CEC Accredited courses through CARSI, so every credential on the capability statement is active and auditable.
 
-2. **Built a WHS management system** — Engaged a WHS consultant ($4,000) to formalise their existing procedures into a documented management system with SWMS for all high-risk activities.
+2. **Builds a WHS management system** — Engages a WHS consultant to formalise existing procedures into a documented management system, with SWMS for all high-risk activities.
 
-3. **Upgraded insurance** — Increased public liability from $10M to $20M and added pollution liability cover. Premium increase: $3,200/year.
+3. **Upgrades insurance** — Increases public liability to the $20M government standard and adds pollution liability cover for mould and hazmat work.
 
-4. **Created a professional capability statement** — 4-page document with IICRC certification table, equipment inventory, and 5 project case studies with measurable outcomes.
+4. **Creates a professional capability statement** — A concise document with an IICRC certification table, equipment inventory, and project case studies with measurable outcomes.
 
-5. **Applied systematically** — Registered on AusTender, QTenders, and 6 local council procurement platforms. Set up keyword alerts. Responded to every relevant panel opening within 3 months.
+5. **Applies systematically** — Registers on AusTender, QTenders, and local council procurement platforms. Sets up keyword alerts. Responds to every relevant panel opening.
 
-**The result:**
+**Why this works:**
 
-- Accepted onto Queensland Government building maintenance panel (3-year term)
-- Accepted onto 2 local council emergency restoration panels
-- First government job: $48,000 water damage restoration at a state school
-- First-year government revenue: $420,000 (13% of total revenue)
-- Second-year government revenue: $780,000 (21% of total revenue)
-
-**Key insight from the owner:**
-
-> "The IICRC certifications were the turning point. In our previous applications, we had the experience but couldn't prove competency on paper. Once every technician had verifiable IICRC credentials through CARSI, the panel evaluators had the evidence they needed. The online format meant we didn't lose a single day of production during the upskilling."
+Panel evaluators score documented evidence, not assertions. A certification table where every entry is verifiable, current, and backed by CEC records answers the competency criteria directly — which is precisely where under-documented applications fall down. Businesses that make these changes put themselves in a position to compete credibly for state and council panel positions, and the online, self-paced format of CEC training means the upskilling happens without pulling technicians off billable work.
 
 ---
 
@@ -284,24 +279,24 @@ Coastal Restoration Services had been operating for 4 years with strong commerci
 
 | Week        | Action                                                                              | Resources                                       |
 | ----------- | ----------------------------------------------------------------------------------- | ----------------------------------------------- |
-| **1–2**     | Audit current certifications. Identify gaps.                                        | CARSI pathway tool at carsi.com.au/pathways     |
-| **3–6**     | Enrol team in WRT certification (minimum). Senior staff: add ASD + OCT.             | CARSI annual subscription ($795/year unlimited) |
-| **5–6**     | Review and upgrade insurance policies.                                              | Your insurance broker                           |
-| **5–8**     | Build or formalise WHS management system. Complete all SWMS.                        | WHS consultant or SafeWork Australia templates  |
-| **7–8**     | Prepare capability statement. Gather project case studies and references.           | Template available at carsi.com.au/resources    |
-| **9–10**    | Register on all relevant procurement platforms. Set up keyword alerts.              | See Chapter 1 platform list                     |
-| **11–12**   | Submit first panel application.                                                     | —                                               |
-| **Ongoing** | Monitor alerts. Apply to every relevant panel. Maintain CEC currency through CARSI. | CARSI CEC tracking dashboard                    |
+| **1–2**     | Audit current certifications. Identify gaps.                                                                    | CARSI pathway tool at carsi.com.au/pathways    |
+| **3–6**     | Book IICRC certification (WRT minimum) through an IICRC-approved school. Keep existing credentials current with CARSI IICRC CEC Accredited courses. | iicrc.org + carsi.com.au                       |
+| **5–6**     | Review and upgrade insurance policies.                                                                          | Your insurance broker                          |
+| **5–8**     | Build or formalise WHS management system. Complete all SWMS.                                                    | WHS consultant or SafeWork Australia templates |
+| **7–8**     | Prepare capability statement. Gather project case studies and references.                                       | See the structure in Chapter 4                 |
+| **9–10**    | Register on all relevant procurement platforms. Set up keyword alerts.                                          | See Chapter 1 platform list                    |
+| **11–12**   | Submit first panel application.                                                                                 | —                                              |
+| **Ongoing** | Monitor alerts. Apply to every relevant panel. Maintain CEC currency through CARSI.                             | CARSI CEC tracking                             |
 
 ---
 
 ## Key Takeaways
 
 1. **Government panels are accessible** — They're not reserved for large companies. Many panels specifically target SMEs and regional businesses.
-2. **IICRC certifications are the entry ticket** — Without documented competency, your application will be rejected regardless of your experience.
+2. **IICRC certifications are the entry ticket** — Without documented competency, your application is unlikely to succeed regardless of your experience.
 3. **WHS compliance is non-negotiable** — Government agencies audit WHS records. Your system must be documented, current, and evidence-based.
-4. **Start with your state** — Local and state government panels are easier to access than federal panels. Build your track record locally first.
-5. **Online training eliminates the biggest barrier** — CARSI's 24/7, self-paced IICRC CEC courses mean your team can upskill without losing a single billable day.
+4. **Start with your state** — Local and state government panels are generally easier to access than federal panels. Build your track record locally first.
+5. **Online CEC training removes a major barrier** — CARSI's 24/7, self-paced IICRC CEC Accredited courses mean your team can keep certifications current without losing billable days.
 
 ---
 
@@ -309,9 +304,9 @@ Coastal Restoration Services had been operating for 4 years with strong commerci
 
 **Ready to get panel-ready?**
 
-1. **Assess your team's certifications** — Visit carsi.com.au/pathways to see which IICRC credentials you need
-2. **Start with WRT** — Water Restoration Technician is the foundation credential for every government restoration panel
-3. **Subscribe for unlimited access** — $795 AUD/year covers your entire team. Start your 7-day free trial at carsi.com.au/subscribe
+1. **Assess your team's certifications** — Visit carsi.com.au/pathways to see which IICRC credentials your target panels call for
+2. **Start with WRT** — Water Restoration Technician is the foundation credential for government restoration panel work, obtained through an IICRC-approved school and examination
+3. **Keep your CECs current with CARSI** — Individual and team membership options are at carsi.com.au/pricing
 
 ---
 
@@ -331,7 +326,7 @@ Coastal Restoration Services had been operating for 4 years with strong commerci
 
 ---
 
-_Last updated: 2026-03-05_
+_Last updated: 2026-07-09_
 _Lead magnet owner: CARSI Marketing_
 _Linear issue: GP-199_
 _Format: Designed for PDF conversion (A4, ~15 pages)_
