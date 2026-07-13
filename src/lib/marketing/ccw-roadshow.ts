@@ -79,7 +79,7 @@ export const ccwRoadshowEvents: CcwRoadshowEvent[] = [
     state: 'VIC',
     description:
       'Two practical days with Phill McGurk and the CCW team, connecting training, equipment, service design, chemistry, quoting confidence and business growth for carpet, rug, stain and tile cleaning operators.',
-    capacity: 10,
+    capacity: 15,
     // Real recurring event on phill.mcgurk@gmail.com ("CARSI x CCW Business Growth
     // Days — Melbourne", 22–23 Jul 2026). The previous id was stale → guest-add 404'd
     // silently. Verified against Google Calendar 2026-06-30.
