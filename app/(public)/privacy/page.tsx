@@ -194,9 +194,10 @@ export default function PrivacyPage() {
         <h2 className={marketingLegalH2}>9. International Transfers</h2>
         <p>
           Your information may be transferred to and processed in countries outside Australia,
-          including the United States (for cloud hosting and payment processing). We ensure
-          appropriate safeguards are in place to protect your information in accordance with this
-          Privacy Policy and applicable law.
+          including the United States (for cloud hosting and payment processing) and, where you use
+          the voice assistant, the United States and Singapore (voice processing and transcription
+          by ElevenLabs — see Section 2.3). We ensure appropriate safeguards are in place to protect
+          your information in accordance with this Privacy Policy and applicable law.
         </p>
       </section>
 
