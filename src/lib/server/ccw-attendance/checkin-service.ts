@@ -29,7 +29,6 @@
 import type { Prisma } from '@/generated/prisma/client';
 
 import { getCcwRoadshowEvent } from '@/lib/marketing/ccw-roadshow';
-import { prisma } from '@/lib/prisma';
 import { runSerializable } from '@/lib/server/db-tx';
 
 import { normalizeBusiness, normalizeEmail, normalizeName } from './normalize';
