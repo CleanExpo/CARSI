@@ -17,8 +17,7 @@ import type { CheckInDayIndex } from '@/lib/server/ccw-attendance/checkin-token'
  *
  * DARK behind `CCW_ATTENDANCE_ENABLED` (404 when off). Admin-only
  * (`getAdminSessionOrNull` → 401). Scoped to a single event — there is no
- * cross-event / global-PII view here. IICRC# appears on this CEC-facing admin
- * roster only, NEVER in the general roadshow CSV export.
+ * cross-event / global-PII view here.
  *
  * GET  ?eventSlug=<slug>          → { ok, roster }
  * POST { action: 'correct' | 'merge' | 'digitise_paper', ... }
@@ -83,7 +82,6 @@ type DigitisePaperBody = {
   fullName?: string;
   email?: string;
   businessName?: string;
-  iicrcRegNumber?: string;
 };
 type PostBody = CorrectBody | MergeBody | DigitisePaperBody | { action?: string };
 
@@ -189,7 +187,6 @@ export async function POST(request: NextRequest) {
           fullName,
           email,
           businessName: b.businessName,
-          iicrcRegNumber: b.iicrcRegNumber,
         });
         switch (result.status) {
           case 'email_collision_different_name':

@@ -19,7 +19,7 @@ const RATE_WINDOW_MS = 60 * 60 * 1000;
  * DARK behind `CCW_ATTENDANCE_ENABLED` (404 when off). Authorised ONLY by the
  * event-day-scoped check-in token (never an admin/user session). Hardened like
  * the guest-free enrol route: same-site JSON content-type check (CSRF),
- * per-IP rate-limit, and Cloudflare Turnstile. Provisioning/enrolment/CEC/email
+ * per-IP rate-limit, and Cloudflare Turnstile. Provisioning/enrolment/email
  * are NOT done here — the door write is local + fast and awaits no external I/O.
  */
 export async function POST(request: NextRequest) {
@@ -58,7 +58,6 @@ export async function POST(request: NextRequest) {
     dayIndex?: number;
     fullName?: string;
     businessName?: string;
-    iicrcRegNumber?: string;
     email?: string;
     turnstileToken?: string;
   };
@@ -110,7 +109,6 @@ export async function POST(request: NextRequest) {
       fullName,
       email,
       businessName: body.businessName,
-      iicrcRegNumber: body.iicrcRegNumber,
       source: 'self',
     });
 

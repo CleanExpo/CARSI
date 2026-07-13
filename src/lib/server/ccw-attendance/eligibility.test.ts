@@ -1,18 +1,19 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  attendanceComplete,
   baseOfferEligible,
-  cecEligible,
   courseAccessGranted,
   type CcwSignInEligibilityInput,
 } from './eligibility';
 
-/** AC#15(j) — pure server-side derivations; no client-presented attendance flag. */
+/** Pure server-side derivations; no client-presented attendance flag. This
+ * course grants NO CECs, so there is no CEC predicate — both days yields a plain
+ * certificate of attendance, surfaced here as `attendanceComplete`. */
 function base(overrides: Partial<CcwSignInEligibilityInput> = {}): CcwSignInEligibilityInput {
   return {
     day1CheckedInAt: null,
     day2CheckedInAt: null,
-    iicrcRegNumber: null,
     studentId: null,
     enrollmentId: null,
     provisionStatus: 'pending',
@@ -30,29 +31,23 @@ describe('courseAccessGranted', () => {
   });
 });
 
-describe('cecEligible', () => {
-  it('requires both days AND an IICRC# AND cecHours>0', () => {
-    const bothDaysIicrc = base({ day1CheckedInAt: now, day2CheckedInAt: now, iicrcRegNumber: 'IICRC-1' });
-    expect(cecEligible(bothDaysIicrc, 4)).toBe(true);
+describe('attendanceComplete (certificate-of-attendance trigger)', () => {
+  it('true only when BOTH days are checked in', () => {
+    expect(attendanceComplete(base({ day1CheckedInAt: now, day2CheckedInAt: now }))).toBe(true);
   });
 
-  it('no IICRC# → NOT CEC-eligible (cert of attendance only)', () => {
-    const bothDaysNoIicrc = base({ day1CheckedInAt: now, day2CheckedInAt: now, iicrcRegNumber: null });
-    expect(cecEligible(bothDaysNoIicrc, 4)).toBe(false);
+  it('false with only one day (or neither)', () => {
+    expect(attendanceComplete(base())).toBe(false);
+    expect(attendanceComplete(base({ day1CheckedInAt: now }))).toBe(false);
+    expect(attendanceComplete(base({ day2CheckedInAt: now }))).toBe(false);
   });
 
-  it('cecHours 0/null (not CEC-approved) → NOT eligible even with IICRC# + both days', () => {
-    const bothDaysIicrc = base({ day1CheckedInAt: now, day2CheckedInAt: now, iicrcRegNumber: 'IICRC-1' });
-    expect(cecEligible(bothDaysIicrc, 0)).toBe(false);
-    expect(cecEligible(bothDaysIicrc, null)).toBe(false);
-  });
-
-  it('only one day → NOT eligible', () => {
-    expect(cecEligible(base({ day1CheckedInAt: now, iicrcRegNumber: 'IICRC-1' }), 4)).toBe(false);
-  });
-
-  it('blank/whitespace IICRC# is treated as absent', () => {
-    expect(cecEligible(base({ day1CheckedInAt: now, day2CheckedInAt: now, iicrcRegNumber: '  ' }), 4)).toBe(false);
+  it('does NOT depend on provisioning/enrolment — it is purely both-days', () => {
+    // Both days but not yet provisioned still reads complete; the certificate
+    // WRITE (in the async batch) is what additionally requires an enrolment.
+    expect(
+      attendanceComplete(base({ day1CheckedInAt: now, day2CheckedInAt: now, enrollmentId: null })),
+    ).toBe(true);
   });
 });
 

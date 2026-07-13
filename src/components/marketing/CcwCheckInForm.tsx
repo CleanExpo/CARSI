@@ -34,13 +34,12 @@ type CheckInResponse = {
  *
  * Deliberately shows NO roster and NO other-attendee PII (no enumeration). The
  * event-day-scoped token arrives via the QR/link and is posted straight back to
- * the server; the attendee only ever types their own four fields. IICRC# is
- * clearly optional (blank = course + certificate, no CEC).
+ * the server; the attendee only ever types their own details. Attending both
+ * days yields a certificate of attendance (this course grants no CECs).
  */
 export function CcwCheckInForm({ token, dayIndex, eventCity, eventDates }: CheckInProps) {
   const [fullName, setFullName] = useState('');
   const [businessName, setBusinessName] = useState('');
-  const [iicrcRegNumber, setIicrcRegNumber] = useState('');
   const [email, setEmail] = useState('');
   const [turnstileToken, setTurnstileToken] = useState('');
 
@@ -77,7 +76,6 @@ export function CcwCheckInForm({ token, dayIndex, eventCity, eventDates }: Check
           dayIndex,
           fullName: name,
           businessName: businessName.trim(),
-          iicrcRegNumber: iicrcRegNumber.trim(),
           email: mail,
           turnstileToken,
         }),
@@ -178,19 +176,8 @@ export function CcwCheckInForm({ token, dayIndex, eventCity, eventDates }: Check
             className={marketingInput}
             placeholder="Business name"
           />
-        </label>
-
-        <label className="block">
-          <span className={marketingLabel}>IICRC registration number (optional)</span>
-          <input
-            value={iicrcRegNumber}
-            onChange={(e) => setIicrcRegNumber(e.target.value)}
-            className={marketingInput}
-            placeholder="Leave blank if not applicable"
-          />
           <span className={`mt-1 block ${marketingBodySm}`}>
-            Blank = course + certificate of attendance, no CEC. Add it (and attend both days) to
-            claim IICRC CECs.
+            Attend both days for your certificate of attendance.
           </span>
         </label>
 

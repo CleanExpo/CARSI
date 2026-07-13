@@ -1,24 +1,25 @@
 /**
  * CCW/CARSI attendance foundation (unit A) — PURE server-side derivation.
  *
- * Every downstream decision (course access, CEC eligibility, and — for a LATER
- * unit — offer eligibility) is derived here from ONE `CcwRoadshowSignIn` row
- * plus the course's founder-set `cecHours`. There is no client-presented
- * attendance flag; these predicates are the only source of truth and run
- * server-side only.
+ * Every downstream decision (course access and — for a LATER unit — offer
+ * eligibility) is derived here from ONE `CcwRoadshowSignIn` row. There is no
+ * client-presented attendance flag; these predicates are the only source of
+ * truth and run server-side only.
  *
- * NOTE: these are pure functions of the row's current state. The row's day
- * columns are themselves a derived cache of the append-only
- * `CcwRoadshowCheckInEvent` ledger — callers must recompute that cache from the
- * ledger before trusting these predicates for a regulatory decision.
+ * This course promotes CCW commercial products, so IICRC will NOT grant CECs:
+ * there is no CEC eligibility here. Attending both days yields a plain
+ * certificate of attendance (issued in the async batch), not a CEC submission.
+ *
+ * NOTE: these are pure functions of the row's current state. The day columns are
+ * the write-once source of truth for attendance.
  */
 
 /**
  * The canonical slug of the real 2-day CCW/CARSI workshop `LmsCourse`.
  *
- * The course row itself (and its `cecHours` / `iicrcDiscipline`) is
- * FOUNDER-GATED — see `scripts/seed-ccw-2day-course.ts`. This constant only
- * names the slug the foundation reconciles against; it never sets a CEC value.
+ * The course row itself is FOUNDER-GATED — see `scripts/seed-ccw-2day-course.ts`.
+ * This constant only names the slug the foundation reconciles against. The course
+ * is free + unlisted with NO CEC.
  */
 export const CCW_2DAY_COURSE_SLUG = 'ccw-2-day-workshop';
 
@@ -43,7 +44,6 @@ export function getCcwWorkshopCourseSlug(): string {
 export interface CcwSignInEligibilityInput {
   day1CheckedInAt: Date | null;
   day2CheckedInAt: Date | null;
-  iicrcRegNumber: string | null;
   studentId: string | null;
   enrollmentId: string | null;
   provisionStatus: string;
@@ -62,36 +62,22 @@ function hasAnyCheckIn(signIn: CcwSignInEligibilityInput): boolean {
   return signIn.day1CheckedInAt != null || signIn.day2CheckedInAt != null;
 }
 
-function hasIicrcRegNumber(signIn: CcwSignInEligibilityInput): boolean {
-  return signIn.iicrcRegNumber != null && signIn.iicrcRegNumber.trim() !== '';
-}
-
 /**
  * Course access is granted at Day-1 once the attendee is provisioned/enrolled —
- * it is NOT gated on both days. (Both-days only matters for CEC.)
+ * it is NOT gated on both days. (Both-days only matters for the certificate of
+ * attendance, issued in the async batch.)
  */
 export function courseAccessGranted(signIn: CcwSignInEligibilityInput): boolean {
   return isProvisioned(signIn);
 }
 
 /**
- * CEC-eligible only when the attendee checked in BOTH days, supplied an IICRC
- * registration number, AND the course carries founder-set CEC hours (> 0).
- * A missing/zero `cecHours` (the "not CEC-approved" default) yields false so
- * the attendee still gets account + course + certificate of attendance, but no
- * CEC submission.
+ * True once the attendee has completed BOTH days — the trigger for the
+ * certificate of attendance. Pure predicate; the actual certificate write
+ * (LmsEnrollment.certificateIssuedAt) happens in the async batch.
  */
-export function cecEligible(
-  signIn: CcwSignInEligibilityInput,
-  courseCecHours: number | null | undefined,
-): boolean {
-  return (
-    signIn.day1CheckedInAt != null &&
-    signIn.day2CheckedInAt != null &&
-    hasIicrcRegNumber(signIn) &&
-    typeof courseCecHours === 'number' &&
-    courseCecHours > 0
-  );
+export function attendanceComplete(signIn: CcwSignInEligibilityInput): boolean {
+  return signIn.day1CheckedInAt != null && signIn.day2CheckedInAt != null;
 }
 
 /**

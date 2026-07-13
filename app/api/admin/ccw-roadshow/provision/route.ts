@@ -9,15 +9,15 @@ import { isCcwAttendanceEnabled } from '@/lib/server/ccw-attendance/flag';
 /**
  * POST /api/admin/ccw-roadshow/provision — run the async attendance batch for
  * one event: provision pending Day-1 sign-ins (account + 2-day-course enrol +
- * fire-and-forget welcome email) and finalise CEC for anyone now checked in both
- * days.
+ * fire-and-forget welcome email) and issue a certificate of attendance for
+ * anyone now checked in both days (this course grants no CECs).
  *
  * Admin-only (`getAdminSessionOrNull`) AND dark behind `CCW_ATTENDANCE_ENABLED`
  * (404 when off). This is the DECOUPLED provisioning path — never the door-side
  * check-in route — so the DO→external egress that 504s can never block capture.
  *
  * Request JSON: { eventSlug: string }
- * Success 200: { ok: true; eventSlug; provision: {...}; cec: {...} }
+ * Success 200: { ok: true; eventSlug; provision: {...}; attendance: {...} }
  */
 export async function POST(request: NextRequest) {
   if (!isCcwAttendanceEnabled()) {
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
       ok: true,
       eventSlug: event.slug,
       provision: summary.provision,
-      cec: summary.cec,
+      attendance: summary.attendance,
     });
   } catch (e) {
     console.error('[ccw-roadshow/provision]', e);

@@ -1,26 +1,23 @@
 /**
  * CCW/CARSI attendance foundation (unit A) — CAPTURE service (the door write).
  *
- * The ONLY place that writes a sign-in + appends to the append-only
- * `CcwRoadshowCheckInEvent` ledger. Kept deliberately local + fast: it performs
- * NO external I/O (no provisioning, no enrolment, no email — those are the async
- * Stage-3 batch). The DO→external egress path 504s (§2/§15 AC8), so the door
- * write must never await it.
+ * The ONLY place that writes a sign-in. Kept deliberately local + fast: it
+ * performs NO external I/O (no provisioning, no enrolment, no email — those are
+ * the async Stage-3 batch). The DO→external egress path 504s (§2/§15 AC8), so
+ * the door write must never await it.
  *
  * Invariants enforced here (all from §12 / §15):
  *  - UNIQUE email per event. A second person on the same email but a DIFFERENT
  *    normalized name is refused (`email_collision_different_name`) — never
  *    collapsed, never overwritten.
- *  - Day marks are WRITE-ONCE (set-if-null). A re-tap on an already-marked day is
- *    idempotent (`already_checked_in`) and appends no duplicate ledger row.
+ *  - Day marks are WRITE-ONCE (set-if-null) — the source of truth for attendance.
+ *    A re-tap on an already-marked day is idempotent (`already_checked_in`).
  *  - Reconcile-by-email against an existing confirmed registration links the
  *    sign-in (not a walk-in). No email match ⇒ walk-in.
  *  - WALK-INS CONSUME CAPACITY: a walk-in is refused (`at_capacity`) once
  *    confirmed-registration seats + existing walk-ins reach the event cap. A
  *    reconciled (registered) attendee already holds a reserved seat and is never
  *    capacity-checked.
- *  - Every check-in appends a `checkin` ledger row (the regulatory source of
- *    truth); the day-columns are a derived cache.
  *
  * Concurrency: runs in a SERIALIZABLE transaction (`runSerializable`) so two
  * simultaneous walk-ins cannot both commit past the cap and two writers on the
@@ -34,7 +31,7 @@ import { runSerializable } from '@/lib/server/db-tx';
 import { normalizeBusiness, normalizeEmail, normalizeName } from './normalize';
 import type { CheckInDayIndex } from './checkin-token';
 
-/** Where the check-in came from — mirrors the ledger `source` column. */
+/** Where the check-in came from (self QR, digitised paper, or admin action). */
 export type CheckInSource = 'self' | 'paper' | 'admin';
 
 export interface RecordCheckInInput {
@@ -43,7 +40,6 @@ export interface RecordCheckInInput {
   fullName: string;
   email: string;
   businessName?: string | null;
-  iicrcRegNumber?: string | null;
   /** Defaults to 'self' (the QR/own-device path). */
   source?: CheckInSource;
   /** AdminUser.id when an admin performed/digitised this action. */
@@ -105,7 +101,7 @@ async function findRegistrationIdByEmail(
 }
 
 /**
- * Record a single check-in. Pure DB work only — provisioning/enrolment/CEC/email
+ * Record a single check-in. Pure DB work only — provisioning/enrolment/email
  * are Stage-3 async and must NOT be invoked here.
  */
 export async function recordCheckIn(input: RecordCheckInInput): Promise<RecordCheckInResult> {
@@ -118,7 +114,6 @@ export async function recordCheckIn(input: RecordCheckInInput): Promise<RecordCh
   const normalizedName = normalizeName(fullName);
   const businessName = input.businessName?.trim() || null;
   const normalizedBusiness = businessName ? normalizeBusiness(businessName) || null : null;
-  const iicrcRegNumber = input.iicrcRegNumber?.trim() || null;
   const source: CheckInSource = input.source ?? 'self';
   const dayField = input.dayIndex === 1 ? 'day1CheckedInAt' : 'day2CheckedInAt';
 
@@ -147,20 +142,11 @@ export async function recordCheckIn(input: RecordCheckInInput): Promise<RecordCh
         };
       }
 
-      // Write-once: set this day mark (it was null) + append the ledger row.
+      // Write-once: set this day mark (it was null).
       const now = new Date();
       await tx.ccwRoadshowSignIn.update({
         where: { id: existing.id },
         data: { [dayField]: now },
-      });
-      await tx.ccwRoadshowCheckInEvent.create({
-        data: {
-          signInId: existing.id,
-          dayIndex: input.dayIndex,
-          action: 'checkin',
-          source,
-          actorAdminId: input.actorAdminId ?? null,
-        },
       });
       return {
         status: 'checked_in',
@@ -191,7 +177,6 @@ export async function recordCheckIn(input: RecordCheckInInput): Promise<RecordCh
         registrationId,
         fullName,
         businessName,
-        iicrcRegNumber,
         email,
         normalizedEmail,
         normalizedBusiness,
@@ -200,15 +185,6 @@ export async function recordCheckIn(input: RecordCheckInInput): Promise<RecordCh
         provisionStatus: 'pending',
         signedInByAdmin: source === 'self' ? null : input.actorAdminId ?? null,
         [dayField]: now,
-      },
-    });
-    await tx.ccwRoadshowCheckInEvent.create({
-      data: {
-        signInId: created.id,
-        dayIndex: input.dayIndex,
-        action: 'checkin',
-        source,
-        actorAdminId: input.actorAdminId ?? null,
       },
     });
 

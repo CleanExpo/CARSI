@@ -1,19 +1,20 @@
 /**
  * CCW/CARSI attendance foundation (unit A) — Stage 4 ADMIN OPS.
  *
- * Admin-only, single-event-scoped operations over captured sign-ins. Every
- * function here honours the two hard invariants of the foundation:
+ * Admin-only, single-event-scoped operations over captured sign-ins.
  *
- *  - The append-only `CcwRoadshowCheckInEvent` ledger is the regulatory source
- *    of truth. History is NEVER UPDATE'd or DELETE'd away. A correction is a new
- *    `reversal` row; the derived `day1/day2` cache is then RECOMPUTED from the
- *    full ledger via the pure `deriveDayColumns` replay.
- *  - Merging typo-duplicates re-parents the duplicate's ledger onto the survivor
- *    (custody moves; no checkin/reversal fact is lost) before the empty duplicate
- *    row is removed — so a merge can never erase attendance evidence.
+ * The `day1CheckedInAt` / `day2CheckedInAt` columns on `CcwRoadshowSignIn` are the
+ * WRITE-ONCE source of truth for attendance. The door path only ever sets them
+ * (set-if-null); admin corrections here are the sole path allowed to clear a
+ * mistaken mark — a direct, write-once-respecting update (there is no append-only
+ * ledger; this course grants no CECs, so the regulatory audit ledger is gone).
+ *
+ * Merging typo-duplicates backfills the survivor from the duplicate (linkage,
+ * detail, and any day mark the survivor is missing) before the empty duplicate
+ * row is removed — so a merge can never erase attendance evidence.
  *
  * All mutating ops run in a SERIALIZABLE transaction so concurrent admin actions
- * and door writes cannot interleave into an inconsistent cache.
+ * and door writes cannot interleave into an inconsistent state.
  *
  * Server-only. Never import into client code.
  */
@@ -23,52 +24,26 @@ import { prisma } from '@/lib/prisma';
 import { runSerializable } from '@/lib/server/db-tx';
 
 import {
-  cecEligible,
+  attendanceComplete,
   courseAccessGranted,
   getCcwWorkshopCourseSlug,
   type CcwSignInEligibilityInput,
 } from './eligibility';
-import { deriveDayColumns } from './ledger';
 import { matchSignIn } from './match';
 import { recordCheckIn, type RecordCheckInResult } from './checkin-service';
 import type { CheckInDayIndex } from './checkin-token';
 
-/**
- * Recompute a sign-in's derived day cache from its FULL append-only ledger and
- * persist it. Pure derivation (`deriveDayColumns`) + one guarded write; never
- * touches ledger rows.
- */
-async function recomputeSignInDayColumns(
-  tx: Prisma.TransactionClient,
-  signInId: string,
-): Promise<{ day1CheckedInAt: Date | null; day2CheckedInAt: Date | null }> {
-  const events = await tx.ccwRoadshowCheckInEvent.findMany({
-    where: { signInId },
-    select: { dayIndex: true, action: true, createdAt: true },
-    orderBy: { createdAt: 'asc' },
-  });
-  const derived = deriveDayColumns(events);
-  await tx.ccwRoadshowSignIn.update({
-    where: { id: signInId },
-    data: {
-      day1CheckedInAt: derived.day1CheckedInAt,
-      day2CheckedInAt: derived.day2CheckedInAt,
-    },
-  });
-  return derived;
-}
-
 // ---------------------------------------------------------------------------
-// Correction (append-only reversal)
+// Correction (direct, write-once-respecting clear of a day mark)
 // ---------------------------------------------------------------------------
 
 export interface CorrectionInput {
   signInId: string;
   dayIndex: CheckInDayIndex;
   reason: string;
-  /** AdminUser.id when available (ledger `actor_admin_id`, no FK). */
+  /** AdminUser.id when available (recorded in the app log). */
   actorAdminId?: string | null;
-  /** Admin email — recorded in the ledger `reason` for a human-readable trail. */
+  /** Admin email — recorded in the app log for a human-readable trail. */
   actorAdminEmail?: string | null;
 }
 
@@ -83,13 +58,16 @@ export type CorrectionResult =
   | { status: 'invalid_reason' };
 
 /**
- * Correct a day mark by APPENDING a `reversal` ledger row (with a mandatory
- * reason) and recomputing the derived cache. No existing row is ever mutated —
- * the reversal cancels the most recent check-in for that day on replay.
+ * Correct a day mark by CLEARING it (a mistaken check-in) with a mandatory
+ * reason. This is the only path allowed to un-set a write-once day column; the
+ * door path can only ever set-if-null. The reason + actor are recorded in the
+ * application log (there is no ledger table).
  */
 export async function applyCheckInCorrection(input: CorrectionInput): Promise<CorrectionResult> {
   const reason = input.reason?.trim();
   if (!reason) return { status: 'invalid_reason' };
+
+  const dayField = input.dayIndex === 1 ? 'day1CheckedInAt' : 'day2CheckedInAt';
 
   return runSerializable(async (tx) => {
     const signIn = await tx.ccwRoadshowSignIn.findUnique({
@@ -98,24 +76,31 @@ export async function applyCheckInCorrection(input: CorrectionInput): Promise<Co
     });
     if (!signIn) return { status: 'not_found' };
 
-    await tx.ccwRoadshowCheckInEvent.create({
-      data: {
-        signInId: input.signInId,
-        dayIndex: input.dayIndex,
-        action: 'reversal',
-        source: 'admin',
-        actorAdminId: input.actorAdminId ?? null,
-        reason: input.actorAdminEmail ? `${reason} (by ${input.actorAdminEmail})` : reason,
-      },
+    const updated = await tx.ccwRoadshowSignIn.update({
+      where: { id: input.signInId },
+      data: { [dayField]: null },
+      select: { day1CheckedInAt: true, day2CheckedInAt: true },
     });
 
-    const derived = await recomputeSignInDayColumns(tx, input.signInId);
-    return { status: 'corrected', signInId: input.signInId, ...derived };
+    console.info(
+      '[ccw-correction]',
+      input.signInId,
+      `day${input.dayIndex}`,
+      input.actorAdminEmail ? `by ${input.actorAdminEmail}` : '',
+      reason,
+    );
+
+    return {
+      status: 'corrected',
+      signInId: input.signInId,
+      day1CheckedInAt: updated.day1CheckedInAt,
+      day2CheckedInAt: updated.day2CheckedInAt,
+    };
   });
 }
 
 // ---------------------------------------------------------------------------
-// Merge duplicates (re-parent ledger, never delete history)
+// Merge duplicates (backfill survivor, never lose an attendance mark)
 // ---------------------------------------------------------------------------
 
 export interface MergeInput {
@@ -132,21 +117,18 @@ export type MergeResult =
       primaryId: string;
       day1CheckedInAt: Date | null;
       day2CheckedInAt: Date | null;
-      movedEvents: number;
     }
   | { status: 'not_found' }
   | { status: 'same_row' }
   | { status: 'different_event' };
 
 /**
- * Merge a typo-duplicate sign-in into a surviving primary row. The duplicate's
- * append-only ledger is RE-PARENTED onto the primary (custody move; every
- * checkin/reversal fact is preserved), then the now-childless duplicate is
- * removed and the primary's cache is recomputed from the combined ledger.
- *
- * NULL linkage/detail on the survivor is backfilled from the duplicate. The
- * duplicate is deleted BEFORE the survivor's `enrollmentId` is set so the
- * `@@unique([enrollmentId])` constraint is never transiently violated.
+ * Merge a typo-duplicate sign-in into a surviving primary row. Any attendance
+ * mark, linkage, or detail the survivor is MISSING is backfilled from the
+ * duplicate, so no attendance evidence is lost; the survivor keeps its own value
+ * where it already has one. The duplicate is deleted BEFORE the survivor's
+ * `enrollmentId` is set so the `@@unique([enrollmentId])` constraint is never
+ * transiently violated.
  */
 export async function mergeDuplicateSignIns(input: MergeInput): Promise<MergeResult> {
   if (input.primaryId === input.duplicateId) return { status: 'same_row' };
@@ -159,16 +141,10 @@ export async function mergeDuplicateSignIns(input: MergeInput): Promise<MergeRes
     if (!primary || !duplicate) return { status: 'not_found' };
     if (primary.eventSlug !== duplicate.eventSlug) return { status: 'different_event' };
 
-    // 1. Re-parent the duplicate's ledger onto the survivor (no fact is lost).
-    const moved = await tx.ccwRoadshowCheckInEvent.updateMany({
-      where: { signInId: input.duplicateId },
-      data: { signInId: input.primaryId },
-    });
-
-    // 2. Remove the empty duplicate BEFORE re-homing its unique enrollmentId.
+    // Remove the empty duplicate BEFORE re-homing its unique enrollmentId.
     await tx.ccwRoadshowSignIn.delete({ where: { id: input.duplicateId } });
 
-    // 3. Backfill only NULL/empty fields on the survivor from the duplicate.
+    // Backfill only NULL/empty fields on the survivor from the duplicate.
     const data: Prisma.CcwRoadshowSignInUncheckedUpdateInput = {};
     if (primary.registrationId == null && duplicate.registrationId != null) {
       data.registrationId = duplicate.registrationId;
@@ -179,6 +155,15 @@ export async function mergeDuplicateSignIns(input: MergeInput): Promise<MergeRes
     if (primary.enrollmentId == null && duplicate.enrollmentId != null) {
       data.enrollmentId = duplicate.enrollmentId;
     }
+    // Never lose an attendance mark: fill a missing day from the duplicate.
+    const day1CheckedInAt = primary.day1CheckedInAt ?? duplicate.day1CheckedInAt;
+    const day2CheckedInAt = primary.day2CheckedInAt ?? duplicate.day2CheckedInAt;
+    if (primary.day1CheckedInAt == null && duplicate.day1CheckedInAt != null) {
+      data.day1CheckedInAt = duplicate.day1CheckedInAt;
+    }
+    if (primary.day2CheckedInAt == null && duplicate.day2CheckedInAt != null) {
+      data.day2CheckedInAt = duplicate.day2CheckedInAt;
+    }
     if (
       (primary.businessName == null || primary.businessName === '') &&
       duplicate.businessName != null &&
@@ -186,13 +171,6 @@ export async function mergeDuplicateSignIns(input: MergeInput): Promise<MergeRes
     ) {
       data.businessName = duplicate.businessName;
       data.normalizedBusiness = duplicate.normalizedBusiness;
-    }
-    if (
-      (primary.iicrcRegNumber == null || primary.iicrcRegNumber === '') &&
-      duplicate.iicrcRegNumber != null &&
-      duplicate.iicrcRegNumber !== ''
-    ) {
-      data.iicrcRegNumber = duplicate.iicrcRegNumber;
     }
     // If either row was a reconciled (registered) attendee, the survivor is too.
     if (!primary.isWalkIn || !duplicate.isWalkIn) {
@@ -202,13 +180,11 @@ export async function mergeDuplicateSignIns(input: MergeInput): Promise<MergeRes
       await tx.ccwRoadshowSignIn.update({ where: { id: input.primaryId }, data });
     }
 
-    // 4. Recompute the survivor's cache from the combined ledger.
-    const derived = await recomputeSignInDayColumns(tx, input.primaryId);
     return {
       status: 'merged',
       primaryId: input.primaryId,
-      ...derived,
-      movedEvents: moved.count,
+      day1CheckedInAt,
+      day2CheckedInAt,
     };
   });
 }
@@ -223,14 +199,13 @@ export interface DigitisePaperInput {
   fullName: string;
   email: string;
   businessName?: string | null;
-  iicrcRegNumber?: string | null;
   actorAdminId?: string | null;
 }
 
 /**
  * Digitise a paper/offline sign-in through the SAME capture writer as the door
  * path, tagged `source='paper'`. It shares every invariant (write-once day
- * marks, unique-email collision refusal, walk-in capacity, ledger append).
+ * marks, unique-email collision refusal, walk-in capacity).
  */
 export function digitisePaperCheckIn(input: DigitisePaperInput): Promise<RecordCheckInResult> {
   return recordCheckIn({
@@ -239,14 +214,13 @@ export function digitisePaperCheckIn(input: DigitisePaperInput): Promise<RecordC
     fullName: input.fullName,
     email: input.email,
     businessName: input.businessName,
-    iicrcRegNumber: input.iicrcRegNumber,
     source: 'paper',
     actorAdminId: input.actorAdminId ?? null,
   });
 }
 
 // ---------------------------------------------------------------------------
-// Roster (single-event scope; derived from the ledger, not the cache)
+// Roster (single-event scope)
 // ---------------------------------------------------------------------------
 
 export interface SignInRosterRow {
@@ -255,56 +229,39 @@ export interface SignInRosterRow {
   fullName: string;
   businessName: string | null;
   email: string;
-  /** CEC surface only — this admin roster, NEVER the general roadshow CSV. */
-  iicrcRegNumber: string | null;
   registrationId: string | null;
   isWalkIn: boolean;
   provisionStatus: string;
   day1CheckedInAt: string | null;
   day2CheckedInAt: string | null;
-  checkInCount: number;
-  reversalCount: number;
   courseAccessGranted: boolean;
-  cecEligible: boolean;
+  /** Both days done → certificate of attendance issued by the async batch. */
+  attendanceComplete: boolean;
 }
 
 export interface SignInRoster {
   eventSlug: string;
   courseSlug: string;
-  courseCecHours: number | null;
   rows: SignInRosterRow[];
 }
 
 /**
- * List the sign-ins for ONE event with day-state RE-DERIVED from each row's
- * append-only ledger (the cache is not trusted for a regulatory read). Scoped to
- * the given event only — no cross-event / global-PII view.
+ * List the sign-ins for ONE event. Scoped to the given event only — no
+ * cross-event / global-PII view. Day-state is read directly from the write-once
+ * day columns (the source of truth).
  */
 export async function listSignInsForEvent(eventSlug: string): Promise<SignInRoster> {
   const rows = await prisma.ccwRoadshowSignIn.findMany({
     where: { eventSlug },
     orderBy: { createdAt: 'asc' },
-    include: {
-      checkInEvents: {
-        select: { dayIndex: true, action: true, createdAt: true },
-        orderBy: { createdAt: 'asc' },
-      },
-    },
   });
 
   const courseSlug = getCcwWorkshopCourseSlug();
-  const course = await prisma.lmsCourse.findUnique({
-    where: { slug: courseSlug },
-    select: { cecHours: true },
-  });
-  const courseCecHours = course?.cecHours ?? null;
 
   const mapped: SignInRosterRow[] = rows.map((row) => {
-    const derived = deriveDayColumns(row.checkInEvents);
     const eligibilityInput: CcwSignInEligibilityInput = {
-      day1CheckedInAt: derived.day1CheckedInAt,
-      day2CheckedInAt: derived.day2CheckedInAt,
-      iicrcRegNumber: row.iicrcRegNumber,
+      day1CheckedInAt: row.day1CheckedInAt,
+      day2CheckedInAt: row.day2CheckedInAt,
       studentId: row.studentId,
       enrollmentId: row.enrollmentId,
       provisionStatus: row.provisionStatus,
@@ -315,20 +272,17 @@ export async function listSignInsForEvent(eventSlug: string): Promise<SignInRost
       fullName: row.fullName,
       businessName: row.businessName,
       email: row.email,
-      iicrcRegNumber: row.iicrcRegNumber,
       registrationId: row.registrationId,
       isWalkIn: row.isWalkIn,
       provisionStatus: row.provisionStatus,
-      day1CheckedInAt: derived.day1CheckedInAt ? derived.day1CheckedInAt.toISOString() : null,
-      day2CheckedInAt: derived.day2CheckedInAt ? derived.day2CheckedInAt.toISOString() : null,
-      checkInCount: row.checkInEvents.filter((e) => e.action === 'checkin').length,
-      reversalCount: row.checkInEvents.filter((e) => e.action === 'reversal').length,
+      day1CheckedInAt: row.day1CheckedInAt ? row.day1CheckedInAt.toISOString() : null,
+      day2CheckedInAt: row.day2CheckedInAt ? row.day2CheckedInAt.toISOString() : null,
       courseAccessGranted: courseAccessGranted(eligibilityInput),
-      cecEligible: cecEligible(eligibilityInput, courseCecHours),
+      attendanceComplete: attendanceComplete(eligibilityInput),
     };
   });
 
-  return { eventSlug, courseSlug, courseCecHours, rows: mapped };
+  return { eventSlug, courseSlug, rows: mapped };
 }
 
 /**

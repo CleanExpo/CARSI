@@ -2,11 +2,12 @@
  * FOUNDER-GATED seed skeleton — creates the real 2-day CCW/CARSI workshop
  * `LmsCourse` that the attendance foundation (unit A) reconciles against.
  *
- * This is intentionally a SKELETON. The CEC values are regulatory and MUST NOT
- * be hardcoded by an agent: the founder supplies `--cec-hours` and
- * `--iicrc-discipline` at run time after IICRC approval is confirmed. Without
- * `--cec-hours`, the course is created CEC-DISABLED (cecHours = 0), which the
- * eligibility layer treats as "certificate of attendance only, no CEC".
+ * This course promotes CCW commercial products, so IICRC will NOT grant CECs:
+ * the course is created free + unlisted with NO CEC. There is deliberately no
+ * `--cec-hours` / `--iicrc-discipline` setup here — attending both days yields a
+ * plain certificate of attendance (issued by the async attendance batch), never
+ * a CEC/IICRC submission. (The broader CARSI CEC system still serves OTHER,
+ * IICRC-approved courses; it is simply not wired to this workshop.)
  *
  * The course slug is the single source of truth in
  * `src/lib/server/ccw-attendance/eligibility.ts` (CCW_2DAY_COURSE_SLUG).
@@ -15,11 +16,9 @@
  *   DATABASE_URL=... npx tsx scripts/seed-ccw-2day-course.ts \
  *     --instructor-email founder@example.com
  *
- * Apply (founder, after IICRC approval):
+ * Apply (founder):
  *   DATABASE_URL=... npx tsx scripts/seed-ccw-2day-course.ts --apply \
- *     --instructor-email founder@example.com \
- *     --cec-hours <FOUNDER_SETS_THIS> \
- *     --iicrc-discipline <FOUNDER_SETS_THIS>
+ *     --instructor-email founder@example.com
  *
  * Idempotent: re-running upserts the course by slug. It never applies a DB
  * migration and never touches attendance rows.
@@ -51,20 +50,6 @@ async function main() {
   const apply = process.argv.includes('--apply');
   const instructorEmail = getArg('instructor-email');
 
-  // TODO(founder): supply after IICRC approval. Absent => CEC-disabled (0 hrs).
-  const cecHoursRaw = getArg('cec-hours');
-  const iicrcDiscipline = getArg('iicrc-discipline') ?? null;
-
-  let cecHours = 0; // "not CEC-approved" default — never invent a real number.
-  if (cecHoursRaw != null) {
-    const parsed = Number(cecHoursRaw);
-    if (!Number.isFinite(parsed) || parsed < 0) {
-      console.error(`--cec-hours must be a non-negative number, got: ${cecHoursRaw}`);
-      process.exit(1);
-    }
-    cecHours = parsed;
-  }
-
   if (!instructorEmail) {
     console.error('--instructor-email <email> is required (course.instructorId is NOT NULL).');
     process.exit(1);
@@ -81,28 +66,26 @@ async function main() {
 
   const existing = await prisma.lmsCourse.findUnique({
     where: { slug: CCW_2DAY_COURSE_SLUG },
-    select: { id: true, cecHours: true, iicrcDiscipline: true },
+    select: { id: true, slug: true, status: true },
   });
 
   const plan = {
     slug: CCW_2DAY_COURSE_SLUG,
     title: 'CARSI x CCW Business Growth Days (2-Day Workshop)',
     instructorId: instructor.id,
-    status: 'published',
+    // Unlisted: not surfaced in the public catalog (which only lists
+    // status='published'); attendees receive access via the attendance batch.
+    status: 'unlisted',
     priceAud: 0,
     isFree: true,
-    cecHours,
-    iicrcDiscipline,
   };
 
   console.log(existing ? '[exists] will UPDATE course:' : '[new] will CREATE course:');
   console.log(JSON.stringify(plan, null, 2));
-  if (cecHours === 0) {
-    console.log(
-      'NOTE: cecHours = 0 → certificate of attendance only, NO CEC submission. ' +
-        'Re-run with --cec-hours <n> --iicrc-discipline <d> once IICRC-approved.',
-    );
-  }
+  console.log(
+    'NOTE: this course promotes CCW commercial products → NO CEC. Both days yields ' +
+      'a certificate of attendance only, never a CEC/IICRC submission.',
+  );
 
   if (!apply) {
     console.log('\nDry-run (no --apply). Nothing written.');
@@ -111,12 +94,9 @@ async function main() {
 
   const course = await prisma.lmsCourse.upsert({
     where: { slug: CCW_2DAY_COURSE_SLUG },
-    // Only the founder-gated CEC fields are mutated on update; identity fields
-    // are left intact for an already-existing course.
-    update: {
-      cecHours: plan.cecHours,
-      iicrcDiscipline: plan.iicrcDiscipline,
-    },
+    // Identity fields are left intact for an already-existing course; this seed
+    // never mutates CEC fields (the workshop grants none).
+    update: {},
     create: {
       id: randomUUID(),
       slug: plan.slug,
@@ -125,10 +105,8 @@ async function main() {
       status: plan.status,
       priceAud: plan.priceAud,
       isFree: plan.isFree,
-      cecHours: plan.cecHours,
-      iicrcDiscipline: plan.iicrcDiscipline,
     },
-    select: { id: true, slug: true, cecHours: true, iicrcDiscipline: true },
+    select: { id: true, slug: true, status: true, isFree: true },
   });
 
   console.log('\nApplied:');

@@ -886,8 +886,10 @@ model CcwRoadshowAttendee {
 }
 
 /// CCW/CARSI 2-day-workshop attendance foundation (unit A). One row per PERSON per EVENT.
-/// The two day-columns here are a DERIVED CACHE of the append-only
-/// `CcwRoadshowCheckInEvent` ledger, which is the regulatory source of truth.
+/// The two day-columns here are the WRITE-ONCE source of truth for attendance
+/// (set-if-null on check-in; admin corrections are direct, write-once-respecting
+/// updates). Both days set → certificate of attendance (no CEC — this course
+/// promotes CCW commercial products, so IICRC will not grant CECs).
 /// Everything is DARK behind the `CCW_ATTENDANCE_ENABLED` env flag.
 model CcwRoadshowSignIn {
   id                 String    @id @default(uuid()) @db.Uuid
@@ -900,12 +902,11 @@ model CcwRoadshowSignIn {
   enrollmentId       String?   @map("enrollment_id") @db.Uuid
   fullName           String    @map("full_name")
   businessName       String?   @map("business_name")
-  iicrcRegNumber     String?   @map("iicrc_reg_number") @db.VarChar(32)
   email              String    @db.VarChar(320)
   normalizedEmail    String    @map("normalized_email") @db.VarChar(320)
   normalizedBusiness String?   @map("normalized_business")
   normalizedName     String    @map("normalized_name")
-  /// Write-once (set-if-null). Corrections happen via a `reversal` ledger row + recompute.
+  /// Write-once (set-if-null). Admin corrections are direct, write-once-respecting updates.
   day1CheckedInAt    DateTime? @map("day1_checked_in_at") @db.Timestamptz(6)
   day2CheckedInAt    DateTime? @map("day2_checked_in_at") @db.Timestamptz(6)
   isWalkIn           Boolean   @default(false) @map("is_walk_in")
@@ -919,35 +920,12 @@ model CcwRoadshowSignIn {
   registration CcwRoadshowRegistration? @relation(fields: [registrationId], references: [id], onDelete: SetNull)
   student      LmsUser?                 @relation("SignInStudent", fields: [studentId], references: [id], onDelete: SetNull)
   enrollment   LmsEnrollment?           @relation("SignInEnrollment", fields: [enrollmentId], references: [id], onDelete: SetNull)
-  checkInEvents CcwRoadshowCheckInEvent[]
 
   @@unique([eventSlug, normalizedEmail])
   @@unique([enrollmentId])
   @@index([eventSlug, normalizedBusiness])
   @@index([eventSlug, normalizedName])
   @@map("ccw_roadshow_sign_ins")
-}
-
-/// APPEND-ONLY regulatory ledger — the source of truth for attendance.
-/// NEVER UPDATE or DELETE a row here; a correction is a new `reversal` row.
-/// The day-columns on CcwRoadshowSignIn are a derived cache recomputed from this.
-model CcwRoadshowCheckInEvent {
-  id           String   @id @default(uuid()) @db.Uuid
-  signInId     String   @map("sign_in_id") @db.Uuid
-  dayIndex     Int      @map("day_index")
-  /// checkin | reversal
-  action       String   @db.VarChar(16)
-  /// AdminUser.id when an admin performed this action (no FK by design).
-  actorAdminId String?  @map("actor_admin_id") @db.Uuid
-  /// self | paper | admin
-  source       String   @db.VarChar(16)
-  reason       String?  @db.Text
-  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
-
-  signIn CcwRoadshowSignIn @relation(fields: [signInId], references: [id], onDelete: Cascade)
-
-  @@index([signInId])
-  @@map("ccw_roadshow_check_in_events")
 }
 
 /// Margot public assistant — conversation threads (anonymous or linked to a learner).

@@ -3,14 +3,18 @@
  * CCW attendance capture + admin-ops code issues. Wired into tests via
  * `vi.mock('@/lib/prisma', () => import('./test-support/fake-prisma')...)`.
  *
- * It exercises the REAL service logic (write-once, ledger append, capacity,
- * SERIALIZABLE `$transaction`, merge re-parenting, ledger-derived recompute)
- * against mutable arrays — no DB, no network. Each test FILE gets its own module
- * instance (vitest isolates module registries per file); call `resetFakeStore()`
- * in `beforeEach`.
+ * It exercises the REAL service logic (write-once day marks, capacity,
+ * SERIALIZABLE `$transaction`, direct write-once-respecting corrections, merge
+ * backfill) against mutable arrays — no DB, no network. Each test FILE gets its
+ * own module instance (vitest isolates module registries per file); call
+ * `resetFakeStore()` in `beforeEach`.
+ *
+ * There is NO append-only check-in ledger anymore: this course grants no CECs,
+ * so the regulatory audit ledger is gone and the day columns are the write-once
+ * source of truth.
  *
  * NOT a general Prisma emulator — it only understands the specific `where` /
- * `select` / `include` shapes used by this unit. Keep it in lock-step with them.
+ * `select` shapes used by this unit. Keep it in lock-step with them.
  */
 import { randomUUID } from 'node:crypto';
 
@@ -22,7 +26,6 @@ export interface FakeSignIn {
   enrollmentId: string | null;
   fullName: string;
   businessName: string | null;
-  iicrcRegNumber: string | null;
   email: string;
   normalizedEmail: string;
   normalizedBusiness: string | null;
@@ -36,17 +39,6 @@ export interface FakeSignIn {
   updatedAt: Date;
 }
 
-export interface FakeCheckInEvent {
-  id: string;
-  signInId: string;
-  dayIndex: number;
-  action: string;
-  actorAdminId: string | null;
-  source: string;
-  reason: string | null;
-  createdAt: Date;
-}
-
 export interface FakeRegistration {
   id: string;
   eventSlug: string;
@@ -55,37 +47,26 @@ export interface FakeRegistration {
   status: string;
 }
 
-export interface FakeCourse {
-  slug: string;
-  cecHours: number | null;
-}
-
 interface Store {
   signIns: FakeSignIn[];
-  events: FakeCheckInEvent[];
   registrations: FakeRegistration[];
-  courses: FakeCourse[];
-  /** Monotonic clock so ledger rows have strictly increasing createdAt. */
+  /** Monotonic clock so created rows have strictly increasing createdAt. */
   clock: number;
 }
 
 export const fakeStore: Store = {
   signIns: [],
-  events: [],
   registrations: [],
-  courses: [],
   clock: 0,
 };
 
 export function resetFakeStore(): void {
   fakeStore.signIns = [];
-  fakeStore.events = [];
   fakeStore.registrations = [];
-  fakeStore.courses = [];
   fakeStore.clock = 0;
 }
 
-/** Strictly-increasing timestamps so ledger ordering is deterministic. */
+/** Strictly-increasing timestamps so ordering is deterministic. */
 function nextNow(): Date {
   fakeStore.clock += 1000;
   return new Date(Date.UTC(2026, 6, 22, 0, 0, fakeStore.clock / 1000));
@@ -101,7 +82,7 @@ function pick<T extends object>(row: T, select?: Record<string, boolean>): Parti
 }
 
 const ccwRoadshowSignIn = {
-  findUnique(args: { where: Record<string, unknown>; select?: Record<string, boolean>; include?: Record<string, unknown> }) {
+  findUnique(args: { where: Record<string, unknown>; select?: Record<string, boolean> }) {
     const w = args.where;
     let row: FakeSignIn | undefined;
     if (typeof w.id === 'string') {
@@ -115,9 +96,6 @@ const ccwRoadshowSignIn = {
       row = fakeStore.signIns.find((s) => s.enrollmentId === w.enrollmentId);
     }
     if (!row) return Promise.resolve(null);
-    if (args.include?.checkInEvents) {
-      return Promise.resolve({ ...row, checkInEvents: eventsFor(row.id, args.include.checkInEvents) });
-    }
     return Promise.resolve(pick(row, args.select));
   },
 
@@ -131,7 +109,6 @@ const ccwRoadshowSignIn = {
       enrollmentId: null,
       fullName: '',
       businessName: null,
-      iicrcRegNumber: null,
       email: '',
       normalizedEmail: '',
       normalizedBusiness: null,
@@ -149,12 +126,12 @@ const ccwRoadshowSignIn = {
     return Promise.resolve(row);
   },
 
-  update(args: { where: { id: string }; data: Record<string, unknown> }) {
+  update(args: { where: { id: string }; data: Record<string, unknown>; select?: Record<string, boolean> }) {
     const row = fakeStore.signIns.find((s) => s.id === args.where.id);
     if (!row) throw new Error('signIn not found');
     Object.assign(row, args.data);
     row.updatedAt = nextNow();
-    return Promise.resolve(row);
+    return Promise.resolve(pick(row, args.select));
   },
 
   updateMany(args: { where: Record<string, unknown>; data: Record<string, unknown> }) {
@@ -172,8 +149,6 @@ const ccwRoadshowSignIn = {
     const idx = fakeStore.signIns.findIndex((s) => s.id === args.where.id);
     if (idx === -1) throw new Error('signIn not found');
     const [removed] = fakeStore.signIns.splice(idx, 1);
-    // Cascade: any ledger rows still pointing at it are removed.
-    fakeStore.events = fakeStore.events.filter((e) => e.signInId !== removed.id);
     return Promise.resolve(removed);
   },
 
@@ -181,32 +156,12 @@ const ccwRoadshowSignIn = {
     return Promise.resolve(fakeStore.signIns.filter((s) => matchSignInWhere(s, args.where)).length);
   },
 
-  findMany(args: {
-    where?: Record<string, unknown>;
-    orderBy?: unknown;
-    select?: Record<string, boolean>;
-    include?: Record<string, unknown>;
-  }) {
+  findMany(args: { where?: Record<string, unknown>; orderBy?: unknown; select?: Record<string, boolean> }) {
     let rows = fakeStore.signIns.filter((s) => matchSignInWhere(s, args.where ?? {}));
     rows = rows.slice().sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
-    const out = rows.map((row) => {
-      if (args.include?.checkInEvents) {
-        return { ...row, checkInEvents: eventsFor(row.id, args.include.checkInEvents) };
-      }
-      return pick(row, args.select);
-    });
-    return Promise.resolve(out);
+    return Promise.resolve(rows.map((row) => pick(row, args.select)));
   },
 };
-
-function eventsFor(signInId: string, spec: unknown): unknown[] {
-  const s = spec as { select?: Record<string, boolean> };
-  const rows = fakeStore.events
-    .filter((e) => e.signInId === signInId)
-    .slice()
-    .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
-  return rows.map((e) => pick(e, s?.select));
-}
 
 function matchSignInWhere(row: FakeSignIn, where: Record<string, unknown>): boolean {
   for (const [key, cond] of Object.entries(where)) {
@@ -231,47 +186,6 @@ function matchSignInWhere(row: FakeSignIn, where: Record<string, unknown>): bool
   return true;
 }
 
-const ccwRoadshowCheckInEvent = {
-  create(args: { data: Partial<FakeCheckInEvent> }) {
-    const row: FakeCheckInEvent = {
-      id: randomUUID(),
-      signInId: '',
-      dayIndex: 1,
-      action: 'checkin',
-      actorAdminId: null,
-      source: 'self',
-      reason: null,
-      createdAt: nextNow(),
-      ...args.data,
-    };
-    fakeStore.events.push(row);
-    return Promise.resolve(row);
-  },
-
-  findMany(args: { where: { signInId?: string }; select?: Record<string, boolean>; orderBy?: unknown }) {
-    let rows = fakeStore.events.filter((e) => !args.where.signInId || e.signInId === args.where.signInId);
-    rows = rows.slice().sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
-    return Promise.resolve(rows.map((e) => pick(e, args.select)));
-  },
-
-  updateMany(args: { where: { signInId?: string }; data: { signInId?: string } }) {
-    let count = 0;
-    for (const e of fakeStore.events) {
-      if (!args.where.signInId || e.signInId === args.where.signInId) {
-        if (args.data.signInId) e.signInId = args.data.signInId;
-        count += 1;
-      }
-    }
-    return Promise.resolve({ count });
-  },
-
-  count(args: { where: { signInId?: string } }) {
-    return Promise.resolve(
-      fakeStore.events.filter((e) => !args.where.signInId || e.signInId === args.where.signInId).length,
-    );
-  },
-};
-
 const ccwRoadshowRegistration = {
   aggregate(args: { _sum: { seatCount: true }; where: { eventSlug: string; status: string } }) {
     const sum = fakeStore.registrations
@@ -288,13 +202,6 @@ const ccwRoadshowRegistration = {
   },
 };
 
-const lmsCourse = {
-  findUnique(args: { where: { slug: string }; select?: Record<string, boolean> }) {
-    const row = fakeStore.courses.find((c) => c.slug === args.where.slug);
-    return Promise.resolve(row ? pick(row, args.select) : null);
-  },
-};
-
 async function $transaction<T>(fn: (tx: unknown) => Promise<T>): Promise<T> {
   return fn(fakePrisma);
 }
@@ -302,9 +209,7 @@ async function $transaction<T>(fn: (tx: unknown) => Promise<T>): Promise<T> {
 export const fakePrisma = {
   $transaction,
   ccwRoadshowSignIn,
-  ccwRoadshowCheckInEvent,
   ccwRoadshowRegistration,
-  lmsCourse,
 };
 
 // ---- test seed helpers -----------------------------------------------------
@@ -317,11 +222,5 @@ export function seedRegistration(reg: Partial<FakeRegistration> & { eventSlug: s
     ...reg,
   };
   fakeStore.registrations.push(row);
-  return row;
-}
-
-export function seedCourse(slug: string, cecHours: number | null): FakeCourse {
-  const row: FakeCourse = { slug, cecHours };
-  fakeStore.courses.push(row);
   return row;
 }

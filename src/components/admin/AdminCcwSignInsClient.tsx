@@ -10,22 +10,18 @@ type RosterRow = {
   fullName: string;
   businessName: string | null;
   email: string;
-  iicrcRegNumber: string | null;
   registrationId: string | null;
   isWalkIn: boolean;
   provisionStatus: string;
   day1CheckedInAt: string | null;
   day2CheckedInAt: string | null;
-  checkInCount: number;
-  reversalCount: number;
   courseAccessGranted: boolean;
-  cecEligible: boolean;
+  attendanceComplete: boolean;
 };
 
 type Roster = {
   eventSlug: string;
   courseSlug: string;
-  courseCecHours: number | null;
   rows: RosterRow[];
 };
 
@@ -38,7 +34,7 @@ export function AdminCcwSignInsClient() {
   const [error, setError] = useState('');
 
   // Paper-digitisation form.
-  const [paper, setPaper] = useState({ fullName: '', email: '', businessName: '', iicrcRegNumber: '', dayIndex: 1 });
+  const [paper, setPaper] = useState({ fullName: '', email: '', businessName: '', dayIndex: 1 });
 
   const load = useCallback(async () => {
     if (!eventSlug) return;
@@ -78,7 +74,7 @@ export function AdminCcwSignInsClient() {
   }
 
   async function correct(row: RosterRow, dayIndex: 1 | 2) {
-    const reason = window.prompt(`Reverse Day ${dayIndex} check-in for ${row.fullName}? Enter a reason (recorded in the audit ledger):`);
+    const reason = window.prompt(`Reverse Day ${dayIndex} check-in for ${row.fullName}? Enter a reason (recorded in the admin log):`);
     if (!reason) return;
     await post({ action: 'correct', signInId: row.signInId, dayIndex, reason });
   }
@@ -97,9 +93,8 @@ export function AdminCcwSignInsClient() {
       fullName: paper.fullName,
       email: paper.email,
       businessName: paper.businessName || undefined,
-      iicrcRegNumber: paper.iicrcRegNumber || undefined,
     });
-    if (ok) setPaper({ fullName: '', email: '', businessName: '', iicrcRegNumber: '', dayIndex: 1 });
+    if (ok) setPaper({ fullName: '', email: '', businessName: '', dayIndex: 1 });
   }
 
   return (
@@ -108,7 +103,7 @@ export function AdminCcwSignInsClient() {
         <p className="text-[11px] font-semibold tracking-[0.2em] text-white/55 uppercase">Attendance foundation</p>
         <h1 className="mt-1 text-2xl font-bold tracking-tight">CCW Roadshow Sign-ins</h1>
         <p className="mt-1 text-sm text-white/60">
-          Day-state is derived live from the append-only ledger. Corrections append a reversal row — history is never deleted.
+          Day marks are the write-once source of truth. A correction clears a mistaken mark (recorded in the admin log). Both days = certificate of attendance.
         </p>
       </div>
 
@@ -127,7 +122,7 @@ export function AdminCcwSignInsClient() {
         </select>
         {roster && (
           <span className="text-sm text-white/60">
-            CEC hours: {roster.courseCecHours ?? '—'} · {roster.rows.length} sign-ins
+            {roster.rows.length} sign-ins
           </span>
         )}
       </div>
@@ -142,12 +137,11 @@ export function AdminCcwSignInsClient() {
               <tr className="border-b border-white/10 text-left">
                 <th className="p-3 font-semibold">Name</th>
                 <th className="p-3 font-semibold">Business</th>
-                <th className="p-3 font-semibold">IICRC#</th>
                 <th className="p-3 font-semibold">Day 1</th>
                 <th className="p-3 font-semibold">Day 2</th>
                 <th className="p-3 font-semibold">Type</th>
                 <th className="p-3 font-semibold">Provision</th>
-                <th className="p-3 font-semibold">CEC</th>
+                <th className="p-3 font-semibold">Certificate</th>
                 <th className="p-3 font-semibold">Actions</th>
               </tr>
             </thead>
@@ -160,12 +154,11 @@ export function AdminCcwSignInsClient() {
                     <span className="text-white/55">{row.email}</span>
                   </td>
                   <td className="p-3 text-white/75">{row.businessName ?? '—'}</td>
-                  <td className="p-3 font-mono text-xs text-white/75">{row.iicrcRegNumber ?? '—'}</td>
                   <td className="p-3">{row.day1CheckedInAt ? '✓' : '—'}</td>
                   <td className="p-3">{row.day2CheckedInAt ? '✓' : '—'}</td>
                   <td className="p-3">{row.isWalkIn ? 'Walk-in' : 'Registered'}</td>
                   <td className="p-3 text-white/70">{row.provisionStatus}</td>
-                  <td className="p-3">{row.cecEligible ? 'Eligible' : '—'}</td>
+                  <td className="p-3">{row.attendanceComplete ? 'Attended' : '—'}</td>
                   <td className="p-3">
                     <div className="flex flex-wrap gap-2">
                       {row.day1CheckedInAt && (
@@ -210,12 +203,6 @@ export function AdminCcwSignInsClient() {
             placeholder="Business (optional)"
             value={paper.businessName}
             onChange={(e) => setPaper((p) => ({ ...p, businessName: e.target.value }))}
-            className="rounded-lg border border-white/15 bg-white/10 px-3 py-2 text-sm"
-          />
-          <input
-            placeholder="IICRC# (optional)"
-            value={paper.iicrcRegNumber}
-            onChange={(e) => setPaper((p) => ({ ...p, iicrcRegNumber: e.target.value }))}
             className="rounded-lg border border-white/15 bg-white/10 px-3 py-2 text-sm"
           />
           <select

@@ -8,19 +8,23 @@
  * never be awaited by the capture service. The door writes fast + local; this
  * batch runs afterwards.
  *
+ * This course promotes CCW commercial products, so IICRC will NOT grant CECs:
+ * there is NO CEC pipeline here. Attending BOTH days instead issues a plain
+ * CERTIFICATE OF ATTENDANCE (reusing `LmsEnrollment.certificateIssuedAt`) — never
+ * a CEC/IICRC submission. No IICRC number is collected anywhere.
+ *
  * Reused primitives (verbatim, per §6 — do NOT reimplement):
  *  - `findOrCreateGuestUser` — HONOURS the P0-A guard: an `exists` outcome mints
  *    NO session and NEVER overwrites its password. Per §12/§10 (LOCKED, the
  *    authoritative security decision) an `exists` outcome is NOT silently
  *    attached/enrolled: a stranger typing an established account's email at the
- *    door must not bind, enrol, or CEC-credit that account. On `exists` this
- *    HALTS and quarantines the row as `needs_confirm`; the attach/enrol (and any
- *    IICRC# write) may proceed ONLY after emailed owner-confirmation — a
- *    follow-up unit (no confirm route/token exists yet). NOTE the spec is
- *    internally contradictory here (§9 says "exists -> link", §12/§10 require
- *    confirm-before-attach); the LOCKED §12 governs. A `created` account gets a
- *    random password NEVER surfaced to the operator or logs (access is delivered
- *    only via the emailed link).
+ *    door must not bind or enrol that account. On `exists` this HALTS and
+ *    quarantines the row as `needs_confirm`; the attach/enrol may proceed ONLY
+ *    after emailed owner-confirmation — a follow-up unit (no confirm route/token
+ *    exists yet). NOTE the spec is internally contradictory here (§9 says
+ *    "exists -> link", §12/§10 require confirm-before-attach); the LOCKED §12
+ *    governs. A `created` account gets a random password NEVER surfaced to the
+ *    operator or logs (access is delivered only via the emailed link).
  *  - `enrollStudentInCourse` — idempotent (`already_enrolled`).
  *  - `sendEnrollmentWelcomeEmail` — invoked fire-and-forget (`void … .catch`),
  *    never awaited.
@@ -38,13 +42,11 @@ import { findOrCreateGuestUser } from '@/lib/server/guest-checkout';
 import { sessionClaimsForUserId } from '@/lib/server/lms-auth';
 import { prisma } from '@/lib/prisma';
 
-import { finalizeCecForEvent, type FinalizeCecBatchSummary } from './cec';
-
 /** Marks enrolments created by the workshop attendance foundation. */
 export const CCW_ATTENDANCE_PAYMENT_REFERENCE = 'ccw:attendance';
 
 export interface ProvisionOptions {
-  /** AdminUser email that triggered the batch (audit trail; forwarded to CEC). */
+  /** AdminUser email that triggered the batch (audit trail). */
   initiatedByAdminEmail?: string | null;
   /** Origin used to build welcome-email links; defaults to the app origin. */
   appOrigin?: string;
@@ -108,7 +110,6 @@ export async function provisionSignIn(
         id: true,
         email: true,
         fullName: true,
-        iicrcRegNumber: true,
       },
     });
     if (!signIn) {
@@ -125,17 +126,16 @@ export async function provisionSignIn(
     const accountOutcome = outcome.status;
 
     // SECURITY (§12/§10, LOCKED): an existing established CARSI account must NEVER
-    // be silently attached, enrolled, or CEC-credited from a door-typed sign-in.
-    // A stranger typing a victim's account email at the door must not bind the
-    // sign-in to, enrol, write an IICRC# onto, or generate a regulatory CEC
-    // submission against that victim's account. So on `exists` we HALT here and
-    // quarantine the row as `needs_confirm` — no studentId/enrollmentId link, no
-    // iicrcMemberNumber write, no enrolment, no welcome email, and CEC is never
-    // reached (finalizeCec requires a non-null enrollmentId). The attach/enrol
-    // may proceed only after emailed owner-confirmation, which is a follow-up
-    // unit (no confirm route/token exists in the repo yet); until then these rows
-    // surface in the admin roster for owner review. (§9 "exists -> link"
-    // contradicts §12/§10 confirm-before-attach; the LOCKED §12 governs.)
+    // be silently attached or enrolled from a door-typed sign-in. A stranger
+    // typing a victim's account email at the door must not bind the sign-in to,
+    // or enrol, that victim's account. So on `exists` we HALT here and quarantine
+    // the row as `needs_confirm` — no studentId/enrollmentId link, no enrolment,
+    // no welcome email, and no certificate is ever reached (finalizeAttendance
+    // requires a non-null enrollmentId). The attach/enrol may proceed only after
+    // emailed owner-confirmation, which is a follow-up unit (no confirm
+    // route/token exists in the repo yet); until then these rows surface in the
+    // admin roster for owner review. (§9 "exists -> link" contradicts §12/§10
+    // confirm-before-attach; the LOCKED §12 governs.)
     if (outcome.status === 'exists') {
       await markNeedsConfirmation(signInId);
       return {
@@ -154,17 +154,6 @@ export async function provisionSignIn(
     if (!claims) {
       await markFailed(signInId);
       return { signInId, status: 'failed', accountOutcome, studentId, reason: 'inactive_account' };
-    }
-
-    // Write the IICRC# onto the student record ONLY when the account doesn't
-    // already carry one — never clobber an established member's number with a
-    // door-typed value. This is what the CEC pipeline reads later.
-    const iicrc = signIn.iicrcRegNumber?.trim();
-    if (iicrc) {
-      await prisma.lmsUser.updateMany({
-        where: { id: studentId, OR: [{ iicrcMemberNumber: null }, { iicrcMemberNumber: '' }] },
-        data: { iicrcMemberNumber: iicrc },
-      });
     }
 
     const slug = getCcwWorkshopCourseSlug();
@@ -267,23 +256,144 @@ export async function provisionDay1SignIns(
   };
 }
 
+// ---------------------------------------------------------------------------
+// Certificate of attendance (replaces CEC — this course grants no CECs)
+// ---------------------------------------------------------------------------
+
+export type FinalizeAttendanceStatus =
+  /** Not both days yet, or no enrolment — nothing to finalise. */
+  | 'not_ready'
+  /** Enrolment was revoked/refunded — never resurrected. */
+  | 'skipped_revoked'
+  /** Both days done → enrolment completed + certificate of attendance issued. */
+  | 'certified';
+
+export interface FinalizeAttendanceResult {
+  signInId: string;
+  status: FinalizeAttendanceStatus;
+  enrollmentId?: string;
+}
+
+/**
+ * Finalise ONE sign-in's certificate of attendance. When the attendee checked in
+ * BOTH days and has a linked enrolment, mark the enrolment `completed` and stamp
+ * `certificateIssuedAt` — a plain certificate of attendance, NOT a CEC/IICRC
+ * submission. NEVER throws (a failure surfaces as a status so a batch keeps
+ * going) and is idempotent: a guarded `updateMany` from `active` means a revoked/
+ * refunded enrolment is never resurrected and an already-`completed` row is left
+ * untouched (its certificate is backfilled if it was somehow missing).
+ */
+export async function finalizeAttendanceForSignIn(
+  signInId: string,
+): Promise<FinalizeAttendanceResult> {
+  const signIn = await prisma.ccwRoadshowSignIn.findUnique({
+    where: { id: signInId },
+    select: {
+      id: true,
+      day1CheckedInAt: true,
+      day2CheckedInAt: true,
+      enrollmentId: true,
+    },
+  });
+
+  if (
+    !signIn ||
+    signIn.day1CheckedInAt == null ||
+    signIn.day2CheckedInAt == null ||
+    signIn.enrollmentId == null
+  ) {
+    return { signInId, status: 'not_ready' };
+  }
+
+  const enrollmentId = signIn.enrollmentId;
+  const enrollment = await prisma.lmsEnrollment.findUnique({
+    where: { id: enrollmentId },
+    select: { id: true, status: true, certificateIssuedAt: true },
+  });
+  if (!enrollment) {
+    return { signInId, status: 'not_ready', enrollmentId };
+  }
+
+  const now = new Date();
+  const promoted = await prisma.lmsEnrollment.updateMany({
+    where: { id: enrollmentId, status: 'active' },
+    data: { status: 'completed', completedAt: now, certificateIssuedAt: now },
+  });
+
+  if (promoted.count === 0 && enrollment.status !== 'completed') {
+    // Not active and not completed → terminal/revoked; never resurrect.
+    return { signInId, status: 'skipped_revoked', enrollmentId };
+  }
+
+  // Already completed but with no certificate stamp → backfill (idempotent).
+  if (
+    promoted.count === 0 &&
+    enrollment.status === 'completed' &&
+    enrollment.certificateIssuedAt == null
+  ) {
+    await prisma.lmsEnrollment.updateMany({
+      where: { id: enrollmentId, status: 'completed' },
+      data: { certificateIssuedAt: now },
+    });
+  }
+
+  return { signInId, status: 'certified', enrollmentId };
+}
+
+export interface FinalizeAttendanceBatchSummary {
+  eventSlug: string;
+  considered: number;
+  certified: number;
+  results: FinalizeAttendanceResult[];
+}
+
+/**
+ * Issue certificates of attendance for every both-days, enrolled sign-in of an
+ * event. Resilient: each row is finalised independently.
+ */
+export async function finalizeAttendanceForEvent(
+  eventSlug: string,
+): Promise<FinalizeAttendanceBatchSummary> {
+  const rows = await prisma.ccwRoadshowSignIn.findMany({
+    where: {
+      eventSlug,
+      day1CheckedInAt: { not: null },
+      day2CheckedInAt: { not: null },
+      enrollmentId: { not: null },
+    },
+    select: { id: true },
+    orderBy: { createdAt: 'asc' },
+  });
+
+  const results: FinalizeAttendanceResult[] = [];
+  for (const row of rows) {
+    results.push(await finalizeAttendanceForSignIn(row.id));
+  }
+
+  return {
+    eventSlug,
+    considered: rows.length,
+    certified: results.filter((r) => r.status === 'certified').length,
+    results,
+  };
+}
+
 export interface CcwAttendanceBatchSummary {
   provision: ProvisionBatchSummary;
-  cec: FinalizeCecBatchSummary;
+  attendance: FinalizeAttendanceBatchSummary;
 }
 
 /**
  * The full admin-triggered async batch for an event: (1) provision pending
- * Day-1 sign-ins, then (2) finalise CEC for anyone now checked in BOTH days.
- * This is the single entry point the admin provision route calls.
+ * Day-1 sign-ins, then (2) issue certificates of attendance for anyone now
+ * checked in BOTH days. This is the single entry point the admin provision
+ * route calls.
  */
 export async function runCcwAttendanceBatch(
   eventSlug: string,
   options?: ProvisionOptions,
 ): Promise<CcwAttendanceBatchSummary> {
   const provision = await provisionDay1SignIns(eventSlug, options);
-  const cec = await finalizeCecForEvent(eventSlug, {
-    initiatedByAdminEmail: options?.initiatedByAdminEmail ?? null,
-  });
-  return { provision, cec };
+  const attendance = await finalizeAttendanceForEvent(eventSlug);
+  return { provision, attendance };
 }
