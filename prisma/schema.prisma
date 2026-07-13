@@ -66,6 +66,7 @@ model LmsUser {
   reviewReplies         LmsCourseReview[]         @relation("ReviewReplyAuthor")
   subscription          LmsSubscription?
   margotConversations   MargotConversation[]
+  ccwRoadshowSignIns    CcwRoadshowSignIn[]       @relation("SignInStudent")
 
   @@map("lms_users")
 }
@@ -284,6 +285,7 @@ model LmsEnrollment {
   student            LmsUser                @relation("EnrollmentStudent", fields: [studentId], references: [id], onDelete: Cascade)
   course             LmsCourse              @relation(fields: [courseId], references: [id], onDelete: Cascade)
   iicrcCecSubmission LmsIicrcCecSubmission?
+  ccwRoadshowSignIn  CcwRoadshowSignIn?     @relation("SignInEnrollment")
 
   @@unique([studentId, courseId], map: "uq_lms_enrollment")
   @@index([courseId], map: "ix_lms_enrollments_course_id")
@@ -862,6 +864,7 @@ model CcwRoadshowRegistration {
   createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
 
   attendees CcwRoadshowAttendee[]
+  signIns   CcwRoadshowSignIn[]
 
   @@index([eventSlug, status])
   @@index([eventSlug, createdAt(sort: Asc)])
@@ -880,6 +883,49 @@ model CcwRoadshowAttendee {
 
   @@index([registrationId])
   @@map("ccw_roadshow_attendees")
+}
+
+/// CCW/CARSI 2-day-workshop attendance foundation (unit A). One row per PERSON per EVENT.
+/// The two day-columns here are the WRITE-ONCE source of truth for attendance
+/// (set-if-null on check-in; admin corrections are direct, write-once-respecting
+/// updates). Both days set → certificate of attendance (no CEC — this course
+/// promotes CCW commercial products, so IICRC will not grant CECs).
+/// Everything is DARK behind the `CCW_ATTENDANCE_ENABLED` env flag.
+model CcwRoadshowSignIn {
+  id                 String    @id @default(uuid()) @db.Uuid
+  eventSlug          String    @map("event_slug") @db.VarChar(32)
+  /// Null = walk-in (no pre-registration matched). FK is SET NULL on registration delete.
+  registrationId     String?   @map("registration_id") @db.Uuid
+  /// Set once the attendee has been provisioned a CARSI account (async batch).
+  studentId          String?   @map("student_id") @db.Uuid
+  /// Set once the attendee is enrolled in the 2-day course (async batch).
+  enrollmentId       String?   @map("enrollment_id") @db.Uuid
+  fullName           String    @map("full_name")
+  businessName       String?   @map("business_name")
+  email              String    @db.VarChar(320)
+  normalizedEmail    String    @map("normalized_email") @db.VarChar(320)
+  normalizedBusiness String?   @map("normalized_business")
+  normalizedName     String    @map("normalized_name")
+  /// Write-once (set-if-null). Admin corrections are direct, write-once-respecting updates.
+  day1CheckedInAt    DateTime? @map("day1_checked_in_at") @db.Timestamptz(6)
+  day2CheckedInAt    DateTime? @map("day2_checked_in_at") @db.Timestamptz(6)
+  isWalkIn           Boolean   @default(false) @map("is_walk_in")
+  /// pending | provisioning | provisioned | failed — drives the async provision batch.
+  provisionStatus    String    @default("pending") @map("provision_status") @db.VarChar(16)
+  /// AdminUser.id when an admin digitised a paper entry (no FK by design).
+  signedInByAdmin    String?   @map("signed_in_by_admin") @db.Uuid
+  createdAt          DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt          DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  registration CcwRoadshowRegistration? @relation(fields: [registrationId], references: [id], onDelete: SetNull)
+  student      LmsUser?                 @relation("SignInStudent", fields: [studentId], references: [id], onDelete: SetNull)
+  enrollment   LmsEnrollment?           @relation("SignInEnrollment", fields: [enrollmentId], references: [id], onDelete: SetNull)
+
+  @@unique([eventSlug, normalizedEmail])
+  @@unique([enrollmentId])
+  @@index([eventSlug, normalizedBusiness])
+  @@index([eventSlug, normalizedName])
+  @@map("ccw_roadshow_sign_ins")
 }
 
 /// Margot public assistant — conversation threads (anonymous or linked to a learner).
