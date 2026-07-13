@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="1131" viewBox="0 0 800 1131" role="img" aria-labelledby="title desc" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+  <title id="title">School and childcare floor care: the four jobs</title>
+  <desc id="desc">The four floor-care services that win school and childcare contracts, each with its compliance anchor: carpet cleaning for occupied rooms (child-safe low-tox products, ventilation, isolate and sign damp floors); tile and grout cleaning (confirm slip resistance under AS 4663 after cleaning); vinyl strip and seal (SDS-led PPE, ventilation, physical isolation; cure and re-entry from the SDS/TDS; re-verify slip resistance to the target class under AS 4663); pressure washing with run-off control (the drain is just for rain; trade-waste approval before discharge to sewer). Foundations for every job: current SDS, chemicals register, correct labels including decanted containers, heavy work scheduled into term breaks.</desc>
+
+  <!-- Background -->
+  <rect width="800" height="1131" fill="#e9e7e2"/>
+
+  <!-- Header band -->
+  <rect x="0" y="0" width="800" height="176" fill="#1f3a52"/>
+  <text x="60" y="64" fill="#cfe0ea" font-size="18" font-weight="600" letter-spacing="1.5">CARSI &#183; FLOOR CARE FOR SCHOOLS &amp; CHILDCARE</text>
+  <text x="60" y="112" fill="#ffffff" font-size="38" font-weight="700">The four jobs that win the work</text>
+  <text x="60" y="150" fill="#bcd0dd" font-size="17" font-weight="400">Each service paired with the compliance a school or childcare contract assumes you know.</text>
+
+  <!-- Intro prompt -->
+  <text x="60" y="228" fill="#1f3a52" font-size="22" font-weight="700">Four services, four compliance anchors</text>
+  <rect x="60" y="242" width="680" height="3" fill="#7594a3"/>
+
+  <!-- JOB 1: Carpet -->
+  <g>
+    <rect x="60" y="262" width="680" height="160" rx="14" fill="#ffffff" stroke="#d5cec2" stroke-width="1.5"/>
+    <circle cx="112" cy="310" r="28" fill="#1f3a52"/>
+    <text x="112" y="319" fill="#ffffff" font-size="26" font-weight="700" text-anchor="middle">1</text>
+    <text x="158" y="302" fill="#1f3a52" font-size="21" font-weight="700">Carpet cleaning &#8212; occupied rooms</text>
+    <text x="158" y="330" fill="#334155" font-size="15.5">Hot water extraction for deep soil when there is a drying window;</text>
+    <text x="158" y="352" fill="#334155" font-size="15.5">low-moisture encapsulation when the room must reopen fast.</text>
+    <rect x="158" y="368" width="4" height="40" fill="#7594a3"/>
+    <text x="172" y="384" fill="#1f3a52" font-size="14.5" font-weight="700">Child-safe, low-tox products &#183; dilute per the label &#183; ventilate &#183;</text>
+    <text x="172" y="403" fill="#1f3a52" font-size="14.5" font-weight="700">isolate and sign damp floors. Never promise a fixed dry time.</text>
+  </g>
+
+  <!-- JOB 2: Tile & grout -->
+  <g>
+    <rect x="60" y="437" width="680" height="160" rx="14" fill="#ffffff" stroke="#d5cec2" stroke-width="1.5"/>
+    <circle cx="112" cy="485" r="28" fill="#1f3a52"/>
+    <text x="112" y="494" fill="#ffffff" font-size="26" font-weight="700" text-anchor="middle">2</text>
+    <text x="158" y="477" fill="#1f3a52" font-size="21" font-weight="700">Tile &amp; grout cleaning</text>
+    <text x="158" y="505" fill="#334155" font-size="15.5">Pre-wet, apply, dwell to the label, agitate, rinse, recover.</text>
+    <text x="158" y="527" fill="#334155" font-size="15.5">Residue that dries on the floor dulls it and holds new soil.</text>
+    <rect x="158" y="543" width="4" height="40" fill="#7594a3"/>
+    <text x="172" y="559" fill="#1f3a52" font-size="14.5" font-weight="700">After cleaning, confirm the in-service floor&#8217;s slip resistance</text>
+    <text x="172" y="578" fill="#1f3a52" font-size="14.5" font-weight="700">against the site&#8217;s target class under AS 4663.</text>
+  </g>
+
+  <!-- JOB 3: Vinyl strip & seal -->
+  <g>
+    <rect x="60" y="612" width="680" height="160" rx="14" fill="#ffffff" stroke="#d5cec2" stroke-width="1.5"/>
+    <circle cx="112" cy="660" r="28" fill="#1f3a52"/>
+    <text x="112" y="669" fill="#ffffff" font-size="26" font-weight="700" text-anchor="middle">3</text>
+    <text x="158" y="652" fill="#1f3a52" font-size="21" font-weight="700">Vinyl strip &amp; seal &#8212; the high-risk job</text>
+    <text x="158" y="680" fill="#334155" font-size="15.5">Caustic strippers burn skin and eyes: SDS-led PPE, ventilation</text>
+    <text x="158" y="702" fill="#334155" font-size="15.5">and spill control &#8212; and physical isolation, not a sign alone.</text>
+    <rect x="158" y="718" width="4" height="40" fill="#7594a3"/>
+    <text x="172" y="734" fill="#1f3a52" font-size="14.5" font-weight="700">Cure &amp; re-entry come from the SDS/TDS, not guesswork &#8212; then</text>
+    <text x="172" y="753" fill="#1f3a52" font-size="14.5" font-weight="700">re-verify slip resistance to the target class (AS 4663).</text>
+  </g>
+
+  <!-- JOB 4: Pressure washing -->
+  <g>
+    <rect x="60" y="787" width="680" height="160" rx="14" fill="#ffffff" stroke="#d5cec2" stroke-width="1.5"/>
+    <circle cx="112" cy="835" r="28" fill="#1f3a52"/>
+    <text x="112" y="844" fill="#ffffff" font-size="26" font-weight="700" text-anchor="middle">4</text>
+    <text x="158" y="827" fill="#1f3a52" font-size="21" font-weight="700">Pressure washing &#8212; with run-off control</text>
+    <text x="158" y="855" fill="#334155" font-size="15.5">Wash water carries detergents, grit and grease. Confine the zone,</text>
+    <text x="158" y="877" fill="#334155" font-size="15.5">cover stormwater pits, and recover the water &#8212; never let it run.</text>
+    <rect x="158" y="893" width="4" height="40" fill="#7594a3"/>
+    <text x="172" y="909" fill="#1f3a52" font-size="14.5" font-weight="700">&#8220;The drain is just for rain&#8221; &#8212; trade-waste approval is required</text>
+    <text x="172" y="928" fill="#1f3a52" font-size="14.5" font-weight="700">before any discharge to sewer. Ask the water authority early.</text>
+  </g>
+
+  <!-- Foundations strip -->
+  <rect x="60" y="963" width="680" height="92" rx="14" fill="#1f3a52"/>
+  <text x="84" y="995" fill="#ffffff" font-size="17" font-weight="700" letter-spacing="0.5">BEFORE ANY JOB &#8212; WHAT EVERY CONTRACT ASSUMES</text>
+  <text x="84" y="1020" fill="#cfe0ea" font-size="14.5">Current SDS for every chemical (reviewed within 5 years) &#183; a maintained chemicals register &#183;</text>
+  <text x="84" y="1040" fill="#cfe0ea" font-size="14.5">correct labels, including decanted containers &#183; heavy work scheduled into term breaks.</text>
+
+  <!-- Footer -->
+  <line x1="60" y1="1072" x2="740" y2="1072" stroke="#c9c2b6" stroke-width="1.5"/>
+  <text x="60" y="1092" fill="#5b5346" font-size="13">This training supports your judgement &#8212; it does not replace Safety Data Sheets, manufacturer technical data,</text>
+  <text x="60" y="1109" fill="#5b5346" font-size="13">Australian Standards or your own qualified assessment of each site.</text>
+  <text x="60" y="1126" fill="#7a7263" font-size="12.5" font-style="italic">From the CARSI course &#8220;Commercial Floor Care for Schools &amp; Childcare Contracts&#8221; &#183; carsi.com.au</text>
+</svg>
