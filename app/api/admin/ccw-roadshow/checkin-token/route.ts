@@ -29,6 +29,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ detail: 'Unauthorized' }, { status: 401 });
   }
 
+  // Implicit CSRF defense on this cookie-authenticated admin POST — mirror the
+  // sibling ccw-roadshow admin routes (sign-ins, provision).
+  const contentType = request.headers.get('content-type') ?? '';
+  if (!contentType.toLowerCase().includes('application/json')) {
+    return NextResponse.json({ detail: 'Expected application/json' }, { status: 415 });
+  }
+
   const body = (await request.json().catch(() => ({}))) as {
     eventSlug?: string;
     dayIndex?: number;

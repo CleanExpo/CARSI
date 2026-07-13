@@ -108,10 +108,16 @@ export function AdminCcwSignInsClient() {
       </div>
 
       <div className="flex items-center gap-3">
-        <label className="text-sm text-white/70">Event</label>
+        <label htmlFor="ccw-event-select" className="text-sm text-white/70">Event</label>
         <select
+          id="ccw-event-select"
           value={eventSlug}
-          onChange={(e) => setEventSlug(e.target.value)}
+          // Clear the roster immediately on event switch so a stale roster from the
+          // previous event can never be acted on during the reload.
+          onChange={(e) => {
+            setRoster(null);
+            setEventSlug(e.target.value);
+          }}
           className="rounded-lg border border-white/15 bg-white/10 px-3 py-2 text-sm"
         >
           {ccwRoadshowEvents.map((ev) => (
@@ -188,24 +194,28 @@ export function AdminCcwSignInsClient() {
         <p className="mt-1 text-sm text-white/60">Records an offline/paper entry against this event (source: paper).</p>
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
           <input
+            aria-label="Paper sign-in full name"
             placeholder="Full name"
             value={paper.fullName}
             onChange={(e) => setPaper((p) => ({ ...p, fullName: e.target.value }))}
             className="rounded-lg border border-white/15 bg-white/10 px-3 py-2 text-sm"
           />
           <input
+            aria-label="Paper sign-in email"
             placeholder="Email"
             value={paper.email}
             onChange={(e) => setPaper((p) => ({ ...p, email: e.target.value }))}
             className="rounded-lg border border-white/15 bg-white/10 px-3 py-2 text-sm"
           />
           <input
+            aria-label="Paper sign-in business (optional)"
             placeholder="Business (optional)"
             value={paper.businessName}
             onChange={(e) => setPaper((p) => ({ ...p, businessName: e.target.value }))}
             className="rounded-lg border border-white/15 bg-white/10 px-3 py-2 text-sm"
           />
           <select
+            aria-label="Paper sign-in day"
             value={paper.dayIndex}
             onChange={(e) => setPaper((p) => ({ ...p, dayIndex: Number(e.target.value) }))}
             className="rounded-lg border border-white/15 bg-white/10 px-3 py-2 text-sm"
