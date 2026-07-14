@@ -31,9 +31,10 @@ describe('resolveInitialEventSlug (QR/vanity-URL preselect)', () => {
 });
 
 describe('event capacity config', () => {
-  it('caps Melbourne at 15 and Sydney at 12', () => {
+  it('caps Melbourne at 15, Sydney at 12, Brisbane at 15', () => {
     expect(getCcwRoadshowEvent('melbourne')?.capacity).toBe(15);
     expect(getCcwRoadshowEvent('sydney')?.capacity).toBe(12);
+    expect(getCcwRoadshowEvent('brisbane')?.capacity).toBe(15);
   });
 
   it('maps every event to a calendar event id', () => {
@@ -49,6 +50,7 @@ describe('event capacity config', () => {
   it('points each event at its real Google Calendar id', () => {
     expect(getCcwRoadshowEvent('melbourne')?.calendarEventId).toBe('1d1uqjm6an36n1kgc6s4s3ln7s');
     expect(getCcwRoadshowEvent('sydney')?.calendarEventId).toBe('h6qm8t3muuv44ht9gqann5dhuk');
+    expect(getCcwRoadshowEvent('brisbane')?.calendarEventId).toBe('1nnfc9hv164f4882q09krd1ies');
   });
 });
 

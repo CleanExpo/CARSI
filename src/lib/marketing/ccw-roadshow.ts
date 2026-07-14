@@ -1,6 +1,6 @@
 export type CcwRoadshowEvent = {
   slug: string;
-  city: 'Melbourne' | 'Sydney';
+  city: 'Melbourne' | 'Sydney' | 'Brisbane';
   title: string;
   dates: string;
   dateRangeLabel: string;
@@ -11,7 +11,7 @@ export type CcwRoadshowEvent = {
   streetAddress: string;
   suburb: string;
   suburbStatePostcode: string;
-  state: 'VIC' | 'NSW';
+  state: 'VIC' | 'NSW' | 'QLD';
   description: string;
   capacity: number;
   calendarEventId: string;
@@ -106,6 +106,27 @@ export const ccwRoadshowEvents: CcwRoadshowEvent[] = [
     // Days — Sydney", 30–31 Jul 2026). The previous id was stale → guest-add 404'd
     // silently. Verified against Google Calendar 2026-06-30.
     calendarEventId: 'h6qm8t3muuv44ht9gqann5dhuk',
+  },
+  {
+    slug: 'brisbane',
+    city: 'Brisbane',
+    title: `${ccwRoadshowTitle} - Brisbane`,
+    dates: '11-12 August 2026',
+    dateRangeLabel: 'Tuesday 11 August - Wednesday 12 August 2026',
+    startDateIso: '2026-08-11T08:30:00+10:00',
+    endDateIso: '2026-08-12T16:30:00+10:00',
+    timeLabel: '8.30am-4.30pm both days',
+    venueName: 'Carpet Cleaners Warehouse Boondall',
+    streetAddress: 'D1-3/194 Zillmere Road',
+    suburb: 'Boondall',
+    suburbStatePostcode: 'Boondall QLD 4034',
+    state: 'QLD',
+    description:
+      'Two practical days with Phill McGurk and the CCW team, connecting training, equipment, service design, chemistry, quoting confidence and business growth for carpet, rug, stain and tile cleaning operators.',
+    capacity: 15,
+    // Real event on phill.mcgurk@gmail.com ("CARSI x CCW Business Growth Days —
+    // Brisbane", 11–12 Aug 2026), created 2026-07-14. QLD is AEST (UTC+10, no DST).
+    calendarEventId: '1nnfc9hv164f4882q09krd1ies',
   },
 ];
 

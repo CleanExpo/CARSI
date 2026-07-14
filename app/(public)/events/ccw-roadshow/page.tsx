@@ -44,11 +44,12 @@ const canonical = `${siteUrl}${ccwRoadshowPath}`;
 export const metadata: Metadata = {
   title: 'Grow Your Cleaning Business | CARSI x CCW Roadshow 2026',
   description:
-    'Free for CCW past and current customers. Spend two practical days with Phill McGurk at CCW Melbourne or Sydney and claim a free entry token when you register.',
+    'Free for CCW past and current customers. Spend two practical days with Phill McGurk at CCW Melbourne, Sydney or Brisbane and claim a free entry token when you register.',
   alternates: { canonical },
   keywords: [
     'carpet cleaning training Melbourne',
     'carpet cleaning training Sydney',
+    'carpet cleaning training Brisbane',
     'rug cleaning training Australia',
     'stain removal training',
     'tile cleaning training',
@@ -58,7 +59,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Grow Your Cleaning Business with CARSI x CCW',
     description:
-      'Two practical business-growth days with Phill McGurk inside CCW Melbourne and Sydney locations.',
+      'Two practical business-growth days with Phill McGurk inside CCW Melbourne, Sydney and Brisbane locations.',
     url: canonical,
     type: 'website',
     images: ['/og-image.png'],
@@ -83,9 +84,9 @@ const faqs = [
       'All CCW past and current customers can attend free. Register on the CARSI event page to claim a free entry token for check-in.',
   },
   {
-    question: 'Where are the Melbourne and Sydney events held?',
+    question: 'Where are the Melbourne, Sydney and Brisbane events held?',
     answer:
-      'Melbourne is held at Carpet Cleaners Warehouse, Unit 1/5 Gatwick Road, Bayswater North VIC 3153. Sydney is held at Carpet Cleaners Warehouse, 2/8 Tollis Place, Seven Hills NSW 2147.',
+      'Melbourne is held at Carpet Cleaners Warehouse, Unit 1/5 Gatwick Road, Bayswater North VIC 3153. Sydney is held at Carpet Cleaners Warehouse, 2/8 Tollis Place, Seven Hills NSW 2147. Brisbane is held at Carpet Cleaners Warehouse, D1-3/194 Zillmere Road, Boondall QLD 4034.',
   },
   {
     question: 'What topics are covered?',
@@ -94,7 +95,7 @@ const faqs = [
   },
 ];
 
-type CcwFocusCity = 'melbourne' | 'sydney';
+type CcwFocusCity = 'melbourne' | 'sydney' | 'brisbane';
 
 export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) {
   const focusEvent = focusSlug ? getCcwRoadshowEvent(focusSlug) : null;
@@ -105,7 +106,7 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
       <FAQSchema questions={faqs} />
       <ItemListSchema
         name="CARSI x CCW Business Growth Days event dates"
-        description="Melbourne and Sydney CARSI x CCW roadshow events for cleaners who want better jobs, stronger quoting confidence and practical business growth."
+        description="Melbourne, Sydney and Brisbane CARSI x CCW roadshow events for cleaners who want better jobs, stronger quoting confidence and practical business growth."
         items={ccwRoadshowEvents.map((event) => ({
           name: event.title,
           description: event.description,
@@ -169,7 +170,7 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#ed9d24] opacity-40" />
                   <span className="relative inline-flex h-2 w-2 rounded-full bg-[#ed9d24]" />
                 </span>
-                {focusEvent ? `${focusEvent.city} · ${focusEvent.dates}` : 'Melbourne + Sydney · July 2026'}
+                {focusEvent ? `${focusEvent.city} · ${focusEvent.dates}` : 'Melbourne, Sydney + Brisbane · Jul-Aug 2026'}
               </span>
 
               <p className={`mt-5 ${marketingEyebrowAmber}`}>
@@ -191,8 +192,8 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
               <div className="mt-8 grid gap-3 sm:grid-cols-3">
                 <div className={marketingStatCard}>
                   <CalendarDays className="mb-3 h-4 w-4 text-[#146fc2] dark:text-[#7ec5ff]" aria-hidden />
-                  <p className="text-sm font-semibold text-slate-900 dark:text-white/90">July 2026</p>
-                  <p className={`mt-1 ${marketingBodySm}`}>Melbourne 22-23, Sydney 30-31</p>
+                  <p className="text-sm font-semibold text-slate-900 dark:text-white/90">Jul-Aug 2026</p>
+                  <p className={`mt-1 ${marketingBodySm}`}>Melbourne 22-23 Jul, Sydney 30-31 Jul, Brisbane 11-12 Aug</p>
                 </div>
                 <div className={marketingStatCard}>
                   <Users className="mb-3 h-4 w-4 text-[#ed9d24]/80" aria-hidden />
@@ -364,7 +365,7 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
               <MarketingSectionHeader
                 eyebrow="Why CCW Facilities Matter"
                 title="Practical training inside Carpet Cleaners Warehouse"
-                body={`This is not a hotel-room lecture. The Melbourne and Sydney days happen inside CCW locations, so the training can connect directly to equipment, chemical choices, service offers and the questions cleaners ask before they buy or quote. ${ccwRoadshowPresenter.value}`}
+                body={`This is not a hotel-room lecture. The Melbourne, Sydney and Brisbane days happen inside CCW locations, so the training can connect directly to equipment, chemical choices, service offers and the questions cleaners ask before they buy or quote. ${ccwRoadshowPresenter.value}`}
                 className="mb-0 md:mb-0"
               />
             </div>
