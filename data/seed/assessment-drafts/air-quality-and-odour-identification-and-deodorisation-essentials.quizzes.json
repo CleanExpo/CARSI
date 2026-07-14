@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "status": "draft",
+  "courseSlug": "air-quality-and-odour-identification-and-deodorisation-essentials",
+  "disclaimer": "Educational assessment. CARSI is an IICRC-approved CEC provider; this is CARSI-original Australian training, not IICRC certification.",
+  "note": "Australian-produced. Grounded in the course's own modules. Founder to review before wiring live.",
+  "quizzes": [
+    {
+      "quizId": "ef5e4116-7d75-5090-9fff-8fe261db4496",
+      "lessonTitle": "Knowledge check",
+      "title": "Air Quality and Odour: Identification and Deodorisation Essentials — Course Quiz",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "According to the course, what does our sense of smell actually detect when we perceive an odour?",
+          "options": [
+            "Volatile chemical compounds, called odorants, that become airborne and stimulate receptors in the nose",
+            "Fine dust particles that settle on the lining of the nose",
+            "Sudden changes in indoor air pressure",
+            "High humidity acting directly on the sinuses"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M1 — What is Odour and Why it Matters"
+        },
+        {
+          "questionText": "A musty, earthy smell in a building most commonly indicates which underlying problem?",
+          "options": [
+            "High concentrations of VOCs off-gassing from fresh paint",
+            "Hidden moisture supporting mould and microbial growth, producing MVOCs",
+            "Combustion residues left over from a recent fire",
+            "Outdoor agricultural odours drawn in through the ventilation system"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M2 — Categories of Odours and Their Characteristics"
+        },
+        {
+          "questionText": "Which deodorising approach does the course describe as especially suited to biological odours such as pet urine and decomposing matter?",
+          "options": [
+            "Ozone generators operated in occupied rooms",
+            "Masking agents used as the primary treatment",
+            "Enzyme-based (biologically active) cleaners",
+            "HEPA filtration used on its own"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "sourceRef": "M7 — Deodorisation Methods and When to Use Them"
+        },
+        {
+          "questionText": "How does ventilation primarily help to control odours?",
+          "options": [
+            "By sealing the building so that odours cannot escape",
+            "By diluting contaminated air with fresh outdoor air and exhausting odorous gases",
+            "By raising the indoor temperature to mask the smells",
+            "By adding fragrance to the incoming air supply"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M6 — Ventilation and Air Movement Considerations"
+        },
+        {
+          "questionText": "What does the course identify as the essential first step in any deodorisation effort?",
+          "options": [
+            "Applying a pleasant masking fragrance",
+            "Running an ozone generator for several hours",
+            "Addressing and removing the odour source",
+            "Installing plug-in air fresheners throughout the space"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "sourceRef": "M7 — Deodorisation Methods and When to Use Them"
+        },
+        {
+          "questionText": "What is the key safety difference between ozone generators and hydroxyl generators?",
+          "options": [
+            "Ozone must be used only in unoccupied spaces, while hydroxyl generators can be used safely with occupants present",
+            "Both ozone and hydroxyl generators may be operated with occupants present",
+            "Hydroxyl generators must be used only in sealed, unoccupied rooms",
+            "Ozone is safe to use in occupied spaces and leaves no harmful byproducts"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M8 — Equipment Setups for Odour Control"
+        },
+        {
+          "questionText": "Which statement about air filtration devices for odour control is correct?",
+          "options": [
+            "HEPA filters remove gaseous odours, while activated carbon filters capture particulates",
+            "HEPA filters capture airborne particulates but do not remove gaseous odours, whereas activated carbon adsorbs odour gases and VOCs",
+            "Both HEPA and activated carbon filters only remove particulates",
+            "Activated carbon filters never need to be replaced once installed"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M8 — Equipment Setups for Odour Control"
+        },
+        {
+          "questionText": "After treatment, what provides objective evidence that odour levels have actually been reduced?",
+          "options": [
+            "Asking occupants to sign off without taking any measurements",
+            "Measuring only the temperature of the room",
+            "Relying on the strength of a masking fragrance",
+            "Using a photoionisation detector (PID) to measure VOC concentrations, ideally against a baseline taken before treatment"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "sourceRef": "M10 — Final Odour Clearance and Verification"
+        }
+      ]
+    }
+  ]
+}

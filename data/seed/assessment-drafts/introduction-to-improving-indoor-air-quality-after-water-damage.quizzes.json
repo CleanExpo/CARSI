@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "status": "draft",
+  "courseSlug": "introduction-to-improving-indoor-air-quality-after-water-damage",
+  "disclaimer": "Educational assessment. CARSI is an IICRC-approved CEC provider; this is CARSI-original Australian training, not IICRC certification.",
+  "note": "Australian-produced. Grounded in the course's own modules. Founder to review before wiring live.",
+  "quizzes": [
+    {
+      "quizId": "de3ddac0-142d-52a0-a53f-5e8edcb1eacc",
+      "lessonTitle": "Knowledge check",
+      "title": "Improving Indoor Air Quality After Water Damage — Knowledge Check",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "According to the course, what is the most common contaminant found in a building after water damage?",
+          "options": [
+            "Mould",
+            "Asbestos",
+            "Radon gas",
+            "Carbon monoxide"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M1 — The Impact of Water Damage on Indoor Air Quality"
+        },
+        {
+          "questionText": "How soon can mould start growing after water exposure?",
+          "options": [
+            "Within 24 to 48 hours",
+            "Within 6 to 8 hours",
+            "Only after 2 to 3 weeks",
+            "Only after several months"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M2 — Identifying Common Contaminants After Water Damage"
+        },
+        {
+          "questionText": "Which tool is used to measure the concentration of volatile organic compounds (VOCs) in the air in real time?",
+          "options": [
+            "A Photoionisation Detector (PID)",
+            "An ATP tester",
+            "A moisture meter",
+            "An infrared camera"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M3 — Tools and Techniques for Assessing Indoor Air Quality"
+        },
+        {
+          "questionText": "Which device is used to detect biological contamination on surfaces by measuring adenosine triphosphate?",
+          "options": [
+            "An ATP tester",
+            "A Photoionisation Detector (PID)",
+            "A moisture meter",
+            "A spore trap"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M2 — Identifying Common Contaminants After Water Damage"
+        },
+        {
+          "questionText": "To help prevent further mould growth, relative humidity should be kept below what level?",
+          "options": [
+            "Below 60%",
+            "Below 90%",
+            "Above 75%",
+            "Exactly 100%"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M3 — Tools and Techniques for Assessing Indoor Air Quality"
+        },
+        {
+          "questionText": "Which non-invasive tool identifies temperature differences in surfaces that often correlate with hidden moisture?",
+          "options": [
+            "An infrared camera",
+            "A Photoionisation Detector (PID)",
+            "An ATP tester",
+            "A HEPA air scrubber"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M3 — Tools and Techniques for Assessing Indoor Air Quality"
+        },
+        {
+          "questionText": "During mould remediation, what is the purpose of a negative air pressure system?",
+          "options": [
+            "To contain mould and prevent spores from migrating to other areas of the building",
+            "To raise indoor humidity to speed up drying",
+            "To measure the concentration of VOCs in the air",
+            "To record before-and-after air quality readings"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M4 — Remediation Techniques for Improving Indoor Air Quality"
+        },
+        {
+          "questionText": "What should documentation of air quality improvements include after remediation is complete?",
+          "options": [
+            "Before-and-after air quality measurements such as moisture, air sampling, VOC and humidity readings",
+            "Only a verbal description with no measurements recorded",
+            "Just the final invoice provided to the client",
+            "A prediction of the building's future resale value"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M5 — Documenting and Reporting Air Quality Improvements"
+        }
+      ]
+    }
+  ]
+}

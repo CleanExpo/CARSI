@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "status": "draft",
+  "courseSlug": "introduction-to-air-quality-fundamentals",
+  "disclaimer": "Educational assessment. CARSI is an IICRC-approved CEC provider; this is CARSI-original Australian training, not IICRC certification.",
+  "note": "Australian-produced. Grounded in the course's own modules. Founder to review before wiring live.",
+  "quizzes": [
+    {
+      "quizId": "e4eeba27-3a36-5371-ae27-965ced978e38",
+      "lessonTitle": "Knowledge check",
+      "title": "Introduction to Air Quality Fundamentals — Knowledge Check",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "According to the reading, why can pollutants become concentrated and potentially harmful indoors?",
+          "options": [
+            "Because indoor environments are enclosed and can trap pollutants",
+            "Because indoor air always contains more oxygen than outdoor air",
+            "Because outdoor air is free of any pollutants",
+            "Because higher indoor temperatures destroy pollutants"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M1 — Understanding Indoor Air Quality (IAQ)"
+        },
+        {
+          "questionText": "Volatile organic compounds (VOCs) released from paints, solvents and adhesives are an example of which type of contaminant?",
+          "options": [
+            "Biological contaminants",
+            "Chemical contaminants",
+            "Particulate matter",
+            "Radiological contaminants"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M2 — Common Indoor Air Contaminants in Restoration and Cleaning"
+        },
+        {
+          "questionText": "What does mould typically release into the air when it is disturbed during restoration work?",
+          "options": [
+            "Spores",
+            "Volatile organic compounds",
+            "Soot particles",
+            "Carbon monoxide"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M2 — Common Indoor Air Contaminants in Restoration and Cleaning"
+        },
+        {
+          "questionText": "What does the measure air changes per hour (ACH) describe?",
+          "options": [
+            "How many times the air within a room is replaced or cleaned in one hour",
+            "The number of air movers running in a room",
+            "The efficiency rating printed on an HVAC filter",
+            "The relative humidity of the room as a percentage"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M3 — Ventilation and Air Exchange Principles"
+        },
+        {
+          "questionText": "During mould remediation, what type of pressure should be established in the contaminated area to stop particles escaping into cleaner areas?",
+          "options": [
+            "Positive air pressure",
+            "Negative air pressure",
+            "Neutral air pressure",
+            "Increased humidity"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M3 — Ventilation and Air Exchange Principles"
+        },
+        {
+          "questionText": "Which assessment tool is used to identify wet materials that could become breeding grounds for mould and bacteria?",
+          "options": [
+            "Particle counter",
+            "Moisture metre",
+            "VOC metre",
+            "Temperature and humidity metre"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M4 — Air Quality Monitoring and Assessment Tools"
+        },
+        {
+          "questionText": "What relative humidity range does the reading say is generally recommended to help limit microbial growth?",
+          "options": [
+            "0–20%",
+            "30–60%",
+            "60–80%",
+            "80–100%"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M5 — Strategies to Improve and Maintain Air Quality"
+        },
+        {
+          "questionText": "Which approach does the reading describe as the most effective strategy for managing indoor air quality?",
+          "options": [
+            "Source control — eliminating or reducing pollutant sources",
+            "Running portable air purifiers continuously",
+            "Raising the indoor temperature",
+            "Sealing all windows permanently"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M5 — Strategies to Improve and Maintain Air Quality"
+        }
+      ]
+    }
+  ]
+}

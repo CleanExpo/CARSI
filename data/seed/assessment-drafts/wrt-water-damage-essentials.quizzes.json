@@ -1,0 +1,102 @@
+{
+  "version": 1,
+  "status": "draft",
+  "courseSlug": "wrt-water-damage-essentials",
+  "disclaimer": "Educational assessment. CARSI is an IICRC-approved CEC provider; this is CARSI-original Australian training, not IICRC certification.",
+  "note": "Australian-produced. Grounded in the course's own modules. Founder to review before wiring live.",
+  "quizzes": [
+    {
+      "quizId": "7cd16981-58d9-533b-a0e3-7f632fd4e687",
+      "lessonTitle": "Knowledge check",
+      "title": "Water Damage Restoration — Essentials: Knowledge Check",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "According to the lesson, what does water damage restoration begin with?",
+          "options": [
+            "Correctly classifying the loss",
+            "Extracting all standing water",
+            "Setting up dehumidifiers",
+            "Applying antimicrobial agents"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "Water Damage Fundamentals — Categories and Classes of Water Damage"
+        },
+        {
+          "questionText": "Into how many categories is water grouped?",
+          "options": [
+            "Two",
+            "Three",
+            "Four",
+            "Six"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Water Damage Fundamentals — Categories and Classes of Water Damage"
+        },
+        {
+          "questionText": "Water is grouped into categories according to what?",
+          "options": [
+            "Contamination level",
+            "The rate of evaporation required",
+            "The temperature of the water",
+            "The size of the affected area"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "Water Damage Fundamentals — Categories and Classes of Water Damage"
+        },
+        {
+          "questionText": "Affected materials are grouped into classes according to what?",
+          "options": [
+            "Their contamination level",
+            "The rate of evaporation required",
+            "The number of rooms affected",
+            "The category of the water"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Water Damage Fundamentals — Categories and Classes of Water Damage"
+        },
+        {
+          "questionText": "In the lesson, what is grouped by the rate of evaporation required?",
+          "options": [
+            "The water itself",
+            "The affected materials (into classes)",
+            "The contamination level",
+            "The job documentation"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Water Damage Fundamentals — Categories and Classes of Water Damage"
+        },
+        {
+          "questionText": "Understanding the distinctions between categories and classes guides which of the following, according to the lesson?",
+          "options": [
+            "Safe handling, drying strategy, and documentation",
+            "Only the final invoicing of the job",
+            "Only the choice of cleaning chemicals",
+            "Only the disposal of waste materials"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "Water Damage Fundamentals — Categories and Classes of Water Damage"
+        },
+        {
+          "questionText": "Which statement correctly matches how the lesson describes the two groupings?",
+          "options": [
+            "Water is grouped by contamination level; materials are grouped by the rate of evaporation required",
+            "Water is grouped by rate of evaporation; materials are grouped by contamination level",
+            "Both water and materials are grouped by contamination level",
+            "Both water and materials are grouped by the rate of evaporation required"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "Water Damage Fundamentals — Categories and Classes of Water Damage"
+        }
+      ]
+    }
+  ]
+}

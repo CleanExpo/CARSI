@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "status": "draft",
+  "courseSlug": "introduction-to-iaq-and-mould-understanding-airborne-spread-and-containment",
+  "disclaimer": "Educational assessment. CARSI is an IICRC-approved CEC provider; this is CARSI-original Australian training, not IICRC certification.",
+  "note": "Australian-produced. Grounded in the course's own modules. Founder to review before wiring live.",
+  "quizzes": [
+    {
+      "quizId": "730d31ff-cbc6-588a-a4cd-0e648cc02df7",
+      "lessonTitle": "Knowledge check",
+      "title": "Introduction to IAQ and Mould: Understanding Airborne Spread and Containment — Course Quiz",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "According to the course, what does mould release that can circulate throughout a building and cause health problems when inhaled?",
+          "options": [
+            "Microscopic spores",
+            "Carbon dioxide",
+            "Ground-level ozone",
+            "Volatile plasticisers"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M1 — The Impact of Mould on Indoor Air Quality (IAQ)"
+        },
+        {
+          "questionText": "Which toxic substances, produced by some moulds such as Stachybotrys chartarum, can negatively affect the immune system and contribute to respiratory illness when airborne?",
+          "options": [
+            "Mycotoxins",
+            "Bacterial endotoxins",
+            "Nitrates",
+            "Chlorofluorocarbons"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M1 — The Impact of Mould on Indoor Air Quality (IAQ)"
+        },
+        {
+          "questionText": "The course identifies which factor as the most important in the spread of mould, with colonies growing faster and releasing more spores when it is high?",
+          "options": [
+            "Moisture",
+            "Air temperature alone",
+            "Available light",
+            "The age of the building"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M2 — Understanding the Mechanisms of Mould Spread Through the Air"
+        },
+        {
+          "questionText": "Above which humidity level does the course say a perfect environment for mould growth is created?",
+          "options": [
+            "60%",
+            "30%",
+            "45%",
+            "90%"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M2 — Understanding the Mechanisms of Mould Spread Through the Air"
+        },
+        {
+          "questionText": "How is negative pressure created in a mould-affected area so that spores stay contained during remediation?",
+          "options": [
+            "Air scrubbers or negative air machines draw air out of the space so that air flows inward from uncontaminated areas",
+            "All windows are opened to increase natural airflow through the space",
+            "The building's HVAC system is set to its maximum fan speed",
+            "The affected room is heated well above normal room temperature"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M3 — Containment Strategies to Prevent Airborne Mould Spread"
+        },
+        {
+          "questionText": "Which Personal Protective Equipment does the course specify for restoration workers inside the contained zone?",
+          "options": [
+            "Respirators equipped with HEPA filters, protective suits, gloves and goggles",
+            "Cloth face masks and cotton aprons",
+            "Ear protection and hard hats",
+            "Cotton gloves only"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M3 — Containment Strategies to Prevent Airborne Mould Spread"
+        },
+        {
+          "questionText": "During remediation, how should heavily contaminated materials such as drywall and carpeting be handled before disposal?",
+          "options": [
+            "Sealed in plastic bags so spores are not released, then disposed of in accordance with local regulations",
+            "Left to dry in the open air before being carried out",
+            "Rinsed with water and returned to service",
+            "Stacked uncovered outside the containment barrier"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M4 — Remediation Techniques for Mould and Airborne Spores"
+        },
+        {
+          "questionText": "What is the purpose of post-remediation air testing described in the course?",
+          "options": [
+            "To confirm that airborne spores have been removed and that spore levels are within safe limits",
+            "To measure the building's electricity consumption during works",
+            "To decide the market value of the property after restoration",
+            "To identify which brand of dehumidifier performs best"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M5 — Monitoring and Maintaining IAQ After Mould Remediation"
+        }
+      ]
+    }
+  ]
+}

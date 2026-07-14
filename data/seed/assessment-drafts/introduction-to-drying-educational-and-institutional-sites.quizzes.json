@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "status": "draft",
+  "courseSlug": "introduction-to-drying-educational-and-institutional-sites",
+  "disclaimer": "Educational assessment. CARSI is an IICRC-approved CEC provider; this is CARSI-original Australian training, not IICRC certification.",
+  "note": "Australian-produced. Grounded in the course's own modules. Founder to review before wiring live.",
+  "quizzes": [
+    {
+      "quizId": "b0404640-6b83-51b4-b1ae-4effca1f8f30",
+      "lessonTitle": "Knowledge check",
+      "title": "Introduction to Drying Educational and Institutional Sites — Knowledge Check",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "In a laboratory, which feature does the lesson say must be protected from moisture because corrosion can compromise its ability to remove hazardous substances from the air?",
+          "options": [
+            "Exhaust ventilation systems",
+            "Emergency eye wash stations",
+            "Chemical trench drainage networks",
+            "Scales and microscopes"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M1 — Special Design Features (Laboratories)"
+        },
+        {
+          "questionText": "In auditoriums, which components does the lesson identify as particularly susceptible to rust and requiring specialised climate control around them?",
+          "options": [
+            "Expansive hardwood stages",
+            "Soundboards, lighting arrays and orchestra shell hydraulics",
+            "Fibre optic backbones and routing equipment",
+            "Museum-standard crate packaging"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M1 — Special Design Features (Auditoriums)"
+        },
+        {
+          "questionText": "When relocating flood-threatened archives and collections, the lesson recommends coordinating relocation logistics with which specialists?",
+          "options": [
+            "Specialised historic architects",
+            "Radiation safety personnel",
+            "Insurance-adjusted fine arts specialists",
+            "Electrical contractors"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "sourceRef": "M1 — Special Design Features (Archives and Collections)"
+        },
+        {
+          "questionText": "According to the lesson, what must be maintained on a facility's fire protection system even if repairs to the water mains, post indicator valves or fire pumps take months?",
+          "options": [
+            "Maximum portable generator wattage",
+            "Optimal laboratory humidity levels",
+            "Museum-standard environmental monitoring",
+            "Code-minimum operational nozzle pressures"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "sourceRef": "M2 — Shared Infrastructure (Fire Protection Systems)"
+        },
+        {
+          "questionText": "To manage the unpredictable power demands of running drying equipment and facility electronics simultaneously for months, the lesson recommends establishing what?",
+          "options": [
+            "Open budgetary electrical allocation allowances",
+            "Compartmentalised drying zones",
+            "Redundant fibre optic backbones",
+            "Interim supplemental water supplies"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M2 — Shared Infrastructure (Power Distribution)"
+        },
+        {
+          "questionText": "When relocating athletics dormitories during drying, which occupants does the lesson single out as particularly vulnerable to mould exposure and off-gassed volatile organic compounds (VOCs)?",
+          "options": [
+            "Graduate pharmaceutical researchers",
+            "Students with compromised immune systems",
+            "Faculty attending commencement ceremonies",
+            "Students without assistive technology"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M3 — Building Population Factors (Student Health)"
+        },
+        {
+          "questionText": "When federal grant funds are used to purchase drying equipment, what does the lesson say facilities should retain to demonstrate the equipment's utilisation and justify the expenditure?",
+          "options": [
+            "Approved roofing material certificates",
+            "Post indicator valve location maps",
+            "Extensive runtime machine logs",
+            "Environmental monitoring device readings"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "sourceRef": "M4 — Regulatory Oversight (Funding Requirements)"
+        },
+        {
+          "questionText": "What does the incremental drying strategy described in the lesson involve doing to affected wings?",
+          "options": [
+            "Leasing modular classroom trailers for the whole wing",
+            "Installing a chilled water piping bypass to each room",
+            "Relocating the entire wing to interim facilities at once",
+            "Dividing them into compartmentalised drying zones renovated on a staggered basis"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "sourceRef": "M5 — Loss Limitation Tactics (Incremental Drying)"
+        }
+      ]
+    }
+  ]
+}

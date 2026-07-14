@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "status": "draft",
+  "courseSlug": "introduction-to-drying-industrial-and-manufacturing-sites",
+  "disclaimer": "Educational assessment. CARSI is an IICRC-approved CEC provider; this is CARSI-original Australian training, not IICRC certification.",
+  "note": "Australian-produced. Grounded in the course's own modules. Founder to review before wiring live.",
+  "quizzes": [
+    {
+      "quizId": "453dd24b-f26c-5eb7-8abb-80a9364526f7",
+      "lessonTitle": "Knowledge check",
+      "title": "Introduction to Drying Industrial and Manufacturing Sites — Knowledge Check",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "According to the course, sustained flooding of a manufacturing plant causes which combination of business-interruption impacts?",
+          "options": [
+            "Immediate income losses, contractual penalty risks and supply-chain customer departures",
+            "Lower operating costs and reduced regulatory scrutiny",
+            "Increased market share and higher product margins",
+            "Guaranteed full reimbursement with no recovery period"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M1 — Production Considerations"
+        },
+        {
+          "questionText": "Before disposing of damaged inventory or equipment, the course says a facility should first:",
+          "options": [
+            "Dispose of all items immediately to reduce contamination risk",
+            "Wait for the insurer to arrive before recording any condition",
+            "Sell the items for salvage before any assessment is made",
+            "Document the degradation in detail with photographs, condition reports and expert assessments to support insurance claims"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "sourceRef": "M1 — Production Considerations"
+        },
+        {
+          "questionText": "To contain contaminants around chemical storage tanks, electrical splicing zones and storm-drainage outlets, the course recommends:",
+          "options": [
+            "Sealing the whole building and permanently evacuating staff",
+            "Replacing all affected machinery straight away",
+            "Constructing polyethylene enclosures to act as physical barriers",
+            "Pumping floodwater directly into the storm drains"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "sourceRef": "M2 — Hazard Communication"
+        },
+        {
+          "questionText": "What is the stated purpose of multipoint remote particulate alarm sensors placed around containment zones?",
+          "options": [
+            "To measure the structural load of the building",
+            "To continuously monitor air quality and give early warning of VOC leakage, allowing time for strategic ventilation adjustments",
+            "To regulate the temperature of the finishing lines",
+            "To automatically shut down all plant machinery on contact with water"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M2 — Hazard Communication"
+        },
+        {
+          "questionText": "In a staged equipment refurbishment, the course advises a facility to:",
+          "options": [
+            "Recommission the whole facility at once to save time",
+            "Install intelligent routing systems first and add conveyors afterwards",
+            "Install elevated robotic conveyors in the early phases and defer intelligent routing systems to later stages",
+            "Set aggressive, optimistic recovery milestones from the outset"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "sourceRef": "M3 — Reconstituting Operations"
+        },
+        {
+          "questionText": "To remove subsurface humidity from the porosity interstitials of dense metals such as aluminium moulds, the course recommends:",
+          "options": [
+            "Relying solely on circulating fans to reach every surface",
+            "Placing desiccant drying pouches in the crevices to draw out subsurface moisture",
+            "Submerging the moulds in warm water before drying",
+            "Applying fresh polymer residual to seal the surface"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M4 — Drying Complex Materials"
+        },
+        {
+          "questionText": "When thermal-acoustic firewall (porous) insulation is waterlogged and microbial amplification has been confirmed, the course recommends that a facility:",
+          "options": [
+            "Continues drying attempts indefinitely with adjusted equipment",
+            "Replaces the waterlogged insulation immediately to minimise microbial spread",
+            "Paints over the insulation to seal it in place",
+            "Leaves it in place if the surface looks dry"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M4 — Drying Complex Materials"
+        },
+        {
+          "questionText": "Before regulators reinstate suspended operational permits, the course says a facility must:",
+          "options": [
+            "Simply sign a self-declaration of compliance",
+            "Wait twelve months, after which no testing is required",
+            "Test only the exterior of the building",
+            "Conduct multistage quantitative indoor air-quality testing showing contaminant levels are well below regulatory limits"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "sourceRef": "M5 — Achieving Regulatory Compliance"
+        }
+      ]
+    }
+  ]
+}

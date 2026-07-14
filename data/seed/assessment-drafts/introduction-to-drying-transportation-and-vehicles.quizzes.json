@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "status": "draft",
+  "courseSlug": "introduction-to-drying-transportation-and-vehicles",
+  "disclaimer": "Educational assessment. CARSI is an IICRC-approved CEC provider; this is CARSI-original Australian training, not IICRC certification.",
+  "note": "Australian-produced. Grounded in the course's own modules. Founder to review before wiring live.",
+  "quizzes": [
+    {
+      "quizId": "8f5932ec-523f-529a-9a63-98246e6c6444",
+      "lessonTitle": "Knowledge check",
+      "title": "Introduction to Drying Transportation and Vehicles — Knowledge Check",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "According to the course, what should a facility do before disposing of any damaged inventory or equipment?",
+          "options": [
+            "Immediately transport it to a licensed landfill for solid municipal disposal",
+            "Determine its reactivity coordinates using a non-fixed laboratory",
+            "Document the degradation with photographs, condition reports and expert assessments to support insurance claims",
+            "Apply protective coatings and lubrication to prevent further corrosion"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "sourceRef": "M1 — Inventory and Equipment Exposures"
+        },
+        {
+          "questionText": "When specialised electronics such as robotic assembly apparatus are affected by flooding, what does the course recommend as the immediate first step?",
+          "options": [
+            "Disconnect and isolate the delicate equipment from power sources",
+            "Engage the original equipment manufacturers for triage assessments",
+            "Procure rapid emergent replacements from alternative vendors",
+            "Place desiccant drying pouches around the equipment"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M1 — Specialised Electronics Vulnerability"
+        },
+        {
+          "questionText": "What is the stated purpose of constructing polyethylene enclosures around chemical storage tanks and electrical splicing zones?",
+          "options": [
+            "To provide connection points for portable air filtration arrays",
+            "To absorb subsurface humidity from porous metal moulds",
+            "To capture moisture-laden exhaust vapours before they reach finishing lines",
+            "To act as physical barriers that prevent contaminants migrating into other areas of the facility"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "sourceRef": "M2 — Containment Efforts"
+        },
+        {
+          "questionText": "Why does the course recommend deploying portable multistage air filtration arrays through provisional PVC ducting tie-ins?",
+          "options": [
+            "To neutralise and immobilise hazardous substances in situ",
+            "To capture and remove moisture-laden exhaust vapours before they reach the finishing lines",
+            "To monitor VOC levels around containment zones",
+            "To determine the actual cash value of damaged machinery"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M2 — Ventilation Control"
+        },
+        {
+          "questionText": "Which equipment does the course recommend for safely transporting delicate custom machinery to nearby leased standalone warehouses?",
+          "options": [
+            "Elevated robotic conveyors",
+            "Intelligent routing systems",
+            "Crane-lifted vibration isolation platforms",
+            "Portable multistage air filtration arrays"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "sourceRef": "M3 — Interim Process Relocations"
+        },
+        {
+          "questionText": "How does the course recommend drawing subsurface humidity out of the porous interstitials of dense metal moulds where circulating fans may not reach effectively?",
+          "options": [
+            "Negative pressure cycling through drying containers",
+            "Infrared thermal mapping of the mould surface",
+            "Orienting heat stations directly at the mould",
+            "Placing desiccant drying pouches within the crevices and intricate areas"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "sourceRef": "M4 — Dense Metals"
+        },
+        {
+          "questionText": "What method does the course recommend to evacuate moisture from flooded composite furnace stocks such as epoxy hardeners and cellulose substrates?",
+          "options": [
+            "Negative pressure cycling through drying containers",
+            "Aliquot culturing and electron microscopy analysis",
+            "Placing desiccant drying pouches in the crevices",
+            "Infrared thermal mapping to redirect heat stations"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M4 — Composite Materials"
+        },
+        {
+          "questionText": "Before regulatory inspectors can reinstate suspended operational permits, what does the course say a facility must conduct to show indoor air quality has improved?",
+          "options": [
+            "Trace spectrographic identification of site soils",
+            "Multistage quantitative indoor air quality testing showing contaminant levels well below regulatory limits",
+            "Hourly remote camera feeds capturing unedited site visibility",
+            "Destructive explorations using aliquot culturing"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M5 — Securing Clearance Certification"
+        }
+      ]
+    }
+  ]
+}

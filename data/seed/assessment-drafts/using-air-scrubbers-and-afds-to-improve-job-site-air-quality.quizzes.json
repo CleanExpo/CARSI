@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "status": "draft",
+  "courseSlug": "using-air-scrubbers-and-afds-to-improve-job-site-air-quality",
+  "disclaimer": "Educational assessment. CARSI is an IICRC-approved CEC provider; this is CARSI-original Australian training, not IICRC certification.",
+  "note": "Australian-produced. Grounded in the course's own modules. Founder to review before wiring live.",
+  "quizzes": [
+    {
+      "quizId": "55a2a70b-ec9b-5b9d-86cb-688f37d53545",
+      "lessonTitle": "Knowledge check",
+      "title": "Using Air Scrubbers and AFDs to Improve Job Site Air Quality — Knowledge Check",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "According to the course, HEPA filters are capable of capturing what percentage of airborne particles that are 0.3 microns or larger?",
+          "options": [
+            "95%",
+            "99.5%",
+            "99.97%",
+            "100%"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "sourceRef": "M2 — Components and Mechanics of AFDs"
+        },
+        {
+          "questionText": "Which formula does the course give for calculating Air Changes per Hour (ACH)?",
+          "options": [
+            "(CFM × 60) / Room Volume",
+            "(Room Volume × 60) / CFM",
+            "(CFM × Room Volume) / 60",
+            "CFM / (Room Volume × 60)"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M6 — Calculating Air Changes per Hour (ACH)"
+        },
+        {
+          "questionText": "An air scrubber delivers 500 CFM in a room with a volume of 10,000 cubic feet. Using the course formula, what is the ACH?",
+          "options": [
+            "30 ACH",
+            "3 ACH",
+            "6 ACH",
+            "5 ACH"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M6 — Calculating Air Changes per Hour (ACH)"
+        },
+        {
+          "questionText": "Which mode of operation is used when the goal is containment of contaminants?",
+          "options": [
+            "Recirculation mode",
+            "Standby mode",
+            "Negative pressure mode",
+            "Variable speed mode"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "sourceRef": "M4 — Modes of Operation: Recirculation vs Negative Pressure"
+        },
+        {
+          "questionText": "What is a key limitation of recirculation mode described in the course?",
+          "options": [
+            "It does not control the direction of airflow and should not be relied on for containment",
+            "It cannot capture fine dust particles",
+            "It requires ducting to vent air outside the space",
+            "It only functions when an activated carbon filter is fitted"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M4 — Modes of Operation: Recirculation vs Negative Pressure"
+        },
+        {
+          "questionText": "What is the recommended ACH range for mould remediation?",
+          "options": [
+            "2–4 ACH",
+            "4–6 ACH",
+            "6–12 ACH",
+            "10–14 ACH"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M6 — Calculating Air Changes per Hour (ACH)"
+        },
+        {
+          "questionText": "What is the primary purpose of the pre-filter in an air scrubber?",
+          "options": [
+            "To absorb VOCs and neutralise odours",
+            "To deactivate microbes using UV light",
+            "To capture larger particles and protect the HEPA filter downstream",
+            "To create a pressure differential for containment"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "sourceRef": "M3 — Types of Filters and Their Functions"
+        },
+        {
+          "questionText": "Which instrument is used to verify that negative pressure has been achieved in a containment setup?",
+          "options": [
+            "A particle counter",
+            "A manometer or pressure gauge",
+            "A built-in hour meter",
+            "An electrostatic filter"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M9 — Monitoring Effectiveness on Site"
+        }
+      ]
+    }
+  ]
+}

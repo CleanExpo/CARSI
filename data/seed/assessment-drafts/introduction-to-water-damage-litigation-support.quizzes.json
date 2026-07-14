@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "status": "draft",
+  "courseSlug": "introduction-to-water-damage-litigation-support",
+  "disclaimer": "Educational assessment. CARSI is an IICRC-approved CEC provider; this is CARSI-original Australian training, not IICRC certification.",
+  "note": "Australian-produced. Grounded in the course's own modules. Founder to review before wiring live.",
+  "quizzes": [
+    {
+      "quizId": "54174ab9-0f6a-5fcb-af96-973412243f5e",
+      "lessonTitle": "Knowledge check",
+      "title": "Introduction to Water Damage Litigation Support — Knowledge Check",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "In forensic moisture source tracing, which parts of a building does the course say to investigate for deterioration explanations behind the original flooding?",
+          "options": [
+            "Occupant medical records and past insurance premium histories",
+            "Jury verdicts and final insurance claim determinations",
+            "Supply-side piping networks, roofing assemblies and below-grade foundation waterproofing",
+            "Technician payroll pools and equipment leasing contracts"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "sourceRef": "M1 — Forensic Investigations: Moisture Source Tracing"
+        },
+        {
+          "questionText": "According to the Forensic Investigations module, why are timelapse cameras established at the loss site?",
+          "options": [
+            "To identify chemical residues within substrate core samples",
+            "To monitor daily dry-out progress and guard against accusations of unnecessary equipment over-deployment or wilful demolition damage",
+            "To benchmark competitive pricing from local contractors",
+            "To rehearse witnesses ahead of cross-examination"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M1 — Forensic Investigations: Photographic Documentation"
+        },
+        {
+          "questionText": "Which data does the course say contractor daily psychrometric reports capture to quantify site drying conditions?",
+          "options": [
+            "Jury verdict amounts and comparable restoration expenditures",
+            "Laboratory chain-of-custody seal numbers",
+            "Civil engineer structural fitness ratings",
+            "Equipment runtime hours, relative humidity, dew point validations and temperature data"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "sourceRef": "M2 — Data Gathering: Psychrometric Records"
+        },
+        {
+          "questionText": "In the Scope Analysis module, which bodies' procedural excerpts are referenced as the foundation for validating moisture meters, air circulation equations, material evaluations and antimicrobial applications?",
+          "options": [
+            "Local council building codes only",
+            "Equipment manufacturer marketing brochures",
+            "IICRC and ANSI procedural excerpts",
+            "An insurer's internal claims guidelines"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "sourceRef": "M3 — Scope Analysis: Industry Standard Alignment"
+        },
+        {
+          "questionText": "What does estimate benchmarking, as described in the Scope Analysis module, involve?",
+          "options": [
+            "Submitting bulk debris to laboratories for particulate density analysis",
+            "Requesting competitive pricing packages from qualified local contractors against the original estimate line items to validate submitted expenditures",
+            "Installing timelapse cameras to track flood-stain reduction",
+            "Coaching witnesses to manage courtroom anxiety"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M3 — Scope Analysis: Estimate Benchmarking"
+        },
+        {
+          "questionText": "What is the stated purpose of the demonstrative diagrams and annotated photo montages produced in the Report Creation module?",
+          "options": [
+            "To record equipment runtime hours and dew point measurements",
+            "To establish the chain of custody for laboratory samples",
+            "To research jury verdicts in comparable losses",
+            "To illustrate structural deterioration with call-out arrows and discovery dates, reinforcing failure trajectories against eyewitness testimony affected by recall biases"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "sourceRef": "M4 — Report Creation: Demonstrative Diagrams"
+        },
+        {
+          "questionText": "Why does the Legal Proceedings module emphasise documenting an evidence chain of custody, such as custody seals, access-restriction protocols and unchanged-status records?",
+          "options": [
+            "To defend the purity of the evidence should opponents allege tampering and attempt to cast doubt on its credibility",
+            "To calculate per-gallon particulate toxicity rates",
+            "To benchmark contractor equipment rates",
+            "To monitor daily dry-out progress at the site"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M5 — Legal Proceedings: Evidence Chain of Custody"
+        },
+        {
+          "questionText": "According to the Legal Proceedings module, cross-examination training with litigation consultants prepares experts to withstand which kinds of tactics?",
+          "options": [
+            "Fire pump performance failures during a loss",
+            "Roof parapet flashing defects",
+            "Adversarial rhetorical traps such as misdirection fallacies, untenable binary choices and baseless skill aspersions",
+            "Dew point measurement errors in daily reports"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "sourceRef": "M5 — Legal Proceedings: Cross Examination Training"
+        }
+      ]
+    }
+  ]
+}
