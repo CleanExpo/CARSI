@@ -60,6 +60,11 @@ services:
 
       - key: ADMIN_EMAIL
         scope: RUN_TIME
+      # Extra admin-panel emails (comma-separated) beyond the hardcoded founder
+      # accounts in src/lib/admin/admin-panel-access.ts. Optional — set here to
+      # grant a new admin the /admin panel without a code change.
+      - key: ADMIN_PANEL_EMAILS
+        scope: RUN_TIME
       - key: ADMIN_PASSWORD
         scope: RUN_TIME
       - key: NEXT_PUBLIC_ADMIN_EMAIL
