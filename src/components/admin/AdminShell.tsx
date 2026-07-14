@@ -7,6 +7,7 @@ import {
   Building2,
   CalendarDays,
   ClipboardCheck,
+  GraduationCap,
   LogOut,
   Mail,
   Percent,
@@ -24,15 +25,22 @@ function NavButton({
   label,
   icon: Icon,
   active,
+  newTab = false,
 }: {
   href: string;
   label: string;
   icon: typeof Users;
   active: boolean;
+  /**
+   * Open in a new tab. Used for links that leave the admin shell (e.g. the
+   * public /ccw-training page), so the admin session/context is preserved.
+   */
+  newTab?: boolean;
 }) {
   return (
     <Link
       href={href}
+      {...(newTab ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
       className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200"
       style={
         active
@@ -110,6 +118,15 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             label="Facility"
             icon={Building2}
             active={facilityCourseActive}
+          />
+          <NavButton
+            href="/ccw-training"
+            label="CCW Training"
+            icon={GraduationCap}
+            // The Carpet Cleaning Workshop is a public page, not an /admin route,
+            // so it never lights an active state and opens in a new tab.
+            active={false}
+            newTab
           />
           <NavButton
             href="/admin/discounts"
