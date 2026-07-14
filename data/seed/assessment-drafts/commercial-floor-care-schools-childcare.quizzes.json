@@ -1,0 +1,162 @@
+{
+  "version": 1,
+  "status": "draft",
+  "courseSlug": "commercial-floor-care-schools-childcare",
+  "disclaimer": "Educational assessment. CARSI is an IICRC-approved CEC provider; this is CARSI-original Australian training, not IICRC certification.",
+  "note": "Australian-produced. Grounded in the course's own modules. Answer keys independently verified against the course text. Founder to review before wiring live.",
+  "quizzes": [
+    {
+      "quizId": "57ec72a1-8c24-508b-b32d-bf359601e4f7",
+      "lessonTitle": "Knowledge check",
+      "title": "Commercial Floor Care for Schools and Childcare Contracts - Knowledge Check",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Under the model WHS framework, how often must a Safety Data Sheet be reviewed for it to be considered current?",
+          "options": [
+            "Every 12 months",
+            "At least every 5 years",
+            "Only when the product changes",
+            "Every 10 years"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Module 1 - Your WHS duties: current SDS, the chemicals register and labelling"
+        },
+        {
+          "questionText": "Which statement about Victoria is correct regarding chemical safety law?",
+          "options": [
+            "Victoria has not adopted any chemical safety laws",
+            "Victoria operates under its own OHS Act and Regulations rather than the model WHS framework",
+            "Victoria's rules are identical to the model WHS Regulations in every respect",
+            "Victoria does not require Safety Data Sheets"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Module 1 - Your WHS duties: current SDS, the chemicals register and labelling"
+        },
+        {
+          "questionText": "You decant a floor stripper from its drum into a spray bottle for the day's work. What must you do?",
+          "options": [
+            "Nothing - only the original drum needs a label",
+            "Correctly label the decanted spray bottle as well",
+            "Add it to a manifest",
+            "Dispose of it the same day so no label is needed"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Module 1 - Your WHS duties: current SDS, the chemicals register and labelling"
+        },
+        {
+          "questionText": "Which Quality Area of the National Quality Standard is the main reason for choosing child-safe, low-tox products and controlling infection in childcare?",
+          "options": [
+            "Quality Area 1 (Educational program and practice)",
+            "Quality Area 2 (Children's health and safety)",
+            "Quality Area 5 (Relationships with children)",
+            "Quality Area 7 (Governance and leadership)"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Module 1 - Choosing child-safe, low-tox products and ventilating occupied rooms"
+        },
+        {
+          "questionText": "What best describes the status of ANSI/IICRC S100 for carpet cleaning?",
+          "options": [
+            "A government regulation that legally mandates how carpet must be cleaned",
+            "A recognised industry standard of care, not law, that supports your judgement",
+            "A SafeWork Australia code of practice",
+            "A state-based licensing requirement for cleaners"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Module 2 - Carpet, fibre and soil: an overview"
+        },
+        {
+          "questionText": "Compared with encapsulation, hot water extraction (HWE) is generally associated with:",
+          "options": [
+            "Deeper soil removal but more moisture and a longer return to service",
+            "The lowest moisture and the fastest return to service",
+            "No need to vacuum beforehand",
+            "A guaranteed fixed dry time"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "Module 2 - Hot water extraction vs encapsulation: the dry-time trade-off"
+        },
+        {
+          "questionText": "Why do grout lines tend to look dingy even when the tiles look clean?",
+          "options": [
+            "Grout is always a darker colour than tile",
+            "Grout is porous and traps soil below the surface, while the denser tile face rinses clean",
+            "Tiles are never sealed and grout always is",
+            "Mopping cleans grout more effectively than tile"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Module 3 - Hard-floor and grout soil: tools, brushes and chemistry"
+        },
+        {
+          "questionText": "In the generic strip-and-seal process, what is the correct order of stages?",
+          "options": [
+            "Apply finish, then strip, then rinse",
+            "Strip old finish, rinse and neutralise, dry, then apply multiple thin sealer and finish coats with drying between coats",
+            "Dry, strip, apply one thick coat, reopen",
+            "Neutralise, apply finish, strip, rinse"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Module 4 - The strip-and-seal process, end to end"
+        },
+        {
+          "questionText": "Where do the correct dry, cure and re-entry times for a sealer or finish come from?",
+          "options": [
+            "A fixed industry rule you can memorise",
+            "AS 4663",
+            "The product's SDS and TDS",
+            "Whatever the previous job used"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "sourceRef": "Module 4 - Sealing and finishing: cure and re-entry come from the SDS/TDS"
+        },
+        {
+          "questionText": "Which standard is the correct basis to verify slip resistance of a finished, in-service floor after sealing?",
+          "options": [
+            "AS 4586:2013, which classifies new surfaces before installation",
+            "AS 4663:2013, which measures existing surfaces in service",
+            "Neither - slip resistance cannot be measured",
+            "The SDS, which sets the slip class"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Module 4 - Verifying slip resistance to a target class (AS 4663)"
+        },
+        {
+          "questionText": "Before discharging pressure-washing wash water (trade wastewater) to the sewer, you must:",
+          "options": [
+            "Dilute it with clean water until it looks clear",
+            "Have prior written approval - a trade-waste agreement - from the water authority",
+            "Notify the school after the job is done",
+            "Nothing - the sewer accepts any liquid waste"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Module 5 - The drain is just for rain: capturing run-off and trade-waste to sewer"
+        },
+        {
+          "questionText": "Working With Children checks in Australia are:",
+          "options": [
+            "A single national check valid everywhere",
+            "Issued only to permanent school staff, never contractors",
+            "State and territory based, generally not auto-transferable, and not necessarily the only screening a site requires",
+            "Replaced entirely by a police check"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "sourceRef": "Module 6 - Compliance and documentation: SDS register, WWC checks, NQS QA2 and school cleaning standards"
+        }
+      ]
+    }
+  ]
+}
