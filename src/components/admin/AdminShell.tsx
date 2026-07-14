@@ -59,12 +59,12 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { user, signOut } = useAuth();
   const usersActive = pathname === '/admin' || pathname.startsWith('/admin/users');
-  // The Floor Care course has its own quick-access tab below; don't light the
+  // The Facility course has its own quick-access tab below; don't light the
   // generic Courses tab as well when we're on it.
   const facilityCourseId = '6011d465-1981-487b-84e3-a53b10a2bd07';
   const coursesActive =
     pathname.startsWith('/admin/courses') && !pathname.startsWith(`/admin/courses/${facilityCourseId}`);
-  const floorCareCourseActive = pathname.startsWith(`/admin/courses/${facilityCourseId}`);
+  const facilityCourseActive = pathname.startsWith(`/admin/courses/${facilityCourseId}`);
   const discountsActive = pathname.startsWith('/admin/discounts');
   const contactsActive = pathname.startsWith('/admin/contacts');
   const analyticsActive = pathname.startsWith('/admin/analytics');
@@ -107,9 +107,9 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           <NavButton href="/admin/courses" label="Courses" icon={BookOpen} active={coursesActive} />
           <NavButton
             href={`/admin/courses/${facilityCourseId}`}
-            label="Floor Care"
+            label="Facility"
             icon={Building2}
-            active={floorCareCourseActive}
+            active={facilityCourseActive}
           />
           <NavButton
             href="/admin/discounts"
