@@ -110,7 +110,7 @@ function buildHomeFaqs(facts: { publishedCourseCount: number; disciplineCodes: s
     {
       question: 'Does CARSI run in-person events?',
       answer:
-        'Yes. CARSI partners with Carpet Cleaners Warehouse on Business Growth Days in Melbourne and Sydney, and offers the 2-Day CCW Carpet Cleaning Workshop. Online courses remain available 24/7 between events.',
+        'Yes. CARSI partners with Carpet Cleaners Warehouse on Business Growth Days in Melbourne, Sydney and Brisbane, and offers the 2-Day CCW Carpet Cleaning Workshop. Online courses remain available 24/7 between events.',
     },
   ];
 }
