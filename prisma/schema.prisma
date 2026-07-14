@@ -281,6 +281,12 @@ model LmsEnrollment {
   /// A dispute-won re-grant reactivates ONLY 'disputed' rows; a later refund
   /// downgrades a 'disputed' row to 'refunded' so it can never be re-granted.
   revokedReason        String?   @map("revoked_reason")
+  /// Stripe `event.created` of the last status-changing reversal event
+  /// (dispute/refund) applied to this row. Out-of-order guard: a revoke or
+  /// dispute-won reactivate ignores an event older than this stamp, so a
+  /// retried/late webhook can't overwrite a newer decision. Null for rows never
+  /// touched by a reversal event (the guard then treats them as unconstrained).
+  statusEventAt        DateTime? @map("status_event_at") @db.Timestamptz(6)
 
   student            LmsUser                @relation("EnrollmentStudent", fields: [studentId], references: [id], onDelete: Cascade)
   course             LmsCourse              @relation(fields: [courseId], references: [id], onDelete: Cascade)

@@ -80,6 +80,11 @@ type StripeWebhookEventDelegate = {
  */
 async function handleStripeRevocation(event: Stripe.Event): Promise<void> {
   const reason = event.type === 'charge.dispute.created' ? 'disputed' : 'refunded';
+  // Stripe `event.created` (seconds) is the authoritative moment this reversal was
+  // true — the key for the enrolment out-of-order guard. NB: NOT `dispute.created`,
+  // which is identical for a dispute's created and closed events and cannot order
+  // them.
+  const eventTimestamp = new Date(event.created * 1000);
   let paymentIntentId: string | null = null;
 
   if (event.type === 'charge.refunded') {
@@ -134,7 +139,7 @@ async function handleStripeRevocation(event: Stripe.Event): Promise<void> {
   });
   for (const s of sessions.data) {
     const ref = resolveStripePaymentReference(s.id);
-    if (ref) await revokeEnrollmentsByPaymentReference(ref, reason);
+    if (ref) await revokeEnrollmentsByPaymentReference(ref, reason, eventTimestamp);
   }
 }
 
@@ -158,16 +163,17 @@ async function handleStripeRevocation(event: Stripe.Event): Promise<void> {
  * annual member who wins a dispute stays lapsed until the next invoice.paid.
  *
  * ORDERING — this and handleStripeRevocation are two independently-claimed
- * events with no Stripe delivery-order guarantee. If charge.dispute.closed(won)
- * is processed BEFORE charge.dispute.created (e.g. a created-retry after a
- * transient 5xx), this re-grant no-ops (nothing is revoked yet) and the later
- * created leaves the row revoked. Safe-direction (access withheld, never wrongly
- * granted). A robust fix is an ordering guard on the enrolment row (compare-and-
- * set, mirroring subscription-store's statusEventAt) — deferred as it changes
- * the shipped WS3 revoke path.
+ * events with no Stripe delivery-order guarantee. The realistic hazard is a
+ * charge.dispute.created that 5xx'd being RETRIED after this won-close is
+ * processed; the retried created would otherwise re-revoke the row and lock out a
+ * customer who WON their dispute. Closed by the enrolment out-of-order guard: we
+ * pass the Stripe `event.created` timestamp so the reactivate stamps every
+ * still-active row's `statusEventAt`, and the retried created's own not-stale
+ * guard (statusEventAt <= its older timestamp) then skips the revoke. See
+ * reactivateDisputeWonEnrollmentsByPaymentReference (mirrors subscription-store).
  *
  * Idempotent under the StripeWebhookEvent claim + the reactivate query (an
- * already-active row matches nothing).
+ * already-active row matches nothing; `lte`/`lt` guards make replays no-ops).
  */
 async function handleDisputeWonRegrant(event: Stripe.Event): Promise<void> {
   const dispute = event.data.object as Stripe.Dispute;
@@ -177,6 +183,9 @@ async function handleDisputeWonRegrant(event: Stripe.Event): Promise<void> {
     typeof dispute.payment_intent === 'string' ? dispute.payment_intent : null;
   if (!paymentIntentId) return;
 
+  // Authoritative ordering key — the event time, not dispute.created (identical
+  // across a dispute's created/closed events).
+  const eventTimestamp = new Date(event.created * 1000);
   const stripe = getStripeClient();
   const sessions = await stripe.checkout.sessions.list({
     payment_intent: paymentIntentId,
@@ -184,7 +193,7 @@ async function handleDisputeWonRegrant(event: Stripe.Event): Promise<void> {
   });
   for (const s of sessions.data) {
     const ref = resolveStripePaymentReference(s.id);
-    if (ref) await reactivateDisputeWonEnrollmentsByPaymentReference(ref);
+    if (ref) await reactivateDisputeWonEnrollmentsByPaymentReference(ref, eventTimestamp);
   }
 }
 

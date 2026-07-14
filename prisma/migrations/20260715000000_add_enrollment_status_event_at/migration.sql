@@ -1,0 +1,13 @@
+-- Add a nullable "last status-changing reversal event" timestamp to
+-- lms_enrollments for the out-of-order webhook guard.
+--
+-- Stripe delivers dispute/refund webhooks at-least-once and NOT in order, so a
+-- retried charge.dispute.created can arrive AFTER charge.dispute.closed(won) is
+-- processed and wrongly re-revoke a re-granted enrolment. Recording the Stripe
+-- event.created of the last reversal event lets revoke/reactivate ignore any
+-- event older than the stored stamp (compare-and-set), mirroring lms_subscriptions.
+--
+-- Nullable, no default, no backfill: existing rows keep NULL and the guard treats
+-- NULL as "no prior event" (applies unconditionally). Purely additive DDL; cannot
+-- abort the deploy. Rollback: ALTER TABLE "lms_enrollments" DROP COLUMN "status_event_at";
+ALTER TABLE "lms_enrollments" ADD COLUMN "status_event_at" TIMESTAMPTZ(6);
