@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "status": "draft",
+  "courseSlug": "introduction-to-drying-health-care-facilities",
+  "disclaimer": "Educational assessment. CARSI is an IICRC-approved CEC provider; this is CARSI-original Australian training, not IICRC certification.",
+  "note": "Australian-produced. Grounded in the course's own modules. Founder to review before wiring live.",
+  "quizzes": [
+    {
+      "quizId": "8109eaf5-af35-5f4e-8769-e084861a3453",
+      "lessonTitle": "Knowledge check",
+      "title": "Introduction to Drying Health Care Facilities — Knowledge Check",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Compared with residential HVAC equipment, what filter rating do hospital facilities commonly employ to improve indoor air quality and reduce infection risk?",
+          "options": [
+            "MERV 6 to 8",
+            "MERV 1 to 2",
+            "MERV 13 or higher",
+            "MERV 20 to 25"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "sourceRef": "M1 — Special Design Considerations (Filtration Requirements)"
+        },
+        {
+          "questionText": "In a protected environment for immunocompromised patients, staged pressure differentials are maintained so that air flows in which direction?",
+          "options": [
+            "From the construction zone into the patient wing",
+            "From the patient wing towards the construction zone",
+            "Equally in both directions to balance the space",
+            "No airflow is permitted between the areas"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M1 — Special Design Considerations (Protected Environments)"
+        },
+        {
+          "questionText": "Why do hospital wall assemblies use non-porous monolithic sheathing rather than the porous materials common in residential settings?",
+          "options": [
+            "It absorbs moisture to help the structure dry faster",
+            "It is chosen mainly to reduce construction costs",
+            "It improves thermal insulation and nothing else",
+            "It prevents absorption of biological materials and allows repeated antimicrobial disinfection"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "sourceRef": "M1 — Special Design Considerations (Scrubbable Surfaces)"
+        },
+        {
+          "questionText": "When restoring flood-affected medical gas infrastructure, which component should be prioritised first?",
+          "options": [
+            "Exterior bulk tank farms",
+            "Nitrous oxide pipe chases",
+            "Central oxygen manifolds",
+            "All components are restored at the same priority"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "sourceRef": "M2 — Unique Building Systems (Medical Gas Infrastructure)"
+        },
+        {
+          "questionText": "To protect sterile pharmaceutical clean rooms from humidity infiltration, what air pressure relationship should be maintained relative to surrounding areas?",
+          "options": [
+            "Negative air pressure",
+            "Positive air pressure",
+            "Neutral pressure with no gradient",
+            "Alternating positive and negative pressure"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M2 — Unique Building Systems (Pharmacy Dispensaries)"
+        },
+        {
+          "questionText": "How do sequentially staged containments help prevent cross-contamination during healthcare drying work?",
+          "options": [
+            "They combine all activities into a single shared work zone for efficiency",
+            "They remove physical barriers so air can circulate freely",
+            "They rely solely on staff hand hygiene without designated zones",
+            "They establish distinct work zones separated by risk level, such as clean, intermediate and dirty activities"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "sourceRef": "M3 — Infection Control Risks (Cross Contamination Potentials)"
+        },
+        {
+          "questionText": "What is the purpose of dividing hospital wings into compartmentalised project bands during restoration?",
+          "options": [
+            "To remove the need for regulatory inspections before reopening",
+            "To reduce the total number of contractors required on site",
+            "To allow staggered reopening of departments as they are cleared, preventing whole-scale disruption",
+            "To keep the entire hospital closed until all work is finished"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "sourceRef": "M4 — Maintaining Critical Operations (Staged Functionality Restoration)"
+        },
+        {
+          "questionText": "Before removing containment enclosures and returning a wing to occupancy, clearance verification testing should assess which hazards?",
+          "options": [
+            "Only visible dust on surfaces",
+            "Lead dust particulates, VOC off-gassing and microbiological organisms",
+            "Only the room temperature and humidity",
+            "Only the noise levels from equipment"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M5 — Remediation Standards (Clearance Verification)"
+        }
+      ]
+    }
+  ]
+}

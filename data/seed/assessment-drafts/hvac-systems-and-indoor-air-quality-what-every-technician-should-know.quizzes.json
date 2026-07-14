@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "status": "draft",
+  "courseSlug": "hvac-systems-and-indoor-air-quality-what-every-technician-should-know",
+  "disclaimer": "Educational assessment. CARSI is an IICRC-approved CEC provider; this is CARSI-original Australian training, not IICRC certification.",
+  "note": "Australian-produced. Grounded in the course's own modules. Founder to review before wiring live.",
+  "quizzes": [
+    {
+      "quizId": "65067fdf-8afa-5a4b-bfb3-09cc71050182",
+      "lessonTitle": "Knowledge check",
+      "title": "HVAC Systems and Indoor Air Quality: Knowledge Check",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "What does the acronym HVAC stand for?",
+          "options": [
+            "Heating, Ventilation, and Air Conditioning",
+            "Humidity, Ventilation, and Air Control",
+            "Heating, Volume, and Airflow Conditioning",
+            "Heating, Ventilation, and Airflow Containment"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M1 — Understanding the Basics of HVAC and Airflow"
+        },
+        {
+          "questionText": "In an optimally designed HVAC system, what is the role of the return ducts?",
+          "options": [
+            "They pull air from occupied spaces back into the system to be filtered and reconditioned",
+            "They deliver freshly conditioned air directly to occupied spaces",
+            "They exhaust all indoor air outdoors without any recirculation",
+            "They house the heating and cooling coils and the blower fan"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M1 — Understanding the Basics of HVAC and Airflow"
+        },
+        {
+          "questionText": "On the MERV scale (1 to 16), what does a higher number indicate?",
+          "options": [
+            "Better filtration, capturing finer particles",
+            "Lower resistance to airflow through the filter",
+            "A cheaper, more disposable filter",
+            "A larger physical filter housing"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M3 — Filtration and Air Cleaning Technologies"
+        },
+        {
+          "questionText": "According to the course, HEPA filters can trap what proportion of particles as small as 0.3 microns?",
+          "options": [
+            "99.97%",
+            "90%",
+            "75%",
+            "60%"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M3 — Filtration and Air Cleaning Technologies"
+        },
+        {
+          "questionText": "Which air cleaning technology is described as effective at removing odours, VOCs, and gaseous pollutants?",
+          "options": [
+            "Activated carbon filters",
+            "HEPA filters",
+            "MERV 1 to 4 filters",
+            "UV-C lamps"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M3 — Filtration and Air Cleaning Technologies"
+        },
+        {
+          "questionText": "Which type of ventilation uses both intake and exhaust fans to ensure a consistent, even exchange of air?",
+          "options": [
+            "Balanced ventilation",
+            "Natural ventilation",
+            "Exhaust-only mechanical ventilation",
+            "Demand-controlled ventilation"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M4 — Ventilation: Fresh Air and IAQ"
+        },
+        {
+          "questionText": "The course states that high relative humidity above which level encourages dust mites, mildew, and the breakdown of building materials?",
+          "options": [
+            "60%",
+            "40%",
+            "50%",
+            "80%"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M6 — Moisture Control and HVAC Systems"
+        },
+        {
+          "questionText": "Which material is described as forming a long-lasting bond for sealing most duct surfaces?",
+          "options": [
+            "Mastic sealant",
+            "Foil-backed tape",
+            "Silicone caulk",
+            "Expanding spray foam"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M7 — Ductwork: Inspection, Cleaning, and Sealing"
+        }
+      ]
+    }
+  ]
+}

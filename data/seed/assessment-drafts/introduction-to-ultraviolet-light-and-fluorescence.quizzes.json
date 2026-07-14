@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "status": "draft",
+  "courseSlug": "introduction-to-ultraviolet-light-and-fluorescence",
+  "disclaimer": "Educational assessment. CARSI is an IICRC-approved CEC provider; this is CARSI-original Australian training, not IICRC certification.",
+  "note": "Australian-produced. Grounded in the course's own modules. Founder to review before wiring live.",
+  "quizzes": [
+    {
+      "quizId": "3d262ada-cd79-5011-ac67-eb7ce5726734",
+      "lessonTitle": "Knowledge check",
+      "title": "Introduction to Ultraviolet Light and Fluorescence — Knowledge Check",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "According to the course, what wavelength range is given for long-wave UVA light?",
+          "options": [
+            "315–400 nanometres",
+            "280–315 nanometres",
+            "Below 280 nanometres",
+            "400–700 nanometres"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M1 — Ultraviolet Light Spectrum (UVA)"
+        },
+        {
+          "questionText": "Which ultraviolet band does the course describe as shortwave light below 280 nanometres that readily destroys genetic bonds and has sterilisation capacity?",
+          "options": [
+            "UVA",
+            "UVB",
+            "UVC",
+            "Visible light"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "sourceRef": "M1 — Ultraviolet Light Spectrum (UVC)"
+        },
+        {
+          "questionText": "Which of the following does the course recommend as part of ultraviolet safety protections for workers?",
+          "options": [
+            "Respirator masks, specialised eyewear, reflective outerwear and routine exposure monitoring",
+            "Working only in brightly lit rooms without eyewear",
+            "Removing all shielding to increase visible fluorescence",
+            "Relying on sunscreen alone with no other precautions"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M1 — Ultraviolet Light Spectrum (Ultraviolet Safety)"
+        },
+        {
+          "questionText": "In fluorescence, after a material absorbs ultraviolet photon energy, the excited electrons relax and the energy is re-emitted as what?",
+          "options": [
+            "Longer-wavelength visible fluorescent light",
+            "Shorter-wavelength ultraviolet light",
+            "Light of exactly the same wavelength that was absorbed",
+            "Audible sound"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M2 — Fluorescence Principles (Electronic Excitation / Light Emission Relaxation)"
+        },
+        {
+          "questionText": "According to the course, how can an inspector improve the clarity of a fluorescence signal?",
+          "options": [
+            "By dampening stray light and working in a darkened environment with a narrowed field of view",
+            "By adding more ambient white light to the space",
+            "By widening the field of view as much as possible",
+            "By warming the material before inspection"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M2 — Fluorescence Principles (Ambient Condition Impacts)"
+        },
+        {
+          "questionText": "Why does the course advise against unnecessary overexposure when adjusting lamp brightness intensity?",
+          "options": [
+            "It can degrade building material integrity, clog HEPA filters and cause needless pigment fading",
+            "It shortens the wavelength of the emitted fluorescence",
+            "It converts UVA light into UVC light",
+            "It permanently increases a material's autofluorescence"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M3 — Equipment Application (Brightness Intensity)"
+        },
+        {
+          "questionText": "How are UV-responsive dye tracers used during a water loss inspection?",
+          "options": [
+            "Introduced into supply-side plumbing to reveal water migration pathways and pinpoint leaking fittings and joins",
+            "Sprayed onto workers' skin to check for UV exposure",
+            "Added to drying equipment to increase airflow",
+            "Applied to sterilise microbial colonies on wall surfaces"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M4 — Water Loss Inspection Uses (Tracing Leak Sources)"
+        },
+        {
+          "questionText": "According to the course, how does infrared thermography complement UV fluorescence inspection?",
+          "options": [
+            "It identifies secondary hidden moisture through heat dissipation into cooler materials that is not evident under UV alone",
+            "It replaces the need for any UV lamp during inspection",
+            "It measures the exact wavelength of fluorescent emissions",
+            "It sterilises microbial colonies detected under UVC"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M5 — Complementary Technologies (Infrared Thermography)"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "status": "draft",
+  "courseSlug": "introduction-to-drying-hospitality-and-lodging-sites",
+  "disclaimer": "Educational assessment. CARSI is an IICRC-approved CEC provider; this is CARSI-original Australian training, not IICRC certification.",
+  "note": "Australian-produced. Grounded in the course's own modules. Founder to review before wiring live.",
+  "quizzes": [
+    {
+      "quizId": "feaa75b5-fb2f-5403-9167-aedef92c9141",
+      "lessonTitle": "Knowledge check",
+      "title": "Introduction to Drying Hospitality and Lodging Sites — Knowledge Check",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "When reservations are unaffected by the water damage at a flooded hospitality venue, what does the course recommend doing with them?",
+          "options": [
+            "Cancel every reservation until restoration is fully complete",
+            "Relocate them into authorised alternative networked properties using enterprise databases while rehabilitation timelines are assessed",
+            "Offer full refunds and stop accepting new bookings entirely",
+            "Move guests into the damaged wings under staff supervision"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M1 — Business Operations Impacts (Booking Displacements)"
+        },
+        {
+          "questionText": "To protect unaffected porous items such as linens, bedding, curtains and upholstery from cross-contamination during emergency mitigation, the course advises technicians to:",
+          "options": [
+            "Leave them in place and run dehumidifiers around them",
+            "Discard all porous textiles as a precaution",
+            "Relocate them using manifest sealed polyethylene bags and bins to minimise unnecessary discard",
+            "Stack them in the corridor away from the water source"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "sourceRef": "M2 — Room and Content Considerations (Porous Textiles)"
+        },
+        {
+          "questionText": "How should room access control systems, telephone infrastructure and entertainment centres be handled after a flood?",
+          "options": [
+            "Left powered on to keep their internal components warm and dry",
+            "Replaced immediately without any inspection",
+            "Wiped with damp microfibre cloths and returned straight to service",
+            "Security sealed and powered down until forensic component triage determines salvageability, avoiding short-out fire risks"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "sourceRef": "M2 — Room and Content Considerations (Electronic Systems)"
+        },
+        {
+          "questionText": "After disposing of flood-permeated kitchen foodstuffs, what does the course say must be done before appliances are reintroduced to service?",
+          "options": [
+            "Validate the electrical grounding integrity of the appliances across the boards",
+            "Restart every appliance immediately to test it under full load",
+            "Reuse any sealed packaged goods that appear undamaged",
+            "Donate opened stock to reduce disposal costs"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M2 — Room and Content Considerations (Food Contamination Traces)"
+        },
+        {
+          "questionText": "In Structural Repair Staging, what is the purpose of dividing scaffold containment zones by floor levels and wings?",
+          "options": [
+            "To reduce the number of heritage consultants required on site",
+            "To permit incremental guest reentry and minimise whole-asset closure durations through targeted compartmentalisation",
+            "To remove the need for scaffolding altogether",
+            "To accelerate the insurance payout process"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M3 — Structural Repair Staging (Levels and Wings)"
+        },
+        {
+          "questionText": "Why does the course advise erecting exterior structural scaffolding early to establish weatherproof facility shells?",
+          "options": [
+            "To advertise the restoration works to passers-by",
+            "To provide outdoor storage for contaminated contents",
+            "To enable accelerated interior rehabilitation while protecting unaffected areas from storms",
+            "To satisfy the building's heritage colour requirements"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "sourceRef": "M3 — Structural Repair Staging (Temporary Enclosures)"
+        },
+        {
+          "questionText": "For a landmark hospitality property, how does the course say replacement millwork, period door hardware and crown moulding should be handled to match the original 1930s art deco design?",
+          "options": [
+            "Use modern equivalents to keep reconstruction costs down",
+            "Substitute any available period-style materials without further checks",
+            "Remove the building's landmark status before works begin",
+            "Engage heritage architectural consultants to ensure the profiles precisely replicate the original designs in line with the facility's landmark status"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "sourceRef": "M4 — Reconstructive Constraints (Historical Accuracy)"
+        },
+        {
+          "questionText": "In Remediation Cleanup, what does the course require before containment barriers are removed to permit safe occupancy?",
+          "options": [
+            "A single humidity reading taken at the doorway",
+            "Multivariate sensor testing across lead particulate dust, mould spore counts and VOC off-gassing to validate the zone meets indoor air quality thresholds",
+            "A visual inspection carried out by the front desk manager",
+            "Guest feedback surveys about how the air smells"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M5 — Remediation Cleanup (Confirming Parameter Safety)"
+        }
+      ]
+    }
+  ]
+}

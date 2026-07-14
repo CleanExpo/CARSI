@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "status": "draft",
+  "courseSlug": "moisture-mould-and-indoor-air-quality-understanding-the-link",
+  "disclaimer": "Educational assessment. CARSI is an IICRC-approved CEC provider; this is CARSI-original Australian training, not IICRC certification.",
+  "note": "Australian-produced. Grounded in the course's own modules. Founder to review before wiring live.",
+  "quizzes": [
+    {
+      "quizId": "b78dc7db-405d-52e7-86b0-4128213d5e8d",
+      "lessonTitle": "Knowledge check",
+      "title": "Moisture, Mould, and Indoor Air Quality: Understanding the Link — Knowledge Check",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "According to the course, what is the critical factor that activates dormant mould spores and allows them to germinate and grow?",
+          "options": [
+            "Moisture",
+            "Direct sunlight",
+            "Cold temperatures",
+            "Oxygen on its own"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M1 — The Moisture-Mould Connection"
+        },
+        {
+          "questionText": "The course states that indoor conditions become highly favourable for mould colonisation when sustained relative humidity consistently exceeds which level?",
+          "options": [
+            "60%",
+            "30%",
+            "45%",
+            "20%"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M5 — The Role of Humidity and HVAC Systems"
+        },
+        {
+          "questionText": "Which instrument does the course describe as measuring the relative humidity of indoor air?",
+          "options": [
+            "A hygrometer",
+            "A pin-type moisture meter",
+            "A thermal imaging camera",
+            "An air scrubber"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M2 — Identifying Common Moisture Sources"
+        },
+        {
+          "questionText": "Why does the course say porous materials such as drywall and carpet often require removal rather than cleaning once they are colonised?",
+          "options": [
+            "Because mould grows into the material, not just on the surface",
+            "Because such materials are always too expensive to clean",
+            "Because cleaning them always spreads spores to metal surfaces",
+            "Because they cannot absorb antimicrobial solutions"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M4 — Building Materials and Mould Susceptibility"
+        },
+        {
+          "questionText": "How does the course define MVOCs?",
+          "options": [
+            "Microbial volatile organic compounds that are responsible for the musty, earthy odours associated with damp buildings",
+            "Mould-based vitamins that neutralise airborne spores",
+            "Mechanical ventilation output controls fitted to HVAC systems",
+            "Moisture vapour operating cycles used to schedule drying"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M3 — How Mould Affects Indoor Air Quality"
+        },
+        {
+          "questionText": "The course notes that short-term mould symptoms are often mistaken for seasonal allergies. What clue does it give that mould may be the underlying cause?",
+          "options": [
+            "Symptoms such as sneezing, coughing and itchy eyes often improve when the person leaves the affected environment",
+            "Symptoms only ever appear at night, regardless of location",
+            "Symptoms are always accompanied by a high fever and skin infection",
+            "Symptoms never ease even after the person leaves the building"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M6 — Health Effects of Mould Exposure"
+        },
+        {
+          "questionText": "What does the course say about the need for air sampling when a mould problem is present?",
+          "options": [
+            "Not all mould problems require air sampling; visible mould is often sufficient to warrant remediation",
+            "Air sampling is legally required before any remediation can begin",
+            "Air sampling removes the need for a visual inspection",
+            "Air sampling results never need to be interpreted by a professional"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M7 — Inspection Protocols and Air Sampling"
+        },
+        {
+          "questionText": "Why does the course warn against removing drying equipment too early?",
+          "options": [
+            "Materials can reabsorb moisture or dormant mould spores can reactivate",
+            "The equipment is likely to overheat and fail",
+            "It automatically voids the equipment manufacturer's warranty",
+            "Air sampling cassettes can become contaminated by the fans"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M8 — Drying Strategies to Prevent Mould Regrowth"
+        }
+      ]
+    }
+  ]
+}

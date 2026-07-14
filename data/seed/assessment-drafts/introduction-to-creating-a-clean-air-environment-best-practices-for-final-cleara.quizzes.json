@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "status": "draft",
+  "courseSlug": "introduction-to-creating-a-clean-air-environment-best-practices-for-final-cleara",
+  "disclaimer": "Educational assessment. CARSI is an IICRC-approved CEC provider; this is CARSI-original Australian training, not IICRC certification.",
+  "note": "Australian-produced. Grounded in the course's own modules. Founder to review before wiring live.",
+  "quizzes": [
+    {
+      "quizId": "edd5798c-7931-537d-b735-0a95cdee7bda",
+      "lessonTitle": "Knowledge check",
+      "title": "Creating a Clean Air Environment: Final Clearance and Handover — Quiz",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "What is the purpose of final clearance in air quality remediation?",
+          "options": [
+            "To begin the remediation process and install containment structures.",
+            "To raise the building's humidity before occupants return.",
+            "To confirm that all contamination has been removed and the space is safe for occupancy.",
+            "To market the property to prospective tenants."
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "sourceRef": "M1 — The Importance of Final Clearance in Air Quality Remediation"
+        },
+        {
+          "questionText": "According to the lesson, indoor PM2.5 levels are generally considered healthy when they are below which value?",
+          "options": [
+            "Below 12 µg/m³",
+            "Below 850 µg/m³",
+            "Below 500 µg/m³",
+            "Below 60 µg/m³"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M2 — The Role of Air Quality Testing in Final Clearance"
+        },
+        {
+          "questionText": "When air is sampled for mould spores, a successful final clearance result (Condition 1) typically demonstrates that:",
+          "options": [
+            "No spores of any type are present anywhere in the building.",
+            "Indoor spore levels and types are similar to or lower than outdoor levels or non-impacted indoor reference areas.",
+            "Indoor spore levels are around twice the outdoor levels.",
+            "Spore levels are highest in the previously contaminated source area."
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M2 — The Role of Air Quality Testing in Final Clearance"
+        },
+        {
+          "questionText": "In air quality testing, carbon dioxide (CO2) levels are mainly used as an indicator of:",
+          "options": [
+            "The concentration of mould spores in the air.",
+            "The structural strength of the building.",
+            "The level of VOCs released from paints.",
+            "Ventilation adequacy relative to occupancy."
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "sourceRef": "M2 — The Role of Air Quality Testing in Final Clearance"
+        },
+        {
+          "questionText": "Under what conditions should final clearance air quality testing be carried out?",
+          "options": [
+            "After remediation and cleaning are complete and containment structures have been removed, reflecting normal occupancy.",
+            "While remediation is still underway and containment is still in place.",
+            "Only during periods of high outdoor humidity.",
+            "Before any cleaning of the affected area has begun."
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M2 — The Role of Air Quality Testing in Final Clearance"
+        },
+        {
+          "questionText": "Why should the HVAC system be inspected during final clearance?",
+          "options": [
+            "Because HVAC filters have no effect on indoor air quality.",
+            "To measure the outdoor air temperature.",
+            "It can be a hidden source of contamination if ducts, vents, or filters were not properly cleaned.",
+            "Because it is the only place where mould can grow."
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "sourceRef": "M3 — Visual Inspections and Documentation for Final Handover"
+        },
+        {
+          "questionText": "According to the lesson, relative humidity should be kept below what level to help prevent mould proliferation?",
+          "options": [
+            "Below 30%",
+            "Below 60%",
+            "Below 85%",
+            "Below 100%"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M4 — Final Clearance Equipment and Tools"
+        },
+        {
+          "questionText": "What should a comprehensive handover report include?",
+          "options": [
+            "Only a verbal summary, with no written record of the work.",
+            "The contractor's pricing for future unrelated projects.",
+            "A guarantee that mould can never return under any circumstances.",
+            "The final clearance inspection and testing results, confirmation that the clearance criteria were met, and photographic documentation."
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "sourceRef": "M5 — Best Practices for Handover and Client Communication"
+        }
+      ]
+    }
+  ]
+}

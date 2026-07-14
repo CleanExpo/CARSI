@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "status": "draft",
+  "courseSlug": "introduction-to-recovery-of-submerged-items-and-contents",
+  "disclaimer": "Educational assessment. CARSI is an IICRC-approved CEC provider; this is CARSI-original Australian training, not IICRC certification.",
+  "note": "Australian-produced. Grounded in the course's own modules. Founder to review before wiring live.",
+  "quizzes": [
+    {
+      "quizId": "648e09ab-8708-51d5-9332-d8ff44884332",
+      "lessonTitle": "Knowledge check",
+      "title": "Introduction to Recovery of Submerged Items and Contents — Quiz",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Why does the course say securing flooded items quickly matters for their restorability?",
+          "options": [
+            "Fast removal lets insurers approve the claim before the floodwater recedes.",
+            "Limiting how long items stay saturated before conservator evaluation raises restorability confidence, because degradation worsens over days of delay.",
+            "Items only begin degrading once they are fully dried, so speed prevents premature drying.",
+            "Quick removal removes the need for any contamination testing."
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M1 — Evaluating Restorability (Duration Submerged)"
+        },
+        {
+          "questionText": "How does the course recommend assessing the contamination that submerged items have been exposed to?",
+          "options": [
+            "Submit initial floodwater samples for spectrographic contaminant analysis to guide neutralisation chemistry and post-treatment verification testing.",
+            "Rely on restorative drying alone, since drying removes toxic contaminants as the moisture leaves.",
+            "Grade contamination by visually inspecting the colour of the water.",
+            "Assume the floodwater is clean unless an odour is present."
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M1 — Evaluating Restorability (Contamination Exposure)"
+        },
+        {
+          "questionText": "According to the course, how should new flood damage be distinguished from pre-existing aging degradation?",
+          "options": [
+            "Assume all visible damage is flood-related to simplify the assessment.",
+            "Rely only on an item's weight to separate old damage from new damage.",
+            "Review historic collection manifests and compile photographic documentation, resin-fracture timelines and UV-exposure evidence to set a damage baseline.",
+            "Treat any damage that is not currently visible as pre-existing."
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "sourceRef": "M1 — Evaluating Restorability (Existing Damage)"
+        },
+        {
+          "questionText": "What does the course describe for maintaining chain of custody during recovery?",
+          "options": [
+            "A single supervisor memorises who handled each item.",
+            "Custody is recorded once, only when items reach the restoration facility.",
+            "Handlers are not tracked because the items are sealed inside bins.",
+            "Rotated handlers sign immutable digital custodial records that timestamp who takes responsibility at each loading and unloading junction."
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "sourceRef": "M2 — Recovery Logistics (Chain of Custody)"
+        },
+        {
+          "questionText": "How should recovered collections be protected during transport to a processing facility?",
+          "options": [
+            "Seal them in consolidated, manifest-labelled, continually desiccated polyethylene bins within temperature-regulated encapsulation.",
+            "Air-dry them in open trays during the drive to speed up drying.",
+            "Transport them loose so handlers can inspect them enroute.",
+            "Leave them in the original floodwater to keep them stable in transit."
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M2 — Recovery Logistics (Transport Protection)"
+        },
+        {
+          "questionText": "What is the course's guidance for creating drying conditions for preserved items?",
+          "options": [
+            "Apply the highest safe heat to dry items as quickly as possible.",
+            "Adjust dehumidification set points to extract pore humidity gradually, without exceeding the materials' temperature tolerances.",
+            "Let items dry naturally in ambient air with no equipment.",
+            "Keep the surrounding humidity high to stop items from cracking."
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M3 — Initial Preservation (Creating Drying Conditions)"
+        },
+        {
+          "questionText": "For which contents does the course say vacuum freeze-drying is suited?",
+          "options": [
+            "Robust metal items that tolerate high heat.",
+            "Any item, because freeze-drying is always the fastest method.",
+            "Delicate contents such as soaked parchment scrolls, where direct heating would risk permanent distortion.",
+            "Only items that already have no remaining moisture."
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "sourceRef": "M4 — Cleaning Methods (Vacuum Freeze-Drying Suitability)"
+        },
+        {
+          "questionText": "Why does the course recommend a gradual reintroduction of restored contents to normal conditions?",
+          "options": [
+            "Rapid reintroduction to normal conditions locks in the restored state faster.",
+            "Items should return to service immediately after cleaning, with no trials.",
+            "Reintroduction is unnecessary once an item simply looks dry.",
+            "Slowly elevating humidity in isolated chambers lets contents reach equilibrium and avoids phase-change disruptions caused by sudden spikes."
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "sourceRef": "M5 — Functionality Validation (Gradual Reintroduction)"
+        }
+      ]
+    }
+  ]
+}

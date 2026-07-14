@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "status": "draft",
+  "courseSlug": "documenting-and-reporting-air-quality-improvements",
+  "disclaimer": "Educational assessment. CARSI is an IICRC-approved CEC provider; this is CARSI-original Australian training, not IICRC certification.",
+  "note": "Australian-produced. Grounded in the course's own modules. Founder to review before wiring live.",
+  "quizzes": [
+    {
+      "quizId": "ab4ed7cb-51cf-5621-867e-9053a19bc72e",
+      "lessonTitle": "Knowledge check",
+      "title": "Documenting and Reporting Air Quality Improvements — Course Quiz",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "According to the course, monitoring air quality is described as an especially essential part of the remediation process when dealing with which situations?",
+          "options": [
+            "Only during the final handover of a completed project",
+            "Electrical rewiring and cabling tasks",
+            "Remediation involving water damage, fire damage, or mould contamination",
+            "Outdoor landscaping and groundwork"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "sourceRef": "M1 — Understanding Air Quality and Its Importance in Restoration"
+        },
+        {
+          "questionText": "Which contaminant does the course describe as being released when mould is disturbed during water or fire damage work and able to spread rapidly in enclosed spaces?",
+          "options": [
+            "Mould spores",
+            "Asbestos fibres",
+            "Carbon monoxide",
+            "Nitrogen dioxide"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M2 — Common Contaminants Found on Job Sites"
+        },
+        {
+          "questionText": "The course states that prolonged exposure to high levels of VOCs can have which serious long-term effects?",
+          "options": [
+            "Mesothelioma and asbestosis",
+            "Liver damage, kidney damage, or cancer",
+            "Immediate improvement in respiratory function",
+            "A reduction in job-site humidity"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M2 — Common Contaminants Found on Job Sites"
+        },
+        {
+          "questionText": "Which instrument does the course recommend for measuring the presence of VOCs and other gases in real-time?",
+          "options": [
+            "A particulate counter",
+            "An airborne mould testing kit",
+            "A temperature and humidity sensor",
+            "A Photoionisation Detector (PID)"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "sourceRef": "M3 — Tools and Equipment for Monitoring Air Quality"
+        },
+        {
+          "questionText": "According to the course, what does a particulate counter measure?",
+          "options": [
+            "The concentration, number and size of dust and particulate matter in the air",
+            "The presence of VOCs and solvent vapours",
+            "Carbon monoxide and nitrogen dioxide levels",
+            "The species of airborne mould spores present"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M3 — Tools and Equipment for Monitoring Air Quality"
+        },
+        {
+          "questionText": "For protection against particulate matter, which respirator does the course identify as suitable?",
+          "options": [
+            "A full-face respirator with a particulate and gas filter",
+            "An N95 respirator",
+            "A lightweight cloth face covering",
+            "No respirator is required for particulate matter"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M4 — Safety Measures and Protocols for Handling Poor Air Quality"
+        },
+        {
+          "questionText": "What is the stated purpose of a negative air machine on a job site?",
+          "options": [
+            "To measure VOC concentrations in real-time",
+            "To heat the affected area and speed up drying",
+            "To create a negative pressure environment that prevents contaminants from spreading to other parts of the building",
+            "To automatically record air quality readings for reports"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "sourceRef": "M4 — Safety Measures and Protocols for Handling Poor Air Quality"
+        },
+        {
+          "questionText": "Why does the course say documenting and reporting air quality is important?",
+          "options": [
+            "It is only needed to market the restoration business",
+            "It removes the need to monitor air quality with equipment",
+            "It is optional and has no bearing on regulatory compliance",
+            "It helps ensure compliance with health and safety regulations, provides data for insurance claims, and can serve as evidence in disputes"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "sourceRef": "M5 — Documenting and Reporting Air Quality on Site"
+        }
+      ]
+    }
+  ]
+}

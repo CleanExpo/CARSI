@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "status": "draft",
+  "courseSlug": "introduction-to-restoration-of-antiques-and-fine-furnishings",
+  "disclaimer": "Educational assessment. CARSI is an IICRC-approved CEC provider; this is CARSI-original Australian training, not IICRC certification.",
+  "note": "Australian-produced. Grounded in the course's own modules. Founder to review before wiring live.",
+  "quizzes": [
+    {
+      "quizId": "117a2a64-c79b-516b-9f05-8ca9998e5810",
+      "lessonTitle": "Knowledge check",
+      "title": "Introduction to Restoration of Antiques and Fine Furnishings — Knowledge Check",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "According to the course, what happens when aged glued joints and composite furniture laminates are exposed to prolonged moisture and then dried abruptly?",
+          "options": [
+            "The adhesive cures harder and permanently strengthens the joint",
+            "Adhesive erosion from swelling, followed by shear stresses that can trigger cascading structural failures",
+            "The wood grain permanently stabilises with no further risk",
+            "The laminate becomes fully waterproof"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M1 — Material Integrity Risks (Bonding Damage)"
+        },
+        {
+          "questionText": "Before cleaning flood-contaminated ornamental metals and dyed surfaces, what does the course advise technicians to do first?",
+          "options": [
+            "Immediately strip all patination back to bare metal",
+            "Apply concentrated solvent to speed up residue removal",
+            "Treat all contamination identically regardless of residue type",
+            "Document likely colour changes and patination first, because cleaning can strip fragile patination"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "sourceRef": "M1 — Material Integrity Risks (Chemical Degradation)"
+        },
+        {
+          "questionText": "Why does the course recommend consolidating loose joints before moving waterlogged antique furniture?",
+          "options": [
+            "Waterlogging strengthens joints, so no securing is needed",
+            "You can assume the item retains full intact handling durability",
+            "Waterlogging weakens structural integrity, so loose joints should be consolidated rather than assumed strong enough to move intact",
+            "Securing joints is done only to raise the item's market value"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "sourceRef": "M2 — Handling Precautions (Securing Loose Pieces)"
+        },
+        {
+          "questionText": "Why does the course require clean gloved manipulation when handling items such as French armoire cabinetry?",
+          "options": [
+            "To prevent skin oil transfer and inadvertent scratching",
+            "To speed up the drying process",
+            "To remove the original patina",
+            "To reduce the item's weight for transport"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M2 — Handling Precautions (Preventing Surface Contact)"
+        },
+        {
+          "questionText": "On shellacked antique fixtures, what does the course advise using instead of concentrated acetone and ethylene solvents?",
+          "options": [
+            "High-pressure steam wands",
+            "Gentle terpene emulsifying microemulsions that maintain original curing integrity",
+            "Aggressive stripping compounds",
+            "Undiluted household bleach"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M3 — Cleaning Technique Selection (Solvent Considerations)"
+        },
+        {
+          "questionText": "Why does the course recommend museum-grade ultrasonic atomiser nozzles for cleaning gilded frames?",
+          "options": [
+            "They saturate the surface fully, like a steam wand",
+            "They rely on concentrated solvent immersion",
+            "They require abrasive scrubbing to lift accumulations",
+            "They deliver thin humidification mists that lift surface accumulations without the soaking risks of steam wand saturation"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "sourceRef": "M3 — Cleaning Technique Selection (Energised Water Systems)"
+        },
+        {
+          "questionText": "When faced with localised disintegration such as rotted joist ends or rail splits, what approach does the course suggest?",
+          "options": [
+            "Always replace the entire assembly",
+            "Leave the damage untreated",
+            "Target repair of the deteriorated area rather than assuming the whole assembly needs replacement",
+            "Discard the piece as unrestorable"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "sourceRef": "M4 — Restorative Methodologies (Structural Repair Options)"
+        },
+        {
+          "questionText": "To ensure adequate insurance coverage for fine furnishings, what does the course recommend?",
+          "options": [
+            "Securing pre-loss fair market appraisals from accredited facilities that specialise in the relevant asset class",
+            "Relying on a rough guess of the replacement cost",
+            "Using only the item's original purchase price",
+            "Skipping appraisal to save time"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M5 — Authentication and Appraisals (Estimated Market Valuations)"
+        }
+      ]
+    }
+  ]
+}

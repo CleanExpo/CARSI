@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "status": "draft",
+  "courseSlug": "introduction-to-infrared-thermography-for-drying",
+  "disclaimer": "Educational assessment. CARSI is an IICRC-approved CEC provider; this is CARSI-original Australian training, not IICRC certification.",
+  "note": "Australian-produced. Grounded in the course's own modules. Founder to review before wiring live.",
+  "quizzes": [
+    {
+      "quizId": "a67f958e-37b2-5a4c-9993-8bc3107464c7",
+      "lessonTitle": "Knowledge check",
+      "title": "Introduction to Infrared Thermography for Drying — Knowledge Check",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "On a thermogram of a wet building material, what does a cooler surface temperature typically indicate?",
+          "options": [
+            "The surface has fully dried and needs no further attention",
+            "The camera's emissivity setting is too high",
+            "Higher moisture content remaining within the material's depth",
+            "The material is non-porous and cannot hold water"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "sourceRef": "M1 — Thermal Energy Concepts: Surface Temperature Dynamics"
+        },
+        {
+          "questionText": "Which three principles does the course identify as governing how thermal energy moves through materials and space?",
+          "options": [
+            "Conduction, convection and radiation",
+            "Evaporation, condensation and sublimation",
+            "Absorption, reflection and transmission",
+            "Wicking, capillarity and diffusion"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M1 — Thermal Energy Concepts: Heat Transfer Principles"
+        },
+        {
+          "questionText": "What distinguishes a quantitative infrared camera output from a qualitative one?",
+          "options": [
+            "It only displays a generic greyscale heat approximation",
+            "It provides calibrated exact temperature readings usable as quantifiable metrics for trending drying progress",
+            "It removes the need for any analysis software",
+            "It works only with shortwave infrared bands"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M2 — Infrared Camera Technologies: Qualitative vs Quantitative Outputs"
+        },
+        {
+          "questionText": "According to the course, what does higher detector pixel density (sensor resolution) in a camera primarily assist with?",
+          "options": [
+            "Reducing the camera's tolerance to water and dust intrusion",
+            "Removing the need to match infrared bands to the material scanned",
+            "Lowering the purchase price of the camera",
+            "Identifying minute moisture across wall cavities and intricate textures"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "sourceRef": "M2 — Infrared Camera Technologies: Sensor Resolution Factors"
+        },
+        {
+          "questionText": "How does thermography help locate hidden leak sources behind or beneath structures?",
+          "options": [
+            "Through differential temperature analysis, denoting areas cooler than expected",
+            "By measuring the surface hardness of building materials",
+            "By reading the emissivity rating of dry insulation",
+            "By capturing high-resolution visible-light photographs of pipe runs"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M3 — Moisture Detection Applications: Locating Hidden Leak Sources"
+        },
+        {
+          "questionText": "How is even heat-drying across an enclosed restorative chamber best verified over time?",
+          "options": [
+            "By taking a single thermogram only at the end of the job",
+            "By measuring outdoor air temperature alone",
+            "By comparing initial thermograms against progress benchmarks, supported by periodic moisture-meter checks",
+            "By relying solely on the camera's greyscale image without any other readings"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "sourceRef": "M3 — Moisture Detection Applications: Verifying Heat Drying Uniformity"
+        },
+        {
+          "questionText": "Which of the following is a stated limitation of moisture-detection cameras?",
+          "options": [
+            "They can only be operated outdoors in direct sunlight",
+            "Contact barriers such as vinyl wallpaper impede moisture evaporation and dense materials attenuate heat, limiting insight into interstitial layers",
+            "They read temperatures accurately through any material regardless of density",
+            "They completely replace the need for moisture meters and hygrometers"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M4 — Safely Applying Thermography: Understanding Limitations"
+        },
+        {
+          "questionText": "Which complementary methods does the course recommend to confirm infrared moisture findings before demolition or equipment decisions?",
+          "options": [
+            "X-ray scanners and ultrasound imaging",
+            "Visible-light cameras used on their own",
+            "Emissivity calibration cards used in isolation",
+            "Moisture meters, hygrometers and tracer dyes"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "sourceRef": "M5 — Result Analysis and Applications: Complementary Techniques"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "status": "draft",
+  "courseSlug": "dust-and-particulates-in-indoor-air-control-and-cleaning-strategies",
+  "disclaimer": "Educational assessment. CARSI is an IICRC-approved CEC provider; this is CARSI-original Australian training, not IICRC certification.",
+  "note": "Australian-produced. Grounded in the course's own modules. Founder to review before wiring live.",
+  "quizzes": [
+    {
+      "quizId": "b2bc74c4-b69f-5814-9b29-be7a7370acef",
+      "lessonTitle": "Knowledge check",
+      "title": "Dust and Particulates in Indoor Air: Control and Cleaning Strategies — Quiz",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "According to the course, how is particulate matter (PM) classified?",
+          "options": [
+            "By their aerodynamic diameter",
+            "By their colour under ultraviolet light",
+            "By their chemical odour",
+            "By the electrical charge they carry"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M1 — Understanding Indoor Particulates"
+        },
+        {
+          "questionText": "How does the course define ultrafine particles (UFPs)?",
+          "options": [
+            "Coarse particles 10 micrometres or less, such as pollen and mould spores",
+            "Fine particles 2.5 micrometres or smaller, mainly from combustion",
+            "Particles smaller than 0.1 micrometres that can penetrate the deepest regions of the lungs and enter the bloodstream",
+            "Visible household dust that settles quickly on surfaces"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "sourceRef": "M1 — Understanding Indoor Particulates"
+        },
+        {
+          "questionText": "Why can PM2.5 and ultrafine particles cause deeper harm than larger particles?",
+          "options": [
+            "They are caught in the nasal passages and expelled by sneezing",
+            "They penetrate deep into the lungs and reach the alveoli, where they can cause inflammation and be absorbed into the bloodstream",
+            "They are too large to be inhaled into the airways",
+            "They dissolve harmlessly in saliva before reaching the lungs"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M2 — Health Impacts of Dust and Fine Particles"
+        },
+        {
+          "questionText": "Why does the course identify children as particularly vulnerable to particulates?",
+          "options": [
+            "Their respiratory systems are still developing and they breathe more air per kilogram of body weight than adults",
+            "They are exposed only to coarse PM10 particles",
+            "Their immune systems are fully mature and overreact to dust",
+            "They spend far less time indoors than adults"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M2 — Health Impacts of Dust and Fine Particles"
+        },
+        {
+          "questionText": "What does the course describe as 'resuspension'?",
+          "options": [
+            "Dust particles clumping together and settling in high humidity",
+            "The permanent settling of heavy particles into carpets",
+            "Previously settled dust being lifted back into the air by activities such as walking, sweeping, or vacuuming",
+            "The removal of dust as air passes through an HVAC filter"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "sourceRef": "M3 — How Dust Moves Through Indoor Environments"
+        },
+        {
+          "questionText": "How does low humidity affect airborne dust, according to the course?",
+          "options": [
+            "It allows particles to remain airborne for longer",
+            "It causes particles to clump together and settle more quickly",
+            "It increases microbial growth on suspended particles",
+            "It has no measurable effect on how dust behaves"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M3 — How Dust Moves Through Indoor Environments"
+        },
+        {
+          "questionText": "The course states that a PM2.5 reading above which level is considered unhealthy for sensitive groups?",
+          "options": [
+            "12 µg/m³",
+            "35 µg/m³",
+            "100 µg/m³",
+            "2.5 µg/m³"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "M4 — Measuring Dust Levels and Airborne Particles"
+        },
+        {
+          "questionText": "What does the MERV rating describe?",
+          "options": [
+            "A filter's ability to trap particles of different sizes",
+            "The volume of airflow a fan can produce",
+            "The expected lifespan of a filter in months",
+            "The overall energy efficiency of an HVAC unit"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "M5 — Filtration Technologies and Effectiveness"
+        }
+      ]
+    }
+  ]
+}
