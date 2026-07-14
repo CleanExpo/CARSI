@@ -1,0 +1,138 @@
+{
+  "version": 1,
+  "status": "draft",
+  "courseSlug": "ccw-carsi-truckmount-operations",
+  "disclaimer": "Educational assessment. CARSI is an IICRC-approved CEC provider; this is CARSI-original Australian training, not IICRC certification.",
+  "note": "Australian-produced. Grounded in the course's own modules. Answer keys independently verified against the course text. Founder to review before wiring live.",
+  "quizzes": [
+    {
+      "quizId": "d24c9d64-887b-5743-a90a-1b149517dd5b",
+      "lessonTitle": "Knowledge check",
+      "title": "Truckmount Operations - Knowledge Check",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "How are the HydraMaster and Sapphire Scientific petrol-engine truck-mounts in this course powered?",
+          "options": [
+            "An onboard petrol engine drives the pump and blower, and the onboard electrics are 12 V DC - not 240 V mains",
+            "They plug into 240 V mains power at the customer premises",
+            "An onboard converter changes US 120 V into Australian 240 V on the machine",
+            "A separate diesel generator carried by the operator supplies mains power"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "Unit 3.1 - Australian Configurations and Specifications"
+        },
+        {
+          "questionText": "What is the correct order for the truck-mount startup sequence?",
+          "options": [
+            "Engine first, then pressure, then water last",
+            "Pressure first, then water, then the engine",
+            "Water on first, then the engine, then pressure",
+            "Chemical prime first, then water and pressure together"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "sourceRef": "Unit 3.2 - Safe Operating Procedures"
+        },
+        {
+          "questionText": "When the carbon monoxide monitor alarms at 35 ppm, what is the required response?",
+          "options": [
+            "Open the van doors and keep cleaning until the job is finished",
+            "Evacuate to fresh air, shut the engine down, and notify the supervisor",
+            "Wait until symptoms such as headache appear before acting",
+            "Nudge the exhaust to one side and continue working"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Unit 3.2 - Safe Operating Procedures"
+        },
+        {
+          "questionText": "What is the Australian workplace exposure standard for carbon monoxide taught in this course?",
+          "options": [
+            "200 ppm as an 8-hour average",
+            "6,000 ppm as an 8-hour average",
+            "140 ppm with no scheduled change",
+            "30 ppm as an 8-hour average, reducing to 20 ppm effective 2026"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "sourceRef": "Unit 3.2 - Safe Operating Procedures"
+        },
+        {
+          "questionText": "What is the minimum rating the high-pressure solution hose must meet?",
+          "options": [
+            "At least 3,000 psi and at least 121 C - plain thermoplastic hose must never be used",
+            "Any garden hose is acceptable for the solution line",
+            "Only 500 psi and 40 C are required",
+            "Plain thermoplastic hose rated to 1,000 psi is sufficient"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "Unit 3.2 - Safe Operating Procedures"
+        },
+        {
+          "questionText": "How does Australian law split obligations for the host vehicle by Gross Vehicle Mass (GVM)?",
+          "options": [
+            "Any vehicle over 2 t is a heavy vehicle",
+            "GVM has no bearing on which rules apply",
+            "4.5 t GVM or less is a light vehicle; over 4.5 t is a heavy vehicle regulated by the NHVR",
+            "All slide-in vans are classed as heavy vehicles"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "sourceRef": "Module 02 - Manufacturers Truck-Mount Safety Certificate"
+        },
+        {
+          "questionText": "How must recovery (waste) water from the truck-mount be disposed of?",
+          "options": [
+            "It is domestic greywater and may go into any street stormwater drain",
+            "It is commercial trade waste and must go to an approved sewer point under a trade-waste permit, never to stormwater",
+            "It may be tipped onto the ground or a garden at the job site",
+            "It may be discharged into the nearest waterway"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "sourceRef": "Unit 3.3 - Storage, Transport and Road Safety"
+        },
+        {
+          "questionText": "What forward performance standard must the load restraint on a mounted unit meet?",
+          "options": [
+            "There is no performance standard for restraint",
+            "The load must resist only 0.1 g forward",
+            "The load must resist 5 g forward",
+            "The restraint must hold the load under heavy braking, resisting at minimum 0.8 g forward"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "sourceRef": "Unit 3.3 - Storage, Transport and Road Safety"
+        },
+        {
+          "questionText": "What is the rule on chemistry used to descale the heat exchanger?",
+          "options": [
+            "Use only the manufacturers descaler; never use concentrated acids or solvents including d-limonene in the water or chemical system",
+            "Any strong household acid at a guessed dilution works well",
+            "d-limonene is the preferred descaling agent for the heat exchanger",
+            "Descaling is unnecessary because Australian water is always soft"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "sourceRef": "Unit 3.4 - Maintenance and Servicing"
+        },
+        {
+          "questionText": "How is the carbon monoxide control criterion treated in the operator competency assessment?",
+          "options": [
+            "A carbon monoxide shortfall lowers the score but the operator can still pass overall",
+            "Carbon monoxide is not part of the competency assessment",
+            "Any shortfall on the carbon monoxide control criterion is an automatic fail of the whole assessment",
+            "Carbon monoxide only matters when the host vehicle is a heavy vehicle"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "sourceRef": "Unit 3.6 - Assessment and Competency Sign-Off"
+        }
+      ]
+    }
+  ]
+}
