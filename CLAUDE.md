@@ -120,3 +120,14 @@ Per the IICRC's published AI Use Policy and copyright terms on its official stan
 ## Continual Learning
 
 This repo emits signal to `.harness/learning/*.jsonl` for the weekly distillation routine (RA-1745). If you notice something the system should learn from, append a structured entry — do not stop work to reason about meta-rules. Schema and consumer per RA-1745.
+
+## Sub-agent doctrine (persistent specialists)
+
+Multi-round agent work follows the global `persistent-subagents` skill: keep ONE warm,
+named specialist per domain per session and feed follow-ups via SendMessage resume —
+never re-spawn for a second task in the same domain. The main thread coordinates only;
+noisy collection (grep sweeps, web fan-outs, bulk reads) goes to throwaway children,
+which return distilled verdicts. Standing specialist domains for this repo:
+`course-content-carsi` (carsi-course-production rules still bind), `frontend-carsi-lms`, `ci-infra-carsi`. Name = `<type>-<durable-mission>`, frozen at spawn, must still be true on
+resume #8. Retire a specialist near ~300k context with a written handoff; domain
+change = fresh agent, always.
