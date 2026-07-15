@@ -34,9 +34,12 @@ export type CcwAttendeeOffer = {
 export const ccwRoadshowAttendeeOffers: CcwAttendeeOffer[] = [
   {
     key: 'ccw-store-credit',
-    label: 'CCW store credit',
-    detail: 'Attendee-exclusive Carpet Cleaners Warehouse store credit — details on the day.',
-    live: false,
+    label: 'CCW attendee voucher',
+    detail: 'Purchase your CCW/CARSI 2-day training voucher — includes CCW store credit.',
+    // Verified live 2026-07-15: published product on the ccwonline.com.au custom
+    // domain ("CCW/CARSI 2 Day In-house Training", $100 → $150 store credit).
+    url: 'https://ccwonline.com.au/products/ccw-carsi-2-day-in-house-training',
+    live: true,
   },
   {
     key: 'carsi-membership',

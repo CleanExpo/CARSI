@@ -135,19 +135,26 @@ describe('selectActiveOffers', () => {
     expect(result[0].key).toBe('carsi-membership');
   });
 
-  it('defaults to the shipped config, which is entirely dark (all offers live:false)', () => {
-    expect(selectActiveOffers(melb, during, { enabled: true })).toEqual([]);
+  it('by default surfaces only the live CCW offer during the window', () => {
+    const result = selectActiveOffers(melb, during, { enabled: true });
+    expect(result.map((o) => o.key)).toEqual(['ccw-store-credit']);
   });
 });
 
 describe('ccwRoadshowAttendeeOffers (shipped config)', () => {
-  it('defines the three offers, all dark (live:false) at ship time', () => {
-    expect(ccwRoadshowAttendeeOffers.map((o) => o.key).sort()).toEqual([
+  it('defines the three offers; CCW is live, membership + RA still dark pending deps', () => {
+    const byKey = Object.fromEntries(ccwRoadshowAttendeeOffers.map((o) => [o.key, o]));
+    expect(Object.keys(byKey).sort()).toEqual([
       'carsi-membership',
       'ccw-store-credit',
       'ra-setup',
     ]);
-    expect(ccwRoadshowAttendeeOffers.every((o) => o.live === false)).toBe(true);
+    expect(byKey['ccw-store-credit'].live).toBe(true);
+    expect(byKey['ccw-store-credit'].url).toBe(
+      'https://ccwonline.com.au/products/ccw-carsi-2-day-in-house-training',
+    );
+    expect(byKey['carsi-membership'].live).toBe(false);
+    expect(byKey['ra-setup'].live).toBe(false);
   });
 
   it('carries no baked-in preview URLs', () => {
