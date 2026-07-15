@@ -68,6 +68,13 @@ const ABSENCE =
 const SEARCH_GIMMICK = /\bsearch(?:ing)?\s+(?:the\s+)?(?:ANSI\/)?(?:IICRC[\s-]*)?S\s?5\d0\b[^.\n]{0,30}\bfor\b/i;
 // A section citation and its top-level number, e.g. "§9.1.7" or "section 12" → "9" / "12".
 const SECTION_CITE = /(?:§|section)\s?(\d{1,2})(?:\.\d+)*/i;
+// STRONG assertion of regulatory content — soft verbs (cover/include/reference/
+// treat) are excluded so legit nominative copy ("aligned to S500 and covering the
+// workflow") does not false-positive the uncited-claim rule.
+const STRONG_ASSERT =
+  /\b(?:require|mandate|prohibit|forbid|ban|permit|allow|specif|stipulate|dictate)(?:s|es|ed|d|ing|y|ies)?\b|\b(?:states?|says?)\s+that\b/i;
+// A numeric/count assertion ("references it only twice") is a count-evasion — block if uncited.
+const COUNT_CLAIM = /\b(?:only\s+)?(?:once|twice|\d+\s+times?)\b|\bonly\s+\d+\b/i;
 
 function whichStandard(text) {
   const m = text.match(/\bS\s?5(\d)0\b/i);
@@ -120,11 +127,11 @@ function evaluate(text, strict = true) {
     return findings;
   }
 
-  // 4) PRE-PUBLISH only: a positive content claim must carry a section citation.
-  //    Too broad for a blanket repo scan; enforced at the egress moment (--text).
-  if (strict && !cite) {
+  // 4) PRE-PUBLISH only: a STRONG positive content claim must carry a section
+  //    citation. Gated on STRONG_ASSERT so soft/nominative verbs don't false-positive.
+  if (strict && !cite && (STRONG_ASSERT.test(text) || COUNT_CLAIM.test(text))) {
     findings.push(
-      'A claim about what a standard says/requires/prohibits must cite its section number (§x[.x]) verified against the licensed index (lib/standards) — an uncited assertion is how the 2026-07-15 false claim happened.'
+      'A claim about what a standard requires/prohibits/says must cite its section number (§x[.x]) verified against the licensed index (lib/standards) — an uncited assertion is how the 2026-07-15 false claim happened.'
     );
   }
   return findings;

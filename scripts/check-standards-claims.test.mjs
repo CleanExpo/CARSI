@@ -20,6 +20,7 @@ const MUST_PASS = [
   ['corrected true claim (cited, valid section)', 'S520 §9.1.7 addresses ozone and other antimicrobial devices as supplementary tools.'],
   ['legit nominative, no content claim', 'Our courses are aligned to ANSI/IICRC S500:2021.'],
   ['legit cited content claim', 'Worker protection is covered in S520 §5, Safety and Health.'],
+  ['legit nominative + soft verb (no false positive)', 'Aligned to ANSI/IICRC S500:2021 and covering the full water-damage workflow.'],
   ['unrelated copy', 'Mould remediation begins with a moisture inspection.'],
 ];
 
