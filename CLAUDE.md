@@ -96,6 +96,32 @@ standing fix inverts that to **fail-CLOSED — absent by default, added only by 
   `CEC_APPROVED_SLUGS` in `scripts/check-iicrc-compliance.mjs`. Fix a false positive by tightening
   the rule's allow-list, never by disabling the rule.
 
+## Standards claims — verify against the licensed source (MUST — 2026-07-15 incident)
+
+A CARSI brand post nearly published "Search the IICRC S520 for the word 'hydroxyl' — it isn't
+there. Not once. Neither is 'ozone'." It was **FALSE**: S520:2024 §9.1.7 "Ozone Gas and Other
+Antimicrobial Devices" names both. The claim came from a **web scrape** ("grep found 0
+occurrences"), self-tagged unverified, then promoted to a headline. CARSI's authority IS knowing
+the standards — a false claim about a standard is a licence/credibility risk. Never again.
+
+- **Source of truth = the owner's LICENSED store, never a web scrape.** Any claim about what a
+  standard says/omits is verified against the transcribed section index (`lib/standards/s520-sections.ts`
+  / `s500-sections.ts`, mirrored in RestoreAssist) and the owner's private full-text RAG. A
+  scrape / trade-press paraphrase is NOT a basis for a published claim.
+- **ABSENCE claims about a standard are BANNED.** You cannot prove "the standard never mentions X"
+  from a table-of-contents index; absence needs full-text licensed verification. State what the
+  standard DOES say.
+- **Positive claims must cite a section that EXISTS** in the licensed index (a fabricated §14 is
+  worse than the original error).
+- **Run the pre-publish gate on any brand copy that names a standard**, before it publishes on ANY
+  surface (blog, course, LinkedIn/social, email): `npm run verify:standards-claim -- "<copy>"`.
+  It blocks the incident + common evasions (proven in `scripts/check-standards-claims.test.mjs`).
+  It is a FILTER, not a guarantee — a regex cannot fully verify a standard's content, so a
+  standards claim in brand copy is an L2/irreversible-reputation action that also requires **human
+  sign-off** (autonomy-ladder), never an un-gated autonomous browser keystroke. The true structural
+  fix — a single publish-egress interlock that fails closed on an uncited standards claim and reads
+  a verification token the orchestrator cannot strip — is specced separately.
+
 ## IICRC standards IP + AI use — prohibited (MUST)
 
 Per the IICRC's published AI Use Policy and copyright terms on its official standards store

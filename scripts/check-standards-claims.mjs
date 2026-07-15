@@ -1,0 +1,216 @@
+#!/usr/bin/env node
+/**
+ * Standards-claim guard — licence-critical (2026-07-15 incident).
+ *
+ * WHY. A CARSI brand post nearly published "Search the IICRC S520 for the word
+ * 'hydroxyl' — it isn't there. Not once. Neither is 'ozone'." FALSE: S520:2024
+ * §9.1.7 "Ozone Gas and Other Antimicrobial Devices" names both. The claim came
+ * from a WEB-SCRAPED copy ("grep found 0 occurrences"), self-tagged unverified,
+ * then promoted to a headline. CARSI's authority IS knowing the standards, so a
+ * false claim about a standard is a credibility/licence risk.
+ *
+ * DESIGN — default-deny, not a blocklist (per adversarial review 2026-07-15).
+ * A blocklist of bad phrasings loses to paraphrase, and banning only ABSENCE
+ * claims ignores the more dangerous class: fabricated POSITIVE claims ("S520
+ * requires ozone") and fake section numbers ("S520 §14.2 prohibits…"). So:
+ *
+ *   Any sentence that NAMES a standard AND asserts anything about its content
+ *   or silence (positive, negative, or numeric) MUST cite a section number that
+ *   RESOLVES to a real section in the licensed index below. Otherwise: BLOCKED.
+ *
+ *   - Absence claims ("does not mention / never / silent on / not found in") are
+ *     banned outright — absence cannot be proven from a scrape, and the licensed
+ *     index is a table of contents, not full text.
+ *   - Positive/numeric content claims must carry a §-citation whose top-level
+ *     section exists in the index (a fake §14 fails; S520 has only §1–13).
+ *   - Merely NAMING a standard nominatively ("aligned to ANSI/IICRC S500:2021")
+ *     with no content assertion is fine.
+ *
+ * LICENSED SOURCE OF TRUTH. Top-level section numbers below are transcribed from
+ * the owner's LICENSED standards (mirrors RestoreAssist lib/standards/*.ts).
+ * This file holds section NUMBERS only — never verbatim prose (IICRC IP). Deeper
+ * validation (does §9.1.7 actually say X) needs the owner's private full-text
+ * store + human sign-off; this guard enforces the mechanical floor.
+ *
+ * Modes:
+ *   node scripts/check-standards-claims.mjs            # scan tracked brand copy (CI + manual)
+ *   node scripts/check-standards-claims.mjs --staged   # scan STAGED additions (pre-commit)
+ *   node scripts/check-standards-claims.mjs --text "…" # validate a raw string (pre-publish gate)
+ *
+ * Bypass a verified false positive: git commit --no-verify
+ */
+import { execSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
+
+// Licensed section index — TOP-LEVEL section numbers that EXIST in each standard.
+// SSOT mirror of RestoreAssist lib/standards/s520-sections.ts / s500-sections.ts.
+const VALID_SECTIONS = {
+  S520: new Set(['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13']),
+  S500: new Set(['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14']),
+};
+
+// A finding requires a NAMED IICRC S-standard on the line. Bare "the standard"
+// is deliberately NOT a trigger — repo-scale testing showed it fires on the
+// English idiom ("has long been the standard for…"), swamping real violations
+// with false positives. Precision over recall: catch the licence-critical case
+// (a claim naming S500/S520/…), not every sentence containing "standard".
+// Repo/staged scan requires a NAMED S-standard (precision at scale). The
+// `--text` pre-publish gate ALSO treats "the standard" as a trigger (strict) —
+// at the egress moment a false positive is a human-reviewable prompt, not a
+// build break, so recall matters more there.
+const STD_NUMBERED = /\b(?:ANSI\/)?(?:IICRC[\s-]*)?S\s?5\d0\b/i;
+const STD_STRICT = /\b(?:ANSI\/)?(?:IICRC[\s-]*)?S\s?5\d0\b|\bthe standard\b/i;
+// A content/silence assertion — verb stems cover -s/-ed/-d/-ing forms and passives.
+const CLAIM_VERB =
+  /\b(?:mention|contain|say|state|reference|address|cover|include|list|require|mandate|prohibit|ban|forbid|permit|allow|specif|stipulate|dictate|define|treat|classif|omit|lack|ignore|exclude)(?:s|es|ed|d|ing|y|ies)?\b|\bis\s+silent\b|\bdoes\s*n['o]t\b|\bdoesn'?t\b|\bnever\b|\bno\s+(?:mention|reference|occurrence)\b|\bzero\b|\bonly\s+(?:once|twice|\d)\b|\bout\s+of\s+scope\b/i;
+const ABSENCE =
+  /\b(?:does\s*n['o]t|doesn'?t|do\s*n['o]t|don'?t|never|is\s+silent|are\s+silent|no\s+(?:mention|reference|occurrence|instance)|zero\s+(?:mention|reference|occurrence|instance)|not\s+(?:found|mentioned|present|listed|referenced)\s+in|nowhere\s+in|out\s+of\s+scope|isn'?t\s+(?:there|in\b)|not\s+a\s+single)\b/i;
+const SEARCH_GIMMICK = /\bsearch(?:ing)?\s+(?:the\s+)?(?:ANSI\/)?(?:IICRC[\s-]*)?S\s?5\d0\b[^.\n]{0,30}\bfor\b/i;
+// A section citation and its top-level number, e.g. "§9.1.7" or "section 12" → "9" / "12".
+const SECTION_CITE = /(?:§|section)\s?(\d{1,2})(?:\.\d+)*/i;
+
+function whichStandard(text) {
+  const m = text.match(/\bS\s?5(\d)0\b/i);
+  if (!m) return null;
+  return `S5${m[1]}0`;
+}
+
+/**
+ * @param strict when true (default — the `--text` PRE-PUBLISH gate) also enforces
+ *   the "positive content claim must cite a resolvable section" rule. Repo/staged
+ *   scans pass strict=false and enforce only the high-precision rules (absence,
+ *   the search gimmick, fabricated section) — the must-cite rule is too broad for
+ *   a blanket scan (it fires on the CARSI assistant's own citation logic, course
+ *   content and tests that legitimately discuss standards). Precision at scale,
+ *   full rigour at the egress moment where a human reviews in context.
+ */
+function evaluate(text, strict = true) {
+  // text = a single line / sentence-ish unit.
+  const findings = [];
+  const namesStd = (strict ? STD_STRICT : STD_NUMBERED).test(text);
+  if (!namesStd) return findings;
+
+  // 1) The search-for-a-word gimmick that invites an unprovable absence claim.
+  if (SEARCH_GIMMICK.test(text)) {
+    findings.push(
+      '"search the standard for the word X" framing is banned (2026-07-15 incident) — it invites an unprovable absence claim. Make a positive, section-cited point.'
+    );
+    return findings;
+  }
+
+  const makesClaim = CLAIM_VERB.test(text);
+  if (!makesClaim) return findings; // naming a standard without asserting content is fine.
+
+  // 2) Absence claims are banned outright — cannot be proven from the index.
+  if (ABSENCE.test(text)) {
+    findings.push(
+      'ABSENCE claim about a standard is banned — absence cannot be verified from the licensed section index (a table of contents, not full text). State what the standard DOES say, cited by section.'
+    );
+    return findings;
+  }
+
+  // 3) A cited section must RESOLVE in the licensed index (fabricated §14 fails).
+  //    Runs in BOTH modes — a fake section number is a high-precision violation.
+  const cite = text.match(SECTION_CITE);
+  const std = whichStandard(text);
+  if (cite && std && VALID_SECTIONS[std] && !VALID_SECTIONS[std].has(cite[1])) {
+    findings.push(
+      `Cited section §${cite[1]} does not exist in ${std} (licensed index has §1–${Math.max(...[...VALID_SECTIONS[std]].map(Number))}). A fabricated section is worse than the original error — verify against lib/standards.`
+    );
+    return findings;
+  }
+
+  // 4) PRE-PUBLISH only: a positive content claim must carry a section citation.
+  //    Too broad for a blanket repo scan; enforced at the egress moment (--text).
+  if (strict && !cite) {
+    findings.push(
+      'A claim about what a standard says/requires/prohibits must cite its section number (§x[.x]) verified against the licensed index (lib/standards) — an uncited assertion is how the 2026-07-15 false claim happened.'
+    );
+  }
+  return findings;
+}
+
+const COPY_EXT = /\.(tsx?|jsx?|mdx?)$/;
+const SCANNED_DIRS = ['app/', 'src/', 'templates/', 'docs/marketing/'];
+const JSON_SCANNED_DIRS = ['data/seed/', '.curation/', 'data/wordpress-export/'];
+function inScope(file) {
+  const norm = file.replace(/\\/g, '/');
+  if (COPY_EXT.test(norm) && SCANNED_DIRS.some((d) => norm.startsWith(d))) return true;
+  if (norm.endsWith('.json') && JSON_SCANNED_DIRS.some((d) => norm.startsWith(d))) return true;
+  return false;
+}
+const EXEMPT = ['scripts/check-standards-claims.mjs', 'scripts/check-standards-claims.test.mjs', 'CLAUDE.md'];
+function isExempt(file) {
+  const norm = file.replace(/\\/g, '/');
+  return EXEMPT.some((e) => norm === e || norm.endsWith('/' + e));
+}
+
+export { evaluate };
+
+// Only run the scanner when invoked directly (not when imported by the test).
+const invokedDirectly = process.argv[1] && process.argv[1].endsWith('check-standards-claims.mjs');
+if (!invokedDirectly) {
+  // imported for testing — export evaluate() and stop.
+} else main();
+
+function main() {
+const findings = [];
+function scanLine(file, lineNo, content, strict) {
+  for (const msg of evaluate(content, strict)) {
+    findings.push(`  ${file}:${lineNo}: ${msg}\n    → ${content.trim().slice(0, 140)}`);
+  }
+}
+
+const argv = process.argv.slice(2);
+const textIdx = argv.indexOf('--text');
+if (textIdx !== -1) {
+  // Pre-publish gate: validate a raw string (any brand copy about to go public).
+  const text = argv[textIdx + 1] || '';
+  text.split('\n').forEach((line, i) => scanLine('<stdin>', i + 1, line, true));
+} else if (argv.includes('--staged')) {
+  let diff = '';
+  try {
+    diff = execSync('git diff --cached --no-color -U0', { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+  } catch (err) {
+    console.error('check-standards-claims: failed to read staged diff:', err.message);
+    process.exit(1);
+  }
+  let currentFile = null;
+  let lineNo = 0;
+  for (const line of diff.split('\n')) {
+    const fm = line.match(/^\+\+\+ b\/(.+)$/);
+    if (fm) { currentFile = fm[1]; continue; }
+    const hunk = line.match(/^@@ -\d+(?:,\d+)? \+(\d+)/);
+    if (hunk) { lineNo = parseInt(hunk[1], 10); continue; }
+    if (!line.startsWith('+') || line.startsWith('+++')) continue;
+    if (!currentFile || !inScope(currentFile) || isExempt(currentFile)) continue;
+    scanLine(currentFile, lineNo, line.slice(1), false);
+    lineNo++;
+  }
+} else {
+  let list = '';
+  try {
+    list = execSync('git ls-files', { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+  } catch (err) {
+    console.error('check-standards-claims: failed to list tracked files:', err.message);
+    process.exit(1);
+  }
+  const files = list.split('\n').map((f) => f.trim()).filter((f) => f && inScope(f) && !isExempt(f));
+  for (const file of files) {
+    let text = '';
+    try { text = readFileSync(file, 'utf8'); } catch { continue; }
+    text.split('\n').forEach((line, i) => scanLine(file, i + 1, line, false));
+  }
+}
+
+if (findings.length > 0) {
+  console.error('\n✖ Standards-claim guard failed (2026-07-15 incident)\n');
+  console.error('A claim about an IICRC standard must be verified against the LICENSED section index');
+  console.error('(lib/standards) and cited by a section that exists — never a scrape, never an absence claim.\n');
+  console.error(findings.join('\n'));
+  console.error('\nSee CLAUDE.md § "Standards claims". Verified false positive? git commit --no-verify\n');
+  process.exit(1);
+}
+console.log('✓ Standards-claim guard passed.');
+process.exit(0);
+}
