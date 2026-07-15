@@ -99,6 +99,12 @@ The webhook route already exists and is signature-verified + idempotent. You onl
    - `invoice.paid`
    - `invoice.payment_failed`
    - `charge.dispute.closed` — **required for the dispute-won re-grant**: when a chargeback is resolved in your favour (`status = won`), the route restores the one-off enrolment that `charge.dispute.created` revoked. The handler is inert until this event is enabled on the endpoint.
+
+   > **Testing the dispute-won re-grant.** Unlike `charge.dispute.created` (which the test card `4000 0000 0000 0259` fires directly), `charge.dispute.closed` with `status = won` is **not** a built-in `stripe trigger` event and **cannot** be produced by a test card — you have to close a dispute. Two ways, in Test mode:
+   > 1. **Dashboard (simplest):** create a test dispute with card `4000 0000 0000 0259`, then in **Payments → the disputed charge → dispute**, submit/close it **in your favour** so Stripe emits `charge.dispute.closed` with `status = won`.
+   > 2. **Custom fixture:** replay a hand-written `charge.dispute.closed` event (`status: won`, the original `payment_intent`) via the Stripe CLI's *Create and use fixtures* flow.
+   >
+   > Do **not** use `stripe-mock` for this — per Stripe's own guidance it returns hardcoded, behaviour-less responses and won't exercise the route. The re-grant + out-of-order-ordering logic is already unit-covered in `src/lib/server/stripe-revocation.test.ts`; this checklist is only for the end-to-end webhook wiring.
 4. Copy the endpoint's **Signing secret** (`whsec_...`) and confirm it matches `STRIPE_WEBHOOK_SECRET` in DigitalOcean for that mode. Test mode and Live mode have **different** signing secrets — use the right one per environment.
 
 ---
