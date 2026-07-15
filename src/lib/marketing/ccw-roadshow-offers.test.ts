@@ -5,6 +5,7 @@ import {
   ccwRoadshowAttendeeOffers,
   isDistributableOfferUrl,
   selectActiveOffers,
+  selectActiveOffersForNow,
   type CcwAttendeeOffer,
 } from './ccw-roadshow-offers';
 
@@ -161,5 +162,23 @@ describe('ccwRoadshowAttendeeOffers (shipped config)', () => {
     for (const offer of ccwRoadshowAttendeeOffers) {
       if (offer.url) expect(isDistributableOfferUrl(offer.url)).toBe(true);
     }
+  });
+});
+
+describe('selectActiveOffersForNow', () => {
+  it('surfaces the live CCW offer during a real roadshow event (Melbourne day 1)', () => {
+    const now = new Date('2026-07-22T10:00:00+10:00');
+    const result = selectActiveOffersForNow(now, { enabled: true });
+    expect(result.map((o) => o.key)).toEqual(['ccw-store-credit']);
+  });
+
+  it('surfaces nothing when no roadshow event is running', () => {
+    const now = new Date('2026-07-10T10:00:00+10:00'); // before all events
+    expect(selectActiveOffersForNow(now, { enabled: true })).toEqual([]);
+  });
+
+  it('surfaces nothing when the feature is disabled, even mid-event', () => {
+    const now = new Date('2026-07-22T10:00:00+10:00');
+    expect(selectActiveOffersForNow(now, { enabled: false })).toEqual([]);
   });
 });

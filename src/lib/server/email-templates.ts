@@ -2,6 +2,7 @@
  * CARSI branded transactional email layout — site theme (#060a14, glass card, #ed9d24 CTAs).
  * All project emails should use buildCarsiEmailHtml / render* helpers below.
  */
+import type { CcwAttendeeOffer } from '@/lib/marketing/ccw-roadshow-offers';
 
 export const BRAND = {
   pageBg: '#060a14',
@@ -391,7 +392,26 @@ export function renderEnrollmentWelcomeEmail(params: {
   courseTitle: string;
   startUrl: string;
   dashboardUrl: string;
+  /** CCW roadshow attendee offers (already gated/selected by the caller). */
+  offers?: CcwAttendeeOffer[];
 }): RenderedEmail {
+  const offers = params.offers ?? [];
+  const offersHtml = offers.length
+    ? `<p style="margin: 16px 0 6px;"><strong>Your attendee offers</strong></p>` +
+      `<ul style="margin: 0 0 12px; padding-left: 20px;">` +
+      offers
+        .map((o) => {
+          const head = o.url ? brandLink(o.url, o.label) : `<strong>${escapeHtml(o.label)}</strong>`;
+          return `<li style="margin: 4px 0;">${head} — ${escapeHtml(o.detail)}</li>`;
+        })
+        .join('') +
+      `</ul>`
+    : '';
+  const offersText = offers.length
+    ? `\n\nYour attendee offers:\n` +
+      offers.map((o) => `- ${o.label}${o.url ? `: ${o.url}` : ''}`).join('\n')
+    : '';
+
   return render(
     {
       appOrigin: params.appOrigin,
@@ -409,9 +429,9 @@ export function renderEnrollmentWelcomeEmail(params: {
         { label: 'Next action', value: 'Complete lesson 1 today so your progress loop starts' },
       ],
       cta: { label: 'Start lesson 1', href: params.startUrl },
-      noteHtml: `Or open ${brandLink(params.dashboardUrl, 'My Learning')} to resume, track CEC progress, download certificates, and find the next recommended course.`,
+      noteHtml: `${offersHtml}Or open ${brandLink(params.dashboardUrl, 'My Learning')} to resume, track CEC progress, download certificates, and find the next recommended course.`,
     },
-    `Hi ${params.name},\n\nYou're enrolled in ${params.courseTitle}.\n\nNext action: complete lesson 1 today so your progress loop starts.\n\nStart: ${params.startUrl}\n\nMy Learning: ${params.dashboardUrl}`
+    `Hi ${params.name},\n\nYou're enrolled in ${params.courseTitle}.\n\nNext action: complete lesson 1 today so your progress loop starts.\n\nStart: ${params.startUrl}\n\nMy Learning: ${params.dashboardUrl}${offersText}`
   );
 }
 

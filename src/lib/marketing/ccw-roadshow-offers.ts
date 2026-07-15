@@ -7,7 +7,7 @@
  * welcome-email wiring is a later slice. Spec:
  * docs/specs/ccw-attendee-offers-day-gated-2026-07-15.md
  */
-import type { CcwRoadshowEvent } from './ccw-roadshow';
+import { ccwRoadshowEvents, type CcwRoadshowEvent } from './ccw-roadshow';
 
 export type CcwOfferKey = 'ccw-store-credit' | 'carsi-membership' | 'ra-setup';
 
@@ -107,4 +107,20 @@ export function selectActiveOffers(
   if (!areAttendeeOffersActive(event, now)) return [];
   const offers = opts.offers ?? ccwRoadshowAttendeeOffers;
   return offers.filter((o) => o.live && (o.url == null || isDistributableOfferUrl(o.url)));
+}
+
+/**
+ * Convenience for callers that don't know which event they're in (e.g. Day-1
+ * provisioning): pick the roadshow event whose window contains `now` and return
+ * its active offers. Off-event (or flag off) → []. The provisioning path runs at
+ * sign-in time, so `now` is inside the running event's window.
+ */
+export function selectActiveOffersForNow(
+  now: Date,
+  opts: { enabled: boolean; events?: readonly EventWindow[]; offers?: CcwAttendeeOffer[] },
+): CcwAttendeeOffer[] {
+  const events = opts.events ?? ccwRoadshowEvents;
+  const active = events.find((event) => areAttendeeOffersActive(event, now));
+  if (!active) return [];
+  return selectActiveOffers(active, now, { enabled: opts.enabled, offers: opts.offers });
 }
