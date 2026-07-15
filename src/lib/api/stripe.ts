@@ -113,7 +113,7 @@ export async function listPrices(productId?: string, limit = 10) {
 // Checkout Session Helpers
 // ---------------------------------------------------------------------------
 
-export async function createCheckoutSession(params: {
+export type CheckoutSessionParams = {
   customer?: string;
   line_items: Array<{
     price: string;
@@ -123,7 +123,14 @@ export async function createCheckoutSession(params: {
   success_url: string;
   cancel_url: string;
   metadata?: Record<string, string>;
-}) {
+  /**
+   * Server-side Stripe coupon(s), applied directly at checkout. Deliberately NO
+   * `allow_promotion_codes` — the coupon is never exposed as a public code.
+   */
+  discounts?: Array<{ coupon: string }>;
+};
+
+export async function createCheckoutSession(params: CheckoutSessionParams) {
   const stripe = getStripeClient();
   return stripe.checkout.sessions.create(params);
 }

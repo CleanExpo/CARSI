@@ -133,3 +133,48 @@ Building the feature **dark** needs none of the above; **activating** each offer
 2. Welcome-email wiring into UNIT-A #587 provisioning (behind flag).
 3. Attendee-portal "My Offers" panel (optional fast-follow).
 4. Activate offers one row at a time as each §7 dependency lands.
+
+---
+
+## 10. Slice-3 — self-serve discounted CARSI membership (owner-chosen: self-serve, auto-renew)
+
+### 10.1 Goal
+A **verified attendee** can start a CARSI annual membership at **$295 first year → auto-renew $795/yr**, via a **discounted Stripe subscription checkout**, without ever exposing the discount publicly. Matches locked Decision §3.
+
+### 10.2 Reuse vs build (verified on origin/main)
+**Reuse:** subscription engine `subscription-store.ts` (LmsSubscription + idempotent Stripe webhook lifecycle); `mode:'subscription'` in `createCheckoutSession` (`src/lib/api/stripe.ts:116`); `pro_annual` $795 tier (`SubscriptionStatus.tsx`, `PricingTiers.tsx`); `SUBSCRIPTIONS_ENABLED` flag; attendee gating via `freeEntryToken` (`CcwRoadshowRegistration`) / provisioned attendee.
+**Build (missing):** `createCheckoutSession` does **not** pass Stripe `discounts` → extend it; no attendee-gated entry that starts `pro_annual` **with** the attendee coupon; no `CCW_MEMBERSHIP_COUPON_ID` wiring.
+
+### 10.3 Design
+- **$295 first year = a Stripe Coupon `duration: once`** ($500 AUD `amount_off` on the $795 annual price) → first invoice $295, renewals $795. Chosen over a separate $295 one-time price: cleaner, auto-renews at list naturally, no second product.
+- Extend `createCheckoutSession` with optional `discounts?: Array<{ coupon: string }>` — passed straight through to Stripe; omitted ⇒ unchanged.
+- New **attendee-gated** server route (`POST /api/ccw/membership-checkout`): (1) verify attendee (valid `freeEntryToken` on a real registration, or signed-in provisioned attendee); (2) resolve `CCW_MEMBERSHIP_COUPON_ID` + the annual price id; (3) create a `mode:'subscription'` checkout carrying `carsi_user_id` metadata + the coupon; (4) return the URL. The coupon is **never** applied on the public `pro_annual` path.
+- The membership offer gains a `url` → this attendee-gated entry (slice-2 already links url-bearing offers).
+- **Dark:** gated by `CCW_ATTENDEE_OFFERS_ENABLED`; offer stays `live:false` until `SUBSCRIPTIONS_ENABLED` + the annual price + the coupon exist.
+
+### 10.4 Acceptance criteria
+1. `createCheckoutSession` accepts optional `discounts` and forwards to Stripe; omitted ⇒ byte-identical to today (regression-safe unit test).
+2. The discounted membership checkout is reachable **only** via the attendee-gated route; the public `pro_annual` checkout stays $795 (no coupon).
+3. The route rejects a caller with no valid attendee credential (401/403) — non-attendees get no discount.
+4. The checkout carries `carsi_user_id` metadata so `subscription-store` binds the membership to the correct learner (no IDOR / no wrong-account grant).
+5. Coupon is `duration: once` (test asserts the configured coupon id is passed to the session; Stripe does the $295/$795 math).
+6. Dark: `CCW_ATTENDEE_OFFERS_ENABLED` off and/or missing `CCW_MEMBERSHIP_COUPON_ID`/price ⇒ offer not live + route returns "not available".
+7. Merging with flags off ⇒ zero behaviour change.
+8. **(security)** The discounted checkout binds to the **authenticated attendee's own** `carsi_user_id` — never a caller-supplied email. No discount-for-arbitrary-email.
+9. **(security)** **One discounted membership per attendee/registration** — the route is idempotent: reject if the attendee already holds an active `LmsSubscription`, or the registration is already `membershipClaimed`.
+10. **(security)** `allow_promotion_codes` is **off** on the session; the coupon is applied server-side via `discounts:[{ coupon }]` only — never a discoverable public code.
+
+### 10.5 Dependencies / gates (Rana/owner — activation, not build)
+- Live `$795` recurring Stripe **price** id (GP-439 founder gate / GP-441 engine).
+- A Stripe **Coupon** ($500 AUD off, `duration: once`) → `CCW_MEMBERSHIP_COUPON_ID` env.
+- `SUBSCRIPTIONS_ENABLED=true` + `CCW_ATTENDEE_OFFERS_ENABLED=true`.
+
+### 10.6 Smallest safe first slice (dark, buildable now — no live Stripe calls)
+- Extend `createCheckoutSession` with optional `discounts` (unit test: forwarded when present, absent otherwise).
+- Pure `buildMembershipCheckoutParams({ userId, priceId, couponId })` assembling line-item + coupon + `carsi_user_id` metadata (fully unit-tested).
+- Defer to a judged sub-slice: the attendee-gated route + offer-url wiring (touches auth + live Stripe).
+
+### 10.7 Open questions
+- $295 exact: coupon `amount_off: 50000` (AUD cents) vs `percent_off` — confirm the final list/discount with Rana.
+- Entry UX: **RESOLVED — signed-in-only claim by default** (kills the arbitrary-email vector per AC-8); a single-use registration-bound token link is a later option if a not-signed-in flow is needed.
+- Attendee coupon applies to `pro_annual` **only** (never team tiers) — confirm.
