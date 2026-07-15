@@ -116,20 +116,32 @@ function evaluate(text, strict = true) {
     return findings;
   }
 
-  // 3) A cited section must RESOLVE in the licensed index (fabricated §14 fails).
-  //    Runs in BOTH modes — a fake section number is a high-precision violation.
+  // 3) A cited section must RESOLVE in the licensed index. Handles the bypasses
+  //    CodeRabbit flagged: a cite with no named standard ("the standard §99"),
+  //    an unsupported standard ("S540 §14"), and leading-zero normalisation (§09→9).
   const cite = text.match(SECTION_CITE);
   const std = whichStandard(text);
-  if (cite && std && VALID_SECTIONS[std] && !VALID_SECTIONS[std].has(cite[1])) {
-    findings.push(
-      `Cited section §${cite[1]} does not exist in ${std} (licensed index has §1–${Math.max(...[...VALID_SECTIONS[std]].map(Number))}). A fabricated section is worse than the original error — verify against lib/standards.`
-    );
+  const asserts = STRONG_ASSERT.test(text) || COUNT_CLAIM.test(text);
+  if (cite) {
+    const top = String(parseInt(cite[1], 10)); // normalise §09 → "9"
+    if (std && VALID_SECTIONS[std]) {
+      if (!VALID_SECTIONS[std].has(top)) {
+        findings.push(
+          `Cited section §${cite[1]} does not exist in ${std} (licensed index has §1–${Math.max(...[...VALID_SECTIONS[std]].map(Number))}). A fabricated section is worse than the original error — verify against lib/standards.`
+        );
+      }
+    } else if (strict && asserts) {
+      // cite present but no verifiable standard (unnamed, or unsupported like S540)
+      // → cannot resolve the section. Block at the egress moment.
+      findings.push(
+        'A cited section could not be verified — name the standard (S500/S520) and cite a section that exists in the licensed index (lib/standards). An unverifiable citation is how the 2026-07-15 false claim happened.'
+      );
+    }
     return findings;
   }
 
-  // 4) PRE-PUBLISH only: a STRONG positive content claim must carry a section
-  //    citation. Gated on STRONG_ASSERT so soft/nominative verbs don't false-positive.
-  if (strict && !cite && (STRONG_ASSERT.test(text) || COUNT_CLAIM.test(text))) {
+  // 4) PRE-PUBLISH only: an uncited STRONG/positive or count claim about the standard.
+  if (strict && asserts) {
     findings.push(
       'A claim about what a standard requires/prohibits/says must cite its section number (§x[.x]) verified against the licensed index (lib/standards) — an uncited assertion is how the 2026-07-15 false claim happened.'
     );
@@ -137,8 +149,8 @@ function evaluate(text, strict = true) {
   return findings;
 }
 
-const COPY_EXT = /\.(tsx?|jsx?|mdx?)$/;
-const SCANNED_DIRS = ['app/', 'src/', 'templates/', 'docs/marketing/'];
+const COPY_EXT = /\.(tsx?|jsx?|mdx?|html?|mjs)$/;
+const SCANNED_DIRS = ['app/', 'src/', 'templates/', 'docs/marketing/', 'docs/content/', 'public/courses/'];
 const JSON_SCANNED_DIRS = ['data/seed/', '.curation/', 'data/wordpress-export/'];
 function inScope(file) {
   const norm = file.replace(/\\/g, '/');

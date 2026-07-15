@@ -14,12 +14,15 @@ const MUST_BLOCK = [
   ['adversary #3a out-of-scope', 'S520 treats ozone as out of scope.'],
   ['adversary #3b false positive count', 'S520 references ozone only twice, both as cautions.'],
   ['uncited requirement claim', 'The standard requires ozone fogging after every mould job.'],
+  ['CodeRabbit: unnamed-standard cited §99', 'The standard §99 requires ozone fogging in every occupied structure.'],
+  ['CodeRabbit: unsupported standard S540 §14', 'S540 §14 requires hydroxyl generators as the primary control.'],
 ];
 
 const MUST_PASS = [
   ['corrected true claim (cited, valid section)', 'S520 §9.1.7 addresses ozone and other antimicrobial devices as supplementary tools.'],
   ['legit nominative, no content claim', 'Our courses are aligned to ANSI/IICRC S500:2021.'],
   ['legit cited content claim', 'Worker protection is covered in S520 §5, Safety and Health.'],
+  ['CodeRabbit: leading-zero §09 normalises to valid §9', 'S520 §09 requires structural remediation to begin with containment.'],
   ['legit nominative + soft verb (no false positive)', 'Aligned to ANSI/IICRC S500:2021 and covering the full water-damage workflow.'],
   ['unrelated copy', 'Mould remediation begins with a moisture inspection.'],
 ];
