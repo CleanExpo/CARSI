@@ -135,6 +135,7 @@ export async function sendEnrollmentWelcomeEmail(params: {
   studentId: string;
   courseSlug: string;
   appOrigin: string;
+  offers?: import('@/lib/marketing/ccw-roadshow-offers').CcwAttendeeOffer[];
 }): Promise<SendEmailResult> {
   const { studentId, courseSlug, appOrigin } = params;
   const user = await prisma.lmsUser.findUnique({
@@ -161,6 +162,7 @@ export async function sendEnrollmentWelcomeEmail(params: {
     courseTitle: course.title,
     startUrl,
     dashboardUrl,
+    offers: params.offers,
   });
 
   return sendEmail({
