@@ -112,7 +112,7 @@ A **separate** `CCW_ATTENDEE_OFFERS_ENABLED` flag (distinct from `CCW_ATTENDANCE
 
 | Dep | Owner | Needed for |
 |-----|-------|-----------|
-| **Permanent CCW Shopify product URL** (published, not `shopifypreview.com`) | Toby | `ccw-store-credit` offer `live: true` |
+| ~~Permanent CCW Shopify product URL~~ ✅ **DONE 2026-07-15** — `https://ccwonline.com.au/products/ccw-carsi-2-day-in-house-training` (verified live: "CCW/CARSI 2 Day In-house Training", $100→$150 credit). `ccw-store-credit` now `live:true`. | Toby | — |
 | **CARSI live `$795` annual price + tracked coupon ref** | Rana | `carsi-membership` offer `live: true` |
 | **RA assisted-setup discount mechanism** (coupon vs in-app; RA repo) | RA / Rana | `ra-setup` offer `live: true` |
 | **Financial sign-off** (funding model, GST) | Owner | any offer live |
