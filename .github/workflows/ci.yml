@@ -221,6 +221,15 @@ jobs:
       - name: Apply Prisma migrations to test DB
         run: npx prisma migrate deploy
 
+      # Drift gate (operating agreement B3): after migrate deploy the test DB IS
+      # the migration history applied. Diff it against schema.prisma — any model
+      # or field without a backing migration produces a non-empty diff and exit
+      # code 2, failing CI before a P2021 can reach auto-deployed prod. Prisma 7
+      # flags: --from-config-datasource (the DB prisma.config.ts points at, just
+      # migrated) vs --to-schema (schema.prisma). No shadow DB needed.
+      - name: Fail on Prisma schema drift (a model/field with no migration)
+        run: npx prisma migrate diff --from-config-datasource --to-schema prisma/schema.prisma --exit-code
+
       # Seed the course catalogue so the data-dependent journeys in
       # e2e/carsi-journeys.spec.ts (course list, WRT filter, "Carpet" search,
       # course detail by slug) run against real data instead of an empty DB.
