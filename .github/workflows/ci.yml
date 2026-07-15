@@ -287,11 +287,13 @@ jobs:
           JWT_SECRET: 'ci-e2e-test-only-jwt-secret-min-32-chars-1234567890'
           # WS2 (#575) added a fail-loud boot validator (src/lib/server/boot-env.ts via
           # instrumentation.ts) that REFUSES to start the production webServer unless
-          # STRIPE_SECRET_KEY and OPENROUTER_API_KEY are also present. Without them the
-          # `npm run start` server never boots and Playwright times out at 240s. The
-          # validator only checks presence (.trim()), so these test-only placeholders
-          # suffice — the E2E journeys never call Stripe/OpenRouter. Do NOT reuse anywhere real.
+          # STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET and OPENROUTER_API_KEY are present.
+          # Without them the `npm run start` server never boots and Playwright times out
+          # at 240s. The validator only checks presence (.trim()), so these test-only
+          # placeholders suffice — the E2E journeys never call Stripe/OpenRouter. Do NOT
+          # reuse anywhere real.
           STRIPE_SECRET_KEY: 'ci-e2e-placeholder-not-a-real-stripe-key'
+          STRIPE_WEBHOOK_SECRET: 'ci-e2e-placeholder-not-a-real-webhook-secret'
           OPENROUTER_API_KEY: 'ci-e2e-placeholder-not-a-real-openrouter-key'
           # DATABASE_URL inherited from job-level env (postgresql://root:root@localhost:5432/carsi).
           # The previous step-level starter_db override caused P1000 auth failure
