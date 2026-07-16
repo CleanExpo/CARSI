@@ -102,9 +102,24 @@ async function heygenRequest<T>(apiKey: string, method: 'GET' | 'POST', route: s
   return (text ? JSON.parse(text) : {}) as T;
 }
 
-/** HeyGen avatar video driven by a public audio URL (lip-sync; duration = audio length). */
+/**
+ * HeyGen avatar video driven by a public audio URL (lip-sync; duration = audio length).
+ *
+ * Face/expression quality knobs (2026-07-16 — the first render looked flat because BOTH of these
+ * silently defaulted):
+ *   INTRO_VIDEO_ENGINE       'avatar_v' (highest fidelity, cross-reference animation) | 'avatar_iv'
+ *                            (default if HeyGen picks) | 'avatar_iii'. Check the look's
+ *                            supported_api_engines before setting.
+ *   INTRO_VIDEO_EXPRESSIVENESS  'high' | 'medium' | 'low'. Photo avatars only, Avatar IV only —
+ *                            HeyGen defaults it to 'low' when omitted (= dead expression).
+ *                            REJECTED by the API when engine is avatar_v.
+ *   INTRO_VIDEO_MOTION_PROMPT   natural-language body/gesture direction (photo avatars, either engine).
+ */
 async function renderAvatarWithAudio(apiKey: string, brief: CourseLessonVideoBrief, audioUrl: string): Promise<{ videoUrl: string; captionUrl?: string }> {
-  const payload = {
+  const engineType = (process.env.INTRO_VIDEO_ENGINE ?? 'avatar_v').trim();
+  const expressiveness = (process.env.INTRO_VIDEO_EXPRESSIVENESS ?? 'high').trim();
+  const motionPrompt = process.env.INTRO_VIDEO_MOTION_PROMPT?.trim();
+  const payload: Record<string, unknown> = {
     type: 'avatar',
     avatar_id: avatarFor(brief),
     title: `CARSI Intro - ${brief.title}`,
@@ -115,6 +130,10 @@ async function renderAvatarWithAudio(apiKey: string, brief: CourseLessonVideoBri
     caption: brief.captions ? { file_format: 'srt' } : undefined,
     output_format: 'mp4',
   };
+  if (engineType && engineType !== 'default') payload.engine = { type: engineType };
+  // expressiveness is Avatar IV only — the API rejects it alongside avatar_v
+  if (engineType !== 'avatar_v' && expressiveness) payload.expressiveness = expressiveness;
+  if (motionPrompt) payload.motion_prompt = motionPrompt;
   const submit = await heygenRequest<{ data: { video_id?: string } }>(apiKey, 'POST', '/v3/videos', payload);
   const videoId = submit.data?.video_id;
   if (!videoId) throw new Error('HeyGen submit returned no video_id.');
@@ -165,8 +184,10 @@ async function main(): Promise<void> {
   if (dryRun) {
     console.log(`[dry-run] ${queue.length} course-intro video(s). ElevenLabs → Cloudinary → HeyGen. No API, no spend.\n`);
     for (const b of queue) {
+      const eng = (process.env.INTRO_VIDEO_ENGINE ?? 'avatar_v').trim();
       console.log(`— ${b.courseSlug}  (${b.script.trim().split(/\s+/).length} words)`);
       console.log(`   voice=${voiceFor(b) || '<INTRO_ELEVENLABS_VOICE_ID / brief.voiceId unset>'}  avatar=${avatarFor(b) || '<HEYGEN_AVATAR_ID unset>'}  model=${ELEVEN_MODEL}  captions=${b.captions}`);
+      console.log(`   engine=${eng}${eng !== 'avatar_v' ? `  expressiveness=${process.env.INTRO_VIDEO_EXPRESSIVENESS ?? 'high'}` : ''}${process.env.INTRO_VIDEO_MOTION_PROMPT ? '  motion_prompt=set' : ''}`);
     }
     console.log(`\nWhen secrets are set: rerun with --generate. Then: npx tsx scripts/apply-intro-video-urls.ts`);
     return;
