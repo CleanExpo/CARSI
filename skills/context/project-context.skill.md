@@ -17,7 +17,7 @@ Use this skill when working inside `/Users/phillmcgurk/CARSI`.
 - Purpose: Online training and CEC learning platform for Australian cleaning and restoration professionals
 - GitHub: `CleanExpo/CARSI`
 
-The portfolio registry remains the SSOT for identity: `../Unite-Hub/.portfolio/PORTFOLIO.yaml`.
+The portfolio registry previously held the SSOT for identity at `../Unite-Hub/.portfolio/PORTFOLIO.yaml`; Unite-Hub was decommissioned 2026-06-20 and no active replacement registry is wired here.
 
 ## Current Stack
 

@@ -1,4 +1,4 @@
-@../Unite-Hub/.portfolio/PORTFOLIO.yaml
+<!-- Unite-Hub (CleanExpo/Unite-Hub) held the cross-repo portfolio registry; decommissioned 2026-06-20. No active replacement registry is wired here. -->
 
 ## Identity (SSOT)
 **Canonical name:** CARSI
@@ -6,7 +6,7 @@
 **Canonical local path:** `D:$canon`
 **GitHub:** `CleanExpo/CARSI`
 
-> Registry: see `D:\Unite-Hub\.portfolio\PORTFOLIO.yaml` (single source of truth)
+> Registry: previously `D:\Unite-Hub\.portfolio\PORTFOLIO.yaml` (single source of truth); Unite-Hub decommissioned 2026-06-20, no active replacement wired here.
 
 ---# CLAUDE.md
 
