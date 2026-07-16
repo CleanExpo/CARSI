@@ -3,7 +3,7 @@
  * Proof the standards-claim guard catches the 2026-07-15 incident AND every
  * evasion the adversarial review raised, while leaving legitimate copy alone.
  */
-import { evaluate } from './check-standards-claims.mjs';
+import { evaluate, isExempt, inScope, JSON_SCANNED_DIRS } from './check-standards-claims.mjs';
 
 const MUST_BLOCK = [
   ['incident gimmick', 'Search the IICRC S520 for the word "hydroxyl."'],
@@ -27,7 +27,65 @@ const MUST_PASS = [
   ['unrelated copy', 'Mould remediation begins with a moisture inspection.'],
 ];
 
+// SCAN-MODE precision (strict=false). The repo scan is the mode CI runs; before
+// 2026-07-17 nothing tested it, so it sat RED on false positives and was never
+// wired into CI. Case 1 is a verbatim repo line the scan wrongly blocked (it fails
+// without the proximity fix below). Case 2 is a shortened DRAFT banner that already
+// passes — kept as a regression case, not as proof of the fix.
+const MUST_PASS_SCAN = [
+  [
+    'FP: benign negation 200+ chars from the standard name (lesson-outlines.md:50)',
+    '**Key Concepts:** Restoration scoping does not occur in a vacuum — it is governed by industry standards that define best practice, protect the restorer legally, and provide a common language for all stakeholders. This lesson introduces IICRC S500 (water damage), S520 (mould remediation), and their relationship to Australian standards including AS/NZS 4349.1 (building inspections). Students learn how to reference these standards in scope documents.',
+  ],
+  [
+    'FP: DRAFT banner naming a standard, no content claim (wordpress-export/courses.json:4790)',
+    '<strong>DRAFT &mdash; pending SME review.</strong> This course content has been drafted against ANSI/IICRC S520:2024 and Australian work health and safety requirements.',
+  ],
+];
+
+// SCOPE REGRESSION — data/wordpress-export/ MUST stay scanned. `db:seed-wp-export`
+// upserts its 84 published rows into `lms_courses` (seed-wordpress-export-courses.ts),
+// and 80 courses are live on carsi.com.au, so it is a first-class content surface —
+// NOT the "frozen legacy" archive an earlier spec draft mistook it for. A future
+// "tidy-up" that narrows this scope would silently blind the guard across most of
+// the catalogue. That mistake must fail a test, not rely on memory.
+const SCOPE_MUST_INCLUDE = [
+  ['wordpress-export is scanned (84 published rows seed lms_courses)', 'data/wordpress-export/courses.json'],
+  ['data/seed is scanned', 'data/seed/courses-catalog.json'],
+];
+
+// Rule-describing sources — the guard already exempts its own text, its test and
+// CLAUDE.md. These three are the OTHER copies of the same rule; their negations
+// instruct the author ("NEVER quote copyrighted IICRC prose"), they make no claim
+// about a standard's content. Exempt at FILE level (never directory level).
+const MUST_BE_EXEMPT = [
+  ['guard self-exempt', 'scripts/check-standards-claims.mjs'],
+  ['rule text: standards-excerpt', 'src/lib/course-kit/standards-excerpt.ts'],
+  ['rule text: ai-course-builder-guard', 'src/lib/course-kit/ai-course-builder-guard.ts'],
+  ['rule text: assistant-prompt', 'src/lib/server/assistant-prompt.ts'],
+];
+
 let fail = 0;
+for (const [name, text] of MUST_PASS_SCAN) {
+  const hits = evaluate(text, false);
+  const ok = hits.length === 0;
+  console.log(`${ok ? '✓ SCAN-OK ' : '✗ SCAN-FP '} | ${name}`);
+  if (!ok) { console.log(`           → ${hits[0]}`); fail++; }
+}
+for (const [name, file] of SCOPE_MUST_INCLUDE) {
+  const ok = inScope(file) && !isExempt(file);
+  console.log(`${ok ? '✓ IN-SCOPE' : '✗ BLIND  '} | ${name}`);
+  if (!ok) { console.log(`           → "${file}" is not scanned — the guard is blind here.`); fail++; }
+}
+for (const [name, file] of MUST_BE_EXEMPT) {
+  const ok = isExempt(file);
+  console.log(`${ok ? '✓ EXEMPT  ' : '✗ NOT-EX  '} | ${name}`);
+  if (!ok) { console.log(`           → "${file}" should be exempt (rule-describing source).`); fail++; }
+}
+if (!JSON_SCANNED_DIRS.includes('data/wordpress-export/')) {
+  console.log('✗ SCOPE    | data/wordpress-export/ removed from JSON_SCANNED_DIRS — 84 live courses would go unscanned.');
+  fail++;
+}
 for (const [name, text] of MUST_BLOCK) {
   const hits = evaluate(text);
   const ok = hits.length > 0;
