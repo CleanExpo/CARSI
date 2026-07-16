@@ -71,6 +71,47 @@ export function areAttendeeOffersActive(event: EventWindow, now: Date): boolean 
   return t >= start && t <= end;
 }
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * The CCW store-credit voucher has a PRE-PURCHASE window that is deliberately
+ * wider than the on-the-day `areAttendeeOffersActive` window: it is open from now
+ * right through the event's first day, so attendees can pay ahead, get store
+ * credit immediately, and lock in their seat (the $50 bonus lands when they sign
+ * in on day 1). Owner decision 2026-07-16 — supersedes the original "claim during
+ * the 2 event days only" lock in the day-gated-offers spec.
+ *
+ * "Through the first day" = the 24h from `startDateIso` (day-1 morning) — covers
+ * all of day 1. Pure instant math; the ISO offset already encodes AEST/AEDT, and
+ * the client clock is never trusted (server passes `now`). Closed for past events.
+ */
+export function isVoucherPurchaseWindowOpen(event: EventWindow, now: Date): boolean {
+  const start = new Date(event.startDateIso).getTime();
+  const t = now.getTime();
+  if (Number.isNaN(start) || Number.isNaN(t)) return false;
+  return t <= start + DAY_MS;
+}
+
+/**
+ * The pre-purchase CCW store-credit voucher to promote right now, or null.
+ * Returns it only when the feature flag is enabled, the purchase window is open,
+ * the offer is `live`, and its URL passes the preview-host guard. Pure — the
+ * caller passes `enabled` (server flag) so this stays client-safe and testable.
+ */
+export function selectPrepurchaseVoucher(
+  event: EventWindow,
+  now: Date,
+  opts: { enabled: boolean; offers?: CcwAttendeeOffer[] },
+): CcwAttendeeOffer | null {
+  if (!opts.enabled) return null;
+  if (!isVoucherPurchaseWindowOpen(event, now)) return null;
+  const offers = opts.offers ?? ccwRoadshowAttendeeOffers;
+  const voucher = offers.find((o) => o.key === 'ccw-store-credit') ?? null;
+  if (!voucher || !voucher.live) return null;
+  if (voucher.url != null && !isDistributableOfferUrl(voucher.url)) return null;
+  return voucher;
+}
+
 const PREVIEW_HOST = 'shopifypreview.com';
 
 /**

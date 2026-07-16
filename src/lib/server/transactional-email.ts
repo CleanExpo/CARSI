@@ -27,6 +27,9 @@ import {
   buildRegistrationEmail,
   type RoadshowEmailKind,
 } from '@/lib/server/ccw-roadshow-registration-email';
+import { ccwRoadshowEvents } from '@/lib/marketing/ccw-roadshow';
+import { selectPrepurchaseVoucher } from '@/lib/marketing/ccw-roadshow-offers';
+import { isCcwAttendeeOffersEnabled } from '@/lib/server/ccw-offers-flag';
 
 export { isEmailConfigured };
 export type { SendEmailResult };
@@ -359,6 +362,21 @@ export async function sendCcwRoadshowRegistrationEmail(params: {
   appOrigin: string;
 }): Promise<SendEmailResult> {
   const base = params.appOrigin.replace(/\/$/, '');
+
+  // Pre-purchase store-credit voucher CTA — only for seat holders (confirmed /
+  // promoted), only when the offers flag is on and the purchase window is open.
+  // Waitlisted attendees have no seat to lock in, so they don't get the CTA.
+  let voucherUrl: string | undefined;
+  if (params.kind === 'confirmed' || params.kind === 'promoted') {
+    const event = ccwRoadshowEvents.find((e) => e.city === params.eventCity);
+    if (event) {
+      const voucher = selectPrepurchaseVoucher(event, new Date(), {
+        enabled: isCcwAttendeeOffersEnabled(),
+      });
+      voucherUrl = voucher?.url;
+    }
+  }
+
   const { subject, html, text } = buildRegistrationEmail({
     kind: params.kind,
     attendeeName: params.attendeeName,
@@ -370,6 +388,7 @@ export async function sendCcwRoadshowRegistrationEmail(params: {
     seatCount: params.seatCount,
     freeEntryToken: params.freeEntryToken,
     eventPageUrl: `${base}/events/ccw-roadshow`,
+    voucherUrl,
   });
 
   return sendEmail({ to: params.to, subject, html, text });
