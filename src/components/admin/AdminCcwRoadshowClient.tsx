@@ -11,6 +11,14 @@ type CitySummary = {
   waitlisted: number;
 };
 
+type EmailStatus = {
+  lastKind: string | null;
+  lastStatus: string | null;
+  lastAttemptAt: string | null;
+  failureReason: string | null;
+  everSent: boolean;
+};
+
 type RegistryRow = {
   registrationId: string;
   eventSlug: string;
@@ -24,7 +32,35 @@ type RegistryRow = {
   calendarSynced: boolean;
   createdAt: string;
   attendees: { fullName: string; yearsExperience: string; goals: string }[];
+  /** null = no send ever attempted (or predates email logging). */
+  email: EmailStatus | null;
 };
+
+/** Renders the email delivery state so a silent failure is visible at a glance. */
+function EmailCell({ email }: { email: EmailStatus | null }) {
+  if (!email) {
+    return (
+      <span className="text-amber-300" title="No email send has ever been recorded for this registration.">
+        ⚠ never sent
+      </span>
+    );
+  }
+  if (email.lastStatus === 'failed') {
+    return (
+      <span className="text-red-400" title={email.failureReason ?? 'Send failed'}>
+        ✗ failed{email.failureReason ? ` (${email.failureReason})` : ''}
+      </span>
+    );
+  }
+  if (email.lastStatus === 'skipped') {
+    return <span className="text-white/50" title="Dev console — not sent to the provider">– skipped</span>;
+  }
+  return (
+    <span className="text-emerald-400" title={email.lastAttemptAt ?? undefined}>
+      ✓ {email.lastKind ?? 'sent'}
+    </span>
+  );
+}
 
 const surface = 'rounded-2xl border border-white/10 bg-white/[0.04] shadow-[0_1px_0_rgba(255,255,255,0.04)_inset]';
 const mutedText = 'text-white/70';
@@ -67,6 +103,20 @@ export function AdminCcwRoadshowClient() {
       const payload = (await res.json().catch(() => ({}))) as { detail?: string };
       setError(payload.detail || 'Failed to promote');
       return;
+    }
+    // A 200 means the seat was granted — it does NOT mean the attendee was told.
+    // The email can fail independently, which used to be invisible here.
+    const payload = (await res.json().catch(() => ({}))) as {
+      emailSent?: boolean;
+      emailReason?: string;
+    };
+    if (payload.emailSent === false) {
+      setError(
+        `Promoted ${row.contactEmail} — but the confirmation email did NOT send` +
+          `${payload.emailReason ? ` (${payload.emailReason})` : ''}. Contact them manually.`,
+      );
+    } else {
+      setError('');
     }
     await load();
   }
@@ -143,6 +193,7 @@ export function AdminCcwRoadshowClient() {
               <th className="p-3 font-semibold">Company</th>
               <th className="p-3 font-semibold">Contact</th>
               <th className="p-3 font-semibold">Calendar</th>
+              <th className="p-3 font-semibold">Email</th>
               <th className="p-3 font-semibold">Attendees</th>
               <th className="p-3 font-semibold">Token</th>
               <th className="p-3 font-semibold">Action</th>
@@ -181,6 +232,9 @@ export function AdminCcwRoadshowClient() {
                       Pending
                     </span>
                   )}
+                </td>
+                <td className="whitespace-nowrap p-3 text-xs font-semibold">
+                  <EmailCell email={row.email} />
                 </td>
                 <td className="p-3">
                   <ul className="space-y-2">
