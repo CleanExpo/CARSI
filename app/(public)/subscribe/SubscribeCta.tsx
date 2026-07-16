@@ -34,7 +34,9 @@ export function SubscribeCta({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  if (!enabled) {
+  // Regular membership stays behind the flag; attendee $295 special is always on
+  // when the offer query is present (price is hardcoded in checkout).
+  if (!enabled && !attendeeOffer) {
     return (
       <>
         <span

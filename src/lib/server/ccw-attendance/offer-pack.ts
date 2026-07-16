@@ -14,7 +14,7 @@ import {
   CCW_ATTENDEE_MEMBERSHIP_LABEL,
   CCW_ATTENDEE_OFFER_QUERY,
   CCW_OFFER_SOCIAL_LINKS,
-  getCcwShopifyTrainingUrl,
+  CCW_SHOPIFY_TRAINING_URL,
 } from '@/lib/marketing/ccw-roadshow-offer-pack';
 import { prisma } from '@/lib/prisma';
 import { baseOfferEligible } from '@/lib/server/ccw-attendance/eligibility';
@@ -89,7 +89,7 @@ export async function runCcwOfferPackBatch(
         attendeeName: row.fullName,
         eventCity: event.city,
         eventDates: event.dates,
-        shopifyTrainingUrl: getCcwShopifyTrainingUrl(),
+        shopifyTrainingUrl: CCW_SHOPIFY_TRAINING_URL,
         membershipCheckoutUrl,
         membershipPriceLabel: CCW_ATTENDEE_MEMBERSHIP_LABEL,
         socialLinks: CCW_OFFER_SOCIAL_LINKS,
