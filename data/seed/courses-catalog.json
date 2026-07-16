@@ -33,7 +33,10 @@
    ],
    "iicrcDiscipline": null,
    "cecHours": 0,
-   "meta": null,
+   "meta": {
+    "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784189964/carsi/course-intro/fbc9f098-6ae7-4865-b4ad-db6ed4ef4991.mp4",
+    "introCaptionsUrl": "https://files2.heygen.ai/aws_pacific/avatar_tmp/796a104f8f42428d95773a663755e11c/subtitles_f7d20bc435494eb4b27c4d8a7af7d906.srt?Expires=1784794763&Signature=PMaYRLjEptyc4fYTEQDoulTl35W4r1h56h6wDGnUnqa-s~xHM776N9eFdOHdDRRDbcN1kRMXz7G7ljIOFVG1Z9GloegcB2ivbrSK~3tjerzbFxnqeFzY4DprG6bDbrBOjf5gAIsxYM2KWnAyT8bTS0SIre6N62BNPn04xAqz5Btzw754IpW6luCPe5cFaziBsQvKrmsbuf6gXciyqTH40O1PCgEFKb4x72YWKueLniozxcM8VXM1il4RgoZf5AGxy82YBzLGey1VaF7vz5aSGNu~7-Sq3XsZvW2JtkP~YwRJg-manJb5iRlaTvC6vBFSGzblcQXhaqQxJYELxMUD6w__&Key-Pair-Id=K38HBHX5LX3X2H"
+   },
    "isPublished": false,
    "modules": [
     {
@@ -196,7 +199,8 @@
       }
      ]
     }
-   ]
+   ],
+   "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784189964/carsi/course-intro/fbc9f098-6ae7-4865-b4ad-db6ed4ef4991.mp4"
   },
   {
    "id": "ae989f1b-e9f2-43ab-848e-3f3fe0c120bc",
@@ -222,7 +226,10 @@
    ],
    "iicrcDiscipline": null,
    "cecHours": 0,
-   "meta": null,
+   "meta": {
+    "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784190256/carsi/course-intro/e8e6e955-fbbe-4c6c-b3bb-478ae9ee7b90.mp4",
+    "introCaptionsUrl": "https://files2.heygen.ai/aws_pacific/avatar_tmp/796a104f8f42428d95773a663755e11c/subtitles_17c2320e6c7c42ca82a5f08b843de0ff.srt?Expires=1784795055&Signature=R2nqfqGgViyN0Vu6e68g63G7OoBrpDGGn09g-vMyWgfdfk4Obqr87LxYrhZtL2sgPdoRIFFNbrZN6h~G5fhzBh79mg-dKlwQg7FFkLZrGnSicrS50K5ON0RvN-C2pot~hRlUM49bf9QKYLwAJQ8at3obPFYKBidr1Q~zT7zCOUZv~h1MA62MsKFUv9r08f4oIwOwMLjdbC0iwfOaMG-bXlNsVtAnhbQ7JYW9B0p5wjSPxAftSx9fOLO0d9Y-u57DS9mm3XfTlWkY-PiK5q-GOP-KOY3liBsj5Bb4LFhSSRxZa62MlRT7cxeXglv0WhVYERb08bQvyGPrY8zSv8legg__&Key-Pair-Id=K38HBHX5LX3X2H"
+   },
    "isPublished": false,
    "modules": [
     {
@@ -305,7 +312,8 @@
       }
      ]
     }
-   ]
+   ],
+   "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784190256/carsi/course-intro/e8e6e955-fbbe-4c6c-b3bb-478ae9ee7b90.mp4"
   },
   {
    "id": "6e3da1ba-fce2-466a-bfae-f2cc662243bf",
@@ -329,7 +337,10 @@
    ],
    "iicrcDiscipline": null,
    "cecHours": 0,
-   "meta": null,
+   "meta": {
+    "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784190594/carsi/course-intro/41bf0059-82cc-45f1-915c-1ec3a1d21a11.mp4",
+    "introCaptionsUrl": "https://files2.heygen.ai/aws_pacific/avatar_tmp/796a104f8f42428d95773a663755e11c/subtitles_4863fdfcdecf403dbd1f09280fd96383.srt?Expires=1784795393&Signature=GmxQQKCsb3VKuI8uUncdHxkOP2fk0wSXgPV8a2LQbwoQxdMcM4IybEESxXYzTsZxIynrQQt-h-h2A65jQh5m8v0Eh1-caC9RA6UMVTL8apdzlInMF-U6UbI7EP3O78XVdEnP~ADbIFhpv5rEbVU9qtccbrLVSXJVGtJ1RBhP4gwQ7zaWsVc1FiCWCA2y4GGaBBc3daoW-ZpN~Wjm2l8OPotzDycbx85cvk6YSt-MV6Lgpi0d28jTloIuHk0~jfiCRxN5XFaVcPadEIs5giSzI5kqURkvPSXauB3tPO9EB70PYL58Ra0TSbAZ5lGZwgC3updDY5pRXtLD7C~GbIVDCg__&Key-Pair-Id=K38HBHX5LX3X2H"
+   },
    "isPublished": false,
    "modules": [
     {
@@ -492,7 +503,8 @@
       }
      ]
     }
-   ]
+   ],
+   "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784190594/carsi/course-intro/41bf0059-82cc-45f1-915c-1ec3a1d21a11.mp4"
   },
   {
    "id": "72d9d048-2a56-49b7-bc76-08bc3ebada78",
@@ -517,7 +529,10 @@
    ],
    "iicrcDiscipline": null,
    "cecHours": 0,
-   "meta": null,
+   "meta": {
+    "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784190878/carsi/course-intro/759442cb-809a-4137-b7e1-b9ab593a5b74.mp4",
+    "introCaptionsUrl": "https://files2.heygen.ai/aws_pacific/avatar_tmp/796a104f8f42428d95773a663755e11c/subtitles_657316554ebb427a8aecfa7e740c3cfd.srt?Expires=1784795677&Signature=pbZ3lnfYbC5Q2kC6~nacbkhJVY4s-JhdBBujk0KhCGy8uvg-G7comhMFF7XUtie2NKRA47--6jBAY1G2xOnO~R4uV6DRMeOzP7tS6yZxPK73NcjcItm~WTMtoPBW0FlN--W9Qzp8PmycccXcrNPQyppVPFkpjGaWZvBsZWUNgVAWp1BhqBdLjPuN2BEERb2lOcTaIqdYlDoeemFt8ozzhPzosLloxYy2cqAN6TGj-Kkjtzngfgt0QllDRFMIoUw5YmoTAl7Z3xrUmDTwo~n7~uVjb9Spe2o0rDYO~aC7oA8L6WoIjnqJFyGekeCrTX0cPtzrbrgGttZuk38WwlolKw__&Key-Pair-Id=K38HBHX5LX3X2H"
+   },
    "isPublished": false,
    "modules": [
     {
@@ -680,7 +695,8 @@
       }
      ]
     }
-   ]
+   ],
+   "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784190878/carsi/course-intro/759442cb-809a-4137-b7e1-b9ab593a5b74.mp4"
   },
   {
    "id": "3c166311-a7e6-4830-9e2b-98ba5db818d6",
@@ -705,7 +721,10 @@
    ],
    "iicrcDiscipline": null,
    "cecHours": 0,
-   "meta": null,
+   "meta": {
+    "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784191161/carsi/course-intro/02fc0026-d978-4372-bf97-833f7d9653c7.mp4",
+    "introCaptionsUrl": "https://files2.heygen.ai/aws_pacific/avatar_tmp/796a104f8f42428d95773a663755e11c/subtitles_1f2bb06c097741cab4483ee2840df2c8.srt?Expires=1784795960&Signature=hGIZ7b1M~omjQWpGUFsfqsAogQYOE6fgfdCCkADfd4jI70S23IvMEe1mVVFicr~Zv5H0TIKFoL2DJlgtAZ15~47a9NrZCvZEhQCV6RQdYftOr6UqfoNIXr03Zim5aVu6HouBPBqlG4Zl2ILU0dEWeVXLDJzMAQ050JZKoEWrewhb6nCnTIw-n45CZ709LI38RJ2PdERbaKW6Ipu24JlubraR6GSBt7dQS8Z7OF1VwPYxhlaWZ~vBE9Jnhg6C5SmMKq1BKCu7yhyOpFdKNXtYUcXqzO817Olmf0gMFG-D0NgTUyIZFwX8GmYbqHW~6CUxHfoaB-iX5UoEkAtMiEcXRg__&Key-Pair-Id=K38HBHX5LX3X2H"
+   },
    "isPublished": false,
    "modules": [
     {
@@ -788,7 +807,8 @@
       }
      ]
     }
-   ]
+   ],
+   "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784191161/carsi/course-intro/02fc0026-d978-4372-bf97-833f7d9653c7.mp4"
   },
   {
    "id": "5e9c2c3c-9a2b-49d9-8b83-3d7add8174fc",
@@ -813,7 +833,10 @@
    ],
    "iicrcDiscipline": null,
    "cecHours": 0,
-   "meta": null,
+   "meta": {
+    "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784191473/carsi/course-intro/7e4e1581-d7a3-456b-823b-8b09f400febb.mp4",
+    "introCaptionsUrl": "https://files2.heygen.ai/aws_pacific/avatar_tmp/796a104f8f42428d95773a663755e11c/subtitles_3461b197324346eea19d2828b9251a01.srt?Expires=1784796273&Signature=c9IEluFpbxaOy0b5Wd91Ys4Ex4DeRdihpCZevUFow87rNO9DCMRH1b3hqgCvHa-2aRw1C9O5zugwTrvYfhfr8HlEfZk~M8LEureX9hgbBJJA~Nc7c1kud7siVrnyaErV17O1v0u9CYG0xotFQ4h-IDjqiQx6nJYr0KlAKJTk9ElsxzOQILerVI8tjMLAC0WjAmYXNlm6xH10gLqaWIjasJeFkfKhp2eN4ow0Jy3nkSWg5Ug3HsahgBCW4UFxzf5lUhePinbG-VEYHmWTvg4evqykNd0mosfIIfluXNYLmfzcwLl4lIva-GDACwzyD6c5aG0R7aI6Duy0~QaEzh~G7g__&Key-Pair-Id=K38HBHX5LX3X2H"
+   },
    "isPublished": false,
    "modules": [
     {
@@ -896,7 +919,8 @@
       }
      ]
     }
-   ]
+   ],
+   "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784191473/carsi/course-intro/7e4e1581-d7a3-456b-823b-8b09f400febb.mp4"
   },
   {
    "id": "12405aba-1c8f-4707-b906-8696aad97cdb",
@@ -921,7 +945,10 @@
    ],
    "iicrcDiscipline": null,
    "cecHours": 0,
-   "meta": null,
+   "meta": {
+    "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784191775/carsi/course-intro/8a941ac1-0b4f-4d50-9839-6bd4ebf5bdff.mp4",
+    "introCaptionsUrl": "https://files2.heygen.ai/aws_pacific/avatar_tmp/796a104f8f42428d95773a663755e11c/subtitles_aff63b75e2c2408fa375060081c3909e.srt?Expires=1784796574&Signature=FXs-sEsOfao8CtPprYfbaGlNv4S7wxPlO2iU4ATe9rU6kufWLKAQXnYbmLr66D4ihcYAaAg5pQfVWYAOuGLyTgp9NlwcfogdMAhkQdJbPemTyEWDZh8mRiTYiam1Mn~XsdeeLZlAwUfU7bOA1hXd4v5T6o31JCtcp1d9KZrO5XPpM40hH1iQ-i0x4Qy7go~j7A91UuGJTOIBnm1u8axHeKn6EqNlOqSFsyVl3pmrUBb1wzD1gkIGLwxTsqbq5-3W4DL2FX01krUbwdm3lkWJXS6ACFG3DYJkv2cUM86t-sMk3cqOwxBXUqe4o96AClQqg46dDeg4NFSItt-zZKZcyA__&Key-Pair-Id=K38HBHX5LX3X2H"
+   },
    "isPublished": false,
    "modules": [
     {
@@ -1004,7 +1031,8 @@
       }
      ]
     }
-   ]
+   ],
+   "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784191775/carsi/course-intro/8a941ac1-0b4f-4d50-9839-6bd4ebf5bdff.mp4"
   },
   {
    "id": "f720d0b8-59c4-4360-b7b4-0e7502ab3476",
@@ -1029,7 +1057,10 @@
    ],
    "iicrcDiscipline": null,
    "cecHours": 0,
-   "meta": null,
+   "meta": {
+    "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784192192/carsi/course-intro/36b0c2f0-6496-4329-b323-2558c9b34408.mp4",
+    "introCaptionsUrl": "https://files2.heygen.ai/aws_pacific/avatar_tmp/796a104f8f42428d95773a663755e11c/subtitles_ccb9d2a1c9694cfcaafec5f44fcfdef7.srt?Expires=1784796991&Signature=X0I2uTbZBTRAIjoVi1mikdydnj9YqG4k4CNDNg-YvaZlho7QuVflWpAtSOmsjx4m5fQrr4XKAUMt4c0WFQALO600ixZqQpyYkouCctboj7m2SQt4i4A4ADHCkcsWWLKo~08b5eJNFL3BQfmWRY5K6W8IBDsVSjdqO0lCJgS8GzE4MTBG6yNHePIR-tfAVbsIeCrVdvO0d2c5IZNWFn-vmBjzTuSg-lBHJH2W1KcSRnA2p6qICcqR9hd58B5FI4hI16mGLlFwBH9hMZxu9WWyhHBd2bE9BMC5AnEJhfnWo2ISo9N50aY6229nQFagyksP5He8zH~LJmJdeHo2CvmiOw__&Key-Pair-Id=K38HBHX5LX3X2H"
+   },
    "isPublished": false,
    "modules": [
     {
@@ -1112,7 +1143,8 @@
       }
      ]
     }
-   ]
+   ],
+   "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784192192/carsi/course-intro/36b0c2f0-6496-4329-b323-2558c9b34408.mp4"
   },
   {
    "id": "f5fb2d55-2daf-4a65-8f82-75a8f23231c3",
@@ -1137,7 +1169,10 @@
    ],
    "iicrcDiscipline": null,
    "cecHours": 0,
-   "meta": null,
+   "meta": {
+    "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784192500/carsi/course-intro/fdf67405-1d0f-4bba-b122-35f5f75f7b7b.mp4",
+    "introCaptionsUrl": "https://files2.heygen.ai/aws_pacific/avatar_tmp/796a104f8f42428d95773a663755e11c/subtitles_6f651e434935492f82d870e2cca9ef02.srt?Expires=1784797300&Signature=UBolwRdCHv730yJDdKFQ-NbOTZrEb1QgAH5tfa-G0pa94~N1TrNwrgDab6rvuzRoU2WrDi-uCTZn2KCpUVPTs9kJnTWo9EV8BvmT3tZ3oN9HAd3MASWndG8TagcdeQ0qPh88TViFLt57JfM6W7ypVb~W0RVLnE6vZaqRRJEpb1-vhBvPV5RwaOr0aZphiA0kISI9PUaiKBqMybwrJuDc6GCExRAQ8i4qZudED0vcXOQdw1-rakra476wr~7zsjrX9mlOHU2S79JmOZDZhP8LP9NWF8frY6gviWsk5ERp4q2Hu46WNA-L6X6Hqd0zJng8Y9Fbas8UZydDa0ZUmH9YHQ__&Key-Pair-Id=K38HBHX5LX3X2H"
+   },
    "isPublished": false,
    "modules": [
     {
@@ -1220,7 +1255,8 @@
       }
      ]
     }
-   ]
+   ],
+   "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784192500/carsi/course-intro/fdf67405-1d0f-4bba-b122-35f5f75f7b7b.mp4"
   },
   {
    "id": "94f365b7-10ff-411d-9740-427655beb4a0",
@@ -1245,7 +1281,10 @@
    ],
    "iicrcDiscipline": null,
    "cecHours": 0,
-   "meta": null,
+   "meta": {
+    "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784192799/carsi/course-intro/e308a210-22b4-424e-a039-3ea0e6df8bc6.mp4",
+    "introCaptionsUrl": "https://files2.heygen.ai/aws_pacific/avatar_tmp/796a104f8f42428d95773a663755e11c/subtitles_22359f11f28e4863960d9fb047bab7c9.srt?Expires=1784797599&Signature=Rx60YO6lzvyBoeyuwQ4C4hL9cOx4P3p6LzdGQUp3lgxd7kjualrwAf8dgOckKX44aqoAFjT4hzQSrrjsUZoLllIWIH9kUwwNKU4L50dnK3ZzhRHPBhViCPekhoV9OGL9yIF-huKmrkF2ICeUm0nFdu9jFfVXCwtF6XgTce9xuFDv0xtyNgzcMT-LF54H9UZEy3vdKs3LgGbDjrhfrlvXtfrB8buhWLlC64MbFUlOM77myTSk6HhVAvmEw0V0S9P3GEMflLKIi2o5mFvA5o3zkkWySHzmRPpHHYmkHrbC98a0TCFIadBDmU-bYwuqV1iUWTvfmfNj3pGuzAnmAsuY7g__&Key-Pair-Id=K38HBHX5LX3X2H"
+   },
    "isPublished": false,
    "modules": [
     {
@@ -1328,7 +1367,8 @@
       }
      ]
     }
-   ]
+   ],
+   "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784192799/carsi/course-intro/e308a210-22b4-424e-a039-3ea0e6df8bc6.mp4"
   },
   {
    "id": "4f6711d4-5227-4618-bbe4-4063b881f8c0",
@@ -1353,7 +1393,10 @@
    ],
    "iicrcDiscipline": null,
    "cecHours": 0,
-   "meta": null,
+   "meta": {
+    "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784193097/carsi/course-intro/6fabb776-7ec9-4eaf-b399-dd8190c33e61.mp4",
+    "introCaptionsUrl": "https://files2.heygen.ai/aws_pacific/avatar_tmp/796a104f8f42428d95773a663755e11c/subtitles_ae03f168b6d8473392b7cf7d95cbcb06.srt?Expires=1784797896&Signature=pFyuWLD5bALBmAwyNk2VCXbXLO~G6rUrJwcx0JlCx255RE~8aqRCLNHXxIWhthgJinEBBJlrlGnUUEbOGmBPtX516FvBwRiwKM4doK0kGC8FPrk0pwwRzt5O9J8VIOeRFlDwQv14lPCnO0dg6g6a1Sv718dUDgodQjGgWQM9y3DkdgTt8qR6WnYKKsBZayb6iX9gqXbgCmIy0yaqOyCYUf4jKda54kGmfovF2xGv7gki6AA5kFpcklHti6H-fw-y9AoFYRsTBZ3SzbU8G8Yfs1ycfbToakIyY9USLIHpc5FPSEjC6PitUM2~ZMezp2XEUIL8TqPGrI3~ViU9A3dd0Q__&Key-Pair-Id=K38HBHX5LX3X2H"
+   },
    "isPublished": false,
    "modules": [
     {
@@ -1436,7 +1479,8 @@
       }
      ]
     }
-   ]
+   ],
+   "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784193097/carsi/course-intro/6fabb776-7ec9-4eaf-b399-dd8190c33e61.mp4"
   },
   {
    "id": "9ff47b03-15ab-4b0d-b341-d8939c1d866b",
@@ -1461,7 +1505,10 @@
    ],
    "iicrcDiscipline": null,
    "cecHours": 0,
-   "meta": null,
+   "meta": {
+    "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784193375/carsi/course-intro/d18f59d3-615b-4760-a146-0a5c9dfa0487.mp4",
+    "introCaptionsUrl": "https://files2.heygen.ai/aws_pacific/avatar_tmp/796a104f8f42428d95773a663755e11c/subtitles_8f221782909f48c9a8917b6e0a926da6.srt?Expires=1784798175&Signature=Tlw9Xfq3oNh~9RYzGlF5wx7PcJOVaGTbV2J9xuqSVueA6mXW7tiLqm-ep7o4sSnonEb6IGV2r~Q3~pv6xawPj4igSbVamDvAs4e15ExxGYJdVAguAYKiploQpBut3JulPGWWMpgyara84LJOE33bbPGN80BYsqNflNQSv8-v2DTwhuDJEQSNXDR0Id9zp8F0SJhEYJz0IpAVOpg~9Hm-NkcWztnY19bFqR8IdbcZ31-PtMcY0s1CreG31xvK-hTITCNmftXUtBhP~fU7XxQ~-an9eh3B-VvD0Q~0aOBu3~1LuEZ5ZOhzNaiZ986yAevWWvEYwjz5y-lBPdEHJLW0hg__&Key-Pair-Id=K38HBHX5LX3X2H"
+   },
    "isPublished": false,
    "modules": [
     {
@@ -1544,7 +1591,8 @@
       }
      ]
     }
-   ]
+   ],
+   "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784193375/carsi/course-intro/d18f59d3-615b-4760-a146-0a5c9dfa0487.mp4"
   },
   {
    "id": "61258279-7cc0-4f5d-8ffb-fe2b3afeb3e6",
@@ -1569,7 +1617,10 @@
    ],
    "iicrcDiscipline": null,
    "cecHours": 0,
-   "meta": null,
+   "meta": {
+    "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784193663/carsi/course-intro/04d8178a-b86b-4485-ae66-c4bdb8f1f9a1.mp4",
+    "introCaptionsUrl": "https://files2.heygen.ai/aws_pacific/avatar_tmp/796a104f8f42428d95773a663755e11c/subtitles_42744241526b4cf69de601cdc0ce14e8.srt?Expires=1784798462&Signature=YwZim~S3sM9s3s8dMYsXYHg9XmA9zfIjDhFBcFk1DjxKSfD7eRrPQgjiX2oPX5QqZ-zCITADIMXTlt2BbdNtwnE6EvFsPRTaAPquRrtOroZ6wj6S1ZPVJUklpXckj9OKnsGYThzs~8uaXJCouVmbfdoRid0oCy2fQCNtnG5ANpuVzl~RwszP093Q0cEDpVnWyijQl4WjXLG1RYRqrh7dE4veyd3WuNwlSvG1XJIUfaw51hlh5OFyTYY9fcovVGhaSvyINdvdeoxDNEoQT2KPfKoZUQfzIF~1C-vDrrybMhSZqqZzoH8DOJhotXhFyhzFGfEkNZTfuWI~fPNbQtPzcA__&Key-Pair-Id=K38HBHX5LX3X2H"
+   },
    "isPublished": false,
    "modules": [
     {
@@ -1652,7 +1703,8 @@
       }
      ]
     }
-   ]
+   ],
+   "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784193663/carsi/course-intro/04d8178a-b86b-4485-ae66-c4bdb8f1f9a1.mp4"
   },
   {
    "id": "3b264878-ff60-461f-a0fa-02605867e83e",
@@ -1677,7 +1729,10 @@
    ],
    "iicrcDiscipline": null,
    "cecHours": 0,
-   "meta": null,
+   "meta": {
+    "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784193960/carsi/course-intro/ba0c43bb-fca1-42a7-a29d-a1aff63e698a.mp4",
+    "introCaptionsUrl": "https://files2.heygen.ai/aws_pacific/avatar_tmp/796a104f8f42428d95773a663755e11c/subtitles_d91d271c108042cd9d34098b7053adf9.srt?Expires=1784798759&Signature=FJ4nNZZBza41dv~t5-kuzlGBML15va-C8EZ8hhSXxkfKZ9XWwPoGkLY6FNyV~dSp6jpVc5b4etk0oWxMC8fjLcg3COjIlOwdJFFQYrkK3-JqFJMzrfqdzvYQt5BYJgG0wbbEE0AbC-9bACy8Sf9K8MxlV-QasLGZuYOMVM3eHm8afM95Ky6hIoH~8u2Q6Iu2PGuMWkqHLCVx-cKqavwvfjjQyaSvPS5VX~nr0DCWOHxs-DlalNP0OpHig-Cx5bhSOxSeC8QcxD-9rK1-GdBIYN~S4E5RvnoBEPHcW5cK8mZNGvwIb3ZTMS~FtpAHFMXIHXhkyWuahKppzuvMAUiWLA__&Key-Pair-Id=K38HBHX5LX3X2H"
+   },
    "isPublished": false,
    "modules": [
     {
@@ -1760,7 +1815,8 @@
       }
      ]
     }
-   ]
+   ],
+   "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784193960/carsi/course-intro/ba0c43bb-fca1-42a7-a29d-a1aff63e698a.mp4"
   },
   {
    "id": "cca422eb-419f-4032-bf83-fe1b1a3e4c87",
@@ -1785,7 +1841,10 @@
    ],
    "iicrcDiscipline": null,
    "cecHours": 0,
-   "meta": null,
+   "meta": {
+    "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784194253/carsi/course-intro/4a7f85f5-43fe-4a92-8e25-6a7183b078b7.mp4",
+    "introCaptionsUrl": "https://files2.heygen.ai/aws_pacific/avatar_tmp/796a104f8f42428d95773a663755e11c/subtitles_06eb47dc9e6642679eae2d9a8d18008f.srt?Expires=1784799052&Signature=WZUj9BTQ5BwBXsHWKeyfJca6qJ0ICwLPNANEzggf7Hq8r4QF3sfupPABA8RhrhiHGK6AERqTrx3H7Q2raImHzcgD7vbm5gyPzunjocDbQhKYMqoJJY48T4J3HXVHJI8LdXmEzpby7qj4BKV5I1j-yWWGz-~XWifVMU-VUtM1dbcZESoBg2SwJ-Hd7Jvzvof8i5aEd~EcLQcsDxVAJ~BktE8MFyye0iuzBGvcHAf-y6mNzbRwNk0nxJvpcXIq58j-9IM9w1caEeMX8Nq7TPzd~~4~AZQKSnuuPVxjm7vEK2uKDbqTinhKHKob7Spd8XzLEO9mF68RrjDNQmmRUrFZSg__&Key-Pair-Id=K38HBHX5LX3X2H"
+   },
    "isPublished": false,
    "modules": [
     {
@@ -1868,7 +1927,8 @@
       }
      ]
     }
-   ]
+   ],
+   "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784194253/carsi/course-intro/4a7f85f5-43fe-4a92-8e25-6a7183b078b7.mp4"
   },
   {
    "id": "a574fcee-8ca2-49f2-82f6-da25883c5ef0",
@@ -1892,7 +1952,10 @@
    ],
    "iicrcDiscipline": null,
    "cecHours": 0,
-   "meta": null,
+   "meta": {
+    "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784194593/carsi/course-intro/516e1365-e78d-4e45-9530-937585a91b5e.mp4",
+    "introCaptionsUrl": "https://files2.heygen.ai/aws_pacific/avatar_tmp/796a104f8f42428d95773a663755e11c/subtitles_8e78a37b2c1942b58b9e9fa7d808c7d7.srt?Expires=1784799392&Signature=Gb6N1o~Gi05HX9YbcSwOUM~lGRFItfwuKd0woQzosylsoMCpYVgW5dbOBsuBZFnLJwurXYcW4p2B8PaGYFIFb0PJNzKWsGHmnTqPiJP41FfNbp3YkKaMdxAUdwQMo0zvM0PITPZGZjFTGHuPrDKahraL30X5kaWgtLPXFR2VkAMrESVUS2aNSfioOOu1yESNsJyTG2G6Ri9AzKGiEsrVuyEbLJWI8UAVebRBdAD8W~B~7irphHPGFNuoMswd3GwQJhPnRHAgTn-BmhinHl-8uBpD-3c2zHpnUdBK24lyFKZb0zQF57jYdPcS2ChRoUEHGStQWP8UbQxYLaljTtL8hQ__&Key-Pair-Id=K38HBHX5LX3X2H"
+   },
    "isPublished": false,
    "modules": [
     {
@@ -1975,7 +2038,8 @@
       }
      ]
     }
-   ]
+   ],
+   "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784194593/carsi/course-intro/516e1365-e78d-4e45-9530-937585a91b5e.mp4"
   },
   {
    "id": "414a56a5-5924-4b53-bce0-5cd3ade7d555",
@@ -2000,7 +2064,10 @@
    ],
    "iicrcDiscipline": null,
    "cecHours": 0,
-   "meta": null,
+   "meta": {
+    "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784194874/carsi/course-intro/865db54a-abf8-44fa-ac94-cacc125162f7.mp4",
+    "introCaptionsUrl": "https://files2.heygen.ai/aws_pacific/avatar_tmp/796a104f8f42428d95773a663755e11c/subtitles_dbf0cf593c4c4c95ab06eb941ef21ff4.srt?Expires=1784799673&Signature=mprT3RT9jgj2DdQRPXphRxkvwZ5rOP7-D2c7UAOWXk2XhyoOmYoeU1LyAaJREozrI35v7Hmq7li8DGXD11rVaAYpb7AolStJc~MQng3THI1krLTAqqWeK4To7JU2MixojbYEAEotRJgZ-dwlHEL6get9Yqz-bkN1edej8gQMEZKur-FM8gzcf2BcCV-f6WJqDOu9qquZ97pswJSV8bj344QPbUskibeZLr~xuThEqW-gy05VhURtS4OCMRyCN6AMh~OyHAC8gSByAgOLxCQUfLbU73GS7s9iBxX9H0GsHZxcEQBhSIGMStWL3szmQXn90BWmEvWZK8dFRjtchztMJw__&Key-Pair-Id=K38HBHX5LX3X2H"
+   },
    "isPublished": false,
    "modules": [
     {
@@ -2083,7 +2150,8 @@
       }
      ]
     }
-   ]
+   ],
+   "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784194874/carsi/course-intro/865db54a-abf8-44fa-ac94-cacc125162f7.mp4"
   },
   {
    "id": "493a529c-62aa-48e9-9d32-79af03f60c8b",
@@ -2108,7 +2176,10 @@
    ],
    "iicrcDiscipline": null,
    "cecHours": 0,
-   "meta": null,
+   "meta": {
+    "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784195161/carsi/course-intro/c64f5098-39ea-4387-bb01-abb82e40f622.mp4",
+    "introCaptionsUrl": "https://files2.heygen.ai/aws_pacific/avatar_tmp/796a104f8f42428d95773a663755e11c/subtitles_8067439788794ffc8b2376100a85f67c.srt?Expires=1784799960&Signature=H6Safz42qS6ZVo8Wyxyi5nih3FWIALK0UfMFpox7S1cfDOd7iHiaXyB44DG9Wm7jL7YT2ynUO~wg93tOscLZvIzZoqPOwrBgQET6SZm9X84T9SjQdffsYmyRZuyauqEUeWvp3iy7a6B9aZ4w18KOiTXMZCiGzgRimGkeT-yHGuH7qeVVo~TSBzZPJmyj-PomC4koyvGNeo0tFVITfSgZZQGDMZPOTGlDwMIzmBRpzc9b4EtoBH4ETLM8SUQPZt-~1cEb5rJ3sqAf5ux4Z8z~W4fmI7yOPKkN3qS-XdmYSw~WDalwyNTFlzSBdZi0asAd8OAa1DyAeJlpR3USJYpazg__&Key-Pair-Id=K38HBHX5LX3X2H"
+   },
    "isPublished": false,
    "modules": [
     {
@@ -2191,7 +2262,8 @@
       }
      ]
     }
-   ]
+   ],
+   "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784195161/carsi/course-intro/c64f5098-39ea-4387-bb01-abb82e40f622.mp4"
   },
   {
    "id": "a58c4979-3b11-4b03-bce7-9d31cffb66d4",
@@ -2217,7 +2289,10 @@
    ],
    "iicrcDiscipline": null,
    "cecHours": 0,
-   "meta": null,
+   "meta": {
+    "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784195471/carsi/course-intro/550035ab-9153-4252-b7aa-e3c34aacc9a2.mp4",
+    "introCaptionsUrl": "https://files2.heygen.ai/aws_pacific/avatar_tmp/796a104f8f42428d95773a663755e11c/subtitles_2c9d8acd80eb4468bd54809ea0c894b9.srt?Expires=1784800270&Signature=eSPXZ9MwztkGfR1Wl4-AzRw4bTUaQQPNzVKds7~vXISDAfiByCVICItRM1crSb0xoUYrS7-dDD6mjMlFh7a~IqnMtWGNYwFoa-KKWLWlYJcDhQe1xs~nIy-8l9Hrj2W94CK7XD6wrIWuj0aBY5SmKJ1ujp4AFdLxoo7wjggJQfBTS3CR6TJkrop2Xqh6iCVQLf~i5--bKUP0tYMEoPIzYgTaVt263UKAGFiTokFlBYTuYUCA2WAC4-7joS1wVpqYi~f4jfO4JN0jiKifiUOEa9fXRw91xzeXE-B8NmO9S43CRt0P47aZYkyFck1yM5I88dQnPw9L~STread85MnPEw__&Key-Pair-Id=K38HBHX5LX3X2H"
+   },
    "isPublished": false,
    "modules": [
     {
@@ -2380,7 +2455,8 @@
       }
      ]
     }
-   ]
+   ],
+   "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784195471/carsi/course-intro/550035ab-9153-4252-b7aa-e3c34aacc9a2.mp4"
   },
   {
    "id": "37ead055-972f-4134-966d-d9c1068a15c3",
@@ -2405,7 +2481,10 @@
    ],
    "iicrcDiscipline": null,
    "cecHours": 0,
-   "meta": null,
+   "meta": {
+    "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784195742/carsi/course-intro/30ca3495-05f1-40d1-8e2b-f6fe8a6d149e.mp4",
+    "introCaptionsUrl": "https://files2.heygen.ai/aws_pacific/avatar_tmp/796a104f8f42428d95773a663755e11c/subtitles_3b44a4aa2edd4341b340dfc4f14c2101.srt?Expires=1784800541&Signature=RiMnoktXjgdKj10Ub7UWk7Ky0nq30WIKFG3wCd5P8t4818Oevo2uQa5gvX5Cirv6C5Z7Av6YOurDCMQhwSd4TtLsYjn4MJsKskWB2TJuburu2m0-99Ny-n5soaufsaab~p3qobI86MPf6iqX0fu6H7qOb-E3qQYA4vpRvZrACHuew7wu2nDx-XNAvcLQ7P7Dg4MfcmeY5vOmheCgG1sNjO3xx-41SK38sRB0vEiTl093f9LkNFnPqeQx0wd3AikL5DtCJdRGzuLNQGWFmf9jYNEZ2q1vuGrl6mhY1ZVXcx76nRY7GwES6w4LeGxbl2luRiWk44i~7AE-j876bELHdw__&Key-Pair-Id=K38HBHX5LX3X2H"
+   },
    "isPublished": false,
    "modules": [
     {
@@ -2568,7 +2647,8 @@
       }
      ]
     }
-   ]
+   ],
+   "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784195742/carsi/course-intro/30ca3495-05f1-40d1-8e2b-f6fe8a6d149e.mp4"
   },
   {
    "id": "b7c1d9e4-5a2f-4c83-9e61-2d4f8a1b3c7e",
@@ -2593,7 +2673,10 @@
    ],
    "iicrcDiscipline": null,
    "cecHours": 0,
-   "meta": null,
+   "meta": {
+    "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784196045/carsi/course-intro/8c1b520c-e437-43fb-abcf-89762ada4610.mp4",
+    "introCaptionsUrl": "https://files2.heygen.ai/aws_pacific/avatar_tmp/796a104f8f42428d95773a663755e11c/subtitles_a563b4b4f88e4f1691281ae737085e00.srt?Expires=1784800844&Signature=S7uIKJLu6nIUES4M~PvQJ0Kd0A0YEv9e6kxCn3EtRowaQB0dTLQCQV~R48MGZVnOi2x8cQh~hR1LTrUQMNvpimMyJ~4FEUQpdSHN1JLOOaqRu9jcX~WWFq-3u2fSoBPSfiJVehkR1iubH9vHb6OKu2ITlVHI2rNUJMYNAwfUxeP0KIvZf-sE6caXx-nRyp6EXE64Odrt4wSQvh~3Qtb3fOOxvF8sntLvI4DpJUqjX2cADLtIjDZyH6bcPtQApfaeaD4MkWUbsEJT6oZZoKjpsvVYRrQge0wjOMF-~rhesJ9mrRp-Cy9tXsL8GZLJWRY8aJpU~UDLriIQZ~IzU93BOQ__&Key-Pair-Id=K38HBHX5LX3X2H"
+   },
    "isPublished": true,
    "modules": [
     {
@@ -2740,7 +2823,8 @@
       }
      ]
     }
-   ]
+   ],
+   "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784196045/carsi/course-intro/8c1b520c-e437-43fb-abcf-89762ada4610.mp4"
   },
   {
    "id": "505daa3e-72ac-4be2-a79b-114d3c9d9378",
@@ -3886,7 +3970,9 @@
     "campaignContact": "Ivi Sims, 1300 654 684",
     "buildStage": "seeded-unpublished-pending-sme-review",
     "linearIssue": "GP-456",
-    "officialSourceRecheck": "2026-07-05: DAFF/Australian CDC/Animal Health Australia guidance reconfirmed current — migratory seabird detections only (WA, SA), no poultry, public risk low, hotline 1800 675 888 correct. Recheck again before publish per lms-import-plan.md gate 1."
+    "officialSourceRecheck": "2026-07-05: DAFF/Australian CDC/Animal Health Australia guidance reconfirmed current — migratory seabird detections only (WA, SA), no poultry, public risk low, hotline 1800 675 888 correct. Recheck again before publish per lms-import-plan.md gate 1.",
+    "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784196448/carsi/course-intro/e04b750c-5c75-4933-a8f8-014b33f7023d.mp4",
+    "introCaptionsUrl": "https://files2.heygen.ai/aws_pacific/avatar_tmp/796a104f8f42428d95773a663755e11c/subtitles_63a723ddd7e8478db242d7a07b8048fc.srt?Expires=1784801247&Signature=pJ58CCNJTl0ar-n5FWPB-G9I4QfiyRXZeCWFGApmiMEkTjfFDzRKY~NkNVxNZJJRiK3IQ6kuvpMcJqFwbSGYuR6wMH~7kofhTbh4cmbohOUkDBxXdd0a9aY80cf-3oOF9lOtH0Q~1us67xQer2V1LKITQBVv3wjuy3ekMZyg0tpi1dfJTd04WV8W2JQjh-sIvcdVQzx~AlYc~WCIVJaKuCbFnM10z3F6O244g1XVgCnWVdxlZdmgUOnrzmPtKZP8o6awpQ72dgzZXGiaX-tJ7a7gYuztAHQLg5kQPiN3lERb-k0w00WvIhr5ihliLJVnU2ebGtkYOgHD3qXtih713w__&Key-Pair-Id=K38HBHX5LX3X2H"
    },
    "isPublished": true,
    "modules": [
@@ -4589,7 +4675,8 @@
       }
      ]
     }
-   ]
+   ],
+   "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784196448/carsi/course-intro/e04b750c-5c75-4933-a8f8-014b33f7023d.mp4"
   },
   {
    "id": "c1b7f0a2-0e5c-4b8a-9d3e-7a6f2c9b1d40",
@@ -5022,7 +5109,9 @@
     "australianProduced": true,
     "standardsReferenced": "Nominative only (ANSI/IICRC S500); no standard text reproduced (IICRC AI Use Policy honoured).",
     "designationProgram": "CARSI Southern Hemisphere Restoration Designations",
-    "designation": "CARSI Water Restoration Practitioner"
+    "designation": "CARSI Water Restoration Practitioner",
+    "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784189671/carsi/course-intro/19def23e-1143-4c20-a390-3713485984df.mp4",
+    "introCaptionsUrl": "https://files2.heygen.ai/aws_pacific/avatar_tmp/796a104f8f42428d95773a663755e11c/subtitles_57f76a920d74452c956d825a9f81cf99.srt?Expires=1784794471&Signature=SdZj4L0Xn-IhcVmhEVXd9DetQcR-0Ruu0JnlSPvZ6R9H05FRZKqHyna5bCAMlLUnRKq3XRLfG87Q8z1Hz0Up6AKVa778rvbEBB68EDmtC4IohjI3x-CiqZmO837S1dKTTZtwGEdEybehLP2CLVW8xRCxuCwBRos8ZPfFFM9Fi51RZG71uw7A-sZPoXc1QG1Hg0ZLX88g-Y4BtJu1JVf-jKi1JFvh2Iov0ja8eTQjk0VBLDF~1Mn-U1bK5Ie-Doz21acAoW~~d6XZr1M9Sy0VKlWNu~gCoe~MMoPGyS5H~F6kO6G5k1eu5pOn5YFMCh6Vahu0xeY6JwPDscRyYxRKhQ__&Key-Pair-Id=K38HBHX5LX3X2H"
    },
    "isPublished": false,
    "modules": [
@@ -5190,7 +5279,8 @@
       }
      ]
     }
-   ]
+   ],
+   "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784189671/carsi/course-intro/19def23e-1143-4c20-a390-3713485984df.mp4"
   },
   {
    "id": "58af5a2e-c6ee-481d-ad3a-21f4c156b03b",
@@ -5227,7 +5317,9 @@
     "australianProduced": true,
     "standardsReferenced": "Nominative only (ANSI/IICRC S520); no standard text reproduced (IICRC AI Use Policy honoured).",
     "designationProgram": "CARSI Southern Hemisphere Restoration Designations",
-    "designation": "CARSI Mould Remediation Practitioner"
+    "designation": "CARSI Mould Remediation Practitioner",
+    "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784196782/carsi/course-intro/ffd1680b-446d-4986-ae3b-d2a906f4df63.mp4",
+    "introCaptionsUrl": "https://files2.heygen.ai/aws_pacific/avatar_tmp/796a104f8f42428d95773a663755e11c/subtitles_e67685a634474366ae2ba04e29d1ef1c.srt?Expires=1784801581&Signature=pCQ8IXlHqp9hcRQbFliCPtt8jmFEaMQVE~34d5kc4IvrrHGZ5DymvI~2FTEDKre5iBrZv1Xcw6-R0UHbvq~XH0jndJGDYg76BY7qDjWwGXLl~2mS0Mg2m9x5SBiJ6nY59X5FFebkk-Ep24DQudK6MEvHY7QwoAoU471v~5Xqj~oEBEE73QBdfyS~bgEYANK~5f7biSrbGcPimUHtvBmhqaaCWYK9Bm9OOhK5h6ojOM7uHW1XN2Uy1Dt953buN2m5MRB8cdEynd2aQTHVxKykOvPJ9WubXy5SFd6TTqk7Amb59rDOt8tYHZNpUUWHdogymTwBxQ8wqjs-TMK9KI7SwQ__&Key-Pair-Id=K38HBHX5LX3X2H"
    },
    "isPublished": false,
    "modules": [
@@ -5411,7 +5503,8 @@
       }
      ]
     }
-   ]
+   ],
+   "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784196782/carsi/course-intro/ffd1680b-446d-4986-ae3b-d2a906f4df63.mp4"
   },
   {
    "id": "234eb5f5-8a6f-4438-a8b6-515ade44b4fb",
@@ -5448,7 +5541,9 @@
     "australianProduced": true,
     "standardsReferenced": "Nominative only (ANSI/IICRC S500; AS/NZS 3760/3112 for electrical test-and-tag). No standard text reproduced (IICRC AI Use Policy honoured).",
     "designationProgram": "CARSI Southern Hemisphere Restoration Designations",
-    "designation": "CARSI Structural Drying Practitioner"
+    "designation": "CARSI Structural Drying Practitioner",
+    "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784197075/carsi/course-intro/023d4a47-686b-461f-af1c-8d706baa49ba.mp4",
+    "introCaptionsUrl": "https://files2.heygen.ai/aws_pacific/avatar_tmp/796a104f8f42428d95773a663755e11c/subtitles_4194fae702ae45f1857c9e2835f1a212.srt?Expires=1784801875&Signature=Y~ayGRU9mGQLf45HyNtlMZWPCGp8Rdbr~L9BgvGgCEgB9Kho0aDVqJvixJsFJIedzCMuMp5fr1FsYdGyoflpwSkJ9olcgMGtsAZLqw5uiMJCP89c4lhTE3pYk7w6ERBEf-y~k7P~WNPCPetq-46IdQU4ms5obDDL5IyVgFP9qRUdyZtDH4hjIFOZK0GXZVPq4HkFrwI8bGv0d8slWWdShmI0lydMg3wHpmG4Uio9f4m-axHnpKu5-kRPzSZR11X~Vv4Eq2MfeVl3t5YOIeYW5j3LkSPnp6ZMzNDN~3iZULQ1Z20zgWuePBQe2EwhJTswRNTDCQkm5N~VGZbFY4-oeQ__&Key-Pair-Id=K38HBHX5LX3X2H"
    },
    "isPublished": false,
    "modules": [
@@ -5627,7 +5722,8 @@
       }
      ]
     }
-   ]
+   ],
+   "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784197075/carsi/course-intro/023d4a47-686b-461f-af1c-8d706baa49ba.mp4"
   },
   {
    "id": "7a186ba6-90ee-45a4-b8da-f67dbc5b2076",
@@ -5664,7 +5760,9 @@
     "australianProduced": true,
     "standardsReferenced": "Nominative only (ANSI/IICRC S500 Category 3; AS/NZS 3500 sanitary plumbing). No standard text reproduced (IICRC AI Use Policy honoured).",
     "designationProgram": "CARSI Southern Hemisphere Restoration Designations",
-    "designation": "CARSI Contaminated-Water Practitioner"
+    "designation": "CARSI Contaminated-Water Practitioner",
+    "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784197416/carsi/course-intro/f66b649c-af60-41ef-8f3a-d3311ffeb0a5.mp4",
+    "introCaptionsUrl": "https://files2.heygen.ai/aws_pacific/avatar_tmp/796a104f8f42428d95773a663755e11c/subtitles_e02209b218a642d0bf6c7a674ad91b4e.srt?Expires=1784802215&Signature=L~RPClIJUT3hMknwJzcjlS2waBb5JAbThSbY0gznVVykNrQNmrFvuBuqMyZnYP4SK1EHcMvqY1jrjtqkTbG5-qeM1-gJsfVpBUNKTsm9C6yyn9G4ebI6QdWYvaPnM9UdMAk5N~V-HHQKYd0PoxazDO8X9CPtZHOGpk4UKADRdK7GPLXw5lkascHTkbLs3elxz2eZTqKhNSP3e6QU1XfRKs9QIMjuI0D14kGk~HIRhb4EBnrKWCjaafBOGz6Tv~er~63g1VeSRaEpguZVv6VgPuOGq-0YQnY1VVm6x91L5D7C5dSoMYwBTHaNv3zKvLbJ45C4Anzou6xcX7J1ezRXLQ__&Key-Pair-Id=K38HBHX5LX3X2H"
    },
    "isPublished": false,
    "modules": [
@@ -5843,7 +5941,8 @@
       }
      ]
     }
-   ]
+   ],
+   "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784197416/carsi/course-intro/f66b649c-af60-41ef-8f3a-d3311ffeb0a5.mp4"
   },
   {
    "id": "ec0fcc4d-5ae9-43e3-9dde-53eebb4a492a",
@@ -5881,7 +5980,9 @@
     "courseType": "awareness-only (not a removal/assessment qualification)",
     "standardsReferenced": "Nominative only (model WHS Regulations Part 8.7; Safe Work Australia asbestos codes; AS 4964; AS 2601). No standard text reproduced.",
     "designationProgram": "CARSI Southern Hemisphere Restoration Designations",
-    "designation": null
+    "designation": null,
+    "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784197692/carsi/course-intro/70748d24-7511-4b2b-b3df-ce520b82102c.mp4",
+    "introCaptionsUrl": "https://files2.heygen.ai/aws_pacific/avatar_tmp/796a104f8f42428d95773a663755e11c/subtitles_dd6fbdd12e9e42cd94766814eff7a54d.srt?Expires=1784802492&Signature=SJO3afNpkn4BSZNw76NE608Ga6r3rHQUImnBnqVmXQy-pbaQoK168Mg7XbUaobatq6lxLwRNPlfDVg8Njttr-tFP5B8BkLqOgewYaHwCaLuEqzNLVaUWcSOzZE5zh4Dy0UxvpApizK35r8L4SPpkdxGk8vf1GFhgcQDOEPFiqd0Txw67-TH8mS7HGPcKIRiOleUvXu3hDoRBjJUPj4zGA-75JDHlqh2Cqy89LJAjksQ5Az0eH8ioDw~3vY4cUNOlMSaolmp6xUxEZnPwSeVfisdJZRv-h6aIz9d6QYpzI2etSSRzprBJoPjFLxywLlfSWOtZJKA-5eifByXcYwgtaQ__&Key-Pair-Id=K38HBHX5LX3X2H"
    },
    "isPublished": false,
    "modules": [
@@ -6035,7 +6136,8 @@
       }
      ]
     }
-   ]
+   ],
+   "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784197692/carsi/course-intro/70748d24-7511-4b2b-b3df-ce520b82102c.mp4"
   },
   {
    "id": "3e86eb42-a5e9-4ea5-b1eb-adf228fdc044",
@@ -6073,7 +6175,9 @@
     "australianProduced": true,
     "standardsReferenced": "Nominative only (ANSI/IICRC S500). No standard text reproduced (IICRC AI Use Policy honoured).",
     "designationProgram": "CARSI Southern Hemisphere Restoration Designations",
-    "designation": null
+    "designation": null,
+    "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784198022/carsi/course-intro/081f96c6-0f95-4674-be61-f6751c620967.mp4",
+    "introCaptionsUrl": "https://files2.heygen.ai/aws_pacific/avatar_tmp/796a104f8f42428d95773a663755e11c/subtitles_64069b0ab06b43b881a63a7e271cddc4.srt?Expires=1784802821&Signature=kC5kjjqcHs8Qu7RZTEWb7-tf8aUL7gNF6yD9kEPKj5ldyHXe4P~NHprtXeKsH~6ZyqEKmRkNgG4RULYKBsxHDXE01z51LWBIi4UVJZTKSGssfDVGU9YZEzB36zLALuqa~E0MkYLJ2fLdp71naP1k5TlitnF5x7HkWAKBLfXs7GAWOxswiRpJQYUrj~StFiPm1VeALoEjsKHpzSRthmZm3jeqyKz6UKLA~FCT9SlDFgo1uXKtaR-zypt61MbIL1SLj3rRyPzg3lHDGo4OPYFz5M7HL2X7MfKQ2Wpe1qxvXDOA95H9ko1RaghlXhz8WdB9SRr8sPDWLaxZ5YcKp8JomQ__&Key-Pair-Id=K38HBHX5LX3X2H"
    },
    "isPublished": false,
    "modules": [
@@ -6252,7 +6356,8 @@
       }
      ]
     }
-   ]
+   ],
+   "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784198022/carsi/course-intro/081f96c6-0f95-4674-be61-f6751c620967.mp4"
   },
   {
    "id": "b998f96e-1cc3-4265-8306-92144f5f3611",
@@ -6289,7 +6394,9 @@
     "australianProduced": true,
     "standardsReferenced": "Nominative only (ANSI/IICRC S700). No standard text reproduced (IICRC AI Use Policy honoured).",
     "designationProgram": "CARSI Southern Hemisphere Restoration Designations",
-    "designation": "CARSI Fire & Smoke Restoration Practitioner"
+    "designation": "CARSI Fire & Smoke Restoration Practitioner",
+    "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784198310/carsi/course-intro/aeabfd69-0032-4ff5-a2c0-58859d9a3b8c.mp4",
+    "introCaptionsUrl": "https://files2.heygen.ai/aws_pacific/avatar_tmp/796a104f8f42428d95773a663755e11c/subtitles_8d657309cc52482ea7ca8bf584a12183.srt?Expires=1784803109&Signature=PaFjbPR3MDdDPBSAoZ26PtFqcDWYJm~W3HPB0NN4PaaQgmwDmPQH83i3eZWKHFx0ajZTPWoV9qxC6uXV0SKg4-7tuF6rpn4u8cuNH5KPwfbOQrR1GoexGCyA71u0kLwHlPdMXPmfkiMj6Y0dpkIw7AAdIvzzHW9657CeIL1Qcev3K~zEhVsLQ4GMzFCSS5-Ee12WmV3vyIn-6R4oEwoEC74ic-CSiynaGVbk9ueHcT5Eq2S~l-HgE3736fCQgh~HDrEKUcuA-XavcUV8DkyHutf7sED3THnsq8VTkIXysmbVjj-U38Q6k6u7W7qKB1dEld7ikoBCaebUdQf0be0ftg__&Key-Pair-Id=K38HBHX5LX3X2H"
    },
    "isPublished": false,
    "modules": [
@@ -6468,7 +6575,8 @@
       }
      ]
     }
-   ]
+   ],
+   "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784198310/carsi/course-intro/aeabfd69-0032-4ff5-a2c0-58859d9a3b8c.mp4"
   },
   {
    "id": "ebfe102b-9292-4a42-9be6-4cb35678d552",
@@ -6505,7 +6613,9 @@
     "australianProduced": true,
     "standardsReferenced": "Nominative only (ANSI/IICRC S540). No standard text reproduced (IICRC AI Use Policy honoured).",
     "designationProgram": "CARSI Southern Hemisphere Restoration Designations",
-    "designation": "CARSI Trauma & Biohazard Decontamination Practitioner"
+    "designation": "CARSI Trauma & Biohazard Decontamination Practitioner",
+    "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784198666/carsi/course-intro/3a7b1865-5c7b-4b51-9ef2-3c2e6a5582e9.mp4",
+    "introCaptionsUrl": "https://files2.heygen.ai/aws_pacific/avatar_tmp/796a104f8f42428d95773a663755e11c/subtitles_8dffcf16514e48408257882e55f59864.srt?Expires=1784803465&Signature=PFsg4MLsbifWKWlf9m2oxIz2OcgR5qPWYWZg0DTJxlylCD98cTOC9wI209TIbq7373pVJSYoiNpbctoj66xsri8NGGe4UZuawcMu1hE7ChqOYdxahsPClfiemjrNSFniG-DiSmAy0sqsewuLSyubBTdCSxcStWuJH0SNOaPQXu2ULdUoSZt0EZml171GL2FELgTUdXHk9SyJerKBVe~lgsBCQawOu6EemAIenYySN2Ev6ivew1J7QTqurIlnPLdGlT747hCefTOhVNutt5kWkzFWXMThGAsReFI-drvzMkR6ZDTM9V7LJ97uKyqMujunerWV9wJ709inWUVe4WZWUw__&Key-Pair-Id=K38HBHX5LX3X2H"
    },
    "isPublished": false,
    "modules": [
@@ -6684,7 +6794,8 @@
       }
      ]
     }
-   ]
+   ],
+   "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784198666/carsi/course-intro/3a7b1865-5c7b-4b51-9ef2-3c2e6a5582e9.mp4"
   },
   {
    "id": "0a4fb335-4561-4b9c-952e-58ce1401fc80",
@@ -7155,7 +7266,9 @@
     "australianProduced": true,
     "standardsReferenced": "Nominative only (e.g. ANSI/IICRC S500, S520). No standard text reproduced (IICRC AI Use Policy honoured).",
     "designationProgram": "CARSI Southern Hemisphere Restoration Designations",
-    "designation": "CARSI Indoor Environment Assessment Practitioner"
+    "designation": "CARSI Indoor Environment Assessment Practitioner",
+    "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784199001/carsi/course-intro/47cc498a-f783-4c39-aa94-8a62c193d7cd.mp4",
+    "introCaptionsUrl": "https://files2.heygen.ai/aws_pacific/avatar_tmp/796a104f8f42428d95773a663755e11c/subtitles_881bd09550d54c0091c11de76fef6b1a.srt?Expires=1784803800&Signature=eeXEtNmcZIFDol6AMacqjOjzKhrlyyHe-ovgFDPCIyLawuJhTQqldeOjhNq-uchTGK~voJx-ZYWzgBCm6TX3f8MQdhyum0MiDqyYkmIWRb4xP9FAEzMFh9q~9kqqcEMgLiMoCD04n0CbY3w39Pe5q7XA~83QT724XhB9lI8kPXFiY3BiyNU5sy3oZgbhoLlWdanAY4XF67VBVr2Q62ysFaRgZWfoCiFMv1rhP30VFQyZFes1Wap2ROLM3TE-yDz~mkox2Cx2qH5C0XUBATr3-Tr8vN2PxUl56ptIMNrjUxD-ecda6nAYJOWGOuncHgWgxBlENCbf2GPWniMXUKAVXw__&Key-Pair-Id=K38HBHX5LX3X2H"
    },
    "isPublished": false,
    "modules": [
@@ -7334,7 +7447,8 @@
       }
      ]
     }
-   ]
+   ],
+   "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784199001/carsi/course-intro/47cc498a-f783-4c39-aa94-8a62c193d7cd.mp4"
   },
   {
    "id": "b7c9c962-4f03-509e-91e3-6bc852faabbb",
@@ -7377,7 +7491,9 @@
     "cecStatus": "NOT an IICRC CEC course. cecHours null. General WHS awareness content; no IICRC CEC claim is made.",
     "sourceRegister": "docs/courses/whs-fundamentals-restoration/source-register.md",
     "officialSourceRecheck": "2026-07-11: engineered stone ban (1 Jul 2024) + import ban (1 Jan 2025), silica CSS regime (1 Sep 2024), WES->WEL (1 Dec 2026, RCS limit under further review), asbestos Class A/B >10m2 threshold (WHS Reg 487), lead removal levels 20/5 ug/dL (WHS Amendment (Blood Lead Level Exposure Values) Regs 2025, F2025L00404), AS/NZS 1715:2009 & 1716:2012 current — all Tier-1 verified via Safe Work Australia / legislation.gov.au / Standards Australia. Recheck before publish: exact RCS WEL figure, any AS/NZS 1715/1716 re-issue, per-state industrial manslaughter penalties.",
-    "verificationMethod": "nexus deep-research (3 subagents) + Exa Tier-1 corroboration; nexus-copywriter substantiation gate."
+    "verificationMethod": "nexus deep-research (3 subagents) + Exa Tier-1 corroboration; nexus-copywriter substantiation gate.",
+    "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784199351/carsi/course-intro/6e8dd42d-c006-45c7-a247-edc92c134c7a.mp4",
+    "introCaptionsUrl": "https://files2.heygen.ai/aws_pacific/avatar_tmp/796a104f8f42428d95773a663755e11c/subtitles_ad8e566d4ef44d429c9a4e0969b56a68.srt?Expires=1784804150&Signature=ftZY8vVI67RP06OmkXmg2MYtxyolK-gjRPuLbNubzjGCcEFvMr5g2TVBeqDFAVCkw42ZlpDuEjo6mqMwe002x6mgDJpmMaJ9rJIujfG-0U466D4efYToIaLMETcSHXbe3lzv1M9Nko4IAKtBVhmP1jTca1D3DJV1dNnE-uOqvMsSYfms7g9gvtyb1VDKsVRcGESIIYVX9QHA9J7inLIFYUaf3jM2sXXszP2iQRIock1aSz8jHkFD~adBxamzGpLAA6VDyP6~A7DVZV3lp062tM7-XY8CBXiB-FuwV3egVoPShYRDGDueng4ncLsTsOae5SysUfHw-4PnjL58etK71A__&Key-Pair-Id=K38HBHX5LX3X2H"
    },
    "isPublished": false,
    "modules": [
@@ -7606,7 +7722,8 @@
       }
      ]
     }
-   ]
+   ],
+   "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784199351/carsi/course-intro/6e8dd42d-c006-45c7-a247-edc92c134c7a.mp4"
   }
  ]
 }
