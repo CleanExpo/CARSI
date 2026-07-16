@@ -871,10 +871,43 @@ model CcwRoadshowRegistration {
 
   attendees CcwRoadshowAttendee[]
   signIns   CcwRoadshowSignIn[]
+  emails    CcwRoadshowEmailLog[]
 
   @@index([eventSlug, status])
   @@index([eventSlug, createdAt(sort: Asc)])
   @@map("ccw_roadshow_registrations")
+}
+
+/// Delivery record for every roadshow attendee email we ATTEMPT (confirmed /
+/// waitlisted / promoted).
+///
+/// Why this exists: `sendEmail()` reports failure by RETURNING
+/// `{ sent: false, reason }` rather than throwing, so a failed send used to be
+/// invisible — the promote route's try/catch never fired, the return value was
+/// discarded, and nothing was recorded. One row per attempt makes
+/// "was this person actually emailed?" answerable.
+///
+/// Mirrors the delivery fields on LmsIicrcCecCommunication.
+model CcwRoadshowEmailLog {
+  id                String    @id @default(uuid()) @db.Uuid
+  registrationId    String    @map("registration_id") @db.Uuid
+  /// confirmed | waitlisted | promoted
+  kind              String    @db.VarChar(16)
+  recipientEmail    String    @map("recipient_email")
+  /// sent | failed | skipped
+  deliveryStatus    String    @map("delivery_status") @db.VarChar(16)
+  /// SendEmailResult.reason — not_configured | send_failed | provider_error | dev_console
+  failureReason     String?   @map("failure_reason") @db.Text
+  providerMessageId String?   @map("provider_message_id") @db.VarChar(128)
+  sentAt            DateTime? @map("sent_at") @db.Timestamptz(6)
+  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  registration CcwRoadshowRegistration @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+
+  @@index([registrationId])
+  @@index([deliveryStatus])
+  @@index([createdAt])
+  @@map("ccw_roadshow_email_logs")
 }
 
 model CcwRoadshowAttendee {

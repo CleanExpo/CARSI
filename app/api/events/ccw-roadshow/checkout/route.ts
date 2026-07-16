@@ -17,10 +17,8 @@ import {
 import { addRegistrationToCalendar } from '@/lib/server/ccw-roadshow-calendar';
 import { isMissingTableError } from '@/lib/server/db-errors';
 import { getAppOrigin } from '@/lib/server/app-url';
-import {
-  sendCcwRoadshowRegistrationEmail,
-  sendCcwRoadshowOrganizerNotificationEmail,
-} from '@/lib/server/transactional-email';
+import { sendCcwRoadshowOrganizerNotificationEmail } from '@/lib/server/transactional-email';
+import { sendAndLogRoadshowEmail } from '@/lib/server/ccw-roadshow-email-log';
 import { getRoadshowNotifyRecipients } from '@/lib/server/ccw-roadshow-notify';
 
 type AttendeeBody = { fullName?: string; yearsExperience?: string; goals?: string };
@@ -176,23 +174,23 @@ export async function POST(request: NextRequest) {
       registration_url: bookingUrl,
     });
 
-    try {
-      await sendCcwRoadshowRegistrationEmail({
-        to: contactEmail,
-        kind: result.status === 'confirmed' ? 'confirmed' : 'waitlisted',
-        attendeeName: attendees[0]?.fullName ?? 'there',
-        eventCity: event.city,
-        dateRangeLabel: event.dateRangeLabel,
-        timeLabel: event.timeLabel,
-        venueName: event.venueName,
-        venueAddress: `${event.streetAddress}, ${event.suburbStatePostcode}`,
-        seatCount: result.seatCount,
-        freeEntryToken,
-        appOrigin: origin,
-      });
-    } catch (emailErr) {
-      console.error('[ccw-roadshow] registration email failed (non-fatal):', emailErr);
-    }
+    // Records every attempt and never throws. Previously this discarded the
+    // returned SendEmailResult, so a `{ sent:false, reason:'provider_error' }`
+    // left the registrant silently un-emailed with no record of it.
+    await sendAndLogRoadshowEmail({
+      registrationId: result.registrationId,
+      to: contactEmail,
+      kind: result.status === 'confirmed' ? 'confirmed' : 'waitlisted',
+      attendeeName: attendees[0]?.fullName ?? 'there',
+      eventCity: event.city,
+      dateRangeLabel: event.dateRangeLabel,
+      timeLabel: event.timeLabel,
+      venueName: event.venueName,
+      venueAddress: `${event.streetAddress}, ${event.suburbStatePostcode}`,
+      seatCount: result.seatCount,
+      freeEntryToken,
+      appOrigin: origin,
+    });
 
     // Notify the campaign owner(s) for this city (Melbourne → Phill; Sydney → Toby + Phill).
     try {
