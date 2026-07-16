@@ -20,6 +20,19 @@ on:
       slug:
         description: 'Optional single course slug (blank = all pending)'
         default: ''
+      engine:
+        description: 'HeyGen render engine (avatar_v = highest fidelity; avatar_iv allows expressiveness)'
+        type: choice
+        options: [avatar_v, avatar_iv, avatar_iii]
+        default: avatar_v
+      expressiveness:
+        description: 'Face expressiveness — avatar_iv ONLY (HeyGen silently defaults to low)'
+        type: choice
+        options: [high, medium, low]
+        default: high
+      motion_prompt:
+        description: 'Optional body/gesture direction (photo avatars)'
+        default: ''
 
 permissions:
   contents: write
@@ -31,6 +44,10 @@ env:
   CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
   CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
   CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+  # face/expression quality — see scripts/generate-course-intro-videos.ts
+  INTRO_VIDEO_ENGINE: ${{ inputs.engine }}
+  INTRO_VIDEO_EXPRESSIVENESS: ${{ inputs.expressiveness }}
+  INTRO_VIDEO_MOTION_PROMPT: ${{ inputs.motion_prompt }}
 
 jobs:
   intro-videos:
@@ -66,15 +83,24 @@ jobs:
           npx tsx scripts/generate-course-intro-videos.ts --generate --yes $SLUG_ARG --limit=${{ inputs.limit }}
           npx tsx scripts/apply-intro-video-urls.ts
 
-      - name: Commit results to the branch
+      # main is a protected branch (GH006 on direct push), so results land as a PR for review.
+      - name: Open PR with rendered results
         if: ${{ inputs.mode == 'generate' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           git config user.name "carsi-ci"
           git config user.email "ci@carsi.local"
           git add data/seed/courses-catalog.json data/video/course-intro-video-results.json
           if git diff --cached --quiet; then
             echo "No changes to commit (nothing rendered)."
-          else
-            git commit -m "chore(intro-videos): render + write introVideoUrl [skip ci]"
-            git push
+            exit 0
           fi
+          BR="chore/intro-video-results-${{ github.run_id }}"
+          git checkout -b "$BR"
+          git commit -m "chore(intro-videos): rendered intros + introVideoUrl (engine=${{ inputs.engine }})"
+          git push -u origin "$BR"
+          gh pr create --base main --head "$BR" \
+            --title "Course intro videos: rendered results (engine=${{ inputs.engine }})" \
+            --body "Automated: rendered course-intro videos (ElevenLabs voice → HeyGen avatar) and wrote \`introVideoUrl\` into the catalog. Engine: \`${{ inputs.engine }}\`, expressiveness: \`${{ inputs.expressiveness }}\`. Review the linked Cloudinary URLs before merging." \
+            || echo "PR may already exist for $BR"
