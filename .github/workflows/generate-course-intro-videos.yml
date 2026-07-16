@@ -1,0 +1,80 @@
+name: Course intro videos
+
+# Manual only. Renders course-intro videos: ElevenLabs voice (Phill McGurk) → HeyGen
+# Phill avatar (audio-driven lip-sync) → Cloudinary, then writes introVideoUrl into the
+# catalog. Secrets are GitHub Actions repo secrets (same set the media/brand-video
+# workflows use), NOT a Vercel pull. Start with mode=dry-run, then generate with limit=1
+# to validate the avatar + voice before batching.
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'dry-run (free preview) or generate (spends credits)'
+        type: choice
+        options: [dry-run, generate]
+        default: dry-run
+      limit:
+        description: 'Max videos to render this run (start at 1 to validate)'
+        default: '1'
+      slug:
+        description: 'Optional single course slug (blank = all pending)'
+        default: ''
+
+permissions:
+  contents: write
+
+env:
+  HEYGEN_API_KEY: ${{ secrets.HEYGEN_API_KEY }}
+  HEYGEN_AVATAR_ID: ${{ secrets.HEYGEN_AVATAR_ID }}   # must resolve to the Phill McGurk avatar
+  ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+  CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
+  CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
+  CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+
+jobs:
+  intro-videos:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+
+      - name: Preflight (generate only) — confirm secrets present
+        if: ${{ inputs.mode == 'generate' }}
+        run: |
+          missing=0
+          for k in HEYGEN_API_KEY HEYGEN_AVATAR_ID ELEVENLABS_API_KEY CLOUDINARY_CLOUD_NAME CLOUDINARY_API_KEY CLOUDINARY_API_SECRET; do
+            if [ -z "${!k}" ]; then echo "::error::missing secret $k"; missing=1; fi
+          done
+          [ "$missing" = "0" ] || exit 1
+
+      - name: Dry-run (no spend)
+        if: ${{ inputs.mode == 'dry-run' }}
+        run: npx tsx scripts/generate-course-intro-videos.ts --dry-run
+
+      - name: Render intros + write introVideoUrl
+        if: ${{ inputs.mode == 'generate' }}
+        run: |
+          SLUG_ARG=""
+          if [ -n "${{ inputs.slug }}" ]; then SLUG_ARG="--slug=${{ inputs.slug }}"; fi
+          npx tsx scripts/generate-course-intro-videos.ts --generate --yes $SLUG_ARG --limit=${{ inputs.limit }}
+          npx tsx scripts/apply-intro-video-urls.ts
+
+      - name: Commit results to the branch
+        if: ${{ inputs.mode == 'generate' }}
+        run: |
+          git config user.name "carsi-ci"
+          git config user.email "ci@carsi.local"
+          git add data/seed/courses-catalog.json data/video/course-intro-video-results.json
+          if git diff --cached --quiet; then
+            echo "No changes to commit (nothing rendered)."
+          else
+            git commit -m "chore(intro-videos): render + write introVideoUrl [skip ci]"
+            git push
+          fi

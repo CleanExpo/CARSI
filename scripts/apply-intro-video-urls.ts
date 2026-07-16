@@ -36,8 +36,13 @@ const resultsFile = JSON.parse(readFileSync(RESULTS, 'utf8'));
 const results: Record<string, { url?: string; captionsUrl?: string; thumbnailUrl?: string }> =
   resultsFile.results || {};
 
-const catalog = JSON.parse(readFileSync(CATALOG, 'utf8'));
-const bySlug = new Map<string, any>(catalog.courses.map((c: any) => [c.slug, c]));
+type CatalogCourse = {
+  slug: string;
+  introVideoUrl?: string;
+  meta?: Record<string, unknown> & { introVideoUrl?: string; introThumbnailUrl?: string; introCaptionsUrl?: string };
+};
+const catalog = JSON.parse(readFileSync(CATALOG, 'utf8')) as { courses: CatalogCourse[] };
+const bySlug = new Map<string, CatalogCourse>(catalog.courses.map((c) => [c.slug, c]));
 
 const changes: string[] = [];
 let missing = 0;

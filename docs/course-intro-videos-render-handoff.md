@@ -1,51 +1,41 @@
 # Course intro videos — render handoff
 
-**Status (2026-07-16):** All 32 intro scripts authored and the write-back proven. The render is the
-only remaining step and is **owner-gated on secrets** — it spends HeyGen credits, so it can't run
-from a dev box without keys.
+**Status (2026-07-16):** All 32 intro scripts authored, the audio-driven render pipeline built, and
+the write-back proven. The render runs in **CI** (where the secrets live) via a manual workflow.
 
-## What's already done (this branch: `feat/course-completion-wave0-1`)
+## Pipeline (natural delivery — Phill's real voice, no time-boxing)
 
-- **32 intro scripts** — `data/video/course-intro-video-briefs.json` (one per intro-missing course,
-  ~50s / 106–126 words, en-AU, CARSI educator voice, grounded in each course's own modules, no
-  standards-content claims).
-- **Render script** — `scripts/generate-course-intro-videos.ts` (HeyGen avatar → Cloudinary →
-  results map). `--dry-run` verified at $0. `--generate` guarded by a spend confirm + `HARD_CAP=40`.
-- **Write-back glue** — `scripts/apply-intro-video-urls.ts`. Proven end-to-end: with mock URLs on
-  all 32 courses the completeness gate went to **37/37 finalised, introVideo 0/37**; reverted so no
-  fake URL is committed.
+Per course, from `data/video/course-intro-video-briefs.json`:
+1. **ElevenLabs TTS** in Phill's voice (`Hywjw1pu9qLxpN2CqxU1`, model `eleven_multilingual_v2`) →
+   natural-prosody MP3 (human pauses, rhythm, tempo — the words are never clipped to a timeframe).
+2. Upload MP3 to Cloudinary → public audio URL.
+3. **HeyGen** `POST /v3/videos` `{type:avatar, avatar_id, audio_url}` — the Phill avatar lip-syncs to
+   the audio; **video length follows the speech** (no forced duration, no cut-off sentences).
+4. Poll → download MP4 → Cloudinary → results map → `apply-intro-video-urls.ts` writes
+   `introVideoUrl` (+ `meta.introVideoUrl`).
 
-## Secrets required (all MISSING on the dev box; live in DigitalOcean repo secrets)
+## How to render (GitHub → Actions → "Course intro videos" → Run workflow)
 
-| Secret | Purpose |
-|---|---|
-| `HEYGEN_API_KEY` | render the avatar video |
-| `HEYGEN_AVATAR_ID` | which presenter avatar |
-| `HEYGEN_VOICE_ID` | en-AU voice (or set per-brief) |
-| `CLOUDINARY_CLOUD_NAME` (`dmaulkthb`), `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` | host the MP4 |
+Run **on the `feat/course-completion-wave0-1` branch**:
+1. **mode = dry-run** — free preview, prints the per-course plan. Confirms secrets/branch are right.
+2. **mode = generate, limit = 1** — renders ONE course (validate Phill's avatar + voice + pacing).
+   Review the result in Cloudinary / the updated `introVideoUrl`.
+3. **mode = generate, limit = 40** — batch the rest (idempotent: skips done courses). The workflow
+   commits the rendered URLs back to the branch and the gate reaches **37/37**.
 
-## Render sequence (once secrets are set)
+## Secrets (GitHub Actions repo secrets — already used by the media/brand workflows)
 
-```bash
-# 1. free preview — prints the HeyGen payload for every course, no spend
-npx tsx scripts/generate-course-intro-videos.ts --dry-run
+`HEYGEN_API_KEY`, `HEYGEN_AVATAR_ID`, `ELEVENLABS_API_KEY`, `CLOUDINARY_CLOUD_NAME`,
+`CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`. The workflow preflights these before spending.
 
-# 2. VALIDATE on ONE course first (spends 1 credit) — confirm the avatar/voice/look
-npx tsx scripts/generate-course-intro-videos.ts --generate --slug=water-damage-restoration-fundamentals --limit=1 --yes
+## Assumptions to confirm on the first (limit=1) run
 
-# 3. review the single result, then batch the rest (skips done courses; HARD_CAP 40)
-npx tsx scripts/generate-course-intro-videos.ts --generate --yes
+- **`HEYGEN_AVATAR_ID` = the Phill McGurk avatar.** If the repo secret points at a different avatar,
+  set the correct HeyGen avatar look id there (or per-brief `avatarId`) before batching.
+- The `--generate` path (ElevenLabs + HeyGen audio_url) is grounded in the current API docs but is
+  first exercised live on this run — which is exactly why step 2 renders a single video first.
 
-# 4. write the rendered URLs into the catalog (introVideoUrl + meta.introVideoUrl)
-npx tsx scripts/apply-intro-video-urls.ts
+## Local ($0) verification already done
 
-# 5. confirm
-node scripts/check-course-completeness.mjs   # expect Finalised 37/37
-```
-
-## Caveat — validate before batching
-
-The `--generate` path is a faithful mirror of the proven lesson-video HeyGen calls
-(`scripts/generate-course-lesson-videos.ts`) but has **not been exercised against the live HeyGen
-API** (no keys on the dev box). Run step 2 (one video) and eyeball the result before the batch in
-step 3 — that's why the script is idempotent and single-slug capable.
+`npx tsx scripts/generate-course-intro-videos.ts --dry-run` (32 courses) and the write-back glue
+(mock URLs on all 32 → gate 37/37, reverted). No secrets touch a dev box.
