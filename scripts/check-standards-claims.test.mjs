@@ -16,6 +16,11 @@ const MUST_BLOCK = [
   ['uncited requirement claim', 'The standard requires ozone fogging after every mould job.'],
   ['CodeRabbit: unnamed-standard cited §99', 'The standard §99 requires ozone fogging in every occupied structure.'],
   ['CodeRabbit: unsupported standard S540 §14', 'S540 §14 requires hydroxyl generators as the primary control.'],
+  // ADVERSARIAL — the AUTHOR_DIRECTED exclusion must not become an absence-claim
+  // laundering route. A CONTENT-verb negation stays blocked no matter what else the
+  // sentence says about reproduction.
+  ['author-directed wording must NOT launder a real absence claim', 'We never reproduce their text, and S520 does not mention ozone at all.'],
+  ['content-verb negation stays blocked next to a handling clause', 'We do not quote S520 verbatim; it never mentions hydroxyl.'],
 ];
 
 const MUST_PASS = [
@@ -25,6 +30,17 @@ const MUST_PASS = [
   ['CodeRabbit: leading-zero §09 normalises to valid §9', 'S520 §09 requires structural remediation to begin with containment.'],
   ['legit nominative + soft verb (no false positive)', 'Aligned to ANSI/IICRC S500:2021 and covering the full water-damage workflow.'],
   ['unrelated copy', 'Mould remediation begins with a moisture inspection.'],
+  // The IICRC IP-compliance disclaimer CLAUDE.md REQUIRES. Verbatim from
+  // data/seed/courses-catalog.json:5047 and the assessment-draft notes — the guard
+  // blocked these, i.e. it blocked the sentences that prove IP compliance.
+  [
+    'IP disclaimer: "never reproduce their text" (courses-catalog.json:5047)',
+    'Where standards are named, we reference them nominatively (for example, aligning to ANSI/IICRC S500) and never reproduce their text.',
+  ],
+  [
+    'IP disclaimer: "does not reproduce the Standard\'s copyrighted text" (assessment-drafts)',
+    "Every question paraphrases/applies ANSI/IICRC S520:2024 with clause citations — it does not reproduce the Standard's copyrighted text.",
+  ],
 ];
 
 // SCAN-MODE precision (strict=false). The repo scan is the mode CI runs; before

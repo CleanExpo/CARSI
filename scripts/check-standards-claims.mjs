@@ -69,6 +69,25 @@ const CLAIM_VERB =
   /\b(?:mention|contain|say|state|reference|address|cover|include|list|require|mandate|prohibit|ban|forbid|permit|allow|specif|stipulate|dictate|define|treat|classif|omit|lack|ignore|exclude)(?:s|es|ed|d|ing|y|ies)?\b|\bis\s+silent\b|\bdoes\s*n['o]t\b|\bdoesn'?t\b|\bnever\b|\bno\s+(?:mention|reference|occurrence)\b|\bzero\b|\bonly\s+(?:once|twice|\d)\b|\bout\s+of\s+scope\b/i;
 const ABSENCE =
   /\b(?:does\s*n['o]t|doesn'?t|do\s*n['o]t|don'?t|never|is\s+silent|are\s+silent|no\s+(?:mention|reference|occurrence|instance)|zero\s+(?:mention|reference|occurrence|instance)|not\s+(?:found|mentioned|present|listed|referenced)\s+in|nowhere\s+in|out\s+of\s+scope|isn'?t\s+(?:there|in\b)|not\s+a\s+single)\b/i;
+// AUTHOR-DIRECTED negation — a statement about how WE HANDLE the standard, not a
+// claim about what the standard CONTAINS. "we never reproduce their text" and "it
+// does not reproduce the Standard's copyrighted text" are the IICRC IP-compliance
+// disclaimer CLAUDE.md REQUIRES — the guard was blocking the exact sentences that
+// prove compliance. The subject of the negation is CARSI, not the standard.
+// Deliberately narrow: only reproduction/handling verbs. A negation against a
+// CONTENT verb ("S520 does not MENTION ozone") stays an ABSENCE claim and is still
+// blocked — that is the 2026-07-15 incident class and it must never pass.
+// GLOBAL + MASKED, not a whole-text veto. A whole-text test was tried first and the
+// adversarial cases below caught it laundering a real claim: "We never reproduce
+// their text, AND S520 does not mention ozone" wrongly passed, because one compliant
+// clause suppressed the whole line. So: mask ONLY the author-directed spans (with
+// equal-length blanks, preserving offsets for nearStandard) and evaluate what is
+// LEFT. Any surviving absence claim still blocks.
+const AUTHOR_DIRECTED =
+  /\b(?:does\s*n['o]t|doesn'?t|do\s*n['o]t|don'?t|never|not)\s+(?:\w+\s+){0,2}?(?:reproduce|reproducing|quote|quoting|paste|pasting|copy|copying|print|printing|republish|redistribute|verbatim)\b/gi;
+function maskAuthorDirected(text) {
+  return text.replace(AUTHOR_DIRECTED, (m) => ' '.repeat(m.length));
+}
 const SEARCH_GIMMICK = /\bsearch(?:ing)?\s+(?:the\s+)?(?:ANSI\/)?(?:IICRC[\s-]*)?S\s?5\d0\b[^.\n]{0,30}\bfor\b/i;
 // A section citation and its top-level number, e.g. "§9.1.7" or "section 12" → "9" / "12".
 const SECTION_CITE = /(?:§|section)\s?(\d{1,2})(?:\.\d+)*/i;
@@ -130,7 +149,13 @@ function evaluate(text, strict = true) {
   if (!makesClaim) return findings; // naming a standard without asserting content is fine.
 
   // 2) Absence claims are banned outright — cannot be proven from the index.
-  if (strict ? ABSENCE.test(text) : nearStandard(text, ABSENCE)) {
+  //    Author-directed spans ("we never reproduce their text") are MASKED first —
+  //    they assert nothing about the standard's contents and are the IP disclaimer
+  //    CLAUDE.md requires. Whatever absence claim SURVIVES the mask still blocks, so
+  //    a compliant clause cannot launder a real claim. Both modes: correctness fix,
+  //    not a scope reduction.
+  const masked = maskAuthorDirected(text);
+  if (strict ? ABSENCE.test(masked) : nearStandard(masked, ABSENCE)) {
     findings.push(
       'ABSENCE claim about a standard is banned — absence cannot be verified from the licensed section index (a table of contents, not full text). State what the standard DOES say, cited by section.'
     );
