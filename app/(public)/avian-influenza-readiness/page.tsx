@@ -316,10 +316,10 @@ export default function AvianInfluenzaReadinessPage() {
 
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
-                href="/courses"
+                href="/courses/avian-influenza-awareness-restoration-iaq-facilities"
                 className="inline-flex items-center gap-2 rounded-md bg-[#146fc2] px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#115a9e] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#146fc2]"
               >
-                View CARSI training
+                View the H5 awareness course
               </Link>
               <a
                 href="https://restoreassist.app/"
