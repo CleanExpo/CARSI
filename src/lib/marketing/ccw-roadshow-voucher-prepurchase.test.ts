@@ -29,8 +29,18 @@ describe('isVoucherPurchaseWindowOpen', () => {
     expect(isVoucherPurchaseWindowOpen(event, new Date('2026-07-22T09:00:00+10:00'))).toBe(true);
   });
 
-  it('is open through the whole of day 1 (up to 24h after start)', () => {
+  it('is open through the whole of day 1, Melbourne time', () => {
     expect(isVoucherPurchaseWindowOpen(event, new Date('2026-07-22T23:59:00+10:00'))).toBe(true);
+  });
+
+  it('is closed from the first moment of day 2, Melbourne time', () => {
+    expect(isVoucherPurchaseWindowOpen(event, new Date('2026-07-23T00:05:00+10:00'))).toBe(false);
+  });
+
+  // The copy promises a bonus for signing in on day 1, so the window must close
+  // when day 1 ends locally — not 24h after an 08:30 start, which runs into day 2.
+  it('is closed on the morning of day 2, before start+24h', () => {
+    expect(isVoucherPurchaseWindowOpen(event, new Date('2026-07-23T07:45:00+10:00'))).toBe(false);
   });
 
   it('is closed once the first day has fully passed (day 2)', () => {
@@ -68,5 +78,12 @@ describe('selectPrepurchaseVoucher', () => {
   it('returns null once the purchase window has closed', () => {
     const afterDay1 = new Date('2026-07-23T10:00:00+10:00');
     expect(selectPrepurchaseVoucher(event, afterDay1, { enabled: true, offers: [liveVoucher] })).toBeNull();
+  });
+
+  // `url` is optional on the type, so a config landing without one must not
+  // surface a money CTA that links nowhere.
+  it('returns null when the voucher has no url (fail-closed)', () => {
+    const noUrl = [{ ...liveVoucher, url: undefined }];
+    expect(selectPrepurchaseVoucher(event, now, { enabled: true, offers: noUrl })).toBeNull();
   });
 });
