@@ -36,6 +36,23 @@ describe('buildRegistrationEmail', () => {
     expect(email.text.toLowerCase()).toContain('check-in');
   });
 
+  it('renders the voucher CTA (money copy + link) only when voucherUrl is supplied', () => {
+    const withVoucher = buildRegistrationEmail({
+      ...base,
+      kind: 'confirmed',
+      voucherUrl: 'https://ccwonline.com.au/products/ccw-carsi-2-day-in-house-training',
+    });
+    expect(withVoucher.text).toContain('$100');
+    expect(withVoucher.text).toContain('$50');
+    expect(withVoucher.text).toContain('$150');
+    expect(withVoucher.text).toContain('ccwonline.com.au');
+    expect(withVoucher.html).toContain('Get your voucher');
+
+    const withoutVoucher = buildRegistrationEmail({ ...base, kind: 'confirmed' });
+    expect(withoutVoucher.text).not.toContain('Get your voucher');
+    expect(withoutVoucher.text).not.toContain('$150');
+  });
+
   it('always includes the event city, dates and venue', () => {
     for (const kind of ['confirmed', 'waitlisted', 'promoted'] as const) {
       const email = buildRegistrationEmail({ ...base, kind });
