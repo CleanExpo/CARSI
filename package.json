@@ -27,6 +27,7 @@
     "start": "prisma migrate deploy && next start",
     "start:production": "bash scripts/start-production.sh",
     "db:migrate:do": "bash scripts/do-migrate.sh",
+    "stripe:ensure-ccw-attendee": "npx tsx scripts/ensure-ccw-attendee-stripe.ts",
     "start:with-course-seed": "prisma migrate deploy && npm run db:seed-courses && npm run db:seed-quizzes && next start",
     "db:export-courses": "npx tsx scripts/export-courses-catalog.ts",
     "db:seed-courses": "npx tsx scripts/seed-courses-catalog.ts",

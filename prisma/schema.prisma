@@ -909,6 +909,10 @@ model CcwRoadshowSignIn {
   /// Write-once (set-if-null). Admin corrections are direct, write-once-respecting updates.
   day1CheckedInAt    DateTime? @map("day1_checked_in_at") @db.Timestamptz(6)
   day2CheckedInAt    DateTime? @map("day2_checked_in_at") @db.Timestamptz(6)
+  /// Marketing email consent captured at check-in (Spam Act). Required for post-event offer pack.
+  emailOptIn         Boolean   @default(false) @map("email_opt_in")
+  /// Set when the post-event offer pack email was sent (idempotent batch).
+  offerEmailSentAt   DateTime? @map("offer_email_sent_at") @db.Timestamptz(6)
   isWalkIn           Boolean   @default(false) @map("is_walk_in")
   /// pending | provisioning | provisioned | failed — drives the async provision batch.
   provisionStatus    String    @default("pending") @map("provision_status") @db.VarChar(16)

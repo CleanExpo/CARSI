@@ -1,9 +1,14 @@
 'use client';
 
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 
 import { apiClient, ApiClientError } from '@/lib/api/client';
+import {
+  CCW_ATTENDEE_MEMBERSHIP_LABEL,
+  CCW_ATTENDEE_OFFER_QUERY,
+} from '@/lib/marketing/ccw-roadshow-offer-pack';
 import type { MembershipDecisionReason } from '@/lib/server/entitlements';
 
 interface CheckoutResponse {
@@ -15,7 +20,7 @@ interface CheckoutResponse {
  * Membership CTA. When the feature flag is off it renders the exact WS0
  * "coming soon" affordance. When on, it reflects the learner's real status and
  * starts a `mode: 'subscription'` Stripe Checkout for those who need to
- * subscribe or renew.
+ * subscribe or renew. `/subscribe?offer=ccw-attendee` uses the attendee $295 path.
  */
 export function SubscribeCta({
   enabled,
@@ -24,10 +29,11 @@ export function SubscribeCta({
   enabled: boolean;
   reason: MembershipDecisionReason | null;
 }) {
+  const searchParams = useSearchParams();
+  const attendeeOffer = searchParams.get('offer') === CCW_ATTENDEE_OFFER_QUERY;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Ship dark: flag off = coming-soon interim, unchanged.
   if (!enabled) {
     return (
       <>
@@ -45,7 +51,6 @@ export function SubscribeCta({
     );
   }
 
-  // Active member — catalogue + billing portal.
   if (reason === 'active' || reason === 'grace') {
     return <ActiveMembershipActions />;
   }
@@ -54,7 +59,10 @@ export function SubscribeCta({
     setLoading(true);
     setError(null);
     try {
-      const data = await apiClient.post<CheckoutResponse>('/api/lms/subscription/checkout', {});
+      const data = await apiClient.post<CheckoutResponse>(
+        '/api/lms/subscription/checkout',
+        attendeeOffer ? { attendeeOffer: true } : {}
+      );
       const url = data.url ?? data.checkout_url;
       if (url) {
         window.location.href = url;
@@ -63,7 +71,8 @@ export function SubscribeCta({
       setError('Membership checkout is not available yet. Please try again later.');
     } catch (err) {
       if (err instanceof ApiClientError && err.status === 401) {
-        window.location.href = `/login?next=${encodeURIComponent('/subscribe')}`;
+        const next = attendeeOffer ? `/subscribe?offer=${CCW_ATTENDEE_OFFER_QUERY}` : '/subscribe';
+        window.location.href = `/login?next=${encodeURIComponent(next)}`;
         return;
       }
       const msg =
@@ -77,19 +86,28 @@ export function SubscribeCta({
   }
 
   const label = reason === 'lapsed' ? 'Renew membership' : 'Start membership';
+  const priceLabel = attendeeOffer ? CCW_ATTENDEE_MEMBERSHIP_LABEL : '$795 / year';
 
   return (
     <>
+      {attendeeOffer ? (
+        <p className="rounded-lg border border-[#9fdab8] bg-[#f1fbf5] px-3 py-2 text-center text-sm font-medium text-[#1b5e37]">
+          CCW/CARSI training-day special — {CCW_ATTENDEE_MEMBERSHIP_LABEL} for eligible attendees
+          (both days + email opt-in).
+        </p>
+      ) : null}
       <button
         type="button"
         onClick={startCheckout}
         disabled={loading}
         className="flex w-full items-center justify-center rounded-lg bg-[#0f5fa8] py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {loading ? 'Starting…' : `${label} — $795 / year`}
+        {loading ? 'Starting…' : `${label} — ${priceLabel}`}
       </button>
       {error ? <p className="text-center text-sm text-red-600">{error}</p> : null}
-      <p className="text-center text-xs text-slate-600">Secure checkout via Stripe. GST included.</p>
+      <p className="text-center text-xs text-slate-600">
+        Secure checkout via Stripe. GST included.
+      </p>
     </>
   );
 }
@@ -112,7 +130,7 @@ function ActiveMembershipActions() {
       setPortalError('Billing portal is not available yet.');
     } catch (err) {
       setPortalError(
-        err instanceof ApiClientError ? err.message : 'Could not open billing portal.',
+        err instanceof ApiClientError ? err.message : 'Could not open billing portal.'
       );
     } finally {
       setPortalLoading(false);

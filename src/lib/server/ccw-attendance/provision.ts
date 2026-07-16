@@ -35,6 +35,7 @@
  * double-provision the same person.
  */
 import { getCcwWorkshopCourseSlug } from '@/lib/server/ccw-attendance/eligibility';
+import { runCcwOfferPackBatch, type OfferPackBatchSummary } from '@/lib/server/ccw-attendance/offer-pack';
 import { getAppOrigin } from '@/lib/server/app-url';
 import { enrollStudentInCourse } from '@/lib/server/enrollment-service';
 import { sendEnrollmentWelcomeEmail } from '@/lib/server/enrollment-email';
@@ -381,13 +382,15 @@ export async function finalizeAttendanceForEvent(
 export interface CcwAttendanceBatchSummary {
   provision: ProvisionBatchSummary;
   attendance: FinalizeAttendanceBatchSummary;
+  /** Post-event Shopify + $295 membership emails (idempotent). */
+  offers: OfferPackBatchSummary;
 }
 
 /**
  * The full admin-triggered async batch for an event: (1) provision pending
- * Day-1 sign-ins, then (2) issue certificates of attendance for anyone now
- * checked in BOTH days. This is the single entry point the admin provision
- * route calls.
+ * Day-1 sign-ins, (2) issue certificates of attendance for anyone now checked
+ * in BOTH days, (3) send the post-event offer pack to eligible opted-in
+ * attendees. This is the single entry point the admin provision route calls.
  */
 export async function runCcwAttendanceBatch(
   eventSlug: string,
@@ -395,5 +398,7 @@ export async function runCcwAttendanceBatch(
 ): Promise<CcwAttendanceBatchSummary> {
   const provision = await provisionDay1SignIns(eventSlug, options);
   const attendance = await finalizeAttendanceForEvent(eventSlug);
-  return { provision, attendance };
+  const appOrigin = options?.appOrigin?.trim() || getAppOrigin();
+  const offers = await runCcwOfferPackBatch(eventSlug, { appOrigin });
+  return { provision, attendance, offers };
 }

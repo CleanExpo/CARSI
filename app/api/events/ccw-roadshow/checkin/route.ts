@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { applyRateLimit, clientIpFrom, UNKNOWN_IP } from '@/lib/rate-limit';
-import { isCcwAttendanceEnabled } from '@/lib/server/ccw-attendance/flag';
 import { recordCheckIn } from '@/lib/server/ccw-attendance/checkin-service';
 import { verifyCheckInToken } from '@/lib/server/ccw-attendance/checkin-token';
+import { isCcwAttendanceEnabled } from '@/lib/server/ccw-attendance/flag';
 import { captureServerError } from '@/lib/server/sentry';
 import { verifyTurnstileToken } from '@/lib/server/turnstile';
 
@@ -34,10 +34,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ detail: 'Unsupported content type' }, { status: 415 });
   }
 
-  const ip = clientIpFrom(
-    request.headers.get('x-forwarded-for'),
-    request.headers.get('x-real-ip'),
-  );
+  const ip = clientIpFrom(request.headers.get('x-forwarded-for'), request.headers.get('x-real-ip'));
   const rl = applyRateLimit(ip, RATE_LIMIT, RATE_WINDOW_MS);
   if (!rl.ok) {
     return NextResponse.json(
@@ -45,7 +42,7 @@ export async function POST(request: NextRequest) {
       {
         status: 429,
         headers: { 'Retry-After': String(Math.ceil((rl.resetAt - Date.now()) / 1000)) },
-      },
+      }
     );
   }
 
@@ -59,13 +56,11 @@ export async function POST(request: NextRequest) {
     fullName?: string;
     businessName?: string;
     email?: string;
+    emailOptIn?: boolean;
     turnstileToken?: string;
   };
 
-  const turnstile = await verifyTurnstileToken(
-    body.turnstileToken,
-    ip === UNKNOWN_IP ? null : ip,
-  );
+  const turnstile = await verifyTurnstileToken(body.turnstileToken, ip === UNKNOWN_IP ? null : ip);
   if (!turnstile.ok) {
     return NextResponse.json({ detail: 'Verification failed. Please try again.' }, { status: 403 });
   }
@@ -80,15 +75,18 @@ export async function POST(request: NextRequest) {
         detail:
           "This check-in code has expired. Please scan today's QR code, or ask an organiser for a new link.",
       },
-      { status: 403 },
+      { status: 403 }
     );
   }
   const { eventSlug, dayIndex } = tokenResult.scope;
 
   if (body.dayIndex != null && body.dayIndex !== dayIndex) {
     return NextResponse.json(
-      { code: 'day_mismatch', detail: 'This code is for a different day. Please scan the current QR code.' },
-      { status: 403 },
+      {
+        code: 'day_mismatch',
+        detail: 'This code is for a different day. Please scan the current QR code.',
+      },
+      { status: 403 }
     );
   }
 
@@ -98,7 +96,7 @@ export async function POST(request: NextRequest) {
   if (!fullName || !emailValid) {
     return NextResponse.json(
       { code: 'invalid_input', detail: 'A full name and a valid email are required.' },
-      { status: 400 },
+      { status: 400 }
     );
   }
 
@@ -109,6 +107,7 @@ export async function POST(request: NextRequest) {
       fullName,
       email,
       businessName: body.businessName,
+      emailOptIn: body.emailOptIn === true,
       source: 'self',
     });
 
@@ -116,7 +115,7 @@ export async function POST(request: NextRequest) {
       case 'invalid_event':
         return NextResponse.json(
           { code: 'invalid_event', detail: 'This event is not recognised.' },
-          { status: 400 },
+          { status: 400 }
         );
 
       case 'email_collision_different_name':
@@ -126,7 +125,7 @@ export async function POST(request: NextRequest) {
             detail:
               'This email is already checked in under a different name. Please use a distinct email for each person.',
           },
-          { status: 409 },
+          { status: 409 }
         );
 
       case 'at_capacity':
@@ -136,7 +135,7 @@ export async function POST(request: NextRequest) {
             detail:
               'This event has reached capacity. Please see an organiser — they can add you at the door.',
           },
-          { status: 409 },
+          { status: 409 }
         );
 
       case 'already_checked_in':

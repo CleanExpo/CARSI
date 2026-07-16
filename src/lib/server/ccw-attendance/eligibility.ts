@@ -47,6 +47,8 @@ export interface CcwSignInEligibilityInput {
   studentId: string | null;
   enrollmentId: string | null;
   provisionStatus: string;
+  /** Marketing consent from check-in. Required for post-event offers. */
+  emailOptIn?: boolean;
 }
 
 /** True once the attendee has an enrolment (account + 2-day-course access). */
@@ -56,10 +58,6 @@ function isProvisioned(signIn: CcwSignInEligibilityInput): boolean {
     signIn.studentId != null ||
     signIn.provisionStatus === 'provisioned'
   );
-}
-
-function hasAnyCheckIn(signIn: CcwSignInEligibilityInput): boolean {
-  return signIn.day1CheckedInAt != null || signIn.day2CheckedInAt != null;
 }
 
 /**
@@ -81,11 +79,9 @@ export function attendanceComplete(signIn: CcwSignInEligibilityInput): boolean {
 }
 
 /**
- * Base predicate for a LATER offer unit (deferred — no offer UI is wired now).
- * Exposed here so the invariant "offers are computed server-side from stored
- * rows" is stated at the foundation. True when provisioned AND has >= 1
- * check-in.
+ * Post-event offer pack eligibility (Shopify link + $295 membership email / Stripe).
+ * Provisioned + both days checked in + email opt-in. Server-side only.
  */
 export function baseOfferEligible(signIn: CcwSignInEligibilityInput): boolean {
-  return isProvisioned(signIn) && hasAnyCheckIn(signIn);
+  return isProvisioned(signIn) && attendanceComplete(signIn) && signIn.emailOptIn === true;
 }

@@ -6,10 +6,16 @@
 import { signEmailUnsubscribeToken } from '@/lib/auth/session-jwt';
 import { prisma } from '@/lib/prisma';
 import { getAppOrigin } from '@/lib/server/app-url';
-import { buildUnsubscribeUrl } from '@/lib/server/email-preferences';
-import { isEmailConfigured, sendEmail, type SendEmailResult } from '@/lib/server/email';
 import {
+  buildRegistrationEmail,
+  type RoadshowEmailKind,
+} from '@/lib/server/ccw-roadshow-registration-email';
+import { isEmailConfigured, sendEmail, type SendEmailResult } from '@/lib/server/email';
+import { buildUnsubscribeUrl } from '@/lib/server/email-preferences';
+import {
+  renderAdminPasswordResetEmail,
   renderCcwRoadshowBookingConfirmationEmail,
+  renderCcwRoadshowOfferPackEmail,
   renderContactNotificationEmail,
   renderContactReplyEmail,
   renderEnrollmentWelcomeEmail,
@@ -17,16 +23,11 @@ import {
   renderPasswordResetEmail,
   renderRecertReminderEmail,
   renderRegistrationWelcomeEmail,
-  renderToolboxTalkEmail,
-  renderAdminPasswordResetEmail,
   renderTeamMemberAddedEmail,
+  renderToolboxTalkEmail,
   renderYearlyMembershipEmail,
 } from '@/lib/server/email-templates';
 import { getFirstLessonLearnPath } from '@/lib/server/first-lesson';
-import {
-  buildRegistrationEmail,
-  type RoadshowEmailKind,
-} from '@/lib/server/ccw-roadshow-registration-email';
 
 export { isEmailConfigured };
 export type { SendEmailResult };
@@ -108,7 +109,7 @@ export async function sendToolboxTalkEmail(params: {
   const appOrigin = getAppOrigin();
   const unsubscribeUrl = buildUnsubscribeUrl(
     appOrigin,
-    await signEmailUnsubscribeToken(params.userId),
+    await signEmailUnsubscribeToken(params.userId)
   );
   const { html, text } = renderToolboxTalkEmail({
     appOrigin,
@@ -399,8 +400,7 @@ export async function sendCcwRoadshowOrganizerNotificationEmail(params: {
   const base = params.appOrigin.replace(/\/$/, '');
   const adminUrl = `${base}/admin/ccw-roadshow`;
   const statusLabel = params.registrationStatus === 'confirmed' ? 'Confirmed' : 'Waitlisted';
-  const esc = (v: string) =>
-    v.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const esc = (v: string) => v.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
   const attendeeLinesText = params.attendees
     .map((a, i) => `  ${i + 1}. ${a.fullName} (${a.yearsExperience} yrs) — ${a.goals}`)
@@ -408,7 +408,7 @@ export async function sendCcwRoadshowOrganizerNotificationEmail(params: {
   const attendeeLinesHtml = params.attendees
     .map(
       (a) =>
-        `<li><strong>${esc(a.fullName)}</strong> (${esc(a.yearsExperience)} yrs) — ${esc(a.goals)}</li>`,
+        `<li><strong>${esc(a.fullName)}</strong> (${esc(a.yearsExperience)} yrs) — ${esc(a.goals)}</li>`
     )
     .join('');
 
@@ -566,6 +566,37 @@ export async function sendContactReplyEmail(params: {
       process.env.ADMIN_EMAIL?.trim() ||
       'support@carsi.com.au',
     subject: ref ? `Re: your enquiry to CARSI [#${ref}]` : 'Re: your enquiry to CARSI',
+    html,
+    text,
+  });
+}
+
+export async function sendCcwRoadshowOfferPackEmail(params: {
+  to: string;
+  attendeeName: string;
+  eventCity: string;
+  eventDates: string;
+  shopifyTrainingUrl: string;
+  membershipCheckoutUrl: string;
+  membershipPriceLabel: string;
+  socialLinks: ReadonlyArray<{ label: string; href: string }>;
+  appOrigin: string;
+}): Promise<SendEmailResult> {
+  const base = params.appOrigin.replace(/\/$/, '');
+  const { html, text } = renderCcwRoadshowOfferPackEmail({
+    appOrigin: base,
+    attendeeName: params.attendeeName,
+    eventCity: params.eventCity,
+    eventDates: params.eventDates,
+    shopifyTrainingUrl: params.shopifyTrainingUrl,
+    membershipCheckoutUrl: params.membershipCheckoutUrl,
+    membershipPriceLabel: params.membershipPriceLabel,
+    socialLinks: params.socialLinks,
+  });
+
+  return sendEmail({
+    to: params.to,
+    subject: `Thanks for ${params.eventCity} — your CCW/CARSI offers`,
     html,
     text,
   });

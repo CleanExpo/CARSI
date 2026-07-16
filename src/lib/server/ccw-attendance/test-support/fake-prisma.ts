@@ -32,6 +32,8 @@ export interface FakeSignIn {
   normalizedName: string;
   day1CheckedInAt: Date | null;
   day2CheckedInAt: Date | null;
+  emailOptIn: boolean;
+  offerEmailSentAt: Date | null;
   isWalkIn: boolean;
   provisionStatus: string;
   signedInByAdmin: string | null;
@@ -90,7 +92,7 @@ const ccwRoadshowSignIn = {
     } else if (w.eventSlug_normalizedEmail) {
       const c = w.eventSlug_normalizedEmail as { eventSlug: string; normalizedEmail: string };
       row = fakeStore.signIns.find(
-        (s) => s.eventSlug === c.eventSlug && s.normalizedEmail === c.normalizedEmail,
+        (s) => s.eventSlug === c.eventSlug && s.normalizedEmail === c.normalizedEmail
       );
     } else if (typeof w.enrollmentId === 'string') {
       row = fakeStore.signIns.find((s) => s.enrollmentId === w.enrollmentId);
@@ -115,6 +117,8 @@ const ccwRoadshowSignIn = {
       normalizedName: '',
       day1CheckedInAt: null,
       day2CheckedInAt: null,
+      emailOptIn: false,
+      offerEmailSentAt: null,
       isWalkIn: false,
       provisionStatus: 'pending',
       signedInByAdmin: null,
@@ -126,7 +130,11 @@ const ccwRoadshowSignIn = {
     return Promise.resolve(row);
   },
 
-  update(args: { where: { id: string }; data: Record<string, unknown>; select?: Record<string, boolean> }) {
+  update(args: {
+    where: { id: string };
+    data: Record<string, unknown>;
+    select?: Record<string, boolean>;
+  }) {
     const row = fakeStore.signIns.find((s) => s.id === args.where.id);
     if (!row) throw new Error('signIn not found');
     Object.assign(row, args.data);
@@ -156,7 +164,11 @@ const ccwRoadshowSignIn = {
     return Promise.resolve(fakeStore.signIns.filter((s) => matchSignInWhere(s, args.where)).length);
   },
 
-  findMany(args: { where?: Record<string, unknown>; orderBy?: unknown; select?: Record<string, boolean> }) {
+  findMany(args: {
+    where?: Record<string, unknown>;
+    orderBy?: unknown;
+    select?: Record<string, boolean>;
+  }) {
     let rows = fakeStore.signIns.filter((s) => matchSignInWhere(s, args.where ?? {}));
     rows = rows.slice().sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
     return Promise.resolve(rows.map((row) => pick(row, args.select)));
@@ -169,15 +181,30 @@ function matchSignInWhere(row: FakeSignIn, where: Record<string, unknown>): bool
       if (row.id === (cond as { not: string }).not) return false;
       continue;
     }
-    if (key === 'day1CheckedInAt' && typeof cond === 'object' && cond !== null && 'not' in (cond as object)) {
+    if (
+      key === 'day1CheckedInAt' &&
+      typeof cond === 'object' &&
+      cond !== null &&
+      'not' in (cond as object)
+    ) {
       if (row.day1CheckedInAt == null) return false;
       continue;
     }
-    if (key === 'day2CheckedInAt' && typeof cond === 'object' && cond !== null && 'not' in (cond as object)) {
+    if (
+      key === 'day2CheckedInAt' &&
+      typeof cond === 'object' &&
+      cond !== null &&
+      'not' in (cond as object)
+    ) {
       if (row.day2CheckedInAt == null) return false;
       continue;
     }
-    if (key === 'enrollmentId' && typeof cond === 'object' && cond !== null && 'not' in (cond as object)) {
+    if (
+      key === 'enrollmentId' &&
+      typeof cond === 'object' &&
+      cond !== null &&
+      'not' in (cond as object)
+    ) {
       if (row.enrollmentId == null) return false;
       continue;
     }
@@ -194,9 +221,12 @@ const ccwRoadshowRegistration = {
     return Promise.resolve({ _sum: { seatCount: sum } });
   },
 
-  findMany(args: { where: { eventSlug: string; status: string }; select?: Record<string, boolean> }) {
+  findMany(args: {
+    where: { eventSlug: string; status: string };
+    select?: Record<string, boolean>;
+  }) {
     const rows = fakeStore.registrations.filter(
-      (r) => r.eventSlug === args.where.eventSlug && r.status === args.where.status,
+      (r) => r.eventSlug === args.where.eventSlug && r.status === args.where.status
     );
     return Promise.resolve(rows.map((r) => pick(r, args.select)));
   },
@@ -214,7 +244,9 @@ export const fakePrisma = {
 
 // ---- test seed helpers -----------------------------------------------------
 
-export function seedRegistration(reg: Partial<FakeRegistration> & { eventSlug: string; contactEmail: string }): FakeRegistration {
+export function seedRegistration(
+  reg: Partial<FakeRegistration> & { eventSlug: string; contactEmail: string }
+): FakeRegistration {
   const row: FakeRegistration = {
     id: randomUUID(),
     seatCount: 1,

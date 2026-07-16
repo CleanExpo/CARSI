@@ -54,6 +54,20 @@ services:
         scope: RUN_AND_BUILD_TIME
       - key: STRIPE_WEBHOOK_SECRET
         scope: RUN_TIME
+      # Optional — CCW roadshow attendee yearly Price (A$295). If unset, code
+      # resolves lookup_key carsi_pro_annual_attendee, else STRIPE_COUPON_CCW_ATTENDEE.
+      - key: STRIPE_PRICE_PRO_ANNUAL_ATTENDEE
+        scope: RUN_TIME
+      - key: STRIPE_COUPON_CCW_ATTENDEE
+        scope: RUN_TIME
+      - key: STRIPE_PRICE_PRO_ANNUAL
+        scope: RUN_TIME
+      - key: SUBSCRIPTIONS_ENABLED
+        scope: RUN_TIME
+      - key: CCW_ATTENDANCE_ENABLED
+        scope: RUN_TIME
+      - key: NEXT_PUBLIC_CCW_SHOPIFY_TRAINING_URL
+        scope: RUN_AND_BUILD_TIME
 
       - key: NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
         scope: RUN_AND_BUILD_TIME

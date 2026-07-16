@@ -23,15 +23,16 @@ import type { Prisma } from '@/generated/prisma/client';
 import { prisma } from '@/lib/prisma';
 import { runSerializable } from '@/lib/server/db-tx';
 
+import { recordCheckIn, type RecordCheckInResult } from './checkin-service';
+import type { CheckInDayIndex } from './checkin-token';
 import {
   attendanceComplete,
+  baseOfferEligible,
   courseAccessGranted,
   getCcwWorkshopCourseSlug,
   type CcwSignInEligibilityInput,
 } from './eligibility';
 import { matchSignIn } from './match';
-import { recordCheckIn, type RecordCheckInResult } from './checkin-service';
-import type { CheckInDayIndex } from './checkin-token';
 
 // ---------------------------------------------------------------------------
 // Correction (direct, write-once-respecting clear of a day mark)
@@ -87,7 +88,7 @@ export async function applyCheckInCorrection(input: CorrectionInput): Promise<Co
       input.signInId,
       `day${input.dayIndex}`,
       input.actorAdminEmail ? `by ${input.actorAdminEmail}` : '',
-      reason,
+      reason
     );
 
     return {
@@ -200,6 +201,7 @@ export interface DigitisePaperInput {
   email: string;
   businessName?: string | null;
   actorAdminId?: string | null;
+  emailOptIn?: boolean;
 }
 
 /**
@@ -214,6 +216,7 @@ export function digitisePaperCheckIn(input: DigitisePaperInput): Promise<RecordC
     fullName: input.fullName,
     email: input.email,
     businessName: input.businessName,
+    emailOptIn: input.emailOptIn,
     source: 'paper',
     actorAdminId: input.actorAdminId ?? null,
   });
@@ -234,9 +237,13 @@ export interface SignInRosterRow {
   provisionStatus: string;
   day1CheckedInAt: string | null;
   day2CheckedInAt: string | null;
+  emailOptIn: boolean;
+  offerEmailSentAt: string | null;
   courseAccessGranted: boolean;
   /** Both days done → certificate of attendance issued by the async batch. */
   attendanceComplete: boolean;
+  /** Both days + opt-in + provisioned → post-event offer pack. */
+  offerEligible: boolean;
 }
 
 export interface SignInRoster {
@@ -265,6 +272,7 @@ export async function listSignInsForEvent(eventSlug: string): Promise<SignInRost
       studentId: row.studentId,
       enrollmentId: row.enrollmentId,
       provisionStatus: row.provisionStatus,
+      emailOptIn: row.emailOptIn,
     };
     return {
       signInId: row.id,
@@ -277,8 +285,11 @@ export async function listSignInsForEvent(eventSlug: string): Promise<SignInRost
       provisionStatus: row.provisionStatus,
       day1CheckedInAt: row.day1CheckedInAt ? row.day1CheckedInAt.toISOString() : null,
       day2CheckedInAt: row.day2CheckedInAt ? row.day2CheckedInAt.toISOString() : null,
+      emailOptIn: row.emailOptIn,
+      offerEmailSentAt: row.offerEmailSentAt ? row.offerEmailSentAt.toISOString() : null,
       courseAccessGranted: courseAccessGranted(eligibilityInput),
       attendanceComplete: attendanceComplete(eligibilityInput),
+      offerEligible: baseOfferEligible(eligibilityInput),
     };
   });
 
@@ -291,10 +302,7 @@ export async function listSignInsForEvent(eventSlug: string): Promise<SignInRost
  * tiers — which are AMBIGUOUS by definition, so the result is only ever a list
  * for an admin to choose from (never an auto-merge).
  */
-export async function findMergeCandidates(
-  eventSlug: string,
-  signInId: string,
-): Promise<string[]> {
+export async function findMergeCandidates(eventSlug: string, signInId: string): Promise<string[]> {
   const target = await prisma.ccwRoadshowSignIn.findUnique({
     where: { id: signInId },
     select: { id: true, eventSlug: true, businessName: true, fullName: true },
@@ -308,7 +316,7 @@ export async function findMergeCandidates(
 
   const result = matchSignIn(
     { businessName: target.businessName, fullName: target.fullName },
-    others,
+    others
   );
   return result.autoTick ? [] : result.matches;
 }

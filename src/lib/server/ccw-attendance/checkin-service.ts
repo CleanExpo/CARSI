@@ -28,8 +28,8 @@ import type { Prisma } from '@/generated/prisma/client';
 import { getCcwRoadshowEvent } from '@/lib/marketing/ccw-roadshow';
 import { runSerializable } from '@/lib/server/db-tx';
 
-import { normalizeBusiness, normalizeEmail, normalizeName } from './normalize';
 import type { CheckInDayIndex } from './checkin-token';
+import { normalizeBusiness, normalizeEmail, normalizeName } from './normalize';
 
 /** Where the check-in came from (self QR, digitised paper, or admin action). */
 export type CheckInSource = 'self' | 'paper' | 'admin';
@@ -44,6 +44,8 @@ export interface RecordCheckInInput {
   source?: CheckInSource;
   /** AdminUser.id when an admin performed/digitised this action. */
   actorAdminId?: string | null;
+  /** Marketing email consent — sticky true (never clears an existing opt-in). */
+  emailOptIn?: boolean;
 }
 
 export type RecordCheckInResult =
@@ -90,7 +92,7 @@ async function capacityUsed(tx: Prisma.TransactionClient, eventSlug: string): Pr
 async function findRegistrationIdByEmail(
   tx: Prisma.TransactionClient,
   eventSlug: string,
-  normalizedEmail: string,
+  normalizedEmail: string
 ): Promise<string | null> {
   const regs = await tx.ccwRoadshowRegistration.findMany({
     where: { eventSlug, status: 'confirmed' },
@@ -116,6 +118,7 @@ export async function recordCheckIn(input: RecordCheckInInput): Promise<RecordCh
   const normalizedBusiness = businessName ? normalizeBusiness(businessName) || null : null;
   const source: CheckInSource = input.source ?? 'self';
   const dayField = input.dayIndex === 1 ? 'day1CheckedInAt' : 'day2CheckedInAt';
+  const emailOptIn = input.emailOptIn === true;
 
   return runSerializable(async (tx) => {
     const existing = await tx.ccwRoadshowSignIn.findUnique({
@@ -134,6 +137,13 @@ export async function recordCheckIn(input: RecordCheckInInput): Promise<RecordCh
       const alreadyMarked =
         input.dayIndex === 1 ? existing.day1CheckedInAt : existing.day2CheckedInAt;
       if (alreadyMarked) {
+        // Still allow a late opt-in flip on an already-checked-in day.
+        if (emailOptIn && !existing.emailOptIn) {
+          await tx.ccwRoadshowSignIn.update({
+            where: { id: existing.id },
+            data: { emailOptIn: true },
+          });
+        }
         return {
           status: 'already_checked_in',
           signInId: existing.id,
@@ -142,11 +152,14 @@ export async function recordCheckIn(input: RecordCheckInInput): Promise<RecordCh
         };
       }
 
-      // Write-once: set this day mark (it was null).
+      // Write-once: set this day mark (it was null). Opt-in is sticky true.
       const now = new Date();
       await tx.ccwRoadshowSignIn.update({
         where: { id: existing.id },
-        data: { [dayField]: now },
+        data: {
+          [dayField]: now,
+          ...(emailOptIn || existing.emailOptIn ? { emailOptIn: true } : {}),
+        },
       });
       return {
         status: 'checked_in',
@@ -182,8 +195,9 @@ export async function recordCheckIn(input: RecordCheckInInput): Promise<RecordCh
         normalizedBusiness,
         normalizedName,
         isWalkIn,
+        emailOptIn,
         provisionStatus: 'pending',
-        signedInByAdmin: source === 'self' ? null : input.actorAdminId ?? null,
+        signedInByAdmin: source === 'self' ? null : (input.actorAdminId ?? null),
         [dayField]: now,
       },
     });

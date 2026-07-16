@@ -15,8 +15,11 @@ type RosterRow = {
   provisionStatus: string;
   day1CheckedInAt: string | null;
   day2CheckedInAt: string | null;
+  emailOptIn: boolean;
+  offerEmailSentAt: string | null;
   courseAccessGranted: boolean;
   attendanceComplete: boolean;
+  offerEligible: boolean;
 };
 
 type Roster = {
@@ -40,7 +43,9 @@ export function AdminCcwSignInsClient() {
     if (!eventSlug) return;
     setLoading(true);
     try {
-      const res = await fetch(`/api/admin/ccw-roadshow/sign-ins?eventSlug=${encodeURIComponent(eventSlug)}`);
+      const res = await fetch(
+        `/api/admin/ccw-roadshow/sign-ins?eventSlug=${encodeURIComponent(eventSlug)}`
+      );
       if (!res.ok) throw new Error('Failed to load sign-ins');
       const data = (await res.json()) as { roster: Roster };
       setRoster(data.roster);
@@ -74,13 +79,17 @@ export function AdminCcwSignInsClient() {
   }
 
   async function correct(row: RosterRow, dayIndex: 1 | 2) {
-    const reason = window.prompt(`Reverse Day ${dayIndex} check-in for ${row.fullName}? Enter a reason (recorded in the admin log):`);
+    const reason = window.prompt(
+      `Reverse Day ${dayIndex} check-in for ${row.fullName}? Enter a reason (recorded in the admin log):`
+    );
     if (!reason) return;
     await post({ action: 'correct', signInId: row.signInId, dayIndex, reason });
   }
 
   async function merge(row: RosterRow) {
-    const duplicateId = window.prompt(`Merge a duplicate INTO ${row.fullName}. Paste the duplicate sign-in id:`);
+    const duplicateId = window.prompt(
+      `Merge a duplicate INTO ${row.fullName}. Paste the duplicate sign-in id:`
+    );
     if (!duplicateId) return;
     await post({ action: 'merge', primaryId: row.signInId, duplicateId: duplicateId.trim() });
   }
@@ -93,22 +102,110 @@ export function AdminCcwSignInsClient() {
       fullName: paper.fullName,
       email: paper.email,
       businessName: paper.businessName || undefined,
+      emailOptIn: true,
     });
     if (ok) setPaper({ fullName: '', email: '', businessName: '', dayIndex: 1 });
+  }
+
+  async function runProvisionBatch() {
+    if (!eventSlug) return;
+    if (
+      !window.confirm(
+        `Run provision for ${eventSlug}? Creates CARSI accounts for Day-1 sign-ins, issues both-day certificates, and sends the post-event offer pack (Shopify + $295 membership) to eligible attendees.`,
+      )
+    ) {
+      return;
+    }
+    setLoading(true);
+    try {
+      const res = await fetch('/api/admin/ccw-roadshow/provision', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ eventSlug }),
+      });
+      const p = (await res.json().catch(() => ({}))) as {
+        detail?: string;
+        provision?: { provisioned?: number; failed?: number };
+        attendance?: { certified?: number };
+        offers?: { sent?: number; eligible?: number; skippedAlreadySent?: number };
+      };
+      if (!res.ok) {
+        setError(p.detail || 'Provision batch failed');
+        return;
+      }
+      setError('');
+      window.alert(
+        [
+          `Provisioned: ${p.provision?.provisioned ?? 0} (failed ${p.provision?.failed ?? 0})`,
+          `Certificates: ${p.attendance?.certified ?? 0}`,
+          `Offer emails: ${p.offers?.sent ?? 0} sent / ${p.offers?.eligible ?? 0} eligible / ${p.offers?.skippedAlreadySent ?? 0} already sent`,
+        ].join('\n'),
+      );
+      await load();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Provision batch failed');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function sendOfferPack() {
+    if (!eventSlug) return;
+    if (
+      !window.confirm(
+        `Send post-event offer emails for ${eventSlug}? Only both-days + opted-in + provisioned attendees who have not already been emailed.`
+      )
+    ) {
+      return;
+    }
+    setLoading(true);
+    try {
+      const res = await fetch('/api/admin/ccw-roadshow/offer-pack', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ eventSlug }),
+      });
+      const p = (await res.json().catch(() => ({}))) as {
+        detail?: string;
+        sent?: number;
+        eligible?: number;
+        skippedAlreadySent?: number;
+      };
+      if (!res.ok) {
+        setError(p.detail || 'Offer pack send failed');
+        return;
+      }
+      setError('');
+      window.alert(
+        `Offer pack: ${p.sent ?? 0} sent / ${p.eligible ?? 0} eligible / ${p.skippedAlreadySent ?? 0} already sent.`
+      );
+      await load();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Offer pack send failed');
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
     <div className="space-y-6 p-6 text-white">
       <div>
-        <p className="text-[11px] font-semibold tracking-[0.2em] text-white/55 uppercase">Attendance foundation</p>
+        <p className="text-[11px] font-semibold tracking-[0.2em] text-white/55 uppercase">
+          Attendance foundation
+        </p>
         <h1 className="mt-1 text-2xl font-bold tracking-tight">CCW Roadshow Sign-ins</h1>
         <p className="mt-1 text-sm text-white/60">
-          Day marks are the write-once source of truth. A correction clears a mistaken mark (recorded in the admin log). Both days = certificate of attendance.
+          Day marks are write-once. Both days = certificate of attendance. After Day 2, run{' '}
+          <span className="text-white/80">Provision + offers</span> to create accounts, issue
+          certificates, and email the Shopify training link + $295 membership special to opted-in
+          attendees.
         </p>
       </div>
 
       <div className="flex items-center gap-3">
-        <label htmlFor="ccw-event-select" className="text-sm text-white/70">Event</label>
+        <label htmlFor="ccw-event-select" className="text-sm text-white/70">
+          Event
+        </label>
         <select
           id="ccw-event-select"
           value={eventSlug}
@@ -126,14 +223,30 @@ export function AdminCcwSignInsClient() {
             </option>
           ))}
         </select>
-        {roster && (
-          <span className="text-sm text-white/60">
-            {roster.rows.length} sign-ins
-          </span>
-        )}
+        {roster && <span className="text-sm text-white/60">{roster.rows.length} sign-ins</span>}
+        <button
+          type="button"
+          onClick={() => void runProvisionBatch()}
+          disabled={loading || !eventSlug}
+          className="rounded-lg border border-[#2490ed]/50 bg-[#2490ed]/20 px-3 py-2 text-sm font-semibold text-[#9fd4ff] disabled:opacity-50"
+        >
+          Run provision + offers
+        </button>
+        <button
+          type="button"
+          onClick={() => void sendOfferPack()}
+          disabled={loading || !eventSlug}
+          className="rounded-lg border border-[#b8e62e]/40 bg-[#b8e62e]/15 px-3 py-2 text-sm font-semibold text-[#d4f07a] disabled:opacity-50"
+        >
+          Resend offer pack only
+        </button>
       </div>
 
-      {error && <p className="rounded-lg border border-red-400/30 bg-red-400/10 px-3 py-2 text-sm text-red-100">{error}</p>}
+      {error && (
+        <p className="rounded-lg border border-red-400/30 bg-red-400/10 px-3 py-2 text-sm text-red-100">
+          {error}
+        </p>
+      )}
       {loading && <p className="text-sm text-white/60">Loading…</p>}
 
       {roster && (
@@ -147,6 +260,8 @@ export function AdminCcwSignInsClient() {
                 <th className="p-3 font-semibold">Day 2</th>
                 <th className="p-3 font-semibold">Type</th>
                 <th className="p-3 font-semibold">Provision</th>
+                <th className="p-3 font-semibold">Opt-in</th>
+                <th className="p-3 font-semibold">Offer</th>
                 <th className="p-3 font-semibold">Certificate</th>
                 <th className="p-3 font-semibold">Actions</th>
               </tr>
@@ -164,20 +279,36 @@ export function AdminCcwSignInsClient() {
                   <td className="p-3">{row.day2CheckedInAt ? '✓' : '—'}</td>
                   <td className="p-3">{row.isWalkIn ? 'Walk-in' : 'Registered'}</td>
                   <td className="p-3 text-white/70">{row.provisionStatus}</td>
+                  <td className="p-3">{row.emailOptIn ? 'Yes' : '—'}</td>
+                  <td className="p-3">
+                    {row.offerEmailSentAt ? 'Sent' : row.offerEligible ? 'Ready' : '—'}
+                  </td>
                   <td className="p-3">{row.attendanceComplete ? 'Attended' : '—'}</td>
                   <td className="p-3">
                     <div className="flex flex-wrap gap-2">
                       {row.day1CheckedInAt && (
-                        <button type="button" onClick={() => correct(row, 1)} className="rounded border border-amber-300/40 bg-amber-300/10 px-2 py-1 text-xs text-amber-100">
+                        <button
+                          type="button"
+                          onClick={() => correct(row, 1)}
+                          className="rounded border border-amber-300/40 bg-amber-300/10 px-2 py-1 text-xs text-amber-100"
+                        >
                           Reverse D1
                         </button>
                       )}
                       {row.day2CheckedInAt && (
-                        <button type="button" onClick={() => correct(row, 2)} className="rounded border border-amber-300/40 bg-amber-300/10 px-2 py-1 text-xs text-amber-100">
+                        <button
+                          type="button"
+                          onClick={() => correct(row, 2)}
+                          className="rounded border border-amber-300/40 bg-amber-300/10 px-2 py-1 text-xs text-amber-100"
+                        >
                           Reverse D2
                         </button>
                       )}
-                      <button type="button" onClick={() => merge(row)} className="rounded border border-white/15 bg-white/10 px-2 py-1 text-xs">
+                      <button
+                        type="button"
+                        onClick={() => merge(row)}
+                        className="rounded border border-white/15 bg-white/10 px-2 py-1 text-xs"
+                      >
                         Merge dupe
                       </button>
                     </div>
@@ -191,7 +322,9 @@ export function AdminCcwSignInsClient() {
 
       <div className={`${surface} p-4`}>
         <h2 className="text-lg font-semibold">Digitise a paper sign-in</h2>
-        <p className="mt-1 text-sm text-white/60">Records an offline/paper entry against this event (source: paper).</p>
+        <p className="mt-1 text-sm text-white/60">
+          Records an offline/paper entry against this event (source: paper).
+        </p>
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
           <input
             aria-label="Paper sign-in full name"
@@ -220,10 +353,18 @@ export function AdminCcwSignInsClient() {
             onChange={(e) => setPaper((p) => ({ ...p, dayIndex: Number(e.target.value) }))}
             className="rounded-lg border border-white/15 bg-white/10 px-3 py-2 text-sm"
           >
-            <option value={1} className="bg-[#09111f]">Day 1</option>
-            <option value={2} className="bg-[#09111f]">Day 2</option>
+            <option value={1} className="bg-[#09111f]">
+              Day 1
+            </option>
+            <option value={2} className="bg-[#09111f]">
+              Day 2
+            </option>
           </select>
-          <button type="button" onClick={submitPaper} className="rounded-lg border border-white/15 bg-white/15 px-3 py-2 text-sm font-semibold">
+          <button
+            type="button"
+            onClick={submitPaper}
+            className="rounded-lg border border-white/15 bg-white/15 px-3 py-2 text-sm font-semibold"
+          >
             Record paper sign-in
           </button>
         </div>

@@ -1,10 +1,11 @@
 import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
 import Link from 'next/link';
+import { Suspense } from 'react';
 
+import { verifySessionToken } from '@/lib/auth/session-jwt';
 import { getEntitlements, type Entitlements } from '@/lib/server/entitlements';
 import { subscriptionsEnabled } from '@/lib/server/subscriptions-flag';
-import { verifySessionToken } from '@/lib/auth/session-jwt';
 import { SubscribeCta } from './SubscribeCta';
 
 export const metadata: Metadata = {
@@ -51,8 +52,8 @@ function GraceBanner({ periodEnd }: { periodEnd: Date | null }) {
   return (
     <p className="rounded-lg border border-[#f2cf8f] bg-[#fff8ed] px-3 py-2 text-sm font-medium text-[#7a3500]">
       Your membership payment is past due. You still have full access during a 7-day grace period
-      {periodEnd ? ` from ${periodEnd.toLocaleDateString('en-AU')}` : ''}. Please update your payment
-      to avoid interruption — your progress and certificates are always retained.
+      {periodEnd ? ` from ${periodEnd.toLocaleDateString('en-AU')}` : ''}. Please update your
+      payment to avoid interruption — your progress and certificates are always retained.
     </p>
   );
 }
@@ -108,8 +109,8 @@ export default async function SubscribePage() {
               </div>
             ) : (
               <p className="mt-3 rounded-lg border border-[#f2cf8f] bg-[#fff8ed] px-3 py-2 text-sm font-medium text-[#7a3500]">
-                Membership is best for clients planning multiple courses, refreshing knowledge across
-                levels, or maintaining CECs over time.
+                Membership is best for clients planning multiple courses, refreshing knowledge
+                across levels, or maintaining CECs over time.
               </p>
             )}
           </div>
@@ -124,7 +125,15 @@ export default async function SubscribePage() {
           </ul>
 
           <div className="flex flex-col gap-3">
-            <SubscribeCta enabled={enabled} reason={status} />
+            <Suspense
+              fallback={
+                <span className="flex w-full items-center justify-center rounded-lg border border-slate-200 bg-slate-50 py-3 text-sm font-semibold text-slate-500">
+                  Loading…
+                </span>
+              }
+            >
+              <SubscribeCta enabled={enabled} reason={status} />
+            </Suspense>
           </div>
         </div>
 

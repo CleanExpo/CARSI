@@ -253,7 +253,7 @@ export function renderRecertReminderEmail(params: {
       cta: { label: 'View renewal status', href: params.renewalsUrl },
       noteHtml: `Open ${brandLink(params.renewalsUrl, 'Credentials')} to track CEC progress and submit your renewal.`,
     },
-    `Hi ${params.name},\n\n${lead}\n\nComplete CEC-eligible courses and submit your renewal.\n\nCredentials: ${params.renewalsUrl}`,
+    `Hi ${params.name},\n\n${lead}\n\nComplete CEC-eligible courses and submit your renewal.\n\nCredentials: ${params.renewalsUrl}`
   );
 }
 
@@ -290,7 +290,7 @@ export function renderToolboxTalkEmail(params: {
       cta: { label: 'Open this month’s talk', href: params.courseUrl },
       noteHtml: `You’re receiving this as part of your CARSI toolbox-talk subscription. Open ${brandLink(params.courseUrl, 'the course')} to view all talks.${unsubHtml}`,
     },
-    `Hi ${params.name},\n\nThis month's toolbox talk is ready: "${params.talkTitle}".\n\nOpen it: ${params.courseUrl}${unsubText}`,
+    `Hi ${params.name},\n\nThis month's toolbox talk is ready: "${params.talkTitle}".\n\nOpen it: ${params.courseUrl}${unsubText}`
   );
 }
 
@@ -667,5 +667,56 @@ export function renderContactReplyEmail(params: {
       noteHtml: `You're receiving this because you contacted ${brandLink(`${base}/contact`, 'carsi.com.au')}.`,
     },
     params.replyBody
+  );
+}
+
+/** Post-event offer pack for both-days + email-opt-in CCW/CARSI attendees. */
+export function renderCcwRoadshowOfferPackEmail(params: {
+  appOrigin: string;
+  attendeeName: string;
+  eventCity: string;
+  eventDates: string;
+  shopifyTrainingUrl: string;
+  membershipCheckoutUrl: string;
+  membershipPriceLabel: string;
+  socialLinks: ReadonlyArray<{ label: string; href: string }>;
+}): RenderedEmail {
+  const name = params.attendeeName.trim() || 'there';
+  const socialHtml = params.socialLinks
+    .map((l) => `<li style="margin: 0 0 8px;">${brandLink(l.href, l.label)}</li>`)
+    .join('');
+  const socialText = params.socialLinks.map((l) => `- ${l.label}: ${l.href}`).join('\n');
+
+  return render(
+    {
+      appOrigin: params.appOrigin,
+      preheader: `Thanks for joining us in ${params.eventCity} — your exclusive CCW/CARSI offers`,
+      eyebrow: 'Post-event offers',
+      title: `Thanks for attending ${params.eventCity}`,
+      greeting: `Hi ${name},`,
+      paragraphs: [
+        `You completed both days of the CARSI x CCW Business Growth Days (${params.eventDates}). Here are your exclusive follow-up offers.`,
+        `Shopify — CCW/CARSI 2 Day In-house Training: open the training product via the button below.`,
+        `CARSI Yearly membership special: ${params.membershipPriceLabel} for your first year (attendee-only). Use the membership link below — sign in to your CARSI account to checkout.`,
+      ],
+      details: [
+        { label: 'Event', value: `${params.eventCity} — ${params.eventDates}` },
+        { label: 'Membership special', value: params.membershipPriceLabel },
+      ],
+      cta: { label: 'View Shopify training product', href: params.shopifyTrainingUrl },
+      messageHtml: `
+        <p style="margin: 24px 0 12px; font-family: ${BRAND.font}; font-size: 15px; line-height: 1.6; color: ${BRAND.text};">
+          <a href="${escapeHtml(params.membershipCheckoutUrl)}" style="display: inline-block; padding: 12px 22px; background: ${BRAND.orange}; color: #060a14; font-weight: 700; text-decoration: none; border-radius: 8px;">
+            Claim ${escapeHtml(params.membershipPriceLabel)} membership
+          </a>
+        </p>
+        <p style="margin: 20px 0 8px; font-family: ${BRAND.font}; font-size: 14px; font-weight: 600; color: ${BRAND.silverHi};">Stay connected with CCW</p>
+        <ul style="margin: 0; padding-left: 18px; font-family: ${BRAND.font}; font-size: 14px; line-height: 1.5; color: ${BRAND.text};">
+          ${socialHtml}
+        </ul>
+      `,
+      noteHtml: `You're receiving this because you attended both days and opted in at check-in.`,
+    },
+    `Hi ${name},\n\nThanks for completing both days in ${params.eventCity} (${params.eventDates}).\n\nShopify training product:\n${params.shopifyTrainingUrl}\n\nCARSI yearly membership special (${params.membershipPriceLabel}):\n${params.membershipCheckoutUrl}\n\nStay connected with CCW:\n${socialText}\n`
   );
 }

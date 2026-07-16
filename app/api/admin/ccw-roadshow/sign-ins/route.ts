@@ -9,8 +9,8 @@ import {
   listSignInsForEvent,
   mergeDuplicateSignIns,
 } from '@/lib/server/ccw-attendance/admin-ops';
-import { isCcwAttendanceEnabled } from '@/lib/server/ccw-attendance/flag';
 import type { CheckInDayIndex } from '@/lib/server/ccw-attendance/checkin-token';
+import { isCcwAttendanceEnabled } from '@/lib/server/ccw-attendance/flag';
 
 /**
  * Admin sign-in roster + correction/merge/paper-digitisation for ONE event.
@@ -82,6 +82,7 @@ type DigitisePaperBody = {
   fullName?: string;
   email?: string;
   businessName?: string;
+  emailOptIn?: boolean;
 };
 type PostBody = CorrectBody | MergeBody | DigitisePaperBody | { action?: string };
 
@@ -116,7 +117,7 @@ export async function POST(request: NextRequest) {
         if (!signInId || dayIndex == null || !reason) {
           return NextResponse.json(
             { detail: 'signInId, dayIndex (1 or 2) and a reason are required.' },
-            { status: 400 },
+            { status: 400 }
           );
         }
         const result = await applyCheckInCorrection({
@@ -141,7 +142,7 @@ export async function POST(request: NextRequest) {
         if (!primaryId || !duplicateId) {
           return NextResponse.json(
             { detail: 'primaryId and duplicateId are required.' },
-            { status: 400 },
+            { status: 400 }
           );
         }
         const result = await mergeDuplicateSignIns({
@@ -153,16 +154,19 @@ export async function POST(request: NextRequest) {
         if (result.status === 'same_row') {
           return NextResponse.json(
             { detail: 'Cannot merge a sign-in into itself.' },
-            { status: 400 },
+            { status: 400 }
           );
         }
         if (result.status === 'not_found') {
-          return NextResponse.json({ detail: 'One of the sign-ins was not found.' }, { status: 404 });
+          return NextResponse.json(
+            { detail: 'One of the sign-ins was not found.' },
+            { status: 404 }
+          );
         }
         if (result.status === 'different_event') {
           return NextResponse.json(
             { detail: 'Sign-ins from different events cannot be merged.' },
-            { status: 400 },
+            { status: 400 }
           );
         }
         return NextResponse.json({ ok: true, result });
@@ -178,7 +182,7 @@ export async function POST(request: NextRequest) {
         if (!event || dayIndex == null || !fullName || !emailValid) {
           return NextResponse.json(
             { detail: 'A valid eventSlug, dayIndex (1 or 2), full name and email are required.' },
-            { status: 400 },
+            { status: 400 }
           );
         }
         const result = await digitisePaperCheckIn({
@@ -187,6 +191,7 @@ export async function POST(request: NextRequest) {
           fullName,
           email,
           businessName: b.businessName,
+          emailOptIn: b.emailOptIn === true,
         });
         switch (result.status) {
           case 'email_collision_different_name':
@@ -196,17 +201,17 @@ export async function POST(request: NextRequest) {
                 detail:
                   'This email is already checked in under a different name. Use a distinct email for each person.',
               },
-              { status: 409 },
+              { status: 409 }
             );
           case 'at_capacity':
             return NextResponse.json(
               { code: 'at_capacity', detail: 'This event is at capacity.' },
-              { status: 409 },
+              { status: 409 }
             );
           case 'invalid_event':
             return NextResponse.json(
               { code: 'invalid_event', detail: 'This event is not recognised.' },
-              { status: 400 },
+              { status: 400 }
             );
           default:
             return NextResponse.json({ ok: true, result });

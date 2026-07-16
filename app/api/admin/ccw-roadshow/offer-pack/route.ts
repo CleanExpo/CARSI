@@ -3,21 +3,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAdminSessionOrNull } from '@/lib/admin/admin-session';
 import { getCcwRoadshowEvent } from '@/lib/marketing/ccw-roadshow';
 import { getAppOrigin } from '@/lib/server/app-url';
-import { runCcwAttendanceBatch } from '@/lib/server/ccw-attendance/provision';
 import { isCcwAttendanceEnabled } from '@/lib/server/ccw-attendance/flag';
+import { runCcwOfferPackBatch } from '@/lib/server/ccw-attendance/offer-pack';
 
 /**
- * POST /api/admin/ccw-roadshow/provision — run the async attendance batch for
- * one event: provision pending Day-1 sign-ins (account + 2-day-course enrol +
- * fire-and-forget welcome email) and issue a certificate of attendance for
- * anyone now checked in both days (this course grants no CECs).
+ * POST /api/admin/ccw-roadshow/offer-pack — send post-event offer emails for
+ * one event (both days + email opt-in + provisioned; idempotent via
+ * offerEmailSentAt). Admin-only; dark behind CCW_ATTENDANCE_ENABLED.
  *
- * Admin-only (`getAdminSessionOrNull`) AND dark behind `CCW_ATTENDANCE_ENABLED`
- * (404 when off). This is the DECOUPLED provisioning path — never the door-side
- * check-in route — so the DO→external egress that 504s can never block capture.
- *
- * Request JSON: { eventSlug: string }
- * Success 200: { ok: true; eventSlug; provision: {...}; attendance: {...} }
+ * Body: { eventSlug: string }
  */
 export async function POST(request: NextRequest) {
   if (!isCcwAttendanceEnabled()) {
@@ -45,19 +39,12 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const summary = await runCcwAttendanceBatch(event.slug, {
-      initiatedByAdminEmail: session.email,
+    const summary = await runCcwOfferPackBatch(event.slug, {
       appOrigin: getAppOrigin(request),
     });
-    return NextResponse.json({
-      ok: true,
-      eventSlug: event.slug,
-      provision: summary.provision,
-      attendance: summary.attendance,
-      offers: summary.offers,
-    });
+    return NextResponse.json({ ok: true, ...summary });
   } catch (e) {
-    console.error('[ccw-roadshow/provision]', e);
-    return NextResponse.json({ detail: 'Provisioning batch failed' }, { status: 500 });
+    console.error('[ccw-roadshow/offer-pack]', e);
+    return NextResponse.json({ detail: 'Offer pack batch failed' }, { status: 500 });
   }
 }

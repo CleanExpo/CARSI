@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
 import { ArrowRight, CheckCircle2, Loader2 } from 'lucide-react';
+import { useState } from 'react';
 
 import { TurnstileWidget } from '@/components/security/TurnstileWidget';
 import {
@@ -41,6 +41,7 @@ export function CcwCheckInForm({ token, dayIndex, eventCity, eventDates }: Check
   const [fullName, setFullName] = useState('');
   const [businessName, setBusinessName] = useState('');
   const [email, setEmail] = useState('');
+  const [emailOptIn, setEmailOptIn] = useState(true);
   const [turnstileToken, setTurnstileToken] = useState('');
 
   const [state, setState] = useState<'idle' | 'loading' | 'done'>('idle');
@@ -77,6 +78,7 @@ export function CcwCheckInForm({ token, dayIndex, eventCity, eventDates }: Check
           fullName: name,
           businessName: businessName.trim(),
           email: mail,
+          emailOptIn,
           turnstileToken,
         }),
       });
@@ -92,14 +94,18 @@ export function CcwCheckInForm({ token, dayIndex, eventCity, eventDates }: Check
       if (payload.code === 'email_in_use') {
         setError(
           payload.detail ??
-            'This email is already checked in under a different name. Please use a distinct email.',
+            'This email is already checked in under a different name. Please use a distinct email.'
         );
       } else if (payload.code === 'at_capacity') {
         setError(payload.detail ?? 'This event is at capacity — please see an organiser.');
-      } else if (payload.code === 'token_expired' || payload.code === 'token_invalid' || payload.code === 'day_mismatch') {
+      } else if (
+        payload.code === 'token_expired' ||
+        payload.code === 'token_invalid' ||
+        payload.code === 'day_mismatch'
+      ) {
         setError(
           payload.detail ??
-            "This check-in code isn't valid right now. Please scan today's QR code or ask an organiser.",
+            "This check-in code isn't valid right now. Please scan today's QR code or ask an organiser."
         );
       } else {
         setError(payload.detail ?? 'Check-in failed. Please try again or see an organiser.');
@@ -132,8 +138,8 @@ export function CcwCheckInForm({ token, dayIndex, eventCity, eventDates }: Check
           Check in for {eventCity}
         </h2>
         <p className={`mt-2 ${marketingBodySm}`}>
-          {eventCity} · {eventDates}. Enter your own details below. Day 1 sets up your CARSI
-          account — we&apos;ll email your login link.
+          {eventCity} · {eventDates}. Enter your own details below. Day 1 sets up your CARSI account
+          — we&apos;ll email your login link.
         </p>
       </div>
 
@@ -178,6 +184,20 @@ export function CcwCheckInForm({ token, dayIndex, eventCity, eventDates }: Check
           />
           <span className={`mt-1 block ${marketingBodySm}`}>
             Attend both days for your certificate of attendance.
+          </span>
+        </label>
+
+        <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-3">
+          <input
+            type="checkbox"
+            checked={emailOptIn}
+            onChange={(e) => setEmailOptIn(e.target.checked)}
+            className="mt-1 h-4 w-4 shrink-0 rounded border-white/30"
+          />
+          <span className={marketingBodySm}>
+            Email me after the event with exclusive CCW/CARSI offers (including the Shopify training
+            link and a one-year CARSI membership special), plus CCW social and shop links. You can
+            unsubscribe anytime.
           </span>
         </label>
 

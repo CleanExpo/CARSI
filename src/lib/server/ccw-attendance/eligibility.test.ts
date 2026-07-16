@@ -46,15 +46,41 @@ describe('attendanceComplete (certificate-of-attendance trigger)', () => {
     // Both days but not yet provisioned still reads complete; the certificate
     // WRITE (in the async batch) is what additionally requires an enrolment.
     expect(
-      attendanceComplete(base({ day1CheckedInAt: now, day2CheckedInAt: now, enrollmentId: null })),
+      attendanceComplete(base({ day1CheckedInAt: now, day2CheckedInAt: now, enrollmentId: null }))
     ).toBe(true);
   });
 });
 
-describe('baseOfferEligible (deferred unit — predicate only, no UI wired)', () => {
-  it('true when provisioned AND has >=1 check-in', () => {
-    expect(baseOfferEligible(base({ enrollmentId: 'e1', day1CheckedInAt: now }))).toBe(true);
-    expect(baseOfferEligible(base({ enrollmentId: 'e1' }))).toBe(false);
-    expect(baseOfferEligible(base({ day1CheckedInAt: now }))).toBe(false);
+describe('baseOfferEligible (post-event offer pack)', () => {
+  it('true when provisioned AND both days AND email opt-in', () => {
+    expect(
+      baseOfferEligible(
+        base({
+          enrollmentId: 'e1',
+          day1CheckedInAt: now,
+          day2CheckedInAt: now,
+          emailOptIn: true,
+        })
+      )
+    ).toBe(true);
+  });
+
+  it('false without both days, opt-in, or provision', () => {
+    expect(
+      baseOfferEligible(base({ enrollmentId: 'e1', day1CheckedInAt: now, emailOptIn: true }))
+    ).toBe(false);
+    expect(
+      baseOfferEligible(
+        base({
+          enrollmentId: 'e1',
+          day1CheckedInAt: now,
+          day2CheckedInAt: now,
+          emailOptIn: false,
+        })
+      )
+    ).toBe(false);
+    expect(
+      baseOfferEligible(base({ day1CheckedInAt: now, day2CheckedInAt: now, emailOptIn: true }))
+    ).toBe(false);
   });
 });
