@@ -71,7 +71,17 @@ export function areAttendeeOffersActive(event: EventWindow, now: Date): boolean 
   return t >= start && t <= end;
 }
 
-const DAY_MS = 24 * 60 * 60 * 1000;
+/**
+ * Last instant of the event's first day, in the event's OWN local timezone.
+ * `startDateIso` carries the venue's offset (e.g. `+10:00`), so the calendar day
+ * is read straight off it rather than through the server's clock.
+ */
+function endOfFirstLocalDay(startDateIso: string): number {
+  const m = /^(\d{4}-\d{2}-\d{2})T[\d:.]+(Z|[+-]\d{2}:\d{2})$/.exec(startDateIso);
+  if (!m) return NaN;
+  const [, date, offset] = m;
+  return new Date(`${date}T23:59:59.999${offset === 'Z' ? '+00:00' : offset}`).getTime();
+}
 
 /**
  * The CCW store-credit voucher has a PRE-PURCHASE window that is deliberately
@@ -81,22 +91,25 @@ const DAY_MS = 24 * 60 * 60 * 1000;
  * in on day 1). Owner decision 2026-07-16 — supersedes the original "claim during
  * the 2 event days only" lock in the day-gated-offers spec.
  *
- * "Through the first day" = the 24h from `startDateIso` (day-1 morning) — covers
- * all of day 1. Pure instant math; the ISO offset already encodes AEST/AEDT, and
- * the client clock is never trusted (server passes `now`). Closed for past events.
+ * "Through the first day" = up to midnight at the end of day 1, local to the venue.
+ * NOT `start + 24h`: for an 08:30 start that would stay open until 08:30 on day 2
+ * and promise a day-1 sign-in bonus that can no longer be earned. The client clock
+ * is never trusted (server passes `now`). Closed for past events.
  */
 export function isVoucherPurchaseWindowOpen(event: EventWindow, now: Date): boolean {
-  const start = new Date(event.startDateIso).getTime();
+  const closesAt = endOfFirstLocalDay(event.startDateIso);
   const t = now.getTime();
-  if (Number.isNaN(start) || Number.isNaN(t)) return false;
-  return t <= start + DAY_MS;
+  if (Number.isNaN(closesAt) || Number.isNaN(t)) return false;
+  return t <= closesAt;
 }
 
 /**
  * The pre-purchase CCW store-credit voucher to promote right now, or null.
  * Returns it only when the feature flag is enabled, the purchase window is open,
- * the offer is `live`, and its URL passes the preview-host guard. Pure — the
- * caller passes `enabled` (server flag) so this stays client-safe and testable.
+ * the offer is `live`, and it has a URL that passes the preview-host guard. Pure —
+ * the caller passes `enabled` (server flag) so this stays client-safe and testable.
+ * `url` is optional on the type, so a missing one is rejected rather than allowed
+ * through to a caller that would render a CTA linking nowhere.
  */
 export function selectPrepurchaseVoucher(
   event: EventWindow,
@@ -108,7 +121,7 @@ export function selectPrepurchaseVoucher(
   const offers = opts.offers ?? ccwRoadshowAttendeeOffers;
   const voucher = offers.find((o) => o.key === 'ccw-store-credit') ?? null;
   if (!voucher || !voucher.live) return null;
-  if (voucher.url != null && !isDistributableOfferUrl(voucher.url)) return null;
+  if (typeof voucher.url !== 'string' || !isDistributableOfferUrl(voucher.url)) return null;
   return voucher;
 }
 
