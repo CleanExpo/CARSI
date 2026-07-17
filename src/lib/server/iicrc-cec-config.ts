@@ -9,11 +9,20 @@ export function getIicrcCecSubmissionEmail(): string {
   return v || DEFAULT_IICRC_CEC_SUBMISSION_EMAIL;
 }
 
-/** When false, submissions are recorded as `skipped` with reason `auto_submit_disabled`. */
+/**
+ * Auto-submission to the IICRC is FAIL-CLOSED: off unless explicitly enabled.
+ *
+ * Emailing renewals@iicrcnet.org asserts a CEC claim on a learner's behalf. Per
+ * CLAUDE.md that claim is licence-critical and valid only after per-course IICRC
+ * approval confirmed by the founder — so the absence of configuration must mean
+ * "do not submit", never "submit". This previously defaulted to ON, which sent a
+ * live submission for a course that had no approval (2026-07-17).
+ *
+ * When false, submissions are recorded as `skipped` with reason `auto_submit_disabled`.
+ */
 export function isIicrcCecAutoSubmitEnabled(): boolean {
   const v = process.env.IICRC_CEC_AUTO_SUBMIT?.trim().toLowerCase();
-  if (v === 'false' || v === '0' || v === 'no' || v === 'off') return false;
-  return true;
+  return v === 'true' || v === '1' || v === 'yes' || v === 'on';
 }
 
 export function resolveEffectiveCecHours(course: {
