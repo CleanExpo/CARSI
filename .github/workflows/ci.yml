@@ -99,6 +99,25 @@ jobs:
       - name: CEC approvals registry check
         run: npm run check:cec
 
+      # Licence-critical (2026-07-15 incident): CARSI nearly published "Search the
+      # IICRC S520 for the word 'hydroxyl' — it isn't there", which S520:2024 §9.1.7
+      # refutes. CARSI's authority IS knowing the standards, so a false claim about
+      # one is a licence/credibility risk. The guard existed from that day but fired
+      # NOWHERE — no workflow, no git hook — because its repo scan sat red on false
+      # positives (17 at baseline, all benign). Fixed + wired 2026-07-17.
+      # It is a FILTER, not a guarantee: per CLAUDE.md a standards claim in brand copy
+      # is an L2/irreversible action that ALSO needs human sign-off. Green here does
+      # not mean a standards claim is verified.
+      - name: Standards-claim guard
+        run: npm run check:standards-claims
+
+      # Proves the guard still catches the incident + every known evasion, and that
+      # data/wordpress-export/ stays in scope (it seeds 84 published rows into
+      # lms_courses — not the "frozen legacy" archive its name suggests). Without
+      # this, a "fix" that silences the guard would look identical to one that works.
+      - name: Standards-claim guard self-test
+        run: npm run test:standards-claims
+
       - name: Lint
         run: npm run lint
 
