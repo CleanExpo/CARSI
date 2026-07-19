@@ -65,6 +65,7 @@
     "lint": "eslint .",
     "type-check": "tsc --noEmit",
     "test:stripe-webhook": "node scripts/test-stripe-webhook-idempotency.mjs",
+    "attribution:reversal-recovery:plan": "tsx scripts/plan-attribution-reversal-recovery.ts",
     "db:seed-phase2": "npx tsx scripts/seed-phase2-pathways-quizzes.ts",
     "db:seed-floor-care-quizzes": "npx tsx scripts/seed-floor-care-quizzes.ts",
     "db:seed-h5-bird-flu-quiz": "npx tsx scripts/seed-h5-bird-flu-quiz.ts",

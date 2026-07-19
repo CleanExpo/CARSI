@@ -16,8 +16,8 @@ import { ensureGuestUserFromStripeEmail } from '@/lib/server/guest-checkout';
 import { sendGa4PurchaseEvent } from '@/lib/server/ga4-measurement-protocol';
 import { parseAttributionJourneyId } from '@/lib/analytics/event-attribution';
 import {
-  tryApplyAttributedRevenueReversal,
-  tryRecordAttributedStage,
+  persistAttributedRevenueReversal,
+  recordAttributedStage,
 } from '@/lib/server/event-attribution';
 import { sessionClaimsForUserId } from '@/lib/server/lms-auth';
 import { prisma } from '@/lib/prisma';
@@ -95,23 +95,27 @@ async function handleStripeRevocation(event: Stripe.Event): Promise<void> {
   const eventTimestamp = new Date(event.created * 1000);
   let paymentIntentId: string | null = null;
   let reversedRevenueCents = 0;
+  let reversalCurrency: string | null = null;
   let revokeEntitlement = true;
 
   if (event.type === 'charge.refunded') {
     const charge = event.data.object as Stripe.Charge;
     // Partial refunds reduce net attribution but do not revoke course access.
     reversedRevenueCents = Math.max(0, charge.amount_refunded);
+    reversalCurrency = charge.currency;
     revokeEntitlement =
       typeof charge.amount !== 'number' || charge.amount_refunded >= charge.amount;
     paymentIntentId = typeof charge.payment_intent === 'string' ? charge.payment_intent : null;
   } else {
     const dispute = event.data.object as Stripe.Dispute;
     reversedRevenueCents = Math.max(0, dispute.amount);
+    reversalCurrency = dispute.currency;
     paymentIntentId = typeof dispute.payment_intent === 'string' ? dispute.payment_intent : null;
   }
   if (!paymentIntentId) return;
 
   const stripe = getStripeClient();
+  let invoiceTransactionId: string | null = null;
 
   // Path 2: is this a SUBSCRIPTION charge? Follow payment intent → invoice →
   // subscription id (version-tolerant). If so, revoke the membership. We do this
@@ -121,13 +125,14 @@ async function handleStripeRevocation(event: Stripe.Event): Promise<void> {
     const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId, {
       expand: ['invoice'],
     });
-    const invoiceId = readInvoiceIdFromPaymentIntent(paymentIntent);
-    if (invoiceId) {
-      await tryApplyAttributedRevenueReversal(invoiceId, {
+    invoiceTransactionId = readInvoiceIdFromPaymentIntent(paymentIntent);
+    if (invoiceTransactionId) {
+      await persistAttributedRevenueReversal(invoiceTransactionId, {
         eventId: event.id,
         eventAt: eventTimestamp,
         reason,
         reversedRevenueCents,
+        currency: reversalCurrency,
       });
     }
     const subscriptionId = readSubscriptionIdFromPaymentIntent(paymentIntent);
@@ -162,12 +167,17 @@ async function handleStripeRevocation(event: Stripe.Event): Promise<void> {
   for (const s of sessions.data) {
     const ref = resolveStripePaymentReference(s.id);
     if (!ref) continue;
-    await tryApplyAttributedRevenueReversal(ref, {
-      eventId: event.id,
-      eventAt: eventTimestamp,
-      reason,
-      reversedRevenueCents,
-    });
+    // A charge is either an invoice transaction or a one-off checkout. A single
+    // Stripe event ID must map to exactly one canonical attribution key.
+    if (!invoiceTransactionId) {
+      await persistAttributedRevenueReversal(ref, {
+        eventId: event.id,
+        eventAt: eventTimestamp,
+        reason,
+        reversedRevenueCents,
+        currency: reversalCurrency,
+      });
+    }
     if (revokeEntitlement) {
       await revokeEnrollmentsByPaymentReference(ref, reason, eventTimestamp);
     }
@@ -223,11 +233,12 @@ async function handleDisputeWonRegrant(event: Stripe.Event): Promise<void> {
   });
   const invoiceId = readInvoiceIdFromPaymentIntent(paymentIntent);
   if (invoiceId) {
-    await tryApplyAttributedRevenueReversal(invoiceId, {
+    await persistAttributedRevenueReversal(invoiceId, {
       eventId: event.id,
       eventAt: eventTimestamp,
       reason: 'dispute_won',
       reversedRevenueCents: 0,
+      currency: dispute.currency,
     });
   }
   const sessions = await stripe.checkout.sessions.list({
@@ -237,12 +248,15 @@ async function handleDisputeWonRegrant(event: Stripe.Event): Promise<void> {
   for (const s of sessions.data) {
     const ref = resolveStripePaymentReference(s.id);
     if (!ref) continue;
-    await tryApplyAttributedRevenueReversal(ref, {
-      eventId: event.id,
-      eventAt: eventTimestamp,
-      reason: 'dispute_won',
-      reversedRevenueCents: 0,
-    });
+    if (!invoiceId) {
+      await persistAttributedRevenueReversal(ref, {
+        eventId: event.id,
+        eventAt: eventTimestamp,
+        reason: 'dispute_won',
+        reversedRevenueCents: 0,
+        currency: dispute.currency,
+      });
+    }
     await reactivateDisputeWonEnrollmentsByPaymentReference(ref, eventTimestamp);
   }
 }
@@ -381,7 +395,7 @@ export async function POST(request: NextRequest) {
         teamSeatCount: Number.isFinite(teamSeatCount) ? teamSeatCount : undefined,
       });
 
-      await tryRecordAttributedStage(
+      await recordAttributedStage(
         parseAttributionJourneyId(session.metadata?.attribution_journey_id),
         'purchase',
         {
