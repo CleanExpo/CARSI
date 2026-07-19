@@ -18,7 +18,7 @@ Use these suffixes with `https://carsi.com.au/events/ccw-roadshow`. Do not publi
 `event_registration → course_view → checkout_started → purchase | subscription`
 
 - `event_registration`: written after the existing roadshow registration succeeds.
-- `course_view`: written once per journey and real catalogue course when an attributed browser mounts a CARSI course page. Arbitrary slugs are rejected, repeats are idempotent, and the route also applies the existing instance-local per-IP-and-journey abuse limit.
+- `course_view`: written once per journey and real catalogue course when an attributed browser mounts a CARSI course page. Arbitrary slugs are rejected, repeats are idempotent, and the route applies an instance-local per-client-IP limit that cannot be reset by cycling journey IDs. Public registration itself is bounded to five attempts per client IP per hour before body parsing.
 - `checkout_started`: written only after Stripe returns a checkout session.
 - `purchase`: written after a paid one-off course checkout is fulfilled.
 - `subscription`: written when Stripe starts the subscription and for each paid invoice; unique transaction IDs make retries idempotent.
@@ -43,6 +43,6 @@ An authenticated admin can request:
 
 `GET /api/admin/attribution/report`
 
-The response uses complete database-side aggregation across the retained campaign window and reports unique journeys at every funnel stage plus verified AUD revenue by source. It does not return partial totals from an oldest/newest row window. The first useful read should be taken after the Melbourne event, then again after Sydney, with the exact deployed commit and report timestamp recorded.
+The response uses complete database-side aggregation across the retained campaign window and reports unique journeys at every funnel stage plus `netRevenueAud` by source. Net revenue subtracts cumulative partial/full refunds and disputes from the original signature-verified paid event; a later merchant-won dispute restores that amount. Gross payment history remains in the ledger and reversal snapshots are ordered/idempotent by Stripe event ID and timestamp. It does not return partial totals from an oldest/newest row window. The first useful read should be taken after the Melbourne event, then again after Sydney, with the exact deployed commit and report timestamp recorded.
 
 Campaign/source values are public and self-asserted. The report is last-touch marketing attribution, not fraud-resistant proof that a registration came from a particular QR code or email.

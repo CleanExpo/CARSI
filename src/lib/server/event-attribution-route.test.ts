@@ -38,6 +38,7 @@ describe('POST /api/analytics/attribution', () => {
     const response = await POST(request);
 
     expect(response.status).toBe(429);
+    expect(mocks.applyRateLimit).toHaveBeenCalledWith('203.0.113.7', 20, 60 * 60 * 1000);
     expect(mocks.recordStage).not.toHaveBeenCalled();
   });
 

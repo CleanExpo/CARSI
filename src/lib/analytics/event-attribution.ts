@@ -42,7 +42,7 @@ export type AttributionReportRow = {
   checkout_started: number;
   purchase: number;
   subscription: number;
-  revenueAud: number;
+  netRevenueAud: number;
 };
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
@@ -102,7 +102,7 @@ export function aggregateAttributionEvents(rows: AttributionEventRecord[]) {
         checkout_started: 0,
         purchase: 0,
         subscription: 0,
-        revenueAud: 0,
+        netRevenueAud: 0,
       };
       bySource.set(row.sourceId, report);
     }
@@ -121,7 +121,7 @@ export function aggregateAttributionEvents(rows: AttributionEventRecord[]) {
         : `${row.stage}:${row.journeyId}:${row.revenueCents}`;
       if (!seenTransactions.has(transactionKey)) {
         seenTransactions.add(transactionKey);
-        report.revenueAud += row.revenueCents / 100;
+        report.netRevenueAud += row.revenueCents / 100;
         totalRevenueCents += row.revenueCents;
       }
     }
@@ -135,7 +135,7 @@ export function aggregateAttributionEvents(rows: AttributionEventRecord[]) {
       checkout_started: totalStageJourneys.get('checkout_started')?.size ?? 0,
       purchase: totalStageJourneys.get('purchase')?.size ?? 0,
       subscription: totalStageJourneys.get('subscription')?.size ?? 0,
-      revenueAud: totalRevenueCents / 100,
+      netRevenueAud: totalRevenueCents / 100,
     },
     sources: [...bySource.values()].sort((a, b) => a.sourceId.localeCompare(b.sourceId)),
   };

@@ -3,9 +3,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const db = vi.hoisted(() => ({
   create: vi.fn(),
   deleteMany: vi.fn(),
+  findMany: vi.fn(),
   findCourse: vi.fn(),
   findFirst: vi.fn(),
   queryRaw: vi.fn(),
+  updateMany: vi.fn(),
 }));
 
 vi.mock('@/lib/prisma', () => ({
@@ -13,7 +15,9 @@ vi.mock('@/lib/prisma', () => ({
     eventAttributionEvent: {
       create: db.create,
       deleteMany: db.deleteMany,
+      findMany: db.findMany,
       findFirst: db.findFirst,
+      updateMany: db.updateMany,
     },
     lmsCourse: { findUnique: db.findCourse },
     $queryRaw: db.queryRaw,
@@ -22,6 +26,7 @@ vi.mock('@/lib/prisma', () => ({
 
 import { ATTRIBUTION_CAMPAIGN_ID } from '@/lib/analytics/event-attribution';
 import {
+  applyAttributedRevenueReversal,
   getAttributionReport,
   recordAttributedStage,
   startAttributionJourney,
@@ -160,8 +165,65 @@ describe('event attribution persistence', () => {
     expect(report.rowCount).toBe(10_002);
     expect(report.complete).toBe(true);
     expect(report.totals.purchase).toBe(1);
-    expect(report.totals.revenueAud).toBe(99);
+    expect(report.totals.netRevenueAud).toBe(99);
     expect(db.queryRaw).toHaveBeenCalledTimes(1);
+  });
+
+  it('records a cumulative partial refund against the original paid transaction idempotently', async () => {
+    const reversedAt = new Date('2026-07-19T10:00:00.000Z');
+    db.findMany.mockResolvedValueOnce([{ id: 'paid-row', revenueCents: 9_900 }]);
+    db.updateMany.mockResolvedValueOnce({ count: 1 });
+
+    await expect(
+      applyAttributedRevenueReversal('cs_paid', {
+        eventId: 'evt_refund',
+        eventAt: reversedAt,
+        reason: 'refunded',
+        reversedRevenueCents: 2_500,
+      }),
+    ).resolves.toBe(1);
+
+    expect(db.updateMany).toHaveBeenCalledWith({
+      where: {
+        id: 'paid-row',
+        OR: [{ reversalEventAt: null }, { reversalEventAt: { lte: reversedAt } }],
+      },
+      data: {
+        reversedRevenueCents: 2_500,
+        reversalReason: 'refunded',
+        reversalEventId: 'evt_refund',
+        reversalEventAt: reversedAt,
+      },
+    });
+  });
+
+  it('restores disputed revenue only after a newer merchant-won event', async () => {
+    const restoredAt = new Date('2026-07-19T11:00:00.000Z');
+    db.findMany.mockResolvedValueOnce([{ id: 'paid-row', revenueCents: 9_900 }]);
+    db.updateMany.mockResolvedValueOnce({ count: 1 });
+
+    await expect(
+      applyAttributedRevenueReversal('cs_paid', {
+        eventId: 'evt_won',
+        eventAt: restoredAt,
+        reason: 'dispute_won',
+        reversedRevenueCents: 0,
+      }),
+    ).resolves.toBe(1);
+
+    expect(db.updateMany).toHaveBeenCalledWith({
+      where: {
+        id: 'paid-row',
+        reversalReason: 'disputed',
+        OR: [{ reversalEventAt: null }, { reversalEventAt: { lte: restoredAt } }],
+      },
+      data: {
+        reversedRevenueCents: 0,
+        reversalReason: 'dispute_won',
+        reversalEventId: 'evt_won',
+        reversalEventAt: restoredAt,
+      },
+    });
   });
 
   it('fails open when attribution storage is unavailable', async () => {

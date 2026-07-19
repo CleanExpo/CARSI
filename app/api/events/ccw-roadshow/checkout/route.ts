@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { randomBytes } from 'node:crypto';
 
+import { applyRateLimit, clientIpFrom } from '@/lib/rate-limit';
+
 import {
   buildAttributionSource,
   type AttributionSource,
@@ -43,6 +45,9 @@ type RoadshowCheckoutBody = {
   attendees?: AttendeeBody[];
 };
 
+const REGISTRATION_RATE_LIMIT = 5;
+const REGISTRATION_RATE_WINDOW_MS = 60 * 60 * 1000;
+
 function clean(value: unknown, maxLength = 240) {
   return typeof value === 'string' ? value.trim().slice(0, maxLength) : '';
 }
@@ -63,6 +68,27 @@ function generateFreeEntryToken(eventSlug: string) {
 
 export async function POST(request: NextRequest) {
   try {
+    // This public route mints attribution journeys. Bound it before body parsing
+    // so cycling self-asserted campaign values cannot reset downstream limits.
+    const ip = clientIpFrom(
+      request.headers.get('x-forwarded-for'),
+      request.headers.get('x-real-ip'),
+    );
+    const rateLimit = applyRateLimit(
+      ip,
+      REGISTRATION_RATE_LIMIT,
+      REGISTRATION_RATE_WINDOW_MS,
+    );
+    if (!rateLimit.ok) {
+      return NextResponse.json(
+        { detail: 'Too many registration attempts. Please try again later.' },
+        {
+          status: 429,
+          headers: { 'Retry-After': String(Math.ceil((rateLimit.resetAt - Date.now()) / 1000)) },
+        },
+      );
+    }
+
     const body = (await request.json().catch(() => ({}))) as RoadshowCheckoutBody;
     const event = getCcwRoadshowEvent(body.eventSlug);
     const ticketPackage = getCcwRoadshowTicketPackage(body.packageId);

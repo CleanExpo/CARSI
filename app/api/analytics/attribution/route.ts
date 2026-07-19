@@ -22,7 +22,9 @@ export async function POST(request: NextRequest) {
     request.headers.get('x-forwarded-for'),
     request.headers.get('x-real-ip'),
   );
-  const rateLimit = applyRateLimit(`${ip}:${journeyId}`, RATE_LIMIT, RATE_WINDOW_MS);
+  // A client can mint fresh journey cookies through public registration, so the
+  // abuse window must be keyed by the non-self-asserted client IP, not journey.
+  const rateLimit = applyRateLimit(ip, RATE_LIMIT, RATE_WINDOW_MS);
   if (!rateLimit.ok) {
     return new Response(null, {
       status: 429,

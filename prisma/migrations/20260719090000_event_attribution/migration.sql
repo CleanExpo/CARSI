@@ -10,6 +10,10 @@ CREATE TABLE "event_attribution_events" (
     "revenue_cents" INTEGER,
     "currency" VARCHAR(3),
     "transaction_id" VARCHAR(255),
+    "reversed_revenue_cents" INTEGER NOT NULL DEFAULT 0,
+    "reversal_reason" VARCHAR(32),
+    "reversal_event_id" VARCHAR(255),
+    "reversal_event_at" TIMESTAMPTZ(6),
     "created_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "event_attribution_events_pkey" PRIMARY KEY ("id"),
@@ -24,6 +28,13 @@ CREATE TABLE "event_attribution_events" (
     ),
     CONSTRAINT "event_attribution_events_currency_check" CHECK (
       "revenue_cents" IS NULL OR "currency" = 'AUD'
+    ),
+    CONSTRAINT "event_attribution_events_reversed_revenue_check" CHECK (
+      "reversed_revenue_cents" >= 0
+      AND "reversed_revenue_cents" <= COALESCE("revenue_cents", 0)
+    ),
+    CONSTRAINT "event_attribution_events_reversal_reason_check" CHECK (
+      "reversal_reason" IS NULL OR "reversal_reason" IN ('refunded', 'disputed', 'dispute_won')
     )
 );
 

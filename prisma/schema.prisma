@@ -751,17 +751,21 @@ model StripeWebhookEvent {
 /// stored in an HttpOnly cookie after successful attributed event registration.
 /// Rows are excluded after 90 days and opportunistically deleted by the service.
 model EventAttributionEvent {
-  id            String   @id @default(uuid()) @db.Uuid
-  journeyId     String   @map("journey_id") @db.Uuid
-  campaignId    String   @map("campaign_id") @db.VarChar(80)
-  sourceId      String   @map("source_id") @db.VarChar(40)
-  eventSlug     String   @map("event_slug") @db.VarChar(32)
-  stage         String   @db.VarChar(32)
-  courseSlug    String?  @map("course_slug") @db.VarChar(200)
-  revenueCents  Int?     @map("revenue_cents")
-  currency      String?  @db.VarChar(3)
-  transactionId String?  @map("transaction_id") @db.VarChar(255)
-  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  id                   String    @id @default(uuid()) @db.Uuid
+  journeyId            String    @map("journey_id") @db.Uuid
+  campaignId           String    @map("campaign_id") @db.VarChar(80)
+  sourceId             String    @map("source_id") @db.VarChar(40)
+  eventSlug            String    @map("event_slug") @db.VarChar(32)
+  stage                String    @db.VarChar(32)
+  courseSlug           String?   @map("course_slug") @db.VarChar(200)
+  revenueCents         Int?      @map("revenue_cents")
+  currency             String?   @db.VarChar(3)
+  transactionId        String?   @map("transaction_id") @db.VarChar(255)
+  reversedRevenueCents Int       @default(0) @map("reversed_revenue_cents")
+  reversalReason       String?   @map("reversal_reason") @db.VarChar(32)
+  reversalEventId      String?   @map("reversal_event_id") @db.VarChar(255)
+  reversalEventAt      DateTime? @map("reversal_event_at") @db.Timestamptz(6)
+  createdAt            DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
 
   @@unique([stage, transactionId])
   @@index([campaignId, sourceId, stage])

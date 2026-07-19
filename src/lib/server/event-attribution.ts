@@ -25,6 +25,16 @@ type StageDetails = {
   transactionId?: string;
 };
 
+export type AttributionReversalReason = 'refunded' | 'disputed' | 'dispute_won';
+
+type RevenueReversal = {
+  eventId: string;
+  eventAt: Date;
+  reason: AttributionReversalReason;
+  /** Stripe's cumulative refunded/disputed cents for the original transaction. */
+  reversedRevenueCents: number;
+};
+
 type AggregatedAttributionRow = {
   source_id: AttributionSourceId;
   stage: AttributionStage;
@@ -162,6 +172,61 @@ export async function tryRecordAttributedStage(
   }
 }
 
+export async function applyAttributedRevenueReversal(
+  transactionId: string,
+  reversal: RevenueReversal,
+): Promise<number> {
+  const normalisedTransactionId = transactionId.trim().slice(0, 255);
+  const eventId = reversal.eventId.trim().slice(0, 255);
+  if (!normalisedTransactionId || !eventId || !Number.isFinite(reversal.reversedRevenueCents)) {
+    return 0;
+  }
+
+  const paidRows = await prisma.eventAttributionEvent.findMany({
+    where: {
+      transactionId: normalisedTransactionId,
+      stage: { in: ['purchase', 'subscription'] },
+    },
+    select: { id: true, revenueCents: true },
+    take: 2,
+  });
+
+  let updated = 0;
+  for (const row of paidRows) {
+    const reversedRevenueCents = Math.min(
+      row.revenueCents ?? 0,
+      Math.max(0, Math.round(reversal.reversedRevenueCents)),
+    );
+    const result = await prisma.eventAttributionEvent.updateMany({
+      where: {
+        id: row.id,
+        ...(reversal.reason === 'dispute_won' ? { reversalReason: 'disputed' } : {}),
+        OR: [{ reversalEventAt: null }, { reversalEventAt: { lte: reversal.eventAt } }],
+      },
+      data: {
+        reversedRevenueCents,
+        reversalReason: reversal.reason,
+        reversalEventId: eventId,
+        reversalEventAt: reversal.eventAt,
+      },
+    });
+    updated += result.count;
+  }
+  return updated;
+}
+
+export async function tryApplyAttributedRevenueReversal(
+  transactionId: string,
+  reversal: RevenueReversal,
+): Promise<boolean> {
+  try {
+    return (await applyAttributedRevenueReversal(transactionId, reversal)) > 0;
+  } catch (error) {
+    console.error('[event-attribution] could not apply revenue reversal:', error);
+    return false;
+  }
+}
+
 export async function getAttributionReport() {
   await pruneExpiredAttributionEvents();
   const cutoff = retentionCutoff();
@@ -172,7 +237,7 @@ export async function getAttributionReport() {
       COUNT(DISTINCT journey_id)::int AS journey_count,
       COALESCE(SUM(
         CASE WHEN stage IN ('purchase', 'subscription') AND currency = 'AUD'
-          THEN revenue_cents ELSE 0 END
+          THEN revenue_cents - reversed_revenue_cents ELSE 0 END
       ), 0)::bigint AS revenue_cents,
       SUM(COUNT(*)) OVER ()::bigint AS total_row_count
     FROM event_attribution_events
@@ -197,14 +262,14 @@ export async function getAttributionReport() {
         checkout_started: 0,
         purchase: 0,
         subscription: 0,
-        revenueAud: 0,
+        netRevenueAud: 0,
       };
       bySource.set(row.source_id, source);
     }
     source[row.stage] = row.journey_count;
     totals[row.stage] += row.journey_count;
     const revenueCents = Number(row.revenue_cents);
-    source.revenueAud += revenueCents / 100;
+    source.netRevenueAud += revenueCents / 100;
     totalRevenueCents += revenueCents;
   }
 
@@ -219,7 +284,7 @@ export async function getAttributionReport() {
       checkout_started: totals.checkout_started,
       purchase: totals.purchase,
       subscription: totals.subscription,
-      revenueAud: totalRevenueCents / 100,
+      netRevenueAud: totalRevenueCents / 100,
     },
     sources: ATTRIBUTION_SOURCE_IDS.flatMap((sourceId) => {
       const source = bySource.get(sourceId);

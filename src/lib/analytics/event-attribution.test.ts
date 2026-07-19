@@ -84,7 +84,7 @@ describe('aggregateAttributionEvents', () => {
         checkout_started: 1,
         purchase: 1,
         subscription: 1,
-        revenueAud: 394,
+        netRevenueAud: 394,
       },
       sources: [
         {
@@ -94,7 +94,7 @@ describe('aggregateAttributionEvents', () => {
           checkout_started: 1,
           purchase: 1,
           subscription: 0,
-          revenueAud: 99,
+          netRevenueAud: 99,
         },
         {
           sourceId: 'sydney_email',
@@ -103,7 +103,7 @@ describe('aggregateAttributionEvents', () => {
           checkout_started: 0,
           purchase: 0,
           subscription: 1,
-          revenueAud: 295,
+          netRevenueAud: 295,
         },
       ],
     });
