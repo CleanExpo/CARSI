@@ -170,12 +170,15 @@ export function CcwRoadshowBooking({
     }
 
     try {
+      const attributionParams = new URLSearchParams(window.location.search);
       const response = await fetch('/api/events/ccw-roadshow/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           eventSlug: form.eventSlug,
           packageId: form.packageId,
+          campaignId: attributionParams.get('campaign') ?? undefined,
+          sourceId: attributionParams.get('source') ?? undefined,
           ccwCustomerStatus: form.ccwCustomerStatus,
           companyName: form.companyName.trim(),
           contactEmail,

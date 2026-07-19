@@ -14,6 +14,8 @@ import { notifyCrmEnrollmentCreated } from '@/lib/server/crm-enrollment-notify';
 import { sendEnrollmentWelcomeEmail } from '@/lib/server/enrollment-email';
 import { ensureGuestUserFromStripeEmail } from '@/lib/server/guest-checkout';
 import { sendGa4PurchaseEvent } from '@/lib/server/ga4-measurement-protocol';
+import { parseAttributionJourneyId } from '@/lib/analytics/event-attribution';
+import { tryRecordAttributedStage } from '@/lib/server/event-attribution';
 import { sessionClaimsForUserId } from '@/lib/server/lms-auth';
 import { prisma } from '@/lib/prisma';
 import { captureServerError } from '@/lib/server/sentry';
@@ -330,6 +332,17 @@ export async function POST(request: NextRequest) {
         purchaseMode,
         teamSeatCount: Number.isFinite(teamSeatCount) ? teamSeatCount : undefined,
       });
+
+      await tryRecordAttributedStage(
+        parseAttributionJourneyId(session.metadata?.attribution_journey_id),
+        'purchase',
+        {
+          courseSlug: slug,
+          revenueCents: typeof session.amount_total === 'number' ? session.amount_total : undefined,
+          currency: session.currency,
+          transactionId: ref,
+        },
+      );
 
       if (!fulfilled.alreadyEnrolled && fulfilled.enrollmentId && fulfilled.courseId) {
         void sendEnrollmentWelcomeEmail({

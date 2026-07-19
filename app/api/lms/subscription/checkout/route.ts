@@ -21,6 +21,10 @@ import { getStripeClient } from '@/lib/api/stripe';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { resolveProAnnualPriceId } from '@/lib/server/subscription-price';
 import { subscriptionsEnabled } from '@/lib/server/subscriptions-flag';
+import {
+  readAttributionJourneyId,
+  tryRecordAttributedStage,
+} from '@/lib/server/event-attribution';
 
 const UNAVAILABLE = 'Membership purchasing is not yet available.';
 
@@ -37,6 +41,7 @@ export async function POST(request: NextRequest) {
       { status: 401 },
     );
   }
+  const attributionJourneyId = readAttributionJourneyId(request);
 
   if (!process.env.STRIPE_SECRET_KEY?.trim()) {
     return NextResponse.json(
@@ -80,13 +85,18 @@ export async function POST(request: NextRequest) {
         carsi_user_id: claims.sub,
         plan: 'pro_annual',
         source: 'carsi-pro-annual',
+        ...(attributionJourneyId ? { attribution_journey_id: attributionJourneyId } : {}),
       },
       subscription_data: {
         // 7-day free trial on the individual annual membership (GP-458). The
         // subscription starts `trialing` (entitled per decideMembershipEntitlement)
         // and converts to `active` on first successful charge after the trial.
         trial_period_days: 7,
-        metadata: { carsi_user_id: claims.sub, plan: 'pro_annual' },
+        metadata: {
+          carsi_user_id: claims.sub,
+          plan: 'pro_annual',
+          ...(attributionJourneyId ? { attribution_journey_id: attributionJourneyId } : {}),
+        },
       },
       allow_promotion_codes: true,
     });
@@ -94,6 +104,9 @@ export async function POST(request: NextRequest) {
     if (!session.url) {
       return NextResponse.json({ detail: 'Failed to start checkout session.' }, { status: 500 });
     }
+    await tryRecordAttributedStage(attributionJourneyId, 'checkout_started', {
+      transactionId: session.id,
+    });
     return NextResponse.json({ url: session.url, checkout_url: session.url });
   } catch (error) {
     console.error('[subscription/checkout] Stripe error:', error);
