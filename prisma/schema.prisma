@@ -790,7 +790,7 @@ model EventAttributionReversal {
   createdAt            DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt            DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  @@index([transactionId, eventAt, stripeEventId])
+  @@index([transactionId, eventAt, stripeEventId], map: "ix_attribution_reversals_transaction_event")
   @@index([status, createdAt])
   @@map("event_attribution_reversals")
 }

@@ -278,7 +278,7 @@ describe('event attribution persistence', () => {
         reversedRevenueCents: 2_500,
         currency: 'USD',
       }),
-    ).resolves.toEqual({ status: 'pending', appliedRows: 0 });
+    ).resolves.toEqual({ status: 'currency_mismatch', appliedRows: 0 });
 
     expect(db.updateMany).not.toHaveBeenCalled();
     expect(db.reversalUpdateMany).toHaveBeenCalledWith(
@@ -314,6 +314,51 @@ describe('event attribution persistence', () => {
         { stripeEventId: 'evt_won', eventAt: later, reason: 'dispute_won', reversedRevenueCents: 0 },
       ]),
     ).toEqual({ reversedRevenueCents: 2_500, reason: 'refunded', eventId: 'evt_refund', eventAt: at });
+  });
+
+  it('classifies a lower cumulative refund delivered after the applied maximum as stale', async () => {
+    const earlier = new Date('2026-07-19T10:00:00.000Z');
+    const later = new Date('2026-07-19T10:00:01.000Z');
+    db.reversalCreate.mockResolvedValueOnce({ id: 'stale-reversal-row' });
+    db.findMany.mockResolvedValueOnce([
+      { id: 'paid-row', revenueCents: 9_900, currency: 'AUD' },
+    ]);
+    db.reversalFindMany.mockResolvedValueOnce([
+      {
+        stripeEventId: 'evt_refund_max',
+        eventAt: earlier,
+        reason: 'refunded',
+        reversedRevenueCents: 5_000,
+        currency: 'AUD',
+      },
+      {
+        stripeEventId: 'evt_refund_stale',
+        eventAt: later,
+        reason: 'refunded',
+        reversedRevenueCents: 2_500,
+        currency: 'AUD',
+      },
+    ]);
+    db.updateMany.mockResolvedValueOnce({ count: 1 });
+
+    await expect(
+      persistAttributedRevenueReversal('cs_paid', {
+        eventId: 'evt_refund_stale',
+        eventAt: later,
+        reason: 'refunded',
+        reversedRevenueCents: 2_500,
+        currency: 'AUD',
+      }),
+    ).resolves.toEqual({ status: 'stale', appliedRows: 1 });
+
+    expect(db.updateMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          reversedRevenueCents: 5_000,
+          reversalEventId: 'evt_refund_max',
+        }),
+      }),
+    );
   });
 
   it('atomically reconciles a pending early refund when the paid row arrives', async () => {
@@ -358,6 +403,143 @@ describe('event attribution persistence', () => {
       },
     });
     expect(db.transaction).toHaveBeenCalledTimes(1);
+  });
+
+  it.each([
+    {
+      name: 'cumulative partial refunds',
+      reversals: [
+        { stripeEventId: 'evt_refund_25', eventAt: new Date('2026-07-19T10:00:00.000Z'), reason: 'refunded', reversedRevenueCents: 2_500, currency: 'AUD' },
+        { stripeEventId: 'evt_refund_50', eventAt: new Date('2026-07-19T10:01:00.000Z'), reason: 'refunded', reversedRevenueCents: 5_000, currency: 'AUD' },
+      ],
+      expectedCents: 5_000,
+      expectedReason: 'refunded',
+      expectedEventId: 'evt_refund_50',
+    },
+    {
+      name: 'full refund',
+      reversals: [
+        { stripeEventId: 'evt_refund_full', eventAt: new Date('2026-07-19T10:00:00.000Z'), reason: 'refunded', reversedRevenueCents: 9_900, currency: 'AUD' },
+      ],
+      expectedCents: 9_900,
+      expectedReason: 'refunded',
+      expectedEventId: 'evt_refund_full',
+    },
+    {
+      name: 'open dispute',
+      reversals: [
+        { stripeEventId: 'evt_dispute', eventAt: new Date('2026-07-19T10:00:00.000Z'), reason: 'disputed', reversedRevenueCents: 9_900, currency: 'AUD' },
+      ],
+      expectedCents: 9_900,
+      expectedReason: 'disputed',
+      expectedEventId: 'evt_dispute',
+    },
+    {
+      name: 'same-second dispute won after dispute creation',
+      reversals: [
+        { stripeEventId: 'evt_won', eventAt: new Date('2026-07-19T10:00:00.000Z'), reason: 'dispute_won', reversedRevenueCents: 0, currency: 'AUD' },
+        { stripeEventId: 'evt_dispute', eventAt: new Date('2026-07-19T10:00:00.000Z'), reason: 'disputed', reversedRevenueCents: 9_900, currency: 'AUD' },
+      ],
+      expectedCents: 0,
+      expectedReason: 'dispute_won',
+      expectedEventId: 'evt_won',
+    },
+  ])('reconciles early $name when the paid row arrives', async ({
+    reversals,
+    expectedCents,
+    expectedReason,
+    expectedEventId,
+  }) => {
+    db.findFirst.mockResolvedValueOnce({
+      campaignId: ATTRIBUTION_CAMPAIGN_ID,
+      sourceId: 'melbourne_qr',
+      eventSlug: 'melbourne',
+    });
+    db.create.mockResolvedValueOnce({ id: 'paid-row' });
+    db.findMany.mockResolvedValueOnce([
+      { id: 'paid-row', revenueCents: 9_900, currency: 'AUD' },
+    ]);
+    db.reversalFindMany.mockResolvedValueOnce(reversals);
+    db.updateMany.mockResolvedValueOnce({ count: 1 });
+
+    await expect(
+      recordAttributedStage('44444444-4444-4444-8444-444444444444', 'purchase', {
+        revenueCents: 9_900,
+        currency: 'AUD',
+        transactionId: 'cs_early_matrix',
+      }),
+    ).resolves.toBe(true);
+
+    expect(db.updateMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          reversedRevenueCents: expectedCents,
+          reversalReason: expectedReason,
+          reversalEventId: expectedEventId,
+        }),
+      }),
+    );
+  });
+
+  it('keeps the paid-first partial-refund control correct', async () => {
+    const eventAt = new Date('2026-07-19T10:00:00.000Z');
+    db.reversalCreate.mockResolvedValueOnce({ id: 'paid-first-reversal' });
+    db.findMany.mockResolvedValueOnce([
+      { id: 'paid-row', revenueCents: 9_900, currency: 'AUD' },
+    ]);
+    db.reversalFindMany.mockResolvedValueOnce([
+      {
+        stripeEventId: 'evt_paid_first_refund',
+        eventAt,
+        reason: 'refunded',
+        reversedRevenueCents: 2_500,
+        currency: 'AUD',
+      },
+    ]);
+    db.updateMany.mockResolvedValueOnce({ count: 1 });
+
+    await expect(
+      persistAttributedRevenueReversal('cs_paid_first', {
+        eventId: 'evt_paid_first_refund',
+        eventAt,
+        reason: 'refunded',
+        reversedRevenueCents: 2_500,
+        currency: 'AUD',
+      }),
+    ).resolves.toEqual({ status: 'applied', appliedRows: 1 });
+
+    expect(db.updateMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ reversedRevenueCents: 2_500 }),
+      }),
+    );
+  });
+
+  it('fails retryably instead of truncating an oversized reversal history', async () => {
+    db.reversalCreate.mockResolvedValueOnce({ id: 'overflow-reversal' });
+    db.findMany.mockResolvedValueOnce([
+      { id: 'paid-row', revenueCents: 9_900, currency: 'AUD' },
+    ]);
+    db.reversalFindMany.mockResolvedValueOnce(
+      Array.from({ length: 1_001 }, (_, index) => ({
+        stripeEventId: `evt_overflow_${index}`,
+        eventAt: new Date('2026-07-19T10:00:00.000Z'),
+        reason: 'refunded',
+        reversedRevenueCents: index,
+        currency: 'AUD',
+      })),
+    );
+
+    await expect(
+      persistAttributedRevenueReversal('cs_overflow', {
+        eventId: 'evt_overflow_1000',
+        eventAt: new Date('2026-07-19T10:00:00.000Z'),
+        reason: 'refunded',
+        reversedRevenueCents: 1_000,
+        currency: 'AUD',
+      }),
+    ).rejects.toThrow('reconciliation limit exceeded');
+    expect(db.updateMany).not.toHaveBeenCalled();
   });
 
 

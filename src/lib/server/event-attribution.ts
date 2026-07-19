@@ -40,8 +40,13 @@ type RevenueReversal = {
 };
 
 export type AttributionReversalPersistenceResult = {
-  status: 'pending' | 'applied' | 'duplicate';
+  status: 'pending' | 'applied' | 'stale' | 'currency_mismatch' | 'duplicate';
   appliedRows: number;
+};
+
+type ReconciliationResult = {
+  appliedRows: number;
+  targetStatus: Exclude<AttributionReversalPersistenceResult['status'], 'duplicate'>;
 };
 
 type StoredRevenueReversal = {
@@ -248,8 +253,8 @@ export async function recordAttributedStage(
           if (!isUniqueConstraintError(error)) throw error;
           recorded = false;
         }
-        const appliedRows = await reconcileAttributedRevenueReversals(tx, transactionId);
-        return { recorded, appliedRows };
+        const reconciliation = await reconcileAttributedRevenueReversals(tx, transactionId);
+        return { recorded, appliedRows: reconciliation.appliedRows };
       });
       if (outcome.appliedRows > 0) {
         console.info('[event-attribution] reversal reconciliation', {
@@ -283,13 +288,14 @@ export async function tryRecordAttributedStage(
 async function reconcileAttributedRevenueReversals(
   tx: Prisma.TransactionClient,
   transactionId: string,
-): Promise<number> {
+  target?: { stripeEventId: string; currency: string },
+): Promise<ReconciliationResult> {
   const paidRows = await tx.eventAttributionEvent.findMany({
     where: { transactionId, stage: { in: ['purchase', 'subscription'] } },
     select: { id: true, revenueCents: true, currency: true },
     take: 2,
   });
-  if (paidRows.length === 0) return 0;
+  if (paidRows.length === 0) return { appliedRows: 0, targetStatus: 'pending' };
 
   const reversals = await tx.eventAttributionReversal.findMany({
     where: { transactionId },
@@ -307,6 +313,8 @@ async function reconcileAttributedRevenueReversals(
   }
 
   let appliedRows = 0;
+  let targetCompatible = false;
+  let targetWinner = false;
   const reconciledAt = new Date();
   for (const paidRow of paidRows) {
     const compatible = reversals.filter((row) => row.currency === paidRow.currency);
@@ -316,11 +324,17 @@ async function reconcileAttributedRevenueReversals(
         reason: row.reason as AttributionReversalReason,
       })),
     );
+    targetCompatible ||= Boolean(
+      target &&
+        target.currency === paidRow.currency &&
+        compatible.some((row) => row.stripeEventId === target.stripeEventId),
+    );
     await tx.eventAttributionReversal.updateMany({
       where: { transactionId, currency: { not: paidRow.currency ?? '' } },
       data: { status: 'currency_mismatch', reconciledAt },
     });
     if (!reduced) continue;
+    targetWinner ||= reduced.eventId === target?.stripeEventId;
 
     const result = await tx.eventAttributionEvent.updateMany({
       where: { id: paidRow.id },
@@ -344,7 +358,10 @@ async function reconcileAttributedRevenueReversals(
       data: { status: 'applied', reconciledAt },
     });
   }
-  return appliedRows;
+  return {
+    appliedRows,
+    targetStatus: targetWinner ? 'applied' : targetCompatible ? 'stale' : 'currency_mismatch',
+  };
 }
 
 /**
@@ -406,13 +423,14 @@ export async function persistAttributedRevenueReversal(
       }
       duplicate = true;
     }
-    const appliedRows = await reconcileAttributedRevenueReversals(tx, normalisedTransactionId);
+    const reconciliation = await reconcileAttributedRevenueReversals(tx, normalisedTransactionId, {
+      stripeEventId,
+      currency,
+    });
     const status: AttributionReversalPersistenceResult['status'] = duplicate
       ? 'duplicate'
-      : appliedRows > 0
-        ? 'applied'
-        : 'pending';
-    return { status, appliedRows };
+      : reconciliation.targetStatus;
+    return { status, appliedRows: reconciliation.appliedRows };
   });
   console.info('[event-attribution] reversal reconciliation', result);
   return result;

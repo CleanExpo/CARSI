@@ -30,7 +30,7 @@ CREATE TABLE "event_attribution_reversals" (
 
 CREATE UNIQUE INDEX "event_attribution_reversals_stripe_event_id_key"
   ON "event_attribution_reversals"("stripe_event_id");
-CREATE INDEX "event_attribution_reversals_transaction_id_event_at_stripe_event_id_idx"
+CREATE INDEX "ix_attribution_reversals_transaction_event"
   ON "event_attribution_reversals"("transaction_id", "event_at", "stripe_event_id");
 CREATE INDEX "event_attribution_reversals_status_created_at_idx"
   ON "event_attribution_reversals"("status", "created_at");
