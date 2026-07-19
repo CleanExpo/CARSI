@@ -109,3 +109,16 @@ export function readSubscriptionIdFromPaymentIntent(
   }
   return null;
 }
+
+/** Invoice id used as the attribution transaction id for paid subscriptions. */
+export function readInvoiceIdFromPaymentIntent(
+  paymentIntent: Stripe.PaymentIntent,
+): string | null {
+  const invoice = (paymentIntent as unknown as { invoice?: unknown }).invoice;
+  if (typeof invoice === 'string') return invoice;
+  if (invoice && typeof invoice === 'object' && 'id' in invoice) {
+    const id = (invoice as { id?: unknown }).id;
+    return typeof id === 'string' ? id : null;
+  }
+  return null;
+}

@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { randomBytes } from 'node:crypto';
 
+import { applyRateLimit, clientIpFrom } from '@/lib/rate-limit';
+import { verifyTurnstileToken } from '@/lib/server/turnstile';
+
+import {
+  buildAttributionSource,
+  type AttributionSource,
+} from '@/lib/analytics/event-attribution';
+
 import {
   ccwRoadshowFreeEntryOffer,
   ccwRoadshowPath,
@@ -20,17 +28,27 @@ import { getAppOrigin } from '@/lib/server/app-url';
 import { sendCcwRoadshowOrganizerNotificationEmail } from '@/lib/server/transactional-email';
 import { sendAndLogRoadshowEmail } from '@/lib/server/ccw-roadshow-email-log';
 import { getRoadshowNotifyRecipients } from '@/lib/server/ccw-roadshow-notify';
+import {
+  setAttributionJourneyCookie,
+  tryStartAttributionJourney,
+} from '@/lib/server/event-attribution';
 
 type AttendeeBody = { fullName?: string; yearsExperience?: string; goals?: string };
 type RoadshowCheckoutBody = {
   eventSlug?: string;
   packageId?: string;
+  campaignId?: string;
+  sourceId?: string;
   ccwCustomerStatus?: string;
   companyName?: string;
   contactEmail?: string;
   contactPhone?: string;
   attendees?: AttendeeBody[];
+  turnstileToken?: string;
 };
+
+const REGISTRATION_RATE_LIMIT = 5;
+const REGISTRATION_RATE_WINDOW_MS = 60 * 60 * 1000;
 
 function clean(value: unknown, maxLength = 240) {
   return typeof value === 'string' ? value.trim().slice(0, maxLength) : '';
@@ -52,7 +70,32 @@ function generateFreeEntryToken(eventSlug: string) {
 
 export async function POST(request: NextRequest) {
   try {
+    // This public route mints attribution journeys. Bound it before body parsing
+    // so cycling self-asserted campaign values cannot reset downstream limits.
+    const ip = clientIpFrom(
+      request.headers.get('x-forwarded-for'),
+      request.headers.get('x-real-ip'),
+    );
+    const rateLimit = applyRateLimit(
+      ip,
+      REGISTRATION_RATE_LIMIT,
+      REGISTRATION_RATE_WINDOW_MS,
+    );
+    if (!rateLimit.ok) {
+      return NextResponse.json(
+        { detail: 'Too many registration attempts. Please try again later.' },
+        {
+          status: 429,
+          headers: { 'Retry-After': String(Math.ceil((rateLimit.resetAt - Date.now()) / 1000)) },
+        },
+      );
+    }
+
     const body = (await request.json().catch(() => ({}))) as RoadshowCheckoutBody;
+    const turnstile = await verifyTurnstileToken(body.turnstileToken, ip);
+    if (!turnstile.ok) {
+      return NextResponse.json({ detail: 'Security verification failed.' }, { status: 403 });
+    }
     const event = getCcwRoadshowEvent(body.eventSlug);
     const ticketPackage = getCcwRoadshowTicketPackage(body.packageId);
 
@@ -61,6 +104,13 @@ export async function POST(request: NextRequest) {
     }
     if (!ticketPackage) {
       return NextResponse.json({ detail: 'Select a valid ticket package.' }, { status: 400 });
+    }
+
+    let attributionSource: AttributionSource | null;
+    try {
+      attributionSource = buildAttributionSource(event.slug, body.sourceId, body.campaignId);
+    } catch {
+      return NextResponse.json({ detail: 'Invalid event campaign source.' }, { status: 400 });
     }
 
     const companyName = clean(body.companyName, 160);
@@ -129,6 +179,10 @@ export async function POST(request: NextRequest) {
         throw error;
       }
     }
+
+    // Begin attribution only after registration succeeds. Attribution storage is
+    // best-effort so it can never block a seat reservation.
+    const attributionJourneyId = await tryStartAttributionJourney(attributionSource);
 
     if (result.status === 'confirmed') {
       const synced = await addRegistrationToCalendar({
@@ -214,12 +268,16 @@ export async function POST(request: NextRequest) {
       console.error('[ccw-roadshow] organizer notification failed (non-fatal):', notifyErr);
     }
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       booking_url: bookingUrl,
       free_entry_token: freeEntryToken,
       status: result.status,
       remaining: result.remaining,
     });
+    if (attributionJourneyId) {
+      setAttributionJourneyCookie(response, attributionJourneyId);
+    }
+    return response;
   } catch (error) {
     console.error('[ccw-roadshow-registration] error:', error);
     return NextResponse.json({ detail: 'Failed to reserve free event entry.' }, { status: 500 });
