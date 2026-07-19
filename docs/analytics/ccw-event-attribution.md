@@ -18,7 +18,7 @@ Use these suffixes with `https://carsi.com.au/events/ccw-roadshow`. Do not publi
 `event_registration → course_view → checkout_started → purchase | subscription`
 
 - `event_registration`: written after the existing roadshow registration succeeds.
-- `course_view`: written once per journey and real catalogue course when an attributed browser mounts a CARSI course page. Arbitrary slugs are rejected, repeats are idempotent, and the route applies an instance-local per-client-IP limit that cannot be reset by cycling journey IDs. Public registration itself is bounded to five attempts per client IP per hour before body parsing.
+- `course_view`: written once per journey and real catalogue course when an attributed browser mounts a CARSI course page. Arbitrary slugs are rejected, repeats are idempotent, and the route applies an instance-local per-client-IP limit that cannot be reset by cycling journey IDs. Public registration itself is protected by the existing Turnstile control plus five attempts per client IP per hour before body parsing.
 - `checkout_started`: written only after Stripe returns a checkout session.
 - `purchase`: written after a paid one-off course checkout is fulfilled.
 - `subscription`: written when Stripe starts the subscription and for each paid invoice; unique transaction IDs make retries idempotent.

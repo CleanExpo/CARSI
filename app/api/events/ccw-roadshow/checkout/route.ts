@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { randomBytes } from 'node:crypto';
 
 import { applyRateLimit, clientIpFrom } from '@/lib/rate-limit';
+import { verifyTurnstileToken } from '@/lib/server/turnstile';
 
 import {
   buildAttributionSource,
@@ -43,6 +44,7 @@ type RoadshowCheckoutBody = {
   contactEmail?: string;
   contactPhone?: string;
   attendees?: AttendeeBody[];
+  turnstileToken?: string;
 };
 
 const REGISTRATION_RATE_LIMIT = 5;
@@ -90,6 +92,10 @@ export async function POST(request: NextRequest) {
     }
 
     const body = (await request.json().catch(() => ({}))) as RoadshowCheckoutBody;
+    const turnstile = await verifyTurnstileToken(body.turnstileToken, ip);
+    if (!turnstile.ok) {
+      return NextResponse.json({ detail: 'Security verification failed.' }, { status: 403 });
+    }
     const event = getCcwRoadshowEvent(body.eventSlug);
     const ticketPackage = getCcwRoadshowTicketPackage(body.packageId);
 
