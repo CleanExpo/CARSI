@@ -69,6 +69,35 @@ Large-scale carpet maintenance for commercial facilities, including hot water ex
 - /subscribe — Subscription signup with Stripe checkout
 - /credentials/{id} — Public credential verification pages
 
+## Courses (published catalogue — 24 courses, snapshot 2026-07-19)
+
+CARSI publishes the following continuing-education courses. Each is available at https://carsi.com.au/courses/<slug>. CARSI is an IICRC CEC provider; see the IICRC CEC section above for what that means.
+
+- [Air Quality and Odour: Identification and Deodorisation Essentials](/courses/air-quality-and-odour-identification-and-deodorisation-essentials)
+- [Australian H5 Bird Flu Awareness for Restoration, IAQ and Facility Professionals](/courses/avian-influenza-awareness-restoration-iaq-facilities)
+- [CARSI Maintenance Company Onboarding — Professional Floor Care & Operational Readiness](/courses/floor-care-onboarding-operational-readiness)
+- [Documenting and Reporting Air Quality Improvements](/courses/documenting-and-reporting-air-quality-improvements)
+- [Dust and Particulates in Indoor Air: Control and Cleaning Strategies](/courses/dust-and-particulates-in-indoor-air-control-and-cleaning-strategies)
+- [HVAC Systems and Indoor Air Quality: What Every Technician Should Know](/courses/hvac-systems-and-indoor-air-quality-what-every-technician-should-know)
+- [Introduction to Air Quality Fundamentals](/courses/introduction-to-air-quality-fundamentals)
+- [Introduction to Creating a Clean Air Environment: Best Practices for Final Clearance and Handover](/courses/introduction-to-creating-a-clean-air-environment-best-practices-for-final-cleara)
+- [Introduction to Drying Educational and Institutional Sites](/courses/introduction-to-drying-educational-and-institutional-sites)
+- [Introduction to Drying Health Care Facilities](/courses/introduction-to-drying-health-care-facilities)
+- [Introduction to Drying Hospitality and Lodging Sites](/courses/introduction-to-drying-hospitality-and-lodging-sites)
+- [Introduction to Drying Industrial and Manufacturing Sites](/courses/introduction-to-drying-industrial-and-manufacturing-sites)
+- [Introduction to Drying Transportation and Vehicles](/courses/introduction-to-drying-transportation-and-vehicles)
+- [Introduction to IAQ and Mould: Understanding Airborne Spread and Containment](/courses/introduction-to-iaq-and-mould-understanding-airborne-spread-and-containment)
+- [Introduction to Improving Indoor Air Quality After Water Damage](/courses/introduction-to-improving-indoor-air-quality-after-water-damage)
+- [Introduction to Infrared Thermography for Drying](/courses/introduction-to-infrared-thermography-for-drying)
+- [Introduction to Recovery of Submerged Items and Contents](/courses/introduction-to-recovery-of-submerged-items-and-contents)
+- [Introduction to Restoration of Antiques and Fine Furnishings](/courses/introduction-to-restoration-of-antiques-and-fine-furnishings)
+- [Introduction to Ultraviolet Light and Fluorescence](/courses/introduction-to-ultraviolet-light-and-fluorescence)
+- [Introduction to Water Damage Litigation Support](/courses/introduction-to-water-damage-litigation-support)
+- [Moisture, Mould, and Indoor Air Quality: Understanding the Link](/courses/moisture-mould-and-indoor-air-quality-understanding-the-link)
+- [Truckmount Operations Course — HydraMaster & Sapphire Scientific (Australian configuration)](/courses/ccw-carsi-truckmount-operations)
+- [Using Air Scrubbers and AFDs to Improve Job Site Air Quality](/courses/using-air-scrubbers-and-afds-to-improve-job-site-air-quality)
+- [Water Damage Restoration — Essentials](/courses/wrt-water-damage-essentials)
+
 ## Contact
 
 Email: info@carsi.com.au
