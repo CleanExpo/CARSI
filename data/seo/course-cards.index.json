@@ -113,6 +113,57 @@
    "coursePrerequisites": "None — awareness training for restoration, IAQ, facility, strata and insurance-support professionals."
   }
  },
+ "ccw-carsi-truckmount-operations": {
+  "slug": "ccw-carsi-truckmount-operations",
+  "seoTitle": "Truckmount Operations Course (Australian) | CARSI",
+  "metaDescription": "A CARSI and CCW operator course for HydraMaster and Sapphire Scientific truck-mounts in Australian configuration — safe operating procedures, carbon monoxide safety, road safety and servicing.",
+  "imageAlt": "Operator running a petrol-engine truck-mount carpet cleaning unit from an Australian work van",
+  "og": {
+   "title": "Truckmount Operations — HydraMaster & Sapphire Scientific | CARSI",
+   "description": "A CARSI continuing-education course, co-produced with Carpet Cleaners Warehouse, for operating petrol-engine HydraMaster and Sapphire Scientific truck-mounts in Australian configuration — safe operating procedures, carbon monoxide control, storage and road safety, maintenance, and a competency sign-off."
+  },
+  "keywords": [
+   "truckmount operations course",
+   "truck-mount training australia",
+   "hydramaster training",
+   "sapphire scientific truckmount",
+   "carpet cleaning truckmount course",
+   "carbon monoxide safety truckmount",
+   "truck-mount maintenance course",
+   "load restraint truck mount"
+  ],
+  "faq": [
+   {
+    "q": "Which machines does this truck-mount course cover?",
+    "a": "It is an operator course for petrol-engine HydraMaster and Sapphire Scientific truck-mount systems run in Australian configuration, covering their Australian specifications and set-up. The course opens with a machine-selection step so you follow the content for your unit."
+   },
+   {
+    "q": "What safety topics does the course cover?",
+    "a": "Carbon monoxide is treated as the critical hazard within the safe operating procedures. The course also covers the manufacturer's truck-mount safety certificate, and storage, transport and road safety including load restraint, GVM, and fuel and chemical carriage."
+   },
+   {
+    "q": "Is the course specific to Australia?",
+    "a": "Yes. It works from Australian configurations and specifications and the Australian regulatory map — the National Heavy Vehicle Regulator and state road rules, work health and safety, and pressure and fuel requirements — drawn from manufacturer manuals and Australian authorities."
+   },
+   {
+    "q": "How is the course assessed?",
+    "a": "Through a maintenance and servicing unit, a reference image catalogue and a knowledge check, then a final assessment with a trainer pre-flight verification gate and an operator competency sign-off."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Truckmount Operations Course — HydraMaster & Sapphire Scientific (Australian configuration)",
+   "description": "A CARSI continuing-education operator course, co-produced with Carpet Cleaners Warehouse, for petrol-engine HydraMaster and Sapphire Scientific truck-mounts in Australian configuration — Australian specifications, safe operating procedures with carbon monoxide as the critical hazard, storage, transport and road safety, maintenance and servicing, and an assessment with operator competency sign-off.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "coursePrerequisites": "None — open entry"
+  }
+ },
  "commercial-floor-care-schools-childcare": {
   "slug": "commercial-floor-care-schools-childcare",
   "seoTitle": "Commercial Floor Care for Schools & Childcare | CARSI",
@@ -1310,6 +1361,57 @@
     "availability": "https://schema.org/InStock"
    },
    "coursePrerequisites": "None — suitable for restoration professionals, contractors and environmental technicians."
+  }
+ },
+ "wrt-water-damage-essentials": {
+  "slug": "wrt-water-damage-essentials",
+  "seoTitle": "Water Damage Restoration Course — Essentials | CARSI",
+  "metaDescription": "A CARSI continuing-education course on water damage restoration fundamentals — water categories, classes of loss, site safety, extraction, dehumidification and psychrometry.",
+  "imageAlt": "Restoration technician moisture-mapping a water-damaged Australian home during drying setup",
+  "og": {
+   "title": "Water Damage Restoration: Essentials | CARSI",
+   "description": "A CARSI continuing-education course covering the core water damage workflow — water categories and material science, inspection and moisture mapping, extraction, evaporation and dehumidification, equipment placement and psychrometric monitoring."
+  },
+  "keywords": [
+   "water damage restoration course",
+   "water damage training australia",
+   "water categories restoration",
+   "structural drying course",
+   "dehumidification training",
+   "psychrometry restoration",
+   "moisture mapping training",
+   "water extraction techniques"
+  ],
+  "faq": [
+   {
+    "q": "What does this water damage course cover?",
+    "a": "It works through the fundamentals in nine modules — safety, standards and site control; water categories and material science; initial inspection and moisture mapping; water extraction principles; evaporation and dehumidification; equipment selection and placement; monitoring and psychrometry basics; and completion, handover and reporting."
+   },
+   {
+    "q": "What are water categories and classes of loss?",
+    "a": "A water category describes how contaminated the water is, from clean supply water through to grossly contaminated water. A class of loss describes how much water is present and how much evaporation load the drying job carries. The course introduces both so you can scope a job correctly."
+   },
+   {
+    "q": "Do I need experience to start this course?",
+    "a": "No. It is an open-entry essentials course with no prerequisites, designed to give newcomers and support staff a grounding in the core drying workflow before they move on to more advanced restoration training."
+   },
+   {
+    "q": "Who is this course for?",
+    "a": "It suits technicians new to water damage restoration, along with insurance, property and facilities staff who need to understand the drying process, equipment and reporting involved in a restoration job."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Water Damage Restoration — Essentials",
+   "description": "A CARSI continuing-education course introducing water damage restoration fundamentals — water categories, classes of loss, safety and standards, inspection and moisture mapping, extraction, evaporation and dehumidification, equipment placement and psychrometric monitoring.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "coursePrerequisites": "None — open entry"
   }
  }
 }
