@@ -367,7 +367,8 @@ async function reconcileAttributedRevenueReversals(
 /**
  * Persist a signed provider reversal before webhook acknowledgement. The raw
  * event exists independently of its paid attribution row, so delivery order
- * cannot erase the adjustment. Reconciliation is added in the next TDD slice.
+ * cannot erase the adjustment. Reconciliation against any existing paid rows
+ * runs in the same serializable transaction.
  */
 export async function persistAttributedRevenueReversal(
   transactionId: string,
