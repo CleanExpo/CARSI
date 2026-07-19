@@ -119,32 +119,42 @@ export async function generateMetadata({
     course.description?.slice(0, 155) ??
     `${course.title} — ${disciplineText} training course. ${priceText}.`;
 
+  // Prefer the hand-authored SEO card copy (data/seo/course-cards) when present,
+  // falling back to the course-derived defaults for any un-carded course.
+  const card = getCourseMarketing(slug);
+  const metaTitle = card?.seoTitle ?? course.title;
+  const metaDescription = card?.metaDescription ?? description;
+  const ogTitle = card?.og?.title ?? `${course.title} | CARSI`;
+  const ogDescription = card?.og?.description ?? description;
+  const metaKeywords = card?.keywords ?? [
+    course.title,
+    designation?.name ?? '',
+    designation?.disciplineTopic ?? '',
+    'IICRC CEC course',
+    'restoration course',
+    'CARSI',
+  ].filter(Boolean);
+  const imageAlt = card?.imageAlt ?? course.title;
+
   return {
-    title: course.title,
-    description,
-    keywords: [
-      course.title,
-      designation?.name ?? '',
-      designation?.disciplineTopic ?? '',
-      'IICRC CEC course',
-      'restoration course',
-      'CARSI',
-    ].filter(Boolean),
+    title: metaTitle,
+    description: metaDescription,
+    keywords: metaKeywords,
     openGraph: {
-      title: `${course.title} | CARSI`,
-      description,
+      title: ogTitle,
+      description: ogDescription,
       url: `${siteUrl}/courses/${slug}`,
       siteName: 'CARSI',
       images: thumbnailUrl
-        ? [{ url: thumbnailUrl, width: 1200, height: 630, alt: course.title }]
+        ? [{ url: thumbnailUrl, width: 1200, height: 630, alt: imageAlt }]
         : OG_IMAGES,
       locale: 'en_AU',
       type: 'website',
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${course.title} | CARSI`,
-      description,
+      title: ogTitle,
+      description: ogDescription,
       images: thumbnailUrl ? [thumbnailUrl] : OG_IMAGE_URLS,
     },
     alternates: {
