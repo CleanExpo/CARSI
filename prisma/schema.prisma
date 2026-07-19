@@ -780,6 +780,7 @@ model EventAttributionEvent {
 model EventAttributionReversal {
   id                   String    @id @default(uuid()) @db.Uuid
   stripeEventId        String    @unique @map("stripe_event_id") @db.VarChar(255)
+  providerObjectId     String?   @map("provider_object_id") @db.VarChar(255)
   transactionId        String    @map("transaction_id") @db.VarChar(255)
   reversedRevenueCents Int       @map("reversed_revenue_cents")
   currency             String    @db.VarChar(3)

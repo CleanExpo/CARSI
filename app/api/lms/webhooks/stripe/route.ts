@@ -96,6 +96,7 @@ async function handleStripeRevocation(event: Stripe.Event): Promise<void> {
   let paymentIntentId: string | null = null;
   let reversedRevenueCents = 0;
   let reversalCurrency: string | null = null;
+  let providerObjectId: string | null = null;
   let revokeEntitlement = true;
 
   if (event.type === 'charge.refunded') {
@@ -108,6 +109,7 @@ async function handleStripeRevocation(event: Stripe.Event): Promise<void> {
     paymentIntentId = typeof charge.payment_intent === 'string' ? charge.payment_intent : null;
   } else {
     const dispute = event.data.object as Stripe.Dispute;
+    providerObjectId = dispute.id;
     reversedRevenueCents = Math.max(0, dispute.amount);
     reversalCurrency = dispute.currency;
     paymentIntentId = typeof dispute.payment_intent === 'string' ? dispute.payment_intent : null;
@@ -129,6 +131,7 @@ async function handleStripeRevocation(event: Stripe.Event): Promise<void> {
     if (invoiceTransactionId) {
       await persistAttributedRevenueReversal(invoiceTransactionId, {
         eventId: event.id,
+        providerObjectId,
         eventAt: eventTimestamp,
         reason,
         reversedRevenueCents,
@@ -172,6 +175,7 @@ async function handleStripeRevocation(event: Stripe.Event): Promise<void> {
     if (!invoiceTransactionId) {
       await persistAttributedRevenueReversal(ref, {
         eventId: event.id,
+        providerObjectId,
         eventAt: eventTimestamp,
         reason,
         reversedRevenueCents,
@@ -235,6 +239,7 @@ async function handleDisputeWonRegrant(event: Stripe.Event): Promise<void> {
   if (invoiceId) {
     await persistAttributedRevenueReversal(invoiceId, {
       eventId: event.id,
+      providerObjectId: dispute.id,
       eventAt: eventTimestamp,
       reason: 'dispute_won',
       reversedRevenueCents: 0,
@@ -251,6 +256,7 @@ async function handleDisputeWonRegrant(event: Stripe.Event): Promise<void> {
     if (!invoiceId) {
       await persistAttributedRevenueReversal(ref, {
         eventId: event.id,
+        providerObjectId: dispute.id,
         eventAt: eventTimestamp,
         reason: 'dispute_won',
         reversedRevenueCents: 0,

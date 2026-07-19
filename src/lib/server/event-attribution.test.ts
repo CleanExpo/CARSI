@@ -220,6 +220,7 @@ describe('event attribution persistence', () => {
     expect(db.reversalCreate).toHaveBeenCalledWith({
       data: {
         stripeEventId: 'evt_early_refund',
+        providerObjectId: null,
         transactionId: 'cs_early',
         reversedRevenueCents: 2_500,
         currency: 'AUD',
@@ -234,6 +235,7 @@ describe('event attribution persistence', () => {
     db.reversalCreate.mockRejectedValueOnce({ code: 'P2002' });
     db.reversalFindUnique.mockResolvedValueOnce({
       transactionId: 'cs_early',
+      providerObjectId: null,
       reversedRevenueCents: 2_500,
       currency: 'AUD',
       reason: 'refunded',
@@ -254,6 +256,7 @@ describe('event attribution persistence', () => {
     expect(db.reversalFindUnique).toHaveBeenCalledWith(
       expect.objectContaining({ where: { stripeEventId: 'evt_early_refund' } }),
     );
+    expect(db.transaction).toHaveBeenCalledTimes(2);
   });
 
   it('keeps a mismatched-currency reversal out of the AUD materialised row', async () => {
@@ -314,6 +317,31 @@ describe('event attribution persistence', () => {
         { stripeEventId: 'evt_won', eventAt: later, reason: 'dispute_won', reversedRevenueCents: 0 },
       ]),
     ).toEqual({ reversedRevenueCents: 2_500, reason: 'refunded', eventId: 'evt_refund', eventAt: at });
+  });
+
+  it('aggregates refunds with distinct active partial disputes', () => {
+    const at = new Date('2026-07-19T10:00:00.000Z');
+
+    expect(
+      reduceAttributionReversals([
+        { stripeEventId: 'evt_refund', providerObjectId: null, eventAt: at, reason: 'refunded', reversedRevenueCents: 2_500 },
+        { stripeEventId: 'evt_dispute_a', providerObjectId: 'dp_a', eventAt: at, reason: 'disputed', reversedRevenueCents: 3_000 },
+        { stripeEventId: 'evt_dispute_b', providerObjectId: 'dp_b', eventAt: at, reason: 'disputed', reversedRevenueCents: 4_500 },
+      ]),
+    ).toEqual({ reversedRevenueCents: 10_000, reason: 'disputed', eventId: 'evt_dispute_b', eventAt: at });
+  });
+
+  it('closes only the won dispute while preserving other active disputes', () => {
+    const at = new Date('2026-07-19T10:00:00.000Z');
+    const later = new Date('2026-07-19T10:00:01.000Z');
+
+    expect(
+      reduceAttributionReversals([
+        { stripeEventId: 'evt_dispute_a', providerObjectId: 'dp_a', eventAt: at, reason: 'disputed', reversedRevenueCents: 3_000 },
+        { stripeEventId: 'evt_dispute_b', providerObjectId: 'dp_b', eventAt: at, reason: 'disputed', reversedRevenueCents: 4_000 },
+        { stripeEventId: 'evt_won_a', providerObjectId: 'dp_a', eventAt: later, reason: 'dispute_won', reversedRevenueCents: 0 },
+      ]),
+    ).toEqual({ reversedRevenueCents: 4_000, reason: 'disputed', eventId: 'evt_dispute_b', eventAt: at });
   });
 
   it('classifies a lower cumulative refund delivered after the applied maximum as stale', async () => {
@@ -404,6 +432,77 @@ describe('event attribution persistence', () => {
     });
     expect(db.transaction).toHaveBeenCalledTimes(1);
   });
+
+  it.each(['reversal-first', 'paid-first'] as const)(
+    'materialises the same result when serializable writers race %s',
+    async (commitOrder) => {
+      const eventAt = new Date('2026-07-19T10:00:00.000Z');
+      const reversals: Array<{
+        stripeEventId: string;
+        providerObjectId: null;
+        eventAt: Date;
+        reason: 'refunded';
+        reversedRevenueCents: number;
+        currency: string;
+      }> = [];
+      let paid = false;
+      let materialised = 0;
+      let releasePrevious = Promise.resolve();
+
+      db.findFirst.mockResolvedValue({
+        campaignId: ATTRIBUTION_CAMPAIGN_ID,
+        sourceId: 'melbourne_qr',
+        eventSlug: 'melbourne',
+      });
+      db.transaction.mockImplementation(async (fn: (tx: unknown) => Promise<unknown>) => {
+        const previous = releasePrevious;
+        let release!: () => void;
+        releasePrevious = new Promise<void>((resolve) => { release = resolve; });
+        await previous;
+        try {
+          return await fn({
+            eventAttributionEvent: {
+              create: async () => { paid = true; },
+              findMany: async () => paid ? [{ id: 'paid-row', revenueCents: 9_900, currency: 'AUD' }] : [],
+              updateMany: async ({ data }: { data: { reversedRevenueCents: number } }) => {
+                materialised = data.reversedRevenueCents;
+                return { count: 1 };
+              },
+            },
+            eventAttributionReversal: {
+              create: async ({ data }: { data: (typeof reversals)[number] }) => { reversals.push(data); },
+              findUnique: async () => null,
+              findMany: async () => reversals,
+              updateMany: async () => ({ count: 1 }),
+            },
+          });
+        } finally {
+          release();
+        }
+      });
+
+      const paidWrite = () => recordAttributedStage(
+        '44444444-4444-4444-8444-444444444444',
+        'purchase',
+        { revenueCents: 9_900, currency: 'AUD', transactionId: 'cs_race' },
+      );
+      const reversalWrite = () => persistAttributedRevenueReversal('cs_race', {
+        eventId: 'evt_race_refund',
+        eventAt,
+        reason: 'refunded',
+        reversedRevenueCents: 2_500,
+        currency: 'AUD',
+      });
+
+      await Promise.all(commitOrder === 'reversal-first'
+        ? [reversalWrite(), paidWrite()]
+        : [paidWrite(), reversalWrite()]);
+
+      expect(materialised).toBe(2_500);
+      expect(reversals).toHaveLength(1);
+      expect(paid).toBe(true);
+    },
+  );
 
   it.each([
     {

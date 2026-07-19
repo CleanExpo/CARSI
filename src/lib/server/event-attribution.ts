@@ -32,6 +32,8 @@ export type AttributionReversalReason = 'refunded' | 'disputed' | 'dispute_won';
 
 type RevenueReversal = {
   eventId: string;
+  /** Stripe dispute ID for dispute lifecycle events; null for cumulative refunds. */
+  providerObjectId?: string | null;
   eventAt: Date;
   reason: AttributionReversalReason;
   /** Stripe's cumulative refunded/disputed cents for the original transaction. */
@@ -51,6 +53,7 @@ type ReconciliationResult = {
 
 type StoredRevenueReversal = {
   stripeEventId: string;
+  providerObjectId?: string | null;
   eventAt: Date;
   reason: AttributionReversalReason;
   reversedRevenueCents: number;
@@ -91,7 +94,7 @@ const REVERSAL_REASON_ORDER: Record<AttributionReversalReason, number> = {
   refunded: 2,
 };
 
-/** Deterministically materialise cumulative refunds plus the latest dispute state. */
+/** Deterministically materialise cumulative refunds plus every active dispute. */
 export function reduceAttributionReversals(
   reversals: StoredRevenueReversal[],
 ): ReducedRevenueReversal | null {
@@ -106,7 +109,7 @@ export function reduceAttributionReversals(
   if (ordered.length === 0) return null;
 
   let refund: StoredRevenueReversal | null = null;
-  let dispute: StoredRevenueReversal | null = null;
+  const activeDisputes = new Map<string, StoredRevenueReversal>();
   let won: StoredRevenueReversal | null = null;
   for (const reversal of ordered) {
     if (reversal.reason === 'refunded') {
@@ -114,22 +117,28 @@ export function reduceAttributionReversals(
         refund = reversal;
       }
     } else if (reversal.reason === 'disputed') {
-      dispute = reversal;
-      won = null;
+      activeDisputes.set(reversal.providerObjectId ?? `event:${reversal.stripeEventId}`, reversal);
     } else {
-      dispute = null;
       won = reversal;
+      if (reversal.providerObjectId) {
+        activeDisputes.delete(reversal.providerObjectId);
+      } else {
+        // Compatibility for ledger facts written before dispute identity existed.
+        activeDisputes.clear();
+      }
     }
   }
 
   const refundCents = refund?.reversedRevenueCents ?? 0;
-  const disputeCents = dispute?.reversedRevenueCents ?? 0;
-  if (dispute && disputeCents > refundCents) {
+  const disputes = [...activeDisputes.values()];
+  const disputeCents = disputes.reduce((total, dispute) => total + dispute.reversedRevenueCents, 0);
+  const latestDispute = disputes.at(-1) ?? null;
+  if (latestDispute) {
     return {
-      reversedRevenueCents: disputeCents,
+      reversedRevenueCents: refundCents + disputeCents,
       reason: 'disputed',
-      eventId: dispute.stripeEventId,
-      eventAt: dispute.eventAt,
+      eventId: latestDispute.stripeEventId,
+      eventAt: latestDispute.eventAt,
     };
   }
   if (refund) {
@@ -140,9 +149,9 @@ export function reduceAttributionReversals(
       eventAt: refund.eventAt,
     };
   }
-  const terminal = won ?? dispute ?? ordered.at(-1)!;
+  const terminal = won ?? ordered.at(-1)!;
   return {
-    reversedRevenueCents: disputeCents,
+    reversedRevenueCents: 0,
     reason: terminal.reason,
     eventId: terminal.stripeEventId,
     eventAt: terminal.eventAt,
@@ -245,24 +254,34 @@ export async function recordAttributedStage(
 
   try {
     if ((stage === 'purchase' || stage === 'subscription') && transactionId) {
-      const outcome = await runSerializable(async (tx) => {
-        let recorded = true;
-        try {
+      try {
+        const outcome = await runSerializable(async (tx) => {
           await tx.eventAttributionEvent.create({ data });
-        } catch (error) {
-          if (!isUniqueConstraintError(error)) throw error;
-          recorded = false;
-        }
-        const reconciliation = await reconcileAttributedRevenueReversals(tx, transactionId);
-        return { recorded, appliedRows: reconciliation.appliedRows };
-      });
-      if (outcome.appliedRows > 0) {
-        console.info('[event-attribution] reversal reconciliation', {
-          status: 'applied',
-          appliedRows: outcome.appliedRows,
+          const reconciliation = await reconcileAttributedRevenueReversals(tx, transactionId);
+          return { recorded: true, appliedRows: reconciliation.appliedRows };
         });
+        if (outcome.appliedRows > 0) {
+          console.info('[event-attribution] reversal reconciliation', {
+            status: 'applied',
+            appliedRows: outcome.appliedRows,
+          });
+        }
+        return outcome.recorded;
+      } catch (error) {
+        if (!isUniqueConstraintError(error)) throw error;
+        // PostgreSQL aborts the transaction after P2002. Reconcile only after it
+        // has rolled back, in a fresh serializable transaction.
+        const reconciliation = await runSerializable((tx) =>
+          reconcileAttributedRevenueReversals(tx, transactionId),
+        );
+        if (reconciliation.appliedRows > 0) {
+          console.info('[event-attribution] reversal reconciliation', {
+            status: 'applied',
+            appliedRows: reconciliation.appliedRows,
+          });
+        }
+        return false;
       }
-      return outcome.recorded;
     }
     await prisma.eventAttributionEvent.create({ data });
     return true;
@@ -301,6 +320,7 @@ async function reconcileAttributedRevenueReversals(
     where: { transactionId },
     select: {
       stripeEventId: true,
+      providerObjectId: true,
       eventAt: true,
       reason: true,
       reversedRevenueCents: true,
@@ -376,6 +396,7 @@ export async function persistAttributedRevenueReversal(
 ): Promise<AttributionReversalPersistenceResult> {
   const normalisedTransactionId = transactionId.trim().slice(0, 255);
   const stripeEventId = reversal.eventId.trim().slice(0, 255);
+  const providerObjectId = reversal.providerObjectId?.trim().slice(0, 255) || null;
   const currency = reversal.currency?.trim().toUpperCase() || 'AUD';
   const reversedRevenueCents = Math.max(0, Math.round(reversal.reversedRevenueCents));
   if (
@@ -388,24 +409,35 @@ export async function persistAttributedRevenueReversal(
     throw new Error('Invalid attributed revenue reversal');
   }
 
-  const result = await runSerializable<AttributionReversalPersistenceResult>(async (tx) => {
-    let duplicate = false;
-    const data = {
-      stripeEventId,
-      transactionId: normalisedTransactionId,
-      reversedRevenueCents,
-      currency,
-      reason: reversal.reason,
-      eventAt: reversal.eventAt,
-    };
-    try {
+  const data = {
+    stripeEventId,
+    providerObjectId,
+    transactionId: normalisedTransactionId,
+    reversedRevenueCents,
+    currency,
+    reason: reversal.reason,
+    eventAt: reversal.eventAt,
+  };
+  let result: AttributionReversalPersistenceResult;
+  try {
+    result = await runSerializable<AttributionReversalPersistenceResult>(async (tx) => {
       await tx.eventAttributionReversal.create({ data });
-    } catch (error) {
-      if (!isUniqueConstraintError(error)) throw error;
+      const reconciliation = await reconcileAttributedRevenueReversals(tx, normalisedTransactionId, {
+        stripeEventId,
+        currency,
+      });
+      return { status: reconciliation.targetStatus, appliedRows: reconciliation.appliedRows };
+    });
+  } catch (error) {
+    if (!isUniqueConstraintError(error)) throw error;
+    // The failed insert transaction is aborted. Validate identity and reconcile
+    // in a fresh transaction so retries after partial webhook success terminate.
+    result = await runSerializable<AttributionReversalPersistenceResult>(async (tx) => {
       const existing = await tx.eventAttributionReversal.findUnique({
         where: { stripeEventId },
         select: {
           transactionId: true,
+          providerObjectId: true,
           reversedRevenueCents: true,
           currency: true,
           reason: true,
@@ -415,6 +447,7 @@ export async function persistAttributedRevenueReversal(
       if (
         !existing ||
         existing.transactionId !== data.transactionId ||
+        existing.providerObjectId !== data.providerObjectId ||
         existing.reversedRevenueCents !== data.reversedRevenueCents ||
         existing.currency !== data.currency ||
         existing.reason !== data.reason ||
@@ -422,17 +455,13 @@ export async function persistAttributedRevenueReversal(
       ) {
         throw new Error('Stripe reversal event identity conflict');
       }
-      duplicate = true;
-    }
-    const reconciliation = await reconcileAttributedRevenueReversals(tx, normalisedTransactionId, {
-      stripeEventId,
-      currency,
+      const reconciliation = await reconcileAttributedRevenueReversals(tx, normalisedTransactionId, {
+        stripeEventId,
+        currency,
+      });
+      return { status: 'duplicate', appliedRows: reconciliation.appliedRows };
     });
-    const status: AttributionReversalPersistenceResult['status'] = duplicate
-      ? 'duplicate'
-      : reconciliation.targetStatus;
-    return { status, appliedRows: reconciliation.appliedRows };
-  });
+  }
   console.info('[event-attribution] reversal reconciliation', result);
   return result;
 }

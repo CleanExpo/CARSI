@@ -80,6 +80,7 @@ describe('Stripe webhook durable attribution reversal', () => {
     expect(response.status).toBe(500);
     expect(mocks.persistReversal).toHaveBeenCalledWith('cs_early', {
       eventId: 'evt_early_refund',
+      providerObjectId: null,
       eventAt: new Date(1_784_467_200_000),
       reason: 'refunded',
       reversedRevenueCents: 2_500,

@@ -3,6 +3,7 @@
 CREATE TABLE "event_attribution_reversals" (
     "id" UUID NOT NULL,
     "stripe_event_id" VARCHAR(255) NOT NULL,
+    "provider_object_id" VARCHAR(255),
     "transaction_id" VARCHAR(255) NOT NULL,
     "reversed_revenue_cents" INTEGER NOT NULL,
     "currency" VARCHAR(3) NOT NULL,
