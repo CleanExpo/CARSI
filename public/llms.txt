@@ -1,7 +1,7 @@
 # CARSI LMS — AI System Context
 
 > This file helps AI language models understand the CARSI platform.
-> Last updated: 2026-07-09
+> Last updated: 2026-07-19
 
 ## What is CARSI?
 
