@@ -774,6 +774,28 @@ model EventAttributionEvent {
   @@map("event_attribution_events")
 }
 
+/// Durable, provider-event-level audit ledger for attributed payment reversals.
+/// Raw Stripe facts are inserted once; reconciliation metadata may be advanced
+/// without deleting the event, independently of the 90-day attribution report.
+model EventAttributionReversal {
+  id                   String    @id @default(uuid()) @db.Uuid
+  stripeEventId        String    @unique @map("stripe_event_id") @db.VarChar(255)
+  providerObjectId     String?   @map("provider_object_id") @db.VarChar(255)
+  transactionId        String    @map("transaction_id") @db.VarChar(255)
+  reversedRevenueCents Int       @map("reversed_revenue_cents")
+  currency             String    @db.VarChar(3)
+  reason               String    @db.VarChar(32)
+  status               String    @default("pending") @db.VarChar(32)
+  eventAt              DateTime  @map("event_at") @db.Timestamptz(6)
+  reconciledAt         DateTime? @map("reconciled_at") @db.Timestamptz(6)
+  createdAt            DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt            DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@index([transactionId, eventAt, stripeEventId], map: "ix_attribution_reversals_transaction_event")
+  @@index([status, createdAt])
+  @@map("event_attribution_reversals")
+}
+
 /// One row per learner; mirrors the Stripe subscription lifecycle. The
 /// `getEntitlements` service reads `status` + `currentPeriodEnd` to decide new-
 /// enrolment access (active / 7-day past-due grace / lapsed). Additive table —

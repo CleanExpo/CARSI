@@ -9,7 +9,11 @@ import { CourseThumbnail } from '@/components/lms/CourseThumbnail';
 import { CourseHubContext } from '@/components/lms/CourseHubContext';
 import { CourseSchema, BreadcrumbSchema, VideoObjectSchema } from '@/components/seo';
 import { SchemaMarkup, buildFaqSchema } from '@/lib/schema';
-import { getCourseMarketing } from '@/lib/seo/course-marketing';
+import {
+  buildCourseFallbackKeywords,
+  getCourseMarketing,
+  resolveCourseMarketingTruth,
+} from '@/lib/seo/course-marketing';
 import { getBackendOrigin, getPublicSiteUrl } from '@/lib/env/public-url';
 import { isOnboardingCourse } from '@/lib/onboarding/enterprise';
 import { normalizePublicAssetUrl } from '@/lib/remote-image';
@@ -67,6 +71,45 @@ function resolveAssetUrl(url?: string | null): string | null {
   return `${backendUrl}${path}`;
 }
 
+function getCourseDerivedDescription(
+  course: CourseDetail,
+  designation: DesignationDefinition | null
+): string {
+  const priceNum = parseFloat(course.price_aud);
+  const priceText = course.is_free || priceNum === 0 ? 'Free' : `$${priceNum.toFixed(0)} AUD`;
+  const disciplineText = designation ? `CARSI ${designation.disciplineTopic}` : 'restoration';
+  return (
+    course.short_description ??
+    course.description?.slice(0, 155) ??
+    `${course.title} — ${disciplineText} training course. ${priceText}.`
+  );
+}
+
+function getResolvedCourseMarketing(
+  course: CourseDetail,
+  designation: DesignationDefinition | null
+) {
+  const description = getCourseDerivedDescription(course, designation);
+  return resolveCourseMarketingTruth({
+    marketing: getCourseMarketing(course.slug),
+    isFree: course.is_free,
+    priceAud: course.price_aud,
+    fallback: {
+      seoTitle: course.title,
+      metaDescription: description,
+      ogTitle: `${course.title} | CARSI`,
+      ogDescription: description,
+      keywords: buildCourseFallbackKeywords({
+        title: course.title,
+        designationName: designation?.name,
+        disciplineTopic: designation?.disciplineTopic,
+        cecHours: course.cec_hours,
+      }),
+      imageAlt: course.title,
+    },
+  });
+}
+
 export async function getCourse(slug: string): Promise<CourseDetail | null> {
   if (process.env.DATABASE_URL?.trim()) {
     try {
@@ -108,32 +151,25 @@ export async function generateMetadata({
     };
   }
 
-  const priceNum = parseFloat(course.price_aud);
   const thumbnailUrl = resolveAssetUrl(course.thumbnail_url);
-  const priceText = course.is_free || priceNum === 0 ? 'Free' : `$${priceNum.toFixed(0)} AUD`;
   const designation = getDesignationForCourseSlug(slug);
-  const disciplineText = designation ? `CARSI ${designation.disciplineTopic}` : 'restoration';
-
-  const description =
-    course.short_description ??
-    course.description?.slice(0, 155) ??
-    `${course.title} — ${disciplineText} training course. ${priceText}.`;
+  const description = getCourseDerivedDescription(course, designation);
 
   // Prefer the hand-authored SEO card copy (data/seo/course-cards) when present,
-  // falling back to the course-derived defaults for any un-carded course.
-  const card = getCourseMarketing(slug);
+  // after reconciling it with course-derived commerce and CEC truth.
+  const card = getResolvedCourseMarketing(course, designation);
   const metaTitle = card?.seoTitle ?? course.title;
   const metaDescription = card?.metaDescription ?? description;
   const ogTitle = card?.og?.title ?? `${course.title} | CARSI`;
   const ogDescription = card?.og?.description ?? description;
-  const metaKeywords = card?.keywords ?? [
-    course.title,
-    designation?.name ?? '',
-    designation?.disciplineTopic ?? '',
-    'IICRC CEC course',
-    'restoration course',
-    'CARSI',
-  ].filter(Boolean);
+  const metaKeywords =
+    card?.keywords ??
+    buildCourseFallbackKeywords({
+      title: course.title,
+      designationName: designation?.name,
+      disciplineTopic: designation?.disciplineTopic,
+      cecHours: course.cec_hours,
+    });
   const imageAlt = card?.imageAlt ?? course.title;
 
   return {
@@ -292,7 +328,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
       <BreadcrumbSchema items={breadcrumbs} />
       {(() => {
         // AEO/GEO: FAQPage JSON-LD from the course's marketing metadata (data/seo/course-cards).
-        const faqs = getCourseMarketing(slug)?.faq;
+        const faqs = getResolvedCourseMarketing(course, designation)?.faq;
         return faqs?.length ? <SchemaMarkup schema={buildFaqSchema({ faqs })} /> : null;
       })()}
 
