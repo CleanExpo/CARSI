@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { renderSVG } from 'uqr';
 
 import { ccwRoadshowEvents } from '@/lib/marketing/ccw-roadshow';
@@ -44,6 +44,8 @@ export function AdminCcwSignInsClient() {
   const [checkInLink, setCheckInLink] = useState<CheckInLink | null>(null);
   const [generatingLink, setGeneratingLink] = useState(false);
   const [submittingAssisted, setSubmittingAssisted] = useState(false);
+  const [pendingAction, setPendingAction] = useState<string | null>(null);
+  const mutationInFlight = useRef(false);
   const [copied, setCopied] = useState(false);
 
   // Organiser-assisted electronic fallback for anyone unable to use the QR.
@@ -98,12 +100,29 @@ export function AdminCcwSignInsClient() {
     }
   }
 
+  async function runRosterMutation(actionKey: string, payload: Record<string, unknown>) {
+    if (mutationInFlight.current) return false;
+    mutationInFlight.current = true;
+    setPendingAction(actionKey);
+    try {
+      return await post(payload);
+    } finally {
+      mutationInFlight.current = false;
+      setPendingAction(null);
+    }
+  }
+
   async function correct(row: RosterRow, dayIndex: 1 | 2) {
     const reason = window.prompt(
       `Reverse Day ${dayIndex} check-in for ${row.fullName}? Enter a reason (recorded in the admin log):`
     );
     if (!reason) return;
-    await post({ action: 'correct', signInId: row.signInId, dayIndex, reason });
+    await runRosterMutation(`correct:${row.signInId}:${dayIndex}`, {
+      action: 'correct',
+      signInId: row.signInId,
+      dayIndex,
+      reason,
+    });
   }
 
   async function merge(row: RosterRow) {
@@ -111,7 +130,11 @@ export function AdminCcwSignInsClient() {
       `Merge a duplicate INTO ${row.fullName}. Paste the duplicate sign-in id:`
     );
     if (!duplicateId) return;
-    await post({ action: 'merge', primaryId: row.signInId, duplicateId: duplicateId.trim() });
+    await runRosterMutation(`merge:${row.signInId}`, {
+      action: 'merge',
+      primaryId: row.signInId,
+      duplicateId: duplicateId.trim(),
+    });
   }
 
   async function generateCheckInLink() {
@@ -330,7 +353,9 @@ export function AdminCcwSignInsClient() {
                         <button
                           type="button"
                           onClick={() => correct(row, 1)}
-                          className="rounded border border-amber-300/40 bg-amber-300/10 px-2 py-1 text-xs text-amber-100"
+                          disabled={pendingAction !== null}
+                          aria-busy={pendingAction === `correct:${row.signInId}:1`}
+                          className="rounded border border-amber-300/40 bg-amber-300/10 px-2 py-1 text-xs text-amber-100 disabled:cursor-not-allowed disabled:opacity-60"
                         >
                           Reverse D1
                         </button>
@@ -339,7 +364,9 @@ export function AdminCcwSignInsClient() {
                         <button
                           type="button"
                           onClick={() => correct(row, 2)}
-                          className="rounded border border-amber-300/40 bg-amber-300/10 px-2 py-1 text-xs text-amber-100"
+                          disabled={pendingAction !== null}
+                          aria-busy={pendingAction === `correct:${row.signInId}:2`}
+                          className="rounded border border-amber-300/40 bg-amber-300/10 px-2 py-1 text-xs text-amber-100 disabled:cursor-not-allowed disabled:opacity-60"
                         >
                           Reverse D2
                         </button>
@@ -347,7 +374,9 @@ export function AdminCcwSignInsClient() {
                       <button
                         type="button"
                         onClick={() => merge(row)}
-                        className="rounded border border-white/15 bg-white/10 px-2 py-1 text-xs"
+                        disabled={pendingAction !== null}
+                        aria-busy={pendingAction === `merge:${row.signInId}`}
+                        className="rounded border border-white/15 bg-white/10 px-2 py-1 text-xs disabled:cursor-not-allowed disabled:opacity-60"
                       >
                         Merge dupe
                       </button>

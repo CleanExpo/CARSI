@@ -144,9 +144,13 @@ export async function recordCheckIn(input: RecordCheckInInput): Promise<RecordCh
 
       // Write-once: set this day mark (it was null).
       const now = new Date();
+      const updateData: Prisma.CcwRoadshowSignInUncheckedUpdateInput = { [dayField]: now };
+      if (source === 'admin' && input.actorAdminId != null && existing.signedInByAdmin == null) {
+        updateData.signedInByAdmin = input.actorAdminId;
+      }
       await tx.ccwRoadshowSignIn.update({
         where: { id: existing.id },
-        data: { [dayField]: now },
+        data: updateData,
       });
       return {
         status: 'checked_in',

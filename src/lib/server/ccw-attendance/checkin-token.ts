@@ -65,6 +65,20 @@ export function configuredEventDayStamp(startDateIso: string, dayIndex: CheckInD
   return eventDayStamp(new Date(start.getTime() + (dayIndex - 1) * 24 * 60 * 60 * 1000));
 }
 
+/**
+ * Fail-closed configured-event-day guard shared by every attendance entry path.
+ * The optional instant exists for deterministic AU-timezone boundary tests.
+ */
+export function configuredEventDayGuard(
+  startDateIso: string,
+  dayIndex: CheckInDayIndex,
+  now: Date = new Date()
+): { ok: boolean; dateStamp: string; expectedDateStamp: string } {
+  const dateStamp = eventDayStamp(now);
+  const expectedDateStamp = configuredEventDayStamp(startDateIso, dayIndex);
+  return { ok: dateStamp === expectedDateStamp, dateStamp, expectedDateStamp };
+}
+
 function constantTimeEqual(a: string, b: string): boolean {
   const da = createHash('sha256').update(a, 'utf8').digest();
   const db = createHash('sha256').update(b, 'utf8').digest();

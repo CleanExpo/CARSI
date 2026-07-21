@@ -11,7 +11,10 @@ import {
   recordAdminCheckIn,
 } from '@/lib/server/ccw-attendance/admin-ops';
 import { isCcwAttendanceEnabled } from '@/lib/server/ccw-attendance/flag';
-import type { CheckInDayIndex } from '@/lib/server/ccw-attendance/checkin-token';
+import {
+  configuredEventDayGuard,
+  type CheckInDayIndex,
+} from '@/lib/server/ccw-attendance/checkin-token';
 
 /**
  * Admin sign-in roster + correction/merge/assisted electronic check-in for ONE event.
@@ -183,6 +186,16 @@ export async function POST(request: NextRequest) {
           return NextResponse.json(
             { detail: 'A valid eventSlug, dayIndex (1 or 2), full name and email are required.' },
             { status: 400 }
+          );
+        }
+        const dayGuard = configuredEventDayGuard(event.startDateIso, dayIndex);
+        if (!dayGuard.ok) {
+          return NextResponse.json(
+            {
+              code: 'wrong_event_day',
+              detail: `Day ${dayIndex} check-in opens on ${dayGuard.expectedDateStamp}. Record attendance on the event day.`,
+            },
+            { status: 409 }
           );
         }
         const actorAdmin = await prisma.adminUser.findUnique({

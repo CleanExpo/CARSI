@@ -11,5 +11,5 @@ export function isCcwAttendanceEnabled(): boolean {
   const raw = process.env.CCW_ATTENDANCE_ENABLED;
   if (raw == null) return false;
   const value = raw.trim().toLowerCase();
-  return value === 'true' || value === '1' || value === 'yes' || value === 'on';
+  return value === 'true' || value === '1';
 }
