@@ -5,6 +5,7 @@ import { getCcwRoadshowEvent } from '@/lib/marketing/ccw-roadshow';
 import { isCcwAttendanceEnabled } from '@/lib/server/ccw-attendance/flag';
 import {
   CHECKIN_TOKEN_TTL_SECONDS,
+  configuredEventDayStamp,
   eventDayStamp,
   mintCheckInToken,
   type CheckInDayIndex,
@@ -42,20 +43,29 @@ export async function POST(request: NextRequest) {
   };
 
   const event = getCcwRoadshowEvent(body.eventSlug);
-  const dayIndex: CheckInDayIndex | null =
-    body.dayIndex === 1 ? 1 : body.dayIndex === 2 ? 2 : null;
+  const dayIndex: CheckInDayIndex | null = body.dayIndex === 1 ? 1 : body.dayIndex === 2 ? 2 : null;
   if (!event || dayIndex == null) {
     return NextResponse.json(
       { detail: 'A valid eventSlug and dayIndex (1 or 2) are required.' },
-      { status: 400 },
+      { status: 400 }
     );
   }
 
   const dateStamp = eventDayStamp();
+  const expectedDateStamp = configuredEventDayStamp(event.startDateIso, dayIndex);
+  if (dateStamp !== expectedDateStamp) {
+    return NextResponse.json(
+      {
+        code: 'wrong_event_day',
+        detail: `Day ${dayIndex} check-in opens on ${expectedDateStamp}. Generate the QR on the event day.`,
+      },
+      { status: 409 }
+    );
+  }
   const token = await mintCheckInToken({ eventSlug: event.slug, dayIndex, dateStamp });
 
   const checkInUrl = `${request.nextUrl.origin}/events/ccw-roadshow/checkin?event=${encodeURIComponent(
-    event.slug,
+    event.slug
   )}&day=${dayIndex}&t=${encodeURIComponent(token)}`;
 
   return NextResponse.json({

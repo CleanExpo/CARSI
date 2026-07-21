@@ -31,8 +31,8 @@ import { runSerializable } from '@/lib/server/db-tx';
 import { normalizeBusiness, normalizeEmail, normalizeName } from './normalize';
 import type { CheckInDayIndex } from './checkin-token';
 
-/** Where the check-in came from (self QR, digitised paper, or admin action). */
-export type CheckInSource = 'self' | 'paper' | 'admin';
+/** Where the electronic check-in came from (self-service QR or admin assistance). */
+export type CheckInSource = 'self' | 'admin';
 
 export interface RecordCheckInInput {
   eventSlug: string;
@@ -90,7 +90,7 @@ async function capacityUsed(tx: Prisma.TransactionClient, eventSlug: string): Pr
 async function findRegistrationIdByEmail(
   tx: Prisma.TransactionClient,
   eventSlug: string,
-  normalizedEmail: string,
+  normalizedEmail: string
 ): Promise<string | null> {
   const regs = await tx.ccwRoadshowRegistration.findMany({
     where: { eventSlug, status: 'confirmed' },
@@ -183,7 +183,7 @@ export async function recordCheckIn(input: RecordCheckInInput): Promise<RecordCh
         normalizedName,
         isWalkIn,
         provisionStatus: 'pending',
-        signedInByAdmin: source === 'self' ? null : input.actorAdminId ?? null,
+        signedInByAdmin: source === 'self' ? null : (input.actorAdminId ?? null),
         [dayField]: now,
       },
     });
