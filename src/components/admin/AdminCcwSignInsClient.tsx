@@ -132,8 +132,14 @@ export function AdminCcwSignInsClient() {
 
   async function copyCheckInLink() {
     if (!checkInLink) return;
-    await navigator.clipboard.writeText(checkInLink.checkInUrl);
-    setCopied(true);
+    try {
+      await navigator.clipboard.writeText(checkInLink.checkInUrl);
+      setCopied(true);
+      setError('');
+    } catch {
+      setCopied(false);
+      setError('The browser blocked copying. Select and copy the link shown below instead.');
+    }
   }
 
   async function submitAssisted() {

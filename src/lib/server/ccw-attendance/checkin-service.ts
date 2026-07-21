@@ -42,7 +42,7 @@ export interface RecordCheckInInput {
   businessName?: string | null;
   /** Defaults to 'self' (the QR/own-device path). */
   source?: CheckInSource;
-  /** AdminUser.id when an admin performed/digitised this action. */
+  /** AdminUser.id when an admin assisted this electronic check-in. */
   actorAdminId?: string | null;
 }
 

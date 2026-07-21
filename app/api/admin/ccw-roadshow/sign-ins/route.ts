@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { getAdminSessionOrNull } from '@/lib/admin/admin-session';
 import { getCcwRoadshowEvent } from '@/lib/marketing/ccw-roadshow';
+import { prisma } from '@/lib/prisma';
 import {
   applyCheckInCorrection,
   findMergeCandidates,
@@ -184,12 +185,17 @@ export async function POST(request: NextRequest) {
             { status: 400 }
           );
         }
+        const actorAdmin = await prisma.adminUser.findUnique({
+          where: { email: session.email.trim().toLowerCase() },
+          select: { id: true },
+        });
         const result = await recordAdminCheckIn({
           eventSlug: event.slug,
           dayIndex,
           fullName,
           email,
           businessName: b.businessName,
+          actorAdminId: actorAdmin?.id ?? null,
           actorAdminEmail: session.email,
         });
         switch (result.status) {
