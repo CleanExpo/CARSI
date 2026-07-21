@@ -78,19 +78,24 @@ export function AdminCcwSignInsClient() {
   }, [load]);
 
   async function post(payload: Record<string, unknown>) {
-    const res = await fetch('/api/admin/ccw-roadshow/sign-ins', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-    if (!res.ok) {
-      const p = (await res.json().catch(() => ({}))) as { detail?: string };
-      setError(p.detail || 'Action failed');
+    try {
+      const res = await fetch('/api/admin/ccw-roadshow/sign-ins', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        const p = (await res.json().catch(() => ({}))) as { detail?: string };
+        setError(p.detail || 'Action failed');
+        return false;
+      }
+      setError('');
+      await load();
+      return true;
+    } catch {
+      setError('Network error while completing the action. Please try again.');
       return false;
     }
-    setError('');
-    await load();
-    return true;
   }
 
   async function correct(row: RosterRow, dayIndex: 1 | 2) {
