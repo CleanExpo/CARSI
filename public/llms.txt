@@ -69,9 +69,9 @@ Large-scale carpet maintenance for commercial facilities, including hot water ex
 - /subscribe — Subscription signup with Stripe checkout
 - /credentials/{id} — Public credential verification pages
 
-## Courses (published catalogue — 24 courses, snapshot 2026-07-19)
+## Featured courses (curated 24-course snapshot — 2026-07-19)
 
-CARSI publishes the following continuing-education courses. Each is available at https://carsi.com.au/courses/<slug>. CARSI is an IICRC CEC provider; see the IICRC CEC section above for what that means.
+The following is a curated selection of CARSI continuing-education courses, not the complete live catalogue. Visit https://carsi.com.au/courses for the full current catalogue. Each course below is available at https://carsi.com.au/courses/<slug>. CARSI is an IICRC CEC provider; see the IICRC CEC section above for what that means.
 
 - [Air Quality and Odour: Identification and Deodorisation Essentials](/courses/air-quality-and-odour-identification-and-deodorisation-essentials)
 - [Australian H5 Bird Flu Awareness for Restoration, IAQ and Facility Professionals](/courses/avian-influenza-awareness-restoration-iaq-facilities)
