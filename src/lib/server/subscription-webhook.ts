@@ -19,7 +19,10 @@ import type Stripe from 'stripe';
 
 import { parseAttributionJourneyId } from '@/lib/analytics/event-attribution';
 import { getStripeClient } from '@/lib/api/stripe';
-import { tryRecordAttributedStage } from '@/lib/server/event-attribution';
+import {
+  recordAttributedStage,
+  tryRecordAttributedStage,
+} from '@/lib/server/event-attribution';
 import {
   readCancelAtPeriodEnd,
   readCurrentPeriodEnd,
@@ -357,7 +360,7 @@ export async function handleSubscriptionEvent(event: Stripe.Event): Promise<void
         const subscription = await getStripeClient().subscriptions.retrieve(subscriptionId);
         await applySubscriptionSnapshot(subscription, eventTimestamp);
         if (event.type === 'invoice.paid') {
-          await tryRecordAttributedStage(
+          await recordAttributedStage(
             parseAttributionJourneyId(subscription.metadata?.attribution_journey_id),
             'subscription',
             {

@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 
 import type { NextRequest, NextResponse } from 'next/server';
+import type { Prisma } from '@/generated/prisma/client';
 
 import {
   ATTRIBUTION_CAMPAIGN_ID,
@@ -15,8 +16,10 @@ import {
   type AttributionStage,
 } from '@/lib/analytics/event-attribution';
 import { prisma } from '@/lib/prisma';
+import { runSerializable } from '@/lib/server/db-tx';
 
 export const ATTRIBUTION_RETENTION_DAYS = 90;
+const MAX_REVERSALS_PER_TRANSACTION = 1_000;
 
 type StageDetails = {
   courseSlug?: string;
@@ -29,10 +32,38 @@ export type AttributionReversalReason = 'refunded' | 'disputed' | 'dispute_won';
 
 type RevenueReversal = {
   eventId: string;
+  /** Stripe dispute ID for dispute lifecycle events; null for cumulative refunds. */
+  providerObjectId?: string | null;
   eventAt: Date;
   reason: AttributionReversalReason;
   /** Stripe's cumulative refunded/disputed cents for the original transaction. */
   reversedRevenueCents: number;
+  currency?: string | null;
+};
+
+export type AttributionReversalPersistenceResult = {
+  status: 'pending' | 'applied' | 'stale' | 'currency_mismatch' | 'duplicate';
+  appliedRows: number;
+};
+
+type ReconciliationResult = {
+  appliedRows: number;
+  targetStatus: Exclude<AttributionReversalPersistenceResult['status'], 'duplicate'>;
+};
+
+type StoredRevenueReversal = {
+  stripeEventId: string;
+  providerObjectId?: string | null;
+  eventAt: Date;
+  reason: AttributionReversalReason;
+  reversedRevenueCents: number;
+};
+
+type ReducedRevenueReversal = {
+  reversedRevenueCents: number;
+  reason: AttributionReversalReason;
+  eventId: string;
+  eventAt: Date;
 };
 
 type AggregatedAttributionRow = {
@@ -55,6 +86,76 @@ function normaliseRevenueCents(value: number | undefined): number | null {
 
 function isUniqueConstraintError(error: unknown): boolean {
   return Boolean(error && typeof error === 'object' && 'code' in error && error.code === 'P2002');
+}
+
+const REVERSAL_REASON_ORDER: Record<AttributionReversalReason, number> = {
+  disputed: 0,
+  dispute_won: 1,
+  refunded: 2,
+};
+
+/** Deterministically materialise cumulative refunds plus every active dispute. */
+export function reduceAttributionReversals(
+  reversals: StoredRevenueReversal[],
+): ReducedRevenueReversal | null {
+  const ordered = [...reversals].sort((a, b) => {
+    const byTime = a.eventAt.getTime() - b.eventAt.getTime();
+    if (byTime !== 0) return byTime;
+    const byReason = REVERSAL_REASON_ORDER[a.reason] - REVERSAL_REASON_ORDER[b.reason];
+    if (byReason !== 0) return byReason;
+    const byAmount = a.reversedRevenueCents - b.reversedRevenueCents;
+    return byAmount !== 0 ? byAmount : a.stripeEventId.localeCompare(b.stripeEventId);
+  });
+  if (ordered.length === 0) return null;
+
+  let refund: StoredRevenueReversal | null = null;
+  const activeDisputes = new Map<string, StoredRevenueReversal>();
+  let won: StoredRevenueReversal | null = null;
+  for (const reversal of ordered) {
+    if (reversal.reason === 'refunded') {
+      if (!refund || reversal.reversedRevenueCents >= refund.reversedRevenueCents) {
+        refund = reversal;
+      }
+    } else if (reversal.reason === 'disputed') {
+      activeDisputes.set(reversal.providerObjectId ?? `event:${reversal.stripeEventId}`, reversal);
+    } else {
+      won = reversal;
+      if (reversal.providerObjectId) {
+        activeDisputes.delete(reversal.providerObjectId);
+      } else {
+        // Compatibility for ledger facts written before dispute identity existed.
+        activeDisputes.clear();
+      }
+    }
+  }
+
+  const refundCents = refund?.reversedRevenueCents ?? 0;
+  const disputes = [...activeDisputes.values()];
+  const disputeCents = disputes.reduce((total, dispute) => total + dispute.reversedRevenueCents, 0);
+  const latestDispute = disputes.at(-1) ?? null;
+  if (latestDispute) {
+    return {
+      reversedRevenueCents: refundCents + disputeCents,
+      reason: 'disputed',
+      eventId: latestDispute.stripeEventId,
+      eventAt: latestDispute.eventAt,
+    };
+  }
+  if (refund) {
+    return {
+      reversedRevenueCents: refundCents,
+      reason: 'refunded',
+      eventId: refund.stripeEventId,
+      eventAt: refund.eventAt,
+    };
+  }
+  const terminal = won ?? ordered.at(-1)!;
+  return {
+    reversedRevenueCents: 0,
+    reason: terminal.reason,
+    eventId: terminal.stripeEventId,
+    eventAt: terminal.eventAt,
+  };
 }
 
 function retentionCutoff(): Date {
@@ -138,20 +239,51 @@ export async function recordAttributedStage(
   });
   if (!source) return false;
 
+  const transactionId = details.transactionId?.trim().slice(0, 255) || null;
+  const data = {
+    journeyId,
+    campaignId: source.campaignId,
+    sourceId: source.sourceId,
+    eventSlug: source.eventSlug,
+    stage,
+    courseSlug,
+    revenueCents,
+    currency: revenueCents == null ? null : currency,
+    transactionId,
+  };
+
   try {
-    await prisma.eventAttributionEvent.create({
-      data: {
-        journeyId,
-        campaignId: source.campaignId,
-        sourceId: source.sourceId,
-        eventSlug: source.eventSlug,
-        stage,
-        courseSlug,
-        revenueCents,
-        currency: revenueCents == null ? null : currency,
-        transactionId: details.transactionId?.trim().slice(0, 255) || null,
-      },
-    });
+    if ((stage === 'purchase' || stage === 'subscription') && transactionId) {
+      try {
+        const outcome = await runSerializable(async (tx) => {
+          await tx.eventAttributionEvent.create({ data });
+          const reconciliation = await reconcileAttributedRevenueReversals(tx, transactionId);
+          return { recorded: true, appliedRows: reconciliation.appliedRows };
+        });
+        if (outcome.appliedRows > 0) {
+          console.info('[event-attribution] reversal reconciliation', {
+            status: 'applied',
+            appliedRows: outcome.appliedRows,
+          });
+        }
+        return outcome.recorded;
+      } catch (error) {
+        if (!isUniqueConstraintError(error)) throw error;
+        // PostgreSQL aborts the transaction after P2002. Reconcile only after it
+        // has rolled back, in a fresh serializable transaction.
+        const reconciliation = await runSerializable((tx) =>
+          reconcileAttributedRevenueReversals(tx, transactionId),
+        );
+        if (reconciliation.appliedRows > 0) {
+          console.info('[event-attribution] reversal reconciliation', {
+            status: 'applied',
+            appliedRows: reconciliation.appliedRows,
+          });
+        }
+        return false;
+      }
+    }
+    await prisma.eventAttributionEvent.create({ data });
     return true;
   } catch (error) {
     if (isUniqueConstraintError(error)) return false;
@@ -172,59 +304,166 @@ export async function tryRecordAttributedStage(
   }
 }
 
-export async function applyAttributedRevenueReversal(
+async function reconcileAttributedRevenueReversals(
+  tx: Prisma.TransactionClient,
   transactionId: string,
-  reversal: RevenueReversal,
-): Promise<number> {
-  const normalisedTransactionId = transactionId.trim().slice(0, 255);
-  const eventId = reversal.eventId.trim().slice(0, 255);
-  if (!normalisedTransactionId || !eventId || !Number.isFinite(reversal.reversedRevenueCents)) {
-    return 0;
-  }
-
-  const paidRows = await prisma.eventAttributionEvent.findMany({
-    where: {
-      transactionId: normalisedTransactionId,
-      stage: { in: ['purchase', 'subscription'] },
-    },
-    select: { id: true, revenueCents: true },
+  target?: { stripeEventId: string; currency: string },
+): Promise<ReconciliationResult> {
+  const paidRows = await tx.eventAttributionEvent.findMany({
+    where: { transactionId, stage: { in: ['purchase', 'subscription'] } },
+    select: { id: true, revenueCents: true, currency: true },
     take: 2,
   });
+  if (paidRows.length === 0) return { appliedRows: 0, targetStatus: 'pending' };
 
-  let updated = 0;
-  for (const row of paidRows) {
-    const reversedRevenueCents = Math.min(
-      row.revenueCents ?? 0,
-      Math.max(0, Math.round(reversal.reversedRevenueCents)),
+  const reversals = await tx.eventAttributionReversal.findMany({
+    where: { transactionId },
+    select: {
+      stripeEventId: true,
+      providerObjectId: true,
+      eventAt: true,
+      reason: true,
+      reversedRevenueCents: true,
+      currency: true,
+    },
+    take: MAX_REVERSALS_PER_TRANSACTION + 1,
+  });
+  if (reversals.length > MAX_REVERSALS_PER_TRANSACTION) {
+    throw new Error('Attribution reversal reconciliation limit exceeded');
+  }
+
+  let appliedRows = 0;
+  let targetCompatible = false;
+  let targetWinner = false;
+  const reconciledAt = new Date();
+  for (const paidRow of paidRows) {
+    const compatible = reversals.filter((row) => row.currency === paidRow.currency);
+    const reduced = reduceAttributionReversals(
+      compatible.map((row) => ({
+        ...row,
+        reason: row.reason as AttributionReversalReason,
+      })),
     );
-    const result = await prisma.eventAttributionEvent.updateMany({
-      where: {
-        id: row.id,
-        ...(reversal.reason === 'dispute_won' ? { reversalReason: 'disputed' } : {}),
-        OR: [{ reversalEventAt: null }, { reversalEventAt: { lte: reversal.eventAt } }],
-      },
+    targetCompatible ||= Boolean(
+      target &&
+        target.currency === paidRow.currency &&
+        compatible.some((row) => row.stripeEventId === target.stripeEventId),
+    );
+    await tx.eventAttributionReversal.updateMany({
+      where: { transactionId, currency: { not: paidRow.currency ?? '' } },
+      data: { status: 'currency_mismatch', reconciledAt },
+    });
+    if (!reduced) continue;
+    targetWinner ||= reduced.eventId === target?.stripeEventId;
+
+    const result = await tx.eventAttributionEvent.updateMany({
+      where: { id: paidRow.id },
       data: {
-        reversedRevenueCents,
-        reversalReason: reversal.reason,
-        reversalEventId: eventId,
-        reversalEventAt: reversal.eventAt,
+        reversedRevenueCents: Math.min(
+          paidRow.revenueCents ?? 0,
+          Math.max(0, reduced.reversedRevenueCents),
+        ),
+        reversalReason: reduced.reason,
+        reversalEventId: reduced.eventId,
+        reversalEventAt: reduced.eventAt,
       },
     });
-    updated += result.count;
+    appliedRows += result.count;
+    await tx.eventAttributionReversal.updateMany({
+      where: { transactionId, currency: paidRow.currency ?? '' },
+      data: { status: 'stale', reconciledAt },
+    });
+    await tx.eventAttributionReversal.updateMany({
+      where: { stripeEventId: reduced.eventId },
+      data: { status: 'applied', reconciledAt },
+    });
   }
-  return updated;
+  return {
+    appliedRows,
+    targetStatus: targetWinner ? 'applied' : targetCompatible ? 'stale' : 'currency_mismatch',
+  };
 }
 
-export async function tryApplyAttributedRevenueReversal(
+/**
+ * Persist a signed provider reversal before webhook acknowledgement. The raw
+ * event exists independently of its paid attribution row, so delivery order
+ * cannot erase the adjustment. Reconciliation against any existing paid rows
+ * runs in the same serializable transaction.
+ */
+export async function persistAttributedRevenueReversal(
   transactionId: string,
   reversal: RevenueReversal,
-): Promise<boolean> {
-  try {
-    return (await applyAttributedRevenueReversal(transactionId, reversal)) > 0;
-  } catch (error) {
-    console.error('[event-attribution] could not apply revenue reversal:', error);
-    return false;
+): Promise<AttributionReversalPersistenceResult> {
+  const normalisedTransactionId = transactionId.trim().slice(0, 255);
+  const stripeEventId = reversal.eventId.trim().slice(0, 255);
+  const providerObjectId = reversal.providerObjectId?.trim().slice(0, 255) || null;
+  const currency = reversal.currency?.trim().toUpperCase() || 'AUD';
+  const reversedRevenueCents = Math.max(0, Math.round(reversal.reversedRevenueCents));
+  if (
+    !normalisedTransactionId ||
+    !stripeEventId ||
+    !Number.isFinite(reversal.reversedRevenueCents) ||
+    !Number.isFinite(reversal.eventAt.getTime()) ||
+    !/^[A-Z]{3}$/.test(currency)
+  ) {
+    throw new Error('Invalid attributed revenue reversal');
   }
+
+  const data = {
+    stripeEventId,
+    providerObjectId,
+    transactionId: normalisedTransactionId,
+    reversedRevenueCents,
+    currency,
+    reason: reversal.reason,
+    eventAt: reversal.eventAt,
+  };
+  let result: AttributionReversalPersistenceResult;
+  try {
+    result = await runSerializable<AttributionReversalPersistenceResult>(async (tx) => {
+      await tx.eventAttributionReversal.create({ data });
+      const reconciliation = await reconcileAttributedRevenueReversals(tx, normalisedTransactionId, {
+        stripeEventId,
+        currency,
+      });
+      return { status: reconciliation.targetStatus, appliedRows: reconciliation.appliedRows };
+    });
+  } catch (error) {
+    if (!isUniqueConstraintError(error)) throw error;
+    // The failed insert transaction is aborted. Validate identity and reconcile
+    // in a fresh transaction so retries after partial webhook success terminate.
+    result = await runSerializable<AttributionReversalPersistenceResult>(async (tx) => {
+      const existing = await tx.eventAttributionReversal.findUnique({
+        where: { stripeEventId },
+        select: {
+          transactionId: true,
+          providerObjectId: true,
+          reversedRevenueCents: true,
+          currency: true,
+          reason: true,
+          eventAt: true,
+        },
+      });
+      if (
+        !existing ||
+        existing.transactionId !== data.transactionId ||
+        existing.providerObjectId !== data.providerObjectId ||
+        existing.reversedRevenueCents !== data.reversedRevenueCents ||
+        existing.currency !== data.currency ||
+        existing.reason !== data.reason ||
+        existing.eventAt.getTime() !== data.eventAt.getTime()
+      ) {
+        throw new Error('Stripe reversal event identity conflict');
+      }
+      const reconciliation = await reconcileAttributedRevenueReversals(tx, normalisedTransactionId, {
+        stripeEventId,
+        currency,
+      });
+      return { status: 'duplicate', appliedRows: reconciliation.appliedRows };
+    });
+  }
+  console.info('[event-attribution] reversal reconciliation', result);
+  return result;
 }
 
 export async function getAttributionReport() {
