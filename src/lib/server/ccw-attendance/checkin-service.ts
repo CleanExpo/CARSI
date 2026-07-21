@@ -26,6 +26,7 @@
 import type { Prisma } from '@/generated/prisma/client';
 
 import { getCcwRoadshowEvent } from '@/lib/marketing/ccw-roadshow';
+import { isUniqueConstraintErrorForFields } from '@/lib/server/db-errors';
 import { runSerializable } from '@/lib/server/db-tx';
 
 import { normalizeBusiness, normalizeEmail, normalizeName } from './normalize';
@@ -117,7 +118,7 @@ export async function recordCheckIn(input: RecordCheckInInput): Promise<RecordCh
   const source: CheckInSource = input.source ?? 'self';
   const dayField = input.dayIndex === 1 ? 'day1CheckedInAt' : 'day2CheckedInAt';
 
-  return runSerializable(async (tx) => {
+  const attempt = (): Promise<RecordCheckInResult> => runSerializable(async (tx) => {
     const existing = await tx.ccwRoadshowSignIn.findUnique({
       where: {
         eventSlug_normalizedEmail: { eventSlug: event.slug, normalizedEmail },
@@ -201,4 +202,16 @@ export async function recordCheckIn(input: RecordCheckInInput): Promise<RecordCh
       reconciledRegistration: !isWalkIn,
     };
   });
+
+  try {
+    return await attempt();
+  } catch (error) {
+    if (!isUniqueConstraintErrorForFields(error, ['event_slug', 'normalized_email'])) {
+      throw error;
+    }
+    // A concurrent writer committed this logical attendee after our initial
+    // read. Replay once in a fresh transaction so the existing-row branch
+    // returns the declared idempotent/collision outcome.
+    return attempt();
+  }
 }
