@@ -43,8 +43,7 @@ export interface CheckInTokenScope {
 }
 
 export type CheckInTokenResult =
-  | { ok: true; scope: CheckInTokenScope }
-  | { ok: false; reason: 'invalid' | 'wrong_day' };
+  { ok: true; scope: CheckInTokenScope } | { ok: false; reason: 'invalid' | 'wrong_day' };
 
 /** Event-local (AU eastern) YYYY-MM-DD stamp for a given instant. */
 export function eventDayStamp(date: Date = new Date()): string {
@@ -55,6 +54,29 @@ export function eventDayStamp(date: Date = new Date()): string {
     month: '2-digit',
     day: '2-digit',
   }).format(date);
+}
+
+/** Expected AU-eastern calendar date for one day of a configured two-day event. */
+export function configuredEventDayStamp(startDateIso: string, dayIndex: CheckInDayIndex): string {
+  const start = new Date(startDateIso);
+  if (Number.isNaN(start.getTime())) {
+    throw new Error('Invalid event start date.');
+  }
+  return eventDayStamp(new Date(start.getTime() + (dayIndex - 1) * 24 * 60 * 60 * 1000));
+}
+
+/**
+ * Fail-closed configured-event-day guard shared by every attendance entry path.
+ * The optional instant exists for deterministic AU-timezone boundary tests.
+ */
+export function configuredEventDayGuard(
+  startDateIso: string,
+  dayIndex: CheckInDayIndex,
+  now: Date = new Date()
+): { ok: boolean; dateStamp: string; expectedDateStamp: string } {
+  const dateStamp = eventDayStamp(now);
+  const expectedDateStamp = configuredEventDayStamp(startDateIso, dayIndex);
+  return { ok: dateStamp === expectedDateStamp, dateStamp, expectedDateStamp };
 }
 
 function constantTimeEqual(a: string, b: string): boolean {
@@ -69,7 +91,7 @@ function constantTimeEqual(a: string, b: string): boolean {
  */
 export async function mintCheckInToken(
   input: { eventSlug: string; dayIndex: CheckInDayIndex; dateStamp?: string; now?: Date },
-  ttlSeconds: number = CHECKIN_TOKEN_TTL_SECONDS,
+  ttlSeconds: number = CHECKIN_TOKEN_TTL_SECONDS
 ): Promise<string> {
   const dateStamp = input.dateStamp ?? eventDayStamp(input.now ?? new Date());
   const iat = Math.floor((input.now?.getTime() ?? Date.now()) / 1000);
@@ -90,7 +112,7 @@ export async function mintCheckInToken(
  */
 export async function verifyCheckInToken(
   token: string | undefined | null,
-  opts?: { now?: Date },
+  opts?: { now?: Date }
 ): Promise<CheckInTokenResult> {
   if (!token || typeof token !== 'string') return { ok: false, reason: 'invalid' };
   try {

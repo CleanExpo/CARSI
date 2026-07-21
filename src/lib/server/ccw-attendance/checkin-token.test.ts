@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  configuredEventDayStamp,
   eventDayStamp,
   mintCheckInToken,
   verifyCheckInToken,
@@ -12,6 +13,11 @@ import {
  * expired token, or a garbage token are all rejected.
  */
 describe('verifyCheckInToken', () => {
+  it('derives the configured date for each event day', () => {
+    expect(configuredEventDayStamp('2026-07-22T08:30:00+10:00', 1)).toBe('2026-07-22');
+    expect(configuredEventDayStamp('2026-07-22T08:30:00+10:00', 2)).toBe('2026-07-23');
+  });
+
   it('round-trips a freshly minted token and returns its scope', async () => {
     const dateStamp = eventDayStamp();
     const token = await mintCheckInToken({ eventSlug: 'melbourne', dayIndex: 1, dateStamp });
@@ -25,7 +31,11 @@ describe('verifyCheckInToken', () => {
   });
 
   it('rejects a token whose event-local day has rolled over (wrong_day)', async () => {
-    const token = await mintCheckInToken({ eventSlug: 'melbourne', dayIndex: 1, dateStamp: '2026-07-22' });
+    const token = await mintCheckInToken({
+      eventSlug: 'melbourne',
+      dayIndex: 1,
+      dateStamp: '2026-07-22',
+    });
     // A later calendar day in Australia/Sydney; token not yet expired.
     const result = await verifyCheckInToken(token, { now: new Date('2026-07-25T02:00:00Z') });
     expect(result).toEqual({ ok: false, reason: 'wrong_day' });
@@ -33,9 +43,11 @@ describe('verifyCheckInToken', () => {
 
   it('rejects an already-expired token', async () => {
     // Minted 20h in the past with a 14h TTL → exp is behind real now.
-    const token = await mintCheckInToken(
-      { eventSlug: 'melbourne', dayIndex: 1, now: new Date(Date.now() - 20 * 60 * 60 * 1000) },
-    );
+    const token = await mintCheckInToken({
+      eventSlug: 'melbourne',
+      dayIndex: 1,
+      now: new Date(Date.now() - 20 * 60 * 60 * 1000),
+    });
     const result = await verifyCheckInToken(token);
     expect(result.ok).toBe(false);
   });

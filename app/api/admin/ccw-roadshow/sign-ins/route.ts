@@ -2,25 +2,29 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { getAdminSessionOrNull } from '@/lib/admin/admin-session';
 import { getCcwRoadshowEvent } from '@/lib/marketing/ccw-roadshow';
+import { prisma } from '@/lib/prisma';
 import {
   applyCheckInCorrection,
-  digitisePaperCheckIn,
   findMergeCandidates,
   listSignInsForEvent,
   mergeDuplicateSignIns,
+  recordAdminCheckIn,
 } from '@/lib/server/ccw-attendance/admin-ops';
 import { isCcwAttendanceEnabled } from '@/lib/server/ccw-attendance/flag';
-import type { CheckInDayIndex } from '@/lib/server/ccw-attendance/checkin-token';
+import {
+  configuredEventDayGuard,
+  type CheckInDayIndex,
+} from '@/lib/server/ccw-attendance/checkin-token';
 
 /**
- * Admin sign-in roster + correction/merge/paper-digitisation for ONE event.
+ * Admin sign-in roster + correction/merge/assisted electronic check-in for ONE event.
  *
  * DARK behind `CCW_ATTENDANCE_ENABLED` (404 when off). Admin-only
  * (`getAdminSessionOrNull` → 401). Scoped to a single event — there is no
  * cross-event / global-PII view here.
  *
  * GET  ?eventSlug=<slug>          → { ok, roster }
- * POST { action: 'correct' | 'merge' | 'digitise_paper', ... }
+ * POST { action: 'correct' | 'merge' | 'admin_checkin', ... }
  */
 
 export const dynamic = 'force-dynamic';
@@ -75,15 +79,15 @@ type MergeBody = {
   duplicateId?: string;
   reason?: string;
 };
-type DigitisePaperBody = {
-  action: 'digitise_paper';
+type AdminCheckInBody = {
+  action: 'admin_checkin';
   eventSlug?: string;
   dayIndex?: number;
   fullName?: string;
   email?: string;
   businessName?: string;
 };
-type PostBody = CorrectBody | MergeBody | DigitisePaperBody | { action?: string };
+type PostBody = CorrectBody | MergeBody | AdminCheckInBody | { action?: string };
 
 export async function POST(request: NextRequest) {
   if (!isCcwAttendanceEnabled()) {
@@ -116,7 +120,7 @@ export async function POST(request: NextRequest) {
         if (!signInId || dayIndex == null || !reason) {
           return NextResponse.json(
             { detail: 'signInId, dayIndex (1 or 2) and a reason are required.' },
-            { status: 400 },
+            { status: 400 }
           );
         }
         const result = await applyCheckInCorrection({
@@ -141,7 +145,7 @@ export async function POST(request: NextRequest) {
         if (!primaryId || !duplicateId) {
           return NextResponse.json(
             { detail: 'primaryId and duplicateId are required.' },
-            { status: 400 },
+            { status: 400 }
           );
         }
         const result = await mergeDuplicateSignIns({
@@ -153,23 +157,26 @@ export async function POST(request: NextRequest) {
         if (result.status === 'same_row') {
           return NextResponse.json(
             { detail: 'Cannot merge a sign-in into itself.' },
-            { status: 400 },
+            { status: 400 }
           );
         }
         if (result.status === 'not_found') {
-          return NextResponse.json({ detail: 'One of the sign-ins was not found.' }, { status: 404 });
+          return NextResponse.json(
+            { detail: 'One of the sign-ins was not found.' },
+            { status: 404 }
+          );
         }
         if (result.status === 'different_event') {
           return NextResponse.json(
             { detail: 'Sign-ins from different events cannot be merged.' },
-            { status: 400 },
+            { status: 400 }
           );
         }
         return NextResponse.json({ ok: true, result });
       }
 
-      case 'digitise_paper': {
-        const b = body as DigitisePaperBody;
+      case 'admin_checkin': {
+        const b = body as AdminCheckInBody;
         const event = getCcwRoadshowEvent(b.eventSlug);
         const dayIndex = toDayIndex(b.dayIndex);
         const fullName = b.fullName?.trim() ?? '';
@@ -178,15 +185,31 @@ export async function POST(request: NextRequest) {
         if (!event || dayIndex == null || !fullName || !emailValid) {
           return NextResponse.json(
             { detail: 'A valid eventSlug, dayIndex (1 or 2), full name and email are required.' },
-            { status: 400 },
+            { status: 400 }
           );
         }
-        const result = await digitisePaperCheckIn({
+        const dayGuard = configuredEventDayGuard(event.startDateIso, dayIndex);
+        if (!dayGuard.ok) {
+          return NextResponse.json(
+            {
+              code: 'wrong_event_day',
+              detail: `Day ${dayIndex} check-in opens on ${dayGuard.expectedDateStamp}. Record attendance on the event day.`,
+            },
+            { status: 409 }
+          );
+        }
+        const actorAdmin = await prisma.adminUser.findUnique({
+          where: { email: session.email.trim().toLowerCase() },
+          select: { id: true },
+        });
+        const result = await recordAdminCheckIn({
           eventSlug: event.slug,
           dayIndex,
           fullName,
           email,
           businessName: b.businessName,
+          actorAdminId: actorAdmin?.id ?? null,
+          actorAdminEmail: session.email,
         });
         switch (result.status) {
           case 'email_collision_different_name':
@@ -196,17 +219,17 @@ export async function POST(request: NextRequest) {
                 detail:
                   'This email is already checked in under a different name. Use a distinct email for each person.',
               },
-              { status: 409 },
+              { status: 409 }
             );
           case 'at_capacity':
             return NextResponse.json(
               { code: 'at_capacity', detail: 'This event is at capacity.' },
-              { status: 409 },
+              { status: 409 }
             );
           case 'invalid_event':
             return NextResponse.json(
               { code: 'invalid_event', detail: 'This event is not recognised.' },
-              { status: 400 },
+              { status: 400 }
             );
           default:
             return NextResponse.json({ ok: true, result });

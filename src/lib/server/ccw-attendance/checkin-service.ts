@@ -26,13 +26,14 @@
 import type { Prisma } from '@/generated/prisma/client';
 
 import { getCcwRoadshowEvent } from '@/lib/marketing/ccw-roadshow';
+import { isUniqueConstraintErrorForFields } from '@/lib/server/db-errors';
 import { runSerializable } from '@/lib/server/db-tx';
 
 import { normalizeBusiness, normalizeEmail, normalizeName } from './normalize';
 import type { CheckInDayIndex } from './checkin-token';
 
-/** Where the check-in came from (self QR, digitised paper, or admin action). */
-export type CheckInSource = 'self' | 'paper' | 'admin';
+/** Where the electronic check-in came from (self-service QR or admin assistance). */
+export type CheckInSource = 'self' | 'admin';
 
 export interface RecordCheckInInput {
   eventSlug: string;
@@ -42,7 +43,7 @@ export interface RecordCheckInInput {
   businessName?: string | null;
   /** Defaults to 'self' (the QR/own-device path). */
   source?: CheckInSource;
-  /** AdminUser.id when an admin performed/digitised this action. */
+  /** AdminUser.id when an admin assisted this electronic check-in. */
   actorAdminId?: string | null;
 }
 
@@ -90,7 +91,7 @@ async function capacityUsed(tx: Prisma.TransactionClient, eventSlug: string): Pr
 async function findRegistrationIdByEmail(
   tx: Prisma.TransactionClient,
   eventSlug: string,
-  normalizedEmail: string,
+  normalizedEmail: string
 ): Promise<string | null> {
   const regs = await tx.ccwRoadshowRegistration.findMany({
     where: { eventSlug, status: 'confirmed' },
@@ -117,7 +118,7 @@ export async function recordCheckIn(input: RecordCheckInInput): Promise<RecordCh
   const source: CheckInSource = input.source ?? 'self';
   const dayField = input.dayIndex === 1 ? 'day1CheckedInAt' : 'day2CheckedInAt';
 
-  return runSerializable(async (tx) => {
+  const attempt = (): Promise<RecordCheckInResult> => runSerializable(async (tx) => {
     const existing = await tx.ccwRoadshowSignIn.findUnique({
       where: {
         eventSlug_normalizedEmail: { eventSlug: event.slug, normalizedEmail },
@@ -144,9 +145,13 @@ export async function recordCheckIn(input: RecordCheckInInput): Promise<RecordCh
 
       // Write-once: set this day mark (it was null).
       const now = new Date();
+      const updateData: Prisma.CcwRoadshowSignInUncheckedUpdateInput = { [dayField]: now };
+      if (source === 'admin' && input.actorAdminId != null && existing.signedInByAdmin == null) {
+        updateData.signedInByAdmin = input.actorAdminId;
+      }
       await tx.ccwRoadshowSignIn.update({
         where: { id: existing.id },
-        data: { [dayField]: now },
+        data: updateData,
       });
       return {
         status: 'checked_in',
@@ -183,7 +188,7 @@ export async function recordCheckIn(input: RecordCheckInInput): Promise<RecordCh
         normalizedName,
         isWalkIn,
         provisionStatus: 'pending',
-        signedInByAdmin: source === 'self' ? null : input.actorAdminId ?? null,
+        signedInByAdmin: source === 'self' ? null : (input.actorAdminId ?? null),
         [dayField]: now,
       },
     });
@@ -197,4 +202,16 @@ export async function recordCheckIn(input: RecordCheckInInput): Promise<RecordCh
       reconciledRegistration: !isWalkIn,
     };
   });
+
+  try {
+    return await attempt();
+  } catch (error) {
+    if (!isUniqueConstraintErrorForFields(error, ['event_slug', 'normalized_email'])) {
+      throw error;
+    }
+    // A concurrent writer committed this logical attendee after our initial
+    // read. Replay once in a fresh transaction so the existing-row branch
+    // returns the declared idempotent/collision outcome.
+    return attempt();
+  }
 }
