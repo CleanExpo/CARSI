@@ -43,6 +43,7 @@ export function AdminCcwSignInsClient() {
   const [checkInDay, setCheckInDay] = useState<1 | 2>(1);
   const [checkInLink, setCheckInLink] = useState<CheckInLink | null>(null);
   const [generatingLink, setGeneratingLink] = useState(false);
+  const [submittingAssisted, setSubmittingAssisted] = useState(false);
   const [copied, setCopied] = useState(false);
 
   // Organiser-assisted electronic fallback for anyone unable to use the QR.
@@ -125,6 +126,9 @@ export function AdminCcwSignInsClient() {
       }
       setCheckInLink(payload);
       setError('');
+    } catch {
+      setError('Network error while generating the check-in link. Please try again.');
+      setCheckInLink(null);
     } finally {
       setGeneratingLink(false);
     }
@@ -143,15 +147,23 @@ export function AdminCcwSignInsClient() {
   }
 
   async function submitAssisted() {
-    const ok = await post({
-      action: 'admin_checkin',
-      eventSlug,
-      dayIndex: assisted.dayIndex,
-      fullName: assisted.fullName,
-      email: assisted.email,
-      businessName: assisted.businessName || undefined,
-    });
-    if (ok) setAssisted({ fullName: '', email: '', businessName: '', dayIndex: 1 });
+    if (submittingAssisted) return;
+    setSubmittingAssisted(true);
+    try {
+      const ok = await post({
+        action: 'admin_checkin',
+        eventSlug,
+        dayIndex: assisted.dayIndex,
+        fullName: assisted.fullName,
+        email: assisted.email,
+        businessName: assisted.businessName || undefined,
+      });
+      if (ok) setAssisted({ fullName: '', email: '', businessName: '', dayIndex: 1 });
+    } catch {
+      setError('Network error while recording the check-in. Please try again.');
+    } finally {
+      setSubmittingAssisted(false);
+    }
   }
 
   const qrSvg = checkInLink
@@ -359,6 +371,7 @@ export function AdminCcwSignInsClient() {
           />
           <input
             aria-label="Assisted check-in email"
+            type="email"
             placeholder="Email"
             value={assisted.email}
             onChange={(e) => setAssisted((p) => ({ ...p, email: e.target.value }))}
@@ -387,9 +400,11 @@ export function AdminCcwSignInsClient() {
           <button
             type="button"
             onClick={submitAssisted}
-            className="rounded-lg border border-white/15 bg-white/15 px-3 py-2 text-sm font-semibold"
+            disabled={submittingAssisted}
+            aria-busy={submittingAssisted}
+            className="rounded-lg border border-white/15 bg-white/15 px-3 py-2 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-60"
           >
-            Record electronic check-in
+            {submittingAssisted ? 'Recording…' : 'Record electronic check-in'}
           </button>
         </div>
       </div>
