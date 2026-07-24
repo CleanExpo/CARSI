@@ -83,6 +83,7 @@
     "video:brand:generate": "npx tsx scripts/automate-brand-videos.ts --execute",
     "video:lessons:plan": "npx tsx scripts/generate-course-lesson-videos.ts --plan",
     "video:lessons:generate": "npx tsx scripts/generate-course-lesson-videos.ts --generate",
+    "video:floor-care-intro:local": "npx tsx scripts/render-local-floor-care-intro.ts",
     "video:demo:plan": "npx tsx scripts/generate-demo-videos.ts --plan",
     "video:demo:record": "npx tsx scripts/generate-demo-videos.ts --record",
     "video:demo:composite": "npx tsx scripts/generate-demo-videos.ts --composite",
