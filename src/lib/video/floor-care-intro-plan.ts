@@ -160,6 +160,9 @@ export const FLOOR_CARE_INTRO_VIDEO_CONSTRAINTS: VideoValidationConstraints = {
   requiredAudioCodec: 'aac',
 };
 
+// Legacy ffmpeg-stderr-parsing validator. Superseded by the ffprobe-JSON-based
+// validateFloorCareIntroProbe below, which is what verifyFloorCareIntroVideo actually
+// uses; kept only so its existing backward-compatible tests keep passing.
 export function validateFloorCareIntroVideo(
   probe: FfmpegProbe,
   fileSizeBytes: number,
@@ -373,19 +376,49 @@ export function ffmpegBinaryPath(): string {
   return resolveInstalledBinaryPath('@ffmpeg-installer/ffmpeg');
 }
 
-function runCapture(command: string, args: string[]): Promise<{ stdout: string; stderr: string }> {
+export type RunCaptureFn = (command: string, args: string[]) => Promise<{ stdout: string; stderr: string }>;
+
+export type RunCaptureOptions = {
+  timeoutMs?: number;
+};
+
+const DEFAULT_RUN_CAPTURE_TIMEOUT_MS = 30_000;
+
+export function runCapture(
+  command: string,
+  args: string[],
+  options: RunCaptureOptions = {}
+): Promise<{ stdout: string; stderr: string }> {
+  const timeoutMs = options.timeoutMs ?? DEFAULT_RUN_CAPTURE_TIMEOUT_MS;
+
   return new Promise((resolvePromise, reject) => {
     const child = spawn(command, args, { stdio: ['ignore', 'pipe', 'pipe'] });
     let stdout = '';
     let stderr = '';
+    let settled = false;
+
+    const timer = setTimeout(() => {
+      settled = true;
+      child.kill('SIGKILL');
+      reject(new Error(`${command} timed out after ${timeoutMs}ms`));
+    }, timeoutMs);
+
     child.stdout?.on('data', (chunk) => {
       stdout += chunk.toString();
     });
     child.stderr?.on('data', (chunk) => {
       stderr += chunk.toString();
     });
-    child.on('error', reject);
+    child.on('error', (err) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      reject(err);
+    });
     child.on('close', (code) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
       if (code === 0) resolvePromise({ stdout, stderr });
       else reject(new Error(`${command} exited ${code}${stderr ? `: ${stderr.slice(-1000)}` : ''}`));
     });
@@ -409,12 +442,14 @@ export type FloorCareVerifyResult = {
 
 export async function verifyFloorCareIntroVideo(
   filePath: string,
-  evidenceDir: string
+  evidenceDir: string,
+  deps: { runCapture?: RunCaptureFn } = {}
 ): Promise<FloorCareVerifyResult> {
+  const run = deps.runCapture ?? runCapture;
   const ffprobe = ffprobeBinaryPath();
   const ffmpeg = ffmpegBinaryPath();
 
-  const probeRun = await runCapture(ffprobe, buildFfprobeArgs(filePath));
+  const probeRun = await run(ffprobe, buildFfprobeArgs(filePath));
   const probeResult = parseFfprobeResult(probeRun.stdout);
   const summary = summariseFloorCareProbe(probeResult);
 
@@ -422,22 +457,36 @@ export async function verifyFloorCareIntroVideo(
   summary.fileSizeBytes = fileStat.size;
 
   const validation = validateFloorCareIntroProbe(summary);
+  if (!validation.valid) {
+    return { valid: false, errors: validation.errors, decoded: false, summary, frames: [] };
+  }
 
-  await runCapture(ffmpeg, buildFullDecodeArgs(filePath));
-
-  await mkdir(evidenceDir, { recursive: true });
-  const specs = buildFloorCareFrameSpecs(summary.durationSeconds);
   const frames: FloorCareFrameEvidence[] = [];
-  for (const spec of specs) {
-    const framePath = join(evidenceDir, `${spec.label}.png`);
-    await runCapture(ffmpeg, buildFrameExtractionArgs(filePath, spec.timestampSeconds, framePath));
-    const bytes = await readFile(framePath);
-    frames.push({
-      label: spec.label,
-      timestampSeconds: spec.timestampSeconds,
-      path: framePath,
-      sha256: createHash('sha256').update(bytes).digest('hex'),
-    });
+  try {
+    await run(ffmpeg, buildFullDecodeArgs(filePath));
+
+    await mkdir(evidenceDir, { recursive: true });
+    const specs = buildFloorCareFrameSpecs(summary.durationSeconds);
+    for (const spec of specs) {
+      const framePath = join(evidenceDir, `${spec.label}.png`);
+      await run(ffmpeg, buildFrameExtractionArgs(filePath, spec.timestampSeconds, framePath));
+      const bytes = await readFile(framePath);
+      frames.push({
+        label: spec.label,
+        timestampSeconds: spec.timestampSeconds,
+        path: framePath,
+        sha256: createHash('sha256').update(bytes).digest('hex'),
+      });
+    }
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return {
+      valid: false,
+      errors: [`decode/frame extraction failed: ${message}`],
+      decoded: false,
+      summary,
+      frames,
+    };
   }
 
   return { valid: validation.valid, errors: validation.errors, decoded: true, summary, frames };

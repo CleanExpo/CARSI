@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach } from 'vitest';
 import { mkdtemp, rm, stat } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
@@ -14,7 +14,10 @@ import {
   buildFrameExtractionArgs,
   buildFullDecodeArgs,
   verifyFloorCareIntroVideo,
+  runCapture,
+  ffmpegBinaryPath,
   FLOOR_CARE_INTRO_PROBE_CONSTRAINTS,
+  type RunCaptureFn,
 } from './floor-care-intro-plan';
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
@@ -189,4 +192,127 @@ describe('verifyFloorCareIntroVideo (real local integration, no network)', () =>
   afterAll(async () => {
     await rm(evidenceDir, { recursive: true, force: true });
   });
+});
+
+describe('runCapture bounded timeout', () => {
+  it('rejects a hung child process instead of waiting forever', async () => {
+    const start = Date.now();
+    await expect(
+      runCapture(process.execPath, ['-e', 'setInterval(() => {}, 1000);'], { timeoutMs: 300 })
+    ).rejects.toThrow(/timed out/i);
+    expect(Date.now() - start).toBeLessThan(2000);
+  }, 3000);
+
+  it('does not wait for the timeout when the child errors immediately (e.g. missing binary)', async () => {
+    const start = Date.now();
+    let error: unknown;
+    try {
+      await runCapture('carsi-does-not-exist-binary-xyz', [], { timeoutMs: 5000 });
+    } catch (err) {
+      error = err;
+    }
+    expect(error).toBeDefined();
+    expect(String(error)).not.toMatch(/timed out/i);
+    expect(Date.now() - start).toBeLessThan(1000);
+  }, 3000);
+
+  it('resolves normally for a fast command well within the timeout', async () => {
+    const result = await runCapture(process.execPath, ['-e', 'process.stdout.write("ok")'], {
+      timeoutMs: 5000,
+    });
+    expect(result.stdout).toBe('ok');
+  }, 5000);
+});
+
+describe('verifyFloorCareIntroVideo fails closed', () => {
+  let evidenceDir: string;
+
+  beforeEach(async () => {
+    evidenceDir = await mkdtemp(join(tmpdir(), 'carsi-floor-care-verify-failclosed-'));
+  });
+
+  afterEach(async () => {
+    await rm(evidenceDir, { recursive: true, force: true });
+  });
+
+  it('stops at an invalid probe and never invokes decode or frame extraction', async () => {
+    const badMp4 = join(evidenceDir, 'bad-resolution.mp4');
+    await runCapture(ffmpegBinaryPath(), [
+      '-hide_banner',
+      '-loglevel',
+      'error',
+      '-y',
+      '-f',
+      'lavfi',
+      '-i',
+      'testsrc=duration=1:size=320x240:rate=25',
+      '-f',
+      'lavfi',
+      '-i',
+      'sine=frequency=1000:duration=1',
+      '-c:v',
+      'libx264',
+      '-c:a',
+      'aac',
+      '-shortest',
+      badMp4,
+    ]);
+
+    let calls = 0;
+    const countingRunCapture: RunCaptureFn = async (command, args) => {
+      calls += 1;
+      return runCapture(command, args);
+    };
+
+    const result = await verifyFloorCareIntroVideo(badMp4, evidenceDir, { runCapture: countingRunCapture });
+
+    expect(result.valid).toBe(false);
+    expect(result.decoded).toBe(false);
+    expect(result.errors.length).toBeGreaterThan(0);
+    expect(result.frames).toEqual([]);
+    expect(calls).toBe(1);
+  }, 30_000);
+
+  it('catches a decode failure and reports valid:false, decoded:false instead of throwing', async () => {
+    const failingRunCapture: RunCaptureFn = async (command, args) => {
+      if (args.includes('-show_streams')) {
+        return runCapture(command, args);
+      }
+      if (args.includes('null')) {
+        throw new Error('simulated decode failure: moov atom corrupt');
+      }
+      return runCapture(command, args);
+    };
+
+    const result = await verifyFloorCareIntroVideo(FLOOR_CARE_MP4, evidenceDir, {
+      runCapture: failingRunCapture,
+    });
+
+    expect(result.valid).toBe(false);
+    expect(result.decoded).toBe(false);
+    expect(result.errors.join(' ')).toMatch(/decode/i);
+  }, 30_000);
+
+  it('catches a frame-extraction failure, reports decoded:false, and keeps frames already collected', async () => {
+    let frameCalls = 0;
+    const failingRunCapture: RunCaptureFn = async (command, args) => {
+      if (args.includes('-frames:v')) {
+        frameCalls += 1;
+        if (frameCalls === 2) {
+          throw new Error('simulated frame extraction failure');
+        }
+      }
+      return runCapture(command, args);
+    };
+
+    const result = await verifyFloorCareIntroVideo(FLOOR_CARE_MP4, evidenceDir, {
+      runCapture: failingRunCapture,
+    });
+
+    expect(result.valid).toBe(false);
+    expect(result.decoded).toBe(false);
+    expect(result.errors.join(' ')).toMatch(/frame/i);
+    expect(result.frames.length).toBe(1);
+    expect(result.frames[0].label).toBe('opening');
+  }, 60_000);
 });
