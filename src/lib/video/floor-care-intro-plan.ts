@@ -1,5 +1,8 @@
-import { access } from 'node:fs/promises';
+import { access, mkdir, readFile, stat } from 'node:fs/promises';
 import { basename, dirname, join, resolve } from 'node:path';
+import { spawn } from 'node:child_process';
+import { createHash } from 'node:crypto';
+import { createRequire } from 'node:module';
 
 export type FloorCareIntroScene = {
   id: string;
@@ -190,4 +193,252 @@ export function validateFloorCareIntroVideo(
   }
 
   return { valid: errors.length === 0, errors };
+}
+
+// --- Real ffprobe-based verification (repo-owned binary, no ffmpeg-stderr parsing) ---
+
+export type FfprobeStream = {
+  index: number;
+  codec_name?: string;
+  codec_type?: string;
+  width?: number;
+  height?: number;
+  r_frame_rate?: string;
+  avg_frame_rate?: string;
+};
+
+export type FfprobeFormat = {
+  nb_streams?: number;
+  duration?: string;
+  size?: string;
+};
+
+export type FfprobeResult = {
+  streams: FfprobeStream[];
+  format: FfprobeFormat;
+};
+
+export function buildFfprobeArgs(filePath: string): string[] {
+  return ['-hide_banner', '-loglevel', 'error', '-print_format', 'json', '-show_format', '-show_streams', filePath];
+}
+
+export function parseFrameRate(rate: string | undefined): number {
+  if (!rate) return 0;
+  const [num, den] = rate.split('/').map(Number);
+  if (!den) return 0;
+  return num / den;
+}
+
+export function parseFfprobeResult(jsonText: string): FfprobeResult {
+  const parsed = JSON.parse(jsonText) as Partial<FfprobeResult>;
+  return { streams: parsed.streams ?? [], format: parsed.format ?? {} };
+}
+
+export type FloorCareProbeSummary = {
+  videoStreamCount: number;
+  audioStreamCount: number;
+  videoCodec: string | null;
+  audioCodec: string | null;
+  width: number;
+  height: number;
+  fps: number;
+  durationSeconds: number;
+  fileSizeBytes: number;
+};
+
+export function summariseFloorCareProbe(result: FfprobeResult): FloorCareProbeSummary {
+  const videoStreams = result.streams.filter((s) => s.codec_type === 'video');
+  const audioStreams = result.streams.filter((s) => s.codec_type === 'audio');
+  const video = videoStreams[0];
+  const audio = audioStreams[0];
+
+  return {
+    videoStreamCount: videoStreams.length,
+    audioStreamCount: audioStreams.length,
+    videoCodec: video?.codec_name ?? null,
+    audioCodec: audio?.codec_name ?? null,
+    width: video?.width ?? 0,
+    height: video?.height ?? 0,
+    fps: parseFrameRate(video?.avg_frame_rate ?? video?.r_frame_rate),
+    durationSeconds: Number(result.format.duration ?? 0),
+    fileSizeBytes: Number(result.format.size ?? 0),
+  };
+}
+
+export type ProbeValidationConstraints = {
+  requiredWidth: number;
+  requiredHeight: number;
+  requiredFps: number;
+  fpsTolerance: number;
+  minDurationSeconds: number;
+  maxDurationSeconds: number;
+  maxFileSizeBytes: number;
+  requiredVideoCodec: string;
+  requiredAudioCodec: string;
+};
+
+export const FLOOR_CARE_INTRO_PROBE_CONSTRAINTS: ProbeValidationConstraints = {
+  requiredWidth: 1280,
+  requiredHeight: 720,
+  requiredFps: 25,
+  fpsTolerance: 0.05,
+  minDurationSeconds: 30,
+  maxDurationSeconds: 75,
+  maxFileSizeBytes: 12 * 1024 * 1024,
+  requiredVideoCodec: 'h264',
+  requiredAudioCodec: 'aac',
+};
+
+export function validateFloorCareIntroProbe(
+  summary: FloorCareProbeSummary,
+  constraints: ProbeValidationConstraints = FLOOR_CARE_INTRO_PROBE_CONSTRAINTS
+): { valid: boolean; errors: string[] } {
+  const errors: string[] = [];
+
+  if (summary.videoStreamCount !== 1) {
+    errors.push(`expected exactly one video stream, found ${summary.videoStreamCount}`);
+  }
+  if (summary.videoCodec !== constraints.requiredVideoCodec) {
+    errors.push(`video codec "${summary.videoCodec ?? 'none'}" is not ${constraints.requiredVideoCodec}`);
+  }
+  if (summary.audioStreamCount < 1) {
+    errors.push(`expected at least one audio stream, found ${summary.audioStreamCount}`);
+  }
+  if (summary.audioCodec !== constraints.requiredAudioCodec) {
+    errors.push(`audio codec "${summary.audioCodec ?? 'none'}" is not ${constraints.requiredAudioCodec}`);
+  }
+  if (summary.width !== constraints.requiredWidth || summary.height !== constraints.requiredHeight) {
+    errors.push(`resolution ${summary.width}x${summary.height} is not ${constraints.requiredWidth}x${constraints.requiredHeight}`);
+  }
+  if (Math.abs(summary.fps - constraints.requiredFps) > constraints.fpsTolerance) {
+    errors.push(`fps ${summary.fps} is not ${constraints.requiredFps}`);
+  }
+  if (summary.durationSeconds < constraints.minDurationSeconds || summary.durationSeconds > constraints.maxDurationSeconds) {
+    errors.push(`duration ${summary.durationSeconds.toFixed(1)}s is outside ${constraints.minDurationSeconds}-${constraints.maxDurationSeconds}s`);
+  }
+  if (summary.fileSizeBytes > constraints.maxFileSizeBytes) {
+    errors.push(`file size ${summary.fileSizeBytes} bytes exceeds the ${constraints.maxFileSizeBytes} byte cap`);
+  }
+
+  return { valid: errors.length === 0, errors };
+}
+
+export type FloorCareFrameSpec = {
+  label: 'opening' | 'midpoint' | 'ending';
+  timestampSeconds: number;
+};
+
+export function buildFloorCareFrameSpecs(durationSeconds: number): FloorCareFrameSpec[] {
+  const midpoint = durationSeconds / 2;
+  const ending = Math.max(midpoint, durationSeconds - 1);
+  return [
+    { label: 'opening', timestampSeconds: 0 },
+    { label: 'midpoint', timestampSeconds: midpoint },
+    { label: 'ending', timestampSeconds: ending },
+  ];
+}
+
+export function buildFrameExtractionArgs(inputPath: string, timestampSeconds: number, outputPath: string): string[] {
+  return [
+    '-hide_banner',
+    '-loglevel',
+    'error',
+    '-y',
+    '-ss',
+    String(timestampSeconds),
+    '-i',
+    inputPath,
+    '-frames:v',
+    '1',
+    outputPath,
+  ];
+}
+
+export function buildFullDecodeArgs(inputPath: string): string[] {
+  return ['-v', 'error', '-i', inputPath, '-f', 'null', '-'];
+}
+
+function resolveInstalledBinaryPath(packageName: string): string {
+  const require = createRequire(import.meta.url);
+  const installer = require(packageName) as { path?: string };
+  if (!installer.path) throw new Error(`${packageName} did not expose a binary path.`);
+  return installer.path;
+}
+
+export function ffprobeBinaryPath(): string {
+  return resolveInstalledBinaryPath('@ffprobe-installer/ffprobe');
+}
+
+export function ffmpegBinaryPath(): string {
+  return resolveInstalledBinaryPath('@ffmpeg-installer/ffmpeg');
+}
+
+function runCapture(command: string, args: string[]): Promise<{ stdout: string; stderr: string }> {
+  return new Promise((resolvePromise, reject) => {
+    const child = spawn(command, args, { stdio: ['ignore', 'pipe', 'pipe'] });
+    let stdout = '';
+    let stderr = '';
+    child.stdout?.on('data', (chunk) => {
+      stdout += chunk.toString();
+    });
+    child.stderr?.on('data', (chunk) => {
+      stderr += chunk.toString();
+    });
+    child.on('error', reject);
+    child.on('close', (code) => {
+      if (code === 0) resolvePromise({ stdout, stderr });
+      else reject(new Error(`${command} exited ${code}${stderr ? `: ${stderr.slice(-1000)}` : ''}`));
+    });
+  });
+}
+
+export type FloorCareFrameEvidence = {
+  label: FloorCareFrameSpec['label'];
+  timestampSeconds: number;
+  path: string;
+  sha256: string;
+};
+
+export type FloorCareVerifyResult = {
+  valid: boolean;
+  errors: string[];
+  decoded: boolean;
+  summary: FloorCareProbeSummary;
+  frames: FloorCareFrameEvidence[];
+};
+
+export async function verifyFloorCareIntroVideo(
+  filePath: string,
+  evidenceDir: string
+): Promise<FloorCareVerifyResult> {
+  const ffprobe = ffprobeBinaryPath();
+  const ffmpeg = ffmpegBinaryPath();
+
+  const probeRun = await runCapture(ffprobe, buildFfprobeArgs(filePath));
+  const probeResult = parseFfprobeResult(probeRun.stdout);
+  const summary = summariseFloorCareProbe(probeResult);
+
+  const fileStat = await stat(filePath);
+  summary.fileSizeBytes = fileStat.size;
+
+  const validation = validateFloorCareIntroProbe(summary);
+
+  await runCapture(ffmpeg, buildFullDecodeArgs(filePath));
+
+  await mkdir(evidenceDir, { recursive: true });
+  const specs = buildFloorCareFrameSpecs(summary.durationSeconds);
+  const frames: FloorCareFrameEvidence[] = [];
+  for (const spec of specs) {
+    const framePath = join(evidenceDir, `${spec.label}.png`);
+    await runCapture(ffmpeg, buildFrameExtractionArgs(filePath, spec.timestampSeconds, framePath));
+    const bytes = await readFile(framePath);
+    frames.push({
+      label: spec.label,
+      timestampSeconds: spec.timestampSeconds,
+      path: framePath,
+      sha256: createHash('sha256').update(bytes).digest('hex'),
+    });
+  }
+
+  return { valid: validation.valid, errors: validation.errors, decoded: true, summary, frames };
 }

@@ -106,6 +106,7 @@
     "@axe-core/playwright": "^4.11.3",
     "@eslint/eslintrc": "^3.3.3",
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
+    "@ffprobe-installer/ffprobe": "^2.1.2",
     "@playwright/test": "^1.49.1",
     "@tailwindcss/postcss": "^4.1.18",
     "@types/node": "^22.10.0",
