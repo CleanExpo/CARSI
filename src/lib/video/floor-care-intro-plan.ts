@@ -1,3 +1,6 @@
+import { access } from 'node:fs/promises';
+import { basename, dirname, join, resolve } from 'node:path';
+
 export type FloorCareIntroScene = {
   id: string;
   image: string;
@@ -59,6 +62,28 @@ export const FLOOR_CARE_INTRO_SCENES: FloorCareIntroScene[] = [
 
 export function buildFloorCareIntroScenes(): FloorCareIntroScene[] {
   return FLOOR_CARE_INTRO_SCENES;
+}
+
+export async function validateFloorCareIntroSceneAssets(
+  scenes: FloorCareIntroScene[],
+  baseDir: string
+): Promise<{ valid: boolean; errors: string[] }> {
+  const errors: string[] = [];
+
+  for (const scene of scenes) {
+    const imagePath = resolve(baseDir, scene.image);
+    try {
+      await access(imagePath);
+    } catch {
+      errors.push(`scene "${scene.id}" references a missing image file: ${scene.image}`);
+    }
+  }
+
+  return { valid: errors.length === 0, errors };
+}
+
+export function buildFloorCareIntroCandidatePath(outputPath: string): string {
+  return join(dirname(outputPath), `.${basename(outputPath)}.candidate.mp4`);
 }
 
 export type FfmpegProbe = {

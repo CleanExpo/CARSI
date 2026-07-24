@@ -1,13 +1,19 @@
 import { describe, it, expect } from 'vitest';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import {
   buildFloorCareIntroScenes,
   buildFloorCareSegmentFilter,
+  buildFloorCareIntroCandidatePath,
   parseFfmpegProbeOutput,
   validateFloorCareIntroVideo,
+  validateFloorCareIntroSceneAssets,
   FLOOR_CARE_INTRO_VIDEO_CONSTRAINTS,
   type FfmpegProbe,
 } from './floor-care-intro-plan';
+
+const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 
 describe('buildFloorCareIntroScenes', () => {
   const scenes = buildFloorCareIntroScenes();
@@ -120,5 +126,39 @@ describe('validateFloorCareIntroVideo', () => {
     const result = validateFloorCareIntroVideo(goodProbe, FLOOR_CARE_INTRO_VIDEO_CONSTRAINTS.maxFileSizeBytes + 1);
     expect(result.valid).toBe(false);
     expect(result.errors.join(' ')).toMatch(/size/i);
+  });
+});
+
+describe('validateFloorCareIntroSceneAssets', () => {
+  it('accepts the current scene set, whose image files all exist in the repository', async () => {
+    const result = await validateFloorCareIntroSceneAssets(buildFloorCareIntroScenes(), repoRoot);
+    expect(result.valid).toBe(true);
+    expect(result.errors).toEqual([]);
+  });
+
+  it('rejects a scene that references a deliberately missing image file', async () => {
+    const scenes = [
+      ...buildFloorCareIntroScenes(),
+      {
+        id: 'missing-scene',
+        image: 'public/images/courses/does-not-exist-floor-care.webp',
+        caption: 'Missing',
+        narration: 'This scene points at a file that was never created.',
+      },
+    ];
+    const result = await validateFloorCareIntroSceneAssets(scenes, repoRoot);
+    expect(result.valid).toBe(false);
+    expect(result.errors.join(' ')).toMatch(/missing-scene/);
+    expect(result.errors.join(' ')).toMatch(/does-not-exist-floor-care\.webp/);
+  });
+});
+
+describe('buildFloorCareIntroCandidatePath', () => {
+  it('builds a candidate path in the same directory as the final output path', () => {
+    const outputPath = resolve(repoRoot, 'public/videos/course-intros/commercial-floor-care-schools-childcare.mp4');
+    const candidate = buildFloorCareIntroCandidatePath(outputPath);
+    expect(dirname(candidate)).toBe(dirname(outputPath));
+    expect(candidate).not.toBe(outputPath);
+    expect(candidate.endsWith('.mp4')).toBe(true);
   });
 });

@@ -1,16 +1,18 @@
 #!/usr/bin/env npx tsx
 
 import { spawn } from 'node:child_process';
-import { mkdtemp, mkdir, rm, stat, writeFile } from 'node:fs/promises';
+import { mkdtemp, mkdir, rename, rm, stat, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 
 import {
+  buildFloorCareIntroCandidatePath,
   buildFloorCareIntroScenes,
   buildFloorCareSegmentFilter,
   parseFfmpegProbeOutput,
+  validateFloorCareIntroSceneAssets,
   validateFloorCareIntroVideo,
 } from '../src/lib/video/floor-care-intro-plan';
 
@@ -60,14 +62,20 @@ async function render(): Promise<void> {
   const ffmpeg = ffmpegPath();
   const work = await mkdtemp(join(tmpdir(), 'carsi-floor-care-intro-'));
   const scenes = buildFloorCareIntroScenes();
+  const candidatePath = buildFloorCareIntroCandidatePath(outputPath);
 
   try {
     await mkdir(dirname(outputPath), { recursive: true });
+
+    const assetValidation = await validateFloorCareIntroSceneAssets(scenes, repoRoot);
+    if (!assetValidation.valid) {
+      throw new Error(`Scene image assets failed validation: ${assetValidation.errors.join('; ')}`);
+    }
+
     const segments: string[] = [];
 
     for (const [index, scene] of scenes.entries()) {
       const imagePath = resolve(repoRoot, scene.image);
-      await stat(imagePath);
 
       const audioPath = join(work, `${String(index).padStart(2, '0')}-${scene.id}.aiff`);
       const segmentPath = join(work, `${String(index).padStart(2, '0')}-${scene.id}.mp4`);
@@ -129,22 +137,25 @@ async function render(): Promise<void> {
       'copy',
       '-movflags',
       '+faststart',
-      outputPath,
+      candidatePath,
     ]);
 
-    const probeRun = await run(ffmpeg, ['-hide_banner', '-i', outputPath], true).catch((error: Error) => {
+    const probeRun = await run(ffmpeg, ['-hide_banner', '-i', candidatePath], true).catch((error: Error) => {
       const marker = ': ';
       const detail = error.message.includes(marker) ? error.message.slice(error.message.indexOf(marker) + marker.length) : error.message;
       return { stdout: '', stderr: detail };
     });
     const probe = parseFfmpegProbeOutput(probeRun.stderr);
     if (!probe) throw new Error('Could not parse the rendered MP4 metadata.');
-    const file = await stat(outputPath);
+    const file = await stat(candidatePath);
     const validation = validateFloorCareIntroVideo(probe, file.size);
     if (!validation.valid) throw new Error(`Rendered MP4 failed acceptance: ${validation.errors.join('; ')}`);
 
     // Decode every frame and audio packet; a container-only success is not sufficient.
-    await run(ffmpeg, ['-v', 'error', '-i', outputPath, '-f', 'null', '-']);
+    await run(ffmpeg, ['-v', 'error', '-i', candidatePath, '-f', 'null', '-']);
+
+    // Only publish over the existing output once the candidate has passed every check.
+    await rename(candidatePath, outputPath);
 
     console.log(
       JSON.stringify(
@@ -163,6 +174,7 @@ async function render(): Promise<void> {
     );
   } finally {
     await rm(work, { recursive: true, force: true });
+    await rm(candidatePath, { force: true });
   }
 }
 
