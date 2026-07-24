@@ -111,6 +111,13 @@ describe('validateFloorCareIntroProbe', () => {
     expect(errors.join(' ')).toMatch(/audio/i);
   });
 
+  it('rejects a second audio stream (must be exactly one AAC stream)', () => {
+    const twoAudio = { ...good, audioStreamCount: 2 };
+    const { valid, errors } = validateFloorCareIntroProbe(twoAudio);
+    expect(valid).toBe(false);
+    expect(errors.join(' ')).toMatch(/exactly one audio stream/i);
+  });
+
   it('rejects a frame rate that is not 25 fps', () => {
     const wrongFps = { ...good, fps: 30 };
     const { valid, errors } = validateFloorCareIntroProbe(wrongFps);

@@ -304,8 +304,8 @@ export function validateFloorCareIntroProbe(
   if (summary.videoCodec !== constraints.requiredVideoCodec) {
     errors.push(`video codec "${summary.videoCodec ?? 'none'}" is not ${constraints.requiredVideoCodec}`);
   }
-  if (summary.audioStreamCount < 1) {
-    errors.push(`expected at least one audio stream, found ${summary.audioStreamCount}`);
+  if (summary.audioStreamCount !== 1) {
+    errors.push(`expected exactly one audio stream, found ${summary.audioStreamCount}`);
   }
   if (summary.audioCodec !== constraints.requiredAudioCodec) {
     errors.push(`audio codec "${summary.audioCodec ?? 'none'}" is not ${constraints.requiredAudioCodec}`);
