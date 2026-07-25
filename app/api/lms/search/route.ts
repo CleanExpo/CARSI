@@ -42,7 +42,6 @@ export async function GET(request: NextRequest) {
         category: true,
         meta: true,
         iicrcDiscipline: true,
-        cecHours: true,
       },
     });
 

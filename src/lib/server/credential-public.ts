@@ -87,7 +87,6 @@ export async function getPublicCredentialPdfBuffer(credentialId: string): Promis
           title: true,
           slug: true,
           iicrcDiscipline: true,
-          cecHours: true,
           shortDescription: true,
           description: true,
           meta: true,

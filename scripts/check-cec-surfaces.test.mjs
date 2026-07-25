@@ -1,73 +1,80 @@
 #!/usr/bin/env node
 /**
  * Non-vacuity proof for the CEC surface-leak guard (GP-498). A guard that cannot fail is
- * worthless: this asserts the guard FIRES on every known leak shape and stays SILENT on the
- * legitimate resolved-value reads it must not touch. If someone "fixes" the guard by making
- * it inert, this test goes red.
+ * worthless: this asserts the guard FIRES on every known leak shape — including the ones a
+ * naive line-regex misses (computed access, aliased / multiline destructuring, Prisma
+ * selects, non-trivial boolean eligibility) — and stays SILENT on the legitimate resolved
+ * reads it must not touch. If someone makes the guard inert, this test goes red.
  */
-import {
-  evaluateFile,
-  readsRawCecColumn,
-  usesDisciplineAsEligibility,
-} from './check-cec-surfaces.mjs';
+import { evaluateFile } from './check-cec-surfaces.mjs';
 
-// Each MUST_BLOCK line, scanned on its own, must produce at least one finding.
+// Each MUST_BLOCK case (scanned as its own source) must produce at least one finding.
 const MUST_BLOCK = [
-  ['raw column render (JSX)', `<span>{course.cecHours} CECs</span>`],
-  ['raw column in marketing string', 'const copy = `Earn ${course.cecHours} IICRC CECs`;'],
-  ['raw column eligibility boolean', 'const show = enrollment.cecHours != null && enrollment.cecHours > 0;'],
-  ['raw column via optional chain', 'const n = row?.cecHours ?? 0; return n;'],
-  ['raw column destructure', 'const { cecHours } = course; renderBadge(cecHours);'],
+  ['member read (JSX render)', `const X = () => <span>{course.cecHours} CECs</span>;`],
+  ['member read in marketing string', 'const copy = `Earn ${course.cecHours} IICRC CECs`;'],
+  ['member read eligibility boolean', 'const show = enrollment.cecHours != null && enrollment.cecHours > 0;'],
+  ['optional-chain member read', 'const n = row?.cecHours ?? 0;'],
+  ['computed / bracket access', "const n = course['cecHours'];"],
+  ['computed access double-quote', 'const n = course["cecHours"];'],
+  ['destructure (shorthand)', 'const { cecHours } = course; renderBadge(cecHours);'],
+  ['destructure (aliased)', 'const { cecHours: raw } = course; renderBadge(raw);'],
+  [
+    'destructure (multiline)',
+    'const {\n  slug,\n  cecHours,\n  title,\n} = course;',
+  ],
+  ['assignment-target destructure', 'let cecHours; ({ cecHours } = course);'],
+  ['Prisma select of raw column', 'const q = { select: { slug: true, cecHours: true } };'],
+  [
+    'Prisma select multiline',
+    'const q = {\n  select: {\n    slug: true,\n    cecHours: true,\n  },\n};',
+  ],
   ['discipline as eligibility (Boolean)', 'const eligible = Boolean(course.iicrcDiscipline) && isCecCourse;'],
-  ['discipline as eligibility (truthy || in CEC ctx)', 'return cecApproved || Boolean(course.iicrcDiscipline?.trim()); // cec eligibility'],
-  ['discipline as eligibility (if + submission)', 'if (course.iicrcDiscipline) { return submitCecToIicrc(); }'],
+  ['discipline as eligibility (|| in CEC fn)', 'function isCecEligible(c) { return cecApproved || Boolean(c.iicrcDiscipline); }'],
+  ['discipline as eligibility (double negation)', 'const cecOk = !!course.iicrcDiscipline;'],
+  ['discipline as eligibility (if + submission)', 'function f(c){ if (c.iicrcDiscipline) { return submitCec(); } return null; }'],
+  ['discipline snake as eligibility', 'function f(c){ return c.iicrc_discipline ? cecEligible : false; }'],
+  [
+    'discipline as eligibility (multiline)',
+    'function isEligibleForCec(course) {\n  return (\n    Boolean(course.iicrcDiscipline)\n  );\n}',
+  ],
 ];
 
-// Each MUST_PASS line must produce NO findings — these are the gate's own outputs / legit reads.
+// Each MUST_PASS case must produce NO findings — gate outputs / legit reads.
 const MUST_PASS = [
-  ['resolved snake DTO render', `<span>{course.cec_hours} CECs</span>`],
-  ['resolved renamed field render', `<span>{enrollment.resolvedCecHours} CEC</span>`],
-  ['resolved renamed eligibility', 'return enrollment.resolvedCecHours != null && enrollment.resolvedCecHours > 0;'],
+  ['resolved snake DTO render', `const X = () => <span>{course.cec_hours} CECs</span>;`],
+  ['renamed resolved field render', `const X = () => <span>{enrollment.resolvedCecHours} CEC</span>;`],
+  ['renamed resolved eligibility', 'function f(e){ return e.resolvedCecHours != null && e.resolvedCecHours > 0; }'],
+  ['renamed label prop', `const X = () => <Thumb cecHoursLabel={course.cec_hours} />;`],
   ['discipline display default (nullish)', `const meta = \`\${c.iicrc_discipline ?? '—'} · \${c.cec_hours} CEC\`;`],
-  ['discipline badge display', '<StatusBadge label={enrollment.discipline} tone="info" />'],
-  ['discipline plain label read (no eligibility)', 'const disc = course.iicrcDiscipline; setLabel(disc);'],
-  ['resolver-input object key (value has no raw read)', 'formatLmsCourseCecHoursLabel({ slug: c.slug, cecHours: null });'],
-  ['type/prop declaration', '  cecHours?: number | null;'],
-  ['snake DTO type declaration', '  cec_hours?: string | null;'],
+  ['discipline conditional DISPLAY in JSX', `const X = () => <div>{course.iicrc_discipline && <Badge>{course.iicrc_discipline} CEC</Badge>}</div>;`],
+  ['discipline badge display', `const X = () => <StatusBadge label={enrollment.discipline} />;`],
+  ['discipline plain label read (no CEC context)', 'const disc = course.iicrcDiscipline; setLabel(disc);'],
+  ['resolver-input object key (value not a raw read)', 'formatLmsCourseCecHoursLabel({ slug: c.slug, cecHours: null });'],
+  ['object write with resolver value', 'const dto = { resolvedCecHours: resolveLmsCourseCecHours({ slug }) };'],
+  ['type/prop declaration', 'type T = { cecHours?: number | null };'],
+  ['snake DTO type declaration', 'type T = { cec_hours?: string | null };'],
+  ['function param named cecHours (bare)', 'function has(cecHours) { return Number(cecHours) > 0; }'],
   ['comment mentioning cecHours', '// the stored cecHours column is WP-import pollution'],
-  ['resolver call by slug only', 'cecHours: resolveLmsCourseCecHours({ slug: e.course.slug }),'],
 ];
 
 let failed = 0;
 
-for (const [name, line] of MUST_BLOCK) {
-  const findings = evaluateFile('fixture.tsx', line);
+for (const [name, src] of MUST_BLOCK) {
+  const findings = evaluateFile('fixture.tsx', src);
   if (findings.length === 0) {
-    console.error(`✖ MUST BLOCK but passed: ${name}\n    ${line}`);
+    console.error(`✖ MUST BLOCK but passed: ${name}\n    ${src.replace(/\n/g, ' ')}`);
     failed++;
   }
 }
 
-for (const [name, line] of MUST_PASS) {
-  const findings = evaluateFile('fixture.tsx', line);
+for (const [name, src] of MUST_PASS) {
+  const findings = evaluateFile('fixture.tsx', src);
   if (findings.length > 0) {
-    console.error(`✖ MUST PASS but blocked: ${name}\n    ${line}\n    ${findings.join('\n    ')}`);
+    console.error(
+      `✖ MUST PASS but blocked: ${name}\n    ${src.replace(/\n/g, ' ')}\n    ${findings.join('\n    ')}`
+    );
     failed++;
   }
-}
-
-// Unit-level sanity: the two detectors are independently non-vacuous.
-if (!readsRawCecColumn('x.cecHours')) {
-  console.error('✖ readsRawCecColumn failed to detect a member read');
-  failed++;
-}
-if (readsRawCecColumn('x.cec_hours')) {
-  console.error('✖ readsRawCecColumn wrongly flagged the resolved snake DTO field');
-  failed++;
-}
-if (!usesDisciplineAsEligibility('const ok = Boolean(c.iicrcDiscipline); // cec')) {
-  console.error('✖ usesDisciplineAsEligibility failed to detect an eligibility use');
-  failed++;
 }
 
 if (failed > 0) {

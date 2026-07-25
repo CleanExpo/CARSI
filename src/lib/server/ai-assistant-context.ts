@@ -154,7 +154,6 @@ export async function getAssistantPageFocusContext(
       level: true,
       category: true,
       iicrcDiscipline: true,
-      cecHours: true,
       durationHours: true,
       meta: true,
       tags: true,

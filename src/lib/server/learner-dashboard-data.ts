@@ -74,7 +74,6 @@ function mapEnrollmentRow(
       title: string;
       slug: string;
       thumbnailUrl: string | null;
-      cecHours: unknown;
       durationHours: unknown;
       modules: { lessons: { id: string; title: string }[] }[];
     };
@@ -146,7 +145,6 @@ export async function getLearnerDashboardSummary(
           select: {
             title: true,
             slug: true,
-            cecHours: true,
             durationHours: true,
             thumbnailUrl: true,
             modules: {

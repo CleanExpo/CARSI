@@ -124,7 +124,6 @@ type EnrollmentRow = {
     slug: string;
     title: string;
     iicrcDiscipline: string | null;
-    cecHours: number | null;
     modules: { lessons: { id: string }[] }[];
   };
 };
@@ -281,7 +280,6 @@ const enrollmentSelect = {
       slug: true,
       title: true,
       iicrcDiscipline: true,
-      cecHours: true,
       modules: {
         orderBy: { orderIndex: 'asc' },
         select: {

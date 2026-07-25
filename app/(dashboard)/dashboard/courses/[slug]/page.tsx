@@ -123,7 +123,7 @@ export default async function DashboardCourseDetailPage({
             isFree={course.is_free || priceNum === 0}
             moduleCount={course.module_count ?? null}
             level={course.level}
-            cecHours={course.cec_hours}
+            cecHoursLabel={course.cec_hours}
             durationHours={course.duration_hours}
             shortDescription={course.short_description}
             instructorName={course.instructor?.full_name ?? null}

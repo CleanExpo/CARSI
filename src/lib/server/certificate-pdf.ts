@@ -33,7 +33,8 @@ export type CompletionCertificateData = {
   completedDate: Date;
   issuedDate?: Date;
   discipline?: string;
-  cecHours?: number | null;
+  /** Registry-resolved CEC hours (GP-498) — the gate output, NOT the raw `cecHours` column. */
+  resolvedCecHours?: number | null;
   courseLevel?: string | null;
   credentialId?: string;
 };
@@ -310,7 +311,7 @@ export async function buildCompletionCertificatePdf(
     completedDate,
     issuedDate,
     discipline: disciplineRaw,
-    cecHours,
+    resolvedCecHours,
     courseLevel,
     credentialId,
   } = params;
@@ -465,7 +466,7 @@ export async function buildCompletionCertificatePdf(
   const completedStr = formatAuDate(completedDate);
   const issuedStr = formatAuDate(issuedDate ?? completedDate);
   const credRef = credentialId ? formatCredentialRef(credentialId) : '—';
-  const cecStr = formatCecHoursForCertificate(cecHours);
+  const cecStr = formatCecHoursForCertificate(resolvedCecHours);
   const levelStr = courseLevel?.trim() ? courseLevel.trim() : 'Professional development';
   const discName = disciplineLabel(discCode);
 
@@ -606,7 +607,7 @@ export function completionCertificateDataFromEnrollment(
     completedDate: row.completedAt,
     issuedDate: row.certificateIssuedAt ?? row.completedAt,
     discipline: row.course.iicrcDiscipline?.trim() || undefined,
-    cecHours: resolveLmsCourseCecHours(cecSource),
+    resolvedCecHours: resolveLmsCourseCecHours(cecSource),
     courseLevel: row.course.level,
     credentialId: row.id,
   };

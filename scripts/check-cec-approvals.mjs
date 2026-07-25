@@ -121,6 +121,32 @@ registry.approvals.forEach((entry, i) => {
   }
 });
 
+// Catalogue ↔ registry consistency (licence-critical, GP-498). `resolveCatalogCecHours`
+// (data/seed/cec-hours.ts) treats an explicit positive `cecHours` in courses-catalog.json as a
+// founder-set approval when the registry has no entry. That is only safe if the catalogue can
+// never hold a positive value that the registry has NOT approved. Enforce exactly that here:
+// any catalogue course advertising cecHours > 0 MUST have an `approved` registry entry. This
+// keeps the approvals registry the effective single source of truth without changing the
+// resolver — an unapproved positive can never reach it, so no future caller can surface one.
+const approvedSlugs = new Set(
+  registry.approvals
+    .filter((e) => e && e.status === 'approved' && typeof e.slug === 'string')
+    .map((e) => e.slug.trim().toLowerCase())
+);
+for (const course of Array.isArray(catalog?.courses) ? catalog.courses : []) {
+  const hours = course?.cecHours;
+  if (typeof hours === 'number' && Number.isFinite(hours) && hours > 0) {
+    const slug = typeof course.slug === 'string' ? course.slug.trim() : '';
+    if (!slug || !approvedSlugs.has(slug.toLowerCase())) {
+      fail(
+        `courses-catalog.json course "${slug || '(no slug)'}" advertises cecHours ${hours} but has no ` +
+          `approved registry entry — CEC hours require a founder-confirmed IICRC approval in ` +
+          `cec-approvals.json. Set cecHours: 0 or add the registry approval.`
+      );
+    }
+  }
+}
+
 if (errors.length > 0) {
   console.error(`\n✖ CEC approvals registry check failed — ${errors.length} issue(s)\n`);
   console.error(errors.map((e) => `  ${e}`).join('\n'));
