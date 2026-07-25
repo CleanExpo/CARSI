@@ -646,7 +646,7 @@ export function AdminCoursesList() {
                   category={c.category}
                   level={c.level}
                   iicrcDiscipline={c.iicrcDiscipline}
-                  cecHours={c.cecHours ?? c.resolvedCecHours}
+                  cecHours={c.resolvedCecHours}
                   durationHours={c.durationHours ?? c.resolvedDurationHours}
                 />
                 {c.cecMissing ? (
