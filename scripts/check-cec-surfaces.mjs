@@ -28,11 +28,23 @@
  * Fix a flagged surface by routing it through `resolveLmsCourseCecHours` /
  * `getApprovedCecHours` / `courseEligibleForIicrcCecSubmission`, never by weakening this guard.
  *
- * KNOWN LIMIT (documented, not hidden): a name-based rule cannot chase an arbitrary rename of
- * the raw value into a fresh local before it is rendered. That is bounded here by ALSO
- * forbidding the raw column from being selected/read outside the cluster, so a raw value
- * cannot legitimately enter a surface to be renamed. Full type-flow proof would need the type
- * checker; this is the deterministic backstop.
+ * CAUGHT (deterministically, AST): member reads, computed reads by string literal AND by a
+ * constant identifier key (`const k = 'cecHours'; x[k]`), aliased / multiline destructuring,
+ * Prisma `cecHours: true` selects, and `iicrcDiscipline` (plus intra-file aliases like
+ * `const { iicrcDiscipline: d } = c`) used as a CEC/eligibility boolean.
+ *
+ * KNOWN LIMIT (documented, not hidden): two shapes are undecidable for a name-based AST rule
+ * and would need the TYPE CHECKER (type-aware taint analysis):
+ *   (a) a Prisma query that omits an explicit projection returns the raw `cecHours` column,
+ *       which a WHOLE-RECORD spread/serialisation (`return Response.json(row)`, `{ ...row }`)
+ *       could carry to output without any property read; and
+ *   (b) a dynamic RUNTIME key (`obj[expr]` where expr is computed at runtime).
+ * These are bounded by layered defence, not by this guard alone: the raw column is never
+ * explicitly selected or read outside the cluster (rules above); the resolvers are fail-closed
+ * and the approvals registry is the SSOT; and the current tree has NO whole-record spread of a
+ * course/enrollment row (the one API serialisation, app/api/lms/courses/[slug]/route.ts,
+ * returns the resolved DTO whose CEC field is the snake-case `cec_hours` string, not the raw
+ * column). Closing (a)/(b) fully is a separate type-checker-based effort.
  *
  *   node scripts/check-cec-surfaces.mjs     # scan tracked app code (CI + manual)
  */
@@ -242,17 +254,57 @@ export function evaluateFile(file, text) {
     findings.push(`  ${file}:${lineOf(node)}: ${msg}\n    → ${snip(node)}`);
   }
 
+  // Pass 1: collect intra-file aliases so constant-computed access (`const k = 'cecHours'`)
+  // and aliased discipline eligibility (`const { iicrcDiscipline: d } = c`) — which a purely
+  // local read cannot see — are still caught.
+  const cecKeyIdents = new Set(); // const NAME = 'cecHours'
+  const disciplineAliases = new Set(); // local names bound to iicrc(_)Discipline
+  (function collect(node) {
+    if (ts.isVariableDeclaration(node) && node.initializer && ts.isIdentifier(node.name)) {
+      if (ts.isStringLiteralLike(node.initializer) && node.initializer.text === RAW_FIELD) {
+        cecKeyIdents.add(node.name.text);
+      }
+      if (
+        ts.isPropertyAccessExpression(node.initializer) &&
+        DISCIPLINE_NAMES.has(node.initializer.name.text)
+      ) {
+        disciplineAliases.add(node.name.text);
+      }
+    }
+    if (ts.isBindingElement(node) && node.parent && ts.isObjectBindingPattern(node.parent)) {
+      const src = propName(node.propertyName) ?? propName(node.name);
+      if (src && DISCIPLINE_NAMES.has(src) && ts.isIdentifier(node.name)) {
+        disciplineAliases.add(node.name.text);
+      }
+    }
+    ts.forEachChild(node, collect);
+  })(sf);
+
+  // Is this Identifier an actual READ (not a declaration name, property key, or `.name` part)?
+  function isBareIdentifierRead(node) {
+    if (!ts.isIdentifier(node)) return false;
+    const p = node.parent;
+    if (!p) return false;
+    if ((ts.isVariableDeclaration(p) || ts.isParameter(p) || ts.isBindingElement(p)) && p.name === node) {
+      return false;
+    }
+    if (ts.isBindingElement(p) && p.propertyName === node) return false;
+    if (ts.isPropertyAccessExpression(p) && p.name === node) return false;
+    if ((ts.isPropertyAssignment(p) || ts.isShorthandPropertyAssignment(p)) && p.name === node) return false;
+    return true;
+  }
+
   function visit(node) {
     // 1. member read: X.cecHours
     if (ts.isPropertyAccessExpression(node) && node.name.text === RAW_FIELD) {
       push(node, rawMsg);
     }
-    // 2. computed read: X['cecHours']
+    // 2. computed read: X['cecHours'] or X[k] where `const k = 'cecHours'`.
     else if (
       ts.isElementAccessExpression(node) &&
       node.argumentExpression &&
-      ts.isStringLiteralLike(node.argumentExpression) &&
-      node.argumentExpression.text === RAW_FIELD
+      ((ts.isStringLiteralLike(node.argumentExpression) && node.argumentExpression.text === RAW_FIELD) ||
+        (ts.isIdentifier(node.argumentExpression) && cecKeyIdents.has(node.argumentExpression.text)))
     ) {
       push(node, rawMsg);
     }
@@ -308,6 +360,18 @@ export function evaluateFile(file, text) {
         ts.isStringLiteralLike(node.argumentExpression) &&
         DISCIPLINE_NAMES.has(node.argumentExpression.text))
     ) {
+      if (
+        !isInsideJsx(node) &&
+        inBooleanContext(node) &&
+        CEC_PROXIMITY.test(decisionContextText(node, sf))
+      ) {
+        push(node, discMsg);
+      }
+    }
+    // 5b. aliased discipline eligibility: a read of a local that was bound to iicrcDiscipline
+    //     (`const { iicrcDiscipline: d } = c` / `const d = c.iicrcDiscipline`) used in a
+    //     boolean CEC/eligibility decision.
+    else if (isBareIdentifierRead(node) && disciplineAliases.has(node.text)) {
       if (
         !isInsideJsx(node) &&
         inBooleanContext(node) &&

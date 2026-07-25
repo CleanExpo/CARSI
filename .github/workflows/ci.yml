@@ -113,6 +113,12 @@ jobs:
       - name: CEC approvals registry check
         run: npm run check:cec
 
+      # Proves the registry validator (incl. the catalogue↔registry consistency that keeps the
+      # registry the effective SSOT) is non-vacuous: numeric-string and other coercible cecHours
+      # values fail closed.
+      - name: CEC approvals validator self-test
+        run: npm run test:cec
+
       # Licence-critical (2026-07-15 incident): CARSI nearly published "Search the
       # IICRC S520 for the word 'hydroxyl' — it isn't there", which S520:2024 §9.1.7
       # refutes. CARSI's authority IS knowing the standards, so a false claim about

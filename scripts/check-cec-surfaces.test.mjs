@@ -23,6 +23,9 @@ const MUST_BLOCK = [
     'const {\n  slug,\n  cecHours,\n  title,\n} = course;',
   ],
   ['assignment-target destructure', 'let cecHours; ({ cecHours } = course);'],
+  ['computed access via const string key', "const k = 'cecHours'; const n = course[k];"],
+  ['aliased-shorthand discipline eligibility', 'function f(c){ const { iicrcDiscipline: d } = c; return Boolean(d) && isCec; }'],
+  ['aliased-var discipline eligibility', 'function f(c){ const disc = c.iicrcDiscipline; const cecOk = Boolean(disc); return cecOk; }'],
   ['Prisma select of raw column', 'const q = { select: { slug: true, cecHours: true } };'],
   [
     'Prisma select multiline',
@@ -54,6 +57,8 @@ const MUST_PASS = [
   ['type/prop declaration', 'type T = { cecHours?: number | null };'],
   ['snake DTO type declaration', 'type T = { cec_hours?: string | null };'],
   ['function param named cecHours (bare)', 'function has(cecHours) { return Number(cecHours) > 0; }'],
+  ['non-cec const key computed access', "const k = 'title'; const t = course[k];"],
+  ['aliased discipline used for DISPLAY only', 'function f(c){ const { iicrcDiscipline: d } = c; return d ? d.toUpperCase() : "n/a"; }'],
   ['comment mentioning cecHours', '// the stored cecHours column is WP-import pollution'],
 ];
 

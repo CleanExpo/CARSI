@@ -484,7 +484,6 @@ export function AdminUserDetailClient({
     setActionError(null);
     setActionSuccess(null);
 
-    const enrollment = user.enrollments.find((e) => e.enrollmentId === enrollmentId);
     const iicrcMemberNumber = user.iicrcMemberNumber?.trim();
     if (!iicrcMemberNumber) {
       setActionError('Add an IICRC member number to this learner profile before sending renewal email.');
@@ -502,7 +501,8 @@ export function AdminUserDetailClient({
           enrollmentId,
           studentId: user.userId,
           iicrcMemberNumber,
-          cecHours: enrollment?.resolvedCecHours ?? null,
+          // GP-498: no cecHours override — the submission resolver derives CEC solely from the
+          // approvals registry, so an override is inert. Not sent, to keep the payload honest.
         }),
       });
       const payload = (await res.json().catch(() => ({}))) as {
