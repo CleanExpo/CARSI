@@ -63,10 +63,10 @@ const chartTooltipProps = {
 } as const;
 
 function isCecEligibleEnrollment(enrollment: AdminCourseProgressForUser): boolean {
-  return (
-    (enrollment.cecHours != null && enrollment.cecHours > 0) ||
-    Boolean(enrollment.discipline?.trim())
-  );
+  // Registry-only, fail-closed (GP-498). Eligibility derives SOLELY from registry-resolved CEC
+  // hours. A non-empty discipline is NOT IICRC approval and must never make an enrollment
+  // CEC-eligible on its own (that was the fail-open leak). Mirrors courseEligibleForIicrcCecSubmission.
+  return enrollment.resolvedCecHours != null && enrollment.resolvedCecHours > 0;
 }
 
 function CourseEnrollmentCard({
@@ -135,8 +135,8 @@ function CourseEnrollmentCard({
               {enrollment.discipline ? (
                 <StatusBadge label={enrollment.discipline} tone="info" />
               ) : null}
-              {enrollment.cecHours != null && enrollment.cecHours > 0 ? (
-                <span className="text-xs text-white/45">{enrollment.cecHours} CEC</span>
+              {enrollment.resolvedCecHours != null && enrollment.resolvedCecHours > 0 ? (
+                <span className="text-xs text-white/45">{enrollment.resolvedCecHours} CEC</span>
               ) : null}
             </div>
             <h3 className="text-lg font-semibold tracking-tight text-white/95">{enrollment.courseTitle}</h3>
@@ -502,7 +502,7 @@ export function AdminUserDetailClient({
           enrollmentId,
           studentId: user.userId,
           iicrcMemberNumber,
-          cecHours: enrollment?.cecHours ?? null,
+          cecHours: enrollment?.resolvedCecHours ?? null,
         }),
       });
       const payload = (await res.json().catch(() => ({}))) as {
@@ -863,8 +863,8 @@ export function AdminUserDetailClient({
                       >
                         <div className="min-w-0">
                           <p className="truncate text-xs font-medium text-white/80">{e.courseTitle}</p>
-                          {e.cecHours != null && e.cecHours > 0 ? (
-                            <p className="text-[10px] text-white/40">{e.cecHours} CEC hours</p>
+                          {e.resolvedCecHours != null && e.resolvedCecHours > 0 ? (
+                            <p className="text-[10px] text-white/40">{e.resolvedCecHours} CEC hours</p>
                           ) : null}
                         </div>
                         {alreadySent ? (

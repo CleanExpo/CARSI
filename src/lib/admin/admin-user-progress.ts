@@ -22,7 +22,9 @@ export type AdminCourseProgressForUser = {
   enrolledAt: string;
   completedAt: string | null;
   paymentReference: string | null;
-  cecHours: number | null;
+  /** Registry-resolved CEC hours (GP-498) — null when the course has no IICRC approval.
+   *  Named distinctly from the raw `cecHours` column so no surface can render the stale value. */
+  resolvedCecHours: number | null;
   discipline: string | null;
   totalLessons: number;
   completedLessons: number;
@@ -225,7 +227,7 @@ export function mapUserToAdminProgress(
       // REGISTRY-ONLY, FAIL-CLOSED (GP-498). The admin user-detail view derives IICRC-submission
       // eligibility and the "N CEC" badge from this value — so it must be the gated registry
       // figure, never the stale WP-import `cecHours`. No approval → null (ineligible, no badge).
-      cecHours: resolveLmsCourseCecHours({ slug: e.course.slug }),
+      resolvedCecHours: resolveLmsCourseCecHours({ slug: e.course.slug }),
       discipline: e.course.iicrcDiscipline,
       totalLessons,
       completedLessons,

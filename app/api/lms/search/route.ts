@@ -59,7 +59,9 @@ export async function GET(request: NextRequest) {
         // from the approvals registry via the gate; no approval → null (no CEC in search).
         cec_hours: formatLmsCourseCecHoursLabel({
           slug: course.slug,
-          cecHours: typeof course.cecHours === 'number' ? course.cecHours : null,
+          // Registry-only (GP-498): the label resolves solely from the approvals registry by
+          // slug; the stored `cecHours` column is WP-import pollution and is not read.
+          cecHours: null,
           iicrcDiscipline: course.iicrcDiscipline,
         }),
         is_onboarding: onboarding,

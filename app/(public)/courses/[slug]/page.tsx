@@ -103,7 +103,7 @@ function getResolvedCourseMarketing(
         title: course.title,
         designationName: designation?.name,
         disciplineTopic: designation?.disciplineTopic,
-        cecHours: course.cec_hours,
+        cecHoursLabel: course.cec_hours,
       }),
       imageAlt: course.title,
     },
@@ -168,7 +168,7 @@ export async function generateMetadata({
       title: course.title,
       designationName: designation?.name,
       disciplineTopic: designation?.disciplineTopic,
-      cecHours: course.cec_hours,
+      cecHoursLabel: course.cec_hours,
     });
   const imageAlt = card?.imageAlt ?? course.title;
 

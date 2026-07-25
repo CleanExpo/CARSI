@@ -589,10 +589,10 @@ export function completionCertificateDataFromEnrollment(
   const studentName = certificateHolderDisplayName(row.student);
   const cecSource: LmsCourseCecSource = {
     slug: row.course.slug,
-    cecHours:
-      row.course.cecHours != null && row.course.cecHours !== ''
-        ? Number(row.course.cecHours)
-        : null,
+    // Registry-only (GP-498): the stored `cecHours` column is WP-import pollution and is
+    // deliberately not passed — `resolveLmsCourseCecHours` resolves solely from the approvals
+    // registry by slug, so reading the raw column here would be dead and misleading.
+    cecHours: null,
     shortDescription: row.course.shortDescription,
     description: row.course.description,
     meta: row.course.meta,
