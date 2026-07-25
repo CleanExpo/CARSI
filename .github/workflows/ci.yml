@@ -92,6 +92,14 @@ jobs:
       - name: IICRC / CEC compliance guard
         run: npm run check:iicrc-compliance
 
+      # Proves the compliance guard's specific-CEC-hour rule is non-vacuous: it fires on a
+      # static "earns/awards N IICRC CEC(s)" claim on a non-approved course (incl. the looser
+      # prose where IICRC is not adjacent to the number, and the "maintaining an existing IICRC
+      # certification" boilerplate that must NOT exempt a numbered claim) and stays silent on
+      # legitimate recert-cadence facts and generic no-number framing. An inert rule turns this red.
+      - name: IICRC / CEC compliance guard self-test
+        run: npm run test:iicrc-compliance
+
       # Licence-critical STRUCTURAL backstop (GP-498): scans the whole application (app/, src/)
       # for the leak class the copy scanner cannot see — any code that reads the RAW course CEC
       # column (`.cecHours`) or uses `iicrcDiscipline` as a CEC/eligibility signal outside the
