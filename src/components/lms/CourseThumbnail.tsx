@@ -18,7 +18,7 @@ interface CourseThumbnailProps {
   moduleCount?: number | null;
   lessonCount?: number | null;
   level?: string | null;
-  cecHours?: string | null;
+  cecHoursLabel?: string | null;
   durationHours?: string | null;
   shortDescription?: string | null;
   instructorName?: string | null;
@@ -36,7 +36,7 @@ export function CourseThumbnail({
   moduleCount,
   lessonCount,
   level,
-  cecHours,
+  cecHoursLabel,
   durationHours,
   shortDescription,
   instructorName,
@@ -82,7 +82,7 @@ export function CourseThumbnail({
           moduleCount={moduleCount}
           lessonCount={lessonCount}
           level={level}
-          cecHours={cecHours}
+          cecHoursLabel={cecHoursLabel}
           durationHours={durationHours}
           shortDescription={shortDescription}
           instructorName={instructorName}

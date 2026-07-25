@@ -33,7 +33,8 @@ export type CompletionCertificateData = {
   completedDate: Date;
   issuedDate?: Date;
   discipline?: string;
-  cecHours?: number | null;
+  /** Registry-resolved CEC hours (GP-498) — the gate output, NOT the raw `cecHours` column. */
+  resolvedCecHours?: number | null;
   courseLevel?: string | null;
   credentialId?: string;
 };
@@ -310,7 +311,7 @@ export async function buildCompletionCertificatePdf(
     completedDate,
     issuedDate,
     discipline: disciplineRaw,
-    cecHours,
+    resolvedCecHours,
     courseLevel,
     credentialId,
   } = params;
@@ -465,7 +466,7 @@ export async function buildCompletionCertificatePdf(
   const completedStr = formatAuDate(completedDate);
   const issuedStr = formatAuDate(issuedDate ?? completedDate);
   const credRef = credentialId ? formatCredentialRef(credentialId) : '—';
-  const cecStr = formatCecHoursForCertificate(cecHours);
+  const cecStr = formatCecHoursForCertificate(resolvedCecHours);
   const levelStr = courseLevel?.trim() ? courseLevel.trim() : 'Professional development';
   const discName = disciplineLabel(discCode);
 
@@ -589,10 +590,10 @@ export function completionCertificateDataFromEnrollment(
   const studentName = certificateHolderDisplayName(row.student);
   const cecSource: LmsCourseCecSource = {
     slug: row.course.slug,
-    cecHours:
-      row.course.cecHours != null && row.course.cecHours !== ''
-        ? Number(row.course.cecHours)
-        : null,
+    // Registry-only (GP-498): the stored `cecHours` column is WP-import pollution and is
+    // deliberately not passed — `resolveLmsCourseCecHours` resolves solely from the approvals
+    // registry by slug, so reading the raw column here would be dead and misleading.
+    cecHours: null,
     shortDescription: row.course.shortDescription,
     description: row.course.description,
     meta: row.course.meta,
@@ -606,7 +607,7 @@ export function completionCertificateDataFromEnrollment(
     completedDate: row.completedAt,
     issuedDate: row.certificateIssuedAt ?? row.completedAt,
     discipline: row.course.iicrcDiscipline?.trim() || undefined,
-    cecHours: resolveLmsCourseCecHours(cecSource),
+    resolvedCecHours: resolveLmsCourseCecHours(cecSource),
     courseLevel: row.course.level,
     credentialId: row.id,
   };

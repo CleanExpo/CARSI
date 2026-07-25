@@ -148,17 +148,18 @@ function resolvedCecHoursForCourse(
     durationHours?: number | null;
     iicrcDiscipline?: string | null;
   },
-  override?: number | null
+  // Deliberately unused (GP-498): see note below. Kept so callers may still pass the legacy
+  // admin override without a signature change; it no longer affects the exported hours.
+  _override?: number | null
 ): number | null {
-  const direct =
-    typeof override === 'number' && Number.isFinite(override) && override > 0 ? override : null;
-  if (direct != null) return direct;
+  // REGISTRY-ONLY, FAIL-CLOSED (licence-critical, GP-498). The CEC hours emailed to the IICRC and
+  // written onto the submission record MUST equal the founder-approved registry value — never an
+  // arbitrary admin override and never the stale DB cecHours. Trusting an override would let the
+  // system email the IICRC a CEC count the registry never approved, breaking the registry as the
+  // single source of truth. Hours resolve solely from the approvals registry (by slug).
   return resolveLmsCourseCecHours({
     slug: course.slug,
-    cecHours:
-      course.cecHours != null && course.cecHours !== ''
-        ? Number(course.cecHours)
-        : null,
+    cecHours: null,
     shortDescription: course.shortDescription,
     description: course.description,
     meta: course.meta,
@@ -838,7 +839,9 @@ export async function listIicrcCecSubmissionsForAdmin(options?: {
     renewal_status: r.renewalStatus,
     initiated_by_admin_email: r.initiatedByAdminEmail,
     communication_count: countBySubmission.get(r.id) ?? 0,
-    cec_hours: r.cecHours,
+    // REGISTRY-ONLY, FAIL-CLOSED (GP-498). Show the current registry-approved CEC hours (by slug),
+    // not the persisted snapshot, so historical fail-open rows don't keep displaying stale CEC.
+    cec_hours: resolveLmsCourseCecHours({ slug: r.course.slug }),
     iicrc_discipline: r.iicrcDiscipline,
     iicrc_member_number: r.iicrcMemberNumber,
     recipient_email: r.recipientEmail,

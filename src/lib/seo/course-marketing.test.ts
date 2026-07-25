@@ -182,13 +182,13 @@ describe('buildCourseFallbackKeywords', () => {
   };
 
   it.each([undefined, null, '', '0', 0, 'not-a-number'])('omits CEC/IICRC wording without positive evidence: %s', (cecHours) => {
-    expect(buildCourseFallbackKeywords({ ...base, cecHours })).not.toEqual(
+    expect(buildCourseFallbackKeywords({ ...base, cecHoursLabel: cecHours })).not.toEqual(
       expect.arrayContaining([expect.stringMatching(/IICRC|CEC/i)]),
     );
   });
 
   it('allows qualified wording from explicit positive CEC evidence', () => {
-    expect(buildCourseFallbackKeywords({ ...base, cecHours: '2' })).toContain(
+    expect(buildCourseFallbackKeywords({ ...base, cecHoursLabel: '2' })).toContain(
       'IICRC Continuing Education Credit (CEC) course',
     );
   });
@@ -250,7 +250,7 @@ describe('current repository truth', () => {
           metaDescription: description,
           ogTitle: `${course.title} | CARSI`,
           ogDescription: description,
-          keywords: buildCourseFallbackKeywords({ title: course.title, cecHours: course.cecHours }),
+          keywords: buildCourseFallbackKeywords({ title: course.title, cecHoursLabel: course.cecHours }),
           imageAlt: course.title,
         },
       });

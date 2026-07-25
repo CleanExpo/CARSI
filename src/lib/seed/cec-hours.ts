@@ -79,24 +79,22 @@ export type CecResolvable = {
 };
 
 /**
- * CEC hours for a WP-export or catalog-shaped row: registry approval (by slug) →
- * explicit founder-set `cec_hours` → null. Nothing is derived.
+ * CEC hours for a WP-export / LmsCourse DB row: registry approval (by slug) → null.
+ *
+ * REGISTRY-ONLY (licence-critical, GP-498, 2026-07-25). This path reads `row.cec_hours`
+ * from WordPress-imported `LmsCourse` DB rows, whose stored `cec_hours` values are stale
+ * import data the IICRC never approved. Trusting a stored positive here rendered
+ * "N IICRC CECs, exportable for IICRC submission" on unapproved courses on prod
+ * (fundamental-business-framework=4, glass-cleaning-course=1, donning/doffing-PPE=1).
+ * The stored DB column is therefore NOT a founder-approval signal and is never consulted.
+ * The founder-set mechanism lives in the git-controlled catalog (`resolveCatalogCecHours`,
+ * `data/seed/courses-catalog.json`) and the approvals registry — not this legacy column.
+ * Absence of a registry approval yields null (no CEC), never a stored or derived value.
  */
 export function resolveCecHours(row: CecResolvable): number | null {
-  // The approvals registry is the SSOT: a recorded IICRC approval wins outright.
-  const fromRegistry = getApprovedCecHours(row.slug);
-  if (fromRegistry != null) return fromRegistry;
-
-  const explicit = parsePositiveHours(row.cec_hours);
-  // Explicit 0 is a deliberate opt-out: the course has NOT been approved by IICRC for
-  // CECs. Claiming CECs without IICRC approval is a licence-critical defect (founder
-  // directive 2026-07-09).
-  if (explicit === 0) return null;
-  if (explicit != null) return explicit;
-
-  // Fail-closed: no approval recorded and no explicit value — no CEC claim. Duration,
-  // prose and meta are NOT approval and are never consulted.
-  return null;
+  // Registry is the ONLY trusted source on the WP/DB path; the stored `cec_hours`
+  // column is WP-import pollution and is deliberately ignored (fail-closed).
+  return getApprovedCecHours(row.slug) ?? null;
 }
 
 export function enrichCourseWithCecHours<T extends CecResolvable>(

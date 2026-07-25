@@ -34,15 +34,15 @@ export function resolveEffectiveCecHours(course: {
   durationHours?: number | null;
   iicrcDiscipline?: string | null;
 }): number | null {
-  const direct = toFiniteNumber(course.cecHours);
-  if (direct !== null && direct > 0) return direct;
-
+  // REGISTRY-ONLY, FAIL-CLOSED (licence-critical, GP-498). The stored `cecHours` is NOT
+  // consulted — it is WP-import pollution, not IICRC approval. CEC hours resolve solely from
+  // the founder-confirmed approvals registry (by slug); no slug → no CEC.
   const slug = course.slug?.trim();
-  if (!slug) return direct;
+  if (!slug) return null;
 
   return resolveLmsCourseCecHours({
     slug,
-    cecHours: direct,
+    cecHours: null,
     shortDescription: course.shortDescription,
     description: course.description,
     meta: course.meta,
@@ -60,14 +60,9 @@ export function courseEligibleForIicrcCecSubmission(course: {
   meta?: unknown;
   durationHours?: number | null;
 }): boolean {
+  // Eligibility requires REGISTRY-APPROVED CEC hours only. A non-empty `iicrcDiscipline`
+  // string is NOT IICRC approval and must never make a course submission-eligible on its own
+  // (that was a fail-open path — GP-498). Auto-submit is separately fail-closed by config.
   const cec = resolveEffectiveCecHours(course);
-  if (cec !== null && cec > 0) return true;
-  const disc = course.iicrcDiscipline?.trim();
-  return Boolean(disc && disc !== '—' && disc !== '-');
-}
-
-function toFiniteNumber(v: unknown): number | null {
-  if (v === null || v === undefined) return null;
-  const n = typeof v === 'number' ? v : Number(v);
-  return Number.isFinite(n) ? n : null;
+  return cec !== null && cec > 0;
 }

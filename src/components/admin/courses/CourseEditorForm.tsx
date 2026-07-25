@@ -539,14 +539,16 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
             <section className={cn(panelClass, 'space-y-5 p-5 sm:p-6')}>
               <SectionTitle>IICRC &amp; programme record</SectionTitle>
               <p className="text-xs leading-relaxed text-white/45">
-                CEC hours appear on course listings, completion certificates, and learner credential
-                records. Leave blank only for non-training products (memberships, downloads).
+                Public CEC hours on listings, certificates and credentials come from the IICRC
+                approvals registry, not this field. This records the stored catalogue value for
+                reference only — editing it does not change what learners see. To publish or change
+                CEC hours, add a founder-confirmed approval to the registry.
               </p>
               {cecMissing && !cecExcluded ? (
                 <p className="rounded-lg border border-amber-500/35 bg-amber-500/10 px-3 py-2 text-xs text-amber-100">
-                  This course has no resolvable CEC hours
-                  {resolvedCecHours ? ` (effective: ${resolvedCecHours})` : ''}. Set CEC hours below
-                  before publishing to learners.
+                  This course has no registry-approved CEC hours, so it shows no CEC to learners. Add
+                  a founder-confirmed approval to the registry to publish CEC hours — editing the
+                  field below will not change the published value.
                 </p>
               ) : null}
               {cecExcluded ? (
@@ -570,10 +572,10 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
                     className={cn('h-11 tabular-nums', fieldClass)}
                     placeholder="e.g. 2"
                   />
-                  {!cecHours.trim() && !cecExcluded && resolvedCecHours ? (
+                  {!cecExcluded && resolvedCecHours ? (
                     <p className="text-xs text-white/45">
-                      Effective on site: {resolvedCecHours} CEC (resolved from the course
-                      catalogue). Set a value here to override.
+                      Effective on site: {resolvedCecHours} CEC — resolved from the IICRC approvals
+                      registry. This field is the stored catalogue value and does not override it.
                     </p>
                   ) : null}
                 </div>

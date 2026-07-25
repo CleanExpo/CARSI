@@ -33,7 +33,7 @@ type Row = {
   category?: string | null;
   level?: string | null;
   iicrcDiscipline?: string | null;
-  cecHours?: string | null;
+  cecHoursLabel?: string | null;
   durationHours?: string | null;
   resolvedCecHours?: string | null;
   cecMissing?: boolean;
@@ -90,7 +90,7 @@ function AdminCourseListThumb({
   category,
   level,
   iicrcDiscipline,
-  cecHours,
+  cecHoursLabel,
   durationHours,
 }: {
   thumbnailUrl: string | null;
@@ -102,7 +102,7 @@ function AdminCourseListThumb({
   category?: string | null;
   level?: string | null;
   iicrcDiscipline?: string | null;
-  cecHours?: string | null;
+  cecHoursLabel?: string | null;
   durationHours?: string | null;
 }) {
   const [failed, setFailed] = useState(false);
@@ -131,7 +131,7 @@ function AdminCourseListThumb({
       isFree={isFree}
       moduleCount={moduleCount}
       level={level}
-      cecHours={cecHours}
+      cecHoursLabel={cecHoursLabel}
       durationHours={durationHours}
       backdropImageSrc={backdrop}
       backdropImageLoading={eager ? 'eager' : 'lazy'}
@@ -646,7 +646,7 @@ export function AdminCoursesList() {
                   category={c.category}
                   level={c.level}
                   iicrcDiscipline={c.iicrcDiscipline}
-                  cecHours={c.cecHours ?? c.resolvedCecHours}
+                  cecHoursLabel={c.resolvedCecHours}
                   durationHours={c.durationHours ?? c.resolvedDurationHours}
                 />
                 {c.cecMissing ? (

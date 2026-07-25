@@ -92,12 +92,32 @@ jobs:
       - name: IICRC / CEC compliance guard
         run: npm run check:iicrc-compliance
 
+      # Licence-critical STRUCTURAL backstop (GP-498): scans the whole application (app/, src/)
+      # for the leak class the copy scanner cannot see — any code that reads the RAW course CEC
+      # column (`.cecHours`) or uses `iicrcDiscipline` as a CEC/eligibility signal outside the
+      # approvals-registry accessor cluster. This mechanically enumerates every leaking surface so
+      # the fix converges instead of being chased one surface at a time.
+      - name: CEC surface-leak guard
+        run: npm run check:cec-surfaces
+
+      # Proves the surface-leak guard is non-vacuous: it fires on every known leak shape and stays
+      # silent on the gate's own resolved outputs. Without this, an inert guard looks identical to a
+      # working one.
+      - name: CEC surface-leak guard self-test
+        run: npm run test:cec-surfaces
+
       # Licence-critical: validates data/seed/cec-approvals.json — the SSOT any displayed
       # CEC hours must come from. Slugs must exist in the catalog, approved hours are
       # whole numbers >= 1 and never exceed course educational hours (1 CEC = 1 contact
       # hour, iicrc.org). Fail-closed.
       - name: CEC approvals registry check
         run: npm run check:cec
+
+      # Proves the registry validator (incl. the catalogue↔registry consistency that keeps the
+      # registry the effective SSOT) is non-vacuous: numeric-string and other coercible cecHours
+      # values fail closed.
+      - name: CEC approvals validator self-test
+        run: npm run test:cec
 
       # Licence-critical (2026-07-15 incident): CARSI nearly published "Search the
       # IICRC S520 for the word 'hydroxyl' — it isn't there", which S520:2024 §9.1.7

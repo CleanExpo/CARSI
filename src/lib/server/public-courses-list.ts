@@ -38,7 +38,9 @@ function cecHoursLabelForRow(c: {
 }): string | null {
   return formatLmsCourseCecHoursLabel({
     slug: c.slug,
-    cecHours: c.cecHours,
+    // Registry-only (GP-498): stored `cecHours` is WP-import pollution; the label resolves
+    // solely from the approvals registry by slug, so the raw column is not read here.
+    cecHours: null,
     shortDescription: c.shortDescription,
     description: c.description,
     meta: c.meta,
@@ -380,7 +382,7 @@ export async function getPublishedCourseDetailBySlugFromDatabase(slug: string) {
     iicrc_discipline: row.iicrcDiscipline ?? null,
     cec_hours: cecHoursLabelForRow({
       slug: row.slug,
-      cecHours: row.cecHours,
+      cecHours: null,
       shortDescription: row.shortDescription,
       description: row.description,
       meta: row.meta,

@@ -97,13 +97,14 @@ export function buildCourseFallbackKeywords(opts: {
   title: string;
   designationName?: string | null;
   disciplineTopic?: string | null;
-  cecHours?: string | number | null;
+  /** Registry-resolved CEC label (the gate output), NOT the raw `cecHours` column (GP-498). */
+  cecHoursLabel?: string | number | null;
 }): string[] {
   return [
     opts.title,
     opts.designationName ?? '',
     opts.disciplineTopic ?? '',
-    ...(hasPositiveCecEvidence(opts.cecHours)
+    ...(hasPositiveCecEvidence(opts.cecHoursLabel)
       ? ['IICRC Continuing Education Credit (CEC) course']
       : []),
     'restoration course',

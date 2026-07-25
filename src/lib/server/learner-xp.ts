@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { resolveLmsCourseCecHours } from '@/lib/server/course-cec-hours';
 import {
   levelTitleFromLifetimeXp,
   lessonXpGrouped,
@@ -98,10 +99,13 @@ export async function getLearnerLevelPayload(studentId: string): Promise<Learner
 
   const cecRows = await prisma.lmsEnrollment.findMany({
     where: { studentId, status: 'completed', completedAt: { not: null } },
-    include: { course: { select: { cecHours: true } } },
+    include: { course: { select: { slug: true } } },
   });
+  // REGISTRY-ONLY, FAIL-CLOSED (GP-498). `total_cec_lifetime` is displayed to the learner —
+  // it must never sum the stale WP-import `cecHours`. Registry approval only (by slug); an
+  // unapproved course adds 0.
   const total_cec_lifetime = Math.round(
-    cecRows.reduce((s, e) => s + Number(e.course.cecHours ?? 0), 0) * 100,
+    cecRows.reduce((s, e) => s + (resolveLmsCourseCecHours({ slug: e.course.slug }) ?? 0), 0) * 100,
   ) / 100;
 
   return {

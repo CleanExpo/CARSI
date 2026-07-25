@@ -103,7 +103,7 @@ function getResolvedCourseMarketing(
         title: course.title,
         designationName: designation?.name,
         disciplineTopic: designation?.disciplineTopic,
-        cecHours: course.cec_hours,
+        cecHoursLabel: course.cec_hours,
       }),
       imageAlt: course.title,
     },
@@ -168,7 +168,7 @@ export async function generateMetadata({
       title: course.title,
       designationName: designation?.name,
       disciplineTopic: designation?.disciplineTopic,
-      cecHours: course.cec_hours,
+      cecHoursLabel: course.cec_hours,
     });
   const imageAlt = card?.imageAlt ?? course.title;
 
@@ -470,7 +470,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                   >
                     {course.short_description ??
                       course.description?.slice(0, 280) ??
-                      'Australian-produced restoration training — a CARSI credential that also earns IICRC CECs.'}
+                      'Australian-produced restoration training built for the Southern-Hemisphere restoration industry.'}
                   </p>
 
                   {/* Instructor */}
@@ -574,7 +574,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                       isFree={course.is_free || priceNum === 0}
                       moduleCount={course.module_count ?? null}
                       level={course.level}
-                      cecHours={course.cec_hours}
+                      cecHoursLabel={course.cec_hours}
                       durationHours={course.duration_hours}
                       shortDescription={course.short_description}
                       instructorName={course.instructor?.full_name ?? null}
@@ -887,7 +887,9 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                         className="mb-1 text-sm font-semibold"
                         style={{ color: 'rgba(255,255,255,0.85)' }}
                       >
-                        IICRC CEC Tracking
+                        {/* GP-498: only claim IICRC CEC tracking when this course has
+                            registry-approved CEC hours; otherwise no CEC claim is made. */}
+                        {course.cec_hours ? 'IICRC CEC Tracking' : 'Progress Tracking'}
                       </h3>
                       <p
                         className="text-xs leading-relaxed"
@@ -895,7 +897,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                       >
                         {course.cec_hours
                           ? `This course awards ${course.cec_hours} IICRC Continuing Education Credits. Credits are automatically recorded and exportable for IICRC submission.`
-                          : 'Continuing Education Credits are tracked automatically in your CARSI dashboard and exportable for IICRC submission.'}
+                          : 'Your progress and completion are recorded automatically in your CARSI dashboard, with a verifiable digital credential on completion.'}
                       </p>
                     </div>
                   </div>
@@ -908,9 +910,12 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                   >
                     {designation ? `${designation.name} is a CARSI credential that ` : 'This CARSI course '}
                     complements the IICRC — it is Southern-Hemisphere training the IICRC does not
-                    offer, not an IICRC certification. It earns IICRC Continuing Education Credits
-                    (CECs) toward maintaining an existing IICRC certification, which is obtained
-                    separately through IICRC-approved schools and examinations.
+                    offer, not an IICRC certification.{' '}
+                    {/* GP-498: assert this course earns CECs only when it has registry-approved
+                        CEC hours; unapproved courses make no CEC-earning claim. */}
+                    {course.cec_hours
+                      ? 'It earns IICRC Continuing Education Credits (CECs) toward maintaining an existing IICRC certification, which is obtained separately through IICRC-approved schools and examinations.'
+                      : 'IICRC certification is obtained separately through IICRC-approved schools and examinations.'}
                   </p>
                 </div>
               </section>
