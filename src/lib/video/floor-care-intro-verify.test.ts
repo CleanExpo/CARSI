@@ -280,6 +280,66 @@ describe('verifyFloorCareIntroVideo fails closed', () => {
     expect(calls).toBe(1);
   }, 30_000);
 
+  it('catches an ffprobe execution failure and reports a probe error instead of throwing', async () => {
+    let calls = 0;
+    const failingRunCapture: RunCaptureFn = async () => {
+      calls += 1;
+      throw new Error('simulated ffprobe execution failure: exited 1');
+    };
+
+    const result = await verifyFloorCareIntroVideo(FLOOR_CARE_MP4, evidenceDir, {
+      runCapture: failingRunCapture,
+    });
+
+    expect(result.valid).toBe(false);
+    expect(result.decoded).toBe(false);
+    expect(result.frames).toEqual([]);
+    expect(result.errors.join(' ')).toMatch(/probe/i);
+    expect(result.summary).toEqual({
+      videoStreamCount: 0,
+      audioStreamCount: 0,
+      videoCodec: null,
+      audioCodec: null,
+      width: 0,
+      height: 0,
+      fps: 0,
+      durationSeconds: 0,
+      fileSizeBytes: 0,
+    });
+    // Only the ffprobe call is attempted: no decode, no frame extraction.
+    expect(calls).toBe(1);
+  }, 30_000);
+
+  it('catches malformed ffprobe JSON and reports a probe error instead of throwing', async () => {
+    let calls = 0;
+    const malformedRunCapture: RunCaptureFn = async () => {
+      calls += 1;
+      return { stdout: '{"streams": [ truncated', stderr: '' };
+    };
+
+    const result = await verifyFloorCareIntroVideo(FLOOR_CARE_MP4, evidenceDir, {
+      runCapture: malformedRunCapture,
+    });
+
+    expect(result.valid).toBe(false);
+    expect(result.decoded).toBe(false);
+    expect(result.frames).toEqual([]);
+    expect(result.errors.join(' ')).toMatch(/probe/i);
+    expect(result.summary).toEqual({
+      videoStreamCount: 0,
+      audioStreamCount: 0,
+      videoCodec: null,
+      audioCodec: null,
+      width: 0,
+      height: 0,
+      fps: 0,
+      durationSeconds: 0,
+      fileSizeBytes: 0,
+    });
+    // Only the ffprobe call is attempted: no decode, no frame extraction.
+    expect(calls).toBe(1);
+  }, 30_000);
+
   it('catches a decode failure and reports valid:false, decoded:false instead of throwing', async () => {
     const failingRunCapture: RunCaptureFn = async (command, args) => {
       if (args.includes('-show_streams')) {

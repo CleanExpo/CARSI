@@ -268,6 +268,20 @@ export function summariseFloorCareProbe(result: FfprobeResult): FloorCareProbeSu
   };
 }
 
+export function emptyFloorCareProbeSummary(): FloorCareProbeSummary {
+  return {
+    videoStreamCount: 0,
+    audioStreamCount: 0,
+    videoCodec: null,
+    audioCodec: null,
+    width: 0,
+    height: 0,
+    fps: 0,
+    durationSeconds: 0,
+    fileSizeBytes: 0,
+  };
+}
+
 export type ProbeValidationConstraints = {
   requiredWidth: number;
   requiredHeight: number;
@@ -449,9 +463,20 @@ export async function verifyFloorCareIntroVideo(
   const ffprobe = ffprobeBinaryPath();
   const ffmpeg = ffmpegBinaryPath();
 
-  const probeRun = await run(ffprobe, buildFfprobeArgs(filePath));
-  const probeResult = parseFfprobeResult(probeRun.stdout);
-  const summary = summariseFloorCareProbe(probeResult);
+  let summary = emptyFloorCareProbeSummary();
+  try {
+    const probeRun = await run(ffprobe, buildFfprobeArgs(filePath));
+    summary = summariseFloorCareProbe(parseFfprobeResult(probeRun.stdout));
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return {
+      valid: false,
+      errors: [`ffprobe failed: ${message}`],
+      decoded: false,
+      summary,
+      frames: [],
+    };
+  }
 
   const fileStat = await stat(filePath);
   summary.fileSizeBytes = fileStat.size;
