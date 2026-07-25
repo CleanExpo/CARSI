@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { resolveLmsCourseCecHours, formatLmsCourseCecHoursLabel } from './course-cec-hours';
 import { resolveEffectiveCecHours, courseEligibleForIicrcCecSubmission } from './iicrc-cec-config';
-import { resolveCecHoursFromCourse } from './renewal-summary';
+import { resolveCecHoursFromCourse, suggestionReason } from './renewal-summary';
 import { resolveCecHours } from '@/lib/seed/cec-hours';
 import {
   getApprovedCecHours,
@@ -140,5 +140,20 @@ describe('GP-498 CEC licence gate — per-surface resolvers fail closed', () => 
     expect(
       resolveCecHoursFromCourse({ slug: 'some-unapproved', iicrcDiscipline: 'AMRT' })
     ).toEqual({ hours: 0, estimated: false });
+  });
+
+  // Surface: renewal "suggested courses" copy — previously told the learner an unapproved course
+  // "Adds {disc} CEC hours" using the bare DB discipline, even though the CEC badge was null.
+  it('renewal suggestion copy never claims CEC benefit for an unapproved course', () => {
+    const disciplines = ['WRT', 'AMRT', 'General'];
+    for (const disc of disciplines) {
+      const reason = suggestionReason({ disc, earnedCec: 0, approvedHours: 0 });
+      expect(reason).not.toMatch(/CEC/i);
+      expect(reason).not.toMatch(/continuing education/i);
+    }
+    // Positive control: when the course HAS registry-approved hours the CEC copy returns.
+    expect(suggestionReason({ disc: 'WRT', earnedCec: 0, approvedHours: 2 })).toMatch(
+      /CEC hours/
+    );
   });
 });

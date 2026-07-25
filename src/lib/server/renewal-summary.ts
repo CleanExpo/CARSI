@@ -83,6 +83,28 @@ export function resolveCecHoursFromCourse(course: {
   return { hours: approved != null && approved > 0 ? approved : 0, estimated: false };
 }
 
+/**
+ * Learner-visible copy for a suggested renewal course.
+ *
+ * REGISTRY-ONLY, FAIL-CLOSED (licence-critical, GP-498). A suggestion may only claim a course
+ * "Adds CEC hours" / builds CEC when that course has registry-approved CEC hours. A bare
+ * `iicrcDiscipline` is NOT approval — asserting an unapproved course earns IICRC CEC toward
+ * renewal is a licence leak (the CEC-hours badge is separately gated to null). With the registry
+ * empty every suggestion falls to the neutral, non-CEC-claiming copy.
+ */
+export function suggestionReason(args: {
+  disc: string;
+  earnedCec: number;
+  approvedHours: number;
+}): string {
+  if (args.approvedHours > 0) {
+    return args.earnedCec < 0.5
+      ? `Adds ${args.disc} CEC hours — priority gap for your renewal mix.`
+      : `Strengthen ${args.disc} — builds on ${args.earnedCec.toFixed(1)} CEC from your current period.`;
+  }
+  return `Relevant ${args.disc} training for your professional development.`;
+}
+
 export function isCompleteEnrollment(args: {
   status: string;
   allLessonsComplete: boolean;
@@ -329,12 +351,10 @@ async function pickSuggestedCourses(args: {
         prefer.size > 0 && prefer.has(discUpper) ? 1.45 : prefer.size > 0 ? 0.92 : 1;
       const score =
         gapWeight * (hours + 0.5) * (disc === 'General' ? 0.85 : 1) * onboardingBoost;
-    const reason =
-      earned < 0.5
-        ? `Adds ${disc} CEC hours — priority gap for your renewal mix.`
-        : `Strengthen ${disc} — builds on ${earned.toFixed(1)} CEC from your current period.`;
-    return { c, score, reason, disc };
-  });
+      // GP-498: only claim a CEC benefit when this course has registry-approved CEC hours.
+      const reason = suggestionReason({ disc, earnedCec: earned, approvedHours: rh });
+      return { c, score, reason, disc };
+    });
 
   scored.sort((a, b) => b.score - a.score);
 
@@ -376,7 +396,8 @@ async function pickSuggestedCourses(args: {
           return r.hours > 0 ? r.hours : null;
         })(),
         thumbnail_url: normalizePublicAssetUrl(c.thumbnailUrl),
-        reason: 'Popular choice for IICRC continuing education.',
+        // GP-498: neutral copy — must not imply IICRC CEC benefit for an unapproved course.
+        reason: 'Popular choice among CARSI learners.',
       });
     }
   }
