@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { isOnboardingCourse, parseOnboardingMeta } from '@/lib/onboarding/enterprise';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
+import { formatLmsCourseCecHoursLabel } from '@/lib/server/course-cec-hours';
 import { prisma } from '@/lib/prisma';
 
 export async function GET(request: NextRequest) {
@@ -53,8 +54,14 @@ export async function GET(request: NextRequest) {
         slug: course.slug,
         title: course.title,
         iicrc_discipline: course.iicrcDiscipline,
-        cec_hours:
-          course.cecHours != null && Number(course.cecHours) > 0 ? String(course.cecHours) : null,
+        // REGISTRY-ONLY, FAIL-CLOSED (GP-498). The stored `cecHours` column is WP-import
+        // pollution — never IICRC approval — so it is never surfaced. CEC hours come solely
+        // from the approvals registry via the gate; no approval → null (no CEC in search).
+        cec_hours: formatLmsCourseCecHoursLabel({
+          slug: course.slug,
+          cecHours: typeof course.cecHours === 'number' ? course.cecHours : null,
+          iicrcDiscipline: course.iicrcDiscipline,
+        }),
         is_onboarding: onboarding,
         program_label: onboarding ? (meta?.program ?? 'Organisation onboarding') : null,
       };

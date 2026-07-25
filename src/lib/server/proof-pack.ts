@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { resolveLmsCourseCecHours } from '@/lib/server/course-cec-hours';
 import type { ProofPackCredentialRow, ProofPackPayload } from '@/types/proof-pack';
 
 export type { ProofPackCredentialRow, ProofPackPayload } from '@/types/proof-pack';
@@ -40,7 +41,10 @@ export async function getProofPackPayloadForStudent(
     credential_id: e.id,
     course_title: e.course.title,
     iicrc_discipline: e.course.iicrcDiscipline,
-    cec_hours: roundCec(Number(e.course.cecHours ?? 0)),
+    // REGISTRY-ONLY, FAIL-CLOSED (GP-498). This employer/insurer transcript is an exported CEC
+    // record — it must never carry the stale WP-import `cecHours`. Registry approval only; an
+    // unapproved course contributes 0 to the row and the total.
+    cec_hours: roundCec(resolveLmsCourseCecHours({ slug: e.course.slug }) ?? 0),
     issued_date: (e.certificateIssuedAt ?? e.completedAt)!.toISOString().slice(0, 10),
     verification_url: `${base}/verify/credential/${e.id}`,
   }));

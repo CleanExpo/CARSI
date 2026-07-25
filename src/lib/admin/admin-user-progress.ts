@@ -2,6 +2,7 @@ import type { AdminCatalogCourse } from '@/lib/admin/load-admin-catalog';
 import { loadAdminCatalogSource, type AdminCatalogCourseOption } from '@/lib/admin/admin-catalog-source';
 import { buildAdminCatalogFromSeed } from '@/lib/lms-seed-catalog';
 import { prisma } from '@/lib/prisma';
+import { resolveLmsCourseCecHours } from '@/lib/server/course-cec-hours';
 import { getRenewalSummaryByEnrollmentIds } from '@/lib/server/iicrc-renewal-communication';
 
 export type { AdminCatalogCourseOption };
@@ -221,7 +222,10 @@ export function mapUserToAdminProgress(
       enrolledAt: e.enrolledAt.toISOString(),
       completedAt: e.completedAt?.toISOString() ?? null,
       paymentReference: e.paymentReference,
-      cecHours: e.course.cecHours,
+      // REGISTRY-ONLY, FAIL-CLOSED (GP-498). The admin user-detail view derives IICRC-submission
+      // eligibility and the "N CEC" badge from this value — so it must be the gated registry
+      // figure, never the stale WP-import `cecHours`. No approval → null (ineligible, no badge).
+      cecHours: resolveLmsCourseCecHours({ slug: e.course.slug }),
       discipline: e.course.iicrcDiscipline,
       totalLessons,
       completedLessons,

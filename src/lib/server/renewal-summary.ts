@@ -1,6 +1,7 @@
 import { normalizeEnrollmentStatus } from '@/lib/server/learner-dashboard-data';
 import { isRevokedStatus } from '@/lib/server/enrollment-access';
 import { normalizePublicAssetUrl } from '@/lib/remote-image';
+import { getApprovedCecHours } from '@/lib/seed/cec-approvals';
 import { prisma } from '@/lib/prisma';
 import type {
   RenewalCourseSuggestion,
@@ -14,18 +15,6 @@ export { RENEWAL_CEC_REQUIRED };
 
 const CYCLE_YEARS = 3;
 const URGENCY_DAYS = 90;
-const DEFAULT_CEC_WHEN_HOURS_MISSING = 1;
-
-function toNum(v: unknown): number | null {
-  if (v === null || v === undefined) return null;
-  if (typeof v === 'number' && Number.isFinite(v)) return v;
-  if (typeof v === 'object' && v !== null && 'toString' in v) {
-    const n = Number(String((v as { toString: () => string }).toString()));
-    return Number.isFinite(n) ? n : null;
-  }
-  const n = Number(v);
-  return Number.isFinite(n) ? n : null;
-}
 
 function endOfUtcDay(d: Date): Date {
   const x = new Date(d);
@@ -74,30 +63,24 @@ function completionTimestamp(args: {
   return max;
 }
 
-function resolveCecHoursFromCourse(course: {
-  cecHours: unknown;
-  meta: unknown;
-  iicrcDiscipline: string | null;
+/**
+ * CEC hours a completed course credits toward a learner's IICRC renewal.
+ *
+ * REGISTRY-ONLY, FAIL-CLOSED (licence-critical, GP-498). Renewal tracking derives CEC solely
+ * from the founder-confirmed approvals registry (by slug). The stored `cecHours` column, `meta`
+ * CEC keys, and a bare `iicrcDiscipline` (which previously defaulted to 1 "estimated" hour) are
+ * WordPress-import pollution — never IICRC approval — and crediting them counted CEC toward a
+ * learner's renewal for courses the IICRC never approved. No registry approval → 0 CEC, never a
+ * derived or estimated value. Exported for the licence-gate regression test.
+ */
+export function resolveCecHoursFromCourse(course: {
+  slug: string;
+  cecHours?: unknown;
+  meta?: unknown;
+  iicrcDiscipline?: string | null;
 }): { hours: number; estimated: boolean } {
-  const direct = toNum(course.cecHours);
-  if (direct !== null && direct > 0) {
-    return { hours: direct, estimated: false };
-  }
-  if (direct === 0) {
-    return { hours: 0, estimated: false };
-  }
-  if (course.meta && typeof course.meta === 'object' && course.meta !== null) {
-    const m = course.meta as Record<string, unknown>;
-    for (const key of ['cec_hours', 'cecHours', 'cec', 'CEC']) {
-      const n = toNum(m[key]);
-      if (n !== null && n > 0) return { hours: n, estimated: false };
-    }
-  }
-  const disc = course.iicrcDiscipline?.trim();
-  if (disc) {
-    return { hours: DEFAULT_CEC_WHEN_HOURS_MISSING, estimated: true };
-  }
-  return { hours: 0, estimated: false };
+  const approved = getApprovedCecHours(course.slug);
+  return { hours: approved != null && approved > 0 ? approved : 0, estimated: false };
 }
 
 export function isCompleteEnrollment(args: {
