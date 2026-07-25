@@ -15,6 +15,19 @@
 
 import nextCoreWebVitals from "eslint-config-next/core-web-vitals";
 import nextTypescript from "eslint-config-next/typescript";
+// The final config object below enables plugin-backed rules (`import/*`, `react/*`,
+// `react-hooks/*`, `@next/next/*`, `@typescript-eslint/*`). In ESLint 9 flat config a rule's
+// plugin must be registered in the SAME object that enables the rule, so `eslint .` was
+// aborting before analysing any file. We reuse the exact plugin instances the Next configs
+// already loaded (so there is no "plugin redefined" conflict) and add `import` (which ships
+// transitively with eslint-config-next — no new dependency). GP-498: repairs the repo-wide
+// lint break (identical break existed on origin/main and failed CI's lint step).
+import importPlugin from "eslint-plugin-import";
+
+const nextPlugins = Object.assign(
+  {},
+  ...[...nextCoreWebVitals, ...nextTypescript].map((c) => c.plugins).filter(Boolean),
+);
 
 const config = [
   {
@@ -29,6 +42,10 @@ const config = [
       "next-env.d.ts",
       "**/*.generated.ts",
       "prisma/migrations/**",
+      // Non-app curation/media build scripts (CommonJS `.cjs` using require, one-off batch
+      // tooling). Never part of the shipped app and never previously linted (repo-wide lint was
+      // broken before GP-498). Excluded from app linting rather than weakening the app rules.
+      ".curation/**",
     ],
   },
   ...nextCoreWebVitals,
@@ -40,6 +57,7 @@ const config = [
     // rule below has an outstanding violation. `no-unused-vars` honours the
     // repo's `_`-prefix convention for intentionally-unused bindings (params
     // kept for a signature, caught-but-unused errors, etc.).
+    plugins: { ...nextPlugins, import: importPlugin },
     rules: {
       "@typescript-eslint/no-unused-vars": [
         "error",
