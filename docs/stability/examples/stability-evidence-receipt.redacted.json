@@ -1,0 +1,120 @@
+{
+  "schemaVersion": "carsi.stability-evidence.v1",
+  "generatedAt": "2026-07-25T08:39:34.681Z",
+  "identifiers": {
+    "repository": "CleanExpo/CARSI",
+    "gitSha": "61301c7891998fc267a4238eb2f381a1172d93f1",
+    "baseUrl": "http://127.0.0.1:<redacted-port>",
+    "environment": "fixture",
+    "providerDeploymentId": "fixture-deployment-<redacted>"
+  },
+  "thresholds": {
+    "healthLatencyMs": "TBD-baseline",
+    "smokeDurationMs": "TBD-baseline",
+    "recoveryTimeMs": "TBD-baseline"
+  },
+  "ci": {
+    "outcome": "pass",
+    "requestedSha": "61301c7891998fc267a4238eb2f381a1172d93f1",
+    "matchedSha": "61301c7891998fc267a4238eb2f381a1172d93f1",
+    "workflow": "ci.yml",
+    "runId": 30140878812,
+    "runUrl": "https://github.com/CleanExpo/CARSI/actions/runs/30140878812",
+    "conclusion": "success",
+    "requiredJobs": [
+      {
+        "name": "Dependency Verification",
+        "conclusion": "success",
+        "url": "https://github.com/CleanExpo/CARSI/actions/runs/30140878812/job/89633733689"
+      },
+      {
+        "name": "Frontend Tests",
+        "conclusion": "success",
+        "url": "https://github.com/CleanExpo/CARSI/actions/runs/30140878812/job/89633800239"
+      },
+      {
+        "name": "Unit Tests",
+        "conclusion": "success",
+        "url": "https://github.com/CleanExpo/CARSI/actions/runs/30140878812/job/89633800234"
+      },
+      {
+        "name": "Secret Scan",
+        "conclusion": "success",
+        "url": "https://github.com/CleanExpo/CARSI/actions/runs/30140878812/job/89633733698"
+      },
+      {
+        "name": "Build Check",
+        "conclusion": "success",
+        "url": "https://github.com/CleanExpo/CARSI/actions/runs/30140878812/job/89633915769"
+      },
+      {
+        "name": "E2E Tests",
+        "conclusion": "success",
+        "url": "https://github.com/CleanExpo/CARSI/actions/runs/30140878812/job/89633915777"
+      }
+    ],
+    "reasons": []
+  },
+  "health": {
+    "outcome": "pass",
+    "url": "http://127.0.0.1:<redacted-port>/api/health",
+    "startedAt": "2026-07-25T08:39:35.860Z",
+    "finishedAt": "2026-07-25T08:39:35.876Z",
+    "durationMs": 15.89975000000004,
+    "httpStatus": 200,
+    "rawBody": {
+      "status": "healthy",
+      "timestamp": "2026-07-25T08:39:35.869Z",
+      "version": "fixture",
+      "uptime": 1,
+      "environment": "fixture",
+      "checks": {
+        "ai": true
+      },
+      "verification_system": {
+        "enabled": true,
+        "independent_verification": true,
+        "self_attestation_blocked": true
+      }
+    },
+    "reasons": []
+  },
+  "smoke": {
+    "outcome": "pass",
+    "reasons": [],
+    "suite": "e2e/smoke.spec.ts",
+    "expectedTests": 12,
+    "attempts": [
+      {
+        "attempt": 1,
+        "startedAt": "2026-07-25T08:39:35.877Z",
+        "finishedAt": "2026-07-25T08:39:37.336Z",
+        "durationMs": 1458.162542,
+        "outcome": "pass",
+        "exitCode": 0,
+        "tests": {
+          "expected": 12,
+          "total": 12,
+          "passed": 12,
+          "failed": 0,
+          "skipped": 0
+        },
+        "reportLinks": [
+          "<redacted-evidence-root>/fixture-pass-assets/smoke/attempt-1/playwright-results.json",
+          "<redacted-evidence-root>/fixture-pass-assets/smoke/attempt-1/playwright-report/index.html"
+        ],
+        "error": null
+      }
+    ],
+    "firstAttemptOutcome": "pass",
+    "finalOutcome": "pass",
+    "reportLinks": [
+      "<redacted-evidence-root>/fixture-pass-assets/smoke/attempt-1/playwright-results.json",
+      "<redacted-evidence-root>/fixture-pass-assets/smoke/attempt-1/playwright-report/index.html"
+    ]
+  },
+  "overall": {
+    "result": "pass",
+    "reasons": []
+  }
+}
