@@ -34,14 +34,17 @@
  * claimed (`pending` → `provisioning`) so two concurrent batch runs cannot
  * double-provision the same person.
  */
-import { getCcwWorkshopCourseSlug } from '@/lib/server/ccw-attendance/eligibility';
-import { runCcwOfferPackBatch, type OfferPackBatchSummary } from '@/lib/server/ccw-attendance/offer-pack';
+import { prisma } from '@/lib/prisma';
 import { getAppOrigin } from '@/lib/server/app-url';
-import { enrollStudentInCourse } from '@/lib/server/enrollment-service';
+import { getCcwWorkshopCourseSlug } from '@/lib/server/ccw-attendance/eligibility';
+import {
+  runCcwOfferPackBatch,
+  type OfferPackBatchSummary,
+} from '@/lib/server/ccw-attendance/offer-pack';
 import { sendEnrollmentWelcomeEmail } from '@/lib/server/enrollment-email';
+import { enrollStudentInCourse } from '@/lib/server/enrollment-service';
 import { findOrCreateGuestUser } from '@/lib/server/guest-checkout';
 import { sessionClaimsForUserId } from '@/lib/server/lms-auth';
-import { prisma } from '@/lib/prisma';
 
 /** Marks enrolments created by the workshop attendance foundation. */
 export const CCW_ATTENDANCE_PAYMENT_REFERENCE = 'ccw:attendance';
@@ -93,7 +96,7 @@ export interface ProvisionBatchSummary {
  */
 export async function provisionSignIn(
   signInId: string,
-  options?: ProvisionOptions,
+  options?: ProvisionOptions
 ): Promise<ProvisionSignInResult> {
   // Optimistically claim the row so concurrent batch runs don't double-provision.
   const claim = await prisma.ccwRoadshowSignIn.updateMany({
@@ -174,7 +177,13 @@ export async function provisionSignIn(
         : null;
       if (!existing) {
         await markFailed(signInId);
-        return { signInId, status: 'failed', accountOutcome, studentId, reason: 'enrollment_not_found' };
+        return {
+          signInId,
+          status: 'failed',
+          accountOutcome,
+          studentId,
+          reason: 'enrollment_not_found',
+        };
       }
       enrollmentId = existing.id;
     } else {
@@ -191,7 +200,7 @@ export async function provisionSignIn(
     // email is the only channel that surfaces access (magic/reset link).
     const appOrigin = options?.appOrigin ?? getAppOrigin(null);
     void sendEnrollmentWelcomeEmail({ studentId, courseSlug: slug, appOrigin }).catch((e) =>
-      console.error('[ccw-provision] welcome email', signInId, e),
+      console.error('[ccw-provision] welcome email', signInId, e)
     );
 
     return { signInId, status: 'provisioned', accountOutcome, studentId, enrollmentId };
@@ -233,7 +242,7 @@ async function markNeedsConfirmation(signInId: string): Promise<void> {
  */
 export async function provisionDay1SignIns(
   eventSlug: string,
-  options?: ProvisionOptions,
+  options?: ProvisionOptions
 ): Promise<ProvisionBatchSummary> {
   const rows = await prisma.ccwRoadshowSignIn.findMany({
     where: { eventSlug, provisionStatus: 'pending', day1CheckedInAt: { not: null } },
@@ -285,7 +294,7 @@ export interface FinalizeAttendanceResult {
  * untouched (its certificate is backfilled if it was somehow missing).
  */
 export async function finalizeAttendanceForSignIn(
-  signInId: string,
+  signInId: string
 ): Promise<FinalizeAttendanceResult> {
   const signIn = await prisma.ccwRoadshowSignIn.findUnique({
     where: { id: signInId },
@@ -353,7 +362,7 @@ export interface FinalizeAttendanceBatchSummary {
  * event. Resilient: each row is finalised independently.
  */
 export async function finalizeAttendanceForEvent(
-  eventSlug: string,
+  eventSlug: string
 ): Promise<FinalizeAttendanceBatchSummary> {
   const rows = await prisma.ccwRoadshowSignIn.findMany({
     where: {
@@ -394,7 +403,7 @@ export interface CcwAttendanceBatchSummary {
  */
 export async function runCcwAttendanceBatch(
   eventSlug: string,
-  options?: ProvisionOptions,
+  options?: ProvisionOptions
 ): Promise<CcwAttendanceBatchSummary> {
   const provision = await provisionDay1SignIns(eventSlug, options);
   const attendance = await finalizeAttendanceForEvent(eventSlug);
