@@ -158,7 +158,7 @@ export function PublicFooter({ tone = 'chrome' }: { tone?: 'chrome' | 'light' } 
             <p className="text-[10px] font-semibold tracking-[0.18em] text-white/60 uppercase">
               Built for the field
             </p>
-            <p className="mt-2 text-lg font-semibold leading-snug text-white/90">
+            <p className="mt-2 text-lg leading-snug font-semibold text-white/90">
               Self-paced learning that fits around the job site.
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
@@ -297,9 +297,15 @@ export function PublicFooter({ tone = 'chrome' }: { tone?: 'chrome' | 'light' } 
 
 function FooterSectionLabelLight({ children }: { children: ReactNode }) {
   return (
-    <p className="mb-4 text-[10px] font-semibold tracking-[0.2em] text-slate-400 uppercase">
-      {children}
-    </p>
+    <div className="mb-5 flex items-center gap-3">
+      <span
+        className="h-px w-5 shrink-0 bg-gradient-to-r from-[#146fc2]/70 to-transparent"
+        aria-hidden
+      />
+      <p className="text-[10px] font-semibold tracking-[0.22em] text-slate-400 uppercase">
+        {children}
+      </p>
+    </div>
   );
 }
 
@@ -307,7 +313,7 @@ function FooterLinkLight({ href, children }: { href: string; children: React.Rea
   return (
     <Link
       href={href}
-      className="group inline-flex min-h-8 items-center gap-1 text-sm text-slate-600 transition-colors duration-150 hover:text-[#146fc2] focus-visible:ring-2 focus-visible:ring-[#2490ed]/35 focus-visible:rounded-sm focus-visible:outline-none"
+      className="group inline-flex min-h-8 items-center gap-1 text-sm text-slate-600 transition-colors duration-150 hover:text-[#146fc2] focus-visible:rounded-sm focus-visible:ring-2 focus-visible:ring-[#2490ed]/35 focus-visible:outline-none"
     >
       {children}
     </Link>
@@ -320,7 +326,7 @@ function FooterExternalLinkLight({ href, children }: { href: string; children: R
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="group inline-flex min-h-8 items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-[11px] font-medium text-slate-600 transition-all duration-150 hover:border-[#2490ed]/40 hover:text-[#146fc2] focus-visible:ring-2 focus-visible:ring-[#2490ed]/35 focus-visible:outline-none"
+      className="group inline-flex min-h-8 items-center gap-1.5 rounded-full border border-slate-200/90 bg-white px-3 py-1.5 text-[11px] font-medium text-slate-600 transition-all duration-150 hover:border-[#2490ed]/40 hover:bg-[#eef5fb] hover:text-[#146fc2] focus-visible:ring-2 focus-visible:ring-[#2490ed]/35 focus-visible:outline-none"
       aria-label={typeof children === 'string' ? children : undefined}
     >
       {children}
@@ -330,20 +336,38 @@ function FooterExternalLinkLight({ href, children }: { href: string; children: R
 }
 
 /**
- * Light institutional footer. Calm hairline layout, same link structure as the
- * chrome footer, restyled for white and ice public surfaces (homepage).
+ * Light editorial footer for the redesigned landing surfaces. Airy hairline
+ * layout on white: gradient hairline top edge, editorial masthead, four link
+ * columns beside a refined contact card, a polished legal baseline and a giant
+ * low-contrast CARSI watermark as the closing brand moment. Same content and
+ * links as the chrome footer.
  */
 function LightFooter() {
   return (
     <footer className={PUBLIC_LIGHT_FOOTER_CLASS}>
-      <div className={`${PUBLIC_SHELL_INNER_CLASS} py-14 sm:py-16 lg:py-20`}>
+      {/* Gradient hairline glow along the top edge */}
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#2490ed]/50 to-transparent"
+        aria-hidden
+      />
+      {/* Soft radial glow behind the masthead */}
+      <div
+        className="pointer-events-none absolute -top-44 left-1/2 h-[28rem] w-[64rem] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(36,144,237,0.08),transparent_70%)] blur-2xl"
+        aria-hidden
+      />
+
+      <div className={`relative ${PUBLIC_SHELL_INNER_CLASS} pt-16 sm:pt-20 lg:pt-24`}>
         {/* Brand masthead */}
-        <div className="mb-12 grid gap-10 border-b border-slate-200 pb-12 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
+        <div className="grid gap-10 pb-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] lg:items-end lg:gap-16 lg:pb-14">
           <div>
-            <p className="mb-4 text-[11px] font-semibold tracking-[0.22em] text-[#146fc2] uppercase">
+            <p className="text-[11px] font-medium tracking-[0.24em] text-[#146fc2] uppercase">
               Australian restoration training
             </p>
-            <Link href="/" aria-label="CARSI home" className="inline-block">
+            <Link
+              href="/"
+              aria-label="CARSI home"
+              className="mt-5 inline-block rounded-md focus-visible:ring-2 focus-visible:ring-[#2490ed]/35 focus-visible:outline-none"
+            >
               <PublicLogo variant="footer" surface="light" />
             </Link>
             <p className="mt-5 max-w-md text-sm leading-relaxed text-slate-500">
@@ -354,53 +378,85 @@ function LightFooter() {
             </p>
           </div>
 
-          <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
-            <p className="text-[10px] font-semibold tracking-[0.18em] text-slate-400 uppercase">
+          <div>
+            <p className="text-[10px] font-semibold tracking-[0.22em] text-slate-400 uppercase">
               Built for the field
             </p>
-            <p className="mt-2 text-lg font-semibold leading-snug text-slate-950">
+            <p className="mt-3 font-[family-name:var(--font-display)] text-[1.35rem] leading-snug font-semibold tracking-[-0.01em] text-slate-950">
               Self-paced learning that fits around the job site.
             </p>
-            <div className="mt-4 flex flex-wrap gap-2">
-              {['IICRC CEC', '24/7 access', 'Digital credentials'].map((chip) => (
-                <span
-                  key={chip}
-                  className="rounded-full border border-slate-200 bg-[#f8fafc] px-2.5 py-1 text-[10px] font-medium tracking-wide text-slate-500 uppercase"
-                >
-                  {chip}
-                </span>
+            <ul className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-2">
+              {['IICRC CEC', '24/7 access', 'Digital credentials'].map((chip, index) => (
+                <li key={chip} className="flex items-center gap-3">
+                  {index > 0 ? <span className="h-3 w-px bg-slate-200" aria-hidden /> : null}
+                  <span className="text-[10px] font-medium tracking-[0.14em] text-slate-500 uppercase">
+                    {chip}
+                  </span>
+                </li>
               ))}
-            </div>
+            </ul>
           </div>
         </div>
 
-        {/* Link matrix */}
-        <div className="mb-10 grid gap-10 lg:grid-cols-12 lg:divide-x lg:divide-slate-200">
-          <div className="lg:col-span-5 lg:pr-8">
-            <FooterSectionLabelLight>Platform</FooterSectionLabelLight>
-            <ul className="grid gap-x-6 gap-y-1 sm:grid-cols-2">
-              {platformLinks.map((item) => (
-                <li key={item.label}>
-                  <FooterLinkLight href={item.href}>{item.label}</FooterLinkLight>
-                </li>
-              ))}
-            </ul>
-          </div>
+        {/* Link matrix with contact rail */}
+        <div className="grid gap-12 border-t border-slate-200/80 pt-12 pb-16 lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] lg:gap-16 lg:pt-14">
+          <nav
+            aria-label="Footer navigation"
+            className="grid gap-x-10 gap-y-12 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1.2fr_0.85fr]"
+          >
+            <div>
+              <FooterSectionLabelLight>Platform</FooterSectionLabelLight>
+              <ul className="grid gap-x-6 gap-y-1 sm:grid-cols-2">
+                {platformLinks.map((item) => (
+                  <li key={item.label}>
+                    <FooterLinkLight href={item.href}>{item.label}</FooterLinkLight>
+                  </li>
+                ))}
+              </ul>
+            </div>
 
-          <div className="lg:col-span-3 lg:px-8">
-            <FooterSectionLabelLight>Industries</FooterSectionLabelLight>
-            <ul className="space-y-1">
-              {industries.map((industry) => (
-                <li key={industry.slug}>
-                  <FooterLinkLight href={`/industries/${industry.slug}`}>
-                    {industry.label}
-                  </FooterLinkLight>
-                </li>
-              ))}
-            </ul>
-          </div>
+            <div className="lg:border-l lg:border-slate-200/70 lg:pl-10">
+              <FooterSectionLabelLight>Industries</FooterSectionLabelLight>
+              <ul className="space-y-1">
+                {industries.map((industry) => (
+                  <li key={industry.slug}>
+                    <FooterLinkLight href={`/industries/${industry.slug}`}>
+                      {industry.label}
+                    </FooterLinkLight>
+                  </li>
+                ))}
+              </ul>
+            </div>
 
-          <div className="lg:col-span-4 lg:pl-8">
+            <div className="lg:border-l lg:border-slate-200/70 lg:pl-10">
+              <FooterSectionLabelLight>Community &amp; Resources</FooterSectionLabelLight>
+              <ul className="space-y-1">
+                {communityLinks.map((item) => (
+                  <li key={item.label}>
+                    <FooterLinkLight href={item.href}>{item.label}</FooterLinkLight>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="lg:border-l lg:border-slate-200/70 lg:pl-10">
+              <FooterSectionLabelLight>Events</FooterSectionLabelLight>
+              <ul className="space-y-1">
+                {eventLinks.map((item) => (
+                  <li key={item.label}>
+                    <FooterLinkLight href={item.href}>{item.label}</FooterLinkLight>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </nav>
+
+          {/* Contact and support card */}
+          <div className="relative self-start rounded-2xl border border-slate-200/90 bg-[#fafbfc] p-6 sm:p-7">
+            <div
+              className="pointer-events-none absolute -top-px right-8 left-8 h-px bg-gradient-to-r from-transparent via-[#2490ed]/45 to-transparent"
+              aria-hidden
+            />
             <FooterSectionLabelLight>Contact</FooterSectionLabelLight>
             <ul className="space-y-3 text-sm text-slate-600">
               <li className="flex gap-3">
@@ -410,7 +466,7 @@ function LightFooter() {
               <li>
                 <a
                   href="/contact"
-                  className="group inline-flex items-center gap-3 text-slate-600 transition-colors hover:text-[#146fc2]"
+                  className="group inline-flex items-center gap-3 rounded-sm text-slate-600 transition-colors hover:text-[#146fc2] focus-visible:ring-2 focus-visible:ring-[#2490ed]/35 focus-visible:outline-none"
                 >
                   <Mail className="h-4 w-4 shrink-0 text-[#146fc2]/70" aria-hidden />
                   <span>Contact CARSI support</span>
@@ -424,7 +480,7 @@ function LightFooter() {
               </li>
             </ul>
 
-            <div className="mt-6 border-t border-slate-200 pt-5">
+            <div className="mt-6 border-t border-slate-200/80 pt-5">
               <p className="mb-3 text-[10px] font-semibold tracking-[0.16em] text-slate-400 uppercase">
                 Follow CARSI
               </p>
@@ -439,32 +495,8 @@ function LightFooter() {
           </div>
         </div>
 
-        <div className="mb-12 grid gap-10 border-t border-slate-200 pt-10 lg:grid-cols-12 lg:divide-x lg:divide-slate-200">
-          <div className="lg:col-span-8 lg:pr-8">
-            <FooterSectionLabelLight>Community &amp; Resources</FooterSectionLabelLight>
-            <ul className="grid gap-x-6 gap-y-1 sm:grid-cols-2 lg:grid-cols-3">
-              {communityLinks.map((item) => (
-                <li key={item.label}>
-                  <FooterLinkLight href={item.href}>{item.label}</FooterLinkLight>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="lg:col-span-4 lg:pl-8">
-            <FooterSectionLabelLight>Events</FooterSectionLabelLight>
-            <ul className="grid gap-x-6 gap-y-1 sm:grid-cols-2 lg:grid-cols-1">
-              {eventLinks.map((item) => (
-                <li key={item.label}>
-                  <FooterLinkLight href={item.href}>{item.label}</FooterLinkLight>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-
-        {/* Legal strip */}
-        <div className="flex flex-col gap-4 border-t border-slate-200 pt-6 sm:flex-row sm:items-center sm:justify-between">
+        {/* Legal baseline */}
+        <div className="flex flex-col gap-4 border-t border-slate-200/80 py-7 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-[11px] leading-relaxed text-slate-500">
             © 2026 CARSI Pty Ltd. All rights reserved. ·{' '}
             <Link
@@ -494,6 +526,13 @@ function LightFooter() {
             <AcronymTooltip term="RTO" />
           </p>
         </div>
+      </div>
+
+      {/* Closing brand moment: giant low-contrast wordmark cropped at the bottom edge */}
+      <div className="pointer-events-none relative flex justify-center select-none" aria-hidden>
+        <span className="-mb-[0.3em] font-[family-name:var(--font-display)] text-[clamp(7rem,19vw,24rem)] leading-none font-semibold tracking-[-0.04em] whitespace-nowrap text-slate-950/[0.035]">
+          CARSI
+        </span>
       </div>
     </footer>
   );

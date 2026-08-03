@@ -28,7 +28,8 @@ export const PUBLIC_CHROME_AUTH_BAND_CLASS =
 export const PUBLIC_LIGHT_NAV_CLASS =
   'relative sticky top-0 z-50 border-b border-slate-200/80 bg-white/85 shadow-[0_8px_30px_-24px_rgba(15,23,42,0.18)] backdrop-blur-xl';
 
-export const PUBLIC_LIGHT_FOOTER_CLASS = 'border-t border-slate-200/80 bg-[#f8fafc]';
+export const PUBLIC_LIGHT_FOOTER_CLASS =
+  'relative overflow-hidden border-t border-slate-200/80 bg-white';
 
 export const PUBLIC_LIGHT_LINK_CLASS =
   'rounded-md px-2 py-2 text-sm font-medium text-slate-600 transition-colors duration-150 hover:bg-slate-100 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-[#2490ed]/35 focus-visible:outline-none';
