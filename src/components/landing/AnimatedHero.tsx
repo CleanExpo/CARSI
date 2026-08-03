@@ -95,10 +95,24 @@ export function AnimatedHero({ benefits: _benefits }: AnimatedHeroProps) {
               </span>
             </motion.p>
 
+            <motion.div
+              variants={fadeInUp}
+              transition={{ duration: 0.55, ease: smoothEase }}
+              className="mt-3 h-1 w-24 overflow-hidden rounded-full bg-slate-200/80 dark:bg-white/10"
+              aria-hidden
+            >
+              <motion.div
+                className="h-full w-full origin-left rounded-full bg-gradient-to-r from-[#146fc2] via-[#2490ed] to-[#ed9d24]"
+                initial={{ scaleX: reduceMotion ? 1 : 0 }}
+                animate={{ scaleX: 1 }}
+                transition={{ duration: 0.9, ease: smoothEase, delay: 0.35 }}
+              />
+            </motion.div>
+
             <motion.p
               variants={fadeInUp}
               transition={{ duration: 0.55, ease: smoothEase }}
-              className="mt-3 inline-flex items-center gap-2 text-[11px] font-semibold tracking-[0.22em] text-[#146fc2] uppercase dark:text-[#8fd0ff]"
+              className="mt-4 inline-flex items-center gap-2 text-[11px] font-semibold tracking-[0.22em] text-[#146fc2] uppercase dark:text-[#8fd0ff]"
             >
               <Sparkles className="h-3.5 w-3.5" aria-hidden />
               Australia&apos;s restoration training platform
