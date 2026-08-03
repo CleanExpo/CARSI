@@ -1,73 +1,39 @@
 'use client';
 
-import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
 import { GrowthPathInfographic } from '@/components/landing/GrowthPathInfographic';
-import { PUBLIC_SHELL_INNER_CLASS } from '@/components/landing/public-shell-width';
+import {
+  LANDING_DISPLAY_H2_CLASS,
+  LANDING_EYEBROW_CLASS,
+  LANDING_LEAD_CLASS,
+  PUBLIC_SHELL_INNER_CLASS,
+} from '@/components/landing/public-shell-width';
 import { ccwWorkshopHref, homePathwayItems } from '@/lib/marketing/home-pathways';
 
-interface Stat {
-  value: string;
-  label: string;
-}
-
-interface HomeGrowthSectionProps {
-  stats: Stat[];
-}
-
-const spring = { type: 'spring' as const, stiffness: 120, damping: 22 };
-
 /**
- * Light metric strip + editorial pathways — no dark ribbon.
+ * Editorial pathways and events split. Online courses flowing into in-person Growth Days.
+ * Metrics live in {@link HomeTrustStrip}; this section is pathways and events only.
  */
-export function HomeGrowthSection({ stats }: HomeGrowthSectionProps) {
-  const reduceMotion = useReducedMotion();
-
+export function HomeGrowthSection() {
   return (
     <section
       aria-labelledby="home-growth-heading"
       className="relative border-t border-slate-200/70 bg-white"
     >
-      <div className={`border-b border-slate-100 ${PUBLIC_SHELL_INNER_CLASS} py-12 md:py-14`}>
-        <div className="grid grid-cols-2 gap-8 md:grid-cols-4 md:gap-6">
-          {stats.map((stat, i) => (
-            <motion.div
-              key={stat.label}
-              initial={reduceMotion ? false : { opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-40px' }}
-              transition={{ ...spring, delay: i * 0.06 }}
-            >
-              <p className="font-[family-name:var(--font-display)] text-3xl font-bold tracking-tight text-slate-950 tabular-nums md:text-4xl">
-                {stat.value}
-              </p>
-              <p className="mt-2 text-[11px] font-medium tracking-[0.16em] text-slate-400 uppercase">
-                {stat.label}
-              </p>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-
       <div className={`${PUBLIC_SHELL_INNER_CLASS} py-16 md:py-24`}>
         <div className="grid gap-14 lg:grid-cols-[minmax(280px,0.9fr)_minmax(0,1.1fr)] lg:items-center lg:gap-20">
           <GrowthPathInfographic className="order-2 lg:order-1" />
 
           <div className="order-1 lg:order-2">
-            <p className="text-[11px] font-medium tracking-[0.22em] text-[#146fc2] uppercase">
-              Beyond the catalogue
-            </p>
-            <h2
-              id="home-growth-heading"
-              className="mt-3 font-[family-name:var(--font-display)] text-3xl font-bold tracking-tight text-slate-950 md:text-4xl"
-            >
-              Learn online. Scale in person.
+            <p className={LANDING_EYEBROW_CLASS}>Beyond the catalogue</p>
+            <h2 id="home-growth-heading" className={`mt-3 ${LANDING_DISPLAY_H2_CLASS}`}>
+              Learn online. Grow in person.
             </h2>
-            <p className="mt-4 max-w-md text-[15px] leading-relaxed text-slate-500">
-              Start with self-paced IICRC CEC Accredited courses, then join CARSI × CCW Business
-              Growth Days when you are ready to grow on site.
+            <p className={`mt-4 max-w-md ${LANDING_LEAD_CLASS}`}>
+              Self-paced courses are the start, not the ceiling. When you are ready to grow the
+              business, join CARSI and CCW Business Growth Days in person.
             </p>
 
             <ul className="mt-10 divide-y divide-slate-100 border-y border-slate-100">
