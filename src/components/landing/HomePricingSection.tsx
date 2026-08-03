@@ -100,7 +100,7 @@ export function HomePricingSection({
             </p>
             <Link
               href="/pricing"
-              className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-[#146fc2] transition hover:gap-3 hover:text-[#0f5fa8] dark:text-[#8fd0ff] dark:hover:text-[#b8e2ff]"
+              className="mt-8 inline-flex items-center gap-2 rounded-sm text-sm font-semibold text-[#146fc2] transition hover:gap-3 hover:text-[#0f5fa8] focus-visible:ring-2 focus-visible:ring-[#2490ed]/40 focus-visible:outline-none dark:text-[#8fd0ff] dark:hover:text-[#b8e2ff]"
             >
               Compare all plans, including team seats
               <ArrowRight className="h-4 w-4" aria-hidden />
@@ -145,10 +145,10 @@ export function HomePricingSection({
                   ) : (
                     <Link
                       href={tier.href}
-                      className={`inline-flex min-h-11 items-center justify-center rounded-xl px-5 py-2.5 text-sm font-semibold transition hover:-translate-y-0.5 ${
+                      className={`inline-flex min-h-11 items-center justify-center rounded-xl px-5 py-2.5 text-sm font-semibold transition hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:outline-none ${
                         tier.highlighted
-                          ? 'bg-[#146fc2] text-white shadow-sm hover:bg-[#0f5fa8]'
-                          : 'border border-[#146fc2]/35 text-[#146fc2] hover:border-[#146fc2] dark:border-[#2490ed]/40 dark:text-[#8fd0ff]'
+                          ? 'bg-[#146fc2] text-white shadow-sm hover:bg-[#0f5fa8] focus-visible:ring-[#2490ed]/50'
+                          : 'border border-[#146fc2]/35 text-[#146fc2] hover:border-[#146fc2] focus-visible:ring-[#2490ed]/40 dark:border-[#2490ed]/40 dark:text-[#8fd0ff]'
                       }`}
                     >
                       {tier.cta}
