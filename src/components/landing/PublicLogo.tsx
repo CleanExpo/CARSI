@@ -2,6 +2,8 @@ import Image from 'next/image';
 
 type PublicLogoProps = {
   variant: 'nav' | 'footer' | 'auth';
+  /** Chrome = silver wordmark on dark; light = blue mark + typographic wordmark. */
+  surface?: 'chrome' | 'light';
 };
 
 const logoConfig = {
@@ -28,8 +30,37 @@ const logoConfig = {
   },
 } as const;
 
-/** CARSI wordmark — intended for {@link PUBLIC_CHROME_NAV_CLASS} / footer chrome surfaces. */
-export function PublicLogo({ variant }: PublicLogoProps) {
+/** CARSI wordmark. Chrome for dark bars; light for white professional surfaces. */
+export function PublicLogo({ variant, surface = 'chrome' }: PublicLogoProps) {
+  if (surface === 'light') {
+    const markSize = variant === 'footer' ? 44 : variant === 'auth' ? 48 : 36;
+    const textClass =
+      variant === 'footer'
+        ? 'text-3xl tracking-[-0.04em]'
+        : variant === 'auth'
+          ? 'text-4xl tracking-[-0.04em]'
+          : 'text-xl tracking-[-0.03em]';
+
+    return (
+      <span className="inline-flex items-center gap-2.5">
+        <Image
+          src="/logo.png"
+          alt=""
+          width={markSize}
+          height={markSize}
+          className="shrink-0 rounded-[0.65rem] object-contain"
+          priority={variant === 'nav' || variant === 'auth'}
+          aria-hidden
+        />
+        <span
+          className={`font-[family-name:var(--font-display)] font-bold text-slate-950 ${textClass}`}
+        >
+          CARSI
+        </span>
+      </span>
+    );
+  }
+
   const config = logoConfig[variant];
 
   return (
