@@ -1,7 +1,7 @@
 'use client';
 
-import { ArrowRight, Building2 } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
+import { ArrowRight, Building2 } from 'lucide-react';
 import Link from 'next/link';
 
 import { PUBLIC_SHELL_INNER_CLASS } from '@/components/landing/public-shell-width';
@@ -56,7 +56,8 @@ export function HomeIndustriesSection() {
           </h2>
           <p className="mt-4 text-sm leading-relaxed text-slate-600 md:text-base dark:text-white/70">
             From hospitals to hotels, government facilities to commercial buildings — industry-
-            specific pathways for every sector that needs <AcronymTooltip term="IICRC" /> credentials.
+            specific pathways for every sector that needs <AcronymTooltip term="IICRC" />{' '}
+            credentials.
           </p>
         </div>
 
@@ -72,7 +73,7 @@ export function HomeIndustriesSection() {
             >
               <Link
                 href={`/industries/${industry.slug}`}
-                className={`group relative flex h-full min-h-[5.5rem] flex-col justify-between overflow-hidden rounded-2xl border p-5 transition duration-300 hover:-translate-y-0.5 hover:shadow-lg ${
+                className={`group relative flex h-full min-h-[5.5rem] flex-col justify-between overflow-hidden rounded-2xl border p-5 transition duration-300 hover:-translate-y-0.5 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-[#2490ed]/40 focus-visible:outline-none ${
                   industry.featured
                     ? 'border-[#2490ed]/40 bg-gradient-to-br from-[#eef7ff] via-white to-[#f8fbff] dark:border-[#2490ed]/35 dark:from-[#0d1a2e] dark:via-[#0a1420] dark:to-[#080c14]'
                     : 'border-slate-200/90 bg-white hover:border-[#2490ed]/35 dark:border-white/10 dark:bg-white/[0.04]'

@@ -146,7 +146,7 @@ export function HomeGrowthSection({ stats }: HomeGrowthSectionProps) {
                   <li key={item.href}>
                     <Link
                       href={item.href}
-                      className="group flex items-start gap-4 rounded-2xl border border-transparent px-3 py-3.5 transition hover:border-slate-200/80 hover:bg-[#f8fbff] dark:hover:border-white/10 dark:hover:bg-white/[0.04]"
+                      className="group flex items-start gap-4 rounded-2xl border border-transparent px-3 py-3.5 transition hover:border-slate-200/80 hover:bg-[#f8fbff] focus-visible:ring-2 focus-visible:ring-[#2490ed]/40 focus-visible:outline-none dark:hover:border-white/10 dark:hover:bg-white/[0.04]"
                     >
                       <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200/80 bg-white dark:border-white/10 dark:bg-white/[0.04]">
                         <Icon className={`h-4 w-4 ${item.accentClass}`} aria-hidden />
@@ -176,7 +176,7 @@ export function HomeGrowthSection({ stats }: HomeGrowthSectionProps) {
 
             <Link
               href={ccwWorkshopHref}
-              className="group mt-4 flex items-center justify-between gap-4 border-t border-slate-200/80 px-1 pt-5 transition dark:border-white/10"
+              className="group mt-4 flex items-center justify-between gap-4 rounded-sm border-t border-slate-200/80 px-1 pt-5 transition focus-visible:ring-2 focus-visible:ring-[#2490ed]/40 focus-visible:outline-none dark:border-white/10"
             >
               <span className="flex items-center gap-3">
                 <Award className="h-4 w-4 text-[#146fc2] dark:text-[#8fd0ff]" aria-hidden />
