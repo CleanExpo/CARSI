@@ -185,7 +185,7 @@ export function AnimatedHero({ benefits: _benefits }: AnimatedHeroProps) {
                 className="pointer-events-none absolute inset-y-0 left-0 z-20 w-1/3 bg-gradient-to-r from-transparent via-white/50 to-transparent"
                 initial={{ x: '-120%' }}
                 animate={{ x: '380%' }}
-                transition={{ duration: 1.4, ease: easeOut, delay: 1.15 }}
+                transition={{ duration: 1.6, ease: easeOut, delay: 1.25 }}
               />
             ) : null}
           </motion.div>
