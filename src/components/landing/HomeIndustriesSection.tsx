@@ -4,7 +4,12 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
-import { PUBLIC_SHELL_INNER_CLASS } from '@/components/landing/public-shell-width';
+import {
+  LANDING_DISPLAY_H2_CLASS,
+  LANDING_EYEBROW_CLASS,
+  LANDING_LEAD_CLASS,
+  PUBLIC_SHELL_INNER_CLASS,
+} from '@/components/landing/public-shell-width';
 import { AcronymTooltip } from '@/components/ui/AcronymTooltip';
 
 const INDUSTRIES = [
@@ -25,7 +30,7 @@ const INDUSTRIES = [
 const spring = { type: 'spring' as const, stiffness: 120, damping: 22 };
 
 /**
- * Light industries index — typographic list, not a card bento.
+ * Light industries index. Typographic list, not a card bento.
  */
 export function HomeIndustriesSection() {
   const reduceMotion = useReducedMotion();
@@ -38,18 +43,14 @@ export function HomeIndustriesSection() {
       <div className={PUBLIC_SHELL_INNER_CLASS}>
         <div className="grid gap-12 lg:grid-cols-[minmax(240px,0.7fr)_minmax(0,1.3fr)] lg:gap-20">
           <div>
-            <p className="text-[11px] font-medium tracking-[0.22em] text-[#146fc2] uppercase">
-              Industries
-            </p>
-            <h2
-              id="home-industries-heading"
-              className="mt-3 font-[family-name:var(--font-display)] text-3xl font-bold tracking-tight text-slate-950 md:text-4xl"
-            >
-              Built for every sector you serve
+            <p className={LANDING_EYEBROW_CLASS}>Industries</p>
+            <h2 id="home-industries-heading" className={`mt-3 ${LANDING_DISPLAY_H2_CLASS}`}>
+              Trained for every sector you serve
             </h2>
-            <p className="mt-4 text-[15px] leading-relaxed text-slate-500">
-              Sector-specific pathways for every workplace that needs{' '}
-              <AcronymTooltip term="IICRC" /> credentials — from hospitals to hotels.
+            <p className={`mt-4 ${LANDING_LEAD_CLASS}`}>
+              From hospitals to hotels, sector-specific pathways prepare crews for the standards
+              each workplace expects, including <AcronymTooltip term="IICRC" /> continuing
+              education.
             </p>
             <Link
               href="/industries"
