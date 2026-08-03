@@ -2,57 +2,40 @@
 
 import { HeroTrainingInfographic } from '@/components/landing/HeroTrainingInfographic';
 import { PUBLIC_SHELL_INNER_CLASS } from '@/components/landing/public-shell-width';
-import {
-  motion,
-  useMotionTemplate,
-  useMotionValue,
-  useReducedMotion,
-  useSpring,
-  useTransform,
-} from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
+import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion';
+import { ArrowRight, Check } from 'lucide-react';
 import Link from 'next/link';
-import { useRef, type MouseEvent, type ReactNode } from 'react';
+import { useRef, type ReactNode } from 'react';
 
+const easeOut = [0.16, 1, 0.3, 1] as const;
 const springSoft = { type: 'spring' as const, stiffness: 120, damping: 22, mass: 0.8 };
-const springSnappy = { type: 'spring' as const, stiffness: 280, damping: 24 };
+
+const trustItems = [
+  'Free courses to start',
+  'IICRC CECs on eligible courses',
+  'Certificates anyone can verify',
+];
 
 interface AnimatedHeroProps {
   benefits: string[];
 }
 
 /**
- * Light-first editorial hero — oversized brand, calm plane, mouse-aware product stage.
- * No floating chips, no dark atmosphere, no clutter in the first viewport.
+ * Centered cinematic editorial hero. A full-viewport, single-column
+ * composition with a staggered headline reveal and a scroll-linked product
+ * panorama. Replaces the old side-by-side hero pattern entirely.
  */
 export function AnimatedHero({ benefits: _benefits }: AnimatedHeroProps) {
   const reduceMotion = useReducedMotion();
   const sectionRef = useRef<HTMLElement>(null);
-  const stageRef = useRef<HTMLDivElement>(null);
 
-  const mx = useMotionValue(0);
-  const my = useMotionValue(0);
-  const sx = useSpring(mx, { stiffness: 140, damping: 22 });
-  const sy = useSpring(my, { stiffness: 140, damping: 22 });
-  const rotateX = useTransform(sy, [-0.5, 0.5], reduceMotion ? [0, 0] : [6, -6]);
-  const rotateY = useTransform(sx, [-0.5, 0.5], reduceMotion ? [0, 0] : [-8, 8]);
-  const glareX = useTransform(sx, [-0.5, 0.5], ['0%', '100%']);
-  const glareY = useTransform(sy, [-0.5, 0.5], ['0%', '100%']);
-  const glare = useMotionTemplate`radial-gradient(420px circle at ${glareX} ${glareY}, rgba(255,255,255,0.55), transparent 55%)`;
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start start', 'end start'],
+  });
 
-  function onStageMove(e: MouseEvent<HTMLDivElement>) {
-    if (reduceMotion || !stageRef.current) return;
-    const rect = stageRef.current.getBoundingClientRect();
-    mx.set((e.clientX - rect.left) / rect.width - 0.5);
-    my.set((e.clientY - rect.top) / rect.height - 0.5);
-  }
-
-  function onStageLeave() {
-    mx.set(0);
-    my.set(0);
-  }
-
-  const letters = 'CARSI'.split('');
+  const panoramaRotate = useTransform(scrollYProgress, [0, 0.6], reduceMotion ? [0, 0] : [8, 0]);
+  const panoramaLift = useTransform(scrollYProgress, [0, 0.6], reduceMotion ? [0, 0] : [0, -20]);
 
   return (
     <section
@@ -60,151 +43,153 @@ export function AnimatedHero({ benefits: _benefits }: AnimatedHeroProps) {
       className="relative isolate overflow-hidden bg-[#fafbfc]"
       aria-label="CARSI homepage hero"
     >
-      {/* Soft light plane — calm, not neon */}
+      {/* Calm light atmosphere: gradient plane, soft glow, dotted grid */}
       <div className="pointer-events-none absolute inset-0" aria-hidden>
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,#ffffff_0%,#f4f8fc_48%,#eef5fb_100%)]" />
-        <motion.div
-          className="absolute -top-32 left-1/2 h-[36rem] w-[56rem] -translate-x-1/2 rounded-full bg-[#2490ed]/[0.09] blur-[100px]"
-          animate={
-            reduceMotion
-              ? undefined
-              : {
-                  scale: [1, 1.06, 1],
-                  opacity: [0.7, 1, 0.7],
-                  transition: { duration: 10, repeat: Infinity, ease: 'easeInOut' },
-                }
-          }
-        />
-        <div className="absolute inset-0 opacity-[0.35] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_20%,black,transparent)]">
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,#ffffff_0%,#f5f9fd_55%,#eef5fb_100%)]" />
+        <div className="absolute top-[-12%] left-1/2 h-[42rem] w-[64rem] -translate-x-1/2 rounded-full bg-[#2490ed]/[0.10] blur-[120px]" />
+        <div className="absolute inset-0 opacity-[0.4] [mask-image:radial-gradient(ellipse_65%_55%_at_50%_28%,black,transparent)]">
           <div
             className="h-full w-full"
             style={{
               backgroundImage:
-                'linear-gradient(rgba(15,23,42,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(15,23,42,0.04) 1px, transparent 1px)',
-              backgroundSize: '64px 64px',
+                'linear-gradient(rgba(15,23,42,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(15,23,42,0.05) 1px, transparent 1px)',
+              backgroundSize: '56px 56px',
             }}
           />
         </div>
-        {/* Soft horizon line */}
-        <div className="absolute right-0 bottom-[18%] left-0 h-px bg-gradient-to-r from-transparent via-[#2490ed]/25 to-transparent" />
       </div>
 
       <div
-        className={`relative grid min-h-[min(94vh,900px)] items-center gap-12 py-20 lg:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)] lg:gap-16 lg:py-24 ${PUBLIC_SHELL_INNER_CLASS}`}
+        className={`relative flex min-h-[min(92vh,980px)] flex-col items-center justify-center py-24 sm:py-28 ${PUBLIC_SHELL_INNER_CLASS}`}
       >
-        <div className="relative z-10 max-w-xl">
-          <motion.p
-            className="text-[11px] font-medium tracking-[0.28em] text-[#146fc2] uppercase"
-            initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+        <div className="mx-auto flex max-w-4xl flex-col items-center text-center">
+          <motion.div
+            className="inline-flex items-center gap-2.5 rounded-full border border-slate-200/90 bg-white/80 py-1.5 pr-4 pl-1.5 shadow-[0_1px_2px_rgba(15,23,42,0.04)] backdrop-blur-sm"
+            initial={reduceMotion ? false : { opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ ...springSoft, delay: 0.05 }}
           >
-            Australian restoration training
-          </motion.p>
-
-          {/* Brand-first letter reveal */}
-          <h1 className="mt-5 font-[family-name:var(--font-display)] text-[clamp(3.5rem,12vw,7.5rem)] leading-[0.86] font-bold tracking-[-0.055em] text-slate-950">
-            <span className="sr-only">CARSI</span>
-            <span aria-hidden className="inline-flex">
-              {letters.map((letter, i) => (
-                <motion.span
-                  key={`${letter}-${i}`}
-                  className="inline-block"
-                  initial={reduceMotion ? false : { opacity: 0, y: 48, rotateX: -40 }}
-                  animate={{ opacity: 1, y: 0, rotateX: 0 }}
-                  transition={{ ...springSnappy, delay: reduceMotion ? 0 : 0.08 + i * 0.06 }}
-                  style={{ transformOrigin: '50% 100%', perspective: 600 }}
-                >
-                  {letter}
-                </motion.span>
-              ))}
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#eef5fb] px-2.5 py-0.5 text-[10px] font-semibold tracking-[0.08em] text-[#146fc2] uppercase">
+              <span className="relative flex h-1.5 w-1.5" aria-hidden>
+                <span className="absolute inline-flex h-full w-full rounded-full bg-[#2490ed] opacity-60 motion-safe:animate-ping" />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#146fc2]" />
+              </span>
+              Accredited
             </span>
+            <span className="text-[12px] font-medium text-slate-600">
+              IICRC CEC Accredited provider, made in Australia
+            </span>
+          </motion.div>
+
+          <h1 className="mt-8 font-[family-name:var(--font-display)] text-[clamp(2.7rem,7.5vw,5.6rem)] leading-[1.04] tracking-[-0.035em]">
+            <motion.span
+              className="block font-medium text-slate-900"
+              initial={reduceMotion ? false : { opacity: 0, y: 22, filter: 'blur(10px)' }}
+              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+              transition={{ duration: 0.9, ease: easeOut, delay: 0.12 }}
+            >
+              Learn the craft.
+            </motion.span>
+            <motion.span
+              className="block bg-gradient-to-r from-[#0f5fa8] via-[#2490ed] to-[#0f5fa8] bg-clip-text font-semibold text-transparent"
+              initial={reduceMotion ? false : { opacity: 0, y: 22, filter: 'blur(10px)' }}
+              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+              transition={{ duration: 0.9, ease: easeOut, delay: 0.26 }}
+            >
+              Carry the proof.
+            </motion.span>
           </h1>
 
-          <motion.div
-            className="mt-6 h-px w-full origin-left bg-gradient-to-r from-[#146fc2] via-[#2490ed]/50 to-transparent"
-            initial={reduceMotion ? false : { scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.45 }}
-            aria-hidden
-          />
-
           <motion.p
-            className="mt-7 font-[family-name:var(--font-display)] text-[clamp(1.35rem,2.4vw,1.85rem)] leading-[1.25] font-semibold tracking-tight text-slate-800"
-            initial={reduceMotion ? false : { opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ ...springSoft, delay: 0.35 }}
-          >
-            Professional training that fits the workday.
-          </motion.p>
-
-          <motion.p
-            className="mt-4 max-w-md text-[15px] leading-relaxed text-slate-500"
+            className="mt-7 max-w-2xl text-[16px] leading-relaxed font-normal text-slate-500 sm:text-lg"
             initial={reduceMotion ? false : { opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ ...springSoft, delay: 0.45 }}
+            transition={{ ...springSoft, delay: 0.42 }}
           >
-            Self-paced IICRC CEC Accredited courses — learn around the roster, track CECs, earn
-            verifiable credentials.
+            CARSI is the online training platform for Australian cleaning and restoration
+            professionals. Study around the roster, earn IICRC CECs on eligible courses, and hold
+            credentials anyone can verify in seconds.
           </motion.p>
 
           <motion.div
-            className="mt-10 flex flex-wrap items-center gap-3"
+            className="mt-10 flex flex-wrap items-center justify-center gap-3"
             initial={reduceMotion ? false : { opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ ...springSoft, delay: 0.55 }}
+            transition={{ ...springSoft, delay: 0.52 }}
           >
             <Link
               href="/courses"
-              className="group inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#146fc2] px-8 text-sm font-semibold text-white shadow-[0_14px_40px_-16px_rgba(20,111,194,0.7)] transition hover:bg-[#0f5fa8] focus-visible:ring-2 focus-visible:ring-[#2490ed]/45 focus-visible:outline-none"
+              className="group inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#146fc2] px-8 text-sm font-semibold text-white shadow-[0_18px_45px_-18px_rgba(20,111,194,0.75),inset_0_1px_0_rgba(255,255,255,0.18)] transition motion-safe:hover:-translate-y-0.5 hover:bg-[#0f5fa8] hover:shadow-[0_22px_50px_-18px_rgba(20,111,194,0.85),inset_0_1px_0_rgba(255,255,255,0.18)] focus-visible:ring-2 focus-visible:ring-[#2490ed]/45 focus-visible:outline-none"
             >
-              Browse courses
+              Start learning free
               <ArrowRight
                 className="h-4 w-4 transition group-hover:translate-x-0.5"
                 aria-hidden
               />
             </Link>
             <Link
-              href="/pathways"
-              className="inline-flex min-h-12 items-center justify-center rounded-full border border-slate-200 bg-white/80 px-7 text-sm font-semibold text-slate-700 backdrop-blur-sm transition hover:border-[#2490ed]/50 hover:text-[#146fc2] focus-visible:ring-2 focus-visible:ring-[#2490ed]/35 focus-visible:outline-none"
+              href="/pricing"
+              className="inline-flex min-h-12 items-center justify-center rounded-full border border-slate-200 bg-white/80 px-7 text-sm font-semibold text-slate-700 backdrop-blur-sm transition motion-safe:hover:-translate-y-0.5 hover:border-[#2490ed]/50 hover:text-[#146fc2] focus-visible:ring-2 focus-visible:ring-[#2490ed]/35 focus-visible:outline-none"
             >
-              Find my pathway
+              View pricing
             </Link>
           </motion.div>
+
+          <motion.ul
+            className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[13px] font-medium text-slate-500"
+            initial={reduceMotion ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.62 }}
+          >
+            {trustItems.map((item) => (
+              <li key={item} className="flex items-center gap-1.5">
+                <Check className="h-3.5 w-3.5 text-[#146fc2]" aria-hidden />
+                {item}
+              </li>
+            ))}
+          </motion.ul>
         </div>
 
-        {/* Mouse-aware product stage */}
-        <div
-          ref={stageRef}
-          onMouseMove={onStageMove}
-          onMouseLeave={onStageLeave}
-          className="relative z-10 mx-auto w-full max-w-[560px] [perspective:1200px] lg:max-w-none"
+        {/* Product panorama: the wow moment */}
+        <motion.div
+          className="relative mx-auto mt-16 w-full max-w-5xl [perspective:2000px] sm:mt-20"
+          initial={reduceMotion ? false : { opacity: 0, y: 60, scale: 0.94 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ ...springSoft, delay: 0.7 }}
         >
+          <div
+            className="pointer-events-none absolute -inset-x-10 -inset-y-16 -z-10 rounded-[3rem] bg-[conic-gradient(from_180deg_at_50%_50%,rgba(36,144,237,0.10),transparent_35%,transparent_65%,rgba(20,111,194,0.10))] blur-2xl"
+            aria-hidden
+          />
+          <div
+            className="pointer-events-none absolute -inset-16 -z-10 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(36,144,237,0.16),transparent_65%)] blur-3xl"
+            aria-hidden
+          />
+
           <motion.div
             style={{
-              rotateX: reduceMotion ? 0 : rotateX,
-              rotateY: reduceMotion ? 0 : rotateY,
+              rotateX: panoramaRotate,
+              y: panoramaLift,
               transformStyle: 'preserve-3d',
             }}
-            initial={reduceMotion ? false : { opacity: 0, y: 40, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ ...springSoft, delay: 0.25 }}
-            className="relative"
+            className="relative overflow-hidden rounded-[1.5rem] border border-slate-200/80 bg-white shadow-[0_60px_120px_-60px_rgba(15,23,42,0.35)]"
           >
             <div
-              className="pointer-events-none absolute -inset-10 rounded-[2rem] bg-[radial-gradient(ellipse_at_center,rgba(36,144,237,0.14),transparent_65%)] blur-2xl"
+              className="pointer-events-none absolute inset-x-0 top-0 z-10 h-px bg-gradient-to-r from-transparent via-white to-transparent"
               aria-hidden
             />
-            <div className="relative overflow-hidden rounded-[1.35rem] border border-slate-200/90 bg-white shadow-[0_40px_80px_-40px_rgba(15,23,42,0.28)]">
+            <HeroTrainingInfographic />
+
+            {!reduceMotion ? (
               <motion.div
-                className="pointer-events-none absolute inset-0 z-10 mix-blend-soft-light"
-                style={{ background: glare }}
-                aria-hidden
+                className="pointer-events-none absolute inset-y-0 left-0 z-20 w-1/3 bg-gradient-to-r from-transparent via-white/50 to-transparent"
+                initial={{ x: '-120%' }}
+                animate={{ x: '380%' }}
+                transition={{ duration: 1.4, ease: easeOut, delay: 1.15 }}
               />
-              <HeroTrainingInfographic />
-            </div>
+            ) : null}
           </motion.div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
@@ -219,7 +204,7 @@ interface AnimatedStatsProps {
   stats: Stat[];
 }
 
-/** @deprecated Stats moved into {@link HomeGrowthSection}. Kept for import compatibility. */
+/** @deprecated Stats moved into {@link HomeTrustStrip}. Kept for import compatibility. */
 export function AnimatedStats({ stats }: AnimatedStatsProps) {
   return (
     <section className="border-y border-slate-200/80 bg-white py-10">
@@ -293,8 +278,8 @@ export function AnimatedSection({
             <h2
               className={
                 minimalHeader
-                  ? 'font-[family-name:var(--font-display)] text-2xl font-bold text-slate-950'
-                  : 'max-w-3xl font-[family-name:var(--font-display)] text-2xl font-bold tracking-tight text-slate-950 md:text-3xl'
+                  ? 'font-[family-name:var(--font-display)] text-2xl font-semibold tracking-[-0.02em] text-slate-950'
+                  : 'max-w-3xl font-[family-name:var(--font-display)] text-2xl font-semibold tracking-[-0.02em] text-slate-950 md:text-3xl'
               }
             >
               {title}
