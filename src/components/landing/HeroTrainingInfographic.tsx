@@ -41,24 +41,39 @@ export function HeroTrainingInfographic() {
       role="img"
       aria-label="Learner workspace showing course progress, CEC tracking, and verifiable credentials"
     >
-      {/* Ambient depth */}
+      {/* Ambient depth + stage plate */}
       <div
-        className="pointer-events-none absolute inset-x-0 -inset-y-6 rounded-[2rem] bg-[radial-gradient(ellipse_at_30%_20%,rgba(36,144,237,0.22),transparent_55%),radial-gradient(ellipse_at_80%_70%,rgba(237,157,36,0.14),transparent_50%)] blur-2xl dark:opacity-90"
+        className="pointer-events-none absolute inset-x-0 -inset-y-8 rounded-[2.5rem] bg-[radial-gradient(ellipse_at_30%_20%,rgba(36,144,237,0.28),transparent_55%),radial-gradient(ellipse_at_80%_70%,rgba(237,157,36,0.16),transparent_50%)] blur-2xl dark:opacity-95"
         aria-hidden
       />
       <div
-        className="pointer-events-none absolute top-8 right-4 h-32 w-32 rounded-full bg-[#2490ed]/20 blur-3xl dark:bg-[#2490ed]/25"
+        className="pointer-events-none absolute top-6 right-2 h-40 w-40 rounded-full bg-[#2490ed]/25 blur-3xl dark:bg-[#2490ed]/30"
         aria-hidden
       />
       <div
-        className="pointer-events-none absolute bottom-6 left-0 h-28 w-28 rounded-full bg-emerald-400/15 blur-3xl dark:bg-emerald-500/20"
+        className="pointer-events-none absolute bottom-4 left-0 h-32 w-32 rounded-full bg-emerald-400/20 blur-3xl dark:bg-emerald-500/25"
+        aria-hidden
+      />
+      <div
+        className="pointer-events-none absolute right-[18%] bottom-[-6%] left-[18%] h-10 rounded-[100%] bg-slate-900/10 blur-xl dark:bg-black/40"
+        aria-hidden
+      />
+
+      {/* Decorative ring behind stage */}
+      <motion.div
+        animate={
+          reduceMotion
+            ? undefined
+            : { rotate: [0, 360], transition: { duration: 80, repeat: Infinity, ease: 'linear' } }
+        }
+        className="pointer-events-none absolute top-1/2 left-1/2 z-0 h-[118%] w-[118%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-[#2490ed]/20 dark:border-[#2490ed]/25"
         aria-hidden
       />
 
       {/* Floating CEC chip */}
       <motion.div
         animate={float(0.4)}
-        className="absolute -top-2 right-2 z-20 flex items-center gap-2 rounded-xl border border-[#2490ed]/25 bg-white/95 px-3 py-2 shadow-[0_16px_40px_-16px_rgba(36,144,237,0.45)] backdrop-blur-md dark:border-[#2490ed]/35 dark:bg-[#0f172a]/95"
+        className="absolute -top-3 right-0 z-30 flex items-center gap-2 rounded-2xl border border-[#2490ed]/30 bg-white/95 px-3.5 py-2.5 shadow-[0_20px_50px_-18px_rgba(36,144,237,0.55)] backdrop-blur-md dark:border-[#2490ed]/40 dark:bg-[#0f172a]/95"
       >
         <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#eef7ff] dark:bg-[#2490ed]/15">
           <TrendingUp className="h-4 w-4 text-[#146fc2] dark:text-[#8fd0ff]" aria-hidden />
@@ -88,8 +103,8 @@ export function HeroTrainingInfographic() {
       </motion.div>
 
       {/* Main panel */}
-      <div className="relative overflow-hidden rounded-[1.35rem] border border-slate-200/90 bg-gradient-to-br from-white via-white to-[#f0f7ff] p-[1px] shadow-[0_32px_80px_-40px_rgba(15,23,42,0.35)] dark:border-white/10 dark:from-white/10 dark:via-white/[0.06] dark:to-[#2490ed]/10 dark:shadow-[0_32px_80px_-36px_rgba(0,0,0,0.65)]">
-        <div className="rounded-[1.3rem] bg-white/90 p-4 backdrop-blur-sm sm:p-5 dark:bg-[#080c14]/90">
+      <div className="relative z-10 overflow-hidden rounded-[1.5rem] border border-slate-200/90 bg-gradient-to-br from-white via-white to-[#f0f7ff] p-[1px] shadow-[0_40px_100px_-44px_rgba(15,23,42,0.45)] dark:border-white/10 dark:from-white/10 dark:via-white/[0.06] dark:to-[#2490ed]/10 dark:shadow-[0_40px_100px_-40px_rgba(0,0,0,0.75)]">
+        <div className="rounded-[1.45rem] bg-white/92 p-4 backdrop-blur-sm sm:p-5 dark:bg-[#080c14]/92">
           {/* Window chrome */}
           <div className="mb-4 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2">
