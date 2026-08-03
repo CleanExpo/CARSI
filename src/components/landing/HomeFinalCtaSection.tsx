@@ -57,21 +57,21 @@ export function HomeFinalCtaSection() {
           <div className="mt-10 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:flex-wrap sm:items-center">
             <Link
               href="/courses"
-              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[#ed9d24] px-7 py-3 text-sm font-semibold text-slate-950 shadow-[0_12px_40px_-12px_rgba(237,157,36,0.7)] transition hover:-translate-y-0.5 hover:bg-[#f2b14f] focus-visible:ring-2 focus-visible:ring-[#ed9d24]/50 focus-visible:outline-none"
+              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[#ed9d24] px-7 py-3 text-sm font-semibold text-slate-950 shadow-[0_12px_40px_-12px_rgba(237,157,36,0.7)] transition motion-safe:hover:-translate-y-0.5 hover:bg-[#f2b14f] focus-visible:ring-2 focus-visible:ring-[#ed9d24]/50 focus-visible:outline-none"
             >
               Browse the catalogue
               <CheckCircle2 className="h-4 w-4" aria-hidden />
             </Link>
             <Link
               href={`${ccwRoadshowPath}#booking`}
-              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-white/25 bg-white/5 px-7 py-3 text-sm font-semibold text-white backdrop-blur-sm transition hover:-translate-y-0.5 hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-[#2490ed]/45 focus-visible:outline-none"
+              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-white/25 bg-white/5 px-7 py-3 text-sm font-semibold text-white backdrop-blur-sm transition motion-safe:hover:-translate-y-0.5 hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-[#2490ed]/45 focus-visible:outline-none"
             >
               Book Growth Days
               <Ticket className="h-4 w-4" aria-hidden />
             </Link>
             <Link
               href="/pathways"
-              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-white/25 bg-white/5 px-7 py-3 text-sm font-semibold text-white backdrop-blur-sm transition hover:-translate-y-0.5 hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-[#2490ed]/45 focus-visible:outline-none"
+              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-white/25 bg-white/5 px-7 py-3 text-sm font-semibold text-white backdrop-blur-sm transition motion-safe:hover:-translate-y-0.5 hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-[#2490ed]/45 focus-visible:outline-none"
             >
               Find my pathway
               <Compass className="h-4 w-4" aria-hidden />

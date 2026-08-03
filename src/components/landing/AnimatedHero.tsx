@@ -149,7 +149,7 @@ export function AnimatedHero({ benefits: _benefits }: AnimatedHeroProps) {
             >
               <Link
                 href="/courses"
-                className="group inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-[#146fc2] px-7 py-3.5 text-sm font-semibold text-white shadow-[0_20px_48px_-16px_rgba(20,111,194,0.65)] transition duration-300 hover:-translate-y-0.5 hover:bg-[#0f5fa8] hover:shadow-[0_24px_56px_-14px_rgba(20,111,194,0.7)] focus-visible:ring-2 focus-visible:ring-[#2490ed]/50 focus-visible:outline-none"
+                className="group inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-[#146fc2] px-7 py-3.5 text-sm font-semibold text-white shadow-[0_20px_48px_-16px_rgba(20,111,194,0.65)] transition duration-300 motion-safe:hover:-translate-y-0.5 hover:bg-[#0f5fa8] hover:shadow-[0_24px_56px_-14px_rgba(20,111,194,0.7)] focus-visible:ring-2 focus-visible:ring-[#2490ed]/50 focus-visible:outline-none"
               >
                 Browse courses
                 <ArrowRight
@@ -159,7 +159,7 @@ export function AnimatedHero({ benefits: _benefits }: AnimatedHeroProps) {
               </Link>
               <Link
                 href="/pathways"
-                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-slate-300/80 bg-white/70 px-7 py-3.5 text-sm font-semibold text-slate-800 shadow-sm backdrop-blur-md transition duration-300 hover:-translate-y-0.5 hover:border-[#2490ed] hover:text-[#146fc2] focus-visible:ring-2 focus-visible:ring-[#2490ed]/40 focus-visible:outline-none dark:border-white/15 dark:bg-white/[0.06] dark:text-white dark:hover:border-[#2490ed]/50 dark:hover:text-[#8fd0ff]"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-slate-300/80 bg-white/70 px-7 py-3.5 text-sm font-semibold text-slate-800 shadow-sm backdrop-blur-md transition duration-300 motion-safe:hover:-translate-y-0.5 hover:border-[#2490ed] hover:text-[#146fc2] focus-visible:ring-2 focus-visible:ring-[#2490ed]/40 focus-visible:outline-none dark:border-white/15 dark:bg-white/[0.06] dark:text-white dark:hover:border-[#2490ed]/50 dark:hover:text-[#8fd0ff]"
               >
                 Find my pathway
               </Link>
