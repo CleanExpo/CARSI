@@ -10,6 +10,7 @@ import { PublicFooter } from '@/components/landing/PublicFooter';
 import { PublicNavbar } from '@/components/landing/PublicNavbar';
 import FloatingChatGate from '@/components/lms/FloatingChatGate';
 import { FAQSchema } from '@/components/seo/JsonLd';
+import type { CourseListItem } from '@/lib/course-list-item';
 import {
   catalogueMetaDescription,
   formatCourseCountForCopy,
@@ -17,7 +18,6 @@ import {
 } from '@/lib/server/public-catalogue-facts';
 import { getHomepageFeaturedCourses } from '@/lib/server/public-courses-list';
 import { subscriptionsEnabled } from '@/lib/server/subscriptions-flag';
-import type { CourseListItem } from '@/lib/course-list-item';
 import type { Metadata } from 'next';
 
 // ISR: serve a CDN-cached render, refreshed every 5 minutes, instead of SSR on every
@@ -114,10 +114,7 @@ export default async function Home() {
   ];
 
   return (
-    <div
-      id="main-content"
-      className="min-h-screen bg-[#f6f8fb] text-slate-900 dark:bg-[#050505] dark:text-white"
-    >
+    <div id="main-content" className="min-h-screen bg-[#fafbfc] text-slate-900">
       <FAQSchema questions={faqs} />
       <PublicNavbar />
       <AnimatedHero benefits={benefits} />

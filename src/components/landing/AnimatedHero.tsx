@@ -2,197 +2,205 @@
 
 import { HeroTrainingInfographic } from '@/components/landing/HeroTrainingInfographic';
 import { PUBLIC_SHELL_INNER_CLASS } from '@/components/landing/public-shell-width';
-import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion';
-import { ArrowRight, CheckCircle2, Sparkles } from 'lucide-react';
+import {
+  motion,
+  useMotionTemplate,
+  useMotionValue,
+  useReducedMotion,
+  useSpring,
+  useTransform,
+} from 'framer-motion';
+import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
-import { useRef, type ReactNode } from 'react';
+import { useRef, type MouseEvent, type ReactNode } from 'react';
 
-const smoothEase: [number, number, number, number] = [0.22, 1, 0.36, 1];
-
-const fadeInUp = {
-  hidden: { opacity: 0, y: 22 },
-  visible: { opacity: 1, y: 0 },
-};
-
-const staggerContainer = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.08,
-      delayChildren: 0.06,
-    },
-  },
-};
-
-const trustPoints = [
-  'IICRC CEC Accredited',
-  'Beginner to advanced',
-  'Learn around the roster',
-] as const;
+const springSoft = { type: 'spring' as const, stiffness: 120, damping: 22, mass: 0.8 };
+const springSnappy = { type: 'spring' as const, stiffness: 280, damping: 24 };
 
 interface AnimatedHeroProps {
   benefits: string[];
 }
 
 /**
- * Premium “stage + floating product” hero — atmospheric plane, brand-forward
- * CARSI mark, single CTA group, layered product showcase with parallax.
+ * Light-first editorial hero — oversized brand, calm plane, mouse-aware product stage.
+ * No floating chips, no dark atmosphere, no clutter in the first viewport.
  */
 export function AnimatedHero({ benefits: _benefits }: AnimatedHeroProps) {
   const reduceMotion = useReducedMotion();
   const sectionRef = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ['start start', 'end start'],
-  });
-  const stageY = useTransform(scrollYProgress, [0, 1], [0, reduceMotion ? 0 : 48]);
-  const orbY = useTransform(scrollYProgress, [0, 1], [0, reduceMotion ? 0 : -36]);
+  const stageRef = useRef<HTMLDivElement>(null);
 
-  const fadeVariants = reduceMotion
-    ? { hidden: { opacity: 1, y: 0 }, visible: { opacity: 1, y: 0 } }
-    : fadeInUp;
-  const staggerVariants = reduceMotion
-    ? { hidden: { opacity: 1 }, visible: { opacity: 1 } }
-    : staggerContainer;
+  const mx = useMotionValue(0);
+  const my = useMotionValue(0);
+  const sx = useSpring(mx, { stiffness: 140, damping: 22 });
+  const sy = useSpring(my, { stiffness: 140, damping: 22 });
+  const rotateX = useTransform(sy, [-0.5, 0.5], reduceMotion ? [0, 0] : [6, -6]);
+  const rotateY = useTransform(sx, [-0.5, 0.5], reduceMotion ? [0, 0] : [-8, 8]);
+  const glareX = useTransform(sx, [-0.5, 0.5], ['0%', '100%']);
+  const glareY = useTransform(sy, [-0.5, 0.5], ['0%', '100%']);
+  const glare = useMotionTemplate`radial-gradient(420px circle at ${glareX} ${glareY}, rgba(255,255,255,0.55), transparent 55%)`;
+
+  function onStageMove(e: MouseEvent<HTMLDivElement>) {
+    if (reduceMotion || !stageRef.current) return;
+    const rect = stageRef.current.getBoundingClientRect();
+    mx.set((e.clientX - rect.left) / rect.width - 0.5);
+    my.set((e.clientY - rect.top) / rect.height - 0.5);
+  }
+
+  function onStageLeave() {
+    mx.set(0);
+    my.set(0);
+  }
+
+  const letters = 'CARSI'.split('');
 
   return (
     <section
       ref={sectionRef}
-      className="relative isolate min-h-[min(92vh,920px)] overflow-hidden bg-[#f6f8fb] dark:bg-[#050505]"
+      className="relative isolate overflow-hidden bg-[#fafbfc]"
+      aria-label="CARSI homepage hero"
     >
-      {/* Atmospheric plane */}
+      {/* Soft light plane — calm, not neon */}
       <div className="pointer-events-none absolute inset-0" aria-hidden>
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_90%_70%_at_50%_-15%,rgba(36,144,237,0.22),transparent_58%)] dark:bg-[radial-gradient(ellipse_90%_70%_at_50%_-15%,rgba(36,144,237,0.28),transparent_58%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_55%_45%_at_88%_18%,rgba(237,157,36,0.14),transparent_50%)] dark:bg-[radial-gradient(ellipse_55%_45%_at_88%_18%,rgba(237,157,36,0.18),transparent_50%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_40%_35%_at_8%_75%,rgba(184,230,46,0.08),transparent_55%)]" />
-        <div
-          className="absolute inset-0 opacity-[0.4] dark:opacity-[0.22]"
-          style={{
-            backgroundImage: `linear-gradient(rgba(15,23,42,0.035) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(15,23,42,0.035) 1px, transparent 1px)`,
-            backgroundSize: '56px 56px',
-            maskImage: 'radial-gradient(ellipse 80% 70% at 50% 30%, black, transparent)',
-          }}
-        />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,#ffffff_0%,#f4f8fc_48%,#eef5fb_100%)]" />
         <motion.div
-          style={{ y: orbY }}
-          className="absolute -top-24 left-[12%] h-64 w-64 rounded-full bg-[#2490ed]/25 blur-[90px] dark:bg-[#2490ed]/30"
+          className="absolute -top-32 left-1/2 h-[36rem] w-[56rem] -translate-x-1/2 rounded-full bg-[#2490ed]/[0.09] blur-[100px]"
+          animate={
+            reduceMotion
+              ? undefined
+              : {
+                  scale: [1, 1.06, 1],
+                  opacity: [0.7, 1, 0.7],
+                  transition: { duration: 10, repeat: Infinity, ease: 'easeInOut' },
+                }
+          }
         />
-        <motion.div
-          style={{ y: orbY }}
-          className="absolute top-[20%] right-[-5%] h-72 w-72 rounded-full bg-[#ed9d24]/18 blur-[100px]"
-        />
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#f6f8fb] to-transparent dark:from-[#050505]" />
+        <div className="absolute inset-0 opacity-[0.35] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_20%,black,transparent)]">
+          <div
+            className="h-full w-full"
+            style={{
+              backgroundImage:
+                'linear-gradient(rgba(15,23,42,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(15,23,42,0.04) 1px, transparent 1px)',
+              backgroundSize: '64px 64px',
+            }}
+          />
+        </div>
+        {/* Soft horizon line */}
+        <div className="absolute right-0 bottom-[18%] left-0 h-px bg-gradient-to-r from-transparent via-[#2490ed]/25 to-transparent" />
       </div>
 
       <div
-        className={`relative flex min-h-[min(92vh,920px)] flex-col justify-center py-16 sm:py-20 lg:py-24 ${PUBLIC_SHELL_INNER_CLASS}`}
+        className={`relative grid min-h-[min(94vh,900px)] items-center gap-12 py-20 lg:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)] lg:gap-16 lg:py-24 ${PUBLIC_SHELL_INNER_CLASS}`}
       >
-        <div className="grid items-center gap-14 lg:grid-cols-[minmax(0,1.05fr)_minmax(340px,0.95fr)] lg:gap-10 xl:gap-16">
-          {/* Copy column — brand first */}
-          <motion.div initial="hidden" animate="visible" variants={staggerVariants} className="relative z-10">
-            <motion.p
-              variants={fadeVariants}
-              transition={{ duration: 0.55, ease: smoothEase }}
-              className="font-[family-name:var(--font-display,inherit)] text-[clamp(2.75rem,8vw,5.5rem)] leading-[0.92] font-extrabold tracking-[-0.04em] text-slate-950 dark:text-white"
-            >
-              <span className="bg-gradient-to-br from-slate-950 via-slate-800 to-[#146fc2] bg-clip-text text-transparent dark:from-white dark:via-white dark:to-[#8fd0ff]">
-                CARSI
-              </span>
-            </motion.p>
+        <div className="relative z-10 max-w-xl">
+          <motion.p
+            className="text-[11px] font-medium tracking-[0.28em] text-[#146fc2] uppercase"
+            initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ ...springSoft, delay: 0.05 }}
+          >
+            Australian restoration training
+          </motion.p>
 
-            <motion.div
-              variants={fadeVariants}
-              transition={{ duration: 0.55, ease: smoothEase }}
-              className="mt-3 h-1 w-24 overflow-hidden rounded-full bg-slate-200/80 dark:bg-white/10"
-              aria-hidden
-            >
-              <motion.div
-                className="h-full w-full origin-left rounded-full bg-gradient-to-r from-[#146fc2] via-[#2490ed] to-[#ed9d24]"
-                initial={{ scaleX: reduceMotion ? 1 : 0 }}
-                animate={{ scaleX: 1 }}
-                transition={{ duration: 0.9, ease: smoothEase, delay: 0.35 }}
-              />
-            </motion.div>
-
-            <motion.p
-              variants={fadeVariants}
-              transition={{ duration: 0.55, ease: smoothEase }}
-              className="mt-4 inline-flex items-center gap-2 text-[11px] font-semibold tracking-[0.22em] text-[#146fc2] uppercase dark:text-[#8fd0ff]"
-            >
-              <Sparkles className="h-3.5 w-3.5" aria-hidden />
-              Australia&apos;s restoration training platform
-            </motion.p>
-
-            <motion.h1
-              variants={fadeVariants}
-              transition={{ duration: 0.55, ease: smoothEase }}
-              className="mt-6 max-w-xl text-[clamp(1.75rem,3.5vw,2.75rem)] leading-[1.12] font-bold tracking-tight text-slate-900 dark:text-white"
-            >
-              Professional training that fits the workday.
-            </motion.h1>
-
-            <motion.p
-              variants={fadeVariants}
-              transition={{ duration: 0.55, ease: smoothEase }}
-              className="mt-4 max-w-lg text-base leading-relaxed text-slate-600 sm:text-lg dark:text-white/65"
-            >
-              Self-paced IICRC CEC courses for technicians starting out, updating skills, or
-              maintaining credentials — without travel or downtime.
-            </motion.p>
-
-            <motion.div
-              variants={fadeVariants}
-              transition={{ duration: 0.55, ease: smoothEase }}
-              className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center"
-            >
-              <Link
-                href="/courses"
-                className="group inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-[#146fc2] px-7 py-3.5 text-sm font-semibold text-white shadow-[0_20px_48px_-16px_rgba(20,111,194,0.65)] transition duration-300 motion-safe:hover:-translate-y-0.5 hover:bg-[#0f5fa8] hover:shadow-[0_24px_56px_-14px_rgba(20,111,194,0.7)] focus-visible:ring-2 focus-visible:ring-[#2490ed]/50 focus-visible:outline-none"
-              >
-                Browse courses
-                <ArrowRight
-                  className="h-4 w-4 transition group-hover:translate-x-0.5"
-                  aria-hidden
-                />
-              </Link>
-              <Link
-                href="/pathways"
-                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-slate-300/80 bg-white/70 px-7 py-3.5 text-sm font-semibold text-slate-800 shadow-sm backdrop-blur-md transition duration-300 motion-safe:hover:-translate-y-0.5 hover:border-[#2490ed] hover:text-[#146fc2] focus-visible:ring-2 focus-visible:ring-[#2490ed]/40 focus-visible:outline-none dark:border-white/15 dark:bg-white/[0.06] dark:text-white dark:hover:border-[#2490ed]/50 dark:hover:text-[#8fd0ff]"
-              >
-                Find my pathway
-              </Link>
-            </motion.div>
-
-            <motion.ul
-              variants={staggerVariants}
-              className="mt-10 flex flex-wrap gap-x-6 gap-y-2.5 border-t border-slate-200/80 pt-6 dark:border-white/10"
-            >
-              {trustPoints.map((point) => (
-                <motion.li
-                  key={point}
-                  variants={fadeVariants}
-                  transition={{ duration: 0.45, ease: smoothEase }}
-                  className="flex items-center gap-2 text-sm text-slate-700 dark:text-white/75"
+          {/* Brand-first letter reveal */}
+          <h1 className="mt-5 font-[family-name:var(--font-display)] text-[clamp(3.5rem,12vw,7.5rem)] leading-[0.86] font-bold tracking-[-0.055em] text-slate-950">
+            <span className="sr-only">CARSI</span>
+            <span aria-hidden className="inline-flex">
+              {letters.map((letter, i) => (
+                <motion.span
+                  key={`${letter}-${i}`}
+                  className="inline-block"
+                  initial={reduceMotion ? false : { opacity: 0, y: 48, rotateX: -40 }}
+                  animate={{ opacity: 1, y: 0, rotateX: 0 }}
+                  transition={{ ...springSnappy, delay: reduceMotion ? 0 : 0.08 + i * 0.06 }}
+                  style={{ transformOrigin: '50% 100%', perspective: 600 }}
                 >
-                  <CheckCircle2
-                    className="h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400"
-                    aria-hidden
-                  />
-                  {point}
-                </motion.li>
+                  {letter}
+                </motion.span>
               ))}
-            </motion.ul>
-          </motion.div>
+            </span>
+          </h1>
 
-          {/* Product stage */}
-          <motion.div style={{ y: stageY }} className="relative mx-auto w-full max-w-[620px] lg:max-w-none">
+          <motion.div
+            className="mt-6 h-px w-full origin-left bg-gradient-to-r from-[#146fc2] via-[#2490ed]/50 to-transparent"
+            initial={reduceMotion ? false : { scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.45 }}
+            aria-hidden
+          />
+
+          <motion.p
+            className="mt-7 font-[family-name:var(--font-display)] text-[clamp(1.35rem,2.4vw,1.85rem)] leading-[1.25] font-semibold tracking-tight text-slate-800"
+            initial={reduceMotion ? false : { opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ ...springSoft, delay: 0.35 }}
+          >
+            Professional training that fits the workday.
+          </motion.p>
+
+          <motion.p
+            className="mt-4 max-w-md text-[15px] leading-relaxed text-slate-500"
+            initial={reduceMotion ? false : { opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ ...springSoft, delay: 0.45 }}
+          >
+            Self-paced IICRC CEC Accredited courses — learn around the roster, track CECs, earn
+            verifiable credentials.
+          </motion.p>
+
+          <motion.div
+            className="mt-10 flex flex-wrap items-center gap-3"
+            initial={reduceMotion ? false : { opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ ...springSoft, delay: 0.55 }}
+          >
+            <Link
+              href="/courses"
+              className="group inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#146fc2] px-8 text-sm font-semibold text-white shadow-[0_14px_40px_-16px_rgba(20,111,194,0.7)] transition hover:bg-[#0f5fa8] focus-visible:ring-2 focus-visible:ring-[#2490ed]/45 focus-visible:outline-none"
+            >
+              Browse courses
+              <ArrowRight
+                className="h-4 w-4 transition group-hover:translate-x-0.5"
+                aria-hidden
+              />
+            </Link>
+            <Link
+              href="/pathways"
+              className="inline-flex min-h-12 items-center justify-center rounded-full border border-slate-200 bg-white/80 px-7 text-sm font-semibold text-slate-700 backdrop-blur-sm transition hover:border-[#2490ed]/50 hover:text-[#146fc2] focus-visible:ring-2 focus-visible:ring-[#2490ed]/35 focus-visible:outline-none"
+            >
+              Find my pathway
+            </Link>
+          </motion.div>
+        </div>
+
+        {/* Mouse-aware product stage */}
+        <div
+          ref={stageRef}
+          onMouseMove={onStageMove}
+          onMouseLeave={onStageLeave}
+          className="relative z-10 mx-auto w-full max-w-[560px] [perspective:1200px] lg:max-w-none"
+        >
+          <motion.div
+            style={{
+              rotateX: reduceMotion ? 0 : rotateX,
+              rotateY: reduceMotion ? 0 : rotateY,
+              transformStyle: 'preserve-3d',
+            }}
+            initial={reduceMotion ? false : { opacity: 0, y: 40, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ ...springSoft, delay: 0.25 }}
+            className="relative"
+          >
             <div
-              className="pointer-events-none absolute -inset-8 rounded-[2.5rem] bg-gradient-to-br from-[#2490ed]/15 via-transparent to-[#ed9d24]/12 blur-2xl dark:from-[#2490ed]/25 dark:to-[#ed9d24]/15"
+              className="pointer-events-none absolute -inset-10 rounded-[2rem] bg-[radial-gradient(ellipse_at_center,rgba(36,144,237,0.14),transparent_65%)] blur-2xl"
               aria-hidden
             />
-            <div className="relative">
+            <div className="relative overflow-hidden rounded-[1.35rem] border border-slate-200/90 bg-white shadow-[0_40px_80px_-40px_rgba(15,23,42,0.28)]">
+              <motion.div
+                className="pointer-events-none absolute inset-0 z-10 mix-blend-soft-light"
+                style={{ background: glare }}
+                aria-hidden
+              />
               <HeroTrainingInfographic />
             </div>
           </motion.div>
@@ -214,18 +222,15 @@ interface AnimatedStatsProps {
 /** @deprecated Stats moved into {@link HomeGrowthSection}. Kept for import compatibility. */
 export function AnimatedStats({ stats }: AnimatedStatsProps) {
   return (
-    <section className="border-y border-slate-200 bg-white py-10 dark:border-white/10 dark:bg-[#0a0a0a]">
+    <section className="border-y border-slate-200/80 bg-white py-10">
       <div className={PUBLIC_SHELL_INNER_CLASS}>
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+        <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
           {stats.map((stat) => (
-            <div
-              key={stat.label}
-              className="rounded-lg border border-slate-200 bg-[#f8fbff] px-4 py-5 text-center dark:border-white/10 dark:bg-white/[0.04]"
-            >
-              <p className="text-2xl font-bold text-[#146fc2] tabular-nums sm:text-3xl dark:text-[#8fd0ff]">
+            <div key={stat.label} className="text-center sm:text-left">
+              <p className="font-[family-name:var(--font-display)] text-2xl font-bold text-[#146fc2] tabular-nums sm:text-3xl">
                 {stat.value}
               </p>
-              <p className="mt-1 text-xs font-semibold tracking-wider text-slate-600 uppercase dark:text-white/55">
+              <p className="mt-1 text-xs font-medium tracking-wider text-slate-500 uppercase">
                 {stat.label}
               </p>
             </div>
@@ -247,7 +252,7 @@ export function AnimatedCard({ children, index }: AnimatedCardProps) {
       initial={{ opacity: 0, y: 16 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-40px' }}
-      transition={{ duration: 0.45, ease: smoothEase, delay: index * 0.05 }}
+      transition={{ ...springSoft, delay: index * 0.05 }}
     >
       {children}
     </motion.div>
@@ -272,28 +277,28 @@ export function AnimatedSection({
   minimalHeader = false,
 }: AnimatedSectionProps) {
   return (
-    <section
-      className={`relative border-t border-slate-200/80 bg-[#f6f8fb] py-16 md:py-24 dark:border-white/10 dark:bg-[#050505] ${className}`}
-    >
+    <section className={`relative border-t border-slate-200/70 bg-[#fafbfc] py-16 md:py-24 ${className}`}>
       <div className={PUBLIC_SHELL_INNER_CLASS}>
         <motion.div
           initial={{ opacity: 0, y: 18 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.5, ease: smoothEase }}
+          transition={springSoft}
           className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"
         >
           <div>
-            <p className="mb-2 text-[11px] font-semibold tracking-[0.18em] text-[#146fc2] uppercase dark:text-[#8fd0ff]">
+            <p className="mb-2 text-[11px] font-medium tracking-[0.2em] text-[#146fc2] uppercase">
               {label}
             </p>
-            {minimalHeader ? (
-              <h2 className="text-2xl font-bold text-slate-950 dark:text-white">{title}</h2>
-            ) : (
-              <h2 className="max-w-3xl text-2xl font-bold tracking-tight text-slate-950 md:text-3xl dark:text-white">
-                {title}
-              </h2>
-            )}
+            <h2
+              className={
+                minimalHeader
+                  ? 'font-[family-name:var(--font-display)] text-2xl font-bold text-slate-950'
+                  : 'max-w-3xl font-[family-name:var(--font-display)] text-2xl font-bold tracking-tight text-slate-950 md:text-3xl'
+              }
+            >
+              {title}
+            </h2>
           </div>
           {rightContent ? <div className="shrink-0">{rightContent}</div> : null}
         </motion.div>

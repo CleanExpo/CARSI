@@ -27,7 +27,7 @@ type HomeTier = {
 };
 
 /**
- * Split-screen pricing — sticky story left, stacked plans right (not a 3-up card grid).
+ * Minimal light pricing — typographic rows, hairline dividers, no heavy cards.
  */
 export function HomePricingSection({
   subscriptionsEnabled = false,
@@ -75,89 +75,85 @@ export function HomePricingSection({
   return (
     <section
       aria-labelledby="home-pricing-heading"
-      className="relative border-t border-slate-200/80 bg-[#f6f8fb] py-16 md:py-24 dark:border-white/10 dark:bg-[#050505]"
+      className="relative border-t border-slate-200/70 bg-[#fafbfc] py-16 md:py-24"
     >
-      <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_50%_60%_at_100%_0%,rgba(36,144,237,0.1),transparent_55%)] dark:bg-[radial-gradient(ellipse_50%_60%_at_100%_0%,rgba(36,144,237,0.16),transparent_55%)]"
-        aria-hidden
-      />
+      <div className={PUBLIC_SHELL_INNER_CLASS}>
+        <div className="max-w-xl">
+          <p className="text-[11px] font-medium tracking-[0.22em] text-[#146fc2] uppercase">
+            Pricing
+          </p>
+          <h2
+            id="home-pricing-heading"
+            className="mt-3 font-[family-name:var(--font-display)] text-3xl font-bold tracking-tight text-slate-950 md:text-4xl"
+          >
+            Simple pricing for restoration teams
+          </h2>
+          <p className="mt-4 text-[15px] leading-relaxed text-slate-500">
+            Start free, buy any course, or unlock full catalogue access — IICRC CEC tracking
+            included where approved.
+          </p>
+        </div>
 
-      <div className={`relative ${PUBLIC_SHELL_INNER_CLASS}`}>
-        <div className="grid gap-12 lg:grid-cols-[minmax(260px,0.9fr)_minmax(0,1.1fr)] lg:gap-16">
-          <div className="lg:sticky lg:top-28 lg:self-start">
-            <p className="text-[11px] font-semibold tracking-[0.18em] text-[#146fc2] uppercase dark:text-[#8fd0ff]">
-              Pricing
-            </p>
-            <h2
-              id="home-pricing-heading"
-              className="mt-3 text-2xl font-bold tracking-tight text-slate-950 md:text-3xl dark:text-white"
+        <div className="mt-14 divide-y divide-slate-200/80 border-y border-slate-200/80">
+          {tiers.map((tier) => (
+            <div
+              key={tier.name}
+              className="grid gap-4 py-8 sm:grid-cols-[minmax(0,1.2fr)_auto] sm:items-center sm:gap-10"
             >
-              Simple pricing, built for restoration teams
-            </h2>
-            <p className="mt-4 text-sm leading-relaxed text-slate-600 md:text-base dark:text-white/65">
-              Start free, buy any course outright, or unlock 100% access with a yearly membership —
-              IICRC CEC tracking and verified certificates included.
-            </p>
-            <Link
-              href="/pricing"
-              className="mt-8 inline-flex items-center gap-2 rounded-sm text-sm font-semibold text-[#146fc2] transition hover:gap-3 hover:text-[#0f5fa8] focus-visible:ring-2 focus-visible:ring-[#2490ed]/40 focus-visible:outline-none dark:text-[#8fd0ff] dark:hover:text-[#b8e2ff]"
-            >
-              Compare all plans, including team seats
-              <ArrowRight className="h-4 w-4" aria-hidden />
-            </Link>
-          </div>
-
-          <div className="flex flex-col gap-4">
-            {tiers.map((tier) => (
-              <div
-                key={tier.name}
-                className={`group relative flex flex-col overflow-hidden rounded-2xl border p-6 transition duration-300 sm:flex-row sm:items-center sm:gap-8 sm:p-7 ${
-                  tier.highlighted
-                    ? 'border-[#146fc2]/50 bg-white shadow-[0_24px_60px_-36px_rgba(20,111,194,0.45)] dark:border-[#2490ed]/45 dark:bg-[#0f172a]'
-                    : 'border-slate-200/90 bg-white/80 hover:border-[#2490ed]/30 hover:shadow-md dark:border-white/10 dark:bg-white/[0.04] dark:hover:border-[#2490ed]/35'
-                }`}
-              >
-                {tier.highlighted ? (
-                  <span className="absolute top-4 right-4 rounded-full bg-[#146fc2] px-2.5 py-0.5 text-[10px] font-bold tracking-wide text-white uppercase">
-                    Best value
+              <div>
+                <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                  <h3 className="font-[family-name:var(--font-display)] text-lg font-semibold text-slate-950">
+                    {tier.name}
+                  </h3>
+                  {tier.highlighted ? (
+                    <span className="text-[10px] font-semibold tracking-[0.14em] text-[#146fc2] uppercase">
+                      Best value
+                    </span>
+                  ) : null}
+                </div>
+                <p className="mt-3 flex flex-wrap items-baseline gap-2">
+                  <span className="font-[family-name:var(--font-display)] text-3xl font-bold tracking-tight text-slate-950 tabular-nums">
+                    {tier.price}
                   </span>
-                ) : null}
-                <div className={`min-w-0 flex-1 ${tier.highlighted ? 'pr-24' : ''}`}>
-                  <h3 className="text-base font-bold text-slate-950 dark:text-white">{tier.name}</h3>
-                  <p className="mt-2 flex flex-wrap items-baseline gap-1.5">
-                    <span className="text-3xl font-bold tracking-tight text-slate-950 tabular-nums dark:text-white">
-                      {tier.price}
-                    </span>
-                    <span className="text-xs text-slate-600 dark:text-white/55">{tier.cadence}</span>
-                  </p>
-                  <p className="mt-2 max-w-md text-sm leading-relaxed text-slate-600 dark:text-white/60">
-                    {tier.description}
-                  </p>
-                </div>
-                <div className="mt-5 shrink-0 sm:mt-0">
-                  {tier.comingSoon ? (
-                    <span
-                      aria-disabled="true"
-                      className="inline-flex min-h-11 cursor-not-allowed items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-5 py-2.5 text-sm font-semibold text-slate-500 dark:border-white/10 dark:bg-white/[0.03] dark:text-white/40"
-                    >
-                      {tier.cta}
-                    </span>
-                  ) : (
-                    <Link
-                      href={tier.href}
-                      className={`inline-flex min-h-11 items-center justify-center rounded-xl px-5 py-2.5 text-sm font-semibold transition motion-safe:hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:outline-none ${
-                        tier.highlighted
-                          ? 'bg-[#146fc2] text-white shadow-sm hover:bg-[#0f5fa8] focus-visible:ring-[#2490ed]/50'
-                          : 'border border-[#146fc2]/35 text-[#146fc2] hover:border-[#146fc2] focus-visible:ring-[#2490ed]/40 dark:border-[#2490ed]/40 dark:text-[#8fd0ff]'
-                      }`}
-                    >
-                      {tier.cta}
-                    </Link>
-                  )}
-                </div>
+                  <span className="text-sm text-slate-400">{tier.cadence}</span>
+                </p>
+                <p className="mt-2 max-w-lg text-sm leading-relaxed text-slate-500">
+                  {tier.description}
+                </p>
               </div>
-            ))}
-          </div>
+              <div className="sm:justify-self-end">
+                {tier.comingSoon ? (
+                  <span
+                    aria-disabled="true"
+                    className="inline-flex min-h-11 cursor-not-allowed items-center justify-center rounded-full border border-slate-200 bg-slate-50 px-6 text-sm font-semibold text-slate-400"
+                  >
+                    {tier.cta}
+                  </span>
+                ) : (
+                  <Link
+                    href={tier.href}
+                    className={`inline-flex min-h-11 items-center justify-center rounded-full px-6 text-sm font-semibold transition focus-visible:ring-2 focus-visible:ring-[#2490ed]/40 focus-visible:outline-none ${
+                      tier.highlighted
+                        ? 'bg-[#146fc2] text-white hover:bg-[#0f5fa8]'
+                        : 'border border-slate-200 bg-white text-slate-800 hover:border-[#2490ed]/45 hover:text-[#146fc2]'
+                    }`}
+                  >
+                    {tier.cta}
+                  </Link>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-8">
+          <Link
+            href="/pricing"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-[#146fc2] transition hover:gap-3 focus-visible:ring-2 focus-visible:ring-[#2490ed]/35 focus-visible:outline-none"
+          >
+            Compare all plans, including team seats
+            <ArrowRight className="h-4 w-4" aria-hidden />
+          </Link>
         </div>
       </div>
     </section>

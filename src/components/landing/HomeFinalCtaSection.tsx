@@ -1,14 +1,16 @@
 'use client';
 
-import { CheckCircle2, Compass, ShieldCheck, Ticket } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
+import { ArrowRight, Compass, Ticket } from 'lucide-react';
 import Link from 'next/link';
 
 import { PUBLIC_SHELL_INNER_CLASS } from '@/components/landing/public-shell-width';
 import { ccwRoadshowPath } from '@/lib/marketing/ccw-roadshow';
 
+const spring = { type: 'spring' as const, stiffness: 120, damping: 22 };
+
 /**
- * Immersive final CTA — full-bleed dark band with atmosphere (not a flat slate strip).
+ * Light closing CTA — soft ice-blue band, not a dark immersive strip.
  */
 export function HomeFinalCtaSection() {
   const reduceMotion = useReducedMotion();
@@ -16,65 +18,59 @@ export function HomeFinalCtaSection() {
   return (
     <section
       aria-labelledby="home-final-cta-heading"
-      className="relative overflow-hidden bg-[#0a1628] py-20 text-white md:py-28 dark:bg-[#020617]"
+      className="relative overflow-hidden border-t border-slate-200/70 bg-[#eef5fb] py-20 md:py-28"
     >
       <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_80%_at_20%_50%,rgba(36,144,237,0.28),transparent_55%),radial-gradient(ellipse_50%_60%_at_90%_20%,rgba(237,157,36,0.18),transparent_50%)]"
-        aria-hidden
-      />
-      <div
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-[#2490ed]/50 to-transparent"
-        aria-hidden
-      />
-      <div
-        className="pointer-events-none absolute -left-24 top-1/2 h-64 w-64 -translate-y-1/2 rounded-full bg-[#146fc2]/20 blur-3xl"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_70%_at_50%_0%,rgba(36,144,237,0.12),transparent_60%)]"
         aria-hidden
       />
 
       <div className={`relative ${PUBLIC_SHELL_INNER_CLASS}`}>
         <motion.div
-          className="mx-auto max-w-3xl text-center"
-          initial={reduceMotion ? false : { opacity: 0, y: 24 }}
-          whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+          className="mx-auto max-w-2xl text-center"
+          initial={reduceMotion ? false : { opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.4 }}
-          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          transition={spring}
         >
-          <p className="inline-flex items-center gap-2 text-sm font-semibold text-[#8fd0ff]">
-            <ShieldCheck className="h-4 w-4" aria-hidden />
-            Built for practical professional development
+          <p className="text-[11px] font-medium tracking-[0.22em] text-[#146fc2] uppercase">
+            Get started
           </p>
           <h2
             id="home-final-cta-heading"
-            className="mt-4 text-3xl font-bold tracking-tight md:text-4xl lg:text-[2.75rem] lg:leading-[1.15]"
+            className="mt-4 font-[family-name:var(--font-display)] text-3xl font-bold tracking-tight text-slate-950 md:text-4xl lg:text-[2.75rem] lg:leading-[1.15]"
           >
             Ready to start — online, in person, or both?
           </h2>
-          <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-slate-300 md:text-base">
+          <p className="mx-auto mt-4 max-w-lg text-[15px] leading-relaxed text-slate-500">
             Browse the catalogue for self-paced CEC courses, follow a structured pathway, or book
-            CARSI × CCW Business Growth Days when you are ready to grow in person.
+            CARSI × CCW Business Growth Days.
           </p>
 
           <div className="mt-10 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:flex-wrap sm:items-center">
             <Link
               href="/courses"
-              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[#ed9d24] px-7 py-3 text-sm font-semibold text-slate-950 shadow-[0_12px_40px_-12px_rgba(237,157,36,0.7)] transition motion-safe:hover:-translate-y-0.5 hover:bg-[#f2b14f] focus-visible:ring-2 focus-visible:ring-[#ed9d24]/50 focus-visible:outline-none"
+              className="group inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#146fc2] px-8 text-sm font-semibold text-white shadow-[0_14px_40px_-16px_rgba(20,111,194,0.55)] transition hover:bg-[#0f5fa8] focus-visible:ring-2 focus-visible:ring-[#2490ed]/45 focus-visible:outline-none"
             >
               Browse the catalogue
-              <CheckCircle2 className="h-4 w-4" aria-hidden />
+              <ArrowRight
+                className="h-4 w-4 transition group-hover:translate-x-0.5"
+                aria-hidden
+              />
             </Link>
             <Link
               href={`${ccwRoadshowPath}#booking`}
-              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-white/25 bg-white/5 px-7 py-3 text-sm font-semibold text-white backdrop-blur-sm transition motion-safe:hover:-translate-y-0.5 hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-[#2490ed]/45 focus-visible:outline-none"
+              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-slate-200/90 bg-white px-7 text-sm font-semibold text-slate-800 transition hover:border-[#2490ed]/40 hover:text-[#146fc2] focus-visible:ring-2 focus-visible:ring-[#2490ed]/35 focus-visible:outline-none"
             >
-              Book Growth Days
               <Ticket className="h-4 w-4" aria-hidden />
+              Book Growth Days
             </Link>
             <Link
               href="/pathways"
-              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-white/25 bg-white/5 px-7 py-3 text-sm font-semibold text-white backdrop-blur-sm transition motion-safe:hover:-translate-y-0.5 hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-[#2490ed]/45 focus-visible:outline-none"
+              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-slate-200/90 bg-white px-7 text-sm font-semibold text-slate-800 transition hover:border-[#2490ed]/40 hover:text-[#146fc2] focus-visible:ring-2 focus-visible:ring-[#2490ed]/35 focus-visible:outline-none"
             >
-              Find my pathway
               <Compass className="h-4 w-4" aria-hidden />
+              Find my pathway
             </Link>
           </div>
         </motion.div>
