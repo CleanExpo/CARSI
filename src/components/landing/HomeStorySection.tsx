@@ -48,7 +48,7 @@ export function HomeStorySection() {
           <h2 id="home-story-heading" className="sr-only">
             Why CARSI exists
           </h2>
-          <p className={`mt-8 max-w-4xl text-slate-400 ${LANDING_STATEMENT_CLASS}`}>
+          <p className={`mt-8 max-w-4xl text-balance text-slate-400 ${LANDING_STATEMENT_CLASS}`}>
             Most training asks a technician to{' '}
             <span className="font-medium text-slate-950">leave the tools</span>, travel to a
             classroom, and give up{' '}
