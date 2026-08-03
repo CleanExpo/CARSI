@@ -4,7 +4,12 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowRight, Award, BadgeCheck, BookOpen, Clock } from 'lucide-react';
 import Link from 'next/link';
 
-import { PUBLIC_SHELL_INNER_CLASS } from '@/components/landing/public-shell-width';
+import {
+  LANDING_DISPLAY_H2_CLASS,
+  LANDING_EYEBROW_CLASS,
+  LANDING_LEAD_CLASS,
+  PUBLIC_SHELL_INNER_CLASS,
+} from '@/components/landing/public-shell-width';
 import { StudentJourneyMap } from '@/components/lms/diagrams/StudentJourneyMap';
 
 const STEPS = [
@@ -37,7 +42,8 @@ const STEPS = [
 const spring = { type: 'spring' as const, stiffness: 120, damping: 22 };
 
 /**
- * Light cinematic steps — oversized numerals, no dark journey panel chrome.
+ * Horizontal process on desktop, vertical on mobile. A hairline rail connects
+ * four numbered circle nodes, with a crafted feel beyond plain columns.
  */
 export function HomeHowItWorksSection() {
   const reduceMotion = useReducedMotion();
@@ -49,18 +55,13 @@ export function HomeHowItWorksSection() {
     >
       <div className={PUBLIC_SHELL_INNER_CLASS}>
         <div className="max-w-xl">
-          <p className="text-[11px] font-medium tracking-[0.22em] text-[#146fc2] uppercase">
-            How it works
-          </p>
-          <h2
-            id="home-how-it-works-heading"
-            className="mt-3 font-[family-name:var(--font-display)] text-3xl font-bold tracking-tight text-slate-950 md:text-4xl"
-          >
-            From enrolment to certificate
+          <p className={LANDING_EYEBROW_CLASS}>How it works</p>
+          <h2 id="home-how-it-works-heading" className={`mt-3 ${LANDING_DISPLAY_H2_CLASS}`}>
+            Four steps from sign up to proof
           </h2>
-          <p className="mt-4 text-[15px] leading-relaxed text-slate-500">
-            Find the right course, complete self-paced lessons, track CECs, and share verifiable
-            credentials when your work requires proof.
+          <p className={`mt-4 ${LANDING_LEAD_CLASS}`}>
+            No classrooms, no waiting lists. Pick a course tonight, study when the roster allows,
+            and walk away with credentials your clients can check.
           </p>
           <Link
             href="/pathways"
@@ -71,30 +72,43 @@ export function HomeHowItWorksSection() {
           </Link>
         </div>
 
-        <ol className="mt-16 grid gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
+        <ol className="relative mt-16 flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-6">
+          <div
+            className="absolute top-2 bottom-2 left-5 w-px bg-slate-200 lg:hidden"
+            aria-hidden
+          />
+          <div
+            className="absolute top-5 right-5 left-5 hidden h-px bg-slate-200 lg:block"
+            aria-hidden
+          />
+
           {STEPS.map((item, index) => {
             const Icon = item.icon;
             return (
               <motion.li
                 key={item.title}
-                className="relative"
+                className="relative flex gap-5 lg:flex-1 lg:flex-col lg:items-center lg:gap-4 lg:text-center"
                 initial={reduceMotion ? false : { opacity: 0, y: 24 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.35 }}
                 transition={{ ...spring, delay: index * 0.08 }}
               >
                 <span
-                  className="pointer-events-none absolute -top-6 left-0 font-[family-name:var(--font-display)] text-6xl font-bold tracking-tighter text-slate-950/[0.05]"
+                  className="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#146fc2]/70 bg-white font-[family-name:var(--font-display)] text-sm font-semibold text-[#146fc2]"
                   aria-hidden
                 >
                   {item.step}
                 </span>
-                <Icon className="relative h-5 w-5 text-[#146fc2]" aria-hidden />
-                <h3 className="relative mt-4 font-[family-name:var(--font-display)] text-lg font-semibold text-slate-950">
-                  <span className="sr-only">Step {item.step}. </span>
-                  {item.title}
-                </h3>
-                <p className="relative mt-2 text-sm leading-relaxed text-slate-500">{item.text}</p>
+                <div>
+                  <div className="flex items-center gap-2 lg:flex-col lg:gap-2">
+                    <Icon className="h-4 w-4 text-[#146fc2]" aria-hidden />
+                    <h3 className="font-[family-name:var(--font-display)] text-lg font-semibold text-slate-950">
+                      <span className="sr-only">Step {item.step}. </span>
+                      {item.title}
+                    </h3>
+                  </div>
+                  <p className="mt-2 text-sm leading-relaxed text-slate-500">{item.text}</p>
+                </div>
               </motion.li>
             );
           })}
@@ -102,7 +116,7 @@ export function HomeHowItWorksSection() {
 
         <div className="mt-16 overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-6 sm:p-8">
           <p className="mb-6 text-center text-sm text-slate-500">
-            From enrolment to credential — six steps to recognised professional development.
+            From enrolment to credential. Six steps to recognised professional development.
           </p>
           <StudentJourneyMap />
         </div>
