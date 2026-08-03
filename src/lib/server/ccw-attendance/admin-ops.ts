@@ -191,35 +191,44 @@ export async function mergeDuplicateSignIns(input: MergeInput): Promise<MergeRes
 }
 
 // ---------------------------------------------------------------------------
-// Paper digitisation (reuse the single door writer with source='paper')
+// Assisted electronic check-in (reuse the single door writer with source='admin')
 // ---------------------------------------------------------------------------
 
-export interface DigitisePaperInput {
+export interface AdminCheckInInput {
   eventSlug: string;
   dayIndex: CheckInDayIndex;
   fullName: string;
   email: string;
   businessName?: string | null;
   actorAdminId?: string | null;
+  actorAdminEmail?: string | null;
   emailOptIn?: boolean;
 }
 
 /**
- * Digitise a paper/offline sign-in through the SAME capture writer as the door
- * path, tagged `source='paper'`. It shares every invariant (write-once day
+ * Record an organiser-assisted electronic sign-in through the SAME capture
+ * writer as the attendee path, tagged `source='admin'`. It shares every invariant (write-once day
  * marks, unique-email collision refusal, walk-in capacity).
  */
-export function digitisePaperCheckIn(input: DigitisePaperInput): Promise<RecordCheckInResult> {
-  return recordCheckIn({
+export async function recordAdminCheckIn(input: AdminCheckInInput): Promise<RecordCheckInResult> {
+  const result = await recordCheckIn({
     eventSlug: input.eventSlug,
     dayIndex: input.dayIndex,
     fullName: input.fullName,
     email: input.email,
     businessName: input.businessName,
     emailOptIn: input.emailOptIn,
-    source: 'paper',
+    source: 'admin',
     actorAdminId: input.actorAdminId ?? null,
   });
+  console.info(
+    '[ccw-admin-checkin]',
+    input.eventSlug,
+    `day${input.dayIndex}`,
+    input.actorAdminEmail ? `by ${input.actorAdminEmail}` : '',
+    result.status
+  );
+  return result;
 }
 
 // ---------------------------------------------------------------------------

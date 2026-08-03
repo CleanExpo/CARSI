@@ -6,6 +6,7 @@ import {
   type RegistrationStatus,
 } from '@/lib/marketing/ccw-roadshow';
 import { runSerializable } from '@/lib/server/db-tx';
+import { getEmailStatusByRegistration } from '@/lib/server/ccw-roadshow-email-log';
 
 export type AttendeeInput = {
   fullName: string;
@@ -43,6 +44,18 @@ export type RegistryRow = {
   calendarSynced: boolean;
   createdAt: Date;
   attendees: { fullName: string; yearsExperience: string; goals: string }[];
+  /**
+   * Latest email outcome for this registration.
+   * `null` = no send was ever ATTEMPTED (or it predates email logging) — which is
+   * itself the answer to "was this person emailed?".
+   */
+  email: {
+    lastKind: string | null;
+    lastStatus: string | null;
+    lastAttemptAt: Date | null;
+    failureReason: string | null;
+    everSent: boolean;
+  } | null;
 };
 
 async function sumConfirmedSeats(tx: typeof prisma, eventSlug: string): Promise<number> {
@@ -106,6 +119,8 @@ export async function listRoadshowRegistry(eventSlug?: string): Promise<Registry
     include: { attendees: { orderBy: { createdAt: 'asc' } } },
   });
 
+  const emailStatus = await getEmailStatusByRegistration(rows.map((r) => r.id));
+
   return rows.map((row) => ({
     registrationId: row.id,
     eventSlug: row.eventSlug,
@@ -123,6 +138,7 @@ export async function listRoadshowRegistry(eventSlug?: string): Promise<Registry
       yearsExperience: a.yearsExperience,
       goals: a.goals,
     })),
+    email: emailStatus.get(row.id) ?? null,
   }));
 }
 

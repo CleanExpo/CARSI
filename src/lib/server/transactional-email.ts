@@ -4,8 +4,11 @@
  */
 
 import { signEmailUnsubscribeToken } from '@/lib/auth/session-jwt';
+import { ccwRoadshowEvents } from '@/lib/marketing/ccw-roadshow';
+import { selectPrepurchaseVoucher } from '@/lib/marketing/ccw-roadshow-offers';
 import { prisma } from '@/lib/prisma';
 import { getAppOrigin } from '@/lib/server/app-url';
+import { isCcwAttendeeOffersEnabled } from '@/lib/server/ccw-offers-flag';
 import {
   buildRegistrationEmail,
   type RoadshowEmailKind,
@@ -136,6 +139,7 @@ export async function sendEnrollmentWelcomeEmail(params: {
   studentId: string;
   courseSlug: string;
   appOrigin: string;
+  offers?: import('@/lib/marketing/ccw-roadshow-offers').CcwAttendeeOffer[];
 }): Promise<SendEmailResult> {
   const { studentId, courseSlug, appOrigin } = params;
   const user = await prisma.lmsUser.findUnique({
@@ -162,6 +166,7 @@ export async function sendEnrollmentWelcomeEmail(params: {
     courseTitle: course.title,
     startUrl,
     dashboardUrl,
+    offers: params.offers,
   });
 
   return sendEmail({
@@ -358,6 +363,21 @@ export async function sendCcwRoadshowRegistrationEmail(params: {
   appOrigin: string;
 }): Promise<SendEmailResult> {
   const base = params.appOrigin.replace(/\/$/, '');
+
+  // Pre-purchase store-credit voucher CTA — only for seat holders (confirmed /
+  // promoted), only when the offers flag is on and the purchase window is open.
+  // Waitlisted attendees have no seat to lock in, so they don't get the CTA.
+  let voucherUrl: string | undefined;
+  if (params.kind === 'confirmed' || params.kind === 'promoted') {
+    const event = ccwRoadshowEvents.find((e) => e.city === params.eventCity);
+    if (event) {
+      const voucher = selectPrepurchaseVoucher(event, new Date(), {
+        enabled: isCcwAttendeeOffersEnabled(),
+      });
+      voucherUrl = voucher?.url;
+    }
+  }
+
   const { subject, html, text } = buildRegistrationEmail({
     kind: params.kind,
     attendeeName: params.attendeeName,
@@ -369,6 +389,7 @@ export async function sendCcwRoadshowRegistrationEmail(params: {
     seatCount: params.seatCount,
     freeEntryToken: params.freeEntryToken,
     eventPageUrl: `${base}/events/ccw-roadshow`,
+    voucherUrl,
   });
 
   return sendEmail({ to: params.to, subject, html, text });

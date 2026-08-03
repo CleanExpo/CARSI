@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { normalizePublicAssetUrl } from '@/lib/remote-image';
+import { resolveLmsCourseCecHours } from '@/lib/server/course-cec-hours';
 import { getCecSubmissionsByEnrollmentIds } from '@/lib/server/iicrc-cec-submission';
 
 /** Client / API shape for `EnrolledCourseList` and enrollments/me. */
@@ -73,7 +74,6 @@ function mapEnrollmentRow(
       title: string;
       slug: string;
       thumbnailUrl: string | null;
-      cecHours: unknown;
       durationHours: unknown;
       modules: { lessons: { id: string; title: string }[] }[];
     };
@@ -145,7 +145,6 @@ export async function getLearnerDashboardSummary(
           select: {
             title: true,
             slug: true,
-            cecHours: true,
             durationHours: true,
             thumbnailUrl: true,
             modules: {
@@ -194,7 +193,10 @@ export async function getLearnerDashboardSummary(
       const dto = enrollments[i];
       if (dto.all_lessons_complete || normalizeEnrollmentStatus(dto.status) === 'completed') {
         completed += 1;
-        const cec = toNumber(r.course.cecHours);
+        // REGISTRY-ONLY, FAIL-CLOSED (GP-498). This CEC total is shown on the learner
+        // dashboard — it must never sum the stale WP-import `cecHours`. Registry approval only
+        // (by slug); an unapproved course adds 0.
+        const cec = resolveLmsCourseCecHours({ slug: r.course.slug });
         if (cec !== null) cecHoursFromCompleted += cec;
       } else if (normalizeEnrollmentStatus(dto.status) === 'active') {
         active += 1;

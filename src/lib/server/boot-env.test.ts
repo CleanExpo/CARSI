@@ -15,6 +15,7 @@ const FULL_ENV: NodeJS.ProcessEnv = {
   NODE_ENV: 'production',
   DATABASE_URL: 'postgres://user:pw@host:5432/db',
   STRIPE_SECRET_KEY: 'sk_live_abc123',
+  STRIPE_WEBHOOK_SECRET: 'whsec_abc123',
   OPENROUTER_API_KEY: 'sk-or-abc123',
   JWT_SECRET: 'x'.repeat(32),
 };
@@ -38,6 +39,12 @@ describe('findMissingRequiredEnv', () => {
     );
   });
 
+  it('flags a missing STRIPE_WEBHOOK_SECRET (else webhooks 503 and paid entitlements silently stop)', () => {
+    expect(findMissingRequiredEnv({ ...FULL_ENV, STRIPE_WEBHOOK_SECRET: '' })).toContain(
+      'STRIPE_WEBHOOK_SECRET',
+    );
+  });
+
   it('flags a missing OPENROUTER_API_KEY (the AI provider of record)', () => {
     expect(findMissingRequiredEnv({ ...FULL_ENV, OPENROUTER_API_KEY: '   ' })).toContain(
       'OPENROUTER_API_KEY',
@@ -56,6 +63,7 @@ describe('findMissingRequiredEnv', () => {
     expect(findMissingRequiredEnv({ NODE_ENV: 'production' })).toEqual([
       'DATABASE_URL',
       'STRIPE_SECRET_KEY',
+      'STRIPE_WEBHOOK_SECRET',
       'OPENROUTER_API_KEY',
       'JWT_SECRET (min 32 chars)',
     ]);
@@ -85,9 +93,15 @@ describe('validateRequiredEnv', () => {
     expect(() => validateRequiredEnv(FULL_ENV)).not.toThrow();
   });
 
+  it('throws in production when STRIPE_WEBHOOK_SECRET is missing', () => {
+    expect(() => validateRequiredEnv({ ...FULL_ENV, STRIPE_WEBHOOK_SECRET: undefined })).toThrow(
+      /STRIPE_WEBHOOK_SECRET/,
+    );
+  });
+
   it('names every missing var in the single thrown message', () => {
     expect(() => validateRequiredEnv({ NODE_ENV: 'production' })).toThrow(
-      /DATABASE_URL.*STRIPE_SECRET_KEY.*OPENROUTER_API_KEY.*JWT_SECRET/s,
+      /DATABASE_URL.*STRIPE_SECRET_KEY.*STRIPE_WEBHOOK_SECRET.*OPENROUTER_API_KEY.*JWT_SECRET/s,
     );
   });
 

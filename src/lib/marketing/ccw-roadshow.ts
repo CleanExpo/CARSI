@@ -72,14 +72,14 @@ export const ccwRoadshowEvents: CcwRoadshowEvent[] = [
     startDateIso: '2026-07-22T08:30:00+10:00',
     endDateIso: '2026-07-23T16:30:00+10:00',
     timeLabel: '8.30am-4.30pm both days',
-    venueName: 'Carpet Cleaners Warehouse Melbourne',
-    streetAddress: 'Unit 1/5 Gatwick Road',
+    venueName: 'Club Kilsyth',
+    streetAddress: '1-15 Canterbury Road',
     suburb: 'Bayswater North',
     suburbStatePostcode: 'Bayswater North VIC 3153',
     state: 'VIC',
     description:
       'Two practical days with Phill McGurk and the CCW team, connecting training, equipment, service design, chemistry, quoting confidence and business growth for carpet, rug, stain and tile cleaning operators.',
-    capacity: 15,
+    capacity: 20,
     // Real recurring event on phill.mcgurk@gmail.com ("CARSI x CCW Business Growth
     // Days — Melbourne", 22–23 Jul 2026). The previous id was stale → guest-add 404'd
     // silently. Verified against Google Calendar 2026-06-30.

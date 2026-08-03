@@ -13,7 +13,7 @@ const base = {
   courseTitle: 'Water Damage Restoration Technician',
   completedDate: new Date('2026-03-01T00:00:00Z'),
   discipline: 'WRT',
-  cecHours: 14,
+  resolvedCecHours: 14,
   courseLevel: 'Professional development',
   credentialId: '00000000-0000-0000-0000-000000000001',
 };

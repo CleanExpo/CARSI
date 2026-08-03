@@ -14,6 +14,11 @@ import { notifyCrmEnrollmentCreated } from '@/lib/server/crm-enrollment-notify';
 import { sendEnrollmentWelcomeEmail } from '@/lib/server/enrollment-email';
 import { ensureGuestUserFromStripeEmail } from '@/lib/server/guest-checkout';
 import { sendGa4PurchaseEvent } from '@/lib/server/ga4-measurement-protocol';
+import { parseAttributionJourneyId } from '@/lib/analytics/event-attribution';
+import {
+  persistAttributedRevenueReversal,
+  recordAttributedStage,
+} from '@/lib/server/event-attribution';
 import { sessionClaimsForUserId } from '@/lib/server/lms-auth';
 import { prisma } from '@/lib/prisma';
 import { captureServerError } from '@/lib/server/sentry';
@@ -30,7 +35,10 @@ import {
   reactivateDisputeWonEnrollmentsByPaymentReference,
   isDisputeWon,
 } from '@/lib/server/stripe-revocation';
-import { readSubscriptionIdFromPaymentIntent } from '@/lib/server/stripe-subscription-map';
+import {
+  readInvoiceIdFromPaymentIntent,
+  readSubscriptionIdFromPaymentIntent,
+} from '@/lib/server/stripe-subscription-map';
 import { markSubscriptionStatusBySubscriptionId } from '@/lib/server/subscription-store';
 import { markTeamSubscriptionStatusBySubscriptionId } from '@/lib/server/team-subscription-store';
 import { markOrgSubscriptionStatusBySubscriptionId } from '@/lib/server/org-subscription-store';
@@ -80,20 +88,36 @@ type StripeWebhookEventDelegate = {
  */
 async function handleStripeRevocation(event: Stripe.Event): Promise<void> {
   const reason = event.type === 'charge.dispute.created' ? 'disputed' : 'refunded';
+  // Stripe `event.created` (seconds) is the authoritative moment this reversal was
+  // true — the key for the enrolment out-of-order guard. NB: NOT `dispute.created`,
+  // which is identical for a dispute's created and closed events and cannot order
+  // them.
+  const eventTimestamp = new Date(event.created * 1000);
   let paymentIntentId: string | null = null;
+  let reversedRevenueCents = 0;
+  let reversalCurrency: string | null = null;
+  let providerObjectId: string | null = null;
+  let revokeEntitlement = true;
 
   if (event.type === 'charge.refunded') {
     const charge = event.data.object as Stripe.Charge;
-    // Only a FULL refund revokes access; ignore partial refunds.
-    if (typeof charge.amount === 'number' && charge.amount_refunded < charge.amount) return;
+    // Partial refunds reduce net attribution but do not revoke course access.
+    reversedRevenueCents = Math.max(0, charge.amount_refunded);
+    reversalCurrency = charge.currency;
+    revokeEntitlement =
+      typeof charge.amount !== 'number' || charge.amount_refunded >= charge.amount;
     paymentIntentId = typeof charge.payment_intent === 'string' ? charge.payment_intent : null;
   } else {
     const dispute = event.data.object as Stripe.Dispute;
+    providerObjectId = dispute.id;
+    reversedRevenueCents = Math.max(0, dispute.amount);
+    reversalCurrency = dispute.currency;
     paymentIntentId = typeof dispute.payment_intent === 'string' ? dispute.payment_intent : null;
   }
   if (!paymentIntentId) return;
 
   const stripe = getStripeClient();
+  let invoiceTransactionId: string | null = null;
 
   // Path 2: is this a SUBSCRIPTION charge? Follow payment intent → invoice →
   // subscription id (version-tolerant). If so, revoke the membership. We do this
@@ -103,8 +127,19 @@ async function handleStripeRevocation(event: Stripe.Event): Promise<void> {
     const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId, {
       expand: ['invoice'],
     });
+    invoiceTransactionId = readInvoiceIdFromPaymentIntent(paymentIntent);
+    if (invoiceTransactionId) {
+      await persistAttributedRevenueReversal(invoiceTransactionId, {
+        eventId: event.id,
+        providerObjectId,
+        eventAt: eventTimestamp,
+        reason,
+        reversedRevenueCents,
+        currency: reversalCurrency,
+      });
+    }
     const subscriptionId = readSubscriptionIdFromPaymentIntent(paymentIntent);
-    if (subscriptionId) {
+    if (subscriptionId && revokeEntitlement) {
       // Terminal, non-entitling state. `canceled` is treated as lapsed by every
       // entitlement decision (individual/team/org) → no new catalogue access.
       // The subscription id is unique per table; each mark is a no-op when the id
@@ -134,7 +169,22 @@ async function handleStripeRevocation(event: Stripe.Event): Promise<void> {
   });
   for (const s of sessions.data) {
     const ref = resolveStripePaymentReference(s.id);
-    if (ref) await revokeEnrollmentsByPaymentReference(ref, reason);
+    if (!ref) continue;
+    // A charge is either an invoice transaction or a one-off checkout. A single
+    // Stripe event ID must map to exactly one canonical attribution key.
+    if (!invoiceTransactionId) {
+      await persistAttributedRevenueReversal(ref, {
+        eventId: event.id,
+        providerObjectId,
+        eventAt: eventTimestamp,
+        reason,
+        reversedRevenueCents,
+        currency: reversalCurrency,
+      });
+    }
+    if (revokeEntitlement) {
+      await revokeEnrollmentsByPaymentReference(ref, reason, eventTimestamp);
+    }
   }
 }
 
@@ -158,16 +208,17 @@ async function handleStripeRevocation(event: Stripe.Event): Promise<void> {
  * annual member who wins a dispute stays lapsed until the next invoice.paid.
  *
  * ORDERING — this and handleStripeRevocation are two independently-claimed
- * events with no Stripe delivery-order guarantee. If charge.dispute.closed(won)
- * is processed BEFORE charge.dispute.created (e.g. a created-retry after a
- * transient 5xx), this re-grant no-ops (nothing is revoked yet) and the later
- * created leaves the row revoked. Safe-direction (access withheld, never wrongly
- * granted). A robust fix is an ordering guard on the enrolment row (compare-and-
- * set, mirroring subscription-store's statusEventAt) — deferred as it changes
- * the shipped WS3 revoke path.
+ * events with no Stripe delivery-order guarantee. The realistic hazard is a
+ * charge.dispute.created that 5xx'd being RETRIED after this won-close is
+ * processed; the retried created would otherwise re-revoke the row and lock out a
+ * customer who WON their dispute. Closed by the enrolment out-of-order guard: we
+ * pass the Stripe `event.created` timestamp so the reactivate stamps every
+ * still-active row's `statusEventAt`, and the retried created's own not-stale
+ * guard (statusEventAt <= its older timestamp) then skips the revoke. See
+ * reactivateDisputeWonEnrollmentsByPaymentReference (mirrors subscription-store).
  *
  * Idempotent under the StripeWebhookEvent claim + the reactivate query (an
- * already-active row matches nothing).
+ * already-active row matches nothing; `lte`/`lt` guards make replays no-ops).
  */
 async function handleDisputeWonRegrant(event: Stripe.Event): Promise<void> {
   const dispute = event.data.object as Stripe.Dispute;
@@ -177,14 +228,42 @@ async function handleDisputeWonRegrant(event: Stripe.Event): Promise<void> {
     typeof dispute.payment_intent === 'string' ? dispute.payment_intent : null;
   if (!paymentIntentId) return;
 
+  // Authoritative ordering key — the event time, not dispute.created (identical
+  // across a dispute's created/closed events).
+  const eventTimestamp = new Date(event.created * 1000);
   const stripe = getStripeClient();
+  const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId, {
+    expand: ['invoice'],
+  });
+  const invoiceId = readInvoiceIdFromPaymentIntent(paymentIntent);
+  if (invoiceId) {
+    await persistAttributedRevenueReversal(invoiceId, {
+      eventId: event.id,
+      providerObjectId: dispute.id,
+      eventAt: eventTimestamp,
+      reason: 'dispute_won',
+      reversedRevenueCents: 0,
+      currency: dispute.currency,
+    });
+  }
   const sessions = await stripe.checkout.sessions.list({
     payment_intent: paymentIntentId,
     limit: 10,
   });
   for (const s of sessions.data) {
     const ref = resolveStripePaymentReference(s.id);
-    if (ref) await reactivateDisputeWonEnrollmentsByPaymentReference(ref);
+    if (!ref) continue;
+    if (!invoiceId) {
+      await persistAttributedRevenueReversal(ref, {
+        eventId: event.id,
+        providerObjectId: dispute.id,
+        eventAt: eventTimestamp,
+        reason: 'dispute_won',
+        reversedRevenueCents: 0,
+        currency: dispute.currency,
+      });
+    }
+    await reactivateDisputeWonEnrollmentsByPaymentReference(ref, eventTimestamp);
   }
 }
 
@@ -321,6 +400,17 @@ export async function POST(request: NextRequest) {
         purchaseMode,
         teamSeatCount: Number.isFinite(teamSeatCount) ? teamSeatCount : undefined,
       });
+
+      await recordAttributedStage(
+        parseAttributionJourneyId(session.metadata?.attribution_journey_id),
+        'purchase',
+        {
+          courseSlug: slug,
+          revenueCents: typeof session.amount_total === 'number' ? session.amount_total : undefined,
+          currency: session.currency,
+          transactionId: ref,
+        },
+      );
 
       if (!fulfilled.alreadyEnrolled && fulfilled.enrollmentId && fulfilled.courseId) {
         void sendEnrollmentWelcomeEmail({

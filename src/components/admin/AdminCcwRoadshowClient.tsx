@@ -11,6 +11,14 @@ type CitySummary = {
   waitlisted: number;
 };
 
+type EmailStatus = {
+  lastKind: string | null;
+  lastStatus: string | null;
+  lastAttemptAt: string | null;
+  failureReason: string | null;
+  everSent: boolean;
+};
+
 type RegistryRow = {
   registrationId: string;
   eventSlug: string;
@@ -24,9 +32,45 @@ type RegistryRow = {
   calendarSynced: boolean;
   createdAt: string;
   attendees: { fullName: string; yearsExperience: string; goals: string }[];
+  /** null = no send ever attempted (or predates email logging). */
+  email: EmailStatus | null;
 };
 
-const surface = 'rounded-2xl border border-white/10 bg-white/[0.04] shadow-[0_1px_0_rgba(255,255,255,0.04)_inset]';
+/** Renders the email delivery state so a silent failure is visible at a glance. */
+function EmailCell({ email }: { email: EmailStatus | null }) {
+  if (!email) {
+    return (
+      <span
+        className="text-amber-300"
+        title="No email send has ever been recorded for this registration."
+      >
+        ⚠ never sent
+      </span>
+    );
+  }
+  if (email.lastStatus === 'failed') {
+    return (
+      <span className="text-red-400" title={email.failureReason ?? 'Send failed'}>
+        ✗ failed{email.failureReason ? ` (${email.failureReason})` : ''}
+      </span>
+    );
+  }
+  if (email.lastStatus === 'skipped') {
+    return (
+      <span className="text-white/50" title="Dev console — not sent to the provider">
+        – skipped
+      </span>
+    );
+  }
+  return (
+    <span className="text-emerald-400" title={email.lastAttemptAt ?? undefined}>
+      ✓ {email.lastKind ?? 'sent'}
+    </span>
+  );
+}
+
+const surface =
+  'rounded-2xl border border-white/10 bg-white/[0.04] shadow-[0_1px_0_rgba(255,255,255,0.04)_inset]';
 const mutedText = 'text-white/70';
 const strongText = 'text-white';
 
@@ -67,6 +111,20 @@ export function AdminCcwRoadshowClient() {
       const payload = (await res.json().catch(() => ({}))) as { detail?: string };
       setError(payload.detail || 'Failed to promote');
       return;
+    }
+    // A 200 means the seat was granted — it does NOT mean the attendee was told.
+    // The email can fail independently, which used to be invisible here.
+    const payload = (await res.json().catch(() => ({}))) as {
+      emailSent?: boolean;
+      emailReason?: string;
+    };
+    if (payload.emailSent === false) {
+      setError(
+        `Promoted ${row.contactEmail} — but the confirmation email did NOT send` +
+          `${payload.emailReason ? ` (${payload.emailReason})` : ''}. Contact them manually.`
+      );
+    } else {
+      setError('');
     }
     await load();
   }
@@ -111,24 +169,39 @@ export function AdminCcwRoadshowClient() {
           <p className="text-[11px] font-semibold tracking-[0.2em] text-white/55 uppercase">
             Admin registry
           </p>
-          <h1 className="mt-1 text-2xl font-bold tracking-tight text-white">CCW Roadshow Registry</h1>
+          <h1 className="mt-1 text-2xl font-bold tracking-tight text-white">
+            CCW Roadshow Registry
+          </h1>
         </div>
-        <a
-          href="/api/admin/ccw-roadshow?format=csv"
-          className="rounded-lg border border-white/15 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/15"
-        >
-          Export CSV
-        </a>
+        <div className="flex flex-wrap gap-2">
+          <a
+            href="/admin/ccw-roadshow/sign-ins"
+            className="rounded-lg border border-cyan-300/35 bg-cyan-300/10 px-3 py-2 text-sm font-semibold text-cyan-50 transition hover:bg-cyan-300/15"
+          >
+            Electronic check-in
+          </a>
+          <a
+            href="/api/admin/ccw-roadshow?format=csv"
+            className="rounded-lg border border-white/15 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/15"
+          >
+            Export CSV
+          </a>
+        </div>
       </div>
 
-      {error && <p className="rounded-lg border border-red-400/30 bg-red-400/10 px-3 py-2 text-sm text-red-100">{error}</p>}
+      {error && (
+        <p className="rounded-lg border border-red-400/30 bg-red-400/10 px-3 py-2 text-sm text-red-100">
+          {error}
+        </p>
+      )}
 
       <div className="grid gap-3 sm:grid-cols-2">
         {cities.map((c) => (
           <div key={c.slug} className={`${surface} p-4`}>
             <h2 className="text-lg font-semibold text-white">{c.city}</h2>
             <p className="text-sm text-white/70">
-              {c.confirmed} / {c.capacity} confirmed · {c.remaining} left · {c.waitlisted} waitlisted
+              {c.confirmed} / {c.capacity} confirmed · {c.remaining} left · {c.waitlisted}{' '}
+              waitlisted
             </p>
           </div>
         ))}
@@ -143,6 +216,7 @@ export function AdminCcwRoadshowClient() {
               <th className="p-3 font-semibold">Company</th>
               <th className="p-3 font-semibold">Contact</th>
               <th className="p-3 font-semibold">Calendar</th>
+              <th className="p-3 font-semibold">Email</th>
               <th className="p-3 font-semibold">Attendees</th>
               <th className="p-3 font-semibold">Token</th>
               <th className="p-3 font-semibold">Action</th>
@@ -150,10 +224,15 @@ export function AdminCcwRoadshowClient() {
           </thead>
           <tbody>
             {rows.map((row) => (
-              <tr key={row.registrationId} className="border-b border-white/8 align-top last:border-0 odd:bg-white/[0.025] hover:bg-white/[0.055]">
+              <tr
+                key={row.registrationId}
+                className="border-b border-white/8 align-top last:border-0 odd:bg-white/[0.025] hover:bg-white/[0.055]"
+              >
                 <td className={`p-3 font-medium ${strongText}`}>{row.eventSlug}</td>
                 <td className="p-3">
-                  <span className={`rounded-full border px-2 py-1 text-xs font-semibold ${row.status === 'confirmed' ? 'border-emerald-400/30 bg-emerald-400/10 text-emerald-100' : 'border-amber-400/30 bg-amber-400/10 text-amber-100'}`}>
+                  <span
+                    className={`rounded-full border px-2 py-1 text-xs font-semibold ${row.status === 'confirmed' ? 'border-emerald-400/30 bg-emerald-400/10 text-emerald-100' : 'border-amber-400/30 bg-amber-400/10 text-amber-100'}`}
+                  >
                     {row.status}
                   </span>
                 </td>
@@ -182,6 +261,9 @@ export function AdminCcwRoadshowClient() {
                     </span>
                   )}
                 </td>
+                <td className="p-3 text-xs font-semibold whitespace-nowrap">
+                  <EmailCell email={row.email} />
+                </td>
                 <td className="p-3">
                   <ul className="space-y-2">
                     {row.attendees.map((a, i) => (
@@ -194,7 +276,9 @@ export function AdminCcwRoadshowClient() {
                     ))}
                   </ul>
                 </td>
-                <td className="max-w-[220px] break-all p-3 font-mono text-xs text-white/75">{row.freeEntryToken}</td>
+                <td className="max-w-[220px] p-3 font-mono text-xs break-all text-white/75">
+                  {row.freeEntryToken}
+                </td>
                 <td className="p-3">
                   <div className="flex gap-2">
                     {row.status === 'waitlisted' && (

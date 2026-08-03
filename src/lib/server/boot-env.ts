@@ -24,6 +24,9 @@ export function findMissingRequiredEnv(env: NodeJS.ProcessEnv = process.env): st
 
   if (!env.DATABASE_URL?.trim()) missing.push('DATABASE_URL');
   if (!env.STRIPE_SECRET_KEY?.trim()) missing.push('STRIPE_SECRET_KEY');
+  // Without the webhook secret the Stripe webhook route 503s (route.ts) and paid
+  // entitlements silently stop updating — the Margot-504 class. Boot-critical.
+  if (!env.STRIPE_WEBHOOK_SECRET?.trim()) missing.push('STRIPE_WEBHOOK_SECRET');
   // Single source of truth for the AI provider of record — never ANTHROPIC_API_KEY.
   if (!resolveOpenRouterConfig(env).configured) missing.push('OPENROUTER_API_KEY');
   if ((env.JWT_SECRET ?? '').trim().length < MIN_JWT_SECRET_LENGTH) {

@@ -26,13 +26,14 @@
 import type { Prisma } from '@/generated/prisma/client';
 
 import { getCcwRoadshowEvent } from '@/lib/marketing/ccw-roadshow';
+import { isUniqueConstraintErrorForFields } from '@/lib/server/db-errors';
 import { runSerializable } from '@/lib/server/db-tx';
 
 import type { CheckInDayIndex } from './checkin-token';
 import { normalizeBusiness, normalizeEmail, normalizeName } from './normalize';
 
-/** Where the check-in came from (self QR, digitised paper, or admin action). */
-export type CheckInSource = 'self' | 'paper' | 'admin';
+/** Where the electronic check-in came from (self-service QR or admin assistance). */
+export type CheckInSource = 'self' | 'admin';
 
 export interface RecordCheckInInput {
   eventSlug: string;
@@ -42,7 +43,7 @@ export interface RecordCheckInInput {
   businessName?: string | null;
   /** Defaults to 'self' (the QR/own-device path). */
   source?: CheckInSource;
-  /** AdminUser.id when an admin performed/digitised this action. */
+  /** AdminUser.id when an admin assisted this electronic check-in. */
   actorAdminId?: string | null;
   /** Marketing email consent — sticky true (never clears an existing opt-in). */
   emailOptIn?: boolean;
@@ -120,7 +121,7 @@ export async function recordCheckIn(input: RecordCheckInInput): Promise<RecordCh
   const dayField = input.dayIndex === 1 ? 'day1CheckedInAt' : 'day2CheckedInAt';
   const emailOptIn = input.emailOptIn === true;
 
-  return runSerializable(async (tx) => {
+  const attempt = (): Promise<RecordCheckInResult> => runSerializable(async (tx) => {
     const existing = await tx.ccwRoadshowSignIn.findUnique({
       where: {
         eventSlug_normalizedEmail: { eventSlug: event.slug, normalizedEmail },
@@ -154,12 +155,17 @@ export async function recordCheckIn(input: RecordCheckInInput): Promise<RecordCh
 
       // Write-once: set this day mark (it was null). Opt-in is sticky true.
       const now = new Date();
+      const updateData: Prisma.CcwRoadshowSignInUncheckedUpdateInput = { [dayField]: now };
+      if (source === 'admin' && input.actorAdminId != null && existing.signedInByAdmin == null) {
+        updateData.signedInByAdmin = input.actorAdminId;
+      }
+      // Opt-in is sticky true (never clears an existing opt-in).
+      if (emailOptIn || existing.emailOptIn) {
+        updateData.emailOptIn = true;
+      }
       await tx.ccwRoadshowSignIn.update({
         where: { id: existing.id },
-        data: {
-          [dayField]: now,
-          ...(emailOptIn || existing.emailOptIn ? { emailOptIn: true } : {}),
-        },
+        data: updateData,
       });
       return {
         status: 'checked_in',
@@ -211,4 +217,16 @@ export async function recordCheckIn(input: RecordCheckInInput): Promise<RecordCh
       reconciledRegistration: !isWalkIn,
     };
   });
+
+  try {
+    return await attempt();
+  } catch (error) {
+    if (!isUniqueConstraintErrorForFields(error, ['event_slug', 'normalized_email'])) {
+      throw error;
+    }
+    // A concurrent writer committed this logical attendee after our initial
+    // read. Replay once in a fresh transaction so the existing-row branch
+    // returns the declared idempotent/collision outcome.
+    return attempt();
+  }
 }

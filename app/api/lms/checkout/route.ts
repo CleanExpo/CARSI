@@ -29,6 +29,10 @@ import { getOrCreateCourseBySlug } from '@/lib/server/course-catalog-sync';
 import { getFirstLessonLearnPath } from '@/lib/server/first-lesson';
 import { getPublishedCourseForCheckout } from '@/lib/server/public-courses-list';
 import { captureServerError } from '@/lib/server/sentry';
+import {
+  readAttributionJourneyId,
+  tryRecordAttributedStage,
+} from '@/lib/server/event-attribution';
 
 export async function POST(request: NextRequest) {
   try {
@@ -42,6 +46,7 @@ export async function POST(request: NextRequest) {
       purchase_mode?: string;
       team_seat_count?: number;
     };
+    const attributionJourneyId = readAttributionJourneyId(request);
 
     const slug = typeof body.slug === 'string' ? body.slug.trim() : '';
     if (!slug) {
@@ -150,7 +155,7 @@ export async function POST(request: NextRequest) {
         }
 
         try {
-          const { checkout_url } = await createStripeCheckoutForCourse({
+          const { checkout_url, checkout_session_id } = await createStripeCheckoutForCourse({
             slug,
             course,
             success_url,
@@ -163,6 +168,13 @@ export async function POST(request: NextRequest) {
             quantity: checkoutQuantity,
             purchase_mode: purchaseMode,
             team_seat_count: teamSeatCount ?? undefined,
+            attribution_journey_id: attributionJourneyId ?? undefined,
+          });
+          await tryRecordAttributedStage(attributionJourneyId, 'checkout_started', {
+            courseSlug: slug,
+            revenueCents: cents * checkoutQuantity,
+            currency: 'aud',
+            transactionId: checkout_session_id,
           });
           return NextResponse.json({ checkout_url });
         } catch (err) {
@@ -194,7 +206,7 @@ export async function POST(request: NextRequest) {
 
     try {
       const unit_amount_cents = dbCourse ? Math.round(listAud * 100) : undefined;
-      const { checkout_url } = await createStripeCheckoutForCourse({
+      const { checkout_url, checkout_session_id } = await createStripeCheckoutForCourse({
         slug,
         course,
         success_url,
@@ -206,6 +218,13 @@ export async function POST(request: NextRequest) {
         quantity: checkoutQuantity,
         purchase_mode: purchaseMode,
         team_seat_count: teamSeatCount ?? undefined,
+        attribution_journey_id: attributionJourneyId ?? undefined,
+      });
+      await tryRecordAttributedStage(attributionJourneyId, 'checkout_started', {
+        courseSlug: slug,
+        revenueCents: unit_amount_cents == null ? undefined : unit_amount_cents * checkoutQuantity,
+        currency: unit_amount_cents == null ? undefined : 'aud',
+        transactionId: checkout_session_id,
       });
       return NextResponse.json({ checkout_url });
     } catch (err) {

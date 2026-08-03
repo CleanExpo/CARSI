@@ -1,6 +1,6 @@
 import { formatCecHoursForDisplay } from '@/lib/cec-display';
 import { isCecExcludedSlug } from '@/lib/seed/cec-professional-assignments';
-import { resolveCatalogCecHours } from '@/lib/seed/cec-hours';
+import { getApprovedCecHours } from '@/lib/seed/cec-approvals';
 
 /** Course fields used to resolve IICRC CEC hours for certificates and credentials. */
 export type LmsCourseCecSource = {
@@ -16,17 +16,20 @@ export type LmsCourseCecSource = {
 /**
  * CEC hours for a course on public listings, certificates and credentials.
  *
- * FAIL-CLOSED (licence-critical): CEC hours are shown ONLY from the CEC approvals registry
- * (data/seed/cec-approvals.json, the SSOT) or an explicit, founder-approved positive
- * `cecHours` on the course. There is deliberately no fallback to duration, description/meta
- * prose, or reviewer/professional assignment — none of those is IICRC approval, and deriving
- * a CEC claim from them is a licence-critical false claim (founder directive 2026-07-09).
- * An unapproved course shows no CEC, never a fabricated one.
+ * REGISTRY-ONLY, FAIL-CLOSED (licence-critical, GP-498). CEC hours display ONLY from a
+ * founder-confirmed entry in the CEC approvals registry (data/seed/cec-approvals.json, the
+ * SSOT). The DB/LMS `cecHours` column is WordPress-import pollution — stale values the IICRC
+ * never approved — and is DELIBERATELY NOT consulted here; trusting it rendered "N IICRC CECs"
+ * on unapproved courses on prod (fundamental-business-framework/glass-cleaning/PPE). Duration,
+ * prose, meta and professional assignment are likewise never approval. An unapproved course
+ * shows no CEC, never a fabricated one. (The founder-set catalog mechanism lives in the
+ * git-controlled `courses-catalog.json` via `resolveCatalogCecHours`; this DB read path must
+ * not inherit that trust because its `cecHours` provenance is the polluted DB column.)
  */
 export function resolveLmsCourseCecHours(course: LmsCourseCecSource): number | null {
   if (isCecExcludedSlug(course.slug)) return null;
 
-  const approved = resolveCatalogCecHours({ slug: course.slug, cecHours: course.cecHours });
+  const approved = getApprovedCecHours(course.slug);
   return approved != null && approved > 0 ? approved : null;
 }
 

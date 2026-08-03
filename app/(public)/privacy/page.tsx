@@ -143,6 +143,12 @@ export default function PrivacyPage() {
           CEC completion records are retained indefinitely as they form part of your professional
           certification history.
         </p>
+        <p>
+          Event-campaign attribution records use a pseudonymous journey identifier. They are
+          included in attribution reports for 90 days and deleted during subsequent attributed
+          registration or admin reporting activity. Stripe retains separate payment records under
+          its own legal and operational requirements.
+        </p>
       </section>
 
       <section>
@@ -153,6 +159,7 @@ export default function PrivacyPage() {
           <li>Remember your preferences (e.g., theme settings)</li>
           <li>Understand how you use our Service</li>
           <li>Improve performance and functionality</li>
+          <li>Measure self-asserted campaign journeys from event registration to purchase</li>
         </ul>
         <p>
           You can control cookies through your browser settings. Disabling cookies may affect the

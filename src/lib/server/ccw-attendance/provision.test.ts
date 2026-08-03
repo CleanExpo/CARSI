@@ -116,8 +116,12 @@ describe('provisionSignIn — P0-A guard on an existing account', () => {
     expect(result.enrollmentId).toBe('enr-1');
     // The result object never carries a password field.
     expect(JSON.stringify(result)).not.toMatch(/password/i);
-    // Fire-and-forget welcome email was dispatched for a created account.
+    // Fire-and-forget welcome email was dispatched for a created account,
+    // carrying the computed attendee-offers array (empty off-event / flag-off).
     expect(sendEnrollmentWelcomeEmail).toHaveBeenCalledOnce();
+    expect(sendEnrollmentWelcomeEmail).toHaveBeenCalledWith(
+      expect.objectContaining({ offers: expect.any(Array) }),
+    );
   });
 
   it('is self-guarding: a row not in `pending` is skipped (no double provision)', async () => {

@@ -1,0 +1,136 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://carsi.com.au/schemas/stability-evidence-receipt.v1.json",
+  "title": "CARSI revision-bound stability evidence receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "generatedAt",
+    "identifiers",
+    "thresholds",
+    "ci",
+    "health",
+    "smoke",
+    "overall"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "carsi.stability-evidence.v1" },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "identifiers": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "gitSha", "baseUrl", "environment", "providerDeploymentId"],
+      "properties": {
+        "repository": { "type": ["string", "null"] },
+        "gitSha": {
+          "anyOf": [{ "type": "string", "pattern": "^[0-9a-f]{40}$" }, { "type": "null" }]
+        },
+        "baseUrl": { "type": ["string", "null"] },
+        "environment": { "type": ["string", "null"] },
+        "providerDeploymentId": { "type": ["string", "null"] }
+      }
+    },
+    "thresholds": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["healthLatencyMs", "smokeDurationMs", "recoveryTimeMs"],
+      "properties": {
+        "healthLatencyMs": { "const": "TBD-baseline" },
+        "smokeDurationMs": { "const": "TBD-baseline" },
+        "recoveryTimeMs": { "const": "TBD-baseline" }
+      }
+    },
+    "ci": { "$ref": "#/$defs/evidenceSection" },
+    "health": { "$ref": "#/$defs/evidenceSection" },
+    "smoke": {
+      "allOf": [
+        { "$ref": "#/$defs/evidenceSection" },
+        {
+          "type": "object",
+          "required": [
+            "suite",
+            "expectedTests",
+            "attempts",
+            "firstAttemptOutcome",
+            "finalOutcome",
+            "reportLinks"
+          ],
+          "properties": {
+            "suite": { "const": "e2e/smoke.spec.ts" },
+            "expectedTests": { "const": 12 },
+            "attempts": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/smokeAttempt" }
+            },
+            "firstAttemptOutcome": { "$ref": "#/$defs/outcome" },
+            "finalOutcome": { "$ref": "#/$defs/outcome" },
+            "reportLinks": {
+              "type": "array",
+              "items": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      ]
+    },
+    "overall": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["result", "reasons"],
+      "properties": {
+        "result": { "$ref": "#/$defs/outcome" },
+        "reasons": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "outcome": { "enum": ["pass", "fail", "unverified"] },
+    "evidenceSection": {
+      "type": "object",
+      "required": ["outcome"],
+      "properties": { "outcome": { "$ref": "#/$defs/outcome" } }
+    },
+    "smokeAttempt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "attempt",
+        "startedAt",
+        "finishedAt",
+        "durationMs",
+        "outcome",
+        "exitCode",
+        "tests",
+        "reportLinks"
+      ],
+      "properties": {
+        "attempt": { "type": "integer", "minimum": 1 },
+        "startedAt": { "type": "string", "format": "date-time" },
+        "finishedAt": { "type": "string", "format": "date-time" },
+        "durationMs": { "type": "number", "minimum": 0 },
+        "outcome": { "$ref": "#/$defs/outcome" },
+        "exitCode": { "type": ["integer", "null"] },
+        "tests": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["expected", "total", "passed", "failed", "skipped"],
+          "properties": {
+            "expected": { "const": 12 },
+            "total": { "type": ["integer", "null"], "minimum": 0 },
+            "passed": { "type": ["integer", "null"], "minimum": 0 },
+            "failed": { "type": ["integer", "null"], "minimum": 0 },
+            "skipped": { "type": ["integer", "null"], "minimum": 0 }
+          }
+        },
+        "reportLinks": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "error": { "type": ["string", "null"] }
+      }
+    }
+  }
+}

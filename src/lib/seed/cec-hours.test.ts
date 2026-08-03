@@ -27,8 +27,18 @@ describe('CEC hours resolution — IICRC approval discipline (registry SSOT)', (
     expect(resolveCatalogCecHours({ cecHours: 0, durationHours: 1 })).toBeNull();
   });
 
-  it('explicit positive values still pass through', () => {
-    expect(resolveCecHours({ cec_hours: 3 })).toBe(3);
+  it('WP/DB path is registry-only: a stored positive cec_hours is IGNORED (GP-498 licence gate)', () => {
+    // The DB `cec_hours` column is WP-import pollution, never a founder-approval signal.
+    // Without a registry approval it must yield null, no matter what the column says.
+    expect(resolveCecHours({ cec_hours: 3 })).toBeNull();
+    expect(resolveCecHours({ slug: 'fundamental-business-framework', cec_hours: 4 })).toBeNull();
+    expect(resolveCecHours({ slug: 'glass-cleaning-course', cec_hours: 1 })).toBeNull();
+    expect(resolveCecHours({ slug: 'donning-and-doffing-ppe', cec_hours: 1 })).toBeNull();
+  });
+
+  it('catalog path keeps the founder-set explicit value (git-controlled, CLAUDE.md)', () => {
+    // The catalog JSON is founder-controlled source; an explicit positive there is a
+    // deliberate founder commit and is honoured (unlike the WP/DB column above).
     expect(resolveCatalogCecHours({ cecHours: 2.5 })).toBe(2.5);
   });
 

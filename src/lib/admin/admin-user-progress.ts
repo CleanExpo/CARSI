@@ -2,6 +2,7 @@ import type { AdminCatalogCourse } from '@/lib/admin/load-admin-catalog';
 import { loadAdminCatalogSource, type AdminCatalogCourseOption } from '@/lib/admin/admin-catalog-source';
 import { buildAdminCatalogFromSeed } from '@/lib/lms-seed-catalog';
 import { prisma } from '@/lib/prisma';
+import { resolveLmsCourseCecHours } from '@/lib/server/course-cec-hours';
 import { getRenewalSummaryByEnrollmentIds } from '@/lib/server/iicrc-renewal-communication';
 
 export type { AdminCatalogCourseOption };
@@ -21,7 +22,9 @@ export type AdminCourseProgressForUser = {
   enrolledAt: string;
   completedAt: string | null;
   paymentReference: string | null;
-  cecHours: number | null;
+  /** Registry-resolved CEC hours (GP-498) — null when the course has no IICRC approval.
+   *  Named distinctly from the raw `cecHours` column so no surface can render the stale value. */
+  resolvedCecHours: number | null;
   discipline: string | null;
   totalLessons: number;
   completedLessons: number;
@@ -121,7 +124,6 @@ type EnrollmentRow = {
     slug: string;
     title: string;
     iicrcDiscipline: string | null;
-    cecHours: number | null;
     modules: { lessons: { id: string }[] }[];
   };
 };
@@ -221,7 +223,10 @@ export function mapUserToAdminProgress(
       enrolledAt: e.enrolledAt.toISOString(),
       completedAt: e.completedAt?.toISOString() ?? null,
       paymentReference: e.paymentReference,
-      cecHours: e.course.cecHours,
+      // REGISTRY-ONLY, FAIL-CLOSED (GP-498). The admin user-detail view derives IICRC-submission
+      // eligibility and the "N CEC" badge from this value — so it must be the gated registry
+      // figure, never the stale WP-import `cecHours`. No approval → null (ineligible, no badge).
+      resolvedCecHours: resolveLmsCourseCecHours({ slug: e.course.slug }),
       discipline: e.course.iicrcDiscipline,
       totalLessons,
       completedLessons,
@@ -275,7 +280,6 @@ const enrollmentSelect = {
       slug: true,
       title: true,
       iicrcDiscipline: true,
-      cecHours: true,
       modules: {
         orderBy: { orderIndex: 'asc' },
         select: {

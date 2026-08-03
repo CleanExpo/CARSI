@@ -1,6 +1,7 @@
 import { unstable_cache } from 'next/cache';
 
 import { prisma } from '@/lib/prisma';
+import { resolveLmsCourseCecHours } from '@/lib/server/course-cec-hours';
 
 const publishedWhere = {
   OR: [
@@ -153,7 +154,6 @@ export async function getAssistantPageFocusContext(
       level: true,
       category: true,
       iicrcDiscipline: true,
-      cecHours: true,
       durationHours: true,
       meta: true,
       tags: true,
@@ -225,7 +225,10 @@ The learner is in this course's context (overview, curriculum, or enrolment) but
     : '';
   const short = course.shortDescription?.replace(/\s+/g, ' ').trim() || '';
 
-  const cec = course.cecHours != null ? Number(course.cecHours) : null;
+  // REGISTRY-ONLY, FAIL-CLOSED (GP-498). Margot must never state a CEC figure sourced from the
+  // stale WP-import `cecHours` column — that put "N IICRC CEC hours" into the assistant's mouth
+  // for unapproved courses. CEC hours resolve solely from the approvals registry (by slug).
+  const cec = resolveLmsCourseCecHours({ slug: course.slug });
   const dur = course.durationHours != null ? Number(course.durationHours) : null;
 
   const lines: string[] = [

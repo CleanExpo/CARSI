@@ -92,12 +92,59 @@ jobs:
       - name: IICRC / CEC compliance guard
         run: npm run check:iicrc-compliance
 
+      # Proves the compliance guard's specific-CEC-hour rule is non-vacuous: it fires on a
+      # static "earns/awards N IICRC CEC(s)" claim on a non-approved course (incl. the looser
+      # prose where IICRC is not adjacent to the number, and the "maintaining an existing IICRC
+      # certification" boilerplate that must NOT exempt a numbered claim) and stays silent on
+      # legitimate recert-cadence facts and generic no-number framing. An inert rule turns this red.
+      - name: IICRC / CEC compliance guard self-test
+        run: npm run test:iicrc-compliance
+
+      # Licence-critical STRUCTURAL backstop (GP-498): scans the whole application (app/, src/)
+      # for the leak class the copy scanner cannot see — any code that reads the RAW course CEC
+      # column (`.cecHours`) or uses `iicrcDiscipline` as a CEC/eligibility signal outside the
+      # approvals-registry accessor cluster. This mechanically enumerates every leaking surface so
+      # the fix converges instead of being chased one surface at a time.
+      - name: CEC surface-leak guard
+        run: npm run check:cec-surfaces
+
+      # Proves the surface-leak guard is non-vacuous: it fires on every known leak shape and stays
+      # silent on the gate's own resolved outputs. Without this, an inert guard looks identical to a
+      # working one.
+      - name: CEC surface-leak guard self-test
+        run: npm run test:cec-surfaces
+
       # Licence-critical: validates data/seed/cec-approvals.json — the SSOT any displayed
       # CEC hours must come from. Slugs must exist in the catalog, approved hours are
       # whole numbers >= 1 and never exceed course educational hours (1 CEC = 1 contact
       # hour, iicrc.org). Fail-closed.
       - name: CEC approvals registry check
         run: npm run check:cec
+
+      # Proves the registry validator (incl. the catalogue↔registry consistency that keeps the
+      # registry the effective SSOT) is non-vacuous: numeric-string and other coercible cecHours
+      # values fail closed.
+      - name: CEC approvals validator self-test
+        run: npm run test:cec
+
+      # Licence-critical (2026-07-15 incident): CARSI nearly published "Search the
+      # IICRC S520 for the word 'hydroxyl' — it isn't there", which S520:2024 §9.1.7
+      # refutes. CARSI's authority IS knowing the standards, so a false claim about
+      # one is a licence/credibility risk. The guard existed from that day but fired
+      # NOWHERE — no workflow, no git hook — because its repo scan sat red on false
+      # positives (17 at baseline, all benign). Fixed + wired 2026-07-17.
+      # It is a FILTER, not a guarantee: per CLAUDE.md a standards claim in brand copy
+      # is an L2/irreversible action that ALSO needs human sign-off. Green here does
+      # not mean a standards claim is verified.
+      - name: Standards-claim guard
+        run: npm run check:standards-claims
+
+      # Proves the guard still catches the incident + every known evasion, and that
+      # data/wordpress-export/ stays in scope (it seeds 84 published rows into
+      # lms_courses — not the "frozen legacy" archive its name suggests). Without
+      # this, a "fix" that silences the guard would look identical to one that works.
+      - name: Standards-claim guard self-test
+        run: npm run test:standards-claims
 
       - name: Lint
         run: npm run lint
@@ -221,6 +268,15 @@ jobs:
       - name: Apply Prisma migrations to test DB
         run: npx prisma migrate deploy
 
+      # Drift gate (operating agreement B3): after migrate deploy the test DB IS
+      # the migration history applied. Diff it against schema.prisma — any model
+      # or field without a backing migration produces a non-empty diff and exit
+      # code 2, failing CI before a P2021 can reach auto-deployed prod. Prisma 7
+      # flags: --from-config-datasource (the DB prisma.config.ts points at, just
+      # migrated) vs --to-schema (schema.prisma). No shadow DB needed.
+      - name: Fail on Prisma schema drift (a model/field with no migration)
+        run: npx prisma migrate diff --from-config-datasource --to-schema prisma/schema.prisma --exit-code
+
       # Seed the course catalogue so the data-dependent journeys in
       # e2e/carsi-journeys.spec.ts (course list, WRT filter, "Carpet" search,
       # course detail by slug) run against real data instead of an empty DB.
@@ -278,11 +334,13 @@ jobs:
           JWT_SECRET: 'ci-e2e-test-only-jwt-secret-min-32-chars-1234567890'
           # WS2 (#575) added a fail-loud boot validator (src/lib/server/boot-env.ts via
           # instrumentation.ts) that REFUSES to start the production webServer unless
-          # STRIPE_SECRET_KEY and OPENROUTER_API_KEY are also present. Without them the
-          # `npm run start` server never boots and Playwright times out at 240s. The
-          # validator only checks presence (.trim()), so these test-only placeholders
-          # suffice — the E2E journeys never call Stripe/OpenRouter. Do NOT reuse anywhere real.
+          # STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET and OPENROUTER_API_KEY are present.
+          # Without them the `npm run start` server never boots and Playwright times out
+          # at 240s. The validator only checks presence (.trim()), so these test-only
+          # placeholders suffice — the E2E journeys never call Stripe/OpenRouter. Do NOT
+          # reuse anywhere real.
           STRIPE_SECRET_KEY: 'ci-e2e-placeholder-not-a-real-stripe-key'
+          STRIPE_WEBHOOK_SECRET: 'ci-e2e-placeholder-not-a-real-webhook-secret'
           OPENROUTER_API_KEY: 'ci-e2e-placeholder-not-a-real-openrouter-key'
           # DATABASE_URL inherited from job-level env (postgresql://root:root@localhost:5432/carsi).
           # The previous step-level starter_db override caused P1000 auth failure

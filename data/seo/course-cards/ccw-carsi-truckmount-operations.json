@@ -1,0 +1,51 @@
+{
+  "slug": "ccw-carsi-truckmount-operations",
+  "seoTitle": "Truckmount Operations Course (Australian) | CARSI",
+  "metaDescription": "A CARSI and CCW operator course for HydraMaster and Sapphire Scientific truck-mounts in Australian configuration — safe operating procedures, carbon monoxide safety, road safety and servicing.",
+  "imageAlt": "Operator running a petrol-engine truck-mount carpet cleaning unit from an Australian work van",
+  "og": {
+    "title": "Truckmount Operations — HydraMaster & Sapphire Scientific | CARSI",
+    "description": "A CARSI continuing-education course, co-produced with Carpet Cleaners Warehouse, for operating petrol-engine HydraMaster and Sapphire Scientific truck-mounts in Australian configuration — safe operating procedures, carbon monoxide control, storage and road safety, maintenance, and a competency sign-off."
+  },
+  "keywords": [
+    "truckmount operations course",
+    "truck-mount training australia",
+    "hydramaster training",
+    "sapphire scientific truckmount",
+    "carpet cleaning truckmount course",
+    "carbon monoxide safety truckmount",
+    "truck-mount maintenance course",
+    "load restraint truck mount"
+  ],
+  "faq": [
+    {
+      "q": "Which machines does this truck-mount course cover?",
+      "a": "It is an operator course for petrol-engine HydraMaster and Sapphire Scientific truck-mount systems run in Australian configuration, covering their Australian specifications and set-up. The course opens with a machine-selection step so you follow the content for your unit."
+    },
+    {
+      "q": "What safety topics does the course cover?",
+      "a": "Carbon monoxide is treated as the critical hazard within the safe operating procedures. The course also covers the manufacturer's truck-mount safety certificate, and storage, transport and road safety including load restraint, GVM, and fuel and chemical carriage."
+    },
+    {
+      "q": "Is the course specific to Australia?",
+      "a": "Yes. It works from Australian configurations and specifications and the Australian regulatory map — the National Heavy Vehicle Regulator and state road rules, work health and safety, and pressure and fuel requirements — drawn from manufacturer manuals and Australian authorities."
+    },
+    {
+      "q": "How is the course assessed?",
+      "a": "Through a maintenance and servicing unit, a reference image catalogue and a knowledge check, then a final assessment with a trainer pre-flight verification gate and an operator competency sign-off."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Truckmount Operations Course — HydraMaster & Sapphire Scientific (Australian configuration)",
+    "description": "A CARSI continuing-education operator course, co-produced with Carpet Cleaners Warehouse, for petrol-engine HydraMaster and Sapphire Scientific truck-mounts in Australian configuration — Australian specifications, safe operating procedures with carbon monoxide as the critical hazard, storage, transport and road safety, maintenance and servicing, and an assessment with operator competency sign-off.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "coursePrerequisites": "None — open entry"
+  }
+}

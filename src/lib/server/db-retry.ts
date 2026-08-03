@@ -12,6 +12,17 @@ export function isSerializationConflict(error: unknown): boolean {
   ) {
     return true;
   }
+  if (error && typeof error === 'object' && 'cause' in error) {
+    const cause = (error as { cause?: unknown }).cause;
+    if (
+      cause &&
+      typeof cause === 'object' &&
+      'originalCode' in cause &&
+      (cause as { originalCode?: unknown }).originalCode === '40001'
+    ) {
+      return true;
+    }
+  }
   const message = error instanceof Error ? error.message : String(error);
   return /could not serialize|serialization failure|deadlock detected|write conflict|40001|40P01/i.test(
     message,

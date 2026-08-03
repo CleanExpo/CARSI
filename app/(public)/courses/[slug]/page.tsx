@@ -9,7 +9,11 @@ import { CourseThumbnail } from '@/components/lms/CourseThumbnail';
 import { CourseHubContext } from '@/components/lms/CourseHubContext';
 import { CourseSchema, BreadcrumbSchema, VideoObjectSchema } from '@/components/seo';
 import { SchemaMarkup, buildFaqSchema } from '@/lib/schema';
-import { getCourseMarketing } from '@/lib/seo/course-marketing';
+import {
+  buildCourseFallbackKeywords,
+  getCourseMarketing,
+  resolveCourseMarketingTruth,
+} from '@/lib/seo/course-marketing';
 import { getBackendOrigin, getPublicSiteUrl } from '@/lib/env/public-url';
 import { isOnboardingCourse } from '@/lib/onboarding/enterprise';
 import { normalizePublicAssetUrl } from '@/lib/remote-image';
@@ -67,6 +71,45 @@ function resolveAssetUrl(url?: string | null): string | null {
   return `${backendUrl}${path}`;
 }
 
+function getCourseDerivedDescription(
+  course: CourseDetail,
+  designation: DesignationDefinition | null
+): string {
+  const priceNum = parseFloat(course.price_aud);
+  const priceText = course.is_free || priceNum === 0 ? 'Free' : `$${priceNum.toFixed(0)} AUD`;
+  const disciplineText = designation ? `CARSI ${designation.disciplineTopic}` : 'restoration';
+  return (
+    course.short_description ??
+    course.description?.slice(0, 155) ??
+    `${course.title} — ${disciplineText} training course. ${priceText}.`
+  );
+}
+
+function getResolvedCourseMarketing(
+  course: CourseDetail,
+  designation: DesignationDefinition | null
+) {
+  const description = getCourseDerivedDescription(course, designation);
+  return resolveCourseMarketingTruth({
+    marketing: getCourseMarketing(course.slug),
+    isFree: course.is_free,
+    priceAud: course.price_aud,
+    fallback: {
+      seoTitle: course.title,
+      metaDescription: description,
+      ogTitle: `${course.title} | CARSI`,
+      ogDescription: description,
+      keywords: buildCourseFallbackKeywords({
+        title: course.title,
+        designationName: designation?.name,
+        disciplineTopic: designation?.disciplineTopic,
+        cecHoursLabel: course.cec_hours,
+      }),
+      imageAlt: course.title,
+    },
+  });
+}
+
 export async function getCourse(slug: string): Promise<CourseDetail | null> {
   if (process.env.DATABASE_URL?.trim()) {
     try {
@@ -108,43 +151,46 @@ export async function generateMetadata({
     };
   }
 
-  const priceNum = parseFloat(course.price_aud);
   const thumbnailUrl = resolveAssetUrl(course.thumbnail_url);
-  const priceText = course.is_free || priceNum === 0 ? 'Free' : `$${priceNum.toFixed(0)} AUD`;
   const designation = getDesignationForCourseSlug(slug);
-  const disciplineText = designation ? `CARSI ${designation.disciplineTopic}` : 'restoration';
+  const description = getCourseDerivedDescription(course, designation);
 
-  const description =
-    course.short_description ??
-    course.description?.slice(0, 155) ??
-    `${course.title} — ${disciplineText} training course. ${priceText}.`;
+  // Prefer the hand-authored SEO card copy (data/seo/course-cards) when present,
+  // after reconciling it with course-derived commerce and CEC truth.
+  const card = getResolvedCourseMarketing(course, designation);
+  const metaTitle = card?.seoTitle ?? course.title;
+  const metaDescription = card?.metaDescription ?? description;
+  const ogTitle = card?.og?.title ?? `${course.title} | CARSI`;
+  const ogDescription = card?.og?.description ?? description;
+  const metaKeywords =
+    card?.keywords ??
+    buildCourseFallbackKeywords({
+      title: course.title,
+      designationName: designation?.name,
+      disciplineTopic: designation?.disciplineTopic,
+      cecHoursLabel: course.cec_hours,
+    });
+  const imageAlt = card?.imageAlt ?? course.title;
 
   return {
-    title: course.title,
-    description,
-    keywords: [
-      course.title,
-      designation?.name ?? '',
-      designation?.disciplineTopic ?? '',
-      'IICRC CEC course',
-      'restoration course',
-      'CARSI',
-    ].filter(Boolean),
+    title: metaTitle,
+    description: metaDescription,
+    keywords: metaKeywords,
     openGraph: {
-      title: `${course.title} | CARSI`,
-      description,
+      title: ogTitle,
+      description: ogDescription,
       url: `${siteUrl}/courses/${slug}`,
       siteName: 'CARSI',
       images: thumbnailUrl
-        ? [{ url: thumbnailUrl, width: 1200, height: 630, alt: course.title }]
+        ? [{ url: thumbnailUrl, width: 1200, height: 630, alt: imageAlt }]
         : OG_IMAGES,
       locale: 'en_AU',
       type: 'website',
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${course.title} | CARSI`,
-      description,
+      title: ogTitle,
+      description: ogDescription,
       images: thumbnailUrl ? [thumbnailUrl] : OG_IMAGE_URLS,
     },
     alternates: {
@@ -282,7 +328,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
       <BreadcrumbSchema items={breadcrumbs} />
       {(() => {
         // AEO/GEO: FAQPage JSON-LD from the course's marketing metadata (data/seo/course-cards).
-        const faqs = getCourseMarketing(slug)?.faq;
+        const faqs = getResolvedCourseMarketing(course, designation)?.faq;
         return faqs?.length ? <SchemaMarkup schema={buildFaqSchema({ faqs })} /> : null;
       })()}
 
@@ -424,7 +470,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                   >
                     {course.short_description ??
                       course.description?.slice(0, 280) ??
-                      'Australian-produced restoration training — a CARSI credential that also earns IICRC CECs.'}
+                      'Australian-produced restoration training built for the Southern-Hemisphere restoration industry.'}
                   </p>
 
                   {/* Instructor */}
@@ -528,7 +574,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                       isFree={course.is_free || priceNum === 0}
                       moduleCount={course.module_count ?? null}
                       level={course.level}
-                      cecHours={course.cec_hours}
+                      cecHoursLabel={course.cec_hours}
                       durationHours={course.duration_hours}
                       shortDescription={course.short_description}
                       instructorName={course.instructor?.full_name ?? null}
@@ -841,7 +887,9 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                         className="mb-1 text-sm font-semibold"
                         style={{ color: 'rgba(255,255,255,0.85)' }}
                       >
-                        IICRC CEC Tracking
+                        {/* GP-498: only claim IICRC CEC tracking when this course has
+                            registry-approved CEC hours; otherwise no CEC claim is made. */}
+                        {course.cec_hours ? 'IICRC CEC Tracking' : 'Progress Tracking'}
                       </h3>
                       <p
                         className="text-xs leading-relaxed"
@@ -849,7 +897,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                       >
                         {course.cec_hours
                           ? `This course awards ${course.cec_hours} IICRC Continuing Education Credits. Credits are automatically recorded and exportable for IICRC submission.`
-                          : 'Continuing Education Credits are tracked automatically in your CARSI dashboard and exportable for IICRC submission.'}
+                          : 'Your progress and completion are recorded automatically in your CARSI dashboard, with a verifiable digital credential on completion.'}
                       </p>
                     </div>
                   </div>
@@ -862,9 +910,12 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                   >
                     {designation ? `${designation.name} is a CARSI credential that ` : 'This CARSI course '}
                     complements the IICRC — it is Southern-Hemisphere training the IICRC does not
-                    offer, not an IICRC certification. It earns IICRC Continuing Education Credits
-                    (CECs) toward maintaining an existing IICRC certification, which is obtained
-                    separately through IICRC-approved schools and examinations.
+                    offer, not an IICRC certification.{' '}
+                    {/* GP-498: assert this course earns CECs only when it has registry-approved
+                        CEC hours; unapproved courses make no CEC-earning claim. */}
+                    {course.cec_hours
+                      ? 'It earns IICRC Continuing Education Credits (CECs) toward maintaining an existing IICRC certification, which is obtained separately through IICRC-approved schools and examinations.'
+                      : 'IICRC certification is obtained separately through IICRC-approved schools and examinations.'}
                   </p>
                 </div>
               </section>

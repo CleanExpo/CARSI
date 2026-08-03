@@ -116,7 +116,7 @@ export function CredentialVerificationPageContent({
           courseName={credential.course_title ?? undefined}
           discipline={credential.discipline ?? credential.iicrc_discipline ?? undefined}
           credentialId={credentialId}
-          cecHours={credential.cec_hours}
+          cecHoursLabel={credential.cec_hours}
           completedDate={
             credential.completed_at
               ? new Date(credential.completed_at).toLocaleDateString('en-AU', {

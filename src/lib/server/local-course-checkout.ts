@@ -47,7 +47,8 @@ export async function createStripeCheckoutForCourse(params: {
   quantity?: number;
   purchase_mode?: 'self' | 'team';
   team_seat_count?: number;
-}): Promise<{ checkout_url: string }> {
+  attribution_journey_id?: string;
+}): Promise<{ checkout_url: string; checkout_session_id: string }> {
   const {
     slug,
     course,
@@ -61,6 +62,7 @@ export async function createStripeCheckoutForCourse(params: {
     quantity = 1,
     purchase_mode = 'self',
     team_seat_count,
+    attribution_journey_id,
   } = params;
 
   const priceNum = Number(course.price_aud);
@@ -94,6 +96,7 @@ export async function createStripeCheckoutForCourse(params: {
       ...(teamSeats != null ? { team_seat_count: String(teamSeats) } : {}),
       ...(student_id ? { student_id } : {}),
       ...(guest_checkout ? { guest_checkout: 'true' } : {}),
+      ...(attribution_journey_id ? { attribution_journey_id } : {}),
       ...(extra_metadata ?? {}),
     },
     line_items: [
@@ -115,5 +118,5 @@ export async function createStripeCheckoutForCourse(params: {
 
   const url = session.url;
   if (!url) throw new Error('NO_CHECKOUT_URL');
-  return { checkout_url: url };
+  return { checkout_url: url, checkout_session_id: session.id };
 }

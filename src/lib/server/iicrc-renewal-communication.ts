@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 
 import { prisma } from '@/lib/prisma';
+import { resolveLmsCourseCecHours } from '@/lib/server/course-cec-hours';
 import type {
   CommunicationDirection,
   CommunicationKind,
@@ -216,7 +217,10 @@ export async function getRenewalSubmissionDetail(
     status: row.status,
     renewal_status: row.renewalStatus as RenewalStatus,
     initiated_by_admin_email: row.initiatedByAdminEmail,
-    cec_hours: row.cecHours,
+    // REGISTRY-ONLY, FAIL-CLOSED (GP-498). Re-resolve the displayed CEC hours from the current
+    // approvals registry (by slug) instead of the persisted snapshot — rows written by the old
+    // fail-open logic must not keep showing stale non-zero CEC after the registry is empty.
+    cec_hours: resolveLmsCourseCecHours({ slug: row.course.slug }),
     iicrc_discipline: row.iicrcDiscipline,
     iicrc_member_number: row.iicrcMemberNumber,
     email_subject: row.emailSubject,
@@ -264,7 +268,10 @@ export async function listRenewalSubmissionsForStudent(
     status: row.status,
     renewal_status: row.renewalStatus as RenewalStatus,
     initiated_by_admin_email: row.initiatedByAdminEmail,
-    cec_hours: row.cecHours,
+    // REGISTRY-ONLY, FAIL-CLOSED (GP-498). Re-resolve the displayed CEC hours from the current
+    // approvals registry (by slug) instead of the persisted snapshot — rows written by the old
+    // fail-open logic must not keep showing stale non-zero CEC after the registry is empty.
+    cec_hours: resolveLmsCourseCecHours({ slug: row.course.slug }),
     iicrc_discipline: row.iicrcDiscipline,
     iicrc_member_number: row.iicrcMemberNumber,
     email_subject: row.emailSubject,

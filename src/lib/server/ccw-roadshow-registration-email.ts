@@ -17,6 +17,13 @@ export type RegistrationEmailInput = {
   seatCount: number;
   freeEntryToken: string;
   eventPageUrl: string;
+  /**
+   * Pre-purchase store-credit voucher CTA. When present, the email invites the
+   * attendee to pay $100 now for $100 store credit + a $50 bonus on day-1
+   * sign-in ($150 total). The caller decides whether to include it (flag on +
+   * purchase window open + seat-holding kind), so the builder stays pure.
+   */
+  voucherUrl?: string;
 };
 
 export type BuiltEmail = { subject: string; html: string; text: string };
@@ -41,7 +48,15 @@ export function buildRegistrationEmail(input: RegistrationEmailInput): BuiltEmai
     seatCount,
     freeEntryToken,
     eventPageUrl,
+    voucherUrl,
   } = input;
+
+  // Confirmed money copy (owner-approved 2026-07-16): pay $100 now → $100 store
+  // credit immediately + $50 bonus on day-1 sign-in = $150 total.
+  const voucherHeadline = 'Lock in your seat — and get store credit';
+  const voucherLine =
+    'Pay $100 now for your CCW/CARSI training voucher and get $100 in store credit straight away, ' +
+    'plus a $50 bonus — $150 in total — when you turn up and sign in on day one.';
 
   const greeting = `Hi ${attendeeName || 'there'},`;
   const seatsLabel = `${seatCount} ${seatCount === 1 ? 'seat' : 'seats'}`;
@@ -82,6 +97,10 @@ export function buildRegistrationEmail(input: RegistrationEmailInput): BuiltEmai
     closing = 'We look forward to seeing you there.';
   }
 
+  const voucherText = voucherUrl
+    ? `\n\n${voucherHeadline}\n${voucherLine}\nGet your voucher: ${voucherUrl}`
+    : '';
+
   const text = [
     greeting,
     '',
@@ -90,6 +109,7 @@ export function buildRegistrationEmail(input: RegistrationEmailInput): BuiltEmai
     whenWhere,
     '',
     tokenBlock,
+    voucherText,
     '',
     `Event details: ${eventPageUrl}`,
     '',
@@ -109,6 +129,15 @@ export function buildRegistrationEmail(input: RegistrationEmailInput): BuiltEmai
         <tr><td style="padding: 2px 12px 2px 0; color: #666;">Covers</td><td>${escapeHtml(seatsLabel)}</td></tr>
       </table>
       <p style="font-size: 15px;"><strong>${escapeHtml(tokenBlock)}</strong></p>
+      ${
+        voucherUrl
+          ? `<div style="margin: 18px 0; padding: 16px; background: #f0f6ff; border: 1px solid #cfe0ff; border-radius: 8px;">
+        <p style="margin: 0 0 6px; font-weight: 700; color: #0c3d7a;">${escapeHtml(voucherHeadline)}</p>
+        <p style="margin: 0 0 12px;">${escapeHtml(voucherLine)}</p>
+        <a href="${escapeHtml(voucherUrl)}" style="display: inline-block; padding: 10px 18px; background: #146fc2; color: #fff; text-decoration: none; border-radius: 6px; font-weight: 700;">Get your voucher</a>
+      </div>`
+          : ''
+      }
       <p><a href="${escapeHtml(eventPageUrl)}">View event details</a></p>
       <p>${escapeHtml(closing)}</p>
       <p style="color: #666;">CARSI</p>

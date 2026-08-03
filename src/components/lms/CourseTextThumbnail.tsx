@@ -112,7 +112,7 @@ export type CourseTextThumbnailProps = {
   moduleCount?: number | null;
   lessonCount?: number | null;
   level?: string | null;
-  cecHours?: string | null;
+  cecHoursLabel?: string | null;
   durationHours?: string | null;
   shortDescription?: string | null;
   instructorName?: string | null;
@@ -166,7 +166,7 @@ export function CourseTextThumbnail({
   moduleCount,
   lessonCount,
   level,
-  cecHours,
+  cecHoursLabel,
   durationHours,
   shortDescription,
   instructorName,
@@ -308,9 +308,9 @@ export function CourseTextThumbnail({
 
         {!isCard ? (
           <>
-            {(showCategory || cecHours) && (
+            {(showCategory || cecHoursLabel) && (
               <div className="mb-1.5 flex flex-wrap items-center gap-1">
-                {cecHours ? (
+                {cecHoursLabel ? (
                   <span
                     className={cn(
                       'rounded-md px-1.5 py-0.5 text-[9px] font-semibold tabular-nums',
@@ -319,7 +319,7 @@ export function CourseTextThumbnail({
                         : 'border border-[#2490ed]/25 bg-[#eef7ff] text-[#146fc2]'
                     )}
                   >
-                    {cecHours} CEC{cecHours === '1' ? '' : 's'}
+                    {cecHoursLabel} CEC{cecHoursLabel === '1' ? '' : 's'}
                   </span>
                 ) : null}
                 {showCategory ? (
@@ -375,7 +375,7 @@ export function CourseTextThumbnail({
                   {formatLevelLabel(level)}
                 </span>
               ) : null}
-              {cecHours ? (
+              {cecHoursLabel ? (
                 <span
                   className={cn(
                     'rounded-md px-1.5 py-0.5 text-[9px] font-semibold tabular-nums',
@@ -384,7 +384,7 @@ export function CourseTextThumbnail({
                       : 'border border-[#2490ed]/25 bg-[#eef7ff] text-[#146fc2]'
                   )}
                 >
-                  {cecHours} CEC{cecHours === '1' ? '' : 's'}
+                  {cecHoursLabel} CEC{cecHoursLabel === '1' ? '' : 's'}
                 </span>
               ) : null}
             </div>
@@ -508,9 +508,9 @@ export function CourseTextThumbnail({
                 {level}
               </span>
             ) : null}
-            {cecHours ? (
+            {cecHoursLabel ? (
               <span className={hasBackdrop ? 'text-cyan-200' : 'text-[#146fc2]'}>
-                {cecHours} IICRC CEC{cecHours === '1' ? '' : 's'}
+                {cecHoursLabel} IICRC CEC{cecHoursLabel === '1' ? '' : 's'}
               </span>
             ) : null}
             {durationHours ? (

@@ -1,0 +1,5 @@
+{
+  "version": 1,
+  "note": "Human-maintained exact-line allowlist for the IICRC/CEC compliance guard (scripts/check-iicrc-compliance.mjs) — licence-critical. Every static 'N IICRC CEC(s)' claim on a scanned surface is BLOCKED by default; a line ships ONLY if its exact normalised text (leading/trailing whitespace trimmed, internal whitespace collapsed to single spaces; case and wording preserved) appears in approvedLines below. This is exact-string match — NO patterns, NO wildcards, NO fuzzy matching — so a near-miss variant still blocks. Add a line here ONLY after human review confirming it is a genuine IICRC program-requirement fact (e.g. an IICRC recertification-requirement statement), never a course CEC-award claim. A course-award claim must instead carry ZERO CEC number. Ships EMPTY: on the live tree there are no numbered IICRC-CEC lines, so nothing legitimate is blocked today. Validated indirectly by scripts/check-iicrc-compliance.test.mjs.",
+  "approvedLines": []
+}

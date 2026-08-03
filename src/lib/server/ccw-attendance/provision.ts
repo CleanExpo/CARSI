@@ -41,6 +41,8 @@ import {
   runCcwOfferPackBatch,
   type OfferPackBatchSummary,
 } from '@/lib/server/ccw-attendance/offer-pack';
+import { selectActiveOffersForNow } from '@/lib/marketing/ccw-roadshow-offers';
+import { isCcwAttendeeOffersEnabled } from '@/lib/server/ccw-offers-flag';
 import { sendEnrollmentWelcomeEmail } from '@/lib/server/enrollment-email';
 import { enrollStudentInCourse } from '@/lib/server/enrollment-service';
 import { findOrCreateGuestUser } from '@/lib/server/guest-checkout';
@@ -199,8 +201,14 @@ export async function provisionSignIn(
     // Fire-and-forget welcome email — NEVER awaited (DO→email egress 504s). The
     // email is the only channel that surfaces access (magic/reset link).
     const appOrigin = options?.appOrigin ?? getAppOrigin(null);
-    void sendEnrollmentWelcomeEmail({ studentId, courseSlug: slug, appOrigin }).catch((e) =>
-      console.error('[ccw-provision] welcome email', signInId, e)
+    // Attendee Course Offers: gated by flag + the running event's date window.
+    // Empty off-event or when the flag is off — provisioning only reaches here
+    // for a non-quarantined attendee (AC-11), so offers never go to a stranger.
+    const offers = selectActiveOffersForNow(new Date(), {
+      enabled: isCcwAttendeeOffersEnabled(),
+    });
+    void sendEnrollmentWelcomeEmail({ studentId, courseSlug: slug, appOrigin, offers }).catch((e) =>
+      console.error('[ccw-provision] welcome email', signInId, e),
     );
 
     return { signInId, status: 'provisioned', accountOutcome, studentId, enrollmentId };

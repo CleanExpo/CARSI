@@ -2,25 +2,29 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { getAdminSessionOrNull } from '@/lib/admin/admin-session';
 import { getCcwRoadshowEvent } from '@/lib/marketing/ccw-roadshow';
+import { prisma } from '@/lib/prisma';
 import {
   applyCheckInCorrection,
-  digitisePaperCheckIn,
   findMergeCandidates,
   listSignInsForEvent,
   mergeDuplicateSignIns,
+  recordAdminCheckIn,
 } from '@/lib/server/ccw-attendance/admin-ops';
-import type { CheckInDayIndex } from '@/lib/server/ccw-attendance/checkin-token';
+import {
+  configuredEventDayGuard,
+  type CheckInDayIndex,
+} from '@/lib/server/ccw-attendance/checkin-token';
 import { isCcwAttendanceEnabled } from '@/lib/server/ccw-attendance/flag';
 
 /**
- * Admin sign-in roster + correction/merge/paper-digitisation for ONE event.
+ * Admin sign-in roster + correction/merge/assisted electronic check-in for ONE event.
  *
  * DARK behind `CCW_ATTENDANCE_ENABLED` (404 when off). Admin-only
  * (`getAdminSessionOrNull` → 401). Scoped to a single event — there is no
  * cross-event / global-PII view here.
  *
  * GET  ?eventSlug=<slug>          → { ok, roster }
- * POST { action: 'correct' | 'merge' | 'digitise_paper', ... }
+ * POST { action: 'correct' | 'merge' | 'admin_checkin', ... }
  */
 
 export const dynamic = 'force-dynamic';
@@ -75,8 +79,8 @@ type MergeBody = {
   duplicateId?: string;
   reason?: string;
 };
-type DigitisePaperBody = {
-  action: 'digitise_paper';
+type AdminCheckInBody = {
+  action: 'admin_checkin';
   eventSlug?: string;
   dayIndex?: number;
   fullName?: string;
@@ -84,7 +88,7 @@ type DigitisePaperBody = {
   businessName?: string;
   emailOptIn?: boolean;
 };
-type PostBody = CorrectBody | MergeBody | DigitisePaperBody | { action?: string };
+type PostBody = CorrectBody | MergeBody | AdminCheckInBody | { action?: string };
 
 export async function POST(request: NextRequest) {
   if (!isCcwAttendanceEnabled()) {
@@ -172,8 +176,8 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ ok: true, result });
       }
 
-      case 'digitise_paper': {
-        const b = body as DigitisePaperBody;
+      case 'admin_checkin': {
+        const b = body as AdminCheckInBody;
         const event = getCcwRoadshowEvent(b.eventSlug);
         const dayIndex = toDayIndex(b.dayIndex);
         const fullName = b.fullName?.trim() ?? '';
@@ -185,13 +189,29 @@ export async function POST(request: NextRequest) {
             { status: 400 }
           );
         }
-        const result = await digitisePaperCheckIn({
+        const dayGuard = configuredEventDayGuard(event.startDateIso, dayIndex);
+        if (!dayGuard.ok) {
+          return NextResponse.json(
+            {
+              code: 'wrong_event_day',
+              detail: `Day ${dayIndex} check-in opens on ${dayGuard.expectedDateStamp}. Record attendance on the event day.`,
+            },
+            { status: 409 }
+          );
+        }
+        const actorAdmin = await prisma.adminUser.findUnique({
+          where: { email: session.email.trim().toLowerCase() },
+          select: { id: true },
+        });
+        const result = await recordAdminCheckIn({
           eventSlug: event.slug,
           dayIndex,
           fullName,
           email,
           businessName: b.businessName,
           emailOptIn: b.emailOptIn === true,
+          actorAdminId: actorAdmin?.id ?? null,
+          actorAdminEmail: session.email,
         });
         switch (result.status) {
           case 'email_collision_different_name':

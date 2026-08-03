@@ -14,6 +14,7 @@ import type Stripe from 'stripe';
  */
 
 import {
+  readInvoiceIdFromPaymentIntent,
   readSubscriptionIdFromPaymentIntent,
   readInvoiceSubscriptionId,
 } from './stripe-subscription-map';
@@ -24,6 +25,14 @@ function pi(overrides: Record<string, unknown>): Stripe.PaymentIntent {
 }
 
 describe('readSubscriptionIdFromPaymentIntent (Finding 1 — detect a subscription charge)', () => {
+  it('reads the invoice transaction id used by attributed subscription revenue', () => {
+    expect(readInvoiceIdFromPaymentIntent(pi({ invoice: 'in_string' }))).toBe('in_string');
+    expect(readInvoiceIdFromPaymentIntent(pi({ invoice: { id: 'in_expanded' } }))).toBe(
+      'in_expanded',
+    );
+    expect(readInvoiceIdFromPaymentIntent(pi({ invoice: null }))).toBeNull();
+  });
+
   it('reads the subscription id from an expanded invoice (current clover shape)', () => {
     // charge.refunded → payment_intent retrieved with expand:['invoice'];
     // the invoice carries the subscription under parent.subscription_details.

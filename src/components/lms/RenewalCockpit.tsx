@@ -33,14 +33,14 @@ function SuggestionCard({
   slug,
   reason,
   discipline,
-  cecHours,
+  cecHoursLabel,
   thumbnailUrl,
 }: {
   title: string;
   slug: string;
   reason: string;
   discipline: string | null;
-  cecHours: number | null;
+  cecHoursLabel: number | null;
   thumbnailUrl: string | null;
 }) {
   return (
@@ -64,8 +64,8 @@ function SuggestionCard({
             {discipline}
           </span>
         ) : null}
-        {cecHours !== null ? (
-          <span className="font-mono text-[10px] text-slate-500">{cecHours} CEC hrs</span>
+        {cecHoursLabel !== null ? (
+          <span className="font-mono text-[10px] text-slate-500">{cecHoursLabel} CEC hrs</span>
         ) : null}
       </div>
       <h3 className="line-clamp-2 text-sm font-semibold text-slate-900">{title}</h3>
@@ -274,7 +274,7 @@ export function RenewalCockpit() {
                       slug={c.slug}
                       reason={c.reason}
                       discipline={c.iicrc_discipline}
-                      cecHours={c.cec_hours}
+                      cecHoursLabel={c.cec_hours}
                       thumbnailUrl={c.thumbnail_url}
                     />
                   ))

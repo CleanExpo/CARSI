@@ -6,7 +6,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
  * of truth. Covers:
  *  - correction = direct, write-once-respecting CLEAR of a day mark;
  *  - merge-duplicates backfills the survivor (no attendance mark lost);
- *  - paper digitisation via the same writer (source='paper');
+ *  - assisted electronic check-in via the same writer (source='admin');
  *  - roster is single-event-scoped and derives from the day columns
  *    (attendanceComplete = both days, the certificate-of-attendance trigger).
  */
@@ -17,12 +17,8 @@ vi.mock('@/lib/prisma', async () => {
 
 const { fakeStore, resetFakeStore } = await import('./test-support/fake-prisma');
 const { recordCheckIn } = await import('./checkin-service');
-const {
-  applyCheckInCorrection,
-  mergeDuplicateSignIns,
-  digitisePaperCheckIn,
-  listSignInsForEvent,
-} = await import('./admin-ops');
+const { applyCheckInCorrection, mergeDuplicateSignIns, recordAdminCheckIn, listSignInsForEvent } =
+  await import('./admin-ops');
 
 beforeEach(() => {
   resetFakeStore();
@@ -39,7 +35,12 @@ describe('applyCheckInCorrection — direct write-once-respecting clear', () => 
     const id = await seedSignIn('ann@x.com', 1);
     expect(fakeStore.signIns[0].day1CheckedInAt).not.toBeNull();
 
-    const result = await applyCheckInCorrection({ signInId: id, dayIndex: 1, reason: 'wrong person', actorAdminEmail: 'admin@carsi' });
+    const result = await applyCheckInCorrection({
+      signInId: id,
+      dayIndex: 1,
+      reason: 'wrong person',
+      actorAdminEmail: 'admin@carsi',
+    });
     expect(result.status).toBe('corrected');
     if (result.status === 'corrected') expect(result.day1CheckedInAt).toBeNull();
 
@@ -53,15 +54,24 @@ describe('applyCheckInCorrection — direct write-once-respecting clear', () => 
     await applyCheckInCorrection({ signInId: id, dayIndex: 1, reason: 'oops' });
     expect(fakeStore.signIns[0].day1CheckedInAt).toBeNull();
 
-    await recordCheckIn({ eventSlug: 'melbourne', dayIndex: 1, fullName: 'Ann Jones', email: 'ann@x.com' });
+    await recordCheckIn({
+      eventSlug: 'melbourne',
+      dayIndex: 1,
+      fullName: 'Ann Jones',
+      email: 'ann@x.com',
+    });
     expect(fakeStore.signIns[0].day1CheckedInAt).not.toBeNull();
     expect(fakeStore.signIns).toHaveLength(1);
   });
 
   it('rejects a blank reason and a missing sign-in', async () => {
     const id = await seedSignIn('ann@x.com', 1);
-    expect((await applyCheckInCorrection({ signInId: id, dayIndex: 1, reason: '   ' })).status).toBe('invalid_reason');
-    expect((await applyCheckInCorrection({ signInId: 'missing', dayIndex: 1, reason: 'x' })).status).toBe('not_found');
+    expect(
+      (await applyCheckInCorrection({ signInId: id, dayIndex: 1, reason: '   ' })).status
+    ).toBe('invalid_reason');
+    expect(
+      (await applyCheckInCorrection({ signInId: 'missing', dayIndex: 1, reason: 'x' })).status
+    ).toBe('not_found');
   });
 });
 
@@ -71,7 +81,11 @@ describe('mergeDuplicateSignIns — backfill survivor, lose no attendance mark',
     const duplicate = await seedSignIn('ann2@x.com', 2, 'Ann Jones'); // typo email, Day-2
     expect(fakeStore.signIns).toHaveLength(2);
 
-    const result = await mergeDuplicateSignIns({ primaryId: primary, duplicateId: duplicate, actorAdminEmail: 'admin@carsi' });
+    const result = await mergeDuplicateSignIns({
+      primaryId: primary,
+      duplicateId: duplicate,
+      actorAdminEmail: 'admin@carsi',
+    });
     expect(result.status).toBe('merged');
     if (result.status === 'merged') {
       expect(result.primaryId).toBe(primary);
@@ -89,17 +103,32 @@ describe('mergeDuplicateSignIns — backfill survivor, lose no attendance mark',
   it('rejects same-row, missing, and cross-event merges', async () => {
     const a = await seedSignIn('a@x.com', 1);
     expect((await mergeDuplicateSignIns({ primaryId: a, duplicateId: a })).status).toBe('same_row');
-    expect((await mergeDuplicateSignIns({ primaryId: a, duplicateId: 'missing' })).status).toBe('not_found');
+    expect((await mergeDuplicateSignIns({ primaryId: a, duplicateId: 'missing' })).status).toBe(
+      'not_found'
+    );
 
-    const syd = await recordCheckIn({ eventSlug: 'sydney', dayIndex: 1, fullName: 'S', email: 's@x.com' });
+    const syd = await recordCheckIn({
+      eventSlug: 'sydney',
+      dayIndex: 1,
+      fullName: 'S',
+      email: 's@x.com',
+    });
     if (syd.status !== 'checked_in') throw new Error('seed');
-    expect((await mergeDuplicateSignIns({ primaryId: a, duplicateId: syd.signInId })).status).toBe('different_event');
+    expect((await mergeDuplicateSignIns({ primaryId: a, duplicateId: syd.signInId })).status).toBe(
+      'different_event'
+    );
   });
 });
 
-describe('digitisePaperCheckIn — same writer, source=paper', () => {
-  it('records an offline entry through recordCheckIn, attributing the admin', async () => {
-    const r = await digitisePaperCheckIn({ eventSlug: 'melbourne', dayIndex: 1, fullName: 'Paper Person', email: 'paper@x.com', actorAdminId: 'admin-1' });
+describe('recordAdminCheckIn — same writer, source=admin', () => {
+  it('records an assisted electronic entry through recordCheckIn, attributing the admin', async () => {
+    const r = await recordAdminCheckIn({
+      eventSlug: 'melbourne',
+      dayIndex: 1,
+      fullName: 'Assisted Person',
+      email: 'assisted@x.com',
+      actorAdminId: 'admin-1',
+    });
     expect(r.status).toBe('checked_in');
     expect(fakeStore.signIns).toHaveLength(1);
     expect(fakeStore.signIns[0].day1CheckedInAt).not.toBeNull();
@@ -111,10 +140,25 @@ describe('digitisePaperCheckIn — same writer, source=paper', () => {
 describe('listSignInsForEvent — single-event roster derived from day columns', () => {
   it('scopes to one event and marks attendanceComplete when both days are present', async () => {
     // Both-days person in Melbourne → attendanceComplete.
-    await recordCheckIn({ eventSlug: 'melbourne', dayIndex: 1, fullName: 'Both Days', email: 'both@x.com' });
-    await recordCheckIn({ eventSlug: 'melbourne', dayIndex: 2, fullName: 'Both Days', email: 'both@x.com' });
+    await recordCheckIn({
+      eventSlug: 'melbourne',
+      dayIndex: 1,
+      fullName: 'Both Days',
+      email: 'both@x.com',
+    });
+    await recordCheckIn({
+      eventSlug: 'melbourne',
+      dayIndex: 2,
+      fullName: 'Both Days',
+      email: 'both@x.com',
+    });
     // A different event — must NOT appear.
-    await recordCheckIn({ eventSlug: 'sydney', dayIndex: 1, fullName: 'Other', email: 'other@x.com' });
+    await recordCheckIn({
+      eventSlug: 'sydney',
+      dayIndex: 1,
+      fullName: 'Other',
+      email: 'other@x.com',
+    });
 
     const roster = await listSignInsForEvent('melbourne');
     expect(roster.eventSlug).toBe('melbourne');
@@ -131,7 +175,12 @@ describe('listSignInsForEvent — single-event roster derived from day columns',
   });
 
   it('a single-day attendee is NOT attendanceComplete', async () => {
-    await recordCheckIn({ eventSlug: 'melbourne', dayIndex: 1, fullName: 'One Day', email: 'one@x.com' });
+    await recordCheckIn({
+      eventSlug: 'melbourne',
+      dayIndex: 1,
+      fullName: 'One Day',
+      email: 'one@x.com',
+    });
     const roster = await listSignInsForEvent('melbourne');
     expect(roster.rows).toHaveLength(1);
     expect(roster.rows[0].attendanceComplete).toBe(false);

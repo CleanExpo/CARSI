@@ -9,11 +9,20 @@ export function getIicrcCecSubmissionEmail(): string {
   return v || DEFAULT_IICRC_CEC_SUBMISSION_EMAIL;
 }
 
-/** When false, submissions are recorded as `skipped` with reason `auto_submit_disabled`. */
+/**
+ * Auto-submission to the IICRC is FAIL-CLOSED: off unless explicitly enabled.
+ *
+ * Emailing renewals@iicrcnet.org asserts a CEC claim on a learner's behalf. Per
+ * CLAUDE.md that claim is licence-critical and valid only after per-course IICRC
+ * approval confirmed by the founder — so the absence of configuration must mean
+ * "do not submit", never "submit". This previously defaulted to ON, which sent a
+ * live submission for a course that had no approval (2026-07-17).
+ *
+ * When false, submissions are recorded as `skipped` with reason `auto_submit_disabled`.
+ */
 export function isIicrcCecAutoSubmitEnabled(): boolean {
   const v = process.env.IICRC_CEC_AUTO_SUBMIT?.trim().toLowerCase();
-  if (v === 'false' || v === '0' || v === 'no' || v === 'off') return false;
-  return true;
+  return v === 'true' || v === '1' || v === 'yes' || v === 'on';
 }
 
 export function resolveEffectiveCecHours(course: {
@@ -25,15 +34,15 @@ export function resolveEffectiveCecHours(course: {
   durationHours?: number | null;
   iicrcDiscipline?: string | null;
 }): number | null {
-  const direct = toFiniteNumber(course.cecHours);
-  if (direct !== null && direct > 0) return direct;
-
+  // REGISTRY-ONLY, FAIL-CLOSED (licence-critical, GP-498). The stored `cecHours` is NOT
+  // consulted — it is WP-import pollution, not IICRC approval. CEC hours resolve solely from
+  // the founder-confirmed approvals registry (by slug); no slug → no CEC.
   const slug = course.slug?.trim();
-  if (!slug) return direct;
+  if (!slug) return null;
 
   return resolveLmsCourseCecHours({
     slug,
-    cecHours: direct,
+    cecHours: null,
     shortDescription: course.shortDescription,
     description: course.description,
     meta: course.meta,
@@ -51,14 +60,9 @@ export function courseEligibleForIicrcCecSubmission(course: {
   meta?: unknown;
   durationHours?: number | null;
 }): boolean {
+  // Eligibility requires REGISTRY-APPROVED CEC hours only. A non-empty `iicrcDiscipline`
+  // string is NOT IICRC approval and must never make a course submission-eligible on its own
+  // (that was a fail-open path — GP-498). Auto-submit is separately fail-closed by config.
   const cec = resolveEffectiveCecHours(course);
-  if (cec !== null && cec > 0) return true;
-  const disc = course.iicrcDiscipline?.trim();
-  return Boolean(disc && disc !== '—' && disc !== '-');
-}
-
-function toFiniteNumber(v: unknown): number | null {
-  if (v === null || v === undefined) return null;
-  const n = typeof v === 'number' ? v : Number(v);
-  return Number.isFinite(n) ? n : null;
+  return cec !== null && cec > 0;
 }

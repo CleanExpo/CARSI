@@ -23,7 +23,7 @@ export interface CertificatePreviewProps {
   completedDate?: string;
   issuedDate?: string;
   credentialId?: string;
-  cecHours?: number | null;
+  cecHoursLabel?: number | null;
   courseLevel?: string | null;
 }
 
@@ -69,7 +69,7 @@ export function CertificatePreview({
   }),
   issuedDate,
   credentialId,
-  cecHours = 4,
+  cecHoursLabel = 4,
   courseLevel = 'Professional development',
 }: CertificatePreviewProps) {
   const discCode = disciplineCode(discipline);
@@ -80,7 +80,7 @@ export function CertificatePreview({
       : (IICRC_DISCIPLINE_LONG[discCode] ?? discipline);
   const issued = issuedDate ?? completedDate;
   const credentialRef = credentialId ? formatCredentialRef(credentialId) : 'CARSI-EXAMPLE000';
-  const cecValue = formatCecHoursForCertificate(cecHours);
+  const cecValue = formatCecHoursForCertificate(cecHoursLabel);
 
   return (
     <div

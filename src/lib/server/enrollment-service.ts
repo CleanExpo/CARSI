@@ -350,7 +350,6 @@ export async function getEnrollmentForCertificate(
     title: string;
     slug: string;
     iicrcDiscipline: string | null;
-    cecHours: unknown;
     durationHours: unknown;
     level: string | null;
   };
@@ -367,7 +366,6 @@ export async function getEnrollmentForCertificate(
           slug: true,
           id: true,
           iicrcDiscipline: true,
-          cecHours: true,
           shortDescription: true,
           description: true,
           meta: true,
@@ -396,7 +394,6 @@ export async function getEnrollmentForCertificate(
           title: true,
           slug: true,
           iicrcDiscipline: true,
-          cecHours: true,
           shortDescription: true,
           description: true,
           meta: true,
