@@ -33,9 +33,9 @@ function FaqItem({
         type="button"
         onClick={onToggle}
         aria-expanded={isOpen}
-        className="flex w-full items-center justify-between gap-4 py-5 text-left focus-visible:ring-2 focus-visible:ring-[#2490ed]/35 focus-visible:outline-none"
+        className="group flex w-full items-center justify-between gap-4 py-5 text-left focus-visible:ring-2 focus-visible:ring-[#2490ed]/35 focus-visible:outline-none"
       >
-        <span className="font-[family-name:var(--font-display)] text-base font-semibold text-slate-950 sm:text-lg">
+        <span className="font-[family-name:var(--font-display)] text-base font-semibold text-slate-950 transition-colors group-hover:text-[#146fc2] sm:text-lg">
           {faq.question}
         </span>
         <ChevronDown
@@ -54,7 +54,7 @@ function FaqItem({
             transition={{ duration: reduceMotion ? 0 : 0.3, ease: [0.4, 0, 0.2, 1] }}
             className="overflow-hidden"
           >
-            <p className="pb-5 pr-8 text-sm leading-relaxed text-slate-500">{faq.answer}</p>
+            <p className="pr-8 pb-5 text-sm leading-relaxed text-slate-500">{faq.answer}</p>
           </motion.div>
         ) : null}
       </AnimatePresence>
@@ -83,8 +83,8 @@ export function HomeFaqSection({ faqs }: { faqs: Faq[] }) {
               Questions technicians ask before enrolling
             </h2>
             <p className={`mt-4 max-w-sm ${LANDING_LEAD_CLASS}`}>
-              Straight answers about CECs, pacing, industries, and in-person events. If anything
-              is still unclear, message CARSI support any time.
+              Straight answers about CECs, pacing, industries, and in-person events. If anything is
+              still unclear, message CARSI support any time.
             </p>
           </div>
 
