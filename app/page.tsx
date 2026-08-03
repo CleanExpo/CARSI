@@ -99,8 +99,8 @@ export default async function Home() {
   const disciplineCountLabel =
     catalogueFacts.disciplineCodes.length > 0 ? catalogueFacts.disciplineCodes.length : 7;
   const stats = [
-    { value: '24/7', label: 'Online Access' },
-    { value: '12+', label: 'Industries Served' },
+    { value: '24/7', label: 'Study anytime' },
+    { value: '12+', label: 'Industries served' },
     {
       value:
         catalogueFacts.publishedCourseCount > 0
