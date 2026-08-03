@@ -122,10 +122,10 @@ export function HomePricingSection({
                     Best value
                   </span>
                 ) : null}
-                <div className="min-w-0 flex-1">
+                <div className={`min-w-0 flex-1 ${tier.highlighted ? 'pr-24' : ''}`}>
                   <h3 className="text-base font-bold text-slate-950 dark:text-white">{tier.name}</h3>
                   <p className="mt-2 flex flex-wrap items-baseline gap-1.5">
-                    <span className="text-3xl font-bold tracking-tight text-slate-950 dark:text-white">
+                    <span className="text-3xl font-bold tracking-tight text-slate-950 tabular-nums dark:text-white">
                       {tier.price}
                     </span>
                     <span className="text-xs text-slate-600 dark:text-white/55">{tier.cadence}</span>
@@ -145,7 +145,7 @@ export function HomePricingSection({
                   ) : (
                     <Link
                       href={tier.href}
-                      className={`inline-flex min-h-11 items-center justify-center rounded-xl px-5 py-2.5 text-sm font-semibold transition hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:outline-none ${
+                      className={`inline-flex min-h-11 items-center justify-center rounded-xl px-5 py-2.5 text-sm font-semibold transition motion-safe:hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:outline-none ${
                         tier.highlighted
                           ? 'bg-[#146fc2] text-white shadow-sm hover:bg-[#0f5fa8] focus-visible:ring-[#2490ed]/50'
                           : 'border border-[#146fc2]/35 text-[#146fc2] hover:border-[#146fc2] focus-visible:ring-[#2490ed]/40 dark:border-[#2490ed]/40 dark:text-[#8fd0ff]'
