@@ -4,7 +4,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { BookOpen, CalendarDays, MapPin, TrendingUp, Users } from 'lucide-react';
 
 /**
- * Light growth-path visual — online learning flows into in-person scale.
+ * Light growth-path visual. Online learning flows into in-person scale.
  */
 export function GrowthPathInfographic({ className = '' }: { className?: string }) {
   const reduceMotion = useReducedMotion();
