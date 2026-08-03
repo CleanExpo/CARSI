@@ -51,7 +51,7 @@ export function HomeFeaturedCoursesSection({
             <h2 id="home-featured-courses-heading" className={`mt-3 ${LANDING_DISPLAY_H2_CLASS}`}>
               The courses working crews start with
             </h2>
-            <p className={`mt-4 max-w-xl ${LANDING_LEAD_CLASS}`}>
+            <p className={`mt-4 max-w-xl text-pretty ${LANDING_LEAD_CLASS}`}>
               Self-paced training you can begin tonight and finish around the roster. Filter by
               discipline, level, or outcome
               {courseCountLabel ? ` across ${courseCountLabel} published courses` : ''}.
