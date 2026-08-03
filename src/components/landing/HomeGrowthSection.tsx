@@ -1,8 +1,8 @@
 'use client';
 
+import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowRight, Award, BookOpen, Building2, Clock, type LucideIcon } from 'lucide-react';
 import Link from 'next/link';
-import { motion, useReducedMotion } from 'framer-motion';
 
 import { GrowthPathInfographic } from '@/components/landing/GrowthPathInfographic';
 import { PUBLIC_SHELL_INNER_CLASS } from '@/components/landing/public-shell-width';
@@ -18,10 +18,7 @@ interface HomeGrowthSectionProps {
   stats: Stat[];
 }
 
-const STAT_PRESENTATION: Record<
-  string,
-  { icon: LucideIcon; detail: string; accent: string }
-> = {
+const STAT_PRESENTATION: Record<string, { icon: LucideIcon; detail: string; accent: string }> = {
   'Online Access': {
     icon: Clock,
     detail: 'Study around the roster',
@@ -101,7 +98,7 @@ export function HomeGrowthSection({ stats }: HomeGrowthSectionProps) {
                   <span
                     className={cn(
                       'mt-1 flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-white/15 bg-white/5 transition group-hover:border-[#2490ed]/40 group-hover:bg-[#2490ed]/15',
-                      meta.accent,
+                      meta.accent
                     )}
                   >
                     <Icon className="h-5 w-5 text-[#8fd0ff]" aria-hidden />
@@ -128,13 +125,13 @@ export function HomeGrowthSection({ stats }: HomeGrowthSectionProps) {
           <GrowthPathInfographic className="order-2 lg:order-1" />
 
           <div className="order-1 lg:order-2">
-            <p
-              id="home-growth-heading"
-              className="text-[11px] font-semibold tracking-[0.18em] text-[#146fc2] uppercase dark:text-[#8fd0ff]"
-            >
+            <p className="text-[11px] font-semibold tracking-[0.18em] text-[#146fc2] uppercase dark:text-[#8fd0ff]">
               Beyond the catalogue
             </p>
-            <h2 className="mt-3 text-2xl font-bold tracking-tight text-slate-950 md:text-3xl dark:text-white">
+            <h2
+              id="home-growth-heading"
+              className="mt-3 text-2xl font-bold tracking-tight text-slate-950 md:text-3xl dark:text-white"
+            >
               Learn online. Scale in person.
             </h2>
             <p className="mt-3 max-w-xl text-sm leading-relaxed text-slate-600 md:text-base dark:text-white/65">
