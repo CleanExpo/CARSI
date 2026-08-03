@@ -1,105 +1,110 @@
 'use client';
 
+import { Award, CheckCircle2, Shield } from 'lucide-react';
+import { motion, useReducedMotion } from 'framer-motion';
+
+import { IICRCDisciplineMap } from '@/components/landing/IICRCDisciplineMap';
 import { PUBLIC_SHELL_INNER_CLASS } from '@/components/landing/public-shell-width';
-import { IICRCDisciplineMap } from '@/components/lms/diagrams/IICRCDisciplineMap';
-import { AcronymTooltip } from '@/components/ui/AcronymTooltip';
-import { ArrowRight, Compass, Map } from 'lucide-react';
-import Link from 'next/link';
 
-interface HomeCertificationsSectionProps {
-  disciplineCountLabel: number;
-}
-
-const highlights = [
+const TIMELINE = [
   {
-    icon: Map,
-    title: 'Interactive hub',
-    detail: 'Explore disciplines visually, then open matching courses in one click.',
+    icon: Shield,
+    title: 'IICRC CEC provider',
+    body: 'CARSI is an IICRC CEC Accredited provider. Completing eligible courses earns Continuing Education Credits toward maintaining your existing IICRC certification.',
   },
   {
-    icon: Compass,
-    title: 'Pathway-aligned',
-    detail: 'Each node maps to IICRC CEC tracks in the CARSI catalogue.',
+    icon: Award,
+    title: 'CARSI designations',
+    body: 'Earn CARSI Southern Hemisphere Restoration Designations — credentials issued by CARSI for the work you complete on our platform.',
+  },
+  {
+    icon: CheckCircle2,
+    title: 'Verified on completion',
+    body: 'Certificates and CEC records are issued when you pass — tracked in your learner dashboard for audits and recertification.',
   },
 ] as const;
 
-export function HomeCertificationsSection({ disciplineCountLabel }: HomeCertificationsSectionProps) {
+/**
+ * Certifications as a vertical timeline + discipline map — not a flat two-column stack.
+ */
+export function HomeCertificationsSection({
+  disciplineCountLabel = 7,
+}: {
+  disciplineCountLabel?: number;
+}) {
+  const reduceMotion = useReducedMotion();
+
   return (
     <section
       aria-labelledby="home-certifications-heading"
-      className="relative border-t border-slate-200/80 bg-white py-14 md:py-20 dark:border-white/10 dark:bg-[#0a0a0a]"
+      className="relative overflow-hidden border-t border-slate-200/80 bg-white py-16 md:py-24 dark:border-white/10 dark:bg-[#080c14]"
     >
       <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_55%_50%_at_10%_20%,rgba(36,144,237,0.06),transparent_60%)] dark:bg-[radial-gradient(ellipse_55%_50%_at_10%_20%,rgba(36,144,237,0.1),transparent_60%)]"
+        className="pointer-events-none absolute inset-y-0 left-0 w-px bg-gradient-to-b from-transparent via-[#2490ed]/40 to-transparent md:left-[max(1.5rem,calc((100%-72rem)/2+1.5rem))]"
         aria-hidden
       />
 
       <div className={`relative ${PUBLIC_SHELL_INNER_CLASS}`}>
-        <div className="grid gap-12 lg:grid-cols-[minmax(280px,0.92fr)_minmax(0,1.08fr)] lg:items-start lg:gap-14">
-          <div>
-            <p className="text-[11px] font-semibold tracking-[0.18em] text-[#146fc2] uppercase dark:text-[#8fd0ff]">
-              IICRC CEC Disciplines
-            </p>
-            <h2
-              id="home-certifications-heading"
-              className="mt-3 text-2xl font-bold tracking-tight text-slate-950 md:text-3xl dark:text-white"
-            >
-              <AcronymTooltip term="IICRC" /> discipline map
-            </h2>
-            <p className="mt-3 text-sm leading-relaxed text-slate-600 md:text-base dark:text-white/65">
-              Seven core CEC pathways orbit IICRC standards. Hover or tap any node to see the full
-              discipline name and jump straight into filtered CEC courses.
-            </p>
+        <div className="max-w-2xl">
+          <p className="text-[11px] font-semibold tracking-[0.18em] text-[#146fc2] uppercase dark:text-[#8fd0ff]">
+            Credentials
+          </p>
+          <h2
+            id="home-certifications-heading"
+            className="mt-3 text-2xl font-bold tracking-tight text-slate-950 md:text-3xl dark:text-white"
+          >
+            Credentials that hold up on the job site
+          </h2>
+          <p className="mt-4 text-sm leading-relaxed text-slate-600 md:text-base dark:text-white/65">
+            Dual value: a CARSI designation that also earns IICRC CECs across {disciplineCountLabel}{' '}
+            IICRC disciplines — without confusing CARSI courses for IICRC certification delivery.
+          </p>
+        </div>
 
-            <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-[#b8dbfb] bg-[#eef7ff] px-3 py-1 text-xs font-semibold text-[#146fc2] dark:border-[#2490ed]/30 dark:bg-[#2490ed]/10 dark:text-[#8fd0ff]">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden />
-              {disciplineCountLabel} disciplines in catalogue
-            </div>
-
-            <ul className="mt-8 space-y-3">
-              {highlights.map((item) => (
-                <li
-                  key={item.title}
-                  className="flex gap-4 rounded-xl border border-slate-200/80 bg-[#f8fbff]/80 px-4 py-3.5 dark:border-white/10 dark:bg-white/[0.03]"
-                >
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-200/80 bg-white dark:border-white/10 dark:bg-white/[0.04]">
-                    <item.icon className="h-4 w-4 text-[#146fc2] dark:text-[#8fd0ff]" aria-hidden />
-                  </span>
-                  <span>
-                    <span className="block font-semibold text-slate-950 dark:text-white">
-                      {item.title}
-                    </span>
-                    <span className="mt-0.5 block text-xs leading-relaxed text-slate-600 dark:text-white/55">
-                      {item.detail}
-                    </span>
-                  </span>
+        <div className="mt-12 grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(280px,0.95fr)] lg:gap-16 lg:items-start">
+          <ol className="relative space-y-0">
+            {TIMELINE.map((item, index) => {
+              const Icon = item.icon;
+              const isLast = index === TIMELINE.length - 1;
+              return (
+                <li key={item.title} className="relative flex gap-5 pb-10 last:pb-0">
+                  {!isLast ? (
+                    <span
+                      className="absolute top-10 left-[1.15rem] h-[calc(100%-2.5rem)] w-px bg-gradient-to-b from-[#2490ed]/50 to-[#2490ed]/10 dark:from-[#2490ed]/40 dark:to-transparent"
+                      aria-hidden
+                    />
+                  ) : null}
+                  <motion.span
+                    className="relative z-[1] flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 border-[#146fc2] bg-white text-[#146fc2] shadow-sm dark:border-[#2490ed] dark:bg-[#0a101c] dark:text-[#8fd0ff]"
+                    initial={reduceMotion ? false : { scale: 0.7, opacity: 0 }}
+                    whileInView={reduceMotion ? undefined : { scale: 1, opacity: 1 }}
+                    viewport={{ once: true, amount: 0.6 }}
+                    transition={{ duration: 0.35, delay: index * 0.08 }}
+                  >
+                    <Icon className="h-4 w-4" aria-hidden />
+                  </motion.span>
+                  <motion.div
+                    initial={reduceMotion ? false : { opacity: 0, x: 16 }}
+                    whileInView={reduceMotion ? undefined : { opacity: 1, x: 0 }}
+                    viewport={{ once: true, amount: 0.4 }}
+                    transition={{ duration: 0.4, delay: index * 0.08 }}
+                  >
+                    <h3 className="text-base font-bold text-slate-950 dark:text-white">{item.title}</h3>
+                    <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-white/65">
+                      {item.body}
+                    </p>
+                  </motion.div>
                 </li>
-              ))}
-            </ul>
+              );
+            })}
+          </ol>
 
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link
-                href="/courses"
-                className="inline-flex items-center gap-2 rounded-xl bg-[#146fc2] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#0f5fa8]"
-              >
-                Full course catalogue
-                <ArrowRight className="h-4 w-4" aria-hidden />
-              </Link>
-              <Link
-                href="/pathways"
-                className="inline-flex items-center gap-2 rounded-xl border border-slate-300/90 bg-white px-5 py-2.5 text-sm font-semibold text-slate-800 transition hover:border-[#2490ed] hover:text-[#146fc2] dark:border-white/15 dark:bg-white/[0.04] dark:text-white dark:hover:border-[#2490ed]/50 dark:hover:text-[#8fd0ff]"
-              >
-                View pathways
-              </Link>
-            </div>
-          </div>
-
-          <div className="relative">
+          <div className="relative lg:sticky lg:top-28">
             <div
-              className="pointer-events-none absolute -inset-3 rounded-[1.35rem] bg-[radial-gradient(ellipse_at_50%_40%,rgba(36,144,237,0.12),transparent_65%)] blur-xl dark:opacity-80"
+              className="pointer-events-none absolute -inset-3 rounded-[1.35rem] bg-[radial-gradient(ellipse_at_50%_40%,rgba(36,144,237,0.14),transparent_65%)] blur-xl dark:opacity-80"
               aria-hidden
             />
-            <div className="relative overflow-hidden rounded-[1.25rem] border border-slate-200/80 bg-gradient-to-br from-white via-[#f8fbff] to-white p-1 shadow-[0_28px_70px_-40px_rgba(15,23,42,0.35)] dark:border-white/10 dark:from-[#0f172a] dark:via-[#0d1524] dark:to-[#0a101c] dark:shadow-[0_28px_70px_-36px_rgba(0,0,0,0.65)]">
+            <div className="relative overflow-hidden rounded-[1.25rem] border border-slate-200/80 bg-gradient-to-br from-white via-[#f8fbff] to-white p-1 shadow-[0_28px_70px_-40px_rgba(15,23,42,0.35)] dark:border-white/10 dark:from-[#0f172a] dark:via-[#0d1524] dark:to-[#0a101c]">
               <div className="rounded-[1.15rem] bg-white/90 p-3 sm:p-4 dark:bg-[#080c14]/90">
                 <IICRCDisciplineMap />
               </div>
