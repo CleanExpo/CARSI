@@ -3,7 +3,7 @@
 import { Award, CheckCircle2, Shield } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
 
-import { IICRCDisciplineMap } from '@/components/landing/IICRCDisciplineMap';
+import { IICRCDisciplineMap } from '@/components/lms/diagrams/IICRCDisciplineMap';
 import { PUBLIC_SHELL_INNER_CLASS } from '@/components/landing/public-shell-width';
 
 const TIMELINE = [

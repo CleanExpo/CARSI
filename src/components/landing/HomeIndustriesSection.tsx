@@ -22,14 +22,14 @@ const INDUSTRIES = [
     span: 'lg:col-span-2',
     featured: true,
   },
-  { slug: 'aged-care', label: 'Aged Care', span: '' },
-  { slug: 'mining', label: 'Mining & Resources', span: '' },
-  { slug: 'education', label: 'Education', span: '' },
-  { slug: 'property-management', label: 'Property Management', span: '' },
-  { slug: 'strata', label: 'Strata & Body Corporate', span: '' },
-  { slug: 'retail', label: 'Retail & Shopping Centres', span: '' },
-  { slug: 'childcare', label: 'Childcare', span: '' },
-  { slug: 'construction', label: 'Construction', span: '' },
+  { slug: 'aged-care', label: 'Aged Care', span: '', featured: false },
+  { slug: 'mining', label: 'Mining & Resources', span: '', featured: false },
+  { slug: 'education', label: 'Education', span: '', featured: false },
+  { slug: 'property-management', label: 'Property Management', span: '', featured: false },
+  { slug: 'strata', label: 'Strata & Body Corporate', span: '', featured: false },
+  { slug: 'retail', label: 'Retail & Shopping Centres', span: '', featured: false },
+  { slug: 'childcare', label: 'Childcare', span: '', featured: false },
+  { slug: 'construction', label: 'Construction', span: '', featured: false },
 ] as const;
 
 /**
