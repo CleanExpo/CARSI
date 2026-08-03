@@ -74,11 +74,11 @@ export function HomeHowItWorksSection() {
 
         <ol className="relative mt-16 flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-6">
           <div
-            className="absolute top-2 bottom-2 left-5 w-px bg-slate-200 lg:hidden"
+            className="absolute top-2 bottom-2 left-5 w-px bg-gradient-to-b from-slate-200 via-slate-200 to-transparent lg:hidden"
             aria-hidden
           />
           <div
-            className="absolute top-5 right-5 left-5 hidden h-px bg-slate-200 lg:block"
+            className="absolute top-5 right-5 left-5 hidden h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent lg:block"
             aria-hidden
           />
 
