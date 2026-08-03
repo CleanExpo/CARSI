@@ -2,7 +2,6 @@ import Link from 'next/link';
 
 import { AuthNavLinks } from '@/components/landing/AuthNavLinks';
 import { PublicLogo } from '@/components/landing/PublicLogo';
-import { PublicThemeToggle } from '@/components/landing/PublicThemeToggle';
 import {
   PUBLIC_CHROME_LINK_CLASS,
   PUBLIC_CHROME_NAV_CLASS,
@@ -56,7 +55,6 @@ export function PublicNavbar({ tone = 'chrome' }: { tone?: 'chrome' | 'light' })
           </div>
 
           <div className="hidden items-center gap-3 lg:flex">
-            <PublicThemeToggle variant={isLight ? 'light' : 'chrome'} />
             <AuthNavLinks variant="desktop" tone={isLight ? 'light' : 'chrome'} />
           </div>
 

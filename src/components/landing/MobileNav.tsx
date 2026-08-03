@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 import { AuthNavLinks } from '@/components/landing/AuthNavLinks';
-import { PublicThemeToggle } from '@/components/landing/PublicThemeToggle';
 import { PUBLIC_PRIMARY_NAV } from '@/lib/navigation/public-nav';
 
 const smoothEase: [number, number, number, number] = [0.4, 0, 0.2, 1];
@@ -132,13 +131,6 @@ export default function MobileNav({
               }}
             >
               <nav className="p-4" aria-label="Mobile navigation">
-                <div className="mb-4 flex items-center justify-between px-4">
-                  <span className="text-xs font-semibold tracking-wide text-slate-600 uppercase">
-                    Appearance
-                  </span>
-                  <PublicThemeToggle variant="light" />
-                </div>
-
                 <ul className="space-y-1">
                   {items.map((item, i) => (
                     <motion.li
