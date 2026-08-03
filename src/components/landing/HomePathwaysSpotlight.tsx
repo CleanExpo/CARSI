@@ -4,10 +4,7 @@ import { ArrowRight, Award } from 'lucide-react';
 import Link from 'next/link';
 
 import { PUBLIC_SHELL_INNER_CLASS } from '@/components/landing/public-shell-width';
-import {
-  ccwWorkshopHref,
-  homePathwayItems,
-} from '@/lib/marketing/home-pathways';
+import { ccwWorkshopHref, homePathwayItems } from '@/lib/marketing/home-pathways';
 
 /**
  * Homepage spotlight — Start Smart, CCW roadshow booking/program, and in-person workshop.
@@ -41,7 +38,10 @@ export function HomePathwaysSpotlight() {
             {homePathwayItems.map((item) => {
               const Icon = item.icon;
               return (
-                <li key={item.href} className="border-b border-slate-200 last:border-b-0 md:border-b-0">
+                <li
+                  key={item.href}
+                  className="border-b border-slate-200 last:border-b-0 md:border-b-0"
+                >
                   <Link
                     href={item.href}
                     className={`group flex h-full flex-col px-5 py-6 transition-colors hover:bg-white md:px-6 md:py-7 ${item.borderHoverClass}`}
@@ -54,10 +54,12 @@ export function HomePathwaysSpotlight() {
                         {item.label}
                       </span>
                     </div>
-                    <h3 className="mt-4 text-base font-semibold leading-snug text-slate-950">
+                    <h3 className="mt-4 text-base leading-snug font-semibold text-slate-950">
                       {item.title}
                     </h3>
-                    <p className="mt-2 flex-1 text-sm leading-relaxed text-slate-600">{item.detail}</p>
+                    <p className="mt-2 flex-1 text-sm leading-relaxed text-slate-600">
+                      {item.detail}
+                    </p>
                     <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-[#146fc2] transition-colors group-hover:text-[#0f5fa8]">
                       {item.cta}
                       <ArrowRight
@@ -86,12 +88,17 @@ export function HomePathwaysSpotlight() {
                 <p className="mt-1 text-sm font-medium text-slate-900">
                   2-Day Carpet Cleaning Workshop (CCW) participant resources
                 </p>
-                <p className="mt-0.5 text-xs text-slate-600">Schedules, materials and cohort access</p>
+                <p className="mt-0.5 text-xs text-slate-600">
+                  Schedules, materials and cohort access
+                </p>
               </div>
             </div>
             <span className="inline-flex shrink-0 items-center gap-1.5 text-sm font-medium text-[#146fc2] transition-colors group-hover:text-[#0f5fa8]">
               View workshop
-              <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden />
+              <ArrowRight
+                className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5"
+                aria-hidden
+              />
             </span>
           </Link>
         </div>
