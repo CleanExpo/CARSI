@@ -16,7 +16,7 @@ describe('ccw-roadshow-offer-pack constants', () => {
 
   it('hardcodes the Shopify preview training product URL', () => {
     expect(CCW_SHOPIFY_TRAINING_URL).toBe(
-      'https://h8qtw8uoiufz9z7c-21796391.shopifypreview.com/products/ccw-carsi-2-day-in-house-training',
+      'https://h8qtw8uoiufz9z7c-21796391.shopifypreview.com/products/ccw-carsi-2-day-in-house-training'
     );
   });
 
@@ -27,7 +27,7 @@ describe('ccw-roadshow-offer-pack constants', () => {
         'https://www.facebook.com/CarpetCleanersWarehouse',
         'https://www.linkedin.com/company/carpet-cleaners-warehouse/',
         'https://ccwonline.com.au/',
-      ]),
+      ])
     );
   });
 });
