@@ -20,7 +20,7 @@ export const homePathwayItems: HomePathwayItem[] = [
     href: startSmartBasePath,
     label: 'Start Smart',
     title: 'Start a carpet cleaning business',
-    detail: '8 sub-pillars — equipment, chemistry, quoting and trust',
+    detail: '8 sub-pillars: equipment, chemistry, quoting and trust',
     cta: 'Explore pathway',
     icon: Compass,
     accentClass: 'text-[#9a4a00] dark:text-[#f2b14f]',
@@ -29,7 +29,7 @@ export const homePathwayItems: HomePathwayItem[] = [
   {
     href: `${ccwRoadshowPath}#booking`,
     label: 'Book Growth Days',
-    title: 'Melbourne 22–23 Jul · Sydney 30–31 Jul',
+    title: 'Melbourne 22 to 23 Jul · Sydney 30 to 31 Jul',
     detail: 'Free entry for CCW customers · register for your check-in token',
     cta: 'Book your seat',
     icon: Ticket,
