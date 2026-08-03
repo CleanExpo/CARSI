@@ -79,9 +79,11 @@ export function HomeIndustriesSection() {
                       : 'text-[15px] font-medium text-slate-700'
                   }`}
                 >
-                  <span className="group-hover:text-[#146fc2]">{industry.label}</span>
+                  <span className="group-hover:text-[#146fc2] group-focus-visible:text-[#146fc2]">
+                    {industry.label}
+                  </span>
                   <ArrowRight
-                    className="h-3.5 w-3.5 text-slate-300 opacity-0 transition group-hover:translate-x-0.5 group-hover:opacity-100 group-hover:text-[#146fc2]"
+                    className="h-3.5 w-3.5 text-slate-300 opacity-0 transition group-hover:translate-x-0.5 group-hover:text-[#146fc2] group-hover:opacity-100 group-focus-visible:translate-x-0.5 group-focus-visible:text-[#146fc2] group-focus-visible:opacity-100"
                     aria-hidden
                   />
                 </Link>
