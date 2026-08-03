@@ -65,7 +65,7 @@ function buildHomeFaqs(facts: { publishedCourseCount: number; disciplineCodes: s
   return [
     {
       question: 'What is CARSI?',
-      answer: `CARSI is an Australian online training platform offering ${coursePhrase} across ${disciplinePhrase} for people just starting out, working technicians updating their knowledge, and experienced professionals maintaining CECs.`,
+      answer: `CARSI is an Australian online training platform offering ${coursePhrase} across ${disciplinePhrase}, built for new starters, working technicians, and experienced professionals maintaining CECs.`,
     },
     {
       question: 'Can I complete training at my own pace?',
