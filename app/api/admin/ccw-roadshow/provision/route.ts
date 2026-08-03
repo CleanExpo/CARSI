@@ -3,8 +3,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAdminSessionOrNull } from '@/lib/admin/admin-session';
 import { getCcwRoadshowEvent } from '@/lib/marketing/ccw-roadshow';
 import { getAppOrigin } from '@/lib/server/app-url';
-import { runCcwAttendanceBatch } from '@/lib/server/ccw-attendance/provision';
 import { isCcwAttendanceEnabled } from '@/lib/server/ccw-attendance/flag';
+import { runCcwAttendanceBatch } from '@/lib/server/ccw-attendance/provision';
 
 /**
  * POST /api/admin/ccw-roadshow/provision — run the async attendance batch for
