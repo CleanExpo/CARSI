@@ -4,13 +4,14 @@ import { ArrowUpRight, Mail, MapPin, MessageCircle } from 'lucide-react';
 
 import {
   PUBLIC_CHROME_FOOTER_CLASS,
+  PUBLIC_LIGHT_FOOTER_CLASS,
   PUBLIC_SHELL_INNER_CLASS,
 } from '@/components/landing/public-shell-width';
 import { PublicLogo } from '@/components/landing/PublicLogo';
 import { AcronymTooltip } from '@/components/ui/AcronymTooltip';
 
 /**
- * Shared public footer — design-led site closure with full platform navigation.
+ * Shared public footer. Design-led site closure with full platform navigation.
  * Used in the (public) layout so every public page gets consistent footer content.
  */
 
@@ -104,7 +105,11 @@ function FooterExternalLink({ href, children }: { href: string; children: React.
   );
 }
 
-export function PublicFooter() {
+export function PublicFooter({ tone = 'chrome' }: { tone?: 'chrome' | 'light' } = {}) {
+  if (tone === 'light') {
+    return <LightFooter />;
+  }
+
   return (
     <footer className={`relative overflow-hidden ${PUBLIC_CHROME_FOOTER_CLASS}`}>
       {/* Layered atmosphere */}
@@ -212,7 +217,7 @@ export function PublicFooter() {
               <li className="flex gap-3">
                 <MessageCircle className="mt-0.5 h-4 w-4 shrink-0 text-[#7ec5ff]/70" aria-hidden />
                 <span className="leading-relaxed">
-                  Ask Margot, our online assistant — bottom-right of every page
+                  Ask Margot, our online assistant, bottom right of every page
                 </span>
               </li>
             </ul>
@@ -281,7 +286,211 @@ export function PublicFooter() {
           </p>
           <p className="max-w-xl text-[11px] leading-relaxed text-white/60 sm:text-right">
             <AcronymTooltip term="IICRC" />
-            <span> CEC continuing education — not an </span>
+            <span> CEC continuing education, not an </span>
+            <AcronymTooltip term="RTO" />
+          </p>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+function FooterSectionLabelLight({ children }: { children: ReactNode }) {
+  return (
+    <p className="mb-4 text-[10px] font-semibold tracking-[0.2em] text-slate-400 uppercase">
+      {children}
+    </p>
+  );
+}
+
+function FooterLinkLight({ href, children }: { href: string; children: React.ReactNode }) {
+  return (
+    <Link
+      href={href}
+      className="group inline-flex min-h-8 items-center gap-1 text-sm text-slate-600 transition-colors duration-150 hover:text-[#146fc2] focus-visible:ring-2 focus-visible:ring-[#2490ed]/35 focus-visible:rounded-sm focus-visible:outline-none"
+    >
+      {children}
+    </Link>
+  );
+}
+
+function FooterExternalLinkLight({ href, children }: { href: string; children: React.ReactNode }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group inline-flex min-h-8 items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-[11px] font-medium text-slate-600 transition-all duration-150 hover:border-[#2490ed]/40 hover:text-[#146fc2] focus-visible:ring-2 focus-visible:ring-[#2490ed]/35 focus-visible:outline-none"
+      aria-label={typeof children === 'string' ? children : undefined}
+    >
+      {children}
+      <ArrowUpRight className="h-3 w-3 shrink-0 opacity-50 group-hover:opacity-90" aria-hidden />
+    </a>
+  );
+}
+
+/**
+ * Light institutional footer. Calm hairline layout, same link structure as the
+ * chrome footer, restyled for white and ice public surfaces (homepage).
+ */
+function LightFooter() {
+  return (
+    <footer className={PUBLIC_LIGHT_FOOTER_CLASS}>
+      <div className={`${PUBLIC_SHELL_INNER_CLASS} py-14 sm:py-16 lg:py-20`}>
+        {/* Brand masthead */}
+        <div className="mb-12 grid gap-10 border-b border-slate-200 pb-12 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
+          <div>
+            <p className="mb-4 text-[11px] font-semibold tracking-[0.22em] text-[#146fc2] uppercase">
+              Australian restoration training
+            </p>
+            <Link href="/" aria-label="CARSI home" className="inline-block">
+              <PublicLogo variant="footer" surface="light" />
+            </Link>
+            <p className="mt-5 max-w-md text-sm leading-relaxed text-slate-500">
+              Australia&apos;s industry training leader.
+              <br />
+              24/7 online. <AcronymTooltip term="IICRC" />
+              <span> CEC Accredited courses.</span>
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
+            <p className="text-[10px] font-semibold tracking-[0.18em] text-slate-400 uppercase">
+              Built for the field
+            </p>
+            <p className="mt-2 text-lg font-semibold leading-snug text-slate-950">
+              Self-paced learning that fits around the job site.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {['IICRC CEC', '24/7 access', 'Digital credentials'].map((chip) => (
+                <span
+                  key={chip}
+                  className="rounded-full border border-slate-200 bg-[#f8fafc] px-2.5 py-1 text-[10px] font-medium tracking-wide text-slate-500 uppercase"
+                >
+                  {chip}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Link matrix */}
+        <div className="mb-10 grid gap-10 lg:grid-cols-12 lg:divide-x lg:divide-slate-200">
+          <div className="lg:col-span-5 lg:pr-8">
+            <FooterSectionLabelLight>Platform</FooterSectionLabelLight>
+            <ul className="grid gap-x-6 gap-y-1 sm:grid-cols-2">
+              {platformLinks.map((item) => (
+                <li key={item.label}>
+                  <FooterLinkLight href={item.href}>{item.label}</FooterLinkLight>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="lg:col-span-3 lg:px-8">
+            <FooterSectionLabelLight>Industries</FooterSectionLabelLight>
+            <ul className="space-y-1">
+              {industries.map((industry) => (
+                <li key={industry.slug}>
+                  <FooterLinkLight href={`/industries/${industry.slug}`}>
+                    {industry.label}
+                  </FooterLinkLight>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="lg:col-span-4 lg:pl-8">
+            <FooterSectionLabelLight>Contact</FooterSectionLabelLight>
+            <ul className="space-y-3 text-sm text-slate-600">
+              <li className="flex gap-3">
+                <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#146fc2]/70" aria-hidden />
+                <span className="leading-relaxed">PO Box 4309, Forest Lake QLD 4078</span>
+              </li>
+              <li>
+                <a
+                  href="/contact"
+                  className="group inline-flex items-center gap-3 text-slate-600 transition-colors hover:text-[#146fc2]"
+                >
+                  <Mail className="h-4 w-4 shrink-0 text-[#146fc2]/70" aria-hidden />
+                  <span>Contact CARSI support</span>
+                </a>
+              </li>
+              <li className="flex gap-3">
+                <MessageCircle className="mt-0.5 h-4 w-4 shrink-0 text-[#146fc2]/70" aria-hidden />
+                <span className="leading-relaxed">
+                  Ask Margot, our online assistant, bottom right of every page
+                </span>
+              </li>
+            </ul>
+
+            <div className="mt-6 border-t border-slate-200 pt-5">
+              <p className="mb-3 text-[10px] font-semibold tracking-[0.16em] text-slate-400 uppercase">
+                Follow CARSI
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {socialLinks.map((social) => (
+                  <FooterExternalLinkLight key={social.label} href={social.href}>
+                    {social.label}
+                  </FooterExternalLinkLight>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="mb-12 grid gap-10 border-t border-slate-200 pt-10 lg:grid-cols-12 lg:divide-x lg:divide-slate-200">
+          <div className="lg:col-span-8 lg:pr-8">
+            <FooterSectionLabelLight>Community &amp; Resources</FooterSectionLabelLight>
+            <ul className="grid gap-x-6 gap-y-1 sm:grid-cols-2 lg:grid-cols-3">
+              {communityLinks.map((item) => (
+                <li key={item.label}>
+                  <FooterLinkLight href={item.href}>{item.label}</FooterLinkLight>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="lg:col-span-4 lg:pl-8">
+            <FooterSectionLabelLight>Events</FooterSectionLabelLight>
+            <ul className="grid gap-x-6 gap-y-1 sm:grid-cols-2 lg:grid-cols-1">
+              {eventLinks.map((item) => (
+                <li key={item.label}>
+                  <FooterLinkLight href={item.href}>{item.label}</FooterLinkLight>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        {/* Legal strip */}
+        <div className="flex flex-col gap-4 border-t border-slate-200 pt-6 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-[11px] leading-relaxed text-slate-500">
+            © 2026 CARSI Pty Ltd. All rights reserved. ·{' '}
+            <Link
+              href="/privacy"
+              className="font-medium text-slate-600 underline-offset-2 transition-colors hover:text-[#146fc2] hover:underline"
+            >
+              Privacy
+            </Link>
+            {' · '}
+            <Link
+              href="/terms"
+              className="font-medium text-slate-600 underline-offset-2 transition-colors hover:text-[#146fc2] hover:underline"
+            >
+              Terms
+            </Link>
+            {' · '}
+            <Link
+              href="/admin"
+              className="font-medium text-slate-600 underline-offset-2 transition-colors hover:text-[#146fc2] hover:underline"
+            >
+              Staff login
+            </Link>
+          </p>
+          <p className="max-w-xl text-[11px] leading-relaxed text-slate-500 sm:text-right">
+            <AcronymTooltip term="IICRC" />
+            <span> CEC continuing education, not an </span>
             <AcronymTooltip term="RTO" />
           </p>
         </div>
