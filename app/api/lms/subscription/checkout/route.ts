@@ -29,16 +29,13 @@ const UNAVAILABLE = 'Membership purchasing is not yet available.';
 export async function POST(request: NextRequest) {
   const claims = await getSessionClaimsFromRequest(request);
   if (!claims) {
-    return NextResponse.json(
-      { detail: 'Sign in to start your membership.' },
-      { status: 401 },
-    );
+    return NextResponse.json({ detail: 'Sign in to start your membership.' }, { status: 401 });
   }
 
   if (!process.env.STRIPE_SECRET_KEY?.trim()) {
     return NextResponse.json(
       { detail: 'Payments not configured. Set STRIPE_SECRET_KEY.' },
-      { status: 503 },
+      { status: 503 }
     );
   }
 
@@ -49,8 +46,7 @@ export async function POST(request: NextRequest) {
     offer?: string;
   };
 
-  const wantAttendeeOffer =
-    body.attendeeOffer === true || body.offer === CCW_ATTENDEE_OFFER_QUERY;
+  const wantAttendeeOffer = body.attendeeOffer === true || body.offer === CCW_ATTENDEE_OFFER_QUERY;
 
   // Regular $795 path stays behind the subscriptions flag; attendee $295 does not.
   if (!wantAttendeeOffer && !subscriptionsEnabled()) {
@@ -79,7 +75,7 @@ export async function POST(request: NextRequest) {
             detail:
               'This attendee membership special is only available after both training days and email opt-in.',
           },
-          { status: 403 },
+          { status: 403 }
         );
       }
 
