@@ -36,6 +36,12 @@ export function AnimatedHero({ benefits: _benefits }: AnimatedHeroProps) {
 
   const panoramaRotate = useTransform(scrollYProgress, [0, 0.6], reduceMotion ? [0, 0] : [8, 0]);
   const panoramaLift = useTransform(scrollYProgress, [0, 0.6], reduceMotion ? [0, 0] : [0, -20]);
+  const contentDrift = useTransform(scrollYProgress, [0, 0.5], reduceMotion ? [0, 0] : [0, -36]);
+  const contentFade = useTransform(
+    scrollYProgress,
+    [0, 0.45],
+    reduceMotion ? [1, 1] : [1, 0.35],
+  );
 
   return (
     <section
@@ -47,7 +53,7 @@ export function AnimatedHero({ benefits: _benefits }: AnimatedHeroProps) {
       <div className="pointer-events-none absolute inset-0" aria-hidden>
         <div className="absolute inset-0 bg-[linear-gradient(180deg,#ffffff_0%,#f5f9fd_55%,#eef5fb_100%)]" />
         <div className="absolute top-[-12%] left-1/2 h-[42rem] w-[64rem] -translate-x-1/2 rounded-full bg-[#2490ed]/[0.10] blur-[120px]" />
-        <div className="absolute inset-0 opacity-[0.4] [mask-image:radial-gradient(ellipse_65%_55%_at_50%_28%,black,transparent)]">
+        <div className="absolute inset-0 [mask-image:radial-gradient(ellipse_65%_55%_at_50%_28%,black,transparent)] opacity-[0.4]">
           <div
             className="h-full w-full"
             style={{
@@ -62,7 +68,10 @@ export function AnimatedHero({ benefits: _benefits }: AnimatedHeroProps) {
       <div
         className={`relative flex min-h-[min(92vh,980px)] flex-col items-center justify-center py-24 sm:py-28 ${PUBLIC_SHELL_INNER_CLASS}`}
       >
-        <div className="mx-auto flex max-w-4xl flex-col items-center text-center">
+        <motion.div
+          className="mx-auto flex max-w-4xl flex-col items-center text-center"
+          style={{ y: contentDrift, opacity: contentFade }}
+        >
           <motion.div
             className="inline-flex items-center gap-2.5 rounded-full border border-slate-200/90 bg-white/80 py-1.5 pr-4 pl-1.5 shadow-[0_1px_2px_rgba(15,23,42,0.04)] backdrop-blur-sm"
             initial={reduceMotion ? false : { opacity: 0, y: 10 }}
@@ -119,17 +128,14 @@ export function AnimatedHero({ benefits: _benefits }: AnimatedHeroProps) {
           >
             <Link
               href="/courses"
-              className="group inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#146fc2] px-8 text-sm font-semibold text-white shadow-[0_18px_45px_-18px_rgba(20,111,194,0.75),inset_0_1px_0_rgba(255,255,255,0.18)] transition motion-safe:hover:-translate-y-0.5 hover:bg-[#0f5fa8] hover:shadow-[0_22px_50px_-18px_rgba(20,111,194,0.85),inset_0_1px_0_rgba(255,255,255,0.18)] focus-visible:ring-2 focus-visible:ring-[#2490ed]/45 focus-visible:outline-none"
+              className="group inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#146fc2] px-8 text-sm font-semibold text-white shadow-[0_18px_45px_-18px_rgba(20,111,194,0.75),inset_0_1px_0_rgba(255,255,255,0.18)] transition hover:bg-[#0f5fa8] hover:shadow-[0_22px_50px_-18px_rgba(20,111,194,0.85),inset_0_1px_0_rgba(255,255,255,0.18)] focus-visible:ring-2 focus-visible:ring-[#2490ed]/45 focus-visible:outline-none motion-safe:hover:-translate-y-0.5"
             >
               Start learning free
-              <ArrowRight
-                className="h-4 w-4 transition group-hover:translate-x-0.5"
-                aria-hidden
-              />
+              <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" aria-hidden />
             </Link>
             <Link
               href="/pricing"
-              className="inline-flex min-h-12 items-center justify-center rounded-full border border-slate-200 bg-white/80 px-7 text-sm font-semibold text-slate-700 backdrop-blur-sm transition motion-safe:hover:-translate-y-0.5 hover:border-[#2490ed]/50 hover:text-[#146fc2] focus-visible:ring-2 focus-visible:ring-[#2490ed]/35 focus-visible:outline-none"
+              className="inline-flex min-h-12 items-center justify-center rounded-full border border-slate-200 bg-white/80 px-7 text-sm font-semibold text-slate-700 backdrop-blur-sm transition hover:border-[#2490ed]/50 hover:text-[#146fc2] focus-visible:ring-2 focus-visible:ring-[#2490ed]/35 focus-visible:outline-none motion-safe:hover:-translate-y-0.5"
             >
               View pricing
             </Link>
@@ -148,7 +154,7 @@ export function AnimatedHero({ benefits: _benefits }: AnimatedHeroProps) {
               </li>
             ))}
           </motion.ul>
-        </div>
+        </motion.div>
 
         {/* Product panorama: the wow moment */}
         <motion.div
@@ -262,7 +268,9 @@ export function AnimatedSection({
   minimalHeader = false,
 }: AnimatedSectionProps) {
   return (
-    <section className={`relative border-t border-slate-200/70 bg-[#fafbfc] py-16 md:py-24 ${className}`}>
+    <section
+      className={`relative border-t border-slate-200/70 bg-[#fafbfc] py-16 md:py-24 ${className}`}
+    >
       <div className={PUBLIC_SHELL_INNER_CLASS}>
         <motion.div
           initial={{ opacity: 0, y: 18 }}
