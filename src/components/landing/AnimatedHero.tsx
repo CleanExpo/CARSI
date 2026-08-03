@@ -74,25 +74,25 @@ export function AnimatedHero({ benefits: _benefits }: AnimatedHeroProps) {
     >
       {/* Layered light atmosphere: tinted plane, drifting aurora, halo rings, beam, grid, grain */}
       <div className="pointer-events-none absolute inset-0" aria-hidden>
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,#fdfeff_0%,#eef6fd_38%,#e2eefa_100%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,#ffffff_0%,#e9f3fc_26%,#d9e9f9_62%,#cde2f7_100%)]" />
 
         {/* Aurora fields with slow ambient drift */}
         <motion.div
-          className="absolute top-[-16%] left-1/2 h-[50rem] w-[80rem] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(36,144,237,0.30),transparent_72%)] blur-[70px]"
+          className="absolute top-[-14%] left-1/2 h-[52rem] w-[84rem] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(36,144,237,0.42),transparent_72%)] blur-[70px]"
           animate={reduceMotion ? undefined : { scale: [1, 1.06, 1] }}
           transition={
             reduceMotion ? undefined : { duration: 16, repeat: Infinity, ease: 'easeInOut' }
           }
         />
         <motion.div
-          className="absolute top-[4%] left-[-14%] h-[34rem] w-[34rem] rounded-full bg-[radial-gradient(closest-side,rgba(56,189,248,0.22),transparent_70%)] blur-[80px]"
+          className="absolute top-[2%] left-[-16%] h-[38rem] w-[38rem] rounded-full bg-[radial-gradient(closest-side,rgba(56,189,248,0.34),transparent_70%)] blur-[80px]"
           animate={reduceMotion ? undefined : { y: [0, 30, 0], scale: [1, 1.08, 1] }}
           transition={
             reduceMotion ? undefined : { duration: 20, repeat: Infinity, ease: 'easeInOut' }
           }
         />
         <motion.div
-          className="absolute top-[20%] right-[-12%] h-[30rem] w-[30rem] rounded-full bg-[radial-gradient(closest-side,rgba(99,102,241,0.16),transparent_70%)] blur-[80px]"
+          className="absolute top-[16%] right-[-14%] h-[34rem] w-[34rem] rounded-full bg-[radial-gradient(closest-side,rgba(124,110,245,0.26),transparent_70%)] blur-[80px]"
           animate={reduceMotion ? undefined : { y: [0, -26, 0], scale: [1, 1.05, 1] }}
           transition={
             reduceMotion
@@ -100,17 +100,17 @@ export function AnimatedHero({ benefits: _benefits }: AnimatedHeroProps) {
               : { duration: 18, repeat: Infinity, ease: 'easeInOut', delay: 3 }
           }
         />
-        <div className="absolute bottom-[-18%] left-1/2 h-[32rem] w-[64rem] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(36,144,237,0.18),transparent_70%)] blur-[90px]" />
+        <div className="absolute bottom-[-16%] left-1/2 h-[34rem] w-[68rem] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(36,144,237,0.30),transparent_70%)] blur-[90px]" />
 
         {/* Concentric halo rings */}
-        <div className="absolute top-[30%] left-1/2 h-[46rem] w-[46rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#2490ed]/[0.10]" />
-        <div className="absolute top-[30%] left-1/2 h-[64rem] w-[64rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#2490ed]/[0.06]" />
-        <div className="absolute top-[30%] left-1/2 h-[82rem] w-[82rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#2490ed]/[0.035]" />
+        <div className="absolute top-[30%] left-1/2 h-[46rem] w-[46rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#146fc2]/[0.14]" />
+        <div className="absolute top-[30%] left-1/2 h-[64rem] w-[64rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#146fc2]/[0.09]" />
+        <div className="absolute top-[30%] left-1/2 h-[82rem] w-[82rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#146fc2]/[0.05]" />
 
         {/* Luminous horizon beam behind the panorama */}
         <div className="absolute top-[62%] right-0 left-0">
-          <div className="mx-auto h-px max-w-4xl bg-gradient-to-r from-transparent via-[#2490ed]/50 to-transparent" />
-          <div className="mx-auto -mt-3 h-6 max-w-3xl bg-[radial-gradient(ellipse_at_center,rgba(36,144,237,0.22),transparent_70%)] blur-md" />
+          <div className="mx-auto h-px max-w-4xl bg-gradient-to-r from-transparent via-[#2490ed]/70 to-transparent" />
+          <div className="mx-auto -mt-3 h-7 max-w-3xl bg-[radial-gradient(ellipse_at_center,rgba(36,144,237,0.32),transparent_70%)] blur-md" />
         </div>
 
         {/* Dotted grid, masked to the headline area */}
@@ -135,7 +135,7 @@ export function AnimatedHero({ benefits: _benefits }: AnimatedHeroProps) {
         />
 
         {/* Soft edge vignette keeps focus centred */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_120%_100%_at_50%_40%,transparent_60%,rgba(255,255,255,0.55)_100%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_130%_110%_at_50%_38%,transparent_72%,rgba(255,255,255,0.3)_100%)]" />
       </div>
 
       <div
@@ -163,19 +163,37 @@ export function AnimatedHero({ benefits: _benefits }: AnimatedHeroProps) {
             </span>
           </motion.div>
 
-          <h1 className="mt-8 font-[family-name:var(--font-display)] text-[clamp(2.5rem,6.8vw,5.1rem)] leading-[1.08] tracking-[-0.035em]">
-            <span className="block font-medium text-slate-900">
+          <h1 className="mt-8 font-[family-name:var(--font-display)] text-[clamp(2.5rem,6.8vw,5.1rem)] leading-[1.1] font-semibold tracking-[-0.03em] text-slate-950">
+            <span className="block">
               <HeroWord delay={0.1} reduceMotion={reduceMotion}>
                 Become
               </HeroWord>{' '}
               <HeroWord delay={0.18} reduceMotion={reduceMotion}>
                 the
               </HeroWord>{' '}
-              <HeroWord delay={0.26} reduceMotion={reduceMotion} className="relative">
+              <HeroWord delay={0.26} reduceMotion={reduceMotion}>
                 technician
+              </HeroWord>
+            </span>
+            <span className="mt-[0.06em] block">
+              <HeroWord delay={0.38} reduceMotion={reduceMotion}>
+                every
+              </HeroWord>{' '}
+              <HeroWord delay={0.46} reduceMotion={reduceMotion}>
+                job
+              </HeroWord>{' '}
+              <HeroWord delay={0.54} reduceMotion={reduceMotion}>
+                site
+              </HeroWord>{' '}
+              <HeroWord
+                delay={0.62}
+                reduceMotion={reduceMotion}
+                className="relative bg-gradient-to-r from-[#0f5fa8] via-[#2490ed] to-[#38a2f8] bg-clip-text text-transparent"
+              >
+                trusts.
                 <motion.svg
                   viewBox="0 0 160 16"
-                  className="absolute -bottom-[0.16em] left-0 h-[0.2em] w-full"
+                  className="absolute -bottom-[0.14em] left-0 h-[0.18em] w-[88%]"
                   fill="none"
                   aria-hidden
                 >
@@ -184,50 +202,11 @@ export function AnimatedHero({ benefits: _benefits }: AnimatedHeroProps) {
                     stroke="#2490ed"
                     strokeWidth="6"
                     strokeLinecap="round"
-                    initial={{ pathLength: reduceMotion ? 1 : 0, opacity: 0.8 }}
+                    initial={{ pathLength: reduceMotion ? 1 : 0, opacity: 0.9 }}
                     animate={{ pathLength: 1 }}
-                    transition={{ duration: 0.7, ease: easeOut, delay: 0.9 }}
+                    transition={{ duration: 0.7, ease: easeOut, delay: 1.0 }}
                   />
                 </motion.svg>
-              </HeroWord>
-            </span>
-            <span className="mt-[0.08em] block font-semibold">
-              <HeroWord
-                delay={0.38}
-                reduceMotion={reduceMotion}
-                className="bg-gradient-to-r from-[#0f5fa8] to-[#2490ed] bg-clip-text text-transparent"
-              >
-                every
-              </HeroWord>{' '}
-              <HeroWord
-                delay={0.44}
-                reduceMotion={reduceMotion}
-                className="bg-gradient-to-r from-[#1b82d9] to-[#2e9af0] bg-clip-text text-transparent"
-              >
-                job
-              </HeroWord>{' '}
-              <HeroWord
-                delay={0.5}
-                reduceMotion={reduceMotion}
-                className="bg-gradient-to-r from-[#2490ed] to-[#3ba4f5] bg-clip-text text-transparent"
-              >
-                site
-              </HeroWord>{' '}
-              <motion.span
-                className="mx-[0.06em] inline-flex h-[0.72em] w-[0.72em] items-center justify-center rounded-[28%] bg-white align-[-0.06em] shadow-[0_14px_30px_-10px_rgba(15,23,42,0.3)] ring-1 ring-slate-200/80"
-                initial={reduceMotion ? false : { scale: 0, rotate: -18 }}
-                animate={{ scale: 1, rotate: -6 }}
-                transition={{ type: 'spring', stiffness: 240, damping: 16, delay: 1.05 }}
-                aria-hidden
-              >
-                <BadgeCheck className="h-[58%] w-[58%] text-emerald-500" />
-              </motion.span>{' '}
-              <HeroWord
-                delay={0.58}
-                reduceMotion={reduceMotion}
-                className="bg-gradient-to-r from-[#3ba4f5] via-[#2490ed] to-[#0f5fa8] bg-clip-text text-transparent"
-              >
-                trusts.
               </HeroWord>
             </span>
           </h1>
