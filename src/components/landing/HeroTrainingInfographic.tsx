@@ -46,6 +46,10 @@ export function HeroTrainingInfographic() {
       <div className="grid gap-4 sm:grid-cols-[1.15fr_0.85fr]">
         <div className="overflow-hidden rounded-xl border border-slate-100 bg-[#f8fafc]">
           <div className="relative flex h-20 items-end justify-between bg-gradient-to-br from-[#146fc2] to-[#2490ed] px-4 py-3 sm:h-24">
+            <span
+              className="pointer-events-none absolute inset-0 opacity-20 [background-image:radial-gradient(rgba(255,255,255,0.4)_1px,transparent_1px)] [background-size:14px_14px]"
+              aria-hidden
+            />
             <span className="text-[10px] font-semibold tracking-wide text-white/90 uppercase">
               Water restoration
             </span>
