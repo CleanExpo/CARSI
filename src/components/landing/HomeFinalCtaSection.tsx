@@ -4,13 +4,17 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowRight, Compass, Ticket } from 'lucide-react';
 import Link from 'next/link';
 
-import { PUBLIC_SHELL_INNER_CLASS } from '@/components/landing/public-shell-width';
+import {
+  LANDING_EYEBROW_CLASS,
+  LANDING_LEAD_CLASS,
+  PUBLIC_SHELL_INNER_CLASS,
+} from '@/components/landing/public-shell-width';
 import { ccwRoadshowPath } from '@/lib/marketing/ccw-roadshow';
 
 const spring = { type: 'spring' as const, stiffness: 120, damping: 22 };
 
 /**
- * Light closing CTA — soft ice-blue band, not a dark immersive strip.
+ * Light closing CTA. Soft ice blue band, not a dark immersive strip.
  */
 export function HomeFinalCtaSection() {
   const reduceMotion = useReducedMotion();
@@ -33,18 +37,16 @@ export function HomeFinalCtaSection() {
           viewport={{ once: true, amount: 0.4 }}
           transition={spring}
         >
-          <p className="text-[11px] font-medium tracking-[0.22em] text-[#146fc2] uppercase">
-            Get started
-          </p>
+          <p className={LANDING_EYEBROW_CLASS}>Get started</p>
           <h2
             id="home-final-cta-heading"
-            className="mt-4 font-[family-name:var(--font-display)] text-3xl font-bold tracking-tight text-slate-950 md:text-4xl lg:text-[2.75rem] lg:leading-[1.15]"
+            className="mt-4 font-[family-name:var(--font-display)] text-[2rem] leading-[1.12] font-semibold tracking-[-0.02em] text-slate-950 md:text-[2.6rem] md:leading-[1.08]"
           >
-            Ready to start — online, in person, or both?
+            Your next credential can start tonight
           </h2>
-          <p className="mx-auto mt-4 max-w-lg text-[15px] leading-relaxed text-slate-500">
-            Browse the catalogue for self-paced CEC courses, follow a structured pathway, or book
-            CARSI × CCW Business Growth Days.
+          <p className={`mx-auto mt-5 max-w-lg ${LANDING_LEAD_CLASS}`}>
+            Open the catalogue and start a free course now, follow a structured pathway, or book
+            a Business Growth Day near you. No classroom required.
           </p>
 
           <div className="mt-10 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:flex-wrap sm:items-center">
