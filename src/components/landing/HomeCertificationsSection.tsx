@@ -3,7 +3,12 @@
 import { motion, useReducedMotion } from 'framer-motion';
 import { Award, CheckCircle2, Shield } from 'lucide-react';
 
-import { PUBLIC_SHELL_INNER_CLASS } from '@/components/landing/public-shell-width';
+import {
+  LANDING_DISPLAY_H2_CLASS,
+  LANDING_EYEBROW_CLASS,
+  LANDING_LEAD_CLASS,
+  PUBLIC_SHELL_INNER_CLASS,
+} from '@/components/landing/public-shell-width';
 import { IICRCDisciplineMap } from '@/components/lms/diagrams/IICRCDisciplineMap';
 
 const TIMELINE = [
@@ -15,19 +20,19 @@ const TIMELINE = [
   {
     icon: Award,
     title: 'CARSI designations',
-    body: 'Earn CARSI Southern Hemisphere Restoration Designations — credentials issued by CARSI for the work you complete on our platform.',
+    body: 'Earn CARSI Southern Hemisphere Restoration Designations, credentials issued by CARSI for the work you complete on our platform.',
   },
   {
     icon: CheckCircle2,
     title: 'Verified on completion',
-    body: 'Certificates and CEC records are issued when you pass — tracked in your learner dashboard for audits and recertification.',
+    body: 'Certificates and CEC records are issued when you pass, tracked in your learner dashboard for audits and recertification.',
   },
 ] as const;
 
 const spring = { type: 'spring' as const, stiffness: 120, damping: 22 };
 
 /**
- * Light credentials timeline — calm white plane, hairline rail, soft map panel.
+ * Light credentials timeline. Calm white plane, hairline rail, soft map panel.
  */
 export function HomeCertificationsSection({
   disciplineCountLabel = 7,
@@ -43,18 +48,14 @@ export function HomeCertificationsSection({
     >
       <div className={PUBLIC_SHELL_INNER_CLASS}>
         <div className="max-w-xl">
-          <p className="text-[11px] font-medium tracking-[0.22em] text-[#146fc2] uppercase">
-            Credentials
-          </p>
-          <h2
-            id="home-certifications-heading"
-            className="mt-3 font-[family-name:var(--font-display)] text-3xl font-bold tracking-tight text-slate-950 md:text-4xl"
-          >
+          <p className={LANDING_EYEBROW_CLASS}>Credentials</p>
+          <h2 id="home-certifications-heading" className={`mt-3 ${LANDING_DISPLAY_H2_CLASS}`}>
             Credentials that hold up on the job site
           </h2>
-          <p className="mt-4 text-[15px] leading-relaxed text-slate-500">
-            A CARSI designation that also earns IICRC CECs across {disciplineCountLabel} IICRC
-            disciplines — without confusing CARSI courses for IICRC certification delivery.
+          <p className={`mt-4 ${LANDING_LEAD_CLASS}`}>
+            Earn a CARSI designation and IICRC CECs on eligible courses, with training that spans{' '}
+            {disciplineCountLabel} IICRC disciplines. Every certificate is issued with a
+            verification record.
           </p>
         </div>
 
