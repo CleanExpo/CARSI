@@ -1,7 +1,12 @@
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
-import { PUBLIC_SHELL_INNER_CLASS } from '@/components/landing/public-shell-width';
+import {
+  LANDING_DISPLAY_H2_CLASS,
+  LANDING_EYEBROW_CLASS,
+  LANDING_LEAD_CLASS,
+  PUBLIC_SHELL_INNER_CLASS,
+} from '@/components/landing/public-shell-width';
 import { INDIVIDUAL_TIERS } from '@/lib/lms/pricing-tiers';
 
 function buildHomeTiers(subscriptionsEnabled: boolean) {
@@ -27,7 +32,8 @@ type HomeTier = {
 };
 
 /**
- * Minimal light pricing — typographic rows, hairline dividers, no heavy cards.
+ * Minimal light pricing. Typographic rows, hairline dividers, no heavy cards.
+ * The best-value row gets a soft ice highlight band instead of a card shell.
  */
 export function HomePricingSection({
   subscriptionsEnabled = false,
@@ -42,7 +48,7 @@ export function HomePricingSection({
       price: '$0',
       cadence: 'no card required',
       description:
-        'Every learner gets the Free Library at no cost — start building skills and CEC tracking today.',
+        'Start tonight with the Free Library. Real courses, real certificates, and progress tracking at no cost.',
       cta: 'Start free',
       href: '/courses',
       highlighted: false,
@@ -79,18 +85,13 @@ export function HomePricingSection({
     >
       <div className={PUBLIC_SHELL_INNER_CLASS}>
         <div className="max-w-xl">
-          <p className="text-[11px] font-medium tracking-[0.22em] text-[#146fc2] uppercase">
-            Pricing
-          </p>
-          <h2
-            id="home-pricing-heading"
-            className="mt-3 font-[family-name:var(--font-display)] text-3xl font-bold tracking-tight text-slate-950 md:text-4xl"
-          >
-            Simple pricing for restoration teams
+          <p className={LANDING_EYEBROW_CLASS}>Pricing</p>
+          <h2 id="home-pricing-heading" className={`mt-3 ${LANDING_DISPLAY_H2_CLASS}`}>
+            Pay for training, not for overheads
           </h2>
-          <p className="mt-4 text-[15px] leading-relaxed text-slate-500">
-            Start free, buy any course, or unlock full catalogue access — IICRC CEC tracking
-            included where approved.
+          <p className={`mt-4 ${LANDING_LEAD_CLASS}`}>
+            Start free, buy single courses as you need them, or unlock the whole catalogue.
+            Transparent AUD pricing with CEC tracking included on approved courses.
           </p>
         </div>
 
@@ -98,7 +99,11 @@ export function HomePricingSection({
           {tiers.map((tier) => (
             <div
               key={tier.name}
-              className="grid gap-4 py-8 sm:grid-cols-[minmax(0,1.2fr)_auto] sm:items-center sm:gap-10"
+              className={`grid gap-4 py-8 sm:grid-cols-[minmax(0,1.2fr)_auto] sm:items-center sm:gap-10 ${
+                tier.highlighted
+                  ? 'rounded-2xl bg-[#eef5fb] px-6 -mx-6 sm:px-8 sm:-mx-8'
+                  : ''
+              }`}
             >
               <div>
                 <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
@@ -112,7 +117,7 @@ export function HomePricingSection({
                   ) : null}
                 </div>
                 <p className="mt-3 flex flex-wrap items-baseline gap-2">
-                  <span className="font-[family-name:var(--font-display)] text-3xl font-bold tracking-tight text-slate-950 tabular-nums">
+                  <span className="font-[family-name:var(--font-display)] text-3xl font-semibold tracking-[-0.02em] text-slate-950 tabular-nums">
                     {tier.price}
                   </span>
                   <span className="text-sm text-slate-400">{tier.cadence}</span>
@@ -146,7 +151,11 @@ export function HomePricingSection({
           ))}
         </div>
 
-        <div className="mt-8">
+        <p className="mt-8 text-xs text-slate-400">
+          GST inclusive AUD pricing. Cancel anytime for membership.
+        </p>
+
+        <div className="mt-4">
           <Link
             href="/pricing"
             className="inline-flex items-center gap-2 text-sm font-semibold text-[#146fc2] transition hover:gap-3 focus-visible:ring-2 focus-visible:ring-[#2490ed]/35 focus-visible:outline-none"
