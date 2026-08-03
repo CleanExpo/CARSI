@@ -111,7 +111,7 @@ export function AdminCcwSignInsClient() {
     if (!eventSlug) return;
     if (
       !window.confirm(
-        `Run provision for ${eventSlug}? Creates CARSI accounts for Day-1 sign-ins, issues both-day certificates, and sends the post-event offer pack (Shopify + $295 membership) to eligible attendees.`,
+        `Run provision for ${eventSlug}? Creates CARSI accounts for Day-1 sign-ins, issues both-day certificates, and sends the post-event offer pack (Shopify + $295 membership) to eligible attendees.`
       )
     ) {
       return;
@@ -139,7 +139,7 @@ export function AdminCcwSignInsClient() {
           `Provisioned: ${p.provision?.provisioned ?? 0} (failed ${p.provision?.failed ?? 0})`,
           `Certificates: ${p.attendance?.certified ?? 0}`,
           `Offer emails: ${p.offers?.sent ?? 0} sent / ${p.offers?.eligible ?? 0} eligible / ${p.offers?.skippedAlreadySent ?? 0} already sent`,
-        ].join('\n'),
+        ].join('\n')
       );
       await load();
     } catch (e) {
