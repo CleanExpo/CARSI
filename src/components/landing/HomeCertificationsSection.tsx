@@ -97,7 +97,7 @@ export function HomeCertificationsSection({
             })}
           </ol>
 
-          <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-[#f8fafc] p-3 sm:p-4">
+          <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-[#f8fafc] p-3 transition-colors duration-300 hover:border-[#2490ed]/30 sm:p-4">
             <IICRCDisciplineMap />
           </div>
         </div>
