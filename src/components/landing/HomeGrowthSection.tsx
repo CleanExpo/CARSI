@@ -43,7 +43,7 @@ export function HomeGrowthSection() {
                   <li key={item.href}>
                     <Link
                       href={item.href}
-                      className="group flex items-start gap-4 py-5 transition hover:bg-[#f8fafc] focus-visible:bg-[#f8fafc] focus-visible:outline-none"
+                      className="group -mx-3 flex items-start gap-4 rounded-xl px-3 py-5 transition hover:bg-[#f8fafc] focus-visible:bg-[#f8fafc] focus-visible:outline-none"
                     >
                       <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#eef6fc] text-[#146fc2]">
                         <Icon className="h-4 w-4" aria-hidden />
