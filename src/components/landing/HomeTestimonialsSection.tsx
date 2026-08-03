@@ -80,7 +80,7 @@ export function HomeTestimonialsSection() {
             {SECONDARY.map((testimonial, i) => (
               <motion.figure
                 key={testimonial.role}
-                className="rounded-2xl border border-slate-200/80 bg-white p-6 sm:p-7"
+                className="rounded-2xl border border-slate-200/80 bg-white p-6 transition-colors duration-300 hover:border-[#2490ed]/30 sm:p-7"
                 initial={reduceMotion ? false : { opacity: 0, y: 16 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.4 }}
