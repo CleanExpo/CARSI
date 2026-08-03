@@ -35,8 +35,10 @@ const itemVariants = {
 
 export default function MobileNav({
   items = PUBLIC_PRIMARY_NAV,
+  tone = 'chrome',
 }: {
   items?: readonly { label: string; href: string }[];
+  tone?: 'chrome' | 'light';
 }) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -58,13 +60,23 @@ export default function MobileNav({
     };
   }, [isOpen]);
 
+  const isLight = tone === 'light';
+
   return (
     <div className="lg:hidden">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative z-50 flex h-11 w-11 items-center justify-center rounded-md text-white/82 transition-colors duration-150 hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-[#2490ed]/45 focus-visible:outline-none"
+        className={
+          isLight
+            ? 'relative z-50 flex h-11 w-11 items-center justify-center rounded-md text-slate-700 transition-colors duration-150 hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-[#2490ed]/40 focus-visible:outline-none'
+            : 'relative z-50 flex h-11 w-11 items-center justify-center rounded-md text-white/82 transition-colors duration-150 hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-[#2490ed]/45 focus-visible:outline-none'
+        }
         style={{
-          background: isOpen ? 'rgba(255,255,255,0.12)' : 'transparent',
+          background: isOpen
+            ? isLight
+              ? 'rgba(15,23,42,0.06)'
+              : 'rgba(255,255,255,0.12)'
+            : 'transparent',
         }}
         aria-label={isOpen ? 'Close menu' : 'Open menu'}
         aria-expanded={isOpen}
