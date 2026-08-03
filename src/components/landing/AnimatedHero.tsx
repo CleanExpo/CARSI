@@ -49,6 +49,13 @@ export function AnimatedHero({ benefits: _benefits }: AnimatedHeroProps) {
   const stageY = useTransform(scrollYProgress, [0, 1], [0, reduceMotion ? 0 : 48]);
   const orbY = useTransform(scrollYProgress, [0, 1], [0, reduceMotion ? 0 : -36]);
 
+  const fadeVariants = reduceMotion
+    ? { hidden: { opacity: 1, y: 0 }, visible: { opacity: 1, y: 0 } }
+    : fadeInUp;
+  const staggerVariants = reduceMotion
+    ? { hidden: { opacity: 1 }, visible: { opacity: 1 } }
+    : staggerContainer;
+
   return (
     <section
       ref={sectionRef}
@@ -84,9 +91,9 @@ export function AnimatedHero({ benefits: _benefits }: AnimatedHeroProps) {
       >
         <div className="grid items-center gap-14 lg:grid-cols-[minmax(0,1.05fr)_minmax(340px,0.95fr)] lg:gap-10 xl:gap-16">
           {/* Copy column — brand first */}
-          <motion.div initial="hidden" animate="visible" variants={staggerContainer} className="relative z-10">
+          <motion.div initial="hidden" animate="visible" variants={staggerVariants} className="relative z-10">
             <motion.p
-              variants={fadeInUp}
+              variants={fadeVariants}
               transition={{ duration: 0.55, ease: smoothEase }}
               className="font-[family-name:var(--font-display,inherit)] text-[clamp(2.75rem,8vw,5.5rem)] leading-[0.92] font-extrabold tracking-[-0.04em] text-slate-950 dark:text-white"
             >
@@ -96,7 +103,7 @@ export function AnimatedHero({ benefits: _benefits }: AnimatedHeroProps) {
             </motion.p>
 
             <motion.div
-              variants={fadeInUp}
+              variants={fadeVariants}
               transition={{ duration: 0.55, ease: smoothEase }}
               className="mt-3 h-1 w-24 overflow-hidden rounded-full bg-slate-200/80 dark:bg-white/10"
               aria-hidden
@@ -110,7 +117,7 @@ export function AnimatedHero({ benefits: _benefits }: AnimatedHeroProps) {
             </motion.div>
 
             <motion.p
-              variants={fadeInUp}
+              variants={fadeVariants}
               transition={{ duration: 0.55, ease: smoothEase }}
               className="mt-4 inline-flex items-center gap-2 text-[11px] font-semibold tracking-[0.22em] text-[#146fc2] uppercase dark:text-[#8fd0ff]"
             >
@@ -119,7 +126,7 @@ export function AnimatedHero({ benefits: _benefits }: AnimatedHeroProps) {
             </motion.p>
 
             <motion.h1
-              variants={fadeInUp}
+              variants={fadeVariants}
               transition={{ duration: 0.55, ease: smoothEase }}
               className="mt-6 max-w-xl text-[clamp(1.75rem,3.5vw,2.75rem)] leading-[1.12] font-bold tracking-tight text-slate-900 dark:text-white"
             >
@@ -127,7 +134,7 @@ export function AnimatedHero({ benefits: _benefits }: AnimatedHeroProps) {
             </motion.h1>
 
             <motion.p
-              variants={fadeInUp}
+              variants={fadeVariants}
               transition={{ duration: 0.55, ease: smoothEase }}
               className="mt-4 max-w-lg text-base leading-relaxed text-slate-600 sm:text-lg dark:text-white/65"
             >
@@ -136,7 +143,7 @@ export function AnimatedHero({ benefits: _benefits }: AnimatedHeroProps) {
             </motion.p>
 
             <motion.div
-              variants={fadeInUp}
+              variants={fadeVariants}
               transition={{ duration: 0.55, ease: smoothEase }}
               className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center"
             >
@@ -159,13 +166,13 @@ export function AnimatedHero({ benefits: _benefits }: AnimatedHeroProps) {
             </motion.div>
 
             <motion.ul
-              variants={staggerContainer}
+              variants={staggerVariants}
               className="mt-10 flex flex-wrap gap-x-6 gap-y-2.5 border-t border-slate-200/80 pt-6 dark:border-white/10"
             >
               {trustPoints.map((point) => (
                 <motion.li
                   key={point}
-                  variants={fadeInUp}
+                  variants={fadeVariants}
                   transition={{ duration: 0.45, ease: smoothEase }}
                   className="flex items-center gap-2 text-sm text-slate-700 dark:text-white/75"
                 >
