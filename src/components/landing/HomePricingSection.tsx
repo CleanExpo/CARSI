@@ -100,9 +100,7 @@ export function HomePricingSection({
             <div
               key={tier.name}
               className={`grid gap-4 py-8 sm:grid-cols-[minmax(0,1.2fr)_auto] sm:items-center sm:gap-10 ${
-                tier.highlighted
-                  ? 'rounded-2xl bg-[#eef5fb] px-6 -mx-6 sm:px-8 sm:-mx-8'
-                  : ''
+                tier.highlighted ? '-mx-6 rounded-2xl bg-[#eef5fb] px-6 sm:-mx-8 sm:px-8' : ''
               }`}
             >
               <div>
@@ -152,7 +150,7 @@ export function HomePricingSection({
         </div>
 
         <p className="mt-8 text-xs text-slate-400">
-          GST inclusive AUD pricing. Cancel anytime for membership.
+          All prices in AUD, GST inclusive. Cancel the membership at any time.
         </p>
 
         <div className="mt-4">
