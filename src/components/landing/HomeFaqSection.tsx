@@ -83,8 +83,8 @@ export function HomeFaqSection({ faqs }: { faqs: Faq[] }) {
               Questions technicians ask before enrolling
             </h2>
             <p className={`mt-4 max-w-sm ${LANDING_LEAD_CLASS}`}>
-              Answers about CECs, pacing, industries, and in-person events. Contact CARSI support
-              if something is still unclear.
+              Straight answers about CECs, pacing, industries, and in-person events. If anything
+              is still unclear, message CARSI support any time.
             </p>
           </div>
 
