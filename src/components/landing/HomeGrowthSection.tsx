@@ -101,7 +101,7 @@ export function HomeGrowthSection({ stats }: HomeGrowthSectionProps) {
                       meta.accent
                     )}
                   >
-                    <Icon className="h-5 w-5 text-[#8fd0ff]" aria-hidden />
+                    <Icon className={cn('h-5 w-5', meta.accent)} aria-hidden />
                   </span>
                   <div className="min-w-0">
                     <p className="text-3xl font-bold tracking-tight text-white tabular-nums sm:text-[2.15rem]">
