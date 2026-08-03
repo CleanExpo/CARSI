@@ -84,7 +84,7 @@ export function HomePathwaysSpotlight() {
                   In-person workshop
                 </p>
                 <p className="mt-1 text-sm font-medium text-slate-900">
-                  2-Day Carpet Cleaning Workshop (CCW) — participant resources
+                  2-Day Carpet Cleaning Workshop (CCW) participant resources
                 </p>
                 <p className="mt-0.5 text-xs text-slate-600">Schedules, materials and cohort access</p>
               </div>
