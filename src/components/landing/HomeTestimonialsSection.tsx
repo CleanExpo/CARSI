@@ -53,8 +53,8 @@ export function HomeTestimonialsSection() {
             Training that holds up on real jobs
           </h2>
           <p className={`mt-4 ${LANDING_LEAD_CLASS}`}>
-            Voices from the field, representative of the technicians, managers, and owners who
-            study with CARSI.
+            Voices from the field, representative of the technicians, managers, and owners who study
+            with CARSI.
           </p>
         </div>
 
@@ -67,7 +67,7 @@ export function HomeTestimonialsSection() {
             transition={spring}
           >
             <Quote className="h-10 w-10 text-[#2490ed]/25" aria-hidden />
-            <blockquote className="mt-6 font-[family-name:var(--font-display)] text-2xl font-medium leading-snug text-slate-900 sm:text-[1.7rem]">
+            <blockquote className="mt-6 font-[family-name:var(--font-display)] text-2xl leading-snug font-medium text-balance text-slate-900 sm:text-[1.7rem]">
               &ldquo;{FEATURED.quote}&rdquo;
             </blockquote>
             <figcaption className="mt-8 text-sm">
