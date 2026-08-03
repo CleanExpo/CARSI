@@ -22,10 +22,11 @@ export function HomeTrustStrip({ stats }: { stats: Stat[] }) {
     <section aria-label="CARSI at a glance" className="relative border-y border-slate-200/70 bg-white">
       <div className={`${PUBLIC_SHELL_INNER_CLASS} py-8 md:py-10`}>
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-          <div className="grid grid-cols-2 gap-x-8 gap-y-6 sm:grid-cols-4 sm:gap-x-12">
+          <div className="grid grid-cols-2 gap-x-8 gap-y-6 sm:grid-cols-4 sm:gap-x-0">
             {stats.map((stat, i) => (
               <motion.div
                 key={stat.label}
+                className="sm:border-l sm:border-slate-200/70 sm:pl-10 sm:first:border-l-0 sm:first:pl-0"
                 initial={reduceMotion ? false : { opacity: 0, y: 12 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-40px' }}
