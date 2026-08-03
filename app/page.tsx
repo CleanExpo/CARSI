@@ -1,11 +1,15 @@
 import { AnimatedHero } from '@/components/landing/AnimatedHero';
 import { HomeCertificationsSection } from '@/components/landing/HomeCertificationsSection';
+import { HomeFaqSection } from '@/components/landing/HomeFaqSection';
 import { HomeFeaturedCoursesSection } from '@/components/landing/HomeFeaturedCoursesSection';
 import { HomeFinalCtaSection } from '@/components/landing/HomeFinalCtaSection';
 import { HomeGrowthSection } from '@/components/landing/HomeGrowthSection';
 import { HomeHowItWorksSection } from '@/components/landing/HomeHowItWorksSection';
 import { HomeIndustriesSection } from '@/components/landing/HomeIndustriesSection';
 import { HomePricingSection } from '@/components/landing/HomePricingSection';
+import { HomeStorySection } from '@/components/landing/HomeStorySection';
+import { HomeTestimonialsSection } from '@/components/landing/HomeTestimonialsSection';
+import { HomeTrustStrip } from '@/components/landing/HomeTrustStrip';
 import { PublicFooter } from '@/components/landing/PublicFooter';
 import { PublicNavbar } from '@/components/landing/PublicNavbar';
 import FloatingChatGate from '@/components/lms/FloatingChatGate';
@@ -42,7 +46,7 @@ async function getFeaturedCourses(): Promise<CourseListItem[]> {
 }
 
 const benefits = [
-  '24/7 access — learn anytime, anywhere',
+  '24/7 access, learn anytime, anywhere',
   'IICRC CEC Accredited courses',
   'Beginner, intermediate, and advanced levels',
   'Automatic credit tracking',
@@ -76,7 +80,7 @@ function buildHomeFaqs(facts: { publishedCourseCount: number; disciplineCodes: s
     {
       question: 'What industries does CARSI serve?',
       answer:
-        'CARSI serves healthcare, hospitality, aged care, mining, commercial cleaning, government and defence, education, property management, strata, retail, childcare, construction, and more — with sector-specific training pathways.',
+        'CARSI serves healthcare, hospitality, aged care, mining, commercial cleaning, government and defence, education, property management, strata, retail, childcare, construction, and more, with sector-specific training pathways.',
     },
     {
       question: 'Does CARSI run in-person events?',
@@ -116,9 +120,10 @@ export default async function Home() {
   return (
     <div id="main-content" className="min-h-screen bg-[#fafbfc] text-slate-900">
       <FAQSchema questions={faqs} />
-      <PublicNavbar />
+      <PublicNavbar tone="light" />
       <AnimatedHero benefits={benefits} />
-      <HomeGrowthSection stats={stats} />
+      <HomeTrustStrip stats={stats} />
+      <HomeStorySection />
 
       <HomeFeaturedCoursesSection
         courses={featuredCourses}
@@ -129,13 +134,16 @@ export default async function Home() {
         }
       />
 
-      <HomePricingSection subscriptionsEnabled={subscriptionsEnabled()} />
-      <HomeCertificationsSection disciplineCountLabel={disciplineCountLabel} />
       <HomeHowItWorksSection />
+      <HomeTestimonialsSection />
+      <HomeCertificationsSection disciplineCountLabel={disciplineCountLabel} />
+      <HomePricingSection subscriptionsEnabled={subscriptionsEnabled()} />
+      <HomeGrowthSection />
+      <HomeFaqSection faqs={faqs} />
       <HomeIndustriesSection />
       <HomeFinalCtaSection />
 
-      <PublicFooter />
+      <PublicFooter tone="light" />
       <FloatingChatGate />
     </div>
   );
