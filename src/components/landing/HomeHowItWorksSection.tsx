@@ -87,13 +87,14 @@ export function HomeHowItWorksSection() {
                 transition={{ duration: 0.45, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }}
               >
                 <span
-                  className="pointer-events-none absolute -top-1 right-0 select-none text-5xl font-bold leading-none tracking-tighter text-slate-100 dark:text-white/[0.06]"
+                  className="pointer-events-none absolute -top-1 right-0 select-none text-5xl font-bold leading-none tracking-tighter text-slate-950/[0.06] dark:text-white/[0.08]"
                   aria-hidden
                 >
                   {item.step}
                 </span>
                 <Icon className="relative h-5 w-5 text-[#146fc2] dark:text-[#8fd0ff]" aria-hidden />
                 <h3 className="relative mt-4 text-base font-bold text-slate-950 dark:text-white">
+                  <span className="sr-only">Step {item.step}. </span>
                   {item.title}
                 </h3>
                 <p className="relative mt-2 text-sm leading-relaxed text-slate-600 dark:text-white/60">
