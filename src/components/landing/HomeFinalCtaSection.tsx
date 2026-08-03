@@ -28,6 +28,15 @@ export function HomeFinalCtaSection() {
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_70%_at_50%_0%,rgba(36,144,237,0.12),transparent_60%)]"
         aria-hidden
       />
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.35] [mask-image:radial-gradient(ellipse_70%_80%_at_50%_50%,black,transparent)]"
+        style={{
+          backgroundImage:
+            'linear-gradient(rgba(15,23,42,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(15,23,42,0.05) 1px, transparent 1px)',
+          backgroundSize: '48px 48px',
+        }}
+        aria-hidden
+      />
 
       <div className={`relative ${PUBLIC_SHELL_INNER_CLASS}`}>
         <motion.div
@@ -45,8 +54,8 @@ export function HomeFinalCtaSection() {
             Your next credential can start tonight
           </h2>
           <p className={`mx-auto mt-5 max-w-lg ${LANDING_LEAD_CLASS}`}>
-            Open the catalogue and start a free course now, follow a structured pathway, or book
-            a Business Growth Day near you. No classroom required.
+            Open the catalogue and start a free course now, follow a structured pathway, or book a
+            Business Growth Day near you. No classroom required.
           </p>
 
           <div className="mt-10 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:flex-wrap sm:items-center">
@@ -55,10 +64,7 @@ export function HomeFinalCtaSection() {
               className="group inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#146fc2] px-8 text-sm font-semibold text-white shadow-[0_14px_40px_-16px_rgba(20,111,194,0.55)] transition hover:bg-[#0f5fa8] focus-visible:ring-2 focus-visible:ring-[#2490ed]/45 focus-visible:outline-none"
             >
               Browse the catalogue
-              <ArrowRight
-                className="h-4 w-4 transition group-hover:translate-x-0.5"
-                aria-hidden
-              />
+              <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" aria-hidden />
             </Link>
             <Link
               href={`${ccwRoadshowPath}#booking`}
