@@ -78,6 +78,13 @@ jobs:
       - name: Australian-English course-content guard
         run: npm run check:au-english
 
+      # CARSI designation registry validity. This script existed but was run by NO workflow
+      # (audited 2026-08-07) — a guard nothing invokes is not a guard. It validates that every
+      # designation resolves to a real catalogue course, so a renamed or removed course cannot
+      # silently orphan the credential a learner is told they will earn.
+      - name: CARSI designation registry guard
+        run: npm run check:designations
+
       # Advisory course-completeness scorecard (assessment, thumbnail, intro
       # video, card metadata, scaffolds, depth). Non-blocking today; promote a
       # finalised series with --enforce=<slugs> once it is green.
