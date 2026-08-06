@@ -85,6 +85,12 @@ jobs:
       - name: CARSI designation registry guard
         run: npm run check:designations
 
+      # Course-visibility predicate. `status` is canonical (#137); reading the legacy
+      # `isPublished` column alone hid 20 published courses from pathways, pathway progress and
+      # team assignment. Hand-grepping for this missed readers twice, so it is enforced here.
+      - name: Course visibility predicate guard
+        run: npm run check:course-visibility
+
       # Advisory course-completeness scorecard (assessment, thumbnail, intro
       # video, card metadata, scaffolds, depth). Non-blocking today; promote a
       # finalised series with --enforce=<slugs> once it is green.
