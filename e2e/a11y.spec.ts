@@ -57,6 +57,17 @@ test.describe('a11y: public course surfaces', () => {
     expect(violations, describe(violations)).toEqual([]);
   });
 
+  // Public forms are the highest-risk a11y surface and the original spec did not cover any.
+  // /jobs/submit shipped with 13 fields carrying no htmlFor and no id — a screen-reader user
+  // could not tell which label belonged to which control. The first version of this gate would
+  // have passed that page untouched because it never visited it. Scope follows the defect.
+  test('job submission form has no critical or serious violations', async ({ page }) => {
+    await page.goto('/jobs/submit');
+    await page.waitForLoadState('domcontentloaded');
+    const violations = await blockingViolations(page);
+    expect(violations, describe(violations)).toEqual([]);
+  });
+
   // The credential JSON-LD is the machine-readable half of this page's trust story. Assert it is
   // actually emitted and parses, rather than trusting that it renders.
   test('course detail emits parseable Course JSON-LD', async ({ page }) => {
