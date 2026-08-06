@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { ACCESS_GRANTING_STATUS_LIST } from '@/lib/server/enrollment-access';
 import { normalizeEnrollmentStatus } from '@/lib/server/learner-dashboard-data';
+import { isPublishedCourseStatus } from '@/lib/server/public-courses-list';
 
 export interface PathwayCourseProgress {
   course_id: string;
@@ -58,7 +59,11 @@ export async function getPathwayProgressForStudent(
               id: true,
               title: true,
               slug: true,
-              isPublished: true,
+              // `status` is the canonical publication flag (#137), not the legacy `isPublished`
+              // column. NB the enclosing findMany filters lmsLearningPathway by ITS OWN
+              // isPublished — a different entity with its own flag. Only the COURSE selection
+              // was wrong here.
+              status: true,
               modules: { select: { lessons: { select: { id: true } } } },
             },
           },
@@ -96,7 +101,7 @@ export async function getPathwayProgressForStudent(
     .filter((p) => p.courses.length > 0)
     .map((p) => {
       const courses: PathwayCourseProgress[] = p.courses
-        .filter((pc) => pc.course.isPublished)
+        .filter((pc) => isPublishedCourseStatus(pc.course.status))
         .map((pc) => {
           const lessonIds = pc.course.modules.flatMap((m) => m.lessons.map((l) => l.id));
           const en = enrollmentByCourse.get(pc.courseId);
