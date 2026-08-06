@@ -240,6 +240,12 @@ model LmsLesson {
   orderIndex  Int      @map("order_index")
   isPreview   Boolean  @default(false) @map("is_preview")
   resources   Json?
+  /// Real measured/authored lesson length in whole minutes. NULLABLE AND FAIL-CLOSED BY
+  /// DESIGN: null means "we do not know", and the public syllabus shows nothing rather than
+  /// a guess. Never populate this by deriving from content length, word count or duration
+  /// division — a derived figure shown to a buyer as fact is the same defect class that
+  /// produced unapproved CEC-hour claims. Only a real authored value goes here.
+  durationMinutes Int?  @map("duration_minutes")
   createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
 
   module          LmsModule           @relation(fields: [moduleId], references: [id], onDelete: Cascade)

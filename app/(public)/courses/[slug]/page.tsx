@@ -60,7 +60,14 @@ interface CourseDetail {
   syllabus?: {
     id: string;
     title: string;
-    lessons: { id: string; title: string; content_type: string; is_preview: boolean }[];
+    duration_minutes?: number | null;
+    lessons: {
+      id: string;
+      title: string;
+      content_type: string;
+      is_preview: boolean;
+      duration_minutes?: number | null;
+    }[];
   }[];
   instructor?: { full_name: string } | null;
   intro_video_url?: string | null;
@@ -780,6 +787,14 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                           </span>
                           {' — '}
                           {mod.title}
+                          {typeof mod.duration_minutes === 'number' && (
+                            <span
+                              className="ml-2 text-sm font-normal"
+                              style={{ color: 'rgba(255,255,255,0.5)' }}
+                            >
+                              {mod.duration_minutes} min
+                            </span>
+                          )}
                         </h3>
                         {mod.lessons.length > 0 && (
                           <ul className="space-y-2">
@@ -794,6 +809,14 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                                 </span>
                                 <span>
                                   {lesson.title}
+                                  {typeof lesson.duration_minutes === 'number' && (
+                                    <span
+                                      className="ml-2"
+                                      style={{ color: 'rgba(255,255,255,0.45)' }}
+                                    >
+                                      {lesson.duration_minutes} min
+                                    </span>
+                                  )}
                                   {lesson.is_preview && (
                                     <span
                                       className="ml-2 rounded-sm px-1.5 py-0.5 text-xs font-medium"

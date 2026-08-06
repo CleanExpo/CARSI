@@ -351,6 +351,22 @@ export async function getPublishedCourseListItemsFromDatabase(options?: {
 /**
  * Single published course for `/courses/[slug]` (same source of truth as the index when using Prisma).
  */
+/**
+ * Total a module's runtime ONLY when every lesson in it carries a real duration.
+ *
+ * A partial sum is the dangerous case: it renders as "Module 2 — 12 min" while silently
+ * omitting the lessons nobody has timed, so it reads as authoritative and is wrong. Absent
+ * data must look absent. Returns null for an empty module, a module with no timings, and a
+ * module that is only partly timed.
+ */
+export function summariseModuleDuration(
+  lessons: { durationMinutes: number | null }[]
+): number | null {
+  if (lessons.length === 0) return null;
+  if (!lessons.every((l) => typeof l.durationMinutes === 'number')) return null;
+  return lessons.reduce((n, l) => n + (l.durationMinutes ?? 0), 0);
+}
+
 export async function getPublishedCourseDetailBySlugFromDatabase(slug: string) {
   const target = decodeURIComponent(slug).trim();
   if (!target) return null;
@@ -370,7 +386,13 @@ export async function getPublishedCourseDetailBySlugFromDatabase(slug: string) {
           title: true,
           lessons: {
             orderBy: { orderIndex: 'asc' },
-            select: { id: true, title: true, contentType: true, isPreview: true },
+            select: {
+              id: true,
+              title: true,
+              contentType: true,
+              isPreview: true,
+              durationMinutes: true,
+            },
           },
         },
       },
@@ -412,16 +434,20 @@ export async function getPublishedCourseDetailBySlugFromDatabase(slug: string) {
     // against a named syllabus cannot tell what two hours actually contains, so surface the
     // real module and lesson titles the LMS already stores.
     lesson_count: row.modules.reduce((n, m) => n + m.lessons.length, 0),
-    syllabus: row.modules.map((m) => ({
-      id: m.id,
-      title: m.title,
-      lessons: m.lessons.map((l) => ({
-        id: l.id,
-        title: l.title,
-        content_type: l.contentType,
-        is_preview: l.isPreview,
-      })),
-    })),
+    syllabus: row.modules.map((m) => {
+      return {
+        id: m.id,
+        title: m.title,
+        duration_minutes: summariseModuleDuration(m.lessons),
+        lessons: m.lessons.map((l) => ({
+          id: l.id,
+          title: l.title,
+          content_type: l.contentType,
+          is_preview: l.isPreview,
+          duration_minutes: l.durationMinutes ?? null,
+        })),
+      };
+    }),
     instructor: row.instructor?.fullName ? { full_name: row.instructor.fullName } : null,
     intro_video_url: readIntroVideoUrlFromMeta(row.meta),
   };

@@ -1,0 +1,15 @@
+-- Per-lesson length, in whole minutes.
+--
+-- The public course syllabus could name every lesson but could not say how long any of them
+-- took: the only time signal on the page was the course-level duration. A buyer therefore
+-- could not tell whether the module carrying the decisive work was ten minutes or seventy.
+--
+-- NULLABLE with no default and no backfill, deliberately. NULL means "not yet known" and the
+-- public syllabus renders nothing for it. There is no derivation path — a duration must be a
+-- real authored value. Deriving one from content length or by dividing the course duration
+-- would put a fabricated number in front of a buyer, which is the same defect class as the
+-- unapproved CEC-hour claims this codebase already fails closed on.
+--
+-- Backward-compatible: existing rows are untouched and every existing read keeps working.
+-- Reversal: ALTER TABLE "lms_lessons" DROP COLUMN "duration_minutes";
+ALTER TABLE "lms_lessons" ADD COLUMN "duration_minutes" INTEGER;
