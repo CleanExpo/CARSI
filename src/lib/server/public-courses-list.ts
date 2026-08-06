@@ -359,6 +359,21 @@ export async function getPublishedCourseListItemsFromDatabase(options?: {
  * data must look absent. Returns null for an empty module, a module with no timings, and a
  * module that is only partly timed.
  */
+/**
+ * The body a logged-out visitor is allowed to read for one lesson.
+ *
+ * Returns the body ONLY for a lesson explicitly flagged as a preview. Every other lesson
+ * returns null, whatever its content holds. This runs server-side and is the single decision
+ * point — paid lesson content must never depend on a client-side condition to stay private.
+ */
+export function previewBodyFor(lesson: {
+  isPreview: boolean;
+  contentBody: string | null;
+}): string | null {
+  if (!lesson.isPreview) return null;
+  return lesson.contentBody ?? null;
+}
+
 export function summariseModuleDuration(
   lessons: { durationMinutes: number | null }[]
 ): number | null {
@@ -392,6 +407,10 @@ export async function getPublishedCourseDetailBySlugFromDatabase(slug: string) {
               contentType: true,
               isPreview: true,
               durationMinutes: true,
+              // Body is carried ONLY so a preview lesson can be shown to a logged-out visitor.
+              // It is stripped below for every non-preview lesson before this leaves the server,
+              // so a non-preview body can never reach the public page.
+              contentBody: true,
             },
           },
         },
@@ -445,6 +464,10 @@ export async function getPublishedCourseDetailBySlugFromDatabase(slug: string) {
           content_type: l.contentType,
           is_preview: l.isPreview,
           duration_minutes: l.durationMinutes ?? null,
+          // Hard strip. A body survives to the public page ONLY on a lesson explicitly flagged
+          // isPreview, on a course already filtered to published. Everything else is nulled here,
+          // server-side, so no client-side condition can be the thing protecting paid content.
+          preview_body: previewBodyFor(l),
         })),
       };
     }),

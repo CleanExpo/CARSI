@@ -67,6 +67,7 @@ interface CourseDetail {
       content_type: string;
       is_preview: boolean;
       duration_minutes?: number | null;
+      preview_body?: string | null;
     }[];
   }[];
   instructor?: { full_name: string } | null;
@@ -302,6 +303,12 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
   const designation = getDesignationForCourseSlug(course.slug);
   const thumbnailUrl = resolveAssetUrl(course.thumbnail_url);
   const learningOutcomes = getLearningOutcomes(course, designation);
+
+  // First preview lesson that actually carries a body. The server has already nulled
+  // preview_body on every non-preview lesson, so this only ever selects permitted content.
+  const previewLesson = course.syllabus
+    ?.flatMap((m) => m.lessons)
+    .find((l) => l.is_preview && l.preview_body);
   const audienceItems = getAudienceItems(course, designation);
 
   const breadcrumbs = [
@@ -836,6 +843,33 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                       </li>
                     ))}
                   </ol>
+                </section>
+              )}
+
+              {/* ── Free preview lesson ── */}
+              {/* The isPreview flag was previously only reachable through the curriculum API,
+                  which 401s without a session and 403s without an enrolment — so the one
+                  audience a preview exists for could never see one. Surface it before signup. */}
+              {previewLesson?.preview_body && (
+                <section>
+                  <h2
+                    className="mb-4 text-xl font-bold"
+                    style={{ color: 'rgba(255,255,255,0.92)' }}
+                  >
+                    Read a free lesson
+                  </h2>
+                  <div className="rounded-sm p-6" style={glassPanel}>
+                    <h3
+                      className="mb-1 text-base font-semibold"
+                      style={{ color: 'rgba(255,255,255,0.92)' }}
+                    >
+                      {previewLesson.title}
+                    </h3>
+                    <p className="mb-4 text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                      Free preview — no account needed
+                    </p>
+                    <CourseFormattedBody text={previewLesson.preview_body} />
+                  </div>
                 </section>
               )}
 
