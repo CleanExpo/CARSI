@@ -462,6 +462,26 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                     </p>
                   )}
 
+                  {/* Credential clarity, above the fold.
+                      CARSI's strongest and most honest differentiator — that this is CARSI's own
+                      credential and CARSI is a CEC provider rather than a certifying body — was
+                      stated only in a mid-page bullet and again near the page bottom. A buyer
+                      deciding whether the credential is worth anything had to scroll to find out.
+                      Wording is fixed and licence-bound: "IICRC CEC Accredited" never appears
+                      without CEC, and no discipline acronym brands the course
+                      (CLAUDE.md § IICRC CEC terminology, enforced by check:iicrc-compliance). */}
+                  <p
+                    className="mb-4 max-w-2xl text-sm leading-relaxed"
+                    style={{ color: 'rgba(255,255,255,0.7)' }}
+                  >
+                    <span style={{ color: 'rgba(255,255,255,0.92)', fontWeight: 600 }}>
+                      A CARSI-issued credential — not an IICRC certification.
+                    </span>{' '}
+                    CARSI is an IICRC CEC Accredited provider, so this course counts toward
+                    maintaining a certification you already hold. IICRC certification itself is
+                    obtained through an IICRC-approved school and examination.
+                  </p>
+
                   {/* Star rating (social proof) — only when the course has published reviews */}
                   {aggregateRating && (
                     <div
