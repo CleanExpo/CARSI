@@ -19,6 +19,20 @@ export const lmsPublishedCourseWhere: Prisma.LmsCourseWhereInput = {
   status: { equals: 'published', mode: 'insensitive' },
 };
 
+/**
+ * The same predicate, for rows already in memory.
+ *
+ * Defined here, immediately beside the Prisma filter, so the database question and the
+ * in-memory question can never answer differently. Callers that fetched a course through a
+ * relation (a pathway's ordered courses, for instance) must use this rather than reading the
+ * legacy `isPublished` column — doing that split the product in two: 20 courses currently carry
+ * status='published' with isPublished=false, so they were enrollable from the public catalogue
+ * and simultaneously invisible in pathways and team assignment.
+ */
+export function isPublishedCourseStatus(status: string | null | undefined): boolean {
+  return typeof status === 'string' && status.trim().toLowerCase() === 'published';
+}
+
 const publishedWhere = lmsPublishedCourseWhere;
 
 const draftWhere = {
