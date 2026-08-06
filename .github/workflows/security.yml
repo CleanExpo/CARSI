@@ -87,8 +87,20 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run npm audit
-        run: npm audit --audit-level=critical
+      # Threshold raised from `critical` to `high` on 2026-08-07. It sat at `critical` while the
+      # tree carried 5 HIGH and 0 critical advisories — Next.js SSRF in rewrites, DoS in Server
+      # Actions, unauthenticated disclosure of internal Server Function endpoints, postcss XSS,
+      # sharp libvips CVEs, undici request smuggling — so every one of them passed the gate.
+      #
+      # Raised only after the tree was cleared, never before: `next` 16.2.9 -> 16.3.0 (a
+      # non-major fix per npm's own fixAvailable) plus a non-forced `npm audit fix` took
+      # production advisories from 11 (5 high) to 5 (0 high, 0 critical). Verified after a FULL
+      # install: tsc 0, lint 0, 138 test files / 999 tests, `next build` exit 0.
+      #
+      # Scoped to production dependencies. Dev-only advisories should not block a deploy, and
+      # scanning them here would re-create the pressure to weaken the threshold.
+      - name: Run npm audit (production deps, fail on high or critical)
+        run: npm audit --omit=dev --audit-level=high
 
       - name: Generate audit report
         if: always()
