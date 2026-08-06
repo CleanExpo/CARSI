@@ -160,6 +160,11 @@ interface CourseSchemaProps {
   educationalLevel?: string;
   teaches?: string[];
   aggregateRating?: { ratingValue: number; reviewCount: number };
+  /**
+   * The CARSI designation this course awards, e.g. "CARSI Water Restoration Practitioner".
+   * Omitted for courses with no registry entry — absent rather than guessed.
+   */
+  credentialAwarded?: string;
 }
 
 function normalizeCoursePrice(price: number | undefined): number | undefined {
@@ -205,6 +210,7 @@ export function CourseSchema({
   educationalLevel,
   teaches,
   aggregateRating,
+  credentialAwarded,
 }: CourseSchemaProps) {
   const schema: Record<string, unknown> = {
     '@context': 'https://schema.org',
@@ -237,6 +243,24 @@ export function CourseSchema({
 
   if (teaches && teaches.length > 0) {
     schema.teaches = teaches;
+  }
+
+  // Machine-readable credential standing. Two independent blind critics asked the same thing of
+  // this page — an insurer or employer must be able to establish what the credential IS without
+  // phoning anyone; "honest framing is not the same as auditable standing".
+  //
+  // Deliberately narrow. It states the issuer (CARSI) and that the award is a CARSI designation,
+  // and nothing else. It does NOT assert CEC hours or an IICRC provider/approval number: those
+  // are founder-confirmed data, the CEC registry (`data/seed/cec-approvals.json`) is empty and
+  // fail-closed, and a fabricated credential claim in structured data is worse than none —
+  // machines repeat it without the hedging a human reader would apply.
+  if (credentialAwarded) {
+    schema.educationalCredentialAwarded = {
+      '@type': 'EducationalOccupationalCredential',
+      name: credentialAwarded,
+      credentialCategory: 'certificate',
+      recognizedBy: { '@id': 'https://carsi.com.au/#organization' },
+    };
   }
 
   if (aggregateRating && aggregateRating.reviewCount > 0) {

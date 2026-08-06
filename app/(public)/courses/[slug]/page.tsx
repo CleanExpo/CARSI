@@ -334,6 +334,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
         educationalLevel={course.level ?? undefined}
         teaches={designation ? [designation.disciplineTopic] : undefined}
         aggregateRating={aggregateRating ?? undefined}
+        credentialAwarded={designation?.name}
       />
       {course.intro_video_url ? (
         <VideoObjectSchema
