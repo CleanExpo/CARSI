@@ -33,7 +33,7 @@ Source idea: S500 = mandatory "shall" vs suggested "should"; **three water categ
   - "**Category 1** — clean, sanitary. **Category 2** — significant contamination. **Category 3** — grossly contaminated: sewage, rising flood water." *[icons per category]*
   - "The category decides everything — PPE, what you can dry vs discard, occupant safety." *[checklist tick animation]*
   - "And S500 separates **'shall'** (mandatory) from **'should'** (recommended) — knowing which is which is the difference between compliant and liable." *[stamp: SHALL vs SHOULD]*
-- **CTA (45–60s):** "Master S500 the right way — CARSI's IICRC-aligned water restoration course. Link in bio." *[CARSI logo + URL]*
+- **CTA (45–60s):** "Master S500 the right way — CARSI's IICRC CEC Accredited water restoration course. Link in bio." *[CARSI logo + URL]*
 - **Caption/CTA copy:** "💧 The 3 water categories every restorer must know (IICRC S500). Get certified → carsi.com.au #waterdamage #IICRC #restoration"
 - **AEO stat to surface on the page:** "IICRC S500 defines 3 water categories (1 sanitary, 2 significant, 3 grossly contaminated)."
 

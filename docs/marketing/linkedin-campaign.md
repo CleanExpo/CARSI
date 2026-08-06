@@ -4,7 +4,7 @@
 
 ## Objective
 
-Generate qualified leads from decision-makers who control training budgets across 4 industry segments. Secondary objective: build brand awareness for CARSI as Australia's IICRC-aligned training platform.
+Generate qualified leads from decision-makers who control training budgets across 4 industry segments. Secondary objective: build brand awareness for CARSI as Australia's IICRC CEC Accredited training platform.
 
 **Targets:**
 

@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     images: OG_IMAGES,
     title: 'Subscribe | CARSI',
     description:
-      'Become a CARSI member for full access to IICRC-aligned restoration CEC courses.',
+      'Become a CARSI member for full access to IICRC CEC Accredited restoration CEC courses.',
     type: 'website',
     url: 'https://carsi.com.au/subscribe',
   },

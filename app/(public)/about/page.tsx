@@ -214,14 +214,19 @@ export default async function AboutPage() {
         </div>
       </section>
 
-      <section className="mb-14 sm:mb-16" aria-label="IICRC disciplines">
+      {/* CARSI's own catalogue. CLAUDE.md § "CARSI designation rule" (founder, 2026-07-10) bans
+          describing a CARSI course as "[discipline]-aligned", and the founder restated the boundary
+          on 2026-08-07: what CARSI generates is IICRC CEC Accredited. The subject of this heading
+          is therefore the CEC accreditation — the standing CARSI actually holds — rather than any
+          alignment or certification claim. */}
+      <section className="mb-14 sm:mb-16" aria-label="Restoration disciplines covered">
         <MarketingSectionHeader
           eyebrow="Discipline coverage"
-          title="IICRC-aligned course catalogue"
+          title="IICRC CEC Accredited course catalogue"
           body={
             d > 0
-              ? `Published courses tagged across ${d} IICRC discipline${d === 1 ? '' : 's'} — each counting toward continuing education credits.`
-              : 'CEC Accredited courses across all seven core IICRC disciplines.'
+              ? `Published courses across ${d} restoration discipline${d === 1 ? '' : 's'} — each earning continuing education credits toward an IICRC certification you already hold.`
+              : 'IICRC CEC Accredited courses across all seven core restoration disciplines.'
           }
         />
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">

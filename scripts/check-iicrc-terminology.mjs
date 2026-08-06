@@ -109,7 +109,10 @@ const BANNED = [
     // Nominative third-person references to an IICRC certification remain legal ("FSRT is an
     // IICRC certification covering…", a student's own recert) — what is banned is an acronym
     // used to brand or frame a CARSI course.
-    re: /\bIICRC[\s-]+(WRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)\b|\b(WRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)[\s-]+aligned\b/i,
+    // "IICRC-aligned" is included alongside the discipline acronyms: it was found on the about
+    // page as "IICRC-aligned course catalogue", branding CARSI's OWN catalogue against the IICRC.
+    // The acronym-only form would have missed it.
+    re: /\bIICRC[\s-]+(WRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)\b|\b(WRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST|IICRC)[\s-]+aligned\b/i,
     // Narrow allows, each a case CLAUDE.md explicitly permits — never a blanket bypass:
     //  1. nominative third-person fact about an IICRC certification;
     //  2. a legacy lowercase-hyphenated URL slug from the WordPress import (an identifier, not

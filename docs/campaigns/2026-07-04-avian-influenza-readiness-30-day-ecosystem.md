@@ -90,7 +90,7 @@ Courses to generate:
 6. Halo / Halosil Dry Fogging: Evidence, Limits, Label Compliance and Documentation
 7. NeoSan Product Use: SDS, Label, Dilution, Contact Time and Claim Boundaries
 8. RestoreAssist.app Field Reporting for Bird Flu Readiness
-9. Professional Restoration Industry Boundaries, IICRC-Aligned Thinking and Insurer-Ready Reporting
+9. Professional Restoration Industry Boundaries, IICRC CEC Accredited Thinking and Insurer-Ready Reporting
 
 ## Halo / Halosil / dry fog method language
 

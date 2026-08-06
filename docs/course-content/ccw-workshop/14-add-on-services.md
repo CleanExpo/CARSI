@@ -1,6 +1,6 @@
 # Module 14 — Add-On Services: The Profit Multiplier
 
-*New module extending Module 10 (Business of Cleaning). Australian-produced · IICRC-aligned · verifiable.
+*New module extending Module 10 (Business of Cleaning). Australian-produced · IICRC CEC Accredited · verifiable.
 Every service here is inspection-led, disclosed honestly, and priced — never a pressure upsell.*
 
 Module 10 teaches the six cost lines and three pricing models. This module answers the question that

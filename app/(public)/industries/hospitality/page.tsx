@@ -19,7 +19,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = buildIndustryMetadata(
   'hospitality',
   'Hospitality IICRC CEC Training',
-  'IICRC-aligned training for Australian hotels and resorts. WRT, CRT, ASD and OCT courses for water damage, carpet care, structural drying and odour control.',
+  'IICRC CEC Accredited training for Australian hotels and resorts. WRT, CRT, ASD and OCT courses for water damage, carpet care, structural drying and odour control.',
   [
     'hospitality IICRC CEC training',
     'hotel restoration training',
@@ -106,7 +106,7 @@ export default async function HospitalityIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Hospitality"
         headlineAccent="Restoration Training"
-        description="Keep guests comfortable and properties protected. IICRC-aligned training for hotel maintenance teams covering water damage, carpet care, structural drying, and odour control."
+        description="Keep guests comfortable and properties protected. IICRC CEC Accredited training for hotel maintenance teams covering water damage, carpet care, structural drying, and odour control."
         disciplines={disciplines}
         stats={stats}
       />

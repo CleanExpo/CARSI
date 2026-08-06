@@ -1,7 +1,7 @@
 {
   "version": 1,
   "reviewedAt": "2026-05-21",
-  "reviewer": "CARSI restoration education catalogue — IICRC-aligned CEC audit",
+  "reviewer": "CARSI restoration education catalogue — IICRC CEC Accredited CEC audit",
   "notes": "Approved DB cec_hours values are never overwritten. Assignments apply only when no explicit CEC can be resolved from course data. excludedSlugs are non-training products (memberships, downloads, payment SKUs) plus training that is not IICRC CE-accredited (CARSI Maintenance onboarding/refreshers, floor-care professional development — founder call 2026-07-03). slugAliases map humanized LMS slugs to WordPress export slugs for catalogue lookup. durationAssignments are reviewer-assigned display durations for DB-only courses.",
   "excludedSlugs": [
     "affiliate-membership",
