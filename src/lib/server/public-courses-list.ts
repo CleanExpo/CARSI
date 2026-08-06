@@ -359,6 +359,10 @@ export async function getPublishedCourseListItemsFromDatabase(options?: {
  * data must look absent. Returns null for an empty module, a module with no timings, and a
  * module that is only partly timed.
  */
+/** Syllabus fetch bounds — CARSI_VERIFICATION_GATE.md rule 2 (bounded queries). */
+const SYLLABUS_MODULE_CAP = 60;
+const SYLLABUS_LESSON_CAP = 100;
+
 /**
  * The body a logged-out visitor is allowed to read for one lesson.
  *
@@ -396,21 +400,27 @@ export async function getPublishedCourseDetailBySlugFromDatabase(slug: string) {
       _count: { select: { modules: true } },
       modules: {
         orderBy: { orderIndex: 'asc' },
+        // Bounded per CARSI_VERIFICATION_GATE.md rule 2 — a syllabus grows with the course and
+        // an unbounded nested fetch is a latency time-bomb. The largest live course is well
+        // inside these caps; a course exceeding them renders a truncated syllabus rather than
+        // pulling an unbounded tree on every public page view.
+        take: SYLLABUS_MODULE_CAP,
         select: {
           id: true,
           title: true,
           lessons: {
             orderBy: { orderIndex: 'asc' },
+            take: SYLLABUS_LESSON_CAP,
             select: {
               id: true,
               title: true,
               contentType: true,
               isPreview: true,
               durationMinutes: true,
-              // Body is carried ONLY so a preview lesson can be shown to a logged-out visitor.
-              // It is stripped below for every non-preview lesson before this leaves the server,
-              // so a non-preview body can never reach the public page.
-              contentBody: true,
+              // contentBody is deliberately NOT selected here. Fetching every lesson's full text
+              // on every public page view — then discarding all but the preview in JS — pulled
+              // paid content out of the database for no reason. The preview body is fetched
+              // separately below, bounded to the single lesson actually shown.
             },
           },
         },
@@ -419,6 +429,18 @@ export async function getPublishedCourseDetailBySlugFromDatabase(slug: string) {
   });
 
   if (!row) return null;
+
+  // Fetch the body of the ONE preview lesson actually rendered, rather than every lesson's body.
+  // Bounded by construction: a single row, looked up by id, and re-checked on isPreview at the
+  // database so the guarantee does not rest on the in-memory scan that chose the id.
+  const previewLessonId =
+    row.modules.flatMap((m) => m.lessons).find((l) => l.isPreview)?.id ?? null;
+  const previewLesson = previewLessonId
+    ? await prisma.lmsLesson.findFirst({
+        where: { id: previewLessonId, isPreview: true },
+        select: { id: true, contentBody: true },
+      })
+    : null;
 
   const priceNum = Number(row.priceAud);
   return {
@@ -467,7 +489,10 @@ export async function getPublishedCourseDetailBySlugFromDatabase(slug: string) {
           // Hard strip. A body survives to the public page ONLY on a lesson explicitly flagged
           // isPreview, on a course already filtered to published. Everything else is nulled here,
           // server-side, so no client-side condition can be the thing protecting paid content.
-          preview_body: previewBodyFor(l),
+          preview_body:
+            previewLesson && previewLesson.id === l.id
+              ? previewBodyFor({ isPreview: l.isPreview, contentBody: previewLesson.contentBody })
+              : null,
         })),
       };
     }),
