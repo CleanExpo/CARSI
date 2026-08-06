@@ -363,6 +363,17 @@ export async function getPublishedCourseDetailBySlugFromDatabase(slug: string) {
     include: {
       instructor: { select: { fullName: true } },
       _count: { select: { modules: true } },
+      modules: {
+        orderBy: { orderIndex: 'asc' },
+        select: {
+          id: true,
+          title: true,
+          lessons: {
+            orderBy: { orderIndex: 'asc' },
+            select: { id: true, title: true, contentType: true, isPreview: true },
+          },
+        },
+      },
     },
   });
 
@@ -397,6 +408,20 @@ export async function getPublishedCourseDetailBySlugFromDatabase(slug: string) {
     }),
     thumbnail_url: normalizePublicAssetUrl(row.thumbnailUrl),
     module_count: row._count.modules,
+    // The bare module COUNT was the only curriculum signal this page had. Buyers comparing
+    // against a named syllabus cannot tell what two hours actually contains, so surface the
+    // real module and lesson titles the LMS already stores.
+    lesson_count: row.modules.reduce((n, m) => n + m.lessons.length, 0),
+    syllabus: row.modules.map((m) => ({
+      id: m.id,
+      title: m.title,
+      lessons: m.lessons.map((l) => ({
+        id: l.id,
+        title: l.title,
+        content_type: l.contentType,
+        is_preview: l.isPreview,
+      })),
+    })),
     instructor: row.instructor?.fullName ? { full_name: row.instructor.fullName } : null,
     intro_video_url: readIntroVideoUrlFromMeta(row.meta),
   };

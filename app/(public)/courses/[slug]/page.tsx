@@ -56,6 +56,12 @@ interface CourseDetail {
   duration_hours?: string | null;
   thumbnail_url?: string | null;
   module_count?: number | null;
+  lesson_count?: number | null;
+  syllabus?: {
+    id: string;
+    title: string;
+    lessons: { id: string; title: string; content_type: string; is_preview: boolean }[];
+  }[];
   instructor?: { full_name: string } | null;
   intro_video_url?: string | null;
 }
@@ -743,6 +749,72 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                   </ul>
                 </div>
               </section>
+
+              {/* ── Syllabus ── */}
+              {/* A bare module count cannot tell a buyer what two hours contains. The LMS already
+                  stores every module and lesson title; name them. */}
+              {course.syllabus && course.syllabus.length > 0 && (
+                <section>
+                  <h2
+                    className="mb-4 text-xl font-bold"
+                    style={{ color: 'rgba(255,255,255,0.92)' }}
+                  >
+                    Syllabus
+                  </h2>
+                  <p className="mb-4 text-sm" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                    {course.syllabus.length} module{course.syllabus.length === 1 ? '' : 's'}
+                    {course.lesson_count
+                      ? ` · ${course.lesson_count} lesson${course.lesson_count === 1 ? '' : 's'}`
+                      : ''}
+                    {course.duration_hours ? ` · ${course.duration_hours}` : ''}
+                  </p>
+                  <ol className="space-y-4">
+                    {course.syllabus.map((mod, modIndex) => (
+                      <li key={mod.id} className="rounded-sm p-6" style={glassPanelSubtle}>
+                        <h3
+                          className="mb-3 text-base font-semibold"
+                          style={{ color: 'rgba(255,255,255,0.92)' }}
+                        >
+                          <span style={{ color: 'rgba(255,255,255,0.45)' }}>
+                            Module {modIndex + 1}
+                          </span>
+                          {' — '}
+                          {mod.title}
+                        </h3>
+                        {mod.lessons.length > 0 && (
+                          <ul className="space-y-2">
+                            {mod.lessons.map((lesson) => (
+                              <li
+                                key={lesson.id}
+                                className="flex items-start gap-3 text-sm leading-relaxed"
+                                style={{ color: 'rgba(255,255,255,0.7)' }}
+                              >
+                                <span aria-hidden="true" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                                  •
+                                </span>
+                                <span>
+                                  {lesson.title}
+                                  {lesson.is_preview && (
+                                    <span
+                                      className="ml-2 rounded-sm px-1.5 py-0.5 text-xs font-medium"
+                                      style={{
+                                        background: 'rgba(255,255,255,0.1)',
+                                        color: 'rgba(255,255,255,0.75)',
+                                      }}
+                                    >
+                                      Preview
+                                    </span>
+                                  )}
+                                </span>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </li>
+                    ))}
+                  </ol>
+                </section>
+              )}
 
               {/* ── Course Details Grid ── */}
               <section>
