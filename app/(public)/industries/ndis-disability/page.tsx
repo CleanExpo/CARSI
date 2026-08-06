@@ -48,7 +48,7 @@ const faqs = [
   {
     question: 'What IICRC CEC training do NDIS service providers need?',
     answer:
-      'NDIS providers supporting participants in supported independent living (SIL) or specialist disability accommodation (SDA) have a duty of care to maintain safe, hygienic environments. IICRC AMRT (Applied Microbial Remediation Technician) training covers mould identification, containment, and remediation — skills directly relevant to Module 3 of the NDIS Practice Standards (Supports Provision Environment). WRT training supports water damage response in participant homes and shared accommodation facilities.',
+      'NDIS providers supporting participants in supported independent living (SIL) or specialist disability accommodation (SDA) have a duty of care to maintain safe, hygienic environments. CARSI mould remediation training covers mould identification, containment, and remediation — skills directly relevant to Module 3 of the NDIS Practice Standards (Supports Provision Environment). WRT training supports water damage response in participant homes and shared accommodation facilities.',
   },
   {
     question: 'How does mould affect NDIS participants and their accommodation?',
@@ -105,7 +105,7 @@ export default async function NDISDisabilityIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Meet NDIS Quality"
         headlineAccent="Safeguards"
-        description="600,000+ Australians rely on NDIS providers to maintain safe accommodation. IICRC AMRT and WRT CEC courses build staff competency for NDIS Practice Standards audits — protecting participants and provider registration. CARSI courses earn IICRC CECs; they are not IICRC certification."
+        description="600,000+ Australians rely on NDIS providers to maintain safe accommodation. CARSI mould remediation and water damage restoration CEC courses build staff competency for NDIS Practice Standards audits — protecting participants and provider registration. CARSI courses earn IICRC CECs; they are not IICRC certification."
         disciplines={disciplines}
         stats={stats}
       />

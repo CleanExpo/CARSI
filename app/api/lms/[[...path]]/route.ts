@@ -5,6 +5,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 
+import { getDesignationForCourseSlug } from '@/lib/designations/registry';
+
 type Ctx = { params: Promise<{ path?: string[] }> };
 
 function inferDisciplineFromCourseSlug(slug: string): string {
@@ -48,7 +50,19 @@ async function localStub(method: string, segments: string[]): Promise<NextRespon
       discipline,
       job_keywords,
       related_disciplines: [discipline],
-      pathway_name: `IICRC ${discipline} training pathway`,
+      // LICENCE-CRITICAL. This previously interpolated the course's discipline acronym into a
+      // "training pathway" label, which rendered live in the Career Opportunities block on public
+      // course pages — an IICRC Registered-Training-School discipline acronym branding a CARSI
+      // course, which CLAUDE.md § "CARSI designation rule" (founder, 2026-07-10) forbids outright.
+      //
+      // It survived because the acronym is interpolated from data and never appears literally in
+      // source — but the deeper reason is that NO guard implements the designation rule at all:
+      // check:iicrc-terminology returns 0 even on the fully literal string, and check:designations
+      // only validates registry internal consistency. Guard added alongside this fix.
+      //
+      // Now names CARSI's own designation, or nothing. The client already handles null
+      // (CourseHubContext renders the line only when pathway_name is truthy).
+      pathway_name: getDesignationForCourseSlug(slug)?.name ?? null,
     });
   }
 

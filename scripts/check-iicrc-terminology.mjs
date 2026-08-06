@@ -96,6 +96,32 @@ const BANNED = [
     message: 'CARSI is not an IICRC Approved School or Instructor — never claim that status (it is a separate IICRC licence class).',
   },
   {
+    // Discipline-acronym branding. CLAUDE.md § "CARSI designation rule" (founder, 2026-07-10):
+    // CARSI courses are NEVER branded with IICRC Registered-Training-School discipline
+    // designations/acronyms (WRT/ASD/AMRT/FSRT/CCT/CRT/OCT/TCST), and never described as
+    // "[discipline]-aligned". CARSI issues its own Southern Hemisphere designations.
+    //
+    // This rule did not exist until 2026-08-07 and the founder MUST was therefore enforced by
+    // nothing. It was found live: the Career Opportunities block on public course pages rendered
+    // "IICRC WRT training pathway", built by a template literal in the /api/lms catch-all so the
+    // acronym never appeared in source. The guard returned 0 even on the fully literal string.
+    //
+    // Nominative third-person references to an IICRC certification remain legal ("FSRT is an
+    // IICRC certification covering…", a student's own recert) — what is banned is an acronym
+    // used to brand or frame a CARSI course.
+    re: /\bIICRC[\s-]+(WRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)\b|\b(WRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)[\s-]+aligned\b/i,
+    // Narrow allows, each a case CLAUDE.md explicitly permits — never a blanket bypass:
+    //  1. nominative third-person fact about an IICRC certification;
+    //  2. a legacy lowercase-hyphenated URL slug from the WordPress import (an identifier, not
+    //     copy — rewriting these breaks live redirects);
+    //  3. a PERSON's own certifications, which CLAUDE.md allows referencing third-person
+    //     ("a student's own recert / member number / CEC tracking").
+    allow:
+      /\b(WRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)\s+is\s+an?\s+IICRC\s+certification\b|[a-z0-9]-iicrc-(wrt|asd|amrt|fsrt|cct|crt|oct|tcst)\b|\bcertifications\s*:/i,
+    message:
+      'Never brand a CARSI course with an IICRC discipline acronym or "[discipline]-aligned" — CARSI issues its own Southern Hemisphere designations (CLAUDE.md § CARSI designation rule). Nominative third-person references to an IICRC certification are still allowed.',
+  },
+  {
     // Endorsement claims. The IICRC states it "does not promote any particular
     // educational provider" — endorsement/partnership/promotion claims are banned.
     re: /endorsed[\s-]+by[\s-]+(the[\s-]+)?IICRC/i,

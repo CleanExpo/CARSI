@@ -58,7 +58,7 @@ const faqs = [
   {
     question: 'What is vehicle interior restoration training?',
     answer:
-      'IICRC CRT (Carpet & Upholstery Cleaning) training covers fabric and surface restoration techniques for vehicle interiors including buses, coaches, trucks, and fleet cars. For transport operators, this means extending asset life, maintaining hygiene standards for passenger vehicles, and reducing outsourced detailing costs across large fleets.',
+      'CARSI carpet repair and reinstallation training covers fabric and surface restoration techniques for vehicle interiors including buses, coaches, trucks, and fleet cars. For transport operators, this means extending asset life, maintaining hygiene standards for passenger vehicles, and reducing outsourced detailing costs across large fleets.',
   },
   {
     question: 'Can transport and logistics staff train online around shift schedules?',

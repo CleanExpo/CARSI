@@ -16,7 +16,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'IICRC CEC Training for Real Estate & Property Sales | CARSI Australia',
   description:
-    'Vendor disclosure compliance and pre-sale remediation. IICRC WRT, ASD, and AMRT CEC courses for real estate agents, property managers, and conveyancers. Online, CEC Accredited — continuing education credits, not IICRC certification.',
+    'Vendor disclosure compliance and pre-sale remediation. CARSI water damage restoration, applied structural drying and mould remediation CEC courses for real estate agents, property managers, and conveyancers. Online, CEC Accredited — continuing education credits, not IICRC certification.',
   keywords: [
     'real estate IICRC CEC training Australia',
     'water damage disclosure property',
@@ -48,7 +48,7 @@ const faqs = [
   {
     question: 'Do real estate agents need water damage and mould training in Australia?',
     answer:
-      'Real estate agents in Australia are not legally required to hold IICRC certification, but they have a statutory obligation under Australian Consumer Law and state-specific property acts to disclose known material defects — including water damage and mould — to prospective buyers. IICRC WRT and AMRT training equips agents to identify moisture damage and mould during property inspections, protecting them from non-disclosure liability and enabling them to advise vendors on required remediation before listing.',
+      'Real estate agents in Australia are not legally required to hold IICRC certification, but they have a statutory obligation under Australian Consumer Law and state-specific property acts to disclose known material defects — including water damage and mould — to prospective buyers. CARSI water damage restoration and mould remediation training equips agents to identify moisture damage and mould during property inspections, protecting them from non-disclosure liability and enabling them to advise vendors on required remediation before listing.',
   },
   {
     question:
@@ -64,7 +64,7 @@ const faqs = [
   {
     question: 'What is moisture mapping and why does it matter for real estate?',
     answer:
-      'Moisture mapping is a systematic process of recording moisture readings across a property using calibrated meters and thermal imaging — producing a documented baseline of moisture conditions. In real estate, moisture maps are used to verify that remediation has been completed to IICRC standard before settlement, to resolve building inspection disputes, and to support insurance claims for storm or flood damage. IICRC WRT and ASD training includes moisture mapping methodology, making trained agents significantly more effective in complex property transactions.',
+      'Moisture mapping is a systematic process of recording moisture readings across a property using calibrated meters and thermal imaging — producing a documented baseline of moisture conditions. In real estate, moisture maps are used to verify that remediation has been completed to IICRC standard before settlement, to resolve building inspection disputes, and to support insurance claims for storm or flood damage. CARSI water damage restoration and applied structural drying training includes moisture mapping methodology, making trained agents significantly more effective in complex property transactions.',
   },
 ];
 
@@ -106,7 +106,7 @@ export default async function RealEstateIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Pre-Sale Remediation"
         headlineAccent="& Disclosure Compliance"
-        description="1.1 million Australian property transactions per year carry water damage and mould disclosure obligations. IICRC WRT and AMRT training gives real estate professionals the knowledge to identify, document, and advise on remediation — protecting vendors, buyers, and agents."
+        description="1.1 million Australian property transactions per year carry water damage and mould disclosure obligations. CARSI water damage restoration and mould remediation training gives real estate professionals the knowledge to identify, document, and advise on remediation — protecting vendors, buyers, and agents."
         disciplines={disciplines}
         stats={stats}
       />

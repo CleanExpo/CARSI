@@ -16,7 +16,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'IICRC CEC Mould & Odour Training for Gyms & Fitness Centres',
   description:
-    'Protect your members and your reputation. IICRC AMRT, OCT, and CRT training for Australian gyms, pools, and fitness facilities. Online, self-paced, CEC Accredited.',
+    'Protect your members and your reputation. CARSI mould remediation, odour control and carpet repair and reinstallation training for Australian gyms, pools, and fitness facilities. Online, self-paced, CEC Accredited.',
   keywords: [
     'gym mould training Australia',
     'fitness centre IICRC CEC course',
@@ -48,7 +48,7 @@ const faqs = [
   {
     question: 'Why do gyms and fitness centres need mould remediation training?',
     answer:
-      'Australian gyms generate consistently high humidity from sweat, showers, pools, and air conditioning — creating ideal conditions for mould growth in changerooms, wet decks, locker areas, and ceiling cavities. IICRC AMRT (Applied Microbial Remediation Technician) training teaches maintenance staff to identify mould species, assess moisture sources, and remediate using protocols that eliminate regrowth. Without trained staff, gyms typically experience recurring mould complaints that damage Google reviews, trigger council inspections, and expose operators to liability under Australian Consumer Law.',
+      'Australian gyms generate consistently high humidity from sweat, showers, pools, and air conditioning — creating ideal conditions for mould growth in changerooms, wet decks, locker areas, and ceiling cavities. CARSI mould remediation training teaches maintenance staff to identify mould species, assess moisture sources, and remediate using protocols that eliminate regrowth. Without trained staff, gyms typically experience recurring mould complaints that damage Google reviews, trigger council inspections, and expose operators to liability under Australian Consumer Law.',
   },
   {
     question: 'What causes mould in Australian fitness centres and how can it be prevented?',
@@ -63,7 +63,7 @@ const faqs = [
   {
     question: 'What is OCT certification and how does it help fitness facilities?',
     answer:
-      "OCT (Odour Control Technician) is an IICRC certification covering the science of odour identification, source elimination, and odour counteractant application. For gyms and fitness centres, CARSI's OCT-aligned CEC training is particularly valuable for persistent locker room odours, post-flooding musty smells, and gym mat odour management. Unlike masking agents, OCT-aligned protocols address the biological and chemical source of odours — resolving complaints that damage member retention and online reputation.",
+      "OCT (Odour Control Technician) is an IICRC certification covering the science of odour identification, source elimination, and odour counteractant application. For gyms and fitness centres, CARSI's odour control CEC training is particularly valuable for persistent locker room odours, post-flooding musty smells, and gym mat odour management. Unlike masking agents, odour control protocols address the biological and chemical source of odours — resolving complaints that damage member retention and online reputation.",
   },
 ];
 
@@ -79,7 +79,7 @@ const whyCards = [
     icon: Wind,
     title: 'Odour Control (OCT)',
     description:
-      "Persistent gym odours damage reviews and drive churn. CARSI's OCT-aligned CEC training covers source-based odour elimination — not just masking — for locker rooms, wet areas, and equipment zones.",
+      "Persistent gym odours damage reviews and drive churn. CARSI's odour control CEC training covers source-based odour elimination — not just masking — for locker rooms, wet areas, and equipment zones.",
     color: '#388e3c',
   },
   {
@@ -105,7 +105,7 @@ export default async function GymsFitnessIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Protect Your Members"
         headlineAccent="and Your Reputation"
-        description="Australian gyms face constant mould and odour risk from high-humidity environments. IICRC AMRT and OCT CEC courses give your maintenance team the protocols to keep facilities clean, compliant, and member-ready. CARSI courses earn IICRC CECs; they are not IICRC certification."
+        description="Australian gyms face constant mould and odour risk from high-humidity environments. CARSI mould remediation and odour control CEC courses give your maintenance team the protocols to keep facilities clean, compliant, and member-ready. CARSI courses earn IICRC CECs; they are not IICRC certification."
         disciplines={disciplines}
         stats={stats}
       />

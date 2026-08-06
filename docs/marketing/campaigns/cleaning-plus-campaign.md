@@ -163,7 +163,7 @@ CTA: See the restoration pathway →
 | "water damage restoration training" | Phrase | $2.80–4.50 |
 | "cleaning to restoration course" | Broad modified | $2.00–3.50 |
 | "add restoration services" | Phrase | $1.80–3.00 |
-| "IICRC WRT course online" | Exact | $4.00–6.00 |
+| "water damage restoration course online" | Exact | $4.00–6.00 |
 | "mould remediation certification" | Phrase | $3.00–5.00 |
 
 **Budget:** $1,500–2,500 AUD/month

@@ -33,7 +33,7 @@ Adjust allocation monthly based on vertical ROAS. Start conservative, scale winn
 - [IICRC certification Australia]
 - [water damage restoration course]
 - [mould remediation training online]
-- [IICRC WRT certification]
+- [water damage restoration certification]
 - [flood restoration training Australia]
 - [structural drying course online]
 - [IICRC CEC courses]
@@ -108,7 +108,7 @@ Adjust allocation monthly based on vertical ROAS. Start conservative, scale winn
 - [carpet cleaning certification online]
 - [commercial mould remediation training]
 - [cleaning business certification Australia]
-- [IICRC CCT certification]
+- [carpet cleaning technician certification]
 
 **Broad Match Modifier**
 

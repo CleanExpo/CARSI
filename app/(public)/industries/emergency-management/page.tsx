@@ -16,7 +16,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'IICRC CEC Training for Emergency Management & SES | CARSI Australia',
   description:
-    'Train SES volunteers and council emergency teams before disaster strikes. IICRC WRT, FSRT, ASD, and AMRT certification for flood and fire response. Online, CEC Accredited.',
+    'Train SES volunteers and council emergency teams before disaster strikes. CARSI water damage restoration, fire and smoke restoration, applied structural drying and mould remediation certification for flood and fire response. Online, CEC Accredited.',
   keywords: [
     'SES IICRC CEC training Australia',
     'emergency management restoration training',
@@ -49,7 +49,7 @@ const faqs = [
   {
     question: 'What IICRC CEC training is relevant for SES volunteers and emergency responders?',
     answer:
-      'State Emergency Service (SES) volunteers performing damage assessment and initial response after flooding benefit significantly from IICRC WRT (Water Damage Restoration Technician) training. WRT covers moisture behaviour in building materials, structural damage assessment, and documentation — enabling volunteers to triage flood-affected properties more accurately, advise homeowners on immediate protective actions, and produce assessment records that support insurance claims. FSRT (Fire & Smoke Restoration) certification is similarly valuable for volunteers supporting post-bushfire triage.',
+      'State Emergency Service (SES) volunteers performing damage assessment and initial response after flooding benefit significantly from CARSI water damage restoration training. WRT covers moisture behaviour in building materials, structural damage assessment, and documentation — enabling volunteers to triage flood-affected properties more accurately, advise homeowners on immediate protective actions, and produce assessment records that support insurance claims. FSRT (Fire & Smoke Restoration) certification is similarly valuable for volunteers supporting post-bushfire triage.',
   },
   {
     question: 'How does WRT training help with flood response in Australian communities?',
@@ -107,7 +107,7 @@ export default async function EmergencyManagementIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Train Before"
         headlineAccent="Disaster Strikes"
-        description="Australia's 40,000+ SES volunteers and council emergency teams respond to thousands of flood and fire events every year. IICRC WRT, FSRT, and ASD training gives responders the restoration science knowledge to protect communities more effectively."
+        description="Australia's 40,000+ SES volunteers and council emergency teams respond to thousands of flood and fire events every year. CARSI water damage restoration, fire and smoke restoration and applied structural drying training gives responders the restoration science knowledge to protect communities more effectively."
         disciplines={disciplines}
         stats={stats}
       />

@@ -63,7 +63,7 @@ const faqs = [
   {
     question: 'What is mould remediation training for healthcare facilities?',
     answer:
-      'IICRC AMRT (Applied Microbial Remediation) training covers mould identification, moisture assessment, containment procedures, and remediation protocols specific to clinical environments. In Australian hospitals, this is critical for plant rooms, basement services, and water-damaged areas where microbial growth poses infection risks to immunocompromised patients.',
+      'CARSI mould remediation training covers mould identification, moisture assessment, containment procedures, and remediation protocols specific to clinical environments. In Australian hospitals, this is critical for plant rooms, basement services, and water-damaged areas where microbial growth poses infection risks to immunocompromised patients.',
   },
 ];
 

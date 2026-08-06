@@ -53,12 +53,12 @@ const faqs = [
   {
     question: 'What WHS obligations apply to mould in government buildings?',
     answer:
-      'Under Australian WHS legislation, government employers have a duty of care to identify and manage mould and moisture hazards. IICRC AMRT (Applied Microbial Remediation) training provides facility teams with the skills to conduct mould assessments, implement containment protocols, and document remediation — demonstrating WHS due diligence to regulators.',
+      'Under Australian WHS legislation, government employers have a duty of care to identify and manage mould and moisture hazards. CARSI mould remediation training provides facility teams with the skills to conduct mould assessments, implement containment protocols, and document remediation — demonstrating WHS due diligence to regulators.',
   },
   {
     question: 'How do you restore heritage-listed government buildings after water damage?',
     answer:
-      'Heritage-listed buildings require specialised structural drying techniques that avoid damaging original materials. IICRC ASD (Applied Structural Drying) certification trains government maintenance teams in low-impact drying methods, moisture monitoring, and documentation protocols that satisfy both heritage conservation requirements and WHS compliance.',
+      'Heritage-listed buildings require specialised structural drying techniques that avoid damaging original materials. CARSI applied structural drying training trains government maintenance teams in low-impact drying methods, moisture monitoring, and documentation protocols that satisfy both heritage conservation requirements and WHS compliance.',
   },
   {
     question: 'Can government facility staff complete IICRC CEC training online?',
