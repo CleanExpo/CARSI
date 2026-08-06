@@ -167,6 +167,16 @@ interface CourseSchemaProps {
   credentialAwarded?: string;
 }
 
+/**
+ * The credential disclaimer, single-sourced. Kept identical to the sentence rendered above the
+ * fold on the course page so prose and structured data can never drift apart — drift is how a
+ * machine reader ends up with a less careful claim than a human one.
+ */
+export const CREDENTIAL_DISCLAIMER =
+  'A CARSI-issued credential — not an IICRC certification. CARSI is an IICRC CEC Accredited ' +
+  'provider, so this course counts toward maintaining a certification you already hold. IICRC ' +
+  'certification itself is obtained through an IICRC-approved school and examination.';
+
 function normalizeCoursePrice(price: number | undefined): number | undefined {
   if (typeof price !== 'number' || !Number.isFinite(price) || price < 0) return undefined;
   return Number(price.toFixed(2));
@@ -260,6 +270,17 @@ export function CourseSchema({
       name: credentialAwarded,
       credentialCategory: 'certificate',
       recognizedBy: { '@id': 'https://carsi.com.au/#organization' },
+      // The page's own disclaimer, verbatim, carried INTO the machine-readable payload.
+      //
+      // A blind critic caught the asymmetry: the not-a-certification distinction appeared three
+      // times in prose and zero times here. An answer engine or aggregator lifts this node out of
+      // the page, and without these two fields it reads as "an occupational credential recognised
+      // by CARSI" — which is the one reader whose version of the page nobody had proofread.
+      //
+      // No new assertion: this is the sentence already published above the fold, and a link to the
+      // already-public verification surface. Still no CEC hour count and no IICRC provider number.
+      description: CREDENTIAL_DISCLAIMER,
+      url: 'https://carsi.com.au/verify/training-record',
     };
   }
 

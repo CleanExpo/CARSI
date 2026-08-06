@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 
-import { CourseSchema } from './JsonLd';
+import { CourseSchema, CREDENTIAL_DISCLAIMER } from './JsonLd';
 
 /**
  * Two independent blind critics judged this page's credential standing and both landed on the
@@ -51,12 +51,29 @@ describe('CourseSchema credential', () => {
     expect(schema.educationalCredentialAwarded).toBeUndefined();
   });
 
-  it('NEVER asserts CEC hours or an IICRC provider number in structured data', () => {
+  it('carries the not-a-certification disclaimer INTO the machine-readable payload', () => {
+    const schema = parseSchema(
+      renderToStaticMarkup(
+        <CourseSchema {...base} credentialAwarded="CARSI Water Restoration Practitioner" />
+      )
+    );
+    const cred = schema.educationalCredentialAwarded as Record<string, unknown>;
+    // An answer engine lifts this node out of the page. Without the disclaimer it reads as an
+    // unqualified occupational credential — the careful prose never reaches the machine reader.
+    expect(cred.description).toBe(CREDENTIAL_DISCLAIMER);
+    expect(cred.description).toMatch(/not an IICRC certification/);
+    expect(cred.url).toBe('https://carsi.com.au/verify/training-record');
+  });
+
+  it('NEVER asserts a CEC hour count or an IICRC provider number', () => {
     const markup = renderToStaticMarkup(
       <CourseSchema {...base} credentialAwarded="CARSI Water Restoration Practitioner" />
     );
-    expect(markup).not.toMatch(/CEC/i);
-    expect(markup).not.toMatch(/IICRC/i);
-    expect(markup).not.toMatch(/provider\s*number/i);
+    // Guards over-CLAIMING, not the word itself — the disclaimer names IICRC in a negation, which
+    // is the opposite of a claim. What must never appear is a NUMBER attached to CEC, or any
+    // provider/approval identifier. Both are founder-confirmed data with a fail-closed registry.
+    expect(markup).not.toMatch(/\d+\s*(hour|hr|CEC)/i);
+    expect(markup).not.toMatch(/CEC[^.]{0,20}\d/i);
+    expect(markup).not.toMatch(/(provider|approval|registration)\s*(number|no\.?|id)/i);
   });
 });
