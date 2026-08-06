@@ -479,7 +479,20 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                     </span>{' '}
                     CARSI is an IICRC CEC Accredited provider, so this course counts toward
                     maintaining a certification you already hold. IICRC certification itself is
-                    obtained through an IICRC-approved school and examination.
+                    obtained through an IICRC-approved school and examination.{' '}
+                    {/* Both credential critics asked for a verification path. One already exists
+                        and is public — app/(public)/verify/credential/[credentialId] and
+                        /verify/training-record, neither auth-gated — but the course page linked
+                        it zero times, so the buyer had no way to know the credential is checkable
+                        at source. Surface it where the credential is sold. */}
+                    <Link
+                      href="/verify/training-record"
+                      className="underline underline-offset-2"
+                      style={{ color: '#ed9d24' }}
+                    >
+                      Every CARSI credential gets a public verification page
+                    </Link>{' '}
+                    an employer or insurer can check without contacting us.
                   </p>
 
                   {/* Star rating (social proof) — only when the course has published reviews */}
