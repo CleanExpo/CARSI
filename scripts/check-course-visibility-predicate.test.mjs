@@ -40,6 +40,25 @@ const MUST_BLOCK = [
     'course relation filter with a NON-publication status nearby',
     "const rows = await prisma.lmsEnrollment.findMany({\n  where: {\n    status: { in: ['active'] },\n    course: { isPublished: true },\n  },\n});",
   ],
+  // Defect 5, found by the independent reviewer on d8c463d9. The context gate admitted only
+  // `where` and `.filter`, so an in-memory decision written as plain control flow never reached
+  // the model check. This is the LEAST exotic shape in the file and it was the one that escaped.
+  [
+    'bare member read in a conditional (defect 5)',
+    'const course = await getCourse(slug);\nif (course.isPublished) {\n  return renderCourse(course);\n}\nreturn notFound();',
+  ],
+  [
+    'member read assigned to a variable (defect 5)',
+    'const course = rows[0];\nconst visible = course.isPublished;\nreturn visible ? course : null;',
+  ],
+  [
+    'destructured off a course object (defect 5)',
+    'const course = await getCourse(slug);\nconst { title, isPublished } = course;\nif (!isPublished) return notFound();',
+  ],
+  [
+    'member read returned directly (defect 5)',
+    'export function canSee(course: LmsCourse) {\n  return course.isPublished;\n}',
+  ],
 ];
 
 const MUST_PASS = [

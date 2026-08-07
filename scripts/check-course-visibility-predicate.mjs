@@ -93,7 +93,17 @@ export function evaluateFile(file, text) {
     // `.filter((p) => p.courses.length > 0)`, so the real filter on the next line was never
     // recognised. A canary caught it; the window was the wrong instrument.
     const inFilter = /\.filter\s*\(/.test(line);
-    if (!inWhere && !inFilter) continue;
+    // An in-memory read off a course object. Two shapes, and BOTH are visibility decisions that
+    // live outside a query:
+    //     if (course.isPublished) { renderCourse() }
+    //     const { isPublished } = course
+    // The independent reviewer found this as a true-negative (P0, 2026-08-07): the gate below
+    // admitted only `where` and `.filter` contexts, so a bare member read never reached the
+    // model-resolution check that was already written to catch it. A learner could still be gated
+    // on the legacy column with the guard green — the precise failure this guard exists to stop.
+    const memberRead = /\.course\.isPublished\b/.test(line) || /\bcourse\.isPublished\b/.test(line);
+    const destructuredRead = /\{[^}]*\bisPublished\b[^}]*\}\s*=\s*[\w.]*[Cc]ourse\w*/.test(line);
+    if (!inWhere && !inFilter && !memberRead && !destructuredRead) continue;
 
     // SAFE only when a PUBLICATION status clause sits alongside it — the tolerant union.
     //
@@ -112,11 +122,11 @@ export function evaluateFile(file, text) {
     // A nested course relation inside another model's query still counts.
     // Same depth scan: is the hit inside a still-open `course: { … }` relation block?
     const nestedCourse = openBlock('course');
-    // An in-memory read off a course object. A canary proved this was being missed: in
-    // pathway-progress the nearest `prisma.` model is lmsLessonProgress, so
-    // `.filter(pc => pc.course.isPublished)` was skipped.
-    const memberRead = /\.course\.isPublished\b/.test(line) || /\bcourse\.isPublished\b/.test(line);
-    if (!isCourseModel && !nestedCourse && !memberRead) continue;
+    // `memberRead` / `destructuredRead` (computed above) also settle the model question: a read
+    // written as `course.isPublished` names its own entity, so it needs no `prisma.` lookup. A
+    // canary proved this was being missed for the filter case — in pathway-progress the nearest
+    // `prisma.` model is lmsLessonProgress, so `.filter(pc => pc.course.isPublished)` was skipped.
+    if (!isCourseModel && !nestedCourse && !memberRead && !destructuredRead) continue;
 
     findings.push({ file, line: lineNo, text: line.trim().slice(0, 120) });
   }
