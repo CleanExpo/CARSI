@@ -74,7 +74,14 @@ function bodyStats(course) {
   return { chars, lessons, quizWithContent };
 }
 
-function scoreCourse(course) {
+/**
+ * Exported so scripts/check-course-completeness.test.mjs can prove each bar FAILS when the
+ * element is missing, without those gaps having to exist in the catalogue. This scorecard
+ * runs in advisory mode and exits 0 even while reporting 0/37 finalised, so nothing else in
+ * CI can tell the difference between a working bar and a bar that always returns true —
+ * exactly how the introVideo shortcut survived.
+ */
+export function scoreCourse(course) {
   const slug = course.slug || course.id;
   const { chars, lessons, quizWithContent } = bodyStats(course);
   const bodyBlob = JSON.stringify(course).toLowerCase();
@@ -101,6 +108,14 @@ function scoreCourse(course) {
   const open = Object.entries(checks).filter(([, ok]) => !ok).map(([k]) => k);
   return { slug, title: course.title, chars, lessons, checks, open, complete: open.length === 0 };
 }
+
+// CLI only. Importing this module for the self-test must not run the scan or exit the
+// process — without this, `import` prints the whole scorecard and calls process.exit(),
+// so a self-test can never observe scoreCourse at all.
+const isCli = import.meta.url === `file://${process.argv[1]}`;
+if (!isCli) {
+  // Nothing below runs on import.
+} else {
 
 const scored = courses.map(scoreCourse);
 
@@ -143,3 +158,5 @@ if (failing.length) {
 }
 console.log(`\n  ✓ all enforced courses finalised.\n`);
 process.exit(0);
+
+}

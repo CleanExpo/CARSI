@@ -110,6 +110,12 @@ jobs:
       - name: Course completeness scorecard (advisory)
         run: npm run check:course-completeness
 
+      # The scorecard above is advisory and exits 0 even at 0/37 finalised, so nothing else
+      # in CI can tell a working bar from one that always returns true — that is how the
+      # introVideo slug shortcut survived. This self-test is NOT advisory.
+      - name: Course completeness scorecard self-test
+        run: npm run test:course-completeness
+
       # Licence-critical backstop: scans all course-content + marketing surfaces
       # (data/seed, public/courses, docs/marketing, docs/content) for stray IICRC
       # placements, banned "IICRC-approved"/"certified with CARSI" phrasing, and

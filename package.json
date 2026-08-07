@@ -110,7 +110,8 @@
     "check:course-visibility": "node scripts/check-course-visibility-predicate.mjs",
     "test:course-visibility": "node scripts/check-course-visibility-predicate.test.mjs",
     "test:iicrc-terminology": "node scripts/check-iicrc-terminology.test.mjs",
-    "test:sources": "node scripts/check-source-citations.test.mjs"
+    "test:sources": "node scripts/check-source-citations.test.mjs",
+    "test:course-completeness": "node scripts/check-course-completeness.test.mjs"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.3",
