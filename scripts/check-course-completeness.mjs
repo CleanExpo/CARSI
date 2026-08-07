@@ -82,7 +82,18 @@ function scoreCourse(course) {
   const checks = {
     assessment: quizWithContent || draftSlugs.has(slug),
     thumbnail: !!course.thumbnailUrl,
-    introVideo: !!course.introVideoUrl || mediaSlugs.has(slug) || mediaSlugs.has('ccw-workshop') && /ccw|carpet|floor|truckmount/.test(slug),
+    // Evidence about THIS course only: an intro video on the course record, or a media manifest
+    // that names this slug and carries a video asset.
+    //
+    // A third clause used to read:
+    //   mediaSlugs.has('ccw-workshop') && /ccw|carpet|floor|truckmount/.test(slug)
+    // which passed any course whose slug merely CONTAINED one of those words, on the strength of
+    // a single unrelated `ccw-workshop` manifest. It reported 5 of 37 courses "finalised" while
+    // every one of the 37 had introVideoUrl undefined — verified by direct field read. A
+    // scorecard that manufactures a pass is worse than no scorecard: it retires the very work it
+    // exists to track. If a course really is covered by workshop footage, name its slug in a
+    // manifest and the second clause will find it.
+    introVideo: !!course.introVideoUrl || mediaSlugs.has(slug),
     metadata: !!course.durationHours && !!course.level && !!course.category && !!course.shortDescription && Array.isArray(course.tags) && course.tags.length > 0,
     scaffolds: /objective|by the end|you will (be able|learn)/.test(bodyBlob) && /(did you know|key takeaway|remember|expert nugget|take-?away|in summary|recap)/.test(bodyBlob),
     depth: chars >= MIN_BODY && (lessons === 0 || chars / lessons >= MIN_PER_LESSON),
