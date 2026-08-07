@@ -66,7 +66,7 @@ const BANNED = [
     // greedy enough to swallow the leading "e" of "e.g." and leave a residue that still trips
     // the rule. The bounded lengths keep each exemption to its own construction.
     neutralise:
-      /\be\.g\.[^*]{0,60}?(?=\)|\*\/|$)|\bnever\s+(?:call|brand|use|say)\b.*$|.*\bnever\s+(?:call|brand|use|say)\b.*$|\bdoes\s+not\s+brand\b.*$|.*\bnot\s+by\s+(?:WRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)[/,].*$|\b(?:WRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)\b[^.!?]{0,40}?\b(?:required|held|sought|requested)\s+by\b|\b(?:code|codes|certifications?|discipline)s?\b[^.!?(]{0,30}\([^)]*\)|\bIICRC\s+Discipline:[^`]{0,60}/gi,
+      /\be\.g\.[^*]{0,60}?(?=\)|\*\/|$)|\bnever\s+(?:call|brand|use|say)\b.*$|.*\bnever\s+(?:call|brand|use|say)\b.*$|\bdoes\s+not\s+brand\b.*$|.*\bnot\s+by\s+(?:WRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)[/,].*$|\b(?:WRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)\b[^.!?]{0,40}?\b(?:required|held|sought|requested)\s+by\b|\b(?:code|codes|certifications?)\b[^.!?(]{0,30}\([^)]*\)|\bIICRC\s+Discipline:[^`]{0,60}/gi,
     message:
       'Do not list IICRC discipline acronyms — a CARSI course carries its CARSI Southern Hemisphere designation. Reference at most one IICRC certification, third-person.',
   },
