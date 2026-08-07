@@ -75,6 +75,17 @@ const MUST_BLOCK = [
     "`Published courses across ${d} restoration discipline${d === 1 ? '' : 's'} — each earning continuing education credits toward an IICRC certification`",
   ],
   ['IICRC-training rule is not whole-line allowed', 'IICRC training through CARSI — CARSI is IICRC CEC Accredited'],
+  // The last two whole-line `allow`s, converted to `neutralise`. Both were latent rather
+  // than live — the tree was already clean of them — but a compliant half must never
+  // exempt a false half on the same line, which is how this file was bitten three times.
+  [
+    'a CEC token does not exempt a bare "IICRC courses" claim',
+    'Enrol in our IICRC courses today — CARSI is IICRC CEC Accredited.',
+  ],
+  [
+    'a third-person school mention does not exempt the claim beside it',
+    'CARSI is an IICRC Approved School — certification is obtained through an IICRC approved school.',
+  ],
 ];
 
 const MUST_PASS = [
@@ -126,6 +137,9 @@ const MUST_PASS = [
     'Compare that to $2,000–5,000 per person for face-to-face IICRC certification training at approved schools.',
   ],
   ['compliant CEC training phrasing', 'Enrol in our IICRC CEC training today.'],
+  // The constructions those two neutralise spans exist to protect.
+  ['spelled-out compliant course form', 'Enrol in our IICRC Continuing Education Credit courses.'],
+  ['third-person certification route', 'IICRC certification is obtained through an IICRC approved school and examination.'],
   // The disclaimer itself names IICRC in a NEGATION — the opposite of a claim, and it ships
   // on every course page. If the guard ever blocks this, the product loses its honest framing.
   [

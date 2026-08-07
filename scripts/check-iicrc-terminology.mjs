@@ -127,7 +127,12 @@ const BANNED = [
     // "IICRC course" / "IICRC courses" — must be "IICRC CEC course(s)".
     re: /\bIICRC[\s-]+courses?\b/i,
     // ...unless it is already the compliant "IICRC CEC course(s)" or the spelled-out form.
-    allow: /\bIICRC[\s-]+(CEC|Continuing[\s-]+Education[\s-]+Credit)/i,
+    // `neutralise`, not `allow`. As a whole-line allow, ANY line containing "IICRC CEC"
+    // exempted the whole rule, so "Enrol in our IICRC courses today — CARSI is IICRC CEC
+    // Accredited" passed on the strength of its compliant half. Deleting only the compliant
+    // span and re-testing the remainder leaves the bare "IICRC courses" visible.
+    allow: null,
+    neutralise: /\bIICRC[\s-]+(?:CEC|Continuing[\s-]+Education[\s-]+Credit)\w*(?:[\s-]+(?:Accredited|courses?))?/gi,
     message: 'Use "IICRC CEC course(s)", not "IICRC course(s)".',
   },
   {
@@ -175,7 +180,11 @@ const BANNED = [
     // Third-person facts ("certification is obtained through an IICRC-approved school")
     // are allowed via the preposition context.
     re: /\bIICRC[\s-]+Approved[\s-]+(School|Instructor)\b/i,
-    allow: /\b(through|via|from|at)\s+(an?\s+)?IICRC[\s-]+approved\s+school\b/i,
+    // `neutralise`, not `allow`. As a whole-line allow, one third-person mention exempted the
+    // line, so "CARSI is an IICRC Approved School — certification is obtained through an
+    // IICRC approved school" passed: the true second clause laundered the false first one.
+    allow: null,
+    neutralise: /\b(?:through|via|from|at)\s+(?:an?\s+)?IICRC[\s-]+approved\s+schools?\b/gi,
     message: 'CARSI is not an IICRC Approved School or Instructor — never claim that status (it is a separate IICRC licence class).',
   },
   {
