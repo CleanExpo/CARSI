@@ -16,7 +16,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Food Processing Facility IICRC CEC Training',
   description:
-    'HACCP-aligned IICRC CEC training for Australian food processing facilities. AMRT, OCT and CCT courses supporting hygiene compliance, cold storage maintenance, and contamination prevention.',
+    'HACCP-aligned IICRC CEC training for Australian food processing facilities. Mould remediation, odour control and carpet cleaning courses supporting hygiene compliance, cold storage maintenance, and contamination prevention.',
   keywords: [
     'food processing IICRC CEC training Australia',
     'HACCP compliance restoration',
@@ -86,7 +86,7 @@ const whyCards = [
     icon: SprayCan,
     title: 'Odour & Surface Control',
     description:
-      'Organic odours and surface contamination in processing areas require specialist remediation. OCT and CCT certifications provide standards-based approaches.',
+      'Organic odours and surface contamination in processing areas require specialist remediation. Odour control and carpet cleaning certifications provide standards-based approaches.',
     color: '#ed9d24',
   },
 ];
@@ -119,7 +119,7 @@ export default async function FoodProcessingIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="Food Processing Industry"
-        disciplineList="AMRT, OCT & CCT"
+        disciplineList="Mould remediation, odour control and carpet cleaning"
         disciplines={['AMRT', 'OCT', 'CCT']}
       />
 

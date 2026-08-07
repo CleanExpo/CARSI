@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Mining Site IICRC CEC Restoration Training',
   description:
-    'WHS-compliant IICRC restoration training for Australian mining operations. WRT, AMRT, and ASD courses for water damage, mould, and structural drying on remote sites.',
+    'WHS-compliant IICRC restoration training for Australian mining operations. Water damage restoration, mould remediation and structural drying courses for water damage, mould, and structural drying on remote sites.',
   keywords: [
     'mining IICRC CEC training Australia',
     'WHS compliance restoration',
@@ -94,7 +94,7 @@ export default async function MiningIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="Mining Industry"
-        disciplineList="WRT, AMRT & ASD"
+        disciplineList="Water damage restoration, mould remediation and structural drying"
         disciplines={['WRT', 'AMRT', 'ASD']}
       />
 

@@ -94,7 +94,7 @@ export default async function PropertyManagementIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="Property Management"
-        disciplineList="AMRT, WRT, CRT & ASD"
+        disciplineList="Mould remediation, water damage restoration, carpet repair and structural drying"
         disciplines={['AMRT', 'WRT', 'CRT', 'ASD']}
       />
 

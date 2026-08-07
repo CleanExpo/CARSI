@@ -19,7 +19,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = buildIndustryMetadata(
   'healthcare',
   'Healthcare IICRC CEC Training',
-  'NSQHS-aligned IICRC CEC training for Australian hospitals. AMRT, WRT, FSRT and ASD courses supporting Standard 3 compliance and JCI accreditation.',
+  'NSQHS-aligned IICRC CEC training for Australian hospitals. Mould remediation, water damage restoration, fire & smoke restoration and structural drying courses supporting Standard 3 compliance and JCI accreditation.',
   [
     'healthcare IICRC CEC training',
     'hospital restoration training',
@@ -116,7 +116,7 @@ export default async function HealthcareIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="Healthcare Industry"
-        disciplineList="AMRT, WRT, FSRT & ASD"
+        disciplineList="Mould remediation, water damage restoration, fire & smoke restoration and structural drying"
         disciplines={['AMRT', 'WRT', 'FSRT', 'ASD']}
       />
 

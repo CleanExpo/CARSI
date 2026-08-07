@@ -119,7 +119,7 @@ export default async function CaravanParksIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="Caravan Parks & Holiday Accommodation"
-        disciplineList="AMRT, CRT & WRT"
+        disciplineList="Mould remediation, carpet repair and water damage restoration"
         disciplines={['AMRT', 'CRT', 'WRT']}
       />
 

@@ -59,7 +59,7 @@ const faqs = [
   {
     question: 'Can council emergency management teams complete IICRC CEC training?',
     answer:
-      'Yes. Council emergency management coordinators, building surveyors, and flood response teams benefit from IICRC awareness-level training in WRT and ASD. Online, self-paced delivery means staff can complete training between deployments without disrupting rostering. Councils that invest in IICRC CEC training for emergency response staff report improved property triage accuracy, stronger documentation for DRFA (Disaster Recovery Funding Arrangements) claims, and better community outcomes in the weeks following a major weather event.',
+      'Yes. Council emergency management coordinators, building surveyors, and flood response teams benefit from IICRC awareness-level training in water damage restoration and structural drying. Online, self-paced delivery means staff can complete training between deployments without disrupting rostering. Councils that invest in IICRC CEC training for emergency response staff report improved property triage accuracy, stronger documentation for DRFA (Disaster Recovery Funding Arrangements) claims, and better community outcomes in the weeks following a major weather event.',
   },
   {
     question:
@@ -121,7 +121,7 @@ export default async function EmergencyManagementIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="Emergency Management & SES"
-        disciplineList="WRT, FSRT, ASD & AMRT"
+        disciplineList="Water damage restoration, fire & smoke restoration, structural drying and mould remediation"
         disciplines={['WRT', 'FSRT', 'ASD', 'AMRT']}
       />
 

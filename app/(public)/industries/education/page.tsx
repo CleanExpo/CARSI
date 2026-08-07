@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Education Sector IICRC CEC Training',
   description:
-    'IICRC CEC training for school and university maintenance teams. WRT, CRT, AMRT and ASD training for Australian education facilities.',
+    'IICRC CEC training for school and university maintenance teams. Water damage restoration, carpet repair, mould remediation and structural drying training for Australian education facilities.',
   keywords: [
     'education IICRC CEC training',
     'school restoration certification',
@@ -94,7 +94,7 @@ export default async function EducationIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="Education"
-        disciplineList="AMRT, WRT, CRT & ASD"
+        disciplineList="Mould remediation, water damage restoration, carpet repair and structural drying"
         disciplines={['AMRT', 'WRT', 'CRT', 'ASD']}
       />
 

@@ -19,7 +19,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = buildIndustryMetadata(
   'government-defence',
   'Government & Defence IICRC CEC Training',
-  'WHS-compliant IICRC CEC training for Australian councils, agencies and defence facilities. AMRT, WRT, ASD and FSRT courses for AusTender compliance.',
+  'WHS-compliant IICRC CEC training for Australian councils, agencies and defence facilities. Mould remediation, water damage restoration, structural drying and fire & smoke restoration courses for AusTender compliance.',
   [
     'government IICRC CEC training',
     'defence facility restoration',
@@ -116,7 +116,7 @@ export default async function GovernmentDefenceIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="Government & Defence"
-        disciplineList="AMRT, WRT, ASD & FSRT"
+        disciplineList="Mould remediation, water damage restoration, structural drying and fire & smoke restoration"
         disciplines={['AMRT', 'WRT', 'ASD', 'FSRT']}
       />
 

@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Retail & Shopping Centre IICRC CEC Training',
   description:
-    'IICRC CEC training for shopping centre maintenance teams. Pre-qualify for major landlord panels with WRT, CRT and OCT credentials.',
+    'IICRC CEC training for shopping centre maintenance teams. Pre-qualify for major landlord panels with water damage restoration, carpet repair and odour control credentials.',
   keywords: [
     'retail IICRC CEC training',
     'shopping centre restoration',
@@ -94,7 +94,7 @@ export default async function RetailIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="Retail & Shopping Centres"
-        disciplineList="WRT, CRT, OCT & FSRT"
+        disciplineList="Water damage restoration, carpet repair, odour control and fire & smoke restoration"
         disciplines={['WRT', 'CRT', 'OCT', 'FSRT']}
       />
 

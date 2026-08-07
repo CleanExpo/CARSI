@@ -120,7 +120,7 @@ export default async function RealEstateIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="Real Estate & Property Sales"
-        disciplineList="WRT, ASD & AMRT"
+        disciplineList="Water damage restoration, structural drying and mould remediation"
         disciplines={['WRT', 'ASD', 'AMRT']}
       />
 

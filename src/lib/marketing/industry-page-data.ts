@@ -27,7 +27,7 @@ export const featuredIndustryLinks: FeaturedIndustryLink[] = [
     href: '/industries/healthcare',
     label: 'Healthcare',
     title: 'Hospitals & clinical facilities',
-    detail: 'NSQHS-aligned AMRT, WRT, FSRT and ASD training for environmental services teams',
+    detail: 'NSQHS-aligned mould remediation, water damage restoration, fire & smoke restoration and structural drying training for environmental services teams',
     icon: HeartPulse,
   },
   {
@@ -51,7 +51,7 @@ export const featuredIndustryLinks: FeaturedIndustryLink[] = [
     href: '/industries/commercial-cleaning',
     label: 'Commercial Cleaning',
     title: 'Contractor growth & panels',
-    detail: 'CRT, CCT and OCT credentials for insurance work and tender differentiation',
+    detail: 'carpet repair, carpet cleaning and odour control credentials for insurance work and tender differentiation',
     icon: Sparkles,
   },
 ];

@@ -16,7 +16,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Museums & Cultural Institutions IICRC CEC Training',
   description:
-    'Heritage preservation and artifact protection training for Australian museums, galleries, and cultural institutions. AMRT, WRT and ASD courses for climate-controlled environments.',
+    'Heritage preservation and artifact protection training for Australian museums, galleries, and cultural institutions. Mould remediation, water damage restoration and structural drying courses for climate-controlled environments.',
   keywords: [
     'museum IICRC CEC training Australia',
     'heritage preservation restoration',
@@ -119,7 +119,7 @@ export default async function MuseumsCulturalIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="Museums & Cultural Institutions"
-        disciplineList="AMRT, WRT & ASD"
+        disciplineList="Mould remediation, water damage restoration and structural drying"
         disciplines={['AMRT', 'WRT', 'ASD']}
       />
 

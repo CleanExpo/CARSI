@@ -16,7 +16,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Transport & Logistics IICRC CEC Training',
   description:
-    'IICRC restoration training for Australian transport and logistics operations. WRT, CRT and OCT courses for vehicle interiors, warehouses, and loading dock maintenance.',
+    'IICRC restoration training for Australian transport and logistics operations. Water damage restoration, carpet repair and odour control courses for vehicle interiors, warehouses, and loading dock maintenance.',
   keywords: [
     'transport IICRC CEC training Australia',
     'logistics warehouse restoration',
@@ -86,7 +86,7 @@ const whyCards = [
     icon: Wind,
     title: 'Fleet Interior Maintenance',
     description:
-      'Vehicle interiors across bus, coach, and truck fleets require specialist cleaning. CRT and OCT certifications reduce outsourced costs and extend asset life.',
+      'Vehicle interiors across bus, coach, and truck fleets require specialist cleaning. Carpet repair and odour control certifications reduce outsourced costs and extend asset life.',
     color: '#ed9d24',
   },
 ];
@@ -119,7 +119,7 @@ export default async function TransportLogisticsIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="Transport & Logistics"
-        disciplineList="WRT, CRT & OCT"
+        disciplineList="Water damage restoration, carpet repair and odour control"
         disciplines={['WRT', 'CRT', 'OCT']}
       />
 

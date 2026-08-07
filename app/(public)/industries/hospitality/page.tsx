@@ -19,7 +19,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = buildIndustryMetadata(
   'hospitality',
   'Hospitality IICRC CEC Training',
-  'IICRC CEC Accredited training for Australian hotels and resorts. WRT, CRT, ASD and OCT courses for water damage, carpet care, structural drying and odour control.',
+  'IICRC CEC Accredited training for Australian hotels and resorts. Water damage restoration, carpet repair, structural drying and odour control courses for water damage, carpet care, structural drying and odour control.',
   [
     'hospitality IICRC CEC training',
     'hotel restoration training',
@@ -121,7 +121,7 @@ export default async function HospitalityIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="Hospitality & Tourism"
-        disciplineList="WRT, CRT, ASD & OCT"
+        disciplineList="Water damage restoration, carpet repair, structural drying and odour control"
         disciplines={['WRT', 'CRT', 'ASD', 'OCT']}
       />
 

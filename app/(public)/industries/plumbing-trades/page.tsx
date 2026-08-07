@@ -119,7 +119,7 @@ export default async function PlumbingTradesIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="Plumbing & Trades"
-        disciplineList="WRT, ASD & AMRT"
+        disciplineList="Water damage restoration, structural drying and mould remediation"
         disciplines={['WRT', 'ASD', 'AMRT']}
       />
 

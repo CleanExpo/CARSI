@@ -41,6 +41,68 @@ import { readFileSync } from 'node:fs';
 // CARSI itself delivers IICRC courses or IICRC certification.
 const BANNED = [
   {
+    // A LIST of two or more IICRC discipline acronyms. Found live in
+    // docs/marketing/linkedin-campaign.md ("WRT, CCT, AMRT — all online...") and on the
+    // hospitality industry page ("WRT, CRT, ASD and OCT courses"). Neither the
+    // "IICRC <acronym>" branch nor the "<acronym>-aligned" branch matched, because the
+    // acronyms sat in a bare comma list with no adjacent IICRC and no "aligned".
+    // Two-or-more in a list is always branding — a genuine third-person reference names
+    // ONE certification ("FSRT is an IICRC certification covering…").
+    re: /\b(WRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)\b\s*(?:,|&|,?\s+and\s+|\s*\/\s*)\s*\b(WRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)\b/i,
+    // These runs are legitimate and must not be rewritten:
+    //  - a source COMMENT or type doc describing the data format (`/** IICRC code (WRT/CRT…) */`);
+    //  - an AI prompt line that exists to FORBID the acronyms — rewriting it would delete the
+    //    instruction enforcing this very rule;
+    //  - the LEARNER's own codes, which CLAUDE.md explicitly permits;
+    //  - a third-person fact about IICRC's own certifications ("Standard technician
+    //    certifications (WRT, ASD, AMRT, etc.) require 14 CEC hours").
+    // Written as `neutralise` so the exempt span is deleted and the rest of the line still
+    // tested — a comment marker must not launder branding sitting beside it.
+    allow: null,
+    // Exempt the CONSTRUCTION, never the comment marker. Marking whole `//` lines exempt
+    // would let `// note: WRT, ASD and AMRT courses for CARSI clients` through — the same
+    // whole-line laundering this file has already been bitten by twice.
+    // Order matters: the `e.g.` enumeration is tried FIRST, because the broader patterns are
+    // greedy enough to swallow the leading "e" of "e.g." and leave a residue that still trips
+    // the rule. The bounded lengths keep each exemption to its own construction.
+    neutralise:
+      /\be\.g\.[^*]{0,60}?(?=\)|\*\/|$)|\bnever\s+(?:call|brand|use|say)\b.*$|.*\bnever\s+(?:call|brand|use|say)\b.*$|\bdoes\s+not\s+brand\b.*$|.*\bnot\s+by\s+(?:WRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)[/,].*$|\b(?:WRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)\b[^.!?]{0,40}?\b(?:required|held|sought|requested)\s+by\b|\b(?:code|codes|certifications?|discipline)s?\b[^.!?(]{0,30}\([^)]*\)|\bIICRC\s+Discipline:[^`]{0,60}/gi,
+    message:
+      'Do not list IICRC discipline acronyms — a CARSI course carries its CARSI Southern Hemisphere designation. Reference at most one IICRC certification, third-person.',
+  },
+  {
+    // "IICRC training" as something CARSI supplies. CARSI supplies IICRC CEC courses;
+    // it does not supply IICRC training. Found live as "IICRC training through CARSI".
+    re: /\bIICRC[\s-]+training\b/i,
+    allow: /\bIICRC[\s-]+(CEC|Continuing[\s-]+Education[\s-]+Credit)/i,
+    message:
+      'CARSI does not deliver "IICRC training" — say "IICRC CEC course(s)". IICRC training comes from an IICRC-approved school.',
+  },
+  {
+    // A course-level claim that CARSI courses EARN CECs. Licence-critical and
+    // fail-closed: data/seed/cec-approvals.json is the SSOT and a course may only claim
+    // CECs after per-course IICRC approval. At the time this rule was added the registry
+    // held ZERO approvals while five public surfaces asserted the claim. Provider-level
+    // standing ("CARSI is an IICRC CEC Accredited provider") is NOT this, and is allowed.
+    re: /\b(courses?|training|modules?|programmes?|programs?)\b[^.!?]{0,90}?\b(earn|earns|earning|award|awards|awarding|carry|carries|carrying|count|counts|counting)\b[^.!?]{0,50}?\b(CECs?\b|continuing[\s-]+education[\s-]+credits?)/i,
+    allow: null,
+    // A DENIAL that a course awards CECs, and a QUESTION asking whether it does, are both
+    // correct copy — the FAQ pair "Is this course IICRC CEC accredited or does it award
+    // CECs?" / "No … it does not award CECs" is exactly the honest framing this rule exists
+    // to protect. Written as `neutralise`, so a negated or interrogative sentence is deleted
+    // and the REST of the line still tested; a whole-line `allow` would let one denial
+    // launder a genuine claim sitting beside it.
+    // Also exempt, by construction rather than by comment marker:
+    //  - code describing the GATE itself ("assert this course earns CECs only when it has
+    //    registry-approved hours", "refuse to hard-delete a course carrying filed CEC
+    //    records") — this is the logic that enforces the rule, not a marketing claim;
+    //  - a third-person definition of what a CEC is ("1 CEC = 1 hour of learning").
+    neutralise:
+      /[^.!?]*\b(?:not|never|cannot|isn't|doesn't|does not)\b[^.!?]*?(?:CECs?\b|continuing[\s-]+education[\s-]+credits?)[^.!?]*[.!?]?|[^.!?]*\bno\s+(?:IICRC\s+)?(?:CECs?\b|continuing[\s-]+education[\s-]+credits?)[^.!?]*[.!?]?|[^.!?]*\?|[^.!?]*\b(?:assert|exclude|refuses?|gate|gated|only\s+when|filed)\b[^.!?]*?(?:CECs?\b|continuing[\s-]+education[\s-]+credits?)[^.!?]*|\b1\s+CEC\s*=[^.!?]*/gi,
+    message:
+      'Do not claim a CARSI course earns/awards IICRC CECs — that requires per-course IICRC approval recorded in data/seed/cec-approvals.json (currently the SSOT gates every claim). State CARSI\'s provider standing instead.',
+  },
+  {
     // "IICRC course" / "IICRC courses" — must be "IICRC CEC course(s)".
     re: /\bIICRC[\s-]+courses?\b/i,
     // ...unless it is already the compliant "IICRC CEC course(s)" or the spelled-out form.
@@ -191,7 +253,12 @@ const COPY_EXT = /\.(tsx?|jsx?|mdx?)$/;
 // templates) plus customer-facing marketing collateral (docs/marketing). The
 // broader docs/ tree (internal engineering specs, planning) is out of scope —
 // it uses technical phrasings like "non-IICRC courses" that are not selling copy.
-const SCANNED_DIRS = ['app/', 'src/', 'templates/', 'docs/marketing/'];
+// docs/course-content/ carries AUTHORED COURSE COPY that ships to students. It was out of
+// scope until 2026-08-07, when a blanket rewrite stamped "IICRC CEC Accredited" onto the CCW
+// truckmount workshop — a deliberately NON-IICRC course, and the exact incident CLAUDE.md
+// cites as the reason CEC framing was made fail-closed. The self-test calls scanText()
+// directly and so bypasses inScope(), which is why it stayed green over an unscanned tree.
+const SCANNED_DIRS = ['app/', 'src/', 'templates/', 'docs/marketing/', 'docs/course-content/'];
 
 // Seed JSON is production copy (course descriptions, marketing prose) that ships to the
 // live DB via the PRE_DEPLOY seeder — scan it too (gap closed 2026-07-09).

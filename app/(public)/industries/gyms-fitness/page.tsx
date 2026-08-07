@@ -119,7 +119,7 @@ export default async function GymsFitnessIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="Gyms & Fitness Centres"
-        disciplineList="AMRT, OCT & CRT"
+        disciplineList="Mould remediation, odour control and carpet repair"
         disciplines={['AMRT', 'OCT', 'CRT']}
       />
 

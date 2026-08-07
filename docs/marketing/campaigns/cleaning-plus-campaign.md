@@ -177,7 +177,7 @@ CTA: See the restoration pathway →
 | --- | ------------------------------------------------- | --------------------------------------------------- |
 | 0   | Welcome: Your path from cleaning to restoration   | Revenue gap overview, pathway introduction          |
 | 3   | "I wish I'd done this 5 years ago"                | Case study: cleaning company that added restoration |
-| 7   | The 3 IICRC certs that unlock restoration revenue | WRT, CRT, OCT overview with CEC details             |
+| 7   | The 3 IICRC certs that unlock restoration revenue | water damage restoration, carpet repair and odour control overview with CEC details             |
 | 14  | How [Company Name] can win insurance panel work   | Insurance requirements, IICRC credential value      |
 | 21  | Your team can start today — no downtime needed    | Subscription offer, 7-day free trial CTA            |
 | 30  | Last chance: 15% off annual subscription          | Urgency + discount code (CLEANPLUS15)               |
