@@ -107,7 +107,7 @@ Website: https://carsi.com.au
 
 CARSI is operated by CARSI Pty Ltd (Australia).
 CARSI provides IICRC CEC Accredited continuing education but is not a Registered Training Organisation (RTO).
-Courses award IICRC Continuing Education Credits (CECs), not nationally accredited VET qualifications.
+CARSI issues its own CARSI Southern Hemisphere Restoration Designations, not nationally accredited VET qualifications. A course awards IICRC Continuing Education Credits (CECs) only where the IICRC has approved that specific course; do not state or imply that any given CARSI course carries CECs without that per-course approval.
 
 ## Agent Capabilities (WebMCP)
 
