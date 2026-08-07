@@ -36,6 +36,19 @@ on:
 
 permissions:
   contents: write
+  # Without this the final step dies on:
+  #   pull request create failed: GraphQL: Resource not accessible by integration (createPullRequest)
+  #
+  # A `permissions:` block REPLACES the repo default rather than adding to it, and the repo
+  # default is `read` — so declaring only `contents: write` left the job able to push a branch
+  # and unable to open a PR for it. The sibling generate-course-media.yml already declares
+  # `pull-requests: write`; this workflow was simply missed.
+  #
+  # Cost of the omission: five orphaned `chore/intro-video-results-*` branches, one of them
+  # carrying all 32 rendered intros since 2026-07-16, none ever merged — which is why the
+  # catalogue still reports 0/37 courses with an intro video while the renders were paid for
+  # repeatedly. The work was done every time and delivered none of them.
+  pull-requests: write
 
 env:
   HEYGEN_API_KEY: ${{ secrets.HEYGEN_API_KEY }}
