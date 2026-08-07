@@ -5022,7 +5022,9 @@
     "australianProduced": true,
     "standardsReferenced": "Nominative only (ANSI/IICRC S500); no standard text reproduced (IICRC AI Use Policy honoured).",
     "designationProgram": "CARSI Southern Hemisphere Restoration Designations",
-    "designation": "CARSI Water Restoration Practitioner"
+    "designation": "CARSI Water Restoration Practitioner",
+    "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1786062108/carsi/course-intro/60a854f1-2d38-49b9-883d-12d5c3d1ecfd.mp4",
+    "introCaptionsUrl": "https://files2.heygen.ai/aws_pacific/avatar_tmp/796a104f8f42428d95773a663755e11c/subtitles_8718ab839b6f4d8ca22d8f43a67bc07c.srt?Expires=1786666906&Signature=KLs9etCSOi-1XgZsgndGKYLQQSsukJC1hpVK~GJ7OPxS6BrrpmH1OXg1z8VCAkahGWk9q3b0QDHzT~XXO3wZgMc0FT42iKIbhDNohHC82NwN0I6x5c51eIJrxZa9ks~ehk9hFvV4EuPwXTSPo1eYjl858fxwJNAJvMkDMRzb-i87obDVrTJsk-GzWMa9TrUilTJjgb~jZyG~nn97iPJ6vK6nSjNwgigghFLzTgVGcxEM4UncmGSoB5UOFk7xM~ANxdKU6PfIU3ZcEXLxVTQ37OyCAdfeMQL2BrHarOHNm-5bwMhrOH5tpBd5Z4fYppveP~JypXVdNzwHscIOhjhETQ__&Key-Pair-Id=K38HBHX5LX3X2H"
    },
    "isPublished": false,
    "modules": [
@@ -5190,7 +5192,8 @@
       }
      ]
     }
-   ]
+   ],
+   "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1786062108/carsi/course-intro/60a854f1-2d38-49b9-883d-12d5c3d1ecfd.mp4"
   },
   {
    "id": "58af5a2e-c6ee-481d-ad3a-21f4c156b03b",
