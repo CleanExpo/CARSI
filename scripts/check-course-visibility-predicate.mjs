@@ -14,6 +14,9 @@
  * common Prisma shape — a bare `{ isPublished: true }` inside a where clause. A rule I have to
  * remember to apply is not a rule.
  *
+ * Non-vacuity is proven by scripts/check-course-visibility-predicate.test.mjs, which feeds
+ * synthetic sources through evaluateFile() — the same shape the CEC surface-leak guard uses.
+ *
  * What counts as SAFE, and why:
  *   - a union with status      `OR: [{ isPublished: true }, { status: 'published' }]`
  *                              tolerant: the canonical clause still admits the course
@@ -31,28 +34,18 @@ import { join, extname } from 'node:path';
 const SCAN_DIRS = ['app', 'src'];
 const SKIP = [/src\/generated\//, /\.test\.[tj]sx?$/, /node_modules/];
 /** Admin surfaces legitimately read both columns to show the discrepancy. */
-const ALLOW_FILES = [/src\/lib\/admin\/admin-courses-service\.ts$/];
-
-function walk(dir, out = []) {
-  let entries;
-  try { entries = readdirSync(dir); } catch { return out; }
-  for (const e of entries) {
-    const p = join(dir, e);
-    if (SKIP.some((r) => r.test(p))) continue;
-    const st = statSync(p);
-    if (st.isDirectory()) walk(p, out);
-    else if (['.ts', '.tsx'].includes(extname(p))) out.push(p);
-  }
-  return out;
-}
+export const ALLOW_FILES = [/src\/lib\/admin\/admin-courses-service\.ts$/];
 
 /** A window around the hit, wide enough to see an adjacent status clause. */
 const WINDOW = 220;
 
-const findings = [];
-for (const file of SCAN_DIRS.flatMap((d) => walk(d))) {
-  if (ALLOW_FILES.some((r) => r.test(file))) continue;
-  const text = readFileSync(file, 'utf8');
+/**
+ * Findings for one source. Exported so the self-test can prove the guard fires on every
+ * known shape without needing those shapes to exist in the repository.
+ */
+export function evaluateFile(file, text) {
+  if (ALLOW_FILES.some((r) => r.test(file))) return [];
+  const findings = [];
   const lines = text.split('\n');
 
   // Word-boundary matched. Without it, `isPublishedRow` — the tolerant union helper in
@@ -62,6 +55,7 @@ for (const file of SCAN_DIRS.flatMap((d) => walk(d))) {
     const lineNo = text.slice(0, idx).split('\n').length;
     const line = lines[lineNo - 1] ?? '';
     const ctx = text.slice(Math.max(0, idx - WINDOW), idx + WINDOW);
+    const before = text.slice(0, idx);
 
     if (/^\s*(\/\/|\*)/.test(line)) continue;                          // comment
     if (/^\s*import\b/.test(line)) continue;                           // import of the helper
@@ -71,7 +65,29 @@ for (const file of SCAN_DIRS.flatMap((d) => walk(d))) {
     // Only a READ that DECIDES visibility matters. A `where` clause, or an in-memory filter.
     // Everything else — a select projection, a create/update payload, a React state setter — is
     // not a visibility decision, and flagging it would train someone to ignore this guard.
-    const inWhere = /\bwhere\s*:\s*\{[^}]*$/s.test(text.slice(Math.max(0, idx - WINDOW), idx));
+    // Brace-depth scan, not a regex window.
+    //
+    // Two regex forms failed here in succession: `[^}]*$` could not span the closing brace of a
+    // nested clause, and a one-level-nesting variant still could not span a TRAILING unclosed
+    // brace (`course: {` opens immediately before the hit). Both produced the same silent miss on
+    // an entirely ordinary query:
+    //     where: { status: { notIn: [...] }, course: { isPublished: true } }
+    // Counting depth answers the actual question — "is this hit inside a still-open `where` or
+    // `course` block?" — instead of approximating it with a lookbehind pattern.
+    const openBlock = (label) => {
+      const re = new RegExp(`\\b${label}\\s*:\\s*\\{`, 'g');
+      for (const om of [...before.matchAll(re)].reverse()) {
+        let depth = 0;
+        for (let i = om.index + om[0].length - 1; i < idx; i++) {
+          const c = text[i];
+          if (c === '{') depth++;
+          else if (c === '}') { depth--; if (depth === 0) break; }
+        }
+        if (depth > 0) return true; // still open at the hit
+      }
+      return false;
+    };
+    const inWhere = openBlock('where');
     // Check the LINE for a filter, not a backwards window. The window form used `[^)]*$`, which
     // cannot span an earlier closed paren — in pathway-progress the preceding line ends
     // `.filter((p) => p.courses.length > 0)`, so the real filter on the next line was never
@@ -90,33 +106,54 @@ for (const file of SCAN_DIRS.flatMap((d) => walk(d))) {
     // Only lmsCourse is in scope. Resolve the ENCLOSING Prisma model rather than sniffing a text
     // window — pathways, reviews and practical assessments each own an isPublished, and a window
     // wide enough to catch the model name is also wide enough to catch the wrong one.
-    const before = text.slice(0, idx);
     const modelHits = [...before.matchAll(/prisma\.([A-Za-z]+)\s*\./g)];
     const nearestModel = modelHits.length ? modelHits[modelHits.length - 1][1] : null;
     const isCourseModel = nearestModel === 'lmsCourse';
     // A nested course relation inside another model's query still counts.
-    const nestedCourse = /course\s*:\s*\{[^}]*$/s.test(text.slice(Math.max(0, idx - WINDOW), idx));
+    // Same depth scan: is the hit inside a still-open `course: { … }` relation block?
+    const nestedCourse = openBlock('course');
     // An in-memory read off a course object. A canary proved this was being missed: in
-    // pathway-progress the nearest `prisma.` model is lmsLessonProgress, so model resolution
-    // rejected `.filter(pc => pc.course.isPublished)` — the exact bug the guard exists for.
+    // pathway-progress the nearest `prisma.` model is lmsLessonProgress, so
+    // `.filter(pc => pc.course.isPublished)` was skipped.
     const memberRead = /\.course\.isPublished\b/.test(line) || /\bcourse\.isPublished\b/.test(line);
     if (!isCourseModel && !nestedCourse && !memberRead) continue;
 
     findings.push({ file, line: lineNo, text: line.trim().slice(0, 120) });
   }
+  return findings;
 }
 
-if (process.argv.includes('--json')) {
-  console.log(JSON.stringify({ findings }, null, 2));
-} else if (findings.length === 0) {
-  console.log('\n✓ No course-visibility decision reads the legacy `isPublished` column alone.\n');
-} else {
-  console.log('\n✖ Course visibility decided by the legacy `isPublished` column\n');
-  console.log('  `status` is canonical (#137). Reading isPublished alone hides courses that are');
-  console.log('  published — 20 rows currently differ. Use lmsPublishedCourseWhere, or');
-  console.log('  isPublishedCourseStatus() for rows already in memory.\n');
-  for (const f of findings) console.log(`  ${f.file}:${f.line}\n    → ${f.text}`);
-  console.log('');
+function walk(dir, out = []) {
+  let entries;
+  try { entries = readdirSync(dir); } catch { return out; }
+  for (const e of entries) {
+    const p = join(dir, e);
+    if (SKIP.some((r) => r.test(p))) continue;
+    const st = statSync(p);
+    if (st.isDirectory()) walk(p, out);
+    else if (['.ts', '.tsx'].includes(extname(p))) out.push(p);
+  }
+  return out;
 }
 
-process.exit(findings.length === 0 ? 0 : 1);
+// Executed only when run directly, so the self-test can import evaluateFile cheaply.
+if (import.meta.url === `file://${process.argv[1]}`) {
+  const findings = SCAN_DIRS.flatMap((d) => walk(d)).flatMap((f) =>
+    evaluateFile(f, readFileSync(f, 'utf8'))
+  );
+
+  if (process.argv.includes('--json')) {
+    console.log(JSON.stringify({ findings }, null, 2));
+  } else if (findings.length === 0) {
+    console.log('\n✓ No course-visibility decision reads the legacy `isPublished` column alone.\n');
+  } else {
+    console.log('\n✖ Course visibility decided by the legacy `isPublished` column\n');
+    console.log('  `status` is canonical (#137). Reading isPublished alone hides courses that are');
+    console.log('  published — 20 rows currently differ. Use lmsPublishedCourseWhere, or');
+    console.log('  isPublishedCourseStatus() for rows already in memory.\n');
+    for (const f of findings) console.log(`  ${f.file}:${f.line}\n    → ${f.text}`);
+    console.log('');
+  }
+
+  process.exit(findings.length === 0 ? 0 : 1);
+}

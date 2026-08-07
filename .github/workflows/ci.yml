@@ -91,6 +91,19 @@ jobs:
       - name: Course visibility predicate guard
         run: npm run check:course-visibility
 
+      # Non-vacuity proofs for the three guards added 2026-08-07. The independent reviewer
+      # raised their absence as P0: a guard whose ability to fail is only ever demonstrated by
+      # hand is one refactor from decorative. Writing the first of these immediately exposed a
+      # fifth defect in the visibility guard that three canaries had missed.
+      - name: Course visibility guard self-test
+        run: npm run test:course-visibility
+
+      - name: IICRC terminology guard self-test
+        run: npm run test:iicrc-terminology
+
+      - name: Source-citation scorecard self-test
+        run: npm run test:sources
+
       # Advisory course-completeness scorecard (assessment, thumbnail, intro
       # video, card metadata, scaffolds, depth). Non-blocking today; promote a
       # finalised series with --enforce=<slugs> once it is green.

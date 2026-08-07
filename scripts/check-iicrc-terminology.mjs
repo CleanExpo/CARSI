@@ -228,6 +228,17 @@ function isExempt(file) {
   return EXEMPT.some((e) => norm === e || norm.endsWith('/' + e));
 }
 
+/**
+ * Exported so scripts/check-iicrc-terminology.test.mjs can prove each rule FIRES, without those
+ * banned phrasings having to exist in the repository. A licence guard whose non-vacuity is only
+ * ever demonstrated by hand is one refactor away from being decorative.
+ */
+export function scanText(file, content) {
+  const findings = [];
+  scanLine(file, 1, content, findings);
+  return findings;
+}
+
 function scanLine(file, lineNo, content, findings) {
   const norm = file.replace(/\\/g, '/');
   for (const rule of BANNED) {
@@ -238,6 +249,8 @@ function scanLine(file, lineNo, content, findings) {
   }
 }
 
+// CLI only. Importing this module for the self-test must not run the scan or exit the process.
+const isCli = import.meta.url === `file://${process.argv[1]}`;
 const staged = process.argv.includes('--staged');
 const findings = [];
 
@@ -298,16 +311,18 @@ if (staged) {
   }
 }
 
-if (findings.length > 0) {
-  console.error('\n✖ IICRC CEC terminology guard failed (Linear GP-451)\n');
-  console.error('CARSI sells IICRC *CEC courses*, not IICRC certification. Fix these:\n');
-  console.error(findings.join('\n'));
-  console.error(
-    '\nSee CLAUDE.md § "IICRC CEC terminology". Use "IICRC CEC course(s)" and never imply' +
-      '\nCARSI delivers IICRC certification. Verified false positive? git commit --no-verify\n'
-  );
-  process.exit(1);
-}
+if (isCli) {
+  if (findings.length > 0) {
+    console.error('\n✖ IICRC CEC terminology guard failed (Linear GP-451)\n');
+    console.error('CARSI sells IICRC *CEC courses*, not IICRC certification. Fix these:\n');
+    console.error(findings.join('\n'));
+    console.error(
+      '\nSee CLAUDE.md § "IICRC CEC terminology". Use "IICRC CEC course(s)" and never imply' +
+        '\nCARSI delivers IICRC certification. Verified false positive? git commit --no-verify\n'
+    );
+    process.exit(1);
+  }
 
-console.log('✓ IICRC CEC terminology guard passed.');
-process.exit(0);
+  console.log('✓ IICRC CEC terminology guard passed.');
+  process.exit(0);
+}
