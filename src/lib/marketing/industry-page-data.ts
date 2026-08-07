@@ -181,7 +181,7 @@ export const cleanerUpgrades: IndustryUpgradeRow[] = [
   },
   {
     base: 'Specialised cleaning',
-    addon: 'OCT + FSRT',
+    addon: 'odour control and fire & smoke restoration',
     benefit: 'Odour and fire damage restoration',
   },
 ];

@@ -225,7 +225,7 @@ export default async function AboutPage() {
           title="IICRC CEC Accredited course catalogue"
           body={
             d > 0
-              ? `Published courses across ${d} restoration discipline${d === 1 ? '' : 's'} — each earning continuing education credits toward an IICRC certification you already hold.`
+              ? `Published courses across ${d} restoration discipline${d === 1 ? '' : 's'} — each awarding a CARSI Southern Hemisphere Restoration Designation.`
               : 'IICRC CEC Accredited courses across all seven core restoration disciplines.'
           }
         />

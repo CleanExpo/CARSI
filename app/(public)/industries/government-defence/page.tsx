@@ -128,7 +128,7 @@ export default async function GovernmentDefenceIndustryPage() {
         subtitle="Government facility training"
         title="Facility Restoration Bundle"
         price={industryBundlePriceLabel('government-defence')}
-        description="WRT + AMRT + ASD training for government facility teams. Bulk 10+ seat licensing available for councils and departments."
+        description="water damage restoration, mould remediation and structural drying training for government facility teams. Bulk 10+ seat licensing available for councils and departments."
         ctaText="Request bulk pricing"
         ctaHref="/contact"
         accentColor={ACCENT_COLOR}

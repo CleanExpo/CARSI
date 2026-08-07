@@ -133,7 +133,7 @@ export default async function HospitalityIndustryPage() {
         subtitle="Hospitality training bundle"
         title="Hotel Maintenance Bundle"
         price={industryBundlePriceLabel('hospitality')}
-        description="WRT + CRT + OCT training for hotel maintenance teams. Bulk licensing available for hotel chains and resort groups."
+        description="water damage restoration, carpet repair and odour control training for hotel maintenance teams. Bulk licensing available for hotel chains and resort groups."
         ctaText="Request bundle pricing"
         ctaHref="/contact"
         accentColor={ACCENT_COLOR}

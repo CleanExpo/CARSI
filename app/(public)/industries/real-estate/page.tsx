@@ -87,7 +87,7 @@ const whyCards = [
     icon: Shield,
     title: 'Professional Indemnity Protection',
     description:
-      'Non-disclosure of known defects is the leading source of real estate professional indemnity claims. IICRC awareness training demonstrates due diligence and supports a defensible inspection record.',
+      'Non-disclosure of known defects is the leading source of real estate professional indemnity claims. IICRC CEC Accredited awareness courses demonstrates due diligence and supports a defensible inspection record.',
     color: '#2490ed',
   },
 ];
@@ -130,7 +130,7 @@ export default async function RealEstateIndustryPage() {
         subtitle="Real Estate Training"
         title="Property Professional Bundle"
         price={industryBundlePriceLabel('real-estate')}
-        description="WRT + AMRT awareness training for real estate agents, conveyancers, and property managers. Identify water damage and mould during inspections with IICRC-recognised credentials."
+        description="water damage restoration and mould remediation awareness training for real estate agents, conveyancers, and property managers. Identify water damage and mould during inspections with IICRC-recognised credentials."
         ctaText="Protect Your Practice"
         accentColor={ACCENT_COLOR}
       />

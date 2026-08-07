@@ -129,7 +129,7 @@ export default async function FoodProcessingIndustryPage() {
         subtitle="Food Processing Training"
         title="Food Safety Bundle"
         price={industryBundlePriceLabel('food-processing')}
-        description="AMRT + OCT + CCT training for food processing teams. Includes cold storage mould prevention protocols. Online, self-paced — fits around production schedules."
+        description="mould remediation, odour control and carpet cleaning training for food processing teams. Includes cold storage mould prevention protocols. Online, self-paced — fits around production schedules."
         ctaText="Train Your Facility Team"
         accentColor={ACCENT_COLOR}
       />

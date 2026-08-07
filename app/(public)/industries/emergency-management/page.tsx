@@ -59,7 +59,7 @@ const faqs = [
   {
     question: 'Can council emergency management teams complete IICRC CEC training?',
     answer:
-      'Yes. Council emergency management coordinators, building surveyors, and flood response teams benefit from IICRC awareness-level training in water damage restoration and structural drying. Online, self-paced delivery means staff can complete training between deployments without disrupting rostering. Councils that invest in IICRC CEC training for emergency response staff report improved property triage accuracy, stronger documentation for DRFA (Disaster Recovery Funding Arrangements) claims, and better community outcomes in the weeks following a major weather event.',
+      'Yes. Council emergency management coordinators, building surveyors, and flood response teams benefit from CARSI awareness-level courses in water damage restoration and structural drying. Online, self-paced delivery means staff can complete training between deployments without disrupting rostering. Councils that invest in IICRC CEC training for emergency response staff report improved property triage accuracy, stronger documentation for DRFA (Disaster Recovery Funding Arrangements) claims, and better community outcomes in the weeks following a major weather event.',
   },
   {
     question:
@@ -74,7 +74,7 @@ const whyCards = [
     icon: Droplets,
     title: 'Flood Response Capability',
     description:
-      'WRT + ASD training gives SES volunteers and council teams the knowledge to triage flood-affected properties accurately, advise homeowners, and produce DRFA-compliant documentation.',
+      'water damage restoration and structural drying training gives SES volunteers and council teams the knowledge to triage flood-affected properties accurately, advise homeowners, and produce DRFA-compliant documentation.',
     color: '#ef5350',
   },
   {
@@ -131,7 +131,7 @@ export default async function EmergencyManagementIndustryPage() {
         subtitle="Emergency Management Training"
         title="Emergency Response Bundle"
         price={industryBundlePriceLabel('emergency-management')}
-        description="WRT + FSRT + ASD training for SES volunteers, council emergency managers, and community resilience teams. Bulk licensing available for units and councils."
+        description="water damage restoration, fire & smoke restoration and structural drying training for SES volunteers, council emergency managers, and community resilience teams. Bulk licensing available for units and councils."
         ctaText="Train Your Response Team"
         accentColor={ACCENT_COLOR}
       />

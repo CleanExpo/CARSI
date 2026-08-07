@@ -65,6 +65,16 @@ const MUST_BLOCK = [
   ['question does not launder a claim', 'Is it accredited? Our courses earn CECs toward your certification.'],
   ['comment marker does not launder branding', '// note: WRT, ASD and AMRT courses for CARSI clients'],
   ['scope note does not launder branding', '(IICRC CRT) — and our IICRC AMRT course for CARSI members.'],
+  // Codex round 2 (2026-08-07): four constructions the round-1 rules still could not see.
+  // Each had live occurrences while the guard and its self-test both reported green.
+  ['plus-separated acronym list', 'description="WRT + ASD + FSRT training for data centre facility teams."'],
+  ['topic word steps around IICRC training', 'IICRC restoration training for Australian data centres.'],
+  ['CEC eligibility claimed without the word CEC', 'so this course counts toward maintaining a certification you already hold.'],
+  [
+    'interpolation pushes the verb past the window',
+    "`Published courses across ${d} restoration discipline${d === 1 ? '' : 's'} — each earning continuing education credits toward an IICRC certification`",
+  ],
+  ['IICRC-training rule is not whole-line allowed', 'IICRC training through CARSI — CARSI is IICRC CEC Accredited'],
 ];
 
 const MUST_PASS = [
@@ -107,6 +117,15 @@ const MUST_PASS = [
   ['code describing the gate', '{/* assert this course earns CECs only when it has registry-approved hours */}'],
   ['delete-guard test name', "  it('refuses to delete a course carrying CEC records', async () => {"],
   ['third-person CEC definition', 'CEC (Continuing Education Credit): 1 CEC = 1 hour of learning.'],
+  // Round-2 exemptions. The first two are the rule's own enforcement text — flagging them
+  // would mean a rewrite deletes the instruction that enforces this rule.
+  ['comment naming the school designation', '// an IICRC Registered-Training-School discipline acronym branding a CARSI course'],
+  ['prompt forbidding school acronyms', '3. NEVER brand the course with IICRC Registered-Training-School discipline acronyms'],
+  [
+    'price comparison against IICRC-approved schools',
+    'Compare that to $2,000–5,000 per person for face-to-face IICRC certification training at approved schools.',
+  ],
+  ['compliant CEC training phrasing', 'Enrol in our IICRC CEC training today.'],
   // The disclaimer itself names IICRC in a NEGATION — the opposite of a claim, and it ships
   // on every course page. If the guard ever blocks this, the product loses its honest framing.
   [

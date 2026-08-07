@@ -48,7 +48,11 @@ const BANNED = [
     // acronyms sat in a bare comma list with no adjacent IICRC and no "aligned".
     // Two-or-more in a list is always branding — a genuine third-person reference names
     // ONE certification ("FSRT is an IICRC certification covering…").
-    re: /\b(WRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)\b\s*(?:,|&|,?\s+and\s+|\s*\/\s*)\s*\b(WRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)\b/i,
+    // `+` is in the separator set because 18 IndustryCTA descriptions used it — "WRT + ASD
+    // + FSRT training" — and an earlier version of this rule listed only comma, ampersand,
+    // "and" and slash. Enumerating separators is inherently leaky; anything that joins two
+    // acronyms is a list.
+    re: /\b(WRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)\b\s*(?:,|&|\+|,?\s+and\s+|\s*\/\s*)\s*\b(WRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)\b/i,
     // These runs are legitimate and must not be rewritten:
     //  - a source COMMENT or type doc describing the data format (`/** IICRC code (WRT/CRT…) */`);
     //  - an AI prompt line that exists to FORBID the acronyms — rewriting it would delete the
@@ -66,15 +70,26 @@ const BANNED = [
     // greedy enough to swallow the leading "e" of "e.g." and leave a residue that still trips
     // the rule. The bounded lengths keep each exemption to its own construction.
     neutralise:
-      /\be\.g\.[^*]{0,60}?(?=\)|\*\/|$)|\bnever\s+(?:call|brand|use|say)\b.*$|.*\bnever\s+(?:call|brand|use|say)\b.*$|\bdoes\s+not\s+brand\b.*$|.*\bnot\s+by\s+(?:WRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)[/,].*$|\b(?:WRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)\b[^.!?]{0,40}?\b(?:required|held|sought|requested)\s+by\b|\b(?:code|codes|certifications?)\b[^.!?(]{0,30}\([^)]*\)|\bIICRC\s+Discipline:[^`]{0,60}/gi,
+      // Every quantifier here is BOUNDED. Earlier versions used greedy `.*` on both sides of
+      // the "never call" alternatives inside a /g regex; a 10,000-character line ending in
+      // "WRT, ASD" took ~9.6s to scan, which is a denial-of-service against CI on any
+      // minified or generated file. Bounded spans keep it linear.
+      /\be\.g\.[^*]{0,60}?(?=\)|\*\/|$)|[^\n]{0,120}\bnever\s+(?:call|brand|use|say)\b[^\n]{0,120}|[^\n]{0,120}\bdoes\s+not\s+brand\b[^\n]{0,120}|[^\n]{0,120}\bnot\s+by\s+(?:WRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)[/,][^\n]{0,120}|\b(?:WRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)\b[^.!?]{0,40}?\b(?:required|held|sought|requested)\s+by\b|\b(?:code|codes|certifications?)\b[^.!?(]{0,30}\([^)]*\)|\bIICRC\s+Discipline:[^`]{0,60}/gi,
     message:
       'Do not list IICRC discipline acronyms — a CARSI course carries its CARSI Southern Hemisphere designation. Reference at most one IICRC certification, third-person.',
   },
   {
     // "IICRC training" as something CARSI supplies. CARSI supplies IICRC CEC courses;
     // it does not supply IICRC training. Found live as "IICRC training through CARSI".
-    re: /\bIICRC[\s-]+training\b/i,
-    allow: /\bIICRC[\s-]+(CEC|Continuing[\s-]+Education[\s-]+Credit)/i,
+    // Adjacency was not enough: "IICRC restoration training" slipped past a rule that only
+    // matched "IICRC training", on six public metadata and hero strings. Allow up to three
+    // intervening words so a topic word cannot be used to step around it.
+    re: /\bIICRC(?:[\s-]+\w+){0,3}[\s-]+training\b/i,
+    allow: null,
+    // `neutralise`, not `allow`. As a whole-line allow this let
+    // "IICRC training through CARSI — CARSI is IICRC CEC Accredited" pass on the strength of
+    // the compliant half; the exempt span must be deleted and the remainder still tested.
+    neutralise: /\bIICRC[^.!?]{0,40}?training\s+at\s+(?:IICRC[\s-]+)?approved\s+schools?|\bIICRC[\s-]+Registered-Training-School\b|\bIICRC[\s-]+(?:CEC|Continuing[\s-]+Education[\s-]+Credit)\w*(?:[\s-]+\w+){0,3}[\s-]+training\b|\bIICRC[\s-]+(?:CEC|Continuing[\s-]+Education[\s-]+Credit)/gi,
     message:
       'CARSI does not deliver "IICRC training" — say "IICRC CEC course(s)". IICRC training comes from an IICRC-approved school.',
   },
@@ -84,7 +99,13 @@ const BANNED = [
     // CECs after per-course IICRC approval. At the time this rule was added the registry
     // held ZERO approvals while five public surfaces asserted the claim. Provider-level
     // standing ("CARSI is an IICRC CEC Accredited provider") is NOT this, and is allowed.
-    re: /\b(courses?|training|modules?|programmes?|programs?)\b[^.!?]{0,90}?\b(earn|earns|earning|award|awards|awarding|carry|carries|carrying|count|counts|counting)\b[^.!?]{0,50}?\b(CECs?\b|continuing[\s-]+education[\s-]+credits?)/i,
+    // Window widened from 90 to 200: on the about page a `${d}` interpolation pushed
+    // "earning" past the old bound, so the tracked-file scan stayed green on a sentence the
+    // rendered page still asserted.
+    // Second alternative added because the credential disclaimer never says "CEC" — it says
+    // a course "counts toward maintaining a certification you already hold", which is the
+    // same unapproved eligibility claim expressed without the trigger word.
+    re: /\b(courses?|training|modules?|programmes?|programs?)\b[^.!]{0,200}?\b(earn|earns|earning|award|awards|awarding|carry|carries|carrying|count|counts|counting)\b[^.!?]{0,50}?\b(CECs?\b|continuing[\s-]+education[\s-]+credits?)|\b(?:this\s+)?courses?\b[^.!?]{0,60}?\bcounts?\s+toward(?:s)?\b[^.!?]{0,60}?\b(?:maintain|maintaining|renewing|recertif\w*)\b[^.!?]{0,40}?\bcertification\b/i,
     allow: null,
     // A DENIAL that a course awards CECs, and a QUESTION asking whether it does, are both
     // correct copy — the FAQ pair "Is this course IICRC CEC accredited or does it award
@@ -98,7 +119,7 @@ const BANNED = [
     //    records") — this is the logic that enforces the rule, not a marketing claim;
     //  - a third-person definition of what a CEC is ("1 CEC = 1 hour of learning").
     neutralise:
-      /[^.!?]*\b(?:not|never|cannot|isn't|doesn't|does not)\b[^.!?]*?(?:CECs?\b|continuing[\s-]+education[\s-]+credits?)[^.!?]*[.!?]?|[^.!?]*\bno\s+(?:IICRC\s+)?(?:CECs?\b|continuing[\s-]+education[\s-]+credits?)[^.!?]*[.!?]?|[^.!?]*\?|[^.!?]*\b(?:assert|exclude|refuses?|gate|gated|only\s+when|filed)\b[^.!?]*?(?:CECs?\b|continuing[\s-]+education[\s-]+credits?)[^.!?]*|\b1\s+CEC\s*=[^.!?]*/gi,
+      /[^.!?]*\b(?:not|never|cannot|isn't|doesn't|does not)\b[^.!?]*?(?:CECs?\b|continuing[\s-]+education[\s-]+credits?)[^.!?]*[.!?]?|[^.!?]*\bno\s+(?:IICRC\s+)?(?:CECs?\b|continuing[\s-]+education[\s-]+credits?)[^.!?]*[.!?]?|[^.!?]*\w\?|[^.!?]*\b(?:assert|exclude|refuses?|gate|gated|only\s+when|filed)\b[^.!?]*?(?:CECs?\b|continuing[\s-]+education[\s-]+credits?)[^.!?]*|\b1\s+CEC\s*=[^.!?]*/gi,
     message:
       'Do not claim a CARSI course earns/awards IICRC CECs — that requires per-course IICRC approval recorded in data/seed/cec-approvals.json (currently the SSOT gates every claim). State CARSI\'s provider standing instead.',
   },

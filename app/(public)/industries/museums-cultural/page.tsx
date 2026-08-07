@@ -129,7 +129,7 @@ export default async function MuseumsCulturalIndustryPage() {
         subtitle="Cultural Institution Training"
         title="Heritage Preservation Bundle"
         price={industryBundlePriceLabel('museums-cultural')}
-        description="AMRT + WRT + ASD training for museum and gallery teams. Includes collection-specific emergency response protocols. Online, self-paced — fits around exhibition schedules."
+        description="mould remediation, water damage restoration and structural drying training for museum and gallery teams. Includes collection-specific emergency response protocols. Online, self-paced — fits around exhibition schedules."
         ctaText="Protect Your Collection"
         accentColor={ACCENT_COLOR}
       />

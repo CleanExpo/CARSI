@@ -128,7 +128,7 @@ export default async function HealthcareIndustryPage() {
         subtitle="Healthcare facility training"
         title="Healthcare Bundle"
         price={industryBundlePriceLabel('healthcare')}
-        description="WRT + AMRT + FSRT training + Healthcare-Specific Mould Risk Assessment bonus module. Online, self-paced — fits around 24/7 hospital shift patterns."
+        description="water damage restoration, mould remediation and fire & smoke restoration training + Healthcare-Specific Mould Risk Assessment bonus module. Online, self-paced — fits around 24/7 hospital shift patterns."
         ctaText="Train your team"
         ctaHref="/contact"
         accentColor={ACCENT_COLOR}

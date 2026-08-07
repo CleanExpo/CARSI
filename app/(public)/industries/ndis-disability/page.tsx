@@ -61,9 +61,9 @@ const faqs = [
       'Yes. NDIS registration audits assess whether providers have documented policies and demonstrable staff competency for maintaining safe environments. IICRC certifications are nationally and internationally recognised credentials that provide verifiable evidence of staff training. During a Module 3 audit, presenting IICRC-certified maintenance staff and documented remediation procedures significantly strengthens the compliance record compared to internal training alone.',
   },
   {
-    question: 'Can support coordinators benefit from IICRC restoration awareness training?',
+    question: 'Can support coordinators benefit from CARSI restoration awareness courses?',
     answer:
-      'Support coordinators who understand the signs of water damage and mould can better advocate for participants and initiate remediation before conditions deteriorate. While support coordinators do not perform remediation themselves, IICRC awareness-level training helps them identify hazards during home visits, document concerns accurately, and brief maintenance contractors on required standards — all of which support better participant outcomes and stronger audit documentation.',
+      'Support coordinators who understand the signs of water damage and mould can better advocate for participants and initiate remediation before conditions deteriorate. While support coordinators do not perform remediation themselves, CARSI awareness-level courses helps them identify hazards during home visits, document concerns accurately, and brief maintenance contractors on required standards — all of which support better participant outcomes and stronger audit documentation.',
   },
 ];
 
@@ -129,7 +129,7 @@ export default async function NDISDisabilityIndustryPage() {
         subtitle="NDIS Provider Training"
         title="NDIS Compliance Bundle"
         price={industryBundlePriceLabel('ndis-disability')}
-        description="AMRT + WRT training for NDIS maintenance and facilities staff. Verifiable IICRC credentials for NDIS Quality and Safeguards Commission audits."
+        description="mould remediation and water damage restoration training for NDIS maintenance and facilities staff. Verifiable IICRC credentials for NDIS Quality and Safeguards Commission audits."
         ctaText="Train Your Maintenance Team"
         accentColor={ACCENT_COLOR}
       />

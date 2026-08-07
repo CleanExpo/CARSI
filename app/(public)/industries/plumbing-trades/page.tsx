@@ -129,7 +129,7 @@ export default async function PlumbingTradesIndustryPage() {
         subtitle="Plumbing & Trades Training"
         title="Trades Restoration Bundle"
         price={industryBundlePriceLabel('plumbing-trades')}
-        description="WRT + ASD training for licensed plumbers and trade contractors. Complete online between jobs. IICRC CEC Accredited."
+        description="water damage restoration and structural drying training for licensed plumbers and trade contractors. Complete online between jobs. IICRC CEC Accredited."
         ctaText="Add Restoration to Your Business"
         accentColor={ACCENT_COLOR}
       />

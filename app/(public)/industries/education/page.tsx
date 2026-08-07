@@ -104,7 +104,7 @@ export default async function EducationIndustryPage() {
         subtitle="Education Facility Training"
         title="Education Facility Bundle"
         price={industryBundlePriceLabel('education')}
-        description="AMRT + WRT training for school maintenance teams. Bulk 10+ seat licensing available for education departments and school networks."
+        description="mould remediation and water damage restoration training for school maintenance teams. Bulk 10+ seat licensing available for education departments and school networks."
         ctaText="Request Education Pricing"
         accentColor={ACCENT_COLOR}
       />

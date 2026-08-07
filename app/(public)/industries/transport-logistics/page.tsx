@@ -16,7 +16,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Transport & Logistics IICRC CEC Training',
   description:
-    'IICRC restoration training for Australian transport and logistics operations. Water damage restoration, carpet repair and odour control courses for vehicle interiors, warehouses, and loading dock maintenance.',
+    'IICRC CEC Accredited restoration courses for Australian transport and logistics operations. Water damage restoration, carpet repair and odour control courses for vehicle interiors, warehouses, and loading dock maintenance.',
   keywords: [
     'transport IICRC CEC training Australia',
     'logistics warehouse restoration',
@@ -105,7 +105,7 @@ export default async function TransportLogisticsIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Transport & Logistics"
         headlineAccent="Restoration Training"
-        description="IICRC restoration training for Australia's transport and logistics sector. Credentials for warehouse flood response, vehicle interior maintenance, and loading dock contamination control."
+        description="IICRC CEC Accredited restoration courses for Australia's transport and logistics sector. Credentials for warehouse flood response, vehicle interior maintenance, and loading dock contamination control."
         disciplines={disciplines}
         stats={stats}
       />
@@ -129,7 +129,7 @@ export default async function TransportLogisticsIndustryPage() {
         subtitle="Transport & Logistics Training"
         title="Logistics Restoration Bundle"
         price={industryBundlePriceLabel('transport-logistics')}
-        description="WRT + CRT + OCT training for transport and warehouse teams. Includes fleet maintenance and warehouse flood response protocols. Online, self-paced — fits around shift schedules."
+        description="water damage restoration, carpet repair and odour control training for transport and warehouse teams. Includes fleet maintenance and warehouse flood response protocols. Online, self-paced — fits around shift schedules."
         ctaText="Train Your Operations Team"
         accentColor={ACCENT_COLOR}
       />

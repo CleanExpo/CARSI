@@ -129,7 +129,7 @@ export default async function GymsFitnessIndustryPage() {
         subtitle="Gym & Fitness Training"
         title="Fitness Facility Bundle"
         price={industryBundlePriceLabel('gyms-fitness')}
-        description="AMRT + OCT training for gym maintenance staff. Covers mould identification, remediation, and odour control. Online, self-paced — fits around your facility's operating hours."
+        description="mould remediation and odour control training for gym maintenance staff. Covers mould identification, remediation, and odour control. Online, self-paced — fits around your facility's operating hours."
         ctaText="Train Your Maintenance Staff"
         accentColor={ACCENT_COLOR}
       />

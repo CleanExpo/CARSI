@@ -4,7 +4,7 @@
 
 ## Objective
 
-Penetrate the Australian construction sector with IICRC restoration training, targeting site managers, project managers, and WHS officers across commercial and residential construction.
+Penetrate the Australian construction sector with IICRC CEC Accredited restoration courses, targeting site managers, project managers, and WHS officers across commercial and residential construction.
 Target: 600 enrolled construction professionals in 12 months.
 
 ## Target Audience

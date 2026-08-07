@@ -173,9 +173,17 @@ interface CourseSchemaProps {
  * machine reader ends up with a less careful claim than a human one.
  */
 export const CREDENTIAL_DISCLAIMER =
+  // The middle clause previously asserted per-course CEC eligibility in prose, and
+  // data/seed/cec-approvals.json holds zero approvals — yet this string is emitted in
+  // educationalCredentialAwarded JSON-LD, rendered above the fold on every designation
+  // course, and reused on public credential-verification records. It named no number, so
+  // the schema test (which rejects numeric CEC and provider identifiers) passed it, and it
+  // never says "CEC", so the terminology guard's CEC rule did not see it either.
+  // Provider standing is true and stays; course-level eligibility now depends on approval.
   'A CARSI-issued credential — not an IICRC certification. CARSI is an IICRC CEC Accredited ' +
-  'provider, so this course counts toward maintaining a certification you already hold. IICRC ' +
-  'certification itself is obtained through an IICRC-approved school and examination.';
+  'provider; a course displays IICRC CECs only where that course holds IICRC ' +
+  'approval. IICRC certification itself is obtained through an IICRC-approved school and ' +
+  'examination.';
 
 function normalizeCoursePrice(price: number | undefined): number | undefined {
   if (typeof price !== 'number' || !Number.isFinite(price) || price < 0) return undefined;

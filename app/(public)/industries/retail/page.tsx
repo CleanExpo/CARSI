@@ -104,7 +104,7 @@ export default async function RetailIndustryPage() {
         subtitle="Shopping Centre Training"
         title="Retail Contractor Bundle"
         price={industryBundlePriceLabel('retail')}
-        description="WRT + CRT + OCT training for shopping centre maintenance teams. Equip your crew for rapid tenant restoration and food court compliance."
+        description="water damage restoration, carpet repair and odour control training for shopping centre maintenance teams. Equip your crew for rapid tenant restoration and food court compliance."
         ctaText="Get Started"
         accentColor={ACCENT_COLOR}
       />

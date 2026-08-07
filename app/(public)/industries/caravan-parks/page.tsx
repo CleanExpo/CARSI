@@ -129,7 +129,7 @@ export default async function CaravanParksIndustryPage() {
         subtitle="Holiday Park Training"
         title="Holiday Park Bundle"
         price={industryBundlePriceLabel('caravan-parks')}
-        description="AMRT + CRT + WRT training for caravan park and holiday accommodation maintenance staff. Seasonal inspection protocols included. Online, self-paced."
+        description="mould remediation, carpet repair and water damage restoration training for caravan park and holiday accommodation maintenance staff. Seasonal inspection protocols included. Online, self-paced."
         ctaText="Train Your Park Team"
         accentColor={ACCENT_COLOR}
       />

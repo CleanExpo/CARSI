@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Property Management IICRC CEC Training',
   description:
-    'IICRC restoration training for Australian property and strata managers. Mould, water damage and carpet credentials for RTA compliance.',
+    'IICRC CEC Accredited restoration courses for Australian property and strata managers. Mould, water damage and carpet credentials for RTA compliance.',
   keywords: [
     'property management IICRC CEC training',
     'strata manager restoration course',

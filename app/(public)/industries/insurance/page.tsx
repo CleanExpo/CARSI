@@ -104,7 +104,7 @@ export default async function InsuranceIndustryPage() {
         subtitle="Insurance Professional Training"
         title="Insurance Professional Bundle"
         price={industryBundlePriceLabel('insurance')}
-        description="WRT + FSRT training for claims teams. Equip loss adjusters and assessors with the restoration knowledge to scope accurately and settle faster."
+        description="water damage restoration and fire & smoke restoration training for claims teams. Equip loss adjusters and assessors with the restoration knowledge to scope accurately and settle faster."
         ctaText="Get Started"
         accentColor={ACCENT_COLOR}
       />
