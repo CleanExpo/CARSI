@@ -159,10 +159,20 @@ const SCANNED_DIRS = ['app/', 'src/', 'templates/', 'docs/marketing/'];
 // live DB via the PRE_DEPLOY seeder — scan it too (gap closed 2026-07-09).
 const JSON_SCANNED_DIRS = ['data/seed/', '.curation/', 'data/wordpress-export/'];
 
+// Static files served verbatim from the site root. These are the surfaces AI engines read
+// and quote — llms.txt and the citation packs exist specifically to be cited — so banned
+// branding here is published copy, not internal notes. They were out of scope until
+// 2026-08-07, when `IICRC-aligned` was found live on carsi.com.au/llms.txt (HTTP 200) and
+// on both citation packs while this guard reported green. Their extensions (.txt, .json)
+// are not in COPY_EXT, so directory scope alone would not have caught them.
+const PUBLIC_COPY_EXT = /\.(txt|json|md|mdx)$/;
+const PUBLIC_SCANNED_DIRS = ['public/'];
+
 function inScope(file) {
   const norm = file.replace(/\\/g, '/');
   if (COPY_EXT.test(norm) && SCANNED_DIRS.some((d) => norm.startsWith(d))) return true;
   if (norm.endsWith('.json') && JSON_SCANNED_DIRS.some((d) => norm.startsWith(d))) return true;
+  if (PUBLIC_COPY_EXT.test(norm) && PUBLIC_SCANNED_DIRS.some((d) => norm.startsWith(d))) return true;
   return false;
 }
 
