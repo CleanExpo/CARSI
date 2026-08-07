@@ -26,6 +26,26 @@
  *                              isPublished; only lmsCourse is in scope
  *   - admin surfaces           admin-courses-service reads both ON PURPOSE, to display the drift
  *
+ * KNOWN LIMIT — deliberate, do not "fix" by widening the identifier (reviewer round 3, 4eb7733d).
+ * An in-memory read is recognised only when it is written against an identifier NAMED `course`
+ * (`course.isPublished`, `course?.isPublished`, `pc.course.isPublished`). Three other shapes are
+ * NOT caught: an alias (`const c = course; c.isPublished`), an array element
+ * (`rows[0].isPublished`), and a differently-named holder (`lesson.parentCourse.isPublished`).
+ *
+ * That is a considered trade, not an oversight. Catching them by regex means matching any
+ * `X.isPublished`, and the repository currently contains 19 such reads — every one legitimate:
+ * practical assessments (src/lib/server/practical-assessment.ts, PracticalAssessmentAuthorClient),
+ * course reviews (src/lib/server/course-reviews.ts) and learning pathways each own a SEPARATE
+ * isPublished column; admin-courses-service is allowlisted; and renewal-summary's
+ * `isPublishedRow` (:38) is a tolerant union. Widening the identifier turns all 19 red, and a
+ * guard that cries wolf 19 times is a guard someone deletes.
+ *
+ * Measured on this head: zero occurrences of `?.isPublished` and zero of `].isPublished`, so the
+ * uncaught shapes are hypothetical here rather than live. If one is ever written, the reviewable
+ * signal is the missing `course.` prefix — prefer renaming the variable to `course` over relaxing
+ * this rule. Type-aware detection (resolving the receiver to LmsCourse) is the real fix and needs
+ * the TS compiler API, not a regex.
+ *
  * Usage: node scripts/check-course-visibility-predicate.mjs [--json]
  */
 import { readFileSync, readdirSync, statSync } from 'node:fs';
@@ -101,7 +121,10 @@ export function evaluateFile(file, text) {
     // admitted only `where` and `.filter` contexts, so a bare member read never reached the
     // model-resolution check that was already written to catch it. A learner could still be gated
     // on the legacy column with the guard green — the precise failure this guard exists to stop.
-    const memberRead = /\.course\.isPublished\b/.test(line) || /\bcourse\.isPublished\b/.test(line);
+    // `\??\.` so optional chaining counts: `course?.isPublished` is the same decision as
+    // `course.isPublished`, and reviewer round 3 was right that the earlier form missed it.
+    // Anchored to the `course` identifier ON PURPOSE — see KNOWN LIMIT in the header.
+    const memberRead = /\bcourse\s*\??\.\s*isPublished\b/.test(line);
     const destructuredRead = /\{[^}]*\bisPublished\b[^}]*\}\s*=\s*[\w.]*[Cc]ourse\w*/.test(line);
     if (!inWhere && !inFilter && !memberRead && !destructuredRead) continue;
 

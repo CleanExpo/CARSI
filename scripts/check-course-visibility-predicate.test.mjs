@@ -59,6 +59,11 @@ const MUST_BLOCK = [
     'member read returned directly (defect 5)',
     'export function canSee(course: LmsCourse) {\n  return course.isPublished;\n}',
   ],
+  // Reviewer round 3. Optional chaining is the same decision wearing a safer operator.
+  [
+    'optional-chained member read (defect 6)',
+    'const course = await getCourse(slug);\nif (course?.isPublished) {\n  return renderCourse(course);\n}',
+  ],
 ];
 
 const MUST_PASS = [
@@ -101,6 +106,26 @@ const MUST_PASS = [
   [
     'React state setter on an unrelated entity',
     'onChange={(e) => setEditing((f) => (f ? { ...f, isPublished: e.target.checked } : f))}',
+  ],
+  // These four are the guard's KNOWN LIMIT held in place. Reviewer round 3 asked for the member
+  // read to match ANY identifier, not just `course`. These are the real reads that widening would
+  // turn red — each a DIFFERENT entity with its own isPublished column, or a tolerant union.
+  // Verbatim from the tree at 4eb7733d. If a future "hardening" flags them, this goes red first.
+  [
+    "practical assessment's own flag (src/lib/server/practical-assessment.ts:161)",
+    'if (!assessment || !assessment.isPublished) {\n  return null;\n}',
+  ],
+  [
+    "course review's own flag (src/lib/server/course-reviews.ts:144)",
+    'const summary = summarizeReviews(rows.filter((r) => r.isPublished));',
+  ],
+  [
+    'tolerant union helper (src/lib/server/renewal-summary.ts:38)',
+    "function isPublishedRow(c: { status: string; isPublished: boolean | null }): boolean {\n  if (c.isPublished === true) return true;\n  return String(c.status ?? '').toLowerCase().trim() === 'published';\n}",
+  ],
+  [
+    'admin author client editing a practical assessment',
+    "{a.isPublished ? 'Published' : 'Draft'}",
   ],
 ];
 
