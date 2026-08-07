@@ -28,8 +28,11 @@ describe('isPublishedCourseStatus', () => {
     expect(isPublishedCourseStatus('PUBLISHED')).toBe(true);
   });
 
-  it('tolerates incidental whitespace', () => {
-    expect(isPublishedCourseStatus('  published  ')).toBe(true);
+  it('agrees with Prisma on padded status rather than tolerating it', () => {
+    // Prisma's `equals: 'published', mode: 'insensitive'` does not trim, so a padded value
+    // is NOT published in the database. This predicate must return the same answer, or a
+    // course becomes visible in in-memory pathway filters while every query excludes it.
+    expect(isPublishedCourseStatus('  published  ')).toBe(false);
   });
 
   it('rejects draft, the state that must never reach a learner', () => {

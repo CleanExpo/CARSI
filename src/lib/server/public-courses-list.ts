@@ -30,7 +30,13 @@ export const lmsPublishedCourseWhere: Prisma.LmsCourseWhereInput = {
  * and simultaneously invisible in pathways and team assignment.
  */
 export function isPublishedCourseStatus(status: string | null | undefined): boolean {
-  return typeof status === 'string' && status.trim().toLowerCase() === 'published';
+  // Deliberately NOT trimmed. Prisma's `equals: 'published', mode: 'insensitive'` does not
+  // trim either, and the whole point of this predicate is to give the same answer as the
+  // database. Trimming here made '  published  ' visible in pathway and team filters while
+  // the catalogue, checkout and team queries excluded the same row — the split-brain this
+  // function exists to close, reintroduced one layer up. `status` is an unconstrained
+  // String column, so the padded value is allowed even though no seed row currently uses it.
+  return typeof status === 'string' && status.toLowerCase() === 'published';
 }
 
 const publishedWhere = lmsPublishedCourseWhere;
