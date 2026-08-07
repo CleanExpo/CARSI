@@ -124,8 +124,12 @@ const BANNED = [
     //     was a blanket bypass: any line carrying that key escaped the whole rule, so
     //     `certifications: "IICRC WRT course for CARSI students"` branded a CARSI course and still
     //     passed. Prose inside the array is not a credential name and must stay banned.
-    allow:
-      /\b(WRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)\s+is\s+an?\s+IICRC\s+certification\b|[a-z0-9]-iicrc-(wrt|asd|amrt|fsrt|cct|crt|oct|tcst)\b|\bcertifications\s*:\s*\[\s*(?:['"]IICRC\s+(?:WRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)['"]\s*,?\s*)+\]/i,
+    // Written as `neutralise`, not `allow`: each span below is deleted and the rule re-tested
+    // on the remainder, so a legacy slug or a credential list cannot launder branding sitting
+    // next to it on the same line. /g is required — one permitted span must not exempt the rest.
+    allow: null,
+    neutralise:
+      /\b(?:WRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)\s+is\s+an?\s+IICRC\s+certification\b|[a-z0-9]-iicrc-(?:wrt|asd|amrt|fsrt|cct|crt|oct|tcst)\b|\bcertifications\s*:\s*\[\s*(?:['"]IICRC\s+(?:WRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)['"]\s*,?\s*)+\]/gi,
     message:
       'Never brand a CARSI course with an IICRC discipline acronym or "[discipline]-aligned" — CARSI issues its own Southern Hemisphere designations (CLAUDE.md § CARSI designation rule). Nominative third-person references to an IICRC certification are still allowed.',
   },
@@ -248,7 +252,12 @@ function scanLine(file, lineNo, content, findings) {
   const norm = file.replace(/\\/g, '/');
   for (const rule of BANNED) {
     if (rule.seedOnly && !norm.startsWith('data/seed/')) continue;
-    if (rule.re.test(content) && !(rule.allow && rule.allow.test(content))) {
+    // `allow` exempts the whole LINE, so any line carrying both a violation and an allow
+    // token escapes — `title: "IICRC WRT course", slug: "x-iicrc-wrt"` passed on the slug
+    // alone. `neutralise` is the stricter form: it deletes the permitted spans and re-tests
+    // what is LEFT, so a legitimate token can no longer shelter branding beside it.
+    const probe = rule.neutralise ? content.replace(rule.neutralise, ' ') : content;
+    if (rule.re.test(probe) && !(rule.allow && rule.allow.test(content))) {
       findings.push(`  ${file}:${lineNo}: ${rule.message}\n    → ${content.trim().slice(0, 140)}`);
     }
   }

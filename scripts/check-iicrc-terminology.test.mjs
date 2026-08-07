@@ -41,6 +41,15 @@ const MUST_BLOCK = [
     'prose inside a certifications array is still branding',
     "const b = { certifications: ['IICRC WRT course for CARSI students'] };",
   ],
+  // Same class, the legacy-slug branch: a permitted token must not exempt the whole line.
+  [
+    'legacy slug does not launder branding beside it',
+    'title: "IICRC WRT course for CARSI students", slug: "x-iicrc-wrt"',
+  ],
+  [
+    'valid credential list does not launder branding beside it',
+    "certifications: ['IICRC WRT'], tagline: 'IICRC ASD-aligned CARSI course'",
+  ],
 ];
 
 const MUST_PASS = [
@@ -66,6 +75,8 @@ const MUST_PASS = [
     "person's credential list",
     "certifications: ['IICRC WRT', 'IICRC ASD', 'IICRC FSRT'],",
   ],
+  // The legacy WordPress URL slug — an identifier, not copy. Rewriting these breaks redirects.
+  ['legacy import slug alone', "href: '/courses/water-iicrc-wrt'"],
   // The disclaimer itself names IICRC in a NEGATION — the opposite of a claim, and it ships
   // on every course page. If the guard ever blocks this, the product loses its honest framing.
   [
