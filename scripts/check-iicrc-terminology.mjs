@@ -118,9 +118,14 @@ const BANNED = [
     //  2. a legacy lowercase-hyphenated URL slug from the WordPress import (an identifier, not
     //     copy — rewriting these breaks live redirects);
     //  3. a PERSON's own certifications, which CLAUDE.md allows referencing third-person
-    //     ("a student's own recert / member number / CEC tracking").
+    //     ("a student's own recert / member number / CEC tracking"). This allow is written as a
+    //     positive match on the ONLY legitimate shape — a `certifications:` key whose value is a
+    //     list of bare credential names — rather than on the key alone. A bare `\bcertifications\s*:`
+    //     was a blanket bypass: any line carrying that key escaped the whole rule, so
+    //     `certifications: "IICRC WRT course for CARSI students"` branded a CARSI course and still
+    //     passed. Prose inside the array is not a credential name and must stay banned.
     allow:
-      /\b(WRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)\s+is\s+an?\s+IICRC\s+certification\b|[a-z0-9]-iicrc-(wrt|asd|amrt|fsrt|cct|crt|oct|tcst)\b|\bcertifications\s*:/i,
+      /\b(WRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)\s+is\s+an?\s+IICRC\s+certification\b|[a-z0-9]-iicrc-(wrt|asd|amrt|fsrt|cct|crt|oct|tcst)\b|\bcertifications\s*:\s*\[\s*(?:['"]IICRC\s+(?:WRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)['"]\s*,?\s*)+\]/i,
     message:
       'Never brand a CARSI course with an IICRC discipline acronym or "[discipline]-aligned" — CARSI issues its own Southern Hemisphere designations (CLAUDE.md § CARSI designation rule). Nominative third-person references to an IICRC certification are still allowed.',
   },

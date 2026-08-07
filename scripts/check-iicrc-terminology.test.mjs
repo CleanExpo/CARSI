@@ -30,6 +30,17 @@ const MUST_BLOCK = [
   ['IICRC endorsement', 'CARSI is endorsed by the IICRC'],
   ['IICRC Approved School', 'CARSI is an IICRC Approved School'],
   ['COACH8 brand exclusion', 'brought to you by COACH8'],
+  // The `certifications:` allow must not become a bypass. It was briefly written as a bare
+  // `\bcertifications\s*:`, which let ANY line carrying that key escape the whole designation
+  // rule — including one branding a CARSI course. Both shapes below must stay blocked.
+  [
+    'certifications key does not launder course branding',
+    'const a = { certifications: "IICRC WRT course for CARSI students" };',
+  ],
+  [
+    'prose inside a certifications array is still branding',
+    "const b = { certifications: ['IICRC WRT course for CARSI students'] };",
+  ],
 ];
 
 const MUST_PASS = [
@@ -49,6 +60,12 @@ const MUST_PASS = [
   // A PERSON's own credential — allowed ("a student's own recert / member number").
   ['person holds a certification', 'IICRC-certified staff demonstrate compliance'],
   ['learner self-declares', "Already IICRC certified"],
+  // The one real shape the allow exists for: a person's credential list in the directory fixture.
+  // Bare credential names only — anything with prose in it is caught by MUST_BLOCK above.
+  [
+    "person's credential list",
+    "certifications: ['IICRC WRT', 'IICRC ASD', 'IICRC FSRT'],",
+  ],
   // The disclaimer itself names IICRC in a NEGATION — the opposite of a claim, and it ships
   // on every course page. If the guard ever blocks this, the product loses its honest framing.
   [
