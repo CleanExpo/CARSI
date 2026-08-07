@@ -63,7 +63,7 @@ const faqs = [
   {
     question: 'Can food processing staff complete IICRC CEC training while maintaining shift patterns?',
     answer:
-      'Yes. CARSI offers IICRC CEC Accredited courses online and self-paced. Staff can complete modules around production schedules and shift rotations. Eligible courses count toward IICRC Continuing Education Credits (CECs) and issue verifiable digital credentials on completion.',
+      'Yes. CARSI offers IICRC CEC Accredited courses online and self-paced. Staff can complete modules around production schedules and shift rotations. Courses issue verifiable digital credentials on completion.',
   },
 ];
 

@@ -198,7 +198,7 @@ I'm reaching out because I believe [Association Name] members could significantl
 
 **About CARSI**
 
-CARSI delivers 40+ online courses approved by the IICRC (International Institute of Inspection, Cleaning and Restoration Certification). Our platform is purpose-built for working tradespeople and professionals — courses are 100% online, self-paced, and can be completed on any device. Each course earns verified Continuing Education Credits (CECs) and a digital certificate with a public verification URL.
+CARSI delivers 40+ online courses. Our platform is purpose-built for working tradespeople and professionals — courses are 100% online, self-paced, and can be completed on any device. Each course issues a digital certificate with a public verification URL.
 
 **Why This Matters for [Association Name] Members**
 

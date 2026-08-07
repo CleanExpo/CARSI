@@ -202,7 +202,7 @@ Apply across all campaigns to prevent wasted spend:
 | Headline 4 | Subscription Access — $795/Year |
 | Headline 5 | Upskill Without Leaving the Job Site |
 | Description 1 | Access 40+ IICRC CEC-approved courses with a CARSI subscription. Water damage, mould, fire restoration and more. $795 AUD/year — unlimited access. |
-| Description 2 | Save with course bundles or go all-in with annual subscription. Every course earns verified CECs. Public credential URL included for contractor pre-qualification. |
+| Description 2 | Save with course bundles or go all-in with annual subscription. Public credential URL included for contractor pre-qualification. |
 
 ### Campaign 2: Mining
 

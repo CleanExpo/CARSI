@@ -58,7 +58,7 @@ const faqs = [
   {
     question: 'Can hospital maintenance staff complete IICRC CEC training online?',
     answer:
-      'Yes. CARSI offers IICRC CEC Accredited courses online and self-paced, designed to fit around 24/7 hospital shift patterns. Staff can complete modules between shifts without leaving the facility. Eligible courses count toward IICRC Continuing Education Credits (CECs) and issue verifiable digital credentials on completion.',
+      'Yes. CARSI offers IICRC CEC Accredited courses online and self-paced, designed to fit around 24/7 hospital shift patterns. Staff can complete modules between shifts without leaving the facility. Courses issue verifiable digital credentials on completion.',
   },
   {
     question: 'What is mould remediation training for healthcare facilities?',

@@ -105,7 +105,7 @@ export default async function NDISDisabilityIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Meet NDIS Quality"
         headlineAccent="Safeguards"
-        description="600,000+ Australians rely on NDIS providers to maintain safe accommodation. CARSI mould remediation and water damage restoration CEC courses build staff competency for NDIS Practice Standards audits — protecting participants and provider registration. CARSI courses earn IICRC CECs; they are not IICRC certification."
+        description="600,000+ Australians rely on NDIS providers to maintain safe accommodation. CARSI mould remediation and water damage restoration CEC courses build staff competency for NDIS Practice Standards audits — protecting participants and provider registration. CARSI courses carry CARSI Southern Hemisphere Restoration Designations, not IICRC certification."
         disciplines={disciplines}
         stats={stats}
       />

@@ -105,7 +105,7 @@ export default async function GymsFitnessIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Protect Your Members"
         headlineAccent="and Your Reputation"
-        description="Australian gyms face constant mould and odour risk from high-humidity environments. CARSI mould remediation and odour control CEC courses give your maintenance team the protocols to keep facilities clean, compliant, and member-ready. CARSI courses earn IICRC CECs; they are not IICRC certification."
+        description="Australian gyms face constant mould and odour risk from high-humidity environments. CARSI mould remediation and odour control CEC courses give your maintenance team the protocols to keep facilities clean, compliant, and member-ready. CARSI courses carry CARSI Southern Hemisphere Restoration Designations, not IICRC certification."
         disciplines={disciplines}
         stats={stats}
       />

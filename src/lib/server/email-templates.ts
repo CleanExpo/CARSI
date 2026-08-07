@@ -367,7 +367,7 @@ export function renderGovContractorGuideEmail(params: {
     '',
     `Download the guide (PDF): ${params.downloadUrl}`,
     '',
-    'CARSI is an IICRC CEC Accredited provider — our courses earn Continuing Education Credits (CECs) toward maintaining an existing IICRC certification.',
+    'CARSI is an IICRC CEC Accredited provider.',
     '',
     `CARSI Learning — ${params.appOrigin}`,
   ].join('\n');
@@ -380,7 +380,7 @@ export function renderGovContractorGuideEmail(params: {
       paragraphs,
       cta: { label: 'Download the guide (PDF)', href: params.downloadUrl },
       noteHtml:
-        'CARSI is an IICRC CEC Accredited provider — our courses earn Continuing Education Credits (CECs) toward maintaining an existing IICRC certification.',
+        'CARSI is an IICRC CEC Accredited provider.',
     },
     text
   );

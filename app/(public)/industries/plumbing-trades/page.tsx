@@ -105,7 +105,7 @@ export default async function PlumbingTradesIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Turn Call-Outs Into"
         headlineAccent="Drying Contracts"
-        description="85,000+ licensed Australian plumbers leave water damage behind every day. CARSI water damage restoration and applied structural drying CEC courses give your trade business the continuing-education grounding to capture the full remediation scope — and the revenue that comes with it. CARSI courses earn IICRC CECs; they are not IICRC certification."
+        description="85,000+ licensed Australian plumbers leave water damage behind every day. CARSI water damage restoration and applied structural drying CEC courses give your trade business the continuing-education grounding to capture the full remediation scope — and the revenue that comes with it. CARSI courses carry CARSI Southern Hemisphere Restoration Designations, not IICRC certification."
         disciplines={disciplines}
         stats={stats}
       />

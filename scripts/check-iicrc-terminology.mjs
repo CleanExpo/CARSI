@@ -191,7 +191,11 @@ const BANNED = [
     // next to it on the same line. /g is required — one permitted span must not exempt the rest.
     allow: null,
     neutralise:
-      /\b(?:WRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)\s+is\s+an?\s+IICRC\s+certification\b|[a-z0-9]-iicrc-(?:wrt|asd|amrt|fsrt|cct|crt|oct|tcst)\b|\bcertifications\s*:\s*\[\s*(?:['"]IICRC\s+(?:WRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)['"]\s*,?\s*)+\]/gi,
+      // Also third-person references to IICRC's OWN certification, which CLAUDE.md permits:
+      // a prerequisite naming the learner's existing cert ("recommended: IICRC WRT
+      // certification"), IICRC's competency framework, and a parenthesised scope note
+      // ("colour repair / re-dyeing (IICRC CRT)"). None of these brands a CARSI course.
+      /\b(?:WRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)\s+is\s+an?\s+IICRC\s+certification\b|\bIICRC\s+(?:WRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)\s+(?:certification|competency|credential)\b[^.!?]{0,40}|\(\s*IICRC\s+(?:WRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)\b[^)]*\)|[a-z0-9]-iicrc-(?:wrt|asd|amrt|fsrt|cct|crt|oct|tcst)\b|\bcertifications\s*:\s*\[\s*(?:['"]IICRC\s+(?:WRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)['"]\s*,?\s*)+\]/gi,
     message:
       'Never brand a CARSI course with an IICRC discipline acronym or "[discipline]-aligned" — CARSI issues its own Southern Hemisphere designations (CLAUDE.md § CARSI designation rule). Nominative third-person references to an IICRC certification are still allowed.',
   },
@@ -258,7 +262,14 @@ const COPY_EXT = /\.(tsx?|jsx?|mdx?)$/;
 // truckmount workshop — a deliberately NON-IICRC course, and the exact incident CLAUDE.md
 // cites as the reason CEC framing was made fail-closed. The self-test calls scanText()
 // directly and so bypasses inScope(), which is why it stayed green over an unscanned tree.
-const SCANNED_DIRS = ['app/', 'src/', 'templates/', 'docs/marketing/', 'docs/course-content/'];
+const SCANNED_DIRS = [
+  'app/',
+  'src/',
+  'templates/',
+  'docs/marketing/',
+  'docs/course-content/',
+  'docs/content/',
+];
 
 // Seed JSON is production copy (course descriptions, marketing prose) that ships to the
 // live DB via the PRE_DEPLOY seeder — scan it too (gap closed 2026-07-09).

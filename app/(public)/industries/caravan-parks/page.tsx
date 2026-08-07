@@ -105,7 +105,7 @@ export default async function CaravanParksIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Protect Guest Accommodation"
         headlineAccent="All Season Long"
-        description="Australia's 2,800+ caravan parks face persistent mould, moisture, and storm damage risk. CARSI mould remediation, carpet repair and reinstallation and water damage restoration CEC courses give park maintenance teams the protocols to inspect, remediate, and document — protecting guests, reputation, and revenue. CARSI courses earn IICRC CECs; they are not IICRC certification."
+        description="Australia's 2,800+ caravan parks face persistent mould, moisture, and storm damage risk. CARSI mould remediation, carpet repair and reinstallation and water damage restoration CEC courses give park maintenance teams the protocols to inspect, remediate, and document — protecting guests, reputation, and revenue. CARSI courses carry CARSI Southern Hemisphere Restoration Designations, not IICRC certification."
         disciplines={disciplines}
         stats={stats}
       />

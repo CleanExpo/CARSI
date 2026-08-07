@@ -50,6 +50,21 @@ const MUST_BLOCK = [
     'valid credential list does not launder branding beside it',
     "certifications: ['IICRC WRT'], tagline: 'IICRC ASD-aligned CARSI course'",
   ],
+  // Codex round 1 (2026-08-07): three constructions the rules could not see, each with a
+  // live instance at the time. A bare acronym LIST matched neither the "IICRC <acronym>"
+  // branch nor the "<acronym>-aligned" branch.
+  ['bare acronym list brands a CARSI course', 'WRT, CCT, AMRT — all online, all self-paced.'],
+  ['acronym list with ampersand', 'disciplineList="WRT, CRT, ASD & OCT"'],
+  ['IICRC training sold as CARSI\'s', 'IICRC training through CARSI lets you expand your service offering.'],
+  // CEC is fail-closed: data/seed/cec-approvals.json gates every course-level claim.
+  ['course-level CEC claim', 'Completing this training also earns IICRC Continuing Education Credits (CECs).'],
+  ['blunt CEC claim', 'Every course earns verified CECs.'],
+  // Exemptions must not become laundering routes — each of these carries a permitted
+  // construction AND a real claim on the same line.
+  ['denial does not launder a claim', 'It does not award CECs. Every CARSI course earns IICRC CECs.'],
+  ['question does not launder a claim', 'Is it accredited? Our courses earn CECs toward your certification.'],
+  ['comment marker does not launder branding', '// note: WRT, ASD and AMRT courses for CARSI clients'],
+  ['scope note does not launder branding', '(IICRC CRT) — and our IICRC AMRT course for CARSI members.'],
 ];
 
 const MUST_PASS = [
@@ -77,6 +92,21 @@ const MUST_PASS = [
   ],
   // The legacy WordPress URL slug — an identifier, not copy. Rewriting these breaks redirects.
   ['legacy import slug alone', "href: '/courses/water-iicrc-wrt'"],
+  // Constructions that LOOK like the banned ones but are correct, each found live while
+  // draining the Codex findings. A blanket rewrite mangled the first two before these
+  // cases existed — one of them was the comment documenting this very rule.
+  ['comment documenting the rule', '// (matched against course title/category), not by WRT/ASD/etc.'],
+  ['third-party requirement', "requirement: 'WRT and FSRT commonly required by adjusters'"],
+  ['type doc naming the format', '  /** IICRC code (WRT/CRT/ASD/AMRT/FSRT/OCT/CCT) or null. */'],
+  ['prompt that forbids the acronyms', '   (WRT/ASD/AMRT/FSRT/CCT/TCST) and never call it "[discipline]-aligned".'],
+  ['prerequisite naming the learner\'s own cert', '- Basic understanding (recommended: IICRC WRT certification or equivalent).'],
+  ['parenthesised scope note', '**colour repair / re-dyeing** (IICRC CRT), or refer.'],
+  // Fail-closed copy and the code that enforces it must never be flagged.
+  ['denial that a course carries CECs', 'This course carries no IICRC CECs (pending IICRC approval).'],
+  ['the FAQ question itself', 'Is this course IICRC CEC accredited or does it award CECs?'],
+  ['code describing the gate', '{/* assert this course earns CECs only when it has registry-approved hours */}'],
+  ['delete-guard test name', "  it('refuses to delete a course carrying CEC records', async () => {"],
+  ['third-person CEC definition', 'CEC (Continuing Education Credit): 1 CEC = 1 hour of learning.'],
   // The disclaimer itself names IICRC in a NEGATION — the opposite of a claim, and it ships
   // on every course page. If the guard ever blocks this, the product loses its honest framing.
   [
