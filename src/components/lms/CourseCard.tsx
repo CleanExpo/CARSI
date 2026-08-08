@@ -122,7 +122,7 @@ export function CourseCard({ course, priorityImage, variant = 'catalog' }: Cours
               : 'border-slate-200/70 dark:border-white/[0.08]'
           }`}
         >
-          <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500 dark:text-white/48">
+          <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-600 dark:text-white/60">
             {course.module_count != null ? (
               <span className="inline-flex items-center gap-1" title="Modules">
                 <Layers className="h-3.5 w-3.5 shrink-0 opacity-70" />
