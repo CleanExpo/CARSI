@@ -74,7 +74,7 @@ const BANNED = [
       // the "never call" alternatives inside a /g regex; a 10,000-character line ending in
       // "WRT, ASD" took ~9.6s to scan, which is a denial-of-service against CI on any
       // minified or generated file. Bounded spans keep it linear.
-      /\be\.g\.[^*]{0,60}?(?=\)|\*\/|$)|[^\n]{0,120}\bnever\s+(?:call|brand|use|say)\b[^\n]{0,120}|[^\n]{0,120}\bdoes\s+not\s+brand\b[^\n]{0,120}|[^\n]{0,120}\bnot\s+by\s+(?:WRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)[/,][^\n]{0,120}|\b(?:WRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)\b[^.!?]{0,40}?\b(?:required|held|sought|requested)\s+by\b|\b(?:code|codes|certifications?)\b[^.!?(]{0,30}\([^)]*\)|\bIICRC\s+Discipline:[^`]{0,60}/gi,
+      /\be\.g\.[^*]{0,60}?(?=\)|\*\/)|[^\n]{0,120}\bnever\s+(?:call|brand|use|say)\b[^\n]{0,120}|[^\n]{0,120}\bdoes\s+not\s+brand\b[^\n]{0,120}|[^\n]{0,120}\bnot\s+by\s+(?:WRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)[/,][^\n]{0,120}|\b(?:WRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)\b[^.!?]{0,40}?\b(?:required|held|sought|requested)\s+by\b|\b(?:code|codes|certifications?)\b[^.!?(]{0,30}\([^)]*\)|\bIICRC\s+Discipline:[^`]{0,60}/gi,
     message:
       'Do not list IICRC discipline acronyms — a CARSI course carries its CARSI Southern Hemisphere designation. Reference at most one IICRC certification, third-person.',
   },
@@ -119,7 +119,7 @@ const BANNED = [
     //    records") — this is the logic that enforces the rule, not a marketing claim;
     //  - a third-person definition of what a CEC is ("1 CEC = 1 hour of learning").
     neutralise:
-      /[^.!?]*\b(?:not|never|cannot|isn't|doesn't|does not)\b[^.!?]*?(?:CECs?\b|continuing[\s-]+education[\s-]+credits?)[^.!?]*[.!?]?|[^.!?]*\bno\s+(?:IICRC\s+)?(?:CECs?\b|continuing[\s-]+education[\s-]+credits?)[^.!?]*[.!?]?|[^.!?]*\w\?|[^.!?]*\b(?:assert|exclude|refuses?|gate|gated|only\s+when|filed)\b[^.!?]*?(?:CECs?\b|continuing[\s-]+education[\s-]+credits?)[^.!?]*|\b1\s+CEC\s*=[^.!?]*/gi,
+      /[^.!?]*\b(?:not|never|cannot|isn't|doesn't|does\s+not)\b\s*(?:\w+\s+){0,2}?\b(?:earns?|earning|awards?|awarding|carr(?:y|ies|ying)|counts?|counting|confers?|accredit\w*|eligible|approved|grants?|toward)\b[^.!?]{0,40}?(?:CECs?\b|continuing[\s-]+education[\s-]+credits?)[^.!?]*[.!?]?|[^.!?]*\bno\s+(?:IICRC\s+)?(?:CECs?\b|continuing[\s-]+education[\s-]+credits?)[^.!?]*[.!?]?|[^.!?]*\w\?|[^.!?]*\b(?:assert\w*|exclude|refuses?|gate|gated|only\s+wh(?:en|ere)|filed)\b[^.!?]*?(?:CECs?\b|continuing[\s-]+education[\s-]+credits?)[^.!?]*|\b1\s+CEC\s*=[^.!?]*/gi,
     message:
       'Do not claim a CARSI course earns/awards IICRC CECs — that requires per-course IICRC approval recorded in data/seed/cec-approvals.json (currently the SSOT gates every claim). State CARSI\'s provider standing instead.',
   },

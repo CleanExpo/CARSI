@@ -297,8 +297,8 @@ Apply across all campaigns to prevent wasted spend:
 | Headline 3 | carpet cleaning and water damage restoration & Mould Courses Available |
 | Headline 4 | Win More Contracts with IICRC Creds |
 | Headline 5 | Australian-Owned Training Platform |
-| Description 1 | Stand out from competitors with IICRC certifications. Carpet cleaning, mould remediation, water damage — all available online. Earn CECs and grow your business. |
-| Description 2 | Cleaning franchise owners and operators — add IICRC credentials to your business. Online courses, verifiable certificates, and CECs that prove your expertise. |
+| Description 1 | Stand out from competitors with IICRC certifications. Carpet cleaning, mould remediation, water damage — all available online. Build recognised skills and grow your business. |
+| Description 2 | Cleaning franchise owners and operators — add IICRC credentials to your business. Online courses and verifiable certificates that prove your expertise. |
 
 ### Campaign 6: Construction
 

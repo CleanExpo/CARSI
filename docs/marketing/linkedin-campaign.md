@@ -198,7 +198,7 @@ Downloadable PDF preview in feed — users swipe through pages, then submit lead
 
 > **Hook:** Ready to add mould remediation to your cleaning services?
 >
-> **Body:** IICRC CEC courses through CARSI let you expand your service offering without expensive classroom courses. Water damage restoration, carpet cleaning and mould remediation — all online, all self-paced, all earning verified CECs.
+> **Body:** IICRC CEC courses through CARSI let you expand your service offering without expensive classroom courses. Water damage restoration, carpet cleaning and mould remediation — all online, all self-paced.
 >
 > Group licensing available for franchise networks.
 >
