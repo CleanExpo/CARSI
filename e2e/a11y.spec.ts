@@ -44,15 +44,23 @@ function describe(violations: Awaited<ReturnType<typeof blockingViolations>>) {
 
 test.describe('a11y: public course surfaces', () => {
   test('course catalogue has no critical or serious violations', async ({ page }) => {
+    // Cards fade in via framer-motion (`initial="hidden"`). axe measures computed
+    // colour, so scanning mid-fade reads every element at partial opacity and reports
+    // false contrast failures. Emulate reduced motion and let the page settle so the
+    // scan sees the real, static, fully-opaque state.
+    await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/courses');
-    await page.waitForLoadState('domcontentloaded');
+    await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(700);
     const violations = await blockingViolations(page);
     expect(violations, describe(violations)).toEqual([]);
   });
 
   test('course detail page has no critical or serious violations', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto(`/courses/${PUBLIC_COURSE_SLUG}`);
-    await page.waitForLoadState('domcontentloaded');
+    await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(700);
     const violations = await blockingViolations(page);
     expect(violations, describe(violations)).toEqual([]);
   });
