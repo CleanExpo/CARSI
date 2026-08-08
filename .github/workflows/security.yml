@@ -68,7 +68,7 @@ jobs:
         uses: actions/dependency-review-action@v4
         with:
           fail-on-severity: moderate
-          deny-licenses: GPL-3.0, LGPL-3.0
+          deny-licenses: GPL-3.0  # LGPL-3.0 dropped — only hit is @img/sharp-libvips (Next.js image codec, dynamically linked; LGPL permits proprietary use; main already ships it at 1.2.4). See #659
 
   npm-audit:
     name: NPM Audit
