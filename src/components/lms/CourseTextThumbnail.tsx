@@ -288,8 +288,8 @@ export function CourseTextThumbnail({
                 className="rounded-md px-1.5 py-0.5 font-mono text-[10px] font-bold tracking-wide uppercase"
                 style={{
                   color: accent.fg,
-                  background: hasBackdrop ? 'rgba(0,0,0,0.45)' : 'rgba(255,255,255,0.88)',
-                  border: `1px solid ${accent.fg}44`,
+                  background: hasBackdrop ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.97)',
+                  border: `1px solid ${accent.fg}66`,
                 }}
               >
                 {code}
