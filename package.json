@@ -78,6 +78,7 @@
     "db:gate-onboarding-off-free": "npx tsx scripts/gate-onboarding-course-off-free.ts",
     "test:e2e": "playwright test e2e",
     "test:smoke": "playwright test e2e/smoke.spec.ts",
+    "test:a11y": "playwright test e2e/a11y.spec.ts",
     "test:unit": "vitest run",
     "voice:plan": "npx tsx scripts/generate-course-voiceover.ts --plan",
     "voice:generate": "npx tsx scripts/generate-course-voiceover.ts --generate",
@@ -104,7 +105,13 @@
     "db:strip-ai-vendor-refs": "npx tsx scripts/strip-ai-vendor-references-from-lms.ts",
     "ccw:scrape:plan": "npx tsx scripts/scrape-ccw-products.ts --plan",
     "ccw:scrape": "npx tsx scripts/scrape-ccw-products.ts",
-    "check:course-completeness": "node scripts/check-course-completeness.mjs"
+    "check:course-completeness": "node scripts/check-course-completeness.mjs",
+    "check:sources": "node scripts/check-source-citations.mjs",
+    "check:course-visibility": "node scripts/check-course-visibility-predicate.mjs",
+    "test:course-visibility": "node scripts/check-course-visibility-predicate.test.mjs",
+    "test:iicrc-terminology": "node scripts/check-iicrc-terminology.test.mjs",
+    "test:sources": "node scripts/check-source-citations.test.mjs",
+    "test:course-completeness": "node scripts/check-course-completeness.test.mjs"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.3",
@@ -172,7 +179,7 @@
     "isomorphic-dompurify": "^3.0.0",
     "jose": "^6.2.2",
     "lucide-react": "^0.468.0",
-    "next": "16.2.9",
+    "next": "^16.3.0",
     "pdf-lib": "^1.17.1",
     "pg": "^8.14.1",
     "posthog-js": "^1.396.6",

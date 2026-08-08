@@ -50,7 +50,7 @@ function buildFaqItems(live: boolean) {
     {
       question: 'Do CARSI courses count toward IICRC CECs?',
       answer:
-        "CARSI's catalogue includes IICRC CEC Accredited courses where stated. Your dashboard includes a CEC tracking dashboard that logs completed credits, broken down by discipline (WRT, CRT, OCT, ASD, CCT and more).",
+        "CARSI's catalogue includes IICRC CEC Accredited courses where stated. Your dashboard includes a CEC tracking dashboard that logs completed credits, broken down by restoration discipline.",
     },
   ];
 }
@@ -97,7 +97,7 @@ export default function PricingPage() {
                 : 'Buy any course individually. Free Library for everyone — no card required. Yearly membership and Teams plans are coming soon.'}
             </p>
             <p className="mx-auto mt-4 max-w-2xl rounded-lg border border-[#f2cf8f] bg-[#fff8ed] px-4 py-3 text-sm leading-relaxed text-[#7a3500]">
-              CARSI courses earn IICRC Continuing Education Credits (CECs). They are not IICRC
+              CARSI courses carry CARSI Southern Hemisphere Restoration Designations. They are not IICRC
               certification courses — IICRC certifications are obtained through IICRC-approved schools
               and examinations.
             </p>

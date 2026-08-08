@@ -19,7 +19,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = buildIndustryMetadata(
   'healthcare',
   'Healthcare IICRC CEC Training',
-  'NSQHS-aligned IICRC CEC training for Australian hospitals. AMRT, WRT, FSRT and ASD courses supporting Standard 3 compliance and JCI accreditation.',
+  'NSQHS-aligned IICRC CEC training for Australian hospitals. Mould remediation, water damage restoration, fire & smoke restoration and structural drying courses supporting Standard 3 compliance and JCI accreditation.',
   [
     'healthcare IICRC CEC training',
     'hospital restoration training',
@@ -58,12 +58,12 @@ const faqs = [
   {
     question: 'Can hospital maintenance staff complete IICRC CEC training online?',
     answer:
-      'Yes. CARSI offers IICRC CEC Accredited courses online and self-paced, designed to fit around 24/7 hospital shift patterns. Staff can complete modules between shifts without leaving the facility. Eligible courses count toward IICRC Continuing Education Credits (CECs) and issue verifiable digital credentials on completion.',
+      'Yes. CARSI offers IICRC CEC Accredited courses online and self-paced, designed to fit around 24/7 hospital shift patterns. Staff can complete modules between shifts without leaving the facility. Courses issue verifiable digital credentials on completion.',
   },
   {
     question: 'What is mould remediation training for healthcare facilities?',
     answer:
-      'IICRC AMRT (Applied Microbial Remediation) training covers mould identification, moisture assessment, containment procedures, and remediation protocols specific to clinical environments. In Australian hospitals, this is critical for plant rooms, basement services, and water-damaged areas where microbial growth poses infection risks to immunocompromised patients.',
+      'CARSI mould remediation training covers mould identification, moisture assessment, containment procedures, and remediation protocols specific to clinical environments. In Australian hospitals, this is critical for plant rooms, basement services, and water-damaged areas where microbial growth poses infection risks to immunocompromised patients.',
   },
 ];
 
@@ -116,7 +116,7 @@ export default async function HealthcareIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="Healthcare Industry"
-        disciplineList="AMRT, WRT, FSRT & ASD"
+        disciplineList="Mould remediation, water damage restoration, fire & smoke restoration and structural drying"
         disciplines={['AMRT', 'WRT', 'FSRT', 'ASD']}
       />
 
@@ -128,7 +128,7 @@ export default async function HealthcareIndustryPage() {
         subtitle="Healthcare facility training"
         title="Healthcare Bundle"
         price={industryBundlePriceLabel('healthcare')}
-        description="WRT + AMRT + FSRT training + Healthcare-Specific Mould Risk Assessment bonus module. Online, self-paced — fits around 24/7 hospital shift patterns."
+        description="water damage restoration, mould remediation and fire & smoke restoration training + Healthcare-Specific Mould Risk Assessment bonus module. Online, self-paced — fits around 24/7 hospital shift patterns."
         ctaText="Train your team"
         ctaHref="/contact"
         accentColor={ACCENT_COLOR}

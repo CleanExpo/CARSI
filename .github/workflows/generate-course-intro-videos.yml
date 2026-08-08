@@ -36,6 +36,19 @@ on:
 
 permissions:
   contents: write
+  # Without this the final step dies on:
+  #   pull request create failed: GraphQL: Resource not accessible by integration (createPullRequest)
+  #
+  # A `permissions:` block REPLACES the repo default rather than adding to it, and the repo
+  # default is `read` — so declaring only `contents: write` left the job able to push a branch
+  # and unable to open a PR for it. The sibling generate-course-media.yml already declares
+  # `pull-requests: write`; this workflow was simply missed.
+  #
+  # Cost of the omission: five orphaned `chore/intro-video-results-*` branches, one of them
+  # carrying all 32 rendered intros since 2026-07-16, none ever merged — which is why the
+  # catalogue still reports 0/37 courses with an intro video while the renders were paid for
+  # repeatedly. The work was done every time and delivered none of them.
+  pull-requests: write
 
 env:
   HEYGEN_API_KEY: ${{ secrets.HEYGEN_API_KEY }}
@@ -103,4 +116,17 @@ jobs:
           gh pr create --base main --head "$BR" \
             --title "Course intro videos: rendered results (engine=${{ inputs.engine }})" \
             --body "Automated: rendered course-intro videos (ElevenLabs voice → HeyGen avatar) and wrote \`introVideoUrl\` into the catalog. Engine: \`${{ inputs.engine }}\`, expressiveness: \`${{ inputs.expressiveness }}\`. Review the linked Cloudinary URLs before merging." \
-            || echo "PR may already exist for $BR"
+            || {
+              # `|| echo` turned EVERY failure into success. The branch is pushed and the
+              # renders are already paid for at this point, so a permission, API, validation
+              # or auth failure left an orphan branch behind a green job — the exact delivery
+              # gap this step exists to close. Only an ALREADY-EXISTS race is benign, and that
+              # is provable: ask GitHub whether a PR is actually open for this head.
+              existing=$(gh pr list --head "$BR" --state open --json number --jq 'length' || echo 0)
+              if [ "$existing" -ge 1 ]; then
+                echo "PR already open for $BR — treating as success."
+              else
+                echo "::error::gh pr create failed and no open PR exists for $BR. The result branch is pushed but unmerged."
+                exit 1
+              fi
+            }

@@ -16,7 +16,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'IICRC CEC Mould & Restoration Training for Caravan Parks | CARSI Australia',
   description:
-    'Protect guests and comply with state Fair Trading obligations. IICRC AMRT, CRT, and WRT training for Australian caravan parks and holiday accommodation. Online, CEC Accredited.',
+    'Protect guests and comply with state Fair Trading obligations. CARSI mould remediation, carpet repair and reinstallation and water damage restoration training for Australian caravan parks and holiday accommodation. Online, CEC Accredited.',
   keywords: [
     'caravan park mould training Australia',
     'holiday park IICRC CEC course',
@@ -48,17 +48,17 @@ const faqs = [
   {
     question: 'Why do caravan parks need mould remediation training?',
     answer:
-      'Australian caravan parks face persistent mould risk due to seasonal occupancy patterns that leave cabins, ensuite blocks, and annexes unventilated for months. High humidity coastal and tropical locations, poor drainage around cabin pads, and ageing accommodation stock with limited vapour barriers compound the risk. IICRC AMRT (Applied Microbial Remediation Technician) training gives maintenance staff the ability to inspect cabins systematically before peak season, identify hidden mould in walls and subfloors, and remediate using protocols that prevent costly comeback situations and guest complaints.',
+      'Australian caravan parks face persistent mould risk due to seasonal occupancy patterns that leave cabins, ensuite blocks, and annexes unventilated for months. High humidity coastal and tropical locations, poor drainage around cabin pads, and ageing accommodation stock with limited vapour barriers compound the risk. CARSI mould remediation training gives maintenance staff the ability to inspect cabins systematically before peak season, identify hidden mould in walls and subfloors, and remediate using protocols that prevent costly comeback situations and guest complaints.',
   },
   {
     question: 'What water damage risks do holiday parks face in Australia?',
     answer:
-      'Caravan parks and holiday parks face water damage from cyclone and storm events in tropical regions, flooding in low-lying coastal and riverside parks, roof failures in ageing cabin stock, and plumbing failures in shared amenities blocks. IICRC WRT (Water Damage Restoration Technician) training equips park maintenance staff to respond immediately after these events — extracting water, placing drying equipment, and documenting damage for insurance claims — reducing the period of lost revenue from uninhabitable sites.',
+      'Caravan parks and holiday parks face water damage from cyclone and storm events in tropical regions, flooding in low-lying coastal and riverside parks, roof failures in ageing cabin stock, and plumbing failures in shared amenities blocks. CARSI water damage restoration training equips park maintenance staff to respond immediately after these events — extracting water, placing drying equipment, and documenting damage for insurance claims — reducing the period of lost revenue from uninhabitable sites.',
   },
   {
     question: 'How does IICRC CEC training protect caravan park guests and operators?',
     answer:
-      'Caravan park operators owe guests a duty of care under Australian Consumer Law and state-specific tourism accommodation legislation. Providing accommodation with hidden mould or water damage exposes operators to Fair Trading complaints, negative TripAdvisor reviews, and potential personal injury claims if guests suffer health impacts. IICRC AMRT certification demonstrates that maintenance staff are competent to identify and remediate mould — providing a defensible record that standards-based inspections and remediation were performed, which is increasingly expected by park accreditation bodies.',
+      'Caravan park operators owe guests a duty of care under Australian Consumer Law and state-specific tourism accommodation legislation. Providing accommodation with hidden mould or water damage exposes operators to Fair Trading complaints, negative TripAdvisor reviews, and potential personal injury claims if guests suffer health impacts. CARSI mould remediation training demonstrates that maintenance staff are competent to identify and remediate mould — providing a defensible record that standards-based inspections and remediation were performed, which is increasingly expected by park accreditation bodies.',
   },
   {
     question: 'What is CRT training and how does it help holiday accommodation?',
@@ -105,7 +105,7 @@ export default async function CaravanParksIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Protect Guest Accommodation"
         headlineAccent="All Season Long"
-        description="Australia's 2,800+ caravan parks face persistent mould, moisture, and storm damage risk. IICRC AMRT, CRT, and WRT CEC courses give park maintenance teams the protocols to inspect, remediate, and document — protecting guests, reputation, and revenue. CARSI courses earn IICRC CECs; they are not IICRC certification."
+        description="Australia's 2,800+ caravan parks face persistent mould, moisture, and storm damage risk. CARSI mould remediation, carpet repair and reinstallation and water damage restoration CEC courses give park maintenance teams the protocols to inspect, remediate, and document — protecting guests, reputation, and revenue. CARSI courses carry CARSI Southern Hemisphere Restoration Designations, not IICRC certification."
         disciplines={disciplines}
         stats={stats}
       />
@@ -119,7 +119,7 @@ export default async function CaravanParksIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="Caravan Parks & Holiday Accommodation"
-        disciplineList="AMRT, CRT & WRT"
+        disciplineList="Mould remediation, carpet repair and water damage restoration"
         disciplines={['AMRT', 'CRT', 'WRT']}
       />
 
@@ -129,7 +129,7 @@ export default async function CaravanParksIndustryPage() {
         subtitle="Holiday Park Training"
         title="Holiday Park Bundle"
         price={industryBundlePriceLabel('caravan-parks')}
-        description="AMRT + CRT + WRT training for caravan park and holiday accommodation maintenance staff. Seasonal inspection protocols included. Online, self-paced."
+        description="mould remediation, carpet repair and water damage restoration training for caravan park and holiday accommodation maintenance staff. Seasonal inspection protocols included. Online, self-paced."
         ctaText="Train Your Park Team"
         accentColor={ACCENT_COLOR}
       />

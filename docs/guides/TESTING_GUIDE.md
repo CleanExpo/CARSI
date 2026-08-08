@@ -4,23 +4,30 @@
 
 This document provides comprehensive testing information for the entire system, including PRD generation, security, accessibility, and database integration.
 
-**Test Coverage** (Updated 2026-01-06):
+> **Corrected 2026-08-07.** The coverage table that stood here was boilerplate describing a
+> system this repo has never had. It claimed Percy visual regression, Pact contract tests, k6 load
+> testing and OWASP ZAP penetration testing (**zero references to any of them in `package.json`**),
+> a `tests/accessibility/` directory holding "50+ accessibility tests" (**no `tests/` directory
+> exists**), an `apps/web` workspace (**no `apps/` directory exists**), and pnpm commands (**no
+> `pnpm-lock.yaml`; this repo uses npm**). Paths below still referencing `apps/web/…`,
+> `tests/…` or `pnpm exec` are from that same boilerplate and are equally unreliable — trust
+> `package.json` scripts over this document.
+>
+> Accessibility in particular was documented as **Complete** while no axe spec existed anywhere in
+> the repository, even though `COMPOUND_ENGINEERING_LOOP.md` mandates `npm run test:a11y` on every
+> UI change. That gate now exists (`e2e/a11y.spec.ts`) and is proven to fail on real violations.
 
-- ✅ Backend Unit Tests: **87%+** coverage
-- ✅ Frontend Unit Tests: **77%+** coverage
-- ✅ Security Tests: **Complete** (XSS, API Security, OWASP ZAP)
-- ✅ Accessibility Tests: **Complete** (WCAG 2.1 AA)
-- ✅ Component Tests: **Complete** (Dashboard, Forms)
-- ✅ Integration Tests: **Complete**
-- ✅ E2E Tests: **Complete**
-- ✅ Database Tests: **Complete** (RLS, Integrity)
-- ✅ Contract Tests: **Complete** (Pact - Frontend/Backend)
-- ✅ Visual Regression: **Complete** (Percy - 50+ snapshots)
-- ✅ Performance Tests: **Complete** (Lighthouse CI - Core Web Vitals)
-- ✅ Load Testing: **Complete** (k6 - 4 scenarios)
-- ✅ Penetration Testing: **Complete** (OWASP ZAP - Baseline + Full)
+**Test coverage — measured 2026-08-07, not asserted:**
 
-**Total Test Count**: **300+ test cases** | **4 load test scenarios** | **Automated security scans**
+| Suite | Command | Verified state |
+| --- | --- | --- |
+| Unit (vitest) | `npm run test:unit` | 138 test files passing |
+| E2E / smoke (Playwright) | `npm run test:e2e` / `npm run test:smoke` | 5 spec files; smoke is 12 checks |
+| Accessibility (axe) | `npm run test:a11y` | 3 checks, WCAG 2.1 A/AA, critical + serious only |
+| Licence & content guards | `check:iicrc-terminology`, `check:iicrc-compliance`, `check:cec-surfaces`, `check:cec`, `check:designations`, `check:au-english`, `check:standards-claims`, `check:secrets`, `check:course-completeness` | all exit 0 on `main` |
+
+Anything not in this table is not covered. Add a row only after the suite runs and you have read
+its output.
 
 ---
 

@@ -175,7 +175,7 @@ export default async function CoursesPage({
             track <AcronymTooltip term="CEC">CECs</AcronymTooltip> online, at your own pace
           </p>
           <p className="mt-3 rounded-lg border border-[#f2cf8f] bg-[#fff8ed] px-4 py-3 text-sm leading-relaxed text-[#7a3500]">
-            CARSI courses earn IICRC Continuing Education Credits (CECs). They are not IICRC
+            CARSI courses carry CARSI Southern Hemisphere Restoration Designations. They are not IICRC
             certification courses — IICRC certifications are obtained through IICRC-approved schools
             and examinations.
           </p>

@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Award, Building2, CheckCircle2, Download, PartyPopper } from 'lucide-react';
 
 import { CertificatePreview } from '@/components/lms/diagrams/CertificatePreview';
+import { CREDENTIAL_DISCLAIMER } from '@/components/seo/JsonLd';
 import { dash } from '@/lib/dashboard-light-ui';
 import { FLOOR_CARE_ONBOARDING_SLUG, isOnboardingCourse, ONBOARDING_BRAND } from '@/lib/onboarding/enterprise';
 import type { PublicCredentialJson } from '@/lib/server/credential-public';
@@ -136,6 +137,24 @@ export function CredentialVerificationPageContent({
               : undefined
           }
         />
+      </section>
+
+      {/* What this credential is — and is not.
+          A blind critic named the asymmetry: every protective statement lived on the marketing
+          page, which is the one surface a third party never opens. THIS page is the credential's
+          point of use — an employer, insurer or loss adjuster arrives here decoupled from all that
+          copy. A designation name alone ("CARSI Water Restoration Practitioner") reads exactly like
+          a trade certification, so without this the product is disclaimed and the artifact is not,
+          and the misleading happens where the stakes are highest.
+          Verbatim from CREDENTIAL_DISCLAIMER so the record and the course page cannot drift. */}
+      <section
+        className="mt-8 rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4"
+        aria-labelledby="credential-scope-heading"
+      >
+        <h2 id="credential-scope-heading" className="text-sm font-semibold text-slate-900">
+          What this credential is
+        </h2>
+        <p className="mt-2 text-sm leading-relaxed text-slate-600">{CREDENTIAL_DISCLAIMER}</p>
       </section>
 
       <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">

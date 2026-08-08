@@ -10,7 +10,7 @@ export const revalidate = 300;
 export const metadata = {
   title: 'CARSI Designations — Southern Hemisphere Restoration Credentials',
   description:
-    'CARSI Southern Hemisphere Restoration Designations complement the IICRC — Australian-produced credentials for training the IICRC does not offer, that also earn IICRC Continuing Education Credits (CECs). Not an IICRC certification.',
+    'CARSI Southern Hemisphere Restoration Designations complement the IICRC — Australian-produced credentials for training the IICRC does not offer. Not an IICRC certification.',
 };
 
 export default function DesignationsIndexPage() {

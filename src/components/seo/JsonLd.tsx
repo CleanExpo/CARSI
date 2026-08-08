@@ -160,7 +160,30 @@ interface CourseSchemaProps {
   educationalLevel?: string;
   teaches?: string[];
   aggregateRating?: { ratingValue: number; reviewCount: number };
+  /**
+   * The CARSI designation this course awards, e.g. "CARSI Water Restoration Practitioner".
+   * Omitted for courses with no registry entry — absent rather than guessed.
+   */
+  credentialAwarded?: string;
 }
+
+/**
+ * The credential disclaimer, single-sourced. Kept identical to the sentence rendered above the
+ * fold on the course page so prose and structured data can never drift apart — drift is how a
+ * machine reader ends up with a less careful claim than a human one.
+ */
+export const CREDENTIAL_DISCLAIMER =
+  // The middle clause previously asserted per-course CEC eligibility in prose, and
+  // data/seed/cec-approvals.json holds zero approvals — yet this string is emitted in
+  // educationalCredentialAwarded JSON-LD, rendered above the fold on every designation
+  // course, and reused on public credential-verification records. It named no number, so
+  // the schema test (which rejects numeric CEC and provider identifiers) passed it, and it
+  // never says "CEC", so the terminology guard's CEC rule did not see it either.
+  // Provider standing is true and stays; course-level eligibility now depends on approval.
+  'A CARSI-issued credential — not an IICRC certification. CARSI is an IICRC CEC Accredited ' +
+  'provider; a course displays IICRC CECs only where that course holds IICRC ' +
+  'approval. IICRC certification itself is obtained through an IICRC-approved school and ' +
+  'examination.';
 
 function normalizeCoursePrice(price: number | undefined): number | undefined {
   if (typeof price !== 'number' || !Number.isFinite(price) || price < 0) return undefined;
@@ -205,6 +228,7 @@ export function CourseSchema({
   educationalLevel,
   teaches,
   aggregateRating,
+  credentialAwarded,
 }: CourseSchemaProps) {
   const schema: Record<string, unknown> = {
     '@context': 'https://schema.org',
@@ -237,6 +261,35 @@ export function CourseSchema({
 
   if (teaches && teaches.length > 0) {
     schema.teaches = teaches;
+  }
+
+  // Machine-readable credential standing. Two independent blind critics asked the same thing of
+  // this page — an insurer or employer must be able to establish what the credential IS without
+  // phoning anyone; "honest framing is not the same as auditable standing".
+  //
+  // Deliberately narrow. It states the issuer (CARSI) and that the award is a CARSI designation,
+  // and nothing else. It does NOT assert CEC hours or an IICRC provider/approval number: those
+  // are founder-confirmed data, the CEC registry (`data/seed/cec-approvals.json`) is empty and
+  // fail-closed, and a fabricated credential claim in structured data is worse than none —
+  // machines repeat it without the hedging a human reader would apply.
+  if (credentialAwarded) {
+    schema.educationalCredentialAwarded = {
+      '@type': 'EducationalOccupationalCredential',
+      name: credentialAwarded,
+      credentialCategory: 'certificate',
+      recognizedBy: { '@id': 'https://carsi.com.au/#organization' },
+      // The page's own disclaimer, verbatim, carried INTO the machine-readable payload.
+      //
+      // A blind critic caught the asymmetry: the not-a-certification distinction appeared three
+      // times in prose and zero times here. An answer engine or aggregator lifts this node out of
+      // the page, and without these two fields it reads as "an occupational credential recognised
+      // by CARSI" — which is the one reader whose version of the page nobody had proofread.
+      //
+      // No new assertion: this is the sentence already published above the fold, and a link to the
+      // already-public verification surface. Still no CEC hour count and no IICRC provider number.
+      description: CREDENTIAL_DISCLAIMER,
+      url: 'https://carsi.com.au/verify/training-record',
+    };
   }
 
   if (aggregateRating && aggregateRating.reviewCount > 0) {

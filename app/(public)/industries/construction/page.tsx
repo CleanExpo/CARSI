@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Construction IICRC CEC Training',
   description:
-    'IICRC water damage and mould management training for Australian construction sites. WRT, ASD and AMRT courses supporting NCC compliance.',
+    'IICRC water damage and mould management training for Australian construction sites. Water damage restoration, structural drying and mould remediation courses supporting NCC compliance.',
   keywords: [
     'construction IICRC CEC training',
     'building site mould management',
@@ -93,7 +93,7 @@ export default async function ConstructionIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="Construction Industry"
-        disciplineList="WRT, ASD & AMRT"
+        disciplineList="Water damage restoration, structural drying and mould remediation"
         disciplines={['WRT', 'ASD', 'AMRT']}
       />
 

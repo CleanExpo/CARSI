@@ -11,49 +11,49 @@ const DISCIPLINE_ACCENTS: Record<
   { fg: string; glow: string; from: string; via: string; to: string }
 > = {
   WRT: {
-    fg: '#146fc2',
+    fg: '#0b5a9c',
     glow: 'rgba(36,144,237,0.22)',
     from: '#eef7ff',
     via: '#dceeff',
     to: '#ffffff',
   },
   CRT: {
-    fg: '#047f6f',
+    fg: '#036356',
     glow: 'rgba(38,196,160,0.2)',
     from: '#ecfdf7',
     via: '#d7fbef',
     to: '#ffffff',
   },
   ASD: {
-    fg: '#4f46e5',
+    fg: '#3c34b8',
     glow: 'rgba(108,99,255,0.18)',
     from: '#f0f1ff',
     via: '#e3e5ff',
     to: '#ffffff',
   },
   OCT: {
-    fg: '#7e3ba0',
+    fg: '#6a2f88',
     glow: 'rgba(155,89,182,0.18)',
     from: '#fbf0ff',
     via: '#f1ddfb',
     to: '#ffffff',
   },
   CCT: {
-    fg: '#0f7890',
+    fg: '#0b5f73',
     glow: 'rgba(23,184,212,0.18)',
     from: '#ecfbff',
     via: '#d9f6fb',
     to: '#ffffff',
   },
   FSRT: {
-    fg: '#c2410c',
+    fg: '#9c340a',
     glow: 'rgba(240,90,53,0.18)',
     from: '#fff4ed',
     via: '#ffe3d2',
     to: '#ffffff',
   },
   AMRT: {
-    fg: '#15803d',
+    fg: '#116631',
     glow: 'rgba(39,174,96,0.18)',
     from: '#f0fdf4',
     via: '#dcfce7',
@@ -68,7 +68,7 @@ const DISCIPLINE_ACCENTS: Record<
  * takes this one CARSI-neutral treatment.
  */
 const CARSI_NEUTRAL: (typeof DISCIPLINE_ACCENTS)['WRT'] = {
-  fg: '#9a4526',
+  fg: '#7d3820',
   glow: 'rgba(184,92,56,0.16)',
   from: '#faf5ef',
   via: '#f2e8db',
@@ -288,8 +288,8 @@ export function CourseTextThumbnail({
                 className="rounded-md px-1.5 py-0.5 font-mono text-[10px] font-bold tracking-wide uppercase"
                 style={{
                   color: accent.fg,
-                  background: hasBackdrop ? 'rgba(0,0,0,0.45)' : 'rgba(255,255,255,0.88)',
-                  border: `1px solid ${accent.fg}44`,
+                  background: hasBackdrop ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.97)',
+                  border: `1px solid ${accent.fg}66`,
                 }}
               >
                 {code}

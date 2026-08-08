@@ -19,7 +19,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = buildIndustryMetadata(
   'government-defence',
   'Government & Defence IICRC CEC Training',
-  'WHS-compliant IICRC CEC training for Australian councils, agencies and defence facilities. AMRT, WRT, ASD and FSRT courses for AusTender compliance.',
+  'WHS-compliant IICRC CEC training for Australian councils, agencies and defence facilities. Mould remediation, water damage restoration, structural drying and fire & smoke restoration courses for AusTender compliance.',
   [
     'government IICRC CEC training',
     'defence facility restoration',
@@ -53,12 +53,12 @@ const faqs = [
   {
     question: 'What WHS obligations apply to mould in government buildings?',
     answer:
-      'Under Australian WHS legislation, government employers have a duty of care to identify and manage mould and moisture hazards. IICRC AMRT (Applied Microbial Remediation) training provides facility teams with the skills to conduct mould assessments, implement containment protocols, and document remediation — demonstrating WHS due diligence to regulators.',
+      'Under Australian WHS legislation, government employers have a duty of care to identify and manage mould and moisture hazards. CARSI mould remediation training provides facility teams with the skills to conduct mould assessments, implement containment protocols, and document remediation — demonstrating WHS due diligence to regulators.',
   },
   {
     question: 'How do you restore heritage-listed government buildings after water damage?',
     answer:
-      'Heritage-listed buildings require specialised structural drying techniques that avoid damaging original materials. IICRC ASD (Applied Structural Drying) certification trains government maintenance teams in low-impact drying methods, moisture monitoring, and documentation protocols that satisfy both heritage conservation requirements and WHS compliance.',
+      'Heritage-listed buildings require specialised structural drying techniques that avoid damaging original materials. CARSI applied structural drying training trains government maintenance teams in low-impact drying methods, moisture monitoring, and documentation protocols that satisfy both heritage conservation requirements and WHS compliance.',
   },
   {
     question: 'Can government facility staff complete IICRC CEC training online?',
@@ -116,7 +116,7 @@ export default async function GovernmentDefenceIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="Government & Defence"
-        disciplineList="AMRT, WRT, ASD & FSRT"
+        disciplineList="Mould remediation, water damage restoration, structural drying and fire & smoke restoration"
         disciplines={['AMRT', 'WRT', 'ASD', 'FSRT']}
       />
 
@@ -128,7 +128,7 @@ export default async function GovernmentDefenceIndustryPage() {
         subtitle="Government facility training"
         title="Facility Restoration Bundle"
         price={industryBundlePriceLabel('government-defence')}
-        description="WRT + AMRT + ASD training for government facility teams. Bulk 10+ seat licensing available for councils and departments."
+        description="water damage restoration, mould remediation and structural drying training for government facility teams. Bulk 10+ seat licensing available for councils and departments."
         ctaText="Request bulk pricing"
         ctaHref="/contact"
         accentColor={ACCENT_COLOR}

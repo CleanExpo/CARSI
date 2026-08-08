@@ -50,7 +50,7 @@ const SEED_COURSES: SeedCourseFull[] = [
       short_description:
         'Foundations of water damage assessment, extraction, drying, and documentation for Australian restoration technicians.',
       description:
-        'Professional introduction to water damage restoration aligned with IICRC WRT concepts: safety, psychrometry, equipment, and client communication.',
+        'Professional introduction to water damage restoration: safety, psychrometry, equipment, and client communication.',
       price_aud: 0,
       is_free: true,
       iicrc_discipline: 'WRT',

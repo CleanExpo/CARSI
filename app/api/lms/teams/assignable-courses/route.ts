@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 
 import { prisma } from '@/lib/prisma';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
+import { lmsPublishedCourseWhere } from '@/lib/server/public-courses-list';
 import { getTeamCourseSeatPools } from '@/lib/server/team-course-seats';
 import { repairAndGetTeamForUser } from '@/lib/server/teams';
 
@@ -25,7 +26,12 @@ export async function GET(request: NextRequest) {
       where: {
         studentId: claims.sub,
         status: { notIn: ['cancelled'] },
-        course: { isPublished: true },
+        // `status` is the canonical publication flag (#137); `isPublished` is the legacy
+        // dual-write column. Filtering on the legacy field here split the product in two: 20
+        // courses currently carry status='published' with isPublished=false, so a learner could
+        // find and enrol in them from the public catalogue (which uses the canonical predicate)
+        // while they stayed invisible to team assignment. Same predicate everywhere, one truth.
+        course: lmsPublishedCourseWhere,
       },
       include: {
         course: { select: { slug: true, title: true } },

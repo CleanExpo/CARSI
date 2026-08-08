@@ -61,7 +61,7 @@ Establish CARSI as a recognised training partner across 7+ Australian industry a
 | Detail                      | Information                                                                                                                            |
 | --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
 | **Relevance**               | Peak body for the building and construction industry. Water damage, structural drying and mould during construction are common issues. |
-| **Proposition**             | Construction safety training partner — IICRC CEC courses in WRT, ASD and mould assessment as CPD for builder registration renewal.         |
+| **Proposition**             | Construction safety training partner — IICRC CEC courses in water damage restoration and structural drying and mould assessment as CPD for builder registration renewal.         |
 | **Contact Strategy**        | Approach state branches first (MBA VIC, MBA QLD, MBA WA) → local partnership → escalate to national body.                              |
 | **Partnership Tier Target** | Preferred Training Partner (CPD recognition + member discount)                                                                         |
 | **URL**                     | masterbuilders.com.au                                                                                                                  |
@@ -129,7 +129,7 @@ Establish CARSI as a recognised training partner across 7+ Australian industry a
 
 ### Version 1: Short (< 150 words)
 
-**Subject:** IICRC Training Partnership — [Association Name] Members
+**Subject:** IICRC CEC Course Partnership — [Association Name] Members
 
 ---
 
@@ -162,7 +162,7 @@ I'm writing to introduce CARSI (carsi.com.au), an Australian-owned platform deli
 
 We believe there's a strong alignment between CARSI's course catalogue and the professional development needs of [Association Name] members. Specifically:
 
-- **40+ IICRC CEC Accredited courses** — covering WRT, ASD, AMRT, CCT and more
+- **40+ IICRC CEC Accredited courses** — covering water damage restoration, structural drying, mould remediation and carpet cleaning and more
 - **100% online, self-paced** — no classroom attendance or roster disruption
 - **Verifiable digital certificates** — public credential URL for employer and client verification
 - **Continuing Education Credits** — recognised IICRC CECs for credential maintenance
@@ -198,7 +198,7 @@ I'm reaching out because I believe [Association Name] members could significantl
 
 **About CARSI**
 
-CARSI delivers 40+ online courses approved by the IICRC (International Institute of Inspection, Cleaning and Restoration Certification). Our platform is purpose-built for working tradespeople and professionals — courses are 100% online, self-paced, and can be completed on any device. Each course earns verified Continuing Education Credits (CECs) and a digital certificate with a public verification URL.
+CARSI delivers 40+ online courses. Our platform is purpose-built for working tradespeople and professionals — courses are 100% online, self-paced, and can be completed on any device. Each course issues a digital certificate with a public verification URL.
 
 **Why This Matters for [Association Name] Members**
 
@@ -206,7 +206,7 @@ CARSI delivers 40+ online courses approved by the IICRC (International Institute
 
 - _For BSCAA:_ Cleaning contractors increasingly need IICRC credentials to win commercial tenders and insurance-related work. Our courses help your members compete.
 - _For LASA:_ Mould in aged care facilities is a growing compliance concern. Our training equips facility maintenance teams with recognised credentials.
-- _For Master Builders:_ Water damage during construction causes costly defects. Our WRT and ASD courses train site teams to respond correctly.
+- _For Master Builders:_ Water damage during construction causes costly defects. Our water damage restoration and structural drying courses train site teams to respond correctly.
 
 **Partnership Proposal**
 

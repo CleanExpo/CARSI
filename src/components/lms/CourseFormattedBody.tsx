@@ -20,7 +20,7 @@ const blockGap = 'space-y-4';
 const proseByTone = {
   light:
     'prose prose-slate max-w-none text-sm leading-relaxed prose-headings:text-slate-900 prose-p:text-slate-700 prose-li:text-slate-700 prose-p:leading-relaxed',
-  dark: 'prose prose-invert prose-headings:text-white/90 prose-p:text-white/70 prose-li:text-white/70 max-w-none text-sm leading-relaxed prose-p:leading-relaxed',
+  dark: 'prose prose-invert max-w-none text-sm leading-relaxed prose-p:leading-relaxed [&_:where(h1,h2,h3,h4,h5,h6)]:!text-white/90 [&_p]:!text-white/80 [&_li]:!text-white/80 [&_strong]:!text-white [&_a]:!text-[#8fd0ff]',
 } as const;
 
 const textByTone = {

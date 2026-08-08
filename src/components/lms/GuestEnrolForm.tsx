@@ -134,11 +134,19 @@ export function GuestEnrolForm({ slug, priceAud, isFree, showTeamOption = false 
         <Label htmlFor="guest-full-name" className="text-white/70">
           Full name
         </Label>
+        {/* A free course asking for a real name reads as data collection unless you say why.
+            It is on the credential, so it cannot be dropped — state the reason instead of
+            leaving the buyer to assume the worst. */}
+        <p id="guest-full-name-help" className="text-xs text-white/45">
+          Printed on your credential — enter it as you want it to appear. You can change it later
+          in your account.
+        </p>
         <Input
           id="guest-full-name"
           value={fullName}
           onChange={(e) => setFullName(e.target.value)}
           required
+          aria-describedby="guest-full-name-help"
           className="border-white/15 bg-white/5 text-white"
         />
       </div>

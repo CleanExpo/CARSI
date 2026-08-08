@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Aged Care IICRC CEC Training',
   description:
-    'NQF-compliant IICRC CEC training for aged care facilities. CRT and AMRT courses for carpet restoration, mould remediation, and infection control.',
+    'NQF-compliant IICRC CEC training for aged care facilities. Carpet repair and mould remediation courses for carpet restoration, mould remediation, and infection control.',
   keywords: [
     'aged care IICRC CEC training',
     'NQF compliance training',
@@ -112,7 +112,7 @@ export default async function AgedCareIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="Aged Care Industry"
-        disciplineList="CRT & AMRT"
+        disciplineList="Carpet repair and mould remediation"
         disciplines={['CRT', 'AMRT']}
       />
 

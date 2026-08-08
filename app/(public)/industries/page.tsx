@@ -190,7 +190,7 @@ const industries = [
 
 export const metadata: Metadata = {
   title: 'Industry Training Solutions',
-  description: `IICRC-aligned training for ${industries.length} industries across Australia. Sector-specific restoration courses with verifiable credentials for healthcare, hospitality, mining, plumbing, NDIS, real estate, and more.`,
+  description: `IICRC CEC Accredited training for ${industries.length} industries across Australia. Sector-specific restoration courses with verifiable credentials for healthcare, hospitality, mining, plumbing, NDIS, real estate, and more.`,
   alternates: { canonical: '/industries' },
 };
 
@@ -226,7 +226,7 @@ export default function IndustriesPage() {
             className="max-w-2xl text-lg leading-relaxed"
             style={{ color: 'rgba(255,255,255,0.5)' }}
           >
-            IICRC-aligned training for {industries.length} industries across Australia. Each pathway
+            IICRC CEC Accredited training for {industries.length} industries across Australia. Each pathway
             includes sector-specific courses, verifiable credentials, and continuing education credits.
           </p>
         </section>

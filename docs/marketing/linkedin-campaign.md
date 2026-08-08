@@ -4,7 +4,7 @@
 
 ## Objective
 
-Generate qualified leads from decision-makers who control training budgets across 4 industry segments. Secondary objective: build brand awareness for CARSI as Australia's IICRC-aligned training platform.
+Generate qualified leads from decision-makers who control training budgets across 4 industry segments. Secondary objective: build brand awareness for CARSI as Australia's IICRC CEC Accredited training platform.
 
 **Targets:**
 
@@ -114,7 +114,7 @@ Downloadable PDF preview in feed — users swipe through pages, then submit lead
 
 > **Hook:** 40+ IICRC CEC courses. Zero classroom time. One annual subscription.
 >
-> **Body:** CARSI gives mining companies unlimited access to IICRC CEC Accredited restoration and safety training for $795/year per user. WRT, ASD, AMRT and more — all self-paced, all verifiable, all built for shift workers.
+> **Body:** CARSI gives mining companies unlimited access to IICRC CEC Accredited restoration and safety training for $795/year per user. Water damage restoration, structural drying and mould remediation and more — all self-paced, all verifiable, all built for shift workers.
 >
 > Bulk licensing discounts for teams of 10+.
 >
@@ -198,7 +198,7 @@ Downloadable PDF preview in feed — users swipe through pages, then submit lead
 
 > **Hook:** Ready to add mould remediation to your cleaning services?
 >
-> **Body:** IICRC training through CARSI lets you expand your service offering without expensive classroom courses. WRT, CCT, AMRT — all online, all self-paced, all earning verified CECs.
+> **Body:** IICRC CEC courses through CARSI let you expand your service offering without expensive classroom courses. Water damage restoration, carpet cleaning and mould remediation — all online, all self-paced.
 >
 > Group licensing available for franchise networks.
 >
@@ -224,14 +224,14 @@ Downloadable PDF preview in feed — users swipe through pages, then submit lead
 
 1. **What is IICRC?** — International Institute of Inspection, Cleaning and Restoration Certification explained for the Australian market
 2. **Why IICRC Matters in Australia** — Insurance requirements, tender pre-qualification, WHS compliance links
-3. **The 5 Core IICRC Disciplines** — WRT, CRT/CCT, OCT, ASD, AMRT — what each covers and who needs it
+3. **The 5 Core IICRC Disciplines** — water damage restoration, carpet repair, carpet cleaning, odour control, structural drying and mould remediation — what each covers and who needs it
 4. **CECs Explained** — How Continuing Education Credits work, renewal cycles, how to track them
-5. **Industry Applications** — How IICRC training applies to Restoration, Mining, Aged Care, Property, Cleaning, Construction
+5. **Industry Applications** — How IICRC CEC courses apply to Restoration, Mining, Aged Care, Property, Cleaning, Construction
 6. **Online vs Classroom Training** — Pros, cons, and why online delivery suits Australian tradespeople
 7. **How to Get Started** — Step-by-step guide to choosing your first course
 8. **CARSI Course Catalogue Overview** — Summary of 40+ available courses with CEC values
 9. **Group Training & Corporate Licensing** — Options for businesses enrolling teams
-10. **FAQs** — Common questions from Australian professionals considering IICRC training
+10. **FAQs** — Common questions from Australian professionals considering IICRC CEC courses
 
 **CTA on final page:** "Ready to start? Visit carsi.com.au or contact us at training@carsi.com.au"
 

@@ -54,7 +54,7 @@ business, drawn from the ranges in `research-and-figures.md`:
 | Software (Xero Grow $900 + RestoreAssist `[NEEDS CURRENT FIGURE]` + QBO/MYOB) | $2,700 | Xero §7; RestoreAssist price TBC |
 | Accounting + bookkeeping + BAS + annual return | $6,000 | Bookkeeping + BAS + company return (§7) |
 | Marketing / website / advertising | $4,000 | Overhead (owner-set) |
-| IICRC/CARSI training & certification (amortised) | $1,500 | WRT+ASD combo ~$2,350 (§9 training) amortised |
+| IICRC/CARSI training & certification (amortised) | $1,500 | water damage restoration and structural drying combo ~$2,350 (§9 training) amortised |
 | Premises / storage | $6,000 | Storage/occupancy (owner-set) |
 | **Total annual overheads** | **$39,700** | *Replace with your real P&L totals* |
 

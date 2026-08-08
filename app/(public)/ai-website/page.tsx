@@ -156,8 +156,7 @@ export default function AiWebsitePage() {
           <div className="aiw-compliance">
             CARSI delivers <strong>IICRC CEC Accredited</strong> continuing education. CARSI is an accredited IICRC
             Continuing Education Credit (CEC) provider — it does not deliver IICRC certification. IICRC certification is
-            obtained through IICRC-approved schools and examinations; CARSI courses earn CECs toward maintaining an
-            existing IICRC certification, alongside CARSI’s own Southern Hemisphere Restoration Designations.
+            obtained through IICRC-approved schools and examinations; CARSI courses carry CARSI’s own Southern Hemisphere Restoration Designations.
           </div>
         </div>
       </footer>

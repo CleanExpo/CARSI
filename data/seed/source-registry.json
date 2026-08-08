@@ -1,0 +1,153 @@
+{
+  "version": 1,
+  "purpose": "Approved external sources for CARSI course content and marketing, tiered by evidential authority. Exists so an E-E-A-T claim is checkable rather than asserted: content that cites tier-1 primary sources demonstrates expertise, content that cites only suppliers demonstrates a catalogue.",
+  "createdAt": "2026-08-07",
+  "seededFrom": "Domains already cited in data/seed and docs/course-content, enumerated 2026-08-07. Nothing here is aspirational - every tier-1 and tier-3 entry was already in use.",
+  "rules": {
+    "iicrcStandardText": "NEVER reproduce IICRC standard text, and never enter it into AI tooling. The IICRC's published AI Use Policy prohibits both. iicrc.org is registered for NOMINATIVE reference only (naming a standard or a certification third-person). Enforced separately by src/lib/course-kit/standards-excerpt.ts.",
+    "absenceClaims": "Never claim a standard omits something. Absence cannot be proven from a section index - state what the standard DOES say. See CLAUDE.md, 2026-07-15 incident.",
+    "supplierSources": "Tier 4 is citable for product specification and availability. It is NOT evidence for a safety, health or regulatory claim, and does not count toward authority ratio.",
+    "unregistered": "A domain absent from this registry is not banned - it is unvetted. Add it with a tier and a reason, or replace the citation."
+  },
+  "tiers": {
+    "1": "Primary Australian regulator, legislator or standards body. Highest authority for a compliance or safety claim.",
+    "2": "Peer-reviewed research or an international public-health body. Authority for a scientific claim.",
+    "3": "Industry certifying body. Nominative reference only.",
+    "4": "Manufacturer, supplier or distributor. Product specification and availability only."
+  },
+  "sources": [
+    {
+      "domain": "safeworkaustralia.gov.au",
+      "name": "Safe Work Australia",
+      "tier": 1,
+      "jurisdiction": "AU national",
+      "covers": "Model WHS laws and duties, hazardous chemicals, asbestos, crystalline silica, safety data sheets",
+      "inUse": true
+    },
+    {
+      "domain": "legislation.gov.au",
+      "name": "Federal Register of Legislation",
+      "tier": 1,
+      "jurisdiction": "AU national",
+      "covers": "Commonwealth Acts and instruments as made",
+      "inUse": true
+    },
+    {
+      "domain": "standards.org.au",
+      "name": "Standards Australia",
+      "tier": 1,
+      "jurisdiction": "AU/NZ",
+      "covers": "AS and AS/NZS standards catalogue. Cite nominatively - do not reproduce clause text.",
+      "inUse": true
+    },
+    {
+      "domain": "health.gov.au",
+      "name": "Australian Department of Health",
+      "tier": 1,
+      "jurisdiction": "AU national",
+      "covers": "Public health guidance, communicable disease control",
+      "inUse": true
+    },
+    {
+      "domain": "acecqa.gov.au",
+      "name": "ACECQA",
+      "tier": 1,
+      "jurisdiction": "AU national",
+      "covers": "Education and care national quality framework - relevant to childcare and education facility work",
+      "inUse": true
+    },
+    {
+      "domain": "worksafe.vic.gov.au",
+      "name": "WorkSafe Victoria",
+      "tier": 1,
+      "jurisdiction": "VIC",
+      "covers": "OHS Act and regulations, hazardous substances",
+      "inUse": true
+    },
+    {
+      "domain": "schoolinfrastructure.nsw.gov.au",
+      "name": "School Infrastructure NSW",
+      "tier": 1,
+      "jurisdiction": "NSW",
+      "covers": "Education facility standards and maintenance requirements",
+      "inUse": true
+    },
+    {
+      "domain": "epa.nsw.gov.au",
+      "name": "NSW Environment Protection Authority",
+      "tier": 1,
+      "jurisdiction": "NSW",
+      "covers": "Contaminated site and waste handling obligations",
+      "inUse": true
+    },
+    {
+      "domain": "epa.vic.gov.au",
+      "name": "EPA Victoria",
+      "tier": 1,
+      "jurisdiction": "VIC",
+      "covers": "Contaminated site and waste handling obligations",
+      "inUse": true
+    },
+    {
+      "domain": "sydneywater.com.au",
+      "name": "Sydney Water",
+      "tier": 1,
+      "jurisdiction": "NSW",
+      "covers": "Trade waste and discharge requirements for extraction water",
+      "inUse": true
+    },
+    {
+      "domain": "iicrc.org",
+      "name": "IICRC",
+      "tier": 3,
+      "jurisdiction": "international",
+      "covers": "NOMINATIVE ONLY - naming a standard or certification third-person. Never reproduce standard text; never enter standard text into AI tooling.",
+      "inUse": true
+    },
+    {
+      "domain": "hydramaster.com",
+      "name": "HydraMaster",
+      "tier": 4,
+      "jurisdiction": "supplier",
+      "covers": "Truckmount equipment specification",
+      "inUse": true
+    },
+    {
+      "domain": "legendbrands.com",
+      "name": "Legend Brands",
+      "tier": 4,
+      "jurisdiction": "supplier",
+      "covers": "Restoration equipment specification",
+      "inUse": true
+    },
+    {
+      "domain": "actichem.com.au",
+      "name": "Actichem",
+      "tier": 4,
+      "jurisdiction": "supplier AU",
+      "covers": "Chemical product specification and Australian availability",
+      "inUse": true
+    },
+    {
+      "domain": "ccwonline.com.au",
+      "name": "CCW Online",
+      "tier": 4,
+      "jurisdiction": "supplier AU",
+      "covers": "Product catalogue and Australian availability",
+      "inUse": true
+    }
+  ],
+  "assetHosts": {
+    "note": "Not citations. Excluded from authority scoring so image and CDN links never inflate or deflate a course's source profile.",
+    "domains": [
+      "cdn.shopify.com",
+      "res.cloudinary.com",
+      "secureservercdn.net",
+      "carpet-cleaners.neto.com.au",
+      "go.cin7.com",
+      "youtube.com",
+      "youtu.be",
+      "carsi.com.au"
+    ]
+  }
+}

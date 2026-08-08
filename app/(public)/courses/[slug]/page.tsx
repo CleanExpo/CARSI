@@ -56,6 +56,20 @@ interface CourseDetail {
   duration_hours?: string | null;
   thumbnail_url?: string | null;
   module_count?: number | null;
+  lesson_count?: number | null;
+  syllabus?: {
+    id: string;
+    title: string;
+    duration_minutes?: number | null;
+    lessons: {
+      id: string;
+      title: string;
+      content_type: string;
+      is_preview: boolean;
+      duration_minutes?: number | null;
+      preview_body?: string | null;
+    }[];
+  }[];
   instructor?: { full_name: string } | null;
   intro_video_url?: string | null;
 }
@@ -289,6 +303,12 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
   const designation = getDesignationForCourseSlug(course.slug);
   const thumbnailUrl = resolveAssetUrl(course.thumbnail_url);
   const learningOutcomes = getLearningOutcomes(course, designation);
+
+  // First preview lesson that actually carries a body. The server has already nulled
+  // preview_body on every non-preview lesson, so this only ever selects permitted content.
+  const previewLesson = course.syllabus
+    ?.flatMap((m) => m.lessons)
+    .find((l) => l.is_preview && l.preview_body);
   const audienceItems = getAudienceItems(course, designation);
 
   const breadcrumbs = [
@@ -314,6 +334,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
         educationalLevel={course.level ?? undefined}
         teaches={designation ? [designation.disciplineTopic] : undefined}
         aggregateRating={aggregateRating ?? undefined}
+        credentialAwarded={designation?.name}
       />
       {course.intro_video_url ? (
         <VideoObjectSchema
@@ -441,6 +462,39 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                       Earns the {designation.name}
                     </p>
                   )}
+
+                  {/* Credential clarity, above the fold.
+                      CARSI's strongest and most honest differentiator — that this is CARSI's own
+                      credential and CARSI is a CEC provider rather than a certifying body — was
+                      stated only in a mid-page bullet and again near the page bottom. A buyer
+                      deciding whether the credential is worth anything had to scroll to find out.
+                      Wording is fixed and licence-bound: "IICRC CEC Accredited" never appears
+                      without CEC, and no discipline acronym brands the course
+                      (CLAUDE.md § IICRC CEC terminology, enforced by check:iicrc-compliance). */}
+                  <p
+                    className="mb-4 max-w-2xl text-sm leading-relaxed"
+                    style={{ color: 'rgba(255,255,255,0.7)' }}
+                  >
+                    <span style={{ color: 'rgba(255,255,255,0.92)', fontWeight: 600 }}>
+                      A CARSI-issued credential — not an IICRC certification.
+                    </span>{' '}
+                    CARSI is an IICRC CEC Accredited provider, so this course counts toward
+                    maintaining a certification you already hold. IICRC certification itself is
+                    obtained through an IICRC-approved school and examination.{' '}
+                    {/* Both credential critics asked for a verification path. One already exists
+                        and is public — app/(public)/verify/credential/[credentialId] and
+                        /verify/training-record, neither auth-gated — but the course page linked
+                        it zero times, so the buyer had no way to know the credential is checkable
+                        at source. Surface it where the credential is sold. */}
+                    <Link
+                      href="/verify/training-record"
+                      className="underline underline-offset-2"
+                      style={{ color: '#ed9d24' }}
+                    >
+                      Every CARSI credential gets a public verification page
+                    </Link>{' '}
+                    an employer or insurer can check without contacting us.
+                  </p>
 
                   {/* Star rating (social proof) — only when the course has published reviews */}
                   {aggregateRating && (
@@ -743,6 +797,115 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                   </ul>
                 </div>
               </section>
+
+              {/* ── Syllabus ── */}
+              {/* A bare module count cannot tell a buyer what two hours contains. The LMS already
+                  stores every module and lesson title; name them. */}
+              {course.syllabus && course.syllabus.length > 0 && (
+                <section>
+                  <h2
+                    className="mb-4 text-xl font-bold"
+                    style={{ color: 'rgba(255,255,255,0.92)' }}
+                  >
+                    Syllabus
+                  </h2>
+                  <p className="mb-4 text-sm" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                    {course.syllabus.length} module{course.syllabus.length === 1 ? '' : 's'}
+                    {course.lesson_count
+                      ? ` · ${course.lesson_count} lesson${course.lesson_count === 1 ? '' : 's'}`
+                      : ''}
+                    {course.duration_hours ? ` · ${course.duration_hours}` : ''}
+                  </p>
+                  <ol className="space-y-4">
+                    {course.syllabus.map((mod, modIndex) => (
+                      <li key={mod.id} className="rounded-sm p-6" style={glassPanelSubtle}>
+                        <h3
+                          className="mb-3 text-base font-semibold"
+                          style={{ color: 'rgba(255,255,255,0.92)' }}
+                        >
+                          <span style={{ color: 'rgba(255,255,255,0.45)' }}>
+                            Module {modIndex + 1}
+                          </span>
+                          {' — '}
+                          {mod.title}
+                          {typeof mod.duration_minutes === 'number' && (
+                            <span
+                              className="ml-2 text-sm font-normal"
+                              style={{ color: 'rgba(255,255,255,0.5)' }}
+                            >
+                              {mod.duration_minutes} min
+                            </span>
+                          )}
+                        </h3>
+                        {mod.lessons.length > 0 && (
+                          <ul className="space-y-2">
+                            {mod.lessons.map((lesson) => (
+                              <li
+                                key={lesson.id}
+                                className="flex items-start gap-3 text-sm leading-relaxed"
+                                style={{ color: 'rgba(255,255,255,0.7)' }}
+                              >
+                                <span aria-hidden="true" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                                  •
+                                </span>
+                                <span>
+                                  {lesson.title}
+                                  {typeof lesson.duration_minutes === 'number' && (
+                                    <span
+                                      className="ml-2"
+                                      style={{ color: 'rgba(255,255,255,0.45)' }}
+                                    >
+                                      {lesson.duration_minutes} min
+                                    </span>
+                                  )}
+                                  {lesson.is_preview && (
+                                    <span
+                                      className="ml-2 rounded-sm px-1.5 py-0.5 text-xs font-medium"
+                                      style={{
+                                        background: 'rgba(255,255,255,0.1)',
+                                        color: 'rgba(255,255,255,0.75)',
+                                      }}
+                                    >
+                                      Preview
+                                    </span>
+                                  )}
+                                </span>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </li>
+                    ))}
+                  </ol>
+                </section>
+              )}
+
+              {/* ── Free preview lesson ── */}
+              {/* The isPreview flag was previously only reachable through the curriculum API,
+                  which 401s without a session and 403s without an enrolment — so the one
+                  audience a preview exists for could never see one. Surface it before signup. */}
+              {previewLesson?.preview_body && (
+                <section>
+                  <h2
+                    className="mb-4 text-xl font-bold"
+                    style={{ color: 'rgba(255,255,255,0.92)' }}
+                  >
+                    Read a free lesson
+                  </h2>
+                  <div className="rounded-sm p-6" style={glassPanel}>
+                    <h3
+                      className="mb-1 text-base font-semibold"
+                      style={{ color: 'rgba(255,255,255,0.92)' }}
+                    >
+                      {previewLesson.title}
+                    </h3>
+                    <p className="mb-4 text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                      Free preview — no account needed
+                    </p>
+                    <CourseFormattedBody text={previewLesson.preview_body} />
+                  </div>
+                </section>
+              )}
 
               {/* ── Course Details Grid ── */}
               <section>

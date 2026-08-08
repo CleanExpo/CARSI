@@ -888,7 +888,7 @@ export const startSmartPages: StartSmartPage[] = [
     keywords: [
       'do you need certification to clean carpets',
       'carpet cleaning certification Australia',
-      'IICRC CCT training',
+      'carpet cleaning technician training',
       'CARSI CEC carpet cleaning',
     ],
   },

@@ -138,3 +138,4 @@ data/wordpress-export/*
 
 # Prisma 7 generated client (`npm run postinstall` / `prisma generate`)
 src/generated/prisma/
+.handoff-logs/

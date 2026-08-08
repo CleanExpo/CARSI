@@ -78,11 +78,43 @@ jobs:
       - name: Australian-English course-content guard
         run: npm run check:au-english
 
+      # CARSI designation registry validity. This script existed but was run by NO workflow
+      # (audited 2026-08-07) — a guard nothing invokes is not a guard. It validates that every
+      # designation resolves to a real catalogue course, so a renamed or removed course cannot
+      # silently orphan the credential a learner is told they will earn.
+      - name: CARSI designation registry guard
+        run: npm run check:designations
+
+      # Course-visibility predicate. `status` is canonical (#137); reading the legacy
+      # `isPublished` column alone hid 20 published courses from pathways, pathway progress and
+      # team assignment. Hand-grepping for this missed readers twice, so it is enforced here.
+      - name: Course visibility predicate guard
+        run: npm run check:course-visibility
+
+      # Non-vacuity proofs for the three guards added 2026-08-07. The independent reviewer
+      # raised their absence as P0: a guard whose ability to fail is only ever demonstrated by
+      # hand is one refactor from decorative. Writing the first of these immediately exposed a
+      # fifth defect in the visibility guard that three canaries had missed.
+      - name: Course visibility guard self-test
+        run: npm run test:course-visibility
+
+      - name: IICRC terminology guard self-test
+        run: npm run test:iicrc-terminology
+
+      - name: Source-citation scorecard self-test
+        run: npm run test:sources
+
       # Advisory course-completeness scorecard (assessment, thumbnail, intro
       # video, card metadata, scaffolds, depth). Non-blocking today; promote a
       # finalised series with --enforce=<slugs> once it is green.
       - name: Course completeness scorecard (advisory)
         run: npm run check:course-completeness
+
+      # The scorecard above is advisory and exits 0 even at 0/37 finalised, so nothing else
+      # in CI can tell a working bar from one that always returns true — that is how the
+      # introVideo slug shortcut survived. This self-test is NOT advisory.
+      - name: Course completeness scorecard self-test
+        run: npm run test:course-completeness
 
       # Licence-critical backstop: scans all course-content + marketing surfaces
       # (data/seed, public/courses, docs/marketing, docs/content) for stray IICRC

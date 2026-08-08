@@ -16,7 +16,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Food Processing Facility IICRC CEC Training',
   description:
-    'HACCP-aligned IICRC CEC training for Australian food processing facilities. AMRT, OCT and CCT courses supporting hygiene compliance, cold storage maintenance, and contamination prevention.',
+    'HACCP-aligned IICRC CEC training for Australian food processing facilities. Mould remediation, odour control and carpet cleaning courses supporting hygiene compliance, cold storage maintenance, and contamination prevention.',
   keywords: [
     'food processing IICRC CEC training Australia',
     'HACCP compliance restoration',
@@ -63,7 +63,7 @@ const faqs = [
   {
     question: 'Can food processing staff complete IICRC CEC training while maintaining shift patterns?',
     answer:
-      'Yes. CARSI offers IICRC CEC Accredited courses online and self-paced. Staff can complete modules around production schedules and shift rotations. Eligible courses count toward IICRC Continuing Education Credits (CECs) and issue verifiable digital credentials on completion.',
+      'Yes. CARSI offers IICRC CEC Accredited courses online and self-paced. Staff can complete modules around production schedules and shift rotations. Courses issue verifiable digital credentials on completion.',
   },
 ];
 
@@ -86,7 +86,7 @@ const whyCards = [
     icon: SprayCan,
     title: 'Odour & Surface Control',
     description:
-      'Organic odours and surface contamination in processing areas require specialist remediation. OCT and CCT certifications provide standards-based approaches.',
+      'Organic odours and surface contamination in processing areas require specialist remediation. Odour control and carpet cleaning certifications provide standards-based approaches.',
     color: '#ed9d24',
   },
 ];
@@ -119,7 +119,7 @@ export default async function FoodProcessingIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="Food Processing Industry"
-        disciplineList="AMRT, OCT & CCT"
+        disciplineList="Mould remediation, odour control and carpet cleaning"
         disciplines={['AMRT', 'OCT', 'CCT']}
       />
 
@@ -129,7 +129,7 @@ export default async function FoodProcessingIndustryPage() {
         subtitle="Food Processing Training"
         title="Food Safety Bundle"
         price={industryBundlePriceLabel('food-processing')}
-        description="AMRT + OCT + CCT training for food processing teams. Includes cold storage mould prevention protocols. Online, self-paced — fits around production schedules."
+        description="mould remediation, odour control and carpet cleaning training for food processing teams. Includes cold storage mould prevention protocols. Online, self-paced — fits around production schedules."
         ctaText="Train Your Facility Team"
         accentColor={ACCENT_COLOR}
       />

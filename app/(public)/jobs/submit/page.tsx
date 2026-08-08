@@ -203,8 +203,8 @@ export default function SubmitJobPage() {
           </h2>
 
           <div>
-            <label className={marketingLabel}>Job Title *</label>
-            <input
+            <label htmlFor="job-title" className={marketingLabel}>Job Title *</label>
+            <input id="job-title"
               type="text"
               required
               value={form.title}
@@ -216,8 +216,8 @@ export default function SubmitJobPage() {
 
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
             <div>
-              <label className={marketingLabel}>Company Name *</label>
-              <input
+              <label htmlFor="job-company-name" className={marketingLabel}>Company Name *</label>
+              <input id="job-company-name"
                 type="text"
                 required
                 value={form.company_name}
@@ -227,8 +227,8 @@ export default function SubmitJobPage() {
               />
             </div>
             <div>
-              <label className={marketingLabel}>Company Website</label>
-              <input
+              <label htmlFor="job-company-website" className={marketingLabel}>Company Website</label>
+              <input id="job-company-website"
                 type="url"
                 value={form.company_website}
                 onChange={(e) => updateField('company_website', e.target.value)}
@@ -239,8 +239,8 @@ export default function SubmitJobPage() {
           </div>
 
           <div>
-            <label className={marketingLabel}>Employment Type *</label>
-            <select
+            <label htmlFor="job-employment-type" className={marketingLabel}>Employment Type *</label>
+            <select id="job-employment-type"
               value={form.employment_type}
               onChange={(e) => updateField('employment_type', e.target.value)}
               className={marketingInput}
@@ -254,8 +254,8 @@ export default function SubmitJobPage() {
           </div>
 
           <div>
-            <label className={marketingLabel}>Job Description * (minimum 50 characters)</label>
-            <textarea
+            <label htmlFor="job-description" className={marketingLabel}>Job Description * (minimum 50 characters)</label>
+            <textarea id="job-description"
               required
               minLength={50}
               rows={8}
@@ -287,8 +287,8 @@ export default function SubmitJobPage() {
           {!form.is_remote && (
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
               <div>
-                <label className={marketingLabel}>City</label>
-                <input
+                <label htmlFor="job-location-city" className={marketingLabel}>City</label>
+                <input id="job-location-city"
                   type="text"
                   value={form.location_city}
                   onChange={(e) => updateField('location_city', e.target.value)}
@@ -297,8 +297,8 @@ export default function SubmitJobPage() {
                 />
               </div>
               <div>
-                <label className={marketingLabel}>State</label>
-                <select
+                <label htmlFor="job-location-state" className={marketingLabel}>State</label>
+                <select id="job-location-state"
                   value={form.location_state}
                   onChange={(e) => updateField('location_state', e.target.value)}
                   className={marketingInput}
@@ -344,8 +344,8 @@ export default function SubmitJobPage() {
           </h2>
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
             <div>
-              <label className={marketingLabel}>Minimum (AUD per annum)</label>
-              <input
+              <label htmlFor="job-salary-min" className={marketingLabel}>Minimum (AUD per annum)</label>
+              <input id="job-salary-min"
                 type="number"
                 min="0"
                 value={form.salary_min}
@@ -355,8 +355,8 @@ export default function SubmitJobPage() {
               />
             </div>
             <div>
-              <label className={marketingLabel}>Maximum (AUD per annum)</label>
-              <input
+              <label htmlFor="job-salary-max" className={marketingLabel}>Maximum (AUD per annum)</label>
+              <input id="job-salary-max"
                 type="number"
                 min="0"
                 value={form.salary_max}
@@ -376,8 +376,8 @@ export default function SubmitJobPage() {
             </span>
           </h2>
           <div>
-            <label className={marketingLabel}>Application URL</label>
-            <input
+            <label htmlFor="job-apply-url" className={marketingLabel}>Application URL</label>
+            <input id="job-apply-url"
               type="url"
               value={form.apply_url}
               onChange={(e) => updateField('apply_url', e.target.value)}
@@ -386,8 +386,8 @@ export default function SubmitJobPage() {
             />
           </div>
           <div>
-            <label className={marketingLabel}>Application Email</label>
-            <input
+            <label htmlFor="job-apply-email" className={marketingLabel}>Application Email</label>
+            <input id="job-apply-email"
               type="email"
               value={form.apply_email}
               onChange={(e) => updateField('apply_email', e.target.value)}
@@ -404,8 +404,8 @@ export default function SubmitJobPage() {
           </h2>
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
             <div>
-              <label className={marketingLabel}>Your Name *</label>
-              <input
+              <label htmlFor="job-submitter-name" className={marketingLabel}>Your Name *</label>
+              <input id="job-submitter-name"
                 type="text"
                 required
                 value={form.submitter_name}
@@ -415,8 +415,8 @@ export default function SubmitJobPage() {
               />
             </div>
             <div>
-              <label className={marketingLabel}>Your Email *</label>
-              <input
+              <label htmlFor="job-submitter-email" className={marketingLabel}>Your Email *</label>
+              <input id="job-submitter-email"
                 type="email"
                 required
                 value={form.submitter_email}

@@ -19,7 +19,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = buildIndustryMetadata(
   'commercial-cleaning',
   'Commercial Cleaning IICRC CEC Training',
-  'IICRC CEC Accredited courses for commercial cleaning contractors in Australia. CRT, CCT, and OCT topics for carpet restoration, odour control, and insurance panel readiness.',
+  'IICRC CEC Accredited courses for commercial cleaning contractors in Australia. Carpet repair, carpet cleaning and odour control topics for carpet restoration, odour control, and insurance panel readiness.',
   [
     'commercial cleaning IICRC CEC training',
     'cleaning contractor training Australia',
@@ -120,7 +120,7 @@ export default async function CommercialCleaningIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="Commercial Cleaning"
-        disciplineList="CRT, CCT & OCT"
+        disciplineList="Carpet repair, carpet cleaning and odour control"
         disciplines={['CRT', 'CCT', 'OCT']}
       />
 
