@@ -148,7 +148,9 @@ Concrete first targets:
     the first agent that did not finish and *everything started after it re-runs*.
   - **No mid-run user input.** Founder sign-off must be modelled as separate workflows:
     `/cec-audit` → review → `/cec-fix` → review → `/cec-verify`.
-  - Limits: 16 concurrent, 1,000 agents per run, subagents always run in `acceptEdits`.
+  - Limits: **up to** 16 concurrent (fewer on fewer CPUs, including in CPU-limited CI containers),
+    1,000 agents per run, subagents always run in `acceptEdits`. Resume works only within the same
+    session — exiting Claude Code restarts the workflow fresh.
   - <https://code.claude.com/docs/en/workflows>
 
 ---
