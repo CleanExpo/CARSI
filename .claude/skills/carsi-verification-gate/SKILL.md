@@ -52,7 +52,9 @@ npm run check:designations        # no WRT/ASD/AMRT/FSRT/CCT/TCST branding on CA
 npm run check:cec                 # CEC hours come only from data/seed/cec-approvals.json
 npm run check:cec-surfaces        # no CEC claims leaking onto unapproved surfaces
 npm run check:iicrc-compliance
-npm run check:standards-claims    # S-standard claims cited nominatively only
+npm run check:standards-claims    # repository scan — the mechanical FLOOR, not the full gate.
+                                  # It does not catch an uncited standards claim in new brand
+                                  # copy; see the pre-publish gate below.
 npm run check:au-english          # Australian English across content surfaces
 npm run check:sources             # ADVISORY scorecard: classifies cited domains by tier and
                                   # reports an authority ratio. It exits 0 on warnings, performs
@@ -60,6 +62,31 @@ npm run check:sources             # ADVISORY scorecard: classifies cited domains
                                   # present. Read its output; never treat exit 0 as "sources are
                                   # verified". Pass --enforce to fail on unvetted domains.
 ```
+
+## Pre-publish gate — any brand copy that names a standard
+
+`check:standards-claims` scans the repository. It will **not** stop new copy asserting what a
+standard requires. Before such copy publishes on ANY surface (course, blog, social, email), run
+the strict text gate on the copy itself:
+
+```bash
+npm run verify:standards-claim -- "<the exact copy>"
+```
+
+Positive control — the strict form exits 1 on an uncited claim that the repository scan lets
+through. Canonical failing cases live in `scripts/check-standards-claims.test.mjs`; take one
+from there and pass it via `--text` to prove the gate still bites before you trust a green run.
+
+> Scope note: `SCANNED_DIRS` is `app/ src/ templates/ docs/marketing/ docs/content/
+> public/courses/` — `.claude/` is **not** among them, so this file is never scanned and a green
+> `check:standards-claims` says nothing about it. If that scope ever widens, add this SKILL.md to
+> `EXEMPT` in the script, as `CLAUDE.md` already is, since both only *describe* the rule.
+
+A positive claim must cite a section that exists in the licensed index (`lib/standards`), never a
+scrape and never an absence claim. The gate is a FILTER, not a guarantee: a regex cannot verify a
+standard's content, so a standards claim in brand copy is an L2 irreversible-reputation action
+that **also requires human sign-off**. Never publish it on an un-gated autonomous action. This
+rule exists because of the 2026-07-15 false-claim incident; CLAUDE.md is the authority.
 
 ## Rules that no script catches — check by eye
 
