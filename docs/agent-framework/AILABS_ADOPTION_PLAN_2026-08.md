@@ -236,7 +236,7 @@ as skills absorb the procedural content, the licence-critical *facts* stay in `C
 | 4 | `.claude/agents/carsi-content-reviewer` + `carsi-security-reviewer` | M | low | high |
 | 5 | Screenshot assertions in the Playwright gate | M | low | medium |
 | 6 | Prompt audit for `reasoning_extraction` triggers | S | none | medium |
-| 7 | `@AGENTS.md` bridge in `CLAUDE.md` | XS | none | medium |
+| 7 | `@docs/AGENTS.md` bridge in `CLAUDE.md` (see §6 — not `@AGENTS.md`, which resolves to nothing) | XS | none | medium |
 | 8 | Migrate remaining skills, delete `skills/INDEX.md` | M | low | medium |
 | 9 | `/cec-audit` dynamic workflow | L | medium | high |
 
