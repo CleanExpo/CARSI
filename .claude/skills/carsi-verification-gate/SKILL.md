@@ -1,6 +1,6 @@
 ---
 name: carsi-verification-gate
-description: Use before marking ANY code-modifying pass Done in CARSI, and whenever touching course copy, catalogue data, SEO/schema surfaces, or IICRC/CEC wording. Runs the licence-critical guard scripts (IICRC terminology, CEC approvals, designations, Australian English, standards claims) plus type-check, and reports pass/fail evidence rather than asserting success.
+description: Verifies a CARSI pass before it is marked Done — required for any code-modifying pass, and for any change to course copy, catalogue data, SEO/schema surfaces, or IICRC/CEC wording. Runs type-check plus the licence-critical guard scripts (IICRC terminology and compliance, CEC approvals and surfaces, designations, Australian English, standards claims, source citations), carries the six mandatory manual rules from CARSI_VERIFICATION_GATE.md that no script can catch, and reports pass/fail evidence rather than asserting success.
 license: UNLICENSED
 metadata:
   owner: CARSI
