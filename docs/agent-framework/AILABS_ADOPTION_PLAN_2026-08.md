@@ -212,8 +212,13 @@ and keyboard navigation.
 
 ## 6. Bridge `AGENTS.md`
 
-`docs/AGENTS.md` exists but Claude Code reads `CLAUDE.md` only. The documented bridge is to make
-`@AGENTS.md` the first line of `CLAUDE.md`, or symlink. <https://code.claude.com/docs/en/memory>
+`docs/AGENTS.md` exists but Claude Code reads `CLAUDE.md` only. The documented bridge is an
+import on the first line of `CLAUDE.md`. Write it as **`@docs/AGENTS.md`** — imports resolve
+relative to the file that contains them, and there is no `AGENTS.md` at the repo root, so
+`@AGENTS.md` would resolve to a file that does not exist. It fails silently: nothing is loaded
+and no error is raised, so the bridge looks wired while the content never reaches context.
+(Create a root `AGENTS.md` symlink to `docs/AGENTS.md` first if the shorter form is wanted.)
+<https://code.claude.com/docs/en/memory>
 
 `CLAUDE.md` is currently 159 lines — inside Anthropic's "under 200 lines" guidance. Keep it there:
 as skills absorb the procedural content, the licence-critical *facts* stay in `CLAUDE.md` and the
