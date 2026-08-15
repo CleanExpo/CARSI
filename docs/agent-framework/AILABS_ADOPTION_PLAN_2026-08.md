@@ -30,7 +30,8 @@ Consequences today:
 
 | | Count |
 |---|---|
-| Real Agent Skills in the repo | **1** (`.claude/skills/carsi-course-production`) |
+| Real Agent Skills in the repo, before this branch | **1** (`.claude/skills/carsi-course-production`) |
+| Real Agent Skills after this branch | **2** (adds `.claude/skills/carsi-verification-gate`) |
 | Bespoke `*.skill.md` files never auto-loaded | **23** |
 | `.claude/settings.json` | absent |
 | `.claude/agents/` (subagent definitions) | absent |
@@ -96,9 +97,16 @@ runtime from `description` fields, and a hand-maintained index will always drift
 
 ## 2. Make the licence-critical guards deterministic, not advisory
 
-CARSI already has the hard part: `check:iicrc-terminology`, `check:designations`, `check:cec`,
-`check:cec-surfaces`, `check:standards-claims`, `check:au-english`, `check:sources`. What is
-missing is a mechanism that makes an agent unable to finish a turn while one of them fails.
+CARSI already has the hard part: `check:iicrc-terminology`, `check:iicrc-compliance`,
+`check:designations`, `check:cec`, `check:cec-surfaces`, `check:standards-claims`,
+`check:au-english`, `check:sources`. What is missing is a mechanism that makes an agent unable
+to finish a turn while one of them fails.
+
+`check:iicrc-compliance` must be in that list and in whatever Stop hook enforces it: CLAUDE.md
+names it and `check:iicrc-terminology` as the two guards that must never be weakened, so a
+suite that omits it silently drops half the systemic backstop. Note also that `check:sources`
+is advisory — it exits 0 on warnings, so an enforcing hook must either pass `--enforce` or not
+count it as a gate.
 
 Anthropic documents four escalating enforcement tiers
 (<https://code.claude.com/docs/en/best-practices>):
@@ -142,8 +150,9 @@ Concrete first targets:
 - **Subagent definitions** in `.claude/agents/`: `carsi-content-reviewer` (Australian-production +
   CEC terminology, read-only), `carsi-security-reviewer` (auth on admin routes, bounded
   `findMany`). Both should carry `isolation: worktree` if they write.
-- **A dynamic workflow** for catalogue-wide passes — e.g. auditing all 25 catalogue courses for
-  CEC-claim leakage. Two documented rules govern the design:
+- **A dynamic workflow** for catalogue-wide passes — e.g. auditing every catalogue course for
+  CEC-claim leakage. Derive the fan-out from `data/seed/courses-catalog.json` at run time rather
+  than hard-coding a total; it currently holds 37 courses (24 published, 13 draft) and moves. Two documented rules govern the design:
   - **Fan out across many short agents, never a few long ones.** On resume, cached results stop at
     the first agent that did not finish and *everything started after it re-runs*.
   - **No mid-run user input.** Founder sign-off must be modelled as separate workflows:

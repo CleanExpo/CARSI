@@ -10,9 +10,14 @@ metadata:
 # CARSI verification gate
 
 Run this before any pass is marked Done. `npm run type-check` is mandatory on every pass; the
-rest scale with what was touched. Full rationale for each rule lives in
-`docs/agent-framework/CARSI_VERIFICATION_GATE.md` — read it only when a check fails and you need
-the *why*.
+scripted checks scale with what was touched.
+
+**`docs/agent-framework/CARSI_VERIFICATION_GATE.md` is the authority, and every code-modifying
+pass must apply all six of its manual rules.** `docs/AGENTS.md` requires it. This skill is an
+index over that checklist, never a replacement for it — four of the six rules (raw-SQL
+interpolation, leaked `error.message` in 5xx, upload content sniffing, paid/AI entitlement
+gating) cannot fail any script, so an agent that only reads this file when a script fails would
+never apply them at all.
 
 ## Always
 
@@ -28,8 +33,15 @@ npm run type-check
 | Logic / lib | `npm run test:unit` |
 | User-facing flows | `npm run test:e2e` |
 | UI / markup | `npm run test:a11y` |
+| Course records, CEC eligibility, DTOs, rendering, raw CEC fields or `iicrcDiscipline` — **even in pure source/logic** | the full licence-critical block below |
 
-## Licence-critical guards — run whenever copy, catalogue data, schema or SEO surfaces changed
+## Licence-critical guards
+
+Run these whenever copy, catalogue data, schema or SEO surfaces changed — **and whenever a
+source-only change touches course records, CEC eligibility, DTOs, rendering, raw CEC fields or
+`iicrcDiscipline`.** A logic change alone can create the leak: a function deriving CEC
+eligibility from `iicrcDiscipline` is caught by `check:cec-surfaces` and by nothing else, so
+"it was only logic" is not a reason to skip this block.
 
 These protect CARSI's standing as an IICRC CEC provider. A failure here is a **release blocker**,
 not a warning.
@@ -42,19 +54,36 @@ npm run check:cec-surfaces        # no CEC claims leaking onto unapproved surfac
 npm run check:iicrc-compliance
 npm run check:standards-claims    # S-standard claims cited nominatively only
 npm run check:au-english          # Australian English across content surfaces
-npm run check:sources             # source citations present and resolvable
+npm run check:sources             # ADVISORY scorecard: classifies cited domains by tier and
+                                  # reports an authority ratio. It exits 0 on warnings, performs
+                                  # no network resolution, and does not require a citation to be
+                                  # present. Read its output; never treat exit 0 as "sources are
+                                  # verified". Pass --enforce to fail on unvetted domains.
 ```
 
 ## Rules that no script catches — check by eye
 
+All six mandatory rules from `docs/agent-framework/CARSI_VERIFICATION_GATE.md`. No script can
+fail on any of them, so each must be checked deliberately on every code-modifying pass.
+
 1. **Auth on protected APIs.** Any new route under `app/api/admin/**` (or otherwise non-public)
    must load a session and return `401` before doing work. Public routes must be *intentionally*
    public.
-2. **Bounded `findMany`.** New or edited Prisma list queries that grow with data must pass `take`,
-   unless the set is provably small and fixed.
-3. **New courses ship `cecHours: 0`.** In `data/seed/courses-catalog.json`. Only the founder flips
-   a course to approved hours, and only after IICRC approval. Never rely on duration inference.
-4. **`iicrcDiscipline: null`** on CARSI courses; the credential belongs in `meta.designation`.
+2. **Bounded Prisma `findMany`.** New or edited list queries that grow with data must pass
+   `take`, unless the set is provably small and fixed.
+3. **No raw-SQL string interpolation.** Never build SQL by concatenating or interpolating
+   values; use parameterised queries.
+4. **No leaked `error.message` in 5xx responses.** Return a generic message to the client and
+   log the detail server-side.
+5. **Upload validation by content sniffing**, not the declared MIME type alone.
+6. **Subscription / credit / Stripe gating on paid and AI actions.** A paid or AI-billable path
+   must verify entitlement before doing the work.
+
+Two CARSI data rules on top of those six:
+
+7. **New courses ship `cecHours: 0`** in `data/seed/courses-catalog.json`. Only the founder
+   flips a course to approved hours, and only after IICRC approval. Never infer from duration.
+8. **`iicrcDiscipline: null`** on CARSI courses; the credential belongs in `meta.designation`.
 
 ## Reporting
 
