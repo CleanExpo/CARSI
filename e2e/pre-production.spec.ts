@@ -580,10 +580,17 @@ test.describe('9. Credentials page', () => {
 
     await page.goto('/credentials/00000000-0000-0000-0000-000000000001');
 
-    // Legacy /credentials/<id> redirects to the public verify page at
-    // /dashboard/credentials/<id> (allowlisted in middleware — no auth required).
-    await page.waitForURL('**/dashboard/credentials/**', { timeout: 10_000 });
-    await expect(page.locator('body')).toBeVisible();
+    // Legacy /credentials/<id> forwards to the PUBLIC verify page. It must not
+    // land on /dashboard/credentials/<id>, which is behind auth: that chain sent
+    // an anonymous viewer to /login, so an employer following a credential link
+    // could never verify it. Measured on production 2026-08-16.
+    await page.waitForURL('**/verify/credential/**', { timeout: 10_000 });
+
+    // Asserting the URL alone is not enough — a bounce to /login would also
+    // render a visible body. Assert the verification surface, and assert the
+    // sign-in form is absent, so this fails if the auth bounce ever returns.
+    await expect(page).toHaveURL(/\/verify\/credential\//);
+    await expect(page.locator('input[type="password"]')).toHaveCount(0);
   });
 
   test('subscribe page loads', async ({ page }) => {
