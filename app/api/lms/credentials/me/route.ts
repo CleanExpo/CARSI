@@ -55,7 +55,10 @@ export async function GET(request: NextRequest) {
     cec_hours: resolveLmsCourseCecHours(e.course) ?? 0,
     cppp40421_unit_code: null as string | null,
     issued_date: (e.certificateIssuedAt ?? e.completedAt)!.toISOString().slice(0, 10),
-    verification_url: `${origin}/dashboard/credentials/${e.id}`,
+    // Must be the PUBLIC verify page. This field exists to be handed to a third
+    // party — an employer checking a designation — who has no CARSI account, so a
+    // /dashboard/** URL sends them to /login instead of the credential.
+    verification_url: `${origin}/verify/credential/${e.id}`,
     status: 'issued',
   }));
 
