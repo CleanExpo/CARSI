@@ -1,3 +1,8 @@
+**Read `GOAL.md` first** — then `DECISIONS.md`, then `BACKLOG.md`. They are the objective
+function, the founder queue and the single work queue. All work comes from the top of the
+backlog; discoveries go to its bottom, not into the running session. `ENGINE.md` describes how
+a session starts and what only Phill may do.
+
 <!-- Unite-Hub (CleanExpo/Unite-Hub) held the cross-repo portfolio registry; decommissioned 2026-06-20. No active replacement registry is wired here. -->
 
 ## Identity (SSOT)
