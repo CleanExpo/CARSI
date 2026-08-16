@@ -4,7 +4,7 @@ Owner key: F = founder-only · A = agents · A→F = agents prepare, founder app
 
 | # | Item | Owner | Gate | Status |
 |---|---|---|---|---|
-| 1 | Land GOAL/BACKLOG/DECISIONS/ENGINE in repo root; add "Read GOAL.md first" as CLAUDE.md line 1 | A | 0 | **awaiting merge** — branch `docs/engine-files-gate0`; NOT on `main` |
+| 1 | Land GOAL/BACKLOG/DECISIONS/ENGINE in repo root; add "Read GOAL.md first" as CLAUDE.md line 1 | A | 0 | **done 2026-08-16** — merged to `main` as `41712c69` (PR #666) |
 | 2 | Generate CEC submission packs for top 10 courses (`generate-cec-submission.ts`) + cover email draft | A→F | 0 | ready |
 | 3 | Send CEC packs to CECCourse@iicrcnet.org | F | 0 | blocked on #2 |
 | 4 | Subscriptions go-live: Stripe Prices + Test Clock + DO env; flip at go-live script exit 0 | A→F | 0 | ready — see note below |

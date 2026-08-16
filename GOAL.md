@@ -35,9 +35,8 @@ plus 4-week rolling course sales. Every session reports RWR movement or names th
   Engine files created; awaiting landing in repo root.
 - 2026-08-17: Gate 0. RWR ≈ $0 — unchanged, and the blocker is unchanged: subscriptions are
   dark and the CEC approvals registry is empty, both founder-gated (DECISIONS #1, #2).
-  Engine files are NOT yet on `main` — BACKLOG #1 is awaiting merge on `docs/engine-files-gate0`.
-  (If you are reading this file from `main`, it arrived with that PR.) Readiness was measured
-  against the live site and a prod-like stack for the first time.
+  Engine files are on `main` as of 2026-08-16, merged as `41712c69` (PR #666) — BACKLOG #1 done.
+  Readiness was measured against the live site and a prod-like stack for the first time.
   **Correction to the first draft of this entry:** it recorded the per-course purchase path as
   "GREEN end to end". That was FALSE and is struck. The per-course endpoint
   `app/api/lms/checkout/route.ts` exists, but no e2e spec exercises it: `grep -rn "lms/checkout"
