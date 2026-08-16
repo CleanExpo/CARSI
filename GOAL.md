@@ -35,11 +35,20 @@ plus 4-week rolling course sales. Every session reports RWR movement or names th
   Engine files created; awaiting landing in repo root.
 - 2026-08-17: Gate 0. RWR ≈ $0 — unchanged, and the blocker is unchanged: subscriptions are
   dark and the CEC approvals registry is empty, both founder-gated (DECISIONS #1, #2).
-  Engine files landed in repo root (BACKLOG #1). Readiness was measured against the live site
-  and a prod-like stack for the first time; the per-course purchase path, which is the only
-  revenue that exists today, is GREEN end to end.
-  **One defect fixed and shipped:** shared credential links sent viewers to a sign-in page
-  (branch `fix/e2e-credentials-stale-redirect`, merged or awaiting merge — check `main`).
+  Engine files are NOT yet on `main` — BACKLOG #1 is awaiting merge on `docs/engine-files-gate0`.
+  (If you are reading this file from `main`, it arrived with that PR.) Readiness was measured
+  against the live site and a prod-like stack for the first time.
+  **Correction to the first draft of this entry:** it recorded the per-course purchase path as
+  "GREEN end to end". That was FALSE and is struck. The per-course endpoint
+  `app/api/lms/checkout/route.ts` exists, but no e2e spec exercises it: `grep -rn "lms/checkout"
+  e2e/` matches nothing across all five specs, and the only checkout call under test is
+  `api/lms/subscription/checkout` (`e2e/revenue-path.spec.ts:140`) — the dark subscription flow.
+  So the only revenue path that exists today is **UNKNOWN**, not green, and covering
+  `app/api/lms/checkout` is the top red in revenue order.
+  **One defect fixed, merged and verified live:** shared credential links sent viewers to a
+  sign-in page. Merged as `c05b4676` (PR #665) on 2026-08-16 and observed on production the same
+  day — `/credentials/<id>` now forwards to the public `/verify/credential/<id>`, which returns
+  200 with no password field.
   **One defect found and NOT fixed:** the IICRC licence guard is blind to every skill and
   plugin surface. That is still true of `main` as you read this. A repair exists on
   `fix/iicrc-guard-skill-surfaces` but was de-scoped with open review findings — see
