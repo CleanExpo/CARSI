@@ -130,35 +130,45 @@ export function formatCourseCountForCopy(n: number): string {
   return String(Math.max(0, Math.floor(n)));
 }
 
-export function catalogueMetaDescription(
-  facts: PublicCatalogueFacts,
-  opts?: { maxDisciplinesInList?: number }
-): string {
+/**
+ * GP-523 — the public topic list for catalogue selling copy.
+ *
+ * This deliberately does NOT interpolate `facts.disciplineCodes`. Those are IICRC
+ * Registered-Training-School discipline acronyms, and joining them into a sentence about
+ * what CARSI offers brands the CARSI catalogue with IICRC disciplines — banned by the
+ * CARSI designation rule (CLAUDE.md, founder 2026-07-10). It was also the live defect on
+ * `/courses`: the meta description and the FAQPage schema both rendered a bare
+ * comma-separated run of stored discipline codes as the list of what CARSI teaches.
+ *
+ * The plain-English restoration topics say the same thing without the branding, and are
+ * constant, so the copy no longer changes with whatever discipline codes happen to be
+ * stored on course rows.
+ */
+const PUBLIC_TOPIC_LIST =
+  'water damage restoration, carpet repair, structural drying, mould remediation, fire & smoke restoration, odour control and carpet cleaning';
+
+/**
+ * Provider standing, not a course-level CEC claim. A CARSI course may only assert that it
+ * earns CECs once the founder records its per-course IICRC approval in
+ * `data/seed/cec-approvals.json` (the fail-closed SSOT, currently empty), so catalogue
+ * copy states CARSI's accreditation as a CEC provider instead of promising credits.
+ */
+const PROVIDER_STANDING_SENTENCE = 'Study online with CARSI, an IICRC CEC Accredited provider.';
+
+export function catalogueMetaDescription(facts: PublicCatalogueFacts): string {
   const n = facts.publishedCourseCount;
-  const maxList = opts?.maxDisciplinesInList ?? 7;
-  const codes = facts.disciplineCodes.slice(0, maxList);
-  const list =
-    codes.length > 0
-      ? codes.join(', ')
-      : 'water damage restoration, carpet repair, structural drying, mould remediation, fire & smoke restoration, odour control and carpet cleaning';
   if (n <= 0) {
-    return `Browse IICRC CEC Accredited restoration and cleaning courses across ${list}. Earn continuing education credits online with CARSI.`;
+    return `Browse IICRC CEC Accredited restoration and cleaning courses across ${PUBLIC_TOPIC_LIST}. ${PROVIDER_STANDING_SENTENCE}`;
   }
-  return `Browse ${n} IICRC CEC Accredited restoration and cleaning courses across ${list}. Earn continuing education credits online with CARSI.`;
+  return `Browse ${n} IICRC CEC Accredited restoration and cleaning courses across ${PUBLIC_TOPIC_LIST}. ${PROVIDER_STANDING_SENTENCE}`;
 }
 
 /** `/courses` index — question-led SEO line without a duplicated “Browse”. */
 export function coursesIndexMetaDescription(facts: PublicCatalogueFacts): string {
-  const maxList = 7;
-  const codes = facts.disciplineCodes.slice(0, maxList);
-  const list =
-    codes.length > 0
-      ? codes.join(', ')
-      : 'water damage restoration, carpet repair, structural drying, mould remediation, fire & smoke restoration, odour control and carpet cleaning';
   const n = facts.publishedCourseCount;
   const core =
     n > 0
-      ? `${n} IICRC CEC Accredited restoration and cleaning courses across ${list}. Earn continuing education credits online with CARSI.`
-      : `IICRC CEC Accredited restoration and cleaning courses across ${list}. Earn continuing education credits online with CARSI.`;
+      ? `${n} IICRC CEC Accredited restoration and cleaning courses across ${PUBLIC_TOPIC_LIST}. ${PROVIDER_STANDING_SENTENCE}`
+      : `IICRC CEC Accredited restoration and cleaning courses across ${PUBLIC_TOPIC_LIST}. ${PROVIDER_STANDING_SENTENCE}`;
   return `What courses does CARSI offer? ${core}`;
 }
