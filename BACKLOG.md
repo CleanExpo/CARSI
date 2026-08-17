@@ -181,9 +181,13 @@ RWR; it compounds slowly and must not be read as revenue movement.
   and any existence check built on status code is blind, which is exactly how an earlier sweep
   reported six and then fourteen acronym courses before a nonsense-slug control corrected it to
   four. Fixing needs a production-like build to verify, so it was measured, not guessed at.
-- 2026-08-18 · **Course page titles are doubling the site suffix** — "Water Damage Restoration
-  Course — Essentials | CARSI | CARSI" and "Indoor Air Quality Fundamentals Course | CARSI |
-  CARSI" are live. A title template is being applied to a title that already carries it.
+- 2026-08-18 · **The seed catalogue disagrees with production in both directions.** Of 80 live
+  courses, 24 are in `data/seed/courses-catalog.json`, 56 are not in the repo at all, and 13 seed
+  entries are not live. So anything reasoning from that file about what is published is reasoning
+  from a file that is wrong both ways — and every repo-scanning licence guard covers **24 of 80
+  live courses, 30%**. That is the measured ceiling on what arming the guards can achieve, and
+  the reason a live-catalogue or database check is a different control rather than a nicer
+  version of the same one. Counts independently reproduced by two sessions.
 - 2026-08-18 · **The licence guards scan SOURCE LINES; components emit copy at RENDER.** This is
   how the flagship `/courses` page published the full seven-acronym IICRC discipline roster while
   every guard reported green. The sentence is assembled from JSX children — `Water Restoration

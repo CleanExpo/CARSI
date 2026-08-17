@@ -109,9 +109,12 @@ plus 4-week rolling course sales. Every session reports RWR movement or names th
     exact phrase CLAUDE.md bans, in the browser tab and the Google result. They exist **only in
     the production database**; the repo is clean. So arming the guards was necessary and is not
     sufficient: every guard here scans repo paths, and course content that lives only in prod is
-    beyond all of them. DECISIONS #19, founder-only. Separately, `/courses/[slug]` soft-404s (200
-    with the not-found page), which is both an SEO defect and the reason a slug sweep cannot
-    return "absent".
+    beyond all of them. DECISIONS #19, founder-only. All 80 live course titles were then swept:
+    those are the complete set, not a sample. **The ceiling is now measured — of 80 live courses,
+    24 are in the repo seed and 56 are not, so every repo-scanning licence guard covers 30% of
+    what is published.** Separately, `/courses/[slug]` soft-404s (200 with the not-found page),
+    which is both an SEO defect and the reason a slug sweep cannot return "absent"; and 24 live
+    course titles were rendering "… | CARSI | CARSI", now fixed at the source.
   - **The release gate is NOT satisfied and nothing was self-certified.** Codex — the
     model-diverse reviewer the gate prefers — is out of credits until 2026-08-20; the fallback
     reviewer could not execute; three checklist items are undischarged. Per the gate, the work is
