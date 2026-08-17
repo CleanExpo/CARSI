@@ -160,6 +160,20 @@ RWR; it compounds slowly and must not be read as revenue movement.
   thumbnail, metadata, scaffolds, depth) and `introVideo` red across the board. The check runs
   in advisory mode, so it exits 0 and says nothing in CI. It was also silently vacuous on this
   machine until tonight — see the guard fix.
+- 2026-08-18 · **No standing check enforces the Australian-production standard.** The rules in
+  `.claude/skills/carsi-course-production/SKILL.md` — 230 V / 50 Hz, 10 A GPO, metric primary,
+  AS/NZS and Safe Work Australia, no US regulators presented as authoritative — are enforced by
+  nothing; `check:au-english` covers spelling only. A throwaway sweep of the 13 draft courses
+  (366k characters) found no genuine defect, so the content is good, but that was a one-off with
+  no regression protection. A standing checker would need care: every US reference in the corpus
+  today is a deliberate AU-vs-US contrast that teaches the difference, so a naive rule would
+  condemn the best content in the catalogue. Not built tonight — GOAL rule 4, and a new guard is
+  a queue decision. Findings: `docs/cec-submissions/DRAFT-COURSES-READINESS.md`.
+- 2026-08-18 · **Four draft courses have no `meta.designation`** —
+  `commercial-floor-care-schools-childcare`, `whs-fundamentals`,
+  `psychrometry-building-science-for-drying`, `asbestos-awareness-for-restoration-technicians`.
+  For the first two that is probably correct (company onboarding and general WHS are not
+  restoration designations); the other two look like oversights.
 - 2026-08-18 · **`docs/onboarding/` carries unresolved `[COMPANY TO CONFIRM …]` placeholders in
   shipped floor-care standards** (uniform spec, sign-in process, supervisor contact). Surfaced by
   `check-company-placeholders.mjs`, which could not run on this machine at all until tonight.
