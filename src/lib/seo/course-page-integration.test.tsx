@@ -59,7 +59,12 @@ describe('course page SEO truth integration', () => {
   it('executes generateMetadata with canonical and Twitter/OpenGraph parity after truth resolution', async () => {
     const metadata = await generateMetadata({ params: Promise.resolve({ slug }) });
 
-    expect(metadata.title).toBe('Odour Identification & Deodorisation Course | CARSI');
+    // No "| CARSI" here on purpose. `app/layout.tsx` sets `title: { template: '%s | CARSI' }`,
+    // so this value is the PAGE title and the layout appends the site name to it. This
+    // assertion previously required the suffix, which pinned the defect rather than catching
+    // it: on production, 24 course pages rendered "… | CARSI | CARSI" because the card data
+    // carried the suffix too. See src/lib/seo/course-card-titles.test.ts.
+    expect(metadata.title).toBe('Odour Identification & Deodorisation Course');
     expect(metadata.description).toBe(paidCourse.short_description);
     expect(metadata.alternates?.canonical).toBe(`https://carsi.com.au/courses/${slug}`);
     expect(metadata.openGraph?.url).toBe(metadata.alternates?.canonical);
