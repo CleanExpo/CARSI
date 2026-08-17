@@ -5,7 +5,7 @@ Owner key: F = founder-only · A = agents · A→F = agents prepare, founder app
 | # | Item | Owner | Gate | Status |
 |---|---|---|---|---|
 | 1 | Land GOAL/BACKLOG/DECISIONS/ENGINE in repo root; add "Read GOAL.md first" as CLAUDE.md line 1 | A | 0 | **done 2026-08-16** — merged to `main` as `41712c69` (PR #666) |
-| 2 | Generate CEC submission packs for top 10 courses (`generate-cec-submission.ts`) + cover email draft | A→F | 0 | ready |
+| 2 | Generate CEC submission packs for top 10 courses (`generate-cec-submission.ts`) + cover email draft | A→F | 0 | **done 2026-08-18** — 10 packs + cover email in `docs/cec-submissions/`, 11 CECs requested. Awaiting founder send (DECISIONS #1). On branch `worktree-overnight-gate0-20260818`, unpushed |
 | 3 | Send CEC packs to CECCourse@iicrcnet.org | F | 0 | blocked on #2 |
 | 4 | Subscriptions go-live: Stripe Prices + Test Clock + DO env; flip at go-live script exit 0 | A→F | 0 | ready — see note below |
 | 5 | Personalise + send the 3 outreach emails (BSCAA, RIA, SCA — drafts in 2nd Brain/Plans) | F | 0 | ready |
@@ -33,14 +33,17 @@ Owner key: F = founder-only · A = agents · A→F = agents prepare, founder app
 | 27 | E-E-A-T metrics into Monday pulse: referring domains, AI-answer presence, kw growth | A | 1 | ready |
 | 28 | Retrofit remaining courses with evidence layers (batched, guards on) | A | 2–3 | after #21 |
 
-**Note on #4 (subscriptions go-live).** The pre-flight script `verify-go-live-readiness.mjs`
-exits 0 today, but one of its four checks cannot currently tell success from failure: it asserts
-only `status !== 200`, and what it receives is a 504. The origin is correct — it returns 503 by
-design while the flag is off — but DigitalOcean rewrites that to a 504 with an HTML body before
-it reaches any client. Since the flip requires "checkout fails closed without session" to hold
-before AND after, that check must be tightened to assert the exact expected status first, or
-the gate is blind at the moment it matters. Full detail is in `docs/RELEASE-READINESS.md` R2 —
-which lands with branch `docs/release-readiness-20260817` and is **not** on `main` yet.
+**Note on #4 (subscriptions go-live) — RESOLVED 2026-08-18.** The blind check is fixed. The
+probe now returns one of three verdicts and only `refused` passes; an edge/gateway response is
+`unknown` and fails, because it proves nothing. The cause also turned out to be readable from the
+response itself: the 504 carries `x-do-orig-status: 503`, DigitalOcean's record of what the
+application actually answered, so the probe reads that header and sees through the rewrite. The
+gate is conclusive again and states its reason ("origin answered HTTP 503, edge rewrote it to
+504") instead of passing because the status merely was not 200. A 504 hiding an origin 200 — an
+open checkout behind a gateway error — now fails; under the old assertion it passed. 14 self-test
+cases including the literal production response.
+`docs/RELEASE-READINESS.md` and branch `docs/release-readiness-20260817` do not exist anywhere
+reachable — see the 2026-08-18 Discoveries entry before looking for them.
 
 **Note on #21–#28 (the Evidence Engine).** These implement the founder's 2026-08-16 spec: a
 five-stage loop (ingest → grade → map → teach → publish) that turns the existing 2nd Brain

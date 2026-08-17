@@ -55,3 +55,40 @@ plus 4-week rolling course sales. Every session reports RWR movement or names th
   A full readiness scorecard was written to `docs/RELEASE-READINESS.md` on branch
   `docs/release-readiness-20260817`; it is **not** on `main` yet, so do not expect to find it
   here until that branch merges.
+- 2026-08-18: Gate 0. **RWR ≈ $0 — unchanged, and the blocker is unchanged.** Both remaining
+  Gate 0 revenue switches are founder-only: the CEC packs need sending (DECISIONS #1, due
+  2026-08-20) and the subscription flip needs approving (DECISIONS #2, due 2026-08-23). No agent
+  action moves RWR until one of those happens. What moved was everything standing behind them.
+  Eight commits on `worktree-overnight-gate0-20260818`, **unpushed** — Codex, the independent
+  reviewer the release gate requires, is out of credits until 2026-08-20, and the gate forbids
+  self-certifying, so the branch is queued rather than released. The commits live in the shared
+  `.git`, so removing the worktree does not lose them.
+  - **The IICRC terminology guard could not fail on this machine.** `isCli` compared
+    `import.meta.url` against `file://` + the raw path; the space in `/Volumes/Storage Unit/`
+    percent-encodes, so the comparison was always false, the reporting block never ran and it
+    exited 0 whatever the scan found. Proven both directions with one canary. CI paths have no
+    space, so CI was unaffected and `main`'s green history is real — the damage was to every
+    manual run used to self-certify a change. Three scripts shared the idiom; a fourth crashed
+    on the same root cause. **Any "guards green" claim made locally before today is worthless.**
+  - Armed, the guard then found real violations live on production: `llms.txt` carried a
+    seven-acronym IICRC discipline roster, an acronym-headed "IICRC Disciplines Explained"
+    section and a blanket CEC claim against an empty approvals registry, plus seven CTAs naming
+    CARSI products by acronym. All fixed; three new rules added, each measured against the full
+    scope before being written.
+  - The guards were also blind to `.claude/skills/`, `skills/` and `.claude-plugin/` — 25 tracked
+    files, including the skill that tells an agent how to write a course — and lost any file
+    whose name needed percent-encoding, because `git ls-files` quotes those paths. Both closed,
+    both proven before/after.
+  - **BACKLOG #2 delivered:** ten CEC packs and a cover email, 11 CECs, in `docs/cec-submissions/`.
+  - **BACKLOG #4 unblocked:** the go-live pre-flight can now tell a refusal from a broken gateway.
+  - **The only live revenue path now has tests.** `app/api/lms/checkout` had none; it has 10 e2e
+    cases, proven non-vacuous by running them against the wrong server.
+  - **Customer flow:** `/courses` was shipping 46.2 MiB of raw Cloudinary PNGs into cards a few
+    hundred pixels wide — measured 48,486,199 → 255,619 bytes, 99.48% smaller, ~242 s → ~1.2 s of
+    image transfer on a slow connection. `/refund-policy` and `/support` existed only as 404s and
+    now exist, are footer-linked and pass accessibility checks.
+  - **Security:** six checkout and billing-portal routes accepted any attacker-supplied Stripe
+    return URL. Now restricted to an origin allowlist.
+  - Founder queue grew by three: DECISIONS #15 (four live course URLs branded with IICRC
+    discipline acronyms), #16 ("CEC-accredited" live on ~19 surfaces against an empty registry),
+    #17 (`/terms` §5 asserts IICRC-approved courses and CEC reporting).
