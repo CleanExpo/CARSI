@@ -10,8 +10,13 @@
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const ROOT = new URL('..', import.meta.url).pathname;
+// fileURLToPath, not `.pathname` — a URL pathname stays percent-encoded, so a checkout under a
+// path containing a space resolved to `/Volumes/Storage%20Unit/CARSI/` and every read threw
+// ENOENT. Same root cause as the `file://` + raw-path comparison fixed in the guards alongside
+// this, with the opposite symptom: that one passed vacuously, this one could not run at all.
+const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const DOCS_DIR = join(ROOT, 'docs', 'onboarding');
 const SKIP_FILES = new Set(['HANDOFF.md', 'COMPANY-DETAILS.md']);
 const MARKER = /\[COMPANY TO CONFIRM[^\]]*\]/g;

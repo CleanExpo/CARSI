@@ -86,6 +86,20 @@ const MUST_BLOCK = [
     'a third-person school mention does not exempt the claim beside it',
     'CARSI is an IICRC Approved School — certification is obtained through an IICRC approved school.',
   ],
+  // 2026-08-18: three discipline-acronym branding forms found LIVE on carsi.com.au/llms.txt and
+  // across seven catalogue CTA labels, all while this guard reported green. The acronym-list
+  // rule only ever saw acronyms sitting next to each other with a separator between them, so a
+  // glossed roster, a section heading and a product label each walked straight past it.
+  [
+    'glossed discipline roster',
+    'Our platform provides IICRC CEC courses across disciplines: Water Restoration (WRT), Structural Drying (ASD).',
+  ],
+  ['acronym as a section heading', '### WRT — Water Restoration Technician'],
+  ['acronym heading at other depths', '## CCT — Commercial Carpet Cleaning Technician'],
+  ['CARSI-branded acronym course label', 'Explore CARSI CCT courses'],
+  ['acronym CTA label', 'Browse WRT courses'],
+  ['acronym pathway label', 'Start the CCT pathway'],
+  ['acronym pathway name in a manifest', '"name": "CARSI CCT course pathway",'],
 ];
 
 const MUST_PASS = [
@@ -149,6 +163,26 @@ const MUST_PASS = [
   // Plain CARSI framing with no IICRC branding at all.
   ['CARSI own designation', 'Earns the CARSI Water Restoration Practitioner designation'],
   ['plain topic wording', 'CARSI water damage restoration training for Australian technicians'],
+  // The three 2026-08-18 branding rules are scoped so that nominative third-person description
+  // of an IICRC discipline stays legal — CLAUDE.md permits it explicitly. These are the live
+  // industry-page constructions the unscoped form would have condemned: measured, the unscoped
+  // "<acronym> course|training|pathway" matched 24 lines and most were these.
+  [
+    'third-person question about a discipline',
+    'What is WRT training and how does it help a plumbing business?',
+  ],
+  [
+    'third-person discipline gloss',
+    'CRT (Carpet Cleaning Technician) is an IICRC certification covering hot water extraction.',
+  ],
+  [
+    'discipline named as what a technician holds',
+    'WRT training equips park staff to respond immediately, reducing uninhabitable nights.',
+  ],
+  // A single parenthesised acronym is a gloss, not a roster — only two or more brand a range.
+  ['single glossed acronym', 'Applied Structural Drying (ASD) is an IICRC certification.'],
+  // A heading naming the TOPIC rather than the discipline acronym is the compliant form.
+  ['topic heading', '### Water Restoration — the CARSI Water Restoration Practitioner designation'],
 ];
 
 let failed = 0;

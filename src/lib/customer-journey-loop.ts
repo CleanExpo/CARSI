@@ -141,11 +141,11 @@ export const pathwayAdvisorOptions: PathwayAdvisorOption[] = [
     firstAction:
       'Start with WRT fundamentals, then add structural drying and microbial risk awareness.',
     retentionCue:
-      'Recommend ASD or microbial remediation content immediately after WRT completion.',
-    primaryHref: '/courses?discipline=WRT',
-    primaryLabel: 'Browse WRT courses',
-    secondaryHref: '/courses?discipline=ASD',
-    secondaryLabel: 'Add drying courses',
+      'Recommend structural drying or microbial remediation content immediately after the water damage course.',
+    primaryHref: '/courses?discipline=Water Damage',
+    primaryLabel: 'Browse water damage courses',
+    secondaryHref: '/courses?discipline=Mould',
+    secondaryLabel: 'Add mould remediation courses',
     icon: ShieldCheck,
   },
   {

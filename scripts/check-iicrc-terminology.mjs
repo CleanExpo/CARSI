@@ -36,6 +36,7 @@
  */
 import { execSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
+import { pathToFileURL } from 'node:url';
 
 // Banned selling/descriptive phrasings. Each must be something that implies
 // CARSI itself delivers IICRC courses or IICRC certification.
@@ -230,6 +231,64 @@ const BANNED = [
       'Never brand a CARSI course with an IICRC discipline acronym or "[discipline]-aligned" — CARSI issues its own Southern Hemisphere designations (CLAUDE.md § CARSI designation rule). Nominative third-person references to an IICRC certification are still allowed.',
   },
   {
+    // Discipline-acronym branding, GLOSSED-LIST form. The list rule above requires the acronyms
+    // to sit next to each other with only a separator between them. Found live on
+    // carsi.com.au/llms.txt (HTTP 200) in the form that breaks that assumption: each acronym is
+    // parenthesised after its spelled-out discipline name, so what sits between two acronyms is
+    // `), <discipline words> (` — never a bare separator, and the rule returned 0 on the whole
+    // paragraph. The line branded CARSI's own offering as "IICRC Continuing Education Credit
+    // (CEC) courses across disciplines: Water Restoration (WRT), … Commercial Carpet Cleaning
+    // (CCT)". Requiring TWO parenthesised acronyms from the known set, within a bounded window,
+    // keeps this specific to a discipline roster and off ordinary prose: measured across the
+    // full scanned scope it matched that one line and nothing else.
+    //
+    // RRT is in this set. It is absent from every rule above, so a roster naming it was
+    // unenforced — and RRT was one of the acronyms live in that paragraph.
+    re: /\((?:WRT|RRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)\)[^\n]{0,160}?\((?:WRT|RRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)\)/i,
+    allow: null,
+    neutralise: null,
+    message:
+      'Do not publish a roster of IICRC discipline acronyms as CARSI\'s course range — CARSI courses carry CARSI Southern Hemisphere designations (CLAUDE.md § CARSI designation rule).',
+  },
+  {
+    // Discipline-acronym branding, SECTION-HEADING form. Found live on carsi.com.au/llms.txt as
+    // an "IICRC Disciplines Explained" section whose seven H3 headings were bare acronyms
+    // ("### WRT — Water Restoration Technician"), each followed by a paragraph describing the
+    // training. A heading names the thing beneath it, so this is the acronym used as the name of
+    // a body of CARSI training — exactly what the founder MUST bans. No rule above matched:
+    // there is no adjacent "IICRC", no "-aligned", and only one acronym per line.
+    //
+    // Deliberately anchored to a markdown heading rather than any line beginning with an
+    // acronym: measured across the full scanned scope it matched those seven lines and nothing
+    // else. Prose that merely opens with an acronym is left to the rules above.
+    re: /^\s{0,3}#{1,6}\s*(?:WRT|RRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)\b/i,
+    allow: null,
+    neutralise: null,
+    message:
+      'Do not title a section with an IICRC discipline acronym — a heading names what follows, which brands that content as an IICRC discipline (CLAUDE.md § CARSI designation rule).',
+  },
+  {
+    // Discipline-acronym branding, PRODUCT-SURFACE form: the acronym used as the NAME of a CARSI
+    // catalogue surface — "Explore CARSI CCT courses", "Browse WRT courses", "CARSI CCT course
+    // pathway", "Start the CCT pathway". These are call-to-action labels and route names, so the
+    // acronym IS the product name a learner sees. No rule above matched: no adjacent "IICRC", no
+    // "-aligned", one acronym per line.
+    //
+    // Scoped by the two signals that separate branding from permitted nominative reference: the
+    // CARSI brand within a short window, or a catalogue call-to-action verb. Deliberately does
+    // NOT match third-person description of the discipline itself — "CRT (Carpet Cleaning
+    // Technician) is an IICRC certification covering…" and "What is WRT training and how does it
+    // help a plumbing business?" both stay legal, because CLAUDE.md permits nominative reference.
+    // Measured: the unscoped form ("<acronym> course|training|pathway" anywhere) matched 24
+    // lines, of which the majority were those permitted third-person descriptions; this scoped
+    // form matched 7, every one of them a CARSI product label.
+    re: /(?:\bCARSI\b[^\n]{0,30}|\b(?:explore|browse|start(?:\s+the)?|enrol\s+in|view|our)\s+(?:the\s+)?)(?:WRT|RRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)\s+(?:course|courses|pathway|pathways|training)\b/i,
+    allow: null,
+    neutralise: null,
+    message:
+      'Do not name a CARSI course, pathway or CTA with an IICRC discipline acronym — use the topic ("carpet cleaning") or the CARSI designation (CLAUDE.md § CARSI designation rule).',
+  },
+  {
     // Endorsement claims. The IICRC states it "does not promote any particular
     // educational provider" — endorsement/partnership/promotion claims are banned.
     re: /endorsed[\s-]+by[\s-]+(the[\s-]+)?IICRC/i,
@@ -372,7 +431,18 @@ function scanLine(file, lineNo, content, findings) {
 }
 
 // CLI only. Importing this module for the self-test must not run the scan or exit the process.
-const isCli = import.meta.url === `file://${process.argv[1]}`;
+//
+// Build the comparison with pathToFileURL, never `file://` + the raw path. String-concatenating
+// leaves the path unencoded, so any character needing percent-encoding makes the comparison
+// false and this guard silently no-ops: the scan still runs and findings still accumulate, but
+// the reporting block below is skipped and the process exits 0. A repository checked out under
+// a path containing a space (e.g. `/Volumes/Storage Unit/CARSI`) reproduced exactly that — a
+// staged file carrying an explicitly-banned phrase produced no output and exit 0. CI paths have
+// no space, so CI was unaffected and its green history is real. This repo wires no pre-commit
+// hook either — lint-staged runs only eslint and prettier — so the damage landed exactly on the
+// manual `npm run check:iicrc-terminology` used to self-certify a change before pushing it. A
+// check that cannot go red is worse than no check, because it is quoted as evidence.
+const isCli = Boolean(process.argv[1]) && import.meta.url === pathToFileURL(process.argv[1]).href;
 const staged = process.argv.includes('--staged');
 const findings = [];
 

@@ -295,8 +295,8 @@ export function StartSmartHub({ siteUrl }: { siteUrl: string }) {
               money or take customer work.
             </p>
             <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-              <Link href="/courses?discipline=CCT" className={marketingBtnPrimary}>
-                Explore CCT courses <ArrowRight className="h-4 w-4" />
+              <Link href="/courses?discipline=Cleaning" className={marketingBtnPrimary}>
+                Explore carpet cleaning courses <ArrowRight className="h-4 w-4" />
               </Link>
               <Link href="/pricing" className={marketingBtnSecondary}>
                 View membership

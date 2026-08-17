@@ -14,8 +14,24 @@ const smoothEase: [number, number, number, number] = [0.4, 0, 0.2, 1];
 // Topic tabs (de-IICRC 2026-07-10): CARSI does not brand courses with IICRC
 // discipline acronyms, so the catalogue filters by plain restoration topic
 // (matched against course title/category), not by WRT/ASD/etc.
-const DISCIPLINE_TABS = ['All', 'Onboarding', 'Water Damage', 'Mould', 'Fire & Smoke', 'Cleaning', 'Free'] as const;
+export const DISCIPLINE_TABS = ['All', 'Onboarding', 'Water Damage', 'Mould', 'Fire & Smoke', 'Cleaning', 'Free'] as const;
 type DisciplineTab = (typeof DISCIPLINE_TABS)[number];
+
+/**
+ * Resolve a deep-linked tab name (`/courses?discipline=<tab>`) to a real tab.
+ *
+ * Case-insensitive on purpose. `app/(public)/courses/page.tsx` upper-cases the query value
+ * before passing it here, and every tab name is mixed case, so the previous exact-equality
+ * lookup could not match any of them: `'CLEANING' !== 'Cleaning'`. Every deep link in the site's
+ * marketing CTAs therefore landed on the unfiltered "All" tab, so a link promising one topic
+ * delivered the whole catalogue. Falling back to 'All' must mean "no such tab", never "the
+ * caller normalised the value".
+ */
+export function resolveDisciplineTab(input: string | undefined | null): DisciplineTab {
+  const wanted = input?.trim().toLowerCase();
+  if (!wanted) return 'All';
+  return DISCIPLINE_TABS.find((tab) => tab.toLowerCase() === wanted) ?? 'All';
+}
 type PriceFilter = 'all' | 'free' | 'paid';
 type CecFilter = 'all' | 'has-cec';
 type DurationFilter = 'all' | 'short' | 'medium' | 'long';
@@ -152,9 +168,7 @@ export function CourseGrid({
   const controlClass = isDark
     ? 'h-11 rounded-xl border border-white/10 bg-[#080c14]/80 px-3 text-sm text-white outline-none focus:border-[#2490ed]/50 focus:ring-1 focus:ring-[#2490ed]/25'
     : 'h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-800 shadow-sm focus:border-[#2490ed] focus:ring-2 focus:ring-[#2490ed]/20 focus:outline-none';
-  const validInitial: DisciplineTab = (DISCIPLINE_TABS as readonly string[]).includes(initialTab)
-    ? (initialTab as DisciplineTab)
-    : 'All';
+  const validInitial: DisciplineTab = resolveDisciplineTab(initialTab);
 
   const [activeTab, setActiveTab] = useState<DisciplineTab>(validInitial);
   const [searchQuery, setSearchQuery] = useState('');
