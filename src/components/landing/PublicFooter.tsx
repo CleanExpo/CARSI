@@ -273,6 +273,20 @@ export function PublicFooter() {
             </Link>
             {' · '}
             <Link
+              href="/refund-policy"
+              className="font-medium text-white/65 underline-offset-2 transition-colors hover:text-white hover:underline"
+            >
+              Refunds
+            </Link>
+            {' · '}
+            <Link
+              href="/support"
+              className="font-medium text-white/65 underline-offset-2 transition-colors hover:text-white hover:underline"
+            >
+              Support
+            </Link>
+            {' · '}
+            <Link
               href="/admin"
               className="font-medium text-white/65 underline-offset-2 transition-colors hover:text-white hover:underline"
             >

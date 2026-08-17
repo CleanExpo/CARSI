@@ -76,6 +76,20 @@ test.describe('a11y: public course surfaces', () => {
     expect(violations, describe(violations)).toEqual([]);
   });
 
+  // The legal pages are linked from the footer of every page on the site, so a violation here
+  // is a violation everywhere. /refund-policy and /support did not exist until 2026-08-18 —
+  // both returned 404 on production while the only refund sentence CARSI published sat inside a
+  // subscription clause for a product that is still switched off.
+  for (const path of ['/refund-policy', '/support', '/terms', '/privacy']) {
+    test(`${path} has no critical or serious violations`, async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      await page.goto(path);
+      await page.waitForLoadState('domcontentloaded');
+      const violations = await blockingViolations(page);
+      expect(violations, describe(violations)).toEqual([]);
+    });
+  }
+
   // The credential JSON-LD is the machine-readable half of this page's trust story. Assert it is
   // actually emitted and parses, rather than trusting that it renders.
   test('course detail emits parseable Course JSON-LD', async ({ page }) => {

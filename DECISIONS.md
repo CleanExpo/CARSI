@@ -21,6 +21,7 @@ External sends, spend, pricing and licence-critical claims NEVER default — the
 | 14 | Paywalled-journal budget for the evidence sweep | Default: OPEN-ACCESS ONLY (commits no spend). Any paid source is a new cost → founder-only. | 2026-08-30 | OPEN |
 | 15 | Four LIVE course URLs are branded with IICRC discipline acronyms — `wrt-water-damage-essentials`, `asd-structural-drying-core`, `cct-commercial-carpet-core`, `fsrt-fire-smoke-restoration-core` | Default: agents prepare new topic slugs + 301 redirects and a preview; you approve before it publishes (public URL surface, SEO + inbound links at risk) | 2026-08-25 | OPEN |
 | 16 | Is "CEC-accredited training" allowed while the CEC approvals registry is empty? It is live on ~19 surfaces (12 industry pages, the hero infographic, `designations.json`) | No default — licence-critical claim. Agents will not mass-rewrite live copy on a reading of the rules; escalates daily. | 2026-08-22 | OPEN |
+| 17 | `/terms` §5 states courses ARE IICRC-approved for CECs and that CARSI reports completions to the IICRC; §4 describes only subscriptions; §1 says "ABN to be confirmed" | No default — a published contract. Agents drafted the Refund Policy it now links to, but will not rewrite the Terms themselves. | 2026-08-24 | OPEN |
 
 ## Decided (move rows here with date + outcome)
 - 2026-08-16 · Telegram competing-idea-bots → rejected in favour of single cockpit bot (founder direction + blueprint §5)

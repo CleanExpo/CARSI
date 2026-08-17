@@ -1,8 +1,10 @@
 import { Metadata } from 'next';
+import Link from 'next/link';
 
 import {
   LegalDocumentShell,
   marketingLegalH2,
+  marketingLink,
   marketingTextStrong,
 } from '@/components/marketing/LegalDocumentShell';
 
@@ -56,7 +58,14 @@ export default function TermsPage() {
         <ul className="list-disc space-y-2 pl-6">
           <li>Subscriptions automatically renew unless cancelled before the renewal date.</li>
           <li>You may cancel your subscription at any time through your account settings.</li>
-          <li>Refunds are provided in accordance with Australian Consumer Law.</li>
+          <li>
+            Refunds are provided in accordance with Australian Consumer Law. Individual course
+            purchases, team seats and memberships are each covered by the{' '}
+            <Link href="/refund-policy" className={marketingLink}>
+              Refund Policy
+            </Link>
+            .
+          </li>
           <li>We reserve the right to change subscription pricing with 30 days notice.</li>
         </ul>
       </section>
