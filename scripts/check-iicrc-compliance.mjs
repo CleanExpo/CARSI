@@ -140,6 +140,11 @@ const SCANNED_DIRS = [
   'docs/marketing/', 'docs/content/',
   'data/seed/', 'data/voice/',
   'public/courses/',
+  // Agent instruction surfaces. They do not ship to a learner, but they tell an agent how to
+  // write a course and that copy does ship, so a banned framing here propagates into generated
+  // content while this backstop reports green. 25 tracked files sat outside every scope until
+  // 2026-08-18; an identical banned canary exited 0 in each and 1 in docs/marketing/.
+  '.claude/skills/', 'skills/', '.claude-plugin/',
 ];
 const EXEMPT = [
   'scripts/check-iicrc-compliance.mjs',
@@ -152,9 +157,15 @@ const EXEMPT = [
   'src/lib/course-kit/cec-guard.ts',
   'src/lib/seed/cec-hours.ts',
   'src/lib/seed/cec-hours.test.ts',
+  // The course-production skill states every banned phrasing in order to forbid it — the same
+  // rationale as CLAUDE.md above.
+  '.claude/skills/carsi-course-production/SKILL.md',
+  'skills/context/project-context.skill.md',
 ];
 
-function inScope(f) { const n = f.replace(/\\/g, '/'); return SCANNED_DIRS.some((d) => n.startsWith(d)); }
+// Case-folded: macOS is case-insensitive by default, so `SKILL.MD` and `.Claude/Skills/` are the
+// same files to the OS but different strings to a case-sensitive extension test and prefix check.
+function inScope(f) { const n = f.replace(/\\/g, '/').toLowerCase(); return SCANNED_DIRS.some((d) => n.startsWith(d)); }
 function isExempt(f) { const n = f.replace(/\\/g, '/'); return EXEMPT.some((e) => n === e || n.endsWith('/' + e)); }
 
 function scanLine(file, lineNo, content, findings, allowlist) {
@@ -196,13 +207,17 @@ export { BANNED, CEC_NUMBER, inScope, isExempt, normaliseLine, ALLOWLIST };
 function main() {
   let list = '';
   try {
-    list = execSync('git ls-files', { encoding: 'utf8', maxBuffer: 128 * 1024 * 1024 });
+    // `-z` gives NUL-separated, UNQUOTED paths. Plain `git ls-files` applies core.quotePath, so
+    // any path containing a non-ASCII byte, a backslash or a quote came back escaped and wrapped
+    // in quotes — matching no scope prefix and opening no file. Proven: a banned canary at
+    // `docs/marketing/__canary_café.md` exited 0 under the old parser and 1 under this one.
+    list = execSync('git ls-files -z', { encoding: 'utf8', maxBuffer: 128 * 1024 * 1024 });
   } catch (err) {
     console.error('check-iicrc-compliance: failed to list tracked files:', err.message);
     process.exit(1);
   }
   const findings = [];
-  for (const file of list.split('\n').map((f) => f.trim()).filter((f) => f && COPY_EXT.test(f) && inScope(f) && !isExempt(f))) {
+  for (const file of list.split('\0').filter((f) => f && COPY_EXT.test(f.toLowerCase()) && inScope(f) && !isExempt(f))) {
     let text = '';
     try { text = readFileSync(file, 'utf8'); } catch { continue; }
     findings.push(...evaluateContent(file, text));

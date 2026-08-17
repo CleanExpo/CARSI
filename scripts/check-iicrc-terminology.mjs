@@ -373,11 +373,33 @@ const JSON_SCANNED_DIRS = ['data/seed/', '.curation/', 'data/wordpress-export/']
 const PUBLIC_COPY_EXT = /\.(txt|json|md|mdx)$/;
 const PUBLIC_SCANNED_DIRS = ['public/'];
 
-function inScope(file) {
-  const norm = file.replace(/\\/g, '/');
+// Agent instruction surfaces. These do not ship to a learner directly — they tell an agent how
+// to write a course, and that copy DOES ship. `carsi-course-production/SKILL.md` encodes the
+// CEC and designation rules verbatim, so a banned phrase here propagates into generated course
+// content while every guard reports green. 25 tracked files sat outside every scope until now.
+const INSTRUCTION_COPY_EXT = /\.(md|mdx|json)$/;
+const INSTRUCTION_SCANNED_DIRS = ['.claude/skills/', 'skills/', '.claude-plugin/'];
+
+/**
+ * Scope test.
+ *
+ * Case-folded, because the extension and prefix tests are the whole gate and macOS ships a
+ * case-insensitive filesystem by default: `SKILL.MD` is the same file as `skill.md` to the OS
+ * but a different string to a case-sensitive regex, and `.Claude/Skills/` resolves identically
+ * while failing a `startsWith('.claude/skills/')` test. Either spelling would have placed a file
+ * outside every scope while still being read, built and shipped.
+ */
+export function inScope(file) {
+  const norm = file.replace(/\\/g, '/').toLowerCase();
   if (COPY_EXT.test(norm) && SCANNED_DIRS.some((d) => norm.startsWith(d))) return true;
   if (norm.endsWith('.json') && JSON_SCANNED_DIRS.some((d) => norm.startsWith(d))) return true;
   if (PUBLIC_COPY_EXT.test(norm) && PUBLIC_SCANNED_DIRS.some((d) => norm.startsWith(d))) return true;
+  if (
+    INSTRUCTION_COPY_EXT.test(norm) &&
+    INSTRUCTION_SCANNED_DIRS.some((d) => norm.startsWith(d))
+  ) {
+    return true;
+  }
   return false;
 }
 
@@ -387,6 +409,12 @@ const EXEMPT = [
   'scripts/check-iicrc-terminology.mjs',
   'CLAUDE.md',
   'skills/context/project-context.skill.md',
+  // The course-production skill IS the rule text an agent reads before writing a course. It
+  // states every banned phrasing in order to forbid it ("BANNED in any selling context: …"),
+  // exactly like CLAUDE.md and project-context above. Flagging it would mean a blanket rewrite
+  // deletes the instruction that enforces this guard — the failure mode the round-2 exemptions
+  // in the self-test already exist to prevent.
+  '.claude/skills/carsi-course-production/SKILL.md',
   // The course-asset-kit engine's banned-phrase scanner mirrors this guard's
   // regexes and messages, and its tests use the banned phrases as fixtures to
   // prove the scan fires — same rationale as exempting this guard itself.
@@ -480,15 +508,18 @@ if (staged) {
   // CI / manual: scan all tracked source-copy files.
   let list = '';
   try {
-    list = execSync('git ls-files', { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+    // `-z` gives NUL-separated, UNQUOTED paths. Plain `git ls-files` applies core.quotePath, so a
+    // path containing a backslash, a quote or a non-ASCII byte comes back wrapped in quotes with
+    // escapes — a string that matches no scope prefix and opens no file, so the file was skipped
+    // in silence. Splitting on NUL also removes the `.trim()` that used to run on every path,
+    // which silently renamed any file whose name ends in a space and then failed to read it.
+    // Both were bypasses: a file could be placed in a scanned directory and never scanned.
+    list = execSync('git ls-files -z', { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
   } catch (err) {
     console.error('check-iicrc-terminology: failed to list tracked files:', err.message);
     process.exit(1);
   }
-  const files = list
-    .split('\n')
-    .map((f) => f.trim())
-    .filter((f) => f && inScope(f) && !isExempt(f));
+  const files = list.split('\0').filter((f) => f && inScope(f) && !isExempt(f));
   for (const file of files) {
     let text = '';
     try {

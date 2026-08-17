@@ -12,7 +12,7 @@
  * The allow-cases matter as much as the block-cases: every one is a phrasing CLAUDE.md
  * explicitly permits, and a guard that blocks them would be turned off within a week.
  */
-import { scanText } from './check-iicrc-terminology.mjs';
+import { inScope, scanText } from './check-iicrc-terminology.mjs';
 
 const F = 'app/(public)/fixture/page.tsx';
 
@@ -185,7 +185,48 @@ const MUST_PASS = [
   ['topic heading', '### Water Restoration — the CARSI Water Restoration Practitioner designation'],
 ];
 
+/**
+ * Scope cases. The rules above are only ever as good as the set of files they are run over, and
+ * every rule in this file could be perfect while a path quietly sat outside `inScope`. Measured
+ * 2026-08-18: 25 tracked files under `.claude/skills/` and `skills/` were in no scope at all,
+ * and an identical banned canary exited 0 in each of them while exiting 1 in `docs/marketing/`.
+ */
+const MUST_BE_IN_SCOPE = [
+  ['course-production skill', '.claude/skills/carsi-course-production/SKILL.md'],
+  // Case variants: macOS is case-insensitive by default, so these are the SAME file to the OS
+  // but were different strings to a case-sensitive extension test and prefix check.
+  ['upper-case extension', '.claude/skills/x/SKILL.MD'],
+  ['upper-case directory', '.Claude/Skills/x/skill.md'],
+  ['repo-level skills tree', 'skills/australian/australian-context.skill.md'],
+  ['plugin surface', '.claude-plugin/anything/notes.md'],
+  ['marketing copy', 'docs/marketing/linkedin-campaign.md'],
+  ['seed data', 'data/seed/courses-catalog.json'],
+  ['static AI surface', 'public/llms.txt'],
+  ['app route', 'app/(public)/courses/page.tsx'],
+];
+
+const MUST_BE_OUT_OF_SCOPE = [
+  ['repo-root operating file', 'GOAL.md'],
+  ['this guard is handled by EXEMPT, not scope', 'scripts/other-script.mjs'],
+  ['a lockfile', 'package-lock.json'],
+  ['a skill image', '.claude/skills/x/diagram.png'],
+];
+
 let failed = 0;
+
+for (const [name, path] of MUST_BE_IN_SCOPE) {
+  if (!inScope(path)) {
+    console.error(`✖ MUST BE SCANNED but is out of scope: ${name}\n    ${path}`);
+    failed++;
+  }
+}
+
+for (const [name, path] of MUST_BE_OUT_OF_SCOPE) {
+  if (inScope(path)) {
+    console.error(`✖ MUST BE OUT OF SCOPE but is scanned: ${name}\n    ${path}`);
+    failed++;
+  }
+}
 
 for (const [name, src] of MUST_BLOCK) {
   if (scanText(F, src).length === 0) {
@@ -207,6 +248,7 @@ if (failed > 0) {
   process.exit(1);
 }
 console.log(
-  `✓ IICRC terminology guard self-test passed (${MUST_BLOCK.length} block, ${MUST_PASS.length} pass).`
+  `✓ IICRC terminology guard self-test passed (${MUST_BLOCK.length} block, ${MUST_PASS.length} pass, ` +
+    `${MUST_BE_IN_SCOPE.length + MUST_BE_OUT_OF_SCOPE.length} scope).`
 );
 process.exit(0);

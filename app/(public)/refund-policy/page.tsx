@@ -105,9 +105,9 @@ export default function RefundPolicyPage() {
       <section>
         <h2 className={marketingLegalH2}>5. Continuing education credits</h2>
         <p>
-          Where a course carries continuing education credits, those credits are awarded by the
-          issuing body, not by CARSI, and a refund may mean the associated credits are withdrawn.
-          We will tell you before processing a refund if that applies to your purchase.
+          Continuing education credits are awarded by the issuing body, not by CARSI, and a refund
+          may mean associated credits are withdrawn. We will tell you before processing a refund if
+          that applies to your purchase.
         </p>
       </section>
 
