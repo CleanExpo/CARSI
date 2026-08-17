@@ -89,6 +89,23 @@ plus 4-week rolling course sales. Every session reports RWR movement or names th
     now exist, are footer-linked and pass accessibility checks.
   - **Security:** six checkout and billing-portal routes accepted any attacker-supplied Stripe
     return URL. Now restricted to an origin allowlist.
-  - Founder queue grew by three: DECISIONS #15 (four live course URLs branded with IICRC
+  - Founder queue grew by four: DECISIONS #15 (four live course URLs branded with IICRC
     discipline acronyms), #16 ("CEC-accredited" live on ~19 surfaces against an empty registry),
-    #17 (`/terms` §5 asserts IICRC-approved courses and CEC reporting).
+    #17 (`/terms` §5 asserts IICRC-approved courses and CEC reporting), #18 (the `/courses`
+    "IICRC Discipline Map" feature). #7's AAA half was measured for the first time and FAILS.
+  - **An independent reviewer was run and returned FAIL, which was worth every minute.** It found
+    that `/courses` — the flagship page — still published the seven-acronym IICRC discipline
+    roster plus a blanket CEC claim, live, and that the three rules written earlier in the session
+    provably could not see it: the sentence is assembled from JSX children, so the literal `(WRT)`
+    never appears on a source line. Copy fixed; the underlying lesson is that **these guards scan
+    source, and components emit copy at render** — logged as a design question, not patched with
+    more regex. The reviewer's own session denied code execution, so mutation-control,
+    guard-falsification and clean-environment-suite are undone rather than N/A, and it correctly
+    refused to quote this session's runs as its evidence. Report kept at
+    `docs/reviews/reviewer-report-5f1f8914.json`.
+  - **The release gate is NOT satisfied and nothing was self-certified.** Codex — the
+    model-diverse reviewer the gate prefers — is out of credits until 2026-08-20; the fallback
+    reviewer could not execute; three checklist items are undischarged. Per the gate, the work is
+    queued rather than released. The branch is committed and lives in the shared `.git`, so it
+    survives worktree removal, but it exists only on this machine's external drive until someone
+    pushes it.

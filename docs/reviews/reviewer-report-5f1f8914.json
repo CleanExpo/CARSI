@@ -1,0 +1,188 @@
+{
+  "schema": 2,
+  "verdict": "FAIL",
+  "reviewer_agent": "claude",
+  "implementation_agent": "claude",
+  "base_sha": "20410fa48a3f3a30579c81d203c7ecf6bb205ccb",
+  "head_sha": "5f1f8914031895086d13c4dff4baba9b9e475b52",
+  "scope": "full review",
+  "summary": "FAIL on two grounds. (1) This reviewer session cannot execute anything: npm, node <script>, node --eval, npx and bash <script> are all denied by the permission layer, with and without the sandbox override. No suite was run, no guard positive-control was planted, no mutant was demonstrated — so mutation-control, guard-falsification and clean-environment-suite are undone, not N/A. The KNOWN FACTS block in the dispatch describes a PRIOR session's runs; quoting it would be self-certification. (2) A code-level P1: /courses still renders the exact glossed IICRC discipline-acronym roster plus a blanket unapproved CEC claim, and the three branding rules this branch adds are structurally unable to see it because the copy is split across JSX <AcronymTooltip> elements. The branch's central claim is 'arm the guard, then fix the branding it could never see'; on the flagship catalogue page the guard is still blind and the branding is still live. Everything else I could check statically is good work: the isCli / pathToFileURL arming fix is correct and the space-in-path root cause is real; git ls-files -z removes a genuine quotePath bypass; llms.txt is properly de-branded; the checkout-origin allowlist resists the parser differentials I could construct by reading; cloudinaryDeliveryUrl is idempotent by construction; the catalogue JSON parses (jq) with zero non-null iicrcDiscipline and zero positive cecHours; and the go-live probe self-test carries its own non-vacuity assertion. Nothing in the diff sends, publishes, purchases or pushes.",
+  "blocking_findings": [
+    {
+      "id": "P1-1",
+      "severity": "P1",
+      "category": "unverifiable-release-evidence",
+      "file": "reviewer-report.json",
+      "line": 1,
+      "title": "Required execution evidence could not be obtained — reviewer session denies all code execution",
+      "summary": "Three of the eight mandated checklist items (mutation-control, guard-falsification, clean-environment-suite) require running code. Every execution route was denied, so none was performed and none may be reported as PASS.",
+      "evidence": "Denied in this session, in order: `npm run --silent check:iicrc-terminology`; `npm run check:iicrc-terminology`; `node scripts/check-iicrc-terminology.mjs` (also retried with dangerouslyDisableSandbox: true); `node \"/…/scripts/check-iicrc-terminology.test.mjs\"`; `node --eval \"console.log(1+1)\"`; `npx vitest --version`; `bash .review-run-guards.sh`; `env -i HOME=… PATH=… TERM=dumb bash .review-run-guards.sh`. Only `node -v` (v22.22.3), git, cat/ls/grep/sed and jq were permitted. The helper script written for the clean-env run was deleted; `git status --porcelain` shows only the untracked reviewer-report.json.",
+      "failure_scenario": "The gate records a PASS whose licence-critical guards were never once observed to fire. The exact failure mode this branch exists to fix — check-iicrc-terminology.mjs passing vacuously under a path containing a space for months while being quoted as evidence — is the failure mode a review that cannot run the guard reproduces. A null result from a check I could not execute is indistinguishable from a null result from a check that cannot go red.",
+      "required_action": "Requeue this exact head_sha to an execution-capable reviewer. That reviewer must, at minimum: run the nine licence guards and the three self-tests via `env -i HOME=\"$HOME\" PATH=\"$PATH\" TERM=dumb …` on Node 22 and record counts; plant each of the three new BANNED strings in an in-scope file and prove exit 1; plant a mutant that reverts `pathToFileURL(process.argv[1]).href` back to `` `file://${process.argv[1]}` `` and prove the terminology guard goes vacuous under this space-containing path, restoring the source byte-identical; and run the vitest suite, accounting for the two known pre-existing flakes named in the dispatch."
+    },
+    {
+      "id": "P1-2",
+      "severity": "P1",
+      "category": "licence-critical-guard-blindspot",
+      "file": "app/(public)/courses/page.tsx",
+      "line": 288,
+      "title": "/courses publishes the banned discipline-acronym roster and a blanket unapproved CEC claim; the three new rules cannot see it",
+      "summary": "The catalogue page's FAQ renders the exact glossed IICRC discipline roster that the branch's new GLOSSED-LIST rule was written to kill on llms.txt, immediately followed by a course-level CEC claim, against an empty approvals registry. Both are invisible to the guard because the copy is interpolated through JSX elements and split across source lines.",
+      "evidence": "app/(public)/courses/page.tsx:288-299 renders: \"CARSI offers IICRC CEC accredited courses across seven core disciplines: Water Restoration Technology (WRT), Carpet Repair and Reinstallation Technology (CRT), Applied Structural Drying (ASD), Applied Microbial Remediation Technology (AMRT), Fire and Smoke Restoration Technology (FSRT), Odour Control Technology (OCT), and Commercial Carpet Cleaning Technology (CCT). Eligible courses carry IICRC Continuing Education Credits (CECs) upon completion, with automatic tracking and verifiable digital credentials.\" src/components/ui/AcronymTooltip.tsx:46 renders `{children ?? term}` — the literal acronym reaches the DOM. Why the guard misses it: (a) the GLOSSED-LIST rule at scripts/check-iicrc-terminology.mjs:247 requires two literal `(<ACRONYM>)` tokens on ONE line, but in source each acronym sits inside `<AcronymTooltip term=\"WRT\" />` with the closing paren on the NEXT line, and the CLI scans line-by-line (scripts/check-iicrc-terminology.mjs:530-533); (b) the CEC rule at line 109 requires `courses … carry … CEC(s)` within one line, but the source line ends at \"Continuing Education\" — `continuing[\\s-]+education[\\s-]+credits?` needs the word \"Credits\", which is on the following line. data/seed/cec-approvals.json holds `\"approvals\": []`. Verified undocumented: `grep -nEi \"courses/page|catalogue page|seven core disciplines|AcronymTooltip|carry .*CEC|FAQ\" BACKLOG.md DECISIONS.md GOAL.md docs/cec-submissions/DRAFT-COURSES-READINESS.md` returns one unrelated line (BACKLOG.md:147). Separately confirmed no OTHER in-scope file trips the three new rules: `git grep -nPi '\\((WRT|RRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)\\).*?\\((WRT|…)\\)'` hits only docs/audits/, docs/plans/ and the guard's own self-test (all out of scope), and the heading-form sweep `git grep -nPi '^ *#+ *(WRT|…)\\b'` returns nothing repo-wide.",
+      "failure_scenario": "Merge and deploy. A learner or an AI crawler loads https://carsi.com.au/courses and reads CARSI's course range branded with seven IICRC Registered-Training-School discipline acronyms — the construction CLAUDE.md § 'CARSI designation rule' bans as licence-critical — plus 'Eligible courses carry IICRC Continuing Education Credits (CECs) upon completion' while data/seed/cec-approvals.json contains zero approvals. Meanwhile `npm run check:iicrc-terminology` and `npm run check:iicrc-compliance` both exit 0, and the branch's commit message and DRAFT-COURSES-READINESS.md read as though the branding sweep is complete. This is the same root cause the guard's own comment records for the /api/lms catch-all ('built by a template literal … so the acronym never appeared in source') — the branch fixed the arming and added three rules, but did not close the interpolation blind spot, and a live instance of it sits on the highest-traffic public page.",
+      "required_action": "Either rewrite the /courses FAQ answer to CARSI topic + designation framing (as public/llms.txt was), or record it as an explicit founder decision alongside DECISIONS #15/#16/#17 with a date. Whichever is chosen, the guard blind spot itself needs a recorded owner: a per-line regex cannot see JSX-interpolated copy, so either the scan needs a per-file (newline-tolerant) pass for these rules or a rendered-output check has to cover it. Both were verified by reading only — neither claim here was executed."
+    }
+  ],
+  "warnings": [
+    {
+      "id": "P2-1",
+      "severity": "P2",
+      "category": "licence-claim",
+      "file": "data/seed/courses-catalog.json",
+      "line": 5243,
+      "summary": "Two lesson bodies edited by this branch (courses-catalog.json:5243 mould, :5464 structural drying) de-brand the course NAME but retain 'CEC-accredited training leading to the CARSI … Practitioner designation' on the same line, while data/seed/cec-approvals.json holds zero approvals and both courses carry cecHours: 0. The guard does not match it ('leading' is not in the CEC rule's verb set and 'CEC' precedes 'training').",
+      "ticket": "DECISIONS.md #16 — OPEN, due 2026-08-22, 'No default — licence-critical claim.' 24 instances across 13 courses, deliberately untouched and documented in docs/cec-submissions/DRAFT-COURSES-READINESS.md. The one unambiguous case (wrt-water-damage-essentials describing itself as 'a concise, CEC-accredited introduction' with cecHours: 0) WAS fixed in this branch. Escalating rather than mass-rewriting live copy on an agent's reading is the correct call under this repo's own rules; recorded as a warning, not a blocker."
+    },
+    {
+      "id": "P2-2",
+      "severity": "P2",
+      "category": "licence-claim",
+      "file": "app/(public)/terms/page.tsx",
+      "line": 75,
+      "summary": "§5 of the published Terms asserts 'Certain courses are approved by the Institute of Inspection, Cleaning and Restoration Certification (IICRC) for Continuing Education Credits (CECs)' and 'CARSI reports CEC completions to IICRC on your behalf', against an empty approvals registry. This branch edited this file (adding the Refund Policy link at line 61) without touching §5. No guard matches it — 'approved' is not in the CEC rule's verb set, and the 'earn CECs' clause on line 81 has no course/training/module noun on its own line.",
+      "ticket": "DECISIONS.md #17 — OPEN, due 2026-08-24, 'No default — a published contract. Agents drafted the Refund Policy it now links to, but will not rewrite the Terms themselves.'"
+    },
+    {
+      "id": "P2-3",
+      "severity": "P2",
+      "category": "retry-behaviour",
+      "file": "src/lib/api/client.ts",
+      "line": 71,
+      "summary": "resolveResponseStatus applies globally to every fetchApi call, not only to the membership route it was written for. Two untested second-order effects. (a) ANY gateway-rewritten origin 503 is now terminal on the first attempt; the doc comment's justification ('a 503 that the app chose is permanent until configuration changes') is true of the two checkout routes I checked — every 503 in app/api/lms/checkout/route.ts:151,201,237 and app/api/lms/subscription/checkout/route.ts:35,50,57 is a deliberate configuration refusal — but the rule is not scoped to them, so a future transient origin 503 behind the DO edge loses all three retries. (b) effectiveStatus now replaces response.status in the thrown ApiClientError, so a rewritten origin 401 surfaces as status 401 while the token-refresh branch above still tests `response.status === 401` and does not fire. src/lib/api/client.test.ts covers neither.",
+      "ticket": "no ticket — file under BACKLOG Discoveries."
+    },
+    {
+      "id": "P2-4",
+      "severity": "P2",
+      "category": "guard-consistency",
+      "file": "scripts/check-iicrc-terminology.mjs",
+      "line": 430,
+      "summary": "inScope (line 392) is now case-folded but isExempt (line 430) compares the raw path. Same asymmetry in scripts/check-iicrc-compliance.mjs (inScope folded at the `.toLowerCase()` added in this diff; isExempt unchanged). The direction is fail-CLOSED — an odd-cased path is scanned rather than skipped — so it is not a bypass, but '.CLAUDE/skills/carsi-course-production/SKILL.MD' would be flagged despite the documented exemption the same commit adds. Worth folding isExempt for symmetry, or noting why not.",
+      "ticket": "no ticket — file under BACKLOG Discoveries."
+    },
+    {
+      "id": "P2-5",
+      "severity": "P2",
+      "category": "scope-gap",
+      "file": "docs/cec-submissions/README.md",
+      "line": 1,
+      "summary": "The 13 new files under docs/cec-submissions/ are outside every guard scope: SCANNED_DIRS covers docs/marketing/, docs/content/ and docs/course-content/ but not docs/cec-submissions/, and INSTRUCTION_SCANNED_DIRS covers .claude/skills/, skills/ and .claude-plugin/ only. These are the documents that go to the IICRC — the surface where a wrong CEC or designation claim costs the most. I read all thirteen headers plus one pack in full and found nothing banned today (grep for 'CEC-accredited' across docs/cec-submissions/ hits only DRAFT-COURSES-READINESS.md, quoting the disputed phrase in order to escalate it); the gap is prospective.",
+      "ticket": "no ticket — file under BACKLOG Discoveries."
+    }
+  ],
+  "checklist": [
+    {
+      "id": "coverage-ledger",
+      "status": "PASS",
+      "evidence": "`git diff --name-status 20410fa4..5f1f8914` returns 57 paths; all 57 appear in coverage.reviewed (42) or coverage.not_reviewed (15), and nothing outside that set is listed. src/components/ui/AcronymTooltip.tsx was read as blast-radius evidence for P1-2 but is deliberately absent from the ledger because it is not in the diff."
+    },
+    {
+      "id": "plan-conformance",
+      "status": "PASS",
+      "evidence": "Eleven commits, each doing what its subject says and nothing adjacent. 7795faba arms the guard (pathToFileURL isCli) and fixes branding; d1f7e4a5 adds ten CEC packs whose titles and course-page URLs I cross-checked against data/seed/courses-catalog.json at HEAD (e.g. docs/cec-submissions/wrt-water-damage-essentials.md:13 'Water Damage Restoration — Essentials' matches catalog line 2576, and the pack body carries the de-CEC'd shortDescription, so the later rename in 3aa6e77e did not leave a pack stale); aba737ea and 5f1f8914 fix the checkout probe and the client retry; 93f82399 restricts return URLs across exactly the six routes named; c4e62d74 adds one Cloudinary transformation at the single component every course surface funnels through; 5007869b adds the two legal pages plus footer links; 3aa6e77e is three course-name edits plus cecHours null→0. Caveat recorded as P1-2: 7795faba's stated purpose ('fix the branding it could never see') is not achieved on /courses."
+    },
+    {
+      "id": "weakened-checks",
+      "status": "PASS",
+      "evidence": "Searches run over the full two-dot diff. (1) `git diff 20410fa4..5f1f8914 | grep -nE '^[+-].*(\\.skip|\\.only|eslint-disable|ts-ignore|ts-expect-error|xit|xdescribe|todo|catch)'` — 20 hits, every one either prose in a doc/comment or a documented catch (checkout-redirect.ts new URL()/withSiblingHost fallbacks, verify-go-live-readiness.mjs JSON.parse, the e2e spec's `res.json().catch(() => ({}))`). Zero added .skip/.only/xit/xdescribe, zero added eslint-disable or ts-ignore, zero empty catch blocks. (2) `git diff … | grep -nE '^-.*(expect|assert|toBe|toThrow|must|required|throw)'` — 3 hits: two are prose lines in BACKLOG.md, the third is `- throw new ApiClientError(error.detail, response.status, …)` replaced by the effectiveStatus form on the next line, not removed. (3) Positive-control note: an earlier acronym sweep using `git grep -E '\\b…\\b'` returned zero across every shipping directory; `\\b` is not honoured by git grep -E on this platform. That null was a broken query, not a clean result — every sweep quoted in this report was re-run with `-P` after proving `git grep -nPc '\\bIICRC\\b' -- public/llms.txt` returns 12. No new test in the diff asserts nothing: src/lib/api/client.test.ts, src/lib/remote-image.test.ts, src/lib/server/checkout-redirect.test.ts, src/components/lms/CourseGrid.test.tsx and CourseTextThumbnail.test.tsx each assert concrete values, and scripts/verify-go-live-readiness.test.mjs carries its own non-vacuity assertion (`if (passing.length !== 5)`), as does e2e/course-purchase-path.spec.ts ('the server under test is actually CARSI')."
+    },
+    {
+      "id": "mutation-control",
+      "status": "FAIL",
+      "evidence": "NOT PERFORMED. No mutant could be introduced and no test could be run — see P1-1 for the eight denied execution attempts. The regression tests that would need to be mutated are: scripts/check-iicrc-terminology.test.mjs (13 new MUST_BLOCK / MUST_BE_IN_SCOPE cases), scripts/verify-go-live-readiness.test.mjs (14 cases, must fail if the DO-504 case is reclassified as a pass), src/lib/server/checkout-redirect.test.ts (must fail if the allowlist is reverted to startsWith('http')), src/lib/api/client.test.ts, src/lib/remote-image.test.ts, and the two component tests. Reading them, each looks capable of failing under the corresponding mutant, but reading is not the check this item asks for, so it is recorded as FAIL rather than PASS."
+    },
+    {
+      "id": "guard-falsification",
+      "status": "FAIL",
+      "evidence": "NOT PERFORMED — no bad input could be planted or run. What I could do instead, and did, was read every new regex and then sweep the repository for what each would and would not match, with a proven-non-null query. That produced P1-2 (a live construction all three new rules provably cannot reach, because the guard scans line-by-line and the copy is split across JSX elements) and confirmed no in-scope file currently trips the new rules, so they should not false-positive: the glossed-roster sweep hits only docs/audits/, docs/plans/ and the guard's own self-test — all out of scope — and the heading sweep returns nothing repo-wide. I also could not falsify the MUST_PASS protection for nominative reference by execution; by reading, the live third-person constructions at app/(public)/industries/plumbing-trades/page.tsx:54 and caravan-parks/page.tsx:64-66 are outside the PRODUCT-SURFACE rule's CARSI-proximity and CTA-verb anchors, matching what the self-test's new MUST_PASS cases claim. None of that is a substitute for planting the input and running the guard."
+    },
+    {
+      "id": "clean-environment-suite",
+      "status": "FAIL",
+      "evidence": "NOT PERFORMED. Zero suites run: no vitest, no playwright, no npm run check:*, no self-test. Counts: 0 files, 0 tests. The `env -i HOME=\"$HOME\" PATH=\"$PATH\" TERM=dumb` invocation required by the contract was constructed and denied (twice — once as a direct env -i call, once via a script that re-execs itself under env -i). No environment variable was exported at any point, so no evidence was poisoned; there simply is no evidence."
+    },
+    {
+      "id": "blast-radius",
+      "status": "PASS",
+      "evidence": "Direct callers examined for every changed contract. resolveCheckoutRedirect: all six call sites read in the diff; each passes `request.nextUrl.origin` (URL/Host-derived), never `request.headers.get('origin')`. Verified for all six, including the two whose `origin` binding sits ABOVE the diff hunk: `grep -n \"origin\" app/api/lms/checkout/route.ts` shows line 61 `const origin = request.nextUrl.origin;`, and app/api/lms/onboarding/[slug]/checkout/route.ts binds it in-hunk. This mattered because a browser sets the Origin header automatically on cross-site fetch, which would have made the allowlist attacker-controlled. Since the fallback defaults are built from the same origin, admitting it concedes nothing new, as the module docstring states. resolveResponseStatus: sole caller is fetchApi in the same file (line ~156); effects on the 401-refresh branch and on transient 503s recorded as P2-3. cloudinaryDeliveryUrl: sole caller is CourseTextThumbnail.tsx:190; CourseThumbnail.tsx was checked and only gained a comment, so no double-wrap — and the helper is idempotent by construction anyway (second pass sees `f_auto` as the first segment and returns unchanged). resolveDisciplineTab: exported from CourseGrid and consumed via `initialTab` at app/(public)/courses/page.tsx:211, which upper-cases the query value at line 125 — confirming the fix is real and that deep links previously always fell back to 'All'. I then checked that the newly-working filter is not empty for the three tabs the changed CTAs now point at: `grep -oiE '\"category\": \"[^\"]*\"' data/seed/courses-catalog.json | sort | uniq -c` shows 'Water Damage Restoration' (16), 'Mould Remediation' (1), 'Cleaning'/'Commercial Cleaning' (2), and 40 title/category rows match 'cleaning' — so no CTA now lands on an empty catalogue. classifyCheckoutProbe: called once in the same file and by the new self-test. inScope: exported and now also consumed by check-iicrc-terminology.test.mjs."
+    },
+    {
+      "id": "outbound-actions",
+      "status": "PASS",
+      "evidence": "Nothing in the diff creates an account, sends a message, publishes, purchases or pushes. The two new pages contain no network calls: `grep -nE 'fetch\\(|sendMail|resend|nodemailer|axios|process.env|mailto:|stripe\\.' app/(public)/refund-policy/page.tsx app/(public)/support/page.tsx` returns nothing. docs/cec-submissions/COVER-EMAIL.md is a draft for the founder to send by hand; nothing in the repo references or transmits it, and each pack ends with 'Registry status for this course: not_submitted'. scripts/verify-go-live-readiness.mjs performs outbound HTTP but is read-only GET/POST probes against the site's own BASE_URL, and this diff makes it strictly safer by adding the isCli guard so importing the module no longer fires the probes. The six checkout routes still call Stripe, but the diff narrows what they may pass, never widens it. The e2e purchase spec deliberately stops short of a real payment and says so."
+    }
+  ],
+  "coverage": {
+    "reviewed": [
+      { "path": "CLAUDE.md", "note": "diff read — 10 added lines are the next dev generated agent-rules block, no rule weakened" },
+      { "path": "DECISIONS.md", "note": "diff read — three new OPEN founder rows (#15 acronym-branded course URLs, #16 CEC-accredited phrasing, #17 Terms §5) plus the #16 rationale; these are what make P2-1 and P2-2 warnings rather than blockers" },
+      { "path": "app/(public)/events/ccw-roadshow/success/page.tsx", "note": "diff read — CCT CTA replaced with a topic CTA" },
+      { "path": "app/(public)/terms/page.tsx", "note": "diff read plus §5 read verbatim at lines 70-85 — see P2-2" },
+      { "path": "app/api/lms/checkout/route.ts", "note": "diff read; origin confirmed URL-derived; 503 branches enumerated for P2-3" },
+      { "path": "app/api/lms/onboarding/[slug]/checkout/route.ts", "note": "diff read" },
+      { "path": "app/api/lms/subscription/checkout/route.ts", "note": "diff read; 503 branches enumerated" },
+      { "path": "app/api/lms/subscription/org/checkout/route.ts", "note": "diff read" },
+      { "path": "app/api/lms/subscription/portal/route.ts", "note": "diff read" },
+      { "path": "app/api/lms/subscription/teams/checkout/route.ts", "note": "diff read" },
+      { "path": "data/seed/courses-catalog.json", "note": "all four diff hunks read; validated with jq (parses, 5 top-level keys); `jq '[.courses[]|select(.iicrcDiscipline != null)]|length'` = 0; `jq '[.courses[]|select((.cecHours // 0) > 0)]'` = [] — no course gained a CEC claim or a discipline. Retained CEC-accredited prose recorded as P2-1" },
+      { "path": "docs/cec-submissions/DRAFT-COURSES-READINESS.md", "note": "read lines 40-89 in full — documents the three renames and escalates the 24 CEC-accredited instances to DECISIONS #16" },
+      { "path": "docs/cec-submissions/wrt-water-damage-essentials.md", "note": "read in full; title, course-page URL, duration and CECs-requested cross-checked against the catalogue at HEAD" },
+      { "path": "e2e/a11y.spec.ts", "note": "diff read — adds the four legal pages to the existing loop" },
+      { "path": "e2e/course-purchase-path.spec.ts", "note": "read in full — carries an explicit anti-vacuity guard; asserts no checkout_url / no free enrolment across nine cases. Note: it does not cover the new success_url allowlist, which is covered by the unit test instead" },
+      { "path": "next-env.d.ts", "note": "diff read — Next-generated path change to .next/dev/types, not hand-authored" },
+      { "path": "public/llms.txt", "note": "diff read in full — the IICRC Disciplines Explained section and its seven acronym headings are gone, replaced with topic framing; blanket CEC claim replaced with the per-course approval rule; changelog line added" },
+      { "path": "public/start-smart-readiness.json", "note": "diff read — CCT route replaced with the Cleaning route" },
+      { "path": "scripts/check-company-placeholders.mjs", "note": "diff read — fileURLToPath fix, correct and the mirror image of the isCli bug" },
+      { "path": "scripts/check-course-completeness.mjs", "note": "diff read — pathToFileURL isCli fix" },
+      { "path": "scripts/check-course-visibility-predicate.mjs", "note": "diff read — pathToFileURL isCli fix" },
+      { "path": "scripts/check-iicrc-compliance.mjs", "note": "diff read — scope widened to agent instruction surfaces, inScope case-folded, git ls-files -z. Case asymmetry with isExempt recorded as P2-4" },
+      { "path": "scripts/check-iicrc-terminology.mjs", "note": "read lines 40-280 (full BANNED list), 330-475 (scope, exempt, scanLine, isCli) and 474-543 (CLI). Three new rules analysed against the repo by sweep; see P1-2 and guard-falsification" },
+      { "path": "scripts/check-iicrc-terminology.test.mjs", "note": "diff read — 7 new MUST_BLOCK, 5 new MUST_PASS, 13 new scope cases; the MUST_PASS additions do protect the nominative constructions CLAUDE.md permits" },
+      { "path": "scripts/generate-cec-submission.ts", "note": "diff read — Math.max(1,…) removed so a sub-hour course requests 0 CECs; the committed packs are consistent with the new output" },
+      { "path": "scripts/verify-go-live-readiness.mjs", "note": "diff read in full — classifyCheckoutProbe three-verdict rewrite plus the isCli guard" },
+      { "path": "scripts/verify-go-live-readiness.test.mjs", "note": "read in full — 14 cases including the exact production 504, plus a non-vacuity assertion that exactly 5 cases may pass" },
+      { "path": "src/components/landing/PublicFooter.tsx", "note": "diff read — two new footer links" },
+      { "path": "src/components/lms/CourseGrid.tsx", "note": "diff read plus matchesDiscipline at lines 114-131 — resolveDisciplineTab fix confirmed necessary and correct" },
+      { "path": "src/components/lms/CourseGrid.test.tsx", "note": "read in full" },
+      { "path": "src/components/lms/CourseTextThumbnail.tsx", "note": "diff read — the single funnel point for the Cloudinary transformation" },
+      { "path": "src/components/lms/CourseTextThumbnail.test.tsx", "note": "read in full — asserts on the rendered <img src>, not just the helper" },
+      { "path": "src/components/lms/CourseThumbnail.tsx", "note": "diff read — comment only, confirming no double transformation" },
+      { "path": "src/components/marketing/StartSmartContent.tsx", "note": "diff read — CCT CTA replaced" },
+      { "path": "src/lib/api/client.ts", "note": "diff read in full — see P2-3" },
+      { "path": "src/lib/api/client.test.ts", "note": "read in full" },
+      { "path": "src/lib/customer-journey-loop.ts", "note": "diff read — WRT/ASD hrefs and labels replaced with topic ones; target tabs confirmed non-empty" },
+      { "path": "src/lib/marketing/start-smart.ts", "note": "diff read" },
+      { "path": "src/lib/remote-image.ts", "note": "diff read in full — idempotency traced by hand: second pass sees f_auto as the first segment and returns unchanged; version-segment and hand-transformed URLs both handled; non-Cloudinary hosts short-circuit on the res.cloudinary.com host test" },
+      { "path": "src/lib/remote-image.test.ts", "note": "read in full" },
+      { "path": "src/lib/server/checkout-redirect.ts", "note": "read in full — attacked by reading: userinfo smuggling (https://www.carsi.com.au@evil.com), backslash normalisation (https:/\\\\evil.com), default-port and case normalisation, lookalike and subdomain hosts all resolve to a rejecting parsed.origin; javascript:/data: rejected by the protocol test; the verbatim return preserving {CHECKOUT_SESSION_ID} is deliberate and correct. Not executed" },
+      { "path": "src/lib/server/checkout-redirect.test.ts", "note": "read in full — covers each of the above" }
+    ],
+    "not_reviewed": [
+      { "path": "BACKLOG.md", "reason": "68-line narrative diff to the work queue; grepped for the specific claims in this report but not read line-by-line. No executable or customer-facing effect." },
+      { "path": "GOAL.md", "reason": "37-line narrative diff to the objective-function document; not read. No executable or customer-facing effect." },
+      { "path": "app/(public)/refund-policy/page.tsx", "reason": "156 new lines. Scanned for outbound actions and IICRC/CEC claims (both clean) but the legal prose was not read line-by-line — reviewing whether the refund terms are correct under Australian Consumer Law is outside a code reviewer's competence and belongs to the founder." },
+      { "path": "app/(public)/support/page.tsx", "reason": "130 new lines. Same treatment — grepped for outbound actions and IICRC claims (lines 79-84 read and compliant); prose not line-read." },
+      { "path": "docs/cec-submissions/COVER-EMAIL.md", "reason": "Founder-facing draft email. Header and the CECs-requested table grepped; body not read. Nothing in the repo sends it." },
+      { "path": "docs/cec-submissions/README.md", "reason": "Index for the packs. Grepped for CEC/title lines; body not read." },
+      { "path": "docs/cec-submissions/air-quality-and-odour-identification-and-deodorisation-essentials.md", "reason": "One of nine packs batch-verified by grep only — title, course-page URL and CECs-requested line checked against the catalogue; body not read. Budget: one representative pack (wrt-water-damage-essentials.md) was read in full instead." },
+      { "path": "docs/cec-submissions/dust-and-particulates-in-indoor-air-control-and-cleaning-strategies.md", "reason": "as above — grep-verified header only" },
+      { "path": "docs/cec-submissions/hvac-systems-and-indoor-air-quality-what-every-technician-should-know.md", "reason": "as above — grep-verified header only" },
+      { "path": "docs/cec-submissions/introduction-to-drying-educational-and-institutional-sites.md", "reason": "as above — grep-verified header only" },
+      { "path": "docs/cec-submissions/introduction-to-drying-health-care-facilities.md", "reason": "as above — grep-verified header only" },
+      { "path": "docs/cec-submissions/introduction-to-drying-industrial-and-manufacturing-sites.md", "reason": "as above — grep-verified header only" },
+      { "path": "docs/cec-submissions/introduction-to-drying-transportation-and-vehicles.md", "reason": "as above — grep-verified header only" },
+      { "path": "docs/cec-submissions/moisture-mould-and-indoor-air-quality-understanding-the-link.md", "reason": "as above — grep-verified header only" },
+      { "path": "docs/cec-submissions/using-air-scrubbers-and-afds-to-improve-job-site-air-quality.md", "reason": "as above — grep-verified header only" }
+    ]
+  }
+}
