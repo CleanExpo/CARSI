@@ -20,6 +20,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { createPortalSession } from '@/lib/api/stripe';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
+import { resolveCheckoutRedirect } from '@/lib/server/checkout-redirect';
 import { subscriptionsEnabled } from '@/lib/server/subscriptions-flag';
 
 const UNAVAILABLE = 'Membership management is not yet available.';
@@ -76,10 +77,10 @@ export async function POST(request: NextRequest) {
   };
 
   const origin = request.nextUrl.origin;
-  const return_url =
-    typeof body.return_url === 'string' && body.return_url.startsWith('http')
-      ? body.return_url
-      : `${origin}/dashboard/courses`;
+  // Restricted to known origins — see lib/server/checkout-redirect. The billing portal returns a
+  // signed-in customer here after they manage their card, so an off-origin value is the same
+  // phishing hand-off as the checkout return URLs.
+  const return_url = resolveCheckoutRedirect(body.return_url, origin, `${origin}/dashboard/courses`);
 
   try {
     const session = await createPortalSession({

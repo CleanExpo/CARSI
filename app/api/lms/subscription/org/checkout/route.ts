@@ -18,6 +18,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { getStripeClient } from '@/lib/api/stripe';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
+import { resolveCheckoutRedirect } from '@/lib/server/checkout-redirect';
 import { resolveOrgMonthlyPriceId } from '@/lib/server/org-subscription-price';
 import { provisionOrgSubscriptionContainer } from '@/lib/server/org-subscription-provision';
 import { subscriptionsEnabled } from '@/lib/server/subscriptions-flag';
@@ -89,14 +90,17 @@ export async function POST(request: NextRequest) {
   }
 
   const origin = request.nextUrl.origin;
-  const success_url =
-    typeof body.success_url === 'string' && body.success_url.startsWith('http')
-      ? body.success_url
-      : `${origin}/dashboard/team?org_subscription=active`;
-  const cancel_url =
-    typeof body.cancel_url === 'string' && body.cancel_url.startsWith('http')
-      ? body.cancel_url
-      : `${origin}/pricing?checkout=cancelled`;
+  // Restricted to known origins — see lib/server/checkout-redirect.
+  const success_url = resolveCheckoutRedirect(
+    body.success_url,
+    origin,
+    `${origin}/dashboard/team?org_subscription=active`,
+  );
+  const cancel_url = resolveCheckoutRedirect(
+    body.cancel_url,
+    origin,
+    `${origin}/pricing?checkout=cancelled`,
+  );
 
   try {
     const session = await getStripeClient().checkout.sessions.create({

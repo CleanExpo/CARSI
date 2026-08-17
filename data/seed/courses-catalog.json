@@ -2574,7 +2574,7 @@
    "id": "b7c1d9e4-5a2f-4c83-9e61-2d4f8a1b3c7e",
    "slug": "wrt-water-damage-essentials",
    "title": "Water Damage Restoration — Essentials",
-   "description": "A concise, CEC-accredited introduction to water damage restoration fundamentals: categories of water, classes of loss, safety, and the core drying workflow.",
+   "description": "A concise introduction to water damage restoration fundamentals: categories of water, classes of loss, safety, and the core drying workflow.",
    "shortDescription": "Introduces the fundamentals of water damage restoration: categories of water, classes of loss, safety, and the core drying workflow.",
    "thumbnailUrl": "https://res.cloudinary.com/dmaulkthb/image/upload/v1782411617/carsi/admin-courses/504428d4-2df6-4692-ae73-86856957ca99.png",
    "instructorId": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
@@ -7369,7 +7369,7 @@
     "Safe Work Australia"
    ],
    "iicrcDiscipline": null,
-   "cecHours": null,
+   "cecHours": 0,
    "meta": {
     "buildStage": "seeded-unpublished-pending-sme-review",
     "origin": "Rebuilt AU-original from a US OSHA/HAZWOPER source document (Google Drive 'CARSI Courses/RTO Courses/OH&S'); the US framework does not apply in Australia and was fully replaced.",

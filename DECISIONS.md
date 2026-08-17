@@ -20,6 +20,7 @@ External sends, spend, pricing and licence-critical claims NEVER default — the
 | 13 | Public Research Notes page (1 distilled, cited note/week) — go? | Default: YES at Gate 1 — it is the E-E-A-T engine | 2026-08-30 | OPEN |
 | 14 | Paywalled-journal budget for the evidence sweep | Default: OPEN-ACCESS ONLY (commits no spend). Any paid source is a new cost → founder-only. | 2026-08-30 | OPEN |
 | 15 | Four LIVE course URLs are branded with IICRC discipline acronyms — `wrt-water-damage-essentials`, `asd-structural-drying-core`, `cct-commercial-carpet-core`, `fsrt-fire-smoke-restoration-core` | Default: agents prepare new topic slugs + 301 redirects and a preview; you approve before it publishes (public URL surface, SEO + inbound links at risk) | 2026-08-25 | OPEN |
+| 16 | Is "CEC-accredited training" allowed while the CEC approvals registry is empty? It is live on ~19 surfaces (12 industry pages, the hero infographic, `designations.json`) | No default — licence-critical claim. Agents will not mass-rewrite live copy on a reading of the rules; escalates daily. | 2026-08-22 | OPEN |
 
 ## Decided (move rows here with date + outcome)
 - 2026-08-16 · Telegram competing-idea-bots → rejected in favour of single cockpit bot (founder direction + blueprint §5)
@@ -39,6 +40,20 @@ confirm; if you override any of the three, only the accessibility target changes
 requires **no pull-request review** and permits force-pushes. That combination means nothing
 structurally prevents an unreviewed production deploy. It is recorded here as a decision rather
 than a discovery because leaving it implicit is itself a choice.
+
+**#16 is a rules question, not a defect report, which is why it is here rather than fixed.**
+`CLAUDE.md` explicitly APPROVES "IICRC CEC Accredited courses" as selling copy, and separately
+requires that a course show CEC *hours* only after per-course IICRC approval. "CARSI's
+CEC-accredited mould remediation training" sits between the two: it claims accreditation for
+named training without stating hours. Read one way it is the approved provider-standing phrasing
+with "IICRC" dropped; read the other it is a course-level accreditation claim while
+`data/seed/cec-approvals.json` holds zero approvals. Both readings are defensible, the exposure
+is the licence, and rewriting nineteen live customer-facing surfaces on an agent's reading is
+exactly the kind of unilateral call that should not happen overnight. One clear case was fixed
+without waiting: `wrt-water-damage-essentials` described *itself* as "a concise, CEC-accredited
+introduction" with `cecHours: 0` — a specific course claiming its own accreditation, which no
+reading permits. No guard catches any of this; measured with a positive control, the exact live
+string passes every one.
 
 **#11 is licence-adjacent, not merely commercial.** Australian Consumer Law obligations attach
 to the per-course sale that is live today, and the only refund sentence on the site sits inside

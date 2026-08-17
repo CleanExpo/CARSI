@@ -10,6 +10,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { verifySessionToken } from '@/lib/auth/session-jwt';
 import { buildCourseCheckoutUrls } from '@/lib/checkout-urls';
+import { resolveCheckoutRedirect } from '@/lib/server/checkout-redirect';
 import {
   parsePurchaseMode,
   parseTeamSeatCount,
@@ -62,14 +63,11 @@ export async function POST(request: NextRequest) {
     const defaults = buildCourseCheckoutUrls(origin, slug, learnNext, {
       teamSeats: purchaseMode === 'team' ? teamSeatCount ?? undefined : undefined,
     });
-    const success_url =
-      typeof body.success_url === 'string' && body.success_url.startsWith('http')
-        ? body.success_url
-        : defaults.success_url;
-    const cancel_url =
-      typeof body.cancel_url === 'string' && body.cancel_url.startsWith('http')
-        ? body.cancel_url
-        : defaults.cancel_url;
+    // Caller-supplied return URLs are restricted to known origins. `startsWith('http')` accepted
+    // any host, so a crafted checkout link returned a paying customer to an attacker's page
+    // straight after a genuine payment. Off-origin values silently fall back to the defaults.
+    const success_url = resolveCheckoutRedirect(body.success_url, origin, defaults.success_url);
+    const cancel_url = resolveCheckoutRedirect(body.cancel_url, origin, defaults.cancel_url);
 
     const authHeader = request.headers.get('authorization') ?? '';
     const authTokenCookie = request.cookies.get('auth_token')?.value;
