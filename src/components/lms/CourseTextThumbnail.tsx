@@ -4,6 +4,7 @@ import { BookOpen, Clock, GraduationCap, Layers, User } from 'lucide-react';
 import type { ImgHTMLAttributes } from 'react';
 
 import { IICRC_DISCIPLINE_SHORT } from '@/lib/iicrc-discipline-display';
+import { cloudinaryDeliveryUrl } from '@/lib/remote-image';
 import { cn } from '@/lib/utils';
 
 const DISCIPLINE_ACCENTS: Record<
@@ -185,6 +186,15 @@ export function CourseTextThumbnail({
   const hasBackdrop = Boolean(backdropImageSrc?.trim());
   const isCard = variant === 'card';
 
+  // Every course surface funnels its backdrop through this component, so the delivery
+  // transformation belongs here rather than in each caller. Cloudinary URLs bypass the Next
+  // optimizer, so without it the browser downloads the raw upload: measured on production,
+  // /courses served 22 thumbnails totalling 46.2 MiB into cards a few hundred pixels wide.
+  // Sized per variant — a card is small, a hero fills the content column. No-op off Cloudinary.
+  const backdropSrc = backdropImageSrc?.trim()
+    ? cloudinaryDeliveryUrl(backdropImageSrc.trim(), variant === 'hero' ? 1200 : 400)
+    : backdropImageSrc;
+
   const titleClass =
     variant === 'hero'
       ? `font-display text-xl font-bold leading-snug tracking-tight sm:text-2xl ${
@@ -226,7 +236,7 @@ export function CourseTextThumbnail({
         <>
           {/* eslint-disable-next-line @next/next/no-img-element -- external / CDN URLs */}
           <img
-            src={backdropImageSrc!.trim()}
+            src={backdropSrc!}
             alt=""
             loading={backdropImageLoading}
             decoding="async"

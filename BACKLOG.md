@@ -128,3 +128,36 @@ RWR; it compounds slowly and must not be read as revenue movement.
 - 2026-08-17 · **Merging to `main` deploys straight to production** (`deploy_on_push: true` in
   `app.yaml`) and `main` requires no pull-request review. Worth a deliberate decision rather
   than leaving it implicit.
+- 2026-08-18 · **The three branches this file pointed future sessions at do not exist.**
+  `fix/iicrc-guard-skill-surfaces`, `feat/carsi-agent-skills-additive` and
+  `docs/release-readiness-20260817` are on neither `origin` nor this machine — `git fetch
+  --prune` then `git branch -a --list` returns nothing for any of them. They were local to
+  another machine and were never pushed, so that work is unrecoverable and must be redone from
+  the descriptions here. `docs/RELEASE-READINESS.md` likewise does not exist anywhere reachable.
+  Nothing in the notes below should be read as "a fix already exists".
+- 2026-08-18 · **`og-image.png` is 1.1 MB and is fetched on every measured page.** That is the
+  right size for an Open Graph meta tag and the wrong size for something the page renders. It
+  and `logo.png` (217 KB) are site-wide, so they are worth one pass independent of the course
+  thumbnails, which are fixed. Check whether it is referenced from an `<img>` at all before
+  changing anything.
+- 2026-08-18 · **The `/courses` HTML document is ~854 KB on its own**, before any image. Worth
+  looking at what is being serialised into the payload for a catalogue page.
+- 2026-08-18 · **DigitalOcean rewrites the app's fail-closed 503 into a 504 HTML page.** Proven
+  by the `x-do-orig-status: 503` header on the live response. The application is behaving
+  correctly; the platform replaces its JSON `detail` with a generic gateway page, so the honest
+  "Membership purchasing is not yet available" message never reaches the browser. Four endpoints
+  behave this way (`subscription/checkout`, `org/checkout`, `teams/enroll`, `portal`). The
+  go-live gate now reads the header and is no longer fooled, but the customer-facing half is
+  untouched.
+- 2026-08-18 · **`x-do-orig-status` also means any client-side error handling that reads a JSON
+  body from these endpoints is receiving HTML in production.** Not audited — worth checking what
+  the subscribe page does with a failed checkout response.
+- 2026-08-18 · **Course completeness: 0 of 37 courses are finalised, and all 37 lack an intro
+  video.** `npm run check:course-completeness` reports every other bar green (assessment,
+  thumbnail, metadata, scaffolds, depth) and `introVideo` red across the board. The check runs
+  in advisory mode, so it exits 0 and says nothing in CI. It was also silently vacuous on this
+  machine until tonight — see the guard fix.
+- 2026-08-18 · **`docs/onboarding/` carries unresolved `[COMPANY TO CONFIRM …]` placeholders in
+  shipped floor-care standards** (uniform spec, sign-in process, supervisor contact). Surfaced by
+  `check-company-placeholders.mjs`, which could not run on this machine at all until tonight.
+  These are founder-answerable facts, not agent-answerable ones.

@@ -57,6 +57,8 @@ export function CourseThumbnail({
     const normalized = normalizePublicAssetUrl(src);
     if (!normalized) return null;
     if (normalized.startsWith('http://') || normalized.startsWith('https://')) {
+      // Cloudinary delivery sizing happens once, in CourseTextThumbnail, which every course
+      // surface funnels its backdrop through.
       if (bypassNextImageOptimizer(normalized)) return normalized;
       return `/api/image-proxy?url=${encodeURIComponent(normalized)}`;
     }
