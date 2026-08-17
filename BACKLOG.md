@@ -160,6 +160,16 @@ RWR; it compounds slowly and must not be read as revenue movement.
   thumbnail, metadata, scaffolds, depth) and `introVideo` red across the board. The check runs
   in advisory mode, so it exits 0 and says nothing in CI. It was also silently vacuous on this
   machine until tonight — see the guard fix.
+- 2026-08-18 · **The licence guards scan SOURCE LINES; components emit copy at RENDER.** This is
+  how the flagship `/courses` page published the full seven-acronym IICRC discipline roster while
+  every guard reported green. The sentence is assembled from JSX children — `Water Restoration
+  Technology (<AcronymTooltip term="WRT" />), …` — so the literal `(WRT)` never appears on any
+  source line, and both the glossed-list rule and the CEC-claim rule are defeated by the line
+  split even though the rendered page reads exactly like the copy they ban. Found by the
+  independent reviewer, then confirmed live on production. The copy that branded CARSI's own
+  range is fixed; `AcronymTooltip` remains a general way for banned text to reach a page
+  invisibly. A real fix scans the RENDERED output (the e2e suite already has pages open in a
+  browser) rather than adding more source-line regexes — that is a design decision, not a patch.
 - 2026-08-18 · **Checkout return-URL safety depends on the platform rejecting a forged Host.**
   The six checkout/portal routes build their default success and cancel URLs from
   `request.nextUrl.origin`, which is Host-derived, and the new origin allowlist folds that same

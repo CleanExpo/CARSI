@@ -171,8 +171,8 @@ export default async function CoursesPage({
           </h1>
           <p className="mt-2 text-sm text-slate-600">
             {displayTotal} beginner, intermediate, and advanced course
-            {displayTotal !== 1 ? 's' : ''} across 7 <AcronymTooltip term="IICRC" /> disciplines —
-            track <AcronymTooltip term="CEC">CECs</AcronymTooltip> online, at your own pace
+            {displayTotal !== 1 ? 's' : ''} across water damage, mould, fire and smoke, indoor air
+            quality and cleaning — online, at your own pace
           </p>
           <p className="mt-3 rounded-lg border border-[#f2cf8f] bg-[#fff8ed] px-4 py-3 text-sm leading-relaxed text-[#7a3500]">
             CARSI courses carry CARSI Southern Hemisphere Restoration Designations. They are not IICRC
@@ -285,18 +285,15 @@ export default async function CoursesPage({
               </summary>
               <div className="px-5 pb-5">
                 <CitablePassage variant="faq-answer" className="text-sm leading-relaxed text-slate-600">
-                  CARSI offers <AcronymTooltip term="IICRC" /> <AcronymTooltip term="CEC" />{' '}
-                  accredited courses across seven core disciplines: Water Restoration
-                  Technology (<AcronymTooltip term="WRT" />
-                  ), Carpet Repair and Reinstallation Technology (<AcronymTooltip term="CRT" />
-                  ), Applied Structural Drying (<AcronymTooltip term="ASD" />
-                  ), Applied Microbial Remediation Technology (<AcronymTooltip term="AMRT" />
-                  ), Fire and Smoke Restoration Technology (<AcronymTooltip term="FSRT" />
-                  ), Odour Control Technology (<AcronymTooltip term="OCT" />
-                  ), and Commercial Carpet Cleaning Technology (<AcronymTooltip term="CCT" />
-                  ). Eligible courses carry <AcronymTooltip term="IICRC" /> Continuing Education
-                  Credits (<AcronymTooltip term="CEC">CECs</AcronymTooltip>) upon completion, with
-                  automatic tracking and verifiable digital credentials.{' '}
+                  CARSI is an <AcronymTooltip term="IICRC" /> <AcronymTooltip term="CEC" />{' '}
+                  Accredited provider, and its courses are grouped by restoration topic: water
+                  damage restoration, structural drying and psychrometry, mould remediation, fire
+                  and smoke restoration, odour control, carpet and textile care, indoor air
+                  quality, and biosecurity readiness. Each course carries a CARSI Southern
+                  Hemisphere Restoration Designation. Continuing education credits apply only to
+                  courses the <AcronymTooltip term="IICRC" /> has individually approved; completion
+                  is recorded either way, with automatic tracking and verifiable digital
+                  credentials.{' '}
                   {catalogueFacts.publishedCourseCount > 0 ? (
                     <>Our {catalogueFacts.publishedCourseCount} courses range from</>
                   ) : (
