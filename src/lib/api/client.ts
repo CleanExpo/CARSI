@@ -34,6 +34,46 @@ function isRetryable(status: number): boolean {
 }
 
 /**
+ * The status the APPLICATION answered with, when a gateway rewrote it.
+ *
+ * DigitalOcean's edge replaces the origin's response with its own error page and records what
+ * it received in `x-do-orig-status`. Measured on production: the subscription checkout route
+ * answers `503 {"detail":"Membership purchasing is not yet available."}` and the client receives
+ * `504` with 1,263 bytes of HTML. The header is therefore proof the request reached the app and
+ * got a deliberate answer — it is not a gateway timeout at all.
+ */
+export function originStatusOf(response: { headers: { get(name: string): string | null } }): number | null {
+  const raw = response.headers.get('x-do-orig-status');
+  if (!raw) return null;
+  const parsed = Number.parseInt(raw, 10);
+  return Number.isFinite(parsed) && parsed >= 100 && parsed <= 599 ? parsed : null;
+}
+
+/**
+ * Decide retry and message status together, so a rewritten response is judged on what the
+ * application actually said.
+ *
+ * Without this, a learner clicking "Start membership" against a 503 spends 3.5 s over four
+ * requests — 500 ms, 1 s, 2 s of backoff on a refusal that will never change — and is then shown
+ * the string "HTTP 504: Gateway Timeout", because the edge destroyed the JSON body the route
+ * wrote and the fallback synthesises a message from the edge's status. The route's own honest
+ * wording never reaches the page.
+ *
+ * A 503 that the app chose is permanent until configuration changes, so it is terminal. Other
+ * origin 5xx values keep the existing retry behaviour: a genuine fault may well be transient,
+ * and narrowing this to the proven case avoids trading one defect for another.
+ */
+export function resolveResponseStatus(response: {
+  status: number;
+  headers: { get(name: string): string | null };
+}): { effectiveStatus: number; retryable: boolean } {
+  const origin = originStatusOf(response);
+  const effectiveStatus = origin ?? response.status;
+  const deliberateRefusal = origin === 503;
+  return { effectiveStatus, retryable: !deliberateRefusal && isRetryable(effectiveStatus) };
+}
+
+/**
  * Sleep for a given number of milliseconds
  */
 function sleep(ms: number): Promise<void> {
@@ -113,8 +153,10 @@ async function fetchApi<T>(
       throw new ApiClientError('Session expired', 401);
     }
 
-    // Retry on 5xx with exponential backoff
-    if (isRetryable(response.status) && retriesLeft > 0) {
+    // Retry on 5xx with exponential backoff — but judge a gateway-rewritten response on the
+    // status the application actually returned, so a deliberate refusal is not retried.
+    const { effectiveStatus, retryable } = resolveResponseStatus(response);
+    if (retryable && retriesLeft > 0) {
       const delay = RETRY_BASE_MS * 2 ** (MAX_RETRIES - retriesLeft);
       await sleep(delay);
       return fetchApi<T>(endpoint, options, retriesLeft - 1, didRefresh);
@@ -122,10 +164,10 @@ async function fetchApi<T>(
 
     if (!response.ok) {
       const error: ApiError = await response.json().catch(() => ({
-        detail: `HTTP ${response.status}: ${response.statusText}`,
+        detail: `HTTP ${effectiveStatus}: ${response.statusText}`,
       }));
 
-      throw new ApiClientError(error.detail, response.status, error.error_code, error.request_id);
+      throw new ApiClientError(error.detail, effectiveStatus, error.error_code, error.request_id);
     }
 
     // Handle 204 No Content
