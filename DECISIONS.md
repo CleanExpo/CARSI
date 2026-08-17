@@ -44,11 +44,22 @@ than a discovery because leaving it implicit is itself a choice.
 branding test asserted the seed catalogue carried no discipline acronym and passed — but its
 regex lacked the `i` flag, so it matched `CCT` and never `cct-commercial-carpet-core`. Adding the
 flag turned that assertion red against five real slugs (`wrt-`, `asd-`, `amrt-`, `fsrt-`, `cct-`),
-which is how the exposure surfaced. The guard now runs case-insensitively and exempts *only*
-slug-shaped lowercase matches; an acronym in a title, or a bare lowercase acronym, still fails,
-and both directions are asserted in the test's positive-control block. Renaming the slugs without
+which is how the exposure surfaced. The guard now runs case-insensitively and exempts the five
+deferred slugs by literal VALUE; an acronym in a title, or a bare lowercase acronym, still fails,
+and both directions are asserted in the test's positive-control block.
+
+> **Corrected 2026-08-18 after review.** This paragraph previously read "exempts *only*
+> slug-shaped lowercase matches" and closed "the deferral covers URLs only — rendered copy is
+> clean". Both overstated the guard. The exemption was keyed to slug SHAPE, so it erased any
+> lowercase acronym-hyphen-word token from any string literal: a mutation placing `cct-certified`
+> in a real `title:` field left the guard green, and no other check caught it. Fixed by keying the
+> exemption to the five literal slug values, with the mutation pinned as a regression test.
+
+Renaming the slugs without
 redirects would break live URLs, `app/sitemap.ts:137` and indexed SEO, so the rename is deferred
-rather than rushed into a licence fix. **The deferral covers URLs only — rendered copy is clean.**
+rather than rushed into a licence fix. **The deferral covers the five slug URLs only. Rendered copy
+carries no acronym today, and since the 18/08 fix the guard actually enforces that rather than
+merely asserting it.**
 
 **#11 is licence-adjacent, not merely commercial.** Australian Consumer Law obligations attach
 to the per-course sale that is live today, and the only refund sentence on the site sits inside

@@ -37,13 +37,27 @@ const ALIGNED_RE = /\b[A-Za-z]{2,6}-aligned\b/i;
  * prefix (`cct-commercial-carpet-core`). Renaming them breaks live URLs, sitemap entries and
  * indexed SEO, so it is deferred to a follow-up that ships redirects with the rename.
  *
- * The exemption is deliberately narrow — ONLY a lowercase acronym immediately followed by a
- * hyphen and more slug characters. Rendered copy is unaffected: an uppercase acronym anywhere,
- * or a bare lowercase acronym not in slug position, still fails. Asserted in both directions.
+ * Keyed to the five REAL slugs by literal VALUE, never by slug SHAPE.
+ *
+ * The original shape-keyed form — /\b(wrt|crt|asd|oct|cct|fsrt|amrt|tcst)-[a-z0-9-]+/g — was a
+ * content amnesty, not a path exemption: it erased ANY lowercase acronym-hyphen-word token from
+ * ANY string literal before the acronym check ran. Mutation on 2026-08-18 put
+ * `cct-certified` in a real `title:` field — rendered copy, not a URL — and this guard stayed
+ * green, with no other check catching it (check-iicrc-terminology's acronym rules both return
+ * false on a bare single acronym in a title). Value-keying closes that: a token only escapes if
+ * it IS one of the five deferred slugs. Add an entry here only when the slug genuinely exists.
  */
-const DEFERRED_SLUG_RE = /\b(wrt|crt|asd|oct|cct|fsrt|amrt|tcst)-[a-z0-9-]+/g;
+const DEFERRED_SLUGS = [
+  'wrt-water-damage-essentials',
+  'asd-structural-drying-core',
+  'amrt-microbial-remediation-core',
+  'fsrt-fire-smoke-restoration-core',
+  'cct-commercial-carpet-core',
+] as const;
 
-/** Strip only the deferred URL slugs, so the guard still fires on everything else. */
+const DEFERRED_SLUG_RE = new RegExp(`\\b(?:${DEFERRED_SLUGS.join('|')})\\b`, 'g');
+
+/** Strip only the five deferred URL slugs, so the guard still fires on everything else. */
 function withoutDeferredSlugs(value: string): string {
   return value.replace(DEFERRED_SLUG_RE, '');
 }
@@ -105,6 +119,28 @@ describe('positive control — the checks below can fail', () => {
     expect(ACRONYM_RE.test(withoutDeferredSlugs(`Carpet Care (${'CCT'})`))).toBe(true);
     // Out of scope: an "-aligned" claim is untouched by the slug exemption.
     expect(ALIGNED_RE.test(withoutDeferredSlugs(aligned('CCT')))).toBe(true);
+  });
+
+  it('exempts by slug VALUE, not by slug SHAPE — the amnesty this guard shipped with', () => {
+    // Regression for the 2026-08-18 review. The shape-keyed exemption erased any lowercase
+    // acronym-hyphen-word token, so a banned acronym in RENDERED copy read clean. Each case
+    // below is slug-SHAPED but is not a deferred slug, so each must still fail.
+    //
+    // Asserted lowercase deliberately: the shape-keyed regex carried no `i` flag, so the
+    // pre-existing uppercase assertions above passed against a branch it never matched. They
+    // could not fail, and so proved nothing about the case that actually leaked.
+    expect(ACRONYM_RE.test(withoutDeferredSlugs('cct-certified'))).toBe(true);
+    expect(ACRONYM_RE.test(withoutDeferredSlugs('cct-certified Commercial Carpet Care'))).toBe(
+      true
+    );
+    expect(ALIGNED_RE.test(withoutDeferredSlugs(aligned('cct')))).toBe(true);
+    expect(ACRONYM_RE.test(withoutDeferredSlugs('wrt-restoration-training'))).toBe(true);
+
+    // ...while every genuinely deferred slug still passes, including inside a URL path.
+    for (const slug of DEFERRED_SLUGS) {
+      expect(ACRONYM_RE.test(withoutDeferredSlugs(slug))).toBe(false);
+      expect(ACRONYM_RE.test(withoutDeferredSlugs(`/courses/${slug}`))).toBe(false);
+    }
   });
 
   it('stringLiterals ignores comments but still catches a real string literal', () => {
