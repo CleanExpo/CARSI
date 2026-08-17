@@ -181,6 +181,18 @@ RWR; it compounds slowly and must not be read as revenue movement.
   and any existence check built on status code is blind, which is exactly how an earlier sweep
   reported six and then fourteen acronym courses before a nonsense-slug control corrected it to
   four. Fixing needs a production-like build to verify, so it was measured, not guessed at.
+- 2026-08-18 · **56 of 80 live course pages have no SEO card at all — 70%.** A card in
+  `data/seo/course-cards/` supplies `seoTitle`, `metaDescription`, `imageAlt`, `og`, `keywords`,
+  `faq` and `courseJsonLd`. There are 25 card files; 24 correspond to live courses. The other 56
+  live courses emit no meta description, no Open Graph, no FAQ and no Course structured data.
+  Nothing reports this because it is missing data, not a broken check — no assertion fails, and
+  none was ever written. It bears directly on work already queued: **#27** tracks organic keyword
+  count (baseline 119), referring domains and AI-answer presence, and answer engines lean on
+  structured data that 70% of course pages do not emit; **#22** and the Evidence Engine thread
+  (**#21–#28**) are written as though every course surface carries citable metadata, and for most
+  of the catalogue there is no card to extend. That is a scoping fact the founder needs before
+  funding that thread, not a 6am fix. Raised by `carsi-e7`; the 24/56 split follows from the same
+  measurements that produced the 30% guard-coverage figure above.
 - 2026-08-18 · **The seed catalogue disagrees with production in both directions.** Of 80 live
   courses, 24 are in `data/seed/courses-catalog.json`, 56 are not in the repo at all, and 13 seed
   entries are not live. So anything reasoning from that file about what is published is reasoning
