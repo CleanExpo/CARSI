@@ -44,8 +44,18 @@ const ALIGNED_RE = /\b[A-Za-z]{2,6}-aligned\b/i;
  * ANY string literal before the acronym check ran. Mutation on 2026-08-18 put
  * `cct-certified` in a real `title:` field — rendered copy, not a URL — and this guard stayed
  * green, with no other check catching it (check-iicrc-terminology's acronym rules both return
- * false on a bare single acronym in a title). Value-keying closes that: a token only escapes if
- * it IS one of the five deferred slugs. Add an entry here only when the slug genuinely exists.
+ * false on a bare single acronym in a title). Value-keying closes that.
+ *
+ * The boundary is `(?<![\w-]) … (?![\w-])`, not `\b`. With `\b`, the enumeration matched a
+ * PREFIX of a longer token, so `cct-commercial-carpet-core-advanced` still stripped silently —
+ * a narrower recurrence of the same over-claim, caught on re-review the same day. Excluding the
+ * hyphen from the boundary makes it an exact-token match.
+ *
+ * Scope, stated precisely so this comment cannot drift from behaviour again: a token escapes iff
+ * it IS one of the five slugs exactly. It escapes anywhere in the file, not only in a `slug:`
+ * field — the same string in prose is exempt too. That residue is accepted: it is the identical
+ * exposure to the live URL that DECISIONS #15 already defers, and it disappears entirely when the
+ * rename ships. Add an entry here only when the slug genuinely exists.
  */
 const DEFERRED_SLUGS = [
   'wrt-water-damage-essentials',
@@ -55,7 +65,10 @@ const DEFERRED_SLUGS = [
   'cct-commercial-carpet-core',
 ] as const;
 
-const DEFERRED_SLUG_RE = new RegExp(`\\b(?:${DEFERRED_SLUGS.join('|')})\\b`, 'g');
+const DEFERRED_SLUG_RE = new RegExp(
+  `(?<![\\w-])(?:${DEFERRED_SLUGS.join('|')})(?![\\w-])`,
+  'g'
+);
 
 /** Strip only the five deferred URL slugs, so the guard still fires on everything else. */
 function withoutDeferredSlugs(value: string): string {
@@ -141,6 +154,26 @@ describe('positive control — the checks below can fail', () => {
       expect(ACRONYM_RE.test(withoutDeferredSlugs(slug))).toBe(false);
       expect(ACRONYM_RE.test(withoutDeferredSlugs(`/courses/${slug}`))).toBe(false);
     }
+  });
+
+  it('matches a deferred slug as a whole token, never as the prefix of a longer one', () => {
+    // Second-round regression. The first fix used `\b`, which matches before a trailing hyphen,
+    // so the enumeration still matched a PREFIX: `cct-commercial-carpet-core-advanced` stripped
+    // to `-advanced` and read clean. A future slug variant would have re-opened the amnesty.
+    for (const suffix of ['-advanced', '-2026', '-part-2']) {
+      expect(ACRONYM_RE.test(withoutDeferredSlugs(`cct-commercial-carpet-core${suffix}`))).toBe(
+        true
+      );
+      expect(ACRONYM_RE.test(withoutDeferredSlugs(`wrt-water-damage-essentials${suffix}`))).toBe(
+        true
+      );
+    }
+    // A leading token must not be swallowed either.
+    expect(ACRONYM_RE.test(withoutDeferredSlugs('legacy-cct-commercial-carpet-core'))).toBe(true);
+    // The exact slug is still exempt at a real boundary — trailing punctuation is not a token char.
+    expect(ACRONYM_RE.test(withoutDeferredSlugs('/courses/cct-commercial-carpet-core.'))).toBe(
+      false
+    );
   });
 
   it('stringLiterals ignores comments but still catches a real string literal', () => {
