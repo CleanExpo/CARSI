@@ -128,3 +128,8 @@ RWR; it compounds slowly and must not be read as revenue movement.
 - 2026-08-17 · **Merging to `main` deploys straight to production** (`deploy_on_push: true` in
   `app.yaml`) and `main` requires no pull-request review. Worth a deliberate decision rather
   than leaving it implicit.
+- 2026-08-18 · **Course URL slugs still carry IICRC discipline prefixes** (`cct-`, `wrt-`,
+  `asd-`, `amrt-`, `fsrt-`). Rendered copy is clean and guarded; the slugs are exempted only in
+  slug position, recorded as DECISIONS #15 (GP-523-D1). Renaming needs 301 redirects plus
+  `app/sitemap.ts` and `src/lib/seo/course-marketing.ts` updates, so it is a follow-up, not a
+  hotfix. Surfaced when the GP-523 branding guard was made case-insensitive.

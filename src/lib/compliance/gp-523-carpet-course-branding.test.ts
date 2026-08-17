@@ -23,9 +23,30 @@ import { describe, expect, it } from 'vitest';
 
 const REPO_ROOT = join(__dirname, '..', '..', '..');
 
-const ACRONYM_RE = /\b(WRT|CRT|ASD|OCT|CCT|FSRT|AMRT|TCST)\b/;
-const ACRONYM_RE_G = /\b(WRT|CRT|ASD|OCT|CCT|FSRT|AMRT|TCST)\b/g;
+// Case-INSENSITIVE by design. Without the `i` flag these matched `CCT` but not
+// `cct-commercial-carpet-core`, so this guard read the seed catalogue — which carries five
+// lowercase acronym slugs — and reported clean. A branding guard blind to the banned token in
+// the file it audits is the defect class this branch exists to close, so the flag is load-bearing:
+// do not remove it. Proven both ways in the positive-control block below.
+const ACRONYM_RE = /\b(WRT|CRT|ASD|OCT|CCT|FSRT|AMRT|TCST)\b/i;
+const ACRONYM_RE_G = /\b(WRT|CRT|ASD|OCT|CCT|FSRT|AMRT|TCST)\b/gi;
 const ALIGNED_RE = /\b[A-Za-z]{2,6}-aligned\b/i;
+
+/**
+ * Deferred by DECISIONS.md GP-523-D1: the course URL slugs still carry a lowercase discipline
+ * prefix (`cct-commercial-carpet-core`). Renaming them breaks live URLs, sitemap entries and
+ * indexed SEO, so it is deferred to a follow-up that ships redirects with the rename.
+ *
+ * The exemption is deliberately narrow — ONLY a lowercase acronym immediately followed by a
+ * hyphen and more slug characters. Rendered copy is unaffected: an uppercase acronym anywhere,
+ * or a bare lowercase acronym not in slug position, still fails. Asserted in both directions.
+ */
+const DEFERRED_SLUG_RE = /\b(wrt|crt|asd|oct|cct|fsrt|amrt|tcst)-[a-z0-9-]+/g;
+
+/** Strip only the deferred URL slugs, so the guard still fires on everything else. */
+function withoutDeferredSlugs(value: string): string {
+  return value.replace(DEFERRED_SLUG_RE, '');
+}
 
 function read(relative: string): string {
   return readFileSync(join(REPO_ROOT, relative), 'utf8');
@@ -64,6 +85,26 @@ describe('positive control — the checks below can fail', () => {
     );
     // The pre-fix seed field this branch nulls.
     expect(ACRONYM_RE.test(`iicrc_discipline: '${'CCT'}',`)).toBe(true);
+  });
+
+  it('matches a LOWERCASE acronym — the blindness that let the seed catalogue read clean', () => {
+    // Regression guard for the missing `i` flag. Before the fix these were false, so this
+    // suite reported the seed catalogue clean while it carried five acronym slugs.
+    expect(ACRONYM_RE.test('cct-commercial-carpet-core')).toBe(true);
+    expect(ACRONYM_RE.test('wrt-water-damage-essentials')).toBe(true);
+    // Mixed case must not slip through either.
+    expect(ACRONYM_RE.test('Cct-commercial')).toBe(true);
+  });
+
+  it('exempts ONLY deferred URL slugs, never rendered copy', () => {
+    // In scope of the deferral: the slug disappears, so the guard stays quiet.
+    expect(ACRONYM_RE.test(withoutDeferredSlugs('cct-commercial-carpet-core'))).toBe(false);
+    // Out of scope: a bare lowercase acronym is not a slug and must still fail.
+    expect(ACRONYM_RE.test(withoutDeferredSlugs('cct'))).toBe(true);
+    // Out of scope: uppercase branding in a title must still fail.
+    expect(ACRONYM_RE.test(withoutDeferredSlugs(`Carpet Care (${'CCT'})`))).toBe(true);
+    // Out of scope: an "-aligned" claim is untouched by the slug exemption.
+    expect(ALIGNED_RE.test(withoutDeferredSlugs(aligned('CCT')))).toBe(true);
   });
 
   it('stringLiterals ignores comments but still catches a real string literal', () => {
@@ -112,8 +153,18 @@ describe('src/lib/lms-seed-catalog.ts — source of /courses/cct-commercial-carp
   });
 
   it('uses no discipline acronym in any course, module or lesson string', () => {
-    const offenders = stringLiterals(source).filter((s) => ACRONYM_RE.test(s));
+    // URL slugs are exempt per DECISIONS.md GP-523-D1 (rename needs redirects). Rendered copy
+    // is not exempt: strip only the deferred slugs, then the acronym check applies in full.
+    const offenders = stringLiterals(source)
+      .map(withoutDeferredSlugs)
+      .filter((s) => ACRONYM_RE.test(s));
     expect(offenders).toEqual([]);
+  });
+
+  it('still fails on an acronym in rendered copy, slug deferral notwithstanding', () => {
+    // The deferral must not become a blanket amnesty. A title is not a slug.
+    const rendered = `'Commercial Carpet Care (${'CCT'})'`;
+    expect(ACRONYM_RE.test(withoutDeferredSlugs(rendered))).toBe(true);
   });
 
   it('brands no seeded course "[discipline]-aligned"', () => {
