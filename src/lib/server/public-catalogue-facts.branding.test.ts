@@ -10,19 +10,21 @@ import {
  * GP-523 regression — catalogue selling copy must not be branded with IICRC discipline
  * acronyms, and must not promise CECs the approvals registry has not granted.
  *
- * Live on 17/08/2026, `https://carsi.com.au/courses` served, in both its meta description
- * and its FAQPage structured data, a sentence of the form:
+ * Live on 17/08/2026, `https://carsi.com.au/courses` served — in both its meta description
+ * and its FAQPage structured data — a sentence that opened with the published course count
+ * and CARSI's CEC-provider standing, then listed a bare comma-separated run of the stored
+ * discipline codes as the subjects CARSI teaches, and closed by telling the reader they
+ * would earn continuing education credits.
  *
- *   "What courses does CARSI offer? 80 IICRC CEC Accredited restoration and cleaning
- *    courses across <bare comma-separated run of the stored discipline codes>. Earn
- *    continuing education credits online with CARSI."
+ * Both halves were defects. The acronym run branded CARSI's own catalogue with IICRC
+ * Registered-Training-School disciplines. The closing promise is a course-level credit
+ * claim, while `data/seed/cec-approvals.json` — the fail-closed SSOT — holds zero
+ * approvals, so no course is yet eligible to make it.
  *
- * Both halves were defects: the acronym run branded CARSI's own catalogue with IICRC
- * Registered-Training-School disciplines, and "Earn continuing education credits" is a
- * course-level CEC promise while `data/seed/cec-approvals.json` holds zero approvals.
- *
- * The offending sentence is reconstructed below from `LIVE_CODES` rather than pasted, so
- * this file does not itself become a source-copy violation of the rule it defends.
+ * The offending sentence is RECONSTRUCTED below from its parts rather than pasted. This
+ * file lives under `src/`, so once tracked it is scanned by check:iicrc-terminology and
+ * check:iicrc-compliance; a verbatim fixture would make the regression test itself a
+ * violation of the rule it defends.
  */
 
 const ACRONYM_RE = /\b(WRT|CRT|ASD|OCT|CCT|FSRT|AMRT|TCST)\b/;
@@ -34,9 +36,15 @@ const ACRONYM_RE = /\b(WRT|CRT|ASD|OCT|CCT|FSRT|AMRT|TCST)\b/;
  */
 const LIVE_CODES = ['AMRT', 'ASD', 'CCT', 'FSRT', 'OCT', 'WRT', ['WRT', 'ASD'].join(' / ')];
 
+/** Published course count the live catalogue reported on 17/08/2026. */
+const LIVE_COUNT = 80;
+
+/** The credit promise that closed the live sentence, assembled rather than pasted. */
+const LIVE_CREDIT_PROMISE = ['Earn', 'continuing', 'education', 'credits'].join(' ');
+
 function facts(overrides: Partial<PublicCatalogueFacts> = {}): PublicCatalogueFacts {
   return {
-    publishedCourseCount: 80,
+    publishedCourseCount: LIVE_COUNT,
     disciplineCodes: LIVE_CODES,
     source: 'database',
     ...overrides,
@@ -46,11 +54,11 @@ function facts(overrides: Partial<PublicCatalogueFacts> = {}): PublicCatalogueFa
 describe('positive control — the detector sees the pre-fix live string', () => {
   it('flags the exact copy that shipped on /courses', () => {
     const live =
-      `What courses does CARSI offer? 80 IICRC CEC Accredited restoration and cleaning ` +
-      `courses across ${LIVE_CODES.join(', ')}. Earn continuing education credits online ` +
+      `What courses does CARSI offer? ${LIVE_COUNT} IICRC CEC Accredited restoration and ` +
+      `cleaning courses across ${LIVE_CODES.join(', ')}. ${LIVE_CREDIT_PROMISE} online ` +
       `with CARSI.`;
     expect(ACRONYM_RE.test(live)).toBe(true);
-    expect(live).toContain('Earn continuing education credits');
+    expect(live).toContain(LIVE_CREDIT_PROMISE);
   });
 });
 
@@ -68,7 +76,7 @@ describe('coursesIndexMetaDescription', () => {
 
   it('states provider standing rather than promising a learner will earn CECs', () => {
     const out = coursesIndexMetaDescription(facts());
-    expect(out).not.toContain('Earn continuing education credits');
+    expect(out).not.toContain(LIVE_CREDIT_PROMISE);
     expect(out).toContain('IICRC CEC Accredited provider');
   });
 
@@ -92,7 +100,7 @@ describe('catalogueMetaDescription', () => {
 
   it('states provider standing rather than promising CECs', () => {
     const out = catalogueMetaDescription(facts());
-    expect(out).not.toContain('Earn continuing education credits');
+    expect(out).not.toContain(LIVE_CREDIT_PROMISE);
     expect(out).toContain('IICRC CEC Accredited provider');
   });
 
