@@ -76,3 +76,34 @@ describe('resolveCheckoutRedirect', () => {
     expect(resolveCheckoutRedirect(candidate, 'http://localhost:3002', FALLBACK)).toBe(candidate);
   });
 });
+
+/**
+ * The request origin is trusted, and that trust is inherited from the platform.
+ *
+ * All six call sites pass `request.nextUrl.origin`, which comes from the Host header, so this
+ * allowlist is only as trustworthy as the platform's Host handling. Production rejects a forged
+ * Host at the edge with 403 before the application sees it (measured 2026-08-18), which is what
+ * makes this safe today.
+ *
+ * The dependency is wider than this module — those routes already build their DEFAULT return
+ * URLs from the same value, so a forged Host would steer the fallback with or without an
+ * allowlist. These cases exist to pin the behaviour, not to endorse it: if CARSI moves to a host
+ * that forwards arbitrary Host headers, someone reading these will know immediately what breaks.
+ */
+describe('trust boundary: the request origin is inherited from the platform', () => {
+  it('trusts whatever origin it is handed — the caller must pass a Host-derived value', () => {
+    const attacker = 'https://evil.example.com';
+    expect(allowedCheckoutOrigins(attacker)).toContain(attacker);
+    expect(resolveCheckoutRedirect(`${attacker}/pay`, attacker, FALLBACK)).toBe(`${attacker}/pay`);
+  });
+
+  it('never lets an unrelated candidate through on the canonical origins alone', () => {
+    // With no request origin at all, only the site's own www/apex forms are allowed — this is
+    // the floor the allowlist guarantees regardless of what the platform does with Host.
+    expect(resolveCheckoutRedirect('https://evil.example.com/pay', null, FALLBACK)).toBe(FALLBACK);
+    expect(allowedCheckoutOrigins(null)).toEqual(
+      expect.arrayContaining(['https://carsi.com.au', 'https://www.carsi.com.au']),
+    );
+    expect(allowedCheckoutOrigins(null)).not.toContain('https://evil.example.com');
+  });
+});

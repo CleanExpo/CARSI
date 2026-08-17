@@ -160,6 +160,20 @@ RWR; it compounds slowly and must not be read as revenue movement.
   thumbnail, metadata, scaffolds, depth) and `introVideo` red across the board. The check runs
   in advisory mode, so it exits 0 and says nothing in CI. It was also silently vacuous on this
   machine until tonight — see the guard fix.
+- 2026-08-18 · **Checkout return-URL safety depends on the platform rejecting a forged Host.**
+  The six checkout/portal routes build their default success and cancel URLs from
+  `request.nextUrl.origin`, which is Host-derived, and the new origin allowlist folds that same
+  value in. Production rejects `Host: evil.example` at the edge with 403 before the app sees it
+  (measured, so it is safe today), but the dependency is environmental and undocumented outside
+  the code comment now added. If CARSI ever moves off DigitalOcean App Platform to a host that
+  forwards arbitrary Host headers, both the allowlist and every default return URL become
+  attacker-controllable. Pinned by tests in `checkout-redirect.test.ts` so the change surfaces.
+  Raised by the `carsi-e7` session, which tested the production behaviour rather than assuming it.
+- 2026-08-18 · **The edge still destroys the JSON body of every fail-closed 503.** The client no
+  longer retries a deliberate refusal or reports a phantom gateway timeout, but the route's own
+  sentence ("Membership purchasing is not yet available.") cannot reach the browser because
+  DigitalOcean replaces the body with an HTML error page. Recovering the human wording needs
+  either a DO configuration change or per-status copy in the client — a product decision.
 - 2026-08-18 · **No standing check enforces the Australian-production standard.** The rules in
   `.claude/skills/carsi-course-production/SKILL.md` — 230 V / 50 Hz, 10 A GPO, metric primary,
   AS/NZS and Safe Work Australia, no US regulators presented as authoritative — are enforced by

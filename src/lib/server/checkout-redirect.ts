@@ -31,7 +31,22 @@ function withSiblingHost(origin: string): string[] {
   }
 }
 
-/** Origins a Stripe return URL may point at. */
+/**
+ * Origins a Stripe return URL may point at.
+ *
+ * ENVIRONMENTAL DEPENDENCY, stated because it is easy to lose. `requestOrigin` is always
+ * `request.nextUrl.origin` at the six call sites, which is derived from the Host header. Folding
+ * it into the allowlist is therefore safe only while the platform rejects a forged Host. It does
+ * today: a request to production with `Host: evil.example` is rejected at the edge with 403
+ * before it reaches the application (measured 2026-08-18).
+ *
+ * That dependency is not introduced here and is wider than this function — every one of those
+ * routes already builds its DEFAULT success and cancel URLs from the same `origin`, so a caller
+ * who could forge Host would steer the fallback whether or not this allowlist existed. But if
+ * CARSI ever moves to a host that forwards arbitrary Host headers, this becomes
+ * attacker-controllable and so does every default URL beside it. The test file pins the
+ * behaviour so that change surfaces as a failing expectation rather than a silent one.
+ */
 export function allowedCheckoutOrigins(requestOrigin?: string | null): string[] {
   const origins = new Set<string>();
   for (const o of withSiblingHost(getPublicSiteUrl())) origins.add(o);

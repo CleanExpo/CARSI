@@ -28,6 +28,33 @@ External sends, spend, pricing and licence-critical claims NEVER default — the
 
 ## Notes on open rows
 
+**#7's AAA half is MEASURED and NOT met (2026-08-18).** The default reads "WCAG 2.1 AA
+everywhere + AAA on enrol/learn/checkout flows", and until now the AAA half was measured by
+nothing — `e2e/a11y.spec.ts` scans `wcag2a`/`wcag2aa` only. Scanned with the AAA rules against
+the two checkout entry pages that render without a database, `/pricing` and `/subscribe` both
+fail **1.4.6 Contrast (Enhanced)**, on the light-mode brand blue `#146fc2` at **5.14:1 on
+white** — clears AA at 4.5:1, misses AAA at 7:1. The dark-mode counterpart `#8fd0ff` is
+11.77:1 and passes comfortably. AAA `2.4.9 Link Purpose` raised nothing.
+
+**The remediation is narrower than it first appears.** 1.4.6 requires 7:1 for *normal* text but
+only **4.5:1 for large text** (≥18pt/24px, or ≥14pt bold), and it does not govern non-text
+elements at all — buttons, borders and focus rings fall under 1.4.11 at 3:1, which this blue
+clears easily. At 5.14:1 `#146fc2` therefore **already conforms for headings, buttons and UI
+furniture**; axe applies the large-text threshold itself, so the nodes it flagged are
+specifically normal-size text. Three options, not two:
+
+1. **Tint only normal-size text.** Keep `#146fc2` as the brand's dominant expression — headings,
+   buttons, badges — and use a darker tint for body-size text and inline links. Meets the
+   stated default without repainting anything anyone would recognise as the brand.
+2. **Darken the light-mode brand blue** to something like `#0d4d87` (8.65:1, same colour
+   family). Simplest rule, largest visual change.
+3. **Amend this row to AA everywhere** and drop the AAA promise.
+
+An agent should not repaint the brand overnight, so nothing was changed. A failing AAA gate was
+deliberately **not** committed either — a red test in the tree is worse than an honest
+measurement. The large-text distinction was raised by the `carsi-e7` session after an initial
+write-up here overstated the scope as the whole landing system.
+
 **#5, #6, #7 were already applied as their defaults during the 2026-08-17 readiness loop.**
 That work ran under de-scope (marketplace PR #1 was verified OPEN and unmerged), the narrowed
 Lucide rule, and AA-everywhere-with-AAA-on-enrol/learn/checkout. Nothing needs redoing if you
