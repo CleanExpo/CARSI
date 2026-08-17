@@ -103,6 +103,15 @@ plus 4-week rolling course sales. Every session reports RWR movement or names th
     guard-falsification and clean-environment-suite are undone rather than N/A, and it correctly
     refused to quote this session's runs as its evidence. Report kept at
     `docs/reviews/reviewer-report-5f1f8914.json`.
+  - **The night's last finding is the one that limits all the others.** Three live courses —
+    `asd-structural-drying-core`, `cct-commercial-carpet-core`, `fsrt-fire-smoke-restoration-core`
+    — publish "(ASD-aligned)", "(CCT-aligned)", "(FSRT-aligned)" in their page `<title>`, the
+    exact phrase CLAUDE.md bans, in the browser tab and the Google result. They exist **only in
+    the production database**; the repo is clean. So arming the guards was necessary and is not
+    sufficient: every guard here scans repo paths, and course content that lives only in prod is
+    beyond all of them. DECISIONS #19, founder-only. Separately, `/courses/[slug]` soft-404s (200
+    with the not-found page), which is both an SEO defect and the reason a slug sweep cannot
+    return "absent".
   - **The release gate is NOT satisfied and nothing was self-certified.** Codex — the
     model-diverse reviewer the gate prefers — is out of credits until 2026-08-20; the fallback
     reviewer could not execute; three checklist items are undischarged. Per the gate, the work is

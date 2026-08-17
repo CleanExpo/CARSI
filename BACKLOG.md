@@ -160,6 +160,30 @@ RWR; it compounds slowly and must not be read as revenue movement.
   thumbnail, metadata, scaffolds, depth) and `introVideo` red across the board. The check runs
   in advisory mode, so it exits 0 and says nothing in CI. It was also silently vacuous on this
   machine until tonight — see the guard fix.
+- 2026-08-18 · **Repo-scanning guards cannot see production-only course content, and three
+  courses live there.** `asd-structural-drying-core`, `cct-commercial-carpet-core` and
+  `fsrt-fire-smoke-restoration-core` are live on the site, are **not in `data/seed/`**, and their
+  page titles read "(ASD-aligned)", "(CCT-aligned)", "(FSRT-aligned)" — the exact phrase
+  `CLAUDE.md` bans. `grep` for that construction across the seed returns only innocent prose
+  ("aligned with environmental changes"), so the repo is clean and production is not. Every guard
+  armed on 2026-08-18 scans repo paths; none of them can reach this. The control that would catch
+  it scans the live catalogue API or the database — a different kind of check, and a queue
+  decision rather than a patch. Escalated as DECISIONS #19 because only the founder can edit prod
+  course data. Found by the `carsi-e7` session.
+- 2026-08-18 · **`/courses/[slug]` soft-404s: HTTP 200 with the not-found page.** An invented slug
+  (`zzz-not-a-real-course-12345`) returns **200** while a bogus path outside the route
+  (`/definitely-not-a-page-xyz`) correctly returns 404. Measured at the origin — no
+  `x-do-orig-status` header, so the platform is not rewriting it. `notFound()` IS firing and
+  `app/not-found.tsx` IS rendering; only the status is wrong. The likely cause is that a
+  non-matching path is resolved before render while this route MATCHES and calls `notFound()`
+  mid-render, after the response has begun, so the status is already committed. Two consequences:
+  search engines treat 200-with-not-found-content badly, and GOAL tracks organic keyword count;
+  and any existence check built on status code is blind, which is exactly how an earlier sweep
+  reported six and then fourteen acronym courses before a nonsense-slug control corrected it to
+  four. Fixing needs a production-like build to verify, so it was measured, not guessed at.
+- 2026-08-18 · **Course page titles are doubling the site suffix** — "Water Damage Restoration
+  Course — Essentials | CARSI | CARSI" and "Indoor Air Quality Fundamentals Course | CARSI |
+  CARSI" are live. A title template is being applied to a title that already carries it.
 - 2026-08-18 · **The licence guards scan SOURCE LINES; components emit copy at RENDER.** This is
   how the flagship `/courses` page published the full seven-acronym IICRC discipline roster while
   every guard reported green. The sentence is assembled from JSX children — `Water Restoration
