@@ -1,6 +1,11 @@
 # Session handoff — 2026-08-18 08:51 — GP-523 repaired, re-review pending
 
 **State: WIP-BLOCKED. This handoff is INCOMPLETE.**
+
+> **Head correction (2026-08-18 08:56).** Committing this report moved head from `4dcbb83c` to
+> `36a83499`. Diffing the two name-only returns one `docs/` path — this file — and nothing else,
+> so **no code changed between them**. Bind the re-review to `36a83499`, the head that would
+> actually ship. Verified green at that head: 1048/1048 across 142 files.
 GP-523's two review blockers are fixed and committed, but the review that found them was bound
 to the superseded head, so nothing may ship until a re-review runs at `4dcbb83c`.
 
@@ -96,7 +101,7 @@ cd ~/Pi-Dev-Ops/.worktrees/drills && uv run --with pytest --with pyyaml python -
 
 | Item | Owner | Blocking | Why |
 |---|---|---|---|
-| GP-523 re-review at `4dcbb83c` | next agent | **yes** | Review was bound to `553ae87f`; head moved |
+| GP-523 re-review at `36a83499` | next agent | **yes** | Review was bound to `553ae87f`; head moved |
 | `/about` renders 7 acronyms | founder | no | Pre-existing; reviewer judged it a **larger** live exposure than GP-523 fixes |
 | Slug rename + 301 redirects | founder | no | DECISIONS #15, deadline 2026-08-25 |
 | `API_SERVER_HOST=0.0.0.0` | founder | yes for cross-machine | Blocked by the credentials-file classifier |
