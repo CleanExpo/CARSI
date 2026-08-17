@@ -19,6 +19,7 @@ External sends, spend, pricing and licence-critical claims NEVER default — the
 | 12 | Level names for the CARSI tier ladder (Foundation → Practitioner → Advanced → top tier TBD) | No default — naming is founder-owned. Agents propose 3 naming sets; you pick. | 2026-08-30 | OPEN |
 | 13 | Public Research Notes page (1 distilled, cited note/week) — go? | Default: YES at Gate 1 — it is the E-E-A-T engine | 2026-08-30 | OPEN |
 | 14 | Paywalled-journal budget for the evidence sweep | Default: OPEN-ACCESS ONLY (commits no spend). Any paid source is a new cost → founder-only. | 2026-08-30 | OPEN |
+| 15 | Four LIVE course URLs are branded with IICRC discipline acronyms — `wrt-water-damage-essentials`, `asd-structural-drying-core`, `cct-commercial-carpet-core`, `fsrt-fire-smoke-restoration-core` | Default: agents prepare new topic slugs + 301 redirects and a preview; you approve before it publishes (public URL surface, SEO + inbound links at risk) | 2026-08-25 | OPEN |
 
 ## Decided (move rows here with date + outcome)
 - 2026-08-16 · Telegram competing-idea-bots → rejected in favour of single cockpit bot (founder direction + blueprint §5)

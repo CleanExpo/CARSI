@@ -52,7 +52,12 @@ function buildPack(course: CatalogCourse, instructorName: string | null): string
     shortDescription: course.shortDescription,
     description: course.description,
   });
-  const requestedCecs = durationHours != null ? Math.max(1, Math.floor(durationHours)) : null;
+  // Never round a CEC request UP. `Math.max(1, …)` used to floor sub-hour courses to 1, so a
+  // 0.5-hour course requested 1 CEC on the same line that states "1 CEC per educational hour" —
+  // an internally contradictory 2x overstatement, in the document that goes to the IICRC. A
+  // course under one educational hour requests nothing and says why; the founder decides whether
+  // to bundle it with another course or leave it out.
+  const requestedCecs = durationHours != null ? Math.floor(durationHours) : null;
 
   const summary =
     firstParagraph(course.shortDescription) ??
@@ -87,23 +92,25 @@ Prepared ${today} for submission to **CECCourse@iicrcnet.org**.
 ## 2. Course title
 
 - **Title:** ${course.title}
-- **Catalogue slug:** \`${course.slug}\`
+- **Course page:** ${PROVIDER_WEBSITE}/courses/${course.slug}
 - **Level:** ${course.level ?? 'All levels'}
 - **Category:** ${course.category ?? 'Restoration / cleaning continuing education'}
 
 ## 3. Dates and duration
 
-- **Delivery:** online, self-paced (on demand) at ${PROVIDER_WEBSITE}
-- **Available from:** ${today} (submitted for approval before any CEC claim is made)
+- **Delivery:** online, self-paced (on demand), available year-round at the course page above
+- **Submission prepared:** ${today}. The course is submitted for approval before any CEC claim is made; no CEC is displayed to learners until the IICRC approves it.
 - **Duration:** ${
     durationHours != null
       ? `${durationHours} educational hour${durationHours === 1 ? '' : 's'}`
       : 'TBC — founder to confirm the educational (contact) hours'
   }
 - **CECs requested:** ${
-    requestedCecs != null
-      ? `${requestedCecs} (1 CEC per educational hour, per the published IICRC CEC arithmetic)`
-      : 'TBC — 1 CEC per educational hour once duration is confirmed'
+    requestedCecs == null
+      ? 'TBC — 1 CEC per educational hour once duration is confirmed'
+      : requestedCecs > 0
+        ? `${requestedCecs} (1 CEC per educational hour, per the published IICRC CEC arithmetic)`
+        : 'None — this course runs under one educational hour, so no CEC is claimed for it on its own.'
   }
 
 ## 4. Course summary and learning objectives
