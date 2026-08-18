@@ -507,6 +507,62 @@ check('still fires on bare CCT with no lighting context', () => {
   assert.ok(hits.some((h) => h.detail === 'CCT'));
 });
 
+console.log('live-catalogue guard — round 9: audience usage, and a designation name I got wrong');
+
+// P1 round 9 (gpt-5.5): the TCST expansion in this map was GUESSED from memory with no
+// licensed source — "tile stone and concrete cleaning technician" — and was wrong. TCST is
+// Trauma and Crime Scene Technician. Both are kept: the wrong one costs nothing, and removing
+// it silently would hide that the map was once fabricated.
+check('fires on the TCST designation spelled out', () => {
+  const hits = scanCourse({
+    slug: 'trauma-and-crime-scene-technician-course',
+    title: 'Trauma and Crime Scene Technician | CARSI',
+  });
+  assert.ok(hits.some((h) => h.rule === 'designation-phrase'));
+});
+
+// P1 round 9, FALSE POSITIVE: substring matching blocked audience wording. A course teaching
+// PPE *to* technicians is not a course branded as the designation.
+check('does NOT fire on plural audience wording', () => {
+  const hits = scanCourse({
+    slug: 'ppe-for-water-damage-restoration-technicians',
+    title: 'PPE for Water Damage Restoration Technicians | CARSI',
+  });
+  assert.equal(hits.length, 0, 'teaching an audience is not branding');
+});
+
+// Both audience tests above carry "for", so the PLURAL marker was never exercised on its own
+// and its mutant survived a mutation run. This is the control that makes it load-bearing.
+check('does NOT fire on a plural audience title with no "for"', () => {
+  const hits = scanCourse({
+    slug: 'water-damage-restoration-technicians-handbook',
+    title: 'Water Damage Restoration Technicians Handbook | CARSI',
+  });
+  assert.equal(hits.length, 0, 'addressing technicians in the plural is audience, not branding');
+});
+
+check('does NOT fire on singular audience wording with an article', () => {
+  const hits = scanCourse({
+    slug: 'ppe-for-the-water-damage-restoration-technician',
+    title: 'PPE for the Water Damage Restoration Technician | CARSI',
+  });
+  assert.equal(hits.length, 0, '"for the …" is audience, not branding');
+});
+
+// The line the audience rule must not cross: branding is the singular, unprefixed designation.
+check('still fires when the designation IS the course name', () => {
+  const hits = scanCourse({
+    slug: 'water-restoration-technician-course',
+    title: 'Water Restoration Technician | CARSI',
+  });
+  assert.ok(hits.some((h) => h.rule === 'designation-phrase'));
+});
+
+check('still fires on the designation as a programme name', () => {
+  const hits = scanCourse({ slug: 'wd', title: 'Water Damage Restoration Technician Programme | CARSI' });
+  assert.ok(hits.some((h) => h.rule === 'designation-phrase'));
+});
+
 // --- end-to-end: exit codes against a fixture site -------------------------------------
 //
 // The checks above are pure. They cannot see fetchText() rejecting a non-2xx page, nor the

@@ -71,10 +71,32 @@ export const DESIGNATION_PHRASES = {
   AMRT: ['applied microbial remediation technician'],
   FSRT: ['fire and smoke restoration technician', 'fire & smoke restoration technician'],
   CCT: ['carpet cleaning technician'],
-  TCST: ['tile stone and concrete cleaning technician'],
+  // TCST is Trauma and Crime Scene Technician. An earlier revision of this map guessed
+  // "tile stone and concrete cleaning technician" from memory with no licensed source, and
+  // independent review caught it. Both are listed: the wrong one costs nothing to keep, and
+  // dropping it silently would hide that the map was once wrong.
+  TCST: ['trauma and crime scene technician', 'tile stone and concrete cleaning technician'],
   OCT: ['odour control technician', 'odor control technician'],
   RRT: ['carpet repair and reinstallation technician'],
 };
+
+/**
+ * AUDIENCE USAGE IS NOT BRANDING. `PPE for Water Damage Restoration Technicians` teaches PPE
+ * *to* those technicians; it does not brand the course as the designation. Two markers
+ * distinguish it, and either one is enough:
+ *   - the phrase is PLURAL ("… Technicians"), which is how an audience is addressed
+ *   - the phrase is preceded by "for ", which names an audience explicitly
+ * A course actually branded with the designation reads "Water Damage Restoration Technician",
+ * singular and unprefixed.
+ */
+function isAudienceUsage(haystack, phrase, index) {
+  const after = haystack.slice(index + phrase.length, index + phrase.length + 1);
+  if (after === 's') return true;
+  // Look back far enough to clear an article: "for the Water Damage Restoration Technician"
+  // is still audience usage, and a 5-character window pushed "for" out of view.
+  const before = haystack.slice(Math.max(0, index - 24), index);
+  return /(^|[\s-])for([\s-]+(the|all|any))?[\s-]+$/.test(before);
+}
 
 /**
  * Industry phrases that legitimately produce a banned acronym's letters. `RRT` is the IICRC
@@ -214,7 +236,12 @@ export function scanCourse({ slug, title }) {
   for (const [a, phrases] of Object.entries(DESIGNATION_PHRASES)) {
     if (hasBenignExpansion(a, fTitle, fSlug)) continue;
     for (const ph of phrases) {
-      if (lowerTitle.includes(ph) || fSlug.includes(ph.replace(/[ &]+/g, '-'))) {
+      const slugPh = ph.replace(/[ &]+/g, '-');
+      const ti = lowerTitle.indexOf(ph);
+      const si = fSlug.indexOf(slugPh);
+      const titleHit = ti !== -1 && !isAudienceUsage(lowerTitle, ph, ti);
+      const slugHit = si !== -1 && !isAudienceUsage(fSlug, slugPh, si);
+      if (titleHit || slugHit) {
         hits.push({ rule: 'designation-phrase', detail: ph });
         break;
       }
