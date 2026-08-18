@@ -1,0 +1,275 @@
+{
+  "schema": 2,
+  "implementation_agent": "claude",
+  "reviewer_agent": "gpt-5.5",
+  "reviewer_session_id": "gpt-5.5-pr-release-gate-2026-08-18",
+  "base_sha": "cea8b7f99b6a2bd64bcc85c1757857b73b7e7a90",
+  "head_sha": "83091a0553ba4022af7df8b6cf857b2a8ce852cd",
+  "verdict": "FAIL",
+  "blocking_findings": [
+    {
+      "id": "P1-COURSES-DISCIPLINE-MAP-STILL-SHIPS",
+      "severity": "P1",
+      "title": "/courses still ships the IICRC discipline-acronym map after the claimed fix",
+      "file": "DECISIONS.md",
+      "line": 25,
+      "quoted_line": "| 18 | `/courses` carries an interactive **\"IICRC Discipline Map\"** whose seven nodes are the discipline acronyms, and an FAQ answer advising which IICRC discipline to choose | No default — removing or reframing a feature on the flagship commercial page is a product and SEO decision, not a copy fix. Agents fixed the copy that branded CARSI's own range; this is what remains. | 2026-08-22 | OPEN |",
+      "reproduction": "Confirmed in the post-image. `app/(public)/courses/page.tsx` still imports `IICRCDisciplineMap`, renders the section heading `IICRC Discipline Map`, renders `<IICRCDisciplineMap />`, and keeps the FAQ answer that spells out WRT/CRT/ASD/AMRT/FSRT/OCT/CCT via `AcronymTooltip`. `src/components/lms/diagrams/IICRCDisciplineMap.tsx` defines the seven node labels as WRT, CRT, ASD, OCT, CCT, FSRT and AMRT. `src/components/ui/AcronymTooltip.tsx` renders `{children ?? term}`, so those acronyms reach the DOM. I then ran `npm run check:iicrc-terminology` and `npm run check:iicrc-compliance`; both exited 0, proving the source guards still miss this rendered public surface.",
+      "suggested_fix": "Do not release while this is OPEN. Either remove/reframe the `/courses` discipline map and FAQ into CARSI topic/designation language, or obtain explicit founder approval and update the licence rules/guard strategy before release. A source-line regex cannot discharge this because the offending rendered copy is assembled through JSX components."
+    },
+    {
+      "id": "P1-TERMS-STILL-ASSERT-UNAPPROVED-CEC-STATE",
+      "severity": "P1",
+      "title": "The changed Terms page still asserts IICRC-approved courses and reporting with an empty CEC registry",
+      "file": "DECISIONS.md",
+      "line": 24,
+      "quoted_line": "| 17 | `/terms` §5 states courses ARE IICRC-approved for CECs and that CARSI reports completions to the IICRC; §4 describes only subscriptions; §1 says \"ABN to be confirmed\" | No default — a published contract. Agents drafted the Refund Policy it now links to, but will not rewrite the Terms themselves. | 2026-08-24 | OPEN |",
+      "reproduction": "The branch edits `app/(public)/terms/page.tsx` to add a Refund Policy link in section 4, but section 5 remains live: `Certain courses are approved by the Institute of Inspection, Cleaning and Restoration Certification (IICRC) for Continuing Education Credits (CECs).`, `You must achieve a minimum passing score (typically 80%) to earn CECs.`, and `CARSI reports CEC completions to IICRC on your behalf.` I ran `env -i HOME=\"$HOME\" PATH=\"$PATH\" TERM=dumb npm run check:cec`; it exited 0 with `CEC approvals registry valid — 0 entries (0 approved).` The diff itself records this as an OPEN published-contract issue.",
+      "suggested_fix": "Do not release a Terms-page change while the same page still carries unresolved licence-critical CEC approval/reporting assertions. Rewrite section 5 to fail closed against `data/seed/cec-approvals.json`, or hold the release until the founder resolves DECISIONS #17."
+    }
+  ],
+  "checklist": [
+    {
+      "id": "coverage-ledger",
+      "verdict": "PASS",
+      "evidence": "`git diff --name-only cea8b7f99b6a2bd64bcc85c1757857b73b7e7a90 83091a0553ba4022af7df8b6cf857b2a8ce852cd` returned 87 paths; every path is listed exactly once in coverage.reviewed or coverage.not_reviewed."
+    },
+    {
+      "id": "plan-conformance",
+      "verdict": "FAIL",
+      "evidence": "The branch partly fixes the prior `/courses` wording but also records the still-shipped IICRC Discipline Map/FAQ as DECISIONS #18 OPEN. It also edits `/terms` while recording the same page's CEC approval/reporting assertions as DECISIONS #17 OPEN. A release candidate that knowingly ships open licence-critical public surfaces does not conform to the release gate."
+    },
+    {
+      "id": "weakened-checks",
+      "verdict": "PASS",
+      "evidence": "Searched the full two-dot diff with `rg` over `git diff` for `.skip`, `.only`, `xit`, `xdescribe`, `eslint-disable`, `ts-ignore`, `ts-expect-error`, `noqa`, `type: ignore`, and catches. No added skipped/exclusive tests or lint/type silencing. Removed assertion search found only the intentional `ApiClientError` status replacement and the old SEO title expectation that pinned `| CARSI`; added weak assertion search found two concrete `retryable` expectations."
+    },
+    {
+      "id": "mutation-control",
+      "verdict": "FAIL",
+      "evidence": "Partially performed only. I mutated `src/lib/server/checkout-redirect.ts` back to prefix behaviour (`candidate.startsWith('http')`) and `npx vitest run src/lib/server/checkout-redirect.test.ts` failed 5 of 14 tests; source was restored and the same test then passed 14 of 14. I did not mutate every regression test in this 87-file diff, so this checklist item is not fully discharged."
+    },
+    {
+      "id": "guard-falsification",
+      "verdict": "FAIL",
+      "evidence": "Partially performed. I planted `Get IICRC certified with CARSI` in tracked `public/llms.txt`; `npm run check:iicrc-terminology` exited 1 and named the planted line, then I restored the file. I ran the clean terminology and compliance guards afterward and both exited 0. I also exercised the checkout allowlist via the mutant test above. I did not plant bad inputs for every changed guard/allow-list, so this is not a PASS."
+    },
+    {
+      "id": "clean-environment-suite",
+      "verdict": "FAIL",
+      "evidence": "Partial clean-environment runs only: `env -i HOME=\"$HOME\" PATH=\"$PATH\" TERM=dumb npm run test:unit` passed 145 files / 1071 tests / 0 skipped; `env -i HOME=\"$HOME\" PATH=\"$PATH\" TERM=dumb npm run type-check` exited 0; `env -i HOME=\"$HOME\" PATH=\"$PATH\" TERM=dumb npm run check:cec` exited 0 with 0 approved entries. I did not rerun all 21 repo gates, so this item is not fully discharged."
+    },
+    {
+      "id": "blast-radius",
+      "verdict": "PASS",
+      "evidence": "Examined direct callers for the highest-risk changed contracts. `resolveCheckoutRedirect` has exactly six route call sites, and all six pass `request.nextUrl.origin` and feed the resolved values to Stripe checkout/portal returns. `resolveCecHours`/`resolveCatalogCecHours` read from the approvals registry or explicit positive catalogue values only; no duration/prose/meta inference path was found in the resolver. SEO title handling is data-invariant based; the focused SEO tests passed 2 files / 30 tests."
+    },
+    {
+      "id": "outbound-actions",
+      "verdict": "PASS",
+      "evidence": "The diff adds draft CEC submission documents but no code path sends them. The changed checkout routes still create Stripe sessions only on request and narrow return URLs. Searches and file reads found no new account creation, messaging send, publishing, purchasing automation, or git push action introduced by the diff."
+    }
+  ],
+  "coverage": {
+    "reviewed": [
+      "BACKLOG.md",
+      "CLAUDE.md",
+      "DECISIONS.md",
+      "GOAL.md",
+      "app/(public)/courses/page.tsx",
+      "app/(public)/terms/page.tsx",
+      "app/api/lms/checkout/route.ts",
+      "app/api/lms/onboarding/[slug]/checkout/route.ts",
+      "app/api/lms/subscription/checkout/route.ts",
+      "app/api/lms/subscription/org/checkout/route.ts",
+      "app/api/lms/subscription/portal/route.ts",
+      "app/api/lms/subscription/teams/checkout/route.ts",
+      "data/seed/courses-catalog.json",
+      "data/seo/course-cards.index.json",
+      "data/seo/course-cards/air-quality-and-odour-identification-and-deodorisation-essentials.json",
+      "data/seo/course-cards/avian-influenza-awareness-restoration-iaq-facilities.json",
+      "data/seo/course-cards/ccw-carsi-truckmount-operations.json",
+      "data/seo/course-cards/commercial-floor-care-schools-childcare.json",
+      "data/seo/course-cards/documenting-and-reporting-air-quality-improvements.json",
+      "data/seo/course-cards/dust-and-particulates-in-indoor-air-control-and-cleaning-strategies.json",
+      "data/seo/course-cards/floor-care-onboarding-operational-readiness.json",
+      "data/seo/course-cards/hvac-systems-and-indoor-air-quality-what-every-technician-should-know.json",
+      "data/seo/course-cards/introduction-to-air-quality-fundamentals.json",
+      "data/seo/course-cards/introduction-to-creating-a-clean-air-environment-best-practices-for-final-cleara.json",
+      "data/seo/course-cards/introduction-to-drying-educational-and-institutional-sites.json",
+      "data/seo/course-cards/introduction-to-drying-health-care-facilities.json",
+      "data/seo/course-cards/introduction-to-drying-hospitality-and-lodging-sites.json",
+      "data/seo/course-cards/introduction-to-drying-industrial-and-manufacturing-sites.json",
+      "data/seo/course-cards/introduction-to-drying-transportation-and-vehicles.json",
+      "data/seo/course-cards/introduction-to-iaq-and-mould-understanding-airborne-spread-and-containment.json",
+      "data/seo/course-cards/introduction-to-improving-indoor-air-quality-after-water-damage.json",
+      "data/seo/course-cards/introduction-to-infrared-thermography-for-drying.json",
+      "data/seo/course-cards/introduction-to-recovery-of-submerged-items-and-contents.json",
+      "data/seo/course-cards/introduction-to-restoration-of-antiques-and-fine-furnishings.json",
+      "data/seo/course-cards/introduction-to-ultraviolet-light-and-fluorescence.json",
+      "data/seo/course-cards/introduction-to-water-damage-litigation-support.json",
+      "data/seo/course-cards/moisture-mould-and-indoor-air-quality-understanding-the-link.json",
+      "data/seo/course-cards/using-air-scrubbers-and-afds-to-improve-job-site-air-quality.json",
+      "data/seo/course-cards/wrt-water-damage-essentials.json",
+      "docs/cec-submissions/DRAFT-COURSES-READINESS.md",
+      "docs/cec-submissions/README.md",
+      "docs/reviews/reviewer-report-5f1f8914.json",
+      "public/llms.txt",
+      "scripts/check-iicrc-compliance.mjs",
+      "scripts/check-iicrc-terminology.mjs",
+      "scripts/check-iicrc-terminology.test.mjs",
+      "scripts/generate-cec-submission.ts",
+      "src/lib/seo/course-card-titles.test.ts",
+      "src/lib/seo/course-page-integration.test.tsx",
+      "src/lib/server/checkout-redirect.test.ts",
+      "src/lib/server/checkout-redirect.ts"
+    ],
+    "not_reviewed": [
+      {
+        "path": "app/(public)/events/ccw-roadshow/success/page.tsx",
+        "reason": "Not line-read; lower-risk copy/CTA change outside the blocking licence findings."
+      },
+      {
+        "path": "app/(public)/refund-policy/page.tsx",
+        "reason": "New legal prose not line-reviewed for Australian Consumer Law correctness; outside reviewer competence and already blocked by P1s."
+      },
+      {
+        "path": "app/(public)/support/page.tsx",
+        "reason": "New support-page prose not line-read; checked only indirectly for outbound actions and IICRC/CEC risk."
+      },
+      {
+        "path": "docs/cec-submissions/COVER-EMAIL.md",
+        "reason": "Draft external email not line-read; no repo path sends it."
+      },
+      {
+        "path": "docs/cec-submissions/air-quality-and-odour-identification-and-deodorisation-essentials.md",
+        "reason": "Submission pack batch-checked by CEC/approval grep only; not line-read."
+      },
+      {
+        "path": "docs/cec-submissions/dust-and-particulates-in-indoor-air-control-and-cleaning-strategies.md",
+        "reason": "Submission pack batch-checked by CEC/approval grep only; not line-read."
+      },
+      {
+        "path": "docs/cec-submissions/hvac-systems-and-indoor-air-quality-what-every-technician-should-know.md",
+        "reason": "Submission pack batch-checked by CEC/approval grep only; not line-read."
+      },
+      {
+        "path": "docs/cec-submissions/introduction-to-drying-educational-and-institutional-sites.md",
+        "reason": "Submission pack batch-checked by CEC/approval grep only; not line-read."
+      },
+      {
+        "path": "docs/cec-submissions/introduction-to-drying-health-care-facilities.md",
+        "reason": "Submission pack batch-checked by CEC/approval grep only; not line-read."
+      },
+      {
+        "path": "docs/cec-submissions/introduction-to-drying-industrial-and-manufacturing-sites.md",
+        "reason": "Submission pack batch-checked by CEC/approval grep only; not line-read."
+      },
+      {
+        "path": "docs/cec-submissions/introduction-to-drying-transportation-and-vehicles.md",
+        "reason": "Submission pack batch-checked by CEC/approval grep only; not line-read."
+      },
+      {
+        "path": "docs/cec-submissions/moisture-mould-and-indoor-air-quality-understanding-the-link.md",
+        "reason": "Submission pack batch-checked by CEC/approval grep only; not line-read."
+      },
+      {
+        "path": "docs/cec-submissions/using-air-scrubbers-and-afds-to-improve-job-site-air-quality.md",
+        "reason": "Submission pack batch-checked by CEC/approval grep only; not line-read."
+      },
+      {
+        "path": "docs/cec-submissions/wrt-water-damage-essentials.md",
+        "reason": "Submission pack batch-checked by CEC/approval grep only; not line-read."
+      },
+      {
+        "path": "e2e/a11y.spec.ts",
+        "reason": "Not read; no clean e2e/browser suite run after blocking P1s."
+      },
+      {
+        "path": "e2e/course-purchase-path.spec.ts",
+        "reason": "Not read; unit and focused guard tests were prioritised after blocking P1s."
+      },
+      {
+        "path": "next-env.d.ts",
+        "reason": "Generated Next type file; not reviewed beyond diff listing."
+      },
+      {
+        "path": "public/start-smart-readiness.json",
+        "reason": "Not line-read; lower-risk readiness metadata."
+      },
+      {
+        "path": "scripts/check-company-placeholders.mjs",
+        "reason": "Not line-read; isCli/path fix not in attack priority after P1s."
+      },
+      {
+        "path": "scripts/check-course-completeness.mjs",
+        "reason": "Not line-read; isCli/path fix not in attack priority after P1s."
+      },
+      {
+        "path": "scripts/check-course-visibility-predicate.mjs",
+        "reason": "Not line-read; isCli/path fix not in attack priority after P1s."
+      },
+      {
+        "path": "scripts/verify-go-live-readiness.mjs",
+        "reason": "Not line-read; clean unit suite covered its test file, but this implementation was not manually reviewed."
+      },
+      {
+        "path": "scripts/verify-go-live-readiness.test.mjs",
+        "reason": "Not line-read; executed through full unit suite only."
+      },
+      {
+        "path": "src/components/landing/PublicFooter.tsx",
+        "reason": "Not line-read; footer links outside the blocking licence findings."
+      },
+      {
+        "path": "src/components/lms/CourseGrid.test.tsx",
+        "reason": "Not line-read; executed through full unit suite only."
+      },
+      {
+        "path": "src/components/lms/CourseGrid.tsx",
+        "reason": "Not line-read; lower-risk filter UI change."
+      },
+      {
+        "path": "src/components/lms/CourseTextThumbnail.test.tsx",
+        "reason": "Not line-read; executed through full unit suite only."
+      },
+      {
+        "path": "src/components/lms/CourseTextThumbnail.tsx",
+        "reason": "Not line-read; lower-risk image optimisation path."
+      },
+      {
+        "path": "src/components/lms/CourseThumbnail.tsx",
+        "reason": "Not line-read; lower-risk image comment/change."
+      },
+      {
+        "path": "src/components/marketing/StartSmartContent.tsx",
+        "reason": "Not line-read; lower-risk CTA copy."
+      },
+      {
+        "path": "src/lib/api/client.test.ts",
+        "reason": "Not line-read; executed through full unit suite only."
+      },
+      {
+        "path": "src/lib/api/client.ts",
+        "reason": "Not line-read; retry/status change outside attack priority after P1s."
+      },
+      {
+        "path": "src/lib/customer-journey-loop.ts",
+        "reason": "Not line-read; lower-risk CTA routing/copy."
+      },
+      {
+        "path": "src/lib/marketing/start-smart.ts",
+        "reason": "Not line-read; lower-risk marketing metadata."
+      },
+      {
+        "path": "src/lib/remote-image.test.ts",
+        "reason": "Not line-read; executed through full unit suite only."
+      },
+      {
+        "path": "src/lib/remote-image.ts",
+        "reason": "Not line-read; image URL helper outside attack priority after P1s."
+      }
+    ]
+  },
+  "reviewed_at": "2026-08-18T12:41:00Z"
+}
