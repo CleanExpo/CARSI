@@ -149,6 +149,138 @@ check('stays silent on a clean multi-segment slug', () => {
   assert.equal(hits.length, 0);
 });
 
+// P1 round 2 (gpt-5.5): the slug rule lowercased the acronym but tested the raw slug with no
+// `i` flag, so an uppercase segment in a URL walked straight through.
+check('fires on an UPPERCASE banned acronym slug segment', () => {
+  const hits = scanCourse({
+    slug: 'water-damage-WRT-essentials',
+    title: 'Water Damage Restoration Essentials | CARSI',
+  });
+  assert.ok(
+    hits.some((h) => h.rule === 'slug-acronym' && h.detail === 'WRT'),
+    'uppercase WRT in a slug segment must be caught',
+  );
+});
+
+check('fires on a MixedCase banned acronym slug segment', () => {
+  const hits = scanCourse({ slug: 'Asd-structural-drying', title: 'Structural Drying | CARSI' });
+  assert.ok(hits.some((h) => h.rule === 'slug-acronym' && h.detail === 'ASD'));
+});
+
+check('case-insensitive slug matching still respects segment bounds', () => {
+  const hits = scanCourse({ slug: 'downWRTx-handling', title: 'Handling | CARSI' });
+  assert.equal(hits.length, 0, 'mid-word uppercase letters are not branding');
+});
+
+// The title rule must stay case-SENSITIVE, or the banned token OCT would fire on "oct".
+check('title rule does not fire on a lowercase month abbreviation', () => {
+  const hits = scanCourse({ slug: 'seasonal-cleaning', title: 'Seasonal Cleaning oct 2026 | CARSI' });
+  assert.equal(hits.length, 0, '"oct" in prose is not the OCT designation');
+});
+
+// --- end-to-end: exit codes against a fixture site -------------------------------------
+//
+// The checks above are pure. They cannot see fetchText() rejecting a non-2xx page, nor the
+// coverage accounting that refuses to exit 0 on an unaudited URL — both are network behaviour.
+// A mutation run proved the gap was real: deleting `if (!res.ok) throw` left every check above
+// passing. These cases run the real script against a local fixture server and assert its exit
+// code, so those two fixes cannot be removed silently.
+import http from 'node:http';
+import { spawn } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+
+const GUARD = fileURLToPath(new URL('./check-live-catalogue.mjs', import.meta.url));
+
+function serve(pages) {
+  // pages: { '/courses/x': [status, html] }; the sitemap is generated from its keys.
+  const server = http.createServer((req, res) => {
+    const path = req.url.split('?')[0];
+    const port = server.address().port;
+    if (path === '/sitemap.xml') {
+      const urls = Object.keys(pages)
+        .map((p) => `<url><loc>http://127.0.0.1:${port}${p}</loc></url>`)
+        .join('');
+      res.writeHead(200, { 'Content-Type': 'application/xml' });
+      res.end(`<?xml version="1.0"?><urlset>${urls}</urlset>`);
+      return;
+    }
+    const hit = pages[path];
+    if (!hit) {
+      res.writeHead(404);
+      res.end('nope');
+      return;
+    }
+    res.writeHead(hit[0], { 'Content-Type': 'text/html; charset=utf-8' });
+    res.end(hit[1]);
+  });
+  return new Promise((resolve) => {
+    server.listen(0, '127.0.0.1', () => resolve(server));
+  });
+}
+
+function runGuard(port) {
+  return new Promise((resolve) => {
+    const child = spawn(process.execPath, [GUARD], {
+      env: { ...process.env, CARSI_SITE: `http://127.0.0.1:${port}` },
+    });
+    let out = '';
+    child.stdout.on('data', (d) => (out += d));
+    child.stderr.on('data', (d) => (out += d));
+    child.on('close', (code) => resolve({ code, out }));
+  });
+}
+
+async function checkE2E(name, pages, assertFn) {
+  const server = await serve(pages);
+  try {
+    const result = await runGuard(server.address().port);
+    assertFn(result);
+    console.log(`  ✓ ${name}`);
+  } catch (err) {
+    failures += 1;
+    console.error(`  ✗ ${name}\n      ${err.message}`);
+  } finally {
+    server.close();
+  }
+}
+
+const title = (t) => `<html><head><title>${t}</title></head><body>x</body></html>`;
+
+console.log('live-catalogue guard — end-to-end exit codes');
+
+await checkE2E(
+  'exits 2 (not 0) when a course page returns HTTP 500',
+  { '/courses/server-error-course': [500, title('Server Error | CARSI')] },
+  ({ code }) => assert.equal(code, 2, 'a 500 page must never count as a clean live course'),
+);
+
+await checkE2E(
+  'exits 2 (not 0) when a course page returns 200 with no <title>',
+  {
+    '/courses/clean-course': [200, title('Clean Course | CARSI')],
+    '/courses/untitled-course': [200, '<html><head></head><body>no title</body></html>'],
+  },
+  ({ code, out }) => {
+    assert.equal(code, 2, 'an unaudited URL must not be dropped silently');
+    assert.match(out, /unaudited/, 'the unaudited URL must be named');
+  },
+);
+
+await checkE2E(
+  'exits 1 on a banned slug hiding behind a missing title',
+  { '/courses/wrt-hidden': [200, '<html><head></head><body>no title</body></html>'] },
+  ({ code, out }) => {
+    assert.equal(code, 1, 'slug rules must run even when the title is unusable');
+    assert.match(out, /slug-acronym/);
+  },
+);
+
+await checkE2E(
+  'exits 0 on a genuinely clean fixture site',
+  { '/courses/water-damage-restoration': [200, title('Water Damage Restoration | CARSI')] },
+  ({ code }) => assert.equal(code, 0, 'a clean site must still pass, or the guard is a rubber stamp'),
+);
+
 if (failures > 0) {
   console.error(`\n${failures} check(s) failed — the guard is not trustworthy until they pass.`);
   process.exit(1);

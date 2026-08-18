@@ -53,10 +53,14 @@ export function scanCourse({ slug, title }) {
     // Title: whole-word only, so "Restoration" never trips on "ASD" and a topic name that
     // merely contains the letters is not a violation.
     if (new RegExp(`\\b${a}\\b`).test(title)) hits.push({ rule: 'title-acronym', detail: a });
-    // Slug: any hyphen-delimited SEGMENT, not just the leading one. Leading-only let
-    // `water-damage-wrt-essentials` through — the acronym is course branding wherever it sits.
-    // Segment-bounded, so a slug merely containing the letters mid-word stays clean.
-    if (new RegExp(`(?:^|-)${a.toLowerCase()}(?:-|$)`).test(slug)) hits.push({ rule: 'slug-acronym', detail: a });
+    // Slug: any hyphen-delimited SEGMENT, not just the leading one, and case-insensitively.
+    // Leading-only let `water-damage-wrt-essentials` through; case-sensitive matching then let
+    // `water-damage-WRT-essentials` through, because URLs may carry uppercase. Segment-bounded,
+    // so a slug merely containing the letters mid-word stays clean.
+    //
+    // The TITLE rule above stays case-SENSITIVE on purpose: these are acronyms, and lowercasing
+    // it would make the banned token `OCT` match the ordinary month abbreviation "oct" in prose.
+    if (new RegExp(`(?:^|-)${a.toLowerCase()}(?:-|$)`, 'i').test(slug)) hits.push({ rule: 'slug-acronym', detail: a });
   }
   if (/-aligned\b/i.test(title)) hits.push({ rule: 'title-aligned', detail: '"-aligned"' });
   return hits;
@@ -123,11 +127,6 @@ async function main() {
     (r) => !r.error && !isLiveCourse(r.title) && !(r.title || '').includes(NOT_FOUND_MARKER),
   );
 
-  if (live.length === 0) {
-    console.error(`cannot audit: fetched ${results.length} course URLs, none returned a usable title.`);
-    process.exit(2);
-  }
-
   // Scan every successfully fetched URL, not only the live ones: the slug rules do not depend on
   // the title, so a banned slug must still be caught when the title is missing or is a soft-404.
   const violations = results
@@ -150,12 +149,19 @@ async function main() {
     }
   }
 
+  // A banned slug is readable from the URL, so report it even when coverage is incomplete —
+  // refusing to audit must not swallow a breach already in hand.
   if (violations.length) {
     console.error(
       `\n${violations.length} live course(s) carry banned IICRC discipline branding. ` +
         'Course data is edited through the admin session, not this repo — see DECISIONS #19.',
     );
     process.exit(1);
+  }
+
+  if (live.length === 0) {
+    console.error(`cannot audit: fetched ${results.length} course URLs, none returned a usable title.`);
+    process.exit(2);
   }
 
   // Non-vacuity is part of the pass, so the count is always stated. "Clean" without a number is
