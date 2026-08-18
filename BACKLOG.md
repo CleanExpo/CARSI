@@ -147,3 +147,14 @@ RWR; it compounds slowly and must not be read as revenue movement.
   source rather than trusted. Note CLAUDE.md forbids feeding IICRC standard TEXT into AI
   tooling; designation names are public nomenclature, but the verification is a founder
   action, not an agent one.
+- 2026-08-18 · **CLC-P2-003 — separated-letter acronym forms are not caught** by
+  `check-live-catalogue` (`scripts/check-live-catalogue.mjs:220`). Raised as a documented P2 by
+  independent review at `623c3f9d` and accepted, not fixed. `W.R.T.`, `W R T`, `W/R/T`,
+  `water-damage-w.r.t-essentials` and `water-damage-w-r-t-essentials` all return no hit. The
+  reviewer's own disposition: a non-canonical separated initialism is an evasion class rather
+  than a plausible ordinary CARSI course-title form, and `rg` found no such form anywhere in the
+  repo. Every real violation measured on production uses the contiguous acronym or the
+  spelled-out designation. Revisit only if a separated form is ever observed on the live
+  catalogue; widening the acronym rules to match separated letters risks false positives on
+  ordinary initialisms in course copy, which is the failure mode this guard has already
+  produced five times.
