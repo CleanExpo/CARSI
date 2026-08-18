@@ -389,10 +389,10 @@ export default async function CoursesPage({
                   IICRC members and certified technicians continue their education through{' '}
                   <AcronymTooltip term="CEC">CECs</AcronymTooltip> within each certification cycle
                   to maintain their credentials with the Institute of Inspection, Cleaning and
-                  Restoration Certification. A CARSI course carries a specific{' '}
-                  <AcronymTooltip term="CEC" /> value only once the{' '}
+                  Restoration Certification. A CARSI course may carry a specific{' '}
+                  <AcronymTooltip term="CEC" /> value only after the{' '}
                   <AcronymTooltip term="IICRC" /> has approved that course for{' '}
-                  <AcronymTooltip term="CEC">CECs</AcronymTooltip>; courses awaiting approval show
+                  <AcronymTooltip term="CEC">CECs</AcronymTooltip>. Courses awaiting approval show
                   no CEC value. Upon completing an approved course, your{' '}
                   <AcronymTooltip term="CEC">CECs</AcronymTooltip> are automatically recorded in
                   your CARSI student dashboard and can be exported for submission to the{' '}
