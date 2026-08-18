@@ -708,6 +708,63 @@ check('a designation phrase is never silently dropped, whatever the lists say', 
   }
 });
 
+console.log('live-catalogue guard — round 12: the P0, and the subject test');
+
+// P0 round 12 (gpt-5.5). The never-silent invariant I asserted last round was FALSE. A benign
+// acronym expansion skipped the WHOLE acronym, including its spelled-out designation, so
+// `Correlated Colour Temperature (CCT) for Carpet Cleaning Technician` reported nothing at all.
+// The whitelist exists because an ACRONYM's letters collide with an industry term; a
+// spelled-out designation has no such collision and must never be suppressed by it.
+check('P0: a benign expansion cannot hide a spelled-out designation (CCT)', () => {
+  const hits = scanCourse({
+    slug: 'clean-slug',
+    title: 'Correlated Colour Temperature (CCT) for Carpet Cleaning Technician | CARSI',
+  });
+  assert.ok(hits.length > 0, 'the designation phrase must still be reported');
+});
+
+check('P0: a benign expansion cannot hide a spelled-out designation (RRT)', () => {
+  const hits = scanCourse({
+    slug: 'clean-slug',
+    title: 'Rapid Response Team (RRT) for Carpet Repair and Reinstallation Technician | CARSI',
+  });
+  assert.ok(hits.length > 0);
+});
+
+// …while still suppressing the bare ACRONYM, which is what the whitelist is for.
+check('the benign expansion still silences the bare acronym', () => {
+  const hits = scanCourse({
+    slug: 'cct-lighting',
+    title: 'Correlated Colour Temperature (CCT) for Restoration Inspection Lighting | CARSI',
+  });
+  assert.equal(hits.length, 0);
+});
+
+// P1 round 12: the subject test matched any subject ENDING in a course noun, so real subjects
+// that happen to end in one were read as branding.
+check('"PPE Training for … Technicians" is a note, not a violation', () => {
+  const hits = scanCourse({
+    slug: 'clean-slug',
+    title: 'PPE Training for Water Damage Restoration Technicians | CARSI',
+  });
+  assert.ok(hits.some((h) => h.rule === 'designation-phrase-audience'));
+  assert.ok(!hits.some((h) => h.rule === 'designation-phrase'), 'a real subject is not branding');
+});
+
+check('"Respiratory Protection Module for the … Technician" is a note', () => {
+  const hits = scanCourse({
+    slug: 'clean-slug',
+    title: 'Respiratory Protection Module for the Water Damage Restoration Technician | CARSI',
+  });
+  assert.ok(!hits.some((h) => h.rule === 'designation-phrase'));
+});
+
+// The line that must hold: a course noun as the WHOLE subject is still branding.
+check('a bare course noun as the whole subject still blocks', () => {
+  const hits = scanCourse({ slug: 'c', title: 'Webinar for Water Damage Restoration Technician | CARSI' });
+  assert.ok(hits.some((h) => h.rule === 'designation-phrase'));
+});
+
 // --- end-to-end: exit codes against a fixture site -------------------------------------
 //
 // The checks above are pure. They cannot see fetchText() rejecting a non-2xx page, nor the
@@ -748,15 +805,18 @@ function serve(pages) {
   });
 }
 
-function runGuard(port) {
+function runGuard(port, args = []) {
   return new Promise((resolve) => {
-    const child = spawn(process.execPath, [GUARD], {
+    const child = spawn(process.execPath, [GUARD, ...args], {
       env: { ...process.env, CARSI_SITE: `http://127.0.0.1:${port}` },
     });
+    // stdout and stderr kept separate: a --json consumer reads stdout alone, so a human line
+    // leaking onto stdout is a real defect and must be visible to the assertion.
     let out = '';
+    let err = '';
     child.stdout.on('data', (d) => (out += d));
-    child.stderr.on('data', (d) => (out += d));
-    child.on('close', (code) => resolve({ code, out }));
+    child.stderr.on('data', (d) => (err += d));
+    child.on('close', (code) => resolve({ code, out, err, combined: out + err }));
   });
 }
 
@@ -790,18 +850,18 @@ await checkE2E(
     '/courses/clean-course': [200, title('Clean Course | CARSI')],
     '/courses/untitled-course': [200, '<html><head></head><body>no title</body></html>'],
   },
-  ({ code, out }) => {
+  ({ code, combined }) => {
     assert.equal(code, 2, 'an unaudited URL must not be dropped silently');
-    assert.match(out, /unaudited/, 'the unaudited URL must be named');
+    assert.match(combined, /unaudited/, 'the unaudited URL must be named');
   },
 );
 
 await checkE2E(
   'exits 1 on a banned slug hiding behind a missing title',
   { '/courses/wrt-hidden': [200, '<html><head></head><body>no title</body></html>'] },
-  ({ code, out }) => {
+  ({ code, combined }) => {
     assert.equal(code, 1, 'slug rules must run even when the title is unusable');
-    assert.match(out, /slug-acronym/);
+    assert.match(combined, /slug-acronym/);
   },
 );
 
@@ -809,6 +869,58 @@ await checkE2E(
   'exits 0 on a genuinely clean fixture site',
   { '/courses/water-damage-restoration': [200, title('Water Damage Restoration | CARSI')] },
   ({ code }) => assert.equal(code, 0, 'a clean site must still pass, or the guard is a rubber stamp'),
+);
+
+async function checkJson(name, pages, assertFn) {
+  const server = await serve(pages);
+  try {
+    const { code, out } = await runGuard(server.address().port, ['--json']);
+    assertFn(JSON.parse(out), code, out);
+    console.log(`  ✓ ${name}`);
+  } catch (err) {
+    failures += 1;
+    console.error(`  ✗ ${name}\n      ${err.message}`);
+  } finally {
+    server.close();
+  }
+}
+
+console.log('live-catalogue guard — --json must be machine-readable');
+
+// P1 round 12: a trailing "✓ N live courses clean." was printed after the JSON object, so
+// JSON.parse failed on every clean or note-only audit. A machine-readable flag that emits
+// unparseable output is worse than no flag.
+await checkJson(
+  '--json is parseable on a CLEAN site',
+  { '/courses/water-damage-restoration': [200, title('Water Damage Restoration | CARSI')] },
+  (parsed, code) => {
+    assert.equal(code, 0);
+    assert.equal(parsed.violations.length, 0);
+  },
+);
+
+await checkJson(
+  '--json is parseable on a NOTE-ONLY site, and does not block',
+  {
+    '/courses/ppe-for-water-damage-restoration-technicians': [
+      200,
+      title('PPE for Water Damage Restoration Technicians | CARSI'),
+    ],
+  },
+  (parsed, code) => {
+    assert.equal(code, 0, 'audience notes must not block');
+    assert.equal(parsed.violations.length, 0);
+    assert.equal(parsed.notes.length, 1, 'the note must still be reported');
+  },
+);
+
+await checkJson(
+  '--json is parseable on a VIOLATION site',
+  { '/courses/water-restoration-technician': [200, title('Water Restoration Technician | CARSI')] },
+  (parsed, code) => {
+    assert.equal(code, 1);
+    assert.equal(parsed.violations.length, 1);
+  },
 );
 
 if (failures > 0) {

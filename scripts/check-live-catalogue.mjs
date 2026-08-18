@@ -105,8 +105,10 @@ function isAudienceUsage(haystack, phrase, index) {
   if (!m) return false;
   const subject = before.slice(0, m.index).replace(/[-\s]+/g, ' ').trim();
   if (!subject) return false;
-  const lastWords = subject.split(' ').slice(-2).join(' ');
-  return !COURSE_NOUNS.test(subject) && !COURSE_NOUNS.test(lastWords) && !COURSE_NOUNS.test(subject.split(' ').pop());
+  // WHOLE-subject match only. Testing the last word too meant `PPE Training for …` and
+  // `Respiratory Protection Module for …` were read as branding: a real subject that merely
+  // ends in a course noun is still a real subject.
+  return !COURSE_NOUNS.test(subject);
 }
 
 /**
@@ -250,8 +252,12 @@ export function scanCourse({ slug, title }) {
   // while the "and" spelling was caught; enumerating both variants per designation is a list
   // that goes stale silently, so normalise once instead.
   const lowerTitle = fTitle.toLowerCase().replace(/\s*[&/+]\s*/g, ' and ');
-  for (const [a, phrases] of Object.entries(DESIGNATION_PHRASES)) {
-    if (hasBenignExpansion(a, fTitle, fSlug)) continue;
+  for (const phrases of Object.values(DESIGNATION_PHRASES)) {
+    // NO benign-expansion skip here. The whitelist exists because an ACRONYM's letters collide
+    // with an industry term (CCT / correlated colour temperature, RRT / rapid response team).
+    // A spelled-out designation has no such collision — `Carpet Cleaning Technician` is the
+    // designation whatever else the title mentions. Skipping it here hid the phrase entirely,
+    // which independent review rated P0 against the never-silent invariant.
     for (const ph of phrases) {
       const slugPh = ph.replace(/[ &]+/g, '-');
       // Slugs drop "and" as often as they keep it: trauma-crime-scene-technician and
@@ -397,7 +403,9 @@ async function main() {
 
   // Non-vacuity is part of the pass, so the count is always stated. "Clean" without a number is
   // indistinguishable from "checked nothing".
-  console.log(`\n✓ ${live.length} live courses clean.`);
+  // Only in text mode: a trailing human line after the JSON object made --json output
+  // unparseable for any clean or note-only audit.
+  if (!asJson) console.log(`\n✓ ${live.length} live courses clean.`);
   if (failed.length || unaccounted.length) {
     for (const u of unaccounted) console.error(`  unaudited (no usable title): ${u.url}`);
     console.error(
