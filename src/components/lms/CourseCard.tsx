@@ -58,11 +58,11 @@ export function CourseCard({ course, priorityImage, variant = 'catalog' }: Cours
   const isFree = course.is_free || priceNum === 0;
   const price = isFree ? 'Free' : `$${priceNum.toFixed(0)}`;
 
-  const discipline =
-    course.discipline ??
-    (course.category?.match(/^(WRT|CRT|ASD|OCT|CCT|FSRT|AMRT)/)
-      ? course.category.split(' ')[0]
-      : null);
+  // GP-523: do NOT re-derive an IICRC discipline from the category string. That was a
+  // fail-OPEN branding path — it re-attached a discipline acronym to a CARSI course even
+  // after the stored `iicrcDiscipline` was nulled. Absent by default; only an explicitly
+  // stored value is honoured, and it is rendered as a plain-English topic, never an acronym.
+  const discipline = course.discipline ?? null;
 
   const { courseLinkBase } = useCourseBrowseBase();
   const thumbSrc = course.thumbnail_url ?? undefined;
