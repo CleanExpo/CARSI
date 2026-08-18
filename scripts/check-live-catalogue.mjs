@@ -39,6 +39,20 @@ const SITE = (process.env.CARSI_SITE || 'https://www.carsi.com.au').replace(/\/$
  */
 export const BANNED_ACRONYMS = ['WRT', 'ASD', 'AMRT', 'FSRT', 'CCT', 'TCST', 'OCT', 'RRT'];
 
+/**
+ * Acronyms that collide with an ordinary lowercase word or abbreviation, where a
+ * case-insensitive TITLE match would fire on innocent prose. `OCT` is the designation for
+ * Odour Control Technician; "oct" is also how October is abbreviated, and a course title
+ * reading "… oct 2026" is not branding. For these, and ONLY these, the title match stays
+ * case-sensitive so the designation must be written as the designation.
+ *
+ * Every other banned acronym is matched case-insensitively in titles: `Water Damage wrt
+ * Essentials` and `Water Damage WrT Essentials` both shipped past a case-sensitive rule.
+ * This set is a licence-risk trade-off, so keep it as small as the evidence demands and
+ * record why each member is here.
+ */
+export const CASE_SENSITIVE_TITLE_ACRONYMS = new Set(['OCT']);
+
 const NOT_FOUND_MARKER = 'Course Not Found';
 
 /**
@@ -51,8 +65,10 @@ export function scanCourse({ slug, title }) {
   const hits = [];
   for (const a of BANNED_ACRONYMS) {
     // Title: whole-word only, so "Restoration" never trips on "ASD" and a topic name that
-    // merely contains the letters is not a violation.
-    if (new RegExp(`\\b${a}\\b`).test(title)) hits.push({ rule: 'title-acronym', detail: a });
+    // merely contains the letters is not a violation. Case-insensitive except for the
+    // ambiguous set above — a case-sensitive rule let `wrt` and `WrT` through in titles.
+    const titleFlags = CASE_SENSITIVE_TITLE_ACRONYMS.has(a) ? '' : 'i';
+    if (new RegExp(`\\b${a}\\b`, titleFlags).test(title)) hits.push({ rule: 'title-acronym', detail: a });
     // Slug: any hyphen-delimited SEGMENT, not just the leading one, and case-insensitively.
     // Leading-only let `water-damage-wrt-essentials` through; case-sensitive matching then let
     // `water-damage-WRT-essentials` through, because URLs may carry uppercase. Segment-bounded,

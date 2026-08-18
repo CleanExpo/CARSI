@@ -172,10 +172,41 @@ check('case-insensitive slug matching still respects segment bounds', () => {
   assert.equal(hits.length, 0, 'mid-word uppercase letters are not branding');
 });
 
-// The title rule must stay case-SENSITIVE, or the banned token OCT would fire on "oct".
+// P1 round 3 (gpt-5.5): a blanket case-SENSITIVE title rule let `wrt` and `WrT` through.
+// Title matching is now case-insensitive for every acronym EXCEPT the ambiguous set, so the
+// OCT/"oct" month collision stays protected without exposing everything else.
+check('fires on a LOWERCASE designation in a title', () => {
+  const hits = scanCourse({
+    slug: 'water-damage-essentials',
+    title: 'Water Damage wrt Essentials | CARSI',
+  });
+  assert.ok(
+    hits.some((h) => h.rule === 'title-acronym' && h.detail === 'WRT'),
+    'lowercase wrt in a title must be caught',
+  );
+});
+
+check('fires on a MixedCase designation in a title', () => {
+  const hits = scanCourse({
+    slug: 'water-damage-essentials',
+    title: 'Water Damage WrT Essentials | CARSI',
+  });
+  assert.ok(hits.some((h) => h.rule === 'title-acronym' && h.detail === 'WRT'));
+});
+
 check('title rule does not fire on a lowercase month abbreviation', () => {
   const hits = scanCourse({ slug: 'seasonal-cleaning', title: 'Seasonal Cleaning oct 2026 | CARSI' });
   assert.equal(hits.length, 0, '"oct" in prose is not the OCT designation');
+});
+
+check('still fires on the OCT designation written as a designation', () => {
+  const hits = scanCourse({ slug: 'odour-control', title: 'Odour Control OCT Programme | CARSI' });
+  assert.ok(hits.some((h) => h.rule === 'title-acronym' && h.detail === 'OCT'));
+});
+
+check('case-insensitive title matching still respects word bounds', () => {
+  const hits = scanCourse({ slug: 'general-course', title: 'Wrtx Asdf Cctv Handling | CARSI' });
+  assert.equal(hits.length, 0, 'letters inside longer words are not designations');
 });
 
 // --- end-to-end: exit codes against a fixture site -------------------------------------
