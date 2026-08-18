@@ -271,6 +271,42 @@ is precisely why it is the one guard that caught a real defect.
 
 ---
 
+## Class C8 — the reviewer that cannot fail (found while trying to ship the C1 fix)
+
+Fixing C1 required an independent review bound to the exact commit. All three reviewer options in
+the release gate's priority order were unavailable:
+
+| # | Reviewer | State |
+|---|---|---|
+| 1 | OpenRouter swarm (`swarm_review.py`) — the free, non-Anthropic default | **no `OPENROUTER_API_KEY`** anywhere on this machine |
+| 2 | A second Max-plan CLI (different vendor) | none installed (`gemini`, `llm` both absent) |
+| 3 | Codex | **rate-limited until 2026-08-20 1:33 PM** |
+
+And Codex demonstrated the disease directly:
+
+```
+codex exec "Reply with exactly the word ALIVE"
+ERROR: You've hit your usage limit … try again at Aug 20th, 2026 1:33 PM.
+EXIT: 0
+```
+
+**It failed and exited 0.** Any script or agent gating on that exit code records a passing
+independent review that never happened. This is C1 in a different costume — a control emitting a
+success signal while doing nothing — and it sits on the release path, which is the worst place
+for it.
+
+**Consequence, honestly stated:** the C1 fix is committed, fully gated locally, and **not pushed**.
+The release law says an unavailable reviewer means queue and stop, never self-certify. That is
+what happened.
+
+**Fix:** an `OPENROUTER_API_KEY` restores the free, non-Anthropic, model-diverse reviewer and
+removes the dependency on a metered service that fails open. It is the single cheapest unblock for
+autonomous operation — without it, no agent can complete a release gate when Codex is limited.
+Filed as DECISIONS #16. Separately, any wrapper invoking Codex must treat its exit code as
+untrusted and parse for the usage-limit string.
+
+---
+
 ## What this register does not claim
 
 - I fixed nothing. Nothing was committed; HEAD is unmoved at the receipted `511a91bf`.
