@@ -379,8 +379,30 @@ async function main() {
   const violations = scanned.filter((c) => c.hits.some((h) => !isNote(h)));
   const notes = scanned.filter((c) => c.hits.length > 0 && c.hits.every(isNote));
 
+  // Computed BEFORE any output so it can ride in the single JSON object. Emitting it as a
+  // second document was the round-14 P1: one unparseable path traded for another.
+  const coverageShortfall = failed.length || unaccounted.length
+    ? `${failed.length} URL(s) could not be fetched and ${unaccounted.length} returned no usable title — coverage is incomplete.`
+    : null;
+  const auditError =
+    live.length === 0
+      ? `fetched ${results.length} course URLs, none returned a usable title.`
+      : coverageShortfall;
+
   if (asJson) {
-    console.log(JSON.stringify({ site: SITE, checked: live.length, violations, notes }, null, 2));
+    console.log(
+      JSON.stringify(
+        {
+          site: SITE,
+          checked: live.length,
+          violations,
+          notes,
+          ...(auditError ? { error: auditError } : {}),
+        },
+        null,
+        2,
+      ),
+    );
   } else {
     console.log(`Live catalogue licence audit — ${SITE}`);
     console.log(`  sitemap course URLs: ${courseUrls.length}`);
@@ -410,8 +432,10 @@ async function main() {
     process.exit(1);
   }
 
-  if (live.length === 0) {
-    cannotAudit(`fetched ${results.length} course URLs, none returned a usable title.`);
+
+  if (auditError && !coverageShortfall) {
+    if (!asJson) console.error(`cannot audit: ${auditError}`);
+    process.exit(2);
   }
 
   // Non-vacuity is part of the pass, so the count is always stated. "Clean" without a number is

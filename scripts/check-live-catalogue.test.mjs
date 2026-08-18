@@ -981,6 +981,56 @@ await (async () => {
   }
 })();
 
+// P1 round 14 (gpt-5.5): the round-13 fix traded one unparseable path for another. On the
+// no-usable-title path the main JSON block had ALREADY printed, so cannotAudit() emitted a
+// SECOND object and stdout carried two adjacent documents. The error is now a FIELD of the one
+// report. This test walks EVERY exit path rather than the three it started with — the gap that
+// let round 13 and round 14 both ship an unparseable --json.
+
+const NOTITLE = '<html><head></head><body>no title</body></html>';
+
+async function jsonPath(name, pages, expectCode, expectError) {
+  const server = await serve(pages);
+  try {
+    const { code, out } = await runGuard(server.address().port, ['--json']);
+    const parsed = JSON.parse(out); // throws if stdout is empty or holds two documents
+    assert.equal(code, expectCode, `exit code for ${name}`);
+    if (expectError) assert.ok(parsed.error, 'exit 2 must carry a machine-readable reason');
+    else assert.ok(!parsed.error, 'a successful audit carries no error');
+    console.log(`  ✓ ${name}`);
+  } catch (err) {
+    failures += 1;
+    console.error(`  ✗ ${name}\n      ${err.message}`);
+  } finally {
+    server.close();
+  }
+}
+
+console.log('live-catalogue guard — one parseable JSON object on EVERY exit path');
+
+await jsonPath('exit 0, clean', { '/courses/wdr': [200, title('Water Damage Restoration | CARSI')] }, 0, false);
+await jsonPath(
+  'exit 0, note only',
+  { '/courses/ppe': [200, title('PPE for Water Damage Restoration Technicians | CARSI')] },
+  0,
+  false,
+);
+await jsonPath(
+  'exit 1, violation',
+  { '/courses/wrt': [200, title('Water Restoration Technician | CARSI')] },
+  1,
+  false,
+);
+await jsonPath('exit 2, no usable title', { '/courses/untitled': [200, NOTITLE] }, 2, true);
+await jsonPath(
+  'exit 2, partial coverage carries a reason',
+  { '/courses/ok': [200, title('Clean Course | CARSI')], '/courses/untitled': [200, NOTITLE] },
+  2,
+  true,
+);
+await jsonPath('exit 2, HTTP 500', { '/courses/boom': [500, title('Server Error | CARSI')] }, 2, true);
+await jsonPath('exit 2, empty sitemap', {}, 2, true);
+
 if (failures > 0) {
   console.error(`\n${failures} check(s) failed — the guard is not trustworthy until they pass.`);
   process.exit(1);
