@@ -245,8 +245,18 @@ describe('data/wordpress-export/courses.json — source of the two carpet course
   const records = JSON.parse(read('data/wordpress-export/courses.json')) as Array<{
     slug: string;
     title: string;
+    category: string | null;
+    short_description: string | null;
+    description: string | null;
+    tags: string[] | null;
     iicrc_discipline: string | null;
   }>;
+
+  /** Every field of a record that reaches a learner's screen. */
+  const renderedFields = (r: (typeof records)[number]): string[] =>
+    [r.title, r.category, r.short_description, r.description, ...(r.tags ?? [])].filter(
+      (v): v is string => typeof v === 'string'
+    );
 
   // `carpet-cleaning` renders at /courses/introduction-to-basic-carpet-cleaning-and-drying and
   // `carpet-cleaning-basics` at /courses/carpet-cleaning-basics-b66757ce (see
@@ -271,6 +281,34 @@ describe('data/wordpress-export/courses.json — source of the two carpet course
       expect(ACRONYM_RE.test(title)).toBe(false);
       expect(ALIGNED_RE.test(title)).toBe(false);
     }
+  });
+
+  it('positive control — the whole-file sweep below can actually fail', () => {
+    // The sweep asserts an ABSENCE across 95 records. Without this, a typo in the predicate
+    // would yield the same empty result as a clean catalogue and read as proof.
+    const decoy = { title: `Water Damage (${'WRT'}) Essentials`, category: null,
+      short_description: null, description: null, tags: null, slug: 'x',
+      iicrc_discipline: null };
+    expect(renderedFields(decoy).some((v) => ACRONYM_RE.test(v))).toBe(true);
+    const decoyAligned = { ...decoy, title: aligned('CCT') };
+    expect(renderedFields(decoyAligned).some((v) => ALIGNED_RE.test(v))).toBe(true);
+    // ...and a clean record must not trip it.
+    const clean = { ...decoy, title: 'Commercial Carpet Care — Core Methods' };
+    expect(renderedFields(clean).some((v) => ACRONYM_RE.test(v))).toBe(false);
+  });
+
+  it('brands NO record with an acronym in any rendered field, not just the ticket pair', () => {
+    // Drain for a 2026-08-18 review finding: the assertions above inspect only TICKET_SLUGS, so
+    // a third course acquiring acronym branding would pass unnoticed.
+    //
+    // Deliberately NOT asserting `iicrc_discipline === null` across the file. 42 of 95 records
+    // still carry a code (ASD/WRT/AMRT/OCT); that field drives accent colour and a plain-English
+    // label and is not itself branding. The invariant that matters is that no field a learner
+    // SEES carries the acronym — which is what this asserts, over every record.
+    const offenders = records
+      .flatMap((r) => renderedFields(r).map((value) => ({ slug: r.slug, value })))
+      .filter(({ value }) => ACRONYM_RE.test(value) || ALIGNED_RE.test(value));
+    expect(offenders).toEqual([]);
   });
 });
 
