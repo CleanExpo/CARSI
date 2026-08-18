@@ -13,7 +13,7 @@
  */
 import assert from 'node:assert/strict';
 
-import { isLiveCourse, scanCourse } from './check-live-catalogue.mjs';
+import { fold, isLiveCourse, scanCourse } from './check-live-catalogue.mjs';
 
 let failures = 0;
 function check(name, fn) {
@@ -207,6 +207,64 @@ check('still fires on the OCT designation written as a designation', () => {
 check('case-insensitive title matching still respects word bounds', () => {
   const hits = scanCourse({ slug: 'general-course', title: 'Wrtx Asdf Cctv Handling | CARSI' });
   assert.equal(hits.length, 0, 'letters inside longer words are not designations');
+});
+
+console.log('live-catalogue guard — plural and lookalike forms (round 4)');
+
+// P1 round 4 (gpt-5.5): plural designation forms exited clean. A human writing a course title
+// reaches for the plural without thinking; it is the same branding claim.
+check('fires on a PLURAL designation in a title', () => {
+  const hits = scanCourse({
+    slug: 'water-damage-restoration',
+    title: 'Water Damage WRTs Essentials | CARSI',
+  });
+  assert.ok(hits.some((h) => h.rule === 'title-acronym' && h.detail === 'WRT'));
+});
+
+check('fires on a POSSESSIVE designation in a title', () => {
+  const hits = scanCourse({ slug: 'clean-slug', title: "The WRT's Handbook | CARSI" });
+  assert.ok(hits.some((h) => h.rule === 'title-acronym' && h.detail === 'WRT'));
+});
+
+check('fires on a PLURAL designation slug segment', () => {
+  const hits = scanCourse({ slug: 'wrts-water-damage', title: 'Water Damage Essentials | CARSI' });
+  assert.ok(hits.some((h) => h.rule === 'slug-acronym' && h.detail === 'WRT'));
+});
+
+// P1 round 4: Greek capital rho U+03A1 stood in for R and read as clean.
+check('fires on a Greek-lookalike designation (U+03A1 rho for R)', () => {
+  const hits = scanCourse({ slug: 'clean', title: 'Water Damage W\u03A1T Essentials | CARSI' });
+  assert.ok(hits.some((h) => h.rule === 'title-acronym' && h.detail === 'WRT'));
+});
+
+check('fires on a Cyrillic-lookalike designation slug', () => {
+  const hits = scanCourse({ slug: 'w\u0420t-water-damage', title: 'Water Damage | CARSI' });
+  assert.ok(hits.some((h) => h.rule === 'slug-acronym' && h.detail === 'WRT'));
+});
+
+check('fires on a fullwidth designation, folded by NFKC', () => {
+  const hits = scanCourse({ slug: 'clean', title: 'Water Damage \uFF37\uFF32\uFF34 Essentials | CARSI' });
+  assert.ok(hits.some((h) => h.rule === 'title-acronym' && h.detail === 'WRT'));
+});
+
+// Negative controls for the widened forms — these must NOT become false positives.
+check('CCTV is not the CCT designation', () => {
+  const hits = scanCourse({ slug: 'cctv-monitoring', title: 'CCTV Monitoring Basics | CARSI' });
+  assert.equal(hits.length, 0, 'CCTV must not trip CCT');
+});
+
+check('the folded month abbreviation is still not the OCT designation', () => {
+  const hits = scanCourse({ slug: 'seasonal', title: 'Seasonal Cleaning oct 2026 | CARSI' });
+  assert.equal(hits.length, 0);
+});
+
+check('an ordinary plural word is not a designation', () => {
+  const hits = scanCourse({ slug: 'carpets-and-rugs', title: 'Carpets and Rugs | CARSI' });
+  assert.equal(hits.length, 0);
+});
+
+check('fold() leaves ordinary ASCII untouched', () => {
+  assert.equal(fold('Water Damage Restoration'), 'Water Damage Restoration');
 });
 
 // --- end-to-end: exit codes against a fixture site -------------------------------------

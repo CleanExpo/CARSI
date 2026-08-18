@@ -53,6 +53,37 @@ export const BANNED_ACRONYMS = ['WRT', 'ASD', 'AMRT', 'FSRT', 'CCT', 'TCST', 'OC
  */
 export const CASE_SENSITIVE_TITLE_ACRONYMS = new Set(['OCT']);
 
+/**
+ * Cyrillic / Greek / digit lookalikes for the ASCII letters used by BANNED_ACRONYMS
+ * (A C D F M O R S T W). `Water Damage WΡT Essentials` — Greek capital rho U+03A1 — read as
+ * clean until this existed. Scoped deliberately to those letters rather than a general
+ * confusables table: a narrow map is auditable, and nothing else in this guard needs one.
+ */
+const HOMOGLYPHS = {
+  '\u0410': 'A', '\u0391': 'A',              // Cyrillic А, Greek Α
+  '\u0421': 'C', '\u03F9': 'C',              // Cyrillic С, Greek Ϲ
+  '\u041C': 'M', '\u039C': 'M',              // Cyrillic М, Greek Μ
+  '\u041E': 'O', '\u039F': 'O', '0': 'O',    // Cyrillic О, Greek Ο, digit zero
+  '\u0420': 'R', '\u03A1': 'R',              // Cyrillic Р, Greek Ρ
+  '\u0405': 'S', '5': 'S',                    // Cyrillic Ѕ, digit five
+  '\u0422': 'T', '\u03A4': 'T',              // Cyrillic Т, Greek Τ
+  '\u051C': 'W',                              // Cyrillic Ԝ
+  '\u0414': 'D', '\u03DC': 'F',              // Cyrillic Д, Greek Ϝ
+};
+
+/**
+ * Fold a string to a comparable ASCII form: NFKC first (handles fullwidth and compatibility
+ * forms), then the lookalike map. Matching runs against the folded text while the ORIGINAL is
+ * always what gets reported, so an operator sees the real title, not a normalised one.
+ */
+export function fold(text) {
+  return (text || '')
+    .normalize('NFKC')
+    .split('')
+    .map((ch) => HOMOGLYPHS[ch] ?? HOMOGLYPHS[ch.toUpperCase()] ?? ch)
+    .join('');
+}
+
 const NOT_FOUND_MARKER = 'Course Not Found';
 
 /**
@@ -63,12 +94,17 @@ const NOT_FOUND_MARKER = 'Course Not Found';
  */
 export function scanCourse({ slug, title }) {
   const hits = [];
+  // Match against folded text; report the originals untouched.
+  const fTitle = fold(title);
+  const fSlug = fold(slug).toLowerCase();
   for (const a of BANNED_ACRONYMS) {
     // Title: whole-word only, so "Restoration" never trips on "ASD" and a topic name that
     // merely contains the letters is not a violation. Case-insensitive except for the
     // ambiguous set above — a case-sensitive rule let `wrt` and `WrT` through in titles.
+    // `s` / `'s` accepted: "WRTs Essentials" is the same branding claim as "WRT Essentials",
+    // and a human writing a course title reaches for the plural without thinking about it.
     const titleFlags = CASE_SENSITIVE_TITLE_ACRONYMS.has(a) ? '' : 'i';
-    if (new RegExp(`\\b${a}\\b`, titleFlags).test(title)) hits.push({ rule: 'title-acronym', detail: a });
+    if (new RegExp(`\\b${a}(?:'?s)?\\b`, titleFlags).test(fTitle)) hits.push({ rule: 'title-acronym', detail: a });
     // Slug: any hyphen-delimited SEGMENT, not just the leading one, and case-insensitively.
     // Leading-only let `water-damage-wrt-essentials` through; case-sensitive matching then let
     // `water-damage-WRT-essentials` through, because URLs may carry uppercase. Segment-bounded,
@@ -76,9 +112,12 @@ export function scanCourse({ slug, title }) {
     //
     // The TITLE rule above stays case-SENSITIVE on purpose: these are acronyms, and lowercasing
     // it would make the banned token `OCT` match the ordinary month abbreviation "oct" in prose.
-    if (new RegExp(`(?:^|-)${a.toLowerCase()}(?:-|$)`, 'i').test(slug)) hits.push({ rule: 'slug-acronym', detail: a });
+    // No `i` flag: fSlug is already lowercased above, so the flag would be unreachable — a
+    // mutation run proved no test could tell it apart from its absence. The lowercasing is the
+    // load-bearing part, because fold() emits uppercase ASCII for lookalike characters.
+    if (new RegExp(`(?:^|-)${a.toLowerCase()}s?(?:-|$)`).test(fSlug)) hits.push({ rule: 'slug-acronym', detail: a });
   }
-  if (/-aligned\b/i.test(title)) hits.push({ rule: 'title-aligned', detail: '"-aligned"' });
+  if (/-aligned\b/i.test(fTitle)) hits.push({ rule: 'title-aligned', detail: '"-aligned"' });
   return hits;
 }
 
