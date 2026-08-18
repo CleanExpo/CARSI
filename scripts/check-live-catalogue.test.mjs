@@ -439,6 +439,74 @@ check('does NOT fire when a standards reference sits several words after IICRC',
   assert.equal(hits.length, 0, 'a distant standards reference is not designation branding');
 });
 
+console.log('live-catalogue guard — round 8: designation NAMES, and the CCT lighting collision');
+
+// P1 round 8 (gpt-5.5), THE BIGGEST ESCAPE FOUND. Every rule keyed on the ACRONYM, so the
+// designation spelled out with no acronym anywhere passed clean through eight rounds. That is
+// the plainest form of the thing CLAUDE.md bans.
+check('fires on a designation NAME with no acronym present', () => {
+  const hits = scanCourse({
+    slug: 'water-restoration-technician-course',
+    title: 'Water Restoration Technician | CARSI',
+  });
+  assert.ok(hits.some((h) => h.rule === 'designation-phrase'));
+});
+
+check('fires on the full WRT designation name', () => {
+  const hits = scanCourse({ slug: 'wd', title: 'Water Damage Restoration Technician Programme | CARSI' });
+  assert.ok(hits.some((h) => h.rule === 'designation-phrase'));
+});
+
+check('fires on "Odour Control Technician" spelled out', () => {
+  const hits = scanCourse({ slug: 'o', title: 'Odour Control Technician Training | CARSI' });
+  assert.ok(hits.some((h) => h.rule === 'designation-phrase'));
+});
+
+check('fires on a designation name in the SLUG', () => {
+  const hits = scanCourse({ slug: 'carpet-cleaning-technician-course', title: 'Clean | CARSI' });
+  assert.ok(hits.some((h) => h.rule === 'designation-phrase'));
+});
+
+// The controls that stop this rule swallowing ordinary subject matter. CARSI must remain free
+// to teach and NAME its topics; only the IICRC designations are branding.
+check('does NOT fire on "Water Damage Restoration" as a topic', () => {
+  const hits = scanCourse({ slug: 'water-damage-restoration', title: 'Water Damage Restoration | CARSI' });
+  assert.equal(hits.length, 0, 'the topic is not the designation');
+});
+
+check('does NOT fire on "Structural Drying Fundamentals"', () => {
+  const hits = scanCourse({ slug: 'structural-drying-fundamentals', title: 'Structural Drying Fundamentals | CARSI' });
+  assert.equal(hits.length, 0);
+});
+
+check("does NOT fire on CARSI's OWN designation", () => {
+  const hits = scanCourse({
+    slug: 'carsi-water-restoration-practitioner',
+    title: 'CARSI Water Restoration Practitioner | CARSI',
+  });
+  assert.equal(hits.length, 0, 'CARSI Practitioner designations are the whole point');
+});
+
+check('does NOT fire on "Odour Control Methods"', () => {
+  const hits = scanCourse({ slug: 'odour-control-methods', title: 'Odour Control Methods for Fire Damage | CARSI' });
+  assert.equal(hits.length, 0);
+});
+
+// P1 round 8, FALSE POSITIVE: CCT is also Correlated Colour Temperature, the lighting measure
+// used when specifying inspection lamps — genuine restoration subject matter.
+check('does NOT fire on Correlated Colour Temperature (CCT)', () => {
+  const hits = scanCourse({
+    slug: 'correlated-colour-temperature-cct-inspection-lighting',
+    title: 'Correlated Colour Temperature (CCT) for Restoration Inspection Lighting | CARSI',
+  });
+  assert.equal(hits.length, 0, 'a lighting measure is not the Carpet Cleaning Technician designation');
+});
+
+check('still fires on bare CCT with no lighting context', () => {
+  const hits = scanCourse({ slug: 'cct-commercial-carpet', title: 'Commercial Carpet Care CCT | CARSI' });
+  assert.ok(hits.some((h) => h.detail === 'CCT'));
+});
+
 // --- end-to-end: exit codes against a fixture site -------------------------------------
 //
 // The checks above are pure. They cannot see fetchText() rejecting a non-2xx page, nor the

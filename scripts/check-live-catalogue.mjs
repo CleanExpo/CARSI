@@ -56,6 +56,27 @@ export const BANNED_ACRONYMS = ['WRT', 'ASD', 'AMRT', 'FSRT', 'CCT', 'TCST', 'OC
 export const AMBIGUOUS_ACRONYMS = new Set(['OCT']);
 
 /**
+ * The IICRC discipline designations written out in full. Every rule above keys on the ACRONYM,
+ * so `Water Restoration Technician | CARSI` — the designation spelled out, with no acronym
+ * anywhere — passed clean through eight rounds of review. That is the plainest possible form
+ * of the thing CLAUDE.md bans: branding a CARSI course with an IICRC discipline designation.
+ *
+ * Matched as whole phrases, case-insensitively, on the folded title and the hyphenated slug.
+ * Deliberately NOT including bare topic words ("water damage", "structural drying"), which are
+ * ordinary subject matter CARSI must be free to teach and name.
+ */
+export const DESIGNATION_PHRASES = {
+  WRT: ['water damage restoration technician', 'water restoration technician'],
+  ASD: ['applied structural drying technician'],
+  AMRT: ['applied microbial remediation technician'],
+  FSRT: ['fire and smoke restoration technician', 'fire & smoke restoration technician'],
+  CCT: ['carpet cleaning technician'],
+  TCST: ['tile stone and concrete cleaning technician'],
+  OCT: ['odour control technician', 'odor control technician'],
+  RRT: ['carpet repair and reinstallation technician'],
+};
+
+/**
  * Industry phrases that legitimately produce a banned acronym's letters. `RRT` is the IICRC
  * Carpet Repair and Reinstallation Technician designation, but "Rapid Response Team (RRT)" is
  * ordinary Australian storm-response wording and case cannot tell them apart.
@@ -68,6 +89,11 @@ export const AMBIGUOUS_ACRONYMS = new Set(['OCT']);
  */
 const BENIGN_EXPANSIONS = {
   RRT: ['rapid response team'],
+  // Correlated Colour Temperature is the lighting measure used when specifying inspection
+  // lamps — genuine restoration subject matter, and nothing to do with Carpet Cleaning
+  // Technician. Both spellings, because source copy is not always Australian even though
+  // CARSI's published copy must be.
+  CCT: ['correlated colour temperature', 'correlated color temperature'],
 };
 
 /** True when the copy carries a whitelisted benign expansion of this acronym. */
@@ -181,6 +207,20 @@ export function scanCourse({ slug, title }) {
       hits.push({ rule: 'slug-acronym', detail: a });
     }
   }
+  // The designation NAMES, independent of any acronym. A benign expansion still suppresses:
+  // "Correlated Colour Temperature" does not make "carpet cleaning technician" acceptable, but
+  // the two never co-occur, and skipping is consistent with how the acronym rules behave.
+  const lowerTitle = fTitle.toLowerCase();
+  for (const [a, phrases] of Object.entries(DESIGNATION_PHRASES)) {
+    if (hasBenignExpansion(a, fTitle, fSlug)) continue;
+    for (const ph of phrases) {
+      if (lowerTitle.includes(ph) || fSlug.includes(ph.replace(/[ &]+/g, '-'))) {
+        hits.push({ rule: 'designation-phrase', detail: ph });
+        break;
+      }
+    }
+  }
+
   // "-aligned" is banned ONLY when what precedes it is an IICRC discipline designation. A bare
   // /-aligned/ flagged `AS/NZS-aligned Electrical Safety …`, which is not merely legitimate —
   // CLAUDE.md REQUIRES AS/NZS framing on Australian course content, so the guard was flagging
