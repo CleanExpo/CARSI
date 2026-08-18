@@ -81,22 +81,27 @@ export const DESIGNATION_PHRASES = {
 };
 
 /**
- * AUDIENCE USAGE IS NOT BRANDING — but the test for it has to be narrow, or it becomes the
- * escape hatch. An earlier version treated a PLURAL phrase, or any preceding "for", as
- * sufficient. Independent review then showed that `Water Damage Restoration Technicians
- * Course` and `Course for Water Damage Restoration Technician` both walked straight through:
- * a branded course escaped by adding one letter or one word.
+ * AUDIENCE USAGE IS NOT BRANDING — but classifying it must never SUPPRESS a match.
  *
- * Plural is NOT a signal — a designation stays a designation in the plural. The only accepted
- * marker is a real SUBJECT followed by "for": `PPE for Water Damage Restoration Technicians`
- * teaches PPE to an audience. When the subject is itself a generic course noun — "Course for
- * …", "Training for …" — the course IS being named by the designation, so it still fires.
+ * Earlier revisions dropped the hit when this returned true. Independent review then found, in
+ * three consecutive rounds, that the decision rested on hand-written English word lists: a
+ * course noun missing from the list (`Webinar for …`, `Seminar for …`, `Lesson for …`) hid a
+ * real violation, while a modifier the list did not expect (`for Every …`, `for New …`) raised
+ * a false one. Every round produced another missing word. That is a ratchet, not a fix.
+ *
+ * So the classification no longer suppresses anything. A designation match is ALWAYS reported;
+ * this function only decides whether it counts as BRANDING (drives exit 1) or is listed as an
+ * audience NOTE for a human to judge. A word missing from the list now costs a line of noise
+ * in a report, not a hidden licence breach — the failure mode is the safe one.
  */
-const COURSE_NOUNS = /^(a|an|the)?[\s-]*(course|courses|programme|program|training|certification|qualification|class|classes|workshop|workshops|module|modules)$/i;
+const COURSE_NOUNS =
+  /^(a|an|the)?[\s-]*(course|courses|programme|programmes|program|programs|training|certification|qualification|class|classes|workshop|workshops|module|modules|webinar|webinars|seminar|seminars|lesson|lessons|unit|units|masterclass|bootcamp|intensive)$/i;
 
 function isAudienceUsage(haystack, phrase, index) {
   const before = haystack.slice(0, index);
-  const m = before.match(/(^|[\s-])for([\s-]+(the|all|any))?[\s-]+$/);
+  // Any 0-2 modifier words are allowed after "for": "for the", "for every", "for new",
+  // "for all trainee". A closed article list read "for Every <designation>" as branding.
+  const m = before.match(/(^|[\s-])for([\s-]+[a-z]+){0,2}[\s-]+$/);
   if (!m) return false;
   const subject = before.slice(0, m.index).replace(/[-\s]+/g, ' ').trim();
   if (!subject) return false;
@@ -131,7 +136,7 @@ function hasBenignExpansion(a, fTitle, fSlug) {
   // Normalise "&" to "and" before phrase matching. `Trauma & Crime Scene Technician` escaped
   // while the "and" spelling was caught; enumerating both variants per designation is the kind
   // of list that silently goes stale, so normalise once instead.
-  const lowerTitle = fTitle.toLowerCase().replace(/\s*&\s*/g, ' and ');
+  const lowerTitle = fTitle.toLowerCase().replace(/\s*[&/+]\s*/g, ' and ');
   return phrases.some((ph) => lowerTitle.includes(ph) || fSlug.includes(ph.replace(/ /g, '-')));
 }
 
@@ -244,7 +249,7 @@ export function scanCourse({ slug, title }) {
   // Normalise "&" to "and" before phrase matching. `Trauma & Crime Scene Technician` escaped
   // while the "and" spelling was caught; enumerating both variants per designation is a list
   // that goes stale silently, so normalise once instead.
-  const lowerTitle = fTitle.toLowerCase().replace(/\s*&\s*/g, ' and ');
+  const lowerTitle = fTitle.toLowerCase().replace(/\s*[&/+]\s*/g, ' and ');
   for (const [a, phrases] of Object.entries(DESIGNATION_PHRASES)) {
     if (hasBenignExpansion(a, fTitle, fSlug)) continue;
     for (const ph of phrases) {
@@ -254,12 +259,17 @@ export function scanCourse({ slug, title }) {
       const slugPhNoAnd = ph.replace(/ and /g, ' ').replace(/[ &]+/g, '-');
       const ti = lowerTitle.indexOf(ph);
       const si = fSlug.indexOf(slugPh) !== -1 ? fSlug.indexOf(slugPh) : fSlug.indexOf(slugPhNoAnd);
-      const titleHit = ti !== -1 && !isAudienceUsage(lowerTitle, ph, ti);
-      const slugHit = si !== -1 && !isAudienceUsage(fSlug, fSlug.slice(si).startsWith(slugPh) ? slugPh : slugPhNoAnd, si);
-      if (titleHit || slugHit) {
-        hits.push({ rule: 'designation-phrase', detail: ph });
-        break;
-      }
+      if (ti === -1 && si === -1) continue;
+      const titleAudience = ti === -1 || isAudienceUsage(lowerTitle, ph, ti);
+      const slugAudience =
+        si === -1 ||
+        isAudienceUsage(fSlug, fSlug.slice(si).startsWith(slugPh) ? slugPh : slugPhNoAnd, si);
+      // Branding on EITHER surface is a violation. Audience on BOTH is a note, never silence.
+      hits.push({
+        rule: titleAudience && slugAudience ? 'designation-phrase-audience' : 'designation-phrase',
+        detail: ph,
+      });
+      break;
     }
   }
 
@@ -343,18 +353,25 @@ async function main() {
 
   // Scan every successfully fetched URL, not only the live ones: the slug rules do not depend on
   // the title, so a banned slug must still be caught when the title is missing or is a soft-404.
-  const violations = results
-    .filter((r) => !r.error)
-    .map((c) => ({ ...c, hits: scanCourse(c) }))
-    .filter((c) => c.hits.length > 0);
+  const scanned = results.filter((r) => !r.error).map((c) => ({ ...c, hits: scanCourse(c) }));
+  const isNote = (h) => h.rule === 'designation-phrase-audience';
+  // A course whose ONLY hits are audience notes does not block; it is listed for a human.
+  const violations = scanned.filter((c) => c.hits.some((h) => !isNote(h)));
+  const notes = scanned.filter((c) => c.hits.length > 0 && c.hits.every(isNote));
 
   if (asJson) {
-    console.log(JSON.stringify({ site: SITE, checked: live.length, violations }, null, 2));
+    console.log(JSON.stringify({ site: SITE, checked: live.length, violations, notes }, null, 2));
   } else {
     console.log(`Live catalogue licence audit — ${SITE}`);
     console.log(`  sitemap course URLs: ${courseUrls.length}`);
     console.log(`  live (title is not "${NOT_FOUND_MARKER}"): ${live.length}`);
     if (failed.length) console.log(`  fetch failures: ${failed.length}`);
+    for (const n of notes) {
+      console.log(`\n· ${n.slug}  (audience wording — review, does not block)`);
+      console.log(`    title: ${n.title}`);
+      for (const h of n.hits) console.log(`    ${h.rule}: ${h.detail}`);
+      console.log(`    ${n.url}`);
+    }
     for (const v of violations) {
       console.log(`\n✗ ${v.slug}`);
       console.log(`    title: ${v.title}`);

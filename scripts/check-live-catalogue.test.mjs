@@ -528,7 +528,8 @@ check('does NOT fire on plural audience wording', () => {
     slug: 'ppe-for-water-damage-restoration-technicians',
     title: 'PPE for Water Damage Restoration Technicians | CARSI',
   });
-  assert.equal(hits.length, 0, 'teaching an audience is not branding');
+  assert.ok(hits.some((h) => h.rule === 'designation-phrase-audience'), 'reported as an audience note');
+  assert.ok(!hits.some((h) => h.rule === 'designation-phrase'), 'but it must not block');
 });
 
 // REVERSED at round 10. Plural was treated as an audience signal; independent review showed
@@ -548,7 +549,8 @@ check('does NOT fire on singular audience wording with an article', () => {
     slug: 'ppe-for-the-water-damage-restoration-technician',
     title: 'PPE for the Water Damage Restoration Technician | CARSI',
   });
-  assert.equal(hits.length, 0, '"for the …" is audience, not branding');
+  assert.ok(hits.some((h) => h.rule === 'designation-phrase-audience'));
+  assert.ok(!hits.some((h) => h.rule === 'designation-phrase'));
 });
 
 // The line the audience rule must not cross: branding is the singular, unprefixed designation.
@@ -600,20 +602,22 @@ check('FIRES on the ampersand spelling of FSRT', () => {
 
 // The remaining audience form: a REAL subject before "for". This is the only survivor of the
 // heuristic, and it must keep working or legitimate training content gets blocked.
-check('does NOT fire on "PPE for … Technicians" — a real subject before "for"', () => {
+check('reports "PPE for … Technicians" as an audience NOTE, and does not block', () => {
   const hits = scanCourse({
     slug: 'ppe-for-water-damage-restoration-technicians',
     title: 'PPE for Water Damage Restoration Technicians | CARSI',
   });
-  assert.equal(hits.length, 0);
+  assert.ok(hits.some((h) => h.rule === 'designation-phrase-audience'), 'never silently dropped');
+  assert.ok(!hits.some((h) => h.rule === 'designation-phrase'), 'audience must not block');
 });
 
-check('does NOT fire on "Respiratory Protection for the … Technician"', () => {
+check('reports "Respiratory Protection for the … Technician" as a note', () => {
   const hits = scanCourse({
     slug: 'respiratory-protection-for-the-water-damage-restoration-technician',
     title: 'Respiratory Protection for the Water Damage Restoration Technician | CARSI',
   });
-  assert.equal(hits.length, 0);
+  assert.ok(hits.some((h) => h.rule === 'designation-phrase-audience'));
+  assert.ok(!hits.some((h) => h.rule === 'designation-phrase'));
 });
 
 // Two mutants SURVIVED a mutation run at this point, meaning nothing exercised these paths.
@@ -636,6 +640,72 @@ check('FIRES on an and-less designation SLUG with a clean title', () => {
     title: 'Restoration Basics | CARSI',
   });
   assert.ok(hits.some((h) => h.rule === 'designation-phrase'), 'slug branding must be caught alone');
+});
+
+console.log('live-catalogue guard — round 11: classification reports, it never suppresses');
+
+// P1 round 11 (gpt-5.5), THREE findings, one cause: a hand-written English word list decided
+// what to SUPPRESS. Missing course nouns hid real violations; missing modifiers raised false
+// ones. The architecture changed so classification can no longer hide anything.
+check('a course noun the list did not have still BLOCKS (Webinar)', () => {
+  const hits = scanCourse({ slug: 'clean-slug', title: 'Webinar for Water Damage Restoration Technician | CARSI' });
+  assert.ok(hits.some((h) => h.rule === 'designation-phrase'));
+});
+
+check('Seminar for <designation> blocks', () => {
+  const hits = scanCourse({ slug: 'clean-slug', title: 'Seminar for Water Damage Restoration Technician | CARSI' });
+  assert.ok(hits.some((h) => h.rule === 'designation-phrase'));
+});
+
+// A slash is as plausible a staff separator as an ampersand.
+check('FIRES on a slash-separated designation (FSRT)', () => {
+  const hits = scanCourse({ slug: 'clean-slug', title: 'Fire/Smoke Restoration Technician | CARSI' });
+  assert.ok(hits.some((h) => h.rule === 'designation-phrase'));
+});
+
+check('FIRES on a slash-separated designation (TCST)', () => {
+  const hits = scanCourse({ slug: 'clean-slug', title: 'Trauma/Crime Scene Technician | CARSI' });
+  assert.ok(hits.some((h) => h.rule === 'designation-phrase'));
+});
+
+// Modifiers after "for" are adjectives, not evidence of branding. A closed article list read
+// these as violations.
+check('"for Every <designation>" is a note, not a violation', () => {
+  const hits = scanCourse({
+    slug: 'clean-slug',
+    title: 'Communication Skills for Every Water Damage Restoration Technician | CARSI',
+  });
+  assert.ok(hits.some((h) => h.rule === 'designation-phrase-audience'));
+  assert.ok(!hits.some((h) => h.rule === 'designation-phrase'));
+});
+
+check('"for New <designation>" is a note, not a violation', () => {
+  const hits = scanCourse({
+    slug: 'clean-slug',
+    title: 'Induction for New Water Damage Restoration Technician | CARSI',
+  });
+  assert.ok(hits.some((h) => h.rule === 'designation-phrase-audience'));
+  assert.ok(!hits.some((h) => h.rule === 'designation-phrase'));
+});
+
+// THE ARCHITECTURAL INVARIANT. This is the test that makes the ratchet impossible: whatever the
+// word lists say, a designation phrase present in the copy is ALWAYS reported as something.
+// A missing word can downgrade a violation to a note; it can never produce silence.
+check('a designation phrase is never silently dropped, whatever the lists say', () => {
+  const titles = [
+    'Water Damage Restoration Technician | CARSI',
+    'Webinar for Water Damage Restoration Technician | CARSI',
+    'PPE for Water Damage Restoration Technicians | CARSI',
+    'Communication Skills for Every Water Damage Restoration Technician | CARSI',
+    'Zorbing for the Water Damage Restoration Technician | CARSI',
+  ];
+  for (const title of titles) {
+    const hits = scanCourse({ slug: 'clean-slug', title });
+    assert.ok(
+      hits.some((h) => h.rule === 'designation-phrase' || h.rule === 'designation-phrase-audience'),
+      `silently dropped: ${title}`,
+    );
+  }
 });
 
 // --- end-to-end: exit codes against a fixture site -------------------------------------
