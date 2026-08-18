@@ -55,3 +55,14 @@ plus 4-week rolling course sales. Every session reports RWR movement or names th
   A full readiness scorecard was written to `docs/RELEASE-READINESS.md` on branch
   `docs/release-readiness-20260817`; it is **not** on `main` yet, so do not expect to find it
   here until that branch merges.
+- 2026-08-19: Gate 0. RWR ≈ $0 — unchanged; DECISIONS #1 and #2 still the blockers.
+  **Customer-visible delta: four live courses on carsi.com.au carry banned IICRC designation
+  branding right now** (`CCT-aligned`, `WRT`, `FSRT-aligned`, `ASD-aligned`), found by
+  `npm run check:live-catalogue` (exit 1). Three of the four are absent from repo seed, so no
+  agent can reach them — filed as DECISIONS #15 (licence-critical, escalates daily).
+  A stopper audit measured why this was not caught: repo seed holds 37 courses, production sells
+  80, and three licence guards exit 0 without scanning anything on this checkout (the path
+  contains a space; `import.meta.url` percent-encodes it and `argv[1]` does not, so their
+  CLI-detection idiom is always false). Proven by positive control — the same guard file on an
+  unspaced path speaks. Full evidence: `docs/session-handoffs/STOPPER-REGISTER-20260819.md`;
+  work queued as BACKLOG #29–#36. Nothing was fixed this session and nothing was committed.

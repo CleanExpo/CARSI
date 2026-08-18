@@ -158,3 +158,27 @@ RWR; it compounds slowly and must not be read as revenue movement.
   catalogue; widening the acronym rules to match separated letters risks false positives on
   ordinary initialisms in course copy, which is the failure mode this guard has already
   produced five times.
+
+---
+
+## Discoveries — 2026-08-19 stopper audit
+
+Full evidence: `docs/session-handoffs/STOPPER-REGISTER-20260819.md`. Every item below was
+measured, not inferred; the register carries the exact commands and positive controls.
+
+| # | Item | Owner | Gate | Status |
+|---|---|---|---|---|
+| 29 | Fix 3 vacuous guards — `check-iicrc-terminology`, `check-course-completeness`, `check-course-visibility-predicate` all use the naive entry-point idiom comparing `import.meta.url` against a bare `file://` + `argv[1]` concat. The checkout path contains a space, which `import.meta.url` percent-encodes and `argv[1]` does not, so the comparison is always false, the scan body never runs, and the guard exits 0 in silence. Replace with the `pathToFileURL(argv[1]).href` idiom already used correctly by `check-cec-approvals` and `check-live-catalogue`. Proven by positive control: the same file on an unspaced path speaks. | A | 0 | ready |
+| 30 | Wire `check:live-catalogue` into CI on a schedule. It is NOT in CI, and it is the only guard that has caught a real production defect. Needs no credentials — it reads the public sitemap. | A | 0 | ready |
+| 31 | Fix 4 live designation violations on carsi.com.au (`cct-commercial-carpet-core`, `wrt-water-damage-essentials`, `fsrt-fire-smoke-restoration-core`, `asd-structural-drying-core`). Licence-critical and live now. 3 of the 4 are absent from repo seed, so this needs the prod-DB path. | A→F | 0 | blocked on prod-DB access |
+| 32 | ~~Render `commercial-floor-care-schools-childcare.mp4`~~ **WITHDRAWN 2026-08-19 — false premise.** The mp4 exists (2,109,732 bytes, dated 18 Aug 01:15) and `test:unit` is green (139 files, 1005/1005, exit 0; floor-care test stable 3/3). The "never rendered" claim came from `find . -name "*floor-care*intro*.mp4"`, which cannot match that filename — `intro` is in the directory `course-intros/`, not the filename — so it returned empty against a file that exists. Same disease as #29, in the evidence-gathering rather than the guard. Residual unknown: the handoff's `test:unit` exit 1 was a real AssertionError on the ffprobe test; why it failed then and passes now on an unchanged tree is unexplained. If it recurs, capture the environment at failure time. | A | 0 | **withdrawn** |
+| 33 | Add `tsx` to devDependencies. `check:live-cec` runs `npx tsx`; tsx is absent from both `package.json` and `node_modules`, so that guard cannot execute. ~50 scripts reach for it via npx. | A | 0 | ready |
+| 34 | Remove `continue-on-error: true` from the Build step at `.github/workflows/agent-pr-checks.yml:100`. Measured: the following `Report Results` step writes only to `$GITHUB_STEP_SUMMARY` and never exits non-zero, so `Agent PR Validation` goes green while its own summary prints `Build: ❌ Failed`. **The merge gate is NOT holed** — the required checks are `Build Check` and `Frontend Tests`, both jobs in `ci.yml`, and a broken build still fails those. This is reporting dishonesty, not a merge hole. Low priority. | A | 0 | ready |
+| 35 | Scanned-count contract: as each guard is touched, make it print what it looked at and exit non-zero when that count is zero. Applied opportunistically, not as a sweep. This is the structural fix — it collapses the whole vacuous-guard class into a loud failure on the day it occurs. | A | 0 | ready |
+| 36 | `bootstrap.sh` must install the pre-push hook, and its absence must be detectable. `core.hooksPath` points at `~/.config/git/hooks` — machine-local and outside every repo — so a fresh machine or agent checkout has no pre-push gate at all. | A | 0 | ready |
+
+**The class, not the instances.** All of #29–#36 are one disease: *silence read as evidence*. A
+control that emits nothing is currently indistinguishable from a control that found nothing. #35
+is the structural fix; the rest are the instances it would have caught. Note the scope limit that
+sits above all of them: repo seed holds 37 courses, production sells 80, so no source-scanning
+guard can see 54% of what is actually being sold.

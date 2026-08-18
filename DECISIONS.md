@@ -19,6 +19,7 @@ External sends, spend, pricing and licence-critical claims NEVER default — the
 | 12 | Level names for the CARSI tier ladder (Foundation → Practitioner → Advanced → top tier TBD) | No default — naming is founder-owned. Agents propose 3 naming sets; you pick. | 2026-08-30 | OPEN |
 | 13 | Public Research Notes page (1 distilled, cited note/week) — go? | Default: YES at Gate 1 — it is the E-E-A-T engine | 2026-08-30 | OPEN |
 | 14 | Paywalled-journal budget for the evidence sweep | Default: OPEN-ACCESS ONLY (commits no spend). Any paid source is a new cost → founder-only. | 2026-08-30 | OPEN |
+| 15 | **Prod-DB access path for the 43 live courses absent from repo seed** — 4 live courses carry banned IICRC designation branding on carsi.com.au NOW (`CCT-aligned`, `WRT`, `FSRT-aligned`, `ASD-aligned`); 3 of the 4 are not in the repo, so no agent can reach them | No default — licence-critical. Escalates daily. | 2026-08-21 | OPEN |
 
 ## Decided (move rows here with date + outcome)
 - 2026-08-16 · Telegram competing-idea-bots → rejected in favour of single cockpit bot (founder direction + blueprint §5)

@@ -25,6 +25,11 @@ Compound → Kanban movement). Every code-modifying pass must pass the
 `docs/agent-framework/CARSI_VERIFICATION_GATE.md` checklist, and `npm run
 type-check` is mandatory before any pass is marked Done.
 
+**Quality claims use the estate claim grammar.** "AAA" is a rung against a named bar, never an
+adjective — an unqualified `AAA` / `AAA+` is `[UNCONFIRMED]`. Doctrine:
+`~/.claude/skills/waterline/references/estate.md`. This line adds no gate and changes no
+existing one; CARSI's gates remain the verification-gate checklist above.
+
 ## Course production — Australian-produced (MUST)
 
 **Every CARSI course, module, lesson, quiz, trailer and piece of course marketing is
