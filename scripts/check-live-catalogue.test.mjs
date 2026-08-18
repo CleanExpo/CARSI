@@ -531,14 +531,16 @@ check('does NOT fire on plural audience wording', () => {
   assert.equal(hits.length, 0, 'teaching an audience is not branding');
 });
 
-// Both audience tests above carry "for", so the PLURAL marker was never exercised on its own
-// and its mutant survived a mutation run. This is the control that makes it load-bearing.
-check('does NOT fire on a plural audience title with no "for"', () => {
+// REVERSED at round 10. Plural was treated as an audience signal; independent review showed
+// that made it an escape hatch — `Water Damage Restoration Technicians Course` passed clean, so
+// any branded title escaped by adding one letter. A designation stays a designation in the
+// plural. Only a real SUBJECT followed by "for" now counts as audience.
+check('FIRES on a plural designation title (plural is not an escape)', () => {
   const hits = scanCourse({
     slug: 'water-damage-restoration-technicians-handbook',
     title: 'Water Damage Restoration Technicians Handbook | CARSI',
   });
-  assert.equal(hits.length, 0, 'addressing technicians in the plural is audience, not branding');
+  assert.ok(hits.some((h) => h.rule === 'designation-phrase'), 'plural must not suppress');
 });
 
 check('does NOT fire on singular audience wording with an article', () => {
@@ -561,6 +563,79 @@ check('still fires when the designation IS the course name', () => {
 check('still fires on the designation as a programme name', () => {
   const hits = scanCourse({ slug: 'wd', title: 'Water Damage Restoration Technician Programme | CARSI' });
   assert.ok(hits.some((h) => h.rule === 'designation-phrase'));
+});
+
+console.log('live-catalogue guard — round 10: the audience heuristic was an escape hatch');
+
+// P1 round 10 (gpt-5.5), THREE escapes, all created by my own round-9 false-positive fix.
+// Fixing a false positive by loosening a rule is how a guard quietly stops guarding.
+check('FIRES on a plural designation used as the course name', () => {
+  const hits = scanCourse({
+    slug: 'water-damage-restoration-technicians-course',
+    title: 'Water Damage Restoration Technicians Course | CARSI',
+  });
+  assert.ok(hits.some((h) => h.rule === 'designation-phrase'));
+});
+
+check('FIRES on "Course for <designation>" — a course noun is not an audience', () => {
+  const hits = scanCourse({
+    slug: 'course-for-water-damage-restoration-technician',
+    title: 'Course for Water Damage Restoration Technician | CARSI',
+  });
+  assert.ok(hits.some((h) => h.rule === 'designation-phrase'), 'the course IS being named by it');
+});
+
+check('FIRES on the ampersand spelling of a designation', () => {
+  const hits = scanCourse({
+    slug: 'trauma-crime-scene-technician-course',
+    title: 'Trauma & Crime Scene Technician | CARSI',
+  });
+  assert.ok(hits.some((h) => h.rule === 'designation-phrase'));
+});
+
+check('FIRES on the ampersand spelling of FSRT', () => {
+  const hits = scanCourse({ slug: 'f', title: 'Fire & Smoke Restoration Technician | CARSI' });
+  assert.ok(hits.some((h) => h.rule === 'designation-phrase'));
+});
+
+// The remaining audience form: a REAL subject before "for". This is the only survivor of the
+// heuristic, and it must keep working or legitimate training content gets blocked.
+check('does NOT fire on "PPE for … Technicians" — a real subject before "for"', () => {
+  const hits = scanCourse({
+    slug: 'ppe-for-water-damage-restoration-technicians',
+    title: 'PPE for Water Damage Restoration Technicians | CARSI',
+  });
+  assert.equal(hits.length, 0);
+});
+
+check('does NOT fire on "Respiratory Protection for the … Technician"', () => {
+  const hits = scanCourse({
+    slug: 'respiratory-protection-for-the-water-damage-restoration-technician',
+    title: 'Respiratory Protection for the Water Damage Restoration Technician | CARSI',
+  });
+  assert.equal(hits.length, 0);
+});
+
+// Two mutants SURVIVED a mutation run at this point, meaning nothing exercised these paths.
+// Both are added here rather than left as "probably fine".
+
+// "for" with NOTHING before it is not audience — there is no subject being taught.
+check('FIRES when the title opens with "For <designation>"', () => {
+  const hits = scanCourse({
+    slug: 'for-water-damage-restoration-technicians',
+    title: 'For Water Damage Restoration Technicians | CARSI',
+  });
+  assert.ok(hits.some((h) => h.rule === 'designation-phrase'), 'no subject means no audience');
+});
+
+// The and-less SLUG form was only ever covered by tests whose TITLE also matched, so the slug
+// path itself was never exercised. Clean title, branded slug.
+check('FIRES on an and-less designation SLUG with a clean title', () => {
+  const hits = scanCourse({
+    slug: 'trauma-crime-scene-technician-course',
+    title: 'Restoration Basics | CARSI',
+  });
+  assert.ok(hits.some((h) => h.rule === 'designation-phrase'), 'slug branding must be caught alone');
 });
 
 // --- end-to-end: exit codes against a fixture site -------------------------------------

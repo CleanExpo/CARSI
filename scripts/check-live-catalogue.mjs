@@ -69,7 +69,7 @@ export const DESIGNATION_PHRASES = {
   WRT: ['water damage restoration technician', 'water restoration technician'],
   ASD: ['applied structural drying technician'],
   AMRT: ['applied microbial remediation technician'],
-  FSRT: ['fire and smoke restoration technician', 'fire & smoke restoration technician'],
+  FSRT: ['fire and smoke restoration technician'],
   CCT: ['carpet cleaning technician'],
   // TCST is Trauma and Crime Scene Technician. An earlier revision of this map guessed
   // "tile stone and concrete cleaning technician" from memory with no licensed source, and
@@ -81,21 +81,27 @@ export const DESIGNATION_PHRASES = {
 };
 
 /**
- * AUDIENCE USAGE IS NOT BRANDING. `PPE for Water Damage Restoration Technicians` teaches PPE
- * *to* those technicians; it does not brand the course as the designation. Two markers
- * distinguish it, and either one is enough:
- *   - the phrase is PLURAL ("… Technicians"), which is how an audience is addressed
- *   - the phrase is preceded by "for ", which names an audience explicitly
- * A course actually branded with the designation reads "Water Damage Restoration Technician",
- * singular and unprefixed.
+ * AUDIENCE USAGE IS NOT BRANDING — but the test for it has to be narrow, or it becomes the
+ * escape hatch. An earlier version treated a PLURAL phrase, or any preceding "for", as
+ * sufficient. Independent review then showed that `Water Damage Restoration Technicians
+ * Course` and `Course for Water Damage Restoration Technician` both walked straight through:
+ * a branded course escaped by adding one letter or one word.
+ *
+ * Plural is NOT a signal — a designation stays a designation in the plural. The only accepted
+ * marker is a real SUBJECT followed by "for": `PPE for Water Damage Restoration Technicians`
+ * teaches PPE to an audience. When the subject is itself a generic course noun — "Course for
+ * …", "Training for …" — the course IS being named by the designation, so it still fires.
  */
+const COURSE_NOUNS = /^(a|an|the)?[\s-]*(course|courses|programme|program|training|certification|qualification|class|classes|workshop|workshops|module|modules)$/i;
+
 function isAudienceUsage(haystack, phrase, index) {
-  const after = haystack.slice(index + phrase.length, index + phrase.length + 1);
-  if (after === 's') return true;
-  // Look back far enough to clear an article: "for the Water Damage Restoration Technician"
-  // is still audience usage, and a 5-character window pushed "for" out of view.
-  const before = haystack.slice(Math.max(0, index - 24), index);
-  return /(^|[\s-])for([\s-]+(the|all|any))?[\s-]+$/.test(before);
+  const before = haystack.slice(0, index);
+  const m = before.match(/(^|[\s-])for([\s-]+(the|all|any))?[\s-]+$/);
+  if (!m) return false;
+  const subject = before.slice(0, m.index).replace(/[-\s]+/g, ' ').trim();
+  if (!subject) return false;
+  const lastWords = subject.split(' ').slice(-2).join(' ');
+  return !COURSE_NOUNS.test(subject) && !COURSE_NOUNS.test(lastWords) && !COURSE_NOUNS.test(subject.split(' ').pop());
 }
 
 /**
@@ -122,7 +128,10 @@ const BENIGN_EXPANSIONS = {
 function hasBenignExpansion(a, fTitle, fSlug) {
   const phrases = BENIGN_EXPANSIONS[a];
   if (!phrases) return false;
-  const lowerTitle = fTitle.toLowerCase();
+  // Normalise "&" to "and" before phrase matching. `Trauma & Crime Scene Technician` escaped
+  // while the "and" spelling was caught; enumerating both variants per designation is the kind
+  // of list that silently goes stale, so normalise once instead.
+  const lowerTitle = fTitle.toLowerCase().replace(/\s*&\s*/g, ' and ');
   return phrases.some((ph) => lowerTitle.includes(ph) || fSlug.includes(ph.replace(/ /g, '-')));
 }
 
@@ -232,15 +241,21 @@ export function scanCourse({ slug, title }) {
   // The designation NAMES, independent of any acronym. A benign expansion still suppresses:
   // "Correlated Colour Temperature" does not make "carpet cleaning technician" acceptable, but
   // the two never co-occur, and skipping is consistent with how the acronym rules behave.
-  const lowerTitle = fTitle.toLowerCase();
+  // Normalise "&" to "and" before phrase matching. `Trauma & Crime Scene Technician` escaped
+  // while the "and" spelling was caught; enumerating both variants per designation is a list
+  // that goes stale silently, so normalise once instead.
+  const lowerTitle = fTitle.toLowerCase().replace(/\s*&\s*/g, ' and ');
   for (const [a, phrases] of Object.entries(DESIGNATION_PHRASES)) {
     if (hasBenignExpansion(a, fTitle, fSlug)) continue;
     for (const ph of phrases) {
       const slugPh = ph.replace(/[ &]+/g, '-');
+      // Slugs drop "and" as often as they keep it: trauma-crime-scene-technician and
+      // trauma-and-crime-scene-technician are the same branding.
+      const slugPhNoAnd = ph.replace(/ and /g, ' ').replace(/[ &]+/g, '-');
       const ti = lowerTitle.indexOf(ph);
-      const si = fSlug.indexOf(slugPh);
+      const si = fSlug.indexOf(slugPh) !== -1 ? fSlug.indexOf(slugPh) : fSlug.indexOf(slugPhNoAnd);
       const titleHit = ti !== -1 && !isAudienceUsage(lowerTitle, ph, ti);
-      const slugHit = si !== -1 && !isAudienceUsage(fSlug, slugPh, si);
+      const slugHit = si !== -1 && !isAudienceUsage(fSlug, fSlug.slice(si).startsWith(slugPh) ? slugPh : slugPhNoAnd, si);
       if (titleHit || slugHit) {
         hits.push({ rule: 'designation-phrase', detail: ph });
         break;
