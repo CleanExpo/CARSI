@@ -137,3 +137,13 @@ RWR; it compounds slowly and must not be read as revenue movement.
   because a digit is not a plausible staff-authored form and a false positive on a licence guard
   costs more than this miss; `check-iicrc-compliance` remains the backstop. Revisit only if a
   digit-form designation is ever observed on the live catalogue.
+- 2026-08-18 · **CLC-P2-002 — the IICRC designation expansions in `check-live-catalogue` need
+  founder verification against the licensed source.** `DESIGNATION_PHRASES` maps each banned
+  acronym to the designation written out, and the guard now blocks on those phrases. One of the
+  eight was FABRICATED: TCST was expanded as "tile stone and concrete cleaning technician" from
+  memory with no source, and independent review established it is Trauma and Crime Scene
+  Technician. The other seven were written the same way and have not been checked. They are
+  load-bearing for a licence guard, so they should be confirmed against the licensed IICRC
+  source rather than trusted. Note CLAUDE.md forbids feeding IICRC standard TEXT into AI
+  tooling; designation names are public nomenclature, but the verification is a founder
+  action, not an agent one.
