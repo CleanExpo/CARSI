@@ -111,6 +111,44 @@ check('treats an empty title as not-live', () => {
   assert.equal(isLiveCourse(''), false);
 });
 
+console.log('live-catalogue guard — the three P1 escapes found in independent review');
+
+// P1-LIVE-CATALOGUE-SLUG-SEGMENT-BYPASS: the slug rule matched only the LEADING segment, so
+// moving the acronym one segment right walked straight through. Reported by gpt-5.5 with the
+// exact reproduction below, which returned [] before the fix.
+check('fires on a banned acronym in a NON-leading slug segment', () => {
+  const hits = scanCourse({
+    slug: 'water-damage-wrt-essentials',
+    title: 'Water Damage Restoration Essentials | CARSI',
+  });
+  assert.ok(
+    hits.some((h) => h.rule === 'slug-acronym' && h.detail === 'WRT'),
+    'WRT as a middle slug segment must be caught',
+  );
+});
+
+check('fires on a banned acronym as the FINAL slug segment', () => {
+  const hits = scanCourse({ slug: 'structural-drying-asd', title: 'Structural Drying | CARSI' });
+  assert.ok(hits.some((h) => h.rule === 'slug-acronym' && h.detail === 'ASD'));
+});
+
+// The negative control the widened regex must not break: segment-bounded, never substring.
+check('stays silent when the acronym is only part of a longer slug word', () => {
+  const hits = scanCourse({
+    slug: 'downwrt-handling-and-asdf-tooling',
+    title: 'General Handling | CARSI',
+  });
+  assert.equal(hits.length, 0, 'mid-word letters are not branding');
+});
+
+check('stays silent on a clean multi-segment slug', () => {
+  const hits = scanCourse({
+    slug: 'water-damage-restoration-essentials',
+    title: 'Water Damage Restoration Essentials | CARSI',
+  });
+  assert.equal(hits.length, 0);
+});
+
 if (failures > 0) {
   console.error(`\n${failures} check(s) failed — the guard is not trustworthy until they pass.`);
   process.exit(1);

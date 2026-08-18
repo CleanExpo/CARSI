@@ -53,9 +53,10 @@ export function scanCourse({ slug, title }) {
     // Title: whole-word only, so "Restoration" never trips on "ASD" and a topic name that
     // merely contains the letters is not a violation.
     if (new RegExp(`\\b${a}\\b`).test(title)) hits.push({ rule: 'title-acronym', detail: a });
-    // Slug: leading segment only. `wrt-water-damage-essentials` is branding; a slug that merely
-    // contains the letters mid-word is not.
-    if (new RegExp(`^${a.toLowerCase()}-`).test(slug)) hits.push({ rule: 'slug-acronym', detail: a });
+    // Slug: any hyphen-delimited SEGMENT, not just the leading one. Leading-only let
+    // `water-damage-wrt-essentials` through — the acronym is course branding wherever it sits.
+    // Segment-bounded, so a slug merely containing the letters mid-word stays clean.
+    if (new RegExp(`(?:^|-)${a.toLowerCase()}(?:-|$)`).test(slug)) hits.push({ rule: 'slug-acronym', detail: a });
   }
   if (/-aligned\b/i.test(title)) hits.push({ rule: 'title-aligned', detail: '"-aligned"' });
   return hits;
@@ -68,6 +69,10 @@ export function isLiveCourse(title) {
 
 async function fetchText(url) {
   const res = await fetch(url, { headers: { 'User-Agent': 'carsi-live-catalogue-guard' } });
+  // A non-2xx body is not a course page. Without this, a 500 rendering "Server Error | CARSI"
+  // satisfied isLiveCourse() and was counted as a clean live course — the guard reporting
+  // "clean" about a page it never really read. The soft-404 case is untouched: that is a real 200.
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return res.text();
 }
 
@@ -112,13 +117,21 @@ async function main() {
 
   const failed = results.filter((r) => r.error);
   const live = results.filter((r) => isLiveCourse(r.title));
+  // A sitemap URL that is neither a live course nor the exact soft-404 marker used to be dropped
+  // silently: not scanned, not counted as a failure. That is unaudited surface reported as clean.
+  const unaccounted = results.filter(
+    (r) => !r.error && !isLiveCourse(r.title) && !(r.title || '').includes(NOT_FOUND_MARKER),
+  );
 
   if (live.length === 0) {
     console.error(`cannot audit: fetched ${results.length} course URLs, none returned a usable title.`);
     process.exit(2);
   }
 
-  const violations = live
+  // Scan every successfully fetched URL, not only the live ones: the slug rules do not depend on
+  // the title, so a banned slug must still be caught when the title is missing or is a soft-404.
+  const violations = results
+    .filter((r) => !r.error)
     .map((c) => ({ ...c, hits: scanCourse(c) }))
     .filter((c) => c.hits.length > 0);
 
@@ -148,8 +161,12 @@ async function main() {
   // Non-vacuity is part of the pass, so the count is always stated. "Clean" without a number is
   // indistinguishable from "checked nothing".
   console.log(`\n✓ ${live.length} live courses clean.`);
-  if (failed.length) {
-    console.error(`but ${failed.length} URL(s) could not be fetched — coverage is incomplete.`);
+  if (failed.length || unaccounted.length) {
+    for (const u of unaccounted) console.error(`  unaudited (no usable title): ${u.url}`);
+    console.error(
+      `but ${failed.length} URL(s) could not be fetched and ${unaccounted.length} returned no ` +
+        'usable title — coverage is incomplete.',
+    );
     process.exit(2);
   }
 }
