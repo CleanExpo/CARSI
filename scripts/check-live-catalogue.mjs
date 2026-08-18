@@ -56,6 +56,29 @@ export const BANNED_ACRONYMS = ['WRT', 'ASD', 'AMRT', 'FSRT', 'CCT', 'TCST', 'OC
 export const AMBIGUOUS_ACRONYMS = new Set(['OCT']);
 
 /**
+ * Industry phrases that legitimately produce a banned acronym's letters. `RRT` is the IICRC
+ * Carpet Repair and Reinstallation Technician designation, but "Rapid Response Team (RRT)" is
+ * ordinary Australian storm-response wording and case cannot tell them apart.
+ *
+ * Whitelisted as EXACT PHRASES rather than by a general "acronym is defined by the preceding
+ * words" rule, deliberately: a general rule would also suppress `Water Restoration Technician
+ * (WRT)`, which IS the designation spelled out and IS banned as course branding. Each entry
+ * here is a specific claim that this phrase is not IICRC branding — keep the list short and
+ * justify every addition.
+ */
+const BENIGN_EXPANSIONS = {
+  RRT: ['rapid response team'],
+};
+
+/** True when the copy carries a whitelisted benign expansion of this acronym. */
+function hasBenignExpansion(a, fTitle, fSlug) {
+  const phrases = BENIGN_EXPANSIONS[a];
+  if (!phrases) return false;
+  const lowerTitle = fTitle.toLowerCase();
+  return phrases.some((ph) => lowerTitle.includes(ph) || fSlug.includes(ph.replace(/ /g, '-')));
+}
+
+/**
  * Cyrillic / Greek / digit lookalikes for the ASCII letters used by BANNED_ACRONYMS
  * (A C D F M O R S T W). `Water Damage WΡT Essentials` — Greek capital rho U+03A1 — read as
  * clean until this existed. Scoped deliberately to those letters rather than a general
@@ -119,6 +142,11 @@ export function scanCourse({ slug, title }) {
   const fTitle = fold(title);
   const fSlug = fold(slug).toLowerCase();
   for (const a of BANNED_ACRONYMS) {
+    // A whitelisted industry phrase is not IICRC branding. Skipping the acronym entirely (both
+    // surfaces) is correct: `Rapid Response Team (RRT) Mobilisation` at
+    // `rapid-response-team-rrt-mobilisation` is one course, and flagging either half of it
+    // would be the same false positive.
+    if (hasBenignExpansion(a, fTitle, fSlug)) continue;
     // Title: whole-word only, so "Restoration" never trips on "ASD" and a topic name that
     // merely contains the letters is not a violation. Case-insensitive except for the
     // ambiguous set above — a case-sensitive rule let `wrt` and `WrT` through in titles.
@@ -158,7 +186,13 @@ export function scanCourse({ slug, title }) {
   // CLAUDE.md REQUIRES AS/NZS framing on Australian course content, so the guard was flagging
   // the house style it exists to protect. ANSI-, ISO- and AS/NZS-aligned are all correct
   // nominative usage; only the designations are branding.
-  const alignedRe = new RegExp(`\\b(?:${[...BANNED_ACRONYMS, 'IICRC'].join('|')})[-\\s]?aligned\\b`, 'i');
+  // Up to two intervening tokens, so `IICRC CEC-aligned` and `IICRC CEC aligned` are caught as
+  // well as `IICRC-aligned`. Bounded at two on purpose: an unbounded gap would make
+  // "IICRC CEC Accredited courses, AS/NZS aligned" — the phrasing CLAUDE.md REQUIRES — match.
+  const alignedRe = new RegExp(
+    `\\b(?:${[...BANNED_ACRONYMS, 'IICRC'].join('|')})(?:[-\\s][A-Za-z]{2,12}){0,2}[-\\s]?aligned\\b`,
+    'i',
+  );
   const alignedHit = fTitle.match(alignedRe);
   if (alignedHit) hits.push({ rule: 'title-aligned', detail: `"${alignedHit[0]}"` });
   return hits;

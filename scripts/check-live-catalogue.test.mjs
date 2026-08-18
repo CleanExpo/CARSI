@@ -371,6 +371,74 @@ check('the reported detail names the matched phrase, not a generic label', () =>
   assert.match(aligned.detail, /FSRT-aligned/i, 'an operator must see what actually matched');
 });
 
+console.log('live-catalogue guard — round 7: benign industry phrase, and the CEC-aligned escape');
+
+// P1 round 7 (gpt-5.5), FALSE POSITIVE. RRT is the IICRC Carpet Repair and Reinstallation
+// Technician designation, but "Rapid Response Team (RRT)" is ordinary Australian storm-response
+// wording. Case cannot separate them, so the phrase is whitelisted explicitly.
+check('does NOT fire on "Rapid Response Team (RRT)" in a title', () => {
+  const hits = scanCourse({
+    slug: 'rapid-response-team-mobilisation',
+    title: 'Rapid Response Team (RRT) Mobilisation for Storm Damage | CARSI',
+  });
+  assert.equal(hits.length, 0, 'a rapid response team is not the IICRC designation');
+});
+
+check('does NOT fire on the same phrase in a slug', () => {
+  const hits = scanCourse({
+    slug: 'rapid-response-team-rrt-mobilisation',
+    title: 'Rapid Response Team Mobilisation for Storm Damage | CARSI',
+  });
+  assert.equal(hits.length, 0);
+});
+
+// The whitelist is a PHRASE, not a general "acronym defined by preceding words" rule — that
+// generalisation would suppress a spelled-out designation, which is banned as course branding.
+check('still fires on bare RRT with no benign phrase present', () => {
+  const hits = scanCourse({ slug: 'rrt-carpet-repair', title: 'Carpet Repair RRT Course | CARSI' });
+  assert.ok(hits.some((h) => h.detail === 'RRT'));
+});
+
+check('still fires on a SPELLED-OUT designation, which the whitelist must not cover', () => {
+  const hits = scanCourse({
+    slug: 'water-restoration-technician-wrt',
+    title: 'Water Restoration Technician (WRT) | CARSI',
+  });
+  assert.ok(hits.some((h) => h.detail === 'WRT'), 'the designation spelled out is still branding');
+});
+
+// P1 round 7, ESCAPE: the aligned rule required the designation immediately before "aligned".
+check('fires on IICRC CEC-aligned', () => {
+  const hits = scanCourse({ slug: 'c', title: 'IICRC CEC-aligned Restoration Course | CARSI' });
+  assert.ok(hits.some((h) => h.rule === 'title-aligned'));
+});
+
+check('fires on IICRC CEC aligned (spaced)', () => {
+  const hits = scanCourse({ slug: 'c', title: 'IICRC CEC aligned Restoration Course | CARSI' });
+  assert.ok(hits.some((h) => h.rule === 'title-aligned'));
+});
+
+// The intervening-token allowance is bounded at two SPECIFICALLY so the phrasing CLAUDE.md
+// REQUIRES does not become a violation. This is the control that stops the fix over-reaching.
+check('does NOT fire on the required "IICRC CEC Accredited … AS/NZS aligned" phrasing', () => {
+  const hits = scanCourse({
+    slug: 'drying-course',
+    title: 'IICRC CEC Accredited courses, AS/NZS aligned | CARSI',
+  });
+  assert.equal(hits.length, 0, 'the mandated phrasing must never be flagged');
+});
+
+// The control above is WEAK on its own: it stays silent partly because the comma breaks the
+// token run. A mutation run proved it — widening the gap to six tokens survived. This
+// comma-free sentence is the real control, and it is copy CARSI could plausibly publish.
+check('does NOT fire when a standards reference sits several words after IICRC', () => {
+  const hits = scanCourse({
+    slug: 'drying-course',
+    title: 'IICRC CEC Accredited course content is ANSI aligned | CARSI',
+  });
+  assert.equal(hits.length, 0, 'a distant standards reference is not designation branding');
+});
+
 // --- end-to-end: exit codes against a fixture site -------------------------------------
 //
 // The checks above are pure. They cannot see fetchText() rejecting a non-2xx page, nor the
