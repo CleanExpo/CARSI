@@ -1,6 +1,22 @@
 # Session handoff — 2026-08-18 08:51 — GP-523 repaired, re-review pending
 
-**State: WIP-BLOCKED. This handoff is INCOMPLETE.**
+> ## SUPERSEDED 2026-08-18 — this handoff's blocking claim is resolved.
+>
+> Everything below was written at `e8f04c09`, before the re-review ran. It is kept for the trail;
+> **do not act on its "Pick up here" section.** Current state:
+>
+> - The re-review RAN. It returned **FAIL** on one blocker: the branding guard's deferral
+>   exemption was keyed to slug *shape*, making it a blanket content amnesty — a banned acronym in
+>   a rendered `title:` field left the guard green, unbackstopped.
+> - Repaired in `942b6c64` (key by literal value) and `f2b179c0` (exact-token boundary), each
+>   independently re-verified by mutation testing. Final verdict **PASS at `f2b179c0`**.
+> - Suite 1050/1050 across 142 files; type-check, lint, build and the licence guards green.
+>
+> Two framing errors in the text below are struck: nothing was "pending Codex" — Codex is one
+> reviewer option, never the gate — and there is no pickup date. Full evidence, including all
+> three verdicts verbatim, is outside the repo at `~/carsi-gp523-review/`.
+
+**State: WIP-BLOCKED. This handoff is INCOMPLETE.** *(Superseded — see the banner above.)*
 
 > **Head correction (2026-08-18 08:56).** Committing this report moved head from `4dcbb83c` to
 > `36a83499`. Diffing the two name-only returns one `docs/` path — this file — and nothing else,
