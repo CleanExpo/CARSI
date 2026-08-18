@@ -155,12 +155,25 @@ const PUBLIC_TOPIC_LIST =
  */
 const PROVIDER_STANDING_SENTENCE = 'Study online with CARSI, an IICRC CEC Accredited provider.';
 
+/**
+ * No catalogue-wide accreditation adjective, deliberately.
+ *
+ * "IICRC CEC Accredited" is a true statement about CARSI's standing as a CEC PROVIDER. Attached
+ * to the plural noun and applied across the whole catalogue, it stops describing the provider and
+ * starts describing each listed item — an accreditation assertion at the item level. As of
+ * 2026-08-18 the approvals registry `data/seed/cec-approvals.json` holds `"approvals": []` and 0
+ * of 37 catalogue entries have `cecHours > 0`, so that assertion held for none of them.
+ *
+ * This is the fail-closed CEC rule applied to marketing copy rather than to a badge: absent by
+ * default, added only per course by explicit founder-recorded approval. Do not re-attach the
+ * adjective to "courses" here — state provider standing, which is what the sentence below does.
+ */
 export function catalogueMetaDescription(facts: PublicCatalogueFacts): string {
   const n = facts.publishedCourseCount;
   if (n <= 0) {
-    return `Browse IICRC CEC Accredited restoration and cleaning courses across ${PUBLIC_TOPIC_LIST}. ${PROVIDER_STANDING_SENTENCE}`;
+    return `Browse restoration and cleaning courses across ${PUBLIC_TOPIC_LIST}. ${PROVIDER_STANDING_SENTENCE}`;
   }
-  return `Browse ${n} IICRC CEC Accredited restoration and cleaning courses across ${PUBLIC_TOPIC_LIST}. ${PROVIDER_STANDING_SENTENCE}`;
+  return `Browse ${n} restoration and cleaning courses across ${PUBLIC_TOPIC_LIST}. ${PROVIDER_STANDING_SENTENCE}`;
 }
 
 /** `/courses` index — question-led SEO line without a duplicated “Browse”. */
@@ -168,7 +181,9 @@ export function coursesIndexMetaDescription(facts: PublicCatalogueFacts): string
   const n = facts.publishedCourseCount;
   const core =
     n > 0
-      ? `${n} IICRC CEC Accredited restoration and cleaning courses across ${PUBLIC_TOPIC_LIST}. ${PROVIDER_STANDING_SENTENCE}`
-      : `IICRC CEC Accredited restoration and cleaning courses across ${PUBLIC_TOPIC_LIST}. ${PROVIDER_STANDING_SENTENCE}`;
+      ? `${n} restoration and cleaning courses across ${PUBLIC_TOPIC_LIST}. ${PROVIDER_STANDING_SENTENCE}`
+      : // Capitalised: this branch opens the sentence after "What courses does CARSI offer?".
+        // The removed accreditation adjective used to supply that capital.
+        `Restoration and cleaning courses across ${PUBLIC_TOPIC_LIST}. ${PROVIDER_STANDING_SENTENCE}`;
   return `What courses does CARSI offer? ${core}`;
 }

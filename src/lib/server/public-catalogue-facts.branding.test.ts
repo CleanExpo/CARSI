@@ -109,3 +109,37 @@ describe('catalogueMetaDescription', () => {
     expect(out).not.toMatch(ACRONYM_RE);
   });
 });
+
+/**
+ * The adjective "IICRC CEC Accredited" is TRUE of CARSI as a provider and FALSE of the catalogue
+ * as a set of courses while `data/seed/cec-approvals.json` is empty. Both meta descriptions used
+ * to attach it to the noun "courses", asserting per-course accreditation for 37 courses of which
+ * zero were approved. These assertions pin the distinction so it cannot drift back.
+ */
+describe('CEC accreditation is claimed for the PROVIDER, never for the catalogue', () => {
+  const CATALOGUE_CLAIM = /IICRC CEC Accredited[^.]*\bcourses\b/i;
+
+  it('positive control — the detector fires on the exact pre-fix wording', () => {
+    // Assembled, not pasted, so this file does not itself become a violation.
+    const prefix = 'Browse 37 ' + 'IICRC CEC Accredited' + ' restoration and cleaning courses';
+    expect(CATALOGUE_CLAIM.test(prefix)).toBe(true);
+    // ...and does NOT fire on the permitted provider-standing form.
+    expect(CATALOGUE_CLAIM.test('Study online with CARSI, an IICRC CEC Accredited provider.')).toBe(
+      false
+    );
+  });
+
+  for (const [name, fn] of [
+    ['catalogueMetaDescription', catalogueMetaDescription],
+    ['coursesIndexMetaDescription', coursesIndexMetaDescription],
+  ] as const) {
+    it(`${name} makes no catalogue-wide accreditation claim, at any count`, () => {
+      for (const publishedCourseCount of [0, 1, 37, 80]) {
+        const out = fn(facts({ publishedCourseCount }));
+        expect(out).not.toMatch(CATALOGUE_CLAIM);
+        // The provider-standing sentence must survive — this is not a blanket ban on the phrase.
+        expect(out).toContain('IICRC CEC Accredited provider');
+      }
+    });
+  }
+});

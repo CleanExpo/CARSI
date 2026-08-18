@@ -24,7 +24,10 @@ export async function generateMetadata(): Promise<Metadata> {
   const { items } = await getCoursesCached();
   const facts = deriveCatalogueFactsFromCourseItems(items);
   return {
-    title: 'IICRC CEC Accredited Restoration Courses',
+    // Not "IICRC CEC Accredited ... Courses". That brands every catalogue course as CEC
+    // accredited, which is false while the approvals registry is empty. CARSI's CEC provider
+    // standing is stated in the description instead, where it is accurate.
+    title: 'Restoration and Cleaning Courses',
     description: coursesIndexMetaDescription(facts),
     alternates: { canonical: '/courses' },
   };
@@ -386,9 +389,11 @@ export default async function CoursesPage({
                   IICRC members and certified technicians continue their education through{' '}
                   <AcronymTooltip term="CEC">CECs</AcronymTooltip> within each certification cycle
                   to maintain their credentials with the Institute of Inspection, Cleaning and
-                  Restoration Certification. Eligible CARSI courses carry a specific{' '}
-                  <AcronymTooltip term="CEC" /> value based on course scope and duration. Upon
-                  completing a course, your{' '}
+                  Restoration Certification. A CARSI course carries a specific{' '}
+                  <AcronymTooltip term="CEC" /> value only once the{' '}
+                  <AcronymTooltip term="IICRC" /> has approved that course for{' '}
+                  <AcronymTooltip term="CEC">CECs</AcronymTooltip>; courses awaiting approval show
+                  no CEC value. Upon completing an approved course, your{' '}
                   <AcronymTooltip term="CEC">CECs</AcronymTooltip> are automatically recorded in
                   your CARSI student dashboard and can be exported for submission to the{' '}
                   <AcronymTooltip term="IICRC" />. CARSI also provides verifiable digital
