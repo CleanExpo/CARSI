@@ -267,6 +267,64 @@ check('fold() leaves ordinary ASCII untouched', () => {
   assert.equal(fold('Water Damage Restoration'), 'Water Damage Restoration');
 });
 
+console.log('live-catalogue guard — round 5: false positive, possessive slug, small caps');
+
+// P1 round 5 (gpt-5.5), FALSE POSITIVE — the worst class for a licence guard, because staff
+// who see it cry wolf stop believing the guard at all. The ambiguous set was applied to titles
+// only; a slug carries no case signal, so an ordinary October slug was reported as a breach.
+check('does NOT fire on an ordinary October slug', () => {
+  const hits = scanCourse({
+    slug: 'seasonal-cleaning-oct-2026',
+    title: 'Seasonal Cleaning oct 2026 | CARSI',
+  });
+  assert.equal(hits.length, 0, 'an October course is not the OCT designation');
+});
+
+check('does NOT fire on an October slug even with a clean unrelated title', () => {
+  const hits = scanCourse({ slug: 'oct-2026-intake', title: 'Intake | CARSI' });
+  assert.equal(hits.length, 0);
+});
+
+// The documented cost of that decision: OCT is unreachable via slug. The title rule and the
+// compliance backstop still cover it, and this test pins the trade-off so it cannot drift
+// silently into "we forgot".
+check('OCT is still caught in a TITLE, which is where case disambiguates it', () => {
+  const hits = scanCourse({ slug: 'odour-control-programme', title: 'Odour Control OCT | CARSI' });
+  assert.ok(hits.some((h) => h.rule === 'title-acronym' && h.detail === 'OCT'));
+});
+
+// P1 round 5: the slug regex accepted `s?` while the commit claimed `s` / `'s`.
+check('fires on a POSSESSIVE designation slug', () => {
+  const hits = scanCourse({ slug: "wrt's-water-damage", title: 'Water Damage Essentials | CARSI' });
+  assert.ok(hits.some((h) => h.rule === 'slug-acronym' && h.detail === 'WRT'));
+});
+
+// P1 round 5: U+1D21 small-capital W is not folded by NFKC. Mapped as a BLOCK, because
+// enumerating single codepoints as each is reported is an infinite ratchet.
+check('fires on a small-capital lookalike (U+1D21 W)', () => {
+  const hits = scanCourse({ slug: 'clean', title: 'Water Damage \u1D21RT Essentials | CARSI' });
+  assert.ok(hits.some((h) => h.rule === 'title-acronym' && h.detail === 'WRT'));
+});
+
+check('fires on a small-capital lookalike in another acronym (U+1D00 A)', () => {
+  const hits = scanCourse({ slug: 'clean', title: 'Structural Drying \u1D00SD Core | CARSI' });
+  assert.ok(hits.some((h) => h.rule === 'title-acronym' && h.detail === 'ASD'));
+});
+
+// fold() must not corrupt the Australian metric and electrical text CARSI course copy is
+// required to carry. Digit mappings (0->O, 5->S) did exactly that — `50 m² @ 230 V` folded to
+// `SO m2 @ 23O V` — and also opened a false-positive path where `0ct` becomes `OCT`.
+// NFKC still folds the superscript, which is harmless: matching is ASCII-only and the ORIGINAL
+// title is what gets reported.
+check('fold does not corrupt Australian metric or electrical text', () => {
+  assert.equal(fold('Odour, Colour & Mould — 50 m² @ 230 V'), 'Odour, Colour & Mould — 50 m2 @ 230 V');
+});
+
+check('a digit is never treated as a designation letter', () => {
+  const hits = scanCourse({ slug: '0ct-2026-intake', title: 'Intake 0CT 2026 | CARSI' });
+  assert.equal(hits.length, 0, 'digits must not fold into OCT');
+});
+
 // --- end-to-end: exit codes against a fixture site -------------------------------------
 //
 // The checks above are pure. They cannot see fetchText() rejecting a non-2xx page, nor the

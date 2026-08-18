@@ -40,32 +40,53 @@ const SITE = (process.env.CARSI_SITE || 'https://www.carsi.com.au').replace(/\/$
 export const BANNED_ACRONYMS = ['WRT', 'ASD', 'AMRT', 'FSRT', 'CCT', 'TCST', 'OCT', 'RRT'];
 
 /**
- * Acronyms that collide with an ordinary lowercase word or abbreviation, where a
- * case-insensitive TITLE match would fire on innocent prose. `OCT` is the designation for
- * Odour Control Technician; "oct" is also how October is abbreviated, and a course title
- * reading "… oct 2026" is not branding. For these, and ONLY these, the title match stays
- * case-sensitive so the designation must be written as the designation.
+ * Acronyms that collide with an ordinary lowercase word or abbreviation. `OCT` is the
+ * designation for Odour Control Technician; "oct" is also how October is abbreviated.
  *
- * Every other banned acronym is matched case-insensitively in titles: `Water Damage wrt
- * Essentials` and `Water Damage WrT Essentials` both shipped past a case-sensitive rule.
- * This set is a licence-risk trade-off, so keep it as small as the evidence demands and
- * record why each member is here.
+ * TITLES: matched case-SENSITIVELY, so the designation must be written as the designation.
+ * Case is the disambiguator, and it works — "OCT" fires, "oct 2026" does not.
+ * SLUGS: skipped entirely. A slug carries no case signal (they are lowercase by convention),
+ * so there is nothing to disambiguate with, and matching produced a false positive on
+ * `seasonal-cleaning-oct-2026`.
+ *
+ * Every other banned acronym is matched case-insensitively in titles and always in slugs.
+ * This set is a deliberate licence-risk trade-off: keep it as small as the evidence demands,
+ * and record why each member is here.
  */
-export const CASE_SENSITIVE_TITLE_ACRONYMS = new Set(['OCT']);
+export const AMBIGUOUS_ACRONYMS = new Set(['OCT']);
 
 /**
  * Cyrillic / Greek / digit lookalikes for the ASCII letters used by BANNED_ACRONYMS
  * (A C D F M O R S T W). `Water Damage WΡT Essentials` — Greek capital rho U+03A1 — read as
  * clean until this existed. Scoped deliberately to those letters rather than a general
  * confusables table: a narrow map is auditable, and nothing else in this guard needs one.
+ *
+ * DIGITS ARE DELIBERATELY EXCLUDED. Mapping 0->O and 5->S corrupted the metric and electrical
+ * text that CARSI's Australian-production standard requires on nearly every course — `50 m²
+ * @ 230 V` folded to `SO m2 @ 23O V` — and opened a false-positive path where `0ct` becomes
+ * `OCT`. Digits are not a plausible staff-authored lookalike; metric units are everywhere.
  */
+/**
+ * Latin small-capital and related phonetic letters, U+1D00-U+1D2B. NFKC does NOT fold these,
+ * so `ᴡRT` (U+1D21) read as clean. Mapped as a BLOCK rather than one character at a time:
+ * enumerating single lookalikes as each is reported is an infinite ratchet, and a block is
+ * both bounded and auditable.
+ */
+const SMALL_CAPS = {
+  '\u1D00': 'A', '\u1D01': 'A', '\u1D03': 'B', '\u1D04': 'C', '\u1D05': 'D',
+  '\u1D07': 'E', '\u1D0A': 'J', '\u1D0B': 'K', '\u1D0C': 'L', '\u1D0D': 'M',
+  '\u1D0E': 'N', '\u1D0F': 'O', '\u1D18': 'P', '\u1D19': 'R', '\u1D1A': 'R',
+  '\u1D1B': 'T', '\u1D1C': 'U', '\u1D20': 'V', '\u1D21': 'W', '\u1D22': 'Z',
+};
+
 const HOMOGLYPHS = {
+  ...SMALL_CAPS,
   '\u0410': 'A', '\u0391': 'A',              // Cyrillic А, Greek Α
   '\u0421': 'C', '\u03F9': 'C',              // Cyrillic С, Greek Ϲ
   '\u041C': 'M', '\u039C': 'M',              // Cyrillic М, Greek Μ
-  '\u041E': 'O', '\u039F': 'O', '0': 'O',    // Cyrillic О, Greek Ο, digit zero
+  '\u041E': 'O', '\u039F': 'O',              // Cyrillic О, Greek Ο
   '\u0420': 'R', '\u03A1': 'R',              // Cyrillic Р, Greek Ρ
-  '\u0405': 'S', '5': 'S',                    // Cyrillic Ѕ, digit five
+  '\u0405': 'S',                              // Cyrillic Ѕ
   '\u0422': 'T', '\u03A4': 'T',              // Cyrillic Т, Greek Τ
   '\u051C': 'W',                              // Cyrillic Ԝ
   '\u0414': 'D', '\u03DC': 'F',              // Cyrillic Д, Greek Ϝ
@@ -103,7 +124,7 @@ export function scanCourse({ slug, title }) {
     // ambiguous set above — a case-sensitive rule let `wrt` and `WrT` through in titles.
     // `s` / `'s` accepted: "WRTs Essentials" is the same branding claim as "WRT Essentials",
     // and a human writing a course title reaches for the plural without thinking about it.
-    const titleFlags = CASE_SENSITIVE_TITLE_ACRONYMS.has(a) ? '' : 'i';
+    const titleFlags = AMBIGUOUS_ACRONYMS.has(a) ? '' : 'i';
     if (new RegExp(`\\b${a}(?:'?s)?\\b`, titleFlags).test(fTitle)) hits.push({ rule: 'title-acronym', detail: a });
     // Slug: any hyphen-delimited SEGMENT, not just the leading one, and case-insensitively.
     // Leading-only let `water-damage-wrt-essentials` through; case-sensitive matching then let
@@ -115,7 +136,22 @@ export function scanCourse({ slug, title }) {
     // No `i` flag: fSlug is already lowercased above, so the flag would be unreachable — a
     // mutation run proved no test could tell it apart from its absence. The lowercasing is the
     // load-bearing part, because fold() emits uppercase ASCII for lookalike characters.
-    if (new RegExp(`(?:^|-)${a.toLowerCase()}s?(?:-|$)`).test(fSlug)) hits.push({ rule: 'slug-acronym', detail: a });
+    //
+    // Ambiguous acronyms are skipped for SLUGS. A title has case to disambiguate ("OCT" the
+    // designation vs "oct" the month); a slug does not, because slugs are lowercase by
+    // convention. Without this, `seasonal-cleaning-oct-2026` was reported as a licence
+    // violation. A guard that cries wolf on a legitimate October course is worse than one that
+    // misses a slug — staff stop believing it. The title rule still catches the designation
+    // written as a designation, and check-iicrc-compliance remains the backstop.
+    //
+    // `'?s?` accepts the possessive slug form as well as the plural: `wrt's-water-damage`
+    // passed while the commit claimed otherwise.
+    if (
+      !AMBIGUOUS_ACRONYMS.has(a) &&
+      new RegExp(`(?:^|-)${a.toLowerCase()}'?s?(?:-|$)`).test(fSlug)
+    ) {
+      hits.push({ rule: 'slug-acronym', detail: a });
+    }
   }
   if (/-aligned\b/i.test(fTitle)) hits.push({ rule: 'title-aligned', detail: '"-aligned"' });
   return hits;
