@@ -923,6 +923,64 @@ await checkJson(
   },
 );
 
+// P1 round 13 (gpt-5.5): the three JSON tests above cover clean, note-only and violation, but
+// NOT the cannot-audit exits. Those wrote human text to stderr and left stdout EMPTY, so a
+// consumer got a parse error rather than a machine-readable reason. "I could not look" is
+// precisely the outcome a consumer most needs to tell apart from "nothing is wrong".
+
+async function checkJsonExit2(name, site, assertFn) {
+  const { code, out } = await new Promise((resolve) => {
+    const child = spawn(process.execPath, [GUARD, '--json'], {
+      env: { ...process.env, CARSI_SITE: site },
+    });
+    let o2 = '';
+    child.stdout.on('data', (d) => (o2 += d));
+    child.on('close', (c) => resolve({ code: c, out: o2 }));
+  });
+  try {
+    assertFn(JSON.parse(out), code);
+    console.log(`  ✓ ${name}`);
+  } catch (err) {
+    failures += 1;
+    console.error(`  ✗ ${name}\n      ${err.message}\n      stdout: ${JSON.stringify(out.slice(0, 120))}`);
+  }
+}
+
+console.log('live-catalogue guard — --json must be parseable on the FAILURE paths too');
+
+await checkJsonExit2(
+  '--json is parseable when the site is unreachable',
+  'http://127.0.0.1:9',
+  (parsed, code) => {
+    assert.equal(code, 2, 'unreachable must not be exit 0');
+    assert.ok(parsed.error, 'the reason must be machine-readable');
+    assert.equal(parsed.checked, 0);
+    assert.deepEqual(parsed.violations, []);
+  },
+);
+
+await (async () => {
+  // A sitemap that lists no course URLs at all.
+  const server = await serve({ '/courses/unused': [200, title('unused | CARSI')] });
+  const port = server.address().port;
+  server.close();
+  const empty = await serve({});
+  try {
+    await checkJsonExit2(
+      '--json is parseable when the sitemap lists no course URLs',
+      `http://127.0.0.1:${empty.address().port}`,
+      (parsed, code) => {
+        assert.equal(code, 2);
+        assert.ok(parsed.error);
+        assert.equal(parsed.checked, 0);
+      },
+    );
+  } finally {
+    empty.close();
+    void port;
+  }
+})();
+
 if (failures > 0) {
   console.error(`\n${failures} check(s) failed — the guard is not trustworthy until they pass.`);
   process.exit(1);

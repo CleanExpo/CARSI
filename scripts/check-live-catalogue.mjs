@@ -324,19 +324,33 @@ function titleOf(html) {
 
 async function main() {
   const asJson = process.argv.includes('--json');
+
+  /**
+   * Exit without an audit. In --json mode this still emits a parseable object on stdout: a
+   * consumer that cannot parse the failure cannot tell a broken run from a clean one, which is
+   * the same "silence reads as success" defect this whole guard exists to prevent.
+   */
+  const cannotAudit = (reason, extra = []) => {
+    if (asJson) {
+      console.log(JSON.stringify({ site: SITE, error: reason, checked: 0, violations: [], notes: [] }, null, 2));
+    } else {
+      console.error(`cannot audit: ${reason}`);
+      for (const line of extra) console.error(line);
+    }
+    process.exit(2);
+  };
   let courseUrls;
   try {
     const sitemap = await fetchText(`${SITE}/sitemap.xml`);
     courseUrls = [...new Set(sitemap.match(/https?:\/\/[^<\s]*?\/courses\/[^<\s]+/g) || [])];
   } catch (err) {
-    console.error(`cannot audit: sitemap fetch failed for ${SITE} — ${err.message}`);
-    process.exit(2);
+    cannotAudit(`sitemap fetch failed for ${SITE} — ${err.message}`);
   }
 
   if (courseUrls.length === 0) {
-    console.error(`cannot audit: sitemap at ${SITE} listed no course URLs.`);
-    console.error('Refusing to exit 0 — a guard that reached nothing has not checked anything.');
-    process.exit(2);
+    cannotAudit(`sitemap at ${SITE} listed no course URLs.`, [
+      'Refusing to exit 0 — a guard that reached nothing has not checked anything.',
+    ]);
   }
 
   const results = [];
@@ -397,8 +411,7 @@ async function main() {
   }
 
   if (live.length === 0) {
-    console.error(`cannot audit: fetched ${results.length} course URLs, none returned a usable title.`);
-    process.exit(2);
+    cannotAudit(`fetched ${results.length} course URLs, none returned a usable title.`);
   }
 
   // Non-vacuity is part of the pass, so the count is always stated. "Clean" without a number is
