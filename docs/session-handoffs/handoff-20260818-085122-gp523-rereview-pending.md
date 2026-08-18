@@ -190,4 +190,6 @@ process to bind `127.0.0.1:27125` becomes internet-facing.
 
 ---
 
-`Handoff complete. Next safe action: re-review GP-523 at 4dcbb83c before any push — the prior review is void at this head.`
+`Handoff complete — SUPERSEDED 2026-08-18. The review ran, FAILED on one blocker, the blocker was
+repaired and independently re-verified, and the work now sits on PR #672. Nothing remains
+outstanding from this handoff; see the banner at the top of this file for the current state.`

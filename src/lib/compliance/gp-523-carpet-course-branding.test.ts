@@ -90,7 +90,13 @@ function stringLiterals(source: string): string[] {
   const withoutComments = source
     .replace(/\/\*[\s\S]*?\*\//g, '')
     .replace(/(^|[^:])\/\/.*$/gm, '$1');
-  return withoutComments.match(/'(?:[^'\\\n]|\\.)*'|"(?:[^"\\\n]|\\.)*"/g) ?? [];
+  // Backtick literals are included deliberately. Scanning only ' and " left a hole a release
+  // guard must not have: a title written as a template literal bypassed the acronym check
+  // entirely. Found on review 2026-08-18; the seed catalogue happens to contain no acronym in a
+  // template literal today, so this closes a latent gap rather than a live defect.
+  return (
+    withoutComments.match(/'(?:[^'\\\n]|\\.)*'|"(?:[^"\\\n]|\\.)*"|`(?:[^`\\]|\\.)*`/g) ?? []
+  );
 }
 
 /**
@@ -185,6 +191,29 @@ describe('positive control — the checks below can fail', () => {
     ].join('\n');
     const offenders = stringLiterals(sample).filter((s) => ACRONYM_RE.test(s));
     expect(offenders).toEqual([banned]);
+  });
+
+  it('catches an acronym inside a TEMPLATE literal, not only quoted strings', () => {
+    // Review finding 2026-08-18: scanning only ' and " meant a title written with backticks
+    // bypassed the acronym check entirely. Asserted both ways so the extraction cannot silently
+    // regress to quote-only.
+    const backticked = '`Commercial Carpet Care (' + 'CCT' + ')`';
+    const found = stringLiterals('const title = ' + backticked + ';').filter((s) =>
+      ACRONYM_RE.test(s)
+    );
+    expect(found).toEqual([backticked]);
+
+    // The quote-only extraction this replaced returns nothing for the same input — proving the
+    // assertion above discriminates rather than passing for an unrelated reason.
+    const quoteOnly =
+      ('const title = ' + backticked + ';').match(/'(?:[^'\\\n]|\\.)*'|"(?:[^"\\\n]|\\.)*"/g) ?? [];
+    expect(quoteOnly.filter((s) => ACRONYM_RE.test(s))).toEqual([]);
+
+    // A comment written with backticks still must not count as branding.
+    const commented = stringLiterals('// naming `' + 'WRT' + '` in a comment\n').filter((s) =>
+      ACRONYM_RE.test(s)
+    );
+    expect(commented).toEqual([]);
   });
 
   it('reads the real files, not empty strings', () => {
