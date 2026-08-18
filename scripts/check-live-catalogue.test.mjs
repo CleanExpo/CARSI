@@ -325,6 +325,52 @@ check('a digit is never treated as a designation letter', () => {
   assert.equal(hits.length, 0, 'digits must not fold into OCT');
 });
 
+console.log('live-catalogue guard — round 6: "-aligned" must mean DESIGNATION-aligned');
+
+// P1 round 6 (gpt-5.5), FALSE POSITIVE. A bare /-aligned/ flagged `AS/NZS-aligned …`. That is
+// not merely legitimate wording — CLAUDE.md REQUIRES AS/NZS framing on Australian course
+// content, so the guard was flagging the house style it exists to protect. Nominative
+// standards references are correct usage; only IICRC discipline designations are branding.
+check('does NOT fire on AS/NZS-aligned, which CARSI course copy is required to use', () => {
+  const hits = scanCourse({
+    slug: 'as-nzs-electrical-safety',
+    title: 'AS/NZS-aligned Electrical Safety for Restoration Technicians — 230 V / 50 Hz / 10 A | CARSI',
+  });
+  assert.equal(hits.length, 0, 'AS/NZS framing is mandated, not banned');
+});
+
+check('does NOT fire on ANSI-aligned', () => {
+  assert.equal(scanCourse({ slug: 'c', title: 'ANSI-aligned Drying Practice | CARSI' }).length, 0);
+});
+
+check('does NOT fire on ISO-aligned', () => {
+  assert.equal(scanCourse({ slug: 'c', title: 'ISO-aligned Quality Systems | CARSI' }).length, 0);
+});
+
+check('still fires on a DESIGNATION-aligned title', () => {
+  const hits = scanCourse({
+    slug: 'structural-drying',
+    title: 'Applied Structural Drying — Core Concepts (ASD-aligned) | CARSI',
+  });
+  assert.ok(hits.some((h) => h.rule === 'title-aligned'));
+});
+
+check('still fires on IICRC-aligned', () => {
+  const hits = scanCourse({ slug: 'general', title: 'IICRC-aligned Restoration Course | CARSI' });
+  assert.ok(hits.some((h) => h.rule === 'title-aligned'));
+});
+
+check('fires on a space-separated designation-aligned form', () => {
+  const hits = scanCourse({ slug: 'general', title: 'WRT aligned Water Damage | CARSI' });
+  assert.ok(hits.some((h) => h.rule === 'title-aligned'));
+});
+
+check('the reported detail names the matched phrase, not a generic label', () => {
+  const hits = scanCourse({ slug: 'c', title: 'Course (FSRT-aligned) | CARSI' });
+  const aligned = hits.find((h) => h.rule === 'title-aligned');
+  assert.match(aligned.detail, /FSRT-aligned/i, 'an operator must see what actually matched');
+});
+
 // --- end-to-end: exit codes against a fixture site -------------------------------------
 //
 // The checks above are pure. They cannot see fetchText() rejecting a non-2xx page, nor the

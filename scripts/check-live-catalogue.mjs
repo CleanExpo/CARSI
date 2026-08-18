@@ -153,7 +153,14 @@ export function scanCourse({ slug, title }) {
       hits.push({ rule: 'slug-acronym', detail: a });
     }
   }
-  if (/-aligned\b/i.test(fTitle)) hits.push({ rule: 'title-aligned', detail: '"-aligned"' });
+  // "-aligned" is banned ONLY when what precedes it is an IICRC discipline designation. A bare
+  // /-aligned/ flagged `AS/NZS-aligned Electrical Safety …`, which is not merely legitimate —
+  // CLAUDE.md REQUIRES AS/NZS framing on Australian course content, so the guard was flagging
+  // the house style it exists to protect. ANSI-, ISO- and AS/NZS-aligned are all correct
+  // nominative usage; only the designations are branding.
+  const alignedRe = new RegExp(`\\b(?:${[...BANNED_ACRONYMS, 'IICRC'].join('|')})[-\\s]?aligned\\b`, 'i');
+  const alignedHit = fTitle.match(alignedRe);
+  if (alignedHit) hits.push({ rule: 'title-aligned', detail: `"${alignedHit[0]}"` });
   return hits;
 }
 

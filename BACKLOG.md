@@ -128,3 +128,12 @@ RWR; it compounds slowly and must not be read as revenue movement.
 - 2026-08-17 · **Merging to `main` deploys straight to production** (`deploy_on_push: true` in
   `app.yaml`) and `main` requires no pull-request review. Worth a deliberate decision rather
   than leaving it implicit.
+- 2026-08-18 · **CLC-P2-001 — digit lookalikes of banned designations are deliberately not
+  caught** by `check-live-catalogue`. Raised as a documented P2 by independent review at
+  `a3530296` and accepted, not fixed. Folding digits (`0`->`O`, `5`->`S`) was removed because it
+  corrupted the metric and electrical text CARSI's Australian-production standard requires on
+  nearly every course — `50 m² @ 230 V` folded to `SO m2 @ 23O V` — and opened a false-positive
+  path where `0ct` becomes `OCT`. A title reading `0CT` therefore escapes this guard. Accepted
+  because a digit is not a plausible staff-authored form and a false positive on a licence guard
+  costs more than this miss; `check-iicrc-compliance` remains the backstop. Revisit only if a
+  digit-form designation is ever observed on the live catalogue.
