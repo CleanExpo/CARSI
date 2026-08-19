@@ -603,7 +603,8 @@ async function main() {
   if (violations.length) {
     console.error(
       `\n${violations.length} live course(s) carry banned IICRC discipline branding. ` +
-        'Course data is edited through the admin session, not this repo — see DECISIONS #19.',
+        'Course data is edited through the admin session, not this repo — see DECISIONS #16 ' +
+          'and BACKLOG #31.',
     );
     process.exit(1);
   }

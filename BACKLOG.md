@@ -219,3 +219,17 @@ of what is actually being sold.
   a ruling on which surfaces are "course branding". Until then `check-iicrc-compliance` remains
   the repo-side backstop, and its 46%-of-catalogue ceiling still applies. Blast radius if
   ignored: unknown — no live page is currently known to do this, and nothing measures it.
+
+- 2026-08-19 · **CLC-P2-006 — exotic HTML5 named entities are still not decoded.** Raised by
+  independent review round 4 on PR #674 (gpt-5.5-high) and reproduced: `&AMPWRT` and `&Wopf;RT`
+  render text a reader sees as WRT-like, but `decodeEntities` knows only the five named entities
+  it needs (`amp`, `lt`, `gt`, `quot`, `apos`) plus the full numeric forms. Accepted, not fixed.
+  The full HTML5 named-entity table is ~2,231 entries; embedding it — or adding a parser
+  dependency to a guard that must run with zero install — buys coverage of forms no CMS emits,
+  in exchange for a much larger false-positive surface and a dependency in the one guard that
+  reads production. The classes that actually occur in authored copy are closed: numeric
+  references decimal and hex, with or without the semicolon and with any padding; the five named
+  entities a title realistically carries; every default-ignorable character; and full URL
+  normalisation. Revisit only if an exotic named entity is ever observed on the live catalogue —
+  and fix it by decoding with a real HTML parser, never by hand-extending the table, which is the
+  ratchet this file has already lost to three times.
