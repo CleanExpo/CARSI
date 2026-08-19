@@ -1,6 +1,6 @@
 # Module 12 — Advanced Stain Removal Masterclass
 
-*Deep-dive expansion of Module 5 (Spot & Stain Removal). Australian-produced · IICRC S100-aligned ·
+*Deep-dive expansion of Module 5 (Spot & Stain Removal). Australian-produced · aligned to ANSI/IICRC S100 ·
 verifiable. Assumes the Module 5 decision tree, the six-bottle kit, and the three-attempt rule.*
 
 Module 5 gives you the framework: identify the class, blot not rub, cold-first then escalate, know when

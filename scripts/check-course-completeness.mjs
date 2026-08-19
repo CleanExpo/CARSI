@@ -26,6 +26,7 @@
  */
 import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 const CATALOG = 'data/seed/courses-catalog.json';
 const DRAFTS_DIR = 'data/seed/assessment-drafts';
@@ -74,7 +75,14 @@ function bodyStats(course) {
   return { chars, lessons, quizWithContent };
 }
 
-function scoreCourse(course) {
+/**
+ * Exported so scripts/check-course-completeness.test.mjs can prove each bar FAILS when the
+ * element is missing, without those gaps having to exist in the catalogue. This scorecard
+ * runs in advisory mode and exits 0 even while reporting 0/37 finalised, so nothing else in
+ * CI can tell the difference between a working bar and a bar that always returns true —
+ * exactly how the introVideo shortcut survived.
+ */
+export function scoreCourse(course) {
   const slug = course.slug || course.id;
   const { chars, lessons, quizWithContent } = bodyStats(course);
   const bodyBlob = JSON.stringify(course).toLowerCase();
@@ -82,7 +90,18 @@ function scoreCourse(course) {
   const checks = {
     assessment: quizWithContent || draftSlugs.has(slug),
     thumbnail: !!course.thumbnailUrl,
-    introVideo: !!course.introVideoUrl || mediaSlugs.has(slug) || mediaSlugs.has('ccw-workshop') && /ccw|carpet|floor|truckmount/.test(slug),
+    // Evidence about THIS course only: an intro video on the course record, or a media manifest
+    // that names this slug and carries a video asset.
+    //
+    // A third clause used to read:
+    //   mediaSlugs.has('ccw-workshop') && /ccw|carpet|floor|truckmount/.test(slug)
+    // which passed any course whose slug merely CONTAINED one of those words, on the strength of
+    // a single unrelated `ccw-workshop` manifest. It reported 5 of 37 courses "finalised" while
+    // every one of the 37 had introVideoUrl undefined — verified by direct field read. A
+    // scorecard that manufactures a pass is worse than no scorecard: it retires the very work it
+    // exists to track. If a course really is covered by workshop footage, name its slug in a
+    // manifest and the second clause will find it.
+    introVideo: !!course.introVideoUrl || mediaSlugs.has(slug),
     metadata: !!course.durationHours && !!course.level && !!course.category && !!course.shortDescription && Array.isArray(course.tags) && course.tags.length > 0,
     scaffolds: /objective|by the end|you will (be able|learn)/.test(bodyBlob) && /(did you know|key takeaway|remember|expert nugget|take-?away|in summary|recap)/.test(bodyBlob),
     depth: chars >= MIN_BODY && (lessons === 0 || chars / lessons >= MIN_PER_LESSON),
@@ -90,6 +109,16 @@ function scoreCourse(course) {
   const open = Object.entries(checks).filter(([, ok]) => !ok).map(([k]) => k);
   return { slug, title: course.title, chars, lessons, checks, open, complete: open.length === 0 };
 }
+
+// CLI only. Importing this module for the self-test must not run the scan or exit the
+// process — without this, `import` prints the whole scorecard and calls process.exit(),
+// so a self-test can never observe scoreCourse at all.
+// pathToFileURL, never `file://` + the raw path — an unencoded space (or any character needing
+// percent-encoding) in the checkout path makes this false and silently disarms the check.
+const isCli = Boolean(process.argv[1]) && import.meta.url === pathToFileURL(process.argv[1]).href;
+if (!isCli) {
+  // Nothing below runs on import.
+} else {
 
 const scored = courses.map(scoreCourse);
 
@@ -132,3 +161,5 @@ if (failing.length) {
 }
 console.log(`\n  ✓ all enforced courses finalised.\n`);
 process.exit(0);
+
+}

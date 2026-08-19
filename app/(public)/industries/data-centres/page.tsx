@@ -16,7 +16,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Data Centre IICRC CEC Training',
   description:
-    'IICRC restoration training for Australian data centres. WRT, ASD and FSRT courses for water damage prevention, climate control recovery, and fire suppression system response.',
+    'IICRC CEC Accredited restoration courses for Australian data centres. Water damage restoration, structural drying and fire & smoke restoration courses for water damage prevention, climate control recovery, and fire suppression system response.',
   keywords: [
     'data centre IICRC CEC training Australia',
     'water damage prevention data centre',
@@ -79,7 +79,7 @@ const whyCards = [
     icon: Droplets,
     title: 'Water Damage Prevention',
     description:
-      'CRAC unit leaks, overhead pipe bursts, and cooling failures are the leading non-power cause of data centre outages. WRT and ASD training equips teams to contain and dry before equipment damage occurs.',
+      'CRAC unit leaks, overhead pipe bursts, and cooling failures are the leading non-power cause of data centre outages. Water damage restoration and structural drying training equips teams to contain and dry before equipment damage occurs.',
     color: '#4A148C',
   },
   {
@@ -105,7 +105,7 @@ export default async function DataCentresIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Data Centre"
         headlineAccent="Protection Training"
-        description="IICRC restoration training for Australia's 300+ data centres. Credentials for water damage prevention, climate control recovery, and fire suppression system response — protecting uptime SLAs and infrastructure investment."
+        description="IICRC CEC Accredited restoration courses for Australia's 300+ data centres. Credentials for water damage prevention, climate control recovery, and fire suppression system response — protecting uptime SLAs and infrastructure investment."
         disciplines={disciplines}
         stats={stats}
       />
@@ -119,7 +119,7 @@ export default async function DataCentresIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="Data Centres"
-        disciplineList="WRT, ASD & FSRT"
+        disciplineList="Water damage restoration, structural drying and fire & smoke restoration"
         disciplines={['WRT', 'ASD', 'FSRT']}
       />
 
@@ -129,7 +129,7 @@ export default async function DataCentresIndustryPage() {
         subtitle="Data Centre Training"
         title="Data Centre Protection Bundle"
         price={industryBundlePriceLabel('data-centres')}
-        description="WRT + ASD + FSRT training for data centre facility teams. Includes cooling system failure response and post-suppression cleanup protocols. Online, self-paced — fits around maintenance windows."
+        description="water damage restoration, structural drying and fire & smoke restoration training for data centre facility teams. Includes cooling system failure response and post-suppression cleanup protocols. Online, self-paced — fits around maintenance windows."
         ctaText="Protect Your Infrastructure"
         accentColor={ACCENT_COLOR}
       />

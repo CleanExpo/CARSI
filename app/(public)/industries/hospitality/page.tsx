@@ -19,7 +19,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = buildIndustryMetadata(
   'hospitality',
   'Hospitality IICRC CEC Training',
-  'IICRC-aligned training for Australian hotels and resorts. WRT, CRT, ASD and OCT courses for water damage, carpet care, structural drying and odour control.',
+  'IICRC CEC Accredited training for Australian hotels and resorts. Water damage restoration, carpet repair, structural drying and odour control courses for water damage, carpet care, structural drying and odour control.',
   [
     'hospitality IICRC CEC training',
     'hotel restoration training',
@@ -48,27 +48,27 @@ const faqs = [
   {
     question: 'How do hotels handle water damage in guest rooms?',
     answer:
-      'Hotels require rapid water damage response to minimise room downtime and protect guest reviews. IICRC WRT (Water Damage Restoration) training teaches maintenance teams to assess damage categories, deploy extraction equipment, and document the restoration process for insurance claims — all within the tight turnaround hospitality demands.',
+      'Hotels require rapid water damage response to minimise room downtime and protect guest reviews. CARSI water damage restoration training teaches maintenance teams to assess damage categories, deploy extraction equipment, and document the restoration process for insurance claims — all within the tight turnaround hospitality demands.',
   },
   {
     question: 'What carpet maintenance training do hotel staff need?',
     answer:
-      'Hotel maintenance teams benefit from IICRC CRT (Carpet Repair & Reinstallation) certification for lobbies, corridors, and conference rooms that see thousands of daily footfalls. Training covers spot dyeing, re-stretching, seam repair, and pattern matching — skills that extend carpet lifespan and reduce replacement costs across large properties.',
+      'Hotel maintenance teams benefit from CARSI carpet repair and reinstallation training for lobbies, corridors, and conference rooms that see thousands of daily footfalls. Training covers spot dyeing, re-stretching, seam repair, and pattern matching — skills that extend carpet lifespan and reduce replacement costs across large properties.',
   },
   {
     question: 'How do you remove odours from hotel rooms in Australia?',
     answer:
-      'IICRC OCT (Odour Control) certification trains hotel staff in source identification, thermal fogging, ozone treatment, and hydroxyl generation for smoke, pet, and biological odours. Proper odour remediation prevents negative guest reviews and avoids taking rooms offline unnecessarily.',
+      'CARSI odour control training trains hotel staff in source identification, thermal fogging, ozone treatment, and hydroxyl generation for smoke, pet, and biological odours. Proper odour remediation prevents negative guest reviews and avoids taking rooms offline unnecessarily.',
   },
   {
     question: 'Can hospitality teams complete IICRC CEC training online?',
     answer:
-      'Yes. CARSI offers IICRC CEC Accredited courses online and self-paced, ideal for hotel teams working rotating rosters. Staff can complete modules between shifts. Courses issue verifiable digital credentials and count toward IICRC Continuing Education Credits.',
+      'Yes. CARSI offers IICRC CEC Accredited courses online and self-paced, ideal for hotel teams working rotating rosters. Staff can complete modules between shifts. Courses issue verifiable digital credentials.',
   },
   {
     question: 'What is structural drying training for hotel pool and spa areas?',
     answer:
-      'IICRC ASD (Applied Structural Drying) training covers moisture mapping, psychrometric calculations, and equipment placement for pool overflow and spa water incidents. For hospitality properties, this prevents secondary damage to surrounding guest rooms, change rooms, and below-grade structures.',
+      'CARSI applied structural drying training covers moisture mapping, psychrometric calculations, and equipment placement for pool overflow and spa water incidents. For hospitality properties, this prevents secondary damage to surrounding guest rooms, change rooms, and below-grade structures.',
   },
 ];
 
@@ -106,7 +106,7 @@ export default async function HospitalityIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Hospitality"
         headlineAccent="Restoration Training"
-        description="Keep guests comfortable and properties protected. IICRC-aligned training for hotel maintenance teams covering water damage, carpet care, structural drying, and odour control."
+        description="Keep guests comfortable and properties protected. IICRC CEC Accredited training for hotel maintenance teams covering water damage, carpet care, structural drying, and odour control."
         disciplines={disciplines}
         stats={stats}
       />
@@ -121,7 +121,7 @@ export default async function HospitalityIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="Hospitality & Tourism"
-        disciplineList="WRT, CRT, ASD & OCT"
+        disciplineList="Water damage restoration, carpet repair, structural drying and odour control"
         disciplines={['WRT', 'CRT', 'ASD', 'OCT']}
       />
 
@@ -133,7 +133,7 @@ export default async function HospitalityIndustryPage() {
         subtitle="Hospitality training bundle"
         title="Hotel Maintenance Bundle"
         price={industryBundlePriceLabel('hospitality')}
-        description="WRT + CRT + OCT training for hotel maintenance teams. Bulk licensing available for hotel chains and resort groups."
+        description="water damage restoration, carpet repair and odour control training for hotel maintenance teams. Bulk licensing available for hotel chains and resort groups."
         ctaText="Request bundle pricing"
         ctaHref="/contact"
         accentColor={ACCENT_COLOR}

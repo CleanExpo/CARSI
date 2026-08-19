@@ -61,7 +61,7 @@ Upon successful completion of this course, students will be able to:
 
 ## Accreditation
 
-This course earns **IICRC Continuing Education Credits (CECs)** toward maintaining your existing IICRC certification (hours confirmed once the course is approved by the IICRC). CECs contribute to the maintenance of IICRC certifications including WRT (Water Damage Restoration Technician), ASD (Applied Structural Drying) and related designations.
+This course awards a CARSI Southern Hemisphere Restoration Designation. It carries IICRC CECs only if and when the IICRC approves it. CECs contribute to the maintenance of IICRC certifications including WRT (Water Damage Restoration Technician), ASD (Applied Structural Drying) and related designations.
 
 ---
 
@@ -105,7 +105,7 @@ Yes. Module 6 includes hands-on instruction for navigating Xactimate with Austra
 
 ### 6. How do IICRC CECs work?
 
-Upon completing the course and passing the final assessment, you earn IICRC Continuing Education Credits (CECs) toward maintaining your existing IICRC certification (hours confirmed once the course is approved by the IICRC). These credits are recorded against your IICRC certification profile and contribute to your ongoing certification maintenance requirements.
+Upon completing the course and passing the final assessment, you earn your CARSI Southern Hemisphere Restoration Designation (hours confirmed once the course is approved by the IICRC). These credits are recorded against your IICRC certification profile and contribute to your ongoing certification maintenance requirements.
 
 ### 7. Is this course recognised by Australian insurers?
 

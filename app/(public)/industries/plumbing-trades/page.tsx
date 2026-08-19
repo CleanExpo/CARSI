@@ -16,7 +16,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'IICRC CEC Training for Plumbers & Trades | CARSI Australia',
   description:
-    'Turn water damage call-outs into drying contracts. IICRC WRT and ASD CEC courses for Australian plumbers and trade contractors — online, self-paced, CEC Accredited. These are continuing education (CEC) courses, not IICRC certification.',
+    'Turn water damage call-outs into drying contracts. CARSI water damage restoration and applied structural drying CEC courses for Australian plumbers and trade contractors — online, self-paced, CEC Accredited. These are continuing education (CEC) courses, not IICRC certification.',
   keywords: [
     'IICRC CEC training plumbers Australia',
     'WRT CEC course plumbing',
@@ -105,7 +105,7 @@ export default async function PlumbingTradesIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Turn Call-Outs Into"
         headlineAccent="Drying Contracts"
-        description="85,000+ licensed Australian plumbers leave water damage behind every day. IICRC WRT and ASD CEC courses give your trade business the continuing-education grounding to capture the full remediation scope — and the revenue that comes with it. CARSI courses earn IICRC CECs; they are not IICRC certification."
+        description="85,000+ licensed Australian plumbers leave water damage behind every day. CARSI water damage restoration and applied structural drying CEC courses give your trade business the continuing-education grounding to capture the full remediation scope — and the revenue that comes with it. CARSI courses carry CARSI Southern Hemisphere Restoration Designations, not IICRC certification."
         disciplines={disciplines}
         stats={stats}
       />
@@ -119,7 +119,7 @@ export default async function PlumbingTradesIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="Plumbing & Trades"
-        disciplineList="WRT, ASD & AMRT"
+        disciplineList="Water damage restoration, structural drying and mould remediation"
         disciplines={['WRT', 'ASD', 'AMRT']}
       />
 
@@ -129,7 +129,7 @@ export default async function PlumbingTradesIndustryPage() {
         subtitle="Plumbing & Trades Training"
         title="Trades Restoration Bundle"
         price={industryBundlePriceLabel('plumbing-trades')}
-        description="WRT + ASD training for licensed plumbers and trade contractors. Complete online between jobs. IICRC CEC Accredited."
+        description="water damage restoration and structural drying training for licensed plumbers and trade contractors. Complete online between jobs. IICRC CEC Accredited."
         ctaText="Add Restoration to Your Business"
         accentColor={ACCENT_COLOR}
       />

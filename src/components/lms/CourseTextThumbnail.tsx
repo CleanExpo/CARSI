@@ -11,49 +11,49 @@ const DISCIPLINE_ACCENTS: Record<
   { fg: string; glow: string; from: string; via: string; to: string }
 > = {
   WRT: {
-    fg: '#146fc2',
+    fg: '#0b5a9c',
     glow: 'rgba(36,144,237,0.22)',
     from: '#eef7ff',
     via: '#dceeff',
     to: '#ffffff',
   },
   CRT: {
-    fg: '#047f6f',
+    fg: '#036356',
     glow: 'rgba(38,196,160,0.2)',
     from: '#ecfdf7',
     via: '#d7fbef',
     to: '#ffffff',
   },
   ASD: {
-    fg: '#4f46e5',
+    fg: '#3c34b8',
     glow: 'rgba(108,99,255,0.18)',
     from: '#f0f1ff',
     via: '#e3e5ff',
     to: '#ffffff',
   },
   OCT: {
-    fg: '#7e3ba0',
+    fg: '#6a2f88',
     glow: 'rgba(155,89,182,0.18)',
     from: '#fbf0ff',
     via: '#f1ddfb',
     to: '#ffffff',
   },
   CCT: {
-    fg: '#0f7890',
+    fg: '#0b5f73',
     glow: 'rgba(23,184,212,0.18)',
     from: '#ecfbff',
     via: '#d9f6fb',
     to: '#ffffff',
   },
   FSRT: {
-    fg: '#c2410c',
+    fg: '#9c340a',
     glow: 'rgba(240,90,53,0.18)',
     from: '#fff4ed',
     via: '#ffe3d2',
     to: '#ffffff',
   },
   AMRT: {
-    fg: '#15803d',
+    fg: '#116631',
     glow: 'rgba(39,174,96,0.18)',
     from: '#f0fdf4',
     via: '#dcfce7',
@@ -68,7 +68,7 @@ const DISCIPLINE_ACCENTS: Record<
  * takes this one CARSI-neutral treatment.
  */
 const CARSI_NEUTRAL: (typeof DISCIPLINE_ACCENTS)['WRT'] = {
-  fg: '#9a4526',
+  fg: '#7d3820',
   glow: 'rgba(184,92,56,0.16)',
   from: '#faf5ef',
   via: '#f2e8db',
@@ -87,9 +87,24 @@ function inferDisciplineCode(
   return null;
 }
 
+/**
+ * GP-523: course `category` values imported from the legacy WordPress catalogue are
+ * sometimes prefixed with an IICRC discipline acronym ("CCT Commercial Carpet"). The
+ * acronym may not brand a CARSI course, so it is stripped from the visible label while
+ * the plain-English restoration topic is kept. Exported for regression testing.
+ */
+export function stripDisciplineAcronym(category: string | null | undefined): string {
+  const c = category?.trim() ?? '';
+  if (!c) return '';
+  const stripped = c.replace(/^(?:WRT|CRT|ASD|OCT|CCT|FSRT|AMRT|TCST)\b[\s\-–—:/]*/i, '').trim();
+  return stripped;
+}
+
 function shouldShowCategoryLabel(category: string | null | undefined, code: string | null) {
   const c = category?.trim();
   if (!c) return false;
+  // A category that is nothing but the acronym has no plain-English label left to show.
+  if (!stripDisciplineAcronym(c)) return false;
   if (!code) return true;
   return c.toUpperCase() !== code;
 }
@@ -198,7 +213,10 @@ export function CourseTextThumbnail({
   const showDesc = !isCard && Boolean(shortDescription?.trim());
   const showModuleCallout =
     !isCard && moduleCount != null && (moduleCount > 0 || variant === 'admin');
-  const disciplineLabel = code ? (IICRC_DISCIPLINE_SHORT[code] ?? code) : null;
+  // GP-523: fail CLOSED — an unmapped code must never fall back to rendering the raw
+  // acronym. Only the plain-English restoration topic is shown on a CARSI course.
+  const disciplineLabel = code ? (IICRC_DISCIPLINE_SHORT[code] ?? null) : null;
+  const categoryLabel = stripDisciplineAcronym(category);
   const hasCardStats =
     isCard &&
     ((moduleCount != null && moduleCount > 0) ||
@@ -263,15 +281,13 @@ export function CourseTextThumbnail({
             }}
             aria-hidden
           />
-          {isCard && code ? (
-            <div
-              className="pointer-events-none absolute -right-1 bottom-0 z-0 select-none font-mono text-[4.5rem] font-black leading-none tracking-tighter opacity-[0.07]"
-              style={{ color: accent.fg }}
-              aria-hidden
-            >
-              {code}
-            </div>
-          ) : null}
+          {/*
+            GP-523: the oversized watermark used to render the raw IICRC discipline
+            acronym on every CARSI course card. CARSI issues its own Southern Hemisphere
+            Restoration Designations and may not brand a course with an IICRC
+            Registered-Training-School discipline acronym, so the acronym text is gone;
+            the discipline-derived accent colour stays.
+          */}
         </>
       )}
 
@@ -283,18 +299,13 @@ export function CourseTextThumbnail({
       >
         <div className="mb-2 flex items-start justify-between gap-2">
           <div className="flex min-w-0 flex-wrap items-center gap-1">
-            {code ? (
-              <span
-                className="rounded-md px-1.5 py-0.5 font-mono text-[10px] font-bold tracking-wide uppercase"
-                style={{
-                  color: accent.fg,
-                  background: hasBackdrop ? 'rgba(0,0,0,0.45)' : 'rgba(255,255,255,0.88)',
-                  border: `1px solid ${accent.fg}44`,
-                }}
-              >
-                {code}
-              </span>
-            ) : null}
+            {/*
+              GP-523: this badge rendered the IICRC discipline acronym on the public
+              course card — the "catalogue renders discipline acronym cards" defect
+              named in the ticket. The plain-English restoration topic is still shown
+              by the category label below (and by `disciplineLabel` on the non-card
+              variants), so no information is lost.
+            */}
             {draft ? (
               <span className="rounded-md bg-amber-500/90 px-1.5 py-0.5 text-[9px] font-bold tracking-wide text-black uppercase">
                 Draft
@@ -331,7 +342,7 @@ export function CourseTextThumbnail({
                         : 'border border-slate-200/90 bg-white/80 text-slate-700'
                     )}
                   >
-                    {category}
+                    {categoryLabel}
                   </span>
                 ) : null}
               </div>
@@ -351,14 +362,14 @@ export function CourseTextThumbnail({
               >
                 {disciplineLabel}
               </p>
-            ) : showCategory && category ? (
+            ) : showCategory && categoryLabel ? (
               <p
                 className={cn(
                   'line-clamp-1 text-[11px] font-semibold tracking-wide uppercase',
                   hasBackdrop ? 'text-white/85' : 'text-slate-600'
                 )}
               >
-                {category}
+                {categoryLabel}
               </p>
             ) : null}
 

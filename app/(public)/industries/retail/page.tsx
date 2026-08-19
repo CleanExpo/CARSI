@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Retail & Shopping Centre IICRC CEC Training',
   description:
-    'IICRC CEC training for shopping centre maintenance teams. Pre-qualify for major landlord panels with WRT, CRT and OCT credentials.',
+    'IICRC CEC training for shopping centre maintenance teams. Pre-qualify for major landlord panels with water damage restoration, carpet repair and odour control credentials.',
   keywords: [
     'retail IICRC CEC training',
     'shopping centre restoration',
@@ -80,7 +80,7 @@ export default async function RetailIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Shopping Centre"
         headlineAccent="Restoration Training"
-        description="IICRC-aligned training for retail property maintenance teams. Pre-qualify for major landlord panels and deliver rapid-response restoration across shopping centre portfolios."
+        description="IICRC CEC Accredited training for retail property maintenance teams. Pre-qualify for major landlord panels and deliver rapid-response restoration across shopping centre portfolios."
         disciplines={disciplines}
         stats={stats}
       />
@@ -94,7 +94,7 @@ export default async function RetailIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="Retail & Shopping Centres"
-        disciplineList="WRT, CRT, OCT & FSRT"
+        disciplineList="Water damage restoration, carpet repair, odour control and fire & smoke restoration"
         disciplines={['WRT', 'CRT', 'OCT', 'FSRT']}
       />
 
@@ -104,7 +104,7 @@ export default async function RetailIndustryPage() {
         subtitle="Shopping Centre Training"
         title="Retail Contractor Bundle"
         price={industryBundlePriceLabel('retail')}
-        description="WRT + CRT + OCT training for shopping centre maintenance teams. Equip your crew for rapid tenant restoration and food court compliance."
+        description="water damage restoration, carpet repair and odour control training for shopping centre maintenance teams. Equip your crew for rapid tenant restoration and food court compliance."
         ctaText="Get Started"
         accentColor={ACCENT_COLOR}
       />

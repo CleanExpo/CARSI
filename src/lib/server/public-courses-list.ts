@@ -19,6 +19,26 @@ export const lmsPublishedCourseWhere: Prisma.LmsCourseWhereInput = {
   status: { equals: 'published', mode: 'insensitive' },
 };
 
+/**
+ * The same predicate, for rows already in memory.
+ *
+ * Defined here, immediately beside the Prisma filter, so the database question and the
+ * in-memory question can never answer differently. Callers that fetched a course through a
+ * relation (a pathway's ordered courses, for instance) must use this rather than reading the
+ * legacy `isPublished` column — doing that split the product in two: 20 courses currently carry
+ * status='published' with isPublished=false, so they were enrollable from the public catalogue
+ * and simultaneously invisible in pathways and team assignment.
+ */
+export function isPublishedCourseStatus(status: string | null | undefined): boolean {
+  // Deliberately NOT trimmed. Prisma's `equals: 'published', mode: 'insensitive'` does not
+  // trim either, and the whole point of this predicate is to give the same answer as the
+  // database. Trimming here made '  published  ' visible in pathway and team filters while
+  // the catalogue, checkout and team queries excluded the same row — the split-brain this
+  // function exists to close, reintroduced one layer up. `status` is an unconstrained
+  // String column, so the padded value is allowed even though no seed row currently uses it.
+  return typeof status === 'string' && status.toLowerCase() === 'published';
+}
+
 const publishedWhere = lmsPublishedCourseWhere;
 
 const draftWhere = {
@@ -351,6 +371,41 @@ export async function getPublishedCourseListItemsFromDatabase(options?: {
 /**
  * Single published course for `/courses/[slug]` (same source of truth as the index when using Prisma).
  */
+/**
+ * Total a module's runtime ONLY when every lesson in it carries a real duration.
+ *
+ * A partial sum is the dangerous case: it renders as "Module 2 — 12 min" while silently
+ * omitting the lessons nobody has timed, so it reads as authoritative and is wrong. Absent
+ * data must look absent. Returns null for an empty module, a module with no timings, and a
+ * module that is only partly timed.
+ */
+/** Syllabus fetch bounds — CARSI_VERIFICATION_GATE.md rule 2 (bounded queries). */
+const SYLLABUS_MODULE_CAP = 60;
+const SYLLABUS_LESSON_CAP = 100;
+
+/**
+ * The body a logged-out visitor is allowed to read for one lesson.
+ *
+ * Returns the body ONLY for a lesson explicitly flagged as a preview. Every other lesson
+ * returns null, whatever its content holds. This runs server-side and is the single decision
+ * point — paid lesson content must never depend on a client-side condition to stay private.
+ */
+export function previewBodyFor(lesson: {
+  isPreview: boolean;
+  contentBody: string | null;
+}): string | null {
+  if (!lesson.isPreview) return null;
+  return lesson.contentBody ?? null;
+}
+
+export function summariseModuleDuration(
+  lessons: { durationMinutes: number | null }[]
+): number | null {
+  if (lessons.length === 0) return null;
+  if (!lessons.every((l) => typeof l.durationMinutes === 'number')) return null;
+  return lessons.reduce((n, l) => n + (l.durationMinutes ?? 0), 0);
+}
+
 export async function getPublishedCourseDetailBySlugFromDatabase(slug: string) {
   const target = decodeURIComponent(slug).trim();
   if (!target) return null;
@@ -363,10 +418,49 @@ export async function getPublishedCourseDetailBySlugFromDatabase(slug: string) {
     include: {
       instructor: { select: { fullName: true } },
       _count: { select: { modules: true } },
+      modules: {
+        orderBy: { orderIndex: 'asc' },
+        // Bounded per CARSI_VERIFICATION_GATE.md rule 2 — a syllabus grows with the course and
+        // an unbounded nested fetch is a latency time-bomb. The largest live course is well
+        // inside these caps; a course exceeding them renders a truncated syllabus rather than
+        // pulling an unbounded tree on every public page view.
+        take: SYLLABUS_MODULE_CAP,
+        select: {
+          id: true,
+          title: true,
+          lessons: {
+            orderBy: { orderIndex: 'asc' },
+            take: SYLLABUS_LESSON_CAP,
+            select: {
+              id: true,
+              title: true,
+              contentType: true,
+              isPreview: true,
+              durationMinutes: true,
+              // contentBody is deliberately NOT selected here. Fetching every lesson's full text
+              // on every public page view — then discarding all but the preview in JS — pulled
+              // paid content out of the database for no reason. The preview body is fetched
+              // separately below, bounded to the single lesson actually shown.
+            },
+          },
+        },
+      },
     },
   });
 
   if (!row) return null;
+
+  // Fetch the body of the ONE preview lesson actually rendered, rather than every lesson's body.
+  // Bounded by construction: a single row, looked up by id, and re-checked on isPreview at the
+  // database so the guarantee does not rest on the in-memory scan that chose the id.
+  const previewLessonId =
+    row.modules.flatMap((m) => m.lessons).find((l) => l.isPreview)?.id ?? null;
+  const previewLesson = previewLessonId
+    ? await prisma.lmsLesson.findFirst({
+        where: { id: previewLessonId, isPreview: true },
+        select: { id: true, contentBody: true },
+      })
+    : null;
 
   const priceNum = Number(row.priceAud);
   return {
@@ -397,6 +491,31 @@ export async function getPublishedCourseDetailBySlugFromDatabase(slug: string) {
     }),
     thumbnail_url: normalizePublicAssetUrl(row.thumbnailUrl),
     module_count: row._count.modules,
+    // The bare module COUNT was the only curriculum signal this page had. Buyers comparing
+    // against a named syllabus cannot tell what two hours actually contains, so surface the
+    // real module and lesson titles the LMS already stores.
+    lesson_count: row.modules.reduce((n, m) => n + m.lessons.length, 0),
+    syllabus: row.modules.map((m) => {
+      return {
+        id: m.id,
+        title: m.title,
+        duration_minutes: summariseModuleDuration(m.lessons),
+        lessons: m.lessons.map((l) => ({
+          id: l.id,
+          title: l.title,
+          content_type: l.contentType,
+          is_preview: l.isPreview,
+          duration_minutes: l.durationMinutes ?? null,
+          // Hard strip. A body survives to the public page ONLY on a lesson explicitly flagged
+          // isPreview, on a course already filtered to published. Everything else is nulled here,
+          // server-side, so no client-side condition can be the thing protecting paid content.
+          preview_body:
+            previewLesson && previewLesson.id === l.id
+              ? previewBodyFor({ isPreview: l.isPreview, contentBody: previewLesson.contentBody })
+              : null,
+        })),
+      };
+    }),
     instructor: row.instructor?.fullName ? { full_name: row.instructor.fullName } : null,
     intro_video_url: readIntroVideoUrlFromMeta(row.meta),
   };

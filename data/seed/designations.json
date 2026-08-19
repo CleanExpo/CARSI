@@ -1,8 +1,8 @@
 {
   "version": 1,
   "program": "CARSI Southern Hemisphere Restoration Designations",
-  "programSummary": "CARSI designations complement the IICRC — Southern-Hemisphere training the IICRC does not offer, produced for Australian and New Zealand conditions: AS/NZS standards, 230 V/10 A power, metric units and our climate. They are not IICRC certifications and do not use IICRC designations; each is a distinct CARSI-issued credential earned through CARSI CEC-accredited training that also earns IICRC Continuing Education Credits (CECs) toward maintaining an existing IICRC certification.",
-  "positioning": "Complements the IICRC — we offer Southern-Hemisphere courses they do not. Not an IICRC certification; earns IICRC CECs.",
+  "programSummary": "CARSI designations complement the IICRC — Southern-Hemisphere training the IICRC does not offer, produced for Australian and New Zealand conditions: AS/NZS standards, 230 V/10 A power, metric units and our climate. They are not IICRC certifications and do not use IICRC designations; each is a distinct CARSI-issued credential earned through CARSI's IICRC CEC-accredited training.",
+  "positioning": "Complements the IICRC — we offer Southern-Hemisphere courses they do not. Not an IICRC certification.",
   "designations": [
     {
       "slug": "carsi-water-restoration-practitioner",

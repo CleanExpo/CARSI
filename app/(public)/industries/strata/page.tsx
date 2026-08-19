@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Strata & Body Corporate IICRC CEC Training',
   description:
-    'IICRC CEC training for strata managers and building managers. Protect common property with WRT, AMRT and ASD restoration credentials.',
+    'IICRC CEC training for strata managers and building managers. Protect common property with water damage restoration, mould remediation and structural drying restoration credentials.',
   keywords: [
     'strata IICRC CEC training',
     'body corporate restoration',
@@ -94,7 +94,7 @@ export default async function StrataIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="Strata & Body Corporate"
-        disciplineList="WRT, CRT, AMRT & ASD"
+        disciplineList="Water damage restoration, carpet repair, mould remediation and structural drying"
         disciplines={['WRT', 'CRT', 'AMRT', 'ASD']}
       />
 
@@ -104,7 +104,7 @@ export default async function StrataIndustryPage() {
         subtitle="Strata & Body Corporate Training"
         title="Building Manager Bundle"
         price={industryBundlePriceLabel('strata')}
-        description="WRT + AMRT training for strata maintenance teams. Equip your building managers with the credentials to handle water damage and mould remediation across common property."
+        description="water damage restoration and mould remediation training for strata maintenance teams. Equip your building managers with the credentials to handle water damage and mould remediation across common property."
         ctaText="Enquire Now"
         accentColor={ACCENT_COLOR}
       />

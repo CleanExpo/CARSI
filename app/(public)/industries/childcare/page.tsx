@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Childcare IICRC CEC Training',
   description:
-    'IICRC CEC training for childcare centre maintenance. AMRT and CRT training supporting NQF compliance across Australian early learning centres.',
+    'IICRC CEC training for childcare centre maintenance. Mould remediation and carpet repair training supporting NQF compliance across Australian early learning centres.',
   keywords: [
     'childcare IICRC CEC training',
     'early learning centre cleaning',
@@ -93,7 +93,7 @@ export default async function ChildcareIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="Childcare Industry"
-        disciplineList="AMRT, CRT & WRT"
+        disciplineList="Mould remediation, carpet repair and water damage restoration"
         disciplines={['CRT', 'AMRT', 'WRT']}
       />
 

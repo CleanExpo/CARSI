@@ -43,7 +43,15 @@ function webpackReactAliases(config: {
 // @serwist/next) rather than reinstating next-pwa.
 
 const nextConfig: NextConfig = {
-  output: 'standalone',
+  // `output: 'standalone'` is required for the Docker / App Platform deploys —
+  // Dockerfile, deploy/Dockerfile and scripts/prepare-standalone.sh consume
+  // .next/standalone. But Next 16.3.0's Vercel builder regresses on standalone
+  // output: its onBuildComplete step fails with `ENOENT next-server.js.nft.json`
+  // even though `next build` DOES emit that file (verified locally). main on
+  // 16.2.9 + standalone deployed green on Vercel; only the 16.3.0 upgrade broke
+  // it. Vercel optimises output natively and does not need standalone, so drop
+  // it on Vercel (process.env.VERCEL) and keep it for every other target. #659.
+  output: process.env.VERCEL ? undefined : 'standalone',
   reactStrictMode: true,
   poweredByHeader: false,
   devIndicators: false,

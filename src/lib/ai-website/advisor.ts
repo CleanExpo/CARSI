@@ -111,7 +111,7 @@ export function answer(message: string): AdvisorReply {
   if (/\b(cec|credit|continuing)\b/.test(q)) {
     return {
       text:
-        'Every CARSI course earns a CARSI Southern Hemisphere Restoration Designation — and also earns IICRC CECs toward maintaining your existing IICRC certification. CARSI is an accredited IICRC CEC provider; it does not issue IICRC certification itself. Which discipline are you tracking CECs in?',
+        'Every CARSI course earns a CARSI Southern Hemisphere Restoration Designation. CARSI is an accredited IICRC CEC provider; it does not issue IICRC certification itself. Which discipline are you tracking CECs in?',
       recommendations: none, pathway: null,
     };
   }

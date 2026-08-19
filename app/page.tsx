@@ -75,7 +75,7 @@ function buildHomeFaqs(facts: { publishedCourseCount: number; disciplineCodes: s
     {
       question: 'How do IICRC CECs work?',
       answer:
-        'IICRC members and certified technicians continue their education through CECs. Each eligible CARSI course carries a specific Continuing Education Credit value, with certificates and progress available in the learner dashboard.',
+        'IICRC members and certified technicians continue their education through CECs.',
     },
     {
       question: 'What industries does CARSI serve?',

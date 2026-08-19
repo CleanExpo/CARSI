@@ -58,11 +58,11 @@ export function CourseCard({ course, priorityImage, variant = 'catalog' }: Cours
   const isFree = course.is_free || priceNum === 0;
   const price = isFree ? 'Free' : `$${priceNum.toFixed(0)}`;
 
-  const discipline =
-    course.discipline ??
-    (course.category?.match(/^(WRT|CRT|ASD|OCT|CCT|FSRT|AMRT)/)
-      ? course.category.split(' ')[0]
-      : null);
+  // GP-523: do NOT re-derive an IICRC discipline from the category string. That was a
+  // fail-OPEN branding path — it re-attached a discipline acronym to a CARSI course even
+  // after the stored `iicrcDiscipline` was nulled. Absent by default; only an explicitly
+  // stored value is honoured, and it is rendered as a plain-English topic, never an acronym.
+  const discipline = course.discipline ?? null;
 
   const { courseLinkBase } = useCourseBrowseBase();
   const thumbSrc = course.thumbnail_url ?? undefined;
@@ -122,22 +122,22 @@ export function CourseCard({ course, priorityImage, variant = 'catalog' }: Cours
               : 'border-slate-200/70 dark:border-white/[0.08]'
           }`}
         >
-          <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500 dark:text-white/48">
+          <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-700 dark:text-white/70">
             {course.module_count != null ? (
               <span className="inline-flex items-center gap-1" title="Modules">
-                <Layers className="h-3.5 w-3.5 shrink-0 opacity-70" />
+                <Layers className="h-3.5 w-3.5 shrink-0" />
                 {course.module_count}
               </span>
             ) : null}
             {course.lesson_count != null ? (
               <span className="inline-flex items-center gap-1" title="Lessons">
-                <BookOpen className="h-3.5 w-3.5 shrink-0 opacity-70" />
+                <BookOpen className="h-3.5 w-3.5 shrink-0" />
                 {course.lesson_count}
               </span>
             ) : null}
             {course.updated_at ? (
               <span className="inline-flex items-center gap-1" title="Last updated">
-                <Clock className="h-3.5 w-3.5 shrink-0 opacity-70" />
+                <Clock className="h-3.5 w-3.5 shrink-0" />
                 {formatRelativeDate(course.updated_at)}
               </span>
             ) : null}

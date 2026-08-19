@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Insurance Professional IICRC CEC Training',
   description:
-    'IICRC CEC training for loss adjusters and claims assessors. Scope restoration claims accurately with WRT, FSRT and AMRT certification.',
+    'IICRC CEC training for loss adjusters and claims assessors. Scope restoration claims accurately with water damage restoration, fire & smoke restoration and mould remediation certification.',
   keywords: [
     'insurance IICRC CEC training',
     'loss adjuster certification',
@@ -94,7 +94,7 @@ export default async function InsuranceIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="Insurance"
-        disciplineList="WRT, FSRT, AMRT & ASD"
+        disciplineList="Water damage restoration, fire & smoke restoration, mould remediation and structural drying"
         disciplines={['WRT', 'FSRT', 'AMRT', 'ASD']}
       />
 
@@ -104,7 +104,7 @@ export default async function InsuranceIndustryPage() {
         subtitle="Insurance Professional Training"
         title="Insurance Professional Bundle"
         price={industryBundlePriceLabel('insurance')}
-        description="WRT + FSRT training for claims teams. Equip loss adjusters and assessors with the restoration knowledge to scope accurately and settle faster."
+        description="water damage restoration and fire & smoke restoration training for claims teams. Equip loss adjusters and assessors with the restoration knowledge to scope accurately and settle faster."
         ctaText="Get Started"
         accentColor={ACCENT_COLOR}
       />

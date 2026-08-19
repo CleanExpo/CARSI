@@ -163,7 +163,7 @@ CTA: See the restoration pathway →
 | "water damage restoration training" | Phrase | $2.80–4.50 |
 | "cleaning to restoration course" | Broad modified | $2.00–3.50 |
 | "add restoration services" | Phrase | $1.80–3.00 |
-| "IICRC WRT course online" | Exact | $4.00–6.00 |
+| "water damage restoration course online" | Exact | $4.00–6.00 |
 | "mould remediation certification" | Phrase | $3.00–5.00 |
 
 **Budget:** $1,500–2,500 AUD/month
@@ -177,7 +177,7 @@ CTA: See the restoration pathway →
 | --- | ------------------------------------------------- | --------------------------------------------------- |
 | 0   | Welcome: Your path from cleaning to restoration   | Revenue gap overview, pathway introduction          |
 | 3   | "I wish I'd done this 5 years ago"                | Case study: cleaning company that added restoration |
-| 7   | The 3 IICRC certs that unlock restoration revenue | WRT, CRT, OCT overview with CEC details             |
+| 7   | The 3 IICRC certs that unlock restoration revenue | water damage restoration, carpet repair and odour control overview with CEC details             |
 | 14  | How [Company Name] can win insurance panel work   | Insurance requirements, IICRC credential value      |
 | 21  | Your team can start today — no downtime needed    | Subscription offer, 7-day free trial CTA            |
 | 30  | Last chance: 15% off annual subscription          | Urgency + discount code (CLEANPLUS15)               |

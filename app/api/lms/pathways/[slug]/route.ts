@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import { prisma } from '@/lib/prisma';
+import { isPublishedCourseStatus } from '@/lib/server/public-courses-list';
 
 type Ctx = { params: Promise<{ slug: string }> };
 
@@ -27,7 +28,11 @@ export async function GET(_request: Request, ctx: Ctx) {
                 shortDescription: true,
                 thumbnailUrl: true,
                 priceAud: true,
-                isPublished: true,
+                // `status` is the canonical publication flag (#137). This route filtered on the
+                // legacy `isPublished` column, so the 20 courses currently carrying
+                // status='published' with isPublished=false were enrollable from the public
+                // catalogue yet silently dropped from every pathway that contained them.
+                status: true,
               },
             },
           },
@@ -40,7 +45,7 @@ export async function GET(_request: Request, ctx: Ctx) {
     }
 
     const courses = pathway.courses
-      .filter((pc) => pc.course.isPublished)
+      .filter((pc) => isPublishedCourseStatus(pc.course.status))
       .map((pc) => ({
         id: pc.course.id,
         slug: pc.course.slug,

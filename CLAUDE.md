@@ -1,3 +1,8 @@
+**Read `GOAL.md` first** — then `DECISIONS.md`, then `BACKLOG.md`. They are the objective
+function, the founder queue and the single work queue. All work comes from the top of the
+backlog; discoveries go to its bottom, not into the running session. `ENGINE.md` describes how
+a session starts and what only Phill may do.
+
 <!-- Unite-Hub (CleanExpo/Unite-Hub) held the cross-repo portfolio registry; decommissioned 2026-06-20. No active replacement registry is wired here. -->
 
 ## Identity (SSOT)
@@ -19,6 +24,18 @@ Autonomous and semi-autonomous work follows the continuous ship loop in
 Compound → Kanban movement). Every code-modifying pass must pass the
 `docs/agent-framework/CARSI_VERIFICATION_GATE.md` checklist, and `npm run
 type-check` is mandatory before any pass is marked Done.
+
+**Quality claims use the estate claim grammar.** "AAA" is a rung against a named bar, never an
+adjective — an unqualified `AAA` / `AAA+` is `[UNCONFIRMED]`. Doctrine:
+`~/.claude/skills/waterline/references/estate.md`. This line adds no gate and changes no
+existing one; CARSI's gates remain the verification-gate checklist above.
+
+**A guard's silence is not a pass.** Before quoting any check as evidence, confirm it can fail —
+plant the bad input and watch it exit non-zero. On 2026-08-19 three licence guards were exiting 0
+having scanned nothing (PR #680), and a `find` whose pattern could not match a file that existed
+was read as that file's absence. Prefer the `pathToFileURL(process.argv[1]).href` idiom for CLI
+detection; the bare `file://` + argv concat breaks on any path needing percent-encoding, and this
+checkout's path contains a space.
 
 ## Course production — Australian-produced (MUST)
 

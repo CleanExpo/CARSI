@@ -1,7 +1,7 @@
 # Module 9+ — Machine-Specific Maintenance Schedules (CCW Range)
 
 *Expansion of Module 9 (Machinery Maintenance) in the CARSI 2-Day Carpet Cleaning Workshop
-Participant Take-Home Manual. Australian-produced · IICRC-aligned · verifiable.*
+Participant Take-Home Manual. Australian-produced · verifiable.*
 
 > **Verifiability promise.** Model names, families and headline specifications below are taken from
 > the Carpet Cleaners Warehouse catalogue (**ccwonline.com.au**, verified July 2026) and the machine

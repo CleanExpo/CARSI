@@ -33,7 +33,7 @@ Adjust allocation monthly based on vertical ROAS. Start conservative, scale winn
 - [IICRC certification Australia]
 - [water damage restoration course]
 - [mould remediation training online]
-- [IICRC WRT certification]
+- [water damage restoration certification]
 - [flood restoration training Australia]
 - [structural drying course online]
 - [IICRC CEC courses]
@@ -108,7 +108,7 @@ Adjust allocation monthly based on vertical ROAS. Start conservative, scale winn
 - [carpet cleaning certification online]
 - [commercial mould remediation training]
 - [cleaning business certification Australia]
-- [IICRC CCT certification]
+- [carpet cleaning technician certification]
 
 **Broad Match Modifier**
 
@@ -177,7 +177,7 @@ Apply across all campaigns to prevent wasted spend:
 | Headline 1 | IICRC CEC Accredited Restoration Courses |
 | Headline 2 | Online Training — Study at Your Pace |
 | Headline 3 | Earn CECs From Anywhere in Australia |
-| Headline 4 | WRT, ASD, AMRT Certifications |
+| Headline 4 | water damage restoration, structural drying and mould remediation Certifications |
 | Headline 5 | Trusted by 500+ Australian Technicians |
 | Description 1 | Earn IICRC CECs toward your certification in water damage restoration, mould remediation and structural drying. 100% online, self-paced. Start today. |
 | Description 2 | Earn Continuing Education Credits recognised across Australia. Complete courses between jobs — no roster disruption. Verifiable digital certificates included. |
@@ -202,7 +202,7 @@ Apply across all campaigns to prevent wasted spend:
 | Headline 4 | Subscription Access — $795/Year |
 | Headline 5 | Upskill Without Leaving the Job Site |
 | Description 1 | Access 40+ IICRC CEC-approved courses with a CARSI subscription. Water damage, mould, fire restoration and more. $795 AUD/year — unlimited access. |
-| Description 2 | Save with course bundles or go all-in with annual subscription. Every course earns verified CECs. Public credential URL included for contractor pre-qualification. |
+| Description 2 | Save with course bundles or go all-in with annual subscription. Public credential URL included for contractor pre-qualification. |
 
 ### Campaign 2: Mining
 
@@ -256,7 +256,7 @@ Apply across all campaigns to prevent wasted spend:
 | Element | Copy |
 |---------|------|
 | Headline 1 | Mould in Aged Care — Are You Compliant? |
-| Headline 2 | IICRC Training for Facility Teams |
+| Headline 2 | IICRC CEC Courses for Facility Teams |
 | Headline 3 | Online Courses — No Staff Downtime |
 | Headline 4 | Verifiable Digital Certificates |
 | Headline 5 | Group Rates for Multi-Site Operators |
@@ -294,11 +294,11 @@ Apply across all campaigns to prevent wasted spend:
 |---------|------|
 | Headline 1 | IICRC Cleaning Certification — Online |
 | Headline 2 | Upskill Your Cleaning Business |
-| Headline 3 | CCT, WRT & Mould Courses Available |
+| Headline 3 | carpet cleaning and water damage restoration & Mould Courses Available |
 | Headline 4 | Win More Contracts with IICRC Creds |
 | Headline 5 | Australian-Owned Training Platform |
-| Description 1 | Stand out from competitors with IICRC certifications. Carpet cleaning, mould remediation, water damage — all available online. Earn CECs and grow your business. |
-| Description 2 | Cleaning franchise owners and operators — add IICRC credentials to your business. Online courses, verifiable certificates, and CECs that prove your expertise. |
+| Description 1 | Stand out from competitors with IICRC certifications. Carpet cleaning, mould remediation, water damage — all available online. Build recognised skills and grow your business. |
+| Description 2 | Cleaning franchise owners and operators — add IICRC credentials to your business. Online courses and verifiable certificates that prove your expertise. |
 
 ### Campaign 6: Construction
 
