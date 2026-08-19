@@ -1388,6 +1388,99 @@ await checkE2E(
   },
 );
 
+// --- Independent review round 2 (gpt-5.5-high, 2026-08-19): two P1 release blockers ---
+// Both are the SAME disease as the fixes above, one notch finer: a form an HTML parser renders
+// as a banned acronym that this decoder did not. Verified against `html.unescape` rather than
+// assumed — a browser decodes a numeric reference even when the author omits the semicolon.
+
+console.log('live-catalogue guard — numeric references without a semicolon, and overlong padding');
+
+check('decodes a decimal reference with NO closing semicolon', () => {
+  assert.equal(decodeEntities('&#87RT'), 'WRT');
+});
+
+check('decodes a hex reference with NO closing semicolon', () => {
+  assert.equal(decodeEntities('&#x57RT'), 'WRT');
+});
+
+check('decodes arbitrarily zero-padded references', () => {
+  assert.equal(decodeEntities('&#000000087;RT'), 'WRT');
+  assert.equal(decodeEntities('&#x00000057;RT'), 'WRT');
+});
+
+check('decodes the legacy named references a browser accepts without a semicolon', () => {
+  // `&ampWRT` renders as `&WRT`. Leaving it encoded hid the acronym behind "amp".
+  assert.equal(decodeEntities('&ampWRT'), '&WRT');
+});
+
+check('STILL does not decode recursively, now that semicolons are optional', () => {
+  assert.equal(decodeEntities('&amp;#87;RT'), '&#87;RT');
+  assert.equal(decodeEntities('&amp;#87RT'), '&#87RT');
+});
+
+check('STILL leaves an unknown named entity and ordinary ampersand copy untouched', () => {
+  assert.equal(decodeEntities('a&nbsp;b'), 'a&nbsp;b');
+  assert.equal(decodeEntities('AT&T Restoration'), 'AT&T Restoration');
+  assert.equal(decodeEntities('R&D and Cleaning & Drying'), 'R&D and Cleaning & Drying');
+});
+
+check('STILL refuses an out-of-range code point', () => {
+  assert.equal(decodeEntities('&#999999999999;x'), '&#999999999999;x');
+  assert.equal(decodeEntities('&#xD800;x'), '&#xD800;x');
+});
+
+await checkE2E(
+  'exits 1 on a semicolonless numeric reference served end to end',
+  { '/courses/advanced-drying-fundamentals': [200, title('&#87RT Fundamentals | CARSI')] },
+  ({ code, combined }) => {
+    assert.equal(code, 1, 'a semicolonless numeric reference must not bypass the acronym rules');
+    assert.match(combined, /title-acronym/);
+  },
+);
+
+await checkE2E(
+  'exits 1 on an overlong zero-padded numeric reference served end to end',
+  { '/courses/advanced-drying-fundamentals': [200, title('&#000000087;RT Fundamentals | CARSI')] },
+  ({ code, combined }) => {
+    assert.equal(code, 1, 'zero padding must not bypass the acronym rules');
+    assert.match(combined, /title-acronym/);
+  },
+);
+
+console.log('live-catalogue guard — the invisible set must be the runtime\'s, not hand-maintained');
+
+check('folds away U+034F COMBINING GRAPHEME JOINER', () => {
+  assert.equal(fold('W͏RT'), 'WRT');
+});
+
+check('folds away U+061C ARABIC LETTER MARK', () => {
+  assert.equal(fold('A؜SD'), 'ASD');
+});
+
+check('folds away the wider default-ignorable set', () => {
+  assert.equal(fold('FㅤSRT'), 'FSRT'); // Hangul filler
+  assert.equal(fold('C️CT'), 'CCT'); // variation selector
+  assert.equal(fold('T⁠CST'), 'TCST'); // word joiner
+});
+
+await checkE2E(
+  'exits 1 on a title split by U+034F, end to end',
+  { '/courses/water-damage-essentials': [200, title('Water Damage W͏RT Essentials | CARSI')] },
+  ({ code, combined }) => {
+    assert.equal(code, 1, 'U+034F must not bypass the acronym rules');
+    assert.match(combined, /title-acronym/);
+  },
+);
+
+await checkE2E(
+  'exits 1 on a title split by U+061C, end to end',
+  { '/courses/structural-drying-core': [200, title('Structural Drying A؜SD Core | CARSI')] },
+  ({ code, combined }) => {
+    assert.equal(code, 1, 'U+061C must not bypass the acronym rules');
+    assert.match(combined, /title-acronym/);
+  },
+);
+
 if (failures > 0) {
   console.error(`\n${failures} check(s) failed — the guard is not trustworthy until they pass.`);
   process.exit(1);

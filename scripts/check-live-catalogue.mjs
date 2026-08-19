@@ -221,12 +221,17 @@ const HOMOGLYPHS = {
 /**
  * Characters a browser renders as nothing at all. Independent review (gpt-5.5-high,
  * 2026-08-19) planted `W<ZWJ>RT` in a title: it displays as WRT to every reader, NFKC leaves
- * the joiner in place, and the acronym rule saw a string that was not WRT. Soft hyphen, the
- * zero-width space/joiner family, the bidi controls and the BOM all do the same job.
+ * the joiner in place, and the acronym rule saw a string that was not WRT.
+ *
+ * The set is the RUNTIME'S, not one written out by hand. A hand-listed class shipped first and
+ * the next review round immediately found two it missed — U+034F COMBINING GRAPHEME JOINER and
+ * U+061C ARABIC LETTER MARK. Enumerating invisibles by hand is the same losing ratchet as
+ * enumerating English course nouns: every round finds one more. `Default_Ignorable_Code_Point`
+ * is maintained by Unicode and updated with Node.
  *
  * Stripped BEFORE normalising, so a designation cannot be smuggled through in pieces.
  */
-const INVISIBLES = /[­᠎​-‏‪-‮⁠-⁤⁦-⁯﻿]/g;
+const INVISIBLES = /\p{Default_Ignorable_Code_Point}/gu;
 
 export function fold(text) {
   return (text || '')
@@ -415,6 +420,13 @@ async function fetchText(url, timeoutMs) {
 const NAMED_ENTITIES = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'" };
 
 /**
+ * The four an HTML parser decodes even with the closing semicolon missing, for legacy
+ * compatibility. `&apos` is deliberately absent — it is not on that list and needs its
+ * semicolon, and inventing a decode a browser would not perform manufactures false positives.
+ */
+const SEMICOLON_OPTIONAL = new Set(['amp', 'lt', 'gt', 'quot']);
+
+/**
  * Decode HTML character references in ONE pass.
  *
  * Named entities alone were not enough: a title served as `&#87;RT` or `&#x57;RT` reached
@@ -426,19 +438,33 @@ const NAMED_ENTITIES = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'" };
  * page that never displayed the acronym. A guard that invents violations gets switched off.
  */
 export function decodeEntities(text) {
-  return text.replace(/&(#\d{1,7}|#[xX][0-9a-fA-F]{1,6}|[a-zA-Z]{2,8});/g, (full, body) => {
-    if (body[0] === '#') {
-      const hex = body[1] === 'x' || body[1] === 'X';
-      const code = Number.parseInt(hex ? body.slice(2) : body.slice(1), hex ? 16 : 10);
-      // Out of range, or a lone surrogate: leave it exactly as written rather than throwing.
-      // An audit that crashes on a malformed title tells us less than one that reads it literally.
-      if (!Number.isFinite(code) || code < 0 || code > 0x10ffff) return full;
-      if (code >= 0xd800 && code <= 0xdfff) return full;
-      return String.fromCodePoint(code);
-    }
-    const named = NAMED_ENTITIES[body];
-    return named === undefined ? full : named;
-  });
+  // The semicolon is OPTIONAL on the numeric forms and the digits are UNBOUNDED, because that is
+  // what an HTML parser does: `&#87RT` and `&#000000087;RT` both display as WRT. Requiring the
+  // semicolon and capping the digits at seven was a licence bypass, found by review round 2.
+  //
+  // The named alternatives are listed EXPLICITLY rather than as a generic `[a-zA-Z]+` run. A
+  // generic run is greedy, so `&ampWRT` would match "ampWRT", find no such entity, and leave the
+  // acronym hidden behind "amp" — while a browser renders it `&WRT`.
+  return text.replace(
+    /&(#\d+;?|#[xX][0-9a-fA-F]+;?|amp;?|lt;?|gt;?|quot;?|apos;|[a-zA-Z][a-zA-Z0-9]*;)/g,
+    (full, body) => {
+      const core = body.endsWith(';') ? body.slice(0, -1) : body;
+      if (core[0] === '#') {
+        const hex = core[1] === 'x' || core[1] === 'X';
+        const digits = hex ? core.slice(2) : core.slice(1);
+        const code = Number.parseInt(digits, hex ? 16 : 10);
+        // Out of range, or a lone surrogate: leave it exactly as written rather than throwing.
+        // An audit that crashes on a malformed title tells us less than one that reads it
+        // literally.
+        if (!Number.isFinite(code) || code < 0 || code > 0x10ffff) return full;
+        if (code >= 0xd800 && code <= 0xdfff) return full;
+        return String.fromCodePoint(code);
+      }
+      if (core === body && !SEMICOLON_OPTIONAL.has(core)) return full;
+      const named = NAMED_ENTITIES[core];
+      return named === undefined ? full : named;
+    },
+  );
 }
 
 export function titleOf(html) {
