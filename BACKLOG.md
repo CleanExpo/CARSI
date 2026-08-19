@@ -233,3 +233,21 @@ of what is actually being sold.
   normalisation. Revisit only if an exotic named entity is ever observed on the live catalogue —
   and fix it by decoding with a real HTML parser, never by hand-extending the table, which is the
   ratchet this file has already lost to three times.
+
+- 2026-08-20 · **CI-P1-001 — `npm run test:unit` fails inside the release gate's sequential run
+  on the `/Volumes/Storage Unit` checkout, and passes standalone.** Measured this session: green
+  standalone five times (143 files / 1060 tests, 5–51s); red four times when run by
+  `pr_release_gate.py issue` immediately after `npm run type-check`. The symptom is always the
+  same file — `[vitest-pool]: Failed to start forks worker for
+  src/components/admin/AdminCcwSignInsClient.test.tsx`, sometimes `Timeout waiting for worker to
+  respond`, once surfacing instead as a 5s `Test timed out` in the filesystem-heavy
+  `src/lib/seo/course-marketing.test.ts`. That file passes alone in 1.4s. **Ruled out:** memory
+  (70% free, zero swap), worker oversubscription (reproduced at `--maxWorkers=4` on a 10-CPU
+  box), and the branch under test (the diff touches zero files under `src/`, and
+  `vitest.config.ts` globs only `src/**`). CI's own `Unit Tests` job passes on a clean runner, so
+  this is specific to this machine/checkout. **Why it matters:** it blocks the release gate
+  non-deterministically, and the tempting workaround — dropping `test:unit` from the receipt, or
+  re-running until green — is self-certification. It cost a genuine, independently-PASSed commit
+  (`e3a3b49e`) its push this session. Next step: capture a full `--reporter=verbose` run inside
+  the gate context and check `ulimit -u` (4000 soft) against the fork count under the harness's
+  ~57 resident node processes.
