@@ -153,17 +153,27 @@ function maskBenignExpansion(a, fTitle, fSlug) {
   for (const ph of phrases) {
     const phRe = ph.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/ /g, '\\s+');
     if (new RegExp(phRe, 'i').test(t) || fSlug.includes(ph.replace(/ /g, '-'))) present = true;
-    // The phrase, plus the acronym that immediately annotates it — parenthesised or bare — so
-    // `Correlated Colour Temperature (CCT)` is fully neutralised while a second, unattached
-    // `(CCT)` elsewhere in the title still reaches the rules below.
-    t = t.replace(new RegExp(`${phRe}(?:\\s*\\(\\s*${a}\\s*\\)|\\s+${a}\\b)?`, 'gi'), ' ');
+    // The phrase, plus the acronym that immediately annotates it — parenthesised or bare, on
+    // EITHER side — so `Correlated Colour Temperature (CCT)` and `CCT Correlated Colour
+    // Temperature` are both neutralised, while a second, unattached `(CCT)` elsewhere in the
+    // title still reaches the rules below. Review round 3 caught the leading form: masking only
+    // a trailing acronym made `RRT Rapid Response Team` a false positive.
+    t = t.replace(
+      new RegExp(`(?:\\(\\s*${a}\\s*\\)|\\b${a}\\b)?\\s*${phRe}(?:\\s*\\(\\s*${a}\\s*\\)|\\s+${a}\\b)?`, 'gi'),
+      ' ',
+    );
   }
-  // The SLUG keeps the original cross-surface trust: when the copy carries the benign expansion,
-  // a slug abbreviating it is legitimate too — `cct-lighting` under a Correlated Colour
-  // Temperature title is one course, and flagging the slug half is the same false positive the
-  // whitelist exists to prevent. `null` means "do not apply the slug rule for this acronym".
-  // Only the TITLE mask narrowed, because that is where the hole was.
-  return [t, present ? null : fSlug];
+  // The SLUG keeps cross-surface trust, but NOT unconditionally. `cct-lighting` under a
+  // Correlated Colour Temperature title is one legitimate course; `cct-carpet-cleaning` under
+  // the same title is branding, and review round 3 found the earlier blanket exemption passed
+  // it silently. The separator: a slug that also carries the designation's OWN domain words is
+  // not describing the benign topic. `null` means "do not apply the slug rule for this acronym".
+  if (!present) return [t, fSlug];
+  const domainWords = (DESIGNATION_PHRASES[a] || [])
+    .flatMap((ph) => ph.split(' '))
+    .filter((w) => w.length > 3 && w !== 'and' && w !== 'technician');
+  const slugCarriesDesignation = domainWords.some((w) => fSlug.includes(w));
+  return [t, slugCarriesDesignation ? fSlug : null];
 }
 
 /**

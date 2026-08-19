@@ -455,6 +455,41 @@ check('a hyphen or underscore does not defeat a designation phrase', () => {
   );
 });
 
+// Review round 3, both directions of the benign-expansion boundary.
+check('a benign title does not licence a designation-carrying slug', () => {
+  // `cct-lighting` under a Correlated Colour Temperature title is one legitimate course, but a
+  // slug carrying the designation's OWN domain words is branding, whatever the title says.
+  assert.ok(
+    scanCourse({ slug: 'cct-carpet-cleaning', title: 'Correlated Colour Temperature | CARSI' })
+      .some((h) => h.rule === 'slug-acronym'),
+    'cct + carpet/cleaning in the slug is the designation, not the lighting measure',
+  );
+  assert.equal(
+    scanCourse({
+      slug: 'cct-lighting',
+      title: 'Correlated Colour Temperature (CCT) for Restoration Inspection Lighting | CARSI',
+    }).length,
+    0,
+    'a slug abbreviating the benign topic stays clean',
+  );
+});
+
+check('an acronym BEFORE its benign phrase is not a violation', () => {
+  // Masking only a trailing acronym made these false positives — the annotation is the same
+  // claim whichever side of the phrase it sits on.
+  for (const title of [
+    'RRT Rapid Response Team Mobilisation | CARSI',
+    'CCT Correlated Colour Temperature | CARSI',
+    '(CCT) Correlated Colour Temperature for Inspection Lighting | CARSI',
+  ]) {
+    assert.equal(
+      scanCourse({ slug: 'clean-slug', title }).length,
+      0,
+      `leading acronym annotating a benign phrase must stay clean: ${title}`,
+    );
+  }
+});
+
 // The whitelist is a PHRASE, not a general "acronym defined by preceding words" rule — that
 // generalisation would suppress a spelled-out designation, which is banned as course branding.
 check('still fires on bare RRT with no benign phrase present', () => {
