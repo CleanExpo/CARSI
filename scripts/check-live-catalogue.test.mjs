@@ -392,6 +392,44 @@ check('does NOT fire on the same phrase in a slug', () => {
   assert.equal(hits.length, 0);
 });
 
+// The whitelist masks the benign PHRASE and the acronym annotating it — never the acronym across
+// the whole course. The earlier `hasBenignExpansion() -> continue` skipped both surfaces
+// entirely, so a whitelisted phrase silenced a genuine brand use of the SAME acronym later in
+// the same title. Independent review raised it on PR #674 and it reproduced: the first case
+// below returned [] before this fix. Both directions are pinned, because a mask that is too
+// greedy re-creates the false positive the whitelist exists to prevent.
+check('benign expansion does NOT grant the rest of the title an exemption', () => {
+  const rrt = scanCourse({
+    slug: 'rapid-response-team-rrt',
+    title: 'Rapid Response Team (RRT) and Restoration RRT Certification | CARSI',
+  });
+  assert.ok(
+    rrt.some((h) => h.rule === 'title-acronym' && h.detail === 'RRT'),
+    'a second, unattached RRT is branding and must fire even though the benign phrase is present',
+  );
+
+  const cct = scanCourse({
+    slug: 'inspection-lighting',
+    title: 'Correlated Colour Temperature (CCT) and Carpet Cleaning CCT Course | CARSI',
+  });
+  assert.ok(
+    cct.some((h) => h.rule === 'title-acronym' && h.detail === 'CCT'),
+    'the lighting measure does not license a bare CCT brand elsewhere in the title',
+  );
+
+  // …and the mask must still suppress what it was written for, both spellings.
+  for (const title of [
+    'Inspection Lighting — Correlated Colour Temperature (CCT) | CARSI',
+    'Inspection Lighting — Correlated Color Temperature (CCT) | CARSI',
+  ]) {
+    assert.equal(
+      scanCourse({ slug: 'inspection-lighting', title }).length,
+      0,
+      `benign expansion alone must stay clean: ${title}`,
+    );
+  }
+});
+
 // The whitelist is a PHRASE, not a general "acronym defined by preceding words" rule — that
 // generalisation would suppress a spelled-out designation, which is banned as course branding.
 check('still fires on bare RRT with no benign phrase present', () => {

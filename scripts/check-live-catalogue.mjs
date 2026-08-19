@@ -131,15 +131,39 @@ const BENIGN_EXPANSIONS = {
   CCT: ['correlated colour temperature', 'correlated color temperature'],
 };
 
-/** True when the copy carries a whitelisted benign expansion of this acronym. */
-function hasBenignExpansion(a, fTitle, fSlug) {
+/**
+ * Blank out a benign expansion AND the acronym mention that belongs to it, returning the copy
+ * with everything else intact.
+ *
+ * This replaces an earlier `hasBenignExpansion() -> continue`, which skipped the acronym across
+ * BOTH surfaces for the whole course. Independent review found the hole and it reproduced:
+ * `Rapid Response Team (RRT) and Restoration RRT Certification` returned `[]` — the whitelisted
+ * phrase silenced a genuine brand use of the same acronym later in the same title. Masking only
+ * the benign occurrence keeps the false positive suppressed (which is why the whitelist exists)
+ * without granting the rest of the string an exemption it never earned.
+ */
+function maskBenignExpansion(a, fTitle, fSlug) {
   const phrases = BENIGN_EXPANSIONS[a];
-  if (!phrases) return false;
+  if (!phrases) return [fTitle, fSlug];
   // Normalise "&" to "and" before phrase matching. `Trauma & Crime Scene Technician` escaped
   // while the "and" spelling was caught; enumerating both variants per designation is the kind
   // of list that silently goes stale, so normalise once instead.
-  const lowerTitle = fTitle.toLowerCase().replace(/\s*[&/+]\s*/g, ' and ');
-  return phrases.some((ph) => lowerTitle.includes(ph) || fSlug.includes(ph.replace(/ /g, '-')));
+  let t = fTitle.replace(/\s*[&/+]\s*/g, ' and ');
+  let present = false;
+  for (const ph of phrases) {
+    const phRe = ph.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/ /g, '\\s+');
+    if (new RegExp(phRe, 'i').test(t) || fSlug.includes(ph.replace(/ /g, '-'))) present = true;
+    // The phrase, plus the acronym that immediately annotates it — parenthesised or bare — so
+    // `Correlated Colour Temperature (CCT)` is fully neutralised while a second, unattached
+    // `(CCT)` elsewhere in the title still reaches the rules below.
+    t = t.replace(new RegExp(`${phRe}(?:\\s*\\(\\s*${a}\\s*\\)|\\s+${a}\\b)?`, 'gi'), ' ');
+  }
+  // The SLUG keeps the original cross-surface trust: when the copy carries the benign expansion,
+  // a slug abbreviating it is legitimate too — `cct-lighting` under a Correlated Colour
+  // Temperature title is one course, and flagging the slug half is the same false positive the
+  // whitelist exists to prevent. `null` means "do not apply the slug rule for this acronym".
+  // Only the TITLE mask narrowed, because that is where the hole was.
+  return [t, present ? null : fSlug];
 }
 
 /**
@@ -206,18 +230,19 @@ export function scanCourse({ slug, title }) {
   const fTitle = fold(title);
   const fSlug = fold(slug).toLowerCase();
   for (const a of BANNED_ACRONYMS) {
-    // A whitelisted industry phrase is not IICRC branding. Skipping the acronym entirely (both
-    // surfaces) is correct: `Rapid Response Team (RRT) Mobilisation` at
-    // `rapid-response-team-rrt-mobilisation` is one course, and flagging either half of it
-    // would be the same false positive.
-    if (hasBenignExpansion(a, fTitle, fSlug)) continue;
+    // A whitelisted industry phrase is not IICRC branding, so the phrase and the acronym that
+    // annotates it are masked out — `Rapid Response Team (RRT) Mobilisation` at
+    // `rapid-response-team-rrt-mobilisation` is one course and stays clean. The rest of the
+    // copy is still scanned: masking, not skipping, is what stops a benign phrase granting the
+    // whole title an exemption.
+    const [aTitle, aSlug] = maskBenignExpansion(a, fTitle, fSlug);
     // Title: whole-word only, so "Restoration" never trips on "ASD" and a topic name that
     // merely contains the letters is not a violation. Case-insensitive except for the
     // ambiguous set above — a case-sensitive rule let `wrt` and `WrT` through in titles.
     // `s` / `'s` accepted: "WRTs Essentials" is the same branding claim as "WRT Essentials",
     // and a human writing a course title reaches for the plural without thinking about it.
     const titleFlags = AMBIGUOUS_ACRONYMS.has(a) ? '' : 'i';
-    if (new RegExp(`\\b${a}(?:'?s)?\\b`, titleFlags).test(fTitle)) hits.push({ rule: 'title-acronym', detail: a });
+    if (new RegExp(`\\b${a}(?:'?s)?\\b`, titleFlags).test(aTitle)) hits.push({ rule: 'title-acronym', detail: a });
     // Slug: any hyphen-delimited SEGMENT, not just the leading one, and case-insensitively.
     // Leading-only let `water-damage-wrt-essentials` through; case-sensitive matching then let
     // `water-damage-WRT-essentials` through, because URLs may carry uppercase. Segment-bounded,
@@ -240,7 +265,8 @@ export function scanCourse({ slug, title }) {
     // passed while the commit claimed otherwise.
     if (
       !AMBIGUOUS_ACRONYMS.has(a) &&
-      new RegExp(`(?:^|-)${a.toLowerCase()}'?s?(?:-|$)`).test(fSlug)
+      aSlug !== null &&
+      new RegExp(`(?:^|-)${a.toLowerCase()}'?s?(?:-|$)`).test(aSlug)
     ) {
       hits.push({ rule: 'slug-acronym', detail: a });
     }
