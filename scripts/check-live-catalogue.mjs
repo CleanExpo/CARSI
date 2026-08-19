@@ -354,16 +354,39 @@ async function fetchText(url) {
   return res.text();
 }
 
-function titleOf(html) {
+const NAMED_ENTITIES = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'" };
+
+/**
+ * Decode HTML character references in ONE pass.
+ *
+ * Named entities alone were not enough: a title served as `&#87;RT` or `&#x57;RT` reached
+ * scanCourse still encoded, so every acronym rule stayed silent. That is the same evasion class
+ * the lookalike-character folding already covers, arriving through a different door.
+ *
+ * Single pass on purpose. Decoding twice would turn an author's deliberately escaped
+ * `&amp;#87;RT` — which a browser renders as the literal text "&#87;RT" — into "WRT" and flag a
+ * page that never displayed the acronym. A guard that invents violations gets switched off.
+ */
+export function decodeEntities(text) {
+  return text.replace(/&(#\d{1,7}|#[xX][0-9a-fA-F]{1,6}|[a-zA-Z]{2,8});/g, (full, body) => {
+    if (body[0] === '#') {
+      const hex = body[1] === 'x' || body[1] === 'X';
+      const code = Number.parseInt(hex ? body.slice(2) : body.slice(1), hex ? 16 : 10);
+      // Out of range, or a lone surrogate: leave it exactly as written rather than throwing.
+      // An audit that crashes on a malformed title tells us less than one that reads it literally.
+      if (!Number.isFinite(code) || code < 0 || code > 0x10ffff) return full;
+      if (code >= 0xd800 && code <= 0xdfff) return full;
+      return String.fromCodePoint(code);
+    }
+    const named = NAMED_ENTITIES[body];
+    return named === undefined ? full : named;
+  });
+}
+
+export function titleOf(html) {
   const m = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
   if (!m) return '';
-  return m[1]
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&#39;|&apos;/g, "'")
-    .replace(/&quot;/g, '"')
-    .trim();
+  return decodeEntities(m[1]).trim();
 }
 
 async function main() {

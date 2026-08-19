@@ -13,7 +13,7 @@
  */
 import assert from 'node:assert/strict';
 
-import { fold, isLiveCourse, scanCourse } from './check-live-catalogue.mjs';
+import { decodeEntities, fold, isLiveCourse, scanCourse, titleOf } from './check-live-catalogue.mjs';
 
 let failures = 0;
 function check(name, fn) {
@@ -1128,6 +1128,70 @@ await jsonPath(
 );
 await jsonPath('exit 2, HTTP 500', { '/courses/boom': [500, title('Server Error | CARSI')] }, 2, true);
 await jsonPath('exit 2, empty sitemap', {}, 2, true);
+
+// --- CodeRabbit #674 finding 367: numeric character references were a real bypass ---
+// titleOf decoded five NAMED entities only, so a title served as `&#87;RT` or `&#x57;RT` reached
+// scanCourse still encoded and every acronym rule stayed silent. Same evasion class the lookalike
+// folding already covers, arriving through a different door.
+
+console.log('live-catalogue guard — numeric character references must not bypass the rules');
+
+check('decodes DECIMAL numeric references', () => {
+  assert.equal(decodeEntities('&#87;RT'), 'WRT');
+  assert.equal(decodeEntities('&#65;SD'), 'ASD');
+});
+
+check('decodes HEX numeric references in both letter cases', () => {
+  assert.equal(decodeEntities('&#x57;RT'), 'WRT');
+  assert.equal(decodeEntities('&#X41;SD'), 'ASD');
+});
+
+check('still decodes the five named entities', () => {
+  assert.equal(decodeEntities('a&amp;b &lt;c&gt; &quot;d&quot; &apos;e&apos; &#39;f&#39;'), 'a&b <c> "d" \'e\' \'f\'');
+});
+
+check('does NOT decode recursively — &amp;#87; stays literal', () => {
+  // One pass, never two. A second pass would turn an author's deliberately escaped text
+  // "&#87;RT" into the acronym WRT and flag a page that never displayed it.
+  assert.equal(decodeEntities('&amp;#87;RT'), '&#87;RT');
+});
+
+check('leaves an out-of-range code point as written instead of crashing', () => {
+  assert.equal(decodeEntities('&#99999999;x'), '&#99999999;x');
+  assert.equal(decodeEntities('&#xD800;x'), '&#xD800;x');
+});
+
+check('leaves an unknown named entity untouched', () => {
+  assert.equal(decodeEntities('a&nbsp;b'), 'a&nbsp;b');
+});
+
+check('titleOf runs the decode, so an encoded acronym reaches scanCourse', () => {
+  const decoded = titleOf('<html><head><title>&#87;RT Fundamentals | CARSI</title></head></html>');
+  assert.equal(decoded, 'WRT Fundamentals | CARSI');
+  const hits = scanCourse({ slug: 'advanced-drying-fundamentals', title: decoded });
+  assert.ok(
+    hits.some((h) => h.rule === 'title-acronym' && h.detail === 'WRT'),
+    'the acronym rule must fire on the decoded title',
+  );
+});
+
+await checkE2E(
+  'exits 1 when a banned acronym is served as a DECIMAL character reference',
+  { '/courses/advanced-drying-fundamentals': [200, title('&#87;RT Fundamentals | CARSI')] },
+  ({ code, combined }) => {
+    assert.equal(code, 1, 'a numeric character reference must not bypass the acronym rules');
+    assert.match(combined, /title-acronym/);
+  },
+);
+
+await checkE2E(
+  'exits 1 when a banned acronym is served as a HEX character reference',
+  { '/courses/advanced-drying-fundamentals': [200, title('&#x41;SD Fundamentals | CARSI')] },
+  ({ code, combined }) => {
+    assert.equal(code, 1, 'a hex character reference must not bypass the acronym rules');
+    assert.match(combined, /title-acronym/);
+  },
+);
 
 if (failures > 0) {
   console.error(`\n${failures} check(s) failed — the guard is not trustworthy until they pass.`);
