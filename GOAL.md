@@ -55,3 +55,20 @@ plus 4-week rolling course sales. Every session reports RWR movement or names th
   A full readiness scorecard was written to `docs/RELEASE-READINESS.md` on branch
   `docs/release-readiness-20260817`; it is **not** on `main` yet, so do not expect to find it
   here until that branch merges.
+- 2026-08-19: Gate 0. RWR ≈ $0 — unchanged; DECISIONS #1 and #2 remain the blockers.
+  **Customer-visible delta: four live courses on carsi.com.au carry banned IICRC designation
+  branding right now** (`CCT-aligned`, `WRT`, `FSRT-aligned`, `ASD-aligned`), found by
+  `npm run check:live-catalogue` (exit 1). Three of the four are absent from repo seed, so no
+  agent can reach them — DECISIONS #16, licence-critical, escalates daily.
+  **Why it was not caught:** repo seed holds 37 courses, production sells 80, and three licence
+  guards were exiting 0 without scanning anything — the checkout path contains a space,
+  `import.meta.url` percent-encodes it and `argv` does not, so their CLI-detection idiom was
+  always false. Proven by positive control (same guard file on an unspaced path speaks) and
+  **fixed** in PR #680, receipt `PR_RELEASE_GATE_PASS head=ed01376a`.
+  **A false blocker was retired:** the previous entry's claim that `test:unit` was permanently
+  red and an intro video "had never been rendered" was wrong on both counts — the mp4 exists and
+  the suite is green 1056/1056. The claim came from a `find` pattern that could not match the
+  filename. Same disease, in the evidence-gathering rather than the guard.
+  **Autonomy unblocked:** the founder set `OPENROUTER_API_KEY`/`OPENROUTER_MODEL` in Vercel, so
+  agents can now complete a release gate independently. Full evidence:
+  `docs/session-handoffs/STOPPER-REGISTER-20260819.md`; queue as BACKLOG #29–#37.
