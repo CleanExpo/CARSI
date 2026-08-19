@@ -104,9 +104,9 @@ Housekeeping: 2 stale worktrees pruned, local `main` fast-forwarded to `86165d5e
   resolved.
 - Review worktrees have been deleted and `git worktree prune` run. Remaining worktrees: the main
   checkout, this one, and `overnight-gate0-20260818`.
-- **The main checkout is stale.** It sits at `92be1290` on `guard/live-catalogue-licence`, five
-  commits behind the pushed tip. Nothing is lost — the remote has everything — but a `git pull`
-  there is the first thing to do before working in it.
+- **The main checkout is stale.** It sits at `92be1290` on `guard/live-catalogue-licence`,
+  **11 commits behind** the pushed tip (`git rev-list --count 92be1290..54e5344d`). Nothing is
+  lost — the remote has everything — but a `git pull` there comes before any work in it.
 - This worktree has `node_modules` symlinked and `src/generated/prisma` generated locally;
   `node_modules` is excluded via `.git/info/exclude` (the `.gitignore` rule's trailing slash does
   not match a symlink).
@@ -115,8 +115,9 @@ Housekeeping: 2 stale worktrees pruned, local `main` fast-forwarded to `86165d5e
 
 ## 6. Verification — exact commands
 
-All run this session in this worktree on `70c0253f`, and re-run by the release-gate recorder
-against that exact SHA:
+All run this session in this worktree, and re-run by the release-gate recorder against each
+receipted SHA — `70c0253f`, then `54e5344d`, then `380684a0` as the docs commits landed. The
+counts below are from the runs on the current head:
 
 ```bash
 cd "/Volumes/Storage Unit/CARSI/.claude/worktrees/fix-674-review-findings"
