@@ -1,0 +1,92 @@
+name: Live Catalogue Licence Guard
+
+# The only guard that reads PRODUCTION. Every other licence check scans repo files, and the
+# repo holds 37 courses while the live site sells 80 — so their ceiling is 46% of what is
+# actually for sale. This one fetches the public sitemap and audits every live course title
+# and slug for banned IICRC discipline designations (BACKLOG #30).
+#
+# NO CREDENTIALS. It reads the public sitemap over HTTPS, so unlike the sibling
+# `live-cec-guard.yml` it is NOT gated behind a repo variable — a config flag that silently
+# disables a licence guard is the failure mode this whole family of guards exists to prevent.
+#
+# EXIT CODES, and why the job fails on both:
+#   0  clean AND non-vacuous — courses were actually checked
+#   1  live licence violations found
+#   2  could not audit (network, empty sitemap, no usable titles)
+# Exit 2 fails the job deliberately. "I could not look" must never render as "nothing is
+# wrong" — that equivalence is the defect this repo has already shipped once.
+#
+# EXPECTED RED, and it is not a bug: as of 2026-08-20 four live courses carry banned
+# branding (BACKLOG #31). Their course data is edited through the admin session, not this
+# repo, so no code change here can clear them. This job is red until they are fixed, on
+# purpose. Do NOT add a baseline or allow-list to make it green — an exemption that outlives
+# its reason is exactly how unapproved CEC hours reached 22 courses.
+
+on:
+  schedule:
+    # Daily, 03:00 UTC — an hour after the live CEC guard, so a shared failure is legible
+    # in order rather than as two simultaneous alarms.
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+  # Also on any push that touches the guard itself, so a change to the guard is exercised
+  # against production before it is trusted.
+  push:
+    paths:
+      - 'scripts/check-live-catalogue.mjs'
+      - '.github/workflows/live-catalogue-guard.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: live-catalogue-guard
+  cancel-in-progress: false
+
+jobs:
+  live-catalogue-guard:
+    name: Live Catalogue Licence Guard
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # No `npm ci`. The guard imports nothing outside node: builtins, so installing ~1,700
+      # packages to run it would add a supply-chain surface and a failure mode (a broken
+      # install reading as a broken audit) for no benefit.
+      - name: Prove the guard's own rules still fire
+        run: node scripts/check-live-catalogue.test.mjs
+
+      - name: Audit the live catalogue
+        id: audit
+        run: |
+          set +e
+          node scripts/check-live-catalogue.mjs --json > audit.json
+          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+          set -e
+
+      - name: Report what was found
+        if: always()
+        run: node scripts/live-catalogue-ci-summary.mjs audit.json "${{ steps.audit.outputs.exit_code }}" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Fail on violations or on an audit that could not run
+        if: always()
+        run: |
+          code="${{ steps.audit.outputs.exit_code }}"
+          if [ "$code" = "0" ]; then
+            echo "Live catalogue clean."
+            exit 0
+          fi
+          if [ "$code" = "1" ]; then
+            echo "::error::Live courses carry banned IICRC discipline branding. See the job summary and BACKLOG #31."
+          elif [ "$code" = "2" ]; then
+            echo "::error::The live catalogue could not be audited. This is NOT a pass — see the job summary."
+          else
+            echo "::error::The guard exited with an unexpected code ${code}."
+          fi
+          exit 1
