@@ -191,3 +191,17 @@ that emits nothing is currently indistinguishable from a control that found noth
 structural fix; the rest are instances it would have caught. The scope limit that sits above all
 of them: repo seed holds 37 courses, production sells 80, so no source-scanning guard can see 54%
 of what is actually being sold.
+
+- 2026-08-19 · **CLC-P2-004 — an `OCT`-branded SLUG with a clean title is not caught** by
+  `check-live-catalogue`. Raised by independent review on PR #674 and reproduced: slug
+  `oct-odour-control` with title `Odour Management Fundamentals` returns `[]`. `OCT` is in
+  `AMBIGUOUS_ACRONYMS`, which disables the slug rule for it. Accepted, not fixed, for the reason
+  already recorded in the code: slugs are lowercase by convention and carry no case to
+  disambiguate, so enabling the rule flags `seasonal-cleaning-oct-2026` — a legitimate October
+  course — as a licence violation. Measured in the same run: the false-positive control is
+  silent today and would fire if the exemption were removed. A guard that cries wolf on October
+  is one staff stop believing, which is the failure mode this guard has already produced five
+  times. The title rule still catches `OCT` written as a designation, the designation-phrase
+  rule catches `odour/odor control technician` on both surfaces, and `check-iicrc-compliance`
+  remains the backstop. Revisit only if an `OCT`-form slug is ever observed on the live
+  catalogue — and fix it by narrowing to a month-name exclusion, never by dropping the guard.

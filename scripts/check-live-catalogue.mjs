@@ -277,7 +277,15 @@ export function scanCourse({ slug, title }) {
   // Normalise "&" to "and" before phrase matching. `Trauma & Crime Scene Technician` escaped
   // while the "and" spelling was caught; enumerating both variants per designation is a list
   // that goes stale silently, so normalise once instead.
-  const lowerTitle = fTitle.toLowerCase().replace(/\s*[&/+]\s*/g, ' and ');
+  // Hyphens and underscores BETWEEN words are normalised to spaces first. Independent review of
+  // PR #674 found `Water Damage Restoration-Technician` returned clean while the identical
+  // spaced form fired — a designation is the designation however its author punctuated it, and
+  // a licence guard that a hyphen defeats is not one. Scoped to separators sitting between two
+  // letters, so hyphenated ordinary words are untouched.
+  const lowerTitle = fTitle
+    .toLowerCase()
+    .replace(/\s*[&/+]\s*/g, ' and ')
+    .replace(/(?<=[a-z])[-_](?=[a-z])/g, ' ');
   for (const phrases of Object.values(DESIGNATION_PHRASES)) {
     // NO benign-expansion skip here. The whitelist exists because an ACRONYM's letters collide
     // with an industry term (CCT / correlated colour temperature, RRT / rapid response team).

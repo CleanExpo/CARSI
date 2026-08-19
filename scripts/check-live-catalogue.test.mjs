@@ -430,6 +430,31 @@ check('benign expansion does NOT grant the rest of the title an exemption', () =
   }
 });
 
+// A designation is the designation however its author punctuated it. Independent review of
+// PR #674 found `Water Damage Restoration-Technician` returned clean while the identical spaced
+// form fired. Separators between two letters are normalised to spaces; ordinary hyphenated words
+// must stay untouched, so both directions are pinned.
+check('a hyphen or underscore does not defeat a designation phrase', () => {
+  for (const title of [
+    'Water Damage Restoration-Technician Course | CARSI',
+    'Applied Structural Drying_Technician | CARSI',
+    'Carpet Cleaning-Technician Essentials | CARSI',
+  ]) {
+    assert.ok(
+      scanCourse({ slug: 'clean-slug', title }).some((h) => h.rule === 'designation-phrase'),
+      `punctuated designation must still fire: ${title}`,
+    );
+  }
+  assert.equal(
+    scanCourse({
+      slug: 'clean-slug',
+      title: 'Two-Stage Pre-Cleaning for Hard-Surface Floors | CARSI',
+    }).length,
+    0,
+    'ordinary hyphenated words are not designations',
+  );
+});
+
 // The whitelist is a PHRASE, not a general "acronym defined by preceding words" rule — that
 // generalisation would suppress a spelled-out designation, which is banned as course branding.
 check('still fires on bare RRT with no benign phrase present', () => {
