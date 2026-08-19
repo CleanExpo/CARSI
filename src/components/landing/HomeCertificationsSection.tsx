@@ -14,7 +14,7 @@ const ITEMS = [
   {
     n: '01',
     title: 'IICRC CEC provider',
-    body: 'CARSI is an IICRC CEC Accredited provider. Completing eligible courses earns Continuing Education Credits toward maintaining your existing IICRC certification.',
+    body: 'CARSI is an IICRC CEC Accredited provider. Where the IICRC has approved a course, its CEC hours are shown on the course and recorded in your learner dashboard when you pass.',
   },
   {
     n: '02',
@@ -100,7 +100,11 @@ export function HomeCertificationsSection({
                         initial={reduceMotion ? false : { scaleX: 0 }}
                         whileInView={{ scaleX: 1 }}
                         viewport={{ once: true, amount: 0.5 }}
-                        transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.3 + index * 0.12 }}
+                        transition={{
+                          duration: 0.7,
+                          ease: [0.22, 1, 0.36, 1],
+                          delay: 0.3 + index * 0.12,
+                        }}
                       />
                       <motion.span
                         className="absolute top-1/2 right-0 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-[#2490ed]"
@@ -166,9 +170,7 @@ export function HomeCertificationsSection({
                   <p className="mt-1.5 font-[family-name:var(--font-display)] text-2xl font-semibold tracking-[-0.01em] text-slate-950">
                     Sam Taylor
                   </p>
-                  <p className="mt-3 text-[11px] text-slate-400">
-                    has earned the designation of
-                  </p>
+                  <p className="mt-3 text-[11px] text-slate-400">has earned the designation of</p>
                   <p className="mt-1 font-[family-name:var(--font-display)] text-[17px] font-semibold text-[#146fc2]">
                     CARSI Water Restoration Practitioner
                   </p>
