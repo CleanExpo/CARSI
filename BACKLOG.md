@@ -251,3 +251,18 @@ of what is actually being sold.
   (`e3a3b49e`) its push this session. Next step: capture a full `--reporter=verbose` run inside
   the gate context and check `ulimit -u` (4000 soft) against the fork count under the harness's
   ~57 resident node processes.
+
+- 2026-08-20 · **`main` is RED on E2E: three specs assert hero copy the homepage no longer has.**
+  Found because PR #682 is the first PR branched off `1057be16`, so it inherited the break rather
+  than causing it — its diff touches zero files under `src/` or `e2e/`. Commit `c9f8028d`
+  ("copy(hero): lead with the outcome…") replaced the H1 with "Become the technician every job
+  site trusts.", but `e2e/carsi-journeys.spec.ts:33`, `e2e/smoke.spec.ts:37` and
+  `e2e/pre-production.spec.ts:268` still expect "Professional training that fits the workday.".
+  Observed in run `32295812622`: `expect(locator).toContainText` failed against
+  `#main-content`, which received the new copy. **Why it matters beyond the red tick:** these are
+  the only automated checks that the landing page renders its hero at all, so until they are
+  realigned the homepage has no working smoke test — and a copy change is exactly the kind of
+  edit that would otherwise be caught here. Fix by updating the three expectations to the current
+  H1, not by loosening them to match any text; the assertion's value is that it pins specific
+  published copy. Confirm the wording is final with the founder first — the hero has changed
+  twice in three commits (`c9f8028d`, then `1e88d119`).
