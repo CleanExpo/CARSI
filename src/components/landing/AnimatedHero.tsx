@@ -12,7 +12,7 @@ const springSoft = { type: 'spring' as const, stiffness: 120, damping: 22, mass:
 
 const trustItems = [
   'Free courses to start',
-  'IICRC CECs on eligible courses',
+  'IICRC CEC Accredited provider',
   'Certificates anyone can verify',
 ];
 
@@ -220,8 +220,8 @@ export function AnimatedHero({ benefits: _benefits }: AnimatedHeroProps) {
             <span className="font-medium text-slate-700">
               CARSI trains Australia&apos;s cleaning and restoration professionals online.
             </span>{' '}
-            Study around the roster, earn IICRC CECs on eligible courses, and hold credentials
-            any client, employer, or insurer can verify in seconds.
+            Study around the roster, earn CARSI designations, and hold credentials any client,
+            employer, or insurer can verify in seconds.
           </motion.p>
 
           <motion.div

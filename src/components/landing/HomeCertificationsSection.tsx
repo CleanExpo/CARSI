@@ -24,7 +24,7 @@ const ITEMS = [
   {
     n: '03',
     title: 'Verified on completion',
-    body: 'Certificates and CEC records are issued when you pass, tracked in your learner dashboard for audits and recertification.',
+    body: 'Certificates are issued when you pass and tracked in your learner dashboard for audits and recertification. CEC records are added for courses the IICRC has approved for CECs.',
   },
 ] as const;
 
@@ -64,9 +64,8 @@ export function HomeCertificationsSection({
             Credentials that hold up on the job site
           </h2>
           <p className={`mt-4 ${LANDING_LEAD_CLASS}`}>
-            Earn a CARSI designation and IICRC CECs on eligible courses, with training that spans{' '}
-            {disciplineCountLabel} IICRC disciplines. Every certificate is issued with a
-            verification record.
+            Earn a CARSI designation, with training that spans {disciplineCountLabel} IICRC
+            disciplines. Every certificate is issued with a verification record.
           </p>
         </div>
 
@@ -185,7 +184,7 @@ export function HomeCertificationsSection({
                     <span className="h-3 w-px bg-slate-200" aria-hidden />
                     <span className="tabular-nums">ID CRD-2481</span>
                     <span className="h-3 w-px bg-slate-200" aria-hidden />
-                    <span className="font-semibold text-[#146fc2]">IICRC CECs recorded</span>
+                    <span className="font-semibold text-[#146fc2]">Designation recorded</span>
                   </div>
 
                   <div className="mt-7 flex items-end justify-between">
