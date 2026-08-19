@@ -345,19 +345,34 @@ export function isLiveCourse(title) {
   return Boolean(title) && !title.includes(NOT_FOUND_MARKER);
 }
 
+export const DEFAULT_FETCH_TIMEOUT_MS = 15000;
+
 /**
  * Every request is bounded. A server that accepts the connection and then says nothing used to
  * hold the audit open indefinitely, and an audit that never returns is an audit that never
  * fails — in CI it burns the job timeout and reports as infrastructure flake, by hand it looks
  * like a slow network. Either way the licence question goes unanswered while reading as "not a
  * violation", which is the exact silence this guard exists to break.
+ *
+ * A malformed override is refused rather than coerced. `Number.parseInt('abc')` is NaN, and
+ * `AbortSignal.timeout(NaN)` aborts at 0ms — so a typo in the env var would abort every request
+ * instantly and the audit would blame the network for a configuration mistake.
  */
-const FETCH_TIMEOUT_MS = Number.parseInt(process.env.CARSI_FETCH_TIMEOUT_MS || '15000', 10);
+export function parseFetchTimeout(raw) {
+  if (raw === undefined || raw === '') return DEFAULT_FETCH_TIMEOUT_MS;
+  const ms = Number(raw);
+  if (!Number.isInteger(ms) || ms <= 0) {
+    throw new Error(
+      `CARSI_FETCH_TIMEOUT_MS must be a positive whole number of milliseconds, got ${JSON.stringify(raw)}`,
+    );
+  }
+  return ms;
+}
 
-async function fetchText(url) {
+async function fetchText(url, timeoutMs) {
   const res = await fetch(url, {
     headers: { 'User-Agent': 'carsi-live-catalogue-guard' },
-    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+    signal: AbortSignal.timeout(timeoutMs),
   });
   // A non-2xx body is not a course page. Without this, a 500 rendering "Server Error | CARSI"
   // satisfied isLiveCourse() and was counted as a clean live course — the guard reporting
@@ -401,26 +416,39 @@ export function titleOf(html) {
   return decodeEntities(m[1]).trim();
 }
 
+/**
+ * The one report shape for "I could not look". Module scope on purpose: the top-level handler
+ * needs the identical shape, and when the two were written separately the unexpected-failure
+ * path printed human text to stderr and left stdout EMPTY. A consumer then got a parse error
+ * instead of a reason, which is indistinguishable from a crashed run — the same "silence reads
+ * as success" defect this whole guard exists to prevent.
+ */
+export function cannotAuditReport(reason) {
+  return { site: SITE, error: reason, checked: 0, violations: [], notes: [] };
+}
+
+/** Emit that report and leave with code 2. Never 0: "I could not look" is not "nothing is wrong". */
+function emitCannotAudit(reason, asJson, extra = []) {
+  if (asJson) {
+    console.log(JSON.stringify(cannotAuditReport(reason), null, 2));
+  } else {
+    console.error(`cannot audit: ${reason}`);
+    for (const line of extra) console.error(line);
+  }
+  process.exit(2);
+}
+
 async function main() {
   const asJson = process.argv.includes('--json');
+  const cannotAudit = (reason, extra = []) => emitCannotAudit(reason, asJson, extra);
 
-  /**
-   * Exit without an audit. In --json mode this still emits a parseable object on stdout: a
-   * consumer that cannot parse the failure cannot tell a broken run from a clean one, which is
-   * the same "silence reads as success" defect this whole guard exists to prevent.
-   */
-  const cannotAudit = (reason, extra = []) => {
-    if (asJson) {
-      console.log(JSON.stringify({ site: SITE, error: reason, checked: 0, violations: [], notes: [] }, null, 2));
-    } else {
-      console.error(`cannot audit: ${reason}`);
-      for (const line of extra) console.error(line);
-    }
-    process.exit(2);
-  };
+  // Validated before any request, so a malformed override is named as a configuration error
+  // rather than surfacing later as a site-wide network failure.
+  const timeoutMs = parseFetchTimeout(process.env.CARSI_FETCH_TIMEOUT_MS);
+
   let courseUrls;
   try {
-    const sitemap = await fetchText(`${SITE}/sitemap.xml`);
+    const sitemap = await fetchText(`${SITE}/sitemap.xml`, timeoutMs);
     courseUrls = [...new Set(sitemap.match(/https?:\/\/[^<\s]*?\/courses\/[^<\s]+/g) || [])];
   } catch (err) {
     cannotAudit(`sitemap fetch failed for ${SITE} — ${err.message}`);
@@ -436,7 +464,7 @@ async function main() {
   for (const url of courseUrls) {
     const slug = url.replace(/\/$/, '').split('/').pop();
     try {
-      results.push({ slug, url, title: titleOf(await fetchText(url)) });
+      results.push({ slug, url, title: titleOf(await fetchText(url, timeoutMs)) });
     } catch (err) {
       results.push({ slug, url, title: '', error: err.message });
     }
@@ -535,8 +563,8 @@ async function main() {
 // pathToFileURL, never `file://` + the raw path: an unencoded space makes the comparison false
 // and silently disables the whole script. That defect shipped in three guards in this repo.
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  main().catch((err) => {
-    console.error(`cannot audit: ${err.message}`);
-    process.exit(2);
-  });
+  // Through the SAME emitter as every other failure. Written separately, this handler printed to
+  // stderr and left stdout empty, so `--json` promised a parseable object on every exit path and
+  // broke that promise on the one path a consumer least expects: the unexpected one.
+  main().catch((err) => emitCannotAudit(err && err.message ? err.message : String(err), process.argv.includes('--json')));
 }

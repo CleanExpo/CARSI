@@ -13,7 +13,16 @@
  */
 import assert from 'node:assert/strict';
 
-import { decodeEntities, fold, isLiveCourse, scanCourse, titleOf } from './check-live-catalogue.mjs';
+import {
+  cannotAuditReport,
+  DEFAULT_FETCH_TIMEOUT_MS,
+  decodeEntities,
+  fold,
+  isLiveCourse,
+  parseFetchTimeout,
+  scanCourse,
+  titleOf,
+} from './check-live-catalogue.mjs';
 
 let failures = 0;
 function check(name, fn) {
@@ -1244,6 +1253,69 @@ await (async () => {
   } catch (err) {
     failures += 1;
     console.error(`  ✗ ${name}\n      ${err.message}`);
+  }
+})();
+
+// --- CodeRabbit #674 finding 507: the top-level catch broke the --json contract ---
+// The header promises one parseable object on EVERY exit path. The unexpected-failure handler
+// wrote human text to stderr and left stdout empty, so a consumer got a parse error instead of a
+// reason — indistinguishable from a crashed run, and the same silence the guard exists to break.
+//
+// This is exercised through a genuinely reachable throw rather than a stubbed one: a malformed
+// CARSI_FETCH_TIMEOUT_MS. Before the fix that also degraded silently — Number.parseInt('abc') is
+// NaN and AbortSignal.timeout(NaN) aborts at 0ms, so every request failed and the audit blamed
+// the network for what was a typo in an env var.
+
+console.log('live-catalogue guard — an UNEXPECTED failure must still be parseable JSON');
+
+check('parseFetchTimeout defaults when unset or empty', () => {
+  assert.equal(parseFetchTimeout(undefined), DEFAULT_FETCH_TIMEOUT_MS);
+  assert.equal(parseFetchTimeout(''), DEFAULT_FETCH_TIMEOUT_MS);
+});
+
+check('parseFetchTimeout accepts a positive whole number', () => {
+  assert.equal(parseFetchTimeout('300'), 300);
+});
+
+check('parseFetchTimeout refuses a malformed override instead of coercing it', () => {
+  for (const bad of ['abc', '0', '-5', '1.5', 'NaN']) {
+    assert.throws(() => parseFetchTimeout(bad), /CARSI_FETCH_TIMEOUT_MS/, `must refuse ${bad}`);
+  }
+});
+
+check('cannotAuditReport is the one failure shape, and it is non-vacuous', () => {
+  const report = cannotAuditReport('because');
+  assert.equal(report.error, 'because');
+  assert.equal(report.checked, 0);
+  assert.deepEqual(report.violations, []);
+  assert.deepEqual(report.notes, []);
+});
+
+await (async () => {
+  const name = '--json is parseable when an UNEXPECTED error reaches the top-level handler';
+  const server = await serve({ '/courses/clean': [200, title('Clean Course | CARSI')] });
+  const { code, out } = await new Promise((resolve) => {
+    const child = spawn(process.execPath, [GUARD, '--json'], {
+      env: {
+        ...process.env,
+        CARSI_SITE: `http://127.0.0.1:${server.address().port}`,
+        CARSI_FETCH_TIMEOUT_MS: 'abc',
+      },
+    });
+    let o = '';
+    child.stdout.on('data', (d) => (o += d));
+    child.on('close', (c) => resolve({ code: c, out: o }));
+  });
+  server.close();
+  try {
+    assert.equal(code, 2, 'an unexpected failure must exit 2, never 0');
+    const parsed = JSON.parse(out); // throws if stdout is empty — the defect being pinned
+    assert.match(parsed.error, /CARSI_FETCH_TIMEOUT_MS/, 'the reason must name the real cause');
+    assert.equal(parsed.checked, 0);
+    console.log(`  ✓ ${name}`);
+  } catch (err) {
+    failures += 1;
+    console.error(`  ✗ ${name}\n      ${err.message}\n      stdout: ${JSON.stringify(out.slice(0, 120))}`);
   }
 })();
 
