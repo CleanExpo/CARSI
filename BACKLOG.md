@@ -128,6 +128,36 @@ RWR; it compounds slowly and must not be read as revenue movement.
 - 2026-08-17 · **Merging to `main` deploys straight to production** (`deploy_on_push: true` in
   `app.yaml`) and `main` requires no pull-request review. Worth a deliberate decision rather
   than leaving it implicit.
+- 2026-08-18 · **CLC-P2-001 — digit lookalikes of banned designations are deliberately not
+  caught** by `check-live-catalogue`. Raised as a documented P2 by independent review at
+  `a3530296` and accepted, not fixed. Folding digits (`0`->`O`, `5`->`S`) was removed because it
+  corrupted the metric and electrical text CARSI's Australian-production standard requires on
+  nearly every course — `50 m² @ 230 V` folded to `SO m2 @ 23O V` — and opened a false-positive
+  path where `0ct` becomes `OCT`. A title reading `0CT` therefore escapes this guard. Accepted
+  because a digit is not a plausible staff-authored form and a false positive on a licence guard
+  costs more than this miss; `check-iicrc-compliance` remains the backstop. Revisit only if a
+  digit-form designation is ever observed on the live catalogue.
+- 2026-08-18 · **CLC-P2-002 — the IICRC designation expansions in `check-live-catalogue` need
+  founder verification against the licensed source.** `DESIGNATION_PHRASES` maps each banned
+  acronym to the designation written out, and the guard now blocks on those phrases. One of the
+  eight was FABRICATED: TCST was expanded as "tile stone and concrete cleaning technician" from
+  memory with no source, and independent review established it is Trauma and Crime Scene
+  Technician. The other seven were written the same way and have not been checked. They are
+  load-bearing for a licence guard, so they should be confirmed against the licensed IICRC
+  source rather than trusted. Note CLAUDE.md forbids feeding IICRC standard TEXT into AI
+  tooling; designation names are public nomenclature, but the verification is a founder
+  action, not an agent one.
+- 2026-08-18 · **CLC-P2-003 — separated-letter acronym forms are not caught** by
+  `check-live-catalogue` (`scripts/check-live-catalogue.mjs:220`). Raised as a documented P2 by
+  independent review at `623c3f9d` and accepted, not fixed. `W.R.T.`, `W R T`, `W/R/T`,
+  `water-damage-w.r.t-essentials` and `water-damage-w-r-t-essentials` all return no hit. The
+  reviewer's own disposition: a non-canonical separated initialism is an evasion class rather
+  than a plausible ordinary CARSI course-title form, and `rg` found no such form anywhere in the
+  repo. Every real violation measured on production uses the contiguous acronym or the
+  spelled-out designation. Revisit only if a separated form is ever observed on the live
+  catalogue; widening the acronym rules to match separated letters risks false positives on
+  ordinary initialisms in course copy, which is the failure mode this guard has already
+  produced five times.
 - 2026-08-18 · **Course URL slugs still carry IICRC discipline prefixes** (`cct-`, `wrt-`,
   `asd-`, `amrt-`, `fsrt-`). Rendered copy is clean and guarded; the five slugs are exempted from
   the branding guard by exact literal value — anywhere in the scanned file, not only in slug
@@ -161,3 +191,45 @@ that emits nothing is currently indistinguishable from a control that found noth
 structural fix; the rest are instances it would have caught. The scope limit that sits above all
 of them: repo seed holds 37 courses, production sells 80, so no source-scanning guard can see 54%
 of what is actually being sold.
+
+- 2026-08-19 · **CLC-P2-004 — an `OCT`-branded SLUG with a clean title is not caught** by
+  `check-live-catalogue`. Raised by independent review on PR #674 and reproduced: slug
+  `oct-odour-control` with title `Odour Management Fundamentals` returns `[]`. `OCT` is in
+  `AMBIGUOUS_ACRONYMS`, which disables the slug rule for it. Accepted, not fixed, for the reason
+  already recorded in the code: slugs are lowercase by convention and carry no case to
+  disambiguate, so enabling the rule flags `seasonal-cleaning-oct-2026` — a legitimate October
+  course — as a licence violation. Measured in the same run: the false-positive control is
+  silent today and would fire if the exemption were removed. A guard that cries wolf on October
+  is one staff stop believing, which is the failure mode this guard has already produced five
+  times. The title rule still catches `OCT` written as a designation, the designation-phrase
+  rule catches `odour/odor control technician` on both surfaces, and `check-iicrc-compliance`
+  remains the backstop. Revisit only if an `OCT`-form slug is ever observed on the live
+  catalogue — and fix it by narrowing to a month-name exclusion, never by dropping the guard.
+
+- 2026-08-19 · **CLC-P2-005 — the guard reads `<title>` only, so a designation shown in `<h1>`
+  or `og:title` is invisible to it.** Raised by independent review on PR #674 (gpt-5.5-high) and
+  reproduced end to end: a page serving `<title>Clean Course | CARSI</title>` alongside
+  `<meta property="og:title" content="Water Damage WRT Essentials | CARSI">` and
+  `<h1>Water Damage WRT Essentials</h1>` exits **0** and prints `✓ 1 live courses clean.` The
+  acronym is displayed to every reader and shared to every social preview; the guard never sees
+  it. Filed rather than fixed because this is a **scope decision, not a defect in what the guard
+  claims to do** — its stated contract is the document title, and widening it to the rendered
+  body is a different guard with a different false-positive profile (an `<h1>` quoting an IICRC
+  standard nominatively is legitimate copy, and `og:title` is often generated). Deciding it needs
+  a ruling on which surfaces are "course branding". Until then `check-iicrc-compliance` remains
+  the repo-side backstop, and its 46%-of-catalogue ceiling still applies. Blast radius if
+  ignored: unknown — no live page is currently known to do this, and nothing measures it.
+
+- 2026-08-19 · **CLC-P2-006 — exotic HTML5 named entities are still not decoded.** Raised by
+  independent review round 4 on PR #674 (gpt-5.5-high) and reproduced: `&AMPWRT` and `&Wopf;RT`
+  render text a reader sees as WRT-like, but `decodeEntities` knows only the five named entities
+  it needs (`amp`, `lt`, `gt`, `quot`, `apos`) plus the full numeric forms. Accepted, not fixed.
+  The full HTML5 named-entity table is ~2,231 entries; embedding it — or adding a parser
+  dependency to a guard that must run with zero install — buys coverage of forms no CMS emits,
+  in exchange for a much larger false-positive surface and a dependency in the one guard that
+  reads production. The classes that actually occur in authored copy are closed: numeric
+  references decimal and hex, with or without the semicolon and with any padding; the five named
+  entities a title realistically carries; every default-ignorable character; and full URL
+  normalisation. Revisit only if an exotic named entity is ever observed on the live catalogue —
+  and fix it by decoding with a real HTML parser, never by hand-extending the table, which is the
+  ratchet this file has already lost to three times.
