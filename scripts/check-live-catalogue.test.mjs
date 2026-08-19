@@ -21,6 +21,7 @@ import {
   isLiveCourse,
   parseFetchTimeout,
   scanCourse,
+  slugOf,
   titleOf,
 } from './check-live-catalogue.mjs';
 
@@ -1318,6 +1319,74 @@ await (async () => {
     console.error(`  ✗ ${name}\n      ${err.message}\n      stdout: ${JSON.stringify(out.slice(0, 120))}`);
   }
 })();
+
+// --- Independent review (gpt-5.5-high, 2026-08-19): two more ways to stay silent ---
+// Found by planting the input, not by reading the regex. Both are the same disease as the
+// numeric-entity bypass: a form a BROWSER renders as a banned acronym that this guard did not
+// recognise as one.
+
+console.log('live-catalogue guard — zero-width characters must not split an acronym');
+
+check('folds away a zero-width joiner inside an acronym', () => {
+  // "W‍RT" renders as WRT. NFKC does not remove default-ignorable characters, so the
+  // acronym rule never saw it.
+  assert.equal(fold('W‍RT'), 'WRT');
+});
+
+check('folds away the other default-ignorables an author can paste', () => {
+  assert.equal(fold('A​S‌D'), 'ASD'); // zero-width space, zero-width non-joiner
+  assert.equal(fold('F﻿SRT'), 'FSRT'); // BOM / zero-width no-break space
+  assert.equal(fold('C­CT'), 'CCT'); // soft hyphen
+});
+
+check('fires on a title whose acronym is split by a zero-width joiner', () => {
+  const hits = scanCourse({
+    slug: 'water-damage-essentials',
+    title: 'Water Damage W‍RT Essentials | CARSI',
+  });
+  assert.ok(hits.some((h) => h.rule === 'title-acronym' && h.detail === 'WRT'));
+});
+
+console.log('live-catalogue guard — a slug must be read as the browser resolves it');
+
+check('slugOf percent-decodes, so w%72t-hidden is read as wrt-hidden', () => {
+  assert.equal(slugOf('http://x/courses/w%72t-hidden'), 'wrt-hidden');
+});
+
+check('slugOf strips a query string and a fragment', () => {
+  assert.equal(slugOf('http://x/courses/wrt?utm=1'), 'wrt');
+  assert.equal(slugOf('http://x/courses/wrt#top'), 'wrt');
+  assert.equal(slugOf('http://x/courses/wrt/'), 'wrt');
+});
+
+check('slugOf reads malformed percent-encoding literally instead of crashing', () => {
+  assert.equal(slugOf('http://x/courses/100%-clean'), '100%-clean');
+});
+
+check('a percent-encoded banned slug still fires', () => {
+  const hits = scanCourse({ slug: slugOf('http://x/courses/w%72t-hidden'), title: 'Clean | CARSI' });
+  assert.ok(hits.some((h) => h.rule === 'slug-acronym' && h.detail === 'WRT'));
+});
+
+await checkE2E(
+  'exits 1 on a percent-encoded banned slug served end to end',
+  { '/courses/w%72t-hidden': [200, title('Water Damage Essentials | CARSI')] },
+  ({ code, combined }) => {
+    assert.equal(code, 1, 'a percent-encoded slug must not bypass the slug rules');
+    assert.match(combined, /slug-acronym/);
+  },
+);
+
+await checkE2E(
+  'exits 1 on a title whose acronym is split by a zero-width joiner, end to end',
+  {
+    '/courses/water-damage-essentials': [200, title('Water Damage W‍RT Essentials | CARSI')],
+  },
+  ({ code, combined }) => {
+    assert.equal(code, 1, 'a zero-width joiner must not bypass the acronym rules');
+    assert.match(combined, /title-acronym/);
+  },
+);
 
 if (failures > 0) {
   console.error(`\n${failures} check(s) failed — the guard is not trustworthy until they pass.`);

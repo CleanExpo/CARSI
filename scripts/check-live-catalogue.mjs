@@ -218,8 +218,19 @@ const HOMOGLYPHS = {
  * forms), then the lookalike map. Matching runs against the folded text while the ORIGINAL is
  * always what gets reported, so an operator sees the real title, not a normalised one.
  */
+/**
+ * Characters a browser renders as nothing at all. Independent review (gpt-5.5-high,
+ * 2026-08-19) planted `W<ZWJ>RT` in a title: it displays as WRT to every reader, NFKC leaves
+ * the joiner in place, and the acronym rule saw a string that was not WRT. Soft hyphen, the
+ * zero-width space/joiner family, the bidi controls and the BOM all do the same job.
+ *
+ * Stripped BEFORE normalising, so a designation cannot be smuggled through in pieces.
+ */
+const INVISIBLES = /[­᠎​-‏‪-‮⁠-⁤⁦-⁯﻿]/g;
+
 export function fold(text) {
   return (text || '')
+    .replace(INVISIBLES, '')
     .normalize('NFKC')
     .split('')
     .map((ch) => HOMOGLYPHS[ch] ?? HOMOGLYPHS[ch.toUpperCase()] ?? ch)
@@ -338,6 +349,26 @@ export function scanCourse({ slug, title }) {
   const alignedHit = fTitle.match(alignedRe);
   if (alignedHit) hits.push({ rule: 'title-aligned', detail: `"${alignedHit[0]}"` });
   return hits;
+}
+
+/**
+ * Read a slug the way the browser resolves it, not the way the sitemap spells it.
+ *
+ * Independent review (gpt-5.5-high, 2026-08-19) listed `/courses/w%72t-hidden` in a sitemap:
+ * it serves the same page as `/courses/wrt-hidden`, but the raw URL tail contains no `wrt` and
+ * the slug rules never fired. A query string did the same job — `/courses/wrt?utm=1` made the
+ * tail `wrt?utm=1`.
+ */
+export function slugOf(url) {
+  const path = url.split('#')[0].split('?')[0].replace(/\/+$/, '');
+  const raw = path.split('/').pop() || '';
+  try {
+    return decodeURIComponent(raw);
+  } catch {
+    // Malformed percent-encoding (a literal `%` in a real slug): read it as written rather
+    // than throwing away the audit of a URL that is otherwise perfectly checkable.
+    return raw;
+  }
 }
 
 /** A live course is one whose title is not the soft-404 marker. Status is never consulted. */
@@ -462,7 +493,7 @@ async function main() {
 
   const results = [];
   for (const url of courseUrls) {
-    const slug = url.replace(/\/$/, '').split('/').pop();
+    const slug = slugOf(url);
     try {
       results.push({ slug, url, title: titleOf(await fetchText(url, timeoutMs)) });
     } catch (err) {
