@@ -3,8 +3,8 @@
 **Timestamp:** 2026-08-19 21:45 AEST
 **Machine:** `Phills-Mac-mini.local`
 **Repo:** CARSI — worktree `/Volumes/Storage Unit/CARSI/.claude/worktrees/fix-674-review-findings`
-**Branch:** `fix/674-review-findings` @ `70c0253f` — **pushed** to `guard/live-catalogue-licence`,
-tree clean, stash empty
+**Branch:** `fix/674-review-findings` @ `54e5344d` — **pushed** to `guard/live-catalogue-licence`,
+tree clean, stash empty, PR #674 green and `CLEAN`
 **Scope:** founder ask — "clear all old completed works by pushing and committing, ensure the work
 is at a AAA rating, clean and clear data to work with"
 
@@ -42,11 +42,13 @@ worktrees; local `main` 4 commits behind.
 
 | Ref | What |
 |---|---|
-| `guard/live-catalogue-licence` @ `70c0253f` | PR #674 — 32 commits ahead of `main`; the live-catalogue licence guard plus 7 bypass fixes |
+| `guard/live-catalogue-licence` @ `54e5344d` | PR #674 — 34 commits ahead of `main`; the live-catalogue licence guard plus 7 bypass fixes. 14/14 CI green, `CLEAN` |
 | `archive/overnight-gate0-20260818` @ `4777a0af` | 19 commits incl. BACKLOG #2 (ten IICRC CEC submission packs) — previously local-only |
 | `archive/vacuous-cli-guards-20260819` @ `df74a462` | 4 commits — previously local-only |
 
-Receipt: **`PR_RELEASE_GATE_PASS head=70c0253fe8f5897f3d9394577313bbe6dae7896a reviewer=gpt-5.5`**
+Receipt: **`PR_RELEASE_GATE_PASS head=54e5344d9b8cdd2fcb9131882e8c8ca16c856504 reviewer=gpt-5.5`**
+(an earlier receipt bound `70c0253f`; the docs commits that followed required a re-bind, because
+a PASS binds to an exact SHA)
 
 Housekeeping: 2 stale worktrees pruned, local `main` fast-forwarded to `86165d5e`.
 
@@ -91,12 +93,20 @@ Housekeeping: 2 stale worktrees pruned, local `main` fast-forwarded to `86165d5e
 ## 5. Running state
 
 - **No background processes.** All five review rounds completed.
-- **CI on #674 was still finishing at handoff time.** At last read: Unit Tests, Frontend Tests,
-  Secret Scan, Trivy, NPM Audit, Dependency Review/Verification, Vercel — **pass**; **Build Check
-  and E2E Tests pending**, CodeRabbit re-reviewing. E2E took ~28 min on the previous SHA. Verify
-  before treating the PR as green — this is the one claim in this handoff not yet closed.
-- Review worktrees remain at `~/.claude/jobs/f37f7054/tmp/review-{wt,final,r3,r4,r5}` with
-  `node_modules` / `src/generated` symlinked. Delete them, then `git worktree prune`.
+- **No background processes. CI is observed green.** Final SHA `54e5344d`: all **14** checks
+  pass (Build Check, E2E Tests, Unit Tests, Frontend Tests, Secret Scan, Trivy, NPM Audit,
+  Dependency Review/Verification, Security Summary, Vercel ×2, detect-agent-pr, CodeRabbit).
+  `mergeable: MERGEABLE`, `mergeStateStatus: **CLEAN**`, **0 of 7 review threads unresolved** —
+  the BLOCKED state that held this PR for two sessions is gone.
+- **CodeRabbit's re-review opened 3 further threads** on the superseded 21:14 handoff — a
+  committed reviewer account email (Major), a missing supersession note, and a pickup command
+  omitting `npx prisma generate`. All three were valid, fixed in `54e5344d`, replied to and
+  resolved.
+- Review worktrees have been deleted and `git worktree prune` run. Remaining worktrees: the main
+  checkout, this one, and `overnight-gate0-20260818`.
+- **The main checkout is stale.** It sits at `92be1290` on `guard/live-catalogue-licence`, five
+  commits behind the pushed tip. Nothing is lost — the remote has everything — but a `git pull`
+  there is the first thing to do before working in it.
 - This worktree has `node_modules` symlinked and `src/generated/prisma` generated locally;
   `node_modules` is excluded via `.git/info/exclude` (the `.gitignore` rule's trailing slash does
   not match a symlink).
@@ -150,7 +160,7 @@ normalisation) — so no widening raised a false positive across the 76 clean li
 
 | Question | Why |
 |---|---|
-| **Merge #674** | `main` deploys to production on push. Merge is founder-only. Threads are resolved and the receipt is issued; it needs Build Check + E2E green. |
+| **Merge #674** | `main` deploys to production on push, so merge is founder-only. Everything agent-owned is done: 14/14 checks pass, 0 unresolved threads, `mergeStateStatus: CLEAN`, receipt `PR_RELEASE_GATE_PASS head=54e5344d reviewer=gpt-5.5`. |
 | **DECISIONS #16 — prod-DB access** | 4 courses carry banned IICRC branding live **right now**; 3 are absent from repo seed, so no agent can reach them. Licence-critical, unchanged by this session. |
 | DECISIONS #1 / #3 — CEC packs, outreach emails | Deadlines were 2026-08-20; now past. |
 
@@ -160,10 +170,13 @@ normalisation) — so no widening raised a false positive across the 76 clean li
 
 **Start here**
 
-1. Confirm CI went green on `70c0253f` — `gh pr checks 674`. Build Check and E2E were pending.
-2. If green, #674 is ready for the founder's merge decision. Nothing else blocks it.
-3. If red, read the failing job before assuming it is this branch: `main` carries ~14,777
-   pre-existing lint problems (BACKLOG #37) and the changed files lint clean.
+1. **#674 is ready for the founder's merge decision.** 14/14 checks pass on `54e5344d`, 0
+   unresolved threads, `mergeStateStatus: CLEAN`. Nothing agent-owned blocks it. Merge is
+   founder-only because `main` deploys to production on push.
+2. Refresh the stale main checkout before working in it (§5).
+3. The highest-value follow-up is BACKLOG #30 — wire `check:live-catalogue` into CI. It is the
+   only guard that sees the 54% of the catalogue no source scan can reach, it needs no
+   credentials, and today it runs only when a human types it.
 
 **Do not redo**
 
@@ -176,15 +189,19 @@ normalisation) — so no widening raised a false positive across the 76 clean li
 **First command to run**
 
 ```bash
-gh pr checks 674
+cd "/Volumes/Storage Unit/CARSI" && git pull --ff-only
 ```
 
 ---
 
 ## 9. Risk notes
 
-- **CI was not observed green.** Build Check and E2E were still pending when this was written.
-  "Pushed with a receipt" is not "CI green" — shipped is not observed.
+- **CI is now observed green** (14/14 on `54e5344d`) — the earlier draft of this handoff recorded
+  it as pending, and it was confirmed afterwards rather than assumed. "Pushed with a receipt" is
+  not "CI green"; both now hold, and each was read from `gh pr checks`.
+- **Merging still deploys to production.** `CLEAN` means the gates are satisfied, not that the
+  change is risk-free. The guard is additive — a new script plus tests, no product code path —
+  but the merge itself publishes `main`.
 - **The `AAA-S` rung is earned for the gate half, not the production half.** Rung A — the gate
   watched failing on the live defect — holds seven times over, each red-observed. But
   `prod-observed-by` is not discharged: the guard's fixes are proven against fixtures and against
@@ -215,5 +232,5 @@ pending state is stated as pending in §5 and §9 rather than rounded up to gree
 claim is qualified rather than asserted. Nothing was merged, no production was mutated, no branch
 deleted.
 
-**Handoff complete. Next safe action: run `gh pr checks 674`; if Build Check and E2E are green,
-#674 is ready for the founder's merge decision.**
+**Handoff complete. Next safe action: `git pull --ff-only` in the main checkout to clear the
+stale branch; #674 is green, CLEAN, and awaiting only the founder's merge decision.**
