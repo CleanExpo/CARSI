@@ -205,3 +205,17 @@ of what is actually being sold.
   rule catches `odour/odor control technician` on both surfaces, and `check-iicrc-compliance`
   remains the backstop. Revisit only if an `OCT`-form slug is ever observed on the live
   catalogue — and fix it by narrowing to a month-name exclusion, never by dropping the guard.
+
+- 2026-08-19 · **CLC-P2-005 — the guard reads `<title>` only, so a designation shown in `<h1>`
+  or `og:title` is invisible to it.** Raised by independent review on PR #674 (gpt-5.5-high) and
+  reproduced end to end: a page serving `<title>Clean Course | CARSI</title>` alongside
+  `<meta property="og:title" content="Water Damage WRT Essentials | CARSI">` and
+  `<h1>Water Damage WRT Essentials</h1>` exits **0** and prints `✓ 1 live courses clean.` The
+  acronym is displayed to every reader and shared to every social preview; the guard never sees
+  it. Filed rather than fixed because this is a **scope decision, not a defect in what the guard
+  claims to do** — its stated contract is the document title, and widening it to the rendered
+  body is a different guard with a different false-positive profile (an `<h1>` quoting an IICRC
+  standard nominatively is legitimate copy, and `og:title` is often generated). Deciding it needs
+  a ruling on which surfaces are "course branding". Until then `check-iicrc-compliance` remains
+  the repo-side backstop, and its 46%-of-catalogue ceiling still applies. Blast radius if
+  ignored: unknown — no live page is currently known to do this, and nothing measures it.
