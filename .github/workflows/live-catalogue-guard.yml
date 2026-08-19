@@ -28,12 +28,17 @@ on:
     # in order rather than as two simultaneous alarms.
     - cron: '0 3 * * *'
   workflow_dispatch:
-  # Also on any push that touches the guard itself, so a change to the guard is exercised
-  # against production before it is trusted.
-  push:
-    paths:
-      - 'scripts/check-live-catalogue.mjs'
-      - '.github/workflows/live-catalogue-guard.yml'
+
+# NOT on push, deliberately. An earlier revision added a `push` path filter so that a change to
+# the guard would be exercised against production before being trusted. Dispatching the real
+# workflow showed why that is wrong: it attaches a PR check whose verdict is about the state of
+# the live CATALOGUE, not about the pull request's code — so every PR touching this guard would
+# carry a red check it cannot fix, and a red check nobody can act on is one everybody learns to
+# scroll past.
+#
+# The intent is kept, manually: run `gh workflow run live-catalogue-guard.yml --ref <branch>`
+# after changing the guard, and read the result. That is a deliberate act with a reader attached,
+# rather than an alarm with none.
 
 permissions:
   contents: read
