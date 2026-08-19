@@ -886,13 +886,16 @@ import { fileURLToPath } from 'node:url';
 
 const GUARD = fileURLToPath(new URL('./check-live-catalogue.mjs', import.meta.url));
 
-function serve(pages) {
-  // pages: { '/courses/x': [status, html] }; the sitemap is generated from its keys.
+function serve(pages, sitemapPaths) {
+  // pages: { '/courses/x': [status, html] }; the sitemap is generated from its keys unless
+  // sitemapPaths overrides it. The override exists because a sitemap may advertise a path the
+  // server RESOLVES to a different one — `/courses/wrt/.` is served at `/courses/wrt/` — and a
+  // fixture that cannot express that cannot test it.
   const server = http.createServer((req, res) => {
     const path = req.url.split('?')[0];
     const port = server.address().port;
     if (path === '/sitemap.xml') {
-      const urls = Object.keys(pages)
+      const urls = (sitemapPaths || Object.keys(pages))
         .map((p) => `<url><loc>http://127.0.0.1:${port}${p}</loc></url>`)
         .join('');
       res.writeHead(200, { 'Content-Type': 'application/xml' });
@@ -1480,6 +1483,58 @@ await checkE2E(
     assert.match(combined, /title-acronym/);
   },
 );
+
+// --- Independent review round 3 (gpt-5.5-high, 2026-08-19): dot segments ---
+// `/courses/wrt/.` resolves to `/courses/wrt/` in any browser, but hand-rolled tail-splitting
+// returned the slug `"."` and the slug rules matched nothing. Third round, third hand-rolled
+// parser beaten by a real one — the standing lesson of this file.
+
+console.log('live-catalogue guard — a path must be normalised the way the browser normalises it');
+
+check('slugOf resolves a trailing dot segment', () => {
+  assert.equal(slugOf('http://x/courses/wrt/.'), 'wrt');
+});
+
+check('slugOf resolves interior dot segments', () => {
+  assert.equal(slugOf('http://x/courses/sub/../wrt'), 'wrt');
+  assert.equal(slugOf('http://x/courses/./wrt'), 'wrt');
+});
+
+check('slugOf still handles the ordinary forms after normalising', () => {
+  assert.equal(slugOf('http://x/courses/wrt'), 'wrt');
+  assert.equal(slugOf('http://x/courses/wrt/'), 'wrt');
+  assert.equal(slugOf('http://x/courses/w%72t-hidden'), 'wrt-hidden');
+  assert.equal(slugOf('http://x/courses/wrt?utm=1'), 'wrt');
+  assert.equal(slugOf('http://x/courses/wrt#top'), 'wrt');
+  assert.equal(slugOf('http://x/courses/100%-clean'), '100%-clean');
+});
+
+check('slugOf falls back rather than throwing on an unparseable URL', () => {
+  // A sitemap is not guaranteed to hold absolute URLs. Losing the audit of one entry to a
+  // thrown error would be the guard going quiet, which is the thing it exists to prevent.
+  assert.equal(slugOf('/courses/wrt'), 'wrt');
+  assert.equal(slugOf('not a url at all/courses/asd'), 'asd');
+});
+
+await (async () => {
+  // The sitemap advertises `/courses/wrt/.`; the server serves it at `/courses/wrt/`, which is
+  // what any real server does with a dot segment.
+  const name = 'exits 1 on a banned slug reached through a dot segment, end to end';
+  const server = await serve({ '/courses/wrt/': [200, title('Water Damage Essentials | CARSI')] }, [
+    '/courses/wrt/.',
+  ]);
+  try {
+    const { code, combined } = await runGuard(server.address().port);
+    assert.equal(code, 1, 'a dot segment must not bypass the slug rules');
+    assert.match(combined, /slug-acronym/);
+    console.log(`  ✓ ${name}`);
+  } catch (err) {
+    failures += 1;
+    console.error(`  ✗ ${name}\n      ${err.message}`);
+  } finally {
+    server.close();
+  }
+})();
 
 if (failures > 0) {
   console.error(`\n${failures} check(s) failed — the guard is not trustworthy until they pass.`);

@@ -365,8 +365,20 @@ export function scanCourse({ slug, title }) {
  * tail `wrt?utm=1`.
  */
 export function slugOf(url) {
-  const path = url.split('#')[0].split('?')[0].replace(/\/+$/, '');
-  const raw = path.split('/').pop() || '';
+  // WHATWG URL, not hand-rolled splitting. Round 2 caught a query string and a percent-encoded
+  // slug; round 3 caught `/courses/wrt/.`, which every browser resolves to `/courses/wrt/` but
+  // tail-splitting read as the slug ".". Three rounds, three hand-rolled parsers beaten by a
+  // real one — dot segments, and whatever the fourth round would have found, belong to the URL
+  // parser that already implements the standard.
+  let path;
+  try {
+    path = new URL(url, 'https://carsi.invalid').pathname;
+  } catch {
+    // A sitemap is not guaranteed to hold parseable URLs. Losing the audit of one entry to a
+    // thrown error is the guard going quiet, which is the thing it exists to prevent.
+    path = url.split('#')[0].split('?')[0];
+  }
+  const raw = path.replace(/\/+$/, '').split('/').pop() || '';
   try {
     return decodeURIComponent(raw);
   } catch {
