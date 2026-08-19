@@ -53,7 +53,10 @@ const SEED_COURSES: SeedCourseFull[] = [
         'Professional introduction to water damage restoration: safety, psychrometry, equipment, and client communication.',
       price_aud: 0,
       is_free: true,
-      iicrc_discipline: 'WRT',
+      // GP-523: CARSI designation rule — a CARSI course is never branded with an
+      // IICRC discipline acronym (was 'WRT'). The credential is the CARSI
+      // Southern Hemisphere Restoration Designation in data/seed/designations.json.
+      iicrc_discipline: null,
       status: 'published',
       level: 'Foundation',
       category: 'Water Restoration',
@@ -192,7 +195,10 @@ const SEED_COURSES: SeedCourseFull[] = [
         'Builds on water restoration fundamentals with a focus on structural drying, documentation rigour, and complex assemblies.',
       price_aud: 0,
       is_free: true,
-      iicrc_discipline: 'ASD',
+      // GP-523: CARSI designation rule — a CARSI course is never branded with an
+      // IICRC discipline acronym (was 'ASD'). The credential is the CARSI
+      // Southern Hemisphere Restoration Designation in data/seed/designations.json.
+      iicrc_discipline: null,
       status: 'published',
       level: 'Intermediate',
       category: 'Structural Drying',
@@ -201,7 +207,7 @@ const SEED_COURSES: SeedCourseFull[] = [
     },
     modules: [
       mod(
-        'Module 1 — ASD scope & prerequisites',
+        'Module 1 — Structural drying scope & prerequisites',
         'When structural drying differs from general water jobs',
         [{ h: 'Course map', p: ['Structural drying addresses bound water in framing, subfloors, and complex cavities where surface drying alone is insufficient.'] }]
       ),
@@ -253,7 +259,10 @@ const SEED_COURSES: SeedCourseFull[] = [
         'Introduces professional microbial remediation concepts emphasising safety, containment, cleaning vs removal decisions, and documentation.',
       price_aud: 0,
       is_free: true,
-      iicrc_discipline: 'AMRT',
+      // GP-523: CARSI designation rule — a CARSI course is never branded with an
+      // IICRC discipline acronym (was 'AMRT'). The credential is the CARSI
+      // Southern Hemisphere Restoration Designation in data/seed/designations.json.
+      iicrc_discipline: null,
       status: 'published',
       level: 'Intermediate',
       category: 'Microbial',
@@ -314,7 +323,10 @@ const SEED_COURSES: SeedCourseFull[] = [
         'Foundational fire and smoke restoration concepts for technicians working on residential and commercial smoke-affected properties.',
       price_aud: 0,
       is_free: true,
-      iicrc_discipline: 'FSRT',
+      // GP-523: CARSI designation rule — a CARSI course is never branded with an
+      // IICRC discipline acronym (was 'FSRT'). The credential is the CARSI
+      // Southern Hemisphere Restoration Designation in data/seed/designations.json.
+      iicrc_discipline: null,
       status: 'published',
       level: 'Foundation',
       category: 'Fire & Smoke',
@@ -375,7 +387,10 @@ const SEED_COURSES: SeedCourseFull[] = [
         'Practical commercial carpet maintenance aligned with professional cleaning expectations in education, retail, and strata settings.',
       price_aud: 0,
       is_free: true,
-      iicrc_discipline: 'CCT',
+      // GP-523: CARSI designation rule — a CARSI course is never branded with an
+      // IICRC discipline acronym (was 'CCT'). The credential is the CARSI
+      // Southern Hemisphere Restoration Designation in data/seed/designations.json.
+      iicrc_discipline: null,
       status: 'published',
       level: 'Foundation',
       category: 'Commercial Carpet',
@@ -437,7 +452,10 @@ const SEED_COURSES: SeedCourseFull[] = [
         'A paid professional skills course: translate technical work into clear project plans, commercial communication, and defensible documentation. Purchase once for lifetime access to this title (CARSI Pro subscribers may access the full catalogue separately).',
       price_aud: 179,
       is_free: false,
-      iicrc_discipline: 'ASD',
+      // GP-523: CARSI designation rule — a CARSI course is never branded with an
+      // IICRC discipline acronym (was 'ASD'). The credential is the CARSI
+      // Southern Hemisphere Restoration Designation in data/seed/designations.json.
+      iicrc_discipline: null,
       status: 'published',
       level: 'Professional',
       category: 'Business & Leadership',

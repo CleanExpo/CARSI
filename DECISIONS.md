@@ -19,6 +19,7 @@ External sends, spend, pricing and licence-critical claims NEVER default — the
 | 12 | Level names for the CARSI tier ladder (Foundation → Practitioner → Advanced → top tier TBD) | No default — naming is founder-owned. Agents propose 3 naming sets; you pick. | 2026-08-30 | OPEN |
 | 13 | Public Research Notes page (1 distilled, cited note/week) — go? | Default: YES at Gate 1 — it is the E-E-A-T engine | 2026-08-30 | OPEN |
 | 14 | Paywalled-journal budget for the evidence sweep | Default: OPEN-ACCESS ONLY (commits no spend). Any paid source is a new cost → founder-only. | 2026-08-30 | OPEN |
+| 15 | GP-523-D1 — course URL slugs still carry a lowercase IICRC discipline prefix (`cct-commercial-carpet-core`, plus wrt/asd/amrt/fsrt) | Default: KEEP the slugs for now; rename ships only with 301 redirects in a follow-up. Rendered copy is already clean and stays guarded. | 2026-08-25 | OPEN |
 
 ## Decided (move rows here with date + outcome)
 - 2026-08-16 · Telegram competing-idea-bots → rejected in favour of single cockpit bot (founder direction + blueprint §5)
@@ -38,6 +39,27 @@ confirm; if you override any of the three, only the accessibility target changes
 requires **no pull-request review** and permits force-pushes. That combination means nothing
 structurally prevents an unreviewed production deploy. It is recorded here as a decision rather
 than a discovery because leaving it implicit is itself a choice.
+
+**#15 exists because a compliance guard was blind, not because the slugs are new.** The GP-523
+branding test asserted the seed catalogue carried no discipline acronym and passed — but its
+regex lacked the `i` flag, so it matched `CCT` and never `cct-commercial-carpet-core`. Adding the
+flag turned that assertion red against five real slugs (`wrt-`, `asd-`, `amrt-`, `fsrt-`, `cct-`),
+which is how the exposure surfaced. The guard now runs case-insensitively and exempts the five
+deferred slugs by literal VALUE; an acronym in a title, or a bare lowercase acronym, still fails,
+and both directions are asserted in the test's positive-control block.
+
+> **Corrected 2026-08-18 after review.** This paragraph previously read "exempts *only*
+> slug-shaped lowercase matches" and closed "the deferral covers URLs only — rendered copy is
+> clean". Both overstated the guard. The exemption was keyed to slug SHAPE, so it erased any
+> lowercase acronym-hyphen-word token from any string literal: a mutation placing `cct-certified`
+> in a real `title:` field left the guard green, and no other check caught it. Fixed by keying the
+> exemption to the five literal slug values, with the mutation pinned as a regression test.
+
+Renaming the slugs without
+redirects would break live URLs, `app/sitemap.ts:137` and indexed SEO, so the rename is deferred
+rather than rushed into a licence fix. **The deferral covers the five slug URLs only. Rendered copy
+carries no acronym today, and since the 18/08 fix the guard actually enforces that rather than
+merely asserting it.**
 
 **#11 is licence-adjacent, not merely commercial.** Australian Consumer Law obligations attach
 to the per-course sale that is live today, and the only refund sentence on the site sits inside
