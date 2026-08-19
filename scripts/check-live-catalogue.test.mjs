@@ -1193,6 +1193,60 @@ await checkE2E(
   },
 );
 
+// --- CodeRabbit #674 finding 355: fetch had no timeout ---
+// A server that accepts the connection and then says nothing held the audit open indefinitely.
+// An audit that never returns is an audit that never fails: in CI it burns the job timeout and
+// reports as infrastructure flake, and run by hand it looks like a slow network. Either way the
+// licence question goes unanswered while reading as "not a violation".
+
+console.log('live-catalogue guard — a hung server must not hang the audit');
+
+await (async () => {
+  const name = 'exits 2 (not forever) when a course page never responds';
+  const held = [];
+  const server = http.createServer((req, res) => {
+    const path = req.url.split('?')[0];
+    if (path === '/sitemap.xml') {
+      const port = server.address().port;
+      res.writeHead(200, { 'Content-Type': 'application/xml' });
+      res.end(
+        `<?xml version="1.0"?><urlset><url><loc>http://127.0.0.1:${port}/courses/hangs</loc></url></urlset>`,
+      );
+      return;
+    }
+    held.push(res); // accepted, and never answered
+  });
+  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+
+  const child = spawn(process.execPath, [GUARD, '--json'], {
+    env: {
+      ...process.env,
+      CARSI_SITE: `http://127.0.0.1:${server.address().port}`,
+      CARSI_FETCH_TIMEOUT_MS: '300',
+    },
+  });
+  let out = '';
+  child.stdout.on('data', (d) => (out += d));
+  // The watchdog is the control: if the guard has no timeout of its own, this is what stops the
+  // suite, and `code === null` is how the assertion below can tell that happened.
+  const watchdog = setTimeout(() => child.kill('SIGKILL'), 10_000);
+  const code = await new Promise((resolve) => child.on('close', resolve));
+  clearTimeout(watchdog);
+  for (const res of held) res.destroy();
+  server.close();
+
+  try {
+    assert.notEqual(code, null, 'the guard never timed out on its own — the watchdog had to kill it');
+    assert.equal(code, 2, 'a hung page must end the audit as "could not audit", not hang');
+    const parsed = JSON.parse(out);
+    assert.ok(parsed.error, 'the timeout must be reported as a machine-readable reason');
+    console.log(`  ✓ ${name}`);
+  } catch (err) {
+    failures += 1;
+    console.error(`  ✗ ${name}\n      ${err.message}`);
+  }
+})();
+
 if (failures > 0) {
   console.error(`\n${failures} check(s) failed — the guard is not trustworthy until they pass.`);
   process.exit(1);

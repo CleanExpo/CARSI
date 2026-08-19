@@ -345,8 +345,20 @@ export function isLiveCourse(title) {
   return Boolean(title) && !title.includes(NOT_FOUND_MARKER);
 }
 
+/**
+ * Every request is bounded. A server that accepts the connection and then says nothing used to
+ * hold the audit open indefinitely, and an audit that never returns is an audit that never
+ * fails — in CI it burns the job timeout and reports as infrastructure flake, by hand it looks
+ * like a slow network. Either way the licence question goes unanswered while reading as "not a
+ * violation", which is the exact silence this guard exists to break.
+ */
+const FETCH_TIMEOUT_MS = Number.parseInt(process.env.CARSI_FETCH_TIMEOUT_MS || '15000', 10);
+
 async function fetchText(url) {
-  const res = await fetch(url, { headers: { 'User-Agent': 'carsi-live-catalogue-guard' } });
+  const res = await fetch(url, {
+    headers: { 'User-Agent': 'carsi-live-catalogue-guard' },
+    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+  });
   // A non-2xx body is not a course page. Without this, a 500 rendering "Server Error | CARSI"
   // satisfied isLiveCourse() and was counted as a clean live course — the guard reporting
   // "clean" about a page it never really read. The soft-404 case is untouched: that is a real 200.
