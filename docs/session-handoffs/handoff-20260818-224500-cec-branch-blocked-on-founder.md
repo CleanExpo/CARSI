@@ -111,9 +111,10 @@ test, `check:iicrc-terminology` + test, `check:iicrc-compliance` + test, `check:
 `check:sources` + test, `check:course-visibility` + test.
 
 `check:iicrc-terminology` is **armed here**, and the reviewer proved it independently rather
-than taking my word: it planted the banned "get IICRC cert⋯ with CARSI" selling claim (literal
-redacted 2026-08-19 — a canary string in a tracked file is a violation waiting for the guard's
-scope to widen) in tracked `public/llms.txt`,
+than taking my word: it planted one of the banned IICRC-certification selling claims listed in
+`CLAUDE.md` (the exact literal is deliberately not reproduced here — a canary string sitting in
+a tracked file is a violation waiting for the guard's scanned scope to widen) in tracked
+`public/llms.txt`,
 ran the guard, and recorded **exit 1 naming the planted line**, then restored the file. The
 guard also prints `✓ IICRC CEC terminology guard passed.` on clean input.
 On the main checkout at `guard/live-catalogue-licence` the same command prints **nothing at
