@@ -92,12 +92,13 @@ jobs:
           npm run --if-present test
           echo "status=$?" >> $GITHUB_OUTPUT
 
+      # No continue-on-error here: a failed build must fail this check, not just
+      # render a red line in a green summary (stopper register 2026-08-19, C5).
       - name: Build
         id: build
         run: |
           npm run build
           echo "status=$?" >> $GITHUB_OUTPUT
-        continue-on-error: true
 
       - name: Report Results
         if: always()
