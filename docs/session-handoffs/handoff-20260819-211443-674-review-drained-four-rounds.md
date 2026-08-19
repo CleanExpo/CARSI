@@ -1,5 +1,12 @@
 # Session Handoff — #674's three review findings drained, plus four more the reviewer found
 
+> **SUPERSEDED by `handoff-20260819-214500-674-shipped-and-archives-landed.md`.** Written while
+> the final review round was still running, this correctly recorded WIP-BLOCKED at that moment;
+> the work has since been reviewed, receipt-bound and pushed. Kept because it is the honest
+> snapshot of a session that had not yet earned its push — read the 214500 handoff for current
+> state. It in turn supersedes `handoff-20260819-175333`, whose reviewer selection (OpenRouter)
+> is not reachable from this machine; the working reviewer is `cursor-agent --model gpt-5.5-high`.
+
 **Timestamp:** 2026-08-19 21:14 AEST
 **Machine:** `Phills-Mac-mini.local`
 **Repo:** CARSI — worktree `/Volumes/Storage Unit/CARSI/.claude/worktrees/fix-674-review-findings`
@@ -47,7 +54,9 @@ Housekeeping done in the main checkout: 2 stale worktrees pruned, local `main` f
   OpenRouter, on this machine today. Codex is credit-exhausted until 2026-08-20 13:33; the
   OpenRouter route needs `OPENROUTER_API_KEY`, which the harness classifier blocks this session
   from sourcing (§7). `cursor-agent` is gate option 2 — a different vendor's subscription
-  reviewer, no metered spend. It is logged in as `support@carsi.com.au`.
+  reviewer, no metered spend. It is logged in under the configured reviewer account — check with
+  `cursor-agent status` rather than assuming; this supersedes the OpenRouter selection recorded
+  in `handoff-20260819-175333`, which is not reachable from this session.
 - **Hand-rolled parsers lose.** Three consecutive rounds beat one: a hand-listed invisible
   character class missed U+034F/U+061C; hand-rolled URL tail-splitting missed a query string,
   then a percent-encoded slug, then a dot segment. Both are now delegated to the runtime —
@@ -187,7 +196,7 @@ Then push into the **existing** branch — one head, no replacement PR:
 **First command to run**
 
 ```bash
-cd "/Volumes/Storage Unit/CARSI/.claude/worktrees/fix-674-review-findings" && npm run type-check && npm run test:live-catalogue
+cd "/Volumes/Storage Unit/CARSI/.claude/worktrees/fix-674-review-findings" && npx prisma generate && npm run type-check && npm run test:live-catalogue
 ```
 
 ---
