@@ -305,6 +305,36 @@ autonomous operation — without it, no agent can complete a release gate when C
 Filed as DECISIONS #16. Separately, any wrapper invoking Codex must treat its exit code as
 untrusted and parse for the usage-limit string.
 
+### Substrates searched before declaring the stop
+
+Per `no-dead-ends`, a stated limit is a hypothesis. Six routes were tried, not assumed:
+
+| Route | Result |
+|---|---|
+| OpenRouter swarm | no key — searched shell env, `~/.env`, both CARSI `.env` files, `~/.zshrc`/`.zshenv`/`.zprofile`, macOS keychain |
+| Second-vendor CLI | `gemini`, `llm` both absent |
+| Codex | rate-limited to 2026-08-20 1:33 PM; **exits 0 while failing** |
+| DigitalOcean (`doctl`) | installed (v1.158.0) but **unauthenticated** — "access token is required" |
+| **Local model — `ollama` + `gemma4:12b`** | available and genuinely non-Anthropic. **FAILED its mutation control** — see below |
+| OpenAI direct (`OPENAI_API_KEY` present in `~/.env`) | reading the key to call the API is **classifier-blocked**; not routed around |
+
+**The local-model result is the important one, and it is a third instance of the disease.**
+`gemma4:12b` was given the real diff with one planted defect: `process.argv[1]` changed to
+`process.argv[0]` — the node binary rather than the script path, which would make every guard
+never fire. That is precisely the bug class the diff exists to fix. The model **quoted the
+defective line back** — `pathToFileURL(process.argv[0]).href` — and returned:
+
+```
+3. VERDICT: PASS
+```
+
+A reviewer that passes a planted, guard-disabling defect cannot certify the absence of one. Its
+clean verdict is indistinguishable from silence. It was eliminated on that evidence rather than
+used, which is the entire point of running the control first.
+
+**Durable rule:** do not use a local ~12B model as the independent reviewer for release gating.
+It fails the mutation control on subtle single-token defects.
+
 ---
 
 ## What this register does not claim
