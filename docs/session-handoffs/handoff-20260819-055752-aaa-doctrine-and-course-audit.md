@@ -1,5 +1,25 @@
 # Session Handoff — AAA doctrine shipped; course completion audited and blocked
 
+> ## ⚠ SUPERSEDED IN PART — read this first (added 2026-08-19)
+>
+> Two claims below were **disproven the same day**. They are left in place because deleting them
+> would hide how the error was made, but do not act on them:
+>
+> 1. **"`test:unit` exits 1" and "no intro video has ever been rendered" are both FALSE.**
+>    `public/videos/course-intros/commercial-floor-care-schools-childcare.mp4` exists
+>    (2,109,732 bytes, dated 18 Aug 01:15 — a day *before* this handoff was written) and the
+>    suite is green. The "missing video" conclusion came from
+>    `find . -name "*floor-care*intro*.mp4"`, which **cannot match that filename** — `intro`
+>    appears in the directory `course-intros/`, not in the file. An empty result from a pattern
+>    that cannot match is indistinguishable from a genuine absence.
+> 2. **The "render one intro video" next-action is withdrawn** (BACKLOG #32).
+>
+> Test counts also differ between this handoff and the register: this one ran on
+> `guard/live-catalogue-licence` (139 files / 1005 tests); the register ran on `origin/main`
+> (142 files / 1056 tests). Different bases, not a contradiction.
+>
+> Authoritative record: `docs/session-handoffs/STOPPER-REGISTER-20260819.md` § C6.
+
 **Timestamp:** 2026-08-19 05:57 AEST
 **Machine:** `Phills-Mac-mini.local`
 **Repos touched:** `~/.claude` (2 commits) · CARSI `/Volumes/Storage Unit/CARSI` (1 uncommitted doc line)
