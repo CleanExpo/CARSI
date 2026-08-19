@@ -21,8 +21,19 @@ External sends, spend, pricing and licence-critical claims NEVER default — the
 | 14 | Paywalled-journal budget for the evidence sweep | Default: OPEN-ACCESS ONLY (commits no spend). Any paid source is a new cost → founder-only. | 2026-08-30 | OPEN |
 | 15 | GP-523-D1 — course URL slugs still carry a lowercase IICRC discipline prefix (`cct-commercial-carpet-core`, plus wrt/asd/amrt/fsrt) | Default: KEEP the slugs for now; rename ships only with 301 redirects in a follow-up. Rendered copy is already clean and stays guarded. | 2026-08-25 | OPEN |
 
+| 16 | **Prod-DB access path for the 43 live courses absent from repo seed** — 4 live courses carry banned IICRC designation branding on carsi.com.au NOW (`CCT-aligned`, `WRT`, `FSRT-aligned`, `ASD-aligned`); 3 of the 4 are not in the repo, so no agent can reach them | No default — licence-critical. Escalates daily. | 2026-08-21 | OPEN |
+
 ## Decided (move rows here with date + outcome)
 - 2026-08-16 · Telegram competing-idea-bots → rejected in favour of single cockpit bot (founder direction + blueprint §5)
+- 2026-08-19 · **Independent-reviewer credential → RESOLVED by founder.** All three reviewer
+  options were down (no OpenRouter key, no second-vendor CLI, Codex rate-limited **and exiting 0
+  while failing**), so no agent could complete a release gate and Level 1 work accumulated
+  committed-but-unshippable. Founder set `OPENROUTER_API_KEY` + `OPENROUTER_MODEL`
+  (`qwen/qwen3.8-27b`) in Vercel `unite-group/carsi-web` production env; agents pull via
+  `vercel env pull`. Proven working the same day: the reviewer failed a planted mutation and
+  passed the real diff, minting the first `PR_RELEASE_GATE_PASS` of the session (PR #680).
+  A local `gemma4:12b` was tried first and **failed the same mutation control** — it quoted the
+  defective line and returned PASS — so Ollama was removed from the Mac Mini entirely (60 GB).
 
 ## Notes on open rows
 
