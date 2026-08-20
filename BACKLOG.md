@@ -248,9 +248,25 @@ of what is actually being sold.
   this is specific to this machine/checkout. **Why it matters:** it blocks the release gate
   non-deterministically, and the tempting workaround — dropping `test:unit` from the receipt, or
   re-running until green — is self-certification. It cost a genuine, independently-PASSed commit
-  (`e3a3b49e`) its push this session. Next step: capture a full `--reporter=verbose` run inside
-  the gate context and check `ulimit -u` (4000 soft) against the fork count under the harness's
-  ~57 resident node processes.
+  (`e3a3b49e`) its push this session. **2026-08-20, resumed session — two more hypotheses ruled
+  out, and the flake did not reproduce.** Descriptor exhaustion is out: `ulimit -n` is 1048576
+  soft / unlimited hard (`kern.maxfilesperproc` 92160), not the macOS 256 default. Process
+  exhaustion is out: `ulimit -u` is 4000 soft / 6000 hard, and a sampler taken every 2s across a
+  full sequential run peaked at **671 user processes and 27 node processes** — an order of
+  magnitude below the cap, with `vm.swapusage` 0.00M used throughout. Both hypotheses were
+  measured, not reasoned. The run then passed twice: once as a plain sequential
+  `type-check` → `test:unit` in bash, and once through
+  `~/.claude/jobs/f37f7054/tmp/mirror-gate-tests.py`, a faithful mirror of
+  `pr_release_gate.run_tests` — same `subprocess.run(shell=True)`, same `cwd`, same env stripped
+  of `GIT_REDIRECT_VARS`, all seven receipt commands in receipt order. All seven exited 0
+  (type-check 28.8s, test:unit 29.3s). The mirror exists so diagnosis never has to be paid for
+  with the gate's own run. **Still not root-caused** — a negative reproduction is not a fix. The
+  surviving hypothesis is contention from concurrent load rather than any static limit: the four
+  failures happened while this session's review agents and watchers were resident (~57 node
+  processes), and the two clean runs happened after they exited (17–27). That is a correlation
+  across two conditions, not a demonstrated mechanism, and it is recorded as such. It also
+  predicts the flake will return the next time the gate is run under a busy multi-agent session,
+  so the entry stays open. Do not close it on the strength of a green run.
 
 - 2026-08-20 · **`main` is RED on E2E: three specs assert hero copy the homepage no longer has.**
   Found because PR #682 is the first PR branched off `1057be16`, so it inherited the break rather
