@@ -84,8 +84,16 @@ jobs:
         run: |
           code="${{ steps.audit.outputs.exit_code }}"
           if [ "$code" = "0" ]; then
-            echo "Live catalogue clean."
-            exit 0
+            # Exit 0 is believed ONLY when the report agrees with it. A guard that exits clean
+            # while its own JSON lists violations — or that leaves no readable report at all —
+            # has contradicted itself, and trusting the exit code would let a broken licence
+            # guard render as a pass. Fails closed on both, for the same reason exit 2 does.
+            if node --input-type=module -e 'import { readFileSync } from "node:fs"; const r = JSON.parse(readFileSync("audit.json", "utf8")); process.exit((r.violations || []).length ? 1 : 0);'; then
+              echo "Live catalogue clean."
+              exit 0
+            fi
+            echo "::error::The audit exited 0 but its report is missing, unparseable, or lists violations. That is a defect in the guard, not a clean catalogue — see the job summary."
+            exit 1
           fi
           if [ "$code" = "1" ]; then
             echo "::error::Live courses carry banned IICRC discipline branding. See the job summary and BACKLOG #31."

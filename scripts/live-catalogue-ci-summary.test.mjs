@@ -60,6 +60,27 @@ check('separates a NEW violation from the four tracked in BACKLOG #31', () => {
   assert.ok(out.indexOf('NEW — not previously tracked') < out.indexOf('already tracked'));
 });
 
+check('exit 0 with violations is a guard defect, never "all clean" — the report outranks the code', () => {
+  const out = renderSummary(
+    JSON.stringify({
+      site: 'https://x',
+      checked: 80,
+      violations: [violation('brand-new-wrt-course', 'WRT Course | CARSI')],
+      notes: [],
+    }),
+    '0',
+  );
+  assert.doesNotMatch(out, /all clean/, 'a contradicted audit must never render as clean');
+  assert.match(out, /contradicted itself/);
+  assert.ok(out.includes('brand-new-wrt-course'), 'the violation it reported must still be shown');
+});
+
+check('a genuinely clean audit still renders clean — the contradiction branch is not a catch-all', () => {
+  const out = renderSummary(JSON.stringify({ site: 'https://x', checked: 80, violations: [], notes: [] }), '0');
+  assert.match(out, /80 live courses checked, all clean/);
+  assert.doesNotMatch(out, /contradicted itself/);
+});
+
 check('the known list annotates but NEVER suppresses — a known breach is still reported', () => {
   const out = renderSummary(
     JSON.stringify({

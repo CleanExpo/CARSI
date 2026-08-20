@@ -59,7 +59,24 @@ export function renderSummary(raw, exitCode) {
   const violations = report.violations || [];
   const notes = report.notes || [];
 
-  if (exitCode === '0') {
+  if (exitCode === '0' && violations.length) {
+    // The guard promises exit 1 whenever it finds anything, so exit 0 WITH violations means the
+    // guard contradicted itself. Rendering "all clean" here would turn a broken licence guard
+    // into a green tick — the exact equivalence between "found nothing" and "could not tell"
+    // that this file exists to prevent. Say it out loud and show what it reported anyway.
+    lines.push(
+      `🚨 **The audit contradicted itself — it exited 0 (clean) while reporting ${violations.length} violation(s).**`,
+      '',
+      'This is a defect in the guard, not evidence of a clean catalogue. Treat this run as "did',
+      'not audit": the exit code cannot be read as a pass when the report disagrees with it.',
+      '',
+      `Site: ${report.site} · ${report.checked} live courses checked`,
+      '',
+      'What it reported despite exiting clean:',
+      '',
+    );
+    for (const v of violations) lines.push(...violationLines(v));
+  } else if (exitCode === '0') {
     lines.push(`✅ **${report.checked} live courses checked, all clean.**`, '', `Site: ${report.site}`);
   } else if (exitCode === '1') {
     const fresh = violations.filter((v) => !KNOWN_IN_BREACH.has(v.slug));
