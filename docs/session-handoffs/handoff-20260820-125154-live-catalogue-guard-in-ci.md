@@ -73,7 +73,7 @@ nowhere automatically.
 | `.github/workflows/live-catalogue-guard.yml` | Created — daily 03:00 UTC + `workflow_dispatch`. **On `3ab22784` it still has the `push:` trigger**; removed in unpushed `e3a3b49e` |
 | `scripts/live-catalogue-ci-summary.mjs` | Created — step-summary renderer, annotation-only, never decides pass/fail |
 | `scripts/live-catalogue-ci-summary.test.mjs` | Created — 11 checks, mutation-controlled |
-| `package.json` | Modified — `test:live-catalogue` now runs both suites (167 checks total) |
+| `package.json` | Modified — `test:live-catalogue` now runs both suites (167 checks total **as at `3c9cddbb`**; the suite has since grown to 177 — see the note under §6) |
 | `BACKLOG.md` | Modified — #30 done; #33/#34 corrected to done; CI-P1-001 and the E2E finding filed |
 | `docs/session-handoffs/handoff-20260820-125154-*.md` | Created — this file |
 
@@ -110,6 +110,14 @@ npx eslint scripts/live-catalogue-ci-summary.mjs scripts/live-catalogue-ci-summa
 
 npm run check:live-catalogue    # 1   ← NOT a gate failure. 80 URLs, 4 REAL breaches.
 ```
+
+> **Counts superseded (2026-08-20, later session).** The `167 checks (156 guard + 11 summary)`
+> figure above was accurate at `3c9cddbb` and is left as written rather than rewritten, because a
+> handoff is a record of what was observed, not a live dashboard. At the current head the suite is
+> **177 checks (156 guard + 21 summary)**: an independent review found a P1 (a report containing
+> violations rendered as "all clean") and then a P0 (a non-array `violations` bypassing both the
+> renderer and the workflow's fail step), and the fixes added 10 regression checks. Read the
+> counts here as historical; re-derive them at HEAD before quoting them as release evidence.
 
 **`npx prisma generate` is required first in a fresh worktree**, and again after pulling a schema
 change — a stale client surfaces as `Cannot find module '@/generated/prisma/client'` or a missing

@@ -60,6 +60,45 @@ check('separates a NEW violation from the four tracked in BACKLOG #31', () => {
   assert.ok(out.indexOf('NEW — not previously tracked') < out.indexOf('already tracked'));
 });
 
+// A non-array `violations` makes `.length` undefined, which is falsy — so a breach reported in
+// the wrong shape reads as "found nothing" everywhere downstream. Each shape is pinned because
+// `|| []` catches only null/undefined and waves every truthy non-array straight through.
+for (const [label, shape] of [
+  ['an object', { slug: 'brand-new-wrt-course', title: 'WRT Course | CARSI' }],
+  ['a string', 'brand-new-wrt-course'],
+  ['a number', 1],
+  ['a bare true', true],
+  ['null', null],
+  ['missing', undefined],
+]) {
+  check(`violations arriving as ${label} is a malformed report, never a clean run`, () => {
+    const out = renderSummary(
+      JSON.stringify({ site: 'https://x', checked: 80, violations: shape, notes: [] }),
+      '0',
+    );
+    assert.doesNotMatch(out, /all clean/, `violations as ${label} must not render as clean`);
+    assert.match(out, /malformed/);
+  });
+}
+
+check('notes arriving in the wrong shape is malformed too — notes are reported, not decorative', () => {
+  const out = renderSummary(
+    JSON.stringify({ site: 'https://x', checked: 80, violations: [], notes: { slug: 'x' } }),
+    '0',
+  );
+  assert.doesNotMatch(out, /all clean/);
+  assert.match(out, /malformed/);
+});
+
+check('the malformed branch names the shape it received, so the run is diagnosable without the artefact', () => {
+  const out = renderSummary(
+    JSON.stringify({ site: 'https://x', checked: 80, violations: { slug: 'x' }, notes: [] }),
+    '0',
+  );
+  assert.match(out, /`violations`: object/);
+  assert.match(out, /`notes`: array/);
+});
+
 check('exit 0 with violations is a guard defect, never "all clean" — the report outranks the code', () => {
   const out = renderSummary(
     JSON.stringify({

@@ -88,7 +88,7 @@ jobs:
             # while its own JSON lists violations — or that leaves no readable report at all —
             # has contradicted itself, and trusting the exit code would let a broken licence
             # guard render as a pass. Fails closed on both, for the same reason exit 2 does.
-            if node --input-type=module -e 'import { readFileSync } from "node:fs"; const r = JSON.parse(readFileSync("audit.json", "utf8")); process.exit((r.violations || []).length ? 1 : 0);'; then
+            if node --input-type=module -e 'import { readFileSync } from "node:fs"; const r = JSON.parse(readFileSync("audit.json", "utf8")); if (!Array.isArray(r.violations) || !Array.isArray(r.notes)) process.exit(1); process.exit(r.violations.length ? 1 : 0);'; then
               echo "Live catalogue clean."
               exit 0
             fi

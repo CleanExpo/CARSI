@@ -56,8 +56,32 @@ export function renderSummary(raw, exitCode) {
     return lines.join('\n');
   }
 
-  const violations = report.violations || [];
-  const notes = report.notes || [];
+  // The SHAPE is validated, never assumed. `violations` arriving as an object rather than an
+  // array makes `.length` undefined — falsy — so every "did it find anything?" test below would
+  // silently answer "no" and render a live breach as a clean run. `|| []` does not save this:
+  // an object is truthy, so it passes straight through. The guard promises arrays on every exit
+  // path (check-live-catalogue.mjs:496,574-575), so anything else is a broken guard, and a
+  // broken guard must be loud rather than convenient.
+  if (!Array.isArray(report.violations) || !Array.isArray(report.notes)) {
+    lines.push(
+      '🚨 **The audit report is malformed — `violations` and `notes` must both be arrays.**',
+      '',
+      `Received \`violations\`: ${describeShape(report.violations)} · \`notes\`: ${describeShape(report.notes)}.`,
+      '',
+      'This is a defect in the guard, not evidence of a clean catalogue. A report whose shape',
+      'cannot be trusted cannot be read as "found nothing" — treat this run as "did not audit".',
+      '',
+      'Raw output (first 500 chars):',
+      '',
+      '```',
+      String(raw).slice(0, 500) || '(empty)',
+      '```',
+    );
+    return lines.join('\n');
+  }
+
+  const violations = report.violations;
+  const notes = report.notes;
 
   if (exitCode === '0' && violations.length) {
     // The guard promises exit 1 whenever it finds anything, so exit 0 WITH violations means the
@@ -139,6 +163,15 @@ export function renderSummary(raw, exitCode) {
   }
 
   return lines.join('\n');
+}
+
+// Names the shape that arrived, so a malformed report is diagnosable from the summary alone
+// rather than needing the raw artefact re-fetched from a run that may already be expired.
+function describeShape(value) {
+  if (Array.isArray(value)) return 'array';
+  if (value === null) return 'null';
+  if (value === undefined) return 'missing';
+  return typeof value;
 }
 
 function violationLines(course) {
