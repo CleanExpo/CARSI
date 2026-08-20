@@ -228,6 +228,81 @@ check('a single malformed hit does not discard the valid hits beside it', () => 
   assert.match(out, /title-acronym/, 'the valid hit beside the malformed one must still render');
 });
 
+// Template interpolation calls `toString`, so `${x}` on an object that has none throws
+// "Cannot convert object to primitive value". Four crashes in this file were the same mistake at
+// four depths — root, entry, `hits`, then the scalar fields — so the guard is on the CLASS: every
+// report-derived value goes through `shown`, which branches on `typeof` and never calls a method.
+// The property these tests pin is TOTALITY: renderSummary cannot throw on any JSON input.
+const UNSTRINGIFIABLE = { toString: null };
+
+for (const field of ['slug', 'title', 'url']) {
+  check(`a violation whose \`${field}\` cannot be stringified is still REPORTED, never thrown`, () => {
+    const course = {
+      slug: 'brand-new-wrt-course',
+      title: 'WRT Course',
+      url: 'https://x/c',
+      hits: [{ rule: 'title-acronym', detail: 'WRT' }],
+    };
+    course[field] = UNSTRINGIFIABLE;
+    let out;
+    assert.doesNotThrow(() => {
+      out = renderSummary(
+        JSON.stringify({ site: 'https://x', checked: 80, violations: [course], notes: [] }),
+        '1',
+      );
+    }, `an unstringifiable ${field} must not throw`);
+    assert.match(out, /malformed/, `the broken ${field} must be named`);
+    assert.match(out, /live course\(s\) carry banned/, 'the breach itself must still be reported');
+  });
+}
+
+for (const field of ['rule', 'detail']) {
+  check(`a hit whose \`${field}\` cannot be stringified is still REPORTED, never thrown`, () => {
+    const hit = { rule: 'title-acronym', detail: 'WRT' };
+    hit[field] = UNSTRINGIFIABLE;
+    let out;
+    assert.doesNotThrow(() => {
+      out = renderSummary(
+        JSON.stringify({
+          site: 'https://x',
+          checked: 80,
+          violations: [{ slug: 'brand-new-wrt-course', title: 'WRT', url: 'https://x/c', hits: [hit] }],
+          notes: [],
+        }),
+        '1',
+      );
+    }, `an unstringifiable hit.${field} must not throw`);
+    assert.match(out, /brand-new-wrt-course/, 'the breach must survive a broken hit field');
+  });
+}
+
+for (const [field, code] of [
+  ['site', '1'],
+  ['checked', '1'],
+  ['site', '0'],
+  ['checked', '0'],
+  ['error', '2'],
+]) {
+  check(`a report whose \`${field}\` cannot be stringified does not throw at exit ${code}`, () => {
+    const report = { site: 'https://x', checked: 80, violations: [], notes: [] };
+    if (code === '1') report.violations = [violation('brand-new-wrt-course', 'WRT Course')];
+    report[field] = UNSTRINGIFIABLE;
+    assert.doesNotThrow(() => {
+      renderSummary(JSON.stringify(report), code);
+    }, `an unstringifiable report.${field} must not throw at exit ${code}`);
+  });
+}
+
+check('an unstringifiable value never renders as a clean run', () => {
+  const out = renderSummary(
+    JSON.stringify({ site: UNSTRINGIFIABLE, checked: UNSTRINGIFIABLE, violations: [], notes: [] }),
+    '0',
+  );
+  // Exit 0 with an empty violations list IS clean — the point is that the broken fields are
+  // named rather than crashing the render or vanishing silently.
+  assert.match(out, /malformed/, 'the broken fields must be named');
+});
+
 check('an empty-object entry is accepted — the check rejects shapes that throw, not fields that are absent', () => {
   const out = renderSummary(
     JSON.stringify({ site: 'https://x', checked: 80, violations: [{}], notes: [] }),

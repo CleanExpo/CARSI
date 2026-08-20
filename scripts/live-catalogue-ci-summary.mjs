@@ -50,7 +50,7 @@ export function renderSummary(raw, exitCode) {
       `Raw output (first 500 chars):`,
       '',
       '```',
-      String(raw).slice(0, 500) || '(empty)',
+      shown(raw).slice(0, 500) || '(empty)',
       '```',
     );
     return lines.join('\n');
@@ -119,21 +119,25 @@ export function renderSummary(raw, exitCode) {
       'This is a defect in the guard, not evidence of a clean catalogue. Treat this run as "did',
       'not audit": the exit code cannot be read as a pass when the report disagrees with it.',
       '',
-      `Site: ${report.site} · ${report.checked} live courses checked`,
+      `Site: ${shown(report.site)} · ${shown(report.checked)} live courses checked`,
       '',
       'What it reported despite exiting clean:',
       '',
     );
     for (const v of violations) lines.push(...violationLines(v));
   } else if (exitCode === '0') {
-    lines.push(`✅ **${report.checked} live courses checked, all clean.**`, '', `Site: ${report.site}`);
+    lines.push(
+      `✅ **${shown(report.checked)} live courses checked, all clean.**`,
+      '',
+      `Site: ${shown(report.site)}`,
+    );
   } else if (exitCode === '1') {
     const fresh = violations.filter((v) => !KNOWN_IN_BREACH.has(v.slug));
     const known = violations.filter((v) => KNOWN_IN_BREACH.has(v.slug));
     lines.push(
       `❌ **${violations.length} live course(s) carry banned IICRC discipline branding.**`,
       '',
-      `Site: ${report.site} · ${report.checked} live courses checked`,
+      `Site: ${shown(report.site)} · ${shown(report.checked)} live courses checked`,
       '',
     );
     if (fresh.length) {
@@ -160,16 +164,16 @@ export function renderSummary(raw, exitCode) {
     lines.push(
       '⚠️ **The catalogue could not be audited. This is NOT a pass.**',
       '',
-      `Reason: ${report.error || '(the guard reported no reason, which is itself a defect)'}`,
+      `Reason: ${shown(report.error || '(the guard reported no reason, which is itself a defect)')}`,
       '',
-      `Site: ${report.site} · ${report.checked} live courses checked`,
+      `Site: ${shown(report.site)} · ${shown(report.checked)} live courses checked`,
       '',
       'A guard that reached nothing has not checked anything. Nothing about the licence status',
       'of the live catalogue can be concluded from this run.',
     );
   } else {
     lines.push(
-      `⚠️ **The guard exited with an unexpected code \`${exitCode}\`.**`,
+      `⚠️ **The guard exited with an unexpected code \`${shown(exitCode)}\`.**`,
       '',
       'Expected 0 (clean), 1 (violations) or 2 (could not audit). Treat as "did not audit".',
     );
@@ -190,6 +194,28 @@ export function renderSummary(raw, exitCode) {
   return lines.join('\n');
 }
 
+// EVERY report-derived value reaches the summary through here, and the property that matters is
+// TOTALITY: this cannot throw on any JSON-representable value, because it branches on `typeof`
+// and never calls a method on the value it was given.
+//
+// Template interpolation does call one — `toString` — so `${x}` on `{"toString": null}` throws
+// "Cannot convert object to primitive value", killing the render. Four separate crashes in this
+// file have now been the same mistake at four different depths: the root, the entry, the `hits`
+// field, and the scalar fields. Guarding them one at a time is what kept producing the next one,
+// so the guard is applied to the whole class instead of to the member that was found.
+//
+// `String()` only ever touches primitives here; objects, arrays, null and undefined all route to
+// `describeShape`, which is itself typeof-only. JSON cannot produce symbols or BigInts, so this
+// is total over everything the guard can emit.
+// Absent is not the same as broken, and the distinction is the one already ratified for entries:
+// a field that is simply not there is reported as missing, not accused of being malformed.
+function shown(value) {
+  if (typeof value === 'string') return value;
+  if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+  if (value === null || value === undefined) return '(missing)';
+  return `(malformed: ${describeShape(value)})`;
+}
+
 // One voice for every shape complaint. Shared deliberately: three separate copies of this block
 // is how one of them eventually ships quieter than its neighbours, and a quiet malformed-report
 // message is the failure this file exists to prevent.
@@ -205,7 +231,7 @@ function pushMalformed(lines, headline, received, raw) {
     'Raw output (first 500 chars):',
     '',
     '```',
-    String(raw).slice(0, 500) || '(empty)',
+    shown(raw).slice(0, 500) || '(empty)',
     '```',
   );
 }
@@ -240,11 +266,16 @@ function violationLines(course) {
         .map((h) =>
           h === null || typeof h !== 'object'
             ? `⚠️ (malformed hit: ${describeShape(h)})`
-            : `\`${h.rule}\`: ${h.detail}`,
+            : `\`${shown(h.rule)}\`: ${shown(h.detail)}`,
         )
         .join(' · ')
     : `⚠️ malformed \`hits\` (${describeShape(course.hits)}) — the guard reported this course but not why`;
-  return [`- **${course.slug}** — ${course.title || '(no title)'}`, `  - ${hits}`, `  - ${course.url}`, ''];
+  return [
+    `- **${shown(course.slug)}** — ${shown(course.title || '(no title)')}`,
+    `  - ${hits}`,
+    `  - ${shown(course.url)}`,
+    '',
+  ];
 }
 
 // pathToFileURL, never `file://` + the raw path: an unencoded space makes the comparison

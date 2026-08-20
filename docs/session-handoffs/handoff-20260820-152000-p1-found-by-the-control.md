@@ -284,6 +284,14 @@ then-current 177 checks (156 guard + 21 summary).
 > entry check could not reach it, and `.map` on a truthy non-array threw inside the render loop.
 > Fixed with 7 more checks: the suite is **195 checks (156 guard + 39 summary)** from that fix
 > onward. 169, 177 and 188 all stand.
+>
+> **Annotation, fourth link — and the last, because the strategy changed.** Round 4 found a
+> FIFTH crash of the same family: `${x}` on an object without a callable `toString` throws, so
+> object-valued scalar fields killed the render. Four point-fixes had each guarded one
+> dereference and produced the next; the fix at that point stopped being another guard and
+> became a CLASS fix — every report-derived value now goes through a total formatter that
+> branches on `typeof` and never calls a method. Suite **206 checks (156 guard + 50 summary)**
+> from that fix onward. 169, 177, 188 and 195 all stand.
 
 **Evidence at `3d11b5e9`:** all seven gates 0 (type-check 56.6s, test:unit 44.6s), `eslint` 0,
 `actionlint` 0. A mutant replacing the shape check with `if (false)` turns the suite red on all 8
