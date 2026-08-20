@@ -159,6 +159,75 @@ check('a notes entry that is not an object is malformed too — notes are derefe
   assert.match(out, /malformed/);
 });
 
+// `hits` is a FIELD of a valid entry, so the entry check above cannot reach it, and `.map` on a
+// non-array throws. The throw happens INSIDE the render loop, so it would take every other breach
+// in the same report down with it — a worse outcome than the crash that prompted the entry check.
+for (const [label, hits] of [
+  ['an object', { rule: 'title-acronym', detail: 'WRT' }],
+  ['a string', 'title-acronym'],
+  ['a number', 3],
+  ['null', null],
+  ['missing', undefined],
+]) {
+  check(`a violation whose \`hits\` is ${label} is still REPORTED, never thrown`, () => {
+    let out;
+    assert.doesNotThrow(() => {
+      out = renderSummary(
+        JSON.stringify({
+          site: 'https://x',
+          checked: 80,
+          violations: [{ slug: 'brand-new-wrt-course', title: 'WRT Course', url: 'https://x/c', hits }],
+          notes: [],
+        }),
+        '1',
+      );
+    }, `hits as ${label} must not throw`);
+    // The breach itself must survive: suppressing a real live breach because the REASON for it
+    // arrived in the wrong shape would be the defect this whole file exists to prevent.
+    assert.match(out, /brand-new-wrt-course/, `hits as ${label} must still name the course`);
+    assert.match(out, /https:\/\/x\/c/, `hits as ${label} must still give the URL`);
+    assert.doesNotMatch(out, /all clean/);
+  });
+}
+
+check('a malformed `hits` does not hide the OTHER breaches in the same report', () => {
+  const out = renderSummary(
+    JSON.stringify({
+      site: 'https://x',
+      checked: 80,
+      violations: [
+        { slug: 'broken-hits-course', title: 'Broken', url: 'https://x/broken', hits: 'not-an-array' },
+        violation('second-new-course', 'Second | CARSI'),
+      ],
+      notes: [],
+    }),
+    '1',
+  );
+  assert.match(out, /broken-hits-course/);
+  assert.match(out, /second-new-course/, 'the second breach must survive the first one being malformed');
+});
+
+check('a single malformed hit does not discard the valid hits beside it', () => {
+  const out = renderSummary(
+    JSON.stringify({
+      site: 'https://x',
+      checked: 80,
+      violations: [
+        {
+          slug: 'brand-new-wrt-course',
+          title: 'WRT Course',
+          url: 'https://x/c',
+          hits: [null, { rule: 'title-acronym', detail: 'WRT' }],
+        },
+      ],
+      notes: [],
+    }),
+    '1',
+  );
+  assert.match(out, /malformed hit/);
+  assert.match(out, /title-acronym/, 'the valid hit beside the malformed one must still render');
+});
+
 check('an empty-object entry is accepted — the check rejects shapes that throw, not fields that are absent', () => {
   const out = renderSummary(
     JSON.stringify({ site: 'https://x', checked: 80, violations: [{}], notes: [] }),

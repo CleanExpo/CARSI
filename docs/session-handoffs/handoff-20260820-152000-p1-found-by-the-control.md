@@ -278,6 +278,12 @@ then-current 177 checks (156 guard + 21 summary).
 > **188 checks (156 guard + 32 summary)** from that fix onward. The 169 in §6 and the 177 above
 > both stand as written — each records what was true when it was written. Extend this chain;
 > never rewrite a figure in place.
+>
+> **Annotation, continued again.** Working the round-4 attack list before dispatching it found a
+> further crash of the same class in `violationLines` — `hits` is a FIELD of a valid entry, so the
+> entry check could not reach it, and `.map` on a truthy non-array threw inside the render loop.
+> Fixed with 7 more checks: the suite is **195 checks (156 guard + 39 summary)** from that fix
+> onward. 169, 177 and 188 all stand.
 
 **Evidence at `3d11b5e9`:** all seven gates 0 (type-check 56.6s, test:unit 44.6s), `eslint` 0,
 `actionlint` 0. A mutant replacing the shape check with `if (false)` turns the suite red on all 8

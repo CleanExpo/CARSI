@@ -219,8 +219,31 @@ function describeShape(value) {
   return typeof value;
 }
 
+// `hits` is a FIELD of an otherwise-valid entry, so the entry check upstream cannot catch a bad
+// one — and `.map` on a non-array throws, which would kill the render of every OTHER breach in
+// the same report. `|| []` does not save this, for the identical reason it did not save the
+// round-2 defect: a non-array object is truthy and passes straight through.
+//
+// A malformed `hits` is therefore NAMED here rather than thrown, and rendering continues. This
+// deliberately differs from the entry check, which routes a bad entry to the loud malformed
+// branch: nothing can be rendered from a null entry, whereas a course with a broken `hits` still
+// has a slug and a URL, and those are the actionable part. Suppressing a real breach because the
+// reason for it arrived in the wrong shape would be the same defect this file exists to prevent.
 function violationLines(course) {
-  const hits = (course.hits || []).map((h) => `\`${h.rule}\`: ${h.detail}`).join(' · ');
+  // Only a TRUTHY non-array throws: `undefined`, `null` and the other falsy values fall through
+  // `|| []` to an empty list, exactly as before, and are left alone. An absent `hits` is a field
+  // that is missing, not a shape that is broken — the same distinction that keeps
+  // `violations: [{}]` an accepted entry rather than a malformed report.
+  const given = course.hits || [];
+  const hits = Array.isArray(given)
+    ? given
+        .map((h) =>
+          h === null || typeof h !== 'object'
+            ? `⚠️ (malformed hit: ${describeShape(h)})`
+            : `\`${h.rule}\`: ${h.detail}`,
+        )
+        .join(' · ')
+    : `⚠️ malformed \`hits\` (${describeShape(course.hits)}) — the guard reported this course but not why`;
   return [`- **${course.slug}** — ${course.title || '(no title)'}`, `  - ${hits}`, `  - ${course.url}`, ''];
 }
 
