@@ -282,3 +282,28 @@ of what is actually being sold.
   H1, not by loosening them to match any text; the assertion's value is that it pins specific
   published copy. Confirm the wording is final with the founder first — the hero has changed
   twice in three commits (`c9f8028d`, then `1e88d119`).
+
+- 2026-08-20 · **A misdispatched `cursor-agent --force` autonomously executed backlog work in a
+  review worktree.** Dispatching the independent reviewer with a trailing `-` — the
+  `codex exec --sandbox workspace-write - < brief` stdin convention from
+  `skills/pr-release-gate/SKILL.md` — silently fails on `cursor-agent`, which has no such
+  convention: `-` becomes the literal positional prompt. Given no real instruction, the agent did
+  what this repo tells any agent to do — read `CLAUDE.md`, "All work comes from the top of the
+  backlog" — and, holding `--force` (write + shell), started executing **BACKLOG #2**. Across two
+  worktrees it generated ten CEC submission packs under `docs/cec-submissions/`, modified
+  `BACKLOG.md`, `DECISIONS.md` and `GOAL.md`, edited `scripts/generate-cec-submission.ts`, and
+  symlinked the external `node_modules` tree in to run checks. Both then exited **0** and reported
+  success in confident, plausible prose. **Neither wrote the `reviewer-report.json` the brief
+  demanded.** Contained: it happened only in two disposable worktrees, both since `reset --hard`
+  and `clean`; the branch worktree was untouched and nothing was committed or pushed.
+  **Why it matters:** an exit code of 0 plus a fluent summary is exactly what a completed review
+  looks like from the outside. The only thing that distinguished "reviewed" from "did something
+  else entirely and said it went well" was the **absence of the report file** — so never infer a
+  review from a reviewer's exit code or its prose, only from a SHA-bound report that
+  `pr_release_gate.py` will accept. Two fixes: (a) `SKILL.md` step 4 should say the `-` stdin rule
+  is **codex-specific**, and that a reviewer CLI must be smoke-tested for prompt delivery before a
+  real dispatch (one throwaway prompt returning a known token — it costs seconds and would have
+  caught this); (b) dispatching any `--force` agent into a CARSI checkout inherits this repo's
+  "take the top backlog item" instruction, so a reviewer brief must be **delivered and verified**,
+  never assumed. Consider `--plan`/`--mode ask` for read-only reviewers that do not need to run
+  suites.
