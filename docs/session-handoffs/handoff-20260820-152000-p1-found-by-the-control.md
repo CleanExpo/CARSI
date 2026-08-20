@@ -271,7 +271,13 @@ findings:
 and `notes` must each be an array, or the run is a guard defect — rendered loudly with the shape
 named, and failed closed by the workflow. The stale counts were **annotated, not rewritten**: a
 handoff records what was observed, so the original figures stand with a forward pointer to the
-current 177 checks (156 guard + 21 summary).
+then-current 177 checks (156 guard + 21 summary).
+
+> **Annotation, continued.** Round 3 of review found a further P1 at `1139d5af`
+> (`P1-SUMMARY-MALFORMED-REPORT-SHAPE-CAN-CRASH`), whose fix adds 11 more checks. The suite is
+> **188 checks (156 guard + 32 summary)** from that fix onward. The 169 in §6 and the 177 above
+> both stand as written — each records what was true when it was written. Extend this chain;
+> never rewrite a figure in place.
 
 **Evidence at `3d11b5e9`:** all seven gates 0 (type-check 56.6s, test:unit 44.6s), `eslint` 0,
 `actionlint` 0. A mutant replacing the shape check with `if (false)` turns the suite red on all 8

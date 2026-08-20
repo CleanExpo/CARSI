@@ -56,6 +56,21 @@ export function renderSummary(raw, exitCode) {
     return lines.join('\n');
   }
 
+  // A root that is not a plain object cannot carry `violations` or `notes` at all, and reaching
+  // for them is how this renderer DIES instead of reporting. `JSON.parse('null')` succeeds and
+  // `typeof null === 'object'`, so the array checks below are never reached — the summary throws
+  // and the human is left with a stack trace where the guard defect should have been. A guard
+  // that crashes instead of reporting is still a guard that did not report.
+  if (report === null || typeof report !== 'object' || Array.isArray(report)) {
+    pushMalformed(
+      lines,
+      '🚨 **The audit report is malformed — the top level must be a JSON object.**',
+      `Received: ${describeShape(report)}.`,
+      raw,
+    );
+    return lines.join('\n');
+  }
+
   // The SHAPE is validated, never assumed. `violations` arriving as an object rather than an
   // array makes `.length` undefined — falsy — so every "did it find anything?" test below would
   // silently answer "no" and render a live breach as a clean run. `|| []` does not save this:
@@ -63,25 +78,35 @@ export function renderSummary(raw, exitCode) {
   // path (check-live-catalogue.mjs:496,574-575), so anything else is a broken guard, and a
   // broken guard must be loud rather than convenient.
   if (!Array.isArray(report.violations) || !Array.isArray(report.notes)) {
-    lines.push(
+    pushMalformed(
+      lines,
       '🚨 **The audit report is malformed — `violations` and `notes` must both be arrays.**',
-      '',
       `Received \`violations\`: ${describeShape(report.violations)} · \`notes\`: ${describeShape(report.notes)}.`,
-      '',
-      'This is a defect in the guard, not evidence of a clean catalogue. A report whose shape',
-      'cannot be trusted cannot be read as "found nothing" — treat this run as "did not audit".',
-      '',
-      'Raw output (first 500 chars):',
-      '',
-      '```',
-      String(raw).slice(0, 500) || '(empty)',
-      '```',
+      raw,
     );
     return lines.join('\n');
   }
 
   const violations = report.violations;
   const notes = report.notes;
+
+  // Right container, wrong contents. Every entry is dereferenced downstream — `v.slug` in the
+  // NEW-versus-known split, `course.hits` when rendered — so a single null or primitive entry
+  // throws mid-render, and it throws precisely when there IS a breach to report. Checked up
+  // front so a malformed entry is NAMED rather than fatal.
+  const entries = [...violations, ...notes];
+  const badIndex = entries.findIndex(
+    (entry) => entry === null || typeof entry !== 'object' || Array.isArray(entry),
+  );
+  if (badIndex !== -1) {
+    pushMalformed(
+      lines,
+      '🚨 **The audit report is malformed — every `violations` and `notes` entry must be an object.**',
+      `Received an entry of shape: ${describeShape(entries[badIndex])}.`,
+      raw,
+    );
+    return lines.join('\n');
+  }
 
   if (exitCode === '0' && violations.length) {
     // The guard promises exit 1 whenever it finds anything, so exit 0 WITH violations means the
@@ -163,6 +188,26 @@ export function renderSummary(raw, exitCode) {
   }
 
   return lines.join('\n');
+}
+
+// One voice for every shape complaint. Shared deliberately: three separate copies of this block
+// is how one of them eventually ships quieter than its neighbours, and a quiet malformed-report
+// message is the failure this file exists to prevent.
+function pushMalformed(lines, headline, received, raw) {
+  lines.push(
+    headline,
+    '',
+    received,
+    '',
+    'This is a defect in the guard, not evidence of a clean catalogue. A report whose shape',
+    'cannot be trusted cannot be read as "found nothing" — treat this run as "did not audit".',
+    '',
+    'Raw output (first 500 chars):',
+    '',
+    '```',
+    String(raw).slice(0, 500) || '(empty)',
+    '```',
+  );
 }
 
 // Names the shape that arrived, so a malformed report is diagnosable from the summary alone

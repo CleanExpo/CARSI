@@ -177,7 +177,7 @@ measured, not inferred; the register carries the exact commands and positive con
 | # | Item | Owner | Gate | Status |
 |---|---|---|---|---|
 | 29 | Fix 3 vacuous guards — `check-iicrc-terminology`, `check-course-completeness`, `check-course-visibility-predicate` used the naive entry-point idiom comparing `import.meta.url` against a bare `file://` + argv concat. The checkout path contains a space, which `import.meta.url` percent-encodes and argv does not, so the comparison was always false, the scan body never ran, and each exited 0 in silence. | A | 0 | **done 2026-08-19** — PR #680, receipt `PR_RELEASE_GATE_PASS head=ed01376a` |
-| 30 | Wire `check:live-catalogue` into CI on a schedule. It is NOT in CI and is the only guard that has caught a real production defect. Needs no credentials — it reads the public sitemap. | A | 0 | **done 2026-08-20** — `.github/workflows/live-catalogue-guard.yml`. Daily 03:00 UTC and `workflow_dispatch`. **Not** on push: dispatching the real workflow showed a push trigger attaches a PR check whose verdict is about the live catalogue rather than the PR's code, so every PR touching the guard would carry a red check it cannot fix. Observed run `32295824919` — reached production, exited 1, failed for the right reason, and ran its then-168-check suite with no `npm ci` (the suite is 177 checks at the current head, after a P1 and a P0 found by independent review). Deliberately NOT gated behind a repo variable like `live-cec-guard.yml`: it needs no credentials, and a config flag that silently disables a licence guard is the defect this family exists to prevent. Exit 2 fails the job as loudly as exit 1. **Expected RED until #31 is fixed** — do not add a baseline to make it green. |
+| 30 | Wire `check:live-catalogue` into CI on a schedule. It is NOT in CI and is the only guard that has caught a real production defect. Needs no credentials — it reads the public sitemap. | A | 0 | **done 2026-08-20** — `.github/workflows/live-catalogue-guard.yml`. Daily 03:00 UTC and `workflow_dispatch`. **Not** on push: dispatching the real workflow showed a push trigger attaches a PR check whose verdict is about the live catalogue rather than the PR's code, so every PR touching the guard would carry a red check it cannot fix. Observed run `32295824919` — reached production, exited 1, failed for the right reason, and ran its then-168-check suite with no `npm ci` (the suite is 188 checks at the current head, after a P1, a P0 and a second P1 found across three rounds of independent review). Deliberately NOT gated behind a repo variable like `live-cec-guard.yml`: it needs no credentials, and a config flag that silently disables a licence guard is the defect this family exists to prevent. Exit 2 fails the job as loudly as exit 1. **Expected RED until #31 is fixed** — do not add a baseline to make it green. |
 | 31 | Fix 4 live designation violations on carsi.com.au (`cct-commercial-carpet-core`, `wrt-water-damage-essentials`, `fsrt-fire-smoke-restoration-core`, `asd-structural-drying-core`). Licence-critical and live now. 3 of the 4 are absent from repo seed, so this needs the prod-DB path. | A→F | 0 | blocked on DECISIONS #16 |
 | 32 | ~~Render `commercial-floor-care-schools-childcare.mp4`~~ **WITHDRAWN — false premise.** The mp4 exists (2,109,732 bytes, 18 Aug 01:15) and `test:unit` is green (1056/1056). The "never rendered" claim came from `find . -name "*floor-care*intro*.mp4"`, which cannot match that filename — `intro` is in the directory `course-intros/`, not the filename — so it returned empty against a file that exists. Same disease as #29, in the evidence-gathering rather than the guard. Residual unknown: the earlier `test:unit` exit 1 was a real AssertionError on the ffprobe test; why it failed then and passes now on an unchanged tree is unexplained. | A | 0 | **withdrawn** |
 | 33 | Add `tsx` to devDependencies. `check:live-cec` runs `npx tsx`; tsx is absent from both `package.json` and `node_modules`, so that guard cannot execute. ~50 scripts reach for it via npx. | A | 0 | **done** — landed in `e7d85d3f` ("align package.json with the committed lockfile"), `tsx ^4.23.12`. Verified on `origin/main` 2026-08-20; the row was still marked ready. |
@@ -267,6 +267,29 @@ of what is actually being sold.
   across two conditions, not a demonstrated mechanism, and it is recorded as such. It also
   predicts the flake will return the next time the gate is run under a busy multi-agent session,
   so the entry stays open. Do not close it on the strength of a green run.
+  **2026-08-20, third session — the prediction above came true, and the failure is now known not
+  to be a test defect at all.** Reproduced at head `1139d5af` while a `cursor-agent` reviewer was
+  resident (1-min load average **5.38** on 10 CPUs): `type-check` 0 in 101.0s, then `test:unit`
+  **exit 1 in 106.7s** — the slowest recorded run of this suite by a wide margin. The decisive new
+  datum is the count, not the error string (which this entry already recorded): the run reported
+  `Test Files 142 passed (142)` and `Tests 1058 passed (1058)` against a healthy **143 / 1060**
+  confirmed in three prior logs. **Zero tests failed.** Exactly one file — worth two tests —
+  never ran, because the forks pool never started its worker
+  (`AdminCcwSignInsClient.test.tsx`, `[vitest-pool-runner]: Timeout waiting for worker to
+  respond`), and vitest correctly declined to call an incomplete run green. So every search for a
+  nondeterministic *assertion* was looking for the wrong object; the assertions were never
+  involved. `import 236.30s` against a 96.24s wall clock shows the pool heavily contended.
+  **This does NOT license a fix by timeout-raising.** Raising the pool timeout converts "one file
+  silently did not run" into "one file silently did not run and nothing said so" — the exit-1
+  behaviour is the guard working. **Nor does it revive `maxForks` capping**, which this entry
+  already measured out: it reproduced at `--maxWorkers=4`. The honest residue is that load remains
+  a **correlation** — one loaded run failed here, but another loaded run passed at 66.7s earlier
+  the same day — so the mechanism (worker-startup timeout) is demonstrated while its trigger is
+  not. The one operational rule that follows and is worth keeping: **never run `test:unit`, the
+  receipt, or the push hook while a reviewer process is alive on the same box**, since the gate
+  and the push both re-execute the test commands. Raw log preserved at
+  `~/.claude/jobs/f37f7054/tmp/ci-p1-001-repro-1139d5af.log` for as long as that job exists;
+  the evidence that matters is quoted above precisely because that path will not outlive the job.
 
 - 2026-08-20 · **`main` is RED on E2E: three specs assert hero copy the homepage no longer has.**
   Found because PR #682 is the first PR branched off `1057be16`, so it inherited the break rather

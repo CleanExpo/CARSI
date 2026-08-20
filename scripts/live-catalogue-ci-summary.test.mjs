@@ -99,6 +99,75 @@ check('the malformed branch names the shape it received, so the run is diagnosab
   assert.match(out, /`notes`: array/);
 });
 
+// A renderer that THROWS has not reported. The shape checks above dereference `report`, so a
+// root that is not an object kills them before they can speak — and `JSON.parse('null')`
+// returns null, which `typeof` calls an object. The human is then handed a stack trace where
+// the guard defect should have been, which is the same outcome as a summary that renders
+// nothing. Each root shape is pinned separately because only `null` actually crashed.
+for (const [label, raw] of [
+  ['null', 'null'],
+  ['a bare string', '"brand-new-wrt-course"'],
+  ['a bare number', '80'],
+  ['a bare true', 'true'],
+  ['a root array', '[{"slug":"brand-new-wrt-course"}]'],
+]) {
+  check(`a report whose root is ${label} is reported as malformed, never thrown`, () => {
+    let out;
+    assert.doesNotThrow(() => {
+      out = renderSummary(raw, '0');
+    }, `root as ${label} must not throw`);
+    assert.doesNotMatch(out, /all clean/);
+    assert.match(out, /malformed/);
+  });
+}
+
+// Right container, wrong contents: `violations` is a genuine array but carries an entry that is
+// not an object. `v.slug` in the NEW-versus-known split throws on it — and it throws precisely
+// on the run where a real breach IS present, so the crash lands at the worst possible moment.
+for (const [label, entry] of [
+  ['null', null],
+  ['a string', 'brand-new-wrt-course'],
+  ['a number', 7],
+  ['an array', ['brand-new-wrt-course']],
+]) {
+  check(`a violations entry that is ${label} is reported as malformed, never thrown`, () => {
+    let out;
+    assert.doesNotThrow(() => {
+      out = renderSummary(
+        JSON.stringify({
+          site: 'https://x',
+          checked: 80,
+          violations: [entry, violation('brand-new-wrt-course', 'WRT Course | CARSI')],
+          notes: [],
+        }),
+        '1',
+      );
+    }, `a violations entry of ${label} must not throw`);
+    assert.match(out, /malformed/);
+  });
+}
+
+check('a notes entry that is not an object is malformed too — notes are dereferenced exactly like violations', () => {
+  let out;
+  assert.doesNotThrow(() => {
+    out = renderSummary(
+      JSON.stringify({ site: 'https://x', checked: 80, violations: [], notes: [null] }),
+      '0',
+    );
+  });
+  assert.doesNotMatch(out, /all clean/);
+  assert.match(out, /malformed/);
+});
+
+check('an empty-object entry is accepted — the check rejects shapes that throw, not fields that are absent', () => {
+  const out = renderSummary(
+    JSON.stringify({ site: 'https://x', checked: 80, violations: [{}], notes: [] }),
+    '1',
+  );
+  assert.doesNotMatch(out, /malformed/);
+  assert.match(out, /live course\(s\) carry banned/);
+});
+
 check('exit 0 with violations is a guard defect, never "all clean" — the report outranks the code', () => {
   const out = renderSummary(
     JSON.stringify({
