@@ -245,3 +245,54 @@ bypassed or re-run until green.
 
 **Handoff complete. Next safe action: re-derive HEAD, dispatch a review bound to it, and push only
 on a PASS whose `blocking_findings` is empty and whose checklist carries real evidence.**
+
+---
+
+## 11. Update — the drain review returned a P0 after this handoff was committed
+
+This handoff was committed at `5ad6a584` while the drain review of `2cc95296` was still running.
+It has since finished, and it changes the picture. Recorded here rather than by editing the
+sections above, so the sequence stays visible.
+
+**Drain review verdict: FAIL**, head `2cc95296`, reviewer `gpt-5.5`, session
+`cursor-review-drain-2cc95296-2026-08-20`. Coverage complete (`not_reviewed: []`). Two blocking
+findings:
+
+- **P0 — `P0-WORKFLOW-TRUSTS-NONARRAY-VIOLATIONS-AS-CLEAN`** (`live-catalogue-guard.yml:91`). The
+  P1 fix was incomplete and **bypassable in both halves**. `(r.violations || []).length` is
+  `undefined` when `violations` is an object — falsy — so the fail step printed
+  `Live catalogue clean.` and exited 0, and `renderSummary` took the clean branch, on a report
+  naming a live breach. `|| []` catches only `null`/`undefined`; every truthy non-array passes
+  through. Reproduced on the "fixed" code before anything was changed.
+- **P1 — `P1-HANDOFF-VERIFICATION-COUNTS-ARE-STALE`.** The previous handoff and BACKLOG #30
+  carried suite counts (167, 168) that no longer matched the head.
+
+**Both drained in `3d11b5e9`.** Shape is now validated before contents in both halves: `violations`
+and `notes` must each be an array, or the run is a guard defect — rendered loudly with the shape
+named, and failed closed by the workflow. The stale counts were **annotated, not rewritten**: a
+handoff records what was observed, so the original figures stand with a forward pointer to the
+current 177 checks (156 guard + 21 summary).
+
+**Evidence at `3d11b5e9`:** all seven gates 0 (type-check 56.6s, test:unit 44.6s), `eslint` 0,
+`actionlint` 0. A mutant replacing the shape check with `if (false)` turns the suite red on all 8
+new checks (exit 1); source restored byte-identical. The fail step was exercised as shell across
+object, string, number, null, missing and array-shaped `violations` plus object-shaped `notes` —
+status 0 **only** for a genuinely clean array report, status 1 for every other shape and for codes
+1, 2, 137 and empty (`~/.claude/jobs/f37f7054/tmp/wf-failstep-test2.sh`).
+
+**What this means for the next session — read this before quoting anything above.**
+
+1. **HEAD is `3d11b5e9`, not `2cc95296`.** Nine commits unpushed.
+2. **`3d11b5e9` has NO review.** The P0 fix is evidenced but not independently reviewed. Per the
+   release law a fresh review must bind the exact final HEAD before any push.
+3. **The lesson, stated plainly: the P1 fix passed a green suite while still carrying a P0.** The
+   tests written for it asserted the behaviour its author had thought of. Only an adversary
+   instructed to attack the *shape* found the one he had not. Do not read "gates green" as
+   "correct" on this branch.
+4. The positive control has now paid for itself twice: it found the original P1, and the drain
+   round it made trustworthy found the P0 inside the fix for that P1.
+
+**Revised next action:** dispatch a review bound to `3d11b5e9` (or to HEAD if it has moved),
+using `~/.claude/jobs/f37f7054/tmp/dispatch-review.sh` with the brief's `head_sha` updated; drain
+anything it finds; push only on a PASS with empty `blocking_findings` and a checklist carrying real
+evidence.
