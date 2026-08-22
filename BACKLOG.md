@@ -177,11 +177,11 @@ measured, not inferred; the register carries the exact commands and positive con
 | # | Item | Owner | Gate | Status |
 |---|---|---|---|---|
 | 29 | Fix 3 vacuous guards — `check-iicrc-terminology`, `check-course-completeness`, `check-course-visibility-predicate` used the naive entry-point idiom comparing `import.meta.url` against a bare `file://` + argv concat. The checkout path contains a space, which `import.meta.url` percent-encodes and argv does not, so the comparison was always false, the scan body never ran, and each exited 0 in silence. | A | 0 | **done 2026-08-19** — PR #680, receipt `PR_RELEASE_GATE_PASS head=ed01376a` |
-| 30 | Wire `check:live-catalogue` into CI on a schedule. It is NOT in CI and is the only guard that has caught a real production defect. Needs no credentials — it reads the public sitemap. | A | 0 | ready |
+| 30 | Wire `check:live-catalogue` into CI on a schedule. It is NOT in CI and is the only guard that has caught a real production defect. Needs no credentials — it reads the public sitemap. | A | 0 | **done 2026-08-20** — `.github/workflows/live-catalogue-guard.yml`. Daily 03:00 UTC and `workflow_dispatch`. **Not** on push: dispatching the real workflow showed a push trigger attaches a PR check whose verdict is about the live catalogue rather than the PR's code, so every PR touching the guard would carry a red check it cannot fix. Observed run `32295824919` — reached production, exited 1, failed for the right reason, and ran its then-168-check suite with no `npm ci` (the suite is 206 checks at the current head, after five defects of one family — a P1, a P0, a second P1, a fourth found by working the next round's attack list before dispatching it, and a fifth that ended the point-fix strategy in favour of a class fix: every report-derived value now passes through a total formatter that cannot throw). Deliberately NOT gated behind a repo variable like `live-cec-guard.yml`: it needs no credentials, and a config flag that silently disables a licence guard is the defect this family exists to prevent. Exit 2 fails the job as loudly as exit 1. **Expected RED until #31 is fixed** — do not add a baseline to make it green. |
 | 31 | Fix 4 live designation violations on carsi.com.au (`cct-commercial-carpet-core`, `wrt-water-damage-essentials`, `fsrt-fire-smoke-restoration-core`, `asd-structural-drying-core`). Licence-critical and live now. 3 of the 4 are absent from repo seed, so this needs the prod-DB path. | A→F | 0 | blocked on DECISIONS #16 |
 | 32 | ~~Render `commercial-floor-care-schools-childcare.mp4`~~ **WITHDRAWN — false premise.** The mp4 exists (2,109,732 bytes, 18 Aug 01:15) and `test:unit` is green (1056/1056). The "never rendered" claim came from `find . -name "*floor-care*intro*.mp4"`, which cannot match that filename — `intro` is in the directory `course-intros/`, not the filename — so it returned empty against a file that exists. Same disease as #29, in the evidence-gathering rather than the guard. Residual unknown: the earlier `test:unit` exit 1 was a real AssertionError on the ffprobe test; why it failed then and passes now on an unchanged tree is unexplained. | A | 0 | **withdrawn** |
-| 33 | Add `tsx` to devDependencies. `check:live-cec` runs `npx tsx`; tsx is absent from both `package.json` and `node_modules`, so that guard cannot execute. ~50 scripts reach for it via npx. | A | 0 | ready |
-| 34 | Remove `continue-on-error: true` from the Build step at `.github/workflows/agent-pr-checks.yml:100`. Measured: the following `Report Results` step writes only to `$GITHUB_STEP_SUMMARY` and never exits non-zero, so `Agent PR Validation` goes green while its own summary prints `Build: ❌ Failed`. **The merge gate is NOT holed** — required checks are `Build Check` and `Frontend Tests`, both in `ci.yml`. Reporting dishonesty, not a merge hole. Low priority. | A | 0 | ready |
+| 33 | Add `tsx` to devDependencies. `check:live-cec` runs `npx tsx`; tsx is absent from both `package.json` and `node_modules`, so that guard cannot execute. ~50 scripts reach for it via npx. | A | 0 | **done** — landed in `e7d85d3f` ("align package.json with the committed lockfile"), `tsx ^4.23.12`. Verified on `origin/main` 2026-08-20; the row was still marked ready. |
+| 34 | Remove `continue-on-error: true` from the Build step at `.github/workflows/agent-pr-checks.yml:100`. Measured: the following `Report Results` step writes only to `$GITHUB_STEP_SUMMARY` and never exits non-zero, so `Agent PR Validation` goes green while its own summary prints `Build: ❌ Failed`. **The merge gate is NOT holed** — required checks are `Build Check` and `Frontend Tests`, both in `ci.yml`. Reporting dishonesty, not a merge hole. Low priority. | A | 0 | **done** — landed in `df9da305` ("fail the agent pr build check when the build fails"). Verified on `origin/main` 2026-08-20: no `continue-on-error` remains in that workflow, and the line now carries a comment saying why. The row was still marked ready. |
 | 35 | Scanned-count contract: as each guard is touched, make it print what it looked at and exit non-zero when that count is zero. Applied opportunistically, not as a sweep. This is the structural fix — it collapses the whole vacuous-guard class into a loud failure on the day it occurs. | A | 0 | ready |
 | 36 | `bootstrap.sh` must install the pre-push hook, and its absence must be detectable. `core.hooksPath` points at `~/.config/git/hooks` — machine-local and outside every repo — so a fresh machine or agent checkout has no pre-push gate at all. | A | 0 | ready |
 | 37 | Repo-wide `npm run lint` exits 1 with **14,777 problems** (7,738 errors). A gate nobody can action is a gate that is effectively off — same class as #29. Attribution was checked: eslint on changed files exits 0, so it is pre-existing, not branch-introduced. Needs a baseline-and-ratchet decision before lint can gate anything. | A | 0 | ready |
@@ -233,3 +233,100 @@ of what is actually being sold.
   normalisation. Revisit only if an exotic named entity is ever observed on the live catalogue —
   and fix it by decoding with a real HTML parser, never by hand-extending the table, which is the
   ratchet this file has already lost to three times.
+
+- 2026-08-20 · **CI-P1-001 — `npm run test:unit` fails inside the release gate's sequential run
+  on the `/Volumes/Storage Unit` checkout, and passes standalone.** Measured this session: green
+  standalone five times (143 files / 1060 tests, 5–51s); red four times when run by
+  `pr_release_gate.py issue` immediately after `npm run type-check`. The symptom is always the
+  same file — `[vitest-pool]: Failed to start forks worker for
+  src/components/admin/AdminCcwSignInsClient.test.tsx`, sometimes `Timeout waiting for worker to
+  respond`, once surfacing instead as a 5s `Test timed out` in the filesystem-heavy
+  `src/lib/seo/course-marketing.test.ts`. That file passes alone in 1.4s. **Ruled out:** memory
+  (70% free, zero swap), worker oversubscription (reproduced at `--maxWorkers=4` on a 10-CPU
+  box), and the branch under test (the diff touches zero files under `src/`, and
+  `vitest.config.ts` globs only `src/**`). CI's own `Unit Tests` job passes on a clean runner, so
+  this is specific to this machine/checkout. **Why it matters:** it blocks the release gate
+  non-deterministically, and the tempting workaround — dropping `test:unit` from the receipt, or
+  re-running until green — is self-certification. It cost a genuine, independently-PASSed commit
+  (`e3a3b49e`) its push this session. **2026-08-20, resumed session — two more hypotheses ruled
+  out, and the flake did not reproduce.** Descriptor exhaustion is out: `ulimit -n` is 1048576
+  soft / unlimited hard (`kern.maxfilesperproc` 92160), not the macOS 256 default. Process
+  exhaustion is out: `ulimit -u` is 4000 soft / 6000 hard, and a sampler taken every 2s across a
+  full sequential run peaked at **671 user processes and 27 node processes** — an order of
+  magnitude below the cap, with `vm.swapusage` 0.00M used throughout. Both hypotheses were
+  measured, not reasoned. The run then passed twice: once as a plain sequential
+  `type-check` → `test:unit` in bash, and once through
+  `~/.claude/jobs/f37f7054/tmp/mirror-gate-tests.py`, a faithful mirror of
+  `pr_release_gate.run_tests` — same `subprocess.run(shell=True)`, same `cwd`, same env stripped
+  of `GIT_REDIRECT_VARS`, all seven receipt commands in receipt order. All seven exited 0
+  (type-check 28.8s, test:unit 29.3s). The mirror exists so diagnosis never has to be paid for
+  with the gate's own run. **Still not root-caused** — a negative reproduction is not a fix. The
+  surviving hypothesis is contention from concurrent load rather than any static limit: the four
+  failures happened while this session's review agents and watchers were resident (~57 node
+  processes), and the two clean runs happened after they exited (17–27). That is a correlation
+  across two conditions, not a demonstrated mechanism, and it is recorded as such. It also
+  predicts the flake will return the next time the gate is run under a busy multi-agent session,
+  so the entry stays open. Do not close it on the strength of a green run.
+  **2026-08-20, third session — the prediction above came true, and the failure is now known not
+  to be a test defect at all.** Reproduced at head `1139d5af` while a `cursor-agent` reviewer was
+  resident (1-min load average **5.38** on 10 CPUs): `type-check` 0 in 101.0s, then `test:unit`
+  **exit 1 in 106.7s** — the slowest recorded run of this suite by a wide margin. The decisive new
+  datum is the count, not the error string (which this entry already recorded): the run reported
+  `Test Files 142 passed (142)` and `Tests 1058 passed (1058)` against a healthy **143 / 1060**
+  confirmed in three prior logs. **Zero tests failed.** Exactly one file — worth two tests —
+  never ran, because the forks pool never started its worker
+  (`AdminCcwSignInsClient.test.tsx`, `[vitest-pool-runner]: Timeout waiting for worker to
+  respond`), and vitest correctly declined to call an incomplete run green. So every search for a
+  nondeterministic *assertion* was looking for the wrong object; the assertions were never
+  involved. `import 236.30s` against a 96.24s wall clock shows the pool heavily contended.
+  **This does NOT license a fix by timeout-raising.** Raising the pool timeout converts "one file
+  silently did not run" into "one file silently did not run and nothing said so" — the exit-1
+  behaviour is the guard working. **Nor does it revive `maxForks` capping**, which this entry
+  already measured out: it reproduced at `--maxWorkers=4`. The honest residue is that load remains
+  a **correlation** — one loaded run failed here, but another loaded run passed at 66.7s earlier
+  the same day — so the mechanism (worker-startup timeout) is demonstrated while its trigger is
+  not. The one operational rule that follows and is worth keeping: **never run `test:unit`, the
+  receipt, or the push hook while a reviewer process is alive on the same box**, since the gate
+  and the push both re-execute the test commands. Raw log preserved at
+  `~/.claude/jobs/f37f7054/tmp/ci-p1-001-repro-1139d5af.log` for as long as that job exists;
+  the evidence that matters is quoted above precisely because that path will not outlive the job.
+
+- 2026-08-20 · **`main` is RED on E2E: three specs assert hero copy the homepage no longer has.**
+  Found because PR #682 is the first PR branched off `1057be16`, so it inherited the break rather
+  than causing it — its diff touches zero files under `src/` or `e2e/`. Commit `c9f8028d`
+  ("copy(hero): lead with the outcome…") replaced the H1 with "Become the technician every job
+  site trusts.", but `e2e/carsi-journeys.spec.ts:33`, `e2e/smoke.spec.ts:37` and
+  `e2e/pre-production.spec.ts:268` still expect "Professional training that fits the workday.".
+  Observed in run `32295812622`: `expect(locator).toContainText` failed against
+  `#main-content`, which received the new copy. **Why it matters beyond the red tick:** these are
+  the only automated checks that the landing page renders its hero at all, so until they are
+  realigned the homepage has no working smoke test — and a copy change is exactly the kind of
+  edit that would otherwise be caught here. Fix by updating the three expectations to the current
+  H1, not by loosening them to match any text; the assertion's value is that it pins specific
+  published copy. Confirm the wording is final with the founder first — the hero has changed
+  twice in three commits (`c9f8028d`, then `1e88d119`).
+
+- 2026-08-20 · **A misdispatched `cursor-agent --force` autonomously executed backlog work in a
+  review worktree.** Dispatching the independent reviewer with a trailing `-` — the
+  `codex exec --sandbox workspace-write - < brief` stdin convention from
+  `skills/pr-release-gate/SKILL.md` — silently fails on `cursor-agent`, which has no such
+  convention: `-` becomes the literal positional prompt. Given no real instruction, the agent did
+  what this repo tells any agent to do — read `CLAUDE.md`, "All work comes from the top of the
+  backlog" — and, holding `--force` (write + shell), started executing **BACKLOG #2**. Across two
+  worktrees it generated ten CEC submission packs under `docs/cec-submissions/`, modified
+  `BACKLOG.md`, `DECISIONS.md` and `GOAL.md`, edited `scripts/generate-cec-submission.ts`, and
+  symlinked the external `node_modules` tree in to run checks. Both then exited **0** and reported
+  success in confident, plausible prose. **Neither wrote the `reviewer-report.json` the brief
+  demanded.** Contained: it happened only in two disposable worktrees, both since `reset --hard`
+  and `clean`; the branch worktree was untouched and nothing was committed or pushed.
+  **Why it matters:** an exit code of 0 plus a fluent summary is exactly what a completed review
+  looks like from the outside. The only thing that distinguished "reviewed" from "did something
+  else entirely and said it went well" was the **absence of the report file** — so never infer a
+  review from a reviewer's exit code or its prose, only from a SHA-bound report that
+  `pr_release_gate.py` will accept. Two fixes: (a) `SKILL.md` step 4 should say the `-` stdin rule
+  is **codex-specific**, and that a reviewer CLI must be smoke-tested for prompt delivery before a
+  real dispatch (one throwaway prompt returning a known token — it costs seconds and would have
+  caught this); (b) dispatching any `--force` agent into a CARSI checkout inherits this repo's
+  "take the top backlog item" instruction, so a reviewer brief must be **delivered and verified**,
+  never assumed. Consider `--plan`/`--mode ask` for read-only reviewers that do not need to run
+  suites.

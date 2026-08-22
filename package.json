@@ -18,7 +18,7 @@
     "check:secrets": "node scripts/check-secrets.mjs",
     "check:iicrc-terminology": "node scripts/check-iicrc-terminology.mjs",
     "check:live-catalogue": "node scripts/check-live-catalogue.mjs",
-    "test:live-catalogue": "node scripts/check-live-catalogue.test.mjs",
+    "test:live-catalogue": "node scripts/check-live-catalogue.test.mjs && node scripts/live-catalogue-ci-summary.test.mjs",
     "verify:standards-claim": "node scripts/check-standards-claims.mjs --text",
     "check:standards-claims": "node scripts/check-standards-claims.mjs",
     "test:standards-claims": "node scripts/check-standards-claims.test.mjs",
