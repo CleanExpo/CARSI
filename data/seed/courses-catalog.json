@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "exportedAt": "2026-04-04T13:24:11.142Z",
   "publishedOnly": true,
   "instructors": [
@@ -197,7 +197,7 @@
           ]
         }
       ],
-      "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784189964/carsi/course-intro/fbc9f098-6ae7-4865-b4ad-db6ed4ef4991.mp4"
+      "introVideoUrl": "https://www.youtube.com/watch?v=ddkY-p1QzKo"
     },
     {
       "id": "ae989f1b-e9f2-43ab-848e-3f3fe0c120bc",
@@ -307,7 +307,7 @@
           ]
         }
       ],
-      "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784190256/carsi/course-intro/e8e6e955-fbbe-4c6c-b3bb-478ae9ee7b90.mp4"
+      "introVideoUrl": "https://www.youtube.com/watch?v=ig5xRyS8My8"
     },
     {
       "id": "6e3da1ba-fce2-466a-bfae-f2cc662243bf",
@@ -495,7 +495,7 @@
           ]
         }
       ],
-      "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784190594/carsi/course-intro/41bf0059-82cc-45f1-915c-1ec3a1d21a11.mp4"
+      "introVideoUrl": "https://www.youtube.com/watch?v=_p68M2FFTm8"
     },
     {
       "id": "72d9d048-2a56-49b7-bc76-08bc3ebada78",
@@ -684,7 +684,7 @@
           ]
         }
       ],
-      "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784190878/carsi/course-intro/759442cb-809a-4137-b7e1-b9ab593a5b74.mp4"
+      "introVideoUrl": "https://www.youtube.com/watch?v=-5HLgzAkgJA"
     },
     {
       "id": "3c166311-a7e6-4830-9e2b-98ba5db818d6",
@@ -793,7 +793,7 @@
           ]
         }
       ],
-      "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784191161/carsi/course-intro/02fc0026-d978-4372-bf97-833f7d9653c7.mp4"
+      "introVideoUrl": "https://www.youtube.com/watch?v=q0iMTzhXgts"
     },
     {
       "id": "5e9c2c3c-9a2b-49d9-8b83-3d7add8174fc",
@@ -902,7 +902,7 @@
           ]
         }
       ],
-      "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784191473/carsi/course-intro/7e4e1581-d7a3-456b-823b-8b09f400febb.mp4"
+      "introVideoUrl": "https://www.youtube.com/watch?v=lOn4YfmN1xE"
     },
     {
       "id": "12405aba-1c8f-4707-b906-8696aad97cdb",
@@ -1011,7 +1011,7 @@
           ]
         }
       ],
-      "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784191775/carsi/course-intro/8a941ac1-0b4f-4d50-9839-6bd4ebf5bdff.mp4"
+      "introVideoUrl": "https://www.youtube.com/watch?v=p72ky64Rq3Y"
     },
     {
       "id": "f720d0b8-59c4-4360-b7b4-0e7502ab3476",
@@ -1120,7 +1120,7 @@
           ]
         }
       ],
-      "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784192192/carsi/course-intro/36b0c2f0-6496-4329-b323-2558c9b34408.mp4"
+      "introVideoUrl": "https://www.youtube.com/watch?v=p2nX-VSHmIc"
     },
     {
       "id": "f5fb2d55-2daf-4a65-8f82-75a8f23231c3",
@@ -1229,7 +1229,7 @@
           ]
         }
       ],
-      "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784192500/carsi/course-intro/fdf67405-1d0f-4bba-b122-35f5f75f7b7b.mp4"
+      "introVideoUrl": "https://www.youtube.com/watch?v=pB7cARTfbwY"
     },
     {
       "id": "94f365b7-10ff-411d-9740-427655beb4a0",
@@ -1338,7 +1338,7 @@
           ]
         }
       ],
-      "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784192799/carsi/course-intro/e308a210-22b4-424e-a039-3ea0e6df8bc6.mp4"
+      "introVideoUrl": "https://www.youtube.com/watch?v=TbQZHanthHw"
     },
     {
       "id": "4f6711d4-5227-4618-bbe4-4063b881f8c0",
@@ -1447,7 +1447,7 @@
           ]
         }
       ],
-      "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784193097/carsi/course-intro/6fabb776-7ec9-4eaf-b399-dd8190c33e61.mp4"
+      "introVideoUrl": "https://www.youtube.com/watch?v=7aJO3I4x_m4"
     },
     {
       "id": "9ff47b03-15ab-4b0d-b341-d8939c1d866b",
@@ -1556,7 +1556,7 @@
           ]
         }
       ],
-      "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784193375/carsi/course-intro/d18f59d3-615b-4760-a146-0a5c9dfa0487.mp4"
+      "introVideoUrl": "https://www.youtube.com/watch?v=FY34pZX1F8c"
     },
     {
       "id": "61258279-7cc0-4f5d-8ffb-fe2b3afeb3e6",
@@ -1665,7 +1665,7 @@
           ]
         }
       ],
-      "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784193663/carsi/course-intro/04d8178a-b86b-4485-ae66-c4bdb8f1f9a1.mp4"
+      "introVideoUrl": "https://www.youtube.com/watch?v=i_eNAg7Gao4"
     },
     {
       "id": "3b264878-ff60-461f-a0fa-02605867e83e",
@@ -1774,7 +1774,7 @@
           ]
         }
       ],
-      "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784193960/carsi/course-intro/ba0c43bb-fca1-42a7-a29d-a1aff63e698a.mp4"
+      "introVideoUrl": "https://www.youtube.com/watch?v=uqv_65gC9GY"
     },
     {
       "id": "cca422eb-419f-4032-bf83-fe1b1a3e4c87",
@@ -1883,7 +1883,7 @@
           ]
         }
       ],
-      "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784194253/carsi/course-intro/4a7f85f5-43fe-4a92-8e25-6a7183b078b7.mp4"
+      "introVideoUrl": "https://www.youtube.com/watch?v=YapJKlHM2yc"
     },
     {
       "id": "a574fcee-8ca2-49f2-82f6-da25883c5ef0",
@@ -1991,7 +1991,7 @@
           ]
         }
       ],
-      "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784194593/carsi/course-intro/516e1365-e78d-4e45-9530-937585a91b5e.mp4"
+      "introVideoUrl": "https://www.youtube.com/watch?v=llluUhDs-E8"
     },
     {
       "id": "414a56a5-5924-4b53-bce0-5cd3ade7d555",
@@ -2100,7 +2100,7 @@
           ]
         }
       ],
-      "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784194874/carsi/course-intro/865db54a-abf8-44fa-ac94-cacc125162f7.mp4"
+      "introVideoUrl": "https://www.youtube.com/watch?v=ygac5gMEU3c"
     },
     {
       "id": "493a529c-62aa-48e9-9d32-79af03f60c8b",
@@ -2209,7 +2209,7 @@
           ]
         }
       ],
-      "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784195161/carsi/course-intro/c64f5098-39ea-4387-bb01-abb82e40f622.mp4"
+      "introVideoUrl": "https://www.youtube.com/watch?v=0MbLuzXqwws"
     },
     {
       "id": "a58c4979-3b11-4b03-bce7-9d31cffb66d4",
@@ -2399,7 +2399,7 @@
           ]
         }
       ],
-      "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784195471/carsi/course-intro/550035ab-9153-4252-b7aa-e3c34aacc9a2.mp4"
+      "introVideoUrl": "https://www.youtube.com/watch?v=0NosYbAdM80"
     },
     {
       "id": "37ead055-972f-4134-966d-d9c1068a15c3",
@@ -2588,7 +2588,7 @@
           ]
         }
       ],
-      "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784195742/carsi/course-intro/30ca3495-05f1-40d1-8e2b-f6fe8a6d149e.mp4"
+      "introVideoUrl": "https://www.youtube.com/watch?v=zd9Ru-lSLBU"
     },
     {
       "id": "b7c1d9e4-5a2f-4c83-9e61-2d4f8a1b3c7e",
@@ -2761,7 +2761,7 @@
           ]
         }
       ],
-      "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784196045/carsi/course-intro/8c1b520c-e437-43fb-abcf-89762ada4610.mp4"
+      "introVideoUrl": "https://www.youtube.com/watch?v=ivoWtiCSDx8"
     },
     {
       "id": "505daa3e-72ac-4be2-a79b-114d3c9d9378",
@@ -4611,7 +4611,7 @@
           ]
         }
       ],
-      "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784196448/carsi/course-intro/e04b750c-5c75-4933-a8f8-014b33f7023d.mp4"
+      "introVideoUrl": "https://www.youtube.com/watch?v=WKgO3etk7Bc"
     },
     {
       "id": "c1b7f0a2-0e5c-4b8a-9d3e-7a6f2c9b1d40",
@@ -5213,7 +5213,7 @@
           ]
         }
       ],
-      "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784189671/carsi/course-intro/19def23e-1143-4c20-a390-3713485984df.mp4"
+      "introVideoUrl": "https://www.youtube.com/watch?v=g0IlgrqcTIM"
     },
     {
       "id": "58af5a2e-c6ee-481d-ad3a-21f4c156b03b",
@@ -5435,7 +5435,7 @@
           ]
         }
       ],
-      "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784196782/carsi/course-intro/ffd1680b-446d-4986-ae3b-d2a906f4df63.mp4"
+      "introVideoUrl": "https://www.youtube.com/watch?v=N0q-yU0Jt3w"
     },
     {
       "id": "234eb5f5-8a6f-4438-a8b6-515ade44b4fb",
@@ -5652,7 +5652,7 @@
           ]
         }
       ],
-      "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784197075/carsi/course-intro/023d4a47-686b-461f-af1c-8d706baa49ba.mp4"
+      "introVideoUrl": "https://www.youtube.com/watch?v=2zv4Us9_1Kk"
     },
     {
       "id": "7a186ba6-90ee-45a4-b8da-f67dbc5b2076",
@@ -5869,7 +5869,7 @@
           ]
         }
       ],
-      "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784197416/carsi/course-intro/f66b649c-af60-41ef-8f3a-d3311ffeb0a5.mp4"
+      "introVideoUrl": "https://www.youtube.com/watch?v=3aWC08OQ31M"
     },
     {
       "id": "ec0fcc4d-5ae9-43e3-9dde-53eebb4a492a",
@@ -6062,7 +6062,7 @@
           ]
         }
       ],
-      "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784197692/carsi/course-intro/70748d24-7511-4b2b-b3df-ce520b82102c.mp4"
+      "introVideoUrl": "https://www.youtube.com/watch?v=NI3PtVB4Zdk"
     },
     {
       "id": "3e86eb42-a5e9-4ea5-b1eb-adf228fdc044",
@@ -6280,7 +6280,7 @@
           ]
         }
       ],
-      "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784198022/carsi/course-intro/081f96c6-0f95-4674-be61-f6751c620967.mp4"
+      "introVideoUrl": "https://www.youtube.com/watch?v=XDf9iRQ58JE"
     },
     {
       "id": "b998f96e-1cc3-4265-8306-92144f5f3611",
@@ -6497,7 +6497,7 @@
           ]
         }
       ],
-      "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784198310/carsi/course-intro/aeabfd69-0032-4ff5-a2c0-58859d9a3b8c.mp4"
+      "introVideoUrl": "https://www.youtube.com/watch?v=zYHlVOCmZLk"
     },
     {
       "id": "ebfe102b-9292-4a42-9be6-4cb35678d552",
@@ -6714,7 +6714,7 @@
           ]
         }
       ],
-      "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784198666/carsi/course-intro/3a7b1865-5c7b-4b51-9ef2-3c2e6a5582e9.mp4"
+      "introVideoUrl": "https://www.youtube.com/watch?v=2Q2ZKFMMMKc"
     },
     {
       "id": "0a4fb335-4561-4b9c-952e-58ce1401fc80",
@@ -7365,7 +7365,7 @@
           ]
         }
       ],
-      "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784199001/carsi/course-intro/47cc498a-f783-4c39-aa94-8a62c193d7cd.mp4"
+      "introVideoUrl": "https://www.youtube.com/watch?v=qT5oI7fVFkA"
     },
     {
       "id": "b7c9c962-4f03-509e-91e3-6bc852faabbb",
@@ -7638,7 +7638,7 @@
           ]
         }
       ],
-      "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784199351/carsi/course-intro/6e8dd42d-c006-45c7-a247-edc92c134c7a.mp4"
+      "introVideoUrl": "https://www.youtube.com/watch?v=UNmU8odlSVc"
     }
   ]
 }
