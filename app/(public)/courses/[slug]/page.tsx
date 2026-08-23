@@ -605,15 +605,30 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                     {/* Intro/marketing video trailer (plays inline when the course has one) */}
                     {course.intro_video_url ? (
                       <div className="mb-4 overflow-hidden rounded-2xl border border-white/10 bg-black">
-                        <video
-                          controls
-                          preload="metadata"
-                          poster={thumbnailUrl ?? undefined}
-                          className="aspect-video w-full"
-                          src={course.intro_video_url}
-                        >
-                          Your browser does not support the video tag.
-                        </video>
+                        {/youtube\.com|youtu\.be/.test(course.intro_video_url) ? (
+                          <iframe
+                            src={(() => {
+                              const url = course.intro_video_url;
+                              const m = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+                              const id = m ? m[1] : '';
+                              return `https://www.youtube.com/embed/${id}?rel=0&modestbranding=1`;
+                            })()}
+                            title={`${course.title} — intro video`}
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                            className="aspect-video w-full"
+                          />
+                        ) : (
+                          <video
+                            controls
+                            preload="metadata"
+                            poster={thumbnailUrl ?? undefined}
+                            className="aspect-video w-full"
+                            src={course.intro_video_url}
+                          >
+                            Your browser does not support the video tag.
+                          </video>
+                        )}
                       </div>
                     ) : null}
                     {/* Thumbnail */}
