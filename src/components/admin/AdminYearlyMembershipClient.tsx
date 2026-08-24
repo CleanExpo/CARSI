@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import {
   describeWelcomeEmailFailure,
-  WELCOME_EMAIL_RECOVERY,
+  welcomeEmailRecovery,
   type WelcomeEmailDelivery,
 } from '@/lib/admin/welcome-email-delivery';
 
@@ -288,7 +288,7 @@ export function AdminYearlyMembershipClient() {
               </li>
               {result.welcomeEmail === undefined ? null : result.welcomeEmail.delivered ? (
                 <li>
-                  Welcome email sent with login credentials. {WELCOME_EMAIL_RECOVERY}
+                  Welcome email sent with login credentials. {welcomeEmailRecovery(true)}
                 </li>
               ) : (
                 <li className="font-semibold text-amber-200">
@@ -296,7 +296,7 @@ export function AdminYearlyMembershipClient() {
                     result.welcomeEmail.reason
                   )}
                   . The membership is granted, but the password existed only in that email, so{' '}
-                  {result.email} cannot sign in yet. Send them a password reset.
+                  {result.email} cannot sign in yet. {welcomeEmailRecovery(false)}
                 </li>
               )}
             </ul>

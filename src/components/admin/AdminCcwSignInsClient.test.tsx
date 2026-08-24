@@ -355,6 +355,14 @@ describe('AdminCcwSignInsClient comp membership — welcome email reporting', ()
     expect(message).toMatch(/password reset/i);
   });
 
+  it('warns against re-granting on the FAILURE path, where the lockout is real', async () => {
+    const message = await compWith({ delivered: false, reason: 'not_configured' });
+
+    expect(message).toMatch(/not grant or comp again/i);
+    // It already did not arrive — do not phrase the recovery as a hypothetical.
+    expect(message).not.toMatch(/if it does not arrive/i);
+  });
+
   it('still gives the recovery when the server reports no delivery at all', async () => {
     const message = await compWith(undefined);
 

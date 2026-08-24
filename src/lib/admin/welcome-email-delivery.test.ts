@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   describeWelcomeEmailDelivery,
   describeWelcomeEmailFailure,
-  WELCOME_EMAIL_RECOVERY,
+  welcomeEmailRecovery,
   type WelcomeEmailFailureReason,
 } from './welcome-email-delivery';
 
@@ -57,12 +57,23 @@ describe('describeWelcomeEmailFailure — one wording for both admin surfaces', 
   });
 });
 
-describe('WELCOME_EMAIL_RECOVERY', () => {
-  it('tells the operator to reset rather than re-grant', () => {
-    // Re-granting is the instinct and the wrong move: a second comp is refused
-    // with 409 already_comped, and would rotate the password afresh if it were
-    // not. The line has to say both halves.
-    expect(WELCOME_EMAIL_RECOVERY).toMatch(/password reset/i);
-    expect(WELCOME_EMAIL_RECOVERY).toMatch(/not grant or comp again/i);
+describe('welcomeEmailRecovery — the warning must survive both branches', () => {
+  it('always says reset, never re-grant', () => {
+    // The instinct on a lockout is to grant again. On the CCW path that is
+    // refused (409 already_comped); on the yearly path NOTHING refuses it and it
+    // rotates the password afresh, deepening the lockout. Both branches carry it
+    // because the branch where it matters most is the failure one.
+    for (const delivered of [true, false]) {
+      const line = welcomeEmailRecovery(delivered);
+      expect(line).toMatch(/password reset/i);
+      expect(line).toMatch(/not grant or comp again/i);
+    }
+  });
+
+  it('does not say "if it does not arrive" about a mail that already did not', () => {
+    // A single constant could not phrase both, which is exactly why one surface
+    // dropped the shared wording and wrote its own without the warning.
+    expect(welcomeEmailRecovery(true)).toMatch(/if it does not arrive/i);
+    expect(welcomeEmailRecovery(false)).not.toMatch(/if it does not arrive/i);
   });
 });

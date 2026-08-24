@@ -76,11 +76,26 @@ export function describeWelcomeEmailFailure(reason: WelcomeEmailFailureReason | 
 }
 
 /**
- * What the operator must DO. Reached the provider is NOT reached the person: an
- * accepted message still bounces or lands in spam, and the password exists
- * nowhere else. A second comp is refused (409 `already_comped`) and would rotate
- * the password afresh if it were not, so the recovery is always a password
- * reset — which is worth saying on the SUCCESS path too, not only on failure.
+ * What the operator must DO, phrased for what is actually known.
+ *
+ * A FUNCTION rather than one string because the two branches are different
+ * statements, and a single constant is why they drifted: on a confirmed
+ * non-delivery, "if it does not arrive" is nonsense — it already did not — and
+ * that mismatch is what led one surface to drop the shared wording and write its
+ * own, losing the re-grant warning with it.
+ *
+ * The warning matters MOST where the system will not stop the operator. The CCW
+ * comp path claims `membershipCompedAt` set-if-null, so a second comp is refused
+ * with 409 `already_comped`. The yearly-membership route has NO such guard: a
+ * second grant simply runs and rotates the password again, deepening the very
+ * lockout the operator is trying to undo. So both branches on both surfaces say
+ * it, and this function is the only way to say it.
+ *
+ * Delivered is not the same as read: the provider accepted the message, which a
+ * bounce or a spam folder does not undo — hence a recovery line on success too.
  */
-export const WELCOME_EMAIL_RECOVERY =
-  'If it does not arrive, send a password reset — do not grant or comp again.';
+export function welcomeEmailRecovery(delivered: boolean): string {
+  return delivered
+    ? 'If it does not arrive, send a password reset — do not grant or comp again.'
+    : 'Send a password reset — do not grant or comp again.';
+}

@@ -7,7 +7,7 @@ import { ccwRoadshowEvents } from '@/lib/marketing/ccw-roadshow';
 import { ccwRoadshowAttendeeOffers } from '@/lib/marketing/ccw-roadshow-offers';
 import {
   describeWelcomeEmailFailure,
-  WELCOME_EMAIL_RECOVERY,
+  welcomeEmailRecovery,
   type WelcomeEmailDelivery,
 } from '@/lib/admin/welcome-email-delivery';
 
@@ -282,10 +282,10 @@ export function AdminCcwSignInsClient() {
         // it — a bounce or a spam folder leaves them locked out just the same,
         // and the password exists nowhere else.
         welcomeEmail === undefined
-          ? `Their password has been reset and exists only in the welcome email. ${WELCOME_EMAIL_RECOVERY}`
+          ? `Their password has been reset and exists only in the welcome email. ${welcomeEmailRecovery(true)}`
           : welcomeEmail.delivered
-            ? `The welcome email carrying their new password has been sent. ${WELCOME_EMAIL_RECOVERY}`
-            : `WARNING: the welcome email was NOT delivered — ${describeWelcomeEmailFailure(welcomeEmail.reason)}. Their password was reset and existed only in that email, so ${row.email} CANNOT sign in. ${WELCOME_EMAIL_RECOVERY}`,
+            ? `The welcome email carrying their new password has been sent. ${welcomeEmailRecovery(true)}`
+            : `WARNING: the welcome email was NOT delivered — ${describeWelcomeEmailFailure(welcomeEmail.reason)}. Their password was reset and existed only in that email, so ${row.email} CANNOT sign in. ${welcomeEmailRecovery(false)}`,
       ].join('\n')
     );
   }
