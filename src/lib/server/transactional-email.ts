@@ -222,6 +222,8 @@ export async function sendYearlyMembershipEmail(params: {
   temporaryPassword: string;
   priceLabel: string;
   courseCount: number;
+  /** Published courses on offer; when above `courseCount` the copy drops the full-library claim. */
+  publishedCourseCount?: number;
   durationLabel: string;
   appOrigin: string;
 }): Promise<SendEmailResult> {
@@ -237,6 +239,7 @@ export async function sendYearlyMembershipEmail(params: {
     temporaryPassword: params.temporaryPassword,
     priceLabel: params.priceLabel,
     courseCount: params.courseCount,
+    publishedCourseCount: params.publishedCourseCount,
     durationLabel: params.durationLabel,
     loginUrl,
     dashboardUrl,
