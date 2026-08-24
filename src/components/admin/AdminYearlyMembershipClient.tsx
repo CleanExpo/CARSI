@@ -9,6 +9,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
+import {
+  describeWelcomeEmailFailure,
+  WELCOME_EMAIL_RECOVERY,
+  type WelcomeEmailDelivery,
+} from '@/lib/admin/welcome-email-delivery';
 
 type UserOpt = { id: string; email: string; fullName: string | null };
 
@@ -21,27 +26,7 @@ type GrantResult = {
   coursesFailed: number;
   publishedCourseCount: number;
   priceLabel: string;
-  welcomeEmail?: {
-    delivered: boolean;
-    reason: 'not_configured' | 'send_failed' | 'provider_error' | 'dev_console' | null;
-  };
-};
-
-/**
- * What an operator must DO about a welcome email that did not arrive. The grant
- * itself stands — the member simply cannot read the password it issued, because
- * the email was its only copy.
- */
-const WELCOME_EMAIL_FAILURE_DETAIL: Record<string, string> = {
-  not_configured: 'no email provider is configured on this environment',
-  // These two are NOT interchangeable, and an operator diagnosing a lockout
-  // acts on the difference. In `sendEmail`, `send_failed` comes from the catch
-  // block — the request threw before any provider response (network, DNS,
-  // timeout). `provider_error` is the provider answering and refusing.
-  send_failed: 'the send failed before the provider answered (network or timeout)',
-  provider_error: 'the email provider rejected it',
-  dev_console: 'it was only written to the server console, not posted',
-  unknown: 'the send did not complete and gave no reason',
+  welcomeEmail?: WelcomeEmailDelivery;
 };
 
 export function AdminYearlyMembershipClient() {
@@ -302,12 +287,14 @@ export function AdminYearlyMembershipClient() {
                 {result.coursesFailed > 0 ? ` · ${result.coursesFailed} failed` : ''}
               </li>
               {result.welcomeEmail === undefined ? null : result.welcomeEmail.delivered ? (
-                <li>Welcome email sent with login credentials</li>
+                <li>
+                  Welcome email sent with login credentials. {WELCOME_EMAIL_RECOVERY}
+                </li>
               ) : (
                 <li className="font-semibold text-amber-200">
-                  Welcome email NOT delivered —{' '}
-                  {WELCOME_EMAIL_FAILURE_DETAIL[result.welcomeEmail.reason ?? ''] ??
-                    'the send did not complete'}
+                  Welcome email NOT delivered — {describeWelcomeEmailFailure(
+                    result.welcomeEmail.reason
+                  )}
                   . The membership is granted, but the password existed only in that email, so{' '}
                   {result.email} cannot sign in yet. Send them a password reset.
                 </li>

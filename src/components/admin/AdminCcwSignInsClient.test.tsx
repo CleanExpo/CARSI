@@ -315,3 +315,49 @@ describe('AdminCcwSignInsClient comp membership action', () => {
     expect(compCalls()).toHaveLength(0);
   });
 });
+
+describe('AdminCcwSignInsClient comp membership — welcome email reporting', () => {
+  function stubDialogs() {
+    vi.spyOn(window, 'prompt').mockReturnValue('295');
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    return vi.spyOn(window, 'alert').mockImplementation(() => undefined);
+  }
+
+  async function compWith(welcomeEmail: unknown): Promise<string> {
+    await remount(rosterOf(eligibleRow));
+    const alertSpy = stubDialogs();
+    vi.mocked(fetch)
+      .mockResolvedValueOnce(jsonResponse({ ok: true, priceLabel: 'A$295', welcomeEmail }))
+      .mockResolvedValueOnce(jsonResponse({ roster: rosterOf(eligibleRow) }));
+    await act(async () => {
+      compButtons(container)[0].click();
+    });
+    return String(alertSpy.mock.calls[0]?.[0] ?? '');
+  }
+
+  it('keeps the recovery instruction on the SUCCESS path', async () => {
+    // Delivered means the provider accepted it, not that the attendee read it.
+    // A bounce or a spam folder locks them out just the same, and the password
+    // exists nowhere else — so the operator still needs to know what to do.
+    const message = await compWith({ delivered: true, reason: null });
+
+    expect(message).toContain('has been sent');
+    expect(message).toMatch(/password reset/i);
+    expect(message).toMatch(/not grant or comp again/i);
+  });
+
+  it('states the cause in prose, never as a raw machine token', async () => {
+    const message = await compWith({ delivered: false, reason: 'provider_error' });
+
+    expect(message).toContain('NOT delivered');
+    expect(message).toContain('the email provider rejected it');
+    expect(message).not.toContain('provider_error');
+    expect(message).toMatch(/password reset/i);
+  });
+
+  it('still gives the recovery when the server reports no delivery at all', async () => {
+    const message = await compWith(undefined);
+
+    expect(message).toMatch(/password reset/i);
+  });
+});
