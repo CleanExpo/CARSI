@@ -35,6 +35,12 @@ model LmsUser {
   iicrcCertifications        Json?     @map("iicrc_certifications")
   /// First-run dashboard onboarding (industry, disciplines, goals). Set when wizard completes.
   onboardingCompletedAt      DateTime? @map("onboarding_completed_at") @db.Timestamptz(6)
+  /// When an admin last granted this learner a yearly membership. Claimed by a
+  /// conditional UPDATE so a repeat grant inside the re-grant window is refused
+  /// by the DATABASE, not by a read-then-write that cannot arbitrate a race.
+  /// A repeat grant rotates the password and reveals it only in the welcome
+  /// email, so an accidental second one locks the member out.
+  yearlyMembershipGrantedAt  DateTime? @map("yearly_membership_granted_at") @db.Timestamptz(6)
   /// JSON: industry, role, iicrc_experience, disciplines_held[], primary_goal, etc.
   onboarding                 Json?
   /// none | email | sms — preference for unfinished-lesson reminders (delivery not yet wired for sms).

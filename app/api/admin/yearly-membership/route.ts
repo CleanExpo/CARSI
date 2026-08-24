@@ -5,6 +5,12 @@ import {
   grantYearlyMembership,
 } from '@/lib/admin/admin-yearly-membership';
 import { getAdminSessionOrNull } from '@/lib/admin/admin-session';
+import {
+  claimYearlyMembershipGrant,
+  recordYearlyMembershipGrant,
+  releaseYearlyMembershipClaim,
+  YEARLY_MEMBERSHIP_REGRANT_WINDOW_MS,
+} from '@/lib/admin/yearly-membership-claim';
 
 export async function GET() {
   const session = await getAdminSessionOrNull();
@@ -62,6 +68,24 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ detail: 'A valid email address is required' }, { status: 400 });
   }
 
+  // Claim BEFORE granting. The grant rotates an existing member's password and
+  // reveals it only in the welcome email, so a second one — a double-submit, a
+  // retry after a timeout, two admins at once — invalidates the credentials the
+  // first email just delivered. The claim is a conditional UPDATE, so the
+  // database arbitrates rather than a read-then-write that cannot.
+  const claimedAt = new Date();
+  const claim = await claimYearlyMembershipGrant(email, claimedAt);
+  if (!claim.claimed) {
+    return NextResponse.json(
+      {
+        detail:
+          'That learner was granted a yearly membership moments ago. Granting again would reset their password a second time and invalidate the one already emailed to them. Wait a few minutes, or send a password reset instead.',
+        retryAfterMs: YEARLY_MEMBERSHIP_REGRANT_WINDOW_MS,
+      },
+      { status: 409 },
+    );
+  }
+
   try {
     const result = await grantYearlyMembership({
       email,
@@ -69,8 +93,16 @@ export async function POST(request: NextRequest) {
       priceAud,
       appOrigin: request.nextUrl.origin,
     });
+    // Stamp the claim now the grant has actually happened. For a learner who
+    // already had an account the claim wrote this same timestamp and this is a
+    // no-op; for a NEW account it is the only write, and without it the guard
+    // never engages for that learner — which is the ordinary case here.
+    await recordYearlyMembershipGrant(email, claimedAt);
     return NextResponse.json({ ok: true, ...result });
   } catch (e) {
+    // The grant did not happen, so the claim must not outlive it — otherwise one
+    // failed attempt blocks this learner for the whole window for nothing.
+    await releaseYearlyMembershipClaim(email, claimedAt);
     const msg = e instanceof Error ? e.message : String(e);
     if (msg === 'INVALID_EMAIL') {
       return NextResponse.json({ detail: 'Invalid email address' }, { status: 400 });
