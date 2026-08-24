@@ -259,13 +259,26 @@ export function AdminCcwSignInsClient() {
     );
     if (!result) return;
 
+    // The grant reports whether the welcome email — the ONLY copy of the password
+    // it just issued — actually reached the attendee. A failure here is not a
+    // failed comp: the membership stands and must NOT be re-issued (that would
+    // rotate the password again). It is a locked-out member, and the operator is
+    // the only one positioned to notice.
+    const welcomeEmail = result.welcomeEmail as
+      | { delivered: boolean; reason: string | null }
+      | undefined;
+
     window.alert(
       [
         `Membership granted to ${row.email}.`,
         `Recorded at: ${result.priceLabel ?? `A$${raw}`}`,
         `Courses they can open: ${result.reachableCourseCount ?? 0} of ${result.publishedCourseCount ?? 0} published.`,
         '',
-        'Their password has been reset and exists only in the welcome email. If it does not arrive, have them use “Forgot password” rather than comping again.',
+        welcomeEmail === undefined
+          ? 'Their password has been reset and exists only in the welcome email.'
+          : welcomeEmail.delivered
+            ? 'The welcome email carrying their new password has been sent.'
+            : `WARNING: the welcome email was NOT delivered (${welcomeEmail.reason ?? 'unknown reason'}). Their password was reset and existed only in that email, so ${row.email} CANNOT sign in. Send a password reset — do NOT comp again.`,
       ].join('\n')
     );
   }

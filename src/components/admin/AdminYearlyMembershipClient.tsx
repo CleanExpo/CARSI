@@ -21,6 +21,22 @@ type GrantResult = {
   coursesFailed: number;
   publishedCourseCount: number;
   priceLabel: string;
+  welcomeEmail?: {
+    delivered: boolean;
+    reason: 'not_configured' | 'send_failed' | 'provider_error' | 'dev_console' | null;
+  };
+};
+
+/**
+ * What an operator must DO about a welcome email that did not arrive. The grant
+ * itself stands — the member simply cannot read the password it issued, because
+ * the email was its only copy.
+ */
+const WELCOME_EMAIL_FAILURE_DETAIL: Record<string, string> = {
+  not_configured: 'no email provider is configured on this environment',
+  send_failed: 'the provider rejected the send',
+  provider_error: 'the email provider returned an error',
+  dev_console: 'it was only written to the server console, not posted',
 };
 
 export function AdminYearlyMembershipClient() {
@@ -280,7 +296,17 @@ export function AdminYearlyMembershipClient() {
                   : ''}
                 {result.coursesFailed > 0 ? ` · ${result.coursesFailed} failed` : ''}
               </li>
-              <li>Welcome email sent with login credentials</li>
+              {result.welcomeEmail === undefined ? null : result.welcomeEmail.delivered ? (
+                <li>Welcome email sent with login credentials</li>
+              ) : (
+                <li className="font-semibold text-amber-200">
+                  Welcome email NOT delivered —{' '}
+                  {WELCOME_EMAIL_FAILURE_DETAIL[result.welcomeEmail.reason ?? ''] ??
+                    'the send did not complete'}
+                  . The membership is granted, but the password existed only in that email, so{' '}
+                  {result.email} cannot sign in yet. Send them a password reset.
+                </li>
+              )}
             </ul>
             <Link
               href={`/admin/users/${result.userId}`}

@@ -6,7 +6,10 @@ import { prisma } from '@/lib/prisma';
 import { lmsPublishedCourseWhere } from '@/lib/server/public-courses-list';
 import { generateMemberTempPassword } from '@/lib/server/member-temp-password';
 import { hashPassword } from '@/lib/server/lms-auth';
-import { sendYearlyMembershipEmail } from '@/lib/server/transactional-email';
+import {
+  sendYearlyMembershipEmail,
+  type SendEmailResult,
+} from '@/lib/server/transactional-email';
 
 const MEMBERSHIP_DURATION_LABEL = '12 months from activation';
 
@@ -43,6 +46,42 @@ export async function listPublishedCourseSlugsForYearlyMembership(): Promise<str
   return rows.map((r) => r.slug.trim().toLowerCase()).filter(Boolean);
 }
 
+/**
+ * Whether the welcome email — which carries the ONLY copy of the temporary
+ * password — actually reached the member.
+ *
+ * This exists because the grant ROTATES an existing member's password before
+ * sending. If the send then fails, the member holds credentials that exist
+ * nowhere a human can read them, and until now the only trace was a
+ * `console.warn` on the server: both admin surfaces reported an unqualified
+ * success. An operator who cannot see the failure cannot recover from it.
+ */
+export type WelcomeEmailDelivery = {
+  /** True ONLY when the message was handed to the email provider. */
+  delivered: boolean;
+  /** Why it did not reach the member; null when it did. */
+  reason: 'not_configured' | 'send_failed' | 'provider_error' | 'dev_console' | null;
+};
+
+/**
+ * PURE, so the classification is testable without an email provider.
+ *
+ * `sent: true` is NOT sufficient. `sendEmail` also returns `sent: true` with
+ * `reason: 'dev_console'` when it merely prints the message to the server log —
+ * which happens whenever `MAILTRAP_API_KEY` is unset with the dev console on, and
+ * on provider errors and network failures in that mode. The member cannot read a
+ * server log, so for the question this type answers — does this person have their
+ * password? — dev-console output is a NON-delivery. Treating it as success would
+ * reproduce the original defect in a new place.
+ */
+export function describeWelcomeEmailDelivery(result: SendEmailResult): WelcomeEmailDelivery {
+  const reachedProvider = result.sent && result.reason !== 'dev_console';
+  if (reachedProvider) return { delivered: true, reason: null };
+  // `sent: false` with no reason is still a non-delivery; name it rather than
+  // reporting `null`, which this type reserves for success.
+  return { delivered: false, reason: result.reason ?? 'send_failed' };
+}
+
 export async function grantYearlyMembership(params: {
   email: string;
   fullName?: string | null;
@@ -62,6 +101,12 @@ export async function grantYearlyMembership(params: {
   /** Published courses whose enrolment row exists but is denied by the read gates. */
   deniedCourseSlugs: string[];
   priceLabel: string;
+  /**
+   * Whether the member can actually READ the password this grant issued.
+   * Callers must surface a non-delivery: the grant still stands, but the
+   * member is locked out until an admin password reset is sent.
+   */
+  welcomeEmail: WelcomeEmailDelivery;
 }> {
   const email = params.email.trim().toLowerCase();
   if (!email.includes('@')) throw new Error('INVALID_EMAIL');
@@ -178,14 +223,19 @@ export async function grantYearlyMembership(params: {
     appOrigin: params.appOrigin,
   });
 
-  if (!emailResult.sent) {
-    console.warn('[yearly-membership] welcome email not sent', emailResult.reason);
+  const welcomeEmail = describeWelcomeEmailDelivery(emailResult);
+  if (!welcomeEmail.delivered) {
+    // Kept as a server-side trace, but it is no longer the ONLY trace — the
+    // caller now receives this and is expected to show it to the operator.
+    console.warn('[yearly-membership] welcome email not delivered', welcomeEmail.reason);
   }
 
   return {
     userId: user.id,
     email,
     accountCreated,
+    // A password was always issued. Whether the member can READ it is a
+    // separate question, answered by `welcomeEmail` below.
     passwordIssued: true,
     coursesGranted,
     alreadyEnrolled,
@@ -194,5 +244,6 @@ export async function grantYearlyMembership(params: {
     reachableCourseCount,
     deniedCourseSlugs,
     priceLabel: formatYearlyMembershipPriceLabel(priceAud),
+    welcomeEmail,
   };
 }
