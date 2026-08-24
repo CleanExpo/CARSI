@@ -11,22 +11,22 @@ import {
 const mocks = vi.hoisted(() => ({
   findSignIn: vi.fn(),
   findSubscription: vi.fn(),
-  findEnrollment: vi.fn(),
+  claimComp: vi.fn(),
   grant: vi.fn(),
 }));
 
 vi.mock('@/lib/prisma', () => ({
   prisma: {
-    ccwRoadshowSignIn: { findUnique: mocks.findSignIn },
+    ccwRoadshowSignIn: { findUnique: mocks.findSignIn, updateMany: mocks.claimComp },
     lmsSubscription: { findUnique: mocks.findSubscription },
-    lmsEnrollment: { findFirst: mocks.findEnrollment },
   },
 }));
 
 vi.mock('@/lib/admin/admin-yearly-membership', () => ({
   grantYearlyMembership: mocks.grant,
-  YEARLY_MEMBERSHIP_PAYMENT_PREFIX: 'admin:yearly-membership:',
 }));
+
+const NOW = new Date('2026-08-24T14:30:00.000Z');
 
 /** An attendee who satisfies `baseOfferEligible`: both days, opted in, provisioned. */
 function eligibleSignIn(overrides: Record<string, unknown> = {}) {
@@ -47,7 +47,8 @@ beforeEach(() => {
   process.env.DATABASE_URL = 'postgres://configured';
   mocks.findSignIn.mockReset().mockResolvedValue(eligibleSignIn());
   mocks.findSubscription.mockReset().mockResolvedValue(null);
-  mocks.findEnrollment.mockReset().mockResolvedValue(null);
+  // count 1 = this call won the claim.
+  mocks.claimComp.mockReset().mockResolvedValue({ count: 1 });
   mocks.grant.mockReset().mockResolvedValue({ userId: 'user-1', email: 'attendee@example.test' });
   vi.spyOn(console, 'error').mockImplementation(() => {});
 });
@@ -213,36 +214,105 @@ describe('an unrecognised membership status refuses, rather than granting', () =
 
 describe('a second comp for the same attendee', () => {
   it('is refused, because a repeat would rotate the member’s password', async () => {
-    // A completed comp writes enrolments, not a subscription row, so the
-    // membership check cannot see it. The payment-reference stamp is the marker.
-    mocks.findEnrollment.mockResolvedValue({ id: 'enrol-1' });
+    // count 0 = the set-if-null UPDATE matched nothing, so someone already holds
+    // the claim. The database decided that, not this process.
+    mocks.claimComp.mockResolvedValue({ count: 0 });
 
     await expect(
-      compAttendeeMembership({ signInId: 'sign-in-1', priceAud: 295, appOrigin: 'https://x.test' }),
+      compAttendeeMembership(
+        { signInId: 'sign-in-1', priceAud: 295, appOrigin: 'https://x.test' },
+        NOW,
+      ),
     ).resolves.toEqual({ ok: false, reason: 'already_comped' });
     expect(mocks.grant).not.toHaveBeenCalled();
   });
 
-  it('looks for the grant stamp, not for any enrolment at all', async () => {
-    await compAttendeeMembership({
-      signInId: 'sign-in-1',
-      priceAud: 295,
-      appOrigin: 'https://x.test',
-    });
+  it('claims with a set-if-null UPDATE, so two callers cannot both win', async () => {
+    await compAttendeeMembership(
+      { signInId: 'sign-in-1', priceAud: 295, appOrigin: 'https://x.test' },
+      NOW,
+    );
 
-    // Matching any enrolment would refuse every attendee, since they are all
-    // enrolled in the 2-day workshop course by provisioning.
-    expect(mocks.findEnrollment.mock.calls[0][0].where.paymentReference).toEqual({
-      startsWith: 'admin:yearly-membership:',
+    // Without `membershipCompedAt: null` in the WHERE, every caller would "win"
+    // and the claim would stop nothing.
+    expect(mocks.claimComp.mock.calls[0][0]).toEqual({
+      where: { id: 'sign-in-1', membershipCompedAt: null },
+      data: { membershipCompedAt: NOW },
     });
   });
 
-  it('refuses rather than granting when the prior-grant lookup throws', async () => {
-    mocks.findEnrollment.mockRejectedValue(new Error('connection refused'));
+  it('claims BEFORE granting, never after', async () => {
+    const order: string[] = [];
+    mocks.claimComp.mockImplementation(async () => {
+      order.push('claim');
+      return { count: 1 };
+    });
+    mocks.grant.mockImplementation(async () => {
+      order.push('grant');
+      return { userId: 'user-1' };
+    });
+
+    await compAttendeeMembership(
+      { signInId: 'sign-in-1', priceAud: 295, appOrigin: 'https://x.test' },
+      NOW,
+    );
+
+    // Reversed, the loser of a real race would already have had their password
+    // rotated by the time the claim refused them.
+    expect(order).toEqual(['claim', 'grant']);
+  });
+
+  it('refuses rather than granting when the claim query throws', async () => {
+    mocks.claimComp.mockRejectedValue(new Error('connection refused'));
 
     await expect(
-      compAttendeeMembership({ signInId: 'sign-in-1', priceAud: 295, appOrigin: 'https://x.test' }),
+      compAttendeeMembership(
+        { signInId: 'sign-in-1', priceAud: 295, appOrigin: 'https://x.test' },
+        NOW,
+      ),
     ).resolves.toEqual({ ok: false, reason: 'membership_unverifiable' });
     expect(mocks.grant).not.toHaveBeenCalled();
+  });
+
+  it('is not claimed at all when the request is refused earlier', async () => {
+    mocks.findSubscription.mockResolvedValue({ status: 'active', currentPeriodEnd: null });
+
+    await compAttendeeMembership(
+      { signInId: 'sign-in-1', priceAud: 295, appOrigin: 'https://x.test' },
+      NOW,
+    );
+
+    // A refused request must not consume the attendee's one comp.
+    expect(mocks.claimComp).not.toHaveBeenCalled();
+  });
+});
+
+describe('a claim never outlives a failed grant', () => {
+  it('is released when grantYearlyMembership throws', async () => {
+    mocks.grant.mockRejectedValue(new Error('NO_PUBLISHED_COURSES'));
+
+    await expect(
+      compAttendeeMembership(
+        { signInId: 'sign-in-1', priceAud: 295, appOrigin: 'https://x.test' },
+        NOW,
+      ),
+    ).rejects.toThrow('NO_PUBLISHED_COURSES');
+
+    // Scoped to the exact timestamp this call wrote, so a claim someone else has
+    // since taken is never cleared. Otherwise one failure would lock the
+    // attendee out of ever being comped.
+    expect(mocks.claimComp.mock.calls[1][0]).toEqual({
+      where: { id: 'sign-in-1', membershipCompedAt: NOW },
+      data: { membershipCompedAt: null },
+    });
+  });
+
+  it('is NOT released after a successful grant', async () => {
+    await compAttendeeMembership(
+      { signInId: 'sign-in-1', priceAud: 295, appOrigin: 'https://x.test' },
+      NOW,
+    );
+
+    expect(mocks.claimComp).toHaveBeenCalledTimes(1);
   });
 });

@@ -1007,6 +1007,11 @@ model CcwRoadshowSignIn {
   emailOptIn         Boolean   @default(false) @map("email_opt_in")
   /// Set when the post-event offer pack email was sent (idempotent batch).
   offerEmailSentAt   DateTime? @map("offer_email_sent_at") @db.Timestamptz(6)
+  /// Set when an admin comped this attendee a yearly membership. Claimed by a
+  /// conditional UPDATE (set-if-null) BEFORE the grant runs, so it is the record
+  /// that makes the comp idempotent — not an inference from enrolment rows.
+  /// Cleared again only if the grant itself fails.
+  membershipCompedAt DateTime? @map("membership_comped_at") @db.Timestamptz(6)
   isWalkIn           Boolean   @default(false) @map("is_walk_in")
   /// pending | provisioning | provisioned | failed — drives the async provision batch.
   provisionStatus    String    @default("pending") @map("provision_status") @db.VarChar(16)

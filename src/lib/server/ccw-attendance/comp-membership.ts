@@ -20,10 +20,7 @@
  * nor the attendee's screens: it is an authenticated staff action, gated by the
  * admin session and `CCW_ATTENDANCE_ENABLED` at the route.
  */
-import {
-  YEARLY_MEMBERSHIP_PAYMENT_PREFIX,
-  grantYearlyMembership,
-} from '@/lib/admin/admin-yearly-membership';
+import { grantYearlyMembership } from '@/lib/admin/admin-yearly-membership';
 import { ccwRoadshowAttendeeOffers } from '@/lib/marketing/ccw-roadshow-offers';
 import { prisma } from '@/lib/prisma';
 import { baseOfferEligible } from '@/lib/server/ccw-attendance/eligibility';
@@ -104,12 +101,15 @@ export function decideCompMembership(input: {
  * receives the post-event offer pack — so an admin comp cannot reach someone the
  * offer itself would never have been shown to.
  */
-export async function compAttendeeMembership(params: {
-  signInId: string;
-  /** Lump sum to record against the grant. 0 = complimentary. */
-  priceAud: number;
-  appOrigin: string;
-}): Promise<CompMembershipOutcome> {
+export async function compAttendeeMembership(
+  params: {
+    signInId: string;
+    /** Lump sum to record against the grant. 0 = complimentary. */
+    priceAud: number;
+    appOrigin: string;
+  },
+  now: Date = new Date(),
+): Promise<CompMembershipOutcome> {
   const signIn = await prisma.ccwRoadshowSignIn.findUnique({
     where: { id: params.signInId },
     select: {
@@ -151,41 +151,55 @@ export async function compAttendeeMembership(params: {
     if (!decision.allowed) return { ok: false, reason: decision.reason };
   }
 
-  // A completed comp leaves NO subscription row — `grantYearlyMembership` writes
-  // enrolments, not a subscription — so the membership check above cannot see a
-  // previous comp, and a repeated request would rotate the member's password and
-  // re-send the welcome email. The grant does stamp every enrolment it creates
-  // with `YEARLY_MEMBERSHIP_PAYMENT_PREFIX`, so that stamp is the marker.
+  // Claim the comp before granting. `membershipCompedAt` is set by a conditional
+  // UPDATE on this row (set-if-null), so the DATABASE decides the winner: a
+  // second caller — a double-click or a genuinely concurrent request — matches
+  // no row and is turned away. That matters because a repeat comp rotates the
+  // member's password and reveals it only in the welcome email.
   //
-  // Honest limit: this is a read, so it stops a REPEATED comp, not two issued at
-  // the same instant. Closing that properly needs a uniquely-constrained
-  // comp-grant record (a migration) — raised on the PR rather than smuggled in
-  // here, since a wrong schema on a grant path is worse than a narrow window.
-  if (signIn.studentId) {
-    let alreadyComped = false;
-    try {
-      const priorGrant = await prisma.lmsEnrollment.findFirst({
-        where: {
-          studentId: signIn.studentId,
-          paymentReference: { startsWith: YEARLY_MEMBERSHIP_PAYMENT_PREFIX },
-        },
-        select: { id: true },
-      });
-      alreadyComped = priorGrant !== null;
-    } catch (error) {
-      console.error('[ccw-comp-membership] prior-grant lookup failed:', error);
-      return { ok: false, reason: 'membership_unverifiable' };
-    }
-
-    if (alreadyComped) return { ok: false, reason: 'already_comped' };
+  // This replaced an inference from enrolment `paymentReference` stamps, which
+  // was a proxy for a fact nothing recorded and had two holes: a comp granting
+  // no NEW enrolments wrote no stamp (`adminGrantEnrollment` returns
+  // `already_enrolled` before writing one), and a read cannot arbitrate a race.
+  let claimed = false;
+  try {
+    const { count } = await prisma.ccwRoadshowSignIn.updateMany({
+      where: { id: params.signInId, membershipCompedAt: null },
+      data: { membershipCompedAt: now },
+    });
+    claimed = count === 1;
+  } catch (error) {
+    console.error('[ccw-comp-membership] comp claim failed:', error);
+    return { ok: false, reason: 'membership_unverifiable' };
   }
 
-  const result = await grantYearlyMembership({
-    email: signIn.email,
-    fullName: signIn.fullName,
-    priceAud: params.priceAud,
-    appOrigin: params.appOrigin,
-  });
+  if (!claimed) return { ok: false, reason: 'already_comped' };
 
-  return { ok: true, result };
+  try {
+    const result = await grantYearlyMembership({
+      email: signIn.email,
+      fullName: signIn.fullName,
+      priceAud: params.priceAud,
+      appOrigin: params.appOrigin,
+    });
+    return { ok: true, result };
+  } catch (error) {
+    // The grant did not happen, so the claim must not outlive it — otherwise one
+    // failed attempt locks the attendee out of ever being comped. Scoped to the
+    // exact timestamp this call wrote, so a claim someone else has since taken
+    // is never cleared.
+    await releaseCompClaim(params.signInId, now);
+    throw error;
+  }
+}
+
+async function releaseCompClaim(signInId: string, claimedAt: Date): Promise<void> {
+  try {
+    await prisma.ccwRoadshowSignIn.updateMany({
+      where: { id: signInId, membershipCompedAt: claimedAt },
+      data: { membershipCompedAt: null },
+    });
+  } catch (error) {
+    console.error('[ccw-comp-membership] comp claim release failed:', error);
+  }
 }
