@@ -131,6 +131,8 @@ function refusalDetail(reason: string): string {
       return 'That attendee already holds an active CARSI membership.';
     case 'already_comped':
       return 'That attendee has already been granted a yearly membership.';
+    case 'checkout_in_progress':
+      return 'That attendee has a membership checkout open right now. Wait for it to finish, or cancel it, before comping.';
     default:
       return 'We could not confirm the attendee’s membership status. Please try again shortly.';
   }
@@ -144,6 +146,7 @@ function statusFor(reason: string): number {
       return 403;
     case 'already_a_member':
     case 'already_comped':
+    case 'checkout_in_progress':
       return 409;
     default:
       return 503;

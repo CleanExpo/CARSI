@@ -24,7 +24,10 @@ import { grantYearlyMembership } from '@/lib/admin/admin-yearly-membership';
 import { ccwRoadshowAttendeeOffers } from '@/lib/marketing/ccw-roadshow-offers';
 import { prisma } from '@/lib/prisma';
 import { baseOfferEligible } from '@/lib/server/ccw-attendance/eligibility';
-import { decideMembershipEntitlement } from '@/lib/server/entitlements';
+import {
+  CHECKOUT_RESERVATION_STATUS,
+  decideMembershipEntitlement,
+} from '@/lib/server/entitlements';
 
 /**
  * The attendee first-year rate, read from the offer config rather than repeated
@@ -47,6 +50,8 @@ export type CompMembershipRefusal =
   | 'already_a_member'
   /** Could not prove the attendee is NOT already a member. Refuse rather than guess. */
   | 'membership_unverifiable'
+  /** A self-serve checkout is open for this learner right now. */
+  | 'checkout_in_progress'
   /** A yearly membership was already granted to this learner. */
   | 'already_comped';
 
@@ -70,6 +75,18 @@ export function decideCompMembership(input: {
 }): { allowed: true } | { allowed: false; reason: CompMembershipRefusal } {
   if (input.lookupFailed) {
     return { allowed: false, reason: 'membership_unverifiable' };
+  }
+
+  // An in-flight self-serve checkout is NOT "no membership" for this purpose.
+  // `decideMembershipEntitlement` maps `checkout_pending` to `reason: 'none'`
+  // deliberately — a reservation must grant no catalogue access — but the cost of
+  // being wrong differs here: comping someone who is part-way through paying
+  // A$295 rotates the password on the account they are using to pay, and the new
+  // one exists only in an email that can lag or bounce. Reported by Cursor's
+  // security review; it is the #694 hazard reappearing where the self-serve and
+  // admin paths meet.
+  if (input.subscription?.status?.trim().toLowerCase() === CHECKOUT_RESERVATION_STATUS) {
+    return { allowed: false, reason: 'checkout_in_progress' };
   }
 
   const decision = decideMembershipEntitlement(input.subscription);
@@ -130,26 +147,31 @@ export async function compAttendeeMembership(
     return { ok: false, reason: 'not_offer_eligible' };
   }
 
-  // An attendee with no provisioned account cannot already hold a membership, so
-  // there is nothing to look up and nothing to clobber.
-  if (signIn.studentId) {
-    let subscription: { status: string; currentPeriodEnd: Date | null } | null = null;
-    let lookupFailed = false;
-    try {
+  // Resolve the membership by the same identity the grant will act on. The grant
+  // does `lmsUser.findUnique({ where: { email } })`, and `baseOfferEligible` is
+  // satisfied by `provisionStatus` alone — so `studentId` can be null on a row
+  // whose email nonetheless belongs to a real, possibly paying, LMS user. Keying
+  // this check on `studentId` would skip the guard for exactly those rows.
+  let subscription: { status: string; currentPeriodEnd: Date | null } | null = null;
+  let lookupFailed = false;
+  try {
+    const email = signIn.email.trim().toLowerCase();
+    const user = await prisma.lmsUser.findUnique({ where: { email }, select: { id: true } });
+    if (user) {
       subscription = await prisma.lmsSubscription.findUnique({
-        where: { userId: signIn.studentId },
+        where: { userId: user.id },
         select: { status: true, currentPeriodEnd: true },
       });
-    } catch (error) {
-      // No learner identifier in the log line (CWE-532 was paid for once on this
-      // code path already).
-      console.error('[ccw-comp-membership] membership lookup failed:', error);
-      lookupFailed = true;
     }
-
-    const decision = decideCompMembership({ subscription, lookupFailed });
-    if (!decision.allowed) return { ok: false, reason: decision.reason };
+  } catch (error) {
+    // No learner identifier in the log line (CWE-532 was paid for once on this
+    // code path already).
+    console.error('[ccw-comp-membership] membership lookup failed:', error);
+    lookupFailed = true;
   }
+
+  const decision = decideCompMembership({ subscription, lookupFailed });
+  if (!decision.allowed) return { ok: false, reason: decision.reason };
 
   // Claim the comp before granting. `membershipCompedAt` is set by a conditional
   // UPDATE on this row (set-if-null), so the DATABASE decides the winner: a
