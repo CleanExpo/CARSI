@@ -219,7 +219,7 @@ describe('AdminCcwSignInsClient comp membership action', () => {
     // One button: not for the already-comped row (the route answers 409), and
     // not for the ineligible row (403). Both are refusals worth not offering.
     expect(compButtons(container)).toHaveLength(1);
-    // Rendered in the viewer's locale, not sliced from the UTC ISO string: a
+    // Resolved in the viewer's timezone, not sliced from the UTC ISO string: a
     // comp stamped 04:15Z is the 24th in UTC but already the 24th afternoon in
     // Melbourne, and an operator reconciles against the local date.
     const localDate = new Date('2026-08-24T04:15:00.000Z').toLocaleDateString('en-AU');

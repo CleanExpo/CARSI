@@ -60,9 +60,18 @@ const PRICE_PATTERN = /^\d+(\.\d{1,2})?$/;
 /**
  * The comp timestamp is stored and served in UTC. Slicing the ISO string would
  * show the UTC date, which is the PREVIOUS day for any comp issued before 10am
- * AEST — misdating a record an operator may have to reconcile. Rendered in the
- * viewer's own locale instead; safe from hydration mismatch because the roster
- * only ever arrives client-side, after mount.
+ * AEST — misdating a record an operator may have to reconcile.
+ * `toLocaleDateString` resolves the date in the VIEWER'S TIMEZONE, which is what
+ * fixes that.
+ *
+ * The LOCALE is pinned to en-AU deliberately, and is not an oversight to
+ * "correct" to the viewer's own. CARSI operates in Australia; left to each
+ * viewer's locale, 09/08 reads as 8 September to one operator and 9 August to
+ * another, on a record that may have to be reconciled against a payment. A
+ * fixed day/month order costs nothing and removes the ambiguity.
+ *
+ * Safe from hydration mismatch either way: the roster only ever arrives
+ * client-side, after mount, so this never renders on the server.
  */
 function formatCompedDate(iso: string): string {
   const parsed = new Date(iso);
