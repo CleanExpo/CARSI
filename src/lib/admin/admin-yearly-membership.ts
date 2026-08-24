@@ -10,10 +10,17 @@ import { sendYearlyMembershipEmail } from '@/lib/server/transactional-email';
 
 const MEMBERSHIP_DURATION_LABEL = '12 months from activation';
 
+/**
+ * Prefix every yearly-membership grant stamps onto its enrolments. Exported so a
+ * caller can recognise "this learner has already been granted one" without
+ * restating the literal — see `compAttendeeMembership`.
+ */
+export const YEARLY_MEMBERSHIP_PAYMENT_PREFIX = 'admin:yearly-membership:';
+
 export function yearlyMembershipPaymentReference(priceAud: number): string {
-  if (priceAud <= 0) return 'admin:yearly-membership:free';
+  if (priceAud <= 0) return `${YEARLY_MEMBERSHIP_PAYMENT_PREFIX}free`;
   const cents = Math.round(priceAud * 100);
-  return `admin:yearly-membership:${cents}`;
+  return `${YEARLY_MEMBERSHIP_PAYMENT_PREFIX}${cents}`;
 }
 
 export function formatYearlyMembershipPriceLabel(priceAud: number): string {

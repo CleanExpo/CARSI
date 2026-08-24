@@ -40,7 +40,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ detail: 'Database not configured' }, { status: 503 });
   }
 
-  const body = (await request.json().catch(() => ({}))) as {
+  // `request.json()` RESOLVES with null for a literal `null` body, so `.catch`
+  // never runs and the field reads below would throw before any validation.
+  const body = ((await request.json().catch(() => ({}))) ?? {}) as {
     signInId?: string;
     pricingMode?: string;
     priceAud?: unknown;
@@ -57,7 +59,10 @@ export async function POST(request: NextRequest) {
   const priceAud = resolvePriceAud(body.pricingMode, body.priceAud);
   if (priceAud === null) {
     return NextResponse.json(
-      { detail: 'Enter a valid lump-sum price (AUD), or choose the attendee rate.' },
+      {
+        detail:
+          'Enter a valid lump-sum price (AUD), or choose “free”. The attendee rate is not configured on the offer.',
+      },
       { status: 400 },
     );
   }
@@ -110,8 +115,10 @@ function resolvePriceAud(pricingMode: unknown, raw: unknown): number | null {
     return value;
   }
 
-  // Default, and the explicit 'attendee_rate' mode.
-  return attendeeMembershipRateAud() ?? 0;
+  // Default, and the explicit 'attendee_rate' mode. A missing configured rate is
+  // NOT free — silently recording $0 when the operator asked for the event rate
+  // misstates what was collected, so it takes the 400 path instead.
+  return attendeeMembershipRateAud();
 }
 
 function refusalDetail(reason: string): string {
@@ -122,6 +129,8 @@ function refusalDetail(reason: string): string {
       return 'This offer is for attendees who completed both days, opted in to email, and have been provisioned.';
     case 'already_a_member':
       return 'That attendee already holds an active CARSI membership.';
+    case 'already_comped':
+      return 'That attendee has already been granted a yearly membership.';
     default:
       return 'We could not confirm the attendee’s membership status. Please try again shortly.';
   }
@@ -134,6 +143,7 @@ function statusFor(reason: string): number {
     case 'not_offer_eligible':
       return 403;
     case 'already_a_member':
+    case 'already_comped':
       return 409;
     default:
       return 503;

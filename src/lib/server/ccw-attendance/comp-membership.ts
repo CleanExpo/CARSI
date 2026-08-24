@@ -20,7 +20,10 @@
  * nor the attendee's screens: it is an authenticated staff action, gated by the
  * admin session and `CCW_ATTENDANCE_ENABLED` at the route.
  */
-import { grantYearlyMembership } from '@/lib/admin/admin-yearly-membership';
+import {
+  YEARLY_MEMBERSHIP_PAYMENT_PREFIX,
+  grantYearlyMembership,
+} from '@/lib/admin/admin-yearly-membership';
 import { ccwRoadshowAttendeeOffers } from '@/lib/marketing/ccw-roadshow-offers';
 import { prisma } from '@/lib/prisma';
 import { baseOfferEligible } from '@/lib/server/ccw-attendance/eligibility';
@@ -46,7 +49,9 @@ export type CompMembershipRefusal =
   /** The attendee already holds a live membership; granting would rotate their password for nothing. */
   | 'already_a_member'
   /** Could not prove the attendee is NOT already a member. Refuse rather than guess. */
-  | 'membership_unverifiable';
+  | 'membership_unverifiable'
+  /** A yearly membership was already granted to this learner. */
+  | 'already_comped';
 
 export type CompMembershipOutcome =
   | { ok: true; result: Awaited<ReturnType<typeof grantYearlyMembership>> }
@@ -69,9 +74,26 @@ export function decideCompMembership(input: {
   if (input.lookupFailed) {
     return { allowed: false, reason: 'membership_unverifiable' };
   }
-  if (decideMembershipEntitlement(input.subscription).entitled) {
+
+  const decision = decideMembershipEntitlement(input.subscription);
+  if (decision.entitled) {
     return { allowed: false, reason: 'already_a_member' };
   }
+
+  // `entitled: false` is not the same as "safe to comp". `decideMembershipEntitlement`
+  // reports `unknown` for an `incomplete` subscription and for any status it does
+  // not recognise — and an unrecognised status is precisely the case where we
+  // cannot say whether this person is paying us. Granting there would rotate a
+  // possible member's password on a guess, so `unknown` refuses.
+  //
+  // Note this is deliberately STRICTER than the checkout reservation, which does
+  // claim `incomplete` rows. The asymmetry is in the cost of being wrong: there,
+  // refusing strands someone who cannot buy; here, refusing merely asks an
+  // operator to look, while granting can lock a member out of their account.
+  if (decision.reason === 'unknown') {
+    return { allowed: false, reason: 'membership_unverifiable' };
+  }
+
   return { allowed: true };
 }
 
@@ -127,6 +149,35 @@ export async function compAttendeeMembership(params: {
 
     const decision = decideCompMembership({ subscription, lookupFailed });
     if (!decision.allowed) return { ok: false, reason: decision.reason };
+  }
+
+  // A completed comp leaves NO subscription row — `grantYearlyMembership` writes
+  // enrolments, not a subscription — so the membership check above cannot see a
+  // previous comp, and a repeated request would rotate the member's password and
+  // re-send the welcome email. The grant does stamp every enrolment it creates
+  // with `YEARLY_MEMBERSHIP_PAYMENT_PREFIX`, so that stamp is the marker.
+  //
+  // Honest limit: this is a read, so it stops a REPEATED comp, not two issued at
+  // the same instant. Closing that properly needs a uniquely-constrained
+  // comp-grant record (a migration) — raised on the PR rather than smuggled in
+  // here, since a wrong schema on a grant path is worse than a narrow window.
+  if (signIn.studentId) {
+    let alreadyComped = false;
+    try {
+      const priorGrant = await prisma.lmsEnrollment.findFirst({
+        where: {
+          studentId: signIn.studentId,
+          paymentReference: { startsWith: YEARLY_MEMBERSHIP_PAYMENT_PREFIX },
+        },
+        select: { id: true },
+      });
+      alreadyComped = priorGrant !== null;
+    } catch (error) {
+      console.error('[ccw-comp-membership] prior-grant lookup failed:', error);
+      return { ok: false, reason: 'membership_unverifiable' };
+    }
+
+    if (alreadyComped) return { ok: false, reason: 'already_comped' };
   }
 
   const result = await grantYearlyMembership({
