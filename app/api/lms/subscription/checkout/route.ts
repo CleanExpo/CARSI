@@ -19,7 +19,9 @@
  * Both paths are guarded against opening a second checkout for a learner who
  * already holds a live membership (spec §10.4 AC-9) — see
  * `@/lib/server/membership-checkout-guard` for why that has to happen here
- * rather than being reconciled afterwards.
+ * rather than being reconciled afterwards — and both then take an atomic
+ * per-learner reservation, so two requests arriving together cannot each open a
+ * session (`@/lib/server/membership-checkout-reservation`).
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -29,6 +31,11 @@ import { CCW_ATTENDEE_OFFER_QUERY } from '@/lib/marketing/ccw-roadshow-offer-pac
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { learnerIsCcwAttendeeOfferEligible } from '@/lib/server/ccw-attendance/attendee-offer';
 import { membershipCheckoutDecisionFor } from '@/lib/server/membership-checkout-guard';
+import {
+  checkoutSessionExpiresAt,
+  releaseMembershipCheckout,
+  reserveMembershipCheckout,
+} from '@/lib/server/membership-checkout-reservation';
 import { resolveProAnnualPriceId } from '@/lib/server/subscription-price';
 import { subscriptionsEnabled } from '@/lib/server/subscriptions-flag';
 import {
@@ -98,6 +105,26 @@ export async function POST(request: NextRequest) {
         );
   }
 
+  // Atomic claim on this learner's checkout. The guard above answers "does a
+  // membership already exist"; this answers "is another checkout already open",
+  // which a read cannot decide because both racers read the same absence.
+  // Taken AFTER validation so a rejected request never holds a reservation.
+  const reservation = await reserveMembershipCheckout(claims.sub);
+  if (reservation !== 'reserved') {
+    return reservation === 'busy'
+      ? NextResponse.json(
+          {
+            detail:
+              'A membership checkout is already open for your account. Finish it, or try again in a few minutes.',
+          },
+          { status: 409 }
+        )
+      : NextResponse.json(
+          { detail: 'We could not start checkout just now. Please try again shortly.' },
+          { status: 503 }
+        );
+  }
+
   try {
     if (wantAttendeeOffer) {
       const eligible = await learnerIsCcwAttendeeOfferEligible({
@@ -105,6 +132,7 @@ export async function POST(request: NextRequest) {
         email: claims.email,
       });
       if (!eligible) {
+        await releaseMembershipCheckout(claims.sub);
         return NextResponse.json(
           {
             detail:
@@ -121,12 +149,15 @@ export async function POST(request: NextRequest) {
       const attendeePriceId = await resolveProAnnualPriceId();
       const couponId = process.env.CCW_MEMBERSHIP_COUPON_ID?.trim();
       if (!attendeePriceId || !couponId) {
+        await releaseMembershipCheckout(claims.sub);
         return NextResponse.json({ detail: ATTENDEE_UNAVAILABLE }, { status: 503 });
       }
 
       const session = await getStripeClient().checkout.sessions.create({
         mode: 'subscription',
         line_items: [{ price: attendeePriceId, quantity: 1 }],
+        // Paired with the reservation TTL — see membership-checkout-reservation.
+        expires_at: checkoutSessionExpiresAt(),
         // AC-10: the discount is applied server-side and is never reachable as a
         // public promotion code. `allow_promotion_codes` is OMITTED rather than
         // set false — Stripe rejects a session carrying both it and `discounts`,
@@ -150,6 +181,7 @@ export async function POST(request: NextRequest) {
       });
 
       if (!session.url) {
+        await releaseMembershipCheckout(claims.sub);
         return NextResponse.json({ detail: 'Failed to start checkout session.' }, { status: 500 });
       }
       return NextResponse.json({ url: session.url, checkout_url: session.url });
@@ -157,12 +189,15 @@ export async function POST(request: NextRequest) {
 
     const priceId = await resolveProAnnualPriceId();
     if (!priceId) {
+      await releaseMembershipCheckout(claims.sub);
       return NextResponse.json({ detail: UNAVAILABLE }, { status: 503 });
     }
 
     const session = await getStripeClient().checkout.sessions.create({
       mode: 'subscription',
       line_items: [{ price: priceId, quantity: 1 }],
+      // Paired with the reservation TTL — see membership-checkout-reservation.
+      expires_at: checkoutSessionExpiresAt(),
       customer_email: claims.email,
       success_url,
       cancel_url,
@@ -184,6 +219,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!session.url) {
+      await releaseMembershipCheckout(claims.sub);
       return NextResponse.json({ detail: 'Failed to start checkout session.' }, { status: 500 });
     }
     await tryRecordAttributedStage(attributionJourneyId, 'checkout_started', {
@@ -191,6 +227,9 @@ export async function POST(request: NextRequest) {
     });
     return NextResponse.json({ url: session.url, checkout_url: session.url });
   } catch (error) {
+    // Stripe never opened a session, so hand the reservation back rather than
+    // making the learner wait out the TTL for a failure that was ours.
+    await releaseMembershipCheckout(claims.sub);
     console.error('[subscription/checkout] Stripe error:', error);
     return NextResponse.json({ detail: 'Failed to start checkout session.' }, { status: 500 });
   }
