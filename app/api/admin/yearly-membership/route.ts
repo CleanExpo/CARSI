@@ -7,7 +7,6 @@ import {
 import { getAdminSessionOrNull } from '@/lib/admin/admin-session';
 import {
   claimYearlyMembershipGrant,
-  recordYearlyMembershipGrant,
   releaseYearlyMembershipClaim,
   YEARLY_MEMBERSHIP_REGRANT_WINDOW_MS,
 } from '@/lib/admin/yearly-membership-claim';
@@ -71,11 +70,13 @@ export async function POST(request: NextRequest) {
   // Claim BEFORE granting. The grant rotates an existing member's password and
   // reveals it only in the welcome email, so a second one — a double-submit, a
   // retry after a timeout, two admins at once — invalidates the credentials the
-  // first email just delivered. The claim is a conditional UPDATE, so the
-  // database arbitrates rather than a read-then-write that cannot.
+  // first email just delivered. The claim is a conditional UPSERT keyed by
+  // EMAIL, so the database arbitrates — and so it can be taken before the
+  // grant creates the learner's row, which a claim living on that row could
+  // not be.
   const claimedAt = new Date();
-  const claim = await claimYearlyMembershipGrant(email, claimedAt);
-  if (!claim.claimed) {
+  const claimed = await claimYearlyMembershipGrant(email, claimedAt);
+  if (!claimed) {
     return NextResponse.json(
       {
         detail:
@@ -93,11 +94,6 @@ export async function POST(request: NextRequest) {
       priceAud,
       appOrigin: request.nextUrl.origin,
     });
-    // Stamp the claim now the grant has actually happened. For a learner who
-    // already had an account the claim wrote this same timestamp and this is a
-    // no-op; for a NEW account it is the only write, and without it the guard
-    // never engages for that learner — which is the ordinary case here.
-    await recordYearlyMembershipGrant(email, claimedAt);
     return NextResponse.json({ ok: true, ...result });
   } catch (e) {
     // The grant did not happen, so the claim must not outlive it — otherwise one
