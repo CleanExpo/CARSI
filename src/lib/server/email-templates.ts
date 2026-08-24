@@ -379,8 +379,7 @@ export function renderGovContractorGuideEmail(params: {
       title,
       paragraphs,
       cta: { label: 'Download the guide (PDF)', href: params.downloadUrl },
-      noteHtml:
-        'CARSI is an IICRC CEC Accredited provider.',
+      noteHtml: 'CARSI is an IICRC CEC Accredited provider.',
     },
     text
   );
@@ -401,7 +400,9 @@ export function renderEnrollmentWelcomeEmail(params: {
       `<ul style="margin: 0 0 12px; padding-left: 20px;">` +
       offers
         .map((o) => {
-          const head = o.url ? brandLink(o.url, o.label) : `<strong>${escapeHtml(o.label)}</strong>`;
+          const head = o.url
+            ? brandLink(o.url, o.label)
+            : `<strong>${escapeHtml(o.label)}</strong>`;
           return `<li style="margin: 4px 0;">${head} — ${escapeHtml(o.detail)}</li>`;
         })
         .join('') +
@@ -505,13 +506,34 @@ export function renderYearlyMembershipEmail(params: {
   memberEmail: string;
   temporaryPassword: string;
   priceLabel: string;
+  /** Courses the member can actually open. */
   courseCount: number;
+  /**
+   * Published courses on offer. When this exceeds `courseCount` the member does NOT have the
+   * whole library, and the copy below says so instead of promising it. Defaults to
+   * `courseCount` (full access) so callers that cannot distinguish keep the original wording.
+   */
+  publishedCourseCount?: number;
   durationLabel: string;
   loginUrl: string;
   dashboardUrl: string;
 }): RenderedEmail {
-  const courseAccessLine =
-    params.courseCount === 1 ? '1 published course' : `all ${params.courseCount} published courses`;
+  const publishedCourseCount = params.publishedCourseCount ?? params.courseCount;
+  // Partial access is not just a smaller number: "all N published courses", "Full library
+  // access" and "any published course in the catalogue" all promise the whole catalogue, so a
+  // member short a revoked or failed course would be told they had it.
+  const partialAccess = params.courseCount < publishedCourseCount;
+
+  const courseAccessLine = partialAccess
+    ? `${params.courseCount} of ${publishedCourseCount} published courses`
+    : params.courseCount === 1
+      ? '1 published course'
+      : `all ${params.courseCount} published courses`;
+
+  const title = partialAccess ? 'Your course access is ready' : 'Full library access is ready';
+  const openingParagraph = partialAccess
+    ? 'Your CARSI Yearly Membership is now active. You can sign in and start the courses in your account.'
+    : 'Your CARSI Yearly Membership is now active. You can sign in and start any published course in the catalogue.';
 
   const details: CarsiEmailDetail[] = [
     { label: 'Membership', value: 'Yearly Membership' },
@@ -527,10 +549,10 @@ export function renderYearlyMembershipEmail(params: {
       appOrigin: params.appOrigin,
       preheader: 'Your CARSI Yearly Membership is active',
       eyebrow: 'Yearly Membership',
-      title: 'Full library access is ready',
+      title,
       greeting: `Hi ${params.memberName},`,
       paragraphs: [
-        'Your CARSI Yearly Membership is now active. You can sign in and start any published course in the catalogue.',
+        openingParagraph,
         'Use the sign-in details below. We recommend changing your password after your first login.',
       ],
       details,

@@ -164,6 +164,9 @@ export async function grantYearlyMembership(params: {
     // The count the member can open, not the count we attempted. Sending `slugs.length` told a
     // member with a revoked or failed enrolment they had courses they could not reach.
     courseCount: reachableCourseCount,
+    // Lets the template drop "all N published courses" / "Full library access" when the member
+    // is short a course — the number alone was honest while the copy still promised the lot.
+    publishedCourseCount: slugs.length,
     durationLabel: MEMBERSHIP_DURATION_LABEL,
     appOrigin: params.appOrigin,
   });
