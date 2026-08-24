@@ -121,7 +121,11 @@ async function main() {
   }
   console.log('  ---\n');
 
-  if (failed.length && created === 0 && already === 0) {
+  // Any failure means Toby is missing a course, so the grant is incomplete — exit non-zero.
+  // Gating this on "every course failed" (created === 0 && already === 0) reported a partial
+  // failure as success: 24 of 25 enrolled with 1 erroring exited 0, so an operator or wrapper
+  // reading the exit status saw a clean run while Toby silently lacked a course.
+  if (failed.length) {
     process.exitCode = 1;
   }
 }
