@@ -35,12 +35,6 @@ model LmsUser {
   iicrcCertifications        Json?     @map("iicrc_certifications")
   /// First-run dashboard onboarding (industry, disciplines, goals). Set when wizard completes.
   onboardingCompletedAt      DateTime? @map("onboarding_completed_at") @db.Timestamptz(6)
-  /// When an admin last granted this learner a yearly membership. Claimed by a
-  /// conditional UPDATE so a repeat grant inside the re-grant window is refused
-  /// by the DATABASE, not by a read-then-write that cannot arbitrate a race.
-  /// A repeat grant rotates the password and reveals it only in the welcome
-  /// email, so an accidental second one locks the member out.
-  yearlyMembershipGrantedAt  DateTime? @map("yearly_membership_granted_at") @db.Timestamptz(6)
   /// JSON: industry, role, iicrc_experience, disciplines_held[], primary_goal, etc.
   onboarding                 Json?
   /// none | email | sms — preference for unfinished-lesson reminders (delivery not yet wired for sms).
@@ -1109,4 +1103,23 @@ model AiWebsiteEvent {
 
   @@index([leadId, createdAt])
   @@map("ai_website_events")
+}
+
+/// A claim on the right to grant a yearly membership to one email address.
+///
+/// Deliberately NOT a column on `LmsUser`. The grant CREATES that row — before
+/// the enrolment loop and the mail send — so a claim living there could not be
+/// taken until the grant was already underway, leaving the ordinary new-learner
+/// path unguarded across the slowest stretch of the work. Keying the claim by
+/// email means it can be taken BEFORE the grant starts, whether or not the
+/// learner exists.
+///
+/// No foreign key for the same reason: a claim legitimately exists for an email
+/// that has no account.
+model YearlyMembershipGrantClaim {
+  /// Normalised (trimmed, lower-cased) by the caller before it reaches here.
+  email     String   @id
+  claimedAt DateTime @map("claimed_at") @db.Timestamptz(6)
+
+  @@map("yearly_membership_grant_claims")
 }
