@@ -11,6 +11,7 @@ import {
 const mocks = vi.hoisted(() => ({
   findSignIn: vi.fn(),
   findSubscription: vi.fn(),
+  findUser: vi.fn(),
   claimComp: vi.fn(),
   grant: vi.fn(),
 }));
@@ -19,6 +20,7 @@ vi.mock('@/lib/prisma', () => ({
   prisma: {
     ccwRoadshowSignIn: { findUnique: mocks.findSignIn, updateMany: mocks.claimComp },
     lmsSubscription: { findUnique: mocks.findSubscription },
+    lmsUser: { findUnique: mocks.findUser },
   },
 }));
 
@@ -47,6 +49,7 @@ beforeEach(() => {
   process.env.DATABASE_URL = 'postgres://configured';
   mocks.findSignIn.mockReset().mockResolvedValue(eligibleSignIn());
   mocks.findSubscription.mockReset().mockResolvedValue(null);
+  mocks.findUser.mockReset().mockResolvedValue({ id: 'user-1' });
   // count 1 = this call won the claim.
   mocks.claimComp.mockReset().mockResolvedValue({ count: 1 });
   mocks.grant.mockReset().mockResolvedValue({ userId: 'user-1', email: 'attendee@example.test' });
@@ -314,5 +317,89 @@ describe('a claim never outlives a failed grant', () => {
     );
 
     expect(mocks.claimComp).toHaveBeenCalledTimes(1);
+  });
+});
+
+
+describe('an attendee part-way through the self-serve checkout', () => {
+  it('is refused, not comped', () => {
+    // `decideMembershipEntitlement` maps `checkout_pending` to `reason: 'none'`
+    // on purpose — a reservation grants no catalogue access. But comping here
+    // rotates the password on the account they are using to pay A$295, and the
+    // new one exists only in an email that can lag or bounce.
+    expect(
+      decideCompMembership({
+        subscription: { status: 'checkout_pending', currentPeriodEnd: null },
+        lookupFailed: false,
+      }),
+    ).toEqual({ allowed: false, reason: 'checkout_in_progress' });
+  });
+
+  it('is refused however the status is cased or padded', () => {
+    expect(
+      decideCompMembership({
+        subscription: { status: '  Checkout_Pending ', currentPeriodEnd: null },
+        lookupFailed: false,
+      }),
+    ).toEqual({ allowed: false, reason: 'checkout_in_progress' });
+  });
+
+  it('reaches no grant through the full service path', async () => {
+    mocks.findSubscription.mockResolvedValue({
+      status: 'checkout_pending',
+      currentPeriodEnd: null,
+    });
+
+    await expect(
+      compAttendeeMembership(
+        { signInId: 'sign-in-1', priceAud: 295, appOrigin: 'https://x.test' },
+        NOW,
+      ),
+    ).resolves.toEqual({ ok: false, reason: 'checkout_in_progress' });
+    expect(mocks.grant).not.toHaveBeenCalled();
+  });
+});
+
+describe('the membership check follows the identity the grant will act on', () => {
+  it('resolves the learner by EMAIL, as grantYearlyMembership does', async () => {
+    await compAttendeeMembership(
+      { signInId: 'sign-in-1', priceAud: 295, appOrigin: 'https://x.test' },
+      NOW,
+    );
+
+    // Keyed on studentId instead, the guard would skip every row that is
+    // eligible via `provisionStatus` alone but still has a real LMS user.
+    expect(mocks.findUser).toHaveBeenCalledWith({
+      where: { email: 'attendee@example.test' },
+      select: { id: true },
+    });
+  });
+
+  it('guards a row whose studentId is null but whose email is a paying member', async () => {
+    mocks.findSignIn.mockResolvedValue(
+      eligibleSignIn({ studentId: null, enrollmentId: null, provisionStatus: 'provisioned' }),
+    );
+    mocks.findUser.mockResolvedValue({ id: 'user-9' });
+    mocks.findSubscription.mockResolvedValue({ status: 'active', currentPeriodEnd: null });
+
+    await expect(
+      compAttendeeMembership(
+        { signInId: 'sign-in-1', priceAud: 295, appOrigin: 'https://x.test' },
+        NOW,
+      ),
+    ).resolves.toEqual({ ok: false, reason: 'already_a_member' });
+    expect(mocks.grant).not.toHaveBeenCalled();
+  });
+
+  it('allows the comp when no LMS user exists for that email yet', async () => {
+    mocks.findUser.mockResolvedValue(null);
+
+    const outcome = await compAttendeeMembership(
+      { signInId: 'sign-in-1', priceAud: 295, appOrigin: 'https://x.test' },
+      NOW,
+    );
+
+    expect(outcome.ok).toBe(true);
+    expect(mocks.findSubscription).not.toHaveBeenCalled();
   });
 });
