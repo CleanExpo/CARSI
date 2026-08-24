@@ -9,6 +9,11 @@
  *
  * Regular $795 membership still ships dark behind SUBSCRIPTIONS_ENABLED.
  * The attendee path only needs STRIPE_SECRET_KEY (already used for payments).
+ *
+ * Both paths are guarded against opening a second checkout for a learner who
+ * already holds a live membership (spec §10.4 AC-9) — see
+ * `@/lib/server/membership-checkout-guard` for why that has to happen here
+ * rather than being reconciled afterwards.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -21,6 +26,7 @@ import {
 } from '@/lib/marketing/ccw-roadshow-offer-pack';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { learnerIsCcwAttendeeOfferEligible } from '@/lib/server/ccw-attendance/attendee-offer';
+import { membershipCheckoutDecisionFor } from '@/lib/server/membership-checkout-guard';
 import { resolveProAnnualPriceId } from '@/lib/server/subscription-price';
 import { subscriptionsEnabled } from '@/lib/server/subscriptions-flag';
 import {
@@ -67,6 +73,26 @@ export async function POST(request: NextRequest) {
     typeof body.cancel_url === 'string' && body.cancel_url.startsWith('http')
       ? body.cancel_url
       : `${origin}/subscribe?checkout=cancelled`;
+
+  // AC-9: at most one live membership per learner, on BOTH paths. `userId` is
+  // unique on LmsSubscription, so a second Stripe subscription collapses onto
+  // one row while Stripe bills both — see membership-checkout-guard. Fails
+  // closed: an unverifiable membership state opens no checkout.
+  const guard = await membershipCheckoutDecisionFor(claims.sub);
+  if (!guard.allowed) {
+    return guard.block === 'already_subscribed'
+      ? NextResponse.json(
+          {
+            detail:
+              'You already have an active CARSI membership. Manage it from your dashboard.',
+          },
+          { status: 409 }
+        )
+      : NextResponse.json(
+          { detail: 'We could not confirm your membership status. Please try again shortly.' },
+          { status: 503 }
+        );
+  }
 
   try {
     if (wantAttendeeOffer) {
