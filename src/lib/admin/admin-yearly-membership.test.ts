@@ -20,6 +20,8 @@ const state = vi.hoisted(() => ({
   /** Slugs already enrolled (any status) — these return `already_enrolled`. */
   existingSlugs: new Set<string>(),
   sentEmails: [] as { to: string; courseCount: number }[],
+  /** What the mocked send reports back; steered per test. */
+  emailResult: { sent: true } as { sent: boolean; reason?: string },
   /** Every `lmsUser.update` payload, in order — credential mutations show up here. */
   userUpdates: [] as Record<string, unknown>[],
 }));
@@ -65,11 +67,13 @@ vi.mock('@/lib/server/lms-auth', () => ({ hashPassword: vi.fn(async () => 'hashe
 vi.mock('@/lib/server/transactional-email', () => ({
   sendYearlyMembershipEmail: vi.fn(async (p: { to: string; courseCount: number }) => {
     state.sentEmails.push({ to: p.to, courseCount: p.courseCount });
-    return { sent: true };
+    return state.emailResult;
   }),
 }));
 
-const { grantYearlyMembership } = await import('./admin-yearly-membership');
+const { grantYearlyMembership, describeWelcomeEmailDelivery } = await import(
+  './admin-yearly-membership'
+);
 
 const grant = () =>
   grantYearlyMembership({
@@ -100,6 +104,7 @@ beforeEach(() => {
   state.failSlugs = new Set();
   state.existingSlugs = new Set();
   state.sentEmails = [];
+  state.emailResult = { sent: true } as { sent: boolean; reason?: string };
   state.userUpdates = [];
 });
 
@@ -277,5 +282,75 @@ describe('grantYearlyMembership — failing closed', () => {
 
     expect(result.reachableCourseCount).toBe(1);
     expect(state.sentEmails).toHaveLength(1);
+  });
+});
+
+describe('describeWelcomeEmailDelivery — the password has one copy', () => {
+  it('reports delivery only when the message reached the provider', () => {
+    expect(describeWelcomeEmailDelivery({ sent: true })).toEqual({
+      delivered: true,
+      reason: null,
+    });
+    expect(describeWelcomeEmailDelivery({ sent: true, messageId: 'abc' })).toEqual({
+      delivered: true,
+      reason: null,
+    });
+  });
+
+  it('treats dev-console output as a NON-delivery despite sent: true', () => {
+    // The member cannot read a server log. This is the trap: `sendEmail` returns
+    // `sent: true` here, so any check of `.sent` alone reports a password as
+    // delivered when nobody outside the server has ever seen it.
+    expect(describeWelcomeEmailDelivery({ sent: true, reason: 'dev_console' })).toEqual({
+      delivered: false,
+      reason: 'dev_console',
+    });
+  });
+
+  it('names every real failure rather than reporting a bare false', () => {
+    for (const reason of ['not_configured', 'send_failed', 'provider_error'] as const) {
+      expect(describeWelcomeEmailDelivery({ sent: false, reason })).toEqual({
+        delivered: false,
+        reason,
+      });
+    }
+  });
+
+  it('never reports a null reason for a non-delivery', () => {
+    // `null` is reserved for success, so an unexplained failure must not borrow it.
+    expect(describeWelcomeEmailDelivery({ sent: false })).toEqual({
+      delivered: false,
+      reason: 'send_failed',
+    });
+  });
+});
+
+describe('grantYearlyMembership — a failed welcome email must not read as success', () => {
+  beforeEach(() => catalogue(['a', 'b']));
+
+  it('reports delivery on the happy path', async () => {
+    const result = await grant();
+    expect(result.welcomeEmail).toEqual({ delivered: true, reason: null });
+  });
+
+  it('still GRANTS the membership when the email fails, and says so', async () => {
+    state.emailResult = { sent: false, reason: 'provider_error' };
+
+    const result = await grant();
+
+    // The grant stands. Throwing here would be worse than the bug: on the CCW comp
+    // path a throw releases the comp claim, so a membership that really was granted
+    // would look un-granted and be re-issued — rotating the password a second time.
+    expect(result.reachableCourseCount).toBe(2);
+    expect(result.welcomeEmail).toEqual({ delivered: false, reason: 'provider_error' });
+  });
+
+  it('does not report dev-console output as a delivered password', async () => {
+    state.emailResult = { sent: true, reason: 'dev_console' };
+
+    const result = await grant();
+
+    expect(result.welcomeEmail.delivered).toBe(false);
+    expect(result.welcomeEmail.reason).toBe('dev_console');
   });
 });
