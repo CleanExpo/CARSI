@@ -19,6 +19,7 @@ import { randomUUID } from 'node:crypto';
 import { prisma } from '@/lib/prisma';
 import { lmsPublishedCourseWhere } from '@/lib/server/public-courses-list';
 import { adminGrantEnrollment } from '@/lib/admin/admin-enrollment-mutations';
+import { isEnrolmentAccessAllowed } from '@/lib/server/enrollment-access';
 
 const EMAIL = 'tobyb@ccwarehouse.com.au';
 const FULL_NAME = 'Toby B';
@@ -37,6 +38,16 @@ async function main() {
   //    password of an existing user, so re-running never locks Toby out.
   let user = await prisma.lmsUser.findUnique({ where: { email } });
   let accountCreated = false;
+  let reactivated = false;
+
+  //    `isActive` IS reset, though — skipping it was collateral of skipping the password,
+  //    not intent. Both `authenticateWithPassword` and `sessionClaimsForUserId` return null
+  //    for an inactive user, so enrolments granted to a deactivated account are unreachable:
+  //    the grant would look complete while Toby could not sign in to use it.
+  if (user && !user.isActive) {
+    user = await prisma.lmsUser.update({ where: { id: user.id }, data: { isActive: true } });
+    reactivated = true;
+  }
 
   if (!user) {
     const { generateMemberTempPassword } = await import('@/lib/server/member-temp-password');
@@ -91,25 +102,39 @@ async function main() {
     }
   }
 
-  // 3. Report any enrolment that exists but is not active.
+  // 3. Report any enrolment that exists but does NOT grant access.
   //    adminGrantEnrollment() reports a revoked row as 'already_enrolled' and leaves it
   //    revoked, so without this the summary would claim access that the read gates deny.
   //    Reported, never auto-reactivated: `revokedReason` carries dispute/refund meaning
   //    that a complimentary grant must not silently overwrite.
-  const inactive = await prisma.lmsEnrollment.findMany({
-    where: { studentId: user.id, status: { not: 'active' } },
+  //
+  //    Filtered in memory through `isEnrolmentAccessAllowed`, the same WS3 predicate the
+  //    read gates use, rather than a `status: { not: 'active' }` query. The allow-set is
+  //    {active, completed}, so the narrower query flagged every COMPLETED course as having
+  //    no access — on a re-run after Toby finishes one, the report would have claimed he
+  //    was locked out of content and certificates he can still reach. Reusing the predicate
+  //    also normalises case/whitespace the free-text column permits, which `notIn` cannot,
+  //    and keeps this report from ever disagreeing with the gates it is reporting on.
+  const enrolments = await prisma.lmsEnrollment.findMany({
+    where: { studentId: user.id },
     select: { status: true, revokedReason: true, course: { select: { slug: true } } },
     orderBy: { enrolledAt: 'asc' },
   });
+  const inactive = enrolments.filter((en) => !isEnrolmentAccessAllowed(en.status));
 
   console.log('\n  ---');
-  console.log(`  Account:           ${email}${accountCreated ? ' (new)' : ' (existing)'}`);
+  const accountNote = accountCreated
+    ? ' (new)'
+    : reactivated
+      ? ' (existing, reactivated)'
+      : ' (existing)';
+  console.log(`  Account:           ${email}${accountNote}`);
   console.log(`  Role note:         ${NOTE_ROLE}`);
   console.log(`  Published courses: ${courses.length}`);
   console.log(`  Newly enrolled:    ${created}`);
   console.log(`  Already enrolled:  ${already}`);
   if (inactive.length) {
-    console.log(`  NOT ACTIVE (${inactive.length}) — no access despite the enrolment row:`);
+    console.log(`  NO ACCESS (${inactive.length}) — enrolment row exists but the gates deny it:`);
     for (const en of inactive) {
       const reason = en.revokedReason ? ` (${en.revokedReason})` : '';
       console.log(`    - ${en.course.slug}: ${en.status}${reason}`);
