@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { renderSVG } from 'uqr';
 
 import { ccwRoadshowEvents } from '@/lib/marketing/ccw-roadshow';
+import { ccwRoadshowAttendeeOffers } from '@/lib/marketing/ccw-roadshow-offers';
 
 type RosterRow = {
   signInId: string;
@@ -21,6 +22,7 @@ type RosterRow = {
   courseAccessGranted: boolean;
   attendanceComplete: boolean;
   offerEligible: boolean;
+  membershipCompedAt: string | null;
 };
 
 type Roster = {
@@ -36,6 +38,36 @@ type CheckInLink = {
 };
 
 const surface = 'rounded-2xl border border-white/10 bg-white/[0.04]';
+
+const SIGN_INS_ENDPOINT = '/api/admin/ccw-roadshow/sign-ins';
+const COMP_MEMBERSHIP_ENDPOINT = '/api/admin/ccw-roadshow/comp-membership';
+
+/**
+ * The attendee first-year rate, read from the offer config rather than typed in
+ * here, so the figure this form defaults to is the same one the offer itself
+ * advertises. `null` when the offer carries no rate — the operator then has to
+ * name a price, which is the right outcome: defaulting a missing rate to $0
+ * would misstate what was collected.
+ */
+const attendeeRateAud = (() => {
+  const offer = ccwRoadshowAttendeeOffers.find((o) => o.key === 'carsi-membership');
+  return typeof offer?.membershipPriceAud === 'number' ? offer.membershipPriceAud : null;
+})();
+
+/** Money, so: digits with at most two decimal places. Rejects negatives and junk. */
+const PRICE_PATTERN = /^\d+(\.\d{1,2})?$/;
+
+/**
+ * The comp timestamp is stored and served in UTC. Slicing the ISO string would
+ * show the UTC date, which is the PREVIOUS day for any comp issued before 10am
+ * AEST — misdating a record an operator may have to reconcile. Rendered in the
+ * viewer's own locale instead; safe from hydration mismatch because the roster
+ * only ever arrives client-side, after mount.
+ */
+function formatCompedDate(iso: string): string {
+  const parsed = new Date(iso);
+  return Number.isNaN(parsed.getTime()) ? iso.slice(0, 10) : parsed.toLocaleDateString('en-AU');
+}
 
 export function AdminCcwSignInsClient() {
   const [eventSlug, setEventSlug] = useState(ccwRoadshowEvents[0]?.slug ?? '');
@@ -82,33 +114,47 @@ export function AdminCcwSignInsClient() {
     void load();
   }, [load]);
 
-  async function post(payload: Record<string, unknown>) {
+  /**
+   * Returns the parsed success body, or `null` for any failure. Callers that
+   * only care whether it worked can test truthiness; the comp action needs the
+   * body, because what was actually granted is not derivable from the request.
+   */
+  async function post(
+    payload: Record<string, unknown>,
+    url: string = SIGN_INS_ENDPOINT
+  ): Promise<Record<string, unknown> | null> {
     try {
-      const res = await fetch('/api/admin/ccw-roadshow/sign-ins', {
+      const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
+      const body = (await res.json().catch(() => ({}))) as Record<string, unknown> & {
+        detail?: string;
+      };
       if (!res.ok) {
-        const p = (await res.json().catch(() => ({}))) as { detail?: string };
-        setError(p.detail || 'Action failed');
-        return false;
+        setError(body.detail || 'Action failed');
+        return null;
       }
       setError('');
       await load();
-      return true;
+      return body;
     } catch {
       setError('Network error while completing the action. Please try again.');
-      return false;
+      return null;
     }
   }
 
-  async function runRosterMutation(actionKey: string, payload: Record<string, unknown>) {
-    if (mutationInFlight.current) return false;
+  async function runRosterMutation(
+    actionKey: string,
+    payload: Record<string, unknown>,
+    url: string = SIGN_INS_ENDPOINT
+  ): Promise<Record<string, unknown> | null> {
+    if (mutationInFlight.current) return null;
     mutationInFlight.current = true;
     setPendingAction(actionKey);
     try {
-      return await post(payload);
+      return await post(payload, url);
     } finally {
       mutationInFlight.current = false;
       setPendingAction(null);
@@ -138,6 +184,70 @@ export function AdminCcwSignInsClient() {
       primaryId: row.signInId,
       duplicateId: duplicateId.trim(),
     });
+  }
+
+  /**
+   * Comp ONE named attendee a year of membership — the admin half of the
+   * `carsi-membership` offer.
+   *
+   * Two dialogs, deliberately. The grant rotates an existing member's password
+   * and reveals the new one only in the welcome email, so a mis-click costs a
+   * real person their access (the #694 hazard). The price is asked for first
+   * because it is recorded against the grant and cannot be corrected from this
+   * screen afterwards; the confirm then restates the resolved figure and the
+   * address the credentials go to.
+   */
+  async function compMembership(row: RosterRow) {
+    const entered = window.prompt(
+      [
+        `Grant ${row.fullName} (${row.email}) a year of CARSI membership.`,
+        '',
+        'This grants the membership outright — it creates NO Stripe subscription, so it will not renew. It also resets their CARSI password and sends the new one in the welcome email.',
+        '',
+        'Enter the lump sum collected in AUD, or 0 for a complimentary comp:',
+      ].join('\n'),
+      attendeeRateAud === null ? '' : String(attendeeRateAud)
+    );
+    if (entered === null) return;
+
+    const raw = entered.trim();
+    if (!PRICE_PATTERN.test(raw)) {
+      setError('Enter the lump sum in AUD — digits only, up to two decimal places (0 for a complimentary comp).');
+      return;
+    }
+    const priceAud = Number(raw);
+
+    if (
+      !window.confirm(
+        `Comp ${row.fullName} a year of membership at A$${raw}?\n\nTheir password will be reset and the new one sent to ${row.email}.`
+      )
+    ) {
+      return;
+    }
+
+    const result = await runRosterMutation(
+      `comp:${row.signInId}`,
+      {
+        signInId: row.signInId,
+        // An explicit price every time. The route defaults a missing mode to the
+        // configured attendee rate, but this screen already knows the figure the
+        // operator agreed to, so it says so rather than relying on that default.
+        pricingMode: priceAud === 0 ? 'free' : 'custom',
+        priceAud,
+      },
+      COMP_MEMBERSHIP_ENDPOINT
+    );
+    if (!result) return;
+
+    window.alert(
+      [
+        `Membership granted to ${row.email}.`,
+        `Recorded at: ${result.priceLabel ?? `A$${raw}`}`,
+        `Courses they can open: ${result.reachableCourseCount ?? 0} of ${result.publishedCourseCount ?? 0} published.`,
+        '',
+        'Their password has been reset and exists only in the welcome email. If it does not arrive, have them use “Forgot password” rather than comping again.',
+      ].join('\n')
+    );
   }
 
   async function runProvisionBatch() {
@@ -422,7 +532,7 @@ export function AdminCcwSignInsClient() {
 
       {roster && (
         <div className="overflow-x-auto rounded-2xl border border-white/10 bg-[#09111f]/95">
-          <table className="w-full min-w-[980px] border-collapse text-sm">
+          <table className="w-full min-w-[1080px] border-collapse text-sm">
             <thead className="bg-white/[0.06] text-white/85">
               <tr className="border-b border-white/10 text-left">
                 <th className="p-3 font-semibold">Name</th>
@@ -434,6 +544,7 @@ export function AdminCcwSignInsClient() {
                 <th className="p-3 font-semibold">Opt-in</th>
                 <th className="p-3 font-semibold">Offer</th>
                 <th className="p-3 font-semibold">Certificate</th>
+                <th className="p-3 font-semibold">Membership</th>
                 <th className="p-3 font-semibold">Actions</th>
               </tr>
             </thead>
@@ -455,6 +566,13 @@ export function AdminCcwSignInsClient() {
                     {row.offerEmailSentAt ? 'Sent' : row.offerEligible ? 'Ready' : '—'}
                   </td>
                   <td className="p-3">{row.attendanceComplete ? 'Attended' : '—'}</td>
+                  <td className="p-3">
+                    {row.membershipCompedAt
+                      ? `Comped ${formatCompedDate(row.membershipCompedAt)}`
+                      : row.offerEligible
+                        ? 'Eligible'
+                        : '—'}
+                  </td>
                   <td className="p-3">
                     <div className="flex flex-wrap gap-2">
                       {row.day1CheckedInAt && (
@@ -488,6 +606,17 @@ export function AdminCcwSignInsClient() {
                       >
                         Merge dupe
                       </button>
+                      {row.offerEligible && !row.membershipCompedAt && (
+                        <button
+                          type="button"
+                          onClick={() => compMembership(row)}
+                          disabled={pendingAction !== null}
+                          aria-busy={pendingAction === `comp:${row.signInId}`}
+                          className="rounded border border-emerald-300/40 bg-emerald-300/10 px-2 py-1 text-xs text-emerald-100 disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          Comp membership
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>

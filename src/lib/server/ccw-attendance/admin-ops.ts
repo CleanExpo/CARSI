@@ -253,6 +253,12 @@ export interface SignInRosterRow {
   attendanceComplete: boolean;
   /** Both days + opt-in + provisioned → post-event offer pack. */
   offerEligible: boolean;
+  /**
+   * Set when an admin has already comped this attendee a year of membership.
+   * Surfaced so the roster can show the state and withhold the action, rather
+   * than letting an operator discover it from a 409 after the click.
+   */
+  membershipCompedAt: string | null;
 }
 
 export interface SignInRoster {
@@ -299,6 +305,7 @@ export async function listSignInsForEvent(eventSlug: string): Promise<SignInRost
       courseAccessGranted: courseAccessGranted(eligibilityInput),
       attendanceComplete: attendanceComplete(eligibilityInput),
       offerEligible: baseOfferEligible(eligibilityInput),
+      membershipCompedAt: row.membershipCompedAt ? row.membershipCompedAt.toISOString() : null,
     };
   });
 
