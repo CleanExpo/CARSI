@@ -6,13 +6,23 @@ import {
   CHECKOUT_SESSION_TTL_MS,
   checkoutSessionExpiresAt,
   releaseMembershipCheckout,
+  releaseOrgCheckout,
+  releaseTeamCheckout,
   reserveMembershipCheckout,
+  reserveOrgCheckout,
+  reserveTeamCheckout,
 } from './membership-checkout-reservation';
 
 const mocks = vi.hoisted(() => ({
   create: vi.fn(),
   updateMany: vi.fn(),
   deleteMany: vi.fn(),
+  teamCreate: vi.fn(),
+  teamUpdateMany: vi.fn(),
+  teamDeleteMany: vi.fn(),
+  orgCreate: vi.fn(),
+  orgUpdateMany: vi.fn(),
+  orgDeleteMany: vi.fn(),
 }));
 
 vi.mock('@/lib/prisma', () => ({
@@ -21,6 +31,16 @@ vi.mock('@/lib/prisma', () => ({
       create: mocks.create,
       updateMany: mocks.updateMany,
       deleteMany: mocks.deleteMany,
+    },
+    lmsTeamSubscription: {
+      create: mocks.teamCreate,
+      updateMany: mocks.teamUpdateMany,
+      deleteMany: mocks.teamDeleteMany,
+    },
+    lmsOrgSubscription: {
+      create: mocks.orgCreate,
+      updateMany: mocks.orgUpdateMany,
+      deleteMany: mocks.orgDeleteMany,
     },
   },
 }));
@@ -37,6 +57,12 @@ beforeEach(() => {
   mocks.create.mockReset().mockResolvedValue({});
   mocks.updateMany.mockReset().mockResolvedValue({ count: 0 });
   mocks.deleteMany.mockReset().mockResolvedValue({ count: 0 });
+  mocks.teamCreate.mockReset().mockResolvedValue({});
+  mocks.teamUpdateMany.mockReset().mockResolvedValue({ count: 0 });
+  mocks.teamDeleteMany.mockReset().mockResolvedValue({ count: 0 });
+  mocks.orgCreate.mockReset().mockResolvedValue({});
+  mocks.orgUpdateMany.mockReset().mockResolvedValue({ count: 0 });
+  mocks.orgDeleteMany.mockReset().mockResolvedValue({ count: 0 });
   vi.spyOn(console, 'error').mockImplementation(() => {});
 });
 
@@ -81,7 +107,10 @@ describe('reserveMembershipCheckout', () => {
     mocks.updateMany.mockResolvedValue({ count: 0 });
 
     await expect(reserveMembershipCheckout('user-1', NOW)).resolves.toBe('busy');
-    expect(mocks.updateMany.mock.calls[0][0].where.status).toBe(CHECKOUT_RESERVATION_STATUS);
+    // The claimable set is an allow-list of provably-not-live states, so an
+    // `active` row matches no branch and is never stolen.
+    const branches = JSON.stringify(mocks.updateMany.mock.calls[0][0].where.OR);
+    expect(branches).not.toContain('active');
   });
 
   it('takes over a reservation that has passed its TTL', async () => {
@@ -92,8 +121,13 @@ describe('reserveMembershipCheckout', () => {
 
     const where = mocks.updateMany.mock.calls[0][0].where;
     expect(where.userId).toBe('user-1');
-    // Only rows last touched before now-minus-TTL are stealable.
-    expect(where.updatedAt.lt).toEqual(new Date(NOW.getTime() - CHECKOUT_RESERVATION_TTL_MS));
+    // A reservation is stealable only once it is older than the TTL.
+    const reservationBranch = (where.OR as Array<{ status?: string; updatedAt?: { lt: Date } }>).find(
+      (b) => b.status === CHECKOUT_RESERVATION_STATUS,
+    );
+    expect(reservationBranch?.updatedAt?.lt).toEqual(
+      new Date(NOW.getTime() - CHECKOUT_RESERVATION_TTL_MS),
+    );
   });
 
   it('restamps the row on takeover so the next caller has to wait again', async () => {
@@ -149,5 +183,147 @@ describe('releaseMembershipCheckout', () => {
     mocks.deleteMany.mockRejectedValue(new Error('connection refused'));
 
     await expect(releaseMembershipCheckout('user-1')).resolves.toBeUndefined();
+  });
+});
+
+
+/** Pull the OR branches the takeover offered as claimable. */
+function claimableStatuses(call: unknown): unknown[] {
+  const where = (call as { where: { OR: unknown[] } }).where;
+  return where.OR;
+}
+
+describe('a payer whose subscription lapsed can buy again', () => {
+  it('offers cancelled, unpaid, expired and abandoned rows as claimable', async () => {
+    // Without this the takeover would only match a stale reservation, so anyone
+    // with an old row would fail every insert, match no update, and be told a
+    // checkout was already open — forever. The duplicate-membership guard lets
+    // exactly these states through, so the reservation must agree with it.
+    mocks.create.mockRejectedValue(uniqueViolation());
+    mocks.updateMany.mockResolvedValue({ count: 1 });
+
+    await expect(reserveMembershipCheckout('user-1', NOW)).resolves.toBe('reserved');
+
+    const branches = JSON.stringify(claimableStatuses(mocks.updateMany.mock.calls[0][0]));
+    for (const status of ['canceled', 'unpaid', 'incomplete_expired', 'incomplete']) {
+      expect(branches).toContain(status);
+    }
+  });
+
+  it('offers a past-due row only once it is beyond the grace window', async () => {
+    mocks.create.mockRejectedValue(uniqueViolation());
+    mocks.updateMany.mockResolvedValue({ count: 1 });
+
+    await reserveMembershipCheckout('user-1', NOW);
+
+    const branches = claimableStatuses(mocks.updateMany.mock.calls[0][0]) as Array<{
+      status?: string;
+      currentPeriodEnd?: unknown;
+    }>;
+    const pastDue = branches.filter((b) => b.status === 'past_due');
+    // Both forms: unknown period end (unprovable, so lapsed) and beyond grace.
+    expect(pastDue).toHaveLength(2);
+    expect(pastDue.some((b) => b.currentPeriodEnd === null)).toBe(true);
+  });
+
+  it('never offers a live status as claimable', async () => {
+    mocks.create.mockRejectedValue(uniqueViolation());
+    mocks.updateMany.mockResolvedValue({ count: 0 });
+
+    await reserveMembershipCheckout('user-1', NOW);
+
+    // An allow-list, so `active`/`trialing` can never be stolen — and an
+    // unrecognised or oddly-cased status is left alone rather than claimed.
+    const branches = JSON.stringify(claimableStatuses(mocks.updateMany.mock.calls[0][0]));
+    expect(branches).not.toContain('active');
+    expect(branches).not.toContain('trialing');
+  });
+});
+
+describe('reserveTeamCheckout', () => {
+  it('claims the team checkout with zero seats until Stripe confirms', async () => {
+    await expect(reserveTeamCheckout('team-1', NOW)).resolves.toBe('reserved');
+
+    expect(mocks.teamCreate).toHaveBeenCalledWith({
+      data: { teamId: 'team-1', status: CHECKOUT_RESERVATION_STATUS, seatLimit: 0 },
+    });
+  });
+
+  it('refuses when a live team subscription or fresh reservation holds the row', async () => {
+    mocks.teamCreate.mockRejectedValue(uniqueViolation());
+    mocks.teamUpdateMany.mockResolvedValue({ count: 0 });
+
+    await expect(reserveTeamCheckout('team-1', NOW)).resolves.toBe('busy');
+  });
+
+  it('never hands out seats on takeover either', async () => {
+    mocks.teamCreate.mockRejectedValue(uniqueViolation());
+    mocks.teamUpdateMany.mockResolvedValue({ count: 1 });
+
+    await expect(reserveTeamCheckout('team-1', NOW)).resolves.toBe('reserved');
+    expect(mocks.teamUpdateMany.mock.calls[0][0].data.seatLimit).toBe(0);
+  });
+
+  it('fails closed when the database throws', async () => {
+    mocks.teamCreate.mockRejectedValue(new Error('connection refused'));
+
+    await expect(reserveTeamCheckout('team-1', NOW)).resolves.toBe('unavailable');
+  });
+
+  it('releases only reservation rows', async () => {
+    await releaseTeamCheckout('team-1');
+
+    expect(mocks.teamDeleteMany).toHaveBeenCalledWith({
+      where: { teamId: 'team-1', status: CHECKOUT_RESERVATION_STATUS },
+    });
+  });
+});
+
+describe('reserveOrgCheckout', () => {
+  const params = {
+    teamId: 'team-1',
+    organisationName: 'Acme Restoration Pty Ltd',
+    contactEmail: '  Owner@Example.Test ',
+  };
+
+  it('claims the org checkout, normalising the contact email', async () => {
+    await expect(reserveOrgCheckout(params, NOW)).resolves.toBe('reserved');
+
+    const data = mocks.orgCreate.mock.calls[0][0].data;
+    expect(data.teamId).toBe('team-1');
+    expect(data.status).toBe(CHECKOUT_RESERVATION_STATUS);
+    expect(data.contactEmail).toBe('owner@example.test');
+    expect(data.seatModel).toBe('unlimited');
+  });
+
+  it('refuses a second org checkout for the same container', async () => {
+    mocks.orgCreate.mockRejectedValue(uniqueViolation());
+    mocks.orgUpdateMany.mockResolvedValue({ count: 0 });
+
+    await expect(reserveOrgCheckout(params, NOW)).resolves.toBe('busy');
+  });
+
+  it('refreshes the organisation details when taking over a claimable row', async () => {
+    mocks.orgCreate.mockRejectedValue(uniqueViolation());
+    mocks.orgUpdateMany.mockResolvedValue({ count: 1 });
+
+    await expect(reserveOrgCheckout(params, NOW)).resolves.toBe('reserved');
+    expect(mocks.orgUpdateMany.mock.calls[0][0].data.organisationName).toBe(
+      'Acme Restoration Pty Ltd',
+    );
+  });
+
+  it('fails closed when the database throws', async () => {
+    mocks.orgCreate.mockRejectedValue(new Error('connection refused'));
+
+    await expect(reserveOrgCheckout(params, NOW)).resolves.toBe('unavailable');
+  });
+
+  it('releases only reservation rows', async () => {
+    await releaseOrgCheckout('team-1');
+
+    expect(mocks.orgDeleteMany).toHaveBeenCalledWith({
+      where: { teamId: 'team-1', status: CHECKOUT_RESERVATION_STATUS },
+    });
   });
 });

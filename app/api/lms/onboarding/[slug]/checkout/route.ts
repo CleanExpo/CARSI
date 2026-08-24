@@ -10,6 +10,10 @@ import {
 import { getOnboardingCourseBySlug } from '@/lib/server/onboarding-programs';
 import { resolveOrgMonthlyPriceId } from '@/lib/server/org-subscription-price';
 import { provisionOrgSubscriptionContainer } from '@/lib/server/org-subscription-provision';
+import {
+  checkoutSessionExpiresAt,
+  releaseOrgCheckout,
+} from '@/lib/server/membership-checkout-reservation';
 import { subscriptionsEnabled } from '@/lib/server/subscriptions-flag';
 import { prisma } from '@/lib/prisma';
 
@@ -87,7 +91,23 @@ export async function POST(request: NextRequest, ctx: Ctx) {
           organisationName,
           contactEmail,
         });
-        teamId = provisioned.teamId;
+        if (!provisioned.ok) {
+          // Same reservation semantics as the org checkout route: a claimed
+          // container opens no second Stripe session.
+          return provisioned.reason === 'busy'
+            ? NextResponse.json(
+                {
+                  detail:
+                    'An organisation checkout is already open for your account. Finish it, or try again in a few minutes.',
+                },
+                { status: 409 },
+              )
+            : NextResponse.json(
+                { detail: 'We could not start checkout just now. Please try again shortly.' },
+                { status: 503 },
+              );
+        }
+        teamId = provisioned.result.teamId;
       } catch (e) {
         const msg = e instanceof Error ? e.message : String(e);
         if (msg === 'ALREADY_ON_TEAM') {
@@ -107,6 +127,8 @@ export async function POST(request: NextRequest, ctx: Ctx) {
         const session = await getStripeClient().checkout.sessions.create({
           mode: 'subscription',
           line_items: [{ price: priceId, quantity: 1 }],
+          // Paired with the reservation TTL — see membership-checkout-reservation.
+          expires_at: checkoutSessionExpiresAt(),
           customer_email: contactEmail || undefined,
           success_url: successUrl,
           cancel_url: cancelUrl,
@@ -130,10 +152,14 @@ export async function POST(request: NextRequest, ctx: Ctx) {
         });
 
         if (!session.url) {
+          await releaseOrgCheckout(teamId);
           return NextResponse.json({ detail: 'Could not start checkout' }, { status: 500 });
         }
         return NextResponse.json({ checkout_url: session.url });
       } catch (e) {
+        // Stripe never opened a session — release the claim so the owner can
+        // retry immediately rather than waiting out the TTL.
+        await releaseOrgCheckout(teamId);
         console.error('[onboarding/checkout] org Stripe session failed:', e);
         return NextResponse.json({ detail: 'Could not start checkout' }, { status: 500 });
       }

@@ -12,9 +12,9 @@
  * active.
  */
 
-import { prisma } from '@/lib/prisma';
 import { ONBOARDING_BRAND } from '@/lib/onboarding/enterprise';
-import { createTeamForOwner, getTeamForUser } from '@/lib/server/teams';
+import { ensureContainerTeamForOwner, getTeamForUser } from '@/lib/server/teams';
+import { reserveOrgCheckout } from '@/lib/server/membership-checkout-reservation';
 
 const ORG_CONTAINER_TIER = 'org_subscription';
 
@@ -22,6 +22,11 @@ export interface OrgProvisionResult {
   teamId: string;
   created: boolean;
 }
+
+/** Thrown-equivalent signal that another org checkout already holds this team. */
+export type OrgProvisionOutcome =
+  | { ok: true; result: OrgProvisionResult }
+  | { ok: false; reason: 'busy' | 'unavailable' };
 
 /**
  * Ensure an org container team + a seeded org subscription row exist for the
@@ -34,7 +39,7 @@ export async function provisionOrgSubscriptionContainer(params: {
   organisationName: string;
   contactEmail: string;
   entitledCategory?: string;
-}): Promise<OrgProvisionResult> {
+}): Promise<OrgProvisionOutcome> {
   const existing = await getTeamForUser(params.ownerId);
   let teamId: string;
   let created = false;
@@ -45,35 +50,31 @@ export async function provisionOrgSubscriptionContainer(params: {
     }
     teamId = existing.id;
   } else {
-    const team = await createTeamForOwner({
+    // Atomic find-or-create — `LmsTeam.slug` is unique and derived from the
+    // owner, so two concurrent org checkouts converge on ONE container.
+    const container = await ensureContainerTeamForOwner({
       ownerId: params.ownerId,
       name: params.organisationName.slice(0, 80) || 'My organisation',
-      bundleTier: ORG_CONTAINER_TIER,
+      tier: ORG_CONTAINER_TIER,
     });
-    teamId = team.id;
-    created = true;
+    teamId = container.id;
+    created = container.created;
   }
 
-  // Seed the org subscription row in `incomplete` so the entitlement gate denies
-  // until Stripe confirms `active`. Idempotent on teamId. Never grants on the
-  // pre-payment `incomplete` status (decideMembershipEntitlement fails closed).
-  await prisma.lmsOrgSubscription.upsert({
-    where: { teamId },
-    create: {
-      teamId,
-      organisationName: params.organisationName.slice(0, 255),
-      contactEmail: params.contactEmail.trim().toLowerCase(),
-      status: 'incomplete',
-      seatModel: 'unlimited',
-      entitledCategory: params.entitledCategory ?? ONBOARDING_BRAND,
-      stripeSubscriptionId: null,
-    },
-    update: {
-      organisationName: params.organisationName.slice(0, 255),
-      contactEmail: params.contactEmail.trim().toLowerCase(),
-      ...(params.entitledCategory ? { entitledCategory: params.entitledCategory } : {}),
-    },
+  // Claim the checkout. This replaces a plain upsert: the upsert was idempotent
+  // on teamId but happily let a SECOND concurrent request carry on to open its
+  // own Stripe session for the same team. The reservation seeds the same
+  // pre-payment row (entitlement fails closed on it, exactly as `incomplete`
+  // did) while also refusing a second live checkout.
+  const reservation = await reserveOrgCheckout({
+    teamId,
+    organisationName: params.organisationName,
+    contactEmail: params.contactEmail,
+    entitledCategory: params.entitledCategory ?? ONBOARDING_BRAND,
   });
+  if (reservation !== 'reserved') {
+    return { ok: false, reason: reservation === 'busy' ? 'busy' : 'unavailable' };
+  }
 
-  return { teamId, created };
+  return { ok: true, result: { teamId, created } };
 }
