@@ -60,11 +60,18 @@ export function isWithinRegrantWindow(
  * write could not — it is the same reason the CCW path stopped inferring its
  * duplicate check from enrolment payment references.
  *
- * A learner with no account yet cannot have been granted before, so there is
- * nothing to claim and the grant proceeds. Two concurrent grants for the same
- * NEW email both pass here and race on `lmsUser.create`; one wins and the other
- * throws a unique-constraint error before rotating anything. That is a worse
- * error message, not a lockout, and it is the pre-existing behaviour.
+ * A learner with no account yet cannot have been granted before, so there is no
+ * row to claim on and the grant proceeds. That leaves NOTHING STAMPED, which is
+ * why `recordYearlyMembershipGrant` must run after a successful grant: without
+ * it the first grant to a new email leaves the column null and the SECOND one is
+ * admitted, rotating the password again — the exact lockout this guard exists to
+ * prevent, on the path that matters most, since granting to someone who has no
+ * account yet is the ordinary case for this form.
+ *
+ * Two concurrent grants for the same NEW email both pass here and race on
+ * `lmsUser.create`; one wins and the other throws a unique-constraint error
+ * before rotating anything. That is a worse error message, not a lockout, and it
+ * is the pre-existing behaviour.
  */
 export async function claimYearlyMembershipGrant(
   email: string,
@@ -116,5 +123,34 @@ export async function releaseYearlyMembershipClaim(email: string, claimedAt: Dat
     // No learner identifier in the log line (CWE-532 was paid for once on this
     // code path already).
     console.error('[yearly-membership] claim release failed:', error);
+  }
+}
+
+/**
+ * Stamp the claim after a grant that actually happened.
+ *
+ * Required because `claimYearlyMembershipGrant` cannot stamp a row that does not
+ * exist yet. For a learner who already had an account the claim wrote this same
+ * timestamp and this is a no-op; for a NEW account it is the only write, and
+ * without it the guard never engages for that learner at all.
+ *
+ * Keyed on email rather than id because the grant creates the row and the caller
+ * does not hold its id. Never throws: the grant has already succeeded and the
+ * member has their credentials, so failing the response here would report a
+ * disaster that did not happen. It is logged loudly instead, because the silent
+ * outcome is an unguarded learner.
+ */
+export async function recordYearlyMembershipGrant(email: string, at: Date): Promise<void> {
+  try {
+    const { count } = await prisma.lmsUser.updateMany({
+      where: { email: email.trim().toLowerCase() },
+      data: { yearlyMembershipGrantedAt: at },
+    });
+    if (count !== 1) {
+      // No learner identifier in the log line (CWE-532).
+      console.error('[yearly-membership] grant stamp matched no row — learner is unguarded');
+    }
+  } catch (error) {
+    console.error('[yearly-membership] grant stamp failed — learner is unguarded:', error);
   }
 }

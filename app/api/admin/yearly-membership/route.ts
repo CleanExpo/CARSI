@@ -7,6 +7,7 @@ import {
 import { getAdminSessionOrNull } from '@/lib/admin/admin-session';
 import {
   claimYearlyMembershipGrant,
+  recordYearlyMembershipGrant,
   releaseYearlyMembershipClaim,
   YEARLY_MEMBERSHIP_REGRANT_WINDOW_MS,
 } from '@/lib/admin/yearly-membership-claim';
@@ -92,6 +93,11 @@ export async function POST(request: NextRequest) {
       priceAud,
       appOrigin: request.nextUrl.origin,
     });
+    // Stamp the claim now the grant has actually happened. For a learner who
+    // already had an account the claim wrote this same timestamp and this is a
+    // no-op; for a NEW account it is the only write, and without it the guard
+    // never engages for that learner — which is the ordinary case here.
+    await recordYearlyMembershipGrant(email, claimedAt);
     return NextResponse.json({ ok: true, ...result });
   } catch (e) {
     // The grant did not happen, so the claim must not outlive it — otherwise one
