@@ -11,6 +11,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   accountActionFor,
+  deniedPublishedCourses,
   enrolmentsWithoutAccess,
   grantExitCode,
   isGrantComplete,
@@ -96,15 +97,41 @@ describe('enrolmentsWithoutAccess', () => {
   });
 });
 
+describe('deniedPublishedCourses', () => {
+  it('keeps denied rows whose course is still published', () => {
+    const denied = [row('water', 'revoked'), row('mould', 'refunded')];
+    expect(
+      deniedPublishedCourses(denied, ['water', 'mould', 'fire']).map((r) => r.course.slug)
+    ).toEqual(['water', 'mould']);
+  });
+
+  // A revoked row on a retired course cannot be fixed by re-running the grant, so counting it
+  // would leave every future run permanently incomplete.
+  it('drops denied rows whose course is no longer published', () => {
+    const denied = [row('retired', 'revoked'), row('water', 'revoked')];
+    expect(deniedPublishedCourses(denied, ['water']).map((r) => r.course.slug)).toEqual(['water']);
+  });
+
+  it('matches slugs case- and whitespace-insensitively, as the admin grant path does', () => {
+    const denied = [row(' Water ', 'revoked')];
+    expect(deniedPublishedCourses(denied, ['water'])).toHaveLength(1);
+    expect(deniedPublishedCourses([row('water', 'revoked')], [' WATER '])).toHaveLength(1);
+  });
+
+  it('is empty when nothing was denied', () => {
+    expect(deniedPublishedCourses([], ['water'])).toEqual([]);
+  });
+});
+
 describe('isGrantComplete / grantExitCode', () => {
   it('is complete when every course enrolled', () => {
-    const outcome = { created: 25, alreadyEnrolled: 0, failed: 0 };
+    const outcome = { created: 25, alreadyEnrolled: 0, failed: 0, deniedAccess: 0 };
     expect(isGrantComplete(outcome)).toBe(true);
     expect(grantExitCode(outcome)).toBe(0);
   });
 
   it('is complete on a re-run where every course was already enrolled', () => {
-    const outcome = { created: 0, alreadyEnrolled: 25, failed: 0 };
+    const outcome = { created: 0, alreadyEnrolled: 25, failed: 0, deniedAccess: 0 };
     expect(isGrantComplete(outcome)).toBe(true);
     expect(grantExitCode(outcome)).toBe(0);
   });
@@ -114,17 +141,46 @@ describe('isGrantComplete / grantExitCode', () => {
   // Every partial outcome below exited 0, so a run that left the learner short of a course
   // reported success to any operator or wrapper reading the status code.
   it.each([
-    ['24 enrolled, 1 failed', { created: 24, alreadyEnrolled: 0, failed: 1 }],
-    ['1 enrolled, 24 failed', { created: 1, alreadyEnrolled: 0, failed: 24 }],
-    ['re-run: 24 already enrolled, 1 failed', { created: 0, alreadyEnrolled: 24, failed: 1 }],
-    ['mixed: some new, some existing, 1 failed', { created: 12, alreadyEnrolled: 12, failed: 1 }],
+    ['24 enrolled, 1 failed', { created: 24, alreadyEnrolled: 0, failed: 1, deniedAccess: 0 }],
+    ['1 enrolled, 24 failed', { created: 1, alreadyEnrolled: 0, failed: 24, deniedAccess: 0 }],
+    [
+      're-run: 24 already enrolled, 1 failed',
+      { created: 0, alreadyEnrolled: 24, failed: 1, deniedAccess: 0 },
+    ],
+    [
+      'mixed: some new, some existing, 1 failed',
+      { created: 12, alreadyEnrolled: 12, failed: 1, deniedAccess: 0 },
+    ],
   ])('reports partial failure as incomplete — %s', (_label, outcome) => {
     expect(isGrantComplete(outcome)).toBe(false);
     expect(grantExitCode(outcome)).toBe(1);
   });
 
+  // REGRESSION (CodeRabbit, PR #693): completion counted only `failed`. adminGrantEnrollment
+  // returns 'already_enrolled' for ANY existing row without checking its status, so a revoked
+  // enrolment landed in `alreadyEnrolled` with `failed` at zero — the script printed the course
+  // under NO ACCESS and exited 0 in the same run.
+  it('reports a denied published course as incomplete even with zero failures', () => {
+    const outcome = { created: 24, alreadyEnrolled: 1, failed: 0, deniedAccess: 1 };
+    expect(isGrantComplete(outcome)).toBe(false);
+    expect(grantExitCode(outcome)).toBe(1);
+  });
+
+  it('reports incomplete when a run both fails and leaves a course denied', () => {
+    const outcome = { created: 20, alreadyEnrolled: 3, failed: 1, deniedAccess: 1 };
+    expect(isGrantComplete(outcome)).toBe(false);
+    expect(grantExitCode(outcome)).toBe(1);
+  });
+
+  it('treats failed and deniedAccess as independent reasons to be incomplete', () => {
+    expect(grantExitCode({ created: 25, alreadyEnrolled: 0, failed: 0, deniedAccess: 0 })).toBe(0);
+    expect(grantExitCode({ created: 25, alreadyEnrolled: 0, failed: 1, deniedAccess: 0 })).toBe(1);
+    expect(grantExitCode({ created: 25, alreadyEnrolled: 0, failed: 0, deniedAccess: 1 })).toBe(1);
+    expect(grantExitCode({ created: 25, alreadyEnrolled: 0, failed: 1, deniedAccess: 1 })).toBe(1);
+  });
+
   it('reports total failure as incomplete', () => {
-    const outcome = { created: 0, alreadyEnrolled: 0, failed: 25 };
+    const outcome = { created: 0, alreadyEnrolled: 0, failed: 25, deniedAccess: 0 };
     expect(isGrantComplete(outcome)).toBe(false);
     expect(grantExitCode(outcome)).toBe(1);
   });
@@ -136,8 +192,8 @@ describe('isGrantComplete / grantExitCode', () => {
       [0, 50],
       [25, 25],
     ]) {
-      expect(grantExitCode({ created, alreadyEnrolled, failed: 1 })).toBe(1);
-      expect(grantExitCode({ created, alreadyEnrolled, failed: 0 })).toBe(0);
+      expect(grantExitCode({ created, alreadyEnrolled, failed: 1, deniedAccess: 0 })).toBe(1);
+      expect(grantExitCode({ created, alreadyEnrolled, failed: 0, deniedAccess: 0 })).toBe(0);
     }
   });
 });

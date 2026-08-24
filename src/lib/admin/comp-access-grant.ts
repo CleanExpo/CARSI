@@ -59,23 +59,58 @@ export function enrolmentsWithoutAccess<T extends EnrolmentAccessRow>(rows: read
   return rows.filter((row) => !isEnrolmentAccessAllowed(row.status));
 }
 
+/**
+ * The denied enrolments that actually count against the grant's contract: those on a course
+ * that is currently published.
+ *
+ * Scoping matters. A learner can hold a revoked enrolment on a course that has since been
+ * retired or unpublished; that row is worth reporting, but it says nothing about whether they
+ * have access to every course on offer today. Counting it would leave the grant permanently
+ * incomplete with no action able to fix it.
+ *
+ * Slugs are normalised on both sides because `slug` is free text, matching how the rest of the
+ * admin grant path (`adminGrantEnrollment`, `listPublishedCourseSlugsForYearlyMembership`)
+ * lower-cases and trims before comparing.
+ */
+export function deniedPublishedCourses<T extends EnrolmentAccessRow>(
+  denied: readonly T[],
+  publishedSlugs: Iterable<string>
+): T[] {
+  const normalise = (slug: string) => slug.trim().toLowerCase();
+  const published = new Set([...publishedSlugs].map(normalise));
+  return denied.filter((row) => published.has(normalise(row.course.slug)));
+}
+
 /** Tally of one grant run, as the per-course loop accumulates it. */
 export interface GrantOutcome {
   created: number;
   alreadyEnrolled: number;
   failed: number;
+  /**
+   * Published courses whose enrolment row exists but is denied by the read gates (revoked,
+   * refunded, disputed...). Not a failure of the run — the row was left alone on purpose —
+   * but the learner still cannot reach the course.
+   */
+  deniedAccess: number;
 }
 
 /**
- * True only when every published course was granted.
+ * True only when the learner can actually reach every published course.
  *
- * The contract is access to EVERY published course, so a single failure means the grant is
- * incomplete — even alongside many successes. Gating this on "every course failed" (the
- * original `failed && created === 0 && already === 0`) reported 24-of-25 as success, and an
- * operator or wrapper reading the exit status saw a clean run.
+ * Two distinct ways to fall short, and both must count:
+ *
+ *  - `failed`       — the grant call threw, so no enrolment exists.
+ *  - `deniedAccess` — an enrolment exists but the gates deny it. `adminGrantEnrollment`
+ *                     returns `already_enrolled` for ANY existing row without inspecting its
+ *                     status, so a revoked enrolment is tallied under `alreadyEnrolled` and
+ *                     leaves `failed` at zero.
+ *
+ * Counting only `failed` let the script print a course under NO ACCESS and exit 0 in the same
+ * breath. Deciding not to auto-reactivate a revoked row (its `revokedReason` carries
+ * dispute/refund meaning) is not the same as deciding the grant succeeded.
  */
 export function isGrantComplete(outcome: GrantOutcome): boolean {
-  return outcome.failed === 0;
+  return outcome.failed === 0 && outcome.deniedAccess === 0;
 }
 
 /** Process exit code for a run: 0 only when the grant is complete. */

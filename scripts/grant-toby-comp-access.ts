@@ -21,6 +21,7 @@ import { lmsPublishedCourseWhere } from '@/lib/server/public-courses-list';
 import { adminGrantEnrollment } from '@/lib/admin/admin-enrollment-mutations';
 import {
   accountActionFor,
+  deniedPublishedCourses,
   enrolmentsWithoutAccess,
   grantExitCode,
 } from '@/lib/admin/comp-access-grant';
@@ -131,6 +132,14 @@ async function main() {
   });
   const inactive = enrolmentsWithoutAccess(enrolments);
 
+  //    Only denied rows on a CURRENTLY PUBLISHED course count against the grant: a revoked
+  //    enrolment on a retired course is worth showing but cannot be fixed by this script, so
+  //    counting it would leave every future run permanently incomplete.
+  const deniedPublished = deniedPublishedCourses(
+    inactive,
+    courses.map((c) => c.slug)
+  );
+
   console.log('\n  ---');
   const accountNote = accountCreated
     ? ' (new)'
@@ -143,10 +152,19 @@ async function main() {
   console.log(`  Newly enrolled:    ${created}`);
   console.log(`  Already enrolled:  ${already}`);
   if (inactive.length) {
+    const publishedSlugs = new Set(deniedPublished.map((en) => en.course.slug));
     console.log(`  NO ACCESS (${inactive.length}) — enrolment row exists but the gates deny it:`);
     for (const en of inactive) {
       const reason = en.revokedReason ? ` (${en.revokedReason})` : '';
-      console.log(`    - ${en.course.slug}: ${en.status}${reason}`);
+      //  Flag the ones that leave the grant incomplete; the rest are retired courses.
+      const scope = publishedSlugs.has(en.course.slug) ? ' [published]' : ' [not published]';
+      console.log(`    - ${en.course.slug}: ${en.status}${reason}${scope}`);
+    }
+    if (deniedPublished.length) {
+      console.log(
+        `  ^ ${deniedPublished.length} of these are published courses Toby still cannot reach.`
+      );
+      console.log('    Left as-is on purpose — revokedReason carries dispute/refund meaning.');
     }
   }
   if (failed.length) {
@@ -155,10 +173,15 @@ async function main() {
   }
   console.log('  ---\n');
 
-  // Any failure means Toby is missing a course, so the grant is incomplete — exit non-zero.
-  // The rule itself lives in `grantExitCode` (unit-tested in comp-access-grant.test.ts);
-  // it previously reported a partial failure as success.
-  process.exitCode = grantExitCode({ created, alreadyEnrolled: already, failed: failed.length });
+  // Incomplete if any published course is unreachable — whether the grant threw (`failed`) or
+  // the row exists but the gates deny it (`deniedAccess`). The rule lives in `grantExitCode`
+  // (unit-tested in comp-access-grant.test.ts); it previously reported both as success.
+  process.exitCode = grantExitCode({
+    created,
+    alreadyEnrolled: already,
+    failed: failed.length,
+    deniedAccess: deniedPublished.length,
+  });
 }
 
 main()
