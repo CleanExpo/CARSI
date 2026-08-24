@@ -60,7 +60,7 @@ export type WelcomeEmailDelivery = {
   /** True ONLY when the message was handed to the email provider. */
   delivered: boolean;
   /** Why it did not reach the member; null when it did. */
-  reason: 'not_configured' | 'send_failed' | 'provider_error' | 'dev_console' | null;
+  reason: 'not_configured' | 'send_failed' | 'provider_error' | 'dev_console' | 'unknown' | null;
 };
 
 /**
@@ -78,8 +78,12 @@ export function describeWelcomeEmailDelivery(result: SendEmailResult): WelcomeEm
   const reachedProvider = result.sent && result.reason !== 'dev_console';
   if (reachedProvider) return { delivered: true, reason: null };
   // `sent: false` with no reason is still a non-delivery; name it rather than
-  // reporting `null`, which this type reserves for success.
-  return { delivered: false, reason: result.reason ?? 'send_failed' };
+  // reporting `null`, which this type reserves for success. It gets its OWN
+  // label rather than borrowing `send_failed`: that reason means something
+  // specific (the request threw before the provider answered), and an operator
+  // reads the label as a diagnosis. Claiming a cause we do not have would be
+  // the same class of error this whole change exists to remove.
+  return { delivered: false, reason: result.reason ?? 'unknown' };
 }
 
 export async function grantYearlyMembership(params: {

@@ -34,9 +34,14 @@ type GrantResult = {
  */
 const WELCOME_EMAIL_FAILURE_DETAIL: Record<string, string> = {
   not_configured: 'no email provider is configured on this environment',
-  send_failed: 'the provider rejected the send',
-  provider_error: 'the email provider returned an error',
+  // These two are NOT interchangeable, and an operator diagnosing a lockout
+  // acts on the difference. In `sendEmail`, `send_failed` comes from the catch
+  // block — the request threw before any provider response (network, DNS,
+  // timeout). `provider_error` is the provider answering and refusing.
+  send_failed: 'the send failed before the provider answered (network or timeout)',
+  provider_error: 'the email provider rejected it',
   dev_console: 'it was only written to the server console, not posted',
+  unknown: 'the send did not complete and gave no reason',
 };
 
 export function AdminYearlyMembershipClient() {
