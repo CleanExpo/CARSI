@@ -6,6 +6,12 @@
  * DB); the server flag lives in `@/lib/server/ccw-offers-flag` and the
  * welcome-email wiring is a later slice. Spec:
  * docs/specs/ccw-attendee-offers-day-gated-2026-07-15.md
+ *
+ * `carsi-membership` is still `live: false`: its delivery path — the
+ * attendee-gated `POST /api/ccw/membership-checkout` of spec §10.3 — is not
+ * built. `buildMembershipCheckoutParams` (`@/lib/server/ccw-membership-checkout`)
+ * and `createCheckoutSession`'s `discounts` are the built half (§10.6); the route
+ * itself is deferred to a judged sub-slice because it touches auth + live Stripe.
  */
 import { ccwRoadshowEvents, type CcwRoadshowEvent } from './ccw-roadshow';
 
@@ -19,7 +25,18 @@ export type CcwAttendeeOffer = {
   detail: string;
   /** CCW / RA permanent product URL. Preview URLs are rejected (see below). */
   url?: string;
-  /** CARSI: price passed to `grantYearlyMembership`; NOT a coupon. Server-only. */
+  /**
+   * CARSI: the attendee first-year rate, in AUD. Server-only, and NOT the value
+   * that buys the membership — spec §10 (owner-chosen, supersedes the original
+   * `grantYearlyMembership` note in §4.1) delivers this offer as a discounted
+   * `pro_annual` Stripe subscription: a `duration: once` coupon takes the first
+   * invoice to this figure, then it renews at list. Held here so the rate lives
+   * with the offer, and so a hard price can never leak into `label`/`detail`.
+   *
+   * Roadshow costs are separate to CARSI course costs (founder, 2026-08-24): this
+   * is an event-attendee rate on a membership, not a course price, and it is not
+   * an input to anything in the course catalogue or its pricing.
+   */
   membershipPriceAud?: number;
   /** false = configured but its external dependency isn't satisfied yet. */
   live: boolean;
