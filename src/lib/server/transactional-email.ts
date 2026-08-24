@@ -600,7 +600,8 @@ export async function sendCcwRoadshowOfferPackEmail(params: {
   attendeeName: string;
   eventCity: string;
   eventDates: string;
-  shopifyTrainingUrl: string;
+  /** `null` ⇒ the pack sends without the Shopify CTA. Never a preview link. */
+  shopifyTrainingUrl: string | null;
   membershipCheckoutUrl: string;
   membershipPriceLabel: string;
   socialLinks: ReadonlyArray<{ label: string; href: string }>;

@@ -718,12 +718,19 @@ export function renderCcwRoadshowOfferPackEmail(params: {
   attendeeName: string;
   eventCity: string;
   eventDates: string;
-  shopifyTrainingUrl: string;
+  /**
+   * `null` when no distributable CCW product link is available (see
+   * `resolveCcwShopifyTrainingUrl`). The Shopify CTA, its paragraph and its
+   * text-body line are then omitted — the rest of the pack still sends. Never
+   * fall back to a placeholder or a preview link.
+   */
+  shopifyTrainingUrl: string | null;
   membershipCheckoutUrl: string;
   membershipPriceLabel: string;
   socialLinks: ReadonlyArray<{ label: string; href: string }>;
 }): RenderedEmail {
   const name = params.attendeeName.trim() || 'there';
+  const shopifyUrl = params.shopifyTrainingUrl;
   const socialHtml = params.socialLinks
     .map((l) => `<li style="margin: 0 0 8px;">${brandLink(l.href, l.label)}</li>`)
     .join('');
@@ -738,14 +745,18 @@ export function renderCcwRoadshowOfferPackEmail(params: {
       greeting: `Hi ${name},`,
       paragraphs: [
         `You completed both days of the CARSI x CCW Business Growth Days (${params.eventDates}). Here are your exclusive follow-up offers.`,
-        `Shopify — CCW/CARSI 2 Day In-house Training: open the training product via the button below.`,
+        ...(shopifyUrl
+          ? [`Shopify — CCW/CARSI 2 Day In-house Training: open the training product via the button below.`]
+          : []),
         `CARSI Yearly membership special: ${params.membershipPriceLabel} for your first year (attendee-only). Use the membership link below — sign in to your CARSI account to checkout.`,
       ],
       details: [
         { label: 'Event', value: `${params.eventCity} — ${params.eventDates}` },
         { label: 'Membership special', value: params.membershipPriceLabel },
       ],
-      cta: { label: 'View Shopify training product', href: params.shopifyTrainingUrl },
+      ...(shopifyUrl
+        ? { cta: { label: 'View Shopify training product', href: shopifyUrl } }
+        : {}),
       messageHtml: `
         <p style="margin: 24px 0 12px; font-family: ${BRAND.font}; font-size: 15px; line-height: 1.6; color: ${BRAND.text};">
           <a href="${escapeHtml(params.membershipCheckoutUrl)}" style="display: inline-block; padding: 12px 22px; background: ${BRAND.orange}; color: #060a14; font-weight: 700; text-decoration: none; border-radius: 8px;">
@@ -759,6 +770,8 @@ export function renderCcwRoadshowOfferPackEmail(params: {
       `,
       noteHtml: `You're receiving this because you attended both days and opted in at check-in.`,
     },
-    `Hi ${name},\n\nThanks for completing both days in ${params.eventCity} (${params.eventDates}).\n\nShopify training product:\n${params.shopifyTrainingUrl}\n\nCARSI yearly membership special (${params.membershipPriceLabel}):\n${params.membershipCheckoutUrl}\n\nStay connected with CCW:\n${socialText}\n`
+    `Hi ${name},\n\nThanks for completing both days in ${params.eventCity} (${params.eventDates}).\n${
+      shopifyUrl ? `\nShopify training product:\n${shopifyUrl}\n` : ''
+    }\nCARSI yearly membership special (${params.membershipPriceLabel}):\n${params.membershipCheckoutUrl}\n\nStay connected with CCW:\n${socialText}\n`
   );
 }

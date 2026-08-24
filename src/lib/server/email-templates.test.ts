@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  renderCcwRoadshowOfferPackEmail,
   renderEnrollmentWelcomeEmail,
   renderToolboxTalkEmail,
   renderYearlyMembershipEmail,
@@ -140,5 +141,46 @@ describe('renderYearlyMembershipEmail — access claim matches actual access', (
 
     expect(html).toContain('1 of 25 published courses');
     expect(html).not.toContain('Full library access is ready');
+  });
+});
+
+describe('CCW offer pack — the Shopify CTA is omitted, never broken', () => {
+  const base = {
+    appOrigin: 'https://carsi.example.test',
+    attendeeName: 'Sam Attendee',
+    eventCity: 'Melbourne',
+    eventDates: '22–23 July 2026',
+    membershipCheckoutUrl: 'https://carsi.example.test/subscribe?offer=ccw-attendee',
+    membershipPriceLabel: '$295 first year, then $795 / year',
+    socialLinks: [{ label: 'CCW on X', href: 'https://x.com/ccwonline' }],
+  };
+
+  it('renders the CTA when a distributable product URL is supplied', () => {
+    const { html, text } = renderCcwRoadshowOfferPackEmail({
+      ...base,
+      shopifyTrainingUrl: 'https://ccwonline.com.au/products/ccw-carsi-2-day-in-house-training',
+    });
+
+    expect(html).toContain('View Shopify training product');
+    expect(html).toContain('https://ccwonline.com.au/products/ccw-carsi-2-day-in-house-training');
+    expect(text).toContain('Shopify training product:');
+  });
+
+  it('drops the CTA entirely when there is no safe URL — no placeholder, no dead link', () => {
+    const { html, text } = renderCcwRoadshowOfferPackEmail({
+      ...base,
+      shopifyTrainingUrl: null,
+    });
+
+    expect(html).not.toContain('View Shopify training product');
+    expect(html).not.toContain('Shopify —');
+    expect(text).not.toContain('Shopify training product:');
+    // The rest of the pack must still send.
+    expect(html).toContain('Claim');
+    expect(text).toContain(base.membershipCheckoutUrl);
+    // Nothing that reads as an empty or undefined href sneaks through.
+    expect(html).not.toContain('href=""');
+    expect(html).not.toContain('undefined');
+    expect(text).not.toContain('undefined');
   });
 });
