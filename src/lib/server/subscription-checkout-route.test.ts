@@ -58,6 +58,7 @@ beforeEach(() => {
   process.env.DATABASE_URL = 'postgres://configured';
   process.env.STRIPE_SECRET_KEY = 'sk_test_synthetic';
   process.env.SUBSCRIPTIONS_ENABLED = 'true';
+  process.env.CCW_MEMBERSHIP_COUPON_ID = 'coupon_synthetic_once';
   mocks.sessionsCreate.mockReset();
   mocks.sessionsCreate.mockResolvedValue({ id: 'cs_test_1', url: 'https://checkout.example/session' });
   mocks.claims.mockReset();
@@ -120,8 +121,9 @@ describe('a learner with no membership', () => {
     expect(params.mode).toBe('subscription');
     // AC-4 / AC-8: bound to the authenticated learner, never a supplied email.
     expect(params.metadata.carsi_user_id).toBe('user-1');
-    // AC-10: the discount is never reachable as a public promotion code.
-    expect(params.allow_promotion_codes).toBe(false);
+    // AC-10: never reachable as a public promotion code. Omitted rather than
+    // false — Stripe rejects a session carrying both this and `discounts`.
+    expect(params.allow_promotion_codes).not.toBe(true);
   });
 
   it('still reaches the regular checkout', async () => {
@@ -139,6 +141,50 @@ describe('a learner with no membership', () => {
 
     expect(res.status).toBe(403);
     expect(mocks.sessionsCreate).not.toHaveBeenCalled();
+  });
+});
+
+describe('the attendee rate is a first-year discount, not a cheaper subscription', () => {
+  it('charges the standing annual price and discounts it with a once-only coupon', async () => {
+    await POST(request({ attendeeOffer: true }));
+
+    const params = mocks.sessionsCreate.mock.calls[0][0];
+    // The SAME recurring price every member pays — so renewals bill A$795.
+    expect(params.line_items).toEqual([{ price: 'price_synthetic_annual', quantity: 1 }]);
+    expect(params.discounts).toEqual([{ coupon: 'coupon_synthetic_once' }]);
+  });
+
+  it('never builds an inline recurring price for the attendee rate', async () => {
+    await POST(request({ attendeeOffer: true }));
+
+    // A `price_data` line item with a recurring interval is what made the
+    // attendee subscription renew at A$295 forever. It must not come back.
+    const params = mocks.sessionsCreate.mock.calls[0][0];
+    expect(params.line_items[0].price_data).toBeUndefined();
+  });
+
+  it('refuses the checkout when the coupon is not configured, rather than charging full price', async () => {
+    delete process.env.CCW_MEMBERSHIP_COUPON_ID;
+
+    const res = await POST(request({ attendeeOffer: true }));
+
+    expect(res.status).toBe(503);
+    expect(mocks.sessionsCreate).not.toHaveBeenCalled();
+  });
+
+  it('refuses the checkout when the annual price cannot be resolved', async () => {
+    mocks.proAnnualPriceId.mockResolvedValue(null);
+
+    const res = await POST(request({ attendeeOffer: true }));
+
+    expect(res.status).toBe(503);
+    expect(mocks.sessionsCreate).not.toHaveBeenCalled();
+  });
+
+  it('does not apply the attendee coupon to the regular $795 checkout', async () => {
+    await POST(request({}));
+
+    expect(mocks.sessionsCreate.mock.calls[0][0].discounts).toBeUndefined();
   });
 });
 

@@ -3,9 +3,15 @@
  * (`pro_annual`, A$795/yr) Stripe Checkout in `mode: 'subscription'`.
  *
  * Optional body `{ attendeeOffer: true }` starts the CCW roadshow attendee
- * special (A$295/yr) when the learner is offer-eligible (both days + email
- * opt-in + provisioned). Attendee pricing is hardcoded via Checkout
- * `price_data` — no Stripe Price id or extra env vars.
+ * special when the learner is offer-eligible (both days + email opt-in +
+ * provisioned): A$295 for the FIRST YEAR, then the standing A$795/yr.
+ *
+ * That first-year shape is the whole point (founder, 2026-08-24: A$795/yr is the
+ * standing price, not a first-year one). It is delivered exactly as spec §10.3
+ * requires — the SAME `pro_annual` recurring price every member pays, with a
+ * server-side `duration: once` coupon taking the first invoice down. It is NOT a
+ * discounted recurring price: that would renew at A$295 forever and quietly
+ * commit CARSI to A$500/yr less from every attendee who ever claimed it.
  *
  * Regular $795 membership still ships dark behind SUBSCRIPTIONS_ENABLED.
  * The attendee path only needs STRIPE_SECRET_KEY (already used for payments).
@@ -19,11 +25,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { getStripeClient } from '@/lib/api/stripe';
-import {
-  CCW_ATTENDEE_MEMBERSHIP_PRICE_CENTS,
-  CCW_ATTENDEE_MEMBERSHIP_PRODUCT_NAME,
-  CCW_ATTENDEE_OFFER_QUERY,
-} from '@/lib/marketing/ccw-roadshow-offer-pack';
+import { CCW_ATTENDEE_OFFER_QUERY } from '@/lib/marketing/ccw-roadshow-offer-pack';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { learnerIsCcwAttendeeOfferEligible } from '@/lib/server/ccw-attendance/attendee-offer';
 import { membershipCheckoutDecisionFor } from '@/lib/server/membership-checkout-guard';
@@ -35,6 +37,8 @@ import {
 } from '@/lib/server/event-attribution';
 
 const UNAVAILABLE = 'Membership purchasing is not yet available.';
+const ATTENDEE_UNAVAILABLE =
+  'The attendee membership special is not available yet. Please try again later.';
 
 export async function POST(request: NextRequest) {
   const claims = await getSessionClaimsFromRequest(request);
@@ -110,30 +114,27 @@ export async function POST(request: NextRequest) {
         );
       }
 
+      // The standing annual price plus a first-year-only coupon. Both must
+      // resolve: without the coupon this would charge the attendee full price
+      // while the CTA promises A$295, so it fails closed rather than selling the
+      // wrong thing (spec §10.4 AC-6).
+      const attendeePriceId = await resolveProAnnualPriceId();
+      const couponId = process.env.CCW_MEMBERSHIP_COUPON_ID?.trim();
+      if (!attendeePriceId || !couponId) {
+        return NextResponse.json({ detail: ATTENDEE_UNAVAILABLE }, { status: 503 });
+      }
+
       const session = await getStripeClient().checkout.sessions.create({
         mode: 'subscription',
-        line_items: [
-          {
-            quantity: 1,
-            price_data: {
-              currency: 'aud',
-              unit_amount: CCW_ATTENDEE_MEMBERSHIP_PRICE_CENTS,
-              recurring: { interval: 'year' },
-              tax_behavior: 'inclusive',
-              product_data: {
-                name: CCW_ATTENDEE_MEMBERSHIP_PRODUCT_NAME,
-                metadata: {
-                  plan: 'pro_annual_attendee',
-                  source: 'ccw-roadshow-offer',
-                },
-              },
-            },
-          },
-        ],
+        line_items: [{ price: attendeePriceId, quantity: 1 }],
+        // AC-10: the discount is applied server-side and is never reachable as a
+        // public promotion code. `allow_promotion_codes` is OMITTED rather than
+        // set false — Stripe rejects a session carrying both it and `discounts`,
+        // and its default is already "no promotion codes".
+        discounts: [{ coupon: couponId }],
         customer_email: claims.email,
         success_url,
         cancel_url,
-        allow_promotion_codes: false,
         metadata: {
           carsi_user_id: claims.sub,
           plan: 'pro_annual_attendee',
