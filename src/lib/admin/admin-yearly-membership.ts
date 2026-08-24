@@ -6,10 +6,11 @@ import { prisma } from '@/lib/prisma';
 import { lmsPublishedCourseWhere } from '@/lib/server/public-courses-list';
 import { generateMemberTempPassword } from '@/lib/server/member-temp-password';
 import { hashPassword } from '@/lib/server/lms-auth';
+import { sendYearlyMembershipEmail } from '@/lib/server/transactional-email';
 import {
-  sendYearlyMembershipEmail,
-  type SendEmailResult,
-} from '@/lib/server/transactional-email';
+  describeWelcomeEmailDelivery as classifyWelcomeEmailDelivery,
+  type WelcomeEmailDelivery,
+} from '@/lib/admin/welcome-email-delivery';
 
 const MEMBERSHIP_DURATION_LABEL = '12 months from activation';
 
@@ -47,44 +48,15 @@ export async function listPublishedCourseSlugsForYearlyMembership(): Promise<str
 }
 
 /**
- * Whether the welcome email — which carries the ONLY copy of the temporary
- * password — actually reached the member.
- *
- * This exists because the grant ROTATES an existing member's password before
- * sending. If the send then fails, the member holds credentials that exist
- * nowhere a human can read them, and until now the only trace was a
- * `console.warn` on the server: both admin surfaces reported an unqualified
- * success. An operator who cannot see the failure cannot recover from it.
+ * The delivery classification lives in `welcome-email-delivery` so the admin
+ * CLIENT components can import it too — this module reaches for Prisma, so they
+ * cannot import from here. Re-exported for existing callers and tests.
  */
-export type WelcomeEmailDelivery = {
-  /** True ONLY when the message was handed to the email provider. */
-  delivered: boolean;
-  /** Why it did not reach the member; null when it did. */
-  reason: 'not_configured' | 'send_failed' | 'provider_error' | 'dev_console' | 'unknown' | null;
-};
-
-/**
- * PURE, so the classification is testable without an email provider.
- *
- * `sent: true` is NOT sufficient. `sendEmail` also returns `sent: true` with
- * `reason: 'dev_console'` when it merely prints the message to the server log —
- * which happens whenever `MAILTRAP_API_KEY` is unset with the dev console on, and
- * on provider errors and network failures in that mode. The member cannot read a
- * server log, so for the question this type answers — does this person have their
- * password? — dev-console output is a NON-delivery. Treating it as success would
- * reproduce the original defect in a new place.
- */
-export function describeWelcomeEmailDelivery(result: SendEmailResult): WelcomeEmailDelivery {
-  const reachedProvider = result.sent && result.reason !== 'dev_console';
-  if (reachedProvider) return { delivered: true, reason: null };
-  // `sent: false` with no reason is still a non-delivery; name it rather than
-  // reporting `null`, which this type reserves for success. It gets its OWN
-  // label rather than borrowing `send_failed`: that reason means something
-  // specific (the request threw before the provider answered), and an operator
-  // reads the label as a diagnosis. Claiming a cause we do not have would be
-  // the same class of error this whole change exists to remove.
-  return { delivered: false, reason: result.reason ?? 'unknown' };
-}
+export {
+  describeWelcomeEmailDelivery,
+  type WelcomeEmailDelivery,
+  type WelcomeEmailFailureReason,
+} from '@/lib/admin/welcome-email-delivery';
 
 export async function grantYearlyMembership(params: {
   email: string;
@@ -227,7 +199,7 @@ export async function grantYearlyMembership(params: {
     appOrigin: params.appOrigin,
   });
 
-  const welcomeEmail = describeWelcomeEmailDelivery(emailResult);
+  const welcomeEmail = classifyWelcomeEmailDelivery(emailResult);
   if (!welcomeEmail.delivered) {
     // Kept as a server-side trace, but it is no longer the ONLY trace — the
     // caller now receives this and is expected to show it to the operator.

@@ -5,6 +5,11 @@ import { renderSVG } from 'uqr';
 
 import { ccwRoadshowEvents } from '@/lib/marketing/ccw-roadshow';
 import { ccwRoadshowAttendeeOffers } from '@/lib/marketing/ccw-roadshow-offers';
+import {
+  describeWelcomeEmailFailure,
+  WELCOME_EMAIL_RECOVERY,
+  type WelcomeEmailDelivery,
+} from '@/lib/admin/welcome-email-delivery';
 
 type RosterRow = {
   signInId: string;
@@ -264,9 +269,7 @@ export function AdminCcwSignInsClient() {
     // failed comp: the membership stands and must NOT be re-issued (that would
     // rotate the password again). It is a locked-out member, and the operator is
     // the only one positioned to notice.
-    const welcomeEmail = result.welcomeEmail as
-      | { delivered: boolean; reason: string | null }
-      | undefined;
+    const welcomeEmail = result.welcomeEmail as WelcomeEmailDelivery | undefined;
 
     window.alert(
       [
@@ -274,11 +277,15 @@ export function AdminCcwSignInsClient() {
         `Recorded at: ${result.priceLabel ?? `A$${raw}`}`,
         `Courses they can open: ${result.reachableCourseCount ?? 0} of ${result.publishedCourseCount ?? 0} published.`,
         '',
+        // The recovery line belongs on EVERY branch, including success. Delivered
+        // means the provider accepted the message, not that the attendee read
+        // it — a bounce or a spam folder leaves them locked out just the same,
+        // and the password exists nowhere else.
         welcomeEmail === undefined
-          ? 'Their password has been reset and exists only in the welcome email.'
+          ? `Their password has been reset and exists only in the welcome email. ${WELCOME_EMAIL_RECOVERY}`
           : welcomeEmail.delivered
-            ? 'The welcome email carrying their new password has been sent.'
-            : `WARNING: the welcome email was NOT delivered (${welcomeEmail.reason ?? 'unknown reason'}). Their password was reset and existed only in that email, so ${row.email} CANNOT sign in. Send a password reset — do NOT comp again.`,
+            ? `The welcome email carrying their new password has been sent. ${WELCOME_EMAIL_RECOVERY}`
+            : `WARNING: the welcome email was NOT delivered — ${describeWelcomeEmailFailure(welcomeEmail.reason)}. Their password was reset and existed only in that email, so ${row.email} CANNOT sign in. ${WELCOME_EMAIL_RECOVERY}`,
       ].join('\n')
     );
   }
