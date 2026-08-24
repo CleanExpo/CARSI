@@ -1,0 +1,22 @@
+-- Yearly membership: the record that makes an admin grant idempotent.
+--
+-- `grantYearlyMembership` ROTATES an existing member's password and reveals the
+-- new one only in the welcome email. Nothing stopped a second grant: a
+-- double-submit, a retry after a timeout, or two admins acting at once each
+-- rotated the password again, invalidating the credentials the previous email
+-- had just delivered. The CCW comp path has been guarded since
+-- 20260824143000_ccw_roadshow_membership_comp; this route had no guard at all.
+--
+-- Deliberately NOT the enrolment `paymentReference` proxy that the CCW migration
+-- rejected: a grant that creates no NEW enrolments writes no stamp, and a
+-- read-then-write cannot arbitrate a race.
+--
+-- Nullable and unindexed by design: claimed by a conditional UPDATE on the row's
+-- own primary key, so the claim is atomic without a separate table. Existing
+-- rows default to NULL = never granted by this path, which is true — and a NULL
+-- always admits the next grant, so no existing member is locked out by this.
+--
+-- The claim is a WINDOW, not a permanent lock. A yearly membership is renewed by
+-- design, so a grant older than the window is allowed through; only a repeat
+-- inside it is refused.
+ALTER TABLE "lms_users" ADD COLUMN "yearly_membership_granted_at" TIMESTAMPTZ(6);
