@@ -316,11 +316,13 @@ describe('describeWelcomeEmailDelivery — the password has one copy', () => {
     }
   });
 
-  it('never reports a null reason for a non-delivery', () => {
-    // `null` is reserved for success, so an unexplained failure must not borrow it.
+  it('labels an unexplained failure as unknown, not as a specific cause', () => {
+    // `null` is reserved for success, so an unexplained failure must not borrow
+    // it — and it must not borrow `send_failed` either, which names a specific
+    // cause (the request threw before the provider answered).
     expect(describeWelcomeEmailDelivery({ sent: false })).toEqual({
       delivered: false,
-      reason: 'send_failed',
+      reason: 'unknown',
     });
   });
 });
