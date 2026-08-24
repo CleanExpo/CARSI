@@ -1,0 +1,15 @@
+-- CCW/CARSI roadshow admin membership comp: the record that makes the comp
+-- idempotent.
+--
+-- Before this column the duplicate check inferred "already comped" from an
+-- enrolment carrying the `admin:yearly-membership:` payment reference. That was
+-- a proxy for a fact nothing recorded, and it had two holes: a comp that granted
+-- no NEW enrolments wrote no stamp at all (adminGrantEnrollment returns
+-- `already_enrolled` before it writes one), and a read-then-write cannot stop
+-- two comps issued at the same instant. Both matter because a repeat comp
+-- rotates the member's password and reveals it only in the welcome email.
+--
+-- Nullable and unindexed by design: it is claimed by a conditional UPDATE on the
+-- row's own primary key (set-if-null), so the claim is atomic without a separate
+-- table, and existing rows default to NULL = never comped, which is true.
+ALTER TABLE "ccw_roadshow_sign_ins" ADD COLUMN "membership_comped_at" TIMESTAMPTZ(6);

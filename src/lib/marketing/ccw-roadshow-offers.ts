@@ -7,11 +7,24 @@
  * welcome-email wiring is a later slice. Spec:
  * docs/specs/ccw-attendee-offers-day-gated-2026-07-15.md
  *
- * `carsi-membership` is still `live: false`: its delivery path — the
- * attendee-gated `POST /api/ccw/membership-checkout` of spec §10.3 — is not
- * built. `buildMembershipCheckoutParams` (`@/lib/server/ccw-membership-checkout`)
- * and `createCheckoutSession`'s `discounts` are the built half (§10.6); the route
- * itself is deferred to a judged sub-slice because it touches auth + live Stripe.
+ * `carsi-membership` has TWO delivery paths, and they are different instruments:
+ *
+ *  - Self-serve (spec §10, owner-chosen): a discounted `pro_annual` Stripe
+ *    SUBSCRIPTION — A$295 for the first year via a `duration: once` coupon, then
+ *    A$795 renewals. Built, at `POST /api/lms/subscription/checkout` with
+ *    `{ attendeeOffer: true }`, reached from `/subscribe?offer=ccw-attendee`.
+ *    (§10.3 named a `POST /api/ccw/membership-checkout` route; that path was
+ *    never built and is not needed — the attendee branch of the existing
+ *    subscription checkout is where this actually lives.)
+ *  - Admin comp: `POST /api/admin/ccw-roadshow/comp-membership`, which grants a
+ *    year outright via `grantYearlyMembership` for a named attendee. NO Stripe
+ *    subscription, so no renewal — see that route's service for why the two must
+ *    never be swapped for one another.
+ *
+ * Still `live: false`: the self-serve path needs `CCW_MEMBERSHIP_COUPON_ID` set
+ * in Stripe (`duration: once`, `amount_off` 50000) or it returns 503 rather than
+ * charging full price against a A$295 promise. The admin comp path does not
+ * depend on that flag or on Stripe at all.
  */
 import { ccwRoadshowEvents, type CcwRoadshowEvent } from './ccw-roadshow';
 
