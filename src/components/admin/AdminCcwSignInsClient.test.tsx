@@ -222,7 +222,11 @@ describe('AdminCcwSignInsClient comp membership action', () => {
     // Resolved in the viewer's timezone, not sliced from the UTC ISO string: a
     // comp stamped 04:15Z is the 24th in UTC but already the 24th afternoon in
     // Melbourne, and an operator reconciles against the local date.
-    const localDate = new Date('2026-08-24T04:15:00.000Z').toLocaleDateString('en-AU');
+    const localDate = new Date('2026-08-24T04:15:00.000Z').toLocaleDateString('en-AU', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    });
     expect(container.textContent).toContain(`Comped ${localDate}`);
   });
 

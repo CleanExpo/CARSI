@@ -54,6 +54,13 @@ const attendeeRateAud = (() => {
   return typeof offer?.membershipPriceAud === 'number' ? offer.membershipPriceAud : null;
 })();
 
+/** Named month — unambiguous to any reader, unlike a numeric day/month order. */
+const COMPED_DATE_FORMAT: Intl.DateTimeFormatOptions = {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+};
+
 /** Money, so: digits with at most two decimal places. Rejects negatives and junk. */
 const PRICE_PATTERN = /^\d+(\.\d{1,2})?$/;
 
@@ -64,18 +71,22 @@ const PRICE_PATTERN = /^\d+(\.\d{1,2})?$/;
  * `toLocaleDateString` resolves the date in the VIEWER'S TIMEZONE, which is what
  * fixes that.
  *
- * The LOCALE is pinned to en-AU deliberately, and is not an oversight to
- * "correct" to the viewer's own. CARSI operates in Australia; left to each
- * viewer's locale, 09/08 reads as 8 September to one operator and 9 August to
- * another, on a record that may have to be reconciled against a payment. A
- * fixed day/month order costs nothing and removes the ambiguity.
+ * The FORMAT is deliberate and is not an oversight to "correct" to the viewer's
+ * own locale. A purely numeric date is ambiguous across locales — 09/08 reads as
+ * 8 September to one operator and 9 August to another — and this is a record
+ * that may be reconciled against a payment. Naming the month removes that
+ * ambiguity for every reader regardless of locale, which a viewer-locale numeric
+ * date would not: it would make each operator's screen self-consistent while
+ * leaving any two of them unable to agree on what a shared roster says.
  *
  * Safe from hydration mismatch either way: the roster only ever arrives
  * client-side, after mount, so this never renders on the server.
  */
 function formatCompedDate(iso: string): string {
   const parsed = new Date(iso);
-  return Number.isNaN(parsed.getTime()) ? iso.slice(0, 10) : parsed.toLocaleDateString('en-AU');
+  return Number.isNaN(parsed.getTime())
+    ? iso.slice(0, 10)
+    : parsed.toLocaleDateString('en-AU', COMPED_DATE_FORMAT);
 }
 
 export function AdminCcwSignInsClient() {
