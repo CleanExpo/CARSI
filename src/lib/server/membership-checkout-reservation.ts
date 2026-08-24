@@ -1,29 +1,28 @@
 /**
- * Per-learner checkout reservation — closes the concurrent-first-purchase race
- * on `POST /api/lms/subscription/checkout`.
+ * Per-payer checkout reservations — close the concurrent-first-purchase race on
+ * all three subscription checkout routes (individual, teams, org).
  *
- * `membershipCheckoutDecisionFor` stops a learner who ALREADY holds a membership
- * from opening a second checkout. It cannot stop two requests that arrive
- * together from a learner who holds none: both read "no row", both are allowed,
- * both open a Stripe Checkout Session. If the learner pays both, Stripe bills
- * two subscriptions and the second webhook UPSERTS onto the same
- * `LmsSubscription` row (`userId` is `@unique`) — so CARSI keeps one row, Stripe
- * keeps two charges, and nothing downstream can see the difference. Reported by
- * CodeRabbit on #696; the fix has to be atomic, because a read cannot arbitrate
- * between two callers who both read the same "absent".
+ * The duplicate-membership guard stops a payer who ALREADY holds a live
+ * subscription from opening a second checkout. It cannot stop two requests that
+ * arrive together from a payer who holds none: both read "no row", both are
+ * allowed, both open a Stripe Checkout Session. Pay both and Stripe bills twice
+ * while the second webhook upserts onto the same row (`userId` / `teamId` are
+ * `@unique`) — one row here, two charges there, and nothing downstream able to
+ * see the difference. Reported by CodeRabbit on #696.
  *
- * The atomic primitive is the `userId` unique constraint itself. A reservation
- * is a real `LmsSubscription` row written BEFORE Stripe is called, carrying
+ * A read cannot arbitrate between two callers who read the same absence, so the
+ * atomic primitive is the unique constraint itself: a reservation is a real
+ * subscription row written BEFORE Stripe is called, carrying
  * `status: 'checkout_pending'`. Whoever wins the insert owns the checkout; the
  * loser gets `busy`. No new table, no migration, no advisory lock.
  *
- * `checkout_pending` is NOT a Stripe status and must never be treated as one:
- * `decideMembershipEntitlement` maps it to "no membership at all", so a
- * reservation grants nothing, reports nothing, and blocks no future purchase.
+ * `checkout_pending` is NOT a Stripe status. `decideMembershipEntitlement` maps
+ * it to "no membership at all", and the teams and org entitlement paths reuse
+ * that same decision verbatim — so one branch covers all three products.
  *
  * The two TTLs are deliberately paired, not independently tuned:
  *
- *   session (35 min)  ├────────────────────────┤ Stripe refuses payment after this
+ *   session (35 min)     ├────────────────────────┤ Stripe refuses payment after this
  *   reservation (40 min) ├──────────────────────────┤ only now may another take over
  *
  * The Checkout Session is created with `expires_at`, so by the time a
@@ -33,11 +32,9 @@
  * very duplicate this module exists to prevent. Change one, change the other.
  */
 import { prisma } from '@/lib/prisma';
-// Defined in `entitlements` so that module — which avoids importing prisma at
-// module scope — can recognise the marker without pulling this one in.
-// Deliberately NOT one of Stripe's subscription statuses.
-export { CHECKOUT_RESERVATION_STATUS } from '@/lib/server/entitlements';
-import { CHECKOUT_RESERVATION_STATUS } from '@/lib/server/entitlements';
+import { CHECKOUT_RESERVATION_STATUS, PAST_DUE_GRACE_DAYS } from '@/lib/server/entitlements';
+
+export { CHECKOUT_RESERVATION_STATUS };
 
 /**
  * How long the Stripe Checkout Session stays payable. Stripe's floor is 30
@@ -55,7 +52,7 @@ export const CHECKOUT_RESERVATION_TTL_MS = 40 * 60 * 1000;
 export type ReservationOutcome =
   /** This request owns the checkout. */
   | 'reserved'
-  /** Someone else holds a live reservation, or a real membership appeared. */
+  /** A live subscription or another request's fresh reservation holds the row. */
   | 'busy'
   /** The database could not answer. Fail closed: open no checkout. */
   | 'unavailable';
@@ -74,75 +71,259 @@ function isUniqueConstraintViolation(error: unknown): boolean {
 }
 
 /**
- * Claim the right to open a checkout for this learner.
+ * Which existing rows a new checkout may claim.
  *
- * Fails closed on every uncertainty — a lookup that throws returns
- * `unavailable`, never `reserved`.
+ * The insert only fails when a row already exists, and that row is one of three
+ * things: a LIVE subscription (never claimable — that is the duplicate we are
+ * preventing), another request's FRESH reservation (not yet claimable), or a
+ * row the payer is entitled to buy their way out of — a stale reservation, a
+ * cancelled/unpaid/expired membership, an abandoned `incomplete` checkout, or a
+ * past-due one beyond its grace window.
+ *
+ * That last group matters more than it looks: without it a learner whose
+ * membership was ever cancelled could NEVER re-subscribe, because their old row
+ * would fail every insert and match no takeover. The duplicate-membership guard
+ * deliberately lets those states through, so the reservation must too, or the
+ * two disagree and the guard's permission is meaningless.
+ *
+ * The liveness rule is expressed here as a query rather than delegated to
+ * `decideMembershipEntitlement`, because it has to run INSIDE the atomic UPDATE
+ * — a read-then-decide would reopen the race this module exists to close. It is
+ * written as an allow-list of provably-not-live states (never a deny-list of
+ * live ones), so an unrecognised or oddly-cased status is left alone rather than
+ * stolen: unknown means refuse, not proceed.
  */
-export async function reserveMembershipCheckout(
-  userId: string,
-  now: Date = new Date(),
-): Promise<ReservationOutcome> {
-  if (!userId?.trim() || !process.env.DATABASE_URL?.trim()) {
-    return 'unavailable';
-  }
+function claimableWhere(now: Date) {
+  const staleBefore = new Date(now.getTime() - CHECKOUT_RESERVATION_TTL_MS);
+  const graceCutoff = new Date(now.getTime() - PAST_DUE_GRACE_DAYS * 24 * 60 * 60 * 1000);
 
+  return {
+    OR: [
+      // Another checkout that was started and abandoned long enough ago that its
+      // Stripe session has expired.
+      { status: CHECKOUT_RESERVATION_STATUS, updatedAt: { lt: staleBefore } },
+      // Terminal states, plus a checkout that was never paid for.
+      { status: { in: ['canceled', 'unpaid', 'incomplete_expired', 'incomplete'] } },
+      // Past due with no known period end cannot be proven inside grace, and
+      // `decideMembershipEntitlement` already treats it as lapsed.
+      { status: 'past_due', currentPeriodEnd: null },
+      { status: 'past_due', currentPeriodEnd: { lt: graceCutoff } },
+    ],
+  };
+}
+
+/**
+ * What a takeover must write to detach the row from the subscription it used to
+ * describe. Reported by Cursor Bugbot on #699, and correct: claiming a LAPSED
+ * row (rather than only a stale reservation) means the row can still carry the
+ * old `stripeSubscriptionId`, and two webhook paths would then quietly undo the
+ * reservation.
+ *
+ *  - `markSubscriptionStatusBySubscriptionId` updates by `stripeSubscriptionId`
+ *    with no status filter and no ordering guard, so ANY late event for the old
+ *    subscription overwrites `checkout_pending`. Nulling the id severs that.
+ *  - `upsertSubscription` discards a snapshot only when the stored
+ *    `statusEventAt` is NEWER than the event. Stamping it with the takeover time
+ *    makes every event predating this claim stale, while the new subscription's
+ *    own events — which are necessarily later — still apply.
+ *
+ * The earlier `statusEventAt: null` was actively wrong here: "always
+ * overwritable" is the right posture for a webhook write and the wrong one for a
+ * claim that has to survive until checkout completes.
+ *
+ * Cost, accepted: a refund or dispute event arriving later for the OLD
+ * subscription can no longer resolve this row by id. That row was already
+ * terminal — which is why it was claimable — so the revocation it would trigger
+ * is a no-op in practice.
+ */
+function severOldSubscription(now: Date) {
+  return { stripeSubscriptionId: null, statusEventAt: now };
+}
+
+/**
+ * The shared claim algorithm. Callers supply typed Prisma calls for their own
+ * table, so the three products share this logic without any casting.
+ */
+async function claimCheckout(
+  ops: {
+    insert: () => Promise<unknown>;
+    takeOver: (claimable: ReturnType<typeof claimableWhere>) => Promise<number>;
+  },
+  now: Date,
+): Promise<ReservationOutcome> {
   try {
-    await prisma.lmsSubscription.create({
-      data: { userId, status: CHECKOUT_RESERVATION_STATUS },
-    });
+    await ops.insert();
     return 'reserved';
   } catch (error) {
     if (!isUniqueConstraintViolation(error)) {
-      console.error('[subscription/checkout] reservation insert failed:', error);
+      console.error('[checkout-reservation] insert failed:', error);
       return 'unavailable';
     }
   }
 
-  // A row already exists. It may be a real membership (the guard's job, and a
-  // webhook may have landed since it ran) or another request's reservation —
-  // both mean "not ours". Only a reservation past its TTL may be taken over.
-  //
-  // The takeover is a single conditional UPDATE, so it is the database, not this
-  // process, that decides the winner: under READ COMMITTED a second caller
-  // blocks on the row lock, then re-evaluates `updatedAt` against the value the
-  // winner just wrote and matches nothing.
+  // A row already exists. The takeover is a single conditional UPDATE, so it is
+  // the database — not this process — that decides the winner: under READ
+  // COMMITTED a second caller blocks on the row lock, then re-evaluates the
+  // WHERE against what the winner just wrote and matches nothing.
   try {
-    const staleBefore = new Date(now.getTime() - CHECKOUT_RESERVATION_TTL_MS);
-    const { count } = await prisma.lmsSubscription.updateMany({
-      where: {
-        userId,
-        status: CHECKOUT_RESERVATION_STATUS,
-        updatedAt: { lt: staleBefore },
-      },
-      // Rewriting the same status is the point: `@updatedAt` restamps the row,
-      // which is what makes this reservation fresh and the next one wait.
-      data: { status: CHECKOUT_RESERVATION_STATUS, statusEventAt: null },
-    });
+    const count = await ops.takeOver(claimableWhere(now));
     return count === 1 ? 'reserved' : 'busy';
   } catch (error) {
-    console.error('[subscription/checkout] reservation takeover failed:', error);
+    console.error('[checkout-reservation] takeover failed:', error);
     return 'unavailable';
   }
 }
 
-/**
- * Give the reservation back when the checkout could not be opened, so the
- * learner can retry immediately instead of waiting out the TTL.
- *
- * Scoped to `status: CHECKOUT_RESERVATION_STATUS`, so it can never delete a real
- * membership — including one a webhook wrote in between. Best effort: a failure
- * to release is logged and swallowed, because the TTL already bounds the damage
- * and the caller is usually already handling an error.
- */
-export async function releaseMembershipCheckout(userId: string): Promise<void> {
-  if (!userId?.trim() || !process.env.DATABASE_URL?.trim()) return;
+function unusable(id: string): boolean {
+  return !id?.trim() || !process.env.DATABASE_URL?.trim();
+}
 
+/* ------------------------------------------------------------------ */
+/* Individual membership — keyed on LmsSubscription.userId            */
+/* ------------------------------------------------------------------ */
+
+export async function reserveMembershipCheckout(
+  userId: string,
+  now: Date = new Date(),
+): Promise<ReservationOutcome> {
+  if (unusable(userId)) return 'unavailable';
+
+  return claimCheckout(
+    {
+      insert: () =>
+        prisma.lmsSubscription.create({
+          data: { userId, status: CHECKOUT_RESERVATION_STATUS, statusEventAt: now },
+        }),
+      takeOver: async (claimable) => {
+        const { count } = await prisma.lmsSubscription.updateMany({
+          where: { userId, ...claimable },
+          data: { status: CHECKOUT_RESERVATION_STATUS, ...severOldSubscription(now) },
+        });
+        return count;
+      },
+    },
+    now,
+  );
+}
+
+export async function releaseMembershipCheckout(userId: string): Promise<void> {
+  if (unusable(userId)) return;
   try {
     await prisma.lmsSubscription.deleteMany({
       where: { userId, status: CHECKOUT_RESERVATION_STATUS },
     });
   } catch (error) {
-    console.error('[subscription/checkout] reservation release failed:', error);
+    console.error('[checkout-reservation] release failed:', error);
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Teams seat subscription — keyed on LmsTeamSubscription.teamId      */
+/* ------------------------------------------------------------------ */
+
+export async function reserveTeamCheckout(
+  teamId: string,
+  now: Date = new Date(),
+): Promise<ReservationOutcome> {
+  if (unusable(teamId)) return 'unavailable';
+
+  return claimCheckout(
+    {
+      insert: () =>
+        prisma.lmsTeamSubscription.create({
+          // seatLimit 0 until Stripe confirms the paid quantity — a reservation
+          // must never hand out seats.
+          data: {
+            teamId,
+            status: CHECKOUT_RESERVATION_STATUS,
+            seatLimit: 0,
+            statusEventAt: now,
+          },
+        }),
+      takeOver: async (claimable) => {
+        const { count } = await prisma.lmsTeamSubscription.updateMany({
+          where: { teamId, ...claimable },
+          data: {
+            status: CHECKOUT_RESERVATION_STATUS,
+            seatLimit: 0,
+            ...severOldSubscription(now),
+          },
+        });
+        return count;
+      },
+    },
+    now,
+  );
+}
+
+export async function releaseTeamCheckout(teamId: string): Promise<void> {
+  if (unusable(teamId)) return;
+  try {
+    await prisma.lmsTeamSubscription.deleteMany({
+      where: { teamId, status: CHECKOUT_RESERVATION_STATUS },
+    });
+  } catch (error) {
+    console.error('[checkout-reservation] team release failed:', error);
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Org monthly subscription — keyed on LmsOrgSubscription.teamId      */
+/* ------------------------------------------------------------------ */
+
+export async function reserveOrgCheckout(
+  params: {
+    teamId: string;
+    organisationName: string;
+    contactEmail: string;
+    entitledCategory?: string;
+  },
+  now: Date = new Date(),
+): Promise<ReservationOutcome> {
+  if (unusable(params.teamId)) return 'unavailable';
+
+  const details = {
+    organisationName: params.organisationName.slice(0, 255),
+    contactEmail: params.contactEmail.trim().toLowerCase(),
+    ...(params.entitledCategory ? { entitledCategory: params.entitledCategory } : {}),
+  };
+
+  return claimCheckout(
+    {
+      insert: () =>
+        prisma.lmsOrgSubscription.create({
+          data: {
+            teamId: params.teamId,
+            status: CHECKOUT_RESERVATION_STATUS,
+            seatModel: 'unlimited',
+            stripeSubscriptionId: null,
+            statusEventAt: now,
+            ...details,
+          },
+        }),
+      takeOver: async (claimable) => {
+        const { count } = await prisma.lmsOrgSubscription.updateMany({
+          where: { teamId: params.teamId, ...claimable },
+          data: {
+            status: CHECKOUT_RESERVATION_STATUS,
+            ...severOldSubscription(now),
+            ...details,
+          },
+        });
+        return count;
+      },
+    },
+    now,
+  );
+}
+
+export async function releaseOrgCheckout(teamId: string): Promise<void> {
+  if (unusable(teamId)) return;
+  try {
+    await prisma.lmsOrgSubscription.deleteMany({
+      where: { teamId, status: CHECKOUT_RESERVATION_STATUS },
+    });
+  } catch (error) {
+    console.error('[checkout-reservation] org release failed:', error);
   }
 }
