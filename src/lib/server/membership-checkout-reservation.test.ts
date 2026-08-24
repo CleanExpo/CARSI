@@ -88,7 +88,7 @@ describe('reserveMembershipCheckout', () => {
   it('claims the checkout by inserting the reservation row', async () => {
     await expect(reserveMembershipCheckout('user-1', NOW)).resolves.toBe('reserved');
     expect(mocks.create).toHaveBeenCalledWith({
-      data: { userId: 'user-1', status: CHECKOUT_RESERVATION_STATUS },
+      data: { userId: 'user-1', status: CHECKOUT_RESERVATION_STATUS, statusEventAt: NOW },
     });
     expect(mocks.updateMany).not.toHaveBeenCalled();
   });
@@ -140,7 +140,8 @@ describe('reserveMembershipCheckout', () => {
     // racer take the same stale reservation.
     expect(mocks.updateMany.mock.calls[0][0].data).toEqual({
       status: CHECKOUT_RESERVATION_STATUS,
-      statusEventAt: null,
+      stripeSubscriptionId: null,
+      statusEventAt: NOW,
     });
   });
 
@@ -245,7 +246,12 @@ describe('reserveTeamCheckout', () => {
     await expect(reserveTeamCheckout('team-1', NOW)).resolves.toBe('reserved');
 
     expect(mocks.teamCreate).toHaveBeenCalledWith({
-      data: { teamId: 'team-1', status: CHECKOUT_RESERVATION_STATUS, seatLimit: 0 },
+      data: {
+        teamId: 'team-1',
+        status: CHECKOUT_RESERVATION_STATUS,
+        seatLimit: 0,
+        statusEventAt: NOW,
+      },
     });
   });
 
@@ -325,5 +331,70 @@ describe('reserveOrgCheckout', () => {
     expect(mocks.orgDeleteMany).toHaveBeenCalledWith({
       where: { teamId: 'team-1', status: CHECKOUT_RESERVATION_STATUS },
     });
+  });
+});
+
+
+describe('a takeover detaches the row from the subscription it used to describe', () => {
+  it.each([
+    ['individual', () => reserveMembershipCheckout('user-1', NOW), () => mocks.updateMany],
+    ['team', () => reserveTeamCheckout('team-1', NOW), () => mocks.teamUpdateMany],
+    [
+      'org',
+      () =>
+        reserveOrgCheckout(
+          { teamId: 'team-1', organisationName: 'Acme', contactEmail: 'o@example.test' },
+          NOW,
+        ),
+      () => mocks.orgUpdateMany,
+    ],
+  ])('nulls the old stripeSubscriptionId on the %s path', async (_label, run, updater) => {
+    // `markSubscriptionStatusBySubscriptionId` updates by stripeSubscriptionId
+    // with no status filter and no ordering guard, so leaving the old id on the
+    // row lets ANY late event for the old subscription overwrite the claim —
+    // dropping the reservation and reopening the duplicate checkout.
+    mocks.create.mockRejectedValue(uniqueViolation());
+    mocks.teamCreate.mockRejectedValue(uniqueViolation());
+    mocks.orgCreate.mockRejectedValue(uniqueViolation());
+    mocks.updateMany.mockResolvedValue({ count: 1 });
+    mocks.teamUpdateMany.mockResolvedValue({ count: 1 });
+    mocks.orgUpdateMany.mockResolvedValue({ count: 1 });
+
+    await run();
+
+    expect(updater().mock.calls[0][0].data.stripeSubscriptionId).toBeNull();
+  });
+
+  it.each([
+    ['individual', () => reserveMembershipCheckout('user-1', NOW), () => mocks.updateMany],
+    ['team', () => reserveTeamCheckout('team-1', NOW), () => mocks.teamUpdateMany],
+    [
+      'org',
+      () =>
+        reserveOrgCheckout(
+          { teamId: 'team-1', organisationName: 'Acme', contactEmail: 'o@example.test' },
+          NOW,
+        ),
+      () => mocks.orgUpdateMany,
+    ],
+  ])('stamps statusEventAt so older events lose, on the %s path', async (_label, run, updater) => {
+    // `null` here would mean "always overwritable" — the right posture for a
+    // webhook write, the wrong one for a claim that must survive checkout.
+    mocks.create.mockRejectedValue(uniqueViolation());
+    mocks.teamCreate.mockRejectedValue(uniqueViolation());
+    mocks.orgCreate.mockRejectedValue(uniqueViolation());
+    mocks.updateMany.mockResolvedValue({ count: 1 });
+    mocks.teamUpdateMany.mockResolvedValue({ count: 1 });
+    mocks.orgUpdateMany.mockResolvedValue({ count: 1 });
+
+    await run();
+
+    expect(updater().mock.calls[0][0].data.statusEventAt).toEqual(NOW);
+  });
+
+  it('stamps statusEventAt on a fresh insert too', async () => {
+    await reserveMembershipCheckout('user-1', NOW);
+
+    expect(mocks.create.mock.calls[0][0].data.statusEventAt).toEqual(NOW);
   });
 });

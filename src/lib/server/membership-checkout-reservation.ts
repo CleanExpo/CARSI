@@ -113,6 +113,34 @@ function claimableWhere(now: Date) {
 }
 
 /**
+ * What a takeover must write to detach the row from the subscription it used to
+ * describe. Reported by Cursor Bugbot on #699, and correct: claiming a LAPSED
+ * row (rather than only a stale reservation) means the row can still carry the
+ * old `stripeSubscriptionId`, and two webhook paths would then quietly undo the
+ * reservation.
+ *
+ *  - `markSubscriptionStatusBySubscriptionId` updates by `stripeSubscriptionId`
+ *    with no status filter and no ordering guard, so ANY late event for the old
+ *    subscription overwrites `checkout_pending`. Nulling the id severs that.
+ *  - `upsertSubscription` discards a snapshot only when the stored
+ *    `statusEventAt` is NEWER than the event. Stamping it with the takeover time
+ *    makes every event predating this claim stale, while the new subscription's
+ *    own events — which are necessarily later — still apply.
+ *
+ * The earlier `statusEventAt: null` was actively wrong here: "always
+ * overwritable" is the right posture for a webhook write and the wrong one for a
+ * claim that has to survive until checkout completes.
+ *
+ * Cost, accepted: a refund or dispute event arriving later for the OLD
+ * subscription can no longer resolve this row by id. That row was already
+ * terminal — which is why it was claimable — so the revocation it would trigger
+ * is a no-op in practice.
+ */
+function severOldSubscription(now: Date) {
+  return { stripeSubscriptionId: null, statusEventAt: now };
+}
+
+/**
  * The shared claim algorithm. Callers supply typed Prisma calls for their own
  * table, so the three products share this logic without any casting.
  */
@@ -164,15 +192,12 @@ export async function reserveMembershipCheckout(
     {
       insert: () =>
         prisma.lmsSubscription.create({
-          data: { userId, status: CHECKOUT_RESERVATION_STATUS },
+          data: { userId, status: CHECKOUT_RESERVATION_STATUS, statusEventAt: now },
         }),
       takeOver: async (claimable) => {
         const { count } = await prisma.lmsSubscription.updateMany({
           where: { userId, ...claimable },
-          // Restamping `updatedAt` (via `@updatedAt`) is what makes this
-          // reservation fresh and the next caller wait. `statusEventAt: null`
-          // keeps the row unconditionally overwritable by the real webhook.
-          data: { status: CHECKOUT_RESERVATION_STATUS, statusEventAt: null },
+          data: { status: CHECKOUT_RESERVATION_STATUS, ...severOldSubscription(now) },
         });
         return count;
       },
@@ -208,12 +233,21 @@ export async function reserveTeamCheckout(
         prisma.lmsTeamSubscription.create({
           // seatLimit 0 until Stripe confirms the paid quantity — a reservation
           // must never hand out seats.
-          data: { teamId, status: CHECKOUT_RESERVATION_STATUS, seatLimit: 0 },
+          data: {
+            teamId,
+            status: CHECKOUT_RESERVATION_STATUS,
+            seatLimit: 0,
+            statusEventAt: now,
+          },
         }),
       takeOver: async (claimable) => {
         const { count } = await prisma.lmsTeamSubscription.updateMany({
           where: { teamId, ...claimable },
-          data: { status: CHECKOUT_RESERVATION_STATUS, seatLimit: 0, statusEventAt: null },
+          data: {
+            status: CHECKOUT_RESERVATION_STATUS,
+            seatLimit: 0,
+            ...severOldSubscription(now),
+          },
         });
         return count;
       },
@@ -263,13 +297,18 @@ export async function reserveOrgCheckout(
             status: CHECKOUT_RESERVATION_STATUS,
             seatModel: 'unlimited',
             stripeSubscriptionId: null,
+            statusEventAt: now,
             ...details,
           },
         }),
       takeOver: async (claimable) => {
         const { count } = await prisma.lmsOrgSubscription.updateMany({
           where: { teamId: params.teamId, ...claimable },
-          data: { status: CHECKOUT_RESERVATION_STATUS, statusEventAt: null, ...details },
+          data: {
+            status: CHECKOUT_RESERVATION_STATUS,
+            ...severOldSubscription(now),
+            ...details,
+          },
         });
         return count;
       },
