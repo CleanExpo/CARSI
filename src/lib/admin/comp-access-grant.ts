@@ -76,9 +76,35 @@ export function deniedPublishedCourses<T extends EnrolmentAccessRow>(
   denied: readonly T[],
   publishedSlugs: Iterable<string>
 ): T[] {
+  return publishedCourseAccess(denied, publishedSlugs).denied;
+}
+
+/**
+ * Split a learner's enrolments into the published courses they can actually reach and the
+ * published courses they cannot, judged with the WS3 predicate.
+ *
+ * `reachable` is ground truth rather than arithmetic. Counting "granted + already enrolled"
+ * overstates access, because `adminGrantEnrollment` reports a revoked row as `already_enrolled`
+ * — so any figure derived from those tallies (a total, an email's course count) can promise
+ * courses the gates deny. Ask the rows.
+ *
+ * Enrolments on courses that are not currently published are excluded from BOTH sides: they are
+ * neither part of what a membership offers today nor a failure it can remediate.
+ */
+export function publishedCourseAccess<T extends EnrolmentAccessRow>(
+  rows: readonly T[],
+  publishedSlugs: Iterable<string>
+): { reachable: T[]; denied: T[] } {
   const normalise = (slug: string) => slug.trim().toLowerCase();
   const published = new Set([...publishedSlugs].map(normalise));
-  return denied.filter((row) => published.has(normalise(row.course.slug)));
+
+  const reachable: T[] = [];
+  const denied: T[] = [];
+  for (const row of rows) {
+    if (!published.has(normalise(row.course.slug))) continue;
+    (isEnrolmentAccessAllowed(row.status) ? reachable : denied).push(row);
+  }
+  return { reachable, denied };
 }
 
 /** Tally of one grant run, as the per-course loop accumulates it. */
