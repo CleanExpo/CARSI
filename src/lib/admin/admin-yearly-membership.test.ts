@@ -20,6 +20,8 @@ const state = vi.hoisted(() => ({
   /** Slugs already enrolled (any status) — these return `already_enrolled`. */
   existingSlugs: new Set<string>(),
   sentEmails: [] as { to: string; courseCount: number }[],
+  /** Every `lmsUser.update` payload, in order — credential mutations show up here. */
+  userUpdates: [] as Record<string, unknown>[],
 }));
 
 vi.mock('@/lib/prisma', () => ({
@@ -37,7 +39,10 @@ vi.mock('@/lib/prisma', () => ({
         };
         return state.user;
       }),
-      update: vi.fn(async () => state.user),
+      update: vi.fn(async (args: { data: Record<string, unknown> }) => {
+        state.userUpdates.push(args.data);
+        return state.user;
+      }),
     },
   },
 }));
@@ -95,6 +100,7 @@ beforeEach(() => {
   state.failSlugs = new Set();
   state.existingSlugs = new Set();
   state.sentEmails = [];
+  state.userUpdates = [];
 });
 
 describe('grantYearlyMembership — course count promised to the member', () => {
@@ -177,6 +183,63 @@ describe('grantYearlyMembership — course count promised to the member', () => 
 
     expect(result.reachableCourseCount).toBe(1);
     expect(result.deniedCourseSlugs).toEqual([]); // retired course is not this grant's problem
+    expect(state.sentEmails[0].courseCount).toBe(1);
+  });
+});
+
+describe('grantYearlyMembership — an existing member must not be locked out', () => {
+  const existingMember = () => {
+    state.user = {
+      id: 'usr',
+      email: 'member@example.com',
+      fullName: 'A Member',
+      isActive: true,
+    };
+  };
+
+  // REGRESSION (CodeRabbit, PR #694): this function resets an existing member's password to a
+  // fresh temporary one and only reveals it in the welcome email. Rotating it before a possible
+  // throw changes the password to a value nobody receives — the member loses an account that
+  // previously worked. Widening the throw to cover all-revoked made that reachable.
+  it('does not touch the password when the grant reaches nothing and throws', async () => {
+    existingMember();
+    catalogue(['water', 'mould'], { water: 'revoked', mould: 'revoked' });
+    state.existingSlugs = new Set(['water', 'mould']);
+
+    await expect(grant()).rejects.toThrow('ENROLLMENT_FAILED');
+    expect(state.userUpdates).toHaveLength(0);
+    expect(state.sentEmails).toHaveLength(0);
+  });
+
+  it('does not touch the password when every grant throws', async () => {
+    existingMember();
+    state.courses = [{ slug: 'water' }];
+    state.enrolments = [];
+    state.failSlugs = new Set(['water']);
+
+    await expect(grant()).rejects.toThrow('ENROLLMENT_FAILED');
+    expect(state.userUpdates).toHaveLength(0);
+  });
+
+  it('rotates the password once the grant succeeds, alongside the email carrying it', async () => {
+    existingMember();
+    catalogue(['water', 'mould']);
+
+    await grant();
+
+    expect(state.userUpdates).toHaveLength(1);
+    expect(state.userUpdates[0]).toMatchObject({ hashedPassword: 'hashed', isActive: true });
+    expect(state.sentEmails).toHaveLength(1);
+  });
+
+  it('still rotates when only some courses are denied — the member keeps a usable login', async () => {
+    existingMember();
+    catalogue(['water', 'mould'], { mould: 'revoked' });
+    state.existingSlugs = new Set(['mould']);
+
+    await grant();
+
+    expect(state.userUpdates).toHaveLength(1);
     expect(state.sentEmails[0].courseCount).toBe(1);
   });
 });

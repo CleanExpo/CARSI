@@ -70,11 +70,21 @@ export async function grantYearlyMembership(params: {
   const hashedPassword = await hashPassword(temporaryPassword);
   const displayName = params.fullName?.trim() || email.split('@')[0] || 'Learner';
 
-  let user = await prisma.lmsUser.findUnique({ where: { email } });
-  let accountCreated = false;
+  const existing = await prisma.lmsUser.findUnique({ where: { email } });
+  const accountCreated = !existing;
 
-  if (!user) {
-    user = await prisma.lmsUser.create({
+  // An EXISTING member's credentials are deliberately left alone until the grant is known to
+  // succeed. This function resets the password to a fresh temporary one and only reveals it in
+  // the welcome email — so mutating it before a possible throw would change the password to a
+  // value nobody receives and lock a member out of an account that previously worked. The reset
+  // happens after the reachability check below.
+  //
+  // A NEW account is created up front because the enrolment loop needs its id, and there is no
+  // prior access to lose: if the grant then throws, the row is inert and a later successful run
+  // picks it up through this same path and mails out a password.
+  let user =
+    existing ??
+    (await prisma.lmsUser.create({
       data: {
         id: randomUUID(),
         email,
@@ -83,18 +93,7 @@ export async function grantYearlyMembership(params: {
         isActive: true,
         isVerified: false,
       },
-    });
-    accountCreated = true;
-  } else {
-    user = await prisma.lmsUser.update({
-      where: { id: user.id },
-      data: {
-        hashedPassword,
-        ...(params.fullName?.trim() ? { fullName: params.fullName.trim() } : {}),
-        isActive: true,
-      },
-    });
-  }
+    }));
 
   let coursesGranted = 0;
   let alreadyEnrolled = 0;
@@ -135,10 +134,23 @@ export async function grantYearlyMembership(params: {
     throw new Error('ENROLLMENT_FAILED');
   }
 
+  // Safe to rotate credentials now: the only remaining step is the email that carries them.
+  if (existing) {
+    user = await prisma.lmsUser.update({
+      where: { id: existing.id },
+      data: {
+        hashedPassword,
+        ...(params.fullName?.trim() ? { fullName: params.fullName.trim() } : {}),
+        isActive: true,
+      },
+    });
+  }
+
   if (deniedCourseSlugs.length > 0) {
+    // Identified by id, not email — the surrounding logs do not carry member addresses.
     console.warn(
       '[yearly-membership] granted with courses the read gates deny',
-      email,
+      user.id,
       deniedCourseSlugs
     );
   }
