@@ -37,10 +37,18 @@ export type CcwAttendeeOffer = {
 };
 
 /**
- * Shipped config — all three offers DARK (`live: false`) at ship time. Each is
- * flipped to `live: true` only when its dependency lands (permanent CCW URL from
- * Toby; Rana's membership price; RA mechanism). No URLs are baked in yet, so
- * nothing can accidentally ship a temporary preview link.
+ * Shipped config — the two remaining attendee offers.
+ *
+ * `ccw-store-credit` is LIVE: its dependency was the permanent CCW product URL
+ * from Toby, verified on the ccwonline.com.au custom domain 2026-07-15.
+ * `ra-setup` is still dark, waiting on the RestoreAssist mechanism.
+ *
+ * There is no third offer. `carsi-membership` was removed with the A$295
+ * attendee discount on 2026-08-25, so "Rana's membership price" is no longer a
+ * dependency of anything here — do not restore an offer on the strength of it.
+ *
+ * An offer is flipped to `live: true` only when its dependency lands, and no
+ * preview URL is ever baked in, so a temporary link cannot ship by accident.
  */
 export const ccwRoadshowAttendeeOffers: CcwAttendeeOffer[] = [
   {
