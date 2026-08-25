@@ -1,14 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 
 import { apiClient, ApiClientError } from '@/lib/api/client';
-import {
-  CCW_ATTENDEE_MEMBERSHIP_LABEL,
-  CCW_ATTENDEE_OFFER_QUERY,
-} from '@/lib/marketing/ccw-roadshow-offer-pack';
 import type { MembershipDecisionReason } from '@/lib/server/entitlements';
 
 interface CheckoutResponse {
@@ -20,7 +15,9 @@ interface CheckoutResponse {
  * Membership CTA. When the feature flag is off it renders the exact WS0
  * "coming soon" affordance. When on, it reflects the learner's real status and
  * starts a `mode: 'subscription'` Stripe Checkout for those who need to
- * subscribe or renew. `/subscribe?offer=ccw-attendee` uses the attendee $295 path.
+ * subscribe or renew. There is one price: A$795/yr. The `?offer=ccw-attendee`
+ * A$295 attendee special was removed by the founder on 2026-08-25 (its Stripe
+ * coupon was never created, so it had only ever failed closed).
  */
 export function SubscribeCta({
   enabled,
@@ -29,14 +26,10 @@ export function SubscribeCta({
   enabled: boolean;
   reason: MembershipDecisionReason | null;
 }) {
-  const searchParams = useSearchParams();
-  const attendeeOffer = searchParams.get('offer') === CCW_ATTENDEE_OFFER_QUERY;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Regular membership stays behind the flag; attendee $295 special is always on
-  // when the offer query is present (price is hardcoded in checkout).
-  if (!enabled && !attendeeOffer) {
+  if (!enabled) {
     return (
       <>
         <span
@@ -63,7 +56,7 @@ export function SubscribeCta({
     try {
       const data = await apiClient.post<CheckoutResponse>(
         '/api/lms/subscription/checkout',
-        attendeeOffer ? { attendeeOffer: true } : {}
+        {}
       );
       const url = data.url ?? data.checkout_url;
       if (url) {
@@ -73,8 +66,7 @@ export function SubscribeCta({
       setError('Membership checkout is not available yet. Please try again later.');
     } catch (err) {
       if (err instanceof ApiClientError && err.status === 401) {
-        const next = attendeeOffer ? `/subscribe?offer=${CCW_ATTENDEE_OFFER_QUERY}` : '/subscribe';
-        window.location.href = `/login?next=${encodeURIComponent(next)}`;
+        window.location.href = `/login?next=${encodeURIComponent('/subscribe')}`;
         return;
       }
       const msg =
@@ -88,16 +80,10 @@ export function SubscribeCta({
   }
 
   const label = reason === 'lapsed' ? 'Renew membership' : 'Start membership';
-  const priceLabel = attendeeOffer ? CCW_ATTENDEE_MEMBERSHIP_LABEL : '$795 / year';
+  const priceLabel = '$795 / year';
 
   return (
     <>
-      {attendeeOffer ? (
-        <p className="rounded-lg border border-[#9fdab8] bg-[#f1fbf5] px-3 py-2 text-center text-sm font-medium text-[#1b5e37]">
-          CCW/CARSI training-day special — {CCW_ATTENDEE_MEMBERSHIP_LABEL} for eligible attendees
-          (both days + email opt-in).
-        </p>
-      ) : null}
       <button
         type="button"
         onClick={startCheckout}

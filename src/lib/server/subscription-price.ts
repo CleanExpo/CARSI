@@ -10,9 +10,6 @@
  * (docs/runbooks/rana-stripe-connection.md). Until then this resolver returns
  * `null` and the checkout route FAILS CLOSED with an honest "membership
  * purchasing not yet available" response — it never falls back to a wrong Price.
- *
- * CCW attendee $295 checkout does NOT use this resolver — it passes inline
- * `price_data` (see subscription/checkout) so no Price id / env is required.
  */
 
 import { getStripeClient } from '@/lib/api/stripe';

@@ -1,5 +1,17 @@
 # Spec — CCW/CARSI Roadshow: day-gated Attendee Offers
 
+> **PARTLY SUPERSEDED — 2026-08-25.** The founder removed the CARSI attendee
+> membership discount (A$295 first year via a `duration: once` Stripe coupon).
+> It never went live: `CCW_MEMBERSHIP_COUPON_ID` was never created in Stripe, so
+> the path only ever returned 503. Everything in §10 describing the self-serve
+> discounted membership — the coupon, `/subscribe?offer=ccw-attendee`, the
+> attendee checkout branch and the A$295 claim in the post-event email — is
+> HISTORY, not a build instruction. Do not implement it from this document.
+>
+> Still current: the CCW store-credit voucher and RestoreAssist offers, the
+> day-gating rules, and the URL guard. Attendee membership is now granted only
+> by the admin comp path, `POST /api/admin/ccw-roadshow/comp-membership`.
+
 - **Date:** 2026-07-15
 - **Status:** REVISED post-`/judge` (79/100 APPROVE EXPERIMENT for slice-1). Slice-1 (pure config + date-gate + URL guard + flag) owner-approved to build 2026-07-15. Welcome-email wiring + activation remain gated on §7 deps.
 - **Judge corrections folded in:** the CARSI membership offer uses the existing **`grantYearlyMembership({ priceAud })`** path (`src/lib/admin/admin-yearly-membership.ts`) — there is **no Stripe coupon system** in the repo (grep-confirmed empty). Offers reuse `sendEnrollmentWelcomeEmail`, `email-templates.ts` CTA block, and the `CCW_ATTENDANCE_ENABLED` flag convention.

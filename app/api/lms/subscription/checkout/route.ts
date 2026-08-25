@@ -2,34 +2,28 @@
  * POST /api/lms/subscription/checkout — start the individual annual membership
  * (`pro_annual`, A$795/yr) Stripe Checkout in `mode: 'subscription'`.
  *
- * Optional body `{ attendeeOffer: true }` starts the CCW roadshow attendee
- * special when the learner is offer-eligible (both days + email opt-in +
- * provisioned): A$295 for the FIRST YEAR, then the standing A$795/yr.
+ * There is ONE membership price. The CCW roadshow attendee special — A$295 for
+ * the first year via a `duration: once` Stripe coupon — was removed by the
+ * founder on 2026-08-25 before it ever went live: the coupon it depended on was
+ * never created in Stripe, so the path had only ever returned 503. Do not
+ * reintroduce a discounted recurring price if the special is ever revived; that
+ * would renew at the reduced rate forever and quietly commit CARSI to A$500/yr
+ * less from every attendee who claimed it. The admin comp path
+ * (`POST /api/admin/ccw-roadshow/comp-membership`) is a DIFFERENT instrument and
+ * is unaffected — it grants a year outright with no Stripe subscription.
  *
- * That first-year shape is the whole point (founder, 2026-08-24: A$795/yr is the
- * standing price, not a first-year one). It is delivered exactly as spec §10.3
- * requires — the SAME `pro_annual` recurring price every member pays, with a
- * server-side `duration: once` coupon taking the first invoice down. It is NOT a
- * discounted recurring price: that would renew at A$295 forever and quietly
- * commit CARSI to A$500/yr less from every attendee who ever claimed it.
+ * Ships dark behind SUBSCRIPTIONS_ENABLED.
  *
- * Regular $795 membership still ships dark behind SUBSCRIPTIONS_ENABLED.
- * The attendee path only needs STRIPE_SECRET_KEY (already used for payments).
- *
- * Both paths are guarded against opening a second checkout for a learner who
- * already holds a live membership (spec §10.4 AC-9) — see
- * `@/lib/server/membership-checkout-guard` for why that has to happen here
- * rather than being reconciled afterwards — and both then take an atomic
- * per-learner reservation, so two requests arriving together cannot each open a
- * session (`@/lib/server/membership-checkout-reservation`).
+ * Guarded against opening a second checkout for a learner who already holds a
+ * live membership (spec §10.4 AC-9) — see `@/lib/server/membership-checkout-guard`
+ * for why that has to happen here rather than being reconciled afterwards — and
+ * then takes an atomic per-learner reservation, so two requests arriving together
+ * cannot each open a session (`@/lib/server/membership-checkout-reservation`).
  */
-
 import { NextRequest, NextResponse } from 'next/server';
 
 import { getStripeClient } from '@/lib/api/stripe';
-import { CCW_ATTENDEE_OFFER_QUERY } from '@/lib/marketing/ccw-roadshow-offer-pack';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
-import { learnerIsCcwAttendeeOfferEligible } from '@/lib/server/ccw-attendance/attendee-offer';
 import { membershipCheckoutDecisionFor } from '@/lib/server/membership-checkout-guard';
 import {
   checkoutSessionExpiresAt,
@@ -44,8 +38,6 @@ import {
 } from '@/lib/server/event-attribution';
 
 const UNAVAILABLE = 'Membership purchasing is not yet available.';
-const ATTENDEE_UNAVAILABLE =
-  'The attendee membership special is not available yet. Please try again later.';
 
 export async function POST(request: NextRequest) {
   const claims = await getSessionClaimsFromRequest(request);
@@ -64,14 +56,9 @@ export async function POST(request: NextRequest) {
   const body = (await request.json().catch(() => ({}))) as {
     success_url?: string;
     cancel_url?: string;
-    attendeeOffer?: boolean;
-    offer?: string;
   };
 
-  const wantAttendeeOffer = body.attendeeOffer === true || body.offer === CCW_ATTENDEE_OFFER_QUERY;
-
-  // Regular $795 path stays behind the subscriptions flag; attendee $295 does not.
-  if (!wantAttendeeOffer && !subscriptionsEnabled()) {
+  if (!subscriptionsEnabled()) {
     return NextResponse.json({ detail: UNAVAILABLE }, { status: 503 });
   }
 
@@ -126,67 +113,6 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    if (wantAttendeeOffer) {
-      const eligible = await learnerIsCcwAttendeeOfferEligible({
-        userId: claims.sub,
-        email: claims.email,
-      });
-      if (!eligible) {
-        await releaseMembershipCheckout(claims.sub);
-        return NextResponse.json(
-          {
-            detail:
-              'This attendee membership special is only available after both training days and email opt-in.',
-          },
-          { status: 403 }
-        );
-      }
-
-      // The standing annual price plus a first-year-only coupon. Both must
-      // resolve: without the coupon this would charge the attendee full price
-      // while the CTA promises A$295, so it fails closed rather than selling the
-      // wrong thing (spec §10.4 AC-6).
-      const attendeePriceId = await resolveProAnnualPriceId();
-      const couponId = process.env.CCW_MEMBERSHIP_COUPON_ID?.trim();
-      if (!attendeePriceId || !couponId) {
-        await releaseMembershipCheckout(claims.sub);
-        return NextResponse.json({ detail: ATTENDEE_UNAVAILABLE }, { status: 503 });
-      }
-
-      const session = await getStripeClient().checkout.sessions.create({
-        mode: 'subscription',
-        line_items: [{ price: attendeePriceId, quantity: 1 }],
-        // Paired with the reservation TTL — see membership-checkout-reservation.
-        expires_at: checkoutSessionExpiresAt(),
-        // AC-10: the discount is applied server-side and is never reachable as a
-        // public promotion code. `allow_promotion_codes` is OMITTED rather than
-        // set false — Stripe rejects a session carrying both it and `discounts`,
-        // and its default is already "no promotion codes".
-        discounts: [{ coupon: couponId }],
-        customer_email: claims.email,
-        success_url,
-        cancel_url,
-        metadata: {
-          carsi_user_id: claims.sub,
-          plan: 'pro_annual_attendee',
-          source: 'ccw-roadshow-offer',
-        },
-        subscription_data: {
-          metadata: {
-            carsi_user_id: claims.sub,
-            plan: 'pro_annual_attendee',
-            source: 'ccw-roadshow-offer',
-          },
-        },
-      });
-
-      if (!session.url) {
-        await releaseMembershipCheckout(claims.sub);
-        return NextResponse.json({ detail: 'Failed to start checkout session.' }, { status: 500 });
-      }
-      return NextResponse.json({ url: session.url, checkout_url: session.url });
-    }
-
     const priceId = await resolveProAnnualPriceId();
     if (!priceId) {
       await releaseMembershipCheckout(claims.sub);
