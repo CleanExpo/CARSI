@@ -1,7 +1,4 @@
 import {
-  CCW_ATTENDEE_MEMBERSHIP_PRICE_AUD,
-  CCW_ATTENDEE_MEMBERSHIP_PRICE_CENTS,
-  CCW_ATTENDEE_OFFER_QUERY,
   CCW_OFFER_SOCIAL_LINKS,
   resolveCcwShopifyTrainingUrl,
 } from '@/lib/marketing/ccw-roadshow-offer-pack';
@@ -9,12 +6,6 @@ import type { CcwAttendeeOffer } from '@/lib/marketing/ccw-roadshow-offers';
 import { describe, expect, it } from 'vitest';
 
 describe('ccw-roadshow-offer-pack constants', () => {
-  it('locks the $295 attendee price and offer query in code (no env)', () => {
-    expect(CCW_ATTENDEE_MEMBERSHIP_PRICE_AUD).toBe(295);
-    expect(CCW_ATTENDEE_MEMBERSHIP_PRICE_CENTS).toBe(29500);
-    expect(CCW_ATTENDEE_OFFER_QUERY).toBe('ccw-attendee');
-  });
-
   it('resolves the permanent CCW product URL from the offer config', () => {
     // The shipped config — proves the SSOT wiring, not just the helper.
     expect(resolveCcwShopifyTrainingUrl()).toBe(

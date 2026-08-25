@@ -1,18 +1,18 @@
 /**
- * Comp a roadshow attendee a year of CARSI membership — the ADMIN path for the
- * `carsi-membership` offer.
+ * Comp a roadshow attendee a year of CARSI membership — an ADMIN action for a
+ * named attendee.
  *
- * This complements, and does not replace, the self-serve attendee path. Spec §10
- * (owner-chosen) delivers that offer as a discounted `pro_annual` Stripe
- * SUBSCRIPTION — A$295 for the first year via a `duration: once` coupon, then
- * A$795 renewals. `grantYearlyMembership` is a different instrument: it grants
- * membership outright, with no Stripe subscription and therefore no renewal. So
- * it belongs behind an admin action for a named attendee (a comp, or a rate
- * settled off-platform at the event), never on the self-serve path — routing
- * attendees through it would silently give away every future renewal.
+ * This is now the ONLY attendee membership path. The self-serve one — a
+ * discounted `pro_annual` subscription at A$295 for the first year via a
+ * `duration: once` coupon — was removed by the founder on 2026-08-25 without
+ * ever going live, because the coupon it needed was never created in Stripe.
  *
- * Founder decision, 2026-08-24: admin comp path; the self-serve $295 → $795
- * subscription stays as it is.
+ * `grantYearlyMembership` remains a different instrument to any Stripe
+ * subscription: it grants membership outright, with no subscription and
+ * therefore no renewal. That is why it belongs behind an admin action for a
+ * named attendee (a comp, or a rate settled off-platform at the event) and must
+ * never be wired to a self-serve path — routing attendees through it would
+ * silently give away every future renewal.
  *
  * Deliberately NOT gated on `CCW_ATTENDEE_OFFERS_ENABLED` or the offer's own
  * `live` flag. Both exist for the attendee-facing surface and its external
@@ -21,7 +21,6 @@
  * admin session and `CCW_ATTENDANCE_ENABLED` at the route.
  */
 import { grantYearlyMembership } from '@/lib/admin/admin-yearly-membership';
-import { ccwRoadshowAttendeeOffers } from '@/lib/marketing/ccw-roadshow-offers';
 import { prisma } from '@/lib/prisma';
 import { baseOfferEligible } from '@/lib/server/ccw-attendance/eligibility';
 import {
@@ -30,15 +29,21 @@ import {
 } from '@/lib/server/entitlements';
 
 /**
- * The attendee first-year rate, read from the offer config rather than repeated
- * here — the same figure the self-serve coupon is sized against, so the two
- * cannot drift. `null` when the offer carries no rate.
+ * The attendee first-year rate — now always `null`.
+ *
+ * This used to read A$295 from the `carsi-membership` offer, so the comp form's
+ * default could not drift from the self-serve coupon. The founder removed that
+ * discount on 2026-08-25 and there is no attendee rate any more, so there is no
+ * figure to return and none may be invented: a comp recorded at a rate CARSI
+ * never charged misstates what was collected.
+ *
+ * Kept rather than deleted because callers already depend on the `null`
+ * contract and handle it correctly — `attendee_rate` mode takes the 400 path,
+ * and the admin form asks the operator to name a price. Comping free or at a
+ * named price is unaffected.
  */
-export function attendeeMembershipRateAud(
-  offers = ccwRoadshowAttendeeOffers,
-): number | null {
-  const offer = offers.find((o) => o.key === 'carsi-membership');
-  return typeof offer?.membershipPriceAud === 'number' ? offer.membershipPriceAud : null;
+export function attendeeMembershipRateAud(): number | null {
+  return null;
 }
 
 export type CompMembershipRefusal =
@@ -81,7 +86,7 @@ export function decideCompMembership(input: {
   // `decideMembershipEntitlement` maps `checkout_pending` to `reason: 'none'`
   // deliberately — a reservation must grant no catalogue access — but the cost of
   // being wrong differs here: comping someone who is part-way through paying
-  // A$295 rotates the password on the account they are using to pay, and the new
+  // rotates the password on the account they are using to pay, and the new
   // one exists only in an email that can lag or bounce. Reported by Cursor's
   // security review; it is the #694 hazard reappearing where the self-serve and
   // admin paths meet.

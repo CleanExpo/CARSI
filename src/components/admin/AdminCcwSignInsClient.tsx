@@ -4,7 +4,6 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { renderSVG } from 'uqr';
 
 import { ccwRoadshowEvents } from '@/lib/marketing/ccw-roadshow';
-import { ccwRoadshowAttendeeOffers } from '@/lib/marketing/ccw-roadshow-offers';
 import {
   describeWelcomeEmailFailure,
   welcomeEmailRecovery,
@@ -48,16 +47,12 @@ const SIGN_INS_ENDPOINT = '/api/admin/ccw-roadshow/sign-ins';
 const COMP_MEMBERSHIP_ENDPOINT = '/api/admin/ccw-roadshow/comp-membership';
 
 /**
- * The attendee first-year rate, read from the offer config rather than typed in
- * here, so the figure this form defaults to is the same one the offer itself
- * advertises. `null` when the offer carries no rate — the operator then has to
- * name a price, which is the right outcome: defaulting a missing rate to $0
- * would misstate what was collected.
+ * The attendee first-year rate. `null` since the founder removed the A$295
+ * attendee discount on 2026-08-25 — there is no advertised rate to default to,
+ * so the operator names the price. That is the right outcome: defaulting a
+ * missing rate to $0 would misstate what was collected.
  */
-const attendeeRateAud = (() => {
-  const offer = ccwRoadshowAttendeeOffers.find((o) => o.key === 'carsi-membership');
-  return typeof offer?.membershipPriceAud === 'number' ? offer.membershipPriceAud : null;
-})();
+const attendeeRateAud: number | null = null;
 
 /** Named month — unambiguous to any reader, unlike a numeric day/month order. */
 const COMPED_DATE_FORMAT: Intl.DateTimeFormatOptions = {
@@ -294,7 +289,7 @@ export function AdminCcwSignInsClient() {
     if (!eventSlug) return;
     if (
       !window.confirm(
-        `Run provision for ${eventSlug}? Creates CARSI accounts for Day-1 sign-ins, issues both-day certificates, and sends the post-event offer pack (Shopify + $295 membership) to eligible attendees.`
+        `Run provision for ${eventSlug}? Creates CARSI accounts for Day-1 sign-ins, issues both-day certificates, and sends the post-event offer pack (Shopify + CCW links) to eligible attendees.`
       )
     ) {
       return;
@@ -443,8 +438,7 @@ export function AdminCcwSignInsClient() {
           Day marks are the write-once source of truth. A correction clears a mistaken mark
           (recorded in the admin log). Both days = certificate of attendance. After Day 2, run{' '}
           <span className="text-white/80">Provision + offers</span> to create accounts, issue
-          certificates, and email the Shopify training link + $295 membership special to opted-in
-          attendees.
+          certificates, and email the Shopify training link to opted-in attendees.
         </p>
       </div>
 

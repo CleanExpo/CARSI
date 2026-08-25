@@ -143,18 +143,16 @@ describe('selectActiveOffers', () => {
 });
 
 describe('ccwRoadshowAttendeeOffers (shipped config)', () => {
-  it('defines the three offers; CCW is live, membership + RA still dark pending deps', () => {
+  it('defines the two remaining offers; CCW is live, RA still dark pending its dep', () => {
+    // `carsi-membership` is deliberately absent: the founder removed the A$295
+    // attendee discount on 2026-08-25, and it was the whole of that offer. Its
+    // return here would mean the price claim came back with it.
     const byKey = Object.fromEntries(ccwRoadshowAttendeeOffers.map((o) => [o.key, o]));
-    expect(Object.keys(byKey).sort()).toEqual([
-      'carsi-membership',
-      'ccw-store-credit',
-      'ra-setup',
-    ]);
+    expect(Object.keys(byKey).sort()).toEqual(['ccw-store-credit', 'ra-setup']);
     expect(byKey['ccw-store-credit'].live).toBe(true);
     expect(byKey['ccw-store-credit'].url).toBe(
       'https://ccwonline.com.au/products/ccw-carsi-2-day-in-house-training',
     );
-    expect(byKey['carsi-membership'].live).toBe(false);
     expect(byKey['ra-setup'].live).toBe(false);
   });
 

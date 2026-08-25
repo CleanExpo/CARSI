@@ -7,28 +7,22 @@
  * welcome-email wiring is a later slice. Spec:
  * docs/specs/ccw-attendee-offers-day-gated-2026-07-15.md
  *
- * `carsi-membership` has TWO delivery paths, and they are different instruments:
+ * The attendee membership offer was REMOVED by the founder on 2026-08-25. It was
+ * a self-serve discounted `pro_annual` subscription — A$295 for the first year
+ * via a `duration: once` Stripe coupon — and it never went live: the coupon it
+ * depended on was never created, so the path only ever returned 503. Its price
+ * constants, checkout branch, `/subscribe?offer=` entry point and the A$295 claim
+ * in the attendee email are all gone with it.
  *
- *  - Self-serve (spec §10, owner-chosen): a discounted `pro_annual` Stripe
- *    SUBSCRIPTION — A$295 for the first year via a `duration: once` coupon, then
- *    A$795 renewals. Built, at `POST /api/lms/subscription/checkout` with
- *    `{ attendeeOffer: true }`, reached from `/subscribe?offer=ccw-attendee`.
- *    (§10.3 named a `POST /api/ccw/membership-checkout` route; that path was
- *    never built and is not needed — the attendee branch of the existing
- *    subscription checkout is where this actually lives.)
- *  - Admin comp: `POST /api/admin/ccw-roadshow/comp-membership`, which grants a
- *    year outright via `grantYearlyMembership` for a named attendee. NO Stripe
- *    subscription, so no renewal — see that route's service for why the two must
- *    never be swapped for one another.
- *
- * Still `live: false`: the self-serve path needs `CCW_MEMBERSHIP_COUPON_ID` set
- * in Stripe (`duration: once`, `amount_off` 50000) or it returns 503 rather than
- * charging full price against a A$295 promise. The admin comp path does not
- * depend on that flag or on Stripe at all.
+ * Membership for a named attendee is still available, by a DIFFERENT instrument:
+ * `POST /api/admin/ccw-roadshow/comp-membership` grants a year outright via
+ * `grantYearlyMembership`. No Stripe subscription, so no renewal — see that
+ * route's service for why the two must never be swapped for one another. It does
+ * not depend on any offer flag or on Stripe at all, and is unaffected here.
  */
 import { ccwRoadshowEvents, type CcwRoadshowEvent } from './ccw-roadshow';
 
-export type CcwOfferKey = 'ccw-store-credit' | 'carsi-membership' | 'ra-setup';
+export type CcwOfferKey = 'ccw-store-credit' | 'ra-setup';
 
 export type CcwAttendeeOffer = {
   key: CcwOfferKey;
@@ -38,19 +32,6 @@ export type CcwAttendeeOffer = {
   detail: string;
   /** CCW / RA permanent product URL. Preview URLs are rejected (see below). */
   url?: string;
-  /**
-   * CARSI: the attendee first-year rate, in AUD. Server-only, and NOT the value
-   * that buys the membership — spec §10 (owner-chosen, supersedes the original
-   * `grantYearlyMembership` note in §4.1) delivers this offer as a discounted
-   * `pro_annual` Stripe subscription: a `duration: once` coupon takes the first
-   * invoice to this figure, then it renews at list. Held here so the rate lives
-   * with the offer, and so a hard price can never leak into `label`/`detail`.
-   *
-   * Roadshow costs are separate to CARSI course costs (founder, 2026-08-24): this
-   * is an event-attendee rate on a membership, not a course price, and it is not
-   * an input to anything in the course catalogue or its pricing.
-   */
-  membershipPriceAud?: number;
   /** false = configured but its external dependency isn't satisfied yet. */
   live: boolean;
 };
@@ -70,13 +51,6 @@ export const ccwRoadshowAttendeeOffers: CcwAttendeeOffer[] = [
     // domain ("CCW/CARSI 2 Day In-house Training", $100 → $150 store credit).
     url: 'https://ccwonline.com.au/products/ccw-carsi-2-day-in-house-training',
     live: true,
-  },
-  {
-    key: 'carsi-membership',
-    label: 'CARSI 1-year membership',
-    detail: 'Attendee rate on a full year of CARSI membership — details on the day.',
-    membershipPriceAud: 295,
-    live: false,
   },
   {
     key: 'ra-setup',

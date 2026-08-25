@@ -150,8 +150,6 @@ describe('CCW offer pack — the Shopify CTA is omitted, never broken', () => {
     attendeeName: 'Sam Attendee',
     eventCity: 'Melbourne',
     eventDates: '22–23 July 2026',
-    membershipCheckoutUrl: 'https://carsi.example.test/subscribe?offer=ccw-attendee',
-    membershipPriceLabel: '$295 first year, then $795 / year',
     socialLinks: [{ label: 'CCW on X', href: 'https://x.com/ccwonline' }],
   };
 
@@ -176,8 +174,8 @@ describe('CCW offer pack — the Shopify CTA is omitted, never broken', () => {
     expect(html).not.toContain('Shopify —');
     expect(text).not.toContain('Shopify training product:');
     // The rest of the pack must still send.
-    expect(html).toContain('Claim');
-    expect(text).toContain(base.membershipCheckoutUrl);
+    expect(html).toContain('Stay connected with CCW');
+    expect(text).toContain('Stay connected with CCW:');
     // Nothing that reads as an empty or undefined href sneaks through.
     expect(html).not.toContain('href=""');
     expect(html).not.toContain('undefined');

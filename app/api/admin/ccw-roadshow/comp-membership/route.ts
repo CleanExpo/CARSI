@@ -16,10 +16,11 @@ import {
  * Body: { signInId: string, pricingMode?: 'attendee_rate' | 'free' | 'custom',
  *         priceAud?: number }
  *
- * This is the ADMIN half of the `carsi-membership` offer. The self-serve half
- * stays a discounted Stripe subscription ($295 first year, then $795) — see
- * `@/lib/server/ccw-attendance/comp-membership` for why the two instruments must
- * not be swapped for one another.
+ * This is now the ONLY attendee membership path: the self-serve discounted
+ * subscription was removed by the founder on 2026-08-25. `attendee_rate` mode
+ * therefore has no rate to resolve and takes the 400 path — comp free, or name
+ * the price actually collected. See `@/lib/server/ccw-attendance/comp-membership`
+ * for why this instrument must never be wired to a self-serve path.
  */
 export async function POST(request: NextRequest) {
   if (!isCcwAttendanceEnabled()) {

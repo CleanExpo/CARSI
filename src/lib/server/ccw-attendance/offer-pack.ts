@@ -1,7 +1,7 @@
 /**
  * Post-event offer pack batch for one CCW/CARSI roadshow event.
  *
- * Sends the Shopify + $295 membership + social links email to attendees who:
+ * Sends the Shopify + social links email to attendees who:
  *   - checked in both days
  *   - opted in to marketing email
  *   - are provisioned
@@ -11,8 +11,6 @@
  */
 import { getCcwRoadshowEvent } from '@/lib/marketing/ccw-roadshow';
 import {
-  CCW_ATTENDEE_MEMBERSHIP_LABEL,
-  CCW_ATTENDEE_OFFER_QUERY,
   CCW_OFFER_SOCIAL_LINKS,
   resolveCcwShopifyTrainingUrl,
 } from '@/lib/marketing/ccw-roadshow-offer-pack';
@@ -49,7 +47,6 @@ export async function runCcwOfferPackBatch(
   });
 
   const base = opts.appOrigin.replace(/\/$/, '');
-  const membershipCheckoutUrl = `${base}/subscribe?offer=${CCW_ATTENDEE_OFFER_QUERY}`;
   const emailOn = isEmailConfigured();
 
   // Resolved once for the whole batch, and allowed to be null: a preview or
@@ -101,8 +98,6 @@ export async function runCcwOfferPackBatch(
         eventCity: event.city,
         eventDates: event.dates,
         shopifyTrainingUrl,
-        membershipCheckoutUrl,
-        membershipPriceLabel: CCW_ATTENDEE_MEMBERSHIP_LABEL,
         socialLinks: CCW_OFFER_SOCIAL_LINKS,
         appOrigin: base,
       });

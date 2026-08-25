@@ -1,6 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { CcwAttendeeOffer } from '@/lib/marketing/ccw-roadshow-offers';
 
 import {
   attendeeMembershipRateAud,
@@ -57,18 +56,11 @@ beforeEach(() => {
 });
 
 describe('attendeeMembershipRateAud', () => {
-  it('reads the rate from the shipped offer config', () => {
-    // Sourced, not restated — the same figure the self-serve coupon is sized
-    // against, so the two cannot drift apart.
-    expect(attendeeMembershipRateAud()).toBe(295);
-  });
-
-  it('returns null when the offer carries no rate', () => {
-    const offers: CcwAttendeeOffer[] = [
-      { key: 'carsi-membership', label: 'x', detail: 'x', live: false },
-    ];
-
-    expect(attendeeMembershipRateAud(offers)).toBeNull();
+  it('has no rate to report once the attendee discount is removed', () => {
+    // The founder removed the A$295 attendee discount on 2026-08-25. A rate
+    // here would be one CARSI never charged, so `attendee_rate` mode must take
+    // the 400 path and the operator name a price instead — see the route.
+    expect(attendeeMembershipRateAud()).toBeNull();
   });
 });
 
