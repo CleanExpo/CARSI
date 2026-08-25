@@ -1,10 +1,13 @@
 /**
  * CCW/CARSI roadshow — attendee Course Offers (slice-1: pure config + gating).
  *
- * Three attendee-exclusive offers surfaced ONLY on the days of each event and
- * ONLY to verified attendees. This module is pure and client-safe (no env, no
- * DB); the server flag lives in `@/lib/server/ccw-offers-flag` and the
- * welcome-email wiring is a later slice. Spec:
+ * TWO attendee-exclusive offers surfaced ONLY on the days of each event and
+ * ONLY to verified attendees — see `ccwRoadshowAttendeeOffers` below for which,
+ * and for why there is no longer a third. This module is pure and client-safe
+ * (no env, no DB); the server flag lives in `@/lib/server/ccw-offers-flag`, and
+ * the welcome-email wiring is BUILT (`ccw-attendance/provision.ts` feeds
+ * `selectActiveOffersForNow` into the enrolment email). Spec — partly
+ * superseded, read its header first:
  * docs/specs/ccw-attendee-offers-day-gated-2026-07-15.md
  *
  * The attendee membership offer was REMOVED by the founder on 2026-08-25. It was
