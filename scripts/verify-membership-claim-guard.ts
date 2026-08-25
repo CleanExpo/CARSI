@@ -42,6 +42,15 @@ const DOMAIN = '@guard-verify.invalid';
 const failures: string[] = [];
 let checks = 0;
 
+/**
+ * Record one assertion.
+ *
+ * Deliberately does NOT throw on a mismatch: a guard that fails in more than
+ * one place should report every place at once, because which checks fail
+ * together is what identifies the defect. Dropping the WHERE clause fails five
+ * checks including the concurrency one; skipping normalisation fails exactly
+ * one. Stopping at the first would make those look identical.
+ */
 function check(label: string, actual: unknown, expected: unknown): void {
   checks += 1;
   if (actual === expected) {
@@ -53,12 +62,28 @@ function check(label: string, actual: unknown, expected: unknown): void {
   failures.push(line);
 }
 
+/**
+ * Remove this script's own claim rows, before and after the run.
+ *
+ * Scoped by the synthetic domain rather than truncating the table, so running
+ * this against a database that holds real claims cannot disturb them. Runs
+ * first as well as last because a previous run killed midway would otherwise
+ * leave a claim that makes the opening assertion fail for the wrong reason.
+ */
 async function clear(): Promise<void> {
   await prisma.$executeRaw`
     DELETE FROM yearly_membership_grant_claims WHERE email LIKE ${'%' + DOMAIN}
   `;
 }
 
+/**
+ * Drive the guard through the sequences an operator can actually produce, then
+ * require it to be observable failing.
+ *
+ * Ordered so the cheap refusal checks run before the concurrency one: if the
+ * conditional upsert is broken outright, the earlier failures say so more
+ * precisely than a race that happens to produce three winners.
+ */
 async function main(): Promise<void> {
   if (!process.env.DATABASE_URL?.trim()) {
     console.error('DATABASE_URL is required — this verifies the guard against a real database.');
