@@ -75,3 +75,26 @@ merely asserting it.**
 **#11 is licence-adjacent, not merely commercial.** Australian Consumer Law obligations attach
 to the per-course sale that is live today, and the only refund sentence on the site sits inside
 a subscription clause that is still dark.
+
+---
+
+## Added 2026-08-26
+
+| # | Decision | Default if silent | Deadline | Status |
+|---|---|---|---|---|
+| 17 | **Rotate then seal the `monkfish-app` secrets.** `doctl apps spec get` returns env vars in plaintext, including a **live `sk_live_` Stripe key** and the Mailtrap key — 43 of 44 unencrypted, only `CRON_SECRET` sealed. Anything holding `doctl` on any machine can read them, and has been able to. | No default — credential handling, escalates daily. An agent cannot do this: sealing means submitting the live values, which is prohibited regardless of authorisation. | 2026-08-28 | OPEN |
+| 18 | **Melbourne and Sydney: new dates, or retire the listings.** Both events finished (22–23 and 30–31 July) and `/events/ccw-roadshow` still lists and sells them. Dates were deliberately **not** invented; a test pins the expired set exactly so it cannot be forgotten. | Default: **remove both listings** if no dates by the deadline. A page selling a past event is worse than a page with one city on it. | 2026-08-29 | OPEN |
+| 19 | **Does CCW still owe its customers free entry?** The founder set $149/seat for every customer and retired free entry, and the code now says so throughout. If CCW promised its own customer base free attendance, that is a partner commitment this repo cannot see. | No default — a partnership term, not a price. Escalates. | 2026-08-29 | OPEN |
+| 20 | **Flip `ROADSHOW_PAYMENT_REQUIRED=true`.** Pay-to-play is built, tested and dark: a booking takes a 72-hour hold that counts against the cap, Stripe checkout runs, and the webhook refuses to confirm a lapsed hold rather than overselling. | No default — money. **Sequence it after #17**; turning payments on while a live key sits in plaintext is the wrong order. Brisbane is 4 September, so this is the deadline that actually bites. | 2026-09-01 | OPEN |
+| 21 | **A free course for the row-11 email-capture funnel.** BACKLOG row 11 assumes a free library to capture from. All 37 catalogue courses are `isFree: false`, so the funnel has no front door. | No default — pricing. | 2026-09-05 | OPEN |
+
+**Decided by the founder on 2026-08-26, recorded here as context rather than as open rows:**
+$149 per seat at every location; free entry retired outright ("we just offered this to see if
+there was a market" — it worked, so it ends rather than pauses); Brisbane moved to Friday 4 –
+Saturday 5 September 2026; and #2, the subscription flip, decided and awaiting execution only.
+
+**A note on this file's own track record, measured 2026-08-26.** It held 16 rows, **11 past their
+deadline**, and **not one has ever been marked RESOLVED, DONE or CLOSED**. Writing a blocker here
+unblocks the *agent*, not the *work* — so no row above should be treated as progress, and nothing
+downstream should be built assuming an answer arrives. That is why #18 carries a real default:
+where a safe fallback exists, the deadline should do something rather than pass quietly.
