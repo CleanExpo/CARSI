@@ -459,8 +459,21 @@ splitting.
 **Order to merge, once the reviewer returns 31/08:** `docs/carsi-session-260826` →
 `fix/carsi-guards-metrics-proofpack` → `feat/carsi-leather-and-ai-courses` →
 `feat/ccw-roadshow-pay-to-play`. The last two are independent of each other; only the first pair
-is ordered. The omnibus branch `claude/carsi-cec-packs-260826` is now a superset of all four and
-should be **abandoned rather than merged** — merging it would defeat the split.
+is ordered.
+
+**Omnibus ABANDONED 2026-08-26.** `claude/carsi-cec-packs-260826` was renamed to
+**`archive/carsi-omnibus-260826-superseded`** — renamed, not deleted, and that was deliberate: it
+held 46 commits that exist nowhere else (nothing is pushed), the repo already uses an `archive/`
+prefix on `origin` for exactly this, and a rename is reversible at no cost while a delete leaves
+the commits findable only through a reflog that expires. Do not merge it; it is a superset of the
+four splits and merging it would undo them.
+**Preservation was proven before the rename, not assumed.** A checker compared every path the
+omnibus changed against all four split branches by blob hash: **80 covered, 0 stranded.** It
+self-tested first — confirming it could report a miss on a bogus path — so the zero is a real
+result rather than a broken query. One genuine gap was found and closed on the way: `BACKLOG.md`
+on the omnibus was **45 lines ahead** of the docs branch, because the split records and this
+merge-order finding were written after the docs branch was cut. Carried across as `722b146d`
+before anything was abandoned.
 
 - **B2 (original finding) — the omnibus branch is not a reviewable unit.**
   `git diff --stat origin/main...HEAD` → **41 commits, 80 files, +15,293 / −9,787**, spanning five
