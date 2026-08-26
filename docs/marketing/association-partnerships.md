@@ -135,9 +135,9 @@ Establish CARSI as a recognised training partner across 7+ Australian industry a
 
 Dear [Name],
 
-I'm Phill from CARSI (carsi.com.au), an Australian-owned online training platform delivering IICRC CEC-approved courses in restoration, mould remediation and water damage management.
+I'm Phill from CARSI (carsi.com.au), an Australian-owned online training platform delivering IICRC CEC Accredited courses in restoration, mould remediation and water damage management.
 
-We'd like to explore a training partnership with [Association Name] — offering your members discounted access to 40+ IICRC CEC Accredited courses, all available online and self-paced.
+We'd like to explore a training partnership with [Association Name] — offering your members discounted access to 80 published courses, all available online and self-paced.
 
 There's no cost to the association. Members receive a discount code and verifiable digital certificates on completion.
 
@@ -158,14 +158,15 @@ carsi.com.au | training@carsi.com.au
 
 Dear [Name],
 
-I'm writing to introduce CARSI (carsi.com.au), an Australian-owned platform delivering IICRC CEC-approved online training in water damage restoration, mould remediation, structural drying and related disciplines.
+I'm writing to introduce CARSI (carsi.com.au), an Australian-owned platform delivering IICRC CEC Accredited online training in water damage restoration, mould remediation, structural drying and related disciplines.
 
 We believe there's a strong alignment between CARSI's course catalogue and the professional development needs of [Association Name] members. Specifically:
 
-- **40+ IICRC CEC Accredited courses** — covering water damage restoration, structural drying, mould remediation and carpet cleaning and more
+- **80 published courses** — covering water damage restoration, structural drying, mould remediation and carpet cleaning and more
 - **100% online, self-paced** — no classroom attendance or roster disruption
 - **Verifiable digital certificates** — public credential URL for employer and client verification
-- **Continuing Education Credits** — recognised IICRC CECs for credential maintenance
+- **IICRC CEC Accredited provider** — CEC hours are approved one course at a time, on application
+  to the IICRC, and every learner gets a CEC tracking dashboard for the credits they hold
 
 We'd like to propose an **Endorsed Provider** partnership at no cost to [Association Name]. Your members would receive:
 
@@ -192,13 +193,13 @@ carsi.com.au | training@carsi.com.au
 
 Dear [Name],
 
-I'm Phill from CARSI (carsi.com.au) — an Australian-owned online training platform specialising in IICRC CEC-approved courses for restoration, cleaning and building maintenance professionals.
+I'm Phill from CARSI (carsi.com.au) — an Australian-owned online training platform specialising in IICRC CEC Accredited courses for restoration, cleaning and building maintenance professionals.
 
 I'm reaching out because I believe [Association Name] members could significantly benefit from access to our training catalogue, and I'd like to explore a formal partnership.
 
 **About CARSI**
 
-CARSI delivers 40+ online courses. Our platform is purpose-built for working tradespeople and professionals — courses are 100% online, self-paced, and can be completed on any device. Each course issues a digital certificate with a public verification URL.
+CARSI delivers 80 published online courses. Our platform is purpose-built for working tradespeople and professionals — courses are 100% online, self-paced, and can be completed on any device. Each course issues a digital certificate with a public verification URL.
 
 **Why This Matters for [Association Name] Members**
 
@@ -241,7 +242,7 @@ Attachment: CARSI-Partnership-Overview.pdf
 **CARSI — Training Partnership for [Association Name]**
 
 **Who We Are**
-CARSI (carsi.com.au) is an Australian-owned online training platform delivering 40+ IICRC CEC-approved courses in restoration, mould remediation, water damage management and related disciplines.
+CARSI (carsi.com.au) is an Australian-owned online training platform delivering 80 published courses in restoration, mould remediation, water damage management and related disciplines.
 
 **What We Offer Your Members**
 | Benefit | Detail |
@@ -249,7 +250,7 @@ CARSI (carsi.com.au) is an Australian-owned online training platform delivering 
 | Discounted Training | 10–20% off all courses via unique member code |
 | Online, Self-Paced | No classroom, no roster disruption, any device |
 | Verifiable Credentials | Digital certificates with public verification URL |
-| IICRC CECs | Recognised Continuing Education Credits |
+| IICRC CEC Accredited provider | CEC hours approved course by course; CEC tracking dashboard included |
 | Group Licensing | Bulk pricing for organisations enrolling teams |
 
 **What We Offer the Association**
@@ -263,8 +264,8 @@ CARSI (carsi.com.au) is an Australian-owned online training platform delivering 
 
 **Credibility**
 
-- IICRC CEC-approved courses (board-voted)
-- 40+ courses across 5 IICRC disciplines
+- IICRC CEC Accredited courses (board-voted)
+- 80 published courses across water damage, structural drying, mould, fire and smoke, odour control and carpet cleaning
 - Built for Australian tradespeople and professionals
 - Digital-first: verifiable credentials, LinkedIn sharing, employer audit trail
 
@@ -277,22 +278,40 @@ Contact: training@carsi.com.au | carsi.com.au
 
 ## Group Licensing Pricing
 
-| Seats | Annual Price (AUD) | Per-Seat Cost | Discount vs Individual        |
-| ----- | ------------------ | ------------- | ----------------------------- |
-| 10    | $1,750             | $175          | 78% off subscription          |
-| 25    | $3,900             | $156          | 80% off subscription          |
-| 50    | $6,900             | $138          | 83% off subscription          |
-| 100+  | Custom             | Negotiated    | Contact training@carsi.com.au |
+**These are the published Teams prices on carsi.com.au/pricing. Do not quote anything else.**
+Verified against the live page and `src/lib/lms/pricing-tiers.ts` on 26/08/2026.
+
+| Tier | Annual price (AUD) | Seats included | Each extra seat |
+| ---- | ------------------ | -------------- | --------------- |
+| Teams Starter | $299 | 5 | +$49 |
+| Teams Growth | $799 | 15 | +$39 |
+| Full library | $2,499 | 25 | +$29 |
+| Larger networks | Custom | Negotiated | Contact support@carsi.com.au |
+
+All three tiers are marked **"Coming soon"** on the live pricing page. Say "launching", not
+"available". What can be bought today is a single course from $20, or the free library.
+
+> **Corrected 26/08/2026.** This table previously published a different and much higher set of
+> group-licensing prices — 10 seats at $1,750, 25 at $3,900, 50 at $6,900. The live page sells 25
+> seats for $2,499, so this document was asking about 56% more for the same product. The live page
+> and the pricing module agreed with each other, so this document was the outlier. If the old
+> table has already gone to any association, they are holding a quote CARSI does not honour, and
+> that needs a correcting note from the founder.
 
 **What's included per seat:**
 
-- Unlimited access to all 40+ IICRC CEC Accredited courses for 12 months
-- All CECs earned and tracked per user
-- Digital certificate per course completion
+- Unlimited access to all 80 published courses for 12 months
+- CEC tracking dashboard per user, for the credits a member holds
+- Digital certificate per course completion, each with a public verification page
 - Admin dashboard: enrolment tracking, completion rates, CEC reports
 - Dedicated account manager (50+ seats)
 
-**Association-specific pricing:** Associations at Tier 2 or Tier 3 receive an additional 5% off group licensing for their members' organisations.
+**Association-specific pricing:** Associations at Tier 2 or Tier 3 receive an additional 5% off the Teams tiers for their members' organisations.
+
+> **Founder to confirm.** This 5% was written against the old group-licensing table, which is now
+> withdrawn. A 5% concession on the published Teams price is a pricing decision, not a wording
+> one, so it is left in place rather than silently removed — but it has not been re-approved
+> against the current numbers.
 
 ---
 
