@@ -207,8 +207,9 @@ export function AdminCcwSignInsClient() {
   }
 
   /**
-   * Comp ONE named attendee a year of membership — the admin half of the
-   * `carsi-membership` offer.
+   * Comp ONE named attendee a year of membership. Since the A$295 attendee
+   * discount was removed on 2026-08-25 this is the only attendee membership
+   * path, and the price is always one the operator names.
    *
    * Two dialogs, deliberately. The grant rotates an existing member's password
    * and reveals the new one only in the welcome email, so a mis-click costs a
