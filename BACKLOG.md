@@ -416,11 +416,51 @@ one thing an agent may never do here.
   `cecHours: 6` on the leather course made `check:cec` exit **1**, proving the guard genuinely
   reads the new courses here. Reverted, exit 0, tree clean.
 
-**What remains on the omnibus branch** `claude/carsi-cec-packs-260826`: the 316-file markdown
-audit, the plan archiving, the AI model registry reconciliation, the proof-pack and recert work
-from earlier in the day, and the operating-file edits (`SPEC.md`, `ENGINE.md`, `DECISIONS.md`,
-this file). That is the third split when someone gets to it — all documentation and internal
-tooling, none of it customer-facing, so it is the lowest-risk of the three.
+- **Docs split too, 2026-08-26: `docs/carsi-session-260826`** (`989d8082`), from `origin/main`.
+  **40 files, +2,255 / −44** — the markdown audit and its fixes, the plan archiving, `SPEC.md`,
+  the `ENGINE.md` doctl correction, DECISIONS #2, the sealing runbook, the campaign and segment
+  briefs, the CEC packs, the day report and the handoff.
+  **Rebuilt as a path-restricted diff rather than cherry-picked, deliberately.** Those ~22
+  documentation commits sit interleaved with the code commits they were written beside, and all of
+  them touch `BACKLOG.md`, so replaying only the doc ones would have conflicted repeatedly. One
+  coherent change also reviews better than 22 fragments whose order carries no meaning; full
+  per-commit history stays on the omnibus branch. `git apply --check` was run before the tree was
+  touched.
+  **The plan moves survived as moves, verified rather than assumed:** originals gone from
+  `docs/plans/`, 10 files in `docs/plans/archive/`, `docs/superpowers/plans/` empty.
+  Green on this branch: `type-check`, `lint`, `build` exit 0 and `test:unit` is **151 files /
+  1233 tests** — *identical to `origin/main`*, which is the point, since documentation must change
+  no behaviour. `check:au-english`, `check:iicrc-terminology`, `check:iicrc-compliance`,
+  `check:standards-claims` and `check:secrets --all` all exit 0.
+
+- **Code split too, 2026-08-26: `fix/carsi-guards-metrics-proofpack`** (`22ee68ee`), from
+  `origin/main`. **24 files, +2,008 / −150** — licence-guard blind spots, hook wiring, the RWR
+  Stripe metric, the proof-pack Unicode fix, recert email visibility, the model registry, and the
+  money-path test pins. Built as a path-restricted diff like the docs branch, `git apply --check`
+  first. Green: `type-check`, `lint`, `build` exit 0, `test:unit` **159 files / 1315 tests**,
+  and `check:hooks`, `check:iicrc-compliance`, `test:iicrc-terminology`, `check:secrets --all`,
+  `check:au-english`, `check:cec` all exit 0.
+
+**MERGE ORDER — `docs/carsi-session-260826` MUST land before `fix/carsi-guards-metrics-proofpack`.**
+Not a preference, and the reason is the most valuable thing the split surfaced. The code branch
+tightens `check-iicrc-terminology` (untracked-file blind spot, plus a rule for the banned
+"IICRC CEC-approved" form). Run on that branch it **exits 1 on nine hits** across
+`docs/marketing/association-partnerships.md`, `google-ads-campaign.md` and `linkedin-campaign.md`.
+**Those violations are real and already on `origin/main`:**
+`git show origin/main:docs/marketing/association-partnerships.md | grep -c "CEC-approved"` → **5**;
+the same against the docs branch → **0**, because the docs branch carries the corrections. So the
+guard is not broken and the code branch introduces no fault — it correctly begins catching a
+licence-critical error `main` has been carrying unnoticed. Merging code first turns CI red on
+`main` for a defect it merely exposes.
+**This coupling was invisible on the omnibus branch**, where the hardening and the corrections sat
+together and everything was green. Splitting is what made it visible, which is the argument for
+splitting.
+
+**Order to merge, once the reviewer returns 31/08:** `docs/carsi-session-260826` →
+`fix/carsi-guards-metrics-proofpack` → `feat/carsi-leather-and-ai-courses` →
+`feat/ccw-roadshow-pay-to-play`. The last two are independent of each other; only the first pair
+is ordered. The omnibus branch `claude/carsi-cec-packs-260826` is now a superset of all four and
+should be **abandoned rather than merged** — merging it would defeat the split.
 
 - **B2 (original finding) — the omnibus branch is not a reviewable unit.**
   `git diff --stat origin/main...HEAD` → **41 commits, 80 files, +15,293 / −9,787**, spanning five
