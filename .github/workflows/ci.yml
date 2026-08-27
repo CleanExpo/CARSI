@@ -309,6 +309,20 @@ jobs:
       - name: Fail on Prisma schema drift (a model/field with no migration)
         run: npx prisma migrate diff --from-config-datasource --to-schema prisma/schema.prisma --exit-code
 
+      # The yearly-membership grant ROTATES an existing member's password and
+      # reveals it only in the welcome email, so a second grant locks the member
+      # out of an account that was working. The guard against that is a
+      # conditional upsert — the database arbitrates a double-submit — and it
+      # merged having never executed: the unit tests cover only the pure window
+      # arithmetic and email normalisation. That is the same shape as the defect
+      # the guard was rewritten to fix, where the pure function was correct and
+      # the guard around it failed open, so pure coverage is not evidence here.
+      # This runs the real claim/release against the freshly migrated Postgres,
+      # including a genuine concurrent race, and requires the guard to be
+      # observable FAILING when weakened.
+      - name: Verify the yearly-membership grant guard against the database
+        run: npm run verify:membership-guard
+
       # Seed the course catalogue so the data-dependent journeys in
       # e2e/carsi-journeys.spec.ts (course list, WRT filter, "Carpet" search,
       # course detail by slug) run against real data instead of an empty DB.

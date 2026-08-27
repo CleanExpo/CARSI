@@ -20,6 +20,10 @@ import { getStripeClient } from '@/lib/api/stripe';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { resolveOrgMonthlyPriceId } from '@/lib/server/org-subscription-price';
 import { provisionOrgSubscriptionContainer } from '@/lib/server/org-subscription-provision';
+import {
+  checkoutSessionExpiresAt,
+  releaseOrgCheckout,
+} from '@/lib/server/membership-checkout-reservation';
 import { subscriptionsEnabled } from '@/lib/server/subscriptions-flag';
 
 const UNAVAILABLE = 'Organisation subscription purchasing is not yet available.';
@@ -75,7 +79,23 @@ export async function POST(request: NextRequest) {
       organisationName,
       contactEmail,
     });
-    teamId = provisioned.teamId;
+    if (!provisioned.ok) {
+      // The container is claimed by another in-flight checkout, or the database
+      // could not say. Either way, open no second Stripe session.
+      return provisioned.reason === 'busy'
+        ? NextResponse.json(
+            {
+              detail:
+                'An organisation checkout is already open for your account. Finish it, or try again in a few minutes.',
+            },
+            { status: 409 },
+          )
+        : NextResponse.json(
+            { detail: 'We could not start checkout just now. Please try again shortly.' },
+            { status: 503 },
+          );
+    }
+    teamId = provisioned.result.teamId;
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     if (msg === 'ALREADY_ON_TEAM') {
@@ -102,6 +122,8 @@ export async function POST(request: NextRequest) {
     const session = await getStripeClient().checkout.sessions.create({
       mode: 'subscription',
       line_items: [{ price: priceId, quantity: 1 }],
+      // Paired with the reservation TTL — see membership-checkout-reservation.
+      expires_at: checkoutSessionExpiresAt(),
       customer_email: contactEmail || claims.email,
       success_url,
       cancel_url,
@@ -123,10 +145,14 @@ export async function POST(request: NextRequest) {
     });
 
     if (!session.url) {
+      await releaseOrgCheckout(teamId);
       return NextResponse.json({ detail: 'Failed to start checkout session.' }, { status: 500 });
     }
     return NextResponse.json({ url: session.url, checkout_url: session.url, team_id: teamId });
   } catch (error) {
+    // Stripe never opened a session — hand the reservation back rather than
+    // making the owner wait out the TTL for a failure that was ours.
+    await releaseOrgCheckout(teamId);
     console.error('[subscription/org/checkout] Stripe error:', error);
     return NextResponse.json({ detail: 'Failed to start checkout session.' }, { status: 500 });
   }

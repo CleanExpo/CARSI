@@ -379,8 +379,7 @@ export function renderGovContractorGuideEmail(params: {
       title,
       paragraphs,
       cta: { label: 'Download the guide (PDF)', href: params.downloadUrl },
-      noteHtml:
-        'CARSI is an IICRC CEC Accredited provider.',
+      noteHtml: 'CARSI is an IICRC CEC Accredited provider.',
     },
     text
   );
@@ -401,7 +400,9 @@ export function renderEnrollmentWelcomeEmail(params: {
       `<ul style="margin: 0 0 12px; padding-left: 20px;">` +
       offers
         .map((o) => {
-          const head = o.url ? brandLink(o.url, o.label) : `<strong>${escapeHtml(o.label)}</strong>`;
+          const head = o.url
+            ? brandLink(o.url, o.label)
+            : `<strong>${escapeHtml(o.label)}</strong>`;
           return `<li style="margin: 4px 0;">${head} — ${escapeHtml(o.detail)}</li>`;
         })
         .join('') +
@@ -505,13 +506,34 @@ export function renderYearlyMembershipEmail(params: {
   memberEmail: string;
   temporaryPassword: string;
   priceLabel: string;
+  /** Courses the member can actually open. */
   courseCount: number;
+  /**
+   * Published courses on offer. When this exceeds `courseCount` the member does NOT have the
+   * whole library, and the copy below says so instead of promising it. Defaults to
+   * `courseCount` (full access) so callers that cannot distinguish keep the original wording.
+   */
+  publishedCourseCount?: number;
   durationLabel: string;
   loginUrl: string;
   dashboardUrl: string;
 }): RenderedEmail {
-  const courseAccessLine =
-    params.courseCount === 1 ? '1 published course' : `all ${params.courseCount} published courses`;
+  const publishedCourseCount = params.publishedCourseCount ?? params.courseCount;
+  // Partial access is not just a smaller number: "all N published courses", "Full library
+  // access" and "any published course in the catalogue" all promise the whole catalogue, so a
+  // member short a revoked or failed course would be told they had it.
+  const partialAccess = params.courseCount < publishedCourseCount;
+
+  const courseAccessLine = partialAccess
+    ? `${params.courseCount} of ${publishedCourseCount} published courses`
+    : params.courseCount === 1
+      ? '1 published course'
+      : `all ${params.courseCount} published courses`;
+
+  const title = partialAccess ? 'Your course access is ready' : 'Full library access is ready';
+  const openingParagraph = partialAccess
+    ? 'Your CARSI Yearly Membership is now active. You can sign in and start the courses in your account.'
+    : 'Your CARSI Yearly Membership is now active. You can sign in and start any published course in the catalogue.';
 
   const details: CarsiEmailDetail[] = [
     { label: 'Membership', value: 'Yearly Membership' },
@@ -527,10 +549,10 @@ export function renderYearlyMembershipEmail(params: {
       appOrigin: params.appOrigin,
       preheader: 'Your CARSI Yearly Membership is active',
       eyebrow: 'Yearly Membership',
-      title: 'Full library access is ready',
+      title,
       greeting: `Hi ${params.memberName},`,
       paragraphs: [
-        'Your CARSI Yearly Membership is now active. You can sign in and start any published course in the catalogue.',
+        openingParagraph,
         'Use the sign-in details below. We recommend changing your password after your first login.',
       ],
       details,
@@ -696,12 +718,17 @@ export function renderCcwRoadshowOfferPackEmail(params: {
   attendeeName: string;
   eventCity: string;
   eventDates: string;
-  shopifyTrainingUrl: string;
-  membershipCheckoutUrl: string;
-  membershipPriceLabel: string;
+  /**
+   * `null` when no distributable CCW product link is available (see
+   * `resolveCcwShopifyTrainingUrl`). The Shopify CTA, its paragraph and its
+   * text-body line are then omitted — the rest of the pack still sends. Never
+   * fall back to a placeholder or a preview link.
+   */
+  shopifyTrainingUrl: string | null;
   socialLinks: ReadonlyArray<{ label: string; href: string }>;
 }): RenderedEmail {
   const name = params.attendeeName.trim() || 'there';
+  const shopifyUrl = params.shopifyTrainingUrl;
   const socialHtml = params.socialLinks
     .map((l) => `<li style="margin: 0 0 8px;">${brandLink(l.href, l.label)}</li>`)
     .join('');
@@ -716,20 +743,17 @@ export function renderCcwRoadshowOfferPackEmail(params: {
       greeting: `Hi ${name},`,
       paragraphs: [
         `You completed both days of the CARSI x CCW Business Growth Days (${params.eventDates}). Here are your exclusive follow-up offers.`,
-        `Shopify — CCW/CARSI 2 Day In-house Training: open the training product via the button below.`,
-        `CARSI Yearly membership special: ${params.membershipPriceLabel} for your first year (attendee-only). Use the membership link below — sign in to your CARSI account to checkout.`,
+        ...(shopifyUrl
+          ? [`Shopify — CCW/CARSI 2 Day In-house Training: open the training product via the button below.`]
+          : []),
       ],
       details: [
         { label: 'Event', value: `${params.eventCity} — ${params.eventDates}` },
-        { label: 'Membership special', value: params.membershipPriceLabel },
       ],
-      cta: { label: 'View Shopify training product', href: params.shopifyTrainingUrl },
+      ...(shopifyUrl
+        ? { cta: { label: 'View Shopify training product', href: shopifyUrl } }
+        : {}),
       messageHtml: `
-        <p style="margin: 24px 0 12px; font-family: ${BRAND.font}; font-size: 15px; line-height: 1.6; color: ${BRAND.text};">
-          <a href="${escapeHtml(params.membershipCheckoutUrl)}" style="display: inline-block; padding: 12px 22px; background: ${BRAND.orange}; color: #060a14; font-weight: 700; text-decoration: none; border-radius: 8px;">
-            Claim ${escapeHtml(params.membershipPriceLabel)} membership
-          </a>
-        </p>
         <p style="margin: 20px 0 8px; font-family: ${BRAND.font}; font-size: 14px; font-weight: 600; color: ${BRAND.silverHi};">Stay connected with CCW</p>
         <ul style="margin: 0; padding-left: 18px; font-family: ${BRAND.font}; font-size: 14px; line-height: 1.5; color: ${BRAND.text};">
           ${socialHtml}
@@ -737,6 +761,8 @@ export function renderCcwRoadshowOfferPackEmail(params: {
       `,
       noteHtml: `You're receiving this because you attended both days and opted in at check-in.`,
     },
-    `Hi ${name},\n\nThanks for completing both days in ${params.eventCity} (${params.eventDates}).\n\nShopify training product:\n${params.shopifyTrainingUrl}\n\nCARSI yearly membership special (${params.membershipPriceLabel}):\n${params.membershipCheckoutUrl}\n\nStay connected with CCW:\n${socialText}\n`
+    `Hi ${name},\n\nThanks for completing both days in ${params.eventCity} (${params.eventDates}).\n${
+      shopifyUrl ? `\nShopify training product:\n${shopifyUrl}\n` : ''
+    }\nStay connected with CCW:\n${socialText}\n`
   );
 }

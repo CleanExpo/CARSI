@@ -399,7 +399,7 @@ export async function finalizeAttendanceForEvent(
 export interface CcwAttendanceBatchSummary {
   provision: ProvisionBatchSummary;
   attendance: FinalizeAttendanceBatchSummary;
-  /** Post-event Shopify + $295 membership emails (idempotent). */
+  /** Post-event Shopify + CCW links emails (idempotent). */
   offers: OfferPackBatchSummary;
 }
 

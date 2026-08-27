@@ -21,6 +21,18 @@
  * the callers (this service is only consulted before granting new access).
  */
 
+/**
+ * Marker status for a checkout reserved but not yet paid for — see
+ * `membership-checkout-reservation.ts`, which owns the mechanism.
+ *
+ * The constant lives HERE, and the reservation module imports it, rather than
+ * the other way round: this module resolves Prisma through a dynamic
+ * `await import('@/lib/prisma')` so that merely importing it never instantiates
+ * a Prisma client, and a static import of the reservation module (which does
+ * hold prisma at module scope) would undo that.
+ */
+export const CHECKOUT_RESERVATION_STATUS = 'checkout_pending';
+
 /** Days of grace after `currentPeriodEnd` while a subscription is `past_due`. */
 export const PAST_DUE_GRACE_DAYS = 7;
 const GRACE_MS = PAST_DUE_GRACE_DAYS * 24 * 60 * 60 * 1000;
@@ -70,6 +82,16 @@ export function decideMembershipEntitlement(
   }
 
   const status = sub.status.toLowerCase().trim();
+
+  // A checkout reservation is NOT a subscription — it is a row written before
+  // Stripe is called, to stop two concurrent checkouts opening two of them. It
+  // must read as "no membership at all" rather than as an unrecognised Stripe
+  // status: `none` is what every consumer of this decision (the status
+  // endpoint, admin views, the checkout guard) should see for a learner who has
+  // not bought anything yet.
+  if (status === CHECKOUT_RESERVATION_STATUS) {
+    return { entitled: false, reason: 'none' };
+  }
 
   // Live membership → entitled, no need to look at the period end.
   if (ACTIVE_STATUSES.has(status)) {

@@ -79,7 +79,7 @@ export function attendanceComplete(signIn: CcwSignInEligibilityInput): boolean {
 }
 
 /**
- * Post-event offer pack eligibility (Shopify link + $295 membership email / Stripe).
+ * Post-event offer pack eligibility (Shopify link + CCW links email).
  * Provisioned + both days checked in + email opt-in. Server-side only.
  */
 export function baseOfferEligible(signIn: CcwSignInEligibilityInput): boolean {
