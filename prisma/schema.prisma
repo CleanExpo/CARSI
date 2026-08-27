@@ -1007,6 +1007,11 @@ model CcwRoadshowSignIn {
   emailOptIn         Boolean   @default(false) @map("email_opt_in")
   /// Set when the post-event offer pack email was sent (idempotent batch).
   offerEmailSentAt   DateTime? @map("offer_email_sent_at") @db.Timestamptz(6)
+  /// Set when an admin comped this attendee a yearly membership. Claimed by a
+  /// conditional UPDATE (set-if-null) BEFORE the grant runs, so it is the record
+  /// that makes the comp idempotent — not an inference from enrolment rows.
+  /// Cleared again only if the grant itself fails.
+  membershipCompedAt DateTime? @map("membership_comped_at") @db.Timestamptz(6)
   isWalkIn           Boolean   @default(false) @map("is_walk_in")
   /// pending | provisioning | provisioned | failed — drives the async provision batch.
   provisionStatus    String    @default("pending") @map("provision_status") @db.VarChar(16)
@@ -1098,4 +1103,23 @@ model AiWebsiteEvent {
 
   @@index([leadId, createdAt])
   @@map("ai_website_events")
+}
+
+/// A claim on the right to grant a yearly membership to one email address.
+///
+/// Deliberately NOT a column on `LmsUser`. The grant CREATES that row — before
+/// the enrolment loop and the mail send — so a claim living there could not be
+/// taken until the grant was already underway, leaving the ordinary new-learner
+/// path unguarded across the slowest stretch of the work. Keying the claim by
+/// email means it can be taken BEFORE the grant starts, whether or not the
+/// learner exists.
+///
+/// No foreign key for the same reason: a claim legitimately exists for an email
+/// that has no account.
+model YearlyMembershipGrantClaim {
+  /// Normalised (trimmed, lower-cased) by the caller before it reaches here.
+  email     String   @id
+  claimedAt DateTime @map("claimed_at") @db.Timestamptz(6)
+
+  @@map("yearly_membership_grant_claims")
 }

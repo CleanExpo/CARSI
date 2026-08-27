@@ -265,7 +265,7 @@ test.describe('1. Homepage', () => {
     // heading by role + accessible name and take the first match so the assertion
     // is strict-safe and waits for the real, settled heading.
     const h1 = page
-      .getByRole('heading', { level: 1, name: /Professional training that fits the workday/i })
+      .getByRole('heading', { level: 1, name: /Become the technician every job site trusts/i })
       .first();
     await expect(h1).toBeVisible({ timeout: 15_000 });
 

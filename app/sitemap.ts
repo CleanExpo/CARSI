@@ -42,6 +42,7 @@ const staticPages = [
   { path: '/about', priority: 0.6, changeFreq: 'monthly' as const },
   { path: '/contact', priority: 0.6, changeFreq: 'monthly' as const },
   { path: '/testimonials', priority: 0.5, changeFreq: 'monthly' as const },
+  { path: '/case-studies/ccw', priority: 0.55, changeFreq: 'monthly' as const },
   { path: '/pricing', priority: 0.7, changeFreq: 'monthly' as const },
   { path: '/privacy', priority: 0.25, changeFreq: 'yearly' as const },
   { path: '/terms', priority: 0.25, changeFreq: 'yearly' as const },

@@ -30,10 +30,11 @@ test.describe('Public course catalogue', () => {
 
     // Hero section visible
     const pageContent = page.locator('#main-content');
-    await expect(pageContent).toContainText('Professional training that fits the workday.', {
+    await expect(pageContent).toContainText('Become the technician', {
       timeout: 10_000,
     });
-    await expect(pageContent).toContainText('Self-paced IICRC CEC courses');
+    await expect(pageContent).toContainText('every job site trusts.');
+    await expect(pageContent).toContainText('CARSI trains Australia');
 
     // CTA link exists
     const browseCta = page.getByRole('link', { name: /^Browse courses$/i }).first();

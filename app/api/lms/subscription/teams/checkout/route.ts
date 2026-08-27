@@ -26,7 +26,12 @@ import { getStripeClient } from '@/lib/api/stripe';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { teamTierById, type TeamBundleTierId } from '@/lib/lms/pricing-tiers';
 import { resolveTeamTierPriceId } from '@/lib/server/team-subscription-price';
-import { createTeamForOwner, getTeamForUser } from '@/lib/server/teams';
+import { ensureContainerTeamForOwner, getTeamForUser } from '@/lib/server/teams';
+import {
+  checkoutSessionExpiresAt,
+  releaseTeamCheckout,
+  reserveTeamCheckout,
+} from '@/lib/server/membership-checkout-reservation';
 import { subscriptionsEnabled } from '@/lib/server/subscriptions-flag';
 
 const UNAVAILABLE = 'Teams membership purchasing is not yet available.';
@@ -80,12 +85,33 @@ export async function POST(request: NextRequest) {
     }
     teamId = existing.id;
   } else {
-    const created = await createTeamForOwner({
+    // Atomic find-or-create: `LmsTeam.slug` is unique and derived from the
+    // owner, so two concurrent checkouts converge on ONE container instead of
+    // creating two teams to bill separately.
+    const container = await ensureContainerTeamForOwner({
       ownerId: claims.sub,
       name: 'My team',
-      bundleTier: TEAMS_SUBSCRIPTION_TIER,
+      tier: TEAMS_SUBSCRIPTION_TIER,
     });
-    teamId = created.id;
+    teamId = container.id;
+  }
+
+  // Then claim the checkout itself, so two requests on the SAME team cannot each
+  // open a session. Fails closed: an unverifiable state opens no checkout.
+  const reservation = await reserveTeamCheckout(teamId);
+  if (reservation !== 'reserved') {
+    return reservation === 'busy'
+      ? NextResponse.json(
+          {
+            detail:
+              'A Teams checkout is already open for your team. Finish it, or try again in a few minutes.',
+          },
+          { status: 409 },
+        )
+      : NextResponse.json(
+          { detail: 'We could not start checkout just now. Please try again shortly.' },
+          { status: 503 },
+        );
   }
 
   const seats = tier.seatsIncluded;
@@ -103,6 +129,8 @@ export async function POST(request: NextRequest) {
     const session = await getStripeClient().checkout.sessions.create({
       mode: 'subscription',
       line_items: [{ price: priceId, quantity: seats }],
+      // Paired with the reservation TTL — see membership-checkout-reservation.
+      expires_at: checkoutSessionExpiresAt(),
       customer_email: claims.email,
       success_url,
       cancel_url,
@@ -125,10 +153,14 @@ export async function POST(request: NextRequest) {
     });
 
     if (!session.url) {
+      await releaseTeamCheckout(teamId);
       return NextResponse.json({ detail: 'Failed to start checkout session.' }, { status: 500 });
     }
     return NextResponse.json({ url: session.url, checkout_url: session.url, team_id: teamId });
   } catch (error) {
+    // Stripe never opened a session — hand the reservation back so the owner can
+    // retry immediately rather than waiting out the TTL.
+    await releaseTeamCheckout(teamId);
     console.error('[subscription/teams/checkout] Stripe error:', error);
     // If we just created an empty team and checkout failed, it simply has no
     // subscription and no seats — harmless, left for the owner to retry against.

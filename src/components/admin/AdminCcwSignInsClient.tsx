@@ -4,6 +4,11 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { renderSVG } from 'uqr';
 
 import { ccwRoadshowEvents } from '@/lib/marketing/ccw-roadshow';
+import {
+  describeWelcomeEmailFailure,
+  welcomeEmailRecovery,
+  type WelcomeEmailDelivery,
+} from '@/lib/admin/welcome-email-delivery';
 
 type RosterRow = {
   signInId: string;
@@ -21,6 +26,7 @@ type RosterRow = {
   courseAccessGranted: boolean;
   attendanceComplete: boolean;
   offerEligible: boolean;
+  membershipCompedAt: string | null;
 };
 
 type Roster = {
@@ -36,6 +42,52 @@ type CheckInLink = {
 };
 
 const surface = 'rounded-2xl border border-white/10 bg-white/[0.04]';
+
+const SIGN_INS_ENDPOINT = '/api/admin/ccw-roadshow/sign-ins';
+const COMP_MEMBERSHIP_ENDPOINT = '/api/admin/ccw-roadshow/comp-membership';
+
+/**
+ * The attendee first-year rate. `null` since the founder removed the A$295
+ * attendee discount on 2026-08-25 — there is no advertised rate to default to,
+ * so the operator names the price. That is the right outcome: defaulting a
+ * missing rate to $0 would misstate what was collected.
+ */
+const attendeeRateAud: number | null = null;
+
+/** Named month — unambiguous to any reader, unlike a numeric day/month order. */
+const COMPED_DATE_FORMAT: Intl.DateTimeFormatOptions = {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+};
+
+/** Money, so: digits with at most two decimal places. Rejects negatives and junk. */
+const PRICE_PATTERN = /^\d+(\.\d{1,2})?$/;
+
+/**
+ * The comp timestamp is stored and served in UTC. Slicing the ISO string would
+ * show the UTC date, which is the PREVIOUS day for any comp issued before 10am
+ * AEST — misdating a record an operator may have to reconcile.
+ * `toLocaleDateString` resolves the date in the VIEWER'S TIMEZONE, which is what
+ * fixes that.
+ *
+ * The FORMAT is deliberate and is not an oversight to "correct" to the viewer's
+ * own locale. A purely numeric date is ambiguous across locales — 09/08 reads as
+ * 8 September to one operator and 9 August to another — and this is a record
+ * that may be reconciled against a payment. Naming the month removes that
+ * ambiguity for every reader regardless of locale, which a viewer-locale numeric
+ * date would not: it would make each operator's screen self-consistent while
+ * leaving any two of them unable to agree on what a shared roster says.
+ *
+ * Safe from hydration mismatch either way: the roster only ever arrives
+ * client-side, after mount, so this never renders on the server.
+ */
+function formatCompedDate(iso: string): string {
+  const parsed = new Date(iso);
+  return Number.isNaN(parsed.getTime())
+    ? iso.slice(0, 10)
+    : parsed.toLocaleDateString('en-AU', COMPED_DATE_FORMAT);
+}
 
 export function AdminCcwSignInsClient() {
   const [eventSlug, setEventSlug] = useState(ccwRoadshowEvents[0]?.slug ?? '');
@@ -82,33 +134,47 @@ export function AdminCcwSignInsClient() {
     void load();
   }, [load]);
 
-  async function post(payload: Record<string, unknown>) {
+  /**
+   * Returns the parsed success body, or `null` for any failure. Callers that
+   * only care whether it worked can test truthiness; the comp action needs the
+   * body, because what was actually granted is not derivable from the request.
+   */
+  async function post(
+    payload: Record<string, unknown>,
+    url: string = SIGN_INS_ENDPOINT
+  ): Promise<Record<string, unknown> | null> {
     try {
-      const res = await fetch('/api/admin/ccw-roadshow/sign-ins', {
+      const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
+      const body = (await res.json().catch(() => ({}))) as Record<string, unknown> & {
+        detail?: string;
+      };
       if (!res.ok) {
-        const p = (await res.json().catch(() => ({}))) as { detail?: string };
-        setError(p.detail || 'Action failed');
-        return false;
+        setError(body.detail || 'Action failed');
+        return null;
       }
       setError('');
       await load();
-      return true;
+      return body;
     } catch {
       setError('Network error while completing the action. Please try again.');
-      return false;
+      return null;
     }
   }
 
-  async function runRosterMutation(actionKey: string, payload: Record<string, unknown>) {
-    if (mutationInFlight.current) return false;
+  async function runRosterMutation(
+    actionKey: string,
+    payload: Record<string, unknown>,
+    url: string = SIGN_INS_ENDPOINT
+  ): Promise<Record<string, unknown> | null> {
+    if (mutationInFlight.current) return null;
     mutationInFlight.current = true;
     setPendingAction(actionKey);
     try {
-      return await post(payload);
+      return await post(payload, url);
     } finally {
       mutationInFlight.current = false;
       setPendingAction(null);
@@ -140,11 +206,91 @@ export function AdminCcwSignInsClient() {
     });
   }
 
+  /**
+   * Comp ONE named attendee a year of membership. Since the A$295 attendee
+   * discount was removed on 2026-08-25 this is the only attendee membership
+   * path, and the price is always one the operator names.
+   *
+   * Two dialogs, deliberately. The grant rotates an existing member's password
+   * and reveals the new one only in the welcome email, so a mis-click costs a
+   * real person their access (the #694 hazard). The price is asked for first
+   * because it is recorded against the grant and cannot be corrected from this
+   * screen afterwards; the confirm then restates the resolved figure and the
+   * address the credentials go to.
+   */
+  async function compMembership(row: RosterRow) {
+    const entered = window.prompt(
+      [
+        `Grant ${row.fullName} (${row.email}) a year of CARSI membership.`,
+        '',
+        'This grants the membership outright — it creates NO Stripe subscription, so it will not renew. It also resets their CARSI password and sends the new one in the welcome email.',
+        '',
+        'Enter the lump sum collected in AUD, or 0 for a complimentary comp:',
+      ].join('\n'),
+      attendeeRateAud === null ? '' : String(attendeeRateAud)
+    );
+    if (entered === null) return;
+
+    const raw = entered.trim();
+    if (!PRICE_PATTERN.test(raw)) {
+      setError('Enter the lump sum in AUD — digits only, up to two decimal places (0 for a complimentary comp).');
+      return;
+    }
+    const priceAud = Number(raw);
+
+    if (
+      !window.confirm(
+        `Comp ${row.fullName} a year of membership at A$${raw}?\n\nTheir password will be reset and the new one sent to ${row.email}.`
+      )
+    ) {
+      return;
+    }
+
+    const result = await runRosterMutation(
+      `comp:${row.signInId}`,
+      {
+        signInId: row.signInId,
+        // An explicit price every time. The route defaults a missing mode to the
+        // configured attendee rate, but this screen already knows the figure the
+        // operator agreed to, so it says so rather than relying on that default.
+        pricingMode: priceAud === 0 ? 'free' : 'custom',
+        priceAud,
+      },
+      COMP_MEMBERSHIP_ENDPOINT
+    );
+    if (!result) return;
+
+    // The grant reports whether the welcome email — the ONLY copy of the password
+    // it just issued — actually reached the attendee. A failure here is not a
+    // failed comp: the membership stands and must NOT be re-issued (that would
+    // rotate the password again). It is a locked-out member, and the operator is
+    // the only one positioned to notice.
+    const welcomeEmail = result.welcomeEmail as WelcomeEmailDelivery | undefined;
+
+    window.alert(
+      [
+        `Membership granted to ${row.email}.`,
+        `Recorded at: ${result.priceLabel ?? `A$${raw}`}`,
+        `Courses they can open: ${result.reachableCourseCount ?? 0} of ${result.publishedCourseCount ?? 0} published.`,
+        '',
+        // The recovery line belongs on EVERY branch, including success. Delivered
+        // means the provider accepted the message, not that the attendee read
+        // it — a bounce or a spam folder leaves them locked out just the same,
+        // and the password exists nowhere else.
+        welcomeEmail === undefined
+          ? `Their password has been reset and exists only in the welcome email. ${welcomeEmailRecovery(true)}`
+          : welcomeEmail.delivered
+            ? `The welcome email carrying their new password has been sent. ${welcomeEmailRecovery(true)}`
+            : `WARNING: the welcome email was NOT delivered — ${describeWelcomeEmailFailure(welcomeEmail.reason)}. Their password was reset and existed only in that email, so ${row.email} CANNOT sign in. ${welcomeEmailRecovery(false)}`,
+      ].join('\n')
+    );
+  }
+
   async function runProvisionBatch() {
     if (!eventSlug) return;
     if (
       !window.confirm(
-        `Run provision for ${eventSlug}? Creates CARSI accounts for Day-1 sign-ins, issues both-day certificates, and sends the post-event offer pack (Shopify + $295 membership) to eligible attendees.`
+        `Run provision for ${eventSlug}? Creates CARSI accounts for Day-1 sign-ins, issues both-day certificates, and sends the post-event offer pack (Shopify + CCW links) to eligible attendees.`
       )
     ) {
       return;
@@ -293,8 +439,7 @@ export function AdminCcwSignInsClient() {
           Day marks are the write-once source of truth. A correction clears a mistaken mark
           (recorded in the admin log). Both days = certificate of attendance. After Day 2, run{' '}
           <span className="text-white/80">Provision + offers</span> to create accounts, issue
-          certificates, and email the Shopify training link + $295 membership special to opted-in
-          attendees.
+          certificates, and email the Shopify training link to opted-in attendees.
         </p>
       </div>
 
@@ -422,7 +567,7 @@ export function AdminCcwSignInsClient() {
 
       {roster && (
         <div className="overflow-x-auto rounded-2xl border border-white/10 bg-[#09111f]/95">
-          <table className="w-full min-w-[980px] border-collapse text-sm">
+          <table className="w-full min-w-[1080px] border-collapse text-sm">
             <thead className="bg-white/[0.06] text-white/85">
               <tr className="border-b border-white/10 text-left">
                 <th className="p-3 font-semibold">Name</th>
@@ -434,6 +579,7 @@ export function AdminCcwSignInsClient() {
                 <th className="p-3 font-semibold">Opt-in</th>
                 <th className="p-3 font-semibold">Offer</th>
                 <th className="p-3 font-semibold">Certificate</th>
+                <th className="p-3 font-semibold">Membership</th>
                 <th className="p-3 font-semibold">Actions</th>
               </tr>
             </thead>
@@ -455,6 +601,13 @@ export function AdminCcwSignInsClient() {
                     {row.offerEmailSentAt ? 'Sent' : row.offerEligible ? 'Ready' : '—'}
                   </td>
                   <td className="p-3">{row.attendanceComplete ? 'Attended' : '—'}</td>
+                  <td className="p-3">
+                    {row.membershipCompedAt
+                      ? `Comped ${formatCompedDate(row.membershipCompedAt)}`
+                      : row.offerEligible
+                        ? 'Eligible'
+                        : '—'}
+                  </td>
                   <td className="p-3">
                     <div className="flex flex-wrap gap-2">
                       {row.day1CheckedInAt && (
@@ -488,6 +641,17 @@ export function AdminCcwSignInsClient() {
                       >
                         Merge dupe
                       </button>
+                      {row.offerEligible && !row.membershipCompedAt && (
+                        <button
+                          type="button"
+                          onClick={() => compMembership(row)}
+                          disabled={pendingAction !== null}
+                          aria-busy={pendingAction === `comp:${row.signInId}`}
+                          className="rounded border border-emerald-300/40 bg-emerald-300/10 px-2 py-1 text-xs text-emerald-100 disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          Comp membership
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>
