@@ -22,7 +22,7 @@ import { resolveDurationHours } from '../src/lib/seed/cec-hours';
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const CATALOG_PATH = join(ROOT, 'data', 'seed', 'courses-catalog.json');
 
-const PROVIDER_NAME = 'Cleaning and Restoration Science Institute (CARSI)';
+const PROVIDER_NAME = 'Centre for Australian Restoration and Standards Information (CARSI)';
 const PROVIDER_WEBSITE = 'https://www.carsi.com.au';
 const POINT_OF_CONTACT = 'CARSI Support — support@carsi.com.au';
 
@@ -52,7 +52,12 @@ function buildPack(course: CatalogCourse, instructorName: string | null): string
     shortDescription: course.shortDescription,
     description: course.description,
   });
-  const requestedCecs = durationHours != null ? Math.max(1, Math.floor(durationHours)) : null;
+  // No CEC quantity is derived here, deliberately. CLAUDE.md makes CEC fail-closed: a course
+  // carries a credit only from an approval recorded in data/seed/cec-approvals.json, or an
+  // explicit founder-set positive cecHours. Deriving one from duration is the exact inference
+  // path deleted from resolveCecHours on 2026-07-09; it survived in this script until the
+  // independent review of 364b996e found it. Duration is a verified fact and is still stated;
+  // the credit that would follow from it is the IICRC's to determine, not CARSI's to assert.
 
   const summary =
     firstParagraph(course.shortDescription) ??
@@ -82,7 +87,6 @@ Prepared ${today} for submission to **CECCourse@iicrcnet.org**.
 
 - **Provider:** ${PROVIDER_NAME}
 - **Website:** ${PROVIDER_WEBSITE}
-- **Standing:** listed in the IICRC CEC Provider Directory and Online CEC Training list (iicrccecevents.com)
 
 ## 2. Course title
 
@@ -100,11 +104,7 @@ Prepared ${today} for submission to **CECCourse@iicrcnet.org**.
       ? `${durationHours} educational hour${durationHours === 1 ? '' : 's'}`
       : 'TBC — founder to confirm the educational (contact) hours'
   }
-- **CECs requested:** ${
-    requestedCecs != null
-      ? `${requestedCecs} (1 CEC per educational hour, per the published IICRC CEC arithmetic)`
-      : 'TBC — 1 CEC per educational hour once duration is confirmed'
-  }
+- **CEC credit:** none claimed. CARSI asks the IICRC to determine the credit for the duration stated above. No CEC value is published for this course on any surface until an approval is recorded in \`data/seed/cec-approvals.json\`.
 
 ## 4. Course summary and learning objectives
 
@@ -128,7 +128,6 @@ ${objectives.length > 0 ? objectives.map((o) => `- ${o}`).join('\n') : '- TBC �
 - Learning-objective map (section 4 above)
 - Sample certificate of completion (issued on course completion; names learner, course, hours)
 - Assessment/quiz outline demonstrating learner evaluation
-- CARSI listing in the IICRC CEC Provider Directory (iicrccecevents.com)
 
 ---
 

@@ -72,3 +72,35 @@ plus 4-week rolling course sales. Every session reports RWR movement or names th
   **Autonomy unblocked:** the founder set `OPENROUTER_API_KEY`/`OPENROUTER_MODEL` in Vercel, so
   agents can now complete a release gate independently. Full evidence:
   `docs/session-handoffs/STOPPER-REGISTER-20260819.md`; queue as BACKLOG #29–#37.
+- 2026-08-26: Gate 0. **RWR ≈ $0 — unchanged, and the blocker moved.** It is no longer that the
+  code is not ready. Subscriptions are decided (DECISIONS #2) and the roadshow money path is
+  built end to end; both wait on the founder, and the thing genuinely in front of them is a
+  **live `sk_live_` Stripe key sitting in plaintext** in the `monkfish-app` spec — 43 of 44 env
+  vars unencrypted, only `CRON_SECRET` sealed. Turning payments on in that environment is the
+  wrong order. Runbook: `docs/runbooks/seal-do-app-secrets.md` — rotate, then seal, then flip.
+  **Customer-visible delta: carsi.com.au was selling three events that had already happened.**
+  `/events/ccw-roadshow` returned HTTP 200 advertising Melbourne (ended 22–23 Jul), Sydney
+  (30–31 Jul) and Brisbane (11–12 Aug), and was taking registrations for all three. Brisbane is
+  now Friday 4 – Saturday 5 September at **$149/seat, every location**; free entry is retired on
+  founder decision. Melbourne and Sydney still need dates or retirement — dates were **not**
+  invented, and a test pins the expired set exactly so it cannot be forgotten.
+  **The booking flow confirmed seats without taking payment**, so a 15-seat cap could fill with
+  people who never paid. Pay-to-play now takes a 72-hour hold that counts against the cap,
+  Stripe checkout runs behind `ROADSHOW_PAYMENT_REQUIRED` (default **off**), and the webhook
+  refuses to confirm a lapsed hold rather than overselling the room. No migration was needed.
+  **Two courses authored** — one-day Leather Technician ($275) and one-day AI for Cleaning and
+  Restoration ($220), both `draft`, both `iicrcDiscipline: null` / `cecHours: 0` because neither
+  is a restoration discipline. Neither has been validated with a buyer; the prices are
+  founder-set, not tested.
+  **A day's work became four reviewable branches** (`docs/` → `fix/` → courses / money), cut
+  from `origin/main` and each green standalone; the omnibus was archived, not deleted, after a
+  self-testing checker proved **80 paths covered, 0 stranded**. Splitting exposed a hard merge
+  order that was invisible while everything sat together: the hardened licence guard catches
+  **nine real violations already on `main`**, so `docs/` must land first or CI goes red for a
+  defect the code branch merely reveals.
+  **Nothing is pushed.** The cross-vendor reviewer is rate-limited until **31/08 11:13**,
+  verified this session two ways — not carried over as an assumption.
+  **One correction worth keeping:** a session reported the subscription flip impossible after
+  checking `printenv` and finding no credentials. `doctl` was authenticated the whole time.
+  `ENGINE.md` now says to check it before asserting a credential blocker. Full detail:
+  `docs/session-handoffs/handoff-20260826-2320-four-branch-split.md`.

@@ -1,5 +1,18 @@
 # Production Deployment Guide - Domain Memory System
 
+> ## NOT ABOUT CARSI. Flagged 26/08/2026.
+>
+> This document deploys a "domain memory system" — a different product. Its filename collides
+> with `docs/PRODUCTION_DEPLOY.md` and `docs/guides/PRODUCTION-DEPLOYMENT.md`, so a reader
+> searching for how CARSI ships lands here by accident and follows instructions for something
+> else entirely.
+>
+> **CARSI's real deployment:** DigitalOcean App Platform app `monkfish-app` via `app.yaml`
+> (`branch: main`, `deploy_on_push: true`, `dockerfile_path: deploy/Dockerfile`).
+>
+> Nothing below applies to shipping CARSI. Deleting or renaming this file is a backlog
+> discovery, not done here.
+
 Complete guide for deploying the domain memory system to production environments.
 
 ## Table of Contents

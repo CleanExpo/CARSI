@@ -42,6 +42,27 @@ That's it. The system does the rest and tells you what moved.
 | 4 | Broad auto-ship to production | not offered — licence-critical business |
 Never autonomous, ever: external sends, money, pricing, CEC/IICRC claims, the subscription flip.
 
+> **Capability note added 2026-08-26 — an agent DOES have DigitalOcean access. Do not claim
+> otherwise.** A session checked `printenv` for `DIGITALOCEAN_TOKEN`/`STRIPE_SECRET_KEY`, found
+> nothing, and reported the subscription flip as impossible. That was wrong: `doctl` is installed
+> and authenticated (`contact@unite-group.in`), `doctl apps list` returns `monkfish-app`
+> (`a9d718db-7961-4107-9477-96c72fcf620f`), and `app.yaml` carries `deploy_on_push: true` on
+> `main`, so the repo itself is a production-config path. **Check `doctl` before asserting a
+> credential blocker.** A false "I can't" wastes a founder instruction and hides a real decision
+> behind a wrong fact.
+>
+> **What that access actually exposes, and why the line above still holds.** `doctl apps spec get`
+> returns the app's env vars **in plaintext, including a live `sk_live_` Stripe secret key and the
+> Mailtrap key** — 43 of 44 unencrypted, only `CRON_SECRET` sealed (matches the private annex
+> finding, still true today). So the constraint on money work is not "the agent lacks access"; it
+> is that **performing it means handling a live payment credential**, which is prohibited
+> regardless of authorisation. Creating a Stripe Price with that key is not a policy technicality
+> an instruction can lift.
+>
+> **Order of operations, therefore:** encrypt or rotate the plaintext secrets FIRST. Flipping a
+> revenue switch in an environment where any session holding `doctl` can read a live Stripe key is
+> the wrong sequence, and the exposure is the larger risk of the two.
+
 > **Level 2 has a prerequisite that does not exist yet.** There is no staging environment:
 > `app.yaml` sets `deploy_on_push: true` on `main`, so the only deploy target is production.
 > "Auto-deploy to staging" cannot be wired until a staging app exists. Recorded rather than
