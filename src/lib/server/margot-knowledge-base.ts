@@ -34,7 +34,7 @@ Core IICRC discipline certifications (acronyms used across CARSI's catalogue):
 - OCT — Odor Control Technician
 - CCT — Carpet Cleaning Technician
 
-CEC (Continuing Education Credit): 1 CEC = 1 hour of learning. Standard technician certifications (WRT, ASD, AMRT, etc.) require 14 CEC hours every 4 years to maintain; Master-level and Inspector certifications require 14 CEC hours every 2 years. It is the certified technician's own responsibility to submit CEC documentation to IICRC and pay the annual renewal fee. A CARSI course displays IICRC CEC hours only where data/seed/cec-approvals.json records a founder-confirmed per-course IICRC approval.
+CEC (Continuing Education Credit): the IICRC's general arithmetic is 1 CEC per hour of learning, but that rule describes courses the IICRC has already approved and must NEVER be applied to a CARSI course to work out its credit. Do not multiply a CARSI course's duration to state or imply a CEC value. A CARSI course carries CEC hours only where data/seed/cec-approvals.json records a founder-confirmed per-course IICRC approval; for any course without such an entry the correct answer is that it earns no CECs yet, whatever its length. Standard technician certifications (WRT, ASD, AMRT, etc.) require 14 CEC hours every 4 years to maintain; Master-level and Inspector certifications require 14 CEC hours every 2 years. It is the certified technician's own responsibility to submit CEC documentation to IICRC and pay the annual renewal fee.
 Source: iicrc.org/abouttheiicrc, iicrc.org/accepted-cecs, iicrc.org/iicrcfaqs
 
 --- Australian Cert IV Cleaning Qualification ---
