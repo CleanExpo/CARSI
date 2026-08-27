@@ -22,7 +22,7 @@ import { resolveDurationHours } from '../src/lib/seed/cec-hours';
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const CATALOG_PATH = join(ROOT, 'data', 'seed', 'courses-catalog.json');
 
-const PROVIDER_NAME = 'Cleaning and Restoration Science Institute (CARSI)';
+const PROVIDER_NAME = 'Centre for Australian Restoration and Standards Information (CARSI)';
 const PROVIDER_WEBSITE = 'https://www.carsi.com.au';
 const POINT_OF_CONTACT = 'CARSI Support â€” support@carsi.com.au';
 
@@ -87,7 +87,6 @@ Prepared ${today} for submission to **CECCourse@iicrcnet.org**.
 
 - **Provider:** ${PROVIDER_NAME}
 - **Website:** ${PROVIDER_WEBSITE}
-- **Standing:** listed in the IICRC CEC Provider Directory and Online CEC Training list (iicrccecevents.com)
 
 ## 2. Course title
 
@@ -129,7 +128,6 @@ ${objectives.length > 0 ? objectives.map((o) => `- ${o}`).join('\n') : '- TBC â€
 - Learning-objective map (section 4 above)
 - Sample certificate of completion (issued on course completion; names learner, course, hours)
 - Assessment/quiz outline demonstrating learner evaluation
-- CARSI listing in the IICRC CEC Provider Directory (iicrccecevents.com)
 
 ---
 

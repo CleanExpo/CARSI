@@ -4,9 +4,8 @@ Prepared 27 August 2026 for submission to **CECCourse@iicrcnet.org**.
 
 ## 1. Provider name and website
 
-- **Provider:** Cleaning and Restoration Science Institute (CARSI)
+- **Provider:** Centre for Australian Restoration and Standards Information (CARSI)
 - **Website:** https://www.carsi.com.au
-- **Standing:** listed in the IICRC CEC Provider Directory and Online CEC Training list (iicrccecevents.com)
 
 ## 2. Course title
 
@@ -53,7 +52,6 @@ Prepared 27 August 2026 for submission to **CECCourse@iicrcnet.org**.
 - Learning-objective map (section 4 above)
 - Sample certificate of completion (issued on course completion; names learner, course, hours)
 - Assessment/quiz outline demonstrating learner evaluation
-- CARSI listing in the IICRC CEC Provider Directory (iicrccecevents.com)
 
 ---
 
