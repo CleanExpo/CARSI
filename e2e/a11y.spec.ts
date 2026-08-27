@@ -35,6 +35,40 @@ async function blockingViolations(page: import('@playwright/test').Page) {
   return results.violations.filter((v) => BLOCKING_IMPACTS.has(v.impact ?? ''));
 }
 
+/**
+ * Block until every catalogue card has finished fading in.
+ *
+ * `CourseGrid` wraps each card in a `motion.div` with
+ * `transition={{ duration: 0.4, delay: i * 0.05 }}`, so card 44 of the catalogue does not
+ * finish until 2.6s and the last of 71 not until ~3.9s. `emulateMedia({ reducedMotion })`
+ * does not suppress it: `CourseGrid` never calls `useReducedMotion()` and the app sets no
+ * `MotionConfig`, so framer-motion animates regardless. The previous fixed 700ms sleep
+ * therefore let axe measure the tail of the grid mid-fade and report partial opacity as
+ * nine `color-contrast` violations — cards 44-47, foreground fading #3181c9 to #d3e4f4.
+ *
+ * Waiting for the real end state removes that false failure without weakening the gate: a
+ * genuine contrast defect is still fully opaque when measured, and still fails.
+ */
+async function waitForCardsSettled(page: import('@playwright/test').Page) {
+  await page.locator('article').first().waitFor({ state: 'attached' });
+  await page.waitForFunction(
+    () => {
+      const articles = Array.from(document.querySelectorAll('article'));
+      if (articles.length === 0) return false;
+      return articles.every((article) => {
+        let el: Element | null = article;
+        while (el && el !== document.body) {
+          if (Number.parseFloat(getComputedStyle(el).opacity) < 1) return false;
+          el = el.parentElement;
+        }
+        return true;
+      });
+    },
+    undefined,
+    { timeout: 20_000 },
+  );
+}
+
 /** Readable failure output — an id alone does not tell you what to fix. */
 function describe(violations: Awaited<ReturnType<typeof blockingViolations>>) {
   return violations
@@ -44,14 +78,14 @@ function describe(violations: Awaited<ReturnType<typeof blockingViolations>>) {
 
 test.describe('a11y: public course surfaces', () => {
   test('course catalogue has no critical or serious violations', async ({ page }) => {
-    // Cards fade in via framer-motion (`initial="hidden"`). axe measures computed
-    // colour, so scanning mid-fade reads every element at partial opacity and reports
-    // false contrast failures. Emulate reduced motion and let the page settle so the
-    // scan sees the real, static, fully-opaque state.
+    // Cards fade in via framer-motion, staggered by index. axe measures computed colour,
+    // so scanning mid-fade reads the tail of the grid at partial opacity and reports false
+    // contrast failures. Wait for every card to reach full opacity so the scan sees the
+    // real, static state. Reduced motion is still emulated for any component that honours it.
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/courses');
     await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(700);
+    await waitForCardsSettled(page);
     const violations = await blockingViolations(page);
     expect(violations, describe(violations)).toEqual([]);
   });
