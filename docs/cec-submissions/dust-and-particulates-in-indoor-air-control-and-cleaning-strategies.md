@@ -1,11 +1,12 @@
 # IICRC CEC Course Approval Submission — Dust and Particulates in Indoor Air: Control and Cleaning Strategies
 
-Prepared 26 August 2026 for submission to **CECCourse@iicrcnet.org**.
+Prepared 27 August 2026 for submission to **CECCourse@iicrcnet.org**.
 
 ## 1. Provider name and website
 
-- **Provider:** Centre for Australian Restoration and Standards Information (CARSI)
+- **Provider:** Cleaning and Restoration Science Institute (CARSI)
 - **Website:** https://www.carsi.com.au
+- **Standing:** listed in the IICRC CEC Provider Directory and Online CEC Training list (iicrccecevents.com)
 
 ## 2. Course title
 
@@ -17,7 +18,7 @@ Prepared 26 August 2026 for submission to **CECCourse@iicrcnet.org**.
 ## 3. Dates and duration
 
 - **Delivery:** online, self-paced (on demand) at https://www.carsi.com.au
-- **Available from:** 26 August 2026 (submitted for approval before any CEC claim is made)
+- **Available from:** 27 August 2026 (submitted for approval before any CEC claim is made)
 - **Duration:** 1.1 educational hours
 - **CEC credit:** none claimed. CARSI asks the IICRC to determine the credit for the duration stated above. No CEC value is published for this course on any surface until an approval is recorded in `data/seed/cec-approvals.json`.
 
@@ -52,6 +53,7 @@ Prepared 26 August 2026 for submission to **CECCourse@iicrcnet.org**.
 - Learning-objective map (section 4 above)
 - Sample certificate of completion (issued on course completion; names learner, course, hours)
 - Assessment/quiz outline demonstrating learner evaluation
+- CARSI listing in the IICRC CEC Provider Directory (iicrccecevents.com)
 
 ---
 

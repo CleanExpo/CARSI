@@ -52,7 +52,12 @@ function buildPack(course: CatalogCourse, instructorName: string | null): string
     shortDescription: course.shortDescription,
     description: course.description,
   });
-  const requestedCecs = durationHours != null ? Math.max(1, Math.floor(durationHours)) : null;
+  // No CEC quantity is derived here, deliberately. CLAUDE.md makes CEC fail-closed: a course
+  // carries a credit only from an approval recorded in data/seed/cec-approvals.json, or an
+  // explicit founder-set positive cecHours. Deriving one from duration is the exact inference
+  // path deleted from resolveCecHours on 2026-07-09; it survived in this script until the
+  // independent review of 364b996e found it. Duration is a verified fact and is still stated;
+  // the credit that would follow from it is the IICRC's to determine, not CARSI's to assert.
 
   const summary =
     firstParagraph(course.shortDescription) ??
@@ -100,11 +105,7 @@ Prepared ${today} for submission to **CECCourse@iicrcnet.org**.
       ? `${durationHours} educational hour${durationHours === 1 ? '' : 's'}`
       : 'TBC — founder to confirm the educational (contact) hours'
   }
-- **CECs requested:** ${
-    requestedCecs != null
-      ? `${requestedCecs} (1 CEC per educational hour, per the published IICRC CEC arithmetic)`
-      : 'TBC — 1 CEC per educational hour once duration is confirmed'
-  }
+- **CEC credit:** none claimed. CARSI asks the IICRC to determine the credit for the duration stated above. No CEC value is published for this course on any surface until an approval is recorded in \`data/seed/cec-approvals.json\`.
 
 ## 4. Course summary and learning objectives
 

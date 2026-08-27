@@ -1,4 +1,4 @@
-# IICRC CEC submission packs — batch of 10
+# IICRC CEC submission packs — batch of 9
 
 BACKLOG row 2. Generated 26/08/2026 by `scripts/generate-cec-submission.ts` from
 `data/seed/courses-catalog.json`.
@@ -60,8 +60,9 @@ a genuine credential. It should not come back into the template unconfirmed.
 
 ## Which nine, and why
 
-Ranked among the **24 published** courses by educational hours, since CEC arithmetic follows
-contact hours, restricted to courses that genuinely map to an IICRC discipline area.
+Ranked among the **24 published** courses by educational hours — the longer courses are the
+stronger candidates — restricted to courses that genuinely map to an IICRC discipline area.
+No credit quantity is stated or implied anywhere in this batch; the IICRC determines it.
 
 | # | slug | hours | category |
 |---|---|---|---|
