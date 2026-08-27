@@ -61,14 +61,19 @@ describe('approvedCecHoursFromRegistry (pure lookup)', () => {
 });
 
 describe('shipped registry (data/seed/cec-approvals.json)', () => {
-  it('contains only genuinely-approved entries — none recorded yet, so it is empty', () => {
-    // When the founder records the first IICRC approval, update this expectation to
-    // assert the approved entries instead — never seed an approval without evidence.
-    expect(getCecApprovalEntries()).toEqual([]);
-    expect(getApprovedCecSlugs()).toEqual([]);
+  it('records the 38 approvals from the founder-supplied IICRC CEC class list (2026-08-27)', () => {
+    const entries = getCecApprovalEntries();
+    expect(entries).toHaveLength(38);
+    expect(entries.every((e) => e.status === 'approved' && e.approvedHours === 1)).toBe(true);
+    expect(getApprovedCecSlugs()).toHaveLength(38);
   });
 
-  it('yields no hours for any slug while empty (fail-closed launch state)', () => {
+  it('resolves hours for approved slugs only — everything else stays fail-closed', () => {
+    expect(getApprovedCecHours('introduction-to-water-damage-restoration')).toBe(1);
+    expect(getCecApproval('introduction-to-porous-materials-drying')?.approvedAt).toBe(
+      '2024-01-18'
+    );
+    // Near-miss course NOT on the class list — no entry, no hours (fail-closed).
     expect(getApprovedCecHours('wrt-water-damage-essentials')).toBeNull();
     expect(getCecApproval('wrt-water-damage-essentials')).toBeNull();
   });

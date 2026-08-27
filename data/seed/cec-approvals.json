@@ -1,5 +1,398 @@
 {
   "version": 1,
-  "note": "IICRC CEC approvals registry — the single source of truth for CEC hours (licence-critical). A course may display CEC hours ONLY when it has an entry here with status 'approved' and founder-recorded approvedHours. Entries are added by the founder after per-course IICRC approval via CECCourse@iicrcnet.org (submission pack: scripts/generate-cec-submission.ts). Validated in CI by npm run check:cec. Ships empty until the first genuine approval is confirmed.",
-  "approvals": []
+  "note": "IICRC CEC approvals registry — the single source of truth for CEC hours (licence-critical). A course may display CEC hours ONLY when it has an entry here with status 'approved' and founder-recorded approvedHours. Entries are added by the founder after per-course IICRC approval via CECCourse@iicrcnet.org (submission pack: scripts/generate-cec-submission.ts). Validated in CI by npm run check:cec. Current contents: 38 classes recorded 2026-08-27 from the IICRC CEC Accredited class list for CARSI supplied by the founder (CARSI_courses.pdf, 2 pages; approval batches 2024-01-18, 2024-05-06, 2024-06-20 and 2025-05-15, each expiring three years after approval).",
+  "approvals": [
+    {
+      "slug": "introduction-to-porous-materials-drying",
+      "title": "Introduction to Porous Materials Drying",
+      "status": "approved",
+      "approvedHours": 1,
+      "approvedAt": "2024-01-18",
+      "expiresAt": "2027-01-18",
+      "iicrcReference": "IICRC CEC class listing for CARSI — approval batch 2024-01-18",
+      "evidence": "CARSI_courses.pdf (IICRC CEC Accredited class list for CARSI, 2 pages) supplied by founder 2026-08-27",
+      "note": "Class is on the legacy WordPress platform (WP slug 'porous-drying'), not on the current published LMS catalogue; LMS slug derived from the title per the LMS slug convention."
+    },
+    {
+      "slug": "introduction-to-odour-control-and-removal-techniques",
+      "title": "Introduction to Odour Control and Removal Techniques",
+      "status": "approved",
+      "approvedHours": 1,
+      "approvedAt": "2024-01-18",
+      "expiresAt": "2027-01-18",
+      "iicrcReference": "IICRC CEC class listing for CARSI — approval batch 2024-01-18",
+      "evidence": "CARSI_courses.pdf (IICRC CEC Accredited class list for CARSI, 2 pages) supplied by founder 2026-08-27"
+    },
+    {
+      "slug": "introduction-to-structural-drying-concepts",
+      "title": "Introduction to Structural Drying Concepts",
+      "status": "approved",
+      "approvedHours": 1,
+      "approvedAt": "2024-01-18",
+      "expiresAt": "2027-01-18",
+      "iicrcReference": "IICRC CEC class listing for CARSI — approval batch 2024-01-18",
+      "evidence": "CARSI_courses.pdf (IICRC CEC Accredited class list for CARSI, 2 pages) supplied by founder 2026-08-27"
+    },
+    {
+      "slug": "introduction-to-drying-techniques-and-equipment",
+      "title": "Introduction to Drying Techniques and Equipment",
+      "status": "approved",
+      "approvedHours": 1,
+      "approvedAt": "2024-01-18",
+      "expiresAt": "2027-01-18",
+      "iicrcReference": "IICRC CEC class listing for CARSI — approval batch 2024-01-18",
+      "evidence": "CARSI_courses.pdf (IICRC CEC Accredited class list for CARSI, 2 pages) supplied by founder 2026-08-27",
+      "note": "Class is on the legacy WordPress platform (WP slug 'drying-techniques'), not on the current published LMS catalogue; LMS slug derived from the title per the LMS slug convention."
+    },
+    {
+      "slug": "introduction-to-water-damage-estimating",
+      "title": "Introduction to Water Damage Estimating",
+      "status": "approved",
+      "approvedHours": 1,
+      "approvedAt": "2024-01-18",
+      "expiresAt": "2027-01-18",
+      "iicrcReference": "IICRC CEC class listing for CARSI — approval batch 2024-01-18",
+      "evidence": "CARSI_courses.pdf (IICRC CEC Accredited class list for CARSI, 2 pages) supplied by founder 2026-08-27"
+    },
+    {
+      "slug": "introduction-to-applied-structural-drying",
+      "title": "Introduction to Applied Structural Drying",
+      "status": "approved",
+      "approvedHours": 1,
+      "approvedAt": "2024-01-18",
+      "expiresAt": "2027-01-18",
+      "iicrcReference": "IICRC CEC class listing for CARSI — approval batch 2024-01-18",
+      "evidence": "CARSI_courses.pdf (IICRC CEC Accredited class list for CARSI, 2 pages) supplied by founder 2026-08-27"
+    },
+    {
+      "slug": "introduction-to-safety-procedures-for-water-damage-work",
+      "title": "Introduction to Safety Procedures for Water Damage Work",
+      "status": "approved",
+      "approvedHours": 1,
+      "approvedAt": "2024-01-18",
+      "expiresAt": "2027-01-18",
+      "iicrcReference": "IICRC CEC class listing for CARSI — approval batch 2024-01-18",
+      "evidence": "CARSI_courses.pdf (IICRC CEC Accredited class list for CARSI, 2 pages) supplied by founder 2026-08-27"
+    },
+    {
+      "slug": "introduction-to-advanced-drying-equipment-and-methods",
+      "title": "Introduction to Advanced Drying Equipment and Methods",
+      "status": "approved",
+      "approvedHours": 1,
+      "approvedAt": "2024-01-18",
+      "expiresAt": "2027-01-18",
+      "iicrcReference": "IICRC CEC class listing for CARSI — approval batch 2024-01-18",
+      "evidence": "CARSI_courses.pdf (IICRC CEC Accredited class list for CARSI, 2 pages) supplied by founder 2026-08-27"
+    },
+    {
+      "slug": "introduction-to-water-damage-restoration",
+      "title": "Introduction to Water Damage Restoration",
+      "status": "approved",
+      "approvedHours": 1,
+      "approvedAt": "2024-01-18",
+      "expiresAt": "2027-01-18",
+      "iicrcReference": "IICRC CEC class listing for CARSI — approval batch 2024-01-18",
+      "evidence": "CARSI_courses.pdf (IICRC CEC Accredited class list for CARSI, 2 pages) supplied by founder 2026-08-27"
+    },
+    {
+      "slug": "introduction-to-water-damage-in-commercial-buildings",
+      "title": "Introduction to Water Damage in Commercial Buildings",
+      "status": "approved",
+      "approvedHours": 1,
+      "approvedAt": "2024-01-18",
+      "expiresAt": "2027-01-18",
+      "iicrcReference": "IICRC CEC class listing for CARSI — approval batch 2024-01-18",
+      "evidence": "CARSI_courses.pdf (IICRC CEC Accredited class list for CARSI, 2 pages) supplied by founder 2026-08-27"
+    },
+    {
+      "slug": "introduction-to-water-extraction-methods",
+      "title": "Introduction to Water Extraction Methods",
+      "status": "approved",
+      "approvedHours": 1,
+      "approvedAt": "2024-01-18",
+      "expiresAt": "2027-01-18",
+      "iicrcReference": "IICRC CEC class listing for CARSI — approval batch 2024-01-18",
+      "evidence": "CARSI_courses.pdf (IICRC CEC Accredited class list for CARSI, 2 pages) supplied by founder 2026-08-27"
+    },
+    {
+      "slug": "introduction-to-mould-identification-and-remediation",
+      "title": "Introduction to Mould Identification and Remediation",
+      "status": "approved",
+      "approvedHours": 1,
+      "approvedAt": "2024-01-18",
+      "expiresAt": "2027-01-18",
+      "iicrcReference": "IICRC CEC class listing for CARSI — approval batch 2024-01-18",
+      "evidence": "CARSI_courses.pdf (IICRC CEC Accredited class list for CARSI, 2 pages) supplied by founder 2026-08-27",
+      "note": "Class is on the legacy WordPress platform (WP slug 'mould-identification'), not on the current published LMS catalogue; LMS slug derived from the title per the LMS slug convention."
+    },
+    {
+      "slug": "introduction-to-basic-carpet-cleaning-and-drying",
+      "title": "Introduction to Basic Carpet Cleaning and Drying",
+      "status": "approved",
+      "approvedHours": 1,
+      "approvedAt": "2024-01-18",
+      "expiresAt": "2027-01-18",
+      "iicrcReference": "IICRC CEC class listing for CARSI — approval batch 2024-01-18",
+      "evidence": "CARSI_courses.pdf (IICRC CEC Accredited class list for CARSI, 2 pages) supplied by founder 2026-08-27"
+    },
+    {
+      "slug": "introduction-to-water-damage-principles",
+      "title": "Introduction to Water Damage Principles",
+      "status": "approved",
+      "approvedHours": 1,
+      "approvedAt": "2024-01-18",
+      "expiresAt": "2027-01-18",
+      "iicrcReference": "IICRC CEC class listing for CARSI — approval batch 2024-01-18",
+      "evidence": "CARSI_courses.pdf (IICRC CEC Accredited class list for CARSI, 2 pages) supplied by founder 2026-08-27"
+    },
+    {
+      "slug": "introduction-to-using-personal-protective-equipment",
+      "title": "Introduction to Using Personal Protective Equipment",
+      "status": "approved",
+      "approvedHours": 1,
+      "approvedAt": "2024-01-18",
+      "expiresAt": "2027-01-18",
+      "iicrcReference": "IICRC CEC class listing for CARSI — approval batch 2024-01-18",
+      "evidence": "CARSI_courses.pdf (IICRC CEC Accredited class list for CARSI, 2 pages) supplied by founder 2026-08-27"
+    },
+    {
+      "slug": "introduction-to-psychrometry-and-the-drying-process",
+      "title": "Introduction to Psychrometry and the Drying Process",
+      "status": "approved",
+      "approvedHours": 1,
+      "approvedAt": "2024-01-18",
+      "expiresAt": "2027-01-18",
+      "iicrcReference": "IICRC CEC class listing for CARSI — approval batch 2024-01-18",
+      "evidence": "CARSI_courses.pdf (IICRC CEC Accredited class list for CARSI, 2 pages) supplied by founder 2026-08-27",
+      "note": "Class is on the legacy WordPress platform (WP slug 'psychrometry-drying'), not on the current published LMS catalogue; LMS slug derived from the title per the LMS slug convention."
+    },
+    {
+      "slug": "introduction-to-forensic-investigations-for-water-losses",
+      "title": "Introduction to Forensic Investigations for Water Losses",
+      "status": "approved",
+      "approvedHours": 1,
+      "approvedAt": "2024-05-06",
+      "expiresAt": "2027-05-06",
+      "iicrcReference": "IICRC CEC class listing for CARSI — approval batch 2024-05-06",
+      "evidence": "CARSI_courses.pdf (IICRC CEC Accredited class list for CARSI, 2 pages) supplied by founder 2026-08-27"
+    },
+    {
+      "slug": "introduction-to-psychrometry-science-and-calculations",
+      "title": "Introduction to Psychrometry Science and Calculations",
+      "status": "approved",
+      "approvedHours": 1,
+      "approvedAt": "2024-05-06",
+      "expiresAt": "2027-05-06",
+      "iicrcReference": "IICRC CEC class listing for CARSI — approval batch 2024-05-06",
+      "evidence": "CARSI_courses.pdf (IICRC CEC Accredited class list for CARSI, 2 pages) supplied by founder 2026-08-27"
+    },
+    {
+      "slug": "introduction-to-project-management-for-water-losses",
+      "title": "Introduction to Project Management for Water Losses",
+      "status": "approved",
+      "approvedHours": 1,
+      "approvedAt": "2024-05-06",
+      "expiresAt": "2027-05-06",
+      "iicrcReference": "IICRC CEC class listing for CARSI — approval batch 2024-05-06",
+      "evidence": "CARSI_courses.pdf (IICRC CEC Accredited class list for CARSI, 2 pages) supplied by founder 2026-08-27"
+    },
+    {
+      "slug": "introduction-to-biological-contaminants-and-treatments",
+      "title": "Introduction to Biological Contaminants and Treatments",
+      "status": "approved",
+      "approvedHours": 1,
+      "approvedAt": "2024-05-06",
+      "expiresAt": "2027-05-06",
+      "iicrcReference": "IICRC CEC class listing for CARSI — approval batch 2024-05-06",
+      "evidence": "CARSI_courses.pdf (IICRC CEC Accredited class list for CARSI, 2 pages) supplied by founder 2026-08-27",
+      "note": "Class is on the legacy WordPress platform (WP slug 'biologicalcontaminants'), not on the current published LMS catalogue; LMS slug derived from the title per the LMS slug convention."
+    },
+    {
+      "slug": "introduction-to-upholstery-cleaning-and-drying",
+      "title": "Introduction to Upholstery Cleaning and Drying",
+      "status": "approved",
+      "approvedHours": 1,
+      "approvedAt": "2024-05-06",
+      "expiresAt": "2027-05-06",
+      "iicrcReference": "IICRC CEC class listing for CARSI — approval batch 2024-05-06",
+      "evidence": "CARSI_courses.pdf (IICRC CEC Accredited class list for CARSI, 2 pages) supplied by founder 2026-08-27",
+      "note": "Class is on the legacy WordPress platform (WP slug 'upholstery'), not on the current published LMS catalogue; LMS slug derived from the title per the LMS slug convention."
+    },
+    {
+      "slug": "introduction-to-hvac-systems-and-drying-strategies",
+      "title": "Introduction to HVAC Systems and Drying Strategies",
+      "status": "approved",
+      "approvedHours": 1,
+      "approvedAt": "2024-05-06",
+      "expiresAt": "2027-05-06",
+      "iicrcReference": "IICRC CEC class listing for CARSI — approval batch 2024-05-06",
+      "evidence": "CARSI_courses.pdf (IICRC CEC Accredited class list for CARSI, 2 pages) supplied by founder 2026-08-27",
+      "note": "Class is on the legacy WordPress platform (WP slug 'hvacsystems'), not on the current published LMS catalogue; LMS slug derived from the title per the LMS slug convention."
+    },
+    {
+      "slug": "introduction-to-digital-moisture-mapping",
+      "title": "Introduction to Digital Moisture Mapping",
+      "status": "approved",
+      "approvedHours": 1,
+      "approvedAt": "2024-05-06",
+      "expiresAt": "2027-05-06",
+      "iicrcReference": "IICRC CEC class listing for CARSI — approval batch 2024-05-06",
+      "evidence": "CARSI_courses.pdf (IICRC CEC Accredited class list for CARSI, 2 pages) supplied by founder 2026-08-27"
+    },
+    {
+      "slug": "introduction-to-applied-microbial-remediation",
+      "title": "Introduction to Applied Microbial Remediation",
+      "status": "approved",
+      "approvedHours": 1,
+      "approvedAt": "2024-05-06",
+      "expiresAt": "2027-05-06",
+      "iicrcReference": "IICRC CEC class listing for CARSI — approval batch 2024-05-06",
+      "evidence": "CARSI_courses.pdf (IICRC CEC Accredited class list for CARSI, 2 pages) supplied by founder 2026-08-27"
+    },
+    {
+      "slug": "introduction-to-smoke-and-soot-damage-restoration",
+      "title": "Introduction to Smoke and Soot Damage Restoration",
+      "status": "approved",
+      "approvedHours": 1,
+      "approvedAt": "2024-05-06",
+      "expiresAt": "2027-05-06",
+      "iicrcReference": "IICRC CEC class listing for CARSI — approval batch 2024-05-06",
+      "evidence": "CARSI_courses.pdf (IICRC CEC Accredited class list for CARSI, 2 pages) supplied by founder 2026-08-27"
+    },
+    {
+      "slug": "introduction-to-advanced-structural-drying-concepts",
+      "title": "Introduction to Advanced Structural Drying Concepts",
+      "status": "approved",
+      "approvedHours": 1,
+      "approvedAt": "2024-05-06",
+      "expiresAt": "2027-05-06",
+      "iicrcReference": "IICRC CEC class listing for CARSI — approval batch 2024-05-06",
+      "evidence": "CARSI_courses.pdf (IICRC CEC Accredited class list for CARSI, 2 pages) supplied by founder 2026-08-27"
+    },
+    {
+      "slug": "introduction-to-developing-a-drying-protocol",
+      "title": "Introduction to Developing a Drying Protocol",
+      "status": "approved",
+      "approvedHours": 1,
+      "approvedAt": "2024-06-20",
+      "expiresAt": "2027-06-20",
+      "iicrcReference": "IICRC CEC class listing for CARSI — approval batch 2024-06-20",
+      "evidence": "CARSI_courses.pdf (IICRC CEC Accredited class list for CARSI, 2 pages) supplied by founder 2026-08-27",
+      "note": "Class is on the legacy WordPress platform (WP slug 'dryingprotocol'), not on the current published LMS catalogue; LMS slug derived from the title per the LMS slug convention."
+    },
+    {
+      "slug": "introduction-to-controlled-environment-drying-methods",
+      "title": "Introduction to Controlled Environment Drying Methods",
+      "status": "approved",
+      "approvedHours": 1,
+      "approvedAt": "2024-06-20",
+      "expiresAt": "2027-06-20",
+      "iicrcReference": "IICRC CEC class listing for CARSI — approval batch 2024-06-20",
+      "evidence": "CARSI_courses.pdf (IICRC CEC Accredited class list for CARSI, 2 pages) supplied by founder 2026-08-27"
+    },
+    {
+      "slug": "introduction-to-large-loss-drying-projects",
+      "title": "Introduction to Large Loss Drying Projects",
+      "status": "approved",
+      "approvedHours": 1,
+      "approvedAt": "2024-06-20",
+      "expiresAt": "2027-06-20",
+      "iicrcReference": "IICRC CEC class listing for CARSI — approval batch 2024-06-20",
+      "evidence": "CARSI_courses.pdf (IICRC CEC Accredited class list for CARSI, 2 pages) supplied by founder 2026-08-27",
+      "note": "Class is on the legacy WordPress platform (WP slug 'largelossdrying'), not on the current published LMS catalogue; LMS slug derived from the title per the LMS slug convention."
+    },
+    {
+      "slug": "introduction-to-consulting-for-complex-water-losses",
+      "title": "Introduction to Consulting for Complex Water Losses",
+      "status": "approved",
+      "approvedHours": 1,
+      "approvedAt": "2024-06-20",
+      "expiresAt": "2027-06-20",
+      "iicrcReference": "IICRC CEC class listing for CARSI — approval batch 2024-06-20",
+      "evidence": "CARSI_courses.pdf (IICRC CEC Accredited class list for CARSI, 2 pages) supplied by founder 2026-08-27"
+    },
+    {
+      "slug": "introduction-to-drying-difficult-materials",
+      "title": "Introduction to Drying Difficult Materials",
+      "status": "approved",
+      "approvedHours": 1,
+      "approvedAt": "2024-06-20",
+      "expiresAt": "2027-06-20",
+      "iicrcReference": "IICRC CEC class listing for CARSI — approval batch 2024-06-20",
+      "evidence": "CARSI_courses.pdf (IICRC CEC Accredited class list for CARSI, 2 pages) supplied by founder 2026-08-27",
+      "note": "Class is on the legacy WordPress platform (WP slug 'difficult-materials'), not on the current published LMS catalogue; LMS slug derived from the title per the LMS slug convention."
+    },
+    {
+      "slug": "introduction-to-exterior-envelope-drying-strategies",
+      "title": "Introduction to Exterior Envelope Drying Strategies",
+      "status": "approved",
+      "approvedHours": 1,
+      "approvedAt": "2024-06-20",
+      "expiresAt": "2027-06-20",
+      "iicrcReference": "IICRC CEC class listing for CARSI — approval batch 2024-06-20",
+      "evidence": "CARSI_courses.pdf (IICRC CEC Accredited class list for CARSI, 2 pages) supplied by founder 2026-08-27",
+      "note": "Class is on the legacy WordPress platform (WP slug 'exterior-envelope-drying'), not on the current published LMS catalogue; LMS slug derived from the title per the LMS slug convention."
+    },
+    {
+      "slug": "introduction-to-water-damage-marketing-and-sales",
+      "title": "Introduction to Water Damage Sales and Marketing",
+      "status": "approved",
+      "approvedHours": 1,
+      "approvedAt": "2024-06-20",
+      "expiresAt": "2027-06-20",
+      "iicrcReference": "IICRC CEC class listing for CARSI — approval batch 2024-06-20",
+      "evidence": "CARSI_courses.pdf (IICRC CEC Accredited class list for CARSI, 2 pages) supplied by founder 2026-08-27",
+      "note": "IICRC class list reads 'Introduction to Water Damage Sales and Marketing'; the live LMS course is titled 'Introduction to Water Damage Marketing and Sales' (same course, word order differs)."
+    },
+    {
+      "slug": "introduction-to-improving-indoor-air-quality-after-water-damage",
+      "title": "Introduction to Improving Indoor Air Quality After Water Damage",
+      "status": "approved",
+      "approvedHours": 1,
+      "approvedAt": "2025-05-15",
+      "expiresAt": "2028-05-15",
+      "iicrcReference": "IICRC CEC class listing for CARSI — approval batch 2025-05-15",
+      "evidence": "CARSI_courses.pdf (IICRC CEC Accredited class list for CARSI, 2 pages) supplied by founder 2026-08-27"
+    },
+    {
+      "slug": "introduction-to-iaq-and-mould-understanding-airborne-spread-and-containment",
+      "title": "Introduction to IAQ and Mould: Understanding Airborne Spread and Containment",
+      "status": "approved",
+      "approvedHours": 1,
+      "approvedAt": "2025-05-15",
+      "expiresAt": "2028-05-15",
+      "iicrcReference": "IICRC CEC class listing for CARSI — approval batch 2025-05-15",
+      "evidence": "CARSI_courses.pdf (IICRC CEC Accredited class list for CARSI, 2 pages) supplied by founder 2026-08-27"
+    },
+    {
+      "slug": "introduction-to-monitoring-air-quality-on-the-job-site",
+      "title": "Introduction to Monitoring Air Quality on the Job Site",
+      "status": "approved",
+      "approvedHours": 1,
+      "approvedAt": "2025-05-15",
+      "expiresAt": "2028-05-15",
+      "iicrcReference": "IICRC CEC class listing for CARSI — approval batch 2025-05-15",
+      "evidence": "CARSI_courses.pdf (IICRC CEC Accredited class list for CARSI, 2 pages) supplied by founder 2026-08-27"
+    },
+    {
+      "slug": "introduction-to-air-quality-fundamentals",
+      "title": "Introduction to Air Quality Fundamentals",
+      "status": "approved",
+      "approvedHours": 1,
+      "approvedAt": "2025-05-15",
+      "expiresAt": "2028-05-15",
+      "iicrcReference": "IICRC CEC class listing for CARSI — approval batch 2025-05-15",
+      "evidence": "CARSI_courses.pdf (IICRC CEC Accredited class list for CARSI, 2 pages) supplied by founder 2026-08-27"
+    },
+    {
+      "slug": "introduction-to-creating-a-clean-air-environment-best-practices-for-final-cleara",
+      "title": "Introduction to Creating a Clean Air Environment: Best Practices for Final Clearance and Handover",
+      "status": "approved",
+      "approvedHours": 1,
+      "approvedAt": "2025-05-15",
+      "expiresAt": "2028-05-15",
+      "iicrcReference": "IICRC CEC class listing for CARSI — approval batch 2025-05-15",
+      "evidence": "CARSI_courses.pdf (IICRC CEC Accredited class list for CARSI, 2 pages) supplied by founder 2026-08-27"
+    }
+  ]
 }

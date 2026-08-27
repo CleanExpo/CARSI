@@ -196,12 +196,12 @@ describe('buildCourseFallbackKeywords', () => {
 
 describe('current repository truth', () => {
   it('freezes catalogue, surface, card, price, and CEC truth', () => {
-    expect(catalogue).toHaveLength(37);
+    expect(catalogue).toHaveLength(71);
     expect(surfaceSlugs).toHaveLength(24);
     expect(new Set(surfaceSlugs).size).toBe(24);
     expect(readdirSync(cardsDirectory).filter((name) => name.endsWith('.json'))).toHaveLength(25);
     expect(Object.keys(cardsIndex)).toHaveLength(25);
-    expect(cecApprovals).toHaveLength(0);
+    expect(cecApprovals).toHaveLength(38);
     expect(Object.keys(cardsIndex).filter((slug) => !surfaceSlugs.includes(slug))).toEqual([
       'commercial-floor-care-schools-childcare',
     ]);
