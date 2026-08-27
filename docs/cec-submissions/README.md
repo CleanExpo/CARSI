@@ -58,23 +58,24 @@ a genuine credential. It should not come back into the template unconfirmed.
 
 ---
 
-## Which ten, and why
+## Which nine, and why
 
 Ranked among the **24 published** courses by educational hours, since CEC arithmetic follows
 contact hours, restricted to courses that genuinely map to an IICRC discipline area.
 
 | # | slug | hours | category |
 |---|---|---|---|
-| 1 | `wrt-water-damage-essentials` | 2.0 | Water Damage Restoration |
-| 2 | `air-quality-and-odour-identification-and-deodorisation-essentials` | 1.2 | Indoor Air Quality |
-| 3 | `hvac-systems-and-indoor-air-quality-what-every-technician-should-know` | 1.2 | Indoor Air Quality |
-| 4 | `using-air-scrubbers-and-afds-to-improve-job-site-air-quality` | 1.2 | Indoor Air Quality |
-| 5 | `dust-and-particulates-in-indoor-air-control-and-cleaning-strategies` | 1.1 | Indoor Air Quality |
-| 6 | `introduction-to-drying-educational-and-institutional-sites` | 1.1 | Water Damage Restoration |
-| 7 | `introduction-to-drying-health-care-facilities` | 1.1 | Water Damage Restoration |
-| 8 | `moisture-mould-and-indoor-air-quality-understanding-the-link` | 1.1 | Indoor Air Quality |
-| 9 | `introduction-to-drying-industrial-and-manufacturing-sites` | 1.0 | Water Damage Restoration |
-| 10 | `introduction-to-drying-transportation-and-vehicles` | 1.0 | Water Damage Restoration |
+| 1 | `air-quality-and-odour-identification-and-deodorisation-essentials` | 1.2 | Indoor Air Quality |
+| 2 | `hvac-systems-and-indoor-air-quality-what-every-technician-should-know` | 1.2 | Indoor Air Quality |
+| 3 | `using-air-scrubbers-and-afds-to-improve-job-site-air-quality` | 1.2 | Indoor Air Quality |
+| 4 | `dust-and-particulates-in-indoor-air-control-and-cleaning-strategies` | 1.1 | Indoor Air Quality |
+| 5 | `introduction-to-drying-educational-and-institutional-sites` | 1.1 | Water Damage Restoration |
+| 6 | `introduction-to-drying-health-care-facilities` | 1.1 | Water Damage Restoration |
+| 7 | `moisture-mould-and-indoor-air-quality-understanding-the-link` | 1.1 | Indoor Air Quality |
+| 8 | `introduction-to-drying-industrial-and-manufacturing-sites` | 1.0 | Water Damage Restoration |
+| 9 | `introduction-to-drying-transportation-and-vehicles` | 1.0 | Water Damage Restoration |
+
+A tenth candidate, `wrt-water-damage-essentials` (2.0 h), is **held back** — see below.
 
 ### Two longer courses were deliberately left out
 
@@ -89,10 +90,15 @@ content at all. Submitting them would repeat that error to the IICRC directly.
 it is indoor-air-quality work in facilities — but it is a campaign course, so it is held back
 rather than included by default.
 
-### One thing to look at on pack 1
+### Held back: `wrt-water-damage-essentials`
 
-`wrt-water-damage-essentials` carries an IICRC discipline acronym in its **slug**, so the URL in
-that pack reads `.../courses/wrt-water-damage-essentials`. The course page title itself is already
-clean. This is the same live issue as DECISIONS row 16 and BACKLOG row 31. Fixing the slug before
-sending would avoid handing the IICRC a URL that brands a CARSI course with one of its own
-discipline codes.
+Moved to `held-back/` and **removed from the send batch**. Its slug carries an IICRC discipline
+acronym, so the URL in the pack reads `.../courses/wrt-water-damage-essentials`. `CLAUDE.md`
+bans using an IICRC discipline acronym to name or brand a CARSI course, and sending this pack
+would hand that URL to the IICRC itself. The course page title is already clean; the slug is not.
+
+Same live issue as DECISIONS row 16 and BACKLOG row 31. To release it: give the course a
+CARSI-owned slug, add a 301 from the old URL so no live link breaks, regenerate the pack from the
+corrected canonical URL, and move it back up into the table above.
+
+Raised as P0-WRT-COURSE-BRANDING by the independent review of head `364b996e`, 2026-08-27.

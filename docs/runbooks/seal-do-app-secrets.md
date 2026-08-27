@@ -1,9 +1,17 @@
 # Sealing (and first rotating) the `monkfish-app` secrets
 
-**Written 2026-08-26.** Founder-only. An agent must not perform this: sealing requires submitting
-the live values, and writing a live Stripe secret key into a field is prohibited regardless of
-authorisation. Everything below is verified against DigitalOcean's own App Spec reference, not
-assumed.
+**Written 2026-08-26.** Founder-only. An agent must not perform this, and must not be shown the
+values: sealing requires submitting live credentials, and an agent handling one is prohibited
+regardless of authorisation.
+
+**What is and is not allowed, precisely.** The founder entering a value into DigitalOcean's
+App-Level Environment Variables field with type **Encrypted** is the approved path — that field
+*is* the encrypted secret store, and DO encrypts on first submission. What is prohibited is a
+plaintext credential reaching anywhere else: a file in this repository (which is public), a
+terminal command or shell history, a log, a chat message, an agent's context, or a git commit.
+Step 2 below is the allowed operation; step 4 is what keeps it out of git.
+
+Everything below is verified against DigitalOcean's own App Spec reference, not assumed.
 
 ---
 
@@ -55,7 +63,10 @@ into line using the encrypted blobs.
    `ADMIN_PASSWORD`, and the database credentials at source. Note that rotating `JWT_SECRET`
    signs every existing session out, so pick the hour deliberately.
 2. In the DO console, App → Settings → App-Level Environment Variables, set each secret-bearing
-   var to **Encrypted**. The console handles the value so it never passes through a file.
+   var to **Encrypted** and paste the newly rotated value into that field. This is the approved
+   entry point per the header: the value goes straight into DO's encrypted store, never through a
+   file, a shell command, or this repository. Do not paste it anywhere else, and do not copy it
+   back out afterwards — from here on the spec carries `EV[1:...]` and that is all anyone needs.
 3. Redeploy and confirm the app is healthy — `https://carsi.com.au/api/health` returns
    `{"status":"healthy",...}`.
 4. Re-fetch the spec. Secrets now read `EV[1:...]`. Copy those blobs and the `type: SECRET` lines

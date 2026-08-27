@@ -4,7 +4,7 @@
 
 **To:** CECCourse@iicrcnet.org
 **From:** Phill McGurk, CARSI
-**Attach:** the ten pack files in this folder
+**Attach:** the nine pack files in this folder (`held-back/` is not part of the submission)
 
 Both blockers are settled, 26/08/2026. The provider name is **Centre for Australian Restoration
 and Standards Information**, now the only name in the repository. The unverifiable
@@ -13,21 +13,21 @@ asserts it. Nothing is outstanding on the packs themselves.
 
 ---
 
-**Subject:** CEC course approval — 10 online courses, CARSI (Australia)
+**Subject:** CEC course approval — 9 online courses, CARSI (Australia)
 
 ---
 
 Dear CEC Committee,
 
-I am writing to submit ten online courses for IICRC CEC approval.
+I am writing to submit nine online courses for IICRC CEC approval.
 
 CARSI is an Australian online continuing education provider for the cleaning and restoration
 trade. We are an IICRC CEC Accredited provider. Our courses are self-paced and delivered online at
 https://www.carsi.com.au, which is how Australian technicians keep their certifications current
 without the flights, hotels and lost days that classroom delivery costs them here.
 
-The ten courses in this submission are our restoration and indoor-air-quality titles, ranging from
-1.0 to 2.0 educational hours. Each attached pack follows the information your process asks for:
+The nine courses in this submission are our restoration and indoor-air-quality titles, ranging from
+1.0 to 1.2 educational hours. Each attached pack follows the information your process asks for:
 provider name and website, course title, delivery dates and duration, summary and learning
 objectives, instructor, point of contact, and the supporting documentation available.
 
@@ -63,8 +63,9 @@ support@carsi.com.au · https://www.carsi.com.au
 
 - If CARSI *is* listed in the IICRC CEC Provider Directory, that is worth saying — but add it by
   hand on the day you can confirm it. It was cut because it could not be verified from here.
-- Decide whether to fix `wrt-water-damage-essentials`'s slug first, so the URL in pack 1 does not
-  brand a CARSI course with an IICRC discipline code.
+- `wrt-water-damage-essentials` is NOT attached. It is held back in `held-back/` because its slug
+  brands a CARSI course with an IICRC discipline code. Release it only after the slug is renamed
+  and a 301 is in place; see the README section "Held back".
 - Check the submission address is still `CECCourse@iicrcnet.org`. It came from the generator's
   own header comment, not from a check made today.
 - Offering a reviewer account is a real commitment. Remove that paragraph if you would rather not

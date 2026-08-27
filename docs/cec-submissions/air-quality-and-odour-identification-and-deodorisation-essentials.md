@@ -19,7 +19,7 @@ Prepared 26 August 2026 for submission to **CECCourse@iicrcnet.org**.
 - **Delivery:** online, self-paced (on demand) at https://www.carsi.com.au
 - **Available from:** 26 August 2026 (submitted for approval before any CEC claim is made)
 - **Duration:** 1.2 educational hours
-- **CECs requested:** 1 (1 CEC per educational hour, per the published IICRC CEC arithmetic)
+- **CEC credit:** none claimed. CARSI asks the IICRC to determine the credit for the duration stated above. No CEC value is published for this course on any surface until an approval is recorded in `data/seed/cec-approvals.json`.
 
 ## 4. Course summary and learning objectives
 
