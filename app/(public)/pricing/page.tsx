@@ -6,6 +6,13 @@ import { BreadcrumbSchema, FAQSchema } from '@/components/seo';
 import { OG_IMAGES } from '@/lib/seo/og-image';
 import { subscriptionsEnabled } from '@/lib/server/subscriptions-flag';
 
+// `subscriptionsEnabled()` reads process.env at render time. Without this the
+// page is statically prerendered at BUILD time and served s-maxage=31536000,
+// so the flag's value is baked into the HTML and a run-time env var can never
+// reach it — flipping the flag would require a full rebuild, which is exactly
+// what the flag exists to avoid (see lib/server/subscriptions-flag.ts).
+export const dynamic = 'force-dynamic';
+
 export async function generateMetadata(): Promise<Metadata> {
   const live = subscriptionsEnabled();
   return {
