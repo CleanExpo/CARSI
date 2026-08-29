@@ -8,6 +8,13 @@ import { getEntitlements, type Entitlements } from '@/lib/server/entitlements';
 import { subscriptionsEnabled } from '@/lib/server/subscriptions-flag';
 import { SubscribeCta } from './SubscribeCta';
 
+// `subscriptionsEnabled()` reads process.env at render time. Without this the
+// page is statically prerendered at BUILD time and served s-maxage=31536000,
+// so the flag's value is baked into the HTML and a run-time env var can never
+// reach it — flipping the flag would require a full rebuild, which is exactly
+// what the flag exists to avoid (see lib/server/subscriptions-flag.ts).
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'Yearly Membership | CARSI',
   description:
