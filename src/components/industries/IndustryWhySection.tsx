@@ -2,15 +2,16 @@ import type { CSSProperties } from 'react';
 
 import type { LucideIcon } from 'lucide-react';
 
+import {
+  LANDING_DISPLAY_H2_CLASS,
+  LANDING_EYEBROW_CLASS,
+  LANDING_LEAD_CLASS,
+} from '@/components/landing/public-shell-width';
 import { accentTextVars } from './accentContrast';
 import {
-  marketingBodySm,
-  marketingEyebrowPill,
   marketingIconWrap,
   marketingPanel,
   marketingPanelHover,
-  marketingSection,
-  marketingSectionTitle,
 } from '@/lib/marketing/marketing-ui';
 
 interface WhyCard {
@@ -37,41 +38,50 @@ export function IndustryWhySection({
 }: IndustryWhySectionProps) {
   const accent = accentTextVars(accentColor, 'large');
   return (
-    <section className={marketingSection}>
-      <div className="mb-8 max-w-4xl md:mb-10">
-        <p className={`mb-3 ${marketingEyebrowPill}`}>Why {industryName} choose CARSI</p>
-        <h2 className={marketingSectionTitle}>
-          {headline}{' '}
-          <span
-            className="text-[color:var(--carsi-accent-l)] dark:text-[color:var(--carsi-accent-d)]"
-            style={{ '--carsi-accent-l': accent.light, '--carsi-accent-d': accent.dark } as CSSProperties}
-          >
-            {headlineAccent}
-          </span>
-        </h2>
-        <div
-          className="mt-4 h-1 w-16 rounded-full bg-gradient-to-r from-[#2490ed] via-[#5eb3ff] to-[#00d4aa]"
-          aria-hidden
-        />
-      </div>
-
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {cards.map((card) => (
-          <div key={card.title} className={`p-6 ${marketingPanel} ${marketingPanelHover}`}>
-            <div
-              className={`mb-4 ${marketingIconWrap}`}
-              style={{
-                borderColor: `${card.color}35`,
-                background: `${card.color}12`,
-                color: card.color,
-              }}
+    <section className="py-16 md:py-24">
+      <div className="grid items-start gap-10 lg:grid-cols-[0.72fr_1.28fr] lg:gap-16">
+        <div className="lg:sticky lg:top-28">
+          <p className={LANDING_EYEBROW_CLASS}>Why {industryName} choose CARSI</p>
+          <h2 className={`mt-4 ${LANDING_DISPLAY_H2_CLASS}`}>
+            {headline} <br aria-hidden />
+            <span
+              className="text-[color:var(--carsi-accent-l)]"
+              style={{ '--carsi-accent-l': accent.light } as CSSProperties}
             >
-              <card.icon className="h-5 w-5" aria-hidden />
-            </div>
-            <h3 className="text-base font-semibold text-slate-900 dark:text-white/90">{card.title}</h3>
-            <p className={`mt-3 ${marketingBodySm}`}>{card.description}</p>
-          </div>
-        ))}
+              {headlineAccent}
+            </span>
+          </h2>
+          <p className={`mt-5 max-w-md ${LANDING_LEAD_CLASS}`}>
+            Training organised around the actual constraints technicians meet on site, with a clear
+            path from task to course.
+          </p>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          {cards.map((card, index) => (
+            <article
+              key={card.title}
+              className={`p-6 sm:p-7 ${index === 0 ? 'sm:col-span-2' : ''} ${marketingPanel} ${marketingPanelHover}`}
+            >
+              <div
+                className={`mb-4 ${marketingIconWrap}`}
+                style={{
+                  borderColor: `${card.color}35`,
+                  background: `${card.color}12`,
+                  color: card.color,
+                }}
+              >
+                <card.icon className="h-5 w-5" aria-hidden />
+              </div>
+              <h3 className="font-[family-name:var(--font-display)] text-lg font-semibold tracking-[-0.015em] text-slate-950">
+                {card.title}
+              </h3>
+              <p className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-600">
+                {card.description}
+              </p>
+            </article>
+          ))}
+        </div>
       </div>
     </section>
   );
