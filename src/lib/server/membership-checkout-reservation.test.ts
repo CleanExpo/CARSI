@@ -4,6 +4,7 @@ import {
   CHECKOUT_RESERVATION_STATUS,
   CHECKOUT_RESERVATION_TTL_MS,
   CHECKOUT_SESSION_TTL_MS,
+  checkoutSessionIdempotencyKey,
   checkoutSessionExpiresAt,
   releaseMembershipCheckout,
   releaseOrgCheckout,
@@ -84,6 +85,30 @@ describe('the reservation window outlives the session it protects', () => {
   });
 });
 
+describe('Stripe checkout idempotency keys', () => {
+  it('is stable for retries of one reservation without exposing the owner id', () => {
+    const first = checkoutSessionIdempotencyKey('individual', 'user-sensitive-1', NOW);
+    const retry = checkoutSessionIdempotencyKey('individual', 'user-sensitive-1', NOW);
+
+    expect(retry).toBe(first);
+    expect(first).not.toContain('user-sensitive-1');
+    expect(first.length).toBeLessThanOrEqual(255);
+  });
+
+  it('changes for a new reservation or a different checkout kind', () => {
+    const first = checkoutSessionIdempotencyKey('org', 'team-1', NOW);
+    const later = checkoutSessionIdempotencyKey(
+      'org',
+      'team-1',
+      new Date(NOW.getTime() + CHECKOUT_RESERVATION_TTL_MS)
+    );
+    const onboarding = checkoutSessionIdempotencyKey('onboarding', 'team-1', NOW);
+
+    expect(later).not.toBe(first);
+    expect(onboarding).not.toBe(first);
+  });
+});
+
 describe('reserveMembershipCheckout', () => {
   it('claims the checkout by inserting the reservation row', async () => {
     await expect(reserveMembershipCheckout('user-1', NOW)).resolves.toBe('reserved');
@@ -122,11 +147,11 @@ describe('reserveMembershipCheckout', () => {
     const where = mocks.updateMany.mock.calls[0][0].where;
     expect(where.userId).toBe('user-1');
     // A reservation is stealable only once it is older than the TTL.
-    const reservationBranch = (where.OR as Array<{ status?: string; updatedAt?: { lt: Date } }>).find(
-      (b) => b.status === CHECKOUT_RESERVATION_STATUS,
-    );
+    const reservationBranch = (
+      where.OR as Array<{ status?: string; updatedAt?: { lt: Date } }>
+    ).find((b) => b.status === CHECKOUT_RESERVATION_STATUS);
     expect(reservationBranch?.updatedAt?.lt).toEqual(
-      new Date(NOW.getTime() - CHECKOUT_RESERVATION_TTL_MS),
+      new Date(NOW.getTime() - CHECKOUT_RESERVATION_TTL_MS)
     );
   });
 
@@ -186,7 +211,6 @@ describe('releaseMembershipCheckout', () => {
     await expect(releaseMembershipCheckout('user-1')).resolves.toBeUndefined();
   });
 });
-
 
 /** Pull the OR branches the takeover offered as claimable. */
 function claimableStatuses(call: unknown): unknown[] {
@@ -315,7 +339,7 @@ describe('reserveOrgCheckout', () => {
 
     await expect(reserveOrgCheckout(params, NOW)).resolves.toBe('reserved');
     expect(mocks.orgUpdateMany.mock.calls[0][0].data.organisationName).toBe(
-      'Acme Restoration Pty Ltd',
+      'Acme Restoration Pty Ltd'
     );
   });
 
@@ -334,7 +358,6 @@ describe('reserveOrgCheckout', () => {
   });
 });
 
-
 describe('a takeover detaches the row from the subscription it used to describe', () => {
   it.each([
     ['individual', () => reserveMembershipCheckout('user-1', NOW), () => mocks.updateMany],
@@ -344,7 +367,7 @@ describe('a takeover detaches the row from the subscription it used to describe'
       () =>
         reserveOrgCheckout(
           { teamId: 'team-1', organisationName: 'Acme', contactEmail: 'o@example.test' },
-          NOW,
+          NOW
         ),
       () => mocks.orgUpdateMany,
     ],
@@ -373,7 +396,7 @@ describe('a takeover detaches the row from the subscription it used to describe'
       () =>
         reserveOrgCheckout(
           { teamId: 'team-1', organisationName: 'Acme', contactEmail: 'o@example.test' },
-          NOW,
+          NOW
         ),
       () => mocks.orgUpdateMany,
     ],
