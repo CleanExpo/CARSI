@@ -2,36 +2,36 @@
 
 Owner key: F = founder-only · A = agents · A→F = agents prepare, founder approves/sends
 
-| # | Item | Owner | Gate | Status |
-|---|---|---|---|---|
-| 1 | Land GOAL/BACKLOG/DECISIONS/ENGINE in repo root; add "Read GOAL.md first" as CLAUDE.md line 1 | A | 0 | **done 2026-08-16** — merged to `main` as `41712c69` (PR #666) |
-| 2 | Generate CEC submission packs for top 10 courses (`generate-cec-submission.ts`) + cover email draft | A→F | 0 | ready |
-| 3 | Send CEC packs to CECCourse@iicrcnet.org | F | 0 | blocked on #2 |
-| 4 | Subscriptions go-live: Stripe Prices + Test Clock + DO env; flip at go-live script exit 0 | A→F | 0 | ready — see note below |
-| 5 | Personalise + send the 3 outreach emails (BSCAA, RIA, SCA — drafts in 2nd Brain/Plans) | F | 0 | ready |
-| 6 | Approve benchmark survey instrument (DRAFT in docs/marketing) | F | 0 | ready |
-| 7 | Pick first franchise target + agents draft pilot offer letter | A→F | 0 | ready |
-| 8 | Wire the RWR metric: Stripe → weekly number in the daily brief | A | 0 | ready |
-| 9 | Teams tier: seat pricing page + Stripe products + seat management ($99–149/seat/yr, 10/50/200) | A | 1 | ready |
-| 10 | Employer proof-pack (transcript + training record PDF — PRODUCT_STRATEGY §5) | A | 1 | ready |
-| 11 | Email capture + renewal-reminder funnel (free library → "CECs lapse in N months") | A | 1 | ready |
-| 12 | NRPG directory launch prep: real listings only, free for CARSI-trained firms | A | 1 | ready |
-| 13 | Ship authored Google Ads + LinkedIn campaigns at small budget | A→F | 1 | needs budget |
-| 14 | AU price-anchoring page (vs $699–$1,150 instructor-led) | A | 1 | ready |
-| 15 | Telegram cockpit: daily RWR + approvals + 3 founder actions | A | 1 | after #4 |
-| 16 | Field benchmark survey (CARSI + CCW lists + INCLEAN + suppliers, n≥150) | A→F | 2 | blocked on #6 |
-| 17 | RestoreAssist bundle: train + document + listed, one subscription | A | 2 | ready |
-| 18 | SCA CPD provider application; RTO partner shortlist for QLD CPD | A→F | 2 | after #5 |
-| 19 | NZ locale pass (en-NZ gap) | A | 2 | ready |
-| 20 | Benchmark report + media pack (the citable dataset) | A→F | 3 | blocked on #16 |
-| 21 | Evidence-layer template into course-production skill + one pilot course retrofit | A | 1 | ready |
-| 22 | Public References block on course pages (+ llms.txt wiring) | A | 1 | after #21 |
-| 23 | Weekly Research Notes page (1 distilled, cited note/week) | A→F | 1 | ready — DECISIONS #13 defaults YES |
-| 24 | Findings→course mapping pass added to weekly triage | A | 1 | ready |
-| 25 | Level architecture: map 80 courses into tiers; founder names levels | A→F | 2 | blocked on DECISIONS #12 (level names) |
-| 26 | Reference PDFs into employer proof-pack | A | 2 | after #10 |
-| 27 | E-E-A-T metrics into Monday pulse: referring domains, AI-answer presence, kw growth | A | 1 | ready |
-| 28 | Retrofit remaining courses with evidence layers (batched, guards on) | A | 2–3 | after #21 |
+| #   | Item                                                                                                | Owner | Gate | Status                                                         |
+| --- | --------------------------------------------------------------------------------------------------- | ----- | ---- | -------------------------------------------------------------- |
+| 1   | Land GOAL/BACKLOG/DECISIONS/ENGINE in repo root; add "Read GOAL.md first" as CLAUDE.md line 1       | A     | 0    | **done 2026-08-16** — merged to `main` as `41712c69` (PR #666) |
+| 2   | Generate CEC submission packs for top 10 courses (`generate-cec-submission.ts`) + cover email draft | A→F   | 0    | ready                                                          |
+| 3   | Send CEC packs to CECCourse@iicrcnet.org                                                            | F     | 0    | blocked on #2                                                  |
+| 4   | Subscriptions go-live: Stripe Prices + Test Clock + DO env; flip at go-live script exit 0           | A→F   | 0    | ready — see note below                                         |
+| 5   | Personalise + send the 3 outreach emails (BSCAA, RIA, SCA — drafts in 2nd Brain/Plans)              | F     | 0    | ready                                                          |
+| 6   | Approve benchmark survey instrument (DRAFT in docs/marketing)                                       | F     | 0    | ready                                                          |
+| 7   | Pick first franchise target + agents draft pilot offer letter                                       | A→F   | 0    | ready                                                          |
+| 8   | Wire the RWR metric: Stripe → weekly number in the daily brief                                      | A     | 0    | ready                                                          |
+| 9   | Teams tier: seat pricing page + Stripe products + seat management ($99–149/seat/yr, 10/50/200)      | A     | 1    | ready                                                          |
+| 10  | Employer proof-pack (transcript + training record PDF — PRODUCT_STRATEGY §5)                        | A     | 1    | ready                                                          |
+| 11  | Email capture + renewal-reminder funnel (free library → "CECs lapse in N months")                   | A     | 1    | ready                                                          |
+| 12  | NRPG directory launch prep: real listings only, free for CARSI-trained firms                        | A     | 1    | ready                                                          |
+| 13  | Ship authored Google Ads + LinkedIn campaigns at small budget                                       | A→F   | 1    | needs budget                                                   |
+| 14  | AU price-anchoring page (vs $699–$1,150 instructor-led)                                             | A     | 1    | ready                                                          |
+| 15  | Telegram cockpit: daily RWR + approvals + 3 founder actions                                         | A     | 1    | after #4                                                       |
+| 16  | Field benchmark survey (CARSI + CCW lists + INCLEAN + suppliers, n≥150)                             | A→F   | 2    | blocked on #6                                                  |
+| 17  | RestoreAssist bundle: train + document + listed, one subscription                                   | A     | 2    | ready                                                          |
+| 18  | SCA CPD provider application; RTO partner shortlist for QLD CPD                                     | A→F   | 2    | after #5                                                       |
+| 19  | NZ locale pass (en-NZ gap)                                                                          | A     | 2    | ready                                                          |
+| 20  | Benchmark report + media pack (the citable dataset)                                                 | A→F   | 3    | blocked on #16                                                 |
+| 21  | Evidence-layer template into course-production skill + one pilot course retrofit                    | A     | 1    | ready                                                          |
+| 22  | Public References block on course pages (+ llms.txt wiring)                                         | A     | 1    | after #21                                                      |
+| 23  | Weekly Research Notes page (1 distilled, cited note/week)                                           | A→F   | 1    | ready — DECISIONS #13 defaults YES                             |
+| 24  | Findings→course mapping pass added to weekly triage                                                 | A     | 1    | ready                                                          |
+| 25  | Level architecture: map 80 courses into tiers; founder names levels                                 | A→F   | 2    | blocked on DECISIONS #12 (level names)                         |
+| 26  | Reference PDFs into employer proof-pack                                                             | A     | 2    | after #10                                                      |
+| 27  | E-E-A-T metrics into Monday pulse: referring domains, AI-answer presence, kw growth                 | A     | 1    | ready                                                          |
+| 28  | Retrofit remaining courses with evidence layers (batched, guards on)                                | A     | 2–3  | after #21                                                      |
 
 **Note on #4 (subscriptions go-live).** The pre-flight script `verify-go-live-readiness.mjs`
 exits 0 today, but one of its four checks cannot currently tell success from failure: it asserts
@@ -70,15 +70,17 @@ voiceover/thumbnail production and the AEO/llms.txt surfaces all already exist.
 
 Metric for this thread (§7 of the spec): referring domains to course/research pages, AI-answer
 presence for target questions, organic keyword count (baseline 119), and external citations of
-the Benchmark — reported in the Monday pulse via #27. Note this is an *authority* metric, not
+the Benchmark — reported in the Monday pulse via #27. Note this is an _authority_ metric, not
 RWR; it compounds slowly and must not be read as revenue movement.
 
 ## Parked (deliberate)
+
 - unite-group-marketplace plugin cutover — de-scope stands unless PR #1 merged (DECISIONS #5)
 - Release-gate rewrite lane (quoted-separator bypass etc.) — after Gate 0
 - Competing idea-generation bots — rejected; the cockpit (#15) is the accepted form
 
 ## Discoveries (append here, triage weekly — do NOT work these mid-session)
+
 - 2026-08-16 · **The Evidence Engine's own per-lesson template fails CARSI's standards-claim
   gate.** `npm run verify:standards-claim -- "<copy>"` exits 1 on the spec's heading structure
   (the "what the standard requires / why it works / what the evidence shows" wording), and also
@@ -93,7 +95,7 @@ RWR; it compounds slowly and must not be read as revenue movement.
   is not scanned, per the next entry.
 - 2026-08-16 · **The licence guards do not scan the repo-root operating files.**
   `check-iicrc-compliance` scans `app/ src/ templates/ docs/marketing/ docs/content/ data/seed/
-  data/voice/ public/courses/`; `check-iicrc-terminology` a similar list plus `public/`. None
+data/voice/ public/courses/`; `check-iicrc-terminology` a similar list plus `public/`. None
   match `GOAL.md`, `BACKLOG.md`, `DECISIONS.md` or `ENGINE.md`, so a green run says nothing about
   their contents. That is defensible — they are internal notes, the same class as the explicitly
   exempted `CLAUDE.md` — but it means "guards green" must never be quoted as evidence that
@@ -136,6 +138,16 @@ RWR; it compounds slowly and must not be read as revenue movement.
   empties the exemption list entirely, which is the real fix. It needs 301 redirects plus
   `app/sitemap.ts` and `src/lib/seo/course-marketing.ts` updates, so it is a follow-up, not a
   hotfix. Surfaced when the GP-523 branding guard was made case-insensitive.
+- 2026-09-01 · **Track 1 healthcare SEO is complete pending deploy (industry pages), not new
+  full courses.** The technician/subcontractor path now covers healthcare, aged care and
+  hospitality with search-intent cards, job context, practical outcomes, slug-pinned approved
+  courses, FAQs/schema, cross-sector internal links and current Australian source notes. The
+  shared industry shell now uses the homepage light visual system and was checked at 375 px and
+  1440 px with no horizontal overflow. Four new course builds remain blocked on Mona supplying
+  the approved source content and founder review: Mould Remediation for Healthcare Facilities;
+  Infection Control for Restoration Technicians; Water Damage Response in Clinical
+  Environments; Working in Aged Care: Compliance and CEC Requirements. Each starts with
+  `cecHours: 0`; only the founder may record later IICRC approval.
 
 ---
 
@@ -144,20 +156,27 @@ RWR; it compounds slowly and must not be read as revenue movement.
 Full evidence: `docs/session-handoffs/STOPPER-REGISTER-20260819.md`. Every item below was
 measured, not inferred; the register carries the exact commands and positive controls.
 
-| # | Item | Owner | Gate | Status |
-|---|---|---|---|---|
-| 29 | Fix 3 vacuous guards — `check-iicrc-terminology`, `check-course-completeness`, `check-course-visibility-predicate` used the naive entry-point idiom comparing `import.meta.url` against a bare `file://` + argv concat. The checkout path contains a space, which `import.meta.url` percent-encodes and argv does not, so the comparison was always false, the scan body never ran, and each exited 0 in silence. | A | 0 | **done 2026-08-19** — PR #680, receipt `PR_RELEASE_GATE_PASS head=ed01376a` |
-| 30 | Wire `check:live-catalogue` into CI on a schedule. It is NOT in CI and is the only guard that has caught a real production defect. Needs no credentials — it reads the public sitemap. | A | 0 | ready |
-| 31 | Fix 4 live designation violations on carsi.com.au (`cct-commercial-carpet-core`, `wrt-water-damage-essentials`, `fsrt-fire-smoke-restoration-core`, `asd-structural-drying-core`). Licence-critical and live now. 3 of the 4 are absent from repo seed, so this needs the prod-DB path. | A→F | 0 | blocked on DECISIONS #16 |
-| 32 | ~~Render `commercial-floor-care-schools-childcare.mp4`~~ **WITHDRAWN — false premise.** The mp4 exists (2,109,732 bytes, 18 Aug 01:15) and `test:unit` is green (1056/1056). The "never rendered" claim came from `find . -name "*floor-care*intro*.mp4"`, which cannot match that filename — `intro` is in the directory `course-intros/`, not the filename — so it returned empty against a file that exists. Same disease as #29, in the evidence-gathering rather than the guard. Residual unknown: the earlier `test:unit` exit 1 was a real AssertionError on the ffprobe test; why it failed then and passes now on an unchanged tree is unexplained. | A | 0 | **withdrawn** |
-| 33 | Add `tsx` to devDependencies. `check:live-cec` runs `npx tsx`; tsx is absent from both `package.json` and `node_modules`, so that guard cannot execute. ~50 scripts reach for it via npx. | A | 0 | ready |
-| 34 | Remove `continue-on-error: true` from the Build step at `.github/workflows/agent-pr-checks.yml:100`. Measured: the following `Report Results` step writes only to `$GITHUB_STEP_SUMMARY` and never exits non-zero, so `Agent PR Validation` goes green while its own summary prints `Build: ❌ Failed`. **The merge gate is NOT holed** — required checks are `Build Check` and `Frontend Tests`, both in `ci.yml`. Reporting dishonesty, not a merge hole. Low priority. | A | 0 | ready |
-| 35 | Scanned-count contract: as each guard is touched, make it print what it looked at and exit non-zero when that count is zero. Applied opportunistically, not as a sweep. This is the structural fix — it collapses the whole vacuous-guard class into a loud failure on the day it occurs. | A | 0 | ready |
-| 36 | `bootstrap.sh` must install the pre-push hook, and its absence must be detectable. `core.hooksPath` points at `~/.config/git/hooks` — machine-local and outside every repo — so a fresh machine or agent checkout has no pre-push gate at all. | A | 0 | ready |
-| 37 | Repo-wide `npm run lint` exits 1 with **14,777 problems** (7,738 errors). A gate nobody can action is a gate that is effectively off — same class as #29. Attribution was checked: eslint on changed files exits 0, so it is pre-existing, not branch-introduced. Needs a baseline-and-ratchet decision before lint can gate anything. | A | 0 | ready |
+| #   | Item                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | Owner | Gate | Status                                                                      |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----- | ---- | --------------------------------------------------------------------------- |
+| 29  | Fix 3 vacuous guards — `check-iicrc-terminology`, `check-course-completeness`, `check-course-visibility-predicate` used the naive entry-point idiom comparing `import.meta.url` against a bare `file://` + argv concat. The checkout path contains a space, which `import.meta.url` percent-encodes and argv does not, so the comparison was always false, the scan body never ran, and each exited 0 in silence.                                                                                                                                                                                                                                            | A     | 0    | **done 2026-08-19** — PR #680, receipt `PR_RELEASE_GATE_PASS head=ed01376a` |
+| 30  | Wire `check:live-catalogue` into CI on a schedule. It is NOT in CI and is the only guard that has caught a real production defect. Needs no credentials — it reads the public sitemap.                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | A     | 0    | ready                                                                       |
+| 31  | Fix 4 live designation violations on carsi.com.au (`cct-commercial-carpet-core`, `wrt-water-damage-essentials`, `fsrt-fire-smoke-restoration-core`, `asd-structural-drying-core`). Licence-critical and live now. 3 of the 4 are absent from repo seed, so this needs the prod-DB path.                                                                                                                                                                                                                                                                                                                                                                      | A→F   | 0    | blocked on DECISIONS #16                                                    |
+| 32  | ~~Render `commercial-floor-care-schools-childcare.mp4`~~ **WITHDRAWN — false premise.** The mp4 exists (2,109,732 bytes, 18 Aug 01:15) and `test:unit` is green (1056/1056). The "never rendered" claim came from `find . -name "*floor-care*intro*.mp4"`, which cannot match that filename — `intro` is in the directory `course-intros/`, not the filename — so it returned empty against a file that exists. Same disease as #29, in the evidence-gathering rather than the guard. Residual unknown: the earlier `test:unit` exit 1 was a real AssertionError on the ffprobe test; why it failed then and passes now on an unchanged tree is unexplained. | A     | 0    | **withdrawn**                                                               |
+| 33  | Add `tsx` to devDependencies. `check:live-cec` runs `npx tsx`; tsx is absent from both `package.json` and `node_modules`, so that guard cannot execute. ~50 scripts reach for it via npx.                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | A     | 0    | ready                                                                       |
+| 34  | Remove `continue-on-error: true` from the Build step at `.github/workflows/agent-pr-checks.yml:100`. Measured: the following `Report Results` step writes only to `$GITHUB_STEP_SUMMARY` and never exits non-zero, so `Agent PR Validation` goes green while its own summary prints `Build: ❌ Failed`. **The merge gate is NOT holed** — required checks are `Build Check` and `Frontend Tests`, both in `ci.yml`. Reporting dishonesty, not a merge hole. Low priority.                                                                                                                                                                                    | A     | 0    | ready                                                                       |
+| 35  | Scanned-count contract: as each guard is touched, make it print what it looked at and exit non-zero when that count is zero. Applied opportunistically, not as a sweep. This is the structural fix — it collapses the whole vacuous-guard class into a loud failure on the day it occurs.                                                                                                                                                                                                                                                                                                                                                                    | A     | 0    | ready                                                                       |
+| 36  | `bootstrap.sh` must install the pre-push hook, and its absence must be detectable. `core.hooksPath` points at `~/.config/git/hooks` — machine-local and outside every repo — so a fresh machine or agent checkout has no pre-push gate at all.                                                                                                                                                                                                                                                                                                                                                                                                               | A     | 0    | ready                                                                       |
+| 37  | Repo-wide `npm run lint` exits 1 with **14,777 problems** (7,738 errors). A gate nobody can action is a gate that is effectively off — same class as #29. Attribution was checked: eslint on changed files exits 0, so it is pre-existing, not branch-introduced. Needs a baseline-and-ratchet decision before lint can gate anything.                                                                                                                                                                                                                                                                                                                       | A     | 0    | ready                                                                       |
 
-**The class, not the instances.** #29–#37 are one disease: *silence read as evidence*. A control
+**The class, not the instances.** #29–#37 are one disease: _silence read as evidence_. A control
 that emits nothing is currently indistinguishable from a control that found nothing. #35 is the
 structural fix; the rest are instances it would have caught. The scope limit that sits above all
 of them: repo seed holds 37 courses, production sells 80, so no source-scanning guard can see 54%
 of what is actually being sold.
+
+- 2026-09-01 · **CEC approval expiry is stored but not enforced at read time.**
+  `data/seed/cec-approvals.json` records `expiresAt`, but `CecApprovalEntry`,
+  `approvedCecHoursFromRegistry` and `check-cec-approvals.mjs` do not read it. An approval would
+  therefore continue rendering after its expiry date unless the founder manually changes its
+  status. Current approvals remain valid until 2027 or 2028, so Track 1 is correct today; add an
+  expiry-aware fail-closed resolver and positive-control test before the first 2027 expiry.
