@@ -25,8 +25,7 @@ export interface OrgProvisionResult {
 
 /** Thrown-equivalent signal that another org checkout already holds this team. */
 export type OrgProvisionOutcome =
-  | { ok: true; result: OrgProvisionResult }
-  | { ok: false; reason: 'busy' | 'unavailable' };
+  { ok: true; result: OrgProvisionResult } | { ok: false; reason: 'busy' | 'unavailable' };
 
 /**
  * Ensure an org container team + a seeded org subscription row exist for the
@@ -39,6 +38,7 @@ export async function provisionOrgSubscriptionContainer(params: {
   organisationName: string;
   contactEmail: string;
   entitledCategory?: string;
+  reservedAt?: Date;
 }): Promise<OrgProvisionOutcome> {
   const existing = await getTeamForUser(params.ownerId);
   let teamId: string;
@@ -66,12 +66,15 @@ export async function provisionOrgSubscriptionContainer(params: {
   // own Stripe session for the same team. The reservation seeds the same
   // pre-payment row (entitlement fails closed on it, exactly as `incomplete`
   // did) while also refusing a second live checkout.
-  const reservation = await reserveOrgCheckout({
-    teamId,
-    organisationName: params.organisationName,
-    contactEmail: params.contactEmail,
-    entitledCategory: params.entitledCategory ?? ONBOARDING_BRAND,
-  });
+  const reservation = await reserveOrgCheckout(
+    {
+      teamId,
+      organisationName: params.organisationName,
+      contactEmail: params.contactEmail,
+      entitledCategory: params.entitledCategory ?? ONBOARDING_BRAND,
+    },
+    params.reservedAt
+  );
   if (reservation !== 'reserved') {
     return { ok: false, reason: reservation === 'busy' ? 'busy' : 'unavailable' };
   }
