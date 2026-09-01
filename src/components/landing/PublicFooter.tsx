@@ -302,7 +302,7 @@ function FooterSectionLabelLight({ children }: { children: ReactNode }) {
         className="h-px w-5 shrink-0 bg-gradient-to-r from-[#146fc2]/70 to-transparent"
         aria-hidden
       />
-      <p className="text-[10px] font-semibold tracking-[0.22em] text-slate-400 uppercase">
+      <p className="text-[10px] font-semibold tracking-[0.22em] text-slate-600 uppercase">
         {children}
       </p>
     </div>
@@ -379,7 +379,7 @@ function LightFooter() {
           </div>
 
           <div>
-            <p className="text-[10px] font-semibold tracking-[0.22em] text-slate-400 uppercase">
+            <p className="text-[10px] font-semibold tracking-[0.22em] text-slate-600 uppercase">
               Built for the field
             </p>
             <p className="mt-3 font-[family-name:var(--font-display)] text-[1.35rem] leading-snug font-semibold tracking-[-0.01em] text-slate-950">
@@ -481,7 +481,7 @@ function LightFooter() {
             </ul>
 
             <div className="mt-6 border-t border-slate-200/80 pt-5">
-              <p className="mb-3 text-[10px] font-semibold tracking-[0.16em] text-slate-400 uppercase">
+              <p className="mb-3 text-[10px] font-semibold tracking-[0.16em] text-slate-600 uppercase">
                 Follow CARSI
               </p>
               <div className="flex flex-wrap gap-2">
@@ -530,7 +530,7 @@ function LightFooter() {
 
       {/* Closing brand moment: giant low-contrast wordmark cropped at the bottom edge */}
       <div className="pointer-events-none relative flex justify-center select-none" aria-hidden>
-        <span className="-mb-[0.3em] font-[family-name:var(--font-display)] text-[clamp(7rem,19vw,24rem)] leading-none font-semibold tracking-[-0.04em] whitespace-nowrap text-slate-950/[0.035]">
+        <span className="-mb-[0.3em] font-[family-name:var(--font-display)] text-[clamp(7rem,19vw,24rem)] leading-none font-semibold tracking-[-0.04em] whitespace-nowrap text-transparent [-webkit-text-stroke:1px_rgba(15,23,42,0.07)]">
           CARSI
         </span>
       </div>
