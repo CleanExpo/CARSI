@@ -21,6 +21,10 @@
  * admin session and `CCW_ATTENDANCE_ENABLED` at the route.
  */
 import { grantYearlyMembership } from '@/lib/admin/admin-yearly-membership';
+import {
+  claimYearlyMembershipGrant,
+  releaseYearlyMembershipClaim,
+} from '@/lib/admin/yearly-membership-claim';
 import { prisma } from '@/lib/prisma';
 import { baseOfferEligible } from '@/lib/server/ccw-attendance/eligibility';
 import {
@@ -58,7 +62,9 @@ export type CompMembershipRefusal =
   /** A self-serve checkout is open for this learner right now. */
   | 'checkout_in_progress'
   /** A yearly membership was already granted to this learner. */
-  | 'already_comped';
+  | 'already_comped'
+  /** Another admin grant path currently owns this learner's email claim. */
+  | 'grant_in_progress';
 
 export type CompMembershipOutcome =
   | { ok: true; result: Awaited<ReturnType<typeof grantYearlyMembership>> }
@@ -130,7 +136,7 @@ export async function compAttendeeMembership(
     priceAud: number;
     appOrigin: string;
   },
-  now: Date = new Date(),
+  now: Date = new Date()
 ): Promise<CompMembershipOutcome> {
   const signIn = await prisma.ccwRoadshowSignIn.findUnique({
     where: { id: params.signInId },
@@ -202,6 +208,23 @@ export async function compAttendeeMembership(
 
   if (!claimed) return { ok: false, reason: 'already_comped' };
 
+  // The sign-in claim stops duplicate clicks on this route. The email claim
+  // also arbitrates against POST /api/admin/yearly-membership, which can act on
+  // the same learner through a different table and otherwise rotate the
+  // password concurrently.
+  let emailClaimed = false;
+  try {
+    emailClaimed = await claimYearlyMembershipGrant(signIn.email, now);
+  } catch (error) {
+    console.error('[ccw-comp-membership] email claim failed:', error);
+    await releaseCompClaim(params.signInId, now);
+    return { ok: false, reason: 'membership_unverifiable' };
+  }
+  if (!emailClaimed) {
+    await releaseCompClaim(params.signInId, now);
+    return { ok: false, reason: 'grant_in_progress' };
+  }
+
   try {
     const result = await grantYearlyMembership({
       email: signIn.email,
@@ -216,6 +239,7 @@ export async function compAttendeeMembership(
     // exact timestamp this call wrote, so a claim someone else has since taken
     // is never cleared.
     await releaseCompClaim(params.signInId, now);
+    await releaseYearlyMembershipClaim(signIn.email, now);
     throw error;
   }
 }
