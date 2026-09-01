@@ -1,5 +1,5 @@
 interface DisciplinePillProps {
-  code: string;
+  code?: string;
   label: string;
   color: string;
 }
@@ -15,7 +15,7 @@ export function DisciplinePill({ code, label, color }: DisciplinePillProps) {
       }}
     >
       <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: color }} />
-      {code} — {label}
+      {code ? `${code} · ${label}` : label}
     </span>
   );
 }
