@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
         detail:
           'Enter a valid lump-sum price (AUD), or choose “free”. The attendee rate is not configured on the offer.',
       },
-      { status: 400 },
+      { status: 400 }
     );
   }
 
@@ -76,14 +76,20 @@ export async function POST(request: NextRequest) {
     });
 
     if (!outcome.ok) {
-      return NextResponse.json({ detail: refusalDetail(outcome.reason) }, { status: statusFor(outcome.reason) });
+      return NextResponse.json(
+        { detail: refusalDetail(outcome.reason) },
+        { status: statusFor(outcome.reason) }
+      );
     }
 
     return NextResponse.json({ ok: true, ...outcome.result });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     if (msg === 'INVALID_EMAIL') {
-      return NextResponse.json({ detail: 'That attendee has an invalid email address.' }, { status: 400 });
+      return NextResponse.json(
+        { detail: 'That attendee has an invalid email address.' },
+        { status: 400 }
+      );
     }
     if (msg === 'INVALID_PRICE') {
       return NextResponse.json({ detail: 'Invalid price' }, { status: 400 });
@@ -91,13 +97,13 @@ export async function POST(request: NextRequest) {
     if (msg === 'NO_PUBLISHED_COURSES') {
       return NextResponse.json(
         { detail: 'No published courses in the catalogue to grant' },
-        { status: 400 },
+        { status: 400 }
       );
     }
     if (msg === 'ENROLLMENT_FAILED') {
       return NextResponse.json(
         { detail: 'Could not enrol the attendee in any course' },
-        { status: 500 },
+        { status: 500 }
       );
     }
     console.error('[ccw-roadshow/comp-membership]', e);
@@ -132,6 +138,8 @@ function refusalDetail(reason: string): string {
       return 'That attendee already holds an active CARSI membership.';
     case 'already_comped':
       return 'That attendee has already been granted a yearly membership.';
+    case 'grant_in_progress':
+      return 'A yearly membership grant is already in progress for that attendee.';
     case 'checkout_in_progress':
       return 'That attendee has a membership checkout open right now. Wait for it to finish, or cancel it, before comping.';
     default:
@@ -147,6 +155,7 @@ function statusFor(reason: string): number {
       return 403;
     case 'already_a_member':
     case 'already_comped':
+    case 'grant_in_progress':
     case 'checkout_in_progress':
       return 409;
     default:
