@@ -7,18 +7,18 @@ import { Suspense, type ReactNode } from 'react';
 
 export default function PublicLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-screen bg-[#f6f8fb] text-slate-900 transition-colors duration-300 dark:bg-[#060a14] dark:text-white">
+    <div className="min-h-screen bg-[#fafbfc] text-slate-900">
       {/* Silent UTM attribution — no UI rendered */}
       <Suspense fallback={null}>
         <UtmCapture />
       </Suspense>
       <header>
-        <PublicNavbar />
+        <PublicNavbar tone="light" />
       </header>
       <main id="main-content" className={PUBLIC_PAGE_FULL_CLASS}>
         {children}
       </main>
-      <PublicFooter />
+      <PublicFooter tone="light" />
       <FloatingChatGate />
     </div>
   );
