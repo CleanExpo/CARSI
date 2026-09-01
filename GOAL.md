@@ -11,15 +11,16 @@ plus 4-week rolling course sales. Every session reports RWR movement or names th
 
 **Gate ladder (work only at the current gate):**
 
-| Gate | Trigger | Focus |
-|---|---|---|
-| **0 — ignition (CURRENT)** | now | CEC submissions sent · subscriptions ON · outreach sent · benchmark instrument approved |
-| 1 — records wedge | ~$500/wk RWR | Proof-pack · NRPG directory live · renewal funnel |
-| 2 — firm stack | ~$1,000/wk RWR | Teams tier · CARSI+RestoreAssist+NRPG bundle · benchmark fielded · franchise deals |
-| 3 — authority flip | ~$2,000/wk RWR | Benchmark report published · membership tier · insurer/strata demand side |
-| 4 — quiet flip | organic | Directory becomes how the industry finds firms |
+| Gate                       | Trigger        | Focus                                                                                   |
+| -------------------------- | -------------- | --------------------------------------------------------------------------------------- |
+| **0 — ignition (CURRENT)** | now            | CEC submissions sent · subscriptions ON · outreach sent · benchmark instrument approved |
+| 1 — records wedge          | ~$500/wk RWR   | Proof-pack · NRPG directory live · renewal funnel                                       |
+| 2 — firm stack             | ~$1,000/wk RWR | Teams tier · CARSI+RestoreAssist+NRPG bundle · benchmark fielded · franchise deals      |
+| 3 — authority flip         | ~$2,000/wk RWR | Benchmark report published · membership tier · insurer/strata demand side               |
+| 4 — quiet flip             | organic        | Directory becomes how the industry finds firms                                          |
 
 **Standing rules:**
+
 1. All work comes from `BACKLOG.md` top-down. No work that isn't on it; discoveries go on the
    bottom, not into the current session.
 2. Blocked-on-founder goes to `DECISIONS.md` with a default and a deadline — then keep moving
@@ -31,6 +32,7 @@ plus 4-week rolling course sales. Every session reports RWR movement or names th
 6. Session end = update BACKLOG/DECISIONS state + one line: the customer-visible delta.
 
 **Current state (update each session):**
+
 - 2026-08-16: Gate 0. RWR ≈ $0 (subscriptions off, CEC registry empty). Site live, 80 courses.
   Engine files created; awaiting landing in repo root.
 - 2026-08-17: Gate 0. RWR ≈ $0 — unchanged, and the blocker is unchanged: subscriptions are
@@ -40,7 +42,7 @@ plus 4-week rolling course sales. Every session reports RWR movement or names th
   **Correction to the first draft of this entry:** it recorded the per-course purchase path as
   "GREEN end to end". That was FALSE and is struck. The per-course endpoint
   `app/api/lms/checkout/route.ts` exists, but no e2e spec exercises it: `grep -rn "lms/checkout"
-  e2e/` matches nothing across all five specs, and the only checkout call under test is
+e2e/` matches nothing across all five specs, and the only checkout call under test is
   `api/lms/subscription/checkout` (`e2e/revenue-path.spec.ts:140`) — the dark subscription flow.
   So the only revenue path that exists today is **UNKNOWN**, not green, and covering
   `app/api/lms/checkout` is the top red in revenue order.
@@ -72,3 +74,9 @@ plus 4-week rolling course sales. Every session reports RWR movement or names th
   **Autonomy unblocked:** the founder set `OPENROUTER_API_KEY`/`OPENROUTER_MODEL` in Vercel, so
   agents can now complete a release gate independently. Full evidence:
   `docs/session-handoffs/STOPPER-REGISTER-20260819.md`; queue as BACKLOG #29–#37.
+- 2026-09-01: Gate 0. Track 1 healthcare SEO is implementation-complete pending deploy:
+  healthcare, aged-care and hospitality pages target technicians/subcontractors, pin only
+  approved live courses, map search intent to job context and practical outcomes, cite current
+  Australian public sources and share the homepage light design system. RWR unchanged because
+  this improves organic acquisition but does not switch on subscriptions. Customer-visible delta:
+  three evidence-backed sector pathways land on the next deploy.
