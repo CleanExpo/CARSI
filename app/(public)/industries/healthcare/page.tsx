@@ -1,92 +1,130 @@
 import type { Metadata } from 'next';
-import { Stethoscope, Shield, Droplets, Flame } from 'lucide-react';
+import { Droplets, Shield, Stethoscope, Wind } from 'lucide-react';
 import {
   ContractorAddOns,
   IndustryCTA,
   IndustryCrossLinks,
+  IndustryEvidenceLinks,
   IndustryFAQSection,
   IndustryHero,
   IndustryPageLayout,
   IndustryRecommendedCourses,
+  IndustrySearchTopics,
   IndustryWhySection,
 } from '@/components/industries';
 import { FAQSchema } from '@/components/seo/JsonLd';
 import { buildIndustryMetadata } from '@/lib/marketing/industry-metadata';
+import {
+  healthcareRecommendedSlugs,
+  healthcareSearchTopics,
+} from '@/lib/marketing/industry-track1-topics';
 import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = buildIndustryMetadata(
   'healthcare',
-  'Healthcare IICRC CEC Training',
-  'NSQHS-aligned IICRC CEC training for Australian hospitals. Mould remediation, water damage restoration, fire & smoke restoration and structural drying courses supporting Standard 3 compliance and JCI accreditation.',
+  'Healthcare restoration training for Australian hospital crews',
+  'IICRC CEC Accredited courses for restoration technicians and subcontractors working hospitals and clinics. Mould, indoor air quality and water damage training that fits around call-outs.',
   [
-    'healthcare IICRC CEC training',
-    'hospital restoration training',
-    'NSQHS Standard 3',
-    'AMRT certification',
-    'medical facility cleaning',
+    'healthcare mould training Australia',
+    'hospital restoration technician course',
+    'infection control restoration training',
+    'indoor air quality healthcare course',
+    'NSQHS environmental services training',
   ]
 );
 
 const ACCENT_COLOR = '#009688';
 
-const disciplines = [
-  { code: 'AMRT', label: 'Applied Microbial Remediation', color: '#009688' },
-  { code: 'WRT', label: 'Water Damage Restoration', color: '#00796b' },
-  { code: 'FSRT', label: 'Fire & Smoke Restoration', color: '#00695c' },
-  { code: 'ASD', label: 'Applied Structural Drying', color: '#004d40' },
+const topics = [
+  { label: 'Mould and IAQ', color: '#009688' },
+  { label: 'Water damage', color: '#00796b' },
+  { label: 'Infection control', color: '#00695c' },
+  { label: 'Clinical buildings', color: '#004d40' },
 ];
 
 const stats = [
-  { value: '2,050+', label: 'Hospitals' },
-  { value: 'NSQHS', label: 'Standard 3' },
-  { value: 'IICRC', label: 'CEC Accredited' },
+  {
+    value: '701',
+    label: 'Public hospitals, 2023 to 2024',
+    sourceHref:
+      'https://www.aihw.gov.au/getmedia/46e5576a-068b-4887-8db4-b22e9209668d/australia-s-hospitals-at-a-glance-2023-24.pdf',
+    sourceLabel: 'Source: AIHW',
+  },
+  { value: 'NSQHS', label: 'Standard 3 context' },
+  { value: 'IICRC CEC', label: 'On approved courses' },
+];
+
+const evidenceLinks = [
+  {
+    title: 'Australia’s hospitals at a glance 2023 to 2024',
+    publisher: 'Australian Institute of Health and Welfare',
+    context: 'Current public-hospital count and Australian hospital system context.',
+    href: 'https://www.aihw.gov.au/getmedia/46e5576a-068b-4887-8db4-b22e9209668d/australia-s-hospitals-at-a-glance-2023-24.pdf',
+  },
+  {
+    title: 'NSQHS Preventing and Controlling Infections, Action 3.13',
+    publisher: 'Australian Commission on Safety and Quality in Health Care',
+    context:
+      'Environmental-cleaning training, policies, auditing and improvement responsibilities, including relevant contractors.',
+    href: 'https://www.safetyandquality.gov.au/standards/nsqhs-standards/preventing-and-controlling-infections-standard/infection-prevention-and-control-systems/action-313',
+  },
 ];
 
 const faqs = [
   {
-    question: 'What IICRC certifications do Australian hospitals need?',
+    question: 'Who is CARSI healthcare training for?',
     answer:
-      'Australian healthcare facilities typically require AMRT (Applied Microbial Remediation) for mould and infection control, WRT (Water Damage Restoration) for pipe bursts and flooding in clinical areas, and FSRT (Fire & Smoke Restoration) for emergency response. These certifications support NSQHS Standard 3 compliance and JCI accreditation audits.',
+      'Restoration technicians, subcontractors and environmental services staff who work hospitals, clinics and clinical plant rooms. The pages and courses are written for crews who service those sites, not for doctors or nurses.',
   },
   {
-    question: 'How does IICRC CEC training support NSQHS Standard 3 compliance?',
+    question: 'Does CARSI deliver IICRC certification for hospital work?',
     answer:
-      "NSQHS Standard 3 (Preventing and Controlling Infections) requires healthcare facilities to demonstrate staff competency in infection prevention. CARSI's CEC-accredited mould remediation training provides verifiable evidence that environmental services teams are trained in mould identification, remediation protocols, and contamination prevention — all directly relevant to Standard 3 audit requirements.",
+      'No. CARSI is an IICRC CEC Accredited provider. Where the IICRC has approved a course, its CEC hours are shown on the course page and recorded in your learner dashboard when you pass. IICRC certification itself is obtained only through IICRC-approved schools and examinations.',
   },
   {
-    question: 'Can hospital maintenance staff complete IICRC CEC training online?',
+    question: 'What mould training applies to healthcare facilities in Australia?',
     answer:
-      'Yes. CARSI offers IICRC CEC Accredited courses online and self-paced, designed to fit around 24/7 hospital shift patterns. Staff can complete modules between shifts without leaving the facility. Courses issue verifiable digital credentials on completion.',
+      'Start with Introduction to IAQ and Mould: Understanding Airborne Spread and Containment, then Introduction to Applied Microbial Remediation. Both are IICRC CEC Accredited. Hours are shown on each course page.',
   },
   {
-    question: 'What is mould remediation training for healthcare facilities?',
+    question: 'How does this training sit next to NSQHS Standard 3?',
     answer:
-      'CARSI mould remediation training covers mould identification, moisture assessment, containment procedures, and remediation protocols specific to clinical environments. In Australian hospitals, this is critical for plant rooms, basement services, and water-damaged areas where microbial growth poses infection risks to immunocompromised patients.',
+      'NSQHS Standard 3 is about preventing and controlling infections in health service organisations. CARSI courses do not replace hospital infection-control policy. They give visiting restoration crews documented training in mould, moisture and indoor air quality that site managers can file beside their own competency records.',
+  },
+  {
+    question: 'Can hospital and contractor crews complete training around shift work?',
+    answer:
+      'Yes. CARSI offers IICRC CEC Accredited courses online and self-paced, designed to fit around 24/7 hospital shift patterns and after-hours call-outs. Certificates and CEC records sit in the learner dashboard when you pass an approved course.',
+  },
+  {
+    question: 'Which courses should a crew open first for a hospital water loss?',
+    answer:
+      'Open Introduction to Water Damage in Commercial Buildings, then Introduction to Safety Procedures for Water Damage Work and Introduction to Improving Indoor Air Quality After Water Damage. CEC hours appear only on IICRC CEC Accredited titles.',
   },
 ];
 
 const whyCards = [
   {
     icon: Shield,
-    title: 'NSQHS Alignment',
+    title: 'Site managers want records',
     description:
-      'Training supports National Safety & Quality Health Service Standards compliance, particularly Standard 3 (Preventing and Controlling Infections).',
+      'A CARSI certificate can contribute to training records alongside site induction, role-specific competency checks, policies and performance monitoring.',
     color: '#009688',
   },
   {
     icon: Droplets,
-    title: 'Water Damage Response',
+    title: 'Water in clinical fabric',
     description:
-      'Water damage in clinical areas, plant rooms, and basement services requires immediate, standards-based response. Train your environmental services team.',
+      'Pipe bursts and leaks in plant rooms, basements and ward blocks need commercial drying thinking, not a domestic flood playbook.',
     color: '#00796b',
   },
   {
-    icon: Flame,
-    title: 'Fire & Smoke',
+    icon: Wind,
+    title: 'Mould and indoor air quality',
     description:
-      'Fire & smoke response in clinical environments and equipment rooms. IICRC credentials provide verifiable evidence for JCI accreditation audits.',
+      'Immunocompromised patients raise the stakes on containment and handover. Train on airborne spread, monitoring and clean-air close-out.',
     color: '#ed9d24',
   },
 ];
@@ -99,42 +137,51 @@ export default async function HealthcareIndustryPage() {
         icon={Stethoscope}
         industryName="Healthcare Industry"
         accentColor={ACCENT_COLOR}
-        headline="Healthcare Facility"
-        headlineAccent="Restoration Training"
-        description="NSQHS-aligned training for Australia's 2,050+ public and private hospitals. IICRC credentials support Standard 3 (Preventing and Controlling Infections) compliance and JCI accreditation audits."
-        disciplines={disciplines}
+        headline="Train for the hospital"
+        headlineAccent="jobs you already win"
+        description="For restoration crews and facility teams who work Australian hospitals and clinics. IICRC CEC Accredited courses in mould, indoor air quality and water damage, studied around the roster."
+        disciplines={topics}
         stats={stats}
       />
 
       <IndustryWhySection
         industryName="healthcare facilities"
         headline="Built for"
-        headlineAccent="patient safety"
+        headlineAccent="patient-site work"
         accentColor={ACCENT_COLOR}
         cards={whyCards}
       />
 
+      <IndustrySearchTopics
+        eyebrow="What crews search"
+        title="Four hospital-site problems, four live courses"
+        body="Start with these IICRC CEC Accredited introductions for common hospital-site tasks. They supplement, but do not replace, facility induction, infection-control policy or role-specific competency assessment."
+        topics={healthcareSearchTopics}
+      />
+
       <IndustryRecommendedCourses
         industryName="Healthcare Industry"
-        disciplineList="Mould remediation, water damage restoration, fire & smoke restoration and structural drying"
-        disciplines={['AMRT', 'WRT', 'FSRT', 'ASD']}
+        disciplineList="Mould, indoor air quality and water damage"
+        courseSlugs={healthcareRecommendedSlugs}
       />
 
       <ContractorAddOns accentColor={ACCENT_COLOR} variant="healthcare" />
+
+      <IndustryCrossLinks currentSlug="healthcare" />
+
+      <IndustryEvidenceLinks links={evidenceLinks} />
 
       <IndustryFAQSection industryName="Healthcare" faqs={faqs} />
 
       <IndustryCTA
         subtitle="Healthcare facility training"
-        title="Healthcare Bundle"
+        title="Train the crew that walks on site"
         price={industryBundlePriceLabel('healthcare')}
-        description="water damage restoration, mould remediation and fire & smoke restoration training + Healthcare-Specific Mould Risk Assessment bonus module. Online, self-paced — fits around 24/7 hospital shift patterns."
-        ctaText="Train your team"
+        description="Mould, indoor air quality and water damage courses for technicians servicing hospitals. Ask about team seats if you send more than one person."
+        ctaText="Talk to CARSI"
         ctaHref="/contact"
         accentColor={ACCENT_COLOR}
       />
-
-      <IndustryCrossLinks currentSlug="healthcare" />
     </IndustryPageLayout>
   );
 }
