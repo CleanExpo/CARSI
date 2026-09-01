@@ -17,13 +17,15 @@ This document provides comprehensive testing information for the entire system, 
 > the repository, even though `COMPOUND_ENGINEERING_LOOP.md` mandates `npm run test:a11y` on every
 > UI change. That gate now exists (`e2e/a11y.spec.ts`) and is proven to fail on real violations.
 
-**Test coverage — measured 2026-08-07, not asserted:**
+**Test coverage — re-measured 2026-08-26, not asserted.** Only the unit row had actually drifted.
+A number here may only change by running the command again, and the row must say whether the
+figure came from a **run** or from **counting the source**, because those are not the same claim.
 
 | Suite | Command | Verified state |
 | --- | --- | --- |
-| Unit (vitest) | `npm run test:unit` | 138 test files passing |
-| E2E / smoke (Playwright) | `npm run test:e2e` / `npm run test:smoke` | 5 spec files; smoke is 12 checks |
-| Accessibility (axe) | `npm run test:a11y` | 3 checks, WCAG 2.1 A/AA, critical + serious only |
+| Unit (vitest) | `npm run test:unit` | **Run 2026-08-26:** 158 test files, 1309 tests passing (was 138 files on 2026-08-07) |
+| E2E / smoke (Playwright) | `npm run test:e2e` / `npm run test:smoke` | **Source count:** 5 spec files; smoke declares 12 `test()` cases. Not run here — Playwright needs a server |
+| Accessibility (axe) | `npm run test:a11y` | **Source count:** 3 axe checks, WCAG 2.1 A/AA, critical + serious only. `e2e/a11y.spec.ts` declares 4 `test()` cases, but the fourth asserts Course JSON-LD, which is structured data rather than accessibility |
 | Licence & content guards | `check:iicrc-terminology`, `check:iicrc-compliance`, `check:cec-surfaces`, `check:cec`, `check:designations`, `check:au-english`, `check:standards-claims`, `check:secrets`, `check:course-completeness` | all exit 0 on `main` |
 
 Anything not in this table is not covered. Add a row only after the suite runs and you have read

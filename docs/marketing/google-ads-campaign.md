@@ -201,7 +201,7 @@ Apply across all campaigns to prevent wasted spend:
 | Headline 3 | 40+ Courses Available Online |
 | Headline 4 | Subscription Access — $795/Year |
 | Headline 5 | Upskill Without Leaving the Job Site |
-| Description 1 | Access 40+ IICRC CEC-approved courses with a CARSI subscription. Water damage, mould, fire restoration and more. $795 AUD/year — unlimited access. |
+| Description 1 | Access our IICRC CEC Accredited catalogue — 80 courses with a CARSI subscription. Water damage, mould, fire restoration and more. $795 AUD/year. |
 | Description 2 | Save with course bundles or go all-in with annual subscription. Public credential URL included for contractor pre-qualification. |
 
 ### Campaign 2: Mining
@@ -354,7 +354,12 @@ Apply across all campaigns to prevent wasted spend:
 
 Each landing page must include:
 
-- IICRC logo and "CEC-approved" badge
+- **No IICRC logo.** CLAUDE.md § "IICRC standards IP + AI use": logo rights attach to Certified
+  Firms and Registrants under signed agreements, the IICRC publicly enforces violations, and CARSI
+  holds no such agreement. The wordmark is nominative-use only. Use the text
+  "IICRC CEC Accredited provider" instead of a mark, and no approval badge — CARSI is an
+  accredited provider, and no course displays approved CEC hours until the IICRC approves that
+  course
 - Relevant course cards for that vertical
 - Social proof (enrolment count, testimonials)
 - Clear CTA: "Enrol Now" or "Start Free Trial"

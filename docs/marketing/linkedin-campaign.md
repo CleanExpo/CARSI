@@ -104,7 +104,7 @@ Downloadable PDF preview in feed — users swipe through pages, then submit lead
 
 > **Hook:** Is your mining site team trained to handle water ingress and mould?
 >
-> **Body:** WHS regulations require competent persons for mould and water damage response. CARSI delivers IICRC CEC-approved courses 100% online — your team completes them between shifts, on any device, with no roster disruption.
+> **Body:** WHS regulations require competent persons for mould and water damage response. CARSI delivers IICRC CEC Accredited courses 100% online — your team completes them between shifts, on any device, with no roster disruption.
 >
 > Verifiable digital certificates. Group licensing available for 10+ seats.
 >
@@ -146,7 +146,7 @@ Downloadable PDF preview in feed — users swipe through pages, then submit lead
 
 > **Hook:** Train your entire aged care team in mould safety — from $79 per course.
 >
-> **Body:** CARSI offers IICRC CEC-approved training starting at $79 per course, or unlimited access for $795/year. Every completion earns a verifiable digital certificate your compliance team can audit.
+> **Body:** CARSI offers IICRC CEC Accredited training starting at $79 per course, or unlimited access for $795/year. Every completion earns a verifiable digital certificate your compliance team can audit.
 >
 > No classroom time. No roster disruption. Instant online access.
 >
@@ -168,7 +168,7 @@ Downloadable PDF preview in feed — users swipe through pages, then submit lead
 
 > **Hook:** Property managers with IICRC credentials win more management agreements.
 >
-> **Body:** Differentiate yourself in a competitive market. CARSI offers IICRC CEC-approved courses in water damage, mould assessment and restoration oversight — relevant CPD for every property professional.
+> **Body:** Differentiate yourself in a competitive market. CARSI offers IICRC CEC Accredited courses in water damage, mould assessment and restoration oversight — relevant CPD for every property professional.
 >
 > 100% online. Self-paced. Certificate on completion.
 >

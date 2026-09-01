@@ -222,6 +222,8 @@ export async function sendYearlyMembershipEmail(params: {
   temporaryPassword: string;
   priceLabel: string;
   courseCount: number;
+  /** Published courses on offer; when above `courseCount` the copy drops the full-library claim. */
+  publishedCourseCount?: number;
   durationLabel: string;
   appOrigin: string;
 }): Promise<SendEmailResult> {
@@ -237,6 +239,7 @@ export async function sendYearlyMembershipEmail(params: {
     temporaryPassword: params.temporaryPassword,
     priceLabel: params.priceLabel,
     courseCount: params.courseCount,
+    publishedCourseCount: params.publishedCourseCount,
     durationLabel: params.durationLabel,
     loginUrl,
     dashboardUrl,
@@ -597,9 +600,8 @@ export async function sendCcwRoadshowOfferPackEmail(params: {
   attendeeName: string;
   eventCity: string;
   eventDates: string;
-  shopifyTrainingUrl: string;
-  membershipCheckoutUrl: string;
-  membershipPriceLabel: string;
+  /** `null` ⇒ the pack sends without the Shopify CTA. Never a preview link. */
+  shopifyTrainingUrl: string | null;
   socialLinks: ReadonlyArray<{ label: string; href: string }>;
   appOrigin: string;
 }): Promise<SendEmailResult> {
@@ -610,8 +612,6 @@ export async function sendCcwRoadshowOfferPackEmail(params: {
     eventCity: params.eventCity,
     eventDates: params.eventDates,
     shopifyTrainingUrl: params.shopifyTrainingUrl,
-    membershipCheckoutUrl: params.membershipCheckoutUrl,
-    membershipPriceLabel: params.membershipPriceLabel,
     socialLinks: params.socialLinks,
   });
 

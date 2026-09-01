@@ -58,6 +58,18 @@ services:
       - key: NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
         scope: RUN_AND_BUILD_TIME
 
+      # Feature flag for the individual yearly membership (WS1-E1). Read by
+      # src/lib/server/subscriptions-flag.ts, which accepts only `true`, `1`,
+      # `yes` or `on` (trimmed + lowercased) — anything else, including unset,
+      # means off. Set the VALUE in DO; it is deliberately not committed, so
+      # the flag stays a founder decision rather than a merge.
+      #
+      # Recorded here because its absence from this spec is why an unset flag
+      # was hard to spot: every surface correctly reported "coming soon" and
+      # nothing pointed at the missing variable.
+      - key: SUBSCRIPTIONS_ENABLED
+        scope: RUN_AND_BUILD_TIME
+
       - key: ADMIN_EMAIL
         scope: RUN_TIME
       # Extra admin-panel emails (comma-separated) beyond the hardcoded founder

@@ -265,7 +265,7 @@ test.describe('1. Homepage', () => {
     // heading by role + accessible name and take the first match so the assertion
     // is strict-safe and waits for the real, settled heading.
     const h1 = page
-      .getByRole('heading', { level: 1, name: /Professional training that fits the workday/i })
+      .getByRole('heading', { level: 1, name: /Become the technician every job site trusts/i })
       .first();
     await expect(h1).toBeVisible({ timeout: 15_000 });
 
@@ -294,8 +294,21 @@ test.describe('2. Course catalogue', () => {
   test('shows at least one course card', async ({ page }) => {
     await page.goto('/courses');
 
-    // Page heading
-    await expect(page.locator('h1')).toBeVisible({ timeout: 10_000 });
+    // Page heading. Same transient-two-<h1> hydration race as the homepage test above, and a
+    // bare `page.locator('h1')` is strict — it throws "strict mode violation" rather than
+    // retrying. Target the heading by role + accessible name, as that test does.
+    //
+    // Assert the count rather than taking `.first()`: waiting for exactly one heading rides out
+    // the hydration frame just as well, and unlike `.first()` it still fails if the page ever
+    // ships a genuinely duplicated <h1>, which is an accessibility and SEO defect. Checked
+    // against production — carsi.com.au/courses serves exactly one <h1>; the apparent second
+    // copy in the HTML is the RSC flight payload inside a <script>, which no locator matches.
+    const heading = page.getByRole('heading', {
+      level: 1,
+      name: /Restoration Training Courses/i,
+    });
+    await expect(heading).toHaveCount(1, { timeout: 15_000 });
+    await expect(heading).toBeVisible({ timeout: 15_000 });
 
     // At least one real course card. SSR renders the seeded catalogue from the DB
     // (page.route mocks don't apply server-side), and each card links to

@@ -10,7 +10,7 @@
 - [ ] N/A — not user-facing / config change only
 
 ## Verification
-- [ ] Type checks pass (`npm run typecheck` or equivalent)
+- [ ] Type checks pass (`npm run type-check`)
 - [ ] Tests pass (or none applicable)
 - [ ] Build succeeds (`npm run build`)
 - [ ] Manual smoke test of changed feature

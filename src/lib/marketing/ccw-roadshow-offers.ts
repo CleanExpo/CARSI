@@ -1,15 +1,31 @@
 /**
  * CCW/CARSI roadshow — attendee Course Offers (slice-1: pure config + gating).
  *
- * Three attendee-exclusive offers surfaced ONLY on the days of each event and
- * ONLY to verified attendees. This module is pure and client-safe (no env, no
- * DB); the server flag lives in `@/lib/server/ccw-offers-flag` and the
- * welcome-email wiring is a later slice. Spec:
+ * TWO attendee-exclusive offers surfaced ONLY on the days of each event and
+ * ONLY to verified attendees — see `ccwRoadshowAttendeeOffers` below for which,
+ * and for why there is no longer a third. This module is pure and client-safe
+ * (no env, no DB); the server flag lives in `@/lib/server/ccw-offers-flag`, and
+ * the welcome-email wiring is BUILT (`ccw-attendance/provision.ts` feeds
+ * `selectActiveOffersForNow` into the enrolment email). Spec — partly
+ * superseded, read its header first:
  * docs/specs/ccw-attendee-offers-day-gated-2026-07-15.md
+ *
+ * The attendee membership offer was REMOVED by the founder on 2026-08-25. It was
+ * a self-serve discounted `pro_annual` subscription — A$295 for the first year
+ * via a `duration: once` Stripe coupon — and it never went live: the coupon it
+ * depended on was never created, so the path only ever returned 503. Its price
+ * constants, checkout branch, `/subscribe?offer=` entry point and the A$295 claim
+ * in the attendee email are all gone with it.
+ *
+ * Membership for a named attendee is still available, by a DIFFERENT instrument:
+ * `POST /api/admin/ccw-roadshow/comp-membership` grants a year outright via
+ * `grantYearlyMembership`. No Stripe subscription, so no renewal — see that
+ * route's service for why the two must never be swapped for one another. It does
+ * not depend on any offer flag or on Stripe at all, and is unaffected here.
  */
 import { ccwRoadshowEvents, type CcwRoadshowEvent } from './ccw-roadshow';
 
-export type CcwOfferKey = 'ccw-store-credit' | 'carsi-membership' | 'ra-setup';
+export type CcwOfferKey = 'ccw-store-credit' | 'ra-setup';
 
 export type CcwAttendeeOffer = {
   key: CcwOfferKey;
@@ -19,17 +35,23 @@ export type CcwAttendeeOffer = {
   detail: string;
   /** CCW / RA permanent product URL. Preview URLs are rejected (see below). */
   url?: string;
-  /** CARSI: price passed to `grantYearlyMembership`; NOT a coupon. Server-only. */
-  membershipPriceAud?: number;
   /** false = configured but its external dependency isn't satisfied yet. */
   live: boolean;
 };
 
 /**
- * Shipped config — all three offers DARK (`live: false`) at ship time. Each is
- * flipped to `live: true` only when its dependency lands (permanent CCW URL from
- * Toby; Rana's membership price; RA mechanism). No URLs are baked in yet, so
- * nothing can accidentally ship a temporary preview link.
+ * Shipped config — the two remaining attendee offers.
+ *
+ * `ccw-store-credit` is LIVE: its dependency was the permanent CCW product URL
+ * from Toby, verified on the ccwonline.com.au custom domain 2026-07-15.
+ * `ra-setup` is still dark, waiting on the RestoreAssist mechanism.
+ *
+ * There is no third offer. `carsi-membership` was removed with the A$295
+ * attendee discount on 2026-08-25, so "Rana's membership price" is no longer a
+ * dependency of anything here — do not restore an offer on the strength of it.
+ *
+ * An offer is flipped to `live: true` only when its dependency lands, and no
+ * preview URL is ever baked in, so a temporary link cannot ship by accident.
  */
 export const ccwRoadshowAttendeeOffers: CcwAttendeeOffer[] = [
   {
@@ -40,13 +62,6 @@ export const ccwRoadshowAttendeeOffers: CcwAttendeeOffer[] = [
     // domain ("CCW/CARSI 2 Day In-house Training", $100 → $150 store credit).
     url: 'https://ccwonline.com.au/products/ccw-carsi-2-day-in-house-training',
     live: true,
-  },
-  {
-    key: 'carsi-membership',
-    label: 'CARSI 1-year membership',
-    detail: 'Attendee rate on a full year of CARSI membership — details on the day.',
-    membershipPriceAud: 295,
-    live: false,
   },
   {
     key: 'ra-setup',

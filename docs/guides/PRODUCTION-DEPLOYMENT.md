@@ -1,7 +1,25 @@
 # Production Deployment Guide
 
+> ## STALE — DO NOT FOLLOW. Corrected 26/08/2026.
+>
+> **Every element of the stack line below is wrong for this repo.** Measured, not assumed:
+> there is no `railway.json`/`railway.toml`, no `requirements.txt`/`pyproject.toml`/`main.py`
+> (so no FastAPI service), and `docs/runbooks/rana-retire-vercel.md` records DigitalOcean as the
+> **sole** production path. Prisma's provider is plain `postgresql`, not a Supabase-hosted app DB.
+>
+> **The real deployment:** DigitalOcean App Platform app `monkfish-app`, defined by `app.yaml`
+> (`branch: main`, `deploy_on_push: true`, `dockerfile_path: deploy/Dockerfile`, `http_port: 8080`).
+> Pushing to `main` deploys to production; there is no staging environment (DECISIONS #10).
+>
+> Two Dockerfiles exist and only one is used: `app.yaml` names **`deploy/Dockerfile`**. The root
+> `Dockerfile` is near-identical and plays no part in the deploy — do not edit it expecting an
+> effect.
+>
+> This file is kept for its generic procedure notes only. For anything environment-specific,
+> trust `app.yaml`, `deploy/Dockerfile` and `docs/runbooks/` over this document.
+
 **Last Updated:** 06/01/2026
-**Stack:** Next.js 15 (Vercel) + FastAPI (Railway) + Supabase (PostgreSQL)
+**Stack (WRONG — see the correction above):** Next.js 15 (Vercel) + FastAPI (Railway) + Supabase (PostgreSQL)
 
 ---
 

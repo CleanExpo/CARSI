@@ -9,6 +9,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
+import {
+  describeWelcomeEmailFailure,
+  welcomeEmailRecovery,
+  type WelcomeEmailDelivery,
+} from '@/lib/admin/welcome-email-delivery';
 
 type UserOpt = { id: string; email: string; fullName: string | null };
 
@@ -21,6 +26,7 @@ type GrantResult = {
   coursesFailed: number;
   publishedCourseCount: number;
   priceLabel: string;
+  welcomeEmail?: WelcomeEmailDelivery;
 };
 
 export function AdminYearlyMembershipClient() {
@@ -280,7 +286,19 @@ export function AdminYearlyMembershipClient() {
                   : ''}
                 {result.coursesFailed > 0 ? ` · ${result.coursesFailed} failed` : ''}
               </li>
-              <li>Welcome email sent with login credentials</li>
+              {result.welcomeEmail === undefined ? null : result.welcomeEmail.delivered ? (
+                <li>
+                  Welcome email sent with login credentials. {welcomeEmailRecovery(true)}
+                </li>
+              ) : (
+                <li className="font-semibold text-amber-200">
+                  Welcome email NOT delivered — {describeWelcomeEmailFailure(
+                    result.welcomeEmail.reason
+                  )}
+                  . The membership is granted, but the password existed only in that email, so{' '}
+                  {result.email} cannot sign in yet. {welcomeEmailRecovery(false)}
+                </li>
+              )}
             </ul>
             <Link
               href={`/admin/users/${result.userId}`}

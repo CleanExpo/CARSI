@@ -34,7 +34,7 @@ test.describe('smoke: deploy health', () => {
       page
         .getByRole('heading', {
           level: 1,
-          name: /Professional training that fits the workday/i,
+          name: /Become the technician every job site trusts/i,
         })
         .first()
     ).toBeVisible({ timeout: 15_000 });

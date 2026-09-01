@@ -1,5 +1,27 @@
 # Anthropic Claude API Documentation
 
+> ## A GENERATION BEHIND THE CODE. Corrected 26/08/2026.
+>
+> The model tables below stop at the **Claude 4** family — their newest entries are
+> `claude-opus-4-1` and `claude-sonnet-4-0`. This repo's own source already calls newer models:
+> `grep` over `src/` returns `claude-sonnet-5`, `claude-opus-4-8`, `claude-sonnet-4-5-20250929`
+> and `claude-haiku-4-5-20251001`. So a developer following these tables would pick a superseded
+> model while the code beside them uses a current one.
+>
+> **Current family — Claude 5.** Model IDs: Opus 5 `claude-opus-5`, Sonnet 5 `claude-sonnet-5`,
+> Fable 5 `claude-fable-5`, plus Haiku 4.5 `claude-haiku-4-5-20251001`. When building anything
+> new, default to the latest and most capable model rather than a table entry.
+>
+> **Do not treat this file as the source of truth for model IDs.** Model names move faster than a
+> vendored doc last touched 2026-06-25. Check the live API docs, or the IDs already in `src/`.
+> The non-model content below — request shapes, streaming, tool use — ages far more slowly and is
+> still broadly useful.
+>
+> One consequence worth knowing: prompting guidance written for older models can actively hurt on
+> newer ones. `CLAUDE.md` records exactly this, having removed an always-loaded playbook because
+> its "verify your own work" scaffolding caused **over**-verification on a model that already does
+> it natively.
+
 > Official documentation sourced from [docs.anthropic.com](https://docs.anthropic.com) and [github.com/anthropics](https://github.com/anthropics)
 
 ## Installation

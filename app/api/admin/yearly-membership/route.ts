@@ -5,6 +5,11 @@ import {
   grantYearlyMembership,
 } from '@/lib/admin/admin-yearly-membership';
 import { getAdminSessionOrNull } from '@/lib/admin/admin-session';
+import {
+  claimYearlyMembershipGrant,
+  releaseYearlyMembershipClaim,
+  YEARLY_MEMBERSHIP_REGRANT_WINDOW_MS,
+} from '@/lib/admin/yearly-membership-claim';
 
 export async function GET() {
   const session = await getAdminSessionOrNull();
@@ -62,6 +67,26 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ detail: 'A valid email address is required' }, { status: 400 });
   }
 
+  // Claim BEFORE granting. The grant rotates an existing member's password and
+  // reveals it only in the welcome email, so a second one — a double-submit, a
+  // retry after a timeout, two admins at once — invalidates the credentials the
+  // first email just delivered. The claim is a conditional UPSERT keyed by
+  // EMAIL, so the database arbitrates — and so it can be taken before the
+  // grant creates the learner's row, which a claim living on that row could
+  // not be.
+  const claimedAt = new Date();
+  const claimed = await claimYearlyMembershipGrant(email, claimedAt);
+  if (!claimed) {
+    return NextResponse.json(
+      {
+        detail:
+          'That learner was granted a yearly membership moments ago. Granting again would reset their password a second time and invalidate the one already emailed to them. Wait a few minutes, or send a password reset instead.',
+        retryAfterMs: YEARLY_MEMBERSHIP_REGRANT_WINDOW_MS,
+      },
+      { status: 409 },
+    );
+  }
+
   try {
     const result = await grantYearlyMembership({
       email,
@@ -71,6 +96,9 @@ export async function POST(request: NextRequest) {
     });
     return NextResponse.json({ ok: true, ...result });
   } catch (e) {
+    // The grant did not happen, so the claim must not outlive it — otherwise one
+    // failed attempt blocks this learner for the whole window for nothing.
+    await releaseYearlyMembershipClaim(email, claimedAt);
     const msg = e instanceof Error ? e.message : String(e);
     if (msg === 'INVALID_EMAIL') {
       return NextResponse.json({ detail: 'Invalid email address' }, { status: 400 });

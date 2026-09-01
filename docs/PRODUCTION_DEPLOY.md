@@ -1,7 +1,22 @@
 # CARSI LMS Production Deployment Runbook
 
+> ## STALE — DO NOT FOLLOW. Corrected 26/08/2026.
+>
+> The header below describes a **Fly.io** deployment (`syd` region, a separate "backend"). No
+> `fly.toml` exists in this repo, and there is no separate backend service — no
+> `requirements.txt`, `pyproject.toml` or `main.py`.
+>
+> **The real deployment:** DigitalOcean App Platform app `monkfish-app`, defined by `app.yaml`
+> — `region: blr`, `branch: main`, `deploy_on_push: true`, `dockerfile_path: deploy/Dockerfile`,
+> `http_port: 8080`. Note the region is **blr**, not `syd`. Pushing to `main` deploys straight to
+> production; there is no staging environment (DECISIONS #10).
+>
+> This is one of **three** competing production deployment documents in this repo, all of which
+> described stacks that do not exist. See also `docs/guides/PRODUCTION-DEPLOYMENT.md` and
+> `docs/production-deployment.md`. Consolidating them is a backlog discovery, not done here.
+
 > **Last Updated**: 06/03/2026
-> **Region**: Sydney, Australia (syd)
+> **Region (WRONG — see above)**: Sydney, Australia (syd)
 > **Status**: Backend deployed and healthy
 
 ---

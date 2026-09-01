@@ -2,25 +2,34 @@
  * POST /api/lms/subscription/checkout — start the individual annual membership
  * (`pro_annual`, A$795/yr) Stripe Checkout in `mode: 'subscription'`.
  *
- * Optional body `{ attendeeOffer: true }` starts the CCW roadshow attendee
- * special (A$295/yr) when the learner is offer-eligible (both days + email
- * opt-in + provisioned). Attendee pricing is hardcoded via Checkout
- * `price_data` — no Stripe Price id or extra env vars.
+ * There is ONE membership price. The CCW roadshow attendee special — A$295 for
+ * the first year via a `duration: once` Stripe coupon — was removed by the
+ * founder on 2026-08-25 before it ever went live: the coupon it depended on was
+ * never created in Stripe, so the path had only ever returned 503. Do not
+ * reintroduce a discounted recurring price if the special is ever revived; that
+ * would renew at the reduced rate forever and quietly commit CARSI to A$500/yr
+ * less from every attendee who claimed it. The admin comp path
+ * (`POST /api/admin/ccw-roadshow/comp-membership`) is a DIFFERENT instrument and
+ * is unaffected — it grants a year outright with no Stripe subscription.
  *
- * Regular $795 membership still ships dark behind SUBSCRIPTIONS_ENABLED.
- * The attendee path only needs STRIPE_SECRET_KEY (already used for payments).
+ * Ships dark behind SUBSCRIPTIONS_ENABLED.
+ *
+ * Guarded against opening a second checkout for a learner who already holds a
+ * live membership (spec §10.4 AC-9) — see `@/lib/server/membership-checkout-guard`
+ * for why that has to happen here rather than being reconciled afterwards — and
+ * then takes an atomic per-learner reservation, so two requests arriving together
+ * cannot each open a session (`@/lib/server/membership-checkout-reservation`).
  */
-
 import { NextRequest, NextResponse } from 'next/server';
 
 import { getStripeClient } from '@/lib/api/stripe';
-import {
-  CCW_ATTENDEE_MEMBERSHIP_PRICE_CENTS,
-  CCW_ATTENDEE_MEMBERSHIP_PRODUCT_NAME,
-  CCW_ATTENDEE_OFFER_QUERY,
-} from '@/lib/marketing/ccw-roadshow-offer-pack';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
-import { learnerIsCcwAttendeeOfferEligible } from '@/lib/server/ccw-attendance/attendee-offer';
+import { membershipCheckoutDecisionFor } from '@/lib/server/membership-checkout-guard';
+import {
+  checkoutSessionExpiresAt,
+  releaseMembershipCheckout,
+  reserveMembershipCheckout,
+} from '@/lib/server/membership-checkout-reservation';
 import { resolveProAnnualPriceId } from '@/lib/server/subscription-price';
 import { subscriptionsEnabled } from '@/lib/server/subscriptions-flag';
 import {
@@ -47,14 +56,9 @@ export async function POST(request: NextRequest) {
   const body = (await request.json().catch(() => ({}))) as {
     success_url?: string;
     cancel_url?: string;
-    attendeeOffer?: boolean;
-    offer?: string;
   };
 
-  const wantAttendeeOffer = body.attendeeOffer === true || body.offer === CCW_ATTENDEE_OFFER_QUERY;
-
-  // Regular $795 path stays behind the subscriptions flag; attendee $295 does not.
-  if (!wantAttendeeOffer && !subscriptionsEnabled()) {
+  if (!subscriptionsEnabled()) {
     return NextResponse.json({ detail: UNAVAILABLE }, { status: 503 });
   }
 
@@ -68,74 +72,58 @@ export async function POST(request: NextRequest) {
       ? body.cancel_url
       : `${origin}/subscribe?checkout=cancelled`;
 
-  try {
-    if (wantAttendeeOffer) {
-      const eligible = await learnerIsCcwAttendeeOfferEligible({
-        userId: claims.sub,
-        email: claims.email,
-      });
-      if (!eligible) {
-        return NextResponse.json(
+  // AC-9: at most one live membership per learner, on BOTH paths. `userId` is
+  // unique on LmsSubscription, so a second Stripe subscription collapses onto
+  // one row while Stripe bills both — see membership-checkout-guard. Fails
+  // closed: an unverifiable membership state opens no checkout.
+  const guard = await membershipCheckoutDecisionFor(claims.sub);
+  if (!guard.allowed) {
+    return guard.block === 'already_subscribed'
+      ? NextResponse.json(
           {
             detail:
-              'This attendee membership special is only available after both training days and email opt-in.',
+              'You already have an active CARSI membership. Manage it from your dashboard.',
           },
-          { status: 403 }
+          { status: 409 }
+        )
+      : NextResponse.json(
+          { detail: 'We could not confirm your membership status. Please try again shortly.' },
+          { status: 503 }
         );
-      }
+  }
 
-      const session = await getStripeClient().checkout.sessions.create({
-        mode: 'subscription',
-        line_items: [
+  // Atomic claim on this learner's checkout. The guard above answers "does a
+  // membership already exist"; this answers "is another checkout already open",
+  // which a read cannot decide because both racers read the same absence.
+  // Taken AFTER validation so a rejected request never holds a reservation.
+  const reservation = await reserveMembershipCheckout(claims.sub);
+  if (reservation !== 'reserved') {
+    return reservation === 'busy'
+      ? NextResponse.json(
           {
-            quantity: 1,
-            price_data: {
-              currency: 'aud',
-              unit_amount: CCW_ATTENDEE_MEMBERSHIP_PRICE_CENTS,
-              recurring: { interval: 'year' },
-              tax_behavior: 'inclusive',
-              product_data: {
-                name: CCW_ATTENDEE_MEMBERSHIP_PRODUCT_NAME,
-                metadata: {
-                  plan: 'pro_annual_attendee',
-                  source: 'ccw-roadshow-offer',
-                },
-              },
-            },
+            detail:
+              'A membership checkout is already open for your account. Finish it, or try again in a few minutes.',
           },
-        ],
-        customer_email: claims.email,
-        success_url,
-        cancel_url,
-        allow_promotion_codes: false,
-        metadata: {
-          carsi_user_id: claims.sub,
-          plan: 'pro_annual_attendee',
-          source: 'ccw-roadshow-offer',
-        },
-        subscription_data: {
-          metadata: {
-            carsi_user_id: claims.sub,
-            plan: 'pro_annual_attendee',
-            source: 'ccw-roadshow-offer',
-          },
-        },
-      });
+          { status: 409 }
+        )
+      : NextResponse.json(
+          { detail: 'We could not start checkout just now. Please try again shortly.' },
+          { status: 503 }
+        );
+  }
 
-      if (!session.url) {
-        return NextResponse.json({ detail: 'Failed to start checkout session.' }, { status: 500 });
-      }
-      return NextResponse.json({ url: session.url, checkout_url: session.url });
-    }
-
+  try {
     const priceId = await resolveProAnnualPriceId();
     if (!priceId) {
+      await releaseMembershipCheckout(claims.sub);
       return NextResponse.json({ detail: UNAVAILABLE }, { status: 503 });
     }
 
     const session = await getStripeClient().checkout.sessions.create({
       mode: 'subscription',
       line_items: [{ price: priceId, quantity: 1 }],
+      // Paired with the reservation TTL — see membership-checkout-reservation.
+      expires_at: checkoutSessionExpiresAt(),
       customer_email: claims.email,
       success_url,
       cancel_url,
@@ -157,6 +145,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!session.url) {
+      await releaseMembershipCheckout(claims.sub);
       return NextResponse.json({ detail: 'Failed to start checkout session.' }, { status: 500 });
     }
     await tryRecordAttributedStage(attributionJourneyId, 'checkout_started', {
@@ -164,6 +153,9 @@ export async function POST(request: NextRequest) {
     });
     return NextResponse.json({ url: session.url, checkout_url: session.url });
   } catch (error) {
+    // Stripe never opened a session, so hand the reservation back rather than
+    // making the learner wait out the TTL for a failure that was ours.
+    await releaseMembershipCheckout(claims.sub);
     console.error('[subscription/checkout] Stripe error:', error);
     return NextResponse.json({ detail: 'Failed to start checkout session.' }, { status: 500 });
   }
