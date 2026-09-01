@@ -26,16 +26,14 @@ import { getStripeClient } from '@/lib/api/stripe';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { membershipCheckoutDecisionFor } from '@/lib/server/membership-checkout-guard';
 import {
+  checkoutSessionIdempotencyKey,
   checkoutSessionExpiresAt,
   releaseMembershipCheckout,
   reserveMembershipCheckout,
 } from '@/lib/server/membership-checkout-reservation';
 import { resolveProAnnualPriceId } from '@/lib/server/subscription-price';
 import { subscriptionsEnabled } from '@/lib/server/subscriptions-flag';
-import {
-  readAttributionJourneyId,
-  tryRecordAttributedStage,
-} from '@/lib/server/event-attribution';
+import { readAttributionJourneyId, tryRecordAttributedStage } from '@/lib/server/event-attribution';
 
 const UNAVAILABLE = 'Membership purchasing is not yet available.';
 
@@ -81,8 +79,7 @@ export async function POST(request: NextRequest) {
     return guard.block === 'already_subscribed'
       ? NextResponse.json(
           {
-            detail:
-              'You already have an active CARSI membership. Manage it from your dashboard.',
+            detail: 'You already have an active CARSI membership. Manage it from your dashboard.',
           },
           { status: 409 }
         )
@@ -96,7 +93,8 @@ export async function POST(request: NextRequest) {
   // membership already exist"; this answers "is another checkout already open",
   // which a read cannot decide because both racers read the same absence.
   // Taken AFTER validation so a rejected request never holds a reservation.
-  const reservation = await reserveMembershipCheckout(claims.sub);
+  const reservedAt = new Date();
+  const reservation = await reserveMembershipCheckout(claims.sub, reservedAt);
   if (reservation !== 'reserved') {
     return reservation === 'busy'
       ? NextResponse.json(
@@ -119,33 +117,37 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ detail: UNAVAILABLE }, { status: 503 });
     }
 
-    const session = await getStripeClient().checkout.sessions.create({
-      mode: 'subscription',
-      line_items: [{ price: priceId, quantity: 1 }],
-      // Paired with the reservation TTL — see membership-checkout-reservation.
-      expires_at: checkoutSessionExpiresAt(),
-      customer_email: claims.email,
-      success_url,
-      cancel_url,
-      metadata: {
-        carsi_user_id: claims.sub,
-        plan: 'pro_annual',
-        source: 'carsi-pro-annual',
-        ...(attributionJourneyId ? { attribution_journey_id: attributionJourneyId } : {}),
-      },
-      subscription_data: {
-        trial_period_days: 7,
+    const session = await getStripeClient().checkout.sessions.create(
+      {
+        mode: 'subscription',
+        line_items: [{ price: priceId, quantity: 1 }],
+        // Paired with the reservation TTL — see membership-checkout-reservation.
+        expires_at: checkoutSessionExpiresAt(reservedAt),
+        customer_email: claims.email,
+        success_url,
+        cancel_url,
         metadata: {
           carsi_user_id: claims.sub,
           plan: 'pro_annual',
+          source: 'carsi-pro-annual',
           ...(attributionJourneyId ? { attribution_journey_id: attributionJourneyId } : {}),
         },
+        subscription_data: {
+          trial_period_days: 7,
+          metadata: {
+            carsi_user_id: claims.sub,
+            plan: 'pro_annual',
+            ...(attributionJourneyId ? { attribution_journey_id: attributionJourneyId } : {}),
+          },
+        },
+        allow_promotion_codes: true,
       },
-      allow_promotion_codes: true,
-    });
+      {
+        idempotencyKey: checkoutSessionIdempotencyKey('individual', claims.sub, reservedAt),
+      }
+    );
 
     if (!session.url) {
-      await releaseMembershipCheckout(claims.sub);
       return NextResponse.json({ detail: 'Failed to start checkout session.' }, { status: 500 });
     }
     await tryRecordAttributedStage(attributionJourneyId, 'checkout_started', {
@@ -153,9 +155,9 @@ export async function POST(request: NextRequest) {
     });
     return NextResponse.json({ url: session.url, checkout_url: session.url });
   } catch (error) {
-    // Stripe never opened a session, so hand the reservation back rather than
-    // making the learner wait out the TTL for a failure that was ours.
-    await releaseMembershipCheckout(claims.sub);
+    // A timeout or 5xx is ambiguous: Stripe may have opened a payable session
+    // and lost only the response. Keep the reservation until its paired TTL
+    // expires. Releasing here would let a retry open a duplicate subscription.
     console.error('[subscription/checkout] Stripe error:', error);
     return NextResponse.json({ detail: 'Failed to start checkout session.' }, { status: 500 });
   }
