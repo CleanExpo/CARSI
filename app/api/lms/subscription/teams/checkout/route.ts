@@ -28,8 +28,8 @@ import { teamTierById, type TeamBundleTierId } from '@/lib/lms/pricing-tiers';
 import { resolveTeamTierPriceId } from '@/lib/server/team-subscription-price';
 import { ensureContainerTeamForOwner, getTeamForUser } from '@/lib/server/teams';
 import {
+  checkoutSessionIdempotencyKey,
   checkoutSessionExpiresAt,
-  releaseTeamCheckout,
   reserveTeamCheckout,
 } from '@/lib/server/membership-checkout-reservation';
 import { subscriptionsEnabled } from '@/lib/server/subscriptions-flag';
@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
   if (!process.env.STRIPE_SECRET_KEY?.trim()) {
     return NextResponse.json(
       { detail: 'Payments not configured. Set STRIPE_SECRET_KEY.' },
-      { status: 503 },
+      { status: 503 }
     );
   }
 
@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
     if (existing.ownerId !== claims.sub) {
       return NextResponse.json(
         { detail: 'You are already a member of a team. Leave it before starting your own.' },
-        { status: 409 },
+        { status: 409 }
       );
     }
     teamId = existing.id;
@@ -98,7 +98,8 @@ export async function POST(request: NextRequest) {
 
   // Then claim the checkout itself, so two requests on the SAME team cannot each
   // open a session. Fails closed: an unverifiable state opens no checkout.
-  const reservation = await reserveTeamCheckout(teamId);
+  const reservedAt = new Date();
+  const reservation = await reserveTeamCheckout(teamId, reservedAt);
   if (reservation !== 'reserved') {
     return reservation === 'busy'
       ? NextResponse.json(
@@ -106,11 +107,11 @@ export async function POST(request: NextRequest) {
             detail:
               'A Teams checkout is already open for your team. Finish it, or try again in a few minutes.',
           },
-          { status: 409 },
+          { status: 409 }
         )
       : NextResponse.json(
           { detail: 'We could not start checkout just now. Please try again shortly.' },
-          { status: 503 },
+          { status: 503 }
         );
   }
 
@@ -126,41 +127,44 @@ export async function POST(request: NextRequest) {
       : `${origin}/pricing?checkout=cancelled`;
 
   try {
-    const session = await getStripeClient().checkout.sessions.create({
-      mode: 'subscription',
-      line_items: [{ price: priceId, quantity: seats }],
-      // Paired with the reservation TTL — see membership-checkout-reservation.
-      expires_at: checkoutSessionExpiresAt(),
-      customer_email: claims.email,
-      success_url,
-      cancel_url,
-      metadata: {
-        carsi_user_id: claims.sub,
-        carsi_team_id: teamId,
-        plan: tierId,
-        seat_count: String(seats),
-        source: 'carsi-teams-subscription',
-      },
-      subscription_data: {
+    const session = await getStripeClient().checkout.sessions.create(
+      {
+        mode: 'subscription',
+        line_items: [{ price: priceId, quantity: seats }],
+        // Paired with the reservation TTL — see membership-checkout-reservation.
+        expires_at: checkoutSessionExpiresAt(reservedAt),
+        customer_email: claims.email,
+        success_url,
+        cancel_url,
         metadata: {
           carsi_user_id: claims.sub,
           carsi_team_id: teamId,
           plan: tierId,
           seat_count: String(seats),
+          source: 'carsi-teams-subscription',
         },
+        subscription_data: {
+          metadata: {
+            carsi_user_id: claims.sub,
+            carsi_team_id: teamId,
+            plan: tierId,
+            seat_count: String(seats),
+          },
+        },
+        allow_promotion_codes: true,
       },
-      allow_promotion_codes: true,
-    });
+      {
+        idempotencyKey: checkoutSessionIdempotencyKey('team', teamId, reservedAt),
+      }
+    );
 
     if (!session.url) {
-      await releaseTeamCheckout(teamId);
       return NextResponse.json({ detail: 'Failed to start checkout session.' }, { status: 500 });
     }
     return NextResponse.json({ url: session.url, checkout_url: session.url, team_id: teamId });
   } catch (error) {
-    // Stripe never opened a session — hand the reservation back so the owner can
-    // retry immediately rather than waiting out the TTL.
-    await releaseTeamCheckout(teamId);
+    // Stripe may have accepted the session before a timeout or 5xx. Keep the
+    // reservation until the paired TTL expires so a retry cannot double-bill.
     console.error('[subscription/teams/checkout] Stripe error:', error);
     // If we just created an empty team and checkout failed, it simply has no
     // subscription and no seats — harmless, left for the owner to retry against.
