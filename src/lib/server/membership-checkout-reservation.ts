@@ -31,6 +31,8 @@
  * out a second session while the first was still payable — reintroducing the
  * very duplicate this module exists to prevent. Change one, change the other.
  */
+import { createHash } from 'node:crypto';
+
 import { prisma } from '@/lib/prisma';
 import { CHECKOUT_RESERVATION_STATUS, PAST_DUE_GRACE_DAYS } from '@/lib/server/entitlements';
 
@@ -62,11 +64,27 @@ export function checkoutSessionExpiresAt(now: Date = new Date()): number {
   return Math.floor((now.getTime() + CHECKOUT_SESSION_TTL_MS) / 1000);
 }
 
+export type CheckoutReservationKind = 'individual' | 'team' | 'org' | 'onboarding';
+
+/**
+ * Stable for one database reservation, different for the next legitimate one.
+ *
+ * Stripe may accept a Checkout Session and then lose the response. Supplying
+ * this key lets its own network retries return that session instead of opening
+ * another. Hashing keeps internal ids out of Stripe logs and bounds the key.
+ */
+export function checkoutSessionIdempotencyKey(
+  kind: CheckoutReservationKind,
+  ownerId: string,
+  reservedAt: Date
+): string {
+  const ownerHash = createHash('sha256').update(ownerId.trim()).digest('hex').slice(0, 32);
+  return `carsi:${kind}:${ownerHash}:${reservedAt.getTime()}`;
+}
+
 function isUniqueConstraintViolation(error: unknown): boolean {
   return (
-    typeof error === 'object' &&
-    error !== null &&
-    (error as { code?: unknown }).code === 'P2002'
+    typeof error === 'object' && error !== null && (error as { code?: unknown }).code === 'P2002'
   );
 }
 
@@ -149,7 +167,7 @@ async function claimCheckout(
     insert: () => Promise<unknown>;
     takeOver: (claimable: ReturnType<typeof claimableWhere>) => Promise<number>;
   },
-  now: Date,
+  now: Date
 ): Promise<ReservationOutcome> {
   try {
     await ops.insert();
@@ -184,7 +202,7 @@ function unusable(id: string): boolean {
 
 export async function reserveMembershipCheckout(
   userId: string,
-  now: Date = new Date(),
+  now: Date = new Date()
 ): Promise<ReservationOutcome> {
   if (unusable(userId)) return 'unavailable';
 
@@ -202,7 +220,7 @@ export async function reserveMembershipCheckout(
         return count;
       },
     },
-    now,
+    now
   );
 }
 
@@ -223,7 +241,7 @@ export async function releaseMembershipCheckout(userId: string): Promise<void> {
 
 export async function reserveTeamCheckout(
   teamId: string,
-  now: Date = new Date(),
+  now: Date = new Date()
 ): Promise<ReservationOutcome> {
   if (unusable(teamId)) return 'unavailable';
 
@@ -252,7 +270,7 @@ export async function reserveTeamCheckout(
         return count;
       },
     },
-    now,
+    now
   );
 }
 
@@ -278,7 +296,7 @@ export async function reserveOrgCheckout(
     contactEmail: string;
     entitledCategory?: string;
   },
-  now: Date = new Date(),
+  now: Date = new Date()
 ): Promise<ReservationOutcome> {
   if (unusable(params.teamId)) return 'unavailable';
 
@@ -313,7 +331,7 @@ export async function reserveOrgCheckout(
         return count;
       },
     },
-    now,
+    now
   );
 }
 
