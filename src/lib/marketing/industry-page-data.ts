@@ -1,16 +1,8 @@
 import type { LucideIcon } from 'lucide-react';
-import {
-  Building2,
-  HeartPulse,
-  Hotel,
-  Sparkles,
-} from 'lucide-react';
+import { Building2, HeartHandshake, HeartPulse, Hotel, Sparkles } from 'lucide-react';
 
 export type FeaturedIndustrySlug =
-  | 'healthcare'
-  | 'hospitality'
-  | 'government-defence'
-  | 'commercial-cleaning';
+  'healthcare' | 'aged-care' | 'hospitality' | 'government-defence' | 'commercial-cleaning';
 
 export type FeaturedIndustryLink = {
   slug: FeaturedIndustrySlug;
@@ -27,8 +19,18 @@ export const featuredIndustryLinks: FeaturedIndustryLink[] = [
     href: '/industries/healthcare',
     label: 'Healthcare',
     title: 'Hospitals & clinical facilities',
-    detail: 'NSQHS-aligned mould remediation, water damage restoration, fire & smoke restoration and structural drying training for environmental services teams',
+    detail:
+      'Mould, indoor air quality and water-damage training for crews working hospitals and clinics',
     icon: HeartPulse,
+  },
+  {
+    slug: 'aged-care',
+    href: '/industries/aged-care',
+    label: 'Aged Care',
+    title: 'Residential care facilities',
+    detail:
+      'Infection control, mould and carpet hygiene training for crews servicing aged care sites',
+    icon: HeartHandshake,
   },
   {
     slug: 'hospitality',
@@ -51,7 +53,8 @@ export const featuredIndustryLinks: FeaturedIndustryLink[] = [
     href: '/industries/commercial-cleaning',
     label: 'Commercial Cleaning',
     title: 'Contractor growth & panels',
-    detail: 'carpet repair, carpet cleaning and odour control credentials for insurance work and tender differentiation',
+    detail:
+      'carpet repair, carpet cleaning and odour control credentials for insurance work and tender differentiation',
     icon: Sparkles,
   },
 ];
@@ -70,21 +73,78 @@ export type IndustryUpgradeRow = {
 export type IndustryAddonVariant = FeaturedIndustrySlug | 'default';
 
 const healthcarePanels: IndustryAddonPanel[] = [
-  { name: 'NSQHS Standard 3', requirement: 'Infection prevention competency for environmental services' },
-  { name: 'JCI accreditation', requirement: 'Verifiable IICRC credentials for clinical facility audits' },
-  { name: 'Plant room & basement risk', requirement: 'AMRT mould assessment in high-risk clinical zones' },
-  { name: '24/7 shift-friendly learning', requirement: 'Self-paced modules between hospital shifts' },
-  { name: 'Water incident response', requirement: 'WRT protocols for pipe bursts in clinical areas' },
-  { name: 'Fire & smoke readiness', requirement: 'FSRT evidence for equipment room emergencies' },
+  {
+    name: 'NSQHS Standard 3',
+    requirement:
+      'Facility-led environmental cleaning training, policies, audits and improvement actions',
+  },
+  {
+    name: 'Site manager records',
+    requirement:
+      'CARSI completion records can supplement induction and role-specific competency evidence',
+  },
+  {
+    name: 'Plant room and basement risk',
+    requirement: 'Mould and moisture assessment in high-risk clinical zones',
+  },
+  {
+    name: 'Roster-friendly learning',
+    requirement: 'Self-paced modules between hospital shifts and call-outs',
+  },
+  {
+    name: 'Water incident response',
+    requirement: 'Category and drying decisions for pipe bursts in clinical areas',
+  },
+  {
+    name: 'Indoor air quality handover',
+    requirement: 'Monitoring and clearance thinking after a water or mould job',
+  },
+];
+
+const agedCarePanels: IndustryAddonPanel[] = [
+  {
+    name: 'Quality Standard 4',
+    requirement:
+      'A safe, supportive environment that meets older people’s needs, including infection prevention controls',
+  },
+  {
+    name: 'Mould in occupied rooms',
+    requirement: 'Containment and air-quality records when residents cannot vacate',
+  },
+  {
+    name: 'Carpet and soft furnishings',
+    requirement: 'Hygiene and drying for corridors, dining rooms and lounges',
+  },
+  {
+    name: 'PPE around residents',
+    requirement: 'Personal protective equipment for wet work in care settings',
+  },
+  { name: 'Shift-friendly learning', requirement: 'Self-paced modules around 24/7 care rosters' },
+  {
+    name: 'Training records',
+    requirement: 'Shareable completion records that sit beside induction and competency checks',
+  },
 ];
 
 const hospitalityPanels: IndustryAddonPanel[] = [
-  { name: 'Guest room turnaround', requirement: 'Rapid WRT response to minimise room downtime' },
-  { name: 'High-traffic carpet care', requirement: 'CRT maintenance for lobbies and conference floors' },
-  { name: 'Pool & spa incidents', requirement: 'ASD drying for wet-area overflow events' },
-  { name: 'Odour remediation', requirement: 'OCT methods for enclosed guest bathrooms and suites' },
+  {
+    name: 'Guest room turnaround',
+    requirement: 'Rapid water-damage response to minimise room downtime',
+  },
+  {
+    name: 'High-traffic carpet care',
+    requirement: 'Cleaning and repair for lobbies and conference floors',
+  },
+  { name: 'Pool and spa incidents', requirement: 'Structural drying for wet-area overflow events' },
+  {
+    name: 'Odour remediation',
+    requirement: 'Source removal for enclosed guest bathrooms and suites',
+  },
   { name: 'Chain bulk licensing', requirement: 'Team dashboards for multi-property hotel groups' },
-  { name: 'Insurance documentation', requirement: 'Structured restoration records for property claims' },
+  {
+    name: 'Insurance documentation',
+    requirement: 'Structured restoration records for property claims',
+  },
 ];
 
 const governmentPanels: IndustryAddonPanel[] = [
@@ -97,9 +157,15 @@ const governmentPanels: IndustryAddonPanel[] = [
 ];
 
 const commercialPanels: IndustryAddonPanel[] = [
-  { name: 'Insurance restoration panels', requirement: 'WRT and FSRT commonly required by adjusters' },
+  {
+    name: 'Insurance restoration panels',
+    requirement: 'WRT and FSRT commonly required by adjusters',
+  },
   { name: 'Tender differentiation', requirement: 'Verifiable CEC records in client proposals' },
-  { name: 'ISSA + IICRC alignment', requirement: 'Complementary management and technician credentials' },
+  {
+    name: 'ISSA + IICRC alignment',
+    requirement: 'Complementary management and technician credentials',
+  },
   { name: 'Team CEC tracking', requirement: 'Dashboard visibility across technicians' },
   { name: 'Service line expansion', requirement: 'Add restoration revenue to cleaning contracts' },
   { name: 'Digital credentials', requirement: 'Shareable proof for panel applications' },
@@ -119,9 +185,17 @@ export const industryAddonContent: Record<
   healthcare: {
     eyebrow: 'Healthcare compliance',
     title: 'Built for',
-    titleAccent: 'accreditation evidence',
-    body: 'Hospital environmental services teams need training that maps to infection prevention, clinical risk and audit-ready documentation — not generic cleaning advice.',
+    titleAccent: 'site-ready crews',
+    body: 'Restoration subcontractors and hospital environmental services teams need task-specific training that supports facility infection-control procedures and training records. Not generic cleaning advice.',
     panels: healthcarePanels,
+    showUpgrades: false,
+  },
+  'aged-care': {
+    eyebrow: 'Aged care sites',
+    title: 'Built for',
+    titleAccent: 'occupied care wings',
+    body: 'Crews who service residential aged care need mould, air quality and carpet hygiene skills that hold up when residents stay in the building.',
+    panels: agedCarePanels,
     showUpgrades: false,
   },
   hospitality: {
