@@ -1,6 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-
 import {
   attendeeMembershipRateAud,
   compAttendeeMembership,
@@ -12,6 +11,8 @@ const mocks = vi.hoisted(() => ({
   findSubscription: vi.fn(),
   findUser: vi.fn(),
   claimComp: vi.fn(),
+  claimYearly: vi.fn(),
+  releaseYearly: vi.fn(),
   grant: vi.fn(),
 }));
 
@@ -25,6 +26,11 @@ vi.mock('@/lib/prisma', () => ({
 
 vi.mock('@/lib/admin/admin-yearly-membership', () => ({
   grantYearlyMembership: mocks.grant,
+}));
+
+vi.mock('@/lib/admin/yearly-membership-claim', () => ({
+  claimYearlyMembershipGrant: mocks.claimYearly,
+  releaseYearlyMembershipClaim: mocks.releaseYearly,
 }));
 
 const NOW = new Date('2026-08-24T14:30:00.000Z');
@@ -51,6 +57,8 @@ beforeEach(() => {
   mocks.findUser.mockReset().mockResolvedValue({ id: 'user-1' });
   // count 1 = this call won the claim.
   mocks.claimComp.mockReset().mockResolvedValue({ count: 1 });
+  mocks.claimYearly.mockReset().mockResolvedValue(true);
+  mocks.releaseYearly.mockReset().mockResolvedValue(undefined);
   mocks.grant.mockReset().mockResolvedValue({ userId: 'user-1', email: 'attendee@example.test' });
   vi.spyOn(console, 'error').mockImplementation(() => {});
 });
@@ -76,7 +84,7 @@ describe('decideCompMembership — refusing beats guessing', () => {
       decideCompMembership({
         subscription: { status, currentPeriodEnd: null },
         lookupFailed: false,
-      }),
+      })
     ).toEqual({ allowed: false, reason: 'already_a_member' });
   });
 
@@ -85,7 +93,7 @@ describe('decideCompMembership — refusing beats guessing', () => {
       decideCompMembership({
         subscription: { status: 'canceled', currentPeriodEnd: null },
         lookupFailed: false,
-      }),
+      })
     ).toEqual({ allowed: true });
   });
 
@@ -121,7 +129,7 @@ describe('compAttendeeMembership', () => {
     mocks.findSignIn.mockResolvedValue(null);
 
     await expect(
-      compAttendeeMembership({ signInId: 'nope', priceAud: 295, appOrigin: 'https://x.test' }),
+      compAttendeeMembership({ signInId: 'nope', priceAud: 295, appOrigin: 'https://x.test' })
     ).resolves.toEqual({ ok: false, reason: 'not_found' });
     expect(mocks.grant).not.toHaveBeenCalled();
   });
@@ -129,7 +137,10 @@ describe('compAttendeeMembership', () => {
   it.each([
     ['only attended day 1', { day2CheckedInAt: null }],
     ['did not opt in to email', { emailOptIn: false }],
-    ['has not been provisioned', { studentId: null, enrollmentId: null, provisionStatus: 'pending' }],
+    [
+      'has not been provisioned',
+      { studentId: null, enrollmentId: null, provisionStatus: 'pending' },
+    ],
   ])('refuses an attendee who %s', async (_label, overrides) => {
     mocks.findSignIn.mockResolvedValue(eligibleSignIn(overrides));
 
@@ -148,7 +159,7 @@ describe('compAttendeeMembership', () => {
     mocks.findSubscription.mockResolvedValue({ status: 'active', currentPeriodEnd: null });
 
     await expect(
-      compAttendeeMembership({ signInId: 'sign-in-1', priceAud: 0, appOrigin: 'https://x.test' }),
+      compAttendeeMembership({ signInId: 'sign-in-1', priceAud: 0, appOrigin: 'https://x.test' })
     ).resolves.toEqual({ ok: false, reason: 'already_a_member' });
     expect(mocks.grant).not.toHaveBeenCalled();
   });
@@ -157,7 +168,7 @@ describe('compAttendeeMembership', () => {
     mocks.findSubscription.mockRejectedValue(new Error('connection refused'));
 
     await expect(
-      compAttendeeMembership({ signInId: 'sign-in-1', priceAud: 0, appOrigin: 'https://x.test' }),
+      compAttendeeMembership({ signInId: 'sign-in-1', priceAud: 0, appOrigin: 'https://x.test' })
     ).resolves.toEqual({ ok: false, reason: 'membership_unverifiable' });
     expect(mocks.grant).not.toHaveBeenCalled();
   });
@@ -178,7 +189,6 @@ describe('compAttendeeMembership', () => {
   });
 });
 
-
 describe('an unrecognised membership status refuses, rather than granting', () => {
   it.each([
     ['an abandoned incomplete checkout', 'incomplete'],
@@ -191,7 +201,7 @@ describe('an unrecognised membership status refuses, rather than granting', () =
       decideCompMembership({
         subscription: { status, currentPeriodEnd: null },
         lookupFailed: false,
-      }),
+      })
     ).toEqual({ allowed: false, reason: 'membership_unverifiable' });
   });
 
@@ -202,7 +212,7 @@ describe('an unrecognised membership status refuses, rather than granting', () =
       decideCompMembership({
         subscription: { status: 'canceled', currentPeriodEnd: null },
         lookupFailed: false,
-      }),
+      })
     ).toEqual({ allowed: true });
   });
 });
@@ -216,8 +226,8 @@ describe('a second comp for the same attendee', () => {
     await expect(
       compAttendeeMembership(
         { signInId: 'sign-in-1', priceAud: 295, appOrigin: 'https://x.test' },
-        NOW,
-      ),
+        NOW
+      )
     ).resolves.toEqual({ ok: false, reason: 'already_comped' });
     expect(mocks.grant).not.toHaveBeenCalled();
   });
@@ -225,7 +235,7 @@ describe('a second comp for the same attendee', () => {
   it('claims with a set-if-null UPDATE, so two callers cannot both win', async () => {
     await compAttendeeMembership(
       { signInId: 'sign-in-1', priceAud: 295, appOrigin: 'https://x.test' },
-      NOW,
+      NOW
     );
 
     // Without `membershipCompedAt: null` in the WHERE, every caller would "win"
@@ -239,8 +249,12 @@ describe('a second comp for the same attendee', () => {
   it('claims BEFORE granting, never after', async () => {
     const order: string[] = [];
     mocks.claimComp.mockImplementation(async () => {
-      order.push('claim');
+      order.push('attendee-claim');
       return { count: 1 };
+    });
+    mocks.claimYearly.mockImplementation(async () => {
+      order.push('email-claim');
+      return true;
     });
     mocks.grant.mockImplementation(async () => {
       order.push('grant');
@@ -249,12 +263,12 @@ describe('a second comp for the same attendee', () => {
 
     await compAttendeeMembership(
       { signInId: 'sign-in-1', priceAud: 295, appOrigin: 'https://x.test' },
-      NOW,
+      NOW
     );
 
     // Reversed, the loser of a real race would already have had their password
     // rotated by the time the claim refused them.
-    expect(order).toEqual(['claim', 'grant']);
+    expect(order).toEqual(['attendee-claim', 'email-claim', 'grant']);
   });
 
   it('refuses rather than granting when the claim query throws', async () => {
@@ -263,8 +277,8 @@ describe('a second comp for the same attendee', () => {
     await expect(
       compAttendeeMembership(
         { signInId: 'sign-in-1', priceAud: 295, appOrigin: 'https://x.test' },
-        NOW,
-      ),
+        NOW
+      )
     ).resolves.toEqual({ ok: false, reason: 'membership_unverifiable' });
     expect(mocks.grant).not.toHaveBeenCalled();
   });
@@ -274,7 +288,7 @@ describe('a second comp for the same attendee', () => {
 
     await compAttendeeMembership(
       { signInId: 'sign-in-1', priceAud: 295, appOrigin: 'https://x.test' },
-      NOW,
+      NOW
     );
 
     // A refused request must not consume the attendee's one comp.
@@ -289,8 +303,8 @@ describe('a claim never outlives a failed grant', () => {
     await expect(
       compAttendeeMembership(
         { signInId: 'sign-in-1', priceAud: 295, appOrigin: 'https://x.test' },
-        NOW,
-      ),
+        NOW
+      )
     ).rejects.toThrow('NO_PUBLISHED_COURSES');
 
     // Scoped to the exact timestamp this call wrote, so a claim someone else has
@@ -305,13 +319,59 @@ describe('a claim never outlives a failed grant', () => {
   it('is NOT released after a successful grant', async () => {
     await compAttendeeMembership(
       { signInId: 'sign-in-1', priceAud: 295, appOrigin: 'https://x.test' },
-      NOW,
+      NOW
     );
 
     expect(mocks.claimComp).toHaveBeenCalledTimes(1);
+    expect(mocks.releaseYearly).not.toHaveBeenCalled();
   });
 });
 
+describe('the shared email claim closes cross-route grant races', () => {
+  it('refuses when another yearly-membership grant owns the email', async () => {
+    mocks.claimYearly.mockResolvedValue(false);
+
+    await expect(
+      compAttendeeMembership(
+        { signInId: 'sign-in-1', priceAud: 0, appOrigin: 'https://x.test' },
+        NOW
+      )
+    ).resolves.toEqual({ ok: false, reason: 'grant_in_progress' });
+
+    expect(mocks.grant).not.toHaveBeenCalled();
+    expect(mocks.claimComp.mock.calls[1][0]).toEqual({
+      where: { id: 'sign-in-1', membershipCompedAt: NOW },
+      data: { membershipCompedAt: null },
+    });
+  });
+
+  it('releases both claims when the grant fails', async () => {
+    mocks.grant.mockRejectedValue(new Error('NO_PUBLISHED_COURSES'));
+
+    await expect(
+      compAttendeeMembership(
+        { signInId: 'sign-in-1', priceAud: 0, appOrigin: 'https://x.test' },
+        NOW
+      )
+    ).rejects.toThrow('NO_PUBLISHED_COURSES');
+
+    expect(mocks.releaseYearly).toHaveBeenCalledWith('attendee@example.test', NOW);
+  });
+
+  it('fails closed and releases the attendee claim when the email claim cannot be read', async () => {
+    mocks.claimYearly.mockRejectedValue(new Error('connection refused'));
+
+    await expect(
+      compAttendeeMembership(
+        { signInId: 'sign-in-1', priceAud: 0, appOrigin: 'https://x.test' },
+        NOW
+      )
+    ).resolves.toEqual({ ok: false, reason: 'membership_unverifiable' });
+
+    expect(mocks.grant).not.toHaveBeenCalled();
+    expect(mocks.claimComp).toHaveBeenCalledTimes(2);
+  });
+});
 
 describe('an attendee part-way through the self-serve checkout', () => {
   it('is refused, not comped', () => {
@@ -323,7 +383,7 @@ describe('an attendee part-way through the self-serve checkout', () => {
       decideCompMembership({
         subscription: { status: 'checkout_pending', currentPeriodEnd: null },
         lookupFailed: false,
-      }),
+      })
     ).toEqual({ allowed: false, reason: 'checkout_in_progress' });
   });
 
@@ -332,7 +392,7 @@ describe('an attendee part-way through the self-serve checkout', () => {
       decideCompMembership({
         subscription: { status: '  Checkout_Pending ', currentPeriodEnd: null },
         lookupFailed: false,
-      }),
+      })
     ).toEqual({ allowed: false, reason: 'checkout_in_progress' });
   });
 
@@ -345,8 +405,8 @@ describe('an attendee part-way through the self-serve checkout', () => {
     await expect(
       compAttendeeMembership(
         { signInId: 'sign-in-1', priceAud: 295, appOrigin: 'https://x.test' },
-        NOW,
-      ),
+        NOW
+      )
     ).resolves.toEqual({ ok: false, reason: 'checkout_in_progress' });
     expect(mocks.grant).not.toHaveBeenCalled();
   });
@@ -356,7 +416,7 @@ describe('the membership check follows the identity the grant will act on', () =
   it('resolves the learner by EMAIL, as grantYearlyMembership does', async () => {
     await compAttendeeMembership(
       { signInId: 'sign-in-1', priceAud: 295, appOrigin: 'https://x.test' },
-      NOW,
+      NOW
     );
 
     // Keyed on studentId instead, the guard would skip every row that is
@@ -369,7 +429,7 @@ describe('the membership check follows the identity the grant will act on', () =
 
   it('guards a row whose studentId is null but whose email is a paying member', async () => {
     mocks.findSignIn.mockResolvedValue(
-      eligibleSignIn({ studentId: null, enrollmentId: null, provisionStatus: 'provisioned' }),
+      eligibleSignIn({ studentId: null, enrollmentId: null, provisionStatus: 'provisioned' })
     );
     mocks.findUser.mockResolvedValue({ id: 'user-9' });
     mocks.findSubscription.mockResolvedValue({ status: 'active', currentPeriodEnd: null });
@@ -377,8 +437,8 @@ describe('the membership check follows the identity the grant will act on', () =
     await expect(
       compAttendeeMembership(
         { signInId: 'sign-in-1', priceAud: 295, appOrigin: 'https://x.test' },
-        NOW,
-      ),
+        NOW
+      )
     ).resolves.toEqual({ ok: false, reason: 'already_a_member' });
     expect(mocks.grant).not.toHaveBeenCalled();
   });
@@ -388,7 +448,7 @@ describe('the membership check follows the identity the grant will act on', () =
 
     const outcome = await compAttendeeMembership(
       { signInId: 'sign-in-1', priceAud: 295, appOrigin: 'https://x.test' },
-      NOW,
+      NOW
     );
 
     expect(outcome.ok).toBe(true);
