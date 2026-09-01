@@ -1,97 +1,118 @@
 import type { Metadata } from 'next';
-import { Hotel, Droplets, Footprints, Waves } from 'lucide-react';
+import { Droplets, Footprints, Hotel, Waves } from 'lucide-react';
 import {
   ContractorAddOns,
   IndustryCTA,
   IndustryCrossLinks,
+  IndustryEvidenceLinks,
   IndustryFAQSection,
   IndustryHero,
   IndustryPageLayout,
   IndustryRecommendedCourses,
+  IndustrySearchTopics,
   IndustryWhySection,
 } from '@/components/industries';
 import { FAQSchema } from '@/components/seo/JsonLd';
 import { buildIndustryMetadata } from '@/lib/marketing/industry-metadata';
+import {
+  hospitalityRecommendedSlugs,
+  hospitalitySearchTopics,
+} from '@/lib/marketing/industry-track1-topics';
 import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = buildIndustryMetadata(
   'hospitality',
-  'Hospitality IICRC CEC Training',
-  'IICRC CEC Accredited training for Australian hotels and resorts. Water damage restoration, carpet repair, structural drying and odour control courses for water damage, carpet care, structural drying and odour control.',
+  'Hotel restoration training for Australian technicians',
+  'IICRC CEC Accredited courses for crews servicing hotels and resorts. Water damage, odour control, carpet care and structural drying trained around occupied rooms and tight turnaround.',
   [
-    'hospitality IICRC CEC training',
-    'hotel restoration training',
-    'hotel water damage',
-    'carpet repair certification',
-    'odour control training',
+    'hotel water damage training Australia',
+    'hotel odour control training',
+    'hospitality restoration technician course',
+    'hotel carpet cleaning training',
+    'IICRC CEC hotel training',
   ]
 );
 
 const ACCENT_COLOR = '#ed9d24';
 
-const disciplines = [
-  { code: 'WRT', label: 'Water Damage Restoration', color: '#ed9d24' },
-  { code: 'CRT', label: 'Carpet Repair & Reinstallation', color: '#d48b1e' },
-  { code: 'ASD', label: 'Applied Structural Drying', color: '#bb7918' },
-  { code: 'OCT', label: 'Odour Control', color: '#a36712' },
+const topics = [
+  { label: 'Water damage', color: '#ed9d24' },
+  { label: 'Carpet care', color: '#d48b1e' },
+  { label: 'Structural drying', color: '#bb7918' },
+  { label: 'Odour control', color: '#a36712' },
 ];
 
 const stats = [
-  { value: '10,000+', label: 'Hotels' },
-  { value: '24/7', label: 'Response' },
-  { value: 'IICRC', label: 'Certified' },
+  {
+    value: '340,662',
+    label: 'Rooms in accommodation properties with 10 or more rooms',
+    sourceHref: 'https://www.tra.gov.au/en/tourism-industry-analysis/annual-benchmark-report',
+    sourceLabel: 'Source: Tourism Research Australia',
+  },
+  { value: 'Occupied', label: 'Guest areas stay live' },
+  { value: 'IICRC CEC', label: 'On approved courses' },
+];
+
+const evidenceLinks = [
+  {
+    title: 'Australian Accommodation Monitor annual benchmark',
+    publisher: 'Tourism Research Australia',
+    context:
+      'National accommodation supply and performance context for establishments with ten or more rooms.',
+    href: 'https://www.tra.gov.au/en/tourism-industry-analysis/annual-benchmark-report',
+  },
 ];
 
 const faqs = [
   {
+    question: 'Who is CARSI hospitality training for?',
+    answer:
+      'Hotel maintenance teams and the restoration subcontractors they call after a leak, odour complaint or wet carpet. Training is for technicians, not for front-of-house staff.',
+  },
+  {
     question: 'How do hotels handle water damage in guest rooms?',
     answer:
-      'Hotels require rapid water damage response to minimise room downtime and protect guest reviews. CARSI water damage restoration training teaches maintenance teams to assess damage categories, deploy extraction equipment, and document the restoration process for insurance claims — all within the tight turnaround hospitality demands.',
+      'Speed and documentation matter more than a long classroom course. Introduction to Water Damage Restoration is IICRC CEC Accredited. It covers assessment, extraction thinking and records you can hand the duty manager and the insurer.',
   },
   {
-    question: 'What carpet maintenance training do hotel staff need?',
+    question: 'What carpet training helps in lobbies and corridors?',
     answer:
-      'Hotel maintenance teams benefit from CARSI carpet repair and reinstallation training for lobbies, corridors, and conference rooms that see thousands of daily footfalls. Training covers spot dyeing, re-stretching, seam repair, and pattern matching — skills that extend carpet lifespan and reduce replacement costs across large properties.',
+      'Introduction to Basic Carpet Cleaning and Drying covers residential, commercial and institutional settings. It is IICRC CEC Accredited and provides a foundation for planning work around a hotel access schedule.',
   },
   {
-    question: 'How do you remove odours from hotel rooms in Australia?',
+    question: 'How do you train for odours in Australian hotel rooms?',
     answer:
-      'CARSI odour control training trains hotel staff in source identification, thermal fogging, ozone treatment, and hydroxyl generation for smoke, pet, and biological odours. Proper odour remediation prevents negative guest reviews and avoids taking rooms offline unnecessarily.',
+      'Open Introduction to Odour Control and Removal Techniques. It is IICRC CEC Accredited and covers source identification and removal methods. CARSI does not sell IICRC certification; CECs apply only where the IICRC has approved the course.',
   },
   {
-    question: 'Can hospitality teams complete IICRC CEC training online?',
+    question: 'Can hospitality crews complete IICRC CEC training online?',
     answer:
-      'Yes. CARSI offers IICRC CEC Accredited courses online and self-paced, ideal for hotel teams working rotating rosters. Staff can complete modules between shifts. Courses issue verifiable digital credentials.',
-  },
-  {
-    question: 'What is structural drying training for hotel pool and spa areas?',
-    answer:
-      'CARSI applied structural drying training covers moisture mapping, psychrometric calculations, and equipment placement for pool overflow and spa water incidents. For hospitality properties, this prevents secondary damage to surrounding guest rooms, change rooms, and below-grade structures.',
+      'Yes. CARSI offers IICRC CEC Accredited courses online and self-paced, suited to rotating hotel rosters. Staff can complete modules between shifts. Certificates and CEC records sit in the learner dashboard when you pass an approved course.',
   },
 ];
 
 const whyCards = [
   {
     icon: Droplets,
-    title: 'Guest Experience',
+    title: 'Rooms have to come back tonight',
     description:
-      'Rapid water damage response minimises room downtime and protects guest satisfaction. IICRC-trained teams restore affected areas before reviews are impacted.',
+      'A leaking guest bathroom cannot wait on a weekday classroom. Train extraction and drying so inventory returns before reviews pile up.',
     color: '#ed9d24',
   },
   {
     icon: Footprints,
-    title: 'High-Traffic Areas',
+    title: 'Public carpet never rests',
     description:
-      'Professional carpet maintenance for lobbies, corridors, and conference rooms. CRT-certified technicians extend carpet lifespan in areas with thousands of daily footfalls.',
+      'Lobbies and corridors carry continuous guest traffic. Cleaning and drying those surfaces requires staged access and a clear handover.',
     color: '#d48b1e',
   },
   {
     icon: Waves,
-    title: 'Pool & Spa Areas',
+    title: 'Pools, spas and wet walls',
     description:
-      'ASD training for pool overflow and spa water incidents. OCT certification for odour control in enclosed wet areas, change rooms, and guest bathrooms.',
+      'Overflow events wet neighbouring rooms. Applied structural drying and odour control keep the rest of the floor sellable.',
     color: '#bb7918',
   },
 ];
@@ -104,42 +125,51 @@ export default async function HospitalityIndustryPage() {
         icon={Hotel}
         industryName="Hospitality & Tourism"
         accentColor={ACCENT_COLOR}
-        headline="Hospitality"
-        headlineAccent="Restoration Training"
-        description="Keep guests comfortable and properties protected. IICRC CEC Accredited training for hotel maintenance teams covering water damage, carpet care, structural drying, and odour control."
-        disciplines={disciplines}
+        headline="Keep occupied hotels"
+        headlineAccent="sellable after a loss"
+        description="IICRC CEC Accredited courses for hotel maintenance teams and the restoration crews they subcontract. Water damage, carpet care, structural drying and odour control, studied around rotating rosters."
+        disciplines={topics}
         stats={stats}
       />
 
       <IndustryWhySection
         industryName="hospitality teams"
         headline="Built for"
-        headlineAccent="guest-first operations"
+        headlineAccent="guest-first turnaround"
         accentColor={ACCENT_COLOR}
         cards={whyCards}
       />
 
+      <IndustrySearchTopics
+        eyebrow="What crews search"
+        title="Four hotel problems, four live courses"
+        body="Start with these IICRC CEC Accredited introductions for common hotel-site tasks. Property procedures, site induction and role-specific competency checks still apply."
+        topics={hospitalitySearchTopics}
+      />
+
       <IndustryRecommendedCourses
         industryName="Hospitality & Tourism"
-        disciplineList="Water damage restoration, carpet repair, structural drying and odour control"
-        disciplines={['WRT', 'CRT', 'ASD', 'OCT']}
+        disciplineList="Water damage, carpet care, drying and odour control"
+        courseSlugs={hospitalityRecommendedSlugs}
       />
 
       <ContractorAddOns accentColor={ACCENT_COLOR} variant="hospitality" />
 
+      <IndustryCrossLinks currentSlug="hospitality" />
+
+      <IndustryEvidenceLinks links={evidenceLinks} />
+
       <IndustryFAQSection industryName="Hotels & Resorts" faqs={faqs} />
 
       <IndustryCTA
-        subtitle="Hospitality training bundle"
-        title="Hotel Maintenance Bundle"
+        subtitle="Hospitality training"
+        title="Train the crew that protects inventory"
         price={industryBundlePriceLabel('hospitality')}
-        description="water damage restoration, carpet repair and odour control training for hotel maintenance teams. Bulk licensing available for hotel chains and resort groups."
-        ctaText="Request bundle pricing"
+        description="Water damage, carpet care and odour control courses for hotel maintenance teams and subcontractors. Bulk licensing available for multi-property groups."
+        ctaText="Request team pricing"
         ctaHref="/contact"
         accentColor={ACCENT_COLOR}
       />
-
-      <IndustryCrossLinks currentSlug="hospitality" />
     </IndustryPageLayout>
   );
 }
