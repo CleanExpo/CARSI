@@ -87,7 +87,10 @@ beforeEach(() => {
   process.env.SUBSCRIPTIONS_ENABLED = 'true';
   process.env.CCW_MEMBERSHIP_COUPON_ID = 'coupon_synthetic_once';
   mocks.sessionsCreate.mockReset();
-  mocks.sessionsCreate.mockResolvedValue({ id: 'cs_test_1', url: 'https://checkout.example/session' });
+  mocks.sessionsCreate.mockResolvedValue({
+    id: 'cs_test_1',
+    url: 'https://checkout.example/session',
+  });
   mocks.claims.mockReset();
   mocks.claims.mockResolvedValue({ sub: 'user-1', email: 'attendee@example.test' });
   mocks.findUnique.mockReset();
@@ -248,25 +251,23 @@ describe('a second checkout while one is already open', () => {
   });
 });
 
-describe('a reservation is never left stranded', () => {
-  it('is released when Stripe throws', async () => {
+describe('an ambiguous Stripe result keeps the duplicate-billing guard closed', () => {
+  it('keeps the reservation when Stripe throws', async () => {
     mocks.sessionsCreate.mockRejectedValue(new Error('stripe is down'));
 
     const res = await POST(request({}));
 
     expect(res.status).toBe(500);
-    expect(mocks.deleteMany).toHaveBeenCalledWith({
-      where: { userId: 'user-1', status: 'checkout_pending' },
-    });
+    expect(mocks.deleteMany).not.toHaveBeenCalled();
   });
 
-  it('is released when Stripe returns a session with no URL', async () => {
+  it('keeps the reservation when Stripe returns a session with no URL', async () => {
     mocks.sessionsCreate.mockResolvedValue({ id: 'cs_test_1', url: null });
 
     const res = await POST(request({}));
 
     expect(res.status).toBe(500);
-    expect(mocks.deleteMany).toHaveBeenCalled();
+    expect(mocks.deleteMany).not.toHaveBeenCalled();
   });
 
   it('is NOT released after a session is successfully opened', async () => {
@@ -282,6 +283,17 @@ describe('a reservation is never left stranded', () => {
     await POST(request({}));
 
     expect(mocks.create).not.toHaveBeenCalled();
+  });
+});
+
+describe('Stripe retries reuse one Checkout Session', () => {
+  it('supplies a bounded idempotency key without exposing the learner id', async () => {
+    await POST(request({}));
+
+    const options = mocks.sessionsCreate.mock.calls[0][1];
+    expect(options.idempotencyKey).toMatch(/^carsi:individual:/);
+    expect(options.idempotencyKey).not.toContain('user-1');
+    expect(options.idempotencyKey.length).toBeLessThanOrEqual(255);
   });
 });
 
