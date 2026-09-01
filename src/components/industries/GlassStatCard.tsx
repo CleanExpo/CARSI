@@ -6,21 +6,43 @@ interface GlassStatCardProps {
   value: string;
   label: string;
   accentColor?: string;
+  sourceHref?: string;
+  sourceLabel?: string;
 }
 
-export function GlassStatCard({ value, label, accentColor = '#2490ed' }: GlassStatCardProps) {
+export function GlassStatCard({
+  value,
+  label,
+  accentColor = '#2490ed',
+  sourceHref,
+  sourceLabel,
+}: GlassStatCardProps) {
   const accent = accentTextVars(accentColor, 'large');
   return (
-    <div className="rounded-2xl border border-slate-200/90 bg-white px-4 py-5 text-center shadow-[0_16px_48px_-28px_rgba(15,23,42,0.12)] dark:border-white/[0.08] dark:bg-gradient-to-b dark:from-white/[0.07] dark:to-white/[0.02] dark:shadow-[0_16px_48px_-28px_rgba(0,0,0,0.8)]">
-      <p
-        className="text-2xl font-bold tracking-tight text-[color:var(--carsi-accent-l)] dark:text-[color:var(--carsi-accent-d)]"
-        style={{ '--carsi-accent-l': accent.light, '--carsi-accent-d': accent.dark } as CSSProperties}
-      >
-        {value}
-      </p>
-      <p className="mt-1 text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-white/55">
-        {label}
-      </p>
+    <div className="rounded-2xl border border-slate-200/90 bg-white/90 px-5 py-4 shadow-[0_18px_46px_-32px_rgba(15,23,42,0.35)] backdrop-blur">
+      <div className="flex items-start justify-between gap-5">
+        <div>
+          <p className="text-[10px] font-semibold tracking-[0.14em] text-slate-500 uppercase">
+            {label}
+          </p>
+          {sourceHref && sourceLabel ? (
+            <a
+              href={sourceHref}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-1.5 inline-block text-[11px] font-medium text-slate-500 underline decoration-slate-300 underline-offset-2 hover:text-slate-800"
+            >
+              {sourceLabel}
+            </a>
+          ) : null}
+        </div>
+        <p
+          className="shrink-0 font-[family-name:var(--font-display)] text-2xl font-semibold tracking-[-0.025em] text-[color:var(--carsi-accent-l)]"
+          style={{ '--carsi-accent-l': accent.light } as CSSProperties}
+        >
+          {value}
+        </p>
+      </div>
     </div>
   );
 }
