@@ -11,8 +11,8 @@ import { getOnboardingCourseBySlug } from '@/lib/server/onboarding-programs';
 import { resolveOrgMonthlyPriceId } from '@/lib/server/org-subscription-price';
 import { provisionOrgSubscriptionContainer } from '@/lib/server/org-subscription-provision';
 import {
+  checkoutSessionIdempotencyKey,
   checkoutSessionExpiresAt,
-  releaseOrgCheckout,
 } from '@/lib/server/membership-checkout-reservation';
 import { subscriptionsEnabled } from '@/lib/server/subscriptions-flag';
 import { prisma } from '@/lib/prisma';
@@ -32,7 +32,7 @@ export async function POST(request: NextRequest, ctx: Ctx) {
   if (!process.env.STRIPE_SECRET_KEY?.trim()) {
     return NextResponse.json(
       { detail: 'Payments not configured. Contact CARSI to provision access.' },
-      { status: 503 },
+      { status: 503 }
     );
   }
 
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest, ctx: Ctx) {
   if (existing) {
     return NextResponse.json(
       { detail: 'Already enrolled in this program', enrolled: true },
-      { status: 409 },
+      { status: 409 }
     );
   }
 
@@ -85,11 +85,13 @@ export async function POST(request: NextRequest, ctx: Ctx) {
 
       const contactEmail = claims.email?.trim().toLowerCase() ?? '';
       let teamId: string;
+      const reservedAt = new Date();
       try {
         const provisioned = await provisionOrgSubscriptionContainer({
           ownerId: claims.sub,
           organisationName,
           contactEmail,
+          reservedAt,
         });
         if (!provisioned.ok) {
           // Same reservation semantics as the org checkout route: a claimed
@@ -100,11 +102,11 @@ export async function POST(request: NextRequest, ctx: Ctx) {
                   detail:
                     'An organisation checkout is already open for your account. Finish it, or try again in a few minutes.',
                 },
-                { status: 409 },
+                { status: 409 }
               )
             : NextResponse.json(
                 { detail: 'We could not start checkout just now. Please try again shortly.' },
-                { status: 503 },
+                { status: 503 }
               );
         }
         teamId = provisioned.result.teamId;
@@ -116,7 +118,7 @@ export async function POST(request: NextRequest, ctx: Ctx) {
               detail:
                 'You are already on a team. Contact CARSI support to provision organisation access.',
             },
-            { status: 409 },
+            { status: 409 }
           );
         }
         console.error('[onboarding/checkout] org provision failed:', e);
@@ -124,42 +126,45 @@ export async function POST(request: NextRequest, ctx: Ctx) {
       }
 
       try {
-        const session = await getStripeClient().checkout.sessions.create({
-          mode: 'subscription',
-          line_items: [{ price: priceId, quantity: 1 }],
-          // Paired with the reservation TTL — see membership-checkout-reservation.
-          expires_at: checkoutSessionExpiresAt(),
-          customer_email: contactEmail || undefined,
-          success_url: successUrl,
-          cancel_url: cancelUrl,
-          metadata: {
-            carsi_user_id: claims.sub,
-            carsi_team_id: teamId,
-            plan: 'org_monthly',
-            organisation_name: organisationName,
-            onboarding_slug: slug,
-            source: 'carsi-org-subscription',
-          },
-          subscription_data: {
+        const session = await getStripeClient().checkout.sessions.create(
+          {
+            mode: 'subscription',
+            line_items: [{ price: priceId, quantity: 1 }],
+            // Paired with the reservation TTL — see membership-checkout-reservation.
+            expires_at: checkoutSessionExpiresAt(reservedAt),
+            customer_email: contactEmail || undefined,
+            success_url: successUrl,
+            cancel_url: cancelUrl,
             metadata: {
               carsi_user_id: claims.sub,
               carsi_team_id: teamId,
               plan: 'org_monthly',
+              organisation_name: organisationName,
               onboarding_slug: slug,
+              source: 'carsi-org-subscription',
             },
+            subscription_data: {
+              metadata: {
+                carsi_user_id: claims.sub,
+                carsi_team_id: teamId,
+                plan: 'org_monthly',
+                onboarding_slug: slug,
+              },
+            },
+            allow_promotion_codes: true,
           },
-          allow_promotion_codes: true,
-        });
+          {
+            idempotencyKey: checkoutSessionIdempotencyKey('onboarding', teamId, reservedAt),
+          }
+        );
 
         if (!session.url) {
-          await releaseOrgCheckout(teamId);
           return NextResponse.json({ detail: 'Could not start checkout' }, { status: 500 });
         }
         return NextResponse.json({ checkout_url: session.url });
       } catch (e) {
-        // Stripe never opened a session — release the claim so the owner can
-        // retry immediately rather than waiting out the TTL.
-        await releaseOrgCheckout(teamId);
+        // Stripe may have accepted the session before a timeout or 5xx. Keep
+        // the reservation until its paired TTL so a retry cannot double-bill.
         console.error('[onboarding/checkout] org Stripe session failed:', e);
         return NextResponse.json({ detail: 'Could not start checkout' }, { status: 500 });
       }
