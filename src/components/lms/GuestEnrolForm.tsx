@@ -134,7 +134,7 @@ export function GuestEnrolForm({ slug, priceAud, isFree, showTeamOption = false 
       <p className="text-xs text-white/55">
         {freePath
           ? 'Quick enrol — create your account and start learning in one step.'
-          : 'Quick enrol — pay securely now. Your account is set up on the confirmation page after payment, where you choose your password.'}
+          : 'Quick enrol — pay securely now. After payment you set up your account on the confirmation page, or sign in there if you already have one.'}
       </p>
       <div className="space-y-1.5">
         <Label htmlFor="guest-full-name" className="text-white/70">
@@ -185,7 +185,7 @@ export function GuestEnrolForm({ slug, priceAud, isFree, showTeamOption = false 
           />
         </div>
       ) : null}
-      {showTeamOption && !isFree ? (
+      {showTeamOption && !freePath ? (
         <CoursePurchaseOptions
           mode={purchaseMode}
           onModeChange={setPurchaseMode}
@@ -205,7 +205,7 @@ export function GuestEnrolForm({ slug, priceAud, isFree, showTeamOption = false 
       >
         {loading
           ? 'Processing…'
-          : isFree
+          : freePath
             ? 'Enrol free & start'
             : purchaseMode === 'team'
               ? `Continue to pay — $${(priceAud * teamSeats).toFixed(0)} AUD (${teamSeats} seats)`
