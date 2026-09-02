@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { homePathwayItems } from './home-pathways';
 import {
   formatStopDates,
+  msUntilNextBrisbaneMidnight,
   NO_UPCOMING_STOPS_COPY,
   ROADSHOW_STOPS,
   todayInBrisbane,
@@ -49,6 +50,15 @@ describe('todayInBrisbane', () => {
   it('rolls over at Brisbane midnight (UTC+10), not at UTC midnight', () => {
     expect(todayInBrisbane(new Date('2026-09-05T13:30:00Z'))).toBe('2026-09-05');
     expect(todayInBrisbane(new Date('2026-09-05T14:30:00Z'))).toBe('2026-09-06');
+  });
+});
+
+describe('msUntilNextBrisbaneMidnight', () => {
+  it('counts down to 00:00 Brisbane time (14:00 UTC), never less than a second', () => {
+    expect(msUntilNextBrisbaneMidnight(new Date('2026-09-05T13:59:58Z'))).toBe(2_000);
+    expect(msUntilNextBrisbaneMidnight(new Date('2026-09-05T14:00:00Z'))).toBe(24 * 60 * 60 * 1000);
+    expect(msUntilNextBrisbaneMidnight(new Date('2026-09-05T13:59:59.900Z'))).toBe(1_000);
+    expect(msUntilNextBrisbaneMidnight(new Date('2026-09-05T02:00:00Z'))).toBe(12 * 60 * 60 * 1000);
   });
 });
 

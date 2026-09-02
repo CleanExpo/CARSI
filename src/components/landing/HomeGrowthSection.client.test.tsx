@@ -38,6 +38,8 @@ window.matchMedia = ((query: string) => ({
 /** A stop whose last day passed long ago: what a stale cached render would still carry. */
 const PAST = { city: 'Melbourne', startsOn: '2000-01-01', endsOn: '2000-01-02' };
 const FUTURE = { city: 'Hobart', startsOn: '2999-12-30', endsOn: '2999-12-31' };
+/** The real stop: its last day is Saturday 5 September 2026 in Brisbane. */
+const BRISBANE = { city: 'Brisbane', startsOn: '2026-09-04', endsOn: '2026-09-05' };
 
 let container: HTMLDivElement;
 let root: Root | null = null;
@@ -54,6 +56,7 @@ afterEach(() => {
   root = null;
   container.remove();
   vi.restoreAllMocks();
+  vi.useRealTimers();
 });
 
 describe('HomeGrowthSection in the browser', () => {
@@ -83,5 +86,41 @@ describe('HomeGrowthSection in the browser', () => {
     });
     expect(container.textContent).toContain('No upcoming dates listed');
     expect(container.textContent).not.toContain('Melbourne');
+  });
+
+  it('drops the stop at Brisbane midnight while the tab stays open', () => {
+    // 23:59:58 on Saturday 5 September in Brisbane (UTC+10): the last minute of the stop.
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-09-05T13:59:58Z'));
+
+    act(() => {
+      root = createRoot(container);
+      root.render(createElement(HomeGrowthSection, { stops: [BRISBANE] }));
+    });
+    expect(container.textContent).toContain('Brisbane');
+    expect(container.textContent).toContain('4 to 5 Sep');
+
+    act(() => {
+      vi.advanceTimersByTime(3_000);
+    });
+    expect(container.textContent).not.toContain('Brisbane');
+    expect(container.textContent).toContain('No upcoming dates listed');
+  });
+
+  it('re-checks the stops when a suspended tab becomes visible again', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-09-05T13:59:58Z'));
+    act(() => {
+      root = createRoot(container);
+      root.render(createElement(HomeGrowthSection, { stops: [BRISBANE] }));
+    });
+    expect(container.textContent).toContain('Brisbane');
+
+    // The clock jumps past midnight without the timer firing (the tab was suspended).
+    vi.setSystemTime(new Date('2026-09-05T14:30:00Z'));
+    act(() => {
+      document.dispatchEvent(new Event('visibilitychange'));
+    });
+    expect(container.textContent).not.toContain('Brisbane');
   });
 });

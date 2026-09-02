@@ -14,6 +14,7 @@ import {
 import { ccwWorkshopHref, homePathwayItems } from '@/lib/marketing/home-pathways';
 import {
   formatStopDates,
+  msUntilNextBrisbaneMidnight,
   NO_UPCOMING_STOPS_COPY,
   todayInBrisbane,
   upcomingStops,
@@ -38,15 +39,37 @@ const QR_PATTERN = [
   [1, 1, 1, 0, 1, 0, 1],
 ];
 
-const subscribeToNothing = () => () => {};
+/**
+ * Notifies at every Brisbane midnight while the page stays open, and whenever the tab
+ * becomes visible again (a suspended tab may have missed the timer).
+ */
+function subscribeToBrisbaneDay(onDayChange: () => void): () => void {
+  let timer = 0;
+  const arm = () => {
+    timer = window.setTimeout(() => {
+      onDayChange();
+      arm();
+    }, msUntilNextBrisbaneMidnight());
+  };
+  const onVisibilityChange = () => {
+    if (document.visibilityState === 'visible') onDayChange();
+  };
+  arm();
+  document.addEventListener('visibilitychange', onVisibilityChange);
+  return () => {
+    window.clearTimeout(timer);
+    document.removeEventListener('visibilitychange', onVisibilityChange);
+  };
+}
 
 /**
- * Today's date in Brisbane as the browser sees it, or null on the server and during
- * hydration, so the first client render matches the server markup exactly.
+ * Today's date in Brisbane as the browser sees it, re-read at each Brisbane midnight, or
+ * null on the server and during hydration so the first client render matches the server
+ * markup exactly.
  */
 function useClientTodayInBrisbane(): string | null {
   return useSyncExternalStore(
-    subscribeToNothing,
+    subscribeToBrisbaneDay,
     () => todayInBrisbane(),
     () => null,
   );

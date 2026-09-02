@@ -24,16 +24,34 @@ export const ROADSHOW_STOPS: readonly RoadshowStop[] = [
 /** What the ticket says when no stop is upcoming: a fact about the page, not a promise. */
 export const NO_UPCOMING_STOPS_COPY = 'No upcoming dates listed';
 
-const BRISBANE_DAY = new Intl.DateTimeFormat('en-CA', {
+const BRISBANE_DAY = new Intl.DateTimeFormat('en-AU', {
   timeZone: 'Australia/Brisbane',
   year: 'numeric',
   month: '2-digit',
   day: '2-digit',
 });
 
-/** Today's calendar day in Australia/Brisbane as YYYY-MM-DD. */
+/** Australia/Brisbane is AEST all year (UTC+10, no daylight saving). */
+const BRISBANE_OFFSET_MS = 10 * 60 * 60 * 1000;
+
+/**
+ * Today's calendar day in Australia/Brisbane as YYYY-MM-DD, assembled from the formatter's
+ * parts so the result never depends on a locale's output order.
+ */
 export function todayInBrisbane(now: Date = new Date()): string {
-  return BRISBANE_DAY.format(now);
+  const parts = BRISBANE_DAY.formatToParts(now);
+  const part = (type: Intl.DateTimeFormatPartTypes) =>
+    parts.find((candidate) => candidate.type === type)?.value ?? '';
+  return `${part('year')}-${part('month')}-${part('day')}`;
+}
+
+/** Milliseconds from `now` until the next midnight in Brisbane (at least one second). */
+export function msUntilNextBrisbaneMidnight(now: Date = new Date()): number {
+  const wallClock = new Date(now.getTime() + BRISBANE_OFFSET_MS);
+  const nextMidnight =
+    Date.UTC(wallClock.getUTCFullYear(), wallClock.getUTCMonth(), wallClock.getUTCDate() + 1) -
+    BRISBANE_OFFSET_MS;
+  return Math.max(1000, nextMidnight - now.getTime());
 }
 
 /** The stops in `stops` whose last day is `today` or later, in the given order. */
