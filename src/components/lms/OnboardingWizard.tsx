@@ -257,7 +257,7 @@ export function OnboardingWizard({ isOpen, onComplete }: OnboardingWizardProps) 
   };
 
   const handleComplete = () => {
-    onComplete(result?.suggestedUrl ?? POST_ONBOARDING_PATH);
+    onComplete(POST_ONBOARDING_PATH);
   };
 
   return (
