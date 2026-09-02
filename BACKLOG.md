@@ -692,6 +692,11 @@ not fixed, in the order the next sessions should take it.
   selling-phrase form and the catalogue registry; server-side copy helpers such as
   `src/lib/server/onboarding-pathway.ts` are outside both. A unit test now pins that file. Widening
   the guard to server copy is a separate change and must not be folded into a fix.
+  Residual (round-4 review of the fix, 2026-09-03, P2): the wizard's submit path
+  (`submitOnboarding` calling `wizardResultFromResponse`) is covered as an exported pure
+  function; an inline raw-code fallback written back into `submitOnboarding` would not fail the
+  suite, and is reachable only if the onboarding route also stopped sending `pathway_label`.
+  Driving the real submit path needs a DOM test runner, and none is in the repo.
 
 - **The Content-Security-Policy blocks every course video.** `src/lib/security/csp.ts` allows
   frames only from Stripe and sets no `media-src`, so the YouTube intro frame on course pages
@@ -731,3 +736,11 @@ not fixed, in the order the next sessions should take it.
   returns 404 while `/pricing` still lists a "Free Webinar Series".
 
 - **Observation:** 6 of the last 15 Stripe Checkout sessions expired unpaid.
+
+- **The `CRT` discipline code is labelled as carpet repair, but the IICRC's certifications page
+  (iicrc.org/iicrccertifications, read 2026-09-03) lists Carpet Repair and Reinstallation
+  Technician as RRT and gives CRT to Color Repair Technician.** `PATHWAY_LABELS` in
+  `src/lib/server/onboarding-pathway.ts` and the wizard's own-disciplines option `CRT — Carpet`
+  both carry the older pairing, and the catalogue filter key is the same string. A learner
+  recording their own discipline may be mislabelled. Data accuracy, not a licence claim: confirm
+  against the catalogue seed and fix the key or the label in one change. Filed, not fixed.

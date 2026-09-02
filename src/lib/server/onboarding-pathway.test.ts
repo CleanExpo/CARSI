@@ -32,11 +32,17 @@ import {
  * module is the label under test. The component itself is then rendered (static markup) at every
  * step and on the recommendation screen, so a label rewritten inside its render is under test
  * too: what reaches the markup is what is checked.
+ *
+ * The title and acronym lists below follow the IICRC's own certifications page
+ * (iicrc.org/iicrccertifications, read 2026-09-03) and its Master and Journeyman designations
+ * (iicrc.org/iicrcmaster). No list of names stays complete, so two structural checks back them:
+ * the credential nouns IICRC titles are built from, and a rule that any all-caps token this copy
+ * does not legitimately use is an acronym we failed to list.
  */
 
 // Exact strings rendered on 2026-09-03 (WS1 walk B, break 5) and the reviewers' mutants from
-// the release-gate reviews of ff5eeceb, e41fedd5 and 5da8339b. Positive controls: every one is
-// rejected.
+// the release-gate reviews of ff5eeceb, e41fedd5, 5da8339b and 6bab44b2. Positive controls:
+// every one is rejected.
 const OLD_LABEL = 'Water Damage Restoration Technician (WRT)';
 const OLD_DESCRIPTION =
   'Starting with Water Damage Restoration Technician (WRT) builds foundational credentials recognised across restoration employers in Australia.';
@@ -44,6 +50,8 @@ const OLD_GOAL_LABEL = 'Build toward a new IICRC discipline (CEC courses)';
 const REVIEW_MUTANT_CLAIM = 'These courses prepare you for IICRC certification.';
 const REVIEW_MUTANT_LOWERCASE_TITLE = 'Water damage restoration technician';
 const REVIEW_MUTANT_MASTER_TITLE = 'Master Water Restorer';
+const REVIEW_MUTANT_CURRENT_ACRONYM = 'Field Technician (BMI)';
+const REVIEW_MUTANT_CURRENT_TITLE = 'Building Moisture Inspection';
 
 // The only sentences that may mention IICRC, CECs or certification in recommendation copy.
 const ALLOWED_SENTENCES = [
@@ -53,27 +61,36 @@ const ALLOWED_SENTENCES = [
 // The learner's own goal may name their own CECs (a statement about their standing, not ours).
 const ALLOWED_GOAL_LABELS = ['Renew my CECs'];
 
-// Acronyms of IICRC certifications and designations, any case. Not exhaustive by design: the
-// credential nouns below are the backstop that fails a title this list does not know.
+// Acronyms of the current IICRC certifications, plus the Master and Journeyman designations and
+// the older Building Moisture Thermography name, any case.
 const ACRONYMS =
-  'WRT|ASD|CRT|AMRT|FSRT|OCT|CCT|TCST|UFT|HST|LCT|RCT|SMT|BMT|CDS|FCT|RFMT|WFMT|RFI|WFI|CPT|CCMT|HCT|MWR|MTC|MFSR|JWR|JTC|JFSR';
-// IICRC designation titles, by referent, any case: the technician family, the Master and
-// Journeyman family (no "technician" in the title), and the specialist and inspector titles.
+  'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MFSR|JWR|JTC|JFSR';
+// IICRC designation titles by referent, any case: the technician family...
 const TECHNICIAN_REFERENTS =
-  'water damage restoration|applied structural drying|carpet repair (?:and|&) reinstallation|applied microbial remediation|microbial remediation|fire (?:and|&) smoke restoration|odou?r control|commercial carpet(?: cleaning| maintenance)?|carpet cleaning|upholstery (?:and|&) fabric cleaning|health (?:and|&) safety|trauma (?:and|&) crime scene|leather cleaning|rug cleaning|stone,? masonry (?:and|&) ceramic tile cleaning|floor care|resilient flooring maintenance|wood floor maintenance|contents? processing|house cleaning';
+  'water damage restoration|applied structural drying|applied microbial remediation|microbial remediation|fire (?:and|&) smoke (?:damage )?restoration|odou?r control|carpet cleaning|commercial carpet(?: cleaning| maintenance)?|carpet repair (?:and|&) reinstallation|colou?r repair|upholstery (?:and|&) fabric cleaning|health (?:and|&) safety|trauma (?:and|&) crime scene|leather cleaning|rug cleaning|stone,? masonry (?:and|&) ceramic tile cleaning|floor care|resilient flooring maintenance|wood floor maintenance|contents? processing|house cleaning';
+// ...and the titles that never carry the word "technician".
+const OTHER_TITLES =
+  '(?:master|journeyman)\\s+(?:water|textile|fire (?:and|&) smoke)\\s+(?:restorer|cleaner)|commercial drying specialist|mou?ld remediation specialist|building moisture (?:inspection|thermography)|building construction identification|(?:senior )?carpet inspector|resilient flooring inspector|wood (?:floor|(?:and|&) laminate flooring) inspector|introduction to substrate (?:and|&) subfloor inspection';
 const DESIGNATION_TITLE = new RegExp(
-  `\\b(?:(?:${TECHNICIAN_REFERENTS})\\s+technician|(?:master|journeyman)\\s+(?:water|textile|fire (?:and|&) smoke)\\s+(?:restorer|cleaner)|commercial drying specialist|(?:carpet|resilient flooring|wood floor) inspector|building moisture thermography)\\b`,
+  `\\b(?:(?:${TECHNICIAN_REFERENTS})\\s+technician|${OTHER_TITLES})\\b`,
   'i',
 );
-// Nouns IICRC uses to name its credentials. None may appear on any wizard step or in
+// Nouns IICRC builds its credential titles from. None may appear on any wizard step or in
 // recommendation copy, learner-standing steps included: a title carrying one of these words is
 // a designation whether or not the referent list above knows it. "Technician" is handled
 // separately because the role step legitimately offers a job role.
-const CREDENTIAL_NOUNS = /\b(master|journeyman|specialist|restorer|inspector)\b/i;
+const CREDENTIAL_NOUNS = /\b(master|journeyman|specialist|restorer|inspector|inspection)\b/i;
 // On surfaces that speak for CARSI, the bare word is enough to fail: no role option lives here.
 const ANY_TECHNICIAN = /\btechnician\b/i;
 const PARENTHESISED_ACRONYM = new RegExp(`\\((${ACRONYMS})\\)`, 'i');
 const BARE_ACRONYM = new RegExp(`\\b(${ACRONYMS})\\b`, 'i');
+// Backstop for the acronym list: outside the learner-standing question this copy uses exactly
+// four all-caps tokens (our name, the body's name, the renewal step's SMS option, and CEC inside
+// the allow-listed sentence). Any other all-caps token is an acronym the list above missed.
+const UNKNOWN_CAPS_TOKEN = /\b(?!(?:CARSI|IICRC|SMS|CEC)\b)[A-Z]{2,6}\b/;
+// And the designation form itself, "<title> (<acronym>)", in any case: nothing on these surfaces
+// legitimately puts a short token in parentheses ("(optional)" is longer than six letters).
+const PARENTHESISED_TOKEN = /\([A-Za-z]{2,6}\)/;
 const ALIGNED = /-aligned\b/i;
 const LICENCE_WORDS = /IICRC|\bCECs?\b|certif|accredit|qualif|designation|registered training/i;
 const MANGLED_CASE = /\b[a-z][A-Z]{2,}/;
@@ -95,6 +112,8 @@ function assertDesignationFree(text: string) {
   assertNoDesignationTitle(text);
   expect(text).not.toMatch(PARENTHESISED_ACRONYM);
   expect(text).not.toMatch(BARE_ACRONYM);
+  expect(text).not.toMatch(UNKNOWN_CAPS_TOKEN);
+  expect(text).not.toMatch(PARENTHESISED_TOKEN);
 }
 
 /** Claim-free: for surfaces that speak for CARSI (recommendation copy, goal labels). */
@@ -153,18 +172,41 @@ describe('onboarding pathway copy (licence)', () => {
     expect(REVIEW_MUTANT_MASTER_TITLE).toMatch(DESIGNATION_TITLE);
     expect('journeyman fire & smoke restorer').toMatch(DESIGNATION_TITLE);
     expect('Commercial Drying Specialist').toMatch(DESIGNATION_TITLE);
-    expect('Carpet Inspector').toMatch(DESIGNATION_TITLE);
+    expect('Mould Remediation Specialist').toMatch(DESIGNATION_TITLE);
+    expect('Senior Carpet Inspector').toMatch(DESIGNATION_TITLE);
+    expect('Wood and Laminate Flooring Inspector').toMatch(DESIGNATION_TITLE);
+    expect(REVIEW_MUTANT_CURRENT_TITLE).toMatch(DESIGNATION_TITLE);
     expect('Building Moisture Thermography').toMatch(DESIGNATION_TITLE);
+    expect('Building Construction Identification').toMatch(DESIGNATION_TITLE);
+    expect('Fire and Smoke Damage Restoration Technician').toMatch(DESIGNATION_TITLE);
+    expect('Color Repair Technician').toMatch(DESIGNATION_TITLE);
     // ...and the credential nouns fail a title the list does not know.
     expect(REVIEW_MUTANT_MASTER_TITLE).toMatch(CREDENTIAL_NOUNS);
+    expect(REVIEW_MUTANT_CURRENT_TITLE).toMatch(CREDENTIAL_NOUNS);
     expect('Senior Rug Inspector').not.toMatch(DESIGNATION_TITLE);
     expect('Senior Rug Inspector').toMatch(CREDENTIAL_NOUNS);
+    // Acronyms: the current list, the older name, and the backstop for one the list misses.
+    expect(REVIEW_MUTANT_CURRENT_ACRONYM).toMatch(PARENTHESISED_ACRONYM);
     expect('Master Water Restorer (MWR)').toMatch(PARENTHESISED_ACRONYM);
     expect('holds the CDS').toMatch(BARE_ACRONYM);
-    // A job role and area copy are not titles (negative controls for the nouns).
+    expect('holds the BMT').toMatch(BARE_ACRONYM);
+    expect('Field Technician (QQQ)').not.toMatch(PARENTHESISED_ACRONYM);
+    expect('Field Technician (QQQ)').toMatch(UNKNOWN_CAPS_TOKEN);
+    expect('Field Technician QQQ').toMatch(UNKNOWN_CAPS_TOKEN);
+    expect('Field Technician (Qqq)').not.toMatch(UNKNOWN_CAPS_TOKEN);
+    expect('Field Technician (Qqq)').toMatch(PARENTHESISED_TOKEN);
+    // Negative controls: a job role, area copy and the four legitimate tokens pass.
     expect('Field Technician').not.toMatch(DESIGNATION_TITLE);
     expect('Field Technician').not.toMatch(CREDENTIAL_NOUNS);
+    expect('Field Technician').not.toMatch(UNKNOWN_CAPS_TOKEN);
     expect('Australian restoration employers').not.toMatch(CREDENTIAL_NOUNS);
+    expect('Renew my CECs').not.toMatch(UNKNOWN_CAPS_TOKEN);
+    expect('Already IICRC certified').not.toMatch(UNKNOWN_CAPS_TOKEN);
+    expect('SMS reminders').not.toMatch(UNKNOWN_CAPS_TOKEN);
+    expect(ALLOWED_SENTENCES[0]).not.toMatch(UNKNOWN_CAPS_TOKEN);
+    expect(ALLOWED_SENTENCES[1]).not.toMatch(UNKNOWN_CAPS_TOKEN);
+    expect('Renewal & reminders (optional)').not.toMatch(PARENTHESISED_TOKEN);
+    expect('Email me about unfinished lessons (opt-in)').not.toMatch(PARENTHESISED_TOKEN);
     expect(stripAllowed(OLD_GOAL_LABEL, ALLOWED_GOAL_LABELS)).toMatch(LICENCE_WORDS);
     expect(stripAllowed(REVIEW_MUTANT_CLAIM, ALLOWED_SENTENCES)).toMatch(LICENCE_WORDS);
     // A claim appended beside an allow-listed sentence is still caught (only the exact literal
