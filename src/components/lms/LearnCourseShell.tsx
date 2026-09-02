@@ -886,7 +886,8 @@ export function LearnCourseShell({ slug }: { slug: string }) {
                     ) : null}
                     {quizResult ? (
                       isOnboardingProgram ? (
-                        <div className="mt-6">
+                        // WS1 fix 5 (GP-544): every completion action clears Margot; see LessonFooterNav.
+                        <div className="lesson-footer-nav mt-6 pb-24">
                           <EnterpriseQuizResult
                             passed={quizResult.passed}
                             scorePercent={quizResult.score_percent}
@@ -900,7 +901,8 @@ export function LearnCourseShell({ slug }: { slug: string }) {
                           ) : null}
                         </div>
                       ) : (
-                        <div className="mt-6 space-y-3">
+                        // WS1 fix 5 (GP-544): every completion action clears Margot; see LessonFooterNav.
+                        <div className="lesson-footer-nav mt-6 space-y-3 pb-24">
                           <p
                             role="status"
                             aria-live="polite"
