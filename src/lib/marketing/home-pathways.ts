@@ -29,8 +29,8 @@ export const homePathwayItems: HomePathwayItem[] = [
   {
     href: `${ccwRoadshowPath}#booking`,
     label: 'Book Growth Days',
-    title: 'Melbourne 22 to 23 Jul · Sydney 30 to 31 Jul',
-    detail: 'Free entry for CCW customers · register for your check-in token',
+    title: 'Reserve a Growth Days seat',
+    detail: 'Seats are capped per city · waitlist when a city is full',
     cta: 'Book your seat',
     icon: Ticket,
     accentClass: 'text-emerald-700 dark:text-emerald-400',

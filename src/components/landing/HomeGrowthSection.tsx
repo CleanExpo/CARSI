@@ -11,6 +11,8 @@ import {
   PUBLIC_SHELL_INNER_CLASS,
 } from '@/components/landing/public-shell-width';
 import { ccwWorkshopHref, homePathwayItems } from '@/lib/marketing/home-pathways';
+import { formatStopDates, NO_UPCOMING_STOPS_COPY } from '@/lib/marketing/roadshow-stops';
+import type { RoadshowStop } from '@/lib/marketing/roadshow-stops';
 
 const spring = { type: 'spring' as const, stiffness: 120, damping: 22 };
 
@@ -30,18 +32,16 @@ const QR_PATTERN = [
   [1, 1, 1, 0, 1, 0, 1],
 ];
 
-const TOUR_DATES = [
-  { city: 'Melbourne', dates: '22 to 23 Jul' },
-  { city: 'Sydney', dates: '30 to 31 Jul' },
-] as const;
-
 /**
  * Growth Days departures. The centrepiece is a life-like event ticket for the
  * CARSI x CCW Business Growth Days, with a tear-off check-in stub, barcode and
  * a stamped in-person mark. The three pathways sit beside it as boarding rows,
  * and the workshop hangs off the end as a small dashed stub.
+ *
+ * `stops` is the list of upcoming in-person stops, computed by the server page from
+ * today's date in Brisbane, so the ticket never shows a date that has passed.
  */
-export function HomeGrowthSection() {
+export function HomeGrowthSection({ stops }: { stops: RoadshowStop[] }) {
   const reduceMotion = useReducedMotion();
 
   return (
@@ -118,25 +118,32 @@ export function HomeGrowthSection() {
                 </p>
 
                 <div className="mt-5 space-y-2.5">
-                  {TOUR_DATES.map((stop) => (
-                    <div
-                      key={stop.city}
-                      className="flex items-center justify-between gap-3 text-[13px]"
-                    >
-                      <span className="flex items-center gap-2 font-semibold text-slate-800">
-                        <MapPin className="h-3.5 w-3.5 text-[#146fc2]" aria-hidden />
-                        {stop.city}
-                      </span>
-                      <span
-                        className="h-px min-w-6 flex-1 bg-gradient-to-r from-slate-200 via-slate-200 to-transparent"
-                        aria-hidden
-                      />
-                      <span className="flex items-center gap-1.5 text-slate-500 tabular-nums">
-                        <CalendarDays className="h-3.5 w-3.5 text-[#ed9d24]" aria-hidden />
-                        {stop.dates}
-                      </span>
-                    </div>
-                  ))}
+                  {stops.length === 0 ? (
+                    <p className="flex items-center gap-1.5 text-[13px] text-slate-500">
+                      <CalendarDays className="h-3.5 w-3.5 text-[#ed9d24]" aria-hidden />
+                      {NO_UPCOMING_STOPS_COPY}
+                    </p>
+                  ) : (
+                    stops.map((stop) => (
+                      <div
+                        key={stop.city}
+                        className="flex items-center justify-between gap-3 text-[13px]"
+                      >
+                        <span className="flex items-center gap-2 font-semibold text-slate-800">
+                          <MapPin className="h-3.5 w-3.5 text-[#146fc2]" aria-hidden />
+                          {stop.city}
+                        </span>
+                        <span
+                          className="h-px min-w-6 flex-1 bg-gradient-to-r from-slate-200 via-slate-200 to-transparent"
+                          aria-hidden
+                        />
+                        <span className="flex items-center gap-1.5 text-slate-500 tabular-nums">
+                          <CalendarDays className="h-3.5 w-3.5 text-[#ed9d24]" aria-hidden />
+                          {formatStopDates(stop)}
+                        </span>
+                      </div>
+                    ))
+                  )}
                 </div>
 
                 <div
@@ -145,7 +152,7 @@ export function HomeGrowthSection() {
                 />
 
                 <p className="mt-4 text-[11px] text-slate-500">
-                  Admit one · Free entry for CCW customers
+                  Admit one · Seats capped per city
                 </p>
 
                 {/* Barcode */}
