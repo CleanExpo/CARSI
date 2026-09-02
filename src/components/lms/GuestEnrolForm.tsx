@@ -31,6 +31,10 @@ export function GuestEnrolForm({ slug, priceAud, isFree, showTeamOption = false 
   const [purchaseMode, setPurchaseMode] = useState<CoursePurchaseMode>('self');
   const [teamSeats, setTeamSeats] = useState(MIN_TEAM_SEATS);
   const [turnstileToken, setTurnstileToken] = useState('');
+  // The free path creates the account here, so it needs a password. The paid path only starts
+  // a Stripe Checkout; the account (and its password) is set up on the confirmation page after
+  // payment, so the form must not ask for one or promise one (WS1 fix 4, GP-543).
+  const freePath = isFree || priceAud <= 0;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -41,11 +45,11 @@ export function GuestEnrolForm({ slug, priceAud, isFree, showTeamOption = false 
       name: 'enrol_click',
       course_slug: slug,
       purchase_mode: purchaseMode,
-      is_free: isFree || priceAud <= 0,
+      is_free: freePath,
     });
 
     try {
-      if (isFree || priceAud <= 0) {
+      if (freePath) {
         const res = await fetch('/api/lms/enrollments/guest-free', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -128,7 +132,9 @@ export function GuestEnrolForm({ slug, priceAud, isFree, showTeamOption = false 
   return (
     <form onSubmit={handleSubmit} className="space-y-3 rounded-lg border border-white/10 bg-white/[0.03] p-4">
       <p className="text-xs text-white/55">
-        Quick enrol — create your account and {isFree ? 'start learning' : 'pay securely'} in one step.
+        {freePath
+          ? 'Quick enrol — create your account and start learning in one step.'
+          : 'Quick enrol — pay securely now. Your account is set up on the confirmation page after payment, where you choose your password.'}
       </p>
       <div className="space-y-1.5">
         <Label htmlFor="guest-full-name" className="text-white/70">
@@ -163,20 +169,22 @@ export function GuestEnrolForm({ slug, priceAud, isFree, showTeamOption = false 
           className="border-white/15 bg-white/5 text-white"
         />
       </div>
-      <div className="space-y-1.5">
-        <Label htmlFor="guest-password" className="text-white/70">
-          Password (min 8 characters)
-        </Label>
-        <Input
-          id="guest-password"
-          type="password"
-          minLength={8}
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          className="border-white/15 bg-white/5 text-white"
-        />
-      </div>
+      {freePath ? (
+        <div className="space-y-1.5">
+          <Label htmlFor="guest-password" className="text-white/70">
+            Password (min 8 characters)
+          </Label>
+          <Input
+            id="guest-password"
+            type="password"
+            minLength={8}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            className="border-white/15 bg-white/5 text-white"
+          />
+        </div>
+      ) : null}
       {showTeamOption && !isFree ? (
         <CoursePurchaseOptions
           mode={purchaseMode}
