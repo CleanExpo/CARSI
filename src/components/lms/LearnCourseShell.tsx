@@ -3,11 +3,12 @@
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Check, ChevronLeft, ChevronRight, Home, Layers, Loader2, Share2 } from 'lucide-react';
+import { Check, ChevronRight, Home, Layers, Loader2 } from 'lucide-react';
 
 import { CampusTopBar } from '@/components/layout/CampusTopBar';
 import { CourseCompletionBanner } from '@/components/lms/CourseCompletionBanner';
 import { LearnModuleOverview } from '@/components/lms/LearnModuleOverview';
+import { LessonFooterNav } from '@/components/lms/LessonFooterNav';
 import { LessonPlayer } from '@/components/lms/LessonPlayer';
 import { EnterpriseLessonFooter } from '@/components/onboarding/EnterpriseLessonFooter';
 import { OnboardingCurriculumNav } from '@/components/onboarding/OnboardingCurriculumNav';
@@ -1040,59 +1041,19 @@ export function LearnCourseShell({ slug }: { slug: string }) {
                         </div>
                         {noteStatus ? <p className="mt-2 text-xs text-slate-500">{noteStatus}</p> : null}
                       </div>
-                      <div className="mt-8 flex flex-col gap-4 border-t border-slate-200 pt-6 sm:flex-row sm:items-center sm:justify-between">
-                        <div className="flex flex-wrap gap-2">
-                          <Button
-                            type="button"
-                            variant="outline"
-                            disabled={!prevLesson}
-                            className="gap-1 border-slate-300 text-slate-700"
-                            onClick={() => prevLesson && selectLesson(prevLesson.id)}
-                          >
-                            <ChevronLeft className="h-4 w-4" />
-                            Previous
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            disabled={!nextLesson}
-                            className="gap-1 border-slate-300 text-slate-700"
-                            onClick={() => nextLesson && selectLesson(nextLesson.id)}
-                          >
-                            Next
-                            <ChevronRight className="h-4 w-4" />
-                          </Button>
-                        </div>
-                        <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-3">
-                          {currentMeta?.completed ? (
-                            <Button
-                              type="button"
-                              variant="outline"
-                              onClick={openLessonSharePrompt}
-                              className="gap-1.5 border-[#2490ed]/35 bg-[#2490ed]/10 text-[#146fc2] hover:bg-[#2490ed]/20"
-                            >
-                              <Share2 className="h-4 w-4" aria-hidden />
-                              Share progress
-                            </Button>
-                          ) : null}
-                          <Button
-                            type="button"
-                            disabled={savingComplete || currentMeta?.completed}
-                            className="rounded-md bg-emerald-600 text-white hover:bg-emerald-500 disabled:opacity-50"
-                            onClick={() => void toggleComplete(true)}
-                          >
-                            {currentMeta?.completed ? 'Lesson completed' : 'Mark lesson complete'}
-                          </Button>
-                        </div>
-                        {completeError ? (
-                          <p
-                            role="alert"
-                            className="text-right text-sm text-red-600"
-                          >
-                            {completeError}
-                          </p>
-                        ) : null}
-                      </div>
+                      {/* WS1 fix 5 (GP-544): the footer keeps every control at the left of the
+                          column, clear of Margot's fixed bottom-right launcher and panel. */}
+                      <LessonFooterNav
+                        hasPrev={Boolean(prevLesson)}
+                        hasNext={Boolean(nextLesson)}
+                        onPrev={() => prevLesson && selectLesson(prevLesson.id)}
+                        onNext={() => nextLesson && selectLesson(nextLesson.id)}
+                        completed={Boolean(currentMeta?.completed)}
+                        saving={savingComplete}
+                        onComplete={() => void toggleComplete(true)}
+                        onShare={openLessonSharePrompt}
+                        error={completeError}
+                      />
                     </>
                     )
                   }
