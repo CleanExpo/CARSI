@@ -2,32 +2,10 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Building2,
-  HardHat,
-  HeartPulse,
-  LandPlot,
-  Wrench,
-  Users,
-  Briefcase,
-  Sprout,
-  GraduationCap,
-  RefreshCw,
-  TrendingUp,
-  ArrowRight,
-  Calendar,
-  Bell,
-  BellOff,
-} from 'lucide-react';
+import { GraduationCap, ArrowRight, Calendar, Bell, BellOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { apiClient } from '@/lib/api/client';
-import { ONBOARDING_GOAL_OPTIONS, type OnboardingGoalValue } from '@/lib/onboarding/goal-options';
-
-const GOAL_ICONS: Record<OnboardingGoalValue, React.ReactNode> = {
-  new_cert: <GraduationCap className="h-6 w-6" />,
-  cec_renewal: <RefreshCw className="h-6 w-6" />,
-  career_change: <TrendingUp className="h-6 w-6" />,
-};
+import { ONBOARDING_FLOW as FLOW } from '@/components/lms/onboarding-flow';
 
 interface OnboardingWizardProps {
   isOpen: boolean;
@@ -36,118 +14,8 @@ interface OnboardingWizardProps {
 
 const POST_ONBOARDING_PATH = '/dashboard/student';
 
-interface AnswerCard {
-  value: string;
-  label: string;
-  icon: React.ReactNode;
-}
-
-type FlowItem =
-  | {
-      kind: 'single';
-      question: string;
-      key: 'industry' | 'role' | 'iicrc_experience' | 'primary_goal';
-      answers: AnswerCard[];
-    }
-  | {
-      kind: 'multi';
-      question: string;
-      key: 'disciplines_held';
-      options: { value: string; label: string }[];
-    }
-  | { kind: 'renewal'; question: string };
-
-const FLOW: FlowItem[] = [
-  {
-    kind: 'single',
-    question: "What's your industry?",
-    key: 'industry',
-    answers: [
-      {
-        value: 'restoration',
-        label: 'Restoration & Remediation',
-        icon: <Building2 className="h-6 w-6" />,
-      },
-      {
-        value: 'construction',
-        label: 'Construction & Trades',
-        icon: <HardHat className="h-6 w-6" />,
-      },
-      { value: 'healthcare', label: 'Healthcare', icon: <HeartPulse className="h-6 w-6" /> },
-      {
-        value: 'government',
-        label: 'Government & Defence',
-        icon: <LandPlot className="h-6 w-6" />,
-      },
-    ],
-  },
-  {
-    kind: 'single',
-    question: "What's your role?",
-    key: 'role',
-    answers: [
-      { value: 'technician', label: 'Field Technician', icon: <Wrench className="h-6 w-6" /> },
-      {
-        value: 'supervisor',
-        label: 'Supervisor / Team Leader',
-        icon: <Users className="h-6 w-6" />,
-      },
-      { value: 'owner', label: 'Business Owner', icon: <Briefcase className="h-6 w-6" /> },
-      {
-        value: 'new_to_industry',
-        label: 'New to the Industry',
-        icon: <Sprout className="h-6 w-6" />,
-      },
-    ],
-  },
-  {
-    kind: 'single',
-    question: 'IICRC experience?',
-    key: 'iicrc_experience',
-    answers: [
-      {
-        value: 'none',
-        label: 'No certifications yet',
-        icon: <GraduationCap className="h-6 w-6" />,
-      },
-      { value: 'some', label: 'Some training / exposure', icon: <RefreshCw className="h-6 w-6" /> },
-      {
-        value: 'certified',
-        label: 'Already IICRC certified',
-        icon: <TrendingUp className="h-6 w-6" />,
-      },
-    ],
-  },
-  {
-    kind: 'multi',
-    question: 'Which IICRC disciplines do you hold or plan to work in? Select all that apply.',
-    key: 'disciplines_held',
-    options: [
-      { value: 'WRT', label: 'WRT — Water' },
-      { value: 'CRT', label: 'CRT — Carpet' },
-      { value: 'ASD', label: 'ASD — Structural drying' },
-      { value: 'AMRT', label: 'AMRT — Microbial' },
-      { value: 'FSRT', label: 'FSRT — Fire & smoke' },
-      { value: 'OCT', label: 'OCT — Odour' },
-      { value: 'CCT', label: 'CCT — Carpet cleaning' },
-    ],
-  },
-  {
-    kind: 'single',
-    question: "What's your main goal?",
-    key: 'primary_goal',
-    // Labels live in src/lib/onboarding/goal-options.ts (licence-pinned by test); only icons here.
-    answers: ONBOARDING_GOAL_OPTIONS.map((option) => ({
-      value: option.value,
-      label: option.label,
-      icon: GOAL_ICONS[option.value],
-    })),
-  },
-  {
-    kind: 'renewal',
-    question: 'Renewal & reminders (optional)',
-  },
-];
+// Step data (questions, answer labels, icons) lives in ./onboarding-flow.tsx so the licence test
+// can import exactly what this component renders.
 
 const slideVariants = {
   enter: (direction: number) => ({

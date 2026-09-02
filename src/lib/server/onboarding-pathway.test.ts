@@ -1,8 +1,6 @@
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
-
 import { describe, expect, it } from 'vitest';
 
+import { ONBOARDING_FLOW, wizardGoalLabels } from '@/components/lms/onboarding-flow';
 import { ONBOARDING_GOAL_OPTIONS } from '@/lib/onboarding/goal-options';
 
 import {
@@ -16,24 +14,26 @@ import {
 /**
  * Licence guard for the first-session onboarding wizard (CLAUDE.md "CARSI designation rule").
  *
- * CARSI recommends a discipline AREA to start in. Rendered recommendation copy never brands
- * that recommendation with an IICRC Registered-Training-School designation title or acronym,
- * and makes no IICRC, CEC, certification or accreditation claim at all, except for two
- * sanctioned sentences allow-listed verbatim below. Both repo licence guards passed while the
- * old copy was live (observed on carsi.com.au 2026-09-03), so this file is the control that
- * fails if any of it comes back, including a label hard-coded back into the wizard.
+ * CARSI recommends a discipline AREA to start in. The goal step and the rendered recommendation
+ * copy never carry an IICRC Registered-Training-School designation title or acronym, and make no
+ * IICRC, CEC, certification or accreditation claim at all, except for sentences allow-listed
+ * verbatim below. Both repo licence guards passed while the old copy was live (observed on
+ * carsi.com.au 2026-09-03), so this file is the control that fails if any of it comes back.
+ *
+ * The wizard's step data is imported from the module the component renders from, so a label
+ * smuggled in through any constant or expression is still the label under test.
  */
 
-// Exact strings rendered on 2026-09-03 (WS1 walk B, break 5) and the reviewer's mutants from
-// the release-gate review of ff5eeceb. Positive controls: every one must be rejected.
+// Exact strings rendered on 2026-09-03 (WS1 walk B, break 5) and the reviewers' mutants from
+// the release-gate reviews of ff5eeceb and e41fedd5. Positive controls: every one is rejected.
 const OLD_LABEL = 'Water Damage Restoration Technician (WRT)';
 const OLD_DESCRIPTION =
   'Starting with Water Damage Restoration Technician (WRT) builds foundational credentials recognised across restoration employers in Australia.';
 const OLD_GOAL_LABEL = 'Build toward a new IICRC discipline (CEC courses)';
-const REVIEW_MUTANT = 'These courses prepare you for IICRC certification.';
+const REVIEW_MUTANT_CLAIM = 'These courses prepare you for IICRC certification.';
+const REVIEW_MUTANT_LOWERCASE_TITLE = 'Water damage restoration technician';
 
-// The only sentences that may mention IICRC, CECs or certification in rendered copy. Anything
-// else that does so is a claim this surface is not allowed to make.
+// The only sentences that may mention IICRC, CECs or certification in recommendation copy.
 const ALLOWED_SENTENCES = [
   'Every CARSI credential is CARSI-issued; it is not an IICRC certification.',
   'Where the IICRC has approved a course, its CEC hours are shown on the course page.',
@@ -42,9 +42,13 @@ const ALLOWED_SENTENCES = [
 const ALLOWED_GOAL_LABELS = ['Renew my CECs'];
 
 const ACRONYMS = 'WRT|ASD|CRT|AMRT|FSRT|OCT|CCT|TCST';
-const DESIGNATION_TITLE = /\bTechnician\b/;
-const PARENTHESISED_ACRONYM = new RegExp(`\\((${ACRONYMS})\\)`);
-const BARE_ACRONYM = new RegExp(`\\b(${ACRONYMS})\\b`);
+// IICRC Registered-Training-School designation titles, by referent, any case.
+const DESIGNATION_TITLE =
+  /\b(water damage restoration|applied structural drying|carpet repair (and|&) reinstallation|applied microbial remediation|microbial remediation|fire (and|&) smoke restoration|odou?r control|commercial carpet(?: cleaning)?|carpet cleaning|upholstery (and|&) fabric cleaning|health (and|&) safety|trauma (and|&) crime scene)\s+technician\b/i;
+// On surfaces that speak for CARSI, the bare word is enough to fail: no role option lives here.
+const ANY_TECHNICIAN = /\btechnician\b/i;
+const PARENTHESISED_ACRONYM = new RegExp(`\\((${ACRONYMS})\\)`, 'i');
+const BARE_ACRONYM = new RegExp(`\\b(${ACRONYMS})\\b`, 'i');
 const ALIGNED = /-aligned\b/i;
 const LICENCE_WORDS = /IICRC|\bCECs?\b|certif|accredit|qualif|designation|registered training/i;
 const MANGLED_CASE = /\b[a-z][A-Z]{2,}/;
@@ -53,6 +57,7 @@ function stripAllowed(text: string, allowed: readonly string[]): string {
   return allowed.reduce((acc, sentence) => acc.split(sentence).join(' '), text);
 }
 
+/** Designation-free: for any surface, including ones where a job role may appear. */
 function assertDesignationFree(text: string) {
   expect(text).not.toMatch(DESIGNATION_TITLE);
   expect(text).not.toMatch(PARENTHESISED_ACRONYM);
@@ -61,8 +66,10 @@ function assertDesignationFree(text: string) {
   expect(text).not.toMatch(MANGLED_CASE);
 }
 
+/** Claim-free: for surfaces that speak for CARSI (recommendation copy, goal labels). */
 function assertNoLicenceClaims(text: string, allowed: readonly string[] = ALLOWED_SENTENCES) {
   assertDesignationFree(text);
+  expect(text).not.toMatch(ANY_TECHNICIAN);
   expect(stripAllowed(text, allowed)).not.toMatch(LICENCE_WORDS);
 }
 
@@ -70,15 +77,20 @@ const UNKNOWN_CODES = ['TCST', 'ZZZ', 'wrt', '', 'WRT2'];
 const GOALS = ['new_cert', 'cec_renewal', 'career_change', 'anything-else', undefined];
 
 describe('onboarding pathway copy (licence)', () => {
-  it('rejects the old copy and the review mutants (positive controls)', () => {
+  it('rejects the old copy and every review mutant (positive controls)', () => {
     expect(OLD_LABEL).toMatch(PARENTHESISED_ACRONYM);
     expect(OLD_LABEL).toMatch(DESIGNATION_TITLE);
     expect(OLD_DESCRIPTION).toMatch(BARE_ACRONYM);
+    expect(REVIEW_MUTANT_LOWERCASE_TITLE).toMatch(DESIGNATION_TITLE);
+    expect(REVIEW_MUTANT_LOWERCASE_TITLE).toMatch(ANY_TECHNICIAN);
+    expect('water damage restoration (wrt)').toMatch(PARENTHESISED_ACRONYM);
     expect(stripAllowed(OLD_GOAL_LABEL, ALLOWED_GOAL_LABELS)).toMatch(LICENCE_WORDS);
-    expect(stripAllowed(REVIEW_MUTANT, ALLOWED_SENTENCES)).toMatch(LICENCE_WORDS);
-    expect(stripAllowed(`Based on your selections. ${REVIEW_MUTANT}`, ALLOWED_SENTENCES)).toMatch(
-      LICENCE_WORDS,
-    );
+    expect(stripAllowed(REVIEW_MUTANT_CLAIM, ALLOWED_SENTENCES)).toMatch(LICENCE_WORDS);
+    // A claim appended beside an allow-listed sentence is still caught (only the exact literal
+    // is stripped). The control avoids reproducing a banned selling form in source.
+    expect(
+      stripAllowed(`${ALLOWED_SENTENCES[1]} This qualifies you for insurer panels.`, ALLOWED_SENTENCES),
+    ).toMatch(LICENCE_WORDS);
     expect('Based on your selections, tCST is a practical place to start.').toMatch(MANGLED_CASE);
   });
 
@@ -116,16 +128,30 @@ describe('onboarding pathway copy (licence)', () => {
     expect(stripAllowed(renewal, ALLOWED_SENTENCES)).not.toMatch(LICENCE_WORDS);
   });
 
-  it('goal options are designation-free and make no claim beyond the learner\'s own CECs', () => {
+  it('the goal labels the wizard renders are the shared options and are claim-free', () => {
+    const rendered = wizardGoalLabels();
+    expect(rendered).toEqual(ONBOARDING_GOAL_OPTIONS.map((o) => o.label));
     expect(ONBOARDING_GOAL_OPTIONS.map((o) => o.value)).toEqual([
       'new_cert',
       'cec_renewal',
       'career_change',
     ]);
-    for (const option of ONBOARDING_GOAL_OPTIONS) {
-      expect(option.label).not.toBe(OLD_GOAL_LABEL);
-      assertNoLicenceClaims(option.label, ALLOWED_GOAL_LABELS);
+    for (const label of rendered) {
+      expect(label).not.toBe(OLD_GOAL_LABEL);
+      assertNoLicenceClaims(label, ALLOWED_GOAL_LABELS);
     }
+  });
+
+  it('no wizard step outside the learner-standing question brands anything with a designation', () => {
+    for (const step of ONBOARDING_FLOW) {
+      if (step.kind === 'multi') continue; // the learner's OWN IICRC disciplines: acronyms allowed
+      assertDesignationFree(step.question);
+      if (step.kind === 'single') {
+        for (const answer of step.answers) assertDesignationFree(answer.label);
+      }
+    }
+    const multi = ONBOARDING_FLOW.filter((s) => s.kind === 'multi');
+    expect(multi).toHaveLength(1);
   });
 
   it('routing: known codes resolve as before; unknown input never becomes the recommendation', () => {
@@ -139,24 +165,5 @@ describe('onboarding pathway copy (licence)', () => {
       expect(KNOWN_PATHWAY_CODES).toContain(resolved);
       expect(resolved).not.toBe(code);
     }
-  });
-
-  it('the wizard takes its goal labels from the shared module and hard-codes none', () => {
-    const source = readFileSync(join(process.cwd(), 'src/components/lms/OnboardingWizard.tsx'), 'utf8');
-    expect(source).toContain('ONBOARDING_GOAL_OPTIONS');
-    const start = source.indexOf("key: 'primary_goal'");
-    expect(start).toBeGreaterThan(-1);
-    const end = source.indexOf('kind:', start);
-    const goalStep = source.slice(start, end === -1 ? undefined : end);
-    expect(goalStep).toContain('ONBOARDING_GOAL_OPTIONS');
-    expect(goalStep).not.toMatch(/label:\s*['"`]/);
-    expect(goalStep).not.toMatch(DESIGNATION_TITLE);
-    // Whole-file checks: the role step legitimately says "Field Technician" and the disciplines
-    // step legitimately asks about the learner's OWN IICRC standing, so only branding forms are
-    // banned file-wide.
-    expect(source).not.toContain(OLD_GOAL_LABEL);
-    expect(source).not.toMatch(/toward[^'"\n]*IICRC/i);
-    expect(source).not.toMatch(PARENTHESISED_ACRONYM);
-    expect(source).not.toMatch(ALIGNED);
   });
 });
