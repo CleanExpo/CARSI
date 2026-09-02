@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { signSessionToken, verifySessionToken } from '@/lib/auth/session-jwt';
+import { SESSION_SENTINEL_COOKIE } from '@/lib/auth/session-sentinel';
 
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
 
@@ -32,5 +33,6 @@ export async function POST(request: NextRequest) {
   const response = NextResponse.json({ success: true });
   response.cookies.set('auth_token', refreshed, { ...cookieOptions, httpOnly: true });
   response.cookies.set('carsi_token', refreshed, { ...cookieOptions, httpOnly: true });
+  response.cookies.set(SESSION_SENTINEL_COOKIE, '1', { ...cookieOptions, httpOnly: false });
   return response;
 }

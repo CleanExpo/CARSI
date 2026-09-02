@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { getPostLoginRedirectPath } from '@/lib/admin/admin-auth';
 import { signSessionToken } from '@/lib/auth/session-jwt';
+import { SESSION_SENTINEL_COOKIE } from '@/lib/auth/session-sentinel';
 import { authenticateWithPassword } from '@/lib/server/lms-auth';
 import { applyRateLimit, clientIpFrom } from '@/lib/rate-limit';
 
@@ -83,6 +84,7 @@ export async function POST(request: NextRequest) {
       ...cookieOptions,
       httpOnly: true,
     });
+    response.cookies.set(SESSION_SENTINEL_COOKIE, '1', { ...cookieOptions, httpOnly: false });
 
     return response;
   } catch (error) {

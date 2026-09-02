@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { signSessionToken } from '@/lib/auth/session-jwt';
+import { SESSION_SENTINEL_COOKIE } from '@/lib/auth/session-sentinel';
 import { sendRegistrationWelcomeEmail } from '@/lib/server/auth-email';
 import { getAppOrigin } from '@/lib/server/app-url';
 import { registerUserWithPassword } from '@/lib/server/lms-auth';
@@ -92,6 +93,7 @@ export async function POST(request: NextRequest) {
     };
     response.cookies.set('auth_token', accessToken, { ...cookieOptions, httpOnly: true });
     response.cookies.set('carsi_token', accessToken, { ...cookieOptions, httpOnly: true });
+    response.cookies.set(SESSION_SENTINEL_COOKIE, '1', { ...cookieOptions, httpOnly: false });
 
     return response;
   } catch (error) {
