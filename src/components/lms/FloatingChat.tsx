@@ -137,6 +137,15 @@ export default function FloatingChat() {
     : null;
 
   const [open, setOpen] = useState(false);
+  // WS1 fix 5 (GP-544): mirror the open state onto the document so page furniture that would
+  // otherwise sit under the panel (the lesson footer, see LessonFooterNav and globals.css)
+  // can clear it with CSS. The attribute is removed on close and on unmount.
+  useEffect(() => {
+    const root = document.documentElement;
+    if (open) root.setAttribute('data-margot-open', '');
+    else root.removeAttribute('data-margot-open');
+    return () => root.removeAttribute('data-margot-open');
+  }, [open]);
   const [messages, setMessages] = useState<Message[]>([
     { id: 'welcome', role: 'assistant', text: WELCOME_MESSAGE },
   ]);

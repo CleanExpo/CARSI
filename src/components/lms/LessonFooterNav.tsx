@@ -26,9 +26,14 @@ export interface LessonFooterNavProps {
   error: string | null;
 }
 
-/** The row: left-aligned on every width; pb-24 (6rem) clears the 66px launcher plus its margin. */
+/**
+ * The row: left-aligned on every width; pb-24 (6rem) clears the 66px launcher plus its margin
+ * while the chat is closed. `lesson-footer-nav` is the hook for the open-panel rule in
+ * app/globals.css: while FloatingChat holds `data-margot-open` on <html>, the row gets enough
+ * bottom clearance (40rem) to scroll above the 560px panel and its launcher at every width.
+ */
 export const LESSON_FOOTER_ROW_CLASS =
-  'mt-8 flex flex-col gap-4 border-t border-slate-200 pt-6 pb-24 sm:flex-row sm:flex-wrap sm:items-center sm:justify-start sm:gap-6';
+  'lesson-footer-nav mt-8 flex flex-col gap-4 border-t border-slate-200 pt-6 pb-24 sm:flex-row sm:flex-wrap sm:items-center sm:justify-start sm:gap-6';
 
 /** The completion actions: left-aligned, beside Previous / Next. */
 export const LESSON_FOOTER_ACTIONS_CLASS = 'flex flex-wrap items-center justify-start gap-2 sm:gap-3';

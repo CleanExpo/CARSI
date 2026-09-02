@@ -611,3 +611,11 @@
     background: linear-gradient(180deg, hsl(222 47% 6%) 0%, hsl(222 47% 4%) 100%);
   }
 }
+
+/* WS1 fix 5 (GP-544): while Margot's chat panel is open (FloatingChat mirrors its state as
+   `data-margot-open` on <html>), the lesson footer gains enough bottom clearance to scroll
+   above the 560px panel and its launcher (606px container plus margin) at every width. The
+   closed-launcher clearance is the row's own pb-24 in LessonFooterNav. */
+html[data-margot-open] .lesson-footer-nav {
+  padding-bottom: 40rem;
+}
