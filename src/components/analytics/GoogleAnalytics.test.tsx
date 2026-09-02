@@ -64,13 +64,31 @@ describe('GoogleAnalytics under the strict Content-Security-Policy', () => {
     expect(inlineScripts()).toEqual([]);
   });
 
-  it('the static bootstrap defines dataLayer and gtag, parses as JavaScript, and carries no measurement id', () => {
+  it('the static bootstrap, executed, queues the js event and every later call on the data layer', () => {
     const source = readFileSync(resolve(process.cwd(), 'public', 'ga-init.js'), 'utf8');
-    expect(source).toContain('window.dataLayer = window.dataLayer || []');
-    expect(source).toContain('window.gtag = gtag');
-    expect(source).toMatch(/gtag\('js', new Date\(\)\)/);
     expect(source).not.toMatch(/G-[A-Z0-9]{6,}/);
-    expect(() => new Function(source)).not.toThrow();
+
+    const w = window as Window & { dataLayer?: unknown[]; gtag?: (...args: unknown[]) => void };
+    delete w.dataLayer;
+    delete w.gtag;
+    new Function(source)();
+
+    expect(Array.isArray(w.dataLayer)).toBe(true);
+    expect(typeof w.gtag).toBe('function');
+    const queued = () => (w.dataLayer as unknown[]).map((entry) => Array.from(entry as ArrayLike<unknown>));
+    expect(queued()).toHaveLength(1);
+    expect(queued()[0][0]).toBe('js');
+    expect(queued()[0][1]).toBeInstanceOf(Date);
+
+    w.gtag!('config', 'G-TEST1234', { page_path: '/dashboard' });
+    expect(queued()).toHaveLength(2);
+    expect(queued()[1]).toEqual(['config', 'G-TEST1234', { page_path: '/dashboard' }]);
+
+    // An existing queue is reused, never replaced.
+    const existing = w.dataLayer;
+    new Function(source)();
+    expect(w.dataLayer).toBe(existing);
+    expect(queued()).toHaveLength(3);
   });
 
   it('positive control: the pre-fix inline bootstrap is exactly what the inline-script probe catches', () => {
