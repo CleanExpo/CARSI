@@ -41,8 +41,8 @@ import {
  */
 
 // Exact strings rendered on 2026-09-03 (WS1 walk B, break 5) and the reviewers' mutants from
-// the release-gate reviews of ff5eeceb, e41fedd5, 5da8339b and 6bab44b2. Positive controls:
-// every one is rejected.
+// the release-gate reviews of ff5eeceb, e41fedd5, 5da8339b, 6bab44b2 and 74604505. Positive
+// controls: every one is rejected.
 const OLD_LABEL = 'Water Damage Restoration Technician (WRT)';
 const OLD_DESCRIPTION =
   'Starting with Water Damage Restoration Technician (WRT) builds foundational credentials recognised across restoration employers in Australia.';
@@ -52,6 +52,7 @@ const REVIEW_MUTANT_LOWERCASE_TITLE = 'Water damage restoration technician';
 const REVIEW_MUTANT_MASTER_TITLE = 'Master Water Restorer';
 const REVIEW_MUTANT_CURRENT_ACRONYM = 'Field Technician (BMI)';
 const REVIEW_MUTANT_CURRENT_TITLE = 'Building Moisture Inspection';
+const REVIEW_MUTANT_LOWERCASE_MASTER_ACRONYM = 'Field Technician msr';
 
 // The only sentences that may mention IICRC, CECs or certification in recommendation copy.
 const ALLOWED_SENTENCES = [
@@ -61,10 +62,11 @@ const ALLOWED_SENTENCES = [
 // The learner's own goal may name their own CECs (a statement about their standing, not ours).
 const ALLOWED_GOAL_LABELS = ['Renew my CECs'];
 
-// Acronyms of the current IICRC certifications, plus the Master and Journeyman designations and
-// the older Building Moisture Thermography name, any case.
+// Acronyms of the current IICRC certifications (iicrc.org/iicrccertifications), the Master and
+// Journeyman designations exactly as the Master Track page abbreviates them (iicrc.org/iicrcmaster:
+// MTC, MSR, MWR, JTC, JSR, JWR), and the older Building Moisture Thermography name; any case.
 const ACRONYMS =
-  'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MFSR|JWR|JTC|JFSR';
+  'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
 // IICRC designation titles by referent, any case: the technician family...
 const TECHNICIAN_REFERENTS =
   'water damage restoration|applied structural drying|applied microbial remediation|microbial remediation|fire (?:and|&) smoke (?:damage )?restoration|odou?r control|carpet cleaning|commercial carpet(?: cleaning| maintenance)?|carpet repair (?:and|&) reinstallation|colou?r repair|upholstery (?:and|&) fabric cleaning|health (?:and|&) safety|trauma (?:and|&) crime scene|leather cleaning|rug cleaning|stone,? masonry (?:and|&) ceramic tile cleaning|floor care|resilient flooring maintenance|wood floor maintenance|contents? processing|house cleaning';
@@ -190,6 +192,16 @@ describe('onboarding pathway copy (licence)', () => {
     expect('Master Water Restorer (MWR)').toMatch(PARENTHESISED_ACRONYM);
     expect('holds the CDS').toMatch(BARE_ACRONYM);
     expect('holds the BMT').toMatch(BARE_ACRONYM);
+    // The Master and Journeyman acronyms as the Master Track page abbreviates them, in any case
+    // and with or without parentheses: the known-acronym checks are case-insensitive, which is
+    // what catches a lowercase bare form the two structural backstops cannot.
+    expect(REVIEW_MUTANT_LOWERCASE_MASTER_ACRONYM).toMatch(BARE_ACRONYM);
+    expect(REVIEW_MUTANT_LOWERCASE_MASTER_ACRONYM).not.toMatch(UNKNOWN_CAPS_TOKEN);
+    expect('Field Technician (jsr)').toMatch(PARENTHESISED_ACRONYM);
+    for (const acronym of ['MTC', 'MSR', 'MWR', 'JTC', 'JSR', 'JWR']) {
+      expect(`holds the ${acronym}`).toMatch(BARE_ACRONYM);
+      expect(`holds the ${acronym.toLowerCase()}`).toMatch(BARE_ACRONYM);
+    }
     expect('Field Technician (QQQ)').not.toMatch(PARENTHESISED_ACRONYM);
     expect('Field Technician (QQQ)').toMatch(UNKNOWN_CAPS_TOKEN);
     expect('Field Technician QQQ').toMatch(UNKNOWN_CAPS_TOKEN);
