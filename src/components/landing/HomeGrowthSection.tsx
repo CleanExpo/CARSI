@@ -3,6 +3,7 @@
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowRight, CalendarDays, Flag, MapPin } from 'lucide-react';
 import Link from 'next/link';
+import { useSyncExternalStore } from 'react';
 
 import {
   LANDING_DISPLAY_H2_CLASS,
@@ -11,7 +12,12 @@ import {
   PUBLIC_SHELL_INNER_CLASS,
 } from '@/components/landing/public-shell-width';
 import { ccwWorkshopHref, homePathwayItems } from '@/lib/marketing/home-pathways';
-import { formatStopDates, NO_UPCOMING_STOPS_COPY } from '@/lib/marketing/roadshow-stops';
+import {
+  formatStopDates,
+  NO_UPCOMING_STOPS_COPY,
+  todayInBrisbane,
+  upcomingStops,
+} from '@/lib/marketing/roadshow-stops';
 import type { RoadshowStop } from '@/lib/marketing/roadshow-stops';
 
 const spring = { type: 'spring' as const, stiffness: 120, damping: 22 };
@@ -32,6 +38,20 @@ const QR_PATTERN = [
   [1, 1, 1, 0, 1, 0, 1],
 ];
 
+const subscribeToNothing = () => () => {};
+
+/**
+ * Today's date in Brisbane as the browser sees it, or null on the server and during
+ * hydration, so the first client render matches the server markup exactly.
+ */
+function useClientTodayInBrisbane(): string | null {
+  return useSyncExternalStore(
+    subscribeToNothing,
+    () => todayInBrisbane(),
+    () => null,
+  );
+}
+
 /**
  * Growth Days departures. The centrepiece is a life-like event ticket for the
  * CARSI x CCW Business Growth Days, with a tear-off check-in stub, barcode and
@@ -39,10 +59,15 @@ const QR_PATTERN = [
  * and the workshop hangs off the end as a small dashed stub.
  *
  * `stops` is the list of upcoming in-person stops, computed by the server page from
- * today's date in Brisbane, so the ticket never shows a date that has passed.
+ * today's date in Brisbane. The page is served from a five-minute ISR cache and Next hands
+ * out the stale copy while it regenerates, so a cached render can outlive a stop's last
+ * day; once hydrated, the ticket re-checks the list against the browser's clock and drops
+ * anything that has passed.
  */
 export function HomeGrowthSection({ stops }: { stops: RoadshowStop[] }) {
   const reduceMotion = useReducedMotion();
+  const clientToday = useClientTodayInBrisbane();
+  const visibleStops = clientToday === null ? stops : upcomingStops(stops, clientToday);
 
   return (
     <section
@@ -118,13 +143,13 @@ export function HomeGrowthSection({ stops }: { stops: RoadshowStop[] }) {
                 </p>
 
                 <div className="mt-5 space-y-2.5">
-                  {stops.length === 0 ? (
+                  {visibleStops.length === 0 ? (
                     <p className="flex items-center gap-1.5 text-[13px] text-slate-500">
                       <CalendarDays className="h-3.5 w-3.5 text-[#ed9d24]" aria-hidden />
                       {NO_UPCOMING_STOPS_COPY}
                     </p>
                   ) : (
-                    stops.map((stop) => (
+                    visibleStops.map((stop) => (
                       <div
                         key={stop.city}
                         className="flex items-center justify-between gap-3 text-[13px]"

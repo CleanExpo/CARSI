@@ -36,9 +36,14 @@ export function todayInBrisbane(now: Date = new Date()): string {
   return BRISBANE_DAY.format(now);
 }
 
-/** Stops whose last day is today or later, in circuit order. */
+/** The stops in `stops` whose last day is `today` or later, in the given order. */
+export function upcomingStops(stops: readonly RoadshowStop[], today: string): RoadshowStop[] {
+  return stops.filter((stop) => stop.endsOn >= today);
+}
+
+/** The configured stops whose last day is today or later, in circuit order. */
 export function upcomingRoadshowStops(today: string = todayInBrisbane()): RoadshowStop[] {
-  return ROADSHOW_STOPS.filter((stop) => stop.endsOn >= today);
+  return upcomingStops(ROADSHOW_STOPS, today);
 }
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
