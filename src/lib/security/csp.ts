@@ -50,7 +50,13 @@ export function buildContentSecurityPolicy(opts: {
     "font-src 'self' https://fonts.gstatic.com",
     "img-src 'self' data: https: blob:",
     connectParts.join(' '),
-    'frame-src https://js.stripe.com https://hooks.stripe.com',
+    // Course media (WS1 fix 2, GP-541): course pages embed their intro video from YouTube (the
+    // repo uses both the standard and the nocookie embed hosts) and play their trailer from
+    // Cloudinary. Frames and media only; neither host may run scripts, and the script allow-list
+    // is deliberately untouched (the voice widget stays a separate decision, DECISIONS #23).
+    // Pinned by csp.test.ts, which also fails if any other directive moves.
+    "media-src 'self' https://res.cloudinary.com",
+    'frame-src https://js.stripe.com https://hooks.stripe.com https://www.youtube.com https://www.youtube-nocookie.com',
     "frame-ancestors 'none'",
   ].join('; ');
 }
