@@ -6,16 +6,53 @@ import { GraduationCap, ArrowRight, Calendar, Bell, BellOff } from 'lucide-react
 import { Button } from '@/components/ui/button';
 import { apiClient } from '@/lib/api/client';
 import { ONBOARDING_FLOW as FLOW } from '@/components/lms/onboarding-flow';
+import { pathwayLabel as areaLabelFor } from '@/lib/server/onboarding-pathway';
+
+/** What the recommendation screen shows. */
+export interface WizardResult {
+  pathway: string;
+  pathwayLabel: string;
+  description: string;
+  suggestedUrl: string;
+}
+
+/** The onboarding API response, as this component consumes it. */
+export interface OnboardingResponse {
+  recommended_pathway: string;
+  pathway_label?: string;
+  pathway_description: string;
+  suggested_courses_url: string;
+}
 
 interface OnboardingWizardProps {
   isOpen: boolean;
   onComplete: (destination: string) => void;
+  /** Open at this step (0-based). Production opens at 0; the licence test renders every step. */
+  initialStep?: number;
+  /** Open on the recommendation screen. Production never sets it; the licence test renders it. */
+  initialResult?: WizardResult;
+}
+
+/**
+ * Licence (CLAUDE.md "CARSI designation rule"): the headline is the discipline-area label the
+ * API sends. Should a response ever arrive without one, the code is mapped through the same
+ * label table the API uses, so a raw catalogue code can never reach the screen as the headline.
+ */
+export function wizardResultFromResponse(data: OnboardingResponse): WizardResult {
+  return {
+    pathway: data.recommended_pathway,
+    pathwayLabel: data.pathway_label ?? areaLabelFor(data.recommended_pathway),
+    description: data.pathway_description,
+    suggestedUrl: data.suggested_courses_url,
+  };
 }
 
 const POST_ONBOARDING_PATH = '/dashboard/student';
 
 // Step data (questions, answer labels, icons) lives in ./onboarding-flow.tsx so the licence test
-// can import exactly what this component renders.
+// can import exactly what this component renders. The same test also renders THIS component at
+// every step and on the recommendation screen (initialStep / initialResult), so a label
+// rewritten inside the render below fails the suite too.
 
 const slideVariants = {
   enter: (direction: number) => ({
@@ -29,19 +66,19 @@ const slideVariants = {
   }),
 };
 
-export function OnboardingWizard({ isOpen, onComplete }: OnboardingWizardProps) {
-  const [step, setStep] = useState(0);
+export function OnboardingWizard({
+  isOpen,
+  onComplete,
+  initialStep = 0,
+  initialResult,
+}: OnboardingWizardProps) {
+  const [step, setStep] = useState(() => Math.min(Math.max(0, initialStep), FLOW.length - 1));
   const [direction, setDirection] = useState(1);
   const [answers, setAnswers] = useState<Record<string, string | string[]>>({});
   const [disciplines, setDisciplines] = useState<Set<string>>(new Set());
   const [renewalDate, setRenewalDate] = useState('');
   const [resumeReminder, setResumeReminder] = useState<'none' | 'email' | 'sms'>('none');
-  const [result, setResult] = useState<{
-    pathway: string;
-    pathwayLabel: string;
-    description: string;
-    suggestedUrl: string;
-  } | null>(null);
+  const [result, setResult] = useState<WizardResult | null>(initialResult ?? null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -105,18 +142,8 @@ export function OnboardingWizard({ isOpen, onComplete }: OnboardingWizardProps) 
     };
 
     try {
-      const data = await apiClient.post<{
-        recommended_pathway: string;
-        pathway_label?: string;
-        pathway_description: string;
-        suggested_courses_url: string;
-      }>('/api/lms/auth/onboarding', payload);
-      setResult({
-        pathway: data.recommended_pathway,
-        pathwayLabel: data.pathway_label ?? data.recommended_pathway,
-        description: data.pathway_description,
-        suggestedUrl: data.suggested_courses_url,
-      });
+      const data = await apiClient.post<OnboardingResponse>('/api/lms/auth/onboarding', payload);
+      setResult(wizardResultFromResponse(data));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong');
     } finally {

@@ -1,6 +1,13 @@
+import { createElement } from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 
 import { ONBOARDING_FLOW, wizardGoalLabels } from '@/components/lms/onboarding-flow';
+import {
+  OnboardingWizard,
+  wizardResultFromResponse,
+  type WizardResult,
+} from '@/components/lms/OnboardingWizard';
 import { ONBOARDING_GOAL_OPTIONS } from '@/lib/onboarding/goal-options';
 
 import {
@@ -15,23 +22,28 @@ import {
  * Licence guard for the first-session onboarding wizard (CLAUDE.md "CARSI designation rule").
  *
  * CARSI recommends a discipline AREA to start in. The goal step and the rendered recommendation
- * copy never carry an IICRC Registered-Training-School designation title or acronym, and make no
- * IICRC, CEC, certification or accreditation claim at all, except for sentences allow-listed
- * verbatim below. Both repo licence guards passed while the old copy was live (observed on
- * carsi.com.au 2026-09-03), so this file is the control that fails if any of it comes back.
+ * copy never carry an IICRC designation title or acronym, and make no IICRC, CEC, certification
+ * or accreditation claim at all, except for sentences allow-listed verbatim below. Both repo
+ * licence guards passed while the old copy was live (observed on carsi.com.au 2026-09-03), so
+ * this file is the control that fails if any of it comes back.
  *
- * The wizard's step data is imported from the module the component renders from, so a label
- * smuggled in through any constant or expression is still the label under test.
+ * Two boundaries are under test. The wizard's step data is imported from the module the
+ * component renders from, so a label smuggled in through any constant or expression in that
+ * module is the label under test. The component itself is then rendered (static markup) at every
+ * step and on the recommendation screen, so a label rewritten inside its render is under test
+ * too: what reaches the markup is what is checked.
  */
 
 // Exact strings rendered on 2026-09-03 (WS1 walk B, break 5) and the reviewers' mutants from
-// the release-gate reviews of ff5eeceb and e41fedd5. Positive controls: every one is rejected.
+// the release-gate reviews of ff5eeceb, e41fedd5 and 5da8339b. Positive controls: every one is
+// rejected.
 const OLD_LABEL = 'Water Damage Restoration Technician (WRT)';
 const OLD_DESCRIPTION =
   'Starting with Water Damage Restoration Technician (WRT) builds foundational credentials recognised across restoration employers in Australia.';
 const OLD_GOAL_LABEL = 'Build toward a new IICRC discipline (CEC courses)';
 const REVIEW_MUTANT_CLAIM = 'These courses prepare you for IICRC certification.';
 const REVIEW_MUTANT_LOWERCASE_TITLE = 'Water damage restoration technician';
+const REVIEW_MUTANT_MASTER_TITLE = 'Master Water Restorer';
 
 // The only sentences that may mention IICRC, CECs or certification in recommendation copy.
 const ALLOWED_SENTENCES = [
@@ -41,10 +53,23 @@ const ALLOWED_SENTENCES = [
 // The learner's own goal may name their own CECs (a statement about their standing, not ours).
 const ALLOWED_GOAL_LABELS = ['Renew my CECs'];
 
-const ACRONYMS = 'WRT|ASD|CRT|AMRT|FSRT|OCT|CCT|TCST';
-// IICRC Registered-Training-School designation titles, by referent, any case.
-const DESIGNATION_TITLE =
-  /\b(water damage restoration|applied structural drying|carpet repair (and|&) reinstallation|applied microbial remediation|microbial remediation|fire (and|&) smoke restoration|odou?r control|commercial carpet(?: cleaning)?|carpet cleaning|upholstery (and|&) fabric cleaning|health (and|&) safety|trauma (and|&) crime scene)\s+technician\b/i;
+// Acronyms of IICRC certifications and designations, any case. Not exhaustive by design: the
+// credential nouns below are the backstop that fails a title this list does not know.
+const ACRONYMS =
+  'WRT|ASD|CRT|AMRT|FSRT|OCT|CCT|TCST|UFT|HST|LCT|RCT|SMT|BMT|CDS|FCT|RFMT|WFMT|RFI|WFI|CPT|CCMT|HCT|MWR|MTC|MFSR|JWR|JTC|JFSR';
+// IICRC designation titles, by referent, any case: the technician family, the Master and
+// Journeyman family (no "technician" in the title), and the specialist and inspector titles.
+const TECHNICIAN_REFERENTS =
+  'water damage restoration|applied structural drying|carpet repair (?:and|&) reinstallation|applied microbial remediation|microbial remediation|fire (?:and|&) smoke restoration|odou?r control|commercial carpet(?: cleaning| maintenance)?|carpet cleaning|upholstery (?:and|&) fabric cleaning|health (?:and|&) safety|trauma (?:and|&) crime scene|leather cleaning|rug cleaning|stone,? masonry (?:and|&) ceramic tile cleaning|floor care|resilient flooring maintenance|wood floor maintenance|contents? processing|house cleaning';
+const DESIGNATION_TITLE = new RegExp(
+  `\\b(?:(?:${TECHNICIAN_REFERENTS})\\s+technician|(?:master|journeyman)\\s+(?:water|textile|fire (?:and|&) smoke)\\s+(?:restorer|cleaner)|commercial drying specialist|(?:carpet|resilient flooring|wood floor) inspector|building moisture thermography)\\b`,
+  'i',
+);
+// Nouns IICRC uses to name its credentials. None may appear on any wizard step or in
+// recommendation copy, learner-standing steps included: a title carrying one of these words is
+// a designation whether or not the referent list above knows it. "Technician" is handled
+// separately because the role step legitimately offers a job role.
+const CREDENTIAL_NOUNS = /\b(master|journeyman|specialist|restorer|inspector)\b/i;
 // On surfaces that speak for CARSI, the bare word is enough to fail: no role option lives here.
 const ANY_TECHNICIAN = /\btechnician\b/i;
 const PARENTHESISED_ACRONYM = new RegExp(`\\((${ACRONYMS})\\)`, 'i');
@@ -57,13 +82,19 @@ function stripAllowed(text: string, allowed: readonly string[]): string {
   return allowed.reduce((acc, sentence) => acc.split(sentence).join(' '), text);
 }
 
-/** Designation-free: for any surface, including ones where a job role may appear. */
-function assertDesignationFree(text: string) {
+/** No designation title in any form, on any surface, learner-standing steps included. */
+function assertNoDesignationTitle(text: string) {
   expect(text).not.toMatch(DESIGNATION_TITLE);
-  expect(text).not.toMatch(PARENTHESISED_ACRONYM);
-  expect(text).not.toMatch(BARE_ACRONYM);
+  expect(text).not.toMatch(CREDENTIAL_NOUNS);
   expect(text).not.toMatch(ALIGNED);
   expect(text).not.toMatch(MANGLED_CASE);
+}
+
+/** Designation-free: no title and no acronym. For any surface where a job role may appear. */
+function assertDesignationFree(text: string) {
+  assertNoDesignationTitle(text);
+  expect(text).not.toMatch(PARENTHESISED_ACRONYM);
+  expect(text).not.toMatch(BARE_ACRONYM);
 }
 
 /** Claim-free: for surfaces that speak for CARSI (recommendation copy, goal labels). */
@@ -73,8 +104,42 @@ function assertNoLicenceClaims(text: string, allowed: readonly string[] = ALLOWE
   expect(stripAllowed(text, allowed)).not.toMatch(LICENCE_WORDS);
 }
 
+/** The text a browser would show for static markup: tags dropped, React's escapes undone. */
+function renderedText(html: string): string {
+  return html
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&#x27;/g, "'")
+    .replace(/&quot;/g, '"')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+const noop = () => {};
+
+/** The real component, opened at a step, exactly as it renders. */
+function renderWizardAtStep(index: number): string {
+  return renderedText(
+    renderToStaticMarkup(
+      createElement(OnboardingWizard, { isOpen: true, initialStep: index, onComplete: noop }),
+    ),
+  );
+}
+
+/** The real component, opened on its recommendation screen, exactly as it renders. */
+function renderWizardResult(result: WizardResult): string {
+  return renderedText(
+    renderToStaticMarkup(
+      createElement(OnboardingWizard, { isOpen: true, initialResult: result, onComplete: noop }),
+    ),
+  );
+}
+
 const UNKNOWN_CODES = ['TCST', 'ZZZ', 'wrt', '', 'WRT2'];
 const GOALS = ['new_cert', 'cec_renewal', 'career_change', 'anything-else', undefined];
+const ALL_CODES = [...KNOWN_PATHWAY_CODES, ...UNKNOWN_CODES];
 
 describe('onboarding pathway copy (licence)', () => {
   it('rejects the old copy and every review mutant (positive controls)', () => {
@@ -84,6 +149,22 @@ describe('onboarding pathway copy (licence)', () => {
     expect(REVIEW_MUTANT_LOWERCASE_TITLE).toMatch(DESIGNATION_TITLE);
     expect(REVIEW_MUTANT_LOWERCASE_TITLE).toMatch(ANY_TECHNICIAN);
     expect('water damage restoration (wrt)').toMatch(PARENTHESISED_ACRONYM);
+    // Titles without the word "technician": the referent list knows these...
+    expect(REVIEW_MUTANT_MASTER_TITLE).toMatch(DESIGNATION_TITLE);
+    expect('journeyman fire & smoke restorer').toMatch(DESIGNATION_TITLE);
+    expect('Commercial Drying Specialist').toMatch(DESIGNATION_TITLE);
+    expect('Carpet Inspector').toMatch(DESIGNATION_TITLE);
+    expect('Building Moisture Thermography').toMatch(DESIGNATION_TITLE);
+    // ...and the credential nouns fail a title the list does not know.
+    expect(REVIEW_MUTANT_MASTER_TITLE).toMatch(CREDENTIAL_NOUNS);
+    expect('Senior Rug Inspector').not.toMatch(DESIGNATION_TITLE);
+    expect('Senior Rug Inspector').toMatch(CREDENTIAL_NOUNS);
+    expect('Master Water Restorer (MWR)').toMatch(PARENTHESISED_ACRONYM);
+    expect('holds the CDS').toMatch(BARE_ACRONYM);
+    // A job role and area copy are not titles (negative controls for the nouns).
+    expect('Field Technician').not.toMatch(DESIGNATION_TITLE);
+    expect('Field Technician').not.toMatch(CREDENTIAL_NOUNS);
+    expect('Australian restoration employers').not.toMatch(CREDENTIAL_NOUNS);
     expect(stripAllowed(OLD_GOAL_LABEL, ALLOWED_GOAL_LABELS)).toMatch(LICENCE_WORDS);
     expect(stripAllowed(REVIEW_MUTANT_CLAIM, ALLOWED_SENTENCES)).toMatch(LICENCE_WORDS);
     // A claim appended beside an allow-listed sentence is still caught (only the exact literal
@@ -92,6 +173,10 @@ describe('onboarding pathway copy (licence)', () => {
       stripAllowed(`${ALLOWED_SENTENCES[1]} This qualifies you for insurer panels.`, ALLOWED_SENTENCES),
     ).toMatch(LICENCE_WORDS);
     expect('Based on your selections, tCST is a practical place to start.').toMatch(MANGLED_CASE);
+    // The markup reader keeps what a browser shows and drops the rest.
+    expect(renderedText('<p class="x">What&#x27;s <b>your</b> &amp; role?</p>')).toBe(
+      "What's your & role?",
+    );
   });
 
   it('every known code has a discipline-area label with no designation or claim', () => {
@@ -112,7 +197,7 @@ describe('onboarding pathway copy (licence)', () => {
   });
 
   it('descriptions for every code and goal carry no designation and no unsanctioned claim', () => {
-    for (const code of [...KNOWN_PATHWAY_CODES, ...UNKNOWN_CODES]) {
+    for (const code of ALL_CODES) {
       for (const goal of GOALS) {
         const text = pathwayDescription(code, goal);
         expect(text).not.toBe(OLD_DESCRIPTION);
@@ -128,7 +213,7 @@ describe('onboarding pathway copy (licence)', () => {
     expect(stripAllowed(renewal, ALLOWED_SENTENCES)).not.toMatch(LICENCE_WORDS);
   });
 
-  it('the goal labels the wizard renders are the shared options and are claim-free', () => {
+  it('the goal labels in the step data are the shared options and are claim-free', () => {
     const rendered = wizardGoalLabels();
     expect(rendered).toEqual(ONBOARDING_GOAL_OPTIONS.map((o) => o.label));
     expect(ONBOARDING_GOAL_OPTIONS.map((o) => o.value)).toEqual([
@@ -142,9 +227,14 @@ describe('onboarding pathway copy (licence)', () => {
     }
   });
 
-  it('no wizard step outside the learner-standing question brands anything with a designation', () => {
+  it('no wizard step brands anything with a designation title; only the learner-standing question shows acronyms', () => {
     for (const step of ONBOARDING_FLOW) {
-      if (step.kind === 'multi') continue; // the learner's OWN IICRC disciplines: acronyms allowed
+      assertNoDesignationTitle(step.question);
+      if (step.kind === 'multi') {
+        // The learner's OWN IICRC disciplines: acronyms allowed here, titles still not.
+        for (const option of step.options) assertNoDesignationTitle(option.label);
+        continue;
+      }
       assertDesignationFree(step.question);
       if (step.kind === 'single') {
         for (const answer of step.answers) assertDesignationFree(answer.label);
@@ -152,6 +242,7 @@ describe('onboarding pathway copy (licence)', () => {
     }
     const multi = ONBOARDING_FLOW.filter((s) => s.kind === 'multi');
     expect(multi).toHaveLength(1);
+    expect(multi[0].key).toBe('disciplines_held');
   });
 
   it('routing: known codes resolve as before; unknown input never becomes the recommendation', () => {
@@ -164,6 +255,72 @@ describe('onboarding pathway copy (licence)', () => {
       const resolved = resolveRecommendedPathwayCode({ disciplines_held: [code] });
       expect(KNOWN_PATHWAY_CODES).toContain(resolved);
       expect(resolved).not.toBe(code);
+    }
+  });
+});
+
+describe('onboarding wizard as rendered (licence)', () => {
+  it('opens at the first step by default', () => {
+    const text = renderedText(
+      renderToStaticMarkup(createElement(OnboardingWizard, { isOpen: true, onComplete: noop })),
+    );
+    expect(text).toContain(ONBOARDING_FLOW[0].question);
+  });
+
+  it('renders every step from the step data, and what it renders passes the same checks', () => {
+    expect(ONBOARDING_FLOW.length).toBeGreaterThan(0);
+    ONBOARDING_FLOW.forEach((step, index) => {
+      const text = renderWizardAtStep(index);
+      expect(text).toContain(step.question);
+      if (step.kind === 'multi') {
+        for (const option of step.options) expect(text).toContain(option.value);
+        assertNoDesignationTitle(text);
+        return;
+      }
+      if (step.kind === 'single') {
+        for (const answer of step.answers) expect(text).toContain(answer.label);
+      }
+      assertDesignationFree(text);
+    });
+  });
+
+  it('the goal step as rendered shows the shared labels and nothing that claims', () => {
+    const index = ONBOARDING_FLOW.findIndex((s) => s.kind === 'single' && s.key === 'primary_goal');
+    expect(index).toBeGreaterThanOrEqual(0);
+    const text = renderWizardAtStep(index);
+    for (const option of ONBOARDING_GOAL_OPTIONS) expect(text).toContain(option.label);
+    expect(text).not.toContain(OLD_GOAL_LABEL);
+    expect(text).not.toContain(REVIEW_MUTANT_CLAIM);
+    assertNoLicenceClaims(text, ALLOWED_GOAL_LABELS);
+  });
+
+  it('the recommendation screen shows the label and description for every code and goal, and nothing that claims', () => {
+    for (const code of ALL_CODES) {
+      for (const goal of GOALS) {
+        const result = wizardResultFromResponse({
+          recommended_pathway: code,
+          pathway_label: pathwayLabel(code),
+          pathway_description: pathwayDescription(code, goal),
+          suggested_courses_url: '/dashboard/courses',
+        });
+        const text = renderWizardResult(result);
+        expect(text).toContain(pathwayLabel(code));
+        expect(text).toContain(pathwayDescription(code, goal));
+        assertNoLicenceClaims(text);
+      }
+    }
+  });
+
+  it('a response without a label never puts the raw code on screen', () => {
+    for (const code of ALL_CODES) {
+      const result = wizardResultFromResponse({
+        recommended_pathway: code,
+        pathway_description: pathwayDescription(code),
+        suggested_courses_url: '/dashboard/courses',
+      });
+      expect(result.pathwayLabel).toBe(pathwayLabel(code));
+      expect(result.pathwayLabel).not.toBe(code);
+      assertNoLicenceClaims(renderWizardResult(result));
     }
   });
 });
