@@ -21,6 +21,13 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { apiClient } from '@/lib/api/client';
+import { ONBOARDING_GOAL_OPTIONS, type OnboardingGoalValue } from '@/lib/onboarding/goal-options';
+
+const GOAL_ICONS: Record<OnboardingGoalValue, React.ReactNode> = {
+  new_cert: <GraduationCap className="h-6 w-6" />,
+  cec_renewal: <RefreshCw className="h-6 w-6" />,
+  career_change: <TrendingUp className="h-6 w-6" />,
+};
 
 interface OnboardingWizardProps {
   isOpen: boolean;
@@ -129,19 +136,12 @@ const FLOW: FlowItem[] = [
     kind: 'single',
     question: "What's your main goal?",
     key: 'primary_goal',
-    answers: [
-      {
-        value: 'new_cert',
-        label: 'Build depth in a new discipline area (CEC courses)',
-        icon: <GraduationCap className="h-6 w-6" />,
-      },
-      { value: 'cec_renewal', label: 'Renew CECs', icon: <RefreshCw className="h-6 w-6" /> },
-      {
-        value: 'career_change',
-        label: 'Career change into the industry',
-        icon: <TrendingUp className="h-6 w-6" />,
-      },
-    ],
+    // Labels live in src/lib/onboarding/goal-options.ts (licence-pinned by test); only icons here.
+    answers: ONBOARDING_GOAL_OPTIONS.map((option) => ({
+      value: option.value,
+      label: option.label,
+      icon: GOAL_ICONS[option.value],
+    })),
   },
   {
     kind: 'renewal',

@@ -27,17 +27,27 @@ const PATHWAY_LABELS: Record<string, string> = {
   CCT: 'Commercial carpet cleaning',
 };
 
+/** The discipline-area codes this module knows how to name. Anything else is never rendered. */
+export const KNOWN_PATHWAY_CODES: readonly string[] = Object.keys(PATHWAY_LABELS);
+
+/** Rendered when a code is unknown, so raw input can never reach the screen as an acronym. */
+export const FALLBACK_PATHWAY_LABEL = 'Restoration fundamentals';
+
 /** Lower-case the first letter so a label reads naturally mid-sentence. */
 function inSentence(label: string): string {
   return label.charAt(0).toLowerCase() + label.slice(1);
 }
 
+/**
+ * Only codes with a label survive. The route accepts arbitrary strings, so an unknown value
+ * (for example a code the wizard never offered) is dropped here rather than echoed back.
+ */
 function normalizeDisciplines(raw: unknown): string[] {
   if (!Array.isArray(raw)) return [];
   const out = new Set<string>();
   for (const x of raw) {
     const s = String(x).trim().toUpperCase();
-    if (/^[A-Z]{2,5}$/.test(s)) out.add(s);
+    if (s in PATHWAY_LABELS) out.add(s);
   }
   return [...out];
 }
@@ -69,7 +79,7 @@ export function resolveRecommendedPathwayCode(input: OnboardingAnswersInput): st
 }
 
 export function pathwayLabel(code: string): string {
-  return PATHWAY_LABELS[code] ?? code;
+  return PATHWAY_LABELS[code] ?? FALLBACK_PATHWAY_LABEL;
 }
 
 export function buildOnboardingDashboardUrls(args: {
@@ -88,7 +98,10 @@ export function pathwayDescription(pathwayCode: string, goal?: string): string {
   const g = goal ?? '';
   const area = inSentence(pathwayLabel(pathwayCode));
   if (g === 'cec_renewal') {
-    return `We prioritised ${area} courses, a strong fit for continuing education credits toward a certification you already hold. You can switch discipline areas anytime in the catalogue.`;
+    // No CEC claim for an area: CEC hours are per-course IICRC approvals and appear only on the
+    // approved course's page (CLAUDE.md "CEC is fail-closed"). This sentence matches the
+    // homepage's sanctioned wording and is allow-listed verbatim in the test.
+    return `We prioritised ${area} courses. Where the IICRC has approved a course, its CEC hours are shown on the course page. You can switch discipline areas anytime in the catalogue.`;
   }
   if (g === 'career_change') {
     return `Starting with ${area} builds the practical foundations Australian restoration employers look for. Every CARSI credential is CARSI-issued; it is not an IICRC certification.`;
