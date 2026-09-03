@@ -47,6 +47,25 @@ const draftWhere = {
 
 export type DashboardCourseStatusFilter = 'all' | 'draft' | 'published';
 
+/**
+ * Who may see draft courses in the dashboard catalogue (WS1 fix 3, GP-542). Drafts are
+ * unfinished content; a learner must never see them. Only the two roles that author or
+ * administer courses may ask for `draft` or `all`. Anything else, including a missing or
+ * unreadable role, is a learner: fail closed.
+ */
+export function canSeeDraftCourses(role: string | null | undefined): boolean {
+  const r = typeof role === 'string' ? role.trim().toLowerCase() : '';
+  return r === 'admin' || r === 'instructor';
+}
+
+/** The status the catalogue will actually query: what was asked for, unless the caller may not see drafts. */
+export function effectiveDashboardCourseStatus(
+  requested: DashboardCourseStatusFilter,
+  role: string | null | undefined,
+): DashboardCourseStatusFilter {
+  return canSeeDraftCourses(role) ? requested : 'published';
+}
+
 function cecHoursLabelForRow(c: {
   slug: string;
   cecHours: number | null;
@@ -128,19 +147,27 @@ function mapDashboardCourseRow(c: {
 /**
  * Full LMS catalogue for `/dashboard/courses`: optional draft / published / all,
  * with module counts. Draft-only lists are ordered by most modules first.
+ *
+ * The caller's role is required, and the requested status is coerced here, not in the page:
+ * a session that may not see drafts gets the published list whatever it asked for, so no
+ * caller can leak draft rows by passing a filter through (WS1 fix 3, GP-542).
  */
 export async function getDashboardCourseListItemsFromDatabase(options: {
   status: DashboardCourseStatusFilter;
+  /** The session's role. Anything but admin or instructor sees published courses only. */
+  role: string | null | undefined;
 }): Promise<CourseListItem[]> {
   if (isBuildPhase() || !process.env.DATABASE_URL?.trim()) {
     return [];
   }
 
+  const status = effectiveDashboardCourseStatus(options.status, options.role);
+
   const countInclude = {
     _count: { select: { modules: true } },
   } as const;
 
-  if (options.status === 'draft') {
+  if (status === 'draft') {
     const rows = await prisma.lmsCourse.findMany({
       where: draftWhere,
       orderBy: { modules: { _count: 'desc' } },
@@ -149,7 +176,7 @@ export async function getDashboardCourseListItemsFromDatabase(options: {
     return rows.map(mapDashboardCourseRow);
   }
 
-  if (options.status === 'published') {
+  if (status === 'published') {
     const rows = await prisma.lmsCourse.findMany({
       where: publishedWhere,
       orderBy: { updatedAt: 'desc' },
