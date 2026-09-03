@@ -51,14 +51,10 @@ export function GoogleAnalytics() {
         src={`https://www.googletagmanager.com/gtag/js?id=${measurementId}`}
         strategy="afterInteractive"
       />
-      <Script id="ga4-bootstrap" strategy="afterInteractive">
-        {`
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){window.dataLayer.push(arguments);}
-          window.gtag = gtag;
-          gtag('js', new Date());
-        `}
-      </Script>
+      {/* The bootstrap is a static file, not inline: the strict Content-Security-Policy on
+          the signed-in app allows own-origin and nonced scripts only, and an inline
+          afterInteractive script never receives the nonce (GP-547, break 11). */}
+      <Script src="/ga-init.js" strategy="afterInteractive" />
     </>
   );
 }
