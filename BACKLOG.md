@@ -675,3 +675,72 @@ which defaults OFF, so nothing is live and the five existing Brisbane bookings a
   therefore continue rendering after its expiry date unless the founder manually changes its
   status. Current approvals remain valid until 2027 or 2028, so Track 1 is correct today; add an
   expiry-aware fail-closed resolver and positive-control test before the first 2027 expiry.
+
+## Discoveries — 2026-09-03 WS1 funnel walk (Cash and Channel Directive)
+
+Two stranger walks of carsi.com.au in an isolated browser with console and network capture:
+paid course to the live Stripe Checkout page (stopped before the card; the real purchase is the
+founder's), and a fresh free signup through to the lesson player with progress saved. Full break
+log with screenshots: `2nd Brain/Plans/carsi-cash-channel-directive-2026-09-03.md`. Fixed in this
+branch: the onboarding wizard's recommendation copy (see the commit). Everything below is filed,
+not fixed, in the order the next sessions should take it.
+
+- **Both licence guards are blind to the onboarding wizard.** `check:iicrc-terminology` and
+  `check:designations` both exited 0 while the wizard's final step branded its recommendation
+  with an IICRC designation title and acronym (the form: "<designation title> (<acronym>)") and a
+  goal option told learners a CEC course builds toward an IICRC discipline. The guards match the
+  selling-phrase form and the catalogue registry; server-side copy helpers such as
+  `src/lib/server/onboarding-pathway.ts` are outside both. A unit test now pins that file. Widening
+  the guard to server copy is a separate change and must not be folded into a fix.
+  Residual (round-4 review of the fix, 2026-09-03, P2): the wizard's submit path
+  (`submitOnboarding` calling `wizardResultFromResponse`) is covered as an exported pure
+  function; an inline raw-code fallback written back into `submitOnboarding` would not fail the
+  suite, and is reachable only if the onboarding route also stopped sending `pathway_label`.
+  Driving the real submit path needs a DOM test runner, and none is in the repo.
+
+- **The Content-Security-Policy blocks every course video.** `src/lib/security/csp.ts` allows
+  frames only from Stripe and sets no `media-src`, so the YouTube intro frame on course pages
+  renders a browser block page and the Cloudinary trailer mp4 shows "Unable to play media". The
+  YouTube migration merged on 29 Aug without a policy change. Fix: `frame-src` for
+  `https://www.youtube.com` and `https://www.youtube-nocookie.com` (both hosts are used in the
+  repo), `media-src 'self' https://res.cloudinary.com`, with a test that fails on today's policy
+  string. Do not widen `script-src` in the same change (DECISIONS #23).
+
+- **Learners see draft courses in the dashboard catalogue.** `app/(dashboard)/dashboard/courses`
+  applies the status filter for every role: a fresh free learner saw "112 courses", a Draft tab
+  and 32 cards badged DRAFT. Gate at the server call (`getDashboardCourseListItemsFromDatabase`
+  forced to published for non-admin, non-instructor sessions), not by hiding the tab.
+
+- **The paid quick-enrol form promises an account it does not create.** `GuestEnrolForm.tsx`
+  says "create your account and pay securely in one step" and collects a password, but only the
+  email and name reach `/api/lms/checkout`; the account is created on the success page after
+  payment, where the buyer is asked for a password again. A buyer who abandons checkout has no
+  account and sees "Invalid credentials" on sign-in. Copy and flow fix.
+
+- **Margot's open chat panel covers "Mark lesson complete".** The fixed bottom-right container in
+  `FloatingChat.tsx` (z-50) sits over the lesson footer; a click on the button lands on the panel.
+  The progress endpoint is fine (a direct trigger saved and advanced). Give the lesson footer
+  clearance or shrink the container to its visible children.
+
+- **Homepage still shows the July roadshow dates** in `HomeGrowthSection.tsx` and
+  `home-pathways.ts`. Same decision as DECISIONS #18; whichever way #18 goes, these two files
+  follow it.
+
+- **Wizard "Go to your dashboard" lands on the catalogue** filtered by discipline, under a
+  "$1,295/month + GST, unlimited learners" organisation-onboarding banner that means nothing to
+  an individual free learner.
+
+- **Hygiene:** one inline script is blocked by the strict policy inside the dashboard (hash
+  beginning `K0oifj+V`); every public page fires two 401s (`/api/auth/me`, `/api/auth/refresh`)
+  for anonymous visitors; the industry calendar renders no events because its backend `/api/events`
+  returns 404 while `/pricing` still lists a "Free Webinar Series".
+
+- **Observation:** 6 of the last 15 Stripe Checkout sessions expired unpaid.
+
+- **The `CRT` discipline code is labelled as carpet repair, but the IICRC's certifications page
+  (iicrc.org/iicrccertifications, read 2026-09-03) lists Carpet Repair and Reinstallation
+  Technician as RRT and gives CRT to Color Repair Technician.** `PATHWAY_LABELS` in
+  `src/lib/server/onboarding-pathway.ts` and the wizard's own-disciplines option `CRT — Carpet`
+  both carry the older pairing, and the catalogue filter key is the same string. A learner
+  recording their own discipline may be mislabelled. Data accuracy, not a licence claim: confirm
+  against the catalogue seed and fix the key or the label in one change. Filed, not fixed.

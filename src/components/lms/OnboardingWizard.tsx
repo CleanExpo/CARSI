@@ -2,152 +2,57 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Building2,
-  HardHat,
-  HeartPulse,
-  LandPlot,
-  Wrench,
-  Users,
-  Briefcase,
-  Sprout,
-  GraduationCap,
-  RefreshCw,
-  TrendingUp,
-  ArrowRight,
-  Calendar,
-  Bell,
-  BellOff,
-} from 'lucide-react';
+import { GraduationCap, ArrowRight, Calendar, Bell, BellOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { apiClient } from '@/lib/api/client';
+import { ONBOARDING_FLOW as FLOW } from '@/components/lms/onboarding-flow';
+import { pathwayLabel as areaLabelFor } from '@/lib/server/onboarding-pathway';
+
+/** What the recommendation screen shows. */
+export interface WizardResult {
+  pathway: string;
+  pathwayLabel: string;
+  description: string;
+  suggestedUrl: string;
+}
+
+/** The onboarding API response, as this component consumes it. */
+export interface OnboardingResponse {
+  recommended_pathway: string;
+  pathway_label?: string;
+  pathway_description: string;
+  suggested_courses_url: string;
+}
 
 interface OnboardingWizardProps {
   isOpen: boolean;
   onComplete: (destination: string) => void;
+  /** Open at this step (0-based). Production opens at 0; the licence test renders every step. */
+  initialStep?: number;
+  /** Open on the recommendation screen. Production never sets it; the licence test renders it. */
+  initialResult?: WizardResult;
+}
+
+/**
+ * Licence (CLAUDE.md "CARSI designation rule"): the headline is the discipline-area label the
+ * API sends. Should a response ever arrive without one, the code is mapped through the same
+ * label table the API uses, so a raw catalogue code can never reach the screen as the headline.
+ */
+export function wizardResultFromResponse(data: OnboardingResponse): WizardResult {
+  return {
+    pathway: data.recommended_pathway,
+    pathwayLabel: data.pathway_label ?? areaLabelFor(data.recommended_pathway),
+    description: data.pathway_description,
+    suggestedUrl: data.suggested_courses_url,
+  };
 }
 
 const POST_ONBOARDING_PATH = '/dashboard/student';
 
-interface AnswerCard {
-  value: string;
-  label: string;
-  icon: React.ReactNode;
-}
-
-type FlowItem =
-  | {
-      kind: 'single';
-      question: string;
-      key: 'industry' | 'role' | 'iicrc_experience' | 'primary_goal';
-      answers: AnswerCard[];
-    }
-  | {
-      kind: 'multi';
-      question: string;
-      key: 'disciplines_held';
-      options: { value: string; label: string }[];
-    }
-  | { kind: 'renewal'; question: string };
-
-const FLOW: FlowItem[] = [
-  {
-    kind: 'single',
-    question: "What's your industry?",
-    key: 'industry',
-    answers: [
-      {
-        value: 'restoration',
-        label: 'Restoration & Remediation',
-        icon: <Building2 className="h-6 w-6" />,
-      },
-      {
-        value: 'construction',
-        label: 'Construction & Trades',
-        icon: <HardHat className="h-6 w-6" />,
-      },
-      { value: 'healthcare', label: 'Healthcare', icon: <HeartPulse className="h-6 w-6" /> },
-      {
-        value: 'government',
-        label: 'Government & Defence',
-        icon: <LandPlot className="h-6 w-6" />,
-      },
-    ],
-  },
-  {
-    kind: 'single',
-    question: "What's your role?",
-    key: 'role',
-    answers: [
-      { value: 'technician', label: 'Field Technician', icon: <Wrench className="h-6 w-6" /> },
-      {
-        value: 'supervisor',
-        label: 'Supervisor / Team Leader',
-        icon: <Users className="h-6 w-6" />,
-      },
-      { value: 'owner', label: 'Business Owner', icon: <Briefcase className="h-6 w-6" /> },
-      {
-        value: 'new_to_industry',
-        label: 'New to the Industry',
-        icon: <Sprout className="h-6 w-6" />,
-      },
-    ],
-  },
-  {
-    kind: 'single',
-    question: 'IICRC experience?',
-    key: 'iicrc_experience',
-    answers: [
-      {
-        value: 'none',
-        label: 'No certifications yet',
-        icon: <GraduationCap className="h-6 w-6" />,
-      },
-      { value: 'some', label: 'Some training / exposure', icon: <RefreshCw className="h-6 w-6" /> },
-      {
-        value: 'certified',
-        label: 'Already IICRC certified',
-        icon: <TrendingUp className="h-6 w-6" />,
-      },
-    ],
-  },
-  {
-    kind: 'multi',
-    question: 'Which IICRC disciplines do you hold or plan to work in? Select all that apply.',
-    key: 'disciplines_held',
-    options: [
-      { value: 'WRT', label: 'WRT — Water' },
-      { value: 'CRT', label: 'CRT — Carpet' },
-      { value: 'ASD', label: 'ASD — Structural drying' },
-      { value: 'AMRT', label: 'AMRT — Microbial' },
-      { value: 'FSRT', label: 'FSRT — Fire & smoke' },
-      { value: 'OCT', label: 'OCT — Odour' },
-      { value: 'CCT', label: 'CCT — Carpet cleaning' },
-    ],
-  },
-  {
-    kind: 'single',
-    question: "What's your main goal?",
-    key: 'primary_goal',
-    answers: [
-      {
-        value: 'new_cert',
-        label: 'Build toward a new IICRC discipline (CEC courses)',
-        icon: <GraduationCap className="h-6 w-6" />,
-      },
-      { value: 'cec_renewal', label: 'Renew CECs', icon: <RefreshCw className="h-6 w-6" /> },
-      {
-        value: 'career_change',
-        label: 'Career change into the industry',
-        icon: <TrendingUp className="h-6 w-6" />,
-      },
-    ],
-  },
-  {
-    kind: 'renewal',
-    question: 'Renewal & reminders (optional)',
-  },
-];
+// Step data (questions, answer labels, icons) lives in ./onboarding-flow.tsx so the licence test
+// can import exactly what this component renders. The same test also renders THIS component at
+// every step and on the recommendation screen (initialStep / initialResult), so a label
+// rewritten inside the render below fails the suite too.
 
 const slideVariants = {
   enter: (direction: number) => ({
@@ -161,19 +66,19 @@ const slideVariants = {
   }),
 };
 
-export function OnboardingWizard({ isOpen, onComplete }: OnboardingWizardProps) {
-  const [step, setStep] = useState(0);
+export function OnboardingWizard({
+  isOpen,
+  onComplete,
+  initialStep = 0,
+  initialResult,
+}: OnboardingWizardProps) {
+  const [step, setStep] = useState(() => Math.min(Math.max(0, initialStep), FLOW.length - 1));
   const [direction, setDirection] = useState(1);
   const [answers, setAnswers] = useState<Record<string, string | string[]>>({});
   const [disciplines, setDisciplines] = useState<Set<string>>(new Set());
   const [renewalDate, setRenewalDate] = useState('');
   const [resumeReminder, setResumeReminder] = useState<'none' | 'email' | 'sms'>('none');
-  const [result, setResult] = useState<{
-    pathway: string;
-    pathwayLabel: string;
-    description: string;
-    suggestedUrl: string;
-  } | null>(null);
+  const [result, setResult] = useState<WizardResult | null>(initialResult ?? null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -237,18 +142,8 @@ export function OnboardingWizard({ isOpen, onComplete }: OnboardingWizardProps) 
     };
 
     try {
-      const data = await apiClient.post<{
-        recommended_pathway: string;
-        pathway_label?: string;
-        pathway_description: string;
-        suggested_courses_url: string;
-      }>('/api/lms/auth/onboarding', payload);
-      setResult({
-        pathway: data.recommended_pathway,
-        pathwayLabel: data.pathway_label ?? data.recommended_pathway,
-        description: data.pathway_description,
-        suggestedUrl: data.suggested_courses_url,
-      });
+      const data = await apiClient.post<OnboardingResponse>('/api/lms/auth/onboarding', payload);
+      setResult(wizardResultFromResponse(data));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong');
     } finally {

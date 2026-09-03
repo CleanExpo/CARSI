@@ -1,6 +1,11 @@
 /**
- * Maps first-session onboarding answers to a recommended IICRC pathway code and dashboard links.
+ * Maps first-session onboarding answers to a recommended discipline-area code and dashboard links.
  * Kept free of Prisma so it can run in the onboarding API route and tests.
+ *
+ * Licence (CLAUDE.md "CARSI designation rule"): the codes below are catalogue filter keys only.
+ * Rendered copy names a discipline AREA and never brands the recommendation with an IICRC
+ * Registered-Training-School designation title or acronym, and never implies a CARSI course
+ * builds toward an IICRC certification. Pinned by onboarding-pathway.test.ts.
  */
 
 export type OnboardingAnswersInput = {
@@ -13,21 +18,36 @@ export type OnboardingAnswersInput = {
 };
 
 const PATHWAY_LABELS: Record<string, string> = {
-  WRT: 'Water Damage Restoration Technician (WRT)',
-  ASD: 'Applied Structural Drying (ASD)',
-  CRT: 'Carpet Repair & Reinstallation (CRT)',
-  AMRT: 'Applied Microbial Remediation Technician (AMRT)',
-  FSRT: 'Fire & Smoke Restoration (FSRT)',
-  OCT: 'Odour Control Technician (OCT)',
-  CCT: 'Commercial Carpet Cleaning (CCT)',
+  WRT: 'Water damage restoration',
+  ASD: 'Applied structural drying',
+  CRT: 'Carpet repair and reinstallation',
+  AMRT: 'Microbial remediation',
+  FSRT: 'Fire and smoke restoration',
+  OCT: 'Odour control',
+  CCT: 'Commercial carpet cleaning',
 };
 
+/** The discipline-area codes this module knows how to name. Anything else is never rendered. */
+export const KNOWN_PATHWAY_CODES: readonly string[] = Object.keys(PATHWAY_LABELS);
+
+/** Rendered when a code is unknown, so raw input can never reach the screen as an acronym. */
+export const FALLBACK_PATHWAY_LABEL = 'Restoration fundamentals';
+
+/** Lower-case the first letter so a label reads naturally mid-sentence. */
+function inSentence(label: string): string {
+  return label.charAt(0).toLowerCase() + label.slice(1);
+}
+
+/**
+ * Only codes with a label survive. The route accepts arbitrary strings, so an unknown value
+ * (for example a code the wizard never offered) is dropped here rather than echoed back.
+ */
 function normalizeDisciplines(raw: unknown): string[] {
   if (!Array.isArray(raw)) return [];
   const out = new Set<string>();
   for (const x of raw) {
     const s = String(x).trim().toUpperCase();
-    if (/^[A-Z]{2,5}$/.test(s)) out.add(s);
+    if (s in PATHWAY_LABELS) out.add(s);
   }
   return [...out];
 }
@@ -59,7 +79,7 @@ export function resolveRecommendedPathwayCode(input: OnboardingAnswersInput): st
 }
 
 export function pathwayLabel(code: string): string {
-  return PATHWAY_LABELS[code] ?? code;
+  return PATHWAY_LABELS[code] ?? FALLBACK_PATHWAY_LABEL;
 }
 
 export function buildOnboardingDashboardUrls(args: {
@@ -76,11 +96,15 @@ export function buildOnboardingDashboardUrls(args: {
 
 export function pathwayDescription(pathwayCode: string, goal?: string): string {
   const g = goal ?? '';
+  const area = inSentence(pathwayLabel(pathwayCode));
   if (g === 'cec_renewal') {
-    return `We prioritised ${pathwayLabel(pathwayCode)} — a strong fit for continuing education credits. You can switch disciplines anytime in the catalogue.`;
+    // No CEC claim for an area: CEC hours are per-course IICRC approvals and appear only on the
+    // approved course's page (CLAUDE.md "CEC is fail-closed"). This sentence matches the
+    // homepage's sanctioned wording and is allow-listed verbatim in the test.
+    return `We prioritised ${area} courses. Where the IICRC has approved a course, its CEC hours are shown on the course page. You can switch discipline areas anytime in the catalogue.`;
   }
   if (g === 'career_change') {
-    return `Starting with ${pathwayLabel(pathwayCode)} builds foundational credentials recognised across restoration employers in Australia.`;
+    return `Starting with ${area} builds the practical foundations Australian restoration employers look for. Every CARSI credential is CARSI-issued; it is not an IICRC certification.`;
   }
-  return `Based on your selections, ${pathwayLabel(pathwayCode)} is a practical place to start. Browse the catalogue anytime to explore every discipline.`;
+  return `Based on your selections, ${area} is a practical place to start. Browse the catalogue anytime to explore every discipline area.`;
 }
