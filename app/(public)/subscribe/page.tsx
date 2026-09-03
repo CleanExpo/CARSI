@@ -28,16 +28,17 @@ const PLAN = {
   helper: 'That is about $66/month · GST included',
 };
 
-const PRO_FEATURES = [
+export const PRO_FEATURES = [
   '100% access to all published CARSI courses',
   'Beginner, intermediate, and advanced levels',
   'IICRC CEC courses where stated',
   'CEC tracking for completed eligible courses',
-  'Water Restoration Technician (WRT) courses',
-  'Carpet Cleaning Technician (CCT) courses',
-  'Odour Control Technician (OCT) courses',
-  'Applied Structural Drying (ASD) courses',
-  'Carpet Repair & Reinstallation (CRT) courses',
+  'Water damage restoration courses',
+  'Structural drying courses',
+  'Mould remediation courses',
+  'Fire and smoke restoration courses',
+  'Carpet and upholstery cleaning courses',
+  'Odour control courses',
   'PDF certificates for every course',
   'IICRC CEC tracking dashboard',
   'Monthly activity recognition (anonymous by default) & streak tracker',
