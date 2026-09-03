@@ -15,6 +15,7 @@ import { PublicNavbar } from '@/components/landing/PublicNavbar';
 import FloatingChatGate from '@/components/lms/FloatingChatGate';
 import { FAQSchema } from '@/components/seo/JsonLd';
 import type { CourseListItem } from '@/lib/course-list-item';
+import { upcomingRoadshowStops } from '@/lib/marketing/roadshow-stops';
 import {
   catalogueMetaDescription,
   formatCourseCountForCopy,
@@ -138,7 +139,7 @@ export default async function Home() {
       <HomeTestimonialsSection />
       <HomeCertificationsSection disciplineCountLabel={disciplineCountLabel} />
       <HomePricingSection subscriptionsEnabled={subscriptionsEnabled()} />
-      <HomeGrowthSection />
+      <HomeGrowthSection stops={upcomingRoadshowStops()} />
       <HomeFaqSection faqs={faqs} />
       <HomeIndustriesSection />
       <HomeFinalCtaSection />

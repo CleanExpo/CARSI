@@ -1,0 +1,24 @@
+name: Homepage cache purge at Brisbane midnight
+
+# Purges the homepage's ISR cache at 00:00 Brisbane time (14:00 UTC; Brisbane has no daylight
+# saving) so the Growth Days ticket never serves a roadshow stop after its last day (GP-545).
+# GitHub schedules can run late under load, so a second trigger ten minutes on covers a
+# delayed or missed first run; the purge is harmless to repeat.
+# Requires the repo secret CRON_SECRET that matches the app's CRON_SECRET env var.
+# If CRON_SECRET is not set on the app, the route returns 503 (fail-closed) and this job errors.
+
+on:
+  schedule:
+    - cron: '0 14 * * *' # 00:00 AEST daily
+    - cron: '10 14 * * *' # 00:10 AEST daily, covers a late or missed first run
+  workflow_dispatch: {}
+
+jobs:
+  revalidate-homepage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger homepage revalidation cron
+        run: |
+          curl -fsS --max-time 120 -X GET \
+            "https://carsi.com.au/api/cron/revalidate-homepage" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
