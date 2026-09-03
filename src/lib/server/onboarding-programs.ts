@@ -29,6 +29,19 @@ function onboardingWhere() {
   };
 }
 
+/**
+ * Individual learners never see the organisation programmes: a learner with no team and no
+ * enrolment gets nothing, which keeps the organisation spotlight (AUD 1,295 per month,
+ * unlimited learners) off every surface that lists programmes (GP-546). A team member sees
+ * every programme; anyone sees the programmes they are enrolled in.
+ */
+export function programsVisibleToLearner<T extends { enrolled: boolean }>(
+  rows: T[],
+  learner: { isTeamMember: boolean }
+): T[] {
+  return learner.isTeamMember ? rows : rows.filter((row) => row.enrolled);
+}
+
 export async function listOnboardingProgramsForUser(
   userId: string
 ): Promise<OnboardingProgramRow[]> {
@@ -60,8 +73,9 @@ export async function listOnboardingProgramsForUser(
           select: { lessonId: true },
         });
   const completedSet = new Set(progressRows.map((p) => p.lessonId));
+  const teamMemberships = await prisma.lmsTeamMember.count({ where: { userId } });
 
-  return courses
+  const rows = courses
     .filter((c) => isOnboardingCourse(c))
     .map((course) => {
       const enrollment = enrollmentByCourse.get(course.id);
@@ -92,6 +106,7 @@ export async function listOnboardingProgramsForUser(
         progressPercent,
       };
     });
+  return programsVisibleToLearner(rows, { isTeamMember: teamMemberships > 0 });
 }
 
 export async function getOnboardingCourseBySlug(slug: string) {
