@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { ONBOARDING_COOKIE } from '@/lib/auth/onboarding-cookie';
+import { SESSION_SENTINEL_COOKIE } from '@/lib/auth/session-sentinel';
 
 function clearSessionCookies(response: NextResponse) {
   const clearOptions = {
@@ -13,6 +14,7 @@ function clearSessionCookies(response: NextResponse) {
   response.cookies.set('auth_token', '', { ...clearOptions, httpOnly: true });
   response.cookies.set('carsi_token', '', { ...clearOptions, httpOnly: true });
   response.cookies.set(ONBOARDING_COOKIE, '', { ...clearOptions, httpOnly: true });
+  response.cookies.set(SESSION_SENTINEL_COOKIE, '', { ...clearOptions, httpOnly: false });
 
   return response;
 }
