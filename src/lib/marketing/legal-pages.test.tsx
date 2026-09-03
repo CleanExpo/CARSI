@@ -37,18 +37,35 @@ describe('refund policy and support pages', () => {
     expect(html).toContain('/refund-policy');
   });
 
-  it('the public footer links to both, so they are reachable from every public page', () => {
-    const html = renderToStaticMarkup(createElement(PublicFooter));
+  // PublicFooter renders one of two independent markup trees and defaults to
+  // 'chrome', but every current public caller passes tone="light"
+  // (app/page.tsx and app/(public)/layout.tsx). A test that renders only the
+  // default therefore proves nothing about the footer users actually see: an
+  // independent review deleted the light strip's two links and this suite still
+  // passed. Both variants are asserted separately, by name, so a deletion from
+  // either one fails.
+  const TONES = ['chrome', 'light'] as const;
+
+  it.each(TONES)('the %s footer links to both new pages', (tone) => {
+    const html = renderToStaticMarkup(createElement(PublicFooter, { tone }));
     expect(html).toContain('href="/refund-policy"');
     expect(html).toContain('href="/support"');
   });
 
-  it('the footer keeps its existing legal links', () => {
+  it.each(TONES)('the %s footer keeps its existing legal links', (tone) => {
     // Guards the edit itself: adding two links must not displace the two that
     // were already there.
-    const html = renderToStaticMarkup(createElement(PublicFooter));
+    const html = renderToStaticMarkup(createElement(PublicFooter, { tone }));
     expect(html).toContain('href="/privacy"');
     expect(html).toContain('href="/terms"');
+  });
+
+  it('the two footer variants really are distinct markup, so neither assertion is redundant', () => {
+    // If the variants ever collapse into one, the per-tone tests above stop
+    // being two checks and quietly become one. This fails when that happens.
+    const chrome = renderToStaticMarkup(createElement(PublicFooter, { tone: 'chrome' }));
+    const light = renderToStaticMarkup(createElement(PublicFooter, { tone: 'light' }));
+    expect(chrome).not.toEqual(light);
   });
 
   it('neither page links to a route that does not exist', () => {

@@ -91,8 +91,8 @@ export default function SupportPage() {
         <h2 className={marketingLegalH2}>Billing, invoices and refunds</h2>
         <ul className="list-disc space-y-2 pl-6">
           <li>
-            Tax invoices are emailed at purchase. Ask us if you need one reissued or addressed to
-            a company name.
+            Email us for a tax invoice, including one addressed to a company name, and we will
+            send it to you.
           </li>
           <li>
             Refunds are covered by our{' '}
