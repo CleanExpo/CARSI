@@ -53,7 +53,10 @@ export function EnterpriseLessonFooter({
   completed,
 }: Props) {
   return (
-    <div className="mt-10 space-y-6">
+    // WS1 fix 5 (GP-544): the whole footer clears Margot's launcher (pb-24) and, while the chat is
+    // open, its panel (the lesson-footer-nav rule in app/globals.css). Actions stay left-aligned so
+    // nothing sits under the bottom-right corner. Pinned by EnterpriseLessonFooter.test.tsx.
+    <div className="lesson-footer-nav mt-10 space-y-6 pb-24" data-testid="enterprise-lesson-footer">
       <div className={`${dash.panel} overflow-hidden`}>
         <div className="flex items-center gap-2 border-b border-slate-100 bg-slate-50/80 px-5 py-3">
           <StickyNote className="h-4 w-4 text-[#146fc2]" aria-hidden />
@@ -124,7 +127,7 @@ export function EnterpriseLessonFooter({
       <div
         className={cn(
           dash.panel,
-          'flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6',
+          'flex flex-col gap-4 p-5 sm:flex-row sm:flex-wrap sm:items-center sm:justify-start sm:gap-6 sm:p-6',
           completed && 'border-emerald-200 bg-emerald-50/30'
         )}
       >
@@ -150,7 +153,7 @@ export function EnterpriseLessonFooter({
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
-        <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+        <div className="flex flex-wrap items-center justify-start gap-2" data-testid="enterprise-lesson-actions">
           {showShare && onShare ? (
             <Button
               type="button"

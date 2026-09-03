@@ -12,6 +12,12 @@ import {
   isLmsClaimsAllowedAdminPanel,
 } from '@/lib/admin/admin-panel-access';
 import { isValidAdminSessionCookie } from '@/lib/admin/admin-session-edge';
+import {
+  SESSION_SENTINEL_COOKIE,
+  SESSION_SENTINEL_MAX_AGE,
+  sessionSentinelAction,
+  sessionSentinelCookieOptions,
+} from '@/lib/auth/session-sentinel';
 import type { SessionClaims } from '@/lib/auth/session-jwt';
 import { verifySessionToken } from '@/lib/auth/session-jwt';
 import { internalToolsEnabled, isInternalToolPath } from '@/lib/internal-tools';
@@ -93,6 +99,18 @@ export async function updateSession(request: NextRequest) {
       response.cookies.delete('auth_token');
       response.cookies.delete('carsi_token');
     }
+  }
+
+  // Keep the script-readable session sentinel in step with the verified session, so an
+  // anonymous browser knows not to ask /api/auth/me (GP-547, break 12). Only a change is
+  // written, so ordinary responses carry no Set-Cookie.
+  const requestHasSentinel = request.cookies.get(SESSION_SENTINEL_COOKIE)?.value === '1';
+  const sentinelAction = sessionSentinelAction(Boolean(user), requestHasSentinel);
+  if (sentinelAction !== 'keep') {
+    response.cookies.set(SESSION_SENTINEL_COOKIE, sentinelAction === 'set' ? '1' : '', {
+      ...sessionSentinelCookieOptions(process.env.NODE_ENV === 'production'),
+      maxAge: sentinelAction === 'set' ? SESSION_SENTINEL_MAX_AGE : 0,
+    });
   }
 
   /** Public credential verify — no login required (Phase 1). */

@@ -6,12 +6,9 @@ import { OnboardingSpotlight } from '@/components/onboarding/OnboardingSpotlight
 import { CourseGrid } from '@/components/lms/CourseGrid';
 import { CourseSearchBar } from '@/components/lms/CourseSearchBar';
 import { AcronymTooltip } from '@/components/ui/AcronymTooltip';
-import {
-  type DashboardCourseStatusFilter,
-  getDashboardCourseListItemsFromDatabase,
-} from '@/lib/server/public-courses-list';
+import { getDashboardCoursesForSession } from '@/lib/server/dashboard-courses';
 import { listOnboardingProgramsForUser } from '@/lib/server/onboarding-programs';
-import { getServerSessionClaims } from '@/lib/server/session-server';
+import type { DashboardCourseStatusFilter } from '@/lib/server/public-courses-list';
 
 export const dynamic = 'force-dynamic';
 
@@ -43,7 +40,12 @@ export default async function DashboardCoursesPage({
   searchParams: Promise<{ discipline?: string; status?: string }>;
 }) {
   const sp = await searchParams;
-  const status = parseStatus(sp.status);
+  // WS1 fix 3 (GP-542): a learner never sees draft courses. The session wrapper reads the role
+  // from the cookie itself and coerces the requested status; the page only decides whether to
+  // offer the filter at all. `status` below is the status actually queried.
+  const { claims, canSeeDrafts, status, courses } = await getDashboardCoursesForSession(
+    parseStatus(sp.status),
+  );
   const rawDiscipline = sp.discipline;
   const discipline =
     typeof rawDiscipline === 'string'
@@ -56,9 +58,7 @@ export default async function DashboardCoursesPage({
       ? discipline.trim().toUpperCase()
       : undefined;
 
-  const courses = await getDashboardCourseListItemsFromDatabase({ status });
   const total = courses.length;
-  const claims = await getServerSessionClaims();
   const onboardingPrograms =
     claims && process.env.DATABASE_URL?.trim()
       ? await listOnboardingProgramsForUser(claims.sub)
@@ -85,8 +85,10 @@ export default async function DashboardCoursesPage({
             Courses
           </h1>
           <p className="mt-2 text-sm text-slate-600">
-            {total} course{total !== 1 ? 's' : ''} — filter by catalogue status. Draft courses are
-            ordered with the most modules first.
+            {total} course{total !== 1 ? 's' : ''}
+            {canSeeDrafts
+              ? ' — filter by catalogue status. Draft courses are ordered with the most modules first.'
+              : ' in the catalogue.'}
           </p>
         </header>
 
@@ -100,40 +102,42 @@ export default async function DashboardCoursesPage({
           <CourseSearchBar />
         </div>
 
-        <div className="mb-6 flex flex-wrap gap-2" role="tablist" aria-label="Filter by publish status">
-          {(
-            [
-              { key: 'all' as const, label: 'All' },
-              { key: 'published' as const, label: 'Published' },
-              { key: 'draft' as const, label: 'Draft' },
-            ] as const
-          ).map(({ key, label }) => {
-            const active = status === key;
-            return (
-              <Link
-                key={key}
-                href={dashboardCoursesHref({ status: key, discipline })}
-                scroll={false}
-                className={filterBtn}
-                style={
-                  active
-                    ? {
-                        color: '#146fc2',
-                        background: '#eef7ff',
-                        border: '1px solid #b8dbfb',
-                      }
-                    : {
-                        color: '#475569',
-                        background: '#ffffff',
-                        border: '1px solid rgba(15,23,42,0.12)',
-                      }
-                }
-              >
-                {label}
-              </Link>
-            );
-          })}
-        </div>
+        {canSeeDrafts ? (
+          <div className="mb-6 flex flex-wrap gap-2" role="tablist" aria-label="Filter by publish status">
+            {(
+              [
+                { key: 'all' as const, label: 'All' },
+                { key: 'published' as const, label: 'Published' },
+                { key: 'draft' as const, label: 'Draft' },
+              ] as const
+            ).map(({ key, label }) => {
+              const active = status === key;
+              return (
+                <Link
+                  key={key}
+                  href={dashboardCoursesHref({ status: key, discipline })}
+                  scroll={false}
+                  className={filterBtn}
+                  style={
+                    active
+                      ? {
+                          color: '#146fc2',
+                          background: '#eef7ff',
+                          border: '1px solid #b8dbfb',
+                        }
+                      : {
+                          color: '#475569',
+                          background: '#ffffff',
+                          border: '1px solid rgba(15,23,42,0.12)',
+                        }
+                  }
+                >
+                  {label}
+                </Link>
+              );
+            })}
+          </div>
+        ) : null}
 
         <section className="mb-10">
           <div

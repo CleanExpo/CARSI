@@ -1,7 +1,8 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState, useSyncExternalStore } from 'react';
 import { authApi, type User } from '@/lib/api/auth';
+import { hasSessionSentinel } from '@/lib/auth/session-sentinel';
 
 interface AuthContextType {
   user: User | null;
@@ -17,19 +18,42 @@ const AuthContext = createContext<AuthContextType>({
   refreshUser: async () => {},
 });
 
+const subscribeToNothing = () => () => {};
+
+/**
+ * Whether the browser holds the session sentinel: null on the server and during hydration, so
+ * the first client render matches the server markup, then the cookie's answer.
+ */
+function useSessionSentinel(): boolean | null {
+  return useSyncExternalStore(
+    subscribeToNothing,
+    () => hasSessionSentinel(document.cookie),
+    () => null
+  );
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const sentinel = useSessionSentinel();
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [resolved, setResolved] = useState(false);
 
   useEffect(() => {
-    const getUser = async () => {
-      const currentUser = await authApi.getCurrentUser();
+    // An anonymous visitor (no sentinel) makes no auth request at all. The session cookies
+    // are httpOnly, so the sentinel is the only way the browser can know; before it, every
+    // public page cost two 401s (/api/auth/me, then the client's automatic /api/auth/refresh).
+    if (sentinel !== true) return;
+    let cancelled = false;
+    authApi.getCurrentUser().then((currentUser) => {
+      if (cancelled) return;
       setUser(currentUser);
-      setLoading(false);
+      setResolved(true);
+    });
+    return () => {
+      cancelled = true;
     };
+  }, [sentinel]);
 
-    getUser();
-  }, []);
+  const loading = sentinel === null ? true : sentinel ? !resolved : false;
 
   const signOut = async () => {
     await authApi.logout();
