@@ -5,7 +5,6 @@ import './globals.css';
 import { AppToastProvider } from '@/hooks/use-toast';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics';
-import { ConvaiWidget } from '@/components/support/ConvaiWidget';
 import { AuthProvider } from '@/components/auth/auth-provider';
 import { OrganizationSchema, WebsiteSchema } from '@/components/seo';
 import { ServiceWorkerRegistration } from '@/components/lms/ServiceWorkerRegistration';
@@ -131,7 +130,6 @@ export default function RootLayout({
           </ThemeProvider>
         </AuthProvider>
         <GoogleAnalytics />
-        <ConvaiWidget />
       </body>
     </html>
   );
