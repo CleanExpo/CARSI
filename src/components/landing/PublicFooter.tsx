@@ -281,7 +281,7 @@ export function PublicFooter({ tone = 'chrome' }: { tone?: 'chrome' | 'light' } 
               href="/refund-policy"
               className="font-medium text-white/65 underline-offset-2 transition-colors hover:text-white hover:underline"
             >
-              Refunds
+              Refund policy
             </Link>
             {' · '}
             <Link
@@ -531,7 +531,7 @@ function LightFooter() {
               href="/refund-policy"
               className="font-medium text-slate-600 underline-offset-2 transition-colors hover:text-[#146fc2] hover:underline"
             >
-              Refunds
+              Refund policy
             </Link>
             {' · '}
             <Link
