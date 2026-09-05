@@ -4,6 +4,7 @@ import {
   hasSessionSentinel,
   SESSION_SENTINEL_COOKIE,
   SESSION_SENTINEL_MAX_AGE,
+  SESSION_SENTINEL_VALUE,
   sessionSentinelAction,
   sessionSentinelCookieOptions,
 } from './session-sentinel';
@@ -51,5 +52,7 @@ describe('the sentinel cookie itself', () => {
     expect(sessionSentinelCookieOptions(false).secure).toBe(false);
     expect(SESSION_SENTINEL_MAX_AGE).toBe(60 * 60 * 24 * 7);
     expect(SESSION_SENTINEL_COOKIE).toBe('carsi_session');
+    expect(SESSION_SENTINEL_VALUE).toBe('1');
+    expect(SESSION_SENTINEL_VALUE).not.toMatch(/eyJ|[A-Za-z0-9_-]{20,}/);
   });
 });
