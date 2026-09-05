@@ -15,6 +15,12 @@ import {
 import { trackFunnelEvent } from '@/lib/analytics/track-funnel-event';
 import { TurnstileWidget } from '@/components/security/TurnstileWidget';
 
+/** Fail-closed client check: empty or space-only email never reaches checkout or free enrol. */
+export function guestEnrolEmailIsUsable(value: string): boolean {
+  const email = value.trim();
+  return email.includes('@') && email.length >= 3 && !email.includes(' ');
+}
+
 type Props = {
   slug: string;
   priceAud: number;
@@ -38,6 +44,10 @@ export function GuestEnrolForm({ slug, priceAud, isFree, showTeamOption = false 
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!guestEnrolEmailIsUsable(email)) {
+      setError('Enter a valid email address.');
+      return;
+    }
     setLoading(true);
     setError(null);
 
