@@ -15,7 +15,8 @@ import { getServerSessionClaims } from '@/lib/server/session-server';
  * cannot ask for drafts on a learner's behalf by passing the wrong role. The list module's own
  * coercion runs again underneath with the same role (defence in depth). Kept out of
  * public-courses-list.ts because that module also serves the sitemap, the homepage and the
- * public catalogue, which must not touch request-scoped cookies.
+ * public catalogue, which must not touch request-scoped cookies. The list call is already
+ * bounded (`CATALOGUE_QUERY_CAP`); this wrapper does not add a second query.
  */
 export interface DashboardCoursesForSession {
   claims: SessionClaims | null;
