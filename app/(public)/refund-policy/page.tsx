@@ -122,7 +122,7 @@ export default function RefundPolicyPage() {
           <li>We acknowledge refund requests within 2 business days.</li>
           <li>Approved refunds are returned to the original payment method.</li>
           <li>
-            Your bank or card issuer usually takes a further 5&ndash;10 business days to show the
+            Your bank or card issuer usually takes a further 5 to 10 business days to show the
             money in your account.
           </li>
         </ul>
