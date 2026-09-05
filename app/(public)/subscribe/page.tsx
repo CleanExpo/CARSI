@@ -31,7 +31,7 @@ const PLAN = {
 export const PRO_FEATURES = [
   '100% access to all published CARSI courses',
   'Beginner, intermediate, and advanced levels',
-  'IICRC CEC courses where stated',
+  'IICRC CEC Accredited courses where stated',
   'CEC tracking for completed eligible courses',
   'Water damage restoration courses',
   'Structural drying courses',
@@ -40,7 +40,7 @@ export const PRO_FEATURES = [
   'Carpet and upholstery cleaning courses',
   'Odour control courses',
   'PDF certificates for every course',
-  'IICRC CEC tracking dashboard',
+  'CEC tracking dashboard',
   'Monthly activity recognition (anonymous by default) & streak tracker',
   'Priority email support',
 ];
