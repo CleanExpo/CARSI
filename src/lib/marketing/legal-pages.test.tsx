@@ -29,12 +29,17 @@ describe('refund policy and support pages', () => {
     // sentence is ever edited away the page stops doing its legal job.
     expect(html).toContain('Australian');
     expect(html).toContain('Consumer Law');
+    expect(html).toContain('5 to 10 business days');
+    expect(html).not.toContain('5–10');
+    expect(html).not.toContain('5&ndash;10');
   });
 
   it('the support route renders and routes billing questions to the refund policy', () => {
     const html = renderToStaticMarkup(createElement(SupportPage));
     expect(html).toContain('Support');
     expect(html).toContain('/refund-policy');
+    expect(html).toContain('Australian Consumer Law');
+    expect(html).toContain('IICRC CEC Accredited');
   });
 
   // PublicFooter renders one of two independent markup trees and defaults to
@@ -50,6 +55,7 @@ describe('refund policy and support pages', () => {
     const html = renderToStaticMarkup(createElement(PublicFooter, { tone }));
     expect(html).toContain('href="/refund-policy"');
     expect(html).toContain('href="/support"');
+    expect(html).toContain('Refund policy');
   });
 
   it.each(TONES)('the %s footer keeps its existing legal links', (tone) => {
