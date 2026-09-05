@@ -116,6 +116,7 @@ function TypingIndicator() {
   );
 }
 
+/** First-party LMS chat only — the Convai voice widget is not mounted (DECISIONS #23). */
 export default function FloatingChat() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -479,7 +480,6 @@ export default function FloatingChat() {
     if (!text || loading) return;
 
     const userMsg: Message = {
-      // eslint-disable-next-line react-hooks/purity -- event handler, not render; pre-existing rule promotion, behaviour-preserving suppression
       id: `u-${Date.now()}`,
       role: 'user',
       text,
