@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 
-import { GuestEnrolForm } from './GuestEnrolForm';
+import { GuestEnrolForm, guestEnrolEmailIsUsable } from './GuestEnrolForm';
 
 /**
  * WS1 fix 4 (GP-543, directive break 6). Observed live on carsi.com.au on 2026-09-03: the paid
@@ -88,6 +88,14 @@ describe('GuestEnrolForm: the promise, the fields and the button all match what 
     expect(text).toMatch(/after payment/i);
     expect(html).not.toContain('id="guest-password"');
     expect(text).toContain('Continue to pay — $149 AUD');
+  });
+
+  it('empty or broken email never reaches a request', () => {
+    expect(guestEnrolEmailIsUsable('')).toBe(false);
+    expect(guestEnrolEmailIsUsable('   ')).toBe(false);
+    expect(guestEnrolEmailIsUsable('not-an-email')).toBe(false);
+    expect(guestEnrolEmailIsUsable('a b@carsi.com.au')).toBe(false);
+    expect(guestEnrolEmailIsUsable('buyer@carsi.com.au')).toBe(true);
   });
 
   it('positive control: the pre-fix paid copy fails the paid checks', () => {
