@@ -22,7 +22,6 @@ export function buildContentSecurityPolicy(opts: {
     strict ? `'nonce-${nonce}'` : "'unsafe-inline'",
     'https://js.stripe.com',
     'https://www.googletagmanager.com',
-    'https://cdn.jsdelivr.net',
     ...(isDev ? ["'unsafe-eval'"] : []),
   ];
 
