@@ -99,7 +99,8 @@ export default function SupportPage() {
             <Link href="/refund-policy" className={marketingLink}>
               Refund Policy
             </Link>
-            , which sits alongside your rights under the Australian Consumer Law.
+            . Those terms sit alongside the Australian Consumer Law guarantees that apply to every
+            course purchase, whether or not a membership is active.
           </li>
           <li>
             Buying for a team: contact us for seat pricing rather than buying courses one at a
