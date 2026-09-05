@@ -9,6 +9,12 @@
  */
 export const SESSION_SENTINEL_COOKIE = 'carsi_session';
 
+/**
+ * The only value this cookie may ever hold. It is a presence flag, never a token, JWT,
+ * session id, or role. Anything else is treated as absent.
+ */
+export const SESSION_SENTINEL_VALUE = '1';
+
 /** Matches the session cookies' lifetime (seven days). */
 export const SESSION_SENTINEL_MAX_AGE = 60 * 60 * 24 * 7;
 
@@ -42,5 +48,5 @@ export function sessionSentinelCookieOptions(isProduction: boolean) {
 export function hasSessionSentinel(cookieHeader: string): boolean {
   return cookieHeader
     .split(';')
-    .some((part) => part.trim() === `${SESSION_SENTINEL_COOKIE}=1`);
+    .some((part) => part.trim() === `${SESSION_SENTINEL_COOKIE}=${SESSION_SENTINEL_VALUE}`);
 }
