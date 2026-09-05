@@ -46,6 +46,8 @@ const staticPages = [
   { path: '/pricing', priority: 0.7, changeFreq: 'monthly' as const },
   { path: '/privacy', priority: 0.25, changeFreq: 'yearly' as const },
   { path: '/terms', priority: 0.25, changeFreq: 'yearly' as const },
+  { path: '/refund-policy', priority: 0.35, changeFreq: 'yearly' as const },
+  { path: '/support', priority: 0.4, changeFreq: 'monthly' as const },
   { path: authorityPath, priority: 0.82, changeFreq: 'weekly' as const },
   { path: ccwRoadshowPath, priority: 0.9, changeFreq: 'daily' as const },
   { path: '/ccw-melbourne', priority: 0.85, changeFreq: 'daily' as const },
