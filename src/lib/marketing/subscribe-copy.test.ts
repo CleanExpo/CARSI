@@ -46,6 +46,13 @@ describe('yearly membership inclusions copy', () => {
     }
   });
 
+  it('CEC selling copy uses the accredited-provider form, never a course-level IICRC claim', () => {
+    expect(PRO_FEATURES).toContain('IICRC CEC Accredited courses where stated');
+    expect(PRO_FEATURES).toContain('CEC tracking dashboard');
+    expect(PRO_FEATURES.join('\n')).not.toMatch(/IICRC CEC courses\b/);
+    expect(PRO_FEATURES).not.toContain('IICRC CEC tracking dashboard');
+  });
+
   it('the list still describes the catalogue by CARSI course area', () => {
     // Each area has at least one course on the live catalogue (crawl of 04/09/2026).
     for (const area of [
