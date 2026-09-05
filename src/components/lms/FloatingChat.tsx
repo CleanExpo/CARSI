@@ -1,12 +1,6 @@
 'use client';
 
-import {
-  animate,
-  AnimatePresence,
-  motion,
-  useDragControls,
-  useMotionValue,
-} from 'framer-motion';
+import { animate, AnimatePresence, motion, useDragControls, useMotionValue } from 'framer-motion';
 import {
   ChevronDown,
   GripVertical,
@@ -18,24 +12,18 @@ import {
   X,
 } from 'lucide-react';
 import { usePathname, useSearchParams } from 'next/navigation';
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  useSyncExternalStore,
-} from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 
 import { MargotAvatar } from '@/components/margot/MargotAvatar';
 import { MargotChatLauncher } from '@/components/margot/MargotChatLauncher';
 import { MargotMessageContent } from '@/components/margot/MargotMessageContent';
+import { ASSISTANT_DISCLAIMER } from '@/lib/assistant-disclaimer';
+import { deriveChatPageContext } from '@/lib/chat-page-context';
 import {
   playMargotMp3Blob,
   stopMargotAudio,
   unlockMargotAudio,
 } from '@/lib/client/margot-audio-player';
-import { ASSISTANT_DISCLAIMER } from '@/lib/assistant-disclaimer';
 import {
   clampOffsetToViewport,
   clampRectShift,
@@ -49,7 +37,6 @@ import {
   ACTION_TRAILER_PREFIX,
   type ActionProposalFrame,
 } from '@/lib/frontdesk-protocol';
-import { deriveChatPageContext } from '@/lib/chat-page-context';
 import {
   MARGOT_ACCENT,
   MARGOT_DISPLAY_NAME,
@@ -61,8 +48,7 @@ const CONVERSATION_STORAGE_KEY = 'carsi-margot-conversation-id';
 
 const ASSISTANT_NAME = MARGOT_DISPLAY_NAME;
 const ASSISTANT_TAGLINE = MARGOT_ROLE_LABEL;
-const WELCOME_MESSAGE =
-  process.env.NEXT_PUBLIC_AI_ASSISTANT_WELCOME?.trim() || MARGOT_WELCOME;
+const WELCOME_MESSAGE = process.env.NEXT_PUBLIC_AI_ASSISTANT_WELCOME?.trim() || MARGOT_WELCOME;
 
 interface Message {
   id: string;
@@ -543,7 +529,9 @@ export default function FloatingChat() {
           // only the text before it is the visible message.
           const sep = acc.indexOf(ACTION_SENTINEL);
           const visible = sep === -1 ? acc : acc.slice(0, sep);
-          setMessages((prev) => prev.map((m) => (m.id === assistantId ? { ...m, text: visible } : m)));
+          setMessages((prev) =>
+            prev.map((m) => (m.id === assistantId ? { ...m, text: visible } : m))
+          );
         }
         const sepIdx = acc.indexOf(ACTION_SENTINEL);
         const finalVisible = (sepIdx === -1 ? acc : acc.slice(0, sepIdx)).trim();
@@ -551,7 +539,10 @@ export default function FloatingChat() {
           setMessages((prev) =>
             prev.map((m) =>
               m.id === assistantId
-                ? { ...m, text: "I'm not sure how to answer that right now. Please try rephrasing your question." }
+                ? {
+                    ...m,
+                    text: "I'm not sure how to answer that right now. Please try rephrasing your question.",
+                  }
                 : m
             )
           );
@@ -565,7 +556,9 @@ export default function FloatingChat() {
             try {
               const frame = JSON.parse(jsonStr) as ActionProposalFrame;
               setMessages((prev) =>
-                prev.map((m) => (m.id === assistantId ? { ...m, action: frame, actionState: 'idle' } : m))
+                prev.map((m) =>
+                  m.id === assistantId ? { ...m, action: frame, actionState: 'idle' } : m
+                )
               );
             } catch {
               // malformed trailer — ignore, the text answer still stands
@@ -607,7 +600,9 @@ export default function FloatingChat() {
   // Execute a confirm-gated action: the only path that turns Margot's proposal
   // into a real write, gated by this explicit user click + a server-verified token.
   async function confirmAction(messageId: string, token: string) {
-    setMessages((prev) => prev.map((m) => (m.id === messageId ? { ...m, actionState: 'sending' } : m)));
+    setMessages((prev) =>
+      prev.map((m) => (m.id === messageId ? { ...m, actionState: 'sending' } : m))
+    );
     try {
       const res = await fetch('/api/margot/action/confirm', {
         method: 'POST',
@@ -615,13 +610,19 @@ export default function FloatingChat() {
         body: JSON.stringify({ token }),
       });
       if (res.ok) {
-        setMessages((prev) => prev.map((m) => (m.id === messageId ? { ...m, actionState: 'done' } : m)));
+        setMessages((prev) =>
+          prev.map((m) => (m.id === messageId ? { ...m, actionState: 'done' } : m))
+        );
       } else {
         const data = (await res.json().catch(() => ({}))) as { detail?: string };
         setMessages((prev) =>
           prev.map((m) =>
             m.id === messageId
-              ? { ...m, actionState: 'error', actionResult: data.detail ?? 'Could not send. Please try again.' }
+              ? {
+                  ...m,
+                  actionState: 'error',
+                  actionResult: data.detail ?? 'Could not send. Please try again.',
+                }
               : m
           )
         );
@@ -629,7 +630,9 @@ export default function FloatingChat() {
     } catch {
       setMessages((prev) =>
         prev.map((m) =>
-          m.id === messageId ? { ...m, actionState: 'error', actionResult: 'Connection error. Please try again.' } : m
+          m.id === messageId
+            ? { ...m, actionState: 'error', actionResult: 'Connection error. Please try again.' }
+            : m
         )
       );
     }
@@ -637,7 +640,9 @@ export default function FloatingChat() {
 
   function dismissAction(messageId: string) {
     setMessages((prev) =>
-      prev.map((m) => (m.id === messageId ? { ...m, action: undefined, actionState: undefined } : m))
+      prev.map((m) =>
+        m.id === messageId ? { ...m, action: undefined, actionState: undefined } : m
+      )
     );
   }
 
@@ -661,273 +666,279 @@ export default function FloatingChat() {
         style={{ x: posX, y: posY }}
         className="fixed right-3 bottom-3 z-50 flex flex-col items-end gap-2 sm:right-6 sm:bottom-6"
       >
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            key="chat-panel"
-            initial={{ opacity: 0, scale: 0.94, y: 16 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.94, y: 16 }}
-            transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
-            className="flex w-[min(100vw-1.5rem,420px)] flex-col overflow-hidden rounded-2xl border border-white/[0.1] shadow-[0_24px_80px_rgba(0,0,0,0.55)]"
-            style={{ height: 'min(560px, calc(100vh - 5.5rem))', background: '#060a14' }}
-          >
-            <div
-              onPointerDown={handleHeaderPointerDown}
-              className={`flex shrink-0 items-center justify-between gap-2 border-b border-white/[0.08] px-4 py-3.5${
-                canDrag ? ' cursor-grab select-none active:cursor-grabbing' : ''
-              }`}
-              style={{
-                background:
-                  'linear-gradient(180deg, rgba(36,144,237,0.14) 0%, rgba(6,10,20,0.98) 100%)',
-                ...(canDrag ? { touchAction: 'none' } : null),
-              }}
+        <AnimatePresence>
+          {open && (
+            <motion.div
+              key="chat-panel"
+              initial={{ opacity: 0, scale: 0.94, y: 16 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.94, y: 16 }}
+              transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
+              className="flex w-[min(100vw-1.5rem,420px)] flex-col overflow-hidden rounded-2xl border border-white/[0.1] shadow-[0_24px_80px_rgba(0,0,0,0.55)]"
+              style={{ height: 'min(560px, calc(100vh - 5.5rem))', background: '#060a14' }}
             >
-              <div className="flex min-w-0 items-center gap-3">
-                <MargotAvatar size={44} showStatus />
-                <div className="min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <span className="truncate text-[15px] font-semibold tracking-tight text-white/95">
-                      {ASSISTANT_NAME}
-                    </span>
-                    <Sparkles className="h-3.5 w-3.5 shrink-0 text-amber-400/90" aria-hidden />
-                  </div>
-                  <p className="truncate text-[11px] leading-tight text-white/50">
-                    {ASSISTANT_TAGLINE}
-                  </p>
-                  {focusSubtitle ? (
-                    <p
-                      className="mt-0.5 truncate text-[10px] text-[#7ec5ff]/85"
-                      title={focusSubtitle}
-                    >
-                      {focusSubtitle}
+              <div
+                onPointerDown={handleHeaderPointerDown}
+                className={`flex shrink-0 items-center justify-between gap-2 border-b border-white/[0.08] px-4 py-3.5${
+                  canDrag ? ' cursor-grab select-none active:cursor-grabbing' : ''
+                }`}
+                style={{
+                  background:
+                    'linear-gradient(180deg, rgba(36,144,237,0.14) 0%, rgba(6,10,20,0.98) 100%)',
+                  ...(canDrag ? { touchAction: 'none' } : null),
+                }}
+              >
+                <div className="flex min-w-0 items-center gap-3">
+                  <MargotAvatar size={44} showStatus />
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <span className="truncate text-[15px] font-semibold tracking-tight text-white/95">
+                        {ASSISTANT_NAME}
+                      </span>
+                      <Sparkles className="h-3.5 w-3.5 shrink-0 text-amber-400/90" aria-hidden />
+                    </div>
+                    <p className="truncate text-[11px] leading-tight text-white/50">
+                      {ASSISTANT_TAGLINE}
                     </p>
-                  ) : null}
+                    {focusSubtitle ? (
+                      <p
+                        className="mt-0.5 truncate text-[10px] text-[#7ec5ff]/85"
+                        title={focusSubtitle}
+                      >
+                        {focusSubtitle}
+                      </p>
+                    ) : null}
+                  </div>
                 </div>
-              </div>
-              <div className="flex shrink-0 items-center gap-0.5">
-                {canDrag ? (
+                <div className="flex shrink-0 items-center gap-0.5">
+                  {canDrag ? (
+                    <button
+                      type="button"
+                      data-drag-handle
+                      onDoubleClick={resetPosition}
+                      onKeyDown={handleGripKeyDown}
+                      className="cursor-grab rounded-lg p-2 text-white/35 transition-colors hover:bg-white/[0.06] hover:text-white/75 active:cursor-grabbing"
+                      aria-label="Move chat"
+                      title="Drag to move · double-click to reset position (arrow keys nudge, Home resets)"
+                    >
+                      <GripVertical size={16} />
+                    </button>
+                  ) : null}
                   <button
                     type="button"
-                    data-drag-handle
-                    onDoubleClick={resetPosition}
-                    onKeyDown={handleGripKeyDown}
-                    className="cursor-grab rounded-lg p-2 text-white/35 transition-colors hover:bg-white/[0.06] hover:text-white/75 active:cursor-grabbing"
-                    aria-label="Move chat"
-                    title="Drag to move · double-click to reset position (arrow keys nudge, Home resets)"
+                    onClick={() => resetChat()}
+                    className="rounded-lg p-2 text-white/35 transition-colors hover:bg-white/[0.06] hover:text-white/75"
+                    aria-label="Reset conversation"
+                    title="New chat"
                   >
-                    <GripVertical size={16} />
+                    <RotateCcw size={16} />
                   </button>
-                ) : null}
-                <button
-                  type="button"
-                  onClick={() => resetChat()}
-                  className="rounded-lg p-2 text-white/35 transition-colors hover:bg-white/[0.06] hover:text-white/75"
-                  aria-label="Reset conversation"
-                  title="New chat"
-                >
-                  <RotateCcw size={16} />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setOpen(false)}
-                  className="rounded-lg p-2 text-white/40 transition-colors hover:bg-white/[0.06] hover:text-white/85"
-                  aria-label="Close chat"
-                >
-                  <X size={16} />
-                </button>
-              </div>
-            </div>
-
-            {showSuggested && (
-              <div className="shrink-0 border-b border-white/[0.06] px-3 py-2">
-                <p className="text-[11px] leading-snug text-amber-200/70">{ASSISTANT_DISCLAIMER}</p>
-              </div>
-            )}
-
-            {showSuggested && (
-              <div className="shrink-0 space-y-1.5 border-b border-white/[0.06] px-3 py-2.5">
-                <p className="text-[10px] font-medium tracking-wide text-white/35 uppercase">
-                  Try asking
-                </p>
-                <div className="flex flex-wrap gap-1.5">
-                  {SUGGESTED_PROMPTS.map((p) => (
-                    <button
-                      key={p}
-                      type="button"
-                      onClick={() => void sendMessage(p)}
-                      disabled={loading}
-                      className="rounded-lg border border-white/[0.08] bg-white/[0.04] px-2.5 py-1.5 text-left text-[11px] leading-snug text-white/65 transition-colors hover:border-[#2490ed]/40 hover:bg-[#2490ed]/10 hover:text-white/90 disabled:opacity-40"
-                    >
-                      {p}
-                    </button>
-                  ))}
+                  <button
+                    type="button"
+                    onClick={() => setOpen(false)}
+                    className="rounded-lg p-2 text-white/40 transition-colors hover:bg-white/[0.06] hover:text-white/85"
+                    aria-label="Close chat"
+                  >
+                    <X size={16} />
+                  </button>
                 </div>
               </div>
-            )}
 
-            <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-3 py-4 sm:px-4">
-              {messages.map((msg) =>
-                msg.role === 'user' ? (
-                  <div key={msg.id} className="flex justify-end">
-                    <div
-                      className="max-w-[85%] rounded-2xl rounded-br-md px-3.5 py-2.5 text-sm leading-relaxed text-white shadow-md"
-                      style={{ background: MARGOT_ACCENT }}
-                    >
-                      <span className="whitespace-pre-wrap">{msg.text}</span>
-                    </div>
+              {showSuggested && (
+                <div className="shrink-0 border-b border-white/[0.06] px-3 py-2">
+                  <p className="text-[11px] leading-snug text-amber-200/70">
+                    {ASSISTANT_DISCLAIMER}
+                  </p>
+                </div>
+              )}
+
+              {showSuggested && (
+                <div className="shrink-0 space-y-1.5 border-b border-white/[0.06] px-3 py-2.5">
+                  <p className="text-[10px] font-medium tracking-wide text-white/35 uppercase">
+                    Try asking
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {SUGGESTED_PROMPTS.map((p) => (
+                      <button
+                        key={p}
+                        type="button"
+                        onClick={() => void sendMessage(p)}
+                        disabled={loading}
+                        className="rounded-lg border border-white/[0.08] bg-white/[0.04] px-2.5 py-1.5 text-left text-[11px] leading-snug text-white/65 transition-colors hover:border-[#2490ed]/40 hover:bg-[#2490ed]/10 hover:text-white/90 disabled:opacity-40"
+                      >
+                        {p}
+                      </button>
+                    ))}
                   </div>
-                ) : (
-                  <div key={msg.id} className="flex items-end gap-2">
-                    <MargotAvatar size={28} variant="inline" className="mb-5 hidden sm:block" />
-                    <div className="min-w-0 max-w-[calc(100%-2rem)] flex-1 rounded-2xl rounded-bl-md border border-white/[0.07] bg-white/[0.045] px-3.5 py-2.5 sm:max-w-[92%]">
-                      <MargotMessageContent text={msg.text} />
-                      {msg.action && msg.actionState !== 'done' ? (
-                        <div className="mt-3 rounded-xl border border-white/10 bg-white/[0.05] p-3">
-                          <p className="text-xs leading-relaxed text-white/70">{msg.action.summary}</p>
-                          {msg.actionState === 'error' ? (
-                            <p className="mt-1.5 text-xs text-red-300">{msg.actionResult}</p>
-                          ) : null}
-                          <div className="mt-2.5 flex gap-2">
-                            <button
-                              type="button"
-                              disabled={msg.actionState === 'sending'}
-                              onClick={() => msg.action && void confirmAction(msg.id, msg.action.token)}
-                              className="rounded-lg px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-opacity disabled:cursor-not-allowed disabled:opacity-50"
-                              style={{ background: MARGOT_ACCENT }}
-                            >
-                              {msg.actionState === 'sending' ? 'Sending…' : 'Confirm'}
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => dismissAction(msg.id)}
-                              className="rounded-lg border border-white/10 px-3 py-1.5 text-xs font-medium text-white/60 transition-colors hover:bg-white/[0.04] hover:text-white/80"
-                            >
-                              Dismiss
-                            </button>
+                </div>
+              )}
+
+              <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-3 py-4 sm:px-4">
+                {messages.map((msg) =>
+                  msg.role === 'user' ? (
+                    <div key={msg.id} className="flex justify-end">
+                      <div
+                        className="max-w-[85%] rounded-2xl rounded-br-md px-3.5 py-2.5 text-sm leading-relaxed text-white shadow-md"
+                        style={{ background: MARGOT_ACCENT }}
+                      >
+                        <span className="whitespace-pre-wrap">{msg.text}</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div key={msg.id} className="flex items-end gap-2">
+                      <MargotAvatar size={28} variant="inline" className="mb-5 hidden sm:block" />
+                      <div className="max-w-[calc(100%-2rem)] min-w-0 flex-1 rounded-2xl rounded-bl-md border border-white/[0.07] bg-white/[0.045] px-3.5 py-2.5 sm:max-w-[92%]">
+                        <MargotMessageContent text={msg.text} />
+                        {msg.action && msg.actionState !== 'done' ? (
+                          <div className="mt-3 rounded-xl border border-white/10 bg-white/[0.05] p-3">
+                            <p className="text-xs leading-relaxed text-white/70">
+                              {msg.action.summary}
+                            </p>
+                            {msg.actionState === 'error' ? (
+                              <p className="mt-1.5 text-xs text-red-300">{msg.actionResult}</p>
+                            ) : null}
+                            <div className="mt-2.5 flex gap-2">
+                              <button
+                                type="button"
+                                disabled={msg.actionState === 'sending'}
+                                onClick={() =>
+                                  msg.action && void confirmAction(msg.id, msg.action.token)
+                                }
+                                className="rounded-lg px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-opacity disabled:cursor-not-allowed disabled:opacity-50"
+                                style={{ background: MARGOT_ACCENT }}
+                              >
+                                {msg.actionState === 'sending' ? 'Sending…' : 'Confirm'}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => dismissAction(msg.id)}
+                                className="rounded-lg border border-white/10 px-3 py-1.5 text-xs font-medium text-white/60 transition-colors hover:bg-white/[0.04] hover:text-white/80"
+                              >
+                                Dismiss
+                              </button>
+                            </div>
                           </div>
-                        </div>
-                      ) : null}
-                      {msg.actionState === 'done' ? (
-                        <p className="mt-2 text-xs font-medium text-emerald-300">
-                          ✓ Sent — the CARSI team will be in touch.
-                        </p>
-                      ) : null}
-                      {voiceAvailable ? (
-                        <button
-                          type="button"
-                          onClick={() => {
-                          unlockMargotAudio();
-                          void playMessageAudio(msg.id, msg.text);
-                        }}
-                          disabled={Boolean(speechLoadingId) && speechLoadingId !== msg.id}
-                          className="mt-2 flex items-center gap-1.5 rounded-md px-1 py-0.5 text-[10px] font-medium tracking-wide text-white/35 uppercase transition-colors hover:bg-white/[0.04] hover:text-[#7ec5ff] disabled:cursor-not-allowed disabled:opacity-40"
-                          aria-label={
-                            speakingId === msg.id
-                              ? `Stop ${ASSISTANT_NAME} speaking`
-                              : `Hear ${ASSISTANT_NAME} say this`
-                          }
-                        >
-                          {speechLoadingId === msg.id ? (
-                            <Loader2 size={11} className="animate-spin" aria-hidden />
-                          ) : (
-                            <Volume2
-                              size={11}
-                              aria-hidden
-                              className={speakingId === msg.id ? 'text-[#7ec5ff]' : undefined}
-                            />
-                          )}
-                          {speakingId === msg.id ? 'Stop' : 'Listen'}
-                        </button>
-                      ) : null}
+                        ) : null}
+                        {msg.actionState === 'done' ? (
+                          <p className="mt-2 text-xs font-medium text-emerald-300">
+                            ✓ Sent — the CARSI team will be in touch.
+                          </p>
+                        ) : null}
+                        {voiceAvailable ? (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              unlockMargotAudio();
+                              void playMessageAudio(msg.id, msg.text);
+                            }}
+                            disabled={Boolean(speechLoadingId) && speechLoadingId !== msg.id}
+                            className="mt-2 flex items-center gap-1.5 rounded-md px-1 py-0.5 text-[10px] font-medium tracking-wide text-white/35 uppercase transition-colors hover:bg-white/[0.04] hover:text-[#7ec5ff] disabled:cursor-not-allowed disabled:opacity-40"
+                            aria-label={
+                              speakingId === msg.id
+                                ? `Stop ${ASSISTANT_NAME} speaking`
+                                : `Hear ${ASSISTANT_NAME} say this`
+                            }
+                          >
+                            {speechLoadingId === msg.id ? (
+                              <Loader2 size={11} className="animate-spin" aria-hidden />
+                            ) : (
+                              <Volume2
+                                size={11}
+                                aria-hidden
+                                className={speakingId === msg.id ? 'text-[#7ec5ff]' : undefined}
+                              />
+                            )}
+                            {speakingId === msg.id ? 'Stop' : 'Listen'}
+                          </button>
+                        ) : null}
+                      </div>
+                    </div>
+                  )
+                )}
+
+                {loading && (
+                  <div className="flex items-end gap-2">
+                    <MargotAvatar size={28} variant="inline" className="mb-1 hidden sm:block" />
+                    <div className="rounded-2xl rounded-bl-md border border-white/[0.07] bg-white/[0.045]">
+                      <TypingIndicator />
                     </div>
                   </div>
-                )
-              )}
+                )}
 
-              {loading && (
-                <div className="flex items-end gap-2">
-                  <MargotAvatar size={28} variant="inline" className="mb-1 hidden sm:block" />
-                  <div className="rounded-2xl rounded-bl-md border border-white/[0.07] bg-white/[0.045]">
-                    <TypingIndicator />
-                  </div>
-                </div>
-              )}
-
-              <div ref={bottomRef} />
-            </div>
-
-            <div className="shrink-0 border-t border-white/[0.08] px-3 py-3">
-              {speechError ? (
-                <p className="mb-2 text-center text-[10px] text-amber-200/80" role="status">
-                  {speechError}
-                </p>
-              ) : null}
-              <div className="flex items-center gap-2">
-                <input
-                  ref={inputRef}
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder="Ask about courses, CECs, or your account…"
-                  maxLength={2000}
-                  className="min-w-0 flex-1 rounded-xl border border-white/[0.08] bg-white/[0.06] px-3.5 py-2.5 text-sm text-white/85 placeholder-white/30 transition-colors outline-none focus:border-[#2490ed]/55"
-                  disabled={loading}
-                  aria-label="Chat message input"
-                />
-                <button
-                  type="button"
-                  onClick={() => void sendMessage()}
-                  disabled={!input.trim() || loading}
-                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-opacity disabled:cursor-not-allowed disabled:opacity-40"
-                  style={{ background: '#0f5fa8' }}
-                  aria-label="Send message"
-                >
-                  <Send size={18} className="text-white" />
-                </button>
+                <div ref={bottomRef} />
               </div>
-              <p className="mt-2 text-center text-[10px] leading-snug text-white/30">
-                {ASSISTANT_DISCLAIMER}
-              </p>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
-      {open ? (
-        <motion.button
-          type="button"
-          onClick={() => setOpen(false)}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 8 }}
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          className="flex items-center gap-2 rounded-full border border-white/[0.12] bg-[#0a1220]/95 px-4 py-2.5 text-xs font-medium text-white/70 shadow-lg backdrop-blur-md transition-colors hover:border-white/20 hover:text-white/90"
-          aria-label="Minimize chat"
-        >
-          <ChevronDown size={16} className="text-[#7ec5ff]" aria-hidden />
-          Hide chat
-        </motion.button>
-      ) : (
-        <MargotChatLauncher
-          onClick={() => {
-            // A drag gesture must not open the chat (GP-500)
-            if (wasDraggedRef.current) {
+              <div className="shrink-0 border-t border-white/[0.08] px-3 py-3">
+                {speechError ? (
+                  <p className="mb-2 text-center text-[10px] text-amber-200/80" role="status">
+                    {speechError}
+                  </p>
+                ) : null}
+                <div className="flex items-center gap-2">
+                  <input
+                    ref={inputRef}
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    placeholder="Ask about courses, CECs, or your account…"
+                    maxLength={2000}
+                    className="min-w-0 flex-1 rounded-xl border border-white/[0.08] bg-white/[0.06] px-3.5 py-2.5 text-sm text-white/85 placeholder-white/30 transition-colors outline-none focus:border-[#2490ed]/55"
+                    disabled={loading}
+                    aria-label="Chat message input"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => void sendMessage()}
+                    disabled={!input.trim() || loading}
+                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-opacity disabled:cursor-not-allowed disabled:opacity-40"
+                    style={{ background: '#0f5fa8' }}
+                    aria-label="Send message"
+                  >
+                    <Send size={18} className="text-white" />
+                  </button>
+                </div>
+                <p className="mt-2 text-center text-[10px] leading-snug text-white/30">
+                  {ASSISTANT_DISCLAIMER}
+                </p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {open ? (
+          <motion.button
+            type="button"
+            onClick={() => setOpen(false)}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 8 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="flex items-center gap-2 rounded-full border border-white/[0.12] bg-[#0a1220]/95 px-4 py-2.5 text-xs font-medium text-white/70 shadow-lg backdrop-blur-md transition-colors hover:border-white/20 hover:text-white/90"
+            aria-label="Minimize chat"
+          >
+            <ChevronDown size={16} className="text-[#7ec5ff]" aria-hidden />
+            Hide chat
+          </motion.button>
+        ) : (
+          <MargotChatLauncher
+            onClick={() => {
+              // A drag gesture must not open the chat (GP-500)
+              if (wasDraggedRef.current) {
+                wasDraggedRef.current = false;
+                return;
+              }
+              unlockMargotAudio();
+              setOpen(true);
+            }}
+            onDragPointerDown={(e) => {
               wasDraggedRef.current = false;
-              return;
-            }
-            unlockMargotAudio();
-            setOpen(true);
-          }}
-          onDragPointerDown={(e) => {
-            wasDraggedRef.current = false;
-            startDrag(e);
-          }}
-          draggable={canDrag}
-          assistantName={ASSISTANT_NAME}
-        />
-      )}
+              startDrag(e);
+            }}
+            draggable={canDrag}
+            assistantName={ASSISTANT_NAME}
+          />
+        )}
       </motion.div>
     </>
   );
