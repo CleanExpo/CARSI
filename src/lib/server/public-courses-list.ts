@@ -29,6 +29,9 @@ export const lmsPublishedCourseWhere: Prisma.LmsCourseWhereInput = {
  * status='published' with isPublished=false, so they were enrollable from the public catalogue
  * and simultaneously invisible in pathways and team assignment.
  */
+/** Catalogue list bounds — CARSI_VERIFICATION_GATE.md rule 2 (bounded queries). */
+export const CATALOGUE_QUERY_CAP = 200;
+
 export function isPublishedCourseStatus(status: string | null | undefined): boolean {
   // Deliberately NOT trimmed. Prisma's `equals: 'published', mode: 'insensitive'` does not
   // trim either, and the whole point of this predicate is to give the same answer as the
@@ -171,6 +174,7 @@ export async function getDashboardCourseListItemsFromDatabase(options: {
     const rows = await prisma.lmsCourse.findMany({
       where: draftWhere,
       orderBy: { modules: { _count: 'desc' } },
+      take: CATALOGUE_QUERY_CAP,
       include: countInclude,
     });
     return rows.map(mapDashboardCourseRow);
@@ -180,6 +184,7 @@ export async function getDashboardCourseListItemsFromDatabase(options: {
     const rows = await prisma.lmsCourse.findMany({
       where: publishedWhere,
       orderBy: { updatedAt: 'desc' },
+      take: CATALOGUE_QUERY_CAP,
       include: countInclude,
     });
     return rows.map(mapDashboardCourseRow);
@@ -189,11 +194,13 @@ export async function getDashboardCourseListItemsFromDatabase(options: {
     prisma.lmsCourse.findMany({
       where: publishedWhere,
       orderBy: { updatedAt: 'desc' },
+      take: CATALOGUE_QUERY_CAP,
       include: countInclude,
     }),
     prisma.lmsCourse.findMany({
       where: draftWhere,
       orderBy: { modules: { _count: 'desc' } },
+      take: CATALOGUE_QUERY_CAP,
       include: countInclude,
     }),
   ]);
@@ -388,7 +395,7 @@ export async function getPublishedCourseListItemsFromDatabase(options?: {
   const rows = await prisma.lmsCourse.findMany({
     where: publishedWhere,
     orderBy: { updatedAt: 'desc' },
-    ...(options?.limit != null ? { take: options.limit } : {}),
+    take: options?.limit != null ? Math.min(options.limit, CATALOGUE_QUERY_CAP) : CATALOGUE_QUERY_CAP,
     include: publicListInclude,
   });
 
@@ -600,6 +607,7 @@ export async function getPublishedCourseSlugsFromDatabase(): Promise<
     where: publishedWhere,
     select: { slug: true, updatedAt: true },
     orderBy: { updatedAt: 'desc' },
+    take: CATALOGUE_QUERY_CAP,
   });
 
   return rows.map((row) => ({
