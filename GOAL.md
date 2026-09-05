@@ -110,3 +110,6 @@ plus 4-week rolling course sales. Every session reports RWR movement or names th
   Australian public sources and share the homepage light design system. RWR unchanged because
   this improves organic acquisition but does not switch on subscriptions. Customer-visible delta:
   three evidence-backed sector pathways land on the next deploy.
+- 2026-09-05: Gate 0. Pulled WS1/legal/licence commits hardened: subscribe copy now says
+  IICRC CEC Accredited (not course-level CEC), refund and support sit in the sitemap and footer,
+  catalogue queries are capped, midnight cron also purges the events page. RWR unchanged.
