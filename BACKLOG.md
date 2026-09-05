@@ -744,3 +744,19 @@ not fixed, in the order the next sessions should take it.
   both carry the older pairing, and the catalogue filter key is the same string. A learner
   recording their own discipline may be mislabelled. Data accuracy, not a licence claim: confirm
   against the catalogue seed and fix the key or the label in one change. Filed, not fixed.
+
+## Discoveries — 2026-09-05 pulled WS1/legal/licence hardening
+
+The seven commits on `origin/main` (`5f287426..1fa5ff17`) are live: onboarding area names,
+WS1 eight fixes, mysql2 pin, voice-widget unmount, refund/support pages, subscribe area copy.
+This session hardened the leftovers rather than reopening those PRs:
+
+- Subscribe still sold `IICRC CEC courses` / `IICRC CEC tracking dashboard` after #758 — now
+  `IICRC CEC Accredited courses where stated` and `CEC tracking dashboard`.
+- Sitemap omitted `/refund-policy` and `/support`. Catalogue `findMany` had no `take`.
+- Homepage midnight cron purged `/` only; events copy could linger.
+- Convai gone, so `cdn.jsdelivr.net` left `script-src`. Guest enrol still POSTed empty email
+  if HTML `required` was bypassed.
+
+Ops, not code: confirm GitHub `CRON_SECRET` matches the DigitalOcean app secret. Do not invent
+Melbourne/Sydney roadshow dates (DECISIONS #18). CEC hours stay founder-approved only.
