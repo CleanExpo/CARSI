@@ -9,9 +9,12 @@ vi.mock('@/lib/prisma', () => ({
 }));
 
 import {
+  CATALOGUE_QUERY_CAP,
   canSeeDraftCourses,
   effectiveDashboardCourseStatus,
   getDashboardCourseListItemsFromDatabase,
+  getPublishedCourseListItemsFromDatabase,
+  getPublishedCourseSlugsFromDatabase,
   lmsPublishedCourseWhere,
   type DashboardCourseStatusFilter,
 } from './public-courses-list';
@@ -96,6 +99,20 @@ describe('the dashboard catalogue query (mocked Prisma)', () => {
       await getDashboardCourseListItemsFromDatabase({ status: 'published', role });
       expect(whereArgs(), role).toEqual([lmsPublishedCourseWhere]);
     }
+  });
+
+  it('every catalogue findMany is capped so an unbounded scan cannot return', async () => {
+    expect(CATALOGUE_QUERY_CAP).toBe(200);
+    await getDashboardCourseListItemsFromDatabase({ status: 'published', role: 'student' });
+    expect(findMany.mock.calls[0]?.[0]).toEqual(expect.objectContaining({ take: CATALOGUE_QUERY_CAP }));
+
+    findMany.mockClear();
+    await getPublishedCourseListItemsFromDatabase();
+    expect(findMany.mock.calls[0]?.[0]).toEqual(expect.objectContaining({ take: CATALOGUE_QUERY_CAP }));
+
+    findMany.mockClear();
+    await getPublishedCourseSlugsFromDatabase();
+    expect(findMany.mock.calls[0]?.[0]).toEqual(expect.objectContaining({ take: CATALOGUE_QUERY_CAP }));
   });
 
   it('runs no query at all without a database or during the build', async () => {
