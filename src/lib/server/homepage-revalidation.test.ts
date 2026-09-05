@@ -23,11 +23,12 @@ describe('revalidateHomepage', () => {
     vi.stubEnv('CRON_SECRET', 'test-secret');
     const { response, revalidatePath } = call('Bearer test-secret');
     expect(response.status).toBe(200);
-    expect(revalidatePath).toHaveBeenCalledTimes(1);
+    expect(revalidatePath).toHaveBeenCalledTimes(2);
     expect(revalidatePath).toHaveBeenCalledWith('/');
+    expect(revalidatePath).toHaveBeenCalledWith('/events/ccw-roadshow');
     await expect(response.json()).resolves.toEqual({
       ok: true,
-      revalidated: ['/'],
+      revalidated: ['/', '/events/ccw-roadshow'],
       brisbaneDay: '2026-09-06',
     });
   });
