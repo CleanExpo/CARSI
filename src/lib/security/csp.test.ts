@@ -88,12 +88,16 @@ describe('Content-Security-Policy: course media may frame and play, never script
       const before = directives(strict ? PRE_FIX_STRICT : PRE_FIX_RELAXED);
       const after = directives(build(strict));
       for (const [name, sources] of before) {
-        if (name === 'frame-src') continue;
+        if (name === 'frame-src' || name === 'script-src') continue;
         expect(after.get(name), name).toEqual(sources);
       }
       expect([...after.keys()].filter((name) => !before.has(name))).toEqual(['media-src']);
-      // The voice widget's script host stays out (DECISIONS #23); no media host reached script-src.
-      expect((after.get('script-src') ?? []).join(' ')).not.toMatch(/unpkg|youtube|cloudinary|elevenlabs/i);
+      // Convai / jsDelivr is gone with the voice widget (DECISIONS #23). Stripe and GA stay.
+      const script = after.get('script-src') ?? [];
+      expect(script).toContain('https://js.stripe.com');
+      expect(script).toContain('https://www.googletagmanager.com');
+      expect(script).not.toContain('https://cdn.jsdelivr.net');
+      expect(script.join(' ')).not.toMatch(/unpkg|youtube|cloudinary|elevenlabs|jsdelivr/i);
     });
   }
 
