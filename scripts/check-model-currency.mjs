@@ -71,14 +71,44 @@ const MODEL_ID = new RegExp(
   String.raw`['"\`](?:[a-z0-9-]+/)?(` +
     // The optional generation group matters: legacy ids put it BEFORE the family
     // (claude-3-5-sonnet-20240620, claude-3-opus-20240229) while current ones put
-    // it after (claude-opus-5). Without it the guard fails OPEN on exactly the
-    // oldest, most urgent ids to catch.
-    String.raw`(?:claude-(?:[0-9]+(?:[.-][0-9]+)*-)?(?:opus|sonnet|haiku|fable|mythos|instant)-[a-z0-9.-]+)` +
-    String.raw`|(?:gemini-[0-9][a-z0-9.-]*|gemini-pro)` +
+    // it after (claude-opus-5). The trailing segment is OPTIONAL because the
+    // OpenRouter alias form ends at the family (anthropic/claude-3.5-sonnet), and
+    // @ and : are allowed because Vertex and Bedrock use them
+    // (claude-3-5-sonnet-v2@20241022).
+    String.raw`(?:claude-(?:[0-9]+(?:[.-][0-9]+)*-)?(?:opus|sonnet|haiku|fable|mythos|instant)(?:[-.@:][a-z0-9.@:-]+)?)` +
+    String.raw`|(?:gemini-(?:exp-[0-9][a-z0-9.-]*|[0-9][a-z0-9.-]*|pro[a-z0-9.-]*))` +
     String.raw`|(?:imagen-[0-9][a-z0-9.-]*)` +
     String.raw`)['"\`]`,
   'g',
 );
+
+/**
+ * A quoted string can look like a model id and be a filename ('gemini-1.png').
+ * Model ids never carry an asset or source extension, so this removes that false
+ * positive class without loosening the pattern. Raised by independent review.
+ */
+const FILE_EXTENSION =
+  /\.(png|jpe?g|gif|svg|webp|avif|ico|json|ts|tsx|js|jsx|mjs|cjs|css|scss|md|mdx|txt|ya?ml|html?|pdf|mp4|webm|woff2?)$/i;
+
+/**
+ * SCOPE OF THE DRIFT CHECK - read before trusting it as a proof.
+ *
+ * Deciding "is this arbitrary quoted string a vendor model id" is a recognition
+ * problem, and no pattern closes it: vendors invent new shapes whenever they like.
+ * Two review rounds each found a further alias form, which is the signature of a
+ * net, not a proof. So the claim this guard makes is deliberately split:
+ *
+ *   FRESHNESS and NON-VACUITY are EXACT. They do not depend on recognising an id,
+ *   and they are what carries the "the registry cannot go stale unnoticed"
+ *   guarantee the founder asked for.
+ *
+ *   DRIFT is BEST-EFFORT. It catches the id shapes enumerated above and will miss
+ *   a genuinely novel one. A clean drift result means "no KNOWN id shape drifted",
+ *   never "no model id anywhere is unapproved".
+ *
+ * Widen the pattern when a new shape appears; do not read a clean run as proof no
+ * unapproved model is in use.
+ */
 
 /**
  * Returns { files, unreadable }. Unreadable paths are RETURNED, not swallowed:
@@ -125,13 +155,90 @@ export function stripComments(source) {
   return source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/[^\n]*/g, '$1');
 }
 
+/**
+ * Split a source string into brace-balanced object blocks, ignoring braces that
+ * appear inside string literals. Needed because entry `notes` values legitimately
+ * contain punctuation, and a regex cannot tell a brace in code from one in prose.
+ */
+export function objectBlocks(source) {
+  const blocks = [];
+  let depth = 0;
+  let start = -1;
+  let quote = null;
+  for (let i = 0; i < source.length; i++) {
+    const c = source[i];
+    if (quote) {
+      if (c === '\\') i++;
+      else if (c === quote) quote = null;
+      continue;
+    }
+    if (c === "'" || c === '"' || c === '`') quote = c;
+    else if (c === '{') {
+      if (depth === 0) start = i;
+      depth++;
+    } else if (c === '}') {
+      depth--;
+      if (depth === 0 && start >= 0) blocks.push(source.slice(start, i + 1));
+    }
+  }
+  return blocks;
+}
+
+/**
+ * Read top-level `key: 'value'` pairs from one object block, skipping anything
+ * inside a string literal.
+ *
+ * A single regex over the whole entry was a fail-open: `[^}]*?status:` matched
+ * the FIRST occurrence of `status:`, so a notes string containing the characters
+ * `status: 'current'` would be read as the entry's status and could mask a
+ * deprecated model. Raised as P1 by independent review 06/09/2026. Scanning
+ * fields properly removes the whole class rather than the one example.
+ */
+export function parseEntryFields(block) {
+  const fields = {};
+  let depth = 0;
+  let quote = null;
+  let token = '';
+  let pendingKey = null;
+  for (let i = 0; i < block.length; i++) {
+    const c = block[i];
+    if (quote) {
+      if (c === '\\') {
+        token += block[i + 1] ?? '';
+        i++;
+      } else if (c === quote) {
+        if (pendingKey && depth === 1 && !(pendingKey in fields)) fields[pendingKey] = token;
+        quote = null;
+        pendingKey = null;
+        token = '';
+      } else token += c;
+      continue;
+    }
+    if (c === "'" || c === '"' || c === '`') {
+      quote = c;
+      token = '';
+      continue;
+    }
+    if (c === '{' || c === '[') depth++;
+    else if (c === '}' || c === ']') depth--;
+    else if (c === ':' && depth === 1) pendingKey = token.trim().replace(/^,/, '').trim();
+    else if (c === ',') {
+      pendingKey = null;
+      token = '';
+    } else token += c;
+  }
+  return fields;
+}
+
 /** Textual parse of the registry, so this guard needs no TypeScript toolchain. */
 export function parseRegistry(rawSource) {
   const source = stripComments(rawSource);
   const reviewedMatch = source.match(/REGISTRY_REVIEWED\s*=\s*['"](\d{4}-\d{2}-\d{2})['"]/);
   const entries = [];
-  const block = /\{\s*id:\s*['"]([^'"]+)['"][^}]*?status:\s*['"]([^'"]+)['"][^}]*?\}/gs;
-  for (const m of source.matchAll(block)) entries.push({ id: m[1], status: m[2] });
+  for (const block of objectBlocks(source)) {
+    const f = parseEntryFields(block);
+    if (f.id && f.status) entries.push({ id: f.id, status: f.status });
+  }
   return { reviewed: reviewedMatch ? reviewedMatch[1] : null, entries };
 }
 
@@ -152,7 +259,10 @@ export function findHardcodedIds(files, readFile) {
       unreadable.push(`${file} (${e.code ?? e.message})`);
       continue;
     }
-    for (const m of text.matchAll(MODEL_ID)) found.push({ file, id: m[1] });
+    for (const m of text.matchAll(MODEL_ID)) {
+      if (FILE_EXTENSION.test(m[1])) continue; // a filename, not a model id
+      found.push({ file, id: m[1] });
+    }
   }
   return { found, unreadable };
 }

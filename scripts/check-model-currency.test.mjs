@@ -146,6 +146,20 @@ check('legacy claude-3-5-sonnet id is detected', legacyHits.includes('claude-3-5
 check('legacy claude-3-opus id is detected', legacyHits.includes('claude-3-opus-20240229'));
 check('legacy claude-3-haiku id is detected', legacyHits.includes('claude-3-haiku-20240307'));
 
+// Alias and platform shapes, all raised by independent review 06/09/2026.
+const aliasRead = (f) =>
+  ({
+    'src/alias.ts':
+      `a='anthropic/claude-3.5-sonnet'; b="claude-3-5-sonnet-v2@20241022"; ` +
+      `c='gemini-exp-1206'; d='gemini-1.png'; e='logo-imagen-4.svg';`,
+  })[f];
+const aliasHits = findHardcodedIds(['src/alias.ts'], aliasRead).found.map((h) => h.id);
+check('OpenRouter alias ending at the family is detected', aliasHits.includes('claude-3.5-sonnet'));
+check('Vertex/Bedrock @-versioned id is detected', aliasHits.includes('claude-3-5-sonnet-v2@20241022'));
+check('gemini-exp-* id is detected', aliasHits.includes('gemini-exp-1206'));
+check('a filename is NOT reported as a model', !aliasHits.some((id) => id.endsWith('.png')), aliasHits.join(','));
+check('an .svg asset is NOT reported as a model', !aliasHits.some((id) => id.endsWith('.svg')));
+
 // --- Unreadable paths must fail, not shrink the scan silently --------------
 // filesScanned === 0 only catches a total wipeout. One EACCES used to mean "that
 // file has no model ids". Raised as P1 by independent review 06/09/2026.
@@ -195,6 +209,32 @@ check('PRECONDITION: the live entry is still parsed', commentedIds.includes('liv
 check('a // commented entry is NOT approved', !commentedIds.includes('commented-out'), commentedIds.join(','));
 check('a /* block */ commented entry is NOT approved', !commentedIds.includes('block-commented'));
 check('the review date survives comment stripping', commented.reviewed === '2026-09-06');
+
+// A notes string containing the characters `status: 'current'` must NOT be read
+// as the entry's status. The old single-regex parser matched the FIRST status:
+// it found, so prose could mask a deprecated model. Raised as P1 by independent
+// review 06/09/2026; fixed by scanning fields instead of pattern-matching.
+const masked = parseRegistry(
+  `export const REGISTRY_REVIEWED = '2026-09-06';\n` +
+    `{\n` +
+    `  id: 'sneaky-model',\n` +
+    `  notes: 'Previous status: "current" — see the migration note',\n` +
+    `  status: 'deprecated',\n` +
+    `},\n`,
+);
+check('PRECONDITION: the entry is parsed at all', masked.entries.length === 1, JSON.stringify(masked.entries));
+check(
+  'prose cannot mask the real status',
+  masked.entries[0]?.status === 'deprecated',
+  `got ${masked.entries[0]?.status}`,
+);
+// And the drift check must therefore still reject a use of it.
+const maskedDrift = evaluate({
+  ...HEALTHY,
+  entries: masked.entries,
+  hardcoded: [{ file: 'src/x.ts', id: 'sneaky-model' }],
+});
+check('a deprecated model hidden behind prose is still blocked', maskedDrift.length > 0);
 
 console.log(
   failures === 0
