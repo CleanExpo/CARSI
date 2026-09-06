@@ -127,11 +127,40 @@ const read = (f) =>
     'src/real.ts': `const m = 'claude-opus-5'; const g = "gemini-2.0-flash-exp";`,
     'app/robots.ts': `userAgent: 'Claude-SearchBot'\nuserAgent: 'Claude-User'`,
   })[f];
-const realHits = findHardcodedIds(['src/real.ts'], read).map((h) => h.id);
+const realHits = findHardcodedIds(['src/real.ts'], read).found.map((h) => h.id);
 check('PRECONDITION: a genuine model id is still detected', realHits.includes('claude-opus-5'));
 check('a genuine Google id is still detected', realHits.includes('gemini-2.0-flash-exp'));
-const uaHits = findHardcodedIds(['app/robots.ts'], read);
+const uaHits = findHardcodedIds(['app/robots.ts'], read).found;
 check('crawler user-agents are NOT reported as models', uaHits.length === 0, JSON.stringify(uaHits));
+
+// Legacy Anthropic ids put the generation BEFORE the family name. An earlier
+// version of this pattern required the family immediately after "claude-", so it
+// missed every Claude 3 id — a fail-open on the oldest ids, which are the ones
+// most worth catching. Raised as P1 by independent review 06/09/2026.
+const legacyRead = (f) =>
+  ({
+    'src/legacy.ts': `a='claude-3-5-sonnet-20240620'; b="claude-3-opus-20240229"; c='claude-3-haiku-20240307';`,
+  })[f];
+const legacyHits = findHardcodedIds(['src/legacy.ts'], legacyRead).found.map((h) => h.id);
+check('legacy claude-3-5-sonnet id is detected', legacyHits.includes('claude-3-5-sonnet-20240620'));
+check('legacy claude-3-opus id is detected', legacyHits.includes('claude-3-opus-20240229'));
+check('legacy claude-3-haiku id is detected', legacyHits.includes('claude-3-haiku-20240307'));
+
+// --- Unreadable paths must fail, not shrink the scan silently --------------
+// filesScanned === 0 only catches a total wipeout. One EACCES used to mean "that
+// file has no model ids". Raised as P1 by independent review 06/09/2026.
+console.log('\ncoverage holes:');
+const throwOnRead = () => {
+  const e = new Error('denied');
+  e.code = 'EACCES';
+  throw e;
+};
+const unreadable = findHardcodedIds(['src/locked.ts'], throwOnRead);
+check('an unreadable file is reported, not skipped', unreadable.unreadable.length === 1);
+check('...and it is not counted as a clean file', unreadable.found.length === 0);
+const holed = evaluate({ ...HEALTHY, unreadable: ['src/locked.ts (EACCES)'] });
+check('a coverage hole fails the guard', holed.length > 0);
+check('and says the result would be unsound', matches(holed, 'holes'), holed.join('; '));
 
 // --- Exemptions cannot swallow the codebase --------------------------------
 console.log('\nexemption scope:');
@@ -151,6 +180,21 @@ check('reads the review date', parsed.reviewed === '2026-09-06');
 check('reads both entries', parsed.entries.length === 2, JSON.stringify(parsed.entries));
 check('reads status', parsed.entries[1]?.status === 'deprecated');
 check('a registry with no date reads as null', parseRegistry('{}').reviewed === null);
+
+// A commented-out entry must NOT count as approved. Before this, commenting an
+// entry out silently kept it approved, so a developer could keep using a model
+// the registry no longer lists. Raised as P1 by independent review 06/09/2026.
+const commented = parseRegistry(
+  `export const REGISTRY_REVIEWED = '2026-09-06';\n` +
+    `{ id: 'live-one', provider: 'anthropic', status: 'current' },\n` +
+    `// { id: 'commented-out', provider: 'anthropic', status: 'current' },\n` +
+    `/* { id: 'block-commented', provider: 'anthropic', status: 'current' }, */\n`,
+);
+const commentedIds = commented.entries.map((e) => e.id);
+check('PRECONDITION: the live entry is still parsed', commentedIds.includes('live-one'));
+check('a // commented entry is NOT approved', !commentedIds.includes('commented-out'), commentedIds.join(','));
+check('a /* block */ commented entry is NOT approved', !commentedIds.includes('block-commented'));
+check('the review date survives comment stripping', commented.reviewed === '2026-09-06');
 
 console.log(
   failures === 0

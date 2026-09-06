@@ -69,21 +69,34 @@ const CODE_EXT = /\.(ts|tsx|js|jsx|mjs|cjs)$/;
  */
 const MODEL_ID = new RegExp(
   String.raw`['"\`](?:[a-z0-9-]+/)?(` +
-    String.raw`(?:claude-(?:opus|sonnet|haiku|fable|mythos|instant)-[a-z0-9.-]+)` +
+    // The optional generation group matters: legacy ids put it BEFORE the family
+    // (claude-3-5-sonnet-20240620, claude-3-opus-20240229) while current ones put
+    // it after (claude-opus-5). Without it the guard fails OPEN on exactly the
+    // oldest, most urgent ids to catch.
+    String.raw`(?:claude-(?:[0-9]+(?:[.-][0-9]+)*-)?(?:opus|sonnet|haiku|fable|mythos|instant)-[a-z0-9.-]+)` +
     String.raw`|(?:gemini-[0-9][a-z0-9.-]*|gemini-pro)` +
     String.raw`|(?:imagen-[0-9][a-z0-9.-]*)` +
     String.raw`)['"\`]`,
   'g',
 );
 
+/**
+ * Returns { files, unreadable }. Unreadable paths are RETURNED, not swallowed:
+ * a directory or file the guard could not read is a hole in its coverage, and a
+ * hole must fail the guard rather than shrink the scan in silence. Only a root
+ * that is simply absent is tolerated, and the non-vacuity check catches the case
+ * where that leaves nothing to scan.
+ */
 export function listFiles(roots, cwd = process.cwd()) {
   const out = [];
-  const walk = (dir) => {
+  const unreadable = [];
+  const walk = (dir, isRoot = false) => {
     let entries;
     try {
       entries = readdirSync(dir);
-    } catch {
-      return; // a missing root is reported by the non-vacuity check, not here
+    } catch (e) {
+      if (!(isRoot && e.code === 'ENOENT')) unreadable.push(`${relative(cwd, dir)} (${e.code})`);
+      return;
     }
     for (const entry of entries) {
       if (SKIP_DIRS.has(entry)) continue;
@@ -91,19 +104,30 @@ export function listFiles(roots, cwd = process.cwd()) {
       let st;
       try {
         st = statSync(full);
-      } catch {
+      } catch (e) {
+        unreadable.push(`${relative(cwd, full)} (${e.code})`);
         continue;
       }
       if (st.isDirectory()) walk(full);
       else if (CODE_EXT.test(entry)) out.push(relative(cwd, full));
     }
   };
-  for (const root of roots) walk(join(cwd, root));
-  return out;
+  for (const root of roots) walk(join(cwd, root), true);
+  return { files: out, unreadable };
+}
+
+/**
+ * Strip // and block comments. Without this a commented-out registry entry still
+ * parses as an approved model, so commenting one out would silently keep it
+ * approved — a fail-open, and the quietest kind.
+ */
+export function stripComments(source) {
+  return source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/[^\n]*/g, '$1');
 }
 
 /** Textual parse of the registry, so this guard needs no TypeScript toolchain. */
-export function parseRegistry(source) {
+export function parseRegistry(rawSource) {
+  const source = stripComments(rawSource);
   const reviewedMatch = source.match(/REGISTRY_REVIEWED\s*=\s*['"](\d{4}-\d{2}-\d{2})['"]/);
   const entries = [];
   const block = /\{\s*id:\s*['"]([^'"]+)['"][^}]*?status:\s*['"]([^'"]+)['"][^}]*?\}/gs;
@@ -111,19 +135,26 @@ export function parseRegistry(source) {
   return { reviewed: reviewedMatch ? reviewedMatch[1] : null, entries };
 }
 
+/**
+ * Returns { found, unreadable }. Same rule as listFiles: a file that could not be
+ * read is a coverage hole, not a file without model ids. Swallowing the error let
+ * a single EACCES turn "one file unscanned" into "guard reports clean".
+ */
 export function findHardcodedIds(files, readFile) {
   const found = [];
+  const unreadable = [];
   for (const file of files) {
     if (isExempt(file)) continue;
     let text;
     try {
       text = readFile(file);
-    } catch {
+    } catch (e) {
+      unreadable.push(`${file} (${e.code ?? e.message})`);
       continue;
     }
     for (const m of text.matchAll(MODEL_ID)) found.push({ file, id: m[1] });
   }
-  return found;
+  return { found, unreadable };
 }
 
 /**
@@ -131,8 +162,27 @@ export function findHardcodedIds(files, readFile) {
  * mode without mutating a tracked file or setting an env var that could also be
  * used to weaken the guard in CI.
  */
-export function evaluate({ reviewed, entries, filesScanned, hardcoded, now, maxAgeDays = MAX_AGE_DAYS }) {
+export function evaluate({
+  reviewed,
+  entries,
+  filesScanned,
+  hardcoded,
+  now,
+  unreadable = [],
+  maxAgeDays = MAX_AGE_DAYS,
+}) {
   const errors = [];
+
+  // 2a. PARTIAL COVERAGE is a failure too. filesScanned === 0 only catches a
+  // total wipeout; a single unreadable file would otherwise shrink the scan
+  // silently and still report clean.
+  if (unreadable.length) {
+    errors.push(
+      `could not read ${unreadable.length} path(s), so the scan has holes and a clean ` +
+        `result would be unsound: ${unreadable.slice(0, 5).join(', ')}` +
+        `${unreadable.length > 5 ? ` (+${unreadable.length - 5} more)` : ''}`,
+    );
+  }
 
   // 2. NON-VACUITY first: everything below is meaningless if nothing was read.
   if (filesScanned === 0) {
@@ -202,14 +252,17 @@ function main() {
   }
 
   const { reviewed, entries } = parseRegistry(registrySource);
-  const files = listFiles(scanRoots, cwd);
-  const hardcoded = findHardcodedIds(files, (f) => readFileSync(join(cwd, f), 'utf8'));
+  const { files, unreadable: unreadableDirs } = listFiles(scanRoots, cwd);
+  const { found: hardcoded, unreadable: unreadableFiles } = findHardcodedIds(files, (f) =>
+    readFileSync(join(cwd, f), 'utf8'),
+  );
 
   const errors = evaluate({
     reviewed,
     entries,
     filesScanned: files.length,
     hardcoded,
+    unreadable: [...unreadableDirs, ...unreadableFiles],
     now: new Date(),
   });
 
