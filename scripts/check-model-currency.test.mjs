@@ -160,6 +160,15 @@ check('gemini-exp-* id is detected', aliasHits.includes('gemini-exp-1206'));
 check('a filename is NOT reported as a model', !aliasHits.some((id) => id.endsWith('.png')), aliasHits.join(','));
 check('an .svg asset is NOT reported as a model', !aliasHits.some((id) => id.endsWith('.svg')));
 
+// Pre-family ids have no family name at all. Finite, frozen set. Round 3.
+const oldRead = (f) =>
+  ({ 'src/old.ts': `a='claude-2.1'; b="claude-2.0"; c='claude-1.3'; d='claude-2.png';` })[f];
+const oldHits = findHardcodedIds(['src/old.ts'], oldRead).found.map((h) => h.id);
+check('claude-2.1 is detected', oldHits.includes('claude-2.1'));
+check('claude-2.0 is detected', oldHits.includes('claude-2.0'));
+check('claude-1.3 is detected', oldHits.includes('claude-1.3'));
+check('claude-2.png is still excluded as a filename', !oldHits.includes('claude-2.png'), oldHits.join(','));
+
 // --- Unreadable paths must fail, not shrink the scan silently --------------
 // filesScanned === 0 only catches a total wipeout. One EACCES used to mean "that
 // file has no model ids". Raised as P1 by independent review 06/09/2026.

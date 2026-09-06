@@ -76,6 +76,11 @@ const MODEL_ID = new RegExp(
     // @ and : are allowed because Vertex and Bedrock use them
     // (claude-3-5-sonnet-v2@20241022).
     String.raw`(?:claude-(?:[0-9]+(?:[.-][0-9]+)*-)?(?:opus|sonnet|haiku|fable|mythos|instant)(?:[-.@:][a-z0-9.@:-]+)?)` +
+    // Pre-family ids (claude-2.1, claude-2.0, claude-1.3) carry no family name at
+    // all. Unlike the alias shapes above this set is FINITE and frozen - no new
+    // claude-N.N will ever ship - so enumerating it closes that subset for good
+    // rather than adding another guess. Raised by independent review round 3.
+    String.raw`|(?:claude-[0-9]+(?:[.-][0-9]+)*)` +
     String.raw`|(?:gemini-(?:exp-[0-9][a-z0-9.-]*|[0-9][a-z0-9.-]*|pro[a-z0-9.-]*))` +
     String.raw`|(?:imagen-[0-9][a-z0-9.-]*)` +
     String.raw`)['"\`]`,
