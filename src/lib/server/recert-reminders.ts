@@ -21,7 +21,11 @@ export type RecertMilestone = 't_minus_30' | 't_minus_7' | 'overdue';
 const MS_PER_DAY = 86_400_000;
 
 /** In-app + email link target — the IICRC credentials/renewal surface. */
-export const RECERT_LINK = '/dashboard/credentials';
+// `/dashboard/credentials` has no index page — that directory holds only `[credentialId]/`,
+// and no redirect covers it in next.config.ts or proxy.ts (both checked 2026-09-07). Every
+// recertification reminder sent to that path landed on a 404, at the exact moment the member
+// is deciding whether to renew. The real wallet is `/dashboard/student/credentials`.
+export const RECERT_LINK = '/dashboard/student/credentials';
 
 /** Pure: whole days until `expiry` (0 or negative once expired). Ceil matches renewal-summary.ts. */
 export function daysUntilExpiry(expiry: Date, now: Date): number {

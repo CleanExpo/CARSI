@@ -95,6 +95,24 @@ function sortCourses(courses: Course[], sortBy: SortKey): Course[] {
   });
 }
 
+/**
+ * Terms that place a course under a topic tab, in addition to the tab's own label.
+ * Every term below occurs in at least one live course category or title (checked against
+ * the production catalogue, 80 of 80 courses reached, 2026-09-06).
+ */
+const TAB_KEYWORDS: Partial<Record<DisciplineTab, readonly string[]>> = {
+  'Water Damage': [
+    'WATER', 'DRYING', 'MOISTURE', 'PSYCHROMETRY', 'EXTRACTION', 'DEHUMIDIF',
+    'FLOOD', 'AIR MOVER', 'THERMOGRAPHY', 'SUBMERGED',
+  ],
+  Mould: [
+    'MOULD', 'MOLD', 'MICROBIAL', 'IAQ', 'INDOOR AIR', 'AIR QUALITY',
+    'CONTAINMENT', 'INFECTION', 'AIR SCRUBBER',
+  ],
+  'Fire & Smoke': ['FIRE', 'SMOKE', 'SOOT', 'ODOUR', 'ODOR', 'DEODORIS'],
+  Cleaning: ['CLEANING', 'CARPET', 'UPHOLSTERY', 'TILE', 'TEXTILE', 'TRUCK-MOUNT', 'TRUCKMOUNT'],
+};
+
 function matchesDiscipline(course: Course, tab: DisciplineTab): boolean {
   if (tab === 'All') return true;
   if (tab === 'Onboarding') {
@@ -111,6 +129,30 @@ function matchesDiscipline(course: Course, tab: DisciplineTab): boolean {
     .filter(Boolean)
     .join(' ')
     .toUpperCase();
+
+  // A literal match on the tab LABEL alone hid most of the catalogue. Measured against
+  // the live 80-course catalogue on 2026-09-06: Fire & Smoke returned 1, Cleaning 6,
+  // Mould 6, Water Damage 14. The cause is that 29 of 80 live courses carry NO category
+  // at all, and of those that do, exactly one is filed under "Fire & Smoke" — so
+  // "Introduction to Smoke and Soot Damage Restoration" (category "Odour, Smoke,
+  // Psychrometry & Drying") could never appear under Fire & Smoke however obviously it
+  // belongs there.
+  //
+  // The keyword sets below are derived from the real live category and title strings,
+  // not invented: every term appears in at least one live course. Deliberately absent is
+  // "RESTORATION", which occurs in most titles and would make any tab holding it a
+  // synonym for All.
+  //
+  // A course may legitimately match more than one tab (indoor air quality after water
+  // damage is both), and the tabs are not exclusive, so that is correct rather than a bug.
+  //
+  // No IICRC discipline acronym appears here, and none may be added — CLAUDE.md's
+  // founder ruling of 2026-07-10 bans branding CARSI courses with them.
+  const keywords = TAB_KEYWORDS[tab];
+  if (keywords?.some((k) => hay.includes(k))) return true;
+
+  // Retained as a fallback so this change can only ever ADD courses to a tab, never
+  // remove one that already appeared.
   return hay.includes(tab.toUpperCase());
 }
 
