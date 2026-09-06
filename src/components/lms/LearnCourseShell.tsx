@@ -881,7 +881,12 @@ export function LearnCourseShell({ slug }: { slug: string }) {
                       <QuizPlayer
                         quiz={quizData}
                         variant={isOnboardingProgram ? 'enterprise' : 'default'}
-                        onSubmit={(a) => void submitQuiz(a)}
+                        // Return the promise, do NOT `void` it. `void submitQuiz(a)` discards
+                        // the promise, so QuizPlayer's `await onSubmit(...)` resolved instantly
+                        // and its in-flight double-submit guard protected a near-zero window —
+                        // which is the whole point of the guard, since a quiz allows 3 attempts
+                        // and one double-click on a slow connection spends two of them.
+                        onSubmit={(a) => submitQuiz(a)}
                       />
                     ) : null}
                     {quizResult ? (

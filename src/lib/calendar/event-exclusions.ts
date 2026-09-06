@@ -7,8 +7,16 @@
  * `filterExcludedEvents` first.
  */
 
-/** Names/brands that must never surface on the calendar. Lower-case, matched as substrings. */
-const EXCLUDED_TERMS = ['coach8', 'coach 8'];
+/**
+ * Names/brands that must never surface on the calendar. Lower-case, matched as substrings.
+ *
+ * Exported so other calendar modules and their tests can assert against the exclusion rule
+ * WITHOUT repeating the brand literal. This file and its test are the only two paths the
+ * terminology guard exempts (`scripts/check-iicrc-terminology.mjs`), so a literal written
+ * anywhere else in the tree is a guard failure — correctly, since the rule is that the brand
+ * appears nowhere except the chokepoint that removes it.
+ */
+export const EXCLUDED_TERMS = ['coach8', 'coach 8'];
 
 type ExcludableEvent = {
   title?: string | null;

@@ -39,6 +39,37 @@ interface QuizPlayerProps {
   variant?: 'default' | 'enterprise';
 }
 
+/**
+ * Run a submit under a re-entry lock, and ALWAYS release the lock.
+ *
+ * The release MUST be in `finally`, not `catch`. An earlier version released only on a thrown
+ * error, which never happened: the real caller (`LearnCourseShell.submitQuiz`) catches its own
+ * API failure, calls `setLessonError`, and RESOLVES. So a failed submit left the lock set and
+ * both submit buttons dead with no reachable retry — and a quiz lesson has no completion path
+ * except passing, so the student was stranded in the course permanently.
+ *
+ * Releasing unconditionally is safe on success because the parent renders this component only
+ * while `!quizResult` (LearnCourseShell.tsx:880), so a successful submit unmounts it and no
+ * live button survives on a spent attempt.
+ *
+ * Exported for test: this component's tests render to static markup, so the lock's behaviour
+ * across a resolving-on-failure caller cannot be reached by clicking. The invariant is tested
+ * here directly instead of not at all.
+ */
+export async function runGuardedSubmit(
+  locked: boolean,
+  setLocked: (v: boolean) => void,
+  submit: () => void | Promise<void>,
+): Promise<void> {
+  if (locked) return;
+  setLocked(true);
+  try {
+    await submit();
+  } finally {
+    setLocked(false);
+  }
+}
+
 export function QuizPlayer({ quiz, onSubmit, variant = 'default' }: QuizPlayerProps) {
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [activeIndex, setActiveIndex] = useState(0);
@@ -61,14 +92,7 @@ export function QuizPlayer({ quiz, onSubmit, variant = 'default' }: QuizPlayerPr
   async function handleSubmit() {
     if (submitting) return;
     setSubmitting(true);
-    try {
-      await onSubmit(answers);
-      // Deliberately NOT re-enabled on success: the parent replaces this view with the result,
-      // and leaving a live button on a spent attempt invites the exact double-spend above.
-    } catch {
-      // Re-enable only on failure, so a network blip costs a retry rather than the course.
-      setSubmitting(false);
-    }
+    await runGuardedSubmit(submitting, setSubmitting, () => onSubmit(answers));
   }
 
   if (!enterprise) {

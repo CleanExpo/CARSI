@@ -73,11 +73,21 @@ export function evaluateCourse(course, approvals) {
   for (const field of TEXT_FIELDS) {
     const value = course[field];
     if (typeof value !== 'string') continue;
-    if (/\b[A-Z]{2,6}-aligned\b/.test(value)) {
+    // CASE-INSENSITIVE ON PURPOSE. Both checks were case-sensitive until 2026-09-07, which
+    // made this guard fail OPEN: an independent reviewer demonstrated that `wrt-aligned` and
+    // a bare `wrt` both returned zero violations. Course titles and descriptions are authored
+    // in the admin UI and are frequently lower-case or slug-derived, so the lower-case form is
+    // the LIKELY shape of the defect, not an exotic one.
+    if (/\b[a-z]{2,6}-aligned\b/i.test(value)) {
       v.push(`${field} contains "[discipline]-aligned" phrasing`);
     }
     for (const a of BANNED_ACRONYMS) {
-      if (new RegExp(`\\b${a}\\b`).test(value)) {
+      // Known collision, deliberately accepted: `OCT` matches "Oct" as a month abbreviation.
+      // A licence guard must err toward flagging — a false positive costs one human read, a
+      // false negative costs the CEC provider standing the business rests on. If this ever
+      // fires on a real date, fix it by allow-listing that exact context (per CLAUDE.md),
+      // never by dropping the flag or restoring case-sensitivity.
+      if (new RegExp(`\\b${a}\\b`, 'i').test(value)) {
         v.push(`${field} contains banned discipline acronym ${a}`);
         break;
       }

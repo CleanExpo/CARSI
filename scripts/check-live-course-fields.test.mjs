@@ -99,6 +99,37 @@ for (const acronym of BANNED_ACRONYMS) {
   });
 }
 
+// ------------------------------------------------- 3b. LOWER-CASE bypass (regression, P1)
+// An independent reviewer demonstrated on 2026-09-07 that this guard was fail-OPEN: both
+// checks were case-sensitive, so `wrt-aligned` and a bare `wrt` returned ZERO violations.
+// Course text is authored in the admin UI and is often lower-case or slug-derived, so the
+// lower-case form is the likely shape of the defect. These are the reviewer's exact cases.
+for (const acronym of BANNED_ACRONYMS) {
+  check(`LOWER-CASE bare acronym ${acronym.toLowerCase()} in title is a violation`, () => {
+    const v = evaluateCourse(
+      { slug: 'x', title: `introduction to ${acronym.toLowerCase()} methods`, iicrc_discipline: null, cec_hours: null },
+      APPROVALS,
+    );
+    assert(v.some((s) => s.includes(acronym)), `lower-case ${acronym.toLowerCase()} bypassed the guard, got: ${JSON.stringify(v)}`);
+  });
+}
+
+check('LOWER-CASE "-aligned" phrasing is a violation', () => {
+  const v = evaluateCourse(
+    { slug: 'x', title: 'applied structural drying (wrt-aligned)', iicrc_discipline: null, cec_hours: null },
+    APPROVALS,
+  );
+  assert(v.some((s) => /aligned/.test(s)), `lower-case "-aligned" bypassed the guard, got: ${JSON.stringify(v)}`);
+});
+
+check('MIXED-CASE "-aligned" phrasing is a violation', () => {
+  const v = evaluateCourse(
+    { slug: 'x', title: 'Applied Structural Drying (Wrt-Aligned)', iicrc_discipline: null, cec_hours: null },
+    APPROVALS,
+  );
+  assert(v.some((s) => /aligned/.test(s)), `mixed-case "-aligned" bypassed the guard, got: ${JSON.stringify(v)}`);
+});
+
 check('acronym embedded in a longer word does NOT fire', () => {
   // \b anchoring: "ASDIC" and "octopus" must not be read as ASD and OCT.
   const v = evaluateCourse(

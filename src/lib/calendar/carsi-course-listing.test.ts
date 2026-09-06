@@ -6,6 +6,10 @@ import {
   UNCATEGORISED_TOPIC,
   type CalendarCourse,
 } from './carsi-course-listing';
+// The excluded brand is named ONLY in event-exclusions.ts — the chokepoint that removes it and
+// the only path the terminology guard exempts. Fixtures are derived from that list rather than
+// hardcoded, so this test covers every excluded term and follows the list if it ever changes.
+import { EXCLUDED_TERMS } from './event-exclusions';
 
 const course = (over: Partial<CalendarCourse> = {}): CalendarCourse => ({
   slug: 'introduction-to-water-damage-restoration',
@@ -38,16 +42,18 @@ describe('CARSI course entries for the calendar', () => {
     expect(entry.availability).not.toMatch(/\d{1,2}[ /-]\d{1,2}|\b20\d\d\b/);
   });
 
-  it('excludes COACH8 even though these are CARSI courses', () => {
+  it('excludes every founder-excluded brand, even though these are CARSI courses', () => {
     // Defence in depth. Course titles come from the admin session, not from this repo, so
     // "it cannot appear here" is an assumption rather than a guarantee.
-    const entries = buildCalendarCourseEntries([
-      course(),
-      course({ slug: 'coach8-partnership', title: 'COACH8 Business Coaching' }),
-      course({ slug: 'legit-2', title: 'Coach 8 Masterclass' }),
+    expect(EXCLUDED_TERMS.length).toBeGreaterThan(0); // precondition: a vacuous list would pass
+    const excluded = EXCLUDED_TERMS.flatMap((term, i) => [
+      course({ slug: `excluded-${i}-lower`, title: `${term} Business Coaching` }),
+      course({ slug: `excluded-${i}-upper`, title: `${term.toUpperCase()} Masterclass` }),
     ]);
+    const entries = buildCalendarCourseEntries([course(), ...excluded]);
     expect(entries).toHaveLength(1);
-    expect(entries.map((e) => e.title).join(' ')).not.toMatch(/coach\s*8/i);
+    const titles = entries.map((e) => e.title).join(' ').toLowerCase();
+    for (const term of EXCLUDED_TERMS) expect(titles).not.toContain(term);
   });
 
   it('drops rows with no slug or no title rather than rendering a broken link', () => {

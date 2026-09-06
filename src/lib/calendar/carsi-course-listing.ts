@@ -18,10 +18,12 @@
  * are rendered as start-any-time entries alongside the dated industry events, never mixed into
  * them.
  *
- * COACH8 EXCLUSION. Founder directive 2026-07-09: COACH8 must never appear on the calendar.
- * These are CARSI's own courses, so the brand cannot appear by construction — but the exclusion
- * filter is applied anyway, because "it cannot happen" is the reasoning that lets it happen. A
- * course title is attacker-adjacent content: it comes from the admin session, not from this repo.
+ * BRAND EXCLUSION. Founder directive 2026-07-09 bars a named partner brand from the calendar.
+ * That brand is deliberately NOT written here: `event-exclusions.ts` is the single chokepoint
+ * that names and removes it, and the only path the terminology guard exempts. These are CARSI's
+ * own courses, so the brand cannot appear by construction — but `isExcludedEvent` is applied
+ * anyway, because "it cannot happen" is the reasoning that lets it happen. A course title is
+ * attacker-adjacent content: it comes from the admin session, not from this repo.
  */
 import { isExcludedEvent } from './event-exclusions';
 

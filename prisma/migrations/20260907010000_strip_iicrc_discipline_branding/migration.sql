@@ -22,8 +22,13 @@
 --
 -- Values captured from https://www.carsi.com.au/api/lms/courses/<slug> at
 -- 2026-09-06T09:54:30.109Z; 80 of 80 live courses reached, 0 unreachable, 35 affected.
--- Rollback: docs/rollback/20260907010000_strip_iicrc_discipline_branding.sql restores every
--- value replaced here, from that same capture.
+-- Rollback: Prisma has no down-migration, so the ROLLBACK IS THE CAPTURE. Both files ship in
+-- this same commit:
+--   docs/rollback/20260907010000_strip_iicrc_discipline_branding-capture.json  (all 35 rows,
+--     before/after, machine-readable — the values to restore)
+--   docs/rollback/20260907010000_strip_iicrc_discipline_branding.md            (the procedure)
+-- There is NO .sql rollback file; an earlier version of this comment named one, which would
+-- have sent an incident responder looking for a file that does not exist.
 --
 -- Idempotent: re-running sets the same values. Safe to apply more than once.
 
