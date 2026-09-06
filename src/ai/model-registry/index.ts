@@ -32,7 +32,7 @@ export interface ModelConfig {
 }
 
 /**
- * Approved model defaults as of 07/05/2026.
+ * Approved model defaults as of 06/09/2026.
  * Update this registry when models are upgraded or deprecated.
  */
 export const APPROVED_MODELS: ModelConfig[] = [
@@ -45,12 +45,17 @@ export const APPROVED_MODELS: ModelConfig[] = [
     notes: 'Primary reasoning and orchestration model',
   },
   {
-    id: 'claude-opus-4-8',
+    id: 'claude-opus-5',
     provider: 'anthropic',
     taskTypes: ['reasoning'],
     approvedDefault: true,
     status: 'current',
-    notes: 'High-capability complex tasks only — higher cost',
+    notes:
+      'High-capability complex tasks only — higher cost. Supersedes the previous ' +
+      'Opus 4.8 default at the same per-token price. Thinking is on by default ' +
+      '(adaptive), so omitting the `thinking` parameter now reasons rather than ' +
+      'answering flat. Do not send `budget_tokens` — it is rejected on this model; ' +
+      'tune spend with output_config.effort instead.',
   },
   {
     id: 'claude-haiku-4-5-20251001',
