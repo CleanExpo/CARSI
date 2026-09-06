@@ -434,7 +434,7 @@ export function createToolDefinition(
  * // Use with Anthropic SDK
  * const response = await anthropic.beta.messages.create({
  *   betas: [client.getBetaHeader()],
- *   model: "claude-sonnet-4-5-20250929",
+ *   model: "claude-sonnet-5",
  *   max_tokens: 4096,
  *   tools: client.getAPITools(),
  *   messages: [...],
