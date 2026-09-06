@@ -32,6 +32,17 @@ export interface ModelConfig {
 }
 
 /**
+ * The date this registry was last checked against the vendors' current model
+ * line-ups. `scripts/check-model-currency.mjs` fails CI once this is more than
+ * 90 days old, which is what stops the list going quietly stale — no offline
+ * check can know that a new model shipped, so this forces a human to look.
+ *
+ * Bump it ONLY after actually re-reading the vendor model list, never to clear
+ * a red build.
+ */
+export const REGISTRY_REVIEWED = '2026-09-06';
+
+/**
  * Approved model defaults as of 06/09/2026.
  * Update this registry when models are upgraded or deprecated.
  */
@@ -80,6 +91,19 @@ export const APPROVED_MODELS: ModelConfig[] = [
     approvedDefault: true,
     status: 'current',
     notes: 'High-fidelity branding visuals — premium cost',
+  },
+  {
+    id: 'gemini-2.0-flash-exp',
+    provider: 'google',
+    taskTypes: ['fast-generation'],
+    approvedDefault: false,
+    status: 'review-needed',
+    notes:
+      'IN USE but never approved — packages/shared/src/types/models.ts wires it as ' +
+      'the Google default. Recorded here rather than silently blessed: it is an ' +
+      '"-exp" preview id, which vendors withdraw without notice. Someone must pick a ' +
+      'supported Google model or drop the path. Surfaced 06/09/2026 by ' +
+      'scripts/check-model-currency.mjs on its first real run.',
   },
   {
     id: 'llama3.1:8b',
