@@ -38,8 +38,9 @@
  * mutant that does not trigger the rule it claims fails the suite. Neither can
  * be satisfied by naming.
  *
- * `at()` throws on an unregistered id, so adding a rule without registering it
- * is a hard error rather than a silent coverage hole.
+ * Every violation, entry-level or file-level, is emitted through one `emit()`
+ * choke point that throws on an unregistered id, so adding a rule without
+ * registering it is a hard error rather than a silent coverage hole.
  */
 import fs from 'node:fs';
 
@@ -102,18 +103,31 @@ const wordCount = (s) => String(s).trim().split(/\s+/).filter(Boolean).length;
 const isIsoDate = (s) => typeof s === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s);
 
 /**
+ * The ONE place a rule id becomes a violation.
+ *
+ * Round-5 (gemini lane): the entry rules went through `at()`, which refuses an
+ * unregistered id, but the file rules pushed their objects by hand. So the
+ * registered-id guard covered half the validator, and `check-mutants.mjs`, which
+ * proves coverage by reading `at()` call sites, could not see the other half at
+ * all — a file rule could be added, fire in anger, and never be demanded by a
+ * mutant. Two ways to emit a rule meant one of them was unguarded; there is now
+ * one, and every caller is a call site the scan can find.
+ */
+const emit = (list, registry, registryName, rule, message) => {
+  if (!registry.includes(rule)) {
+    throw new Error(`validate-ledger: unregistered rule id "${rule}" — add it to ${registryName} so it gets a mutant`);
+  }
+  list.push({ rule, message });
+};
+
+/**
  * Entry validation, returning one {rule, message} per violation.
  * `validateEntry` below flattens this to the string form the rest of the
  * pipeline already consumes, so the message text is unchanged.
  */
 export function validateEntryRules(e, lineNo) {
   const v = [];
-  const at = (rule, msg) => {
-    if (!ENTRY_RULES.includes(rule)) {
-      throw new Error(`validate-ledger: unregistered rule id "${rule}" — add it to ENTRY_RULES so it gets a mutant`);
-    }
-    v.push({ rule, message: `line ${lineNo}: ${msg}` });
-  };
+  const at = (rule, msg) => emit(v, ENTRY_RULES, 'ENTRY_RULES', rule, `line ${lineNo}: ${msg}`);
 
   if (typeof e !== 'object' || e === null || Array.isArray(e)) {
     at('entry-not-object', 'entry is not a JSON object');
@@ -191,11 +205,14 @@ export function validateEntry(e, lineNo) {
  * `validateFile` flattens this to the existing string form.
  */
 export function validateFileRules(file) {
+  const violations = [];
+  const fileAt = (rule, message) => emit(violations, FILE_RULES, 'FILE_RULES', rule, message);
+
   if (!fs.existsSync(file)) {
-    return { violations: [{ rule: 'file-missing', message: `missing ledger file: ${file}` }], count: 0 };
+    fileAt('file-missing', `missing ledger file: ${file}`);
+    return { violations, count: 0 };
   }
   const lines = fs.readFileSync(file, 'utf8').split('\n');
-  const violations = [];
   const ids = new Map();
   let count = 0;
   lines.forEach((line, i) => {
@@ -207,21 +224,18 @@ export function validateFileRules(file) {
     try {
       e = JSON.parse(t);
     } catch (err) {
-      violations.push({ rule: 'file-invalid-json', message: `line ${lineNo}: invalid JSON — ${err.message}` });
+      fileAt('file-invalid-json', `line ${lineNo}: invalid JSON — ${err.message}`);
       return;
     }
     violations.push(...validateEntryRules(e, lineNo));
     if (e && e.id) {
       if (ids.has(e.id)) {
-        violations.push({
-          rule: 'file-duplicate-id',
-          message: `line ${lineNo}: duplicate id "${e.id}" (first seen line ${ids.get(e.id)})`,
-        });
+        fileAt('file-duplicate-id', `line ${lineNo}: duplicate id "${e.id}" (first seen line ${ids.get(e.id)})`);
       } else ids.set(e.id, lineNo);
     }
   });
   if (count === 0) {
-    violations.push({ rule: 'file-empty', message: `${file} holds no entries — an empty ledger is not a clean ledger` });
+    fileAt('file-empty', `${file} holds no entries — an empty ledger is not a clean ledger`);
   }
   return { violations, count };
 }

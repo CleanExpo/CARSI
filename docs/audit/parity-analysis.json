@@ -1,6 +1,6 @@
 {
   "schema": "gp567-parity/1",
-  "generated_at_utc": "2026-09-07T07:52:09Z",
+  "generated_at_utc": "2026-09-07T13:43:43Z",
   "method": {
     "note": "Exact-slug matching alone reports every renamed course as missing. Three matchers, decreasing confidence; only records surviving all three are parity gaps.",
     "token_overlap_threshold": 0.6,

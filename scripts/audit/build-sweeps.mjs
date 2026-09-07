@@ -73,17 +73,31 @@ cur.push('```');
 cur.push('');
 cur.push('## Counts');
 cur.push('');
-cur.push('| Measure | Count |');
-cur.push('| --- | ---: |');
-cur.push(`| Total S500 citation lines | ${lines.length} |`);
-cur.push(`| Distinct files citing S500 | ${files.length} |`);
-cur.push(`| Lines asserting the **2021** edition | ${cite2021.length} |`);
-cur.push(`| Files asserting the **2021** edition | ${files2021.length} |`);
-cur.push(`| Lines asserting the **2025** edition | ${cite2025.length} |`);
-cur.push(`| Lines citing S500 with **no edition at all** | ${citeBare.length} |`);
-cur.push(`| Lines asserting **another edition** (${otherYears.join(', ') || 'none'}) | ${citeOther.length} |`);
+// Round-5 (gemini lane): the Class column exists so the verifier can tell an
+// edition class from any other measure STRUCTURALLY. It used to infer that from
+// the label text — a row whose name merely contained a year was pulled into the
+// partition, and a genuine class row could be hidden from it by prefixing the
+// line. Which rows partition the total is a property of the generator, not
+// something a reader should have to deduce from prose, so the generator now says
+// so and check-currency-sweep.mjs reads the marker instead of guessing.
+const COUNTS = [
+  ['Total S500 citation lines', lines.length, 'total'],
+  ['Distinct files citing S500', files.length, '—'],
+  ['Lines asserting the **2021** edition', cite2021.length, 'edition-class'],
+  ['Files asserting the **2021** edition', files2021.length, '—'],
+  ['Lines asserting the **2025** edition', cite2025.length, 'edition-class'],
+  ['Lines citing S500 with **no edition at all**', citeBare.length, 'edition-class'],
+  [`Lines asserting **another edition** (${otherYears.join(', ') || 'none'})`, citeOther.length, 'edition-class'],
+];
+cur.push('| Measure | Count | Class |');
+cur.push('| --- | ---: | --- |');
+for (const [label, count, cls] of COUNTS) cur.push(`| ${label} | ${count} | ${cls} |`);
 cur.push('');
-cur.push(`The four line classes partition the total: ${cite2021.length} + ${cite2025.length} + ${citeBare.length} + ${citeOther.length} = ${lines.length}.`);
+const classRows = COUNTS.filter(([, , cls]) => cls === 'edition-class');
+cur.push(
+  `The ${classRows.length} line classes partition the total: `
+  + `${classRows.map(([, n]) => n).join(' + ')} = ${lines.length}.`,
+);
 cur.push('');
 cur.push('## Finding');
 cur.push('');

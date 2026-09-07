@@ -1,6 +1,6 @@
 # GP-567 D3 — Standards currency sweep
 
-Generated `2026-09-07T09:52:31Z` by `scripts/audit/build-sweeps.mjs`.
+Generated `2026-09-07T13:38:32Z` by `scripts/audit/build-sweeps.mjs`.
 
 ## Reproduce
 
@@ -10,17 +10,17 @@ git grep -nI -E S500[^0-9]{0,3}(20[0-9]{2})? -- *.ts *.tsx *.mjs *.js *.json *.m
 
 ## Counts
 
-| Measure | Count |
-| --- | ---: |
-| Total S500 citation lines | 274 |
-| Distinct files citing S500 | 49 |
-| Lines asserting the **2021** edition | 20 |
-| Files asserting the **2021** edition | 16 |
-| Lines asserting the **2025** edition | 0 |
-| Lines citing S500 with **no edition at all** | 233 |
-| Lines asserting **another edition** (2026) | 21 |
+| Measure | Count | Class |
+| --- | ---: | --- |
+| Total S500 citation lines | 274 | total |
+| Distinct files citing S500 | 49 | — |
+| Lines asserting the **2021** edition | 20 | edition-class |
+| Files asserting the **2021** edition | 16 | — |
+| Lines asserting the **2025** edition | 0 | edition-class |
+| Lines citing S500 with **no edition at all** | 233 | edition-class |
+| Lines asserting **another edition** (2026) | 21 | edition-class |
 
-The four line classes partition the total: 20 + 0 + 233 + 21 = 274.
+The 4 line classes partition the total: 20 + 0 + 233 + 21 = 274.
 
 ## Finding
 

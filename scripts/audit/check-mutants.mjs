@@ -260,21 +260,34 @@ const validatorRaw = fs.readFileSync(new URL('./validate-ledger.mjs', import.met
 const validatorSrc = validatorRaw
   .replace(/\/\*[\s\S]*?\*\//g, '')
   .replace(/^\s*\/\/.*$/gm, '');
+// Round-5 (gemini lane) walked straight past this scan by not using `at()` at
+// all: `validateFileRules` pushed its violation objects by hand, so every
+// file-level rule was invisible here, and a new one could be added with no
+// mutant and no complaint. The scan was not weak, it was aimed at one of the two
+// doors. The validator now emits through a single `emit()` choke point reached
+// by exactly two named wrappers, and this reads BOTH — then proves, below, that
+// no third door has been cut.
+const EMITTERS = {
+  at: ['ENTRY_RULES', ENTRY_RULES],
+  fileAt: ['FILE_RULES', FILE_RULES],
+};
 const KNOWN_TEMPLATES = ['missing-required:${k}'];
-const callSites = [...validatorSrc.matchAll(/\bat\(\s*([^,]*?)\s*,/g)].map((m) => m[1].trim());
-// The `at` definition itself takes (rule, msg) as identifiers, not literals; skip
-// only that one declaration site, matched exactly.
+const callSites = [...validatorSrc.matchAll(/\b(at|fileAt)\(\s*([^,]*?)\s*,/g)]
+  .map((m) => ({ emitter: m[1], arg: m[2].trim() }));
+// The wrappers take (rule, msg) as identifiers, not literals; skip only those
+// declaration sites, matched exactly.
 const declaration = 'rule';
-for (const arg of callSites) {
+for (const { emitter, arg } of callSites) {
   if (arg === declaration) continue;
+  const [registryName, registry] = EMITTERS[emitter];
   const single = /^'([^']*)'$/.exec(arg);
   const dbl = /^"([^"]*)"$/.exec(arg);
   const tick = /^`([^`]*)`$/.exec(arg);
   const literal = single || dbl;
   if (literal) {
-    if (!ENTRY_RULES.includes(literal[1])) {
+    if (!registry.includes(literal[1])) {
       failures += 1;
-      console.error(`FAIL registry: validate-ledger.mjs emits rule "${literal[1]}" which is NOT in ENTRY_RULES — it would never be demanded by the coverage check`);
+      console.error(`FAIL registry: validate-ledger.mjs emits rule "${literal[1]}" which is NOT in ${registryName} — it would never be demanded by the coverage check`);
     }
   } else if (tick) {
     if (!KNOWN_TEMPLATES.includes(tick[1])) {
@@ -287,6 +300,37 @@ for (const arg of callSites) {
     failures += 1;
     console.error(`FAIL registry: validate-ledger.mjs passes a rule id this suite cannot read statically: \`${arg}\` — use a plain quoted literal so coverage can be proven`);
   }
+}
+
+// A scan that matches nothing reports exactly what a clean scan reports, so
+// prove it can still see. Each emitter must be found in use; if a rename or a
+// refactor takes one out of view, that is a blind scan, not a pass.
+for (const emitter of Object.keys(EMITTERS)) {
+  if (!callSites.some((c) => c.emitter === emitter && c.arg !== declaration)) {
+    failures += 1;
+    console.error(`FAIL registry: the static scan found no \`${emitter}(\` call sites in validate-ledger.mjs — the scan has gone blind rather than the rules having gone away`);
+  }
+}
+
+// Property 5 — THE CHOKE POINT ITSELF.
+//
+// Reading both wrappers is only worth anything while they are the only way to
+// raise a violation. `emit()` is the single place that builds the {rule, message}
+// object, and it is the single place that refuses an unregistered id. A second
+// hand-built violation anywhere in the validator would restore exactly the hole
+// round-5 exploited, one door down — so the shape is counted, not trusted.
+const objectPushes = [...validatorSrc.matchAll(/\.push\(\s*\{\s*rule\b/g)];
+if (objectPushes.length !== 1) {
+  failures += 1;
+  console.error(`FAIL choke point: validate-ledger.mjs builds ${objectPushes.length} violation objects with a literal \`.push({ rule\` — exactly 1 is allowed (the one inside emit()); route the others through at() or fileAt() so coverage can see them`);
+}
+// `rule:` bound to a string literal means an id was written somewhere other than
+// an emitter argument — the array-literal early return that used to sit in
+// validateFileRules was precisely this shape.
+const strayRuleLiterals = [...validatorSrc.matchAll(/\brule\s*:\s*['"`]/g)];
+if (strayRuleLiterals.length) {
+  failures += 1;
+  console.error(`FAIL choke point: validate-ledger.mjs writes ${strayRuleLiterals.length} rule id(s) as a \`rule:\` property literal outside the emit() choke point — pass the id to at() or fileAt() instead`);
 }
 
 if (failures) {

@@ -155,9 +155,11 @@ distinct slugs across all three sources.
 
 **The parity-gap number was wrong in both directions.** Naive slug matching reports
 78 legacy-only courses. Three matchers — exact slug, normalised title, token
-overlap ≥0.6 — reduce that to **18 genuine gaps** (17 published, 1 draft). 48
-legacy records are simply slug-renamed. The card's figure of 31 is not reproduced
+overlap ≥0.6 — reduce that to **18 genuine gaps** (17 published, 1 draft). The
+60 records in between are matched, not missing: **48** by normalised seed title and
+**12** by token overlap, so 18 + 60 = 78. The card's figure of 31 is not reproduced
 by any matcher setting tried, and is filed as a GAP against the card itself.
+Reproduce: `node scripts/audit/parity-analysis.mjs`.
 
 **Two card figures are not reproducible.** "93 planned / 5 seeded" does not match
 the 71 seed courses on `origin/main`. Both are recorded as UNOBSERVED rather than
@@ -193,7 +195,10 @@ render boundary and was closed Done; URLs were not in that fix.
 **The currency picture is worse than 2021-vs-2025.** 274 S500 citation lines across
 49 files. 20 lines assert the 2021 edition; **zero assert 2025**, against the estate
 ruling. **233 lines cite S500 with no edition at all** — the quiet majority, and the
-one no future sweep can detect as stale.
+one no future sweep can detect as stale. A further **21 lines assert a 2026 edition**
+no licensed source in this checkout can confirm or deny; all 21 sit in course-update
+drafts, and they are filed as GP567-026. The four classes account for every line:
+20 + 0 + 233 + 21 = 274. Reproduce: `node scripts/audit/check-currency-sweep.mjs`.
 
 **A verified negative, recorded so nobody chases it.** `cppp40421_unit_code` exists
 in the legacy schema but is populated on zero records. There is no live AQF
@@ -205,10 +210,10 @@ unit-code exposure.
 | --- | --- | --- |
 | D5 role × market matrix | **not started** | Needs per-course content analysis across 182 slugs; a run of its own |
 | D6 benchmark matrix vs AQF/ISO | **not started** | Depends on D5; also the highest-risk deliverable to get wrong, so it should not be rushed at the end of a run |
-| D8 fresh-context citation audit | **not started** | Should run against a larger ledger than 24 entries to be worth the pass |
+| D8 fresh-context citation audit | **not started** | Should run against a larger ledger than 26 entries to be worth the pass |
 | Cross-engine verification | **not exercised** | No contested claim arose that a second engine would settle |
 | `check:cec-surfaces` | **not run** | Imports `typescript`; a git worktree has no `node_modules`. Environment limit, not a repo defect |
-| D2 full-catalogue coverage | **batch 1 only** | 24 entries covers catalogue-level and licence-critical claims, not per-lesson content |
+| D2 full-catalogue coverage | **batch 1 only** | 26 entries covers catalogue-level and licence-critical claims, not per-lesson content |
 
 ## Second engine
 
