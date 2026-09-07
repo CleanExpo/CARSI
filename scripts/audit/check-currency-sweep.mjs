@@ -25,7 +25,7 @@
  *      while the sweep read as complete.
  */
 import fs from 'node:fs';
-import { execFileSync } from 'node:child_process';
+import { run } from './subprocess.mjs';
 
 const FILE = 'docs/audit/currency-sweep.md';
 const fail = (m) => {
@@ -105,9 +105,14 @@ const rows = [...countsBlock.matchAll(ROW)].map((m) => ({
   cls: m[3].trim(),
 }));
 
+// Fail-closed read. `git grep` exits 1 for "no matches", which is a real and
+// successful empty measurement, so 1 is allowed; every other status is the
+// scan not having happened. This check survives a broken git today only by
+// accident — it compares the recorded 274 against a re-scan, and 0 != 274 — so
+// it would pass vacuously the moment a recorded count were legitimately 0.
 let raw = '';
 try {
-  raw = execFileSync(
+  raw = run(
     'git',
     // Identical pathspec to build-sweeps.mjs. The audit's own files cite
     // S500:2021 to describe the problem; counting them would measure this
@@ -117,10 +122,10 @@ try {
       '*.ts', '*.tsx', '*.mjs', '*.js', '*.json', '*.md',
       ':(exclude)docs/audit/*', ':(exclude)scripts/audit/*', ':(exclude).claude/skills/course-truth/*',
     ],
-    { encoding: 'utf8', maxBuffer: 32 * 1024 * 1024 },
+    { allowedExits: [0, 1] },
   );
 } catch (e) {
-  raw = e.stdout || '';
+  fail(`could not re-run the S500 scan — ${e.message}`);
 }
 const lines = raw.split('\n').filter(Boolean);
 

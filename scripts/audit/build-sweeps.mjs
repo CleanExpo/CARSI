@@ -12,19 +12,21 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
+import { run, runCapture } from './subprocess.mjs';
 
 const ROOT = process.cwd();
 const ACCESS = '2026-09-07';
 const OUT = path.join(ROOT, 'docs/audit');
 
-const sh = (cmd, args) => {
-  try {
-    return execFileSync(cmd, args, { cwd: ROOT, encoding: 'utf8', maxBuffer: 32 * 1024 * 1024 });
-  } catch (e) {
-    return e.stdout || '';
-  }
-};
+// Fail-closed. This is the GENERATOR half of the same defect round 10 found in
+// c6: if git could not run, the old version returned `e.stdout || ''` and the
+// sweep recorded 0 for every count. c5 then re-ran the scan, also got 0, and
+// compared 0 against 0 — a green criterion over a measurement that never
+// happened. Two fail-open halves compose into a verdict neither could produce
+// alone, so both halves are closed, not just the one under review.
+//
+// The only allowed non-zero is `git grep` exit 1, which means "no matches".
+const sh = (cmd, args) => run(cmd, args, { cwd: ROOT, allowedExits: [0, 1] });
 
 // ---------- D3: currency ----------------------------------------------------
 // The audit's own output cites S500:2021 while describing the contamination, so
@@ -168,14 +170,15 @@ const guards = [
   'check:designations',
   'check:au-english',
 ];
+// A guard's non-zero exit IS the datum here — the sweep's job is to record what
+// each guard says. But `e.status ?? 1` recorded a FABRICATED exit 1 when npm
+// itself could not spawn, attributing an environment failure to the guard and
+// publishing it as the guard's verdict. runCapture keeps a real exit status and
+// throws when there is none, so the generator dies instead of inventing one.
 const results = guards.map((g) => {
-  try {
-    const out = execFileSync('npm', ['run', '--silent', g], { cwd: ROOT, encoding: 'utf8', maxBuffer: 8 * 1024 * 1024 });
-    return { guard: g, exit: 0, tail: out.trim().split('\n').slice(-1)[0] };
-  } catch (e) {
-    const tail = (e.stdout || e.stderr || '').trim().split('\n').slice(-1)[0];
-    return { guard: g, exit: e.status ?? 1, tail };
-  }
+  const r = runCapture('npm', ['run', '--silent', g], { cwd: ROOT, maxBuffer: 8 * 1024 * 1024 });
+  const tail = (r.stdout || r.stderr || '').trim().split('\n').slice(-1)[0];
+  return { guard: g, exit: r.status, tail };
 });
 
 const html = fs.readFileSync(path.join(ROOT, '.audit-cache/courses.html'), 'utf8');

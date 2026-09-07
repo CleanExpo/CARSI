@@ -204,3 +204,33 @@ and produced nothing; gemini — which has no shell and can never discharge muta
 so it cannot produce a releasable receipt — returned five findings, all five legitimate,
 including the two most serious of the run. **A reviewer that cannot sign off is still worth
 running.** Do not treat "cannot mint a receipt" as "not worth asking".
+
+**A failed measurement must not be able to return a value.** Every audit script that
+shelled out did `try { execFileSync(...) } catch (e) { out = e.stdout || '' }`. When git
+cannot run at all, `e.stdout` is empty — and c6 PASSES on empty, because its pass condition
+is "the set of modified guards is empty". Round 10 planted a real edit in
+`scripts/check-cec-surfaces.mjs`, broke the git invocation, and watched c6 print
+`OK ... no guard modified` and exit 0. The defect was not a missing check on the result; it
+was that a fallback value existed for the catch to reach for. The reader now branches on
+exit status before stdout is touched and throws rather than returning, so there is no value
+to misread. **This is zero-blindness in general form: a check whose pass condition is an
+empty set cannot, alone, tell "measured empty" from "failed to measure".** Reading the exit
+status is the only thing that separates them — asserting the diff is non-empty would not,
+because c6 legitimately sees an empty diff when run on main after a merge.
+
+**Two fail-open halves compose into a verdict neither could reach alone.** The same swallow
+sat in the GENERATOR (`build-sweeps.mjs`) and the VERIFIER (`check-currency-sweep.mjs`).
+Broken git makes the generator record 0 for every count; the verifier re-scans, also gets 0,
+compares 0 against 0 and agrees. c5 survives today only by accident — it compares against a
+recorded 274, and `0 != 274` — so it would pass vacuously the moment a recorded count were
+legitimately zero. **Fix every half, not the half under review.** This was not theoretical:
+the first run of the mutation harness reverted the generator alone and it really did
+overwrite `currency-sweep.md`, stripping 65 lines into a zero-count sweep. The harness had
+backed up the scripts but not the artefacts, so the damage outlived the mutant — a mutation
+control must restore everything its mutant can write, not just the file it edited.
+
+**A control nothing invokes is coverage-shaped decoration.** All eleven criteria had no
+tracked runner: the only thing invoking them was a shell script in one agent session's
+scratch directory. On any other machine, nothing ran them at all. `npm run audit:verify`
+now arms all eleven, and the new c11 with them — the green was always real and always
+meant nothing.

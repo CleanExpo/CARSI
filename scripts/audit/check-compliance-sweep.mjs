@@ -4,7 +4,7 @@
  * carries raw-HTML evidence for the live finding, and modified no guard.
  */
 import fs from 'node:fs';
-import { execFileSync } from 'node:child_process';
+import { run } from './subprocess.mjs';
 
 const FILE = 'docs/audit/compliance-language-sweep.md';
 const fail = (m) => {
@@ -50,12 +50,19 @@ if (!/\*\*Coverage: \d+ of \d+ guards/.test(md)) {
 // next session would have gone looking for an edit that does not exist. The
 // merge base isolates what THIS branch did, which is the only thing this check
 // is entitled to make a claim about.
+// Read through the fail-closed reader. The previous version caught the git
+// failure and substituted `e.stdout || ''`, which is empty — and this check
+// PASSES on empty. Round 10 broke the git invocation with a real edit planted in
+// `scripts/check-cec-surfaces.mjs` and watched this print OK and exit 0.
+//
+// "No guard was modified" and "I could not find out whether a guard was
+// modified" are different claims. Only the first one is a pass.
 let changed = '';
 try {
-  const mergeBase = execFileSync('git', ['merge-base', 'origin/main', 'HEAD'], { encoding: 'utf8' }).trim();
-  changed = execFileSync('git', ['--no-pager', 'diff', '--name-only', mergeBase, '--', 'scripts/'], { encoding: 'utf8' });
+  const mergeBase = run('git', ['merge-base', 'origin/main', 'HEAD']).trim();
+  changed = run('git', ['--no-pager', 'diff', '--name-only', mergeBase, '--', 'scripts/']);
 } catch (e) {
-  changed = e.stdout || '';
+  fail(`could not measure whether a guard was modified — ${e.message}`);
 }
 const touchedGuards = changed
   .split('\n')
