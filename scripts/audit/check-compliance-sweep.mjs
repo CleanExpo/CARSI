@@ -38,9 +38,22 @@ if (!/\*\*Coverage: \d+ of \d+ guards/.test(md)) {
 }
 
 // No guard may be modified by an audit run.
+//
+// Compared against the MERGE BASE, not `origin/main`'s tip. Diffing a moving
+// reference attributes ITS changes to this branch: main gained 8 lines in
+// `scripts/check-cec-surfaces.mjs` via PR #782 on 2026-09-07, and this check
+// immediately reported "an audit run modified guard(s)" naming a file the audit
+// had never opened. `git diff HEAD -- <that file>` was empty at the time, which
+// is what proved the accusation false.
+//
+// A guard that names the wrong culprit is worse than one that stays silent: the
+// next session would have gone looking for an edit that does not exist. The
+// merge base isolates what THIS branch did, which is the only thing this check
+// is entitled to make a claim about.
 let changed = '';
 try {
-  changed = execFileSync('git', ['--no-pager', 'diff', '--name-only', 'origin/main', '--', 'scripts/'], { encoding: 'utf8' });
+  const mergeBase = execFileSync('git', ['merge-base', 'origin/main', 'HEAD'], { encoding: 'utf8' }).trim();
+  changed = execFileSync('git', ['--no-pager', 'diff', '--name-only', mergeBase, '--', 'scripts/'], { encoding: 'utf8' });
 } catch (e) {
   changed = e.stdout || '';
 }
