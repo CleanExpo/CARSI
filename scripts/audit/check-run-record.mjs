@@ -12,9 +12,33 @@ for (const f of ['docs/audit/lessons.md', 'docs/audit/run-records/run-1.md']) {
 }
 
 const run = fs.readFileSync('docs/audit/run-records/run-1.md', 'utf8');
-if (!/VERIFIED/.test(run) || !/JUSTIFIED/.test(run) || !/GAP/.test(run)) {
-  fail('run record does not report ledger counts by status');
+
+// Round-4 (gemini lane): this previously tested only that the WORDS "VERIFIED",
+// "JUSTIFIED" and "GAP" appeared somewhere in the file, while failing with
+// "does not report ledger counts by status" — a message advertising a check the
+// code did not perform. Same defect class as round 2's GAP-vocabulary message,
+// one file over. The counts are now re-derived from the ledger and compared
+// against the numbers the run record publishes, so a stale table fails.
+const led = fs.readFileSync('docs/audit/evidence-ledger.jsonl', 'utf8')
+  .split('\n').filter((l) => l.trim()).map((l) => JSON.parse(l));
+const actual = {
+  VERIFIED: led.filter((e) => e.status === 'VERIFIED').length,
+  JUSTIFIED: led.filter((e) => e.status === 'JUSTIFIED').length,
+  GAP: led.filter((e) => e.status === 'GAP').length,
+  'CONFLICT sidecars': led.filter((e) => e.conflict).length,
+};
+const problems = [];
+for (const [label, n] of Object.entries(actual)) {
+  const m = run.match(new RegExp(`\\| ${label} \\| (\\d+) \\|`));
+  if (!m) problems.push(`run record does not report a "${label}" count in a parseable table row`);
+  else if (Number(m[1]) !== n) problems.push(`run record says ${label} = ${m[1]}, ledger holds ${n}`);
 }
+const totalM = run.match(/\| \*\*Total entries\*\* \| \*\*(\d+)\*\* \|/);
+if (!totalM) problems.push('run record does not report a total entry count');
+else if (Number(totalM[1]) !== led.length) {
+  problems.push(`run record says ${totalM[1]} total entries, ledger holds ${led.length}`);
+}
+if (problems.length) fail(`${problems.length} count problem(s)\n  - ${problems.join('\n  - ')}`);
 if (!/[Dd]eferred/.test(run)) fail('run record does not name what was deferred — the gap is the most important line');
 if (!/[Nn]ext run/.test(run)) fail('run record does not name the next run\'s first batch');
 

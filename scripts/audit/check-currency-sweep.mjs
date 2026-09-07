@@ -112,8 +112,16 @@ for (const [label, actual] of MEASURES) {
 // edition class was added. Reading the table means a class row this verifier has
 // never heard of still has to add up.
 const recTotal = recorded('Total S500 citation lines');
+// Round-4 (gemini lane): this matched ANY row starting `| Lines `, so an unrelated
+// measure such as `| Lines of code | 500 |` would join the partition sum and fail
+// the check for a reason that has nothing to do with edition currency. The rows
+// are now required to name an S500 edition class explicitly — an edition year, or
+// the unversioned class — so a new non-class row is ignored rather than
+// miscounted, while a genuine new edition class is still picked up.
 const recParts = [...md.matchAll(/^\| (Lines [^|]*?) \| (\d+) \|/gm)]
-  .map((m) => [m[1].replace(/\*\*/g, '').trim(), Number(m[2])]);
+  .map((m) => [m[1].replace(/\*\*/g, '').trim(), Number(m[2])])
+  .filter(([label]) => /\b(19|20)\d{2}\b/.test(label)
+    || /no edition|unversioned|another edition/i.test(label));
 if (recTotal !== null && recParts.length) {
   const recSum = recParts.reduce((a, [, n]) => a + n, 0);
   if (recSum !== recTotal) {

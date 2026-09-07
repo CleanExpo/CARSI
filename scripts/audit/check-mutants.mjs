@@ -245,23 +245,47 @@ if (uncovered.length) {
 // this round's P1 in the first place. So the registry is also checked
 // statically, against the validator's source: every `at('<id>'` literal must be
 // registered, and therefore must end up covered.
-const validatorSrc = fs.readFileSync(new URL('./validate-ledger.mjs', import.meta.url), 'utf8');
-const emitted = [...validatorSrc.matchAll(/\bat\(\s*'([^']+)'/g)].map((m) => m[1])
-  .filter((id) => !id.includes('${'));
-const templated = [...validatorSrc.matchAll(/\bat\(\s*`([^`]+)`/g)].map((m) => m[1]);
-for (const id of new Set(emitted)) {
-  if (!ENTRY_RULES.includes(id)) {
+// Round-4 (gemini lane) defeated the first version of this scan: it matched only
+// SINGLE-quoted ids, so `at("rule")` slipped through unseen, and a concatenated id
+// was invisible to it entirely. A scan that reads one of three string syntaxes is
+// not a scan — it is a scan-shaped hole. So instead of enumerating the forms that
+// are ALLOWED to pass, every `at(` call site is located and its first argument is
+// classified; anything not a single readable literal FAILS rather than being
+// skipped. That inverts the default from fail-open to fail-closed.
+const validatorRaw = fs.readFileSync(new URL('./validate-ledger.mjs', import.meta.url), 'utf8');
+// Comments are prose, not call sites. The header of validate-ledger.mjs discusses
+// `at()` in English, and the first version of this scan dutifully reported that
+// sentence as an unreadable rule id. Strip block and line comments first so the
+// scan reads code only.
+const validatorSrc = validatorRaw
+  .replace(/\/\*[\s\S]*?\*\//g, '')
+  .replace(/^\s*\/\/.*$/gm, '');
+const KNOWN_TEMPLATES = ['missing-required:${k}'];
+const callSites = [...validatorSrc.matchAll(/\bat\(\s*([^,]*?)\s*,/g)].map((m) => m[1].trim());
+// The `at` definition itself takes (rule, msg) as identifiers, not literals; skip
+// only that one declaration site, matched exactly.
+const declaration = 'rule';
+for (const arg of callSites) {
+  if (arg === declaration) continue;
+  const single = /^'([^']*)'$/.exec(arg);
+  const dbl = /^"([^"]*)"$/.exec(arg);
+  const tick = /^`([^`]*)`$/.exec(arg);
+  const literal = single || dbl;
+  if (literal) {
+    if (!ENTRY_RULES.includes(literal[1])) {
+      failures += 1;
+      console.error(`FAIL registry: validate-ledger.mjs emits rule "${literal[1]}" which is NOT in ENTRY_RULES — it would never be demanded by the coverage check`);
+    }
+  } else if (tick) {
+    if (!KNOWN_TEMPLATES.includes(tick[1])) {
+      failures += 1;
+      console.error(`FAIL registry: validate-ledger.mjs builds a rule id from an unrecognised template \`${tick[1]}\` — this suite cannot prove it is registered`);
+    }
+  } else {
+    // Concatenation, a variable, a function call — anything this scan cannot
+    // resolve to a registered id. Refuse rather than skip.
     failures += 1;
-    console.error(`FAIL registry: validate-ledger.mjs emits rule "${id}" which is NOT in ENTRY_RULES — it would never be demanded by the coverage check`);
-  }
-}
-// Template-literal rule ids (the per-field `missing-required:${k}` family) cannot
-// be read statically, so assert the one known family is registered for every
-// field rather than letting an unreadable call site pass unchecked.
-for (const t of templated) {
-  if (!/^missing-required:\$\{k\}$/.test(t)) {
-    failures += 1;
-    console.error(`FAIL registry: validate-ledger.mjs builds a rule id from an unrecognised template \`${t}\` — this suite cannot prove it is registered`);
+    console.error(`FAIL registry: validate-ledger.mjs passes a rule id this suite cannot read statically: \`${arg}\` — use a plain quoted literal so coverage can be proven`);
   }
 }
 

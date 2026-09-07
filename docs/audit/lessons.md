@@ -159,3 +159,48 @@ clean base entries — so the suite went red on the clean-base property before c
 was ever reached. It looked like a passing control test and demonstrated nothing. The
 probe had to be redone with a rule the clean bases satisfy, so that only the coverage
 assertion could catch it.
+
+### Round 4 — 2026-09-07 (gemini lane, after the cursor lane failed 6 times)
+
+**I counted from a sample and published the number four times.** Finding #7 was recorded
+as affecting "one course-update draft". It is **six files**. The number came from eyeballing
+the first four lines of a 21-line result, which all happened to share a filename, and
+generalising — while the sweep's own generated *"Files asserting another edition"* list sat
+in the same document saying 6. The wrong figure then propagated into the run record, the
+ledger entry, the PR body and a report to the founder before any check touched it.
+**A sample is not a census, and a figure you can derive is never one to eyeball.**
+
+**A generator and the artefact it generates drift silently, and the artefact loses.**
+`GP567-026` was appended straight to `evidence-ledger.jsonl`, and the round-3 amendments
+plus the `conflict` sidecar were applied by a one-off script. `build-ledger.mjs` still
+produced the old 25 entries, so **the next person to re-run the generator would have
+deleted this round's work without any check failing.** The ledger validator was perfectly
+happy: it validates the artefact, and the artefact was fine. **When a file has a generator,
+edit the generator — and if you must touch the artefact, re-run the generator and diff.**
+
+**Third instance of criterion-vs-recipe drift, and the second "message advertising a check
+that does not exist".** `check-run-record.mjs` failed with *"run record does not report
+ledger counts by status"* while testing only that the words VERIFIED/JUSTIFIED/GAP appeared
+somewhere in the file. Identical in shape to round 2's GAP-vocabulary message, one file
+over. It now re-derives the counts from the ledger and compares them. **After the same
+class appears twice, stop fixing instances and go looking for the rest of them.**
+
+**A scan that reads one of three string syntaxes is a scan-shaped hole.** The round-3
+static registry scan matched only single-quoted rule ids, so `at("rule")` was invisible to
+it. Rewritten to locate every call site and classify its first argument, failing on anything
+it cannot resolve — fail-closed instead of fail-open. It immediately flagged a sentence in
+its own header comment discussing `at()`, which was correct behaviour and a reminder that a
+source scan must read code, not prose.
+
+**Fixing a false positive must not cost the true positive.** The partition check matched any
+row beginning `| Lines `, so an unrelated `| Lines of code | 500 |` row would have failed it
+spuriously. Narrowing it to rows naming an edition class was verified BOTH ways: the
+unrelated row is now ignored (exit 0) *and* a genuine new edition class that breaks the
+arithmetic still fails (exit 1). A narrowing verified only on the false positive is how a
+check gets quietly disabled.
+
+**The lane that could not mint a receipt found five real defects.** Cursor failed six times
+and produced nothing; gemini — which has no shell and can never discharge mutation-control,
+so it cannot produce a releasable receipt — returned five findings, all five legitimate,
+including the two most serious of the run. **A reviewer that cannot sign off is still worth
+running.** Do not treat "cannot mint a receipt" as "not worth asking".

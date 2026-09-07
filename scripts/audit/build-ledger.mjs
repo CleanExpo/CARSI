@@ -160,7 +160,7 @@ add({
   claim: 'CARSI holds founder-recorded IICRC CEC approvals for 38 specific courses.',
   status: 'JUSTIFIED', confidence: 'medium',
   reasoning:
-    'Primary verification is genuinely unavailable, now evidenced rather than assumed: a search for a public IICRC register of approved CEC providers found none. IICRC manages CEC approval by submission to CECCourse@iicrcnet.org — the same address this repo scripts against — and published guidance is to contact IICRC directly, which is founder-gated. So the registry is the best obtainable source, and this claim is scoped to per-course approvals only.',
+    'A primary artefact EXISTS and directly evidences this claim: data/seed/cec-approvals.json, whose evidence field cites CARSI_courses.pdf supplied by the founder 2026-08-27. What is unavailable is INDEPENDENT PUBLIC RE-VERIFICATION of that artefact: a search for a public IICRC register of approved CEC providers found none, IICRC manages CEC approval by submission to CECCourse@iicrcnet.org (the same address this repo scripts against) and its published guidance is to contact IICRC directly, which is founder-gated. That is the JUSTIFIED condition exactly - a named best-available source that cannot be re-checked from outside. Contrast GP567-025, which has no artefact of any kind and is therefore GAP; the absent public register is cited in both entries but does DIFFERENT work in each, and conflating the two is what round-3 review did.',
   best_available_source: 'repo:data/seed/cec-approvals.json — evidence cites CARSI_courses.pdf supplied by founder 2026-08-27; corroborated by iicrc.org/accepted-cecs (no public provider register)',
   feeds: ['cec-registry'], check_by: '2026-10-07',
 });
@@ -169,9 +169,19 @@ add({
   claim: 'CARSI is an IICRC CEC "Accredited provider" (provider-level accreditation, as distinct from holding approved courses).',
   status: 'GAP',
   reason:
-    'No source located establishes provider-level accreditation. The registry evidences per-course approvals; IICRC publishes no provider register; the founder-supplied PDF is described as a class list, not a provider credential. This is the claim the live marketing copy actually makes, and it is the one with no basis.',
+    'No artefact of ANY kind establishes provider-level accreditation - this is not an artefact that cannot be publicly re-verified, it is the absence of one. The registry evidences per-course approvals, a different object; IICRC publishes no provider register; and the founder-supplied PDF is described as a class list, not a provider credential. JUSTIFIED requires a best_available_source, and there is none to name. This is the claim the live marketing copy actually makes, and it is the one with no basis.',
   recommended_action: 'substantiate',
-  note: 'Founder-gated to resolve: only Phill can obtain provider-status confirmation from IICRC. Until then the public wording should not assert it.',
+  note: 'Founder-gated to resolve: only Phill can obtain provider-status confirmation from IICRC. Until then the public wording should not assert it. This entry does NOT assert the claim is false - it records that nothing on this repo\'s evidence supports it.',
+  // The sidecar the ledger was built for. Round-3 review argued this should be
+  // JUSTIFIED; the argument is preserved verbatim BESIDE the original rather
+  // than overwriting it, which is the whole point of the mechanism.
+  conflict: {
+    engine_a: 'claude (implementing agent, rounds 1-3)',
+    engine_b: 'cursor (independent reviewer, round 3, model=auto)',
+    disagreement:
+      'cursor filed this as a P1, arguing GP567-025 should be JUSTIFIED because GP567-013 treats the same absent public IICRC register as grounds for JUSTIFIED, so filing GAP here makes the JUSTIFIED/GAP distinction incoherent for the pair. It offered two defensible bases: CLAUDE.md\'s identity SSOT naming CARSI an IICRC CEC provider, and the inference that 38 founder-recorded course approvals are incoherent without provider standing. RETAINED AS GAP. The epistemology is not identical: GP567-013 has a primary artefact and lacks only public re-verification, whereas this claim has no artefact at all, and JUSTIFIED requires a best_available_source that can be named. CLAUDE.md is repository prose - per the estate done-gate, reading documentation proves the documentation makes a claim and proves nothing about the fact. The 38-approvals argument is an inference, not a source. Deciding a licence-critical public accreditation claim on an inference is the specific risk CLAUDE.md names as able to cost the licence to sell courses, so the conservative filing stands until the founder substantiates it.',
+    overwrote_original: false,
+  },
   feeds: ['catalogue', 'marketing'], check_by: '2026-10-07',
 });
 add({
@@ -250,6 +260,18 @@ add({
   quote: 'guard passed while carsi.com.au/courses serves "IICRC CEC Accredited provider"',
   note: 'The guards scan repo source; this string is served from live page metadata. A repo-only guard cannot see a live surface — the blind spot is structural, not a rule gap.',
   feeds: ['compliance-gate', 'marketing'], check_by: '2026-10-07',
+});
+add({
+  id: 'GP567-026', claim_class: 'standards-currency',
+  surface: 'repo:docs/course-updates/',
+  claim: 'The IICRC S500 2026 revision is published, and course drafts teach that the standard has moved to it.',
+  status: 'GAP',
+  reason:
+    'No licensed source is reachable from this repository to confirm an S500 2026 edition exists. CARSI\'s licensed section index (lib/standards/s500-sections.ts) is mirrored in RestoreAssist per CLAUDE.md and is absent here, and CLAUDE.md forbids a web scrape or trade-press paraphrase as the basis for any published claim about a standard. 21 lines across 6 files assert this edition. No absence claim is made: this records the claim as unsubstantiated ON THIS REPO\'S EVIDENCE, not that the edition does not exist.',
+  recommended_action: 'substantiate',
+  note:
+    'All 6 files sit in the docs/course-updates/ staging area - 5 course drafts each marked "Status: DRAFT - founder review before any DB apply", plus that folder\'s README index, which states "Staging only. These are DRAFTS for founder review." Nothing is live today; the exposure is on apply. Surfaced by the round-3 currency-partition fix: the sweep\'s published classes summed to 253 against a total of 274, and these 21 lines were the difference. The file count was first recorded as 1 - a generalisation from a 4-line sample - and corrected to 6 by the gemini lane at 0968bcdc.',
+  feeds: ['course-content', 'catalogue'], check_by: '2026-10-07',
 });
 
 fs.mkdirSync(path.dirname(OUT), { recursive: true });

@@ -126,10 +126,18 @@ The table looked complete, and the criterion was green, because nothing ever add
 the rows up. This is the sharpest instance in the run of a measurement that reads
 as exhaustive while carrying a blind spot the size of its own gap.
 
-The affected lines all sit in one course-update **draft** carrying
-`Status: DRAFT — founder review before any DB apply`, so nothing is live today.
-The exposure is on apply: they become published course copy the moment the draft
-is applied.
+The affected lines sit across **6 files** in the `docs/course-updates/` staging area:
+five course-update drafts, each carrying `Status: DRAFT — founder review before any
+DB apply`, plus that folder's `README.md` index, which itself states *"Staging only.
+These are DRAFTS for founder review."* So nothing is live today. The exposure is on
+apply: they become published course copy the moment a draft is applied.
+
+**Correction — this said "one draft" until the gemini lane caught it at `0968bcdc`.**
+The count came from eyeballing the first four lines of a 21-line sample, which all
+happened to come from the same file, and generalising. The sweep's own generated
+file list said 6 the whole time. A sample is not a census, and the number was
+asserted in the run record, the ledger entry and the PR body before anyone checked
+it against the artefact that was already sitting there.
 
 **No ruling is made on whether an S500 2026 edition exists.** CARSI's licensed
 section index is mirrored in RestoreAssist per CLAUDE.md and is **not present in
