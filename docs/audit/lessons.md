@@ -287,6 +287,35 @@ parse yields zero loads, every assertion passes over nothing, and the control re
 independence it never measured — silently, in exactly the shape of the bug it guards. Proved by
 pointing the walk at a file with no imports and watching c11 go red.
 
+**Three rounds lost to one undecidable question — the stop signal, and what actually closed it.**
+Rounds 12, 13 and 14 were all the same move: prove by reading source that a file does not load
+something. Each fix was defeated by a spelling the last one did not anticipate — `await import()`
+past a regex, `createRequire as cr` past a callee-text test, and the next one waiting was
+`(function(){}).constructor('return import("…")')()`, which contains no `Function` identifier and
+no import keyword to find at all. **That is not a run of bugs; it is the wrong question.** "Prove
+this JS file never loads X" is undecidable by static analysis, and every tighter allow-list was a
+denylist in better clothing.
+
+The instrument changed instead of the pattern. `verify-all.mjs` is a ~68-line trust anchor that
+should essentially never change, so c11 **pins its sha256**. Any plant — aliased loader,
+`.constructor` trick, dynamic import, one inert space — turns c11 red, because the check reads a
+hash and there is no variant to find. Proved with a semantically inert one-character mutant.
+
+**State honestly what a pin is and is not.** It is change-detection on a trust anchor, not a
+proof of independence. The property itself — that the runner's verdict cannot be swayed by
+anything under `scripts/audit` — was verified BEHAVIOURALLY at pin time: neuter `runCapture` in
+`subprocess.mjs` and `npm run audit:verify` must still exit non-zero (it reports
+`FAIL: 1 of 11 criteria failed`, not `11 of 11`). The residual is that a change which also
+updates the pin defeats it — deliberately so: that converts an invisible edit into a visible
+two-file diff, which is what human review is for. Adding a criterion later will need both files
+in one commit, and that is expected rather than a defect.
+
+**A residual you have not closed should be stated as a limit, not posed as a question.** Three
+briefs running, the reviewer's finding was the exact residual the brief had asked about —
+"does it under-match an aliased `createRequire`?" was answered by a planted aliased
+`createRequire`. Honest briefs are right, but naming an open hole invites it to be walked
+through; name the limit together with the answer already in the code.
+
 **Some good changes have no honest mutant, and claiming one is worse than admitting it.**
 `let changed = ''` was replaced with `let changed;` — the initialiser was the exact fallback
 value the round-10 fix exists to eliminate. But `fail()` calls `process.exit`, so the

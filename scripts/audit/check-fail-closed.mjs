@@ -34,6 +34,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { run, runCapture, SubprocessFailure } from './subprocess.mjs';
 import { parseLdBlocks, LdParseFailure } from './parse-ld.mjs';
 import ts from 'typescript';
@@ -177,31 +178,61 @@ fs.rmSync(stubDir, { recursive: true, force: true });
 // return {status: 0} would turn c11 red while the runner still printed
 // "11 of 11 criteria pass": the gate greening over its own failing control.
 //
-// This is checked STATICALLY because it is a property of the source, not of a
-// run: the runner must load nothing from the tree it gates. c11 cannot simply
-// execute verify-all.mjs to test it — verify-all runs c11, so that recurses.
+// ── Why this is a PIN and not a source analysis ───────────────────────────
 //
-// ── Round 13's P1, and why this is now an AST walk ────────────────────────
+// Three consecutive rounds were lost trying to prove, by reading the source,
+// that this file does not load anything from `scripts/audit`:
 //
-// The first version matched `^\s*import ... from '...'` with a regex. Review
-// planted `await import('./subprocess.mjs')` in the runner and c11 stayed GREEN,
-// still printing "runner imports nothing it gates" — a control rendering a pass
-// over a dependency it never looked at. Exactly round 12's defect one layer up:
-// the JUDGE half was fine and the FIND half was too narrow.
+//   r12  regex saw only `import ... from`         → `await import(...)` evaded it
+//   r13  AST walk keyed require on callee text    → `createRequire as cr` evaded it
+//   r14  tighter allow-list on the specifier      → would have lost to
+//        `(function(){}).constructor('return import("…")')()`, which contains no
+//        `Function` identifier and no ImportKeyword to find
 //
-// So the same remedy applies: stop approximating a parser. TypeScript (already a
-// devDependency) tokenises the runner and every module-loading construct is
-// enumerated from the syntax tree — static import, re-export, dynamic import(),
-// require(), createRequire() — rather than from a pattern that has to anticipate
-// each spelling.
+// That is not a sequence of bugs, it is the wrong question. "Prove this JS file
+// never loads X" is undecidable by static analysis, and a reviewer will always
+// find one more spelling. Every extra pattern was a denylist wearing an
+// allow-list's clothes.
 //
-// The rule is an ALLOW-LIST, because a denylist of evasions fails open forever:
-// every load must carry a STRING-LITERAL specifier beginning with `node:`. A
-// relative path fails, a bare package fails, and a computed specifier fails
-// because it cannot be decided at all. eval and new Function are banned outright
-// — they can load anything, so their presence makes the question undecidable.
+// So the instrument changes rather than the pattern. verify-all.mjs is a ~68-line
+// TRUST ANCHOR that should essentially never change, so this pins its content
+// hash. Any plant — aliased loader, `.constructor` trick, dynamic import, a stray
+// character — turns c11 red, because the check no longer reads variants at all.
+//
+// BE PRECISE ABOUT WHAT THIS DOES AND DOES NOT PROVE:
+//
+//   * It is CHANGE-DETECTION on a trust anchor. It is not, by itself, a proof of
+//     the independence property.
+//   * The property — that the runner's verdict cannot be swayed by anything under
+//     `scripts/audit` — was verified BEHAVIOURALLY at pin time, by neutering
+//     `runCapture` in subprocess.mjs and confirming `npm run audit:verify` STILL
+//     exits non-zero (`FAIL: 1 of 11 criteria failed`) rather than reporting
+//     11/11. That mutant lives in the round's mutation harness and is recorded in
+//     docs/audit/lessons.md.
+//   * ACKNOWLEDGED RESIDUAL: a change that also updates the pin defeats it. That
+//     is deliberate. It converts an invisible edit into a TWO-FILE diff — the
+//     runner and this pin, together, in one commit — which is exactly the shape a
+//     human reviewer can see. Adding a criterion c12 later will legitimately need
+//     both files updated in the same diff; that is expected, not a defect.
+//
+// The AST walk below is KEPT, but demoted: it is a courtesy that produces a
+// readable error for an honest mistake. It is no longer the proof.
 const RUNNER_REL = 'scripts/audit/verify-all.mjs';
 const runnerSrc = fs.readFileSync(path.join(ROOT, RUNNER_REL), 'utf8');
+
+// Pinned 2026-09-07 against verify-all.mjs as committed at a3c16fcc. lint-staged
+// formats *.{js,jsx,ts,tsx} and *.{json,md,yml,yaml} — .mjs is in neither list, so
+// no commit hook can rewrite this file and silently break the pin.
+const RUNNER_PIN = 'f5d1f229cb5050334b781c6f88b78bb686fb30bb88f425dd3354dd3bbdf2f381';
+const runnerHash = createHash('sha256').update(runnerSrc).digest('hex');
+if (runnerHash !== RUNNER_PIN) {
+  bad(
+    `${RUNNER_REL} has changed: sha256 is ${runnerHash}, pinned ${RUNNER_PIN}. The outermost gate `
+    + 'is a trust anchor — if this change is intended, re-verify independence behaviourally '
+    + '(neuter runCapture in subprocess.mjs, confirm `npm run audit:verify` still exits non-zero) '
+    + 'and update RUNNER_PIN in the same commit.',
+  );
+}
 const runnerAst = ts.createSourceFile(RUNNER_REL, runnerSrc, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
 
 const loads = [];
@@ -347,8 +378,8 @@ if (failures) {
 console.log(
   `OK c11: reader refuses ${6} unmeasurable cases and permits the 1 documented empty (git grep exit 1); `
   + `${SUBJECTS.length} verifiers fail closed under a broken git and pass under a working one; `
-  + `generator dies before writing, tree unchanged; runner's ${loads.length} module load(s) are all `
-  + 'node: builtins by AST walk, with no codegen; '
+  + 'generator dies before writing, tree unchanged; runner pinned by content hash '
+  + `(independence verified behaviourally at pin time), ${loads.length} module load(s) all node: builtins; `
   + `JSON-LD reader refuses a broken block in all ${SPELLINGS.length} valid spellings of the type `
   + 'attribute, permits a page with none, and does not mistake plain JavaScript for JSON-LD',
 );
