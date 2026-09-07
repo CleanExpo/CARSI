@@ -212,17 +212,59 @@ try {
 } catch (e) {
   bad(`parseLdBlocks: threw on a page with no JSON-LD, which is not a failure (${e.message})`);
 }
+
+// Round-12 P1. The first fix threw on a bad block but FOUND blocks with a regex
+// that only matched a double-quoted, whitespace-free `type`. Every spelling below
+// is valid HTML for the same element, and each was previously read as "no block
+// present" rather than as a parse failure — the silent-empty class one layer down.
+//
+// Each case carries an UNPARSEABLE body, so the only correct outcome is a throw.
+// A spelling that goes unrecognised returns [] instead, and this catches it.
+const BAD_BODY = '{"@type":';
+const SPELLINGS = [
+  ['double-quoted (the only one the old regex saw)', `<script type="application/ld+json">${BAD_BODY}</script>`],
+  ['single-quoted', `<script type='application/ld+json'>${BAD_BODY}</script>`],
+  ['whitespace around =', `<script type = "application/ld+json">${BAD_BODY}</script>`],
+  ['unquoted value', `<script type=application/ld+json>${BAD_BODY}</script>`],
+  ['uppercase attribute and MIME', `<SCRIPT TYPE="APPLICATION/LD+JSON">${BAD_BODY}</SCRIPT>`],
+  ['charset parameter', `<script type="application/ld+json; charset=utf-8">${BAD_BODY}</script>`],
+  ['type after another attribute', `<script id="x" data-a="b" type="application/ld+json">${BAD_BODY}</script>`],
+  ['newline inside the tag', `<script\n  type="application/ld+json"\n>${BAD_BODY}</script>`],
+];
+for (const [name, html] of SPELLINGS) {
+  let threw = null;
+  try {
+    parseLdBlocks(`<html><body>${html}</body></html>`);
+  } catch (e) {
+    threw = e;
+  }
+  if (threw === null) {
+    bad(`parseLdBlocks: ${name} — an unparseable block was NOT seen at all, so it read as absent rather than broken`);
+  } else if (!(threw instanceof LdParseFailure)) {
+    bad(`parseLdBlocks: ${name} — threw ${threw.name}, not LdParseFailure`);
+  }
+}
+
+// A <script> with no type is JavaScript per the HTML spec, not JSON-LD. Treating
+// it as LD would make the reader throw on ordinary pages, so this is the negative
+// half: the classifier must discriminate, not just say yes.
+try {
+  const blocks = parseLdBlocks('<html><script>var x = {broken:</script></html>');
+  if (blocks.length !== 0) bad(`parseLdBlocks: treated a plain <script> as JSON-LD (${blocks.length} blocks)`);
+} catch (e) {
+  bad(`parseLdBlocks: threw on a plain JavaScript <script>, which is not JSON-LD (${e.message})`);
+}
+
+// Names WHICH block failed, so a multi-block page points at the right one.
 {
   let threw = null;
   try {
-    parseLdBlocks(`<html>${LD_OK}<script type="application/ld+json">{"@type":</script></html>`);
+    parseLdBlocks(`<html>${LD_OK}<script type="application/ld+json">${BAD_BODY}</script></html>`);
   } catch (e) {
     threw = e;
   }
   if (threw === null) {
     bad('parseLdBlocks: accepted an UNPARSEABLE block — a silent drop empties ldCourses while c1 still passes');
-  } else if (!(threw instanceof LdParseFailure)) {
-    bad(`parseLdBlocks: threw ${threw.name}, not LdParseFailure`);
   } else if (!/block 2 of 2 does not parse/.test(threw.message)) {
     bad(`parseLdBlocks: did not name WHICH block failed — got: ${threw.message.slice(0, 80)}`);
   }
@@ -236,5 +278,6 @@ console.log(
   `OK c11: reader refuses ${6} unmeasurable cases and permits the 1 documented empty (git grep exit 1); `
   + `${SUBJECTS.length} verifiers fail closed under a broken git and pass under a working one; `
   + 'generator dies before writing, tree unchanged; runner imports nothing it gates; '
-  + 'JSON-LD reader refuses an unparseable block and permits a page with none',
+  + `JSON-LD reader refuses a broken block in all ${SPELLINGS.length} valid spellings of the type `
+  + 'attribute, permits a page with none, and does not mistake plain JavaScript for JSON-LD',
 );

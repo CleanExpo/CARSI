@@ -245,6 +245,24 @@ runner remove the dependency; the duplication is the point and must not be refac
 Proved behaviourally rather than by inspection: neuter `runCapture`, and `audit:verify` must
 still exit non-zero. It now does.
 
+**Fail-closed on the VALUE is worthless if the FINDER is fail-open.** Round 12 accepted that
+the new JSON-LD reader threw on an unparseable block, then attacked the step before it: blocks
+were located with `/<script[^>]*type="application\/ld\+json"[^>]*>/`, which only recognises a
+double-quoted, whitespace-free `type`. `type='application/ld+json'`, `type = "..."`, an
+unquoted value, uppercase, a `; charset=utf-8` parameter and a newline inside the tag are all
+valid HTML for the same element — and every one of them read as **"no block present"** rather
+than as a broken block. The throw was real and unreachable. A guard has two halves, *find* and
+*judge*, and hardening only the judging half moves the hole rather than closing it.
+
+**The fix was to stop approximating a parser.** "Is this element a JSON-LD script" is decided by
+the HTML spec, so it is answered by a spec-compliant parser (`parse5`, already in the tree and
+now an explicit devDependency), not by a pattern widened once per reviewer imagination. Two
+controls make that real: the reader must throw for a broken block in all eight spellings, and it
+must still NOT treat a plain `<script>` as JSON-LD — a classifier that says yes to everything
+discriminates nothing. Proved by restoring the exact round-12 regex as a mutant: c11 goes red
+naming `single-quoted`. And a positive control that the swap changed no measurement — the
+regenerated inventory was byte-identical to the regex version apart from its timestamp.
+
 **Some good changes have no honest mutant, and claiming one is worse than admitting it.**
 `let changed = ''` was replaced with `let changed;` — the initialiser was the exact fallback
 value the round-10 fix exists to eliminate. But `fail()` calls `process.exit`, so the
