@@ -35,6 +35,7 @@
     "check:cec": "node scripts/check-cec-approvals.mjs",
     "test:cec": "node scripts/check-cec-approvals.test.mjs",
     "check:live-cec": "npx tsx scripts/check-live-cec.ts",
+    "test:live-cec-route": "vitest run src/lib/server/live-cec-route.test.ts",
     "check:designations": "node scripts/check-designations.mjs",
     "check:model-currency": "node scripts/check-model-currency.mjs",
     "test:model-currency": "node scripts/check-model-currency.test.mjs",
