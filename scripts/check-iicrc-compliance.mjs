@@ -196,7 +196,7 @@ export { BANNED, CEC_NUMBER, inScope, isExempt, normaliseLine, ALLOWLIST };
 function main() {
   let list = '';
   try {
-    list = execSync('git ls-files', { encoding: 'utf8', maxBuffer: 128 * 1024 * 1024 });
+    list = execSync('git ls-files --cached --others --exclude-standard', { encoding: 'utf8', maxBuffer: 128 * 1024 * 1024 });
   } catch (err) {
     console.error('check-iicrc-compliance: failed to list tracked files:', err.message);
     process.exit(1);

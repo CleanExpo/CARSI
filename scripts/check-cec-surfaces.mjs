@@ -424,7 +424,7 @@ export { inScope, isExempt, ACCESSOR_ALLOWLIST };
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   let list = '';
   try {
-    list = execSync('git ls-files', { encoding: 'utf8', maxBuffer: 128 * 1024 * 1024 });
+    list = execSync('git ls-files --cached --others --exclude-standard', { encoding: 'utf8', maxBuffer: 128 * 1024 * 1024 });
   } catch (err) {
     console.error('check-cec-surfaces: failed to list tracked files:', err.message);
     process.exit(1);
