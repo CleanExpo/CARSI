@@ -175,16 +175,52 @@ check('an enrolment that carries the id but grants nothing is NOT fulfilled', ()
   }
 });
 
-check('an unrecognised enrolment status does not grant access', () => {
-  // ALLOW-set, not a deny-list: a status nobody anticipated must fail closed.
-  const r = classifySession(paidSession({ id: 'cs_test_new_1' }), new Map([['cs_test_new_1', 'some_future_status']]));
-  assert(r.verdict !== 'fulfilled', `unknown status must not read as fulfilled, got ${r.verdict}`);
+check('an unrecognised enrolment status is REPORTED, not quietly excused', () => {
+  // This assertion is deliberately `=== 'orphan'` and not `!== 'fulfilled'`.
+  //
+  // The weaker form was the original, and it could not fail: an earlier version of the script
+  // sent every non-access-granting status down the "access deliberately removed" path, so an
+  // unknown status returned 'not-applicable' — which is not 'fulfilled', so the check passed
+  // while the payer was silently dropped from the report. An independent review planted
+  // `pending_provision`, `paused` and `''` and demonstrated exactly that.
+  //
+  // "Not fulfilled" is two different outcomes and only one of them is safe. `not-applicable`
+  // clears the payer; `orphan` shows them to the founder. For a status this script does not
+  // recognise, only the second is defensible, so the test must distinguish them.
+  for (const status of ['some_future_status', 'pending_provision', 'paused', '', '   ']) {
+    const refs = new Map([['cs_test_new_1', status]]);
+    const r = classifySession(paidSession({ id: 'cs_test_new_1' }), refs);
+    assert(
+      r.verdict === 'orphan',
+      `unrecognised status "${status}" must be reported as an orphan, got ${r.verdict}: ${r.reason}`,
+    );
+  }
+});
+
+check('a KNOWN deliberate removal is still excused, so the split is real', () => {
+  // Negative control for the check above. Without this, making everything an orphan would pass
+  // that test while destroying the distinction the fix exists to draw.
+  for (const status of ['revoked', 'refunded', 'disputed', 'cancelled', 'canceled', 'chargeback']) {
+    const refs = new Map([['cs_test_rem_1', status]]);
+    const r = classifySession(paidSession({ id: 'cs_test_rem_1' }), refs);
+    assert(
+      r.verdict === 'not-applicable',
+      `known removal status "${status}" should be not-applicable, got ${r.verdict}: ${r.reason}`,
+    );
+  }
 });
 
 // ---------------------------------------------------------------- second pass, access by course
 // enrollment-service.ts:57-68 OVERWRITES paymentReference when a refunded learner buys again,
 // so the earlier session id exists nowhere while the learner sits in the course.
-const ORPHAN = { learnerId: 'user-1', courseSlug: 'introduction-to-water-damage-restoration', reason: 'PAID with no matching enrolment' };
+// `learnerIdSource: 'metadata'` is load-bearing, not decoration: only a learner identified from
+// the checkout's own `metadata.student_id` may be CLEARED. See the email case further down.
+const ORPHAN = {
+  learnerId: 'user-1',
+  courseSlug: 'introduction-to-water-damage-restoration',
+  learnerIdSource: 'metadata',
+  reason: 'PAID with no matching enrolment',
+};
 
 check('positive control: the second pass CAN still return orphan', () => {
   const r = classifyOrphanAgainstAccess(ORPHAN, new Set());
@@ -195,6 +231,30 @@ check('a payer who holds the course under another reference is not an orphan', (
   const keys = new Set([accessKey('user-1', 'introduction-to-water-damage-restoration')]);
   const r = classifyOrphanAgainstAccess(ORPHAN, keys);
   assert(r.verdict === 'fulfilled', `expected fulfilled, got ${r.verdict}: ${r.reason}`);
+});
+
+check('an EMAIL-resolved payer holding the course is annotated, NOT cleared', () => {
+  // The clearing path is only safe when the payer was identified by checkout metadata. An
+  // email match is inference: `email` is unique so it cannot collide across two accounts, and
+  // a case mismatch simply fails to resolve — but a shared or role inbox (office@, accounts@,
+  // a couple or a crew on one address) can resolve to a DIFFERENT person who happens to hold
+  // the course. Clearing on that loses someone who paid and got nothing, silently.
+  //
+  // So this must stay an orphan, carrying the likely explanation for the founder to dismiss in
+  // seconds. Over-reporting costs a minute; under-reporting costs a customer.
+  const keys = new Set([accessKey('user-1', 'introduction-to-water-damage-restoration')]);
+  const r = classifyOrphanAgainstAccess({ ...ORPHAN, learnerIdSource: 'email' }, keys);
+  assert(r.verdict === 'orphan', `email-resolved payer must stay reported, got ${r.verdict}`);
+  assert(/re-purchase/i.test(r.reason), `reason must explain the likely cause, got: ${r.reason}`);
+  assert(/email/i.test(r.reason), `reason must say the id came from email, got: ${r.reason}`);
+});
+
+check('a payer with no identified source is never cleared', () => {
+  // Defensive: a future caller that forgets to set learnerIdSource must not fall into the
+  // clearing branch by default.
+  const keys = new Set([accessKey('user-1', 'introduction-to-water-damage-restoration')]);
+  const r = classifyOrphanAgainstAccess({ ...ORPHAN, learnerIdSource: undefined }, keys);
+  assert(r.verdict === 'orphan', `unsourced learner id must stay reported, got ${r.verdict}`);
 });
 
 check('access to a DIFFERENT course does not clear the orphan', () => {

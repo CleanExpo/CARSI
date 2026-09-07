@@ -46,6 +46,27 @@ const NON_ENROLMENT_SOURCES = new Set(['carsi-ccw-roadshow']);
 export const ACCESS_GRANTING_STATUSES = new Set(['active', 'completed']);
 
 /**
+ * Statuses that mean access was DELIBERATELY taken away — the refund / chargeback family.
+ * Mirrors NO_ACCESS_STATUSES in src/lib/server/enrollment-access.ts:33.
+ *
+ * This set exists because "does not grant access" and "was deliberately removed" are NOT the
+ * same claim, and an earlier version of this file treated them as one. Anything that is
+ * neither access-granting nor listed here is an UNKNOWN status, and an unknown status must be
+ * REPORTED, never quietly excused — see classifySession.
+ *
+ * `status` is a free-text column. Both spellings of cancelled are present upstream because a
+ * Stripe-sourced value may use either; keep them.
+ */
+export const DELIBERATE_NO_ACCESS_STATUSES = new Set([
+  'revoked',
+  'cancelled',
+  'canceled',
+  'refunded',
+  'disputed',
+  'chargeback',
+]);
+
+/**
  * Was this session's charge refunded in full?
  *
  * A refunded Stripe session STILL reads `payment_status: 'paid'`, so without this every
@@ -85,17 +106,45 @@ export function accessKey(userId, courseSlug) {
  * Pure. `accessKeys` holds one entry per learner-course pair that currently grants access.
  */
 export function classifyOrphanAgainstAccess(orphan, accessKeys) {
-  const { learnerId, courseSlug } = orphan;
+  const { learnerId, courseSlug, learnerIdSource } = orphan;
   if (!learnerId) {
     return { verdict: 'orphan', reason: orphan.reason };
   }
-  if (accessKeys.has(accessKey(learnerId, courseSlug))) {
+  if (!accessKeys.has(accessKey(learnerId, courseSlug))) {
+    return { verdict: 'orphan', reason: orphan.reason };
+  }
+
+  // The payer appears to hold access already. WHETHER THAT CLEARS THEM DEPENDS ENTIRELY ON HOW
+  // WE IDENTIFIED THEM, because clearing is the irreversible direction: a cleared payer is
+  // never shown to the founder again.
+  //
+  //   'metadata' — `metadata.student_id`, written by our own checkout for this very session.
+  //                It identifies the payer directly, so it is safe to clear on.
+  //   'email'    — INFERRED by matching the Stripe session email to an LMS account. `email` is
+  //                unique, so this cannot collide across two accounts, and a case mismatch
+  //                simply fails to resolve (which reports, the safe direction). But a shared or
+  //                role inbox — office@, accounts@, a couple or a crew using one address — can
+  //                resolve to a DIFFERENT person who happens to hold the course. Clearing on
+  //                that silently loses someone who paid and got nothing.
+  //
+  // So an email-resolved match is reported, not cleared, and the reason says why. This is the
+  // over-report side of the trade the file's own rule demands: showing the founder someone who
+  // turns out to be fine costs a minute; dropping a real orphan costs a customer.
+  if (learnerIdSource === 'metadata') {
     return {
       verdict: 'fulfilled',
       reason: 'the payer holds access to this course under a different payment reference',
     };
   }
-  return { verdict: 'orphan', reason: orphan.reason };
+
+  return {
+    verdict: 'orphan',
+    reason:
+      `${orphan.reason} — NOTE: an account matching this session's email already holds this ` +
+      'course, so this is most likely a re-purchase after a refund and not a real orphan. ' +
+      'Not cleared automatically because the payer was identified by email rather than by ' +
+      'checkout metadata, and a shared inbox can match the wrong person. Confirm and dismiss.',
+  };
 }
 
 /**
@@ -135,12 +184,29 @@ export function classifySession(session, enrolmentRefs) {
   // access at all.
   const recordedStatus = enrolmentRefs.get(session.id);
   if (recordedStatus !== undefined) {
-    if (ACCESS_GRANTING_STATUSES.has(String(recordedStatus).toLowerCase().trim())) {
+    const normalised = String(recordedStatus).toLowerCase().trim();
+    if (ACCESS_GRANTING_STATUSES.has(normalised)) {
       return { verdict: 'fulfilled', reason: 'an enrolment carries this session id and grants access' };
     }
+    if (DELIBERATE_NO_ACCESS_STATUSES.has(normalised)) {
+      return {
+        verdict: 'not-applicable',
+        reason: `access deliberately removed (enrolment status "${recordedStatus}")`,
+      };
+    }
+    // NEITHER access-granting NOR a known deliberate removal. `status` is free text, so this
+    // is reachable via a new status nobody updated this file for, or an empty string.
+    //
+    // This branch is the whole point of splitting the two sets. Clearing here would mean
+    // telling the founder that a customer who paid and holds no access needs nothing, on the
+    // strength of a status string this script does not understand — a silent false negative,
+    // which is the one direction that loses a paying customer. Report it and say why.
     return {
-      verdict: 'not-applicable',
-      reason: `access deliberately removed (enrolment status "${recordedStatus}")`,
+      verdict: 'orphan',
+      reason:
+        `PAID for "${slug}" and the enrolment status "${recordedStatus}" is not recognised — ` +
+        'it neither grants access nor is a known refund/chargeback status, so this is reported ' +
+        'rather than excused',
     };
   }
   return { verdict: 'orphan', reason: `PAID for "${slug}" with no matching enrolment` };
@@ -253,6 +319,9 @@ async function main() {
             // Carried for the second pass, which asks whether this payer holds the course
             // under some OTHER payment reference. Null until the email lookup resolves it.
             learnerId: session.metadata?.student_id?.trim() || null,
+            // HOW the learner was identified, not just who. The second pass will only CLEAR a
+            // payer on a 'metadata' match — see classifyOrphanAgainstAccess.
+            learnerIdSource: session.metadata?.student_id?.trim() ? 'metadata' : null,
             reason,
           });
         } else if (verdict === 'not-applicable') {
@@ -282,7 +351,15 @@ async function main() {
           select: { id: true, email: true },
         });
         const idByEmail = new Map(users.map((u) => [u.email, u.id]));
-        for (const o of orphans) if (!o.learnerId && o.email) o.learnerId = idByEmail.get(o.email) ?? null;
+        for (const o of orphans) {
+          if (o.learnerId || !o.email) continue;
+          const resolved = idByEmail.get(o.email) ?? null;
+          if (!resolved) continue;
+          o.learnerId = resolved;
+          // Marked as inferred. This identification is good enough to ANNOTATE the row with a
+          // likely explanation, but not to drop the payer from the report entirely.
+          o.learnerIdSource = 'email';
+        }
       } catch (e) {
         // Cannot resolve, so cannot clear anything. Over-reporting is the safe direction:
         // the founder sees a customer who is fine, rather than missing one who is not.

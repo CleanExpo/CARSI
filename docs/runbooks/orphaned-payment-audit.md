@@ -9,31 +9,52 @@ whether the outage cost anything.
 
 ## The command
 
-Both credentials are supplied at run time and neither is stored by this repo or read by any
-agent:
+**You should never see, copy, type or paste either credential to run this.** Point the process
+at a file that holds them and let it read them itself:
 
 ```bash
 cd ~/CARSI
-STRIPE_SECRET_KEY=<carsi live secret key> \
-DATABASE_URL=<production database url> \
-node scripts/audit-orphaned-payments.mjs --since 2026-08-29
+node --env-file=<path to the audit env file> scripts/audit-orphaned-payments.mjs --since 2026-08-29
 ```
 
 Add `--json` for machine-readable output. `--since` defaults to 30 days back. Use
 **2026-08-29** for the current investigation: that is when webhook deliveries began failing
 (`DECISIONS.md:90`).
 
+An earlier version of this runbook told you to put the values on the command line. Do not do
+that, and do not restore it: a secret typed as an argument is written to shell history and is
+readable by any process that can run `ps` for as long as the command runs. Handing a path to
+the tool achieves the same thing and exposes nothing.
+
+### The env file this expects
+
+One file, holding exactly the two variables the script needs and nothing else:
+
+```
+STRIPE_SECRET_KEY=...
+DATABASE_URL=...
+```
+
+Keep it outside the repo, readable only by you (`chmod 600`). It is deliberately a separate
+file from `~/CARSI/.env` — see the first footgun below.
+
 ## Two ways to point it at the wrong thing
 
 Both produce a confident, wrong answer, so check them before believing the output.
 
-1. **`DATABASE_URL` is defined TWICE in `~/CARSI/.env`, on lines 7 and 8, with no comment
-   saying which is which.** Sourcing that file silently takes line 8. If line 8 is not the
-   production database, every live payment reads as an orphan. Pass the value explicitly, as
-   above, rather than sourcing the file.
+1. **Do not use `~/CARSI/.env` for this.** `DATABASE_URL` is defined TWICE in it, with no
+   comment saying which is which, and the last definition silently wins. If the winning one is
+   not the production database, every live payment reads as an orphan and the report is
+   confidently wrong. A dedicated file with one `DATABASE_URL` removes the ambiguity entirely
+   rather than asking you to remember it.
 2. **`STRIPE_SECRET_KEY` in `~/.hermes/.env` is not necessarily CARSI's.** That file holds
    credentials for several businesses. The wrong account lists zero sessions, or somebody
-   else's.
+   else's — and note that exit 2 covers the zero-sessions case precisely so a wrong key cannot
+   read as a clean bill of health.
+
+Neither footgun requires you to inspect a credential's value to avoid it. If you find yourself
+opening a secrets file to compare strings, stop — that is the failure this section exists to
+prevent.
 
 ## Reading the result
 
