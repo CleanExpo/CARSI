@@ -31,13 +31,54 @@ interface Quiz {
 
 interface QuizPlayerProps {
   quiz: Quiz;
-  onSubmit: (answers: Record<string, number>) => void;
+  /**
+   * May be sync or async. When it returns a promise the submit button stays disabled until it
+   * settles, which is what makes the double-submit guard below correct rather than cosmetic.
+   */
+  onSubmit: (answers: Record<string, number>) => void | Promise<void>;
   variant?: 'default' | 'enterprise';
+}
+
+/**
+ * Run a submit under a re-entry lock, and ALWAYS release the lock.
+ *
+ * The release MUST be in `finally`, not `catch`. An earlier version released only on a thrown
+ * error, which never happened: the real caller (`LearnCourseShell.submitQuiz`) catches its own
+ * API failure, calls `setLessonError`, and RESOLVES. So a failed submit left the lock set and
+ * both submit buttons dead with no reachable retry — and a quiz lesson has no completion path
+ * except passing, so the student was stranded in the course permanently.
+ *
+ * Releasing unconditionally is safe on success because the parent renders this component only
+ * while `!quizResult` (LearnCourseShell.tsx:880), so a successful submit unmounts it and no
+ * live button survives on a spent attempt.
+ *
+ * Exported for test: this component's tests render to static markup, so the lock's behaviour
+ * across a resolving-on-failure caller cannot be reached by clicking. The invariant is tested
+ * here directly instead of not at all.
+ */
+export async function runGuardedSubmit(
+  locked: boolean,
+  setLocked: (v: boolean) => void,
+  submit: () => void | Promise<void>,
+): Promise<void> {
+  if (locked) return;
+  setLocked(true);
+  try {
+    await submit();
+  } finally {
+    setLocked(false);
+  }
 }
 
 export function QuizPlayer({ quiz, onSubmit, variant = 'default' }: QuizPlayerProps) {
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [activeIndex, setActiveIndex] = useState(0);
+  // A quiz attempt is DESTRUCTIVE and strictly limited: the schema allows 3, and the API returns
+  // 409 once they are gone. There is no learner-visible reset, and a quiz lesson has no
+  // completion path except passing — so a student who runs out is locked out of finishing the
+  // course permanently. Before this guard, `handleSubmit` called `onSubmit` with nothing to stop
+  // a second call, so one impatient double-click on a slow connection spent two of the three.
+  const [submitting, setSubmitting] = useState(false);
   const enterprise = variant === 'enterprise';
 
   const answeredCount = Object.keys(answers).length;
@@ -48,8 +89,10 @@ export function QuizPlayer({ quiz, onSubmit, variant = 'default' }: QuizPlayerPr
     setAnswers((prev) => ({ ...prev, [questionId]: optionIdx }));
   }
 
-  function handleSubmit() {
-    onSubmit(answers);
+  async function handleSubmit() {
+    if (submitting) return;
+    setSubmitting(true);
+    await runGuardedSubmit(submitting, setSubmitting, () => onSubmit(answers));
   }
 
   if (!enterprise) {
@@ -84,7 +127,9 @@ export function QuizPlayer({ quiz, onSubmit, variant = 'default' }: QuizPlayerPr
             ))}
           </fieldset>
         ))}
-        <Button onClick={handleSubmit}>Submit Quiz</Button>
+        <Button onClick={handleSubmit} disabled={submitting}>
+          {submitting ? 'Submitting…' : 'Submit Quiz'}
+        </Button>
       </div>
     );
   }
@@ -174,7 +219,7 @@ export function QuizPlayer({ quiz, onSubmit, variant = 'default' }: QuizPlayerPr
                 Next question
               </Button>
             ) : (
-              <Button type="button" onClick={handleSubmit} disabled={!allAnswered}>
+              <Button type="button" onClick={handleSubmit} disabled={!allAnswered || submitting}>
                 Submit assessment
               </Button>
             )}

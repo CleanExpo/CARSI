@@ -3,22 +3,42 @@
 import * as React from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
+/**
+ * Acronym expansions shown on hover.
+ *
+ * The IICRC designations below are a THIRD PARTY'S credential names. They are verified against
+ * the issuer's own certifications page, https://iicrc.org/iicrccertifications/, fetched
+ * 2026-09-07, and must be quoted exactly — including "Odor", which is the IICRC's own spelling
+ * of their own certification and is not ours to re-spell. Locked by AcronymTooltip.test.tsx.
+ *
+ * Expanding these correctly is what makes the tooltip a lawful nominative reference rather than
+ * a false claim about someone else's certification.
+ */
 export const ACRONYMS: Record<string, string> = {
   IICRC: 'Institute of Inspection, Cleaning and Restoration Certification',
   CEC: 'Continuing Education Credit',
+  // --- IICRC designations (verified 2026-09-07) ---
   WRT: 'Water Damage Restoration Technician',
-  ASD: 'Applied Structural Drying',
+  ASD: 'Applied Structural Drying Technician',
   AMRT: 'Applied Microbial Remediation Technician',
-  FSRT: 'Fire and Smoke Restoration Technician',
+  FSRT: 'Fire and Smoke Damage Restoration Technician',
   OCT: 'Odor Control Technician',
-  CCT: 'Commercial Carpet Technician',
+  // Was "Commercial Carpet Technician", which conflated this with CCMT (Commercial Carpet
+  // Maintenance Technician) — a real and separate IICRC designation.
+  CCT: 'Carpet Cleaning Technician',
   TCST: 'Trauma and Crime Scene Technician',
   HST: 'Health and Safety Technician',
+  // Was "Carpet Repair and Reinstallation Technician", which is RRT's name, not CRT's.
+  CRT: 'Color Repair Technician',
+  RRT: 'Carpet Repair and Reinstallation Technician',
+  // --- not IICRC ---
+  // IEP does NOT appear on the IICRC certifications page (checked 2026-09-07, with a positive
+  // control confirming the search finds designations that ARE listed). It is an ACAC credential.
+  // Kept because this map is a general glossary, but it must never be presented as IICRC's.
   IEP: 'Indoor Environmentalist Professional',
   RTO: 'Registered Training Organisation',
   TAFE: 'Technical and Further Education',
   CPP: 'Certificate in Property Services (Cleaning Operations)',
-  CRT: 'Carpet Repair and Reinstallation Technician',
   RPL: 'Recognition of Prior Learning',
   LMS: 'Learning Management System',
 };

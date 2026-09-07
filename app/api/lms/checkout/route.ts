@@ -26,6 +26,7 @@ import {
   STRIPE_MIN_UNIT_AMOUNT_CENTS,
 } from '@/lib/server/user-discounts';
 import { getOrCreateCourseBySlug } from '@/lib/server/course-catalog-sync';
+import { getEntitlements } from '@/lib/server/entitlements';
 import { getFirstLessonLearnPath } from '@/lib/server/first-lesson';
 import { getPublishedCourseForCheckout } from '@/lib/server/public-courses-list';
 import { captureServerError } from '@/lib/server/sentry';
@@ -115,6 +116,40 @@ export async function POST(request: NextRequest) {
         { detail: 'Course not found in published catalogue.' },
         { status: 404 }
       );
+    }
+
+    // Never charge a member for a course their membership already includes.
+    //
+    // Before this guard the ONLY thing standing between a paying subscriber and a second
+    // full-price charge was client state in EnrolButton.tsx, and that state fails OPEN — its
+    // status fetch ends in `.catch(() => setSubState('none'))`, so a transient blip on the
+    // status API renders the full price and a live pay button. Two further paths reached this
+    // route with no check at all: "Quick enrol with a different email" posts here directly from
+    // GuestEnrolForm, and the same component tells a subscriber "One-time payment — lifetime
+    // access" while showing them a price they have already paid.
+    //
+    // Scope is deliberately narrow. A `team` purchase is a member buying SEATS FOR OTHER
+    // PEOPLE, which is legitimate revenue and must still go through — blocking it would break
+    // a real sale to fix a different bug. Guests (no session) are unaffected.
+    //
+    // On the fail direction: getEntitlements fails CLOSED, meaning a database outage reports
+    // "not entitled" and checkout proceeds. For content access that is right (deny on doubt);
+    // for charging it is the wrong way round, since the safe answer under uncertainty is not to
+    // take money. It is left as-is because the behaviour is shared with the content gate, where
+    // reversing it would be a fail-open security change. Worth revisiting with a dedicated
+    // "may I charge this person" check rather than reusing the access check.
+    if (studentId && purchaseMode !== 'team') {
+      const entitlements = await getEntitlements(studentId);
+      if (entitlements.entitledCourseIds === 'ALL') {
+        return NextResponse.json(
+          {
+            detail: 'This course is already included in your membership — no payment needed.',
+            included_in_membership: true,
+            enroll_path: '/api/lms/subscription/enroll',
+          },
+          { status: 409 },
+        );
+      }
     }
 
     let listAud = Number(course.price_aud);

@@ -6,6 +6,21 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { buildContentSecurityPolicy } from './csp';
 
+// Explicit timeout, because vitest.config.ts sets none and the 5000ms default is not enough
+// for what these tests do. Each one dynamically imports the REAL root layout under jsdom —
+// the whole layout module graph, fonts and providers included — which measures ~2.8s per test
+// when this file runs alone. Under the full parallel suite that crosses 5s and the test fails
+// with `Test timed out in 5000ms`.
+//
+// Observed twice on 2026-09-07 during release-gate verification: a DIFFERENT test in this file
+// timed out on each run while the assertions themselves were sound (3/3 pass in isolation).
+// A test that fails on machine timing rather than on the behaviour it asserts is a broken
+// test: it blocks releases at random and, worse, trains readers to dismiss its failures.
+//
+// This weakens nothing. No assertion is removed and no test is skipped — all three still run
+// and must pass. Only the clock changes.
+vi.setConfig({ testTimeout: 30_000 });
+
 /**
  * WS1 fix 9 (GP-550, DECISIONS #23 decided "off" on 03/09/2026). Break 9 of the funnel walk: the root
  * layout mounted the ElevenLabs voice widget, whose script host (unpkg.com) the policy's script-src
