@@ -31,6 +31,7 @@
     "test:iicrc-compliance": "node scripts/check-iicrc-compliance.test.mjs",
     "check:cec-surfaces": "node scripts/check-cec-surfaces.mjs",
     "test:cec-surfaces": "node scripts/check-cec-surfaces.test.mjs",
+    "test:guard-enumeration": "node scripts/check-guard-enumeration.test.mjs",
     "check:cec": "node scripts/check-cec-approvals.mjs",
     "test:cec": "node scripts/check-cec-approvals.test.mjs",
     "check:live-cec": "npx tsx scripts/check-live-cec.ts",

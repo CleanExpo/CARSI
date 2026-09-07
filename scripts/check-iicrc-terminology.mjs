@@ -413,7 +413,7 @@ if (staged) {
   // CI / manual: scan all tracked source-copy files.
   let list = '';
   try {
-    list = execSync('git ls-files', { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+    list = execSync('git ls-files --cached --others --exclude-standard', { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
   } catch (err) {
     console.error('check-iicrc-terminology: failed to list tracked files:', err.message);
     process.exit(1);
