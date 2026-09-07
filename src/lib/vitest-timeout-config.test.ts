@@ -7,9 +7,15 @@ import config from '../../vitest.config';
  *
  * Vitest defaults to 5000ms. That default failed release-gate verification TWICE on
  * 2026-09-07 with `Test timed out in 5000ms` — a different test each run, in a file whose
- * assertions were sound. The cause was never a slow test: measured on an idle machine
- * across all 1361 tests, the slowest was 1200ms and the offending file ran in 588ms. With
- * 173 files running in parallel on a loaded machine, that 588ms was observed at 5358ms.
+ * assertions were sound. The cause was never a slow test: the files that timed out do well
+ * under a second of actual work, while 548 suites running in parallel on a loaded machine
+ * inflate wall-clock time many-fold.
+ *
+ * Per-test timings here are NOT reproducible — the same test has been observed varying by
+ * up to 8.8x between runs, and two release reviews were failed for quoting a single run as
+ * a worst case. See vitest.config.ts for the sampled scatter and for why the margin is
+ * argued against the highest value ever recorded (5459ms) rather than against any one run.
+ * Do not restate a point measurement in this file.
  *
  * A test that fails on machine timing rather than on the behaviour it asserts is worse than
  * no test: it blocks releases at random AND trains readers to dismiss its failures, so the
@@ -32,15 +38,15 @@ describe('suite-wide test timeout', () => {
   });
 
   it('is high enough to absorb parallel contention', () => {
-    // The measured worst case is 1200ms; contention was observed inflating a test ~9x.
+    // The highest per-test time ever recorded on this suite is 5459ms, under heavy load.
     // Anything at or below 5000ms reinstates the exact failure this guards against.
     expect(timeout as number).toBeGreaterThanOrEqual(15_000);
   });
 
   it('is not so high that a genuine regression goes unnoticed', () => {
-    // Against the 1200ms worst case, 60s would be a 50x margin — at that point the timeout
-    // has stopped being a signal. If a single file truly needs longer, give that FILE its
-    // own vi.setConfig rather than raising this ceiling for everything.
+    // Against the 5459ms worst ever recorded, 60s would be an 11x margin — at that point the
+    // timeout has stopped being a signal. If a single file truly needs longer, give that FILE
+    // its own vi.setConfig rather than raising this ceiling for everything.
     expect(timeout as number).toBeLessThanOrEqual(60_000);
   });
 });
