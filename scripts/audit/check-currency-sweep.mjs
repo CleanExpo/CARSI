@@ -41,6 +41,11 @@ const md = fs.readFileSync(FILE, 'utf8');
 // lexer, consumed by every check below, is what closed that - and it is still the
 // rule here even though the way the table is FOUND has changed again since.
 const CLASSES = ['total', 'edition-class', '—'];
+// Markdown allows up to THREE leading spaces on a table row; four or more make
+// it an indented code block, which a reader does not see as a table either. Both
+// row readers below share this one prefix so they cannot drift apart - two
+// readers of one grammar diverging is precisely how round 5 was defeated.
+const ROW_INDENT = ' {0,3}';
 
 // ── The table is DELIMITED, not discovered ───────────────────────────────
 //
@@ -88,12 +93,13 @@ const countsBlock = md.slice(begins[0].index + begins[0][0].length, ends[0].inde
 // the verdict, but a stray row still misleads a human reader, and this document
 // is generated with exactly one table.
 const outside = (md.slice(0, begins[0].index) + md.slice(ends[0].index)).split('\n')
-  .filter((l) => /^\|.*\|.*\|/.test(l));
+  .filter((l) => new RegExp(`^${ROW_INDENT}\\|.*\\|.*\\|`).test(l));
 if (outside.length) {
   fail(`${outside.length} table row(s) appear outside the counts table: ${outside.map((l) => JSON.stringify(l.slice(0, 60))).join(', ')} — this document publishes exactly one table`);
 }
 
-const rows = [...countsBlock.matchAll(/^\| (.+?) \| (\d+) \| (.+?) \|[ \t]*$/gm)].map((m) => ({
+const ROW = new RegExp(`^${ROW_INDENT}\\| (.+?) \\| (\\d+) \\| (.+?) \\|[ \\t]*$`, 'gm');
+const rows = [...countsBlock.matchAll(ROW)].map((m) => ({
   label: m[1].replace(/\*\*/g, '').trim(),
   count: Number(m[2]),
   cls: m[3].trim(),
