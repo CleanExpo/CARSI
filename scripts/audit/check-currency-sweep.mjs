@@ -49,8 +49,25 @@ const md = fs.readFileSync(FILE, 'utf8');
 // the table is now lexed exactly once, anchored at both ends, and every check
 // below consumes those same rows. There is no second reading for an attacker to
 // disagree with.
+// Round-6: collapsing the two readers into one lexer was necessary and not
+// sufficient. The lexer still scanned the WHOLE document and the lookup took the
+// FIRST match, so a decoy row planted anywhere above `## Counts` shadowed the
+// real one - the review corrupted the published table to 999 and this still
+// exited 0. Scope was the half I left open: an unanchored SEARCH became an
+// anchored search over an unbounded REGION, which is the same defect one level
+// up. So the region is now bounded to the Counts section, and a label that
+// matches more than one row inside it is ambiguity, refused rather than resolved
+// by document order.
 const CLASSES = ['total', 'edition-class', '—'];
-const rows = [...md.matchAll(/^\| (.+?) \| (\d+) \| (.+?) \|[ \t]*$/gm)].map((m) => ({
+const headings = [...md.matchAll(/^## Counts[ \t]*$/gm)];
+if (headings.length !== 1) {
+  fail(`the sweep declares ${headings.length} "## Counts" sections; exactly one is required, because the table to read must not depend on document order`);
+}
+const afterHeading = md.slice(headings[0].index + headings[0][0].length);
+const nextHeading = afterHeading.search(/^## /m);
+const countsBlock = nextHeading === -1 ? afterHeading : afterHeading.slice(0, nextHeading);
+
+const rows = [...countsBlock.matchAll(/^\| (.+?) \| (\d+) \| (.+?) \|[ \t]*$/gm)].map((m) => ({
   label: m[1].replace(/\*\*/g, '').trim(),
   count: Number(m[2]),
   cls: m[3].trim(),
@@ -106,8 +123,23 @@ const MEASURES = [
 ];
 
 const problems = [];
+
+// Two rows carrying the same label make every lookup depend on which one comes
+// first, which is exactly the property the review exploited. Refuse the document
+// rather than pick a winner.
+const seen = new Map();
+for (const r of rows) seen.set(r.label, (seen.get(r.label) || 0) + 1);
+for (const [label, n] of seen) {
+  if (n > 1) problems.push(`the counts table carries ${n} rows labelled "${label}" — a duplicated label makes the reading depend on row order`);
+}
+
 for (const [labelRe, plain, actual, cls] of MEASURES) {
-  const row = rows.find((r) => labelRe.test(r.label));
+  const matching = rows.filter((r) => labelRe.test(r.label));
+  if (matching.length > 1) {
+    problems.push(`${matching.length} rows in the counts table match "${plain}" (${matching.map((r) => `"${r.label}"`).join(', ')}) — the measure must resolve to exactly one row`);
+    continue;
+  }
+  const row = matching[0];
   if (!row) {
     problems.push(`sweep does not record "${plain}" in a parseable table row`);
     continue;

@@ -40,7 +40,10 @@
  *
  * Every violation, entry-level or file-level, is emitted through one `emit()`
  * choke point that throws on an unregistered id, so adding a rule without
- * registering it is a hard error rather than a silent coverage hole.
+ * registering it is a hard error rather than a silent coverage hole. And because
+ * a choke point is only a convention until something enforces it, both exported
+ * validators pass their result through `sealViolations` on the way out — see the
+ * SEAL note below for why that claim is about the data and not the source.
  */
 import fs from 'node:fs';
 
@@ -121,11 +124,51 @@ const emit = (list, registry, registryName, rule, message) => {
 };
 
 /**
+ * The SEAL — every violation leaving this module carries a registered rule id.
+ *
+ * Round-6 broke the previous guarantee, which was a static scan of this file's
+ * source counting `.push({ rule` shapes. It was defeated twice in one round: a
+ * computed key `{ ['rule']: … }` matched no shape the scan knew, and a pair of
+ * string literals holding a comment-open and a comment-close made the scan's own stripping
+ * erase a raw push before it was ever read. Neither is a bug in the regex.
+ * Deciding "does this source construct an object with a rule property" is not
+ * decidable by pattern, and an AST would fall to `obj['ru' + 'le']` next.
+ *
+ * So the claim moved from the source to the DATA, where it is decidable. It no
+ * longer matters how a violation was built or which door it came through: if it
+ * leaves this module, its id is registered, or nothing leaves at all. A door
+ * emitting a registered id is already covered by that id's mutant; a door
+ * emitting an unregistered one throws the moment it executes.
+ *
+ * This is deliberately narrower than the check it replaces in exactly one
+ * respect, and stronger in every other: a push on a branch nothing reaches is
+ * not caught while it lies dormant. It cannot affect a verdict while dormant
+ * either, and it fails closed the instant it becomes reachable.
+ */
+export function sealViolations(list, registry, registryName) {
+  if (!Array.isArray(list)) {
+    throw new Error(`validate-ledger: ${registryName} seal received ${typeof list}, not an array of violations`);
+  }
+  for (const v of list) {
+    if (typeof v !== 'object' || v === null || Array.isArray(v)) {
+      throw new Error(`validate-ledger: ${registryName} seal found a violation that is not an object: ${JSON.stringify(v)}`);
+    }
+    if (typeof v.rule !== 'string' || v.rule === '') {
+      throw new Error(`validate-ledger: ${registryName} seal found a violation with no readable rule id: ${JSON.stringify(v)}`);
+    }
+    if (!registry.includes(v.rule)) {
+      throw new Error(`validate-ledger: ${registryName} seal rejected unregistered rule id "${v.rule}" — every violation leaving this module must name a registered rule so it gets a mutant`);
+    }
+  }
+  return list;
+}
+
+/**
  * Entry validation, returning one {rule, message} per violation.
  * `validateEntry` below flattens this to the string form the rest of the
  * pipeline already consumes, so the message text is unchanged.
  */
-export function validateEntryRules(e, lineNo) {
+function entryRulesImpl(e, lineNo) {
   const v = [];
   const at = (rule, msg) => emit(v, ENTRY_RULES, 'ENTRY_RULES', rule, `line ${lineNo}: ${msg}`);
 
@@ -196,6 +239,25 @@ export function validateEntryRules(e, lineNo) {
   return v;
 }
 
+/**
+ * Entry validation. Sealed: every violation returned names a registered
+ * ENTRY_RULES id, whatever code path built it.
+ */
+export function validateEntryRules(e, lineNo) {
+  return sealViolations(entryRulesImpl(e, lineNo), ENTRY_RULES, 'ENTRY_RULES');
+}
+
+/**
+ * File validation. Sealed against RULES rather than FILE_RULES: this function
+ * legitimately spreads entry-level violations into its own list, and those were
+ * already sealed against ENTRY_RULES on the way in.
+ */
+export function validateFileRules(file) {
+  const r = fileRulesImpl(file);
+  sealViolations(r.violations, RULES, 'RULES');
+  return r;
+}
+
 export function validateEntry(e, lineNo) {
   return validateEntryRules(e, lineNo).map((x) => x.message);
 }
@@ -204,7 +266,7 @@ export function validateEntry(e, lineNo) {
  * File validation, returning one {rule, message} per violation.
  * `validateFile` flattens this to the existing string form.
  */
-export function validateFileRules(file) {
+function fileRulesImpl(file) {
   const violations = [];
   const fileAt = (rule, message) => emit(violations, FILE_RULES, 'FILE_RULES', rule, message);
 

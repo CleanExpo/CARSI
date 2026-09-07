@@ -182,8 +182,10 @@ also unsubstantiated for most of the catalogue. Separately, the wording is in th
 prohibited public-language class per GP-560 — but the reason it is a GAP is that
 the claim itself has no established basis, not merely that it is unsayable.
 
-**Every repo guard passes while the live site serves prohibited language.** Five
-guards exit 0. They scan repo source; the strings are served from live page
+**Every repo guard passes while the live site serves prohibited language.** All
+**seven** guards exit 0 (`check:iicrc-compliance`, `check:iicrc-terminology`,
+`check:cec`, `check:cec-surfaces`, `check:standards-claims`, `check:designations`,
+`check:au-english`). They scan repo source; the strings are served from live page
 metadata. The blind spot is structural, not a missing rule — no amount of guard
 tuning reaches it.
 

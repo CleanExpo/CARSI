@@ -1,6 +1,6 @@
 # GP-567 D3 — Standards currency sweep
 
-Generated `2026-09-07T13:38:32Z` by `scripts/audit/build-sweeps.mjs`.
+Generated `2026-09-07T14:13:12Z` by `scripts/audit/build-sweeps.mjs`.
 
 ## Reproduce
 

@@ -1,10 +1,10 @@
 # GP-567 D4 — Compliance-language sweep
 
-Generated `2026-09-07T13:38:52Z`. Live surfaces read from `.audit-cache/`, access date **2026-09-07**.
+Generated `2026-09-07T14:13:37Z`. Live surfaces read from `.audit-cache/`, access date **2026-09-07**.
 
 ## No new linter was written
 
-The repo ships five relevant guards. This sweep records what they say and, more
+The repo ships 7 relevant guards. This sweep records what they say and, more
 importantly, what they structurally cannot see. Modifying a guard to change a verdict
 is out of scope for an audit run and was not done.
 

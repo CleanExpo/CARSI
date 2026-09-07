@@ -6,7 +6,7 @@
  * reproducible by re-running this script rather than trusted because a previous
  * session wrote them down.
  *
- * D4 deliberately does NOT add a new linter. The repo already ships five guards;
+ * D4 deliberately does NOT add a new linter. The repo already ships seven guards;
  * this records what they say, plus the one surface class they structurally
  * cannot see (live page metadata), which is where finding #1 lives.
  */
@@ -52,7 +52,8 @@ const citeBare = lines.filter((l) => !/S500[^0-9]{0,3}20[0-9]{2}/.test(l));
 // not partition its own total is not "every citation flagged with the edition
 // asserted" — it is a sweep with a blind spot the size of the gap. The measure
 // below closes the partition, and check-currency-sweep.mjs now enforces that the
-// four line classes sum to the total, so this cannot silently reopen.
+// line classes sum to the total, so this cannot silently reopen. How many classes
+// there are is derived from COUNTS, never written down.
 const citeOther = lines.filter((l) => /S500[^0-9]{0,3}20[0-9]{2}/.test(l)
   && !/S500[^0-9]{0,3}2021/.test(l) && !/S500[^0-9]{0,3}2025/.test(l));
 const otherYears = [...new Set(citeOther.map((l) => (l.match(/S500[^0-9]{0,3}(20[0-9]{2})/) || [])[1]).filter(Boolean))].sort();
@@ -183,7 +184,10 @@ cmp.push(`Generated \`${new Date().toISOString().replace(/\.\d+Z$/, 'Z')}\`. Liv
 cmp.push('');
 cmp.push('## No new linter was written');
 cmp.push('');
-cmp.push('The repo ships five relevant guards. This sweep records what they say and, more');
+// Derived, not written. This sentence said "five" while the coverage line two
+// pushes below derived seven from the same array, so the document contradicted
+// itself and a review had to catch it. One source for the number.
+cmp.push(`The repo ships ${results.length} relevant guards. This sweep records what they say and, more`);
 cmp.push('importantly, what they structurally cannot see. Modifying a guard to change a verdict');
 cmp.push('is out of scope for an audit run and was not done.');
 cmp.push('');

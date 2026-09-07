@@ -41,7 +41,9 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { validateEntryRules, validateFileRules, RULES, ENTRY_RULES, FILE_RULES } from './validate-ledger.mjs';
+import {
+  validateEntryRules, validateFileRules, RULES, ENTRY_RULES, FILE_RULES, sealViolations,
+} from './validate-ledger.mjs';
 
 const BASE_VERIFIED = {
   id: 'mutant-base',
@@ -312,25 +314,56 @@ for (const emitter of Object.keys(EMITTERS)) {
   }
 }
 
-// Property 5 — THE CHOKE POINT ITSELF.
+// Property 5 — THE SEAL.
 //
-// Reading both wrappers is only worth anything while they are the only way to
-// raise a violation. `emit()` is the single place that builds the {rule, message}
-// object, and it is the single place that refuses an unregistered id. A second
-// hand-built violation anywhere in the validator would restore exactly the hole
-// round-5 exploited, one door down — so the shape is counted, not trusted.
-const objectPushes = [...validatorSrc.matchAll(/\.push\(\s*\{\s*rule\b/g)];
-if (objectPushes.length !== 1) {
-  failures += 1;
-  console.error(`FAIL choke point: validate-ledger.mjs builds ${objectPushes.length} violation objects with a literal \`.push({ rule\` — exactly 1 is allowed (the one inside emit()); route the others through at() or fileAt() so coverage can see them`);
+// This replaces a source scan that round 6 defeated twice in one round. That
+// scan counted `.push({ rule` shapes and stray `rule:` literals to prove the
+// emitters were the only door. A computed key `{ ['rule']: … }` matched neither
+// pattern, and two string literals holding a comment-open and a comment-close
+// made the scan's own comment-stripping delete a raw push before it was read.
+// Both exploits were reproduced here before this was rewritten.
+//
+// The lesson is not "write a better regex", and it is not "use an AST" — the
+// next evasion is `obj['ru' + 'le']`, and the one after that is a computed
+// property from a variable. Whether a source constructs an object with a rule
+// property is not decidable by inspecting the source. So the claim moved to the
+// DATA: `sealViolations` checks every violation on its way out of the validator,
+// which makes the construction shape irrelevant. Any door emitting a registered
+// id is already covered by that id's mutant; any door emitting an unregistered
+// id throws.
+//
+// What is checked here is that the seal itself refuses. That it is WIRED IN at
+// both exported entry points is proved by an external mutant, not by this file —
+// stated plainly because a suite that both installs and judges a control is the
+// self-certification this audit exists to reject.
+const sealCases = [
+  ['unregistered id', [{ rule: 'phantom-rule', message: 'x' }], /unregistered rule id "phantom-rule"/],
+  ['missing rule id', [{ message: 'x' }], /no readable rule id/],
+  ['non-object violation', ['just a string'], /is not an object/],
+  ['not an array', 'nope', /not an array of violations/],
+];
+for (const [name, input, expected] of sealCases) {
+  let threw = null;
+  try {
+    sealViolations(input, RULES, 'RULES');
+  } catch (e) {
+    threw = e.message;
+  }
+  if (threw === null) {
+    failures += 1;
+    console.error(`FAIL seal: sealViolations accepted ${name} — the registry invariant is not enforced on the way out`);
+  } else if (!expected.test(threw)) {
+    failures += 1;
+    console.error(`FAIL seal: sealViolations rejected ${name} but with the wrong message (${threw}) — a control must fail for the reason it names`);
+  }
 }
-// `rule:` bound to a string literal means an id was written somewhere other than
-// an emitter argument — the array-literal early return that used to sit in
-// validateFileRules was precisely this shape.
-const strayRuleLiterals = [...validatorSrc.matchAll(/\brule\s*:\s*['"`]/g)];
-if (strayRuleLiterals.length) {
+// Positive control: the seal must ACCEPT a well-formed registered violation, or
+// it would be refusing everything and the four cases above would prove nothing.
+try {
+  sealViolations([{ rule: RULES[0], message: 'x' }], RULES, 'RULES');
+} catch (e) {
   failures += 1;
-  console.error(`FAIL choke point: validate-ledger.mjs writes ${strayRuleLiterals.length} rule id(s) as a \`rule:\` property literal outside the emit() choke point — pass the id to at() or fileAt() instead`);
+  console.error(`FAIL seal: sealViolations rejected a valid registered violation (${e.message}) — a check that refuses everything discriminates nothing`);
 }
 
 if (failures) {
@@ -339,5 +372,6 @@ if (failures) {
 }
 console.log(
   `OK negative control: ${MUTANTS.length} entry mutants + ${FILE_MUTANTS.length} file mutants, `
-  + `each rejected by the rule it declares; all ${RULES.length} registry rules observed firing; 3 clean bases pass`,
+  + `each rejected by the rule it declares; all ${RULES.length} registry rules observed firing; `
+  + `3 clean bases pass; the output seal refuses ${sealCases.length} malformed shapes and accepts a valid one`,
 );
