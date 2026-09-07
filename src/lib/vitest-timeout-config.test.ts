@@ -8,8 +8,10 @@ import config from '../../vitest.config';
  * Vitest defaults to 5000ms. That default failed release-gate verification TWICE on
  * 2026-09-07 with `Test timed out in 5000ms` — a different test each run, in a file whose
  * assertions were sound. The cause was never a slow test: the files that timed out do well
- * under a second of actual work, while 548 suites running in parallel on a loaded machine
- * inflate wall-clock time many-fold.
+ * under a second of actual work, while several hundred suites running in parallel on a loaded
+ * machine inflate wall-clock time many-fold. The exact suite count is deliberately not stated
+ * here or in vitest.config.ts — it grows with every test added, so it is one more figure that
+ * would go stale and be refuted by the next reader to run the suite.
  *
  * Per-test timings here are NOT reproducible — the same test has been observed varying by
  * up to 8.8x between runs, and two release reviews were failed for quoting a single run as

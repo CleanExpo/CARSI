@@ -11,14 +11,18 @@ export default defineConfig({
     include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
     environment: 'node',
     // Vitest's default is 5000ms and it was too tight for THIS suite — not because the
-    // tests that failed are slow, but because 548 suites run in parallel and a loaded
-    // machine inflates wall-clock time many-fold while the work itself is unchanged.
+    // tests that failed are slow, but because several hundred suites run in parallel and a
+    // loaded machine inflates wall-clock time many-fold while the work itself is unchanged.
+    // (The suite count is deliberately not stated exactly: it grows with every test added,
+    // so an exact figure here is one more claim that goes stale. The mechanism does not
+    // depend on the number.)
     //
     // DO NOT quote a single run's milliseconds here as though it were the worst case.
     // Per-test timings in this suite are not reproducible: across FIVE full-suite runs on
-    // 2026-09-07 (1365 passed / 0 failed every time, `npx vitest run --reporter=json`, loads
-    // 4.9 to 16.9) the same test varied by up to 8.8x. Two release reviews were already
-    // failed here for quoting one run.
+    // 2026-09-07 (zero failures on every run, `npx vitest run --reporter=json`, loads 4.9 to
+    // 16.9) the same test varied by up to 8.8x. Two release reviews were already failed here
+    // for quoting one run. Test and suite COUNTS are omitted throughout for the same reason
+    // the timings are hedged: they change whenever anyone adds a test.
     //
     // So the numbers below are a SAMPLE, not a bound. A re-measurement will land outside
     // this range, high or low, and that contradicts nothing:
@@ -42,7 +46,7 @@ export default defineConfig({
     // The qualitative finding, which every run so far agrees on: the two files that blew
     // through the 5000ms default do well under a second of actual work. Optimising them —
     // the first fix proposed — would have achieved nothing, because their own runtime was
-    // never the problem. 548 suites in parallel on a loaded machine was.
+    // never the problem. Several hundred suites in parallel on a loaded machine was.
     //
     // TWO EARLIER VERSIONS OF THIS COMMENT WERE WRONG IN THE SAME WAY. The first claimed a
     // 1200ms worst case and a 12.5x margin; the second "corrected" it to 1884ms and 7.9x.
