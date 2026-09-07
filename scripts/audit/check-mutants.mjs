@@ -236,6 +236,35 @@ if (uncovered.length) {
   }
 }
 
+// Property 4 — STATIC registry completeness.
+//
+// The runtime guard inside `at()` throws on an unregistered rule id, but only
+// when that line actually executes. A rule added on a branch no mutant reaches
+// would never throw, never enter RULES, and so never be demanded by the
+// coverage check above — the same "weaker property one layer up" that produced
+// this round's P1 in the first place. So the registry is also checked
+// statically, against the validator's source: every `at('<id>'` literal must be
+// registered, and therefore must end up covered.
+const validatorSrc = fs.readFileSync(new URL('./validate-ledger.mjs', import.meta.url), 'utf8');
+const emitted = [...validatorSrc.matchAll(/\bat\(\s*'([^']+)'/g)].map((m) => m[1])
+  .filter((id) => !id.includes('${'));
+const templated = [...validatorSrc.matchAll(/\bat\(\s*`([^`]+)`/g)].map((m) => m[1]);
+for (const id of new Set(emitted)) {
+  if (!ENTRY_RULES.includes(id)) {
+    failures += 1;
+    console.error(`FAIL registry: validate-ledger.mjs emits rule "${id}" which is NOT in ENTRY_RULES — it would never be demanded by the coverage check`);
+  }
+}
+// Template-literal rule ids (the per-field `missing-required:${k}` family) cannot
+// be read statically, so assert the one known family is registered for every
+// field rather than letting an unreadable call site pass unchecked.
+for (const t of templated) {
+  if (!/^missing-required:\$\{k\}$/.test(t)) {
+    failures += 1;
+    console.error(`FAIL registry: validate-ledger.mjs builds a rule id from an unrecognised template \`${t}\` — this suite cannot prove it is registered`);
+  }
+}
+
 if (failures) {
   console.error(`FAIL c3: ${failures} control failure(s)`);
   process.exit(1);
