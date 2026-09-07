@@ -22,7 +22,7 @@ import 'dotenv/config';
 import { randomUUID } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import { Prisma } from '../src/generated/prisma/client';
 import { prisma } from '../src/lib/prisma';
@@ -70,7 +70,7 @@ async function ensureInstructorsFromCatalog() {
   return data;
 }
 
-function wpRowToCourseData(
+export function wpRowToCourseData(
   wp: WpExportCourseRow,
   instructorId: string
 ): Omit<Prisma.LmsCourseCreateInput, 'slug' | 'id' | 'modules'> {
@@ -91,8 +91,33 @@ function wpRowToCourseData(
     level: wp.level ?? null,
     category: wp.category ?? null,
     tags: jsonInput(wp.tags),
-    iicrcDiscipline: wp.iicrc_discipline ?? null,
-    cecHours: wp.cec_hours ?? null,
+    // LICENCE-CRITICAL, BOTH FIELDS FAIL CLOSED. Do not restore `wp.*` here.
+    //
+    // This function builds a row that is written straight to `lms_courses` and rendered to
+    // the public. Reading these two fields from the WooCommerce export bypassed every control
+    // the repo has, because both controls live downstream of the seed:
+    //
+    //  - `iicrcDiscipline` MUST be null (founder ruling 2026-07-10, CLAUDE.md). The export
+    //    carries a discipline on 38 published rows (WRT / ASD / ...), and it renders as a
+    //    visible "IICRC <acronym>" badge. Migration 20260907010000 nulled this column on 35
+    //    live courses and was verified against production on 2026-09-07 (35/35). Re-running
+    //    this seed with the old line would have silently reverted that fix — the migration is
+    //    not durable while a seed can write the column back.
+    //
+    //  - `cecHours` MUST come from the approvals registry or an explicit founder-set value,
+    //    never from imported prose or data (founder directive 2026-07-09; the duration/prose
+    //    inference branches were deleted for exactly this reason). The export carries
+    //    `cec_hours` on 34 published rows, none of which is an IICRC approval. `resolveCecHours`
+    //    is the fail-closed resolver, and this seed path never called it — which is why
+    //    `check-iicrc-compliance.mjs` excluding `data/wordpress-export/` on the grounds that
+    //    the resolver makes its CEC prose "inert" was FALSE. 0 is the documented explicit
+    //    opt-out, so the resolver never derives a value later either.
+    //
+    // A course becomes CEC-bearing only when the founder adds it to the approvals registry
+    // (`data/seed/cec-approvals.json`), never by being imported. Pinned by
+    // scripts/seed-wordpress-export-courses.test.mjs — GP-519.
+    iicrcDiscipline: null,
+    cecHours: 0,
     meta: jsonInput(wp.meta),
     isPublished: true,
   };
@@ -160,11 +185,18 @@ async function main() {
   );
 }
 
-main()
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+// Run ONLY when invoked as a CLI. Previously `main()` was called at import time, so merely
+// importing this module — as a test must, to check the fail-closed fields above — would have
+// run a live database seed. Using `pathToFileURL(process.argv[1]).href` rather than a
+// `file://` + argv concat, because this checkout's path contains a space and the naive form
+// breaks on any path needing percent-encoding (CLAUDE.md).
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main()
+    .catch((e) => {
+      console.error(e);
+      process.exit(1);
+    })
+    .finally(async () => {
+      await prisma.$disconnect();
+    });
+}

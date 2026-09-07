@@ -132,9 +132,31 @@ function loadAllowlist() {
 const ALLOWLIST = loadAllowlist();
 
 const COPY_EXT = /\.(tsx?|jsx?|mdx?|html?|json)$/;
-// Authored, customer-facing surfaces. NOTE: data/wordpress-export/ is a frozen legacy
-// WooCommerce import snapshot (not authored copy) whose CEC prose is already made inert by
-// the fail-closed resolver; its legacy-prose cleanup is tracked separately, not gated here.
+// Authored, customer-facing surfaces. data/wordpress-export/ is deliberately NOT scanned: it
+// is a frozen legacy WooCommerce import snapshot, not authored copy.
+//
+// The previous version of this note justified that exclusion by saying the export's CEC prose
+// "is already made inert by the fail-closed resolver". THAT WAS FALSE, and GP-519 caught it.
+// scripts/seed-wordpress-export-courses.ts wrote `cec_hours` and `iicrc_discipline` straight
+// into `lms_courses` and never called `resolveCecHours` at all. Measured 2026-09-07: 84
+// published rows, 34 carrying `cec_hours` and 38 carrying `iicrc_discipline`. Running
+// `npm run db:seed-wp-export` would have published 34 unapproved CEC claims and reverted
+// migration 20260907010000.
+//
+// 27 files reference data/wordpress-export/, so "only one reader" would be wrong. Enumerated
+// 2026-09-07 (`git grep -l wordpress-export`), exactly one of them writes these two columns
+// INTO lms_courses — the seed above. seed-wordpress-lessons-wxr.ts and
+// analyze-module-title-mismatch.ts touch neither column; export-draft-courses-wp-dump.ts runs
+// the opposite direction (database -> JSON); wp-export-published-import-slugs.ts only declares
+// the row type. That enumeration is what makes the exclusion safe, so re-run it before
+// trusting this note.
+//
+// The exclusion is now sound, for a stated and tested reason rather than an assumed one: that
+// seed pins both columns to `null` / `0` regardless of what the export says, and
+// scripts/seed-wordpress-export-courses.test.ts asserts it against the real export with a
+// mutation control per field. If a second reader of data/wordpress-export/ is ever added, this
+// exclusion stops being safe — bring the directory into SCANNED_DIRS then, and do not narrow
+// a guard to make it green.
 const SCANNED_DIRS = [
   'app/', 'src/', 'templates/',
   'docs/marketing/', 'docs/content/',
