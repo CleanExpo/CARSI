@@ -25,8 +25,8 @@
  * non-vacuity test, so a pass cannot come from a fixture the guard was never meant to catch.
  */
 import { execSync } from 'node:child_process';
-import { writeFileSync, mkdirSync, rmSync, existsSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { writeFileSync, mkdirSync, rmSync, rmdirSync, existsSync } from 'node:fs';
+import { dirname, join, resolve } from 'node:path';
 
 const REPO = execSync('git rev-parse --show-toplevel', { encoding: 'utf8' }).trim();
 
@@ -78,16 +78,46 @@ function runScript(script) {
   }
 }
 
-function cleanup(abs) {
+/**
+ * Remove the probe, and ONLY what this run created.
+ *
+ * The first version of this matched the parent path against '__guard_probe__' and removed it
+ * with a RECURSIVE delete, while the preconditions checked only the probe FILE. A release
+ * reviewer reproduced the consequence on 2026-09-07: with a real file already sitting at
+ * `app/__guard_probe__/keep-me.txt`, this test exited 0 — reporting success — and deleted
+ * both that file and the directory. A control that destroys a developer's work to prove the
+ * guards are sound is not a control, it is a defect with a green light on it.
+ *
+ * Two properties replace the name match, and neither depends on the path spelling:
+ *   1. `createdRoot` is what mkdirSync actually created this run (undefined when the
+ *      directory already existed), so a pre-existing directory is never a deletion candidate.
+ *   2. Directories go via the NON-RECURSIVE rmdir, which refuses a non-empty directory.
+ *      Anything we did not put there survives, including a file written concurrently
+ *      between the probe and the cleanup.
+ */
+function cleanup(abs, createdRoot) {
   try { rmSync(abs, { force: true }); } catch { /* best effort */ }
-  const dir = dirname(abs);
-  if (dir.includes('__guard_probe__')) {
-    try { rmSync(dir, { recursive: true, force: true }); } catch { /* best effort */ }
+  if (!createdRoot) return;
+
+  const stopAt = resolve(createdRoot);
+  let dir = resolve(dirname(abs));
+  for (;;) {
+    try {
+      rmdirSync(dir);
+    } catch {
+      return; // non-empty, or already gone — leave it exactly as it is
+    }
+    if (dir === stopAt) return;
+    const parent = dirname(dir);
+    if (parent === dir) return;
+    dir = parent;
   }
 }
 
 for (const c of CASES) {
   const abs = join(REPO, c.probe);
+  /** What mkdirSync created THIS run, or undefined if the directory already existed. */
+  let createdRoot;
   try {
     // PRECONDITION 1: green before the probe. A guard already failing for another reason
     // would look exactly like a guard catching our plant.
@@ -103,14 +133,16 @@ for (const c of CASES) {
       continue;
     }
 
-    mkdirSync(dirname(abs), { recursive: true });
+    // Returns the FIRST directory created, or undefined when nothing needed creating. That
+    // return value is the whole safety mechanism in cleanup() — do not discard it.
+    createdRoot = mkdirSync(dirname(abs), { recursive: true });
     writeFileSync(abs, c.content, 'utf8');
 
     // PRECONDITION 3: the probe must actually be UNTRACKED, or this proves nothing.
     const tracked = execSync(`git ls-files -- ${JSON.stringify(c.probe)}`, { cwd: REPO, encoding: 'utf8' }).trim();
     if (tracked !== '') {
       failures.push(`${c.script}: probe is TRACKED, so it says nothing about untracked files`);
-      cleanup(abs);
+      cleanup(abs, createdRoot);
       continue;
     }
 
@@ -126,7 +158,7 @@ for (const c of CASES) {
       passed += 1;
     }
   } finally {
-    cleanup(abs);
+    cleanup(abs, createdRoot);
   }
 }
 
