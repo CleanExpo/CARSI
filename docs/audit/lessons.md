@@ -109,3 +109,53 @@ state it will actually live in.**
 finding.** `check:cec-surfaces` crashed on a missing `typescript` import. The cause
 is that a git worktree carries no `node_modules` — my environment, not the repo's
 code. It is recorded as NOT RUN, never as failing.
+
+### Round 3 — 2026-09-07
+
+**A control that infers coverage from NAMES can always be satisfied by naming.**
+Round 2's fix derived its obligation from four exported field lists and matched
+mutant *rule strings* with a regex. Review defeated it twice by running it: deleting
+a real mutant left the suite green, because whole rule families (quote length, ISO
+dates, the sidecar, feeds) were not reachable from those lists and so were uncovered
+**by construction**; and a mutant kept under one name while planting a different
+defect also passed, because the check read the name. The fix was to make the
+validator emit a **rule id** per violation, export the registry, and discharge
+coverage only when a rule is **observed firing**. Rebuilding it that way immediately
+found a rule that had never had a mutant and four file-level rules never covered at
+all. **Derive the obligation from the subject's own registry, and discharge it with
+observed behaviour — never with a label the test file chose for itself.**
+
+**The second time the same defect class returns, it has moved up a layer.** Round 1
+was criterion-vs-recipe drift in c8. Round 3 was criterion-vs-recipe drift in c5 —
+the verifier compared one number out of seven while the criterion demanded the whole
+table. Fixing the instance each round is how a class survives; the durable move is to
+ask what the criterion's *text* obliges and enforce all of it.
+
+**A table whose parts do not sum to its own total is a blind spot the exact size of
+the gap — and it reads as complete.** The currency sweep published 274 total lines
+while its named classes summed to 253. Nobody noticed for the document's whole life,
+because no check ever added the rows up, and the one row that *was* checked
+reproduced perfectly. Those 21 lines turned out to assert an entirely unrecorded S500
+**2026** edition. **When a measurement partitions something, assert the partition —
+against the published numbers, not only against a re-derived scan, because a check
+that compares your own scan to your own scan cannot see a category you forgot to
+name.**
+
+**Do not flip a licence-critical status because a reviewer argued well; record the
+disagreement instead.** Round 3 argued that a GAP accreditation entry should be
+JUSTIFIED, on the grounds that a sibling entry treats the same absent public register
+as grounds for JUSTIFIED. The premise was wrong — one entry has a primary artefact
+and lacks only public re-verification, the other has no artefact at all — but the
+reviewer's misreading was itself evidence that the distinction was buried in both
+entries. **The finding was real even though the conclusion was not.** Both entries now
+state the distinction explicitly, and the argument is preserved verbatim in the
+`conflict` sidecar the ledger has defined since day one and had never used. An
+inference is not a `best_available_source`, and repository prose asserting a fact
+proves only that the prose asserts it.
+
+**A mutant that does not actually break the thing proves nothing.** Testing the new
+coverage assertion, the first probe added a validator rule that also rejected the
+clean base entries — so the suite went red on the clean-base property before coverage
+was ever reached. It looked like a passing control test and demonstrated nothing. The
+probe had to be redone with a rule the clean bases satisfy, so that only the coverage
+assertion could catch it.

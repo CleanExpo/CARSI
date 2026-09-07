@@ -10,12 +10,13 @@
 | --- | ---: |
 | VERIFIED | 12 |
 | JUSTIFIED | 1 |
-| GAP | 12 |
-| CONFLICT sidecars | 0 |
-| **Total entries** | **25** |
+| GAP | 13 |
+| CONFLICT sidecars | 1 |
+| **Total entries** | **26** |
 
-No cross-engine conflict was recorded because no contested claim required a second
-engine this run — see "Second engine" below.
+One cross-engine conflict IS recorded, on GP567-025 — see "Round 3" below. The
+sidecar exists so a disagreement sits *beside* the original claim instead of
+replacing it; this is its first use.
 
 ## Independent review and what it changed
 
@@ -61,6 +62,82 @@ claims**. "CARSI holds 38 approved CEC *courses*" is evidenced by the registry.
 actually says, and nothing located establishes it. These are now separate entries:
 the per-course claim is JUSTIFIED with evidenced unavailability; the provider-level
 claim is a **GAP**, as are both live surfaces asserting it.
+
+### Round 3 — `56b96871`, cursor, FAIL / 3 P1 (all eight checklist items PASS)
+
+**P1-1 — the round-2 fix failed its own claim, and the reviewer proved it by
+running it.** Round 2's coverage assertion derived its obligation from four
+exported field lists and matched mutant *name strings* with a regex. Two attacks
+defeated it: deleting the real "quote over 25 words" mutant left the suite
+printing OK on 26 mutants, because the quote / ISO-date / sidecar / feeds rules
+are not reachable from any of those lists — uncovered **by construction**; and a
+mutant kept under the name "missing status" while planting a dropped `id` also
+passed, because the check read the name.
+
+Both holes have one root: **coverage was inferred from names.** The validator now
+emits a machine-checkable rule id beside every violation and exports the complete
+`RULES` registry. `check-mutants.mjs` derives its obligation from that registry
+and discharges it only when a rule is **observed firing** during the run. A rule
+with no mutant is named; a mutant that does not trigger the rule it declares is
+named. Neither is satisfiable by naming. Rebuilding this way immediately exposed
+a rule that had never had a mutant — `conflict-not-object` — plus four
+file-level rules that were never covered at all. Suite went 27 mutants to 28
+entry + 4 file mutants across 31 registry rules.
+
+**P1-2 — criterion-vs-recipe drift, the same class as round 1's c8.** c5 requires
+every S500 citation flagged with the edition asserted AND the contamination count
+reproducible. The verifier compared exactly one number. The reviewer planted
+Total=1, 2025=99, unversioned=1, left the 2021 row intact, and it still exited 0 —
+five sixths of the table was unenforced decoration that a green criterion vouched
+for. All seven measures are now re-derived and compared, and the recorded classes
+must sum to the recorded total.
+
+That sum is what surfaced **the finding below**, which no amount of checking the
+2021 row alone would ever have reached.
+
+**P1-3 — the licence classification. REJECTED on the merits, and recorded as a
+conflict rather than argued away.** The reviewer held that GP567-025 should be
+JUSTIFIED, since GP567-013 treats the same absent public IICRC register as grounds
+for JUSTIFIED, making the pair incoherent. The premise does not hold: GP567-013
+has a **primary artefact** (`cec-approvals.json`, citing a founder-supplied PDF)
+and lacks only independent public re-verification, which is the JUSTIFIED
+condition exactly. GP567-025 concerns a **different object** — provider standing,
+not course approvals — and has no artefact at all; its own reason already records
+that the PDF is a class list, not a provider credential. JUSTIFIED requires a
+`best_available_source` and there is none to name. The two bases offered were
+CLAUDE.md's identity SSOT — repository prose, which per the estate done-gate
+proves only that the documentation makes the claim — and the inference that 38
+course approvals are incoherent without provider standing, which is an inference,
+not a source. Deciding a licence-critical public accreditation claim on an
+inference is the specific risk CLAUDE.md names as able to cost the licence to sell
+courses.
+
+The reviewer did expose a real defect underneath: the two entries **read** as
+identical, because the distinction sat buried in both. Both now state it
+explicitly, and the disagreement is preserved verbatim in the `conflict` sidecar
+on GP567-025 — the first use of a mechanism the ledger has defined since day one.
+
+## Finding #7 — 21 lines assert an S500 **2026** edition, and no check could see them
+
+The currency sweep published 274 total citation lines while its named classes —
+2021, 2025, unversioned — summed to **253**. The 21-line difference asserted an
+S500 **2026** edition, a class the sweep named nowhere and no criterion counted.
+The table looked complete, and the criterion was green, because nothing ever added
+the rows up. This is the sharpest instance in the run of a measurement that reads
+as exhaustive while carrying a blind spot the size of its own gap.
+
+The affected lines all sit in one course-update **draft** carrying
+`Status: DRAFT — founder review before any DB apply`, so nothing is live today.
+The exposure is on apply: they become published course copy the moment the draft
+is applied.
+
+**No ruling is made on whether an S500 2026 edition exists.** CARSI's licensed
+section index is mirrored in RestoreAssist per CLAUDE.md and is **not present in
+this repository**, so no licensed source is reachable from this checkout, and
+CLAUDE.md forbids a scrape or trade-press paraphrase as the basis for any published
+claim about a standard — and bans absence claims outright. Filed as **GP567-026,
+GAP, `substantiate`**: verify against the licensed index before this draft is
+applied.
 
 ## What this run established
 
@@ -131,10 +208,16 @@ The founder directed `perplexity/sonar-deep-research` via OpenRouter. **OpenRout
 exhausted**: HTTP 200, `total_credits` 2619.31043075 against `total_usage`
 2619.308990219 — **$0.00144 remaining**, against a deep-research call costing dollars.
 `PERPLEXITY_API_KEY` does exist in `~/.hermes/.env`, so a direct lane is available
-without placing any new key. It was not used this run because no claim reached the
-contested threshold that justifies a metered research call — every finding above is
-settled by primary observation of the live site or the repo. Recorded as a founder
-spend decision, not topped up.
+without placing any new key. It was still not used, but the original reason — that
+no claim was contested — stopped being true in round 3, so it is restated rather
+than left standing: **two claims are now contested and neither is settleable by a
+web research call.** GP567-025 (provider accreditation) is founder-gated by IICRC's
+own process, which directs enquirers to contact IICRC directly. GP567-026 (the
+S500 2026 edition) must be checked against the owner's **licensed** store, and
+CLAUDE.md explicitly forbids a scrape or trade-press paraphrase as the basis for
+any published claim about a standard — so a research call could only produce
+evidence this project is not permitted to rely on. Recorded as a founder spend
+decision, not topped up.
 
 ## Next run — first batch named
 

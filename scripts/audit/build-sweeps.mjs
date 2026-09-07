@@ -44,6 +44,19 @@ const lines = raw.split('\n').filter(Boolean);
 const cite2021 = lines.filter((l) => /S500[^0-9]{0,3}2021/.test(l));
 const cite2025 = lines.filter((l) => /S500[^0-9]{0,3}2025/.test(l));
 const citeBare = lines.filter((l) => !/S500[^0-9]{0,3}20[0-9]{2}/.test(l));
+// A line asserting SOME edition that is neither 2021 nor 2025.
+//
+// Round-3 review exposed this class by attacking the verifier: the recorded
+// table published 2021 + 2025 + unversioned = 253 against a total of 274, so 21
+// lines asserted an edition the sweep named nowhere. A sweep whose categories do
+// not partition its own total is not "every citation flagged with the edition
+// asserted" — it is a sweep with a blind spot the size of the gap. The measure
+// below closes the partition, and check-currency-sweep.mjs now enforces that the
+// four line classes sum to the total, so this cannot silently reopen.
+const citeOther = lines.filter((l) => /S500[^0-9]{0,3}20[0-9]{2}/.test(l)
+  && !/S500[^0-9]{0,3}2021/.test(l) && !/S500[^0-9]{0,3}2025/.test(l));
+const otherYears = [...new Set(citeOther.map((l) => (l.match(/S500[^0-9]{0,3}(20[0-9]{2})/) || [])[1]).filter(Boolean))].sort();
+const filesOther = [...new Set(citeOther.map((l) => l.split(':')[0]))];
 const files = [...new Set(lines.map((l) => l.split(':')[0]))];
 const files2021 = [...new Set(cite2021.map((l) => l.split(':')[0]))];
 
@@ -68,6 +81,9 @@ cur.push(`| Lines asserting the **2021** edition | ${cite2021.length} |`);
 cur.push(`| Files asserting the **2021** edition | ${files2021.length} |`);
 cur.push(`| Lines asserting the **2025** edition | ${cite2025.length} |`);
 cur.push(`| Lines citing S500 with **no edition at all** | ${citeBare.length} |`);
+cur.push(`| Lines asserting **another edition** (${otherYears.join(', ') || 'none'}) | ${citeOther.length} |`);
+cur.push('');
+cur.push(`The four line classes partition the total: ${cite2021.length} + ${cite2025.length} + ${citeBare.length} + ${citeOther.length} = ${lines.length}.`);
 cur.push('');
 cur.push('## Finding');
 cur.push('');
@@ -79,6 +95,32 @@ cur.push('');
 cur.push('**Recommended control (not built this run):** a guard requiring every S500 citation to');
 cur.push('name an edition. An unversioned citation is the failure mode that survives edition bumps.');
 cur.push('');
+if (citeOther.length) {
+  cur.push(`## Finding — ${citeOther.length} lines assert S500 ${otherYears.join('/')}`);
+  cur.push('');
+  cur.push(`**${citeOther.length} lines across ${filesOther.length} file(s) assert an S500 ${otherYears.join('/')} edition.**`);
+  cur.push('This is a currency claim in the opposite direction to the one this sweep was built to');
+  cur.push('find: not a stale edition, but an edition asserted as published. It is UNVERIFIED here.');
+  cur.push('');
+  cur.push('CARSI\'s licensed section index (`lib/standards/s500-sections.ts`, per CLAUDE.md mirrored');
+  cur.push('in RestoreAssist) is **not present in this repository**, so no licensed source is');
+  cur.push('reachable from this checkout to confirm or deny that such an edition is published.');
+  cur.push('Per CLAUDE.md, a claim about a standard is verified against the owner\'s licensed store,');
+  cur.push('never a web scrape, and an ABSENCE claim about a standard is banned outright — so this');
+  cur.push('sweep records what the corpus asserts and does **not** rule on whether it is true.');
+  cur.push('');
+  cur.push('All affected files are course-update **drafts** carrying `Status: DRAFT — founder review');
+  cur.push('before any DB apply`, so nothing here is live course content today. The exposure is on');
+  cur.push('apply: these lines become published course copy the moment a draft is applied.');
+  cur.push('');
+  cur.push('**Recommended action:** verify against the licensed index before any of these drafts is');
+  cur.push('applied. Filed in the evidence ledger as GP567-026.');
+  cur.push('');
+  cur.push('### Files asserting another edition');
+  cur.push('');
+  for (const f of filesOther) cur.push(`- \`${f}\``);
+  cur.push('');
+}
 if (files2021.length) {
   cur.push('## Files asserting S500:2021');
   cur.push('');
@@ -201,7 +243,7 @@ console.log(
   JSON.stringify(
     {
       ok: true,
-      currency: { total: lines.length, files: files.length, y2021: cite2021.length, files2021: files2021.length, y2025: cite2025.length, unversioned: citeBare.length },
+      currency: { total: lines.length, files: files.length, y2021: cite2021.length, files2021: files2021.length, y2025: cite2025.length, unversioned: citeBare.length, other: citeOther.length, other_years: otherYears },
       compliance: { guards_run: results.length, guards_passing: results.filter((r) => r.exit === 0).length, acronym_urls: acronymSlugs.length },
     },
     null,
