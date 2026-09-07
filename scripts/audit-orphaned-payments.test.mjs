@@ -9,7 +9,13 @@
  *
  * Run: node scripts/audit-orphaned-payments.test.mjs   (exit 0 = all passed)
  */
-import { classifySession, evaluateRun } from './audit-orphaned-payments.mjs';
+import {
+  classifySession,
+  evaluateRun,
+  isFullyRefunded,
+  classifyOrphanAgainstAccess,
+  accessKey,
+} from './audit-orphaned-payments.mjs';
 
 let passed = 0;
 const failures = [];
@@ -19,7 +25,9 @@ function check(name, fn) {
 }
 function assert(cond, msg) { if (!cond) throw new Error(msg); }
 
-const REFS = new Set(['cs_test_fulfilled_1']);
+// Map of payment reference -> enrolment status. A bare Set could not tell a live enrolment
+// from a revoked one, and a revoked enrolment carries the session id while granting nothing.
+const REFS = new Map([['cs_test_fulfilled_1', 'active']]);
 const paidSession = (over = {}) => ({
   id: 'cs_test_orphan_1',
   payment_status: 'paid',
@@ -117,9 +125,100 @@ check('matching is on the raw Stripe session id', () => {
   // Verified 2026-09-06: resolveStripePaymentReference() only trims, so the stored
   // paymentReference IS the session id. If that ever transforms the id, this test fails and
   // the detector must be updated with it — otherwise every payment reads as an orphan.
-  const refs = new Set(['cs_live_abc123']);
+  const refs = new Map([['cs_live_abc123', 'active']]);
   assert(classifySession(paidSession({ id: 'cs_live_abc123' }), refs).verdict === 'fulfilled', 'exact id must match');
   assert(classifySession(paidSession({ id: 'cs_live_abc124' }), refs).verdict === 'orphan', 'a different id must not match');
+});
+
+// ---------------------------------------------------------------- refunds
+// A refunded Stripe session STILL reads payment_status:'paid'. Without this the detector
+// sends the founder to customers who have already been made whole — likely during the
+// 2026-08-29 webhook outage, where complaints were resolved by refund.
+const charged = (over = {}) => ({ payment_intent: { latest_charge: { amount: 9900, amount_refunded: 0, refunded: false, ...over } } });
+
+check('positive control: the SAME session is an orphan when it is not refunded', () => {
+  // Without this, the refund tests below could pass because the session was skipped for some
+  // unrelated reason, and would say nothing about the refund check.
+  const r = classifySession(paidSession({ ...charged() }), REFS);
+  assert(r.verdict === 'orphan', `unrefunded must still be an orphan, got ${r.verdict}: ${r.reason}`);
+});
+
+check('a fully refunded session is not an outstanding obligation', () => {
+  const byFlag = classifySession(paidSession({ ...charged({ refunded: true }) }), REFS);
+  assert(byFlag.verdict === 'not-applicable', `refunded flag must exclude, got ${byFlag.verdict}`);
+  const byAmount = classifySession(paidSession({ ...charged({ amount_refunded: 9900 }) }), REFS);
+  assert(byAmount.verdict === 'not-applicable', `full amount refund must exclude, got ${byAmount.verdict}`);
+});
+
+check('a PARTIAL refund is still an obligation', () => {
+  // Mirrors the webhook's own revocation predicate (route.ts:107-108): a partial refund does
+  // not revoke access, so it must not silently excuse a missing enrolment either.
+  const r = classifySession(paidSession({ ...charged({ amount_refunded: 5000 }) }), REFS);
+  assert(r.verdict === 'orphan', `partial refund must remain an orphan, got ${r.verdict}: ${r.reason}`);
+});
+
+check('without charge expansion the refund check claims nothing', () => {
+  // It cannot see a refund, so it must not assert there was none by excluding the session.
+  assert(isFullyRefunded({ id: 'cs_x' }) === false, 'unexpanded session must not read as refunded');
+  assert(isFullyRefunded({ payment_intent: 'pi_123' }) === false, 'unexpanded payment_intent must not read as refunded');
+  const r = classifySession(paidSession(), REFS);
+  assert(r.verdict === 'orphan', 'an unexpanded session must still be judged, not skipped');
+});
+
+// ---------------------------------------------------------------- revoked enrolments
+check('an enrolment that carries the id but grants nothing is NOT fulfilled', () => {
+  for (const status of ['revoked', 'refunded', 'disputed', 'cancelled']) {
+    const refs = new Map([['cs_test_rev_1', status]]);
+    const r = classifySession(paidSession({ id: 'cs_test_rev_1' }), refs);
+    assert(r.verdict !== 'fulfilled', `status "${status}" must not read as fulfilled, got ${r.verdict}`);
+    assert(new RegExp(status).test(r.reason), `reason must name the status, got: ${r.reason}`);
+  }
+});
+
+check('an unrecognised enrolment status does not grant access', () => {
+  // ALLOW-set, not a deny-list: a status nobody anticipated must fail closed.
+  const r = classifySession(paidSession({ id: 'cs_test_new_1' }), new Map([['cs_test_new_1', 'some_future_status']]));
+  assert(r.verdict !== 'fulfilled', `unknown status must not read as fulfilled, got ${r.verdict}`);
+});
+
+// ---------------------------------------------------------------- second pass, access by course
+// enrollment-service.ts:57-68 OVERWRITES paymentReference when a refunded learner buys again,
+// so the earlier session id exists nowhere while the learner sits in the course.
+const ORPHAN = { learnerId: 'user-1', courseSlug: 'introduction-to-water-damage-restoration', reason: 'PAID with no matching enrolment' };
+
+check('positive control: the second pass CAN still return orphan', () => {
+  const r = classifyOrphanAgainstAccess(ORPHAN, new Set());
+  assert(r.verdict === 'orphan', `empty access index must leave it an orphan, got ${r.verdict}`);
+});
+
+check('a payer who holds the course under another reference is not an orphan', () => {
+  const keys = new Set([accessKey('user-1', 'introduction-to-water-damage-restoration')]);
+  const r = classifyOrphanAgainstAccess(ORPHAN, keys);
+  assert(r.verdict === 'fulfilled', `expected fulfilled, got ${r.verdict}: ${r.reason}`);
+});
+
+check('access to a DIFFERENT course does not clear the orphan', () => {
+  const keys = new Set([accessKey('user-1', 'some-other-course')]);
+  assert(classifyOrphanAgainstAccess(ORPHAN, keys).verdict === 'orphan', 'wrong course must not clear');
+});
+
+check('another learner holding the course does not clear the orphan', () => {
+  const keys = new Set([accessKey('user-2', 'introduction-to-water-damage-restoration')]);
+  assert(classifyOrphanAgainstAccess(ORPHAN, keys).verdict === 'orphan', 'wrong learner must not clear');
+});
+
+check('an unidentifiable payer is reported, never cleared', () => {
+  // Over-reporting is the safe direction: the founder sees someone who is fine, rather than
+  // missing someone who paid and got nothing.
+  const keys = new Set([accessKey('user-1', 'introduction-to-water-damage-restoration')]);
+  const r = classifyOrphanAgainstAccess({ ...ORPHAN, learnerId: null }, keys);
+  assert(r.verdict === 'orphan', `unresolved payer must stay an orphan, got ${r.verdict}`);
+});
+
+check('course slug matching is case and whitespace insensitive', () => {
+  const keys = new Set([accessKey('user-1', 'introduction-to-water-damage-restoration')]);
+  const r = classifyOrphanAgainstAccess({ ...ORPHAN, courseSlug: '  Introduction-To-Water-Damage-Restoration ' }, keys);
+  assert(r.verdict === 'fulfilled', `slug normalisation must match, got ${r.verdict}`);
 });
 
 if (failures.length) {

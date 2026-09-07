@@ -39,6 +39,66 @@ import { pathToFileURL } from 'node:url';
 const NON_ENROLMENT_SOURCES = new Set(['carsi-ccw-roadshow']);
 
 /**
+ * Enrolment statuses that actually grant access. Mirrors ACCESS_GRANTING_STATUS_LIST in
+ * src/lib/server/enrollment-access.ts:23 — an ALLOW-set, so an unrecognised status reads as
+ * "no access" rather than being waved through.
+ */
+export const ACCESS_GRANTING_STATUSES = new Set(['active', 'completed']);
+
+/**
+ * Was this session's charge refunded in full?
+ *
+ * A refunded Stripe session STILL reads `payment_status: 'paid'`, so without this every
+ * customer who was refunded during the 2026-08-29 webhook outage would be reported as owed
+ * access they are not owed. The predicate mirrors the webhook's own revocation test at
+ * app/api/lms/webhooks/stripe/route.ts:107-108: a PARTIAL refund is deliberately not a
+ * revocation, so it is deliberately not an exclusion here either.
+ *
+ * Requires `expand: ['data.payment_intent.latest_charge']` on the listing. Absent expansion
+ * this returns false — it cannot see a refund, so it must not claim there was none.
+ */
+export function isFullyRefunded(session) {
+  const charge = session?.payment_intent?.latest_charge;
+  if (!charge || typeof charge !== 'object') return false;
+  if (charge.refunded === true) return true;
+  return typeof charge.amount === 'number'
+    && typeof charge.amount_refunded === 'number'
+    && charge.amount > 0
+    && charge.amount_refunded >= charge.amount;
+}
+
+/** Key for the "does this learner hold access to this course" index. */
+export function accessKey(userId, courseSlug) {
+  return `${userId}::${String(courseSlug).trim().toLowerCase()}`;
+}
+
+/**
+ * Second pass over a session the id-match called an orphan.
+ *
+ * The id match asks "is this session id recorded on an enrolment", which is a PROXY for the
+ * question that matters: does this customer have the course they paid for. The two diverge,
+ * and verified in src/lib/server/enrollment-service.ts:57-68: when a refunded learner buys
+ * again, the existing enrolment row is UPDATED and `paymentReference` is overwritten with the
+ * new session id. The earlier session id then exists nowhere, so the id match reports an
+ * orphan for a customer who is sitting in the course right now.
+ *
+ * Pure. `accessKeys` holds one entry per learner-course pair that currently grants access.
+ */
+export function classifyOrphanAgainstAccess(orphan, accessKeys) {
+  const { learnerId, courseSlug } = orphan;
+  if (!learnerId) {
+    return { verdict: 'orphan', reason: orphan.reason };
+  }
+  if (accessKeys.has(accessKey(learnerId, courseSlug))) {
+    return {
+      verdict: 'fulfilled',
+      reason: 'the payer holds access to this course under a different payment reference',
+    };
+  }
+  return { verdict: 'orphan', reason: orphan.reason };
+}
+
+/**
  * Decide whether one paid Stripe session should have produced an enrolment, and whether it did.
  * Pure — no network, no database. Separated so the self-test can plant each case.
  *
@@ -50,6 +110,11 @@ export function classifySession(session, enrolmentRefs) {
   }
   if (session.payment_status && session.payment_status !== 'paid') {
     return { verdict: 'not-applicable', reason: `payment_status=${session.payment_status}` };
+  }
+  // A refunded session still reads payment_status='paid'. Someone who was refunded is not
+  // owed access, and listing them sends the founder to a customer already made whole.
+  if (isFullyRefunded(session)) {
+    return { verdict: 'not-applicable', reason: 'refunded in full — no outstanding obligation' };
   }
   const source = session.metadata?.source;
   if (source && NON_ENROLMENT_SOURCES.has(source)) {
@@ -64,8 +129,19 @@ export function classifySession(session, enrolmentRefs) {
   if (!session.id) {
     return { verdict: 'not-applicable', reason: 'session has no id' };
   }
-  if (enrolmentRefs.has(session.id)) {
-    return { verdict: 'fulfilled', reason: 'an enrolment carries this session id' };
+  // `enrolmentRefs` is a Map of payment reference -> enrolment status, not a bare Set. The
+  // status matters: a revoked or refunded enrolment CARRIES the session id while granting
+  // nothing, so a membership test alone would report "fulfilled" for a customer who has no
+  // access at all.
+  const recordedStatus = enrolmentRefs.get(session.id);
+  if (recordedStatus !== undefined) {
+    if (ACCESS_GRANTING_STATUSES.has(String(recordedStatus).toLowerCase().trim())) {
+      return { verdict: 'fulfilled', reason: 'an enrolment carries this session id and grants access' };
+    }
+    return {
+      verdict: 'not-applicable',
+      reason: `access deliberately removed (enrolment status "${recordedStatus}")`,
+    };
   }
   return { verdict: 'orphan', reason: `PAID for "${slug}" with no matching enrolment` };
 }
@@ -129,15 +205,23 @@ async function main() {
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
   const prisma = new PrismaClient();
 
-  // Load every enrolment payment reference. A failure here must not be read as "no enrolments".
-  const enrolmentRefs = new Set();
+  // Load every enrolment payment reference WITH its status, plus a learner-course access
+  // index. A failure here must not be read as "no enrolments".
+  const enrolmentRefs = new Map();
+  const accessKeys = new Set();
   let dbReadOk = false;
   try {
     const rows = await prisma.lmsEnrollment.findMany({
       where: { paymentReference: { not: null } },
-      select: { paymentReference: true },
+      select: { paymentReference: true, status: true, studentId: true, course: { select: { slug: true } } },
     });
-    for (const r of rows) if (r.paymentReference) enrolmentRefs.add(r.paymentReference);
+    for (const r of rows) {
+      if (r.paymentReference) enrolmentRefs.set(r.paymentReference, r.status);
+      const slug = r.course?.slug;
+      if (slug && r.studentId && ACCESS_GRANTING_STATUSES.has(String(r.status ?? '').toLowerCase().trim())) {
+        accessKeys.add(accessKey(r.studentId, slug));
+      }
+    }
     dbReadOk = true;
   } catch (e) {
     console.error(`Could not read enrolments: ${e.message}`);
@@ -152,6 +236,9 @@ async function main() {
       for await (const session of stripe.checkout.sessions.list({
         created: { gte: Math.floor(since.getTime() / 1000) },
         limit: 100,
+        // Required by isFullyRefunded(). Without it a refunded session is indistinguishable
+        // from an unfulfilled one, because both still read payment_status='paid'.
+        expand: ['data.payment_intent.latest_charge'],
       })) {
         sessionsListed++;
         const { verdict, reason } = classifySession(session, enrolmentRefs);
@@ -163,6 +250,9 @@ async function main() {
             courseSlug: session.metadata?.course_slug ?? null,
             amountTotal: session.amount_total,
             currency: session.currency,
+            // Carried for the second pass, which asks whether this payer holds the course
+            // under some OTHER payment reference. Null until the email lookup resolves it.
+            learnerId: session.metadata?.student_id?.trim() || null,
             reason,
           });
         } else if (verdict === 'not-applicable') {
@@ -176,6 +266,38 @@ async function main() {
     }
   }
 
+  // SECOND PASS. The id match asks "is this session id recorded", which is a proxy for the
+  // real question: does this customer have the course they paid for. Those diverge whenever
+  // the reference moves — enrollment-service.ts:57-68 overwrites paymentReference when a
+  // refunded learner re-purchases, orphaning the earlier id while the learner sits in the
+  // course. Resolve each candidate to a learner and ask the real question. Bounded: one
+  // extra query total, over the candidates only.
+  let clearedByAccess = 0;
+  if (orphans.length > 0) {
+    const emails = [...new Set(orphans.filter((o) => !o.learnerId && o.email).map((o) => o.email))];
+    if (emails.length > 0) {
+      try {
+        const users = await prisma.lmsUser.findMany({
+          where: { email: { in: emails } },
+          select: { id: true, email: true },
+        });
+        const idByEmail = new Map(users.map((u) => [u.email, u.id]));
+        for (const o of orphans) if (!o.learnerId && o.email) o.learnerId = idByEmail.get(o.email) ?? null;
+      } catch (e) {
+        // Cannot resolve, so cannot clear anything. Over-reporting is the safe direction:
+        // the founder sees a customer who is fine, rather than missing one who is not.
+        console.error(`Could not resolve payer identities, second pass skipped: ${e.message}`);
+      }
+    }
+    for (let i = orphans.length - 1; i >= 0; i -= 1) {
+      const r = classifyOrphanAgainstAccess(orphans[i], accessKeys);
+      if (r.verdict === 'fulfilled') {
+        orphans.splice(i, 1);
+        clearedByAccess += 1;
+      }
+    }
+  }
+
   await prisma.$disconnect();
 
   const verdict = evaluateRun({
@@ -186,13 +308,14 @@ async function main() {
   });
 
   if (asJson) {
-    console.log(JSON.stringify({ since: since.toISOString(), sessionsListed, enrolmentRefs: enrolmentRefs.size, orphans, verdict }, null, 2));
+    console.log(JSON.stringify({ since: since.toISOString(), sessionsListed, enrolmentRefs: enrolmentRefs.size, clearedByAccess, orphans, verdict }, null, 2));
     process.exit(verdict.code);
   }
 
   console.log(`Orphaned-payment audit — sessions created since ${since.toISOString().slice(0, 10)}`);
   console.log(`  Stripe sessions listed:        ${sessionsListed}`);
   console.log(`  enrolment payment references:  ${enrolmentRefs.size}`);
+  console.log(`  cleared by course access:      ${clearedByAccess}  (paid under an older reference, learner has the course)`);
   for (const [reason, n] of notApplicable) console.log(`  skipped (${reason}): ${n}`);
 
   if (orphans.length) {
