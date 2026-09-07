@@ -135,13 +135,18 @@ const COPY_EXT = /\.(tsx?|jsx?|mdx?|html?|json)$/;
 // Authored, customer-facing surfaces. data/wordpress-export/ is deliberately NOT scanned: it
 // is a frozen legacy WooCommerce import snapshot, not authored copy.
 //
-// The previous version of this note justified that exclusion by saying the export's CEC prose
-// "is already made inert by the fail-closed resolver". THAT WAS FALSE, and GP-519 caught it.
-// scripts/seed-wordpress-export-courses.ts wrote `cec_hours` and `iicrc_discipline` straight
-// into `lms_courses` and never called `resolveCecHours` at all. Measured 2026-09-07: 84
-// published rows, 34 carrying `cec_hours` and 38 carrying `iicrc_discipline`. Running
-// `npm run db:seed-wp-export` would have published 34 unapproved CEC claims and reverted
-// migration 20260907010000.
+// The previous version of this note said the export's CEC prose "is already made inert by the
+// fail-closed resolver". For CEC that is TRUE, and GP-519's doubt about it was misplaced —
+// measured 2026-09-07 through the real path, `getPublishedWpImportRows()` maps every import row
+// through `enrichCourseWithCecHours`, and 0 of the 37 rows that reach the seed still carry a
+// `cec_hours` value. An earlier revision of this comment claimed 34 unapproved claims were
+// being published; that was wrong, counted off the raw export file rather than the code path,
+// and a release reviewer caught it.
+//
+// The note was still incomplete, and dangerously so: it said nothing about `iicrc_discipline`,
+// which NOTHING in the import path touches. 5 of those 37 rows carry one (WRT / ASD), and the
+// seed wrote it straight into `lms_courses`, which would have reverted migration
+// 20260907010000 on those courses. That column is now pinned at the seed.
 //
 // 27 files reference data/wordpress-export/, so "only one reader" would be wrong. Enumerated
 // 2026-09-07 (`git grep -l wordpress-export`), exactly one of them writes these two columns

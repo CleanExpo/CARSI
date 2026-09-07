@@ -97,21 +97,28 @@ export function wpRowToCourseData(
     // the public. Reading these two fields from the WooCommerce export bypassed every control
     // the repo has, because both controls live downstream of the seed:
     //
-    //  - `iicrcDiscipline` MUST be null (founder ruling 2026-07-10, CLAUDE.md). The export
-    //    carries a discipline on 38 published rows (WRT / ASD / ...), and it renders as a
-    //    visible "IICRC <acronym>" badge. Migration 20260907010000 nulled this column on 35
-    //    live courses and was verified against production on 2026-09-07 (35/35). Re-running
-    //    this seed with the old line would have silently reverted that fix — the migration is
-    //    not durable while a seed can write the column back.
+    // MEASURED THROUGH THE ACTUAL CODE PATH, not off the export file — the two disagree, and
+    // an earlier version of this comment quoted the file and was wrong on both counts.
+    // `getPublishedWpImportRows()` excludes catalogue-overlapping slugs and maps what survives
+    // through `enrichCourseWithCecHours`, so only 37 rows reach this function, not the 84
+    // published rows in courses.json. Of those 37, on 2026-09-07:
     //
-    //  - `cecHours` MUST come from the approvals registry or an explicit founder-set value,
-    //    never from imported prose or data (founder directive 2026-07-09; the duration/prose
-    //    inference branches were deleted for exactly this reason). The export carries
-    //    `cec_hours` on 34 published rows, none of which is an IICRC approval. `resolveCecHours`
-    //    is the fail-closed resolver, and this seed path never called it — which is why
-    //    `check-iicrc-compliance.mjs` excluding `data/wordpress-export/` on the grounds that
-    //    the resolver makes its CEC prose "inert" was FALSE. 0 is the documented explicit
-    //    opt-out, so the resolver never derives a value later either.
+    //  - `iicrcDiscipline`: 5 rows STILL carry one (WRT / ASD) — nothing in the import path
+    //    touches this column. THIS IS A LIVE EXPOSURE. The field renders as a visible
+    //    "IICRC <acronym>" badge, and migration 20260907010000 nulled it on 35 live courses,
+    //    verified against production the same day (35/35). Running this seed with the old
+    //    `wp.iicrc_discipline` mapping would have put the badge back on those 5. A migration
+    //    is not durable while a seed can write the column back — that is the defect this
+    //    pinning closes. Founder ruling 2026-07-10, CLAUDE.md.
+    //
+    //  - `cecHours`: 0 rows carry a value by the time they arrive — `enrichCourseWithCecHours`
+    //    has already resolved every one to null against the registry. So the old
+    //    `wp.cec_hours ?? null` mapping was NOT publishing unapproved CEC hours, and any claim
+    //    that it was is false; a release reviewer caught exactly that overstatement here.
+    //    Pinning to 0 is deliberate DEFENCE IN DEPTH, not a live fix: it removes this function's
+    //    dependence on an upstream caller continuing to enrich, and 0 is the documented explicit
+    //    opt-out so the resolver never derives a value downstream either. Founder directive
+    //    2026-07-09.
     //
     // A course becomes CEC-bearing only when the founder adds it to the approvals registry
     // (`data/seed/cec-approvals.json`), never by being imported. Pinned by
