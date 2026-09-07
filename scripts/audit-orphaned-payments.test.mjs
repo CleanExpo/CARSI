@@ -15,6 +15,9 @@ import {
   isFullyRefunded,
   classifyOrphanAgainstAccess,
   applySecondPass,
+  classifyEnrolmentStatus,
+  ACCESS_GRANTING_STATUSES,
+  DELIBERATE_NO_ACCESS_STATUSES,
   accessKey,
 } from './audit-orphaned-payments.mjs';
 
@@ -188,29 +191,105 @@ check('an unrecognised enrolment status is REPORTED, not quietly excused', () =>
   // "Not fulfilled" is two different outcomes and only one of them is safe. `not-applicable`
   // clears the payer; `orphan` shows them to the founder. For a status this script does not
   // recognise, only the second is defensible, so the test must distinguish them.
-  // The statuses are GENERATED, not a fixed list, and that is the point.
+  // The corpus below deliberately has NO single shape. Two earlier versions of this check were
+  // defeated by exactly that: a fixed list of five literals was beaten by a mutant hardcoding
+  // those five, and generated `st_<random>_<n>` strings were beaten by a mutant matching
+  // /^st_[a-z0-9]+_\d+$/ while still clearing `suspended` and `on_hold`.
   //
-  // A previous version enumerated five literal strings. A review defeated it with a mutant
-  // that orphaned exactly those five and cleared every other unknown status — the suite stayed
-  // green while `awaiting_provision` and `held` still silently cleared the payer. A control
-  // that names its own inputs can only ever certify those inputs; the implementation can
-  // hardcode them and the test cannot tell the difference.
-  //
-  // Random statuses cannot be hardcoded in advance, so passing this requires the real
-  // property: anything outside the two known sets is reported. The named cases below are kept
-  // as well, because they are the ones a human reading this file should recognise.
+  // Sampling alone cannot close this — see the metamorphic check further down, which is what
+  // actually proves the classifier reads the exported set rather than any hardcoded list. This
+  // check is the breadth half of that pair, so it carries real-world words a mutant would
+  // plausibly want to special-case, including the ones reviews used against earlier versions.
+  const realWorld = [
+    'suspended', 'awaiting_approval', 'provisioning', 'on_hold', 'pending',
+    'pending_provision', 'awaiting_provision', 'held', 'paused', 'some_future_status',
+    'trialing', 'incomplete', 'past_due', 'unpaid', 'draft', 'archived', 'deleted',
+    'inactive', 'expired', 'locked', 'frozen', 'migrating', 'needs_review',
+  ];
+  const edges = ['', '   ', '\t', 'ACTIVE_', '_active', 'active active', 'régularisé', '状態', '0', 'null', 'undefined'];
   const generated = [];
   for (let i = 0; i < 25; i += 1) {
-    generated.push(`st_${Math.random().toString(36).slice(2, 10)}_${i}`);
+    // Varied shape on purpose: no common prefix, separator or length to pattern-match on.
+    const body = Math.random().toString(36).slice(2, 6 + (i % 8));
+    const shapes = [body, `${body}-${i}`, `x${body}`, `${body}_status`, body.toUpperCase(), `${i}${body}`];
+    generated.push(shapes[i % shapes.length]);
   }
-  const named = ['some_future_status', 'pending_provision', 'awaiting_provision', 'held', 'paused', '', '   '];
 
-  for (const status of [...named, ...generated]) {
+  for (const status of [...realWorld, ...edges, ...generated]) {
     const refs = new Map([['cs_test_new_1', status]]);
     const r = classifySession(paidSession({ id: 'cs_test_new_1' }), refs);
     assert(
       r.verdict === 'orphan',
       `unrecognised status "${status}" must be reported as an orphan, got ${r.verdict}: ${r.reason}`,
+    );
+  }
+});
+
+check('METAMORPHIC: the classifier reads the SET, not a hardcoded list', () => {
+  // This is the check that actually closes the class, and it is here because three review
+  // rounds defeated the sampling checks above by special-casing whatever the samples looked
+  // like. No finite corpus can prove "every status outside the two sets is reported" — the
+  // mutant just picks a string the corpus missed. So stop sampling and test the MECHANISM.
+  //
+  // Invent a string that cannot be in any hardcoded list because it did not exist until now.
+  // Classify it (must be unknown). Add it to DELIBERATE_NO_ACCESS_STATUSES at runtime and
+  // classify it again — the answer MUST change. Then remove it and confirm it reverts.
+  //
+  // An implementation that consults the set passes. One that compares against literals, or
+  // that special-cases any particular family of strings, cannot: its answer would not move
+  // when the set moves.
+  const novel = `mm_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+
+  assert(
+    classifyEnrolmentStatus(novel) === 'unknown',
+    `a never-before-seen status must start out unknown, got ${classifyEnrolmentStatus(novel)}`,
+  );
+
+  DELIBERATE_NO_ACCESS_STATUSES.add(novel);
+  try {
+    assert(
+      classifyEnrolmentStatus(novel) === 'deliberate-removal',
+      'adding the status to DELIBERATE_NO_ACCESS_STATUSES must change its classification — ' +
+        'if it does not, the classifier is not reading the set',
+    );
+  } finally {
+    DELIBERATE_NO_ACCESS_STATUSES.delete(novel);
+  }
+
+  assert(
+    classifyEnrolmentStatus(novel) === 'unknown',
+    'removing it again must revert the classification, or the set is not the source of truth',
+  );
+
+  // Same property for the access-granting set, so neither can be hardcoded.
+  const novel2 = `mm2_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+  ACCESS_GRANTING_STATUSES.add(novel2);
+  try {
+    assert(
+      classifyEnrolmentStatus(novel2) === 'grants',
+      'adding to ACCESS_GRANTING_STATUSES must change the classification',
+    );
+  } finally {
+    ACCESS_GRANTING_STATUSES.delete(novel2);
+  }
+});
+
+check('IFF: non-unknown is exactly set membership, expected values derived from the sets', () => {
+  // The expected answer is computed FROM the exported sets rather than written out, so this
+  // check cannot drift away from the implementation's own definition of the two categories.
+  const corpus = [
+    ...ACCESS_GRANTING_STATUSES,
+    ...DELIBERATE_NO_ACCESS_STATUSES,
+    'suspended', 'on_hold', 'pending', 'provisioning', 'awaiting_approval',
+    'REVOKED', '  refunded  ', 'Active', '', 'not_a_real_status',
+  ];
+  for (const raw of corpus) {
+    const norm = String(raw ?? '').toLowerCase().trim();
+    const isMember = ACCESS_GRANTING_STATUSES.has(norm) || DELIBERATE_NO_ACCESS_STATUSES.has(norm);
+    const cls = classifyEnrolmentStatus(raw);
+    assert(
+      (cls !== 'unknown') === isMember,
+      `"${raw}": set membership is ${isMember} but classification is "${cls}" — these must agree`,
     );
   }
 });

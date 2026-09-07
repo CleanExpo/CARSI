@@ -67,6 +67,27 @@ export const DELIBERATE_NO_ACCESS_STATUSES = new Set([
 ]);
 
 /**
+ * Classify one enrolment status into exactly three outcomes. The ONLY inputs are the two sets
+ * above; there is deliberately no third branch and no literal compared here.
+ *
+ * This exists as its own function because three review rounds faulted the control for it, not
+ * the behaviour. Each round tried to prove "any status outside the two sets is reported" by
+ * feeding the classifier sample strings — first a fixed list, then generated ones — and each
+ * time a mutant defeated it by special-casing whatever shape the samples had. Sampling cannot
+ * prove a claim about all strings; the mutant only has to pick something outside the sample.
+ *
+ * Isolating the decision lets the test attack the MECHANISM instead: it can add a value to
+ * DELIBERATE_NO_ACCESS_STATUSES at runtime and require the answer for that value to change.
+ * An implementation that consults the set passes; one that matches a hardcoded list cannot.
+ */
+export function classifyEnrolmentStatus(raw) {
+  const s = String(raw ?? '').toLowerCase().trim();
+  if (ACCESS_GRANTING_STATUSES.has(s)) return 'grants';
+  if (DELIBERATE_NO_ACCESS_STATUSES.has(s)) return 'deliberate-removal';
+  return 'unknown';
+}
+
+/**
  * Was this session's charge refunded in full?
  *
  * A refunded Stripe session STILL reads `payment_status: 'paid'`, so without this every
@@ -214,11 +235,13 @@ export function classifySession(session, enrolmentRefs) {
   // access at all.
   const recordedStatus = enrolmentRefs.get(session.id);
   if (recordedStatus !== undefined) {
-    const normalised = String(recordedStatus).toLowerCase().trim();
-    if (ACCESS_GRANTING_STATUSES.has(normalised)) {
+    // Single decision point — see classifyEnrolmentStatus. Do not re-test the status against
+    // a literal here; a second branch is exactly what the controls exist to prevent.
+    const statusClass = classifyEnrolmentStatus(recordedStatus);
+    if (statusClass === 'grants') {
       return { verdict: 'fulfilled', reason: 'an enrolment carries this session id and grants access' };
     }
-    if (DELIBERATE_NO_ACCESS_STATUSES.has(normalised)) {
+    if (statusClass === 'deliberate-removal') {
       return {
         verdict: 'not-applicable',
         reason: `access deliberately removed (enrolment status "${recordedStatus}")`,
