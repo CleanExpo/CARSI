@@ -27,9 +27,16 @@ const sh = (cmd, args) => {
 };
 
 // ---------- D3: currency ----------------------------------------------------
+// The audit's own output cites S500:2021 while describing the contamination, so
+// scanning it would count this document as part of the corpus it measures. The
+// exclusions are the difference between measuring the catalogue and measuring
+// the audit. check-currency-sweep.mjs MUST use this identical pathspec — if the
+// two halves drift apart the criterion fails on a difference in the recipe
+// rather than a change in the corpus.
 const GREP_ARGS = [
   '--no-pager', 'grep', '-nI', '-E', 'S500[^0-9]{0,3}(20[0-9]{2})?', '--',
   '*.ts', '*.tsx', '*.mjs', '*.js', '*.json', '*.md',
+  ':(exclude)docs/audit/*', ':(exclude)scripts/audit/*', ':(exclude).claude/skills/course-truth/*',
 ];
 const raw = sh('git', GREP_ARGS);
 const lines = raw.split('\n').filter(Boolean);

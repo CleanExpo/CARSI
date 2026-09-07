@@ -24,7 +24,14 @@ let raw = '';
 try {
   raw = execFileSync(
     'git',
-    ['--no-pager', 'grep', '-nI', '-E', 'S500[^0-9]{0,3}(20[0-9]{2})?', '--', '*.ts', '*.tsx', '*.mjs', '*.js', '*.json', '*.md'],
+    // Identical pathspec to build-sweeps.mjs. The audit's own files cite
+    // S500:2021 to describe the problem; counting them would measure this
+    // document rather than the catalogue.
+    [
+      '--no-pager', 'grep', '-nI', '-E', 'S500[^0-9]{0,3}(20[0-9]{2})?', '--',
+      '*.ts', '*.tsx', '*.mjs', '*.js', '*.json', '*.md',
+      ':(exclude)docs/audit/*', ':(exclude)scripts/audit/*', ':(exclude).claude/skills/course-truth/*',
+    ],
     { encoding: 'utf8', maxBuffer: 32 * 1024 * 1024 },
   );
 } catch (e) {

@@ -1,11 +1,11 @@
 # GP-567 D3 — Standards currency sweep
 
-Generated `2026-09-07T07:29:26Z` by `scripts/audit/build-sweeps.mjs`.
+Generated `2026-09-07T07:33:20Z` by `scripts/audit/build-sweeps.mjs`.
 
 ## Reproduce
 
 ```
-git grep -nI -E S500[^0-9]{0,3}(20[0-9]{2})? -- *.ts *.tsx *.mjs *.js *.json *.md
+git grep -nI -E S500[^0-9]{0,3}(20[0-9]{2})? -- *.ts *.tsx *.mjs *.js *.json *.md :(exclude)docs/audit/* :(exclude)scripts/audit/* :(exclude).claude/skills/course-truth/*
 ```
 
 ## Counts

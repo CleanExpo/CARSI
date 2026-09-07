@@ -44,6 +44,16 @@ validator was neutered with a single early `return`, and the mutant suite went f
 also asserts each mutant is rejected *by its own rule*, so one over-broad rule
 cannot make the whole suite vacuous.
 
+**The sweep counted itself the moment it was committed.** `check:currency-sweep`
+passed before the commit and failed immediately after: 20 lines asserting
+S500:2021 became 27, because the sweep, the run record and the ledger all cite
+"S500:2021" while describing the contamination. The audit had become part of the
+corpus it was auditing. Both halves — the generator and the verifier — now carry
+an identical `:(exclude)docs/audit/*` pathspec, because fixing only one would make
+the criterion fail on a difference in the recipe rather than a change in the
+catalogue. **A criterion that only runs pre-commit has not been tested in the
+state it will actually live in.**
+
 **An environment limit is not a defect, and reporting it as one is a false
 finding.** `check:cec-surfaces` crashed on a missing `typescript` import. The cause
 is that a git worktree carries no `node_modules` — my environment, not the repo's
