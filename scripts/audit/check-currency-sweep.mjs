@@ -59,11 +59,42 @@ const md = fs.readFileSync(FILE, 'utf8');
 // matches more than one row inside it is ambiguity, refused rather than resolved
 // by document order.
 const CLASSES = ['total', 'edition-class', '—'];
-const headings = [...md.matchAll(/^## Counts[ \t]*$/gm)];
+
+// Round-7: bounding the region to the Counts section was right and still read
+// markdown as if it were plain text. A FENCED CODE BLOCK containing a line that
+// begins `## ` ended the region early, so the review planted a correct decoy
+// table directly under `## Counts`, a fence holding `## NotARealHeading`, and
+// left the real table — corrupted to 999 — outside the region entirely. c5
+// exited 0 on a table it had never looked at. Reproduced here first.
+//
+// A fence body is not markdown structure, so it is masked out before anything
+// structural is read: headings, the region slice and the row lexer all see the
+// masked text. Lines are blanked rather than deleted so every `^…$` anchor and
+// every offset still lines up with the document. This document legitimately
+// carries a fence under `## Reproduce`, which is exactly why the check must
+// understand fences rather than ban them.
+const maskFences = (src) => {
+  let fence = null;
+  return src.split('\n').map((line) => {
+    const m = /^\s{0,3}(```+|~~~+)/.exec(line);
+    if (fence === null && m) {
+      fence = m[1][0];
+      return '';
+    }
+    if (fence !== null) {
+      if (m && m[1][0] === fence) fence = null;
+      return '';
+    }
+    return line;
+  }).join('\n');
+};
+const structural = maskFences(md);
+
+const headings = [...structural.matchAll(/^## Counts[ \t]*$/gm)];
 if (headings.length !== 1) {
-  fail(`the sweep declares ${headings.length} "## Counts" sections; exactly one is required, because the table to read must not depend on document order`);
+  fail(`the sweep declares ${headings.length} "## Counts" sections outside fenced code; exactly one is required, because the table to read must not depend on document order`);
 }
-const afterHeading = md.slice(headings[0].index + headings[0][0].length);
+const afterHeading = structural.slice(headings[0].index + headings[0][0].length);
 const nextHeading = afterHeading.search(/^## /m);
 const countsBlock = nextHeading === -1 ? afterHeading : afterHeading.slice(0, nextHeading);
 
