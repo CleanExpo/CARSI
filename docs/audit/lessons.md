@@ -234,3 +234,20 @@ tracked runner: the only thing invoking them was a shell script in one agent ses
 scratch directory. On any other machine, nothing ran them at all. `npm run audit:verify`
 now arms all eleven, and the new c11 with them — the green was always real and always
 meant nothing.
+
+**The outermost gate must not depend on anything it gates.** The first draft of
+`verify-all.mjs` read each criterion's exit status through `runCapture` from
+`subprocess.mjs` — including c11, whose entire job is to test that reader. Mutating
+`runCapture` to return `{status: 0}` turns c11 RED exactly as designed, and the runner,
+reading c11's result *through the mutation*, would have printed `11 of 11 criteria pass`.
+The gate greens over its own failing control. Six duplicated lines of raw `spawnSync` in the
+runner remove the dependency; the duplication is the point and must not be refactored away.
+Proved behaviourally rather than by inspection: neuter `runCapture`, and `audit:verify` must
+still exit non-zero. It now does.
+
+**Some good changes have no honest mutant, and claiming one is worse than admitting it.**
+`let changed = ''` was replaced with `let changed;` — the initialiser was the exact fallback
+value the round-10 fix exists to eliminate. But `fail()` calls `process.exit`, so the
+initialiser is unreachable and restoring it changes no observable behaviour today. It is
+defensive depth, not a behavioural fix, and the mutation harness says so out loud instead of
+inventing a control that would pass either way.

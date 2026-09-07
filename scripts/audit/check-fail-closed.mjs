@@ -35,6 +35,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { run, runCapture, SubprocessFailure } from './subprocess.mjs';
+import { parseLdBlocks, LdParseFailure } from './parse-ld.mjs';
 
 const ROOT = process.cwd();
 let failures = 0;
@@ -167,6 +168,66 @@ if (before.stdout !== after.stdout) {
 
 fs.rmSync(stubDir, { recursive: true, force: true });
 
+// ---------- layer 4: the outermost gate must not depend on what it gates ----
+//
+// verify-all.mjs decides whether each criterion passed by reading its exit
+// status — including THIS file, whose job is to test the subprocess reader. If
+// the runner read those statuses through `runCapture`, mutating `runCapture` to
+// return {status: 0} would turn c11 red while the runner still printed
+// "11 of 11 criteria pass": the gate greening over its own failing control.
+//
+// This is checked STATICALLY because it is a property of the source, not of a
+// run: the runner must import nothing from the tree it gates. c11 cannot simply
+// execute verify-all.mjs to test it — verify-all runs c11, so that recurses.
+const runnerSrc = fs.readFileSync(path.join(ROOT, 'scripts/audit/verify-all.mjs'), 'utf8');
+const relImports = [...runnerSrc.matchAll(/^\s*import\s[^;]*?from\s+['"](\.[^'"]*)['"]/gm)].map((m) => m[1]);
+if (relImports.length) {
+  bad(
+    `verify-all.mjs imports ${relImports.join(', ')} from the tree it gates — `
+    + 'a mutated reader would let the runner report a pass over its own failing control',
+  );
+}
+
+// ---------- layer 5: the JSON-LD reader -------------------------------------
+//
+// Same class as the subprocess swallow, different mechanism. The generator used
+// `catch { return null }` then `.filter(Boolean)`, so an unparseable ItemList
+// block emptied ldCourses and every course silently lost its live name, price
+// and availability — while c1 still passed, because row count comes from the
+// sitemap, not the JSON-LD.
+const LD_OK = '<script type="application/ld+json">{"@type":"ItemList","itemListElement":[]}</script>';
+try {
+  const blocks = parseLdBlocks(`<html>${LD_OK}</html>`);
+  if (blocks.length !== 1 || blocks[0]['@type'] !== 'ItemList') {
+    bad(`parseLdBlocks: a valid block parsed to ${JSON.stringify(blocks)}`);
+  }
+} catch (e) {
+  bad(`parseLdBlocks: threw on a VALID block — it would refuse every snapshot (${e.message})`);
+}
+try {
+  // A page with no JSON-LD at all is a real, observable measurement, not a
+  // failure. Without this the reader could be throwing on everything.
+  const blocks = parseLdBlocks('<html><body>no structured data here</body></html>');
+  if (blocks.length !== 0) bad(`parseLdBlocks: found ${blocks.length} blocks in a page with none`);
+} catch (e) {
+  bad(`parseLdBlocks: threw on a page with no JSON-LD, which is not a failure (${e.message})`);
+}
+{
+  let threw = null;
+  try {
+    parseLdBlocks(`<html>${LD_OK}<script type="application/ld+json">{"@type":</script></html>`);
+  } catch (e) {
+    threw = e;
+  }
+  if (threw === null) {
+    bad('parseLdBlocks: accepted an UNPARSEABLE block — a silent drop empties ldCourses while c1 still passes');
+  } else if (!(threw instanceof LdParseFailure)) {
+    bad(`parseLdBlocks: threw ${threw.name}, not LdParseFailure`);
+  } else if (!/block 2 of 2 does not parse/.test(threw.message)) {
+    bad(`parseLdBlocks: did not name WHICH block failed — got: ${threw.message.slice(0, 80)}`);
+  }
+}
+
 if (failures) {
   console.error(`FAIL c11: ${failures} control failure(s)`);
   process.exit(1);
@@ -174,5 +235,6 @@ if (failures) {
 console.log(
   `OK c11: reader refuses ${6} unmeasurable cases and permits the 1 documented empty (git grep exit 1); `
   + `${SUBJECTS.length} verifiers fail closed under a broken git and pass under a working one; `
-  + 'generator dies before writing, tree unchanged',
+  + 'generator dies before writing, tree unchanged; runner imports nothing it gates; '
+  + 'JSON-LD reader refuses an unparseable block and permits a page with none',
 );

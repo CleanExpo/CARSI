@@ -57,7 +57,11 @@ if (!/\*\*Coverage: \d+ of \d+ guards/.test(md)) {
 //
 // "No guard was modified" and "I could not find out whether a guard was
 // modified" are different claims. Only the first one is a pass.
-let changed = '';
+// Deliberately NOT initialised to '': that is the exact fallback value this fix
+// exists to eliminate, and leaving it here would re-create the defect the moment
+// `fail()` stopped exiting. Undefined degrades to a crash on `.split`, which is
+// fail-closed; '' degrades to a PASS, which is what round 10 exploited.
+let changed;
 try {
   const mergeBase = run('git', ['merge-base', 'origin/main', 'HEAD']).trim();
   changed = run('git', ['--no-pager', 'diff', '--name-only', mergeBase, '--', 'scripts/']);

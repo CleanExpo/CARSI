@@ -16,6 +16,7 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
+import { parseLdBlocks } from './parse-ld.mjs';
 
 const ROOT = process.cwd();
 const CACHE = path.join(ROOT, '.audit-cache');
@@ -43,15 +44,10 @@ const liveSlugs = [
 ].sort();
 
 const html = readCache('courses.html');
-const ldBlocks = [...html.matchAll(/<script[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g)]
-  .map((m) => {
-    try {
-      return JSON.parse(m[1].trim());
-    } catch {
-      return null;
-    }
-  })
-  .filter(Boolean);
+// Fail-closed: an unparseable block throws rather than becoming null and being
+// filtered away. See parse-ld.mjs — a silent drop of the ItemList block empties
+// ldCourses and c1 still passes, because row count comes from the sitemap.
+const ldBlocks = parseLdBlocks(html);
 
 const itemList = ldBlocks.flat().find((o) => o && o['@type'] === 'ItemList');
 const ldCourses = new Map();
