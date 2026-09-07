@@ -14,6 +14,7 @@ import {
   evaluateRun,
   isFullyRefunded,
   classifyOrphanAgainstAccess,
+  applySecondPass,
   accessKey,
 } from './audit-orphaned-payments.mjs';
 
@@ -187,7 +188,24 @@ check('an unrecognised enrolment status is REPORTED, not quietly excused', () =>
   // "Not fulfilled" is two different outcomes and only one of them is safe. `not-applicable`
   // clears the payer; `orphan` shows them to the founder. For a status this script does not
   // recognise, only the second is defensible, so the test must distinguish them.
-  for (const status of ['some_future_status', 'pending_provision', 'paused', '', '   ']) {
+  // The statuses are GENERATED, not a fixed list, and that is the point.
+  //
+  // A previous version enumerated five literal strings. A review defeated it with a mutant
+  // that orphaned exactly those five and cleared every other unknown status — the suite stayed
+  // green while `awaiting_provision` and `held` still silently cleared the payer. A control
+  // that names its own inputs can only ever certify those inputs; the implementation can
+  // hardcode them and the test cannot tell the difference.
+  //
+  // Random statuses cannot be hardcoded in advance, so passing this requires the real
+  // property: anything outside the two known sets is reported. The named cases below are kept
+  // as well, because they are the ones a human reading this file should recognise.
+  const generated = [];
+  for (let i = 0; i < 25; i += 1) {
+    generated.push(`st_${Math.random().toString(36).slice(2, 10)}_${i}`);
+  }
+  const named = ['some_future_status', 'pending_provision', 'awaiting_provision', 'held', 'paused', '', '   '];
+
+  for (const status of [...named, ...generated]) {
     const refs = new Map([['cs_test_new_1', status]]);
     const r = classifySession(paidSession({ id: 'cs_test_new_1' }), refs);
     assert(
@@ -247,6 +265,43 @@ check('an EMAIL-resolved payer holding the course is annotated, NOT cleared', ()
   assert(r.verdict === 'orphan', `email-resolved payer must stay reported, got ${r.verdict}`);
   assert(/re-purchase/i.test(r.reason), `reason must explain the likely cause, got: ${r.reason}`);
   assert(/email/i.test(r.reason), `reason must say the id came from email, got: ${r.reason}`);
+});
+
+// -------------------------------------------------- the second pass as main() actually runs it
+// These call applySecondPass, the SAME function main() calls. A test that re-implemented the
+// loop over its own fixture passed while main() computed the annotation and discarded it.
+
+check('applySecondPass CLEARS a metadata-identified payer who holds the course', () => {
+  const orphans = [{ ...ORPHAN }];
+  const keys = new Set([accessKey('user-1', 'introduction-to-water-damage-restoration')]);
+  const cleared = applySecondPass(orphans, keys);
+  assert(cleared === 1, `expected 1 cleared, got ${cleared}`);
+  assert(orphans.length === 0, `row should be removed, ${orphans.length} left`);
+});
+
+check('applySecondPass WRITES the annotation onto a surviving row', () => {
+  // The regression this exists for: the reason was computed and thrown away, so the operator
+  // read "PAID with no matching enrolment" and the email pass may as well not have run.
+  const orphans = [{ ...ORPHAN, learnerIdSource: 'email' }];
+  const keys = new Set([accessKey('user-1', 'introduction-to-water-damage-restoration')]);
+  const cleared = applySecondPass(orphans, keys);
+  assert(cleared === 0, `email-resolved payer must not be cleared, got ${cleared}`);
+  assert(orphans.length === 1, `row should survive, got ${orphans.length}`);
+  assert(
+    /re-purchase/i.test(orphans[0].reason),
+    `the ROW must carry the annotation, got: ${orphans[0].reason}`,
+  );
+});
+
+check('applySecondPass leaves an unrelated orphan untouched', () => {
+  // Negative control: without this, always overwriting every reason would pass the check above.
+  const orphans = [{ ...ORPHAN, reason: 'PAID with no matching enrolment' }];
+  const cleared = applySecondPass(orphans, new Set());
+  assert(cleared === 0, `nothing should clear, got ${cleared}`);
+  assert(
+    orphans[0].reason === 'PAID with no matching enrolment',
+    `reason must not gain a spurious note, got: ${orphans[0].reason}`,
+  );
 });
 
 check('a payer with no identified source is never cleared', () => {

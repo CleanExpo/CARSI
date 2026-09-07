@@ -105,6 +105,36 @@ export function accessKey(userId, courseSlug) {
  *
  * Pure. `accessKeys` holds one entry per learner-course pair that currently grants access.
  */
+/**
+ * Apply the second pass to the orphan list IN PLACE, returning how many were cleared.
+ *
+ * Extracted from main() so the tests exercise the real thing. The alternative — a test that
+ * re-implements this loop over its own fixture — would have kept passing when main() computed
+ * an annotation and threw it away, which is precisely the defect a review found here. A
+ * control that imitates the producer cannot see the producer regress.
+ *
+ * Two outcomes per row, and the asymmetry is deliberate:
+ *   cleared  — removed from the report entirely. Only for a payer identified from checkout
+ *              metadata who demonstrably holds the course.
+ *   annotated — stays in the report, but carries what the pass worked out, so the founder can
+ *              tell a probable re-purchase from a genuine unpaid obligation at a glance.
+ */
+export function applySecondPass(orphans, accessKeys) {
+  let cleared = 0;
+  for (let i = orphans.length - 1; i >= 0; i -= 1) {
+    const r = classifyOrphanAgainstAccess(orphans[i], accessKeys);
+    if (r.verdict === 'fulfilled') {
+      orphans.splice(i, 1);
+      cleared += 1;
+      continue;
+    }
+    // The row SURVIVES, but the pass may still have learned something about it. Carry the
+    // reason back, or the work is invisible and the pass does nothing but clear.
+    orphans[i].reason = r.reason;
+  }
+  return cleared;
+}
+
 export function classifyOrphanAgainstAccess(orphan, accessKeys) {
   const { learnerId, courseSlug, learnerIdSource } = orphan;
   if (!learnerId) {
@@ -366,13 +396,7 @@ async function main() {
         console.error(`Could not resolve payer identities, second pass skipped: ${e.message}`);
       }
     }
-    for (let i = orphans.length - 1; i >= 0; i -= 1) {
-      const r = classifyOrphanAgainstAccess(orphans[i], accessKeys);
-      if (r.verdict === 'fulfilled') {
-        orphans.splice(i, 1);
-        clearedByAccess += 1;
-      }
-    }
+    clearedByAccess += applySecondPass(orphans, accessKeys);
   }
 
   await prisma.$disconnect();
@@ -403,6 +427,10 @@ async function main() {
       console.log(`    course:  ${o.courseSlug}`);
       console.log(`    email:   ${o.email ?? '(none on session)'}`);
       console.log(`    session: ${o.sessionId}`);
+      // The reason is what tells the founder WHICH of these needs money spent on it. A row
+      // annotated "probably a re-purchase, confirm and dismiss" is a different job from one
+      // that is simply unpaid-for, and printing only course/email/session hid that difference.
+      if (o.reason) console.log(`    why:     ${o.reason}`);
     }
     console.log(`\n  Each of these is a refund-or-fulfil obligation, not a backlog item.`);
   }
