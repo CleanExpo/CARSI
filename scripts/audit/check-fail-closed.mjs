@@ -36,6 +36,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { run, runCapture, SubprocessFailure } from './subprocess.mjs';
 import { parseLdBlocks, LdParseFailure } from './parse-ld.mjs';
+import ts from 'typescript';
 
 const ROOT = process.cwd();
 let failures = 0;
@@ -177,15 +178,84 @@ fs.rmSync(stubDir, { recursive: true, force: true });
 // "11 of 11 criteria pass": the gate greening over its own failing control.
 //
 // This is checked STATICALLY because it is a property of the source, not of a
-// run: the runner must import nothing from the tree it gates. c11 cannot simply
+// run: the runner must load nothing from the tree it gates. c11 cannot simply
 // execute verify-all.mjs to test it — verify-all runs c11, so that recurses.
-const runnerSrc = fs.readFileSync(path.join(ROOT, 'scripts/audit/verify-all.mjs'), 'utf8');
-const relImports = [...runnerSrc.matchAll(/^\s*import\s[^;]*?from\s+['"](\.[^'"]*)['"]/gm)].map((m) => m[1]);
-if (relImports.length) {
+//
+// ── Round 13's P1, and why this is now an AST walk ────────────────────────
+//
+// The first version matched `^\s*import ... from '...'` with a regex. Review
+// planted `await import('./subprocess.mjs')` in the runner and c11 stayed GREEN,
+// still printing "runner imports nothing it gates" — a control rendering a pass
+// over a dependency it never looked at. Exactly round 12's defect one layer up:
+// the JUDGE half was fine and the FIND half was too narrow.
+//
+// So the same remedy applies: stop approximating a parser. TypeScript (already a
+// devDependency) tokenises the runner and every module-loading construct is
+// enumerated from the syntax tree — static import, re-export, dynamic import(),
+// require(), createRequire() — rather than from a pattern that has to anticipate
+// each spelling.
+//
+// The rule is an ALLOW-LIST, because a denylist of evasions fails open forever:
+// every load must carry a STRING-LITERAL specifier beginning with `node:`. A
+// relative path fails, a bare package fails, and a computed specifier fails
+// because it cannot be decided at all. eval and new Function are banned outright
+// — they can load anything, so their presence makes the question undecidable.
+const RUNNER_REL = 'scripts/audit/verify-all.mjs';
+const runnerSrc = fs.readFileSync(path.join(ROOT, RUNNER_REL), 'utf8');
+const runnerAst = ts.createSourceFile(RUNNER_REL, runnerSrc, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
+
+const loads = [];
+const codegen = [];
+const litText = (node) => (node && ts.isStringLiteralLike(node) ? node.text : null);
+
+const visitRunner = (n) => {
+  if (ts.isImportDeclaration(n) || (ts.isExportDeclaration(n) && n.moduleSpecifier)) {
+    loads.push({ kind: 'import', spec: litText(n.moduleSpecifier), text: n.moduleSpecifier.getText() });
+  } else if (ts.isImportEqualsDeclaration(n)) {
+    loads.push({ kind: 'import=', spec: null, text: n.getText().slice(0, 60) });
+  } else if (ts.isCallExpression(n)) {
+    const callee = n.expression.getText();
+    if (n.expression.kind === ts.SyntaxKind.ImportKeyword) {
+      loads.push({ kind: 'dynamic import()', spec: litText(n.arguments[0]), text: n.arguments[0]?.getText() ?? '(no argument)' });
+    } else if (/(^|\.)require$|createRequire/.test(callee)) {
+      loads.push({ kind: 'require()', spec: litText(n.arguments[0]), text: n.arguments[0]?.getText() ?? '(no argument)' });
+    } else if (callee === 'eval') {
+      codegen.push('eval(...)');
+    }
+  } else if (ts.isNewExpression(n) && n.expression.getText() === 'Function') {
+    codegen.push('new Function(...)');
+  }
+  ts.forEachChild(n, visitRunner);
+};
+visitRunner(runnerAst);
+
+// POSITIVE CONTROL, and the most important line here. If the walk silently found
+// nothing — wrong path, a parse that produced an empty tree, a refactor that
+// renamed the file — then every assertion below passes vacuously and the control
+// reports independence it never measured. That is the same shape as the defect
+// being guarded against, so the walk must prove it can see.
+if (!loads.some((l) => l.spec === 'node:child_process')) {
   bad(
-    `verify-all.mjs imports ${relImports.join(', ')} from the tree it gates — `
-    + 'a mutated reader would let the runner report a pass over its own failing control',
+    `the module-load walk over ${RUNNER_REL} did not find its known 'node:child_process' import `
+    + `(found ${loads.length} load(s)) — the walk is not reading the runner, so its verdict is vacuous`,
   );
+}
+for (const l of loads) {
+  if (l.spec === null) {
+    bad(
+      `${RUNNER_REL} has a ${l.kind} with a non-literal specifier (${l.text}) — it cannot be `
+      + 'decided what that loads, and an undecidable dependency is not an absent one',
+    );
+  } else if (!l.spec.startsWith('node:')) {
+    bad(
+      `${RUNNER_REL} has a ${l.kind} of "${l.spec}" — the outermost gate must load nothing but `
+      + 'node: builtins, or a mutation inside scripts/audit could make it report a pass over its '
+      + 'own failing control',
+    );
+  }
+}
+for (const c of codegen) {
+  bad(`${RUNNER_REL} uses ${c}, which can load anything — the gate's dependencies stop being decidable`);
 }
 
 // ---------- layer 5: the JSON-LD reader -------------------------------------
@@ -277,7 +347,8 @@ if (failures) {
 console.log(
   `OK c11: reader refuses ${6} unmeasurable cases and permits the 1 documented empty (git grep exit 1); `
   + `${SUBJECTS.length} verifiers fail closed under a broken git and pass under a working one; `
-  + 'generator dies before writing, tree unchanged; runner imports nothing it gates; '
+  + `generator dies before writing, tree unchanged; runner's ${loads.length} module load(s) are all `
+  + 'node: builtins by AST walk, with no codegen; '
   + `JSON-LD reader refuses a broken block in all ${SPELLINGS.length} valid spellings of the type `
   + 'attribute, permits a page with none, and does not mistake plain JavaScript for JSON-LD',
 );

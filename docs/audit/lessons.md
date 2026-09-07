@@ -263,6 +263,30 @@ discriminates nothing. Proved by restoring the exact round-12 regex as a mutant:
 naming `single-quoted`. And a positive control that the swap changed no measurement — the
 regenerated inventory was byte-identical to the regex version apart from its timestamp.
 
+**The same FIND-half defect, one layer up, in the control itself.** Round 13 accepted the
+JSON-LD fix and turned on the control that had just been added to police the runner. Layer 4
+matched `^\s*import ... from '...'` with a regex; review planted
+`await import('./subprocess.mjs')` in `verify-all.mjs` and c11 stayed **green**, still printing
+"runner imports nothing it gates". A control rendering a pass over a dependency it never looked
+at — the very failure it exists to catch, committed by the catcher.
+
+Two things closed it, and both were already the lesson of the previous round:
+
+1. **Use the parser, again.** Module-loading constructs are enumerated from a TypeScript AST —
+   static import, re-export, `import()`, `require()`, `createRequire()` — instead of from a
+   pattern that must anticipate each spelling. One mutant per construct; all seven die.
+2. **Allow-list, never denylist.** Every load must carry a *string-literal* specifier starting
+   with `node:`. A relative path fails, a bare package fails, and a computed specifier fails
+   because it cannot be decided at all — an undecidable dependency is not an absent one.
+   `eval` and `new Function` are banned outright, since their presence makes the question
+   undecidable in principle.
+
+**And the line that mattered most: a positive control against vacuity.** The walk asserts it can
+still see the runner's known `node:child_process` import. Without it, a wrong path or a broken
+parse yields zero loads, every assertion passes over nothing, and the control reports
+independence it never measured — silently, in exactly the shape of the bug it guards. Proved by
+pointing the walk at a file with no imports and watching c11 go red.
+
 **Some good changes have no honest mutant, and claiming one is worse than admitting it.**
 `let changed = ''` was replaced with `let changed;` — the initialiser was the exact fallback
 value the round-10 fix exists to eliminate. But `fail()` calls `process.exit`, so the
