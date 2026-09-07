@@ -41,10 +41,6 @@ const liveSlugs = [
       .filter(Boolean),
   ),
 ];
-const html = fs.readFileSync(path.join(ROOT, '.audit-cache/courses.html'), 'utf8');
-const metaDesc = (html.match(/<meta name="description" content="([^"]*)"/) || [])[1] || '';
-const ogDesc = (html.match(/<meta property="og:description" content="([^"]*)"/) || [])[1] || '';
-
 const ACRONYMS = /^(wrt|asd|amrt|cct|ccmt|ccu|osr|fsrt|smt|hst|uft|rrt|wlp)-/i;
 const acronymSlugs = liveSlugs.filter((s) => ACRONYMS.test(s));
 const approvedSlugs = new Set(approvals.map((a) => a.slug));
@@ -123,28 +119,59 @@ add({
 });
 
 // ---- The live banned-language surface -----------------------------------
+// Finding #1. These are GAP, not VERIFIED.
+//
+// The first filing recorded these as VERIFIED on the reasoning that the STRING is
+// genuinely on the page, and left the licence question to the compliance sweep's
+// prose. Independent review (cursor, `6e92de9b`) called that a rationalisation and
+// was right: the ledger's job is to resolve the CLAIM A SURFACE MAKES, and a
+// status of VERIFIED on the claim marketing actually asserts means the ledger
+// preserves the licence-critical statement instead of blocking it.
+//
+// The substantive error underneath was a conflation. "CARSI holds 38 approved CEC
+// COURSES" and "CARSI is an ACCREDITED PROVIDER" are different claims. The
+// registry evidences the first. Nothing located evidences the second.
 add({
   id: 'GP567-011', claim_class: 'banned-language', surface: 'https://carsi.com.au/courses',
-  claim: 'The live /courses meta description calls CARSI "an IICRC CEC Accredited provider".',
-  status: 'VERIFIED', source_url: 'https://carsi.com.au/courses', access_date: ACCESS,
+  claim: 'The live /courses meta description asserts CARSI is "an IICRC CEC Accredited provider" — a provider-level accreditation claim.',
+  status: 'GAP',
+  reason:
+    'Nothing located establishes PROVIDER-level accreditation. The approvals registry evidences 38 per-course CEC approvals, which is a different and weaker claim. The wording is also in the prohibited public-language class per GP-560.',
+  recommended_action: 'rewrite',
   quote: 'Study online with CARSI, an IICRC CEC Accredited provider.',
-  note: 'VERIFIED means the string is genuinely on the page. Whether it MAY be said is the Compliance Gate question — see compliance-language-sweep.md. Truth and permission are different axes.',
+  access_date: ACCESS,
+  evidence_url: 'https://carsi.com.au/courses',
   feeds: ['catalogue', 'marketing'], check_by: '2026-10-07',
 });
 add({
   id: 'GP567-012', claim_class: 'banned-language', surface: 'https://carsi.com.au/courses',
-  claim: 'The live /courses og:description claims "IICRC CEC Accredited courses" and invites visitors to "Earn continuing education credits".',
-  status: 'VERIFIED', source_url: 'https://carsi.com.au/courses', access_date: ACCESS,
+  claim: 'The live /courses og:description asserts "IICRC CEC Accredited courses" and invites visitors to "Earn continuing education credits".',
+  status: 'GAP',
+  reason:
+    'Same provider/course conflation, plus "Earn continuing education credits" tells a prospective learner they will receive CECs. Only 38 of 80 live courses have a registry approval, so the invitation is unsubstantiated for the majority of the catalogue.',
+  recommended_action: 'rewrite',
   quote: 'IICRC CEC Accredited courses ... Earn continuing education credits and track your progress.',
+  access_date: ACCESS,
+  evidence_url: 'https://carsi.com.au/courses',
   feeds: ['catalogue', 'marketing'], check_by: '2026-10-07',
 });
 add({
-  id: 'GP567-013', claim_class: 'accreditation', surface: 'https://carsi.com.au/courses',
-  claim: 'CARSI is in fact an IICRC CEC accredited provider.',
+  id: 'GP567-013', claim_class: 'accreditation', surface: 'repo:data/seed/cec-approvals.json',
+  claim: 'CARSI holds founder-recorded IICRC CEC approvals for 38 specific courses.',
   status: 'JUSTIFIED', confidence: 'medium',
   reasoning:
-    'The approvals registry carries 38 founder-recorded approvals citing an IICRC approval batch dated 2024-01-18. That is founder-supplied secondary evidence, not a primary IICRC-published register entry, and no public IICRC URL confirming CARSI provider status was located this run.',
-  best_available_source: 'repo:data/seed/cec-approvals.json — evidence field cites CARSI_courses.pdf supplied by founder 2026-08-27',
+    'Primary verification is genuinely unavailable, now evidenced rather than assumed: a search for a public IICRC register of approved CEC providers found none. IICRC manages CEC approval by submission to CECCourse@iicrcnet.org — the same address this repo scripts against — and published guidance is to contact IICRC directly, which is founder-gated. So the registry is the best obtainable source, and this claim is scoped to per-course approvals only.',
+  best_available_source: 'repo:data/seed/cec-approvals.json — evidence cites CARSI_courses.pdf supplied by founder 2026-08-27; corroborated by iicrc.org/accepted-cecs (no public provider register)',
+  feeds: ['cec-registry'], check_by: '2026-10-07',
+});
+add({
+  id: 'GP567-025', claim_class: 'accreditation', surface: 'https://carsi.com.au/courses',
+  claim: 'CARSI is an IICRC CEC "Accredited provider" (provider-level accreditation, as distinct from holding approved courses).',
+  status: 'GAP',
+  reason:
+    'No source located establishes provider-level accreditation. The registry evidences per-course approvals; IICRC publishes no provider register; the founder-supplied PDF is described as a class list, not a provider credential. This is the claim the live marketing copy actually makes, and it is the one with no basis.',
+  recommended_action: 'substantiate',
+  note: 'Founder-gated to resolve: only Phill can obtain provider-status confirmation from IICRC. Until then the public wording should not assert it.',
   feeds: ['catalogue', 'marketing'], check_by: '2026-10-07',
 });
 add({
@@ -202,19 +229,18 @@ add({
 // ---- Guard coverage ------------------------------------------------------
 add({
   id: 'GP567-022', claim_class: 'guard-coverage', surface: 'repo:scripts/check-cec-surfaces.mjs',
-  claim: 'check:cec-surfaces did not run in this audit.',
-  status: 'JUSTIFIED', confidence: 'high',
-  reasoning:
-    'It imports the typescript package, which is absent because a git worktree carries no node_modules. This is an artefact of the audit environment, NOT evidence of a repo defect — the guard is not reported as failing, only as unrun.',
-  best_available_source: 'ERR_MODULE_NOT_FOUND: Cannot find package typescript (observed 2026-09-07)',
-  feeds: ['compliance-gate'], check_by: '2026-10-07',
+  claim: 'check:cec-surfaces initially crashed with ERR_MODULE_NOT_FOUND, and the cause was the audit environment rather than a repo defect.',
+  status: 'VERIFIED', source_url: 'repo:scripts/check-cec-surfaces.mjs', access_date: ACCESS,
+  quote: 'after npm ci: CEC surface-leak guard passed',
+  note: 'Recorded first as JUSTIFIED ("environment limit, not a defect") while unproven, then PROVEN by provisioning the worktree — the guard runs and passes. Kept as a worked example: a crashing tool is a claim about your environment until you have shown otherwise.',
+  feeds: ['compliance-gate'], check_by: '2026-12-07',
 });
 add({
   id: 'GP567-023', claim_class: 'guard-coverage', surface: 'repo:package.json',
-  claim: 'check:iicrc-compliance, check:iicrc-terminology, check:cec, check:standards-claims and check:designations all pass on origin/main.',
+  claim: 'All seven CARSI compliance guards pass on this branch: iicrc-compliance, iicrc-terminology, cec, cec-surfaces, standards-claims, designations, au-english.',
   status: 'VERIFIED', source_url: 'repo:package.json', access_date: ACCESS,
-  quote: 'five guards exit 0; cec reports 38 entries (38 approved)',
-  note: 'Passing means these guards find nothing in the surfaces they scan. GP-519 and GP-525 both record scope blind spots, so a pass here is not catalogue-wide assurance.',
+  quote: 'seven guards exit 0; cec reports 38 entries (38 approved)',
+  note: 'Passing means these guards find nothing in the surfaces they scan. GP-519 and GP-525 both record scope blind spots, and none of them reads a live response, so a pass here is not catalogue-wide assurance.',
   feeds: ['compliance-gate'], check_by: '2026-10-07',
 });
 add({

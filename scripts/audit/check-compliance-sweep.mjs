@@ -15,11 +15,27 @@ const fail = (m) => {
 if (!fs.existsSync(FILE)) fail(`missing ${FILE}`);
 const md = fs.readFileSync(FILE, 'utf8');
 
-for (const g of ['check:iicrc-compliance', 'check:iicrc-terminology', 'check:cec', 'check:standards-claims']) {
+const REQUIRED_GUARDS = [
+  'check:iicrc-compliance',
+  'check:iicrc-terminology',
+  'check:cec',
+  'check:cec-surfaces',
+  'check:standards-claims',
+  'check:designations',
+  'check:au-english',
+];
+for (const g of REQUIRED_GUARDS) {
   if (!md.includes(g)) fail(`sweep does not record the existing guard ${g}`);
+  // Every named guard must carry a recorded exit code — naming a guard without a
+  // result is what lets a sweep imply coverage it never had.
+  if (!new RegExp(`\\\`${g.replace(/[:]/g, '[:]')}\\\`[^|]*\\|\\s*\\d+\\s*\\|`).test(md)) {
+    fail(`sweep names ${g} but records no exit code for it`);
+  }
 }
 if (!/IICRC CEC Accredited/.test(md)) fail('sweep carries no verbatim live-surface evidence');
-if (!/NOT RUN/.test(md)) fail('sweep must state which guard did not run rather than implying full coverage');
+if (!/\*\*Coverage: \d+ of \d+ guards/.test(md)) {
+  fail('sweep does not state explicit coverage — a sweep that lists passes without stating how many guards ran implies coverage it may not have');
+}
 
 // No guard may be modified by an audit run.
 let changed = '';

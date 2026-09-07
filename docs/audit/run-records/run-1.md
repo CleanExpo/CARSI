@@ -8,14 +8,59 @@
 
 | Status | Count |
 | --- | ---: |
-| VERIFIED | 13 |
-| JUSTIFIED | 2 |
-| GAP | 9 |
+| VERIFIED | 12 |
+| JUSTIFIED | 1 |
+| GAP | 12 |
 | CONFLICT sidecars | 0 |
-| **Total entries** | **24** |
+| **Total entries** | **25** |
 
 No cross-engine conflict was recorded because no contested claim required a second
 engine this run — see "Second engine" below.
+
+## Independent review and what it changed
+
+Reviewed by the **cursor** lane at `6e92de9b` (codex was quota-exhausted until
+2026-09-12; a shell-capable lane was required because only those can execute a
+mutation control). Verdict **FAIL, 4 × P1**. All four were accepted as real; three
+were adopted as stated and one had a correct premise with an incorrect conclusion.
+
+**P1-1, matcher false negative — adopted.** The token matcher dropped tokens of
+length ≤ 3, deleting the level digits, then scored `inter / min(|A|,|B|)`, which
+rates a strict subset as a perfect 1.0. `level-2-` and `level-3-mould-remediation`
+were both being matched to live `level-1-mould-remediation-2cc96b85`. Fixed:
+numeric tokens are always retained, a hard gate rejects any match whose numeric
+tokens differ, and scoring is Jaccard. New criterion **c10** pins the property, and
+was proven to fire by reintroducing the defect — it names the exact case
+(`level-3 → level-1 (3 vs 1)`).
+
+**P1-2, "18 is not defensible" — premise accepted, conclusion corrected.** The
+review inferred that fixing P1-1 "yields at least 20 gaps". It does not. All three
+levels exist live under hash-suffixed slugs — `level-1-…-2cc96b85`,
+`level-2-…-30ee3492`, `level-3-…-c5797369`, verified directly in `sitemap.xml`. The
+defect mis-*targeted* those matches; it did not hide them. **The gap count remains
+18**, now produced by a matcher that maps each level to its own counterpart. The
+review's own re-derivation of every other figure (80 / 95 / 71 / 182 / 38 / 274 /
+20 / 233 / 4) reproduced, which is useful corroboration.
+
+**P1-3, criterion c8 drift — adopted, and the most serious of the four.** Criterion
+c8 requires the meta/og claims filed as **GAP**. The verifier instead asserted that
+the accreditation entry was JUSTIFIED and never checked GAP at all — it tested what
+had been built rather than what the criterion demanded. The implementation was
+changed to meet the criterion; the criterion was not rewritten to match the
+implementation, which would have been self-certification.
+
+**P1-4, the JUSTIFIED filing was a rationalisation — adopted.** Two errors, one
+inside the other. First, `JUSTIFIED` means 100% verification is *unavailable*, not
+merely *not attempted*, and unavailability had never been established. It has now
+been: a search for a public IICRC register of approved CEC providers found none —
+IICRC manages approval by submission to `CECCourse@iicrcnet.org` (the address this
+repo already scripts against) and directs enquirers to contact IICRC, which is
+founder-gated. Second and more important, the entry **conflated two different
+claims**. "CARSI holds 38 approved CEC *courses*" is evidenced by the registry.
+"CARSI is an IICRC CEC **Accredited provider**" is what the live marketing copy
+actually says, and nothing located establishes it. These are now separate entries:
+the per-course claim is JUSTIFIED with evidenced unavailability; the provider-level
+claim is a **GAP**, as are both live surfaces asserting it.
 
 ## What this run established
 
@@ -40,12 +85,15 @@ But `carpet-cleaning` and `carpet-cleaning-basics` — the two courses GP-525 na
 are **still not among the 38**. Do not close GP-525 on the grounds that the
 registry is no longer empty.
 
-**Finding #1 is a language finding, not a lie.** The live `/courses` meta
-description calls CARSI "an IICRC CEC Accredited provider" and the og:description
-adds "Earn continuing education credits". Because the registry now holds 38
-approvals, the underlying claim is filed **JUSTIFIED (medium)** — founder-supplied
-secondary evidence, no primary IICRC register URL located. The finding is that
-this is prohibited language on a public surface, whether or not it is true.
+**Finding #1: the live copy claims provider accreditation that nothing supports.**
+The `/courses` meta description calls CARSI "an IICRC CEC Accredited provider" and
+the og:description adds "Earn continuing education credits". Both are filed **GAP**.
+The registry evidences 38 approved *courses*; it does not evidence *provider*
+accreditation, and no public IICRC provider register exists to check against. Only
+38 of 80 live courses carry an approval, so "Earn continuing education credits" is
+also unsubstantiated for most of the catalogue. Separately, the wording is in the
+prohibited public-language class per GP-560 — but the reason it is a GAP is that
+the claim itself has no established basis, not merely that it is unsayable.
 
 **Every repo guard passes while the live site serves prohibited language.** Five
 guards exit 0. They scan repo source; the strings are served from live page

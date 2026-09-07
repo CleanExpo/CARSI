@@ -1,6 +1,6 @@
 {
   "schema": "gp567-parity/1",
-  "generated_at_utc": "2026-09-07T07:24:15Z",
+  "generated_at_utc": "2026-09-07T07:52:09Z",
   "method": {
     "note": "Exact-slug matching alone reports every renamed course as missing. Three matchers, decreasing confidence; only records surviving all three are parity gaps.",
     "token_overlap_threshold": 0.6,
@@ -233,12 +233,12 @@
     "token_overlap": [
       {
         "legacy_slug": "introduction-to-iaq-and-mould-understanding-airborne-spread",
-        "live_slug": "introduction-to-iaq-and-mould-understanding-airborne-spread-and-containment",
+        "live_slug": "introduction-to-iaq-and-mould",
         "score": 1
       },
       {
         "legacy_slug": "advanced-applied",
-        "live_slug": "introduction-to-applied-structural-drying",
+        "live_slug": "introduction-to-advanced-applied-structural-drying",
         "score": 1
       },
       {
@@ -264,7 +264,7 @@
       {
         "legacy_slug": "large-loss-mastery-course-split-payment",
         "live_slug": "large-loss-mastery-course",
-        "score": 1
+        "score": 0.67
       },
       {
         "legacy_slug": "large-loss-mastery-super-course",
@@ -274,22 +274,22 @@
       {
         "legacy_slug": "level-1-mould-remediation",
         "live_slug": "level-1-mould-remediation-2cc96b85",
-        "score": 1
+        "score": 0.8
       },
       {
         "legacy_slug": "level-3-mould-remediation",
-        "live_slug": "level-1-mould-remediation-2cc96b85",
-        "score": 1
+        "live_slug": "level-3-mould-remediation-c5797369",
+        "score": 0.8
       },
       {
         "legacy_slug": "level-2-mould-remediation",
-        "live_slug": "level-1-mould-remediation-2cc96b85",
-        "score": 1
+        "live_slug": "level-2-mould-remediation-30ee3492",
+        "score": 0.8
       },
       {
         "legacy_slug": "carpet-cleaning-basics",
         "live_slug": "carpet-cleaning-basics-b66757ce",
-        "score": 1
+        "score": 0.75
       }
     ]
   },
@@ -301,7 +301,7 @@
       "cec_hours": null,
       "iicrc_discipline": "ASD",
       "nearest_live_slug": "asd-structural-drying-core",
-      "nearest_score": 0.33
+      "nearest_score": 0.17
     },
     {
       "slug": "heat-drying",
@@ -310,7 +310,7 @@
       "cec_hours": null,
       "iicrc_discipline": "ASD",
       "nearest_live_slug": "asd-structural-drying-core",
-      "nearest_score": 0.33
+      "nearest_score": 0.17
     },
     {
       "slug": "timber-floor",
@@ -319,7 +319,7 @@
       "cec_hours": null,
       "iicrc_discipline": "ASD",
       "nearest_live_slug": "asd-structural-drying-core",
-      "nearest_score": 0.33
+      "nearest_score": 0.17
     },
     {
       "slug": "agi-smallbusiness",
@@ -328,7 +328,7 @@
       "cec_hours": null,
       "iicrc_discipline": null,
       "nearest_live_slug": "wrt-water-damage-essentials",
-      "nearest_score": 0.33
+      "nearest_score": 0.13
     },
     {
       "slug": "social-media-marketing",
@@ -336,8 +336,8 @@
       "legacy_status": "published",
       "cec_hours": null,
       "iicrc_discipline": null,
-      "nearest_live_slug": "introduction-to-iaq-and-mould",
-      "nearest_score": 0.5
+      "nearest_live_slug": "introduction-to-water-damage-marketing-and-sales",
+      "nearest_score": 0.29
     },
     {
       "slug": "laser-measure",
@@ -355,7 +355,7 @@
       "cec_hours": null,
       "iicrc_discipline": null,
       "nearest_live_slug": "safety-data-sheet-sds-course",
-      "nearest_score": 0.25
+      "nearest_score": 0.14
     },
     {
       "slug": "technician-flow-chart",
@@ -364,7 +364,7 @@
       "cec_hours": null,
       "iicrc_discipline": null,
       "nearest_live_slug": "hvac-systems-and-indoor-air-quality-what-every-technician-should-know",
-      "nearest_score": 0.33
+      "nearest_score": 0.09
     },
     {
       "slug": "carsi-chatgpt-ebook",
@@ -373,7 +373,7 @@
       "cec_hours": null,
       "iicrc_discipline": null,
       "nearest_live_slug": "ccw-carsi-truckmount-operations",
-      "nearest_score": 0.33
+      "nearest_score": 0.2
     },
     {
       "slug": "initial-inspection-report-course",
@@ -382,7 +382,7 @@
       "cec_hours": 1,
       "iicrc_discipline": null,
       "nearest_live_slug": "moisture-meter-course",
-      "nearest_score": 0.33
+      "nearest_score": 0.17
     },
     {
       "slug": "marketing-course",
@@ -390,8 +390,8 @@
       "legacy_status": "published",
       "cec_hours": 1,
       "iicrc_discipline": null,
-      "nearest_live_slug": "introduction-to-water-damage-marketing-and-sales",
-      "nearest_score": 0.5
+      "nearest_live_slug": "moisture-meter-course",
+      "nearest_score": 0.25
     },
     {
       "slug": "admin-sole-trader",
@@ -445,7 +445,7 @@
       "cec_hours": 6,
       "iicrc_discipline": null,
       "nearest_live_slug": "moisture-meter-course",
-      "nearest_score": 0.33
+      "nearest_score": 0.2
     },
     {
       "slug": "neosan-labs-product-training-course",

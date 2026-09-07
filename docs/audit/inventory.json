@@ -1,6 +1,6 @@
 {
   "schema": "gp567-inventory/1",
-  "generated_at_utc": "2026-09-07T07:23:24Z",
+  "generated_at_utc": "2026-09-07T07:55:49Z",
   "generated_by": "scripts/audit/build-inventory.mjs",
   "live_snapshot_access_date": "2026-09-07",
   "source_counts_observed": {

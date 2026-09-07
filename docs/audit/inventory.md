@@ -1,6 +1,6 @@
 # GP-567 D1 — Reconciled catalogue inventory
 
-Generated `2026-09-07T07:23:24Z` by `scripts/audit/build-inventory.mjs`.
+Generated `2026-09-07T07:55:49Z` by `scripts/audit/build-inventory.mjs`.
 Live snapshot access date: **2026-09-07** (`.audit-cache/`).
 
 ## Source counts — observed this run

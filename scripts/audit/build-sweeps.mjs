@@ -93,8 +93,10 @@ const guards = [
   'check:iicrc-compliance',
   'check:iicrc-terminology',
   'check:cec',
+  'check:cec-surfaces',
   'check:standards-claims',
   'check:designations',
+  'check:au-english',
 ];
 const results = guards.map((g) => {
   try {
@@ -132,7 +134,14 @@ cmp.push('');
 cmp.push('| Guard | Exit | Verdict |');
 cmp.push('| --- | ---: | --- |');
 for (const r of results) cmp.push(`| \`${r.guard}\` | ${r.exit} | ${r.tail || '—'} |`);
-cmp.push('| `check:cec-surfaces` | — | **NOT RUN** — imports `typescript`, absent in a worktree with no `node_modules`. An environment limit, not a repo defect. |');
+cmp.push('');
+cmp.push(`**Coverage: ${results.filter((r) => r.exit === 0).length} of ${results.length} guards ran and passed.**`);
+cmp.push('');
+cmp.push('`check:cec-surfaces` initially reported NOT RUN — it imports `typescript`, absent in a');
+cmp.push('fresh git worktree with no `node_modules`. That was recorded as an environment limit');
+cmp.push('rather than a repo defect, and provisioning the worktree confirmed it: the guard now runs');
+cmp.push('and passes. Worth keeping as a worked example — a crashing tool is a claim about your');
+cmp.push('environment until you have proven otherwise.');
 cmp.push('');
 cmp.push('## The blind spot that matters');
 cmp.push('');
@@ -152,12 +161,22 @@ cmp.push('Both carry `IICRC CEC Accredited`, and the og description adds `Earn c
 cmp.push('education credits` — the qualification/accreditation class named licence-critical by');
 cmp.push('GP-519, GP-525 and GP-526.');
 cmp.push('');
-cmp.push('### Truth and permission are different axes');
+cmp.push('### Two claims, not one — and only one of them is evidenced');
 cmp.push('');
-cmp.push('The approvals registry now holds **38 approved entries**, so the underlying accreditation');
-cmp.push('claim is not baseless — it is recorded as `JUSTIFIED` (medium) in the ledger, not as false.');
-cmp.push('The finding is that this language is **prohibited on a public surface**, whether or not it');
-cmp.push('is true. Filing a true-but-prohibited claim as a lie would itself be a false finding.');
+cmp.push('The approvals registry holds **38 approved entries**, which evidences that CARSI holds');
+cmp.push('approved CEC **courses**. It does not evidence that CARSI is an accredited **provider**,');
+cmp.push('and that is the claim the live copy actually makes. No public IICRC register of approved');
+cmp.push('CEC providers exists to check it against — IICRC manages approval by submission to');
+cmp.push('`CECCourse@iicrcnet.org` and directs enquirers to contact IICRC, which is founder-gated.');
+cmp.push('');
+cmp.push('So the ledger files the per-course claim as `JUSTIFIED` (unavailability evidenced, not');
+cmp.push('assumed) and the provider-level claim as a `GAP`, along with both live surfaces asserting');
+cmp.push('it. An earlier revision filed those surfaces as `VERIFIED` on the reasoning that the string');
+cmp.push('really is on the page; independent review called that a rationalisation, correctly — it let');
+cmp.push('the ledger preserve the licence-critical claim instead of blocking it.');
+cmp.push('');
+cmp.push('Note also that only **38 of 80** live courses carry a registry approval, so');
+cmp.push('"Earn continuing education credits" is unsubstantiated for most of the catalogue.');
 cmp.push('');
 cmp.push('## Live URL slugs still carrying IICRC discipline acronyms');
 cmp.push('');

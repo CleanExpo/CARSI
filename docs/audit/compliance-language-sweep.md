@@ -1,6 +1,6 @@
 # GP-567 D4 — Compliance-language sweep
 
-Generated `2026-09-07T07:33:25Z`. Live surfaces read from `.audit-cache/`, access date **2026-09-07**.
+Generated `2026-09-07T07:58:11Z`. Live surfaces read from `.audit-cache/`, access date **2026-09-07**.
 
 ## No new linter was written
 
@@ -13,9 +13,18 @@ is out of scope for an audit run and was not done.
 | `check:iicrc-compliance` | 0 | ✓ IICRC/CEC compliance guard passed. |
 | `check:iicrc-terminology` | 0 | ✓ IICRC CEC terminology guard passed. |
 | `check:cec` | 0 | ✓ CEC approvals registry valid — 38 entries (38 approved). |
+| `check:cec-surfaces` | 0 | ✓ CEC surface-leak guard passed — no raw CEC reads/selects outside the accessor cluster. |
 | `check:standards-claims` | 0 | ✓ Standards-claim guard passed. |
 | `check:designations` | 0 | ✓ CARSI designation registry valid — 9 designations. |
-| `check:cec-surfaces` | — | **NOT RUN** — imports `typescript`, absent in a worktree with no `node_modules`. An environment limit, not a repo defect. |
+| `check:au-english` | 0 | ✓ Australian-English course-content guard passed. |
+
+**Coverage: 7 of 7 guards ran and passed.**
+
+`check:cec-surfaces` initially reported NOT RUN — it imports `typescript`, absent in a
+fresh git worktree with no `node_modules`. That was recorded as an environment limit
+rather than a repo defect, and provisioning the worktree confirmed it: the guard now runs
+and passes. Worth keeping as a worked example — a crashing tool is a claim about your
+environment until you have proven otherwise.
 
 ## The blind spot that matters
 
@@ -35,12 +44,22 @@ Both carry `IICRC CEC Accredited`, and the og description adds `Earn continuing
 education credits` — the qualification/accreditation class named licence-critical by
 GP-519, GP-525 and GP-526.
 
-### Truth and permission are different axes
+### Two claims, not one — and only one of them is evidenced
 
-The approvals registry now holds **38 approved entries**, so the underlying accreditation
-claim is not baseless — it is recorded as `JUSTIFIED` (medium) in the ledger, not as false.
-The finding is that this language is **prohibited on a public surface**, whether or not it
-is true. Filing a true-but-prohibited claim as a lie would itself be a false finding.
+The approvals registry holds **38 approved entries**, which evidences that CARSI holds
+approved CEC **courses**. It does not evidence that CARSI is an accredited **provider**,
+and that is the claim the live copy actually makes. No public IICRC register of approved
+CEC providers exists to check it against — IICRC manages approval by submission to
+`CECCourse@iicrcnet.org` and directs enquirers to contact IICRC, which is founder-gated.
+
+So the ledger files the per-course claim as `JUSTIFIED` (unavailability evidenced, not
+assumed) and the provider-level claim as a `GAP`, along with both live surfaces asserting
+it. An earlier revision filed those surfaces as `VERIFIED` on the reasoning that the string
+really is on the page; independent review called that a rationalisation, correctly — it let
+the ledger preserve the licence-critical claim instead of blocking it.
+
+Note also that only **38 of 80** live courses carry a registry approval, so
+"Earn continuing education credits" is unsubstantiated for most of the catalogue.
 
 ## Live URL slugs still carrying IICRC discipline acronyms
 

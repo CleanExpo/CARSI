@@ -47,10 +47,20 @@ const norm = (s) =>
     .join(' ')
     .trim();
 
+// Content tokens for the overlap matcher.
+//
+// The length>3 filter alone was a false-negative generator: it deleted the very
+// tokens that distinguish "level-1" from "level-2" from "level-3", after which
+// three distinct courses normalised to the same bag of words. Numeric tokens are
+// therefore ALWAYS kept regardless of length — in a course catalogue a bare digit
+// is rarely noise and is usually the whole distinction.
+const contentTokens = (s) => new Set(norm(s).split(' ').filter((t) => t.length > 3 || /^\d+$/.test(t)));
+const numbersOf = (set) => [...set].filter((t) => /^\d+$/.test(t)).sort().join(',');
+
 const liveNorm = new Set(live.map(norm));
 const seedSlugNorm = new Set(seed.map((c) => norm(c.slug)));
 const seedTitleNorm = new Map(seed.map((c) => [norm(c.title), c.slug]));
-const liveTokens = live.map((l) => [l, new Set(norm(l).split(' ').filter((t) => t.length > 3))]);
+const liveTokens = live.map((l) => [l, contentTokens(l)]);
 
 const matched = { exact_slug: [], seed_title: [], token_overlap: [] };
 const gaps = [];
@@ -66,12 +76,19 @@ for (const c of legacy) {
     matched.seed_title.push({ legacy_slug: c.slug, seed_slug: seedTitleNorm.get(nt) });
     continue;
   }
-  const toks = new Set(nt.split(' ').filter((t) => t.length > 3));
+  const toks = contentTokens(c.title);
   let best = 0;
   let bestSlug = null;
   for (const [l, lt] of liveTokens) {
+    // Hard gate: two courses whose numeric tokens differ are DIFFERENT courses.
+    // "Level 2" is not a rename of "Level 1". This runs before scoring because no
+    // similarity score should ever be able to overrule it.
+    if (numbersOf(toks) !== numbersOf(lt)) continue;
     const inter = [...toks].filter((t) => lt.has(t)).length;
-    const score = inter / Math.max(1, Math.min(toks.size, lt.size));
+    // Jaccard, not inter/min. inter/min scores a strict subset as a perfect 1.0,
+    // so a short title was absorbed by any longer title containing it.
+    const union = new Set([...toks, ...lt]).size;
+    const score = inter / Math.max(1, union);
     if (score > best) {
       best = score;
       bestSlug = l;
