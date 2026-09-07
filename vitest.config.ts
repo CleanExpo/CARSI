@@ -14,36 +14,38 @@ export default defineConfig({
     // tests that failed are slow, but because 548 suites run in parallel and a loaded
     // machine inflates wall-clock time many-fold while the work itself is unchanged.
     //
-    // MEASURED 2026-09-07 on an idle box (load ~5), `npx vitest run --reporter=json`,
-    // 1365 tests. `testTimeout` is per TEST, so the per-test column is the one that binds:
+    // DO NOT quote a single run's milliseconds here. Per-test timings in this suite are not
+    // reproducible: measured across FIVE full-suite runs on 2026-09-07 (1365 passed / 0
+    // failed every time, `npx vitest run --reporter=json`, loads 4.9 to 16.9), the same test
+    // varies by up to 8.8x between runs at comparable load. A point value is refutable by
+    // anyone who runs it once — which is exactly how two release reviews were failed here.
+    // The defensible claim is a BOUND over a stated number of runs, so that is what follows.
+    // Repeated runs do not make the measurement reproducible; they characterise the scatter,
+    // and it is the scatter that decides a safe timeout.
     //
-    //   slowest test in the suite ........... 1884ms  guest-checkout.test.ts
-    //   next three, same file ............... 1735 / 1440 / 879ms  (real bcrypt hashing)
-    //   root-layout-scripts.test.tsx ........  178ms  <- one of the files that kept FAILING
-    //   stability-evidence.test.ts ..........   44ms  <- the other one
+    //   test                        min      max    spread   (5 runs, per-test max)
+    //   guest-checkout.test.ts    2059ms   3511ms     1.7x   <- slowest in the suite
+    //   root-layout-scripts.tsx    202ms    623ms     3.1x   <- one that kept FAILING
+    //   stability-evidence.ts       16ms    141ms     8.8x   <- the other one
     //
-    // Read those last two lines twice. The files that blew through a 5000ms timeout are
-    // among the FASTEST in the suite: 178ms and 44ms of actual work. Under contention
-    // root-layout-scripts was seen past 5000ms — a ~28x inflation — and it failed
-    // release-gate verification TWICE, a different test in the file each run. Nothing was
-    // wrong with those tests, so no amount of optimising them would have helped.
+    // The point that survives every run: the two files that blew through a 5000ms timeout do
+    // well under a second of work even at their slowest. Optimising them — the obvious fix,
+    // and the one first proposed — would have achieved nothing, because the failure was
+    // never their own runtime.
     //
-    // CORRECTION, and why this comment now carries two sets of numbers. The first version
-    // claimed a 1200ms worst case and a 12.5x margin. Both were wrong. An independent
-    // reviewer re-measured, got 5459ms for guest-checkout, and failed the release for an
-    // overstated margin — correctly. Re-measuring on an idle box gives 1884ms: the
-    // reviewer's figure was inflated by the load their run sat under, and mine was simply
-    // wrong. The honest numbers are above; do not restore the old ones.
+    // WHY 15000. Worst single test ever observed anywhere is 5459ms (independent reviewer,
+    // load ~45); worst across these five runs is 3511ms. 15000 leaves 2.7x over the worst
+    // known and 4.3x over the worst measured here, while still catching a test that truly
+    // hangs. Both figures are stated because the wider one is what the setting must survive.
     //
-    // WHY 15000 AND NOT MORE. It has to absorb contention without going blind to a real
-    // regression. Against the 1884ms idle worst case that is a 7.9x margin, and against the
-    // worst value ever actually observed for it under heavy load (5459ms) still 2.7x. A
-    // test that genuinely becomes slow trips this; a busy CI runner does not fail a passing
-    // one. Raising it further trades that signal away for nothing.
+    // TWO EARLIER VERSIONS OF THIS COMMENT WERE WRONG, in the same way. The first claimed a
+    // 1200ms worst case and a 12.5x margin; the second "corrected" it to 1884ms and 7.9x.
+    // Both quoted one run. The real worst case is above both. Do not restore either, and do
+    // not replace this block with a fresh single measurement — re-run the suite several
+    // times and update the bound.
     //
     // If a test ever legitimately needs longer, give THAT file its own `vi.setConfig` —
-    // do not raise this number. If these figures no longer hold, re-measure with the
-    // command above rather than adjusting on intuition.
+    // do not raise this number.
     testTimeout: 15_000,
   },
 });
