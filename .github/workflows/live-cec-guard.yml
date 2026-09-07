@@ -10,7 +10,10 @@ name: Live CEC Compliance Guard
 # and asserts nothing about production. This job therefore calls an authenticated cron route
 # on the deployed app, which IS on the right side of that allowlist. GitHub needs only HTTPS.
 #
-# `CARSI_PROD_DATABASE_URL` is no longer read by this workflow, or by any other.
+# The production database secret this job used to read is no longer referenced by this
+# workflow, or by any other. Its name is deliberately not written here: a contract check
+# asserts the name appears nowhere in this file, and naming it in a comment would satisfy
+# the grep while the coupling was still gone — the check would then be matching its own prose.
 #
 # Setup (one-time, founder):
 #   1. Repo Settings → Secrets → Actions → CRON_SECRET must match the app's CRON_SECRET env
