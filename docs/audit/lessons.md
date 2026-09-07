@@ -4,6 +4,25 @@ Appended every run exit. Newest first.
 
 ## Run 1 — 2026-09-07
 
+**An error message that names a closed set the code does not enforce is worse than
+no message.** `validate-ledger.mjs` said *"GAP requires recommended_action (rewrite |
+remove | substantiate)"* while checking only that the field was non-empty. Round-2
+review planted `recommended_action: "launder"` and it validated clean. The message
+told every reader a check existed that did not — so the gap was invisible precisely
+because it looked covered. **Enforce the vocabulary you document, or stop documenting
+it.**
+
+**A control that COUNTS its own coverage will lie the moment the thing it counts
+changes.** Criterion c3 asserted "one mutant per schema rule". `status` was in
+`REQUIRED_ALWAYS`, the validator rejected its absence, and no mutant ever planted it —
+so the claim was false and the suite still printed OK. Adding the missing mutant fixes
+today; it does not stop the next added rule from drifting the same way. The fix was to
+make the suite **derive** its obligation from the validator's own exported
+`REQUIRED_ALWAYS` and vocabularies, so a rule without a mutant fails the suite by
+construction. Proven by adding a `provenance` field and watching it name the gap.
+**Never let a control restate the list it is supposed to cover — make it read the
+list.**
+
 **I wrote the verifier to match what I had built, not what the criterion said.**
 Criterion c8 required the live banned claims filed as GAP. The verifier asserted the
 accreditation entry was JUSTIFIED and never checked GAP at all — and it passed, so

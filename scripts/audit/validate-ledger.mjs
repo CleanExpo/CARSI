@@ -19,10 +19,20 @@
  */
 import fs from 'node:fs';
 
-const STATUSES = ['VERIFIED', 'JUSTIFIED', 'GAP'];
-const CONFIDENCES = ['high', 'medium', 'low'];
+export const STATUSES = ['VERIFIED', 'JUSTIFIED', 'GAP'];
+export const CONFIDENCES = ['high', 'medium', 'low'];
 const MAX_QUOTE_WORDS = 25;
-const REQUIRED_ALWAYS = ['id', 'claim', 'claim_class', 'surface', 'status', 'feeds'];
+export const REQUIRED_ALWAYS = ['id', 'claim', 'claim_class', 'surface', 'status', 'feeds'];
+
+// The GAP action vocabulary is CLOSED and now enforced.
+//
+// It was previously named in the error message only — "GAP requires
+// recommended_action (rewrite | remove | substantiate)" — while the code merely
+// checked the field was non-empty. Independent review planted
+// `recommended_action: "launder"` and it validated clean. A message that
+// documents a closed set the code does not enforce is worse than no message: it
+// tells the reader a check exists that does not.
+export const GAP_ACTIONS = ['rewrite', 'remove', 'substantiate'];
 
 const wordCount = (s) => String(s).trim().split(/\s+/).filter(Boolean).length;
 const isIsoDate = (s) => typeof s === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s);
@@ -73,7 +83,10 @@ export function validateEntry(e, lineNo) {
 
   if (e.status === 'GAP') {
     if (!e.reason) at('GAP requires reason');
-    if (!e.recommended_action) at('GAP requires recommended_action (rewrite | remove | substantiate)');
+    if (!e.recommended_action) at(`GAP requires recommended_action (${GAP_ACTIONS.join(' | ')})`);
+    else if (!GAP_ACTIONS.includes(e.recommended_action)) {
+      at(`GAP recommended_action "${e.recommended_action}" is not one of ${GAP_ACTIONS.join(' | ')}`);
+    }
   }
 
   // Sidecar shape, when present.

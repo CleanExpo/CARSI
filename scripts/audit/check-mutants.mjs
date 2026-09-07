@@ -15,7 +15,7 @@
  * rejecting everything — a validator that fails all input is as useless as one
  * that passes all input.
  */
-import { validateEntry } from './validate-ledger.mjs';
+import { validateEntry, REQUIRED_ALWAYS, GAP_ACTIONS, STATUSES, CONFIDENCES } from './validate-ledger.mjs';
 
 const BASE_VERIFIED = {
   id: 'mutant-base',
@@ -65,6 +65,16 @@ const MUTANTS = [
   { rule: 'missing claim_class', entry: drop(BASE_VERIFIED, 'claim_class'), expect: /missing required field "claim_class"/ },
   { rule: 'missing surface', entry: drop(BASE_VERIFIED, 'surface'), expect: /missing required field "surface"/ },
   { rule: 'missing feeds', entry: drop(BASE_VERIFIED, 'feeds'), expect: /missing required field "feeds"/ },
+  // Added after round-2 review: `status` is in REQUIRED_ALWAYS and the validator
+  // rejects its absence, but no mutant planted it. c3 claimed "one mutant per
+  // schema rule" while a rule sat unmutated. The coverage assertion below now
+  // makes that class of gap impossible rather than merely fixing this instance.
+  { rule: 'missing status', entry: drop(BASE_VERIFIED, 'status'), expect: /missing required field "status"/ },
+  {
+    rule: 'GAP recommended_action off-vocabulary',
+    entry: set(BASE_GAP, 'recommended_action', 'launder'),
+    expect: /recommended_action "launder" is not one of/,
+  },
   { rule: 'fourth status invented', entry: set(BASE_VERIFIED, 'status', 'PROBABLY_FINE'), expect: /there is no fourth state/ },
   { rule: 'CONFLICT smuggled in as status', entry: set(BASE_VERIFIED, 'status', 'CONFLICT'), expect: /CONFLICT is a sidecar field, never a status/ },
   { rule: 'VERIFIED without source_url', entry: drop(BASE_VERIFIED, 'source_url'), expect: /VERIFIED requires source_url/ },
@@ -96,6 +106,39 @@ const MUTANTS = [
 ];
 
 let failures = 0;
+
+// COVERAGE ASSERTION — the fix for the round-2 finding, at the class level.
+//
+// c3 asserts "one mutant per schema rule". Round-2 review found that claim was
+// simply untrue: `status` was required by the validator and never mutated. A
+// hand-maintained mutant list will drift from a hand-maintained rule list every
+// time either changes, and nothing notices — the suite still reports OK.
+//
+// So the suite now DERIVES its obligation from the validator's own exported
+// vocabularies instead of restating them. Add a required field or a vocabulary
+// value and forget the mutant, and this fails immediately, naming the gap.
+const covered = MUTANTS.map((m) => m.rule).join(' | ');
+
+for (const field of REQUIRED_ALWAYS) {
+  if (!new RegExp(`missing ${field}\\b`).test(covered)) {
+    failures += 1;
+    console.error(`FAIL coverage: REQUIRED_ALWAYS field "${field}" has no mutant — c3's "one mutant per rule" claim would be false`);
+  }
+}
+for (const [name, vocab, marker] of [
+  ['GAP_ACTIONS', GAP_ACTIONS, 'recommended_action off-vocabulary'],
+  ['STATUSES', STATUSES, 'fourth status invented'],
+  ['CONFIDENCES', CONFIDENCES, 'confidence off-vocabulary'],
+]) {
+  if (!Array.isArray(vocab) || vocab.length === 0) {
+    failures += 1;
+    console.error(`FAIL coverage: closed vocabulary ${name} is empty or missing from the validator`);
+  }
+  if (!covered.includes(marker)) {
+    failures += 1;
+    console.error(`FAIL coverage: closed vocabulary ${name} has no off-vocabulary mutant (expected one whose rule mentions "${marker}")`);
+  }
+}
 
 // Property 0: the clean bases must PASS, or the suite proves nothing.
 for (const [name, base] of [
