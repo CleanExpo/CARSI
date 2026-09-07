@@ -138,6 +138,13 @@ jobs:
       - name: IICRC / CEC compliance guard
         run: npm run check:iicrc-compliance
 
+      # The seed is the ONE writer that can put `iicrc_discipline` back into lms_courses, and
+      # it lives in scripts/, which is outside check:iicrc-compliance's SCANNED_DIRS. Without
+      # this step a revert of that pin merges green — the exact "control exists but never runs"
+      # shape GP-519 was filed about. Asserts against the real WooCommerce export. GP-519.
+      - name: WordPress seed licence pinning
+        run: npm run test:seed-wp-licence
+
       # Proves the compliance guard's specific-CEC-hour rule is non-vacuous: it fires on a
       # static "earns/awards N IICRC CEC(s)" claim on a non-approved course (incl. the looser
       # prose where IICRC is not adjacent to the number, and the "maintaining an existing IICRC
