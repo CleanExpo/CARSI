@@ -90,9 +90,22 @@ const COUNTS = [
   ['Lines citing S500 with **no edition at all**', citeBare.length, 'edition-class'],
   [`Lines asserting **another edition** (${otherYears.join(', ') || 'none'})`, citeOther.length, 'edition-class'],
 ];
+// Round-8: the verifier used to FIND this table by reading markdown structure —
+// first any row in the document, then rows under the `## Counts` heading, then
+// the same with fenced code masked out. Three rounds, three defeats, each one a
+// corner of markdown I had approximated: an unbounded region, then a fence body
+// read as a heading, then a setext heading and CommonMark's fence-length rule.
+// That hunt does not terminate; HTML comments and reference definitions are next.
+//
+// So the table is DELIMITED rather than discovered. The generator says where it
+// is; the verifier matches two whole-line sentinels and never parses markdown at
+// all. Anything an attacker plants that contains a sentinel line makes the count
+// two, which fails closed.
+cur.push('<!-- COUNTS-TABLE-BEGIN -->');
 cur.push('| Measure | Count | Class |');
 cur.push('| --- | ---: | --- |');
 for (const [label, count, cls] of COUNTS) cur.push(`| ${label} | ${count} | ${cls} |`);
+cur.push('<!-- COUNTS-TABLE-END -->');
 cur.push('');
 const classRows = COUNTS.filter(([, , cls]) => cls === 'edition-class');
 cur.push(

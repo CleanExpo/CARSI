@@ -36,67 +36,62 @@ const fail = (m) => {
 if (!fs.existsSync(FILE)) fail(`missing ${FILE}`);
 const md = fs.readFileSync(FILE, 'utf8');
 
-// ── ONE reader for the table, not two ────────────────────────────────────
-//
-// Round-5 (gemini lane) defeated this file by playing its two readers against
-// each other. `recorded()` matched anywhere in the document while the partition
-// scan was anchored to the start of a line, so prefixing a real class row with a
-// single character satisfied the first reader and hid the row from the second —
-// then a decoy row rebalanced the sum and the whole check went green over a
-// table with a class row missing from its own partition.
-//
-// Two parsers over one grammar will always drift, and the drift IS the hole. So
-// the table is now lexed exactly once, anchored at both ends, and every check
-// below consumes those same rows. There is no second reading for an attacker to
-// disagree with.
-// Round-6: collapsing the two readers into one lexer was necessary and not
-// sufficient. The lexer still scanned the WHOLE document and the lookup took the
-// FIRST match, so a decoy row planted anywhere above `## Counts` shadowed the
-// real one - the review corrupted the published table to 999 and this still
-// exited 0. Scope was the half I left open: an unanchored SEARCH became an
-// anchored search over an unbounded REGION, which is the same defect one level
-// up. So the region is now bounded to the Counts section, and a label that
-// matches more than one row inside it is ambiguity, refused rather than resolved
-// by document order.
+// Round-5: this file used to read the table TWICE, with an unanchored lookup and
+// an anchored partition scan, and the review played them against each other. One
+// lexer, consumed by every check below, is what closed that - and it is still the
+// rule here even though the way the table is FOUND has changed again since.
 const CLASSES = ['total', 'edition-class', '—'];
 
-// Round-7: bounding the region to the Counts section was right and still read
-// markdown as if it were plain text. A FENCED CODE BLOCK containing a line that
-// begins `## ` ended the region early, so the review planted a correct decoy
-// table directly under `## Counts`, a fence holding `## NotARealHeading`, and
-// left the real table — corrupted to 999 — outside the region entirely. c5
-// exited 0 on a table it had never looked at. Reproduced here first.
+// ── The table is DELIMITED, not discovered ───────────────────────────────
 //
-// A fence body is not markdown structure, so it is masked out before anything
-// structural is read: headings, the region slice and the row lexer all see the
-// masked text. Lines are blanked rather than deleted so every `^…$` anchor and
-// every offset still lines up with the document. This document legitimately
-// carries a fence under `## Reproduce`, which is exactly why the check must
-// understand fences rather than ban them.
-const maskFences = (src) => {
-  let fence = null;
-  return src.split('\n').map((line) => {
-    const m = /^\s{0,3}(```+|~~~+)/.exec(line);
-    if (fence === null && m) {
-      fence = m[1][0];
-      return '';
-    }
-    if (fence !== null) {
-      if (m && m[1][0] === fence) fence = null;
-      return '';
-    }
-    return line;
-  }).join('\n');
-};
-const structural = maskFences(md);
-
-const headings = [...structural.matchAll(/^## Counts[ \t]*$/gm)];
-if (headings.length !== 1) {
-  fail(`the sweep declares ${headings.length} "## Counts" sections outside fenced code; exactly one is required, because the table to read must not depend on document order`);
+// Three rounds running, this verifier was beaten on the same class: it tried to
+// LOCATE the published table by reading markdown structure, and each fix left a
+// corner of the grammar unhandled.
+//
+//   r6  the region was unbounded, so a decoy row anywhere above the table
+//       shadowed it via a first-match lookup
+//   r7  the region was bounded by `## ` headings, so a fenced code block
+//       containing `## ` truncated it and a corrupted table passed unread
+//   r8  fence masking ignored CommonMark's fence-LENGTH rule (a 3-backtick line
+//       closed a 4-backtick fence), and setext headings were not headings at
+//       all to this code, so `Finding\n---` silently EXTENDED the region
+//
+// Each fix was right at its own layer and wrong one layer down. The lesson is
+// not that the grammar needs one more corner: it is that a check which has to
+// parse markdown to find its subject will keep losing to markdown. HTML comments
+// and link reference definitions are the next two.
+//
+// So the generator now DECLARES the table's extent and this reads the
+// declaration — the same move that fixed class membership (the Class column) and
+// the rule registry (the output seal) earlier in this series. No headings, no
+// fences, no markdown parsing survives here.
+//
+// Why the sentinels cannot be forged: each is matched as a WHOLE LINE and must
+// occur EXACTLY ONCE. Anything an attacker plants that contains a sentinel line —
+// inside a fence, inside prose, inside another table — makes the count two and
+// fails closed. There is no arrangement that yields one sentinel pair enclosing
+// content the generator did not write.
+const BEGIN = /^<!-- COUNTS-TABLE-BEGIN -->$/gm;
+const END = /^<!-- COUNTS-TABLE-END -->$/gm;
+const begins = [...md.matchAll(BEGIN)];
+const ends = [...md.matchAll(END)];
+if (begins.length !== 1 || ends.length !== 1) {
+  fail(`the sweep carries ${begins.length} COUNTS-TABLE-BEGIN and ${ends.length} COUNTS-TABLE-END lines; exactly one of each is required, so that which table is authoritative can never depend on document order`);
 }
-const afterHeading = structural.slice(headings[0].index + headings[0][0].length);
-const nextHeading = afterHeading.search(/^## /m);
-const countsBlock = nextHeading === -1 ? afterHeading : afterHeading.slice(0, nextHeading);
+if (ends[0].index < begins[0].index) {
+  fail('the sweep closes the counts table before it opens it');
+}
+const countsBlock = md.slice(begins[0].index + begins[0][0].length, ends[0].index);
+
+// Every table-shaped line in the document must live inside the sentinels. The
+// r8 exploit put a decoy row in later prose: sentinels alone stop it changing
+// the verdict, but a stray row still misleads a human reader, and this document
+// is generated with exactly one table.
+const outside = (md.slice(0, begins[0].index) + md.slice(ends[0].index)).split('\n')
+  .filter((l) => /^\|.*\|.*\|/.test(l));
+if (outside.length) {
+  fail(`${outside.length} table row(s) appear outside the counts table: ${outside.map((l) => JSON.stringify(l.slice(0, 60))).join(', ')} — this document publishes exactly one table`);
+}
 
 const rows = [...countsBlock.matchAll(/^\| (.+?) \| (\d+) \| (.+?) \|[ \t]*$/gm)].map((m) => ({
   label: m[1].replace(/\*\*/g, '').trim(),
@@ -162,6 +157,16 @@ const seen = new Map();
 for (const r of rows) seen.set(r.label, (seen.get(r.label) || 0) + 1);
 for (const [label, n] of seen) {
   if (n > 1) problems.push(`the counts table carries ${n} rows labelled "${label}" — a duplicated label makes the reading depend on row order`);
+}
+
+// A row between the sentinels that is not one of the measures is a fabricated
+// row. Reject it by name: without this it would be caught only if its number
+// happened to disturb the partition, and a fabricated row carrying zero would
+// not disturb anything - the same blind spot the zero-count class row had.
+for (const r of rows) {
+  if (!MEASURES.some(([labelRe]) => labelRe.test(r.label))) {
+    problems.push(`the counts table carries a row "${r.label}" that is not one of the ${MEASURES.length} published measures`);
+  }
 }
 
 for (const [labelRe, plain, actual, cls] of MEASURES) {

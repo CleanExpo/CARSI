@@ -1,6 +1,6 @@
 # GP-567 D4 — Compliance-language sweep
 
-Generated `2026-09-07T14:13:37Z`. Live surfaces read from `.audit-cache/`, access date **2026-09-07**.
+Generated `2026-09-07T14:50:24Z`. Live surfaces read from `.audit-cache/`, access date **2026-09-07**.
 
 ## No new linter was written
 

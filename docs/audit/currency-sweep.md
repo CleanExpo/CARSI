@@ -1,6 +1,6 @@
 # GP-567 D3 — Standards currency sweep
 
-Generated `2026-09-07T14:13:12Z` by `scripts/audit/build-sweeps.mjs`.
+Generated `2026-09-07T14:49:59Z` by `scripts/audit/build-sweeps.mjs`.
 
 ## Reproduce
 
@@ -10,6 +10,7 @@ git grep -nI -E S500[^0-9]{0,3}(20[0-9]{2})? -- *.ts *.tsx *.mjs *.js *.json *.m
 
 ## Counts
 
+<!-- COUNTS-TABLE-BEGIN -->
 | Measure | Count | Class |
 | --- | ---: | --- |
 | Total S500 citation lines | 274 | total |
@@ -19,6 +20,7 @@ git grep -nI -E S500[^0-9]{0,3}(20[0-9]{2})? -- *.ts *.tsx *.mjs *.js *.json *.m
 | Lines asserting the **2025** edition | 0 | edition-class |
 | Lines citing S500 with **no edition at all** | 233 | edition-class |
 | Lines asserting **another edition** (2026) | 21 | edition-class |
+<!-- COUNTS-TABLE-END -->
 
 The 4 line classes partition the total: 20 + 0 + 233 + 21 = 274.
 
