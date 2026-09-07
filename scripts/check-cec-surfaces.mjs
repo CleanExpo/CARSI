@@ -78,6 +78,14 @@ const ACCESSOR_ALLOWLIST = [
   'src/lib/cec-display.ts',                 // formatCecHoursForDisplay — pure formatter
   'src/lib/course-kit/cec-guard.ts',        // course-kit CEC guard infra
 
+  // The live compliance guard. It MUST read the raw stored column: its entire job is to
+  // compare what production actually stores against what the registry approves. Routing it
+  // through the accessor would compare the registry with itself and the guard could never
+  // detect drift — a check that cannot fail. Same category as cec-remediation.ts above, which
+  // is already listed for the same reason; this is its read-only sibling and writes nothing.
+  // It renders no surface: its only outputs are an exit code and a CI log.
+  'src/lib/server/live-cec-check.ts',       // runLiveCecCheck — raw-vs-registry drift detection
+
   // Admin edit / write cluster. These are the founder's course-management surfaces: they read
   // the RAW stored `cecHours` so it can be EDITED, always alongside the resolved registry
   // figure (`resolvedCecHours` / `cecMissing`). They are not public display / eligibility /
