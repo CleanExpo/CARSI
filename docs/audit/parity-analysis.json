@@ -1,0 +1,460 @@
+{
+  "schema": "gp567-parity/1",
+  "generated_at_utc": "2026-09-07T07:24:15Z",
+  "method": {
+    "note": "Exact-slug matching alone reports every renamed course as missing. Three matchers, decreasing confidence; only records surviving all three are parity gaps.",
+    "token_overlap_threshold": 0.6,
+    "caveat": "Matcher 3 is a heuristic, not a proof. Its matches are listed individually with scores so a reviewer can overturn any one of them."
+  },
+  "legacy_total": 95,
+  "matched_counts": {
+    "exact_slug": 17,
+    "seed_title": 48,
+    "token_overlap": 12
+  },
+  "parity_gap_count": 18,
+  "parity_gap_published": 17,
+  "parity_gap_draft": 1,
+  "card_claimed_parity_gaps_UNOBSERVED": 31,
+  "matched": {
+    "exact_slug": [
+      "introduction-to-creating-a-clean-air-environment",
+      "introduction-to-air-quality-fundamentals",
+      "collaborative-development-your-personal-ai-assistant",
+      "introduction-to-advanced-drying-equipment-and-methods",
+      "glass-cleaning-course",
+      "fundamental-business-framework",
+      "safe-work-method-statements-swms-course",
+      "job-safety-and-environmental-analysis-jsea-course",
+      "standard-operating-procedures-sop-course",
+      "risk-assessment-course",
+      "safety-data-sheet-sds-course",
+      "donning-and-doffing-ppe",
+      "moisture-meter-course",
+      "infectious-control-for-the-business-owner",
+      "using-atp-to-create-protocols",
+      "infection-control-in-child-care",
+      "microbe-clean-basic-understanding-course"
+    ],
+    "seed_title": [
+      {
+        "legacy_slug": "hvac-systems-and-indoor-air-quality",
+        "seed_slug": "hvac-systems-and-indoor-air-quality-what-every-technician-should-know"
+      },
+      {
+        "legacy_slug": "dust-particulates-in-indoor-air",
+        "seed_slug": "dust-and-particulates-in-indoor-air-control-and-cleaning-strategies"
+      },
+      {
+        "legacy_slug": "using-air-scrubbers-and-afds",
+        "seed_slug": "using-air-scrubbers-and-afds-to-improve-job-site-air-quality"
+      },
+      {
+        "legacy_slug": "air-quality-and-odour",
+        "seed_slug": "air-quality-and-odour-identification-and-deodorisation-essentials"
+      },
+      {
+        "legacy_slug": "introduction-to-improving-indoor-air-quality-after-waterdamage",
+        "seed_slug": "introduction-to-improving-indoor-air-quality-after-water-damage"
+      },
+      {
+        "legacy_slug": "introduction-to-monitoring-air-quality-job-site",
+        "seed_slug": "introduction-to-monitoring-air-quality-on-the-job-site"
+      },
+      {
+        "legacy_slug": "antiques",
+        "seed_slug": "introduction-to-restoration-of-antiques-and-fine-furnishings"
+      },
+      {
+        "legacy_slug": "submerged-items-recovery",
+        "seed_slug": "introduction-to-recovery-of-submerged-items-and-contents"
+      },
+      {
+        "legacy_slug": "drying-transportation",
+        "seed_slug": "introduction-to-drying-transportation-and-vehicles"
+      },
+      {
+        "legacy_slug": "industrial-2",
+        "seed_slug": "introduction-to-drying-industrial-and-manufacturing-sites"
+      },
+      {
+        "legacy_slug": "educational",
+        "seed_slug": "introduction-to-drying-educational-and-institutional-sites"
+      },
+      {
+        "legacy_slug": "hospitality",
+        "seed_slug": "introduction-to-drying-hospitality-and-lodging-sites"
+      },
+      {
+        "legacy_slug": "drying-healthcare",
+        "seed_slug": "introduction-to-drying-health-care-facilities"
+      },
+      {
+        "legacy_slug": "ultraviolet",
+        "seed_slug": "introduction-to-ultraviolet-light-and-fluorescence"
+      },
+      {
+        "legacy_slug": "infrared",
+        "seed_slug": "introduction-to-infrared-thermography-for-drying"
+      },
+      {
+        "legacy_slug": "litigation-support",
+        "seed_slug": "introduction-to-water-damage-litigation-support"
+      },
+      {
+        "legacy_slug": "exterior-envelope-drying",
+        "seed_slug": "introduction-to-exterior-envelope-drying-strategies"
+      },
+      {
+        "legacy_slug": "complex-water-losses",
+        "seed_slug": "introduction-to-consulting-for-complex-water-losses"
+      },
+      {
+        "legacy_slug": "difficult-materials",
+        "seed_slug": "introduction-to-drying-difficult-materials"
+      },
+      {
+        "legacy_slug": "largelossdrying",
+        "seed_slug": "introduction-to-large-loss-drying-projects"
+      },
+      {
+        "legacy_slug": "dryingprotocol",
+        "seed_slug": "introduction-to-developing-a-drying-protocol"
+      },
+      {
+        "legacy_slug": "water-damage-marketing",
+        "seed_slug": "introduction-to-water-damage-marketing-and-sales"
+      },
+      {
+        "legacy_slug": "controlled-drying",
+        "seed_slug": "introduction-to-controlled-environment-drying-methods"
+      },
+      {
+        "legacy_slug": "hvacsystems",
+        "seed_slug": "introduction-to-hvac-systems-and-drying-strategies"
+      },
+      {
+        "legacy_slug": "science",
+        "seed_slug": "introduction-to-psychrometry-science-and-calculations"
+      },
+      {
+        "legacy_slug": "advancedstructural",
+        "seed_slug": "introduction-to-advanced-structural-drying-concepts"
+      },
+      {
+        "legacy_slug": "forensic",
+        "seed_slug": "introduction-to-forensic-investigations-for-water-losses"
+      },
+      {
+        "legacy_slug": "biologicalcontaminants",
+        "seed_slug": "introduction-to-biological-contaminants-and-treatments"
+      },
+      {
+        "legacy_slug": "applied-microbial",
+        "seed_slug": "introduction-to-applied-microbial-remediation"
+      },
+      {
+        "legacy_slug": "water-losses",
+        "seed_slug": "introduction-to-project-management-for-water-losses"
+      },
+      {
+        "legacy_slug": "moisture-mapping",
+        "seed_slug": "introduction-to-digital-moisture-mapping"
+      },
+      {
+        "legacy_slug": "upholstery",
+        "seed_slug": "introduction-to-upholstery-cleaning-and-drying"
+      },
+      {
+        "legacy_slug": "smokeandsoot",
+        "seed_slug": "introduction-to-smoke-and-soot-damage-restoration"
+      },
+      {
+        "legacy_slug": "water-damage-estimating",
+        "seed_slug": "introduction-to-water-damage-estimating"
+      },
+      {
+        "legacy_slug": "water-damage-commercial",
+        "seed_slug": "introduction-to-water-damage-in-commercial-buildings"
+      },
+      {
+        "legacy_slug": "porous-drying",
+        "seed_slug": "introduction-to-porous-materials-drying"
+      },
+      {
+        "legacy_slug": "structural-drying-2",
+        "seed_slug": "introduction-to-applied-structural-drying"
+      },
+      {
+        "legacy_slug": "water-damage",
+        "seed_slug": "introduction-to-water-damage-principles"
+      },
+      {
+        "legacy_slug": "carpet-cleaning",
+        "seed_slug": "introduction-to-basic-carpet-cleaning-and-drying"
+      },
+      {
+        "legacy_slug": "odour-control",
+        "seed_slug": "introduction-to-odour-control-and-removal-techniques"
+      },
+      {
+        "legacy_slug": "psychrometry-drying",
+        "seed_slug": "introduction-to-psychrometry-and-the-drying-process"
+      },
+      {
+        "legacy_slug": "structural-drying",
+        "seed_slug": "introduction-to-structural-drying-concepts"
+      },
+      {
+        "legacy_slug": "water-extraction",
+        "seed_slug": "introduction-to-water-extraction-methods"
+      },
+      {
+        "legacy_slug": "drying-techniques",
+        "seed_slug": "introduction-to-drying-techniques-and-equipment"
+      },
+      {
+        "legacy_slug": "mould-identification",
+        "seed_slug": "introduction-to-mould-identification-and-remediation"
+      },
+      {
+        "legacy_slug": "using-ppe",
+        "seed_slug": "introduction-to-using-personal-protective-equipment"
+      },
+      {
+        "legacy_slug": "safety-procedures",
+        "seed_slug": "introduction-to-safety-procedures-for-water-damage-work"
+      },
+      {
+        "legacy_slug": "introduction-to-water-damage-restoration-course",
+        "seed_slug": "introduction-to-water-damage-restoration"
+      }
+    ],
+    "token_overlap": [
+      {
+        "legacy_slug": "introduction-to-iaq-and-mould-understanding-airborne-spread",
+        "live_slug": "introduction-to-iaq-and-mould-understanding-airborne-spread-and-containment",
+        "score": 1
+      },
+      {
+        "legacy_slug": "advanced-applied",
+        "live_slug": "introduction-to-applied-structural-drying",
+        "score": 1
+      },
+      {
+        "legacy_slug": "asbestos",
+        "live_slug": "introduction-to-asbestos-asbestos-awareness",
+        "score": 1
+      },
+      {
+        "legacy_slug": "adjusters",
+        "live_slug": "insurance-adjusters-and-their-roles",
+        "score": 1
+      },
+      {
+        "legacy_slug": "dehumidifiers",
+        "live_slug": "refrigerant-dehumidifiers-for-water-loss-restoration",
+        "score": 1
+      },
+      {
+        "legacy_slug": "duct-cleaning",
+        "live_slug": "introduction-to-residential-duct-cleaning",
+        "score": 1
+      },
+      {
+        "legacy_slug": "large-loss-mastery-course-split-payment",
+        "live_slug": "large-loss-mastery-course",
+        "score": 1
+      },
+      {
+        "legacy_slug": "large-loss-mastery-super-course",
+        "live_slug": "large-loss-mastery-course",
+        "score": 1
+      },
+      {
+        "legacy_slug": "level-1-mould-remediation",
+        "live_slug": "level-1-mould-remediation-2cc96b85",
+        "score": 1
+      },
+      {
+        "legacy_slug": "level-3-mould-remediation",
+        "live_slug": "level-1-mould-remediation-2cc96b85",
+        "score": 1
+      },
+      {
+        "legacy_slug": "level-2-mould-remediation",
+        "live_slug": "level-1-mould-remediation-2cc96b85",
+        "score": 1
+      },
+      {
+        "legacy_slug": "carpet-cleaning-basics",
+        "live_slug": "carpet-cleaning-basics-b66757ce",
+        "score": 1
+      }
+    ]
+  },
+  "parity_gaps": [
+    {
+      "slug": "timber-drying",
+      "title": "Timber Drying Systems Assistance",
+      "legacy_status": "published",
+      "cec_hours": null,
+      "iicrc_discipline": "ASD",
+      "nearest_live_slug": "asd-structural-drying-core",
+      "nearest_score": 0.33
+    },
+    {
+      "slug": "heat-drying",
+      "title": "Heat Drying Systems Assistance",
+      "legacy_status": "published",
+      "cec_hours": null,
+      "iicrc_discipline": "ASD",
+      "nearest_live_slug": "asd-structural-drying-core",
+      "nearest_score": 0.33
+    },
+    {
+      "slug": "timber-floor",
+      "title": "Timber Floor Drying Assistance",
+      "legacy_status": "published",
+      "cec_hours": null,
+      "iicrc_discipline": "ASD",
+      "nearest_live_slug": "asd-structural-drying-core",
+      "nearest_score": 0.33
+    },
+    {
+      "slug": "agi-smallbusiness",
+      "title": "AGI Essentials: A Practical Guide for Small Business Success",
+      "legacy_status": "published",
+      "cec_hours": null,
+      "iicrc_discipline": null,
+      "nearest_live_slug": "wrt-water-damage-essentials",
+      "nearest_score": 0.33
+    },
+    {
+      "slug": "social-media-marketing",
+      "title": "Introduction to Social Media Marketing",
+      "legacy_status": "published",
+      "cec_hours": null,
+      "iicrc_discipline": null,
+      "nearest_live_slug": "introduction-to-iaq-and-mould",
+      "nearest_score": 0.5
+    },
+    {
+      "slug": "laser-measure",
+      "title": "Laser Measurer Assistance Video",
+      "legacy_status": "published",
+      "cec_hours": null,
+      "iicrc_discipline": null,
+      "nearest_live_slug": null,
+      "nearest_score": 0
+    },
+    {
+      "slug": "chat-gpt",
+      "title": "Comprehensive Chat GPT Cheat Sheet",
+      "legacy_status": "published",
+      "cec_hours": null,
+      "iicrc_discipline": null,
+      "nearest_live_slug": "safety-data-sheet-sds-course",
+      "nearest_score": 0.25
+    },
+    {
+      "slug": "technician-flow-chart",
+      "title": "Technician Flow Chart",
+      "legacy_status": "published",
+      "cec_hours": null,
+      "iicrc_discipline": null,
+      "nearest_live_slug": "hvac-systems-and-indoor-air-quality-what-every-technician-should-know",
+      "nearest_score": 0.33
+    },
+    {
+      "slug": "carsi-chatgpt-ebook",
+      "title": "CARSI CHATGPT EBook",
+      "legacy_status": "published",
+      "cec_hours": null,
+      "iicrc_discipline": null,
+      "nearest_live_slug": "ccw-carsi-truckmount-operations",
+      "nearest_score": 0.33
+    },
+    {
+      "slug": "initial-inspection-report-course",
+      "title": "Initial Inspection Report Course",
+      "legacy_status": "published",
+      "cec_hours": 1,
+      "iicrc_discipline": null,
+      "nearest_live_slug": "moisture-meter-course",
+      "nearest_score": 0.33
+    },
+    {
+      "slug": "marketing-course",
+      "title": "Marketing Course",
+      "legacy_status": "published",
+      "cec_hours": 1,
+      "iicrc_discipline": null,
+      "nearest_live_slug": "introduction-to-water-damage-marketing-and-sales",
+      "nearest_score": 0.5
+    },
+    {
+      "slug": "admin-sole-trader",
+      "title": "Admin - Sole Trader",
+      "legacy_status": "published",
+      "cec_hours": 4,
+      "iicrc_discipline": null,
+      "nearest_live_slug": null,
+      "nearest_score": 0
+    },
+    {
+      "slug": "affiliate-membership",
+      "title": "Affiliate Membership",
+      "legacy_status": "draft",
+      "cec_hours": null,
+      "iicrc_discipline": null,
+      "nearest_live_slug": null,
+      "nearest_score": 0
+    },
+    {
+      "slug": "foundation-membership",
+      "title": "Foundation Membership",
+      "legacy_status": "published",
+      "cec_hours": null,
+      "iicrc_discipline": null,
+      "nearest_live_slug": null,
+      "nearest_score": 0
+    },
+    {
+      "slug": "membership",
+      "title": "Growth Membership",
+      "legacy_status": "published",
+      "cec_hours": null,
+      "iicrc_discipline": null,
+      "nearest_live_slug": null,
+      "nearest_score": 0
+    },
+    {
+      "slug": "free-library",
+      "title": "Free Library",
+      "legacy_status": "published",
+      "cec_hours": null,
+      "iicrc_discipline": null,
+      "nearest_live_slug": null,
+      "nearest_score": 0
+    },
+    {
+      "slug": "asthmaallergy",
+      "title": "Asthma and Allergy Course",
+      "legacy_status": "published",
+      "cec_hours": 6,
+      "iicrc_discipline": null,
+      "nearest_live_slug": "moisture-meter-course",
+      "nearest_score": 0.33
+    },
+    {
+      "slug": "neosan-labs-product-training-course",
+      "title": "NeoSan Labs Product Training",
+      "legacy_status": "published",
+      "cec_hours": 5,
+      "iicrc_discipline": null,
+      "nearest_live_slug": null,
+      "nearest_score": 0
+    }
+  ]
+}
