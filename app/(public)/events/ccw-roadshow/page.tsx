@@ -24,6 +24,7 @@ import {
   marketingTopicPill,
 } from '@/lib/marketing/marketing-ui';
 import {
+  allowsFreeEntryRegistration,
   ccwRoadshowCampaignPillars,
   ccwRoadshowEvents,
   ccwRoadshowFacilityAdvantages,
@@ -44,7 +45,7 @@ const canonical = `${siteUrl}${ccwRoadshowPath}`;
 export const metadata: Metadata = {
   title: 'Grow Your Cleaning Business | CARSI x CCW Roadshow 2026',
   description:
-    'Free for CCW past and current customers. Spend two practical days with Phill McGurk at CCW Melbourne, Sydney or Brisbane and claim a free entry token when you register.',
+    'Spend two practical days with Phill McGurk at CCW Melbourne, Sydney or Brisbane. Melbourne is free for past and current CCW customers; Sydney and Brisbane seats are booked through Carpet Cleaners Warehouse.',
   alternates: { canonical },
   keywords: [
     'carpet cleaning training Melbourne',
@@ -81,7 +82,7 @@ const faqs = [
   {
     question: 'How much does it cost?',
     answer:
-      'All CCW past and current customers can attend free. Register on the CARSI event page to claim a free entry token for check-in.',
+      'Melbourne is free for past and current CCW customers - register on the CARSI event page to claim a free entry token for check-in. Sydney and Brisbane are paid seats booked through Carpet Cleaners Warehouse, not on this page.',
   },
   {
     question: 'Where are the Melbourne, Sydney and Brisbane events held?',
@@ -128,7 +129,9 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
           organiserName="CARSI and Carpet Cleaners Warehouse"
           organiserUrl="https://www.carsi.com.au"
           ticketUrl={canonical}
-          isFree
+          // Per city, not blanket. Emitting isFree for a paid seat publishes a false
+          // price in Event schema, which search engines surface directly.
+          isFree={allowsFreeEntryRegistration(event)}
           image={`${siteUrl}/og-image.png`}
           eventType="BusinessEvent"
         />
@@ -170,7 +173,9 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#ed9d24] opacity-40" />
                   <span className="relative inline-flex h-2 w-2 rounded-full bg-[#ed9d24]" />
                 </span>
-                {focusEvent ? `${focusEvent.city} · ${focusEvent.dates}` : 'Melbourne, Sydney + Brisbane · Jul-Aug 2026'}
+                {focusEvent
+                  ? `${focusEvent.city} · ${focusEvent.dates}`
+                  : `Melbourne, Sydney + Brisbane · ${ccwRoadshowEvents.map((e) => e.dates).join(', ')}`}
               </span>
 
               <p className={`mt-5 ${marketingEyebrowAmber}`}>
