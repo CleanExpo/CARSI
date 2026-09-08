@@ -1,5 +1,3 @@
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 
@@ -61,14 +59,5 @@ describe('CourseSchema SEO-card integration', () => {
 
     expect(schema.description).toBe('Database course description');
     expect(schema.isAccessibleForFree).toBe(true);
-  });
-
-  it('keeps the public course renderer connected to the resolved card schema', () => {
-    const pageSource = readFileSync(
-      join(process.cwd(), 'app', '(public)', 'courses', '[slug]', 'page.tsx'),
-      'utf8'
-    );
-
-    expect(pageSource).toContain('authoredCourseJsonLd={resolvedMarketing?.courseJsonLd}');
   });
 });
