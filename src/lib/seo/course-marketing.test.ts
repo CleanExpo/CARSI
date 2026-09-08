@@ -199,8 +199,8 @@ describe('current repository truth', () => {
     expect(catalogue).toHaveLength(71);
     expect(surfaceSlugs).toHaveLength(24);
     expect(new Set(surfaceSlugs).size).toBe(24);
-    expect(readdirSync(cardsDirectory).filter((name) => name.endsWith('.json'))).toHaveLength(34);
-    expect(Object.keys(cardsIndex)).toHaveLength(34);
+    expect(readdirSync(cardsDirectory).filter((name) => name.endsWith('.json'))).toHaveLength(80);
+    expect(Object.keys(cardsIndex)).toHaveLength(80);
     expect(cecApprovals).toHaveLength(38);
     // Cards may lead the llms.txt surface. These slugs are live courses on the sitemap that
     // llms.txt does not list, so they carry a card (page metadata + FAQ JSON-LD) without being
@@ -216,6 +216,52 @@ describe('current repository truth', () => {
       'glass-cleaning-course',
       'infection-control-in-child-care',
       'infectious-control-for-the-business-owner',
+      'asd-structural-drying-core',
+      'cct-commercial-carpet-core',
+      'fsrt-fire-smoke-restoration-core',
+      'insurance-adjusters-and-their-roles',
+      'introduction-to-advanced-applied-structural-drying',
+      'introduction-to-advanced-drying-equipment-and-methods',
+      'introduction-to-advanced-structural-drying-concepts',
+      'introduction-to-applied-microbial-remediation',
+      'introduction-to-applied-structural-drying',
+      'introduction-to-asbestos-asbestos-awareness',
+      'introduction-to-basic-carpet-cleaning-and-drying',
+      'introduction-to-consulting-for-complex-water-losses',
+      'introduction-to-controlled-environment-drying-methods',
+      'introduction-to-creating-a-clean-air-environment',
+      'introduction-to-digital-moisture-mapping',
+      'introduction-to-forensic-investigations-for-water-losses',
+      'introduction-to-iaq-and-mould',
+      'introduction-to-monitoring-air-quality-on-the-job-site',
+      'introduction-to-odour-control-and-removal-techniques',
+      'introduction-to-project-management-for-water-losses',
+      'introduction-to-psychrometry-science-and-calculations',
+      'introduction-to-safety-procedures-for-water-damage-work',
+      'introduction-to-smoke-and-soot-damage-restoration',
+      'introduction-to-structural-drying-concepts',
+      'introduction-to-using-personal-protective-equipment',
+      'introduction-to-water-damage-estimating',
+      'introduction-to-water-damage-in-commercial-buildings',
+      'introduction-to-water-damage-marketing-and-sales',
+      'introduction-to-water-damage-principles',
+      'introduction-to-water-damage-restoration',
+      'introduction-to-water-extraction-methods',
+      'job-safety-and-environmental-analysis-jsea-course',
+      'large-loss-mastery-course',
+      'level-1-mould-remediation-2cc96b85',
+      'level-2-mould-remediation-30ee3492',
+      'level-3-mould-remediation-c5797369',
+      'microbe-clean-basic-understanding-course',
+      'moisture-meter-course',
+      'refrigerant-dehumidifiers-for-water-loss-restoration',
+      'restoration-project-management-premium',
+      'risk-assessment-course',
+      'safe-work-method-statements-swms-course',
+      'safety-data-sheet-sds-course',
+      'standard-operating-procedures-sop-course',
+      'tile-cleaning-for-carpet-cleaners',
+      'using-atp-to-create-protocols',
     ]);
 
     const surfacedCourses = surfaceSlugs.map((slug) => catalogueBySlug.get(slug));
