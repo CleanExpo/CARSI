@@ -45,7 +45,6 @@
       "price": "99",
       "priceCurrency": "AUD",
       "availability": "https://schema.org/InStock"
-    },
-    "coursePrerequisites": "None - open entry"
+    }
   }
 }
