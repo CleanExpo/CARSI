@@ -218,3 +218,29 @@ This version has breaking changes — APIs, conventions, and file structure may 
 This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
+
+## Cursor/Codex lane notes measured on this machine (expires 2026-09-12)
+
+The vendor-routing ORDER itself lives on `main` (added there by PR #782). It is
+deliberately NOT repeated here: this branch and main each appended the same
+section independently, and `git merge-tree` confirms the two merge with no
+conflict marker and leave the order in the file TWICE. Only the notes main
+lacks are kept below.
+
+### Operating notes measured on this machine 2026-09-07 (not part of the order)
+
+- Both `agent` and `cursor-agent` exist at `~/.local/bin/`, so rule 3's
+  invocation is valid as written. Bare `cursor` is NOT a binary here.
+- Cursor auth is live: `cursor-agent about` reports Pro+. Rule 4's blocker
+  condition does not apply today.
+- `~/.claude/skills/pr-release-gate/scripts/independent_review.py` defaults to a
+  lane chain that tries **codex first**. Under rule 1 that default is prohibited:
+  every invocation must pass `--lane cursor` explicitly, or it invokes codex
+  before falling through.
+- Rule 5's fresh-context Claude fallback cannot mint a normal release receipt —
+  the recorder requires `clean-environment-suite`, and a Claude reviewer is the
+  same model family as the implementing agent. Record it as the named degradation
+  the rule specifies rather than as an equivalent pass.
+- Cursor's API was measured unstable on 2026-09-07 (18.0s → 1.1s swings against
+  `api.github.com` at 0.071s). Gate a retry on measured recovery, not on a model
+  swap: four attempts across four models died in one degraded window.
