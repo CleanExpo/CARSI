@@ -51,8 +51,7 @@
     "price": "0",
     "priceCurrency": "AUD",
     "availability": "https://schema.org/InStock"
-   },
-   "coursePrerequisites": "None - open entry"
+   }
   }
  },
  "air-quality-and-odour-identification-and-deodorisation-essentials": {
@@ -216,8 +215,7 @@
     "price": "55",
     "priceCurrency": "AUD",
     "availability": "https://schema.org/InStock"
-   },
-   "coursePrerequisites": "None - open entry"
+   }
   }
  },
  "carsi-maintenance-toolbox-talks-monthly-refreshers": {
@@ -272,8 +270,7 @@
     "price": "0",
     "priceCurrency": "AUD",
     "availability": "https://schema.org/InStock"
-   },
-   "coursePrerequisites": "None - open entry"
+   }
   }
  },
  "ccw-carsi-truckmount-operations": {
@@ -551,8 +548,7 @@
     "price": "39",
     "priceCurrency": "AUD",
     "availability": "https://schema.org/InStock"
-   },
-   "coursePrerequisites": "None - open entry"
+   }
   }
  },
  "dust-and-particulates-in-indoor-air-control-and-cleaning-strategies": {
@@ -717,8 +713,7 @@
     "price": "770",
     "priceCurrency": "AUD",
     "availability": "https://schema.org/InStock"
-   },
-   "coursePrerequisites": "None - open entry"
+   }
   }
  },
  "glass-cleaning-course": {
@@ -768,8 +763,7 @@
     "price": "20",
     "priceCurrency": "AUD",
     "availability": "https://schema.org/InStock"
-   },
-   "coursePrerequisites": "None - open entry"
+   }
   }
  },
  "hvac-systems-and-indoor-air-quality-what-every-technician-should-know": {
@@ -876,8 +870,7 @@
     "price": "99",
     "priceCurrency": "AUD",
     "availability": "https://schema.org/InStock"
-   },
-   "coursePrerequisites": "None - open entry"
+   }
   }
  },
  "infectious-control-for-the-business-owner": {
@@ -927,8 +920,7 @@
     "price": "275",
     "priceCurrency": "AUD",
     "availability": "https://schema.org/InStock"
-   },
-   "coursePrerequisites": "None - open entry"
+   }
   }
  },
  "introduction-to-air-quality-fundamentals": {
