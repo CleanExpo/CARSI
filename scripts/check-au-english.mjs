@@ -77,7 +77,11 @@ function walk(node, file, path) {
 const tracked = new Set(execSync('git ls-files --cached --others --exclude-standard', { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }).split('\n'));
 // Assessment/quiz drafts are AU-produced course copy too — scan them all.
 const draftFiles = [...tracked].filter((f) => f.startsWith('data/seed/assessment-drafts/') && f.endsWith('.json'));
-for (const file of [...COURSE_DATA, ...draftFiles]) {
+// SEO course cards are published copy: the page renders their seoTitle, metaDescription,
+// og and FAQ straight into <head> and FAQPage JSON-LD, so a US spelling here reaches
+// search results. They were out of scope until 2026-09-08.
+const cardFiles = [...tracked].filter((f) => f.startsWith('data/seo/course-cards') && f.endsWith('.json'));
+for (const file of [...COURSE_DATA, ...draftFiles, ...cardFiles]) {
   if (!tracked.has(file)) continue;
   let json;
   try { json = JSON.parse(readFileSync(file, 'utf8')); } catch (e) { console.error(`check-au-english: cannot parse ${file}: ${e.message}`); process.exit(1); }

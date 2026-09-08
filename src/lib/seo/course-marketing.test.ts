@@ -199,11 +199,23 @@ describe('current repository truth', () => {
     expect(catalogue).toHaveLength(71);
     expect(surfaceSlugs).toHaveLength(24);
     expect(new Set(surfaceSlugs).size).toBe(24);
-    expect(readdirSync(cardsDirectory).filter((name) => name.endsWith('.json'))).toHaveLength(25);
-    expect(Object.keys(cardsIndex)).toHaveLength(25);
+    expect(readdirSync(cardsDirectory).filter((name) => name.endsWith('.json'))).toHaveLength(34);
+    expect(Object.keys(cardsIndex)).toHaveLength(34);
     expect(cecApprovals).toHaveLength(38);
+    // Cards may lead the llms.txt surface. These slugs are live courses on the sitemap that
+    // llms.txt does not list, so they carry a card (page metadata + FAQ JSON-LD) without being
+    // a surfaced slug. Keeping the list explicit still catches a card authored by accident.
     expect(Object.keys(cardsIndex).filter((slug) => !surfaceSlugs.includes(slug))).toEqual([
+      'air-movers-for-professional-restoration-specs-selection-on-site-assessment',
+      'carpet-cleaning-basics-b66757ce',
+      'carsi-maintenance-toolbox-talks-monthly-refreshers',
+      'collaborative-development-your-personal-ai-assistant',
       'commercial-floor-care-schools-childcare',
+      'donning-and-doffing-ppe',
+      'fundamental-business-framework',
+      'glass-cleaning-course',
+      'infection-control-in-child-care',
+      'infectious-control-for-the-business-owner',
     ]);
 
     const surfacedCourses = surfaceSlugs.map((slug) => catalogueBySlug.get(slug));

@@ -1,0 +1,51 @@
+{
+  "slug": "glass-cleaning-course",
+  "seoTitle": "Professional Glass Cleaning Course Australia | CARSI",
+  "metaDescription": "Streak-free glass cleaning for cleaning and restoration technicians - site assessment, chemistry and technique, window track cleaning, and a knowledge quiz.",
+  "imageAlt": "Cleaning technician drawing a squeegee down a commercial shopfront window in Australia",
+  "og": {
+    "title": "Glass Cleaning Course | CARSI",
+    "description": "Professional glass cleaning technique for restoration and cleaning technicians. Streaks, smearing and scratching are avoidable with correct technique, appropriate tools and properly prepared cleaning solutions. Includes video demonstration and window track cleaning."
+  },
+  "keywords": [
+    "glass cleaning course australia",
+    "window cleaning training",
+    "streak free glass cleaning technique",
+    "commercial window cleaning course",
+    "window track cleaning",
+    "post construction glass cleaning"
+  ],
+  "faq": [
+    {
+      "q": "When do technicians need professional glass cleaning skills?",
+      "a": "Restoration and cleaning technicians are frequently called on to clean glass after water damage events, construction works and renovation projects, and as part of routine commercial cleaning contracts."
+    },
+    {
+      "q": "What causes streaks and scratching, and can they be avoided?",
+      "a": "Poorly executed glass cleaning produces streaks, smearing and scratching. All of these are avoidable with correct technique, appropriate tools and properly prepared cleaning solutions, which is what the course sets out to build."
+    },
+    {
+      "q": "What is included in the course?",
+      "a": "The complete glass cleaning workflow: pre-job planning and preparation, the cleaning process itself, supplementary video guidance, bonus content on window track cleaning, and a knowledge assessment. Content is aligned with professional cleaning standards relevant to the Australian market."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Glass Cleaning Course",
+    "description": "Professional glass cleaning for restoration and cleaning technicians working after water damage events, construction and renovation works, and on routine commercial contracts. Covers site assessment and equipment preparation, glass cleaning chemistry and technique, a practical video demonstration reference, window track cleaning procedures, and a quiz to confirm knowledge retention.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "20",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    },
+    "coursePrerequisites": "None - open entry"
+  }
+}
