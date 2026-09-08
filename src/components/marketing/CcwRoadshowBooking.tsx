@@ -6,6 +6,7 @@ import { ArrowRight, Loader2, Plus, X } from 'lucide-react';
 import { TurnstileWidget } from '@/components/security/TurnstileWidget';
 import type { CcwRoadshowEvent } from '@/lib/marketing/ccw-roadshow';
 import {
+  allowsFreeEntryRegistration,
   ccwRoadshowExperienceBands,
   ccwRoadshowFreeEntryOffer,
   ccwRoadshowTicketPackages,
@@ -206,6 +207,28 @@ export function CcwRoadshowBooking({
       setStatus('error');
       setMessage(error instanceof Error ? error.message : 'Could not reserve your free entry.');
     }
+  }
+
+  // Events off the free-entry rail must not render a free-token form at all. The API
+  // refuses them too, but a form that always fails is a worse answer than telling the
+  // visitor where the seat is actually sold. No price is shown: this page cannot take
+  // payment, so quoting a figure here would be a promise it cannot keep.
+  if (!allowsFreeEntryRegistration(selectedEvent)) {
+    return (
+      <div className={`p-5 sm:p-6 ${marketingStatCard}`}>
+        <div className="mb-2">
+          <p className={marketingEyebrowPill}>Booked through CCW</p>
+          <h2 className={`mt-4 text-xl font-bold tracking-tight ${marketingTextStrong}`}>
+            Seats for {selectedEvent.city} are booked through Carpet Cleaners Warehouse
+          </h2>
+          <p className={`mt-2 ${marketingBodySm}`}>
+            {selectedEvent.city} - {selectedEvent.dates}, {selectedEvent.timeLabel}, at{' '}
+            {selectedEvent.venueName}. This event is not part of the free CCW entry offer.
+            Contact Carpet Cleaners Warehouse to book a place.
+          </p>
+        </div>
+      </div>
+    );
   }
 
   return (

@@ -15,7 +15,28 @@ export type CcwRoadshowEvent = {
   description: string;
   capacity: number;
   calendarEventId: string;
+  /**
+   * How a seat is claimed for this event.
+   *
+   * `free-token` (the default when omitted) is the original rail: the registration
+   * endpoint issues a `CCW-FREE` entry token and the attendee checks in at CCW.
+   *
+   * `external` means seats are NOT free and are NOT sold through this site. The
+   * registration endpoint must refuse the event, and the page must not advertise
+   * free entry for it. Added 2026-09-08 for Brisbane, which the founder is selling
+   * as a paid seat through Carpet Cleaners Warehouse.
+   */
+  registration?: 'free-token' | 'external';
 };
+
+/**
+ * True when this site may issue a free entry token for the event. Anything not
+ * explicitly `free-token` is refused, so a new registration mode added later
+ * fails closed rather than silently inheriting the free rail.
+ */
+export function allowsFreeEntryRegistration(event: CcwRoadshowEvent): boolean {
+  return (event.registration ?? 'free-token') === 'free-token';
+}
 
 export type CcwRoadshowTicketPackage = {
   id: 'single' | 'team-five';
@@ -89,10 +110,13 @@ export const ccwRoadshowEvents: CcwRoadshowEvent[] = [
     slug: 'sydney',
     city: 'Sydney',
     title: `${ccwRoadshowTitle} - Sydney`,
-    dates: '30-31 July 2026',
-    dateRangeLabel: 'Thursday 30 July - Friday 31 July 2026',
-    startDateIso: '2026-07-30T08:30:00+10:00',
-    endDateIso: '2026-07-31T16:30:00+10:00',
+    dates: '6-7 October 2026',
+    dateRangeLabel: 'Tuesday 6 October - Wednesday 7 October 2026',
+    // NSW daylight saving starts Sunday 4 October 2026, so these dates are AEDT
+    // (UTC+11) — not the +10:00 the July sitting used. Getting this wrong shifts
+    // every calendar invite by an hour.
+    startDateIso: '2026-10-06T08:30:00+11:00',
+    endDateIso: '2026-10-07T16:30:00+11:00',
     timeLabel: '8.30am-4.30pm both days',
     venueName: 'Carpet Cleaners Warehouse Sydney',
     streetAddress: '2/8 Tollis Place',
@@ -102,19 +126,24 @@ export const ccwRoadshowEvents: CcwRoadshowEvent[] = [
     description:
       'Two practical days with Phill McGurk and the CCW team, connecting training, equipment, service design, chemistry, quoting confidence and business growth for carpet, rug, stain and tile cleaning operators.',
     capacity: 12,
-    // Real recurring event on phill.mcgurk@gmail.com ("CARSI x CCW Business Growth
-    // Days — Sydney", 30–31 Jul 2026). The previous id was stale → guest-add 404'd
-    // silently. Verified against Google Calendar 2026-06-30.
+    // Calendar id still points at the 30-31 Jul 2026 sitting. Inert while Sydney is
+    // `external` (the guest-add path never fires), and must be re-pointed at the
+    // October event before Sydney ever returns to the free rail.
     calendarEventId: 'h6qm8t3muuv44ht9gqann5dhuk',
+    // Founder decision 2026-09-08: Sydney relaunches 6-7 October as a PAID seat
+    // ($495 with a $200 CCW in-store voucher — note Brisbane's voucher is $250),
+    // sold through Carpet Cleaners Warehouse. Off the free-entry rail, and no price
+    // is published here because this page cannot take payment.
+    registration: 'external',
   },
   {
     slug: 'brisbane',
     city: 'Brisbane',
     title: `${ccwRoadshowTitle} - Brisbane`,
-    dates: '11-12 August 2026',
-    dateRangeLabel: 'Tuesday 11 August - Wednesday 12 August 2026',
-    startDateIso: '2026-08-11T08:30:00+10:00',
-    endDateIso: '2026-08-12T16:30:00+10:00',
+    dates: '11-12 September 2026',
+    dateRangeLabel: 'Friday 11 September - Saturday 12 September 2026',
+    startDateIso: '2026-09-11T08:30:00+10:00',
+    endDateIso: '2026-09-12T16:30:00+10:00',
     timeLabel: '8.30am-4.30pm both days',
     venueName: 'Carpet Cleaners Warehouse Boondall',
     streetAddress: 'D1-3/194 Zillmere Road',
@@ -123,10 +152,18 @@ export const ccwRoadshowEvents: CcwRoadshowEvent[] = [
     state: 'QLD',
     description:
       'Two practical days with Phill McGurk and the CCW team, connecting training, equipment, service design, chemistry, quoting confidence and business growth for carpet, rug, stain and tile cleaning operators.',
-    capacity: 15,
-    // Real event on phill.mcgurk@gmail.com ("CARSI x CCW Business Growth Days —
-    // Brisbane", 11–12 Aug 2026), created 2026-07-14. QLD is AEST (UTC+10, no DST).
+    capacity: 10,
+    // Calendar event still points at the original 11-12 Aug 2026 booking. Left as-is
+    // deliberately: with `registration: 'external'` the guest-add path never fires for
+    // Brisbane, so this id is inert. Re-point it if Brisbane ever returns to the free
+    // rail. QLD is AEST (UTC+10, no DST).
     calendarEventId: '1nnfc9hv164f4882q09krd1ies',
+    // Founder decision 2026-09-08: Brisbane moved to 11-12 September and is a PAID
+    // seat ($495 with $250 CCW store credit), sold through Carpet Cleaners Warehouse.
+    // It is therefore not on this site's free-entry token rail. No price is published
+    // here because this page is not the booking rail and must not quote one it cannot
+    // take payment for.
+    registration: 'external',
   },
 ];
 
