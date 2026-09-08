@@ -1,0 +1,52 @@
+{
+  "slug": "fundamental-business-framework",
+  "seoTitle": "Cleaning and Restoration Business Course Australia | CARSI",
+  "metaDescription": "The most comprehensive CARSI business course - a complete operating system for building, running and scaling a cleaning or restoration business in Australia.",
+  "imageAlt": "Restoration business owner reviewing job pricing and cash flow figures at an office desk in Australia",
+  "og": {
+    "title": "Fundamental Business Framework | CARSI",
+    "description": "A complete operating system for building and scaling a cleaning or restoration business in Australia. Covers the full business lifecycle from foundational setup through to exit, with the systems, strategies and knowledge to build a business that runs professionally and profitably."
+  },
+  "keywords": [
+    "cleaning business course australia",
+    "restoration business training",
+    "scaling a cleaning business",
+    "restoration business systems",
+    "business exit planning trades",
+    "cleaning business profitability course",
+    "restoration company operating system"
+  ],
+  "faq": [
+    {
+      "q": "What does the Fundamental Business Framework cover?",
+      "a": "It covers the full business lifecycle, from foundational setup through to exit. It is presented as a complete operating system for building and scaling a cleaning or restoration business in Australia."
+    },
+    {
+      "q": "Who is this course for?",
+      "a": "Owners of cleaning and restoration businesses who want the systems, strategies and knowledge to run professionally, generate sustainable profit, and grow the business beyond the personal capacity of the owner."
+    },
+    {
+      "q": "Does the course cover selling or exiting the business?",
+      "a": "Yes. It covers the full business lifecycle, from foundational setup through to exit."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Fundamental Business Framework",
+    "description": "The most comprehensive CARSI business course - a complete operating system for building and scaling a cleaning or restoration business in Australia. Covering the full business lifecycle from foundational setup through to exit, it equips owners with the systems, strategies and knowledge required to build a business that operates professionally, generates sustainable profit, and can grow beyond the personal capacity of the owner.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "770",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    },
+    "coursePrerequisites": "None - open entry"
+  }
+}

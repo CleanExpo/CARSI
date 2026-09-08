@@ -21,7 +21,7 @@
   "faq": [
     {
       "q": "Does this course award IICRC CECs?",
-      "a": "No. This is professional development and contract-readiness training. It is not an IICRC-accredited course and does not award IICRC Continuing Education Credits (CECs). Where it references a standard such as ANSI/IICRC S100, it treats it as a recognised standard of care, not law."
+      "a": "No. This is professional development and contract-readiness training. It is not accredited by the IICRC and does not award IICRC Continuing Education Credits (CECs). Where it references a standard such as ANSI/IICRC S100, it treats it as a recognised standard of care, not law."
     },
     {
       "q": "What floor-care services does the course cover?",
@@ -40,7 +40,7 @@
     "@context": "https://schema.org",
     "@type": "Course",
     "name": "Commercial Floor Care for Schools & Childcare Contracts",
-    "description": "A free CARSI professional-development course taking experienced cleaners to a contract-ready floor-care service for Australian schools and childcare centres, covering carpet, tile and grout, vinyl strip and seal, and pressure washing, each paired with the WHS, SDS, child-safety, slip-resistance and run-off requirements a contract expects. This is contract-readiness training; it is not an IICRC-accredited course and does not award IICRC Continuing Education Credits (CECs).",
+    "description": "A free CARSI professional-development course taking experienced cleaners to a contract-ready floor-care service for Australian schools and childcare centres, covering carpet, tile and grout, vinyl strip and seal, and pressure washing, each paired with the WHS, SDS, child-safety, slip-resistance and run-off requirements a contract expects. This is contract-readiness training; it is not accredited by the IICRC and does not award IICRC Continuing Education Credits (CECs).",
     "provider": {
       "@type": "Organization",
       "name": "CARSI",

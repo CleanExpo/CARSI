@@ -1,0 +1,51 @@
+{
+  "slug": "carpet-cleaning-basics-b66757ce",
+  "seoTitle": "Carpet Cleaning Basics Course Australia | CARSI",
+  "metaDescription": "Learn to clean carpet effectively, safely and to recognised standards - for residential, commercial and insurance-related water loss work in Australia.",
+  "imageAlt": "Cleaning technician working a carpet wand across a residential lounge room floor in Australia",
+  "og": {
+    "title": "Carpet Cleaning Basics | CARSI",
+    "description": "Carpet cleaning is one of the most common services delivered by restoration and cleaning professionals across Australia. This course builds the fundamental skill of cleaning carpet effectively, safely and in accordance with recognised standards."
+  },
+  "keywords": [
+    "carpet cleaning course australia",
+    "carpet cleaning basics training",
+    "carpet cleaning certification australia",
+    "commercial carpet cleaning course",
+    "carpet cleaning water damage",
+    "professional carpet cleaning training"
+  ],
+  "faq": [
+    {
+      "q": "Who is this carpet cleaning course for?",
+      "a": "It is written for restoration and cleaning professionals across Australia, whether the work is in a residential home, a commercial office, or a response to an insurance-related water loss."
+    },
+    {
+      "q": "What will I be able to do after this course?",
+      "a": "You will be able to clean carpet effectively, safely and in accordance with recognised standards. Carpet cleaning is one of the most common services in the industry, so this is treated as a fundamental professional skill."
+    },
+    {
+      "q": "Does this course apply to insurance water-damage work?",
+      "a": "Yes. The course is framed around the three settings where carpet cleaning is delivered - a residential home, a commercial office, and a response to an insurance-related water loss."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Carpet Cleaning Basics",
+    "description": "Carpet cleaning is one of the most common services delivered by restoration and cleaning professionals across Australia. This course builds the ability to clean carpet effectively, safely and in accordance with recognised standards, across residential, commercial and insurance-related water loss work.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "55",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    },
+    "coursePrerequisites": "None - open entry"
+  }
+}
