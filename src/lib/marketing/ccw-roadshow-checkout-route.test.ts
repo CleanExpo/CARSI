@@ -67,8 +67,14 @@ function checkoutRequest(eventSlug: string) {
       packageId: 'single',
       turnstileToken: 'test-token',
       contactEmail: 'operator@example.com',
+      // Field names and the experience band must match what the route actually
+      // validates (fullName / yearsExperience / goals, band from
+      // ccwRoadshowExperienceBands). The first version of this used name /
+      // experienceBand / goal and band '1-3', so Melbourne was rejected at 400 for
+      // a malformed payload and the "not 409" positive control passed without ever
+      // reaching the registration guard - a vacuous control.
       attendees: [
-        { name: 'Test Operator', experienceBand: '1-3', goal: 'Improve quoting' },
+        { fullName: 'Test Operator', yearsExperience: '2-5', goals: 'Improve quoting' },
       ],
     }),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -92,11 +98,14 @@ describe('ccw roadshow checkout route refuses to mint for paid cities', () => {
     },
   );
 
-  it('positive control: melbourne is NOT refused by the registration guard', async () => {
-    // Without this, a route that refused everything - or threw on every request -
-    // would satisfy the assertions above while being completely broken.
+  it('positive control: melbourne passes the guard and DOES reach registration', async () => {
+    // Without this, a route that refused everything - or rejected every payload at
+    // 400 - would satisfy the assertions above while proving nothing. Asserting the
+    // registry was reached is the strong form: a mere "not 409" passes on a 400.
     const response = await POST(checkoutRequest('melbourne'));
     expect(response.status).not.toBe(409);
+    expect(response.status).not.toBe(400);
+    expect(createRoadshowRegistration).toHaveBeenCalled();
   });
 
   it('positive control: the mocks are actually wired in', async () => {
