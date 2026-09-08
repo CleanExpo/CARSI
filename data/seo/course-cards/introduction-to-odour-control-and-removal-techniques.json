@@ -1,0 +1,41 @@
+{
+  "slug": "introduction-to-odour-control-and-removal-techniques",
+  "seoTitle": "Introduction to Odour Control and Removal Techniques | CARSI",
+  "metaDescription": "Odour control and removal: identify, assess, contain and eliminate odour in residential and commercial environments.",
+  "imageAlt": "CARSI course: Introduction to Odour Control and Removal Techniques",
+  "og": {
+    "title": "Introduction to Odour Control and Removal Techniques | CARSI",
+    "description": "Odour control and removal: identify, assess, contain and eliminate odour in residential and commercial environments."
+  },
+  "keywords": [
+    "Introduction to Odour Control and Removal Techniques",
+    "introduction odour control and removal techniques",
+    "CARSI course",
+    "introduction odour training",
+    "removal techniques course"
+  ],
+  "faq": [
+    {
+      "q": "What does the Introduction to Odour Control and Removal Techniques course cover?",
+      "a": "This course provides restoration and cleaning professionals with the practical knowledge to identify, assess, contain, and eliminate odour in residential and commercial environments."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Introduction to Odour Control and Removal Techniques",
+    "description": "This course provides restoration and cleaning professionals with the practical knowledge to identify, assess, contain, and eliminate odour in residential and commercial environments. The focus throughout is on source elimination, not odour masking.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "29",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    }
+  }
+}

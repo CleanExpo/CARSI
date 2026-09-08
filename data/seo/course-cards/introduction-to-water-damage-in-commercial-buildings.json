@@ -1,0 +1,45 @@
+{
+  "slug": "introduction-to-water-damage-in-commercial-buildings",
+  "seoTitle": "Introduction to Water Damage in Commercial Buildings | CARSI",
+  "metaDescription": "Introduction to Water Damage in Commercial Buildings: Commercial water damage events differ from residential losses in scale.",
+  "imageAlt": "CARSI course: Introduction to Water Damage in Commercial Buildings",
+  "og": {
+    "title": "Introduction to Water Damage in Commercial Buildings | CARSI",
+    "description": "Introduction to Water Damage in Commercial Buildings: Commercial water damage events differ from residential losses in scale."
+  },
+  "keywords": [
+    "commercial water damage training",
+    "commercial building water loss",
+    "business interruption restoration",
+    "commercial drying strategy",
+    "commercial restoration planning"
+  ],
+  "faq": [
+    {
+      "q": "What does the Introduction to Water Damage in Commercial Buildings course cover?",
+      "a": "A restoration professional who understands the specific characteristics of commercial water damage is better equipped to assess, scope, and manage these high-value, high-complexity jobs to a successful outcome.; Topics covered: common causes of water damage in commercial buildings, major building system vulnerabilities, the business and financial impacts of commercial water losses, drying strategy considerations specific to commercial environments, and reconstruction and reinstatement factors.; Standards applied: IICRC S500, Building Code of Australia (BCA/NCC), Safe Work Australia Model WHS Regulations, relevant state commercial tenancy legislation."
+    },
+    {
+      "q": "What is the focus of the Introduction to Water Damage in Commercial Buildings course?",
+      "a": "Commercial water damage events differ from residential losses in scale, complexity, stakeholder management requirements, business interruption impact, and regulatory compliance obligations."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Introduction to Water Damage in Commercial Buildings",
+    "description": "Commercial water damage events differ from residential losses in scale, complexity, stakeholder management requirements, business interruption impact, and regulatory compliance obligations. A restoration professional who understands the specific characteristics of commercial water damage is better equipped to assess, scope, and manage these high-value, high-complexity jobs to a successful outcome.; Topics covered: common causes of water damage in commercial buildings, major building system vulnerabilities, the business and financial impacts of commercial water losses, drying strategy considerations specific to commercial environments, and reconstruction and reinstatement factors.; Standards applied: IICRC S500, Building Code of Australia (BCA/NCC), Safe Work Australia Model WHS Regulations, relevant state commercial tenancy legislation.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "29",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    }
+  }
+}

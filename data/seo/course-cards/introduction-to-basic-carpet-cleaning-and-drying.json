@@ -1,0 +1,45 @@
+{
+  "slug": "introduction-to-basic-carpet-cleaning-and-drying",
+  "seoTitle": "Introduction to Basic Carpet Cleaning and Drying | CARSI",
+  "metaDescription": "Welcome to Introduction to Basic Carpet Cleaning and Drying, a foundational course developed by CARSI — the Centre for Applied Restoration and Specialist Industries.",
+  "imageAlt": "CARSI course: Introduction to Basic Carpet Cleaning and Drying",
+  "og": {
+    "title": "Introduction to Basic Carpet Cleaning and Drying | CARSI",
+    "description": "Welcome to Introduction to Basic Carpet Cleaning and Drying, a foundational course developed by CARSI — the Centre for Applied Restoration and Specialist Industries."
+  },
+  "keywords": [
+    "Introduction to Basic Carpet Cleaning and Drying",
+    "introduction basic carpet cleaning and drying",
+    "CARSI course",
+    "introduction basic training",
+    "cleaning drying course"
+  ],
+  "faq": [
+    {
+      "q": "What does the Introduction to Basic Carpet Cleaning and Drying course cover?",
+      "a": "Across five modules, this course takes you through the complete carpet cleaning and drying process from first principles."
+    },
+    {
+      "q": "What does the Introduction to Basic Carpet Cleaning and Drying course help learners understand?",
+      "a": "This course is designed specifically for technicians entering the carpet cleaning and restoration industry in Australia, and for those already working in the field who wish to consolidate and formalise their practical knowledge.; Carpet cleaning is far more than running a machine across a floor."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Introduction to Basic Carpet Cleaning and Drying",
+    "description": "Welcome to Introduction to Basic Carpet Cleaning and Drying, a foundational course developed by CARSI — the Centre for Applied Restoration and Specialist Industries. This course is designed specifically for technicians entering the carpet cleaning and restoration industry in Australia, and for those already working in the field who wish to consolidate and formalise their practical knowledge.; Carpet cleaning is far more than running a machine across a floor. It is a technical discipline that requires a thorough understanding of how carpets are constructed, how different fibre types respond to moisture and chemical treatments, how water damage affects floor coverings at a structural level, what equipment is appropriate for each job, and how to dry carpets effectively and safely once cleaning is complete. It also incorporates guidance from Safe Work Australia, relevant Australian Standards, and accepted best practice across the restoration industry in Australia.; Who This Course Is For; This course suits a wide range of learners, including:; • New technicians entering the carpet cleaning or restoration industry; • Sole traders and small business owners looking to formalise their skills; • Water damage restoration technicians who work with wet or damaged carpet; • Cleaning staff working in commercial, residential, or institutional environments; • Business owners seeking to ensure their team operates to a professional standard; What You Will Learn; Across five modules, this course takes you through the complete carpet cleaning and drying process from first principles. By the time you complete this course, you will have a solid working knowledge of:; • How carpets are constructed and why construction type matters for cleaning; • The effects of water damage on carpet, underlay, and subfloor; • The equipment used in professional carpet cleaning and how to use it correctly; • Cleaning products, their chemistry, and how to select and apply them safely; • Drying techniques and how to achieve effective, efficient drying outcomes",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "29",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    }
+  }
+}

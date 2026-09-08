@@ -1,0 +1,41 @@
+{
+  "slug": "introduction-to-asbestos-asbestos-awareness",
+  "seoTitle": "Introduction to Asbestos: Asbestos Awareness | CARSI",
+  "metaDescription": "Asbestos awareness for cleaning and restoration professionals working safely in the Australian built environment.",
+  "imageAlt": "CARSI course: Introduction to Asbestos: Asbestos Awareness",
+  "og": {
+    "title": "Introduction to Asbestos: Asbestos Awareness | CARSI",
+    "description": "Asbestos awareness for cleaning and restoration professionals working safely in the Australian built environment."
+  },
+  "keywords": [
+    "introduction asbestos awareness",
+    "asbestos awareness training",
+    "asbestos-containing materials",
+    "asbestos site response",
+    "asbestos reporting obligations"
+  ],
+  "faq": [
+    {
+      "q": "What does the Introduction to Asbestos: Asbestos Awareness course cover?",
+      "a": "This course provides cleaning and restoration professionals with the essential asbestos awareness knowledge required to work safely in the Australian built environment."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Introduction to Asbestos: Asbestos Awareness",
+    "description": "This course provides cleaning and restoration professionals with the essential asbestos awareness knowledge required to work safely in the Australian built environment. Asbestos-containing materials (ACMs) are present in a significant proportion of Australian buildings constructed before 1990, and encountering them unexpectedly is a real occupational risk. This course does not qualify you to remove asbestos — it equips you to identify, avoid, report, and respond correctly when asbestos is encountered during routine work.; Topics covered: the history and widespread use of asbestos in Australia, the health dangers and mechanisms of disease, types of asbestos-containing materials you may encounter on site, correct handling and avoidance protocols, what to do when ACMs are damaged or disturbed, documentation and reporting obligations, training and certification requirements, and the legal and regulatory framework.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "29",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    }
+  }
+}

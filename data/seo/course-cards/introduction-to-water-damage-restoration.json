@@ -1,0 +1,45 @@
+{
+  "slug": "introduction-to-water-damage-restoration",
+  "seoTitle": "Introduction to Water Damage Restoration | CARSI",
+  "metaDescription": "Water damage restoration: site safety, inspection, moisture control, extraction and equipment setup.",
+  "imageAlt": "CARSI course: Introduction to Water Damage Restoration",
+  "og": {
+    "title": "Introduction to Water Damage Restoration | CARSI",
+    "description": "Water damage restoration: site safety, inspection, moisture control, extraction and equipment setup."
+  },
+  "keywords": [
+    "water damage restoration training",
+    "water extraction methods",
+    "moisture source control",
+    "drying equipment setup",
+    "water damage inspection"
+  ],
+  "faq": [
+    {
+      "q": "What does the Introduction to Water Damage Restoration course cover?",
+      "a": "This course provides a structured introduction to the complete water damage restoration process for practitioners entering the industry or seeking to formalise their understanding of the field."
+    },
+    {
+      "q": "What does the Introduction to Water Damage Restoration course help learners understand?",
+      "a": "It covers the end-to-end workflow from site safety through inspection, moisture control, extraction, and equipment setup — providing the operational framework on which all more advanced restoration knowledge is built.; Topics covered: health and safety obligations in water damage environments, systematic damage inspection procedures, moisture source identification and control, water extraction methods overview, and drying equipment selection and setup.; Standards applied: IICRC S500, Safe Work Australia Model WHS Act and Regulations."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Introduction to Water Damage Restoration",
+    "description": "This course provides a structured introduction to the complete water damage restoration process for practitioners entering the industry or seeking to formalise their understanding of the field. It covers the end-to-end workflow from site safety through inspection, moisture control, extraction, and equipment setup — providing the operational framework on which all more advanced restoration knowledge is built.; Topics covered: health and safety obligations in water damage environments, systematic damage inspection procedures, moisture source identification and control, water extraction methods overview, and drying equipment selection and setup.; Standards applied: IICRC S500, Safe Work Australia Model WHS Act and Regulations.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "29",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    }
+  }
+}

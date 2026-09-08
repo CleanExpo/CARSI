@@ -1,0 +1,45 @@
+{
+  "slug": "asd-structural-drying-core",
+  "seoTitle": "Applied Structural Drying — Core Concepts | CARSI",
+  "metaDescription": "Deepen drying science for structural assemblies: monitoring, vapour pressure, and advanced equipment strategies.",
+  "imageAlt": "CARSI course: Applied Structural Drying — Core Concepts",
+  "og": {
+    "title": "Applied Structural Drying — Core Concepts | CARSI",
+    "description": "Deepen drying science for structural assemblies: monitoring, vapour pressure, and advanced equipment strategies."
+  },
+  "keywords": [
+    "structural drying core course",
+    "structural drying monitoring",
+    "vapour pressure drying",
+    "concealed assembly drying",
+    "advanced drying equipment"
+  ],
+  "faq": [
+    {
+      "q": "What does Applied Structural Drying — Core Concepts cover?",
+      "a": "Builds on water restoration fundamentals with a focus on structural drying, documentation rigour, and complex assemblies."
+    },
+    {
+      "q": "Which syllabus topics are listed for Applied Structural Drying — Core Concepts?",
+      "a": "Syllabus topics include Module 2 — Vapour pressure & drying forces; Module 3 — Cavities & concealed assemblies; Module 4 — Supplemental heat & conditioning; Module 5 — Hardwood & engineered flooring; Module 6 — Concrete & lightweight slab systems; Module 7 — Monitoring plans & KPIs."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Applied Structural Drying — Core Concepts",
+    "description": "Builds on water restoration fundamentals with a focus on structural drying, documentation rigour, and complex assemblies. Syllabus topics include Module 2 — Vapour pressure & drying forces; Module 3 — Cavities & concealed assemblies; Module 4 — Supplemental heat & conditioning; Module 5 — Hardwood & engineered flooring; Module 6 — Concrete & lightweight slab systems; Module 7 — Monitoring plans & KPIs.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    }
+  }
+}

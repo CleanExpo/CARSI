@@ -1,0 +1,45 @@
+{
+  "slug": "introduction-to-structural-drying-concepts",
+  "seoTitle": "Introduction to Structural Drying Concepts | CARSI",
+  "metaDescription": "This course introduces water damage restoration technicians to the foundational concepts that underpin all structural drying work.",
+  "imageAlt": "CARSI course: Introduction to Structural Drying Concepts",
+  "og": {
+    "title": "Introduction to Structural Drying Concepts | CARSI",
+    "description": "This course introduces water damage restoration technicians to the foundational concepts that underpin all structural drying work."
+  },
+  "keywords": [
+    "Introduction to Structural Drying Concepts",
+    "introduction structural drying concepts",
+    "CARSI course",
+    "introduction structural training",
+    "drying concepts course"
+  ],
+  "faq": [
+    {
+      "q": "What does the Introduction to Structural Drying Concepts course cover?",
+      "a": "It covers the science of how buildings respond to moisture, how drying dynamics operate in real structures, how to monitor drying progress accurately, what equipment systems are available and how they work together, and what standards define successful completion."
+    },
+    {
+      "q": "What is the focus of the Introduction to Structural Drying Concepts course?",
+      "a": "This course introduces water damage restoration technicians to the foundational concepts that underpin all structural drying work."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Introduction to Structural Drying Concepts",
+    "description": "This course introduces water damage restoration technicians to the foundational concepts that underpin all structural drying work. It covers the science of how buildings respond to moisture, how drying dynamics operate in real structures, how to monitor drying progress accurately, what equipment systems are available and how they work together, and what standards define successful completion. Every module is directly applicable to job site decision-making. Content is aligned with the IICRC S500 Standard for Professional Water Damage Restoration and Australian WHS requirements.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "29",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    }
+  }
+}

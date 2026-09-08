@@ -1,0 +1,45 @@
+{
+  "slug": "job-safety-and-environmental-analysis-jsea-course",
+  "seoTitle": "Job Safety and Environmental Analysis (JSEA) Course | CARSI",
+  "metaDescription": "A Job Safety and Environmental Analysis (JSEA) is a dynamic, task-specific hazard identification and control tool used before starting work each day.",
+  "imageAlt": "CARSI course: Job Safety and Environmental Analysis (JSEA) Course",
+  "og": {
+    "title": "Job Safety and Environmental Analysis (JSEA) Course | CARSI",
+    "description": "A Job Safety and Environmental Analysis (JSEA) is a dynamic, task-specific hazard identification and control tool used before starting work each day."
+  },
+  "keywords": [
+    "Job Safety and Environmental Analysis (JSEA) Course",
+    "job safety and environmental analysis jsea",
+    "CARSI course",
+    "job safety training",
+    "analysis jsea course"
+  ],
+  "faq": [
+    {
+      "q": "What does the Job Safety and Environmental Analysis (JSEA) course cover?",
+      "a": "This course covers how to complete a JSEA correctly and embed it as a daily practice in restoration operations."
+    },
+    {
+      "q": "What is the focus of the Job Safety and Environmental Analysis (JSEA) course?",
+      "a": "A Job Safety and Environmental Analysis (JSEA) is a dynamic, task-specific hazard identification and control tool used before starting work each day."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Job Safety and Environmental Analysis (JSEA) Course",
+    "description": "A Job Safety and Environmental Analysis (JSEA) is a dynamic, task-specific hazard identification and control tool used before starting work each day. Unlike a SWMS, a JSEA is completed by the crew on site and adapted to actual site conditions. This course covers how to complete a JSEA correctly and embed it as a daily practice in restoration operations.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "20",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    }
+  }
+}

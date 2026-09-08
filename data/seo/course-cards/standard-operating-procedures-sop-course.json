@@ -1,0 +1,45 @@
+{
+  "slug": "standard-operating-procedures-sop-course",
+  "seoTitle": "Standard Operating Procedures (SOP) Course | CARSI",
+  "metaDescription": "Developing and maintaining Standard Operating Procedures for cleaning and restoration businesses.",
+  "imageAlt": "CARSI course: Standard Operating Procedures (SOP) Course",
+  "og": {
+    "title": "Standard Operating Procedures (SOP) Course | CARSI",
+    "description": "Developing and maintaining Standard Operating Procedures for cleaning and restoration businesses."
+  },
+  "keywords": [
+    "Standard Operating Procedures (SOP) Course",
+    "standard operating procedures sop",
+    "CARSI course",
+    "standard operating training",
+    "procedures sop course"
+  ],
+  "faq": [
+    {
+      "q": "What does the Standard Operating Procedures (SOP) course cover?",
+      "a": "This course provides cleaning and restoration professionals with the knowledge to develop, implement, and maintain Standard Operating Procedures for their business operations."
+    },
+    {
+      "q": "What does the Standard Operating Procedures (SOP) course help learners understand?",
+      "a": "SOPs are the foundation of consistent quality, safe practice, and scalable business performance."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Standard Operating Procedures (SOP) Course",
+    "description": "This course provides cleaning and restoration professionals with the knowledge to develop, implement, and maintain Standard Operating Procedures for their business operations. SOPs are the foundation of consistent quality, safe practice, and scalable business performance. This course covers what SOPs are, why they are essential in a professional cleaning or restoration business, how to write SOPs that are actually used, and how to implement and maintain an SOP system across a team.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "20",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    }
+  }
+}

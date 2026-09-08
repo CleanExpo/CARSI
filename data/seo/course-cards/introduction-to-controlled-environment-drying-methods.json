@@ -1,0 +1,41 @@
+{
+  "slug": "introduction-to-controlled-environment-drying-methods",
+  "seoTitle": "Introduction to Controlled Environment Drying Methods | CARSI",
+  "metaDescription": "Introduction to Controlled Environment Drying Methods: controlled environment approach to structural drying.",
+  "imageAlt": "CARSI course: Introduction to Controlled Environment Drying Methods",
+  "og": {
+    "title": "Introduction to Controlled Environment Drying Methods | CARSI",
+    "description": "Introduction to Controlled Environment Drying Methods: controlled environment approach to structural drying."
+  },
+  "keywords": [
+    "Introduction to Controlled Environment Drying Methods",
+    "introduction controlled environment drying methods",
+    "CARSI course",
+    "introduction controlled training",
+    "drying methods course"
+  ],
+  "faq": [
+    {
+      "q": "What does the Introduction to Controlled Environment Drying Methods course cover?",
+      "a": "This course covers the controlled environment approach to structural drying — where physical containment, managed airflow, controlled energy input, and systematic monitoring are combined to create a drying zone that is isolated from uncontrolled external conditions and managed to maximise drying efficiency."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Introduction to Controlled Environment Drying Methods",
+    "description": "This course covers the controlled environment approach to structural drying — where physical containment, managed airflow, controlled energy input, and systematic monitoring are combined to create a drying zone that is isolated from uncontrolled external conditions and managed to maximise drying efficiency. Used in complex residential losses, commercial restoration, specialty environments, and situations where contamination control is required alongside drying.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "29",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    }
+  }
+}

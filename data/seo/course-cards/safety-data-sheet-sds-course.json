@@ -1,0 +1,41 @@
+{
+  "slug": "safety-data-sheet-sds-course",
+  "seoTitle": "Safety Data Sheet (SDS) Course | CARSI",
+  "metaDescription": "Reading and applying Safety Data Sheets for hazardous chemicals in cleaning and restoration.",
+  "imageAlt": "CARSI course: Safety Data Sheet (SDS) Course",
+  "og": {
+    "title": "Safety Data Sheet (SDS) Course | CARSI",
+    "description": "Reading and applying Safety Data Sheets for hazardous chemicals in cleaning and restoration."
+  },
+  "keywords": [
+    "Safety Data Sheet (SDS) Course",
+    "safety data sheet sds",
+    "CARSI course",
+    "safety data training",
+    "sheet sds course"
+  ],
+  "faq": [
+    {
+      "q": "What does the Safety Data Sheet (SDS) course cover?",
+      "a": "The Safety Data Sheet course provides cleaning and restoration professionals with the knowledge to read, interpret, and apply Safety Data Sheets for every hazardous chemical used in their work."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Safety Data Sheet (SDS) Course",
+    "description": "The Safety Data Sheet course provides cleaning and restoration professionals with the knowledge to read, interpret, and apply Safety Data Sheets for every hazardous chemical used in their work. Under Australian WHS legislation, SDS access and worker familiarity is a legal requirement. This course covers what an SDS contains, which sections are most relevant to field operations, how to use SDS information in real chemical exposure situations, and the obligations of both employers and workers regarding SDS management.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "20",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    }
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "slug": "introduction-to-digital-moisture-mapping",
+  "seoTitle": "Introduction to Digital Moisture Mapping | CARSI",
+  "metaDescription": "Digital moisture mapping transforms individual moisture meter readings into a structured, spatial record of moisture distribution across an entire job site.",
+  "imageAlt": "CARSI course: Introduction to Digital Moisture Mapping",
+  "og": {
+    "title": "Introduction to Digital Moisture Mapping | CARSI",
+    "description": "Digital moisture mapping transforms individual moisture meter readings into a structured, spatial record of moisture distribution across an entire job site."
+  },
+  "keywords": [
+    "Introduction to Digital Moisture Mapping",
+    "introduction digital moisture mapping",
+    "CARSI course",
+    "introduction digital training",
+    "moisture mapping course"
+  ],
+  "faq": [
+    {
+      "q": "What does the Introduction to Digital Moisture Mapping course cover?",
+      "a": "This course covers the systematic collection of moisture data in the field, the use of data management software to organise and store that data, the analysis of moisture distribution patterns to guide drying decisions, the generation of professional reports for insurance and client communication, and the optimisation of the overall drying process using digital moisture map data."
+    },
+    {
+      "q": "What is the focus of the Introduction to Digital Moisture Mapping course?",
+      "a": "Digital moisture mapping transforms individual moisture meter readings into a structured, spatial record of moisture distribution across an entire job site."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Introduction to Digital Moisture Mapping",
+    "description": "Digital moisture mapping transforms individual moisture meter readings into a structured, spatial record of moisture distribution across an entire job site. This course covers the systematic collection of moisture data in the field, the use of data management software to organise and store that data, the analysis of moisture distribution patterns to guide drying decisions, the generation of professional reports for insurance and client communication, and the optimisation of the overall drying process using digital moisture map data. All content is aligned with IICRC S500 Applied Structural Drying documentation requirements and the expectations of Australian insurers for drying project records.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "29",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    }
+  }
+}

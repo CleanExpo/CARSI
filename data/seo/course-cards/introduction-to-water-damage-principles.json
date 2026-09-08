@@ -1,0 +1,45 @@
+{
+  "slug": "introduction-to-water-damage-principles",
+  "seoTitle": "Introduction to Water Damage Principles | CARSI",
+  "metaDescription": "This course establishes the foundational principles that underpin professional water damage restoration practice.",
+  "imageAlt": "CARSI course: Introduction to Water Damage Principles",
+  "og": {
+    "title": "Introduction to Water Damage Principles | CARSI",
+    "description": "This course establishes the foundational principles that underpin professional water damage restoration practice."
+  },
+  "keywords": [
+    "water damage principles training",
+    "moisture behaviour",
+    "structural drying psychrometrics",
+    "microbial risk recognition",
+    "water damage assessment"
+  ],
+  "faq": [
+    {
+      "q": "What does the Introduction to Water Damage Principles course cover?",
+      "a": "Understanding the science behind moisture behaviour, psychrometrics, microbial risk, and damage assessment allows restoration professionals to make informed decisions on site rather than applying fixed procedures that may not suit the specific conditions of each job.; Topics covered: health and safety as the non-negotiable foundation of all restoration work, remediation principles and decision-making frameworks, applied psychrometrics for structural drying, microbial risk recognition and management, and systematic damage assessment.; Standards applied: IICRC S500, IICRC S520, Safe Work Australia Model WHS Regulations."
+    },
+    {
+      "q": "What does the Introduction to Water Damage Principles course help learners understand?",
+      "a": "This course establishes the foundational principles that underpin professional water damage restoration practice."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Introduction to Water Damage Principles",
+    "description": "This course establishes the foundational principles that underpin professional water damage restoration practice. Understanding the science behind moisture behaviour, psychrometrics, microbial risk, and damage assessment allows restoration professionals to make informed decisions on site rather than applying fixed procedures that may not suit the specific conditions of each job.; Topics covered: health and safety as the non-negotiable foundation of all restoration work, remediation principles and decision-making frameworks, applied psychrometrics for structural drying, microbial risk recognition and management, and systematic damage assessment.; Standards applied: IICRC S500, IICRC S520, Safe Work Australia Model WHS Regulations.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "29",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    }
+  }
+}

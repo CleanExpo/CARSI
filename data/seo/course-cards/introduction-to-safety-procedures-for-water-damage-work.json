@@ -1,0 +1,45 @@
+{
+  "slug": "introduction-to-safety-procedures-for-water-damage-work",
+  "seoTitle": "Introduction to Safety Procedures for Water Damage Work | CARSI",
+  "metaDescription": "Water damage restoration creates overlapping hazards that require structured safety procedures.",
+  "imageAlt": "CARSI course: Introduction to Safety Procedures for Water Damage Work",
+  "og": {
+    "title": "Introduction to Safety Procedures for Water Damage Work | CARSI",
+    "description": "Water damage restoration creates overlapping hazards that require structured safety procedures."
+  },
+  "keywords": [
+    "Introduction to Safety Procedures for Water Damage Work",
+    "introduction safety procedures for water damage work",
+    "CARSI course",
+    "introduction safety training",
+    "damage work course"
+  ],
+  "faq": [
+    {
+      "q": "What does the Introduction to Safety Procedures for Water Damage Work course cover?",
+      "a": "This course provides technicians with the practical protocols to assess hazards, select PPE, control exposures, and manage equipment safely in every water damage scenario."
+    },
+    {
+      "q": "What is the focus of the Introduction to Safety Procedures for Water Damage Work course?",
+      "a": "Water damage restoration creates a unique combination of overlapping hazards — electrical, biological, chemical, physical, and ergonomic — that can escalate rapidly if not managed with structured safety procedures."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Introduction to Safety Procedures for Water Damage Work",
+    "description": "Water damage restoration creates a unique combination of overlapping hazards — electrical, biological, chemical, physical, and ergonomic — that can escalate rapidly if not managed with structured safety procedures. This course provides technicians with the practical protocols to assess hazards, select PPE, control exposures, and manage equipment safely in every water damage scenario.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "29",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    }
+  }
+}

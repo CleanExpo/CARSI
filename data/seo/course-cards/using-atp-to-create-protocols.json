@@ -1,0 +1,45 @@
+{
+  "slug": "using-atp-to-create-protocols",
+  "seoTitle": "Using ATP to Create Protocols | CARSI",
+  "metaDescription": "ATP (adenosine triphosphate) bioluminescence testing is the industry standard method for verifying surface hygiene after cleaning and disinfection.",
+  "imageAlt": "CARSI course: Using ATP to Create Protocols",
+  "og": {
+    "title": "Using ATP to Create Protocols | CARSI",
+    "description": "ATP (adenosine triphosphate) bioluminescence testing is the industry standard method for verifying surface hygiene after cleaning and disinfection."
+  },
+  "keywords": [
+    "Using ATP to Create Protocols",
+    "using atp create protocols",
+    "CARSI course",
+    "using atp training",
+    "create protocols course"
+  ],
+  "faq": [
+    {
+      "q": "What does the Using ATP to Create Protocols course cover?",
+      "a": "This course teaches restoration and hygiene professionals how to use ATP meters correctly, how to interpret results, how to establish site-specific benchmarks, and how to build ATP-based cleaning verification protocols that satisfy insurance, regulatory, and client audit requirements."
+    },
+    {
+      "q": "What is the focus of the Using ATP to Create Protocols course?",
+      "a": "ATP (adenosine triphosphate) bioluminescence testing is the industry standard method for verifying surface hygiene after cleaning and disinfection."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Using ATP to Create Protocols",
+    "description": "ATP (adenosine triphosphate) bioluminescence testing is the industry standard method for verifying surface hygiene after cleaning and disinfection. This course teaches restoration and hygiene professionals how to use ATP meters correctly, how to interpret results, how to establish site-specific benchmarks, and how to build ATP-based cleaning verification protocols that satisfy insurance, regulatory, and client audit requirements.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "20",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    }
+  }
+}

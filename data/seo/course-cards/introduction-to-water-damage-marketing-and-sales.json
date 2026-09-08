@@ -1,0 +1,41 @@
+{
+  "slug": "introduction-to-water-damage-marketing-and-sales",
+  "seoTitle": "Introduction to Water Damage Marketing and Sales | CARSI",
+  "metaDescription": "This course covers the specific marketing and sales skills required to grow a water damage restoration business in Australia.",
+  "imageAlt": "CARSI course: Introduction to Water Damage Marketing and Sales",
+  "og": {
+    "title": "Introduction to Water Damage Marketing and Sales | CARSI",
+    "description": "This course covers the specific marketing and sales skills required to grow a water damage restoration business in Australia."
+  },
+  "keywords": [
+    "water damage sales training",
+    "restoration business marketing",
+    "emergency restoration leads",
+    "restoration referral networks",
+    "consultative restoration sales"
+  ],
+  "faq": [
+    {
+      "q": "What does the Introduction to Water Damage Marketing and Sales course cover?",
+      "a": "This course covers the specific marketing and sales skills required to grow a water damage restoration business in Australia."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Introduction to Water Damage Marketing and Sales",
+    "description": "This course covers the specific marketing and sales skills required to grow a water damage restoration business in Australia. Unlike general marketing courses, every module is tailored to the unique dynamics of restoration work — emergency response, insurance involvement, referral networks, and professional credibility. You will learn to generate leads, close jobs consultatively, deliver exceptional client service, expand your market, and use certification to differentiate your business.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "29",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    }
+  }
+}

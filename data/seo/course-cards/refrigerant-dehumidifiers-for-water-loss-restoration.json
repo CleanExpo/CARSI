@@ -1,0 +1,45 @@
+{
+  "slug": "refrigerant-dehumidifiers-for-water-loss-restoration",
+  "seoTitle": "Refrigerant Dehumidifiers for Water Loss Restoration | CARSI",
+  "metaDescription": "The refrigerant dehumidifier is the primary moisture removal tool in structural drying.",
+  "imageAlt": "CARSI course: Refrigerant Dehumidifiers for Water Loss Restoration",
+  "og": {
+    "title": "Refrigerant Dehumidifiers for Water Loss Restoration | CARSI",
+    "description": "The refrigerant dehumidifier is the primary moisture removal tool in structural drying."
+  },
+  "keywords": [
+    "refrigerant dehumidifier training",
+    "dehumidifier sizing calculations",
+    "structural drying equipment",
+    "low grain refrigerant",
+    "dehumidifier maintenance"
+  ],
+  "faq": [
+    {
+      "q": "What does the Refrigerant Dehumidifiers for Water Loss Restoration course cover?",
+      "a": "This course provides the technical grounding needed to use refrigerant dehumidifiers as precision drying tools, not just equipment you put in a room and hope for the best.; Topics covered: refrigerant dehumidifier operating principles, low grain refrigerant technology, dehumidifier sizing calculations, temperature and efficiency relationships, refrigerant types and their implications, essential accessories, maintenance procedures, practical application scenarios, and safety requirements.; Standards applied: IICRC S500, IICRC S520, Australian Refrigeration and Air Conditioning (RAC) regulations, Safe Work Australia."
+    },
+    {
+      "q": "What does the Refrigerant Dehumidifiers for Water Loss Restoration course help learners understand?",
+      "a": "Understanding how it works, how to size it correctly, how to operate it at peak efficiency, and how to maintain it properly directly determines the speed and cost of every water loss restoration you attend."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Refrigerant Dehumidifiers for Water Loss Restoration",
+    "description": "The refrigerant dehumidifier is the primary moisture removal tool in structural drying. Understanding how it works, how to size it correctly, how to operate it at peak efficiency, and how to maintain it properly directly determines the speed and cost of every water loss restoration you attend. This course provides the technical grounding needed to use refrigerant dehumidifiers as precision drying tools, not just equipment you put in a room and hope for the best.; Topics covered: refrigerant dehumidifier operating principles, low grain refrigerant technology, dehumidifier sizing calculations, temperature and efficiency relationships, refrigerant types and their implications, essential accessories, maintenance procedures, practical application scenarios, and safety requirements.; Standards applied: IICRC S500, IICRC S520, Australian Refrigeration and Air Conditioning (RAC) regulations, Safe Work Australia.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    }
+  }
+}

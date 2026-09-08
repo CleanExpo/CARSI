@@ -1,0 +1,45 @@
+{
+  "slug": "introduction-to-psychrometry-science-and-calculations",
+  "seoTitle": "Introduction to Psychrometry Science and Calculations | CARSI",
+  "metaDescription": "Psychrometrics is the science of the physical and thermodynamic properties of moist air.",
+  "imageAlt": "CARSI course: Introduction to Psychrometry Science and Calculations",
+  "og": {
+    "title": "Introduction to Psychrometry Science and Calculations | CARSI",
+    "description": "Psychrometrics is the science of the physical and thermodynamic properties of moist air."
+  },
+  "keywords": [
+    "Introduction to Psychrometry Science and Calculations",
+    "introduction psychrometry science and calculations",
+    "CARSI course",
+    "introduction psychrometry training",
+    "science calculations course"
+  ],
+  "faq": [
+    {
+      "q": "What does the Introduction to Psychrometry Science and Calculations course cover?",
+      "a": "For restoration professionals, it provides the analytical framework for every structural drying decision — from equipment selection and placement to monitoring drying progress and determining when drying is complete."
+    },
+    {
+      "q": "What is the focus of the Introduction to Psychrometry Science and Calculations course?",
+      "a": "Psychrometrics is the science of the physical and thermodynamic properties of moist air."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Introduction to Psychrometry Science and Calculations",
+    "description": "Psychrometrics is the science of the physical and thermodynamic properties of moist air. For restoration professionals, it provides the analytical framework for every structural drying decision — from equipment selection and placement to monitoring drying progress and determining when drying is complete.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "29",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    }
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "slug": "moisture-meter-course",
+  "seoTitle": "Moisture Meter Course | CARSI",
+  "metaDescription": "Moisture meters are the primary measurement instrument in structural drying.",
+  "imageAlt": "CARSI course: Moisture Meter Course",
+  "og": {
+    "title": "Moisture Meter Course | CARSI",
+    "description": "Moisture meters are the primary measurement instrument in structural drying."
+  },
+  "keywords": [
+    "moisture meter training course",
+    "moisture reading accuracy",
+    "structural drying measurements",
+    "moisture testing protocols",
+    "water damage documentation"
+  ],
+  "faq": [
+    {
+      "q": "What does the Moisture Meter course cover?",
+      "a": "This course covers the complete operational knowledge required to use moisture meters correctly in the field: how moisture content is measured, the reading process, accuracy assurance, reference scales, temperature effects, the relationship between moisture and wood warping, moisture testing protocols, prevention strategies, operational tips, accuracy factors, material-specific considerations, the types of meters available, maintenance requirements, and the common mistakes that produce unreliable results."
+    },
+    {
+      "q": "What is the focus of the Moisture Meter course?",
+      "a": "Moisture meters are the primary measurement instrument in structural drying."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Moisture Meter Course",
+    "description": "Moisture meters are the primary measurement instrument in structural drying. Every drying decision, every drying goal, every insurance documentation entry, and every clearance determination in water damage restoration depends on accurate moisture meter readings. This course covers the complete operational knowledge required to use moisture meters correctly in the field: how moisture content is measured, the reading process, accuracy assurance, reference scales, temperature effects, the relationship between moisture and wood warping, moisture testing protocols, prevention strategies, operational tips, accuracy factors, material-specific considerations, the types of meters available, maintenance requirements, and the common mistakes that produce unreliable results. All content is aligned with IICRC S500 drying standards and Australian insurance documentation requirements.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "39",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    }
+  }
+}

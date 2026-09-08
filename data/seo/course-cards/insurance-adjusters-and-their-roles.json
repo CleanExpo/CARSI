@@ -1,0 +1,45 @@
+{
+  "slug": "insurance-adjusters-and-their-roles",
+  "seoTitle": "Insurance Adjusters and Their Roles | CARSI",
+  "metaDescription": "Insurance Adjusters and Their Roles: This course explains who insurance adjusters are.",
+  "imageAlt": "CARSI course: Insurance Adjusters and Their Roles",
+  "og": {
+    "title": "Insurance Adjusters and Their Roles | CARSI",
+    "description": "Insurance Adjusters and Their Roles: This course explains who insurance adjusters are."
+  },
+  "keywords": [
+    "insurance adjuster restoration training",
+    "water damage claim documentation",
+    "restoration scope review",
+    "insurance claims communication",
+    "loss adjuster relationships"
+  ],
+  "faq": [
+    {
+      "q": "What does the Insurance Adjusters and Their Roles course cover?",
+      "a": "This course explains who insurance adjusters are, what their role is in the water damage restoration process, how restoration businesses interact with them professionally, and what documentation and communication practices support a productive working relationship."
+    },
+    {
+      "q": "What does the Insurance Adjusters and Their Roles course help learners understand?",
+      "a": "Understanding the adjuster's role and perspective allows restoration professionals to work more efficiently within the insurance process, reduce delays in claim authorisation, and build credibility with insurers as a preferred restoration provider.; INSURANCE ADJUSTERS — WHO THEY ARE AND WHAT THEY DO; An insurance adjuster (also known as a loss adjuster or claims assessor) is a professional engaged by an insurance company to investigate, assess, and determine the appropriate settlement for an insurance claim."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Insurance Adjusters and Their Roles",
+    "description": "This course explains who insurance adjusters are, what their role is in the water damage restoration process, how restoration businesses interact with them professionally, and what documentation and communication practices support a productive working relationship. Understanding the adjuster's role and perspective allows restoration professionals to work more efficiently within the insurance process, reduce delays in claim authorisation, and build credibility with insurers as a preferred restoration provider.; INSURANCE ADJUSTERS — WHO THEY ARE AND WHAT THEY DO; An insurance adjuster (also known as a loss adjuster or claims assessor) is a professional engaged by an insurance company to investigate, assess, and determine the appropriate settlement for an insurance claim. In water damage restoration, the adjuster's role is to: confirm that the event is covered by the policy, assess the scope and quantum of the loss, review and authorise the proposed restoration scope and cost, and manage the claim to settlement.; There are three primary types of adjusters relevant to restoration professionals. Staff adjusters are employed directly by the insurance company and manage claims as part of their regular employment. Independent adjusters are engaged by insurance companies on a contract basis to handle specific claims — often used for claims requiring specialist assessment or for surge capacity after major weather events. Public adjusters are engaged by the policyholder (your client) rather than the insurer, to advocate for the policyholder's interests in the claim. Understanding which type of adjuster you are dealing with clarifies their obligations and loyalties within the claims process.; HOW RESTORATION BUSINESSES INTERACT WITH ADJUSTERS; The first interaction with an adjuster on a water damage job is typically the scope review — the adjuster reviews your proposed restoration scope and cost estimate to determine whether it is reasonable and covered by the policy. A clearly written, well-documented scope with supporting moisture data, photographs, and IICRC-referenced methodology is far easier for an adjuster to approve than a poorly documented scope with vague descriptions and no supporting data.; Common reasons adjusters request revisions or additional information: scope items without adequate justification (why is this area included in the drying scope?), quantities without supporting measurements, product costs without line-item detail, labour rates without reference to the applicable award or schedule, and completion claims without documentation of dry standard achievement.; DOCUMENTATION PRACTICES THAT SUPPORT ADJUSTER RELATIONSHIPS; The restoration professional's documentation is the adjuster's primary evidence base for approving the claim. Comprehensive, accurate documentation — consistent with IICRC S500 methodology and Australian insurance documentation standards — reduces revision requests, speeds claim approval, and builds the adjuster's confidence in the restoration business as a reliable provider.; Specific documentation that adjusters require: initial inspection report with water category and class determination, moisture readings at initial assessment and at each monitoring visit, equipment deployment records (what equipment, deployed where, for how long), daily site attendance records, photographic evidence at each stage, and completion report with final moisture readings confirming dry standard achievement.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    }
+  }
+}
