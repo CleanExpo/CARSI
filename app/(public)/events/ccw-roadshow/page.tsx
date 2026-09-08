@@ -192,8 +192,12 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
               <div className="mt-8 grid gap-3 sm:grid-cols-3">
                 <div className={marketingStatCard}>
                   <CalendarDays className="mb-3 h-4 w-4 text-[#146fc2] dark:text-[#7ec5ff]" aria-hidden />
-                  <p className="text-sm font-semibold text-slate-900 dark:text-white/90">Jul-Aug 2026</p>
-                  <p className={`mt-1 ${marketingBodySm}`}>Melbourne 22-23 Jul, Sydney 30-31 Jul, Brisbane 11-12 Aug</p>
+                  <p className="text-sm font-semibold text-slate-900 dark:text-white/90">2026 dates</p>
+                  {/* Derived, not restated. This line previously hardcoded "Brisbane 11-12 Aug"
+                      and stayed a month stale after the data module moved. */}
+                  <p className={`mt-1 ${marketingBodySm}`}>
+                    {ccwRoadshowEvents.map((event) => `${event.city} ${event.dates}`).join(', ')}
+                  </p>
                 </div>
                 <div className={marketingStatCard}>
                   <Users className="mb-3 h-4 w-4 text-[#ed9d24]/80" aria-hidden />
