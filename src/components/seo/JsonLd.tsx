@@ -160,6 +160,8 @@ interface CourseSchemaProps {
   educationalLevel?: string;
   teaches?: string[];
   aggregateRating?: { ratingValue: number; reviewCount: number };
+  /** Source-grounded descriptive fields from the SEO card. Identity, URL and commerce stay live. */
+  authoredCourseJsonLd?: Record<string, unknown>;
   /**
    * The CARSI designation this course awards, e.g. "CARSI Water Restoration Practitioner".
    * Omitted for courses with no registry entry — absent rather than guessed.
@@ -229,12 +231,19 @@ export function CourseSchema({
   teaches,
   aggregateRating,
   credentialAwarded,
+  authoredCourseJsonLd,
 }: CourseSchemaProps) {
+  const authoredDescription = authoredCourseJsonLd?.description;
+  const authoredLanguage = authoredCourseJsonLd?.inLanguage;
+  const authoredPrerequisites = authoredCourseJsonLd?.coursePrerequisites;
   const schema: Record<string, unknown> = {
     '@context': 'https://schema.org',
     '@type': 'Course',
     name,
-    description,
+    description:
+      typeof authoredDescription === 'string' && authoredDescription.trim()
+        ? authoredDescription
+        : description,
     provider: {
       '@type': 'EducationalOrganization',
       '@id': 'https://carsi.com.au/#organization',
@@ -242,9 +251,16 @@ export function CourseSchema({
       url: 'https://carsi.com.au',
     },
     url,
-    inLanguage: 'en-AU',
+    inLanguage:
+      typeof authoredLanguage === 'string' && authoredLanguage.trim()
+        ? authoredLanguage
+        : 'en-AU',
     hasCourseInstance: selfPacedCourseInstance(name, url, duration),
   };
+
+  if (typeof authoredPrerequisites === 'string' && authoredPrerequisites.trim()) {
+    schema.coursePrerequisites = authoredPrerequisites;
+  }
 
   const offer = courseOffer(url, price);
   if (offer) schema.offers = offer;
