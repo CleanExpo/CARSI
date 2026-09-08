@@ -17,14 +17,14 @@
   "faq": [
     {
       "q": "What does the Tile Cleaning for Carpet Cleaners course cover?",
-      "a": "Understand the importance of tile cleaning in addition to carpet cleaning.; Learn the different types of tiles and their specific cleaning needs.; Master the chemistry behind cleaning solutions.; Develop skills for sealing tiles and grout.; Explore maintenance practices and strategies for upselling services."
+      "a": "Understand the importance of tile cleaning in addition to carpet cleaning.\n\nLearn the different types of tiles and their specific cleaning needs.\n\nMaster the chemistry behind cleaning solutions.\n\nDevelop skills for sealing tiles and grout.\n\nExplore maintenance practices and strategies for upselling services."
     }
   ],
   "courseJsonLd": {
     "@context": "https://schema.org",
     "@type": "Course",
     "name": "Tile Cleaning for Carpet Cleaners",
-    "description": "Understand the importance of tile cleaning in addition to carpet cleaning.; Learn the different types of tiles and their specific cleaning needs.; Master the chemistry behind cleaning solutions.; Develop skills for sealing tiles and grout.; Explore maintenance practices and strategies for upselling services.",
+    "description": "Understand the importance of tile cleaning in addition to carpet cleaning.\n\nLearn the different types of tiles and their specific cleaning needs.\n\nMaster the chemistry behind cleaning solutions.\n\nDevelop skills for sealing tiles and grout.\n\nExplore maintenance practices and strategies for upselling services.",
     "provider": {
       "@type": "Organization",
       "name": "CARSI",

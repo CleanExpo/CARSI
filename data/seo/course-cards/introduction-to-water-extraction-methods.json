@@ -17,7 +17,7 @@
   "faq": [
     {
       "q": "What does the Introduction to Water Extraction Methods course cover?",
-      "a": "This course covers the operational fundamentals of professional water extraction: why it matters, how to do it safely, what equipment to use, how to apply the right technique for the material type, and how to manage waste correctly.; Topics covered: the purpose and urgency of extraction, site safety assessment before extraction begins, extraction equipment selection, extraction techniques for different material types, and compliant waste disposal.; Standards applied: IICRC S500, Safe Work Australia Model WHS Regulations, state EPA waste disposal requirements."
+      "a": "This course covers the operational fundamentals of professional water extraction: why it matters, how to do it safely, what equipment to use, how to apply the right technique for the material type, and how to manage waste correctly.\n\nTopics covered: the purpose and urgency of extraction, site safety assessment before extraction begins, extraction equipment selection, extraction techniques for different material types, and compliant waste disposal.\n\nStandards applied: IICRC S500, Safe Work Australia Model WHS Regulations, state EPA waste disposal requirements."
     },
     {
       "q": "What is the focus of the Introduction to Water Extraction Methods course?",
@@ -28,7 +28,7 @@
     "@context": "https://schema.org",
     "@type": "Course",
     "name": "Introduction to Water Extraction Methods",
-    "description": "Water extraction is the most time-critical task in any water damage response. Every minute standing water remains in contact with porous building materials increases absorption depth, extends the drying timeline, and increases secondary damage costs. This course covers the operational fundamentals of professional water extraction: why it matters, how to do it safely, what equipment to use, how to apply the right technique for the material type, and how to manage waste correctly.; Topics covered: the purpose and urgency of extraction, site safety assessment before extraction begins, extraction equipment selection, extraction techniques for different material types, and compliant waste disposal.; Standards applied: IICRC S500, Safe Work Australia Model WHS Regulations, state EPA waste disposal requirements.",
+    "description": "Water extraction is the most time-critical task in any water damage response. Every minute standing water remains in contact with porous building materials increases absorption depth, extends the drying timeline, and increases secondary damage costs. This course covers the operational fundamentals of professional water extraction: why it matters, how to do it safely, what equipment to use, how to apply the right technique for the material type, and how to manage waste correctly.\n\nTopics covered: the purpose and urgency of extraction, site safety assessment before extraction begins, extraction equipment selection, extraction techniques for different material types, and compliant waste disposal.\n\nStandards applied: IICRC S500, Safe Work Australia Model WHS Regulations, state EPA waste disposal requirements.",
     "provider": {
       "@type": "Organization",
       "name": "CARSI",

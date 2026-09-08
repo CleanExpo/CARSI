@@ -2051,14 +2051,14 @@
    },
    {
     "q": "What does the Insurance Adjusters and Their Roles course help learners understand?",
-    "a": "Understanding the adjuster's role and perspective allows restoration professionals to work more efficiently within the insurance process, reduce delays in claim authorisation, and build credibility with insurers as a preferred restoration provider.; INSURANCE ADJUSTERS — WHO THEY ARE AND WHAT THEY DO; An insurance adjuster (also known as a loss adjuster or claims assessor) is a professional engaged by an insurance company to investigate, assess, and determine the appropriate settlement for an insurance claim."
+    "a": "Understanding the adjuster's role and perspective allows restoration professionals to work more efficiently within the insurance process, reduce delays in claim authorisation, and build credibility with insurers as a preferred restoration provider. An insurance adjuster (also known as a loss adjuster or claims assessor) is a professional engaged by an insurance company to investigate, assess, and determine the appropriate settlement for an insurance claim."
    }
   ],
   "courseJsonLd": {
    "@context": "https://schema.org",
    "@type": "Course",
    "name": "Insurance Adjusters and Their Roles",
-   "description": "This course explains who insurance adjusters are, what their role is in the water damage restoration process, how restoration businesses interact with them professionally, and what documentation and communication practices support a productive working relationship. Understanding the adjuster's role and perspective allows restoration professionals to work more efficiently within the insurance process, reduce delays in claim authorisation, and build credibility with insurers as a preferred restoration provider.; INSURANCE ADJUSTERS — WHO THEY ARE AND WHAT THEY DO; An insurance adjuster (also known as a loss adjuster or claims assessor) is a professional engaged by an insurance company to investigate, assess, and determine the appropriate settlement for an insurance claim. In water damage restoration, the adjuster's role is to: confirm that the event is covered by the policy, assess the scope and quantum of the loss, review and authorise the proposed restoration scope and cost, and manage the claim to settlement.; There are three primary types of adjusters relevant to restoration professionals. Staff adjusters are employed directly by the insurance company and manage claims as part of their regular employment. Independent adjusters are engaged by insurance companies on a contract basis to handle specific claims — often used for claims requiring specialist assessment or for surge capacity after major weather events. Public adjusters are engaged by the policyholder (your client) rather than the insurer, to advocate for the policyholder's interests in the claim. Understanding which type of adjuster you are dealing with clarifies their obligations and loyalties within the claims process.; HOW RESTORATION BUSINESSES INTERACT WITH ADJUSTERS; The first interaction with an adjuster on a water damage job is typically the scope review — the adjuster reviews your proposed restoration scope and cost estimate to determine whether it is reasonable and covered by the policy. A clearly written, well-documented scope with supporting moisture data, photographs, and IICRC-referenced methodology is far easier for an adjuster to approve than a poorly documented scope with vague descriptions and no supporting data.; Common reasons adjusters request revisions or additional information: scope items without adequate justification (why is this area included in the drying scope?), quantities without supporting measurements, product costs without line-item detail, labour rates without reference to the applicable award or schedule, and completion claims without documentation of dry standard achievement.; DOCUMENTATION PRACTICES THAT SUPPORT ADJUSTER RELATIONSHIPS; The restoration professional's documentation is the adjuster's primary evidence base for approving the claim. Comprehensive, accurate documentation — consistent with IICRC S500 methodology and Australian insurance documentation standards — reduces revision requests, speeds claim approval, and builds the adjuster's confidence in the restoration business as a reliable provider.; Specific documentation that adjusters require: initial inspection report with water category and class determination, moisture readings at initial assessment and at each monitoring visit, equipment deployment records (what equipment, deployed where, for how long), daily site attendance records, photographic evidence at each stage, and completion report with final moisture readings confirming dry standard achievement.",
+   "description": "This course explains who insurance adjusters are, what their role is in the water damage restoration process, how restoration businesses interact with them professionally, and what documentation and communication practices support a productive working relationship. Understanding the adjuster's role and perspective allows restoration professionals to work more efficiently within the insurance process, reduce delays in claim authorisation, and build credibility with insurers as a preferred restoration provider.\n\nAn insurance adjuster (also known as a loss adjuster or claims assessor) is a professional engaged by an insurance company to investigate, assess, and determine the appropriate settlement for an insurance claim. In water damage restoration, the adjuster's role is to: confirm that the event is covered by the policy, assess the scope and quantum of the loss, review and authorise the proposed restoration scope and cost, and manage the claim to settlement.\n\nThere are three primary types of adjusters relevant to restoration professionals. Staff adjusters are employed directly by the insurance company and manage claims as part of their regular employment. Independent adjusters are engaged by insurance companies on a contract basis to handle specific claims — often used for claims requiring specialist assessment or for surge capacity after major weather events. Public adjusters are engaged by the policyholder (your client) rather than the insurer, to advocate for the policyholder's interests in the claim. Understanding which type of adjuster you are dealing with clarifies their obligations and loyalties within the claims process.\n\nThe first interaction with an adjuster on a water damage job is typically the scope review — the adjuster reviews your proposed restoration scope and cost estimate to determine whether it is reasonable and covered by the policy. A clearly written, well-documented scope with supporting moisture data, photographs, and IICRC-referenced methodology is far easier for an adjuster to approve than a poorly documented scope with vague descriptions and no supporting data.\n\nCommon reasons adjusters request revisions or additional information: scope items without adequate justification (why is this area included in the drying scope?), quantities without supporting measurements, product costs without line-item detail, labour rates without reference to the applicable award or schedule, and completion claims without documentation of dry standard achievement.\n\nThe restoration professional's documentation is the adjuster's primary evidence base for approving the claim. Comprehensive, accurate documentation — consistent with IICRC S500 methodology and Australian insurance documentation standards — reduces revision requests, speeds claim approval, and builds the adjuster's confidence in the restoration business as a reliable provider.\n\nSpecific documentation that adjusters require: initial inspection report with water category and class determination, moisture readings at initial assessment and at each monitoring visit, equipment deployment records (what equipment, deployed where, for how long), daily site attendance records, photographic evidence at each stage, and completion report with final moisture readings confirming dry standard achievement.",
    "provider": {
     "@type": "Organization",
     "name": "CARSI",
@@ -2320,7 +2320,7 @@
    "@context": "https://schema.org",
    "@type": "Course",
    "name": "Introduction to Asbestos: Asbestos Awareness",
-   "description": "This course provides cleaning and restoration professionals with the essential asbestos awareness knowledge required to work safely in the Australian built environment. Asbestos-containing materials (ACMs) are present in a significant proportion of Australian buildings constructed before 1990, and encountering them unexpectedly is a real occupational risk. This course does not qualify you to remove asbestos — it equips you to identify, avoid, report, and respond correctly when asbestos is encountered during routine work.; Topics covered: the history and widespread use of asbestos in Australia, the health dangers and mechanisms of disease, types of asbestos-containing materials you may encounter on site, correct handling and avoidance protocols, what to do when ACMs are damaged or disturbed, documentation and reporting obligations, training and certification requirements, and the legal and regulatory framework.",
+   "description": "This course provides cleaning and restoration professionals with the essential asbestos awareness knowledge required to work safely in the Australian built environment. Asbestos-containing materials (ACMs) are present in a significant proportion of Australian buildings constructed before 1990, and encountering them unexpectedly is a real occupational risk. This course does not qualify you to remove asbestos — it equips you to identify, avoid, report, and respond correctly when asbestos is encountered during routine work.\n\nTopics covered: the history and widespread use of asbestos in Australia, the health dangers and mechanisms of disease, types of asbestos-containing materials you may encounter on site, correct handling and avoidance protocols, what to do when ACMs are damaged or disturbed, documentation and reporting obligations, training and certification requirements, and the legal and regulatory framework.",
    "provider": {
     "@type": "Organization",
     "name": "CARSI",
@@ -2347,7 +2347,6 @@
   "keywords": [
    "Introduction to Basic Carpet Cleaning and Drying",
    "introduction basic carpet cleaning and drying",
-   "CARSI course",
    "introduction basic training",
    "cleaning drying course"
   ],
@@ -2358,14 +2357,14 @@
    },
    {
     "q": "What does the Introduction to Basic Carpet Cleaning and Drying course help learners understand?",
-    "a": "This course is designed specifically for technicians entering the carpet cleaning and restoration industry in Australia, and for those already working in the field who wish to consolidate and formalise their practical knowledge.; Carpet cleaning is far more than running a machine across a floor."
+    "a": "This course is designed specifically for technicians entering the carpet cleaning and restoration industry in Australia, and for those already working in the field who wish to consolidate and formalise their practical knowledge. Carpet cleaning is far more than running a machine across a floor."
    }
   ],
   "courseJsonLd": {
    "@context": "https://schema.org",
    "@type": "Course",
    "name": "Introduction to Basic Carpet Cleaning and Drying",
-   "description": "Welcome to Introduction to Basic Carpet Cleaning and Drying, a foundational course developed by CARSI — the Centre for Applied Restoration and Specialist Industries. This course is designed specifically for technicians entering the carpet cleaning and restoration industry in Australia, and for those already working in the field who wish to consolidate and formalise their practical knowledge.; Carpet cleaning is far more than running a machine across a floor. It is a technical discipline that requires a thorough understanding of how carpets are constructed, how different fibre types respond to moisture and chemical treatments, how water damage affects floor coverings at a structural level, what equipment is appropriate for each job, and how to dry carpets effectively and safely once cleaning is complete. It also incorporates guidance from Safe Work Australia, relevant Australian Standards, and accepted best practice across the restoration industry in Australia.; Who This Course Is For; This course suits a wide range of learners, including:; • New technicians entering the carpet cleaning or restoration industry; • Sole traders and small business owners looking to formalise their skills; • Water damage restoration technicians who work with wet or damaged carpet; • Cleaning staff working in commercial, residential, or institutional environments; • Business owners seeking to ensure their team operates to a professional standard; What You Will Learn; Across five modules, this course takes you through the complete carpet cleaning and drying process from first principles. By the time you complete this course, you will have a solid working knowledge of:; • How carpets are constructed and why construction type matters for cleaning; • The effects of water damage on carpet, underlay, and subfloor; • The equipment used in professional carpet cleaning and how to use it correctly; • Cleaning products, their chemistry, and how to select and apply them safely; • Drying techniques and how to achieve effective, efficient drying outcomes",
+   "description": "Welcome to Introduction to Basic Carpet Cleaning and Drying, a foundational course developed by CARSI — the Centre for Applied Restoration and Specialist Industries. This course is designed specifically for technicians entering the carpet cleaning and restoration industry in Australia, and for those already working in the field who wish to consolidate and formalise their practical knowledge.\n\nCarpet cleaning is far more than running a machine across a floor. It is a technical discipline that requires a thorough understanding of how carpets are constructed, how different fibre types respond to moisture and chemical treatments, how water damage affects floor coverings at a structural level, what equipment is appropriate for each job, and how to dry carpets effectively and safely once cleaning is complete. It also incorporates guidance from Safe Work Australia, relevant Australian Standards, and accepted best practice across the restoration industry in Australia.\n\nThis course suits a wide range of learners, including:\n• New technicians entering the carpet cleaning or restoration industry\n• Sole traders and small business owners looking to formalise their skills\n• Water damage restoration technicians who work with wet or damaged carpet\n• Cleaning staff working in commercial, residential, or institutional environments\n• Business owners seeking to ensure their team operates to a professional standard\n\nAcross five modules, this course takes you through the complete carpet cleaning and drying process from first principles. By the time you complete this course, you will have a solid working knowledge of:\n• How carpets are constructed and why construction type matters for cleaning\n• The effects of water damage on carpet, underlay, and subfloor\n• The equipment used in professional carpet cleaning and how to use it correctly\n• Cleaning products, their chemistry, and how to select and apply them safely\n• Drying techniques and how to achieve effective, efficient drying outcomes",
    "provider": {
     "@type": "Organization",
     "name": "CARSI",
@@ -2433,7 +2432,6 @@
   "keywords": [
    "Introduction to Controlled Environment Drying Methods",
    "introduction controlled environment drying methods",
-   "CARSI course",
    "introduction controlled training",
    "drying methods course"
   ],
@@ -2474,7 +2472,6 @@
   "keywords": [
    "Introduction to Creating a Clean Air Environment",
    "introduction creating clean air environment",
-   "CARSI course",
    "introduction creating training",
    "air environment course"
   ],
@@ -2515,7 +2512,6 @@
   "keywords": [
    "Introduction to Digital Moisture Mapping",
    "introduction digital moisture mapping",
-   "CARSI course",
    "introduction digital training",
    "moisture mapping course"
   ],
@@ -2567,7 +2563,7 @@
   "faq": [
    {
     "q": "What does the Introduction to Forensic Investigations for Water Losses course cover?",
-    "a": "This course equips restoration professionals with a systematic forensic methodology, evidence-gathering techniques, failure analysis skills, the ability to present findings professionally, and an understanding of how to establish the financial cost of a loss.; Topics covered: the circumstances that trigger forensic investigations, forensic investigation methods, failure analysis of building systems and materials, presenting findings to insurers and legal representatives, and establishing the total cost of loss.; Standards applied: IICRC S500, relevant Australian Standard AS 4349 series (inspection of buildings), state civil procedure rules for expert evidence."
+    "a": "This course equips restoration professionals with a systematic forensic methodology, evidence-gathering techniques, failure analysis skills, the ability to present findings professionally, and an understanding of how to establish the financial cost of a loss.\n\nTopics covered: the circumstances that trigger forensic investigations, forensic investigation methods, failure analysis of building systems and materials, presenting findings to insurers and legal representatives, and establishing the total cost of loss.\n\nStandards applied: IICRC S500, relevant Australian Standard AS 4349 series (inspection of buildings), state civil procedure rules for expert evidence."
    },
    {
     "q": "What is the focus of the Introduction to Forensic Investigations for Water Losses course?",
@@ -2578,7 +2574,7 @@
    "@context": "https://schema.org",
    "@type": "Course",
    "name": "Introduction to Forensic Investigations for Water Losses",
-   "description": "Forensic water damage investigations are conducted to answer specific factual questions about a water loss: what caused it, when it started, how far it spread, and whether the remediation was adequate. This course equips restoration professionals with a systematic forensic methodology, evidence-gathering techniques, failure analysis skills, the ability to present findings professionally, and an understanding of how to establish the financial cost of a loss.; Topics covered: the circumstances that trigger forensic investigations, forensic investigation methods, failure analysis of building systems and materials, presenting findings to insurers and legal representatives, and establishing the total cost of loss.; Standards applied: IICRC S500, relevant Australian Standard AS 4349 series (inspection of buildings), state civil procedure rules for expert evidence.",
+   "description": "Forensic water damage investigations are conducted to answer specific factual questions about a water loss: what caused it, when it started, how far it spread, and whether the remediation was adequate. This course equips restoration professionals with a systematic forensic methodology, evidence-gathering techniques, failure analysis skills, the ability to present findings professionally, and an understanding of how to establish the financial cost of a loss.\n\nTopics covered: the circumstances that trigger forensic investigations, forensic investigation methods, failure analysis of building systems and materials, presenting findings to insurers and legal representatives, and establishing the total cost of loss.\n\nStandards applied: IICRC S500, relevant Australian Standard AS 4349 series (inspection of buildings), state civil procedure rules for expert evidence.",
    "provider": {
     "@type": "Organization",
     "name": "CARSI",
@@ -2605,7 +2601,6 @@
   "keywords": [
    "Introduction to IAQ and Mould",
    "introduction iaq and mould",
-   "CARSI course",
    "introduction iaq training",
    "iaq mould course"
   ],
@@ -2650,7 +2645,6 @@
   "keywords": [
    "Introduction to Monitoring Air Quality on the Job Site",
    "introduction monitoring air quality the job site",
-   "CARSI course",
    "introduction monitoring training",
    "job site course"
   ],
@@ -2691,7 +2685,6 @@
   "keywords": [
    "Introduction to Odour Control and Removal Techniques",
    "introduction odour control and removal techniques",
-   "CARSI course",
    "introduction odour training",
    "removal techniques course"
   ],
@@ -2739,7 +2732,7 @@
   "faq": [
    {
     "q": "What does the Introduction to Project Management for Water Losses course cover?",
-    "a": "Project management in water damage restoration is the application of structured processes — not bureaucracy — to ensure that the right things happen in the right order, by the right people, on time.; Topics covered: initial response procedures that set the job up for success, project planning for water damage restoration, execution management and daily monitoring, professional project closeout, and risk management throughout the project lifecycle.; Standards applied: IICRC S500, Safe Work Australia Model WHS Act, Australian insurance claims management requirements."
+    "a": "Project management in water damage restoration is the application of structured processes — not bureaucracy — to ensure that the right things happen in the right order, by the right people, on time.\n\nTopics covered: initial response procedures that set the job up for success, project planning for water damage restoration, execution management and daily monitoring, professional project closeout, and risk management throughout the project lifecycle.\n\nStandards applied: IICRC S500, Safe Work Australia Model WHS Act, Australian insurance claims management requirements."
    },
    {
     "q": "What is the focus of the Introduction to Project Management for Water Losses course?",
@@ -2750,7 +2743,7 @@
    "@context": "https://schema.org",
    "@type": "Course",
    "name": "Introduction to Project Management for Water Losses",
-   "description": "A water damage project that is managed well produces an accurate scope, efficient execution, minimal callbacks, satisfied clients and insurers, and a profitable job. A project that is managed poorly produces the opposite of all of these. Project management in water damage restoration is the application of structured processes — not bureaucracy — to ensure that the right things happen in the right order, by the right people, on time.; Topics covered: initial response procedures that set the job up for success, project planning for water damage restoration, execution management and daily monitoring, professional project closeout, and risk management throughout the project lifecycle.; Standards applied: IICRC S500, Safe Work Australia Model WHS Act, Australian insurance claims management requirements.",
+   "description": "A water damage project that is managed well produces an accurate scope, efficient execution, minimal callbacks, satisfied clients and insurers, and a profitable job. A project that is managed poorly produces the opposite of all of these. Project management in water damage restoration is the application of structured processes — not bureaucracy — to ensure that the right things happen in the right order, by the right people, on time.\n\nTopics covered: initial response procedures that set the job up for success, project planning for water damage restoration, execution management and daily monitoring, professional project closeout, and risk management throughout the project lifecycle.\n\nStandards applied: IICRC S500, Safe Work Australia Model WHS Act, Australian insurance claims management requirements.",
    "provider": {
     "@type": "Organization",
     "name": "CARSI",
@@ -2777,7 +2770,6 @@
   "keywords": [
    "Introduction to Psychrometry Science and Calculations",
    "introduction psychrometry science and calculations",
-   "CARSI course",
    "introduction psychrometry training",
    "science calculations course"
   ],
@@ -2822,7 +2814,6 @@
   "keywords": [
    "Introduction to Safety Procedures for Water Damage Work",
    "introduction safety procedures for water damage work",
-   "CARSI course",
    "introduction safety training",
    "damage work course"
   ],
@@ -2867,7 +2858,6 @@
   "keywords": [
    "Introduction to Smoke and Soot Damage Restoration",
    "introduction smoke and soot damage restoration",
-   "CARSI course",
    "introduction smoke training",
    "damage restoration course"
   ],
@@ -2908,7 +2898,6 @@
   "keywords": [
    "Introduction to Structural Drying Concepts",
    "introduction structural drying concepts",
-   "CARSI course",
    "introduction structural training",
    "drying concepts course"
   ],
@@ -2953,7 +2942,6 @@
   "keywords": [
    "Introduction to Using Personal Protective Equipment",
    "introduction using personal protective equipment",
-   "CARSI course",
    "introduction using training",
    "protective equipment course"
   ],
@@ -2964,14 +2952,14 @@
    },
    {
     "q": "What does the Introduction to Using Personal Protective Equipment course help learners understand?",
-    "a": "PPE is the last line of defence in the hierarchy of controls — understanding its correct use is a WHS obligation, not just a best practice.; Topics covered: respiratory protection selection, fit-checking, and correct use; eye and face protection types and applications; head protection in restoration environments; hearing protection selection and correct fitting; and body protection including gloves, coveralls, and chemical-resistant clothing."
+    "a": "PPE is the last line of defence in the hierarchy of controls — understanding its correct use is a WHS obligation, not just a best practice.\n\nTopics covered: respiratory protection selection, fit-checking, and correct use; eye and face protection types and applications; head protection in restoration environments; hearing protection selection and correct fitting; and body protection including gloves, coveralls, and chemical-resistant clothing."
    }
   ],
   "courseJsonLd": {
    "@context": "https://schema.org",
    "@type": "Course",
    "name": "Introduction to Using Personal Protective Equipment",
-   "description": "This course provides cleaning and restoration professionals with practical working knowledge of the personal protective equipment (PPE) used in their daily roles. You will learn to select the right PPE for specific hazards, wear it correctly, maintain it in serviceable condition, and understand its limitations. PPE is the last line of defence in the hierarchy of controls — understanding its correct use is a WHS obligation, not just a best practice.; Topics covered: respiratory protection selection, fit-checking, and correct use; eye and face protection types and applications; head protection in restoration environments; hearing protection selection and correct fitting; and body protection including gloves, coveralls, and chemical-resistant clothing.",
+   "description": "This course provides cleaning and restoration professionals with practical working knowledge of the personal protective equipment (PPE) used in their daily roles. You will learn to select the right PPE for specific hazards, wear it correctly, maintain it in serviceable condition, and understand its limitations. PPE is the last line of defence in the hierarchy of controls — understanding its correct use is a WHS obligation, not just a best practice.\n\nTopics covered: respiratory protection selection, fit-checking, and correct use; eye and face protection types and applications; head protection in restoration environments; hearing protection selection and correct fitting; and body protection including gloves, coveralls, and chemical-resistant clothing.",
    "provider": {
     "@type": "Organization",
     "name": "CARSI",
@@ -3005,7 +2993,7 @@
   "faq": [
    {
     "q": "What does the Introduction to Water Damage Estimating course cover?",
-    "a": "This course builds the estimation skills that translate inspection findings into accurate scopes and fair, defensible pricing.; Topics covered: systematic site assessment as the foundation of estimation, scope development methodology, material and labour quantification, insurance estimating requirements and platforms, and bid analysis for commercial and competitive tender situations.; Standards applied: IICRC S500, Australian insurance industry estimating standards, relevant state contractor licensing requirements."
+    "a": "This course builds the estimation skills that translate inspection findings into accurate scopes and fair, defensible pricing.\n\nTopics covered: systematic site assessment as the foundation of estimation, scope development methodology, material and labour quantification, insurance estimating requirements and platforms, and bid analysis for commercial and competitive tender situations.\n\nStandards applied: IICRC S500, Australian insurance industry estimating standards, relevant state contractor licensing requirements."
    },
    {
     "q": "What is the focus of the Introduction to Water Damage Estimating course?",
@@ -3016,7 +3004,7 @@
    "@context": "https://schema.org",
    "@type": "Course",
    "name": "Introduction to Water Damage Estimating",
-   "description": "An accurate, defensible estimate is the foundation of a profitable water damage job. Estimating errors — missed items, incorrect quantities, wrong unit rates — produce jobs that lose money, create disputes with insurers, or overcharge clients. This course builds the estimation skills that translate inspection findings into accurate scopes and fair, defensible pricing.; Topics covered: systematic site assessment as the foundation of estimation, scope development methodology, material and labour quantification, insurance estimating requirements and platforms, and bid analysis for commercial and competitive tender situations.; Standards applied: IICRC S500, Australian insurance industry estimating standards, relevant state contractor licensing requirements.",
+   "description": "An accurate, defensible estimate is the foundation of a profitable water damage job. Estimating errors — missed items, incorrect quantities, wrong unit rates — produce jobs that lose money, create disputes with insurers, or overcharge clients. This course builds the estimation skills that translate inspection findings into accurate scopes and fair, defensible pricing.\n\nTopics covered: systematic site assessment as the foundation of estimation, scope development methodology, material and labour quantification, insurance estimating requirements and platforms, and bid analysis for commercial and competitive tender situations.\n\nStandards applied: IICRC S500, Australian insurance industry estimating standards, relevant state contractor licensing requirements.",
    "provider": {
     "@type": "Organization",
     "name": "CARSI",
@@ -3050,7 +3038,7 @@
   "faq": [
    {
     "q": "What does the Introduction to Water Damage in Commercial Buildings course cover?",
-    "a": "A restoration professional who understands the specific characteristics of commercial water damage is better equipped to assess, scope, and manage these high-value, high-complexity jobs to a successful outcome.; Topics covered: common causes of water damage in commercial buildings, major building system vulnerabilities, the business and financial impacts of commercial water losses, drying strategy considerations specific to commercial environments, and reconstruction and reinstatement factors.; Standards applied: IICRC S500, Building Code of Australia (BCA/NCC), Safe Work Australia Model WHS Regulations, relevant state commercial tenancy legislation."
+    "a": "A restoration professional who understands the specific characteristics of commercial water damage is better equipped to assess, scope, and manage these high-value, high-complexity jobs to a successful outcome.\n\nTopics covered: common causes of water damage in commercial buildings, major building system vulnerabilities, the business and financial impacts of commercial water losses, drying strategy considerations specific to commercial environments, and reconstruction and reinstatement factors.\n\nStandards applied: IICRC S500, Building Code of Australia (BCA/NCC), Safe Work Australia Model WHS Regulations, relevant state commercial tenancy legislation."
    },
    {
     "q": "What is the focus of the Introduction to Water Damage in Commercial Buildings course?",
@@ -3061,7 +3049,7 @@
    "@context": "https://schema.org",
    "@type": "Course",
    "name": "Introduction to Water Damage in Commercial Buildings",
-   "description": "Commercial water damage events differ from residential losses in scale, complexity, stakeholder management requirements, business interruption impact, and regulatory compliance obligations. A restoration professional who understands the specific characteristics of commercial water damage is better equipped to assess, scope, and manage these high-value, high-complexity jobs to a successful outcome.; Topics covered: common causes of water damage in commercial buildings, major building system vulnerabilities, the business and financial impacts of commercial water losses, drying strategy considerations specific to commercial environments, and reconstruction and reinstatement factors.; Standards applied: IICRC S500, Building Code of Australia (BCA/NCC), Safe Work Australia Model WHS Regulations, relevant state commercial tenancy legislation.",
+   "description": "Commercial water damage events differ from residential losses in scale, complexity, stakeholder management requirements, business interruption impact, and regulatory compliance obligations. A restoration professional who understands the specific characteristics of commercial water damage is better equipped to assess, scope, and manage these high-value, high-complexity jobs to a successful outcome.\n\nTopics covered: common causes of water damage in commercial buildings, major building system vulnerabilities, the business and financial impacts of commercial water losses, drying strategy considerations specific to commercial environments, and reconstruction and reinstatement factors.\n\nStandards applied: IICRC S500, Building Code of Australia (BCA/NCC), Safe Work Australia Model WHS Regulations, relevant state commercial tenancy legislation.",
    "provider": {
     "@type": "Organization",
     "name": "CARSI",
@@ -3136,7 +3124,7 @@
   "faq": [
    {
     "q": "What does the Introduction to Water Damage Principles course cover?",
-    "a": "Understanding the science behind moisture behaviour, psychrometrics, microbial risk, and damage assessment allows restoration professionals to make informed decisions on site rather than applying fixed procedures that may not suit the specific conditions of each job.; Topics covered: health and safety as the non-negotiable foundation of all restoration work, remediation principles and decision-making frameworks, applied psychrometrics for structural drying, microbial risk recognition and management, and systematic damage assessment.; Standards applied: IICRC S500, IICRC S520, Safe Work Australia Model WHS Regulations."
+    "a": "Understanding the science behind moisture behaviour, psychrometrics, microbial risk, and damage assessment allows restoration professionals to make informed decisions on site rather than applying fixed procedures that may not suit the specific conditions of each job.\n\nTopics covered: health and safety as the non-negotiable foundation of all restoration work, remediation principles and decision-making frameworks, applied psychrometrics for structural drying, microbial risk recognition and management, and systematic damage assessment.\n\nStandards applied: IICRC S500, IICRC S520, Safe Work Australia Model WHS Regulations."
    },
    {
     "q": "What does the Introduction to Water Damage Principles course help learners understand?",
@@ -3147,7 +3135,7 @@
    "@context": "https://schema.org",
    "@type": "Course",
    "name": "Introduction to Water Damage Principles",
-   "description": "This course establishes the foundational principles that underpin professional water damage restoration practice. Understanding the science behind moisture behaviour, psychrometrics, microbial risk, and damage assessment allows restoration professionals to make informed decisions on site rather than applying fixed procedures that may not suit the specific conditions of each job.; Topics covered: health and safety as the non-negotiable foundation of all restoration work, remediation principles and decision-making frameworks, applied psychrometrics for structural drying, microbial risk recognition and management, and systematic damage assessment.; Standards applied: IICRC S500, IICRC S520, Safe Work Australia Model WHS Regulations.",
+   "description": "This course establishes the foundational principles that underpin professional water damage restoration practice. Understanding the science behind moisture behaviour, psychrometrics, microbial risk, and damage assessment allows restoration professionals to make informed decisions on site rather than applying fixed procedures that may not suit the specific conditions of each job.\n\nTopics covered: health and safety as the non-negotiable foundation of all restoration work, remediation principles and decision-making frameworks, applied psychrometrics for structural drying, microbial risk recognition and management, and systematic damage assessment.\n\nStandards applied: IICRC S500, IICRC S520, Safe Work Australia Model WHS Regulations.",
    "provider": {
     "@type": "Organization",
     "name": "CARSI",
@@ -3185,14 +3173,14 @@
    },
    {
     "q": "What does the Introduction to Water Damage Restoration course help learners understand?",
-    "a": "It covers the end-to-end workflow from site safety through inspection, moisture control, extraction, and equipment setup — providing the operational framework on which all more advanced restoration knowledge is built.; Topics covered: health and safety obligations in water damage environments, systematic damage inspection procedures, moisture source identification and control, water extraction methods overview, and drying equipment selection and setup.; Standards applied: IICRC S500, Safe Work Australia Model WHS Act and Regulations."
+    "a": "It covers the end-to-end workflow from site safety through inspection, moisture control, extraction, and equipment setup — providing the operational framework on which all more advanced restoration knowledge is built.\n\nTopics covered: health and safety obligations in water damage environments, systematic damage inspection procedures, moisture source identification and control, water extraction methods overview, and drying equipment selection and setup.\n\nStandards applied: IICRC S500, Safe Work Australia Model WHS Act and Regulations."
    }
   ],
   "courseJsonLd": {
    "@context": "https://schema.org",
    "@type": "Course",
    "name": "Introduction to Water Damage Restoration",
-   "description": "This course provides a structured introduction to the complete water damage restoration process for practitioners entering the industry or seeking to formalise their understanding of the field. It covers the end-to-end workflow from site safety through inspection, moisture control, extraction, and equipment setup — providing the operational framework on which all more advanced restoration knowledge is built.; Topics covered: health and safety obligations in water damage environments, systematic damage inspection procedures, moisture source identification and control, water extraction methods overview, and drying equipment selection and setup.; Standards applied: IICRC S500, Safe Work Australia Model WHS Act and Regulations.",
+   "description": "This course provides a structured introduction to the complete water damage restoration process for practitioners entering the industry or seeking to formalise their understanding of the field. It covers the end-to-end workflow from site safety through inspection, moisture control, extraction, and equipment setup — providing the operational framework on which all more advanced restoration knowledge is built.\n\nTopics covered: health and safety obligations in water damage environments, systematic damage inspection procedures, moisture source identification and control, water extraction methods overview, and drying equipment selection and setup.\n\nStandards applied: IICRC S500, Safe Work Australia Model WHS Act and Regulations.",
    "provider": {
     "@type": "Organization",
     "name": "CARSI",
@@ -3226,7 +3214,7 @@
   "faq": [
    {
     "q": "What does the Introduction to Water Extraction Methods course cover?",
-    "a": "This course covers the operational fundamentals of professional water extraction: why it matters, how to do it safely, what equipment to use, how to apply the right technique for the material type, and how to manage waste correctly.; Topics covered: the purpose and urgency of extraction, site safety assessment before extraction begins, extraction equipment selection, extraction techniques for different material types, and compliant waste disposal.; Standards applied: IICRC S500, Safe Work Australia Model WHS Regulations, state EPA waste disposal requirements."
+    "a": "This course covers the operational fundamentals of professional water extraction: why it matters, how to do it safely, what equipment to use, how to apply the right technique for the material type, and how to manage waste correctly.\n\nTopics covered: the purpose and urgency of extraction, site safety assessment before extraction begins, extraction equipment selection, extraction techniques for different material types, and compliant waste disposal.\n\nStandards applied: IICRC S500, Safe Work Australia Model WHS Regulations, state EPA waste disposal requirements."
    },
    {
     "q": "What is the focus of the Introduction to Water Extraction Methods course?",
@@ -3237,7 +3225,7 @@
    "@context": "https://schema.org",
    "@type": "Course",
    "name": "Introduction to Water Extraction Methods",
-   "description": "Water extraction is the most time-critical task in any water damage response. Every minute standing water remains in contact with porous building materials increases absorption depth, extends the drying timeline, and increases secondary damage costs. This course covers the operational fundamentals of professional water extraction: why it matters, how to do it safely, what equipment to use, how to apply the right technique for the material type, and how to manage waste correctly.; Topics covered: the purpose and urgency of extraction, site safety assessment before extraction begins, extraction equipment selection, extraction techniques for different material types, and compliant waste disposal.; Standards applied: IICRC S500, Safe Work Australia Model WHS Regulations, state EPA waste disposal requirements.",
+   "description": "Water extraction is the most time-critical task in any water damage response. Every minute standing water remains in contact with porous building materials increases absorption depth, extends the drying timeline, and increases secondary damage costs. This course covers the operational fundamentals of professional water extraction: why it matters, how to do it safely, what equipment to use, how to apply the right technique for the material type, and how to manage waste correctly.\n\nTopics covered: the purpose and urgency of extraction, site safety assessment before extraction begins, extraction equipment selection, extraction techniques for different material types, and compliant waste disposal.\n\nStandards applied: IICRC S500, Safe Work Australia Model WHS Regulations, state EPA waste disposal requirements.",
    "provider": {
     "@type": "Organization",
     "name": "CARSI",
@@ -3264,7 +3252,6 @@
   "keywords": [
    "Job Safety and Environmental Analysis (JSEA) Course",
    "job safety and environmental analysis jsea",
-   "CARSI course",
    "job safety training",
    "analysis jsea course"
   ],
@@ -3309,14 +3296,13 @@
   "keywords": [
    "Large Loss Mastery Course",
    "large loss mastery",
-   "CARSI course",
    "large loss training",
    "loss mastery course"
   ],
   "faq": [
    {
     "q": "What does the Large Loss Mastery course cover?",
-    "a": "This course covers the complete framework for successfully delivering large loss projects and building a business capable of competing in this high-value segment.; Large loss restoration in Australia is a commercially significant market segment."
+    "a": "This course covers the complete framework for successfully delivering large loss projects and building a business capable of competing in this high-value segment.\n\nLarge loss restoration in Australia is a commercially significant market segment."
    },
    {
     "q": "What does the Large Loss Mastery course help learners understand?",
@@ -3327,7 +3313,7 @@
    "@context": "https://schema.org",
    "@type": "Course",
    "name": "Large Loss Mastery Course",
-   "description": "The Large Loss Mastery Course is the most advanced operational and business course in the CARSI curriculum. It is designed for experienced restoration professionals who are moving into large loss project management or who are seeking to grow their business into the large loss segment of the Australian restoration market. A large loss event — a water damage event affecting a commercial building, multi-storey complex, or major industrial facility — requires a fundamentally different set of skills, systems, and resources to standard residential restoration. This course covers the complete framework for successfully delivering large loss projects and building a business capable of competing in this high-value segment.; Large loss restoration in Australia is a commercially significant market segment. Commercial and strata water damage events, post-storm recovery projects, and industrial loss events regularly generate project values from $100,000 to several million dollars. Business operators who have the systems, certification, documentation capability, and equipment relationships to credibly respond to large loss events operate in a substantially higher-value market than those limited to residential losses.; The course covers: project management structure for large loss events, equipment logistics and specialist subcontractor management, insurer and loss adjuster relationship management for complex claims, documentation systems for multi-week and multi-area projects, business development strategies for accessing commercial and institutional large loss work, risk management and liability considerations for large scale restoration projects, and the financial management considerations specific to large loss projects including cash flow during extended projects and milestone invoicing.; This course is delivered in combination with advanced technical content covering desiccant drying systems, large building structural drying, industrial and commercial facility-specific drying considerations, and multi-trade coordination on complex restoration projects.",
+   "description": "The Large Loss Mastery Course is the most advanced operational and business course in the CARSI curriculum. It is designed for experienced restoration professionals who are moving into large loss project management or who are seeking to grow their business into the large loss segment of the Australian restoration market. A large loss event — a water damage event affecting a commercial building, multi-storey complex, or major industrial facility — requires a fundamentally different set of skills, systems, and resources to standard residential restoration. This course covers the complete framework for successfully delivering large loss projects and building a business capable of competing in this high-value segment.\n\nLarge loss restoration in Australia is a commercially significant market segment. Commercial and strata water damage events, post-storm recovery projects, and industrial loss events regularly generate project values from $100,000 to several million dollars. Business operators who have the systems, certification, documentation capability, and equipment relationships to credibly respond to large loss events operate in a substantially higher-value market than those limited to residential losses.\n\nThe course covers: project management structure for large loss events, equipment logistics and specialist subcontractor management, insurer and loss adjuster relationship management for complex claims, documentation systems for multi-week and multi-area projects, business development strategies for accessing commercial and institutional large loss work, risk management and liability considerations for large scale restoration projects, and the financial management considerations specific to large loss projects including cash flow during extended projects and milestone invoicing.\n\nThis course is delivered in combination with advanced technical content covering desiccant drying systems, large building structural drying, industrial and commercial facility-specific drying considerations, and multi-trade coordination on complex restoration projects.",
    "provider": {
     "@type": "Organization",
     "name": "CARSI",
@@ -3485,7 +3471,6 @@
   "keywords": [
    "Microbe Clean Basic Understanding Course",
    "microbe clean basic understanding",
-   "CARSI course",
    "microbe clean training",
    "basic understanding course"
   ],
@@ -3578,7 +3563,7 @@
   "faq": [
    {
     "q": "What does the Refrigerant Dehumidifiers for Water Loss Restoration course cover?",
-    "a": "This course provides the technical grounding needed to use refrigerant dehumidifiers as precision drying tools, not just equipment you put in a room and hope for the best.; Topics covered: refrigerant dehumidifier operating principles, low grain refrigerant technology, dehumidifier sizing calculations, temperature and efficiency relationships, refrigerant types and their implications, essential accessories, maintenance procedures, practical application scenarios, and safety requirements.; Standards applied: IICRC S500, IICRC S520, Australian Refrigeration and Air Conditioning (RAC) regulations, Safe Work Australia."
+    "a": "This course provides the technical grounding needed to use refrigerant dehumidifiers as precision drying tools, not just equipment you put in a room and hope for the best.\n\nTopics covered: refrigerant dehumidifier operating principles, low grain refrigerant technology, dehumidifier sizing calculations, temperature and efficiency relationships, refrigerant types and their implications, essential accessories, maintenance procedures, practical application scenarios, and safety requirements.\n\nStandards applied: IICRC S500, IICRC S520, Australian Refrigeration and Air Conditioning (RAC) regulations, Safe Work Australia."
    },
    {
     "q": "What does the Refrigerant Dehumidifiers for Water Loss Restoration course help learners understand?",
@@ -3589,7 +3574,7 @@
    "@context": "https://schema.org",
    "@type": "Course",
    "name": "Refrigerant Dehumidifiers for Water Loss Restoration",
-   "description": "The refrigerant dehumidifier is the primary moisture removal tool in structural drying. Understanding how it works, how to size it correctly, how to operate it at peak efficiency, and how to maintain it properly directly determines the speed and cost of every water loss restoration you attend. This course provides the technical grounding needed to use refrigerant dehumidifiers as precision drying tools, not just equipment you put in a room and hope for the best.; Topics covered: refrigerant dehumidifier operating principles, low grain refrigerant technology, dehumidifier sizing calculations, temperature and efficiency relationships, refrigerant types and their implications, essential accessories, maintenance procedures, practical application scenarios, and safety requirements.; Standards applied: IICRC S500, IICRC S520, Australian Refrigeration and Air Conditioning (RAC) regulations, Safe Work Australia.",
+   "description": "The refrigerant dehumidifier is the primary moisture removal tool in structural drying. Understanding how it works, how to size it correctly, how to operate it at peak efficiency, and how to maintain it properly directly determines the speed and cost of every water loss restoration you attend. This course provides the technical grounding needed to use refrigerant dehumidifiers as precision drying tools, not just equipment you put in a room and hope for the best.\n\nTopics covered: refrigerant dehumidifier operating principles, low grain refrigerant technology, dehumidifier sizing calculations, temperature and efficiency relationships, refrigerant types and their implications, essential accessories, maintenance procedures, practical application scenarios, and safety requirements.\n\nStandards applied: IICRC S500, IICRC S520, Australian Refrigeration and Air Conditioning (RAC) regulations, Safe Work Australia.",
    "provider": {
     "@type": "Organization",
     "name": "CARSI",
@@ -3616,7 +3601,6 @@
   "keywords": [
    "Restoration Project Management & Client Communication — Premium",
    "restoration project management premium",
-   "CARSI course",
    "restoration project training",
    "communication premium course"
   ],
@@ -3702,7 +3686,6 @@
   "keywords": [
    "Safe Work Method Statements (SWMS) Course",
    "safe work method statements swms",
-   "CARSI course",
    "safe work training",
    "statements swms course"
   ],
@@ -3743,7 +3726,6 @@
   "keywords": [
    "Safety Data Sheet (SDS) Course",
    "safety data sheet sds",
-   "CARSI course",
    "safety data training",
    "sheet sds course"
   ],
@@ -3784,7 +3766,6 @@
   "keywords": [
    "Standard Operating Procedures (SOP) Course",
    "standard operating procedures sop",
-   "CARSI course",
    "standard operating training",
    "procedures sop course"
   ],
@@ -3836,14 +3817,14 @@
   "faq": [
    {
     "q": "What does the Tile Cleaning for Carpet Cleaners course cover?",
-    "a": "Understand the importance of tile cleaning in addition to carpet cleaning.; Learn the different types of tiles and their specific cleaning needs.; Master the chemistry behind cleaning solutions.; Develop skills for sealing tiles and grout.; Explore maintenance practices and strategies for upselling services."
+    "a": "Understand the importance of tile cleaning in addition to carpet cleaning.\n\nLearn the different types of tiles and their specific cleaning needs.\n\nMaster the chemistry behind cleaning solutions.\n\nDevelop skills for sealing tiles and grout.\n\nExplore maintenance practices and strategies for upselling services."
    }
   ],
   "courseJsonLd": {
    "@context": "https://schema.org",
    "@type": "Course",
    "name": "Tile Cleaning for Carpet Cleaners",
-   "description": "Understand the importance of tile cleaning in addition to carpet cleaning.; Learn the different types of tiles and their specific cleaning needs.; Master the chemistry behind cleaning solutions.; Develop skills for sealing tiles and grout.; Explore maintenance practices and strategies for upselling services.",
+   "description": "Understand the importance of tile cleaning in addition to carpet cleaning.\n\nLearn the different types of tiles and their specific cleaning needs.\n\nMaster the chemistry behind cleaning solutions.\n\nDevelop skills for sealing tiles and grout.\n\nExplore maintenance practices and strategies for upselling services.",
    "provider": {
     "@type": "Organization",
     "name": "CARSI",
@@ -3870,7 +3851,6 @@
   "keywords": [
    "Using ATP to Create Protocols",
    "using atp create protocols",
-   "CARSI course",
    "using atp training",
    "create protocols course"
   ],

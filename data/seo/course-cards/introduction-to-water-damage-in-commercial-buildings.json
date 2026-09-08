@@ -17,7 +17,7 @@
   "faq": [
     {
       "q": "What does the Introduction to Water Damage in Commercial Buildings course cover?",
-      "a": "A restoration professional who understands the specific characteristics of commercial water damage is better equipped to assess, scope, and manage these high-value, high-complexity jobs to a successful outcome.; Topics covered: common causes of water damage in commercial buildings, major building system vulnerabilities, the business and financial impacts of commercial water losses, drying strategy considerations specific to commercial environments, and reconstruction and reinstatement factors.; Standards applied: IICRC S500, Building Code of Australia (BCA/NCC), Safe Work Australia Model WHS Regulations, relevant state commercial tenancy legislation."
+      "a": "A restoration professional who understands the specific characteristics of commercial water damage is better equipped to assess, scope, and manage these high-value, high-complexity jobs to a successful outcome.\n\nTopics covered: common causes of water damage in commercial buildings, major building system vulnerabilities, the business and financial impacts of commercial water losses, drying strategy considerations specific to commercial environments, and reconstruction and reinstatement factors.\n\nStandards applied: IICRC S500, Building Code of Australia (BCA/NCC), Safe Work Australia Model WHS Regulations, relevant state commercial tenancy legislation."
     },
     {
       "q": "What is the focus of the Introduction to Water Damage in Commercial Buildings course?",
@@ -28,7 +28,7 @@
     "@context": "https://schema.org",
     "@type": "Course",
     "name": "Introduction to Water Damage in Commercial Buildings",
-    "description": "Commercial water damage events differ from residential losses in scale, complexity, stakeholder management requirements, business interruption impact, and regulatory compliance obligations. A restoration professional who understands the specific characteristics of commercial water damage is better equipped to assess, scope, and manage these high-value, high-complexity jobs to a successful outcome.; Topics covered: common causes of water damage in commercial buildings, major building system vulnerabilities, the business and financial impacts of commercial water losses, drying strategy considerations specific to commercial environments, and reconstruction and reinstatement factors.; Standards applied: IICRC S500, Building Code of Australia (BCA/NCC), Safe Work Australia Model WHS Regulations, relevant state commercial tenancy legislation.",
+    "description": "Commercial water damage events differ from residential losses in scale, complexity, stakeholder management requirements, business interruption impact, and regulatory compliance obligations. A restoration professional who understands the specific characteristics of commercial water damage is better equipped to assess, scope, and manage these high-value, high-complexity jobs to a successful outcome.\n\nTopics covered: common causes of water damage in commercial buildings, major building system vulnerabilities, the business and financial impacts of commercial water losses, drying strategy considerations specific to commercial environments, and reconstruction and reinstatement factors.\n\nStandards applied: IICRC S500, Building Code of Australia (BCA/NCC), Safe Work Australia Model WHS Regulations, relevant state commercial tenancy legislation.",
     "provider": {
       "@type": "Organization",
       "name": "CARSI",
