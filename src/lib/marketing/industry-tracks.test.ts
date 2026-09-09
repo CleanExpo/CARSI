@@ -11,7 +11,14 @@ import {
   hospitalityRecommendedSlugs,
   hospitalitySearchTopics,
 } from './industry-track1-topics';
-import { facilityManagementFaqs, facilityManagementSearchTopics } from './industry-track2';
+import {
+  facilityManagementContactHref,
+  facilityManagementFaqs,
+  facilityManagementProofPackHref,
+  facilityManagementRecommendedSlugs,
+  facilityManagementSearchTopics,
+  facilityManagementSiteLinks,
+} from './industry-track2';
 
 const DESIGNATION_ACRONYM = /\b(WRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST|RRT)\b/;
 
@@ -46,11 +53,7 @@ describe('Track 1 industry SEO', () => {
   });
 
   it('Track 1 selling strings do not brand CARSI courses with IICRC designation acronyms', () => {
-    const text = [
-      ...healthcareSearchTopics,
-      ...agedCareSearchTopics,
-      ...hospitalitySearchTopics,
-    ]
+    const text = [...healthcareSearchTopics, ...agedCareSearchTopics, ...hospitalitySearchTopics]
       .flatMap((topic) => [topic.title, topic.body, topic.cta])
       .join('\n');
     expect(DESIGNATION_ACRONYM.test(text)).toBe(false);
@@ -79,5 +82,19 @@ describe('Track 2 facility management', () => {
 
   it('points managers at published prices, not a live team checkout promise', () => {
     expect(facilityManagementSearchTopics.some((topic) => topic.href === '/pricing')).toBe(true);
+  });
+
+  it('closes the enterprise loop: tagged contact, proof-pack, Track 1 sites and live course slugs', () => {
+    expect(facilityManagementContactHref).toContain('source=facility-management');
+    expect(facilityManagementProofPackHref).toBe('/dashboard/student/credentials');
+    expect(facilityManagementSiteLinks.map((item) => item.href)).toEqual([
+      '/industries/healthcare',
+      '/industries/aged-care',
+      '/industries/hospitality',
+    ]);
+    expect(facilityManagementRecommendedSlugs.length).toBeGreaterThan(8);
+    for (const slug of facilityManagementRecommendedSlugs) {
+      expect(catalogueSlugs.has(slug), slug).toBe(true);
+    }
   });
 });
