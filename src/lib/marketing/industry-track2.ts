@@ -1,4 +1,9 @@
-import type { IndustrySearchTopic } from '@/lib/marketing/industry-track1-topics';
+import {
+  agedCareRecommendedSlugs,
+  healthcareRecommendedSlugs,
+  hospitalityRecommendedSlugs,
+  type IndustrySearchTopic,
+} from '@/lib/marketing/industry-track1-topics';
 
 /**
  * Track 2: facility-management contract managers and the crews they put on
@@ -61,4 +66,39 @@ export const facilityManagementFaqs = [
     answer:
       'Learners receive a CARSI completion record. An employer proof-pack can list completed courses and IICRC CEC hours only for courses the IICRC has approved. CARSI training does not replace NSQHS, aged-care or hotel site induction.',
   },
+  {
+    question: 'How does a manager get the proof-pack?',
+    answer:
+      'Each learner opens Dashboard, Credentials, then downloads or shares their training record. A manager does not get a pack until a learner completes courses and shares it. Unapproved courses contribute no CEC hours.',
+  },
 ];
+
+export const facilityManagementContactHref =
+  '/contact?source=facility-management&topic=team%20seats%20for%20hospital%2C%20aged-care%20or%20hotel%20crews';
+
+export const facilityManagementProofPackHref = '/dashboard/student/credentials';
+
+export const facilityManagementSiteLinks = [
+  {
+    href: '/industries/healthcare',
+    label: 'Healthcare',
+    detail: 'Hospital and clinic crews — mould, indoor air quality and commercial water damage.',
+  },
+  {
+    href: '/industries/aged-care',
+    label: 'Aged care',
+    detail: 'Occupied homes — mould, carpet hygiene and PPE around residents.',
+  },
+  {
+    href: '/industries/hospitality',
+    label: 'Hotels and resorts',
+    detail: 'Guest inventory — water damage, odour control and structural drying.',
+  },
+] as const;
+
+/** Unique live slugs from the three Track 1 site pathways, marketing order kept. */
+export const facilityManagementRecommendedSlugs = [
+  ...healthcareRecommendedSlugs,
+  ...agedCareRecommendedSlugs,
+  ...hospitalityRecommendedSlugs,
+].filter((slug, index, all) => all.indexOf(slug) === index);
