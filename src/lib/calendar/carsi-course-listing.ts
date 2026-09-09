@@ -47,6 +47,8 @@ export type CalendarCourseEntry = {
   /** Human-readable availability. Never a date — see the module note. */
   availability: string;
   isFree: boolean;
+  /** Display-only AUD label. Never a date. */
+  priceLabel: string | null;
 };
 
 /** Shown when a course carries no category. 29 of 80 live courses had none on 2026-09-07. */
@@ -58,6 +60,12 @@ function priceIsFree(course: CalendarCourse): boolean {
   return typeof n === 'number' && Number.isFinite(n) && n <= 0;
 }
 
+function formatAudPrice(price: CalendarCourse['price_aud']): string | null {
+  const n = typeof price === 'string' ? Number(price) : price;
+  if (typeof n !== 'number' || !Number.isFinite(n) || n <= 0) return null;
+  return `$${Math.round(n)} AUD`;
+}
+
 /**
  * Turn published courses into calendar entries.
  *
@@ -66,7 +74,8 @@ function priceIsFree(course: CalendarCourse): boolean {
  */
 export function buildCalendarCourseEntries(courses: CalendarCourse[]): CalendarCourseEntry[] {
   const safe = courses.filter(
-    (c) => !isExcludedEvent({ title: c.title, organiser_name: null, event_url: `/courses/${c.slug}` }),
+    (c) =>
+      !isExcludedEvent({ title: c.title, organiser_name: null, event_url: `/courses/${c.slug}` })
   );
 
   return safe
@@ -79,13 +88,14 @@ export function buildCalendarCourseEntries(courses: CalendarCourse[]): CalendarC
       topic: c.category?.trim() || UNCATEGORISED_TOPIC,
       availability: 'Start any time — self-paced',
       isFree: priceIsFree(c),
+      priceLabel: priceIsFree(c) ? null : formatAudPrice(c.price_aud),
     }))
     .sort((a, b) => a.title.localeCompare(b.title, 'en-AU'));
 }
 
 /** Group entries by topic for display, topics in alphabetical order. */
 export function groupCoursesByTopic(
-  entries: CalendarCourseEntry[],
+  entries: CalendarCourseEntry[]
 ): Array<{ topic: string; courses: CalendarCourseEntry[] }> {
   const byTopic = new Map<string, CalendarCourseEntry[]>();
   for (const e of entries) {
