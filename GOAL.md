@@ -113,3 +113,7 @@ plus 4-week rolling course sales. Every session reports RWR movement or names th
 - 2026-09-05: Gate 0. Pulled WS1/legal/licence commits hardened: subscribe copy now says
   IICRC CEC Accredited (not course-level CEC), refund and support sit in the sitemap and footer,
   catalogue queries are capped, midnight cron also purges the events page. RWR unchanged.
+- 2026-09-09: Gate 0. Track 1 industry SEO is closed on the hub (course-area chips, not
+  IICRC designation acronyms) and Track 2 is live as `/industries/facility-management` for
+  contract managers and the crews on hospital, aged-care and hotel sites. Four new full
+  courses remain blocked on Mona and founder review. RWR unchanged.
