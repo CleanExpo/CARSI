@@ -760,3 +760,15 @@ This session hardened the leftovers rather than reopening those PRs:
 
 Ops, not code: confirm GitHub `CRON_SECRET` matches the DigitalOcean app secret. Do not invent
 Melbourne/Sydney roadshow dates (DECISIONS #18). CEC hours stay founder-approved only.
+
+## Discoveries — 2026-09-09 Track 1 closed, Track 2 started
+
+Track 1 (technician SEO for healthcare, aged care, hospitality) is complete as pages plus
+hub chips. The industries index no longer prints IICRC designation acronyms. Four new full
+courses stay blocked on Mona’s source files and founder review; each still starts at
+`cecHours: 0`.
+
+Track 2 is the enterprise path Phil asked for: `/industries/facility-management`. It sells
+team records and published team prices to contract managers without naming global FM firms
+as CARSI clients. Team checkout remains coming-soon (DECISIONS #2). Do not invent
+partnerships with named facility-management groups.
