@@ -116,17 +116,17 @@ export default function RestorationTrainingCostPage() {
 
       <main className="mx-auto max-w-3xl px-4 py-14">
         <header>
-          <p className="text-sm font-semibold uppercase tracking-wide text-[#7a3500]">
+          <p className="text-sm font-semibold tracking-wide text-[#7a3500] uppercase">
             Australian pricing, in Australian dollars
           </p>
-          <h1 className="mt-3 text-4xl font-bold leading-tight text-slate-900">
+          <h1 className="mt-3 text-4xl leading-tight font-bold text-slate-900">
             What restoration training actually costs in Australia
           </h1>
           <p className="mt-5 text-lg leading-relaxed text-slate-700">
-            Training gets sold with the price at the bottom of the page, so here it is at the
-            top. Below is one published Australian course fee, read off the provider&rsquo;s own
-            booking page, set beside what a CARSI course costs. Every figure is dated and
-            linked, so you can check it rather than take our word for it.
+            Training gets sold with the price at the bottom of the page, so here it is at the top.
+            Below is one published Australian course fee, read off the provider&rsquo;s own booking
+            page, set beside what a CARSI course costs. Every figure is dated and linked, so you can
+            check it rather than take our word for it.
           </p>
         </header>
 
@@ -138,12 +138,12 @@ export default function RestorationTrainingCostPage() {
             First, the thing most comparisons get wrong
           </h2>
           <p className="mt-3 text-[15px] leading-relaxed text-[#7a3500]">
-            A certification course and a continuing education course are not competing products.
-            You buy an IICRC certification once per discipline, from an IICRC-approved school
-            and its examination. Keeping that certification current is a separate, recurring
-            cost for the rest of your career. CARSI is an accredited IICRC CEC provider and sits
-            on the recurring side. CARSI does not deliver IICRC certification, and no CARSI
-            course will make you IICRC certified.
+            A certification course and a continuing education course are not competing products. You
+            buy an IICRC certification once per discipline, from an IICRC-approved school and its
+            examination. Keeping that certification current is a separate, recurring cost for the
+            rest of your career. CARSI is an accredited IICRC CEC provider and sits on the recurring
+            side. CARSI does not deliver IICRC certification, and no CARSI course will make you
+            IICRC certified.
           </p>
           <p className="mt-3 text-[15px] leading-relaxed text-[#7a3500]">
             So the honest question is not &ldquo;which is cheaper&rdquo;. It is: once you hold a
@@ -156,18 +156,59 @@ export default function RestorationTrainingCostPage() {
             The numbers
           </h2>
           <p className="mt-3 text-[15px] leading-relaxed text-slate-700">
-            Read these as two separate line items, not as two prices for the same thing. The
-            first is a one-off certification bought from an IICRC-approved school. The second is
+            Read these as two separate line items, not as two prices for the same thing. The first
+            is a one-off certification bought from an IICRC-approved school. The second is
             continuing education, which recurs for as long as you hold the certification.
           </p>
 
-          <div className="mt-6 overflow-x-auto">
+          <div className="mt-6 space-y-4 md:hidden">
+            <article className="rounded-xl border border-slate-200 bg-white p-4">
+              <p className="text-xs font-bold tracking-wide text-slate-500 uppercase">
+                One-off · certification
+              </p>
+              <h3 className="mt-2 text-base font-semibold text-slate-900">{COMPARISON.course}</h3>
+              <p className="mt-1 text-sm text-slate-600">
+                {COMPARISON.provider} · {COMPARISON.format}
+              </p>
+              <p className="mt-3 text-slate-800">
+                <strong>${COMPARISON.courseFee} incl GST</strong>
+                <span className="mt-1 block text-sm text-slate-600">
+                  plus a ${COMPARISON.examFee} exam fee paid to the IICRC
+                </span>
+                <span className="mt-1 block text-sm font-semibold text-slate-800">
+                  ${COMPARISON_TOTAL} in total
+                </span>
+              </p>
+              <p className="mt-3 text-sm text-slate-700">
+                One IICRC certification, bought once. Three days of your week.
+              </p>
+            </article>
+            <article className="rounded-xl border border-slate-200 bg-white p-4">
+              <p className="text-xs font-bold tracking-wide text-slate-500 uppercase">
+                Recurring · continuing education
+              </p>
+              <h3 className="mt-2 text-base font-semibold text-slate-900">A CARSI course</h3>
+              <p className="mt-1 text-sm text-slate-600">Online, taken in your own time</p>
+              <p className="mt-3 text-slate-800">
+                <strong>{PER_COURSE_LABEL}</strong>
+                <span className="mt-1 block text-sm text-slate-600">
+                  bought one course at a time
+                </span>
+              </p>
+              <p className="mt-3 text-sm text-slate-700">
+                A CARSI Southern Hemisphere Restoration Designation, and any IICRC CECs that course
+                carries tracked in your dashboard. No days off the tools.
+              </p>
+            </article>
+          </div>
+
+          <div className="mt-6 hidden overflow-x-auto md:block">
             <table className="w-full border-collapse text-left text-[15px]">
               <caption className="sr-only">
-                What each purchase costs. These are two different purchases, not two prices for
-                the same thing. A certification is bought once per discipline,
-                from an IICRC-approved school and its examination.
-                Continuing education recurs for as long as the certification is held.
+                What each purchase costs. These are two different purchases, not two prices for the
+                same thing. A certification is bought once per discipline, from an IICRC-approved
+                school and its examination. Continuing education recurs for as long as the
+                certification is held.
               </caption>
               <thead>
                 <tr className="border-b border-slate-300">
@@ -185,7 +226,7 @@ export default function RestorationTrainingCostPage() {
               <tbody className="align-top">
                 <tr className="border-b border-slate-200">
                   <th scope="row" className="py-4 pr-4 font-medium text-slate-900">
-                    <span className="mb-1 block text-xs font-bold uppercase tracking-wide text-slate-500">
+                    <span className="mb-1 block text-xs font-bold tracking-wide text-slate-500 uppercase">
                       One-off &middot; certification
                     </span>
                     {COMPARISON.course}
@@ -208,7 +249,7 @@ export default function RestorationTrainingCostPage() {
                 </tr>
                 <tr>
                   <th scope="row" className="py-4 pr-4 font-medium text-slate-900">
-                    <span className="mb-1 block text-xs font-bold uppercase tracking-wide text-slate-500">
+                    <span className="mb-1 block text-xs font-bold tracking-wide text-slate-500 uppercase">
                       Recurring &middot; continuing education
                     </span>
                     A CARSI course
@@ -241,8 +282,8 @@ export default function RestorationTrainingCostPage() {
             >
               the provider&rsquo;s published booking page
             </a>{' '}
-            on {CHECKED_ON}. It is one Australian provider and one course, quoted so you can
-            verify it — not a survey of the market, and not the only option worth looking at.
+            on {CHECKED_ON}. It is one Australian provider and one course, quoted so you can verify
+            it — not a survey of the market, and not the only option worth looking at.
           </p>
         </section>
 
@@ -251,15 +292,15 @@ export default function RestorationTrainingCostPage() {
             The cost that never appears on the invoice
           </h2>
           <p className="mt-4 text-[15px] leading-relaxed text-slate-700">
-            A three-day course costs you the fee plus three days you were not earning. We are
-            not going to invent a day rate for you, because yours is the only one that matters.
-            Take what your crew bills in a day, multiply by three, and add it to the course fee.
-            For most restoration businesses that second number is the larger of the two.
+            A three-day course costs you the fee plus three days you were not earning. We are not
+            going to invent a day rate for you, because yours is the only one that matters. Take
+            what your crew bills in a day, multiply by three, and add it to the course fee. For most
+            restoration businesses that second number is the larger of the two.
           </p>
           <p className="mt-4 text-[15px] leading-relaxed text-slate-700">
             That is the whole argument for online CECs. Not that classroom training is bad —
-            hands-on certification training is worth doing properly and in person. It is that
-            your <em>recurring</em> credit-keeping should not keep costing you days on site.
+            hands-on certification training is worth doing properly and in person. It is that your{' '}
+            <em>recurring</em> credit-keeping should not keep costing you days on site.
           </p>
         </section>
 
@@ -272,13 +313,13 @@ export default function RestorationTrainingCostPage() {
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <Link
-              className="rounded-md bg-[#7a3500] px-5 py-3 text-[15px] font-semibold text-white transition hover:bg-[#5e2900]"
+              className="inline-flex min-h-11 items-center justify-center rounded-md bg-[#7a3500] px-5 py-3 text-[15px] font-semibold text-white transition hover:bg-[#5e2900] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#7a3500]"
               href="/courses"
             >
               Browse courses
             </Link>
             <Link
-              className="rounded-md border border-slate-300 px-5 py-3 text-[15px] font-semibold text-slate-800 transition hover:border-slate-400"
+              className="inline-flex min-h-11 items-center justify-center rounded-md border border-slate-300 px-5 py-3 text-[15px] font-semibold text-slate-800 transition hover:border-slate-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-600"
               href="/pricing"
             >
               See all pricing
