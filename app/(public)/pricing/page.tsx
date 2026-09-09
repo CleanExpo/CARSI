@@ -104,8 +104,8 @@ export default function PricingPage() {
                 : 'Buy any course individually. Free Library for everyone — no card required. Yearly membership and Teams plans are coming soon.'}
             </p>
             <p className="mx-auto mt-4 max-w-2xl rounded-lg border border-[#f2cf8f] bg-[#fff8ed] px-4 py-3 text-sm leading-relaxed text-[#7a3500]">
-              CARSI courses carry CARSI Southern Hemisphere Restoration Designations. They are not
-              IICRC certification courses — IICRC certifications are obtained through IICRC-approved
+              CARSI courses carry CARSI Southern Hemisphere Restoration Designations. CARSI does not
+              deliver IICRC certification. IICRC certifications are obtained through IICRC-approved
               schools and examinations.
             </p>
           </section>
@@ -123,7 +123,14 @@ export default function PricingPage() {
               </h2>
               <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
                 See which courses suit learners maintaining CECs, refreshing knowledge across
-                multiple disciplines, or planning beginner through advanced study over time.
+                multiple disciplines, or planning beginner through advanced study over time.{' '}
+                <Link
+                  href="/restoration-training-cost-australia"
+                  className="font-medium text-[#7a3500] underline underline-offset-2 hover:text-[#5e2900]"
+                >
+                  What training costs in Australia
+                </Link>{' '}
+                (certification versus continuing education) is a separate page.
               </p>
             </div>
             <Link
