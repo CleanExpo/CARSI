@@ -25,6 +25,7 @@ const industries = [
 const platformLinks = [
   { label: 'Courses', href: '/courses' },
   { label: 'Pathways', href: '/pathways' },
+  { label: 'Training costs', href: '/restoration-training-cost-australia' },
   { label: 'CCW Roadshow', href: '/events/ccw-roadshow' },
   { label: 'CCW Workshop', href: '/ccw-training' },
   { label: 'Start Smart', href: '/start-carpet-cleaning-business' },
