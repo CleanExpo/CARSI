@@ -24,6 +24,16 @@ function buildLeadContext(params: Awaited<ContactPageProps['searchParams']>): Co
     return undefined;
   }
 
+  if (source === 'facility-management') {
+    return {
+      source,
+      topic: topic ?? 'team seats for hospital, aged-care or hotel crews',
+      pageUrl: '/industries/facility-management',
+      initialMessage:
+        'Hi CARSI, I would like to start team seats for crews who work hospital, aged-care or hotel sites. Please use the published team prices on the pricing page.',
+    };
+  }
+
   if (source === 'professional-directory' && intent === 'directory-notify') {
     return {
       source,
@@ -101,7 +111,9 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
                 <p className="text-[10px] font-semibold tracking-wide text-[#146fc2] uppercase">
                   {leadContext.source === 'professional-directory'
                     ? 'Directory enquiry'
-                    : 'Start Smart enquiry'}
+                    : leadContext.source === 'facility-management'
+                      ? 'Team seats enquiry'
+                      : 'Start Smart enquiry'}
                 </p>
                 <h2 className="mt-2 text-sm font-semibold text-slate-950">
                   Routed to the right conversation
@@ -109,7 +121,9 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
                 <p className="mt-2 text-xs leading-relaxed text-slate-600">
                   {leadContext.source === 'professional-directory'
                     ? 'This enquiry is tagged for the professional directory launch list.'
-                    : 'This enquiry includes the source, topic and pathway so CARSI can quickly see what guidance you need.'}
+                    : leadContext.source === 'facility-management'
+                      ? 'This enquiry is tagged for team seats on hospital, aged-care or hotel contracts.'
+                      : 'This enquiry includes the source, topic and pathway so CARSI can quickly see what guidance you need.'}
                 </p>
               </div>
             ) : null}
