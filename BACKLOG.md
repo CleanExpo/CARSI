@@ -775,3 +775,12 @@ closes the loop — homepage sector, pricing banner, tagged `/contact` enquiry, 
 paths, recommended live courses, and the signed-in employer proof-pack. It still does not
 name global FM firms as CARSI clients. Team checkout remains coming-soon (DECISIONS #2).
 Do not invent partnerships with named facility-management groups.
+
+## Discoveries — 2026-09-09 merged Phil’s 13 without overwriting
+
+Pulled `origin/main` with a merge (no rebase of his history). No file overlap with local
+Track 1/2. His live CEC cron, seed fail-closed, roadshow dates, checkout guards, course
+cards and training-cost comparison figures were left as he pushed them. Local harden is
+findability only: sitemap, footer, pricing link, mobile layout on the cost page, calendar
+AUD labels on his course list. Do not “correct” his Brisbane/Sydney dates or CEC cron
+status codes — those are operations.

@@ -120,3 +120,6 @@ e2e/` matches nothing across all five specs, and the only checkout call under te
   page, tagged team-seat contact, pricing banner, homepage sector, Track 1 site paths,
   recommended live courses and the employer proof-pack. Team checkout stays coming-soon.
   Four new full courses remain blocked on Mona and founder review. RWR unchanged.
+- 2026-09-09: Gate 0. Merged Phil’s 13 commits (licence guards, live CEC cron, roadshow
+  dates, AU training-cost page, 80 course cards) without overwriting them. Local Track 1/2
+  work stayed. Hardened findability and calendar price labels only. RWR unchanged.
