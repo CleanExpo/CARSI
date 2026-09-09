@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import {
   buildCalendarCourseEntries,
@@ -52,7 +52,10 @@ describe('CARSI course entries for the calendar', () => {
     ]);
     const entries = buildCalendarCourseEntries([course(), ...excluded]);
     expect(entries).toHaveLength(1);
-    const titles = entries.map((e) => e.title).join(' ').toLowerCase();
+    const titles = entries
+      .map((e) => e.title)
+      .join(' ')
+      .toLowerCase();
     for (const term of EXCLUDED_TERMS) expect(titles).not.toContain(term);
   });
 
@@ -78,11 +81,25 @@ describe('CARSI course entries for the calendar', () => {
   });
 
   it('reads free correctly from either the flag or the price', () => {
-    expect(buildCalendarCourseEntries([course({ is_free: true, price_aud: 0 })])[0].isFree).toBe(true);
-    expect(buildCalendarCourseEntries([course({ is_free: false, price_aud: '0' })])[0].isFree).toBe(true);
-    expect(buildCalendarCourseEntries([course({ is_free: false, price_aud: 49 })])[0].isFree).toBe(false);
+    expect(buildCalendarCourseEntries([course({ is_free: true, price_aud: 0 })])[0].isFree).toBe(
+      true
+    );
+    expect(buildCalendarCourseEntries([course({ is_free: false, price_aud: '0' })])[0].isFree).toBe(
+      true
+    );
+    expect(buildCalendarCourseEntries([course({ is_free: false, price_aud: 49 })])[0].isFree).toBe(
+      false
+    );
+    expect(
+      buildCalendarCourseEntries([course({ is_free: false, price_aud: 29 })])[0].priceLabel
+    ).toBe('$29 AUD');
+    expect(
+      buildCalendarCourseEntries([course({ is_free: true, price_aud: 0 })])[0].priceLabel
+    ).toBe(null);
     // A malformed price must not read as free — that would advertise a paid course at no cost.
-    expect(buildCalendarCourseEntries([course({ is_free: false, price_aud: 'not-a-number' })])[0].isFree).toBe(false);
+    expect(
+      buildCalendarCourseEntries([course({ is_free: false, price_aud: 'not-a-number' })])[0].isFree
+    ).toBe(false);
   });
 
   it('orders alphabetically so the page does not reshuffle on every admin save', () => {
@@ -106,7 +123,7 @@ describe('grouping by topic', () => {
         course({ slug: 'w1', title: 'Water One', category: 'Water Damage Restoration' }),
         course({ slug: 'm1', title: 'Mould One', category: 'Microbial & Infection Control' }),
         course({ slug: 'w2', title: 'Water Two', category: 'Water Damage Restoration' }),
-      ]),
+      ])
     );
     expect(grouped.map((g) => g.topic)).toEqual([
       'Microbial & Infection Control',
