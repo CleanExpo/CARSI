@@ -7,13 +7,18 @@ import {
   IndustryFAQSection,
   IndustryHero,
   IndustryPageLayout,
+  IndustryProofPack,
+  IndustryRecommendedCourses,
   IndustrySearchTopics,
+  IndustrySitePathways,
   IndustryWhySection,
 } from '@/components/industries';
 import { FAQSchema } from '@/components/seo/JsonLd';
 import { buildIndustryMetadata } from '@/lib/marketing/industry-metadata';
 import {
+  facilityManagementContactHref,
   facilityManagementFaqs,
+  facilityManagementRecommendedSlugs,
   facilityManagementSearchTopics,
 } from '@/lib/marketing/industry-track2';
 import { TEAM_TIERS } from '@/lib/lms/pricing-tiers';
@@ -128,6 +133,16 @@ export default async function FacilityManagementIndustryPage() {
         topics={facilityManagementSearchTopics}
       />
 
+      <IndustrySitePathways />
+
+      <IndustryRecommendedCourses
+        industryName="Facility management"
+        disciplineList="Mould, indoor air quality, water damage, carpet, drying and odour control"
+        courseSlugs={facilityManagementRecommendedSlugs}
+      />
+
+      <IndustryProofPack />
+
       <IndustryCrossLinks currentSlug="healthcare" />
 
       <IndustryEvidenceLinks links={evidenceLinks} />
@@ -140,7 +155,7 @@ export default async function FacilityManagementIndustryPage() {
         price={starter?.priceLabel ?? '$299 / year'}
         description="Starter, Growth and Full library prices are on the pricing page. Contact CARSI to start seats. Technicians can still buy a single IICRC CEC Accredited course."
         ctaText="Talk to CARSI"
-        ctaHref="/contact"
+        ctaHref={facilityManagementContactHref}
         secondaryHref="/pricing"
         secondaryText="See team prices"
         accentColor={ACCENT_COLOR}
