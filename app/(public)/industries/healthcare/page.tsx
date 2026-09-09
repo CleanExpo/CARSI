@@ -180,6 +180,8 @@ export default async function HealthcareIndustryPage() {
         description="Mould, indoor air quality and water damage courses for technicians servicing hospitals. Ask about team seats if you send more than one person."
         ctaText="Talk to CARSI"
         ctaHref="/contact"
+        secondaryHref="/industries/facility-management"
+        secondaryText="Facility managers"
         accentColor={ACCENT_COLOR}
       />
     </IndustryPageLayout>
