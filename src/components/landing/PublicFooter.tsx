@@ -18,8 +18,8 @@ import { AcronymTooltip } from '@/components/ui/AcronymTooltip';
 const industries = [
   { slug: 'healthcare', label: 'Healthcare' },
   { slug: 'hospitality', label: 'Hotels & Resorts' },
+  { slug: 'facility-management', label: 'Facility management' },
   { slug: 'government-defence', label: 'Government & Defence' },
-  { slug: 'commercial-cleaning', label: 'Commercial Cleaning' },
 ];
 
 const platformLinks = [
